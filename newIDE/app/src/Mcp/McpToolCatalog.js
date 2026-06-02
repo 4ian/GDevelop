@@ -62,6 +62,552 @@ const objectInSceneSchema = {
   additionalProperties: true,
 };
 
+const toolNameSchema = {
+  type: 'object',
+  properties: {
+    tool_name: {
+      type: 'string',
+      description:
+        'Optional MCP tool name. When omitted, returns information for every tool.',
+    },
+  },
+  additionalProperties: false,
+};
+
+const addOrUpdateResourceSchema = {
+  type: 'object',
+  properties: {
+    name: {
+      type: 'string',
+      description: 'Resource name as stored in the GDevelop project.',
+    },
+    file: {
+      type: 'string',
+      description:
+        'Resource file path or URL. For local PNG imports, pass the relative or absolute PNG path.',
+    },
+    kind: {
+      type: 'string',
+      description:
+        'Resource kind, for example image, audio, font, video, json, bitmapFont, model3D, atlas, spine, or javascript.',
+    },
+    metadata: {
+      type: 'object',
+      description:
+        'Optional resource-specific metadata. For image resources, supports { smooth: boolean }.',
+      additionalProperties: true,
+    },
+    replace_kind: {
+      type: 'boolean',
+      description:
+        'When true, recreate an existing resource if it exists with a different kind.',
+    },
+  },
+  required: ['name', 'file', 'kind'],
+  additionalProperties: true,
+};
+
+const spriteAnimationFrameSchema = {
+  type: 'object',
+  properties: {
+    image: {
+      type: 'string',
+      description:
+        'Image resource name for the frame. resourceName and imageName aliases are also accepted.',
+    },
+    origin: {
+      type: 'object',
+      properties: {
+        x: { type: 'number' },
+        y: { type: 'number' },
+      },
+      additionalProperties: false,
+    },
+    center: {
+      type: 'object',
+      properties: {
+        x: { type: 'number' },
+        y: { type: 'number' },
+      },
+      additionalProperties: false,
+    },
+    fullImageCollisionMask: {
+      type: 'boolean',
+      description: 'Use the whole image as collision mask.',
+    },
+    collisionMask: {
+      type: 'array',
+      description:
+        'Array of polygons, each polygon being an array of { x, y } vertices.',
+      items: {
+        type: 'array',
+        items: {
+          type: 'object',
+          properties: {
+            x: { type: 'number' },
+            y: { type: 'number' },
+          },
+          required: ['x', 'y'],
+          additionalProperties: false,
+        },
+      },
+    },
+    points: {
+      type: 'array',
+      description: 'Optional custom points: [{ name, x, y }].',
+      items: {
+        type: 'object',
+        properties: {
+          name: { type: 'string' },
+          x: { type: 'number' },
+          y: { type: 'number' },
+        },
+        required: ['name', 'x', 'y'],
+        additionalProperties: false,
+      },
+    },
+  },
+  required: ['image'],
+  additionalProperties: true,
+};
+
+const setSpriteAnimationsSchema = {
+  type: 'object',
+  properties: {
+    scene_name: sceneNameSchema.properties.scene_name,
+    object_name: objectInSceneSchema.properties.object_name,
+    animations: {
+      type: 'array',
+      description:
+        'Complete Sprite animation list. Existing Sprite animations are replaced.',
+      items: {
+        type: 'object',
+        properties: {
+          name: { type: 'string' },
+          useMultipleDirections: { type: 'boolean' },
+          directions: {
+            type: 'array',
+            items: {
+              type: 'object',
+              properties: {
+                frames: {
+                  type: 'array',
+                  items: spriteAnimationFrameSchema,
+                },
+              },
+              required: ['frames'],
+              additionalProperties: true,
+            },
+          },
+          frames: {
+            type: 'array',
+            description:
+              'Shortcut for a single direction: [{ image, origin, center, collisionMask }].',
+            items: spriteAnimationFrameSchema,
+          },
+        },
+        additionalProperties: true,
+      },
+    },
+  },
+  required: ['scene_name', 'object_name', 'animations'],
+  additionalProperties: true,
+};
+
+const replaceObjectDefinitionSchema = {
+  type: 'object',
+  properties: {
+    scene_name: sceneNameSchema.properties.scene_name,
+    object_name: objectInSceneSchema.properties.object_name,
+    object_type: {
+      type: 'string',
+      description:
+        'Optional object type override. If omitted, serialized_object.type is used.',
+    },
+    serialized_object: {
+      type: 'object',
+      description:
+        'Complete serialized GDevelop object definition. Existing scene object is overwritten and type changes are allowed.',
+      additionalProperties: true,
+    },
+  },
+  required: ['scene_name', 'object_name', 'serialized_object'],
+  additionalProperties: true,
+};
+
+const setObjectPropertiesSchema = {
+  type: 'object',
+  properties: {
+    scene_name: sceneNameSchema.properties.scene_name,
+    object_name: objectInSceneSchema.properties.object_name,
+    properties: {
+      type: 'object',
+      description:
+        'Map of property names from inspect_object_properties to new values, for example { text: "Score: 0", characterSize: 36, color: "255;255;255" }.',
+      additionalProperties: true,
+    },
+  },
+  required: ['scene_name', 'object_name', 'properties'],
+  additionalProperties: true,
+};
+
+const put2dInstancesSchema = {
+  type: 'object',
+  properties: {
+    scene_name: sceneNameSchema.properties.scene_name,
+    operation: {
+      type: 'string',
+      description:
+        'Structured operation for instances array: create, update, delete/remove, or upsert. Existing legacy brush_kind payloads are still accepted.',
+    },
+    instances: {
+      type: 'array',
+      description:
+        'Structured instances to create/update/delete. Use describe_instances first to read ids for updates/deletes.',
+      items: {
+        type: 'object',
+        properties: {
+          id: {
+            type: 'string',
+            description:
+              'Short id from describe_instances. Required for update/delete.',
+          },
+          operation: {
+            type: 'string',
+            description:
+              'Optional per-instance operation overriding the top-level operation.',
+          },
+          object_name: { type: 'string' },
+          objectName: { type: 'string' },
+          x: { type: 'number' },
+          y: { type: 'number' },
+          z: { type: 'number' },
+          angle: { type: 'number' },
+          rotation: { type: 'number' },
+          rotationX: { type: 'number' },
+          rotationY: { type: 'number' },
+          layer: { type: 'string' },
+          layer_name: { type: 'string' },
+          zOrder: { type: 'number' },
+          z_order: { type: 'number' },
+          opacity: { type: 'number' },
+          width: { type: 'number' },
+          height: { type: 'number' },
+          depth: { type: 'number' },
+          customSize: {
+            type: 'object',
+            properties: {
+              width: { type: 'number' },
+              height: { type: 'number' },
+              depth: { type: 'number' },
+            },
+            additionalProperties: false,
+          },
+          custom_size: {
+            type: 'object',
+            properties: {
+              width: { type: 'number' },
+              height: { type: 'number' },
+              depth: { type: 'number' },
+            },
+            additionalProperties: false,
+          },
+          locked: { type: 'boolean' },
+          sealed: { type: 'boolean' },
+        },
+        additionalProperties: true,
+      },
+    },
+    object_name: {
+      type: 'string',
+      description: 'Legacy brush payload object name.',
+    },
+    layer_name: {
+      type: 'string',
+      description:
+        'Legacy brush payload layer name; empty string is base layer.',
+    },
+    brush_kind: {
+      type: 'string',
+      description:
+        'Legacy brush payload: point, line, grid, random_in_circle, erase, or none.',
+    },
+    brush_position: {
+      type: 'string',
+      description: 'Legacy brush payload "x,y".',
+    },
+    existing_instance_ids: {
+      type: 'string',
+      description: 'Legacy comma-separated ids from describe_instances.',
+    },
+  },
+  required: ['scene_name'],
+  additionalProperties: true,
+};
+
+const scenePatchSchema = {
+  type: 'object',
+  properties: {
+    scene_name: sceneNameSchema.properties.scene_name,
+    patch: {
+      type: 'array',
+      description:
+        'RFC-6902-style JSON patch subset for one serialized scene. Supports add, replace, remove with JSON pointer paths.',
+      items: {
+        type: 'object',
+        properties: {
+          op: {
+            type: 'string',
+            description: 'Patch operation: add, replace, or remove.',
+          },
+          path: {
+            type: 'string',
+            description: 'JSON pointer path, for example /objects/0/name.',
+          },
+          value: {
+            description: 'Value for add/replace.',
+          },
+        },
+        required: ['op', 'path'],
+        additionalProperties: true,
+      },
+    },
+    patch_file: {
+      type: 'string',
+      description:
+        'Optional local file containing the JSON patch array. Use instead of patch for large patches.',
+    },
+    dry_run: {
+      type: 'boolean',
+      description:
+        'When true, validate and return the patched serialized scene without applying it.',
+    },
+  },
+  required: ['scene_name'],
+  additionalProperties: true,
+};
+
+const inspectProjectResourcesSchema = {
+  type: 'object',
+  properties: {
+    include_serialized_project: {
+      type: 'boolean',
+      description:
+        'When true, include the full serialized project alongside resource audit results.',
+    },
+  },
+  additionalProperties: false,
+};
+
+const eventTargetSchema = {
+  type: 'object',
+  properties: {
+    event_path: {
+      type: 'string',
+      description: 'Event path such as event-0 or event-0.1.',
+    },
+    ai_generated_event_id: {
+      type: 'string',
+      description: 'Stable aiGeneratedEventId on the target event.',
+    },
+    group_name: {
+      type: 'string',
+      description: 'Exact group event name.',
+    },
+    action_type: {
+      type: 'string',
+      description: 'Exact action type to match, for example PlaySound.',
+    },
+    condition_type: {
+      type: 'string',
+      description:
+        'Exact condition type to match, for example SceneJustBegins.',
+    },
+    parameter_contains: {
+      type: 'string',
+      description:
+        'Text that must appear in serialized instruction parameters.',
+    },
+    text_contains: {
+      type: 'string',
+      description: 'Text that must appear anywhere in the serialized event.',
+    },
+  },
+  additionalProperties: true,
+};
+
+const findSceneEventsSchema = {
+  type: 'object',
+  properties: {
+    scene_name: sceneNameSchema.properties.scene_name,
+    event_path: eventTargetSchema.properties.event_path,
+    ai_generated_event_id: eventTargetSchema.properties.ai_generated_event_id,
+    event_type: {
+      type: 'string',
+      description:
+        'Exact event type, for example BuiltinCommonInstructions::Group.',
+    },
+    group_name: eventTargetSchema.properties.group_name,
+    action_type: eventTargetSchema.properties.action_type,
+    condition_type: eventTargetSchema.properties.condition_type,
+    parameter_contains: eventTargetSchema.properties.parameter_contains,
+    text_contains: eventTargetSchema.properties.text_contains,
+    limit: {
+      type: 'number',
+      description: 'Maximum matches to return. Defaults to 50.',
+    },
+  },
+  required: ['scene_name'],
+  additionalProperties: true,
+};
+
+const createGroupSchema = {
+  type: 'object',
+  properties: {
+    scene_name: sceneNameSchema.properties.scene_name,
+    group_name: {
+      type: 'string',
+      description: 'Name of the new event group.',
+    },
+    parent_event: {
+      type: 'object',
+      description:
+        'Optional parent event target. If omitted, the group is inserted at root level.',
+      additionalProperties: true,
+    },
+    insert_index: {
+      type: 'number',
+      description: 'Insertion index in the parent event list.',
+    },
+    folded: {
+      type: 'boolean',
+      description: 'Whether the new group is folded in the event sheet.',
+    },
+    color: {
+      type: 'object',
+      properties: {
+        r: { type: 'number' },
+        g: { type: 'number' },
+        b: { type: 'number' },
+      },
+      additionalProperties: false,
+    },
+    ai_generated_event_id: {
+      type: 'string',
+      description: 'Optional stable id for the group event.',
+    },
+  },
+  required: ['scene_name', 'group_name'],
+  additionalProperties: true,
+};
+
+const wrapEventsInGroupSchema = {
+  type: 'object',
+  properties: {
+    scene_name: sceneNameSchema.properties.scene_name,
+    group_name: createGroupSchema.properties.group_name,
+    target_events: {
+      type: 'array',
+      description:
+        'Sibling events to wrap. Each target can use event_path, ai_generated_event_id, group_name, action_type, condition_type, or text_contains.',
+      items: eventTargetSchema,
+    },
+    folded: createGroupSchema.properties.folded,
+    color: createGroupSchema.properties.color,
+    ai_generated_event_id: createGroupSchema.properties.ai_generated_event_id,
+  },
+  required: ['scene_name', 'group_name', 'target_events'],
+  additionalProperties: true,
+};
+
+const moveEventsToGroupSchema = {
+  type: 'object',
+  properties: {
+    scene_name: sceneNameSchema.properties.scene_name,
+    group_name: {
+      type: 'string',
+      description:
+        'Destination group name. Use group_event for precise targeting.',
+    },
+    group_event: {
+      type: 'object',
+      description:
+        'Destination group target, for example { event_path: "event-0" } or { ai_generated_event_id: "group-id" }.',
+      additionalProperties: true,
+    },
+    target_events: wrapEventsInGroupSchema.properties.target_events,
+    insert_index: createGroupSchema.properties.insert_index,
+  },
+  required: ['scene_name', 'target_events'],
+  additionalProperties: true,
+};
+
+const renameGroupSchema = {
+  type: 'object',
+  properties: {
+    scene_name: sceneNameSchema.properties.scene_name,
+    group_name: {
+      type: 'string',
+      description:
+        'Existing group name. Use group_event for precise targeting.',
+    },
+    group_event: moveEventsToGroupSchema.properties.group_event,
+    new_group_name: {
+      type: 'string',
+      description: 'New group name.',
+    },
+    folded: createGroupSchema.properties.folded,
+    color: createGroupSchema.properties.color,
+  },
+  required: ['scene_name', 'new_group_name'],
+  additionalProperties: true,
+};
+
+const ensureSceneEventIdsSchema = {
+  type: 'object',
+  properties: {
+    scene_name: sceneNameSchema.properties.scene_name,
+    id_prefix: {
+      type: 'string',
+      description: 'Prefix to use for newly assigned event ids.',
+    },
+  },
+  required: ['scene_name'],
+  additionalProperties: true,
+};
+
+const replaceSceneEventsFromFileSchema = {
+  type: 'object',
+  properties: {
+    scene_name: sceneNameSchema.properties.scene_name,
+    events_json_file: {
+      type: 'string',
+      description:
+        'Local file containing a JSON array of serialized GDevelop events.',
+    },
+  },
+  required: ['scene_name', 'events_json_file'],
+  additionalProperties: true,
+};
+
+const compareSceneEventsSemanticsSchema = {
+  type: 'object',
+  properties: {
+    before_events_json: {
+      type: 'string',
+      description:
+        'JSON string containing the event array before the edit. Group visual wrappers are ignored.',
+    },
+    after_events_json: {
+      type: 'string',
+      description:
+        'JSON string containing the event array after the edit. Group visual wrappers are ignored.',
+    },
+  },
+  required: ['before_events_json', 'after_events_json'],
+  additionalProperties: false,
+};
+
 const addSceneEventsSchema = {
   type: 'object',
   properties: {
@@ -380,6 +926,18 @@ const readTools: Array<McpTool> = [
     },
   },
   {
+    name: 'inspect_tool_schema',
+    description:
+      'Return MCP tool input schema and usage examples. Use this before calling a tool whose payload shape is unclear.',
+    inputSchema: toolNameSchema,
+  },
+  {
+    name: 'get_tool_usage_examples',
+    description:
+      'Return concrete MCP tool argument examples. Use this to avoid guessing payload names.',
+    inputSchema: toolNameSchema,
+  },
+  {
     name: 'gdevelop_editor_call',
     description:
       'Advanced escape hatch: call an exposed GDevelop EditorFunction by name. The target function still follows read/write MCP permission checks.',
@@ -403,6 +961,36 @@ const readTools: Array<McpTool> = [
     name: 'read_scene_events',
     description: 'Read the event sheet of a scene as text.',
     inputSchema: sceneNameSchema,
+  },
+  {
+    name: 'read_serialized_scene',
+    description:
+      'Read one scene/layout as complete serialized JSON, without reading the whole project.',
+    inputSchema: sceneNameSchema,
+  },
+  {
+    name: 'read_scene_events_serialized',
+    description:
+      'Read one scene event sheet as raw serialized event JSON, including event types unsupported by text rendering.',
+    inputSchema: sceneNameSchema,
+  },
+  {
+    name: 'inspect_project_resources',
+    description:
+      'Audit project resources and references, including empty files, missing local files, unused resources, Sprite frame references, and generic serialized string references.',
+    inputSchema: inspectProjectResourcesSchema,
+  },
+  {
+    name: 'find_scene_events',
+    description:
+      'Find scene events by stable id, path, group name, event type, action type, condition type, parameter text, or serialized text.',
+    inputSchema: findSceneEventsSchema,
+  },
+  {
+    name: 'compare_scene_events_semantics',
+    description:
+      'Compare two serialized event arrays while ignoring visual Group wrappers, folded state, colors, names, sources, and aiGeneratedEventId fields.',
+    inputSchema: compareSceneEventsSemanticsSchema,
   },
   {
     name: 'describe_instances',
@@ -491,9 +1079,39 @@ const writeTools: Array<McpTool> = [
     inputSchema: objectInSceneSchema,
   },
   {
+    name: 'replace_object_definition',
+    description:
+      'Replace or create a scene object with a complete serialized object definition. This explicitly allows changing the object type.',
+    inputSchema: replaceObjectDefinitionSchema,
+  },
+  {
+    name: 'delete_scene_object',
+    description:
+      'Delete a scene object definition and clean up references/instances through the same refactorer used by the editor.',
+    inputSchema: objectInSceneSchema,
+  },
+  {
     name: 'change_object_property',
     description: 'Change one or more object properties.',
     inputSchema: objectInSceneSchema,
+  },
+  {
+    name: 'set_object_properties',
+    description:
+      'Set object properties using the property names returned by inspect_object_properties, for example TextObject text, characterSize, and color.',
+    inputSchema: setObjectPropertiesSchema,
+  },
+  {
+    name: 'add_or_update_resource',
+    description:
+      'Add or update a project resource such as a local PNG image resource with name, file, and kind.',
+    inputSchema: addOrUpdateResourceSchema,
+  },
+  {
+    name: 'set_sprite_animations',
+    description:
+      'Replace a Sprite object animation list with named animations, directions, frames, origin/center points, custom points, and collision masks.',
+    inputSchema: setSpriteAnimationsSchema,
   },
   {
     name: 'add_behavior',
@@ -514,7 +1132,7 @@ const writeTools: Array<McpTool> = [
     name: 'put_2d_instances',
     description:
       'Place, move, update, or erase 2D object instances. Call describe_instances first to get existing instance ids.',
-    inputSchema: sceneNameSchema,
+    inputSchema: put2dInstancesSchema,
   },
   {
     name: 'put_3d_instances',
@@ -532,6 +1150,48 @@ const writeTools: Array<McpTool> = [
     name: 'change_scene_properties_layers_effects_groups',
     description: 'Change scene properties, layers, effects, or object groups.',
     inputSchema: sceneNameSchema,
+  },
+  {
+    name: 'apply_validated_scene_patch',
+    description:
+      'Apply a focused JSON patch to one serialized scene after validating scene structure and GDevelop unserialization. Use as a safe fallback when focused tools do not cover a small edit.',
+    inputSchema: scenePatchSchema,
+  },
+  {
+    name: 'create_group',
+    description:
+      'Create an empty scene event Group at root level or under a parent event.',
+    inputSchema: createGroupSchema,
+  },
+  {
+    name: 'wrap_events_in_group',
+    description:
+      'Create a scene event Group and move sibling target events into it while preserving their serialized content and stable ids.',
+    inputSchema: wrapEventsInGroupSchema,
+  },
+  {
+    name: 'move_events_to_group',
+    description:
+      'Move existing scene events into an existing Group by stable id, path, group name, action type, condition type, or text match.',
+    inputSchema: moveEventsToGroupSchema,
+  },
+  {
+    name: 'rename_group',
+    description:
+      'Rename an existing scene event Group and optionally update its folded state or background color.',
+    inputSchema: renameGroupSchema,
+  },
+  {
+    name: 'ensure_scene_event_ids',
+    description:
+      'Assign stable aiGeneratedEventId values to scene events that do not already have one.',
+    inputSchema: ensureSceneEventIdsSchema,
+  },
+  {
+    name: 'replace_scene_events_from_file',
+    description:
+      'Replace one scene event sheet from a local events JSON file after GDevelop validation. Use this instead of inlining very large event JSON.',
+    inputSchema: replaceSceneEventsFromFileSchema,
   },
   {
     name: 'add_or_edit_variable',
@@ -625,7 +1285,310 @@ const commandTools: Array<McpTool> = [
       additionalProperties: false,
     },
   },
+  {
+    name: 'gdevelop_save_project_and_wait',
+    description:
+      'Save the current project and wait for the editor save promise to resolve, returning saved/failed status instead of a launched command.',
+    inputSchema: emptyObjectSchema,
+  },
 ];
+
+const toolUsageExamples: { [string]: Array<Object> } = {
+  add_or_update_resource: [
+    {
+      description: 'Import or update a local PNG image resource.',
+      arguments: {
+        name: 'PlayerIdle.png',
+        file: 'assets/PlayerIdle.png',
+        kind: 'image',
+        metadata: {
+          smooth: false,
+        },
+      },
+    },
+    {
+      description:
+        'Import or update an audio resource and mark it as user-added/preloaded as a sound.',
+      arguments: {
+        name: 'Laser.wav',
+        file: 'assets/Laser.wav',
+        kind: 'audio',
+        metadata: {
+          userAdded: true,
+          preloadAsSound: true,
+          preloadAsMusic: false,
+          preloadInCache: false,
+        },
+      },
+    },
+  ],
+  set_sprite_animations: [
+    {
+      description:
+        'Attach one image resource to a Sprite object as a named animation with origin, center, and a rectangular collision mask.',
+      arguments: {
+        scene_name: 'Level1',
+        object_name: 'Player',
+        animations: [
+          {
+            name: 'Idle',
+            directions: [
+              {
+                frames: [
+                  {
+                    image: 'PlayerIdle.png',
+                    origin: { x: 0, y: 0 },
+                    center: { x: 16, y: 24 },
+                    collisionMask: [
+                      [
+                        { x: 0, y: 0 },
+                        { x: 32, y: 0 },
+                        { x: 32, y: 48 },
+                        { x: 0, y: 48 },
+                      ],
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+    },
+  ],
+  replace_object_definition: [
+    {
+      description:
+        'Replace an existing scene object with a full serialized object, allowing the type to change.',
+      arguments: {
+        scene_name: 'Level1',
+        object_name: 'Player',
+        serialized_object: {
+          name: 'Player',
+          type: 'Sprite',
+          variables: [],
+          behaviors: [],
+          effects: [],
+          animations: [],
+        },
+      },
+    },
+  ],
+  delete_scene_object: [
+    {
+      description:
+        'Delete a scene object and clean up references through GDevelop refactoring.',
+      arguments: {
+        scene_name: 'Level1',
+        object_name: 'Player',
+      },
+    },
+  ],
+  set_object_properties: [
+    {
+      description:
+        'Set TextObject properties by using names from inspect_object_properties.',
+      arguments: {
+        scene_name: 'Level1',
+        object_name: 'ScoreText',
+        properties: {
+          text: 'Score: 0',
+          characterSize: 36,
+          color: '255;255;255',
+        },
+      },
+    },
+  ],
+  put_2d_instances: [
+    {
+      description:
+        'Create a 2D instance with exact placement, size, layer, and z order.',
+      arguments: {
+        scene_name: 'Level1',
+        operation: 'create',
+        instances: [
+          {
+            object_name: 'Player',
+            x: 128,
+            y: 256,
+            layer: '',
+            zOrder: 10,
+            customSize: {
+              width: 64,
+              height: 64,
+            },
+          },
+        ],
+      },
+    },
+    {
+      description:
+        'Update an existing 2D instance by id returned from describe_instances.',
+      arguments: {
+        scene_name: 'Level1',
+        operation: 'update',
+        instances: [
+          {
+            id: 'abcdef1234',
+            x: 200,
+            y: 300,
+            angle: 15,
+          },
+        ],
+      },
+    },
+    {
+      description:
+        'Delete an existing 2D instance by id returned from describe_instances.',
+      arguments: {
+        scene_name: 'Level1',
+        operation: 'delete',
+        instances: [
+          {
+            id: 'abcdef1234',
+          },
+        ],
+      },
+    },
+  ],
+  read_serialized_scene: [
+    {
+      description: 'Read a single scene serialized JSON.',
+      arguments: {
+        scene_name: 'Level1',
+      },
+    },
+  ],
+  apply_validated_scene_patch: [
+    {
+      description:
+        'Rename the first serialized scene object after validating the patched scene.',
+      arguments: {
+        scene_name: 'Level1',
+        patch: [
+          {
+            op: 'replace',
+            path: '/objects/0/name',
+            value: 'Player',
+          },
+        ],
+      },
+    },
+  ],
+  read_scene_events_serialized: [
+    {
+      description:
+        'Read raw serialized events for a scene, including event types that text rendering may not support.',
+      arguments: {
+        scene_name: 'Level1',
+      },
+    },
+  ],
+  inspect_project_resources: [
+    {
+      description:
+        'Audit resources before saving or after replacing sprites/audio.',
+      arguments: {},
+    },
+  ],
+  find_scene_events: [
+    {
+      description: 'Find all events that play a sound.',
+      arguments: {
+        scene_name: 'Level1',
+        action_type: 'PlaySound',
+      },
+    },
+    {
+      description: 'Find an event by stable id.',
+      arguments: {
+        scene_name: 'Level1',
+        ai_generated_event_id: 'mcp-test-0',
+      },
+    },
+  ],
+  create_group: [
+    {
+      description: 'Create an empty event group at the end of a scene.',
+      arguments: {
+        scene_name: 'Level1',
+        group_name: 'Initialization',
+        folded: true,
+      },
+    },
+  ],
+  wrap_events_in_group: [
+    {
+      description: 'Wrap two generated events into a new group.',
+      arguments: {
+        scene_name: 'Level1',
+        group_name: 'Enemy logic',
+        target_events: [
+          { ai_generated_event_id: 'enemy-spawn-event' },
+          { ai_generated_event_id: 'enemy-move-event' },
+        ],
+      },
+    },
+  ],
+  move_events_to_group: [
+    {
+      description: 'Move an event found by action type into an existing group.',
+      arguments: {
+        scene_name: 'Level1',
+        group_name: 'Audio',
+        target_events: [{ action_type: 'PlaySound' }],
+      },
+    },
+  ],
+  rename_group: [
+    {
+      description: 'Rename a group by old group name.',
+      arguments: {
+        scene_name: 'Level1',
+        group_name: 'Setup',
+        new_group_name: 'Initialization',
+      },
+    },
+  ],
+  ensure_scene_event_ids: [
+    {
+      description: 'Assign stable ids before doing multiple event edits.',
+      arguments: {
+        scene_name: 'Level1',
+        id_prefix: 'mcp-level1',
+      },
+    },
+  ],
+  replace_scene_events_from_file: [
+    {
+      description:
+        'Replace an event sheet from a local JSON file instead of inlining a large events_json string.',
+      arguments: {
+        scene_name: 'Level1',
+        events_json_file: 'C:/tmp/level1-events.json',
+      },
+    },
+  ],
+  compare_scene_events_semantics: [
+    {
+      description:
+        'Check that wrapping events in visual groups did not change executable event content.',
+      arguments: {
+        before_events_json:
+          '[{"type":"BuiltinCommonInstructions::Standard","conditions":[],"actions":[]}]',
+        after_events_json:
+          '[{"type":"BuiltinCommonInstructions::Group","name":"Group","events":[{"type":"BuiltinCommonInstructions::Standard","conditions":[],"actions":[]}]}]',
+      },
+    },
+  ],
+  gdevelop_save_project_and_wait: [
+    {
+      description:
+        'Save and wait for write completion instead of only launching SAVE_PROJECT.',
+      arguments: {},
+    },
+  ],
+};
 
 const writeToolNames: Set<string> = new Set(writeTools.map(tool => tool.name));
 const commandToolNames: Set<string> = new Set(
@@ -680,6 +1643,21 @@ export const getMcpTools = (
   ...(permissions.allowCommandTools ? commandTools : []),
 ];
 
+export const getAllMcpToolsForIntrospection = (): Array<McpTool> => [
+  ...readTools,
+  ...writeTools,
+  ...commandTools,
+];
+
+export const getMcpToolUsageExamples = (
+  toolName?: ?string
+): { [string]: Array<Object> } => {
+  if (!toolName) return toolUsageExamples;
+  return {
+    [toolName]: toolUsageExamples[toolName] || [],
+  };
+};
+
 export const getMcpResources = (): Array<McpResource> => [
   {
     uri: 'gdevelop://editor/state',
@@ -706,10 +1684,29 @@ export const getMcpResources = (): Array<McpResource> => [
     mimeType: 'application/json',
   },
   {
+    uri: 'gdevelop://project/resources.json',
+    name: 'Project resources audit',
+    description:
+      'Project resources, file validity, unused resources, and reference audit.',
+    mimeType: 'application/json',
+  },
+  {
     uri: 'gdevelop://scene/{sceneName}/events.txt',
     name: 'Scene events',
     description: 'Events for a scene rendered as text.',
     mimeType: 'text/plain',
+  },
+  {
+    uri: 'gdevelop://scene/{sceneName}/events.json',
+    name: 'Serialized scene events',
+    description: 'Raw serialized event JSON for a scene.',
+    mimeType: 'application/json',
+  },
+  {
+    uri: 'gdevelop://scene/{sceneName}/scene.json',
+    name: 'Serialized scene',
+    description: 'Complete serialized JSON for one scene/layout.',
+    mimeType: 'application/json',
   },
   {
     uri: 'gdevelop://scene/{sceneName}/instances.json',

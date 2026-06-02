@@ -278,6 +278,7 @@ function createNewWindow(windowArgs = args) {
 
   // Capture window ID and whether this is the primary window before it can be destroyed
   const windowId = newWindow.id;
+  const windowWebContents = newWindow.webContents;
   const isPrimaryWindow = windowNumber === 0;
   log.info(
     `Created window with Electron ID: ${windowId}, window number: ${windowNumber}, isPrimary: ${isPrimaryWindow}`
@@ -337,8 +338,8 @@ function createNewWindow(windowArgs = args) {
   newWindow.on('closed', function() {
     // Remove from tracked windows
     mainWindows.delete(newWindow);
-    clearPendingMcpRendererRequestsFor(newWindow.webContents);
-    if (mcpRendererWebContents === newWindow.webContents) {
+    clearPendingMcpRendererRequestsFor(windowWebContents);
+    if (mcpRendererWebContents === windowWebContents) {
       mcpRendererWebContents = null;
       stopMcpServer().catch(error => {
         log.error('Failed to stop MCP server after window close:', error);

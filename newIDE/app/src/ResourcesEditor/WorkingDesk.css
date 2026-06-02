@@ -1,16 +1,26 @@
 .resources-markdown-preview {
-  color: inherit;
+  color: #fff;
+  max-width: 100%;
+  min-width: 0;
+  overflow: auto;
 }
 
 .resources-markdown-preview .gd-markdown {
   display: block;
   box-sizing: border-box;
+  width: 100%;
   max-width: 980px;
   margin: 0 auto;
   padding: 28px 34px 40px;
   font-size: 15px;
   line-height: 1.65;
   letter-spacing: 0;
+  overflow-wrap: anywhere;
+}
+
+.resources-markdown-preview .gd-markdown * {
+  max-width: 100%;
+  overflow-wrap: anywhere;
 }
 
 .resources-markdown-preview .gd-markdown h1,
@@ -79,6 +89,8 @@
 .resources-markdown-preview .gd-markdown code {
   border-radius: 4px;
   background: rgba(128, 128, 128, 0.18);
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .resources-markdown-preview .gd-markdown table {

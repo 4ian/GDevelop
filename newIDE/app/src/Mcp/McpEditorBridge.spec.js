@@ -1,9 +1,37 @@
 // @flow
 import { createMcpEditorBridge } from './McpEditorBridge';
+import {
+  serializeToJSObject,
+  unserializeFromJSObject,
+} from '../Utils/Serializer';
+
+const fs = require('fs');
+const os = require('os');
+const path = require('path');
 
 const gd: libGDevelop = global.gd;
 
 describe('McpEditorBridge', () => {
+  const getInitialInstances = (
+    initialInstances: gdInitialInstancesContainer
+  ): Array<gdInitialInstance> => {
+    const instances = [];
+    const instanceGetter = new gd.InitialInstanceJSFunctor();
+    // $FlowFixMe[cannot-write]
+    instanceGetter.invoke = instancePtr => {
+      const instance: gdInitialInstance = gd.wrapPointer(
+        // $FlowFixMe[incompatible-type]
+        instancePtr,
+        gd.InitialInstance
+      );
+      instances.push(instance);
+    };
+    // $FlowFixMe[incompatible-type]
+    initialInstances.iterateOverInstances(instanceGetter);
+    instanceGetter.delete();
+    return instances;
+  };
+
   const makeBridge = (overrides: Object = {}) =>
     createMcpEditorBridge({
       getProject: () => null,
@@ -593,6 +621,767 @@ describe('McpEditorBridge', () => {
     } finally {
       project.delete();
     }
+  });
+
+  it('imports resources, binds sprite animations, and reads serialized scene data', async () => {
+    // $FlowFixMe[invalid-constructor]
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    const layout = project.insertNewLayout('Level1', 0);
+    layout.getObjects().insertNewObject(project, 'Sprite', 'Player', 0);
+    const triggerUnsavedChanges: any = jest.fn();
+
+    try {
+      const bridge = makeBridge({
+        getProject: () => project,
+        getPermissions: () => ({
+          allowWriteTools: true,
+          allowCommandTools: false,
+        }),
+        triggerUnsavedChanges,
+      });
+
+      const resourceResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'add_or_update_resource',
+          arguments: {
+            name: 'PlayerIdle.png',
+            file: 'assets/PlayerIdle.png',
+            kind: 'image',
+            metadata: {
+              smooth: false,
+            },
+          },
+        },
+      });
+      expect(resourceResponse.isError).not.toBe(true);
+      expect(project.getResourcesManager().hasResource('PlayerIdle.png')).toBe(
+        true
+      );
+
+      const resourceViaEditorCallResponse = await bridge.handleRendererMcpRequest(
+        {
+          method: 'tools/call',
+          params: {
+            name: 'gdevelop_editor_call',
+            arguments: {
+              name: 'add_or_update_resource',
+              arguments: {
+                name: 'EnemyIdle.png',
+                file: 'assets/EnemyIdle.png',
+                kind: 'image',
+              },
+            },
+          },
+        }
+      );
+      expect(resourceViaEditorCallResponse.isError).not.toBe(true);
+      expect(project.getResourcesManager().hasResource('EnemyIdle.png')).toBe(
+        true
+      );
+
+      const animationsResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'set_sprite_animations',
+          arguments: {
+            scene_name: 'Level1',
+            object_name: 'Player',
+            animations: [
+              {
+                name: 'Idle',
+                directions: [
+                  {
+                    frames: [
+                      {
+                        image: 'PlayerIdle.png',
+                        origin: { x: 4, y: 5 },
+                        center: { x: 16, y: 24 },
+                        collisionMask: [
+                          [
+                            { x: 0, y: 0 },
+                            { x: 32, y: 0 },
+                            { x: 32, y: 48 },
+                            { x: 0, y: 48 },
+                          ],
+                        ],
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
+        },
+      });
+      expect(animationsResponse.isError).not.toBe(true);
+
+      const spriteObject = layout.getObjects().getObject('Player');
+      const spriteConfiguration = gd.asSpriteConfiguration(
+        spriteObject.getConfiguration()
+      );
+      const frame = spriteConfiguration
+        .getAnimations()
+        .getAnimation(0)
+        .getDirection(0)
+        .getSprite(0);
+      expect(frame.getImageName()).toBe('PlayerIdle.png');
+      expect(frame.getOrigin().getX()).toBe(4);
+      expect(frame.getOrigin().getY()).toBe(5);
+      expect(frame.isDefaultCenterPoint()).toBe(false);
+      expect(frame.getCenter().getX()).toBe(16);
+      expect(frame.getCenter().getY()).toBe(24);
+      expect(frame.getCustomCollisionMask().size()).toBe(1);
+
+      const sceneResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'read_serialized_scene',
+          arguments: {
+            scene_name: 'Level1',
+          },
+        },
+      });
+      const scene = JSON.parse(sceneResponse.content[0].text);
+      expect(scene.serializedScene.name).toBe('Level1');
+      expect(scene.serializedScene.objects[0].name).toBe('Player');
+
+      const eventsResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'read_scene_events_serialized',
+          arguments: {
+            scene_name: 'Level1',
+          },
+        },
+      });
+      const events = JSON.parse(eventsResponse.content[0].text);
+      expect(events.sceneName).toBe('Level1');
+      expect(events.serializedEvents).toEqual([]);
+      expect(triggerUnsavedChanges).toHaveBeenCalled();
+    } finally {
+      project.delete();
+    }
+  });
+
+  it('reads full project JSON directly and audits resource files and references', async () => {
+    // $FlowFixMe[invalid-constructor]
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    const layout = project.insertNewLayout('Level1', 0);
+    layout.getObjects().insertNewObject(project, 'Sprite', 'Player', 0);
+    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gdevelop-mcp-'));
+    const soundFile = path.join(tempDir, 'Laser.wav');
+    fs.writeFileSync(soundFile, 'fake wav content');
+
+    try {
+      project.setProjectFile(path.join(tempDir, 'game.json'));
+      const bridge = makeBridge({
+        getProject: () => project,
+        getPermissions: () => ({
+          allowWriteTools: true,
+          allowCommandTools: false,
+        }),
+      });
+
+      const audioResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'add_or_update_resource',
+          arguments: {
+            name: 'Laser.wav',
+            file: soundFile,
+            kind: 'audio',
+            metadata: {
+              preloadAsSound: true,
+              userAdded: true,
+            },
+          },
+        },
+      });
+      expect(audioResponse.isError).not.toBe(true);
+      const audioResult = JSON.parse(audioResponse.content[0].text);
+      expect(audioResult.resource).toEqual(
+        expect.objectContaining({
+          name: 'Laser.wav',
+          kind: 'audio',
+          file: expect.stringContaining('Laser.wav'),
+          preloadAsSound: true,
+          userAdded: true,
+        })
+      );
+
+      const projectJsonResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'read_game_project_json',
+          arguments: {},
+        },
+      });
+      expect(projectJsonResponse.isError).not.toBe(true);
+      const projectJson = JSON.parse(projectJsonResponse.content[0].text);
+      expect(projectJson.serializedProject.resources.resources[0]).toEqual(
+        expect.objectContaining({
+          name: 'Laser.wav',
+          kind: 'audio',
+        })
+      );
+      expect(projectJson.serializedProjectJson).toContain('Laser.wav');
+
+      const badAudio = new gd.AudioResource();
+      badAudio.setName('Broken.wav');
+      badAudio.setFile('');
+      project.getResourcesManager().addResource(badAudio);
+      badAudio.delete();
+
+      const validateResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'gdevelop_validate_events_json',
+          arguments: {
+            scene_name: 'Level1',
+            events_json: JSON.stringify([
+              {
+                type: 'BuiltinCommonInstructions::Standard',
+                conditions: [],
+                actions: [
+                  {
+                    type: { value: 'PlaySound' },
+                    parameters: ['', 'Broken.wav', 'no', '100', '1'],
+                  },
+                ],
+              },
+            ]),
+          },
+        },
+      });
+      const validation = JSON.parse(validateResponse.content[0].text);
+      expect(validation.valid).toBe(false);
+      expect(validation.issues).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            type: 'resource-empty-file',
+            resourceName: 'Broken.wav',
+          }),
+        ])
+      );
+
+      const auditResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'inspect_project_resources',
+          arguments: {},
+        },
+      });
+      const audit = JSON.parse(auditResponse.content[0].text);
+      expect(audit.resourcesByName['Laser.wav']).toEqual(
+        expect.objectContaining({
+          kind: 'audio',
+          fileExists: true,
+        })
+      );
+      expect(audit.invalidResources).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            name: 'Broken.wav',
+            issue: 'empty-file',
+          }),
+        ])
+      );
+    } finally {
+      project.delete();
+      fs.rmSync(tempDir, { recursive: true, force: true });
+    }
+  });
+
+  it('finds scene events and edits event groups without relying on unstable paths', async () => {
+    // $FlowFixMe[invalid-constructor]
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    const layout = project.insertNewLayout('Level1', 0);
+    unserializeFromJSObject(
+      layout.getEvents(),
+      [
+        {
+          aiGeneratedEventId: 'first-event',
+          type: 'BuiltinCommonInstructions::Standard',
+          conditions: [],
+          actions: [{ type: { value: 'Hide' }, parameters: ['Player'] }],
+        },
+        {
+          aiGeneratedEventId: 'second-event',
+          type: 'BuiltinCommonInstructions::Standard',
+          conditions: [],
+          actions: [
+            {
+              type: { value: 'PlaySound' },
+              parameters: ['', 'Laser.wav', 'no', '100', '1'],
+            },
+          ],
+        },
+        {
+          type: 'BuiltinCommonInstructions::Comment',
+          comment: 'Leave this outside the group',
+        },
+      ],
+      'unserializeFrom',
+      project
+    );
+    const onSceneEventsModifiedOutsideEditor: any = jest.fn();
+
+    try {
+      const bridge = makeBridge({
+        getProject: () => project,
+        getPermissions: () => ({
+          allowWriteTools: true,
+          allowCommandTools: false,
+        }),
+        onSceneEventsModifiedOutsideEditor,
+      });
+
+      const findResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'find_scene_events',
+          arguments: {
+            scene_name: 'Level1',
+            action_type: 'PlaySound',
+          },
+        },
+      });
+      const found = JSON.parse(findResponse.content[0].text);
+      expect(found.matches[0]).toEqual(
+        expect.objectContaining({
+          eventPath: 'event-1',
+          aiGeneratedEventId: 'second-event',
+        })
+      );
+
+      const wrapResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'wrap_events_in_group',
+          arguments: {
+            scene_name: 'Level1',
+            group_name: 'Setup',
+            target_events: [
+              { ai_generated_event_id: 'first-event' },
+              { ai_generated_event_id: 'second-event' },
+            ],
+          },
+        },
+      });
+      expect(wrapResponse.isError).not.toBe(true);
+      expect(layout.getEvents().getEventsCount()).toBe(2);
+      const groupEvent = gd.asGroupEvent(layout.getEvents().getEventAt(0));
+      expect(groupEvent.getName()).toBe('Setup');
+      expect(groupEvent.getSubEvents().getEventsCount()).toBe(2);
+      expect(
+        groupEvent
+          .getSubEvents()
+          .getEventAt(1)
+          .getAiGeneratedEventId()
+      ).toBe('second-event');
+
+      const renameResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'rename_group',
+          arguments: {
+            scene_name: 'Level1',
+            group_name: 'Setup',
+            new_group_name: 'Initialization',
+          },
+        },
+      });
+      expect(renameResponse.isError).not.toBe(true);
+      expect(gd.asGroupEvent(layout.getEvents().getEventAt(0)).getName()).toBe(
+        'Initialization'
+      );
+
+      const ensureIdsResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'ensure_scene_event_ids',
+          arguments: {
+            scene_name: 'Level1',
+            id_prefix: 'mcp-test',
+          },
+        },
+      });
+      const ensureIds = JSON.parse(ensureIdsResponse.content[0].text);
+      expect(ensureIds.assignedCount).toBeGreaterThan(0);
+      expect(
+        layout
+          .getEvents()
+          .getEventAt(1)
+          .getAiGeneratedEventId()
+      ).toContain('mcp-test');
+
+      const moveResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'move_events_to_group',
+          arguments: {
+            scene_name: 'Level1',
+            group_name: 'Initialization',
+            target_events: [{ event_path: 'event-1' }],
+          },
+        },
+      });
+      expect(moveResponse.isError).not.toBe(true);
+      expect(layout.getEvents().getEventsCount()).toBe(1);
+      expect(
+        gd
+          .asGroupEvent(layout.getEvents().getEventAt(0))
+          .getSubEvents()
+          .getEventsCount()
+      ).toBe(3);
+      expect(onSceneEventsModifiedOutsideEditor).toHaveBeenCalled();
+    } finally {
+      project.delete();
+    }
+  });
+
+  it('replaces scene events from a file and exposes a save-and-wait command hook', async () => {
+    // $FlowFixMe[invalid-constructor]
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    const layout = project.insertNewLayout('Level1', 0);
+    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gdevelop-mcp-'));
+    const eventsFile = path.join(tempDir, 'events.json');
+    fs.writeFileSync(
+      eventsFile,
+      JSON.stringify([
+        {
+          type: 'BuiltinCommonInstructions::Comment',
+          comment: 'Loaded from file',
+        },
+      ])
+    );
+    const saveProjectAndWait: any = jest.fn(async () => ({
+      saved: true,
+      fileMetadata: {
+        fileIdentifier: path.join(tempDir, 'game.json'),
+        name: 'game.json',
+      },
+    }));
+
+    try {
+      const bridge = makeBridge({
+        getProject: () => project,
+        getPermissions: () => ({
+          allowWriteTools: true,
+          allowCommandTools: true,
+        }),
+        saveProjectAndWait,
+      });
+
+      const replaceResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'replace_scene_events_from_file',
+          arguments: {
+            scene_name: 'Level1',
+            events_json_file: eventsFile,
+          },
+        },
+      });
+      expect(replaceResponse.isError).not.toBe(true);
+      expect(layout.getEvents().getEventsCount()).toBe(1);
+      expect(serializeToJSObject(layout.getEvents())[0].comment).toBe(
+        'Loaded from file'
+      );
+
+      const saveResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'gdevelop_save_project_and_wait',
+          arguments: {},
+        },
+      });
+      const saveResult = JSON.parse(saveResponse.content[0].text);
+      expect(saveResult.saved).toBe(true);
+      expect(saveProjectAndWait).toHaveBeenCalled();
+    } finally {
+      project.delete();
+      fs.rmSync(tempDir, { recursive: true, force: true });
+    }
+  });
+
+  it('replaces and deletes scene objects with complete serialized definitions', async () => {
+    // $FlowFixMe[invalid-constructor]
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    const layout = project.insertNewLayout('Level1', 0);
+    const objects = layout.getObjects();
+    objects.insertNewObject(project, 'TextObject::Text', 'Player', 0);
+    const sprite = objects.insertNewObject(project, 'Sprite', 'Template', 1);
+    const serializedSprite = serializeToJSObject(sprite);
+    serializedSprite.name = 'Player';
+    const instance = layout.getInitialInstances().insertNewInitialInstance();
+    instance.setObjectName('Player');
+    instance.setX(10);
+    instance.setY(20);
+
+    try {
+      const bridge = makeBridge({
+        getProject: () => project,
+        getPermissions: () => ({
+          allowWriteTools: true,
+          allowCommandTools: false,
+        }),
+      });
+
+      const replaceResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'replace_object_definition',
+          arguments: {
+            scene_name: 'Level1',
+            object_name: 'Player',
+            serialized_object: serializedSprite,
+          },
+        },
+      });
+      expect(replaceResponse.isError).not.toBe(true);
+      expect(
+        layout
+          .getObjects()
+          .getObject('Player')
+          .getType()
+      ).toBe('Sprite');
+      expect(layout.getObjects().hasObjectNamed('Template')).toBe(true);
+
+      const deleteResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'delete_scene_object',
+          arguments: {
+            scene_name: 'Level1',
+            object_name: 'Player',
+            delete_instances: true,
+          },
+        },
+      });
+      expect(deleteResponse.isError).not.toBe(true);
+      expect(layout.getObjects().hasObjectNamed('Player')).toBe(false);
+      expect(layout.getInitialInstances().getInstancesCount()).toBe(0);
+    } finally {
+      project.delete();
+    }
+  });
+
+  it('sets object properties and rejects invalid scene patches before writing', async () => {
+    // $FlowFixMe[invalid-constructor]
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    const layout = project.insertNewLayout('Level1', 0);
+    layout
+      .getObjects()
+      .insertNewObject(project, 'TextObject::Text', 'Label', 0);
+
+    try {
+      const bridge = makeBridge({
+        getProject: () => project,
+        getPermissions: () => ({
+          allowWriteTools: true,
+          allowCommandTools: false,
+        }),
+      });
+
+      const setResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'set_object_properties',
+          arguments: {
+            scene_name: 'Level1',
+            object_name: 'Label',
+            properties: {
+              text: 'Score: 0',
+              characterSize: 36,
+              color: '255;0;128',
+            },
+          },
+        },
+      });
+      expect(setResponse.isError).not.toBe(true);
+      const labelProperties = layout
+        .getObjects()
+        .getObject('Label')
+        .getConfiguration()
+        .getProperties();
+      expect(labelProperties.get('text').getValue()).toBe('Score: 0');
+      expect(labelProperties.get('characterSize').getValue()).toBe('36');
+      expect(labelProperties.get('color').getValue()).toBe('255;0;128');
+
+      const invalidPatchResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'apply_validated_scene_patch',
+          arguments: {
+            scene_name: 'Level1',
+            patch: [
+              {
+                op: 'remove',
+                path: '/objects/0/type',
+              },
+            ],
+          },
+        },
+      });
+      expect(invalidPatchResponse.isError).toBe(true);
+      expect(
+        layout
+          .getObjects()
+          .getObject('Label')
+          .getType()
+      ).toBe('TextObject::Text');
+
+      const validPatchResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'apply_validated_scene_patch',
+          arguments: {
+            scene_name: 'Level1',
+            patch: [
+              {
+                op: 'replace',
+                path: '/objects/0/name',
+                value: 'LabelPatched',
+              },
+            ],
+          },
+        },
+      });
+      expect(validPatchResponse.isError).not.toBe(true);
+      expect(layout.getObjects().hasObjectNamed('LabelPatched')).toBe(true);
+    } finally {
+      project.delete();
+    }
+  });
+
+  it('creates, updates, and deletes 2D instances with structured put_2d_instances payloads', async () => {
+    // $FlowFixMe[invalid-constructor]
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    const layout = project.insertNewLayout('Level1', 0);
+    layout.getObjects().insertNewObject(project, 'Sprite', 'Player', 0);
+    const onInstancesModifiedOutsideEditor: any = jest.fn();
+
+    try {
+      const bridge = makeBridge({
+        getProject: () => project,
+        getPermissions: () => ({
+          allowWriteTools: true,
+          allowCommandTools: false,
+        }),
+        onInstancesModifiedOutsideEditor,
+      });
+
+      const createResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'put_2d_instances',
+          arguments: {
+            scene_name: 'Level1',
+            operation: 'create',
+            instances: [
+              {
+                object_name: 'Player',
+                x: 128,
+                y: 256,
+                zOrder: 3,
+                customSize: {
+                  width: 64,
+                  height: 32,
+                },
+              },
+            ],
+          },
+        },
+      });
+      const createResult = JSON.parse(createResponse.content[0].text);
+      expect(createResponse.isError).not.toBe(true);
+      expect(layout.getInitialInstances().getInstancesCount()).toBe(1);
+      const instanceId = createResult.changes[0].id;
+      let instance = getInitialInstances(layout.getInitialInstances())[0];
+      expect(instance.getObjectName()).toBe('Player');
+      expect(instance.getX()).toBe(128);
+      expect(instance.getY()).toBe(256);
+      expect(instance.getZOrder()).toBe(3);
+      expect(instance.getCustomWidth()).toBe(64);
+      expect(instance.getCustomHeight()).toBe(32);
+
+      const updateResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'put_2d_instances',
+          arguments: {
+            scene_name: 'Level1',
+            operation: 'update',
+            instances: [
+              {
+                id: instanceId,
+                x: 300,
+                y: 400,
+                angle: 45,
+              },
+            ],
+          },
+        },
+      });
+      expect(updateResponse.isError).not.toBe(true);
+      instance = getInitialInstances(layout.getInitialInstances())[0];
+      expect(instance.getX()).toBe(300);
+      expect(instance.getY()).toBe(400);
+      expect(instance.getAngle()).toBe(45);
+
+      const deleteResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'put_2d_instances',
+          arguments: {
+            scene_name: 'Level1',
+            operation: 'delete',
+            instances: [
+              {
+                id: instanceId,
+              },
+            ],
+          },
+        },
+      });
+      expect(deleteResponse.isError).not.toBe(true);
+      expect(layout.getInitialInstances().getInstancesCount()).toBe(0);
+      expect(onInstancesModifiedOutsideEditor).toHaveBeenCalled();
+    } finally {
+      project.delete();
+    }
+  });
+
+  it('returns tool schemas and usage examples for MCP clients', async () => {
+    const bridge = makeBridge();
+
+    const schemaResponse = await bridge.handleRendererMcpRequest({
+      method: 'tools/call',
+      params: {
+        name: 'inspect_tool_schema',
+        arguments: {
+          tool_name: 'put_2d_instances',
+        },
+      },
+    });
+    const schema = JSON.parse(schemaResponse.content[0].text);
+    expect(schema.tool.name).toBe('put_2d_instances');
+    expect(schema.tool.inputSchema.properties.instances.type).toBe('array');
+    expect(schema.examples[0].arguments.instances[0].customSize.width).toBe(64);
+
+    const examplesResponse = await bridge.handleRendererMcpRequest({
+      method: 'tools/call',
+      params: {
+        name: 'get_tool_usage_examples',
+        arguments: {
+          tool_name: 'add_or_update_resource',
+        },
+      },
+    });
+    const examples = JSON.parse(examplesResponse.content[0].text);
+    expect(examples.examples[0].arguments.kind).toBe('image');
   });
 
   it('blocks write tools when write permission is disabled', async () => {

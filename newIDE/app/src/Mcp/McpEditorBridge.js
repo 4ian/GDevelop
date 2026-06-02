@@ -4,7 +4,10 @@ import {
   getMcpPrompts,
   getMcpResources,
   getMcpTools,
+  getAllMcpToolsForIntrospection,
+  getMcpToolUsageExamples,
   canCallMcpTool,
+  isKnownMcpTool,
   type McpPermissionOptions,
 } from './McpToolCatalog';
 import { makeSimplifiedProjectBuilder } from '../EditorFunctions/SimplifiedProject/SimplifiedProject';
@@ -37,6 +40,28 @@ import {
   inspectProjectExtension,
   listProjectExtensions,
 } from './McpExtensionTools';
+import {
+  addOrUpdateResource,
+  applyValidatedScenePatch,
+  deleteSceneObject,
+  inspectProjectResources,
+  putStructured2dInstances,
+  readSceneEventsSerialized,
+  readSerializedScene,
+  replaceObjectDefinition,
+  setObjectProperties,
+  setSpriteAnimations,
+} from './McpSceneTools';
+import {
+  compareSceneEventsSemantics,
+  createGroup,
+  ensureSceneEventIds,
+  findSceneEvents,
+  moveEventsToGroup,
+  renameGroup,
+  replaceSceneEventsFromFile,
+  wrapEventsInGroup,
+} from './McpEventTools';
 
 const gd: libGDevelop = global.gd;
 
@@ -71,6 +96,7 @@ type McpEditorBridgeContext = {|
   processEditorFunctionCalls?: Function,
   triggerUnsavedChanges: () => void,
   runCommand: string => boolean,
+  saveProjectAndWait?: () => Promise<any>,
   getEditorSelection?: () => Object,
   generateEvents?: Function,
   onSceneEventsModifiedOutsideEditor?: Function,
@@ -274,8 +300,16 @@ const getResourceContent = async (
     };
   }
 
+  if (uri === 'gdevelop://project/resources.json') {
+    return {
+      uri,
+      mimeType: 'application/json',
+      text: JSON.stringify(inspectProjectResources(project), null, 2),
+    };
+  }
+
   const sceneResourceMatch = uri.match(
-    /^gdevelop:\/\/scene\/([^/]+)\/(events\.txt|instances\.json|objects\.json)$/
+    /^gdevelop:\/\/scene\/([^/]+)\/(events\.txt|events\.json|instances\.json|objects\.json|scene\.json)$/
   );
   if (!sceneResourceMatch) {
     throw new Error(`Unknown GDevelop MCP resource: ${uri}`);
@@ -294,6 +328,30 @@ const getResourceContent = async (
       text: renderNonTranslatedEventsAsText({
         eventsList: project.getLayout(sceneName).getEvents(),
       }),
+    };
+  }
+
+  if (resourceKind === 'events.json') {
+    return {
+      uri,
+      mimeType: 'application/json',
+      text: JSON.stringify(
+        readSceneEventsSerialized(project, { scene_name: sceneName }),
+        null,
+        2
+      ),
+    };
+  }
+
+  if (resourceKind === 'scene.json') {
+    return {
+      uri,
+      mimeType: 'application/json',
+      text: JSON.stringify(
+        readSerializedScene(project, { scene_name: sceneName }),
+        null,
+        2
+      ),
     };
   }
 
@@ -459,6 +517,21 @@ const callMcpTool = async ({
     );
   }
 
+  if (toolName === 'read_game_project_json') {
+    if (!project) return errorResult('No project opened.');
+    const serializedProject = JSON.parse(serializeToJSON(project));
+    return textResult({
+      success: true,
+      projectName: project.getName(),
+      projectUuid: project.getProjectUuid(),
+      serializedProject,
+      serializedProjectJson: truncateText(
+        JSON.stringify(serializedProject, null, 2),
+        args.maxLength || undefined
+      ),
+    });
+  }
+
   if (toolName === 'gdevelop_list_scenes') {
     if (!project) return errorResult('No project opened.');
     return textResult(
@@ -588,6 +661,84 @@ const callMcpTool = async ({
     );
   }
 
+  if (toolName === 'inspect_tool_schema') {
+    const requestedToolName =
+      args && typeof args.tool_name === 'string' ? args.tool_name : null;
+    const tools = getAllMcpToolsForIntrospection();
+    if (requestedToolName) {
+      const tool = tools.find(tool => tool.name === requestedToolName);
+      if (!tool) return errorResult(`Unknown MCP tool: ${requestedToolName}.`);
+      return textResult({
+        tool,
+        examples: getMcpToolUsageExamples(requestedToolName)[requestedToolName],
+        callPermission: canCallMcpTool(requestedToolName, permissions),
+      });
+    }
+
+    return textResult({
+      tools: tools.map(tool => ({
+        tool,
+        examples: getMcpToolUsageExamples(tool.name)[tool.name],
+        callPermission: canCallMcpTool(tool.name, permissions),
+      })),
+    });
+  }
+
+  if (toolName === 'get_tool_usage_examples') {
+    const requestedToolName =
+      args && typeof args.tool_name === 'string' ? args.tool_name : null;
+    return textResult({
+      examples: requestedToolName
+        ? getMcpToolUsageExamples(requestedToolName)[requestedToolName]
+        : getMcpToolUsageExamples(),
+    });
+  }
+
+  if (toolName === 'read_serialized_scene') {
+    if (!project) return errorResult('No project opened.');
+    try {
+      return textResult(readSerializedScene(project, args || {}));
+    } catch (error) {
+      return errorResult(error.message);
+    }
+  }
+
+  if (toolName === 'read_scene_events_serialized') {
+    if (!project) return errorResult('No project opened.');
+    try {
+      return textResult(readSceneEventsSerialized(project, args || {}));
+    } catch (error) {
+      return errorResult(error.message);
+    }
+  }
+
+  if (toolName === 'inspect_project_resources') {
+    if (!project) return errorResult('No project opened.');
+    try {
+      return textResult(inspectProjectResources(project, args || {}));
+    } catch (error) {
+      return errorResult(error.message);
+    }
+  }
+
+  if (toolName === 'find_scene_events') {
+    if (!project) return errorResult('No project opened.');
+    try {
+      return textResult(findSceneEvents(project, args || {}));
+    } catch (error) {
+      return errorResult(error.message);
+    }
+  }
+
+  if (toolName === 'compare_scene_events_semantics') {
+    if (!project) return errorResult('No project opened.');
+    try {
+      return textResult(compareSceneEventsSemantics(project, args || {}));
+    } catch (error) {
+      return errorResult(error.message);
+    }
+  }
+
   if (toolName === 'gdevelop_run_command') {
     const commandName =
       args && typeof args.commandName === 'string' ? args.commandName : '';
@@ -602,6 +753,27 @@ const callMcpTool = async ({
       : errorResult(`Unknown or unavailable command: ${commandName}.`);
   }
 
+  if (toolName === 'gdevelop_save_project_and_wait') {
+    if (!context.saveProjectAndWait) {
+      return errorResult(
+        'The GDevelop host did not provide saveProjectAndWait, so MCP cannot confirm that the project was written to disk.'
+      );
+    }
+    try {
+      const result = await context.saveProjectAndWait();
+      return textResult({
+        saved: !!result,
+        result,
+      });
+    } catch (error) {
+      return errorResult(
+        error && error.message
+          ? error.message
+          : 'Unable to save the project through MCP.'
+      );
+    }
+  }
+
   if (toolName === 'gdevelop_editor_call') {
     if (!args || typeof args.name !== 'string') {
       return errorResult('Missing EditorFunction name.');
@@ -610,6 +782,13 @@ const callMcpTool = async ({
       args.arguments && typeof args.arguments === 'object'
         ? args.arguments
         : {};
+    if (args.name !== 'gdevelop_editor_call' && isKnownMcpTool(args.name)) {
+      return callMcpTool({
+        toolName: args.name,
+        args: editorFunctionArgs,
+        context,
+      });
+    }
     if (
       (args.name === 'add_scene_events' || args.name === 'generate_events') &&
       !editorFunctionArgs.events_json &&
@@ -682,6 +861,56 @@ const callMcpTool = async ({
           newOrChangedAiGeneratedEventIds: new Set(),
         });
       }
+      context.triggerUnsavedChanges();
+      return textResult(result);
+    } catch (error) {
+      return errorResult(error.message);
+    }
+  }
+
+  let sceneWriteToolHandler = null;
+  if (toolName === 'add_or_update_resource') {
+    sceneWriteToolHandler = addOrUpdateResource;
+  } else if (toolName === 'set_sprite_animations') {
+    sceneWriteToolHandler = setSpriteAnimations;
+  } else if (toolName === 'replace_object_definition') {
+    sceneWriteToolHandler = replaceObjectDefinition;
+  } else if (toolName === 'delete_scene_object') {
+    sceneWriteToolHandler = deleteSceneObject;
+  } else if (toolName === 'set_object_properties') {
+    sceneWriteToolHandler = setObjectProperties;
+  } else if (
+    toolName === 'put_2d_instances' &&
+    args &&
+    Array.isArray(args.instances)
+  ) {
+    sceneWriteToolHandler = putStructured2dInstances;
+  } else if (toolName === 'apply_validated_scene_patch') {
+    sceneWriteToolHandler = applyValidatedScenePatch;
+  } else if (toolName === 'create_group') {
+    sceneWriteToolHandler = createGroup;
+  } else if (toolName === 'wrap_events_in_group') {
+    sceneWriteToolHandler = wrapEventsInGroup;
+  } else if (toolName === 'move_events_to_group') {
+    sceneWriteToolHandler = moveEventsToGroup;
+  } else if (toolName === 'rename_group') {
+    sceneWriteToolHandler = renameGroup;
+  } else if (toolName === 'ensure_scene_event_ids') {
+    sceneWriteToolHandler = ensureSceneEventIds;
+  } else if (toolName === 'replace_scene_events_from_file') {
+    sceneWriteToolHandler = replaceSceneEventsFromFile;
+  }
+
+  if (sceneWriteToolHandler) {
+    if (!project) return errorResult('No project opened.');
+    try {
+      const result = sceneWriteToolHandler(project, args || {}, {
+        onSceneEventsModifiedOutsideEditor:
+          context.onSceneEventsModifiedOutsideEditor,
+        onInstancesModifiedOutsideEditor:
+          context.onInstancesModifiedOutsideEditor,
+        onObjectsModifiedOutsideEditor: context.onObjectsModifiedOutsideEditor,
+      });
       context.triggerUnsavedChanges();
       return textResult(result);
     } catch (error) {

@@ -5169,6 +5169,7 @@ const MainFrame = (props: Props): React.MixedElement => {
           commandPaletteRef.current.launchCommand((commandName: any));
           return true;
         },
+        saveProjectAndWait: () => saveProject(),
         getEditorSelection: getMcpEditorSelection,
         generateEvents,
         onSceneEventsModifiedOutsideEditor,
@@ -5190,6 +5191,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       i18n,
       mcpEditorCallbacks,
       triggerUnsavedChanges,
+      saveProject,
       getMcpEditorSelection,
       generateEvents,
       onSceneEventsModifiedOutsideEditor,

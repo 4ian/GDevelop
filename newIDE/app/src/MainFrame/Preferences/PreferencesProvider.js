@@ -128,6 +128,7 @@ export const getInitialPreferences = (): {
   previewCrashReportUploadLevel: string,
   projectLastUsedPaths: {},
   recentProjectFiles: any,
+  resourcesToolsSettings: any,
   resourcesImporationBehavior: string,
   shareDialogDefaultTab: string,
   showAiAskButtonInTitleBar: boolean,

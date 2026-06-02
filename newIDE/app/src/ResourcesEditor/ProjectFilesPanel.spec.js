@@ -8,6 +8,7 @@ import {
   canMoveProjectFileToFolder,
   getMovedProjectFilePath,
   getProjectFileDragEffectAllowed,
+  getRegisteredProjectFileBadgeTitle,
   getResourceFileAfterProjectFileMove,
   shouldSelectProjectFileNode,
   shouldSelectCreatedProjectFile,
@@ -70,6 +71,12 @@ describe('ProjectFilesPanel', () => {
       'The folder could not be created on disk:\n\nEEXIST'
     );
     expect(typeof buildDuplicateFolderCreationErrorMessage()).toBe('string');
+  });
+
+  it('uses an accessible title for registered file icon badges', () => {
+    expect(getRegisteredProjectFileBadgeTitle('coin')).toBe(
+      'Registered as coin'
+    );
   });
 
   it('allows moving a file to a different folder', () => {

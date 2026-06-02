@@ -184,6 +184,42 @@ export type EditorStateForProject = {|
 // $FlowFixMe[deprecated-utility]
 export type EditorStateForProjectUpdate = $Shape<EditorStateForProject>;
 
+export type ResourcesToolsSettings = {|
+  activeToolCategory: 'image' | 'sound',
+  selectedImageTool: 'nano-banana',
+  selectedSoundTool: 'elevenlabs',
+  geminiApiKey: string,
+  nanoBananaModel: string,
+  nanoBananaPrompt: string,
+  imageAttachmentPath: string,
+  elevenLabsApiKey: string,
+  elevenLabsMode: 'sound-effect' | 'text-to-speech',
+  elevenLabsText: string,
+  elevenLabsVoiceId: string,
+  elevenLabsModel: string,
+  elevenLabsSoundModel: string,
+  elevenLabsOutputFormat: string,
+  elevenLabsDuration: string,
+|};
+
+export const defaultResourcesToolsSettings: ResourcesToolsSettings = {
+  activeToolCategory: 'image',
+  selectedImageTool: 'nano-banana',
+  selectedSoundTool: 'elevenlabs',
+  geminiApiKey: '',
+  nanoBananaModel: 'gemini-3.1-flash-image',
+  nanoBananaPrompt: '',
+  imageAttachmentPath: '',
+  elevenLabsApiKey: '',
+  elevenLabsMode: 'sound-effect',
+  elevenLabsText: '',
+  elevenLabsVoiceId: 'JBFqnCBsd6RMkjVDRZzb',
+  elevenLabsModel: 'eleven_multilingual_v2',
+  elevenLabsSoundModel: 'eleven_text_to_sound_v2',
+  elevenLabsOutputFormat: 'mp3_44100_128',
+  elevenLabsDuration: '',
+};
+
 export type PreferencesValues = {|
   language: string,
   autoDownloadUpdates: boolean,
@@ -253,6 +289,7 @@ export type PreferencesValues = {|
   disableNpmScriptConfirmation: boolean,
   showJsTypeError: boolean,
   canonicalEventSerialization: boolean,
+  resourcesToolsSettings: ResourcesToolsSettings,
 |};
 
 /**
@@ -462,6 +499,7 @@ export const initialPreferences = {
     disableNpmScriptConfirmation: false,
     showJsTypeError: false,
     canonicalEventSerialization: false,
+    resourcesToolsSettings: defaultResourcesToolsSettings,
   },
   setMultipleValues: () => {},
   setLanguage: () => {},

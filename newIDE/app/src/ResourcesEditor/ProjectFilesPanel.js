@@ -17,6 +17,7 @@ import { type FileMetadata } from '../ProjectsStorage';
 import type { StorageProvider } from '../ProjectsStorage';
 import ChevronArrowBottom from '../UI/CustomSvgIcons/ChevronArrowBottom';
 import ChevronArrowRight from '../UI/CustomSvgIcons/ChevronArrowRight';
+import CheckIcon from '../UI/CustomSvgIcons/Check';
 import FileIcon from '../UI/CustomSvgIcons/File';
 import FileWithLines from '../UI/CustomSvgIcons/FileWithLines';
 import FolderIcon from '../UI/CustomSvgIcons/Folder';
@@ -204,6 +205,20 @@ const styles = {
     color: 'var(--theme-success-color)',
     border: '1px solid rgba(69, 217, 161, 0.55)',
   },
+  registeredIconBadge: {
+    width: 18,
+    height: 18,
+    padding: 0,
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    lineHeight: 0,
+  },
+  registeredIcon: {
+    width: 14,
+    height: 14,
+    fontSize: 14,
+  },
   thumbnailBadge: {
     position: 'absolute',
     top: 8,
@@ -306,6 +321,10 @@ const styles = {
     boxSizing: 'border-box',
   },
 };
+
+export const getRegisteredProjectFileBadgeTitle = (
+  resourceName: string
+): string => `Registered as ${resourceName}`;
 
 export const getProjectRootPath = (project: gdProject): ?string => {
   if (!path) return null;
@@ -1779,16 +1798,23 @@ const ProjectFilesPanel: React.ComponentType<{
         const rowColor = isSelected
           ? theme.listItem.selectedTextColor
           : theme.text.color.primary;
+        const registeredResourceName = node.resourceName;
         const registrationBadge =
-          node.type === 'file' && node.resourceName ? (
+          node.type === 'file' && registeredResourceName ? (
             <span
               style={{
                 ...styles.badge,
                 ...styles.registeredBadge,
+                ...styles.registeredIconBadge,
               }}
-              title={`Registered as ${node.resourceName}`}
+              title={getRegisteredProjectFileBadgeTitle(
+                registeredResourceName
+              )}
+              aria-label={getRegisteredProjectFileBadgeTitle(
+                registeredResourceName
+              )}
             >
-              <Trans>Registered</Trans>
+              <CheckIcon style={styles.registeredIcon} aria-hidden="true" />
             </span>
           ) : null;
 
@@ -1928,17 +1954,24 @@ const ProjectFilesPanel: React.ComponentType<{
         const rowColor = isSelected
           ? theme.listItem.selectedTextColor
           : theme.text.color.primary;
+        const registeredResourceName = node.resourceName;
         const registrationBadge =
-          node.type === 'file' && node.resourceName ? (
+          node.type === 'file' && registeredResourceName ? (
             <span
               style={{
                 ...styles.badge,
                 ...styles.thumbnailBadge,
                 ...styles.registeredBadge,
+                ...styles.registeredIconBadge,
               }}
-              title={`Registered as ${node.resourceName}`}
+              title={getRegisteredProjectFileBadgeTitle(
+                registeredResourceName
+              )}
+              aria-label={getRegisteredProjectFileBadgeTitle(
+                registeredResourceName
+              )}
             >
-              <Trans>Registered</Trans>
+              <CheckIcon style={styles.registeredIcon} aria-hidden="true" />
             </span>
           ) : null;
 

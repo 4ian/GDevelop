@@ -5,20 +5,21 @@ import {
   renderInstructionSentenceAsPlainText,
   renderNonTranslatedEventsAsText,
 } from '../EventsSheet/EventsTree/TextRenderer';
-import {
-  serializeToJSON,
-  unserializeFromJSObject,
-} from '../Utils/Serializer';
+import { serializeToJSON, unserializeFromJSObject } from '../Utils/Serializer';
 import { mapFor } from '../Utils/MapFor';
 import { scanEventsListForValidationErrors } from '../Utils/EventsValidationScanner';
+import optionalRequire from '../Utils/OptionalRequire';
 
 const gd: libGDevelop = global.gd;
+const fs = optionalRequire('fs');
+const path = optionalRequire('path');
 
 const DEFAULT_LIMIT = 20;
 const MAX_LIMIT = 100;
 
 const normalizeLimit = (limit: any): number => {
-  if (typeof limit !== 'number' || !Number.isFinite(limit)) return DEFAULT_LIMIT;
+  if (typeof limit !== 'number' || !Number.isFinite(limit))
+    return DEFAULT_LIMIT;
   return Math.max(1, Math.min(MAX_LIMIT, Math.floor(limit)));
 };
 
@@ -141,19 +142,22 @@ export const getEventOperationReference = (): Object => ({
       name: 'insert_at_end',
       requiresTarget: false,
       requiresGeneratedEvents: true,
-      description: 'Append generated events at the end of the scene event sheet.',
+      description:
+        'Append generated events at the end of the scene event sheet.',
     },
     {
       name: 'insert_before_event',
       requiresTarget: true,
       requiresGeneratedEvents: true,
-      description: 'Insert generated events immediately before the target event.',
+      description:
+        'Insert generated events immediately before the target event.',
     },
     {
       name: 'insert_after_event',
       requiresTarget: true,
       requiresGeneratedEvents: true,
-      description: 'Insert generated events immediately after the target event.',
+      description:
+        'Insert generated events immediately after the target event.',
     },
     {
       name: 'insert_as_sub_event',
@@ -165,7 +169,8 @@ export const getEventOperationReference = (): Object => ({
       name: 'insert_and_replace_event',
       requiresTarget: true,
       requiresGeneratedEvents: true,
-      description: 'Delete the target event and insert generated events at the same position.',
+      description:
+        'Delete the target event and insert generated events at the same position.',
     },
     {
       name: 'replace_entire_event_and_sub_events',
@@ -252,6 +257,18 @@ const commentEventExample = [
   },
 ];
 
+const groupEventExample = [
+  {
+    type: 'BuiltinCommonInstructions::Group',
+    name: 'Initialization',
+    folded: true,
+    colorR: 74,
+    colorG: 176,
+    colorB: 228,
+    events: standardEventWithInstructionExample,
+  },
+];
+
 export const getEventsJsonExamples = ({
   project,
   sceneName,
@@ -267,6 +284,7 @@ export const getEventsJsonExamples = ({
     2
   );
   const commentEventsJson = JSON.stringify(commentEventExample, null, 2);
+  const groupEventsJson = JSON.stringify(groupEventExample, null, 2);
   const examples: Array<Object> = [
     {
       name: 'Append one standard event',
@@ -288,6 +306,18 @@ export const getEventsJsonExamples = ({
         {
           operation_name: 'insert_at_end',
           generated_events: commentEventsJson,
+        },
+      ],
+    },
+    {
+      name: 'Append a group event with one sub-event',
+      purpose:
+        'Use groups as visual/organizational wrappers. Put executable logic in the group events array.',
+      events_json: groupEventsJson,
+      event_changes: [
+        {
+          operation_name: 'insert_at_end',
+          generated_events: groupEventsJson,
         },
       ],
     },
@@ -369,7 +399,9 @@ const getInstructionMetadata = (
       project.getCurrentPlatform(),
       type
     );
-    if (!gd.MetadataProvider.isBadExpressionMetadata(numberExpressionMetadata)) {
+    if (
+      !gd.MetadataProvider.isBadExpressionMetadata(numberExpressionMetadata)
+    ) {
       return summarizeExpressionMetadata({
         type,
         metadata: numberExpressionMetadata,
@@ -380,7 +412,9 @@ const getInstructionMetadata = (
       project.getCurrentPlatform(),
       type
     );
-    if (!gd.MetadataProvider.isBadExpressionMetadata(stringExpressionMetadata)) {
+    if (
+      !gd.MetadataProvider.isBadExpressionMetadata(stringExpressionMetadata)
+    ) {
       return summarizeExpressionMetadata({
         type,
         metadata: stringExpressionMetadata,
@@ -525,7 +559,8 @@ export const searchInstructionMetadata = ({
             expression.displayedName,
             expression.fullGroupName,
             expression.scope.extension.name,
-            expression.scope.objectMetadata && expression.scope.objectMetadata.name,
+            expression.scope.objectMetadata &&
+              expression.scope.objectMetadata.name,
             expression.scope.behaviorMetadata &&
               expression.scope.behaviorMetadata.name,
           ],
@@ -569,6 +604,141 @@ const getInstructionMetadataForValidation = (
   return gd.MetadataProvider.isBadInstructionMetadata(metadata)
     ? null
     : metadata;
+};
+
+const isUrlResourceFile = (file: string): boolean =>
+  file.startsWith('http://') ||
+  file.startsWith('https://') ||
+  file.startsWith('ftp://') ||
+  file.startsWith('blob:') ||
+  file.startsWith('data:');
+
+const resolveLocalResourceFile = (
+  project: gdProject,
+  file: string
+): string | null => {
+  if (!file || !path || isUrlResourceFile(file)) return null;
+  if (path.isAbsolute(file)) return file;
+
+  const projectFile = project.getProjectFile();
+  if (!projectFile) return null;
+  return path.resolve(path.dirname(projectFile), file);
+};
+
+const getExpectedResourceKind = (parameterType: string): string | null => {
+  if (
+    parameterType === 'soundfile' ||
+    parameterType === 'musicfile' ||
+    parameterType === 'audioResource'
+  ) {
+    return 'audio';
+  }
+  if (parameterType === 'imageResource') return 'image';
+  if (parameterType === 'fontResource') return 'font';
+  if (parameterType === 'videoResource') return 'video';
+  if (parameterType === 'jsonResource') return 'json';
+  if (parameterType === 'bitmapFontResource') return 'bitmapFont';
+  if (parameterType === 'tilemapResource') return 'tilemap';
+  if (parameterType === 'tilesetResource') return 'tileset';
+  if (parameterType === 'model3DResource') return 'model3D';
+  if (parameterType === 'atlasResource') return 'atlas';
+  if (parameterType === 'spineResource') return 'spine';
+  return null;
+};
+
+const isResourceParameter = (
+  parameterMetadata: gdParameterMetadata
+): boolean => {
+  const valueTypeMetadata = parameterMetadata.getValueTypeMetadata();
+  return !!(
+    valueTypeMetadata &&
+    valueTypeMetadata.isResource &&
+    valueTypeMetadata.isResource()
+  );
+};
+
+const validateReferencedResource = ({
+  project,
+  instructionType,
+  instructionSentence,
+  isCondition,
+  eventPath,
+  instructionIndex,
+  parameterIndex,
+  parameterMetadata,
+  resourceName,
+  issues,
+}: {|
+  project: gdProject,
+  instructionType: string,
+  instructionSentence: string,
+  isCondition: boolean,
+  eventPath: Array<number>,
+  instructionIndex: number,
+  parameterIndex: number,
+  parameterMetadata: gdParameterMetadata,
+  resourceName: string,
+  issues: Array<Object>,
+|}) => {
+  if (!resourceName) return;
+  const resourcesManager = project.getResourcesManager();
+  if (!resourcesManager.hasResource(resourceName)) {
+    // GDevelop's InstructionValidator already reports the invalid parameter.
+    return;
+  }
+
+  const resource = resourcesManager.getResource(resourceName);
+  const expectedKind = getExpectedResourceKind(parameterMetadata.getType());
+  if (expectedKind && resource.getKind() !== expectedKind) {
+    issues.push({
+      severity: 'error',
+      type: 'resource-kind-mismatch',
+      isCondition,
+      instructionType,
+      instructionSentence,
+      eventPath,
+      instructionIndex,
+      parameterIndex,
+      resourceName,
+      resourceKind: resource.getKind(),
+      expectedResourceKind: expectedKind,
+    });
+  }
+
+  const resourceFile = resource.getFile();
+  if (!resourceFile) {
+    issues.push({
+      severity: 'error',
+      type: 'resource-empty-file',
+      isCondition,
+      instructionType,
+      instructionSentence,
+      eventPath,
+      instructionIndex,
+      parameterIndex,
+      resourceName,
+      resourceKind: resource.getKind(),
+    });
+    return;
+  }
+
+  const resolvedFile = resolveLocalResourceFile(project, resourceFile);
+  if (resolvedFile && fs && !fs.existsSync(resolvedFile)) {
+    issues.push({
+      severity: 'error',
+      type: 'resource-missing-file',
+      isCondition,
+      instructionType,
+      instructionSentence,
+      eventPath,
+      instructionIndex,
+      parameterIndex,
+      resourceName,
+      resourceKind: resource.getKind(),
+      resourceFile,
+      resolvedFile,
+    });
+  }
 };
 
 const validateInstructionsList = ({
@@ -643,6 +813,24 @@ const validateInstructionsList = ({
           eventPath: path,
           instructionIndex,
           parameter: summarizeParameter(parameterMetadata, parameterIndex),
+        });
+      }
+
+      if (isResourceParameter(parameterMetadata)) {
+        validateReferencedResource({
+          project,
+          instructionType,
+          instructionSentence: renderInstructionSentenceAsPlainText(
+            instruction,
+            metadata
+          ),
+          isCondition,
+          eventPath: path,
+          instructionIndex,
+          parameterIndex,
+          parameterMetadata,
+          resourceName: value,
+          issues,
         });
       }
     });

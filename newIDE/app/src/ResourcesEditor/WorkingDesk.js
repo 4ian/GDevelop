@@ -5,7 +5,6 @@ import * as React from 'react';
 import Text from '../UI/Text';
 import IconButton from '../UI/IconButton';
 import MiniToolbar, { MiniToolbarText } from '../UI/MiniToolbar';
-import Slider from '../UI/Slider';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import { MarkdownText } from '../UI/MarkdownText';
 import ResourcesLoader from '../ResourcesLoader';
@@ -16,9 +15,9 @@ import optionalRequire from '../Utils/OptionalRequire';
 import EditFileIcon from '../UI/CustomSvgIcons/EditFile';
 import FloppyIcon from '../UI/CustomSvgIcons/Floppy';
 import GridIcon from '../UI/CustomSvgIcons/Grid2d';
-import PauseIcon from '../UI/CustomSvgIcons/Pause';
-import PlayIcon from '../UI/CustomSvgIcons/Play';
 import VisibilityIcon from '../UI/CustomSvgIcons/Visibility';
+import ZoomIn from '../UI/CustomSvgIcons/ZoomIn';
+import ZoomOut from '../UI/CustomSvgIcons/ZoomOut';
 import {
   getFileUrl,
   isAudioFile,
@@ -28,23 +27,22 @@ import {
   isVideoFile,
   type ProjectFileSelection,
 } from './ProjectFilesPanel';
+import {
+  formatImageZoomFactor,
+  getNextImageZoomFactor,
+  imageZoomMaxFactor,
+  imageZoomMinFactor,
+  shouldShowWorkingDeskImageZoomToolbar,
+} from './WorkingDeskZoomUtils';
 import './WorkingDesk.css';
 
 const fs = optionalRequire('fs');
-const path = optionalRequire('path');
 
 type Props = {|
   project: gdProject,
   resourcesLoader: typeof ResourcesLoader,
   selectedItem: ?ProjectFileSelection,
   onProjectFilesChanged: () => Promise<void> | void,
-|};
-
-type SequenceFrame = {|
-  absolutePath: string,
-  fileUrl: string,
-  name: string,
-  index: number,
 |};
 
 const styles = {
@@ -60,6 +58,12 @@ const styles = {
     justifyContent: 'space-between',
     padding: '0 8px',
     minHeight: 32,
+  },
+  headerActions: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 8,
+    flexShrink: 0,
   },
   content: {
     position: 'relative',
@@ -106,6 +110,24 @@ const styles = {
     minHeight: 0,
     overflow: 'hidden',
   },
+  imageScrollArea: {
+    position: 'relative',
+    display: 'flex',
+    flex: 1,
+    minHeight: 0,
+    minWidth: 0,
+    overflow: 'auto',
+    zIndex: 1,
+  },
+  imageZoomCanvas: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    minWidth: '100%',
+    minHeight: '100%',
+    boxSizing: 'border-box',
+    padding: 16,
+  },
   image: {
     maxWidth: '100%',
     maxHeight: '100%',
@@ -134,6 +156,8 @@ const styles = {
     display: 'flex',
     flex: 1,
     minHeight: 0,
+    minWidth: 0,
+    overflow: 'hidden',
   },
   markdownPane: {
     flex: 1,
@@ -157,10 +181,6 @@ const styles = {
   status: {
     padding: '0 8px 6px 8px',
   },
-  sequenceSlider: {
-    width: 140,
-    padding: '0 8px',
-  },
   textPreview: {
     flex: 1,
     overflow: 'auto',
@@ -182,38 +202,6 @@ const readTextFile = async (absolutePath: string): Promise<string> => {
   return fs.promises.readFile(absolutePath, 'utf8');
 };
 
-const detectSequenceFrames = async (
-  selectedItem: ProjectFileSelection
-): Promise<Array<SequenceFrame>> => {
-  if (!fs || !path || !isImageFile(selectedItem.node)) return [];
-
-  const directory = path.dirname(selectedItem.node.absolutePath);
-  const selectedName = path.basename(selectedItem.node.absolutePath);
-  const match = selectedName.match(/^(.*?)(\d+)(\.[^.]+)$/);
-  if (!match) return [];
-
-  const [, prefix, , extension] = match;
-  const dirents = await fs.promises.readdir(directory, { withFileTypes: true });
-  const frames = dirents
-    .filter(dirent => dirent.isFile())
-    .map(dirent => {
-      const frameMatch = dirent.name.match(/^(.*?)(\d+)(\.[^.]+)$/);
-      if (!frameMatch) return null;
-      if (frameMatch[1] !== prefix || frameMatch[3] !== extension) return null;
-      const absolutePath = path.join(directory, dirent.name);
-      return {
-        absolutePath,
-        fileUrl: getFileUrl(absolutePath),
-        name: dirent.name,
-        index: parseInt(frameMatch[2], 10),
-      };
-    })
-    .filter(Boolean)
-    .sort((a, b) => a.index - b.index);
-
-  return frames.length > 1 ? frames : [];
-};
-
 const WorkingDesk = ({
   project,
   resourcesLoader,
@@ -229,13 +217,8 @@ const WorkingDesk = ({
   const [markdownStatus, setMarkdownStatus] = React.useState<?string>(null);
   const [textPreview, setTextPreview] = React.useState<?string>(null);
   const [textPreviewError, setTextPreviewError] = React.useState<?string>(null);
-  const [sequenceFrames, setSequenceFrames] = React.useState<
-    Array<SequenceFrame>
-  >([]);
-  const [currentFrameIndex, setCurrentFrameIndex] = React.useState(0);
-  const [isPlayingSequence, setIsPlayingSequence] = React.useState(false);
-  const [sequenceFps, setSequenceFps] = React.useState(12);
   const [imageSize, setImageSize] = React.useState<?[number, number]>(null);
+  const [imageZoomFactor, setImageZoomFactor] = React.useState(1);
   const [audioPreviewError, setAudioPreviewError] = React.useState<?string>(
     null
   );
@@ -264,10 +247,8 @@ const WorkingDesk = ({
       setIsMarkdownDirty(false);
       setTextPreview(null);
       setTextPreviewError(null);
-      setSequenceFrames([]);
-      setCurrentFrameIndex(0);
-      setIsPlayingSequence(false);
       setImageSize(null);
+      setImageZoomFactor(1);
       setAudioPreviewError(null);
 
       if (!selectedItem || selectedItem.node.type !== 'file') return;
@@ -294,34 +275,11 @@ const WorkingDesk = ({
           });
       }
 
-      if (isImageFile(selectedItem.node)) {
-        detectSequenceFrames(selectedItem)
-          .then(frames => {
-            if (!isMounted) return;
-            setSequenceFrames(frames);
-          })
-          .catch(() => {
-            if (!isMounted) return;
-            setSequenceFrames([]);
-          });
-      }
-
       return () => {
         isMounted = false;
       };
     },
     [selectedItem]
-  );
-
-  React.useEffect(
-    () => {
-      if (!isPlayingSequence || sequenceFrames.length < 2) return;
-      const intervalId = setInterval(() => {
-        setCurrentFrameIndex(index => (index + 1) % sequenceFrames.length);
-      }, Math.max(16, 1000 / sequenceFps));
-      return () => clearInterval(intervalId);
-    },
-    [isPlayingSequence, sequenceFps, sequenceFrames.length]
   );
 
   const saveMarkdown = React.useCallback(
@@ -356,75 +314,86 @@ const WorkingDesk = ({
         </Text>
       );
     }
-    if (sequenceFrames.length > 1) {
-      return (
-        <Text noMargin>
-          {sequenceFrames.length} <Trans>frames</Trans>
-        </Text>
-      );
-    }
     return null;
   };
 
-  const renderSequenceToolbar = () => {
-    if (sequenceFrames.length < 2) return null;
+  const renderImageZoomToolbar = () => {
+    if (!shouldShowWorkingDeskImageZoomToolbar(selectedNode)) return null;
     return (
-      <MiniToolbar>
+      <MiniToolbar noPadding>
         <IconButton
           size="small"
-          onClick={() => setIsPlayingSequence(!isPlayingSequence)}
-          tooltip={isPlayingSequence ? t`Pause animation` : t`Play animation`}
+          onClick={() =>
+            setImageZoomFactor(zoomFactor =>
+              getNextImageZoomFactor(zoomFactor, 'out')
+            )
+          }
+          disabled={imageZoomFactor <= imageZoomMinFactor}
+          tooltip={t`Zoom out`}
         >
-          {isPlayingSequence ? <PauseIcon /> : <PlayIcon />}
+          <ZoomOut />
         </IconButton>
         <MiniToolbarText>
-          {currentFrameIndex + 1}/{sequenceFrames.length}
+          {formatImageZoomFactor(imageZoomFactor)}
         </MiniToolbarText>
-        <div style={styles.sequenceSlider}>
-          <Slider
-            min={0}
-            max={sequenceFrames.length - 1}
-            step={1}
-            value={currentFrameIndex}
-            onChange={value => setCurrentFrameIndex(value)}
-          />
-        </div>
-        <MiniToolbarText>
-          <Trans>FPS</Trans>
-        </MiniToolbarText>
-        <div style={styles.sequenceSlider}>
-          <Slider
-            min={1}
-            max={30}
-            step={1}
-            value={sequenceFps}
-            onChange={value => setSequenceFps(value)}
-          />
-        </div>
+        <IconButton
+          size="small"
+          onClick={() =>
+            setImageZoomFactor(zoomFactor =>
+              getNextImageZoomFactor(zoomFactor, 'in')
+            )
+          }
+          disabled={imageZoomFactor >= imageZoomMaxFactor}
+          tooltip={t`Zoom in`}
+        >
+          <ZoomIn />
+        </IconButton>
       </MiniToolbar>
     );
   };
 
   const renderImagePreview = () => {
     if (!selectedNode) return null;
-    const imageSource =
-      sequenceFrames.length > 1
-        ? sequenceFrames[currentFrameIndex].fileUrl
-        : getFileUrl(selectedNode.absolutePath);
+    const imageSource = getFileUrl(selectedNode.absolutePath);
     return (
       <div style={styles.previewColumn}>
-        {renderSequenceToolbar()}
         <div style={styles.mediaStage}>
           <CheckeredBackground />
-          <img
-            src={imageSource}
-            alt={selectedNode.name}
-            style={styles.image}
-            onLoad={event => {
-              const image = event.currentTarget;
-              setImageSize([image.naturalWidth, image.naturalHeight]);
-            }}
-          />
+          <div style={styles.imageScrollArea}>
+            <div
+              style={{
+                ...styles.imageZoomCanvas,
+                width:
+                  imageZoomFactor >= 1
+                    ? `${imageZoomFactor * 100}%`
+                    : '100%',
+                height:
+                  imageZoomFactor >= 1
+                    ? `${imageZoomFactor * 100}%`
+                    : '100%',
+              }}
+            >
+              <img
+                src={imageSource}
+                alt={selectedNode.name}
+                style={{
+                  ...styles.image,
+                  maxWidth:
+                    imageZoomFactor < 1
+                      ? `${imageZoomFactor * 100}%`
+                      : '100%',
+                  maxHeight:
+                    imageZoomFactor < 1
+                      ? `${imageZoomFactor * 100}%`
+                      : '100%',
+                }}
+                onLoad={event => {
+                  const image = event.currentTarget;
+                  setImageSize([image.naturalWidth, image.naturalHeight]);
+                }}
+              />
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -597,7 +566,10 @@ const WorkingDesk = ({
           <Trans>Working desk</Trans>
           {selectedNode ? `: ${selectedNode.name}` : ''}
         </Text>
-        {renderHeaderDetails()}
+        <div style={styles.headerActions}>
+          {renderHeaderDetails()}
+          {renderImageZoomToolbar()}
+        </div>
       </div>
       <div style={styles.content}>
         <div style={styles.previewArea}>

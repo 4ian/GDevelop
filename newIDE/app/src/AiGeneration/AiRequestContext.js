@@ -518,6 +518,35 @@ type AiRequestProviderProps = {|
   children: React.Node,
 |};
 
+// Merge an incremental fetch (only the messages from `sinceMessageId` onward)
+// back onto the cached request. When the response isn't an incremental slice
+// of what we have (no cache, unknown id, or the backend returned the full
+// output), we just use the fetched request as-is.
+export const mergeIncrementalAiRequest = (
+  previousAiRequest: ?AiRequest,
+  fetchedAiRequest: AiRequest,
+  sinceMessageId: ?string
+): AiRequest => {
+  const fetchedOutput = fetchedAiRequest.output || [];
+  const previousOutput = previousAiRequest && previousAiRequest.output;
+  const isIncrementalSlice =
+    !!sinceMessageId &&
+    !!previousOutput &&
+    fetchedOutput.length > 0 &&
+    fetchedOutput[0].messageId === sinceMessageId;
+  if (!isIncrementalSlice || !previousOutput) return fetchedAiRequest;
+
+  const spliceIndex = previousOutput.findIndex(
+    message => message.messageId === sinceMessageId
+  );
+  if (spliceIndex === -1) return fetchedAiRequest;
+
+  return {
+    ...fetchedAiRequest,
+    output: [...previousOutput.slice(0, spliceIndex), ...fetchedOutput],
+  };
+};
+
 export const AiRequestProvider = ({
   children,
 }: AiRequestProviderProps): React.MixedElement => {
@@ -702,13 +731,26 @@ export const AiRequestProvider = ({
       } else {
         lastFullFetchTimeRef.current = now;
       }
+      // Only fetch the messages we don't have yet: ask for everything from the
+      // last cached message onward (re-fetched so its in-place updates, like
+      // suggestions, are picked up).
+      const cachedOutput = (aiRequests[aiRequestId] || {}).output;
+      const lastCachedMessage =
+        cachedOutput && cachedOutput.length > 0
+          ? cachedOutput[cachedOutput.length - 1]
+          : null;
+      const sinceMessageId =
+        (lastCachedMessage && lastCachedMessage.messageId) || undefined;
       const aiRequest = await retryIfFailed({ times: 2 }, () =>
         getAiRequest(getAuthorizationHeader, {
           userId: profile.id,
           aiRequestId,
+          sinceMessageId,
         })
       );
-      updateAiRequest(aiRequestId, () => aiRequest);
+      updateAiRequest(aiRequestId, prevRequest =>
+        mergeIncrementalAiRequest(prevRequest, aiRequest, sinceMessageId)
+      );
       if (isSubAgent) {
         if (aiRequest.status === 'ready' || aiRequest.status === 'error') {
           removeSubAgentIfDone(aiRequestId);

@@ -280,9 +280,13 @@ export const getAiRequest = async (
   {
     userId,
     aiRequestId,
+    // When set, the backend only returns the messages from this one onward
+    // (see mergeIncrementalAiRequest in AiRequestContext).
+    sinceMessageId,
   }: {|
     userId: string,
     aiRequestId: string,
+    sinceMessageId?: ?string,
   |}
 ): Promise<AiRequest> => {
   const authorizationHeader = await getAuthorizationHeader();
@@ -292,6 +296,7 @@ export const getAiRequest = async (
     {
       params: {
         userId,
+        sinceMessageId: sinceMessageId || undefined,
       },
       headers: {
         Authorization: authorizationHeader,

@@ -518,26 +518,26 @@ type AiRequestProviderProps = {|
   children: React.Node,
 |};
 
-// Merge an incremental fetch (only the messages from `sinceMessageId` onward)
+// Merge an incremental fetch (only the messages from `outputFromMessageId` onward)
 // back onto the cached request. When the response isn't an incremental slice
 // of what we have (no cache, unknown id, or the backend returned the full
 // output), we just use the fetched request as-is.
 export const mergeIncrementalAiRequest = (
   previousAiRequest: ?AiRequest,
   fetchedAiRequest: AiRequest,
-  sinceMessageId: ?string
+  outputFromMessageId: ?string
 ): AiRequest => {
   const fetchedOutput = fetchedAiRequest.output || [];
   const previousOutput = previousAiRequest && previousAiRequest.output;
   const isIncrementalSlice =
-    !!sinceMessageId &&
+    !!outputFromMessageId &&
     !!previousOutput &&
     fetchedOutput.length > 0 &&
-    fetchedOutput[0].messageId === sinceMessageId;
+    fetchedOutput[0].messageId === outputFromMessageId;
   if (!isIncrementalSlice || !previousOutput) return fetchedAiRequest;
 
   const spliceIndex = previousOutput.findIndex(
-    message => message.messageId === sinceMessageId
+    message => message.messageId === outputFromMessageId
   );
   if (spliceIndex === -1) return fetchedAiRequest;
 
@@ -739,17 +739,17 @@ export const AiRequestProvider = ({
         cachedOutput && cachedOutput.length > 0
           ? cachedOutput[cachedOutput.length - 1]
           : null;
-      const sinceMessageId =
+      const outputFromMessageId =
         (lastCachedMessage && lastCachedMessage.messageId) || undefined;
       const aiRequest = await retryIfFailed({ times: 2 }, () =>
         getAiRequest(getAuthorizationHeader, {
           userId: profile.id,
           aiRequestId,
-          sinceMessageId,
+          outputFromMessageId,
         })
       );
       updateAiRequest(aiRequestId, prevRequest =>
-        mergeIncrementalAiRequest(prevRequest, aiRequest, sinceMessageId)
+        mergeIncrementalAiRequest(prevRequest, aiRequest, outputFromMessageId)
       );
       if (isSubAgent) {
         if (aiRequest.status === 'ready' || aiRequest.status === 'error') {

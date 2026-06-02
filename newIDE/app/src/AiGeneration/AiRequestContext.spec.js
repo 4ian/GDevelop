@@ -507,7 +507,7 @@ describe('mergeIncrementalAiRequest', () => {
     output,
   });
 
-  it('returns the fetched request as-is when there is no sinceMessageId', () => {
+  it('returns the fetched request as-is when there is no outputFromMessageId', () => {
     const fetched = requestWithOutput([message('a'), message('b')]);
     expect(
       mergeIncrementalAiRequest(

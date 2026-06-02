@@ -217,6 +217,149 @@ describe('AiRequestProvider sub-agent polling', () => {
     expect(mockFn(getAiRequestStatuses)).toHaveBeenCalledTimes(1);
     expect(mockFn(getAiRequest)).toHaveBeenCalledTimes(2);
   });
+
+  // The selected parent and all its active sub-agents are status-polled in a
+  // single batched request per tick.
+  it('batches the parent and all sub-agents into a single status request', async () => {
+    const { contextRef } = renderProvider();
+    const context = contextRef.current;
+    if (!context) throw new Error('Context not captured');
+
+    mockFn(getAiRequest).mockImplementation((_, { aiRequestId }) =>
+      Promise.resolve(makeAiRequest(aiRequestId, 'working'))
+    );
+
+    await act(async () => {
+      context.aiRequestStorage.updateAiRequest('parent-1', () =>
+        makeAiRequest('parent-1', 'working')
+      );
+      context.aiRequestStorage.updateAiRequest('sub-1', () =>
+        makeAiRequest('sub-1', 'working')
+      );
+      context.aiRequestStorage.updateAiRequest('sub-2', () =>
+        makeAiRequest('sub-2', 'working')
+      );
+      context.setSelectedAiRequestId('parent-1');
+      context.activateSubAgent('sub-1', 'parent-1', 'call-1');
+      context.activateSubAgent('sub-2', 'parent-1', 'call-2');
+    });
+
+    // First tick: everyone is due for a full fetch.
+    await act(async () => {
+      jest.advanceTimersByTime(POLLING_INTERVAL_IN_MS);
+      await flushPromises();
+    });
+
+    mockFn(getAiRequestStatuses).mockResolvedValue([
+      { id: 'parent-1', status: 'working', userId: 'user-1' },
+      { id: 'sub-1', status: 'working', userId: 'user-1' },
+      { id: 'sub-2', status: 'working', userId: 'user-1' },
+    ]);
+
+    // Second tick: everyone is status-only → one batched request for all ids.
+    await act(async () => {
+      jest.advanceTimersByTime(POLLING_INTERVAL_IN_MS);
+      await flushPromises();
+    });
+
+    expect(mockFn(getAiRequestStatuses)).toHaveBeenCalledTimes(1);
+    expect(
+      mockFn(getAiRequestStatuses).mock.calls[0][1].aiRequestIds.sort()
+    ).toEqual(['parent-1', 'sub-1', 'sub-2']);
+  });
+
+  // When the batched response reports a single change, only that entity is
+  // full-fetched; the unchanged ones are not.
+  it('only full-fetches the entity whose status changed', async () => {
+    const { contextRef } = renderProvider();
+    const context = contextRef.current;
+    if (!context) throw new Error('Context not captured');
+
+    mockFn(getAiRequest).mockImplementation((_, { aiRequestId }) =>
+      Promise.resolve(makeAiRequest(aiRequestId, 'working'))
+    );
+
+    await act(async () => {
+      context.aiRequestStorage.updateAiRequest('parent-1', () =>
+        makeAiRequest('parent-1', 'working')
+      );
+      context.aiRequestStorage.updateAiRequest('sub-1', () =>
+        makeAiRequest('sub-1', 'working')
+      );
+      context.aiRequestStorage.updateAiRequest('sub-2', () =>
+        makeAiRequest('sub-2', 'working')
+      );
+      context.setSelectedAiRequestId('parent-1');
+      context.activateSubAgent('sub-1', 'parent-1', 'call-1');
+      context.activateSubAgent('sub-2', 'parent-1', 'call-2');
+    });
+
+    await act(async () => {
+      jest.advanceTimersByTime(POLLING_INTERVAL_IN_MS);
+      await flushPromises();
+    });
+    expect(mockFn(getAiRequest)).toHaveBeenCalledTimes(3);
+
+    // Only sub-1 changes; parent and sub-2 stay working.
+    mockFn(getAiRequestStatuses).mockResolvedValue([
+      { id: 'parent-1', status: 'working', userId: 'user-1' },
+      { id: 'sub-1', status: 'ready', userId: 'user-1' },
+      { id: 'sub-2', status: 'working', userId: 'user-1' },
+    ]);
+
+    await act(async () => {
+      jest.advanceTimersByTime(POLLING_INTERVAL_IN_MS);
+      await flushPromises();
+    });
+
+    expect(mockFn(getAiRequestStatuses)).toHaveBeenCalledTimes(1);
+    expect(mockFn(getAiRequest)).toHaveBeenCalledTimes(4);
+    expect(mockFn(getAiRequest).mock.calls[3][1].aiRequestId).toBe('sub-1');
+  });
+
+  // An id missing from the batched response (not found / not yet visible) must
+  // be left as-is, without crashing or triggering a full fetch.
+  it('leaves an entity untouched when it is missing from the batched response', async () => {
+    const { contextRef } = renderProvider();
+    const context = contextRef.current;
+    if (!context) throw new Error('Context not captured');
+
+    mockFn(getAiRequest).mockImplementation((_, { aiRequestId }) =>
+      Promise.resolve(makeAiRequest(aiRequestId, 'working'))
+    );
+
+    await act(async () => {
+      context.aiRequestStorage.updateAiRequest('parent-1', () =>
+        makeAiRequest('parent-1', 'working')
+      );
+      context.aiRequestStorage.updateAiRequest('sub-1', () =>
+        makeAiRequest('sub-1', 'working')
+      );
+      context.setSelectedAiRequestId('parent-1');
+      context.activateSubAgent('sub-1', 'parent-1', 'call-1');
+    });
+
+    await act(async () => {
+      jest.advanceTimersByTime(POLLING_INTERVAL_IN_MS);
+      await flushPromises();
+    });
+    expect(mockFn(getAiRequest)).toHaveBeenCalledTimes(2);
+
+    // sub-1 is omitted from the response.
+    mockFn(getAiRequestStatuses).mockResolvedValue([
+      { id: 'parent-1', status: 'working', userId: 'user-1' },
+    ]);
+
+    await act(async () => {
+      jest.advanceTimersByTime(POLLING_INTERVAL_IN_MS);
+      await flushPromises();
+    });
+
+    const updated = contextRef.current;
+    if (!updated) throw new Error('Context not captured');
+    expect(mockFn(getAiRequest)).toHaveBeenCalledTimes(2);
+    expect(Object.keys(updated.activeSubAgents)).toEqual(['sub-1']);
+  });
 });
 
 describe('AiRequestProvider sub-agent cleanup on navigation', () => {

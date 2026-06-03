@@ -215,10 +215,14 @@ export default class InstancesAdder {
   };
 
   /**
-   * Return the temporary instances currently added on the scene.
+   * Check if the given instance is one of the temporary instances added while
+   * an object is being dragged over the scene.
    */
-  getTemporaryInstances(): Array<gdInitialInstance> {
-    return this._temporaryInstances;
+  isTemporaryInstance(instance: ?gdInitialInstance): boolean {
+    if (!instance) return false;
+    return this._temporaryInstances.some(
+      temporaryInstance => temporaryInstance.ptr === instance.ptr
+    );
   }
 
   /**

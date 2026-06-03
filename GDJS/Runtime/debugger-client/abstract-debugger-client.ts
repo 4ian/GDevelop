@@ -487,6 +487,8 @@ namespace gdjs {
           }
         } else if (data.command === 'captureScreenshot') {
           this.sendScreenshot(data.messageId);
+        } else if (data.command === 'simulateInput') {
+          this.simulateInput(data.inputs, data.messageId);
         } else if (data.command === 'hardReload') {
           // This usually means that the preview was modified so much that an entire reload
           // is needed, or that the runtime itself could have been modified.
@@ -994,6 +996,78 @@ namespace gdjs {
           command: 'screenshot',
           messageId,
           payload: { dataUrl, width, height, error },
+        })
+      );
+    }
+
+    /**
+     * Inject simulated input events into the running game's InputManager, so an
+     * automated harness can drive the game (press keys, move/click the mouse,
+     * touch). Each input is an object: { type, ... }.
+     *   keyPressed/keyReleased: { type, keyCode, location? }
+     *   releaseAllKeys: { type }
+     *   mouseMove: { type, x, y }   (game coordinates)
+     *   mouseButtonPressed/mouseButtonReleased: { type, button }
+     *   touchStart/touchMove: { type, identifier, x, y }
+     *   touchEnd: { type, identifier }
+     * Mouse/touch coordinates are in game (scene) coordinates.
+     */
+    simulateInput(inputs: Array<any>, messageId: number): void {
+      const inputManager = this._runtimegame.getInputManager();
+      const applied: Array<string> = [];
+      let error: string | null = null;
+      try {
+        (inputs || []).forEach((input) => {
+          if (!input || typeof input !== 'object') return;
+          switch (input.type) {
+            case 'keyPressed':
+              inputManager.onKeyPressed(input.keyCode, input.location);
+              applied.push('keyPressed:' + input.keyCode);
+              break;
+            case 'keyReleased':
+              inputManager.onKeyReleased(input.keyCode, input.location);
+              applied.push('keyReleased:' + input.keyCode);
+              break;
+            case 'releaseAllKeys':
+              inputManager.releaseAllPressedKeys();
+              applied.push('releaseAllKeys');
+              break;
+            case 'mouseMove':
+              inputManager.onMouseMove(input.x, input.y);
+              applied.push('mouseMove');
+              break;
+            case 'mouseButtonPressed':
+              inputManager.onMouseButtonPressed(input.button || 0);
+              applied.push('mouseButtonPressed:' + (input.button || 0));
+              break;
+            case 'mouseButtonReleased':
+              inputManager.onMouseButtonReleased(input.button || 0);
+              applied.push('mouseButtonReleased:' + (input.button || 0));
+              break;
+            case 'touchStart':
+              inputManager.onTouchStart(input.identifier || 0, input.x, input.y);
+              applied.push('touchStart');
+              break;
+            case 'touchMove':
+              inputManager.onTouchMove(input.identifier || 0, input.x, input.y);
+              applied.push('touchMove');
+              break;
+            case 'touchEnd':
+              inputManager.onTouchEnd(input.identifier || 0);
+              applied.push('touchEnd');
+              break;
+            default:
+              applied.push('unknown:' + input.type);
+          }
+        });
+      } catch (e) {
+        error = (e as Error).message || 'Failed to simulate input.';
+      }
+      this._sendMessage(
+        circularSafeStringify({
+          command: 'inputSimulated',
+          messageId,
+          payload: { applied, error },
         })
       );
     }

@@ -1470,12 +1470,14 @@ describe('McpEditorBridge', () => {
       });
       const batchResult = JSON.parse(batchResponse.content[0].text);
       expect(batchResponse.isError).not.toBe(true);
-      expect(batchResult.counts).toEqual({
-        resources: 1,
-        objects: 1,
-        spriteAnimations: 1,
-        instances: 1,
-      });
+      expect(batchResult.counts).toEqual(
+        expect.objectContaining({
+          resources: 1,
+          objects: 1,
+          spriteAnimations: 1,
+          instances: 1,
+        })
+      );
       expect(project.getResourcesManager().hasResource('Player.png')).toBe(
         true
       );
@@ -2431,6 +2433,152 @@ describe('McpEditorBridge', () => {
       const changed2 = autoQuoteEventParameters(project, events2);
       expect(changed2).toBe(0);
       expect(events2[0].actions[0].parameters[1]).toBe('"AlreadyQuoted"');
+    } finally {
+      project.delete();
+    }
+  });
+
+  it('simulates input into a running preview with key-name mapping', async () => {
+    let captured = null;
+    const previewDebuggerServer = {
+      getServerState: () => 'started',
+      getExistingPreviewDebuggerIds: () => ['preview-ws-0'],
+      getExistingDebuggerIds: () => ['preview-ws-0'],
+      registerCallbacks: () => () => {},
+      sendMessage: () => {},
+      sendMessageWithResponse: message => {
+        captured = message;
+        return Promise.resolve({
+          command: 'inputSimulated',
+          payload: { applied: ['keyPressed:37'], error: null },
+        });
+      },
+    };
+    const bridge = makeBridge({
+      getPreviewDebuggerServer: () => previewDebuggerServer,
+    });
+
+    const response = await bridge.handleRendererMcpRequest({
+      method: 'tools/call',
+      params: {
+        name: 'simulate_preview_input',
+        arguments: { inputs: [{ type: 'keyPressed', key: 'Left' }] },
+      },
+    });
+    const result = JSON.parse(response.content[0].text);
+    expect(response.isError).not.toBe(true);
+    expect(result.success).toBe(true);
+    // "Left" must map to DOM key code 37.
+    expect(captured.command).toBe('simulateInput');
+    expect(captured.inputs[0]).toEqual(
+      expect.objectContaining({ type: 'keyPressed', keyCode: 37 })
+    );
+  });
+
+  it('rejects an unknown key name for input simulation', async () => {
+    const bridge = makeBridge({
+      getPreviewDebuggerServer: () => ({
+        getServerState: () => 'started',
+        getExistingPreviewDebuggerIds: () => ['preview-ws-0'],
+        getExistingDebuggerIds: () => ['preview-ws-0'],
+        sendMessageWithResponse: () => Promise.resolve({}),
+        sendMessage: () => {},
+      }),
+    });
+    const response = await bridge.handleRendererMcpRequest({
+      method: 'tools/call',
+      params: {
+        name: 'simulate_preview_input',
+        arguments: { inputs: [{ type: 'keyPressed', key: 'NotARealKey' }] },
+      },
+    });
+    const result = JSON.parse(response.content[0].text);
+    expect(result.success).toBe(false);
+    expect(result.error).toContain('Unknown key name');
+  });
+
+  it('lists behavior names already on an object', async () => {
+    // $FlowFixMe[invalid-constructor]
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    const layout = project.insertNewLayout('Level1', 0);
+    const hero = layout.getObjects().insertNewObject(project, 'Sprite', 'Hero', 0);
+    // Add a concrete behavior so objectBehaviors has a known entry. Capability
+    // behaviors (Animation/Effect/...) are materialized on project load; this
+    // test asserts the objectBehaviors mechanism itself.
+    gd.WholeProjectRefactorer.addBehaviorAndRequiredBehaviors(
+      project,
+      hero,
+      'DestroyOutsideBehavior::DestroyOutside',
+      'DestroyOutside'
+    );
+
+    try {
+      const bridge = makeBridge({ getProject: () => project });
+      const response = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'list_available_behaviors',
+          arguments: { object_name: 'Hero', scene_name: 'Level1' },
+        },
+      });
+      const result = JSON.parse(response.content[0].text);
+      expect(response.isError).not.toBe(true);
+      expect(Array.isArray(result.objectBehaviors)).toBe(true);
+      const entry = result.objectBehaviors.find(
+        b => b.behaviorName === 'DestroyOutside'
+      );
+      expect(entry).toBeDefined();
+      expect(entry.behaviorType).toBe(
+        'DestroyOutsideBehavior::DestroyOutside'
+      );
+    } finally {
+      project.delete();
+    }
+  });
+
+  it('batch-adds behaviors and declares variables via bulk_edit_scene_assets', async () => {
+    // $FlowFixMe[invalid-constructor]
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    const layout = project.insertNewLayout('Level1', 0);
+    layout.getObjects().insertNewObject(project, 'Sprite', 'Player', 0);
+
+    try {
+      const bridge = makeBridge({
+        getProject: () => project,
+        getPermissions: () => ({
+          allowWriteTools: true,
+          allowCommandTools: false,
+        }),
+      });
+
+      const response = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'bulk_edit_scene_assets',
+          arguments: {
+            scene_name: 'Level1',
+            behaviors: [
+              {
+                object_name: 'Player',
+                behavior_type: 'DestroyOutsideBehavior::DestroyOutside',
+              },
+            ],
+            variables: [
+              { scope: 'scene', name: 'Score', value: 0, type: 'number' },
+              { scope: 'global', name: 'Best', value: 10, type: 'number' },
+            ],
+          },
+        },
+      });
+      const result = JSON.parse(response.content[0].text);
+      expect(response.isError).not.toBe(true);
+      expect(result.counts.behaviors).toBe(1);
+      expect(result.counts.variables).toBe(2);
+      expect(
+        layout.getObjects().getObject('Player').getAllBehaviorNames().toJSArray()
+      ).toContain('DestroyOutside');
+      expect(layout.getVariables().has('Score')).toBe(true);
+      expect(project.getVariables().has('Best')).toBe(true);
     } finally {
       project.delete();
     }

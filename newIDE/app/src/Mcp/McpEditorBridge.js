@@ -307,10 +307,17 @@ const summarizeRuntimeVariables = (variablesContainer: any): Object => {
 // Build a compact summary from a runtime game dump payload. Defensive: any
 // missing/unrecognized field is simply omitted rather than throwing, because
 // the dump is the raw runtime object graph and its shape can vary.
-const summarizeRuntimeGameDump = (payload: any): Object => {
+// options.positionObjectNames (Set<string>) → include per-instance x/y/angle for
+// those object names.
+const summarizeRuntimeGameDump = (payload: any, options?: Object): Object => {
   if (!payload || typeof payload !== 'object') {
     return { available: false };
   }
+  const positionObjectNames =
+    options && options.positionObjectNames instanceof Set
+      ? options.positionObjectNames
+      : null;
+  const wantAllPositions = !!(options && options.allInstancePositions);
   try {
     const summary: Object = {
       available: true,
@@ -334,23 +341,61 @@ const summarizeRuntimeGameDump = (payload: any): Object => {
       // from the dump by the runtime, so totals are summed from `_instances`.
       const instancesMap = readRuntimeMap(scene._instances);
       const objectInstanceCounts = {};
+      const instancePositions = {};
       let totalInstances = 0;
       Object.keys(instancesMap).forEach(objectName => {
         if (objectName === 'items') return;
         const list = instancesMap[objectName];
-        const count = Array.isArray(list)
-          ? list.length
+        const instances = Array.isArray(list)
+          ? list
           : Array.isArray(list && list.items)
-          ? list.items.length
-          : 0;
-        objectInstanceCounts[objectName] = count;
-        totalInstances += count;
+          ? list.items
+          : [];
+        objectInstanceCounts[objectName] = instances.length;
+        totalInstances += instances.length;
+        // RuntimeObject stores live position as public x/y (not _x/_y).
+        if (
+          wantAllPositions ||
+          (positionObjectNames && positionObjectNames.has(objectName))
+        ) {
+          instancePositions[objectName] = instances
+            .slice(0, 50)
+            .map(instance => ({
+              x: instance && typeof instance.x === 'number' ? instance.x : undefined,
+              y: instance && typeof instance.y === 'number' ? instance.y : undefined,
+              angle:
+                instance && typeof instance.angle === 'number'
+                  ? instance.angle
+                  : undefined,
+              zOrder:
+                instance && typeof instance.zOrder === 'number'
+                  ? instance.zOrder
+                  : undefined,
+            }));
+        }
       });
+      // Scene clock: _timeManager._timeFromStart is ms since the scene started.
+      const timeManager = scene._timeManager;
+      const sceneElapsedTimeMs =
+        timeManager && typeof timeManager._timeFromStart === 'number'
+          ? timeManager._timeFromStart
+          : undefined;
       summary.scenes.push({
         name: scene._name,
         isLoaded: scene._isLoaded !== false,
+        // Game-time since this scene started (NOT debugger/wall-clock time — do
+        // not infer game speed from MCP round-trip latency).
+        sceneElapsedTimeMs,
+        sceneElapsedTimeSeconds:
+          sceneElapsedTimeMs !== undefined
+            ? Math.round(sceneElapsedTimeMs) / 1000
+            : undefined,
         totalInstances,
         objectInstanceCounts,
+        instancePositions:
+          Object.keys(instancePositions).length > 0
+            ? instancePositions
+            : undefined,
         sceneVariables: summarizeRuntimeVariables(scene._variables),
       });
     });
@@ -444,7 +489,12 @@ const captureRunningPreviewState = (
         inspectedLatest: targetId === latestId,
         availableDebuggerIds: previewIds,
         status,
-        runtime: summarizeRuntimeGameDump(dumpPayload),
+        runtime: summarizeRuntimeGameDump(dumpPayload, {
+          positionObjectNames: Array.isArray(args && args.instance_positions_for)
+            ? new Set(args.instance_positions_for.map(String))
+            : null,
+          allInstancePositions: !!(args && args.include_instance_positions),
+        }),
         includeRawDump: !!(args && args.include_raw_dump),
         rawDump:
           args && args.include_raw_dump ? dumpPayload || undefined : undefined,
@@ -644,6 +694,192 @@ const capturePreviewScreenshot = async (
     filePath,
     width: payload.width,
     height: payload.height,
+  };
+};
+
+// Map GDevelop key names to raw DOM key codes (+ location for left/right
+// modifiers), so callers can pass "Space"/"Left"/"a" instead of numbers.
+// Mirrors GDJS keysNameToCode but stores RAW codes for modifiers (the runtime's
+// onKeyPressed re-applies the location offset).
+const KEY_NAME_TO_CODE: { [string]: {| code: number, location?: number |} } = (() => {
+  const map = {};
+  const add = (name, code, location) => {
+    map[name.toLowerCase()] = location ? { code, location } : { code };
+  };
+  for (let c = 65; c <= 90; c++) add(String.fromCharCode(c), c); // a-z
+  for (let n = 0; n <= 9; n++) add('num' + n, 48 + n);
+  for (let n = 0; n <= 9; n++) add('numpad' + n, 96 + n);
+  add('space', 32); add('return', 13); add('enter', 13); add('escape', 27);
+  add('tab', 9); add('back', 8); add('backspace', 8); add('delete', 46);
+  add('insert', 45); add('pageup', 33); add('pagedown', 34); add('end', 35);
+  add('home', 36); add('pause', 19); add('menu', 93);
+  add('left', 37); add('up', 38); add('right', 39); add('down', 40);
+  add('add', 107); add('subtract', 109); add('multiply', 106); add('divide', 111);
+  add('semicolon', 186); add('comma', 188); add('period', 190); add('quote', 222);
+  add('slash', 191); add('backslash', 220); add('equal', 187); add('dash', 189);
+  add('lbracket', 219); add('rbracket', 221); add('tilde', 192);
+  for (let f = 1; f <= 12; f++) add('f' + f, 111 + f);
+  // Modifiers: raw code + location (1 = left, 2 = right).
+  add('shift', 16); add('lshift', 16, 1); add('rshift', 16, 2);
+  add('control', 17); add('ctrl', 17); add('lcontrol', 17, 1); add('rcontrol', 17, 2);
+  add('alt', 18); add('lalt', 18, 1); add('ralt', 18, 2);
+  add('lsystem', 91, 1); add('rsystem', 91, 2);
+  return map;
+})();
+
+const MOUSE_BUTTON_NAME_TO_CODE: { [string]: number } = {
+  left: 0,
+  right: 1,
+  middle: 2,
+  back: 3,
+  forward: 4,
+};
+
+// Resolve one high-level input descriptor to the low-level shape the runtime
+// simulateInput command expects. Returns { ok, input?, error? }.
+const resolveSimulatedInput = (raw: any): Object => {
+  if (!raw || typeof raw !== 'object' || typeof raw.type !== 'string') {
+    return { ok: false, error: 'Each input needs a string "type".' };
+  }
+  const type = raw.type;
+  if (type === 'keyPressed' || type === 'keyReleased') {
+    let code = typeof raw.key_code === 'number' ? raw.key_code : null;
+    let location = typeof raw.location === 'number' ? raw.location : undefined;
+    if (code === null && typeof raw.key === 'string') {
+      const mapped = KEY_NAME_TO_CODE[raw.key.toLowerCase()];
+      if (!mapped) {
+        return { ok: false, error: `Unknown key name: "${raw.key}".` };
+      }
+      code = mapped.code;
+      if (mapped.location !== undefined) location = mapped.location;
+    }
+    if (code === null) {
+      return { ok: false, error: `${type} needs "key" or "key_code".` };
+    }
+    return { ok: true, input: { type, keyCode: code, location } };
+  }
+  if (type === 'releaseAllKeys') {
+    return { ok: true, input: { type } };
+  }
+  if (type === 'mouseMove') {
+    return { ok: true, input: { type, x: raw.x, y: raw.y } };
+  }
+  if (type === 'mouseButtonPressed' || type === 'mouseButtonReleased') {
+    const button =
+      typeof raw.button === 'number'
+        ? raw.button
+        : typeof raw.button === 'string'
+        ? MOUSE_BUTTON_NAME_TO_CODE[raw.button.toLowerCase()]
+        : 0;
+    return { ok: true, input: { type, button: button || 0 } };
+  }
+  if (type === 'touchStart' || type === 'touchMove') {
+    return {
+      ok: true,
+      input: { type, identifier: raw.identifier || 0, x: raw.x, y: raw.y },
+    };
+  }
+  if (type === 'touchEnd') {
+    return { ok: true, input: { type, identifier: raw.identifier || 0 } };
+  }
+  return { ok: false, error: `Unknown input type: "${type}".` };
+};
+
+// Inject simulated input into a running preview. Sends a 'simulateInput' command
+// (request/response) and returns what was applied.
+const simulatePreviewInput = async (
+  previewDebuggerServer: ?Object,
+  args: Object
+): Promise<Object> => {
+  if (!previewDebuggerServer) {
+    return {
+      success: false,
+      running: false,
+      error:
+        'No preview debugger server is available in this editor build. Input simulation is unsupported here.',
+    };
+  }
+  if (previewDebuggerServer.getServerState() !== 'started') {
+    return {
+      success: false,
+      running: false,
+      error:
+        'No preview is running. Launch a preview first with gdevelop_run_command { commandName: "LAUNCH_NEW_PREVIEW" }, then simulate input.',
+    };
+  }
+  const previewIds =
+    typeof previewDebuggerServer.getExistingPreviewDebuggerIds === 'function'
+      ? previewDebuggerServer.getExistingPreviewDebuggerIds()
+      : previewDebuggerServer.getExistingDebuggerIds();
+  if (!previewIds || !previewIds.length) {
+    return {
+      success: false,
+      running: false,
+      error: 'No preview is currently connected.',
+    };
+  }
+  const rawInputs = Array.isArray(args && args.inputs) ? args.inputs : null;
+  if (!rawInputs || !rawInputs.length) {
+    return {
+      success: false,
+      running: true,
+      error:
+        'Missing "inputs": an array of input descriptors, e.g. [{ type: "keyPressed", key: "Left" }].',
+    };
+  }
+  const resolved = [];
+  for (const raw of rawInputs) {
+    const result = resolveSimulatedInput(raw);
+    if (!result.ok) {
+      return { success: false, running: true, error: result.error };
+    }
+    resolved.push(result.input);
+  }
+
+  const targetId =
+    args && typeof args.debugger_id === 'string'
+      ? args.debugger_id
+      : previewIds[previewIds.length - 1];
+
+  // Prefer request/response so we can report what the runtime applied; fall back
+  // to fire-and-forget sendMessage if unsupported.
+  if (typeof previewDebuggerServer.sendMessageWithResponse === 'function') {
+    try {
+      const response = await previewDebuggerServer.sendMessageWithResponse({
+        command: 'simulateInput',
+        inputs: resolved,
+      });
+      const payload = (response && response.payload) || {};
+      return {
+        success: !payload.error,
+        running: true,
+        debuggerId: targetId,
+        applied: payload.applied,
+        error: payload.error || undefined,
+      };
+    } catch (error) {
+      // Fall through to fire-and-forget.
+    }
+  }
+  try {
+    previewDebuggerServer.sendMessage(targetId, {
+      command: 'simulateInput',
+      inputs: resolved,
+    });
+  } catch (error) {
+    return {
+      success: false,
+      running: true,
+      error: `Could not send input to the preview: ${error.message}`,
+    };
+  }
+  return {
+    success: true,
+    running: true,
+    debuggerId: targetId,
+    appliedCount: resolved.length,
+    note:
+      'Input sent (fire-and-forget; this build does not confirm application). Press and release are separate inputs; hold a key by sending keyPressed without keyReleased.',
   };
 };
 
@@ -1231,6 +1467,21 @@ const callMcpTool = async ({
       : null;
     try {
       const result = await capturePreviewScreenshot(
+        previewDebuggerServer,
+        args || {}
+      );
+      return textResult(result);
+    } catch (error) {
+      return errorResult(error.message);
+    }
+  }
+
+  if (toolName === 'simulate_preview_input') {
+    const previewDebuggerServer = context.getPreviewDebuggerServer
+      ? context.getPreviewDebuggerServer()
+      : null;
+    try {
+      const result = await simulatePreviewInput(
         previewDebuggerServer,
         args || {}
       );

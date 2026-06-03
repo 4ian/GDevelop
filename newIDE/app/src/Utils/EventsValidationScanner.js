@@ -20,6 +20,7 @@ export type ValidationError = {|
   parameterIndex?: number,
   parameterValue?: string,
   parameterType?: string,
+  undeclaredVariable?: boolean,
   relatedBehaviorParameterIndex?: number,
   relatedBehaviorParameterValue?: string,
   locationName: string,
@@ -252,6 +253,33 @@ const createValidationWorker = (
           }
         }
 
+        // A scene/global/local variable parameter whose value is a plain
+        // identifier that is not declared in scope is the common "forgot to
+        // declare the variable" case. Detect it so the suggestion can say so
+        // instead of implying a quoting/syntax problem.
+        let undeclaredVariable = false;
+        if (
+          value &&
+          (parameterType === 'scenevar' ||
+            parameterType === 'globalvar' ||
+            parameterType === 'variable' ||
+            parameterType === 'variableOrProperty') &&
+          /^[A-Za-z_][A-Za-z0-9_]*$/.test(value)
+        ) {
+          try {
+            const variablesContainersList = projectScopedContainers.getVariablesContainersList();
+            if (
+              variablesContainersList &&
+              typeof variablesContainersList.has === 'function' &&
+              !variablesContainersList.has(value)
+            ) {
+              undeclaredVariable = true;
+            }
+          } catch (error) {
+            // If the container API is unavailable, leave the flag unset.
+          }
+        }
+
         errors.push({
           type: value === '' ? 'missing-parameter' : 'invalid-parameter',
           isCondition,
@@ -260,6 +288,7 @@ const createValidationWorker = (
           parameterIndex,
           parameterValue: value,
           parameterType,
+          undeclaredVariable,
           relatedBehaviorParameterIndex,
           relatedBehaviorParameterValue,
           eventPath: [...currentEventPath],

@@ -5239,18 +5239,23 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
             scene,
           });
         } else {
+          const insertPosition =
+            new_layer_position === null
+              ? scene.getLayersCount()
+              : new_layer_position;
           scene
             .getLayers()
-            .insertNewLayer(
-              new_layer_name || layerName,
-              new_layer_position === null
-                ? scene.getLayersCount()
-                : new_layer_position
-            );
+            .insertNewLayer(new_layer_name || layerName, insertPosition);
+          const layersCount = scene.getLayersCount();
+          // Layer index 0 is the bottom (base layer); a higher index renders on
+          // top. Spell out the render order so the caller does not have to
+          // confirm it from a screenshot.
+          const isTopmost = insertPosition >= layersCount - 1;
           changes.push(
             `Created new layer "${new_layer_name ||
-              layerName}" for scene "${scene.getName()}" at position ${new_layer_position ||
-              0}.`
+              layerName}" for scene "${scene.getName()}" at index ${insertPosition} of ${layersCount} (index 0 = bottom/base layer, higher index renders on top; this layer is ${
+              isTopmost ? 'the topmost (renders above all others)' : 'below higher-index layers'
+            }).`
           );
         }
       });

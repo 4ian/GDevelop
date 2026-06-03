@@ -75,16 +75,23 @@ const SEARCH_ALIASES: { [string]: Array<string> } = {
   change: ['mod', 'set', 'change'],
   variable: ['var', 'variable', 'varscene', 'varglobal', 'modvarobjet', 'varobjet', 'setnumbervariable', 'setstringvariable'],
   scene: ['scene', 'layout'],
-  restart: ['scene', 'restart', 'changescene'],
-  switch: ['scene', 'changescene'],
+  restart: ['scene', 'restart', 'changescene', 'replacescene'],
+  switch: ['scene', 'changescene', 'replacescene'],
+  compare: ['compare', 'egal', 'comparison', 'condition'],
+  comparison: ['compare', 'comparison', 'egal'],
+  number: ['number', 'numbervariable', 'value'],
+  looping: ['loop', 'looping', 'channel', 'playmusic', 'playsound'],
+  loop: ['loop', 'looping', 'repeat'],
+  channel: ['channel', 'playmusic', 'playsound', 'sound', 'music'],
   random: ['random', 'randominrange'],
   opacity: ['opacity', 'opacite'],
   rotate: ['angle', 'rotate', 'mettreangle'],
   rotation: ['angle', 'rotate'],
-  hide: ['cache', 'hide', 'visible'],
-  show: ['montre', 'show', 'visible'],
+  hide: ['cache', 'hide', 'visible', 'visibility', 'montre'],
+  show: ['montre', 'show', 'visible', 'visibility', 'cache'],
+  visible: ['visible', 'cache', 'montre', 'visibility'],
   timer: ['timer', 'time'],
-  collision: ['collision', 'collisionnnp', 'iscolliding'],
+  collision: ['collision', 'collisionnp', 'iscolliding'],
   animation: ['animation', 'anim'],
   health: ['variable', 'var'],
   score: ['variable', 'var'],
@@ -180,6 +187,28 @@ const VARIABLE_PARAMETER_TYPES = new Set([
   'variableOrProperty',
 ]);
 
+// Resource parameter types. Their VALUE is a BARE resource name with NO quotes
+// (a resource picker, not a string expression) — the code generator adds the
+// quotes. This is the opposite of string parameters and a common mistake: e.g.
+// a soundfile/musicfile parameter takes Shoot (no quotes), not "Shoot".
+// Mirrors gd::ValueTypeMetadata::IsTypeExpression("resource", ...).
+const RESOURCE_PARAMETER_TYPES = new Set([
+  'fontResource',
+  'audioResource',
+  'videoResource',
+  'bitmapFontResource',
+  'imageResource',
+  'jsonResource',
+  'tilemapResource',
+  'tilesetResource',
+  'model3DResource',
+  'atlasResource',
+  'spineResource',
+  // Deprecated/legacy but still widely used:
+  'soundfile',
+  'musicfile',
+]);
+
 // Describe, in one line, how to write a literal value for a parameter type in
 // event JSON. Used in metadata output and validation suggestions so callers stop
 // guessing which parameters need embedded quotes.
@@ -199,6 +228,9 @@ const describeParameterLiteralSyntax = (parameterType: string): string => {
   if (VARIABLE_PARAMETER_TYPES.has(parameterType)) {
     return `variable reference — bare variable name, no quotes; object variables are Object.VariableName (type "${parameterType}")`;
   }
+  if (RESOURCE_PARAMETER_TYPES.has(parameterType)) {
+    return `resource name — BARE resource name, NO quotes (e.g. Shoot, not "Shoot"); the resource must already exist in the project (type "${parameterType}")`;
+  }
   if (parameterType === 'yesorno' || parameterType === 'trueorfalse') {
     return `boolean — yes/no (no quotes) (type "${parameterType}")`;
   }
@@ -217,6 +249,7 @@ const classifyParameterValueShape = (parameterType: string): string => {
   if (OBJECT_PARAMETER_TYPES.has(parameterType)) return 'object';
   if (parameterType === 'behavior') return 'behavior';
   if (VARIABLE_PARAMETER_TYPES.has(parameterType)) return 'variable';
+  if (RESOURCE_PARAMETER_TYPES.has(parameterType)) return 'resource';
   if (parameterType === 'yesorno' || parameterType === 'trueorfalse')
     return 'boolean';
   return 'other';
@@ -1436,9 +1469,29 @@ const withActionableSuggestion = (issue: Object): Object => {
   }
 
   if (shape === 'variable') {
+    // The scanner sets undeclaredVariable when a bare variable name is not
+    // declared in scope (the definitive cause). Fall back to a heuristic only
+    // when that flag is absent.
+    const looksLikeBareName =
+      value && /^[A-Za-z_][A-Za-z0-9_.]*$/.test(value.trim());
+    if (issue.undeclaredVariable || looksLikeBareName) {
+      return {
+        ...issue,
+        suggestion: `Variable "${value}" is ${
+          issue.undeclaredVariable ? 'not declared' : 'likely not declared'
+        } in this scope. Declare it first with add_or_edit_variable (scene/global/object), or use the add_scene_events event_changes path with undeclared_variables to auto-declare it. The value format (bare name) is already correct.`,
+      };
+    }
     return {
       ...issue,
-      suggestion: `Parameter ${issue.parameterIndex} expects a bare variable reference (no quotes). Scene/global variables are referenced by name (e.g. Score); object variables as Object.VariableName.`,
+      suggestion: `Parameter ${issue.parameterIndex} expects a bare variable reference (no quotes). Scene/global variables are referenced by name (e.g. Score); object variables as Object.VariableName. If the name is correct, declare the variable first with add_or_edit_variable.`,
+    };
+  }
+
+  if (shape === 'resource') {
+    return {
+      ...issue,
+      suggestion: `Parameter ${issue.parameterIndex} is a resource name (${parameterType}): pass the BARE resource name with NO quotes (e.g. Shoot, not "Shoot"). The resource must already exist — add it with add_or_update_resource if needed.`,
     };
   }
 

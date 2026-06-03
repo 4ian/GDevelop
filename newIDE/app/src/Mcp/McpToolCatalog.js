@@ -837,6 +837,17 @@ const inspectRunningPreviewSchema = {
       description:
         'Default false. When true, include the full raw runtime game dump (very large) in addition to the compact summary.',
     },
+    instance_positions_for: {
+      type: 'array',
+      items: { type: 'string' },
+      description:
+        'Optional object names to include live instance positions (x/y/angle/zOrder, up to 50 each) in the compact summary — e.g. ["Player"] to confirm where the player is, without pulling the raw dump.',
+    },
+    include_instance_positions: {
+      type: 'boolean',
+      description:
+        'Default false. When true, include instance positions for ALL objects (can be large).',
+    },
   },
   additionalProperties: false,
 };
@@ -850,6 +861,61 @@ const capturePreviewScreenshotSchema = {
         'Absolute path to write the PNG to (parent directories are created). If omitted, the screenshot is returned as a base64 data URL instead of a file.',
     },
   },
+  additionalProperties: false,
+};
+
+const simulatePreviewInputSchema = {
+  type: 'object',
+  properties: {
+    inputs: {
+      type: 'array',
+      description:
+        'Ordered list of input events to inject into the running game. Press and release are separate events; hold a key by sending keyPressed without a matching keyReleased (the game keeps it pressed across frames until released).',
+      items: {
+        type: 'object',
+        properties: {
+          type: {
+            type: 'string',
+            description:
+              'One of: keyPressed, keyReleased, releaseAllKeys, mouseMove, mouseButtonPressed, mouseButtonReleased, touchStart, touchMove, touchEnd.',
+          },
+          key: {
+            type: 'string',
+            description:
+              'Key name for keyPressed/keyReleased, e.g. "Left", "Right", "Up", "Down", "Space", "Return", "Escape", "a"-"z", "F1". Case-insensitive.',
+          },
+          key_code: {
+            type: 'number',
+            description: 'Raw DOM key code (alternative to key).',
+          },
+          button: {
+            description:
+              'Mouse button for mouseButton* — number (0=left,1=right,2=middle) or name ("left"/"right"/"middle").',
+          },
+          x: {
+            type: 'number',
+            description: 'Game (scene) X coordinate for mouse/touch events.',
+          },
+          y: {
+            type: 'number',
+            description: 'Game (scene) Y coordinate for mouse/touch events.',
+          },
+          identifier: {
+            type: 'number',
+            description: 'Touch identifier for touch events (default 0).',
+          },
+        },
+        required: ['type'],
+        additionalProperties: true,
+      },
+    },
+    debugger_id: {
+      type: 'string',
+      description:
+        'Optional preview/debugger id. Defaults to the latest running preview.',
+    },
+  },
+  required: ['inputs'],
   additionalProperties: false,
 };
 
@@ -899,6 +965,37 @@ const bulkEditSceneAssetsSchema = {
       description:
         'Sprite animation payloads accepted by set_sprite_animations. scene_name can be omitted and defaults to this tool scene_name.',
       items: setSpriteAnimationsSchema,
+    },
+    behaviors: {
+      type: 'array',
+      description:
+        'Behaviors to add to objects in this scene (applied after objects exist): [{ object_name, behavior_type, behavior_name? }]. behavior_name defaults to the behavior\'s default name.',
+      items: {
+        type: 'object',
+        properties: {
+          object_name: { type: 'string' },
+          behavior_type: { type: 'string' },
+          behavior_name: { type: 'string' },
+        },
+        required: ['object_name', 'behavior_type'],
+        additionalProperties: true,
+      },
+    },
+    variables: {
+      type: 'array',
+      description:
+        'Scene/global variables to declare in one call: [{ scope: "scene"|"global", name, value, type? }]. Declare these before writing events that reference them. For object variables use add_or_edit_variable.',
+      items: {
+        type: 'object',
+        properties: {
+          scope: { type: 'string' },
+          name: { type: 'string' },
+          value: {},
+          type: { type: 'string' },
+        },
+        required: ['name'],
+        additionalProperties: true,
+      },
     },
     instances: {
       type: 'array',
@@ -1628,7 +1725,7 @@ const readTools: Array<McpTool> = [
   {
     name: 'list_available_behaviors',
     description:
-      'List behavior types available in the project, with the exact behavior_type to pass to add_behavior and the default behavior name (used in instruction behavior parameters). Optionally filter by an object (only compatible behaviors) and/or a search query.',
+      'List behavior types available in the project, with the exact behavior_type to pass to add_behavior and the default behavior name (used in instruction behavior parameters). Optionally filter by an object (only compatible behaviors) and/or a search query. When object_name is given, the result also includes objectBehaviors: the behaviors already on the object (including hidden capability behaviors like Text/Animation/Effect/Opacity) with the exact NAME to use in instruction behavior parameters.',
     inputSchema: listAvailableBehaviorsSchema,
   },
   {
@@ -1642,6 +1739,12 @@ const readTools: Array<McpTool> = [
     description:
       'Capture a PNG screenshot of the current rendered frame from a running preview, to visually verify sprites, layout, and colors. Writes the PNG to file_path (recommended) or returns it as a base64 data URL. Launch a preview first with gdevelop_run_command { commandName: "LAUNCH_NEW_PREVIEW" }.',
     inputSchema: capturePreviewScreenshotSchema,
+  },
+  {
+    name: 'simulate_preview_input',
+    description:
+      'Inject simulated keyboard/mouse/touch input into a running preview so you can verify input-driven gameplay (movement, shooting, restart) end-to-end, not just autonomous logic. Press and release are separate events; hold a key by sending keyPressed without keyReleased. Then use gdevelop_inspect_running_preview / capture_preview_screenshot to verify the effect. Launch a preview first.',
+    inputSchema: simulatePreviewInputSchema,
   },
   {
     name: 'find_scene_events',
@@ -1809,7 +1912,7 @@ const writeTools: Array<McpTool> = [
   {
     name: 'bulk_edit_scene_assets',
     description:
-      'Batch import resources, create/replace scene objects, bind Sprite animations, and place 2D instances for one scene. Use for initial scene setup to reduce many single-tool calls.',
+      'Batch import resources, create/replace scene objects, bind Sprite animations, add behaviors, declare scene/global variables, and place 2D instances for one scene — in one call. Applied in order: resources → objects → sprite animations → behaviors → variables → instances. Use for initial scene setup to drastically reduce single-tool round-trips.',
     inputSchema: bulkEditSceneAssetsSchema,
   },
   {
@@ -2377,6 +2480,35 @@ const toolUsageExamples: { [string]: Array<Object> } = {
       description:
         'Return the screenshot as a base64 data URL instead of writing a file.',
       arguments: {},
+    },
+  ],
+  simulate_preview_input: [
+    {
+      description:
+        'Hold the Left arrow (press without release) so the player keeps moving; inspect or screenshot afterwards to verify movement.',
+      arguments: {
+        inputs: [{ type: 'keyPressed', key: 'Left' }],
+      },
+    },
+    {
+      description:
+        'Tap Space (press then release) to fire/jump/restart, in one call.',
+      arguments: {
+        inputs: [
+          { type: 'keyPressed', key: 'Space' },
+          { type: 'keyReleased', key: 'Space' },
+        ],
+      },
+    },
+    {
+      description: 'Move the mouse to a game coordinate and click the left button.',
+      arguments: {
+        inputs: [
+          { type: 'mouseMove', x: 360, y: 640 },
+          { type: 'mouseButtonPressed', button: 'left' },
+          { type: 'mouseButtonReleased', button: 'left' },
+        ],
+      },
     },
   ],
   validate_events_json_file: [

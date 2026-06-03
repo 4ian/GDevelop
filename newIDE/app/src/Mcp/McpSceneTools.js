@@ -2096,6 +2096,7 @@ export const listAvailableBehaviors = (
 
   let filterObjectType: string | null = null;
   let resolvedObjectName: string | null = null;
+  let resolvedObject: gdObject | null = null;
   if (objectName) {
     let object: gdObject | null = null;
     if (sceneName) {
@@ -2126,6 +2127,7 @@ export const listAvailableBehaviors = (
       );
     }
     resolvedObjectName = objectName;
+    resolvedObject = object;
     filterObjectType = object.getType();
   }
 
@@ -2179,12 +2181,56 @@ export const listAvailableBehaviors = (
       category: metadata.category || undefined,
     }));
 
+  // When inspecting a specific object, also report the behaviors it ALREADY has
+  // (including hidden default-capability behaviors like Text/Animation/Effect),
+  // with the implicit NAME to use in instruction behavior parameters. This
+  // answers "what is the behavior name for this capability on this object?".
+  let objectBehaviors;
+  if (resolvedObject) {
+    const behaviorNames =
+      typeof resolvedObject.getAllBehaviorNames === 'function'
+        ? resolvedObject.getAllBehaviorNames().toJSArray()
+        : [];
+    objectBehaviors = behaviorNames.map(name => {
+      const behavior = resolvedObject.getBehavior(name);
+      const behaviorType =
+        behavior && typeof behavior.getTypeName === 'function'
+          ? behavior.getTypeName()
+          : '';
+      let fullName = '';
+      if (behaviorType) {
+        const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
+          platform,
+          behaviorType
+        );
+        if (!gd.MetadataProvider.isBadBehaviorMetadata(behaviorMetadata)) {
+          fullName = behaviorMetadata.getFullName();
+        }
+      }
+      return {
+        // The NAME to pass in an instruction's behavior parameter (e.g. Text,
+        // Animation, Effect, Opacity, Resizable, Scale, Flippable for the
+        // built-in capabilities, or your own behavior names).
+        behaviorName: name,
+        behaviorType,
+        fullName: fullName || undefined,
+        isDefaultCapability:
+          behavior && typeof behavior.isDefaultBehavior === 'function'
+            ? behavior.isDefaultBehavior()
+            : undefined,
+      };
+    });
+  }
+
   return {
     success: true,
     objectName: resolvedObjectName,
     objectType: filterObjectType,
     behaviorsCount: behaviors.length,
     behaviors,
+    // Present only when object_name was given: the behavior names already on the
+    // object, including capability behaviors and their implicit names.
+    objectBehaviors,
   };
 };
 
@@ -2272,12 +2318,16 @@ export const bulkEditSceneAssets = (
     : Array.isArray(args.spriteAnimations)
     ? args.spriteAnimations
     : [];
+  const behaviors = Array.isArray(args.behaviors) ? args.behaviors : [];
+  const variables = Array.isArray(args.variables) ? args.variables : [];
   const instances = Array.isArray(args.instances) ? args.instances : [];
 
   const results = {
     resources: [],
     objects: [],
     spriteAnimations: [],
+    behaviors: [],
+    variables: [],
     instances: null,
   };
 
@@ -2335,6 +2385,101 @@ export const bulkEditSceneAssets = (
     });
   });
 
+  // Behaviors: [{ object_name, behavior_type, behavior_name? }]. Adds the
+  // behavior (and its required behaviors) to a scene or global object.
+  behaviors.forEach((behaviorArgs, index) => {
+    if (!behaviorArgs || typeof behaviorArgs !== 'object') {
+      throw new Error(`Invalid behavior payload at behaviors[${index}].`);
+    }
+    const objectName =
+      behaviorArgs.object_name || behaviorArgs.objectName || '';
+    const behaviorType =
+      behaviorArgs.behavior_type || behaviorArgs.behaviorType || '';
+    if (!objectName || !behaviorType) {
+      throw new Error(
+        `behaviors[${index}] needs object_name and behavior_type.`
+      );
+    }
+    const scene = getScene(project, sceneName);
+    let object: gdObject | null = null;
+    if (scene.getObjects().hasObjectNamed(objectName)) {
+      object = scene.getObjects().getObject(objectName);
+    } else if (project.getObjects().hasObjectNamed(objectName)) {
+      object = project.getObjects().getObject(objectName);
+    }
+    if (!object) {
+      throw new Error(
+        `behaviors[${index}]: object "${objectName}" not found in scene "${sceneName}" nor globally.`
+      );
+    }
+    const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
+      project.getCurrentPlatform(),
+      behaviorType
+    );
+    if (gd.MetadataProvider.isBadBehaviorMetadata(behaviorMetadata)) {
+      throw new Error(
+        `behaviors[${index}]: behavior type "${behaviorType}" does not exist.`
+      );
+    }
+    const behaviorName =
+      behaviorArgs.behavior_name ||
+      behaviorArgs.behaviorName ||
+      behaviorMetadata.getDefaultName();
+    if (!object.hasBehaviorNamed(behaviorName)) {
+      gd.WholeProjectRefactorer.addBehaviorAndRequiredBehaviors(
+        project,
+        object,
+        behaviorType,
+        behaviorName
+      );
+    }
+    results.behaviors.push({
+      objectName,
+      behaviorType,
+      behaviorName,
+      added: object.hasBehaviorNamed(behaviorName),
+    });
+  });
+
+  // Variables: [{ scope: 'scene'|'global', name, value, type? }]. Object-scope
+  // variables should use the dedicated variable tool; here we cover scene/global.
+  variables.forEach((variableArgs, index) => {
+    if (!variableArgs || typeof variableArgs !== 'object') {
+      throw new Error(`Invalid variable payload at variables[${index}].`);
+    }
+    const scope = variableArgs.scope || variableArgs.variable_scope || 'scene';
+    const name =
+      variableArgs.name || variableArgs.variable_name_or_path || '';
+    if (!name) {
+      throw new Error(`variables[${index}] needs a name.`);
+    }
+    const rawValue =
+      variableArgs.value !== undefined ? variableArgs.value : '';
+    const container =
+      scope === 'global'
+        ? project.getVariables()
+        : getScene(project, sceneName).getVariables();
+    const variable = container.has(name)
+      ? container.get(name)
+      : container.insertNew(name, container.count());
+    // Type coercion: number unless the value is non-numeric or type says string.
+    const declaredType = (variableArgs.type || '').toLowerCase();
+    const numberValue = Number(rawValue);
+    if (
+      declaredType === 'string' ||
+      (declaredType !== 'number' &&
+        (typeof rawValue !== 'number' &&
+          (typeof rawValue !== 'string' ||
+            rawValue.trim() === '' ||
+            Number.isNaN(numberValue))))
+    ) {
+      variable.setString(String(rawValue));
+    } else {
+      variable.setValue(numberValue);
+    }
+    results.variables.push({ scope, name, value: rawValue });
+  });
+
   if (instances.length) {
     results.instances = putStructured2dInstances(
       project,
@@ -2357,6 +2502,8 @@ export const bulkEditSceneAssets = (
       resources: results.resources.length,
       objects: results.objects.length,
       spriteAnimations: results.spriteAnimations.length,
+      behaviors: results.behaviors.length,
+      variables: results.variables.length,
       instances: results.instances ? results.instances.changes.length : 0,
     },
     results,

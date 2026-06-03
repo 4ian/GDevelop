@@ -20,6 +20,7 @@ import {
   getEventsJsonExamples,
   getExactInstructionMetadata,
   searchInstructionMetadata,
+  validateEventsJsonFile,
   validateEventsJson,
 } from './McpEventKnowledge';
 import {
@@ -51,6 +52,7 @@ import {
   readSerializedScene,
   replaceObjectDefinition,
   setObjectProperties,
+  setTextObjectProperties,
   setSpriteAnimations,
 } from './McpSceneTools';
 import {
@@ -58,6 +60,7 @@ import {
   createGroup,
   ensureSceneEventIds,
   findSceneEvents,
+  lintSceneEvents,
   moveEventsToGroup,
   renameGroup,
   replaceSceneEventsFromFile,
@@ -640,6 +643,23 @@ const callMcpTool = async ({
     );
   }
 
+  if (toolName === 'validate_events_json_file') {
+    if (!project) return errorResult('No project opened.');
+    return textResult(
+      validateEventsJsonFile({
+        project,
+        sceneName:
+          args && typeof args.scene_name === 'string' ? args.scene_name : null,
+        eventsJsonFile:
+          args && typeof args.events_json_file === 'string'
+            ? args.events_json_file
+            : null,
+        allowJavaScriptEvents: !!(args && args.allow_javascript_events),
+        summaryOnly: !!(args && args.summary_only),
+      })
+    );
+  }
+
   if (toolName === 'gdevelop_search_instruction_metadata') {
     if (!project) return errorResult('No project opened.');
     return textResult(
@@ -728,6 +748,15 @@ const callMcpTool = async ({
     if (!project) return errorResult('No project opened.');
     try {
       return textResult(findSceneEvents(project, args || {}));
+    } catch (error) {
+      return errorResult(error.message);
+    }
+  }
+
+  if (toolName === 'lint_scene_events') {
+    if (!project) return errorResult('No project opened.');
+    try {
+      return textResult(lintSceneEvents(project, args || {}));
     } catch (error) {
       return errorResult(error.message);
     }
@@ -902,6 +931,8 @@ const callMcpTool = async ({
     sceneWriteToolHandler = deleteSceneObject;
   } else if (toolName === 'set_object_properties') {
     sceneWriteToolHandler = setObjectProperties;
+  } else if (toolName === 'set_text_object_properties') {
+    sceneWriteToolHandler = setTextObjectProperties;
   } else if (
     toolName === 'put_2d_instances' &&
     args &&

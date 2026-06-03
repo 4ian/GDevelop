@@ -251,6 +251,57 @@ const setObjectPropertiesSchema = {
   additionalProperties: true,
 };
 
+const setTextObjectPropertiesSchema = {
+  type: 'object',
+  properties: {
+    scene_name: sceneNameSchema.properties.scene_name,
+    object_name: objectInSceneSchema.properties.object_name,
+    text: {
+      type: 'string',
+      description: 'Initial text displayed by the Text object.',
+    },
+    character_size: {
+      type: 'number',
+      description: 'Text character size in pixels.',
+    },
+    color: {
+      type: 'string',
+      description: 'Text color as an RGB string, for example 255;255;255.',
+    },
+    bold: { type: 'boolean' },
+    italic: { type: 'boolean' },
+    font_name: {
+      type: 'string',
+      description: 'Optional font resource name.',
+    },
+    text_alignment: {
+      type: 'string',
+      description: 'Horizontal alignment: left, center, or right.',
+    },
+    vertical_text_alignment: {
+      type: 'string',
+      description: 'Vertical alignment: top, center, or bottom.',
+    },
+    line_height: {
+      type: 'number',
+      description: 'Multiline line height.',
+    },
+    outline: {
+      type: 'object',
+      description: 'Optional outline settings: { enabled, color, thickness }.',
+      additionalProperties: true,
+    },
+    shadow: {
+      type: 'object',
+      description:
+        'Optional shadow settings: { enabled, color, distance, angle, opacity, blur_radius }.',
+      additionalProperties: true,
+    },
+  },
+  required: ['scene_name', 'object_name'],
+  additionalProperties: true,
+};
+
 const projectPropertiesSchema = {
   type: 'object',
   properties: {
@@ -725,6 +776,49 @@ const compareSceneEventsSemanticsSchema = {
   additionalProperties: false,
 };
 
+const validateEventsJsonFileSchema = {
+  type: 'object',
+  properties: {
+    scene_name: sceneNameSchema.properties.scene_name,
+    events_json_file: {
+      type: 'string',
+      description:
+        'Local file containing a JSON array of serialized GDevelop events to validate without writing.',
+    },
+    summary_only: {
+      type: 'boolean',
+      description:
+        'When true, omit rendered event text and normalized JSON from the response.',
+    },
+    allow_javascript_events: {
+      type: 'boolean',
+      description:
+        'Default false. Set true only when the user explicitly requested JavaScript events.',
+    },
+  },
+  required: ['events_json_file'],
+  additionalProperties: true,
+};
+
+const lintSceneEventsSchema = {
+  type: 'object',
+  properties: {
+    scene_name: sceneNameSchema.properties.scene_name,
+    require_root_groups: {
+      type: 'boolean',
+      description:
+        'Default true. When true, root-level non-Group events are reported.',
+    },
+    allow_javascript_events: {
+      type: 'boolean',
+      description:
+        'Default false. Set true only when the user explicitly requested JavaScript events.',
+    },
+  },
+  required: ['scene_name'],
+  additionalProperties: true,
+};
+
 const addSceneEventsSchema = {
   type: 'object',
   properties: {
@@ -750,6 +844,41 @@ const addSceneEventsSchema = {
     },
   },
   required: ['scene_name'],
+  additionalProperties: true,
+};
+
+const variableSchema = {
+  type: 'object',
+  properties: {
+    variable_scope: {
+      type: 'string',
+      description: 'Variable scope: global, scene, or object.',
+    },
+    variable_name_or_path: {
+      type: 'string',
+      description:
+        'Variable name or slash/dot-like path used by GDevelop variable helpers, for example Score or Player/Health.',
+    },
+    value: {
+      type: 'string',
+      description:
+        'Serialized variable value. Use plain numbers/text for simple variables, JSON for structures/arrays when needed.',
+    },
+    variable_type: {
+      type: 'string',
+      description:
+        'Optional forced variable type, for example number, string, boolean, structure, or array.',
+    },
+    scene_name: {
+      type: 'string',
+      description: 'Required for scene variables and scene object variables.',
+    },
+    object_name: {
+      type: 'string',
+      description: 'Required for object variables.',
+    },
+  },
+  required: ['variable_scope', 'variable_name_or_path', 'value'],
   additionalProperties: true,
 };
 
@@ -1001,6 +1130,18 @@ const readTools: Array<McpTool> = [
     },
   },
   {
+    name: 'validate_events_json_file',
+    description:
+      'Validate a local file containing serialized GDevelop events JSON without modifying the project. Use for large event sheets before replacing events.',
+    inputSchema: validateEventsJsonFileSchema,
+  },
+  {
+    name: 'lint_scene_events',
+    description:
+      'Lint a scene event sheet for MCP authoring rules, including mandatory semantic Groups at root and no JavaScript events unless explicitly allowed.',
+    inputSchema: lintSceneEventsSchema,
+  },
+  {
     name: 'gdevelop_search_instruction_metadata',
     description:
       'Search GDevelop action, condition, and expression metadata by internal type, displayed name, description, group, object, or behavior. Use before generating event JSON parameters.',
@@ -1236,6 +1377,12 @@ const writeTools: Array<McpTool> = [
     inputSchema: setObjectPropertiesSchema,
   },
   {
+    name: 'set_text_object_properties',
+    description:
+      'Set TextObject::Text properties with a high-level payload: text, character size, color, bold/italic, alignment, outline, shadow, font, and line height.',
+    inputSchema: setTextObjectPropertiesSchema,
+  },
+  {
     name: 'add_or_update_resource',
     description:
       'Add or update a project resource such as a local PNG image resource with name, file, and kind.',
@@ -1336,7 +1483,7 @@ const writeTools: Array<McpTool> = [
   {
     name: 'add_or_edit_variable',
     description: 'Add or edit global, scene, object, or behavior variables.',
-    inputSchema: emptyObjectSchema,
+    inputSchema: variableSchema,
   },
   {
     name: 'create_or_update_plan',
@@ -1519,6 +1666,27 @@ const toolUsageExamples: { [string]: Array<Object> } = {
             ],
           },
         ],
+      },
+    },
+  ],
+  set_text_object_properties: [
+    {
+      description:
+        'Set common TextObject::Text properties without relying on raw serialized object fields.',
+      arguments: {
+        scene_name: 'Level1',
+        object_name: 'ScoreLabel',
+        text: 'Score: 0',
+        character_size: 32,
+        color: '255;255;255',
+        bold: true,
+        text_alignment: 'left',
+        vertical_text_alignment: 'top',
+        outline: {
+          enabled: true,
+          color: '0;0;0',
+          thickness: 2,
+        },
       },
     },
   ],
@@ -1706,6 +1874,26 @@ const toolUsageExamples: { [string]: Array<Object> } = {
       },
     },
   ],
+  validate_events_json_file: [
+    {
+      description:
+        'Validate a large event sheet from a local file without writing it.',
+      arguments: {
+        scene_name: 'Level1',
+        events_json_file: 'C:/tmp/level1-events.json',
+        summary_only: true,
+      },
+    },
+  ],
+  lint_scene_events: [
+    {
+      description:
+        'Check that AI-authored events are grouped and do not use JavaScript events by default.',
+      arguments: {
+        scene_name: 'Level1',
+      },
+    },
+  ],
   find_scene_events: [
     {
       description: 'Find all events that play a sound.',
@@ -1802,6 +1990,29 @@ const toolUsageExamples: { [string]: Array<Object> } = {
       description:
         'Save and wait for write completion instead of only launching SAVE_PROJECT.',
       arguments: {},
+    },
+  ],
+  add_or_edit_variable: [
+    {
+      description: 'Create or update a scene variable before writing events.',
+      arguments: {
+        variable_scope: 'scene',
+        scene_name: 'Level1',
+        variable_name_or_path: 'Score',
+        value: '0',
+        variable_type: 'number',
+      },
+    },
+    {
+      description: 'Create or update an object variable.',
+      arguments: {
+        variable_scope: 'object',
+        scene_name: 'Level1',
+        object_name: 'Player',
+        variable_name_or_path: 'Health',
+        value: '3',
+        variable_type: 'number',
+      },
     },
   ],
 };

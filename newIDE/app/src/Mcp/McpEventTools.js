@@ -440,6 +440,76 @@ export const findSceneEvents = (project: gdProject, args: Object): Object => {
   };
 };
 
+export const lintSceneEvents = (project: gdProject, args: Object): Object => {
+  const sceneName = getRequiredString(args, 'scene_name');
+  const scene = getScene(project, sceneName);
+  const allowJavaScriptEvents = !!(
+    args &&
+    (args.allow_javascript_events || args.allowJavaScriptEvents)
+  );
+  const requireRootGroups =
+    !args ||
+    (args.require_root_groups !== false && args.requireRootGroups !== false);
+  const issues = [];
+
+  const references = collectEventReferences(scene.getEvents());
+  references.forEach(reference => {
+    const event = reference.event;
+    const eventType = event.getType();
+    const eventPath = formatEventPath(reference.path);
+
+    if (
+      requireRootGroups &&
+      reference.path.length === 1 &&
+      eventType !== 'BuiltinCommonInstructions::Group'
+    ) {
+      issues.push({
+        severity: 'error',
+        type: 'root-event-not-group',
+        eventPath,
+        eventType,
+        suggestion:
+          'Root-level gameplay events must be moved into a semantic Group with wrap_events_in_group or move_events_to_group.',
+      });
+    }
+
+    if (
+      eventType === 'BuiltinCommonInstructions::JsCode' &&
+      !allowJavaScriptEvents
+    ) {
+      issues.push({
+        severity: 'error',
+        type: 'javascript-event-not-allowed',
+        eventPath,
+        eventType,
+        suggestion:
+          'Use standard GDevelop events/instructions unless the user explicitly requested JavaScript.',
+      });
+    }
+
+    if (eventType === 'BuiltinCommonInstructions::Group') {
+      const groupName = gd.asGroupEvent(event).getName();
+      if (!groupName) {
+        issues.push({
+          severity: 'warning',
+          type: 'empty-group-name',
+          eventPath,
+          suggestion:
+            'Rename the Group with a semantic name such as Initialization, Player input, Enemy behavior, UI, Audio, or Scoring.',
+        });
+      }
+    }
+  });
+
+  return {
+    success: true,
+    valid: !issues.some(issue => issue.severity === 'error'),
+    sceneName,
+    eventsCount: references.length,
+    issues,
+  };
+};
+
 export const createGroup = (
   project: gdProject,
   args: Object,

@@ -971,16 +971,58 @@ const withActionableSuggestion = (issue: Object): Object => {
   return issue;
 };
 
+const summarizeIssues = (issues: Array<Object>): Object => {
+  const byType = {};
+  const rootCausesByKey = {};
+
+  issues.forEach(issue => {
+    const type = issue.type || 'unknown';
+    byType[type] = (byType[type] || 0) + 1;
+
+    const key = [
+      issue.type || '',
+      issue.instructionType || '',
+      typeof issue.parameterIndex === 'number' ? issue.parameterIndex : '',
+      issue.parameterValue || '',
+      issue.suggestion || '',
+    ].join('|');
+    if (!rootCausesByKey[key]) {
+      rootCausesByKey[key] = {
+        type,
+        count: 0,
+        instructionType: issue.instructionType,
+        parameterIndex: issue.parameterIndex,
+        parameterValue: issue.parameterValue,
+        resourceName: issue.resourceName,
+        suggestion: issue.suggestion,
+        firstEventPath: issue.eventPath,
+      };
+    }
+    rootCausesByKey[key].count++;
+  });
+
+  return {
+    totalIssues: issues.length,
+    totalErrors: issues.filter(issue => issue.severity === 'error').length,
+    byType,
+    rootCauses: Object.keys(rootCausesByKey)
+      .map(key => rootCausesByKey[key])
+      .sort((left, right) => right.count - left.count),
+  };
+};
+
 export const validateEventsJson = ({
   project,
   sceneName,
   eventsJson,
   allowJavaScriptEvents,
+  summaryOnly,
 }: {|
   project: gdProject,
   sceneName?: ?string,
   eventsJson?: ?string,
   allowJavaScriptEvents?: boolean,
+  summaryOnly?: boolean,
 |}): Object => {
   if (!eventsJson) {
     return {
@@ -1039,13 +1081,19 @@ export const validateEventsJson = ({
       issue => issue.severity === 'error'
     );
 
-    return {
+    const result = {
       valid: errors.length === 0,
       eventsCount: eventsList.getEventsCount(),
-      eventsAsText: renderNonTranslatedEventsAsText({ eventsList }),
-      normalizedEventsJson: serializeToJSON(eventsList),
       errors,
       issues: issuesWithSuggestions,
+      issueSummary: summarizeIssues(issuesWithSuggestions),
+    };
+    if (summaryOnly) return result;
+
+    return {
+      ...result,
+      eventsAsText: renderNonTranslatedEventsAsText({ eventsList }),
+      normalizedEventsJson: serializeToJSON(eventsList),
     };
   } catch (error) {
     return {
@@ -1055,4 +1103,51 @@ export const validateEventsJson = ({
   } finally {
     eventsList.delete();
   }
+};
+
+export const validateEventsJsonFile = ({
+  project,
+  sceneName,
+  eventsJsonFile,
+  allowJavaScriptEvents,
+  summaryOnly,
+}: {|
+  project: gdProject,
+  sceneName?: ?string,
+  eventsJsonFile?: ?string,
+  allowJavaScriptEvents?: boolean,
+  summaryOnly?: boolean,
+|}): Object => {
+  if (!eventsJsonFile) {
+    return {
+      valid: false,
+      errors: ['Missing events_json_file.'],
+    };
+  }
+  if (!fs) {
+    return {
+      valid: false,
+      errors: ['Filesystem access is not available.'],
+    };
+  }
+  if (!fs.existsSync(eventsJsonFile)) {
+    return {
+      valid: false,
+      errors: [`Events JSON file not found: "${eventsJsonFile}".`],
+    };
+  }
+
+  const eventsJson = fs.readFileSync(eventsJsonFile, 'utf8');
+  const result = validateEventsJson({
+    project,
+    sceneName,
+    eventsJson,
+    allowJavaScriptEvents,
+    summaryOnly,
+  });
+
+  return {
+    ...result,
+    eventsJsonFile,
+  };
 };

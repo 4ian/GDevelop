@@ -64,8 +64,10 @@ Event/introspection helpers:
 - `gdevelop_get_events_json_examples`: examples of valid serialized event JSON and `add_scene_events` payloads.
 - `gdevelop_get_event_operation_reference`: supported `event_changes` operations and target path format.
 - `gdevelop_validate_events_json`: parse, render, and check event JSON without modifying the project.
+- `validate_events_json_file`: validate a local events JSON file without writing it. Use before `replace_scene_events_from_file` for large event sheets.
 - `gdevelop_search_instruction_metadata`: find action/condition/expression metadata by internal type, name, description, object, or behavior.
 - `gdevelop_get_instruction_metadata`: exact metadata, including parameter order and parameter types.
+- `lint_scene_events`: check MCP event authoring rules: root events must be semantic Groups and JavaScript events are disallowed unless explicitly requested.
 
 Write tools:
 
@@ -77,6 +79,7 @@ Write tools:
 - `replace_object_definition`: replace/create a scene object from complete serialized object JSON; type changes are allowed after validation.
 - `delete_scene_object`: delete a scene object and clean up references/instances through GDevelop refactoring.
 - `set_object_properties`: set object properties using names from `inspect_object_properties`.
+- `set_text_object_properties`: high-level TextObject setter for text, size, color, bold/italic, alignment, outline, shadow, font, and line height.
 - `add_or_update_resource`: add/update a project resource with `name`, `file`, `kind`, and metadata. For audio, use `metadata.preloadAsSound`, `metadata.preloadAsMusic`, `metadata.preloadInCache`, and `metadata.userAdded`.
 - `set_sprite_animations`: replace a Sprite object's animations, directions, frames, origin/center/custom points, and collision masks.
 - `bulk_edit_scene_assets`: batch import resources, create/replace scene objects, bind Sprite animations, and place 2D instances for one scene.
@@ -160,14 +163,14 @@ Hard requirement: unless the user explicitly requests JavaScript, implement busi
 7. `gdevelop_get_events_json_examples` to refresh the serialized shape if needed.
 8. `gdevelop_search_instruction_metadata` for each action, condition, or expression you plan to use.
 9. `gdevelop_get_instruction_metadata` for exact internal type and parameter order.
-10. Draft `events_json` as a JSON string containing an array of serialized GDevelop events. Use standard event types and standard instructions by default; do not include JavaScript event types unless the user explicitly requested JavaScript.
-11. `gdevelop_validate_events_json` with the drafted string.
-12. If validation reports any issue, stop and fix the JSON, metadata choice, parameter value, or missing project object/variable/resource first. Do not write invalid events.
-13. If valid, call `add_scene_events` with `event_changes` targeting the destination Group/sub-event list. Use append-at-end only when the appended event is a Group or when immediately wrapping/moving the new events into the correct Group.
-14. If the write tool rejects the events with validation errors, treat the write as not applied. Fix and validate again before retrying.
-15. `read_scene_events` and `read_scene_events_serialized` again.
-16. Verify no created or modified non-Group event remains outside its semantic Group. If any do, call `move_events_to_group` or `wrap_events_in_group` before finishing.
-17. Verify no JavaScript event was added or modified unless the user explicitly requested JavaScript.
+10. Declare required global/scene/object variables with `add_or_edit_variable` before validation. Do not wait for repeated invalid variable parameter errors.
+11. Draft `events_json` as a JSON string containing an array of serialized GDevelop events. Use standard event types and standard instructions by default; do not include JavaScript event types unless the user explicitly requested JavaScript.
+12. For large event sheets, write the JSON to a local file and call `validate_events_json_file` with `summary_only: true`. For small payloads, call `gdevelop_validate_events_json`.
+13. If validation reports any issue, read `issueSummary.rootCauses` first, then fix the JSON, metadata choice, parameter value, or missing project object/variable/resource. Do not write invalid events.
+14. If valid, call `add_scene_events` with `event_changes` targeting the destination Group/sub-event list, or `replace_scene_events_from_file` with `summary_only: true` for whole-sheet replacement. Use append-at-end only when the appended event is a Group or when immediately wrapping/moving the new events into the correct Group.
+15. If the write tool rejects the events with validation errors, treat the write as not applied. Fix and validate again before retrying.
+16. `read_scene_events` and `read_scene_events_serialized` again.
+17. Run `lint_scene_events`. If it reports ungrouped root events or JavaScript events, fix them before finishing.
 18. If object/variable/resource references were created or expected, read the relevant object/variable/scene/resource summary too.
 
 Never use `add_scene_events` with a natural language description expecting server-side generation. MCP direct event writing does not call the GDevelop AI event generation service. Always pass `events_json` or `event_changes`.
@@ -175,6 +178,8 @@ Never use `add_scene_events` with a natural language description expecting serve
 `gdevelop_validate_events_json` and `add_scene_events` use GDevelop's own instruction metadata and `InstructionValidator` path for parameter validation. This catches expression type errors, unknown instruction types, missing parameters, invalid object/variable references, and malformed string/number expressions before events are inserted.
 
 Resource parameters are also checked. If an event references an audio/image/etc. resource, validation must confirm the resource exists, has the expected kind, has a non-empty `file`, and the local file exists when the path can be resolved. If validation reports `resource-empty-file` or `resource-missing-file`, fix the resource with `add_or_update_resource` or inspect with `inspect_project_resources` before writing events.
+
+Validation responses include `issueSummary`. Use it before inspecting every repeated issue: `byType` shows counts and `rootCauses` groups repeated errors by likely fix. For literal text parameters such as key names, timer names, resource names, and colors, GDevelop often expects a text expression. That means the parameter value must include quotes, for example `"Space"`, `"PlayerFire"`, or `"220;30;55"`, not `Space`, `PlayerFire`, or `220;30;55`.
 
 For extension function event bodies, use the same event JSON shape and metadata workflow. `gdevelop_create_or_update_extension_function` validates `events_json` before replacing the function's event list. Invalid function event JSON must be fixed before retrying.
 
@@ -300,8 +305,13 @@ Import local images/audio and bind Sprite frames:
 2. For initial scene setup or many assets, prefer `bulk_edit_scene_assets` with `resources`, `objects`, `sprite_animations`, and `instances`.
 3. For focused edits, call `add_or_update_resource` for each file. Use a non-empty relative path when the file is inside the project folder; absolute paths are accepted but must be valid. For audio, pass `kind: "audio"` and metadata such as `preloadAsSound: true` and `userAdded: true`.
 4. For Sprite objects, call `set_sprite_animations` with animations/directions/frames. Frame `image` must be the image resource name.
-5. `inspect_project_resources` again, usually with `compact: true`. Check `invalidResources`, `missingSpriteFrameReferences`, and `unusedResources`.
+5. `inspect_project_resources` again, usually with `compact: true`. Check `invalidResources`, `missingSpriteFrameReferences`, `eventResourceReferences`, and `unusedResources`.
 6. `read_serialized_scene` to verify objects, instances, and frames.
+
+Set text object properties:
+
+1. Use `set_text_object_properties` for `TextObject::Text`. Prefer it over raw `set_object_properties` for text, character size, color, bold, italic, alignment, outline, shadow, font, and line height.
+2. Read back with `inspect_object_properties` or `read_serialized_scene`.
 
 Set project startup/settings:
 
@@ -410,7 +420,11 @@ Save the project:
 - Prefer event Group tools over full `/events` replacement for organization-only changes.
 - Prefer extension-specific tools over raw serialized extension JSON. Use `serialized_*` only when no structured field exists for the required edit.
 - Prefer `replace_scene_events_from_file` with `summary_only: true` for very large event sheets instead of inlining huge JSON strings or returning the full sheet.
+- Prefer `validate_events_json_file` before `replace_scene_events_from_file` so validation and writing are separate steps.
+- Prefer `issueSummary.rootCauses` over reading every repeated validation issue.
 - Prefer `inspect_project_resources` with `compact: true` before and after asset replacement tasks; request full output only when investigating references.
+- Prefer `set_text_object_properties` for text objects.
+- Prefer `lint_scene_events` after any event write.
 - Prefer `set_first_layout` or `set_project_properties` over editing project JSON on disk.
 - Prefer `bulk_edit_scene_assets` for initial game/scene construction with many resources, objects, Sprite animations, and instances.
 - Do not delete or replace large event blocks unless the user requested broad refactoring or the current events are clearly wrong.
@@ -425,8 +439,10 @@ Before claiming completion:
 - The target project/scene/object was identified.
 - Every generated instruction type came from metadata search or exact metadata lookup.
 - Event JSON was validated before insertion, and `issues`/`errors` was empty.
+- For file-based event edits, `validate_events_json_file` passed before `replace_scene_events_from_file`.
 - Every created or modified event is inside the appropriate semantic Group; no AI-authored gameplay event is left ungrouped at the root.
 - No JavaScript event was created or modified unless the user explicitly requested JavaScript.
+- `lint_scene_events` passed after event writes.
 - Referenced resources have non-empty files and valid paths, or remaining invalid resource paths were explicitly reported.
 - The startup scene is set with `set_first_layout` or verified from `read_game_project_json`; do not rely on a disk-only patch.
 - A write tool reported success or a non-error result.
@@ -439,6 +455,9 @@ Before claiming completion:
 - Calling `add_scene_events` with only an English description. Fix: provide `events_json` or `event_changes`.
 - Guessing parameter order from display text. Fix: call `gdevelop_get_instruction_metadata`.
 - Passing raw text where GDevelop expects a text expression. Fix: wrap text in quotes inside the parameter, for example `"Red"` or `"220;30;55"`.
+- Inlining a huge event JSON string just to validate. Fix: write a local file and call `validate_events_json_file`.
+- Reading repeated validation errors one by one. Fix: use `issueSummary.rootCauses`.
+- Forgetting to declare variables before event validation. Fix: call `add_or_edit_variable` first with `variable_scope`, `variable_name_or_path`, and `value`.
 - Writing events after validation returned issues. Fix: correct the events first; `add_scene_events` rejects invalid direct event writes.
 - Leaving newly created gameplay events at the root event sheet. Fix: create/find the semantic Group first, or immediately wrap/move the events into it.
 - Using JavaScript events to implement normal gameplay logic. Fix: use standard GDevelop events/instructions; only use JavaScript when the user explicitly asks for it.

@@ -272,9 +272,95 @@ describe('McpEditorBridge', () => {
       expect(invalidColorValidation.issues[0].suggestion).toContain(
         '"220;30;55"'
       );
+      expect(invalidColorValidation.issueSummary.byType).toEqual(
+        expect.objectContaining({
+          'invalid-parameter': expect.any(Number),
+        })
+      );
+      expect(
+        invalidColorValidation.issueSummary.rootCauses[0].suggestion
+      ).toContain('"220;30;55"');
       expect(layout.getEvents().getEventsCount()).toBe(0);
     } finally {
       project.delete();
+    }
+  });
+
+  it('validates event JSON files without writing and lints scene event organization', async () => {
+    // $FlowFixMe[invalid-constructor]
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    const layout = project.insertNewLayout('Level1', 0);
+    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gdevelop-mcp-'));
+    const eventsFile = path.join(tempDir, 'events.json');
+    fs.writeFileSync(
+      eventsFile,
+      JSON.stringify([
+        {
+          type: 'BuiltinCommonInstructions::Standard',
+          conditions: [],
+          actions: [],
+        },
+        {
+          type: 'BuiltinCommonInstructions::JsCode',
+          inlineCode: 'console.log("bad");',
+        },
+      ])
+    );
+
+    try {
+      const bridge = makeBridge({
+        getProject: () => project,
+      });
+
+      const validateFileResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'validate_events_json_file',
+          arguments: {
+            scene_name: 'Level1',
+            events_json_file: eventsFile,
+            summary_only: true,
+          },
+        },
+      });
+      const validation = JSON.parse(validateFileResponse.content[0].text);
+      expect(validateFileResponse.isError).not.toBe(true);
+      expect(validation.valid).toBe(false);
+      expect(validation.eventsAsText).toBeUndefined();
+      expect(validation.issueSummary.byType).toEqual(
+        expect.objectContaining({
+          'javascript-event-not-allowed': 1,
+        })
+      );
+      expect(layout.getEvents().getEventsCount()).toBe(0);
+
+      layout
+        .getEvents()
+        .insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 0);
+      layout
+        .getEvents()
+        .insertNewEvent(project, 'BuiltinCommonInstructions::JsCode', 1);
+
+      const lintResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'lint_scene_events',
+          arguments: {
+            scene_name: 'Level1',
+          },
+        },
+      });
+      const lint = JSON.parse(lintResponse.content[0].text);
+      expect(lint.valid).toBe(false);
+      expect(lint.issues.map(issue => issue.type)).toEqual(
+        expect.arrayContaining([
+          'root-event-not-group',
+          'javascript-event-not-allowed',
+        ])
+      );
+    } finally {
+      project.delete();
+      fs.rmSync(tempDir, { recursive: true, force: true });
     }
   });
 
@@ -930,6 +1016,24 @@ describe('McpEditorBridge', () => {
         ])
       );
 
+      unserializeFromJSObject(
+        layout.getEvents(),
+        [
+          {
+            type: 'BuiltinCommonInstructions::Standard',
+            conditions: [],
+            actions: [
+              {
+                type: { value: 'PlaySound' },
+                parameters: ['', 'Laser.wav', 'no', '100', '1'],
+              },
+            ],
+          },
+        ],
+        'unserializeFrom',
+        project
+      );
+
       const auditResponse = await bridge.handleRendererMcpRequest({
         method: 'tools/call',
         params: {
@@ -949,6 +1053,16 @@ describe('McpEditorBridge', () => {
           expect.objectContaining({
             name: 'Broken.wav',
             issue: 'empty-file',
+          }),
+        ])
+      );
+      expect(audit.eventResourceReferences).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            sceneName: 'Level1',
+            resourceName: 'Laser.wav',
+            instructionType: 'PlaySound',
+            parameterIndex: 1,
           }),
         ])
       );
@@ -1386,6 +1500,43 @@ describe('McpEditorBridge', () => {
       expect(labelProperties.get('characterSize').getValue()).toBe('36');
       expect(labelProperties.get('color').getValue()).toBe('255;0;128');
 
+      const textObjectResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'set_text_object_properties',
+          arguments: {
+            scene_name: 'Level1',
+            object_name: 'Label',
+            text: 'Lives: 3',
+            character_size: 42,
+            color: '255;255;255',
+            bold: true,
+            italic: true,
+            text_alignment: 'center',
+            vertical_text_alignment: 'center',
+            outline: {
+              enabled: true,
+              color: '0;0;0',
+              thickness: 2,
+            },
+          },
+        },
+      });
+      const textObjectResult = JSON.parse(textObjectResponse.content[0].text);
+      expect(textObjectResponse.isError).not.toBe(true);
+      expect(textObjectResult.properties).toEqual(
+        expect.objectContaining({
+          text: 'Lives: 3',
+          characterSize: 42,
+          color: '255;255;255',
+          bold: true,
+          italic: true,
+          textAlignment: 'center',
+          verticalTextAlignment: 'center',
+          outlineEnabled: true,
+        })
+      );
+
       const invalidPatchResponse = await bridge.handleRendererMcpRequest({
         method: 'tools/call',
         params: {
@@ -1546,6 +1697,25 @@ describe('McpEditorBridge', () => {
     expect(schema.tool.name).toBe('put_2d_instances');
     expect(schema.tool.inputSchema.properties.instances.type).toBe('array');
     expect(schema.examples[0].arguments.instances[0].customSize.width).toBe(64);
+
+    const variableSchemaResponse = await bridge.handleRendererMcpRequest({
+      method: 'tools/call',
+      params: {
+        name: 'inspect_tool_schema',
+        arguments: {
+          tool_name: 'add_or_edit_variable',
+        },
+      },
+    });
+    const variableSchema = JSON.parse(variableSchemaResponse.content[0].text);
+    expect(variableSchema.tool.inputSchema.required).toEqual(
+      expect.arrayContaining([
+        'variable_scope',
+        'variable_name_or_path',
+        'value',
+      ])
+    );
+    expect(variableSchema.examples[0].arguments.variable_scope).toBe('scene');
 
     const examplesResponse = await bridge.handleRendererMcpRequest({
       method: 'tools/call',

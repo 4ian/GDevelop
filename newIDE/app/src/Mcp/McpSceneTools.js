@@ -422,6 +422,100 @@ const collectSpriteFrameReferences = (
   return references;
 };
 
+const getSerializedInstructionType = (instruction: any): string =>
+  instruction && instruction.type && typeof instruction.type.value === 'string'
+    ? instruction.type.value
+    : instruction && typeof instruction.type === 'string'
+    ? instruction.type
+    : '';
+
+const collectInstructionResourceReferences = ({
+  instructions,
+  resourcesByName,
+  sceneName,
+  eventPath,
+  isCondition,
+}: {|
+  instructions: Array<any>,
+  resourcesByName: { [string]: Object },
+  sceneName: string,
+  eventPath: string,
+  isCondition: boolean,
+|}): Array<Object> => {
+  const references = [];
+  instructions.forEach((instruction, instructionIndex) => {
+    const parameters = Array.isArray(instruction.parameters)
+      ? instruction.parameters
+      : [];
+    parameters.forEach((parameter, parameterIndex) => {
+      if (typeof parameter !== 'string') return;
+      if (!resourcesByName[parameter]) return;
+      references.push({
+        sceneName,
+        eventPath,
+        isCondition,
+        instructionIndex,
+        instructionType: getSerializedInstructionType(instruction),
+        parameterIndex,
+        resourceName: parameter,
+        resourceKind: resourcesByName[parameter].kind,
+      });
+    });
+
+    const subInstructions = Array.isArray(instruction.subInstructions)
+      ? instruction.subInstructions
+      : [];
+    references.push(
+      ...collectInstructionResourceReferences({
+        instructions: subInstructions,
+        resourcesByName,
+        sceneName,
+        eventPath,
+        isCondition,
+      })
+    );
+  });
+  return references;
+};
+
+const collectEventResourceReferences = (
+  serializedProject: Object,
+  resourcesByName: { [string]: Object }
+): Array<Object> => {
+  const references = [];
+
+  const visitEvents = (events, sceneName, parentPath) => {
+    if (!Array.isArray(events)) return;
+    events.forEach((event, eventIndex) => {
+      const eventPathParts = [...parentPath, eventIndex];
+      const eventPath = `event-${eventPathParts.join('.')}`;
+      references.push(
+        ...collectInstructionResourceReferences({
+          instructions: Array.isArray(event.conditions) ? event.conditions : [],
+          resourcesByName,
+          sceneName,
+          eventPath,
+          isCondition: true,
+        }),
+        ...collectInstructionResourceReferences({
+          instructions: Array.isArray(event.actions) ? event.actions : [],
+          resourcesByName,
+          sceneName,
+          eventPath,
+          isCondition: false,
+        })
+      );
+      visitEvents(event.events, sceneName, eventPathParts);
+    });
+  };
+
+  (serializedProject.layouts || []).forEach(scene => {
+    visitEvents(scene.events, scene.name || '', []);
+  });
+
+  return references;
+};
+
 export const inspectProjectResources = (
   project: gdProject,
   args: Object = {}
@@ -466,6 +560,10 @@ export const inspectProjectResources = (
     serializedProject,
     resourcesByName
   );
+  const eventResourceReferences = collectEventResourceReferences(
+    serializedProject,
+    resourcesByName
+  );
   const uselessResourceNames = gd.ProjectResourcesAdder.getAllUseless(
     project,
     ''
@@ -479,6 +577,7 @@ export const inspectProjectResources = (
     invalidResourcesCount: invalidResources.length,
     unusedResourcesCount: uselessResourceNames.length,
     spriteFrameReferencesCount: spriteFrameReferences.length,
+    eventResourceReferencesCount: eventResourceReferences.length,
     missingSpriteFrameReferencesCount: missingSpriteFrameReferences.length,
     stringReferencesCount: stringReferences.length,
   };
@@ -492,6 +591,7 @@ export const inspectProjectResources = (
       invalidResources,
       unusedResources: uselessResourceNames,
       missingSpriteFrameReferences,
+      eventResourceReferences,
     };
   }
 
@@ -504,6 +604,7 @@ export const inspectProjectResources = (
     invalidResources,
     unusedResources: uselessResourceNames,
     spriteFrameReferences,
+    eventResourceReferences,
     stringReferences,
     includeSerializedProject: !!(args && args.include_serialized_project),
     serializedProject:
@@ -1082,6 +1183,173 @@ export const setObjectProperties = (
     objectName,
     changes,
     warnings,
+    serializedObject: serializeToJSObject(object),
+  };
+};
+
+const readTextObjectProperties = (textObjectConfiguration: any): Object => ({
+  text: textObjectConfiguration.getText(),
+  characterSize: textObjectConfiguration.getCharacterSize(),
+  color: textObjectConfiguration.getColor(),
+  bold: textObjectConfiguration.isBold(),
+  italic: textObjectConfiguration.isItalic(),
+  textAlignment: textObjectConfiguration.getTextAlignment(),
+  verticalTextAlignment: textObjectConfiguration.getVerticalTextAlignment(),
+  fontName: textObjectConfiguration.getFontName(),
+  outlineEnabled: textObjectConfiguration.isOutlineEnabled(),
+  outlineColor: textObjectConfiguration.getOutlineColor(),
+  outlineThickness: textObjectConfiguration.getOutlineThickness(),
+  shadowEnabled: textObjectConfiguration.isShadowEnabled(),
+  shadowColor: textObjectConfiguration.getShadowColor(),
+  shadowDistance: textObjectConfiguration.getShadowDistance(),
+  shadowAngle: textObjectConfiguration.getShadowAngle(),
+  shadowOpacity: textObjectConfiguration.getShadowOpacity(),
+  shadowBlurRadius: textObjectConfiguration.getShadowBlurRadius(),
+  lineHeight: textObjectConfiguration.getLineHeight(),
+});
+
+export const setTextObjectProperties = (
+  project: gdProject,
+  args: Object,
+  callbacks: SceneToolCallbacks = ({}: any)
+): Object => {
+  const sceneName = getRequiredString(args, 'scene_name');
+  const objectName = getRequiredString(args, 'object_name');
+  const scene = getScene(project, sceneName);
+  const { object } = getSceneObject(project, scene, objectName);
+
+  if (object.getType() !== 'TextObject::Text') {
+    throw new Error(
+      `Object "${objectName}" has type "${object.getType()}" but set_text_object_properties only supports TextObject::Text.`
+    );
+  }
+
+  const textObjectConfiguration = gd.asTextObjectConfiguration(
+    object.getConfiguration()
+  );
+  const changes = [];
+  const setValue = (name, value, setter) => {
+    if (value === undefined || value === null) return;
+    setter(value);
+    changes.push(name);
+  };
+
+  setValue('text', args.text, value =>
+    textObjectConfiguration.setText(String(value))
+  );
+  setValue(
+    'characterSize',
+    firstNonNullNumber(args.character_size, args.characterSize),
+    value => textObjectConfiguration.setCharacterSize(value)
+  );
+  setValue('color', args.color, value =>
+    textObjectConfiguration.setColor(String(value))
+  );
+  setValue(
+    'bold',
+    typeof args.bold === 'boolean' ? args.bold : undefined,
+    value => textObjectConfiguration.setBold(value)
+  );
+  setValue(
+    'italic',
+    typeof args.italic === 'boolean' ? args.italic : undefined,
+    value => textObjectConfiguration.setItalic(value)
+  );
+  setValue('fontName', args.font_name || args.fontName, value =>
+    textObjectConfiguration.setFontName(String(value))
+  );
+  setValue('textAlignment', args.text_alignment || args.textAlignment, value =>
+    textObjectConfiguration.setTextAlignment(String(value))
+  );
+  setValue(
+    'verticalTextAlignment',
+    args.vertical_text_alignment || args.verticalTextAlignment,
+    value => textObjectConfiguration.setVerticalTextAlignment(String(value))
+  );
+  setValue(
+    'lineHeight',
+    firstNonNullNumber(args.line_height, args.lineHeight),
+    value => textObjectConfiguration.setLineHeight(value)
+  );
+
+  const outline =
+    args && args.outline && typeof args.outline === 'object'
+      ? args.outline
+      : {};
+  setValue(
+    'outlineEnabled',
+    typeof outline.enabled === 'boolean'
+      ? outline.enabled
+      : typeof args.outline_enabled === 'boolean'
+      ? args.outline_enabled
+      : undefined,
+    value => textObjectConfiguration.setOutlineEnabled(value)
+  );
+  setValue('outlineColor', outline.color || args.outline_color, value =>
+    textObjectConfiguration.setOutlineColor(String(value))
+  );
+  setValue(
+    'outlineThickness',
+    firstNonNullNumber(outline.thickness, args.outline_thickness),
+    value => textObjectConfiguration.setOutlineThickness(value)
+  );
+
+  const shadow =
+    args && args.shadow && typeof args.shadow === 'object' ? args.shadow : {};
+  setValue(
+    'shadowEnabled',
+    typeof shadow.enabled === 'boolean'
+      ? shadow.enabled
+      : typeof args.shadow_enabled === 'boolean'
+      ? args.shadow_enabled
+      : undefined,
+    value => textObjectConfiguration.setShadowEnabled(value)
+  );
+  setValue('shadowColor', shadow.color || args.shadow_color, value =>
+    textObjectConfiguration.setShadowColor(String(value))
+  );
+  setValue(
+    'shadowDistance',
+    firstNonNullNumber(shadow.distance, args.shadow_distance),
+    value => textObjectConfiguration.setShadowDistance(value)
+  );
+  setValue(
+    'shadowAngle',
+    firstNonNullNumber(shadow.angle, args.shadow_angle),
+    value => textObjectConfiguration.setShadowAngle(value)
+  );
+  setValue(
+    'shadowOpacity',
+    firstNonNullNumber(shadow.opacity, args.shadow_opacity),
+    value => textObjectConfiguration.setShadowOpacity(value)
+  );
+  setValue(
+    'shadowBlurRadius',
+    firstNonNullNumber(
+      shadow.blur_radius,
+      shadow.blurRadius,
+      args.shadow_blur_radius
+    ),
+    value => textObjectConfiguration.setShadowBlurRadius(value)
+  );
+
+  if (!changes.length) {
+    throw new Error('No supported text object properties were provided.');
+  }
+
+  if (callbacks.onObjectsModifiedOutsideEditor) {
+    callbacks.onObjectsModifiedOutsideEditor({
+      scene,
+      isNewObjectTypeUsed: false,
+    });
+  }
+
+  return {
+    success: true,
+    sceneName,
+    objectName,
+    changes,
+    properties: readTextObjectProperties(textObjectConfiguration),
     serializedObject: serializeToJSObject(object),
   };
 };

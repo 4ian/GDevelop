@@ -83,7 +83,7 @@ module.exports = [
     "languageCode": "es_ES",
     "languageName": "Spanish",
     "languageNativeName": "Español",
-    "translationRatio": 0.9764299502184294
+    "translationRatio": 0.9765315452605913
   },
   {
     "languageCode": "fa_IR",
@@ -197,7 +197,7 @@ module.exports = [
     "languageCode": "ms_MY",
     "languageName": "Malay",
     "languageNativeName": "Bahasa Melayu",
-    "translationRatio": 0.0630905211825663
+    "translationRatio": 0.0629889261404043
   },
   {
     "languageCode": "my_MM",
@@ -233,7 +233,7 @@ module.exports = [
     "languageCode": "pt_BR",
     "languageName": "Brazilian Portuguese",
     "languageNativeName": "Português brasileiro",
-    "translationRatio": 0.9881133800670527
+    "translationRatio": 0.9882149751092146
   },
   {
     "languageCode": "pt_PT",
@@ -245,31 +245,31 @@ module.exports = [
     "languageCode": "ro_RO",
     "languageName": "Romanian",
     "languageNativeName": "Română",
-    "translationRatio": 0.11673270344407194
+    "translationRatio": 0.11663110840190993
   },
   {
     "languageCode": "ru_RU",
     "languageName": "Russian",
     "languageNativeName": "Русский",
-    "translationRatio": 0.9926851569643401
+    "translationRatio": 0.9927867520065021
   },
   {
     "languageCode": "si_LK",
     "languageName": "Sinhala",
     "languageNativeName": "සිංහල",
-    "translationRatio": 0.9821192725794982
+    "translationRatio": 0.98222086762166
   },
   {
     "languageCode": "sk_SK",
     "languageName": "Slovak",
     "languageNativeName": "Slovenčina",
-    "translationRatio": 0.9783602560195063
+    "translationRatio": 0.9784618510616682
   },
   {
     "languageCode": "sl_SI",
     "languageName": "Slovenian",
     "languageNativeName": "slovenščina",
-    "translationRatio": 0.9793762064411257
+    "translationRatio": 0.9794778014832877
   },
   {
     "languageCode": "sq_AL",
@@ -281,19 +281,19 @@ module.exports = [
     "languageCode": "sr_CS",
     "languageName": "Serbian (Latin)",
     "languageNativeName": "srpski",
-    "translationRatio": 0.9746012394595144
+    "translationRatio": 0.9747028345016763
   },
   {
     "languageCode": "sr_SP",
     "languageName": "Serbian",
     "languageNativeName": "српски језик",
-    "translationRatio": 0.9798841816519354
+    "translationRatio": 0.9799857766940974
   },
   {
     "languageCode": "sv_SE",
     "languageName": "Swedish",
     "languageNativeName": "Svenska",
-    "translationRatio": 0.9714517931524942
+    "translationRatio": 0.9715533881946561
   },
   {
     "languageCode": "sw_KE",
@@ -305,25 +305,25 @@ module.exports = [
     "languageCode": "ta_IN",
     "languageName": "Tamil",
     "languageNativeName": "தமிழ்",
-    "translationRatio": 0.3845372345829523
+    "translationRatio": 0.3844356395407904
   },
   {
     "languageCode": "th_TH",
     "languageName": "Thai",
     "languageNativeName": "ไทย",
-    "translationRatio": 0.9719597683633039
+    "translationRatio": 0.9720613634054658
   },
   {
     "languageCode": "tr_TR",
     "languageName": "Turkish",
     "languageNativeName": "Türkçe",
-    "translationRatio": 0.9888245453621863
+    "translationRatio": 0.9889261404043482
   },
   {
     "languageCode": "uk_UA",
     "languageName": "Ukrainian",
     "languageNativeName": "Українська",
-    "translationRatio": 0.9906532561211013
+    "translationRatio": 0.9907548511632632
   },
   {
     "languageCode": "ur_PK",
@@ -335,19 +335,19 @@ module.exports = [
     "languageCode": "uz_UZ",
     "languageName": "Uzbek",
     "languageNativeName": "Ўзбек",
-    "translationRatio": 0.24687595245352023
+    "translationRatio": 0.24677435741135834
   },
   {
     "languageCode": "vi_VN",
     "languageName": "Vietnamese",
     "languageNativeName": "Tiếng Việt",
-    "translationRatio": 0.9851671238443565
+    "translationRatio": 0.9852687188865183
   },
   {
     "languageCode": "yo_NG",
     "languageName": "Yoruba",
     "languageNativeName": "Yorùbá",
-    "translationRatio": 0.9704358427308747
+    "translationRatio": 0.9705374377730367
   },
   {
     "languageCode": "zh_CN",

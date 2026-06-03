@@ -280,9 +280,13 @@ export const getAiRequest = async (
   {
     userId,
     aiRequestId,
+    // When set, the backend only returns the messages from this one onward
+    // (see mergeIncrementalAiRequest in AiRequestContext).
+    outputFromMessageId,
   }: {|
     userId: string,
     aiRequestId: string,
+    outputFromMessageId?: ?string,
   |}
 ): Promise<AiRequest> => {
   const authorizationHeader = await getAuthorizationHeader();
@@ -292,6 +296,7 @@ export const getAiRequest = async (
     {
       params: {
         userId,
+        outputFromMessageId: outputFromMessageId || undefined,
       },
       headers: {
         Authorization: authorizationHeader,
@@ -305,37 +310,43 @@ export const getAiRequest = async (
   });
 };
 
-export const getPartialAiRequest = async (
+/**
+ * Fetch the status of several AI requests at once (a parent request and all its
+ * active sub-agents). This collapses what used to be one status request per
+ * entity into a single request, without changing the polling cadence.
+ */
+export const getAiRequestStatuses = async (
   getAuthorizationHeader: () => Promise<string>,
   {
     userId,
-    aiRequestId,
-    include,
+    aiRequestIds,
   }: {|
     userId: string,
-    aiRequestId: string,
-    include: string,
+    aiRequestIds: Array<string>,
   |}
-): // $FlowFixMe[deprecated-utility]
-Promise<$Shape<AiRequest>> => {
+): Promise<
+  Array<{| id: string, status: GenerationStatus, userId: ?string |}>
+> => {
+  if (aiRequestIds.length === 0) return [];
+
   const authorizationHeader = await getAuthorizationHeader();
   // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await axios.get(
-    `${GDevelopGenerationApi.baseUrl}/ai-request/${aiRequestId}`,
+    `${GDevelopGenerationApi.baseUrl}/ai-request`,
     {
       params: {
         userId,
-        include,
+        ids: aiRequestIds.join(','),
+        include: 'status',
       },
       headers: {
         Authorization: authorizationHeader,
       },
     }
   );
-  return ensureObjectHasProperty({
+  return ensureIsArray({
     data: response.data,
-    propertyName: 'id',
-    endpointName: '/ai-request/{id} of Generation API',
+    endpointName: '/ai-request?ids=...&include=status of Generation API',
   });
 };
 

@@ -1581,6 +1581,36 @@ export default class InstancesEditor extends Component<Props, State> {
     this.highlightedInstance.setInstance(null);
   };
 
+  /**
+   * Delete the temporary instances added while an object is dragged - ensuring
+   * no reference to it is kept.
+   */
+  _deleteTemporaryInstances = () => {
+    // A temporary instance can be the highlighted one (it gets highlighted on
+    // hover while being dragged over the canvas). Clear the reference before
+    // it's deleted, otherwise the rendering would read the freed instance and
+    // show a corrupted tooltip and a "phantom" default-texture instance.
+    if (
+      this._instancesAdder.isTemporaryInstance(
+        this.highlightedInstance.getInstance()
+      )
+    ) {
+      this.highlightedInstance.setInstance(null);
+    }
+    // Out of caution: a temporary instance is not expected to be selected
+    // (selection only happens on a click on the canvas), but make sure the
+    // selection never keeps a reference to a soon-to-be-freed instance.
+    this.props.instancesSelection
+      .getSelectedInstances()
+      .slice()
+      .forEach(instance => {
+        if (this._instancesAdder.isTemporaryInstance(instance)) {
+          this.props.instancesSelection.unselectInstance(instance);
+        }
+      });
+    this._instancesAdder.deleteTemporaryInstances();
+  };
+
   // Debounce function to avoid storing history for each pixel move when user
   // keeps pressing an arrow key.
   // $FlowFixMe[missing-local-annot]
@@ -1896,7 +1926,7 @@ export default class InstancesEditor extends Component<Props, State> {
           if (monitor.didDrop()) {
             // Drop was done somewhere else (in a child of the canvas:
             // should not happen, but still handling this case).
-            _instancesAdder.deleteTemporaryInstances();
+            this._deleteTemporaryInstances();
             return;
           }
 
@@ -1918,7 +1948,7 @@ export default class InstancesEditor extends Component<Props, State> {
           // take this opportunity to delete any temporary instances
           // if the dragging is not done anymore over the canvas.
           if (this._instancesAdder && !isOver) {
-            this._instancesAdder.deleteTemporaryInstances();
+            this._deleteTemporaryInstances();
           }
 
           return connectDropTarget(

@@ -2,10 +2,11 @@
 import * as React from 'react';
 import {
   getAiRequest,
-  getPartialAiRequest,
+  getAiRequestStatuses,
   fetchAiSettings,
   type AiRequest,
   type AiSettings,
+  type GenerationStatus,
   getAiRequests,
 } from '../Utils/GDevelopServices/Generation';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
@@ -106,7 +107,7 @@ type AiRequestStorage = {|
   aiRequests: { [string]: AiRequest },
   updateAiRequest: (
     aiRequestId: string,
-    updateFn: (prevAiRequest: ?AiRequest) => AiRequest
+    updateFn: (previousAiRequest: ?AiRequest) => AiRequest
   ) => void,
   refreshAiRequest: (aiRequestId: string) => Promise<void>,
   isSendingAiRequest: (aiRequestId: string | null) => boolean,
@@ -230,7 +231,7 @@ export const useAiRequestsStorage = (): AiRequestStorage => {
   const updateAiRequest = React.useCallback(
     (
       aiRequestId: string,
-      updateFn: (prevAiRequest: ?AiRequest) => AiRequest
+      updateFn: (previousAiRequest: ?AiRequest) => AiRequest
     ) => {
       setState(prevState => {
         const currentAiRequest = prevState.aiRequests
@@ -517,6 +518,35 @@ type AiRequestProviderProps = {|
   children: React.Node,
 |};
 
+// Merge an incremental fetch (only the messages from `outputFromMessageId` onward)
+// back onto the cached request. When the response isn't an incremental slice
+// of what we have (no cache, unknown id, or the backend returned the full
+// output), we just use the fetched request as-is.
+export const mergeIncrementalAiRequest = (
+  previousAiRequest: ?AiRequest,
+  fetchedAiRequest: AiRequest,
+  outputFromMessageId: ?string
+): AiRequest => {
+  const fetchedOutput = fetchedAiRequest.output || [];
+  const previousOutput = previousAiRequest && previousAiRequest.output;
+  const isIncrementalSlice =
+    !!outputFromMessageId &&
+    !!previousOutput &&
+    fetchedOutput.length > 0 &&
+    fetchedOutput[0].messageId === outputFromMessageId;
+  if (!isIncrementalSlice || !previousOutput) return fetchedAiRequest;
+
+  const spliceIndex = previousOutput.findIndex(
+    message => message.messageId === outputFromMessageId
+  );
+  if (spliceIndex === -1) return fetchedAiRequest;
+
+  return {
+    ...fetchedAiRequest,
+    output: [...previousOutput.slice(0, spliceIndex), ...fetchedOutput],
+  };
+};
+
 export const AiRequestProvider = ({
   children,
 }: AiRequestProviderProps): React.MixedElement => {
@@ -542,96 +572,22 @@ export const AiRequestProvider = ({
     setIsFetchingSuggestions,
   ] = React.useState<boolean>(false);
   const lastFullFetchTimeRef = React.useRef<number>(0);
-  const fullFetchIntervalInMs = 5000;
 
-  // Watch the selected AI request while it needs polling (backend is working,
-  // or sub-agents are running). Every ~1.4s we do a partial (status-only) fetch;
-  // every 5s we do a full fetch to pick up new messages.
-  const onWatch = async () => {
-    if (!profile) return;
-    if (!selectedAiRequestId || !selectedAiRequest) return;
-    if (!aiRequestShouldBeWatched(selectedAiRequest)) return;
+  // Every status change (new tool call to run, agent finished/errored,
+  // sub-agent launched...) is caught by polling for status changes, which
+  // then fetches the latest messages of an AiRequest. Still do a fetch
+  // manually once in a while as a fail-safe.
+  const fullFetchIntervalInMs = 7000;
 
-    const clearFetchingSuggestionsIfDone = (aiRequest: AiRequest) => {
-      if (!isFetchingSuggestions) return;
-      const output = aiRequest.output || [];
-      const lastMessage = output.length > 0 ? output[output.length - 1] : null;
-      const hasSuggestions =
-        lastMessage &&
-        ((lastMessage.type === 'message' && lastMessage.role === 'assistant') ||
-          lastMessage.type === 'function_call_output') &&
-        lastMessage.suggestions;
-      if (aiRequest.status === 'ready' || hasSuggestions) {
-        setIsFetchingSuggestions(false);
-      }
-    };
-
-    const now = Date.now();
-    const shouldDoFullFetch =
-      now - lastFullFetchTimeRef.current >= fullFetchIntervalInMs;
-
-    try {
-      if (shouldDoFullFetch) {
-        lastFullFetchTimeRef.current = now;
-        const aiRequest = await retryIfFailed({ times: 2 }, () =>
-          getAiRequest(getAuthorizationHeader, {
-            userId: profile.id,
-            aiRequestId: selectedAiRequestId,
-          })
-        );
-
-        updateAiRequest(selectedAiRequestId, () => aiRequest);
-        clearFetchingSuggestionsIfDone(aiRequest);
-      } else {
-        // Use partial request to only fetch the status between full fetches.
-        const partialAiRequest = await getPartialAiRequest(
-          getAuthorizationHeader,
-          {
-            userId: profile.id,
-            aiRequestId: selectedAiRequestId,
-            include: 'status',
-          }
-        );
-
-        if (partialAiRequest.status === selectedAiRequest.status) {
-          // No status change — just merge the partial data.
-          updateAiRequest(selectedAiRequestId, prevRequest => ({
-            ...(prevRequest || {}),
-            ...partialAiRequest,
-          }));
-        } else {
-          // Status changed — do a full fetch immediately to get the latest data.
-          lastFullFetchTimeRef.current = now;
-          const aiRequest = await retryIfFailed({ times: 2 }, () =>
-            getAiRequest(getAuthorizationHeader, {
-              userId: profile.id,
-              aiRequestId: selectedAiRequestId,
-            })
-          );
-
-          updateAiRequest(selectedAiRequestId, () => aiRequest);
-          clearFetchingSuggestionsIfDone(aiRequest);
-        }
-      }
-    } catch (error) {
-      console.warn(
-        'Error while watching AI request. Ignoring and will retry on the next interval.',
-        error
-      );
-    }
-  };
-
+  // The selected AI request and its active sub-agents are watched together by a
+  // single polling loop defined further below (see `onWatch`), so that a parent
+  // request and all its sub-agents are status-polled in one batched request per
+  // tick instead of one request per entity.
   const watchPollingIntervalInMs =
     (selectedAiRequest &&
       selectedAiRequest.toolOptions &&
       selectedAiRequest.toolOptions.watchPollingIntervalInMs) ||
     1400;
-  useInterval(
-    () => {
-      onWatch();
-    },
-    shouldWatchRequest ? watchPollingIntervalInMs : null
-  );
 
   React.useEffect(
     () => {
@@ -744,66 +700,148 @@ export const AiRequestProvider = ({
     [aiRequests, removeSubAgent]
   );
 
+  // Watch loop for the selected AI request and all its active
+  // sub-agents.
+  // All the status-only checks for a given tick are batched
+  // into a single request instead of one request per entity.
+  const onWatch = async () => {
+    if (!profile) return;
+    const now = Date.now();
+
+    const clearFetchingSuggestionsIfDone = (aiRequest: AiRequest) => {
+      if (!isFetchingSuggestions) return;
+      const output = aiRequest.output || [];
+      const lastMessage = output.length > 0 ? output[output.length - 1] : null;
+      const hasSuggestions =
+        lastMessage &&
+        ((lastMessage.type === 'message' && lastMessage.role === 'assistant') ||
+          lastMessage.type === 'function_call_output') &&
+        lastMessage.suggestions;
+      if (aiRequest.status === 'ready' || hasSuggestions) {
+        setIsFetchingSuggestions(false);
+      }
+    };
+
+    const subAgentIds = Object.keys(activeSubAgentsRef.current);
+    const subAgentIdSet = new Set(subAgentIds);
+
+    const doFullFetch = async (aiRequestId: string) => {
+      const isSubAgent = subAgentIdSet.has(aiRequestId);
+      if (isSubAgent) {
+        subAgentLastFullFetchTimeRef.current[aiRequestId] = now;
+      } else {
+        lastFullFetchTimeRef.current = now;
+      }
+      // Only fetch the messages we don't have yet: ask for everything from the
+      // last message we already have onward (re-fetched so its in-place
+      // updates, like suggestions, are picked up).
+      const currentOutput = (aiRequests[aiRequestId] || {}).output;
+      const lastMessage =
+        currentOutput && currentOutput.length > 0
+          ? currentOutput[currentOutput.length - 1]
+          : null;
+      const outputFromMessageId =
+        (lastMessage && lastMessage.messageId) || undefined;
+      const fetchedAiRequest = await retryIfFailed({ times: 2 }, () =>
+        getAiRequest(getAuthorizationHeader, {
+          userId: profile.id,
+          aiRequestId,
+          outputFromMessageId,
+        })
+      );
+      updateAiRequest(aiRequestId, previousAiRequest =>
+        mergeIncrementalAiRequest(
+          previousAiRequest,
+          fetchedAiRequest,
+          outputFromMessageId
+        )
+      );
+      if (isSubAgent) {
+        if (
+          fetchedAiRequest.status === 'ready' ||
+          fetchedAiRequest.status === 'error'
+        ) {
+          removeSubAgentIfDone(aiRequestId);
+        }
+      } else {
+        clearFetchingSuggestionsIfDone(fetchedAiRequest);
+      }
+    };
+
+    // Decide, per watched entity, whether it is due for a full fetch or only a
+    // status check this tick.
+    const fullFetchPromises: Array<Promise<void>> = [];
+    const statusOnlyIds: Array<string> = [];
+
+    const watchParent =
+      !!selectedAiRequestId &&
+      !!selectedAiRequest &&
+      aiRequestShouldBeWatched(selectedAiRequest);
+    if (watchParent && selectedAiRequestId) {
+      if (now - lastFullFetchTimeRef.current >= fullFetchIntervalInMs) {
+        fullFetchPromises.push(doFullFetch(selectedAiRequestId));
+      } else {
+        statusOnlyIds.push(selectedAiRequestId);
+      }
+    }
+    for (const subAgentId of subAgentIds) {
+      const lastFullFetch =
+        subAgentLastFullFetchTimeRef.current[subAgentId] || 0;
+      if (now - lastFullFetch >= fullFetchIntervalInMs) {
+        fullFetchPromises.push(doFullFetch(subAgentId));
+      } else {
+        statusOnlyIds.push(subAgentId);
+      }
+    }
+
+    // Batch all status-only checks into a single request. For any entity whose
+    // status changed, do a full fetch immediately to pick up the new messages.
+    const statusOnlyPromise = (async () => {
+      if (statusOnlyIds.length === 0) return;
+      const statuses = await getAiRequestStatuses(getAuthorizationHeader, {
+        userId: profile.id,
+        aiRequestIds: statusOnlyIds,
+      });
+      const statusById: Map<string, GenerationStatus> = new Map(
+        statuses.map(({ id, status }) => [id, status])
+      );
+      await Promise.all(
+        statusOnlyIds.map(async aiRequestId => {
+          const newStatus = statusById.get(aiRequestId);
+          // Missing from the response (not found / not visible): leave as-is.
+          if (newStatus === undefined) return;
+          const currentRequest = aiRequests[aiRequestId];
+          // Only status-polled entities are already in storage; if not, a full
+          // fetch will populate it on a later tick. Nothing to merge into here.
+          if (!currentRequest) return;
+          if (newStatus !== currentRequest.status) {
+            // Status changed — full fetch immediately to pick up new messages.
+            await doFullFetch(aiRequestId);
+          } else {
+            updateAiRequest(aiRequestId, prevRequest => ({
+              ...(prevRequest || currentRequest),
+              status: newStatus,
+            }));
+          }
+        })
+      );
+    })();
+
+    try {
+      await Promise.all([...fullFetchPromises, statusOnlyPromise]);
+    } catch (error) {
+      console.warn(
+        'Error while watching AI requests. Ignoring and will retry on the next interval.',
+        error
+      );
+    }
+  };
+
   useInterval(
     () => {
-      if (!profile) return;
-      const subAgents = activeSubAgentsRef.current;
-      const subAgentIds = Object.keys(subAgents);
-      if (subAgentIds.length === 0) return;
-
-      subAgentIds.forEach(async subAgentId => {
-        const now = Date.now();
-        const lastFullFetch =
-          subAgentLastFullFetchTimeRef.current[subAgentId] || 0;
-        const shouldDoFullFetch = now - lastFullFetch >= fullFetchIntervalInMs;
-
-        const doFullFetch = async () => {
-          subAgentLastFullFetchTimeRef.current[subAgentId] = now;
-          const aiRequest = await retryIfFailed({ times: 2 }, () =>
-            getAiRequest(getAuthorizationHeader, {
-              userId: profile.id,
-              aiRequestId: subAgentId,
-            })
-          );
-          updateAiRequest(subAgentId, () => aiRequest);
-
-          if (aiRequest.status === 'ready' || aiRequest.status === 'error') {
-            removeSubAgentIfDone(subAgentId);
-          }
-        };
-
-        try {
-          if (shouldDoFullFetch) {
-            await doFullFetch();
-          } else {
-            const partialAiRequest = await getPartialAiRequest(
-              getAuthorizationHeader,
-              {
-                userId: profile.id,
-                aiRequestId: subAgentId,
-                include: 'status',
-              }
-            );
-
-            if (partialAiRequest.status !== aiRequests[subAgentId].status) {
-              // Status changed — do a full fetch immediately.
-              await doFullFetch();
-            } else {
-              updateAiRequest(subAgentId, prevRequest => ({
-                ...(prevRequest || {}),
-                ...partialAiRequest,
-              }));
-            }
-          }
-        } catch (error) {
-          console.warn(
-            `Error while watching sub-agent AI request ${subAgentId}. Will retry on next interval.`,
-            error
-          );
-        }
-      });
+      onWatch();
     },
-    hasActiveSubAgents ? watchPollingIntervalInMs : null
+    shouldWatchRequest || hasActiveSubAgents ? watchPollingIntervalInMs : null
   );
 
   // Clear sub-agents when the parent request is suspended.

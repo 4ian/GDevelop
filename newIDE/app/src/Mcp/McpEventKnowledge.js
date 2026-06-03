@@ -865,11 +865,13 @@ const validateEventsList = ({
   eventsList,
   path,
   issues,
+  allowJavaScriptEvents,
 }: {|
   project: gdProject,
   eventsList: gdEventsList,
   path?: Array<number>,
   issues: Array<Object>,
+  allowJavaScriptEvents?: boolean,
 |}) => {
   const currentPath = path || [];
   mapFor(0, eventsList.getEventsCount(), eventIndex => {
@@ -884,6 +886,20 @@ const validateEventsList = ({
         eventPath,
       });
       return;
+    }
+
+    if (
+      eventType === 'BuiltinCommonInstructions::JsCode' &&
+      !allowJavaScriptEvents
+    ) {
+      issues.push({
+        severity: 'error',
+        type: 'javascript-event-not-allowed',
+        eventPath,
+        eventType,
+        suggestion:
+          'Use standard GDevelop events, conditions, actions, expressions, behaviors, or extensions. Only pass allow_javascript_events: true when the user explicitly requested JavaScript.',
+      });
     }
 
     if (eventType === 'BuiltinCommonInstructions::Standard') {
@@ -918,19 +934,53 @@ const validateEventsList = ({
         eventsList: event.getSubEvents(),
         path: eventPath,
         issues,
+        allowJavaScriptEvents,
       });
     }
   });
+};
+
+const withActionableSuggestion = (issue: Object): Object => {
+  if (issue.suggestion) return issue;
+
+  if (
+    issue.type === 'invalid-parameter' &&
+    typeof issue.parameterValue === 'string' &&
+    issue.parameterValue &&
+    !issue.parameterValue.trim().startsWith('"')
+  ) {
+    return {
+      ...issue,
+      suggestion: `If this parameter expects a text/string expression, wrap literal text in quotes. For this value, try ${JSON.stringify(
+        issue.parameterValue
+      )}.`,
+    };
+  }
+
+  if (
+    issue.type === 'invalid-parameter' &&
+    typeof issue.parameterIndex === 'number'
+  ) {
+    return {
+      ...issue,
+      suggestion:
+        'Check the exact parameter type/order with gdevelop_get_instruction_metadata, then rewrite this parameter as a valid GDevelop expression for that type.',
+    };
+  }
+
+  return issue;
 };
 
 export const validateEventsJson = ({
   project,
   sceneName,
   eventsJson,
+  allowJavaScriptEvents,
 }: {|
   project: gdProject,
   sceneName?: ?string,
   eventsJson?: ?string,
+  allowJavaScriptEvents?: boolean,
 |}): Object => {
   if (!eventsJson) {
     return {
@@ -969,6 +1019,7 @@ export const validateEventsJson = ({
       project,
       eventsList,
       issues,
+      allowJavaScriptEvents,
     });
     const layout =
       sceneName && project.hasLayoutNamed(sceneName)
@@ -983,7 +1034,10 @@ export const validateEventsJson = ({
       ...error,
     }));
     issues.push(...parameterValidationIssues);
-    const errors = issues.filter(issue => issue.severity === 'error');
+    const issuesWithSuggestions = issues.map(withActionableSuggestion);
+    const errors = issuesWithSuggestions.filter(
+      issue => issue.severity === 'error'
+    );
 
     return {
       valid: errors.length === 0,
@@ -991,7 +1045,7 @@ export const validateEventsJson = ({
       eventsAsText: renderNonTranslatedEventsAsText({ eventsList }),
       normalizedEventsJson: serializeToJSON(eventsList),
       errors,
-      issues,
+      issues: issuesWithSuggestions,
     };
   } catch (error) {
     return {

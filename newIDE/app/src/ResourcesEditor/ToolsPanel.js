@@ -24,16 +24,12 @@ import CrossIcon from '../UI/CustomSvgIcons/Cross';
 import {
   getFileUrl,
   getProjectRootPath,
-  isAudioFile,
   normalizeSlashes,
   type ProjectFileSelection,
 } from './ProjectFilesPanel';
 import optionalRequire from '../Utils/OptionalRequire';
-import { applyResourceDefaults } from '../ResourcesList/ResourceUtils';
-import newNameGenerator from '../Utils/NewNameGenerator';
 import { openFilePicker } from '../Utils/FileSystem';
 
-const gd: libGDevelop = global.gd;
 const fs = optionalRequire('fs');
 const path = optionalRequire('path');
 const buffer = optionalRequire('buffer');
@@ -419,6 +415,17 @@ export const shouldDisableNanoBananaButton = ({
   isGeneratingImage: boolean,
 |}): boolean => isGeneratingImage;
 
+export const shouldDisableElevenLabsButton = ({
+  isGeneratingAudio,
+  elevenLabsApiKey,
+  elevenLabsText,
+}: {|
+  isGeneratingAudio: boolean,
+  elevenLabsApiKey: string,
+  elevenLabsText: string,
+|}): boolean =>
+  isGeneratingAudio || !elevenLabsApiKey.trim() || !elevenLabsText.trim();
+
 const getAudioExtensionFromOutputFormat = (outputFormat: string): string => {
   if (outputFormat.indexOf('wav') === 0) return '.wav';
   if (outputFormat.indexOf('ogg') === 0) return '.ogg';
@@ -479,38 +486,13 @@ const getImageGenerationOutputFolderPath = async ({
   const projectRootPath = getProjectRootPath(project);
   if (!projectRootPath) {
     throw new Error(
-      'Save the project before generating an image.'
+      'Save the project before generating media.'
     );
   }
 
   const generatedFolderPath = getGeneratedImagesFolderPath(projectRootPath);
   await fs.promises.mkdir(generatedFolderPath, { recursive: true });
   return generatedFolderPath;
-};
-
-const addResourceForFile = ({
-  project,
-  absolutePath,
-  kind,
-}: {|
-  project: gdProject,
-  absolutePath: string,
-  kind: 'audio' | 'image',
-|}) => {
-  const relativeFilePath = getRelativeProjectFilePath(project, absolutePath);
-  if (!relativeFilePath) return;
-
-  const resourcesManager = project.getResourcesManager();
-  const resourceName = newNameGenerator(relativeFilePath, tentativeName =>
-    resourcesManager.hasResource(tentativeName)
-  );
-  const resource =
-    kind === 'image' ? new gd.ImageResource() : new gd.AudioResource();
-  resource.setFile(relativeFilePath);
-  resource.setName(resourceName);
-  applyResourceDefaults(project, resource);
-  resourcesManager.addResource(resource);
-  resource.delete();
 };
 
 export const getResourcesToolsSettingsWithDefaults = (
@@ -1088,7 +1070,7 @@ const ToolsPanel = ({
   );
   const runElevenLabs = React.useCallback(
     async () => {
-      if (!fs || !path || !selectedNode || !isAudioFile(selectedNode)) return;
+      if (!fs || !path) return;
       if (!elevenLabsApiKey.trim()) {
         setAudioGenerationError('Enter an ElevenLabs API key.');
         return;
@@ -1149,20 +1131,19 @@ const ToolsPanel = ({
           throw new Error('Unable to save the generated audio file.');
         }
         const audioBytes = buffer.Buffer.from(await response.arrayBuffer());
+        const outputFolderPath = await getImageGenerationOutputFolderPath({
+          project,
+        });
+        const outputBaseName =
+          elevenLabsMode === 'text-to-speech'
+            ? 'elevenlabs-speech'
+            : 'elevenlabs-sound';
         const outputPath = await getUniqueOutputPath({
-          folderPath: path.dirname(selectedNode.absolutePath),
-          baseName: `${path.basename(
-            selectedNode.name,
-            selectedNode.extension
-          )}-elevenlabs`,
+          folderPath: outputFolderPath,
+          baseName: outputBaseName,
           extension: getAudioExtensionFromOutputFormat(outputFormat),
         });
         await fs.promises.writeFile(outputPath, audioBytes);
-        addResourceForFile({
-          project,
-          absolutePath: outputPath,
-          kind: 'audio',
-        });
         setAudioGenerationStatus(`Generated ${normalizeSlashes(outputPath)}`);
         await onProjectFilesChanged();
       } catch (error) {
@@ -1182,7 +1163,6 @@ const ToolsPanel = ({
       elevenLabsVoiceId,
       onProjectFilesChanged,
       project,
-      selectedNode,
     ]
   );
 
@@ -1483,9 +1463,11 @@ const ToolsPanel = ({
           icon={<SparkleIcon />}
           color="ai"
           onClick={runElevenLabs}
-          disabled={
-            isGeneratingAudio || !selectedNode || !isAudioFile(selectedNode)
-          }
+          disabled={shouldDisableElevenLabsButton({
+            isGeneratingAudio,
+            elevenLabsApiKey,
+            elevenLabsText,
+          })}
         />
       </MiniToolbar>
       {!!audioGenerationError && (

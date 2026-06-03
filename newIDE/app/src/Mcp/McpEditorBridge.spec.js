@@ -269,7 +269,72 @@ describe('McpEditorBridge', () => {
       expect(invalidColorValidation.valid).toBe(false);
       expect(invalidColorValidation.issues[0].type).toBe('invalid-parameter');
       expect(invalidColorValidation.issues[0].parameterValue).toBe('220;30;55');
+      expect(invalidColorValidation.issues[0].suggestion).toContain(
+        '"220;30;55"'
+      );
       expect(layout.getEvents().getEventsCount()).toBe(0);
+    } finally {
+      project.delete();
+    }
+  });
+
+  it('sets project-level properties and first layout directly', async () => {
+    // $FlowFixMe[invalid-constructor]
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    project.insertNewLayout('Menu', 0);
+    project.insertNewLayout('Sky Battle', 1);
+    const triggerUnsavedChanges: any = jest.fn();
+
+    try {
+      const bridge = makeBridge({
+        getProject: () => project,
+        getPermissions: () => ({
+          allowWriteTools: true,
+          allowCommandTools: false,
+        }),
+        triggerUnsavedChanges,
+      });
+
+      const firstLayoutResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'set_first_layout',
+          arguments: {
+            scene_name: 'Sky Battle',
+          },
+        },
+      });
+      const firstLayoutResult = JSON.parse(firstLayoutResponse.content[0].text);
+      expect(firstLayoutResponse.isError).not.toBe(true);
+      expect(firstLayoutResult.project.firstLayout).toBe('Sky Battle');
+      expect(project.getFirstLayout()).toBe('Sky Battle');
+
+      const propertiesResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'set_project_properties',
+          arguments: {
+            project_name: 'Sky Battle Deluxe',
+            game_resolution_width: 1280,
+            game_resolution_height: 720,
+            adapt_game_resolution_at_runtime: true,
+            min_fps: 20,
+            max_fps: 120,
+            orientation: 'landscape',
+            scale_mode: 'linear',
+          },
+        },
+      });
+      const propertiesResult = JSON.parse(propertiesResponse.content[0].text);
+      expect(propertiesResponse.isError).not.toBe(true);
+      expect(project.getName()).toBe('Sky Battle Deluxe');
+      expect(project.getGameResolutionWidth()).toBe(1280);
+      expect(project.getGameResolutionHeight()).toBe(720);
+      expect(project.getAdaptGameResolutionAtRuntime()).toBe(true);
+      expect(project.getMinimumFPS()).toBe(20);
+      expect(project.getMaximumFPS()).toBe(120);
+      expect(propertiesResult.project.name).toBe('Sky Battle Deluxe');
+      expect(triggerUnsavedChanges).toHaveBeenCalledTimes(2);
     } finally {
       project.delete();
     }
@@ -1081,10 +1146,16 @@ describe('McpEditorBridge', () => {
           arguments: {
             scene_name: 'Level1',
             events_json_file: eventsFile,
+            summary_only: true,
           },
         },
       });
       expect(replaceResponse.isError).not.toBe(true);
+      const replaceResult = JSON.parse(replaceResponse.content[0].text);
+      expect(replaceResult.eventsCount).toBe(1);
+      expect(replaceResult.eventsAsText).toBeUndefined();
+      expect(replaceResult.serializedEvents).toBeUndefined();
+      expect(replaceResult.serializedEventsJson).toBeUndefined();
       expect(layout.getEvents().getEventsCount()).toBe(1);
       expect(serializeToJSObject(layout.getEvents())[0].comment).toBe(
         'Loaded from file'
@@ -1165,6 +1236,111 @@ describe('McpEditorBridge', () => {
       expect(layout.getInitialInstances().getInstancesCount()).toBe(0);
     } finally {
       project.delete();
+    }
+  });
+
+  it('returns compact resource audits and can batch create scene assets', async () => {
+    // $FlowFixMe[invalid-constructor]
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    const layout = project.insertNewLayout('Level1', 0);
+    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gdevelop-mcp-'));
+    const imageFile = path.join(tempDir, 'Player.png');
+    fs.writeFileSync(imageFile, 'fake png content');
+
+    try {
+      project.setProjectFile(path.join(tempDir, 'game.json'));
+      const bridge = makeBridge({
+        getProject: () => project,
+        getPermissions: () => ({
+          allowWriteTools: true,
+          allowCommandTools: false,
+        }),
+      });
+
+      const batchResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'bulk_edit_scene_assets',
+          arguments: {
+            scene_name: 'Level1',
+            resources: [
+              {
+                name: 'Player.png',
+                file: imageFile,
+                kind: 'image',
+              },
+            ],
+            objects: [
+              {
+                object_name: 'Player',
+                object_type: 'Sprite',
+                serialized_object: {
+                  name: 'Player',
+                  type: 'Sprite',
+                  variables: [],
+                  effects: [],
+                  behaviors: [],
+                  animations: [],
+                },
+              },
+            ],
+            sprite_animations: [
+              {
+                object_name: 'Player',
+                animations: [
+                  {
+                    name: 'Idle',
+                    frames: [
+                      {
+                        image: 'Player.png',
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+            instances: [
+              {
+                object_name: 'Player',
+                x: 64,
+                y: 96,
+              },
+            ],
+          },
+        },
+      });
+      const batchResult = JSON.parse(batchResponse.content[0].text);
+      expect(batchResponse.isError).not.toBe(true);
+      expect(batchResult.counts).toEqual({
+        resources: 1,
+        objects: 1,
+        spriteAnimations: 1,
+        instances: 1,
+      });
+      expect(project.getResourcesManager().hasResource('Player.png')).toBe(
+        true
+      );
+      expect(layout.getObjects().hasObjectNamed('Player')).toBe(true);
+      expect(layout.getInitialInstances().getInstancesCount()).toBe(1);
+
+      const auditResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'inspect_project_resources',
+          arguments: {
+            compact: true,
+          },
+        },
+      });
+      const audit = JSON.parse(auditResponse.content[0].text);
+      expect(audit.compact).toBe(true);
+      expect(audit.summary.totalResources).toBe(1);
+      expect(audit.summary.invalidResourcesCount).toBe(0);
+      expect(audit.stringReferences).toBeUndefined();
+      expect(audit.resourcesByName).toBeUndefined();
+    } finally {
+      project.delete();
+      fs.rmSync(tempDir, { recursive: true, force: true });
     }
   });
 

@@ -71,12 +71,15 @@ Write tools:
 
 - `initialize_project`: create a project.
 - `create_scene` / `delete_scene`: scene management.
+- `set_first_layout`: set the project startup scene/layout in the editor model. Use this instead of patching saved JSON.
+- `set_project_properties`: set project name, startup scene, resolution, runtime resolution adaptation, FPS limits, orientation, and scale mode.
 - `create_or_replace_object`: create, duplicate, replace, or move object definitions.
 - `replace_object_definition`: replace/create a scene object from complete serialized object JSON; type changes are allowed after validation.
 - `delete_scene_object`: delete a scene object and clean up references/instances through GDevelop refactoring.
 - `set_object_properties`: set object properties using names from `inspect_object_properties`.
 - `add_or_update_resource`: add/update a project resource with `name`, `file`, `kind`, and metadata. For audio, use `metadata.preloadAsSound`, `metadata.preloadAsMusic`, `metadata.preloadInCache`, and `metadata.userAdded`.
 - `set_sprite_animations`: replace a Sprite object's animations, directions, frames, origin/center/custom points, and collision masks.
+- `bulk_edit_scene_assets`: batch import resources, create/replace scene objects, bind Sprite animations, and place 2D instances for one scene.
 - `change_object_property`: edit object properties.
 - `add_behavior` / `remove_behavior` / `change_behavior_property`: behavior management.
 - `put_2d_instances` / `put_3d_instances`: place, move, update, or erase scene instances.
@@ -293,11 +296,18 @@ Add an object:
 
 Import local images/audio and bind Sprite frames:
 
-1. `inspect_project_resources` to see current names and invalid paths.
-2. `add_or_update_resource` for each file. Use a non-empty relative path when the file is inside the project folder; absolute paths are accepted but must be valid. For audio, pass `kind: "audio"` and metadata such as `preloadAsSound: true` and `userAdded: true`.
-3. For Sprite objects, call `set_sprite_animations` with animations/directions/frames. Frame `image` must be the image resource name.
-4. `inspect_project_resources` again. Check `invalidResources`, `spriteFrameReferences`, and `unusedResources`.
-5. `read_serialized_scene` to verify objects, instances, and frames.
+1. `inspect_project_resources` with `compact: true` to see current counts, invalid paths, and missing Sprite frame references without noisy generic string references.
+2. For initial scene setup or many assets, prefer `bulk_edit_scene_assets` with `resources`, `objects`, `sprite_animations`, and `instances`.
+3. For focused edits, call `add_or_update_resource` for each file. Use a non-empty relative path when the file is inside the project folder; absolute paths are accepted but must be valid. For audio, pass `kind: "audio"` and metadata such as `preloadAsSound: true` and `userAdded: true`.
+4. For Sprite objects, call `set_sprite_animations` with animations/directions/frames. Frame `image` must be the image resource name.
+5. `inspect_project_resources` again, usually with `compact: true`. Check `invalidResources`, `missingSpriteFrameReferences`, and `unusedResources`.
+6. `read_serialized_scene` to verify objects, instances, and frames.
+
+Set project startup/settings:
+
+1. After creating/deleting scenes, call `set_first_layout` with the intended startup scene.
+2. Use `set_project_properties` for project name, startup scene, resolution, FPS, orientation, and scale mode.
+3. Do not patch `firstLayout` only in the saved disk JSON; a later editor save can overwrite disk-only edits from the in-memory project model.
 
 Place or move instances:
 
@@ -399,8 +409,10 @@ Save the project:
 - Prefer `find_scene_events` plus stable `aiGeneratedEventId` over path-only references after the first edit.
 - Prefer event Group tools over full `/events` replacement for organization-only changes.
 - Prefer extension-specific tools over raw serialized extension JSON. Use `serialized_*` only when no structured field exists for the required edit.
-- Prefer `replace_scene_events_from_file` for very large event sheets instead of inlining huge JSON strings.
-- Prefer `inspect_project_resources` before and after asset replacement tasks.
+- Prefer `replace_scene_events_from_file` with `summary_only: true` for very large event sheets instead of inlining huge JSON strings or returning the full sheet.
+- Prefer `inspect_project_resources` with `compact: true` before and after asset replacement tasks; request full output only when investigating references.
+- Prefer `set_first_layout` or `set_project_properties` over editing project JSON on disk.
+- Prefer `bulk_edit_scene_assets` for initial game/scene construction with many resources, objects, Sprite animations, and instances.
 - Do not delete or replace large event blocks unless the user requested broad refactoring or the current events are clearly wrong.
 - When a write returns partial success or errors, stop and inspect the readback before trying another write.
 - If the scene/object name is ambiguous, list options and choose the most likely target only when the user request gives enough context.
@@ -416,6 +428,7 @@ Before claiming completion:
 - Every created or modified event is inside the appropriate semantic Group; no AI-authored gameplay event is left ungrouped at the root.
 - No JavaScript event was created or modified unless the user explicitly requested JavaScript.
 - Referenced resources have non-empty files and valid paths, or remaining invalid resource paths were explicitly reported.
+- The startup scene is set with `set_first_layout` or verified from `read_game_project_json`; do not rely on a disk-only patch.
 - A write tool reported success or a non-error result.
 - The affected scene/object/instance/event sheet/extension was read back.
 - For save requests, `gdevelop_save_project_and_wait` returned a saved result, or the limitation of command-only saving was reported.
@@ -435,6 +448,8 @@ Before claiming completion:
 - Continuing to use an old `event-N` path after moving/grouping events. Fix: assign/read `aiGeneratedEventId` and target by ID.
 - Adding an audio resource with an empty `file`. Fix: call `add_or_update_resource` with a real local path and verify with `inspect_project_resources`.
 - Assuming `SAVE_PROJECT` completed because `gdevelop_run_command` returned `launched`. Fix: use `gdevelop_save_project_and_wait`.
+- Patching `firstLayout` directly in saved JSON while the editor is open. Fix: call `set_first_layout` or `set_project_properties`.
+- Creating many resources/objects/instances one by one for initial setup. Fix: use `bulk_edit_scene_assets` unless stepwise validation is needed.
 - Assuming command names. Fix: call `gdevelop_list_commands`.
 - Forgetting that events without conditions run every frame. Fix: add conditions such as `SceneJustBegins` or a trigger condition when appropriate.
 - Adding object-specific events before the object exists. Fix: create/inspect object first.

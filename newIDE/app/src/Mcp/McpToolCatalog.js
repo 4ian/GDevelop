@@ -251,6 +251,71 @@ const setObjectPropertiesSchema = {
   additionalProperties: true,
 };
 
+const projectPropertiesSchema = {
+  type: 'object',
+  properties: {
+    project_name: {
+      type: 'string',
+      description: 'Project/game name.',
+    },
+    first_layout: {
+      type: 'string',
+      description: 'Startup scene/layout name. The scene must exist.',
+    },
+    scene_name: {
+      type: 'string',
+      description:
+        'Alias for first_layout when using set_first_layout or when only setting the startup scene.',
+    },
+    game_resolution_width: {
+      type: 'number',
+      description: 'Game resolution width in pixels.',
+    },
+    game_resolution_height: {
+      type: 'number',
+      description: 'Game resolution height in pixels.',
+    },
+    adapt_game_resolution_at_runtime: {
+      type: 'boolean',
+      description: 'Whether the game resolution adapts at runtime.',
+    },
+    min_fps: {
+      type: 'number',
+      description: 'Minimum FPS setting.',
+    },
+    max_fps: {
+      type: 'number',
+      description: 'Maximum FPS setting.',
+    },
+    orientation: {
+      type: 'string',
+      description: 'Game orientation, for example landscape or portrait.',
+    },
+    scale_mode: {
+      type: 'string',
+      description: 'Game scale mode, for example linear or nearest.',
+    },
+    include_serialized_project: {
+      type: 'boolean',
+      description:
+        'When true, include the full serialized project after applying changes.',
+    },
+  },
+  additionalProperties: true,
+};
+
+const firstLayoutSchema = {
+  type: 'object',
+  properties: {
+    scene_name: {
+      type: 'string',
+      description: 'Scene/layout to use as the project startup scene.',
+    },
+  },
+  required: ['scene_name'],
+  additionalProperties: true,
+};
+
 const put2dInstancesSchema = {
   type: 'object',
   properties: {
@@ -390,6 +455,15 @@ const scenePatchSchema = {
 const inspectProjectResourcesSchema = {
   type: 'object',
   properties: {
+    compact: {
+      type: 'boolean',
+      description:
+        'When true, return counts and problem lists only. Omits full resourcesByName and generic stringReferences.',
+    },
+    summary_only: {
+      type: 'boolean',
+      description: 'Alias for compact.',
+    },
     include_serialized_project: {
       type: 'boolean',
       description:
@@ -397,6 +471,44 @@ const inspectProjectResourcesSchema = {
     },
   },
   additionalProperties: false,
+};
+
+const bulkEditSceneAssetsSchema = {
+  type: 'object',
+  properties: {
+    scene_name: sceneNameSchema.properties.scene_name,
+    resources: {
+      type: 'array',
+      description:
+        'Resource payloads accepted by add_or_update_resource: [{ name, file, kind, metadata }].',
+      items: addOrUpdateResourceSchema,
+    },
+    objects: {
+      type: 'array',
+      description:
+        'Object replacement payloads accepted by replace_object_definition. scene_name can be omitted and defaults to this tool scene_name.',
+      items: replaceObjectDefinitionSchema,
+    },
+    sprite_animations: {
+      type: 'array',
+      description:
+        'Sprite animation payloads accepted by set_sprite_animations. scene_name can be omitted and defaults to this tool scene_name.',
+      items: setSpriteAnimationsSchema,
+    },
+    instances: {
+      type: 'array',
+      description:
+        '2D instance payloads accepted by put_2d_instances. The default operation is create.',
+      items: put2dInstancesSchema.properties.instances.items,
+    },
+    instances_operation: {
+      type: 'string',
+      description:
+        'Optional default operation for instances: create, update, delete/remove, or upsert.',
+    },
+  },
+  required: ['scene_name'],
+  additionalProperties: true,
 };
 
 const eventTargetSchema = {
@@ -584,6 +696,11 @@ const replaceSceneEventsFromFileSchema = {
       type: 'string',
       description:
         'Local file containing a JSON array of serialized GDevelop events.',
+    },
+    summary_only: {
+      type: 'boolean',
+      description:
+        'When true, return only success, scene name, and event count instead of the full event sheet.',
     },
   },
   required: ['scene_name', 'events_json_file'],
@@ -873,6 +990,11 @@ const readTools: Array<McpTool> = [
           description:
             'JSON string containing an array of serialized GDevelop events.',
         },
+        allow_javascript_events: {
+          type: 'boolean',
+          description:
+            'Default false. Set true only when the user explicitly requested JavaScript events.',
+        },
       },
       required: ['events_json'],
       additionalProperties: false,
@@ -1079,6 +1201,18 @@ const writeTools: Array<McpTool> = [
     inputSchema: objectInSceneSchema,
   },
   {
+    name: 'set_project_properties',
+    description:
+      'Set project-level properties in the open editor model, including project name, first layout/startup scene, game resolution, runtime resolution adaptation, FPS limits, orientation, and scale mode.',
+    inputSchema: projectPropertiesSchema,
+  },
+  {
+    name: 'set_first_layout',
+    description:
+      'Set the project startup scene/layout directly. Prefer this over patching saved JSON firstLayout on disk.',
+    inputSchema: firstLayoutSchema,
+  },
+  {
     name: 'replace_object_definition',
     description:
       'Replace or create a scene object with a complete serialized object definition. This explicitly allows changing the object type.',
@@ -1112,6 +1246,12 @@ const writeTools: Array<McpTool> = [
     description:
       'Replace a Sprite object animation list with named animations, directions, frames, origin/center points, custom points, and collision masks.',
     inputSchema: setSpriteAnimationsSchema,
+  },
+  {
+    name: 'bulk_edit_scene_assets',
+    description:
+      'Batch import resources, create/replace scene objects, bind Sprite animations, and place 2D instances for one scene. Use for initial scene setup to reduce many single-tool calls.',
+    inputSchema: bulkEditSceneAssetsSchema,
   },
   {
     name: 'add_behavior',
@@ -1294,6 +1434,32 @@ const commandTools: Array<McpTool> = [
 ];
 
 const toolUsageExamples: { [string]: Array<Object> } = {
+  set_project_properties: [
+    {
+      description:
+        'Set project name, startup scene, resolution, FPS, orientation, and scale mode in the editor model.',
+      arguments: {
+        project_name: 'Sky Battle',
+        first_layout: 'Sky Battle',
+        game_resolution_width: 1280,
+        game_resolution_height: 720,
+        adapt_game_resolution_at_runtime: true,
+        min_fps: 20,
+        max_fps: 120,
+        orientation: 'landscape',
+        scale_mode: 'linear',
+      },
+    },
+  ],
+  set_first_layout: [
+    {
+      description:
+        'Set the startup scene directly after creating/deleting layouts.',
+      arguments: {
+        scene_name: 'Sky Battle',
+      },
+    },
+  ],
   add_or_update_resource: [
     {
       description: 'Import or update a local PNG image resource.',
@@ -1353,6 +1519,48 @@ const toolUsageExamples: { [string]: Array<Object> } = {
             ],
           },
         ],
+      },
+    },
+  ],
+  bulk_edit_scene_assets: [
+    {
+      description:
+        'Import resources, create a Sprite object, attach frames, and place an initial instance in one call.',
+      arguments: {
+        scene_name: 'Level1',
+        resources: [
+          {
+            name: 'PlayerIdle.png',
+            file: 'assets/PlayerIdle.png',
+            kind: 'image',
+          },
+        ],
+        objects: [
+          {
+            object_name: 'Player',
+            object_type: 'Sprite',
+            serialized_object: {
+              name: 'Player',
+              type: 'Sprite',
+              variables: [],
+              behaviors: [],
+              effects: [],
+              animations: [],
+            },
+          },
+        ],
+        sprite_animations: [
+          {
+            object_name: 'Player',
+            animations: [
+              {
+                name: 'Idle',
+                frames: [{ image: 'PlayerIdle.png' }],
+              },
+            ],
+          },
+        ],
+        instances: [{ object_name: 'Player', x: 100, y: 200 }],
       },
     },
   ],
@@ -1490,6 +1698,13 @@ const toolUsageExamples: { [string]: Array<Object> } = {
         'Audit resources before saving or after replacing sprites/audio.',
       arguments: {},
     },
+    {
+      description:
+        'Return only resource counts and problem lists for final validation.',
+      arguments: {
+        compact: true,
+      },
+    },
   ],
   find_scene_events: [
     {
@@ -1566,6 +1781,7 @@ const toolUsageExamples: { [string]: Array<Object> } = {
       arguments: {
         scene_name: 'Level1',
         events_json_file: 'C:/tmp/level1-events.json',
+        summary_only: true,
       },
     },
   ],

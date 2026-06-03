@@ -725,10 +725,18 @@ export const replaceSceneEventsFromFile = (
   }
 
   notifyEventsChanged(scene, callbacks);
-  return {
+  const result = {
     success: true,
     sceneName,
     eventsCount: scene.getEvents().getEventsCount(),
+  };
+
+  if (args && (args.summary_only === true || args.summaryOnly === true)) {
+    return result;
+  }
+
+  return {
+    ...result,
     eventsAsText: renderNonTranslatedEventsAsText({
       eventsList: scene.getEvents(),
     }),

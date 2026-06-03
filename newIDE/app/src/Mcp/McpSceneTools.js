@@ -471,9 +471,34 @@ export const inspectProjectResources = (
     ''
   ).toJSArray();
 
+  const missingSpriteFrameReferences = spriteFrameReferences.filter(
+    reference => !reference.exists
+  );
+  const summary = {
+    totalResources: resourceNames.length,
+    invalidResourcesCount: invalidResources.length,
+    unusedResourcesCount: uselessResourceNames.length,
+    spriteFrameReferencesCount: spriteFrameReferences.length,
+    missingSpriteFrameReferencesCount: missingSpriteFrameReferences.length,
+    stringReferencesCount: stringReferences.length,
+  };
+
+  if (args && (args.compact === true || args.summary_only === true)) {
+    return {
+      success: true,
+      compact: true,
+      projectName: project.getName(),
+      summary,
+      invalidResources,
+      unusedResources: uselessResourceNames,
+      missingSpriteFrameReferences,
+    };
+  }
+
   return {
     success: true,
     projectName: project.getName(),
+    summary,
     resources: resourceNames.map(name => resourcesByName[name]),
     resourcesByName,
     invalidResources,
@@ -1260,6 +1285,112 @@ export const readSceneEventsSerialized = (
     sceneName,
     serializedEvents: serializeToJSObject(scene.getEvents()),
     serializedEventsJson: serializeToJSON(scene.getEvents()),
+  };
+};
+
+export const bulkEditSceneAssets = (
+  project: gdProject,
+  args: Object,
+  callbacks: SceneToolCallbacks = ({}: any)
+): Object => {
+  const sceneName = getRequiredString(args, 'scene_name');
+  getScene(project, sceneName);
+
+  const resources = Array.isArray(args.resources) ? args.resources : [];
+  const objects = Array.isArray(args.objects) ? args.objects : [];
+  const spriteAnimations = Array.isArray(args.sprite_animations)
+    ? args.sprite_animations
+    : Array.isArray(args.spriteAnimations)
+    ? args.spriteAnimations
+    : [];
+  const instances = Array.isArray(args.instances) ? args.instances : [];
+
+  const results = {
+    resources: [],
+    objects: [],
+    spriteAnimations: [],
+    instances: null,
+  };
+
+  resources.forEach((resourceArgs, index) => {
+    if (!resourceArgs || typeof resourceArgs !== 'object') {
+      throw new Error(`Invalid resource at resources[${index}].`);
+    }
+    const result = addOrUpdateResource(project, resourceArgs);
+    results.resources.push({
+      name: result.resource.name,
+      kind: result.resource.kind,
+      file: result.resource.file,
+      created: result.created,
+      fileStatus: result.fileStatus,
+    });
+  });
+
+  objects.forEach((objectArgs, index) => {
+    if (!objectArgs || typeof objectArgs !== 'object') {
+      throw new Error(`Invalid object at objects[${index}].`);
+    }
+    const result = replaceObjectDefinition(
+      project,
+      {
+        ...objectArgs,
+        scene_name: objectArgs.scene_name || objectArgs.sceneName || sceneName,
+      },
+      callbacks
+    );
+    results.objects.push({
+      objectName: result.objectName,
+      objectType: result.objectType,
+      didReplace: result.didReplace,
+    });
+  });
+
+  spriteAnimations.forEach((animationArgs, index) => {
+    if (!animationArgs || typeof animationArgs !== 'object') {
+      throw new Error(
+        `Invalid Sprite animation payload at sprite_animations[${index}].`
+      );
+    }
+    const result = setSpriteAnimations(
+      project,
+      {
+        ...animationArgs,
+        scene_name:
+          animationArgs.scene_name || animationArgs.sceneName || sceneName,
+      },
+      callbacks
+    );
+    results.spriteAnimations.push({
+      objectName: result.objectName,
+      animationsCount: result.animationsCount,
+    });
+  });
+
+  if (instances.length) {
+    results.instances = putStructured2dInstances(
+      project,
+      {
+        scene_name: sceneName,
+        operation:
+          getOptionalString(args, 'instances_operation') ||
+          getOptionalString(args, 'instancesOperation') ||
+          'create',
+        instances,
+      },
+      callbacks
+    );
+  }
+
+  return {
+    success: true,
+    sceneName,
+    counts: {
+      resources: results.resources.length,
+      objects: results.objects.length,
+      spriteAnimations: results.spriteAnimations.length,
+      instances: results.instances ? results.instances.changes.length : 0,
+    },
+    results,
   };
 };
 

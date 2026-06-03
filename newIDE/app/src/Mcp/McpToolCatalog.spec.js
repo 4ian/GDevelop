@@ -48,8 +48,11 @@ describe('McpToolCatalog', () => {
 
     expect(toolNames).toContain('create_scene');
     expect(toolNames).toContain('change_object_property');
+    expect(toolNames).toContain('set_project_properties');
+    expect(toolNames).toContain('set_first_layout');
     expect(toolNames).toContain('add_or_update_resource');
     expect(toolNames).toContain('set_sprite_animations');
+    expect(toolNames).toContain('bulk_edit_scene_assets');
     expect(toolNames).toContain('replace_object_definition');
     expect(toolNames).toContain('delete_scene_object');
     expect(toolNames).toContain('set_object_properties');
@@ -71,6 +74,9 @@ describe('McpToolCatalog', () => {
 
   it('classifies tool permissions', () => {
     expect(isWriteTool('create_scene')).toBe(true);
+    expect(isWriteTool('set_project_properties')).toBe(true);
+    expect(isWriteTool('set_first_layout')).toBe(true);
+    expect(isWriteTool('bulk_edit_scene_assets')).toBe(true);
     expect(isWriteTool('add_or_update_resource')).toBe(true);
     expect(isWriteTool('replace_object_definition')).toBe(true);
     expect(isWriteTool('read_serialized_scene')).toBe(false);

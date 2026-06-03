@@ -43,6 +43,7 @@ import {
 import {
   addOrUpdateResource,
   applyValidatedScenePatch,
+  bulkEditSceneAssets,
   deleteSceneObject,
   inspectProjectResources,
   putStructured2dInstances,
@@ -62,6 +63,7 @@ import {
   replaceSceneEventsFromFile,
   wrapEventsInGroup,
 } from './McpEventTools';
+import { setFirstLayout, setProjectProperties } from './McpProjectTools';
 
 const gd: libGDevelop = global.gd;
 
@@ -633,6 +635,7 @@ const callMcpTool = async ({
           args && typeof args.events_json === 'string'
             ? args.events_json
             : null,
+        allowJavaScriptEvents: !!(args && args.allow_javascript_events),
       })
     );
   }
@@ -868,9 +871,29 @@ const callMcpTool = async ({
     }
   }
 
+  let projectWriteToolHandler = null;
+  if (toolName === 'set_project_properties') {
+    projectWriteToolHandler = setProjectProperties;
+  } else if (toolName === 'set_first_layout') {
+    projectWriteToolHandler = setFirstLayout;
+  }
+
+  if (projectWriteToolHandler) {
+    if (!project) return errorResult('No project opened.');
+    try {
+      const result = projectWriteToolHandler(project, args || {});
+      context.triggerUnsavedChanges();
+      return textResult(result);
+    } catch (error) {
+      return errorResult(error.message);
+    }
+  }
+
   let sceneWriteToolHandler = null;
   if (toolName === 'add_or_update_resource') {
     sceneWriteToolHandler = addOrUpdateResource;
+  } else if (toolName === 'bulk_edit_scene_assets') {
+    sceneWriteToolHandler = bulkEditSceneAssets;
   } else if (toolName === 'set_sprite_animations') {
     sceneWriteToolHandler = setSpriteAnimations;
   } else if (toolName === 'replace_object_definition') {

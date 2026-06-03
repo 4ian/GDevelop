@@ -41,4 +41,21 @@ describe('ToolsPanel source policies', () => {
     expect(dialogSection).toContain('isGeneratingImage &&');
     expect(dialogSection).toContain('<CircularProgress');
   });
+
+  it('generates ElevenLabs audio without requiring a selected audio file', () => {
+    const source = getSource();
+    const runElevenLabsStart = source.indexOf('const runElevenLabs');
+    const renderNanoBananaDebugDialogStart = source.indexOf(
+      'const renderNanoBananaDebugDialog'
+    );
+    const runElevenLabsSection = source.slice(
+      runElevenLabsStart,
+      renderNanoBananaDebugDialogStart
+    );
+
+    expect(runElevenLabsSection).not.toContain('isAudioFile(selectedNode)');
+    expect(runElevenLabsSection).not.toContain('path.dirname(selectedNode');
+    expect(runElevenLabsSection).not.toContain('addResourceForFile');
+    expect(runElevenLabsSection).toContain('getImageGenerationOutputFolderPath');
+  });
 });

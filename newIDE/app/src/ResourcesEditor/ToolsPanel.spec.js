@@ -13,6 +13,7 @@ import {
   hasProjectFileDragData,
   shouldShowClearImageAttachmentButton,
   shouldDisableNanoBananaButton,
+  shouldDisableElevenLabsButton,
 } from './ToolsPanel';
 
 describe('ToolsPanel', () => {
@@ -188,6 +189,37 @@ describe('ToolsPanel', () => {
     expect(shouldDisableNanoBananaButton({ isGeneratingImage: false })).toBe(
       false
     );
+  });
+
+  it('keeps the ElevenLabs action independent from selected audio files', () => {
+    expect(
+      shouldDisableElevenLabsButton({
+        isGeneratingAudio: false,
+        elevenLabsApiKey: 'eleven-key',
+        elevenLabsText: 'shoot1',
+      })
+    ).toBe(false);
+    expect(
+      shouldDisableElevenLabsButton({
+        isGeneratingAudio: true,
+        elevenLabsApiKey: 'eleven-key',
+        elevenLabsText: 'shoot1',
+      })
+    ).toBe(true);
+    expect(
+      shouldDisableElevenLabsButton({
+        isGeneratingAudio: false,
+        elevenLabsApiKey: '',
+        elevenLabsText: 'shoot1',
+      })
+    ).toBe(true);
+    expect(
+      shouldDisableElevenLabsButton({
+        isGeneratingAudio: false,
+        elevenLabsApiKey: 'eleven-key',
+        elevenLabsText: '   ',
+      })
+    ).toBe(true);
   });
 
   it('builds persisted editor settings from every user-editable Tools field', () => {

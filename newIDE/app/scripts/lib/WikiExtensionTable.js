@@ -37,11 +37,11 @@ const generateExtensionSection = (extension, baseFolder) => {
       : `${gdevelopWikiUrlRoot}/${baseFolder}/${folderName}`;
   const helpPageUrl = getHelpLink(extension.helpPath) || referencePageUrl;
 
-  // @ts-ignore
-  const shortDescription =
-    extension.description.length > 150
-      ? extension.description.slice(0, 100) + '...'
-      : extension.description;
+  let shortDescription = extension.description.split('\n')[0];
+  shortDescription =
+    shortDescription.length > 150
+      ? shortDescription.slice(0, 100) + '...'
+      : shortDescription;
 
   return `|${generateSvgImageIcon(extension.iconUrl)}|**${
     extension.fullName

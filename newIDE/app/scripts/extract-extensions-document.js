@@ -666,7 +666,7 @@ const generateObjectsListPage = async (
   reviewedExtensions,
   experimentalExtensions
 ) => {
-  let content = '# Objects\n\n';
+  let content = '# All objects\n\n';
   content += `This page lists all the [objects](/gdevelop5/objects/) that are 
 provided in GDevelop.\n\n`;
   content += '## Core objects\n\n';

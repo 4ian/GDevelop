@@ -45,27 +45,21 @@ type ResourcePromise<T> = { [resourceName: string]: Promise<T> };
 let loadedBitmapFonts = {};
 let loadedFontFamilies = {};
 
-// A cached PIXI texture, always stored together with the resolved URL it was
-// loaded from, so the texture and its URL can never get out of sync.
+// A cached PIXI texture, stored together with the resolved URL it was loaded
+// from, so the texture and its URL can never get out of sync.
 type LoadedTexture = {|
   pixiTexture: any,
-  // The URL the texture was loaded from, or `null` when it's not meaningful for
-  // change detection (the invalid placeholder texture, video textures…). When
-  // non-null, it's used to detect whether a resource actually changed before
+  // The URL the texture was loaded from. Left undefined when it's not meaningful
+  // for change detection (the invalid placeholder texture, video textures…).
+  // When set, it's used to detect whether a resource actually changed before
   // reloading it (see `_doReloadResource`): for cloud projects every change
   // yields a new immutable URL, and for local files the URL carries a
   // cache-busting token that only changes when the file's cache was burst (i.e.
   // it was edited).
-  loadedFromUrl: string | null,
+  loadedFromUrl?: string,
 |};
 
 // Cache of the PIXI textures loaded for image/video resources.
-//
-// IMPORTANT: this is the *only* place a loaded texture (and the URL it was
-// loaded from) is stored. Always go through these methods and never keep a
-// texture or its URL in a separate structure — that's what guarantees the two
-// can't get out of sync. `set` requires both the texture and its URL, and
-// `delete` removes them together, so neither can be forgotten.
 const loadedTextureCache = (() => {
   let entriesByResourceName: { [resourceName: string]: LoadedTexture } = {};
   return {
@@ -79,10 +73,18 @@ const loadedTextureCache = (() => {
       const entry = entriesByResourceName[resourceName];
       return entry ? entry.pixiTexture : undefined;
     },
-    // Store a texture together with the URL it was loaded from. Pass `null` as
-    // the URL for textures whose changes must never be detected from the URL
-    // (the invalid placeholder, video textures…), so they're always reloaded.
-    set(resourceName: string, pixiTexture: any, loadedFromUrl: string | null) {
+    // Store a texture, optionally with the URL it was loaded from. Omit
+    // `loadedFromUrl` for textures whose changes must never be detected from the
+    // URL (the invalid placeholder, video textures…), so they're always reloaded.
+    set({
+      resourceName,
+      pixiTexture,
+      loadedFromUrl,
+    }: {|
+      resourceName: string,
+      pixiTexture: any,
+      loadedFromUrl?: string,
+    |}) {
       entriesByResourceName[resourceName] = { pixiTexture, loadedFromUrl };
     },
     delete(resourceName: string) {
@@ -404,7 +406,7 @@ export default class PixiResourcesLoader {
     const resourcesManager = project.getResourcesManager();
     if (
       loadedEntry &&
-      loadedEntry.loadedFromUrl !== null &&
+      loadedEntry.loadedFromUrl !== undefined &&
       loadedEntry.pixiTexture !== invalidTexture &&
       loadedEntry.pixiTexture !== loadingTexture &&
       loadedEntry.pixiTexture.baseTexture &&
@@ -651,11 +653,15 @@ export default class PixiResourcesLoader {
             );
           }
 
-          loadedTextureCache.set(resourceName, loadedTexture, url);
+          loadedTextureCache.set({
+            resourceName,
+            pixiTexture: loadedTexture,
+            loadedFromUrl: url,
+          });
           // TODO What if 2 assets share the same file with different settings?
           applyPixiTextureSettings(resource, loadedTexture);
         } catch (error) {
-          loadedTextureCache.set(resourceName, invalidTexture, null);
+          loadedTextureCache.set({ resourceName, pixiTexture: invalidTexture });
           console.error(
             `Unable to load file ${resource.getFile()} for image resource ${resourceName}:`,
             error ? error : '(unknown error)'
@@ -688,17 +694,21 @@ export default class PixiResourcesLoader {
           });
           if (!videoTexture) {
             console.error(`Texture loading for ${url} returned nothing`);
-            // Video textures are never skipped on reload, so the URL is null.
-            loadedTextureCache.set(resourceName, invalidTexture, null);
+            loadedTextureCache.set({
+              resourceName,
+              pixiTexture: invalidTexture,
+            });
           } else {
-            // Video textures are never skipped on reload, so the URL is null.
-            loadedTextureCache.set(resourceName, videoTexture, null);
+            loadedTextureCache.set({ resourceName, pixiTexture: videoTexture });
             videoTexture.baseTexture.resource.load().catch(error => {
               console.error(
                 `Unable to load video texture from url ${url}:`,
                 error
               );
-              loadedTextureCache.set(resourceName, invalidTexture, null);
+              loadedTextureCache.set({
+                resourceName,
+                pixiTexture: invalidTexture,
+              });
             });
           }
         } catch (error) {
@@ -758,13 +768,13 @@ export default class PixiResourcesLoader {
     });
     if (!pixiTexture) {
       console.error(`Texture loading for ${url} returned nothing`);
-      loadedTextureCache.set(resourceName, invalidTexture, null);
+      loadedTextureCache.set({ resourceName, pixiTexture: invalidTexture });
       return invalidTexture;
     }
-    loadedTextureCache.set(resourceName, pixiTexture, url);
+    loadedTextureCache.set({ resourceName, pixiTexture, loadedFromUrl: url });
     pixiTexture.baseTexture.resource.load().catch(error => {
       console.error(`Unable to load texture from url ${url}:`, error);
-      loadedTextureCache.set(resourceName, invalidTexture, null);
+      loadedTextureCache.set({ resourceName, pixiTexture: invalidTexture });
     });
 
     applyPixiTextureSettings(resource, pixiTexture);
@@ -1177,16 +1187,14 @@ export default class PixiResourcesLoader {
     });
     if (!videoTexture) {
       console.error(`Texture loading for ${url} returned nothing`);
-      // Video textures are never skipped on reload, so the URL is null.
-      loadedTextureCache.set(resourceName, invalidTexture, null);
+      loadedTextureCache.set({ resourceName, pixiTexture: invalidTexture });
       return invalidTexture;
     }
 
-    // Video textures are never skipped on reload, so the URL is null.
-    loadedTextureCache.set(resourceName, videoTexture, null);
+    loadedTextureCache.set({ resourceName, pixiTexture: videoTexture });
     videoTexture.baseTexture.resource.load().catch(error => {
       console.error(`Unable to load video texture from url ${url}:`, error);
-      loadedTextureCache.set(resourceName, invalidTexture, null);
+      loadedTextureCache.set({ resourceName, pixiTexture: invalidTexture });
     });
 
     return videoTexture;

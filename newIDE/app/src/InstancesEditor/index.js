@@ -1582,15 +1582,16 @@ export default class InstancesEditor extends Component<Props, State> {
   };
 
   /**
-   * Delete the temporary instances added while an object is dragged over the
-   * canvas. Before they are deleted (and their underlying C++ object freed),
-   * any reference kept by the UI must be cleared - otherwise a dangling
-   * reference would be read while rendering, showing a corrupted tooltip and a
-   * "phantom" instance rendered with a default texture.
+   * Delete the temporary instances added while an object is dragged - ensuring
+   * no reference to it is kept.
    */
   _deleteTemporaryInstances = () => {
     const temporaryInstances = this._instancesAdder.getTemporaryInstances();
     if (temporaryInstances.length) {
+      // A temporary instance can be the highlighted one (it gets highlighted on
+      // hover while being dragged over the canvas). Clear the reference before
+      // it's deleted, otherwise the rendering would read the freed instance and
+      // show a corrupted tooltip and a "phantom" default-texture instance.
       const highlightedInstance = this.highlightedInstance.getInstance();
       if (
         highlightedInstance &&
@@ -1600,6 +1601,9 @@ export default class InstancesEditor extends Component<Props, State> {
       ) {
         this.highlightedInstance.setInstance(null);
       }
+      // Out of caution: a temporary instance is not expected to be selected
+      // (selection only happens on a click on the canvas), but make sure the
+      // selection never keeps a reference to a soon-to-be-freed instance.
       temporaryInstances.forEach(instance => {
         this.props.instancesSelection.unselectInstance(instance);
       });

@@ -26,6 +26,7 @@ const {
 const { mapVector, mapFor } = require('./lib/MapFor');
 const { groupBy, sortKeys } = require('./lib/ArrayHelpers');
 const { generateAllExtensionsSections } = require('./lib/WikiExtensionTable');
+const makeExtensionsLoader = require('./lib/LocalJsExtensionsLoader');
 
 /** @typedef {import("./lib/ExtensionReferenceGenerator.js").RawText} RawText */
 /** @typedef {import("./lib/ExtensionReferenceGenerator.js").ExtensionReference} ExtensionReference */
@@ -781,8 +782,20 @@ Read more about this:
   console.info(`✅ Done. File generated: ${extensionsMainFilePath}`);
 };
 
+const noopTranslationFunction = str => str;
+
 initializeGDevelopJs().then(async gd => {
   try {
+    // @ts-ignore - not passing onFindGDJS - is it still useful?
+    const loadingResults = await makeExtensionsLoader({
+      gd,
+      objectsEditorService: null,
+      objectsRenderingService: null,
+      filterExamples: true,
+    }).loadAllExtensions(noopTranslationFunction);
+
+    console.info('Loaded extensions', loadingResults);
+
     console.info(`ℹ️ Loading all community extensions...`);
 
     /** @type {Project} */

@@ -31,6 +31,7 @@ const { generateAllExtensionsSections } = require('./lib/WikiExtensionTable');
 /** @typedef {import("./lib/ExtensionReferenceGenerator.js").ExtensionReference} ExtensionReference */
 /** @typedef {import("./lib/WikiExtensionTable.js").ExtensionItem} ExtensionItem */
 /** @typedef {import('../../../GDevelop.js/types').EventsFunctionsExtension} EventsFunctionsExtension */
+/** @typedef {import('../../../GDevelop.js/types').EventsBasedBehaviorsList} EventsBasedBehaviorsList */
 /** @typedef {import('../../../GDevelop.js/types').AbstractEventsBasedEntity} AbstractEventsBasedEntity */
 /** @typedef {import('../../../GDevelop.js/types').EventsBasedObject} EventsBasedObject */
 /** @typedef {import('../../../GDevelop.js/types').EventsBasedBehavior} EventsBasedBehavior */
@@ -40,6 +41,11 @@ const { generateAllExtensionsSections } = require('./lib/WikiExtensionTable');
 /** @typedef {import('../../../GDevelop.js/types').BehaviorMetadata} BehaviorMetadata */
 
 /** @typedef {{ tier: 'community' | 'experimental' | 'reviewed', shortDescription: string, authorIds: Array<string>, authors?: Array<{id: string, username: string}>, extensionNamespace: string, fullName: string, name: string, version: string, gdevelopVersion?: string, url: string, headerUrl: string, tags: Array<string>, category: string, previewIconUrl: string, eventsBasedBehaviorsCount: number, eventsFunctionsCount: number}} ExtensionShortHeader */
+
+/**
+ * @template T
+ * @typedef {{size: () => number, at: (i: number) => T}} CppVector
+ */
 
 const extensionShortHeadersUrl =
   'https://api.gdevelop-app.com/asset/extension-short-header';
@@ -492,20 +498,25 @@ const getEntityMetadataExtensionItem = (extension, entityMetadata) => {
  */
 const generateBuiltInObjectsList = extensionReferences => {
   /** @type {Array<ExtensionItem>} */
-  const objects = [];
+  const extensionItems = [];
   for (const extensionReference of extensionReferences) {
     for (const objectReference of extensionReference.objectReferences) {
-      objects.push(
-        getEntityMetadataExtensionItem(
-          extensionReference.extension,
-          objectReference.objectMetadata
-        )
-      );
+      if (
+        !objectReference.objectMetadata.isHidden() &&
+        !objectReference.objectMetadata.isPrivate()
+      ) {
+        extensionItems.push(
+          getEntityMetadataExtensionItem(
+            extensionReference.extension,
+            objectReference.objectMetadata
+          )
+        );
+      }
     }
   }
   let content = '';
   content += generateAllExtensionsSections({
-    extensionItems: objects,
+    extensionItems,
     baseFolder: 'all-features',
   });
   return content;
@@ -517,20 +528,56 @@ const generateBuiltInObjectsList = extensionReferences => {
  */
 const generateBuiltInBehaviorsList = extensionReferences => {
   /** @type {Array<ExtensionItem>} */
-  const behaviors = [];
+  const extensionItems = [];
   for (const extensionReference of extensionReferences) {
     for (const behaviorReference of extensionReference.behaviorReferences) {
-      behaviors.push(
-        getEntityMetadataExtensionItem(
-          extensionReference.extension,
-          behaviorReference.behaviorMetadata
-        )
-      );
+      if (
+        !behaviorReference.behaviorMetadata.isHidden() &&
+        !behaviorReference.behaviorMetadata.isPrivate()
+      ) {
+        extensionItems.push(
+          getEntityMetadataExtensionItem(
+            extensionReference.extension,
+            behaviorReference.behaviorMetadata
+          )
+        );
+      }
     }
   }
   let content = '';
   content += generateAllExtensionsSections({
-    extensionItems: behaviors,
+    extensionItems,
+    baseFolder: 'all-features',
+  });
+  return content;
+};
+
+/**
+ * @param {Array<ExtensionReference>} extensionReferences
+ * @returns
+ */
+const generateCapabilityBehaviorsList = extensionReferences => {
+  /** @type {Array<ExtensionItem>} */
+  const extensionItems = [];
+  for (const extensionReference of extensionReferences) {
+    for (const behaviorReference of extensionReference.behaviorReferences) {
+      if (
+        // Capabilities are hidden behaviors.
+        behaviorReference.behaviorMetadata.isHidden() &&
+        !behaviorReference.behaviorMetadata.isPrivate()
+      ) {
+        extensionItems.push(
+          getEntityMetadataExtensionItem(
+            extensionReference.extension,
+            behaviorReference.behaviorMetadata
+          )
+        );
+      }
+    }
+  }
+  let content = '';
+  content += generateAllExtensionsSections({
+    extensionItems,
     baseFolder: 'all-features',
   });
   return content;
@@ -557,17 +604,21 @@ const getEventBasedEntityExtensionItem = (extension, eventBasedEntity) => ({
  */
 const generateObjectsList = extensions => {
   /** @type {Array<ExtensionItem>} */
-  const objects = [];
+  const extensionItems = [];
   for (const extension of extensions) {
-    mapVector(extension.getEventsBasedObjects(), eventsBasedObject => {
-      objects.push(
-        getEventBasedEntityExtensionItem(extension, eventsBasedObject)
-      );
+    mapVector(extension.getEventsBasedObjects(), (
+      /** @type {EventsBasedObject} */ eventsBasedObject
+    ) => {
+      if (!eventsBasedObject.isPrivate()) {
+        extensionItems.push(
+          getEventBasedEntityExtensionItem(extension, eventsBasedObject)
+        );
+      }
     });
   }
   let content = '';
   content += generateAllExtensionsSections({
-    extensionItems: objects,
+    extensionItems,
     baseFolder: 'extensions',
   });
   return content;
@@ -579,17 +630,21 @@ const generateObjectsList = extensions => {
  */
 const generateBehaviorsList = extensions => {
   /** @type {Array<ExtensionItem>} */
-  const objects = [];
+  const extensionItems = [];
   for (const extension of extensions) {
-    mapVector(extension.getEventsBasedBehaviors(), eventsBasedBehaviors => {
-      objects.push(
-        getEventBasedEntityExtensionItem(extension, eventsBasedBehaviors)
-      );
+    mapVector(extension.getEventsBasedBehaviors(), (
+      /** @type {EventsBasedBehavior} */ eventsBasedBehavior
+    ) => {
+      if (!eventsBasedBehavior.isPrivate()) {
+        extensionItems.push(
+          getEventBasedEntityExtensionItem(extension, eventsBasedBehavior)
+        );
+      }
     });
   }
   let content = '';
   content += generateAllExtensionsSections({
-    extensionItems: objects,
+    extensionItems,
     baseFolder: 'extensions',
   });
   return content;
@@ -611,9 +666,13 @@ const generateObjectsListPage = async (
   experimentalExtensions
 ) => {
   let content = '# Objects\n\n';
+  content += `This page lists all the [objects](/gdevelop5/objects/) that are 
+provided in GDevelop.\n\n`;
   content += '## Core objects\n\n';
   content += generateBuiltInObjectsList(generateAllExtensionReferences(gd));
   content += '## Reviewed objects\n\n';
+  content += `In addition to core features, new objects are provided by 
+[extensions](/gdevelop5/extensions/).\n\n`;
   content += generateObjectsList(reviewedExtensions);
   content += '## Experimental objects\n\n';
   content += getExperimentalWarningMessage('objects') + '\n\n';
@@ -636,14 +695,24 @@ const generateBehaviorsListPage = async (
   reviewedExtensions,
   experimentalExtensions
 ) => {
-  let content = '# Behaviors\n\n';
+  const builtInExtensionReferences = generateAllExtensionReferences(gd);
+
+  let content = '# All behaviors\n\n';
+  content += `This page lists all the [behaviors](/gdevelop5/behaviors/) that 
+are provided in GDevelop.\n\n`;
   content += '## Core behaviors\n\n';
-  content += generateBuiltInBehaviorsList(generateAllExtensionReferences(gd));
+  content += generateBuiltInBehaviorsList(builtInExtensionReferences);
   content += '## Reviewed behaviors\n\n';
+  content += `In addition to core features, new behaviors are provided by 
+[extensions](/gdevelop5/extensions/).\n\n`;
   content += generateBehaviorsList(reviewedExtensions);
   content += '## Experimental behaviors\n\n';
   content += getExperimentalWarningMessage('behaviors') + '\n\n';
   content += generateBehaviorsList(experimentalExtensions);
+  content += '## Capabilities\n\n';
+  content += `Capabilities allow to [create extensions](/gdevelop5/extensions/create/) 
+that handles several object types at once.\n\n`;
+  content += generateCapabilityBehaviorsList(builtInExtensionReferences);
 
   await fs.mkdir(path.dirname(behaviorsListFilePath), {
     recursive: true,

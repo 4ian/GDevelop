@@ -10,15 +10,16 @@ Windows Authenticode signing is disabled by default (``GD_PORTABLE_BUILD=true``)
 so the build works without a code-signing certificate. The resulting installer
 is therefore unsigned and SmartScreen may warn on first run.
 
-Windows symlink note: electron-builder downloads a ``winCodeSign`` cache that
-contains macOS ``.dylib`` symlinks. Extracting symlinks on Windows requires
-Administrator rights or Developer Mode, so a normal user account fails with
-"Cannot create symbolic link : the client does not have the required
-privilege". Those symlinks are only used for macOS cross-signing and are
-irrelevant to an unsigned Windows build, so this script pre-extracts that cache
-with ``7za -snld`` (skip symlinks) before invoking electron-builder. If that
-still fails, run this script from an Administrator terminal or enable Windows
-Developer Mode.
+Windows symlink note: electron-builder only downloads the ``winCodeSign`` tools
+when it has a certificate to sign with. That download is a 7z archive full of
+macOS ``.dylib`` symlinks, and extracting symlinks on Windows needs
+Administrator rights or Developer Mode (otherwise it fails with "Cannot create
+symbolic link : the client does not have the required privilege"). For an
+unsigned build we therefore make sure no certificate resolves — clearing
+``CSC_LINK`` / ``WIN_CSC_LINK`` (and passwords) and setting
+``CSC_IDENTITY_AUTO_DISCOVERY=false`` — so electron-builder skips signing and
+never downloads winCodeSign at all. (Pass ``--sign`` to keep your signing
+environment intact and produce a signed installer.)
 
 The absolute path to the produced installer ``.exe`` is printed at the end so it
 can be copied and distributed elsewhere.
@@ -90,14 +91,21 @@ def run_command(
     cwd: Path,
     dry_run: bool,
     env_updates: dict[str, str] | None = None,
+    env_removes: list[str] | None = None,
 ) -> None:
     env = os.environ.copy()
     if env_updates:
         env.update(env_updates)
+    removed: list[str] = []
+    for name in env_removes or []:
+        if env.pop(name, None) is not None:
+            removed.append(name)
 
     env_prefix = ""
     if env_updates:
-        env_prefix = " ".join(f"{k}={v}" for k, v in env_updates.items()) + " "
+        env_prefix += " ".join(f"{k}={v}" for k, v in env_updates.items()) + " "
+    if removed:
+        env_prefix += " ".join(f"-{k}" for k in removed) + " "
     print(f"[run] {cwd}> {env_prefix}{command_line(command)}", flush=True)
     if dry_run:
         return
@@ -150,111 +158,24 @@ def build_react_app(app_dir: Path, skip_build: bool, dry_run: bool) -> None:
     run_command([resolve_tool("npm"), "run", "build"], cwd=app_dir, dry_run=dry_run)
 
 
-def find_seven_zip(electron_app_dir: Path) -> Path | None:
-    """Locate the 7za executable bundled with electron-builder (7zip-bin)."""
-    candidates = [
-        electron_app_dir / "node_modules" / "7zip-bin" / "win" / "x64" / "7za.exe",
-        electron_app_dir / "node_modules" / "7zip-bin" / "win" / "ia32" / "7za.exe",
-    ]
-    for candidate in candidates:
-        if candidate.exists():
-            return candidate
-    found = shutil.which("7za") or shutil.which("7z")
-    return Path(found) if found else None
-
-
-def wincodesign_cache_dir() -> Path:
-    base = os.environ.get("LOCALAPPDATA")
-    if base:
-        return Path(base) / "electron-builder" / "Cache" / "winCodeSign"
-    return Path.home() / "AppData" / "Local" / "electron-builder" / "Cache" / "winCodeSign"
-
-
-def prepare_wincodesign_cache(electron_app_dir: Path, dry_run: bool) -> None:
-    """Re-extract the winCodeSign cache without symlinks.
-
-    electron-builder downloads winCodeSign-*.7z (used even for unsigned builds)
-    and extracts it into a hash-named folder next to the .7z. That archive holds
-    macOS .dylib symlinks; extracting symlinks on Windows needs Administrator
-    rights or Developer Mode, otherwise extraction fails with "Cannot create
-    symbolic link". Those symlinks are irrelevant to an unsigned Windows build,
-    so we pre-extract each cached .7z with `7za -snld` (skip symlinks) into the
-    folder electron-builder expects, so its own extraction step is a no-op.
-    """
-    if os.name != "nt":
-        return
-
-    step("Prepare winCodeSign cache (skip symlinks)")
-    cache_dir = wincodesign_cache_dir()
-    print(f"winCodeSign cache dir: {cache_dir}", flush=True)
-
-    if not cache_dir.exists():
-        print(
-            "winCodeSign cache not present yet; electron-builder will download it. "
-            "If extraction then fails on symlinks, re-run this script (the .7z will "
-            "be cached) or run from an Administrator terminal / enable Developer Mode.",
-            flush=True,
-        )
-        return
-
-    archives = sorted(cache_dir.glob("*.7z"))
-    if not archives:
-        print(
-            "No cached winCodeSign .7z found; nothing to pre-extract.",
-            flush=True,
-        )
-        return
-
-    seven_zip = find_seven_zip(electron_app_dir)
-    if seven_zip is None:
-        raise RuntimeError(
-            "Could not find 7za (looked in node_modules/7zip-bin and PATH). "
-            "Run npm install in newIDE/electron-app first."
-        )
-
-    for archive in archives:
-        target = archive.with_suffix("")  # e.g. 804803399.7z -> 804803399
-        marker = target / "darwin" / "10.12" / "lib" / "libcrypto.dylib"
-        # If a previous run already extracted the regular files, re-extracting is
-        # cheap and idempotent; we always (re)extract to overwrite a partial dir.
-        print(f"Re-extracting {archive.name} without symlinks -> {target}", flush=True)
-        if dry_run:
-            print(
-                f"[dry-run] would: rmtree {target} && "
-                f"{seven_zip} x -snld -y -o{target} {archive}",
-                flush=True,
-            )
-            continue
-
-        if target.exists():
-            shutil.rmtree(target, ignore_errors=True)
-        target.mkdir(parents=True, exist_ok=True)
-
-        result = subprocess.run(
-            [str(seven_zip), "x", "-snld", "-y", f"-o{target}", str(archive)],
-            capture_output=True,
-            text=True,
-            encoding="utf-8",
-            errors="replace",
-        )
-        if result.stdout.strip():
-            print(result.stdout.rstrip(), flush=True)
-        if result.returncode != 0:
-            if result.stderr.strip():
-                print(result.stderr.rstrip(), file=sys.stderr, flush=True)
-            raise RuntimeError(
-                f"Failed to pre-extract {archive.name} (exit {result.returncode}). "
-                "Try running this script from an Administrator terminal or enable "
-                "Windows Developer Mode."
-            )
-        # The skipped symlinks point at sibling files that DO get extracted, so
-        # the missing links are harmless for an unsigned Windows build.
-        _ = marker
+# Env vars electron-builder reads to discover a Windows code-signing
+# certificate. If any of them resolves, electron-builder runs its signing step,
+# which downloads the "winCodeSign" tools (a 7z full of macOS .dylib symlinks
+# that fail to extract on Windows without admin/Developer Mode). For an unsigned
+# build we clear them so signing — and therefore the winCodeSign download — is
+# skipped entirely.
+WINDOWS_SIGNING_ENV_VARS = [
+    "CSC_LINK",
+    "WIN_CSC_LINK",
+    "CSC_KEY_PASSWORD",
+    "WIN_CSC_KEY_PASSWORD",
+]
 
 
 def package_app(electron_app_dir: Path, sign: bool, dry_run: bool) -> None:
     step("Package distributable Windows installer (.exe)")
     env_updates: dict[str, str] = {}
+    env_removes: list[str] = []
     if sign:
         print(
             "Signing enabled (--sign): expecting GD_SIGNTOOL_SUBJECT_NAME / "
@@ -263,9 +184,15 @@ def package_app(electron_app_dir: Path, sign: bool, dry_run: bool) -> None:
         )
     else:
         env_updates["GD_PORTABLE_BUILD"] = "true"
+        # Make sure no certificate resolves, so electron-builder skips signing and
+        # never downloads/extracts the winCodeSign tools (the source of the
+        # "Cannot create symbolic link" failure on Windows).
+        env_updates["CSC_IDENTITY_AUTO_DISCOVERY"] = "false"
+        env_removes = list(WINDOWS_SIGNING_ENV_VARS)
         print(
-            "Building unsigned portable installer (GD_PORTABLE_BUILD=true). Pass "
-            "--sign to produce an Authenticode-signed installer.",
+            "Building unsigned portable installer (GD_PORTABLE_BUILD=true). "
+            "Signing is disabled and winCodeSign is skipped. Pass --sign to "
+            "produce an Authenticode-signed installer.",
             flush=True,
         )
 
@@ -277,6 +204,7 @@ def package_app(electron_app_dir: Path, sign: bool, dry_run: bool) -> None:
         cwd=electron_app_dir,
         dry_run=dry_run,
         env_updates=env_updates,
+        env_removes=env_removes,
     )
 
 
@@ -338,7 +266,6 @@ def main() -> int:
         ensure_electron_dependencies(electron_app_dir, electron_builder, args.dry_run)
         ensure_react_app_dependencies(app_dir, args.dry_run)
         build_react_app(app_dir, args.skip_build, args.dry_run)
-        prepare_wincodesign_cache(electron_app_dir, args.dry_run)
         package_app(electron_app_dir, args.sign, args.dry_run)
         report_artifact(dist_dir, args.dry_run)
     except (RuntimeError, subprocess.CalledProcessError) as error:

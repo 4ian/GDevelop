@@ -572,10 +572,11 @@ export const AiRequestProvider = ({
     setIsFetchingSuggestions,
   ] = React.useState<boolean>(false);
   const lastFullFetchTimeRef = React.useRef<number>(0);
-  // Only governs how often we refresh intermediate progress while a request
-  // stays in the same status: every status change (new tool call to run, agent
-  // finished/errored, sub-agent launched...) is already caught by the faster
-  // status poll below, which then fetches immediately.
+
+  // Every status change (new tool call to run, agent finished/errored,
+  // sub-agent launched...) is caught by polling for status changes, which
+  // then fetches the latest messages of an AiRequest. Still do a fetch
+  // manually once in a while as a fail-safe.
   const fullFetchIntervalInMs = 7000;
 
   // The selected AI request and its active sub-agents are watched together by a
@@ -700,11 +701,9 @@ export const AiRequestProvider = ({
   );
 
   // Watch loop for the selected AI request and all its active
-  // sub-agents. Each entity does a full fetch every ~5s and
-  // a status-only check in between.
-  // All the status-only checks for a given tick are
-  // batched into a SINGLE request (`getAiRequestStatuses`) instead of one
-  // request per entity.
+  // sub-agents.
+  // All the status-only checks for a given tick are batched
+  // into a single request instead of one request per entity.
   const onWatch = async () => {
     if (!profile) return;
     const now = Date.now();

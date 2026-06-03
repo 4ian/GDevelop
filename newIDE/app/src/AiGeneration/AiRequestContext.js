@@ -107,7 +107,7 @@ type AiRequestStorage = {|
   aiRequests: { [string]: AiRequest },
   updateAiRequest: (
     aiRequestId: string,
-    updateFn: (prevAiRequest: ?AiRequest) => AiRequest
+    updateFn: (previousAiRequest: ?AiRequest) => AiRequest
   ) => void,
   refreshAiRequest: (aiRequestId: string) => Promise<void>,
   isSendingAiRequest: (aiRequestId: string | null) => boolean,
@@ -231,7 +231,7 @@ export const useAiRequestsStorage = (): AiRequestStorage => {
   const updateAiRequest = React.useCallback(
     (
       aiRequestId: string,
-      updateFn: (prevAiRequest: ?AiRequest) => AiRequest
+      updateFn: (previousAiRequest: ?AiRequest) => AiRequest
     ) => {
       setState(prevState => {
         const currentAiRequest = prevState.aiRequests
@@ -695,14 +695,12 @@ export const AiRequestProvider = ({
     [aiRequests, removeSubAgent]
   );
 
-  // Unified watch loop for the selected AI request and all its active
-  // sub-agents. Each entity still does a full fetch every ~5s (to pick up new
-  // messages) and a status-only check in between. The key difference from doing
-  // this per-entity is that all the status-only checks for a given tick are
+  // Watch loop for the selected AI request and all its active
+  // sub-agents. Each entity does a full fetch every ~5s and
+  // a status-only check in between.
+  // All the status-only checks for a given tick are
   // batched into a SINGLE request (`getAiRequestStatuses`) instead of one
-  // request (and one Lambda invocation) per entity. The polling cadence — and
-  // therefore the latency to react to a sub-agent's editor tool call — is
-  // unchanged.
+  // request per entity.
   const onWatch = async () => {
     if (!profile) return;
     const now = Date.now();
@@ -748,9 +746,9 @@ export const AiRequestProvider = ({
           outputFromMessageId,
         })
       );
-      updateAiRequest(aiRequestId, prevRequest =>
+      updateAiRequest(aiRequestId, previousAiRequest =>
         mergeIncrementalAiRequest(
-          prevRequest,
+          previousAiRequest,
           fetchedAiRequest,
           outputFromMessageId
         )

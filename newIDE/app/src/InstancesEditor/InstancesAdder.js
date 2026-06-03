@@ -215,6 +215,13 @@ export default class InstancesAdder {
   };
 
   /**
+   * Return the temporary instances currently added on the scene.
+   */
+  getTemporaryInstances(): Array<gdInitialInstance> {
+    return this._temporaryInstances;
+  }
+
+  /**
    * Delete the temporary instances.
    */
   deleteTemporaryInstances() {

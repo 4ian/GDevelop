@@ -1581,6 +1581,32 @@ export default class InstancesEditor extends Component<Props, State> {
     this.highlightedInstance.setInstance(null);
   };
 
+  /**
+   * Delete the temporary instances added while an object is dragged over the
+   * canvas. Before they are deleted (and their underlying C++ object freed),
+   * any reference kept by the UI must be cleared - otherwise a dangling
+   * reference would be read while rendering, showing a corrupted tooltip and a
+   * "phantom" instance rendered with a default texture.
+   */
+  _deleteTemporaryInstances = () => {
+    const temporaryInstances = this._instancesAdder.getTemporaryInstances();
+    if (temporaryInstances.length) {
+      const highlightedInstance = this.highlightedInstance.getInstance();
+      if (
+        highlightedInstance &&
+        temporaryInstances.some(
+          instance => instance.ptr === highlightedInstance.ptr
+        )
+      ) {
+        this.highlightedInstance.setInstance(null);
+      }
+      temporaryInstances.forEach(instance => {
+        this.props.instancesSelection.unselectInstance(instance);
+      });
+    }
+    this._instancesAdder.deleteTemporaryInstances();
+  };
+
   // Debounce function to avoid storing history for each pixel move when user
   // keeps pressing an arrow key.
   // $FlowFixMe[missing-local-annot]
@@ -1896,7 +1922,7 @@ export default class InstancesEditor extends Component<Props, State> {
           if (monitor.didDrop()) {
             // Drop was done somewhere else (in a child of the canvas:
             // should not happen, but still handling this case).
-            _instancesAdder.deleteTemporaryInstances();
+            this._deleteTemporaryInstances();
             return;
           }
 
@@ -1918,7 +1944,7 @@ export default class InstancesEditor extends Component<Props, State> {
           // take this opportunity to delete any temporary instances
           // if the dragging is not done anymore over the canvas.
           if (this._instancesAdder && !isOver) {
-            this._instancesAdder.deleteTemporaryInstances();
+            this._deleteTemporaryInstances();
           }
 
           return connectDropTarget(

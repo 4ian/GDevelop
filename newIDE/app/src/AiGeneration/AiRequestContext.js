@@ -572,7 +572,11 @@ export const AiRequestProvider = ({
     setIsFetchingSuggestions,
   ] = React.useState<boolean>(false);
   const lastFullFetchTimeRef = React.useRef<number>(0);
-  const fullFetchIntervalInMs = 5000;
+  // Only governs how often we refresh intermediate progress while a request
+  // stays in the same status: every status change (new tool call to run, agent
+  // finished/errored, sub-agent launched...) is already caught by the faster
+  // status poll below, which then fetches immediately.
+  const fullFetchIntervalInMs = 7000;
 
   // The selected AI request and its active sub-agents are watched together by a
   // single polling loop defined further below (see `onWatch`), so that a parent

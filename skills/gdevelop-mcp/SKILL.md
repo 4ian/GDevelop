@@ -7,7 +7,7 @@ description: Use when an AI agent is connected to GDevelop through MCP and needs
 
 ## Overview
 
-Use this skill to operate the GDevelop editor through MCP safely and predictably. Always inspect current editor/project state before writing, prefer specialized tools over raw project JSON edits, validate generated event JSON before inserting it, and read back the result after every meaningful change.
+Use this skill to operate the GDevelop editor through MCP safely and predictably. Always inspect current editor/project state before writing, use MCP tools for every project mutation, validate generated event JSON before inserting it, and read back the result after every meaningful change.
 
 GDevelop logic is event-based. A standard event contains `conditions` and `actions`; when all conditions are true, actions run. If an event has no conditions, its actions run every frame. Event order matters.
 
@@ -28,7 +28,7 @@ When a user asks for any GDevelop edit:
 11. Read back with the relevant read tool.
 12. Summarize what changed and mention any remaining uncertainty.
 
-Do not start by reading or rewriting the full project JSON unless a focused tool cannot answer the question.
+Do not start by reading the full project JSON unless a focused tool cannot answer the question. Never rewrite or patch the opened project JSON file on disk.
 
 ## Tool Map
 
@@ -145,6 +145,8 @@ Tools are permission-gated by the editor:
 - If a write tool returns that write MCP tools are disabled, do not retry the same write. Ask the user to enable write tools in preferences or continue with read-only analysis.
 - If `gdevelop_run_command` is disabled, do not simulate commands through unrelated write tools.
 - `gdevelop_editor_call` is an escape hatch, not a shortcut around permissions. It still follows the same read/write restrictions.
+
+Hard requirement: never directly edit, patch, overwrite, or otherwise mutate the opened GDevelop project `.json` file on disk. All project mutations must go through MCP tools, then be persisted with `gdevelop_save_project_and_wait`. Reading project JSON for verification is allowed; writing temporary events JSON files for `validate_events_json_file` or `replace_scene_events_from_file` is allowed. Disk-only project JSON edits can be overwritten by the editor and can desynchronize MCP state.
 
 ## Event Editing Workflow
 
@@ -425,8 +427,9 @@ Save the project:
 - Prefer `inspect_project_resources` with `compact: true` before and after asset replacement tasks; request full output only when investigating references.
 - Prefer `set_text_object_properties` for text objects.
 - Prefer `lint_scene_events` after any event write.
-- Prefer `set_first_layout` or `set_project_properties` over editing project JSON on disk.
+- Use `set_first_layout` or `set_project_properties` for project-level changes. Do not edit project JSON on disk.
 - Prefer `bulk_edit_scene_assets` for initial game/scene construction with many resources, objects, Sprite animations, and instances.
+- Never directly write the opened project `.json` file, even for small fixes. Use MCP tools and save through the editor.
 - Do not delete or replace large event blocks unless the user requested broad refactoring or the current events are clearly wrong.
 - When a write returns partial success or errors, stop and inspect the readback before trying another write.
 - If the scene/object name is ambiguous, list options and choose the most likely target only when the user request gives enough context.
@@ -445,6 +448,7 @@ Before claiming completion:
 - `lint_scene_events` passed after event writes.
 - Referenced resources have non-empty files and valid paths, or remaining invalid resource paths were explicitly reported.
 - The startup scene is set with `set_first_layout` or verified from `read_game_project_json`; do not rely on a disk-only patch.
+- No opened project `.json` file was directly edited. All project changes went through MCP tools and were saved with `gdevelop_save_project_and_wait` when persistence was required.
 - A write tool reported success or a non-error result.
 - The affected scene/object/instance/event sheet/extension was read back.
 - For save requests, `gdevelop_save_project_and_wait` returned a saved result, or the limitation of command-only saving was reported.
@@ -462,12 +466,12 @@ Before claiming completion:
 - Leaving newly created gameplay events at the root event sheet. Fix: create/find the semantic Group first, or immediately wrap/move the events into it.
 - Using JavaScript events to implement normal gameplay logic. Fix: use standard GDevelop events/instructions; only use JavaScript when the user explicitly asks for it.
 - Editing instances without `describe_instances`. Fix: read existing IDs and positions first.
-- Rewriting full project JSON for a small change. Fix: use focused editor tools.
+- Rewriting or patching the opened project JSON file for any change. Fix: use focused MCP tools, then `gdevelop_save_project_and_wait`.
 - Replacing all scene events just to group them. Fix: use `wrap_events_in_group`, `move_events_to_group`, and `rename_group`.
 - Continuing to use an old `event-N` path after moving/grouping events. Fix: assign/read `aiGeneratedEventId` and target by ID.
 - Adding an audio resource with an empty `file`. Fix: call `add_or_update_resource` with a real local path and verify with `inspect_project_resources`.
 - Assuming `SAVE_PROJECT` completed because `gdevelop_run_command` returned `launched`. Fix: use `gdevelop_save_project_and_wait`.
-- Patching `firstLayout` directly in saved JSON while the editor is open. Fix: call `set_first_layout` or `set_project_properties`.
+- Patching `firstLayout` directly in saved JSON while the editor is open. Fix: call `set_first_layout` or `set_project_properties`, then save through MCP.
 - Creating many resources/objects/instances one by one for initial setup. Fix: use `bulk_edit_scene_assets` unless stepwise validation is needed.
 - Assuming command names. Fix: call `gdevelop_list_commands`.
 - Forgetting that events without conditions run every frame. Fix: add conditions such as `SceneJustBegins` or a trigger condition when appropriate.

@@ -732,16 +732,16 @@ export const AiRequestProvider = ({
         lastFullFetchTimeRef.current = now;
       }
       // Only fetch the messages we don't have yet: ask for everything from the
-      // last cached message onward (re-fetched so its in-place updates, like
-      // suggestions, are picked up).
-      const cachedOutput = (aiRequests[aiRequestId] || {}).output;
-      const lastCachedMessage =
-        cachedOutput && cachedOutput.length > 0
-          ? cachedOutput[cachedOutput.length - 1]
+      // last message we already have onward (re-fetched so its in-place
+      // updates, like suggestions, are picked up).
+      const currentOutput = (aiRequests[aiRequestId] || {}).output;
+      const lastMessage =
+        currentOutput && currentOutput.length > 0
+          ? currentOutput[currentOutput.length - 1]
           : null;
       const outputFromMessageId =
-        (lastCachedMessage && lastCachedMessage.messageId) || undefined;
-      const aiRequest = await retryIfFailed({ times: 2 }, () =>
+        (lastMessage && lastMessage.messageId) || undefined;
+      const fetchedAiRequest = await retryIfFailed({ times: 2 }, () =>
         getAiRequest(getAuthorizationHeader, {
           userId: profile.id,
           aiRequestId,
@@ -749,14 +749,21 @@ export const AiRequestProvider = ({
         })
       );
       updateAiRequest(aiRequestId, prevRequest =>
-        mergeIncrementalAiRequest(prevRequest, aiRequest, outputFromMessageId)
+        mergeIncrementalAiRequest(
+          prevRequest,
+          fetchedAiRequest,
+          outputFromMessageId
+        )
       );
       if (isSubAgent) {
-        if (aiRequest.status === 'ready' || aiRequest.status === 'error') {
+        if (
+          fetchedAiRequest.status === 'ready' ||
+          fetchedAiRequest.status === 'error'
+        ) {
           removeSubAgentIfDone(aiRequestId);
         }
       } else {
-        clearFetchingSuggestionsIfDone(aiRequest);
+        clearFetchingSuggestionsIfDone(fetchedAiRequest);
       }
     };
 

@@ -49,11 +49,8 @@ type LoadedTexture = {|
   pixiTexture: any,
   // The URL the texture was loaded from. Left undefined when it's not meaningful
   // for change detection (the invalid placeholder texture, video textures…).
-  // When set, it's used to detect whether a resource actually changed before
-  // reloading it (see `_doReloadResource`): for cloud projects every change
-  // yields a new immutable URL, and for local files the URL carries a
-  // cache-busting token that only changes when the file's cache was burst (i.e.
-  // it was edited).
+  // When set, it's used to detect whether a resource actually changed and skip
+  // reload when we can.
   loadedFromUrl?: string,
 |};
 
@@ -88,7 +85,7 @@ const loadedOrLoadingPixiTextures = (() => {
     delete(resourceName: string) {
       delete entriesByResourceName[resourceName];
     },
-    // Names of resources (other than `resourceName`) whose cached texture is the
+    // Names of resources (other than `resourceName`) whose texture is the
     // very same object, i.e. that point to the same loaded file/URL.
     getResourceNamesSharingPixiTexture(
       resourceName: string,
@@ -419,7 +416,7 @@ export default class PixiResourcesLoader {
       );
       if (currentUrl === loadedEntry.loadedFromUrl) {
         console.info(
-          `Resource "${resourceName}" URL is unchanged: keeping the already loaded texture (no reload needed).`
+          `Resource "${resourceName}" file/URL is unchanged: keeping the already loaded texture (no reload needed).`
         );
         return;
       }

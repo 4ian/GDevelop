@@ -14,6 +14,20 @@ const gd: libGDevelop = global.gd;
 const fs = optionalRequire('fs');
 const path = optionalRequire('path');
 
+// Resolve a possibly-relative file path against the opened project's folder, so
+// file-based tools accept the same relative paths (e.g. "assets/level.json")
+// that resource tools accept, instead of requiring absolute paths.
+const resolveProjectRelativeFile = (
+  project: gdProject,
+  file: string
+): string => {
+  if (!file || !path) return file;
+  if (path.isAbsolute(file)) return file;
+  const projectFile = project.getProjectFile && project.getProjectFile();
+  if (!projectFile) return file;
+  return path.resolve(path.dirname(projectFile), file);
+};
+
 const DEFAULT_LIMIT = 20;
 const MAX_LIMIT = 100;
 
@@ -25,21 +39,213 @@ const normalizeLimit = (limit: any): number => {
 
 const normalizeText = (text: string): string => text.toLowerCase();
 
-const includesQuery = (values: Array<?string>, query: string): boolean => {
-  const normalizedQuery = normalizeText(query);
-  return values.some(value =>
-    value ? normalizeText(value).includes(normalizedQuery) : false
-  );
+// Alias map: free-text intent terms a model is likely to type, mapped to extra
+// terms that actually appear in GDevelop instruction metadata (including the
+// French/legacy internal type fragments like MettreX, ModVarObjet, Scene). When
+// any alias key token is present in the query, its values are added to the set
+// of acceptable match terms so a single query token can be satisfied by any of
+// them. This fixes "play sound effect", "delete object", "change position",
+// "scene variable", etc. returning nothing.
+const SEARCH_ALIASES: { [string]: Array<string> } = {
+  play: ['playsound', 'sound', 'play'],
+  sound: ['playsound', 'sound', 'audio', 'music'],
+  effect: ['sound', 'playsound'],
+  music: ['playmusic', 'music', 'sound'],
+  key: ['key', 'keyboard', 'keypressed', 'keydown'],
+  keyboard: ['key', 'keyboard', 'keypressed'],
+  pressed: ['pressed', 'keypressed', 'mousebutton'],
+  position: ['mettrex', 'mettrey', 'mettrexy', 'posx', 'posy', 'position'],
+  move: ['mettrex', 'mettrey', 'mettrexy', 'position', 'move', 'forces'],
+  coordinate: ['mettrex', 'mettrey', 'posx', 'posy'],
+  delete: ['delete', 'destroy', 'remove'],
+  destroy: ['delete', 'destroy', 'remove'],
+  remove: ['delete', 'destroy', 'remove'],
+  text: [
+    'string',
+    'text',
+    'settext',
+    'texte',
+    'textcontainer',
+    'textcontainercapability',
+    'setvalue',
+  ],
+  string: ['string', 'text', 'settext', 'setvalue', 'textcontainer'],
+  modify: ['mod', 'set', 'change'],
+  set: ['set', 'mod', 'change', 'mettre', 'setvalue'],
+  change: ['mod', 'set', 'change'],
+  variable: ['var', 'variable', 'varscene', 'varglobal', 'modvarobjet', 'varobjet', 'setnumbervariable', 'setstringvariable'],
+  scene: ['scene', 'layout'],
+  restart: ['scene', 'restart', 'changescene'],
+  switch: ['scene', 'changescene'],
+  random: ['random', 'randominrange'],
+  opacity: ['opacity', 'opacite'],
+  rotate: ['angle', 'rotate', 'mettreangle'],
+  rotation: ['angle', 'rotate'],
+  hide: ['cache', 'hide', 'visible'],
+  show: ['montre', 'show', 'visible'],
+  timer: ['timer', 'time'],
+  collision: ['collision', 'collisionnnp', 'iscolliding'],
+  animation: ['animation', 'anim'],
+  health: ['variable', 'var'],
+  score: ['variable', 'var'],
+};
+
+// Tokenize a search string into lowercase word tokens.
+const tokenizeQuery = (query: string): Array<string> =>
+  normalizeText(query)
+    .split(/[^a-z0-9]+/)
+    .filter(Boolean);
+
+// Score how well candidate field values match the query. Returns 0 for no match.
+// Higher is better. The match requires that EVERY query token is satisfied by
+// some candidate value (directly or via an alias term), which is what makes
+// multi-word queries work as an AND search instead of a single contiguous
+// substring test. A small bonus is added for exact/prefix matches and for
+// matches in the most identifying fields (type, displayed name).
+const scoreMatch = (values: Array<?string>, query: string): number => {
+  const tokens = tokenizeQuery(query);
+  if (!tokens.length) return 0;
+
+  const normalizedValues = values
+    .filter(Boolean)
+    .map(value => normalizeText((value: any)));
+  if (!normalizedValues.length) return 0;
+  const haystack = normalizedValues.join(' ');
+  // Compact haystack with separators removed, so a token like "playsound"
+  // matches the type "PlaySound" and "setnumbervariable" matches the type even
+  // though fields contain spaces or camelCase.
+  const compactHaystack = haystack.replace(/[^a-z0-9]+/g, '');
+
+  let score = 0;
+  for (const token of tokens) {
+    const aliasTerms = SEARCH_ALIASES[token] || [];
+    const candidates = [token, ...aliasTerms];
+    const matched = candidates.some(
+      term => haystack.includes(term) || compactHaystack.includes(term)
+    );
+    if (!matched) return 0; // AND semantics: every token must match something.
+    // Direct (non-alias) token hits are worth more than alias-only hits.
+    score += haystack.includes(token) || compactHaystack.includes(token) ? 2 : 1;
+  }
+
+  // Bonuses: whole-query contiguous hit, and hits in the first value (type) /
+  // second value (displayed name), which are the most identifying.
+  const fullQuery = normalizeText(query).trim();
+  if (fullQuery && haystack.includes(fullQuery)) score += 3;
+  if (normalizedValues[0] && tokens.some(t => normalizedValues[0].includes(t)))
+    score += 2;
+  if (normalizedValues[1] && tokens.some(t => normalizedValues[1].includes(t)))
+    score += 1;
+
+  return score;
+};
+
+const includesQuery = (values: Array<?string>, query: string): boolean =>
+  scoreMatch(values, query) > 0;
+
+// GDevelop parameter types whose VALUE in event JSON is a string EXPRESSION:
+// a literal must be wrapped in double quotes (e.g. "Space", "220;30;55",
+// "Game Over"). Mirrors gd::ValueTypeMetadata::IsTypeExpression("string", ...).
+const QUOTED_STRING_PARAMETER_TYPES = new Set([
+  'string',
+  'layer',
+  'color',
+  'file',
+  'stringWithSelector',
+  'sceneName',
+  'layerEffectName',
+  'layerEffectParameterName',
+  'objectAnimationName',
+  'functionParameterName',
+  'externalLayoutName',
+  'leaderboardId',
+  'identifier',
+  'keyboardKey',
+  'mouseButton',
+]);
+
+// Types whose value is a NUMBER expression (bare number or numeric expression).
+const NUMBER_PARAMETER_TYPES = new Set(['number', 'expression', 'camera']);
+
+// Types whose value is a bare object NAME (no quotes).
+const OBJECT_PARAMETER_TYPES = new Set(['object', 'objectPtr', 'objectList']);
+
+// Types whose value is a bare VARIABLE reference (no quotes). For object
+// variables, reference them in expressions as Object.VariableName.
+const VARIABLE_PARAMETER_TYPES = new Set([
+  'variable',
+  'objectvar',
+  'scenevar',
+  'globalvar',
+  'variableOrProperty',
+]);
+
+// Describe, in one line, how to write a literal value for a parameter type in
+// event JSON. Used in metadata output and validation suggestions so callers stop
+// guessing which parameters need embedded quotes.
+const describeParameterLiteralSyntax = (parameterType: string): string => {
+  if (QUOTED_STRING_PARAMETER_TYPES.has(parameterType)) {
+    return `string expression — wrap literals in double quotes, e.g. "value" (type "${parameterType}")`;
+  }
+  if (NUMBER_PARAMETER_TYPES.has(parameterType)) {
+    return `number expression — bare number or numeric expression, no quotes, e.g. 100 or Variable(Score) (type "${parameterType}")`;
+  }
+  if (OBJECT_PARAMETER_TYPES.has(parameterType)) {
+    return `object name — bare object name, no quotes (type "${parameterType}")`;
+  }
+  if (parameterType === 'behavior') {
+    return `behavior NAME — bare behavior instance name (NOT the behavior type), no quotes (type "behavior")`;
+  }
+  if (VARIABLE_PARAMETER_TYPES.has(parameterType)) {
+    return `variable reference — bare variable name, no quotes; object variables are Object.VariableName (type "${parameterType}")`;
+  }
+  if (parameterType === 'yesorno' || parameterType === 'trueorfalse') {
+    return `boolean — yes/no (no quotes) (type "${parameterType}")`;
+  }
+  if (parameterType === 'key' || parameterType === 'mouse') {
+    return `bare keyword, no quotes (type "${parameterType}")`;
+  }
+  return `type "${parameterType}" — check parameter description; bare identifier unless it expects a string/number expression`;
+};
+
+// Classify how a parameter value should be written, for type-aware validation
+// suggestions. Returns 'quoted-string' | 'number' | 'object' | 'behavior' |
+// 'variable' | 'boolean' | 'other'.
+const classifyParameterValueShape = (parameterType: string): string => {
+  if (QUOTED_STRING_PARAMETER_TYPES.has(parameterType)) return 'quoted-string';
+  if (NUMBER_PARAMETER_TYPES.has(parameterType)) return 'number';
+  if (OBJECT_PARAMETER_TYPES.has(parameterType)) return 'object';
+  if (parameterType === 'behavior') return 'behavior';
+  if (VARIABLE_PARAMETER_TYPES.has(parameterType)) return 'variable';
+  if (parameterType === 'yesorno' || parameterType === 'trueorfalse')
+    return 'boolean';
+  return 'other';
 };
 
 const summarizeParameter = (
   parameterMetadata: gdParameterMetadata,
-  index: number
+  index: number,
+  options?: {| compact?: boolean |}
 ): Object => {
   const valueTypeMetadata = parameterMetadata.getValueTypeMetadata();
+  const type = parameterMetadata.getType();
+  if (options && options.compact) {
+    // Compact form drops the verbose valueType discriminator object and keeps
+    // only what a caller needs to fill the parameter correctly.
+    return {
+      index,
+      type,
+      name: parameterMetadata.getName() || undefined,
+      description: parameterMetadata.getDescription() || undefined,
+      isOptional: parameterMetadata.isOptional(),
+      defaultValue: parameterMetadata.getDefaultValue() || undefined,
+      // How to write a literal value for this parameter in event JSON.
+      literalSyntax: describeParameterLiteralSyntax(type),
+    };
+  }
   const parameter = {
     index,
-    type: parameterMetadata.getType(),
+    type,
     name: parameterMetadata.getName() || undefined,
     description: parameterMetadata.getDescription() || undefined,
     longDescription: parameterMetadata.getLongDescription() || undefined,
@@ -48,6 +254,7 @@ const summarizeParameter = (
     defaultValue: parameterMetadata.getDefaultValue() || undefined,
     isOptional: parameterMetadata.isOptional(),
     isCodeOnly: parameterMetadata.isCodeOnly(),
+    literalSyntax: describeParameterLiteralSyntax(type),
     valueType: valueTypeMetadata
       ? {
           name: valueTypeMetadata.getName(),
@@ -71,66 +278,111 @@ const summarizeInstructionMetadata = ({
   kind,
   metadata,
   fullGroupName,
+  compact,
 }: {|
   type: string,
   kind: 'action' | 'condition',
   metadata: gdInstructionMetadata,
   fullGroupName?: ?string,
-|}): Object => ({
-  kind,
-  type,
-  fullName: metadata.getFullName(),
-  description: metadata.getDescription(),
-  sentence: metadata.getSentence(),
-  group: fullGroupName || metadata.getGroup(),
-  helpPath: metadata.getHelpPath(),
-  iconFilename: metadata.getIconFilename(),
-  smallIconFilename: metadata.getSmallIconFilename(),
-  canHaveSubInstructions: metadata.canHaveSubInstructions(),
-  isHidden: metadata.isHidden(),
-  isPrivate: metadata.isPrivate(),
-  isAsync: metadata.isAsync(),
-  isOptionallyAsync: metadata.isOptionallyAsync(),
-  isRelevantForSceneEvents: metadata.isRelevantForLayoutEvents(),
-  isRelevantForFunctionEvents: metadata.isRelevantForFunctionEvents(),
-  isRelevantForAsynchronousFunctionEvents: metadata.isRelevantForAsynchronousFunctionEvents(),
-  isRelevantForCustomObjectEvents: metadata.isRelevantForCustomObjectEvents(),
-  usageComplexity: metadata.getUsageComplexity(),
-  deprecationMessage: metadata.getDeprecationMessage() || undefined,
-  parameters: mapFor(0, metadata.getParametersCount(), index =>
-    summarizeParameter(metadata.getParameter(index), index)
-  ),
-});
+  compact?: boolean,
+|}): Object => {
+  if (compact) {
+    return {
+      kind,
+      type,
+      fullName: metadata.getFullName(),
+      description: metadata.getDescription(),
+      sentence: metadata.getSentence(),
+      group: fullGroupName || metadata.getGroup(),
+      // True when usable in a scene (layout) or external events sheet.
+      isRelevantForSceneEvents: metadata.isRelevantForLayoutEvents(),
+      parameters: mapFor(0, metadata.getParametersCount(), index =>
+        summarizeParameter(metadata.getParameter(index), index, {
+          compact: true,
+        })
+      ),
+    };
+  }
+  return {
+    kind,
+    type,
+    fullName: metadata.getFullName(),
+    description: metadata.getDescription(),
+    sentence: metadata.getSentence(),
+    group: fullGroupName || metadata.getGroup(),
+    helpPath: metadata.getHelpPath(),
+    iconFilename: metadata.getIconFilename(),
+    smallIconFilename: metadata.getSmallIconFilename(),
+    canHaveSubInstructions: metadata.canHaveSubInstructions(),
+    isHidden: metadata.isHidden(),
+    isPrivate: metadata.isPrivate(),
+    isAsync: metadata.isAsync(),
+    isOptionallyAsync: metadata.isOptionallyAsync(),
+    // Maps to GDevelop core isRelevantForLayoutEvents(): true when the
+    // instruction can be used in a scene's event sheet or in external events
+    // (as opposed to being restricted to events-function/custom-object bodies).
+    // It does NOT mean the instruction is unusable in scenes when false for
+    // object-variable instructions — see the note in get_instruction_metadata.
+    isRelevantForSceneEvents: metadata.isRelevantForLayoutEvents(),
+    isRelevantForFunctionEvents: metadata.isRelevantForFunctionEvents(),
+    isRelevantForAsynchronousFunctionEvents: metadata.isRelevantForAsynchronousFunctionEvents(),
+    isRelevantForCustomObjectEvents: metadata.isRelevantForCustomObjectEvents(),
+    usageComplexity: metadata.getUsageComplexity(),
+    deprecationMessage: metadata.getDeprecationMessage() || undefined,
+    parameters: mapFor(0, metadata.getParametersCount(), index =>
+      summarizeParameter(metadata.getParameter(index), index)
+    ),
+  };
+};
 
 const summarizeExpressionMetadata = ({
   type,
   metadata,
   fullGroupName,
+  compact,
 }: {|
   type: string,
   metadata: gdExpressionMetadata,
   fullGroupName?: ?string,
-|}): Object => ({
-  kind: 'expression',
-  type,
-  fullName: metadata.getFullName(),
-  description: metadata.getDescription(),
-  group: fullGroupName || metadata.getGroup(),
-  returnType: metadata.getReturnType(),
-  helpPath: metadata.getHelpPath(),
-  smallIconFilename: metadata.getSmallIconFilename(),
-  isShown: metadata.isShown(),
-  isPrivate: metadata.isPrivate(),
-  isDeprecated: metadata.isDeprecated(),
-  isRelevantForSceneEvents: metadata.isRelevantForLayoutEvents(),
-  isRelevantForFunctionEvents: metadata.isRelevantForFunctionEvents(),
-  isRelevantForAsynchronousFunctionEvents: metadata.isRelevantForAsynchronousFunctionEvents(),
-  isRelevantForCustomObjectEvents: metadata.isRelevantForCustomObjectEvents(),
-  deprecationMessage: metadata.getDeprecationMessage() || undefined,
-  parameters: mapFor(0, metadata.getParametersCount(), index =>
-    summarizeParameter(metadata.getParameter(index), index)
-  ),
-});
+  compact?: boolean,
+|}): Object => {
+  if (compact) {
+    return {
+      kind: 'expression',
+      type,
+      fullName: metadata.getFullName(),
+      description: metadata.getDescription(),
+      group: fullGroupName || metadata.getGroup(),
+      returnType: metadata.getReturnType(),
+      parameters: mapFor(0, metadata.getParametersCount(), index =>
+        summarizeParameter(metadata.getParameter(index), index, {
+          compact: true,
+        })
+      ),
+    };
+  }
+  return {
+    kind: 'expression',
+    type,
+    fullName: metadata.getFullName(),
+    description: metadata.getDescription(),
+    group: fullGroupName || metadata.getGroup(),
+    returnType: metadata.getReturnType(),
+    helpPath: metadata.getHelpPath(),
+    smallIconFilename: metadata.getSmallIconFilename(),
+    isShown: metadata.isShown(),
+    isPrivate: metadata.isPrivate(),
+    isDeprecated: metadata.isDeprecated(),
+    isRelevantForSceneEvents: metadata.isRelevantForLayoutEvents(),
+    isRelevantForFunctionEvents: metadata.isRelevantForFunctionEvents(),
+    isRelevantForAsynchronousFunctionEvents: metadata.isRelevantForAsynchronousFunctionEvents(),
+    isRelevantForCustomObjectEvents: metadata.isRelevantForCustomObjectEvents(),
+    deprecationMessage: metadata.getDeprecationMessage() || undefined,
+    parameters: mapFor(0, metadata.getParametersCount(), index =>
+      summarizeParameter(metadata.getParameter(index), index)
+    ),
+  };
+};
 
 export const getEventOperationReference = (): Object => ({
   targetPathFormat:
@@ -351,6 +603,56 @@ export const getEventsJsonExamples = ({
       'Serialized scene events are a JSON array. A standard event uses type "BuiltinCommonInstructions::Standard", conditions: [{ type: { value: "<condition type>" }, parameters: [...] }], actions: [{ type: { value: "<action type>" }, parameters: [...] }], and optional nested events: [...].',
     addSceneEventsShape:
       'For add_scene_events, pass { scene_name, events_json } for append-at-end, or { scene_name, event_changes: [{ operation_name, operation_target_event, generated_events }] } for precise edits.',
+    // Quoting and expression-syntax rules. These are the most common cause of
+    // parameter validation failures.
+    parameterSyntaxRules: {
+      summary:
+        'String-expression parameters take a value WITH embedded double quotes; object/behavior/variable names and numbers are bare (no quotes).',
+      quotedStringTypes: [
+        'string (text)',
+        'keyboardKey (e.g. "Space")',
+        'color (e.g. "220;30;55")',
+        'sceneName (e.g. "Game") — yes, the Scene action\'s scene name parameter is quoted',
+        'layer (e.g. "" for base layer, or "HUD")',
+        'file, identifier, stringWithSelector',
+      ],
+      bareTypes: [
+        'object — bare object name (e.g. Player)',
+        'behavior — bare behavior NAME on the object (e.g. PlatformerObject), NOT the behavior type',
+        'number/expression — bare number or numeric expression (e.g. 100, Variable(Score))',
+        'variable/scenevar/globalvar/objectvar — bare variable reference',
+      ],
+    },
+    variableExpressionSyntax: {
+      summary:
+        'How to reference variables inside expressions and string parameters.',
+      sceneVariable:
+        'Reference a scene variable by its bare name: Variable(Score) in a number/string expression, or just Score where a variable parameter is expected. Do NOT write SceneVariable(Score).',
+      globalVariable:
+        'Reference a global variable with GlobalVariable(MyGlobal). Do NOT write Variable(...) for globals.',
+      objectVariable:
+        'Reference an object variable as Object.VariableName, e.g. Player.Life or Enemy.Health (in expressions). For a variable PARAMETER, the object variable instructions take the object name and a bare variable name. Do NOT write VarObjet(Player, Life).',
+      childVariable:
+        'Access a structure child with Variable(Inventory.gold) or Object.Stats.level.',
+    },
+    commonInstructionTypes: {
+      summary:
+        'GDevelop internal types are sometimes French/legacy and hard to guess. Common ones (verify with gdevelop_get_instruction_metadata):',
+      setObjectPositionX: 'MettreX (action)',
+      setObjectPositionY: 'MettreY (action)',
+      setObjectPosition: 'MettreXY (action)',
+      objectPositionXCondition: 'PosX (condition)',
+      objectPositionYCondition: 'PosY (condition)',
+      setObjectAngle: 'MettreAngle (action)',
+      setObjectVariable: 'ModVarObjet (action), VarObjet (condition)',
+      setSceneVariableNumber: 'SetNumberVariable (action)',
+      setSceneVariableString: 'SetStringVariable (action)',
+      deleteObject: 'Delete (action)',
+      changeOrRestartScene: 'Scene (action — its scene name parameter is quoted)',
+      playSound: 'PlaySound (action)',
+      keyPressed: 'KeyPressed (condition)',
+      sceneJustBegins: 'SceneJustBegins (condition)',
+    },
     sources: [
       {
         name: 'GDevelop events documentation',
@@ -372,7 +674,8 @@ export const getEventsJsonExamples = ({
 const getInstructionMetadata = (
   project: gdProject,
   type: string,
-  kind: string
+  kind: string,
+  compact?: boolean
 ): ?Object => {
   if (kind === 'condition') {
     const metadata = gd.MetadataProvider.getConditionMetadata(
@@ -381,7 +684,12 @@ const getInstructionMetadata = (
     );
     return gd.MetadataProvider.isBadInstructionMetadata(metadata)
       ? null
-      : summarizeInstructionMetadata({ type, kind: 'condition', metadata });
+      : summarizeInstructionMetadata({
+          type,
+          kind: 'condition',
+          metadata,
+          compact: !!compact,
+        });
   }
 
   if (kind === 'action') {
@@ -391,7 +699,12 @@ const getInstructionMetadata = (
     );
     return gd.MetadataProvider.isBadInstructionMetadata(metadata)
       ? null
-      : summarizeInstructionMetadata({ type, kind: 'action', metadata });
+      : summarizeInstructionMetadata({
+          type,
+          kind: 'action',
+          metadata,
+          compact: !!compact,
+        });
   }
 
   if (kind === 'expression') {
@@ -405,6 +718,7 @@ const getInstructionMetadata = (
       return summarizeExpressionMetadata({
         type,
         metadata: numberExpressionMetadata,
+        compact: !!compact,
       });
     }
 
@@ -418,6 +732,7 @@ const getInstructionMetadata = (
       return summarizeExpressionMetadata({
         type,
         metadata: stringExpressionMetadata,
+        compact: !!compact,
       });
     }
   }
@@ -429,10 +744,12 @@ export const getExactInstructionMetadata = ({
   project,
   type,
   kind,
+  compact,
 }: {|
   project: gdProject,
   type?: ?string,
   kind?: ?string,
+  compact?: boolean,
 |}): Object => {
   if (!type) {
     return {
@@ -445,12 +762,23 @@ export const getExactInstructionMetadata = ({
     };
   }
 
-  const metadata = getInstructionMetadata(project, type, kind);
-  return (
-    metadata || {
+  const metadata = getInstructionMetadata(project, type, kind, compact);
+  if (!metadata) {
+    return {
       error: `No ${kind} metadata found for "${type}". Use gdevelop_search_instruction_metadata first to find exact types.`,
-    }
-  );
+    };
+  }
+  return {
+    ...metadata,
+    // Clarify a confusing field: object-variable instructions (ModVarObjet /
+    // VarObjet) report isRelevantForSceneEvents:false, but they DO work in scene
+    // events. The flag only marks the instruction's declared "primary" context;
+    // it does not forbid scene usage.
+    fieldNotes: {
+      isRelevantForSceneEvents:
+        'Maps to GDevelop core isRelevantForLayoutEvents(). false does NOT mean the instruction cannot be used in scene events (e.g. object-variable instructions report false yet work in scenes); it reflects the instruction\'s declared primary context.',
+    },
+  };
 };
 
 export const searchInstructionMetadata = ({
@@ -459,16 +787,17 @@ export const searchInstructionMetadata = ({
   query,
   kind,
   limit,
+  compact,
 }: {|
   project: gdProject,
   i18n: any,
   query?: ?string,
   kind?: ?string,
   limit?: ?number,
+  compact?: boolean,
 |}): Object => {
   const normalizedKind = kind || 'all';
   const resultLimit = normalizeLimit(limit);
-  const results: Array<Object> = [];
   const searchQuery = query || '';
 
   if (!searchQuery) {
@@ -478,111 +807,103 @@ export const searchInstructionMetadata = ({
       limit: resultLimit,
       results: [],
       note:
-        'Provide a query such as an internal type, displayed name, description, group, object name, or behavior name.',
+        'Provide a query such as an internal type, displayed name, description, group, object name, or behavior name. Multi-word queries are tokenized (all words must match) and common intents like "play sound", "key pressed", "change position", "delete object", "scene variable" are aliased to GDevelop internal types.',
     };
   }
 
+  // Collect ALL matches with a score across every requested kind, then sort by
+  // score and truncate. This replaces the previous per-kind early-break, which
+  // could let actions consume the whole limit and starve conditions/expressions,
+  // and returned matches in arbitrary enumeration order.
+  const scored: Array<{| score: number, order: number, summary: Object |}> = [];
+  let order = 0;
+
+  const considerInstruction = (instruction, instructionKind) => {
+    const score = scoreMatch(
+      [
+        instruction.type,
+        instruction.displayedName,
+        instruction.description,
+        instruction.fullGroupName,
+        instruction.scope.extension.name,
+        instruction.scope.objectMetadata &&
+          instruction.scope.objectMetadata.name,
+        instruction.scope.behaviorMetadata &&
+          instruction.scope.behaviorMetadata.name,
+      ],
+      searchQuery
+    );
+    if (score > 0) {
+      scored.push({
+        score,
+        order: order++,
+        summary: summarizeInstructionMetadata({
+          type: instruction.type,
+          kind: instructionKind,
+          metadata: instruction.metadata,
+          fullGroupName: instruction.fullGroupName,
+          compact: !!compact,
+        }),
+      });
+    }
+  };
+
   if (normalizedKind === 'all' || normalizedKind === 'action') {
     for (const instruction of enumerateAllInstructions(false, project, i18n)) {
-      if (
-        includesQuery(
-          [
-            instruction.type,
-            instruction.displayedName,
-            instruction.description,
-            instruction.fullGroupName,
-            instruction.scope.extension.name,
-            instruction.scope.objectMetadata &&
-              instruction.scope.objectMetadata.name,
-            instruction.scope.behaviorMetadata &&
-              instruction.scope.behaviorMetadata.name,
-          ],
-          searchQuery
-        )
-      ) {
-        results.push(
-          summarizeInstructionMetadata({
-            type: instruction.type,
-            kind: 'action',
-            metadata: instruction.metadata,
-            fullGroupName: instruction.fullGroupName,
-          })
-        );
-      }
-      if (results.length >= resultLimit) break;
+      considerInstruction(instruction, 'action');
     }
   }
 
-  if (
-    results.length < resultLimit &&
-    (normalizedKind === 'all' || normalizedKind === 'condition')
-  ) {
+  if (normalizedKind === 'all' || normalizedKind === 'condition') {
     for (const instruction of enumerateAllInstructions(true, project, i18n)) {
-      if (
-        includesQuery(
-          [
-            instruction.type,
-            instruction.displayedName,
-            instruction.description,
-            instruction.fullGroupName,
-            instruction.scope.extension.name,
-            instruction.scope.objectMetadata &&
-              instruction.scope.objectMetadata.name,
-            instruction.scope.behaviorMetadata &&
-              instruction.scope.behaviorMetadata.name,
-          ],
-          searchQuery
-        )
-      ) {
-        results.push(
-          summarizeInstructionMetadata({
-            type: instruction.type,
-            kind: 'condition',
-            metadata: instruction.metadata,
-            fullGroupName: instruction.fullGroupName,
-          })
-        );
-      }
-      if (results.length >= resultLimit) break;
+      considerInstruction(instruction, 'condition');
     }
   }
 
-  if (
-    results.length < resultLimit &&
-    (normalizedKind === 'all' || normalizedKind === 'expression')
-  ) {
+  if (normalizedKind === 'all' || normalizedKind === 'expression') {
     for (const expression of enumerateAllExpressions('', project, i18n)) {
-      if (
-        includesQuery(
-          [
-            expression.type,
-            expression.displayedName,
-            expression.fullGroupName,
-            expression.scope.extension.name,
-            expression.scope.objectMetadata &&
-              expression.scope.objectMetadata.name,
-            expression.scope.behaviorMetadata &&
-              expression.scope.behaviorMetadata.name,
-          ],
-          searchQuery
-        )
-      ) {
-        results.push(
-          summarizeExpressionMetadata({
+      const score = scoreMatch(
+        [
+          expression.type,
+          expression.displayedName,
+          expression.fullGroupName,
+          expression.scope.extension.name,
+          expression.scope.objectMetadata &&
+            expression.scope.objectMetadata.name,
+          expression.scope.behaviorMetadata &&
+            expression.scope.behaviorMetadata.name,
+        ],
+        searchQuery
+      );
+      if (score > 0) {
+        scored.push({
+          score,
+          order: order++,
+          summary: summarizeExpressionMetadata({
             type: expression.type,
             metadata: expression.metadata,
             fullGroupName: expression.fullGroupName,
-          })
-        );
+            compact: !!compact,
+          }),
+        });
       }
-      if (results.length >= resultLimit) break;
     }
   }
+
+  scored.sort((left, right) =>
+    right.score !== left.score
+      ? right.score - left.score
+      : left.order - right.order
+  );
+
+  const results = scored.slice(0, resultLimit).map(entry => entry.summary);
 
   return {
     query: searchQuery,
     kind: normalizedKind,
     limit: resultLimit,
+    totalMatches: scored.length,
+    truncated: scored.length > resultLimit,
     results,
   };
 };
@@ -604,6 +925,105 @@ const getInstructionMetadataForValidation = (
   return gd.MetadataProvider.isBadInstructionMetadata(metadata)
     ? null
     : metadata;
+};
+
+// Parameter types where a bare literal is almost never a valid expression, so
+// auto-wrapping it in quotes is safe and fixes the most common quoting mistake
+// (e.g. layer "HUD", a timer identifier, a key name, a color, a scene name).
+// NOTE: plain `string`/`text` are intentionally EXCLUDED — those frequently use
+// concatenation expressions (e.g. "Score: " + ToString(Score)), so wrapping
+// would corrupt valid input.
+const AUTO_QUOTE_PARAMETER_TYPES = new Set([
+  'keyboardKey',
+  'color',
+  'sceneName',
+  'layer',
+  'identifier',
+  'stringWithSelector',
+  'objectAnimationName',
+  'layerEffectName',
+  'layerEffectParameterName',
+]);
+
+// Decide whether a raw parameter value is a bare literal we can safely wrap in
+// double quotes. We refuse anything that already looks like an expression.
+const shouldAutoQuoteValue = (value: any): boolean => {
+  if (typeof value !== 'string') return false;
+  const trimmed = value.trim();
+  if (!trimmed) return false; // empty = default (e.g. base layer), leave as-is
+  if (trimmed.startsWith('"')) return false; // already quoted
+  // Looks like an expression / number / structured value → do not touch.
+  if (/["'()+\-*/.,\[\]]/.test(trimmed)) return false;
+  if (/^[0-9]/.test(trimmed)) return false;
+  return true;
+};
+
+const getSerializedInstructionTypeValue = (instruction: any): string => {
+  if (!instruction || typeof instruction !== 'object') return '';
+  const type = instruction.type;
+  if (type && typeof type === 'object' && typeof type.value === 'string')
+    return type.value;
+  if (typeof type === 'string') return type;
+  return '';
+};
+
+// Walk a parsed events array (the plain JSON shape used in events_json) and wrap
+// bare literals for safe quoted-string parameter types, in place. Returns the
+// number of parameters changed. Used by the write path so callers do not have to
+// remember to escape "HUD" as "\"HUD\"".
+export const autoQuoteEventParameters = (
+  project: gdProject,
+  events: Array<any>
+): number => {
+  let changedCount = 0;
+
+  const normalizeInstructions = (instructions: any, isCondition: boolean) => {
+    if (!Array.isArray(instructions)) return;
+    instructions.forEach(instruction => {
+      const type = getSerializedInstructionTypeValue(instruction);
+      if (type) {
+        const metadata = getInstructionMetadataForValidation(
+          project,
+          type,
+          isCondition
+        );
+        if (metadata && Array.isArray(instruction.parameters)) {
+          const parametersCount = metadata.getParametersCount();
+          for (
+            let index = 0;
+            index < parametersCount && index < instruction.parameters.length;
+            index++
+          ) {
+            const parameterType = metadata.getParameter(index).getType();
+            if (
+              AUTO_QUOTE_PARAMETER_TYPES.has(parameterType) &&
+              shouldAutoQuoteValue(instruction.parameters[index])
+            ) {
+              instruction.parameters[index] = `"${instruction.parameters[index]}"`;
+              changedCount++;
+            }
+          }
+        }
+      }
+      // Recurse into sub-instructions.
+      if (Array.isArray(instruction.subInstructions)) {
+        normalizeInstructions(instruction.subInstructions, isCondition);
+      }
+    });
+  };
+
+  const normalizeEvents = (eventsList: any) => {
+    if (!Array.isArray(eventsList)) return;
+    eventsList.forEach(event => {
+      if (!event || typeof event !== 'object') return;
+      normalizeInstructions(event.conditions, true);
+      normalizeInstructions(event.actions, false);
+      if (Array.isArray(event.events)) normalizeEvents(event.events);
+    });
+  };
+
+  normalizeEvents(events);
+  return changedCount;
 };
 
 const isUrlResourceFile = (file: string): boolean =>
@@ -942,46 +1362,110 @@ const validateEventsList = ({
 
 const withActionableSuggestion = (issue: Object): Object => {
   if (issue.suggestion) return issue;
+  if (issue.type !== 'invalid-parameter' && issue.type !== 'missing-parameter') {
+    return issue;
+  }
 
+  // Highest priority: the object parameter was flagged but the real cause is a
+  // behavior parameter holding a behavior TYPE instead of a behavior NAME.
   if (
-    issue.type === 'invalid-parameter' &&
-    typeof issue.parameterValue === 'string' &&
-    (issue.parameterValue.includes('\n') ||
-      issue.parameterValue.includes('\\n'))
+    typeof issue.relatedBehaviorParameterIndex === 'number' &&
+    issue.relatedBehaviorParameterValue
   ) {
     return {
       ...issue,
-      suggestion:
-        'This parameter failed as a GDevelop text/string expression and contains a newline. Use a valid single-line expression such as "Game Over" + NewLine() + "Press Space", or keep the literal on one line inside quotes.',
+      suggestion: `The object parameter (index ${issue.parameterIndex}) is reported invalid because behavior parameter at index ${issue.relatedBehaviorParameterIndex} contains "${issue.relatedBehaviorParameterValue}", which looks like a behavior TYPE. Behavior parameters take the behavior NAME on the object (e.g. "PlatformerObject"), not the type. Use inspect_object_properties to see the object's behavior names, or list_available_behaviors for the default name.`,
     };
   }
 
-  if (
-    issue.type === 'invalid-parameter' &&
-    typeof issue.parameterValue === 'string' &&
-    issue.parameterValue &&
-    !issue.parameterValue.trim().startsWith('"')
-  ) {
+  const parameterType =
+    typeof issue.parameterType === 'string' ? issue.parameterType : null;
+  const shape = parameterType
+    ? classifyParameterValueShape(parameterType)
+    : null;
+  const value =
+    typeof issue.parameterValue === 'string' ? issue.parameterValue : '';
+  const startsQuoted = value.trim().startsWith('"');
+
+  // Type-aware suggestions: only recommend quoting for string-expression types,
+  // and recommend a bare identifier/number for object/behavior/variable/number
+  // types. This stops the old "wrap in quotes" misfire on object names, variable
+  // names, and already-valid color literals.
+  if (shape === 'quoted-string') {
+    if (value.includes('\n') || value.includes('\\n')) {
+      return {
+        ...issue,
+        suggestion: `Parameter ${issue.parameterIndex} is a string expression (${parameterType}) but contains a newline. Use a single-line expression such as "Game Over" + NewLine() + "Press Space".`,
+      };
+    }
+    if (!startsQuoted && value) {
+      return {
+        ...issue,
+        suggestion: `Parameter ${issue.parameterIndex} is a string expression (${parameterType}); wrap the literal in double quotes. Try ${JSON.stringify(
+          value
+        )}.`,
+      };
+    }
     return {
       ...issue,
-      suggestion: `If this parameter expects a text/string expression, wrap literal text in quotes. For this value, try ${JSON.stringify(
-        issue.parameterValue
+      suggestion: `Parameter ${issue.parameterIndex} is a string expression (${parameterType}). ${describeParameterLiteralSyntax(
+        parameterType
       )}.`,
     };
   }
 
-  if (
-    issue.type === 'invalid-parameter' &&
-    typeof issue.parameterIndex === 'number'
-  ) {
+  if (shape === 'number') {
     return {
       ...issue,
-      suggestion:
-        'Check the exact parameter type/order with gdevelop_get_instruction_metadata, then rewrite this parameter as a valid GDevelop expression for that type.',
+      suggestion: `Parameter ${issue.parameterIndex} is a number expression (${parameterType}); pass a bare number or numeric expression WITHOUT quotes, e.g. 100 or Variable(Score). Do not wrap it in quotes.`,
     };
   }
 
-  return issue;
+  if (shape === 'object') {
+    return {
+      ...issue,
+      suggestion: `Parameter ${issue.parameterIndex} expects a bare object NAME (no quotes). Check the object exists in this scene or globally.`,
+    };
+  }
+
+  if (shape === 'behavior') {
+    return {
+      ...issue,
+      suggestion: `Parameter ${issue.parameterIndex} expects a behavior NAME (the instance name on the object, e.g. "PlatformerObject"), not the behavior type, and without quotes. Use inspect_object_properties to see the names.`,
+    };
+  }
+
+  if (shape === 'variable') {
+    return {
+      ...issue,
+      suggestion: `Parameter ${issue.parameterIndex} expects a bare variable reference (no quotes). Scene/global variables are referenced by name (e.g. Score); object variables as Object.VariableName.`,
+    };
+  }
+
+  if (parameterType) {
+    return {
+      ...issue,
+      suggestion: `Parameter ${issue.parameterIndex} (${parameterType}): ${describeParameterLiteralSyntax(
+        parameterType
+      )}.`,
+    };
+  }
+
+  // Fallback when parameterType is unavailable: keep the legacy guidance but
+  // hedge it so it does not assert that quoting is the fix.
+  if (value && !startsQuoted) {
+    return {
+      ...issue,
+      suggestion: `If this parameter expects a text/string expression, wrap the literal in quotes (e.g. ${JSON.stringify(
+        value
+      )}). If it expects an object/behavior/variable name or a number, leave it unquoted. Confirm with gdevelop_get_instruction_metadata.`,
+    };
+  }
+  return {
+    ...issue,
+    suggestion:
+      'Check the exact parameter type/order with gdevelop_get_instruction_metadata, then rewrite this parameter for that type.',
+  };
 };
 
 const summarizeIssues = (issues: Array<Object>): Object => {
@@ -1005,6 +1489,7 @@ const summarizeIssues = (issues: Array<Object>): Object => {
         count: 0,
         instructionType: issue.instructionType,
         parameterIndex: issue.parameterIndex,
+        parameterType: issue.parameterType,
         parameterValue: issue.parameterValue,
         resourceName: issue.resourceName,
         suggestion: issue.suggestion,
@@ -1030,12 +1515,14 @@ export const validateEventsJson = ({
   eventsJson,
   allowJavaScriptEvents,
   summaryOnly,
+  dedupeErrors,
 }: {|
   project: gdProject,
   sceneName?: ?string,
   eventsJson?: ?string,
   allowJavaScriptEvents?: boolean,
   summaryOnly?: boolean,
+  dedupeErrors?: boolean,
 |}): Object => {
   if (!eventsJson) {
     return {
@@ -1094,13 +1581,29 @@ export const validateEventsJson = ({
       issue => issue.severity === 'error'
     );
 
-    const result = {
-      valid: errors.length === 0,
-      eventsCount: eventsList.getEventsCount(),
-      errors,
-      issues: issuesWithSuggestions,
-      issueSummary: summarizeIssues(issuesWithSuggestions),
-    };
+    const issueSummary = summarizeIssues(issuesWithSuggestions);
+
+    // When dedupeErrors is set, return only the deduped rootCauses instead of one
+    // entry per occurrence. The same 15 raw errors that boil down to 3 causes are
+    // returned as 3 grouped entries (each with a count), drastically shrinking the
+    // payload while keeping every distinct, actionable problem.
+    const result = dedupeErrors
+      ? {
+          valid: errors.length === 0,
+          eventsCount: eventsList.getEventsCount(),
+          deduped: true,
+          errors: issueSummary.rootCauses.filter(
+            cause => cause.type !== 'extra-parameters'
+          ),
+          issueSummary,
+        }
+      : {
+          valid: errors.length === 0,
+          eventsCount: eventsList.getEventsCount(),
+          errors,
+          issues: issuesWithSuggestions,
+          issueSummary,
+        };
     if (summaryOnly) return result;
 
     return {
@@ -1124,12 +1627,14 @@ export const validateEventsJsonFile = ({
   eventsJsonFile,
   allowJavaScriptEvents,
   summaryOnly,
+  dedupeErrors,
 }: {|
   project: gdProject,
   sceneName?: ?string,
   eventsJsonFile?: ?string,
   allowJavaScriptEvents?: boolean,
   summaryOnly?: boolean,
+  dedupeErrors?: boolean,
 |}): Object => {
   if (!eventsJsonFile) {
     return {
@@ -1143,20 +1648,28 @@ export const validateEventsJsonFile = ({
       errors: ['Filesystem access is not available.'],
     };
   }
-  if (!fs.existsSync(eventsJsonFile)) {
+  const resolvedFile = resolveProjectRelativeFile(project, eventsJsonFile);
+  if (!fs.existsSync(resolvedFile)) {
     return {
       valid: false,
-      errors: [`Events JSON file not found: "${eventsJsonFile}".`],
+      errors: [
+        `Events JSON file not found: "${eventsJsonFile}"${
+          resolvedFile !== eventsJsonFile
+            ? ` (resolved to "${resolvedFile}")`
+            : ''
+        }.`,
+      ],
     };
   }
 
-  const eventsJson = fs.readFileSync(eventsJsonFile, 'utf8');
+  const eventsJson = fs.readFileSync(resolvedFile, 'utf8');
   const result = validateEventsJson({
     project,
     sceneName,
     eventsJson,
     allowJavaScriptEvents,
     summaryOnly,
+    dedupeErrors,
   });
 
   return {

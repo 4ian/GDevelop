@@ -10,6 +10,20 @@ import optionalRequire from '../Utils/OptionalRequire';
 
 const gd: libGDevelop = global.gd;
 const fs = optionalRequire('fs');
+const nodePath = optionalRequire('path');
+
+// Resolve a possibly-relative file path against the opened project's folder, so
+// file-based tools accept the same relative paths resource tools accept.
+const resolveProjectRelativeFile = (
+  project: gdProject,
+  file: string
+): string => {
+  if (!file || !nodePath) return file;
+  if (nodePath.isAbsolute(file)) return file;
+  const projectFile = project.getProjectFile && project.getProjectFile();
+  if (!projectFile) return file;
+  return nodePath.resolve(nodePath.dirname(projectFile), file);
+};
 
 type EventToolCallbacks = {|
   onSceneEventsModifiedOutsideEditor?: Function,
@@ -744,11 +758,21 @@ export const replaceSceneEventsFromFile = (
   if (!fs) {
     throw new Error('Filesystem access is not available.');
   }
-  if (!fs.existsSync(eventsJsonFile)) {
-    throw new Error(`Events JSON file not found: "${eventsJsonFile}".`);
+  const resolvedEventsJsonFile = resolveProjectRelativeFile(
+    project,
+    eventsJsonFile
+  );
+  if (!fs.existsSync(resolvedEventsJsonFile)) {
+    throw new Error(
+      `Events JSON file not found: "${eventsJsonFile}"${
+        resolvedEventsJsonFile !== eventsJsonFile
+          ? ` (resolved to "${resolvedEventsJsonFile}")`
+          : ''
+      }.`
+    );
   }
 
-  const eventsJson = fs.readFileSync(eventsJsonFile, 'utf8');
+  const eventsJson = fs.readFileSync(resolvedEventsJsonFile, 'utf8');
   let parsedEvents;
   try {
     parsedEvents = JSON.parse(eventsJson);

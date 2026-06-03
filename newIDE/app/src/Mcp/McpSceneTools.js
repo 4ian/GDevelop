@@ -5,6 +5,10 @@ import {
   unserializeFromJSObject,
 } from '../Utils/Serializer';
 import optionalRequire from '../Utils/OptionalRequire';
+import {
+  enumerateBehaviorsMetadata,
+  isBehaviorDefaultCapability,
+} from '../BehaviorsEditor/EnumerateBehaviorsMetadata';
 
 const gd: libGDevelop = global.gd;
 const fs = optionalRequire('fs');
@@ -422,6 +426,70 @@ const collectSpriteFrameReferences = (
   return references;
 };
 
+// Detect Sprite frames whose collision mask is contradictory: the frame claims
+// to use a custom collision mask (hasCustomCollisionMask === true) but provides
+// an empty polygon list. At runtime this is an empty collision region, so all
+// collision checks against that object silently fail (bullets pass through,
+// platformer floors are non-solid, etc.). This is the "looks fine, isn't
+// playable" failure mode. The healthy alternatives are either
+// hasCustomCollisionMask:false (full image / bounding box mask) or a non-empty
+// customCollisionMask. See applySpriteCollisionMask for how new frames default.
+const collectSuspiciousCollisionMasks = (
+  serializedProject: Object
+): Array<Object> => {
+  const suspicious = [];
+  const inspectObject = (object, scope) => {
+    if (
+      !object ||
+      object.type !== 'Sprite' ||
+      !Array.isArray(object.animations)
+    ) {
+      return;
+    }
+
+    object.animations.forEach((animation, animationIndex) => {
+      const directions = Array.isArray(animation.directions)
+        ? animation.directions
+        : [];
+      directions.forEach((direction, directionIndex) => {
+        const sprites = Array.isArray(direction.sprites)
+          ? direction.sprites
+          : [];
+        sprites.forEach((sprite, frameIndex) => {
+          if (!sprite || sprite.hasCustomCollisionMask !== true) return;
+          const mask = sprite.customCollisionMask;
+          const isEmpty = !Array.isArray(mask) || mask.length === 0;
+          if (!isEmpty) return;
+          suspicious.push({
+            scope,
+            objectName: object.name,
+            animationName:
+              typeof animation.name === 'string' ? animation.name : undefined,
+            animationIndex,
+            directionIndex,
+            frameIndex,
+            issue:
+              'hasCustomCollisionMask is true but customCollisionMask is empty: ' +
+              'the collision region is empty, so collisions against this object never trigger. ' +
+              'Set fullImageCollisionMask to use the bounding box, or provide a non-empty collisionMask.',
+          });
+        });
+      });
+    });
+  };
+
+  (serializedProject.objects || []).forEach(object =>
+    inspectObject(object, 'global')
+  );
+  (serializedProject.layouts || []).forEach(scene => {
+    (scene.objects || []).forEach(object =>
+      inspectObject(object, `scene:${scene.name || ''}`)
+    );
+  });
+
+  return suspicious;
+};
+
 const getSerializedInstructionType = (instruction: any): string =>
   instruction && instruction.type && typeof instruction.type.value === 'string'
     ? instruction.type.value
@@ -623,6 +691,9 @@ export const inspectProjectResources = (
   const missingSpriteFrameReferences = spriteFrameReferences.filter(
     reference => !reference.exists
   );
+  const suspiciousCollisionMasks = collectSuspiciousCollisionMasks(
+    serializedProject
+  );
   const summary = {
     totalResources: resourceNames.length,
     invalidResourcesCount: invalidResources.length,
@@ -630,6 +701,7 @@ export const inspectProjectResources = (
     spriteFrameReferencesCount: spriteFrameReferences.length,
     eventResourceReferencesCount: eventResourceReferences.length,
     missingSpriteFrameReferencesCount: missingSpriteFrameReferences.length,
+    suspiciousCollisionMasksCount: suspiciousCollisionMasks.length,
     stringReferencesCount: stringReferences.length,
   };
 
@@ -642,6 +714,7 @@ export const inspectProjectResources = (
       invalidResources,
       unusedResources: uselessResourceNames,
       missingSpriteFrameReferences,
+      suspiciousCollisionMasks,
       eventResourceReferences,
     };
   }
@@ -656,6 +729,8 @@ export const inspectProjectResources = (
     unusedResources: uselessResourceNames,
     spriteFrameReferences,
     eventResourceReferences,
+    missingSpriteFrameReferences,
+    suspiciousCollisionMasks,
     stringReferences,
     includeSerializedProject: !!(args && args.include_serialized_project),
     serializedProject:
@@ -721,7 +796,19 @@ const applySpriteCollisionMask = (sprite: gdSprite, frame: Object) => {
     return;
   }
 
-  if (!Array.isArray(frame.collisionMask)) return;
+  // When no explicit custom collision mask is provided, default to the full
+  // image (bounding box) collision mask, like the GDevelop editor does for new
+  // sprites. A freshly-constructed gd.Sprite has fullImageCollisionMask=false
+  // with an empty customCollisionMask; leaving it untouched would serialize to
+  // hasCustomCollisionMask:true with an empty mask, i.e. an empty collision
+  // region, so collisions would never trigger.
+  if (
+    !Array.isArray(frame.collisionMask) ||
+    frame.collisionMask.length === 0
+  ) {
+    sprite.setFullImageCollisionMask(true);
+    return;
+  }
 
   sprite.setFullImageCollisionMask(false);
   sprite.getCustomCollisionMask().clear();
@@ -899,6 +986,34 @@ export const setSpriteAnimations = (
       }
 
       const direction = animation.getDirection(directionIndex);
+
+      // Loop and frame timing are core animation properties. Accept them on the
+      // direction or, as a convenience, on the animation (applied to every
+      // direction). Without an explicit timeBetweenFrames the engine default can
+      // make multi-frame animations play oddly, and a non-looping animation is
+      // required for HasAnimationEnded to ever become true.
+      const loopValue =
+        typeof directionData.loop === 'boolean'
+          ? directionData.loop
+          : typeof directionData.looping === 'boolean'
+          ? directionData.looping
+          : typeof animationData.loop === 'boolean'
+          ? animationData.loop
+          : typeof animationData.looping === 'boolean'
+          ? animationData.looping
+          : null;
+      if (loopValue !== null) {
+        direction.setLoop(loopValue);
+      }
+      const timeBetweenFramesValue = getFiniteNumber(
+        directionData.timeBetweenFrames !== undefined
+          ? directionData.timeBetweenFrames
+          : animationData.timeBetweenFrames
+      );
+      if (timeBetweenFramesValue !== null && timeBetweenFramesValue >= 0) {
+        direction.setTimeBetweenFrames(timeBetweenFramesValue);
+      }
+
       frames.forEach((frameData, frameIndex) => {
         if (!frameData || typeof frameData !== 'object') {
           animation.delete();
@@ -1948,6 +2063,8 @@ export const inspectProjectCleanup = (
       possiblyUnusedSceneObjectsCount: possiblyUnusedSceneObjects.length,
       invalidResourcesCount: resourceAudit.summary.invalidResourcesCount,
       unusedResourcesCount: resourceAudit.summary.unusedResourcesCount,
+      suspiciousCollisionMasksCount:
+        resourceAudit.summary.suspiciousCollisionMasksCount,
     },
     scenes:
       args && args.include_scene_summaries === false
@@ -1958,6 +2075,116 @@ export const inspectProjectCleanup = (
     invalidResources: resourceAudit.invalidResources,
     unusedResources: resourceAudit.unusedResources,
     missingSpriteFrameReferences: resourceAudit.missingSpriteFrameReferences,
+    suspiciousCollisionMasks: resourceAudit.suspiciousCollisionMasks,
+  };
+};
+
+// List the behavior types available in the project, with the exact
+// `behavior_type` string to pass to add_behavior and the default behavior name.
+// When `object_name` (+ optional `scene_name`) is given, only behaviors
+// compatible with that object's type are returned (a behavior is compatible
+// when its required object type is empty or matches the object's type).
+export const listAvailableBehaviors = (
+  project: gdProject,
+  args: Object = {}
+): Object => {
+  const platform = project.getCurrentPlatform();
+  const searchText = getOptionalString(args, 'search') || '';
+  const objectName = getOptionalString(args, 'object_name');
+  const sceneName = getOptionalString(args, 'scene_name');
+  const includeHidden = !!(args && args.include_hidden === true);
+
+  let filterObjectType: string | null = null;
+  let resolvedObjectName: string | null = null;
+  if (objectName) {
+    let object: gdObject | null = null;
+    if (sceneName) {
+      const scene = getScene(project, sceneName);
+      if (scene.getObjects().hasObjectNamed(objectName)) {
+        object = scene.getObjects().getObject(objectName);
+      }
+    }
+    if (!object && project.getObjects().hasObjectNamed(objectName)) {
+      object = project.getObjects().getObject(objectName);
+    }
+    // Fall back to searching all scenes so callers can pass just the object
+    // name without knowing which scene owns it.
+    if (!object) {
+      for (let i = 0; i < project.getLayoutsCount(); ++i) {
+        const scene = project.getLayoutAt(i);
+        if (scene.getObjects().hasObjectNamed(objectName)) {
+          object = scene.getObjects().getObject(objectName);
+          break;
+        }
+      }
+    }
+    if (!object) {
+      throw new Error(
+        `Object not found: "${objectName}"${
+          sceneName ? ` in scene "${sceneName}"` : ''
+        } nor globally nor in any scene.`
+      );
+    }
+    resolvedObjectName = objectName;
+    filterObjectType = object.getType();
+  }
+
+  const normalizedSearch = searchText.toLowerCase().trim();
+  const searchTokens = normalizedSearch
+    ? normalizedSearch.split(/\s+/).filter(Boolean)
+    : [];
+
+  const all = enumerateBehaviorsMetadata(platform, project, null);
+  const behaviors = all
+    .filter(metadata => {
+      if (!includeHidden && isBehaviorDefaultCapability(metadata.behaviorMetadata)) {
+        // Default capabilities (e.g. text/effect/opacity capabilities) cannot
+        // be added manually, so hide them unless explicitly requested.
+        return false;
+      }
+      if (
+        filterObjectType !== null &&
+        metadata.objectType &&
+        metadata.objectType !== filterObjectType
+      ) {
+        return false;
+      }
+      if (searchTokens.length) {
+        const haystack = [
+          metadata.type,
+          metadata.fullName,
+          metadata.description,
+          metadata.category,
+          (metadata.tags || []).join(' '),
+        ]
+          .filter(Boolean)
+          .join(' ')
+          .toLowerCase();
+        if (!searchTokens.every(token => haystack.includes(token))) {
+          return false;
+        }
+      }
+      return true;
+    })
+    .map(metadata => ({
+      // The exact value to pass to add_behavior as behavior_type.
+      behaviorType: metadata.type,
+      // The default behavior_name add_behavior uses if you omit behavior_name.
+      // This is the name you reference in instruction behavior parameters.
+      defaultName: metadata.defaultName,
+      fullName: metadata.fullName,
+      description: metadata.description,
+      // Empty string means the behavior works on any object type.
+      requiredObjectType: metadata.objectType || '',
+      category: metadata.category || undefined,
+    }));
+
+  return {
+    success: true,
+    objectName: resolvedObjectName,
+    objectType: filterObjectType,
+    behaviorsCount: behaviors.length,
+    behaviors,
   };
 };
 
@@ -1967,10 +2194,52 @@ export const readSerializedScene = (
 ): Object => {
   const sceneName = getRequiredString(args, 'scene_name');
   const scene = getScene(project, sceneName);
+  const serializedScene = serializeToJSObject(scene);
+
+  // Granular reads: when object_name(s) are given, return only those objects'
+  // serialized definitions (and optionally their initial instances) instead of
+  // the whole 75KB+ scene. This avoids dumping the entire scene to a file just
+  // to inspect one object's animation/behavior config.
+  const objectNamesArg =
+    (args && args.object_names) ||
+    (args && args.object_name ? [args.object_name] : null);
+  if (Array.isArray(objectNamesArg) && objectNamesArg.length) {
+    const wanted = new Set(objectNamesArg.map(name => String(name)));
+    const sceneObjects = Array.isArray(serializedScene.objects)
+      ? serializedScene.objects.filter(object => wanted.has(object.name))
+      : [];
+    const globalObjects = serializeToJSObject(project.getObjects())
+      .objects || [];
+    const matchedGlobalObjects = Array.isArray(globalObjects)
+      ? globalObjects.filter(object => wanted.has(object.name))
+      : [];
+    const includeInstances = !(args && args.include_instances === false);
+    const instances =
+      includeInstances && Array.isArray(serializedScene.instances)
+        ? serializedScene.instances.filter(instance =>
+            wanted.has(instance.name)
+          )
+        : undefined;
+    const foundNames = new Set([
+      ...sceneObjects.map(object => object.name),
+      ...matchedGlobalObjects.map(object => object.name),
+    ]);
+    const notFound = [...wanted].filter(name => !foundNames.has(name));
+    return {
+      success: true,
+      sceneName,
+      filteredByObjectNames: [...wanted],
+      objects: sceneObjects,
+      globalObjects: matchedGlobalObjects,
+      instances,
+      notFound: notFound.length ? notFound : undefined,
+    };
+  }
+
   return {
     success: true,
     sceneName,
-    serializedScene: serializeToJSObject(scene),
+    serializedScene,
   };
 };
 
@@ -2283,10 +2552,20 @@ export const applyValidatedScenePatch = (
   const patchFile = getOptionalString(args || {}, 'patch_file');
   if (!patch && patchFile) {
     if (!fs) throw new Error('Filesystem access is not available.');
-    if (!fs.existsSync(patchFile)) {
-      throw new Error(`Patch file not found: "${patchFile}".`);
+    const resolvedPatchFile =
+      path && !path.isAbsolute(patchFile) && project.getProjectFile()
+        ? path.resolve(path.dirname(project.getProjectFile()), patchFile)
+        : patchFile;
+    if (!fs.existsSync(resolvedPatchFile)) {
+      throw new Error(
+        `Patch file not found: "${patchFile}"${
+          resolvedPatchFile !== patchFile
+            ? ` (resolved to "${resolvedPatchFile}")`
+            : ''
+        }.`
+      );
     }
-    const parsedPatch = JSON.parse(fs.readFileSync(patchFile, 'utf8'));
+    const parsedPatch = JSON.parse(fs.readFileSync(resolvedPatchFile, 'utf8'));
     if (!Array.isArray(parsedPatch)) {
       throw new Error('patch_file must contain a JSON patch array.');
     }

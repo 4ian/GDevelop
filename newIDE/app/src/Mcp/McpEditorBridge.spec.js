@@ -1,5 +1,6 @@
 // @flow
 import { createMcpEditorBridge } from './McpEditorBridge';
+import { autoQuoteEventParameters } from './McpEventKnowledge';
 import {
   serializeToJSObject,
   unserializeFromJSObject,
@@ -1555,6 +1556,12 @@ describe('McpEditorBridge', () => {
       expect(frame.getImageName()).toBe('Enemy.png');
       expect(frame.getOrigin().getX()).toBe(4);
       expect(frame.getCenter().getY()).toBe(20);
+      // Without an explicit collision mask, the frame must default to the full
+      // image (bounding box) mask. Otherwise it would serialize to
+      // hasCustomCollisionMask:true with an empty mask, making collisions never
+      // trigger.
+      expect(frame.isFullImageCollisionMask()).toBe(true);
+      expect(frame.getCustomCollisionMask().size()).toBe(0);
       expect(layout.getInitialInstances().getInstancesCount()).toBe(1);
 
       const textResponse = await bridge.handleRendererMcpRequest({
@@ -2036,5 +2043,396 @@ describe('McpEditorBridge', () => {
     expect(response.contents[0].uri).toBe('gdevelop://editor/state');
     expect(response.contents[0].mimeType).toBe('application/json');
     expect(response.contents[0].text).toContain('"hasProject": false');
+  });
+
+  it('flags suspicious empty custom collision masks in resource and cleanup audits', async () => {
+    // $FlowFixMe[invalid-constructor]
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    const layout = project.insertNewLayout('Level1', 0);
+    const spriteObject = layout
+      .getObjects()
+      .insertNewObject(project, 'Sprite', 'BrokenCollision', 0);
+    const configuration = gd.asSpriteConfiguration(
+      spriteObject.getConfiguration()
+    );
+    const animation = new gd.Animation();
+    animation.setDirectionsCount(1);
+    const sprite = new gd.Sprite();
+    sprite.setImageName('Whatever.png');
+    // Reproduce the broken state: custom collision mask enabled but empty.
+    sprite.setFullImageCollisionMask(false);
+    sprite.getCustomCollisionMask().clear();
+    animation.getDirection(0).addSprite(sprite);
+    sprite.delete();
+    configuration.getAnimations().addAnimation(animation);
+    animation.delete();
+
+    try {
+      const bridge = makeBridge({ getProject: () => project });
+
+      const resourcesResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: { name: 'inspect_project_resources', arguments: {} },
+      });
+      const resources = JSON.parse(resourcesResponse.content[0].text);
+      expect(resources.summary.suspiciousCollisionMasksCount).toBe(1);
+      expect(resources.suspiciousCollisionMasks).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ objectName: 'BrokenCollision' }),
+        ])
+      );
+
+      const cleanupResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: { name: 'inspect_project_cleanup', arguments: {} },
+      });
+      const cleanup = JSON.parse(cleanupResponse.content[0].text);
+      expect(cleanup.summary.suspiciousCollisionMasksCount).toBe(1);
+      expect(cleanup.suspiciousCollisionMasks).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ objectName: 'BrokenCollision' }),
+        ])
+      );
+    } finally {
+      project.delete();
+    }
+  });
+
+  it('lists available behaviors with exact behavior types', async () => {
+    // $FlowFixMe[invalid-constructor]
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    const layout = project.insertNewLayout('Level1', 0);
+    layout.getObjects().insertNewObject(project, 'Sprite', 'Player', 0);
+
+    try {
+      const bridge = makeBridge({ getProject: () => project });
+
+      const response = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'list_available_behaviors',
+          arguments: { object_name: 'Player', scene_name: 'Level1' },
+        },
+      });
+      const result = JSON.parse(response.content[0].text);
+      expect(response.isError).not.toBe(true);
+      expect(result.objectType).toBe('Sprite');
+      expect(result.behaviorsCount).toBeGreaterThan(0);
+      // Every returned behavior must expose the exact behaviorType + defaultName.
+      result.behaviors.forEach(behavior => {
+        expect(typeof behavior.behaviorType).toBe('string');
+        expect(behavior.behaviorType.length).toBeGreaterThan(0);
+        expect(typeof behavior.defaultName).toBe('string');
+      });
+      // The platformer behavior should be among compatible behaviors.
+      expect(
+        result.behaviors.some(
+          behavior =>
+            behavior.behaviorType ===
+            'PlatformBehavior::PlatformerObjectBehavior'
+        )
+      ).toBe(true);
+    } finally {
+      project.delete();
+    }
+  });
+
+  it('matches multi-word and aliased instruction metadata queries', async () => {
+    // $FlowFixMe[invalid-constructor]
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    project.insertNewLayout('Level1', 0);
+
+    try {
+      const bridge = makeBridge({ getProject: () => project });
+
+      const search = async query => {
+        const response = await bridge.handleRendererMcpRequest({
+          method: 'tools/call',
+          params: {
+            name: 'gdevelop_search_instruction_metadata',
+            arguments: { query, compact: true },
+          },
+        });
+        return JSON.parse(response.content[0].text);
+      };
+
+      // Multi-word query that used to return [] with contiguous-substring match.
+      const playSound = await search('play sound effect');
+      expect(playSound.results.length).toBeGreaterThan(0);
+      expect(
+        playSound.results.some(result => /sound/i.test(result.type))
+      ).toBe(true);
+
+      // Aliased intent: "key pressed keyboard".
+      const keyPressed = await search('key pressed keyboard');
+      expect(keyPressed.results.length).toBeGreaterThan(0);
+
+      // Compact mode keeps literalSyntax hints on parameters.
+      const withParams = playSound.results.find(
+        result => result.parameters && result.parameters.length
+      );
+      if (withParams) {
+        expect(withParams.parameters[0]).toHaveProperty('literalSyntax');
+      }
+    } finally {
+      project.delete();
+    }
+  });
+
+  it('inspects a running preview through the debugger server', async () => {
+    // A mock preview debugger server that replies to a refresh with a dump.
+    const dumpPayload = {
+      _paused: false,
+      _variables: {
+        _variables: {
+          Coins: { _value: 7, _str: '', _stringDirty: true, _isStructure: false },
+        },
+      },
+      _sceneStack: {
+        _stack: [
+          {
+            _name: 'Level1',
+            _isLoaded: true,
+            // Live instances live in `_instances` (Hashtable), keyed by object
+            // name; `_objects` is the static template data and must NOT be the
+            // source of counts.
+            _instances: {
+              items: {
+                Player: [{}],
+                Enemy: [{}, {}],
+              },
+            },
+            _objects: {
+              items: {
+                Player: { name: 'Player' },
+                Enemy: { name: 'Enemy' },
+              },
+            },
+            _variables: {
+              _variables: {
+                Score: {
+                  _value: 42,
+                  _str: '',
+                  _stringDirty: true,
+                  _isStructure: false,
+                },
+              },
+            },
+          },
+        ],
+      },
+    };
+
+    let callbacks = null;
+    const previewDebuggerServer = {
+      getServerState: () => 'started',
+      getExistingPreviewDebuggerIds: () => ['preview-ws-0', 'preview-ws-1'],
+      getExistingDebuggerIds: () => ['preview-ws-0', 'preview-ws-1'],
+      registerCallbacks: registered => {
+        callbacks = registered;
+        return () => {
+          callbacks = null;
+        };
+      },
+      sendMessage: (id, message) => {
+        if (message.command === 'refresh' && callbacks) {
+          // Simulate the running game replying asynchronously with a dump.
+          setTimeout(() => {
+            if (callbacks)
+              callbacks.onHandleParsedMessage({
+                id,
+                parsedMessage: { command: 'dump', payload: dumpPayload },
+              });
+          }, 5);
+        }
+      },
+    };
+
+    const bridge = makeBridge({
+      getPreviewDebuggerServer: () => previewDebuggerServer,
+    });
+
+    const response = await bridge.handleRendererMcpRequest({
+      method: 'tools/call',
+      params: {
+        name: 'gdevelop_inspect_running_preview',
+        arguments: { timeout_ms: 1000 },
+      },
+    });
+    const result = JSON.parse(response.content[0].text);
+    expect(response.isError).not.toBe(true);
+    expect(result.running).toBe(true);
+    // Defaults to the latest (last) preview, not the stale first one.
+    expect(result.debuggerId).toBe('preview-ws-1');
+    expect(result.latestDebuggerId).toBe('preview-ws-1');
+    expect(result.inspectedLatest).toBe(true);
+    expect(result.runtime.available).toBe(true);
+    expect(result.runtime.scenes[0].name).toBe('Level1');
+    expect(result.runtime.scenes[0].objectInstanceCounts).toEqual(
+      expect.objectContaining({ Player: 1, Enemy: 2 })
+    );
+    expect(result.runtime.scenes[0].totalInstances).toBe(3);
+    expect(result.runtime.scenes[0].sceneVariables.Score).toBe(42);
+    expect(result.runtime.globalVariables.Coins).toBe(7);
+  });
+
+  it('reports when no preview is running for runtime inspection', async () => {
+    const bridge = makeBridge({
+      getPreviewDebuggerServer: () => ({
+        getServerState: () => 'stopped',
+        getExistingPreviewDebuggerIds: () => [],
+        getExistingDebuggerIds: () => [],
+        registerCallbacks: () => () => {},
+        sendMessage: () => {},
+      }),
+    });
+
+    const response = await bridge.handleRendererMcpRequest({
+      method: 'tools/call',
+      params: {
+        name: 'gdevelop_inspect_running_preview',
+        arguments: {},
+      },
+    });
+    const result = JSON.parse(response.content[0].text);
+    expect(result.running).toBe(false);
+    expect(result.error).toContain('LAUNCH_NEW_PREVIEW');
+  });
+
+  it('captures a preview screenshot as a base64 data URL', async () => {
+    // 1x1 transparent PNG.
+    const onePixelPng =
+      'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+M8AAAMCAQDLuRBYAAAAAElFTkSuQmCC';
+    const previewDebuggerServer = {
+      getServerState: () => 'started',
+      getExistingPreviewDebuggerIds: () => ['preview-ws-0'],
+      getExistingDebuggerIds: () => ['preview-ws-0'],
+      registerCallbacks: () => () => {},
+      sendMessage: () => {},
+      sendMessageWithResponse: message => {
+        expect(message.command).toBe('captureScreenshot');
+        return Promise.resolve({
+          command: 'screenshot',
+          payload: { dataUrl: onePixelPng, width: 1, height: 1, error: null },
+        });
+      },
+    };
+
+    const bridge = makeBridge({
+      getPreviewDebuggerServer: () => previewDebuggerServer,
+    });
+
+    const response = await bridge.handleRendererMcpRequest({
+      method: 'tools/call',
+      params: { name: 'capture_preview_screenshot', arguments: {} },
+    });
+    const result = JSON.parse(response.content[0].text);
+    expect(response.isError).not.toBe(true);
+    expect(result.success).toBe(true);
+    expect(result.width).toBe(1);
+    expect(result.height).toBe(1);
+    expect(result.dataUrl).toBe(onePixelPng);
+  });
+
+  it('writes a preview screenshot to a file when file_path is given', async () => {
+    const onePixelPng =
+      'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+M8AAAMCAQDLuRBYAAAAAElFTkSuQmCC';
+    const previewDebuggerServer = {
+      getServerState: () => 'started',
+      getExistingPreviewDebuggerIds: () => ['preview-ws-0'],
+      getExistingDebuggerIds: () => ['preview-ws-0'],
+      registerCallbacks: () => () => {},
+      sendMessage: () => {},
+      sendMessageWithResponse: () =>
+        Promise.resolve({
+          command: 'screenshot',
+          payload: { dataUrl: onePixelPng, width: 1, height: 1, error: null },
+        }),
+    };
+    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gdevelop-shot-'));
+    const filePath = path.join(tempDir, 'frame.png');
+
+    try {
+      const bridge = makeBridge({
+        getPreviewDebuggerServer: () => previewDebuggerServer,
+      });
+
+      const response = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'capture_preview_screenshot',
+          arguments: { file_path: filePath },
+        },
+      });
+      const result = JSON.parse(response.content[0].text);
+      expect(result.success).toBe(true);
+      expect(result.filePath).toBe(filePath);
+      expect(fs.existsSync(filePath)).toBe(true);
+      expect(fs.statSync(filePath).size).toBeGreaterThan(0);
+    } finally {
+      fs.rmSync(tempDir, { recursive: true, force: true });
+    }
+  });
+
+  it('reports when no preview is running for a screenshot', async () => {
+    const bridge = makeBridge({
+      getPreviewDebuggerServer: () => ({
+        getServerState: () => 'stopped',
+        getExistingPreviewDebuggerIds: () => [],
+        getExistingDebuggerIds: () => [],
+        sendMessageWithResponse: () => Promise.resolve({}),
+      }),
+    });
+
+    const response = await bridge.handleRendererMcpRequest({
+      method: 'tools/call',
+      params: { name: 'capture_preview_screenshot', arguments: {} },
+    });
+    const result = JSON.parse(response.content[0].text);
+    expect(result.success).toBe(false);
+    expect(result.error).toContain('LAUNCH_NEW_PREVIEW');
+  });
+
+  it('auto-quotes bare identifier-like string parameters', () => {
+    // $FlowFixMe[invalid-constructor]
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    try {
+      // ResetTimer (builtin action) parameter 1 is a timer name (identifier),
+      // which must be a quoted string expression. A bare value should be wrapped.
+      const events = [
+        {
+          type: 'BuiltinCommonInstructions::Standard',
+          conditions: [],
+          actions: [
+            {
+              type: { value: 'ResetTimer' },
+              parameters: ['', 'GameTimer'],
+            },
+          ],
+        },
+      ];
+      const changed = autoQuoteEventParameters(project, events);
+      expect(changed).toBeGreaterThanOrEqual(1);
+      expect(events[0].actions[0].parameters[1]).toBe('"GameTimer"');
+
+      // An already-quoted value and an expression are left untouched.
+      const events2 = [
+        {
+          type: 'BuiltinCommonInstructions::Standard',
+          conditions: [],
+          actions: [
+            {
+              type: { value: 'ResetTimer' },
+              parameters: ['', '"AlreadyQuoted"'],
+            },
+          ],
+        },
+      ];
+      const changed2 = autoQuoteEventParameters(project, events2);
+      expect(changed2).toBe(0);
+      expect(events2[0].actions[0].parameters[1]).toBe('"AlreadyQuoted"');
+    } finally {
+      project.delete();
+    }
   });
 });

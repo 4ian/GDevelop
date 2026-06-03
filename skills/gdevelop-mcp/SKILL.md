@@ -64,6 +64,7 @@ Read-only context:
 - `gdevelop_inspect_extension_object`: one events-based object inside an extension.
 - `gdevelop_inspect_extension_property`: one behavior/object property inside an extension.
 - `read_scene_events`: event sheet rendered as text.
+- `read_serialized_scene`: one scene as serialized JSON. Pass `object_name` or `object_names` to return only those objects (and their instances) for a much smaller response, instead of dumping the whole scene to a file.
 - `read_scene_events_serialized`: raw serialized event JSON for a scene, including event types the text renderer cannot describe.
 - `find_scene_events`: locate events by `event_path`, `ai_generated_event_id`, group name, event type, action type, condition type, parameter text, or serialized text.
 - `compare_scene_events_semantics`: compare two serialized event arrays while ignoring visual Group wrappers and stable IDs.
@@ -74,7 +75,8 @@ Read-only context:
 - `inspect_behavior_properties`: behavior details on an object.
 - `list_available_behaviors`: list behavior types available in the project, each with the exact `behaviorType` to pass to `add_behavior` and the `defaultName` used in instruction behavior parameters. Optionally filter by `object_name` (only compatible behaviors) and/or a `search` query. Use this instead of guessing behavior type strings.
 - `inspect_scene_properties_layers_effects`: scene properties, layers, effects.
-- `gdevelop_inspect_running_preview`: inspect a currently running preview to verify runtime behavior. Returns whether a preview is running, its status, captured console/error logs, and a compact runtime snapshot (running scene name, per-object live instance counts, and scene/global variable values). Launch a preview first with `gdevelop_run_command { commandName: "LAUNCH_NEW_PREVIEW" }`. This is the runtime smoke-test channel: use it to confirm a game actually runs and behaves, not just that a preview was launched.
+- `gdevelop_inspect_running_preview`: inspect a currently running preview to verify runtime behavior. Returns whether a preview is running (defaulting to the latest launched preview, reported as `latestDebuggerId`/`inspectedLatest`), its status, captured `logs`, a separate `errors` list (uncaught exceptions, crashes, error-level logs), and a compact `runtime` snapshot (running scene name, per-object live instance counts from live `_instances`, and scene/global variable values). Launch a preview first with `gdevelop_run_command { commandName: "LAUNCH_NEW_PREVIEW" }`. This is the runtime smoke-test channel.
+- `capture_preview_screenshot`: capture a PNG of the current rendered frame from a running preview, to visually verify sprites, layout, and colors. Pass `file_path` to write a PNG (recommended), or omit it to get a base64 data URL. Launch a preview first.
 - `gdevelop_list_commands`: command palette command names.
 - `search_docs` / `read_full_docs`: GDevelop docs when available through the editor integration.
 - `read_game_project_json`: legacy full project JSON reader.
@@ -100,16 +102,16 @@ Write tools:
 - `delete_scene_object`: delete a scene object and clean up references/instances through GDevelop refactoring.
 - `set_object_properties`: set object properties using names from `inspect_object_properties`.
 - `set_text_object_properties`: high-level TextObject setter for text, size, color, bold/italic, alignment, outline, shadow, font, and line height.
-- `create_sprite_object_from_resource`: high-level Sprite authoring helper. It creates or updates a scene Sprite from an existing image resource, binds a default animation frame, and can create one initial instance.
+- `create_sprite_object_from_resource`: high-level Sprite authoring helper. It creates or updates a scene Sprite from an existing image resource, binds a default animation frame, and can create one initial instance. Frames created without an explicit `collisionMask` default to a full-image (bounding box) collision mask so collisions work; pass `fullImageCollisionMask: true` or a non-empty `collisionMask` to override.
 - `create_text_object`: high-level TextObject authoring helper. It creates or updates a scene TextObject with text properties and can create one initial instance.
 - `add_or_update_resource`: add/update a project resource with `name`, `file`, `kind`, and metadata. For audio, use `metadata.preloadAsSound`, `metadata.preloadAsMusic`, `metadata.preloadInCache`, and `metadata.userAdded`.
-- `set_sprite_animations`: replace a Sprite object's animations, directions, frames, origin/center/custom points, and collision masks.
+- `set_sprite_animations`: replace a Sprite object's animations, directions, frames, origin/center/custom points, and collision masks. Set per-animation `loop` (false for one-shot animations like explosions, so HasAnimationEnded can become true) and `timeBetweenFrames` (seconds per frame) — these are first-class fields; do not rely on engine defaults for multi-frame animations.
 - `bulk_edit_scene_assets`: batch import resources, create/replace scene objects, bind Sprite animations, and place 2D instances for one scene.
 - `change_object_property`: edit object properties.
 - `add_behavior` / `remove_behavior` / `change_behavior_property`: behavior management. `add_behavior` requires `behavior_type` (the internal type, e.g. `PlatformBehavior::PlatformerObjectBehavior`); discover valid types with `list_available_behaviors`. `remove_behavior` and `change_behavior_property` take the behavior NAME (the instance name on the object), not the type.
 - `put_2d_instances` / `put_3d_instances`: place, move, update, or erase scene instances.
 - `add_or_edit_variable`: create or modify global, scene, object, behavior variables.
-- `change_scene_properties_layers_effects_groups`: scene properties, layers, effects, object groups.
+- `change_scene_properties_layers_effects_groups`: scene/game properties, layers, effects, object groups. Pass `changed_properties` / `changed_layers` / `changed_layer_effects` / `changed_groups` arrays (see `get_tool_usage_examples`). Create a layer (e.g. a HUD layer) by naming a `layer_name` that does not exist yet in `changed_layers`.
 - `add_scene_events`: direct event sheet edits. Prefer `events_json` or `event_changes`.
 - `generate_events`: alias for `add_scene_events`.
 - `create_group`: create an empty scene event Group.
@@ -205,7 +207,7 @@ Resource parameters are also checked. If an event references an audio/image/etc.
 
 Validation responses include `issueSummary`. Use it before inspecting every repeated issue: `byType` shows counts and `rootCauses` groups repeated errors by likely fix (or pass `dedupe_errors: true` to receive only the grouped causes). Quoting depends on the parameter TYPE, and each error reports its `parameterType` and a type-aware `suggestion`:
 
-- String-expression parameters (`string`, `keyboardKey`, `color`, `sceneName`, `layer`, `file`, `identifier`) take a value WITH embedded double quotes, e.g. `"Space"`, `"220;30;55"`, `"Game Over"`. Note the Scene action's scene name parameter is also a quoted string, e.g. `"Game"`.
+- String-expression parameters (`string`, `keyboardKey`, `color`, `sceneName`, `layer`, `file`, `identifier`) take a value WITH embedded double quotes, e.g. `"Space"`, `"220;30;55"`, `"Game Over"`. Note the Scene action's scene name parameter is also a quoted string, e.g. `"Game"`. As a safety net, `add_scene_events`/`generate_events` auto-wrap a bare literal for the unambiguous identifier-like types (`keyboardKey`, `color`, `sceneName`, `layer`, `identifier`, animation/effect names) — but `string`/`text` are NOT auto-wrapped (they often use `+` concatenation), so quote those yourself.
 - Bare values (no quotes): object names, behavior NAMES (not behavior types), number/numeric expressions (e.g. `100`, `Variable(Score)`), and variable references.
 
 Variable expression syntax (see `gdevelop_get_events_json_examples` → `variableExpressionSyntax`): a scene variable is referenced by bare name (`Variable(Score)` in an expression, or just `Score` in a variable parameter) — not `SceneVariable(Score)`. A global variable is `GlobalVariable(Name)`. An object variable is `Object.VariableName` in expressions (e.g. `Player.Life`) — not `VarObjet(...)`.
@@ -448,10 +450,11 @@ Run a command:
 Verify runtime behavior:
 
 1. Launch a preview with `gdevelop_run_command { commandName: "LAUNCH_NEW_PREVIEW" }` (requires command tools enabled).
-2. Call `gdevelop_inspect_running_preview`. If `running` is false, the preview did not start or did not connect; relaunch and retry, increasing `timeout_ms` if needed.
-3. Read the result: `status`, `logs` (console output and uncaught exceptions), and `runtime` (running scene name, `objectInstanceCounts` per object, and scene/global variable values).
-4. Use this to confirm gameplay actually works: e.g. that bullets and enemies still have live instances after a few seconds, that a `Score` variable changes, or that no uncaught exceptions appear in `logs`. Pass `include_raw_dump: true` only when you need to inspect the full runtime object graph.
-5. Report concrete runtime evidence, not just "preview launched".
+2. Call `gdevelop_inspect_running_preview`. It defaults to the most recently launched preview (`latestDebuggerId`); if several previews are open and you need another, pass `debugger_id`. If `running` is false, relaunch and retry, increasing `timeout_ms` if needed.
+3. Read the result: `status`, `errors` (uncaught exceptions, crashes, error logs — check this first), `logs`, and `runtime` (running scene name, `objectInstanceCounts` per object from live instances, and scene/global variable values). The counts are real live-instance counts; you do not need `include_raw_dump` for them.
+4. Call `capture_preview_screenshot` with a `file_path` to save a PNG and visually verify sprites, layout, and colors. Read the image back to inspect it.
+5. Use these to confirm gameplay actually works: e.g. that bullets and enemies still have live instances after a few seconds, that a `Score` variable changes, that `errors` is empty, and that the screenshot looks right.
+6. Report concrete runtime evidence (counts, variable values, screenshot, error list), not just "preview launched".
 
 Save the project:
 
@@ -471,7 +474,14 @@ Save the project:
 - Prefer extension-specific tools over raw serialized extension JSON. Use `serialized_*` only when no structured field exists for the required edit.
 - Prefer `replace_scene_events_from_file` with `summary_only: true` for very large event sheets instead of inlining huge JSON strings or returning the full sheet.
 - Prefer `validate_events_json_file` before `replace_scene_events_from_file` so validation and writing are separate steps.
-- Prefer `issueSummary.rootCauses` over reading every repeated validation issue.
+- Prefer `issueSummary.rootCauses` over reading every repeated validation issue; or pass `dedupe_errors: true` to validation to get grouped causes directly.
+- Prefer `list_available_behaviors` over guessing a `behavior_type` string for `add_behavior`.
+- Prefer the per-error `parameterType`/`suggestion` and `literalSyntax` hints over guessing whether a parameter value needs quotes.
+- Prefer `compact: true` on `gdevelop_search_instruction_metadata` and `gdevelop_get_instruction_metadata` when you only need types and parameter shapes, to keep responses small.
+- Prefer `gdevelop_inspect_running_preview` after launching a preview to obtain real runtime evidence (running scene, live instance counts, variable values, console/error logs) instead of treating a launched preview as verified. It defaults to the latest preview and returns reliable live instance counts without `include_raw_dump`.
+- Prefer `capture_preview_screenshot` to visually verify a running preview rather than inferring appearance from instance coordinates.
+- Prefer `read_serialized_scene` with `object_name`/`object_names` to inspect a single object instead of dumping the whole scene.
+- File-based tools (`validate_events_json_file`, `replace_scene_events_from_file`, `apply_validated_scene_patch` with `patch_file`) accept project-relative paths (resolved against the project folder), the same as resource `file` paths; absolute paths also work.
 - Prefer `inspect_project_resources` with `compact: true` before and after asset replacement tasks; request full output only when investigating references.
 - Prefer `create_sprite_object_from_resource` for a simple Sprite from one image resource.
 - Prefer `create_text_object` for new text labels/HUD, and `set_text_object_properties` for existing text objects.
@@ -527,7 +537,13 @@ Before claiming completion:
 - Patching `firstLayout` directly in saved JSON while the editor is open. Fix: call `set_first_layout` or `set_project_properties`, then save through MCP.
 - Creating many resources/objects/instances one by one for initial setup. Fix: use `bulk_edit_scene_assets` unless stepwise validation is needed.
 - Hand-writing serialized Sprite/Text object JSON for simple objects. Fix: use `create_sprite_object_from_resource` or `create_text_object`.
-- Treating preview launch as runtime verification. Fix: report that preview was launched only; runtime screenshots/logs/object-state checks need dedicated preview/debugger tools.
+- Treating preview launch as runtime verification. Fix: after launching, call `gdevelop_inspect_running_preview` (live counts, variables, `errors`) and `capture_preview_screenshot` (visual check), and report that evidence; a launched preview alone is not a passed smoke test.
+- Inspecting a stale preview after relaunching. Fix: `gdevelop_inspect_running_preview` defaults to the latest preview; if needed, target a specific one via `debugger_id` (see `availableDebuggerIds`).
+- Authoring a multi-frame animation (e.g. an explosion) without setting `timeBetweenFrames`/`loop`. Fix: set them explicitly in `set_sprite_animations`; set `loop:false` for one-shot animations so HasAnimationEnded works.
+- Guessing a `behavior_type` string for `add_behavior`, or passing a behavior TYPE where a behavior NAME is expected (in instruction behavior parameters, `remove_behavior`, or `change_behavior_property`). Fix: call `list_available_behaviors` for the exact type and default name; use the behavior NAME (e.g. `PlatformerObject`) in instruction parameters.
+- Leaving a Sprite frame with `hasCustomCollisionMask: true` and an empty `customCollisionMask` (collisions silently never fire). Fix: check `suspiciousCollisionMasks` in `inspect_project_resources`/`inspect_project_cleanup`; give the frame a full-image or non-empty mask via `set_sprite_animations`.
+- Omitting `scene_name` when adding an object variable to a scene object. Fix: pass `scene_name` for `variable_scope: "object"` unless the object is global.
+- Assuming a multi-word instruction search returns nothing because the phrase is not a literal substring. Fix: `gdevelop_search_instruction_metadata` tokenizes queries and aliases common intents; phrases like "play sound effect" or "change position" now work and results are ranked.
 - Assuming command names. Fix: call `gdevelop_list_commands`.
 - Forgetting that events without conditions run every frame. Fix: add conditions such as `SceneJustBegins` or a trigger condition when appropriate.
 - Adding object-specific events before the object exists. Fix: create/inspect object first.

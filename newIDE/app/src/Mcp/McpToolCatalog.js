@@ -74,6 +74,177 @@ const toolNameSchema = {
   additionalProperties: false,
 };
 
+const addBehaviorSchema = {
+  type: 'object',
+  properties: {
+    scene_name: {
+      type: 'string',
+      description: 'Name of the GDevelop scene/layout that owns the object.',
+    },
+    object_name: {
+      type: 'string',
+      description:
+        'Name of the object (scene object or global object) to add the behavior to.',
+    },
+    behavior_type: {
+      type: 'string',
+      description:
+        'Required. The internal behavior type, e.g. "PlatformBehavior::PlatformerObjectBehavior", "TopDownMovementBehavior::TopDownMovementBehavior", or "DestroyOutsideBehavior::DestroyOutside". Use list_available_behaviors to discover exact types compatible with an object.',
+    },
+    behavior_name: {
+      type: 'string',
+      description:
+        'Optional behavior instance name. Defaults to the behavior\'s default name (recommended). This is the name you reference in instruction behavior parameters.',
+    },
+  },
+  required: ['scene_name', 'object_name', 'behavior_type'],
+  additionalProperties: true,
+};
+
+const removeBehaviorSchema = {
+  type: 'object',
+  properties: {
+    scene_name: {
+      type: 'string',
+      description: 'Name of the GDevelop scene/layout that owns the object.',
+    },
+    object_name: {
+      type: 'string',
+      description: 'Name of the object to remove the behavior from.',
+    },
+    behavior_name: {
+      type: 'string',
+      description:
+        'Required. The behavior instance NAME on the object (not the behavior type). See inspect_object_properties for the object\'s behavior names.',
+    },
+  },
+  required: ['scene_name', 'object_name', 'behavior_name'],
+  additionalProperties: true,
+};
+
+const changeBehaviorPropertySchema = {
+  type: 'object',
+  properties: {
+    scene_name: {
+      type: 'string',
+      description: 'Name of the GDevelop scene/layout that owns the object.',
+    },
+    object_name: {
+      type: 'string',
+      description: 'Name of the object whose behavior is modified.',
+    },
+    behavior_name: {
+      type: 'string',
+      description:
+        'Required. The behavior instance NAME on the object (not the type). See inspect_object_properties or inspect_behavior_properties.',
+    },
+    changed_properties: {
+      type: 'array',
+      description:
+        'List of property changes. Use inspect_behavior_properties to discover property_name values.',
+      items: {
+        type: 'object',
+        properties: {
+          property_name: {
+            type: 'string',
+            description: 'The behavior property name to change.',
+          },
+          new_value: {
+            type: 'string',
+            description:
+              'The new value as a string (numbers and booleans are coerced).',
+          },
+        },
+        required: ['property_name', 'new_value'],
+        additionalProperties: true,
+      },
+    },
+  },
+  required: ['scene_name', 'object_name', 'behavior_name'],
+  additionalProperties: true,
+};
+
+const changeScenePropertiesLayersEffectsGroupsSchema = {
+  type: 'object',
+  properties: {
+    scene_name: {
+      type: 'string',
+      description: 'Name of the GDevelop scene/layout to modify.',
+    },
+    changed_properties: {
+      type: 'array',
+      description:
+        'Scene/game property changes. Each item is { property_name, new_value }. Known property_name values: backgroundColor (RGB like "32;32;64"), gameResolutionWidth, gameResolutionHeight, gameOrientation, gameScaleMode, gameName, stopSoundsOnStartup.',
+      items: {
+        type: 'object',
+        properties: {
+          property_name: { type: 'string' },
+          new_value: { type: 'string' },
+        },
+        required: ['property_name', 'new_value'],
+        additionalProperties: true,
+      },
+    },
+    changed_layers: {
+      type: 'array',
+      description:
+        'Layer changes. Create a layer by naming a layer_name that does not exist yet (e.g. a "HUD" layer above the base layer). To rename set new_layer_name; to reorder set new_layer_position; to delete set delete_this_layer:true (optionally move_instances_to_layer to keep instances).',
+      items: {
+        type: 'object',
+        properties: {
+          layer_name: {
+            type: 'string',
+            description:
+              'Target layer name. The empty string "" is the base layer. A new name creates a new layer.',
+          },
+          new_layer_name: { type: 'string' },
+          new_layer_position: { type: 'number' },
+          delete_this_layer: { type: 'boolean' },
+          move_instances_to_layer: { type: 'string' },
+        },
+        required: ['layer_name'],
+        additionalProperties: true,
+      },
+    },
+    changed_layer_effects: {
+      type: 'array',
+      description:
+        'Layer effect changes. Each item targets { layer_name, effect_name }; set effect_type to create, new_effect_name/new_effect_position to edit, delete_this_effect:true to remove.',
+      items: {
+        type: 'object',
+        properties: {
+          layer_name: { type: 'string' },
+          effect_name: { type: 'string' },
+          effect_type: { type: 'string' },
+          new_effect_name: { type: 'string' },
+          new_effect_position: { type: 'number' },
+          delete_this_effect: { type: 'boolean' },
+        },
+        required: ['layer_name', 'effect_name'],
+        additionalProperties: true,
+      },
+    },
+    changed_groups: {
+      type: 'array',
+      description:
+        'Object group changes. Each item targets { group_name }; set objects (array of object names) to define membership, new_group_name to rename, delete_this_group:true to remove.',
+      items: {
+        type: 'object',
+        properties: {
+          group_name: { type: 'string' },
+          new_group_name: { type: 'string' },
+          delete_this_group: { type: 'boolean' },
+          objects: { type: 'array', items: { type: 'string' } },
+        },
+        required: ['group_name'],
+        additionalProperties: true,
+      },
+    },
+  },
+  required: ['scene_name'],
+  additionalProperties: true,
+};
+
 const addOrUpdateResourceSchema = {
   type: 'object',
   properties: {
@@ -185,11 +356,31 @@ const setSpriteAnimationsSchema = {
         properties: {
           name: { type: 'string' },
           useMultipleDirections: { type: 'boolean' },
+          loop: {
+            type: 'boolean',
+            description:
+              'Whether the animation loops. Applied to every direction. Set false for one-shot animations (e.g. an explosion) so HasAnimationEnded can become true.',
+          },
+          timeBetweenFrames: {
+            type: 'number',
+            description:
+              'Seconds between frames (frame duration). Applied to every direction. e.g. 0.08 for a fast 12.5 FPS animation. Set this explicitly for multi-frame animations; the default may play them too slowly.',
+          },
           directions: {
             type: 'array',
             items: {
               type: 'object',
               properties: {
+                loop: {
+                  type: 'boolean',
+                  description:
+                    'Per-direction loop override (falls back to the animation-level loop).',
+                },
+                timeBetweenFrames: {
+                  type: 'number',
+                  description:
+                    'Per-direction frame duration in seconds (falls back to the animation-level value).',
+                },
                 frames: {
                   type: 'array',
                   items: spriteAnimationFrameSchema,
@@ -601,6 +792,92 @@ const inspectProjectCleanupSchema = {
   additionalProperties: false,
 };
 
+const listAvailableBehaviorsSchema = {
+  type: 'object',
+  properties: {
+    object_name: {
+      type: 'string',
+      description:
+        'Optional object name. When set, only behaviors compatible with this object type are returned. Searches the given scene first (if scene_name is set), then global objects, then all scenes.',
+    },
+    scene_name: {
+      type: 'string',
+      description:
+        'Optional scene name to disambiguate object_name when the same name exists in multiple scopes.',
+    },
+    search: {
+      type: 'string',
+      description:
+        'Optional space-separated search terms matched (all tokens) against behavior type, name, description, category, and tags.',
+    },
+    include_hidden: {
+      type: 'boolean',
+      description:
+        'Default false. When true, also include default capability behaviors that cannot be added manually.',
+    },
+  },
+  additionalProperties: false,
+};
+
+const inspectRunningPreviewSchema = {
+  type: 'object',
+  properties: {
+    debugger_id: {
+      type: 'string',
+      description:
+        'Optional specific preview/debugger id to inspect. Defaults to the latest (most recently launched) running preview. availableDebuggerIds and latestDebuggerId are returned so you can target another one.',
+    },
+    timeout_ms: {
+      type: 'number',
+      description:
+        'How long to wait (200-10000 ms, default 2500) for the runtime dump reply before returning status/logs only.',
+    },
+    include_raw_dump: {
+      type: 'boolean',
+      description:
+        'Default false. When true, include the full raw runtime game dump (very large) in addition to the compact summary.',
+    },
+  },
+  additionalProperties: false,
+};
+
+const capturePreviewScreenshotSchema = {
+  type: 'object',
+  properties: {
+    file_path: {
+      type: 'string',
+      description:
+        'Absolute path to write the PNG to (parent directories are created). If omitted, the screenshot is returned as a base64 data URL instead of a file.',
+    },
+  },
+  additionalProperties: false,
+};
+
+const readSerializedSceneSchema = {
+  type: 'object',
+  properties: {
+    scene_name: sceneNameSchema.properties.scene_name,
+    object_name: {
+      type: 'string',
+      description:
+        'Optional. Return only this object\'s serialized definition (and its instances) instead of the whole scene. Useful to inspect e.g. one object\'s animation/behavior config without dumping the entire scene.',
+    },
+    object_names: {
+      type: 'array',
+      items: { type: 'string' },
+      description:
+        'Optional. Like object_name but for several objects at once. Both scene and matching global objects are returned; missing names are listed in notFound.',
+    },
+    include_instances: {
+      type: 'boolean',
+      description:
+        'Default true when filtering by object name(s): also return the initial instances of those objects. Set false to omit instances.',
+    },
+  },
+  required: ['scene_name'],
+  additionalProperties: true,
+};
+
 const bulkEditSceneAssetsSchema = {
   type: 'object',
   properties: {
@@ -867,6 +1144,11 @@ const validateEventsJsonFileSchema = {
       description:
         'When true, omit rendered event text and normalized JSON from the response.',
     },
+    dedupe_errors: {
+      type: 'boolean',
+      description:
+        'When true, return errors deduplicated by root cause (each with a count) instead of one entry per occurrence. Much smaller for repetitive failures.',
+    },
     allow_javascript_events: {
       type: 'boolean',
       description:
@@ -948,11 +1230,13 @@ const variableSchema = {
     },
     scene_name: {
       type: 'string',
-      description: 'Required for scene variables and scene object variables.',
+      description:
+        'Required for scene variables. Also required for object variables when the object is a scene object (the usual case) — only omit it for variables of a global object. If omitted for a scene object, the call fails and names the owning scene.',
     },
     object_name: {
       type: 'string',
-      description: 'Required for object variables.',
+      description:
+        'Required for object variables (variable_scope="object"). The object whose variable is set.',
     },
   },
   required: ['variable_scope', 'variable_name_or_path', 'value'],
@@ -1196,6 +1480,11 @@ const readTools: Array<McpTool> = [
           description:
             'JSON string containing an array of serialized GDevelop events.',
         },
+        dedupe_errors: {
+          type: 'boolean',
+          description:
+            'When true, return errors deduplicated by root cause (each with a count) instead of one entry per occurrence.',
+        },
         allow_javascript_events: {
           type: 'boolean',
           description:
@@ -1221,14 +1510,14 @@ const readTools: Array<McpTool> = [
   {
     name: 'gdevelop_search_instruction_metadata',
     description:
-      'Search GDevelop action, condition, and expression metadata by internal type, displayed name, description, group, object, or behavior. Use before generating event JSON parameters.',
+      'Search GDevelop action, condition, and expression metadata by internal type, displayed name, description, group, object, or behavior. Multi-word queries are tokenized (all words must match) and common intents (play sound, key pressed, change position, delete object, scene variable, restart scene, random number) are aliased to internal types. Results are ranked by relevance. Use before generating event JSON parameters.',
     inputSchema: {
       type: 'object',
       properties: {
         query: {
           type: 'string',
           description:
-            'Search text, for example SceneJustBegins, variable, collision, animation, sound, object type, or behavior type.',
+            'Search text, for example SceneJustBegins, variable, collision, animation, sound, object type, or behavior type. Multi-word phrases work (all words must match).',
         },
         kind: {
           type: 'string',
@@ -1239,6 +1528,11 @@ const readTools: Array<McpTool> = [
           type: 'number',
           description: 'Maximum number of results to return. Defaults to 20.',
         },
+        compact: {
+          type: 'boolean',
+          description:
+            'When true, omit verbose per-parameter valueType discriminators and metadata flags; keep type, names, descriptions, parameter types, and literalSyntax hints. Greatly reduces response size.',
+        },
       },
       required: ['query'],
       additionalProperties: false,
@@ -1247,7 +1541,7 @@ const readTools: Array<McpTool> = [
   {
     name: 'gdevelop_get_instruction_metadata',
     description:
-      'Return exact GDevelop action, condition, or expression metadata, including parameter order/types/defaults and event-scope relevance.',
+      'Return exact GDevelop action, condition, or expression metadata, including parameter order/types/defaults, literalSyntax hints (which parameters need quotes), and event-scope relevance.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -1259,6 +1553,11 @@ const readTools: Array<McpTool> = [
         kind: {
           type: 'string',
           description: 'Required kind: action, condition, or expression.',
+        },
+        compact: {
+          type: 'boolean',
+          description:
+            'When true, return a trimmed result (no verbose valueType nesting), keeping parameter types and literalSyntax hints.',
         },
       },
       required: ['type', 'kind'],
@@ -1305,8 +1604,8 @@ const readTools: Array<McpTool> = [
   {
     name: 'read_serialized_scene',
     description:
-      'Read one scene/layout as complete serialized JSON, without reading the whole project.',
-    inputSchema: sceneNameSchema,
+      'Read one scene/layout as complete serialized JSON, without reading the whole project. Pass object_name or object_names to return only those objects (and their instances) for a much smaller response.',
+    inputSchema: readSerializedSceneSchema,
   },
   {
     name: 'read_scene_events_serialized',
@@ -1317,14 +1616,32 @@ const readTools: Array<McpTool> = [
   {
     name: 'inspect_project_resources',
     description:
-      'Audit project resources and references, including empty files, missing local files, unused resources, Sprite frame references, true event resource parameters, and generic serialized string references.',
+      'Audit project resources and references, including empty files, missing local files, unused resources, Sprite frame references, true event resource parameters, generic serialized string references, and suspicious Sprite collision masks (hasCustomCollisionMask:true with an empty mask, which silently disables collisions).',
     inputSchema: inspectProjectResourcesSchema,
   },
   {
     name: 'inspect_project_cleanup',
     description:
-      'Return read-only cleanup candidates: empty scenes, possibly unused scene objects, invalid resources, unused resources, and missing Sprite frame references.',
+      'Return read-only cleanup candidates: empty scenes, possibly unused scene objects, invalid resources, unused resources, missing Sprite frame references, and suspicious Sprite collision masks (empty custom masks that disable collisions).',
     inputSchema: inspectProjectCleanupSchema,
+  },
+  {
+    name: 'list_available_behaviors',
+    description:
+      'List behavior types available in the project, with the exact behavior_type to pass to add_behavior and the default behavior name (used in instruction behavior parameters). Optionally filter by an object (only compatible behaviors) and/or a search query.',
+    inputSchema: listAvailableBehaviorsSchema,
+  },
+  {
+    name: 'gdevelop_inspect_running_preview',
+    description:
+      'Inspect a currently running preview to verify runtime behavior: returns whether a preview is running (defaulting to the latest launched one), its status, captured console logs, a separate errors list (uncaught exceptions, crashes, error-level logs), and a compact runtime snapshot (running scene name, per-object live instance counts, and scene/global variable values). Launch a preview first with gdevelop_run_command { commandName: "LAUNCH_NEW_PREVIEW" }. Use this to confirm a game actually runs and behaves, not just that a preview was launched.',
+    inputSchema: inspectRunningPreviewSchema,
+  },
+  {
+    name: 'capture_preview_screenshot',
+    description:
+      'Capture a PNG screenshot of the current rendered frame from a running preview, to visually verify sprites, layout, and colors. Writes the PNG to file_path (recommended) or returns it as a base64 data URL. Launch a preview first with gdevelop_run_command { commandName: "LAUNCH_NEW_PREVIEW" }.',
+    inputSchema: capturePreviewScreenshotSchema,
   },
   {
     name: 'find_scene_events',
@@ -1497,18 +1814,21 @@ const writeTools: Array<McpTool> = [
   },
   {
     name: 'add_behavior',
-    description: 'Add a behavior to an object.',
-    inputSchema: objectInSceneSchema,
+    description:
+      'Add a behavior to an object. Requires behavior_type (the internal type). Use list_available_behaviors to find compatible behavior types.',
+    inputSchema: addBehaviorSchema,
   },
   {
     name: 'remove_behavior',
-    description: 'Remove a behavior from an object.',
-    inputSchema: objectInSceneSchema,
+    description:
+      'Remove a behavior from an object by its behavior_name (the instance name, not the type).',
+    inputSchema: removeBehaviorSchema,
   },
   {
     name: 'change_behavior_property',
-    description: 'Change one or more behavior properties on an object.',
-    inputSchema: objectInSceneSchema,
+    description:
+      'Change one or more behavior properties on an object. Target the behavior by behavior_name; pass changed_properties as [{ property_name, new_value }].',
+    inputSchema: changeBehaviorPropertySchema,
   },
   {
     name: 'put_2d_instances',
@@ -1530,8 +1850,9 @@ const writeTools: Array<McpTool> = [
   },
   {
     name: 'change_scene_properties_layers_effects_groups',
-    description: 'Change scene properties, layers, effects, or object groups.',
-    inputSchema: sceneNameSchema,
+    description:
+      'Change scene/game properties, layers (create/rename/reorder/delete, e.g. add a HUD layer), layer effects, or object groups. Pass changed_properties / changed_layers / changed_layer_effects / changed_groups arrays.',
+    inputSchema: changeScenePropertiesLayersEffectsGroupsSchema,
   },
   {
     name: 'apply_validated_scene_patch',
@@ -2013,6 +2334,51 @@ const toolUsageExamples: { [string]: Array<Object> } = {
       arguments: {},
     },
   ],
+  list_available_behaviors: [
+    {
+      description:
+        'List every behavior type available, to discover the exact behavior_type for add_behavior.',
+      arguments: {},
+    },
+    {
+      description:
+        'List only behaviors compatible with a specific object and matching a search query.',
+      arguments: {
+        object_name: 'Player',
+        scene_name: 'Level1',
+        search: 'physics',
+      },
+    },
+  ],
+  gdevelop_inspect_running_preview: [
+    {
+      description:
+        'Inspect the running preview to verify the game runs and read live object counts and variables.',
+      arguments: {},
+    },
+    {
+      description:
+        'Wait longer and include the full raw runtime dump for deep inspection.',
+      arguments: {
+        timeout_ms: 4000,
+        include_raw_dump: true,
+      },
+    },
+  ],
+  capture_preview_screenshot: [
+    {
+      description:
+        'Save a screenshot of the running preview to a PNG file for visual verification.',
+      arguments: {
+        file_path: '/tmp/gdevelop-preview.png',
+      },
+    },
+    {
+      description:
+        'Return the screenshot as a base64 data URL instead of writing a file.',
+      arguments: {},
+    },
+  ],
   validate_events_json_file: [
     {
       description:
@@ -2151,6 +2517,77 @@ const toolUsageExamples: { [string]: Array<Object> } = {
         variable_name_or_path: 'Health',
         value: '3',
         variable_type: 'number',
+      },
+    },
+  ],
+  add_behavior: [
+    {
+      description:
+        'Add the platformer character behavior to the Player object (uses the default behavior name).',
+      arguments: {
+        scene_name: 'Level1',
+        object_name: 'Player',
+        behavior_type: 'PlatformBehavior::PlatformerObjectBehavior',
+      },
+    },
+    {
+      description:
+        'Destroy bullets once they leave the screen by adding DestroyOutside.',
+      arguments: {
+        scene_name: 'Level1',
+        object_name: 'Bullet',
+        behavior_type: 'DestroyOutsideBehavior::DestroyOutside',
+      },
+    },
+  ],
+  remove_behavior: [
+    {
+      description: 'Remove a behavior by its instance name.',
+      arguments: {
+        scene_name: 'Level1',
+        object_name: 'Player',
+        behavior_name: 'PlatformerObject',
+      },
+    },
+  ],
+  change_behavior_property: [
+    {
+      description: 'Change two platformer behavior properties at once.',
+      arguments: {
+        scene_name: 'Level1',
+        object_name: 'Player',
+        behavior_name: 'PlatformerObject',
+        changed_properties: [
+          { property_name: 'jumpSpeed', new_value: '900' },
+          { property_name: 'gravity', new_value: '1500' },
+        ],
+      },
+    },
+  ],
+  change_scene_properties_layers_effects_groups: [
+    {
+      description: 'Set the scene background color (RGB string).',
+      arguments: {
+        scene_name: 'Level1',
+        changed_properties: [
+          { property_name: 'backgroundColor', new_value: '32;32;64' },
+        ],
+      },
+    },
+    {
+      description: 'Create a dedicated HUD layer above the base layer.',
+      arguments: {
+        scene_name: 'Level1',
+        changed_layers: [{ layer_name: 'HUD' }],
+      },
+    },
+    {
+      description: 'Define an object group membership.',
+      arguments: {
+        scene_name: 'Level1',
+        changed_groups: [
+          { group_name: 'Enemies', objects: ['Enemy', 'Boss'] },
+        ],
       },
     },
   ],

@@ -5683,8 +5683,25 @@ const addOrEditVariable: EditorFunction = {
       } else {
         objectsContainer = project.getObjects();
         if (!objectsContainer.hasObjectNamed(object_name)) {
+          // Help the caller: object variables almost always belong to a
+          // scene object, so scene_name is effectively required. Find which
+          // scene(s) actually own this object and name them in the error.
+          const scenesWithObject = [];
+          for (let i = 0; i < project.getLayoutsCount(); ++i) {
+            const candidateScene = project.getLayoutAt(i);
+            if (candidateScene.getObjects().hasObjectNamed(object_name)) {
+              scenesWithObject.push(candidateScene.getName());
+            }
+          }
+          if (scenesWithObject.length) {
+            return makeGenericFailure(
+              `Object "${object_name}" is a scene object, not a global object. Set scene_name to ${scenesWithObject
+                .map(name => `"${name}"`)
+                .join(' or ')} to add an object variable to it.`
+            );
+          }
           return makeGenericFailure(
-            `Object "${object_name}" not found globally. Did you forget to specify scene_name?`
+            `Object "${object_name}" not found globally nor in any scene. For a scene object variable, set scene_name; for a global object variable, the object must exist in the global objects.`
           );
         }
         scopeDescription = `global object "${object_name}"`;

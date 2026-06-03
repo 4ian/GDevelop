@@ -347,6 +347,23 @@ export const onSaveProjectAs = async (
 
   options.onStartSaving();
 
+  // Make sure the destination folder exists before any resource is moved or
+  // any file is written. The default location for a new project sits inside
+  // "~/Documents/GDevelop projects/<name>", and that parent folder might not
+  // exist yet on a fresh machine. fs-extra's ensureDir is recursive and a
+  // no-op when the folder already exists.
+  if (fs && path) {
+    try {
+      await fs.ensureDir(path.dirname(filePath));
+    } catch (error) {
+      console.error(
+        `Unable to create project folder "${path.dirname(filePath)}":`,
+        error
+      );
+      throw error;
+    }
+  }
+
   // Ensure we always pick the latest name and gameId.
   const newFileMetadata = {
     fileIdentifier: filePath,

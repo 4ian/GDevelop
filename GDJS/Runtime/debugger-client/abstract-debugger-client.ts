@@ -485,6 +485,8 @@ namespace gdjs {
           if (inGameEditor) {
             this.sendSelectionAABB(data.messageId);
           }
+        } else if (data.command === 'captureScreenshot') {
+          this.sendScreenshot(data.messageId);
         } else if (data.command === 'hardReload') {
           // This usually means that the preview was modified so much that an entire reload
           // is needed, or that the runtime itself could have been modified.
@@ -958,6 +960,40 @@ namespace gdjs {
                 maxY: 0,
                 maxZ: 0,
               },
+        })
+      );
+    }
+
+    /**
+     * Capture the current rendered frame as a PNG data URL and send it back to
+     * the debugger server, addressed by messageId so the editor can resolve a
+     * pending sendMessageWithResponse() call. Works in any preview (not only the
+     * in-game editor) because it reads the shared game canvas directly.
+     */
+    sendScreenshot(messageId: number): void {
+      let dataUrl: string | null = null;
+      let width = 0;
+      let height = 0;
+      let error: string | null = null;
+      try {
+        const canvas = this._runtimegame.getRenderer().getCanvas();
+        if (!canvas) {
+          error = 'No game canvas is available to capture.';
+        } else {
+          width = canvas.width;
+          height = canvas.height;
+          // preserveDrawingBuffer is enabled on the renderers so this captures
+          // the composited 2D + 3D frame.
+          dataUrl = canvas.toDataURL('image/png');
+        }
+      } catch (e) {
+        error = (e as Error).message || 'Failed to capture the canvas.';
+      }
+      this._sendMessage(
+        circularSafeStringify({
+          command: 'screenshot',
+          messageId,
+          payload: { dataUrl, width, height, error },
         })
       );
     }

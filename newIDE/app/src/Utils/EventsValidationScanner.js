@@ -19,6 +19,9 @@ export type ValidationError = {|
   instructionSentence: string,
   parameterIndex?: number,
   parameterValue?: string,
+  parameterType?: string,
+  relatedBehaviorParameterIndex?: number,
+  relatedBehaviorParameterValue?: string,
   locationName: string,
   locationType: 'scene' | 'external-events' | 'extension',
   eventPath: EventPath,
@@ -217,6 +220,38 @@ const createValidationWorker = (
           metadata
         );
 
+        // An object parameter is reported invalid when one of the object's
+        // required behavior parameters holds the wrong value. The most common
+        // mistake is filling a behavior parameter with a behavior TYPE (e.g.
+        // "PlatformBehavior::PlatformerObjectBehavior") instead of the behavior
+        // NAME on the object (e.g. "PlatformerObject"). Detect a downstream
+        // behavior parameter whose value looks like a type so the suggestion can
+        // point at the real culprit instead of the object name.
+        let relatedBehaviorParameterIndex;
+        let relatedBehaviorParameterValue;
+        if (value !== '' && parameterType === 'object') {
+          for (
+            let behaviorIndex = parameterIndex + 1;
+            behaviorIndex < parametersCount;
+            behaviorIndex++
+          ) {
+            const behaviorParameterMetadata = metadata.getParameter(
+              behaviorIndex
+            );
+            const behaviorParameterType = behaviorParameterMetadata.getType();
+            if (behaviorParameterType === 'object') break;
+            if (behaviorParameterType !== 'behavior') continue;
+            const behaviorValue = instruction
+              .getParameter(behaviorIndex)
+              .getPlainString();
+            if (behaviorValue && behaviorValue.includes('::')) {
+              relatedBehaviorParameterIndex = behaviorIndex;
+              relatedBehaviorParameterValue = behaviorValue;
+              break;
+            }
+          }
+        }
+
         errors.push({
           type: value === '' ? 'missing-parameter' : 'invalid-parameter',
           isCondition,
@@ -224,6 +259,9 @@ const createValidationWorker = (
           instructionSentence,
           parameterIndex,
           parameterValue: value,
+          parameterType,
+          relatedBehaviorParameterIndex,
+          relatedBehaviorParameterValue,
           eventPath: [...currentEventPath],
           ...getValidationErrorLocationInformationFromProjectScopedContainers(
             projectScopedContainers

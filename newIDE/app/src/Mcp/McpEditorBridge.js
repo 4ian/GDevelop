@@ -22,6 +22,7 @@ import {
   searchInstructionMetadata,
   validateEventsJsonFile,
   validateEventsJson,
+  autoQuoteEventParameters,
 } from './McpEventKnowledge';
 import {
   createOrUpdateExtension,
@@ -50,6 +51,7 @@ import {
   deleteSceneObject,
   inspectProjectCleanup,
   inspectProjectResources,
+  listAvailableBehaviors,
   putStructured2dInstances,
   readSceneEventsSerialized,
   readSerializedScene,
@@ -70,8 +72,11 @@ import {
   wrapEventsInGroup,
 } from './McpEventTools';
 import { setFirstLayout, setProjectProperties } from './McpProjectTools';
+import optionalRequire from '../Utils/OptionalRequire';
 
 const gd: libGDevelop = global.gd;
+const fs = optionalRequire('fs');
+const path = optionalRequire('path');
 
 const getDefaultProcessEditorFunctionCalls = (): Function => {
   // Lazily require the runner so focused MCP unit tests do not load the full
@@ -106,6 +111,7 @@ type McpEditorBridgeContext = {|
   runCommand: string => boolean,
   saveProjectAndWait?: () => Promise<any>,
   getEditorSelection?: () => Object,
+  getPreviewDebuggerServer?: () => ?Object,
   generateEvents?: Function,
   onSceneEventsModifiedOutsideEditor?: Function,
   onExtensionFunctionEventsModifiedOutsideEditor?: Function,
@@ -247,10 +253,445 @@ const getCommandSummaries = () =>
     };
   });
 
+// ---------------------------------------------------------------------------
+// Runtime preview inspection
+//
+// A running preview connects to the editor's preview debugger server. Sending
+// it { command: 'refresh' } makes it reply with a { command: 'dump', payload }
+// message containing the full serialized RuntimeGame. We capture that dump plus
+// the live status and any console/error logs, and return a compact, defensively
+// extracted summary (scene name, per-object live instance counts, top-level
+// variable values) so an AI can verify the game actually runs and behaves,
+// instead of only knowing a preview was "launched".
+// ---------------------------------------------------------------------------
+
+// Read a GDJS Hashtable-like container ({ items: {...} }) or a plain object map.
+const readRuntimeMap = (container: any): Object => {
+  if (!container || typeof container !== 'object') return {};
+  if (container.items && typeof container.items === 'object')
+    return container.items;
+  return container;
+};
+
+// Extract a readable value from a serialized GDJS RuntimeVariable.
+const readRuntimeVariableValue = (variable: any): any => {
+  if (!variable || typeof variable !== 'object') return undefined;
+  if (variable._isStructure && variable._children) {
+    const children = readRuntimeMap(variable._children);
+    const result = {};
+    Object.keys(children).forEach(childName => {
+      result[childName] = readRuntimeVariableValue(children[childName]);
+    });
+    return result;
+  }
+  // Prefer the string form when it was the last set; otherwise the number.
+  if (variable._stringDirty === false && typeof variable._str === 'string')
+    return variable._str;
+  if (typeof variable._value === 'number') return variable._value;
+  if (typeof variable._str === 'string' && variable._str) return variable._str;
+  return variable._value;
+};
+
+const summarizeRuntimeVariables = (variablesContainer: any): Object => {
+  const map = variablesContainer
+    ? readRuntimeMap(variablesContainer._variables)
+    : {};
+  const result = {};
+  Object.keys(map).forEach(name => {
+    if (name === 'items') return;
+    result[name] = readRuntimeVariableValue(map[name]);
+  });
+  return result;
+};
+
+// Build a compact summary from a runtime game dump payload. Defensive: any
+// missing/unrecognized field is simply omitted rather than throwing, because
+// the dump is the raw runtime object graph and its shape can vary.
+const summarizeRuntimeGameDump = (payload: any): Object => {
+  if (!payload || typeof payload !== 'object') {
+    return { available: false };
+  }
+  try {
+    const summary: Object = {
+      available: true,
+      paused: !!payload._paused,
+      globalVariables: summarizeRuntimeVariables(payload._variables),
+      scenes: [],
+    };
+
+    const stack =
+      payload._sceneStack &&
+      Array.isArray(payload._sceneStack._stack)
+        ? payload._sceneStack._stack
+        : [];
+    summary.runningScenesCount = stack.length;
+    stack.forEach(scene => {
+      if (!scene || typeof scene !== 'object') return;
+      // Live instances are in `_instances` (Hashtable<RuntimeObject[]>), keyed
+      // by object name. `_objects` is the static ObjectData templates (one per
+      // name), NOT instances — reading it would always report 0/1, which is the
+      // bug where every count showed 0. Note `_allInstancesList` is stripped
+      // from the dump by the runtime, so totals are summed from `_instances`.
+      const instancesMap = readRuntimeMap(scene._instances);
+      const objectInstanceCounts = {};
+      let totalInstances = 0;
+      Object.keys(instancesMap).forEach(objectName => {
+        if (objectName === 'items') return;
+        const list = instancesMap[objectName];
+        const count = Array.isArray(list)
+          ? list.length
+          : Array.isArray(list && list.items)
+          ? list.items.length
+          : 0;
+        objectInstanceCounts[objectName] = count;
+        totalInstances += count;
+      });
+      summary.scenes.push({
+        name: scene._name,
+        isLoaded: scene._isLoaded !== false,
+        totalInstances,
+        objectInstanceCounts,
+        sceneVariables: summarizeRuntimeVariables(scene._variables),
+      });
+    });
+
+    return summary;
+  } catch (error) {
+    return {
+      available: true,
+      summaryError: `Could not fully summarize runtime dump: ${error.message}`,
+    };
+  }
+};
+
+// Capture runtime state from a running preview. Returns a promise that resolves
+// to the inspection result (or an error-shaped object). timeoutMs bounds the
+// wait for the dump reply.
+const captureRunningPreviewState = (
+  previewDebuggerServer: ?Object,
+  args: Object
+): Promise<Object> => {
+  return new Promise(resolve => {
+    if (!previewDebuggerServer) {
+      resolve({
+        success: false,
+        running: false,
+        error:
+          'No preview debugger server is available in this editor build. Runtime inspection is unsupported here.',
+      });
+      return;
+    }
+    if (previewDebuggerServer.getServerState() !== 'started') {
+      resolve({
+        success: false,
+        running: false,
+        error:
+          'No preview is running. Launch a preview first with gdevelop_run_command { commandName: "LAUNCH_NEW_PREVIEW" }, then inspect it.',
+      });
+      return;
+    }
+
+    const previewIds =
+      typeof previewDebuggerServer.getExistingPreviewDebuggerIds === 'function'
+        ? previewDebuggerServer.getExistingPreviewDebuggerIds()
+        : previewDebuggerServer.getExistingDebuggerIds();
+    if (!previewIds || !previewIds.length) {
+      resolve({
+        success: false,
+        running: false,
+        error:
+          'No preview is currently connected. Launch a preview first with gdevelop_run_command { commandName: "LAUNCH_NEW_PREVIEW" }.',
+      });
+      return;
+    }
+
+    const requestedId =
+      args && typeof args.debugger_id === 'string' ? args.debugger_id : null;
+    // Debugger ids are assigned incrementally (preview-ws-0, preview-ws-1, ...),
+    // so the LAST id is the most recently launched preview. Default to it so a
+    // fresh "Launch new preview" is inspected instead of a stale, already
+    // game-over window from a previous run.
+    const latestId = previewIds[previewIds.length - 1];
+    const targetId =
+      requestedId && previewIds.indexOf(requestedId) !== -1
+        ? requestedId
+        : latestId;
+
+    const timeoutMs =
+      args && typeof args.timeout_ms === 'number'
+        ? Math.max(200, Math.min(10000, args.timeout_ms))
+        : 2500;
+
+    const logs = [];
+    let dumpPayload = null;
+    let status = null;
+    let settled = false;
+    let unregister = () => {};
+
+    const finish = () => {
+      if (settled) return;
+      settled = true;
+      try {
+        unregister();
+      } catch (error) {
+        // Ignore unregister failures.
+      }
+      resolve({
+        success: true,
+        running: true,
+        debuggerId: targetId,
+        latestDebuggerId: latestId,
+        inspectedLatest: targetId === latestId,
+        availableDebuggerIds: previewIds,
+        status,
+        runtime: summarizeRuntimeGameDump(dumpPayload),
+        includeRawDump: !!(args && args.include_raw_dump),
+        rawDump:
+          args && args.include_raw_dump ? dumpPayload || undefined : undefined,
+        logs,
+        // Surface runtime errors/crashes prominently: error-type console logs,
+        // uncaught exceptions and crash reports. This is the closest available
+        // signal to "an expression failed at runtime".
+        errors: logs.filter(
+          entry =>
+            entry.command === 'uncaughtException' ||
+            entry.command === 'game.crashed' ||
+            entry.command === 'error' ||
+            (entry.command === 'console.log' &&
+              entry.payload &&
+              entry.payload.type === 'error' &&
+              !entry.payload.internal)
+        ),
+        note: dumpPayload
+          ? undefined
+          : 'No runtime dump was received before the timeout. The preview may be paused, loading, or not responding. status/logs may still be useful.',
+      });
+    };
+
+    try {
+      unregister = previewDebuggerServer.registerCallbacks({
+        onErrorReceived: receivedError => {
+          logs.push({
+            command: 'error',
+            payload: {
+              message:
+                (receivedError && receivedError.message) ||
+                String(receivedError),
+              type: 'error',
+            },
+          });
+        },
+        onServerStateChanged: () => {},
+        onConnectionClosed: () => {},
+        onConnectionOpened: () => {},
+        onConnectionErrored: ({ errorMessage }) => {
+          logs.push({
+            command: 'error',
+            payload: { message: errorMessage, type: 'error' },
+          });
+        },
+        onHandleParsedMessage: ({ id, parsedMessage }) => {
+          if (!parsedMessage || typeof parsedMessage !== 'object') return;
+          if (parsedMessage.command === 'dump') {
+            dumpPayload = parsedMessage.payload;
+            // Got what we came for; resolve promptly.
+            finish();
+          } else if (parsedMessage.command === 'status') {
+            status = parsedMessage.payload || parsedMessage.status || null;
+          } else if (
+            parsedMessage.command === 'console.log' ||
+            parsedMessage.command === 'hotReloaderLogs' ||
+            parsedMessage.command === 'uncaughtException' ||
+            parsedMessage.command === 'game.crashed'
+          ) {
+            logs.push(parsedMessage);
+          }
+        },
+      });
+    } catch (error) {
+      resolve({
+        success: false,
+        running: true,
+        error: `Could not register debugger callbacks: ${error.message}`,
+      });
+      return;
+    }
+
+    try {
+      previewDebuggerServer.sendMessage(targetId, { command: 'getStatus' });
+      previewDebuggerServer.sendMessage(targetId, { command: 'refresh' });
+    } catch (error) {
+      finish();
+      return;
+    }
+
+    setTimeout(finish, timeoutMs);
+  });
+};
+
+// Capture a screenshot of the current rendered frame from a running preview.
+// Uses the debugger request/response channel (sendMessageWithResponse) to ask
+// the running game for canvas.toDataURL, then writes the PNG to disk (or returns
+// the data URL when no file path is given / filesystem is unavailable).
+const capturePreviewScreenshot = async (
+  previewDebuggerServer: ?Object,
+  args: Object
+): Promise<Object> => {
+  if (!previewDebuggerServer) {
+    return {
+      success: false,
+      running: false,
+      error:
+        'No preview debugger server is available in this editor build. Screenshot capture is unsupported here.',
+    };
+  }
+  if (previewDebuggerServer.getServerState() !== 'started') {
+    return {
+      success: false,
+      running: false,
+      error:
+        'No preview is running. Launch a preview first with gdevelop_run_command { commandName: "LAUNCH_NEW_PREVIEW" }, then capture a screenshot.',
+    };
+  }
+  const previewIds =
+    typeof previewDebuggerServer.getExistingPreviewDebuggerIds === 'function'
+      ? previewDebuggerServer.getExistingPreviewDebuggerIds()
+      : previewDebuggerServer.getExistingDebuggerIds();
+  if (!previewIds || !previewIds.length) {
+    return {
+      success: false,
+      running: false,
+      error:
+        'No preview is currently connected. Launch a preview first with gdevelop_run_command { commandName: "LAUNCH_NEW_PREVIEW" }.',
+    };
+  }
+  if (typeof previewDebuggerServer.sendMessageWithResponse !== 'function') {
+    return {
+      success: false,
+      running: true,
+      error:
+        'This editor build does not support request/response debugger messages required for screenshots.',
+    };
+  }
+
+  let response;
+  try {
+    response = await previewDebuggerServer.sendMessageWithResponse({
+      command: 'captureScreenshot',
+    });
+  } catch (error) {
+    return {
+      success: false,
+      running: true,
+      error: `Screenshot request failed or timed out: ${error.message ||
+        error}. The preview may be loading or not responding.`,
+    };
+  }
+
+  const payload = (response && response.payload) || {};
+  if (!payload.dataUrl) {
+    return {
+      success: false,
+      running: true,
+      error:
+        payload.error ||
+        'The preview did not return image data. The game canvas may not be ready yet.',
+      width: payload.width,
+      height: payload.height,
+    };
+  }
+
+  const base64 = payload.dataUrl.replace(/^data:image\/png;base64,/, '');
+  const filePath =
+    args && typeof args.file_path === 'string' ? args.file_path : null;
+
+  // No file path requested, or filesystem not available: return the data URL.
+  if (!filePath || !fs) {
+    return {
+      success: true,
+      running: true,
+      width: payload.width,
+      height: payload.height,
+      dataUrl: payload.dataUrl,
+      note: filePath
+        ? 'Filesystem access is unavailable; returning the data URL instead of writing a file.'
+        : 'No file_path given; returning the PNG as a base64 data URL.',
+    };
+  }
+
+  try {
+    if (path) {
+      const directory = path.dirname(filePath);
+      if (directory && !fs.existsSync(directory)) {
+        fs.mkdirSync(directory, { recursive: true });
+      }
+    }
+    fs.writeFileSync(filePath, base64, 'base64');
+  } catch (error) {
+    return {
+      success: false,
+      running: true,
+      error: `Could not write screenshot to "${filePath}": ${error.message}`,
+      width: payload.width,
+      height: payload.height,
+      dataUrl: payload.dataUrl,
+    };
+  }
+
+  return {
+    success: true,
+    running: true,
+    filePath,
+    width: payload.width,
+    height: payload.height,
+  };
+};
+
+// Auto-quote safe bare string literals (e.g. layer "HUD", a timer identifier) in
+// the events_json / event_changes[].generated_events of an add_scene_events
+// payload, so callers do not have to remember to escape them. Mutates a shallow
+// copy of args and returns it; never throws (best-effort normalization).
+const autoQuoteAddSceneEventsArgs = (
+  project: ?gdProject,
+  args: Object
+): Object => {
+  if (!project || !args) return args;
+  const normalizeJsonString = (jsonString: any): any => {
+    if (typeof jsonString !== 'string' || !jsonString.trim()) return jsonString;
+    try {
+      const parsed = JSON.parse(jsonString);
+      if (!Array.isArray(parsed)) return jsonString;
+      const changed = autoQuoteEventParameters(project, parsed);
+      return changed > 0 ? JSON.stringify(parsed) : jsonString;
+    } catch (error) {
+      // Leave invalid JSON untouched; validation will report it.
+      return jsonString;
+    }
+  };
+
+  const next = { ...args };
+  if (typeof next.events_json === 'string') {
+    next.events_json = normalizeJsonString(next.events_json);
+  }
+  if (Array.isArray(next.event_changes)) {
+    next.event_changes = next.event_changes.map(change => {
+      if (!change || typeof change !== 'object') return change;
+      const updated = { ...change };
+      if (typeof updated.generated_events === 'string') {
+        updated.generated_events = normalizeJsonString(updated.generated_events);
+      }
+      if (typeof updated.generatedEvents === 'string') {
+        updated.generatedEvents = normalizeJsonString(updated.generatedEvents);
+      }
+      return updated;
+    });
+  }
+  return next;
+};
+
 const getPrompt = (name: string) => {
   const prompt = getMcpPrompts().find(prompt => prompt.name === name);
   if (!prompt) return null;
-
   return {
     description: prompt.description,
     messages: [
@@ -642,6 +1083,7 @@ const callMcpTool = async ({
             ? args.events_json
             : null,
         allowJavaScriptEvents: !!(args && args.allow_javascript_events),
+        dedupeErrors: !!(args && args.dedupe_errors),
       })
     );
   }
@@ -659,6 +1101,7 @@ const callMcpTool = async ({
             : null,
         allowJavaScriptEvents: !!(args && args.allow_javascript_events),
         summaryOnly: !!(args && args.summary_only),
+        dedupeErrors: !!(args && args.dedupe_errors),
       })
     );
   }
@@ -672,6 +1115,7 @@ const callMcpTool = async ({
         query: args && typeof args.query === 'string' ? args.query : null,
         kind: args && typeof args.kind === 'string' ? args.kind : null,
         limit: args && typeof args.limit === 'number' ? args.limit : null,
+        compact: !!(args && args.compact),
       })
     );
   }
@@ -683,6 +1127,7 @@ const callMcpTool = async ({
         project,
         type: args && typeof args.type === 'string' ? args.type : null,
         kind: args && typeof args.kind === 'string' ? args.kind : null,
+        compact: !!(args && args.compact),
       })
     );
   }
@@ -751,6 +1196,45 @@ const callMcpTool = async ({
     if (!project) return errorResult('No project opened.');
     try {
       return textResult(inspectProjectCleanup(project, args || {}));
+    } catch (error) {
+      return errorResult(error.message);
+    }
+  }
+
+  if (toolName === 'list_available_behaviors') {
+    if (!project) return errorResult('No project opened.');
+    try {
+      return textResult(listAvailableBehaviors(project, args || {}));
+    } catch (error) {
+      return errorResult(error.message);
+    }
+  }
+
+  if (toolName === 'gdevelop_inspect_running_preview') {
+    const previewDebuggerServer = context.getPreviewDebuggerServer
+      ? context.getPreviewDebuggerServer()
+      : null;
+    try {
+      const result = await captureRunningPreviewState(
+        previewDebuggerServer,
+        args || {}
+      );
+      return textResult(result);
+    } catch (error) {
+      return errorResult(error.message);
+    }
+  }
+
+  if (toolName === 'capture_preview_screenshot') {
+    const previewDebuggerServer = context.getPreviewDebuggerServer
+      ? context.getPreviewDebuggerServer()
+      : null;
+    try {
+      const result = await capturePreviewScreenshot(
+        previewDebuggerServer,
+        args || {}
+      );
+      return textResult(result);
     } catch (error) {
       return errorResult(error.message);
     }
@@ -842,7 +1326,10 @@ const callMcpTool = async ({
     }
     return callEditorFunction({
       toolName: args.name,
-      args: editorFunctionArgs,
+      args:
+        args.name === 'add_scene_events' || args.name === 'generate_events'
+          ? autoQuoteAddSceneEventsArgs(context.getProject(), editorFunctionArgs)
+          : editorFunctionArgs,
       context,
     });
   }
@@ -990,7 +1477,11 @@ const callMcpTool = async ({
 
   return callEditorFunction({
     toolName,
-    args: args || {},
+    args:
+      (toolName === 'add_scene_events' || toolName === 'generate_events') &&
+      args
+        ? autoQuoteAddSceneEventsArgs(project, args)
+        : args || {},
     context,
   });
 };

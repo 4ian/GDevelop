@@ -5171,6 +5171,10 @@ const MainFrame = (props: Props): React.MixedElement => {
         },
         saveProjectAndWait: () => saveProject(),
         getEditorSelection: getMcpEditorSelection,
+        getPreviewDebuggerServer: () =>
+          _previewLauncher.current
+            ? _previewLauncher.current.getPreviewDebuggerServer()
+            : null,
         generateEvents,
         onSceneEventsModifiedOutsideEditor,
         onExtensionFunctionEventsModifiedOutsideEditor,

@@ -76,6 +76,10 @@ export const setFirstLayout = (project: gdProject, args: Object): Object => {
   return {
     success: true,
     changes,
+    // Read back the in-memory value so the caller can confirm it stuck.
+    verifiedFirstLayout: project.getFirstLayout(),
+    note:
+      'The startup scene is set on the in-memory project. Persist it with gdevelop_save_project_and_wait; if a later inspection shows firstLayout empty on disk, re-run this then save again.',
     project: summarizeProjectProperties(project),
   };
 };

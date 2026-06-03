@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Build and start the GDevelop Windows Electron app.
+"""Build and start the GDevelop macOS Electron app.
 
-This intentionally uses the production Electron path because the development
-server path can hang on this Windows checkout and can race with GDJS resource
-regeneration.
+This is the macOS counterpart to ``start-windows-app.py``. It intentionally uses
+the production Electron path because the development server path can hang on
+this checkout and can race with GDJS resource regeneration.
 """
 
 from __future__ import annotations
@@ -22,7 +22,7 @@ DEV_PORTS = (3000, 5002)
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Fully build, sync, and start the GDevelop Windows app."
+        description="Fully build, sync, and start the GDevelop macOS app."
     )
     parser.add_argument(
         "--repo-root",
@@ -59,11 +59,9 @@ def step(title: str) -> None:
 
 
 def resolve_tool(name: str) -> str:
-    candidates = [f"{name}.cmd", name] if os.name == "nt" else [name]
-    for candidate in candidates:
-        resolved = shutil.which(candidate)
-        if resolved:
-            return resolved
+    resolved = shutil.which(name)
+    if resolved:
+        return resolved
     raise RuntimeError(f"Could not find required tool on PATH: {name}")
 
 
@@ -89,23 +87,16 @@ def run_command(
     subprocess.run(command, cwd=cwd, env=env, check=True)
 
 
-def run_powershell(script: str, *, cwd: Path, dry_run: bool) -> str:
-    powershell = shutil.which("powershell") or shutil.which("pwsh")
-    if not powershell:
-        raise RuntimeError("Could not find powershell or pwsh on PATH.")
-
-    command = [
-        powershell,
-        "-NoProfile",
-        "-ExecutionPolicy",
-        "Bypass",
-        "-Command",
-        script,
-    ]
-    print(f"[run] {cwd}> powershell -NoProfile -Command <script>", flush=True)
+def run_shell(
+    command: list[str],
+    *,
+    cwd: Path,
+    dry_run: bool,
+    check: bool = True,
+) -> subprocess.CompletedProcess[str]:
+    print(f"[run] {cwd}> {command_line(command)}", flush=True)
     if dry_run:
-        print(script.strip(), flush=True)
-        return ""
+        return subprocess.CompletedProcess(command, 0, "", "")
 
     result = subprocess.run(
         command,
@@ -121,53 +112,67 @@ def run_powershell(script: str, *, cwd: Path, dry_run: bool) -> str:
         print(stdout.rstrip(), flush=True)
     if stderr.strip():
         print(stderr.rstrip(), file=sys.stderr, flush=True)
-    if result.returncode != 0:
-        raise RuntimeError(f"PowerShell command failed with exit code {result.returncode}.")
-    return stdout
-
-
-def quote_powershell_string(path: Path | str) -> str:
-    return "'" + str(path).replace("'", "''") + "'"
+    if check and result.returncode != 0:
+        raise RuntimeError(
+            f"Command {command_line(command)} failed with exit code {result.returncode}."
+        )
+    return result
 
 
 def stop_existing_processes(repo_root: Path, electron_exe: Path, dry_run: bool) -> None:
     step("Stop existing GDevelop Electron processes")
-    script = f"""
-$electronPath = {quote_powershell_string(electron_exe)}
-$processes = Get-Process electron -ErrorAction SilentlyContinue |
-  Where-Object {{ $_.Path -eq $electronPath }}
+    if dry_run:
+        print(
+            f"[dry-run] would pkill Electron processes whose path matches {electron_exe}",
+            flush=True,
+        )
+    else:
+        try:
+            result = subprocess.run(
+                ["pgrep", "-f", str(electron_exe)],
+                capture_output=True,
+                text=True,
+            )
+        except FileNotFoundError as error:
+            raise RuntimeError("Could not find pgrep on PATH.") from error
 
-foreach ($process in $processes) {{
-  try {{
-    Stop-Process -Id $process.Id -Force -ErrorAction Stop
-  }} catch {{
-    Write-Warning "Could not stop Electron process $($process.Id): $($_.Exception.Message)"
-  }}
-}}
-exit 0
-"""
-    run_powershell(script, cwd=repo_root, dry_run=dry_run)
+        pids = [pid for pid in result.stdout.split() if pid.strip()]
+        if not pids:
+            print("No matching Electron processes were running.", flush=True)
+        else:
+            print(f"Stopping Electron PIDs: {', '.join(pids)}", flush=True)
+            subprocess.run(["kill", "-TERM", *pids], check=False)
+            time.sleep(1)
+            subprocess.run(["kill", "-KILL", *pids], check=False)
 
     step("Stop stale dev servers on ports 3000 and 5002")
-    ports_pattern = "|".join(f":{port}.*LISTENING" for port in DEV_PORTS)
-    script = f"""
-$owners = netstat -ano |
-  Select-String {quote_powershell_string(ports_pattern)} |
-  ForEach-Object {{ ($_ -split '\\s+')[-1] }} |
-  Sort-Object -Unique
+    if dry_run:
+        ports = ",".join(str(p) for p in DEV_PORTS)
+        print(
+            f"[dry-run] would lsof -nP -iTCP:{ports} -sTCP:LISTEN and kill the owners",
+            flush=True,
+        )
+        return
 
-foreach ($owner in $owners) {{
-  if ($owner -match '^\\d+$') {{
-    try {{
-      Stop-Process -Id ([int]$owner) -Force -ErrorAction Stop
-    }} catch {{
-      Write-Warning "Could not stop process $owner for dev server port cleanup: $($_.Exception.Message)"
-    }}
-  }}
-}}
-exit 0
-"""
-    run_powershell(script, cwd=repo_root, dry_run=dry_run)
+    pids: set[str] = set()
+    for port in DEV_PORTS:
+        result = subprocess.run(
+            ["lsof", "-nP", "-tiTCP:" + str(port), "-sTCP:LISTEN"],
+            capture_output=True,
+            text=True,
+        )
+        for pid in result.stdout.split():
+            if pid.strip():
+                pids.add(pid.strip())
+
+    if not pids:
+        print("No stale dev server listeners on ports 3000/5002.", flush=True)
+        return
+
+    print(f"Stopping dev server PIDs: {', '.join(sorted(pids))}", flush=True)
+    subprocess.run(["kill", "-TERM", *pids], check=False)
+    time.sleep(1)
+    subprocess.run(["kill", "-KILL", *pids], check=False)
 
 
 def ensure_electron_dependencies(
@@ -186,6 +191,20 @@ def ensure_electron_dependencies(
 
     if not dry_run and not electron_exe.exists():
         raise RuntimeError(f"Electron executable still missing after npm install: {electron_exe}")
+
+
+def ensure_react_app_dependencies(app_dir: Path, dry_run: bool) -> None:
+    step("Ensure React app dependencies")
+    node_modules = app_dir / "node_modules"
+    if node_modules.exists():
+        print(f"React app dependencies present: {node_modules}", flush=True)
+        return
+
+    print("React app node_modules missing; running npm install in newIDE/app.", flush=True)
+    run_command([resolve_tool("npm"), "install"], cwd=app_dir, dry_run=dry_run)
+
+    if not dry_run and not node_modules.exists():
+        raise RuntimeError(f"React app node_modules still missing after npm install: {node_modules}")
 
 
 def build_react_app(app_dir: Path, build: bool, dry_run: bool) -> None:
@@ -228,9 +247,6 @@ def launch_electron(electron_app_dir: Path, electron_exe: Path, dry_run: bool) -
 
     env = os.environ.copy()
     env["ELECTRON_IS_DEV"] = "0"
-    creationflags = 0
-    if os.name == "nt":
-        creationflags = subprocess.CREATE_NEW_PROCESS_GROUP
     process = subprocess.Popen(
         command,
         cwd=electron_app_dir,
@@ -238,7 +254,7 @@ def launch_electron(electron_app_dir: Path, electron_exe: Path, dry_run: bool) -
         stdin=subprocess.DEVNULL,
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL,
-        creationflags=creationflags,
+        start_new_session=True,
     )
     print(f"Started Electron process PID: {process.pid}", flush=True)
     return process.pid
@@ -262,16 +278,20 @@ def verify_inputs(
     if not www_index.exists():
         raise RuntimeError(f"Electron app index missing: {www_index}")
 
-    ports_pattern = "|".join(f":{port}.*LISTENING" for port in DEV_PORTS)
-    script = f"""
-$ports = netstat -ano | Select-String {quote_powershell_string(ports_pattern)}
-if ($ports) {{
-  $ports
-  Write-Error 'Unexpected dev server port listener found.'
-  exit 1
-}}
-"""
-    run_powershell(script, cwd=repo_root, dry_run=dry_run)
+    leftover: list[str] = []
+    for port in DEV_PORTS:
+        result = subprocess.run(
+            ["lsof", "-nP", "-iTCP:" + str(port), "-sTCP:LISTEN"],
+            capture_output=True,
+            text=True,
+        )
+        if result.stdout.strip():
+            leftover.append(result.stdout.rstrip())
+
+    if leftover:
+        for line in leftover:
+            print(line, file=sys.stderr, flush=True)
+        raise RuntimeError("Unexpected dev server port listener found.")
 
 
 def verify_electron_started(repo_root: Path, electron_exe: Path, dry_run: bool) -> None:
@@ -281,21 +301,14 @@ def verify_electron_started(repo_root: Path, electron_exe: Path, dry_run: bool) 
         return
 
     time.sleep(5)
-    script = f"""
-$electronPath = {quote_powershell_string(electron_exe)}
-$windows = Get-Process electron -ErrorAction SilentlyContinue |
-  Where-Object {{ $_.Path -eq $electronPath -and $_.MainWindowTitle -like 'GDevelop 5*' }}
-if (!$windows) {{
-  Get-Process electron -ErrorAction SilentlyContinue |
-    Where-Object {{ $_.Path -eq $electronPath }} |
-    Select-Object Id,MainWindowTitle,StartTime |
-    Format-Table -AutoSize
-  Write-Error 'Could not find a GDevelop 5 Electron window.'
-  exit 1
-}}
-$windows | Select-Object Id,MainWindowTitle,StartTime | Format-Table -AutoSize
-"""
-    run_powershell(script, cwd=repo_root, dry_run=dry_run)
+    result = subprocess.run(
+        ["pgrep", "-lf", str(electron_exe)],
+        capture_output=True,
+        text=True,
+    )
+    if not result.stdout.strip():
+        raise RuntimeError("Could not find a running GDevelop Electron process.")
+    print(result.stdout.rstrip(), flush=True)
 
 
 def main() -> int:
@@ -303,7 +316,16 @@ def main() -> int:
     repo_root = args.repo_root.resolve()
     app_dir = repo_root / "newIDE" / "app"
     electron_app_dir = repo_root / "newIDE" / "electron-app"
-    electron_exe = electron_app_dir / "node_modules" / "electron" / "dist" / "electron.exe"
+    electron_exe = (
+        electron_app_dir
+        / "node_modules"
+        / "electron"
+        / "dist"
+        / "Electron.app"
+        / "Contents"
+        / "MacOS"
+        / "Electron"
+    )
 
     if args.dry_run:
         print("DRY RUN: no commands will be executed.", flush=True)
@@ -319,6 +341,7 @@ def main() -> int:
     try:
         stop_existing_processes(repo_root, electron_exe, args.dry_run)
         ensure_electron_dependencies(repo_root, electron_app_dir, electron_exe, args.dry_run)
+        ensure_react_app_dependencies(app_dir, args.dry_run)
         build_react_app(app_dir, build, args.dry_run)
         sync_electron_www(electron_app_dir, build, args.dry_run)
 

@@ -429,13 +429,44 @@ const getSerializedInstructionType = (instruction: any): string =>
     ? instruction.type
     : '';
 
+const getInstructionMetadataForResourceReferences = (
+  project: gdProject,
+  instructionType: string,
+  isCondition: boolean
+): any | null => {
+  if (!instructionType) return null;
+  const metadata = isCondition
+    ? gd.MetadataProvider.getConditionMetadata(
+        project.getCurrentPlatform(),
+        instructionType
+      )
+    : gd.MetadataProvider.getActionMetadata(
+        project.getCurrentPlatform(),
+        instructionType
+      );
+  return gd.MetadataProvider.isBadInstructionMetadata(metadata)
+    ? null
+    : metadata;
+};
+
+const isResourceParameterMetadata = (parameterMetadata: any): boolean => {
+  const valueTypeMetadata = parameterMetadata.getValueTypeMetadata();
+  return !!(
+    valueTypeMetadata &&
+    valueTypeMetadata.isResource &&
+    valueTypeMetadata.isResource()
+  );
+};
+
 const collectInstructionResourceReferences = ({
+  project,
   instructions,
   resourcesByName,
   sceneName,
   eventPath,
   isCondition,
 }: {|
+  project: gdProject,
   instructions: Array<any>,
   resourcesByName: { [string]: Object },
   sceneName: string,
@@ -444,19 +475,34 @@ const collectInstructionResourceReferences = ({
 |}): Array<Object> => {
   const references = [];
   instructions.forEach((instruction, instructionIndex) => {
+    const instructionType = getSerializedInstructionType(instruction);
+    const metadata = getInstructionMetadataForResourceReferences(
+      project,
+      instructionType,
+      isCondition
+    );
     const parameters = Array.isArray(instruction.parameters)
       ? instruction.parameters
       : [];
     parameters.forEach((parameter, parameterIndex) => {
       if (typeof parameter !== 'string') return;
+      if (!metadata || parameterIndex >= metadata.getParametersCount()) return;
+      const parameterMetadata = metadata.getParameter(parameterIndex);
+      if (
+        parameterMetadata.isCodeOnly() ||
+        !isResourceParameterMetadata(parameterMetadata)
+      ) {
+        return;
+      }
       if (!resourcesByName[parameter]) return;
       references.push({
         sceneName,
         eventPath,
         isCondition,
         instructionIndex,
-        instructionType: getSerializedInstructionType(instruction),
+        instructionType,
         parameterIndex,
+        parameterType: parameterMetadata.getType(),
         resourceName: parameter,
         resourceKind: resourcesByName[parameter].kind,
       });
@@ -467,6 +513,7 @@ const collectInstructionResourceReferences = ({
       : [];
     references.push(
       ...collectInstructionResourceReferences({
+        project,
         instructions: subInstructions,
         resourcesByName,
         sceneName,
@@ -479,6 +526,7 @@ const collectInstructionResourceReferences = ({
 };
 
 const collectEventResourceReferences = (
+  project: gdProject,
   serializedProject: Object,
   resourcesByName: { [string]: Object }
 ): Array<Object> => {
@@ -491,6 +539,7 @@ const collectEventResourceReferences = (
       const eventPath = `event-${eventPathParts.join('.')}`;
       references.push(
         ...collectInstructionResourceReferences({
+          project,
           instructions: Array.isArray(event.conditions) ? event.conditions : [],
           resourcesByName,
           sceneName,
@@ -498,6 +547,7 @@ const collectEventResourceReferences = (
           isCondition: true,
         }),
         ...collectInstructionResourceReferences({
+          project,
           instructions: Array.isArray(event.actions) ? event.actions : [],
           resourcesByName,
           sceneName,
@@ -561,6 +611,7 @@ export const inspectProjectResources = (
     resourcesByName
   );
   const eventResourceReferences = collectEventResourceReferences(
+    project,
     serializedProject,
     resourcesByName
   );
@@ -1526,6 +1577,387 @@ export const putStructured2dInstances = (
     sceneName,
     changes,
     instances: serializeToJSObject(scene.getInitialInstances()),
+  };
+};
+
+const createOrReplaceSceneObjectOfType = (
+  project: gdProject,
+  scene: gdLayout,
+  objectName: string,
+  objectType: string,
+  callbacks: SceneToolCallbacks
+): {|
+  object: gdObject,
+  didCreate: boolean,
+  didReplace: boolean,
+|} => {
+  const objectMetadata = gd.MetadataProvider.getObjectMetadata(
+    project.getCurrentPlatform(),
+    objectType
+  );
+  if (gd.MetadataProvider.isBadObjectMetadata(objectMetadata)) {
+    throw new Error(`Object type "${objectType}" does not exist.`);
+  }
+
+  const objects = scene.getObjects();
+  const previousIndex = getObjectIndex(objects, objectName);
+  if (previousIndex >= 0) {
+    const existingObject = objects.getObject(objectName);
+    if (existingObject.getType() === objectType) {
+      return {
+        object: existingObject,
+        didCreate: false,
+        didReplace: false,
+      };
+    }
+    objects.removeObject(objectName);
+  }
+
+  const isTheFirstOfItsTypeInProject = !gd.UsedObjectTypeFinder.scanProject(
+    project,
+    objectType
+  );
+  const object = objects.insertNewObject(
+    project,
+    objectType,
+    objectName,
+    previousIndex >= 0 ? previousIndex : objects.getObjectsCount()
+  );
+  object.setName(objectName);
+  scene.updateBehaviorsSharedData(project);
+
+  if (callbacks.onObjectsModifiedOutsideEditor) {
+    callbacks.onObjectsModifiedOutsideEditor({
+      scene,
+      isNewObjectTypeUsed: isTheFirstOfItsTypeInProject,
+    });
+  }
+
+  return {
+    object,
+    didCreate: previousIndex < 0,
+    didReplace: previousIndex >= 0,
+  };
+};
+
+const topLevelInstanceFieldNames = [
+  'x',
+  'y',
+  'z',
+  'angle',
+  'rotation',
+  'rotationX',
+  'rotationY',
+  'layer',
+  'layer_name',
+  'zOrder',
+  'z_order',
+  'opacity',
+  'width',
+  'height',
+  'depth',
+  'customSize',
+  'custom_size',
+  'locked',
+  'sealed',
+];
+
+const buildOptionalInstancePayload = (
+  args: Object,
+  objectName: string
+): Object | null => {
+  const instanceArg =
+    args && args.instance && typeof args.instance === 'object'
+      ? args.instance
+      : null;
+  const hasTopLevelInstanceFields = topLevelInstanceFieldNames.some(
+    fieldName => args && args[fieldName] !== undefined
+  );
+  const shouldCreateInstance =
+    args &&
+    (args.create_instance === true ||
+      (args.create_instance !== false &&
+        (instanceArg || hasTopLevelInstanceFields)));
+
+  if (!shouldCreateInstance) return null;
+
+  const instance = instanceArg ? { ...instanceArg } : {};
+  topLevelInstanceFieldNames.forEach(fieldName => {
+    if (args[fieldName] !== undefined) {
+      instance[fieldName] = args[fieldName];
+    }
+  });
+  instance.object_name = objectName;
+  return instance;
+};
+
+const textPropertyNames = [
+  'text',
+  'character_size',
+  'characterSize',
+  'color',
+  'bold',
+  'italic',
+  'font_name',
+  'fontName',
+  'text_alignment',
+  'textAlignment',
+  'vertical_text_alignment',
+  'verticalTextAlignment',
+  'line_height',
+  'lineHeight',
+  'outline',
+  'outline_enabled',
+  'outline_color',
+  'outline_thickness',
+  'shadow',
+  'shadow_enabled',
+  'shadow_color',
+  'shadow_distance',
+  'shadow_angle',
+  'shadow_opacity',
+  'shadow_blur_radius',
+];
+
+const hasTextProperties = (args: Object): boolean =>
+  textPropertyNames.some(
+    propertyName => args && args[propertyName] !== undefined
+  );
+
+export const createSpriteObjectFromResource = (
+  project: gdProject,
+  args: Object,
+  callbacks: SceneToolCallbacks = ({}: any)
+): Object => {
+  const sceneName = getRequiredString(args, 'scene_name');
+  const objectName = getRequiredString(args, 'object_name');
+  const resourceName =
+    getOptionalString(args, 'resource_name') ||
+    getOptionalString(args, 'image_resource') ||
+    getOptionalString(args, 'image');
+  if (!resourceName) {
+    throw new Error('Missing resource_name.');
+  }
+  assertResourceIsImage(project, resourceName);
+
+  const scene = getScene(project, sceneName);
+  const objectResult = createOrReplaceSceneObjectOfType(
+    project,
+    scene,
+    objectName,
+    'Sprite',
+    callbacks
+  );
+
+  const frame: Object = {
+    image: resourceName,
+  };
+  [
+    'origin',
+    'center',
+    'collisionMask',
+    'fullImageCollisionMask',
+    'points',
+  ].forEach(propertyName => {
+    if (args[propertyName] !== undefined) {
+      frame[propertyName] = args[propertyName];
+    }
+  });
+
+  const animationResult = setSpriteAnimations(
+    project,
+    {
+      scene_name: sceneName,
+      object_name: objectName,
+      animations: [
+        {
+          name: getOptionalString(args, 'animation_name') || 'Default',
+          frames: [frame],
+        },
+      ],
+    },
+    callbacks
+  );
+
+  const instancePayload = buildOptionalInstancePayload(args, objectName);
+  const instanceResult = instancePayload
+    ? putStructured2dInstances(
+        project,
+        {
+          scene_name: sceneName,
+          operation: 'create',
+          instances: [instancePayload],
+        },
+        callbacks
+      )
+    : null;
+
+  return {
+    success: true,
+    sceneName,
+    objectName,
+    objectType: 'Sprite',
+    didCreate: objectResult.didCreate,
+    didReplace: objectResult.didReplace,
+    resourceName,
+    animationsCount: animationResult.animationsCount,
+    instanceCreated: !!instanceResult,
+    instanceResult,
+    serializedObject: serializeToJSObject(objectResult.object),
+  };
+};
+
+export const createTextObject = (
+  project: gdProject,
+  args: Object,
+  callbacks: SceneToolCallbacks = ({}: any)
+): Object => {
+  const sceneName = getRequiredString(args, 'scene_name');
+  const objectName = getRequiredString(args, 'object_name');
+  const scene = getScene(project, sceneName);
+  const objectResult = createOrReplaceSceneObjectOfType(
+    project,
+    scene,
+    objectName,
+    'TextObject::Text',
+    callbacks
+  );
+
+  let textResult = null;
+  if (hasTextProperties(args)) {
+    textResult = setTextObjectProperties(project, args, callbacks);
+  }
+
+  const instancePayload = buildOptionalInstancePayload(args, objectName);
+  const instanceResult = instancePayload
+    ? putStructured2dInstances(
+        project,
+        {
+          scene_name: sceneName,
+          operation: 'create',
+          instances: [instancePayload],
+        },
+        callbacks
+      )
+    : null;
+  const textObjectConfiguration = gd.asTextObjectConfiguration(
+    objectResult.object.getConfiguration()
+  );
+
+  return {
+    success: true,
+    sceneName,
+    objectName,
+    objectType: 'TextObject::Text',
+    didCreate: objectResult.didCreate,
+    didReplace: objectResult.didReplace,
+    changes: textResult ? textResult.changes : [],
+    properties: readTextObjectProperties(textObjectConfiguration),
+    instanceCreated: !!instanceResult,
+    instanceResult,
+    serializedObject: serializeToJSObject(objectResult.object),
+  };
+};
+
+const getObjectNamesFromContainer = (
+  objectsContainer: gdObjectsContainer
+): Array<string> => {
+  const objectNames = [];
+  for (let index = 0; index < objectsContainer.getObjectsCount(); index++) {
+    objectNames.push(objectsContainer.getObjectAt(index).getName());
+  }
+  return objectNames;
+};
+
+const getInstanceCountsByObject = (
+  initialInstances: gdInitialInstancesContainer
+): { [string]: number } => {
+  const counts: { [string]: number } = {};
+  iterateInitialInstances(initialInstances, instance => {
+    const objectName = instance.getObjectName();
+    counts[objectName] = (counts[objectName] || 0) + 1;
+  });
+  return counts;
+};
+
+export const inspectProjectCleanup = (
+  project: gdProject,
+  args: Object = {}
+): Object => {
+  const sceneSummaries = [];
+  const emptyScenes = [];
+  const possiblyUnusedSceneObjects = [];
+  const firstLayout = project.getFirstLayout();
+
+  for (let index = 0; index < project.getLayoutsCount(); index++) {
+    const scene = project.getLayoutAt(index);
+    const sceneName = scene.getName();
+    const objectNames = getObjectNamesFromContainer(scene.getObjects());
+    const instanceCountsByObject = getInstanceCountsByObject(
+      scene.getInitialInstances()
+    );
+    const serializedEvents = serializeToJSObject(scene.getEvents());
+    const eventStringValues: Set<string> = new Set();
+    visitSerializedStrings(serializedEvents, [], value => {
+      eventStringValues.add(value);
+    });
+
+    objectNames.forEach(objectName => {
+      const initialInstancesCount = instanceCountsByObject[objectName] || 0;
+      if (initialInstancesCount === 0 && !eventStringValues.has(objectName)) {
+        possiblyUnusedSceneObjects.push({
+          sceneName,
+          objectName,
+          reason:
+            'No initial instances and no exact event parameter/string match.',
+        });
+      }
+    });
+
+    const objectsCount = objectNames.length;
+    const initialInstancesCount = scene
+      .getInitialInstances()
+      .getInstancesCount();
+    const rootEventsCount = scene.getEvents().getEventsCount();
+    const summary = {
+      sceneName,
+      index,
+      isStartupScene: firstLayout ? firstLayout === sceneName : index === 0,
+      objectsCount,
+      initialInstancesCount,
+      rootEventsCount,
+      isEmpty:
+        objectsCount === 0 &&
+        initialInstancesCount === 0 &&
+        rootEventsCount === 0,
+    };
+    sceneSummaries.push(summary);
+    if (summary.isEmpty) emptyScenes.push(summary);
+  }
+
+  const resourceAudit = inspectProjectResources(project, {
+    compact: true,
+  });
+
+  return {
+    success: true,
+    projectName: project.getName(),
+    summary: {
+      scenesCount: sceneSummaries.length,
+      emptyScenesCount: emptyScenes.length,
+      possiblyUnusedSceneObjectsCount: possiblyUnusedSceneObjects.length,
+      invalidResourcesCount: resourceAudit.summary.invalidResourcesCount,
+      unusedResourcesCount: resourceAudit.summary.unusedResourcesCount,
+    },
+    scenes:
+      args && args.include_scene_summaries === false
+        ? undefined
+        : sceneSummaries,
+    emptyScenes,
+    possiblyUnusedSceneObjects,
+    invalidResources: resourceAudit.invalidResources,
+    unusedResources: resourceAudit.unusedResources,
+    missingSpriteFrameReferences: resourceAudit.missingSpriteFrameReferences,
   };
 };
 

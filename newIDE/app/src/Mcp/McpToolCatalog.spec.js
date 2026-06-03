@@ -33,6 +33,7 @@ describe('McpToolCatalog', () => {
     expect(toolNames).toContain('read_serialized_scene');
     expect(toolNames).toContain('read_scene_events_serialized');
     expect(toolNames).toContain('inspect_project_resources');
+    expect(toolNames).toContain('inspect_project_cleanup');
     expect(toolNames).toContain('find_scene_events');
     expect(toolNames).toContain('validate_events_json_file');
     expect(toolNames).toContain('lint_scene_events');
@@ -59,6 +60,8 @@ describe('McpToolCatalog', () => {
     expect(toolNames).toContain('delete_scene_object');
     expect(toolNames).toContain('set_object_properties');
     expect(toolNames).toContain('set_text_object_properties');
+    expect(toolNames).toContain('create_sprite_object_from_resource');
+    expect(toolNames).toContain('create_text_object');
     expect(toolNames).toContain('apply_validated_scene_patch');
     expect(toolNames).toContain('create_group');
     expect(toolNames).toContain('wrap_events_in_group');
@@ -81,9 +84,12 @@ describe('McpToolCatalog', () => {
     expect(isWriteTool('set_first_layout')).toBe(true);
     expect(isWriteTool('bulk_edit_scene_assets')).toBe(true);
     expect(isWriteTool('set_text_object_properties')).toBe(true);
+    expect(isWriteTool('create_sprite_object_from_resource')).toBe(true);
+    expect(isWriteTool('create_text_object')).toBe(true);
     expect(isWriteTool('add_or_update_resource')).toBe(true);
     expect(isWriteTool('replace_object_definition')).toBe(true);
     expect(isWriteTool('read_serialized_scene')).toBe(false);
+    expect(isWriteTool('inspect_project_cleanup')).toBe(false);
     expect(isWriteTool('validate_events_json_file')).toBe(false);
     expect(isWriteTool('lint_scene_events')).toBe(false);
     expect(isWriteTool('gdevelop_create_or_update_extension')).toBe(true);

@@ -461,6 +461,71 @@ const put2dInstancesSchema = {
   additionalProperties: true,
 };
 
+const createSpriteObjectFromResourceSchema = {
+  type: 'object',
+  properties: {
+    scene_name: sceneNameSchema.properties.scene_name,
+    object_name: objectInSceneSchema.properties.object_name,
+    resource_name: {
+      type: 'string',
+      description: 'Existing image resource name to use as the Sprite frame.',
+    },
+    image_resource: {
+      type: 'string',
+      description: 'Alias for resource_name.',
+    },
+    animation_name: {
+      type: 'string',
+      description: 'Optional animation name. Defaults to Default.',
+    },
+    origin: spriteAnimationFrameSchema.properties.origin,
+    center: spriteAnimationFrameSchema.properties.center,
+    fullImageCollisionMask:
+      spriteAnimationFrameSchema.properties.fullImageCollisionMask,
+    collisionMask: spriteAnimationFrameSchema.properties.collisionMask,
+    points: spriteAnimationFrameSchema.properties.points,
+    create_instance: {
+      type: 'boolean',
+      description:
+        'When true, also create one initial instance. If omitted, top-level instance fields or instance create one.',
+    },
+    instance: put2dInstancesSchema.properties.instances.items,
+    x: { type: 'number' },
+    y: { type: 'number' },
+    zOrder: { type: 'number' },
+    layer: { type: 'string' },
+    width: { type: 'number' },
+    height: { type: 'number' },
+    customSize:
+      put2dInstancesSchema.properties.instances.items.properties.customSize,
+  },
+  required: ['scene_name', 'object_name', 'resource_name'],
+  additionalProperties: true,
+};
+
+const createTextObjectSchema = {
+  type: 'object',
+  properties: {
+    ...setTextObjectPropertiesSchema.properties,
+    create_instance: {
+      type: 'boolean',
+      description:
+        'When true, also create one initial instance. If omitted, top-level instance fields or instance create one.',
+    },
+    instance: put2dInstancesSchema.properties.instances.items,
+    x: { type: 'number' },
+    y: { type: 'number' },
+    zOrder: { type: 'number' },
+    layer: { type: 'string' },
+    width: { type: 'number' },
+    height: { type: 'number' },
+    customSize:
+      put2dInstancesSchema.properties.instances.items.properties.customSize,
+  },
+  required: ['scene_name', 'object_name'],
+  additionalProperties: true,
+};
+
 const scenePatchSchema = {
   type: 'object',
   properties: {
@@ -519,6 +584,18 @@ const inspectProjectResourcesSchema = {
       type: 'boolean',
       description:
         'When true, include the full serialized project alongside resource audit results.',
+    },
+  },
+  additionalProperties: false,
+};
+
+const inspectProjectCleanupSchema = {
+  type: 'object',
+  properties: {
+    include_scene_summaries: {
+      type: 'boolean',
+      description:
+        'Default true. Set false to omit the per-scene summary list from the response.',
     },
   },
   additionalProperties: false,
@@ -1240,8 +1317,14 @@ const readTools: Array<McpTool> = [
   {
     name: 'inspect_project_resources',
     description:
-      'Audit project resources and references, including empty files, missing local files, unused resources, Sprite frame references, and generic serialized string references.',
+      'Audit project resources and references, including empty files, missing local files, unused resources, Sprite frame references, true event resource parameters, and generic serialized string references.',
     inputSchema: inspectProjectResourcesSchema,
+  },
+  {
+    name: 'inspect_project_cleanup',
+    description:
+      'Return read-only cleanup candidates: empty scenes, possibly unused scene objects, invalid resources, unused resources, and missing Sprite frame references.',
+    inputSchema: inspectProjectCleanupSchema,
   },
   {
     name: 'find_scene_events',
@@ -1381,6 +1464,18 @@ const writeTools: Array<McpTool> = [
     description:
       'Set TextObject::Text properties with a high-level payload: text, character size, color, bold/italic, alignment, outline, shadow, font, and line height.',
     inputSchema: setTextObjectPropertiesSchema,
+  },
+  {
+    name: 'create_sprite_object_from_resource',
+    description:
+      'Create or update a Sprite scene object from an existing image resource, bind a default animation frame, and optionally create an initial instance.',
+    inputSchema: createSpriteObjectFromResourceSchema,
+  },
+  {
+    name: 'create_text_object',
+    description:
+      'Create or update a TextObject::Text scene object with high-level text properties and optionally create an initial instance.',
+    inputSchema: createTextObjectSchema,
   },
   {
     name: 'add_or_update_resource',
@@ -1690,6 +1785,43 @@ const toolUsageExamples: { [string]: Array<Object> } = {
       },
     },
   ],
+  create_sprite_object_from_resource: [
+    {
+      description:
+        'Create a Sprite object from an existing image resource and place one instance.',
+      arguments: {
+        scene_name: 'Level1',
+        object_name: 'Player',
+        resource_name: 'PlayerIdle.png',
+        animation_name: 'Idle',
+        origin: { x: 0, y: 0 },
+        center: { x: 16, y: 24 },
+        fullImageCollisionMask: true,
+        create_instance: true,
+        x: 100,
+        y: 200,
+        zOrder: 10,
+      },
+    },
+  ],
+  create_text_object: [
+    {
+      description:
+        'Create a TextObject::Text object, set display properties, and place it on the scene.',
+      arguments: {
+        scene_name: 'Level1',
+        object_name: 'ScoreLabel',
+        text: 'Score: 0',
+        character_size: 32,
+        color: '255;255;255',
+        bold: true,
+        create_instance: true,
+        x: 16,
+        y: 16,
+        zOrder: 100,
+      },
+    },
+  ],
   bulk_edit_scene_assets: [
     {
       description:
@@ -1872,6 +2004,13 @@ const toolUsageExamples: { [string]: Array<Object> } = {
       arguments: {
         compact: true,
       },
+    },
+  ],
+  inspect_project_cleanup: [
+    {
+      description:
+        'List empty scenes, possibly unused scene objects, invalid resources, and unused resources before cleanup.',
+      arguments: {},
     },
   ],
   validate_events_json_file: [

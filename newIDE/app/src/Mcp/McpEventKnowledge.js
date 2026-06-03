@@ -946,6 +946,19 @@ const withActionableSuggestion = (issue: Object): Object => {
   if (
     issue.type === 'invalid-parameter' &&
     typeof issue.parameterValue === 'string' &&
+    (issue.parameterValue.includes('\n') ||
+      issue.parameterValue.includes('\\n'))
+  ) {
+    return {
+      ...issue,
+      suggestion:
+        'This parameter failed as a GDevelop text/string expression and contains a newline. Use a valid single-line expression such as "Game Over" + NewLine() + "Press Space", or keep the literal on one line inside quotes.',
+    };
+  }
+
+  if (
+    issue.type === 'invalid-parameter' &&
+    typeof issue.parameterValue === 'string' &&
     issue.parameterValue &&
     !issue.parameterValue.trim().startsWith('"')
   ) {

@@ -45,7 +45,10 @@ import {
   addOrUpdateResource,
   applyValidatedScenePatch,
   bulkEditSceneAssets,
+  createSpriteObjectFromResource,
+  createTextObject,
   deleteSceneObject,
+  inspectProjectCleanup,
   inspectProjectResources,
   putStructured2dInstances,
   readSceneEventsSerialized,
@@ -744,6 +747,15 @@ const callMcpTool = async ({
     }
   }
 
+  if (toolName === 'inspect_project_cleanup') {
+    if (!project) return errorResult('No project opened.');
+    try {
+      return textResult(inspectProjectCleanup(project, args || {}));
+    } catch (error) {
+      return errorResult(error.message);
+    }
+  }
+
   if (toolName === 'find_scene_events') {
     if (!project) return errorResult('No project opened.');
     try {
@@ -921,6 +933,10 @@ const callMcpTool = async ({
   let sceneWriteToolHandler = null;
   if (toolName === 'add_or_update_resource') {
     sceneWriteToolHandler = addOrUpdateResource;
+  } else if (toolName === 'create_sprite_object_from_resource') {
+    sceneWriteToolHandler = createSpriteObjectFromResource;
+  } else if (toolName === 'create_text_object') {
+    sceneWriteToolHandler = createTextObject;
   } else if (toolName === 'bulk_edit_scene_assets') {
     sceneWriteToolHandler = bulkEditSceneAssets;
   } else if (toolName === 'set_sprite_animations') {

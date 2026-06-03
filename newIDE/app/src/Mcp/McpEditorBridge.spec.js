@@ -202,6 +202,9 @@ describe('McpEditorBridge', () => {
     layout
       .getObjects()
       .insertNewObject(project, 'PrimitiveDrawing::Drawer', 'ShapePainter', 0);
+    layout
+      .getObjects()
+      .insertNewObject(project, 'TextObject::Text', 'StatusLabel', 1);
 
     try {
       const bridge = makeBridge({
@@ -281,6 +284,33 @@ describe('McpEditorBridge', () => {
         invalidColorValidation.issueSummary.rootCauses[0].suggestion
       ).toContain('"220;30;55"');
       expect(layout.getEvents().getEventsCount()).toBe(0);
+
+      const invalidTextResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'gdevelop_validate_events_json',
+          arguments: {
+            scene_name: 'Level1',
+            events_json: JSON.stringify([
+              {
+                type: 'BuiltinCommonInstructions::Standard',
+                conditions: [],
+                actions: [
+                  {
+                    type: { value: 'TextObject::String' },
+                    parameters: ['StatusLabel', '=', 'Game Over\nPress Space'],
+                  },
+                ],
+              },
+            ]),
+          },
+        },
+      });
+      const invalidTextValidation = JSON.parse(
+        invalidTextResponse.content[0].text
+      );
+      expect(invalidTextValidation.valid).toBe(false);
+      expect(invalidTextValidation.issues[0].suggestion).toContain('NewLine()');
     } finally {
       project.delete();
     }
@@ -984,6 +1014,12 @@ describe('McpEditorBridge', () => {
       project.getResourcesManager().addResource(badAudio);
       badAudio.delete();
 
+      const collidingImage = new gd.ImageResource();
+      collidingImage.setName('Player');
+      collidingImage.setFile(path.join(tempDir, 'Player.png'));
+      project.getResourcesManager().addResource(collidingImage);
+      collidingImage.delete();
+
       const validateResponse = await bridge.handleRendererMcpRequest({
         method: 'tools/call',
         params: {
@@ -1023,6 +1059,7 @@ describe('McpEditorBridge', () => {
             type: 'BuiltinCommonInstructions::Standard',
             conditions: [],
             actions: [
+              { type: { value: 'Hide' }, parameters: ['Player'] },
               {
                 type: { value: 'PlaySound' },
                 parameters: ['', 'Laser.wav', 'no', '100', '1'],
@@ -1066,6 +1103,13 @@ describe('McpEditorBridge', () => {
           }),
         ])
       );
+      expect(
+        audit.eventResourceReferences.some(
+          reference =>
+            reference.resourceName === 'Player' &&
+            reference.instructionType === 'Hide'
+        )
+      ).toBe(false);
     } finally {
       project.delete();
       fs.rmSync(tempDir, { recursive: true, force: true });
@@ -1455,6 +1499,144 @@ describe('McpEditorBridge', () => {
     } finally {
       project.delete();
       fs.rmSync(tempDir, { recursive: true, force: true });
+    }
+  });
+
+  it('creates Sprite and Text objects with high-level authoring tools', async () => {
+    // $FlowFixMe[invalid-constructor]
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    const layout = project.insertNewLayout('Level1', 0);
+    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gdevelop-mcp-'));
+    const imageFile = path.join(tempDir, 'Enemy.png');
+    fs.writeFileSync(imageFile, 'fake png content');
+    const imageResource = new gd.ImageResource();
+    imageResource.setName('Enemy.png');
+    imageResource.setFile(imageFile);
+    project.getResourcesManager().addResource(imageResource);
+    imageResource.delete();
+
+    try {
+      const bridge = makeBridge({
+        getProject: () => project,
+        getPermissions: () => ({
+          allowWriteTools: true,
+          allowCommandTools: false,
+        }),
+      });
+
+      const spriteResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'create_sprite_object_from_resource',
+          arguments: {
+            scene_name: 'Level1',
+            object_name: 'Enemy',
+            resource_name: 'Enemy.png',
+            animation_name: 'Idle',
+            origin: { x: 4, y: 6 },
+            center: { x: 16, y: 20 },
+            create_instance: true,
+            x: 80,
+            y: 120,
+            zOrder: 5,
+          },
+        },
+      });
+      const spriteResult = JSON.parse(spriteResponse.content[0].text);
+      expect(spriteResponse.isError).not.toBe(true);
+      expect(spriteResult.objectType).toBe('Sprite');
+      const spriteObject = layout.getObjects().getObject('Enemy');
+      const frame = gd
+        .asSpriteConfiguration(spriteObject.getConfiguration())
+        .getAnimations()
+        .getAnimation(0)
+        .getDirection(0)
+        .getSprite(0);
+      expect(frame.getImageName()).toBe('Enemy.png');
+      expect(frame.getOrigin().getX()).toBe(4);
+      expect(frame.getCenter().getY()).toBe(20);
+      expect(layout.getInitialInstances().getInstancesCount()).toBe(1);
+
+      const textResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'create_text_object',
+          arguments: {
+            scene_name: 'Level1',
+            object_name: 'ScoreLabel',
+            text: 'Score: 0',
+            character_size: 32,
+            color: '255;255;255',
+            bold: true,
+            create_instance: true,
+            x: 16,
+            y: 24,
+          },
+        },
+      });
+      const textResult = JSON.parse(textResponse.content[0].text);
+      expect(textResponse.isError).not.toBe(true);
+      expect(textResult.objectType).toBe('TextObject::Text');
+      expect(textResult.properties).toEqual(
+        expect.objectContaining({
+          text: 'Score: 0',
+          characterSize: 32,
+          bold: true,
+        })
+      );
+      expect(layout.getInitialInstances().getInstancesCount()).toBe(2);
+    } finally {
+      project.delete();
+      fs.rmSync(tempDir, { recursive: true, force: true });
+    }
+  });
+
+  it('summarizes project cleanup candidates without mutating the project', async () => {
+    // $FlowFixMe[invalid-constructor]
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    const activeLayout = project.insertNewLayout('Level1', 0);
+    const emptyLayout = project.insertNewLayout('Untitled scene', 1);
+    project.setFirstLayout('Level1');
+    activeLayout.getObjects().insertNewObject(project, 'Sprite', 'Used', 0);
+    activeLayout.getObjects().insertNewObject(project, 'Sprite', 'Unused', 1);
+    const instance = activeLayout
+      .getInitialInstances()
+      .insertNewInitialInstance();
+    instance.setObjectName('Used');
+
+    try {
+      const bridge = makeBridge({
+        getProject: () => project,
+      });
+
+      const cleanupResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'inspect_project_cleanup',
+          arguments: {},
+        },
+      });
+      const cleanup = JSON.parse(cleanupResponse.content[0].text);
+      expect(cleanupResponse.isError).not.toBe(true);
+      expect(cleanup.emptyScenes).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            sceneName: 'Untitled scene',
+            isStartupScene: false,
+          }),
+        ])
+      );
+      expect(cleanup.possiblyUnusedSceneObjects).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            sceneName: 'Level1',
+            objectName: 'Unused',
+          }),
+        ])
+      );
+      expect(emptyLayout.getObjects().getObjectsCount()).toBe(0);
+    } finally {
+      project.delete();
     }
   });
 

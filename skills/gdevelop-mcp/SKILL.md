@@ -11,26 +11,43 @@ Use this skill to operate the GDevelop editor through MCP safely and predictably
 
 GDevelop logic is event-based. A standard event contains `conditions` and `actions`; when all conditions are true, actions run. If an event has no conditions, its actions run every frame. Event order matters.
 
+## Tool Discovery
+
+Some GDevelop MCP tools can be deferred and may not be visible in the active tool list at the start of a session. A tool name listed in this skill is not proof that the tool is currently exposed.
+
+Before deciding that a GDevelop MCP tool is unavailable:
+
+1. Check the currently active tool list.
+2. If `tool_search` is available, call it with the exact tool name first, for example `create_sprite_object_from_resource`, then use a broader query such as `GDevelop MCP sprite resource object` if the exact name does not appear.
+3. If MCP introspection tools are visible, call `tools/list`, `inspect_tool_schema`, or `get_tool_usage_examples` to confirm the final tool name, schema, and examples before calling it.
+4. If only `gdevelop_editor_call` is visible, it may still route known GDevelop MCP tool names through `{ "name": "...", "arguments": { ... } }`. Prefer direct discovered tools when available, but do not assume the underlying tool is missing only because it is not top-level visible.
+5. Only report a tool as unavailable after discovery/introspection fails or the editor explicitly returns an unknown-tool or permission-disabled error.
+
+Do not compensate for an undiscovered or disabled MCP tool by directly editing the opened project JSON file. Use another focused MCP tool, ask the user to enable/restart MCP tooling, or report the precise missing capability.
+
 ## First Response Workflow
 
 When a user asks for any GDevelop edit:
 
-1. Call `gdevelop_get_editor_state`.
-2. If no project is open and the user asked to edit an existing project, report that no project is open. If the user asked to create one, use `initialize_project`.
-3. Call `gdevelop_get_project_summary`. Scope it to a scene only after you know the scene name.
-4. Call `gdevelop_list_scenes` if the target scene is unclear.
-5. For scene work, call `gdevelop_list_objects` and `read_scene_events` for the target scene.
-6. If the user's request refers to "selected", "current object", "this instance", "this event", "the thing I clicked", or similar UI context, call `gdevelop_get_editor_selection` before inferring targets from project data.
-7. For layout work, call `describe_instances` before placing, moving, or deleting instances.
-8. For object/behavior work, call `inspect_object_properties` and, when relevant, `inspect_behavior_properties`.
-9. For extension work, call `gdevelop_list_extensions` and then `gdevelop_inspect_extension` for the target extension before editing functions, events-based objects, events-based behaviors, or extension properties.
-10. Make the smallest write that satisfies the user request.
-11. Read back with the relevant read tool.
-12. Summarize what changed and mention any remaining uncertainty.
+1. Discover required GDevelop MCP tools first if they are not already visible. Do not skip tool discovery and do not judge a documented tool as missing from the initial active tool list alone.
+2. Call `gdevelop_get_editor_state`.
+3. If no project is open and the user asked to edit an existing project, report that no project is open. If the user asked to create one, use `initialize_project`.
+4. Call `gdevelop_get_project_summary`. Scope it to a scene only after you know the scene name.
+5. Call `gdevelop_list_scenes` if the target scene is unclear.
+6. For scene work, call `gdevelop_list_objects` and `read_scene_events` for the target scene.
+7. If the user's request refers to "selected", "current object", "this instance", "this event", "the thing I clicked", or similar UI context, call `gdevelop_get_editor_selection` before inferring targets from project data.
+8. For layout work, call `describe_instances` before placing, moving, or deleting instances.
+9. For object/behavior work, call `inspect_object_properties` and, when relevant, `inspect_behavior_properties`.
+10. For extension work, call `gdevelop_list_extensions` and then `gdevelop_inspect_extension` for the target extension before editing functions, events-based objects, events-based behaviors, or extension properties.
+11. Make the smallest write that satisfies the user request.
+12. Read back with the relevant read tool.
+13. Summarize what changed and mention any remaining uncertainty.
 
 Do not start by reading the full project JSON unless a focused tool cannot answer the question. Never rewrite or patch the opened project JSON file on disk.
 
 ## Tool Map
+
+This map is a reference for tool names and intent. A listed tool may still require tool discovery before it becomes callable in a particular client/session.
 
 Read-only context:
 
@@ -50,7 +67,8 @@ Read-only context:
 - `read_scene_events_serialized`: raw serialized event JSON for a scene, including event types the text renderer cannot describe.
 - `find_scene_events`: locate events by `event_path`, `ai_generated_event_id`, group name, event type, action type, condition type, parameter text, or serialized text.
 - `compare_scene_events_semantics`: compare two serialized event arrays while ignoring visual Group wrappers and stable IDs.
-- `inspect_project_resources`: resource table audit: name/kind/file, empty or missing files, unused resources, Sprite frame references, and generic serialized references.
+- `inspect_project_resources`: resource table audit: name/kind/file, empty or missing files, unused resources, Sprite frame references, true event resource parameters, and generic serialized references.
+- `inspect_project_cleanup`: read-only cleanup candidates: empty scenes, possibly unused scene objects, invalid resources, unused resources, and missing Sprite frame references.
 - `describe_instances`: object instances in a scene; use before `put_2d_instances` or `put_3d_instances`.
 - `inspect_object_properties`: object properties, behaviors, animations, size hints.
 - `inspect_behavior_properties`: behavior details on an object.
@@ -80,6 +98,8 @@ Write tools:
 - `delete_scene_object`: delete a scene object and clean up references/instances through GDevelop refactoring.
 - `set_object_properties`: set object properties using names from `inspect_object_properties`.
 - `set_text_object_properties`: high-level TextObject setter for text, size, color, bold/italic, alignment, outline, shadow, font, and line height.
+- `create_sprite_object_from_resource`: high-level Sprite authoring helper. It creates or updates a scene Sprite from an existing image resource, binds a default animation frame, and can create one initial instance.
+- `create_text_object`: high-level TextObject authoring helper. It creates or updates a scene TextObject with text properties and can create one initial instance.
 - `add_or_update_resource`: add/update a project resource with `name`, `file`, `kind`, and metadata. For audio, use `metadata.preloadAsSound`, `metadata.preloadAsMusic`, `metadata.preloadInCache`, and `metadata.userAdded`.
 - `set_sprite_animations`: replace a Sprite object's animations, directions, frames, origin/center/custom points, and collision masks.
 - `bulk_edit_scene_assets`: batch import resources, create/replace scene objects, bind Sprite animations, and place 2D instances for one scene.
@@ -303,17 +323,25 @@ Add an object:
 
 Import local images/audio and bind Sprite frames:
 
-1. `inspect_project_resources` with `compact: true` to see current counts, invalid paths, and missing Sprite frame references without noisy generic string references.
+1. `inspect_project_resources` with `compact: true` to see current counts, invalid paths, true event resource references, and missing Sprite frame references without generic string-reference noise.
 2. For initial scene setup or many assets, prefer `bulk_edit_scene_assets` with `resources`, `objects`, `sprite_animations`, and `instances`.
 3. For focused edits, call `add_or_update_resource` for each file. Use a non-empty relative path when the file is inside the project folder; absolute paths are accepted but must be valid. For audio, pass `kind: "audio"` and metadata such as `preloadAsSound: true` and `userAdded: true`.
-4. For Sprite objects, call `set_sprite_animations` with animations/directions/frames. Frame `image` must be the image resource name.
-5. `inspect_project_resources` again, usually with `compact: true`. Check `invalidResources`, `missingSpriteFrameReferences`, `eventResourceReferences`, and `unusedResources`.
-6. `read_serialized_scene` to verify objects, instances, and frames.
+4. For a simple Sprite from one image resource, prefer `create_sprite_object_from_resource` over hand-writing serialized Sprite object JSON. Use `create_instance: true` or top-level `x`/`y` fields when the object should appear in the scene.
+5. For existing Sprite objects with multiple animations/directions/frames, call `set_sprite_animations`. Frame `image` must be the image resource name.
+6. `inspect_project_resources` again, usually with `compact: true`. Check `invalidResources`, `missingSpriteFrameReferences`, `eventResourceReferences`, and `unusedResources`. `eventResourceReferences` reports parameters whose instruction metadata says they are resources; use full `stringReferences` only when investigating broad serialized matches.
+7. `read_serialized_scene` to verify objects, instances, and frames.
 
 Set text object properties:
 
-1. Use `set_text_object_properties` for `TextObject::Text`. Prefer it over raw `set_object_properties` for text, character size, color, bold, italic, alignment, outline, shadow, font, and line height.
-2. Read back with `inspect_object_properties` or `read_serialized_scene`.
+1. If the Text object does not exist yet, use `create_text_object` with text properties and optional initial placement.
+2. For existing `TextObject::Text`, use `set_text_object_properties`. Prefer it over raw `set_object_properties` for text, character size, color, bold, italic, alignment, outline, shadow, font, and line height.
+3. Read back with `inspect_object_properties` or `read_serialized_scene`.
+
+Find cleanup candidates:
+
+1. Use `inspect_project_cleanup` before deleting old template scenes, unused objects, or unused resources.
+2. Treat `possiblyUnusedSceneObjects` as a heuristic, not proof. Objects without initial instances may still be created by events or extensions.
+3. Use focused delete tools only after confirming the item is safe to remove: `delete_scene`, `delete_scene_object`, or resource tools when available.
 
 Set project startup/settings:
 
@@ -404,7 +432,7 @@ Run a command:
 1. `gdevelop_list_commands`.
 2. Confirm the exact command exists.
 3. `gdevelop_run_command`.
-4. Observe/read state as needed.
+4. Observe/read state as needed. Preview launch commands only confirm that the editor accepted the command. They do not return a preview URL, screenshot, runtime console, hot-reload status, frame state, or runtime object/variable state. Do not claim a runtime smoke test passed unless a dedicated runtime/debugger tool actually reports that evidence.
 
 Save the project:
 
@@ -415,6 +443,7 @@ Save the project:
 ## Decision Rules
 
 - Prefer narrow tools over full JSON.
+- Prefer tool discovery before declaring a documented MCP tool unavailable.
 - Prefer readback over assumption.
 - Prefer exact instruction metadata over remembered internal names.
 - Prefer `event_changes` for modifying existing event sheets; use `events_json` for simple append.
@@ -425,7 +454,9 @@ Save the project:
 - Prefer `validate_events_json_file` before `replace_scene_events_from_file` so validation and writing are separate steps.
 - Prefer `issueSummary.rootCauses` over reading every repeated validation issue.
 - Prefer `inspect_project_resources` with `compact: true` before and after asset replacement tasks; request full output only when investigating references.
-- Prefer `set_text_object_properties` for text objects.
+- Prefer `create_sprite_object_from_resource` for a simple Sprite from one image resource.
+- Prefer `create_text_object` for new text labels/HUD, and `set_text_object_properties` for existing text objects.
+- Prefer `inspect_project_cleanup` before removing old empty scenes, unused objects, or unused resources.
 - Prefer `lint_scene_events` after any event write.
 - Use `set_first_layout` or `set_project_properties` for project-level changes. Do not edit project JSON on disk.
 - Prefer `bulk_edit_scene_assets` for initial game/scene construction with many resources, objects, Sprite animations, and instances.
@@ -447,6 +478,7 @@ Before claiming completion:
 - No JavaScript event was created or modified unless the user explicitly requested JavaScript.
 - `lint_scene_events` passed after event writes.
 - Referenced resources have non-empty files and valid paths, or remaining invalid resource paths were explicitly reported.
+- If cleanup was requested, `inspect_project_cleanup` was read first and any heuristic candidates were confirmed before deletion.
 - The startup scene is set with `set_first_layout` or verified from `read_game_project_json`; do not rely on a disk-only patch.
 - No opened project `.json` file was directly edited. All project changes went through MCP tools and were saved with `gdevelop_save_project_and_wait` when persistence was required.
 - A write tool reported success or a non-error result.
@@ -457,8 +489,10 @@ Before claiming completion:
 ## Common Mistakes
 
 - Calling `add_scene_events` with only an English description. Fix: provide `events_json` or `event_changes`.
+- Assuming a documented MCP tool does not exist because it is not in the initial active tool list. Fix: use `tool_search` with the exact tool name, then MCP introspection such as `inspect_tool_schema` or `get_tool_usage_examples` when available.
 - Guessing parameter order from display text. Fix: call `gdevelop_get_instruction_metadata`.
 - Passing raw text where GDevelop expects a text expression. Fix: wrap text in quotes inside the parameter, for example `"Red"` or `"220;30;55"`.
+- Passing multiline literal text as a raw parameter. Fix: use a valid text expression such as `"Game Over" + NewLine() + "Press Space"`, or keep the literal on one line inside quotes.
 - Inlining a huge event JSON string just to validate. Fix: write a local file and call `validate_events_json_file`.
 - Reading repeated validation errors one by one. Fix: use `issueSummary.rootCauses`.
 - Forgetting to declare variables before event validation. Fix: call `add_or_edit_variable` first with `variable_scope`, `variable_name_or_path`, and `value`.
@@ -473,6 +507,8 @@ Before claiming completion:
 - Assuming `SAVE_PROJECT` completed because `gdevelop_run_command` returned `launched`. Fix: use `gdevelop_save_project_and_wait`.
 - Patching `firstLayout` directly in saved JSON while the editor is open. Fix: call `set_first_layout` or `set_project_properties`, then save through MCP.
 - Creating many resources/objects/instances one by one for initial setup. Fix: use `bulk_edit_scene_assets` unless stepwise validation is needed.
+- Hand-writing serialized Sprite/Text object JSON for simple objects. Fix: use `create_sprite_object_from_resource` or `create_text_object`.
+- Treating preview launch as runtime verification. Fix: report that preview was launched only; runtime screenshots/logs/object-state checks need dedicated preview/debugger tools.
 - Assuming command names. Fix: call `gdevelop_list_commands`.
 - Forgetting that events without conditions run every frame. Fix: add conditions such as `SceneJustBegins` or a trigger condition when appropriate.
 - Adding object-specific events before the object exists. Fix: create/inspect object first.

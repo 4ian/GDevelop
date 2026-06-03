@@ -15,6 +15,7 @@ import AuthenticatedUserContext, {
 import {
   AiRequestContext,
   AiRequestProvider,
+  mergeIncrementalAiRequest,
   type AiRequestContextState,
 } from './AiRequestContext';
 import { act } from 'react-dom/test-utils';
@@ -490,5 +491,54 @@ describe('AiRequestProvider sub-agent cleanup on navigation', () => {
 
     // $FlowFixMe[incompatible-use]
     expect(Object.keys(contextRef.current.activeSubAgents)).toEqual(['sub-2']);
+  });
+});
+
+describe('mergeIncrementalAiRequest', () => {
+  const message = (messageId: string) => ({
+    messageId,
+    type: 'message',
+    status: 'completed',
+    role: 'user',
+    content: [{ type: 'user_request', status: 'completed', text: messageId }],
+  });
+  const requestWithOutput = (output: Array<any>): AiRequest => ({
+    ...makeAiRequest('req-1', 'working'),
+    output,
+  });
+
+  it('returns the fetched request as-is when there is no outputFromMessageId', () => {
+    const fetched = requestWithOutput([message('a'), message('b')]);
+    expect(
+      mergeIncrementalAiRequest(
+        requestWithOutput([message('a')]),
+        fetched,
+        undefined
+      )
+    ).toBe(fetched);
+  });
+
+  it('splices the incremental slice onto the cached output', () => {
+    const previous = requestWithOutput([message('a'), message('b')]);
+    // The backend re-sends the tail ('b') plus the new message ('c').
+    const fetched = requestWithOutput([message('b'), message('c')]);
+    const merged = mergeIncrementalAiRequest(previous, fetched, 'b');
+    const mergedOutput = merged.output || [];
+    const fetchedOutput = fetched.output || [];
+
+    expect(mergedOutput.map(m => m.messageId)).toEqual(['a', 'b', 'c']);
+    // The tail is taken from the fetched response (so in-place updates like
+    // suggestions are picked up), not from the cache.
+    expect(mergedOutput[1]).toBe(fetchedOutput[0]);
+  });
+
+  it('returns the fetched request as-is when it is a full output, not a slice', () => {
+    const previous = requestWithOutput([message('a'), message('b')]);
+    const fetched = requestWithOutput([
+      message('a'),
+      message('b'),
+      message('c'),
+    ]);
+    expect(mergeIncrementalAiRequest(previous, fetched, 'b')).toBe(fetched);
   });
 });

@@ -45,6 +45,12 @@ type ResourcePromise<T> = { [resourceName: string]: Promise<T> };
 let loadedBitmapFonts = {};
 let loadedFontFamilies = {};
 let loadedTextures: { [string]: any } = {};
+// The resolved URL each image texture in `loadedTextures` was actually loaded
+// from. Used to skip reloading a resource whose URL did not change (see
+// `_doReloadResource`): for cloud projects every change yields a new immutable
+// URL, and for local files the URL carries a cache-busting token that only
+// changes when the file's cache was burst (i.e. it was edited).
+let loadedTextureUrls: { [string]: string } = {};
 const invalidTexture = PIXI.Texture.from('res/invalid_texture.png');
 const loadingTexture = PIXI.Texture.from(
   'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAIAQMAAAD+wSzIAAAAA1BMVEXX19f5cgrAAAAAAXRSTlMz/za5cAAAAApJREFUCNdjQAMAABAAAbSqgB8AAAAASUVORK5CYII='
@@ -282,6 +288,7 @@ export default class PixiResourcesLoader {
     loadedBitmapFonts = {};
     loadedFontFamilies = {};
     loadedTextures = {};
+    loadedTextureUrls = {};
     loadedOrLoadingThreeTextures = {};
     loadedOrLoadingThreeMaterials = {};
     loadedOrLoading3DModelPromises = {};
@@ -327,7 +334,47 @@ export default class PixiResourcesLoader {
 
   static async _doReloadResource(project: gdProject, resourceName: string) {
     const loadedTexture = loadedTextures[resourceName];
+
+    // Optimization: if this is an image resource whose resolved URL did not
+    // change since it was loaded, its content is identical and there's no need
+    // to unload and re-fetch it (which is expensive and visually disruptive).
+    // This makes reloading "every resource of an edited object" cheap when only
+    // a few of them actually changed: editing one animation no longer re-fetches
+    // every other animation's frames.
+    //
+    // It's only safe to skip when we are *certain* the content is unchanged:
+    // - cloud projects: any change yields a new immutable URL;
+    // - local files: the URL carries a cache-busting token that only changes
+    //   when `burstUrlsCacheForResources`/`burstAllUrlsCache` was called (which
+    //   every "resource content changed" code path does).
+    // In any other case (texture not loaded yet, invalid/loading texture, no
+    // recorded URL, or a non-image resource), we fall back to a full reload.
+    const resourcesManager = project.getResourcesManager();
+    if (
+      loadedTexture &&
+      loadedTexture !== invalidTexture &&
+      loadedTexture !== loadingTexture &&
+      loadedTexture.baseTexture &&
+      !loadedTexture.baseTexture.destroyed &&
+      loadedTextureUrls[resourceName] !== undefined &&
+      resourcesManager.hasResource(resourceName) &&
+      resourcesManager.getResource(resourceName).getKind() === 'image'
+    ) {
+      const currentUrl = ResourcesLoader.getResourceFullUrl(
+        project,
+        resourceName,
+        { isResourceForPixi: true }
+      );
+      if (currentUrl === loadedTextureUrls[resourceName]) {
+        console.info(
+          `Resource "${resourceName}" URL is unchanged: keeping the already loaded texture (no reload needed).`
+        );
+        return;
+      }
+    }
+
     if (loadedTexture) {
+      delete loadedTextureUrls[resourceName];
       // Remove the cached texture BEFORE awaiting the unload.
       // PIXI.Assets.unload destroys the BaseTexture synchronously, which sets
       // baseTexture to null on the texture. If getPIXITexture is called before
@@ -554,10 +601,12 @@ export default class PixiResourcesLoader {
           }
 
           loadedTextures[resourceName] = loadedTexture;
+          loadedTextureUrls[resourceName] = url;
           // TODO What if 2 assets share the same file with different settings?
           applyPixiTextureSettings(resource, loadedTexture);
         } catch (error) {
           loadedTextures[resourceName] = invalidTexture;
+          delete loadedTextureUrls[resourceName];
           console.error(
             `Unable to load file ${resource.getFile()} for image resource ${resourceName}:`,
             error ? error : '(unknown error)'
@@ -632,6 +681,7 @@ export default class PixiResourcesLoader {
           `Texture for resource "${resourceName}" was requested but destroyed. Evicting it from the cache and recreating it.`
         );
         delete loadedTextures[resourceName];
+        delete loadedTextureUrls[resourceName];
 
         // Then we let the new texture be loaded below.
       } else {
@@ -660,11 +710,14 @@ export default class PixiResourcesLoader {
     if (!loadedTextures[resourceName]) {
       console.error(`Texture loading for ${url} returned nothing`);
       loadedTextures[resourceName] = invalidTexture;
+      delete loadedTextureUrls[resourceName];
       return loadedTextures[resourceName];
     }
+    loadedTextureUrls[resourceName] = url;
     loadedTextures[resourceName].baseTexture.resource.load().catch(error => {
       console.error(`Unable to load texture from url ${url}:`, error);
       loadedTextures[resourceName] = invalidTexture;
+      delete loadedTextureUrls[resourceName];
     });
 
     applyPixiTextureSettings(resource, loadedTextures[resourceName]);

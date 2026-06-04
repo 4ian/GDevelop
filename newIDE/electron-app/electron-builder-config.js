@@ -18,6 +18,13 @@ const config = {
       from: '../app/resources/preview_node_modules',
       to: 'preview_node_modules',
     },
+    {
+      // Bundled empty-project template (incl. the gdevelop-mcp skill). Copied
+      // into a new project's folder at creation time. Shipped as an extra
+      // resource so it stays available in the packaged binary.
+      from: '../app/resources/gd-project-template',
+      to: 'gd-project-template',
+    },
   ],
   linux: {
     target: [

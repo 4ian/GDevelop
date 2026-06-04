@@ -900,6 +900,11 @@ const capturePreviewScreenshotSchema = {
       description:
         'Absolute path to write the PNG to (parent directories are created). If omitted, the screenshot is returned as a base64 data URL instead of a file.',
     },
+    debugger_id: {
+      type: 'string',
+      description:
+        'Optional preview/debugger id to capture. Defaults to the latest launched preview, so you do not capture a stale game-over window. See availableDebuggerIds from gdevelop_inspect_running_preview.',
+    },
   },
   additionalProperties: false,
 };
@@ -965,7 +970,7 @@ const controlPreviewSchema = {
     action: {
       type: 'string',
       description:
-        'pause (freeze the game loop), play (resume), or step (advance exactly N frames while paused for deterministic testing). Defaults to step.',
+        'pause (freeze the game loop), play (resume), step (advance exactly N frames while paused for deterministic testing), or close (stop the targeted preview; pass close_all:true to close every preview). Defaults to step.',
     },
     frames: {
       type: 'number',
@@ -975,6 +980,11 @@ const controlPreviewSchema = {
       type: 'number',
       description:
         'For action=step: simulated milliseconds per frame (default ~16.67 = 60 FPS). Keep small; large values are clamped by the engine.',
+    },
+    close_all: {
+      type: 'boolean',
+      description:
+        'For action=close: close ALL running previews instead of just the targeted one. Useful before relaunching to avoid stale windows.',
     },
     debugger_id: {
       type: 'string',
@@ -998,7 +1008,7 @@ const setRuntimeStateSchema = {
           type: {
             type: 'string',
             description:
-              'setVariable | moveInstance | spawnInstance | deleteInstance.',
+              'setVariable | moveInstance | spawnInstance | deleteInstance | deleteAllInstances.',
           },
           scope: {
             type: 'string',
@@ -1825,8 +1835,25 @@ const readTools: Array<McpTool> = [
   {
     name: 'read_scene_events_serialized',
     description:
-      'Read one scene event sheet as raw serialized event JSON, including event types unsupported by text rendering.',
-    inputSchema: sceneNameSchema,
+      'Read one scene event sheet as raw serialized event JSON, including event types unsupported by text rendering. Pass summary_only:true for just root event counts/types (avoids dumping a huge tree); the JSON string is omitted by default — pass include_json:true to also get it.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        scene_name: sceneNameSchema.properties.scene_name,
+        summary_only: {
+          type: 'boolean',
+          description:
+            'Return only a compact summary (root event count + per-type counts) instead of the full serialized tree.',
+        },
+        include_json: {
+          type: 'boolean',
+          description:
+            'Also include serializedEventsJson (a string copy of the events). Off by default to keep the response small.',
+        },
+      },
+      required: ['scene_name'],
+      additionalProperties: true,
+    },
   },
   {
     name: 'inspect_project_resources',
@@ -1967,6 +1994,26 @@ const writeTools: Array<McpTool> = [
     name: 'delete_scene',
     description: 'Delete a scene/layout from the current project.',
     inputSchema: sceneNameSchema,
+  },
+  {
+    name: 'rename_scene',
+    description:
+      'Safely rename a scene/layout, updating references (e.g. change-scene actions) across the project and closing its open editor tabs. Use this instead of leaving placeholder names like "Untitled scene".',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        scene_name: {
+          type: 'string',
+          description: 'Current scene/layout name.',
+        },
+        new_scene_name: {
+          type: 'string',
+          description: 'New name for the scene/layout (must be unique).',
+        },
+      },
+      required: ['scene_name', 'new_scene_name'],
+      additionalProperties: true,
+    },
   },
   {
     name: 'create_or_replace_object',

@@ -79,6 +79,9 @@ const gd: libGDevelop = global.gd;
 const fs = optionalRequire('fs');
 const path = optionalRequire('path');
 
+// Monotonic id used to match targeted preview request/response messages.
+let nextTargetedRequestId = 1;
+
 const getDefaultProcessEditorFunctionCalls = (): Function => {
   // Lazily require the runner so focused MCP unit tests do not load the full
   // rendering stack pulled by EditorFunctionCallRunner.
@@ -113,6 +116,7 @@ type McpEditorBridgeContext = {|
   saveProjectAndWait?: () => Promise<any>,
   getEditorSelection?: () => Object,
   getPreviewDebuggerServer?: () => ?Object,
+  closeAllPreviews?: () => void,
   generateEvents?: Function,
   onSceneEventsModifiedOutsideEditor?: Function,
   onExtensionFunctionEventsModifiedOutsideEditor?: Function,
@@ -556,6 +560,9 @@ const captureRunningPreviewState = (
         },
         onHandleParsedMessage: ({ id, parsedMessage }) => {
           if (!parsedMessage || typeof parsedMessage !== 'object') return;
+          // Only accept dump/status/logs from the targeted preview, so a stale
+          // window's messages are not mixed into this inspection.
+          if (id !== targetId) return;
           if (parsedMessage.command === 'dump') {
             dumpPayload = parsedMessage.payload;
             // Got what we came for; resolve promptly.
@@ -601,62 +608,32 @@ const capturePreviewScreenshot = async (
   previewDebuggerServer: ?Object,
   args: Object
 ): Promise<Object> => {
-  if (!previewDebuggerServer) {
-    return {
-      success: false,
-      running: false,
-      error:
-        'No preview debugger server is available in this editor build. Screenshot capture is unsupported here.',
-    };
-  }
-  if (previewDebuggerServer.getServerState() !== 'started') {
-    return {
-      success: false,
-      running: false,
-      error:
-        'No preview is running. Launch a preview first with gdevelop_run_command { commandName: "LAUNCH_NEW_PREVIEW" }, then capture a screenshot.',
-    };
-  }
-  const previewIds =
-    typeof previewDebuggerServer.getExistingPreviewDebuggerIds === 'function'
-      ? previewDebuggerServer.getExistingPreviewDebuggerIds()
-      : previewDebuggerServer.getExistingDebuggerIds();
-  if (!previewIds || !previewIds.length) {
-    return {
-      success: false,
-      running: false,
-      error:
-        'No preview is currently connected. Launch a preview first with gdevelop_run_command { commandName: "LAUNCH_NEW_PREVIEW" }.',
-    };
-  }
-  if (typeof previewDebuggerServer.sendMessageWithResponse !== 'function') {
+  const guard = requireRunningPreview(previewDebuggerServer, args);
+  if (!guard.ok) return guard.result;
+  const targetId = guard.targetId;
+
+  // Target the chosen preview specifically (defaults to the latest launched),
+  // so a stale game-over window cannot answer the screenshot request first.
+  const { matched, payload } = await sendTargetedRequest(
+    (previewDebuggerServer: any),
+    targetId,
+    { command: 'captureScreenshot' }
+  );
+  if (!matched) {
     return {
       success: false,
       running: true,
+      debuggerId: targetId,
       error:
-        'This editor build does not support request/response debugger messages required for screenshots.',
+        'Screenshot request timed out: the targeted preview did not reply. It may be loading or not responding.',
     };
   }
 
-  let response;
-  try {
-    response = await previewDebuggerServer.sendMessageWithResponse({
-      command: 'captureScreenshot',
-    });
-  } catch (error) {
-    return {
-      success: false,
-      running: true,
-      error: `Screenshot request failed or timed out: ${error.message ||
-        error}. The preview may be loading or not responding.`,
-    };
-  }
-
-  const payload = (response && response.payload) || {};
   if (!payload.dataUrl) {
     return {
       success: false,
       running: true,
+      debuggerId: targetId,
       error:
         payload.error ||
         'The preview did not return image data. The game canvas may not be ready yet.',
@@ -840,33 +817,10 @@ const simulatePreviewInput = async (
   previewDebuggerServer: ?Object,
   args: Object
 ): Promise<Object> => {
-  if (!previewDebuggerServer) {
-    return {
-      success: false,
-      running: false,
-      error:
-        'No preview debugger server is available in this editor build. Input simulation is unsupported here.',
-    };
-  }
-  if (previewDebuggerServer.getServerState() !== 'started') {
-    return {
-      success: false,
-      running: false,
-      error:
-        'No preview is running. Launch a preview first with gdevelop_run_command { commandName: "LAUNCH_NEW_PREVIEW" }, then simulate input.',
-    };
-  }
-  const previewIds =
-    typeof previewDebuggerServer.getExistingPreviewDebuggerIds === 'function'
-      ? previewDebuggerServer.getExistingPreviewDebuggerIds()
-      : previewDebuggerServer.getExistingDebuggerIds();
-  if (!previewIds || !previewIds.length) {
-    return {
-      success: false,
-      running: false,
-      error: 'No preview is currently connected.',
-    };
-  }
+  const guard = requireRunningPreview(previewDebuggerServer, args);
+  if (!guard.ok) return guard.result;
+  const targetId = guard.targetId;
+
   const rawInputs = Array.isArray(args && args.inputs) ? args.inputs : null;
   if (!rawInputs || !rawInputs.length) {
     return {
@@ -885,50 +839,27 @@ const simulatePreviewInput = async (
     resolved.push(result.input);
   }
 
-  const targetId =
-    args && typeof args.debugger_id === 'string'
-      ? args.debugger_id
-      : previewIds[previewIds.length - 1];
-
-  // Prefer request/response so we can report what the runtime applied; fall back
-  // to fire-and-forget sendMessage if unsupported.
-  if (typeof previewDebuggerServer.sendMessageWithResponse === 'function') {
-    try {
-      const response = await previewDebuggerServer.sendMessageWithResponse({
-        command: 'simulateInput',
-        inputs: resolved,
-      });
-      const payload = (response && response.payload) || {};
-      return {
-        success: !payload.error,
-        running: true,
-        debuggerId: targetId,
-        applied: payload.applied,
-        error: payload.error || undefined,
-      };
-    } catch (error) {
-      // Fall through to fire-and-forget.
-    }
-  }
-  try {
-    previewDebuggerServer.sendMessage(targetId, {
-      command: 'simulateInput',
-      inputs: resolved,
-    });
-  } catch (error) {
+  const { matched, payload } = await sendTargetedRequest(
+    (previewDebuggerServer: any),
+    targetId,
+    { command: 'simulateInput', inputs: resolved }
+  );
+  if (!matched) {
     return {
-      success: false,
+      success: true,
       running: true,
-      error: `Could not send input to the preview: ${error.message}`,
+      debuggerId: targetId,
+      appliedCount: resolved.length,
+      note:
+        'Input sent but not confirmed (no reply from the targeted preview before timeout). Press and release are separate inputs; hold a key by sending keyPressed without keyReleased.',
     };
   }
   return {
-    success: true,
+    success: !payload.error,
     running: true,
     debuggerId: targetId,
-    appliedCount: resolved.length,
-    note:
-      'Input sent (fire-and-forget; this build does not confirm application). Press and release are separate inputs; hold a key by sending keyPressed without keyReleased.',
+    applied: payload.applied,
+    error: payload.error || undefined,
   };
 };
 
@@ -976,7 +907,81 @@ const requireRunningPreview = (
     args && typeof args.debugger_id === 'string'
       ? args.debugger_id
       : previewIds[previewIds.length - 1];
-  return { ok: true, targetId };
+  return { ok: true, targetId, previewIds };
+};
+
+// Send a request to ONE specific preview and resolve with the reply that comes
+// back FROM THAT preview (matched by messageId + source id). This is required
+// because the shared sendMessageWithResponse broadcasts to every connected
+// preview and resolves on the first reply — which, with several previews open
+// (e.g. a stale game-over window), can return the wrong preview's data.
+// Falls back to fire-and-forget sendMessage if callbacks are unavailable.
+const sendTargetedRequest = (
+  previewDebuggerServer: Object,
+  targetId: string,
+  message: Object,
+  options?: {| timeoutMs?: number |}
+): Promise<{| matched: boolean, payload: Object |}> => {
+  const timeoutMs = (options && options.timeoutMs) || 2500;
+  return new Promise(resolve => {
+    if (typeof previewDebuggerServer.registerCallbacks !== 'function') {
+      // No way to capture a reply: send targeted and report unconfirmed.
+      try {
+        previewDebuggerServer.sendMessage(targetId, message);
+      } catch (error) {
+        resolve({ matched: false, payload: { error: error.message } });
+        return;
+      }
+      resolve({ matched: false, payload: {} });
+      return;
+    }
+
+    // Stamp a unique messageId so we only accept the matching reply.
+    const messageId = `mcp-${targetId}-${nextTargetedRequestId++}`;
+    let settled = false;
+    let unregister = () => {};
+    const finish = result => {
+      if (settled) return;
+      settled = true;
+      try {
+        unregister();
+      } catch (error) {
+        // ignore
+      }
+      resolve(result);
+    };
+
+    try {
+      unregister = previewDebuggerServer.registerCallbacks({
+        onErrorReceived: () => {},
+        onServerStateChanged: () => {},
+        onConnectionClosed: () => {},
+        onConnectionOpened: () => {},
+        onConnectionErrored: () => {},
+        onHandleParsedMessage: ({ id, parsedMessage }) => {
+          if (
+            id === targetId &&
+            parsedMessage &&
+            parsedMessage.messageId === messageId
+          ) {
+            finish({ matched: true, payload: parsedMessage.payload || {} });
+          }
+        },
+      });
+    } catch (error) {
+      resolve({ matched: false, payload: { error: error.message } });
+      return;
+    }
+
+    try {
+      previewDebuggerServer.sendMessage(targetId, { ...message, messageId });
+    } catch (error) {
+      finish({ matched: false, payload: { error: error.message } });
+      return;
+    }
+
+    setTimeout(() => finish({ matched: false, payload: {} }), timeoutMs);
+  });
 };
 
 // Deterministic preview control: pause / play / step N frames. Pausing then
@@ -1003,55 +1008,44 @@ const controlPreview = async (
     return { success: true, running: true, debuggerId: targetId, action };
   }
 
+  // Note: action === 'close' is handled at the tool-handler level (it closes
+  // preview windows via the launcher, not the debugger server).
+
   if (action === 'step') {
     const count = args && typeof args.frames === 'number' ? args.frames : 1;
     const fakeElapsedTimeMs =
       args && typeof args.frame_delta_ms === 'number'
         ? args.frame_delta_ms
         : undefined;
-    if (typeof previewDebuggerServer.sendMessageWithResponse === 'function') {
-      try {
-        const response = await previewDebuggerServer.sendMessageWithResponse({
-          command: 'stepFrames',
-          count,
-          fakeElapsedTimeMs,
-        });
-        const payload = (response && response.payload) || {};
-        return {
-          success: true,
-          running: true,
-          debuggerId: targetId,
-          action: 'step',
-          ...payload,
-        };
-      } catch (error) {
-        // Fall through to fire-and-forget.
-      }
-    }
-    try {
-      // $FlowFixMe
-      previewDebuggerServer.sendMessage(targetId, {
-        command: 'stepFrames',
-        count,
-        fakeElapsedTimeMs,
-      });
-    } catch (error) {
-      return { success: false, running: true, error: error.message };
+    const { matched, payload } = await sendTargetedRequest(
+      (previewDebuggerServer: any),
+      targetId,
+      { command: 'stepFrames', count, fakeElapsedTimeMs }
+    );
+    if (!matched) {
+      return {
+        success: true,
+        running: true,
+        debuggerId: targetId,
+        action: 'step',
+        requestedFrames: count,
+        note:
+          'Step requested but not confirmed (no reply from the targeted preview before timeout).',
+      };
     }
     return {
       success: true,
       running: true,
       debuggerId: targetId,
       action: 'step',
-      requestedFrames: count,
-      note: 'Step requested (this build does not confirm frame count).',
+      ...payload,
     };
   }
 
   return {
     success: false,
     running: true,
-    error: `Unknown action "${action}". Use pause, play, or step.`,
+    error: `Unknown action "${action}". Use pause, play, step, or close.`,
   };
 };
 
@@ -1076,39 +1070,29 @@ const setRuntimeState = async (
         'Missing "operations": an array, e.g. [{ type: "setVariable", scope: "scene", name: "GameOver", value: 0 }].',
     };
   }
-  if (typeof previewDebuggerServer.sendMessageWithResponse === 'function') {
-    try {
-      const response = await previewDebuggerServer.sendMessageWithResponse({
-        command: 'setRuntimeState',
-        operations,
-      });
-      const payload = (response && response.payload) || {};
-      return {
-        success: !payload.error,
-        running: true,
-        debuggerId: targetId,
-        applied: payload.applied,
-        error: payload.error || undefined,
-      };
-    } catch (error) {
-      // Fall through.
-    }
-  }
-  try {
-    // $FlowFixMe
-    previewDebuggerServer.sendMessage(targetId, {
-      command: 'setRuntimeState',
-      operations,
-    });
-  } catch (error) {
-    return { success: false, running: true, error: error.message };
+  // Target the chosen preview specifically (defaults to the latest), so a stale
+  // window does not answer instead.
+  const { matched, payload } = await sendTargetedRequest(
+    (previewDebuggerServer: any),
+    targetId,
+    { command: 'setRuntimeState', operations }
+  );
+  if (!matched) {
+    return {
+      success: true,
+      running: true,
+      debuggerId: targetId,
+      appliedCount: operations.length,
+      note:
+        'State sent but not confirmed (no reply from the targeted preview before timeout).',
+    };
   }
   return {
-    success: true,
+    success: !payload.error,
     running: true,
     debuggerId: targetId,
-    appliedCount: operations.length,
-    note: 'State sent (fire-and-forget; this build does not confirm).',
+    applied: payload.applied,
+    error: payload.error || undefined,
   };
 };
 
@@ -1726,6 +1710,24 @@ const callMcpTool = async ({
     const previewDebuggerServer = context.getPreviewDebuggerServer
       ? context.getPreviewDebuggerServer()
       : null;
+    // Closing actual preview WINDOWS goes through the preview launcher, not the
+    // debugger server. Handle it here where the context callback is available.
+    if (args && args.action === 'close') {
+      if (typeof context.closeAllPreviews === 'function') {
+        context.closeAllPreviews();
+        return textResult({
+          success: true,
+          running: false,
+          action: 'close',
+          closedAll: true,
+          note:
+            'Closed all running previews. (Closing a single preview window is not supported; relaunch the ones you need.)',
+        });
+      }
+      return errorResult(
+        'Closing previews is not supported in this editor build.'
+      );
+    }
     try {
       return textResult(
         await controlPreview(previewDebuggerServer, args || {})

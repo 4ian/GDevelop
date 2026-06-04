@@ -1741,6 +1741,8 @@ const MainFrame = (props: Props): React.MixedElement => {
     });
   };
 
+  // Pre-existing: recreated each render by design; not part of this change.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const onWillInstallExtension = (extensionNames: Array<string>) => {
     const { currentProject } = state;
     if (!currentProject) return;
@@ -1766,6 +1768,8 @@ const MainFrame = (props: Props): React.MixedElement => {
     }
   };
 
+  // Pre-existing: recreated each render by design; not part of this change.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const onExtensionInstalled = (extensionNames: Array<string>) => {
     const { currentProject } = state;
     if (!currentProject) {
@@ -5106,9 +5110,19 @@ const MainFrame = (props: Props): React.MixedElement => {
   const mcpEditorCallbacks: EditorCallbacks = React.useMemo(
     () => ({
       onOpenLayout: (sceneName, options) => openLayout(sceneName, options),
+      onCloseLayout: (sceneName: string) => {
+        const currentProject = currentProjectRef.current;
+        if (!currentProject || !currentProject.hasLayoutNamed(sceneName))
+          return;
+        const layout = currentProject.getLayout(sceneName);
+        setState(state => ({
+          ...state,
+          editorTabs: closeLayoutTabs(state.editorTabs, layout),
+        }));
+      },
       onCreateProject: onCreateProjectFromMcp,
     }),
-    [openLayout, onCreateProjectFromMcp]
+    [openLayout, onCreateProjectFromMcp, currentProjectRef, setState]
   );
 
   const getMcpEditorSelection = React.useCallback(
@@ -5175,6 +5189,12 @@ const MainFrame = (props: Props): React.MixedElement => {
           _previewLauncher.current
             ? _previewLauncher.current.getPreviewDebuggerServer()
             : null,
+        closeAllPreviews: () => {
+          const previewLauncher = _previewLauncher.current;
+          if (previewLauncher && previewLauncher.closeAllPreviews) {
+            previewLauncher.closeAllPreviews();
+          }
+        },
         generateEvents,
         onSceneEventsModifiedOutsideEditor,
         onExtensionFunctionEventsModifiedOutsideEditor,

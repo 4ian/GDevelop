@@ -1875,4 +1875,115 @@ describe('editorFunctions', () => {
       expect(project.getName()).toBe('My Game');
     });
   });
+
+  describe('delete_scene', () => {
+    let project;
+    beforeEach(() => {
+      project = gd.ProjectHelper.createNewGDJSProject();
+      project.insertNewLayout('SceneToDelete', 0);
+      project.insertNewLayout('OtherScene', 1);
+    });
+    afterEach(() => {
+      project.delete();
+    });
+
+    it('closes the layout editor tabs before removing the layout', async () => {
+      const calls = [];
+      const onCloseLayout = jest.fn(sceneName => {
+        // Record that the layout still exists at the moment tabs are closed —
+        // it must be closed BEFORE removeLayout frees the C++ objects.
+        calls.push({
+          event: 'close',
+          existsNow: project.hasLayoutNamed(sceneName),
+        });
+      });
+
+      const result = await editorFunctions.delete_scene.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: { scene_name: 'SceneToDelete' },
+        editorCallbacks: {
+          onOpenLayout: jest.fn(),
+          onCloseLayout,
+          onCreateProject: jest.fn(),
+        },
+      });
+
+      expect(result.success).toBe(true);
+      expect(onCloseLayout).toHaveBeenCalledWith('SceneToDelete');
+      // Tabs were closed while the layout still existed (i.e. before removal).
+      expect(calls).toEqual([{ event: 'close', existsNow: true }]);
+      // The layout is actually removed afterwards.
+      expect(project.hasLayoutNamed('SceneToDelete')).toBe(false);
+      expect(project.hasLayoutNamed('OtherScene')).toBe(true);
+    });
+
+    it('clears firstLayout when the deleted scene was the startup scene', async () => {
+      project.setFirstLayout('SceneToDelete');
+
+      await editorFunctions.delete_scene.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: { scene_name: 'SceneToDelete' },
+      });
+
+      expect(project.getFirstLayout()).toBe('');
+    });
+
+    it('does not require onCloseLayout to be provided', async () => {
+      const options = makeFakeLaunchFunctionOptionsWithProject(project);
+      // No onCloseLayout in the default callbacks — must not throw.
+      const result = await editorFunctions.delete_scene.launchFunction({
+        ...options,
+        args: { scene_name: 'SceneToDelete' },
+      });
+      expect(result.success).toBe(true);
+      expect(project.hasLayoutNamed('SceneToDelete')).toBe(false);
+    });
+  });
+
+  describe('rename_scene', () => {
+    let project;
+    beforeEach(() => {
+      project = gd.ProjectHelper.createNewGDJSProject();
+      project.insertNewLayout('Untitled scene', 0);
+    });
+    afterEach(() => {
+      project.delete();
+    });
+
+    it('renames a scene and closes its open tabs first', async () => {
+      const onCloseLayout = jest.fn();
+      const result = await editorFunctions.rename_scene.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: { scene_name: 'Untitled scene', new_scene_name: 'Main Menu' },
+        editorCallbacks: {
+          onOpenLayout: jest.fn(),
+          onCloseLayout,
+          onCreateProject: jest.fn(),
+        },
+      });
+      expect(result.success).toBe(true);
+      expect(onCloseLayout).toHaveBeenCalledWith('Untitled scene');
+      expect(project.hasLayoutNamed('Untitled scene')).toBe(false);
+      expect(project.hasLayoutNamed('Main Menu')).toBe(true);
+    });
+
+    it('updates firstLayout when renaming the startup scene', async () => {
+      project.setFirstLayout('Untitled scene');
+      await editorFunctions.rename_scene.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: { scene_name: 'Untitled scene', new_scene_name: 'Main Menu' },
+      });
+      expect(project.getFirstLayout()).toBe('Main Menu');
+    });
+
+    it('fails if the new name already exists', async () => {
+      project.insertNewLayout('Main Menu', 1);
+      const result = await editorFunctions.rename_scene.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: { scene_name: 'Untitled scene', new_scene_name: 'Main Menu' },
+      });
+      expect(result.success).toBe(false);
+      expect(project.hasLayoutNamed('Untitled scene')).toBe(true);
+    });
+  });
 });

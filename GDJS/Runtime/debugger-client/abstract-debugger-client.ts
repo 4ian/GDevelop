@@ -1142,6 +1142,7 @@ namespace gdjs {
      *   moveInstance: { type, objectName, index?, x, y }
      *   spawnInstance: { type, objectName, x?, y? }
      *   deleteInstance: { type, objectName, index? }
+     *   deleteAllInstances: { type, objectName }
      */
     setRuntimeState(operations: Array<any>, messageId: number): void {
       const applied: Array<string> = [];
@@ -1194,6 +1195,16 @@ namespace gdjs {
             } else {
               applied.push('deleteInstance:not-found:' + op.objectName);
             }
+          } else if (op.type === 'deleteAllInstances' && scene) {
+            // Delete every live instance of the object in one op (no need to
+            // know the count or call index-by-index).
+            const instances = (scene.getInstancesOf(op.objectName) || []).slice();
+            for (const instance of instances) {
+              instance.deleteFromScene();
+            }
+            applied.push(
+              'deleteAllInstances:' + op.objectName + ':' + instances.length
+            );
           } else {
             applied.push('unknown:' + op.type);
           }

@@ -219,6 +219,10 @@ export type EditorCallbacks = {|
         | 'none',
     |}
   ) => void,
+  // Close any open editor tabs (scene + events) for a layout. Must be called
+  // before removing the layout from the project, otherwise editors keep a
+  // wrapper to a freed C++ object (use-after-free on e.g. LayersContainer).
+  onCloseLayout?: (sceneName: string) => void,
   onCreateProject: ({|
     name: string,
     exampleSlug: string | null,
@@ -3939,7 +3943,10 @@ const makeDirectEventChanges = (
     ];
   }
 
-  const eventChanges = SafeExtractor.extractArrayProperty(args, 'event_changes');
+  const eventChanges = SafeExtractor.extractArrayProperty(
+    args,
+    'event_changes'
+  );
   if (!eventChanges) return null;
 
   return eventChanges
@@ -4332,7 +4339,8 @@ const addSceneEvents: EditorFunction = {
       }
 
       const invalidDirectEventChange = directEventChanges.find(
-        change => change.operationName !== 'delete_event' && !change.generatedEvents
+        change =>
+          change.operationName !== 'delete_event' && !change.generatedEvents
       );
       if (invalidDirectEventChange) {
         return makeGenericFailure(
@@ -4836,16 +4844,81 @@ const deleteScene: EditorFunction = {
       ),
     };
   },
-  launchFunction: async ({ project, args }) => {
+  launchFunction: async ({ project, args, editorCallbacks }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
 
     if (!project.hasLayoutNamed(scene_name)) {
       return makeGenericSuccess(`Scene "${scene_name}" already absent.`);
     }
 
+    // Close any open editor tabs for this scene BEFORE removing the layout.
+    // Otherwise a still-mounted SceneEditor/LayersList keeps a JS wrapper to the
+    // layout's now-freed C++ objects (LayersContainer, etc.) and crashes with a
+    // use-after-free on the next render.
+    if (editorCallbacks && editorCallbacks.onCloseLayout) {
+      editorCallbacks.onCloseLayout(scene_name);
+    }
+
+    if (project.getFirstLayout() === scene_name) {
+      project.setFirstLayout('');
+    }
     project.removeLayout(scene_name);
 
     return makeGenericSuccess(`Deleted scene "${scene_name}".`);
+  },
+  modifiesProject: true,
+};
+
+/**
+ * Safely renames a scene/layout, updating references across the project.
+ */
+const renameScene: EditorFunction = {
+  renderForEditor: ({ args }) => {
+    const scene_name = extractRequiredString(args, 'scene_name');
+    const new_scene_name = extractRequiredString(args, 'new_scene_name');
+    return {
+      text: (
+        <Trans>
+          Rename scene <b>{scene_name}</b> to <b>{new_scene_name}</b>.
+        </Trans>
+      ),
+    };
+  },
+  launchFunction: async ({ project, args, editorCallbacks }) => {
+    const scene_name = extractRequiredString(args, 'scene_name');
+    const new_scene_name = extractRequiredString(args, 'new_scene_name');
+
+    if (!project.hasLayoutNamed(scene_name)) {
+      return makeGenericFailure(`Scene not found: "${scene_name}".`);
+    }
+    if (scene_name === new_scene_name) {
+      return makeGenericSuccess(`Scene already named "${scene_name}".`);
+    }
+    if (project.hasLayoutNamed(new_scene_name)) {
+      return makeGenericFailure(
+        `A scene named "${new_scene_name}" already exists.`
+      );
+    }
+
+    // Close open editor tabs for the scene first, to avoid a stale editor
+    // holding wrappers to objects whose names/containers change during rename.
+    if (editorCallbacks && editorCallbacks.onCloseLayout) {
+      editorCallbacks.onCloseLayout(scene_name);
+    }
+
+    const wasFirstLayout = project.getFirstLayout() === scene_name;
+    // Rename the layout itself, then refactor references (e.g. "change scene"
+    // actions) across the project. Both steps are required — renameLayout only
+    // updates references.
+    project.getLayout(scene_name).setName(new_scene_name);
+    gd.WholeProjectRefactorer.renameLayout(project, scene_name, new_scene_name);
+    if (wasFirstLayout) {
+      project.setFirstLayout(new_scene_name);
+    }
+
+    return makeGenericSuccess(
+      `Renamed scene "${scene_name}" to "${new_scene_name}".`
+    );
   },
   modifiesProject: true,
 };
@@ -5254,7 +5327,9 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
           changes.push(
             `Created new layer "${new_layer_name ||
               layerName}" for scene "${scene.getName()}" at index ${insertPosition} of ${layersCount} (index 0 = bottom/base layer, higher index renders on top; this layer is ${
-              isTopmost ? 'the topmost (renders above all others)' : 'below higher-index layers'
+              isTopmost
+                ? 'the topmost (renders above all others)'
+                : 'below higher-index layers'
             }).`
           );
         }
@@ -5969,6 +6044,7 @@ export const editorFunctions: { [string]: EditorFunction } = {
   add_scene_events: addSceneEvents,
   create_scene: createScene,
   delete_scene: deleteScene,
+  rename_scene: renameScene,
   inspect_scene_properties_layers_effects: inspectScenePropertiesLayersEffects,
   change_scene_properties_layers_effects_groups: changeScenePropertiesLayersEffectsGroups,
   add_or_edit_variable: addOrEditVariable,

@@ -2,6 +2,7 @@
 import path from 'path';
 import {
   copyGitHubRepositoryFilesToLocalProjectFolder,
+  copyLocalTemplateFilesToLocalProjectFolder,
   createNewEmptyProject,
   emptyProjectTemplateFilesSource,
   getProjectTemplateFileDestinationPath,
@@ -18,7 +19,7 @@ describe('CreateProject template files', () => {
     ref: 'main',
   };
 
-  it('marks empty projects as using the GitHub repository files source', () => {
+  it('marks empty projects as using the bundled local template files source', () => {
     const newProjectSource = createNewEmptyProject({
       creationSource: 'default',
     });
@@ -26,6 +27,7 @@ describe('CreateProject template files', () => {
     expect(newProjectSource.templateFilesSource).toEqual(
       emptyProjectTemplateFilesSource
     );
+    expect(emptyProjectTemplateFilesSource.type).toBe('local-folder');
   });
 
   it('copies files from a GitHub repository tree into the local project folder', async () => {
@@ -80,6 +82,111 @@ describe('CreateProject template files', () => {
       'D:\\Project\\assets\\icon.png',
       new Uint8Array([1, 2, 3])
     );
+  });
+
+  it('copies only the subdirectory files and strips the prefix', async () => {
+    const subdirRepository = {
+      owner: 'zhouzhipeng',
+      name: 'GDevelop',
+      ref: 'master',
+      subdirectory: 'gd-project-template',
+    };
+    const fetch = jest
+      .fn()
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          tree: [
+            { path: 'gd-project-template/AGENTS.md', type: 'blob' },
+            { path: 'gd-project-template/assets/icon.png', type: 'blob' },
+            // Files outside the subdirectory must be ignored.
+            { path: 'README.md', type: 'blob' },
+            { path: 'newIDE/app/src/index.js', type: 'blob' },
+          ],
+        }),
+      })
+      .mockResolvedValue({
+        ok: true,
+        arrayBuffer: async () => new Uint8Array([1, 2, 3]).buffer,
+      });
+    const fs = { ensureDir: jest.fn(), writeFile: jest.fn() };
+
+    await copyGitHubRepositoryFilesToLocalProjectFolder({
+      projectFilePath: 'D:\\Project\\game.json',
+      repository: subdirRepository,
+      fetch,
+      fs,
+      path: path.win32,
+    });
+
+    // Raw file is fetched by its FULL repository path...
+    expect(fetch).toHaveBeenCalledWith(
+      'https://raw.githubusercontent.com/zhouzhipeng/GDevelop/master/gd-project-template/AGENTS.md'
+    );
+    // ...but written WITHOUT the subdirectory prefix.
+    expect(fs.writeFile).toHaveBeenCalledWith(
+      'D:\\Project\\AGENTS.md',
+      new Uint8Array([1, 2, 3])
+    );
+    expect(fs.writeFile).toHaveBeenCalledWith(
+      'D:\\Project\\assets\\icon.png',
+      new Uint8Array([1, 2, 3])
+    );
+    // Files outside the subdirectory are not copied.
+    const writtenPaths = fs.writeFile.mock.calls.map(call => call[0]);
+    expect(writtenPaths).not.toContain('D:\\Project\\README.md');
+    expect(writtenPaths).toHaveLength(2);
+  });
+
+  it('recursively copies a bundled local template folder into the project', async () => {
+    // Mock a template folder containing AGENTS.md, CLAUDE.md and a nested skill.
+    const dirEntry = name => ({
+      name,
+      isDirectory: () => false,
+      isFile: () => true,
+    });
+    const subDirEntry = name => ({
+      name,
+      isDirectory: () => true,
+      isFile: () => false,
+    });
+    const fs = {
+      existsSync: jest.fn(() => true),
+      readdir: jest.fn(async dir => {
+        if (dir === '/tpl') {
+          return [
+            dirEntry('AGENTS.md'),
+            dirEntry('CLAUDE.md'),
+            subDirEntry('gdevelop-mcp'),
+          ];
+        }
+        if (dir === '/tpl/gdevelop-mcp') {
+          return [dirEntry('SKILL.md'), subDirEntry('agents')];
+        }
+        if (dir === '/tpl/gdevelop-mcp/agents') {
+          return [dirEntry('openai.yaml')];
+        }
+        return [];
+      }),
+      ensureDir: jest.fn(async () => {}),
+      readFile: jest.fn(async () => Buffer.from('content')),
+      writeFile: jest.fn(async () => {}),
+    };
+
+    await copyLocalTemplateFilesToLocalProjectFolder({
+      projectFilePath: '/Project/game.json',
+      templateFolderPath: '/tpl',
+      fs,
+      path: path.posix,
+    });
+
+    const written = fs.writeFile.mock.calls.map(call => call[0]).sort();
+    expect(written).toEqual([
+      '/Project/AGENTS.md',
+      '/Project/CLAUDE.md',
+      '/Project/gdevelop-mcp/SKILL.md',
+      '/Project/gdevelop-mcp/agents/openai.yaml',
+    ]);
   });
 
   it('rejects repository paths that would escape the local project folder', () => {

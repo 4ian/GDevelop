@@ -2473,12 +2473,40 @@ export const readSceneEventsSerialized = (
 ): Object => {
   const sceneName = getRequiredString(args, 'scene_name');
   const scene = getScene(project, sceneName);
-  return {
+  const serializedEvents = serializeToJSObject(scene.getEvents());
+  const rootEvents = Array.isArray(serializedEvents) ? serializedEvents : [];
+
+  // summary_only: return a compact overview (root event count + per-type counts)
+  // instead of the full, potentially huge, serialized event tree.
+  if (args && (args.summary_only === true || args.summaryOnly === true)) {
+    const typeCounts = {};
+    rootEvents.forEach(event => {
+      const type = (event && event.type) || 'unknown';
+      typeCounts[type] = (typeCounts[type] || 0) + 1;
+    });
+    return {
+      success: true,
+      sceneName,
+      summary: {
+        rootEventsCount: rootEvents.length,
+        rootEventTypeCounts: typeCounts,
+      },
+      note:
+        'Compact summary. Omit summary_only to get the full serialized events; pass include_json:true to also get the JSON string.',
+    };
+  }
+
+  const result: Object = {
     success: true,
     sceneName,
-    serializedEvents: serializeToJSObject(scene.getEvents()),
-    serializedEventsJson: serializeToJSON(scene.getEvents()),
+    serializedEvents,
   };
+  // The JSON string duplicates serializedEvents and can be very large, so only
+  // include it when explicitly requested.
+  if (args && (args.include_json === true || args.includeJson === true)) {
+    result.serializedEventsJson = serializeToJSON(scene.getEvents());
+  }
+  return result;
 };
 
 export const bulkEditSceneAssets = (

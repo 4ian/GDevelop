@@ -53,6 +53,47 @@ describe('McpEditorBridge', () => {
       ...overrides,
     });
 
+  // Build a mock preview debugger server that answers TARGETED requests: when
+  // sendMessage(id, {command, messageId}) is called, it replies (via the
+  // registered onHandleParsedMessage callback) from that id with the same
+  // messageId. `responders` maps a command to a payload (or a function of the
+  // message returning a payload).
+  const makeTargetedPreviewServer = ({
+    debuggerIds = ['preview-ws-0'],
+    responders = {},
+  }: Object = {}) => {
+    let callbacks = null;
+    return {
+      getServerState: () => 'started',
+      getExistingPreviewDebuggerIds: () => debuggerIds,
+      getExistingDebuggerIds: () => debuggerIds,
+      registerCallbacks: registered => {
+        callbacks = registered;
+        return () => {
+          callbacks = null;
+        };
+      },
+      sendMessage: (id, message) => {
+        const responder = responders[message.command];
+        if (responder === undefined || !callbacks) return;
+        const payload =
+          typeof responder === 'function' ? responder(message) : responder;
+        // Reply asynchronously from the targeted id, echoing the messageId.
+        setTimeout(() => {
+          if (callbacks)
+            callbacks.onHandleParsedMessage({
+              id,
+              parsedMessage: {
+                command: `${message.command}-reply`,
+                messageId: message.messageId,
+                payload,
+              },
+            });
+        }, 2);
+      },
+    };
+  };
+
   it('lists MCP tools using current permissions', async () => {
     const bridge = makeBridge();
 
@@ -2310,20 +2351,16 @@ describe('McpEditorBridge', () => {
     // 1x1 transparent PNG.
     const onePixelPng =
       'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+M8AAAMCAQDLuRBYAAAAAElFTkSuQmCC';
-    const previewDebuggerServer = {
-      getServerState: () => 'started',
-      getExistingPreviewDebuggerIds: () => ['preview-ws-0'],
-      getExistingDebuggerIds: () => ['preview-ws-0'],
-      registerCallbacks: () => () => {},
-      sendMessage: () => {},
-      sendMessageWithResponse: message => {
-        expect(message.command).toBe('captureScreenshot');
-        return Promise.resolve({
-          command: 'screenshot',
-          payload: { dataUrl: onePixelPng, width: 1, height: 1, error: null },
-        });
+    const previewDebuggerServer = makeTargetedPreviewServer({
+      responders: {
+        captureScreenshot: {
+          dataUrl: onePixelPng,
+          width: 1,
+          height: 1,
+          error: null,
+        },
       },
-    };
+    });
 
     const bridge = makeBridge({
       getPreviewDebuggerServer: () => previewDebuggerServer,
@@ -2341,21 +2378,68 @@ describe('McpEditorBridge', () => {
     expect(result.dataUrl).toBe(onePixelPng);
   });
 
+  it('captures a screenshot from the requested debugger_id', async () => {
+    const onePixelPng =
+      'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+M8AAAMCAQDLuRBYAAAAAElFTkSuQmCC';
+    const requestedIds = [];
+    let callbacks = null;
+    const previewDebuggerServer = {
+      getServerState: () => 'started',
+      getExistingPreviewDebuggerIds: () => ['preview-ws-0', 'preview-ws-1'],
+      getExistingDebuggerIds: () => ['preview-ws-0', 'preview-ws-1'],
+      registerCallbacks: registered => {
+        callbacks = registered;
+        return () => {
+          callbacks = null;
+        };
+      },
+      sendMessage: (id, message) => {
+        requestedIds.push(id);
+        setTimeout(
+          () =>
+            callbacks &&
+            callbacks.onHandleParsedMessage({
+              id,
+              parsedMessage: {
+                command: 'screenshot',
+                messageId: message.messageId,
+                payload: { dataUrl: onePixelPng, width: 1, height: 1 },
+              },
+            }),
+          2
+        );
+      },
+    };
+    const bridge = makeBridge({
+      getPreviewDebuggerServer: () => previewDebuggerServer,
+    });
+
+    const response = await bridge.handleRendererMcpRequest({
+      method: 'tools/call',
+      params: {
+        name: 'capture_preview_screenshot',
+        arguments: { debugger_id: 'preview-ws-0' },
+      },
+    });
+    const result = JSON.parse(response.content[0].text);
+    expect(result.success).toBe(true);
+    // It must have addressed exactly the requested (older) preview, not latest.
+    expect(requestedIds).toEqual(['preview-ws-0']);
+  });
+
   it('writes a preview screenshot to a file when file_path is given', async () => {
     const onePixelPng =
       'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+M8AAAMCAQDLuRBYAAAAAElFTkSuQmCC';
-    const previewDebuggerServer = {
-      getServerState: () => 'started',
-      getExistingPreviewDebuggerIds: () => ['preview-ws-0'],
-      getExistingDebuggerIds: () => ['preview-ws-0'],
-      registerCallbacks: () => () => {},
-      sendMessage: () => {},
-      sendMessageWithResponse: () =>
-        Promise.resolve({
-          command: 'screenshot',
-          payload: { dataUrl: onePixelPng, width: 1, height: 1, error: null },
-        }),
-    };
+    const previewDebuggerServer = makeTargetedPreviewServer({
+      responders: {
+        captureScreenshot: {
+          dataUrl: onePixelPng,
+          width: 1,
+          height: 1,
+          error: null,
+        },
+      },
+    });
     const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gdevelop-shot-'));
     const filePath = path.join(tempDir, 'frame.png');
 
@@ -2445,20 +2529,14 @@ describe('McpEditorBridge', () => {
 
   it('simulates input into a running preview with key-name mapping', async () => {
     let captured = null;
-    const previewDebuggerServer = {
-      getServerState: () => 'started',
-      getExistingPreviewDebuggerIds: () => ['preview-ws-0'],
-      getExistingDebuggerIds: () => ['preview-ws-0'],
-      registerCallbacks: () => () => {},
-      sendMessage: () => {},
-      sendMessageWithResponse: message => {
-        captured = message;
-        return Promise.resolve({
-          command: 'inputSimulated',
-          payload: { applied: ['keyPressed:37'], error: null },
-        });
+    const previewDebuggerServer = makeTargetedPreviewServer({
+      responders: {
+        simulateInput: message => {
+          captured = message;
+          return { applied: ['keyPressed:37'], error: null };
+        },
       },
-    };
+    });
     const bridge = makeBridge({
       getPreviewDebuggerServer: () => previewDebuggerServer,
     });
@@ -2595,28 +2673,41 @@ describe('McpEditorBridge', () => {
 
   it('steps frames and sets runtime state via control tools', async () => {
     const sent = [];
+    let callbacks = null;
     const previewDebuggerServer = {
       getServerState: () => 'started',
       getExistingPreviewDebuggerIds: () => ['preview-ws-0'],
       getExistingDebuggerIds: () => ['preview-ws-0'],
-      registerCallbacks: () => () => {},
-      sendMessage: (id, message) => sent.push(message),
-      sendMessageWithResponse: message => {
+      registerCallbacks: registered => {
+        callbacks = registered;
+        return () => {
+          callbacks = null;
+        };
+      },
+      sendMessage: (id, message) => {
         sent.push(message);
+        // Reply (with matching messageId) to request/response commands.
+        let payload = null;
         if (message.command === 'stepFrames') {
-          return Promise.resolve({
-            command: 'framesStepped',
-            payload: {
-              steppedFrames: message.count,
-              deltaMs: 16,
-              paused: true,
-            },
-          });
+          payload = { steppedFrames: message.count, deltaMs: 16, paused: true };
+        } else if (message.command === 'setRuntimeState') {
+          payload = { applied: ['setVariable:scene.GameOver'], error: null };
         }
-        return Promise.resolve({
-          command: 'runtimeStateSet',
-          payload: { applied: ['setVariable:scene.GameOver'], error: null },
-        });
+        if (payload && message.messageId && callbacks) {
+          setTimeout(
+            () =>
+              callbacks &&
+              callbacks.onHandleParsedMessage({
+                id,
+                parsedMessage: {
+                  command: `${message.command}-reply`,
+                  messageId: message.messageId,
+                  payload,
+                },
+              }),
+            2
+          );
+        }
       },
     };
     const bridge = makeBridge({
@@ -2656,6 +2747,23 @@ describe('McpEditorBridge', () => {
     const stateResult = JSON.parse(stateResponse.content[0].text);
     expect(stateResult.success).toBe(true);
     expect(stateResult.applied).toContain('setVariable:scene.GameOver');
+  });
+
+  it('closes all previews via control_preview close', async () => {
+    const closeAllPreviews = jest.fn();
+    const bridge = makeBridge({
+      getPreviewDebuggerServer: () =>
+        makeTargetedPreviewServer({ responders: {} }),
+      closeAllPreviews,
+    });
+    const response = await bridge.handleRendererMcpRequest({
+      method: 'tools/call',
+      params: { name: 'control_preview', arguments: { action: 'close' } },
+    });
+    const result = JSON.parse(response.content[0].text);
+    expect(result.success).toBe(true);
+    expect(result.closedAll).toBe(true);
+    expect(closeAllPreviews).toHaveBeenCalled();
   });
 
   it('reports recent sounds from the preview status', async () => {

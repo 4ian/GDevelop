@@ -11,16 +11,28 @@ import {
   type NewProjectCreationSource,
 } from './NewProjectSetupDialog';
 import { retryIfFailed } from '../Utils/RetryIfFailed';
+import { findLocalProjectTemplatePath } from './LocalProjectTemplateFinder';
 const gd: libGDevelop = global.gd;
 const fs = optionalRequire('fs-extra');
 const path = optionalRequire('path');
 
-export type ProjectTemplateFilesSource = {|
-  type: 'github-repository',
-  owner: string,
-  name: string,
-  ref: string,
-|};
+export type ProjectTemplateFilesSource =
+  | {|
+      type: 'github-repository',
+      owner: string,
+      name: string,
+      ref: string,
+      // Optional repository subdirectory holding the template files. When set,
+      // only files under this directory are copied, and the prefix is stripped
+      // so they land at the root of the new project folder.
+      subdirectory?: string,
+    |}
+  | {|
+      // Template files bundled with the app (works offline and in the packaged
+      // binary). The folder is located at runtime via
+      // findLocalProjectTemplatePath.
+      type: 'local-folder',
+    |};
 
 export type NewProjectSource = {|
   project: ?gdProject,
@@ -31,21 +43,28 @@ export type NewProjectSource = {|
 |};
 
 export const emptyProjectTemplateFilesSource: ProjectTemplateFilesSource = {
-  type: 'github-repository',
-  owner: 'zhouzhipeng',
-  name: 'gd-project-template',
-  ref: 'main',
+  // The empty-project template (incl. the gdevelop-mcp skill and AGENTS.md) is
+  // bundled with the app and copied locally on creation. This avoids any network
+  // dependency and keeps working in the released binary.
+  type: 'local-folder',
 };
+
+type GitHubProjectTemplateRepository = {|
+  owner: string,
+  name: string,
+  ref: string,
+  subdirectory?: string,
+|};
 
 const getGitHubRepositoryTreeUrl = ({
   owner,
   name,
   ref,
-}: ProjectTemplateFilesSource): string =>
+}: GitHubProjectTemplateRepository): string =>
   `https://api.github.com/repos/${owner}/${name}/git/trees/${ref}?recursive=1`;
 
 const getGitHubRepositoryRawFileUrl = (
-  repository: ProjectTemplateFilesSource,
+  repository: GitHubProjectTemplateRepository,
   filePath: string
 ): string => {
   const encodedFilePath = filePath
@@ -76,9 +95,7 @@ export const getProjectTemplateFileDestinationPath = ({
     pathModule.isAbsolute(normalizedRelativePath) ||
     normalizedRelativePath.startsWith(`..${pathModule.sep}`)
   ) {
-    throw new Error(
-      `Unsafe project template file path: ${repositoryFilePath}`
-    );
+    throw new Error(`Unsafe project template file path: ${repositoryFilePath}`);
   }
 
   const destinationPath = pathModule.join(
@@ -95,9 +112,7 @@ export const getProjectTemplateFileDestinationPath = ({
     relativeToProjectFolder.startsWith(`..${pathModule.sep}`) ||
     pathModule.isAbsolute(relativeToProjectFolder)
   ) {
-    throw new Error(
-      `Unsafe project template file path: ${repositoryFilePath}`
-    );
+    throw new Error(`Unsafe project template file path: ${repositoryFilePath}`);
   }
 
   return destinationPath;
@@ -111,7 +126,7 @@ export const copyGitHubRepositoryFilesToLocalProjectFolder = async ({
   path: pathModule = path,
 }: {|
   projectFilePath: string,
-  repository: ProjectTemplateFilesSource,
+  repository: GitHubProjectTemplateRepository,
   fetch?: any,
   fs?: any,
   path?: any,
@@ -137,14 +152,29 @@ export const copyGitHubRepositoryFilesToLocalProjectFolder = async ({
   }
 
   const projectFolder = pathModule.dirname(projectFilePath);
+  // When the template lives in a repository subdirectory, only copy files under
+  // it and strip the prefix so they land at the new project's root.
+  const subdirectory = repository.subdirectory
+    ? repository.subdirectory.replace(/\/+$/, '')
+    : null;
+  const subdirectoryPrefix = subdirectory ? `${subdirectory}/` : null;
+
   for (const treeEntry of treeData.tree) {
     if (!treeEntry || treeEntry.type !== 'blob') continue;
     const repositoryFilePath = treeEntry.path;
     if (typeof repositoryFilePath !== 'string') continue;
 
+    // The path used to fetch the raw file (always the full repository path).
+    let relativeFilePath = repositoryFilePath;
+    if (subdirectoryPrefix) {
+      if (!repositoryFilePath.startsWith(subdirectoryPrefix)) continue;
+      relativeFilePath = repositoryFilePath.slice(subdirectoryPrefix.length);
+      if (!relativeFilePath) continue;
+    }
+
     const destinationPath = getProjectTemplateFileDestinationPath({
       projectFolder,
-      repositoryFilePath,
+      repositoryFilePath: relativeFilePath,
       path: pathModule,
     });
     const fileResponse = await fetchImpl(
@@ -160,6 +190,84 @@ export const copyGitHubRepositoryFilesToLocalProjectFolder = async ({
     await fsModule.ensureDir(pathModule.dirname(destinationPath));
     await fsModule.writeFile(destinationPath, fileContent);
   }
+};
+
+// Recursively copy a bundled local template folder into the new project folder.
+// Used for the empty-project template so creation works offline and in the
+// packaged binary (no network/GitHub dependency).
+export const copyLocalTemplateFilesToLocalProjectFolder = async ({
+  projectFilePath,
+  templateFolderPath,
+  fs: fsModule = fs,
+  path: pathModule = path,
+}: {|
+  projectFilePath: string,
+  templateFolderPath: string,
+  fs?: any,
+  path?: any,
+|}): Promise<void> => {
+  if (!fsModule || !pathModule) {
+    throw new Error('Filesystem is not supported.');
+  }
+  if (!fsModule.existsSync(templateFolderPath)) {
+    throw new Error(`Project template folder not found: ${templateFolderPath}`);
+  }
+
+  const projectFolder = pathModule.dirname(projectFilePath);
+
+  const copyDirectory = async (sourceDir: string, relativeDir: string) => {
+    const entries = await fsModule.readdir(sourceDir, { withFileTypes: true });
+    for (const entry of entries) {
+      const entryRelativePath = relativeDir
+        ? `${relativeDir}/${entry.name}`
+        : entry.name;
+      const sourcePath = pathModule.join(sourceDir, entry.name);
+      if (entry.isDirectory()) {
+        await copyDirectory(sourcePath, entryRelativePath);
+        continue;
+      }
+      if (!entry.isFile()) continue;
+
+      // Reuse the same path-safety check as the GitHub path.
+      const destinationPath = getProjectTemplateFileDestinationPath({
+        projectFolder,
+        repositoryFilePath: entryRelativePath,
+        path: pathModule,
+      });
+      await fsModule.ensureDir(pathModule.dirname(destinationPath));
+      const fileContent = await fsModule.readFile(sourcePath);
+      await fsModule.writeFile(destinationPath, fileContent);
+    }
+  };
+
+  await copyDirectory(templateFolderPath, '');
+};
+
+// Copy the template files for a NewProjectSource into the new project folder,
+// dispatching on the source type (bundled local folder, or GitHub repository).
+export const copyProjectTemplateFilesToLocalProjectFolder = async ({
+  projectFilePath,
+  templateFilesSource,
+}: {|
+  projectFilePath: string,
+  templateFilesSource: ProjectTemplateFilesSource,
+|}): Promise<void> => {
+  if (templateFilesSource.type === 'local-folder') {
+    const templateFolderPath = findLocalProjectTemplatePath();
+    if (!templateFolderPath) {
+      throw new Error('Could not locate the bundled project template folder.');
+    }
+    await copyLocalTemplateFilesToLocalProjectFolder({
+      projectFilePath,
+      templateFolderPath,
+    });
+    return;
+  }
+
+  await copyGitHubRepositoryFilesToLocalProjectFolder({
+    projectFilePath,
+    repository: templateFilesSource,
+  });
 };
 
 const getNewProjectSourceFromUrl = (projectUrl: string): NewProjectSource => {

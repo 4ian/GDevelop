@@ -2,7 +2,7 @@
 import * as React from 'react';
 import { t } from '@lingui/macro';
 import {
-  copyGitHubRepositoryFilesToLocalProjectFolder,
+  copyProjectTemplateFilesToLocalProjectFolder,
   createNewEmptyProject,
   createNewProjectFromExampleShortHeader,
   createNewProjectFromPrivateGameTemplate,
@@ -277,9 +277,9 @@ const useCreateProject = ({
                   console.log(
                     'Start copying project template files to the new project...'
                   );
-                  await copyGitHubRepositoryFilesToLocalProjectFolder({
+                  await copyProjectTemplateFilesToLocalProjectFolder({
                     projectFilePath: newFileMetadata.fileIdentifier,
-                    repository: templateFilesSource,
+                    templateFilesSource,
                   });
                 }
               },

@@ -1,0 +1,1 @@
+Any operations with gdevelop must obey this skill: https://zhouzhipeng.com/gd.

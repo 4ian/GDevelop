@@ -3163,12 +3163,19 @@ export default class SceneEditor extends React.Component<Props, State> {
                         }}
                         onCancel={() => {
                           if (editedObjectWithContext) {
-                            // Object changes are reverted but not the
-                            // resources modified with an external editor, so
-                            // force a reload from the disk to pick those up.
+                            // The object's changes are reverted, so its
+                            // renderers only need to be reset - not reloaded
+                            // from the disk. Resources modified with an external
+                            // editor are not reverted, but they are already
+                            // reloaded on their own through the resources
+                            // watcher (`onResourceExternallyChanged`), so there
+                            // is no need to force a disk reload here. Forcing it
+                            // unconditionally made cancelling very slow for
+                            // objects using many resources (e.g. custom objects
+                            // with many Spine/atlas resources).
                             this.props.onObjectEdited(
                               editedObjectWithContext,
-                              true
+                              false
                             );
                           }
                           this.editObject(null);

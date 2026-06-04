@@ -5195,6 +5195,12 @@ const MainFrame = (props: Props): React.MixedElement => {
             previewLauncher.closeAllPreviews();
           }
         },
+        focusAllPreviews: () => {
+          const previewLauncher = _previewLauncher.current;
+          if (previewLauncher && previewLauncher.focusAllPreviews) {
+            previewLauncher.focusAllPreviews();
+          }
+        },
         generateEvents,
         onSceneEventsModifiedOutsideEditor,
         onExtensionFunctionEventsModifiedOutsideEditor,

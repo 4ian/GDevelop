@@ -140,6 +140,13 @@ export default class LocalPreviewLauncher extends React.Component<
     }
   };
 
+  focusAllPreviews = () => {
+    if (!ipcRenderer) return;
+    ipcRenderer.invoke('preview-focus-all').catch(error => {
+      console.info('Unable to focus preview windows - ignoring.', error);
+    });
+  };
+
   _openPreviewWindow = (
     project: gdProject,
     gamePath: string,

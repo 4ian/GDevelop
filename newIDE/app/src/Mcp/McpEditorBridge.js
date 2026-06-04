@@ -60,6 +60,7 @@ import {
   setObjectProperties,
   setTextObjectProperties,
   setSpriteAnimations,
+  sliceSpriteSheet,
 } from './McpSceneTools';
 import {
   compareSceneEventsSemantics,
@@ -117,6 +118,7 @@ type McpEditorBridgeContext = {|
   getEditorSelection?: () => Object,
   getPreviewDebuggerServer?: () => ?Object,
   closeAllPreviews?: () => void,
+  focusAllPreviews?: () => void,
   generateEvents?: Function,
   onSceneEventsModifiedOutsideEditor?: Function,
   onExtensionFunctionEventsModifiedOutsideEditor?: Function,
@@ -178,6 +180,17 @@ const getObjectNames = (objectsContainer: gdObjectsContainer): Array<string> =>
     objectsContainer.getObjectAt(index).getName()
   );
 
+const getProjectFileLocation = (
+  project: gdProject
+): {| projectFile: ?string, projectFolder: ?string |} => {
+  const projectFile =
+    typeof project.getProjectFile === 'function'
+      ? project.getProjectFile() || null
+      : null;
+  const projectFolder = projectFile && path ? path.dirname(projectFile) : null;
+  return { projectFile, projectFolder };
+};
+
 const getEditorState = (
   project: ?gdProject,
   permissions: McpPermissionOptions
@@ -189,10 +202,17 @@ const getEditorState = (
     };
   }
 
+  const { projectFile, projectFolder } = getProjectFileLocation(project);
   return {
     hasProject: true,
     projectName: project.getName(),
     projectUuid: project.getProjectUuid(),
+    // Absolute project file + folder. Relative resource paths
+    // (add_or_update_resource, bulk_edit_scene_assets) and project-relative
+    // file args are resolved against projectFolder — this is the editor's open
+    // project folder, which may differ from the agent's cwd.
+    projectFile,
+    projectFolder,
     sceneNames: getSceneNames(project),
     permissions,
   };
@@ -200,9 +220,12 @@ const getEditorState = (
 
 const getProjectSummary = (project: gdProject, sceneName?: ?string): Object => {
   const simplifiedProjectBuilder = makeSimplifiedProjectBuilder(gd);
+  const { projectFile, projectFolder } = getProjectFileLocation(project);
   return {
     projectName: project.getName(),
     projectUuid: project.getProjectUuid(),
+    projectFile,
+    projectFolder,
     ...simplifiedProjectBuilder.getSimplifiedProject(project, {
       scopeToScene: sceneName || undefined,
     }),
@@ -532,7 +555,7 @@ const captureRunningPreviewState = (
         ),
         note: dumpPayload
           ? undefined
-          : 'No runtime dump was received before the timeout. The preview may be paused, loading, or not responding. status/logs may still be useful.',
+          : 'No runtime dump was received before the timeout — the preview connected but did not respond (commonly because the OS throttled a backgrounded/unfocused preview window). Remediation: close all previews with control_preview { action: "close", close_all: true }, then LAUNCH_NEW_PREVIEW again and inspect promptly; or increase timeout_ms. status/logs may still be useful.',
       });
     };
 
@@ -854,12 +877,31 @@ const simulatePreviewInput = async (
         'Input sent but not confirmed (no reply from the targeted preview before timeout). Press and release are separate inputs; hold a key by sending keyPressed without keyReleased.',
     };
   }
+
+  // Confirmation: read back the InputManager state so the caller can tell the
+  // game actually received the input (distinguishes input-not-received from a
+  // logic bug). Opt out with confirm:false.
+  let inputState;
+  if (!(args && args.confirm === false)) {
+    const confirmResult = await sendTargetedRequest(
+      (previewDebuggerServer: any),
+      targetId,
+      { command: 'getInputState' }
+    );
+    if (confirmResult.matched) inputState = confirmResult.payload;
+  }
+
   return {
     success: !payload.error,
     running: true,
     debuggerId: targetId,
     applied: payload.applied,
     error: payload.error || undefined,
+    // InputManager state right after applying the input (pressedKeyCodes,
+    // lastPressedKey, mouseX/Y, pressedMouseButtons). If a key you pressed is
+    // not in pressedKeyCodes, the game did not receive it (e.g. window not
+    // focused / throttled) — not a logic bug.
+    inputState,
   };
 };
 
@@ -1670,6 +1712,29 @@ const callMcpTool = async ({
         previewDebuggerServer,
         args || {}
       );
+      // When the preview responded, also fetch currently-playing sounds (so a
+      // looping BGM can be confirmed even if recentSounds is flooded) and the
+      // live input state. Best-effort; skipped if not running or opted out.
+      if (
+        result &&
+        result.running &&
+        result.debuggerId &&
+        previewDebuggerServer &&
+        !(args && args.skip_audio_and_input === true)
+      ) {
+        const sounds = await sendTargetedRequest(
+          (previewDebuggerServer: any),
+          result.debuggerId,
+          { command: 'getActiveSounds' }
+        );
+        if (sounds.matched) result.activeSounds = sounds.payload;
+        const input = await sendTargetedRequest(
+          (previewDebuggerServer: any),
+          result.debuggerId,
+          { command: 'getInputState' }
+        );
+        if (input.matched) result.inputState = input.payload;
+      }
       return textResult(result);
     } catch (error) {
       return errorResult(error.message);
@@ -1726,6 +1791,24 @@ const callMcpTool = async ({
       }
       return errorResult(
         'Closing previews is not supported in this editor build.'
+      );
+    }
+    // Focusing/bringing preview windows to front also goes through the launcher.
+    // Useful when a backgrounded preview is being throttled by the OS and
+    // inspect/screenshot time out.
+    if (args && (args.action === 'focus' || args.action === 'bringToFront')) {
+      if (typeof context.focusAllPreviews === 'function') {
+        context.focusAllPreviews();
+        return textResult({
+          success: true,
+          action: 'focus',
+          focusedAll: true,
+          note:
+            'Brought all preview windows to front. Retry inspect/screenshot now; a focused window is not throttled.',
+        });
+      }
+      return errorResult(
+        'Focusing previews is not supported in this editor build.'
       );
     }
     try {
@@ -1943,6 +2026,8 @@ const callMcpTool = async ({
     sceneWriteToolHandler = bulkEditSceneAssets;
   } else if (toolName === 'set_sprite_animations') {
     sceneWriteToolHandler = setSpriteAnimations;
+  } else if (toolName === 'slice_sprite_sheet') {
+    sceneWriteToolHandler = sliceSpriteSheet;
   } else if (toolName === 'replace_object_definition') {
     sceneWriteToolHandler = replaceObjectDefinition;
   } else if (toolName === 'delete_scene_object') {

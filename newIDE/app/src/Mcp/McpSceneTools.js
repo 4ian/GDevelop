@@ -14,6 +14,8 @@ const gd: libGDevelop = global.gd;
 const fs = optionalRequire('fs');
 const path = optionalRequire('path');
 const zlib = optionalRequire('zlib');
+const electronRemote = optionalRequire('@electron/remote');
+const nativeImage = electronRemote ? electronRemote.nativeImage : null;
 
 const asAudioResource = (resource: gdResource): any =>
   gd.castObject(resource, gd.AudioResource);
@@ -2509,6 +2511,138 @@ export const readSceneEventsSerialized = (
   return result;
 };
 
+// Slice a single sprite-sheet PNG into a grid of frames, writing each cell as
+// its own image resource, then bind them as one Sprite animation. GDevelop
+// Sprite frames reference whole image resources (not sub-rects), so an actual
+// image cut is required — done here with Electron's nativeImage (no new dep).
+export const sliceSpriteSheet = (project: gdProject, args: Object): Object => {
+  if (!fs || !path) {
+    throw new Error('Filesystem access is not available.');
+  }
+  if (!nativeImage) {
+    throw new Error(
+      'Sprite-sheet slicing requires the Electron runtime (nativeImage); it is not available in this environment.'
+    );
+  }
+  const sheetFile = getRequiredString(args, 'sheet_file');
+  const objectName = getRequiredString(args, 'object_name');
+  const sceneName = getOptionalString(args, 'scene_name') || undefined;
+  const animationName = getOptionalString(args, 'animation_name') || 'Default';
+
+  const absSheet = resolveLocalResourceFile(project, sheetFile) || sheetFile;
+  if (!fs.existsSync(absSheet)) {
+    throw new Error(`Sprite sheet not found: ${absSheet}`);
+  }
+
+  const sheet = nativeImage.createFromPath(absSheet);
+  const size = sheet.getSize();
+  const sheetWidth = size.width;
+  const sheetHeight = size.height;
+  if (!sheetWidth || !sheetHeight) {
+    throw new Error(
+      `Could not decode sprite sheet "${absSheet}" (got ${sheetWidth}x${sheetHeight}).`
+    );
+  }
+
+  // Two ways to describe the grid: explicit columns/rows, or per-frame size.
+  const columns = getFiniteNumber(args.columns);
+  const rows = getFiniteNumber(args.rows);
+  let frameWidth = getFiniteNumber(args.frame_width);
+  let frameHeight = getFiniteNumber(args.frame_height);
+  let cols;
+  let rws;
+  if (frameWidth && frameHeight) {
+    cols = Math.floor(sheetWidth / frameWidth);
+    rws = Math.floor(sheetHeight / frameHeight);
+  } else if (columns && rows) {
+    cols = Math.floor(columns);
+    rws = Math.floor(rows);
+    frameWidth = Math.floor(sheetWidth / cols);
+    frameHeight = Math.floor(sheetHeight / rws);
+  } else {
+    throw new Error(
+      'Provide either frame_width + frame_height, or columns + rows, to describe the grid.'
+    );
+  }
+  if (cols < 1 || rws < 1) {
+    throw new Error(
+      `Grid resolves to ${cols}x${rws} frames; check the sheet size (${sheetWidth}x${sheetHeight}) and grid params.`
+    );
+  }
+
+  const maxFrames =
+    getFiniteNumber(args.frame_count) !== null
+      ? Math.floor(args.frame_count)
+      : cols * rws;
+  const projectFile = project.getProjectFile && project.getProjectFile();
+  const outDir =
+    getOptionalString(args, 'output_dir') ||
+    `assets/${objectName}_${animationName}`;
+  const absOutDir =
+    !path.isAbsolute(outDir) && projectFile
+      ? path.resolve(path.dirname(projectFile), outDir)
+      : outDir;
+  if (!fs.existsSync(absOutDir)) fs.mkdirSync(absOutDir, { recursive: true });
+
+  const frames = [];
+  let frameIndex = 0;
+  for (let row = 0; row < rws && frameIndex < maxFrames; row++) {
+    for (let col = 0; col < cols && frameIndex < maxFrames; col++) {
+      const cell = sheet.crop({
+        x: col * frameWidth,
+        y: row * frameHeight,
+        width: frameWidth,
+        height: frameHeight,
+      });
+      const buffer = cell.toPNG();
+      const frameFileName = `${animationName}_${frameIndex}.png`;
+      const relativeFrameFile = path
+        .join(outDir, frameFileName)
+        .split(path.sep)
+        .join('/');
+      fs.writeFileSync(path.join(absOutDir, frameFileName), buffer);
+
+      const resourceName = `${objectName}_${animationName}_${frameIndex}`;
+      addOrUpdateResource(project, {
+        name: resourceName,
+        file: relativeFrameFile,
+        kind: 'image',
+      });
+      frames.push({ image: resourceName });
+      frameIndex++;
+    }
+  }
+
+  if (!frames.length) {
+    throw new Error('No frames were produced from the sprite sheet.');
+  }
+
+  // Bind the produced frames as a single animation on the object.
+  const animationResult = setSpriteAnimations(project, {
+    scene_name: sceneName,
+    object_name: objectName,
+    animations: [
+      {
+        name: animationName,
+        frames,
+      },
+    ],
+  });
+
+  return {
+    success: true,
+    objectName,
+    animationName,
+    sheetSize: { width: sheetWidth, height: sheetHeight },
+    grid: { columns: cols, rows: rws, frameWidth, frameHeight },
+    framesProduced: frames.length,
+    outputDir: outDir,
+    animation: animationResult,
+    note:
+      'Sprite sheet sliced into individual frame resources and bound as one animation. Re-run with different grid params to re-slice.',
+  };
+};
+
 export const bulkEditSceneAssets = (
   project: gdProject,
   args: Object,
@@ -2659,10 +2793,33 @@ export const bulkEditSceneAssets = (
       throw new Error(`variables[${index}] needs a name.`);
     }
     const rawValue = variableArgs.value !== undefined ? variableArgs.value : '';
-    const container =
-      scope === 'global'
-        ? project.getVariables()
-        : getScene(project, sceneName).getVariables();
+    let container;
+    if (scope === 'global') {
+      container = project.getVariables();
+    } else if (scope === 'object') {
+      const objectName =
+        variableArgs.object_name || variableArgs.objectName || '';
+      if (!objectName) {
+        throw new Error(
+          `variables[${index}] has scope "object" but no object_name.`
+        );
+      }
+      const scene = getScene(project, sceneName);
+      let object = null;
+      if (scene.getObjects().hasObjectNamed(objectName)) {
+        object = scene.getObjects().getObject(objectName);
+      } else if (project.getObjects().hasObjectNamed(objectName)) {
+        object = project.getObjects().getObject(objectName);
+      }
+      if (!object) {
+        throw new Error(
+          `variables[${index}]: object "${objectName}" not found in scene "${sceneName}" nor globally.`
+        );
+      }
+      container = object.getVariables();
+    } else {
+      container = getScene(project, sceneName).getVariables();
+    }
     const variable = container.has(name)
       ? container.get(name)
       : container.insertNew(name, container.count());
@@ -2681,7 +2838,12 @@ export const bulkEditSceneAssets = (
     } else {
       variable.setValue(numberValue);
     }
-    results.variables.push({ scope, name, value: rawValue });
+    results.variables.push({
+      scope,
+      name,
+      value: rawValue,
+      objectName: variableArgs.object_name || variableArgs.objectName,
+    });
   });
 
   if (instances.length) {

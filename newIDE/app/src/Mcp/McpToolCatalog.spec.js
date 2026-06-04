@@ -56,6 +56,7 @@ describe('McpToolCatalog', () => {
     expect(toolNames).toContain('add_or_update_resource');
     expect(toolNames).toContain('set_sprite_animations');
     expect(toolNames).toContain('bulk_edit_scene_assets');
+    expect(toolNames).toContain('slice_sprite_sheet');
     expect(toolNames).toContain('replace_object_definition');
     expect(toolNames).toContain('delete_scene_object');
     expect(toolNames).toContain('set_object_properties');
@@ -88,6 +89,7 @@ describe('McpToolCatalog', () => {
     expect(isWriteTool('create_text_object')).toBe(true);
     expect(isWriteTool('add_or_update_resource')).toBe(true);
     expect(isWriteTool('replace_object_definition')).toBe(true);
+    expect(isWriteTool('slice_sprite_sheet')).toBe(true);
     expect(isWriteTool('read_serialized_scene')).toBe(false);
     expect(isWriteTool('inspect_project_cleanup')).toBe(false);
     expect(isWriteTool('validate_events_json_file')).toBe(false);

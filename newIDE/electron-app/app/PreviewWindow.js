@@ -127,9 +127,26 @@ const closeAllPreviewWindows = () => {
   });
 };
 
+const focusAllPreviewWindows = () => {
+  previewWindows.forEach(entry => {
+    try {
+      if (entry.previewWindow && !entry.previewWindow.isDestroyed()) {
+        // show() un-minimizes / reveals; focus() brings to front. Together they
+        // counter OS throttling of backgrounded preview windows.
+        entry.previewWindow.show();
+        entry.previewWindow.focus();
+      }
+    } catch (error) {
+      console.warn('Ignoring exception when focusing preview window:', error);
+    }
+  });
+  return previewWindows.length;
+};
+
 module.exports = {
   openPreviewWindow,
   closePreviewWindow,
   closePreviewWindowsForParent,
   closeAllPreviewWindows,
+  focusAllPreviewWindows,
 };

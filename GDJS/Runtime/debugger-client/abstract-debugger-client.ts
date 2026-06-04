@@ -493,6 +493,10 @@ namespace gdjs {
           this.stepFrames(data.count, data.fakeElapsedTimeMs, data.messageId);
         } else if (data.command === 'setRuntimeState') {
           this.setRuntimeState(data.operations, data.messageId);
+        } else if (data.command === 'getInputState') {
+          this.sendInputState(data.messageId);
+        } else if (data.command === 'getActiveSounds') {
+          this.sendActiveSounds(data.messageId);
         } else if (data.command === 'hardReload') {
           // This usually means that the preview was modified so much that an entire reload
           // is needed, or that the runtime itself could have been modified.
@@ -1217,6 +1221,128 @@ namespace gdjs {
           command: 'runtimeStateSet',
           messageId,
           payload: { applied, error },
+        })
+      );
+    }
+
+    /**
+     * Report the InputManager's CURRENT state (pressed keys, last pressed key,
+     * mouse position/buttons). Lets a harness confirm simulated input actually
+     * reached the game (distinguishes "input not received" from "logic bug").
+     */
+    sendInputState(messageId: number): void {
+      const payload: any = {
+        pressedKeyCodes: [],
+        lastPressedKey: 0,
+        mouseX: 0,
+        mouseY: 0,
+        pressedMouseButtons: [],
+        error: null,
+      };
+      try {
+        const inputManager: any = this._runtimegame.getInputManager();
+        // Enumerate currently-pressed keys (truthy values in _pressedKeys.items).
+        const pressedItems =
+          inputManager._pressedKeys && inputManager._pressedKeys.items;
+        if (pressedItems) {
+          for (const keyCode in pressedItems) {
+            if (
+              Object.prototype.hasOwnProperty.call(pressedItems, keyCode) &&
+              pressedItems[keyCode]
+            ) {
+              payload.pressedKeyCodes.push(parseInt(keyCode, 10));
+            }
+          }
+        }
+        payload.lastPressedKey =
+          typeof inputManager.getLastPressedKey === 'function'
+            ? inputManager.getLastPressedKey()
+            : inputManager._lastPressedKey || 0;
+        payload.anyKeyPressed =
+          typeof inputManager.anyKeyPressed === 'function'
+            ? inputManager.anyKeyPressed()
+            : payload.pressedKeyCodes.length > 0;
+        payload.mouseX = inputManager.getCursorX
+          ? inputManager.getCursorX()
+          : 0;
+        payload.mouseY = inputManager.getCursorY
+          ? inputManager.getCursorY()
+          : 0;
+        for (let button = 0; button < 5; button++) {
+          if (
+            inputManager.isMouseButtonPressed &&
+            inputManager.isMouseButtonPressed(button)
+          ) {
+            payload.pressedMouseButtons.push(button);
+          }
+        }
+      } catch (e) {
+        payload.error = (e as Error).message || 'Failed to read input state.';
+      }
+      this._sendMessage(
+        circularSafeStringify({
+          command: 'inputState',
+          messageId,
+          payload,
+        })
+      );
+    }
+
+    /**
+     * Report currently-playing sounds and musics (channel, resource name,
+     * looping). Lets a harness confirm a looping BGM is actually playing, even
+     * when the recentlyPlayedSounds history buffer is flooded by SFX.
+     */
+    sendActiveSounds(messageId: number): void {
+      const sounds: Array<any> = [];
+      const musics: Array<any> = [];
+      let error: string | null = null;
+      try {
+        const soundManager: any = this._runtimegame.getSoundManager();
+        const describe = (sound: any, channel: number | null) => {
+          if (!sound || typeof sound.playing !== 'function') return null;
+          if (!sound.playing()) return null;
+          const data =
+            typeof sound.getNetworkSyncData === 'function'
+              ? sound.getNetworkSyncData()
+              : null;
+          return {
+            channel,
+            soundName: data ? data.resourceName : undefined,
+            looping:
+              typeof sound.getLoop === 'function' ? sound.getLoop() : undefined,
+          };
+        };
+        (soundManager._freeSounds || []).forEach((sound: any) => {
+          const d = describe(sound, null);
+          if (d) sounds.push(d);
+        });
+        (soundManager._freeMusics || []).forEach((music: any) => {
+          const d = describe(music, null);
+          if (d) musics.push(d);
+        });
+        const soundChannels = soundManager._sounds || {};
+        for (const channel in soundChannels) {
+          if (Object.prototype.hasOwnProperty.call(soundChannels, channel)) {
+            const d = describe(soundChannels[channel], parseInt(channel, 10));
+            if (d) sounds.push(d);
+          }
+        }
+        const musicChannels = soundManager._musics || {};
+        for (const channel in musicChannels) {
+          if (Object.prototype.hasOwnProperty.call(musicChannels, channel)) {
+            const d = describe(musicChannels[channel], parseInt(channel, 10));
+            if (d) musics.push(d);
+          }
+        }
+      } catch (e) {
+        error = (e as Error).message || 'Failed to read active sounds.';
+      }
+      this._sendMessage(
+        circularSafeStringify({
+          command: 'activeSounds',
+          messageId,
+          payload: { sounds, musics, error },
         })
       );
     }

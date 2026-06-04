@@ -6,6 +6,7 @@ import {
 } from '../Utils/Serializer';
 import { renderNonTranslatedEventsAsText } from '../EventsSheet/EventsTree/TextRenderer';
 import { scanEventsListForValidationErrors } from '../Utils/EventsValidationScanner';
+import { collectSerializedEventJsonIssues } from './McpEventKnowledge';
 import optionalRequire from '../Utils/OptionalRequire';
 
 const gd: libGDevelop = global.gd;
@@ -138,9 +139,44 @@ const getInstructionSummaries = (
     instructions.push({
       type: instruction.getType(),
       parameters,
+      subInstructionsCount: instruction.getSubInstructions
+        ? instruction.getSubInstructions().size()
+        : 0,
     });
   }
   return instructions;
+};
+
+// Count all sub-instructions (recursively) across an events list, for write-back
+// verification that nested Or/And/Not children were not dropped.
+const countSubInstructionsInList = (eventsList: gdEventsList): number => {
+  let total = 0;
+  const countInInstructions = instructionsList => {
+    for (let i = 0; i < instructionsList.size(); i++) {
+      const sub = instructionsList.get(i).getSubInstructions();
+      total += sub.size();
+      countInInstructions(sub);
+    }
+  };
+  const visit = list => {
+    for (let i = 0; i < list.getEventsCount(); i++) {
+      const event = list.getEventAt(i);
+      const type = event.getType();
+      if (type === 'BuiltinCommonInstructions::Standard') {
+        const standard = gd.asStandardEvent(event);
+        countInInstructions(standard.getConditions());
+        countInInstructions(standard.getActions());
+      } else if (type === 'BuiltinCommonInstructions::While') {
+        const whileEvent = gd.asWhileEvent(event);
+        countInInstructions(whileEvent.getConditions());
+        countInInstructions(whileEvent.getActions());
+        countInInstructions(whileEvent.getWhileConditions());
+      }
+      if (event.canHaveSubEvents()) visit(event.getSubEvents());
+    }
+  };
+  visit(eventsList);
+  return total;
 };
 
 const getEventInstructions = (
@@ -464,7 +500,19 @@ export const lintSceneEvents = (project: gdProject, args: Object): Object => {
   const requireRootGroups =
     !args ||
     (args.require_root_groups !== false && args.requireRootGroups !== false);
+  // Rules the caller wants suppressed (e.g. ['create-without-for-each'] when a
+  // single-instance Create is intentional). Accepts disabled_rules / disabledRules.
+  const disabledRules = new Set(
+    Array.isArray(args && (args.disabled_rules || args.disabledRules))
+      ? args.disabled_rules || args.disabledRules
+      : []
+  );
   const issues = [];
+  // Track each Group's color to flag default/unset colors and color collisions
+  // between distinct Groups (different Groups must use different colors).
+  const groupColorsByKey = {};
+  // Default GroupEvent color in GDevelop core (GroupEvent.cpp): rgb(74,176,228).
+  const DEFAULT_GROUP_COLOR = '74;176;228';
 
   const references = collectEventReferences(scene.getEvents());
   references.forEach(reference => {
@@ -502,7 +550,8 @@ export const lintSceneEvents = (project: gdProject, args: Object): Object => {
     }
 
     if (eventType === 'BuiltinCommonInstructions::Group') {
-      const groupName = gd.asGroupEvent(event).getName();
+      const groupEvent = gd.asGroupEvent(event);
+      const groupName = groupEvent.getName();
       if (!groupName) {
         issues.push({
           severity: 'warning',
@@ -512,6 +561,25 @@ export const lintSceneEvents = (project: gdProject, args: Object): Object => {
             'Rename the Group with a semantic name such as Initialization, Player input, Enemy behavior, UI, Audio, or Scoring.',
         });
       }
+
+      // Record the Group's color and flag the default/unset color. Distinct
+      // Groups must use distinct colors (checked for collisions after the loop).
+      const colorKey = `${groupEvent.getBackgroundColorR()};${groupEvent.getBackgroundColorG()};${groupEvent.getBackgroundColorB()}`;
+      if (colorKey === DEFAULT_GROUP_COLOR) {
+        issues.push({
+          severity: 'warning',
+          type: 'group-default-color',
+          eventPath,
+          groupName: groupName || undefined,
+          suggestion:
+            'Set an explicit, distinct color for this Group (create_group/wrap_events_in_group accept color: { r, g, b }, or use rename_group). The default blue (74;176;228) is treated as unset.',
+        });
+      }
+      if (!groupColorsByKey[colorKey]) groupColorsByKey[colorKey] = [];
+      groupColorsByKey[colorKey].push({
+        eventPath,
+        groupName: groupName || undefined,
+      });
     }
 
     // Heuristic: a Standard event that Creates an object while also picking an
@@ -522,6 +590,31 @@ export const lintSceneEvents = (project: gdProject, args: Object): Object => {
     // action AND at least one condition referencing an object.
     if (eventType === 'BuiltinCommonInstructions::Standard') {
       const { conditions, actions } = getEventInstructions(event);
+
+      // Flag Or/And/Not conditions with no sub-instructions. This is what a
+      // wrong-key mistake (children under "conditions" instead of
+      // "subInstructions") looks like AFTER the bad JSON was already written: an
+      // empty logical condition that matches nothing.
+      conditions.forEach((condition, conditionIndex) => {
+        if (
+          (condition.type === 'BuiltinCommonInstructions::Or' ||
+            condition.type === 'BuiltinCommonInstructions::And' ||
+            condition.type === 'BuiltinCommonInstructions::Not') &&
+          (condition.subInstructionsCount || 0) === 0
+        ) {
+          issues.push({
+            severity: 'error',
+            type: 'empty-logical-condition',
+            eventPath,
+            instructionType: condition.type,
+            conditionIndex,
+            suggestion: `${
+              condition.type
+            } at condition ${conditionIndex} has no sub-conditions — it matches nothing. This usually means the child conditions were written under the wrong key; put them in a "subInstructions" array and re-write the events.`,
+          });
+        }
+      });
+
       const hasCreateAction = actions.some(
         action =>
           action.type === 'Create' ||
@@ -538,15 +631,36 @@ export const lintSceneEvents = (project: gdProject, args: Object): Object => {
           condition.type === 'EstTouche' ||
           /Animation|Variable.*Objet|VarObjet/i.test(condition.type)
       );
-      if (hasCreateAction && conditionPicksObject) {
+      if (
+        hasCreateAction &&
+        conditionPicksObject &&
+        !disabledRules.has('create-without-for-each')
+      ) {
         issues.push({
           severity: 'warning',
           type: 'create-without-for-each',
           eventPath,
           suggestion:
-            'This Standard event creates an object while picking instances in its conditions, but Create runs only once (for a single picked instance). If you want each picked instance to create one (e.g. each enemy fires a bullet), wrap this in a ForEach event over that object.',
+            'This Standard event creates an object while picking instances in its conditions, but Create runs only once (for a single picked instance). If you want each picked instance to create one (e.g. each enemy fires a bullet), wrap this in a ForEach event over that object. If a single Create is intentional, suppress this with disabled_rules: ["create-without-for-each"].',
         });
       }
+    }
+  });
+
+  // Flag colors shared by two or more distinct Groups (including the default
+  // color): different Groups must use different colors for readability.
+  Object.keys(groupColorsByKey).forEach(colorKey => {
+    const groups = groupColorsByKey[colorKey];
+    if (groups.length > 1) {
+      issues.push({
+        severity: 'warning',
+        type: 'group-duplicate-color',
+        color: colorKey,
+        groups,
+        suggestion: `${
+          groups.length
+        } Groups share the color ${colorKey}. Give each Group a distinct color with rename_group (or set color: { r, g, b } when creating them).`,
+      });
     }
   });
 
@@ -818,7 +932,49 @@ export const replaceSceneEventsFromFile = (
     throw new Error('events_json_file must contain a JSON array of events.');
   }
 
+  // Structural check on the raw JSON (catches Or/And/Not children placed under
+  // the wrong key, which unserialization would silently drop — the data-loss
+  // bug). Block the write if found.
+  const structuralIssues = collectSerializedEventJsonIssues(
+    parsedEvents
+  ).filter(issue => issue.severity === 'error');
+  if (structuralIssues.length) {
+    throw new Error(
+      `Events JSON file has structural problems that would lose data on write: ${JSON.stringify(
+        structuralIssues
+      )}`
+    );
+  }
+
+  // Count sub-instructions in the input so we can confirm none were dropped by
+  // the round-trip through the serializer.
+  const countSubInstructionsInJson = (events: Array<any>): number => {
+    let total = 0;
+    const visitInstruction = instruction => {
+      if (!instruction || typeof instruction !== 'object') return;
+      const sub = Array.isArray(instruction.subInstructions)
+        ? instruction.subInstructions
+        : [];
+      total += sub.length;
+      sub.forEach(visitInstruction);
+    };
+    const visitEvents = list => {
+      if (!Array.isArray(list)) return;
+      list.forEach(event => {
+        if (!event || typeof event !== 'object') return;
+        (event.conditions || []).forEach(visitInstruction);
+        (event.actions || []).forEach(visitInstruction);
+        (event.whileConditions || []).forEach(visitInstruction);
+        if (Array.isArray(event.events)) visitEvents(event.events);
+      });
+    };
+    visitEvents(events);
+    return total;
+  };
+  const inputSubInstructionsCount = countSubInstructionsInJson(parsedEvents);
+
   const scene = getScene(project, sceneName);
+  const dryRun = !!(args && (args.dry_run === true || args.dryRun === true));
   const validationEventsList = new gd.EventsList();
   try {
     unserializeFromJSObject(
@@ -840,6 +996,33 @@ export const replaceSceneEventsFromFile = (
       );
     }
 
+    // Count sub-instructions actually present AFTER unserialization to confirm
+    // the round-trip preserved them.
+    const writtenSubInstructionsCount = countSubInstructionsInList(
+      validationEventsList
+    );
+
+    // dry_run: validate + render the would-be result, but DO NOT write.
+    if (dryRun) {
+      return {
+        success: true,
+        dryRun: true,
+        sceneName,
+        wouldWriteEventsCount: validationEventsList.getEventsCount(),
+        inputSubInstructionsCount,
+        writtenSubInstructionsCount,
+        subInstructionsPreserved:
+          writtenSubInstructionsCount === inputSubInstructionsCount,
+        eventsAsText: renderNonTranslatedEventsAsText({
+          eventsList: validationEventsList,
+        }),
+        note:
+          writtenSubInstructionsCount === inputSubInstructionsCount
+            ? 'Dry run only — nothing written. Re-run without dry_run to apply.'
+            : 'Dry run: sub-instruction count changed after parsing — some nested conditions/actions would be lost. Fix the JSON before writing.',
+      };
+    }
+
     scene.getEvents().clear();
     scene
       .getEvents()
@@ -854,10 +1037,19 @@ export const replaceSceneEventsFromFile = (
   }
 
   notifyEventsChanged(scene, callbacks);
+  const writtenSubInstructionsCount = countSubInstructionsInList(
+    scene.getEvents()
+  );
   const result = {
     success: true,
     sceneName,
     eventsCount: scene.getEvents().getEventsCount(),
+    // Write-back verification: confirm nested sub-instructions survived the
+    // write. If these differ, nested conditions/actions were lost.
+    inputSubInstructionsCount,
+    writtenSubInstructionsCount,
+    subInstructionsPreserved:
+      writtenSubInstructionsCount === inputSubInstructionsCount,
   };
 
   if (args && (args.summary_only === true || args.summaryOnly === true)) {

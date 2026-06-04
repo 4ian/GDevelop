@@ -228,6 +228,33 @@ const RESOURCE_PARAMETER_TYPES = new Set([
 // Describe, in one line, how to write a literal value for a parameter type in
 // event JSON. Used in metadata output and validation suggestions so callers stop
 // guessing which parameters need embedded quotes.
+
+// Default behavior NAMES for built-in capability behaviors, so a `behavior`
+// parameter whose extraInfo names one of these types can hint what to fill.
+const CAPABILITY_BEHAVIOR_DEFAULT_NAMES = {
+  'TextContainerCapability::TextContainerBehavior': 'Text',
+  'AnimatableCapability::AnimatableBehavior': 'Animation',
+  'EffectCapability::EffectBehavior': 'Effect',
+  'OpacityCapability::OpacityBehavior': 'Opacity',
+  'ResizableCapability::ResizableBehavior': 'Resizable',
+  'ScalableCapability::ScalableBehavior': 'Scale',
+  'FlippableCapability::FlippableBehavior': 'Flippable',
+};
+
+// For a `behavior` parameter, build a hint about which behavior NAME to fill.
+// `extraInfo` on a behavior parameter is the required behavior TYPE.
+const describeBehaviorParameterHint = (behaviorType: ?string): string => {
+  if (behaviorType && CAPABILITY_BEHAVIOR_DEFAULT_NAMES[behaviorType]) {
+    return `behavior NAME on the object — for the required type "${behaviorType}" the default name is "${
+      CAPABILITY_BEHAVIOR_DEFAULT_NAMES[behaviorType]
+    }". Fill the behavior NAME (not the type), no quotes.`;
+  }
+  if (behaviorType) {
+    return `behavior NAME on the object for type "${behaviorType}" (not the type itself), no quotes. Use list_available_behaviors with object_name to see the object's behavior names.`;
+  }
+  return `behavior NAME on the object (not the behavior type), no quotes. Use list_available_behaviors with object_name to see the names.`;
+};
+
 const describeParameterLiteralSyntax = (parameterType: string): string => {
   if (QUOTED_STRING_PARAMETER_TYPES.has(parameterType)) {
     return `string expression — wrap literals in double quotes, e.g. "value" (type "${parameterType}")`;
@@ -278,6 +305,16 @@ const summarizeParameter = (
 ): Object => {
   const valueTypeMetadata = parameterMetadata.getValueTypeMetadata();
   const type = parameterMetadata.getType();
+  const extraInfo = parameterMetadata.getExtraInfo() || undefined;
+  // For behavior parameters, hint the behavior NAME to fill (extraInfo is the
+  // required behavior TYPE). For object variables, clarify that when the object
+  // is a separate parameter the value is the bare variable name.
+  const behaviorNameHint =
+    type === 'behavior' ? describeBehaviorParameterHint(extraInfo) : undefined;
+  const objectVarHint =
+    type === 'objectvar'
+      ? 'object variable — bare variable name (e.g. HP). The object is a separate parameter on this instruction, so do NOT write Object.HP here, just HP.'
+      : undefined;
   if (options && options.compact) {
     // Compact form drops the verbose valueType discriminator object and keeps
     // only what a caller needs to fill the parameter correctly.
@@ -289,7 +326,8 @@ const summarizeParameter = (
       isOptional: parameterMetadata.isOptional(),
       defaultValue: parameterMetadata.getDefaultValue() || undefined,
       // How to write a literal value for this parameter in event JSON.
-      literalSyntax: describeParameterLiteralSyntax(type),
+      literalSyntax: objectVarHint || describeParameterLiteralSyntax(type),
+      behaviorNameHint,
     };
   }
   const parameter = {
@@ -299,11 +337,12 @@ const summarizeParameter = (
     description: parameterMetadata.getDescription() || undefined,
     longDescription: parameterMetadata.getLongDescription() || undefined,
     hint: parameterMetadata.getHint() || undefined,
-    extraInfo: parameterMetadata.getExtraInfo() || undefined,
+    extraInfo,
     defaultValue: parameterMetadata.getDefaultValue() || undefined,
     isOptional: parameterMetadata.isOptional(),
     isCodeOnly: parameterMetadata.isCodeOnly(),
-    literalSyntax: describeParameterLiteralSyntax(type),
+    literalSyntax: objectVarHint || describeParameterLiteralSyntax(type),
+    behaviorNameHint,
     valueType: valueTypeMetadata
       ? {
           name: valueTypeMetadata.getName(),
@@ -618,8 +657,9 @@ const whileEventExample = [
 ];
 
 // OR sub-conditions: the parent condition is true if ANY child is true. Child
-// conditions go inside the OR condition's own "conditions" array (a sub-list).
-// Use this instead of duplicating an event for each alternative input.
+// conditions go inside the OR condition's "subInstructions" array (NOT a
+// "conditions" key — that is dropped). Use this instead of duplicating an event
+// for each alternative input.
 const orConditionEventExample = [
   {
     type: 'BuiltinCommonInstructions::Standard',
@@ -627,7 +667,10 @@ const orConditionEventExample = [
       {
         type: { value: 'BuiltinCommonInstructions::Or' },
         parameters: [],
-        conditions: [
+        // IMPORTANT: child conditions of Or/And/Not go in "subInstructions",
+        // NOT "conditions". A "conditions" key here is silently dropped by the
+        // GDevelop serializer, leaving the Or empty (matches nothing).
+        subInstructions: [
           {
             type: { value: 'KeyPressed' },
             parameters: ['', 'Left'],
@@ -648,10 +691,10 @@ const orConditionEventExample = [
   },
 ];
 
-// AND / NOT follow the same nested shape as Or:
-//   AND  → type "BuiltinCommonInstructions::And", child conditions in "conditions".
-//   NOT  → type "BuiltinCommonInstructions::Not", child conditions in "conditions"
-//          (true when ALL children are false).
+// AND / NOT follow the same nested shape as Or, with children in
+// "subInstructions":
+//   AND → type "BuiltinCommonInstructions::And" (true when ALL children true).
+//   NOT → type "BuiltinCommonInstructions::Not" (true when ALL children false).
 const andConditionEventExample = [
   {
     type: 'BuiltinCommonInstructions::Standard',
@@ -659,7 +702,7 @@ const andConditionEventExample = [
       {
         type: { value: 'BuiltinCommonInstructions::And' },
         parameters: [],
-        conditions: [
+        subInstructions: [
           { type: { value: 'KeyPressed' }, parameters: ['', 'Space'] },
           { type: { value: 'VarScene' }, parameters: ['CanFire', '=', '1'] },
         ],
@@ -741,13 +784,13 @@ export const getEventsJsonExamples = ({
     {
       name: 'OR sub-conditions',
       purpose:
-        'Match if ANY child condition is true (e.g. Left arrow OR Q). Child conditions go in the OR condition\'s nested "conditions" array. Use instead of duplicating the event per input. AND/NOT use the same nested shape (BuiltinCommonInstructions::And / ::Not).',
+        'Match if ANY child condition is true (e.g. Left arrow OR Q). Child conditions go in the OR condition\'s "subInstructions" array — NOT a "conditions" key, which the serializer silently drops. Use instead of duplicating the event per input. AND/NOT use the same nested shape (BuiltinCommonInstructions::And / ::Not).',
       events_json: JSON.stringify(orConditionEventExample, null, 2),
     },
     {
       name: 'AND sub-conditions',
       purpose:
-        'Match only if ALL child conditions are true. Child conditions go in the nested "conditions" array.',
+        'Match only if ALL child conditions are true. Child conditions go in the "subInstructions" array (not "conditions").',
       events_json: JSON.stringify(andConditionEventExample, null, 2),
     },
   ];
@@ -1734,6 +1777,87 @@ const summarizeIssues = (issues: Array<Object>): Object => {
   };
 };
 
+// Instruction types whose children are nested sub-instructions (Or/And/Not).
+const SUBINSTRUCTION_LOGICAL_TYPES = new Set([
+  'BuiltinCommonInstructions::Or',
+  'BuiltinCommonInstructions::And',
+  'BuiltinCommonInstructions::Not',
+]);
+
+// Walk the PARSED events JSON (before unserialization, which silently drops
+// unknown keys) and flag structural mistakes that the gd serializer would
+// otherwise swallow — most importantly Or/And/Not whose child conditions were
+// put under the wrong key ("conditions"/"actions") instead of "subInstructions",
+// or that have no children at all. Returns an array of issue objects.
+export const collectSerializedEventJsonIssues = (
+  parsedEvents: Array<any>
+): Array<Object> => {
+  const issues = [];
+
+  const checkInstruction = (instruction, isCondition, path) => {
+    if (!instruction || typeof instruction !== 'object') return;
+    const type = getSerializedInstructionTypeValue(instruction);
+    if (SUBINSTRUCTION_LOGICAL_TYPES.has(type)) {
+      const sub = instruction.subInstructions;
+      const hasSub = Array.isArray(sub) && sub.length > 0;
+      // The classic mistake: children placed under "conditions"/"actions".
+      const misplaced =
+        (Array.isArray(instruction.conditions) &&
+          instruction.conditions.length > 0) ||
+        (Array.isArray(instruction.actions) && instruction.actions.length > 0);
+      if (!hasSub) {
+        issues.push({
+          severity: 'error',
+          type: 'empty-or-misplaced-sub-instructions',
+          instructionType: type,
+          eventPath: path,
+          suggestion: misplaced
+            ? `${type} has child conditions under the wrong key ("conditions"/"actions"); they will be SILENTLY DROPPED. Put the child conditions in a "subInstructions" array on this ${type} instruction instead.`
+            : `${type} has no "subInstructions" — it will match nothing. Add the child conditions in a "subInstructions" array (an empty Or/And/Not is almost never intended).`,
+        });
+      }
+      // Recurse into the (correct) sub-instructions.
+      if (Array.isArray(sub)) {
+        sub.forEach(child => checkInstruction(child, isCondition, path));
+      }
+    }
+    // Recurse into any nested subInstructions for non-logical instructions too.
+    if (
+      !SUBINSTRUCTION_LOGICAL_TYPES.has(type) &&
+      Array.isArray(instruction.subInstructions)
+    ) {
+      instruction.subInstructions.forEach(child =>
+        checkInstruction(child, isCondition, path)
+      );
+    }
+  };
+
+  const checkEvents = (events, path) => {
+    if (!Array.isArray(events)) return;
+    events.forEach((event, index) => {
+      if (!event || typeof event !== 'object') return;
+      const eventPath = path ? `${path}.${index}` : `event-${index}`;
+      if (Array.isArray(event.conditions))
+        event.conditions.forEach(condition =>
+          checkInstruction(condition, true, eventPath)
+        );
+      if (Array.isArray(event.actions))
+        event.actions.forEach(action =>
+          checkInstruction(action, false, eventPath)
+        );
+      // While events keep conditions in whileConditions.
+      if (Array.isArray(event.whileConditions))
+        event.whileConditions.forEach(condition =>
+          checkInstruction(condition, true, eventPath)
+        );
+      if (Array.isArray(event.events)) checkEvents(event.events, eventPath);
+    });
+  };
+
+  checkEvents(parsedEvents, '');
+  return issues;
+};
+
 export const validateEventsJson = ({
   project,
   sceneName,
@@ -1782,6 +1906,9 @@ export const validateEventsJson = ({
       project
     );
     const issues: Array<Object> = [];
+    // Structural checks on the raw JSON (catches Or/And/Not children placed under
+    // the wrong key, which the unserializer would silently drop).
+    issues.push(...collectSerializedEventJsonIssues(parsedEvents));
     validateEventsList({
       project,
       eventsList,

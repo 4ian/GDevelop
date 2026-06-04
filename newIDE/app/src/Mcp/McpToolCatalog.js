@@ -318,6 +318,58 @@ const generatePlaceholderAssetSchema = {
   additionalProperties: true,
 };
 
+const sliceSpriteSheetSchema = {
+  type: 'object',
+  properties: {
+    sheet_file: {
+      type: 'string',
+      description:
+        'Path to the sprite-sheet PNG (project-relative recommended, e.g. assets/walk_sheet.png).',
+    },
+    object_name: {
+      type: 'string',
+      description:
+        'Sprite object to receive the sliced animation (created/updated via set_sprite_animations).',
+    },
+    scene_name: {
+      type: 'string',
+      description:
+        'Scene containing the object. Omit to target a global object.',
+    },
+    animation_name: {
+      type: 'string',
+      description: 'Animation name to create (default "Default").',
+    },
+    frame_width: {
+      type: 'number',
+      description:
+        'Per-frame width in px. Provide with frame_height, OR use columns+rows instead.',
+    },
+    frame_height: {
+      type: 'number',
+      description: 'Per-frame height in px (pair with frame_width).',
+    },
+    columns: {
+      type: 'number',
+      description:
+        'Grid columns. Provide with rows as an alternative to frame_width/frame_height.',
+    },
+    rows: { type: 'number', description: 'Grid rows (pair with columns).' },
+    frame_count: {
+      type: 'number',
+      description:
+        'Optional cap on number of frames to extract (default: all grid cells, row-major).',
+    },
+    output_dir: {
+      type: 'string',
+      description:
+        'Optional output folder for the cut frame PNGs (default assets/<object>_<animation>).',
+    },
+  },
+  required: ['sheet_file', 'object_name'],
+  additionalProperties: true,
+};
+
 const spriteAnimationFrameSchema = {
   type: 'object',
   properties: {
@@ -959,6 +1011,11 @@ const simulatePreviewInputSchema = {
       description:
         'Optional preview/debugger id. Defaults to the latest running preview.',
     },
+    confirm: {
+      type: 'boolean',
+      description:
+        'Default true. After injecting, read back the InputManager state (returned as inputState: pressedKeyCodes/lastPressedKey/mouseX/mouseY) so you can confirm the game actually received the input. Set false to skip.',
+    },
   },
   required: ['inputs'],
   additionalProperties: false,
@@ -970,7 +1027,7 @@ const controlPreviewSchema = {
     action: {
       type: 'string',
       description:
-        'pause (freeze the game loop), play (resume), step (advance exactly N frames while paused for deterministic testing), or close (stop the targeted preview; pass close_all:true to close every preview). Defaults to step.',
+        'pause (freeze the game loop), play (resume), step (advance exactly N frames while paused for deterministic testing), close (stop previews; close_all:true closes every preview), or focus (bring all preview windows to front — fixes timed-out inspect/screenshot when a backgrounded preview is throttled). Defaults to step.',
     },
     frames: {
       type: 'number',
@@ -1112,7 +1169,7 @@ const bulkEditSceneAssetsSchema = {
     variables: {
       type: 'array',
       description:
-        'Scene/global variables to declare in one call: [{ scope: "scene"|"global", name, value, type? }]. Declare these before writing events that reference them. For object variables use add_or_edit_variable.',
+        'Variables to declare in one call: [{ scope: "scene"|"global"|"object", name, value, type?, object_name? }]. For scope "object", also pass object_name. Declare these before writing events that reference them.',
       items: {
         type: 'object',
         properties: {
@@ -1120,6 +1177,10 @@ const bulkEditSceneAssetsSchema = {
           name: { type: 'string' },
           value: {},
           type: { type: 'string' },
+          object_name: {
+            type: 'string',
+            description: 'Required when scope is "object".',
+          },
         },
         required: ['name'],
         additionalProperties: true,
@@ -1332,6 +1393,11 @@ const replaceSceneEventsFromFileSchema = {
       description:
         'When true, return only success, scene name, and event count instead of the full event sheet.',
     },
+    dry_run: {
+      type: 'boolean',
+      description:
+        'When true, validate and render the would-be result (eventsAsText) WITHOUT writing, so you can review it first. Also reports whether nested sub-instructions are preserved.',
+    },
   },
   required: ['scene_name', 'events_json_file'],
   additionalProperties: true,
@@ -1397,6 +1463,12 @@ const lintSceneEventsSchema = {
       type: 'boolean',
       description:
         'Default false. Set true only when the user explicitly requested JavaScript events.',
+    },
+    disabled_rules: {
+      type: 'array',
+      items: { type: 'string' },
+      description:
+        'Rule types to suppress, e.g. ["create-without-for-each"] when a single-instance Create is intentional.',
     },
   },
   required: ['scene_name'],
@@ -1729,7 +1801,7 @@ const readTools: Array<McpTool> = [
   {
     name: 'lint_scene_events',
     description:
-      'Lint a scene event sheet for MCP authoring rules, including mandatory semantic Groups at root and no JavaScript events unless explicitly allowed.',
+      'Lint a scene event sheet for MCP authoring rules: mandatory semantic Groups at root, no JavaScript events unless explicitly allowed, likely multi-instance Create-without-ForEach, empty Group names, and Group colors (flags Groups left at the default color and distinct Groups sharing the same color — each Group must have a distinct color).',
     inputSchema: lintSceneEventsSchema,
   },
   {
@@ -1876,7 +1948,7 @@ const readTools: Array<McpTool> = [
   {
     name: 'gdevelop_inspect_running_preview',
     description:
-      'Inspect a currently running preview to verify runtime behavior: returns whether a preview is running (defaulting to the latest launched one), its status, captured console logs, a separate errors list (uncaught exceptions, crashes, error-level logs), recentSounds (sounds/musics played since the last inspect — confirms PlaySound actually fired), and a compact runtime snapshot (running scene name, sceneElapsedTimeSeconds, per-object live instance counts, and scene/global variable values). Launch a preview first with gdevelop_run_command { commandName: "LAUNCH_NEW_PREVIEW" }. Use this to confirm a game actually runs and behaves, not just that a preview was launched.',
+      'Inspect a currently running preview to verify runtime behavior: returns whether a preview is running (defaulting to the latest launched one), its status, captured console logs, a separate errors list (uncaught exceptions, crashes, error-level logs), recentSounds (history since last inspect), activeSounds (sounds/musics currently playing incl. looping BGM), inputState (live pressed keys/mouse), and a compact runtime snapshot (running scene name, sceneElapsedTimeSeconds, per-object live instance counts, scene/global variable values). Launch a preview first with gdevelop_run_command { commandName: "LAUNCH_NEW_PREVIEW" }. Use this to confirm a game actually runs and behaves, not just that a preview was launched.',
     inputSchema: inspectRunningPreviewSchema,
   },
   {
@@ -1888,7 +1960,7 @@ const readTools: Array<McpTool> = [
   {
     name: 'simulate_preview_input',
     description:
-      'Inject simulated keyboard/mouse/touch input into a running preview so you can verify input-driven gameplay (movement, shooting, restart) end-to-end, not just autonomous logic. Press and release are separate events; hold a key by sending keyPressed without keyReleased. Then use gdevelop_inspect_running_preview / capture_preview_screenshot to verify the effect. Launch a preview first.',
+      'Inject simulated keyboard/mouse/touch input into a running preview so you can verify input-driven gameplay (movement, shooting, restart) end-to-end, not just autonomous logic. Press and release are separate events; hold a key by sending keyPressed without keyReleased. Returns inputState (the InputManager state after injecting) so you can confirm the game actually received the input — if a pressed key is missing from inputState.pressedKeyCodes, the window likely was not focused (try control_preview action:"focus"), which is different from a logic bug. Then use gdevelop_inspect_running_preview / capture_preview_screenshot to verify the effect. Launch a preview first.',
     inputSchema: simulatePreviewInputSchema,
   },
   {
@@ -2093,6 +2165,12 @@ const writeTools: Array<McpTool> = [
     inputSchema: setSpriteAnimationsSchema,
   },
   {
+    name: 'slice_sprite_sheet',
+    description:
+      'Slice one sprite-sheet PNG into a grid of individual frame images (cut on disk with Electron nativeImage), register each frame as an image resource, and bind them as a single Sprite animation. Specify the grid with frame_width+frame_height OR columns+rows. Use this to turn a downloaded sheet into a usable walk/explosion/idle animation in one call.',
+    inputSchema: sliceSpriteSheetSchema,
+  },
+  {
     name: 'bulk_edit_scene_assets',
     description:
       'Batch import resources, create/replace scene objects, bind Sprite animations, add behaviors, declare scene/global variables, and place 2D instances for one scene — in one call. Applied in order: resources → objects → sprite animations → behaviors → variables → instances. Use for initial scene setup to drastically reduce single-tool round-trips.',
@@ -2179,7 +2257,7 @@ const writeTools: Array<McpTool> = [
   {
     name: 'replace_scene_events_from_file',
     description:
-      'Replace one scene event sheet from a local events JSON file after GDevelop validation. Use this instead of inlining very large event JSON.',
+      'Replace one scene event sheet from a local events JSON file after GDevelop validation. Use this instead of inlining very large event JSON. Rejects structural mistakes that would silently lose data (e.g. Or/And/Not children under the wrong key) and reports subInstructionsPreserved as a write-back check. Pass dry_run:true to validate + render the result without writing.',
     inputSchema: replaceSceneEventsFromFileSchema,
   },
   {
@@ -2390,6 +2468,32 @@ const toolUsageExamples: { [string]: Array<Object> } = {
             ],
           },
         ],
+      },
+    },
+  ],
+  slice_sprite_sheet: [
+    {
+      description:
+        'Slice a 6-column x 1-row walk sheet into 6 frames and bind them as a "Walk" animation on the Player object.',
+      arguments: {
+        scene_name: 'Level1',
+        object_name: 'Player',
+        sheet_file: 'assets/player_walk.png',
+        animation_name: 'Walk',
+        columns: 6,
+        rows: 1,
+      },
+    },
+    {
+      description:
+        'Slice by fixed 32x32 cells (grid size inferred from the sheet), capping at the first 8 frames.',
+      arguments: {
+        object_name: 'Explosion',
+        sheet_file: 'assets/explosion_sheet.png',
+        animation_name: 'Boom',
+        frame_width: 32,
+        frame_height: 32,
+        frame_count: 8,
       },
     },
   ],

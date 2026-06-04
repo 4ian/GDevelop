@@ -358,6 +358,91 @@ describe('McpEditorBridge', () => {
     }
   });
 
+  it('flags Or/And children placed under the wrong key (would be silently dropped)', async () => {
+    // $FlowFixMe[invalid-constructor]
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    project.insertNewLayout('Level1', 0);
+    try {
+      const bridge = makeBridge({ getProject: () => project });
+
+      // WRONG: Or children under "conditions" instead of "subInstructions".
+      const wrong = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'gdevelop_validate_events_json',
+          arguments: {
+            scene_name: 'Level1',
+            events_json: JSON.stringify([
+              {
+                type: 'BuiltinCommonInstructions::Standard',
+                conditions: [
+                  {
+                    type: { value: 'BuiltinCommonInstructions::Or' },
+                    parameters: [],
+                    conditions: [
+                      {
+                        type: { value: 'KeyPressed' },
+                        parameters: ['', 'Left'],
+                      },
+                      { type: { value: 'KeyPressed' }, parameters: ['', 'q'] },
+                    ],
+                  },
+                ],
+                actions: [],
+              },
+            ]),
+          },
+        },
+      });
+      const wrongResult = JSON.parse(wrong.content[0].text);
+      expect(wrongResult.valid).toBe(false);
+      expect(wrongResult.issues.map(i => i.type)).toContain(
+        'empty-or-misplaced-sub-instructions'
+      );
+      expect(
+        wrongResult.issues.find(
+          i => i.type === 'empty-or-misplaced-sub-instructions'
+        ).suggestion
+      ).toMatch(/subInstructions/);
+
+      // CORRECT: children under "subInstructions" → no such error.
+      const right = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'gdevelop_validate_events_json',
+          arguments: {
+            scene_name: 'Level1',
+            events_json: JSON.stringify([
+              {
+                type: 'BuiltinCommonInstructions::Standard',
+                conditions: [
+                  {
+                    type: { value: 'BuiltinCommonInstructions::Or' },
+                    parameters: [],
+                    subInstructions: [
+                      {
+                        type: { value: 'KeyPressed' },
+                        parameters: ['', 'Left'],
+                      },
+                      { type: { value: 'KeyPressed' }, parameters: ['', 'q'] },
+                    ],
+                  },
+                ],
+                actions: [],
+              },
+            ]),
+          },
+        },
+      });
+      const rightResult = JSON.parse(right.content[0].text);
+      expect(rightResult.issues.map(i => i.type)).not.toContain(
+        'empty-or-misplaced-sub-instructions'
+      );
+    } finally {
+      project.delete();
+    }
+  });
+
   it('validates event JSON files without writing and lints scene event organization', async () => {
     // $FlowFixMe[invalid-constructor]
     const project = new gd.ProjectHelper.createNewGDJSProject();
@@ -433,6 +518,83 @@ describe('McpEditorBridge', () => {
     } finally {
       project.delete();
       fs.rmSync(tempDir, { recursive: true, force: true });
+    }
+  });
+
+  it('lints Group colors: default color and duplicate colors are flagged', async () => {
+    // $FlowFixMe[invalid-constructor]
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    const layout = project.insertNewLayout('Level1', 0);
+    const events = layout.getEvents();
+    // Group 0: left at the default color (74;176;228) → should be flagged.
+    events.insertNewEvent(project, 'BuiltinCommonInstructions::Group', 0);
+    // Group 1 & 2: same explicit color → duplicate-color should be flagged.
+    const g1 = gd.asGroupEvent(
+      events.insertNewEvent(project, 'BuiltinCommonInstructions::Group', 1)
+    );
+    g1.setName('Player input');
+    g1.setBackgroundColor(10, 20, 30);
+    const g2 = gd.asGroupEvent(
+      events.insertNewEvent(project, 'BuiltinCommonInstructions::Group', 2)
+    );
+    g2.setName('Enemy behavior');
+    g2.setBackgroundColor(10, 20, 30);
+
+    try {
+      const bridge = makeBridge({ getProject: () => project });
+      const response = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'lint_scene_events',
+          arguments: { scene_name: 'Level1' },
+        },
+      });
+      const lint = JSON.parse(response.content[0].text);
+      const types = lint.issues.map(issue => issue.type);
+      expect(types).toEqual(
+        expect.arrayContaining(['group-default-color', 'group-duplicate-color'])
+      );
+      const duplicate = lint.issues.find(
+        issue => issue.type === 'group-duplicate-color'
+      );
+      expect(duplicate.color).toBe('10;20;30');
+      expect(duplicate.groups).toHaveLength(2);
+    } finally {
+      project.delete();
+    }
+  });
+
+  it('lints Group colors: distinct explicit colors produce no color issues', async () => {
+    // $FlowFixMe[invalid-constructor]
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    const layout = project.insertNewLayout('Level1', 0);
+    const events = layout.getEvents();
+    const g1 = gd.asGroupEvent(
+      events.insertNewEvent(project, 'BuiltinCommonInstructions::Group', 0)
+    );
+    g1.setName('Player input');
+    g1.setBackgroundColor(10, 20, 30);
+    const g2 = gd.asGroupEvent(
+      events.insertNewEvent(project, 'BuiltinCommonInstructions::Group', 1)
+    );
+    g2.setName('UI');
+    g2.setBackgroundColor(200, 100, 50);
+
+    try {
+      const bridge = makeBridge({ getProject: () => project });
+      const response = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'lint_scene_events',
+          arguments: { scene_name: 'Level1' },
+        },
+      });
+      const lint = JSON.parse(response.content[0].text);
+      const types = lint.issues.map(issue => issue.type);
+      expect(types).not.toContain('group-default-color');
+      expect(types).not.toContain('group-duplicate-color');
+    } finally {
+      project.delete();
     }
   });
 

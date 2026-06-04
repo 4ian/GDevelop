@@ -2036,6 +2036,8 @@ interface ObjectMetadata {
     [Const, Ref] DOMString GetCategory();
     [Const, Ref] DOMString GetAssetStoreTag();
 
+
+    [Ref] ObjectMetadata SetHelpPath([Const] DOMString helpPath);
     [Ref] ObjectMetadata SetCategory([Const] DOMString categoryFullName);
     [Ref] ObjectMetadata SetAssetStoreTag([Const] DOMString assetStoreTag);
     [Ref] InGameEditorResourceMetadata AddInGameEditorResource();
@@ -2173,6 +2175,8 @@ interface BehaviorMetadata {
     [Const, Ref] DOMString GetGroup();
     [Const, Ref] DOMString GetIconFilename();
     [Const, Ref] DOMString GetHelpPath();
+
+    [Ref] BehaviorMetadata SetHelpPath([Const] DOMString helpPath);
 
     [Const, Ref] InstructionMetadata AddScopedCondition([Const] DOMString name,
                                         [Const] DOMString fullname,

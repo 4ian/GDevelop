@@ -3163,12 +3163,9 @@ export default class SceneEditor extends React.Component<Props, State> {
                         }}
                         onCancel={() => {
                           if (editedObjectWithContext) {
-                            // Object changes are reverted but not the
-                            // resources modified with an external editor, so
-                            // force a reload from the disk to pick those up.
                             this.props.onObjectEdited(
                               editedObjectWithContext,
-                              true
+                              false
                             );
                           }
                           this.editObject(null);

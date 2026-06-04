@@ -94,7 +94,7 @@ const addBehaviorSchema = {
     behavior_name: {
       type: 'string',
       description:
-        'Optional behavior instance name. Defaults to the behavior\'s default name (recommended). This is the name you reference in instruction behavior parameters.',
+        "Optional behavior instance name. Defaults to the behavior's default name (recommended). This is the name you reference in instruction behavior parameters.",
     },
   },
   required: ['scene_name', 'object_name', 'behavior_type'],
@@ -115,7 +115,7 @@ const removeBehaviorSchema = {
     behavior_name: {
       type: 'string',
       description:
-        'Required. The behavior instance NAME on the object (not the behavior type). See inspect_object_properties for the object\'s behavior names.',
+        "Required. The behavior instance NAME on the object (not the behavior type). See inspect_object_properties for the object's behavior names.",
     },
   },
   required: ['scene_name', 'object_name', 'behavior_name'],
@@ -275,6 +275,46 @@ const addOrUpdateResourceSchema = {
     },
   },
   required: ['name', 'file', 'kind'],
+  additionalProperties: true,
+};
+
+const generatePlaceholderAssetSchema = {
+  type: 'object',
+  properties: {
+    name: {
+      type: 'string',
+      description: 'Resource name to register (also the default file stem).',
+    },
+    asset_type: {
+      type: 'string',
+      description: '"image" (PNG, default) or "sound" (WAV).',
+    },
+    file: {
+      type: 'string',
+      description:
+        'Optional output path (project-relative recommended). Defaults to assets/<name>.png or .wav.',
+    },
+    width: { type: 'number', description: 'Image width (default 64).' },
+    height: { type: 'number', description: 'Image height (default 64).' },
+    color: {
+      type: 'string',
+      description:
+        'Image fill color as "r;g;b" or "r;g;b;a" (default opaque magenta 255;0;255).',
+    },
+    duration_ms: {
+      type: 'number',
+      description: 'Sound duration in ms (default 150).',
+    },
+    frequency: {
+      type: 'number',
+      description: 'Sound tone frequency in Hz (default 440).',
+    },
+    sound_kind: {
+      type: 'string',
+      description: '"sine" (tone, default) or "noise" (burst).',
+    },
+  },
+  required: ['name'],
   additionalProperties: true,
 };
 
@@ -919,6 +959,84 @@ const simulatePreviewInputSchema = {
   additionalProperties: false,
 };
 
+const controlPreviewSchema = {
+  type: 'object',
+  properties: {
+    action: {
+      type: 'string',
+      description:
+        'pause (freeze the game loop), play (resume), or step (advance exactly N frames while paused for deterministic testing). Defaults to step.',
+    },
+    frames: {
+      type: 'number',
+      description: 'For action=step: number of frames to advance (default 1).',
+    },
+    frame_delta_ms: {
+      type: 'number',
+      description:
+        'For action=step: simulated milliseconds per frame (default ~16.67 = 60 FPS). Keep small; large values are clamped by the engine.',
+    },
+    debugger_id: {
+      type: 'string',
+      description:
+        'Optional preview/debugger id. Defaults to the latest running preview.',
+    },
+  },
+  additionalProperties: false,
+};
+
+const setRuntimeStateSchema = {
+  type: 'object',
+  properties: {
+    operations: {
+      type: 'array',
+      description:
+        'Test/debug state operations applied to the running game, in order.',
+      items: {
+        type: 'object',
+        properties: {
+          type: {
+            type: 'string',
+            description:
+              'setVariable | moveInstance | spawnInstance | deleteInstance.',
+          },
+          scope: {
+            type: 'string',
+            description: 'For setVariable: "scene" or "global".',
+          },
+          name: {
+            type: 'string',
+            description: 'For setVariable: variable name.',
+          },
+          value: {
+            description: 'For setVariable: number, string, or boolean.',
+          },
+          objectName: {
+            type: 'string',
+            description: 'For move/spawn/deleteInstance: the object name.',
+          },
+          index: {
+            type: 'number',
+            description:
+              'For move/deleteInstance: which instance (default 0, the first).',
+          },
+          x: { type: 'number' },
+          y: { type: 'number' },
+        },
+        required: ['type'],
+        additionalProperties: true,
+      },
+    },
+    debugger_id: {
+      type: 'string',
+      description:
+        'Optional preview/debugger id. Defaults to the latest running preview.',
+    },
+  },
+  required: ['operations'],
+  additionalProperties: false,
+};
+
 const readSerializedSceneSchema = {
   type: 'object',
   properties: {
@@ -926,7 +1044,7 @@ const readSerializedSceneSchema = {
     object_name: {
       type: 'string',
       description:
-        'Optional. Return only this object\'s serialized definition (and its instances) instead of the whole scene. Useful to inspect e.g. one object\'s animation/behavior config without dumping the entire scene.',
+        "Optional. Return only this object's serialized definition (and its instances) instead of the whole scene. Useful to inspect e.g. one object's animation/behavior config without dumping the entire scene.",
     },
     object_names: {
       type: 'array',
@@ -969,7 +1087,7 @@ const bulkEditSceneAssetsSchema = {
     behaviors: {
       type: 'array',
       description:
-        'Behaviors to add to objects in this scene (applied after objects exist): [{ object_name, behavior_type, behavior_name? }]. behavior_name defaults to the behavior\'s default name.',
+        "Behaviors to add to objects in this scene (applied after objects exist): [{ object_name, behavior_type, behavior_name? }]. behavior_name defaults to the behavior's default name.",
       items: {
         type: 'object',
         properties: {
@@ -1731,7 +1849,7 @@ const readTools: Array<McpTool> = [
   {
     name: 'gdevelop_inspect_running_preview',
     description:
-      'Inspect a currently running preview to verify runtime behavior: returns whether a preview is running (defaulting to the latest launched one), its status, captured console logs, a separate errors list (uncaught exceptions, crashes, error-level logs), and a compact runtime snapshot (running scene name, per-object live instance counts, and scene/global variable values). Launch a preview first with gdevelop_run_command { commandName: "LAUNCH_NEW_PREVIEW" }. Use this to confirm a game actually runs and behaves, not just that a preview was launched.',
+      'Inspect a currently running preview to verify runtime behavior: returns whether a preview is running (defaulting to the latest launched one), its status, captured console logs, a separate errors list (uncaught exceptions, crashes, error-level logs), recentSounds (sounds/musics played since the last inspect — confirms PlaySound actually fired), and a compact runtime snapshot (running scene name, sceneElapsedTimeSeconds, per-object live instance counts, and scene/global variable values). Launch a preview first with gdevelop_run_command { commandName: "LAUNCH_NEW_PREVIEW" }. Use this to confirm a game actually runs and behaves, not just that a preview was launched.',
     inputSchema: inspectRunningPreviewSchema,
   },
   {
@@ -1745,6 +1863,18 @@ const readTools: Array<McpTool> = [
     description:
       'Inject simulated keyboard/mouse/touch input into a running preview so you can verify input-driven gameplay (movement, shooting, restart) end-to-end, not just autonomous logic. Press and release are separate events; hold a key by sending keyPressed without keyReleased. Then use gdevelop_inspect_running_preview / capture_preview_screenshot to verify the effect. Launch a preview first.',
     inputSchema: simulatePreviewInputSchema,
+  },
+  {
+    name: 'control_preview',
+    description:
+      'Deterministically control a running preview: pause, play, or step N frames. Pause + step makes runtime testing reproducible (no wall-clock drift between MCP calls): pause → simulate_preview_input / set_runtime_state → control_preview step → gdevelop_inspect_running_preview. Launch a preview first.',
+    inputSchema: controlPreviewSchema,
+  },
+  {
+    name: 'set_runtime_state',
+    description:
+      'Inject test state into a running preview: set scene/global variables and move/spawn/delete instances, to reach gameplay states that are hard to trigger naturally (e.g. set GameOver=0, give the player a position, spawn an enemy). Pause first with control_preview for reproducibility. Launch a preview first.',
+    inputSchema: setRuntimeStateSchema,
   },
   {
     name: 'find_scene_events',
@@ -1902,6 +2032,12 @@ const writeTools: Array<McpTool> = [
     description:
       'Add or update a project resource such as a local PNG image resource with name, file, and kind.',
     inputSchema: addOrUpdateResourceSchema,
+  },
+  {
+    name: 'generate_placeholder_asset',
+    description:
+      'Generate a simple placeholder asset (a solid-color PNG image, or a short WAV beep/noise sound) on disk and register it as a project resource — so a from-scratch playable demo can be built entirely through MCP without external image/audio tooling. Replace with real art/audio later by overwriting the file and re-importing the same name.',
+    inputSchema: generatePlaceholderAssetSchema,
   },
   {
     name: 'set_sprite_animations',
@@ -2151,6 +2287,28 @@ const toolUsageExamples: { [string]: Array<Object> } = {
           preloadAsMusic: false,
           preloadInCache: false,
         },
+      },
+    },
+  ],
+  generate_placeholder_asset: [
+    {
+      description:
+        'Generate a 64x64 blue placeholder sprite image and register it as a resource.',
+      arguments: {
+        name: 'Player',
+        asset_type: 'image',
+        width: 64,
+        height: 64,
+        color: '60;120;220',
+      },
+    },
+    {
+      description: 'Generate a short shoot beep sound effect.',
+      arguments: {
+        name: 'Shoot',
+        asset_type: 'sound',
+        duration_ms: 120,
+        frequency: 660,
       },
     },
   ],
@@ -2501,12 +2659,48 @@ const toolUsageExamples: { [string]: Array<Object> } = {
       },
     },
     {
-      description: 'Move the mouse to a game coordinate and click the left button.',
+      description:
+        'Move the mouse to a game coordinate and click the left button.',
       arguments: {
         inputs: [
           { type: 'mouseMove', x: 360, y: 640 },
           { type: 'mouseButtonPressed', button: 'left' },
           { type: 'mouseButtonReleased', button: 'left' },
+        ],
+      },
+    },
+  ],
+  control_preview: [
+    {
+      description:
+        'Pause the game, then advance 30 frames (~0.5s at 60 FPS) deterministically for a reproducible test.',
+      arguments: { action: 'step', frames: 30 },
+    },
+    {
+      description: 'Pause the running preview.',
+      arguments: { action: 'pause' },
+    },
+    {
+      description: 'Resume normal play.',
+      arguments: { action: 'play' },
+    },
+  ],
+  set_runtime_state: [
+    {
+      description:
+        'Force the game out of a game-over state and reposition the player to test mid-game logic.',
+      arguments: {
+        operations: [
+          { type: 'setVariable', scope: 'scene', name: 'GameOver', value: 0 },
+          { type: 'moveInstance', objectName: 'Player', x: 360, y: 900 },
+        ],
+      },
+    },
+    {
+      description: 'Spawn an enemy to test collision/scoring.',
+      arguments: {
+        operations: [
+          { type: 'spawnInstance', objectName: 'EnemyBig', x: 360, y: 100 },
         ],
       },
     },
@@ -2717,9 +2911,7 @@ const toolUsageExamples: { [string]: Array<Object> } = {
       description: 'Define an object group membership.',
       arguments: {
         scene_name: 'Level1',
-        changed_groups: [
-          { group_name: 'Enemies', objects: ['Enemy', 'Boss'] },
-        ],
+        changed_groups: [{ group_name: 'Enemies', objects: ['Enemy', 'Boss'] }],
       },
     },
   ],

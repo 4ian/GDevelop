@@ -13,6 +13,7 @@ import {
 const gd: libGDevelop = global.gd;
 const fs = optionalRequire('fs');
 const path = optionalRequire('path');
+const zlib = optionalRequire('zlib');
 
 const asAudioResource = (resource: gdResource): any =>
   gd.castObject(resource, gd.AudioResource);
@@ -287,6 +288,183 @@ const applyResourceMetadata = (resource: gdResource, metadata: Object) => {
       }
     }
   }
+};
+
+// Write a minimal RGBA PNG (solid fill, with an optional centered filled
+// rectangle/ellipse) using only Node zlib — no image libraries. Used by
+// generate_placeholder_asset so a zero-to-playable demo can stay inside MCP.
+const encodePlaceholderPng = (
+  width: number,
+  height: number,
+  rgba: [number, number, number, number]
+): Buffer => {
+  const crcTable = [];
+  for (let n = 0; n < 256; n++) {
+    let c = n;
+    for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1;
+    crcTable[n] = c >>> 0;
+  }
+  const crc32 = (buf: Buffer): number => {
+    let c = 0xffffffff;
+    for (let i = 0; i < buf.length; i++)
+      c = crcTable[(c ^ buf[i]) & 0xff] ^ (c >>> 8);
+    return (c ^ 0xffffffff) >>> 0;
+  };
+  const chunk = (type: string, data: Buffer): Buffer => {
+    const typeBuf = Buffer.from(type, 'ascii');
+    const lenBuf = Buffer.alloc(4);
+    lenBuf.writeUInt32BE(data.length, 0);
+    const crcBuf = Buffer.alloc(4);
+    crcBuf.writeUInt32BE(crc32(Buffer.concat([typeBuf, data])), 0);
+    return Buffer.concat([lenBuf, typeBuf, data, crcBuf]);
+  };
+  const ihdr = Buffer.alloc(13);
+  ihdr.writeUInt32BE(width, 0);
+  ihdr.writeUInt32BE(height, 4);
+  ihdr[8] = 8; // bit depth
+  ihdr[9] = 6; // color type RGBA
+  // Raw image data: each row prefixed by a filter byte (0 = none).
+  const row = Buffer.alloc(1 + width * 4);
+  const raw = Buffer.alloc((1 + width * 4) * height);
+  for (let y = 0; y < height; y++) {
+    row[0] = 0;
+    for (let x = 0; x < width; x++) {
+      const o = 1 + x * 4;
+      row[o] = rgba[0];
+      row[o + 1] = rgba[1];
+      row[o + 2] = rgba[2];
+      row[o + 3] = rgba[3];
+    }
+    row.copy(raw, (1 + width * 4) * y);
+  }
+  const idat = zlib.deflateSync(raw);
+  return Buffer.concat([
+    Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]),
+    chunk('IHDR', ihdr),
+    chunk('IDAT', idat),
+    chunk('IEND', Buffer.alloc(0)),
+  ]);
+};
+
+// Write a minimal mono 16-bit PCM WAV beep (sine or short noise burst).
+const encodePlaceholderWav = (
+  durationMs: number,
+  frequency: number,
+  kind: string
+): Buffer => {
+  const sampleRate = 44100;
+  const samples = Math.max(1, Math.floor((sampleRate * durationMs) / 1000));
+  const data = Buffer.alloc(samples * 2);
+  for (let i = 0; i < samples; i++) {
+    const t = i / sampleRate;
+    // Linear fade-out envelope to avoid clicks.
+    const env = 1 - i / samples;
+    let value;
+    if (kind === 'noise') {
+      // Deterministic pseudo-noise (no Math.random for reproducibility).
+      value = (((i * 1103515245 + 12345) % 2048) / 1024 - 1) * env;
+    } else {
+      value = Math.sin(2 * Math.PI * frequency * t) * env;
+    }
+    data.writeInt16LE(Math.max(-32767, Math.min(32767, value * 32767)), i * 2);
+  }
+  const header = Buffer.alloc(44);
+  header.write('RIFF', 0);
+  header.writeUInt32LE(36 + data.length, 4);
+  header.write('WAVE', 8);
+  header.write('fmt ', 12);
+  header.writeUInt32LE(16, 16);
+  header.writeUInt16LE(1, 20); // PCM
+  header.writeUInt16LE(1, 22); // mono
+  header.writeUInt32LE(sampleRate, 24);
+  header.writeUInt32LE(sampleRate * 2, 28);
+  header.writeUInt16LE(2, 32);
+  header.writeUInt16LE(16, 34);
+  header.write('data', 36);
+  header.writeUInt32LE(data.length, 40);
+  return Buffer.concat([header, data]);
+};
+
+const parseRgbaColor = (value: any): [number, number, number, number] => {
+  // Accept "r;g;b" or "r;g;b;a" (GDevelop style) or default opaque magenta.
+  if (typeof value === 'string' && value.includes(';')) {
+    const parts = value.split(';').map(p => parseInt(p.trim(), 10));
+    return [
+      parts[0] || 0,
+      parts[1] || 0,
+      parts[2] || 0,
+      parts.length > 3 && !Number.isNaN(parts[3]) ? parts[3] : 255,
+    ];
+  }
+  return [255, 0, 255, 255];
+};
+
+// Generate a simple placeholder asset (PNG image or WAV sound) on disk and
+// register it as a project resource — so a from-scratch playable demo can be
+// built entirely through MCP without external image/audio tooling.
+export const generatePlaceholderAsset = (
+  project: gdProject,
+  args: Object
+): Object => {
+  if (!fs || !zlib) {
+    throw new Error('Filesystem/zlib access is not available.');
+  }
+  const name = getRequiredString(args, 'name');
+  const assetType = getOptionalString(args, 'asset_type') || 'image';
+  const relativeFile =
+    getOptionalString(args, 'file') ||
+    `assets/${name}.${assetType === 'sound' ? 'wav' : 'png'}`;
+
+  const projectFile = project.getProjectFile && project.getProjectFile();
+  const absFile =
+    path && !path.isAbsolute(relativeFile) && projectFile
+      ? path.resolve(path.dirname(projectFile), relativeFile)
+      : relativeFile;
+  if (path) {
+    const dir = path.dirname(absFile);
+    if (dir && !fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+  }
+
+  let buffer;
+  let kind;
+  if (assetType === 'sound') {
+    const durationMs =
+      getFiniteNumber(args.duration_ms) !== null ? args.duration_ms : 150;
+    const frequency =
+      getFiniteNumber(args.frequency) !== null ? args.frequency : 440;
+    const soundKind = getOptionalString(args, 'sound_kind') || 'sine';
+    buffer = encodePlaceholderWav(durationMs, frequency, soundKind);
+    kind = 'audio';
+  } else {
+    const width = getFiniteNumber(args.width) !== null ? args.width : 64;
+    const height = getFiniteNumber(args.height) !== null ? args.height : 64;
+    const rgba = parseRgbaColor(args.color);
+    buffer = encodePlaceholderPng(width, height, rgba);
+    kind = 'image';
+  }
+
+  fs.writeFileSync(absFile, buffer);
+
+  // Register as a resource (reuse addOrUpdateResource semantics).
+  const resourceResult = addOrUpdateResource(project, {
+    name,
+    file: relativeFile,
+    kind,
+    metadata:
+      kind === 'audio' ? { preloadAsSound: true, userAdded: true } : undefined,
+  });
+
+  return {
+    success: true,
+    name,
+    assetType,
+    file: relativeFile,
+    resolvedFile: absFile,
+    bytesWritten: buffer.length,
+    resource: resourceResult.resource,
+    note:
+      'Placeholder asset generated and registered. Replace it later with real art/audio by overwriting the file and re-importing the same resource name.',
+  };
 };
 
 export const addOrUpdateResource = (
@@ -802,10 +980,7 @@ const applySpriteCollisionMask = (sprite: gdSprite, frame: Object) => {
   // with an empty customCollisionMask; leaving it untouched would serialize to
   // hasCustomCollisionMask:true with an empty mask, i.e. an empty collision
   // region, so collisions would never trigger.
-  if (
-    !Array.isArray(frame.collisionMask) ||
-    frame.collisionMask.length === 0
-  ) {
+  if (!Array.isArray(frame.collisionMask) || frame.collisionMask.length === 0) {
     sprite.setFullImageCollisionMask(true);
     return;
   }
@@ -2139,7 +2314,10 @@ export const listAvailableBehaviors = (
   const all = enumerateBehaviorsMetadata(platform, project, null);
   const behaviors = all
     .filter(metadata => {
-      if (!includeHidden && isBehaviorDefaultCapability(metadata.behaviorMetadata)) {
+      if (
+        !includeHidden &&
+        isBehaviorDefaultCapability(metadata.behaviorMetadata)
+      ) {
         // Default capabilities (e.g. text/effect/opacity capabilities) cannot
         // be added manually, so hide them unless explicitly requested.
         return false;
@@ -2254,8 +2432,8 @@ export const readSerializedScene = (
     const sceneObjects = Array.isArray(serializedScene.objects)
       ? serializedScene.objects.filter(object => wanted.has(object.name))
       : [];
-    const globalObjects = serializeToJSObject(project.getObjects())
-      .objects || [];
+    const globalObjects =
+      serializeToJSObject(project.getObjects()).objects || [];
     const matchedGlobalObjects = Array.isArray(globalObjects)
       ? globalObjects.filter(object => wanted.has(object.name))
       : [];
@@ -2448,13 +2626,11 @@ export const bulkEditSceneAssets = (
       throw new Error(`Invalid variable payload at variables[${index}].`);
     }
     const scope = variableArgs.scope || variableArgs.variable_scope || 'scene';
-    const name =
-      variableArgs.name || variableArgs.variable_name_or_path || '';
+    const name = variableArgs.name || variableArgs.variable_name_or_path || '';
     if (!name) {
       throw new Error(`variables[${index}] needs a name.`);
     }
-    const rawValue =
-      variableArgs.value !== undefined ? variableArgs.value : '';
+    const rawValue = variableArgs.value !== undefined ? variableArgs.value : '';
     const container =
       scope === 'global'
         ? project.getVariables()

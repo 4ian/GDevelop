@@ -501,6 +501,17 @@ namespace gdjs {
     _pausedSounds: HowlerSound[] = [];
     _paused: boolean = false;
 
+    /**
+     * Ring buffer of recently played sounds/musics, for debugging/automated
+     * testing (e.g. confirming a PlaySound action actually fired). Capped.
+     */
+    _recentlyPlayedSounds: Array<{
+      soundName: string;
+      isMusic: boolean;
+      channel: number | null;
+    }> = [];
+    static _maxRecentlyPlayedSounds: integer = 50;
+
     _resourceLoader: gdjs.ResourceLoader;
 
     /**
@@ -734,6 +745,28 @@ namespace gdjs {
       return new gdjs.HowlerSound(howl, volume, loop, rate, soundName);
     }
 
+    /** Record a played sound into the ring buffer (for debug/test inspection). */
+    _recordSoundPlayed(
+      soundName: string,
+      isMusic: boolean,
+      channel: number | null
+    ): void {
+      this._recentlyPlayedSounds.push({ soundName, isMusic, channel });
+      if (
+        this._recentlyPlayedSounds.length >
+        HowlerSoundManager._maxRecentlyPlayedSounds
+      ) {
+        this._recentlyPlayedSounds.shift();
+      }
+    }
+
+    /** Get (and by default clear) the list of recently played sounds. */
+    getRecentlyPlayedSounds(clear?: boolean): Array<Object> {
+      const list = this._recentlyPlayedSounds.slice();
+      if (clear !== false) this._recentlyPlayedSounds.length = 0;
+      return list;
+    }
+
     /**
      * Preloads a sound or a music in memory.
      * @param soundName The name of the file or resource to preload.
@@ -850,6 +883,7 @@ namespace gdjs {
           this._pausedSounds.push(sound);
         }
       });
+      this._recordSoundPlayed(soundName, false, null);
       sound.play();
       if (seek) {
         sound.setSeek(seek);
@@ -886,6 +920,7 @@ namespace gdjs {
           this._pausedSounds.push(sound);
         }
       });
+      this._recordSoundPlayed(soundName, false, channel);
       sound.play();
       if (seek) {
         sound.setSeek(seek);
@@ -917,6 +952,7 @@ namespace gdjs {
           this._pausedSounds.push(music);
         }
       });
+      this._recordSoundPlayed(soundName, true, null);
       music.play();
       if (seek) {
         music.setSeek(seek);
@@ -948,6 +984,7 @@ namespace gdjs {
           this._pausedSounds.push(music);
         }
       });
+      this._recordSoundPlayed(soundName, true, channel);
       music.play();
       if (seek) {
         music.setSeek(seek);

@@ -49,6 +49,7 @@ import {
   createSpriteObjectFromResource,
   createTextObject,
   deleteSceneObject,
+  generatePlaceholderAsset,
   inspectProjectCleanup,
   inspectProjectResources,
   listAvailableBehaviors,
@@ -327,8 +328,7 @@ const summarizeRuntimeGameDump = (payload: any, options?: Object): Object => {
     };
 
     const stack =
-      payload._sceneStack &&
-      Array.isArray(payload._sceneStack._stack)
+      payload._sceneStack && Array.isArray(payload._sceneStack._stack)
         ? payload._sceneStack._stack
         : [];
     summary.runningScenesCount = stack.length;
@@ -361,8 +361,14 @@ const summarizeRuntimeGameDump = (payload: any, options?: Object): Object => {
           instancePositions[objectName] = instances
             .slice(0, 50)
             .map(instance => ({
-              x: instance && typeof instance.x === 'number' ? instance.x : undefined,
-              y: instance && typeof instance.y === 'number' ? instance.y : undefined,
+              x:
+                instance && typeof instance.x === 'number'
+                  ? instance.x
+                  : undefined,
+              y:
+                instance && typeof instance.y === 'number'
+                  ? instance.y
+                  : undefined,
               angle:
                 instance && typeof instance.angle === 'number'
                   ? instance.angle
@@ -489,8 +495,16 @@ const captureRunningPreviewState = (
         inspectedLatest: targetId === latestId,
         availableDebuggerIds: previewIds,
         status,
+        // Sounds played since the previous inspect — confirms PlaySound/PlayMusic
+        // actions actually fired (the previous audio verification blind spot).
+        recentSounds:
+          status && Array.isArray(status.recentlyPlayedSounds)
+            ? status.recentlyPlayedSounds
+            : undefined,
         runtime: summarizeRuntimeGameDump(dumpPayload, {
-          positionObjectNames: Array.isArray(args && args.instance_positions_for)
+          positionObjectNames: Array.isArray(
+            args && args.instance_positions_for
+          )
             ? new Set(args.instance_positions_for.map(String))
             : null,
           allInstancePositions: !!(args && args.include_instance_positions),
@@ -701,7 +715,9 @@ const capturePreviewScreenshot = async (
 // modifiers), so callers can pass "Space"/"Left"/"a" instead of numbers.
 // Mirrors GDJS keysNameToCode but stores RAW codes for modifiers (the runtime's
 // onKeyPressed re-applies the location offset).
-const KEY_NAME_TO_CODE: { [string]: {| code: number, location?: number |} } = (() => {
+const KEY_NAME_TO_CODE: {
+  [string]: {| code: number, location?: number |},
+} = (() => {
   const map = {};
   const add = (name, code, location) => {
     map[name.toLowerCase()] = location ? { code, location } : { code };
@@ -709,21 +725,54 @@ const KEY_NAME_TO_CODE: { [string]: {| code: number, location?: number |} } = ((
   for (let c = 65; c <= 90; c++) add(String.fromCharCode(c), c); // a-z
   for (let n = 0; n <= 9; n++) add('num' + n, 48 + n);
   for (let n = 0; n <= 9; n++) add('numpad' + n, 96 + n);
-  add('space', 32); add('return', 13); add('enter', 13); add('escape', 27);
-  add('tab', 9); add('back', 8); add('backspace', 8); add('delete', 46);
-  add('insert', 45); add('pageup', 33); add('pagedown', 34); add('end', 35);
-  add('home', 36); add('pause', 19); add('menu', 93);
-  add('left', 37); add('up', 38); add('right', 39); add('down', 40);
-  add('add', 107); add('subtract', 109); add('multiply', 106); add('divide', 111);
-  add('semicolon', 186); add('comma', 188); add('period', 190); add('quote', 222);
-  add('slash', 191); add('backslash', 220); add('equal', 187); add('dash', 189);
-  add('lbracket', 219); add('rbracket', 221); add('tilde', 192);
+  add('space', 32);
+  add('return', 13);
+  add('enter', 13);
+  add('escape', 27);
+  add('tab', 9);
+  add('back', 8);
+  add('backspace', 8);
+  add('delete', 46);
+  add('insert', 45);
+  add('pageup', 33);
+  add('pagedown', 34);
+  add('end', 35);
+  add('home', 36);
+  add('pause', 19);
+  add('menu', 93);
+  add('left', 37);
+  add('up', 38);
+  add('right', 39);
+  add('down', 40);
+  add('add', 107);
+  add('subtract', 109);
+  add('multiply', 106);
+  add('divide', 111);
+  add('semicolon', 186);
+  add('comma', 188);
+  add('period', 190);
+  add('quote', 222);
+  add('slash', 191);
+  add('backslash', 220);
+  add('equal', 187);
+  add('dash', 189);
+  add('lbracket', 219);
+  add('rbracket', 221);
+  add('tilde', 192);
   for (let f = 1; f <= 12; f++) add('f' + f, 111 + f);
   // Modifiers: raw code + location (1 = left, 2 = right).
-  add('shift', 16); add('lshift', 16, 1); add('rshift', 16, 2);
-  add('control', 17); add('ctrl', 17); add('lcontrol', 17, 1); add('rcontrol', 17, 2);
-  add('alt', 18); add('lalt', 18, 1); add('ralt', 18, 2);
-  add('lsystem', 91, 1); add('rsystem', 91, 2);
+  add('shift', 16);
+  add('lshift', 16, 1);
+  add('rshift', 16, 2);
+  add('control', 17);
+  add('ctrl', 17);
+  add('lcontrol', 17, 1);
+  add('rcontrol', 17, 2);
+  add('alt', 18);
+  add('lalt', 18, 1);
+  add('ralt', 18, 2);
+  add('lsystem', 91, 1);
+  add('rsystem', 91, 2);
   return map;
 })();
 
@@ -883,6 +932,186 @@ const simulatePreviewInput = async (
   };
 };
 
+// Shared guard: confirm a preview is running and return its server + target id.
+const requireRunningPreview = (
+  previewDebuggerServer: ?Object,
+  args: Object
+): Object => {
+  if (!previewDebuggerServer) {
+    return {
+      ok: false,
+      result: {
+        success: false,
+        running: false,
+        error: 'No preview debugger server is available in this editor build.',
+      },
+    };
+  }
+  if (previewDebuggerServer.getServerState() !== 'started') {
+    return {
+      ok: false,
+      result: {
+        success: false,
+        running: false,
+        error:
+          'No preview is running. Launch a preview first with gdevelop_run_command { commandName: "LAUNCH_NEW_PREVIEW" }.',
+      },
+    };
+  }
+  const previewIds =
+    typeof previewDebuggerServer.getExistingPreviewDebuggerIds === 'function'
+      ? previewDebuggerServer.getExistingPreviewDebuggerIds()
+      : previewDebuggerServer.getExistingDebuggerIds();
+  if (!previewIds || !previewIds.length) {
+    return {
+      ok: false,
+      result: {
+        success: false,
+        running: false,
+        error: 'No preview is currently connected.',
+      },
+    };
+  }
+  const targetId =
+    args && typeof args.debugger_id === 'string'
+      ? args.debugger_id
+      : previewIds[previewIds.length - 1];
+  return { ok: true, targetId };
+};
+
+// Deterministic preview control: pause / play / step N frames. Pausing then
+// stepping makes runtime testing reproducible (no wall-clock drift between MCP
+// round-trips). Returns the step result when stepping.
+const controlPreview = async (
+  previewDebuggerServer: ?Object,
+  args: Object
+): Promise<Object> => {
+  const guard = requireRunningPreview(previewDebuggerServer, args);
+  if (!guard.ok) return guard.result;
+  const targetId = guard.targetId;
+  const action = args && typeof args.action === 'string' ? args.action : 'step';
+
+  if (action === 'pause' || action === 'play') {
+    try {
+      // $FlowFixMe
+      previewDebuggerServer.sendMessage(targetId, {
+        command: action === 'pause' ? 'pause' : 'play',
+      });
+    } catch (error) {
+      return { success: false, running: true, error: error.message };
+    }
+    return { success: true, running: true, debuggerId: targetId, action };
+  }
+
+  if (action === 'step') {
+    const count = args && typeof args.frames === 'number' ? args.frames : 1;
+    const fakeElapsedTimeMs =
+      args && typeof args.frame_delta_ms === 'number'
+        ? args.frame_delta_ms
+        : undefined;
+    if (typeof previewDebuggerServer.sendMessageWithResponse === 'function') {
+      try {
+        const response = await previewDebuggerServer.sendMessageWithResponse({
+          command: 'stepFrames',
+          count,
+          fakeElapsedTimeMs,
+        });
+        const payload = (response && response.payload) || {};
+        return {
+          success: true,
+          running: true,
+          debuggerId: targetId,
+          action: 'step',
+          ...payload,
+        };
+      } catch (error) {
+        // Fall through to fire-and-forget.
+      }
+    }
+    try {
+      // $FlowFixMe
+      previewDebuggerServer.sendMessage(targetId, {
+        command: 'stepFrames',
+        count,
+        fakeElapsedTimeMs,
+      });
+    } catch (error) {
+      return { success: false, running: true, error: error.message };
+    }
+    return {
+      success: true,
+      running: true,
+      debuggerId: targetId,
+      action: 'step',
+      requestedFrames: count,
+      note: 'Step requested (this build does not confirm frame count).',
+    };
+  }
+
+  return {
+    success: false,
+    running: true,
+    error: `Unknown action "${action}". Use pause, play, or step.`,
+  };
+};
+
+// Inject test/debug state into a running preview: set scene/global variables,
+// move/spawn/delete instances. For verifying gameplay states that are hard to
+// reach naturally (e.g. set GameOver=0, spawn an enemy, move the player).
+const setRuntimeState = async (
+  previewDebuggerServer: ?Object,
+  args: Object
+): Promise<Object> => {
+  const guard = requireRunningPreview(previewDebuggerServer, args);
+  if (!guard.ok) return guard.result;
+  const targetId = guard.targetId;
+  const operations = Array.isArray(args && args.operations)
+    ? args.operations
+    : null;
+  if (!operations || !operations.length) {
+    return {
+      success: false,
+      running: true,
+      error:
+        'Missing "operations": an array, e.g. [{ type: "setVariable", scope: "scene", name: "GameOver", value: 0 }].',
+    };
+  }
+  if (typeof previewDebuggerServer.sendMessageWithResponse === 'function') {
+    try {
+      const response = await previewDebuggerServer.sendMessageWithResponse({
+        command: 'setRuntimeState',
+        operations,
+      });
+      const payload = (response && response.payload) || {};
+      return {
+        success: !payload.error,
+        running: true,
+        debuggerId: targetId,
+        applied: payload.applied,
+        error: payload.error || undefined,
+      };
+    } catch (error) {
+      // Fall through.
+    }
+  }
+  try {
+    // $FlowFixMe
+    previewDebuggerServer.sendMessage(targetId, {
+      command: 'setRuntimeState',
+      operations,
+    });
+  } catch (error) {
+    return { success: false, running: true, error: error.message };
+  }
+  return {
+    success: true,
+    running: true,
+    debuggerId: targetId,
+    appliedCount: operations.length,
+    note: 'State sent (fire-and-forget; this build does not confirm).',
+  };
+};
+
 // Auto-quote safe bare string literals (e.g. layer "HUD", a timer identifier) in
 // the events_json / event_changes[].generated_events of an add_scene_events
 // payload, so callers do not have to remember to escape them. Mutates a shallow
@@ -914,7 +1143,9 @@ const autoQuoteAddSceneEventsArgs = (
       if (!change || typeof change !== 'object') return change;
       const updated = { ...change };
       if (typeof updated.generated_events === 'string') {
-        updated.generated_events = normalizeJsonString(updated.generated_events);
+        updated.generated_events = normalizeJsonString(
+          updated.generated_events
+        );
       }
       if (typeof updated.generatedEvents === 'string') {
         updated.generatedEvents = normalizeJsonString(updated.generatedEvents);
@@ -1491,6 +1722,32 @@ const callMcpTool = async ({
     }
   }
 
+  if (toolName === 'control_preview') {
+    const previewDebuggerServer = context.getPreviewDebuggerServer
+      ? context.getPreviewDebuggerServer()
+      : null;
+    try {
+      return textResult(
+        await controlPreview(previewDebuggerServer, args || {})
+      );
+    } catch (error) {
+      return errorResult(error.message);
+    }
+  }
+
+  if (toolName === 'set_runtime_state') {
+    const previewDebuggerServer = context.getPreviewDebuggerServer
+      ? context.getPreviewDebuggerServer()
+      : null;
+    try {
+      return textResult(
+        await setRuntimeState(previewDebuggerServer, args || {})
+      );
+    } catch (error) {
+      return errorResult(error.message);
+    }
+  }
+
   if (toolName === 'find_scene_events') {
     if (!project) return errorResult('No project opened.');
     try {
@@ -1579,7 +1836,10 @@ const callMcpTool = async ({
       toolName: args.name,
       args:
         args.name === 'add_scene_events' || args.name === 'generate_events'
-          ? autoQuoteAddSceneEventsArgs(context.getProject(), editorFunctionArgs)
+          ? autoQuoteAddSceneEventsArgs(
+              context.getProject(),
+              editorFunctionArgs
+            )
           : editorFunctionArgs,
       context,
     });
@@ -1671,6 +1931,8 @@ const callMcpTool = async ({
   let sceneWriteToolHandler = null;
   if (toolName === 'add_or_update_resource') {
     sceneWriteToolHandler = addOrUpdateResource;
+  } else if (toolName === 'generate_placeholder_asset') {
+    sceneWriteToolHandler = generatePlaceholderAsset;
   } else if (toolName === 'create_sprite_object_from_resource') {
     sceneWriteToolHandler = createSpriteObjectFromResource;
   } else if (toolName === 'create_text_object') {

@@ -2161,9 +2161,9 @@ describe('McpEditorBridge', () => {
       // Multi-word query that used to return [] with contiguous-substring match.
       const playSound = await search('play sound effect');
       expect(playSound.results.length).toBeGreaterThan(0);
-      expect(
-        playSound.results.some(result => /sound/i.test(result.type))
-      ).toBe(true);
+      expect(playSound.results.some(result => /sound/i.test(result.type))).toBe(
+        true
+      );
 
       // Aliased intent: "key pressed keyboard".
       const keyPressed = await search('key pressed keyboard');
@@ -2187,7 +2187,12 @@ describe('McpEditorBridge', () => {
       _paused: false,
       _variables: {
         _variables: {
-          Coins: { _value: 7, _str: '', _stringDirty: true, _isStructure: false },
+          Coins: {
+            _value: 7,
+            _str: '',
+            _stringDirty: true,
+            _isStructure: false,
+          },
         },
       },
       _sceneStack: {
@@ -2501,7 +2506,9 @@ describe('McpEditorBridge', () => {
     // $FlowFixMe[invalid-constructor]
     const project = new gd.ProjectHelper.createNewGDJSProject();
     const layout = project.insertNewLayout('Level1', 0);
-    const hero = layout.getObjects().insertNewObject(project, 'Sprite', 'Hero', 0);
+    const hero = layout
+      .getObjects()
+      .insertNewObject(project, 'Sprite', 'Hero', 0);
     // Add a concrete behavior so objectBehaviors has a known entry. Capability
     // behaviors (Animation/Effect/...) are materialized on project load; this
     // test asserts the objectBehaviors mechanism itself.
@@ -2528,9 +2535,7 @@ describe('McpEditorBridge', () => {
         b => b.behaviorName === 'DestroyOutside'
       );
       expect(entry).toBeDefined();
-      expect(entry.behaviorType).toBe(
-        'DestroyOutsideBehavior::DestroyOutside'
-      );
+      expect(entry.behaviorType).toBe('DestroyOutsideBehavior::DestroyOutside');
     } finally {
       project.delete();
     }
@@ -2575,12 +2580,205 @@ describe('McpEditorBridge', () => {
       expect(result.counts.behaviors).toBe(1);
       expect(result.counts.variables).toBe(2);
       expect(
-        layout.getObjects().getObject('Player').getAllBehaviorNames().toJSArray()
+        layout
+          .getObjects()
+          .getObject('Player')
+          .getAllBehaviorNames()
+          .toJSArray()
       ).toContain('DestroyOutside');
       expect(layout.getVariables().has('Score')).toBe(true);
       expect(project.getVariables().has('Best')).toBe(true);
     } finally {
       project.delete();
+    }
+  });
+
+  it('steps frames and sets runtime state via control tools', async () => {
+    const sent = [];
+    const previewDebuggerServer = {
+      getServerState: () => 'started',
+      getExistingPreviewDebuggerIds: () => ['preview-ws-0'],
+      getExistingDebuggerIds: () => ['preview-ws-0'],
+      registerCallbacks: () => () => {},
+      sendMessage: (id, message) => sent.push(message),
+      sendMessageWithResponse: message => {
+        sent.push(message);
+        if (message.command === 'stepFrames') {
+          return Promise.resolve({
+            command: 'framesStepped',
+            payload: {
+              steppedFrames: message.count,
+              deltaMs: 16,
+              paused: true,
+            },
+          });
+        }
+        return Promise.resolve({
+          command: 'runtimeStateSet',
+          payload: { applied: ['setVariable:scene.GameOver'], error: null },
+        });
+      },
+    };
+    const bridge = makeBridge({
+      getPreviewDebuggerServer: () => previewDebuggerServer,
+    });
+
+    const stepResponse = await bridge.handleRendererMcpRequest({
+      method: 'tools/call',
+      params: {
+        name: 'control_preview',
+        arguments: { action: 'step', frames: 30 },
+      },
+    });
+    const stepResult = JSON.parse(stepResponse.content[0].text);
+    expect(stepResult.success).toBe(true);
+    expect(stepResult.steppedFrames).toBe(30);
+    expect(sent.find(m => m.command === 'stepFrames').count).toBe(30);
+
+    const pauseResponse = await bridge.handleRendererMcpRequest({
+      method: 'tools/call',
+      params: { name: 'control_preview', arguments: { action: 'pause' } },
+    });
+    expect(JSON.parse(pauseResponse.content[0].text).success).toBe(true);
+    expect(sent.find(m => m.command === 'pause')).toBeDefined();
+
+    const stateResponse = await bridge.handleRendererMcpRequest({
+      method: 'tools/call',
+      params: {
+        name: 'set_runtime_state',
+        arguments: {
+          operations: [
+            { type: 'setVariable', scope: 'scene', name: 'GameOver', value: 0 },
+          ],
+        },
+      },
+    });
+    const stateResult = JSON.parse(stateResponse.content[0].text);
+    expect(stateResult.success).toBe(true);
+    expect(stateResult.applied).toContain('setVariable:scene.GameOver');
+  });
+
+  it('reports recent sounds from the preview status', async () => {
+    const dumpPayload = { _paused: false, _sceneStack: { _stack: [] } };
+    let callbacks = null;
+    const previewDebuggerServer = {
+      getServerState: () => 'started',
+      getExistingPreviewDebuggerIds: () => ['preview-ws-0'],
+      getExistingDebuggerIds: () => ['preview-ws-0'],
+      registerCallbacks: registered => {
+        callbacks = registered;
+        return () => {
+          callbacks = null;
+        };
+      },
+      sendMessage: (id, message) => {
+        if (!callbacks) return;
+        if (message.command === 'getStatus') {
+          setTimeout(
+            () =>
+              callbacks &&
+              callbacks.onHandleParsedMessage({
+                id,
+                parsedMessage: {
+                  command: 'status',
+                  payload: {
+                    isPaused: false,
+                    recentlyPlayedSounds: [
+                      { soundName: 'Shoot', isMusic: false, channel: null },
+                    ],
+                  },
+                },
+              }),
+            2
+          );
+        } else if (message.command === 'refresh') {
+          setTimeout(
+            () =>
+              callbacks &&
+              callbacks.onHandleParsedMessage({
+                id,
+                parsedMessage: { command: 'dump', payload: dumpPayload },
+              }),
+            4
+          );
+        }
+      },
+    };
+    const bridge = makeBridge({
+      getPreviewDebuggerServer: () => previewDebuggerServer,
+    });
+    const response = await bridge.handleRendererMcpRequest({
+      method: 'tools/call',
+      params: {
+        name: 'gdevelop_inspect_running_preview',
+        arguments: { timeout_ms: 1000 },
+      },
+    });
+    const result = JSON.parse(response.content[0].text);
+    expect(result.recentSounds).toEqual([
+      { soundName: 'Shoot', isMusic: false, channel: null },
+    ]);
+  });
+
+  it('generates placeholder image and sound assets', async () => {
+    // $FlowFixMe[invalid-constructor]
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gdevelop-gen-'));
+    project.setProjectFile(path.join(tempDir, 'game.json'));
+
+    try {
+      const bridge = makeBridge({
+        getProject: () => project,
+        getPermissions: () => ({
+          allowWriteTools: true,
+          allowCommandTools: false,
+        }),
+      });
+
+      const imageResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'generate_placeholder_asset',
+          arguments: {
+            name: 'Player',
+            asset_type: 'image',
+            width: 16,
+            height: 16,
+            color: '60;120;220',
+          },
+        },
+      });
+      const imageResult = JSON.parse(imageResponse.content[0].text);
+      expect(imageResponse.isError).not.toBe(true);
+      expect(imageResult.success).toBe(true);
+      expect(fs.existsSync(imageResult.resolvedFile)).toBe(true);
+      expect(fs.statSync(imageResult.resolvedFile).size).toBeGreaterThan(0);
+      // PNG magic bytes.
+      const header = fs.readFileSync(imageResult.resolvedFile).slice(0, 8);
+      expect([...header]).toEqual([137, 80, 78, 71, 13, 10, 26, 10]);
+      expect(project.getResourcesManager().hasResource('Player')).toBe(true);
+
+      const soundResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'generate_placeholder_asset',
+          arguments: { name: 'Shoot', asset_type: 'sound', duration_ms: 50 },
+        },
+      });
+      const soundResult = JSON.parse(soundResponse.content[0].text);
+      expect(soundResult.success).toBe(true);
+      expect(fs.existsSync(soundResult.resolvedFile)).toBe(true);
+      // WAV RIFF header.
+      expect(
+        fs
+          .readFileSync(soundResult.resolvedFile)
+          .slice(0, 4)
+          .toString('ascii')
+      ).toBe('RIFF');
+      expect(project.getResourcesManager().hasResource('Shoot')).toBe(true);
+    } finally {
+      project.delete();
+      fs.rmSync(tempDir, { recursive: true, force: true });
     }
   });
 });

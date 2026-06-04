@@ -489,6 +489,10 @@ namespace gdjs {
           this.sendScreenshot(data.messageId);
         } else if (data.command === 'simulateInput') {
           this.simulateInput(data.inputs, data.messageId);
+        } else if (data.command === 'stepFrames') {
+          this.stepFrames(data.count, data.fakeElapsedTimeMs, data.messageId);
+        } else if (data.command === 'setRuntimeState') {
+          this.setRuntimeState(data.operations, data.messageId);
         } else if (data.command === 'hardReload') {
           // This usually means that the preview was modified so much that an entire reload
           // is needed, or that the runtime itself could have been modified.
@@ -671,6 +675,22 @@ namespace gdjs {
 
     sendRuntimeGameStatus(): void {
       const currentScene = this._runtimegame.getSceneStack().getCurrentScene();
+      // Recently played sounds since the last status (cleared after reporting),
+      // so a harness can confirm a PlaySound action actually fired.
+      let recentlyPlayedSounds: Array<Object> = [];
+      try {
+        const soundManager = this._runtimegame.getSoundManager();
+        if (
+          soundManager &&
+          typeof (soundManager as any).getRecentlyPlayedSounds === 'function'
+        ) {
+          recentlyPlayedSounds = (soundManager as any).getRecentlyPlayedSounds(
+            true
+          );
+        }
+      } catch (e) {
+        // Ignore — sound reporting is best-effort.
+      }
       this._sendMessage(
         circularSafeStringify({
           command: 'status',
@@ -678,6 +698,7 @@ namespace gdjs {
             isPaused: this._runtimegame.isPaused(),
             isInGameEdition: this._runtimegame.isInGameEdition(),
             sceneName: currentScene ? currentScene.getName() : null,
+            recentlyPlayedSounds,
           },
         })
       );
@@ -1066,6 +1087,123 @@ namespace gdjs {
       this._sendMessage(
         circularSafeStringify({
           command: 'inputSimulated',
+          messageId,
+          payload: { applied, error },
+        })
+      );
+    }
+
+    /**
+     * Advance the game by exactly `count` frames using a fixed per-frame delta,
+     * for deterministic, reproducible testing. The game is paused first so the
+     * normal rAF loop only renders; each manual step runs full event logic. This
+     * lets a harness do: pause → inject input → step N frames → read state.
+     */
+    stepFrames(count: number, fakeElapsedTimeMs: number, messageId: number): void {
+      const frames = Math.max(1, Math.min(1000, count || 1));
+      // 16.667 ms ≈ one 60 FPS frame. Kept per-frame small so TimeManager's
+      // minimal-framerate clamp does not distort the delta.
+      const delta =
+        typeof fakeElapsedTimeMs === 'number' && fakeElapsedTimeMs > 0
+          ? fakeElapsedTimeMs
+          : 1000 / 60;
+      // Ensure the game is paused so the rAF loop does not also step.
+      if (!this._runtimegame.isPaused()) {
+        this._runtimegame.pause(true);
+      }
+      let steppedFrames = 0;
+      let stoppedEarly = false;
+      for (let i = 0; i < frames; i++) {
+        const keepGoing = this._runtimegame.getSceneStack().step(delta);
+        steppedFrames++;
+        if (!keepGoing) {
+          stoppedEarly = true;
+          break;
+        }
+      }
+      this._sendMessage(
+        circularSafeStringify({
+          command: 'framesStepped',
+          messageId,
+          payload: {
+            steppedFrames,
+            deltaMs: delta,
+            stoppedEarly,
+            paused: this._runtimegame.isPaused(),
+          },
+        })
+      );
+    }
+
+    /**
+     * Apply test/debug state operations to the running game: set a scene/global
+     * variable, move/spawn/delete an instance. Each op is { type, ... }.
+     *   setVariable: { type, scope: 'scene'|'global', name, value }
+     *   moveInstance: { type, objectName, index?, x, y }
+     *   spawnInstance: { type, objectName, x?, y? }
+     *   deleteInstance: { type, objectName, index? }
+     */
+    setRuntimeState(operations: Array<any>, messageId: number): void {
+      const applied: Array<string> = [];
+      let error: string | null = null;
+      const scene = this._runtimegame.getSceneStack().getCurrentScene();
+      try {
+        (operations || []).forEach((op) => {
+          if (!op || typeof op !== 'object') return;
+          if (op.type === 'setVariable') {
+            const container =
+              op.scope === 'global'
+                ? this._runtimegame.getVariables()
+                : scene
+                ? scene.getVariables()
+                : null;
+            if (!container) {
+              applied.push('setVariable:no-scene');
+              return;
+            }
+            const variable = container.get(op.name);
+            if (typeof op.value === 'number') variable.setNumber(op.value);
+            else if (typeof op.value === 'boolean')
+              variable.setBoolean(op.value);
+            else variable.setString('' + op.value);
+            applied.push('setVariable:' + op.scope + '.' + op.name);
+          } else if (op.type === 'moveInstance' && scene) {
+            const instances = scene.getInstancesOf(op.objectName) || [];
+            const target = instances[op.index || 0];
+            if (target) {
+              target.setPosition(op.x, op.y);
+              applied.push('moveInstance:' + op.objectName);
+            } else {
+              applied.push('moveInstance:not-found:' + op.objectName);
+            }
+          } else if (op.type === 'spawnInstance' && scene) {
+            const created = scene.createObject(op.objectName);
+            if (created) {
+              if (typeof op.x === 'number' && typeof op.y === 'number')
+                created.setPosition(op.x, op.y);
+              applied.push('spawnInstance:' + op.objectName);
+            } else {
+              applied.push('spawnInstance:unknown-object:' + op.objectName);
+            }
+          } else if (op.type === 'deleteInstance' && scene) {
+            const instances = scene.getInstancesOf(op.objectName) || [];
+            const target = instances[op.index || 0];
+            if (target) {
+              target.deleteFromScene();
+              applied.push('deleteInstance:' + op.objectName);
+            } else {
+              applied.push('deleteInstance:not-found:' + op.objectName);
+            }
+          } else {
+            applied.push('unknown:' + op.type);
+          }
+        });
+      } catch (e) {
+        error = (e as Error).message || 'Failed to apply runtime state.';
+      }
+      this._sendMessage(
+        circularSafeStringify({
+          command: 'runtimeStateSet',
           messageId,
           payload: { applied, error },
         })

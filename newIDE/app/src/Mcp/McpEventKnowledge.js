@@ -73,18 +73,36 @@ const SEARCH_ALIASES: { [string]: Array<string> } = {
   modify: ['mod', 'set', 'change'],
   set: ['set', 'mod', 'change', 'mettre', 'setvalue'],
   change: ['mod', 'set', 'change'],
-  variable: ['var', 'variable', 'varscene', 'varglobal', 'modvarobjet', 'varobjet', 'setnumbervariable', 'setstringvariable'],
+  variable: [
+    'var',
+    'variable',
+    'varscene',
+    'varglobal',
+    'modvarobjet',
+    'varobjet',
+    'setnumbervariable',
+    'setstringvariable',
+  ],
   scene: ['scene', 'layout'],
   restart: ['scene', 'restart', 'changescene', 'replacescene'],
   switch: ['scene', 'changescene', 'replacescene'],
   compare: ['compare', 'egal', 'comparison', 'condition'],
   comparison: ['compare', 'comparison', 'egal'],
-  number: ['number', 'numbervariable', 'value'],
+  number: ['number', 'numbervariable', 'value', 'setnumbervariable'],
+  boolean: ['boolean', 'booleanvariable', 'setbooleanvariable', 'yesorno'],
+  true: ['true', 'booleanvariable', 'istrue'],
+  opacity: [
+    'opacity',
+    'opacite',
+    'setvalue',
+    'opacitycapability',
+    'transparency',
+  ],
+  transparency: ['opacity', 'opacite', 'transparency', 'setvalue'],
   looping: ['loop', 'looping', 'channel', 'playmusic', 'playsound'],
   loop: ['loop', 'looping', 'repeat'],
   channel: ['channel', 'playmusic', 'playsound', 'sound', 'music'],
   random: ['random', 'randominrange'],
-  opacity: ['opacity', 'opacite'],
   rotate: ['angle', 'rotate', 'mettreangle'],
   rotation: ['angle', 'rotate'],
   hide: ['cache', 'hide', 'visible', 'visibility', 'montre'],
@@ -132,7 +150,8 @@ const scoreMatch = (values: Array<?string>, query: string): number => {
     );
     if (!matched) return 0; // AND semantics: every token must match something.
     // Direct (non-alias) token hits are worth more than alias-only hits.
-    score += haystack.includes(token) || compactHaystack.includes(token) ? 2 : 1;
+    score +=
+      haystack.includes(token) || compactHaystack.includes(token) ? 2 : 1;
   }
 
   // Bonuses: whole-query contiguous hit, and hits in the first value (type) /
@@ -146,9 +165,6 @@ const scoreMatch = (values: Array<?string>, query: string): number => {
 
   return score;
 };
-
-const includesQuery = (values: Array<?string>, query: string): boolean =>
-  scoreMatch(values, query) > 0;
 
 // GDevelop parameter types whose VALUE in event JSON is a string EXPRESSION:
 // a literal must be wrapped in double quotes (e.g. "Space", "220;30;55",
@@ -554,6 +570,105 @@ const groupEventExample = [
   },
 ];
 
+// For-each-object event: runs its conditions/actions once per instance of the
+// object. REQUIRED when an action like Create/PlaySound must affect EACH
+// instance (a plain Standard event's Create only fires for one picked instance).
+const forEachEventExample = [
+  {
+    type: 'BuiltinCommonInstructions::ForEach',
+    object: 'Enemy',
+    conditions: [],
+    actions: [
+      {
+        type: { value: 'Create' },
+        // currentScene, objectToCreate, x, y, layer (note the trailing
+        // code-only/layer params kept as "").
+        parameters: ['', 'Bullet', 'Enemy.X()', 'Enemy.Y()', ''],
+      },
+    ],
+    events: [],
+  },
+];
+
+// Repeat N times.
+const repeatEventExample = [
+  {
+    type: 'BuiltinCommonInstructions::Repeat',
+    repeatExpression: '5',
+    conditions: [],
+    actions: [],
+    events: [],
+  },
+];
+
+// While loop: runs while whileConditions hold.
+const whileEventExample = [
+  {
+    type: 'BuiltinCommonInstructions::While',
+    whileConditions: [
+      {
+        type: { value: 'VarScene' },
+        parameters: ['Lives', '>', '0'],
+      },
+    ],
+    conditions: [],
+    actions: [],
+    events: [],
+  },
+];
+
+// OR sub-conditions: the parent condition is true if ANY child is true. Child
+// conditions go inside the OR condition's own "conditions" array (a sub-list).
+// Use this instead of duplicating an event for each alternative input.
+const orConditionEventExample = [
+  {
+    type: 'BuiltinCommonInstructions::Standard',
+    conditions: [
+      {
+        type: { value: 'BuiltinCommonInstructions::Or' },
+        parameters: [],
+        conditions: [
+          {
+            type: { value: 'KeyPressed' },
+            parameters: ['', 'Left'],
+          },
+          {
+            type: { value: 'KeyPressed' },
+            parameters: ['', 'q'],
+          },
+        ],
+      },
+    ],
+    actions: [
+      {
+        type: { value: 'MettreX' },
+        parameters: ['Player', '-', '5'],
+      },
+    ],
+  },
+];
+
+// AND / NOT follow the same nested shape as Or:
+//   AND  → type "BuiltinCommonInstructions::And", child conditions in "conditions".
+//   NOT  → type "BuiltinCommonInstructions::Not", child conditions in "conditions"
+//          (true when ALL children are false).
+const andConditionEventExample = [
+  {
+    type: 'BuiltinCommonInstructions::Standard',
+    conditions: [
+      {
+        type: { value: 'BuiltinCommonInstructions::And' },
+        parameters: [],
+        conditions: [
+          { type: { value: 'KeyPressed' }, parameters: ['', 'Space'] },
+          { type: { value: 'VarScene' }, parameters: ['CanFire', '=', '1'] },
+        ],
+      },
+    ],
+    actions: [],
+  },
+];
+
 export const getEventsJsonExamples = ({
   project,
   sceneName,
@@ -605,6 +720,35 @@ export const getEventsJsonExamples = ({
           generated_events: groupEventsJson,
         },
       ],
+    },
+    {
+      name: 'For-each-object event',
+      purpose:
+        'Run conditions/actions once PER instance. REQUIRED when an action must affect each instance (e.g. each enemy fires its own bullet) — a plain Standard event acts on a single picked instance only.',
+      events_json: JSON.stringify(forEachEventExample, null, 2),
+    },
+    {
+      name: 'Repeat N times',
+      purpose: 'Loop a fixed number of times via repeatExpression.',
+      events_json: JSON.stringify(repeatEventExample, null, 2),
+    },
+    {
+      name: 'While loop',
+      purpose:
+        'Loop while whileConditions hold. Conditions go in the whileConditions array.',
+      events_json: JSON.stringify(whileEventExample, null, 2),
+    },
+    {
+      name: 'OR sub-conditions',
+      purpose:
+        'Match if ANY child condition is true (e.g. Left arrow OR Q). Child conditions go in the OR condition\'s nested "conditions" array. Use instead of duplicating the event per input. AND/NOT use the same nested shape (BuiltinCommonInstructions::And / ::Not).',
+      events_json: JSON.stringify(orConditionEventExample, null, 2),
+    },
+    {
+      name: 'AND sub-conditions',
+      purpose:
+        'Match only if ALL child conditions are true. Child conditions go in the nested "conditions" array.',
+      events_json: JSON.stringify(andConditionEventExample, null, 2),
     },
   ];
 
@@ -681,7 +825,8 @@ export const getEventsJsonExamples = ({
       setSceneVariableNumber: 'SetNumberVariable (action)',
       setSceneVariableString: 'SetStringVariable (action)',
       deleteObject: 'Delete (action)',
-      changeOrRestartScene: 'Scene (action — its scene name parameter is quoted)',
+      changeOrRestartScene:
+        'Scene (action — its scene name parameter is quoted)',
       playSound: 'PlaySound (action)',
       keyPressed: 'KeyPressed (condition)',
       sceneJustBegins: 'SceneJustBegins (condition)',
@@ -809,7 +954,7 @@ export const getExactInstructionMetadata = ({
     // it does not forbid scene usage.
     fieldNotes: {
       isRelevantForSceneEvents:
-        'Maps to GDevelop core isRelevantForLayoutEvents(). false does NOT mean the instruction cannot be used in scene events (e.g. object-variable instructions report false yet work in scenes); it reflects the instruction\'s declared primary context.',
+        "Maps to GDevelop core isRelevantForLayoutEvents(). false does NOT mean the instruction cannot be used in scene events (e.g. object-variable instructions report false yet work in scenes); it reflects the instruction's declared primary context.",
     },
   };
 };
@@ -986,7 +1131,7 @@ const shouldAutoQuoteValue = (value: any): boolean => {
   if (!trimmed) return false; // empty = default (e.g. base layer), leave as-is
   if (trimmed.startsWith('"')) return false; // already quoted
   // Looks like an expression / number / structured value → do not touch.
-  if (/["'()+\-*/.,\[\]]/.test(trimmed)) return false;
+  if (/["'()+\-*/.,[\]]/.test(trimmed)) return false;
   if (/^[0-9]/.test(trimmed)) return false;
   return true;
 };
@@ -1032,7 +1177,9 @@ export const autoQuoteEventParameters = (
               AUTO_QUOTE_PARAMETER_TYPES.has(parameterType) &&
               shouldAutoQuoteValue(instruction.parameters[index])
             ) {
-              instruction.parameters[index] = `"${instruction.parameters[index]}"`;
+              instruction.parameters[index] = `"${
+                instruction.parameters[index]
+              }"`;
               changedCount++;
             }
           }
@@ -1395,7 +1542,10 @@ const validateEventsList = ({
 
 const withActionableSuggestion = (issue: Object): Object => {
   if (issue.suggestion) return issue;
-  if (issue.type !== 'invalid-parameter' && issue.type !== 'missing-parameter') {
+  if (
+    issue.type !== 'invalid-parameter' &&
+    issue.type !== 'missing-parameter'
+  ) {
     return issue;
   }
 
@@ -1407,7 +1557,13 @@ const withActionableSuggestion = (issue: Object): Object => {
   ) {
     return {
       ...issue,
-      suggestion: `The object parameter (index ${issue.parameterIndex}) is reported invalid because behavior parameter at index ${issue.relatedBehaviorParameterIndex} contains "${issue.relatedBehaviorParameterValue}", which looks like a behavior TYPE. Behavior parameters take the behavior NAME on the object (e.g. "PlatformerObject"), not the type. Use inspect_object_properties to see the object's behavior names, or list_available_behaviors for the default name.`,
+      suggestion: `The object parameter (index ${
+        issue.parameterIndex
+      }) is reported invalid because behavior parameter at index ${
+        issue.relatedBehaviorParameterIndex
+      } contains "${
+        issue.relatedBehaviorParameterValue
+      }", which looks like a behavior TYPE. Behavior parameters take the behavior NAME on the object (e.g. "PlatformerObject"), not the type. Use inspect_object_properties to see the object's behavior names, or list_available_behaviors for the default name.`,
     };
   }
 
@@ -1428,20 +1584,26 @@ const withActionableSuggestion = (issue: Object): Object => {
     if (value.includes('\n') || value.includes('\\n')) {
       return {
         ...issue,
-        suggestion: `Parameter ${issue.parameterIndex} is a string expression (${parameterType}) but contains a newline. Use a single-line expression such as "Game Over" + NewLine() + "Press Space".`,
+        suggestion: `Parameter ${
+          issue.parameterIndex
+        } is a string expression (${parameterType}) but contains a newline. Use a single-line expression such as "Game Over" + NewLine() + "Press Space".`,
       };
     }
     if (!startsQuoted && value) {
       return {
         ...issue,
-        suggestion: `Parameter ${issue.parameterIndex} is a string expression (${parameterType}); wrap the literal in double quotes. Try ${JSON.stringify(
+        suggestion: `Parameter ${
+          issue.parameterIndex
+        } is a string expression (${parameterType}); wrap the literal in double quotes. Try ${JSON.stringify(
           value
         )}.`,
       };
     }
     return {
       ...issue,
-      suggestion: `Parameter ${issue.parameterIndex} is a string expression (${parameterType}). ${describeParameterLiteralSyntax(
+      suggestion: `Parameter ${
+        issue.parameterIndex
+      } is a string expression (${parameterType}). ${describeParameterLiteralSyntax(
         parameterType
       )}.`,
     };
@@ -1450,21 +1612,27 @@ const withActionableSuggestion = (issue: Object): Object => {
   if (shape === 'number') {
     return {
       ...issue,
-      suggestion: `Parameter ${issue.parameterIndex} is a number expression (${parameterType}); pass a bare number or numeric expression WITHOUT quotes, e.g. 100 or Variable(Score). Do not wrap it in quotes.`,
+      suggestion: `Parameter ${
+        issue.parameterIndex
+      } is a number expression (${parameterType}); pass a bare number or numeric expression WITHOUT quotes, e.g. 100 or Variable(Score). Do not wrap it in quotes.`,
     };
   }
 
   if (shape === 'object') {
     return {
       ...issue,
-      suggestion: `Parameter ${issue.parameterIndex} expects a bare object NAME (no quotes). Check the object exists in this scene or globally.`,
+      suggestion: `Parameter ${
+        issue.parameterIndex
+      } expects a bare object NAME (no quotes). Check the object exists in this scene or globally.`,
     };
   }
 
   if (shape === 'behavior') {
     return {
       ...issue,
-      suggestion: `Parameter ${issue.parameterIndex} expects a behavior NAME (the instance name on the object, e.g. "PlatformerObject"), not the behavior type, and without quotes. Use inspect_object_properties to see the names.`,
+      suggestion: `Parameter ${
+        issue.parameterIndex
+      } expects a behavior NAME (the instance name on the object, e.g. "PlatformerObject"), not the behavior type, and without quotes. Use inspect_object_properties to see the names.`,
     };
   }
 
@@ -1484,23 +1652,27 @@ const withActionableSuggestion = (issue: Object): Object => {
     }
     return {
       ...issue,
-      suggestion: `Parameter ${issue.parameterIndex} expects a bare variable reference (no quotes). Scene/global variables are referenced by name (e.g. Score); object variables as Object.VariableName. If the name is correct, declare the variable first with add_or_edit_variable.`,
+      suggestion: `Parameter ${
+        issue.parameterIndex
+      } expects a bare variable reference (no quotes). Scene/global variables are referenced by name (e.g. Score); object variables as Object.VariableName. If the name is correct, declare the variable first with add_or_edit_variable.`,
     };
   }
 
   if (shape === 'resource') {
     return {
       ...issue,
-      suggestion: `Parameter ${issue.parameterIndex} is a resource name (${parameterType}): pass the BARE resource name with NO quotes (e.g. Shoot, not "Shoot"). The resource must already exist — add it with add_or_update_resource if needed.`,
+      suggestion: `Parameter ${
+        issue.parameterIndex
+      } is a resource name (${parameterType}): pass the BARE resource name with NO quotes (e.g. Shoot, not "Shoot"). The resource must already exist — add it with add_or_update_resource if needed.`,
     };
   }
 
   if (parameterType) {
     return {
       ...issue,
-      suggestion: `Parameter ${issue.parameterIndex} (${parameterType}): ${describeParameterLiteralSyntax(
-        parameterType
-      )}.`,
+      suggestion: `Parameter ${
+        issue.parameterIndex
+      } (${parameterType}): ${describeParameterLiteralSyntax(parameterType)}.`,
     };
   }
 

@@ -513,6 +513,41 @@ export const lintSceneEvents = (project: gdProject, args: Object): Object => {
         });
       }
     }
+
+    // Heuristic: a Standard event that Creates an object while also picking an
+    // object in its conditions usually intends "for each picked instance, create
+    // one" — but a Standard event's Create runs only ONCE (for a single picked
+    // instance). This is a common silent bug (e.g. only one enemy fires). Suggest
+    // a ForEach wrapper. Low-noise: only fires for Standard events with a Create
+    // action AND at least one condition referencing an object.
+    if (eventType === 'BuiltinCommonInstructions::Standard') {
+      const { conditions, actions } = getEventInstructions(event);
+      const hasCreateAction = actions.some(
+        action =>
+          action.type === 'Create' ||
+          action.type === 'CreateByName' ||
+          action.type === 'CreateObject'
+      );
+      const conditionPicksObject = conditions.some(
+        condition =>
+          condition.type === 'CollisionNP' ||
+          condition.type === 'Distance' ||
+          condition.type === 'PosX' ||
+          condition.type === 'PosY' ||
+          condition.type === 'SourisSurObjet' ||
+          condition.type === 'EstTouche' ||
+          /Animation|Variable.*Objet|VarObjet/i.test(condition.type)
+      );
+      if (hasCreateAction && conditionPicksObject) {
+        issues.push({
+          severity: 'warning',
+          type: 'create-without-for-each',
+          eventPath,
+          suggestion:
+            'This Standard event creates an object while picking instances in its conditions, but Create runs only once (for a single picked instance). If you want each picked instance to create one (e.g. each enemy fires a bullet), wrap this in a ForEach event over that object.',
+        });
+      }
+    }
   });
 
   return {

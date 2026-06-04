@@ -369,6 +369,7 @@ module.exports = {
           new gd.Model3DObjectConfiguration()
         )
         .setCategory('General')
+        .setHelpPath('/objects/3d-model')
         // Effects are unsupported because the object is not rendered with PIXI.
         .addDefaultBehavior('ResizableCapability::ResizableBehavior')
         .addDefaultBehavior('ScalableCapability::ScalableBehavior')
@@ -1321,6 +1322,7 @@ module.exports = {
         Cube3DObject
       )
       .setCategory('General')
+      .setHelpPath('/objects/3d-box')
       // Effects are unsupported because the object is not rendered with PIXI.
       .addDefaultBehavior('ResizableCapability::ResizableBehavior')
       .addDefaultBehavior('ScalableCapability::ScalableBehavior')

@@ -147,6 +147,16 @@ export default class LocalPreviewLauncher extends React.Component<
     });
   };
 
+  // Capture a preview window's content from the MAIN process (immune to renderer
+  // suspension of an occluded preview). Returns { dataUrl, width, height } or
+  // { error }. Resolves null if not running in Electron.
+  capturePreviewPage = (windowId: ?number): Promise<?Object> => {
+    if (!ipcRenderer) return Promise.resolve(null);
+    return ipcRenderer
+      .invoke('preview-capture-page', { windowId })
+      .catch(error => ({ error: error.message || String(error) }));
+  };
+
   _openPreviewWindow = (
     project: gdProject,
     gamePath: string,

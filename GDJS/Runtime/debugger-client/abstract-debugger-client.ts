@@ -491,6 +491,13 @@ namespace gdjs {
           this.simulateInput(data.inputs, data.messageId);
         } else if (data.command === 'stepFrames') {
           this.stepFrames(data.count, data.fakeElapsedTimeMs, data.messageId);
+        } else if (data.command === 'runFrames') {
+          this.runFrames(
+            data.inputs,
+            data.count,
+            data.fakeElapsedTimeMs,
+            data.messageId
+          );
         } else if (data.command === 'setRuntimeState') {
           this.setRuntimeState(data.operations, data.messageId);
         } else if (data.command === 'getInputState') {
@@ -1038,52 +1045,11 @@ namespace gdjs {
      * Mouse/touch coordinates are in game (scene) coordinates.
      */
     simulateInput(inputs: Array<any>, messageId: number): void {
-      const inputManager = this._runtimegame.getInputManager();
       const applied: Array<string> = [];
       let error: string | null = null;
       try {
         (inputs || []).forEach((input) => {
-          if (!input || typeof input !== 'object') return;
-          switch (input.type) {
-            case 'keyPressed':
-              inputManager.onKeyPressed(input.keyCode, input.location);
-              applied.push('keyPressed:' + input.keyCode);
-              break;
-            case 'keyReleased':
-              inputManager.onKeyReleased(input.keyCode, input.location);
-              applied.push('keyReleased:' + input.keyCode);
-              break;
-            case 'releaseAllKeys':
-              inputManager.releaseAllPressedKeys();
-              applied.push('releaseAllKeys');
-              break;
-            case 'mouseMove':
-              inputManager.onMouseMove(input.x, input.y);
-              applied.push('mouseMove');
-              break;
-            case 'mouseButtonPressed':
-              inputManager.onMouseButtonPressed(input.button || 0);
-              applied.push('mouseButtonPressed:' + (input.button || 0));
-              break;
-            case 'mouseButtonReleased':
-              inputManager.onMouseButtonReleased(input.button || 0);
-              applied.push('mouseButtonReleased:' + (input.button || 0));
-              break;
-            case 'touchStart':
-              inputManager.onTouchStart(input.identifier || 0, input.x, input.y);
-              applied.push('touchStart');
-              break;
-            case 'touchMove':
-              inputManager.onTouchMove(input.identifier || 0, input.x, input.y);
-              applied.push('touchMove');
-              break;
-            case 'touchEnd':
-              inputManager.onTouchEnd(input.identifier || 0);
-              applied.push('touchEnd');
-              break;
-            default:
-              applied.push('unknown:' + input.type);
-          }
+          this._applySimulatedInput(input, applied);
         });
       } catch (e) {
         error = (e as Error).message || 'Failed to simulate input.';
@@ -1095,6 +1061,170 @@ namespace gdjs {
           payload: { applied, error },
         })
       );
+    }
+
+    /**
+     * Apply a single simulated input event to the InputManager. Shared by
+     * `simulateInput` and the atomic `runFrames` command so the two stay in sync.
+     */
+    private _applySimulatedInput(input: any, applied: Array<string>): void {
+      const inputManager = this._runtimegame.getInputManager();
+      if (!input || typeof input !== 'object') return;
+      switch (input.type) {
+        case 'keyPressed':
+          inputManager.onKeyPressed(input.keyCode, input.location);
+          applied.push('keyPressed:' + input.keyCode);
+          break;
+        case 'keyReleased':
+          inputManager.onKeyReleased(input.keyCode, input.location);
+          applied.push('keyReleased:' + input.keyCode);
+          break;
+        case 'releaseAllKeys':
+          inputManager.releaseAllPressedKeys();
+          applied.push('releaseAllKeys');
+          break;
+        case 'mouseMove':
+          inputManager.onMouseMove(input.x, input.y);
+          applied.push('mouseMove');
+          break;
+        case 'mouseButtonPressed':
+          inputManager.onMouseButtonPressed(input.button || 0);
+          applied.push('mouseButtonPressed:' + (input.button || 0));
+          break;
+        case 'mouseButtonReleased':
+          inputManager.onMouseButtonReleased(input.button || 0);
+          applied.push('mouseButtonReleased:' + (input.button || 0));
+          break;
+        case 'touchStart':
+          inputManager.onTouchStart(input.identifier || 0, input.x, input.y);
+          applied.push('touchStart');
+          break;
+        case 'touchMove':
+          inputManager.onTouchMove(input.identifier || 0, input.x, input.y);
+          applied.push('touchMove');
+          break;
+        case 'touchEnd':
+          inputManager.onTouchEnd(input.identifier || 0);
+          applied.push('touchEnd');
+          break;
+        default:
+          applied.push('unknown:' + input.type);
+      }
+    }
+
+    /**
+     * Atomic runtime-test primitive: inject inputs, then step exactly `count`
+     * frames, then reply ONCE with the full game dump — all synchronously on the
+     * websocket callback, with NO dependency on requestAnimationFrame. This is
+     * what makes runtime verification work even when the OS has throttled a
+     * backgrounded/occluded preview window (whose rAF loop is paused): the game
+     * logic still advances because we drive `step()` directly here.
+     *
+     * The single reply (`framesRan`) carries the same serialized RuntimeGame the
+     * `dump` command produces, so a harness gets injected-input + N-frame-advance
+     * + resulting state in one round-trip that cannot half-fail mid-sequence.
+     */
+    runFrames(
+      inputs: Array<any>,
+      count: number,
+      fakeElapsedTimeMs: number,
+      messageId: number
+    ): void {
+      const applied: Array<string> = [];
+      let error: string | null = null;
+      const frames = Math.max(1, Math.min(2000, count || 1));
+      const delta =
+        typeof fakeElapsedTimeMs === 'number' && fakeElapsedTimeMs > 0
+          ? fakeElapsedTimeMs
+          : 1000 / 60;
+      let steppedFrames = 0;
+      let stoppedEarly = false;
+      try {
+        // 1. Inject inputs (held keys persist across the stepped frames).
+        (inputs || []).forEach((input) => {
+          this._applySimulatedInput(input, applied);
+        });
+        // 2. Pause so the rAF loop (if it is running at all) does not also step.
+        if (!this._runtimegame.isPaused()) {
+          this._runtimegame.pause(true);
+        }
+        // 3. Step the simulation directly — independent of rendering.
+        for (let i = 0; i < frames; i++) {
+          const keepGoing = this._runtimegame.getSceneStack().step(delta);
+          steppedFrames++;
+          if (!keepGoing) {
+            stoppedEarly = true;
+            break;
+          }
+        }
+      } catch (e) {
+        error = (e as Error).message || 'Failed to run frames.';
+      }
+      // 4. Reply once with the full dump plus the run metadata, so the bridge can
+      // summarize live instance counts/variables/positions without a 2nd call.
+      this._sendRuntimeGameDumpWith({
+        command: 'framesRan',
+        messageId,
+        runFrames: {
+          applied,
+          steppedFrames,
+          deltaMs: delta,
+          stoppedEarly,
+          paused: this._runtimegame.isPaused(),
+          error,
+        },
+      });
+    }
+
+    /**
+     * Serialize the RuntimeGame dump (same exclusions/limits as
+     * `sendRuntimeGameDump`) but merge extra top-level fields into the message
+     * and send it under a caller-chosen command. Lets `runFrames` return the
+     * dump in a single matched reply.
+     */
+    private _sendRuntimeGameDumpWith(extraTopLevel: Object): void {
+      const that = this;
+      const message = {
+        ...extraTopLevel,
+        command: (extraTopLevel as any).command || 'dump',
+        payload: this._runtimegame,
+      };
+      const excludedValues = [that._runtimegame.getGameData()];
+      const excludedKeys = [
+        '_debuggerClient',
+        '_allInstancesList',
+        '_runtimeGame',
+        '_runtimeScene',
+        '_behaviorsTable',
+        '_animations',
+        '_animationFrame',
+        'linkedObjectsManager',
+        '_platformRBush',
+        'HSHG',
+        '_obstaclesHSHG',
+        'owner',
+        '_renderer',
+        '_gameRenderer',
+        '_imageManager',
+        '_rendererEffects',
+        'baseTexture',
+        '_baseTexture',
+        '_invalidTexture',
+      ];
+      const stringifiedMessage = circularSafeStringify(
+        message,
+        function (key, value) {
+          if (
+            excludedValues.indexOf(value) !== -1 ||
+            excludedKeys.indexOf(key) !== -1
+          ) {
+            return '[Removed from the debugger]';
+          }
+          return value;
+        },
+        18
+      );
+      this._sendMessage(stringifiedMessage);
     }
 
     /**

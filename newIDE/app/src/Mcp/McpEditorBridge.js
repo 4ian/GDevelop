@@ -50,6 +50,7 @@ import {
   createTextObject,
   deleteSceneObject,
   generatePlaceholderAsset,
+  renderSceneToPng,
   inspectProjectCleanup,
   inspectProjectResources,
   listAvailableBehaviors,
@@ -119,6 +120,7 @@ type McpEditorBridgeContext = {|
   getPreviewDebuggerServer?: () => ?Object,
   closeAllPreviews?: () => void,
   focusAllPreviews?: () => void,
+  capturePreviewPage?: (windowId: ?number) => Promise<?Object>,
   generateEvents?: Function,
   onSceneEventsModifiedOutsideEditor?: Function,
   onExtensionFunctionEventsModifiedOutsideEditor?: Function,
@@ -158,6 +160,22 @@ const errorResult = (message: string): McpToolResult => ({
     },
   ],
 });
+
+// Extract the JSON payload from a textResult/errorResult-shaped tool response,
+// so one tool can embed another tool's outcome in its own result.
+const extractToolResultPayload = (toolResult: any): any => {
+  if (!toolResult || !Array.isArray(toolResult.content)) return toolResult;
+  const text =
+    toolResult.content[0] && typeof toolResult.content[0].text === 'string'
+      ? toolResult.content[0].text
+      : '';
+  if (toolResult.isError) return { success: false, error: text };
+  try {
+    return JSON.parse(text);
+  } catch (error) {
+    return text;
+  }
+};
 
 const mcpDirectEventsRequiredMessage =
   'MCP add_scene_events writes events directly and does not call the GDevelop event generation service. Pass events_json or event_changes.';
@@ -627,14 +645,80 @@ const captureRunningPreviewState = (
 // Uses the debugger request/response channel (sendMessageWithResponse) to ask
 // the running game for canvas.toDataURL, then writes the PNG to disk (or returns
 // the data URL when no file path is given / filesystem is unavailable).
+//
+// Prefers the MAIN-process capturePage() path (via capturePreviewPage) because
+// it does not run JS in the (possibly OS-suspended) renderer of an occluded
+// preview window. Falls back to the renderer-side canvas.toDataURL debugger
+// command when main-process capture is unavailable or fails.
+const writeOrReturnScreenshot = (dataUrl, width, height, args, source) => {
+  const base64 = dataUrl.replace(/^data:image\/png;base64,/, '');
+  const filePath =
+    args && typeof args.file_path === 'string' ? args.file_path : null;
+  if (!filePath || !fs) {
+    return {
+      success: true,
+      running: true,
+      width,
+      height,
+      dataUrl,
+      source,
+      note: filePath
+        ? 'Filesystem access is unavailable; returning the data URL instead of writing a file.'
+        : 'No file_path given; returning the PNG as a base64 data URL.',
+    };
+  }
+  try {
+    if (path) {
+      const directory = path.dirname(filePath);
+      if (directory && !fs.existsSync(directory)) {
+        fs.mkdirSync(directory, { recursive: true });
+      }
+    }
+    fs.writeFileSync(filePath, base64, 'base64');
+  } catch (error) {
+    return {
+      success: false,
+      running: true,
+      error: `Could not write screenshot to "${filePath}": ${error.message}`,
+      width,
+      height,
+      dataUrl,
+    };
+  }
+  return { success: true, running: true, filePath, width, height, source };
+};
+
 const capturePreviewScreenshot = async (
   previewDebuggerServer: ?Object,
-  args: Object
+  args: Object,
+  capturePreviewPage?: ?(windowId: ?number) => Promise<?Object>
 ): Promise<Object> => {
   const guard = requireRunningPreview(previewDebuggerServer, args);
   if (!guard.ok) return guard.result;
   const targetId = guard.targetId;
 
+  // 1. Try the main-process capturePage path first — it works even when the
+  // preview renderer is suspended (occluded window). It captures the latest
+  // preview window when no specific id is mapped.
+  if (typeof capturePreviewPage === 'function') {
+    try {
+      const mainResult = await capturePreviewPage(null);
+      if (mainResult && mainResult.dataUrl) {
+        return writeOrReturnScreenshot(
+          mainResult.dataUrl,
+          mainResult.width,
+          mainResult.height,
+          args,
+          'main-process-capturePage'
+        );
+      }
+      // mainResult.error → fall through to the debugger path below.
+    } catch (error) {
+      // Fall through to the debugger path.
+    }
+  }
+
+  // 2. Fall back to the renderer-side canvas.toDataURL via the debugger channel.
   // Target the chosen preview specifically (defaults to the latest launched),
   // so a stale game-over window cannot answer the screenshot request first.
   const { matched, payload } = await sendTargetedRequest(
@@ -648,7 +732,7 @@ const capturePreviewScreenshot = async (
       running: true,
       debuggerId: targetId,
       error:
-        'Screenshot request timed out: the targeted preview did not reply. It may be loading or not responding.',
+        'Screenshot request timed out: the targeted preview did not reply (a backgrounded/occluded window may be suspended). Try control_preview { action: "focus" } first, or rely on run_frames/inspect which do not need rendering.',
     };
   }
 
@@ -665,50 +749,13 @@ const capturePreviewScreenshot = async (
     };
   }
 
-  const base64 = payload.dataUrl.replace(/^data:image\/png;base64,/, '');
-  const filePath =
-    args && typeof args.file_path === 'string' ? args.file_path : null;
-
-  // No file path requested, or filesystem not available: return the data URL.
-  if (!filePath || !fs) {
-    return {
-      success: true,
-      running: true,
-      width: payload.width,
-      height: payload.height,
-      dataUrl: payload.dataUrl,
-      note: filePath
-        ? 'Filesystem access is unavailable; returning the data URL instead of writing a file.'
-        : 'No file_path given; returning the PNG as a base64 data URL.',
-    };
-  }
-
-  try {
-    if (path) {
-      const directory = path.dirname(filePath);
-      if (directory && !fs.existsSync(directory)) {
-        fs.mkdirSync(directory, { recursive: true });
-      }
-    }
-    fs.writeFileSync(filePath, base64, 'base64');
-  } catch (error) {
-    return {
-      success: false,
-      running: true,
-      error: `Could not write screenshot to "${filePath}": ${error.message}`,
-      width: payload.width,
-      height: payload.height,
-      dataUrl: payload.dataUrl,
-    };
-  }
-
-  return {
-    success: true,
-    running: true,
-    filePath,
-    width: payload.width,
-    height: payload.height,
-  };
+  return writeOrReturnScreenshot(
+    payload.dataUrl,
+    payload.width,
+    payload.height,
+    args,
+    'renderer-canvas'
+  );
 };
 
 // Map GDevelop key names to raw DOM key codes (+ location for left/right
@@ -905,6 +952,87 @@ const simulatePreviewInput = async (
   };
 };
 
+// Atomic runtime-test primitive: inject inputs, step N frames, and read back the
+// resulting state in ONE debugger round-trip. The GDJS `runFrames` command drives
+// the simulation directly on the websocket callback (no requestAnimationFrame),
+// so this works even when the OS throttled a backgrounded/occluded preview window
+// (which is exactly the case that breaks the multi-call pause→input→step→inspect
+// loop, since each separate call needs the window responsive). Returns the same
+// `runtime` summary as gdevelop_inspect_running_preview.
+const runPreviewFrames = async (
+  previewDebuggerServer: ?Object,
+  args: Object
+): Promise<Object> => {
+  const guard = requireRunningPreview(previewDebuggerServer, args);
+  if (!guard.ok) return guard.result;
+  const targetId = guard.targetId;
+
+  // Inputs are optional — runFrames with no inputs just advances the sim.
+  const rawInputs = Array.isArray(args && args.inputs) ? args.inputs : [];
+  const resolved = [];
+  for (const raw of rawInputs) {
+    const result = resolveSimulatedInput(raw);
+    if (!result.ok) {
+      return { success: false, running: true, error: result.error };
+    }
+    resolved.push(result.input);
+  }
+
+  const frames =
+    args && typeof args.frames === 'number'
+      ? Math.max(1, Math.min(2000, Math.floor(args.frames)))
+      : 1;
+  const frameDeltaMs =
+    args && typeof args.frame_delta_ms === 'number'
+      ? args.frame_delta_ms
+      : undefined;
+
+  // A longer default timeout: stepping many frames + serializing the dump can
+  // take a moment, and this is the resilient path for throttled windows.
+  const { matched, payload } = await sendTargetedRequest(
+    (previewDebuggerServer: any),
+    targetId,
+    {
+      command: 'runFrames',
+      inputs: resolved,
+      count: frames,
+      fakeElapsedTimeMs: frameDeltaMs,
+    },
+    { timeoutMs: 6000, returnFullMessage: true }
+  );
+
+  if (!matched) {
+    return {
+      success: false,
+      running: true,
+      debuggerId: targetId,
+      error:
+        'run_frames timed out: the targeted preview did not reply. The window may still be loading; retry, or close all previews and relaunch.',
+    };
+  }
+
+  const runMeta = (payload && payload.runFrames) || {};
+  const dumpPayload = payload && payload.payload;
+  return {
+    success: !runMeta.error,
+    running: true,
+    debuggerId: targetId,
+    applied: runMeta.applied,
+    steppedFrames: runMeta.steppedFrames,
+    stoppedEarly: runMeta.stoppedEarly,
+    deltaMs: runMeta.deltaMs,
+    error: runMeta.error || undefined,
+    runtime: summarizeRuntimeGameDump(dumpPayload, {
+      positionObjectNames: Array.isArray(args && args.instance_positions_for)
+        ? new Set(args.instance_positions_for.map(String))
+        : null,
+      allInstancePositions: !!(args && args.include_instance_positions),
+    }),
+    note:
+      'Frames stepped synchronously on the debugger channel (independent of the render loop), so this works even on a throttled/backgrounded preview window. The game is left paused; control_preview { action: "play" } resumes normal real-time play.',
+  };
+};
+
 // Shared guard: confirm a preview is running and return its server + target id.
 const requireRunningPreview = (
   previewDebuggerServer: ?Object,
@@ -962,9 +1090,10 @@ const sendTargetedRequest = (
   previewDebuggerServer: Object,
   targetId: string,
   message: Object,
-  options?: {| timeoutMs?: number |}
+  options?: {| timeoutMs?: number, returnFullMessage?: boolean |}
 ): Promise<{| matched: boolean, payload: Object |}> => {
   const timeoutMs = (options && options.timeoutMs) || 2500;
+  const returnFullMessage = !!(options && options.returnFullMessage);
   return new Promise(resolve => {
     if (typeof previewDebuggerServer.registerCallbacks !== 'function') {
       // No way to capture a reply: send targeted and report unconfirmed.
@@ -1006,7 +1135,12 @@ const sendTargetedRequest = (
             parsedMessage &&
             parsedMessage.messageId === messageId
           ) {
-            finish({ matched: true, payload: parsedMessage.payload || {} });
+            finish({
+              matched: true,
+              payload: returnFullMessage
+                ? parsedMessage
+                : parsedMessage.payload || {},
+            });
           }
         },
       });
@@ -1748,7 +1882,8 @@ const callMcpTool = async ({
     try {
       const result = await capturePreviewScreenshot(
         previewDebuggerServer,
-        args || {}
+        args || {},
+        context.capturePreviewPage
       );
       return textResult(result);
     } catch (error) {
@@ -1765,6 +1900,18 @@ const callMcpTool = async ({
         previewDebuggerServer,
         args || {}
       );
+      return textResult(result);
+    } catch (error) {
+      return errorResult(error.message);
+    }
+  }
+
+  if (toolName === 'run_frames') {
+    const previewDebuggerServer = context.getPreviewDebuggerServer
+      ? context.getPreviewDebuggerServer()
+      : null;
+    try {
+      const result = await runPreviewFrames(previewDebuggerServer, args || {});
       return textResult(result);
     } catch (error) {
       return errorResult(error.message);
@@ -1798,13 +1945,15 @@ const callMcpTool = async ({
     // inspect/screenshot time out.
     if (args && (args.action === 'focus' || args.action === 'bringToFront')) {
       if (typeof context.focusAllPreviews === 'function') {
-        context.focusAllPreviews();
+        const focusedCount = context.focusAllPreviews();
         return textResult({
           success: true,
           action: 'focus',
           focusedAll: true,
+          focusedCount:
+            typeof focusedCount === 'number' ? focusedCount : undefined,
           note:
-            'Brought all preview windows to front. Retry inspect/screenshot now; a focused window is not throttled.',
+            'Requested OS focus + raise for all preview windows. This usually un-throttles a window so inspect/screenshot work again — but the OS may still keep a window occluded (focus is best-effort, not guaranteed). For state verification that does NOT depend on the window rendering at all, use run_frames, which steps the simulation on the debugger channel regardless of focus/throttling.',
         });
       }
       return errorResult(
@@ -2018,6 +2167,8 @@ const callMcpTool = async ({
     sceneWriteToolHandler = addOrUpdateResource;
   } else if (toolName === 'generate_placeholder_asset') {
     sceneWriteToolHandler = generatePlaceholderAsset;
+  } else if (toolName === 'render_scene_to_png') {
+    sceneWriteToolHandler = renderSceneToPng;
   } else if (toolName === 'create_sprite_object_from_resource') {
     sceneWriteToolHandler = createSpriteObjectFromResource;
   } else if (toolName === 'create_text_object') {
@@ -2069,6 +2220,44 @@ const callMcpTool = async ({
         onObjectsModifiedOutsideEditor: context.onObjectsModifiedOutsideEditor,
       });
       context.triggerUnsavedChanges();
+
+      // bulk_edit_scene_assets can also write events in the same call. Events are
+      // applied LAST (after resources/objects/animations/behaviors/variables/
+      // instances) and go through the SAME validated add_scene_events path — no
+      // structural validation (e.g. Or/And subInstructions checks) is bypassed.
+      if (
+        toolName === 'bulk_edit_scene_assets' &&
+        args &&
+        (typeof args.events_json === 'string' ||
+          Array.isArray(args.events) ||
+          Array.isArray(args.event_changes))
+      ) {
+        const eventsJson =
+          typeof args.events_json === 'string'
+            ? args.events_json
+            : Array.isArray(args.events)
+            ? JSON.stringify(args.events)
+            : undefined;
+        const eventsArgs = {
+          scene_name: args.scene_name,
+          events_json: eventsJson,
+          event_changes: Array.isArray(args.event_changes)
+            ? args.event_changes
+            : undefined,
+        };
+        const eventsResponse = await callEditorFunction({
+          toolName: 'add_scene_events',
+          args: autoQuoteAddSceneEventsArgs(project, eventsArgs),
+          context,
+        });
+        // Surface the events outcome alongside the assets result. callEditorFunction
+        // returns a textResult-shaped object; attach its parsed content if possible.
+        return textResult({
+          ...result,
+          events: extractToolResultPayload(eventsResponse),
+        });
+      }
+
       return textResult(result);
     } catch (error) {
       return errorResult(error.message);

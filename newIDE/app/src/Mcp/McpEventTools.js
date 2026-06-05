@@ -372,6 +372,69 @@ const getGroupReference = (
   );
 };
 
+// Default GroupEvent color in GDevelop core (GroupEvent.cpp): rgb(74,176,228).
+// The lint treats it as "unset", so auto-coloring avoids it.
+const DEFAULT_GROUP_COLOR_KEY = '74;176;228';
+
+// A palette of visually distinct, readable group background colors. Used to
+// auto-assign a DISTINCT color when a group is created/wrapped without one, so
+// the caller does not need a separate recolor pass and the group-color lint
+// (distinct color per group) passes by construction.
+const GROUP_COLOR_PALETTE = [
+  { r: 90, g: 160, b: 110 }, // green
+  { r: 200, g: 130, b: 90 }, // orange
+  { r: 150, g: 110, b: 200 }, // purple
+  { r: 200, g: 100, b: 130 }, // pink
+  { r: 110, g: 170, b: 190 }, // teal
+  { r: 190, g: 180, b: 90 }, // gold
+  { r: 130, g: 140, b: 160 }, // slate
+  { r: 170, g: 120, b: 110 }, // brown
+];
+
+const colorKeyOf = (r: number, g: number, b: number): string =>
+  `${r};${g};${b}`;
+
+// Collect the color keys already used by Group events in the scene, so a newly
+// created group can pick an unused, non-default one.
+const collectUsedGroupColorKeys = (scene: gdLayout): Set<string> => {
+  const used = new Set<string>();
+  const references = collectEventReferences(scene.getEvents());
+  references.forEach(reference => {
+    if (reference.event.getType() === 'BuiltinCommonInstructions::Group') {
+      const groupEvent = gd.asGroupEvent(reference.event);
+      used.add(
+        colorKeyOf(
+          groupEvent.getBackgroundColorR(),
+          groupEvent.getBackgroundColorG(),
+          groupEvent.getBackgroundColorB()
+        )
+      );
+    }
+  });
+  return used;
+};
+
+// If the group has no explicit color (still the default blue) and the caller did
+// not pass one, assign the first palette color not already used in the scene.
+const autoAssignDistinctGroupColor = (
+  groupEvent: gdGroupEvent,
+  scene: gdLayout
+) => {
+  const currentKey = colorKeyOf(
+    groupEvent.getBackgroundColorR(),
+    groupEvent.getBackgroundColorG(),
+    groupEvent.getBackgroundColorB()
+  );
+  // Only auto-color when the group is still the default (unset) color.
+  if (currentKey !== DEFAULT_GROUP_COLOR_KEY) return;
+  const used = collectUsedGroupColorKeys(scene);
+  const choice =
+    GROUP_COLOR_PALETTE.find(
+      color => !used.has(colorKeyOf(color.r, color.g, color.b))
+    ) || GROUP_COLOR_PALETTE[used.size % GROUP_COLOR_PALETTE.length];
+  groupEvent.setBackgroundColor(choice.r, choice.g, choice.b);
+};
+
 const applyGroupProperties = (event: gdBaseEvent, args: Object) => {
   const groupEvent = gd.asGroupEvent(event);
   const groupName =
@@ -664,6 +727,163 @@ export const lintSceneEvents = (project: gdProject, args: Object): Object => {
     }
   });
 
+  // Timer lint (#19): a scene timer that is compared (CompareTimer/Timer/
+  // TimerPaused) but never started with ResetTimer is ALWAYS false and fails
+  // silently. Scan every instruction list (conditions + actions, recursively
+  // into subInstructions) across all events, collecting started vs compared
+  // timer names, then flag compared-but-never-started.
+  if (!disabledRules.has('timer-compared-but-never-started')) {
+    const startedTimers = new Set();
+    const comparedTimers = new Map(); // name -> example eventPath
+    // Parameter index holding the timer NAME, per timer instruction type.
+    const TIMER_NAME_PARAM_INDEX = {
+      ResetTimer: 1,
+      PauseTimer: 1,
+      UnPauseTimer: 1,
+      RemoveTimer: 1,
+      CompareTimer: 1,
+      TimerPaused: 1,
+      Timer: 2, // deprecated condition
+    };
+    const recordInstruction = (instruction, eventPath) => {
+      const type = instruction.getType();
+      const nameIndex = TIMER_NAME_PARAM_INDEX[type];
+      if (
+        nameIndex !== undefined &&
+        instruction.getParametersCount() > nameIndex
+      ) {
+        const rawName = instruction.getParameter(nameIndex).getPlainString();
+        // Timer names are quoted string/identifier literals; strip quotes.
+        const timerName = rawName.replace(/^"+|"+$/g, '').trim();
+        if (timerName) {
+          if (type === 'ResetTimer') {
+            startedTimers.add(timerName);
+          } else if (type === 'CompareTimer' || type === 'Timer') {
+            if (!comparedTimers.has(timerName))
+              comparedTimers.set(timerName, eventPath);
+          }
+        }
+      }
+    };
+    const walkInstructions = (instructionsList, eventPath) => {
+      for (let i = 0; i < instructionsList.size(); i++) {
+        const instruction = instructionsList.get(i);
+        recordInstruction(instruction, eventPath);
+        const sub = instruction.getSubInstructions
+          ? instruction.getSubInstructions()
+          : null;
+        if (sub && sub.size()) walkInstructions(sub, eventPath);
+      }
+    };
+    references.forEach(reference => {
+      const event = reference.event;
+      const eventPath = formatEventPath(reference.path);
+      const eventType = event.getType();
+      if (eventType === 'BuiltinCommonInstructions::Standard') {
+        const standardEvent = gd.asStandardEvent(event);
+        walkInstructions(standardEvent.getConditions(), eventPath);
+        walkInstructions(standardEvent.getActions(), eventPath);
+      } else if (eventType === 'BuiltinCommonInstructions::While') {
+        const whileEvent = gd.asWhileEvent(event);
+        walkInstructions(whileEvent.getWhileConditions(), eventPath);
+        walkInstructions(whileEvent.getConditions(), eventPath);
+        walkInstructions(whileEvent.getActions(), eventPath);
+      }
+    });
+    comparedTimers.forEach((eventPath, timerName) => {
+      if (!startedTimers.has(timerName)) {
+        issues.push({
+          severity: 'warning',
+          type: 'timer-compared-but-never-started',
+          eventPath,
+          timerName,
+          suggestion: `The scene timer "${timerName}" is compared (CompareTimer) but never started with a ResetTimer action anywhere in this scene. CompareTimer is ALWAYS false until the timer is started, so this logic silently never fires. Add a "Start (or reset) a scene timer" (ResetTimer) action for "${timerName}" — typically once at scene start or when the timed behavior begins.`,
+        });
+      }
+    });
+  }
+
+  // Group-as-operand warning (a known per-instance footgun): when an instruction
+  // operates on an OBJECT GROUP and changes an object variable or tests a
+  // collision, the picking semantics across the group's members are easy to get
+  // wrong (e.g. "PlayerBullet in collision with Enemies → subtract Enemies.hp"
+  // may not behave per-member as intended). Flag it so the author verifies, and
+  // suggests using a ForEach over a single object type when in doubt.
+  if (!disabledRules.has('group-objectvar-or-collision')) {
+    // Collect object GROUP names (scene + global).
+    const groupNames = new Set();
+    [scene.getObjects(), project.getObjects()].forEach(container => {
+      const groups = container.getObjectGroups();
+      for (let i = 0; i < groups.count(); i++) {
+        groupNames.add(groups.getAt(i).getName());
+      }
+    });
+    if (groupNames.size) {
+      // Instruction type → object-parameter indexes that, when a group, are
+      // fragile for per-instance variable/collision semantics.
+      const OBJECT_VAR_TYPES = new Set([
+        'ModVarObjet',
+        'SetObjectVariable',
+        'ModVarObjetTxt',
+        'SetObjectVariableAsString',
+      ]);
+      const COLLISION_TYPES = new Set(['CollisionNP', 'EstEnCollision']);
+      const flagged = new Set();
+      const scanForGroupOperand = (instruction, eventPath) => {
+        const type = instruction.getType();
+        const isVar = OBJECT_VAR_TYPES.has(type);
+        const isCollision = COLLISION_TYPES.has(type);
+        if (!isVar && !isCollision) return;
+        // Object params are at index 0 (and index 2 for collision: object B).
+        const indexes = isCollision ? [0, 2] : [0];
+        indexes.forEach(idx => {
+          if (instruction.getParametersCount() <= idx) return;
+          const value = instruction.getParameter(idx).getPlainString();
+          if (groupNames.has(value)) {
+            const key = `${eventPath}:${type}:${value}`;
+            if (flagged.has(key)) return;
+            flagged.add(key);
+            issues.push({
+              severity: 'warning',
+              type: 'group-objectvar-or-collision',
+              eventPath,
+              instructionType: type,
+              groupName: value,
+              suggestion: `This ${
+                isCollision ? 'collision' : 'object-variable'
+              } instruction operates on the object GROUP "${value}". Group operands do not always behave per-member as expected (a known footgun for things like "bullet hits Enemies → change Enemies.hp"). VERIFY this picks/affects the intended instances; if it does not, wrap the logic in a ForEach over a single object type, or split the group into concrete object types. Suppress with disabled_rules: ["group-objectvar-or-collision"] once verified.`,
+            });
+          }
+        });
+      };
+      references.forEach(reference => {
+        const event = reference.event;
+        const eventPath = formatEventPath(reference.path);
+        const eventType = event.getType();
+        const walk = list => {
+          for (let i = 0; i < list.size(); i++) {
+            const instr = list.get(i);
+            scanForGroupOperand(instr, eventPath);
+            const sub = instr.getSubInstructions
+              ? instr.getSubInstructions()
+              : null;
+            if (sub && sub.size()) walk(sub);
+          }
+        };
+        if (eventType === 'BuiltinCommonInstructions::Standard') {
+          const standardEvent = gd.asStandardEvent(event);
+          walk(standardEvent.getConditions());
+          walk(standardEvent.getActions());
+        } else if (eventType === 'BuiltinCommonInstructions::While') {
+          const whileEvent = gd.asWhileEvent(event);
+          walk(whileEvent.getWhileConditions());
+          walk(whileEvent.getConditions());
+          walk(whileEvent.getActions());
+        }
+      });
+    }
+  }
+
   return {
     success: true,
     valid: !issues.some(issue => issue.severity === 'error'),
@@ -707,6 +927,10 @@ export const createGroup = (
     insertIndex
   );
   applyGroupProperties(event, args);
+  // Give the new group a distinct color automatically when none was provided,
+  // so the caller avoids a separate recolor step and the per-group distinct-color
+  // lint passes by construction.
+  if (!args.color) autoAssignDistinctGroupColor(gd.asGroupEvent(event), scene);
   notifyEventsChanged(scene, callbacks);
 
   return {
@@ -783,6 +1007,8 @@ export const wrapEventsInGroup = (
     insertionIndex
   );
   applyGroupProperties(groupEvent, args);
+  if (!args.color)
+    autoAssignDistinctGroupColor(gd.asGroupEvent(groupEvent), scene);
   const groupSubEvents = gd.asGroupEvent(groupEvent).getSubEvents();
   insertSerializedEvents(project, groupSubEvents, serializedEvents, 0);
   notifyEventsChanged(scene, callbacks);

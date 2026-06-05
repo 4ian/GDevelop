@@ -318,6 +318,28 @@ const generatePlaceholderAssetSchema = {
   additionalProperties: true,
 };
 
+const renderSceneToPngSchema = {
+  type: 'object',
+  properties: {
+    scene_name: {
+      type: 'string',
+      description: 'Scene whose layout to render.',
+    },
+    file: {
+      type: 'string',
+      description:
+        'Optional output PNG path (project-relative recommended). Defaults to renders/<scene>-layout.png.',
+    },
+    max_width: {
+      type: 'number',
+      description:
+        'Cap the rendered width in px (the scene is scaled to fit; default 960).',
+    },
+  },
+  required: ['scene_name'],
+  additionalProperties: true,
+};
+
 const sliceSpriteSheetSchema = {
   type: 'object',
   properties: {
@@ -713,6 +735,20 @@ const put2dInstancesSchema = {
           },
           locked: { type: 'boolean' },
           sealed: { type: 'boolean' },
+          align: {
+            type: 'string',
+            description:
+              'Optional alignment within the scene resolution instead of explicit x/y: "center", "center-x", "center-y", "top", "bottom", "left", "right" (combine like "bottom center"). Uses the instance/object effective size — removes the need to hand-compute (sceneWidth - objectWidth)/2.',
+          },
+          initially_hidden: {
+            type: 'boolean',
+            description:
+              'Start the instance not drawn (opacity 0). Note: initial instances have no native visible flag; opacity 0 hides visually but does NOT stop collisions — for a fully inert hidden object add a SceneJustBegins -> Hide event too.',
+          },
+          variables: {
+            description:
+              'Per-instance variables (initial instances support these). Either an object { name: value } or an array [{ name, value, type? }]. Useful to give each placed instance its own data (e.g. each of 3 hearts an index) without a scene-start Repeat loop.',
+          },
         },
         additionalProperties: true,
       },
@@ -738,6 +774,11 @@ const put2dInstancesSchema = {
     existing_instance_ids: {
       type: 'string',
       description: 'Legacy comma-separated ids from describe_instances.',
+    },
+    summary_only: {
+      type: 'boolean',
+      description:
+        'When true, return only the per-change list + instanceCount, omitting the full serialized instance list (which grows with every instance in the scene). Recommended to keep responses small.',
     },
   },
   required: ['scene_name'],
@@ -781,6 +822,26 @@ const createSpriteObjectFromResourceSchema = {
     height: { type: 'number' },
     customSize:
       put2dInstancesSchema.properties.instances.items.properties.customSize,
+    animations: {
+      type: 'array',
+      description:
+        'Optional full animation list (same shape as set_sprite_animations) to build a MULTI-frame / multi-animation Sprite in one call. When given, it replaces the single-frame default built from resource_name. Set per-animation loop / timeBetweenFrames for multi-frame animations.',
+      items: setSpriteAnimationsSchema.properties.animations.items,
+    },
+    loop: {
+      type: 'boolean',
+      description:
+        'For the default single animation: whether it loops (set false for one-shot).',
+    },
+    time_between_frames: {
+      type: 'number',
+      description: 'For the default single animation: seconds per frame.',
+    },
+    summary_only: {
+      type: 'boolean',
+      description:
+        'When true, omit the full serialized object from the response (smaller output).',
+    },
   },
   required: ['scene_name', 'object_name', 'resource_name'],
   additionalProperties: true,
@@ -1052,6 +1113,52 @@ const controlPreviewSchema = {
   additionalProperties: false,
 };
 
+const runFramesSchema = {
+  type: 'object',
+  properties: {
+    inputs: {
+      type: 'array',
+      description:
+        'Optional input events to inject BEFORE stepping (same shape as simulate_preview_input: [{ type, key/key_code/button/x/y, ... }]). Held keys (keyPressed without keyReleased) stay pressed across all stepped frames.',
+      items: {
+        type: 'object',
+        properties: {
+          type: { type: 'string' },
+          key: { type: 'string' },
+          key_code: { type: 'number' },
+          button: {},
+          x: { type: 'number' },
+          y: { type: 'number' },
+          identifier: { type: 'number' },
+        },
+        required: ['type'],
+        additionalProperties: true,
+      },
+    },
+    frames: {
+      type: 'number',
+      description: 'Number of frames to step (default 1, max 2000).',
+    },
+    frame_delta_ms: {
+      type: 'number',
+      description:
+        'Simulated milliseconds per frame (default ~16.67 = 60 FPS). Keep small.',
+    },
+    instance_positions_for: {
+      type: 'array',
+      items: { type: 'string' },
+      description:
+        'Object names whose live instance x/y/angle to include in the returned runtime snapshot.',
+    },
+    debugger_id: {
+      type: 'string',
+      description:
+        'Optional preview/debugger id. Defaults to the latest running preview.',
+    },
+  },
+  additionalProperties: false,
+};
+
 const setRuntimeStateSchema = {
   type: 'object',
   properties: {
@@ -1196,6 +1303,17 @@ const bulkEditSceneAssetsSchema = {
       type: 'string',
       description:
         'Optional default operation for instances: create, update, delete/remove, or upsert.',
+    },
+    events: {
+      type: 'array',
+      description:
+        'Optional scene events to add LAST (after resources/objects/animations/behaviors/variables/instances), as a serialized GDevelop events array (same shape as add_scene_events events_json). Goes through the SAME validation + lint as add_scene_events — Or/And children must be under subInstructions, etc. Lets initial scene setup be done in ONE call.',
+      items: { type: 'object', additionalProperties: true },
+    },
+    events_json: {
+      type: 'string',
+      description:
+        'Alternative to events: the events array as a JSON string (same as add_scene_events events_json).',
     },
   },
   required: ['scene_name'],
@@ -1468,7 +1586,7 @@ const lintSceneEventsSchema = {
       type: 'array',
       items: { type: 'string' },
       description:
-        'Rule types to suppress, e.g. ["create-without-for-each"] when a single-instance Create is intentional.',
+        'Rule types to suppress, e.g. ["create-without-for-each"] when a single-instance Create is intentional, or ["timer-compared-but-never-started"].',
     },
   },
   required: ['scene_name'],
@@ -1801,7 +1919,7 @@ const readTools: Array<McpTool> = [
   {
     name: 'lint_scene_events',
     description:
-      'Lint a scene event sheet for MCP authoring rules: mandatory semantic Groups at root, no JavaScript events unless explicitly allowed, likely multi-instance Create-without-ForEach, empty Group names, and Group colors (flags Groups left at the default color and distinct Groups sharing the same color — each Group must have a distinct color).',
+      'Lint a scene event sheet for MCP authoring rules: mandatory semantic Groups at root, no JavaScript events unless explicitly allowed, likely multi-instance Create-without-ForEach, empty Group names, Group colors (flags Groups left at the default color and distinct Groups sharing the same color — each Group must have a distinct color), and scene timers compared with CompareTimer but never started with ResetTimer (always-false silent bug).',
     inputSchema: lintSceneEventsSchema,
   },
   {
@@ -1954,7 +2072,7 @@ const readTools: Array<McpTool> = [
   {
     name: 'capture_preview_screenshot',
     description:
-      'Capture a PNG screenshot of the current rendered frame from a running preview, to visually verify sprites, layout, and colors. Writes the PNG to file_path (recommended) or returns it as a base64 data URL. Launch a preview first with gdevelop_run_command { commandName: "LAUNCH_NEW_PREVIEW" }.',
+      'Capture a PNG screenshot of the current rendered frame from a running preview, to visually verify sprites, layout, and colors. Captured from the MAIN process (webContents.capturePage) when available, so it works even for a backgrounded preview whose renderer is suspended; falls back to the in-game canvas otherwise. Writes the PNG to file_path (recommended) or returns it as a base64 data URL. Note: a screenshot reflects the last RENDERED frame — for state verification that does not need rendering, use run_frames / gdevelop_inspect_running_preview. Launch a preview first with gdevelop_run_command { commandName: "LAUNCH_NEW_PREVIEW" }.',
     inputSchema: capturePreviewScreenshotSchema,
   },
   {
@@ -1966,7 +2084,7 @@ const readTools: Array<McpTool> = [
   {
     name: 'control_preview',
     description:
-      'Deterministically control a running preview: pause, play, or step N frames. Pause + step makes runtime testing reproducible (no wall-clock drift between MCP calls): pause → simulate_preview_input / set_runtime_state → control_preview step → gdevelop_inspect_running_preview. Launch a preview first.',
+      'Deterministically control a running preview: pause, play, step N frames, close, or focus. Pause + step makes runtime testing reproducible (no wall-clock drift between MCP calls). For a throttled/backgrounded preview window (2nd+ window whose inspect/screenshot times out), prefer run_frames — it steps the simulation on the debugger channel without needing the window to render. Launch a preview first.',
     inputSchema: controlPreviewSchema,
   },
   {
@@ -1974,6 +2092,12 @@ const readTools: Array<McpTool> = [
     description:
       'Inject test state into a running preview: set scene/global variables and move/spawn/delete instances, to reach gameplay states that are hard to trigger naturally (e.g. set GameOver=0, give the player a position, spawn an enemy). Pause first with control_preview for reproducibility. Launch a preview first.',
     inputSchema: setRuntimeStateSchema,
+  },
+  {
+    name: 'run_frames',
+    description:
+      'ATOMIC runtime test: inject inputs, step exactly N frames, and return the resulting live state (instance counts, variables, optional instance positions) in ONE call. This replaces the fragile pause→simulate_input→step→inspect multi-call loop where any single call failing aborts the test. Crucially, it drives the simulation directly on the debugger channel (NOT requestAnimationFrame), so it keeps working even when the OS throttled a backgrounded/occluded preview window — the exact case where inspect/screenshot time out for the 2nd+ preview. The game is left paused (use control_preview play to resume). Screenshots still need a rendered (focused) window; everything else does not. Launch a preview first.',
+    inputSchema: runFramesSchema,
   },
   {
     name: 'find_scene_events',
@@ -2108,7 +2232,7 @@ const writeTools: Array<McpTool> = [
   {
     name: 'replace_object_definition',
     description:
-      'Replace or create a scene object with a complete serialized object definition. This explicitly allows changing the object type.',
+      'Replace or create a scene object with a complete serialized object definition. This explicitly allows changing the object type. Pass summary_only:true to omit the full serialized object from the response.',
     inputSchema: replaceObjectDefinitionSchema,
   },
   {
@@ -2137,13 +2261,13 @@ const writeTools: Array<McpTool> = [
   {
     name: 'create_sprite_object_from_resource',
     description:
-      'Create or update a Sprite scene object from an existing image resource, bind a default animation frame, and optionally create an initial instance.',
+      'Create or update a Sprite scene object from an existing image resource. Pass a full animations array to build a MULTI-frame / multi-animation Sprite in one call (otherwise a single default frame is bound). Optionally create an initial instance. Pass summary_only:true to omit the full serialized object from the response.',
     inputSchema: createSpriteObjectFromResourceSchema,
   },
   {
     name: 'create_text_object',
     description:
-      'Create or update a TextObject::Text scene object with high-level text properties and optionally create an initial instance.',
+      'Create or update a TextObject::Text scene object with high-level text properties and optionally create an initial instance. Pass summary_only:true to omit the full serialized object from the response.',
     inputSchema: createTextObjectSchema,
   },
   {
@@ -2159,9 +2283,15 @@ const writeTools: Array<McpTool> = [
     inputSchema: generatePlaceholderAssetSchema,
   },
   {
+    name: 'render_scene_to_png',
+    description:
+      'Statically render a scene LAYOUT to a PNG without running the game: one colored, positioned box per initial instance (sized to the object/instance size, colored stably per object name). Use this to verify object placement and layout — especially when a live preview is unavailable (throttled/occluded window) — without launching anything. It is a schematic, not pixel-accurate art; for final visuals use capture_preview_screenshot on a running preview.',
+    inputSchema: renderSceneToPngSchema,
+  },
+  {
     name: 'set_sprite_animations',
     description:
-      'Replace a Sprite object animation list with named animations, directions, frames, origin/center points, custom points, and collision masks.',
+      'Replace a Sprite object animation list with named animations, directions, frames, origin/center points, custom points, and collision masks. Pass summary_only:true to omit the full serialized object from the response.',
     inputSchema: setSpriteAnimationsSchema,
   },
   {
@@ -2173,7 +2303,7 @@ const writeTools: Array<McpTool> = [
   {
     name: 'bulk_edit_scene_assets',
     description:
-      'Batch import resources, create/replace scene objects, bind Sprite animations, add behaviors, declare scene/global variables, and place 2D instances for one scene — in one call. Applied in order: resources → objects → sprite animations → behaviors → variables → instances. Use for initial scene setup to drastically reduce single-tool round-trips.',
+      'Batch import resources, create/replace scene objects, bind Sprite animations, add behaviors, declare scene/global/object variables, place 2D instances, AND add scene events for one scene — in one call. Applied in order: resources → objects → sprite animations → behaviors → variables → instances → events. Events go through the same validation + lint as add_scene_events. Use for initial scene setup to drastically reduce single-tool round-trips.',
     inputSchema: bulkEditSceneAssetsSchema,
   },
   {
@@ -2197,7 +2327,7 @@ const writeTools: Array<McpTool> = [
   {
     name: 'put_2d_instances',
     description:
-      'Place, move, update, or erase 2D object instances. Call describe_instances first to get existing instance ids.',
+      'Place, move, update, or erase 2D object instances. Per-instance you can set align ("center"/"bottom center"/...) to position by scene resolution without computing coordinates, and initially_hidden to start it not drawn. Call describe_instances first to get existing instance ids. Pass summary_only:true to omit the full serialized instance list from the response (it grows with every instance in the scene).',
     inputSchema: put2dInstancesSchema,
   },
   {
@@ -2262,7 +2392,8 @@ const writeTools: Array<McpTool> = [
   },
   {
     name: 'add_or_edit_variable',
-    description: 'Add or edit global, scene, object, or behavior variables.',
+    description:
+      'Add or edit ONE global, scene, object, or behavior variable. To declare MANY variables at once (e.g. an object with hp/points/speed), prefer bulk_edit_scene_assets with its variables array (supports scope "scene"/"global"/"object") — one call instead of N.',
     inputSchema: variableSchema,
   },
   {
@@ -2853,6 +2984,31 @@ const toolUsageExamples: { [string]: Array<Object> } = {
         operations: [
           { type: 'spawnInstance', objectName: 'EnemyBig', x: 360, y: 100 },
         ],
+      },
+    },
+  ],
+  run_frames: [
+    {
+      description:
+        'Hold Left for 30 frames and read back the result in one call — confirms the player actually moved left. Works even on a throttled/backgrounded preview window.',
+      arguments: {
+        inputs: [{ type: 'keyPressed', key: 'Left' }],
+        frames: 30,
+        instance_positions_for: ['Player'],
+      },
+    },
+    {
+      description:
+        'Just advance 60 frames (~1s) and inspect autonomous state (e.g. enemies spawned, score) without any input.',
+      arguments: { frames: 60 },
+    },
+    {
+      description:
+        'Tap Space once (register a "just pressed" shot), step a few frames, and check the bullet count.',
+      arguments: {
+        inputs: [{ type: 'keyPressed', key: 'Space' }],
+        frames: 5,
+        instance_positions_for: ['Bullet'],
       },
     },
   ],

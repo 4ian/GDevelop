@@ -78,17 +78,30 @@ describe('McpEditorBridge', () => {
         if (responder === undefined || !callbacks) return;
         const payload =
           typeof responder === 'function' ? responder(message) : responder;
-        // Reply asynchronously from the targeted id, echoing the messageId.
+        // Reply asynchronously from the targeted id, echoing the messageId. When
+        // the payload carries a __fullMessage object, merge its top-level fields
+        // into the reply (run_frames replies put run metadata as a sibling of
+        // payload and the bridge reads the full parsed message).
         setTimeout(() => {
-          if (callbacks)
-            callbacks.onHandleParsedMessage({
-              id,
-              parsedMessage: {
-                command: `${message.command}-reply`,
-                messageId: message.messageId,
-                payload,
-              },
-            });
+          if (!callbacks) return;
+          const fullMessage =
+            payload && typeof payload === 'object' && payload.__fullMessage
+              ? payload.__fullMessage
+              : null;
+          callbacks.onHandleParsedMessage({
+            id,
+            parsedMessage: fullMessage
+              ? {
+                  command: `${message.command}-reply`,
+                  messageId: message.messageId,
+                  ...fullMessage,
+                }
+              : {
+                  command: `${message.command}-reply`,
+                  messageId: message.messageId,
+                  payload,
+                },
+          });
         }, 2);
       },
     };
@@ -590,6 +603,108 @@ describe('McpEditorBridge', () => {
         },
       });
       const lint = JSON.parse(response.content[0].text);
+      const types = lint.issues.map(issue => issue.type);
+      expect(types).not.toContain('group-default-color');
+      expect(types).not.toContain('group-duplicate-color');
+    } finally {
+      project.delete();
+    }
+  });
+
+  it('lints timers: CompareTimer with no ResetTimer is flagged; with one is clean', async () => {
+    const buildSceneWithTimer = ({ withReset }: { withReset: boolean }) => {
+      // $FlowFixMe[invalid-constructor]
+      const project = new gd.ProjectHelper.createNewGDJSProject();
+      const layout = project.insertNewLayout('Level1', 0);
+      const events = layout.getEvents();
+      const standard = gd.asStandardEvent(
+        events.insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 0)
+      );
+      // Condition: CompareTimer "Spawn" > 2 (param 1 = timer name).
+      const condition = new gd.Instruction();
+      condition.setType('CompareTimer');
+      condition.setParametersCount(4);
+      condition.setParameter(0, '');
+      condition.setParameter(1, '"Spawn"');
+      condition.setParameter(2, '>');
+      condition.setParameter(3, '2');
+      standard.getConditions().insert(condition, 0);
+      condition.delete();
+      if (withReset) {
+        // Action: ResetTimer "Spawn" (param 1 = timer name).
+        const action = new gd.Instruction();
+        action.setType('ResetTimer');
+        action.setParametersCount(2);
+        action.setParameter(0, '');
+        action.setParameter(1, '"Spawn"');
+        standard.getActions().insert(action, 0);
+        action.delete();
+      }
+      return project;
+    };
+
+    const lint = async project => {
+      const bridge = makeBridge({ getProject: () => project });
+      const response = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'lint_scene_events',
+          arguments: { scene_name: 'Level1' },
+        },
+      });
+      return JSON.parse(response.content[0].text);
+    };
+
+    const withoutReset = buildSceneWithTimer({ withReset: false });
+    try {
+      const result = await lint(withoutReset);
+      const timerIssue = result.issues.find(
+        issue => issue.type === 'timer-compared-but-never-started'
+      );
+      expect(timerIssue).toBeDefined();
+      expect(timerIssue.timerName).toBe('Spawn');
+    } finally {
+      withoutReset.delete();
+    }
+
+    const withReset = buildSceneWithTimer({ withReset: true });
+    try {
+      const result = await lint(withReset);
+      expect(result.issues.map(issue => issue.type)).not.toContain(
+        'timer-compared-but-never-started'
+      );
+    } finally {
+      withReset.delete();
+    }
+  });
+
+  it('create_group auto-assigns a distinct non-default color when none is given', async () => {
+    // $FlowFixMe[invalid-constructor]
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    project.insertNewLayout('Level1', 0);
+    try {
+      const bridge = makeBridge({ getProject: () => project });
+      const make = name =>
+        bridge.handleRendererMcpRequest({
+          method: 'tools/call',
+          params: {
+            name: 'create_group',
+            arguments: { scene_name: 'Level1', group_name: name },
+          },
+        });
+      await make('Initialization');
+      await make('Player input');
+
+      // Both groups should now have NON-default, DISTINCT colors — so a
+      // follow-up lint reports neither default-color nor duplicate-color.
+      const lintResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'lint_scene_events',
+          arguments: { scene_name: 'Level1' },
+        },
+      });
+      const lint = JSON.parse(lintResponse.content[0].text);
       const types = lint.issues.map(issue => issue.type);
       expect(types).not.toContain('group-default-color');
       expect(types).not.toContain('group-duplicate-color');
@@ -2379,6 +2494,26 @@ describe('McpEditorBridge', () => {
       if (withParams) {
         expect(withParams.parameters[0]).toHaveProperty('literalSyntax');
       }
+
+      // #5: a natural-language query with filler tokens ("modify"/"content"/"of")
+      // must still surface the text-setter and a commonTaskHint pointing at the
+      // hard-to-guess capability action type.
+      const setText = await search('modify text string content of text object');
+      expect(setText.commonTaskHints).toBeDefined();
+      expect(
+        setText.commonTaskHints.some(
+          hint =>
+            hint.type ===
+            'TextContainerCapability::TextContainerBehavior::SetValue'
+        )
+      ).toBe(true);
+
+      // #6: "play music loop" / BGM intent surfaces a music hint.
+      const music = await search('play music loop');
+      expect(music.commonTaskHints).toBeDefined();
+      expect(music.commonTaskHints.some(hint => /music/i.test(hint.type))).toBe(
+        true
+      );
     } finally {
       project.delete();
     }
@@ -2742,6 +2877,75 @@ describe('McpEditorBridge', () => {
     expect(result.error).toContain('Unknown key name');
   });
 
+  it('run_frames injects input, steps frames, and returns runtime state in one call', async () => {
+    let capturedRunFrames = null;
+    const runDumpPayload = {
+      _paused: true,
+      _sceneStack: {
+        _stack: [
+          {
+            _name: 'Level1',
+            _isLoaded: true,
+            _instances: { items: { Bullet: [{}, {}, {}] } },
+            _objects: { items: { Bullet: { name: 'Bullet' } } },
+            _variables: { _variables: {} },
+          },
+        ],
+      },
+    };
+    const previewDebuggerServer = makeTargetedPreviewServer({
+      responders: {
+        runFrames: message => {
+          capturedRunFrames = message;
+          // Reply with the full framesRan message shape: run metadata as a
+          // sibling of payload (the dump), which the bridge reads in full.
+          return {
+            __fullMessage: {
+              runFrames: {
+                applied: ['keyPressed:32'],
+                steppedFrames: 5,
+                stoppedEarly: false,
+                deltaMs: 1000 / 60,
+                error: null,
+              },
+              payload: runDumpPayload,
+            },
+          };
+        },
+      },
+    });
+    const bridge = makeBridge({
+      getPreviewDebuggerServer: () => previewDebuggerServer,
+    });
+
+    const response = await bridge.handleRendererMcpRequest({
+      method: 'tools/call',
+      params: {
+        name: 'run_frames',
+        arguments: {
+          inputs: [{ type: 'keyPressed', key: 'Space' }],
+          frames: 5,
+          instance_positions_for: ['Bullet'],
+        },
+      },
+    });
+    const result = JSON.parse(response.content[0].text);
+    expect(response.isError).not.toBe(true);
+    expect(result.success).toBe(true);
+    // The single request carried the inputs (Space -> 32) and the frame count.
+    expect(capturedRunFrames.command).toBe('runFrames');
+    expect(capturedRunFrames.count).toBe(5);
+    expect(capturedRunFrames.inputs[0]).toEqual(
+      expect.objectContaining({ type: 'keyPressed', keyCode: 32 })
+    );
+    expect(result.steppedFrames).toBe(5);
+    // The returned runtime snapshot is summarized from the dump in the SAME reply.
+    expect(result.runtime.available).toBe(true);
+    expect(result.runtime.scenes[0].objectInstanceCounts).toEqual(
+      expect.objectContaining({ Bullet: 3 })
+    );
+  });
+
   it('lists behavior names already on an object', async () => {
     // $FlowFixMe[invalid-constructor]
     const project = new gd.ProjectHelper.createNewGDJSProject();
@@ -2828,6 +3032,76 @@ describe('McpEditorBridge', () => {
       ).toContain('DestroyOutside');
       expect(layout.getVariables().has('Score')).toBe(true);
       expect(project.getVariables().has('Best')).toBe(true);
+    } finally {
+      project.delete();
+    }
+  });
+
+  it('writes events through bulk_edit_scene_assets with validation', async () => {
+    // $FlowFixMe[invalid-constructor]
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    const layout = project.insertNewLayout('Level1', 0);
+
+    try {
+      // The events part is routed to the add_scene_events editor function, which
+      // is exercised via a mocked processEditorFunctionCalls (the real pipeline
+      // is integration-tested elsewhere). We assert bulk forwards the events.
+      let editorCall = null;
+      const processEditorFunctionCalls: any = (jest.fn(
+        async ({ functionCalls }) => {
+          editorCall = functionCalls[0];
+          return {
+            results: [
+              { call_id: 'mcp-call', status: 'success', eventsCount: 1 },
+            ],
+          };
+        }
+      ): any);
+      const bridge = makeBridge({
+        getProject: () => project,
+        getPermissions: () => ({
+          allowWriteTools: true,
+          allowCommandTools: false,
+        }),
+        processEditorFunctionCalls,
+      });
+
+      const response = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'bulk_edit_scene_assets',
+          arguments: {
+            scene_name: 'Level1',
+            variables: [
+              { scope: 'scene', name: 'Score', value: 0, type: 'number' },
+            ],
+            events: [
+              {
+                type: 'BuiltinCommonInstructions::Standard',
+                conditions: [
+                  { type: { value: 'SceneJustBegins' }, parameters: [''] },
+                ],
+                actions: [
+                  {
+                    type: { value: 'SetNumberVariable' },
+                    parameters: ['Score', '=', '0'],
+                  },
+                ],
+              },
+            ],
+          },
+        },
+      });
+      const result = JSON.parse(response.content[0].text);
+      expect(response.isError).not.toBe(true);
+      // The assets part ran (variable declared), and events were forwarded LAST
+      // to the add_scene_events editor function with the serialized events.
+      expect(result.counts.variables).toBe(1);
+      expect(layout.getVariables().has('Score')).toBe(true);
+      expect(result.events).toBeDefined();
+      expect(processEditorFunctionCalls).toHaveBeenCalled();
+      expect(editorCall.name).toBe('add_scene_events');
+      expect(editorCall.arguments).toContain('SetNumberVariable');
     } finally {
       project.delete();
     }
@@ -3046,6 +3320,54 @@ describe('McpEditorBridge', () => {
           .toString('ascii')
       ).toBe('RIFF');
       expect(project.getResourcesManager().hasResource('Shoot')).toBe(true);
+    } finally {
+      project.delete();
+      fs.rmSync(tempDir, { recursive: true, force: true });
+    }
+  });
+
+  it('renders a scene layout to a PNG without running the game', async () => {
+    // $FlowFixMe[invalid-constructor]
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gdevelop-render-'));
+    project.setProjectFile(path.join(tempDir, 'game.json'));
+    const layout = project.insertNewLayout('Level1', 0);
+    layout.getObjects().insertNewObject(project, 'Sprite', 'Player', 0);
+    // Two placed instances at known positions.
+    const instances = layout.getInitialInstances();
+    const a = instances.insertNewInitialInstance();
+    a.setObjectName('Player');
+    a.setX(10);
+    a.setY(20);
+    const b = instances.insertNewInitialInstance();
+    b.setObjectName('Player');
+    b.setX(100);
+    b.setY(60);
+
+    try {
+      const bridge = makeBridge({
+        getProject: () => project,
+        getPermissions: () => ({
+          allowWriteTools: true,
+          allowCommandTools: false,
+        }),
+      });
+
+      const response = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'render_scene_to_png',
+          arguments: { scene_name: 'Level1' },
+        },
+      });
+      const result = JSON.parse(response.content[0].text);
+      expect(response.isError).not.toBe(true);
+      expect(result.success).toBe(true);
+      expect(result.instanceCount).toBe(2);
+      // PNG was written with the PNG magic header.
+      expect(fs.existsSync(result.resolvedFile)).toBe(true);
+      const header = fs.readFileSync(result.resolvedFile).slice(0, 8);
+      expect([...header]).toEqual([137, 80, 78, 71, 13, 10, 26, 10]);
     } finally {
       project.delete();
       fs.rmSync(tempDir, { recursive: true, force: true });

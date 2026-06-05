@@ -50,7 +50,9 @@ const SEARCH_ALIASES: { [string]: Array<string> } = {
   play: ['playsound', 'sound', 'play'],
   sound: ['playsound', 'sound', 'audio', 'music'],
   effect: ['sound', 'playsound'],
-  music: ['playmusic', 'music', 'sound'],
+  music: ['playmusic', 'music', 'sound', 'bgm', 'soundonchannel'],
+  bgm: ['playmusic', 'music', 'sound', 'bgm'],
+  background: ['playmusic', 'music', 'bgm'],
   key: ['key', 'keyboard', 'keypressed', 'keydown'],
   keyboard: ['key', 'keyboard', 'keypressed'],
   pressed: ['pressed', 'keypressed', 'mousebutton'],
@@ -115,21 +117,156 @@ const SEARCH_ALIASES: { [string]: Array<string> } = {
   score: ['variable', 'var'],
 };
 
+// Curated "common task → exact instruction" cheat-sheet. These are the actions
+// that are notoriously hard to discover by search because they now live on
+// hidden capability behaviors with non-obvious internal types and operator+value
+// parameter shapes (e.g. setting a Text object's text is
+// TextContainerCapability::TextContainerBehavior::SetValue, which no search term
+// obviously yields). When a query overlaps a hint's keywords, we surface the
+// exact type + a ready parameter template so the caller never has to guess.
+const COMMON_TASK_HINTS: Array<{|
+  keywords: Array<string>,
+  kind: 'action' | 'condition',
+  type: string,
+  title: string,
+  parametersTemplate: Array<string>,
+  note: string,
+|}> = [
+  {
+    keywords: ['text', 'string', 'settext', 'setvalue', 'label', 'caption'],
+    kind: 'action',
+    type: 'TextContainerCapability::TextContainerBehavior::SetValue',
+    title: 'Set the text/string shown by a Text object',
+    parametersTemplate: ['MyTextObject', 'Text', '=', '"Hello world"'],
+    note:
+      'Capability-behavior action. Params: [objectName, behaviorName="Text", operator="=", quotedString]. The behavior NAME is "Text". Use "=" to replace; the value is a quoted string expression.',
+  },
+  {
+    keywords: ['opacity', 'transparency', 'alpha', 'fade'],
+    kind: 'action',
+    type: 'OpacityCapability::OpacityBehavior::SetValue',
+    title: 'Set an object opacity (0-255)',
+    parametersTemplate: ['MyObject', 'Opacity', '=', '128'],
+    note:
+      'Capability-behavior action. Params: [objectName, behaviorName="Opacity", operator, numberExpression 0-255].',
+  },
+  {
+    keywords: ['animation', 'anim', 'setanimation', 'changeanimation'],
+    kind: 'action',
+    type: 'AnimatableCapability::AnimatableBehavior::SetAnimationName',
+    title: 'Set a Sprite animation by name',
+    parametersTemplate: ['MySprite', 'Animation', '=', '"Walk"'],
+    note:
+      'Capability-behavior action. Params: [objectName, behaviorName="Animation", operator="=", quotedAnimationName]. There is also SetIndex for setting by number.',
+  },
+  {
+    keywords: ['music', 'bgm', 'background', 'loop', 'looping'],
+    kind: 'action',
+    type: 'PlayMusicCanal',
+    title: 'Play looping background music on a channel',
+    parametersTemplate: ['', 'bgm', '0', 'yes', '100', '1'],
+    note:
+      'Params: [hidden, musicResourceName (BARE, no quotes), channelNumber, repeat ("yes"/"no"), volume 0-100, pitch]. Use a CHANNEL-based music action (not PlaySound) for BGM so it is tracked as music and can be stopped/looped per channel.',
+  },
+  {
+    keywords: ['sound', 'sfx', 'playsound', 'effect', 'shoot', 'explosion'],
+    kind: 'action',
+    type: 'PlaySound',
+    title: 'Play a one-shot sound effect',
+    parametersTemplate: ['', 'shoot', '', '100', '1'],
+    note:
+      'Params: [hidden, soundResourceName (BARE, no quotes — e.g. shoot, NOT "shoot"), loop, volume 0-100, pitch].',
+  },
+  {
+    keywords: ['hide', 'invisible', 'visible', 'visibility'],
+    kind: 'action',
+    type: 'Cache',
+    title: 'Hide an object',
+    parametersTemplate: ['MyObject'],
+    note:
+      'Hide takes just [objectName]. The twin action Show ("Montre") has an extra hidden code-only 2nd parameter — pass "" for it.',
+  },
+];
+
+// Find common-task hints whose keywords overlap the query tokens.
+const findCommonTaskHints = (query: string): Array<Object> => {
+  const tokens = new Set(tokenizeQuery(query));
+  if (!tokens.size) return [];
+  const matches = [];
+  for (const hint of COMMON_TASK_HINTS) {
+    const overlap = hint.keywords.filter(keyword => tokens.has(keyword)).length;
+    if (overlap > 0) {
+      matches.push({
+        overlap,
+        hint: {
+          type: hint.type,
+          kind: hint.kind,
+          title: hint.title,
+          parametersTemplate: hint.parametersTemplate,
+          note: hint.note,
+        },
+      });
+    }
+  }
+  matches.sort((a, b) => b.overlap - a.overlap);
+  return matches.slice(0, 4).map(m => m.hint);
+};
+
 // Tokenize a search string into lowercase word tokens.
 const tokenizeQuery = (query: string): Array<string> =>
   normalizeText(query)
     .split(/[^a-z0-9]+/)
     .filter(Boolean);
 
+// Filler/stopword tokens that should not, by themselves, decide a match. They
+// appear in natural phrasings ("change the text of an object") but carry no
+// discriminating signal, so requiring them to match would drop good results.
+const SEARCH_STOPWORDS = new Set([
+  'a',
+  'an',
+  'the',
+  'of',
+  'to',
+  'in',
+  'on',
+  'for',
+  'with',
+  'and',
+  'or',
+  'is',
+  'be',
+  'this',
+  'that',
+  'object',
+  'objects',
+  'value',
+  'content',
+  'contents',
+  'gdevelop',
+  'game',
+  'how',
+  'do',
+  'i',
+  'my',
+  'its',
+  'it',
+]);
+
 // Score how well candidate field values match the query. Returns 0 for no match.
-// Higher is better. The match requires that EVERY query token is satisfied by
-// some candidate value (directly or via an alias term), which is what makes
-// multi-word queries work as an AND search instead of a single contiguous
-// substring test. A small bonus is added for exact/prefix matches and for
-// matches in the most identifying fields (type, displayed name).
+// Higher is better. Instead of strict AND-over-all-tokens (which dropped good
+// results when a natural-language query contained filler like "content"/"of"),
+// this drops stopwords, then ranks by the FRACTION of meaningful tokens matched.
+// A result must match at least one meaningful token (and, for multi-token
+// queries, a majority) — so "modify text string content" still finds the text
+// setter even though "modify"/"content" do not appear in the metadata. A bonus
+// is added for exact/prefix matches and for hits in the most identifying fields.
 const scoreMatch = (values: Array<?string>, query: string): number => {
-  const tokens = tokenizeQuery(query);
-  if (!tokens.length) return 0;
+  const allTokens = tokenizeQuery(query);
+  if (!allTokens.length) return 0;
+  // Prefer meaningful tokens; fall back to all tokens if the query was all
+  // stopwords (so a query like "show" still works).
+  const meaningfulTokens = allTokens.filter(t => !SEARCH_STOPWORDS.has(t));
+  const tokens = meaningfulTokens.length ? meaningfulTokens : allTokens;
 
   const normalizedValues = values
     .filter(Boolean)
@@ -141,18 +278,33 @@ const scoreMatch = (values: Array<?string>, query: string): number => {
   // though fields contain spaces or camelCase.
   const compactHaystack = haystack.replace(/[^a-z0-9]+/g, '');
 
+  let matchedTokens = 0;
   let score = 0;
   for (const token of tokens) {
     const aliasTerms = SEARCH_ALIASES[token] || [];
     const candidates = [token, ...aliasTerms];
-    const matched = candidates.some(
-      term => haystack.includes(term) || compactHaystack.includes(term)
-    );
-    if (!matched) return 0; // AND semantics: every token must match something.
-    // Direct (non-alias) token hits are worth more than alias-only hits.
-    score +=
-      haystack.includes(token) || compactHaystack.includes(token) ? 2 : 1;
+    const directHit =
+      haystack.includes(token) || compactHaystack.includes(token);
+    const aliasHit =
+      !directHit &&
+      candidates.some(
+        term => haystack.includes(term) || compactHaystack.includes(term)
+      );
+    if (directHit || aliasHit) {
+      matchedTokens++;
+      // Direct (non-alias) token hits are worth more than alias-only hits.
+      score += directHit ? 2 : 1;
+    }
   }
+
+  if (matchedTokens === 0) return 0;
+  // For multi-token queries, require a majority of meaningful tokens to match,
+  // so unrelated single-word coincidences don't flood the results. Single-token
+  // queries pass on any hit.
+  if (tokens.length > 1 && matchedTokens / tokens.length < 0.5) return 0;
+
+  // Reward higher coverage so the most complete matches rank first.
+  score += matchedTokens;
 
   // Bonuses: whole-query contiguous hit, and hits in the first value (type) /
   // second value (displayed name), which are the most identifying.
@@ -269,7 +421,7 @@ const describeParameterLiteralSyntax = (parameterType: string): string => {
     return `behavior NAME — bare behavior instance name (NOT the behavior type), no quotes (type "behavior")`;
   }
   if (VARIABLE_PARAMETER_TYPES.has(parameterType)) {
-    return `variable reference — bare variable name, no quotes; object variables are Object.VariableName (type "${parameterType}")`;
+    return `variable reference — bare variable name, no quotes (type "${parameterType}"). In string/number EXPRESSIONS, reference an object variable with the canonical Object.Variable(Name) form (unambiguous); the legacy Object.Name shorthand is tolerated but discouraged.`;
   }
   if (RESOURCE_PARAMETER_TYPES.has(parameterType)) {
     return `resource name — BARE resource name, NO quotes (e.g. Shoot, not "Shoot"); the resource must already exist in the project (type "${parameterType}")`;
@@ -374,6 +526,29 @@ const summarizeInstructionMetadata = ({
   fullGroupName?: ?string,
   compact?: boolean,
 |}): Object => {
+  // Parameter-shape summary: GDevelop instructions mix user-fillable parameters
+  // with hidden "code-only" ones (e.g. an inlineCode slot) that must still get a
+  // placeholder ("") in the serialized parameters array. Twin actions can even
+  // differ (Show has a hidden 2nd param, Hide does not), which makes the count
+  // impossible to guess. Expose it explicitly so callers stop trial-and-erroring.
+  const totalParameterCount = metadata.getParametersCount();
+  const codeOnlyParameterIndexes = [];
+  for (let index = 0; index < totalParameterCount; index++) {
+    if (metadata.getParameter(index).isCodeOnly())
+      codeOnlyParameterIndexes.push(index);
+  }
+  const parameterShape = {
+    totalParameterCount,
+    userParameterCount: totalParameterCount - codeOnlyParameterIndexes.length,
+    codeOnlyParameterIndexes,
+    note: codeOnlyParameterIndexes.length
+      ? `This instruction has ${
+          codeOnlyParameterIndexes.length
+        } hidden code-only parameter(s) at index ${codeOnlyParameterIndexes.join(
+          ', '
+        )} — pass "" (empty string) for each in the serialized parameters array. The serialized array length must equal totalParameterCount (${totalParameterCount}).`
+      : undefined,
+  };
   if (compact) {
     return {
       kind,
@@ -384,6 +559,7 @@ const summarizeInstructionMetadata = ({
       group: fullGroupName || metadata.getGroup(),
       // True when usable in a scene (layout) or external events sheet.
       isRelevantForSceneEvents: metadata.isRelevantForLayoutEvents(),
+      parameterShape,
       parameters: mapFor(0, metadata.getParametersCount(), index =>
         summarizeParameter(metadata.getParameter(index), index, {
           compact: true,
@@ -417,6 +593,7 @@ const summarizeInstructionMetadata = ({
     isRelevantForCustomObjectEvents: metadata.isRelevantForCustomObjectEvents(),
     usageComplexity: metadata.getUsageComplexity(),
     deprecationMessage: metadata.getDeprecationMessage() || undefined,
+    parameterShape,
     parameters: mapFor(0, metadata.getParametersCount(), index =>
       summarizeParameter(metadata.getParameter(index), index)
     ),
@@ -597,14 +774,50 @@ const commentEventExample = [
   },
 ];
 
+// Capability-behavior actions are the most error-prone to author by hand: the
+// internal types are non-obvious and the parameters use a [object, behaviorName,
+// operator, value] shape (operator + value, even for strings). This worked
+// example shows setting a Text object's text, an opacity, and a Sprite animation.
+const capabilityActionsEventExample = [
+  {
+    type: 'BuiltinCommonInstructions::Standard',
+    conditions: [{ type: { value: 'SceneJustBegins' }, parameters: [''] }],
+    actions: [
+      {
+        // Set the displayed text of a Text object. behaviorName is "Text".
+        type: {
+          value: 'TextContainerCapability::TextContainerBehavior::SetValue',
+        },
+        parameters: ['Title', 'Text', '=', '"Game Over"'],
+      },
+      {
+        // Set opacity (0-255). behaviorName is "Opacity".
+        type: { value: 'OpacityCapability::OpacityBehavior::SetValue' },
+        parameters: ['Title', 'Opacity', '=', '180'],
+      },
+      {
+        // Set a Sprite animation by name. behaviorName is "Animation".
+        type: {
+          value: 'AnimatableCapability::AnimatableBehavior::SetAnimationName',
+        },
+        parameters: ['Player', 'Animation', '=', '"Idle"'],
+      },
+    ],
+  },
+];
+
 const groupEventExample = [
   {
     type: 'BuiltinCommonInstructions::Group',
     name: 'Initialization',
     folded: true,
-    colorR: 74,
-    colorG: 176,
-    colorB: 228,
+    // Use an explicit, NON-default color. The default GDevelop group blue is
+    // (74,176,228); the lint rule treats it as "unset", so examples deliberately
+    // pick a distinct color (here a green). Give each group its OWN distinct
+    // color for readability.
+    colorR: 90,
+    colorG: 160,
+    colorB: 110,
     events: standardEventWithInstructionExample,
   },
 ];
@@ -771,6 +984,12 @@ export const getEventsJsonExamples = ({
       events_json: JSON.stringify(forEachEventExample, null, 2),
     },
     {
+      name: 'Capability-behavior actions (set text / opacity / animation)',
+      purpose:
+        'How to write the hidden capability-behavior actions that are hard to discover by search. Parameters are [objectName, behaviorName, operator, value]: the behaviorName is "Text"/"Opacity"/"Animation", the operator is usually "=", and string values are quoted (e.g. "Game Over"), numbers are bare (e.g. 180). See also gdevelop_search_instruction_metadata commonTaskHints.',
+      events_json: JSON.stringify(capabilityActionsEventExample, null, 2),
+    },
+    {
       name: 'Repeat N times',
       purpose: 'Loop a fixed number of times via repeatExpression.',
       events_json: JSON.stringify(repeatEventExample, null, 2),
@@ -867,6 +1086,10 @@ export const getEventsJsonExamples = ({
       setObjectVariable: 'ModVarObjet (action), VarObjet (condition)',
       setSceneVariableNumber: 'SetNumberVariable (action)',
       setSceneVariableString: 'SetStringVariable (action)',
+      setSceneVariableBoolean:
+        'SetBooleanVariable (action), BooleanVariable (condition) — use these for scene/global boolean flags; the value is yes/no (not a quoted string and not 0/1). These are the unified-variable instructions, NOT the object/dialogue same-named ones.',
+      compareSceneVariableNumber: 'NumberVariable (condition)',
+      compareSceneVariableString: 'StringVariable (condition)',
       deleteObject: 'Delete (action)',
       changeOrRestartScene:
         'Scene (action — its scene name parameter is quoted)',
@@ -1119,6 +1342,12 @@ export const searchInstructionMetadata = ({
 
   const results = scored.slice(0, resultLimit).map(entry => entry.summary);
 
+  // Surface curated hints for hard-to-discover capability actions (set text,
+  // opacity, animation, BGM, etc.) whenever the query overlaps them — even if
+  // the ranked results already include them, the template + note removes the
+  // operator/quoting/behavior-name guesswork.
+  const commonTaskHints = findCommonTaskHints(searchQuery);
+
   return {
     query: searchQuery,
     kind: normalizedKind,
@@ -1126,6 +1355,7 @@ export const searchInstructionMetadata = ({
     totalMatches: scored.length,
     truncated: scored.length > resultLimit,
     results,
+    commonTaskHints: commonTaskHints.length ? commonTaskHints : undefined,
   };
 };
 
@@ -1702,6 +1932,17 @@ const withActionableSuggestion = (issue: Object): Object => {
   }
 
   if (shape === 'resource') {
+    if (startsQuoted && value) {
+      const bare = value.trim().replace(/^"+|"+$/g, '');
+      return {
+        ...issue,
+        suggestion: `Parameter ${
+          issue.parameterIndex
+        } is a resource name (${parameterType}) and must be BARE with NO quotes — this is the OPPOSITE of string parameters. You wrote ${JSON.stringify(
+          value
+        )}; use ${bare} instead. The resource must already exist (add it with add_or_update_resource if needed).`,
+      };
+    }
     return {
       ...issue,
       suggestion: `Parameter ${

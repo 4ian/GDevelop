@@ -295,10 +295,12 @@ const applyResourceMetadata = (resource: gdResource, metadata: Object) => {
 // Write a minimal RGBA PNG (solid fill, with an optional centered filled
 // rectangle/ellipse) using only Node zlib — no image libraries. Used by
 // generate_placeholder_asset so a zero-to-playable demo can stay inside MCP.
-const encodePlaceholderPng = (
+// Encode an RGBA pixel buffer (length width*height*4) as a PNG Buffer. Shared by
+// the placeholder generator and the static scene renderer.
+const encodeRgbaPng = (
   width: number,
   height: number,
-  rgba: [number, number, number, number]
+  pixels: Buffer
 ): Buffer => {
   const crcTable = [];
   for (let n = 0; n < 256; n++) {
@@ -326,18 +328,11 @@ const encodePlaceholderPng = (
   ihdr[8] = 8; // bit depth
   ihdr[9] = 6; // color type RGBA
   // Raw image data: each row prefixed by a filter byte (0 = none).
-  const row = Buffer.alloc(1 + width * 4);
   const raw = Buffer.alloc((1 + width * 4) * height);
   for (let y = 0; y < height; y++) {
-    row[0] = 0;
-    for (let x = 0; x < width; x++) {
-      const o = 1 + x * 4;
-      row[o] = rgba[0];
-      row[o + 1] = rgba[1];
-      row[o + 2] = rgba[2];
-      row[o + 3] = rgba[3];
-    }
-    row.copy(raw, (1 + width * 4) * y);
+    const rowStart = (1 + width * 4) * y;
+    raw[rowStart] = 0;
+    pixels.copy(raw, rowStart + 1, y * width * 4, (y + 1) * width * 4);
   }
   const idat = zlib.deflateSync(raw);
   return Buffer.concat([
@@ -346,6 +341,21 @@ const encodePlaceholderPng = (
     chunk('IDAT', idat),
     chunk('IEND', Buffer.alloc(0)),
   ]);
+};
+
+const encodePlaceholderPng = (
+  width: number,
+  height: number,
+  rgba: [number, number, number, number]
+): Buffer => {
+  const pixels = Buffer.alloc(width * height * 4);
+  for (let i = 0; i < width * height; i++) {
+    pixels[i * 4] = rgba[0];
+    pixels[i * 4 + 1] = rgba[1];
+    pixels[i * 4 + 2] = rgba[2];
+    pixels[i * 4 + 3] = rgba[3];
+  }
+  return encodeRgbaPng(width, height, pixels);
 };
 
 // Write a minimal mono 16-bit PCM WAV beep (sine or short noise burst).
@@ -466,6 +476,131 @@ export const generatePlaceholderAsset = (
     resource: resourceResult.resource,
     note:
       'Placeholder asset generated and registered. Replace it later with real art/audio by overwriting the file and re-importing the same resource name.',
+  };
+};
+
+// Statically render a scene's LAYOUT to a PNG without running the game — a
+// schematic diagram (one colored, labelled box per initial instance at its
+// position/size) so you can verify object placement and layout even when a
+// live preview is unavailable (e.g. throttled/occluded window). This does NOT
+// decode sprite pixels; it answers "is the layout right / are things where I
+// expect" rather than "what does the final art look like".
+export const renderSceneToPng = (project: gdProject, args: Object): Object => {
+  if (!fs || !zlib) {
+    throw new Error('Filesystem/zlib access is not available.');
+  }
+  const sceneName = getRequiredString(args, 'scene_name');
+  const scene = getScene(project, sceneName);
+
+  const sceneWidth = project.getGameResolutionWidth();
+  const sceneHeight = project.getGameResolutionHeight();
+  // Scale down large scenes so the PNG stays small; default cap ~960px wide.
+  const maxWidth =
+    getFiniteNumber(args.max_width) !== null ? args.max_width : 960;
+  const scale = Math.min(1, maxWidth / Math.max(1, sceneWidth));
+  const width = Math.max(1, Math.round(sceneWidth * scale));
+  const height = Math.max(1, Math.round(sceneHeight * scale));
+
+  // Background (scene background color if available, else dark gray).
+  const bg = [40, 44, 52, 255];
+  const pixels = Buffer.alloc(width * height * 4);
+  for (let i = 0; i < width * height; i++) {
+    pixels[i * 4] = bg[0];
+    pixels[i * 4 + 1] = bg[1];
+    pixels[i * 4 + 2] = bg[2];
+    pixels[i * 4 + 3] = bg[3];
+  }
+
+  const setPixel = (x, y, r, g, b, a) => {
+    if (x < 0 || y < 0 || x >= width || y >= height) return;
+    const o = (y * width + x) * 4;
+    // Simple alpha blend over existing.
+    const alpha = a / 255;
+    pixels[o] = Math.round(r * alpha + pixels[o] * (1 - alpha));
+    pixels[o + 1] = Math.round(g * alpha + pixels[o + 1] * (1 - alpha));
+    pixels[o + 2] = Math.round(b * alpha + pixels[o + 2] * (1 - alpha));
+    pixels[o + 3] = 255;
+  };
+
+  // Deterministic color per object name (so the same object is always the same
+  // hue across renders).
+  const colorForName = (name: string): [number, number, number] => {
+    let hash = 0;
+    for (let i = 0; i < name.length; i++)
+      hash = (hash * 31 + name.charCodeAt(i)) >>> 0;
+    return [
+      120 + (hash % 110),
+      90 + ((hash >> 8) % 140),
+      110 + ((hash >> 16) % 120),
+    ];
+  };
+
+  const initialInstances = scene.getInitialInstances();
+  const drawn = [];
+  iterateInitialInstances(initialInstances, instance => {
+    const name = instance.getObjectName();
+    const w = instance.hasCustomSize()
+      ? instance.getCustomWidth()
+      : instance.getDefaultWidth();
+    const h = instance.hasCustomSize()
+      ? instance.getCustomHeight()
+      : instance.getDefaultHeight();
+    const effectiveW = w && w > 0 ? w : 32;
+    const effectiveH = h && h > 0 ? h : 32;
+    const x0 = Math.round(instance.getX() * scale);
+    const y0 = Math.round(instance.getY() * scale);
+    const x1 = Math.round((instance.getX() + effectiveW) * scale);
+    const y1 = Math.round((instance.getY() + effectiveH) * scale);
+    const [r, g, b] = colorForName(name);
+    // Filled translucent body.
+    for (let y = y0; y < y1; y++)
+      for (let x = x0; x < x1; x++) setPixel(x, y, r, g, b, 150);
+    // Opaque border.
+    for (let x = x0; x < x1; x++) {
+      setPixel(x, y0, r, g, b, 255);
+      setPixel(x, y1 - 1, r, g, b, 255);
+    }
+    for (let y = y0; y < y1; y++) {
+      setPixel(x0, y, r, g, b, 255);
+      setPixel(x1 - 1, y, r, g, b, 255);
+    }
+    drawn.push({
+      objectName: name,
+      x: instance.getX(),
+      y: instance.getY(),
+      width: effectiveW,
+      height: effectiveH,
+      layer: instance.getLayer() || '',
+    });
+  });
+
+  const buffer = encodeRgbaPng(width, height, pixels);
+
+  const relativeFile =
+    getOptionalString(args, 'file') || `renders/${sceneName}-layout.png`;
+  const projectFile = project.getProjectFile && project.getProjectFile();
+  const absFile =
+    path && !path.isAbsolute(relativeFile) && projectFile
+      ? path.resolve(path.dirname(projectFile), relativeFile)
+      : relativeFile;
+  if (path) {
+    const dir = path.dirname(absFile);
+    if (dir && !fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+  }
+  fs.writeFileSync(absFile, buffer);
+
+  return {
+    success: true,
+    sceneName,
+    file: relativeFile,
+    resolvedFile: absFile,
+    sceneResolution: { width: sceneWidth, height: sceneHeight },
+    renderedSize: { width, height },
+    scale,
+    instanceCount: drawn.length,
+    instances: drawn,
+    note:
+      'Schematic LAYOUT render (one labelled box per initial instance at its position/size) — verifies placement, not final art. Does not run the game, so it works when a live preview is unavailable. Each object name maps to a stable color. For pixel-accurate visuals, use capture_preview_screenshot on a running preview.',
   };
 };
 
@@ -1240,7 +1375,10 @@ export const setSpriteAnimations = (
     sceneName,
     objectName,
     animationsCount: animations.getAnimationsCount(),
-    serializedObject: serializeToJSObject(object),
+    serializedObject:
+      args && (args.summary_only === true || args.summaryOnly === true)
+        ? undefined
+        : serializeToJSObject(object),
   };
 };
 
@@ -1352,7 +1490,10 @@ export const replaceObjectDefinition = (
     objectName,
     didReplace,
     objectType: object.getType(),
-    serializedObject: serializeToJSObject(object),
+    serializedObject:
+      args && (args.summary_only === true || args.summaryOnly === true)
+        ? undefined
+        : serializeToJSObject(object),
   };
 };
 
@@ -1526,7 +1667,10 @@ export const setObjectProperties = (
     objectName,
     changes,
     warnings,
-    serializedObject: serializeToJSObject(object),
+    serializedObject:
+      args && (args.summary_only === true || args.summaryOnly === true)
+        ? undefined
+        : serializeToJSObject(object),
   };
 };
 
@@ -1693,13 +1837,17 @@ export const setTextObjectProperties = (
     objectName,
     changes,
     properties: readTextObjectProperties(textObjectConfiguration),
-    serializedObject: serializeToJSObject(object),
+    serializedObject:
+      args && (args.summary_only === true || args.summaryOnly === true)
+        ? undefined
+        : serializeToJSObject(object),
   };
 };
 
 const applyInstanceFields = (
   instance: gdInitialInstance,
-  instanceData: Object
+  instanceData: Object,
+  layoutContext?: Object
 ) => {
   const objectName =
     getOptionalString(instanceData, 'object_name') ||
@@ -1760,6 +1908,87 @@ const applyInstanceFields = (
     instance.setSealed(instanceData.sealed);
     if (instanceData.sealed) instance.setLocked(true);
   }
+
+  // Per-instance variables (#9): initial instances support instance-level
+  // variables (e.g. give each of 3 hearts its own index). Accept
+  // variables: { name: value } or [{ name, value, type? }].
+  const instanceVariables = instanceData.variables;
+  if (instanceVariables && typeof instanceVariables === 'object') {
+    const container = instance.getVariables();
+    const setOne = (name, rawValue, declaredType) => {
+      if (!name) return;
+      const variable = container.has(name)
+        ? container.get(name)
+        : container.insertNew(name, container.count());
+      const numberValue = Number(rawValue);
+      const t = (declaredType || '').toLowerCase();
+      if (typeof rawValue === 'boolean' || t === 'boolean') {
+        variable.setBool(!!rawValue);
+      } else if (
+        t === 'string' ||
+        (t !== 'number' && (rawValue === '' || isNaN(numberValue)))
+      ) {
+        variable.setString('' + rawValue);
+      } else {
+        variable.setValue(numberValue);
+      }
+    };
+    if (Array.isArray(instanceVariables)) {
+      instanceVariables.forEach(entry => {
+        if (entry && typeof entry === 'object')
+          setOne(entry.name, entry.value, entry.type);
+      });
+    } else {
+      Object.keys(instanceVariables).forEach(name =>
+        setOne(name, instanceVariables[name])
+      );
+    }
+  }
+
+  // Alignment helper: center/anchor the instance within the scene's game
+  // resolution, so callers don't hand-compute (resolutionWidth - objectWidth)/2.
+  // align: "center" | "center-x" | "center-y" | "top" | "bottom" | "left" |
+  // "right" (combine with center on the other axis). Uses the instance's
+  // effective size (custom size if set, otherwise the object's default size).
+  const align =
+    getOptionalString(instanceData, 'align') ||
+    getOptionalString(instanceData, 'anchor');
+  if (align && layoutContext) {
+    const effectiveWidth = instance.hasCustomSize()
+      ? instance.getCustomWidth()
+      : instance.getDefaultWidth();
+    const effectiveHeight = instance.hasCustomSize()
+      ? instance.getCustomHeight()
+      : instance.getDefaultHeight();
+    const sceneWidth = layoutContext.sceneWidth || 0;
+    const sceneHeight = layoutContext.sceneHeight || 0;
+    const tokens = align.toLowerCase().split(/[\s,_-]+/);
+    const has = name => tokens.includes(name);
+    if (has('center') || has('centerx') || (has('center') && has('x'))) {
+      instance.setX((sceneWidth - effectiveWidth) / 2);
+    }
+    if (has('center') || has('centery') || (has('center') && has('y'))) {
+      instance.setY((sceneHeight - effectiveHeight) / 2);
+    }
+    if (has('left')) instance.setX(0);
+    if (has('right')) instance.setX(sceneWidth - effectiveWidth);
+    if (has('top')) instance.setY(0);
+    if (has('bottom')) instance.setY(sceneHeight - effectiveHeight);
+  }
+
+  // "Initially hidden": GDevelop initial instances have NO native visible flag,
+  // so the closest instance-level approximation is opacity 0 (the object is not
+  // drawn). Note this does NOT disable collisions — for a truly inert hidden
+  // object, also add a SceneJustBegins -> Hide <object> event (or pass events to
+  // bulk_edit_scene_assets). We surface that caveat in the tool result.
+  const initiallyHidden =
+    instanceData.initially_hidden === true ||
+    instanceData.initiallyHidden === true ||
+    instanceData.hidden === true;
+  if (initiallyHidden) {
+    instance.setOpacity(0);
+  }
+  return { initiallyHidden };
 };
 
 export const putStructured2dInstances = (
@@ -1780,6 +2009,11 @@ export const putStructured2dInstances = (
     getOptionalString(args, 'op') ||
     'upsert';
   const initialInstances = scene.getInitialInstances();
+  // Scene size for the align/center helper.
+  const layoutContext = {
+    sceneWidth: project.getGameResolutionWidth(),
+    sceneHeight: project.getGameResolutionHeight(),
+  };
 
   const plannedOperations = instancesData.map((instanceData, index) => {
     if (!instanceData || typeof instanceData !== 'object') {
@@ -1851,11 +2085,16 @@ export const putStructured2dInstances = (
 
       const instance =
         existingInstance || initialInstances.insertNewInitialInstance();
-      applyInstanceFields(instance, instanceData);
+      const applied = applyInstanceFields(
+        instance,
+        instanceData,
+        layoutContext
+      );
       changes.push({
         operation: existingInstance ? 'update' : 'create',
         id: instance.getPersistentUuid().slice(0, 10),
         objectName: instance.getObjectName(),
+        initiallyHidden: applied.initiallyHidden || undefined,
       });
     }
   );
@@ -1864,11 +2103,22 @@ export const putStructured2dInstances = (
     callbacks.onInstancesModifiedOutsideEditor({ scene });
   }
 
+  const anyHidden = changes.some(change => change.initiallyHidden);
+  // summary_only trims the response (issue #20): omit the full serialized
+  // instance list (which otherwise grows with every instance in the scene).
+  const summaryOnly =
+    args && (args.summary_only === true || args.summaryOnly === true);
   return {
     success: true,
     sceneName,
     changes,
-    instances: serializeToJSObject(scene.getInitialInstances()),
+    instanceCount: scene.getInitialInstances().getInstancesCount(),
+    note: anyHidden
+      ? 'Some instances were set initially_hidden via opacity 0 (initial instances have no native visible flag). This hides them visually but does NOT stop collisions — for a fully inert hidden object, also add a SceneJustBegins -> Hide <object> event (e.g. via bulk_edit_scene_assets events).'
+      : undefined,
+    instances: summaryOnly
+      ? undefined
+      : serializeToJSObject(scene.getInitialInstances()),
   };
 };
 
@@ -1952,6 +2202,11 @@ const topLevelInstanceFieldNames = [
   'custom_size',
   'locked',
   'sealed',
+  'align',
+  'anchor',
+  'initially_hidden',
+  'initiallyHidden',
+  'hidden',
 ];
 
 const buildOptionalInstancePayload = (
@@ -2056,17 +2311,31 @@ export const createSpriteObjectFromResource = (
     }
   });
 
+  // #17: allow building a multi-frame / multi-animation Sprite in ONE call. If
+  // the caller passes a full `animations` array (same shape as
+  // set_sprite_animations), use it directly; otherwise fall back to the single
+  // default frame built from resource_name.
+  const animationsPayload =
+    Array.isArray(args.animations) && args.animations.length
+      ? args.animations
+      : [
+          {
+            name: getOptionalString(args, 'animation_name') || 'Default',
+            loop: typeof args.loop === 'boolean' ? args.loop : undefined,
+            timeBetweenFrames:
+              getFiniteNumber(args.time_between_frames) !== null
+                ? args.time_between_frames
+                : undefined,
+            frames: [frame],
+          },
+        ];
+
   const animationResult = setSpriteAnimations(
     project,
     {
       scene_name: sceneName,
       object_name: objectName,
-      animations: [
-        {
-          name: getOptionalString(args, 'animation_name') || 'Default',
-          frames: [frame],
-        },
-      ],
+      animations: animationsPayload,
     },
     callbacks
   );
@@ -2084,6 +2353,8 @@ export const createSpriteObjectFromResource = (
       )
     : null;
 
+  const summaryOnly =
+    args && (args.summary_only === true || args.summaryOnly === true);
   return {
     success: true,
     sceneName,
@@ -2094,8 +2365,14 @@ export const createSpriteObjectFromResource = (
     resourceName,
     animationsCount: animationResult.animationsCount,
     instanceCreated: !!instanceResult,
-    instanceResult,
-    serializedObject: serializeToJSObject(objectResult.object),
+    instanceResult: summaryOnly
+      ? instanceResult
+        ? { created: true }
+        : null
+      : instanceResult,
+    serializedObject: summaryOnly
+      ? undefined
+      : serializeToJSObject(objectResult.object),
   };
 };
 
@@ -2121,6 +2398,33 @@ export const createTextObject = (
   }
 
   const instancePayload = buildOptionalInstancePayload(args, objectName);
+  // Text-centering fix (#6): a freshly created Text object has width 0, so a
+  // plain align:"center-x" would center its left edge (text ends up off-center
+  // / overlapping). When the caller asks to horizontally center a text instance
+  // and gives no explicit width, make the instance span the scene width and set
+  // textAlignment:center, so the text visually centers within it.
+  if (
+    instancePayload &&
+    typeof (instancePayload.align || instancePayload.anchor) === 'string' &&
+    /center/.test(
+      (instancePayload.align || instancePayload.anchor).toLowerCase()
+    )
+  ) {
+    const hasWidth =
+      instancePayload.width !== undefined ||
+      (instancePayload.customSize && instancePayload.customSize.width) ||
+      (instancePayload.custom_size && instancePayload.custom_size.width);
+    if (!hasWidth) {
+      instancePayload.width = project.getGameResolutionWidth();
+      // Center the text within the full-width box.
+      const textObjectConfig = gd.asTextObjectConfiguration(
+        objectResult.object.getConfiguration()
+      );
+      if (typeof textObjectConfig.setTextAlignment === 'function') {
+        textObjectConfig.setTextAlignment('center');
+      }
+    }
+  }
   const instanceResult = instancePayload
     ? putStructured2dInstances(
         project,
@@ -2136,6 +2440,8 @@ export const createTextObject = (
     objectResult.object.getConfiguration()
   );
 
+  const summaryOnly =
+    args && (args.summary_only === true || args.summaryOnly === true);
   return {
     success: true,
     sceneName,
@@ -2146,8 +2452,14 @@ export const createTextObject = (
     changes: textResult ? textResult.changes : [],
     properties: readTextObjectProperties(textObjectConfiguration),
     instanceCreated: !!instanceResult,
-    instanceResult,
-    serializedObject: serializeToJSObject(objectResult.object),
+    instanceResult: summaryOnly
+      ? instanceResult
+        ? { created: true }
+        : null
+      : instanceResult,
+    serializedObject: summaryOnly
+      ? undefined
+      : serializeToJSObject(objectResult.object),
   };
 };
 
@@ -2434,11 +2746,18 @@ export const readSerializedScene = (
     const sceneObjects = Array.isArray(serializedScene.objects)
       ? serializedScene.objects.filter(object => wanted.has(object.name))
       : [];
-    const globalObjects =
-      serializeToJSObject(project.getObjects()).objects || [];
-    const matchedGlobalObjects = Array.isArray(globalObjects)
-      ? globalObjects.filter(object => wanted.has(object.name))
-      : [];
+    // Serialize each wanted GLOBAL object individually. ObjectsContainer itself
+    // is NOT serializable (it has no serializeTo), so serializeToJSObject on the
+    // container throws "e[t] is not a function" — serialize per gd::Object.
+    const globalObjectsContainer = project.getObjects();
+    const matchedGlobalObjects = [];
+    [...wanted].forEach(name => {
+      if (globalObjectsContainer.hasObjectNamed(name)) {
+        matchedGlobalObjects.push(
+          serializeToJSObject(globalObjectsContainer.getObject(name))
+        );
+      }
+    });
     const includeInstances = !(args && args.include_instances === false);
     const instances =
       includeInstances && Array.isArray(serializedScene.instances)

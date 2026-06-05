@@ -5201,6 +5201,13 @@ const MainFrame = (props: Props): React.MixedElement => {
             previewLauncher.focusAllPreviews();
           }
         },
+        capturePreviewPage: windowId => {
+          const previewLauncher = _previewLauncher.current;
+          if (previewLauncher && previewLauncher.capturePreviewPage) {
+            return previewLauncher.capturePreviewPage(windowId);
+          }
+          return Promise.resolve(null);
+        },
         generateEvents,
         onSceneEventsModifiedOutsideEditor,
         onExtensionFunctionEventsModifiedOutsideEditor,

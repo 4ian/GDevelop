@@ -3,6 +3,7 @@ const {
   ipcMain,
   shell,
   screen,
+  powerSaveBlocker,
 } = require('electron');
 const isDev = require('electron-is-dev');
 const { load } = require('./Utils/UrlLoader');
@@ -13,6 +14,36 @@ const { load } = require('./Utils/UrlLoader');
 let previewWindows = [];
 
 let openDevToolsByDefault = false;
+
+// While ANY preview is open we hold a power-save blocker. macOS suspends the
+// entire renderer process of an OCCLUDED window (not just its requestAnimationFrame
+// loop) — which kills the debugger websocket pump, so run_frames /
+// inspect_running_preview / capture_preview_screenshot all time out on a preview
+// that opened behind the editor. 'prevent-app-suspension' keeps the app (and its
+// renderer processes' JS event loops) alive so those debugger-channel tools keep
+// working even when the preview is not foreground. Ref-counted to the number of
+// open previews. (backgroundThrottling:false alone does NOT cover occlusion.)
+let powerSaveBlockerId = null;
+const updatePowerSaveBlocker = () => {
+  const shouldBlock = previewWindows.length > 0;
+  if (shouldBlock && powerSaveBlockerId === null) {
+    try {
+      powerSaveBlockerId = powerSaveBlocker.start('prevent-app-suspension');
+    } catch (error) {
+      console.warn('Could not start power save blocker for preview:', error);
+      powerSaveBlockerId = null;
+    }
+  } else if (!shouldBlock && powerSaveBlockerId !== null) {
+    try {
+      if (powerSaveBlocker.isStarted(powerSaveBlockerId)) {
+        powerSaveBlocker.stop(powerSaveBlockerId);
+      }
+    } catch (error) {
+      console.warn('Could not stop power save blocker for preview:', error);
+    }
+    powerSaveBlockerId = null;
+  }
+};
 
 /**
  * Open 1 or multiple windows running a preview of an exported game.
@@ -77,11 +108,13 @@ const openPreviewWindow = ({
       previewWindow: previewWindow,
       parentWindowId: parentWindow ? parentWindow.id : null,
     });
+    updatePowerSaveBlocker();
 
     previewWindow.on('closed', closeEvent => {
       previewWindows = previewWindows.filter(
         entry => entry.previewWindow !== previewWindow
       );
+      updatePowerSaveBlocker();
       // Only send message if the parent window still exists
       if (openEvent.sender && !openEvent.sender.isDestroyed()) {
         openEvent.sender.send('preview-window-closed');
@@ -129,12 +162,22 @@ const closeAllPreviewWindows = () => {
 
 const focusAllPreviewWindows = () => {
   previewWindows.forEach(entry => {
+    const win = entry.previewWindow;
     try {
-      if (entry.previewWindow && !entry.previewWindow.isDestroyed()) {
-        // show() un-minimizes / reveals; focus() brings to front. Together they
-        // counter OS throttling of backgrounded preview windows.
-        entry.previewWindow.show();
-        entry.previewWindow.focus();
+      if (win && !win.isDestroyed()) {
+        // De-occlude as aggressively as possible so Chromium resumes the
+        // window's requestAnimationFrame loop (it throttles/pauses rAF for
+        // occluded/backgrounded windows even with backgroundThrottling:false).
+        // show() reveals/un-minimizes, moveTop() raises in the z-order,
+        // focus() gives input focus. The transient alwaysOnTop toggle forces
+        // the window above other app windows on macOS where focus() alone may
+        // not change occlusion.
+        if (win.isMinimized()) win.restore();
+        win.show();
+        if (typeof win.moveTop === 'function') win.moveTop();
+        win.setAlwaysOnTop(true);
+        win.focus();
+        win.setAlwaysOnTop(false);
       }
     } catch (error) {
       console.warn('Ignoring exception when focusing preview window:', error);
@@ -143,10 +186,41 @@ const focusAllPreviewWindows = () => {
   return previewWindows.length;
 };
 
+// Capture a PNG of a preview window's content from the MAIN process via
+// webContents.capturePage(). Unlike the renderer-side canvas.toDataURL path,
+// this does NOT execute any JS in the (possibly OS-suspended) renderer, so it
+// works for a preview that opened behind the editor. Returns a base64 PNG data
+// URL plus size, or { error }. If windowId is omitted, captures the most
+// recently opened preview (last in the list = newest).
+const capturePreviewPage = async windowId => {
+  let entry = null;
+  if (windowId !== undefined && windowId !== null) {
+    entry = previewWindows.find(e => e.previewWindow.id === windowId);
+  } else if (previewWindows.length) {
+    entry = previewWindows[previewWindows.length - 1];
+  }
+  if (!entry || !entry.previewWindow || entry.previewWindow.isDestroyed()) {
+    return { error: 'No preview window available to capture.' };
+  }
+  try {
+    const image = await entry.previewWindow.webContents.capturePage();
+    const size = image.getSize();
+    return {
+      dataUrl: image.toDataURL(),
+      width: size.width,
+      height: size.height,
+      windowId: entry.previewWindow.id,
+    };
+  } catch (error) {
+    return { error: 'capturePage failed: ' + (error.message || String(error)) };
+  }
+};
+
 module.exports = {
   openPreviewWindow,
   closePreviewWindow,
   closePreviewWindowsForParent,
   closeAllPreviewWindows,
   focusAllPreviewWindows,
+  capturePreviewPage,
 };

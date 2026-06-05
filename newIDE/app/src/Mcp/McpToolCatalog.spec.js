@@ -57,6 +57,7 @@ describe('McpToolCatalog', () => {
     expect(toolNames).toContain('set_sprite_animations');
     expect(toolNames).toContain('bulk_edit_scene_assets');
     expect(toolNames).toContain('slice_sprite_sheet');
+    expect(toolNames).toContain('render_scene_to_png');
     expect(toolNames).toContain('replace_object_definition');
     expect(toolNames).toContain('delete_scene_object');
     expect(toolNames).toContain('set_object_properties');

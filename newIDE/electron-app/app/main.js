@@ -45,6 +45,7 @@ const {
   closePreviewWindowsForParent,
   closeAllPreviewWindows,
   focusAllPreviewWindows,
+  capturePreviewPage,
 } = require('./PreviewWindow');
 const {
   setupLocalGDJSDevelopmentWatcher,
@@ -623,6 +624,10 @@ app.on('ready', function() {
 
   ipcMain.handle('preview-focus-all', async () => {
     return focusAllPreviewWindows();
+  });
+
+  ipcMain.handle('preview-capture-page', async (event, options) => {
+    return capturePreviewPage(options && options.windowId);
   });
 
   // Piskel image editor

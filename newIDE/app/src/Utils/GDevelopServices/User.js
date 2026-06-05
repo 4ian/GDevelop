@@ -407,9 +407,11 @@ export const updateUserGroup = async (
   teamId: string,
   groupId: string,
   userId: string
-): Promise<Array<TeamGroup>> => {
+): Promise<void> => {
   const authorizationHeader = await getAuthorizationHeader();
-  const response = await client.post(
+  // The endpoint responds with a simple 'OK' string, so don't try
+  // to validate the response content.
+  await client.post(
     `/team/${teamId}/action/update-members`,
     [{ groupId, userId }],
     {
@@ -417,10 +419,6 @@ export const updateUserGroup = async (
       params: { userId: adminUserId },
     }
   );
-  return ensureIsArray({
-    data: response.data,
-    endpointName: '/team/{id}/action/update-members of User API',
-  });
 };
 
 export const getUserPublicProfilesByIds = async (

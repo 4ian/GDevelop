@@ -2741,6 +2741,9 @@ describe('McpEditorBridge', () => {
           height: 1,
           error: null,
         },
+        refresh: {
+          __fullMessage: { payload: { _sceneStack: { _stack: [] } } },
+        },
       },
     });
 
@@ -2805,8 +2808,107 @@ describe('McpEditorBridge', () => {
     });
     const result = JSON.parse(response.content[0].text);
     expect(result.success).toBe(true);
-    // It must have addressed exactly the requested (older) preview, not latest.
-    expect(requestedIds).toEqual(['preview-ws-0']);
+    // It must have addressed only the requested (older) preview, not latest —
+    // both the metadata refresh and the screenshot target that id.
+    expect(requestedIds.every(id => id === 'preview-ws-0')).toBe(true);
+    expect(requestedIds).toContain('preview-ws-0');
+    expect(result.debuggerId).toBe('preview-ws-0');
+  });
+
+  it('builds an action instruction from named parameters via create_action', async () => {
+    // $FlowFixMe[invalid-constructor]
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    project.insertNewLayout('Level1', 0);
+    try {
+      const bridge = makeBridge({ getProject: () => project });
+
+      // SetNumberVariable: [variable, operator, value]. Provide by index.
+      const numberResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'create_action',
+          arguments: {
+            type: 'SetNumberVariable',
+            parameters: { '0': 'Score', '1': '=', '2': '100' },
+          },
+        },
+      });
+      const numberResult = JSON.parse(numberResponse.content[0].text);
+      expect(numberResponse.isError).not.toBe(true);
+      expect(numberResult.instruction.type.value).toBe('SetNumberVariable');
+      expect(numberResult.instruction.parameters).toEqual([
+        'Score',
+        '=',
+        '100',
+      ]);
+
+      // SetBooleanVariable has a hidden code-only 3rd param — it must be auto
+      // filled with "" so the array length is correct.
+      const boolResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'create_action',
+          arguments: {
+            type: 'SetBooleanVariable',
+            parameters: { '0': 'GameOver', '1': 'True' },
+          },
+        },
+      });
+      const boolResult = JSON.parse(boolResponse.content[0].text);
+      expect(boolResult.instruction.parameters[0]).toBe('GameOver');
+      expect(boolResult.instruction.parameters[1]).toBe('True');
+      // Trailing code-only param present as "".
+      expect(boolResult.instruction.parameters.length).toBeGreaterThanOrEqual(
+        3
+      );
+      expect(boolResult.instruction.parameters[2]).toBe('');
+    } finally {
+      project.delete();
+    }
+  });
+
+  it('snapshots and restores the project (rollback)', async () => {
+    // $FlowFixMe[invalid-constructor]
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    project.insertNewLayout('Level1', 0);
+    try {
+      const bridge = makeBridge({
+        getProject: () => project,
+        getPermissions: () => ({
+          allowWriteTools: true,
+          allowCommandTools: false,
+        }),
+      });
+
+      // Snapshot, then make a change, then restore and confirm rollback.
+      const snapResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: { name: 'snapshot_project', arguments: { label: 'before' } },
+      });
+      const snap = JSON.parse(snapResponse.content[0].text);
+      expect(snap.success).toBe(true);
+      expect(typeof snap.snapshotId).toBe('string');
+
+      // Mutate: add a second scene.
+      project.insertNewLayout('Level2', 1);
+      expect(project.getLayoutsCount()).toBe(2);
+
+      const restoreResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'restore_project_snapshot',
+          arguments: { snapshot_id: snap.snapshotId },
+        },
+      });
+      const restore = JSON.parse(restoreResponse.content[0].text);
+      expect(restore.success).toBe(true);
+      // Rolled back to the single-scene snapshot.
+      expect(project.getLayoutsCount()).toBe(1);
+      expect(project.hasLayoutNamed('Level1')).toBe(true);
+      expect(project.hasLayoutNamed('Level2')).toBe(false);
+    } finally {
+      project.delete();
+    }
   });
 
   it('launch_preview with start_paused pauses the new preview on connect', async () => {
@@ -2870,6 +2972,9 @@ describe('McpEditorBridge', () => {
           width: 1,
           height: 1,
           error: null,
+        },
+        refresh: {
+          __fullMessage: { payload: { _sceneStack: { _stack: [] } } },
         },
       },
     });
@@ -3168,6 +3273,63 @@ describe('McpEditorBridge', () => {
       ).toContain('DestroyOutside');
       expect(layout.getVariables().has('Score')).toBe(true);
       expect(project.getVariables().has('Best')).toBe(true);
+    } finally {
+      project.delete();
+    }
+  });
+
+  it('bulk_edit_scene_assets dry_run does NOT mutate (assets or events)', async () => {
+    // $FlowFixMe[invalid-constructor]
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    const layout = project.insertNewLayout('Level1', 0);
+    const triggerUnsavedChanges = jest.fn();
+    // A real processEditorFunctionCalls would write events; assert it is NEVER
+    // called under dry_run (the previous bug wrote events despite dry_run).
+    const processEditorFunctionCalls = jest.fn(async () => ({ results: [] }));
+
+    try {
+      const bridge = makeBridge({
+        getProject: () => project,
+        getPermissions: () => ({
+          allowWriteTools: true,
+          allowCommandTools: false,
+        }),
+        triggerUnsavedChanges,
+        processEditorFunctionCalls,
+      });
+
+      const response = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'bulk_edit_scene_assets',
+          arguments: {
+            scene_name: 'Level1',
+            dry_run: true,
+            variables: [{ scope: 'scene', name: 'Score', value: 0 }],
+            events: [
+              {
+                type: 'BuiltinCommonInstructions::Standard',
+                conditions: [],
+                actions: [
+                  {
+                    type: { value: 'SetNumberVariable' },
+                    parameters: ['Score', '=', '0'],
+                  },
+                ],
+              },
+            ],
+          },
+        },
+      });
+      const result = JSON.parse(response.content[0].text);
+      expect(result.dryRun).toBe(true);
+      expect(result.mutated).toBe(false);
+      // Nothing was written: no scene variable, no events, no events follow-up,
+      // and the project was not marked dirty.
+      expect(layout.getVariables().has('Score')).toBe(false);
+      expect(layout.getEvents().getEventsCount()).toBe(0);
+      expect(processEditorFunctionCalls).not.toHaveBeenCalled();
+      expect(triggerUnsavedChanges).not.toHaveBeenCalled();
     } finally {
       project.delete();
     }

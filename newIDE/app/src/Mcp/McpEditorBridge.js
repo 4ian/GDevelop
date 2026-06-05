@@ -6,6 +6,7 @@ import {
   getMcpTools,
   getAllMcpToolsForIntrospection,
   getMcpToolUsageExamples,
+  getCapabilitiesSummary,
   canCallMcpTool,
   isKnownMcpTool,
   type McpPermissionOptions,
@@ -23,6 +24,7 @@ import {
   validateEventsJsonFile,
   validateEventsJson,
   autoQuoteEventParameters,
+  buildInstruction,
 } from './McpEventKnowledge';
 import {
   createOrUpdateExtension,
@@ -44,6 +46,7 @@ import {
 } from './McpExtensionTools';
 import {
   addOrUpdateResource,
+  replaceProjectResource,
   applyValidatedScenePatch,
   bulkEditSceneAssets,
   createSpriteObjectFromResource,
@@ -74,7 +77,12 @@ import {
   replaceSceneEventsFromFile,
   wrapEventsInGroup,
 } from './McpEventTools';
-import { setFirstLayout, setProjectProperties } from './McpProjectTools';
+import {
+  setFirstLayout,
+  setProjectProperties,
+  snapshotProject,
+  restoreProjectSnapshot,
+} from './McpProjectTools';
 import optionalRequire from '../Utils/OptionalRequire';
 
 const gd: libGDevelop = global.gd;
@@ -539,6 +547,15 @@ const captureRunningPreviewState = (
         latestDebuggerId: latestId,
         inspectedLatest: targetId === latestId,
         availableDebuggerIds: previewIds,
+        // Preview health (#3): distinguish "connected + debugger responded with a
+        // dump" from "connected but the debugger channel did not answer" (the OS
+        // likely suspended an occluded window). 'responsive' = we got the dump;
+        // 'connected-unresponsive' = socket up but no dump before timeout.
+        previewHealth: dumpPayload
+          ? 'responsive'
+          : status
+          ? 'connected-status-only'
+          : 'connected-unresponsive',
         status,
         // Sounds played since the previous inspect — confirms PlaySound/PlayMusic
         // actions actually fired (the previous audio verification blind spot).
@@ -650,7 +667,14 @@ const captureRunningPreviewState = (
 // it does not run JS in the (possibly OS-suspended) renderer of an occluded
 // preview window. Falls back to the renderer-side canvas.toDataURL debugger
 // command when main-process capture is unavailable or fails.
-const writeOrReturnScreenshot = (dataUrl, width, height, args, source) => {
+const writeOrReturnScreenshot = (
+  dataUrl,
+  width,
+  height,
+  args,
+  source,
+  extra
+) => {
   const base64 = dataUrl.replace(/^data:image\/png;base64,/, '');
   const filePath =
     args && typeof args.file_path === 'string' ? args.file_path : null;
@@ -662,6 +686,7 @@ const writeOrReturnScreenshot = (dataUrl, width, height, args, source) => {
       height,
       dataUrl,
       source,
+      ...(extra || {}),
       note: filePath
         ? 'Filesystem access is unavailable; returning the data URL instead of writing a file.'
         : 'No file_path given; returning the PNG as a base64 data URL.',
@@ -685,7 +710,15 @@ const writeOrReturnScreenshot = (dataUrl, width, height, args, source) => {
       dataUrl,
     };
   }
-  return { success: true, running: true, filePath, width, height, source };
+  return {
+    success: true,
+    running: true,
+    filePath,
+    width,
+    height,
+    source,
+    ...(extra || {}),
+  };
 };
 
 const capturePreviewScreenshot = async (
@@ -696,6 +729,30 @@ const capturePreviewScreenshot = async (
   const guard = requireRunningPreview(previewDebuggerServer, args);
   if (!guard.ok) return guard.result;
   const targetId = guard.targetId;
+
+  // Quick context so the result is self-describing (#5): which preview + the
+  // game scene/time the frame reflects, so a stale capture is obvious. Best
+  // effort — a throttled window may not answer, then meta is just { debuggerId }.
+  const meta = { debuggerId: targetId };
+  try {
+    const status = await sendTargetedRequest(
+      (previewDebuggerServer: any),
+      targetId,
+      { command: 'refresh' },
+      { timeoutMs: 1500, returnFullMessage: true }
+    );
+    const dump = status && status.matched && status.payload;
+    const dumpPayload = dump && dump.payload;
+    const runtime = dumpPayload
+      ? summarizeRuntimeGameDump(dumpPayload, {})
+      : null;
+    if (runtime && runtime.scenes && runtime.scenes[0]) {
+      meta.sceneName = runtime.scenes[0].name;
+      meta.sceneElapsedTimeSeconds = runtime.scenes[0].sceneElapsedTimeSeconds;
+    }
+  } catch (error) {
+    // ignore — meta stays as { debuggerId }
+  }
 
   // 1. Try the main-process capturePage path first — it works even when the
   // preview renderer is suspended (occluded window). It captures the latest
@@ -709,7 +766,8 @@ const capturePreviewScreenshot = async (
           mainResult.width,
           mainResult.height,
           args,
-          'main-process-capturePage'
+          'main-process-capturePage',
+          meta
         );
       }
       // mainResult.error → fall through to the debugger path below.
@@ -754,7 +812,8 @@ const capturePreviewScreenshot = async (
     payload.width,
     payload.height,
     args,
-    'renderer-canvas'
+    'renderer-canvas',
+    meta
   );
 };
 
@@ -1927,6 +1986,27 @@ const callMcpTool = async ({
     });
   }
 
+  if (toolName === 'gdevelop_capabilities') {
+    return textResult(getCapabilitiesSummary(context.getPermissions()));
+  }
+
+  if (toolName === 'create_action' || toolName === 'create_condition') {
+    if (!project) return errorResult('No project opened.');
+    const type = args && typeof args.type === 'string' ? args.type : '';
+    if (!type) return errorResult('Missing instruction "type".');
+    try {
+      const built = buildInstruction({
+        project,
+        type,
+        kind: toolName === 'create_condition' ? 'condition' : 'action',
+        parameters: (args && args.parameters) || {},
+      });
+      return textResult(built);
+    } catch (error) {
+      return errorResult(error.message);
+    }
+  }
+
   if (toolName === 'read_serialized_scene') {
     if (!project) return errorResult('No project opened.');
     try {
@@ -2182,9 +2262,31 @@ const callMcpTool = async ({
     }
     try {
       const result = await context.saveProjectAndWait();
+      // Post-save consistency snapshot (#11): report project-level facts so the
+      // caller can confirm the saved state matches intent without a separate read.
+      const project = context.getProject ? context.getProject() : null;
+      let consistency;
+      if (project) {
+        const sceneNames = [];
+        for (let i = 0; i < project.getLayoutsCount(); i++) {
+          sceneNames.push(project.getLayoutAt(i).getName());
+        }
+        consistency = {
+          projectName: project.getName ? project.getName() : undefined,
+          projectFile: project.getProjectFile
+            ? project.getProjectFile() || undefined
+            : undefined,
+          firstLayout: project.getFirstLayout
+            ? project.getFirstLayout() || undefined
+            : undefined,
+          sceneCount: sceneNames.length,
+          sceneNames,
+        };
+      }
       return textResult({
         saved: !!result,
         result,
+        consistency,
       });
     } catch (error) {
       return errorResult(
@@ -2302,6 +2404,25 @@ const callMcpTool = async ({
     projectWriteToolHandler = setFirstLayout;
   }
 
+  if (toolName === 'snapshot_project') {
+    if (!project) return errorResult('No project opened.');
+    try {
+      return textResult(snapshotProject(project, args || {}));
+    } catch (error) {
+      return errorResult(error.message);
+    }
+  }
+  if (toolName === 'restore_project_snapshot') {
+    if (!project) return errorResult('No project opened.');
+    try {
+      const result = restoreProjectSnapshot(project, args || {});
+      context.triggerUnsavedChanges();
+      return textResult(result);
+    } catch (error) {
+      return errorResult(error.message);
+    }
+  }
+
   if (projectWriteToolHandler) {
     if (!project) return errorResult('No project opened.');
     try {
@@ -2316,6 +2437,8 @@ const callMcpTool = async ({
   let sceneWriteToolHandler = null;
   if (toolName === 'add_or_update_resource') {
     sceneWriteToolHandler = addOrUpdateResource;
+  } else if (toolName === 'replace_project_resource') {
+    sceneWriteToolHandler = replaceProjectResource;
   } else if (toolName === 'generate_placeholder_asset') {
     sceneWriteToolHandler = generatePlaceholderAsset;
   } else if (toolName === 'render_scene_to_png') {
@@ -2370,13 +2493,25 @@ const callMcpTool = async ({
           context.onInstancesModifiedOutsideEditor,
         onObjectsModifiedOutsideEditor: context.onObjectsModifiedOutsideEditor,
       });
-      context.triggerUnsavedChanges();
+      // A dry_run handler returns without mutating — don't mark the project
+      // dirty and don't run any follow-up writes (e.g. the bulk events step).
+      const isDryRun = !!(
+        args &&
+        (args.dry_run === true || args.dryRun === true) &&
+        result &&
+        result.dryRun === true
+      );
+      if (!isDryRun) context.triggerUnsavedChanges();
 
       // bulk_edit_scene_assets can also write events in the same call. Events are
       // applied LAST (after resources/objects/animations/behaviors/variables/
       // instances) and go through the SAME validated add_scene_events path — no
       // structural validation (e.g. Or/And subInstructions checks) is bypassed.
+      // CRITICAL: when dry_run is set, the assets handler returned WITHOUT
+      // mutating; we must NOT write events either, or dry_run would still change
+      // the project (a dangerous bug). Skip the events follow-up entirely.
       if (
+        !isDryRun &&
         toolName === 'bulk_edit_scene_assets' &&
         args &&
         (typeof args.events_json === 'string' ||

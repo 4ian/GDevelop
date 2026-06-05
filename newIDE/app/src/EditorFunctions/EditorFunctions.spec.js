@@ -1271,12 +1271,22 @@ describe('editorFunctions', () => {
       expect(result).toMatchInlineSnapshot(`
         Object {
           "aiGeneratedEventId": "mcp-direct-event",
-          "message": "Added 1 event operation(s).",
+          "lowLevelMutations": 1,
+          "message": "Applied 1 requested event operation(s) (insert_at_end: 1); 1 low-level event mutation(s).",
           "newlyAddedResources": Array [
             Object {
               "resourceKind": "fake-resource-kind",
               "resourceName": "fake-resource-name",
               "status": "resource-installed",
+            },
+          ],
+          "operationSummary": Object {
+            "insert_at_end": 1,
+          },
+          "requestedOperations": Array [
+            Object {
+              "operation": "insert_at_end",
+              "target": null,
             },
           ],
           "success": true,

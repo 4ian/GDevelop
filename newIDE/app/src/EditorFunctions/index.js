@@ -4455,9 +4455,29 @@ const addSceneEvents: EditorFunction = {
           resources: allMissingResources,
         });
 
+        // Per-operation summary so the receipt is unambiguous: list each
+        // requested operation (name + target). Note `applied` counts LOW-LEVEL
+        // mutations (a single replace expands to delete+insert), so report both
+        // the requested-operation count and the low-level applied count.
+        const requestedOperations = directEventChanges.map(change => ({
+          operation: change.operationName,
+          target: change.operationTargetEvent || null,
+        }));
+        const operationSummary = requestedOperations.reduce((acc, op) => {
+          acc[op.operation] = (acc[op.operation] || 0) + 1;
+          return acc;
+        }, {});
+
         return {
           success: true,
-          message: `Added ${applied} event operation(s).`,
+          message: `Applied ${
+            requestedOperations.length
+          } requested event operation(s) (${Object.keys(operationSummary)
+            .map(name => `${name}: ${operationSummary[name]}`)
+            .join(', ')}); ${applied} low-level event mutation(s).`,
+          requestedOperations,
+          operationSummary,
+          lowLevelMutations: applied,
           aiGeneratedEventId: directGeneratedEventId,
           newlyAddedResources,
           ...(errors.length > 0 ? { errors } : undefined),

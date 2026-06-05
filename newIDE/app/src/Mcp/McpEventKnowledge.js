@@ -1486,6 +1486,95 @@ const getInstructionMetadataForValidation = (
     : metadata;
 };
 
+// High-level instruction builder (#8): given an instruction type + a map of
+// named parameter values (keyed by parameter name OR index), produce a
+// correctly-ORDERED, fully-populated `parameters` array — code-only slots filled
+// with "", string/identifier/resource values quoted/bare per their type — so
+// callers don't hand-align indexes, hidden params, and quoting. Returns
+// { instruction: { type:{value}, parameters }, filled, warnings } or throws on
+// unknown type / unfillable required parameter.
+export const buildInstruction = ({
+  project,
+  type,
+  kind,
+  parameters,
+}: {|
+  project: gdProject,
+  type: string,
+  kind: 'action' | 'condition',
+  parameters: Object,
+|}): Object => {
+  const isCondition = kind === 'condition';
+  const metadata = getInstructionMetadataForValidation(
+    project,
+    type,
+    isCondition
+  );
+  if (!metadata) {
+    throw new Error(
+      `Unknown ${kind} type "${type}". Use gdevelop_search_instruction_metadata to find the exact type.`
+    );
+  }
+  const named = parameters && typeof parameters === 'object' ? parameters : {};
+  const count = metadata.getParametersCount();
+  const out = [];
+  const warnings = [];
+  const filled = [];
+  for (let index = 0; index < count; index++) {
+    const param = metadata.getParameter(index);
+    const paramType = param.getType();
+    const paramName = param.getName();
+    if (param.isCodeOnly()) {
+      out.push('');
+      continue;
+    }
+    // Look up the provided value by name, then by positional index.
+    let value;
+    if (paramName && named[paramName] !== undefined) value = named[paramName];
+    else if (named[String(index)] !== undefined) value = named[String(index)];
+    else if (named[index] !== undefined) value = named[index];
+    else {
+      const def = param.getDefaultValue();
+      if (def) {
+        out.push(def);
+        filled.push({ index, name: paramName, value: def, source: 'default' });
+        continue;
+      }
+      if (!param.isOptional()) {
+        warnings.push(
+          `Required parameter "${paramName ||
+            index}" (type ${paramType}) was not provided and has no default.`
+        );
+      }
+      out.push('');
+      continue;
+    }
+    // Type-aware serialization: numbers/operators/objects/variables/resources go
+    // in bare; string-expression types get wrapped in quotes if a plain literal.
+    let serialized;
+    if (typeof value === 'number' || typeof value === 'boolean') {
+      serialized = String(value);
+    } else {
+      serialized = String(value);
+      const needsQuotes =
+        QUOTED_STRING_PARAMETER_TYPES.has(paramType) &&
+        !/^".*"$/.test(serialized.trim()) &&
+        // Don't quote an expression that already looks composed (concatenation,
+        // function call) — only bare single literals.
+        !/[+()]/.test(serialized);
+      if (needsQuotes) serialized = JSON.stringify(serialized);
+    }
+    out.push(serialized);
+    filled.push({ index, name: paramName, value: serialized });
+  }
+  return {
+    instruction: { type: { value: type }, parameters: out },
+    parameters: out,
+    filled,
+    warnings: warnings.length ? warnings : undefined,
+  };
+};
+
 // Parameter types where a bare literal is almost never a valid expression, so
 // auto-wrapping it in quotes is safe and fixes the most common quoting mistake
 // (e.g. layer "HUD", a timer identifier, a key name, a color, a scene name).

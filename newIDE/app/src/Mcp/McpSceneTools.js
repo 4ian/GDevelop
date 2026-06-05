@@ -703,8 +703,76 @@ export const renderSceneToPng = (project: gdProject, args: Object): Object => {
     ];
   };
 
+  // Resolve an object's first-frame image resource name (Sprite only), so we can
+  // composite the REAL pixels instead of a box. Cached per object name.
+  const firstFrameResourceCache = {};
+  const getFirstFrameResourceName = (objectName: string): ?string => {
+    if (firstFrameResourceCache[objectName] !== undefined)
+      return firstFrameResourceCache[objectName];
+    let result = null;
+    let object = null;
+    if (scene.getObjects().hasObjectNamed(objectName))
+      object = scene.getObjects().getObject(objectName);
+    else if (project.getObjects().hasObjectNamed(objectName))
+      object = project.getObjects().getObject(objectName);
+    if (object && object.getType() === 'Sprite') {
+      try {
+        const config = gd.asSpriteConfiguration(object.getConfiguration());
+        const anims = config.getAnimations();
+        if (anims.getAnimationsCount() > 0) {
+          const anim = anims.getAnimation(0);
+          if (anim.getDirectionsCount() > 0) {
+            const dir = anim.getDirection(0);
+            if (dir.getSpritesCount() > 0) {
+              result = dir.getSprite(0).getImageName() || null;
+            }
+          }
+        }
+      } catch (error) {
+        result = null;
+      }
+    }
+    firstFrameResourceCache[objectName] = result;
+    return result;
+  };
+
+  // Decode + nearest-neighbour scale a resource image into RGBA, cached.
+  const decodedImageCache = {};
+  const getDecodedImage = (resourceName: string): ?Object => {
+    if (decodedImageCache[resourceName] !== undefined)
+      return decodedImageCache[resourceName];
+    let decoded = null;
+    if (nativeImage) {
+      const dims = null; // unused
+      void dims;
+      const rm = project.getResourcesManager();
+      if (rm.hasResource(resourceName)) {
+        const file = rm.getResource(resourceName).getFile();
+        const absImg = resolveLocalResourceFile(project, file) || file;
+        if (absImg && (!fs || fs.existsSync(absImg))) {
+          try {
+            const img = nativeImage.createFromPath(absImg);
+            const size = img.getSize();
+            if (size.width && size.height) {
+              decoded = {
+                width: size.width,
+                height: size.height,
+                rgba: img.toBitmap(), // BGRA on most platforms
+              };
+            }
+          } catch (error) {
+            decoded = null;
+          }
+        }
+      }
+    }
+    decodedImageCache[resourceName] = decoded;
+    return decoded;
+  };
+
   const initialInstances = scene.getInitialInstances();
   const drawn = [];
+  let spritesComposited = 0;
   iterateInitialInstances(initialInstances, instance => {
     const name = instance.getObjectName();
     const w = instance.hasCustomSize()
@@ -719,11 +787,45 @@ export const renderSceneToPng = (project: gdProject, args: Object): Object => {
     const y0 = Math.round(instance.getY() * scale);
     const x1 = Math.round((instance.getX() + effectiveW) * scale);
     const y1 = Math.round((instance.getY() + effectiveH) * scale);
+
+    // Try to composite the REAL sprite image (#12). nativeImage.toBitmap()
+    // returns BGRA bytes; sample nearest-neighbour into the destination rect.
+    let composited = false;
+    const resourceName = getFirstFrameResourceName(name);
+    if (resourceName) {
+      const decoded = getDecodedImage(resourceName);
+      if (decoded && x1 > x0 && y1 > y0) {
+        for (let y = y0; y < y1; y++) {
+          const sy = Math.min(
+            decoded.height - 1,
+            Math.floor(((y - y0) / (y1 - y0)) * decoded.height)
+          );
+          for (let x = x0; x < x1; x++) {
+            const sx = Math.min(
+              decoded.width - 1,
+              Math.floor(((x - x0) / (x1 - x0)) * decoded.width)
+            );
+            const so = (sy * decoded.width + sx) * 4;
+            // BGRA → RGBA.
+            const b = decoded.rgba[so];
+            const g = decoded.rgba[so + 1];
+            const r = decoded.rgba[so + 2];
+            const a = decoded.rgba[so + 3];
+            if (a > 0) setPixel(x, y, r, g, b, a);
+          }
+        }
+        composited = true;
+        spritesComposited++;
+      }
+    }
+
     const [r, g, b] = colorForName(name);
-    // Filled translucent body.
-    for (let y = y0; y < y1; y++)
-      for (let x = x0; x < x1; x++) setPixel(x, y, r, g, b, 150);
-    // Opaque border.
+    if (!composited) {
+      // Fallback: filled translucent body (e.g. Text objects, or undecodable).
+      for (let y = y0; y < y1; y++)
+        for (let x = x0; x < x1; x++) setPixel(x, y, r, g, b, 150);
+    }
+    // Opaque border (always, so placement is clear even over composited art).
     for (let x = x0; x < x1; x++) {
       setPixel(x, y0, r, g, b, 255);
       setPixel(x, y1 - 1, r, g, b, 255);
@@ -739,6 +841,7 @@ export const renderSceneToPng = (project: gdProject, args: Object): Object => {
       width: effectiveW,
       height: effectiveH,
       layer: instance.getLayer() || '',
+      composited,
     });
   });
 
@@ -766,9 +869,10 @@ export const renderSceneToPng = (project: gdProject, args: Object): Object => {
     renderedSize: { width, height },
     scale,
     instanceCount: drawn.length,
+    spritesComposited,
     instances: drawn,
     note:
-      'Schematic LAYOUT render (one labelled box per initial instance at its position/size) — verifies placement, not final art. Does not run the game, so it works when a live preview is unavailable. Each object name maps to a stable color. For pixel-accurate visuals, use capture_preview_screenshot on a running preview.',
+      'Static LAYOUT render without running the game (works when no preview is available). Sprite instances composite their REAL first-frame image (scaled to the instance size); Text and undecodable objects show a labelled colored box. Each object has a border so placement is clear. For an exact, animated, fully-rendered frame use capture_preview_screenshot on a running preview.',
   };
 };
 
@@ -830,6 +934,57 @@ export const addOrUpdateResource = (
     created,
     resource: serializeResource(storedResource),
     fileStatus: getResourceFileStatus(project, storedResource),
+  };
+};
+
+// Replace an EXISTING resource's file in place (e.g. swap a generated
+// placeholder for finished art under the same name), so every Sprite frame /
+// reference that uses the name automatically picks up the new file. Unlike
+// add_or_update_resource this REQUIRES the resource to already exist (it is a
+// targeted swap, not a create) and reports which scene objects reference it so
+// you can re-verify. The kind must match (pass replace_kind via
+// add_or_update_resource if you need to change kind). A running preview needs a
+// fresh launch/hot-reload to show the new pixels.
+export const replaceProjectResource = (
+  project: gdProject,
+  args: Object
+): Object => {
+  const name = getRequiredString(args, 'name');
+  const file = getRequiredString(args, 'file');
+  const resourcesManager = project.getResourcesManager();
+  if (!resourcesManager.hasResource(name)) {
+    throw new Error(
+      `Resource "${name}" does not exist. Use add_or_update_resource to create it, or check the name with inspect_project_resources.`
+    );
+  }
+  const resource = resourcesManager.getResource(name);
+  resource.setFile(file);
+  // No longer a generated placeholder once a real file is swapped in.
+  if (typeof resource.setUserAdded === 'function') resource.setUserAdded(true);
+
+  // Find scene objects (Sprite frames, etc.) that reference this resource name,
+  // so the caller can re-verify what was affected.
+  const usedBy = [];
+  for (let i = 0; i < project.getLayoutsCount(); i++) {
+    const scene = project.getLayoutAt(i);
+    const objects = scene.getObjects();
+    for (let j = 0; j < objects.getObjectsCount(); j++) {
+      const object = objects.getObjectAt(j);
+      const serialized = serializeToJSObject(object);
+      if (JSON.stringify(serialized).includes(`"${name}"`)) {
+        usedBy.push({ scene: scene.getName(), object: object.getName() });
+      }
+    }
+  }
+
+  return {
+    success: true,
+    name,
+    file,
+    fileStatus: getResourceFileStatus(project, resource),
+    usedBy,
+    note:
+      'Resource file replaced in place; all references to this name now use the new file. A running preview needs a fresh launch / hot reload to show the new pixels.',
   };
 };
 
@@ -2401,7 +2556,8 @@ const topLevelInstanceFieldNames = [
 
 const buildOptionalInstancePayload = (
   args: Object,
-  objectName: string
+  objectName: string,
+  didCreateObject?: boolean
 ): Object | null => {
   const instanceArg =
     args && args.instance && typeof args.instance === 'object'
@@ -2410,11 +2566,19 @@ const buildOptionalInstancePayload = (
   const hasTopLevelInstanceFields = topLevelInstanceFieldNames.some(
     fieldName => args && args[fieldName] !== undefined
   );
+  // #6: only INFER instance creation (from top-level x/y/width/... fields) when
+  // the object was just CREATED. When UPDATING an existing object, an instance
+  // is created ONLY on an explicit create_instance:true — otherwise updating a
+  // property (or passing a sizing field) would silently spawn a stray instance
+  // at (0,0). An explicit `instance:{...}` payload still creates one either way.
+  const inferFromFields =
+    didCreateObject === false
+      ? !!instanceArg
+      : !!instanceArg || hasTopLevelInstanceFields;
   const shouldCreateInstance =
     args &&
     (args.create_instance === true ||
-      (args.create_instance !== false &&
-        (instanceArg || hasTopLevelInstanceFields)));
+      (args.create_instance !== false && inferFromFields));
 
   if (!shouldCreateInstance) return null;
 
@@ -2545,7 +2709,11 @@ export const createSpriteObjectFromResource = (
     callbacks
   );
 
-  const instancePayload = buildOptionalInstancePayload(args, objectName);
+  const instancePayload = buildOptionalInstancePayload(
+    args,
+    objectName,
+    objectResult.didCreate
+  );
   const instanceResult = instancePayload
     ? putStructured2dInstances(
         project,
@@ -2624,7 +2792,11 @@ export const createTextObject = (
     textResult = setTextObjectProperties(project, args, callbacks);
   }
 
-  const instancePayload = buildOptionalInstancePayload(args, objectName);
+  const instancePayload = buildOptionalInstancePayload(
+    args,
+    objectName,
+    objectResult.didCreate
+  );
   // Text anchoring fix (#6/#18): a freshly created Text object has width 0, so a
   // plain align of "center"/"right" would anchor its LEFT edge (text off-center
   // or pushed off-screen). When the caller anchors a text instance horizontally
@@ -3333,6 +3505,8 @@ export const bulkEditSceneAssets = (
     return {
       success: issues.length === 0,
       dryRun: true,
+      // Explicit guarantee that NOTHING was written (dry_run must never mutate).
+      mutated: false,
       sceneName,
       planned: {
         resources: resources.length,

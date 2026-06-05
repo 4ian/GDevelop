@@ -2045,6 +2045,49 @@ const readTools: Array<McpTool> = [
     },
   },
   {
+    name: 'create_action',
+    description:
+      "Build a correctly-formed ACTION instruction JSON from an instruction type + NAMED parameter values, so you do not hand-align parameter order, hidden code-only slots, or quoting. Pass parameters keyed by the metadata parameter NAME (or by index). Returns { instruction, parameters, warnings } — drop instruction into an event's actions array (or pass to add_scene_events). Discover the type/param names with gdevelop_get_instruction_metadata.",
+    inputSchema: {
+      type: 'object',
+      properties: {
+        type: {
+          type: 'string',
+          description: 'Exact action type, e.g. SetNumberVariable, Create.',
+        },
+        parameters: {
+          type: 'object',
+          description:
+            'Map of parameter NAME (or index) to value. Numbers/operators/object names go in bare; string-expression literals are auto-quoted; code-only params are auto-filled.',
+          additionalProperties: true,
+        },
+      },
+      required: ['type'],
+      additionalProperties: false,
+    },
+  },
+  {
+    name: 'create_condition',
+    description:
+      "Build a correctly-formed CONDITION instruction JSON from an instruction type + NAMED parameter values (same as create_action but for conditions). Returns { instruction, parameters, warnings } for an event's conditions array.",
+    inputSchema: {
+      type: 'object',
+      properties: {
+        type: {
+          type: 'string',
+          description: 'Exact condition type, e.g. KeyPressed, CompareTimer.',
+        },
+        parameters: {
+          type: 'object',
+          description: 'Map of parameter NAME (or index) to value.',
+          additionalProperties: true,
+        },
+      },
+      required: ['type'],
+      additionalProperties: false,
+    },
+  },
+  {
     name: 'inspect_tool_schema',
     description:
       'Return MCP tool input schema and usage examples. Use this before calling a tool whose payload shape is unclear.',
@@ -2055,6 +2098,16 @@ const readTools: Array<McpTool> = [
     description:
       'Return concrete MCP tool argument examples. Use this to avoid guessing payload names.',
     inputSchema: toolNameSchema,
+  },
+  {
+    name: 'gdevelop_capabilities',
+    description:
+      'Return a categorized overview of the core GDevelop MCP tools by workflow (project state, reading, instruction discovery, creating objects/assets, authoring events, runtime verification, safety/persistence). Call this FIRST to discover what is available in one shot, instead of many tool searches.',
+    inputSchema: {
+      type: 'object',
+      properties: {},
+      additionalProperties: false,
+    },
   },
   {
     name: 'gdevelop_editor_call',
@@ -2301,6 +2354,37 @@ const writeTools: Array<McpTool> = [
     inputSchema: firstLayoutSchema,
   },
   {
+    name: 'snapshot_project',
+    description:
+      'Take an in-memory snapshot of the WHOLE project (a coarse checkpoint for transaction-style safety). Call before a risky multi-step build; if a later step fails, restore_project_snapshot rolls back. Session-scoped (lost on reload) and NOT a disk save. Returns a snapshot_id.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        label: {
+          type: 'string',
+          description: 'Optional label for the snapshot.',
+        },
+      },
+      additionalProperties: false,
+    },
+  },
+  {
+    name: 'restore_project_snapshot',
+    description:
+      'Roll the project back to a previous snapshot_project checkpoint (in memory). Open scene tabs may need reopening afterward; re-inspect to confirm. Does not touch disk.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        snapshot_id: {
+          type: 'string',
+          description: 'The snapshot_id returned by snapshot_project.',
+        },
+      },
+      required: ['snapshot_id'],
+      additionalProperties: false,
+    },
+  },
+  {
     name: 'replace_object_definition',
     description:
       'Replace or create a scene object with a complete serialized object definition. This explicitly allows changing the object type. Pass summary_only:true to omit the full serialized object from the response.',
@@ -2346,6 +2430,27 @@ const writeTools: Array<McpTool> = [
     description:
       'Add or update a project resource such as a local PNG image resource with name, file, and kind.',
     inputSchema: addOrUpdateResourceSchema,
+  },
+  {
+    name: 'replace_project_resource',
+    description:
+      "Replace an EXISTING resource's file in place (e.g. swap a generated placeholder for finished art under the same name) so every Sprite frame / reference that uses the name picks up the new file automatically. Requires the resource to already exist; reports which scene objects reference it. A running preview needs a fresh launch / hot reload to show the new pixels.",
+    inputSchema: {
+      type: 'object',
+      properties: {
+        name: {
+          type: 'string',
+          description: 'Existing resource name to repoint.',
+        },
+        file: {
+          type: 'string',
+          description:
+            'New file path (project-relative recommended) the resource should point at.',
+        },
+      },
+      required: ['name', 'file'],
+      additionalProperties: true,
+    },
   },
   {
     name: 'generate_placeholder_asset',
@@ -3360,6 +3465,103 @@ export const getMcpToolUsageExamples = (
   if (!toolName) return toolUsageExamples;
   return {
     [toolName]: toolUsageExamples[toolName] || [],
+  };
+};
+
+// A categorized overview of the core tools so callers can discover capabilities
+// in ONE call instead of many tool searches. Only lists tools available under
+// the given permissions; each entry has the tool name + its one-line summary.
+export const getCapabilitiesSummary = (
+  permissions: McpPermissionOptions
+): Object => {
+  const available = new Set(getMcpTools(permissions).map(tool => tool.name));
+  const allByName = {};
+  getAllMcpToolsForIntrospection().forEach(tool => {
+    allByName[tool.name] = tool;
+  });
+  const categories = {
+    'Project & editor state': [
+      'gdevelop_get_editor_state',
+      'gdevelop_get_project_summary',
+      'gdevelop_list_scenes',
+      'gdevelop_list_objects',
+      'gdevelop_get_editor_selection',
+      'gdevelop_capabilities',
+    ],
+    'Read scene / objects / events': [
+      'read_serialized_scene',
+      'read_scene_events',
+      'read_scene_events_serialized',
+      'describe_instances',
+      'find_scene_events',
+      'inspect_object_properties',
+      'list_available_behaviors',
+    ],
+    'Instruction discovery': [
+      'gdevelop_search_instruction_metadata',
+      'gdevelop_get_instruction_metadata',
+      'gdevelop_get_events_json_examples',
+    ],
+    'Create / edit objects & assets': [
+      'bulk_edit_scene_assets',
+      'create_sprite_object_from_resource',
+      'create_text_object',
+      'set_sprite_animations',
+      'slice_sprite_sheet',
+      'add_or_update_resource',
+      'generate_placeholder_asset',
+      'replace_project_resource',
+      'put_2d_instances',
+      'add_behavior',
+    ],
+    'Author events': [
+      'create_action',
+      'create_condition',
+      'add_scene_events',
+      'validate_events_json_file',
+      'lint_scene_events',
+      'create_group',
+    ],
+    'Variables & scenes': [
+      'add_or_edit_variable',
+      'create_scene',
+      'rename_scene',
+      'set_first_layout',
+    ],
+    'Runtime verification': [
+      'launch_preview',
+      'run_frames',
+      'gdevelop_inspect_running_preview',
+      'capture_preview_screenshot',
+      'render_scene_to_png',
+      'control_preview',
+      'simulate_preview_input',
+      'set_runtime_state',
+    ],
+    'Safety & persistence': [
+      'snapshot_project',
+      'restore_project_snapshot',
+      'gdevelop_save_project_and_wait',
+    ],
+  };
+  const result = {};
+  Object.keys(categories).forEach(category => {
+    const entries = categories[category]
+      .filter(name => available.has(name))
+      .map(name => ({
+        name,
+        summary: allByName[name] ? allByName[name].description : undefined,
+      }));
+    if (entries.length) result[category] = entries;
+  });
+  return {
+    note:
+      'Core GDevelop MCP tools by workflow. This is a curated overview, not the full list — use inspect_tool_schema / get_tool_usage_examples for details, or gdevelop_search_instruction_metadata for GDevelop action/condition/expression types.',
+    permissions: {
+      writeToolsEnabled: !!permissions.allowWriteTools,
+      commandToolsEnabled: !!permissions.allowCommandTools,
+    },
+    categories: result,
   };
 };
 

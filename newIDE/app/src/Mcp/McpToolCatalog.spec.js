@@ -37,6 +37,9 @@ describe('McpToolCatalog', () => {
     expect(toolNames).toContain('find_scene_events');
     expect(toolNames).toContain('validate_events_json_file');
     expect(toolNames).toContain('lint_scene_events');
+    expect(toolNames).toContain('gdevelop_capabilities');
+    expect(toolNames).toContain('create_action');
+    expect(toolNames).toContain('create_condition');
     expect(toolNames).not.toContain('create_scene');
     expect(toolNames).not.toContain('gdevelop_create_or_update_extension');
     expect(toolNames).not.toContain('gdevelop_run_command');
@@ -58,6 +61,9 @@ describe('McpToolCatalog', () => {
     expect(toolNames).toContain('bulk_edit_scene_assets');
     expect(toolNames).toContain('slice_sprite_sheet');
     expect(toolNames).toContain('render_scene_to_png');
+    expect(toolNames).toContain('replace_project_resource');
+    expect(toolNames).toContain('snapshot_project');
+    expect(toolNames).toContain('restore_project_snapshot');
     expect(toolNames).toContain('replace_object_definition');
     expect(toolNames).toContain('delete_scene_object');
     expect(toolNames).toContain('set_object_properties');

@@ -705,6 +705,15 @@ export const lintSceneEvents = (project: gdProject, args: Object): Object => {
           eventPath,
           suggestion:
             'This Standard event creates an object while picking instances in its conditions, but Create runs only once (for a single picked instance). If you want each picked instance to create one (e.g. each enemy fires a bullet), wrap this in a ForEach event over that object. If a single Create is intentional, suppress this with disabled_rules: ["create-without-for-each"].',
+          // Concrete fix the caller can apply: re-author this event as the body
+          // of a ForEach over the picked object type (BuiltinCommonInstructions::
+          // ForEach with `object` set), keeping the same conditions/actions.
+          suggestedFix: {
+            action: 'wrap-in-for-each',
+            eventPath,
+            note:
+              'Replace this Standard event with a ForEach event (type "BuiltinCommonInstructions::ForEach", set its `object` to the picked object) whose sub-events are this event\'s conditions/actions. See the "For-each-object event" example in gdevelop_get_events_json_examples.',
+          },
         });
       }
     }

@@ -1,6 +1,61 @@
 // @flow
 import { serializeToJSObject } from '../Utils/Serializer';
 
+const gd: libGDevelop = global.gd;
+
+// In-memory project snapshots for a coarse transaction/rollback (#10). A build
+// can snapshot before a multi-step edit and restore on failure. Session-scoped
+// (lost on reload); each snapshot stores the full serialized project JSON.
+const projectSnapshots: {
+  [string]: { json: string, createdLabel: string },
+} = {};
+let nextSnapshotId = 1;
+
+export const snapshotProject = (project: gdProject, args: Object): Object => {
+  const element = new gd.SerializerElement();
+  project.serializeTo(element);
+  const json = gd.Serializer.toJSON(element);
+  element.delete();
+  const label =
+    getStringWithAliases(args || {}, ['label', 'name']) ||
+    `snapshot-${nextSnapshotId}`;
+  const id = `snapshot-${nextSnapshotId++}`;
+  projectSnapshots[id] = { json, createdLabel: label };
+  return {
+    success: true,
+    snapshotId: id,
+    label,
+    bytes: json.length,
+    note:
+      'Project snapshotted in memory. Restore with restore_project_snapshot { snapshot_id } if a later step fails. Snapshots are session-scoped (lost on reload) and are NOT a disk save — use gdevelop_save_project_and_wait to persist.',
+  };
+};
+
+export const restoreProjectSnapshot = (
+  project: gdProject,
+  args: Object
+): Object => {
+  const id = getStringWithAliases(args || {}, ['snapshot_id', 'snapshotId']);
+  if (!id || !projectSnapshots[id]) {
+    throw new Error(
+      `Unknown snapshot_id "${id || ''}". Available: ${Object.keys(
+        projectSnapshots
+      ).join(', ') || '(none)'}.`
+    );
+  }
+  const { json, createdLabel } = projectSnapshots[id];
+  const element = gd.Serializer.fromJSON(json);
+  project.unserializeFrom(element);
+  element.delete();
+  return {
+    success: true,
+    snapshotId: id,
+    label: createdLabel,
+    note:
+      'Project restored in memory from the snapshot. Open scene editors may hold stale references — if the editor UI looks wrong, reopen the affected scene tab. Re-inspect with read_serialized_scene to confirm state. This did not touch disk.',
+  };
+};
+
 const getStringWithAliases = (
   args: Object,
   names: Array<string>

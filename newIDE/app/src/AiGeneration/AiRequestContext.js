@@ -8,6 +8,7 @@ import {
   type AiSettings,
   type GenerationStatus,
   getAiRequests,
+  suspendAiRequest as apiSuspendAiRequest,
 } from '../Utils/GDevelopServices/Generation';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import { type EditorFunctionCallResult } from '../EditorFunctions';
@@ -17,7 +18,11 @@ import { useAsyncLazyMemo } from '../Utils/UseLazyMemo';
 import { retryIfFailed } from '../Utils/RetryIfFailed';
 import { useInterval } from '../Utils/UseInterval';
 import useForceUpdate from '../Utils/UseForceUpdate';
-import { aiRequestShouldBeWatched } from './AiRequestUtils';
+import {
+  aiRequestShouldBeWatched,
+  aiRequestHasWorkInProgress,
+} from './AiRequestUtils';
+import { type EditApprovalRequest } from './Utils';
 
 type EditorFunctionCallResultsStorage = {|
   getEditorFunctionCallResults: (
@@ -94,6 +99,36 @@ const useEditorFunctionCallResultsStorage = (): EditorFunctionCallResultsStorage
         forceUpdate();
       },
       [forceUpdate]
+    ),
+  };
+};
+
+// "Auto edit" is a frontend-only toggle. Its live value is remembered per AI
+// request here (in the app-level provider) so it survives the Ask AI editor
+// being unmounted/remounted — e.g. when a no-project request creates a project
+// and the editor is repositioned from the center to the right pane. Without
+// this, the toggle would re-initialize from the saved preference (and could
+// wrongly switch off mid-build). `null` means "no value remembered yet".
+type AutoEditEnabledStorage = {|
+  getAutoEditEnabled: (aiRequestId: string) => boolean | null,
+  setAutoEditEnabled: (aiRequestId: string, enabled: boolean) => void,
+|};
+
+const useAutoEditEnabledStorage = (): AutoEditEnabledStorage => {
+  const autoEditEnabledPerRequestRef = React.useRef<{
+    [aiRequestId: string]: boolean,
+  }>({});
+
+  return {
+    getAutoEditEnabled: React.useCallback((aiRequestId: string) => {
+      const value = autoEditEnabledPerRequestRef.current[aiRequestId];
+      return value === undefined ? null : value;
+    }, []),
+    setAutoEditEnabled: React.useCallback(
+      (aiRequestId: string, enabled: boolean) => {
+        autoEditEnabledPerRequestRef.current[aiRequestId] = enabled;
+      },
+      []
     ),
   };
 };
@@ -461,12 +496,37 @@ export type AiRequestContextState = {|
   aiRequestStorage: AiRequestStorage,
   aiRequestHistory: AiRequestHistory,
   editorFunctionCallResultsStorage: EditorFunctionCallResultsStorage,
+  autoEditEnabledStorage: AutoEditEnabledStorage,
   getAiSettings: () => AiSettings | null,
   isFetchingSuggestions: boolean,
   setIsFetchingSuggestions: (value: boolean) => void,
+  /**
+   * The inline "Apply this edit?" approval currently shown in the chat (auto-edit
+   * off), or null. While non-null, the watch/polling loop is suspended.
+   */
+  pendingEditApproval: EditApprovalRequest | null,
+  /**
+   * Request an inline edit approval: shows the prompt and resolves to the user's
+   * Apply (true) / Cancel (false) choice. Passed to the function-call processing.
+   */
+  requestEditApproval: (request: EditApprovalRequest) => Promise<boolean>,
+  /** Resolve the current edit approval prompt (Apply: true, Cancel: false). */
+  resolveEditApproval: (accepted: boolean) => void,
   selectedAiRequestId: string | null,
   setSelectedAiRequestId: (aiRequestId: string | null) => void,
   selectedAiRequest: AiRequest | null,
+  /**
+   * Returns the selected AI request if it still has work in progress (server
+   * working, sub-agents running, or function calls left to process). Works even
+   * when the Ask AI editor is closed, since the request lives in this provider —
+   * used to guard destructive actions (e.g. closing the project).
+   */
+  getWorkingAiRequest: () => AiRequest | null,
+  /**
+   * Suspend a running AI request. Safe to call from anywhere, including when the
+   * Ask AI editor is not mounted.
+   */
+  suspendAiRequest: (aiRequestId: string) => Promise<void>,
   activeSubAgents: { [subAgentAiRequestId: string]: ActiveSubAgent },
   activateSubAgent: (
     subAgentAiRequestId: string,
@@ -501,12 +561,21 @@ export const initialAiRequestContextState: AiRequestContextState = {
     addEditorFunctionCallResults: () => [],
     clearEditorFunctionCallResults: () => {},
   },
+  autoEditEnabledStorage: {
+    getAutoEditEnabled: () => null,
+    setAutoEditEnabled: () => {},
+  },
   getAiSettings: () => null,
   isFetchingSuggestions: false,
   setIsFetchingSuggestions: () => {},
+  pendingEditApproval: null,
+  requestEditApproval: async () => false,
+  resolveEditApproval: () => {},
   selectedAiRequestId: null,
   setSelectedAiRequestId: () => {},
   selectedAiRequest: null,
+  getWorkingAiRequest: () => null,
+  suspendAiRequest: async () => {},
   activeSubAgents: {},
   activateSubAgent: () => {},
 };
@@ -551,6 +620,7 @@ export const AiRequestProvider = ({
   children,
 }: AiRequestProviderProps): React.MixedElement => {
   const editorFunctionCallResultsStorage = useEditorFunctionCallResultsStorage();
+  const autoEditEnabledStorage = useAutoEditEnabledStorage();
   const aiRequestStorage = useAiRequestsStorage();
   const aiRequestHistory = useAiRequestHistory(aiRequestStorage);
 
@@ -567,6 +637,39 @@ export const AiRequestProvider = ({
   const [shouldWatchRequest, setShouldWatchRequest] = React.useState<boolean>(
     false
   );
+
+  // Inline "Apply this edit?" approval shown in the chat when auto-edit is off
+  // and the AI is about to modify the project. `requestEditApproval` (passed to
+  // the function-call processing) stores the resolver and shows the prompt; the
+  // chat's Apply/Cancel buttons call `resolveEditApproval`. It lives here, next
+  // to the watch loop, so polling can be paused while the prompt is shown — the
+  // backend is only waiting for the function call outputs we haven't sent yet,
+  // so there is nothing new to poll for until the user answers.
+  const [
+    pendingEditApproval,
+    setPendingEditApproval,
+  ] = React.useState<EditApprovalRequest | null>(null);
+  const editApprovalResolverRef = React.useRef<(boolean => void) | null>(null);
+  const requestEditApproval = React.useCallback(
+    (request: EditApprovalRequest): Promise<boolean> => {
+      // If a previous prompt is somehow still pending, refuse it before
+      // replacing it, so its processing loop unblocks.
+      const previousResolver = editApprovalResolverRef.current;
+      if (previousResolver) previousResolver(false);
+
+      return new Promise(resolve => {
+        editApprovalResolverRef.current = resolve;
+        setPendingEditApproval(request);
+      });
+    },
+    []
+  );
+  const resolveEditApproval = React.useCallback((accepted: boolean) => {
+    const resolver = editApprovalResolverRef.current;
+    editApprovalResolverRef.current = null;
+    setPendingEditApproval(null);
+    if (resolver) resolver(accepted);
+  }, []);
   const [
     isFetchingSuggestions,
     setIsFetchingSuggestions,
@@ -841,7 +944,9 @@ export const AiRequestProvider = ({
     () => {
       onWatch();
     },
-    shouldWatchRequest || hasActiveSubAgents ? watchPollingIntervalInMs : null
+    (shouldWatchRequest || hasActiveSubAgents) && !pendingEditApproval
+      ? watchPollingIntervalInMs
+      : null
   );
 
   // Clear sub-agents when the parent request is suspended.
@@ -911,17 +1016,79 @@ export const AiRequestProvider = ({
 
   const activeSubAgents = activeSubAgentsRef.current;
 
+  const {
+    getEditorFunctionCallResults,
+    clearEditorFunctionCallResults,
+  } = editorFunctionCallResultsStorage;
+
+  const getWorkingAiRequest = React.useCallback(
+    (): AiRequest | null => {
+      if (!selectedAiRequest) return null;
+      const editorFunctionCallResults =
+        getEditorFunctionCallResults(selectedAiRequest.id) || [];
+      return aiRequestHasWorkInProgress(
+        selectedAiRequest,
+        editorFunctionCallResults
+      )
+        ? selectedAiRequest
+        : null;
+    },
+    [selectedAiRequest, getEditorFunctionCallResults]
+  );
+
+  const suspendAiRequest = React.useCallback(
+    async (aiRequestId: string): Promise<void> => {
+      if (!profile) return;
+      // Dismiss any pending edit approval.
+      editApprovalResolverRef.current = null;
+      setPendingEditApproval(null);
+
+      // Optimistic update: mark as suspended locally immediately so any in-flight
+      // async code sees the suspended status on the next render.
+      const currentRequest = aiRequests[aiRequestId];
+      if (currentRequest) {
+        updateAiRequest(aiRequestId, () => ({
+          ...currentRequest,
+          status: 'suspended',
+        }));
+        clearEditorFunctionCallResults(aiRequestId);
+      }
+
+      const suspendedRequest = await apiSuspendAiRequest(
+        getAuthorizationHeader,
+        {
+          userId: profile.id,
+          aiRequestId,
+        }
+      );
+      updateAiRequest(suspendedRequest.id, () => suspendedRequest);
+    },
+    [
+      profile,
+      aiRequests,
+      getAuthorizationHeader,
+      updateAiRequest,
+      clearEditorFunctionCallResults,
+    ]
+  );
+
   const state = React.useMemo(
     (): AiRequestContextState => ({
       aiRequestStorage,
       aiRequestHistory,
       editorFunctionCallResultsStorage,
+      autoEditEnabledStorage,
       getAiSettings,
       isFetchingSuggestions,
       setIsFetchingSuggestions,
+      pendingEditApproval,
+      requestEditApproval,
+      resolveEditApproval,
       selectedAiRequestId,
       setSelectedAiRequestId,
       selectedAiRequest,
+      getWorkingAiRequest,
+      suspendAiRequest,
       activeSubAgents,
       activateSubAgent,
     }),
@@ -929,12 +1096,18 @@ export const AiRequestProvider = ({
       aiRequestStorage,
       aiRequestHistory,
       editorFunctionCallResultsStorage,
+      autoEditEnabledStorage,
       getAiSettings,
       isFetchingSuggestions,
       setIsFetchingSuggestions,
+      pendingEditApproval,
+      requestEditApproval,
+      resolveEditApproval,
       selectedAiRequestId,
       setSelectedAiRequestId,
       selectedAiRequest,
+      getWorkingAiRequest,
+      suspendAiRequest,
       activeSubAgents,
       activateSubAgent,
     ]

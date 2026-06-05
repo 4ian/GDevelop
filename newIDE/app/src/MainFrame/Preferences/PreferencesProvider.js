@@ -88,6 +88,7 @@ export const getInitialPreferences = (): {
   autoDisplayChangelog: boolean,
   autoDownloadUpdates: boolean,
   autoOpenMostRecentProject: boolean,
+  automaticallyApplyAiRequestEdits: boolean,
   automaticallyUseCreditsForAiRequests: boolean,
   autosaveOnPreview: boolean,
   backdropClickBehavior: string,
@@ -399,6 +400,10 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     ): any),
     // $FlowFixMe[method-unbinding]
     setAutomaticallyUseCreditsForAiRequests: (this._setAutomaticallyUseCreditsForAiRequests.bind(
+      this
+    ): any),
+    // $FlowFixMe[method-unbinding]
+    setAutomaticallyApplyAiRequestEdits: (this._setAutomaticallyApplyAiRequestEdits.bind(
       this
     ): any),
     // $FlowFixMe[method-unbinding]
@@ -1406,6 +1411,18 @@ export default class PreferencesProvider extends React.Component<Props, State> {
         values: {
           ...state.values,
           automaticallyUseCreditsForAiRequests: newValue,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _setAutomaticallyApplyAiRequestEdits(newValue: boolean) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          automaticallyApplyAiRequestEdits: newValue,
         },
       }),
       () => this._persistValuesToLocalStorage(this.state)

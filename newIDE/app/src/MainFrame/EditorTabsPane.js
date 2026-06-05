@@ -423,7 +423,6 @@ const EditorTabsPane: React.ComponentType<{
     projectPath,
     triggerNpmScript,
     onRequestPaneClose,
-    drawerState,
     rightPaneDrawerOpen,
   } = props;
 
@@ -525,6 +524,25 @@ const EditorTabsPane: React.ComponentType<{
     [editorTabs, setEditorTabs]
   );
 
+  // When the Ask AI tab is among the tabs about to be closed and a request is
+  // running, let the AI editor ask the user whether it should keep working,
+  // stop, or cancel the close. Returns false only if the close should be
+  // aborted (the user picked "Cancel").
+  const shouldProceedClosingTabs = React.useCallback(
+    (tabsBeingClosed: Array<EditorTab>): Promise<boolean> => {
+      const askAiTab = tabsBeingClosed.find(tab => tab.key === 'ask-ai');
+      if (askAiTab && askAiTab.editorRef) {
+        // $FlowFixMe[incompatible-use] - the key ensures an AskAiEditorInterface.
+        const ref = (askAiTab.editorRef: any);
+        if (ref.requestClose) {
+          return ref.requestClose();
+        }
+      }
+      return Promise.resolve(true);
+    },
+    []
+  );
+
   const onDropEditorTab = React.useCallback(
     (fromIndex: number, toHoveredIndex: number) => {
       setEditorTabs(
@@ -541,32 +559,6 @@ const EditorTabsPane: React.ComponentType<{
 
   const paneEditorTabs = getEditorsForPane(editorTabs, paneIdentifier);
   const currentTab = getCurrentTabForPane(editorTabs, paneIdentifier);
-
-  // On mobile, the Ask AI drawer is never unmounted when closed — the component
-  // stays mounted and is hidden via CSS transform. The unmount cleanup in
-  // AskAiEditorContainer therefore never fires. Detect the open→closed transition
-  // here and call suspendOnDrawerClose() explicitly so the AI request is stopped.
-  const prevDrawerStateRef = React.useRef(drawerState);
-  React.useEffect(
-    () => {
-      if (
-        isDrawer &&
-        drawerState === 'closed' &&
-        prevDrawerStateRef.current === 'open'
-      ) {
-        const askAiTab = paneEditorTabs.find(tab => tab.key === 'ask-ai');
-        if (askAiTab && askAiTab.editorRef) {
-          // $FlowFixMe[incompatible-use]
-          const ref = (askAiTab.editorRef: any);
-          if (ref.suspendOnDrawerClose) {
-            ref.suspendOnDrawerClose();
-          }
-        }
-      }
-      prevDrawerStateRef.current = drawerState;
-    },
-    [drawerState, isDrawer, paneEditorTabs]
-  );
 
   // Use a layout effect to read the pane width and height, which is then used
   // to communicate to children editors the dimensions of their "window" (the pane).
@@ -612,7 +604,14 @@ const EditorTabsPane: React.ComponentType<{
           drawerAnchor={isRightMostPane ? 'right' : 'left'}
           title={'Ask AI'}
           id={paneIdentifier + '-top-bar'}
-          onClose={() => onSetPaneDrawerState(paneIdentifier, 'closed')}
+          onClose={() => {
+            // Closing the drawer hides the editor but does not unmount it, so
+            // the AI keeps running. Still ask (via the AI editor's requestClose)
+            // whether it should be stopped; only hide the drawer if confirmed.
+            shouldProceedClosingTabs(paneEditorTabs).then(shouldClose => {
+              if (shouldClose) onSetPaneDrawerState(paneIdentifier, 'closed');
+            });
+          }}
           disableSafeAreaTopMargin
         />
       ) : (
@@ -630,34 +629,46 @@ const EditorTabsPane: React.ComponentType<{
               onClickTab={onChangeEditorTab}
               onCloseTab={(editorTab: EditorTab) => {
                 clearTooltipOnTabClose();
-                onEditorTabClosing(editorTab);
-                if (
-                  onRequestPaneClose &&
-                  paneEditorTabs.length === 1 &&
-                  !areSidePanesDrawers
-                ) {
-                  onRequestPaneClose(() => onCloseEditorTab(editorTab));
-                } else {
-                  onCloseEditorTab(editorTab);
-                }
+                shouldProceedClosingTabs([editorTab]).then(shouldClose => {
+                  if (!shouldClose) return;
+                  onEditorTabClosing(editorTab);
+                  if (
+                    onRequestPaneClose &&
+                    paneEditorTabs.length === 1 &&
+                    !areSidePanesDrawers
+                  ) {
+                    onRequestPaneClose(() => onCloseEditorTab(editorTab));
+                  } else {
+                    onCloseEditorTab(editorTab);
+                  }
+                });
               }}
               onCloseOtherTabs={(editorTab: EditorTab) => {
                 clearTooltipOnTabClose();
-                paneEditorTabs.forEach(paneEditorTab => {
-                  if (paneEditorTab !== editorTab && paneEditorTab.closable) {
+                const tabsBeingClosed = paneEditorTabs.filter(
+                  paneEditorTab =>
+                    paneEditorTab !== editorTab && paneEditorTab.closable
+                );
+                shouldProceedClosingTabs(tabsBeingClosed).then(shouldClose => {
+                  if (!shouldClose) return;
+                  tabsBeingClosed.forEach(paneEditorTab => {
                     onEditorTabClosing(paneEditorTab);
-                  }
+                  });
+                  onCloseOtherEditorTabs(editorTab);
                 });
-                onCloseOtherEditorTabs(editorTab);
               }}
               onCloseAll={() => {
                 clearTooltipOnTabClose();
-                paneEditorTabs.forEach(paneEditorTab => {
-                  if (paneEditorTab.closable) {
+                const tabsBeingClosed = paneEditorTabs.filter(
+                  paneEditorTab => paneEditorTab.closable
+                );
+                shouldProceedClosingTabs(tabsBeingClosed).then(shouldClose => {
+                  if (!shouldClose) return;
+                  tabsBeingClosed.forEach(paneEditorTab => {
                     onEditorTabClosing(paneEditorTab);
-                  }
+                  });
+                  onCloseAllEditorTabs();
                 });
-                onCloseAllEditorTabs();
               }}
               onPopOutTab={props.onPopOutTab}
               onTabActivated={onEditorTabActivated}

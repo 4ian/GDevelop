@@ -35,6 +35,7 @@ const commonProps = {
       mode: 'chat',
       disabled: false,
       enableWith: null,
+      enabledWithPlans: [],
     },
     {
       id: 'expert-mode',
@@ -42,6 +43,7 @@ const commonProps = {
       mode: 'chat',
       disabled: false,
       enableWith: null,
+      enabledWithPlans: [],
     },
     {
       id: 'default',
@@ -49,6 +51,7 @@ const commonProps = {
       mode: 'agent',
       disabled: false,
       enableWith: null,
+      enabledWithPlans: [],
     },
     {
       id: 'extended-thinking',
@@ -56,6 +59,7 @@ const commonProps = {
       mode: 'agent',
       disabled: false,
       enableWith: null,
+      enabledWithPlans: [],
     },
     {
       id: 'max-mode',
@@ -63,6 +67,11 @@ const commonProps = {
       mode: 'agent',
       disabled: true,
       enableWith: 'higher-tier-plan',
+      enabledWithPlans: [
+        'gdevelop_gold',
+        'gdevelop_startup',
+        'gdevelop_education',
+      ],
     },
   ],
   editorCallbacks: {

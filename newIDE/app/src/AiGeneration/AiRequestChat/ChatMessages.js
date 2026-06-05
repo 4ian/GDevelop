@@ -121,6 +121,9 @@ type Props = {|
   onStartOrOpenChat: (options: ?{| aiRequestId: string | null |}) => void,
   isFetchingSuggestions: boolean,
   isSending?: boolean,
+  // True while the request is paused waiting for the user to answer the inline
+  // "Apply this edit?" prompt. Replaces the working/thinking indicators.
+  isWaitingForEditApproval?: boolean,
   savingProjectForMessageId: ?string,
   forkingState: ?{| aiRequestId: string, messageId: string |},
   onRestore: ({|
@@ -203,6 +206,7 @@ export const ChatMessages: React.ComponentType<Props> = React.memo<Props>(
     onStartOrOpenChat,
     isFetchingSuggestions,
     isSending,
+    isWaitingForEditApproval,
     savingProjectForMessageId,
     forkingState,
     onRestore,
@@ -1248,6 +1252,10 @@ export const ChatMessages: React.ComponentType<Props> = React.memo<Props>(
               </Trans>
             </AlertMessage>
           </Line>
+        ) : isWaitingForEditApproval ? (
+          // Paused on the inline "Apply this edit?" prompt (rendered below by
+          // EditApprovalRow): suppress the working/thinking indicators.
+          <React.Fragment />
         ) : aiRequest.status === 'suspended' && !shouldBeWorkingIfNotPaused ? (
           <Line justifyContent="flex-start">
             <div className={classes.suspendedIndicator}>

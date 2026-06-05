@@ -42,6 +42,7 @@ import {
   useProcessFunctionCalls,
   useRefreshLimits,
   type NewAiRequestOptions,
+  type OpenAskAiOptions,
   AI_ORCHESTRATOR_TOOLS_VERSION,
 } from './Utils';
 import { ColumnStackLayout, LineStackLayout } from '../UI/Layout';
@@ -53,6 +54,12 @@ import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import Cross from '../UI/CustomSvgIcons/Cross';
 
 const gd: libGDevelop = global.gd;
+
+// Stable references for the standalone form, which never gates edits (it only
+// creates a project from scratch, with nothing to apply on an existing one).
+const alwaysAutoEditEnabled = () => true;
+const noOpSuspendAiRequest = async () => {};
+const alwaysApproveEdit = async () => true;
 
 type Props = {|
   project: ?gdProject,
@@ -81,6 +88,9 @@ type Props = {|
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
   onCloseAskAi: () => void,
+  onOpenAskAi?: (?OpenAskAiOptions) => void,
+  onCloseDialog?: () => void,
+  closeProject?: () => Promise<void>,
   dismissableIdentifier?: string,
 |};
 
@@ -94,6 +104,9 @@ export const AskAiStandAloneForm = ({
   onCreateEmptyProject,
   onOpenLayout,
   onCloseAskAi,
+  onOpenAskAi,
+  onCloseDialog,
+  closeProject,
   dismissableIdentifier,
   onWillInstallExtension,
   onExtensionInstalled,
@@ -221,7 +234,7 @@ export const AskAiStandAloneForm = ({
   // we display the proper quota and credits information for the user.
   React.useEffect(
     () => {
-      refreshLimits();
+      if (profile) refreshLimits();
     },
     // Only on mount, we'll refresh again when sending an AI request.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -243,13 +256,20 @@ export const AskAiStandAloneForm = ({
           return;
         }
 
+        // Read the options and reset them immediately to prevent the effect from firing
+        // again if dependencies change during the async operations below (e.g. when
+        // closeProject causes project to become null).
+        const { userRequest, aiConfigurationPresetId } = newAiRequestOptions;
+        startNewAiRequest(null);
+
         // Ensure the Ask AI pane is closed, to avoid multiple requests being sent
         // at the same time from the editor and the standalone form.
         onCloseAskAi();
 
-        // Read the options and reset them (to avoid launching the same request twice).
-        const { userRequest, aiConfigurationPresetId } = newAiRequestOptions;
-        startNewAiRequest(null);
+        // Close any open project since the AI will create a new one.
+        if (project && closeProject) {
+          await closeProject();
+        }
 
         // Ensure the user has enough credits to pay for the request, or ask them
         // to buy some more.
@@ -313,10 +333,24 @@ export const AskAiStandAloneForm = ({
           // Select the new AI request just created - unless the user switched to another one
           // in the meantime.
           if (!upToDateSelectedAiRequestId.current) {
-            setAiRequestIdForForm(aiRequest.id);
-            // Also set the global selected AI request state,
-            // so that the editor is in sync, when we'll open it.
+            // Set the global selected AI request state so the editor tab
+            // can find the right request when it opens.
             setSelectedAiRequestId(aiRequest.id);
+          }
+
+          // Open the Ask AI tab right away. Always use 'center' pane since
+          // the project has been closed (or was never open) at this point.
+          if (onOpenAskAi) {
+            onOpenAskAi({
+              continueProcessingFunctionCallsOnMount: true,
+              paneIdentifier: 'center',
+            });
+          }
+
+          // Reset the form so it's ready for a new request (the tab now owns the request).
+          setAiRequestIdForForm(null);
+          if (aiRequestChatRef.current) {
+            aiRequestChatRef.current.resetUserInput('');
           }
 
           sendAiRequestStarted({
@@ -327,6 +361,13 @@ export const AskAiStandAloneForm = ({
             mode: aiRequestModeForForm,
             aiRequestId: aiRequest.id,
           });
+
+          // The conversation now continues in the Ask AI tab behind, so close
+          // the dialog hosting this standalone form. Done last, as it unmounts
+          // this component.
+          if (onCloseDialog) {
+            onCloseDialog();
+          }
         } catch (error) {
           console.error('Error starting a new AI request:', error);
           setLastSendError(null, error);
@@ -363,6 +404,9 @@ export const AskAiStandAloneForm = ({
       openSubscriptionDialog,
       onCloseAskAi,
       automaticallyUseCreditsForAiRequests,
+      onOpenAskAi,
+      onCloseDialog,
+      closeProject,
     ]
   );
 
@@ -547,6 +591,11 @@ export const AskAiStandAloneForm = ({
     onWillInstallExtension,
     onExtensionInstalled,
     isReadyToProcessFunctionCalls: true,
+    // The standalone form only ever creates a project from scratch, so there is
+    // nothing to gate: always auto-apply and never need to suspend on refusal.
+    getIsAutoEditEnabled: alwaysAutoEditEnabled,
+    suspendAiRequest: noOpSuspendAiRequest,
+    requestEditApproval: alwaysApproveEdit,
   });
 
   const onProcessFormFunctionCalls = React.useCallback(
@@ -609,16 +658,13 @@ export const AskAiStandAloneForm = ({
         onStartNewAiRequest={startNewAiRequest}
         onSendUserMessage={async ({
           userMessage,
-          mode,
         }: {|
           userMessage: string,
-          mode: 'chat' | 'agent' | 'orchestrator',
         |}) => {
           if (!aiRequestIdForForm) return;
           await onSendMessage({
             aiRequestId: aiRequestIdForForm,
             userMessage,
-            // mode, Mode is forced to agent in standalone form, no need to pass it here.
             editorFunctionCallResults: aiRequestForForm
               ? getEditorFunctionCallResults(aiRequestForForm.id) || []
               : [],

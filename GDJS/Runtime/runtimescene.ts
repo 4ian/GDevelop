@@ -484,6 +484,14 @@ namespace gdjs {
         );
       }
 
+      if (this._debugDraw3DEnabled) {
+        this._debuggerRenderer.renderDebugDraw3D(
+          this.getAdhocListOfAllInstances(),
+          this._debugDraw3DColorHex,
+          this._debugDraw3DDepthTest
+        );
+      }
+
       this._renderer.render();
     }
 

@@ -264,6 +264,7 @@ type State = {|
   setupGridOpen: boolean,
   scenePropertiesDialogOpen: boolean,
   layersListOpen: boolean,
+  areCollisionsShownInEditor: boolean,
   onCloseLayerRemoveDialog: ?(
     doRemove: boolean,
     newLayer: string | null
@@ -327,6 +328,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       setupGridOpen: false,
       scenePropertiesDialogOpen: false,
       layersListOpen: false,
+      areCollisionsShownInEditor: false,
       onCloseLayerRemoveDialog: null,
       layerRemoved: null,
       editedLayer: null,
@@ -1785,6 +1787,22 @@ export default class SceneEditor extends React.Component<Props, State> {
     this._sendHotReloadLayers();
   };
 
+  _onToggleCollisionsShownInEditor = () => {
+    const next = !this.state.areCollisionsShownInEditor;
+    this.setState({ areCollisionsShownInEditor: next }, () => {
+      const { previewDebuggerServer } = this.props;
+      if (!previewDebuggerServer) return;
+      previewDebuggerServer
+        .getExistingEmbeddedGameFrameDebuggerIds()
+        .forEach(debuggerId => {
+          previewDebuggerServer.sendMessage(debuggerId, {
+            command: 'set3DCollisionsShownInEditor',
+            payload: { enabled: next },
+          });
+        });
+    });
+  };
+
   _onChooseLayer = (layerName: string) => {
     this.setState({
       chosenLayer: layerName,
@@ -3035,6 +3053,12 @@ export default class SceneEditor extends React.Component<Props, State> {
                     onBackgroundColorChanged={this._sendSetBackgroundColor}
                     onLayersVisibilityInEditorChanged={
                       this._onLayersVisibilityInEditorChanged
+                    }
+                    areCollisionsShownInEditor={
+                      this.state.areCollisionsShownInEditor
+                    }
+                    onToggleCollisionsShownInEditor={
+                      this._onToggleCollisionsShownInEditor
                     }
                     onRemoveLayer={this._onRemoveLayer}
                     tileMapTileSelection={this.state.tileMapTileSelection}

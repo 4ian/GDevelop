@@ -325,6 +325,18 @@ namespace gdjs {
               );
             }
           }
+        } else if (data.command === 'set3DCollisionsShownInEditor') {
+          if (inGameEditor) {
+            const editedInstanceContainer =
+              inGameEditor.getEditedInstanceContainer();
+            if (editedInstanceContainer) {
+              editedInstanceContainer.enableDebugDraw3D(
+                !!data.payload.enabled,
+                0x00ff00,
+                true
+              );
+            }
+          }
         } else if (data.command === 'setBackgroundColor') {
           if (inGameEditor) {
             const editedInstanceContainer =

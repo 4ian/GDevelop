@@ -575,6 +575,12 @@ const SwipeableDrawerEditorsDisplay: React.ComponentType<{
                     onLayersVisibilityInEditorChanged={
                       props.onLayersVisibilityInEditorChanged
                     }
+                    areCollisionsShownInEditor={
+                      props.areCollisionsShownInEditor
+                    }
+                    onToggleCollisionsShownInEditor={
+                      props.onToggleCollisionsShownInEditor
+                    }
                     onEditLayer={props.editLayer}
                     onRemoveLayer={props.onRemoveLayer}
                     onLayerRenamed={props.onLayerRenamed}

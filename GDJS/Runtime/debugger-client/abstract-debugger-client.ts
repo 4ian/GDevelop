@@ -496,7 +496,8 @@ namespace gdjs {
             data.inputs,
             data.count,
             data.fakeElapsedTimeMs,
-            data.messageId
+            data.messageId,
+            data.autoRelease
           );
         } else if (data.command === 'setRuntimeState') {
           this.setRuntimeState(data.operations, data.messageId);
@@ -1128,7 +1129,8 @@ namespace gdjs {
       inputs: Array<any>,
       count: number,
       fakeElapsedTimeMs: number,
-      messageId: number
+      messageId: number,
+      autoRelease?: boolean
     ): void {
       const applied: Array<string> = [];
       let error: string | null = null;
@@ -1157,11 +1159,22 @@ namespace gdjs {
             break;
           }
         }
+        // 4. Optionally release all held keys, so a held key from this call does
+        // NOT silently carry over and keep driving the player on later calls
+        // (a counter-intuitive footgun). Default behavior keeps keys held.
+        if (autoRelease) {
+          const inputManager: any = this._runtimegame.getInputManager();
+          if (typeof inputManager.releaseAllPressedKeys === 'function') {
+            inputManager.releaseAllPressedKeys();
+            applied.push('autoReleasedKeys');
+          }
+        }
       } catch (e) {
         error = (e as Error).message || 'Failed to run frames.';
       }
-      // 4. Reply once with the full dump plus the run metadata, so the bridge can
-      // summarize live instance counts/variables/positions without a 2nd call.
+      // 5. Reply once with the full dump plus the run metadata (including which
+      // keys are STILL held), so the bridge can summarize live state without a
+      // 2nd call and the caller can see lingering held keys.
       this._sendRuntimeGameDumpWith({
         command: 'framesRan',
         messageId,
@@ -1171,9 +1184,34 @@ namespace gdjs {
           deltaMs: delta,
           stoppedEarly,
           paused: this._runtimegame.isPaused(),
+          heldKeys: this._getHeldKeyCodes(),
           error,
         },
       });
+    }
+
+    // The key codes currently held down in the InputManager (truthy entries in
+    // _pressedKeys.items). Used by runFrames to surface lingering held keys.
+    private _getHeldKeyCodes(): Array<number> {
+      const held: Array<number> = [];
+      try {
+        const inputManager: any = this._runtimegame.getInputManager();
+        const pressedItems =
+          inputManager._pressedKeys && inputManager._pressedKeys.items;
+        if (pressedItems) {
+          for (const keyCode in pressedItems) {
+            if (
+              Object.prototype.hasOwnProperty.call(pressedItems, keyCode) &&
+              pressedItems[keyCode]
+            ) {
+              held.push(parseInt(keyCode, 10));
+            }
+          }
+        }
+      } catch (e) {
+        // ignore
+      }
+      return held;
     }
 
     /**

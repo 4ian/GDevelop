@@ -825,6 +825,11 @@ const createSpriteObjectFromResourceSchema = {
     },
     origin: spriteAnimationFrameSchema.properties.origin,
     center: spriteAnimationFrameSchema.properties.center,
+    center_origin: {
+      type: 'boolean',
+      description:
+        'When true, set the frame ORIGIN to the image center, so Create(x,y) places the object by its center and rotation pivots around the middle (no need to compute origin per object). Reads the image size from disk.',
+    },
     fullImageCollisionMask:
       spriteAnimationFrameSchema.properties.fullImageCollisionMask,
     collisionMask: spriteAnimationFrameSchema.properties.collisionMask,
@@ -988,6 +993,11 @@ const listAvailableBehaviorsSchema = {
       type: 'boolean',
       description:
         'Default false. When true, also include default capability behaviors that cannot be added manually.',
+    },
+    include_properties: {
+      type: 'boolean',
+      description:
+        "Default false. When true, include each behavior TYPE's property schema (name/label/type/default value/choices) so you can learn configurable properties (e.g. DestroyOutside's extra border distance) WITHOUT first adding the behavior to an object.",
     },
   },
   additionalProperties: false,
@@ -1165,6 +1175,11 @@ const runFramesSchema = {
       description:
         'Simulated milliseconds per frame (default ~16.67 = 60 FPS). Keep small.',
     },
+    auto_release: {
+      type: 'boolean',
+      description:
+        'When true, release ALL held keys after stepping, so a key held in this call does not silently carry over and keep driving the game on later calls. The response always lists currently-held keys as heldKeys.',
+    },
     instance_positions_for: {
       type: 'array',
       items: { type: 'string' },
@@ -1175,6 +1190,23 @@ const runFramesSchema = {
       type: 'string',
       description:
         'Optional preview/debugger id. Defaults to the latest running preview.',
+    },
+  },
+  additionalProperties: false,
+};
+
+const launchPreviewSchema = {
+  type: 'object',
+  properties: {
+    start_paused: {
+      type: 'boolean',
+      description:
+        'When true, pause the preview as soon as it connects to the debugger, so you can run a deterministic test near frame 0 (the game otherwise runs in real time immediately and may end before your next call). Then use run_frames / control_preview step to advance, or control_preview play to run normally.',
+    },
+    timeout_ms: {
+      type: 'number',
+      description:
+        'How long to wait for the new preview to connect (for start_paused). Default 6000.',
     },
   },
   additionalProperties: false,
@@ -1342,6 +1374,11 @@ const bulkEditSceneAssetsSchema = {
       type: 'string',
       description:
         'Alternative to events: the events array as a JSON string (same as add_scene_events events_json).',
+    },
+    dry_run: {
+      type: 'boolean',
+      description:
+        'When true, validate the plan WITHOUT applying it: reports missing resource fields, behaviors/instances referencing objects that will not exist, unknown behavior types, and malformed variable payloads. Re-run without dry_run to apply.',
     },
   },
   required: ['scene_name'],
@@ -2120,6 +2157,12 @@ const readTools: Array<McpTool> = [
     description:
       'Inject test state into a running preview: set scene/global variables and move/spawn/delete instances, to reach gameplay states that are hard to trigger naturally (e.g. set GameOver=0, give the player a position, spawn an enemy). Pause first with control_preview for reproducibility. Launch a preview first.',
     inputSchema: setRuntimeStateSchema,
+  },
+  {
+    name: 'launch_preview',
+    description:
+      'Launch a new game preview, optionally paused on connect (start_paused:true) so you can run a deterministic test near frame 0 — the game otherwise runs in real time the instant it loads, and may already be game-over by your next MCP call. With start_paused, advance with run_frames / control_preview step, or control_preview play to run normally. Equivalent to gdevelop_run_command { commandName:"LAUNCH_NEW_PREVIEW" } but adds the pause-on-connect handshake.',
+    inputSchema: launchPreviewSchema,
   },
   {
     name: 'run_frames',

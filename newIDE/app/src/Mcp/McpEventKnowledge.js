@@ -186,6 +186,23 @@ const COMMON_TASK_HINTS: Array<{|
     note:
       'Hide takes just [objectName]. The twin action Show ("Montre") has an extra hidden code-only 2nd parameter — pass "" for it.',
   },
+  {
+    keywords: [
+      'boolean',
+      'bool',
+      'flag',
+      'true',
+      'false',
+      'toggle',
+      'gameover',
+    ],
+    kind: 'action',
+    type: 'SetBooleanVariable',
+    title: 'Set a scene/global BOOLEAN variable (true/false/toggle)',
+    parametersTemplate: ['GameOver', 'True', ''],
+    note:
+      'Params: [variableName, operator, ""(code-only)]. The operator is one of "True" / "False" / "Toggle" (capitalized!) — NOT yes/no, NOT 1/0, NOT "set". The 3rd param is a hidden code-only slot, pass "". The matching condition is BooleanVariable.',
+  },
 ];
 
 // Find common-task hints whose keywords overlap the query tokens.
@@ -407,6 +424,45 @@ const describeBehaviorParameterHint = (behaviorType: ?string): string => {
   return `behavior NAME on the object (not the behavior type), no quotes. Use list_available_behaviors with object_name to see the names.`;
 };
 
+// Enumerated parameter types whose legal literal values are a FIXED small set
+// not exposed by gd metadata (the editor hardcodes them per field). Return the
+// accepted values so callers don't guess. For operator/relationalOperator the
+// set depends on the instruction's manipulated type, carried in the parameter's
+// extraInfo ("number"/"string"/"boolean"/"color"/"time"). Mirrors the editor's
+// OperatorField / RelationalOperatorField / YesNoField / TrueFalseField.
+const OPERATOR_VALUES_BY_TYPE = {
+  number: ['=', '+', '-', '*', '/'],
+  string: ['=', '+'],
+  color: ['=', '+'],
+  boolean: ['True', 'False', 'Toggle'],
+};
+const RELATIONAL_OPERATOR_VALUES_BY_TYPE = {
+  number: ['=', '<', '>', '<=', '>=', '!='],
+  time: ['<', '>', '<=', '>='],
+  string: ['=', '!=', 'startsWith', 'endsWith', 'contains'],
+  color: ['=', '!='],
+};
+const acceptedValuesForParameter = (
+  parameterType: string,
+  extraInfo: ?string
+): ?Array<string> => {
+  const manipulated = extraInfo || 'number';
+  if (parameterType === 'operator') {
+    return (
+      OPERATOR_VALUES_BY_TYPE[manipulated] || OPERATOR_VALUES_BY_TYPE.number
+    );
+  }
+  if (parameterType === 'relationalOperator') {
+    return (
+      RELATIONAL_OPERATOR_VALUES_BY_TYPE[manipulated] ||
+      RELATIONAL_OPERATOR_VALUES_BY_TYPE.number
+    );
+  }
+  if (parameterType === 'yesorno') return ['yes', 'no'];
+  if (parameterType === 'trueorfalse') return ['True', 'False'];
+  return null;
+};
+
 const describeParameterLiteralSyntax = (parameterType: string): string => {
   if (QUOTED_STRING_PARAMETER_TYPES.has(parameterType)) {
     return `string expression — wrap literals in double quotes, e.g. "value" (type "${parameterType}")`;
@@ -467,6 +523,10 @@ const summarizeParameter = (
     type === 'objectvar'
       ? 'object variable — bare variable name (e.g. HP). The object is a separate parameter on this instruction, so do NOT write Object.HP here, just HP.'
       : undefined;
+  // Legal literal values for enumerated parameter types (operator,
+  // relationalOperator, yesorno, trueorfalse). E.g. a boolean SetBooleanVariable
+  // operator accepts ["True","False","Toggle"] — not yes/no/true/1.
+  const acceptedValues = acceptedValuesForParameter(type, extraInfo);
   if (options && options.compact) {
     // Compact form drops the verbose valueType discriminator object and keeps
     // only what a caller needs to fill the parameter correctly.
@@ -480,6 +540,7 @@ const summarizeParameter = (
       // How to write a literal value for this parameter in event JSON.
       literalSyntax: objectVarHint || describeParameterLiteralSyntax(type),
       behaviorNameHint,
+      acceptedValues: acceptedValues || undefined,
     };
   }
   const parameter = {
@@ -495,6 +556,8 @@ const summarizeParameter = (
     isCodeOnly: parameterMetadata.isCodeOnly(),
     literalSyntax: objectVarHint || describeParameterLiteralSyntax(type),
     behaviorNameHint,
+    // Legal literal values for enumerated parameter types.
+    acceptedValues: acceptedValues || undefined,
     valueType: valueTypeMetadata
       ? {
           name: valueTypeMetadata.getName(),
@@ -833,6 +896,34 @@ const groupEventExample = [
   },
 ];
 
+// Create-with-initial-values pattern (#11): GDevelop's Create action only takes
+// object + x/y/layer — it cannot set variables/animation. To create an object
+// AND initialize it, Create it first, then act on it IN THE SAME event (the
+// just-created instance is the picked one). Here: spawn an Enemy, give it a
+// random speed variable, and set its animation.
+const createWithInitEventExample = [
+  {
+    type: 'BuiltinCommonInstructions::Standard',
+    conditions: [],
+    actions: [
+      {
+        type: { value: 'Create' },
+        parameters: ['', 'Enemy', '320', '0', ''],
+      },
+      {
+        type: { value: 'ModVarObjet' },
+        parameters: ['Enemy', 'speed', '=', 'RandomInRange(80, 160)'],
+      },
+      {
+        type: {
+          value: 'AnimatableCapability::AnimatableBehavior::SetAnimationName',
+        },
+        parameters: ['Enemy', 'Animation', '=', '"fly"'],
+      },
+    ],
+  },
+];
+
 // For-each-object event: runs its conditions/actions once per instance of the
 // object. REQUIRED when an action like Create/PlaySound must affect EACH
 // instance (a plain Standard event's Create only fires for one picked instance).
@@ -999,6 +1090,12 @@ export const getEventsJsonExamples = ({
       purpose:
         'How to write the hidden capability-behavior actions that are hard to discover by search. Parameters are [objectName, behaviorName, operator, value]: the behaviorName is "Text"/"Opacity"/"Animation", the operator is usually "=", and string values are quoted (e.g. "Game Over"), numbers are bare (e.g. 180). See also gdevelop_search_instruction_metadata commonTaskHints.',
       events_json: JSON.stringify(capabilityActionsEventExample, null, 2),
+    },
+    {
+      name: 'Create an object WITH initial values',
+      purpose:
+        "GDevelop's Create action cannot set variables/animation. To create AND initialize, Create the object, then act on it in the SAME event (the just-created instance is the picked one): set object variables (ModVarObjet) and animation. This is the standard 2-step — there is no single create-with-values action.",
+      events_json: JSON.stringify(createWithInitEventExample, null, 2),
     },
     {
       name: 'Repeat N times',

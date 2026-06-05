@@ -989,6 +989,7 @@ const runPreviewFrames = async (
 
   // A longer default timeout: stepping many frames + serializing the dump can
   // take a moment, and this is the resilient path for throttled windows.
+  const autoRelease = !!(args && (args.auto_release || args.autoRelease));
   const { matched, payload } = await sendTargetedRequest(
     (previewDebuggerServer: any),
     targetId,
@@ -997,6 +998,7 @@ const runPreviewFrames = async (
       inputs: resolved,
       count: frames,
       fakeElapsedTimeMs: frameDeltaMs,
+      autoRelease,
     },
     { timeoutMs: 6000, returnFullMessage: true }
   );
@@ -1013,6 +1015,7 @@ const runPreviewFrames = async (
 
   const runMeta = (payload && payload.runFrames) || {};
   const dumpPayload = payload && payload.payload;
+  const heldKeys = Array.isArray(runMeta.heldKeys) ? runMeta.heldKeys : [];
   return {
     success: !runMeta.error,
     running: true,
@@ -1021,6 +1024,10 @@ const runPreviewFrames = async (
     steppedFrames: runMeta.steppedFrames,
     stoppedEarly: runMeta.stoppedEarly,
     deltaMs: runMeta.deltaMs,
+    // Keys STILL held after this call. A held key (keyPressed with no release)
+    // carries over to subsequent run_frames and keeps driving the game — pass
+    // auto_release:true, or send a keyReleased, to clear it.
+    heldKeys,
     error: runMeta.error || undefined,
     runtime: summarizeRuntimeGameDump(dumpPayload, {
       positionObjectNames: Array.isArray(args && args.instance_positions_for)
@@ -1029,6 +1036,11 @@ const runPreviewFrames = async (
       allInstancePositions: !!(args && args.include_instance_positions),
     }),
     note:
+      (heldKeys.length && !autoRelease
+        ? `NOTE: ${heldKeys.length} key(s) still held (${heldKeys.join(
+            ', '
+          )}) — they will keep affecting the game on the next call. Pass auto_release:true or send keyReleased to clear. `
+        : '') +
       'Frames stepped synchronously on the debugger channel (independent of the render loop), so this works even on a throttled/backgrounded preview window. The game is left paused; control_preview { action: "play" } resumes normal real-time play.',
   };
 };
@@ -1157,6 +1169,129 @@ const sendTargetedRequest = (
     }
 
     setTimeout(() => finish({ matched: false, payload: {} }), timeoutMs);
+  });
+};
+
+// Launch a new preview and (optionally) pause it the moment it connects, so
+// runtime tests can start near frame 0 instead of after the real-time clock has
+// already advanced (the game keeps running between MCP calls otherwise). This is
+// MCP-level: it triggers LAUNCH_NEW_PREVIEW, then registers a one-shot callback
+// that sends `pause` to the newly-connected debugger id. It is "pause ASAP",
+// not a guaranteed frame-0 pause — combine with run_frames for full determinism.
+const launchPreview = async (
+  previewDebuggerServer: ?Object,
+  runCommand: ?(string) => boolean,
+  args: Object
+): Promise<Object> => {
+  if (typeof runCommand !== 'function') {
+    return {
+      success: false,
+      error: 'Launching previews is not supported in this editor build.',
+    };
+  }
+  const startPaused = !!(args && (args.start_paused || args.startPaused));
+  const timeoutMs =
+    args && typeof args.timeout_ms === 'number'
+      ? Math.max(500, Math.min(15000, args.timeout_ms))
+      : 6000;
+
+  // Snapshot the already-connected ids so we can detect the NEW preview.
+  const existingIds = new Set(
+    previewDebuggerServer && startPaused
+      ? (typeof previewDebuggerServer.getExistingPreviewDebuggerIds ===
+        'function'
+          ? previewDebuggerServer.getExistingPreviewDebuggerIds()
+          : previewDebuggerServer.getExistingDebuggerIds()) || []
+      : []
+  );
+
+  if (!startPaused || !previewDebuggerServer) {
+    const didRun = runCommand('LAUNCH_NEW_PREVIEW');
+    return didRun
+      ? {
+          success: true,
+          launched: true,
+          startPaused: false,
+          note:
+            'Preview launched. It runs in real time immediately — for deterministic tests use run_frames, or relaunch with start_paused:true.',
+        }
+      : { success: false, error: 'Could not launch a preview.' };
+  }
+
+  // start_paused: register a connection watcher BEFORE launching.
+  return new Promise(resolve => {
+    let settled = false;
+    let unregister = () => {};
+    const finish = result => {
+      if (settled) return;
+      settled = true;
+      try {
+        unregister();
+      } catch (error) {
+        // ignore
+      }
+      resolve(result);
+    };
+    try {
+      unregister = previewDebuggerServer.registerCallbacks({
+        onErrorReceived: () => {},
+        onServerStateChanged: () => {},
+        onConnectionClosed: () => {},
+        onConnectionOpened: id => {
+          if (existingIds.has(id)) return; // not the new one
+          // Pause the new preview ASAP. Send a couple of times across a short
+          // window since the very first frames may still process.
+          try {
+            previewDebuggerServer.sendMessage(id, { command: 'pause' });
+          } catch (error) {
+            // ignore
+          }
+          finish({
+            success: true,
+            launched: true,
+            startPaused: true,
+            debuggerId: id,
+            note:
+              'Preview launched and paused on connect. Use run_frames / control_preview { action:"step" } to advance deterministically, or control_preview { action:"play" } to run in real time.',
+          });
+        },
+        onConnectionErrored: () => {},
+        onHandleParsedMessage: () => {},
+      });
+    } catch (error) {
+      // Could not watch connections — launch anyway, unpaused.
+      const didRun = runCommand('LAUNCH_NEW_PREVIEW');
+      finish(
+        didRun
+          ? {
+              success: true,
+              launched: true,
+              startPaused: false,
+              note:
+                'Preview launched, but could not register a pause-on-connect watcher; it is running in real time.',
+            }
+          : { success: false, error: 'Could not launch a preview.' }
+      );
+      return;
+    }
+
+    const didRun = runCommand('LAUNCH_NEW_PREVIEW');
+    if (!didRun) {
+      finish({ success: false, error: 'Could not launch a preview.' });
+      return;
+    }
+    // If no new connection arrives in time, report launched-but-not-confirmed.
+    setTimeout(
+      () =>
+        finish({
+          success: true,
+          launched: true,
+          startPaused: false,
+          note:
+            'Preview launched, but it did not connect to the debugger within the timeout, so it could not be paused on connect. It may be running in real time; you can control_preview { action:"pause" } once it responds.',
+        }),
+      timeoutMs
+    );
   });
 };
 
@@ -2004,6 +2139,22 @@ const callMcpTool = async ({
     if (!project) return errorResult('No project opened.');
     try {
       return textResult(compareSceneEventsSemantics(project, args || {}));
+    } catch (error) {
+      return errorResult(error.message);
+    }
+  }
+
+  if (toolName === 'launch_preview') {
+    const previewDebuggerServer = context.getPreviewDebuggerServer
+      ? context.getPreviewDebuggerServer()
+      : null;
+    try {
+      const result = await launchPreview(
+        previewDebuggerServer,
+        context.runCommand,
+        args || {}
+      );
+      return textResult(result);
     } catch (error) {
       return errorResult(error.message);
     }

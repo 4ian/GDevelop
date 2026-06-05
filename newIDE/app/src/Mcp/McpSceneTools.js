@@ -531,6 +531,7 @@ export const generatePlaceholderAsset = (
 
   let buffer;
   let kind;
+  let collisionMaskForShape;
   if (assetType === 'sound') {
     const durationMs =
       getFiniteNumber(args.duration_ms) !== null ? args.duration_ms : 150;
@@ -567,6 +568,11 @@ export const generatePlaceholderAsset = (
       buffer = encodePlaceholderPng(width, height, rgba);
     }
     kind = 'image';
+    // #10: for a non-rectangle shape, suggest a collision polygon that fits the
+    // shape (instead of the whole bounding box), so transparent corners don't
+    // register collisions. Returned for the caller to pass to
+    // create_sprite_object_from_resource as collisionMask.
+    collisionMaskForShape = collisionPolygonForShape(shape, width, height);
   }
 
   fs.writeFileSync(absFile, buffer);
@@ -588,9 +594,57 @@ export const generatePlaceholderAsset = (
     resolvedFile: absFile,
     bytesWritten: buffer.length,
     resource: resourceResult.resource,
+    // For non-rectangle shapes, a polygon that fits the shape (pass it as
+    // collisionMask to create_sprite_object_from_resource so transparent corners
+    // don't collide). Absent for rectangles (the default full-image box is fine).
+    collisionMask: collisionMaskForShape || undefined,
     note:
       'Placeholder asset generated and registered. Replace it later with real art/audio by overwriting the file and re-importing the same resource name.',
   };
+};
+
+// A collision polygon (array of one polygon = array of {x,y}) fitting a shape
+// within a width x height box. Rectangles return null (the default full-image
+// box already fits). Curves are approximated with a few vertices.
+const collisionPolygonForShape = (
+  shape: ?string,
+  width: number,
+  height: number
+): ?Array<Array<{ x: number, y: number }>> => {
+  const w = width;
+  const h = height;
+  switch (shape) {
+    case 'triangle':
+      return [[{ x: w / 2, y: 0 }, { x: w, y: h }, { x: 0, y: h }]];
+    case 'diamond':
+      return [
+        [
+          { x: w / 2, y: 0 },
+          { x: w, y: h / 2 },
+          { x: w / 2, y: h },
+          { x: 0, y: h / 2 },
+        ],
+      ];
+    case 'circle':
+    case 'ellipse': {
+      // Octagon approximation of the ellipse.
+      const cx = w / 2;
+      const cy = h / 2;
+      const rx = w / 2;
+      const ry = h / 2;
+      const poly = [];
+      for (let i = 0; i < 8; i++) {
+        const a = (Math.PI / 4) * i;
+        poly.push({
+          x: cx + rx * Math.cos(a),
+          y: cy + ry * Math.sin(a),
+        });
+      }
+      return [poly];
+    }
+    default:
+      return null; // rectangle / unknown → use full-image box
+  }
 };
 
 // Statically render a scene's LAYOUT to a PNG without running the game — a
@@ -1185,6 +1239,28 @@ const assertResourceIsImage = (project: gdProject, imageName: string) => {
     throw new Error(
       `Resource "${imageName}" has kind "${resource.getKind()}" but Sprite frames require "image".`
     );
+  }
+};
+
+// Read an image resource's pixel size from disk (via Electron nativeImage), for
+// center-origin computation. Returns { width, height } or null if unavailable.
+const readImageResourceSize = (
+  project: gdProject,
+  imageName: string
+): ?{ width: number, height: number } => {
+  if (!nativeImage) return null;
+  const resourcesManager = project.getResourcesManager();
+  if (!resourcesManager.hasResource(imageName)) return null;
+  const file = resourcesManager.getResource(imageName).getFile();
+  const absFile = resolveLocalResourceFile(project, file) || file;
+  if (!absFile || (fs && !fs.existsSync(absFile))) return null;
+  try {
+    const image = nativeImage.createFromPath(absFile);
+    const size = image.getSize();
+    if (!size.width || !size.height) return null;
+    return { width: size.width, height: size.height };
+  } catch (error) {
+    return null;
   }
 };
 
@@ -2425,6 +2501,21 @@ export const createSpriteObjectFromResource = (
     }
   });
 
+  // #9 center_origin: put the frame's ORIGIN at the image center so Create(x,y)
+  // places the object by its center and rotation pivots around the middle. We
+  // read the image's pixel size from disk (nativeImage) to compute the center.
+  if (
+    (args.center_origin === true || args.centerOrigin === true) &&
+    frame.origin === undefined
+  ) {
+    const dims = readImageResourceSize(project, resourceName);
+    if (dims) {
+      frame.origin = { x: dims.width / 2, y: dims.height / 2 };
+      // The center point already defaults to the image center, but be explicit.
+      if (frame.center === undefined) frame.defaultCenter = true;
+    }
+  }
+
   // #17: allow building a multi-frame / multi-animation Sprite in ONE call. If
   // the caller passes a full `animations` array (same shape as
   // set_sprite_animations), use it directly; otherwise fall back to the single
@@ -2469,6 +2560,27 @@ export const createSpriteObjectFromResource = (
 
   const summaryOnly =
     args && (args.summary_only === true || args.summaryOnly === true);
+  // Per-animation frame counts (#12), so the caller can confirm a multi-frame
+  // animation was bound without a separate read-back.
+  let framesPerAnimation;
+  try {
+    const spriteConfig = gd.asSpriteConfiguration(
+      objectResult.object.getConfiguration()
+    );
+    const anims = spriteConfig.getAnimations();
+    framesPerAnimation = [];
+    for (let i = 0; i < anims.getAnimationsCount(); i++) {
+      const anim = anims.getAnimation(i);
+      const direction =
+        anim.getDirectionsCount() > 0 ? anim.getDirection(0) : null;
+      framesPerAnimation.push({
+        name: anim.getName() || undefined,
+        framesCount: direction ? direction.getSpritesCount() : 0,
+      });
+    }
+  } catch (error) {
+    framesPerAnimation = undefined;
+  }
   return {
     success: true,
     sceneName,
@@ -2478,6 +2590,7 @@ export const createSpriteObjectFromResource = (
     didReplace: objectResult.didReplace,
     resourceName,
     animationsCount: animationResult.animationsCount,
+    framesPerAnimation,
     instanceCreated: !!instanceResult,
     instanceResult: summaryOnly
       ? instanceResult
@@ -2512,30 +2625,35 @@ export const createTextObject = (
   }
 
   const instancePayload = buildOptionalInstancePayload(args, objectName);
-  // Text-centering fix (#6): a freshly created Text object has width 0, so a
-  // plain align:"center-x" would center its left edge (text ends up off-center
-  // / overlapping). When the caller asks to horizontally center a text instance
+  // Text anchoring fix (#6/#18): a freshly created Text object has width 0, so a
+  // plain align of "center"/"right" would anchor its LEFT edge (text off-center
+  // or pushed off-screen). When the caller anchors a text instance horizontally
   // and gives no explicit width, make the instance span the scene width and set
-  // textAlignment:center, so the text visually centers within it.
-  if (
+  // a matching textAlignment, so the text visually sits at the center / right.
+  const textAlignArg =
     instancePayload &&
-    typeof (instancePayload.align || instancePayload.anchor) === 'string' &&
-    /center/.test(
-      (instancePayload.align || instancePayload.anchor).toLowerCase()
-    )
-  ) {
+    typeof (instancePayload.align || instancePayload.anchor) === 'string'
+      ? (instancePayload.align || instancePayload.anchor).toLowerCase()
+      : '';
+  const wantsCenterX = /center/.test(textAlignArg);
+  const wantsRight = /\bright\b/.test(textAlignArg);
+  if (instancePayload && (wantsCenterX || wantsRight)) {
     const hasWidth =
       instancePayload.width !== undefined ||
       (instancePayload.customSize && instancePayload.customSize.width) ||
       (instancePayload.custom_size && instancePayload.custom_size.width);
     if (!hasWidth) {
       instancePayload.width = project.getGameResolutionWidth();
-      // Center the text within the full-width box.
+      // The full-width box starts at x=0; the text aligns within it. Drop the
+      // align field so put_2d_instances does not also shift x by the new width.
+      delete instancePayload.align;
+      delete instancePayload.anchor;
+      instancePayload.x = 0;
       const textObjectConfig = gd.asTextObjectConfiguration(
         objectResult.object.getConfiguration()
       );
       if (typeof textObjectConfig.setTextAlignment === 'function') {
-        textObjectConfig.setTextAlignment('center');
+        textObjectConfig.setTextAlignment(wantsRight ? 'right' : 'center');
       }
     }
   }
@@ -2683,6 +2801,46 @@ export const inspectProjectCleanup = (
 };
 
 // List the behavior types available in the project, with the exact
+// Read a behavior TYPE's default property schema WITHOUT adding it to an object
+// (so callers can learn property names/defaults before deciding to add it, e.g.
+// DestroyOutside's extra-border-distance). Returns [{ name, label, type, value,
+// description, choices? }] or null when the type is unknown.
+const describeBehaviorTypeProperties = (
+  platform: any,
+  behaviorType: string
+): ?Array<Object> => {
+  const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
+    platform,
+    behaviorType
+  );
+  if (gd.MetadataProvider.isBadBehaviorMetadata(behaviorMetadata)) return null;
+  let propertiesMap;
+  try {
+    propertiesMap = behaviorMetadata.getProperties();
+  } catch (error) {
+    return null;
+  }
+  if (!propertiesMap) return null;
+  const names = propertiesMap.keys().toJSArray();
+  return names.map(name => {
+    const property = propertiesMap.get(name);
+    const out: Object = {
+      name,
+      label: property.getLabel() || undefined,
+      type: property.getType() || undefined,
+      value: property.getValue(),
+      description: property.getDescription() || undefined,
+    };
+    try {
+      const extra = property.getExtraInfo().toJSArray();
+      if (extra && extra.length) out.choices = extra;
+    } catch (error) {
+      // no choices
+    }
+    return out;
+  });
+};
+
 // `behavior_type` string to pass to add_behavior and the default behavior name.
 // When `object_name` (+ optional `scene_name`) is given, only behaviors
 // compatible with that object's type are returned (a behavior is compatible
@@ -2785,6 +2943,13 @@ export const listAvailableBehaviors = (
       // Empty string means the behavior works on any object type.
       requiredObjectType: metadata.objectType || '',
       category: metadata.category || undefined,
+      // Property schema (names/defaults/choices) for this behavior TYPE, so you
+      // can configure it via change_behavior_property WITHOUT first adding it.
+      // Pass include_properties:true (it adds size to the response).
+      properties:
+        args && (args.include_properties || args.includeProperties)
+          ? describeBehaviorTypeProperties(platform, metadata.type) || undefined
+          : undefined,
     }));
 
   // When inspecting a specific object, also report the behaviors it ALREADY has
@@ -3094,6 +3259,100 @@ export const bulkEditSceneAssets = (
   const behaviors = Array.isArray(args.behaviors) ? args.behaviors : [];
   const variables = Array.isArray(args.variables) ? args.variables : [];
   const instances = Array.isArray(args.instances) ? args.instances : [];
+
+  // dry_run (#20): validate the plan WITHOUT mutating the project, mirroring the
+  // events validation flow. Reports likely failures (missing resource files,
+  // behaviors/instances referencing objects that won't exist, unknown behavior
+  // types, malformed payloads) so they can be fixed before applying.
+  if (args && (args.dry_run === true || args.dryRun === true)) {
+    const scene = getScene(project, sceneName);
+    const issues = [];
+    // Object names that WILL exist after the objects step (created here) plus
+    // those already in the scene / globally.
+    const plannedObjectNames = new Set();
+    for (let i = 0; i < scene.getObjects().getObjectsCount(); i++)
+      plannedObjectNames.add(
+        scene
+          .getObjects()
+          .getObjectAt(i)
+          .getName()
+      );
+    for (let i = 0; i < project.getObjects().getObjectsCount(); i++)
+      plannedObjectNames.add(
+        project
+          .getObjects()
+          .getObjectAt(i)
+          .getName()
+      );
+    objects.forEach(o => {
+      const n = o && (o.object_name || o.objectName);
+      if (n) plannedObjectNames.add(n);
+    });
+    resources.forEach((r, index) => {
+      if (!r || typeof r !== 'object' || !r.name || !r.file)
+        issues.push(`resources[${index}]: needs name + file.`);
+    });
+    behaviors.forEach((b, index) => {
+      if (!b || !(b.object_name || b.objectName))
+        issues.push(`behaviors[${index}]: missing object_name.`);
+      else if (!plannedObjectNames.has(b.object_name || b.objectName))
+        issues.push(
+          `behaviors[${index}]: object "${b.object_name ||
+            b.objectName}" will not exist (not in scene/global nor created in this call).`
+        );
+      const type = b && (b.behavior_type || b.behaviorType);
+      if (type) {
+        const bm = gd.MetadataProvider.getBehaviorMetadata(
+          project.getCurrentPlatform(),
+          type
+        );
+        if (gd.MetadataProvider.isBadBehaviorMetadata(bm))
+          issues.push(`behaviors[${index}]: unknown behavior_type "${type}".`);
+      } else {
+        issues.push(`behaviors[${index}]: missing behavior_type.`);
+      }
+    });
+    variables.forEach((v, index) => {
+      if (!v || !(v.name || v.variable_name_or_path))
+        issues.push(`variables[${index}]: missing name.`);
+      if (
+        v &&
+        (v.scope === 'object' || v.variable_scope === 'object') &&
+        !(v.object_name || v.objectName)
+      )
+        issues.push(`variables[${index}]: scope "object" needs object_name.`);
+    });
+    instances.forEach((inst, index) => {
+      const n = inst && (inst.object_name || inst.objectName);
+      if (!n) issues.push(`instances[${index}]: missing object_name.`);
+      else if (!plannedObjectNames.has(n))
+        issues.push(
+          `instances[${index}]: object "${n}" will not exist when instances are placed.`
+        );
+    });
+    return {
+      success: issues.length === 0,
+      dryRun: true,
+      sceneName,
+      planned: {
+        resources: resources.length,
+        objects: objects.length,
+        spriteAnimations: spriteAnimations.length,
+        behaviors: behaviors.length,
+        variables: variables.length,
+        instances: instances.length,
+        events:
+          typeof args.events_json === 'string' || Array.isArray(args.events)
+            ? 'present (validated separately by add_scene_events)'
+            : 'none',
+      },
+      issues,
+      note:
+        issues.length === 0
+          ? 'Dry run passed the structural checks. Re-run without dry_run to apply. (Events, if any, are validated by the add_scene_events path on apply.)'
+          : 'Dry run found issues — fix them before applying.',
+    };
+  }
 
   const results = {
     resources: [],

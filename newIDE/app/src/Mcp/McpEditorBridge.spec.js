@@ -2514,6 +2514,29 @@ describe('McpEditorBridge', () => {
             'PlatformBehavior::PlatformerObjectBehavior'
         )
       ).toBe(true);
+
+      // include_properties exposes each behavior TYPE's property schema without
+      // adding it to an object.
+      const withProps = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'list_available_behaviors',
+          arguments: {
+            object_name: 'Player',
+            scene_name: 'Level1',
+            search: 'platformer',
+            include_properties: true,
+          },
+        },
+      });
+      const propsResult = JSON.parse(withProps.content[0].text);
+      const platformer = propsResult.behaviors.find(
+        b => b.behaviorType === 'PlatformBehavior::PlatformerObjectBehavior'
+      );
+      expect(platformer).toBeDefined();
+      expect(Array.isArray(platformer.properties)).toBe(true);
+      expect(platformer.properties.length).toBeGreaterThan(0);
+      expect(typeof platformer.properties[0].name).toBe('string');
     } finally {
       project.delete();
     }
@@ -2784,6 +2807,57 @@ describe('McpEditorBridge', () => {
     expect(result.success).toBe(true);
     // It must have addressed exactly the requested (older) preview, not latest.
     expect(requestedIds).toEqual(['preview-ws-0']);
+  });
+
+  it('launch_preview with start_paused pauses the new preview on connect', async () => {
+    let callbacks = null;
+    const sent = [];
+    const runCommand = jest.fn(commandName => {
+      // Simulate the new preview connecting shortly after launch.
+      if (commandName === 'LAUNCH_NEW_PREVIEW' && callbacks) {
+        setTimeout(() => {
+          if (callbacks && callbacks.onConnectionOpened)
+            callbacks.onConnectionOpened('preview-ws-0');
+        }, 2);
+      }
+      return true;
+    });
+    const previewDebuggerServer = {
+      getServerState: () => 'started',
+      getExistingPreviewDebuggerIds: () => [],
+      getExistingDebuggerIds: () => [],
+      registerCallbacks: registered => {
+        callbacks = registered;
+        return () => {
+          callbacks = null;
+        };
+      },
+      sendMessage: (id, message) => {
+        sent.push({ id, message });
+      },
+    };
+    const bridge = makeBridge({
+      runCommand,
+      getPreviewDebuggerServer: () => previewDebuggerServer,
+    });
+
+    const response = await bridge.handleRendererMcpRequest({
+      method: 'tools/call',
+      params: {
+        name: 'launch_preview',
+        arguments: { start_paused: true, timeout_ms: 1000 },
+      },
+    });
+    const result = JSON.parse(response.content[0].text);
+    expect(response.isError).not.toBe(true);
+    expect(result.launched).toBe(true);
+    expect(result.startPaused).toBe(true);
+    expect(result.debuggerId).toBe('preview-ws-0');
+    expect(runCommand).toHaveBeenCalledWith('LAUNCH_NEW_PREVIEW');
+    // A pause command was sent to the newly-connected preview.
+    expect(
+      sent.some(s => s.id === 'preview-ws-0' && s.message.command === 'pause')
+    ).toBe(true);
   });
 
   it('writes a preview screenshot to a file when file_path is given', async () => {

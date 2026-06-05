@@ -76,6 +76,7 @@ namespace gdjs {
     _verticalTextAlignment: string;
 
     _renderer: gdjs.BBTextRuntimeObjectRenderer;
+    _rotationCenter: FloatPoint | null = null;
 
     // While this should rather be exposed as a property for all objects, honor the "visible"
     // property that is specific to this object.
@@ -241,6 +242,9 @@ namespace gdjs {
      * Set the markup text to display.
      */
     setBBText(text: string): void {
+      if (this.angle !== 0) {
+        this._lockRotationCenter();
+      }
       this._text = text;
       this._renderer.updateText();
       this.invalidateHitboxes();
@@ -336,6 +340,11 @@ namespace gdjs {
 
     override setAngle(angle: float): void {
       super.setAngle(angle);
+      if (angle === 0 && this._rotationCenter) {
+        this._rotationCenter = null;
+        this._renderer.updatePosition();
+        this.invalidateHitboxes();
+      }
       this._renderer.updateAngle();
     }
 
@@ -413,6 +422,24 @@ namespace gdjs {
             ? this.getHeight()
             : 0)
       );
+    }
+
+    private _lockRotationCenter() {
+      if (this._rotationCenter) return;
+
+      this._rotationCenter = [this.getCenterX(), this.getCenterY()];
+    }
+
+    override getCenterX(): float {
+      return this._rotationCenter
+        ? this._rotationCenter[0]
+        : super.getCenterX();
+    }
+
+    override getCenterY(): float {
+      return this._rotationCenter
+        ? this._rotationCenter[1]
+        : super.getCenterY();
     }
   }
   // @ts-ignore

@@ -99,25 +99,27 @@ namespace gdjs {
     }
 
     updatePosition(): void {
-      if (this._object.isWrapping() && this._text.width !== 0) {
-        const alignmentX =
-          this._object._textAlign === 'right'
-            ? 1
-            : this._object._textAlign === 'center'
-              ? 0.5
-              : 0;
+      const alignmentX =
+        this._object._textAlign === 'right'
+          ? 1
+          : this._object._textAlign === 'center'
+            ? 0.5
+            : 0;
+      const objectWidth = this._object.isWrapping()
+        ? this._object.getWrappingWidth()
+        : this._text.width;
+      const textLeftOffset = this._object.isWrapping()
+        ? (objectWidth - this._text.width) * alignmentX
+        : 0;
+      const centerX = this._object._rotationCenter
+        ? this._object._rotationCenter[0]
+        : objectWidth / 2;
 
-        const width = this._object.getWrappingWidth();
-
-        // A vector from the custom size center to the renderer center.
-        const centerToCenterX = (width - this._text.width) * (alignmentX - 0.5);
-
-        this._text.position.x = this._object.x + width / 2;
-        this._text.anchor.x = 0.5 - centerToCenterX / this._text.width;
-      } else {
-        this._text.position.x = this._object.x + this._text.width / 2;
-        this._text.anchor.x = 0.5;
-      }
+      this._text.position.x = this._object.getDrawableX() + centerX;
+      this._text.anchor.x =
+        this._text.width !== 0
+          ? (centerX - textLeftOffset) / this._text.width
+          : 0;
 
       const alignmentY =
         this._object._verticalTextAlignment === 'bottom'
@@ -125,9 +127,14 @@ namespace gdjs {
           : this._object._verticalTextAlignment === 'center'
             ? 0.5
             : 0;
-      this._text.position.y =
-        this._object.y + this._text.height * (0.5 - alignmentY);
-      this._text.anchor.y = 0.5;
+      const textTopOffset = this._text.height * alignmentY;
+      const centerY = this._object._rotationCenter
+        ? this._object._rotationCenter[1]
+        : this._text.height / 2;
+
+      this._text.position.y = this._object.y + centerY - textTopOffset;
+      this._text.anchor.y =
+        this._text.height !== 0 ? centerY / this._text.height : 0;
     }
 
     updateAngle(): void {

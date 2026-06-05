@@ -413,6 +413,171 @@ const sliceSpriteSheetSchema = {
   additionalProperties: true,
 };
 
+// Shared tile-spec item used by tilemap tools: a tile is a number (tileId; <0
+// clears), or an object addressing the tileset cell + optional flips.
+const tilemapTileItemSchema = {
+  type: 'object',
+  properties: {
+    x: { type: 'number', description: 'Map column (0-based).' },
+    y: { type: 'number', description: 'Map row (0-based).' },
+    tile: {
+      description:
+        'The tile to place: a tile id number (row*columnCount+col), { id } or { col, row } (needs tileset_columns), or null / { clear:true } to erase. Use { id|col,row, flipX, flipY } to flip.',
+    },
+  },
+  required: ['x', 'y'],
+  additionalProperties: true,
+};
+
+const createTilemapObjectSchema = {
+  type: 'object',
+  properties: {
+    scene_name: { type: 'string', description: 'Scene to add the tilemap to.' },
+    object_name: {
+      type: 'string',
+      description: 'Name for the TileMap::SimpleTileMap object.',
+    },
+    atlas_image: {
+      type: 'string',
+      description:
+        'The tileset atlas IMAGE RESOURCE name (must already exist; add it with add_or_update_resource). columns/rows are computed from this image size and tile_size.',
+    },
+    tile_size: {
+      type: 'number',
+      description: 'Square tile size in pixels (default 16).',
+    },
+    columns: {
+      type: 'number',
+      description:
+        'Override the tileset column count (default: floor(atlasWidth / tile_size)).',
+    },
+    rows: {
+      type: 'number',
+      description:
+        'Override the tileset row count (default: floor(atlasHeight / tile_size)).',
+    },
+    tiles_with_hit_box: {
+      type: 'string',
+      description:
+        'Comma-separated tile ids that should have a collision hit box (e.g. "0,1,5").',
+    },
+    create_instance: {
+      type: 'boolean',
+      description:
+        'Also create one instance in the scene. Implied if you pass x/y/map_width/map_height/tiles.',
+    },
+    x: { type: 'number', description: 'Instance X (scene coords).' },
+    y: { type: 'number', description: 'Instance Y (scene coords).' },
+    layer: { type: 'string', description: 'Instance layer (default base).' },
+    map_width: {
+      type: 'number',
+      description:
+        'Initial map width in tiles (columns) for the instance grid.',
+    },
+    map_height: {
+      type: 'number',
+      description: 'Initial map height in tiles (rows) for the instance grid.',
+    },
+    tiles: {
+      type: 'array',
+      description:
+        'Optional initial tiles to paint on the created instance (same shape as set_tilemap_tiles tiles).',
+      items: tilemapTileItemSchema,
+    },
+  },
+  required: ['scene_name', 'object_name', 'atlas_image'],
+  additionalProperties: true,
+};
+
+const setTilemapTilesSchema = {
+  type: 'object',
+  properties: {
+    scene_name: { type: 'string' },
+    object_name: {
+      type: 'string',
+      description: 'The tilemap object whose instance to paint.',
+    },
+    instance_id: {
+      type: 'string',
+      description:
+        'Target a specific instance (from describe_instances). Defaults to the first instance of the object.',
+    },
+    create_instance: {
+      type: 'boolean',
+      description:
+        'Create an instance if none exists for the object (positioned at x/y).',
+    },
+    x: { type: 'number' },
+    y: { type: 'number' },
+    layer: { type: 'string' },
+    map_width: {
+      type: 'number',
+      description:
+        'Resize the map to this many columns (else grows to fit the tiles).',
+    },
+    map_height: {
+      type: 'number',
+      description:
+        'Resize the map to this many rows (else grows to fit the tiles).',
+    },
+    clear_all: {
+      type: 'boolean',
+      description: 'Erase the whole grid before applying tiles/fill.',
+    },
+    tile_size: {
+      type: 'number',
+      description:
+        'Tile size in px, used only when creating a brand-new grid (default 16; ideally matches the object tile_size).',
+    },
+    tileset_columns: {
+      type: 'number',
+      description:
+        'The tileset column count, required to address tiles by { col, row } (the object columnCount is used automatically inside the editor).',
+    },
+    opacity: {
+      type: 'number',
+      description: 'Layer opacity 0..1 (or 0..255).',
+    },
+    fill: {
+      type: 'object',
+      description:
+        'Rectangular fill: { x, y, width, height, tile }. Applied before individual tiles.',
+      additionalProperties: true,
+    },
+    tiles: {
+      type: 'array',
+      description:
+        'Tile placements: [{ x, y, tile }]. tile = tileId number (row*columnCount+col), { id } or { col, row } (+ optional flipX/flipY), or null/{clear:true} to erase.',
+      items: tilemapTileItemSchema,
+    },
+    summary_only: {
+      type: 'boolean',
+      description: 'Omit the full returned grid (keep the response small).',
+    },
+  },
+  required: ['scene_name', 'object_name'],
+  additionalProperties: true,
+};
+
+const getTilemapTilesSchema = {
+  type: 'object',
+  properties: {
+    scene_name: { type: 'string' },
+    object_name: { type: 'string' },
+    instance_id: {
+      type: 'string',
+      description: 'Optional specific instance; defaults to the first.',
+    },
+    raw: {
+      type: 'boolean',
+      description:
+        'When true, return only the raw tiles[y][x] grid without the decoded { id, flipX } view.',
+    },
+  },
+  required: ['scene_name', 'object_name'],
+  additionalProperties: false,
+};
+
 const spriteAnimationFrameSchema = {
   type: 'object',
   properties: {
@@ -2141,6 +2306,12 @@ const readTools: Array<McpTool> = [
     inputSchema: readSerializedSceneSchema,
   },
   {
+    name: 'get_tilemap_tiles',
+    description:
+      "Read a Tile map (TileMap::SimpleTileMap) instance's painted grid: returns map size, the raw tiles[y][x] grid (-1 = empty, else tileId = row*columnCount+col), and a decoded { id, flipX?, flipY? } view.",
+    inputSchema: getTilemapTilesSchema,
+  },
+  {
     name: 'read_scene_events_serialized',
     description:
       'Read one scene event sheet as raw serialized event JSON, including event types unsupported by text rendering. Pass summary_only:true for just root event counts/types (avoids dumping a huge tree); the JSON string is omitted by default — pass include_json:true to also get it.',
@@ -2475,6 +2646,18 @@ const writeTools: Array<McpTool> = [
     description:
       'Slice one sprite-sheet PNG into a grid of individual frame images (cut on disk with Electron nativeImage), register each frame as an image resource, and bind them as a single Sprite animation. Specify the grid with frame_width+frame_height OR columns+rows. Use this to turn a downloaded sheet into a usable walk/explosion/idle animation in one call.',
     inputSchema: sliceSpriteSheetSchema,
+  },
+  {
+    name: 'create_tilemap_object',
+    description:
+      'Create the built-in Tile map object (TileMap::SimpleTileMap) from a tileset atlas image: sets atlasImage + tile_size and computes the tileset columns/rows from the image. Optionally creates an instance and paints an initial grid. Use set_tilemap_tiles to paint tiles. (Tileset config applies inside the running editor; the per-instance tile grid works everywhere.)',
+    inputSchema: createTilemapObjectSchema,
+  },
+  {
+    name: 'set_tilemap_tiles',
+    description:
+      'Paint / clear tiles on a Tile map (TileMap::SimpleTileMap) instance. Writes the per-instance grid: tiles are tiles[y][x], empty = -1, a tile id = row*columnCount+col into the tileset (optionally flipped). Supports resizing (map_width/map_height), a rectangular fill, individual { x, y, tile } placements, clear_all, and layer opacity. Address a tile by id, or by { col, row } when tileset_columns is known.',
+    inputSchema: setTilemapTilesSchema,
   },
   {
     name: 'bulk_edit_scene_assets',

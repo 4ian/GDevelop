@@ -65,6 +65,9 @@ import {
   setTextObjectProperties,
   setSpriteAnimations,
   sliceSpriteSheet,
+  createTilemapObject,
+  setTilemapTiles,
+  getTilemapTiles,
 } from './McpSceneTools';
 import {
   compareSceneEventsSemantics,
@@ -2016,6 +2019,15 @@ const callMcpTool = async ({
     }
   }
 
+  if (toolName === 'get_tilemap_tiles') {
+    if (!project) return errorResult('No project opened.');
+    try {
+      return textResult(getTilemapTiles(project, args || {}));
+    } catch (error) {
+      return errorResult(error.message);
+    }
+  }
+
   if (toolName === 'read_scene_events_serialized') {
     if (!project) return errorResult('No project opened.');
     try {
@@ -2453,6 +2465,10 @@ const callMcpTool = async ({
     sceneWriteToolHandler = setSpriteAnimations;
   } else if (toolName === 'slice_sprite_sheet') {
     sceneWriteToolHandler = sliceSpriteSheet;
+  } else if (toolName === 'create_tilemap_object') {
+    sceneWriteToolHandler = createTilemapObject;
+  } else if (toolName === 'set_tilemap_tiles') {
+    sceneWriteToolHandler = setTilemapTiles;
   } else if (toolName === 'replace_object_definition') {
     sceneWriteToolHandler = replaceObjectDefinition;
   } else if (toolName === 'delete_scene_object') {

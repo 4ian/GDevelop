@@ -2867,6 +2867,87 @@ describe('McpEditorBridge', () => {
     }
   });
 
+  it('paints and reads a tilemap instance grid (set/get round-trip)', async () => {
+    // $FlowFixMe[invalid-constructor]
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    const layout = project.insertNewLayout('Level1', 0);
+    // The TileMap JS-extension object type is not registered in the unit-test
+    // env, so create a plain object to hold the instance; set_tilemap_tiles
+    // operates on the instance's raw "tilemap" string regardless of object type.
+    layout.getObjects().insertNewObject(project, 'Sprite', 'Tiles', 0);
+
+    try {
+      const bridge = makeBridge({
+        getProject: () => project,
+        getPermissions: () => ({
+          allowWriteTools: true,
+          allowCommandTools: false,
+        }),
+      });
+
+      const setResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'set_tilemap_tiles',
+          arguments: {
+            scene_name: 'Level1',
+            object_name: 'Tiles',
+            create_instance: true,
+            x: 0,
+            y: 0,
+            tile_size: 16,
+            tileset_columns: 4,
+            map_width: 3,
+            map_height: 2,
+            // Fill row by id, then override one cell by {col,row} + flip, clear another.
+            fill: { x: 0, y: 0, width: 3, height: 1, tile: 0 },
+            tiles: [
+              { x: 1, y: 1, tile: { col: 2, row: 1, flipX: true } }, // id = 1*4+2 = 6
+              { x: 2, y: 0, tile: null }, // clear (was filled by fill)
+            ],
+          },
+        },
+      });
+      const setResult = JSON.parse(setResponse.content[0].text);
+      expect(setResponse.isError).not.toBe(true);
+      expect(setResult.success).toBe(true);
+      expect(setResult.mapSize).toEqual({ columns: 3, rows: 2 });
+      expect(setResult.pixelSize).toEqual({ width: 48, height: 32 });
+
+      // The instance now carries a valid serialized grid.
+      const instances = getInitialInstances(layout.getInitialInstances());
+      const tilemapRaw = instances[0].getRawStringProperty('tilemap');
+      const grid = JSON.parse(tilemapRaw);
+      expect(grid.dimX).toBe(3);
+      expect(grid.dimY).toBe(2);
+      expect(grid.layers[0].id).toBe(0);
+      // tiles[y][x]: row 0 = [0, 0, -1] (third cleared); row 1 has the flipped tile at x=1.
+      expect(grid.layers[0].tiles[0][0]).toBe(0);
+      expect(grid.layers[0].tiles[0][2]).toBe(-1);
+      // id 6 OR-ed with the horizontal flip flag (0x80000000 → negative int32).
+      expect(grid.layers[0].tiles[1][1] & 0x000000ff).toBe(6);
+      expect(grid.layers[0].tiles[1][1] < 0).toBe(true);
+
+      // get_tilemap_tiles decodes it back.
+      const getResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'get_tilemap_tiles',
+          arguments: { scene_name: 'Level1', object_name: 'Tiles' },
+        },
+      });
+      const getResult = JSON.parse(getResponse.content[0].text);
+      expect(getResult.mapSize).toEqual({ columns: 3, rows: 2 });
+      expect(getResult.decodedTiles[0][0]).toEqual({ id: 0 });
+      expect(getResult.decodedTiles[0][2]).toEqual({ empty: true });
+      expect(getResult.decodedTiles[1][1]).toEqual(
+        expect.objectContaining({ id: 6, flipX: true })
+      );
+    } finally {
+      project.delete();
+    }
+  });
+
   it('snapshots and restores the project (rollback)', async () => {
     // $FlowFixMe[invalid-constructor]
     const project = new gd.ProjectHelper.createNewGDJSProject();

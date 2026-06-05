@@ -3413,6 +3413,551 @@ export const sliceSpriteSheet = (project: gdProject, args: Object): Object => {
   };
 };
 
+// ===========================================================================
+// Built-in Tilemap (TileMap::SimpleTileMap) operations.
+//
+// GDevelop's "Tile map" object (internal type TileMap::SimpleTileMap) has two
+// parts:
+//  - Object config (the TILESET): atlasImage (image resource), tileSize (px,
+//    square), columnCount/rowCount (derived from the atlas image size), and
+//    tilesWithHitBox. Edited via the ObjectJsImplementation.updateProperty API.
+//  - The painted GRID: stored PER INITIAL INSTANCE as a raw string property
+//    named "tilemap" holding a JSON EditableTileMapAsJsObject:
+//      { tileWidth, tileHeight, dimX, dimY,
+//        layers: [{ id: 0, alpha, tiles: number[][] }] }
+//    where tiles is row-major tiles[y][x]; an EMPTY cell is -1; a filled cell
+//    is the tile GID = tileId (0-based row*columnCount+col into the tileset),
+//    optionally OR-ed with flip flags. SimpleTileMap always uses a single layer
+//    id:0. dimX = map columns, dimY = map rows; pixel size = tileSize*dim.
+// ===========================================================================
+
+const SIMPLE_TILEMAP_TYPE = 'TileMap::SimpleTileMap';
+const TILE_EMPTY = -1;
+// Flip flags live in the top 3 bits of the tile GID (Tiled convention).
+const TILEMAP_FLIP_X = 0x80000000;
+const TILEMAP_FLIP_Y = 0x40000000;
+const TILEMAP_FLIP_DIAGONAL = 0x20000000;
+const TILEMAP_ID_MASK = ~(
+  TILEMAP_FLIP_X |
+  TILEMAP_FLIP_Y |
+  TILEMAP_FLIP_DIAGONAL
+);
+
+// Convert a tile spec → serialized GID. A spec is: a number (tileId; <0 clears),
+// null/undefined (clear), or an object { id|col,row, flipX?, flipY?, clear? }.
+const tileSpecToGid = (tile: any, tilesetColumns: ?number): number => {
+  if (tile === null || tile === undefined) return TILE_EMPTY;
+  if (typeof tile === 'number') return tile < 0 ? TILE_EMPTY : tile;
+  if (typeof tile === 'object') {
+    if (tile.clear === true) return TILE_EMPTY;
+    let id;
+    if (typeof tile.id === 'number') {
+      id = tile.id;
+    } else if (typeof tile.col === 'number' && typeof tile.row === 'number') {
+      if (!tilesetColumns || tilesetColumns < 1) {
+        throw new Error(
+          "To address a tile by { col, row } you must provide tileset_columns (or the tilemap object's columnCount must be known). Otherwise pass a numeric tile id."
+        );
+      }
+      id = tile.row * tilesetColumns + tile.col;
+    } else {
+      throw new Error(
+        'Each tile must be a numeric tile id, { id }, { col, row }, or null/{ clear:true }.'
+      );
+    }
+    if (id < 0) return TILE_EMPTY;
+    let gid = id;
+    // Bitwise OR yields a signed 32-bit int; that is exactly how GDevelop
+    // stores flipped GIDs (the loader extracts the id via & mask).
+    if (tile.flipX) gid |= TILEMAP_FLIP_X;
+    if (tile.flipY) gid |= TILEMAP_FLIP_Y;
+    return gid;
+  }
+  throw new Error('Invalid tile spec.');
+};
+
+// Decode a serialized GID back to a plain tile descriptor for get_tilemap_tiles.
+const gidToTileInfo = (gid: number): Object => {
+  if (gid === TILE_EMPTY || gid === undefined) return { empty: true };
+  const id = gid & TILEMAP_ID_MASK;
+  const info: Object = { id };
+  if ((gid & TILEMAP_FLIP_X) !== 0) info.flipX = true;
+  if ((gid & TILEMAP_FLIP_Y) !== 0) info.flipY = true;
+  return info;
+};
+
+// Build an empty grid (all cells -1).
+const makeEmptyTilemapGrid = (
+  tileSize: number,
+  dimX: number,
+  dimY: number,
+  alpha: number
+): Object => {
+  const tiles = [];
+  for (let y = 0; y < dimY; y++) tiles.push(new Array(dimX).fill(TILE_EMPTY));
+  return {
+    tileWidth: tileSize,
+    tileHeight: tileSize,
+    dimX,
+    dimY,
+    layers: [{ id: 0, alpha, tiles }],
+  };
+};
+
+// Normalize/validate a parsed grid and resize its single layer to dimX x dimY,
+// preserving existing tiles and padding new cells with -1.
+const normalizeTilemapGrid = (
+  grid: Object,
+  dimX: number,
+  dimY: number,
+  tileSize: number,
+  alpha: number
+): Object => {
+  const layer =
+    grid.layers && grid.layers[0]
+      ? grid.layers[0]
+      : { id: 0, alpha, tiles: [] };
+  const oldTiles = Array.isArray(layer.tiles) ? layer.tiles : [];
+  const tiles = [];
+  for (let y = 0; y < dimY; y++) {
+    const oldRow = Array.isArray(oldTiles[y]) ? oldTiles[y] : [];
+    const row = new Array(dimX);
+    for (let x = 0; x < dimX; x++) {
+      row[x] = typeof oldRow[x] === 'number' ? oldRow[x] : TILE_EMPTY;
+    }
+    tiles.push(row);
+  }
+  return {
+    tileWidth: tileSize,
+    tileHeight: tileSize,
+    dimX,
+    dimY,
+    layers: [
+      {
+        id: 0,
+        alpha: typeof layer.alpha === 'number' ? layer.alpha : alpha,
+        tiles,
+      },
+    ],
+  };
+};
+
+// Resolve the columnCount stored on a tilemap object's config, if available
+// (only present when the TileMap JS-extension is loaded, i.e. in the editor).
+const readTilemapColumnCount = (object: ?gdObject): ?number => {
+  if (!object) return null;
+  try {
+    const config = gd.asObjectJsImplementation(object.getConfiguration());
+    const props = config.getProperties();
+    if (props.has('columnCount')) {
+      const value = parseFloat(props.get('columnCount').getValue());
+      if (Number.isFinite(value) && value >= 1) return value;
+    }
+  } catch (error) {
+    // Not a JS-implementation object, or no columnCount property.
+  }
+  return null;
+};
+
+// Create or update a TileMap::SimpleTileMap object from a tileset atlas image.
+// columnCount/rowCount are computed from the atlas image size and tileSize
+// (overridable). Optionally creates an initial instance and seeds its tile grid.
+export const createTilemapObject = (
+  project: gdProject,
+  args: Object,
+  callbacks: SceneToolCallbacks = ({}: any)
+): Object => {
+  const sceneName = getRequiredString(args, 'scene_name');
+  const objectName = getRequiredString(args, 'object_name');
+  const atlasImage =
+    getOptionalString(args, 'atlas_image') ||
+    getOptionalString(args, 'atlasImage') ||
+    getOptionalString(args, 'image');
+  if (!atlasImage) {
+    throw new Error('Missing atlas_image (the tileset image resource name).');
+  }
+  assertResourceIsImage(project, atlasImage);
+  const tileSize =
+    getFiniteNumber(args.tile_size) !== null
+      ? Math.floor(args.tile_size)
+      : getFiniteNumber(args.tileSize) !== null
+      ? Math.floor(args.tileSize)
+      : 16;
+  if (tileSize < 1) throw new Error('tile_size must be >= 1.');
+
+  const scene = getScene(project, sceneName);
+
+  // Compute tileset grid from the atlas image, unless explicitly overridden.
+  const dims = readImageResourceSize(project, atlasImage);
+  let columnCount =
+    getFiniteNumber(args.columns) !== null
+      ? Math.floor(args.columns)
+      : getFiniteNumber(args.column_count) !== null
+      ? Math.floor(args.column_count)
+      : dims
+      ? Math.max(1, Math.floor(dims.width / tileSize))
+      : null;
+  let rowCount =
+    getFiniteNumber(args.rows) !== null
+      ? Math.floor(args.rows)
+      : getFiniteNumber(args.row_count) !== null
+      ? Math.floor(args.row_count)
+      : dims
+      ? Math.max(1, Math.floor(dims.height / tileSize))
+      : null;
+
+  // Create (or reuse) the object. Done via insertNewObject directly because the
+  // object metadata is only registered when the TileMap JS-extension is loaded
+  // (the editor), whereas insertNewObject preserves the requested type anywhere.
+  const objects = scene.getObjects();
+  const existingIndex = getObjectIndex(objects, objectName);
+  let object;
+  let didCreate = false;
+  if (existingIndex >= 0) {
+    object = objects.getObject(objectName);
+    if (object.getType() !== SIMPLE_TILEMAP_TYPE) {
+      objects.removeObject(objectName);
+      object = objects.insertNewObject(
+        project,
+        SIMPLE_TILEMAP_TYPE,
+        objectName,
+        existingIndex
+      );
+      didCreate = true;
+    }
+  } else {
+    object = objects.insertNewObject(
+      project,
+      SIMPLE_TILEMAP_TYPE,
+      objectName,
+      objects.getObjectsCount()
+    );
+    didCreate = true;
+  }
+
+  // Set the tileset config. updateProperty is the editor-canonical path; it is a
+  // no-op when the JS-extension schema is absent (outside the editor), reported
+  // via configApplied.
+  let configApplied = false;
+  try {
+    const config = gd.asObjectJsImplementation(object.getConfiguration());
+    const set = (k, v) => config.updateProperty(k, String(v));
+    const okAtlas = set('atlasImage', atlasImage);
+    set('tileSize', tileSize);
+    if (columnCount !== null) set('columnCount', columnCount);
+    if (rowCount !== null) set('rowCount', rowCount);
+    const tilesWithHitBox =
+      getOptionalString(args, 'tiles_with_hit_box') ||
+      getOptionalString(args, 'tilesWithHitBox');
+    if (tilesWithHitBox) set('tilesWithHitBox', tilesWithHitBox);
+    configApplied = !!okAtlas;
+    // Read back the authoritative columnCount if the schema is present.
+    const back = readTilemapColumnCount(object);
+    if (back) columnCount = back;
+  } catch (error) {
+    configApplied = false;
+  }
+
+  if (callbacks.onObjectsModifiedOutsideEditor) {
+    callbacks.onObjectsModifiedOutsideEditor({
+      scene,
+      isNewObjectTypeUsed: didCreate,
+    });
+  }
+
+  // Optionally create an instance and seed an initial tile grid on it.
+  let instanceResult = null;
+  const wantsInstance =
+    args.create_instance === true ||
+    args.instance ||
+    args.tiles ||
+    getFiniteNumber(args.map_width) !== null ||
+    getFiniteNumber(args.map_height) !== null ||
+    args.x !== undefined ||
+    args.y !== undefined;
+  if (wantsInstance) {
+    const setArgs: Object = {
+      scene_name: sceneName,
+      object_name: objectName,
+      create_instance: true,
+      tile_size: tileSize,
+      tileset_columns: columnCount || undefined,
+      x: args.x,
+      y: args.y,
+      layer: args.layer,
+      map_width: args.map_width,
+      map_height: args.map_height,
+      tiles: args.tiles,
+      summary_only: true,
+    };
+    instanceResult = setTilemapTiles(project, setArgs, callbacks);
+  }
+
+  return {
+    success: true,
+    sceneName,
+    objectName,
+    objectType: SIMPLE_TILEMAP_TYPE,
+    didCreate,
+    atlasImage,
+    tileSize,
+    columnCount,
+    rowCount,
+    configApplied,
+    instance: instanceResult,
+    note: configApplied
+      ? 'Tilemap object created/updated. Use set_tilemap_tiles to paint tiles on its instance.'
+      : 'Tilemap object created with the correct type, but the tileset config (atlasImage/tileSize/columns/rows) could not be applied in this environment (the TileMap extension is only fully wired inside the running editor). In the editor the config applies normally. The tile grid (set_tilemap_tiles) works everywhere.',
+  };
+};
+
+// Find the initial instance to operate on: by short id if given, else the first
+// instance of object_name; optionally create one when create_instance is set.
+const findTilemapInstance = (
+  scene: gdLayout,
+  objectName: string,
+  args: Object
+): ?gdInitialInstance => {
+  const initialInstances = scene.getInitialInstances();
+  const id = getOptionalString(args, 'instance_id');
+  if (id) {
+    return findInstanceByShortId(initialInstances, id);
+  }
+  let found = null;
+  iterateInitialInstances(initialInstances, instance => {
+    if (!found && instance.getObjectName() === objectName) found = instance;
+  });
+  if (!found && args.create_instance === true) {
+    found = initialInstances.insertNewInitialInstance();
+    found.setObjectName(objectName);
+    const x = getFiniteNumber(args.x);
+    const y = getFiniteNumber(args.y);
+    if (x !== null) found.setX(x);
+    if (y !== null) found.setY(y);
+    const layer = getOptionalString(args, 'layer');
+    if (layer) found.setLayer(layer);
+  }
+  return found;
+};
+
+// Set / clear tiles on a tilemap instance (writes the per-instance "tilemap"
+// raw-string grid). Supports resizing the map, individual tile placements, and
+// rectangular fills. Empty/clear is -1; a tile id is row*columnCount+col.
+export const setTilemapTiles = (
+  project: gdProject,
+  args: Object,
+  callbacks: SceneToolCallbacks = ({}: any)
+): Object => {
+  const sceneName = getRequiredString(args, 'scene_name');
+  const objectName = getRequiredString(args, 'object_name');
+  const scene = getScene(project, sceneName);
+
+  const instance = findTilemapInstance(scene, objectName, args);
+  if (!instance) {
+    throw new Error(
+      `No instance of "${objectName}" found in scene "${sceneName}". Pass instance_id, or create_instance:true to create one (or use create_tilemap_object).`
+    );
+  }
+
+  // Resolve tileSize and tileset columns (for { col, row } tile specs).
+  let object = null;
+  if (scene.getObjects().hasObjectNamed(objectName))
+    object = scene.getObjects().getObject(objectName);
+  else if (project.getObjects().hasObjectNamed(objectName))
+    object = project.getObjects().getObject(objectName);
+  const tilesetColumns =
+    getFiniteNumber(args.tileset_columns) !== null
+      ? Math.floor(args.tileset_columns)
+      : readTilemapColumnCount(object);
+  const tileSize =
+    getFiniteNumber(args.tile_size) !== null ? Math.floor(args.tile_size) : 16;
+
+  // Parse the existing grid (or start empty).
+  let grid;
+  const existing = instance.getRawStringProperty('tilemap');
+  if (existing) {
+    try {
+      grid = JSON.parse(existing);
+    } catch (error) {
+      grid = null;
+    }
+  }
+  const baseTileSize =
+    grid && typeof grid.tileWidth === 'number' ? grid.tileWidth : tileSize;
+  const baseAlpha =
+    grid &&
+    grid.layers &&
+    grid.layers[0] &&
+    typeof grid.layers[0].alpha === 'number'
+      ? grid.layers[0].alpha
+      : typeof args.opacity === 'number'
+      ? Math.max(
+          0,
+          Math.min(1, args.opacity > 1 ? args.opacity / 255 : args.opacity)
+        )
+      : 1;
+
+  // Determine target dimensions: explicit map_width/map_height, else grow to fit
+  // the provided tiles, else keep the existing size (min 1x1).
+  const tileList = Array.isArray(args.tiles) ? args.tiles : [];
+  let neededX = 0;
+  let neededY = 0;
+  tileList.forEach(t => {
+    if (t && typeof t.x === 'number' && typeof t.y === 'number') {
+      neededX = Math.max(neededX, t.x + 1);
+      neededY = Math.max(neededY, t.y + 1);
+    }
+  });
+  const fill = args.fill && typeof args.fill === 'object' ? args.fill : null;
+  if (fill) {
+    const fx = (fill.x || 0) + (fill.width || 0);
+    const fy = (fill.y || 0) + (fill.height || 0);
+    neededX = Math.max(neededX, fx);
+    neededY = Math.max(neededY, fy);
+  }
+  const existingX = grid && typeof grid.dimX === 'number' ? grid.dimX : 0;
+  const existingY = grid && typeof grid.dimY === 'number' ? grid.dimY : 0;
+  const clearAll = args.clear_all === true;
+  const dimX = Math.max(
+    1,
+    getFiniteNumber(args.map_width) !== null
+      ? Math.floor(args.map_width)
+      : Math.max(clearAll ? 0 : existingX, neededX)
+  );
+  const dimY = Math.max(
+    1,
+    getFiniteNumber(args.map_height) !== null
+      ? Math.floor(args.map_height)
+      : Math.max(clearAll ? 0 : existingY, neededY)
+  );
+
+  if (!grid || clearAll) {
+    grid = makeEmptyTilemapGrid(baseTileSize, dimX, dimY, baseAlpha);
+  } else {
+    grid = normalizeTilemapGrid(grid, dimX, dimY, baseTileSize, baseAlpha);
+  }
+  const layerTiles = grid.layers[0].tiles;
+  if (typeof args.opacity === 'number') {
+    grid.layers[0].alpha = Math.max(
+      0,
+      Math.min(1, args.opacity > 1 ? args.opacity / 255 : args.opacity)
+    );
+  }
+
+  let changedCells = 0;
+  const placeTile = (x, y, gid) => {
+    if (x < 0 || y < 0 || x >= dimX || y >= dimY) return;
+    layerTiles[y][x] = gid;
+    changedCells++;
+  };
+
+  // Rectangular fill first (so explicit tiles can override).
+  if (fill) {
+    const gid = tileSpecToGid(
+      fill.tile !== undefined ? fill.tile : fill,
+      tilesetColumns
+    );
+    const fx0 = Math.max(0, Math.floor(fill.x || 0));
+    const fy0 = Math.max(0, Math.floor(fill.y || 0));
+    const fx1 = Math.min(dimX, fx0 + Math.floor(fill.width || dimX - fx0));
+    const fy1 = Math.min(dimY, fy0 + Math.floor(fill.height || dimY - fy0));
+    for (let y = fy0; y < fy1; y++)
+      for (let x = fx0; x < fx1; x++) placeTile(x, y, gid);
+  }
+
+  // Individual tile placements.
+  tileList.forEach((t, index) => {
+    if (!t || typeof t.x !== 'number' || typeof t.y !== 'number') {
+      throw new Error(`tiles[${index}] needs numeric x and y.`);
+    }
+    const gid = tileSpecToGid(
+      t.tile !== undefined ? t.tile : t,
+      tilesetColumns
+    );
+    placeTile(Math.floor(t.x), Math.floor(t.y), gid);
+  });
+
+  instance.setRawStringProperty('tilemap', JSON.stringify(grid));
+  // Match the editor: the instance occupies tileSize*dim pixels.
+  instance.setHasCustomSize(true);
+  instance.setCustomWidth(baseTileSize * dimX);
+  instance.setCustomHeight(baseTileSize * dimY);
+
+  if (callbacks.onInstancesModifiedOutsideEditor) {
+    callbacks.onInstancesModifiedOutsideEditor({ scene });
+  }
+
+  const summaryOnly =
+    args && (args.summary_only === true || args.summaryOnly === true);
+  return {
+    success: true,
+    sceneName,
+    objectName,
+    instanceId: instance.getPersistentUuid().slice(0, 10),
+    mapSize: { columns: dimX, rows: dimY },
+    pixelSize: { width: baseTileSize * dimX, height: baseTileSize * dimY },
+    tileSize: baseTileSize,
+    changedCells,
+    tilesetColumns: tilesetColumns || undefined,
+    grid: summaryOnly ? undefined : grid,
+    note:
+      (tilesetColumns
+        ? ''
+        : 'tileset_columns was not known, so { col, row } tile specs are unavailable — pass tileset_columns or numeric tile ids. ') +
+      'Tiles written to the instance. tiles[y][x]: -1 = empty, otherwise tileId = row*columnCount+col. A running preview needs a relaunch/hot-reload to show changes.',
+  };
+};
+
+// Read a tilemap instance's painted grid.
+export const getTilemapTiles = (project: gdProject, args: Object): Object => {
+  const sceneName = getRequiredString(args, 'scene_name');
+  const objectName = getRequiredString(args, 'object_name');
+  const scene = getScene(project, sceneName);
+  const instance = findTilemapInstance(scene, objectName, args);
+  if (!instance) {
+    throw new Error(
+      `No instance of "${objectName}" found in scene "${sceneName}".`
+    );
+  }
+  const raw = instance.getRawStringProperty('tilemap');
+  if (!raw) {
+    return {
+      success: true,
+      sceneName,
+      objectName,
+      empty: true,
+      note:
+        'This instance has no painted tilemap grid yet. Use set_tilemap_tiles to add tiles.',
+    };
+  }
+  let grid;
+  try {
+    grid = JSON.parse(raw);
+  } catch (error) {
+    throw new Error('The instance tilemap data is not valid JSON.');
+  }
+  const layer = grid.layers && grid.layers[0];
+  const tiles = layer && Array.isArray(layer.tiles) ? layer.tiles : [];
+  const decoded = !(args && args.raw === true)
+    ? tiles.map(row => row.map(gid => gidToTileInfo(gid)))
+    : undefined;
+  return {
+    success: true,
+    sceneName,
+    objectName,
+    instanceId: instance.getPersistentUuid().slice(0, 10),
+    tileWidth: grid.tileWidth,
+    tileHeight: grid.tileHeight,
+    mapSize: { columns: grid.dimX, rows: grid.dimY },
+    layerAlpha: layer ? layer.alpha : undefined,
+    // Raw serialized grid (tiles[y][x]; -1 empty), and a decoded view unless raw:true.
+    tiles,
+    decodedTiles: decoded,
+    note:
+      'tiles is the raw serialized grid (tiles[y][x]; -1 = empty, else tileId = row*columnCount+col, possibly OR-ed with flip flags). decodedTiles expands each cell to { id, flipX?, flipY? } or { empty:true }.',
+  };
+};
+
 export const bulkEditSceneAssets = (
   project: gdProject,
   args: Object,

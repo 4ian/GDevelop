@@ -37,6 +37,7 @@ describe('McpToolCatalog', () => {
     expect(toolNames).toContain('find_scene_events');
     expect(toolNames).toContain('validate_events_json_file');
     expect(toolNames).toContain('lint_scene_events');
+    expect(toolNames).toContain('get_tilemap_tiles');
     expect(toolNames).toContain('gdevelop_capabilities');
     expect(toolNames).toContain('create_action');
     expect(toolNames).toContain('create_condition');
@@ -61,6 +62,8 @@ describe('McpToolCatalog', () => {
     expect(toolNames).toContain('bulk_edit_scene_assets');
     expect(toolNames).toContain('slice_sprite_sheet');
     expect(toolNames).toContain('render_scene_to_png');
+    expect(toolNames).toContain('create_tilemap_object');
+    expect(toolNames).toContain('set_tilemap_tiles');
     expect(toolNames).toContain('replace_project_resource');
     expect(toolNames).toContain('snapshot_project');
     expect(toolNames).toContain('restore_project_snapshot');

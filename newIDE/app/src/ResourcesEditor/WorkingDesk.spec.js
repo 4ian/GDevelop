@@ -110,6 +110,19 @@ describe('WorkingDesk', () => {
     expect(source).toContain('<ClosableTab');
   });
 
+  it('clips working desk tabs inside the working desk bounds', () => {
+    const source = fs.readFileSync(
+      path.join(__dirname, 'WorkingDesk.js'),
+      'utf8'
+    );
+
+    expect(source).toMatch(/container:\s*\{[\s\S]*minWidth:\s*0,/i);
+    expect(source).toMatch(/container:\s*\{[\s\S]*overflow:\s*'hidden',/i);
+    expect(source).toMatch(/tabsBar:\s*\{[\s\S]*minWidth:\s*0,/i);
+    expect(source).toMatch(/tabsBar:\s*\{[\s\S]*maxWidth:\s*'100%',/i);
+    expect(source).toMatch(/tabsBar:\s*\{[\s\S]*overflow:\s*'hidden',/i);
+  });
+
   it('does not render a separate working desk title header above tabs', () => {
     const source = fs.readFileSync(
       path.join(__dirname, 'WorkingDesk.js'),

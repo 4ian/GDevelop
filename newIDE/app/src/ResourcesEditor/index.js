@@ -104,6 +104,7 @@ const styles = {
     display: 'flex',
     minHeight: minWorkingDeskHeight,
     minWidth: 0,
+    overflow: 'hidden',
   },
   horizontalResizeHandle: {
     flex: '0 0 6px',

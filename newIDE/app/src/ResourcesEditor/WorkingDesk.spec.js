@@ -98,4 +98,48 @@ describe('WorkingDesk', () => {
     expect(source).not.toContain('Pause animation');
     expect(source).not.toContain('<Trans>FPS</Trans>');
   });
+
+  it('uses closable tabs as the working desk container', () => {
+    const source = fs.readFileSync(
+      path.join(__dirname, 'WorkingDesk.js'),
+      'utf8'
+    );
+
+    expect(source).toContain("from '../UI/ClosableTabs'");
+    expect(source).toContain('<ClosableTabs');
+    expect(source).toContain('<ClosableTab');
+  });
+
+  it('does not render a separate working desk title header above tabs', () => {
+    const source = fs.readFileSync(
+      path.join(__dirname, 'WorkingDesk.js'),
+      'utf8'
+    );
+
+    expect(source).not.toContain('<Trans>Working desk</Trans>');
+    expect(source).not.toContain('style={styles.header}');
+    expect(source).not.toContain('style={styles.headerActions}');
+  });
+
+  it('opens working desk tabs only for selected files and tool task updates', () => {
+    const source = fs.readFileSync(
+      path.join(__dirname, 'WorkingDesk.js'),
+      'utf8'
+    );
+
+    expect(source).toContain('toolTabUpdate');
+    expect(source).toContain("selectedItem.node.type !== 'file'");
+    expect(source).toContain("kind: 'nano-banana'");
+    expect(source).toContain("'elevenlabs-audio'");
+  });
+
+  it('uses white text for HTTP request and response details', () => {
+    const source = fs.readFileSync(
+      path.join(__dirname, 'WorkingDesk.js'),
+      'utf8'
+    );
+
+    expect(source).toMatch(/debugSummary:\s*\{[\s\S]*color:\s*'#fff'/);
+    expect(source).toMatch(/debugPre:\s*\{[\s\S]*color:\s*'#fff'/);
+  });
 });

@@ -6,6 +6,12 @@ import Text from '../UI/Text';
 import IconButton from '../UI/IconButton';
 import MiniToolbar, { MiniToolbarText } from '../UI/MiniToolbar';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
+import CircularProgress from '../UI/CircularProgress';
+import {
+  ClosableTabs,
+  ClosableTab,
+  TabContentContainer,
+} from '../UI/ClosableTabs';
 import { MarkdownText } from '../UI/MarkdownText';
 import ResourcesLoader from '../ResourcesLoader';
 import ResourcePreview from '../ResourcesList/ResourcePreview';
@@ -18,6 +24,9 @@ import GridIcon from '../UI/CustomSvgIcons/Grid2d';
 import VisibilityIcon from '../UI/CustomSvgIcons/Visibility';
 import ZoomIn from '../UI/CustomSvgIcons/ZoomIn';
 import ZoomOut from '../UI/CustomSvgIcons/ZoomOut';
+import SparkleIcon from '../UI/CustomSvgIcons/Sparkle';
+import MusicIcon from '../UI/CustomSvgIcons/Music';
+import PictureIcon from '../UI/CustomSvgIcons/Picture';
 import {
   getFileUrl,
   isAudioFile,
@@ -34,6 +43,7 @@ import {
   imageZoomMinFactor,
   shouldShowWorkingDeskImageZoomToolbar,
 } from './WorkingDeskZoomUtils';
+import { type WorkingDeskToolTabUpdate } from './WorkingDeskTabTypes';
 import './WorkingDesk.css';
 
 const fs = optionalRequire('fs');
@@ -42,8 +52,34 @@ type Props = {|
   project: gdProject,
   resourcesLoader: typeof ResourcesLoader,
   selectedItem: ?ProjectFileSelection,
+  toolTabUpdate: ?WorkingDeskToolTabUpdate,
   onProjectFilesChanged: () => Promise<void> | void,
 |};
+
+type WorkingDeskFileTab = {|
+  id: string,
+  tabKind: 'file',
+  title: string,
+  selectedItem: ProjectFileSelection,
+|};
+
+type WorkingDeskToolTab = {|
+  id: string,
+  tabKind: 'tool',
+  title: string,
+  kind: 'nano-banana' | 'elevenlabs-audio',
+  status: 'running' | 'success' | 'error',
+  statusText: ?string,
+  requestText: ?string,
+  responseText: ?string,
+  generatedImagePath: ?string,
+  generatedImageUrl: ?string,
+  generatedAudioPath: ?string,
+  generatedAudioUrl: ?string,
+  errorText: ?string,
+|};
+
+type WorkingDeskTab = WorkingDeskFileTab | WorkingDeskToolTab;
 
 const styles = {
   container: {
@@ -52,18 +88,12 @@ const styles = {
     flex: 1,
     minHeight: 0,
   },
-  header: {
+  tabsBar: {
     display: 'flex',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: '0 8px',
-    minHeight: 32,
-  },
-  headerActions: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: 8,
-    flexShrink: 0,
+    minHeight: 34,
+    padding: '0 6px',
+    boxSizing: 'border-box',
   },
   content: {
     position: 'relative',
@@ -109,6 +139,12 @@ const styles = {
     flex: 1,
     minHeight: 0,
     overflow: 'hidden',
+  },
+  imageOverlayToolbar: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    zIndex: 2,
   },
   imageScrollArea: {
     position: 'relative',
@@ -191,6 +227,58 @@ const styles = {
     lineHeight: '18px',
     whiteSpace: 'pre-wrap',
   },
+  toolTaskContent: {
+    display: 'flex',
+    flexDirection: 'column',
+    flex: 1,
+    minHeight: 0,
+    overflow: 'auto',
+    padding: 16,
+    gap: 12,
+    boxSizing: 'border-box',
+  },
+  toolTaskStatusRow: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 8,
+    minHeight: 24,
+  },
+  debugFoldedSection: {
+    borderRadius: 4,
+    border: '1px solid rgba(128, 128, 128, 0.28)',
+    backgroundColor: 'rgba(0, 0, 0, 0.12)',
+    overflow: 'hidden',
+  },
+  debugSummary: {
+    padding: '10px 12px',
+    cursor: 'pointer',
+    fontWeight: 600,
+    color: '#fff',
+  },
+  debugPre: {
+    margin: 0,
+    padding: 12,
+    borderTop: '1px solid rgba(128, 128, 128, 0.18)',
+    backgroundColor: 'rgba(0, 0, 0, 0.24)',
+    color: '#fff',
+    whiteSpace: 'pre-wrap',
+    overflowWrap: 'anywhere',
+    fontFamily: 'Consolas, Monaco, monospace',
+    fontSize: 12,
+    lineHeight: '18px',
+  },
+  generatedImage: {
+    maxWidth: '100%',
+    maxHeight: 420,
+    objectFit: 'contain',
+    borderRadius: 4,
+    border: '1px solid rgba(128, 128, 128, 0.28)',
+    backgroundColor: 'rgba(0, 0, 0, 0.18)',
+  },
+  generatedAudio: {
+    width: '100%',
+    maxWidth: 720,
+  },
 };
 
 const readTextFile = async (absolutePath: string): Promise<string> => {
@@ -202,13 +290,40 @@ const readTextFile = async (absolutePath: string): Promise<string> => {
   return fs.promises.readFile(absolutePath, 'utf8');
 };
 
+const getFileTabId = (selectedItem: ProjectFileSelection): string =>
+  `file:${selectedItem.node.id}`;
+
+const getToolTabFromUpdate = (
+  toolTabUpdate: WorkingDeskToolTabUpdate
+): WorkingDeskToolTab => ({
+  id: toolTabUpdate.id,
+  tabKind: 'tool',
+  title: toolTabUpdate.title,
+  kind: toolTabUpdate.kind,
+  status: toolTabUpdate.status,
+  statusText: toolTabUpdate.statusText || null,
+  requestText: toolTabUpdate.requestText || null,
+  responseText: toolTabUpdate.responseText || null,
+  generatedImagePath: toolTabUpdate.generatedImagePath || null,
+  generatedImageUrl: toolTabUpdate.generatedImageUrl || null,
+  generatedAudioPath: toolTabUpdate.generatedAudioPath || null,
+  generatedAudioUrl: toolTabUpdate.generatedAudioUrl || null,
+  errorText: toolTabUpdate.errorText || null,
+});
+
+const getSafeTabDomId = (tabId: string): string =>
+  `working-desk-tab-${tabId.replace(/[^a-zA-Z0-9_-]/g, '-')}`;
+
 const WorkingDesk = ({
   project,
   resourcesLoader,
   selectedItem,
+  toolTabUpdate,
   onProjectFilesChanged,
 }: Props): React.Node => {
   const theme = React.useContext(GDevelopThemeContext);
+  const [tabs, setTabs] = React.useState<Array<WorkingDeskTab>>([]);
+  const [activeTabId, setActiveTabId] = React.useState<?string>(null);
   const [markdownContent, setMarkdownContent] = React.useState('');
   const [markdownMode, setMarkdownMode] = React.useState<
     'split' | 'edit' | 'preview'
@@ -217,14 +332,63 @@ const WorkingDesk = ({
   const [markdownStatus, setMarkdownStatus] = React.useState<?string>(null);
   const [textPreview, setTextPreview] = React.useState<?string>(null);
   const [textPreviewError, setTextPreviewError] = React.useState<?string>(null);
-  const [imageSize, setImageSize] = React.useState<?[number, number]>(null);
   const [imageZoomFactor, setImageZoomFactor] = React.useState(1);
   const [audioPreviewError, setAudioPreviewError] = React.useState<?string>(
     null
   );
 
-  const selectedNode = selectedItem ? selectedItem.node : null;
-  const selectedResource = selectedItem ? selectedItem.resource : null;
+  React.useEffect(
+    () => {
+      if (!selectedItem || selectedItem.node.type !== 'file') return;
+
+      const tabId = getFileTabId(selectedItem);
+      setTabs(currentTabs => {
+        const existingTabIndex = currentTabs.findIndex(tab => tab.id === tabId);
+        const nextFileTab: WorkingDeskFileTab = {
+          id: tabId,
+          tabKind: 'file',
+          title: selectedItem.node.name,
+          selectedItem,
+        };
+
+        if (existingTabIndex === -1) return [...currentTabs, nextFileTab];
+
+        return currentTabs.map((tab, index) =>
+          index === existingTabIndex ? nextFileTab : tab
+        );
+      });
+      setActiveTabId(tabId);
+    },
+    [selectedItem]
+  );
+
+  React.useEffect(
+    () => {
+      if (!toolTabUpdate) return;
+
+      const nextToolTab = getToolTabFromUpdate(toolTabUpdate);
+      setTabs(currentTabs => {
+        const existingTabIndex = currentTabs.findIndex(
+          tab => tab.id === nextToolTab.id
+        );
+        if (existingTabIndex === -1) return [...currentTabs, nextToolTab];
+        return currentTabs.map((tab, index) =>
+          index === existingTabIndex ? nextToolTab : tab
+        );
+      });
+      setActiveTabId(nextToolTab.id);
+    },
+    [toolTabUpdate]
+  );
+
+  const activeTab =
+    tabs.find(tab => tab.id === activeTabId) || tabs[tabs.length - 1] || null;
+  const activeFileItem =
+    activeTab && activeTab.tabKind === 'file' ? activeTab.selectedItem : null;
+  const activeToolTab =
+    activeTab && activeTab.tabKind === 'tool' ? activeTab : null;
+  const selectedNode = activeFileItem ? activeFileItem.node : null;
+  const selectedResource = activeFileItem ? activeFileItem.resource : null;
 
   const renderDeskMessage = (children: React.Node) => (
     <div style={styles.emptyState}>
@@ -247,14 +411,13 @@ const WorkingDesk = ({
       setIsMarkdownDirty(false);
       setTextPreview(null);
       setTextPreviewError(null);
-      setImageSize(null);
       setImageZoomFactor(1);
       setAudioPreviewError(null);
 
-      if (!selectedItem || selectedItem.node.type !== 'file') return;
+      if (!activeFileItem || activeFileItem.node.type !== 'file') return;
 
-      if (isMarkdownFile(selectedItem.node)) {
-        readTextFile(selectedItem.node.absolutePath)
+      if (isMarkdownFile(activeFileItem.node)) {
+        readTextFile(activeFileItem.node.absolutePath)
           .then(content => {
             if (!isMounted) return;
             setMarkdownContent(content);
@@ -263,8 +426,8 @@ const WorkingDesk = ({
             if (!isMounted) return;
             setMarkdownStatus(error.message);
           });
-      } else if (isTextLikeFile(selectedItem.node)) {
-        readTextFile(selectedItem.node.absolutePath)
+      } else if (isTextLikeFile(activeFileItem.node)) {
+        readTextFile(activeFileItem.node.absolutePath)
           .then(content => {
             if (!isMounted) return;
             setTextPreview(content);
@@ -279,7 +442,7 @@ const WorkingDesk = ({
         isMounted = false;
       };
     },
-    [selectedItem]
+    [activeFileItem]
   );
 
   const saveMarkdown = React.useCallback(
@@ -298,23 +461,73 @@ const WorkingDesk = ({
     [markdownContent, onProjectFilesChanged, selectedNode]
   );
 
-  const renderHeaderDetails = () => {
-    if (!selectedNode) return null;
-    if (selectedNode.type === 'folder') {
-      return (
-        <Text noMargin>
-          <Trans>Folder</Trans>
-        </Text>
-      );
+  const closeTab = React.useCallback(
+    (tabId: string) => {
+      setTabs(currentTabs => {
+        const tabIndex = currentTabs.findIndex(tab => tab.id === tabId);
+        if (tabIndex === -1) return currentTabs;
+
+        const nextTabs = currentTabs.filter(tab => tab.id !== tabId);
+        if (activeTabId === tabId) {
+          const nextActiveTab =
+            nextTabs[tabIndex] || nextTabs[tabIndex - 1] || null;
+          setActiveTabId(nextActiveTab ? nextActiveTab.id : null);
+        }
+        return nextTabs;
+      });
+    },
+    [activeTabId]
+  );
+
+  const renderTabIcon = (tab: WorkingDeskTab): React.Node => {
+    if (tab.tabKind === 'tool') {
+      return tab.kind === 'elevenlabs-audio' ? <MusicIcon /> : <SparkleIcon />;
     }
-    if (imageSize) {
-      return (
-        <Text noMargin>
-          {imageSize[0]} x {imageSize[1]}
-        </Text>
-      );
-    }
+
+    const node = tab.selectedItem.node;
+    if (isImageFile(node)) return <PictureIcon />;
+    if (isAudioFile(node)) return <MusicIcon />;
     return null;
+  };
+
+  const renderTabs = () => {
+    if (!tabs.length) return null;
+
+    return (
+      <div style={styles.tabsBar}>
+        <ClosableTabs
+          renderTabs={({ containerWidth }) => {
+            const tabMaxWidth = Math.max(
+              150,
+              Math.min(260, containerWidth / Math.max(tabs.length, 1))
+            );
+            return tabs.map(tab => (
+              <ClosableTab
+                key={tab.id}
+                id={getSafeTabDomId(tab.id)}
+                active={activeTab ? activeTab.id === tab.id : false}
+                label={tab.title}
+                icon={renderTabIcon(tab)}
+                closable
+                onClick={() => setActiveTabId(tab.id)}
+                onClose={() => closeTab(tab.id)}
+                onCloseOthers={() => {
+                  setTabs([tab]);
+                  setActiveTabId(tab.id);
+                }}
+                onCloseAll={() => {
+                  setTabs([]);
+                  setActiveTabId(null);
+                }}
+                onActivated={() => {}}
+                onHover={() => {}}
+                maxWidth={tabMaxWidth}
+              />
+            ));
+          }}
+        />
+      </div>
+    );
   };
 
   const renderImageZoomToolbar = () => {
@@ -355,10 +568,14 @@ const WorkingDesk = ({
   const renderImagePreview = () => {
     if (!selectedNode) return null;
     const imageSource = getFileUrl(selectedNode.absolutePath);
+    const imageZoomToolbar = renderImageZoomToolbar();
     return (
       <div style={styles.previewColumn}>
         <div style={styles.mediaStage}>
           <CheckeredBackground />
+          {!!imageZoomToolbar && (
+            <div style={styles.imageOverlayToolbar}>{imageZoomToolbar}</div>
+          )}
           <div style={styles.imageScrollArea}>
             <div
               style={{
@@ -386,10 +603,6 @@ const WorkingDesk = ({
                     imageZoomFactor < 1
                       ? `${imageZoomFactor * 100}%`
                       : '100%',
-                }}
-                onLoad={event => {
-                  const image = event.currentTarget;
-                  setImageSize([image.naturalWidth, image.naturalHeight]);
                 }}
               />
             </div>
@@ -559,30 +772,116 @@ const WorkingDesk = ({
     );
   };
 
+  const renderDebugSection = ({
+    title,
+    content,
+  }: {|
+    title: React.Node,
+    content: ?string,
+  |}) => {
+    if (!content) return null;
+
+    return (
+      <details style={styles.debugFoldedSection}>
+        <summary style={styles.debugSummary}>{title}</summary>
+        <pre style={styles.debugPre}>{content}</pre>
+      </details>
+    );
+  };
+
+  const renderToolTaskContent = (toolTab: WorkingDeskToolTab) => {
+    const isRunning = toolTab.status === 'running';
+    const statusText =
+      toolTab.statusText ||
+      (toolTab.kind === 'nano-banana'
+        ? 'Nano Banana task'
+        : 'ElevenLabs task');
+
+    return (
+      <div style={styles.toolTaskContent}>
+        <div style={styles.toolTaskStatusRow}>
+          {isRunning && <CircularProgress size={20} />}
+          <Text noMargin>{statusText}</Text>
+        </div>
+        {!!toolTab.errorText && (
+          <Text color="error" noMargin>
+            {toolTab.errorText}
+          </Text>
+        )}
+        {renderDebugSection({
+          title: <Trans>HTTP request</Trans>,
+          content: toolTab.requestText,
+        })}
+        {renderDebugSection({
+          title: <Trans>HTTP response</Trans>,
+          content: toolTab.responseText,
+        })}
+        {!!toolTab.generatedImagePath && (
+          <React.Fragment>
+            <Text noMargin>
+              <Trans>Generated image</Trans>
+            </Text>
+            <Text noMargin color="secondary" allowBrowserAutoTranslate={false}>
+              {toolTab.generatedImagePath}
+            </Text>
+            {!!toolTab.generatedImageUrl && (
+              <img
+                src={toolTab.generatedImageUrl}
+                alt="Generated Nano Banana result"
+                style={styles.generatedImage}
+                draggable="false"
+              />
+            )}
+          </React.Fragment>
+        )}
+        {!!toolTab.generatedAudioPath && (
+          <React.Fragment>
+            <Text noMargin>
+              <Trans>Generated audio</Trans>
+            </Text>
+            <Text noMargin color="secondary" allowBrowserAutoTranslate={false}>
+              {toolTab.generatedAudioPath}
+            </Text>
+            {!!toolTab.generatedAudioUrl && (
+              <audio
+                controls
+                src={toolTab.generatedAudioUrl}
+                style={styles.generatedAudio}
+              />
+            )}
+          </React.Fragment>
+        )}
+      </div>
+    );
+  };
+
+  const renderActiveTabContent = () => {
+    if (!activeTab) {
+      return renderDeskMessage(
+        <Text noMargin>
+          <Trans>Select a project file to preview or edit it.</Trans>
+        </Text>
+      );
+    }
+
+    if (activeToolTab) return renderToolTaskContent(activeToolTab);
+    return renderMediaPreview();
+  };
+
   return (
     <div style={styles.container}>
-      <div style={styles.header}>
-        <Text noMargin>
-          <Trans>Working desk</Trans>
-          {selectedNode ? `: ${selectedNode.name}` : ''}
-        </Text>
-        <div style={styles.headerActions}>
-          {renderHeaderDetails()}
-          {renderImageZoomToolbar()}
-        </div>
-      </div>
+      {renderTabs()}
       <div style={styles.content}>
         <div style={styles.previewArea}>
-          {!selectedItem
-            ? renderDeskMessage(
-                <Text noMargin>
-                  <Trans>Select a project file to preview or edit it.</Trans>
-                </Text>
-              )
-            : renderMediaPreview()}
+          {tabs.map(tab => (
+            <TabContentContainer key={tab.id} active={activeTab === tab}>
+              {activeTab === tab ? renderActiveTabContent() : null}
+            </TabContentContainer>
+          ))}
+          {!tabs.length && renderActiveTabContent()}
         </div>
       </div>
-      {isMarkdownDirty && (
+      {!!activeFileItem && isMarkdownDirty && (
         <div style={styles.status}>
           <Text noMargin>
             <Trans>Markdown changes are not saved.</Trans>

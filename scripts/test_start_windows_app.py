@@ -35,8 +35,25 @@ class StartWindowsAppScriptTest(unittest.TestCase):
         self.assertIn("Ensure Electron dependencies", result.stdout)
         self.assertIn("Build React app", result.stdout)
         self.assertIn("Sync Electron app/www", result.stdout)
+        self.assertIn("run build", result.stdout)
+        self.assertIn("app-build -- --skip-app-build", result.stdout)
+        self.assertNotIn("Fast launch: reusing existing", result.stdout)
         self.assertIn("Skipping launch because --no-launch was set", result.stdout)
         self.assertIn("Verify startup inputs", result.stdout)
+
+    def test_skip_build_keeps_fast_launch_available(self):
+        result = subprocess.run(
+            [sys.executable, str(SCRIPT), "--dry-run", "--no-launch", "--skip-build"],
+            cwd=ROOT_DIR,
+            capture_output=True,
+            text=True,
+        )
+
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("Fast launch: reusing existing newIDE/app/build", result.stdout)
+        self.assertIn("Fast launch: reusing existing app/www", result.stdout)
+        self.assertNotIn("run build", result.stdout)
+        self.assertNotIn("app-build -- --skip-app-build", result.stdout)
 
     def test_powershell_runner_handles_empty_captured_output(self):
         module = load_script_module()

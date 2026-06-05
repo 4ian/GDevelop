@@ -11,8 +11,6 @@ import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
 import MiniToolbar, { MiniToolbarText } from '../UI/MiniToolbar';
 import { Tabs } from '../UI/Tabs';
-import Dialog from '../UI/Dialog';
-import CircularProgress from '../UI/CircularProgress';
 import PreferencesContext, {
   defaultResourcesToolsSettings,
   type ResourcesToolsSettings,
@@ -29,6 +27,7 @@ import {
 } from './ProjectFilesPanel';
 import optionalRequire from '../Utils/OptionalRequire';
 import { openFilePicker } from '../Utils/FileSystem';
+import { type WorkingDeskToolTabUpdate } from './WorkingDeskTabTypes';
 
 const fs = optionalRequire('fs');
 const path = optionalRequire('path');
@@ -38,6 +37,7 @@ const projectFileDragDataMimeType = 'application/x-gdevelop-project-file';
 type Props = {|
   project: gdProject,
   selectedItem: ?ProjectFileSelection,
+  onOpenWorkingDeskTask: WorkingDeskToolTabUpdate => void,
   onProjectFilesChanged: () => Promise<void> | void,
 |};
 
@@ -155,53 +155,6 @@ const styles = {
     maxWidth: '100%',
     maxHeight: '100%',
     objectFit: 'contain',
-  },
-  debugDialogContent: {
-    display: 'flex',
-    flexDirection: 'column',
-    flex: 1,
-    gap: 12,
-    minHeight: 0,
-    overflow: 'auto',
-    padding: 16,
-    boxSizing: 'border-box',
-  },
-  debugStatusRow: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: 8,
-    minHeight: 24,
-  },
-  debugPre: {
-    margin: 0,
-    padding: 12,
-    borderRadius: 4,
-    border: '1px solid rgba(128, 128, 128, 0.28)',
-    backgroundColor: 'rgba(0, 0, 0, 0.24)',
-    whiteSpace: 'pre-wrap',
-    overflowWrap: 'anywhere',
-    fontFamily: 'Consolas, Monaco, monospace',
-    fontSize: 12,
-    lineHeight: '18px',
-  },
-  debugFoldedSection: {
-    borderRadius: 4,
-    border: '1px solid rgba(128, 128, 128, 0.28)',
-    backgroundColor: 'rgba(0, 0, 0, 0.12)',
-    overflow: 'hidden',
-  },
-  debugSummary: {
-    padding: '10px 12px',
-    cursor: 'pointer',
-    fontWeight: 600,
-  },
-  debugGeneratedImage: {
-    maxWidth: '100%',
-    maxHeight: 280,
-    objectFit: 'contain',
-    borderRadius: 4,
-    border: '1px solid rgba(128, 128, 128, 0.28)',
-    backgroundColor: 'rgba(0, 0, 0, 0.18)',
   },
 };
 
@@ -608,6 +561,7 @@ export const buildResourcesToolsSettings = ({
 const ToolsPanel = ({
   project,
   selectedItem,
+  onOpenWorkingDeskTask,
   onProjectFilesChanged,
 }: Props): React.Node => {
   const preferences = React.useContext(PreferencesContext);
@@ -658,11 +612,6 @@ const ToolsPanel = ({
     imageGenerationError,
     setImageGenerationError,
   ] = React.useState<?string>(null);
-  const [
-    nanoBananaDebugDetails,
-    setNanoBananaDebugDetails,
-  ] = React.useState<?NanoBananaDebugDetails>(null);
-
   const [elevenLabsApiKey, setElevenLabsApiKey] = React.useState(
     savedToolsSettings.elevenLabsApiKey
   );
@@ -854,24 +803,51 @@ const ToolsPanel = ({
 
   const runNanoBanana = React.useCallback(
     async () => {
-      if (!fs || !path) return;
-      if (!geminiApiKey.trim()) {
-        setImageGenerationError('Enter a Gemini API key.');
-        return;
-      }
-      if (!nanoBananaPrompt.trim()) {
-        setImageGenerationError('Enter a prompt.');
-        return;
-      }
-
-      setIsGeneratingImage(true);
-      setImageGenerationError(null);
-      setImageGenerationStatus(null);
-      setNanoBananaDebugDetails(
-        buildNanoBananaProgressDebugDetails({
-          statusText: 'Preparing Nano Banana request...',
-        })
-      );
+      const taskTabId = `nano-banana:${Date.now()}`;
+      const updateWorkingDeskTask = ({
+        details,
+        status,
+        errorText,
+      }: {|
+        details: NanoBananaDebugDetails,
+        status: 'running' | 'success' | 'error',
+        errorText?: ?string,
+      |}) => {
+        onOpenWorkingDeskTask({
+          id: taskTabId,
+          kind: 'nano-banana',
+          title: 'Nano Banana',
+          status,
+          statusText: details.statusText,
+          requestText: details.requestText,
+          responseText: details.responseText,
+          generatedImagePath: details.generatedImagePath
+            ? normalizeSlashes(details.generatedImagePath)
+            : null,
+          generatedImageUrl: details.generatedImageUrl,
+          errorText: errorText || null,
+        });
+      };
+      const updateProgressDetails = (statusText: string) => {
+        updateWorkingDeskTask({
+          status: 'running',
+          details: buildNanoBananaProgressDebugDetails({
+            statusText,
+            request: requestDebugInfo,
+          }),
+        });
+      };
+      const failBeforeRequest = (errorMessage: string) => {
+        updateWorkingDeskTask({
+          status: 'error',
+          errorText: errorMessage,
+          details: buildNanoBananaProgressDebugDetails({
+            statusText: 'Nano Banana request failed.',
+            responseText: `error: ${errorMessage}`,
+          }),
+        });
+        setImageGenerationError(errorMessage);
+      };
 
       let requestDebugInfo: ?NanoBananaRequestDebugInfo = null;
       let latestResponseDebugInfo: ?NanoBananaResponseDebugPayload = null;
@@ -880,31 +856,49 @@ const ToolsPanel = ({
         generatedImagePath,
         generatedImageUrl,
         statusText,
+        status,
+        errorText,
       }: {|
         response: NanoBananaResponseDebugInfo,
         generatedImagePath?: ?string,
         generatedImageUrl?: ?string,
         statusText?: ?string,
+        status: 'running' | 'success' | 'error',
+        errorText?: ?string,
       |}) => {
         if (!requestDebugInfo) return;
-        setNanoBananaDebugDetails(
-          buildNanoBananaDebugDetails({
+        updateWorkingDeskTask({
+          status,
+          errorText,
+          details: buildNanoBananaDebugDetails({
             request: requestDebugInfo,
             response,
             generatedImagePath,
             generatedImageUrl,
             statusText,
-          })
-        );
+          }),
+        });
       };
-      const updateProgressDetails = (statusText: string) => {
-        setNanoBananaDebugDetails(
-          buildNanoBananaProgressDebugDetails({
-            statusText,
-            request: requestDebugInfo,
-          })
-        );
-      };
+
+      updateProgressDetails('Preparing Nano Banana request...');
+
+      if (!fs || !path) {
+        failBeforeRequest('Filesystem paths are not supported.');
+        return;
+      }
+      if (!geminiApiKey.trim()) {
+        failBeforeRequest('Enter a Gemini API key.');
+        return;
+      }
+      if (!nanoBananaPrompt.trim()) {
+        failBeforeRequest('Enter a prompt.');
+        return;
+      }
+
+      setIsGeneratingImage(true);
+      setImageGenerationError(null);
+      setImageGenerationStatus(null);
+
       try {
         const imageData = imageAttachment
           ? await fs.promises.readFile(imageAttachment.absolutePath, 'base64')
@@ -947,10 +941,11 @@ const ToolsPanel = ({
             statusText: response.statusText,
             body: 'Reading response body...',
           },
+          status: 'running',
           statusText: 'Reading Nano Banana HTTP response...',
         });
         const responseText = await response.text();
-        let responseBody;
+        let responseBody: any;
         try {
           responseBody = responseText ? JSON.parse(responseText) : null;
         } catch (error) {
@@ -964,17 +959,26 @@ const ToolsPanel = ({
         };
         latestResponseDebugInfo = responseDebugInfo;
         if (!response.ok) {
-          openDebugDetails({
-            response: responseDebugInfo,
-            statusText: 'Nano Banana request failed.',
-          });
-          throw new Error(
+          const responseErrorMessage =
             responseBody &&
+            typeof responseBody === 'object' &&
             responseBody.error &&
-            responseBody.error.message
+            typeof responseBody.error === 'object' &&
+            typeof responseBody.error.message === 'string'
               ? responseBody.error.message
-              : `Request failed with HTTP ${response.status}`
-          );
+              : null;
+          const errorMessage: string =
+            responseErrorMessage || `Request failed with HTTP ${response.status}`;
+          openDebugDetails({
+            response: {
+              ...responseDebugInfo,
+              errorMessage,
+            },
+            status: 'error',
+            statusText: 'Nano Banana request failed.',
+            errorText: errorMessage,
+          });
+          throw new Error(errorMessage);
         }
 
         const responseObject =
@@ -990,13 +994,16 @@ const ToolsPanel = ({
         );
         if (!imagePart) {
           const textPart = responseParts.find(part => part.text);
+          const errorMessage = textPart
+            ? textPart.text
+            : 'The response did not include an image.';
           openDebugDetails({
             response: responseDebugInfo,
+            status: 'error',
             statusText: 'HTTP response received, but no image was returned.',
+            errorText: errorMessage,
           });
-          setImageGenerationStatus(
-            textPart ? textPart.text : 'The response did not include an image.'
-          );
+          setImageGenerationStatus(errorMessage);
           return;
         }
 
@@ -1006,6 +1013,7 @@ const ToolsPanel = ({
         const outputExtension = mimeType === 'image/jpeg' ? '.jpg' : '.png';
         openDebugDetails({
           response: responseDebugInfo,
+          status: 'running',
           statusText: 'Saving generated image...',
         });
         const outputFolderPath = await getImageGenerationOutputFolderPath({
@@ -1027,6 +1035,7 @@ const ToolsPanel = ({
           response: responseDebugInfo,
           generatedImagePath: outputPath,
           generatedImageUrl: getFileUrl(outputPath),
+          status: 'success',
           statusText: 'Nano Banana request completed.',
         });
         setImageGenerationStatus(`Generated ${normalizeSlashes(outputPath)}`);
@@ -1044,15 +1053,12 @@ const ToolsPanel = ({
               : {
                   errorMessage,
                 },
+            status: 'error',
             statusText: 'Nano Banana request failed.',
+            errorText: errorMessage,
           });
         } else {
-          setNanoBananaDebugDetails(
-            buildNanoBananaProgressDebugDetails({
-              statusText: 'Nano Banana request failed.',
-              responseText: `error: ${errorMessage}`,
-            })
-          );
+          failBeforeRequest(errorMessage);
         }
         setImageGenerationError(errorMessage);
       } finally {
@@ -1064,19 +1070,72 @@ const ToolsPanel = ({
       imageAttachment,
       nanoBananaModel,
       nanoBananaPrompt,
+      onOpenWorkingDeskTask,
       onProjectFilesChanged,
       project,
     ]
   );
+
   const runElevenLabs = React.useCallback(
     async () => {
-      if (!fs || !path) return;
+      const taskTabId = `elevenlabs-audio:${Date.now()}`;
+      const updateWorkingDeskTask = ({
+        status,
+        statusText,
+        requestText,
+        responseText,
+        generatedAudioPath,
+        generatedAudioUrl,
+        errorText,
+      }: {|
+        status: 'running' | 'success' | 'error',
+        statusText: string,
+        requestText?: ?string,
+        responseText?: ?string,
+        generatedAudioPath?: ?string,
+        generatedAudioUrl?: ?string,
+        errorText?: ?string,
+      |}) => {
+        onOpenWorkingDeskTask({
+          id: taskTabId,
+          kind: 'elevenlabs-audio',
+          title: 'ElevenLabs audio',
+          status,
+          statusText,
+          requestText: requestText || 'Preparing HTTP request...',
+          responseText: responseText || 'Waiting for HTTP response...',
+          generatedAudioPath: generatedAudioPath
+            ? normalizeSlashes(generatedAudioPath)
+            : null,
+          generatedAudioUrl: generatedAudioUrl || null,
+          errorText: errorText || null,
+        });
+      };
+      const failBeforeRequest = (errorMessage: string) => {
+        updateWorkingDeskTask({
+          status: 'error',
+          statusText: 'ElevenLabs request failed.',
+          responseText: `error: ${errorMessage}`,
+          errorText: errorMessage,
+        });
+        setAudioGenerationError(errorMessage);
+      };
+
+      updateWorkingDeskTask({
+        status: 'running',
+        statusText: 'Preparing ElevenLabs request...',
+      });
+
+      if (!fs || !path) {
+        failBeforeRequest('Filesystem paths are not supported.');
+        return;
+      }
       if (!elevenLabsApiKey.trim()) {
-        setAudioGenerationError('Enter an ElevenLabs API key.');
+        failBeforeRequest('Enter an ElevenLabs API key.');
         return;
       }
       if (!elevenLabsText.trim()) {
-        setAudioGenerationError('Enter a prompt or text.');
+        failBeforeRequest('Enter a prompt or text.');
         return;
       }
 
@@ -1084,6 +1143,8 @@ const ToolsPanel = ({
       setAudioGenerationError(null);
       setAudioGenerationStatus(null);
 
+      let requestText = 'Preparing HTTP request...';
+      let responseSummaryText = 'Waiting for HTTP response...';
       try {
         const outputFormat = elevenLabsOutputFormat.trim() || 'mp3_44100_128';
         const query = `output_format=${encodeURIComponent(outputFormat)}`;
@@ -1105,25 +1166,77 @@ const ToolsPanel = ({
                 elevenLabsSoundModel.trim() || 'eleven_text_to_sound_v2',
               duration_seconds: Number.isFinite(duration) ? duration : null,
             };
+        const headers = {
+          'Content-Type': 'application/json',
+          'xi-api-key': elevenLabsApiKey.trim(),
+        };
+        requestText = [
+          `POST ${endpoint}`,
+          '',
+          'Headers:',
+          stringifyDebugPayload(headers),
+          '',
+          'Body:',
+          stringifyDebugPayload(body),
+        ].join('\n');
+        updateWorkingDeskTask({
+          status: 'running',
+          statusText: 'Sending ElevenLabs HTTP request...',
+          requestText,
+        });
         const response = await fetch(endpoint, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'xi-api-key': elevenLabsApiKey.trim(),
-          },
+          headers,
           body: JSON.stringify(body),
         });
+        responseSummaryText = [
+          `HTTP ${response.status} ${response.statusText || ''}`.trim(),
+          `ok: ${String(response.ok)}`,
+          '',
+          'Body:',
+          'Reading response body...',
+        ].join('\n');
+        updateWorkingDeskTask({
+          status: 'running',
+          statusText: 'Reading ElevenLabs HTTP response...',
+          requestText,
+          responseText: responseSummaryText,
+        });
         if (!response.ok) {
-          let errorMessage = `Request failed with HTTP ${response.status}`;
+          const errorResponseText = await response.text();
+          let responseBody: any;
           try {
-            const responseBody = await response.json();
-            errorMessage =
-              responseBody && responseBody.detail && responseBody.detail.message
-                ? responseBody.detail.message
-                : errorMessage;
+            responseBody = errorResponseText
+              ? JSON.parse(errorResponseText)
+              : null;
           } catch (error) {
-            // Ignore JSON parsing errors and keep the HTTP status message.
+            responseBody = errorResponseText;
           }
+          const detailErrorMessage =
+            responseBody &&
+            typeof responseBody === 'object' &&
+            responseBody.detail &&
+            typeof responseBody.detail === 'object' &&
+            typeof responseBody.detail.message === 'string'
+              ? responseBody.detail.message
+              : null;
+          const errorMessage: string =
+            detailErrorMessage || `Request failed with HTTP ${response.status}`;
+          responseSummaryText = [
+            `HTTP ${response.status} ${response.statusText || ''}`.trim(),
+            `ok: ${String(response.ok)}`,
+            `error: ${errorMessage}`,
+            '',
+            'Body:',
+            stringifyDebugPayload(responseBody),
+          ].join('\n');
+          updateWorkingDeskTask({
+            status: 'error',
+            statusText: 'ElevenLabs request failed.',
+            requestText,
+            responseText: responseSummaryText,
+            errorText: errorMessage,
+          });
           throw new Error(errorMessage);
         }
 
@@ -1131,6 +1244,19 @@ const ToolsPanel = ({
           throw new Error('Unable to save the generated audio file.');
         }
         const audioBytes = buffer.Buffer.from(await response.arrayBuffer());
+        responseSummaryText = [
+          `HTTP ${response.status} ${response.statusText || ''}`.trim(),
+          `ok: ${String(response.ok)}`,
+          '',
+          'Body:',
+          `Audio payload (${audioBytes.length} bytes)`,
+        ].join('\n');
+        updateWorkingDeskTask({
+          status: 'running',
+          statusText: 'Saving generated audio...',
+          requestText,
+          responseText: responseSummaryText,
+        });
         const outputFolderPath = await getImageGenerationOutputFolderPath({
           project,
         });
@@ -1144,10 +1270,30 @@ const ToolsPanel = ({
           extension: getAudioExtensionFromOutputFormat(outputFormat),
         });
         await fs.promises.writeFile(outputPath, audioBytes);
+        updateWorkingDeskTask({
+          status: 'success',
+          statusText: 'ElevenLabs request completed.',
+          requestText,
+          responseText: responseSummaryText,
+          generatedAudioPath: outputPath,
+          generatedAudioUrl: getFileUrl(outputPath),
+        });
         setAudioGenerationStatus(`Generated ${normalizeSlashes(outputPath)}`);
         await onProjectFilesChanged();
       } catch (error) {
-        setAudioGenerationError(error.message);
+        const errorMessage =
+          error && error.message ? error.message : String(error);
+        updateWorkingDeskTask({
+          status: 'error',
+          statusText: 'ElevenLabs request failed.',
+          requestText,
+          responseText:
+            responseSummaryText === 'Waiting for HTTP response...'
+              ? `error: ${errorMessage}`
+              : responseSummaryText,
+          errorText: errorMessage,
+        });
+        setAudioGenerationError(errorMessage);
       } finally {
         setIsGeneratingAudio(false);
       }
@@ -1161,76 +1307,11 @@ const ToolsPanel = ({
       elevenLabsSoundModel,
       elevenLabsText,
       elevenLabsVoiceId,
+      onOpenWorkingDeskTask,
       onProjectFilesChanged,
       project,
     ]
   );
-
-  const renderNanoBananaDebugDialog = () => {
-    if (!nanoBananaDebugDetails) return null;
-
-    return (
-      <Dialog
-        title={<Trans>Nano Banana HTTP details</Trans>}
-        open
-        onRequestClose={() => setNanoBananaDebugDetails(null)}
-        maxWidth="lg"
-        fullHeight
-        flexColumnBody
-        noPadding
-        actions={[
-          <FlatButton
-            key="close"
-            label={<Trans>Close</Trans>}
-            onClick={() => setNanoBananaDebugDetails(null)}
-          />,
-        ]}
-      >
-        <div style={styles.debugDialogContent}>
-          {!!nanoBananaDebugDetails.statusText && (
-            <div style={styles.debugStatusRow}>
-              {isGeneratingImage && <CircularProgress size={20} />}
-              <Text noMargin>{nanoBananaDebugDetails.statusText}</Text>
-            </div>
-          )}
-          <details style={styles.debugFoldedSection}>
-            <summary style={styles.debugSummary}>
-              <Trans>HTTP request</Trans>
-            </summary>
-            <pre style={styles.debugPre}>
-              {nanoBananaDebugDetails.requestText}
-            </pre>
-          </details>
-          <details style={styles.debugFoldedSection}>
-            <summary style={styles.debugSummary}>
-              <Trans>HTTP response</Trans>
-            </summary>
-            <pre style={styles.debugPre}>
-              {nanoBananaDebugDetails.responseText}
-            </pre>
-          </details>
-          {!!nanoBananaDebugDetails.generatedImagePath && (
-            <React.Fragment>
-              <Text noMargin>
-                <Trans>Generated image</Trans>
-              </Text>
-              <Text noMargin color="secondary" allowBrowserAutoTranslate={false}>
-                {normalizeSlashes(nanoBananaDebugDetails.generatedImagePath)}
-              </Text>
-              {!!nanoBananaDebugDetails.generatedImageUrl && (
-                <img
-                  src={nanoBananaDebugDetails.generatedImageUrl}
-                  alt="Generated Nano Banana result"
-                  style={styles.debugGeneratedImage}
-                  draggable="false"
-                />
-              )}
-            </React.Fragment>
-          )}
-        </div>
-      </Dialog>
-    );
-  };
 
   const renderNanoBanana = () => (
     <div style={styles.section}>
@@ -1478,44 +1559,41 @@ const ToolsPanel = ({
   );
 
   return (
-    <React.Fragment>
-      <Background>
-        <div style={styles.container}>
-          <div style={styles.header}>
-            <Text noMargin size="block-title">
-              <Trans>Tools</Trans>
-            </Text>
-          </div>
-          <div style={styles.tabs}>
-            <Tabs
-              value={activeToolCategory}
-              onChange={setActiveToolCategory}
-              options={[
-                {
-                  label: <Trans>Image</Trans>,
-                  value: 'image',
-                },
-                {
-                  label: <Trans>Sound</Trans>,
-                  value: 'sound',
-                },
-              ]}
-              variant="scrollable"
-            />
-          </div>
-          <div style={styles.body}>
-            {activeToolCategory === 'image'
-              ? selectedImageTool === 'nano-banana'
-                ? renderNanoBanana()
-                : null
-              : selectedSoundTool === 'elevenlabs'
-              ? renderElevenLabs()
-              : null}
-          </div>
+    <Background>
+      <div style={styles.container}>
+        <div style={styles.header}>
+          <Text noMargin size="block-title">
+            <Trans>Tools</Trans>
+          </Text>
         </div>
-      </Background>
-      {renderNanoBananaDebugDialog()}
-    </React.Fragment>
+        <div style={styles.tabs}>
+          <Tabs
+            value={activeToolCategory}
+            onChange={setActiveToolCategory}
+            options={[
+              {
+                label: <Trans>Image</Trans>,
+                value: 'image',
+              },
+              {
+                label: <Trans>Sound</Trans>,
+                value: 'sound',
+              },
+            ]}
+            variant="scrollable"
+          />
+        </div>
+        <div style={styles.body}>
+          {activeToolCategory === 'image'
+            ? selectedImageTool === 'nano-banana'
+              ? renderNanoBanana()
+              : null
+            : selectedSoundTool === 'elevenlabs'
+            ? renderElevenLabs()
+            : null}
+        </div>
+      </div>
+    </Background>
   );
 };
 

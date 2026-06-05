@@ -32,14 +32,16 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--build",
+        dest="build",
         action="store_true",
-        help="Run npm run build before launching. By default the launch is fast "
-        "and reuses the existing newIDE/app/build and app/www.",
+        default=True,
+        help="Run npm run build before launching. This is the default.",
     )
     parser.add_argument(
         "--skip-build",
-        action="store_true",
-        help=argparse.SUPPRESS,  # Deprecated: skipping the build is now the default.
+        dest="build",
+        action="store_false",
+        help="Launch faster by reusing the existing newIDE/app/build and app/www.",
     )
     parser.add_argument(
         "--no-launch",
@@ -211,7 +213,7 @@ def build_react_app(app_dir: Path, build: bool, dry_run: bool) -> None:
     step("Build React app")
     if not build:
         print(
-            "Fast launch: reusing existing newIDE/app/build (pass --build to rebuild).",
+            "Fast launch: reusing existing newIDE/app/build because --skip-build was set.",
             flush=True,
         )
         return
@@ -223,7 +225,7 @@ def sync_electron_www(electron_app_dir: Path, build: bool, dry_run: bool) -> Non
     step("Sync Electron app/www")
     if not build:
         print(
-            "Fast launch: reusing existing app/www (pass --build to re-sync).",
+            "Fast launch: reusing existing app/www because --skip-build was set.",
             flush=True,
         )
         return
@@ -331,12 +333,6 @@ def main() -> int:
         print("DRY RUN: no commands will be executed.", flush=True)
 
     build = args.build
-    if args.skip_build:
-        print(
-            "Note: --skip-build is deprecated and ignored; not rebuilding is now "
-            "the default. Use --build to force a rebuild.",
-            flush=True,
-        )
 
     try:
         stop_existing_processes(repo_root, electron_exe, args.dry_run)

@@ -14,6 +14,7 @@ import ProjectFilesPanel, {
 import WorkingDesk from './WorkingDesk';
 import ToolsPanel from './ToolsPanel';
 import Toolbar from './Toolbar';
+import { type WorkingDeskToolTabUpdate } from './WorkingDeskTabTypes';
 import ResourcesLoader from '../ResourcesLoader';
 import AlertContext, { type ConfirmState } from '../UI/Alert/AlertContext';
 import Dialog from '../UI/Dialog';
@@ -134,6 +135,7 @@ type State = {|
   selectedResource: ?gdResource,
   selectedProjectFile: ?ProjectFileSelection,
   propertiesDialogSelection: ?ProjectFileSelection,
+  workingDeskToolTabUpdate: ?WorkingDeskToolTabUpdate,
   isPropertiesShown: boolean,
   workingDeskHeight: number,
   toolsWidth: number,
@@ -171,6 +173,7 @@ export default class ResourcesEditor extends React.Component<Props, State> {
     selectedResource: null,
     selectedProjectFile: null,
     propertiesDialogSelection: null,
+    workingDeskToolTabUpdate: null,
     isPropertiesShown: true,
     workingDeskHeight: initialLayout.workingDeskHeight,
     toolsWidth: initialLayout.toolsWidth,
@@ -457,6 +460,12 @@ export default class ResourcesEditor extends React.Component<Props, State> {
     this.setState({ propertiesDialogSelection: null });
   };
 
+  _openWorkingDeskToolTab = (
+    workingDeskToolTabUpdate: WorkingDeskToolTabUpdate
+  ) => {
+    this.setState({ workingDeskToolTabUpdate });
+  };
+
   _renderPropertiesContent = (
     selectedProjectFile: ?ProjectFileSelection
   ): React.Node => {
@@ -539,6 +548,7 @@ export default class ResourcesEditor extends React.Component<Props, State> {
       isPropertiesShown,
       workingDeskHeight,
       toolsWidth,
+      workingDeskToolTabUpdate,
     } = this.state;
 
     return (
@@ -560,6 +570,7 @@ export default class ResourcesEditor extends React.Component<Props, State> {
               project={project}
               resourcesLoader={this.resourcesLoader}
               selectedItem={selectedProjectFile}
+              toolTabUpdate={workingDeskToolTabUpdate}
               onProjectFilesChanged={this.refreshResourcesList}
             />
           </div>
@@ -596,6 +607,7 @@ export default class ResourcesEditor extends React.Component<Props, State> {
               <ToolsPanel
                 project={project}
                 selectedItem={selectedProjectFile}
+                onOpenWorkingDeskTask={this._openWorkingDeskToolTab}
                 onProjectFilesChanged={this.refreshResourcesList}
               />
             </div>

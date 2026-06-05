@@ -218,6 +218,249 @@ namespace gdjs {
         arr.length = finalSize;
       };
 
+      /**
+       * Minimum total-object count (list1 + list2) before switching from
+       * brute-force to spatial-hash-accelerated collision.
+       */
+      const _SPATIAL_HASH_MIN_OBJECTS = 32;
+
+      /** Reusable spatial hash grid — avoids re-allocation each frame. */
+      let _spatialHashGrid: gdjs.SpatialHashGrid<gdjs.RuntimeObject> | null =
+        null;
+
+      /** Reusable array for spatial hash query results. */
+      const _spatialQueryResult: gdjs.RuntimeObject[] = [];
+
+      /**
+       * An improved version of {@link twoListsTest} that uses a spatial hash
+       * grid when the total object count exceeds {@link _SPATIAL_HASH_MIN_OBJECTS}.
+       *
+       * For small lists the behaviour is identical to `twoListsTest` (brute-force
+       * O(N×M) all-pairs).  For large lists the spatial hash reduces this to
+       * ~O(N+M) by only testing nearby pairs.
+       *
+       * **Self-collision note:** When `objectsLists1` and `objectsLists2`
+       * refer to the same list (e.g. "Enemies collide with Enemies"), every
+       * pair (A, B) will be considered from both directions (A vs B *and*
+       * B vs A).  The `pick` flag short-circuits the second test when
+       * `!inverted`, because both objects are already marked as picked.
+       * In the `inverted` path the `atLeastOneObject` flag is tracked
+       * per-obj1, which mirrors the existing semantics of `twoListsTest`.
+       *
+       * @param predicate The collision/distance/etc. test to run on each pair.
+       * @param objectsLists1 First set of object lists.
+       * @param objectsLists2 Second set of object lists.
+       * @param inverted When true, only list-1 objects are filtered (picks
+       *   objects that do *not* satisfy the predicate against any list-2 object).
+       * @param extraArg Extra argument forwarded to `predicate` (avoids closures).
+       */
+      export const twoListsTestWithSpatialHashing = function (
+        predicate: (
+          object1: gdjs.RuntimeObject,
+          object2: gdjs.RuntimeObject,
+          extraArg: any
+        ) => boolean,
+        objectsLists1: ObjectsLists,
+        objectsLists2: ObjectsLists,
+        inverted: boolean,
+        extraArg: any
+      ) {
+        // 1. Flatten ObjectsLists into arrays-of-arrays (done once for all paths).
+        const objects1Lists = gdjs.staticArray(
+          gdjs.evtTools.object.twoListsTestWithSpatialHashing
+        );
+        objectsLists1.values(objects1Lists);
+        const objects2Lists = gdjs.staticArray2(
+          gdjs.evtTools.object.twoListsTestWithSpatialHashing
+        );
+        objectsLists2.values(objects2Lists);
+
+        // Count total objects.
+        let totalObj1 = 0;
+        let totalObj2 = 0;
+        for (let i = 0, len = objects1Lists.length; i < len; ++i)
+          totalObj1 += objects1Lists[i].length;
+        for (let i = 0, len = objects2Lists.length; i < len; ++i)
+          totalObj2 += objects2Lists[i].length;
+
+        // 2. Reset pick flags on all objects (shared by both paths).
+        for (let i = 0, leni = objects1Lists.length; i < leni; ++i) {
+          const arr = objects1Lists[i];
+          for (let k = 0, lenk = arr.length; k < lenk; ++k) {
+            arr[k].pick = false;
+          }
+        }
+        for (let i = 0, leni = objects2Lists.length; i < leni; ++i) {
+          const arr = objects2Lists[i];
+          for (let k = 0, lenk = arr.length; k < lenk; ++k) {
+            arr[k].pick = false;
+          }
+        }
+
+        let isTrue = false;
+
+        if (totalObj1 + totalObj2 < _SPATIAL_HASH_MIN_OBJECTS) {
+          // ── Brute-force path ─────────────────────────────────────────
+          // Same O(N×M) all-pairs test as twoListsTest, inlined here to
+          // use the already-flattened arrays and avoid a double-flatten.
+          for (let i = 0, leni = objects1Lists.length; i < leni; ++i) {
+            const arr1 = objects1Lists[i];
+            for (let k = 0, lenk = arr1.length; k < lenk; ++k) {
+              let atLeastOneObject = false;
+              for (let j = 0, lenj = objects2Lists.length; j < lenj; ++j) {
+                const arr2 = objects2Lists[j];
+                for (let l = 0, lenl = arr2.length; l < lenl; ++l) {
+                  if (arr1[k].pick && arr2[l].pick) {
+                    continue;
+                  }
+                  if (
+                    arr1[k].id !== arr2[l].id &&
+                    predicate(arr1[k], arr2[l], extraArg)
+                  ) {
+                    if (!inverted) {
+                      isTrue = true;
+                      arr1[k].pick = true;
+                      arr2[l].pick = true;
+                    }
+                    atLeastOneObject = true;
+                  }
+                }
+              }
+              if (!atLeastOneObject && inverted) {
+                isTrue = true;
+                arr1[k].pick = true;
+              }
+            }
+          }
+        } else {
+          // ── Spatial-hash accelerated path ─────────────────────────────
+
+          // Determine cell size: 2× the average object dimension of list2.
+          // This gives ~1–4 objects per cell on average.
+          let totalDim = 0;
+          for (let i = 0, leni = objects2Lists.length; i < leni; ++i) {
+            const arr = objects2Lists[i];
+            for (let k = 0, lenk = arr.length; k < lenk; ++k) {
+              const w = arr[k].getWidth();
+              const h = arr[k].getHeight();
+              totalDim += w > h ? w : h;
+            }
+          }
+          const avgDim = totalObj2 > 0 ? totalDim / totalObj2 : 64;
+          const cellSize = avgDim * 2 > 32 ? avgDim * 2 : 32;
+
+          // Build (or reconfigure) the grid.
+          if (!_spatialHashGrid) {
+            _spatialHashGrid = new gdjs.SpatialHashGrid<gdjs.RuntimeObject>(
+              cellSize
+            );
+          } else {
+            _spatialHashGrid.clear();
+            if (
+              _spatialHashGrid.getCellSize() < cellSize - 0.01 ||
+              _spatialHashGrid.getCellSize() > cellSize + 0.01
+            ) {
+              _spatialHashGrid.setCellSize(cellSize);
+            }
+          }
+
+          // Insert every list-2 object by its AABB.
+          for (let i = 0, leni = objects2Lists.length; i < leni; ++i) {
+            const arr = objects2Lists[i];
+            for (let k = 0, lenk = arr.length; k < lenk; ++k) {
+              const obj = arr[k];
+              const aabb = obj.getAABB();
+              _spatialHashGrid.insert(
+                obj,
+                aabb.min[0],
+                aabb.min[1],
+                aabb.max[0],
+                aabb.max[1]
+              );
+            }
+          }
+
+          // For each list-1 object, query nearby candidates and test.
+          for (let i = 0, leni = objects1Lists.length; i < leni; ++i) {
+            const arr1 = objects1Lists[i];
+            for (let k = 0, lenk = arr1.length; k < lenk; ++k) {
+              const obj1 = arr1[k];
+              let atLeastOneObject = false;
+
+              // Query the grid with obj1's AABB.
+              const aabb1 = obj1.getAABB();
+              _spatialQueryResult.length = 0;
+              _spatialHashGrid.queryToArray(
+                aabb1.min[0],
+                aabb1.min[1],
+                aabb1.max[0],
+                aabb1.max[1],
+                _spatialQueryResult
+              );
+
+              for (
+                let l = 0, lenl = _spatialQueryResult.length;
+                l < lenl;
+                ++l
+              ) {
+                const obj2 = _spatialQueryResult[l];
+
+                // Skip if both already picked (same optimisation as twoListsTest).
+                if (obj1.pick && obj2.pick) {
+                  continue;
+                }
+                // Never test an object against itself.
+                if (obj1.id === obj2.id) {
+                  continue;
+                }
+
+                if (predicate(obj1, obj2, extraArg)) {
+                  if (!inverted) {
+                    isTrue = true;
+                    obj1.pick = true;
+                    obj2.pick = true;
+                  }
+                  atLeastOneObject = true;
+                }
+              }
+
+              if (!atLeastOneObject && inverted) {
+                isTrue = true;
+                obj1.pick = true;
+              }
+            }
+          }
+        }
+
+        // 3. Trim objects that were not picked (shared by both paths).
+        for (let i = 0, leni = objects1Lists.length; i < leni; ++i) {
+          const arr = objects1Lists[i];
+          let finalSize = 0;
+          for (let k = 0, lenk = arr.length; k < lenk; ++k) {
+            if (arr[k].pick) {
+              arr[finalSize] = arr[k];
+              finalSize++;
+            }
+          }
+          arr.length = finalSize;
+        }
+        if (!inverted) {
+          for (let i = 0, leni = objects2Lists.length; i < leni; ++i) {
+            const arr = objects2Lists[i];
+            let finalSize = 0;
+            for (let k = 0, lenk = arr.length; k < lenk; ++k) {
+              if (arr[k].pick) {
+                arr[finalSize] = arr[k];
+                finalSize++;
+              }
+            }
+            arr.length = finalSize;
+          }
+        }
+
+        return isTrue;
+      };
+
       export const hitBoxesCollisionTest = function (
         objectsLists1: ObjectsLists,
         objectsLists2: ObjectsLists,
@@ -225,7 +468,7 @@ namespace gdjs {
         instanceContainer: gdjs.RuntimeInstanceContainer,
         ignoreTouchingEdges: boolean
       ) {
-        return gdjs.evtTools.object.twoListsTest(
+        return gdjs.evtTools.object.twoListsTestWithSpatialHashing(
           gdjs.RuntimeObject.collisionTest,
           objectsLists1,
           objectsLists2,

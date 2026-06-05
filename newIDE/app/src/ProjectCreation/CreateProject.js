@@ -216,6 +216,15 @@ export const copyLocalTemplateFilesToLocalProjectFolder = async ({
   const projectFolder = pathModule.dirname(projectFilePath);
 
   const copyDirectory = async (sourceDir: string, relativeDir: string) => {
+    const destinationDir = relativeDir
+      ? getProjectTemplateFileDestinationPath({
+          projectFolder,
+          repositoryFilePath: relativeDir,
+          path: pathModule,
+        })
+      : projectFolder;
+    await fsModule.ensureDir(destinationDir);
+
     const entries = await fsModule.readdir(sourceDir, { withFileTypes: true });
     for (const entry of entries) {
       const entryRelativePath = relativeDir
@@ -245,28 +254,51 @@ export const copyLocalTemplateFilesToLocalProjectFolder = async ({
 
 // Copy the template files for a NewProjectSource into the new project folder,
 // dispatching on the source type (bundled local folder, or GitHub repository).
+// Defaults to the bundled local folder so all local project creations receive
+// the app template even when their source project does not declare one.
 export const copyProjectTemplateFilesToLocalProjectFolder = async ({
   projectFilePath,
   templateFilesSource,
+  fetch,
+  fs: fsModule = fs,
+  path: pathModule = path,
+  findLocalProjectTemplatePath: findLocalProjectTemplatePathImpl = findLocalProjectTemplatePath,
 }: {|
   projectFilePath: string,
-  templateFilesSource: ProjectTemplateFilesSource,
+  templateFilesSource?: ?ProjectTemplateFilesSource,
+  fetch?: any,
+  fs?: any,
+  path?: any,
+  findLocalProjectTemplatePath?: () => string | null,
 |}): Promise<void> => {
-  if (templateFilesSource.type === 'local-folder') {
-    const templateFolderPath = findLocalProjectTemplatePath();
+  const source = templateFilesSource || emptyProjectTemplateFilesSource;
+
+  if (source.type === 'local-folder') {
+    const templateFolderPath = findLocalProjectTemplatePathImpl();
     if (!templateFolderPath) {
       throw new Error('Could not locate the bundled project template folder.');
     }
     await copyLocalTemplateFilesToLocalProjectFolder({
       projectFilePath,
       templateFolderPath,
+      fs: fsModule,
+      path: pathModule,
     });
     return;
   }
 
+  const repository: GitHubProjectTemplateRepository = {
+    owner: source.owner,
+    name: source.name,
+    ref: source.ref,
+    subdirectory: source.subdirectory,
+  };
   await copyGitHubRepositoryFilesToLocalProjectFolder({
     projectFilePath,
-    repository: templateFilesSource,
+    repository,
+    fetch,
+    fs: fsModule,
+    path: pathModule,
   });
 };
 

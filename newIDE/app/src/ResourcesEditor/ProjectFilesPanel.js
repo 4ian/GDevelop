@@ -27,6 +27,7 @@ import RefreshIcon from '../UI/CustomSvgIcons/Refresh';
 import VideoIcon from '../UI/CustomSvgIcons/Video';
 import FolderNameDialog from './FolderNameDialog';
 import MarkdownFileNameDialog from './MarkdownFileNameDialog';
+import ProjectFileRenameDialog from './ProjectFileRenameDialog';
 import ContextMenu, { type ContextMenuInterface } from '../UI/Menu/ContextMenu';
 import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
@@ -272,6 +273,10 @@ const styles = {
     userSelect: 'none',
   },
   thumbnailDropTarget: {
+    outline: '2px solid var(--theme-primary-color)',
+    outlineOffset: -2,
+  },
+  thumbnailsDropTarget: {
     outline: '2px solid var(--theme-primary-color)',
     outlineOffset: -2,
   },
@@ -937,6 +942,40 @@ export const canMoveProjectFileToFolder = ({
 
 export const getProjectFileDragEffectAllowed = (): string => 'copyMove';
 
+export const canRenameProjectFileNode = (node: ProjectFileNode): boolean =>
+  node.type === 'file' || (node.type === 'folder' && !!node.relativePath);
+
+export const hasExternalFilesDragData = (dataTransferTypes: any): boolean => {
+  if (!dataTransferTypes) return false;
+
+  if (typeof dataTransferTypes.includes === 'function') {
+    return dataTransferTypes.includes('Files');
+  }
+
+  if (typeof dataTransferTypes.contains === 'function') {
+    return dataTransferTypes.contains('Files');
+  }
+
+  for (let index = 0; index < dataTransferTypes.length; index++) {
+    if (dataTransferTypes[index] === 'Files') return true;
+  }
+
+  return false;
+};
+
+export const getExternalFileDropPaths = (dataTransfer: any): Array<string> => {
+  if (!dataTransfer || !dataTransfer.files) return [];
+
+  const filePaths = [];
+  for (let index = 0; index < dataTransfer.files.length; index++) {
+    const file = dataTransfer.files[index];
+    if (file && typeof file.path === 'string' && file.path.trim()) {
+      filePaths.push(file.path);
+    }
+  }
+  return filePaths;
+};
+
 export const getMovedProjectFilePath = ({
   sourceNode,
   targetFolderNode,
@@ -947,6 +986,28 @@ export const getMovedProjectFilePath = ({
   path
     ? path.join(targetFolderNode.absolutePath, sourceNode.name)
     : `${targetFolderNode.absolutePath}/${sourceNode.name}`;
+
+export const getExternalFileCopyDestinationPath = ({
+  sourceFilePath,
+  targetFolderNode,
+}: {|
+  sourceFilePath: string,
+  targetFolderNode: ProjectFileNode,
+|}): string =>
+  path
+    ? path.join(targetFolderNode.absolutePath, path.basename(sourceFilePath))
+    : `${targetFolderNode.absolutePath}/${sourceFilePath}`;
+
+export const getRenamedProjectFilePath = ({
+  node,
+  newName,
+}: {|
+  node: ProjectFileNode,
+  newName: string,
+|}): string =>
+  path
+    ? path.join(path.dirname(node.absolutePath), newName)
+    : `${node.absolutePath}/${newName}`;
 
 export const getResourceFileAfterProjectFileMove = ({
   projectRootPath,
@@ -964,6 +1025,63 @@ export const getResourceFileAfterProjectFileMove = ({
   return path.isAbsolute(previousResourceFile)
     ? movedAbsolutePath
     : normalizeSlashes(path.relative(projectRootPath, movedAbsolutePath));
+};
+
+const isAbsolutePathAtOrInside = ({
+  parentPath,
+  candidatePath,
+}: {|
+  parentPath: string,
+  candidatePath: string,
+|}): boolean => {
+  if (!path) return false;
+  const relativePath = path.relative(parentPath, candidatePath);
+  return (
+    relativePath === '' ||
+    (!!relativePath &&
+      !relativePath.startsWith('..') &&
+      !path.isAbsolute(relativePath))
+  );
+};
+
+export const getResourceFileAfterProjectPathMove = ({
+  projectRootPath,
+  previousResourceFile,
+  sourceAbsolutePath,
+  movedAbsolutePath,
+}: {|
+  projectRootPath: string,
+  previousResourceFile: string,
+  sourceAbsolutePath: string,
+  movedAbsolutePath: string,
+|}): string => {
+  if (!path || isExternalResourceFile(previousResourceFile)) {
+    return previousResourceFile;
+  }
+
+  const previousAbsolutePath = path.isAbsolute(previousResourceFile)
+    ? previousResourceFile
+    : path.join(projectRootPath, previousResourceFile);
+  if (
+    !isAbsolutePathAtOrInside({
+      parentPath: sourceAbsolutePath,
+      candidatePath: previousAbsolutePath,
+    })
+  ) {
+    return previousResourceFile;
+  }
+
+  const relativePathInsideMovedFolder = path.relative(
+    sourceAbsolutePath,
+    previousAbsolutePath
+  );
+  const movedResourceAbsolutePath = path.join(
+    movedAbsolutePath,
+    relativePathInsideMovedFolder
+  );
+  return path.isAbsolute(previousResourceFile)
+    ? movedResourceAbsolutePath
+    : normalizeSlashes(path.relative(projectRootPath, movedResourceAbsolutePath));
 };
 
 const getFileMoveCheck = (
@@ -1028,14 +1146,45 @@ const updateResourcesAfterProjectFileMove = ({
 
       const resource = resourcesManager.getResource(resourceName);
       resource.setFile(
-        getResourceFileAfterProjectFileMove({
+        getResourceFileAfterProjectPathMove({
           projectRootPath,
           previousResourceFile: resource.getFile(),
+          sourceAbsolutePath,
           movedAbsolutePath,
         })
       );
     }
   );
+};
+
+const updateResourcesAfterProjectPathMove = ({
+  project,
+  sourceAbsolutePath,
+  movedAbsolutePath,
+}: {|
+  project: gdProject,
+  sourceAbsolutePath: string,
+  movedAbsolutePath: string,
+|}) => {
+  if (!path) return;
+  const projectRootPath = getProjectRootPath(project);
+  if (!projectRootPath) return;
+
+  const resourcesManager = project.getResourcesManager();
+  resourcesManager
+    .getAllResourceNames()
+    .toJSArray()
+    .forEach(resourceName => {
+      const resource = resourcesManager.getResource(resourceName);
+      resource.setFile(
+        getResourceFileAfterProjectPathMove({
+          projectRootPath,
+          previousResourceFile: resource.getFile(),
+          sourceAbsolutePath,
+          movedAbsolutePath,
+        })
+      );
+    });
 };
 
 const ProjectFilesPanel: React.ComponentType<{
@@ -1084,6 +1233,11 @@ const ProjectFilesPanel: React.ComponentType<{
       folderCreationError,
       setFolderCreationError,
     ] = React.useState<?string>(null);
+    const [isRenameDialogOpen, setIsRenameDialogOpen] = React.useState(false);
+    const [renameTargetNode, setRenameTargetNode] = React.useState<?ProjectFileNode>(
+      null
+    );
+    const [renameError, setRenameError] = React.useState<?string>(null);
     const [
       draggedFileNode,
       setDraggedFileNode,
@@ -1320,6 +1474,108 @@ const ProjectFilesPanel: React.ComponentType<{
       [makeSelectionForNode, onViewProjectFileProperties]
     );
 
+    const openRenameDialogForNode = React.useCallback((node: ProjectFileNode) => {
+      if (!canRenameProjectFileNode(node)) return;
+      setRenameTargetNode(node);
+      setRenameError(null);
+      setIsRenameDialogOpen(true);
+    }, []);
+
+    const renameProjectFileNode = React.useCallback(
+      async (newName: string) => {
+        if (!fs || !path || !rootNode || !renameTargetNode) return;
+        if (!canRenameProjectFileNode(renameTargetNode)) return;
+
+        const renamedPath = getRenamedProjectFilePath({
+          node: renameTargetNode,
+          newName,
+        });
+        if (
+          normalizeAbsolutePath(renamedPath) ===
+          normalizeAbsolutePath(renameTargetNode.absolutePath)
+        ) {
+          setRenameError(null);
+          setRenameTargetNode(null);
+          setIsRenameDialogOpen(false);
+          return;
+        }
+
+        try {
+          await fs.promises.access(renamedPath);
+          setRenameError('A file or folder with this name already exists.');
+          return;
+        } catch (error) {
+          // The destination does not exist, which is what we want before renaming.
+        }
+
+        if (renameTargetNode.type === 'file') {
+          const { blockers } = getFileMoveCheck(project, renameTargetNode);
+          if (blockers.length) {
+            await showAlert({
+              title: t`Unable to rename this file`,
+              message: buildFileMoveBlockersMessage(blockers),
+            });
+            return;
+          }
+        }
+
+        try {
+          await fs.promises.rename(renameTargetNode.absolutePath, renamedPath);
+        } catch (error) {
+          setRenameError(
+            `The item could not be renamed on disk:\n\n${error.message}`
+          );
+          return;
+        }
+
+        updateResourcesAfterProjectPathMove({
+          project,
+          sourceAbsolutePath: renameTargetNode.absolutePath,
+          movedAbsolutePath: renamedPath,
+        });
+
+        setRenameError(null);
+        setRenameTargetNode(null);
+        setIsRenameDialogOpen(false);
+        setOpenedNodeIds(openedNodeIds =>
+          Array.from(
+            new Set([
+              normalizeSlashes(path.dirname(renamedPath)),
+              ...(renameTargetNode.type === 'folder'
+                ? [normalizeSlashes(renamedPath)]
+                : []),
+              ...openedNodeIds,
+            ])
+          )
+        );
+        const refreshedRoot = (await refresh()) || rootNode;
+        if (
+          selectedItem &&
+          normalizeAbsolutePath(selectedItem.node.absolutePath) ===
+            normalizeAbsolutePath(renameTargetNode.absolutePath)
+        ) {
+          const renamedNode = findNodeByAbsolutePath(refreshedRoot, renamedPath);
+          onSelectProjectFile(
+            renamedNode
+              ? {
+                  node: renamedNode,
+                  resource: getResourceFromNode(project, renamedNode),
+                }
+              : null
+          );
+        }
+      },
+      [
+        project,
+        refresh,
+        renameTargetNode,
+        rootNode,
+        selectedItem,
+        onSelectProjectFile,
+        showAlert,
+      ]
+    );
+
     const deleteProjectFile = React.useCallback(
       async (node: ProjectFileNode) => {
         if (!fs || node.type !== 'file') return;
@@ -1446,6 +1702,126 @@ const ProjectFilesPanel: React.ComponentType<{
       ]
     );
 
+    const copyExternalFilesToFolder = React.useCallback(
+      async (
+        sourceFilePaths: Array<string>,
+        targetFolderNode: ProjectFileNode
+      ) => {
+        if (
+          !fs ||
+          !path ||
+          !rootNode ||
+          targetFolderNode.type !== 'folder' ||
+          !sourceFilePaths.length
+        ) {
+          return;
+        }
+
+        const uniqueSourceFilePaths = Array.from(new Set(sourceFilePaths));
+        const copyJobs = [];
+        const directoryPaths = [];
+        const duplicateFileNames = [];
+
+        for (const sourceFilePath of uniqueSourceFilePaths) {
+          let sourceStat;
+          try {
+            sourceStat = await fs.promises.stat(sourceFilePath);
+          } catch (error) {
+            await showAlert({
+              title: t`Unable to import files`,
+              message: `The file could not be read from disk:\n\n${
+                error.message
+              }`,
+            });
+            return;
+          }
+
+          if (!sourceStat.isFile()) {
+            directoryPaths.push(sourceFilePath);
+            continue;
+          }
+
+          const destinationPath = getExternalFileCopyDestinationPath({
+            sourceFilePath,
+            targetFolderNode,
+          });
+          try {
+            await fs.promises.access(destinationPath);
+            duplicateFileNames.push(path.basename(destinationPath));
+          } catch (error) {
+            // The destination does not exist, which is what we want before copying.
+          }
+
+          copyJobs.push({
+            sourceFilePath,
+            destinationPath,
+          });
+        }
+
+        if (directoryPaths.length) {
+          await showAlert({
+            title: t`Unable to import files`,
+            message: `Only files can be dropped here:\n\n${directoryPaths
+              .map(filePath => `- ${filePath}`)
+              .join('\n')}`,
+          });
+          return;
+        }
+
+        if (duplicateFileNames.length) {
+          await showAlert({
+            title: t`Unable to import files`,
+            message: `These files already exist in "${
+              targetFolderNode.name
+            }":\n\n${duplicateFileNames
+              .map(fileName => `- ${fileName}`)
+              .join('\n')}`,
+          });
+          return;
+        }
+
+        try {
+          for (const copyJob of copyJobs) {
+            await fs.promises.copyFile(
+              copyJob.sourceFilePath,
+              copyJob.destinationPath
+            );
+          }
+        } catch (error) {
+          await showAlert({
+            title: t`Unable to import files`,
+            message: `The files could not be copied on disk:\n\n${
+              error.message
+            }`,
+          });
+          return;
+        }
+
+        setOpenedNodeIds(openedNodeIds =>
+          Array.from(
+            new Set([
+              normalizeSlashes(targetFolderNode.absolutePath),
+              ...openedNodeIds,
+            ])
+          )
+        );
+        const refreshedRoot = (await refresh()) || rootNode;
+        if (copyJobs.length === 1) {
+          const copiedNode = findNodeByAbsolutePath(
+            refreshedRoot,
+            copyJobs[0].destinationPath
+          );
+          if (copiedNode) {
+            onSelectProjectFile({
+              node: copiedNode,
+              resource: getResourceFromNode(project, copiedNode),
+            });
+          }
+        }
+      },
+      [project, refresh, rootNode, onSelectProjectFile, showAlert]
+    );
+
     const moveProjectFileToFolder = React.useCallback(
       async (
         sourceNode: ProjectFileNode,
@@ -1561,17 +1937,20 @@ const ProjectFilesPanel: React.ComponentType<{
 
     const handleFolderDragOver = React.useCallback(
       (event: any, targetFolderNode: ProjectFileNode) => {
-        if (
-          !canMoveProjectFileToFolder({
-            sourceNode: draggedFileNode,
-            targetFolderNode,
-          })
-        ) {
+        const canMoveProjectFile = canMoveProjectFileToFolder({
+          sourceNode: draggedFileNode,
+          targetFolderNode,
+        });
+        const canCopyExternalFiles =
+          targetFolderNode.type === 'folder' &&
+          hasExternalFilesDragData(event.dataTransfer.types);
+        if (!canMoveProjectFile && !canCopyExternalFiles) {
           return;
         }
 
         event.preventDefault();
-        event.dataTransfer.dropEffect = 'move';
+        event.stopPropagation();
+        event.dataTransfer.dropEffect = canMoveProjectFile ? 'move' : 'copy';
         setDropTargetFolderNodeId(targetFolderNode.id);
       },
       [draggedFileNode]
@@ -1598,12 +1977,18 @@ const ProjectFilesPanel: React.ComponentType<{
 
     const handleFolderDrop = React.useCallback(
       async (event: any, targetFolderNode: ProjectFileNode) => {
+        const canMoveProjectFile = canMoveProjectFileToFolder({
+          sourceNode: draggedFileNode,
+          targetFolderNode,
+        });
+        const externalFilePaths = getExternalFileDropPaths(event.dataTransfer);
+        const isExternalFilesDrop = hasExternalFilesDragData(
+          event.dataTransfer.types
+        );
+
         if (
-          !canMoveProjectFileToFolder({
-            sourceNode: draggedFileNode,
-            targetFolderNode,
-          }) ||
-          !draggedFileNode
+          (!canMoveProjectFile || !draggedFileNode) &&
+          !isExternalFilesDrop
         ) {
           finishDraggingProjectFile();
           return;
@@ -1613,9 +1998,29 @@ const ProjectFilesPanel: React.ComponentType<{
         event.stopPropagation();
         const sourceNode = draggedFileNode;
         finishDraggingProjectFile();
-        await moveProjectFileToFolder(sourceNode, targetFolderNode);
+
+        if (canMoveProjectFile && sourceNode) {
+          await moveProjectFileToFolder(sourceNode, targetFolderNode);
+          return;
+        }
+
+        if (!externalFilePaths.length) {
+          await showAlert({
+            title: t`Unable to import files`,
+            message: t`Drop files from your computer here.`,
+          });
+          return;
+        }
+
+        await copyExternalFilesToFolder(externalFilePaths, targetFolderNode);
       },
-      [draggedFileNode, finishDraggingProjectFile, moveProjectFileToFolder]
+      [
+        copyExternalFilesToFolder,
+        draggedFileNode,
+        finishDraggingProjectFile,
+        moveProjectFileToFolder,
+        showAlert,
+      ]
     );
 
     const toggleNode = React.useCallback((node: ProjectFileNode) => {
@@ -1709,6 +2114,11 @@ const ProjectFilesPanel: React.ComponentType<{
             label: i18n._(t`View properties`),
             click: () => viewPropertiesForNode(node),
           },
+          {
+            label: i18n._(t`Rename`),
+            enabled: canRenameProjectFileNode(node),
+            click: () => openRenameDialogForNode(node),
+          },
           { type: 'separator' },
           {
             label: i18n._(t`Create folder`),
@@ -1743,6 +2153,7 @@ const ProjectFilesPanel: React.ComponentType<{
         deleteProjectFile,
         openFolderDialogForNode,
         openMarkdownDialogForNode,
+        openRenameDialogForNode,
         viewPropertiesForNode,
       ]
     );
@@ -1914,6 +2325,8 @@ const ProjectFilesPanel: React.ComponentType<{
       },
       [activeFolderNode, shouldDisplayNode]
     );
+    const isActiveFolderDropTarget =
+      !!activeFolderNode && dropTargetFolderNodeId === activeFolderNode.id;
 
     const renderThumbnailPreview = React.useCallback(
       (node: ProjectFileNode): React.Node => {
@@ -2134,11 +2547,55 @@ const ProjectFilesPanel: React.ComponentType<{
                 </Text>
               </div>
               {thumbnailNodes.length ? (
-                <div style={styles.thumbnailsGrid}>
+                <div
+                  style={{
+                    ...styles.thumbnailsGrid,
+                    ...(isActiveFolderDropTarget
+                      ? styles.thumbnailsDropTarget
+                      : undefined),
+                  }}
+                  onDragOver={event => {
+                    if (activeFolderNode) {
+                      handleFolderDragOver(event, activeFolderNode);
+                    }
+                  }}
+                  onDragLeave={event => {
+                    if (activeFolderNode) {
+                      handleFolderDragLeave(event, activeFolderNode);
+                    }
+                  }}
+                  onDrop={event => {
+                    if (activeFolderNode) {
+                      handleFolderDrop(event, activeFolderNode);
+                    }
+                  }}
+                >
                   {thumbnailNodes.map(renderThumbnailNode)}
                 </div>
               ) : (
-                <div style={styles.emptyFolderState}>
+                <div
+                  style={{
+                    ...styles.emptyFolderState,
+                    ...(isActiveFolderDropTarget
+                      ? styles.thumbnailsDropTarget
+                      : undefined),
+                  }}
+                  onDragOver={event => {
+                    if (activeFolderNode) {
+                      handleFolderDragOver(event, activeFolderNode);
+                    }
+                  }}
+                  onDragLeave={event => {
+                    if (activeFolderNode) {
+                      handleFolderDragLeave(event, activeFolderNode);
+                    }
+                  }}
+                  onDrop={event => {
+                    if (activeFolderNode) {
+                      handleFolderDrop(event, activeFolderNode);
+                    }
+                  }}
+                >
                   <Text noMargin color="secondary">
                     {searchTextLowerCase ? (
                       <Trans>No project files match the current search.</Trans>
@@ -2176,6 +2633,17 @@ const ProjectFilesPanel: React.ComponentType<{
             setIsFolderDialogOpen(false);
           }}
           onCreate={createFolder}
+        />
+        <ProjectFileRenameDialog
+          open={isRenameDialogOpen}
+          initialName={renameTargetNode ? renameTargetNode.name : ''}
+          error={renameError}
+          onCancel={() => {
+            setRenameError(null);
+            setRenameTargetNode(null);
+            setIsRenameDialogOpen(false);
+          }}
+          onRename={renameProjectFileNode}
         />
         <ContextMenu ref={contextMenu} buildMenuTemplate={buildContextMenu} />
       </Background>

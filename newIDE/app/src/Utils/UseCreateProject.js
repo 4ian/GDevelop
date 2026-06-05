@@ -268,10 +268,7 @@ const useCreateProject = ({
                   });
                 }
 
-                const templateFilesSource =
-                  newProjectSource.templateFilesSource;
                 if (
-                  templateFilesSource &&
                   newProjectSetup.storageProvider.internalName === 'LocalFile'
                 ) {
                   console.log(
@@ -279,7 +276,6 @@ const useCreateProject = ({
                   );
                   await copyProjectTemplateFilesToLocalProjectFolder({
                     projectFilePath: newFileMetadata.fileIdentifier,
-                    templateFilesSource,
                   });
                 }
               },

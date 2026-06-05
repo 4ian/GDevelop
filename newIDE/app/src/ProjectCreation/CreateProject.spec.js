@@ -3,13 +3,18 @@ import path from 'path';
 import {
   copyGitHubRepositoryFilesToLocalProjectFolder,
   copyLocalTemplateFilesToLocalProjectFolder,
+  copyProjectTemplateFilesToLocalProjectFolder,
   createNewEmptyProject,
   emptyProjectTemplateFilesSource,
   getProjectTemplateFileDestinationPath,
 } from './CreateProject';
+import { findLocalProjectTemplatePath } from './LocalProjectTemplateFinder';
 
 jest.mock('../Utils/Analytics/EventSender', () => ({
   sendNewGameCreated: jest.fn(),
+}));
+jest.mock('./LocalProjectTemplateFinder', () => ({
+  findLocalProjectTemplatePath: jest.fn(),
 }));
 
 describe('CreateProject template files', () => {
@@ -138,7 +143,7 @@ describe('CreateProject template files', () => {
     expect(writtenPaths).toHaveLength(2);
   });
 
-  it('recursively copies a bundled local template folder into the project', async () => {
+  it('recursively copies all bundled local template folder contents into the project', async () => {
     // Mock a template folder containing AGENTS.md, CLAUDE.md and a nested skill.
     const dirEntry = name => ({
       name,
@@ -157,8 +162,12 @@ describe('CreateProject template files', () => {
           return [
             dirEntry('AGENTS.md'),
             dirEntry('CLAUDE.md'),
+            subDirEntry('assets'),
             subDirEntry('gdevelop-mcp'),
           ];
+        }
+        if (dir === '/tpl/assets') {
+          return [];
         }
         if (dir === '/tpl/gdevelop-mcp') {
           return [dirEntry('SKILL.md'), subDirEntry('agents')];
@@ -187,6 +196,41 @@ describe('CreateProject template files', () => {
       '/Project/gdevelop-mcp/SKILL.md',
       '/Project/gdevelop-mcp/agents/openai.yaml',
     ]);
+    expect(fs.ensureDir).toHaveBeenCalledWith('/Project/assets');
+  });
+
+  it('copies the bundled local template when no explicit template source is provided', async () => {
+    findLocalProjectTemplatePath.mockReturnValue('/tpl');
+    const fs = {
+      existsSync: jest.fn(() => true),
+      readdir: jest.fn(async dir => {
+        if (dir === '/tpl') {
+          return [
+            {
+              name: 'AGENTS.md',
+              isDirectory: () => false,
+              isFile: () => true,
+            },
+          ];
+        }
+        return [];
+      }),
+      ensureDir: jest.fn(async () => {}),
+      readFile: jest.fn(async () => Buffer.from('content')),
+      writeFile: jest.fn(async () => {}),
+    };
+
+    await copyProjectTemplateFilesToLocalProjectFolder({
+      projectFilePath: '/Project/game.json',
+      fs,
+      path: path.posix,
+    });
+
+    expect(findLocalProjectTemplatePath).toHaveBeenCalled();
+    expect(fs.writeFile).toHaveBeenCalledWith(
+      '/Project/AGENTS.md',
+      Buffer.from('content')
+    );
   });
 
   it('rejects repository paths that would escape the local project folder', () => {

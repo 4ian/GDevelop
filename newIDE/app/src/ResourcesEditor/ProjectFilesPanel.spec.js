@@ -6,10 +6,16 @@ import {
   buildFolderCreationDiskErrorMessage,
   canDeleteProjectFolder,
   canMoveProjectFileToFolder,
+  canRenameProjectFileNode,
+  getExternalFileCopyDestinationPath,
+  getExternalFileDropPaths,
   getMovedProjectFilePath,
   getProjectFileDragEffectAllowed,
+  getRenamedProjectFilePath,
   getRegisteredProjectFileBadgeTitle,
   getResourceFileAfterProjectFileMove,
+  getResourceFileAfterProjectPathMove,
+  hasExternalFilesDragData,
   shouldSelectProjectFileNode,
   shouldSelectCreatedProjectFile,
   type ProjectFileNode,
@@ -104,6 +110,36 @@ describe('ProjectFilesPanel', () => {
     expect(getProjectFileDragEffectAllowed()).toBe('copyMove');
   });
 
+  it('detects external files dragged from the operating system', () => {
+    expect(hasExternalFilesDragData(['Files'])).toBe(true);
+    expect(
+      hasExternalFilesDragData({
+        length: 2,
+        0: 'text/plain',
+        1: 'Files',
+      })
+    ).toBe(true);
+    expect(hasExternalFilesDragData(['text/plain'])).toBe(false);
+  });
+
+  it('extracts external file paths and computes copy destinations', () => {
+    expect(
+      getExternalFileDropPaths({
+        files: [
+          { path: 'D:\\Downloads\\coin.png' },
+          { path: '' },
+          { name: 'ignored-without-path.png' },
+        ],
+      })
+    ).toEqual(['D:\\Downloads\\coin.png']);
+    expect(
+      getExternalFileCopyDestinationPath({
+        sourceFilePath: 'D:\\Downloads\\coin.png',
+        targetFolderNode,
+      })
+    ).toBe('D:\\Project\\ui\\coin.png');
+  });
+
   it('allows deleting empty folders only', () => {
     const emptyFolderNode: ProjectFileNode = {
       id: 'project/empty',
@@ -160,6 +196,56 @@ describe('ProjectFilesPanel', () => {
         movedAbsolutePath: movedFilePath,
       })
     ).toBe('ui/coin.png');
+  });
+
+  it('updates resource paths after renaming a folder containing registered files', () => {
+    expect(
+      getResourceFileAfterProjectPathMove({
+        projectRootPath: 'D:\\Project',
+        previousResourceFile: 'assets/coin.png',
+        sourceAbsolutePath: 'D:\\Project\\assets',
+        movedAbsolutePath: 'D:\\Project\\sprites',
+      })
+    ).toBe('sprites/coin.png');
+    expect(
+      getResourceFileAfterProjectPathMove({
+        projectRootPath: 'D:\\Project',
+        previousResourceFile: 'ui/button.png',
+        sourceAbsolutePath: 'D:\\Project\\assets',
+        movedAbsolutePath: 'D:\\Project\\sprites',
+      })
+    ).toBe('ui/button.png');
+  });
+
+  it('computes renamed file and folder paths', () => {
+    expect(
+      getRenamedProjectFilePath({
+        node: fileNode,
+        newName: 'coin-idle.png',
+      })
+    ).toBe('D:\\Project\\assets\\coin-idle.png');
+    expect(
+      getRenamedProjectFilePath({
+        node: sourceFolderNode,
+        newName: 'sprites',
+      })
+    ).toBe('D:\\Project\\sprites');
+  });
+
+  it('allows renaming project files and non-root folders only', () => {
+    const rootFolderNode: ProjectFileNode = {
+      id: 'project',
+      name: 'Project',
+      absolutePath: 'D:\\Project',
+      relativePath: '',
+      type: 'folder',
+      extension: '',
+      children: [],
+    };
+
+    expect(canRenameProjectFileNode(fileNode)).toBe(true);
+    expect(canRenameProjectFileNode(sourceFolderNode)).toBe(true);
+    expect(canRenameProjectFileNode(rootFolderNode)).toBe(false);
   });
 
   it('does not auto-select a newly created folder', () => {

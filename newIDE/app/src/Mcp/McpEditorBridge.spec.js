@@ -678,6 +678,53 @@ describe('McpEditorBridge', () => {
     }
   });
 
+  it('warns when an object-variable instruction operates on an object group', async () => {
+    // $FlowFixMe[invalid-constructor]
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    const layout = project.insertNewLayout('Level1', 0);
+    layout.getObjects().insertNewObject(project, 'Sprite', 'Enemy1', 0);
+    layout.getObjects().insertNewObject(project, 'Sprite', 'Enemy2', 1);
+    // Define a group "Enemies" containing both.
+    const groups = layout.getObjects().getObjectGroups();
+    const group = groups.insertNew('Enemies', 0);
+    group.addObject('Enemy1');
+    group.addObject('Enemy2');
+    // An action that changes an object variable on the GROUP.
+    const standard = gd.asStandardEvent(
+      layout
+        .getEvents()
+        .insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 0)
+    );
+    const action = new gd.Instruction();
+    action.setType('ModVarObjet');
+    action.setParametersCount(4);
+    action.setParameter(0, 'Enemies');
+    action.setParameter(1, 'hp');
+    action.setParameter(2, '-');
+    action.setParameter(3, '1');
+    standard.getActions().insert(action, 0);
+    action.delete();
+
+    try {
+      const bridge = makeBridge({ getProject: () => project });
+      const response = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'lint_scene_events',
+          arguments: { scene_name: 'Level1' },
+        },
+      });
+      const lint = JSON.parse(response.content[0].text);
+      const issue = lint.issues.find(
+        i => i.type === 'group-objectvar-or-collision'
+      );
+      expect(issue).toBeDefined();
+      expect(issue.groupName).toBe('Enemies');
+    } finally {
+      project.delete();
+    }
+  });
+
   it('create_group auto-assigns a distinct non-default color when none is given', async () => {
     // $FlowFixMe[invalid-constructor]
     const project = new gd.ProjectHelper.createNewGDJSProject();
@@ -2126,6 +2173,7 @@ describe('McpEditorBridge', () => {
                   width: 64,
                   height: 32,
                 },
+                variables: { index: 2, label: 'hero' },
               },
             ],
           },
@@ -2142,6 +2190,20 @@ describe('McpEditorBridge', () => {
       expect(instance.getZOrder()).toBe(3);
       expect(instance.getCustomWidth()).toBe(64);
       expect(instance.getCustomHeight()).toBe(32);
+      // Per-instance variables were set on the initial instance.
+      expect(instance.getVariables().has('index')).toBe(true);
+      expect(
+        instance
+          .getVariables()
+          .get('index')
+          .getValue()
+      ).toBe(2);
+      expect(
+        instance
+          .getVariables()
+          .get('label')
+          .getString()
+      ).toBe('hero');
 
       const updateResponse = await bridge.handleRendererMcpRequest({
         method: 'tools/call',
@@ -3320,6 +3382,51 @@ describe('McpEditorBridge', () => {
           .toString('ascii')
       ).toBe('RIFF');
       expect(project.getResourcesManager().hasResource('Shoot')).toBe(true);
+
+      // Richer image: a gradient circle. Still a valid PNG, larger than 1x1.
+      const shapeResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'generate_placeholder_asset',
+          arguments: {
+            name: 'Orb',
+            asset_type: 'image',
+            width: 32,
+            height: 32,
+            shape: 'circle',
+            color: '255;0;0',
+            color2: '0;0;255',
+          },
+        },
+      });
+      const shapeResult = JSON.parse(shapeResponse.content[0].text);
+      expect(shapeResult.success).toBe(true);
+      expect([
+        ...fs.readFileSync(shapeResult.resolvedFile).slice(0, 8),
+      ]).toEqual([137, 80, 78, 71, 13, 10, 26, 10]);
+
+      // Richer sound: a square wave with ADSR.
+      const sqResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'generate_placeholder_asset',
+          arguments: {
+            name: 'Laser',
+            asset_type: 'sound',
+            duration_ms: 60,
+            waveform: 'square',
+            adsr: { attack: 0.05, decay: 0.1, sustain: 0.5, release: 0.3 },
+          },
+        },
+      });
+      const sqResult = JSON.parse(sqResponse.content[0].text);
+      expect(sqResult.success).toBe(true);
+      expect(
+        fs
+          .readFileSync(sqResult.resolvedFile)
+          .slice(0, 4)
+          .toString('ascii')
+      ).toBe('RIFF');
     } finally {
       project.delete();
       fs.rmSync(tempDir, { recursive: true, force: true });

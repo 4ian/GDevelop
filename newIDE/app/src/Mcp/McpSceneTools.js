@@ -358,26 +358,118 @@ const encodePlaceholderPng = (
   return encodeRgbaPng(width, height, pixels);
 };
 
-// Write a minimal mono 16-bit PCM WAV beep (sine or short noise burst).
+// Richer procedural image: a filled SHAPE (rectangle/circle/ellipse/triangle/
+// diamond) over a transparent background, optionally with a vertical 2-color
+// GRADIENT fill. Antialiasing is approximate (hard edges) but produces far more
+// usable placeholder art than a solid rectangle.
+const encodeShapePng = (
+  width: number,
+  height: number,
+  shape: string,
+  color: [number, number, number, number],
+  color2: ?[number, number, number, number]
+): Buffer => {
+  const pixels = Buffer.alloc(width * height * 4); // transparent by default
+  const cx = (width - 1) / 2;
+  const cy = (height - 1) / 2;
+  const rx = width / 2;
+  const ry = height / 2;
+  const inside = (x, y) => {
+    switch (shape) {
+      case 'circle':
+      case 'ellipse': {
+        const dx = (x - cx) / rx;
+        const dy = (y - cy) / ry;
+        return dx * dx + dy * dy <= 1;
+      }
+      case 'triangle': {
+        // Upward triangle: width grows toward the bottom.
+        const t = y / (height - 1 || 1);
+        const halfW = (t * width) / 2;
+        return x >= cx - halfW && x <= cx + halfW;
+      }
+      case 'diamond': {
+        return Math.abs(x - cx) / rx + Math.abs(y - cy) / ry <= 1;
+      }
+      default:
+        return true; // rectangle
+    }
+  };
+  for (let y = 0; y < height; y++) {
+    // Vertical gradient blend factor.
+    const g = height > 1 ? y / (height - 1) : 0;
+    const r = color2
+      ? Math.round(color[0] * (1 - g) + color2[0] * g)
+      : color[0];
+    const gg = color2
+      ? Math.round(color[1] * (1 - g) + color2[1] * g)
+      : color[1];
+    const b = color2
+      ? Math.round(color[2] * (1 - g) + color2[2] * g)
+      : color[2];
+    const a = color2
+      ? Math.round(color[3] * (1 - g) + color2[3] * g)
+      : color[3];
+    for (let x = 0; x < width; x++) {
+      if (inside(x, y)) {
+        const o = (y * width + x) * 4;
+        pixels[o] = r;
+        pixels[o + 1] = gg;
+        pixels[o + 2] = b;
+        pixels[o + 3] = a;
+      }
+    }
+  }
+  return encodeRgbaPng(width, height, pixels);
+};
+
+// Write a minimal mono 16-bit PCM WAV. Supports a waveform and an optional ADSR
+// envelope; falls back to a sine/noise burst with linear fade-out.
 const encodePlaceholderWav = (
   durationMs: number,
   frequency: number,
-  kind: string
+  kind: string,
+  options?: Object
 ): Buffer => {
   const sampleRate = 44100;
   const samples = Math.max(1, Math.floor((sampleRate * durationMs) / 1000));
   const data = Buffer.alloc(samples * 2);
+  // Optional ADSR envelope (fractions of total duration) + waveform. Falls back
+  // to the original linear fade-out when no ADSR is supplied.
+  const adsr = options && options.adsr ? options.adsr : null;
+  const waveform =
+    (options && options.waveform) || (kind === 'noise' ? 'noise' : 'sine');
+  const attack = adsr && adsr.attack != null ? adsr.attack : null;
+  const decay = adsr && adsr.decay != null ? adsr.decay : 0;
+  const sustain = adsr && adsr.sustain != null ? adsr.sustain : 0.7;
+  const release = adsr && adsr.release != null ? adsr.release : 0.2;
+  const envelopeAt = i => {
+    const p = i / samples; // 0..1 progress
+    if (attack === null) return 1 - p; // legacy linear fade-out
+    if (p < attack) return attack > 0 ? p / attack : 1;
+    if (p < attack + decay)
+      return decay > 0 ? 1 - ((p - attack) / decay) * (1 - sustain) : sustain;
+    if (p < 1 - release) return sustain;
+    return release > 0 ? sustain * ((1 - p) / release) : 0;
+  };
+  const oscillator = (t, i) => {
+    const phase = frequency * t;
+    switch (waveform) {
+      case 'noise':
+        return ((i * 1103515245 + 12345) % 2048) / 1024 - 1;
+      case 'square':
+        return Math.sin(2 * Math.PI * phase) >= 0 ? 1 : -1;
+      case 'saw':
+        return 2 * (phase - Math.floor(phase + 0.5));
+      case 'triangle':
+        return 2 * Math.abs(2 * (phase - Math.floor(phase + 0.5))) - 1;
+      default:
+        return Math.sin(2 * Math.PI * phase);
+    }
+  };
   for (let i = 0; i < samples; i++) {
     const t = i / sampleRate;
-    // Linear fade-out envelope to avoid clicks.
-    const env = 1 - i / samples;
-    let value;
-    if (kind === 'noise') {
-      // Deterministic pseudo-noise (no Math.random for reproducibility).
-      value = (((i * 1103515245 + 12345) % 2048) / 1024 - 1) * env;
-    } else {
-      value = Math.sin(2 * Math.PI * frequency * t) * env;
-    }
+    const value = oscillator(t, i) * envelopeAt(i);
     data.writeInt16LE(Math.max(-32767, Math.min(32767, value * 32767)), i * 2);
   }
   const header = Buffer.alloc(44);
@@ -445,13 +537,35 @@ export const generatePlaceholderAsset = (
     const frequency =
       getFiniteNumber(args.frequency) !== null ? args.frequency : 440;
     const soundKind = getOptionalString(args, 'sound_kind') || 'sine';
-    buffer = encodePlaceholderWav(durationMs, frequency, soundKind);
+    // Optional richer synthesis: waveform (sine/square/saw/triangle/noise) and
+    // an ADSR envelope { attack, decay, sustain, release } (fractions of total).
+    const waveform = getOptionalString(args, 'waveform') || undefined;
+    const adsr =
+      args && args.adsr && typeof args.adsr === 'object' ? args.adsr : null;
+    buffer = encodePlaceholderWav(durationMs, frequency, soundKind, {
+      waveform,
+      adsr,
+    });
     kind = 'audio';
   } else {
     const width = getFiniteNumber(args.width) !== null ? args.width : 64;
     const height = getFiniteNumber(args.height) !== null ? args.height : 64;
     const rgba = parseRgbaColor(args.color);
-    buffer = encodePlaceholderPng(width, height, rgba);
+    const shape = getOptionalString(args, 'shape');
+    const color2 =
+      args && args.color2 !== undefined ? parseRgbaColor(args.color2) : null;
+    if ((shape && shape !== 'rectangle') || color2) {
+      // Shape and/or gradient → richer procedural image.
+      buffer = encodeShapePng(
+        width,
+        height,
+        shape || 'rectangle',
+        rgba,
+        color2
+      );
+    } else {
+      buffer = encodePlaceholderPng(width, height, rgba);
+    }
     kind = 'image';
   }
 

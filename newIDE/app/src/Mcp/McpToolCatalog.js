@@ -301,6 +301,16 @@ const generatePlaceholderAssetSchema = {
       description:
         'Image fill color as "r;g;b" or "r;g;b;a" (default opaque magenta 255;0;255).',
     },
+    shape: {
+      type: 'string',
+      description:
+        'Image shape: "rectangle" (default), "circle", "ellipse", "triangle", or "diamond". Non-rectangle shapes are drawn over a transparent background.',
+    },
+    color2: {
+      type: 'string',
+      description:
+        'Optional second color "r;g;b[;a]" — when given, the image is filled with a vertical gradient from color (top) to color2 (bottom).',
+    },
     duration_ms: {
       type: 'number',
       description: 'Sound duration in ms (default 150).',
@@ -312,6 +322,17 @@ const generatePlaceholderAssetSchema = {
     sound_kind: {
       type: 'string',
       description: '"sine" (tone, default) or "noise" (burst).',
+    },
+    waveform: {
+      type: 'string',
+      description:
+        'Sound waveform: "sine" (default), "square", "saw", "triangle", or "noise". Squares/saws sound more "game-y" than a pure sine.',
+    },
+    adsr: {
+      type: 'object',
+      description:
+        'Optional ADSR envelope as fractions of total duration: { attack, decay, sustain, release } (e.g. { attack:0.01, decay:0.1, sustain:0.6, release:0.3 }). Gives a shaped sound instead of a flat fade-out.',
+      additionalProperties: true,
     },
   },
   required: ['name'],
@@ -1194,8 +1215,15 @@ const setRuntimeStateSchema = {
             description:
               'For move/deleteInstance: which instance (default 0, the first).',
           },
-          x: { type: 'number' },
-          y: { type: 'number' },
+          x: {
+            type: 'number',
+            description:
+              'For moveInstance/spawnInstance: scene X. For spawnInstance, if x AND y are both given the new instance is placed exactly there; if omitted it spawns at the object default (0,0). To spawn relative to another object (e.g. above the player), read that position first via run_frames/inspect and compute x/y.',
+          },
+          y: {
+            type: 'number',
+            description: 'For moveInstance/spawnInstance: scene Y (see x).',
+          },
         },
         required: ['type'],
         additionalProperties: true,
@@ -2279,7 +2307,7 @@ const writeTools: Array<McpTool> = [
   {
     name: 'generate_placeholder_asset',
     description:
-      'Generate a simple placeholder asset (a solid-color PNG image, or a short WAV beep/noise sound) on disk and register it as a project resource — so a from-scratch playable demo can be built entirely through MCP without external image/audio tooling. Replace with real art/audio later by overwriting the file and re-importing the same name.',
+      'Generate a placeholder asset on disk and register it as a project resource, so a from-scratch playable demo can be built entirely through MCP. Images: a solid rectangle, a SHAPE (circle/ellipse/triangle/diamond), and/or a vertical 2-color GRADIENT (color → color2). Sounds: a WAV with a chosen waveform (sine/square/saw/triangle/noise) and optional ADSR envelope. Replace with real art/audio later by overwriting the file and re-importing the same name.',
     inputSchema: generatePlaceholderAssetSchema,
   },
   {

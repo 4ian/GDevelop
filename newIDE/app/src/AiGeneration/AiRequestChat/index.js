@@ -12,7 +12,10 @@ import {
   type AiRequestMessageAssistantFunctionCall,
 } from '../../Utils/GDevelopServices/Generation';
 import RaisedButton from '../../UI/RaisedButton';
-import { CompactTextAreaFieldWithControls } from '../../UI/CompactTextAreaFieldWithControls';
+import {
+  CompactTextAreaFieldWithControls,
+  type CompactTextAreaFieldWithControlsInterface,
+} from '../../UI/CompactTextAreaFieldWithControls';
 import { Column, Line, Spacer } from '../../UI/Grid';
 import Tooltip from '@material-ui/core/Tooltip';
 import ScrollView, { type ScrollViewInterface } from '../../UI/ScrollView';
@@ -553,6 +556,9 @@ export const AiRequestChat: React.ComponentType<{
     ] = React.useState<{ [string]: string }>({});
 
     const scrollViewRef = React.useRef<ScrollViewInterface | null>(null);
+    const existingChatTextFieldRef = React.useRef<CompactTextAreaFieldWithControlsInterface | null>(
+      null
+    );
     const [shouldAutoScroll, setShouldAutoScroll] = React.useState<boolean>(
       true
     );
@@ -723,6 +729,26 @@ export const AiRequestChat: React.ComponentType<{
       (!!aiRequest && aiRequest.status === 'working');
     const isWorking = isSending || hasWorkToProcess;
     const canRequestBeStopped = isWorking && !!aiRequest;
+
+    // When the AI finishes working, the input field gets re-enabled but has
+    // lost the focus (it was disabled while working). Focus it again, unless
+    // the user moved the focus to another element in the meantime.
+    const previousIsWorkingRef = React.useRef<boolean>(isWorking);
+    React.useEffect(
+      () => {
+        if (previousIsWorkingRef.current && !isWorking) {
+          const activeElement = document.activeElement;
+          if (
+            (!activeElement || activeElement === document.body) &&
+            existingChatTextFieldRef.current
+          ) {
+            existingChatTextFieldRef.current.focus();
+          }
+        }
+        previousIsWorkingRef.current = isWorking;
+      },
+      [isWorking]
+    );
 
     const doesNotHaveEnoughCreditsToContinue =
       !!price && availableCredits < price.priceInCredits;
@@ -1188,6 +1214,7 @@ export const AiRequestChat: React.ComponentType<{
             {/* $FlowFixMe[constant-condition] */}
             {!standAloneForm && (
               <CompactTextAreaFieldWithControls
+                ref={existingChatTextFieldRef}
                 maxLength={6000}
                 value={userRequestTextPerAiRequestId[aiRequestId] || ''}
                 disabled={isWorking || isForAnotherProject}

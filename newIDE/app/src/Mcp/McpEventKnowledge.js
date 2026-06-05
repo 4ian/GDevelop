@@ -533,20 +533,31 @@ const summarizeInstructionMetadata = ({
   // impossible to guess. Expose it explicitly so callers stop trial-and-erroring.
   const totalParameterCount = metadata.getParametersCount();
   const codeOnlyParameterIndexes = [];
+  // A ready-to-edit parameters array: code-only slots pre-filled with "" so the
+  // caller only replaces the <user:...> placeholders and keeps the array length
+  // correct without manually aligning indexes.
+  const parameterTemplate = [];
   for (let index = 0; index < totalParameterCount; index++) {
-    if (metadata.getParameter(index).isCodeOnly())
+    const param = metadata.getParameter(index);
+    if (param.isCodeOnly()) {
       codeOnlyParameterIndexes.push(index);
+      parameterTemplate.push('');
+    } else {
+      parameterTemplate.push(`<${param.getType()}>`);
+    }
   }
   const parameterShape = {
     totalParameterCount,
     userParameterCount: totalParameterCount - codeOnlyParameterIndexes.length,
     codeOnlyParameterIndexes,
+    // Code-only slots already filled with ""; replace each <type> placeholder.
+    parameterTemplate,
     note: codeOnlyParameterIndexes.length
       ? `This instruction has ${
           codeOnlyParameterIndexes.length
         } hidden code-only parameter(s) at index ${codeOnlyParameterIndexes.join(
           ', '
-        )} — pass "" (empty string) for each in the serialized parameters array. The serialized array length must equal totalParameterCount (${totalParameterCount}).`
+        )} — pass "" (empty string) for each in the serialized parameters array. The serialized array length must equal totalParameterCount (${totalParameterCount}). Use parameterTemplate as a starting point: code-only slots are already "", replace the <type> placeholders.`
       : undefined,
   };
   if (compact) {

@@ -39,6 +39,7 @@ import {
 import {
   formatImageZoomFactor,
   getNextImageZoomFactor,
+  getWorkingDeskImageZoomStyles,
   imageZoomMaxFactor,
   imageZoomMinFactor,
   shouldShowWorkingDeskImageZoomToolbar,
@@ -162,6 +163,7 @@ const styles = {
   },
   imageZoomCanvas: {
     display: 'flex',
+    flexShrink: 0,
     alignItems: 'center',
     justifyContent: 'center',
     minWidth: '100%',
@@ -170,8 +172,11 @@ const styles = {
     padding: 16,
   },
   image: {
-    maxWidth: '100%',
-    maxHeight: '100%',
+    display: 'block',
+    height: '100%',
+    width: 'auto',
+    maxWidth: 'none',
+    maxHeight: 'none',
     objectFit: 'contain',
     zIndex: 1,
   },
@@ -574,6 +579,7 @@ const WorkingDesk = ({
     if (!selectedNode) return null;
     const imageSource = getFileUrl(selectedNode.absolutePath);
     const imageZoomToolbar = renderImageZoomToolbar();
+    const imageZoomStyles = getWorkingDeskImageZoomStyles(imageZoomFactor);
     return (
       <div style={styles.previewColumn}>
         <div style={styles.mediaStage}>
@@ -585,14 +591,7 @@ const WorkingDesk = ({
             <div
               style={{
                 ...styles.imageZoomCanvas,
-                width:
-                  imageZoomFactor >= 1
-                    ? `${imageZoomFactor * 100}%`
-                    : '100%',
-                height:
-                  imageZoomFactor >= 1
-                    ? `${imageZoomFactor * 100}%`
-                    : '100%',
+                ...imageZoomStyles.canvas,
               }}
             >
               <img
@@ -600,14 +599,7 @@ const WorkingDesk = ({
                 alt={selectedNode.name}
                 style={{
                   ...styles.image,
-                  maxWidth:
-                    imageZoomFactor < 1
-                      ? `${imageZoomFactor * 100}%`
-                      : '100%',
-                  maxHeight:
-                    imageZoomFactor < 1
-                      ? `${imageZoomFactor * 100}%`
-                      : '100%',
+                  ...imageZoomStyles.image,
                 }}
               />
             </div>
@@ -798,9 +790,7 @@ const WorkingDesk = ({
     const isRunning = toolTab.status === 'running';
     const statusText =
       toolTab.statusText ||
-      (toolTab.kind === 'nano-banana'
-        ? 'Nano Banana task'
-        : 'ElevenLabs task');
+      (toolTab.kind === 'nano-banana' ? 'Nano Banana task' : 'ElevenLabs task');
 
     return (
       <div style={styles.toolTaskContent}>

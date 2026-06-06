@@ -1,11 +1,33 @@
 // @noflow
 import fs from 'fs';
 import path from 'path';
+import React from 'react';
+import { act } from 'react-dom/test-utils';
+import renderer from 'react-test-renderer';
+import IconButton from '../UI/IconButton';
+import WorkingDesk from './WorkingDesk';
 import {
   formatImageZoomFactor,
   getNextImageZoomFactor,
+  getWorkingDeskImageZoomStyles,
   shouldShowWorkingDeskImageZoomToolbar,
 } from './WorkingDeskZoomUtils';
+
+jest.mock('../UI/SoundPlayer', () => () => null);
+jest.mock('../ResourcesList/ResourcePreview', () => () => null);
+jest.mock('../UI/IconButton', () => {
+  const React = require('react');
+  return function MockIconButton(props) {
+    return React.createElement(
+      'button',
+      {
+        disabled: props.disabled,
+        onClick: props.onClick,
+      },
+      props.children
+    );
+  };
+});
 
 describe('WorkingDesk', () => {
   it('uses readable white text in the Markdown preview', () => {
@@ -29,9 +51,7 @@ describe('WorkingDesk', () => {
       'utf8'
     );
 
-    expect(source).toMatch(
-      /markdownContainer:\s*\{[\s\S]*minWidth:\s*0,/i
-    );
+    expect(source).toMatch(/markdownContainer:\s*\{[\s\S]*minWidth:\s*0,/i);
     expect(source).toMatch(
       /markdownContainer:\s*\{[\s\S]*overflow:\s*'hidden',/i
     );
@@ -81,6 +101,97 @@ describe('WorkingDesk', () => {
     expect(shouldShowWorkingDeskImageZoomToolbar(markdownNode)).toBe(false);
     expect(shouldShowWorkingDeskImageZoomToolbar(folderNode)).toBe(false);
     expect(shouldShowWorkingDeskImageZoomToolbar(null)).toBe(false);
+  });
+
+  it('updates the image zoom factor when pressing the zoom controls', () => {
+    const imageNode = {
+      id: 'coin',
+      type: 'file',
+      name: 'coin.png',
+      extension: '.png',
+      absolutePath: 'D:\\Project\\coin.png',
+      relativePath: 'coin.png',
+    };
+    let component;
+    act(() => {
+      component = renderer.create(
+        <WorkingDesk
+          project={{}}
+          resourcesLoader={{}}
+          selectedItem={{ node: imageNode, resource: null }}
+          toolTabUpdate={null}
+          onProjectFilesChanged={jest.fn()}
+        />
+      );
+    });
+
+    expect(JSON.stringify(component.toJSON())).toContain('100%');
+
+    const iconButtons = component.root.findAllByType(IconButton);
+    const zoomInButton = iconButtons[iconButtons.length - 1];
+    act(() => {
+      zoomInButton.props.onClick();
+    });
+
+    expect(JSON.stringify(component.toJSON())).toContain('125%');
+  });
+
+  it('applies the zoom factor to both the image scroll extent and image itself', () => {
+    expect(getWorkingDeskImageZoomStyles(1)).toEqual({
+      canvas: {
+        width: '100%',
+        height: '100%',
+      },
+      image: {
+        height: '100%',
+        transform: 'scale(1)',
+        transformOrigin: 'center center',
+      },
+    });
+    expect(getWorkingDeskImageZoomStyles(1.25)).toEqual({
+      canvas: {
+        width: '125%',
+        height: '125%',
+      },
+      image: {
+        height: '80%',
+        transform: 'scale(1.25)',
+        transformOrigin: 'center center',
+      },
+    });
+    expect(getWorkingDeskImageZoomStyles(0.75)).toEqual({
+      canvas: {
+        width: '100%',
+        height: '100%',
+      },
+      image: {
+        height: '100%',
+        transform: 'scale(0.75)',
+        transformOrigin: 'center center',
+      },
+    });
+  });
+
+  it('fits image previews to the full working desk height by default', () => {
+    const source = fs.readFileSync(
+      path.join(__dirname, 'WorkingDesk.js'),
+      'utf8'
+    );
+
+    expect(source).toMatch(/image:\s*\{[\s\S]*height:\s*'100%',/i);
+    expect(source).toMatch(/image:\s*\{[\s\S]*width:\s*'auto',/i);
+    expect(source).toMatch(/image:\s*\{[\s\S]*maxWidth:\s*'none',/i);
+    expect(source).toMatch(/image:\s*\{[\s\S]*maxHeight:\s*'none',/i);
+    expect(source).not.toMatch(/maxHeight:\s*imageZoomFactor\s*</i);
+  });
+
+  it('keeps the zoomed image canvas from shrinking back to the viewport', () => {
+    const source = fs.readFileSync(
+      path.join(__dirname, 'WorkingDesk.js'),
+      'utf8'
+    );
+
+    expect(source).toMatch(/imageZoomCanvas:\s*\{[\s\S]*flexShrink:\s*0,/i);
   });
 
   it('handles images as single files without auto-detecting sprite sequences', () => {

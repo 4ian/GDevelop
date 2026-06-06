@@ -36,8 +36,10 @@ const gd: libGDevelop = global.gd;
 const fs = optionalRequire('fs');
 const path = optionalRequire('path');
 const url = optionalRequire('url');
+const electron = optionalRequire('electron');
 const remote = optionalRequire('@electron/remote');
 const shell = remote ? remote.shell : null;
+const electronWebUtils = electron ? electron.webUtils : null;
 
 const MAX_SCANNED_FILES = 8000;
 const ignoredDirectoryNames = new Set([
@@ -131,9 +133,18 @@ const styles = {
   header: {
     display: 'flex',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: '0 8px',
-    minHeight: 32,
+    gap: 8,
+    padding: '4px 8px',
+    minHeight: 38,
+    boxSizing: 'border-box',
+  },
+  headerTitle: {
+    flexShrink: 0,
+  },
+  headerSearch: {
+    display: 'flex',
+    flex: 1,
+    minWidth: 0,
   },
   content: {
     display: 'flex',
@@ -963,17 +974,65 @@ export const hasExternalFilesDragData = (dataTransferTypes: any): boolean => {
   return false;
 };
 
-export const getExternalFileDropPaths = (dataTransfer: any): Array<string> => {
+const getLocalPathFromNativeFile = (file: any, webUtils: any): ?string => {
+  if (!file) return null;
+  if (typeof file.path === 'string' && file.path.trim()) return file.path;
+
+  if (webUtils && typeof webUtils.getPathForFile === 'function') {
+    try {
+      const filePath = webUtils.getPathForFile(file);
+      return typeof filePath === 'string' && filePath.trim() ? filePath : null;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  return null;
+};
+
+export const getExternalFileDropPaths = (
+  dataTransfer: any,
+  webUtils: any = electronWebUtils
+): Array<string> => {
   if (!dataTransfer || !dataTransfer.files) return [];
 
   const filePaths = [];
   for (let index = 0; index < dataTransfer.files.length; index++) {
     const file = dataTransfer.files[index];
-    if (file && typeof file.path === 'string' && file.path.trim()) {
-      filePaths.push(file.path);
-    }
+    const filePath = getLocalPathFromNativeFile(file, webUtils);
+    if (filePath) filePaths.push(filePath);
   }
   return filePaths;
+};
+
+type ProjectFolderDropOperation =
+  | 'move-project-file'
+  | 'copy-external-files'
+  | 'ignore';
+
+export const getProjectFolderDropOperation = ({
+  sourceNode,
+  targetFolderNode,
+  dataTransfer,
+}: {|
+  sourceNode: ?ProjectFileNode,
+  targetFolderNode: ProjectFileNode,
+  dataTransfer: any,
+|}): ProjectFolderDropOperation => {
+  if (
+    canMoveProjectFileToFolder({
+      sourceNode,
+      targetFolderNode,
+    })
+  ) {
+    return 'move-project-file';
+  }
+
+  if (getExternalFileDropPaths(dataTransfer).length) {
+    return 'copy-external-files';
+  }
+
+  return 'ignore';
 };
 
 export const getMovedProjectFilePath = ({
@@ -1977,19 +2036,14 @@ const ProjectFilesPanel: React.ComponentType<{
 
     const handleFolderDrop = React.useCallback(
       async (event: any, targetFolderNode: ProjectFileNode) => {
-        const canMoveProjectFile = canMoveProjectFileToFolder({
+        const dropOperation = getProjectFolderDropOperation({
           sourceNode: draggedFileNode,
           targetFolderNode,
+          dataTransfer: event.dataTransfer,
         });
         const externalFilePaths = getExternalFileDropPaths(event.dataTransfer);
-        const isExternalFilesDrop = hasExternalFilesDragData(
-          event.dataTransfer.types
-        );
 
-        if (
-          (!canMoveProjectFile || !draggedFileNode) &&
-          !isExternalFilesDrop
-        ) {
+        if (dropOperation === 'ignore') {
           finishDraggingProjectFile();
           return;
         }
@@ -1999,16 +2053,8 @@ const ProjectFilesPanel: React.ComponentType<{
         const sourceNode = draggedFileNode;
         finishDraggingProjectFile();
 
-        if (canMoveProjectFile && sourceNode) {
+        if (dropOperation === 'move-project-file' && sourceNode) {
           await moveProjectFileToFolder(sourceNode, targetFolderNode);
-          return;
-        }
-
-        if (!externalFilePaths.length) {
-          await showAlert({
-            title: t`Unable to import files`,
-            message: t`Drop files from your computer here.`,
-          });
           return;
         }
 
@@ -2019,7 +2065,6 @@ const ProjectFilesPanel: React.ComponentType<{
         draggedFileNode,
         finishDraggingProjectFile,
         moveProjectFileToFolder,
-        showAlert,
       ]
     );
 
@@ -2456,9 +2501,11 @@ const ProjectFilesPanel: React.ComponentType<{
       return (
         <Background>
           <div style={styles.header}>
-            <Text noMargin>
-              <Trans>Project files</Trans>
-            </Text>
+            <div style={styles.headerTitle}>
+              <Text noMargin>
+                <Trans>Project files</Trans>
+              </Text>
+            </div>
           </div>
           <PlaceholderMessage>
             <Text>
@@ -2475,9 +2522,19 @@ const ProjectFilesPanel: React.ComponentType<{
     return (
       <Background>
         <div style={styles.header}>
-          <Text noMargin>
-            <Trans>Project files</Trans>
-          </Text>
+          <div style={styles.headerTitle}>
+            <Text noMargin>
+              <Trans>Project files</Trans>
+            </Text>
+          </div>
+          <div style={styles.headerSearch}>
+            <SearchBar
+              value={searchText}
+              onRequestSearch={() => {}}
+              onChange={setSearchText}
+              placeholder={t`Search project files`}
+            />
+          </div>
           <MiniToolbar noPadding>
             <IconButton
               size="small"
@@ -2497,12 +2554,6 @@ const ProjectFilesPanel: React.ComponentType<{
             </IconButton>
           </MiniToolbar>
         </div>
-        <SearchBar
-          value={searchText}
-          onRequestSearch={() => {}}
-          onChange={setSearchText}
-          placeholder={t`Search project files`}
-        />
         {isTruncated && (
           <MiniToolbar>
             <MiniToolbarText firstChild>

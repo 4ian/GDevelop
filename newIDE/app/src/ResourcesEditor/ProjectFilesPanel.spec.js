@@ -1,4 +1,6 @@
 // @flow
+import fs from 'fs';
+import path from 'path';
 import {
   buildFileDeletionBlockersMessage,
   buildDuplicateFolderCreationErrorMessage,
@@ -10,6 +12,7 @@ import {
   getExternalFileCopyDestinationPath,
   getExternalFileDropPaths,
   getMovedProjectFilePath,
+  getProjectFolderDropOperation,
   getProjectFileDragEffectAllowed,
   getRenamedProjectFilePath,
   getRegisteredProjectFileBadgeTitle,
@@ -22,6 +25,9 @@ import {
 } from './ProjectFilesPanel';
 
 describe('ProjectFilesPanel', () => {
+  const getSource = () =>
+    fs.readFileSync(path.join(__dirname, 'ProjectFilesPanel.js'), 'utf8');
+
   const fileNode: ProjectFileNode = {
     id: 'project/assets/coin.png',
     name: 'coin.png',
@@ -85,6 +91,37 @@ describe('ProjectFilesPanel', () => {
     );
   });
 
+  it('renders the project file search bar in the header toolbar', () => {
+    const source = getSource();
+    const browseProjectFilesStart = source.indexOf(
+      'if (!canBrowseProjectFiles)'
+    );
+    const renderEnd = source.indexOf(
+      '{isTruncated &&',
+      browseProjectFilesStart
+    );
+    const projectFilesHeaderSection = source.slice(
+      browseProjectFilesStart,
+      renderEnd
+    );
+    const searchBarStart = projectFilesHeaderSection.indexOf('<SearchBar');
+    const toolbarStart = projectFilesHeaderSection.indexOf(
+      '<MiniToolbar noPadding>'
+    );
+
+    expect(projectFilesHeaderSection).toContain(
+      '<div style={styles.headerSearch}>'
+    );
+    expect(searchBarStart).toBeGreaterThan(
+      projectFilesHeaderSection.indexOf('<div style={styles.header}>')
+    );
+    expect(searchBarStart).toBeLessThan(toolbarStart);
+    expect(projectFilesHeaderSection).toContain(
+      'placeholder={t`Search project files`}'
+    );
+    expect(projectFilesHeaderSection).toContain('<MiniToolbar noPadding>');
+  });
+
   it('allows moving a file to a different folder', () => {
     expect(
       canMoveProjectFileToFolder({
@@ -138,6 +175,38 @@ describe('ProjectFilesPanel', () => {
         targetFolderNode,
       })
     ).toBe('D:\\Project\\ui\\coin.png');
+  });
+
+  it('extracts external file paths through Electron webUtils when file.path is unavailable', () => {
+    const imageFile = { name: 'coin.png' };
+    const soundFile = { name: 'coin.mp3' };
+    const dataTransfer = {
+      files: [imageFile, soundFile],
+    };
+    const webUtils = {
+      getPathForFile: (file: any) =>
+        file === imageFile
+          ? 'D:\\Downloads\\coin.png'
+          : 'D:\\Downloads\\coin.mp3',
+    };
+
+    expect(getExternalFileDropPaths(dataTransfer, webUtils)).toEqual([
+      'D:\\Downloads\\coin.png',
+      'D:\\Downloads\\coin.mp3',
+    ]);
+  });
+
+  it('ignores external file drops when no importable file path is available', () => {
+    expect(
+      getProjectFolderDropOperation({
+        sourceNode: null,
+        targetFolderNode,
+        dataTransfer: {
+          types: ['Files'],
+          files: [{ name: 'file-without-electron-path.png' }],
+        },
+      })
+    ).toBe('ignore');
   });
 
   it('allows deleting empty folders only', () => {

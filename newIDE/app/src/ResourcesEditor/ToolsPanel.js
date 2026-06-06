@@ -1819,17 +1819,20 @@ const ToolsPanel = ({
           </div>
         )}
       </div>
-      <div style={styles.segmentedRow}>
-        <FlatButton
-          label={<Trans>Crop</Trans>}
-          onClick={() => setLocalImageOperation('crop')}
-          primary={localImageOperation === 'crop'}
-        />
-        <FlatButton
-          label={<Trans>Expand canvas</Trans>}
-          onClick={() => setLocalImageOperation('expand-canvas')}
-          primary={localImageOperation === 'expand-canvas'}
-        />
+      <div style={styles.toolSelector}>
+        <SelectField
+          floatingLabelText={<Trans>Operation</Trans>}
+          value={localImageOperation}
+          onChange={(event, index, value: string) => {
+            if (value === 'crop' || value === 'expand-canvas') {
+              setLocalImageOperation(value);
+            }
+          }}
+          fullWidth
+        >
+          <SelectOption value="crop" label={t`Crop`} />
+          <SelectOption value="expand-canvas" label={t`Expand canvas`} />
+        </SelectField>
       </div>
       {localImageOperation === 'crop' ? (
         <div style={styles.fieldGrid}>

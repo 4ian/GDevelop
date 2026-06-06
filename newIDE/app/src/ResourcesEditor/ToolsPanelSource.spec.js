@@ -103,4 +103,39 @@ describe('ToolsPanel source policies', () => {
       'fs.promises.writeFile(imageAttachment.absolutePath'
     );
   });
+
+  it('selects the Local tools operation with a dropdown', () => {
+    const source = getSource();
+    const renderLocalImageToolsStart = source.indexOf(
+      'const renderLocalImageTools ='
+    );
+    const renderElevenLabsStart = source.indexOf('const renderElevenLabs =');
+    const renderLocalImageToolsSection = source.slice(
+      renderLocalImageToolsStart,
+      renderElevenLabsStart
+    );
+    const operationLabelStart = renderLocalImageToolsSection.indexOf(
+      'floatingLabelText={<Trans>Operation</Trans>}'
+    );
+    const operationSelectorStart = renderLocalImageToolsSection.lastIndexOf(
+      '<SelectField',
+      operationLabelStart
+    );
+    const cropFieldsStart = renderLocalImageToolsSection.indexOf(
+      "{localImageOperation === 'crop' ?"
+    );
+    const operationSelectorSection = renderLocalImageToolsSection.slice(
+      operationSelectorStart,
+      cropFieldsStart
+    );
+
+    expect(operationSelectorSection).toContain('<SelectField');
+    expect(operationSelectorSection).toContain(
+      'floatingLabelText={<Trans>Operation</Trans>}'
+    );
+    expect(operationSelectorSection).toContain('value={localImageOperation}');
+    expect(operationSelectorSection).toContain('value="crop"');
+    expect(operationSelectorSection).toContain('value="expand-canvas"');
+    expect(operationSelectorSection).not.toContain('<FlatButton');
+  });
 });

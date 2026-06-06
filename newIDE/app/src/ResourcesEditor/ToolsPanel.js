@@ -19,6 +19,8 @@ import SparkleIcon from '../UI/CustomSvgIcons/Sparkle';
 import MusicIcon from '../UI/CustomSvgIcons/Music';
 import PictureIcon from '../UI/CustomSvgIcons/Picture';
 import CrossIcon from '../UI/CustomSvgIcons/Cross';
+import RectangleIcon from '../UI/CustomSvgIcons/Rectangle';
+import HorizontalSizeIcon from '../UI/CustomSvgIcons/HorizontalSize';
 import {
   getFileUrl,
   getProjectRootPath,
@@ -28,6 +30,15 @@ import {
 import optionalRequire from '../Utils/OptionalRequire';
 import { openFilePicker } from '../Utils/FileSystem';
 import { type WorkingDeskToolTabUpdate } from './WorkingDeskTabTypes';
+import {
+  drawLocalImageOperationToCanvas,
+  getLocalImageOutputBaseName,
+  shouldDisableLocalImageApplyButton,
+  type LocalImageCrop,
+  type LocalImageExpandDirection,
+  type LocalImageOperation,
+  type LocalImageSize,
+} from './LocalImageTools';
 
 const fs = optionalRequire('fs');
 const path = optionalRequire('path');
@@ -154,6 +165,16 @@ const styles = {
   attachmentPreviewImage: {
     maxWidth: '100%',
     maxHeight: '100%',
+    objectFit: 'contain',
+  },
+  fieldGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))',
+    gap: 8,
+  },
+  resultPreview: {
+    maxWidth: '100%',
+    maxHeight: 260,
     objectFit: 'contain',
   },
 };
@@ -448,6 +469,49 @@ const getImageGenerationOutputFolderPath = async ({
   return generatedFolderPath;
 };
 
+const loadImageFromUrl = (imageUrl: string): Promise<any> =>
+  new Promise((resolve, reject) => {
+    const image = new Image();
+    image.onload = () => resolve(image);
+    image.onerror = () => reject(new Error('Unable to load the image.'));
+    image.src = imageUrl;
+  });
+
+const canvasToPngBlob = (canvas: HTMLCanvasElement): Promise<Blob> =>
+  new Promise((resolve, reject) => {
+    canvas.toBlob(blob => {
+      if (blob) resolve(blob);
+      else reject(new Error('Unable to encode the image as PNG.'));
+    }, 'image/png');
+  });
+
+const blobToBuffer = (blob: Blob): Promise<any> =>
+  new Promise((resolve, reject) => {
+    if (!buffer || !buffer.Buffer) {
+      reject(new Error('Binary buffers are not supported.'));
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = reader.result;
+      if (!(result instanceof ArrayBuffer)) {
+        reject(new Error('Unable to read the generated image.'));
+        return;
+      }
+      resolve(buffer.Buffer.from(result));
+    };
+    reader.onerror = () =>
+      reject(reader.error || new Error('Unable to read the generated image.'));
+    reader.onabort = () => reject(new Error('Read aborted'));
+    reader.readAsArrayBuffer(blob);
+  });
+
+const parsePixelField = (value: string): number => {
+  const parsedValue = parseInt(value, 10);
+  return Number.isFinite(parsedValue) ? parsedValue : 0;
+};
+
 export const getResourcesToolsSettingsWithDefaults = (
   settings: any
 ): ResourcesToolsSettings => ({
@@ -615,6 +679,34 @@ const ToolsPanel = ({
     imageGenerationError,
     setImageGenerationError,
   ] = React.useState<?string>(null);
+  const [
+    localImageOperation,
+    setLocalImageOperation,
+  ] = React.useState<LocalImageOperation>('crop');
+  const [localCropX, setLocalCropX] = React.useState('0');
+  const [localCropY, setLocalCropY] = React.useState('0');
+  const [localCropWidth, setLocalCropWidth] = React.useState('0');
+  const [localCropHeight, setLocalCropHeight] = React.useState('0');
+  const [
+    localExpandDirection,
+    setLocalExpandDirection,
+  ] = React.useState<LocalImageExpandDirection>('right');
+  const [localExpandAmount, setLocalExpandAmount] = React.useState('32');
+  const [localImageSize, setLocalImageSize] = React.useState<?LocalImageSize>(
+    null
+  );
+  const [isProcessingLocalImage, setIsProcessingLocalImage] = React.useState(
+    false
+  );
+  const [localImageStatus, setLocalImageStatus] = React.useState<?string>(null);
+  const [localImageError, setLocalImageError] = React.useState<?string>(null);
+  const [localImageResultUrl, setLocalImageResultUrl] = React.useState<?string>(
+    null
+  );
+  const [
+    localImageResultPath,
+    setLocalImageResultPath,
+  ] = React.useState<?string>(null);
   const [elevenLabsApiKey, setElevenLabsApiKey] = React.useState(
     savedToolsSettings.elevenLabsApiKey
   );
@@ -697,8 +789,70 @@ const ToolsPanel = ({
       setImageGenerationError(null);
       setAudioGenerationStatus(null);
       setAudioGenerationError(null);
+      setLocalImageStatus(null);
+      setLocalImageError(null);
     },
     [selectedNode]
+  );
+
+  React.useEffect(
+    () => {
+      if (selectedImageTool !== 'local-tools' || !selectedNode) return;
+      if (selectedNode.type !== 'file') return;
+
+      const selectedImageAttachment = createImageAttachmentFromFilePath(
+        selectedNode.absolutePath
+      );
+      if (!selectedImageAttachment) return;
+      if (
+        imageAttachment &&
+        imageAttachment.absolutePath === selectedImageAttachment.absolutePath
+      ) {
+        return;
+      }
+
+      setImageAttachment(selectedImageAttachment);
+    },
+    [imageAttachment, selectedImageTool, selectedNode]
+  );
+
+  React.useEffect(
+    () => {
+      let isMounted = true;
+      setLocalImageSize(null);
+      setLocalImageResultUrl(null);
+      setLocalImageResultPath(null);
+      setLocalImageStatus(null);
+      setLocalImageError(null);
+
+      const imageUrl = getImageAttachmentPreviewUrl(imageAttachment);
+      if (!imageUrl) return;
+
+      loadImageFromUrl(imageUrl)
+        .then(image => {
+          if (!isMounted) return;
+          const sourceSize = {
+            width: image.naturalWidth || image.width,
+            height: image.naturalHeight || image.height,
+          };
+          setLocalImageSize(sourceSize);
+          setLocalCropX('0');
+          setLocalCropY('0');
+          setLocalCropWidth(String(sourceSize.width));
+          setLocalCropHeight(String(sourceSize.height));
+        })
+        .catch(error => {
+          if (!isMounted) return;
+          setLocalImageError(
+            error && error.message ? error.message : String(error)
+          );
+        });
+
+      return () => {
+        isMounted = false;
+      };
+    },
+    [imageAttachment]
   );
 
   const attachImage = React.useCallback((imageAttachment: ?ImageAttachment) => {
@@ -708,12 +862,15 @@ const ToolsPanel = ({
     });
     if (errorMessage) {
       setImageGenerationError(errorMessage);
+      setLocalImageError(errorMessage);
       return;
     }
 
     setImageAttachment(imageAttachment);
     setImageGenerationError(null);
     setImageGenerationStatus(null);
+    setLocalImageError(null);
+    setLocalImageStatus(null);
   }, []);
 
   const clearImageAttachment = React.useCallback(() => {
@@ -725,6 +882,10 @@ const ToolsPanel = ({
       })
     );
     setImageGenerationStatus(null);
+    setLocalImageError(null);
+    setLocalImageStatus(null);
+    setLocalImageResultUrl(null);
+    setLocalImageResultPath(null);
   }, []);
 
   const selectImageAttachment = React.useCallback(
@@ -733,7 +894,10 @@ const ToolsPanel = ({
         const filePath = await openFilePicker({
           title: 'Choose an attached image',
           properties: ['openFile'],
-          message: 'Choose an image to use as the AI input.',
+          message:
+            selectedImageTool === 'local-tools'
+              ? 'Choose an image to edit locally.'
+              : 'Choose an image to use as the AI input.',
           filters: [
             {
               name: 'Images',
@@ -745,14 +909,15 @@ const ToolsPanel = ({
 
         attachImage(createImageAttachmentFromFilePath(filePath));
       } catch (error) {
-        setImageGenerationError(
+        const errorMessage =
           error && error.message
             ? error.message
-            : 'Unable to choose an attached image.'
-        );
+            : 'Unable to choose an attached image.';
+        setImageGenerationError(errorMessage);
+        setLocalImageError(errorMessage);
       }
     },
-    [attachImage]
+    [attachImage, selectedImageTool]
   );
 
   const getImageAttachmentFromDragEvent = React.useCallback(
@@ -1314,20 +1479,133 @@ const ToolsPanel = ({
     ]
   );
 
+  const runLocalImageTool = React.useCallback(
+    async () => {
+      if (!fs || !path) {
+        setLocalImageError('Filesystem paths are not supported.');
+        return;
+      }
+      if (!imageAttachment) {
+        setLocalImageError('Choose a supported image file.');
+        return;
+      }
+
+      const imageUrl = getImageAttachmentPreviewUrl(imageAttachment);
+      if (!imageUrl) {
+        setLocalImageError('Unable to read the selected image.');
+        return;
+      }
+
+      const crop: LocalImageCrop = {
+        x: parsePixelField(localCropX),
+        y: parsePixelField(localCropY),
+        width: parsePixelField(localCropWidth),
+        height: parsePixelField(localCropHeight),
+      };
+      const expandAmount = parsePixelField(localExpandAmount);
+
+      setIsProcessingLocalImage(true);
+      setLocalImageError(null);
+      setLocalImageStatus('Processing image...');
+      setLocalImageResultUrl(null);
+      setLocalImageResultPath(null);
+
+      try {
+        const sourceImage = await loadImageFromUrl(imageUrl);
+        const sourceSize = {
+          width: sourceImage.naturalWidth || sourceImage.width,
+          height: sourceImage.naturalHeight || sourceImage.height,
+        };
+        const canvas = document.createElement('canvas');
+        drawLocalImageOperationToCanvas({
+          canvas,
+          image: sourceImage,
+          sourceSize,
+          operation: localImageOperation,
+          crop,
+          expandDirection: localExpandDirection,
+          expandAmount,
+        });
+        const outputBlob = await canvasToPngBlob(canvas);
+        const outputFolderPath = await getImageGenerationOutputFolderPath({
+          project,
+        });
+        const outputPath = await getUniqueOutputPath({
+          folderPath: outputFolderPath,
+          baseName: getLocalImageOutputBaseName({
+            sourceName: imageAttachment.name,
+            operation: localImageOperation,
+            expandDirection: localExpandDirection,
+          }),
+          extension: '.png',
+        });
+
+        await fs.promises.writeFile(outputPath, await blobToBuffer(outputBlob));
+        setLocalImageStatus(`Saved ${normalizeSlashes(outputPath)}`);
+        setLocalImageResultPath(normalizeSlashes(outputPath));
+        setLocalImageResultUrl(getFileUrl(outputPath));
+        await onProjectFilesChanged();
+      } catch (error) {
+        setLocalImageError(
+          error && error.message ? error.message : String(error)
+        );
+        setLocalImageStatus(null);
+      } finally {
+        setIsProcessingLocalImage(false);
+      }
+    },
+    [
+      imageAttachment,
+      localCropHeight,
+      localCropWidth,
+      localCropX,
+      localCropY,
+      localExpandAmount,
+      localExpandDirection,
+      localImageOperation,
+      onProjectFilesChanged,
+      project,
+    ]
+  );
+
+  const localCrop: LocalImageCrop = {
+    x: parsePixelField(localCropX),
+    y: parsePixelField(localCropY),
+    width: parsePixelField(localCropWidth),
+    height: parsePixelField(localCropHeight),
+  };
+
+  const localExpandDirectionOptions: Array<{|
+    value: LocalImageExpandDirection,
+    label: React.Node,
+  |}> = [
+    { value: 'left', label: <Trans>Left</Trans> },
+    { value: 'right', label: <Trans>Right</Trans> },
+    { value: 'top', label: <Trans>Top</Trans> },
+    { value: 'bottom', label: <Trans>Bottom</Trans> },
+  ];
+
+  const renderImageToolSelector = () => (
+    <div style={styles.toolSelector}>
+      <SelectField
+        floatingLabelText={<Trans>Image tool</Trans>}
+        value={selectedImageTool}
+        onChange={(event, index, value: string) => {
+          if (value === 'nano-banana' || value === 'local-tools') {
+            setSelectedImageTool(value);
+          }
+        }}
+        fullWidth
+      >
+        <SelectOption value="nano-banana" label={t`Nano Banana`} />
+        <SelectOption value="local-tools" label={t`Local tools`} />
+      </SelectField>
+    </div>
+  );
+
   const renderNanoBanana = () => (
     <div style={styles.section}>
-      <div style={styles.toolSelector}>
-        <SelectField
-          floatingLabelText={<Trans>Image tool</Trans>}
-          value={selectedImageTool}
-          onChange={(event, index, value: string) => {
-            if (value === 'nano-banana') setSelectedImageTool(value);
-          }}
-          fullWidth
-        >
-          <SelectOption value="nano-banana" label={t`Nano Banana`} />
-        </SelectField>
-      </div>
+      {renderImageToolSelector()}
       <MiniToolbar noPadding>
         <SparkleIcon />
         <MiniToolbarText>
@@ -1446,6 +1724,200 @@ const ToolsPanel = ({
         <Text color="error">{imageGenerationError}</Text>
       )}
       {!!imageGenerationStatus && <Text>{imageGenerationStatus}</Text>}
+    </div>
+  );
+
+  const renderLocalImageTools = () => (
+    <div style={styles.section}>
+      {renderImageToolSelector()}
+      <MiniToolbar noPadding>
+        <RectangleIcon />
+        <MiniToolbarText>
+          <Trans>Local tools</Trans>
+        </MiniToolbarText>
+      </MiniToolbar>
+      <div
+        style={{
+          ...styles.attachmentField,
+          ...(isImageAttachmentDragOver
+            ? styles.attachmentFieldDropTarget
+            : undefined),
+        }}
+        onDragOver={handleImageAttachmentDragOver}
+        onDragLeave={handleImageAttachmentDragLeave}
+        onDrop={handleImageAttachmentDrop}
+      >
+        <div style={styles.attachmentInfo}>
+          <MiniToolbar noPadding>
+            <PictureIcon />
+            <MiniToolbarText>
+              <Trans>Source image</Trans>
+            </MiniToolbarText>
+          </MiniToolbar>
+          {imageAttachment ? (
+            <div style={styles.attachmentSummary}>
+              <Text noMargin allowBrowserAutoTranslate={false}>
+                {imageAttachment.name}
+              </Text>
+              <Text
+                noMargin
+                size="body-small"
+                color="secondary"
+                allowBrowserAutoTranslate={false}
+                style={{
+                  overflow: 'hidden',
+                  overflowWrap: 'anywhere',
+                }}
+              >
+                {normalizeSlashes(
+                  getRelativeProjectFilePath(
+                    project,
+                    imageAttachment.absolutePath
+                  ) || imageAttachment.absolutePath
+                )}
+              </Text>
+              {!!localImageSize && (
+                <Text noMargin size="body-small" color="secondary">
+                  {localImageSize.width} x {localImageSize.height}
+                </Text>
+              )}
+            </div>
+          ) : (
+            <Text noMargin color="secondary">
+              <Trans>No image selected.</Trans>
+            </Text>
+          )}
+          <MiniToolbar noPadding>
+            <RaisedButton
+              label={
+                imageAttachment ? (
+                  <Trans>Change image</Trans>
+                ) : (
+                  <Trans>Choose image</Trans>
+                )
+              }
+              icon={<PictureIcon />}
+              onClick={selectImageAttachment}
+            />
+            {shouldShowClearImageAttachmentButton(imageAttachment) && (
+              <FlatButton
+                label={<Trans>Clear</Trans>}
+                leftIcon={<CrossIcon />}
+                onClick={clearImageAttachment}
+              />
+            )}
+          </MiniToolbar>
+        </div>
+        {imageAttachment && (
+          <div style={styles.attachmentPreview}>
+            <img
+              src={getImageAttachmentPreviewUrl(imageAttachment) || undefined}
+              alt={imageAttachment.name}
+              style={styles.attachmentPreviewImage}
+              draggable="false"
+            />
+          </div>
+        )}
+      </div>
+      <div style={styles.segmentedRow}>
+        <FlatButton
+          label={<Trans>Crop</Trans>}
+          onClick={() => setLocalImageOperation('crop')}
+          primary={localImageOperation === 'crop'}
+        />
+        <FlatButton
+          label={<Trans>Expand canvas</Trans>}
+          onClick={() => setLocalImageOperation('expand-canvas')}
+          primary={localImageOperation === 'expand-canvas'}
+        />
+      </div>
+      {localImageOperation === 'crop' ? (
+        <div style={styles.fieldGrid}>
+          <TextField
+            type="number"
+            value={localCropX}
+            onChange={(event, value) => setLocalCropX(value)}
+            floatingLabelText={<Trans>X</Trans>}
+            min={0}
+            fullWidth
+          />
+          <TextField
+            type="number"
+            value={localCropY}
+            onChange={(event, value) => setLocalCropY(value)}
+            floatingLabelText={<Trans>Y</Trans>}
+            min={0}
+            fullWidth
+          />
+          <TextField
+            type="number"
+            value={localCropWidth}
+            onChange={(event, value) => setLocalCropWidth(value)}
+            floatingLabelText={<Trans>Width</Trans>}
+            min={1}
+            fullWidth
+          />
+          <TextField
+            type="number"
+            value={localCropHeight}
+            onChange={(event, value) => setLocalCropHeight(value)}
+            floatingLabelText={<Trans>Height</Trans>}
+            min={1}
+            fullWidth
+          />
+        </div>
+      ) : (
+        <>
+          <div style={styles.segmentedRow}>
+            {localExpandDirectionOptions.map(({ value, label }) => (
+              <FlatButton
+                key={value}
+                label={label}
+                onClick={() => setLocalExpandDirection(value)}
+                primary={localExpandDirection === value}
+              />
+            ))}
+          </div>
+          <TextField
+            type="number"
+            value={localExpandAmount}
+            onChange={(event, value) => setLocalExpandAmount(value)}
+            floatingLabelText={<Trans>Pixels to add</Trans>}
+            min={1}
+            fullWidth
+          />
+        </>
+      )}
+      <MiniToolbar noPadding>
+        <RaisedButton
+          label={<Trans>Apply</Trans>}
+          icon={<HorizontalSizeIcon />}
+          onClick={runLocalImageTool}
+          disabled={shouldDisableLocalImageApplyButton({
+            imageAttachment,
+            isProcessing: isProcessingLocalImage,
+            sourceSize: localImageSize,
+            operation: localImageOperation,
+            crop: localCrop,
+            expandAmount: parsePixelField(localExpandAmount),
+          })}
+        />
+      </MiniToolbar>
+      {!!localImageError && <Text color="error">{localImageError}</Text>}
+      {!!localImageStatus && <Text>{localImageStatus}</Text>}
+      {!!localImageResultPath && (
+        <Text noMargin color="secondary" allowBrowserAutoTranslate={false}>
+          {localImageResultPath}
+        </Text>
+      )}
+      {!!localImageResultUrl && (
+        <img
+          src={localImageResultUrl}
+          alt="Local tool result"
+          style={styles.resultPreview}
+          draggable="false"
+        />
+      )}
     </div>
   );
 
@@ -1588,6 +2060,8 @@ const ToolsPanel = ({
           {activeToolCategory === 'image'
             ? selectedImageTool === 'nano-banana'
               ? renderNanoBanana()
+              : selectedImageTool === 'local-tools'
+              ? renderLocalImageTools()
               : null
             : selectedSoundTool === 'elevenlabs'
             ? renderElevenLabs()

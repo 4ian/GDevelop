@@ -70,6 +70,37 @@ describe('ToolsPanel source policies', () => {
     expect(runElevenLabsSection).not.toContain('isAudioFile(selectedNode)');
     expect(runElevenLabsSection).not.toContain('path.dirname(selectedNode');
     expect(runElevenLabsSection).not.toContain('addResourceForFile');
-    expect(runElevenLabsSection).toContain('getImageGenerationOutputFolderPath');
+    expect(runElevenLabsSection).toContain(
+      'getImageGenerationOutputFolderPath'
+    );
+  });
+
+  it('offers Local tools in the image tool selector', () => {
+    const source = getSource();
+
+    expect(source).toContain('value="local-tools"');
+    expect(source).toContain('Local tools');
+  });
+
+  it('saves Local tools output as a new generated file', () => {
+    const source = getSource();
+    const runLocalImageToolStart = source.indexOf('const runLocalImageTool');
+    const renderLocalImageToolsStart = source.indexOf(
+      'const renderLocalImageTools ='
+    );
+    const runLocalImageToolSection = source.slice(
+      runLocalImageToolStart,
+      renderLocalImageToolsStart
+    );
+
+    expect(runLocalImageToolSection).toContain(
+      'getImageGenerationOutputFolderPath'
+    );
+    expect(runLocalImageToolSection).toContain('getUniqueOutputPath');
+    expect(runLocalImageToolSection).toContain('fs.promises.writeFile');
+    expect(runLocalImageToolSection).not.toContain('addResourceForFile');
+    expect(runLocalImageToolSection).not.toContain(
+      'fs.promises.writeFile(imageAttachment.absolutePath'
+    );
   });
 });

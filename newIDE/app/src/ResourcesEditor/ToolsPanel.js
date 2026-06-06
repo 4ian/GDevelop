@@ -42,7 +42,7 @@ type Props = {|
 |};
 
 type ToolCategory = 'image' | 'sound';
-type ImageTool = 'nano-banana';
+type ImageTool = 'nano-banana' | 'local-tools';
 type SoundTool = 'elevenlabs';
 export type ImageAttachment = {|
   absolutePath: string,
@@ -426,7 +426,9 @@ const getRelativeProjectFilePath = (
 };
 
 export const getGeneratedImagesFolderPath = (projectRootPath: string): string =>
-  path ? path.join(projectRootPath, 'generated') : `${projectRootPath}/generated`;
+  path
+    ? path.join(projectRootPath, 'generated')
+    : `${projectRootPath}/generated`;
 
 const getImageGenerationOutputFolderPath = async ({
   project,
@@ -438,9 +440,7 @@ const getImageGenerationOutputFolderPath = async ({
   }
   const projectRootPath = getProjectRootPath(project);
   if (!projectRootPath) {
-    throw new Error(
-      'Save the project before generating media.'
-    );
+    throw new Error('Save the project before generating media.');
   }
 
   const generatedFolderPath = getGeneratedImagesFolderPath(projectRootPath);
@@ -455,7 +455,10 @@ export const getResourcesToolsSettingsWithDefaults = (
     settings && settings.activeToolCategory === 'sound'
       ? 'sound'
       : defaultResourcesToolsSettings.activeToolCategory,
-  selectedImageTool: defaultResourcesToolsSettings.selectedImageTool,
+  selectedImageTool:
+    settings && settings.selectedImageTool === 'local-tools'
+      ? 'local-tools'
+      : defaultResourcesToolsSettings.selectedImageTool,
   selectedSoundTool: defaultResourcesToolsSettings.selectedSoundTool,
   geminiApiKey:
     settings && typeof settings.geminiApiKey === 'string'
@@ -761,17 +764,14 @@ const ToolsPanel = ({
     []
   );
 
-  const handleImageAttachmentDragOver = React.useCallback(
-    (event: any) => {
-      if (!hasProjectFileDragData(event.dataTransfer.types)) return;
+  const handleImageAttachmentDragOver = React.useCallback((event: any) => {
+    if (!hasProjectFileDragData(event.dataTransfer.types)) return;
 
-      event.preventDefault();
-      event.stopPropagation();
-      event.dataTransfer.dropEffect = 'copy';
-      setIsImageAttachmentDragOver(true);
-    },
-    []
-  );
+    event.preventDefault();
+    event.stopPropagation();
+    event.dataTransfer.dropEffect = 'copy';
+    setIsImageAttachmentDragOver(true);
+  }, []);
 
   const handleImageAttachmentDragLeave = React.useCallback((event: any) => {
     const relatedTarget = event.relatedTarget;
@@ -968,7 +968,8 @@ const ToolsPanel = ({
               ? responseBody.error.message
               : null;
           const errorMessage: string =
-            responseErrorMessage || `Request failed with HTTP ${response.status}`;
+            responseErrorMessage ||
+            `Request failed with HTTP ${response.status}`;
           openDebugDetails({
             response: {
               ...responseDebugInfo,

@@ -142,7 +142,8 @@ describe('ToolsPanel', () => {
     const debugDetails = buildNanoBananaDebugDetails({
       request: {
         method: 'POST',
-        url: 'https://generativelanguage.googleapis.com/v1/models/test:generateContent',
+        url:
+          'https://generativelanguage.googleapis.com/v1/models/test:generateContent',
         headers: {
           'Content-Type': 'application/json',
           'x-goog-api-key': 'secret-key',
@@ -262,6 +263,36 @@ describe('ToolsPanel', () => {
       elevenLabsOutputFormat: 'mp3_44100_128',
       elevenLabsDuration: '2.5',
     });
+  });
+
+  it('persists the Local tools image tool selection', () => {
+    expect(
+      buildResourcesToolsSettings({
+        activeToolCategory: 'image',
+        selectedImageTool: 'local-tools',
+        selectedSoundTool: 'elevenlabs',
+        geminiApiKey: 'gemini-key',
+        nanoBananaModel: 'gemini-image',
+        nanoBananaPrompt: 'make a coin',
+        imageAttachment: null,
+        elevenLabsApiKey: 'eleven-key',
+        elevenLabsMode: 'sound-effect',
+        elevenLabsText: 'laser',
+        elevenLabsVoiceId: 'voice',
+        elevenLabsModel: 'speech-model',
+        elevenLabsSoundModel: 'sound-model',
+        elevenLabsOutputFormat: 'mp3_44100_128',
+        elevenLabsDuration: '2.5',
+      }).selectedImageTool
+    ).toBe('local-tools');
+  });
+
+  it('normalizes persisted Local tools settings', () => {
+    expect(
+      getResourcesToolsSettingsWithDefaults({
+        selectedImageTool: 'local-tools',
+      }).selectedImageTool
+    ).toBe('local-tools');
   });
 
   it('normalizes persisted Tools settings when older preferences are incomplete', () => {

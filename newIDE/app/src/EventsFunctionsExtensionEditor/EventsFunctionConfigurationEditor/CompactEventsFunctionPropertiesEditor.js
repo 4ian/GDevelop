@@ -370,7 +370,11 @@ export const CompactEventsFunctionPropertiesEditor = ({
               valueTypeMetadata={eventsFunction.getExpressionType()}
               isTypeSelectorShown={true}
               onTypeUpdated={() => {
-                if (onConfigurationUpdated) onConfigurationUpdated();
+                gd.PropertyFunctionGenerator.updateReturnActionType(
+                  project,
+                  eventsFunction
+                );
+                if (onConfigurationUpdated) onConfigurationUpdated('type');
               }}
               getLastObjectParameterObjectType={() => ''}
               // Expression can't return behaviors

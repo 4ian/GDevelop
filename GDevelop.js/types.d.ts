@@ -2216,7 +2216,9 @@ export class PropertyFunctionGenerator extends EmscriptenObject {
   static generateBehaviorGetterAndSetter(project: Project, extension: EventsFunctionsExtension, eventsBasedBehavior: EventsBasedBehavior, property: NamedPropertyDescriptor, isSharedProperties: boolean): void;
   static generateObjectGetterAndSetter(project: Project, extension: EventsFunctionsExtension, eventsBasedObject: EventsBasedObject, property: NamedPropertyDescriptor): void;
   static canGenerateGetterAndSetter(eventsBasedBehavior: AbstractEventsBasedEntity, property: NamedPropertyDescriptor): boolean;
-  static generateConditionSkeleton(project: Project, eventFunction: EventsFunction): void;
+  static generateConditionSkeleton(project: Project, eventsFunction: EventsFunction): void;
+  static generateExpressionSkeleton(project: Project, eventsFunction: EventsFunction): void;
+  static updateReturnActionType(project: Project, eventsFunction: EventsFunction): void;
 }
 
 export class UsedExtensionsResult extends EmscriptenObject {

@@ -850,6 +850,11 @@ const EventsFunctionsList = React.forwardRef<
                 project,
                 eventsFunction
               );
+            } else if (eventsFunction.isExpression()) {
+              gd.PropertyFunctionGenerator.generateExpressionSkeleton(
+                project,
+                eventsFunction
+              );
             }
 
             const functionItemId = getEventsFunctionTreeViewItemId(

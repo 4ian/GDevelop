@@ -121,6 +121,50 @@ describe('McpEditorBridge', () => {
     expect(response.tools.map(tool => tool.name)).not.toContain('create_scene');
   });
 
+  it('refreshes the MCP tool catalog in one read-only call', async () => {
+    const bridge = makeBridge();
+
+    const response = await bridge.handleRendererMcpRequest({
+      method: 'tools/call',
+      params: {
+        name: 'gdevelop_refresh_tool_catalog',
+        arguments: {},
+      },
+    });
+    const result = JSON.parse(response.content[0].text);
+
+    expect(response.isError).not.toBe(true);
+    expect(result.success).toBe(true);
+    expect(result.tools.map(tool => tool.name)).toContain(
+      'gdevelop_capabilities'
+    );
+    expect(result.categories).toBeDefined();
+  });
+
+  it('reports preview health and recovery actions without a running preview', async () => {
+    const bridge = makeBridge({
+      getPreviewDebuggerServer: () => ({
+        getServerState: () => 'stopped',
+        getExistingPreviewDebuggerIds: () => [],
+        getExistingDebuggerIds: () => [],
+      }),
+    });
+
+    const response = await bridge.handleRendererMcpRequest({
+      method: 'tools/call',
+      params: {
+        name: 'preview_health_check',
+        arguments: {},
+      },
+    });
+    const result = JSON.parse(response.content[0].text);
+
+    expect(response.isError).not.toBe(true);
+    expect(result.success).toBe(true);
+    expect(result.running).toBe(false);
+    expect(result.recommendedActions).toContain('launch_preview');
+  });
+
   it('returns editor state without an open project', async () => {
     const bridge = makeBridge();
 
@@ -972,7 +1016,7 @@ describe('McpEditorBridge', () => {
             function_type: 'action',
             full_name: 'Set power',
             description: 'Set the power value.',
-            sentence: 'Set _PARAM1_ power of _PARAM0_',
+            sentence: 'Set _PARAM2_ power of _PARAM0_',
             parameters: [
               {
                 name: 'Power',
@@ -1165,6 +1209,242 @@ describe('McpEditorBridge', () => {
         functionName: 'SetPower',
         newOrChangedAiGeneratedEventIds: expect.any(Set),
       });
+    } finally {
+      project.delete();
+    }
+  });
+
+  it('returns stale-state advice after changing scene events while previews are running', async () => {
+    // $FlowFixMe[invalid-constructor]
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    project.insertNewLayout('Level1', 0);
+    const processEditorFunctionCalls: any = jest.fn(async () => ({
+      results: [
+        {
+          status: 'finished',
+          call_id: 'mcp-call',
+          success: true,
+          didModifyProject: true,
+          output: {
+            sceneName: 'Level1',
+            eventsCount: 1,
+          },
+        },
+      ],
+    }));
+    const previewDebuggerServer = {
+      getServerState: () => 'started',
+      getExistingPreviewDebuggerIds: () => ['preview-ws-0'],
+      getExistingDebuggerIds: () => ['preview-ws-0'],
+    };
+
+    try {
+      const bridge = makeBridge({
+        getProject: () => project,
+        getPermissions: () => ({
+          allowWriteTools: true,
+          allowCommandTools: false,
+        }),
+        processEditorFunctionCalls,
+        getPreviewDebuggerServer: () => previewDebuggerServer,
+      });
+
+      const response = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'add_scene_events',
+          arguments: {
+            scene_name: 'Level1',
+            events_json:
+              '[{"type":"BuiltinCommonInstructions::Standard","conditions":[],"actions":[]}]',
+          },
+        },
+      });
+      const result = JSON.parse(response.content[0].text);
+
+      expect(response.isError).not.toBe(true);
+      expect(result.staleStateAdvisory.previewMayBeStale).toBe(true);
+      expect(result.staleStateAdvisory.runningPreviewDebuggerIds).toEqual([
+        'preview-ws-0',
+      ]);
+      expect(result.staleStateAdvisory.recommendedActions).toContain(
+        'control_preview { action: "close", close_all: true }'
+      );
+      expect(result.staleStateAdvisory.editorPanelsMayBeStale).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            kind: 'scene-events',
+            sceneName: 'Level1',
+          }),
+        ])
+      );
+    } finally {
+      project.delete();
+    }
+  });
+
+  it('returns stale-state advice after replacing extension function events', async () => {
+    // $FlowFixMe[invalid-constructor]
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    const extension = project.insertNewEventsFunctionsExtension('McpExt', 0);
+    extension
+      .getEventsFunctions()
+      .insertNewEventsFunction('SetPower', 0)
+      .setFunctionType('Action');
+
+    try {
+      const bridge = makeBridge({
+        getProject: () => project,
+        getPermissions: () => ({
+          allowWriteTools: true,
+          allowCommandTools: false,
+        }),
+      });
+
+      const response = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'gdevelop_create_or_update_extension_function',
+          arguments: {
+            extension_name: 'McpExt',
+            function_name: 'SetPower',
+            function_type: 'action',
+            events_json:
+              '[{"type":"BuiltinCommonInstructions::Standard","conditions":[],"actions":[]}]',
+          },
+        },
+      });
+      const result = JSON.parse(response.content[0].text);
+
+      expect(response.isError).not.toBe(true);
+      expect(result.staleStateAdvisory.previewMayBeStale).toBe(false);
+      expect(result.staleStateAdvisory.editorPanelsMayBeStale).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            kind: 'extension-function',
+            extensionName: 'McpExt',
+            parentKind: 'extension',
+            functionName: 'SetPower',
+          }),
+        ])
+      );
+    } finally {
+      project.delete();
+    }
+  });
+
+  it('rejects extension function updates with invalid sentence parameters', async () => {
+    // $FlowFixMe[invalid-constructor]
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    project.insertNewEventsFunctionsExtension('McpExt', 0);
+    const triggerUnsavedChanges: any = jest.fn();
+
+    try {
+      const bridge = makeBridge({
+        getProject: () => project,
+        getPermissions: () => ({
+          allowWriteTools: true,
+          allowCommandTools: false,
+        }),
+        triggerUnsavedChanges,
+      });
+
+      const invalidCreateResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'gdevelop_create_or_update_extension_function',
+          arguments: {
+            extension_name: 'McpExt',
+            function_name: 'UpdateEnemyWarrior',
+            function_type: 'action',
+            full_name: 'Update enemy warrior AI',
+            description:
+              'Updates enemy warrior AI, combat damage, and health bar UI.',
+            sentence:
+              'Update enemy warrior systems for _PARAM0_, _PARAM1_, _PARAM2_, _PARAM3_, _PARAM4_',
+            parameters: [
+              { name: 'Player', type: 'object' },
+              { name: 'Enemy_Warrior', type: 'object' },
+              { name: 'HealthBar', type: 'object' },
+              { name: 'AttackDamage', type: 'expression' },
+              { name: 'DeltaTime', type: 'expression' },
+            ],
+            events_json:
+              '[{"type":"BuiltinCommonInstructions::Standard","conditions":[],"actions":[]}]',
+          },
+        },
+      });
+
+      expect(invalidCreateResponse.isError).toBe(true);
+      expect(invalidCreateResponse.content[0].text).toContain('_PARAM5_');
+      expect(invalidCreateResponse.content[0].text).toContain('_PARAM0_');
+      expect(
+        project
+          .getEventsFunctionsExtension('McpExt')
+          .getEventsFunctions()
+          .hasEventsFunctionNamed('UpdateEnemyWarrior')
+      ).toBe(false);
+
+      const validCreateResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'gdevelop_create_or_update_extension_function',
+          arguments: {
+            extension_name: 'McpExt',
+            function_name: 'UpdateEnemyWarrior',
+            function_type: 'action',
+            full_name: 'Update enemy warrior AI',
+            description:
+              'Updates enemy warrior AI, combat damage, and health bar UI.',
+            sentence:
+              'Update enemy warrior systems for _PARAM1_, _PARAM2_, _PARAM3_, _PARAM4_, _PARAM5_',
+            parameters: [
+              { name: 'Player', type: 'object' },
+              { name: 'Enemy_Warrior', type: 'object' },
+              { name: 'HealthBar', type: 'object' },
+              { name: 'AttackDamage', type: 'expression' },
+              { name: 'DeltaTime', type: 'expression' },
+            ],
+            events_json:
+              '[{"type":"BuiltinCommonInstructions::Standard","conditions":[],"actions":[]}]',
+          },
+        },
+      });
+
+      expect(validCreateResponse.isError).not.toBe(true);
+
+      const extension = project.getEventsFunctionsExtension('McpExt');
+      const eventsFunction = extension
+        .getEventsFunctions()
+        .getEventsFunction('UpdateEnemyWarrior');
+      expect(eventsFunction.getFullName()).toBe('Update enemy warrior AI');
+      expect(eventsFunction.getEvents().getEventsCount()).toBe(1);
+
+      const invalidUpdateResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'gdevelop_create_or_update_extension_function',
+          arguments: {
+            extension_name: 'McpExt',
+            function_name: 'UpdateEnemyWarrior',
+            function_type: 'action',
+            full_name: 'Broken update',
+            sentence:
+              'Update enemy warrior systems for _PARAM0_, _PARAM1_, _PARAM2_, _PARAM3_, _PARAM4_',
+            events_json: '[]',
+          },
+        },
+      });
+
+      expect(invalidUpdateResponse.isError).toBe(true);
+      const restoredEventsFunction = extension
+        .getEventsFunctions()
+        .getEventsFunction('UpdateEnemyWarrior');
+      expect(restoredEventsFunction.getFullName()).toBe(
+        'Update enemy warrior AI'
+      );
+      expect(restoredEventsFunction.getEvents().getEventsCount()).toBe(1);
+      expect(triggerUnsavedChanges).toHaveBeenCalledTimes(1);
     } finally {
       project.delete();
     }
@@ -2134,6 +2414,30 @@ describe('McpEditorBridge', () => {
       });
       expect(validPatchResponse.isError).not.toBe(true);
       expect(layout.getObjects().hasObjectNamed('LabelPatched')).toBe(true);
+
+      const compactPatchResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'apply_validated_scene_patch',
+          arguments: {
+            scene_name: 'Level1',
+            summary_only: true,
+            patch: [
+              {
+                op: 'replace',
+                path: '/objects/0/name',
+                value: 'LabelCompact',
+              },
+            ],
+          },
+        },
+      });
+      const compactPatch = JSON.parse(compactPatchResponse.content[0].text);
+      expect(compactPatchResponse.isError).not.toBe(true);
+      expect(compactPatch.success).toBe(true);
+      expect(compactPatch.serializedScene).toBeUndefined();
+      expect(compactPatch.changedPaths).toEqual(['/objects/0/name']);
+      expect(layout.getObjects().hasObjectNamed('LabelCompact')).toBe(true);
     } finally {
       project.delete();
     }
@@ -2945,6 +3249,390 @@ describe('McpEditorBridge', () => {
       );
     } finally {
       project.delete();
+    }
+  });
+
+  it('inspects tilemap collision cells and checks walkability paths', async () => {
+    // $FlowFixMe[invalid-constructor]
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    const layout = project.insertNewLayout('Level1', 0);
+    layout.getObjects().insertNewObject(project, 'Sprite', 'Tiles', 0);
+
+    try {
+      const bridge = makeBridge({
+        getProject: () => project,
+        getPermissions: () => ({
+          allowWriteTools: true,
+          allowCommandTools: false,
+        }),
+      });
+
+      await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'set_tilemap_tiles',
+          arguments: {
+            scene_name: 'Level1',
+            object_name: 'Tiles',
+            create_instance: true,
+            tile_size: 16,
+            tileset_columns: 4,
+            map_width: 4,
+            map_height: 3,
+            fill: { x: 0, y: 0, width: 4, height: 3, tile: 0 },
+            tiles: [
+              { x: 1, y: 1, tile: 5 },
+              { x: 2, y: 1, tile: 5 },
+            ],
+          },
+        },
+      });
+
+      const collisionResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'set_tilemap_collision_tiles',
+          arguments: {
+            scene_name: 'Level1',
+            object_name: 'Tiles',
+            tile_ids: [5],
+          },
+        },
+      });
+      const collision = JSON.parse(collisionResponse.content[0].text);
+      expect(collisionResponse.isError).not.toBe(true);
+      expect(collision.collisionTileIds).toEqual([5]);
+
+      const inspectResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'inspect_tilemap_collision',
+          arguments: { scene_name: 'Level1', object_name: 'Tiles' },
+        },
+      });
+      const inspect = JSON.parse(inspectResponse.content[0].text);
+      expect(inspect.blockedCells).toEqual([
+        { x: 1, y: 1, tileId: 5 },
+        { x: 2, y: 1, tileId: 5 },
+      ]);
+      expect(inspect.asciiMask).toEqual(['....', '.##.', '....']);
+
+      const pathResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'check_tilemap_walkability',
+          arguments: {
+            scene_name: 'Level1',
+            object_name: 'Tiles',
+            start: { x: 0, y: 1 },
+            goal: { x: 3, y: 1 },
+          },
+        },
+      });
+      const pathResult = JSON.parse(pathResponse.content[0].text);
+      expect(pathResult.reachable).toBe(true);
+      expect(pathResult.blockedCells).toEqual([
+        { x: 1, y: 1, tileId: 5 },
+        { x: 2, y: 1, tileId: 5 },
+      ]);
+      expect(pathResult.path[0]).toEqual({ x: 0, y: 1 });
+      expect(pathResult.path[pathResult.path.length - 1]).toEqual({
+        x: 3,
+        y: 1,
+      });
+    } finally {
+      project.delete();
+    }
+  });
+
+  it('inspects tilemap palette ids and static draw order', async () => {
+    // $FlowFixMe[invalid-constructor]
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    const layout = project.insertNewLayout('Level1', 0);
+    layout.getObjects().insertNewObject(project, 'Sprite', 'Tiles', 0);
+    layout.getObjects().insertNewObject(project, 'Sprite', 'Back', 1);
+    layout.getObjects().insertNewObject(project, 'Sprite', 'Front', 2);
+    const atlas = new gd.ImageResource();
+    atlas.setName('Tileset');
+    atlas.setFile('assets/tiles.png');
+    project.getResourcesManager().addResource(atlas);
+    atlas.delete();
+    const back = layout.getInitialInstances().insertNewInitialInstance();
+    back.setObjectName('Back');
+    back.setX(0);
+    back.setY(0);
+    back.setZOrder(1);
+    const front = layout.getInitialInstances().insertNewInitialInstance();
+    front.setObjectName('Front');
+    front.setX(8);
+    front.setY(8);
+    front.setZOrder(10);
+
+    try {
+      const bridge = makeBridge({ getProject: () => project });
+      const paletteResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'inspect_tilemap_palette',
+          arguments: {
+            scene_name: 'Level1',
+            object_name: 'Tiles',
+            atlas_image: 'Tileset',
+            tile_size: 16,
+            columns: 2,
+            rows: 2,
+          },
+        },
+      });
+      const palette = JSON.parse(paletteResponse.content[0].text);
+      expect(palette.success).toBe(true);
+      expect(palette.tiles.map(tile => tile.id)).toEqual([0, 1, 2, 3]);
+      expect(palette.tiles[3].sourceRect).toEqual({
+        x: 16,
+        y: 16,
+        width: 16,
+        height: 16,
+      });
+
+      const orderResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'inspect_scene_draw_order',
+          arguments: { scene_name: 'Level1' },
+        },
+      });
+      const order = JSON.parse(orderResponse.content[0].text);
+      expect(order.bottomToTop.map(instance => instance.objectName)).toEqual([
+        'Back',
+        'Front',
+      ]);
+      expect(order.topToBottom[0].objectName).toBe('Front');
+    } finally {
+      project.delete();
+    }
+  });
+
+  it('audits resource paths against allowed asset roots', async () => {
+    // $FlowFixMe[invalid-constructor]
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gdevelop-assets-'));
+    project.setProjectFile(path.join(tempDir, 'game.json'));
+    fs.mkdirSync(path.join(tempDir, 'assets'));
+    fs.writeFileSync(path.join(tempDir, 'assets', 'player.png'), '');
+    fs.writeFileSync(path.join(tempDir, 'outside.png'), '');
+
+    try {
+      const good = new gd.ImageResource();
+      good.setName('Player');
+      good.setFile('assets/player.png');
+      project.getResourcesManager().addResource(good);
+      good.delete();
+      const bad = new gd.ImageResource();
+      bad.setName('Outside');
+      bad.setFile('outside.png');
+      project.getResourcesManager().addResource(bad);
+      bad.delete();
+
+      const bridge = makeBridge({ getProject: () => project });
+      const response = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'audit_project_asset_sources',
+          arguments: { allowed_roots: ['assets'] },
+        },
+      });
+      const result = JSON.parse(response.content[0].text);
+      expect(result.success).toBe(true);
+      expect(result.outsideAllowedRoots.map(issue => issue.name)).toEqual([
+        'Outside',
+      ]);
+      expect(result.resourcesByName.Player.isAllowed).toBe(true);
+    } finally {
+      project.delete();
+      fs.rmSync(tempDir, { recursive: true, force: true });
+    }
+  });
+
+  it('patches an event instruction by stable event id and instruction type', async () => {
+    // $FlowFixMe[invalid-constructor]
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    const layout = project.insertNewLayout('Level1', 0);
+    const standard = gd.asStandardEvent(
+      layout
+        .getEvents()
+        .insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 0)
+    );
+    standard.setAiGeneratedEventId('health-follow');
+    const action = new gd.Instruction();
+    action.setType('MettreX');
+    action.setParametersCount(3);
+    action.setParameter(0, 'HealthBar');
+    action.setParameter(1, '=');
+    action.setParameter(2, 'Enemy.X()-40');
+    standard.getActions().insert(action, 0);
+    action.delete();
+
+    try {
+      const bridge = makeBridge({
+        getProject: () => project,
+        getPermissions: () => ({
+          allowWriteTools: true,
+          allowCommandTools: false,
+        }),
+      });
+      const response = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'patch_scene_event_instruction',
+          arguments: {
+            scene_name: 'Level1',
+            event_id: 'health-follow',
+            instruction_kind: 'action',
+            instruction_type: 'MettreX',
+            object_name: 'HealthBar',
+            parameters: ['HealthBar', '=', 'Enemy.CenterX()-HealthBar.Width()/2'],
+            summary_only: true,
+          },
+        },
+      });
+      const result = JSON.parse(response.content[0].text);
+      expect(response.isError).not.toBe(true);
+      expect(result.success).toBe(true);
+      expect(result.eventPath).toBe('event-0');
+      expect(result.serializedEvents).toBeUndefined();
+
+      const patched = gd.asStandardEvent(layout.getEvents().getEventAt(0));
+      expect(
+        patched
+          .getActions()
+          .get(0)
+          .getParameter(2)
+          .getPlainString()
+      ).toBe('Enemy.CenterX()-HealthBar.Width()/2');
+    } finally {
+      project.delete();
+    }
+  });
+
+  it('attaches a UI object to an object top and reports gameplay rule checks', async () => {
+    // $FlowFixMe[invalid-constructor]
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    const layout = project.insertNewLayout('Level1', 0);
+    layout.getObjects().insertNewObject(project, 'Sprite', 'Enemy', 0);
+    layout.getObjects().insertNewObject(project, 'Sprite', 'EnemyHealthBar', 1);
+
+    try {
+      const bridge = makeBridge({
+        getProject: () => project,
+        getPermissions: () => ({
+          allowWriteTools: true,
+          allowCommandTools: false,
+        }),
+      });
+      const attachResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'attach_object_to_object_top',
+          arguments: {
+            scene_name: 'Level1',
+            follower_object_name: 'EnemyHealthBar',
+            target_object_name: 'Enemy',
+            y_offset: -4,
+            event_id: 'enemy-healthbar-follow',
+          },
+        },
+      });
+      const attach = JSON.parse(attachResponse.content[0].text);
+      expect(attachResponse.isError).not.toBe(true);
+      expect(attach.aiGeneratedEventId).toBe('enemy-healthbar-follow');
+      expect(attach.expressions.x).toBe(
+        'Enemy.CenterX()-EnemyHealthBar.Width()/2'
+      );
+      expect(attach.expressions.y).toBe('Enemy.Y()-EnemyHealthBar.Height()-4');
+
+      const event = gd.asStandardEvent(layout.getEvents().getEventAt(0));
+      expect(event.getAiGeneratedEventId()).toBe('enemy-healthbar-follow');
+      expect(event.getActions().get(0).getType()).toBe('MettreX');
+      expect(event.getActions().get(1).getType()).toBe('MettreY');
+
+      const rulesResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'inspect_gameplay_rules',
+          arguments: {
+            scene_name: 'Level1',
+            top_attachments: [
+              {
+                follower_object_name: 'EnemyHealthBar',
+                target_object_name: 'Enemy',
+              },
+            ],
+          },
+        },
+      });
+      const rules = JSON.parse(rulesResponse.content[0].text);
+      expect(rules.ok).toBe(true);
+      expect(rules.checks[0]).toEqual(
+        expect.objectContaining({ kind: 'top_attachment', ok: true })
+      );
+    } finally {
+      project.delete();
+    }
+  });
+
+  it('binds sprite animations from a standard asset directory', async () => {
+    // $FlowFixMe[invalid-constructor]
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    const layout = project.insertNewLayout('Level1', 0);
+    layout.getObjects().insertNewObject(project, 'Sprite', 'Warrior', 0);
+    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gdevelop-anims-'));
+    project.setProjectFile(path.join(tempDir, 'game.json'));
+    fs.mkdirSync(path.join(tempDir, 'assets', 'Warrior', 'Idle'), {
+      recursive: true,
+    });
+    fs.mkdirSync(path.join(tempDir, 'assets', 'Warrior', 'Run'), {
+      recursive: true,
+    });
+    fs.writeFileSync(path.join(tempDir, 'assets', 'Warrior', 'Idle', '0.png'), '');
+    fs.writeFileSync(path.join(tempDir, 'assets', 'Warrior', 'Idle', '1.png'), '');
+    fs.writeFileSync(path.join(tempDir, 'assets', 'Warrior', 'Run', '0.png'), '');
+
+    try {
+      const bridge = makeBridge({
+        getProject: () => project,
+        getPermissions: () => ({
+          allowWriteTools: true,
+          allowCommandTools: false,
+        }),
+      });
+      const response = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'bind_sprite_animations_from_directory',
+          arguments: {
+            scene_name: 'Level1',
+            object_name: 'Warrior',
+            directory: 'assets/Warrior',
+            frame_duration: 0.1,
+          },
+        },
+      });
+      const result = JSON.parse(response.content[0].text);
+      expect(response.isError).not.toBe(true);
+      expect(result.animationsBound).toEqual([
+        expect.objectContaining({ name: 'Idle', frameCount: 2 }),
+        expect.objectContaining({ name: 'Run', frameCount: 1 }),
+      ]);
+      expect(project.getResourcesManager().hasResource('Warrior_Idle_0_0')).toBe(
+        true
+      );
+      const sprite = gd.asSpriteConfiguration(
+        layout.getObjects().getObject('Warrior').getConfiguration()
+      );
+      expect(sprite.getAnimations().getAnimationsCount()).toBe(2);
+    } finally {
+      project.delete();
+      fs.rmSync(tempDir, { recursive: true, force: true });
     }
   });
 

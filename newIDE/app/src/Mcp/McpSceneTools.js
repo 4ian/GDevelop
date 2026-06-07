@@ -161,6 +161,30 @@ const resolveLocalResourceFile = (
   return path.resolve(path.dirname(projectFile), file);
 };
 
+const resolveProjectRelativeFilePath = (
+  project: gdProject,
+  file: string
+): string => {
+  if (!path || path.isAbsolute(file)) return file;
+  const projectFile = project.getProjectFile && project.getProjectFile();
+  return projectFile ? path.resolve(path.dirname(projectFile), file) : file;
+};
+
+const toProjectRelativeResourceFile = (
+  project: gdProject,
+  file: string
+): string => {
+  if (!path) return file;
+  const projectFile = project.getProjectFile && project.getProjectFile();
+  if (!projectFile || !path.isAbsolute(file)) return file.replace(/\\/g, '/');
+  const projectFolder = path.dirname(projectFile);
+  const relative = path.relative(projectFolder, file);
+  if (!relative.startsWith('..') && !path.isAbsolute(relative)) {
+    return relative.replace(/\\/g, '/');
+  }
+  return file;
+};
+
 const getResourceFileStatus = (
   project: gdProject,
   resource: gdResource
@@ -1376,6 +1400,521 @@ export const inspectProjectResources = (
   };
 };
 
+const analyzeImageResourcePixels = (
+  project: gdProject,
+  resource: gdResource
+): Object => {
+  const file = resource.getFile();
+  const resolvedFile = resolveLocalResourceFile(project, file) || file;
+  const size = readImageResourceSize(project, resource.getName());
+  const base = {
+    name: resource.getName(),
+    file,
+    resolvedFile,
+    width: size ? size.width : undefined,
+    height: size ? size.height : undefined,
+  };
+  if (!nativeImage || !resolvedFile || (fs && !fs.existsSync(resolvedFile))) {
+    return {
+      ...base,
+      pixelAnalysisAvailable: false,
+      nonTransparentBounds: null,
+    };
+  }
+
+  try {
+    const image = nativeImage.createFromPath(resolvedFile);
+    const imageSize = image.getSize();
+    const bitmap = image.toBitmap();
+    let minX = imageSize.width;
+    let minY = imageSize.height;
+    let maxX = -1;
+    let maxY = -1;
+    let opaquePixels = 0;
+    for (let y = 0; y < imageSize.height; y++) {
+      for (let x = 0; x < imageSize.width; x++) {
+        const offset = (y * imageSize.width + x) * 4;
+        const alpha = bitmap[offset + 3];
+        if (alpha === 0) continue;
+        opaquePixels++;
+        minX = Math.min(minX, x);
+        minY = Math.min(minY, y);
+        maxX = Math.max(maxX, x);
+        maxY = Math.max(maxY, y);
+      }
+    }
+    return {
+      ...base,
+      width: imageSize.width,
+      height: imageSize.height,
+      pixelAnalysisAvailable: true,
+      opaquePixels,
+      transparentBorder:
+        maxX >= 0
+          ? {
+              left: minX,
+              top: minY,
+              right: imageSize.width - maxX - 1,
+              bottom: imageSize.height - maxY - 1,
+            }
+          : {
+              left: imageSize.width,
+              top: imageSize.height,
+              right: imageSize.width,
+              bottom: imageSize.height,
+            },
+      nonTransparentBounds:
+        maxX >= 0
+          ? {
+              x: minX,
+              y: minY,
+              width: maxX - minX + 1,
+              height: maxY - minY + 1,
+            }
+          : null,
+      pixelScaleSuggestion:
+        maxX >= 0 && (maxY - minY + 1 <= 3 || maxX - minX + 1 <= 3)
+          ? 'Visible pixels are very thin relative to the image bounds; verify collision masks/origin and consider replacing the image or using a thicker visible asset.'
+          : undefined,
+    };
+  } catch (error) {
+    return {
+      ...base,
+      pixelAnalysisAvailable: false,
+      error: error.message,
+      nonTransparentBounds: null,
+    };
+  }
+};
+
+export const inspectResourceImages = (
+  project: gdProject,
+  args: Object = {}
+): Object => {
+  const resourcesManager = project.getResourcesManager();
+  const resourceNames = resourcesManager.getAllResourceNames().toJSArray();
+  const requestedNames = Array.isArray(args.resource_names)
+    ? new Set(args.resource_names.map(String))
+    : Array.isArray(args.resourceNames)
+    ? new Set(args.resourceNames.map(String))
+    : null;
+  const images = [];
+  resourceNames.forEach(name => {
+    if (requestedNames && !requestedNames.has(name)) return;
+    const resource = resourcesManager.getResource(name);
+    if (resource.getKind() !== 'image') return;
+    images.push(analyzeImageResourcePixels(project, resource));
+  });
+  return {
+    success: true,
+    projectName: project.getName(),
+    imageCount: images.length,
+    pixelAnalysisAvailable: !!nativeImage,
+    images,
+  };
+};
+
+const decodeImageFile = (file: string): Object => {
+  if (!nativeImage) {
+    throw new Error('Image decoding requires Electron nativeImage.');
+  }
+  if (!fs || !fs.existsSync(file)) {
+    throw new Error(`Image file not found: "${file}".`);
+  }
+  const image = nativeImage.createFromPath(file);
+  const size = image.getSize();
+  if (!size.width || !size.height) {
+    throw new Error(`Image file could not be decoded: "${file}".`);
+  }
+  return {
+    width: size.width,
+    height: size.height,
+    bgra: image.toBitmap(),
+  };
+};
+
+const readImageRegion = (
+  region: any,
+  image: Object
+): {| x: number, y: number, width: number, height: number |} => {
+  const rawX = region && getFiniteNumber(region.x);
+  const rawY = region && getFiniteNumber(region.y);
+  const x = rawX !== null ? Math.floor(rawX) : 0;
+  const y = rawY !== null ? Math.floor(rawY) : 0;
+  const rawWidth = region && getFiniteNumber(region.width);
+  const rawHeight = region && getFiniteNumber(region.height);
+  const boundedX = Math.max(0, Math.min(image.width, x));
+  const boundedY = Math.max(0, Math.min(image.height, y));
+  return {
+    x: boundedX,
+    y: boundedY,
+    width: Math.max(
+      0,
+      Math.min(
+        rawWidth !== null ? Math.floor(rawWidth) : image.width - boundedX,
+        image.width - boundedX
+      )
+    ),
+    height: Math.max(
+      0,
+      Math.min(
+        rawHeight !== null ? Math.floor(rawHeight) : image.height - boundedY,
+        image.height - boundedY
+      )
+    ),
+  };
+};
+
+const getBgraPixelAsRgba = (
+  image: Object,
+  x: number,
+  y: number
+): Array<number> => {
+  const offset = (y * image.width + x) * 4;
+  return [
+    image.bgra[offset + 2],
+    image.bgra[offset + 1],
+    image.bgra[offset],
+    image.bgra[offset + 3],
+  ];
+};
+
+export const compareImageFiles = (
+  project: gdProject,
+  args: Object
+): Object => {
+  if (!fs || !path || !zlib) {
+    throw new Error('Filesystem/path/zlib access is not available.');
+  }
+  const referenceFile = getRequiredString(args, 'reference_file');
+  const actualFile =
+    getOptionalString(args, 'actual_file') ||
+    getOptionalString(args, 'current_file');
+  if (!actualFile) throw new Error('Missing actual_file.');
+
+  const referencePath = resolveProjectRelativeFilePath(project, referenceFile);
+  const actualPath = resolveProjectRelativeFilePath(project, actualFile);
+  const reference = decodeImageFile(referencePath);
+  const actual = decodeImageFile(actualPath);
+  const referenceRegion = readImageRegion(args.reference_region, reference);
+  const actualRegion = readImageRegion(args.actual_region, actual);
+  const width = Math.min(referenceRegion.width, actualRegion.width);
+  const height = Math.min(referenceRegion.height, actualRegion.height);
+  if (width <= 0 || height <= 0) {
+    throw new Error('The compared image regions do not overlap any pixels.');
+  }
+
+  const rawThreshold = getFiniteNumber(args.threshold);
+  const threshold = rawThreshold !== null ? Math.max(0, rawThreshold) : 24;
+  const heatmapPixels = Buffer.alloc(width * height * 4);
+  let mismatchCount = 0;
+  let totalDifference = 0;
+  let maxDifference = 0;
+  let minX = width;
+  let minY = height;
+  let maxX = -1;
+  let maxY = -1;
+
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const referencePixel = getBgraPixelAsRgba(
+        reference,
+        referenceRegion.x + x,
+        referenceRegion.y + y
+      );
+      const actualPixel = getBgraPixelAsRgba(
+        actual,
+        actualRegion.x + x,
+        actualRegion.y + y
+      );
+      const diff = Math.max(
+        Math.abs(referencePixel[0] - actualPixel[0]),
+        Math.abs(referencePixel[1] - actualPixel[1]),
+        Math.abs(referencePixel[2] - actualPixel[2]),
+        Math.abs(referencePixel[3] - actualPixel[3])
+      );
+      totalDifference += diff;
+      maxDifference = Math.max(maxDifference, diff);
+      if (diff > threshold) {
+        mismatchCount++;
+        minX = Math.min(minX, x);
+        minY = Math.min(minY, y);
+        maxX = Math.max(maxX, x);
+        maxY = Math.max(maxY, y);
+        const offset = (y * width + x) * 4;
+        heatmapPixels[offset] = 255;
+        heatmapPixels[offset + 1] = 0;
+        heatmapPixels[offset + 2] = 0;
+        heatmapPixels[offset + 3] = 220;
+      }
+    }
+  }
+
+  let heatmapFile = null;
+  const requestedHeatmap =
+    getOptionalString(args, 'output_heatmap_file') ||
+    getOptionalString(args, 'heatmap_file');
+  if (requestedHeatmap) {
+    heatmapFile = resolveProjectRelativeFilePath(project, requestedHeatmap);
+    const directory = path.dirname(heatmapFile);
+    if (directory && !fs.existsSync(directory)) {
+      fs.mkdirSync(directory, { recursive: true });
+    }
+    fs.writeFileSync(heatmapFile, encodeRgbaPng(width, height, heatmapPixels));
+  }
+
+  const totalPixels = width * height;
+  return {
+    success: true,
+    referenceFile,
+    actualFile,
+    resolvedReferenceFile: referencePath,
+    resolvedActualFile: actualPath,
+    imageSizes: {
+      reference: { width: reference.width, height: reference.height },
+      actual: { width: actual.width, height: actual.height },
+    },
+    comparedRegion: {
+      reference: referenceRegion,
+      actual: actualRegion,
+      width,
+      height,
+    },
+    threshold,
+    mismatchCount,
+    mismatchRatio: totalPixels ? mismatchCount / totalPixels : 0,
+    averageDifference: totalPixels ? totalDifference / totalPixels : 0,
+    maxDifference,
+    diffBounds:
+      mismatchCount > 0
+        ? { left: minX, top: minY, right: maxX + 1, bottom: maxY + 1 }
+        : null,
+    heatmapFile,
+  };
+};
+
+export const cropSceneObjectImage = (
+  project: gdProject,
+  args: Object
+): Object => {
+  if (!fs || !path || !zlib) {
+    throw new Error('Filesystem/path/zlib access is not available.');
+  }
+  const sceneName = getRequiredString(args, 'scene_name');
+  const objectName = getRequiredString(args, 'object_name');
+  const sourceFile = getRequiredString(args, 'source_file');
+  const outputFile = getRequiredString(args, 'output_file');
+  const scene = getScene(project, sceneName);
+  const sourcePath = resolveProjectRelativeFilePath(project, sourceFile);
+  const outputPath = resolveProjectRelativeFilePath(project, outputFile);
+  const image = decodeImageFile(sourcePath);
+  const sceneWidth = project.getGameResolutionWidth();
+  const sceneHeight = project.getGameResolutionHeight();
+  const scaleX = image.width / Math.max(1, sceneWidth);
+  const scaleY = image.height / Math.max(1, sceneHeight);
+  const instanceId = getOptionalString(args, 'instance_id');
+  let targetInstance = null;
+  iterateInitialInstances(scene.getInitialInstances(), instance => {
+    if (targetInstance) return;
+    if (instance.getObjectName() !== objectName) return;
+    if (instanceId && !instance.getPersistentUuid().startsWith(instanceId)) return;
+    targetInstance = instance;
+  });
+  if (!targetInstance) {
+    throw new Error(`No initial instance of "${objectName}" found in "${sceneName}".`);
+  }
+
+  const { width: objectWidth, height: objectHeight } = getInitialInstanceSize(
+    targetInstance
+  );
+  const rawPadding = getFiniteNumber(args.padding);
+  const padding = rawPadding !== null ? Math.max(0, rawPadding) : 16;
+  const cropLeft = Math.max(
+    0,
+    Math.floor((targetInstance.getX() - padding) * scaleX)
+  );
+  const cropTop = Math.max(
+    0,
+    Math.floor((targetInstance.getY() - padding) * scaleY)
+  );
+  const cropRight = Math.min(
+    image.width,
+    Math.ceil((targetInstance.getX() + objectWidth + padding) * scaleX)
+  );
+  const cropBottom = Math.min(
+    image.height,
+    Math.ceil((targetInstance.getY() + objectHeight + padding) * scaleY)
+  );
+  const cropWidth = Math.max(1, cropRight - cropLeft);
+  const cropHeight = Math.max(1, cropBottom - cropTop);
+  const rawZoom = getFiniteNumber(args.zoom);
+  const zoom = rawZoom !== null ? Math.max(1, Math.floor(rawZoom)) : 2;
+  const outputWidth = cropWidth * zoom;
+  const outputHeight = cropHeight * zoom;
+  const pixels = Buffer.alloc(outputWidth * outputHeight * 4);
+  for (let y = 0; y < outputHeight; y++) {
+    const sourceY = cropTop + Math.floor(y / zoom);
+    for (let x = 0; x < outputWidth; x++) {
+      const sourceX = cropLeft + Math.floor(x / zoom);
+      const sourceOffset = (sourceY * image.width + sourceX) * 4;
+      const targetOffset = (y * outputWidth + x) * 4;
+      pixels[targetOffset] = image.bgra[sourceOffset + 2];
+      pixels[targetOffset + 1] = image.bgra[sourceOffset + 1];
+      pixels[targetOffset + 2] = image.bgra[sourceOffset];
+      pixels[targetOffset + 3] = image.bgra[sourceOffset + 3];
+    }
+  }
+
+  const overlayBounds = args.overlay_bounds !== false && args.overlayBounds !== false;
+  if (overlayBounds) {
+    const left = Math.max(
+      0,
+      Math.round((targetInstance.getX() * scaleX - cropLeft) * zoom)
+    );
+    const top = Math.max(
+      0,
+      Math.round((targetInstance.getY() * scaleY - cropTop) * zoom)
+    );
+    const right = Math.min(
+      outputWidth - 1,
+      Math.round(((targetInstance.getX() + objectWidth) * scaleX - cropLeft) * zoom)
+    );
+    const bottom = Math.min(
+      outputHeight - 1,
+      Math.round(((targetInstance.getY() + objectHeight) * scaleY - cropTop) * zoom)
+    );
+    const setOverlayPixel = (x, y) => {
+      if (x < 0 || y < 0 || x >= outputWidth || y >= outputHeight) return;
+      const offset = (y * outputWidth + x) * 4;
+      pixels[offset] = 255;
+      pixels[offset + 1] = 0;
+      pixels[offset + 2] = 0;
+      pixels[offset + 3] = 255;
+    };
+    for (let x = left; x <= right; x++) {
+      setOverlayPixel(x, top);
+      setOverlayPixel(x, bottom);
+    }
+    for (let y = top; y <= bottom; y++) {
+      setOverlayPixel(left, y);
+      setOverlayPixel(right, y);
+    }
+  }
+
+  const directory = path.dirname(outputPath);
+  if (directory && !fs.existsSync(directory)) {
+    fs.mkdirSync(directory, { recursive: true });
+  }
+  fs.writeFileSync(outputPath, encodeRgbaPng(outputWidth, outputHeight, pixels));
+
+  return {
+    success: true,
+    sceneName,
+    objectName,
+    sourceFile,
+    outputFile,
+    resolvedSourceFile: sourcePath,
+    resolvedOutputFile: outputPath,
+    sourceImageSize: { width: image.width, height: image.height },
+    sceneResolution: { width: sceneWidth, height: sceneHeight },
+    crop: {
+      left: cropLeft,
+      top: cropTop,
+      width: cropWidth,
+      height: cropHeight,
+      padding,
+    },
+    zoom,
+    outputSize: { width: outputWidth, height: outputHeight },
+    overlayBounds,
+  };
+};
+
+export const auditProjectAssetSources = (
+  project: gdProject,
+  args: Object = {}
+): Object => {
+  const allowedRoots = (
+    Array.isArray(args.allowed_roots)
+      ? args.allowed_roots
+      : Array.isArray(args.allowedRoots)
+      ? args.allowedRoots
+      : ['assets']
+  )
+    .map(root => (typeof root === 'string' ? root : ''))
+    .filter(Boolean);
+  const projectFile = project.getProjectFile && project.getProjectFile();
+  const projectFolder = projectFile && path ? path.dirname(projectFile) : null;
+  const allowedAbsRoots =
+    projectFolder && path
+      ? allowedRoots.map(root => path.resolve(projectFolder, root))
+      : [];
+  const resourcesManager = project.getResourcesManager();
+  const resourceNames = resourcesManager.getAllResourceNames().toJSArray();
+  const resourcesByName = {};
+  const outsideAllowedRoots = [];
+  const unchecked = [];
+
+  resourceNames.forEach(name => {
+    const resource = resourcesManager.getResource(name);
+    const file = resource.getFile();
+    const isUrl = isUrlResourceFile(file);
+    const resolvedFile = resolveLocalResourceFile(project, file);
+    let isAllowed = false;
+    let reason = null;
+    if (isUrl) {
+      reason = 'url-resource';
+    } else if (!file) {
+      reason = 'empty-file';
+    } else if (!path) {
+      reason = 'path-module-unavailable';
+    } else if (resolvedFile && allowedAbsRoots.length) {
+      const normalizedFile = path.normalize(resolvedFile);
+      isAllowed = allowedAbsRoots.some(root => {
+        const normalizedRoot = path.normalize(root);
+        return (
+          normalizedFile === normalizedRoot ||
+          normalizedFile.startsWith(normalizedRoot + path.sep)
+        );
+      });
+      if (!isAllowed) reason = 'outside-allowed-roots';
+    } else {
+      const normalized = file.replace(/\\/g, '/');
+      isAllowed = allowedRoots.some(
+        root => normalized === root || normalized.startsWith(`${root}/`)
+      );
+      if (!isAllowed) reason = 'outside-allowed-roots';
+    }
+
+    const result = {
+      name,
+      kind: resource.getKind(),
+      file,
+      resolvedFile,
+      isUrl,
+      isAllowed,
+      reason,
+    };
+    resourcesByName[name] = result;
+    if (reason === 'outside-allowed-roots') outsideAllowedRoots.push(result);
+    if (reason && reason !== 'outside-allowed-roots') unchecked.push(result);
+  });
+
+  return {
+    success: true,
+    projectName: project.getName(),
+    projectFolder,
+    allowedRoots,
+    totalResources: resourceNames.length,
+    outsideAllowedRoots,
+    unchecked,
+    resourcesByName,
+    compliant: outsideAllowedRoots.length === 0,
+    note:
+      'This checks resource file origins against allowed project-relative folders. It cannot prove that an allowed file was never modified; use source control or hashes for tamper evidence.',
+  };
+};
+
 const readPoint = (value: any): { x: number, y: number } | null => {
   if (!value || typeof value !== 'object') return null;
   const x = getFiniteNumber(value.x);
@@ -1872,6 +2411,99 @@ const findInstanceByShortId = (
     }
   });
   return foundInstance;
+};
+
+const getInitialInstanceSize = (
+  instance: gdInitialInstance
+): {| width: number, height: number |} => {
+  const width = instance.hasCustomSize()
+    ? instance.getCustomWidth()
+    : instance.getDefaultWidth();
+  const height = instance.hasCustomSize()
+    ? instance.getCustomHeight()
+    : instance.getDefaultHeight();
+  return {
+    width: width && width > 0 ? width : 32,
+    height: height && height > 0 ? height : 32,
+  };
+};
+
+export const inspectSceneDrawOrder = (
+  project: gdProject,
+  args: Object
+): Object => {
+  const sceneName = getRequiredString(args, 'scene_name');
+  const scene = getScene(project, sceneName);
+  const filterObjectName =
+    getOptionalString(args, 'object_name') || getOptionalString(args, 'objectName');
+  const layersContainer = scene.getLayers();
+  const layers = [];
+  const layerIndexByName = {};
+  for (let index = 0; index < layersContainer.getLayersCount(); index++) {
+    const layer = layersContainer.getLayerAt(index);
+    const name = layer.getName();
+    layerIndexByName[name] = index;
+    layers.push({ name, label: name || 'Base layer', index });
+  }
+
+  const instances = [];
+  let sourceIndex = 0;
+  iterateInitialInstances(scene.getInitialInstances(), instance => {
+    const objectName = instance.getObjectName();
+    if (filterObjectName && objectName !== filterObjectName) {
+      sourceIndex++;
+      return;
+    }
+    const layerName = instance.getLayer() || '';
+    const { width, height } = getInitialInstanceSize(instance);
+    instances.push({
+      objectName,
+      instanceId: instance.getPersistentUuid().slice(0, 10),
+      sourceIndex,
+      layer: layerName,
+      layerIndex:
+        layerIndexByName[layerName] !== undefined ? layerIndexByName[layerName] : 0,
+      zOrder: instance.getZOrder(),
+      x: instance.getX(),
+      y: instance.getY(),
+      width,
+      height,
+      bounds: {
+        left: instance.getX(),
+        top: instance.getY(),
+        right: instance.getX() + width,
+        bottom: instance.getY() + height,
+      },
+    });
+    sourceIndex++;
+  });
+
+  const drawOrder = instances
+    .slice()
+    .sort((left, right) => {
+      if (left.layerIndex !== right.layerIndex) {
+        return left.layerIndex - right.layerIndex;
+      }
+      if (left.zOrder !== right.zOrder) return left.zOrder - right.zOrder;
+      return left.sourceIndex - right.sourceIndex;
+    })
+    .map((instance, drawIndex) => ({
+      ...instance,
+      drawIndex,
+      drawsAfterCount: drawIndex,
+      drawsBeforeCount: instances.length - drawIndex - 1,
+    }));
+
+  return {
+    success: true,
+    sceneName,
+    layers,
+    instanceCount: drawOrder.length,
+    bottomToTop: drawOrder,
+    topToBottom: drawOrder.slice().reverse(),
+    note:
+      'bottomToTop is the static initial-instance draw order: later entries can cover earlier entries when they overlap.',
+  };
 };
 
 export const deleteSceneObject = (
@@ -3413,6 +4045,219 @@ export const sliceSpriteSheet = (project: gdProject, args: Object): Object => {
   };
 };
 
+const IMAGE_FILE_RE = /\.(png|jpe?g|webp|bmp)$/i;
+
+const sanitizeResourceNamePart = (value: string): string =>
+  value
+    .replace(/\.[^.]+$/, '')
+    .replace(/[^A-Za-z0-9_]+/g, '_')
+    .replace(/^_+|_+$/g, '') || 'Frame';
+
+const sortedImageFilesInDirectory = (
+  directory: string,
+  recursive: boolean
+): Array<string> => {
+  if (!fs || !path) return [];
+  if (!fs.existsSync(directory) || !fs.statSync(directory).isDirectory()) {
+    throw new Error(`Animation directory not found: "${directory}".`);
+  }
+  const results = [];
+  const visit = dir => {
+    fs.readdirSync(dir, { withFileTypes: true }).forEach(entry => {
+      const file = path.join(dir, entry.name);
+      if (entry.isDirectory()) {
+        if (recursive) visit(file);
+        return;
+      }
+      if (entry.isFile() && IMAGE_FILE_RE.test(entry.name)) results.push(file);
+    });
+  };
+  visit(directory);
+  return results.sort((left, right) =>
+    left.localeCompare(right, undefined, { numeric: true, sensitivity: 'base' })
+  );
+};
+
+export const bindSpriteAnimationsFromDirectory = (
+  project: gdProject,
+  args: Object,
+  callbacks: SceneToolCallbacks = ({}: any)
+): Object => {
+  if (!fs || !path) throw new Error('Filesystem/path access is not available.');
+  const sceneName = getRequiredString(args, 'scene_name');
+  const objectName = getRequiredString(args, 'object_name');
+  const directoryArg =
+    getOptionalString(args, 'directory') ||
+    getOptionalString(args, 'animation_directory') ||
+    getOptionalString(args, 'animationDirectory');
+  if (!directoryArg) throw new Error('Missing directory.');
+  const scene = getScene(project, sceneName);
+  const directory = resolveProjectRelativeFilePath(project, directoryArg);
+  if (!fs.existsSync(directory) || !fs.statSync(directory).isDirectory()) {
+    throw new Error(`Animation directory not found: "${directoryArg}".`);
+  }
+
+  let object = scene.getObjects().hasObjectNamed(objectName)
+    ? scene.getObjects().getObject(objectName)
+    : null;
+  let didCreateObject = false;
+  if (!object) {
+    if (args.create_object === true || args.createObject === true) {
+      object = scene
+        .getObjects()
+        .insertNewObject(
+          project,
+          'Sprite',
+          objectName,
+          scene.getObjects().getObjectsCount()
+        );
+      didCreateObject = true;
+    } else {
+      throw new Error(
+        `Object "${objectName}" not found. Pass create_object:true to create it.`
+      );
+    }
+  }
+  if (object.getType() !== 'Sprite') {
+    throw new Error(
+      `Object "${objectName}" has type "${object.getType()}" but this tool only supports Sprite objects.`
+    );
+  }
+
+  const includeRoot =
+    args.include_root_files === true || args.includeRootFiles === true;
+  const recursive = args.recursive !== false;
+  const frameDuration =
+    getFiniteNumber(args.frame_duration) !== null
+      ? args.frame_duration
+      : getFiniteNumber(args.time_between_frames) !== null
+      ? args.time_between_frames
+      : 0.08;
+  const loopDefault =
+    typeof args.loop === 'boolean'
+      ? args.loop
+      : typeof args.looping === 'boolean'
+      ? args.looping
+      : true;
+
+  const animationGroups = [];
+  fs.readdirSync(directory, { withFileTypes: true })
+    .filter(entry => entry.isDirectory())
+    .sort((left, right) =>
+      left.name.localeCompare(right.name, undefined, {
+        numeric: true,
+        sensitivity: 'base',
+      })
+    )
+    .forEach(entry => {
+      const files = sortedImageFilesInDirectory(
+        path.join(directory, entry.name),
+        recursive
+      );
+      if (files.length) animationGroups.push({ name: entry.name, files });
+    });
+
+  const rootFiles = fs
+    .readdirSync(directory, { withFileTypes: true })
+    .filter(entry => entry.isFile() && IMAGE_FILE_RE.test(entry.name))
+    .map(entry => path.join(directory, entry.name))
+    .sort((left, right) =>
+      left.localeCompare(right, undefined, { numeric: true, sensitivity: 'base' })
+    );
+  if (rootFiles.length && (includeRoot || animationGroups.length === 0)) {
+    animationGroups.push({
+      name:
+        getOptionalString(args, 'animation_name') ||
+        getOptionalString(args, 'animationName') ||
+        'Default',
+      files: rootFiles,
+    });
+  }
+
+  if (!animationGroups.length) {
+    throw new Error(
+      `No image frames found in "${directoryArg}". Expected PNG/JPG/WebP/BMP files in root or animation subdirectories.`
+    );
+  }
+
+  const usedResourceNames = new Set(
+    project.getResourcesManager().getAllResourceNames().toJSArray()
+  );
+  const makeUniqueResourceName = base => {
+    let name = base;
+    let suffix = 2;
+    while (usedResourceNames.has(name)) {
+      name = `${base}_${suffix++}`;
+    }
+    usedResourceNames.add(name);
+    return name;
+  };
+
+  const registeredResources = [];
+  const animations = animationGroups.map(group => {
+    const animationName = sanitizeResourceNamePart(group.name);
+    const frames = group.files.map((file, index) => {
+      const resourceName = makeUniqueResourceName(
+        `${sanitizeResourceNamePart(objectName)}_${animationName}_${sanitizeResourceNamePart(
+          path.basename(file)
+        )}_${index}`
+      );
+      const resource = addOrUpdateResource(project, {
+        name: resourceName,
+        file: toProjectRelativeResourceFile(project, file),
+        kind: 'image',
+        metadata: { smooth: false },
+      });
+      registeredResources.push(resource);
+      return { image: resourceName };
+    });
+    return {
+      name: animationName,
+      loop: loopDefault,
+      timeBetweenFrames: frameDuration,
+      frames,
+    };
+  });
+
+  const animationResult = setSpriteAnimations(
+    project,
+    {
+      scene_name: sceneName,
+      object_name: objectName,
+      animations,
+      summary_only: true,
+    },
+    callbacks
+  );
+
+  if (didCreateObject && callbacks.onObjectsModifiedOutsideEditor) {
+    callbacks.onObjectsModifiedOutsideEditor({
+      scene,
+      isNewObjectTypeUsed: false,
+    });
+  }
+
+  return {
+    success: true,
+    sceneName,
+    objectName,
+    directory: directoryArg,
+    resolvedDirectory: directory,
+    didCreateObject,
+    animationsBound: animations.map(animation => ({
+      name: animation.name,
+      frameCount: animation.frames.length,
+      loop: animation.loop,
+      timeBetweenFrames: animation.timeBetweenFrames,
+    })),
+    resourcesRegistered: registeredResources.map(resource => ({
+      name: resource.resource && resource.resource.name,
+      file: resource.resource && resource.resource.file,
+    })),
+    animation: animationResult,
+  };
+};
+
 // ===========================================================================
 // Built-in Tilemap (TileMap::SimpleTileMap) operations.
 //
@@ -3557,6 +4402,101 @@ const readTilemapColumnCount = (object: ?gdObject): ?number => {
     // Not a JS-implementation object, or no columnCount property.
   }
   return null;
+};
+
+const readTilemapConfigProperty = (
+  object: ?gdObject,
+  propertyName: string
+): ?string => {
+  if (!object) return null;
+  try {
+    const config = gd.asObjectJsImplementation(object.getConfiguration());
+    const props = config.getProperties();
+    if (props.has(propertyName)) return props.get(propertyName).getValue();
+  } catch (error) {
+    // Not a JS-implementation object, or the property is unavailable.
+  }
+  return null;
+};
+
+export const inspectTilemapPalette = (
+  project: gdProject,
+  args: Object
+): Object => {
+  const sceneName = getRequiredString(args, 'scene_name');
+  const objectName = getRequiredString(args, 'object_name');
+  const scene = getScene(project, sceneName);
+  const { object } = getSceneObject(project, scene, objectName);
+  const atlasImage =
+    getOptionalString(args, 'atlas_image') ||
+    getOptionalString(args, 'atlasImage') ||
+    readTilemapConfigProperty(object, 'atlasImage');
+  if (!atlasImage) {
+    throw new Error(
+      'Tilemap atlas image is unknown. Pass atlas_image or create the object with create_tilemap_object.'
+    );
+  }
+  assertResourceIsImage(project, atlasImage);
+  const rawTileSize =
+    getFiniteNumber(args.tile_size) !== null
+      ? args.tile_size
+      : getFiniteNumber(args.tileSize) !== null
+      ? args.tileSize
+      : parseFloat(readTilemapConfigProperty(object, 'tileSize') || '');
+  const tileSize =
+    Number.isFinite(rawTileSize) && rawTileSize > 0 ? Math.floor(rawTileSize) : 16;
+  const dims = readImageResourceSize(project, atlasImage);
+  const rawColumns =
+    getFiniteNumber(args.columns) !== null
+      ? args.columns
+      : parseFloat(readTilemapConfigProperty(object, 'columnCount') || '');
+  const rawRows =
+    getFiniteNumber(args.rows) !== null
+      ? args.rows
+      : parseFloat(readTilemapConfigProperty(object, 'rowCount') || '');
+  const columns =
+    Number.isFinite(rawColumns) && rawColumns > 0
+      ? Math.floor(rawColumns)
+      : dims
+      ? Math.max(1, Math.floor(dims.width / tileSize))
+      : 0;
+  const rows =
+    Number.isFinite(rawRows) && rawRows > 0
+      ? Math.floor(rawRows)
+      : dims
+      ? Math.max(1, Math.floor(dims.height / tileSize))
+      : 0;
+  const tiles = [];
+  for (let row = 0; row < rows; row++) {
+    for (let col = 0; col < columns; col++) {
+      tiles.push({
+        id: row * columns + col,
+        col,
+        row,
+        sourceRect: {
+          x: col * tileSize,
+          y: row * tileSize,
+          width: tileSize,
+          height: tileSize,
+        },
+      });
+    }
+  }
+
+  return {
+    success: true,
+    sceneName,
+    objectName,
+    atlasImage,
+    imageSize: dims || null,
+    tileSize,
+    columns,
+    rows,
+    tileCount: tiles.length,
+    tiles,
+    note:
+      'Tile ids are row-major: id = row * columns + col. Use these ids with set_tilemap_tiles and set_tilemap_collision_tiles.',
+  };
 };
 
 // Create or update a TileMap::SimpleTileMap object from a tileset atlas image.
@@ -3955,6 +4895,309 @@ export const getTilemapTiles = (project: gdProject, args: Object): Object => {
     decodedTiles: decoded,
     note:
       'tiles is the raw serialized grid (tiles[y][x]; -1 = empty, else tileId = row*columnCount+col, possibly OR-ed with flip flags). decodedTiles expands each cell to { id, flipX?, flipY? } or { empty:true }.',
+  };
+};
+
+const MCP_TILEMAP_COLLISION_FALLBACK_VARIABLE =
+  '__mcpTilemapCollisionTileIds';
+
+const parseTileIdList = (value: any): Array<number> => {
+  if (Array.isArray(value)) {
+    return Array.from(
+      new Set(
+        value
+          .map(item => (typeof item === 'number' ? Math.floor(item) : NaN))
+          .filter(item => Number.isFinite(item) && item >= 0)
+      )
+    ).sort((left, right) => left - right);
+  }
+  if (typeof value !== 'string') return [];
+  return Array.from(
+    new Set(
+      value
+        .split(',')
+        .map(part => parseInt(part.trim(), 10))
+        .filter(item => Number.isFinite(item) && item >= 0)
+    )
+  ).sort((left, right) => left - right);
+};
+
+const readTilemapCollisionProperty = (object: gdObject): Object => {
+  let value = '';
+  let configAvailable = false;
+  try {
+    const config = gd.asObjectJsImplementation(object.getConfiguration());
+    const props = config.getProperties();
+    if (props.has('tilesWithHitBox')) {
+      configAvailable = true;
+      value = props.get('tilesWithHitBox').getValue() || '';
+    }
+  } catch (error) {
+    configAvailable = false;
+  }
+
+  if (!value) {
+    try {
+      const variables = object.getVariables();
+      if (variables.has(MCP_TILEMAP_COLLISION_FALLBACK_VARIABLE)) {
+        value = variables
+          .get(MCP_TILEMAP_COLLISION_FALLBACK_VARIABLE)
+          .getString();
+      }
+    } catch (error) {
+      // Ignore fallback read failures.
+    }
+  }
+
+  return {
+    value,
+    collisionTileIds: parseTileIdList(value),
+    configAvailable,
+  };
+};
+
+const writeTilemapCollisionProperty = (
+  object: gdObject,
+  collisionTileIds: Array<number>
+): Object => {
+  const value = collisionTileIds.join(',');
+  let configApplied = false;
+  try {
+    const config = gd.asObjectJsImplementation(object.getConfiguration());
+    configApplied = !!config.updateProperty('tilesWithHitBox', value);
+  } catch (error) {
+    configApplied = false;
+  }
+
+  const variables = object.getVariables();
+  const variable = variables.has(MCP_TILEMAP_COLLISION_FALLBACK_VARIABLE)
+    ? variables.get(MCP_TILEMAP_COLLISION_FALLBACK_VARIABLE)
+    : variables.insertNew(MCP_TILEMAP_COLLISION_FALLBACK_VARIABLE, 0);
+  variable.setString(value);
+
+  return { value, configApplied, fallbackStored: true };
+};
+
+const getTilemapGridForObject = (
+  project: gdProject,
+  args: Object
+): {| scene: gdLayout, object: gdObject, grid: Object, instance: gdInitialInstance |} => {
+  const sceneName = getRequiredString(args, 'scene_name');
+  const objectName = getRequiredString(args, 'object_name');
+  const scene = getScene(project, sceneName);
+  const { object } = getSceneObject(project, scene, objectName);
+  const instance = findTilemapInstance(scene, objectName, args);
+  if (!instance) {
+    throw new Error(
+      `No instance of "${objectName}" found in scene "${sceneName}".`
+    );
+  }
+  const raw = instance.getRawStringProperty('tilemap');
+  if (!raw) {
+    throw new Error(
+      `Instance of "${objectName}" has no tilemap grid. Use set_tilemap_tiles first.`
+    );
+  }
+  let grid;
+  try {
+    grid = JSON.parse(raw);
+  } catch (error) {
+    throw new Error('The instance tilemap data is not valid JSON.');
+  }
+  return { scene, object, grid, instance };
+};
+
+const collectTilemapBlockedCells = (
+  grid: Object,
+  collisionTileIds: Array<number>
+): Array<Object> => {
+  const collisionIds = new Set(collisionTileIds);
+  const layer = grid.layers && grid.layers[0];
+  const tiles = layer && Array.isArray(layer.tiles) ? layer.tiles : [];
+  const blockedCells = [];
+  tiles.forEach((row, y) => {
+    if (!Array.isArray(row)) return;
+    row.forEach((gid, x) => {
+      const tileInfo = gidToTileInfo(gid);
+      if (!tileInfo.empty && collisionIds.has(tileInfo.id)) {
+        blockedCells.push({ x, y, tileId: tileInfo.id });
+      }
+    });
+  });
+  return blockedCells;
+};
+
+const makeAsciiCollisionMask = (
+  grid: Object,
+  blockedCells: Array<Object>
+): Array<string> => {
+  const width = typeof grid.dimX === 'number' ? grid.dimX : 0;
+  const height = typeof grid.dimY === 'number' ? grid.dimY : 0;
+  const blocked = new Set(blockedCells.map(cell => `${cell.x},${cell.y}`));
+  const lines = [];
+  for (let y = 0; y < height; y++) {
+    let line = '';
+    for (let x = 0; x < width; x++) {
+      line += blocked.has(`${x},${y}`) ? '#' : '.';
+    }
+    lines.push(line);
+  }
+  return lines;
+};
+
+export const setTilemapCollisionTiles = (
+  project: gdProject,
+  args: Object,
+  callbacks: SceneToolCallbacks = ({}: any)
+): Object => {
+  const sceneName = getRequiredString(args, 'scene_name');
+  const objectName = getRequiredString(args, 'object_name');
+  const scene = getScene(project, sceneName);
+  const { object } = getSceneObject(project, scene, objectName);
+  const collisionTileIds = parseTileIdList(
+    args.tile_ids !== undefined
+      ? args.tile_ids
+      : args.tiles_with_hit_box !== undefined
+      ? args.tiles_with_hit_box
+      : args.tilesWithHitBox
+  );
+  const writeResult = writeTilemapCollisionProperty(object, collisionTileIds);
+
+  if (callbacks.onObjectsModifiedOutsideEditor) {
+    callbacks.onObjectsModifiedOutsideEditor({
+      scene,
+      isNewObjectTypeUsed: false,
+    });
+  }
+
+  return {
+    success: true,
+    sceneName,
+    objectName,
+    collisionTileIds,
+    tilesWithHitBox: writeResult.value,
+    configApplied: writeResult.configApplied,
+    fallbackStored: writeResult.fallbackStored,
+    note: writeResult.configApplied
+      ? 'Updated the TileMap::SimpleTileMap native tilesWithHitBox property.'
+      : 'The TileMap native object schema was unavailable in this environment, so MCP stored the ids in a fallback object variable for inspection/path testing. In the running editor this writes the native tilesWithHitBox property.',
+  };
+};
+
+export const inspectTilemapCollision = (
+  project: gdProject,
+  args: Object
+): Object => {
+  const sceneName = getRequiredString(args, 'scene_name');
+  const objectName = getRequiredString(args, 'object_name');
+  const { object, grid, instance } = getTilemapGridForObject(project, args);
+  const collision = readTilemapCollisionProperty(object);
+  const blockedCells = collectTilemapBlockedCells(
+    grid,
+    collision.collisionTileIds
+  );
+  const summaryOnly =
+    args && (args.summary_only === true || args.summaryOnly === true);
+  return {
+    success: true,
+    sceneName,
+    objectName,
+    instanceId: instance.getPersistentUuid().slice(0, 10),
+    mapSize: { columns: grid.dimX, rows: grid.dimY },
+    tileSize: grid.tileWidth || grid.tileHeight,
+    collisionTileIds: collision.collisionTileIds,
+    tilesWithHitBox: collision.value,
+    configAvailable: collision.configAvailable,
+    blockedCells,
+    blockedCellsCount: blockedCells.length,
+    asciiMask: makeAsciiCollisionMask(grid, blockedCells),
+    grid: summaryOnly ? undefined : grid,
+  };
+};
+
+const readGridPoint = (point: any, name: string): {| x: number, y: number |} => {
+  if (!point || typeof point !== 'object') {
+    throw new Error(`${name} must be { x, y } tile coordinates.`);
+  }
+  const x = getFiniteNumber(point.x);
+  const y = getFiniteNumber(point.y);
+  if (x === null || y === null) {
+    throw new Error(`${name} must be { x, y } tile coordinates.`);
+  }
+  return { x: Math.floor(x), y: Math.floor(y) };
+};
+
+export const checkTilemapWalkability = (
+  project: gdProject,
+  args: Object
+): Object => {
+  const collision = inspectTilemapCollision(project, {
+    ...args,
+    summary_only: true,
+  });
+  const start = readGridPoint(args && args.start, 'start');
+  const goal = readGridPoint(args && (args.goal || args.end), 'goal');
+  const width = collision.mapSize.columns;
+  const height = collision.mapSize.rows;
+  const blocked = new Set(
+    collision.blockedCells.map(cell => `${cell.x},${cell.y}`)
+  );
+  const inBounds = point =>
+    point.x >= 0 && point.y >= 0 && point.x < width && point.y < height;
+  if (!inBounds(start)) throw new Error('start is outside the tilemap.');
+  if (!inBounds(goal)) throw new Error('goal is outside the tilemap.');
+
+  const queue = [start];
+  const previous = {};
+  const seen = new Set([`${start.x},${start.y}`]);
+  const directions = [
+    { x: 1, y: 0 },
+    { x: -1, y: 0 },
+    { x: 0, y: 1 },
+    { x: 0, y: -1 },
+  ];
+  let reached = false;
+  while (queue.length) {
+    const current = queue.shift();
+    if (!current) break;
+    if (current.x === goal.x && current.y === goal.y) {
+      reached = true;
+      break;
+    }
+    directions.forEach(direction => {
+      const next = { x: current.x + direction.x, y: current.y + direction.y };
+      const key = `${next.x},${next.y}`;
+      if (!inBounds(next) || blocked.has(key) || seen.has(key)) return;
+      seen.add(key);
+      previous[key] = current;
+      queue.push(next);
+    });
+  }
+
+  const path = [];
+  if (reached) {
+    let current = goal;
+    while (current) {
+      path.unshift(current);
+      if (current.x === start.x && current.y === start.y) break;
+      current = previous[`${current.x},${current.y}`];
+    }
+  }
+
+  return {
+    success: true,
+    sceneName: collision.sceneName,
+    objectName: collision.objectName,
+    start,
+    goal,
+    reachable: reached,
+    path,
+    sampledCells: seen.size,
+    blockedCells: collision.blockedCells,
+    asciiMask: collision.asciiMask,
+    note: reached
+      ? 'A 4-neighbour path exists through non-colliding tilemap cells.'
+      : 'No 4-neighbour path exists. Check blockedCells/asciiMask for the collision cells preventing movement.',
   };
 };
 
@@ -4511,12 +5754,15 @@ export const applyValidatedScenePatch = (
   validateSceneCanBeUnserialized(project, patchedSerializedScene);
 
   if (args && args.dry_run === true) {
+    const summaryOnly =
+      args && (args.summary_only === true || args.summaryOnly === true);
     return {
       success: true,
       dryRun: true,
       sceneName,
       patchOperations: patch.length,
-      serializedScene: patchedSerializedScene,
+      changedPaths: patch.map(operation => operation.path),
+      serializedScene: summaryOnly ? undefined : patchedSerializedScene,
     };
   }
 
@@ -4547,6 +5793,10 @@ export const applyValidatedScenePatch = (
     dryRun: false,
     sceneName,
     patchOperations: patch.length,
-    serializedScene: serializeToJSObject(scene),
+    changedPaths: patch.map(operation => operation.path),
+    serializedScene:
+      args && (args.summary_only === true || args.summaryOnly === true)
+        ? undefined
+        : serializeToJSObject(scene),
   };
 };

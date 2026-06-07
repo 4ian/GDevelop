@@ -355,6 +355,122 @@ const summarizeEventsFunction = (
   };
 };
 
+const getEventsFunctionSentenceValidation = (
+  parentKind: string,
+  eventsFunction: gdEventsFunction
+): {|
+  valid: boolean,
+  skipped: boolean,
+  missingParameters: Array<string>,
+  nonExpectedParameters: Array<string>,
+  errorMessage?: string,
+|} => {
+  const type = eventsFunction.getFunctionType();
+  if (
+    type !== gd.EventsFunction.Action &&
+    type !== gd.EventsFunction.Condition &&
+    type !== gd.EventsFunction.ExpressionAndCondition
+  ) {
+    return {
+      valid: true,
+      skipped: true,
+      missingParameters: [],
+      nonExpectedParameters: [],
+    };
+  }
+
+  const sentence = eventsFunction.getSentence();
+  if (!sentence) {
+    return {
+      valid: true,
+      skipped: true,
+      missingParameters: [],
+      nonExpectedParameters: [],
+    };
+  }
+
+  const parametersIndexOffset = parentKind === 'extension' ? 1 : 0;
+  const param0isImplicit =
+    parentKind !== 'extension' &&
+    type === gd.EventsFunction.ExpressionAndCondition;
+  const parameters = eventsFunction.getParameters();
+  const parametersCount = parameters.getParametersCount();
+  const missingParameters = [];
+  for (let index = 0; index < parametersCount; index++) {
+    const parameter = parameters.getParameterAt(index);
+    const isBehaviorParameter =
+      parameter.getType() === 'behavior' ||
+      parameter.getValueTypeMetadata().isBehavior();
+
+    if (isBehaviorParameter) {
+      // Behavior parameters are implicit implementation details in sentences.
+      continue;
+    }
+    if (index === 0 && param0isImplicit) {
+      continue;
+    }
+
+    const expectedString = `_PARAM${index + parametersIndexOffset}_`;
+    if (sentence.indexOf(expectedString) === -1) {
+      missingParameters.push(expectedString);
+    }
+  }
+
+  const paramsMatches = sentence.matchAll(/_PARAM(\d+)_/g);
+  const nonExpectedParameters = [];
+  for (const paramsMatch of paramsMatches) {
+    const paramIndex = parseInt(paramsMatch[1], 10);
+    const actualParameterIndex = paramIndex - parametersIndexOffset;
+    if (
+      actualParameterIndex >= parametersCount ||
+      actualParameterIndex < 0
+    ) {
+      nonExpectedParameters.push(paramsMatch[0]);
+    }
+  }
+
+  const valid = !missingParameters.length && !nonExpectedParameters.length;
+  const sentenceErrors = [];
+  if (missingParameters.length) {
+    sentenceErrors.push(
+      `The sentence is probably missing this/these parameter(s): ${missingParameters.join(
+        ', '
+      )}`
+    );
+  }
+  if (nonExpectedParameters.length) {
+    sentenceErrors.push(
+      `The sentence displays one or more wrong parameters: ${nonExpectedParameters.join(
+        ', '
+      )}`
+    );
+  }
+
+  return {
+    valid,
+    skipped: false,
+    missingParameters,
+    nonExpectedParameters,
+    errorMessage: valid ? undefined : sentenceErrors.join(' - '),
+  };
+};
+
+const assertEventsFunctionSentenceIsValid = (
+  parentKind: string,
+  eventsFunction: gdEventsFunction
+) => {
+  const validation = getEventsFunctionSentenceValidation(
+    parentKind,
+    eventsFunction
+  );
+  if (!validation.valid) {
+    throw new Error(
+      `Invalid extension function sentence for "${eventsFunction.getName()}": ${validation.errorMessage ||
+        'Invalid parameter placeholders.'}`
+    );
+  }
+};
+
 const summarizeFunctions = (
   container: gdEventsFunctionsContainer,
   includeEvents: boolean = true
@@ -951,82 +1067,95 @@ export const createOrUpdateExtensionFunction = (
     args.function_name,
     'function_name'
   );
-  const created = !container.hasEventsFunctionNamed(functionName);
-  let eventsFunction = created
-    ? container.insertNewEventsFunction(
-        functionName,
-        container.getEventsFunctionsCount()
-      )
-    : container.getEventsFunction(functionName);
+  const serializedExtensionBefore = serializeToJSObject(extension);
 
-  if (
-    args.serialized_function &&
-    typeof args.serialized_function === 'object'
-  ) {
+  try {
+    const created = !container.hasEventsFunctionNamed(functionName);
+    let eventsFunction = created
+      ? container.insertNewEventsFunction(
+          functionName,
+          container.getEventsFunctionsCount()
+        )
+      : container.getEventsFunction(functionName);
+
+    if (
+      args.serialized_function &&
+      typeof args.serialized_function === 'object'
+    ) {
+      unserializeFromJSObject(
+        eventsFunction,
+        args.serialized_function,
+        'unserializeFrom',
+        project
+      );
+      eventsFunction.setName(functionName);
+    }
+
+    const newFunctionName = normalizeOptionalName(
+      args.new_function_name,
+      'new_function_name'
+    );
+    if (newFunctionName && newFunctionName !== eventsFunction.getName()) {
+      const safeAndUniqueName = getSafeUniqueName(
+        newFunctionName,
+        name => container.hasEventsFunctionNamed(name),
+        eventsFunction.getName()
+      );
+      renameEventsFunction({
+        project,
+        extension,
+        parentKind,
+        parent,
+        eventsFunction,
+        newName: safeAndUniqueName,
+      });
+      eventsFunction = container.getEventsFunction(safeAndUniqueName);
+    }
+
+    const functionType = normalizeFunctionType(args.function_type);
+    if (functionType != null) {
+      eventsFunction.setFunctionType(functionType);
+    }
+    if (parentKind === 'behavior') {
+      gd.WholeProjectRefactorer.ensureBehaviorEventsFunctionsProperParameters(
+        extension,
+        ((parent: any): gdEventsBasedBehavior)
+      );
+    } else if (parentKind === 'object') {
+      gd.WholeProjectRefactorer.ensureObjectEventsFunctionsProperParameters(
+        extension,
+        ((parent: any): gdEventsBasedObject)
+      );
+    }
+
+    applyEventsFunctionFields(project, eventsFunction, args, parsedEventsJson);
+    assertEventsFunctionSentenceIsValid(parentKind, eventsFunction);
+    if (
+      created &&
+      eventsFunction.isCondition() &&
+      !eventsFunction.isExpression()
+    ) {
+      gd.PropertyFunctionGenerator.generateConditionSkeleton(
+        project,
+        eventsFunction
+      );
+    }
+
+    return {
+      success: true,
+      created,
+      parentKind,
+      function: summarizeEventsFunction(eventsFunction, true),
+    };
+  } catch (error) {
     unserializeFromJSObject(
-      eventsFunction,
-      args.serialized_function,
+      extension,
+      serializedExtensionBefore,
       'unserializeFrom',
       project
     );
-    eventsFunction.setName(functionName);
+    throw error;
   }
-
-  const newFunctionName = normalizeOptionalName(
-    args.new_function_name,
-    'new_function_name'
-  );
-  if (newFunctionName && newFunctionName !== eventsFunction.getName()) {
-    const safeAndUniqueName = getSafeUniqueName(
-      newFunctionName,
-      name => container.hasEventsFunctionNamed(name),
-      eventsFunction.getName()
-    );
-    renameEventsFunction({
-      project,
-      extension,
-      parentKind,
-      parent,
-      eventsFunction,
-      newName: safeAndUniqueName,
-    });
-    eventsFunction = container.getEventsFunction(safeAndUniqueName);
-  }
-
-  const functionType = normalizeFunctionType(args.function_type);
-  if (functionType != null) {
-    eventsFunction.setFunctionType(functionType);
-  }
-  if (parentKind === 'behavior') {
-    gd.WholeProjectRefactorer.ensureBehaviorEventsFunctionsProperParameters(
-      extension,
-      ((parent: any): gdEventsBasedBehavior)
-    );
-  } else if (parentKind === 'object') {
-    gd.WholeProjectRefactorer.ensureObjectEventsFunctionsProperParameters(
-      extension,
-      ((parent: any): gdEventsBasedObject)
-    );
-  }
-
-  applyEventsFunctionFields(project, eventsFunction, args, parsedEventsJson);
-  if (
-    created &&
-    eventsFunction.isCondition() &&
-    !eventsFunction.isExpression()
-  ) {
-    gd.PropertyFunctionGenerator.generateConditionSkeleton(
-      project,
-      eventsFunction
-    );
-  }
-
-  return {
-    success: true,
-    created,
-    parentKind,
-    function: summarizeEventsFunction(eventsFunction, true),
-  };
 };
 
 export const deleteExtensionFunction = (

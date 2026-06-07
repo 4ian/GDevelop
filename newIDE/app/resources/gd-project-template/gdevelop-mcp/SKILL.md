@@ -17,6 +17,8 @@ Some GDevelop MCP tools can be deferred and may not be visible in the active too
 
 The fastest way to see what's available is `gdevelop_capabilities` — it returns the core tools grouped by workflow (project state, reading, instruction discovery, creating objects/assets, authoring events, runtime verification, safety/persistence) in ONE call, so you don't need many tool searches. Call it first.
 
+If MCP tools were reloaded or updated during a session, call `gdevelop_refresh_tool_catalog` to resync the current catalog and permission gates before guessing tool names.
+
 Before deciding that a GDevelop MCP tool is unavailable:
 
 1. Check the currently active tool list.
@@ -72,15 +74,22 @@ Read-only context:
 - `read_scene_events_serialized`: raw serialized event JSON for a scene, including event types the text renderer cannot describe. Pass `summary_only:true` for just root event counts/types; the JSON string copy is omitted unless you pass `include_json:true` (keeps responses small).
 - `find_scene_events`: locate events by `event_path`, `ai_generated_event_id`, group name, event type, action type, condition type, parameter text, or serialized text.
 - `compare_scene_events_semantics`: compare two serialized event arrays while ignoring visual Group wrappers and stable IDs.
+- `inspect_gameplay_rules`: higher-level heuristic event checks, such as whether a health bar/nameplate follows an object top or whether a state-machine variable/states are mentioned in events. This is not a proof; still verify runtime behavior.
 - `inspect_project_resources`: resource table audit: name/kind/file, empty or missing files, unused resources, Sprite frame references, true event resource parameters, generic serialized references, and `suspiciousCollisionMasks` (Sprite frames with `hasCustomCollisionMask: true` but an empty `customCollisionMask`, which silently disables collisions).
+- `inspect_resource_images`: image resource dimensions, transparent-pixel bounds, and visible-pixel thickness hints. Use it when a UI/sprite looks missing or too thin.
+- `audit_project_asset_sources`: check whether local resources come from allowed project-relative roots such as `assets`.
+- `compare_image_files`: compare a reference image and current screenshot/render, optionally writing a red diff heatmap for 1:1 remake work.
+- `crop_scene_object_image`: crop and nearest-neighbor zoom a screenshot/render around a scene initial instance by object name, with optional bounds overlay.
 - `inspect_project_cleanup`: read-only cleanup candidates: empty scenes, possibly unused scene objects, invalid resources, unused resources, missing Sprite frame references, and `suspiciousCollisionMasks` (empty custom masks that disable collisions).
 - `describe_instances`: object instances in a scene; use before `put_2d_instances` or `put_3d_instances`.
+- `inspect_scene_draw_order`: static draw order by layer/zOrder with bounds. Use it to debug overlap/visibility before guessing.
 - `inspect_object_properties`: object properties, behaviors, animations, size hints.
 - `inspect_behavior_properties`: behavior details on an object.
 - `list_available_behaviors`: list behavior types available in the project, each with the exact `behaviorType` to pass to `add_behavior` and the `defaultName` used in instruction behavior parameters. Optionally filter by `object_name` (only compatible behaviors) and/or a `search` query. Pass `include_properties:true` to get each behavior TYPE's property schema (name/label/type/default/choices) so you can learn its configurable properties (e.g. DestroyOutside's extra border distance) WITHOUT first adding it to an object. When `object_name` is given, the result also includes `objectBehaviors`: the behaviors already on the object — including hidden capability behaviors — with the exact NAME to use in instruction behavior parameters. The built-in capability behavior names are: Sprite/text → `Text`, animations → `Animation`, effects → `Effect`, opacity → `Opacity`, resize → `Resizable`, scale → `Scale`, flip → `Flippable`.
 - `inspect_scene_properties_layers_effects`: scene properties, layers, effects.
 - `gdevelop_inspect_running_preview`: inspect a currently running preview to verify runtime behavior. Returns whether a preview is running (defaulting to the latest launched preview, reported as `latestDebuggerId`/`inspectedLatest`), its status, captured `logs`, a separate `errors` list (uncaught exceptions, crashes, error-level logs), and a compact `runtime` snapshot: per scene `sceneElapsedTimeSeconds` (game-time since the scene started — NOT debugger/wall-clock; do not infer game speed from MCP latency), per-object live instance counts (from live `_instances`), and scene/global variable values. Pass `instance_positions_for: ["Player"]` to include live instance x/y/angle for specific objects without pulling the raw dump. It also returns `activeSounds` (currently-playing sounds/musics, with loop state — use this to confirm a looping BGM is actually playing, not just that a one-shot fired) and `inputState` (which keys/mouse buttons are currently held, plus mouse position — use this to confirm an injected input is registered). Launch a preview first with `gdevelop_run_command { commandName: "LAUNCH_NEW_PREVIEW" }`.
 - `capture_preview_screenshot`: capture a PNG of the current rendered frame from a running preview, to visually verify sprites, layout, and colors. Captured from the MAIN process (webContents.capturePage) when available, so it works even for a backgrounded preview whose renderer is suspended; falls back to the in-game canvas otherwise. Pass `file_path` to write a PNG (recommended), or omit it to get a base64 data URL. Pass `debugger_id` to target a specific preview; it defaults to the LATEST launched preview so you don't capture a stale game-over window. A screenshot reflects the last RENDERED frame — if the preview never rendered (or you only need layout, not final art), use `render_scene_to_png` instead. Launch a preview first.
+- `preview_health_check`: read preview/debugger channel health and recommended recovery actions before runtime calls when previews look stale or unresponsive. After a non-dry-run write, MCP tool results can include `staleStateAdvisory`; if `previewMayBeStale:true`, close/relaunch previews before trusting runtime checks.
 - `render_scene_to_png`: STATIC layout render to a PNG WITHOUT running the game — Sprite instances composite their REAL first-frame image (scaled to the instance size), while Text/undecodable objects show a labelled colored box; every instance gets a border so placement is clear. The reliable way to verify layout AND rough visuals when a live preview is unavailable (throttled window, or before launching). Returns `spritesComposited`. For an exact animated frame, use `capture_preview_screenshot`.
 - `simulate_preview_input`: inject keyboard/mouse/touch input into a running preview to verify input-driven gameplay (movement, shooting, restart) end-to-end. Pass `inputs: [{ type, ... }]`. Key events use a key name (`"Left"`, `"Space"`, `"a"`) or `key_code`. Press and release are separate events; hold a key by sending `keyPressed` without `keyReleased`. To register a "just pressed" (e.g. restart on ENTER), send only `keyPressed` and let a frame pass (see `control_preview` step) before release. By default the tool reads the runtime input state back and returns it as `inputState`, so you get confirmation the keys/buttons actually registered without a separate inspect call (pass `confirm: false` to skip). After injecting, step a frame and use `gdevelop_inspect_running_preview` / `capture_preview_screenshot` to confirm the gameplay effect.
 - `control_preview`: deterministically control a running preview — `action: "pause" | "play" | "step" | "close" | "focus"`. `step` advances exactly `frames` frames (with `frame_delta_ms` simulated time each) while paused, making runtime tests reproducible regardless of how long MCP round-trips take. `close` (with `close_all:true`) stops running previews — do this before relaunching so later screenshots/sound checks don't hit a stale window. `focus` brings the preview window(s) to the front and tries to un-throttle them — but the OS may still keep a window occluded, so focus is best-effort. Requests target the chosen `debugger_id` (default latest). The canonical deterministic test loop: pause → simulate_preview_input / set_runtime_state → step N frames → inspect.
@@ -140,11 +149,19 @@ Write tools:
 - `apply_validated_scene_patch`: apply focused scene JSON patch; for large patches use `patch_file`.
 - `create_or_update_plan`: store/update an AI orchestration plan when the task needs one.
 
+Recent high-level helpers:
+
+- `bind_sprite_animations_from_directory`: scan a unit asset directory (for example `Idle/Run/Attack` subfolders), register image resources, and bind them as Sprite animations with loop/frame timing.
+- `inspect_tilemap_palette` / `set_tilemap_collision_tiles` / `inspect_tilemap_collision` / `check_tilemap_walkability`: inspect tile IDs, mark collision tile IDs, read blocked cells/ascii masks, and run grid walkability checks.
+- `patch_scene_event_instruction`: patch one action/condition by stable event id/path plus instruction type/object name, avoiding brittle raw `/events/.../actions/...` JSON pointers.
+- `attach_object_to_object_top`: add a standard event that keeps a follower object (health bar/nameplate) centered above a target object's top.
+- `apply_validated_scene_patch` supports `summary_only:true` to return changed paths and validation summary without echoing the full serialized scene.
+
 Extension write tools:
 
 - `gdevelop_create_or_update_extension`: create/update extension metadata. Supports `extension_name`, optional `new_extension_name`, `namespace`, `full_name`, `short_description`, `description`, `version`, `category`, `dimension`, `help_path`, `icon_url`, `preview_icon_url`, `tags`, and advanced `serialized_extension`.
 - `gdevelop_delete_extension`: delete a project-specific extension.
-- `gdevelop_create_or_update_extension_function`: create/update a free, behavior, or object function. Supports `parent_kind` (`extension`, `behavior`, `object`), `parent_name`, `function_type`, `full_name`, `description`, `sentence`, `help_url`, privacy/async/deprecated flags, `parameters`, `expression_type`, `events_json`, and advanced `serialized_function`.
+- `gdevelop_create_or_update_extension_function`: create/update a free, behavior, or object function. Supports `parent_kind` (`extension`, `behavior`, `object`), `parent_name`, `function_type`, `full_name`, `description`, `sentence`, `help_url`, privacy/async/deprecated flags, `parameters`, `expression_type`, `events_json`, and advanced `serialized_function`. It validates `events_json` and non-empty action/condition sentences before keeping the write; invalid sentence placeholders roll back metadata and events.
 - `gdevelop_delete_extension_function`: delete a free, behavior, or object function.
 - `gdevelop_create_or_update_extension_behavior`: create/update an events-based behavior. Supports `behavior_name`, optional rename, display metadata, `object_type`, privacy, icons, and advanced `serialized_behavior`.
 - `gdevelop_delete_extension_behavior`: delete an events-based behavior.
@@ -178,6 +195,32 @@ Prompts:
 - `fix-scene-events`
 - `layout-scene`
 - `refactor-gameplay`
+
+## Known Gaps And Inconveniences
+
+These are current GDevelop MCP limitations observed during real project work. Treat them as design constraints when planning edits, and mention the relevant limitation to the user when it affects confidence or verification.
+
+1. Tool discovery is improved but not fully automatic. `gdevelop_refresh_tool_catalog`, `gdevelop_capabilities`, `tool_search`, and schema introspection reduce guessing, but a client may still need an explicit refresh/search after MCP tools are reloaded or deferred.
+2. Tilemap authoring is still data-oriented. `inspect_tilemap_palette`, `set_tilemap_tiles`, and `get_tilemap_tiles` help, but there is no editor-like visual brush, reference-image overlay, lasso selection, tile picker UI, or interactive fill preview.
+3. Tilemap collision editing is tile-id based. `set_tilemap_collision_tiles`, `inspect_tilemap_collision`, and `check_tilemap_walkability` cover common solid-tile workflows, but there is no full visual collision painter, arbitrary per-cell polygon editor, or live collision-layer overlay in the editor.
+4. Collision debugging is not a full runtime overlay. Resource audits, sprite collision mask checks, draw-order inspection, screenshots, and walkability checks help diagnose issues, but MCP still cannot reliably render every live object and tilemap collision mask over a preview frame.
+5. Walkability checks are grid/path heuristics. They are useful for tilemap blocked-cell mistakes, but they do not prove full runtime movement with object hitboxes, acceleration, platformer physics, moving blockers, z-order changes, or behavior-specific collision rules.
+6. Visual remake comparison is file-based. `compare_image_files`, `crop_scene_object_image`, `render_scene_to_png`, and preview screenshots help with 1:1 work, but MCP does not yet automatically align a reference image to the game camera, scale, crop, and parallax layers without manual inputs.
+7. Static rendering is approximate. `render_scene_to_png` is valuable for layout checks, but it is not a pixel-perfect substitute for the running game; effects, shaders, particles, animations, runtime-created objects, text rendering differences, and custom object renderers may diverge.
+8. Preview health can still be split-brain. Non-dry-run write results include `staleStateAdvisory` when MCP can detect running previews or affected editor panels, and `preview_health_check`, `run_frames`, `control_preview`, and main-process screenshots mitigate stale previews and debugger timeouts. Still close/relaunch previews when runtime evidence looks inconsistent.
+9. Focused screenshots are limited by available instance data. `crop_scene_object_image` can zoom a screenshot/render around known scene instances, but it is not yet a universal live-runtime crop-by-instance-id tool with labels, collision boxes, origins, and animation frame metadata.
+10. Event editing is safer but not fully semantic. Stable event ids, `find_scene_events`, `patch_scene_event_instruction`, and `event_changes` reduce brittle JSON paths, but complex restructuring can still require serialized event JSON and careful read-back.
+11. Event validation is mostly structural and metadata-driven. `gdevelop_validate_events_json` and `lint_scene_events` catch many bad event shapes and common mistakes, but they cannot prove intent such as "the health bar always follows the enemy top" or "this state machine is logically complete" without runtime tests.
+12. Gameplay rule checks are heuristic. `inspect_gameplay_rules` can flag likely missing follow/state-machine wiring, but it is not a verifier for all gameplay behavior and should not replace preview inspection, screenshots, or deterministic `run_frames` tests.
+13. Image resource inspection cannot infer artistic intent. `inspect_resource_images` reports dimensions and transparent-pixel bounds, but it cannot decide the correct anchor, hitbox, scale, UI padding, or whether a sprite was visually modified from the original source.
+14. Animation binding from directories is heuristic. `bind_sprite_animations_from_directory` works well for common `Idle`/`Run`/`Attack` folder layouts, but unusual naming, directional sheets, per-animation origins, frame-specific hitboxes, and transition/state events still need manual authoring.
+15. Attachment helpers cover common cases only. `attach_object_to_object_top` avoids hand-written top-center formulas for health bars/nameplates, but MCP does not yet expose a general constraint/anchor system for arbitrary UI attachments, multiple targets, camera-relative HUD elements, or responsive layout rules.
+16. State machines lack declarative authoring. Enemies, AI, and combat states are still usually built with object variables and standard events. There is no high-level MCP state-machine tool that declares states, transitions, actions, and debug overlays in one schema.
+17. Asset-source compliance is path-based. `audit_project_asset_sources` checks local resource paths against allowed roots, but it does not cryptographically prove that assets are original, unmodified, or license-compliant.
+18. Parameter schemas still require attention. Many tools accept both old and new naming conventions or advanced serialized payloads for compatibility. Prefer introspection (`inspect_tool_schema`, `get_tool_usage_examples`) and exact metadata over guessing `sceneName` vs `scene_name` or object parameter order.
+19. Transactions are explicit, not automatic. `snapshot_project` and rollback helpers exist, and some focused writes roll back internally, but multi-step workflows still need intentional checkpoints and read-back. There is no universal "show diff then confirm save" transaction layer for every MCP batch.
+20. Draw-order inspection is mostly static. `inspect_scene_draw_order` helps with initial layout, layers, and z-order, but runtime z-order changes, hidden objects, created instances, effects, masks, and camera/layer transforms still need preview verification.
+21. Extension function validation is not full semantic compilation. MCP now validates `events_json` and sentence placeholders for extension functions, but it does not yet prove that the function body uses every parameter correctly, that generated code compiles, or that behavior/object methods are semantically correct in every caller context.
 
 ## Permissions
 
@@ -216,6 +259,12 @@ Hard requirement: unless the user explicitly requests JavaScript, implement busi
 17. Run `lint_scene_events`. If it reports ungrouped root events or JavaScript events, fix them before finishing.
 18. If object/variable/resource references were created or expected, read the relevant object/variable/scene/resource summary too.
 
+Write results may include `staleStateAdvisory`. Treat it as part of verification:
+
+- If `previewMayBeStale:true`, any preview that was already open was running old project code/data. Run `control_preview { action: "close", close_all: true }`, relaunch with `launch_preview { start_paused: true }` when deterministic verification matters, then inspect/screenshot the new preview.
+- If `editorPanelsMayBeStale` mentions `scene-events`, `extension-function`, or `scene`, read back through MCP and be skeptical of already-open editor tabs until they visibly refresh. If the panel still shows old data, switch away/back or reopen it.
+- Do not report runtime or visual verification based on a preview or editor panel that `staleStateAdvisory` says may be stale.
+
 Never use `add_scene_events` with a natural language description expecting server-side generation. MCP direct event writing does not call the GDevelop AI event generation service. Always pass `events_json` or `event_changes`.
 
 ### Event-write paths (capability differences)
@@ -249,7 +298,14 @@ Variable expression syntax (see `gdevelop_get_events_json_examples` → `variabl
 
 The field `isRelevantForSceneEvents` (from `gdevelop_get_instruction_metadata`) maps to GDevelop's `isRelevantForLayoutEvents()`. A value of false does NOT mean the instruction is unusable in scene events; object-variable instructions (`ModVarObjet` / `VarObjet`) report false yet work in scene events.
 
-For extension function event bodies, use the same event JSON shape and metadata workflow. `gdevelop_create_or_update_extension_function` validates `events_json` before replacing the function's event list. Invalid function event JSON must be fixed before retrying.
+For extension function event bodies, use the same event JSON shape and metadata workflow. `gdevelop_create_or_update_extension_function` validates `events_json` before replacing the function's event list and validates non-empty action/condition sentences against the final parameter list. Invalid function event JSON or sentence placeholders must be fixed before retrying; failed writes are rolled back.
+
+Extension function sentence parameter indexes:
+
+- Free functions reserve `_PARAM0_` for the hidden scene parameter. The first user parameter is `_PARAM1_`, the second is `_PARAM2_`, and so on.
+- Behavior functions automatically insert object and behavior parameters first. The object is `_PARAM0_`; the behavior parameter is implicit and usually not written in the sentence; custom parameters start after these automatic parameters (usually `_PARAM2_`).
+- Object functions automatically insert the object parameter first. The object is `_PARAM0_`; custom parameters usually start at `_PARAM1_`.
+- If MCP returns a sentence error listing missing or wrong `_PARAMx_` values, correct the `sentence` or parameter list and retry. Do not ignore the error by writing events separately.
 
 ## Event JSON Shape
 
@@ -444,22 +500,23 @@ Add an extension free function:
 
 1. `gdevelop_inspect_extension`.
 2. Decide exact `function_type`: `action`, `condition`, `expression`, `expression_and_condition`, or `action_with_operator`.
-3. If adding events, search instruction metadata and draft valid `events_json`.
-4. Call `gdevelop_create_or_update_extension_function` with `parent_kind: "extension"`.
-5. `gdevelop_inspect_extension_function`.
+3. Draft the `sentence` with `_PARAM1_` for the first user parameter (`_PARAM0_` is hidden scene context).
+4. If adding events, search instruction metadata and draft valid `events_json`.
+5. Call `gdevelop_create_or_update_extension_function` with `parent_kind: "extension"`.
+6. `gdevelop_inspect_extension_function`.
 
 Add a behavior method:
 
 1. `gdevelop_inspect_extension_behavior`.
 2. Call `gdevelop_create_or_update_extension_function` with `parent_kind: "behavior"` and `parent_name`.
-3. Remember GDevelop inserts mandatory behavior parameters first: usually object and behavior parameters. Custom parameters follow them, so `_PARAM0_` and `_PARAM1_` may already be reserved in the sentence.
+3. Remember GDevelop inserts mandatory behavior parameters first: object is `_PARAM0_`, behavior is implicit, and custom parameters usually start at `_PARAM2_`.
 4. `gdevelop_inspect_extension_function`.
 
 Add an object method:
 
 1. `gdevelop_inspect_extension_object`.
 2. Call `gdevelop_create_or_update_extension_function` with `parent_kind: "object"` and `parent_name`.
-3. Remember GDevelop inserts mandatory object parameters first. Custom parameters follow them.
+3. Remember GDevelop inserts the mandatory object parameter first: object is `_PARAM0_`, and custom parameters usually start at `_PARAM1_`.
 4. `gdevelop_inspect_extension_function`.
 
 Add a behavior/object property:
@@ -629,6 +686,7 @@ Before claiming completion:
 - Creating many resources/objects/instances one by one for initial setup. Fix: use `bulk_edit_scene_assets` unless stepwise validation is needed.
 - Hand-writing serialized Sprite/Text object JSON for simple objects. Fix: use `create_sprite_object_from_resource` or `create_text_object`.
 - Treating preview launch as runtime verification. Fix: after launching, call `gdevelop_inspect_running_preview` (live counts, variables, `errors`) and `capture_preview_screenshot` (visual check), and report that evidence; a launched preview alone is not a passed smoke test.
+- Ignoring `staleStateAdvisory` after a write. Fix: if it says `previewMayBeStale:true`, close/relaunch previews before runtime verification; if it lists editor panels, read back through MCP and refresh/reopen stale panels before trusting the UI.
 - Inspecting a stale preview after relaunching. Fix: `gdevelop_inspect_running_preview` and `capture_preview_screenshot` default to the latest preview; if needed target one via `debugger_id`, or `control_preview { action:"close", close_all:true }` before relaunching to remove stale windows entirely.
 - A 2nd+ preview window whose `gdevelop_inspect_running_preview` / `capture_preview_screenshot` / `control_preview step` time out (`runtime` unavailable). Cause: the OS suspended the backgrounded/occluded window's renderer. Mitigations now in place: a power-save blocker keeps the app's event loop alive while a preview is open, and screenshots are taken from the main process — so `run_frames` and `gdevelop_inspect_running_preview` should keep working. If a specific window is still unresponsive, `control_preview { action:"focus" }`, or `close_all` and relaunch a single preview. For layout-only checks, `render_scene_to_png` never needs a running preview.
 - Quoting a resource-name parameter. Fix: sound/music/image/font resource parameters take a BARE name (`Shoot`), not `"Shoot"`; check the param's `literalSyntax`.
@@ -651,5 +709,5 @@ Before claiming completion:
 - Forgetting that events without conditions run every frame. Fix: add conditions such as `SceneJustBegins` or a trigger condition when appropriate.
 - Adding object-specific events before the object exists. Fix: create/inspect object first.
 - Editing extension functions without checking parent kind. Fix: pass `parent_kind` and `parent_name` for behavior/object methods.
-- Writing behavior/object function sentences with wrong `_PARAMx_` indexes. Fix: inspect the function after creation and account for mandatory inserted parameters.
+- Writing extension function sentences with wrong `_PARAMx_` indexes. Fix: free functions start user parameters at `_PARAM1_`; behavior/object functions account for automatic object/behavior parameters. MCP rejects missing/wrong placeholders and rolls the write back.
 - Using `is_shared` for object properties. Fix: only behavior properties can be shared.

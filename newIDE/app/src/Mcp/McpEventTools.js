@@ -1301,6 +1301,355 @@ export const replaceSceneEventsFromFile = (
   };
 };
 
+const collectInstructionReferences = (
+  instructionsList: gdInstructionsList,
+  path: Array<number> = []
+): Array<{| instruction: gdInstruction, path: Array<number> |}> => {
+  const references = [];
+  for (let index = 0; index < instructionsList.size(); index++) {
+    const instruction = instructionsList.get(index);
+    const instructionPath = [...path, index];
+    references.push({ instruction, path: instructionPath });
+    const subInstructions = instruction.getSubInstructions
+      ? instruction.getSubInstructions()
+      : null;
+    if (subInstructions && subInstructions.size()) {
+      references.push(
+        ...collectInstructionReferences(subInstructions, instructionPath)
+      );
+    }
+  }
+  return references;
+};
+
+const getPatchableInstructionLists = (
+  event: gdBaseEvent,
+  instructionKind: string
+): Array<gdInstructionsList> => {
+  const eventType = event.getType();
+  const wantsAction = instructionKind === 'action' || instructionKind === 'actions';
+  const wantsCondition =
+    instructionKind === 'condition' || instructionKind === 'conditions';
+  if (eventType === 'BuiltinCommonInstructions::Standard') {
+    const standard = gd.asStandardEvent(event);
+    if (wantsAction) return [standard.getActions()];
+    if (wantsCondition) return [standard.getConditions()];
+  }
+  if (eventType === 'BuiltinCommonInstructions::While') {
+    const whileEvent = gd.asWhileEvent(event);
+    if (wantsAction) return [whileEvent.getActions()];
+    if (wantsCondition)
+      return [whileEvent.getWhileConditions(), whileEvent.getConditions()];
+  }
+  return [];
+};
+
+const instructionContainsParameter = (
+  instruction: gdInstruction,
+  expected: string
+): boolean => {
+  for (let index = 0; index < instruction.getParametersCount(); index++) {
+    if (instruction.getParameter(index).getPlainString() === expected) {
+      return true;
+    }
+  }
+  return false;
+};
+
+export const patchSceneEventInstruction = (
+  project: gdProject,
+  args: Object,
+  callbacks: EventToolCallbacks = ({}: any)
+): Object => {
+  const sceneName = getRequiredString(args, 'scene_name');
+  const instructionKind =
+    getOptionalString(args, 'instruction_kind') ||
+    getOptionalString(args, 'instructionKind') ||
+    'action';
+  const instructionType =
+    getOptionalString(args, 'instruction_type') ||
+    getOptionalString(args, 'instructionType');
+  if (!instructionType) {
+    throw new Error('Missing instruction_type.');
+  }
+  const replacementParameters = Array.isArray(args.parameters)
+    ? args.parameters.map(parameter => String(parameter))
+    : null;
+  if (!replacementParameters) {
+    throw new Error('Missing parameters array.');
+  }
+
+  const scene = getScene(project, sceneName);
+  const eventReference = getSingleEventReference(
+    scene.getEvents(),
+    args.event || args.event_id || args.eventId || args,
+    'event'
+  );
+  const objectName =
+    getOptionalString(args, 'object_name') || getOptionalString(args, 'objectName');
+  const instructionLists = getPatchableInstructionLists(
+    eventReference.event,
+    instructionKind
+  );
+  const matches = [];
+  instructionLists.forEach(list => {
+    collectInstructionReferences(list).forEach(reference => {
+      const instruction = reference.instruction;
+      if (instruction.getType() !== instructionType) return;
+      if (objectName && !instructionContainsParameter(instruction, objectName))
+        return;
+      matches.push(reference);
+    });
+  });
+
+  if (!matches.length) {
+    throw new Error(
+      `No ${instructionKind} instruction "${instructionType}" matched the event target.`
+    );
+  }
+  if (matches.length > 1) {
+    throw new Error(
+      `Ambiguous instruction target: ${matches.length} instructions matched. Add object_name or narrow the event target.`
+    );
+  }
+
+  const target = matches[0].instruction;
+  const beforeParameters = [];
+  for (let index = 0; index < target.getParametersCount(); index++) {
+    beforeParameters.push(target.getParameter(index).getPlainString());
+  }
+  target.setParametersCount(replacementParameters.length);
+  replacementParameters.forEach((parameter, index) => {
+    target.setParameter(index, parameter);
+  });
+  notifyEventsChanged(scene, callbacks);
+
+  const result = {
+    success: true,
+    sceneName,
+    eventPath: formatEventPath(eventReference.path),
+    aiGeneratedEventId: eventReference.event.getAiGeneratedEventId() || null,
+    instructionKind,
+    instructionType,
+    instructionPath: matches[0].path,
+    before: {
+      type: target.getType(),
+      parameters: beforeParameters,
+    },
+    after: {
+      type: target.getType(),
+      parameters: replacementParameters,
+    },
+  };
+
+  if (args && (args.summary_only === true || args.summaryOnly === true)) {
+    return result;
+  }
+
+  return {
+    ...result,
+    serializedEvents: serializeToJSObject(scene.getEvents()),
+    eventsAsText: renderNonTranslatedEventsAsText({
+      eventsList: scene.getEvents(),
+    }),
+  };
+};
+
+const formatSignedExpressionOffset = (offset: number): string => {
+  if (!Number.isFinite(offset) || offset === 0) return '';
+  return offset > 0 ? `+${offset}` : String(offset);
+};
+
+export const attachObjectToObjectTop = (
+  project: gdProject,
+  args: Object,
+  callbacks: EventToolCallbacks = ({}: any)
+): Object => {
+  const sceneName = getRequiredString(args, 'scene_name');
+  const followerName =
+    getOptionalString(args, 'follower_object_name') ||
+    getOptionalString(args, 'followerObjectName') ||
+    getOptionalString(args, 'ui_object_name') ||
+    getOptionalString(args, 'uiObjectName');
+  const targetName =
+    getOptionalString(args, 'target_object_name') ||
+    getOptionalString(args, 'targetObjectName');
+  if (!followerName) throw new Error('Missing follower_object_name.');
+  if (!targetName) throw new Error('Missing target_object_name.');
+  const xOffset =
+    typeof args.x_offset === 'number' && Number.isFinite(args.x_offset)
+      ? args.x_offset
+      : typeof args.xOffset === 'number' && Number.isFinite(args.xOffset)
+      ? args.xOffset
+      : 0;
+  const yOffset =
+    typeof args.y_offset === 'number' && Number.isFinite(args.y_offset)
+      ? args.y_offset
+      : typeof args.yOffset === 'number' && Number.isFinite(args.yOffset)
+      ? args.yOffset
+      : 0;
+  const scene = getScene(project, sceneName);
+  const insertIndex =
+    typeof args.insert_index === 'number' && Number.isFinite(args.insert_index)
+      ? Math.max(0, Math.min(scene.getEvents().getEventsCount(), args.insert_index))
+      : scene.getEvents().getEventsCount();
+  const eventId =
+    getOptionalString(args, 'ai_generated_event_id') ||
+    getOptionalString(args, 'aiGeneratedEventId') ||
+    getOptionalString(args, 'event_id') ||
+    `${followerName}-follow-${targetName}-top`;
+  const xExpression = `${targetName}.CenterX()-${followerName}.Width()/2${formatSignedExpressionOffset(
+    xOffset
+  )}`;
+  const yExpression = `${targetName}.Y()-${followerName}.Height()${formatSignedExpressionOffset(
+    yOffset
+  )}`;
+  const event = gd.asStandardEvent(
+    scene
+      .getEvents()
+      .insertNewEvent(project, 'BuiltinCommonInstructions::Standard', insertIndex)
+  );
+  event.setAiGeneratedEventId(eventId);
+  const addAction = (type, parameters) => {
+    const instruction = new gd.Instruction();
+    instruction.setType(type);
+    instruction.setParametersCount(parameters.length);
+    parameters.forEach((parameter, index) => {
+      instruction.setParameter(index, parameter);
+    });
+    event.getActions().insert(instruction, event.getActions().size());
+    instruction.delete();
+  };
+  const actions = [
+    { type: 'MettreX', parameters: [followerName, '=', xExpression] },
+    { type: 'MettreY', parameters: [followerName, '=', yExpression] },
+  ];
+  actions.forEach(action => addAction(action.type, action.parameters));
+  notifyEventsChanged(scene, callbacks);
+
+  return {
+    success: true,
+    sceneName,
+    followerObjectName: followerName,
+    targetObjectName: targetName,
+    eventPath: formatEventPath([insertIndex]),
+    aiGeneratedEventId: eventId,
+    expressions: {
+      x: xExpression,
+      y: yExpression,
+    },
+    actions,
+    note:
+      'Added a standard event that centers the follower object horizontally above the target top each frame.',
+  };
+};
+
+export const inspectGameplayRules = (
+  project: gdProject,
+  args: Object
+): Object => {
+  const sceneName = getRequiredString(args, 'scene_name');
+  const scene = getScene(project, sceneName);
+  const serializedEvents = serializeToJSObject(scene.getEvents());
+  const serializedText = JSON.stringify(serializedEvents);
+  const issues = [];
+  const checks = [];
+  const topAttachments = Array.isArray(args.top_attachments)
+    ? args.top_attachments
+    : Array.isArray(args.topAttachments)
+    ? args.topAttachments
+    : [];
+  topAttachments.forEach((attachment, index) => {
+    const follower =
+      attachment &&
+      (attachment.follower_object_name ||
+        attachment.followerObjectName ||
+        attachment.ui_object_name ||
+        attachment.uiObjectName);
+    const target =
+      attachment &&
+      (attachment.target_object_name || attachment.targetObjectName);
+    const hasX =
+      follower &&
+      target &&
+      serializedText.includes('MettreX') &&
+      serializedText.includes(follower) &&
+      serializedText.includes(`${target}.CenterX()`);
+    const hasY =
+      follower &&
+      target &&
+      serializedText.includes('MettreY') &&
+      serializedText.includes(follower) &&
+      serializedText.includes(`${target}.Y()`);
+    const ok = !!(hasX && hasY);
+    checks.push({
+      kind: 'top_attachment',
+      index,
+      followerObjectName: follower,
+      targetObjectName: target,
+      ok,
+      hasX,
+      hasY,
+    });
+    if (!ok) {
+      issues.push({
+        severity: 'warning',
+        rule: 'top_attachment',
+        index,
+        message:
+          'Expected X/Y follow actions were not both found. Use attach_object_to_object_top or inspect the event formulas.',
+      });
+    }
+  });
+
+  const stateMachines = Array.isArray(args.state_machines)
+    ? args.state_machines
+    : Array.isArray(args.stateMachines)
+    ? args.stateMachines
+    : [];
+  stateMachines.forEach((machine, index) => {
+    const objectName = machine && (machine.object_name || machine.objectName);
+    const variableName =
+      machine && (machine.variable_name || machine.variableName || 'State');
+    const states = Array.isArray(machine && machine.states)
+      ? machine.states.map(String)
+      : [];
+    const mentionedStates = states.filter(state => serializedText.includes(state));
+    const variableMentioned =
+      serializedText.includes(variableName) &&
+      (!objectName || serializedText.includes(objectName));
+    const ok = variableMentioned && (!states.length || mentionedStates.length > 0);
+    checks.push({
+      kind: 'state_machine',
+      index,
+      objectName,
+      variableName,
+      states,
+      mentionedStates,
+      ok,
+    });
+    if (!ok) {
+      issues.push({
+        severity: 'warning',
+        rule: 'state_machine',
+        index,
+        message:
+          'The requested state machine variable/states were not found in scene events. This is a semantic heuristic; inspect events before relying on the behavior.',
+      });
+    }
+  });
+
+  return {
+    success: true,
+    sceneName,
+    checks,
+    issues,
+    ok: issues.length === 0,
+    note:
+      'Gameplay rule checks are semantic heuristics over event instructions. They catch likely missing follow/state-machine wiring, but runtime behavior still needs preview verification.',
+  };
+};
+
 const normalizeEventForSemanticComparison = (event: any): Array<any> => {
   if (!event || typeof event !== 'object') return [event];
   if (event.type === 'BuiltinCommonInstructions::Group') {

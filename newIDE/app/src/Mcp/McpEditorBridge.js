@@ -56,6 +56,11 @@ import {
   renderSceneToPng,
   inspectProjectCleanup,
   inspectProjectResources,
+  inspectResourceImages,
+  auditProjectAssetSources,
+  compareImageFiles,
+  cropSceneObjectImage,
+  inspectSceneDrawOrder,
   listAvailableBehaviors,
   putStructured2dInstances,
   readSceneEventsSerialized,
@@ -65,17 +70,25 @@ import {
   setTextObjectProperties,
   setSpriteAnimations,
   sliceSpriteSheet,
+  bindSpriteAnimationsFromDirectory,
   createTilemapObject,
   setTilemapTiles,
   getTilemapTiles,
+  inspectTilemapPalette,
+  setTilemapCollisionTiles,
+  inspectTilemapCollision,
+  checkTilemapWalkability,
 } from './McpSceneTools';
 import {
+  attachObjectToObjectTop,
   compareSceneEventsSemantics,
   createGroup,
   ensureSceneEventIds,
   findSceneEvents,
+  inspectGameplayRules,
   lintSceneEvents,
   moveEventsToGroup,
+  patchSceneEventInstruction,
   renameGroup,
   replaceSceneEventsFromFile,
   wrapEventsInGroup,
@@ -1154,6 +1167,238 @@ const requireRunningPreview = (
   return { ok: true, targetId, previewIds };
 };
 
+const previewHealthCheck = (previewDebuggerServer: ?Object): Object => {
+  if (!previewDebuggerServer) {
+    return {
+      success: true,
+      running: false,
+      serverState: 'unavailable',
+      availableDebuggerIds: [],
+      recommendedActions: ['launch_preview'],
+      note: 'No preview debugger server is available in this editor build.',
+    };
+  }
+  const serverState =
+    typeof previewDebuggerServer.getServerState === 'function'
+      ? previewDebuggerServer.getServerState()
+      : 'unknown';
+  const previewIds =
+    serverState === 'started'
+      ? (typeof previewDebuggerServer.getExistingPreviewDebuggerIds ===
+        'function'
+          ? previewDebuggerServer.getExistingPreviewDebuggerIds()
+          : previewDebuggerServer.getExistingDebuggerIds()) || []
+      : [];
+  const running = serverState === 'started' && previewIds.length > 0;
+  const recommendedActions = running
+    ? [
+        'gdevelop_inspect_running_preview',
+        'run_frames',
+        'capture_preview_screenshot',
+      ]
+    : ['launch_preview'];
+  return {
+    success: true,
+    running,
+    serverState,
+    availableDebuggerIds: previewIds,
+    latestDebuggerId: previewIds.length ? previewIds[previewIds.length - 1] : null,
+    recommendedActions,
+    recovery:
+      running && previewIds.length > 1
+        ? [
+            'control_preview { action: "close", close_all: true }',
+            'launch_preview { start_paused: true }',
+          ]
+        : [
+            'launch_preview { start_paused: true }',
+            'control_preview { action: "focus" }',
+          ],
+    note:
+      'Use this before screenshots/runtime tests when the debugger channel looks stale. For a connected-but-unresponsive preview, close all previews and relaunch a single paused preview.',
+  };
+};
+
+const getPreviewDebuggerIds = (previewDebuggerServer: ?Object): Array<string> => {
+  if (
+    !previewDebuggerServer ||
+    typeof previewDebuggerServer.getServerState !== 'function' ||
+    previewDebuggerServer.getServerState() !== 'started'
+  ) {
+    return [];
+  }
+
+  if (
+    typeof previewDebuggerServer.getExistingPreviewDebuggerIds === 'function'
+  ) {
+    return previewDebuggerServer.getExistingPreviewDebuggerIds() || [];
+  }
+  if (typeof previewDebuggerServer.getExistingDebuggerIds === 'function') {
+    return previewDebuggerServer.getExistingDebuggerIds() || [];
+  }
+  return [];
+};
+
+const getStringArg = (args: ?Object, names: Array<string>): ?string => {
+  if (!args) return null;
+  for (const name of names) {
+    if (typeof args[name] === 'string' && args[name]) return args[name];
+  }
+  return null;
+};
+
+const getStaleStateTargetForTool = (
+  toolName: string,
+  args: ?Object,
+  result?: ?Object
+): Object => {
+  const sceneName =
+    getStringArg(args, ['scene_name', 'sceneName']) ||
+    (result && typeof result.sceneName === 'string' ? result.sceneName : null);
+
+  if (
+    toolName === 'add_scene_events' ||
+    toolName === 'generate_events' ||
+    toolName === 'replace_scene_events_from_file' ||
+    toolName === 'create_group' ||
+    toolName === 'wrap_events_in_group' ||
+    toolName === 'move_events_to_group' ||
+    toolName === 'rename_group' ||
+    toolName === 'ensure_scene_event_ids' ||
+    toolName === 'patch_scene_event_instruction' ||
+    toolName === 'attach_object_to_object_top'
+  ) {
+    return {
+      kind: 'scene-events',
+      sceneName,
+    };
+  }
+
+  if (toolName === 'gdevelop_create_or_update_extension_function') {
+    const parentKind =
+      (result && typeof result.parentKind === 'string'
+        ? result.parentKind
+        : getStringArg(args, ['parent_kind', 'parentKind'])) || 'extension';
+    return {
+      kind: 'extension-function',
+      extensionName: getStringArg(args, ['extension_name', 'extensionName']),
+      parentKind,
+      parentName:
+        parentKind === 'extension'
+          ? null
+          : getStringArg(args, ['parent_name', 'parentName']),
+      functionName:
+        result &&
+        result.function &&
+        typeof result.function.name === 'string'
+          ? result.function.name
+          : getStringArg(args, [
+              'new_function_name',
+              'newFunctionName',
+              'function_name',
+              'functionName',
+            ]),
+    };
+  }
+
+  if (toolName === 'gdevelop_delete_extension_function') {
+    return {
+      kind: 'extension-function',
+      extensionName: getStringArg(args, ['extension_name', 'extensionName']),
+      parentKind:
+        getStringArg(args, ['parent_kind', 'parentKind']) || 'extension',
+      parentName: getStringArg(args, ['parent_name', 'parentName']),
+      functionName: getStringArg(args, ['function_name', 'functionName']),
+    };
+  }
+
+  if (sceneName) {
+    return {
+      kind: 'scene',
+      sceneName,
+    };
+  }
+
+  return { kind: 'project' };
+};
+
+const buildStaleStateAdvisory = (
+  context: McpEditorBridgeContext,
+  target: Object
+): Object => {
+  const previewDebuggerServer = context.getPreviewDebuggerServer
+    ? context.getPreviewDebuggerServer()
+    : null;
+  const previewIds = getPreviewDebuggerIds(previewDebuggerServer);
+  const previewMayBeStale = previewIds.length > 0;
+  const editorPanelsMayBeStale = [];
+
+  if (target.kind === 'scene-events') {
+    editorPanelsMayBeStale.push({
+      kind: 'scene-events',
+      sceneName: target.sceneName || null,
+      reason:
+        'Scene events were modified through MCP. Open event-sheet panels are notified, but if the UI still shows old rows, switch tabs or reopen the scene before trusting it.',
+    });
+  } else if (target.kind === 'extension-function') {
+    editorPanelsMayBeStale.push({
+      kind: 'extension-function',
+      extensionName: target.extensionName || null,
+      parentKind: target.parentKind || 'extension',
+      parentName: target.parentName || null,
+      functionName: target.functionName || null,
+      reason:
+        'An extension function was modified through MCP. If its function/events editor is already open and still shows old data, switch away/back or reopen the extension editor before trusting it.',
+    });
+  } else if (target.kind === 'scene') {
+    editorPanelsMayBeStale.push({
+      kind: 'scene',
+      sceneName: target.sceneName || null,
+      reason:
+        'Scene data was modified through MCP. If the layout/object panels still show old data, switch tabs or reopen the scene before trusting them.',
+    });
+  }
+
+  return {
+    projectStateChanged: true,
+    target,
+    previewMayBeStale,
+    runningPreviewDebuggerIds: previewIds,
+    latestDebuggerId: previewIds.length
+      ? previewIds[previewIds.length - 1]
+      : null,
+    recommendedActions: previewMayBeStale
+      ? [
+          'control_preview { action: "close", close_all: true }',
+          'launch_preview { start_paused: true }',
+          'run runtime checks/screenshots only after relaunching the preview',
+        ]
+      : [],
+    editorPanelsMayBeStale,
+    message: previewMayBeStale
+      ? 'The project changed while one or more previews were running. Existing previews do not automatically reload changed events/resources; close and relaunch before final runtime verification.'
+      : 'The project changed through MCP. No running preview was detected, but already-open editor panels can still need a refresh if they show old state.',
+  };
+};
+
+const withStaleStateAdvisory = (
+  payload: any,
+  context: McpEditorBridgeContext,
+  target: Object
+): Object => {
+  const staleStateAdvisory = buildStaleStateAdvisory(context, target);
+  if (payload && typeof payload === 'object' && !Array.isArray(payload)) {
+    return {
+      ...payload,
+      staleStateAdvisory,
+    };
+  }
+  return {
+    result: payload,
+    staleStateAdvisory,
+  };
+};
+
 // Send a request to ONE specific preview and resolve with the reply that comes
 // back FROM THAT preview (matched by messageId + source id). This is required
 // because the shared sendMessageWithResponse broadcasts to every connected
@@ -1733,7 +1978,15 @@ const callEditorFunction = async ({
   }
 
   return firstResult.success
-    ? textResult(firstResult.output)
+    ? textResult(
+        firstResult.didModifyProject
+          ? withStaleStateAdvisory(
+              firstResult.output,
+              context,
+              getStaleStateTargetForTool(toolName, args, firstResult.output)
+            )
+          : firstResult.output
+      )
     : errorResult(
         firstResult.output && firstResult.output.message
           ? firstResult.output.message
@@ -1993,6 +2246,26 @@ const callMcpTool = async ({
     return textResult(getCapabilitiesSummary(context.getPermissions()));
   }
 
+  if (toolName === 'gdevelop_refresh_tool_catalog') {
+    const permissions = context.getPermissions();
+    const capabilities = getCapabilitiesSummary(permissions);
+    return textResult({
+      success: true,
+      permissions: capabilities.permissions,
+      tools: getMcpTools(permissions),
+      categories: capabilities.categories,
+      note:
+        'Returned the current GDevelop MCP tool catalog from the editor. If your MCP host uses deferred tools, run tool_search for gdevelop after this so the host exposes newly listed tools.',
+    });
+  }
+
+  if (toolName === 'preview_health_check') {
+    const previewDebuggerServer = context.getPreviewDebuggerServer
+      ? context.getPreviewDebuggerServer()
+      : null;
+    return textResult(previewHealthCheck(previewDebuggerServer));
+  }
+
   if (toolName === 'create_action' || toolName === 'create_condition') {
     if (!project) return errorResult('No project opened.');
     const type = args && typeof args.type === 'string' ? args.type : '';
@@ -2028,6 +2301,33 @@ const callMcpTool = async ({
     }
   }
 
+  if (toolName === 'inspect_tilemap_palette') {
+    if (!project) return errorResult('No project opened.');
+    try {
+      return textResult(inspectTilemapPalette(project, args || {}));
+    } catch (error) {
+      return errorResult(error.message);
+    }
+  }
+
+  if (toolName === 'inspect_tilemap_collision') {
+    if (!project) return errorResult('No project opened.');
+    try {
+      return textResult(inspectTilemapCollision(project, args || {}));
+    } catch (error) {
+      return errorResult(error.message);
+    }
+  }
+
+  if (toolName === 'check_tilemap_walkability') {
+    if (!project) return errorResult('No project opened.');
+    try {
+      return textResult(checkTilemapWalkability(project, args || {}));
+    } catch (error) {
+      return errorResult(error.message);
+    }
+  }
+
   if (toolName === 'read_scene_events_serialized') {
     if (!project) return errorResult('No project opened.');
     try {
@@ -2046,6 +2346,51 @@ const callMcpTool = async ({
     }
   }
 
+  if (toolName === 'inspect_resource_images') {
+    if (!project) return errorResult('No project opened.');
+    try {
+      return textResult(inspectResourceImages(project, args || {}));
+    } catch (error) {
+      return errorResult(error.message);
+    }
+  }
+
+  if (toolName === 'audit_project_asset_sources') {
+    if (!project) return errorResult('No project opened.');
+    try {
+      return textResult(auditProjectAssetSources(project, args || {}));
+    } catch (error) {
+      return errorResult(error.message);
+    }
+  }
+
+  if (toolName === 'compare_image_files') {
+    if (!project) return errorResult('No project opened.');
+    try {
+      return textResult(compareImageFiles(project, args || {}));
+    } catch (error) {
+      return errorResult(error.message);
+    }
+  }
+
+  if (toolName === 'crop_scene_object_image') {
+    if (!project) return errorResult('No project opened.');
+    try {
+      return textResult(cropSceneObjectImage(project, args || {}));
+    } catch (error) {
+      return errorResult(error.message);
+    }
+  }
+
+  if (toolName === 'inspect_scene_draw_order') {
+    if (!project) return errorResult('No project opened.');
+    try {
+      return textResult(inspectSceneDrawOrder(project, args || {}));
+    } catch (error) {
+      return errorResult(error.message);
+    }
+  }
+
   if (toolName === 'inspect_project_cleanup') {
     if (!project) return errorResult('No project opened.');
     try {
@@ -2059,6 +2404,15 @@ const callMcpTool = async ({
     if (!project) return errorResult('No project opened.');
     try {
       return textResult(listAvailableBehaviors(project, args || {}));
+    } catch (error) {
+      return errorResult(error.message);
+    }
+  }
+
+  if (toolName === 'inspect_gameplay_rules') {
+    if (!project) return errorResult('No project opened.');
+    try {
+      return textResult(inspectGameplayRules(project, args || {}));
     } catch (error) {
       return errorResult(error.message);
     }
@@ -2403,7 +2757,13 @@ const callMcpTool = async ({
         });
       }
       context.triggerUnsavedChanges();
-      return textResult(result);
+      return textResult(
+        withStaleStateAdvisory(
+          result,
+          context,
+          getStaleStateTargetForTool(toolName, args, result)
+        )
+      );
     } catch (error) {
       return errorResult(error.message);
     }
@@ -2429,7 +2789,13 @@ const callMcpTool = async ({
     try {
       const result = restoreProjectSnapshot(project, args || {});
       context.triggerUnsavedChanges();
-      return textResult(result);
+      return textResult(
+        withStaleStateAdvisory(
+          result,
+          context,
+          getStaleStateTargetForTool(toolName, args, result)
+        )
+      );
     } catch (error) {
       return errorResult(error.message);
     }
@@ -2440,7 +2806,13 @@ const callMcpTool = async ({
     try {
       const result = projectWriteToolHandler(project, args || {});
       context.triggerUnsavedChanges();
-      return textResult(result);
+      return textResult(
+        withStaleStateAdvisory(
+          result,
+          context,
+          getStaleStateTargetForTool(toolName, args, result)
+        )
+      );
     } catch (error) {
       return errorResult(error.message);
     }
@@ -2465,10 +2837,14 @@ const callMcpTool = async ({
     sceneWriteToolHandler = setSpriteAnimations;
   } else if (toolName === 'slice_sprite_sheet') {
     sceneWriteToolHandler = sliceSpriteSheet;
+  } else if (toolName === 'bind_sprite_animations_from_directory') {
+    sceneWriteToolHandler = bindSpriteAnimationsFromDirectory;
   } else if (toolName === 'create_tilemap_object') {
     sceneWriteToolHandler = createTilemapObject;
   } else if (toolName === 'set_tilemap_tiles') {
     sceneWriteToolHandler = setTilemapTiles;
+  } else if (toolName === 'set_tilemap_collision_tiles') {
+    sceneWriteToolHandler = setTilemapCollisionTiles;
   } else if (toolName === 'replace_object_definition') {
     sceneWriteToolHandler = replaceObjectDefinition;
   } else if (toolName === 'delete_scene_object') {
@@ -2485,6 +2861,10 @@ const callMcpTool = async ({
     sceneWriteToolHandler = putStructured2dInstances;
   } else if (toolName === 'apply_validated_scene_patch') {
     sceneWriteToolHandler = applyValidatedScenePatch;
+  } else if (toolName === 'patch_scene_event_instruction') {
+    sceneWriteToolHandler = patchSceneEventInstruction;
+  } else if (toolName === 'attach_object_to_object_top') {
+    sceneWriteToolHandler = attachObjectToObjectTop;
   } else if (toolName === 'create_group') {
     sceneWriteToolHandler = createGroup;
   } else if (toolName === 'wrap_events_in_group') {
@@ -2554,13 +2934,26 @@ const callMcpTool = async ({
         });
         // Surface the events outcome alongside the assets result. callEditorFunction
         // returns a textResult-shaped object; attach its parsed content if possible.
-        return textResult({
+        const combinedResult = {
           ...result,
           events: extractToolResultPayload(eventsResponse),
-        });
+        };
+        return textResult(
+          withStaleStateAdvisory(
+            combinedResult,
+            context,
+            getStaleStateTargetForTool('add_scene_events', eventsArgs, result)
+          )
+        );
       }
 
-      return textResult(result);
+      return textResult(
+        withStaleStateAdvisory(
+          result,
+          context,
+          getStaleStateTargetForTool(toolName, args, result)
+        )
+      );
     } catch (error) {
       return errorResult(error.message);
     }

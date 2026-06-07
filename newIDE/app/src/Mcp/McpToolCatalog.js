@@ -413,6 +413,52 @@ const sliceSpriteSheetSchema = {
   additionalProperties: true,
 };
 
+const bindSpriteAnimationsFromDirectorySchema = {
+  type: 'object',
+  properties: {
+    scene_name: sceneNameSchema.properties.scene_name,
+    object_name: {
+      type: 'string',
+      description:
+        'Sprite object to receive the animations. Pass create_object:true to create it when missing.',
+    },
+    directory: {
+      type: 'string',
+      description:
+        'Project-relative or absolute directory. Subdirectories such as Idle/Run/Attack become animation names; root image files become one animation when there are no subdirectories.',
+    },
+    create_object: {
+      type: 'boolean',
+      description: 'Create the Sprite object if it does not already exist.',
+    },
+    frame_duration: {
+      type: 'number',
+      description: 'Time between frames in seconds. Defaults to 0.08.',
+    },
+    loop: {
+      type: 'boolean',
+      description: 'Whether generated animations loop. Defaults to true.',
+    },
+    recursive: {
+      type: 'boolean',
+      description:
+        'Read images recursively inside each animation directory. Defaults to true.',
+    },
+    include_root_files: {
+      type: 'boolean',
+      description:
+        'Also bind root-level image files as an animation even when subdirectory animations exist.',
+    },
+    animation_name: {
+      type: 'string',
+      description:
+        'Animation name to use for root-level image files. Defaults to Default.',
+    },
+  },
+  required: ['scene_name', 'object_name', 'directory'],
+  additionalProperties: true,
+};
+
 // Shared tile-spec item used by tilemap tools: a tile is a number (tileId; <0
 // clears), or an object addressing the tileset cell + optional flips.
 const tilemapTileItemSchema = {
@@ -575,6 +621,99 @@ const getTilemapTilesSchema = {
     },
   },
   required: ['scene_name', 'object_name'],
+  additionalProperties: false,
+};
+
+const inspectTilemapPaletteSchema = {
+  type: 'object',
+  properties: {
+    scene_name: { type: 'string' },
+    object_name: { type: 'string' },
+    atlas_image: {
+      type: 'string',
+      description:
+        'Optional image resource name when the TileMap object config cannot be read.',
+    },
+    tile_size: {
+      type: 'number',
+      description:
+        'Optional tile size override. Defaults to the object tileSize config or 16.',
+    },
+    columns: {
+      type: 'number',
+      description:
+        'Optional tileset column count override. Otherwise inferred from config or atlas image width.',
+    },
+    rows: {
+      type: 'number',
+      description:
+        'Optional tileset row count override. Otherwise inferred from config or atlas image height.',
+    },
+  },
+  required: ['scene_name', 'object_name'],
+  additionalProperties: true,
+};
+
+const setTilemapCollisionTilesSchema = {
+  type: 'object',
+  properties: {
+    scene_name: { type: 'string' },
+    object_name: { type: 'string' },
+    tile_ids: {
+      type: 'array',
+      items: { type: 'number' },
+      description:
+        'Tile ids that should use the TileMap native collision hit box. Written to the object tilesWithHitBox property.',
+    },
+    tiles_with_hit_box: {
+      type: 'string',
+      description:
+        'Comma-separated tile ids, alias for tile_ids when copying existing TileMap config.',
+    },
+  },
+  required: ['scene_name', 'object_name'],
+  additionalProperties: true,
+};
+
+const inspectTilemapCollisionSchema = {
+  type: 'object',
+  properties: {
+    scene_name: { type: 'string' },
+    object_name: { type: 'string' },
+    instance_id: {
+      type: 'string',
+      description: 'Optional specific tilemap instance; defaults to the first.',
+    },
+    summary_only: {
+      type: 'boolean',
+      description: 'Omit the full grid while keeping blocked cells/ascii mask.',
+    },
+  },
+  required: ['scene_name', 'object_name'],
+  additionalProperties: false,
+};
+
+const checkTilemapWalkabilitySchema = {
+  type: 'object',
+  properties: {
+    scene_name: { type: 'string' },
+    object_name: { type: 'string' },
+    instance_id: {
+      type: 'string',
+      description: 'Optional specific tilemap instance; defaults to the first.',
+    },
+    start: {
+      type: 'object',
+      description: 'Start tile coordinate, { x, y } in tile cells.',
+      additionalProperties: true,
+    },
+    goal: {
+      type: 'object',
+      description: 'Goal tile coordinate, { x, y } in tile cells.',
+      additionalProperties: true,
+    },
+  },
+  required: ['scene_name', 'object_name', 'start', 'goal'],
   additionalProperties: false,
 };
 
@@ -1098,6 +1237,11 @@ const scenePatchSchema = {
       description:
         'When true, validate and return the patched serialized scene without applying it.',
     },
+    summary_only: {
+      type: 'boolean',
+      description:
+        'When true, omit the full serializedScene and return only changedPaths, operation count, and validation status.',
+    },
   },
   required: ['scene_name'],
   additionalProperties: true,
@@ -1134,6 +1278,121 @@ const inspectProjectCleanupSchema = {
     },
   },
   additionalProperties: false,
+};
+
+const inspectResourceImagesSchema = {
+  type: 'object',
+  properties: {
+    resource_names: {
+      type: 'array',
+      items: { type: 'string' },
+      description:
+        'Optional image resource names to inspect. Omit to inspect every image resource.',
+    },
+  },
+  additionalProperties: false,
+};
+
+const auditProjectAssetSourcesSchema = {
+  type: 'object',
+  properties: {
+    allowed_roots: {
+      type: 'array',
+      items: { type: 'string' },
+      description:
+        'Project-relative folders that are allowed as resource origins. Defaults to ["assets"].',
+    },
+  },
+  additionalProperties: false,
+};
+
+const compareImageFilesSchema = {
+  type: 'object',
+  properties: {
+    reference_file: {
+      type: 'string',
+      description: 'Reference PNG/JPG/WebP/BMP file, project-relative or absolute.',
+    },
+    actual_file: {
+      type: 'string',
+      description:
+        'Current render/screenshot file to compare against the reference.',
+    },
+    reference_region: {
+      type: 'object',
+      description: 'Optional { x, y, width, height } crop in the reference file.',
+      additionalProperties: true,
+    },
+    actual_region: {
+      type: 'object',
+      description: 'Optional { x, y, width, height } crop in the actual file.',
+      additionalProperties: true,
+    },
+    threshold: {
+      type: 'number',
+      description:
+        'Per-channel max difference threshold. Pixels above this are counted as mismatches. Defaults to 24.',
+    },
+    output_heatmap_file: {
+      type: 'string',
+      description:
+        'Optional project-relative/absolute PNG file for a red transparent diff heatmap.',
+    },
+  },
+  required: ['reference_file', 'actual_file'],
+  additionalProperties: true,
+};
+
+const cropSceneObjectImageSchema = {
+  type: 'object',
+  properties: {
+    scene_name: sceneNameSchema.properties.scene_name,
+    object_name: {
+      type: 'string',
+      description: 'Initial instance object name to crop around.',
+    },
+    instance_id: {
+      type: 'string',
+      description: 'Optional short persistent instance id to disambiguate.',
+    },
+    source_file: {
+      type: 'string',
+      description:
+        'Screenshot/render PNG path to crop, project-relative or absolute.',
+    },
+    output_file: {
+      type: 'string',
+      description: 'Output PNG path for the cropped/zoomed image.',
+    },
+    padding: {
+      type: 'number',
+      description: 'Padding around the object in scene pixels. Defaults to 16.',
+    },
+    zoom: {
+      type: 'number',
+      description: 'Nearest-neighbor zoom factor. Defaults to 2.',
+    },
+    overlay_bounds: {
+      type: 'boolean',
+      description:
+        'Draw a red rectangle around the object bounds in the crop. Defaults to true.',
+    },
+  },
+  required: ['scene_name', 'object_name', 'source_file', 'output_file'],
+  additionalProperties: true,
+};
+
+const inspectSceneDrawOrderSchema = {
+  type: 'object',
+  properties: {
+    scene_name: sceneNameSchema.properties.scene_name,
+    object_name: {
+      type: 'string',
+      description: 'Optional object name to filter the draw-order listing.',
+    },
+  },
+  required: ['scene_name'],
+  additionalProperties: true,
 };
 
 const listAvailableBehaviorsSchema = {
@@ -1612,6 +1871,112 @@ const findSceneEventsSchema = {
   additionalProperties: true,
 };
 
+const patchSceneEventInstructionSchema = {
+  type: 'object',
+  properties: {
+    scene_name: sceneNameSchema.properties.scene_name,
+    event: {
+      type: 'object',
+      description:
+        'Stable event target. Prefer { ai_generated_event_id } or { event_path } instead of brittle raw JSON paths.',
+      additionalProperties: true,
+    },
+    event_id: {
+      type: 'string',
+      description: 'Alias for event.ai_generated_event_id.',
+    },
+    event_path: {
+      type: 'string',
+      description: 'Alias for event.event_path, for example event-4-event-7.',
+    },
+    instruction_kind: {
+      type: 'string',
+      enum: ['action', 'condition'],
+      description: 'Whether to edit an action or a condition. Defaults to action.',
+    },
+    instruction_type: {
+      type: 'string',
+      description:
+        'Exact GDevelop instruction type to edit, for example MettreX, SetNumberVariable, or KeyPressed.',
+    },
+    object_name: {
+      type: 'string',
+      description:
+        'Optional object name that must appear in the instruction parameters to disambiguate multiple matching instructions.',
+    },
+    parameters: {
+      type: 'array',
+      items: { type: 'string' },
+      description:
+        'Complete replacement parameter array in GDevelop order. Use create_action/create_condition or metadata tools to build the correct order.',
+    },
+    summary_only: {
+      type: 'boolean',
+      description:
+        'When true, omit serializedEvents/eventsAsText and return only the edited event/instruction summary.',
+    },
+  },
+  required: ['scene_name', 'instruction_type', 'parameters'],
+  additionalProperties: true,
+};
+
+const attachObjectToObjectTopSchema = {
+  type: 'object',
+  properties: {
+    scene_name: sceneNameSchema.properties.scene_name,
+    follower_object_name: {
+      type: 'string',
+      description:
+        'Object to position above the target, such as HealthBar or NameLabel.',
+    },
+    target_object_name: {
+      type: 'string',
+      description: 'Object whose top edge is followed, such as Enemy.',
+    },
+    x_offset: {
+      type: 'number',
+      description: 'Horizontal pixel offset added after centering. Defaults to 0.',
+    },
+    y_offset: {
+      type: 'number',
+      description:
+        'Vertical pixel offset added to target.Y()-follower.Height(). Defaults to 0.',
+    },
+    event_id: {
+      type: 'string',
+      description:
+        'Stable aiGeneratedEventId for the generated follow event. Defaults to <follower>-follow-<target>-top.',
+    },
+    insert_index: {
+      type: 'number',
+      description: 'Root event insertion index. Defaults to the end.',
+    },
+  },
+  required: ['scene_name', 'follower_object_name', 'target_object_name'],
+  additionalProperties: true,
+};
+
+const inspectGameplayRulesSchema = {
+  type: 'object',
+  properties: {
+    scene_name: sceneNameSchema.properties.scene_name,
+    top_attachments: {
+      type: 'array',
+      description:
+        'Heuristic checks for follower/target UI attachments. Items use follower_object_name and target_object_name.',
+      items: { type: 'object', additionalProperties: true },
+    },
+    state_machines: {
+      type: 'array',
+      description:
+        'Heuristic checks for object variable state machines. Items use object_name, variable_name, and optional states array.',
+      items: { type: 'object', additionalProperties: true },
+    },
+  },
+  required: ['scene_name'],
+  additionalProperties: true,
+};
+
 const createGroupSchema = {
   type: 'object',
   properties: {
@@ -1917,6 +2282,64 @@ const extensionFunctionSchema = {
       type: 'string',
       description:
         'Required when parent_kind is behavior or object: internal behavior/object name.',
+    },
+    new_function_name: {
+      type: 'string',
+      description: 'Optional new internal name for renaming the events function.',
+    },
+    function_type: {
+      type: 'string',
+      description:
+        'Function kind: action, condition, expression, expression_and_condition, or action_with_operator.',
+    },
+    full_name: {
+      type: 'string',
+      description: 'Display name shown in the editor.',
+    },
+    description: {
+      type: 'string',
+      description: 'Description shown in the editor.',
+    },
+    sentence: {
+      type: 'string',
+      description:
+        'Sentence shown in the events sheet. MCP validates _PARAMx_ placeholders against the final parameter list and rolls back invalid updates. Free functions start user parameters at _PARAM1_ because _PARAM0_ is the hidden scene parameter. Behavior/object functions use _PARAM0_ for the object; behavior parameters are implicit and user parameters come after the automatic object/behavior parameters.',
+    },
+    parameters: {
+      type: 'array',
+      description:
+        'Function parameter metadata. Items are upserted by name. For behavior/object functions, automatic object/behavior parameters are maintained by GDevelop before sentence validation.',
+      items: {
+        type: 'object',
+        properties: {
+          name: { type: 'string' },
+          type: {
+            type: 'string',
+            description:
+              'GDevelop parameter type, for example object, expression, string, variable, layer, or behavior.',
+          },
+          description: { type: 'string' },
+          long_description: { type: 'string' },
+          value_type: {
+            type: 'object',
+            description: 'Optional value type metadata.',
+            additionalProperties: true,
+          },
+        },
+        required: ['name'],
+        additionalProperties: true,
+      },
+    },
+    events_json: {
+      type: 'string',
+      description:
+        'Serialized GDevelop events array to replace the function events. It is validated before writing; function metadata and events are rolled back if sentence validation fails.',
+    },
+    serialized_function: {
+      type: 'object',
+      description:
+        'Complete serialized events function for advanced edits. Other provided fields are applied afterward.',
+      additionalProperties: true,
     },
   },
   required: ['extension_name', 'function_name'],
@@ -2275,6 +2698,12 @@ const readTools: Array<McpTool> = [
     },
   },
   {
+    name: 'gdevelop_refresh_tool_catalog',
+    description:
+      'Return the current MCP tool catalog, permission gates, and capability categories in one read-only call. Use this after changing or reloading the GDevelop MCP server so clients can resync instead of guessing tool names.',
+    inputSchema: emptyObjectSchema,
+  },
+  {
     name: 'gdevelop_editor_call',
     description:
       'Advanced escape hatch: call an exposed GDevelop EditorFunction by name. The target function still follows read/write MCP permission checks.',
@@ -2312,6 +2741,24 @@ const readTools: Array<McpTool> = [
     inputSchema: getTilemapTilesSchema,
   },
   {
+    name: 'inspect_tilemap_palette',
+    description:
+      'List a Tile map tileset atlas as selectable tile ids with row/column/source-rect coordinates, so callers can choose ids visually instead of guessing.',
+    inputSchema: inspectTilemapPaletteSchema,
+  },
+  {
+    name: 'inspect_tilemap_collision',
+    description:
+      'Inspect a Tile map object collision setup as editable cells: reports native collision tile ids, blocked grid cells for an instance, and an ASCII mask (# = blocked, . = walkable).',
+    inputSchema: inspectTilemapCollisionSchema,
+  },
+  {
+    name: 'check_tilemap_walkability',
+    description:
+      'Run a grid pathability check through a Tile map collision mask from start {x,y} to goal {x,y}; returns whether a route exists plus the first blocking reason and reachable cells.',
+    inputSchema: checkTilemapWalkabilitySchema,
+  },
+  {
     name: 'read_scene_events_serialized',
     description:
       'Read one scene event sheet as raw serialized event JSON, including event types unsupported by text rendering. Pass summary_only:true for just root event counts/types (avoids dumping a huge tree); the JSON string is omitted by default — pass include_json:true to also get it.',
@@ -2341,6 +2788,30 @@ const readTools: Array<McpTool> = [
     inputSchema: inspectProjectResourcesSchema,
   },
   {
+    name: 'inspect_resource_images',
+    description:
+      'Inspect image resources with file paths, dimensions, and transparent-pixel bounds when Electron nativeImage can read the file. Use this for thin/transparent sprite or UI assets before hand-tuning positions.',
+    inputSchema: inspectResourceImagesSchema,
+  },
+  {
+    name: 'audit_project_asset_sources',
+    description:
+      'Check local project resources against allowed project-relative asset roots (default: assets). Reports resources outside those roots so projects can enforce original-asset-only workflows.',
+    inputSchema: auditProjectAssetSourcesSchema,
+  },
+  {
+    name: 'compare_image_files',
+    description:
+      'Compare a reference image and a current render/screenshot pixel-by-pixel, with optional crop regions and an optional diff heatmap PNG for 1:1 visual remake workflows.',
+    inputSchema: compareImageFilesSchema,
+  },
+  {
+    name: 'crop_scene_object_image',
+    description:
+      'Crop and nearest-neighbor zoom a screenshot/render around a scene initial instance by object name, with an optional bounds overlay for focused visual debugging.',
+    inputSchema: cropSceneObjectImageSchema,
+  },
+  {
     name: 'inspect_project_cleanup',
     description:
       'Return read-only cleanup candidates: empty scenes, possibly unused scene objects, invalid resources, unused resources, missing Sprite frame references, and suspicious Sprite collision masks (empty custom masks that disable collisions).',
@@ -2357,6 +2828,12 @@ const readTools: Array<McpTool> = [
     description:
       'Inspect a currently running preview to verify runtime behavior: returns whether a preview is running (defaulting to the latest launched one), its status, captured console logs, a separate errors list (uncaught exceptions, crashes, error-level logs), recentSounds (history since last inspect), activeSounds (sounds/musics currently playing incl. looping BGM), inputState (live pressed keys/mouse), and a compact runtime snapshot (running scene name, sceneElapsedTimeSeconds, per-object live instance counts, scene/global variable values). Launch a preview first with gdevelop_run_command { commandName: "LAUNCH_NEW_PREVIEW" }. Use this to confirm a game actually runs and behaves, not just that a preview was launched.',
     inputSchema: inspectRunningPreviewSchema,
+  },
+  {
+    name: 'preview_health_check',
+    description:
+      'Report preview/debugger channel health before runtime calls: whether a preview is connected, available debugger ids, likely stale/disconnected state, and recommended recovery actions such as launch_preview, focus, close, or relaunch.',
+    inputSchema: emptyObjectSchema,
   },
   {
     name: 'capture_preview_screenshot',
@@ -2401,6 +2878,12 @@ const readTools: Array<McpTool> = [
     inputSchema: findSceneEventsSchema,
   },
   {
+    name: 'inspect_gameplay_rules',
+    description:
+      'Run higher-level heuristic checks over scene events, such as whether a health bar follows an enemy top or whether state-machine variables/states are mentioned.',
+    inputSchema: inspectGameplayRulesSchema,
+  },
+  {
     name: 'compare_scene_events_semantics',
     description:
       'Compare two serialized event arrays while ignoring visual Group wrappers, folded state, colors, names, sources, and aiGeneratedEventId fields.',
@@ -2422,6 +2905,12 @@ const readTools: Array<McpTool> = [
       required: ['scene_name'],
       additionalProperties: true,
     },
+  },
+  {
+    name: 'inspect_scene_draw_order',
+    description:
+      'Return static initial-instance draw order by layer and zOrder, including bounds, so overlapping/zOrder issues can be diagnosed without a screenshot.',
+    inputSchema: inspectSceneDrawOrderSchema,
   },
   {
     name: 'inspect_object_properties',
@@ -2648,6 +3137,12 @@ const writeTools: Array<McpTool> = [
     inputSchema: sliceSpriteSheetSchema,
   },
   {
+    name: 'bind_sprite_animations_from_directory',
+    description:
+      'Scan a unit asset directory (for example Idle/Run/Attack subfolders), register image resources, and bind them as Sprite animations with frame timing and loop settings.',
+    inputSchema: bindSpriteAnimationsFromDirectorySchema,
+  },
+  {
     name: 'create_tilemap_object',
     description:
       'Create the built-in Tile map object (TileMap::SimpleTileMap) from a tileset atlas image: sets atlasImage + tile_size and computes the tileset columns/rows from the image. Optionally creates an instance and paints an initial grid. Use set_tilemap_tiles to paint tiles. (Tileset config applies inside the running editor; the per-instance tile grid works everywhere.)',
@@ -2658,6 +3153,12 @@ const writeTools: Array<McpTool> = [
     description:
       'Paint / clear tiles on a Tile map (TileMap::SimpleTileMap) instance. Writes the per-instance grid: tiles are tiles[y][x], empty = -1, a tile id = row*columnCount+col into the tileset (optionally flipped). Supports resizing (map_width/map_height), a rectangular fill, individual { x, y, tile } placements, clear_all, and layer opacity. Address a tile by id, or by { col, row } when tileset_columns is known.',
     inputSchema: setTilemapTilesSchema,
+  },
+  {
+    name: 'set_tilemap_collision_tiles',
+    description:
+      'Set the Tile map object collision tile ids using its native tilesWithHitBox property, so painted cells using those tile ids become solid. Accepts tile_ids or tiles_with_hit_box.',
+    inputSchema: setTilemapCollisionTilesSchema,
   },
   {
     name: 'bulk_edit_scene_assets',
@@ -2712,6 +3213,18 @@ const writeTools: Array<McpTool> = [
     description:
       'Apply a focused JSON patch to one serialized scene after validating scene structure and GDevelop unserialization. Use as a safe fallback when focused tools do not cover a small edit.',
     inputSchema: scenePatchSchema,
+  },
+  {
+    name: 'patch_scene_event_instruction',
+    description:
+      'Patch one action or condition inside a scene event by stable event id/path plus instruction type, avoiding brittle raw /events/... JSON paths for common parameter edits.',
+    inputSchema: patchSceneEventInstructionSchema,
+  },
+  {
+    name: 'attach_object_to_object_top',
+    description:
+      'Add a high-level follow event that keeps one object centered above another object top, useful for health bars/nameplates without hand-written X()-40/Y()-38 formulas.',
+    inputSchema: attachObjectToObjectTopSchema,
   },
   {
     name: 'create_group',
@@ -2780,7 +3293,7 @@ const writeTools: Array<McpTool> = [
   {
     name: 'gdevelop_create_or_update_extension_function',
     description:
-      'Create or update a free, behavior, or object events function inside an extension, including type, metadata, parameters, and events_json.',
+      'Create or update a free, behavior, or object events function inside an extension, including type, metadata, parameters, sentence placeholder validation, and events_json.',
     inputSchema: extensionFunctionSchema,
   },
   {
@@ -2851,6 +3364,20 @@ const commandTools: Array<McpTool> = [
 ];
 
 const toolUsageExamples: { [string]: Array<Object> } = {
+  gdevelop_refresh_tool_catalog: [
+    {
+      description:
+        'Return the current GDevelop MCP tool catalog and capability categories after a reload.',
+      arguments: {},
+    },
+  ],
+  gdevelop_capabilities: [
+    {
+      description:
+        'List the curated tool categories before choosing a GDevelop MCP workflow.',
+      arguments: {},
+    },
+  ],
   set_project_properties: [
     {
       description:
@@ -2987,6 +3514,20 @@ const toolUsageExamples: { [string]: Array<Object> } = {
       },
     },
   ],
+  bind_sprite_animations_from_directory: [
+    {
+      description:
+        'Bind Idle/Run/Attack subfolders from a unit asset directory as Sprite animations.',
+      arguments: {
+        scene_name: 'Level1',
+        object_name: 'Warrior',
+        directory: 'assets/Warrior',
+        create_object: true,
+        frame_duration: 0.08,
+        loop: true,
+      },
+    },
+  ],
   set_text_object_properties: [
     {
       description:
@@ -3084,6 +3625,73 @@ const toolUsageExamples: { [string]: Array<Object> } = {
           },
         ],
         instances: [{ object_name: 'Player', x: 100, y: 200 }],
+      },
+    },
+  ],
+  set_tilemap_tiles: [
+    {
+      description:
+        'Paint two solid wall tiles into an existing Tile map instance.',
+      arguments: {
+        scene_name: 'Level1',
+        object_name: 'GroundTilemap',
+        tiles: [
+          { x: 4, y: 8, tile: 5 },
+          { x: 5, y: 8, tile: 5 },
+        ],
+        summary_only: true,
+      },
+    },
+  ],
+  inspect_tilemap_palette: [
+    {
+      description:
+        'List tile ids and source rectangles for a tileset atlas before painting.',
+      arguments: {
+        scene_name: 'Level1',
+        object_name: 'GroundTilemap',
+      },
+    },
+  ],
+  set_tilemap_collision_tiles: [
+    {
+      description:
+        'Mark tile id 5 as solid using the Tile map native collision setting.',
+      arguments: {
+        scene_name: 'Level1',
+        object_name: 'GroundTilemap',
+        tile_ids: [5],
+      },
+    },
+  ],
+  inspect_tilemap_collision: [
+    {
+      description:
+        'Show which painted cells are blocked by native Tile map collision tiles.',
+      arguments: {
+        scene_name: 'Level1',
+        object_name: 'GroundTilemap',
+      },
+    },
+  ],
+  check_tilemap_walkability: [
+    {
+      description:
+        'Check whether a player can walk from one tile cell to another without crossing solid tiles.',
+      arguments: {
+        scene_name: 'Level1',
+        object_name: 'GroundTilemap',
+        start: { x: 0, y: 10 },
+        goal: { x: 18, y: 10 },
+      },
+    },
+  ],
+  inspect_scene_draw_order: [
+    {
+      description:
+        'Check which instances draw above others by layer and zOrder.',
+      arguments: {
+        scene_name: 'Level1',
       },
     },
   ],
@@ -3203,6 +3811,35 @@ const toolUsageExamples: { [string]: Array<Object> } = {
             value: 'Player',
           },
         ],
+        summary_only: true,
+      },
+    },
+  ],
+  patch_scene_event_instruction: [
+    {
+      description:
+        'Patch one action by stable event id instead of using a fragile raw /events/... JSON path.',
+      arguments: {
+        scene_name: 'Level1',
+        event_id: 'health-follow',
+        instruction_kind: 'action',
+        instruction_type: 'MettreX',
+        object_name: 'HealthBar',
+        parameters: ['HealthBar', '=', 'Enemy.CenterX()-HealthBar.Width()/2'],
+        summary_only: true,
+      },
+    },
+  ],
+  attach_object_to_object_top: [
+    {
+      description:
+        'Keep a health bar centered above an enemy without manually computing X/Y formulas.',
+      arguments: {
+        scene_name: 'Level1',
+        follower_object_name: 'EnemyHealthBar',
+        target_object_name: 'Enemy',
+        y_offset: -4,
+        event_id: 'enemy-healthbar-follow',
       },
     },
   ],
@@ -3226,6 +3863,50 @@ const toolUsageExamples: { [string]: Array<Object> } = {
         'Return only resource counts and problem lists for final validation.',
       arguments: {
         compact: true,
+      },
+    },
+  ],
+  inspect_resource_images: [
+    {
+      description:
+        'Inspect image dimensions and transparent-pixel bounds for a health bar sprite.',
+      arguments: {
+        resource_names: ['EnemyHealthBar.png'],
+      },
+    },
+  ],
+  audit_project_asset_sources: [
+    {
+      description:
+        'Verify every local resource comes from the project assets folder.',
+      arguments: {
+        allowed_roots: ['assets'],
+      },
+    },
+  ],
+  compare_image_files: [
+    {
+      description:
+        'Compare a current preview screenshot against a reference and write a diff heatmap.',
+      arguments: {
+        reference_file: 'assets/reference.png',
+        actual_file: 'captures/current.png',
+        threshold: 16,
+        output_heatmap_file: 'captures/diff-heatmap.png',
+      },
+    },
+  ],
+  crop_scene_object_image: [
+    {
+      description:
+        'Crop and zoom a health bar from a full preview screenshot.',
+      arguments: {
+        scene_name: 'Level1',
+        object_name: 'EnemyHealthBar',
+        source_file: 'captures/current.png',
+        output_file: 'captures/EnemyHealthBar-4x.png',
+        padding: 12,
+        zoom: 4,
       },
     },
   ],
@@ -3265,6 +3946,13 @@ const toolUsageExamples: { [string]: Array<Object> } = {
         timeout_ms: 4000,
         include_raw_dump: true,
       },
+    },
+  ],
+  preview_health_check: [
+    {
+      description:
+        'Check whether the preview/debugger channel is connected before run_frames or screenshot calls.',
+      arguments: {},
     },
   ],
   capture_preview_screenshot: [
@@ -3404,6 +4092,28 @@ const toolUsageExamples: { [string]: Array<Object> } = {
       arguments: {
         scene_name: 'Level1',
         ai_generated_event_id: 'mcp-test-0',
+      },
+    },
+  ],
+  inspect_gameplay_rules: [
+    {
+      description:
+        'Check that a health bar follow event and an enemy State variable are wired in events.',
+      arguments: {
+        scene_name: 'Level1',
+        top_attachments: [
+          {
+            follower_object_name: 'EnemyHealthBar',
+            target_object_name: 'Enemy',
+          },
+        ],
+        state_machines: [
+          {
+            object_name: 'Enemy',
+            variable_name: 'State',
+            states: ['Patrol', 'Chase', 'Attack'],
+          },
+        ],
       },
     },
   ],
@@ -3670,15 +4380,26 @@ export const getCapabilitiesSummary = (
       'gdevelop_list_objects',
       'gdevelop_get_editor_selection',
       'gdevelop_capabilities',
+      'gdevelop_refresh_tool_catalog',
     ],
     'Read scene / objects / events': [
       'read_serialized_scene',
       'read_scene_events',
       'read_scene_events_serialized',
+      'get_tilemap_tiles',
+      'inspect_tilemap_palette',
+      'inspect_tilemap_collision',
+      'check_tilemap_walkability',
       'describe_instances',
+      'inspect_scene_draw_order',
       'find_scene_events',
       'inspect_object_properties',
       'list_available_behaviors',
+      'inspect_project_resources',
+      'inspect_resource_images',
+      'audit_project_asset_sources',
+      'compare_image_files',
+      'crop_scene_object_image',
     ],
     'Instruction discovery': [
       'gdevelop_search_instruction_metadata',
@@ -3691,6 +4412,10 @@ export const getCapabilitiesSummary = (
       'create_text_object',
       'set_sprite_animations',
       'slice_sprite_sheet',
+      'bind_sprite_animations_from_directory',
+      'create_tilemap_object',
+      'set_tilemap_tiles',
+      'set_tilemap_collision_tiles',
       'add_or_update_resource',
       'generate_placeholder_asset',
       'replace_project_resource',
@@ -3701,8 +4426,11 @@ export const getCapabilitiesSummary = (
       'create_action',
       'create_condition',
       'add_scene_events',
+      'patch_scene_event_instruction',
+      'attach_object_to_object_top',
       'validate_events_json_file',
       'lint_scene_events',
+      'inspect_gameplay_rules',
       'create_group',
     ],
     'Variables & scenes': [
@@ -3714,6 +4442,7 @@ export const getCapabilitiesSummary = (
     'Runtime verification': [
       'launch_preview',
       'run_frames',
+      'preview_health_check',
       'gdevelop_inspect_running_preview',
       'capture_preview_screenshot',
       'render_scene_to_png',

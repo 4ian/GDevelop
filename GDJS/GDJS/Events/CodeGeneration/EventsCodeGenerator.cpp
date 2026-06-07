@@ -1331,7 +1331,7 @@ gd::String EventsCodeGenerator::GenerateObject(
       };
 
   gd::String output;
-  if (type == "objectList") {
+  if (type == "object" || type == "objectList") {
     std::vector<gd::String> realObjects =
         GetObjectsContainersList().ExpandObjectName(objectName,
                                                     context.GetCurrentObject());

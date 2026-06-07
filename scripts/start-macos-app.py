@@ -16,6 +16,8 @@ import sys
 import time
 from pathlib import Path
 
+from libgd_build import LIBGD_VARIANTS, build_libgd
+
 
 DEV_PORTS = (3000, 5002)
 
@@ -41,7 +43,15 @@ def parse_args() -> argparse.Namespace:
         "--skip-build",
         dest="build",
         action="store_false",
-        help="Launch faster by reusing the existing newIDE/app/build and app/www.",
+        help="Launch faster by reusing the existing libGD.js, newIDE/app/build and app/www.",
+    )
+    parser.add_argument(
+        "--libgd-variant",
+        choices=LIBGD_VARIANTS,
+        help=(
+            "Optional GDevelop.js build variant to pass as --variant=<value>. "
+            "For development, --libgd-variant dev links faster."
+        ),
     )
     parser.add_argument(
         "--no-launch",
@@ -231,7 +241,14 @@ def sync_electron_www(electron_app_dir: Path, build: bool, dry_run: bool) -> Non
         return
 
     run_command(
-        [resolve_tool("npm"), "run", "app-build", "--", "--skip-app-build"],
+        [
+            resolve_tool("npm"),
+            "run",
+            "app-build",
+            "--",
+            "--skip-app-build",
+            "--allow-development-libgd",
+        ],
         cwd=electron_app_dir,
         dry_run=dry_run,
     )
@@ -338,6 +355,15 @@ def main() -> int:
         stop_existing_processes(repo_root, electron_exe, args.dry_run)
         ensure_electron_dependencies(repo_root, electron_app_dir, electron_exe, args.dry_run)
         ensure_react_app_dependencies(app_dir, args.dry_run)
+        build_libgd(
+            repo_root,
+            skip_build=not build,
+            variant=args.libgd_variant,
+            dry_run=args.dry_run,
+            required=False,
+            auto_install_emscripten=False,
+            skip_message="Fast launch: reusing existing libGD.js because --skip-build was set.",
+        )
         build_react_app(app_dir, build, args.dry_run)
         sync_electron_www(electron_app_dir, build, args.dry_run)
 

@@ -220,7 +220,7 @@ These are current GDevelop MCP limitations observed during real project work. Tr
 18. Parameter schemas still require attention. Many tools accept both old and new naming conventions or advanced serialized payloads for compatibility. Prefer introspection (`inspect_tool_schema`, `get_tool_usage_examples`) and exact metadata over guessing `sceneName` vs `scene_name` or object parameter order.
 19. Transactions are explicit, not automatic. `snapshot_project` and rollback helpers exist, and some focused writes roll back internally, but multi-step workflows still need intentional checkpoints and read-back. There is no universal "show diff then confirm save" transaction layer for every MCP batch.
 20. Draw-order inspection is mostly static. `inspect_scene_draw_order` helps with initial layout, layers, and z-order, but runtime z-order changes, hidden objects, created instances, effects, masks, and camera/layer transforms still need preview verification.
-21. Extension function validation is not full semantic compilation. MCP now validates `events_json` and sentence placeholders for extension functions, but it does not yet prove that the function body uses every parameter correctly, that generated code compiles, or that behavior/object methods are semantically correct in every caller context.
+21. Extension function validation is not full semantic compilation. MCP now validates `events_json` and sentence placeholders for extension functions, and GDJS code generation supports regular `object` parameters by passing object-list maps to free and behavior events functions. Still verify preview/code generation after changing extension function signatures because MCP validation does not prove that every caller context compiles or that the function body uses every parameter correctly.
 
 ## Permissions
 
@@ -299,6 +299,8 @@ Variable expression syntax (see `gdevelop_get_events_json_examples` → `variabl
 The field `isRelevantForSceneEvents` (from `gdevelop_get_instruction_metadata`) maps to GDevelop's `isRelevantForLayoutEvents()`. A value of false does NOT mean the instruction is unusable in scene events; object-variable instructions (`ModVarObjet` / `VarObjet`) report false yet work in scene events.
 
 For extension function event bodies, use the same event JSON shape and metadata workflow. `gdevelop_create_or_update_extension_function` validates `events_json` before replacing the function's event list and validates non-empty action/condition sentences against the final parameter list. Invalid function event JSON or sentence placeholders must be fixed before retrying; failed writes are rolled back.
+
+Extension function object parameters represent selected object lists at runtime. Use the regular `object` parameter type for caller-facing object parameters unless a specialized picking mode is intended (`objectListOrEmptyIfJustDeclared`, `objectListOrEmptyWithoutPicking`, or `objectPtr`). After changing object parameters on free or behavior extension functions, restart stale previews and verify the generated call path; object parameters should not appear as blank arguments or `null` in generated GDJS calls.
 
 Extension function sentence parameter indexes:
 

@@ -2,6 +2,7 @@ const shell = require('shelljs');
 const fs = require('fs');
 const path = require('path');
 const args = require('minimist')(process.argv.slice(2));
+const allowDevelopmentLibGD = !!args['allow-development-libgd'];
 
 // Sanity check electron-builder installation
 if (!shell.test('-f', './node_modules/.bin/electron-builder')) {
@@ -22,7 +23,7 @@ const checkLibGDjsSize = () => {
       }
 
       const sizeInMiB = stats.size / 1024 / 1024;
-      if (sizeInMiB > 2) {
+      if (sizeInMiB > 2 && !allowDevelopmentLibGD) {
         shell.echo(
           `❌ libGD.js size is too big (${sizeInMiB.toFixed(
             2

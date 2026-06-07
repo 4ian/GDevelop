@@ -34,6 +34,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+from libgd_build import LIBGD_VARIANTS, build_libgd
+
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
@@ -48,7 +50,20 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--skip-build",
         action="store_true",
-        help="Reuse newIDE/app/build instead of running npm run build.",
+        help="Reuse existing libGD.js and newIDE/app/build instead of running npm builds.",
+    )
+    parser.add_argument(
+        "--libgd-variant",
+        choices=LIBGD_VARIANTS,
+        help=(
+            "Optional GDevelop.js build variant to pass as --variant=<value>. "
+            "For development, --libgd-variant dev links faster."
+        ),
+    )
+    parser.add_argument(
+        "--libgd-use-mingw",
+        action="store_true",
+        help="Build GDevelop.js with npm run build-with-MinGW instead of the default Ninja build.",
     )
     parser.add_argument(
         "--sign",
@@ -265,6 +280,13 @@ def main() -> int:
     try:
         ensure_electron_dependencies(electron_app_dir, electron_builder, args.dry_run)
         ensure_react_app_dependencies(app_dir, args.dry_run)
+        build_libgd(
+            repo_root,
+            skip_build=args.skip_build,
+            variant=args.libgd_variant,
+            use_mingw=args.libgd_use_mingw,
+            dry_run=args.dry_run,
+        )
         build_react_app(app_dir, args.skip_build, args.dry_run)
         package_app(electron_app_dir, args.sign, args.dry_run)
         report_artifact(dist_dir, args.dry_run)

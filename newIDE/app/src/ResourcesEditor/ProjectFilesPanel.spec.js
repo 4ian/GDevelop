@@ -112,6 +112,10 @@ describe('ProjectFilesPanel', () => {
     expect(projectFilesHeaderSection).toContain(
       '<div style={styles.headerSearch}>'
     );
+    expect(source).toContain('headerSearch: {\n    flex: 1,\n    minWidth: 0,');
+    expect(source).not.toContain(
+      "headerSearch: {\n    display: 'flex',\n    flex: 1,"
+    );
     expect(searchBarStart).toBeGreaterThan(
       projectFilesHeaderSection.indexOf('<div style={styles.header}>')
     );

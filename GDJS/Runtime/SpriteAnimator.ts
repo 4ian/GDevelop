@@ -39,12 +39,29 @@ namespace gdjs {
   };
 
   /**
+   * Represents the part of an image used by a frame.
+   * @category Objects > Animations
+   */
+  export type SpriteFrameSourceRectData = {
+    /** X position of the rectangle inside the image. */
+    x: float;
+    /** Y position of the rectangle inside the image. */
+    y: float;
+    /** Width of the rectangle inside the image. */
+    width: float;
+    /** Height of the rectangle inside the image. */
+    height: float;
+  };
+
+  /**
    * Represents a {@link gdjs.SpriteAnimationFrame}.
    * @category Objects > Animations
    */
   export type SpriteFrameData = {
     /** The resource name of the image used in this frame. */
     image: string;
+    /** The part of the image used in this frame. If omitted, the whole image is used. */
+    sourceRect?: SpriteFrameSourceRectData;
     /** The points of the frame. */
     points: Array<SpriteCustomPointData>;
     /** The origin point. */
@@ -101,7 +118,10 @@ namespace gdjs {
    * @category Objects > Animations
    */
   export interface AnimationFrameTextureManager<T> {
-    getAnimationFrameTexture(imageName: string): T;
+    getAnimationFrameTexture(
+      imageName: string,
+      sourceRect?: SpriteFrameSourceRectData | null
+    ): T;
     getAnimationFrameWidth(pixiTexture: T);
     getAnimationFrameHeight(pixiTexture: T);
   }
@@ -115,6 +135,7 @@ namespace gdjs {
    */
   export class SpriteAnimationFrame<T> {
     image: string;
+    sourceRect: SpriteFrameSourceRectData | null = null;
 
     //TODO: Rename in imageName, and do not store it in the object?
     texture: T;
@@ -133,7 +154,12 @@ namespace gdjs {
       textureManager: gdjs.AnimationFrameTextureManager<T>
     ) {
       this.image = frameData ? frameData.image : '';
-      this.texture = textureManager.getAnimationFrameTexture(this.image);
+      this.sourceRect =
+        frameData && frameData.sourceRect ? { ...frameData.sourceRect } : null;
+      this.texture = textureManager.getAnimationFrameTexture(
+        this.image,
+        this.sourceRect
+      );
       this.points = new Hashtable();
       this.reinitialize(frameData, textureManager);
     }
@@ -147,7 +173,13 @@ namespace gdjs {
       textureManager: gdjs.AnimationFrameTextureManager<T>
     ) {
       this.image = frameData.image;
-      this.texture = textureManager.getAnimationFrameTexture(this.image);
+      this.sourceRect = frameData.sourceRect
+        ? { ...frameData.sourceRect }
+        : null;
+      this.texture = textureManager.getAnimationFrameTexture(
+        this.image,
+        this.sourceRect
+      );
 
       this.points.clear();
       for (let i = 0, len = frameData.points.length; i < len; ++i) {

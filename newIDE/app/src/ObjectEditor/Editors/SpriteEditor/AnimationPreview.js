@@ -15,6 +15,7 @@ import PlaceholderLoader from '../../../UI/PlaceholderLoader';
 import Play from '../../../UI/CustomSvgIcons/Play';
 import Pause from '../../../UI/CustomSvgIcons/Pause';
 import { toFixedWithoutTrailingZeros } from '../../../Utils/Mathematics';
+import { type SpriteSourceRect } from '../../../Utils/SpriteSourceRect';
 
 const styles = {
   // This container is important to have the loader positioned on top of the image.
@@ -42,6 +43,7 @@ const styles = {
 type Props = {|
   animationName: string,
   resourceNames: string[],
+  sourceRects?: Array<?SpriteSourceRect>,
   getImageResourceSource: (resourceName: string) => string,
   isImageResourceSmooth: (resourceName: string) => boolean,
   timeBetweenFrames: number,
@@ -59,6 +61,7 @@ type Props = {|
 const AnimationPreview = ({
   animationName,
   resourceNames,
+  sourceRects,
   getImageResourceSource,
   isImageResourceSmooth,
   timeBetweenFrames,
@@ -236,6 +239,9 @@ const AnimationPreview = ({
   }
 
   const resourceName = resourceNames[currentFrameIndexRef.current];
+  const sourceRect = sourceRects
+    ? sourceRects[currentFrameIndexRef.current]
+    : null;
 
   return (
     <Column expand noOverflowParent noMargin>
@@ -243,6 +249,7 @@ const AnimationPreview = ({
         <ImagePreview
           resourceName={resourceName}
           imageResourceSource={getImageResourceSource(resourceName)}
+          sourceRect={sourceRect}
           isImageResourceSmooth={isImageResourceSmooth(resourceName)}
           displaySpacedView={displaySpacedView}
           hideCheckeredBackground={hideCheckeredBackground}

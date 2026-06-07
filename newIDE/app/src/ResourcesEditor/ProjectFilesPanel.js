@@ -142,7 +142,6 @@ const styles = {
     flexShrink: 0,
   },
   headerSearch: {
-    display: 'flex',
     flex: 1,
     minWidth: 0,
   },

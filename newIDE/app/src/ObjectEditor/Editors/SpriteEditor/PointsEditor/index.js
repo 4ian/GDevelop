@@ -26,6 +26,7 @@ import { useResponsiveWindowSize } from '../../../../UI/Responsive/ResponsiveWin
 import ScrollView from '../../../../UI/ScrollView';
 import Paper from '../../../../UI/Paper';
 import useAlertDialog from '../../../../UI/Alert/useAlertDialog';
+import { getSourceRectFromSprite } from '../../../../Utils/SpriteSourceRect';
 
 const styles = {
   leftContainer: {
@@ -223,6 +224,7 @@ const PointsEditor = ({
                 resourceName,
                 {}
               )}
+              sourceRect={getSourceRectFromSprite(sprite)}
               isImageResourceSmooth={isProjectImageResourceSmooth(
                 project,
                 resourceName

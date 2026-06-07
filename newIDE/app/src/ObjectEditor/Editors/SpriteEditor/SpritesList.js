@@ -39,6 +39,16 @@ import ContextMenu, {
 import useAlertDialog from '../../../UI/Alert/useAlertDialog';
 import { groupResourcesByAnimations } from './AnimationImportHelper';
 import { type ResourceExternalEditor } from '../../../ResourcesList/ResourceExternalEditor';
+import RawSpriteSheetImportDialog, {
+  type RawSpriteSheetImportOptions,
+} from './RawSpriteSheetImportDialog';
+import {
+  createSpriteSheetSourceRects,
+  getSourceRectFromSprite,
+  loadImageSize,
+  setSpriteSourceRect,
+  type SpriteSourceRect,
+} from '../../../Utils/SpriteSourceRect';
 
 const gd: libGDevelop = global.gd;
 
@@ -71,6 +81,7 @@ const SortableSpriteThumbnail = SortableElement(
       onSelect={onSelect}
       onContextMenu={onContextMenu}
       resourceName={sprite.getImageName()}
+      sourceRect={getSourceRectFromSprite(sprite)}
       resourcesLoader={resourcesLoader}
       project={project}
       style={isFirst ? {} : styles.thumbnailExtraStyle}
@@ -117,6 +128,7 @@ const SortableList = SortableContainer(
                 onSelect={selected => onSelectSprite(sprite, selected)}
                 onContextMenu={(x, y) => onOpenSpriteContextMenu(x, y, sprite)}
                 resourceName={sprite.getImageName()}
+                sourceRect={getSourceRectFromSprite(sprite)}
                 resourcesLoader={resourcesLoader}
                 project={project}
                 size={SPRITE_SIZE}
@@ -236,14 +248,16 @@ export const applyPointsAndMasksToSpriteIfNecessary = (
   }
 };
 
-export const addAnimationFrame = (
+export const addAnimationFrameWithResourceName = (
   animations: gdSpriteAnimationList,
   direction: gdDirection,
-  resource: gdResource,
-  onSpriteAdded: (sprite: gdSprite) => void
+  resourceName: string,
+  onSpriteAdded: (sprite: gdSprite) => void,
+  sourceRect?: ?SpriteSourceRect
 ) => {
   const sprite = new gd.Sprite();
-  sprite.setImageName(resource.getName());
+  sprite.setImageName(resourceName);
+  setSpriteSourceRect(sprite, sourceRect);
 
   applyPointsAndMasksToSpriteIfNecessary(animations, direction, sprite);
 
@@ -251,6 +265,28 @@ export const addAnimationFrame = (
   direction.addSprite(sprite);
   sprite.delete();
 };
+
+export const addAnimationFrame = (
+  animations: gdSpriteAnimationList,
+  direction: gdDirection,
+  resource: gdResource,
+  onSpriteAdded: (sprite: gdSprite) => void,
+  sourceRect?: ?SpriteSourceRect
+) => {
+  addAnimationFrameWithResourceName(
+    animations,
+    direction,
+    resource.getName(),
+    onSpriteAdded,
+    sourceRect
+  );
+};
+
+type RawSpriteSheetImportState = {|
+  resourceName: string,
+  sheetWidth: number,
+  sheetHeight: number,
+|};
 
 type Props = {|
   animations: gdSpriteAnimationList,
@@ -297,8 +333,12 @@ const SpritesList = ({
     [number]: boolean,
   }>({});
   const spriteContextMenu = React.useRef<?ContextMenuInterface>(null);
+  const [
+    rawSpriteSheetImport,
+    setRawSpriteSheetImport,
+  ] = React.useState<?RawSpriteSheetImportState>(null);
   const forceUpdate = useForceUpdate();
-  const { showConfirmation } = useAlertDialog();
+  const { showAlert, showConfirmation } = useAlertDialog();
 
   const storageProvider = resourceManagementProps.getStorageProvider();
   const resourceSources = resourceManagementProps.resourceSources
@@ -479,6 +519,119 @@ const SpritesList = ({
     ]
   );
 
+  const onImportRawSpriteSheet = React.useCallback(
+    async (initialResourceSource: ResourceSource) => {
+      const {
+        selectedResources,
+        selectedSourceName,
+      } = await resourceManagementProps.onChooseResource({
+        initialSourceName: initialResourceSource.name,
+        multiSelection: false,
+        resourceKind: 'image',
+      });
+
+      if (!selectedResources.length) return;
+      const selectedResource = selectedResources[0];
+      const selectedResourceSource = resourceSources.find(
+        source => source.name === selectedSourceName
+      );
+      if (!selectedResourceSource) {
+        return;
+      }
+
+      let hasCreatedResource = false;
+      if (selectedResourceSource.shouldCreateResource) {
+        applyResourceDefaults(project, selectedResource);
+        hasCreatedResource = project
+          .getResourcesManager()
+          .addResource(selectedResource);
+      }
+
+      const resourceName = selectedResource.getName();
+      if (selectedResourceSource.shouldCreateResource) {
+        // Important, we are responsible for deleting the resources that were given to us.
+        // Otherwise we have a memory leak, as calling addResource is making a copy of the resource.
+        selectedResources.forEach(resource => resource.delete());
+      }
+
+      if (hasCreatedResource) {
+        await resourceManagementProps.onFetchNewlyAddedResources();
+        resourceManagementProps.onNewResourcesAdded();
+      }
+
+      try {
+        const [sheetWidth, sheetHeight] = await loadImageSize(
+          resourcesLoader.getResourceFullUrl(project, resourceName, {})
+        );
+        setRawSpriteSheetImport({
+          resourceName,
+          sheetWidth,
+          sheetHeight,
+        });
+      } catch (error) {
+        console.error('Unable to load raw sprite sheet image size:', error);
+        await showAlert({
+          title: t`Unable to import the sprite sheet`,
+          message: t`The image size could not be read.`,
+          dismissButtonLabel: t`Close`,
+        });
+      }
+    },
+    [
+      project,
+      resourceManagementProps,
+      resourceSources,
+      resourcesLoader,
+      showAlert,
+    ]
+  );
+
+  const addRawSpriteSheetFrames = React.useCallback(
+    (options: RawSpriteSheetImportOptions) => {
+      if (!rawSpriteSheetImport) return;
+
+      const directionSpritesCountBeforeAdding = direction.getSpritesCount();
+      const sourceRects = createSpriteSheetSourceRects({
+        columns: options.columns,
+        rows: options.rows,
+        frameCount: options.frameCount,
+        sheetWidth: rawSpriteSheetImport.sheetWidth,
+        sheetHeight: rawSpriteSheetImport.sheetHeight,
+      });
+
+      for (const sourceRect of sourceRects) {
+        addAnimationFrameWithResourceName(
+          animations,
+          direction,
+          rawSpriteSheetImport.resourceName,
+          onSpriteAdded,
+          sourceRect
+        );
+      }
+
+      setRawSpriteSheetImport(null);
+      forceUpdate();
+
+      if (sourceRects.length && onSpriteUpdated) onSpriteUpdated();
+      if (
+        directionSpritesCountBeforeAdding === 0 &&
+        sourceRects.length &&
+        onFirstSpriteUpdated
+      ) {
+        onFirstSpriteUpdated();
+      }
+    },
+    [
+      animations,
+      direction,
+      forceUpdate,
+      onFirstSpriteUpdated,
+      onSpriteAdded,
+      onSpriteUpdated,
+      rawSpriteSheetImport,
+    ]
+  );
+
   const deleteSprites = React.useCallback(
     async () => {
       const sprites = selectedSprites.current;
@@ -644,22 +797,33 @@ const SpritesList = ({
             icon={<Add />}
             primary
             buildMenuTemplate={(i18n: I18nType) => {
-              const storageProvider = resourceManagementProps.getStorageProvider();
-              return resourceManagementProps.resourceSources
-                .filter(source => source.kind === 'image')
-                .filter(
-                  ({ onlyForStorageProvider }) =>
-                    !onlyForStorageProvider ||
-                    onlyForStorageProvider === storageProvider.internalName
-                )
-                .map(source => ({
-                  label: i18n._(source.displayName),
-                  click: () => onAddSprite(source),
-                }));
+              const menuTemplate: Array<any> = resourceSources.map(source => ({
+                label: i18n._(source.displayName),
+                click: () => onAddSprite(source),
+              }));
+              if (resourceSources.length) {
+                menuTemplate.push(
+                  { type: 'separator' },
+                  {
+                    label: i18n._(t`Import raw sprite sheet...`),
+                    click: () => onImportRawSpriteSheet(resourceSources[0]),
+                  }
+                );
+              }
+              return menuTemplate;
             }}
           />
         </Column>
       </ResponsiveLineStackLayout>
+      {rawSpriteSheetImport && (
+        <RawSpriteSheetImportDialog
+          resourceName={rawSpriteSheetImport.resourceName}
+          sheetWidth={rawSpriteSheetImport.sheetWidth}
+          sheetHeight={rawSpriteSheetImport.sheetHeight}
+          onApply={addRawSpriteSheetFrames}
+          onRequestClose={() => setRawSpriteSheetImport(null)}
+        />
+      )}
     </ColumnStackLayout>
   );
 };

@@ -3,6 +3,7 @@ import RenderedInstance from './RenderedInstance';
 import PixiResourcesLoader from '../../ObjectsRendering/PixiResourcesLoader';
 import ResourcesLoader from '../../ResourcesLoader';
 import * as PIXI from 'pixi.js-legacy';
+import { getSourceRectFromSprite } from '../../Utils/SpriteSourceRect';
 const gd: libGDevelop = global.gd;
 
 /**
@@ -207,13 +208,23 @@ export default class RenderedSpriteInstance extends RenderedInstance {
       return;
     }
 
+    const sourceRect = getSourceRectFromSprite(sprite);
+    const spriteTexture = sourceRect
+      ? this._pixiResourcesLoader.getPIXITextureForSourceRect(
+          this._project,
+          sprite.getImageName(),
+          sourceRect
+        )
+      : texture;
+    this._pixiObject.texture = spriteTexture;
+
     const origin = sprite.getOrigin();
     this._originX = origin.getX();
     this._originY = origin.getY();
 
     if (sprite.isDefaultCenterPoint()) {
-      this._centerX = texture.width / 2;
-      this._centerY = texture.height / 2;
+      this._centerX = spriteTexture.width / 2;
+      this._centerY = spriteTexture.height / 2;
     } else {
       const center = sprite.getCenter();
       this._centerX = center.getX();

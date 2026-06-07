@@ -203,10 +203,14 @@ const getEventInstructions = (
   };
 };
 
-const summarizeEventReference = (reference: EventReference): Object => {
+const summarizeEventReference = (
+  reference: EventReference,
+  options?: {| includeSerialized?: boolean |}
+): Object => {
   const { event, path } = reference;
   const eventType = event.getType();
   const instructions = getEventInstructions(event);
+  const includeSerialized = !options || options.includeSerialized !== false;
   const summary = {
     eventPath: formatEventPath(path),
     path,
@@ -214,15 +218,20 @@ const summarizeEventReference = (reference: EventReference): Object => {
     aiGeneratedEventId: event.getAiGeneratedEventId() || null,
     conditions: instructions.conditions,
     actions: instructions.actions,
-    serializedEvent: serializeToJSObject(event),
   };
+  if (includeSerialized) {
+    summary.serializedEvent = serializeToJSObject(event);
+  }
 
   if (eventType === 'BuiltinCommonInstructions::Group') {
     summary.groupName = gd.asGroupEvent(event).getName();
     summary.subEventsCount = event.getSubEvents().getEventsCount();
   }
   if (eventType === 'BuiltinCommonInstructions::Comment') {
-    summary.comment = summary.serializedEvent.comment || '';
+    const serializedEvent = includeSerialized
+      ? summary.serializedEvent
+      : serializeToJSObject(event);
+    summary.comment = serializedEvent.comment || '';
   }
 
   return summary;
@@ -313,6 +322,29 @@ const findEventReferences = (
   return references.filter(reference =>
     eventMatchesCriteria(reference, criteria)
   );
+};
+
+export const findEventsInEventsList = ({
+  eventsList,
+  args,
+  owner,
+  defaultIncludeSerialized,
+}: {|
+  eventsList: gdEventsList,
+  args: Object,
+  owner?: Object,
+  defaultIncludeSerialized?: boolean,
+|}): Array<Object> => {
+  const includeSerialized =
+    args && args.summary_only
+      ? false
+      : args && args.include_serialized !== undefined
+      ? !!args.include_serialized
+      : defaultIncludeSerialized !== false;
+  return findEventReferences(eventsList, args).map(reference => ({
+    ...(owner || {}),
+    ...summarizeEventReference(reference, { includeSerialized }),
+  }));
 };
 
 const getSingleEventReference = (
@@ -541,9 +573,12 @@ export const findSceneEvents = (project: gdProject, args: Object): Object => {
     typeof args.limit === 'number' && Number.isFinite(args.limit)
       ? Math.max(1, Math.min(100, Math.floor(args.limit)))
       : 50;
-  const matches = findEventReferences(scene.getEvents(), args)
-    .slice(0, limit)
-    .map(summarizeEventReference);
+  const matches = findEventsInEventsList({
+    eventsList: scene.getEvents(),
+    args,
+    owner: { scope: 'scene', sceneName },
+    defaultIncludeSerialized: true,
+  }).slice(0, limit);
 
   return {
     success: true,

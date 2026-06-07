@@ -3,6 +3,13 @@ declare class gdSprite {
   constructor(): void;
   setImageName(name: string): void;
   getImageName(): string;
+  hasCustomSourceRect(): boolean;
+  setCustomSourceRect(x: number, y: number, width: number, height: number): void;
+  clearCustomSourceRect(): void;
+  getSourceRectX(): number;
+  getSourceRectY(): number;
+  getSourceRectWidth(): number;
+  getSourceRectHeight(): number;
   getOrigin(): gdPoint;
   getCenter(): gdPoint;
   isDefaultCenterPoint(): boolean;

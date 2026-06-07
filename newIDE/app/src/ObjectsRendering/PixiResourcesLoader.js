@@ -45,6 +45,7 @@ type ResourcePromise<T> = { [resourceName: string]: Promise<T> };
 let loadedBitmapFonts = {};
 let loadedFontFamilies = {};
 let loadedTextures: { [string]: any } = {};
+let loadedSourceRectTextures: { [string]: any } = {};
 const invalidTexture = PIXI.Texture.from('res/invalid_texture.png');
 const loadingTexture = PIXI.Texture.from(
   'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAIAQMAAAD+wSzIAAAAA1BMVEXX19f5cgrAAAAAAXRSTlMz/za5cAAAAApJREFUCNdjQAMAABAAAbSqgB8AAAAASUVORK5CYII='
@@ -282,6 +283,7 @@ export default class PixiResourcesLoader {
     loadedBitmapFonts = {};
     loadedFontFamilies = {};
     loadedTextures = {};
+    loadedSourceRectTextures = {};
     loadedOrLoadingThreeTextures = {};
     loadedOrLoadingThreeMaterials = {};
     loadedOrLoading3DModelPromises = {};
@@ -326,6 +328,12 @@ export default class PixiResourcesLoader {
   }
 
   static async _doReloadResource(project: gdProject, resourceName: string) {
+    Object.keys(loadedSourceRectTextures).forEach(key => {
+      if (key.startsWith(`sourceRect:${resourceName}:`)) {
+        delete loadedSourceRectTextures[key];
+      }
+    });
+
     const loadedTexture = loadedTextures[resourceName];
     if (loadedTexture) {
       // Remove the cached texture BEFORE awaiting the unload.
@@ -681,6 +689,61 @@ export default class PixiResourcesLoader {
 
     // $FlowFixMe[invalid-computed-prop]
     return loadedTextures[resourceName];
+  }
+
+  /**
+   * Return a PIXI texture for a rectangle inside an image resource.
+   * The returned texture shares the same base texture as the full image.
+   */
+  static getPIXITextureForSourceRect(
+    project: gdProject,
+    resourceName: string,
+    sourceRect: {|
+      x: number,
+      y: number,
+      width: number,
+      height: number,
+    |}
+  ): any {
+    const texture = PixiResourcesLoader.getPIXITexture(project, resourceName);
+    if (
+      texture === invalidTexture ||
+      !texture.baseTexture ||
+      !texture.baseTexture.valid ||
+      sourceRect.width <= 0 ||
+      sourceRect.height <= 0
+    ) {
+      return texture;
+    }
+
+    const sourceRectKey = `sourceRect:${resourceName}:${sourceRect.x}:${sourceRect.y}:${sourceRect.width}:${sourceRect.height}`;
+    const cachedTexture = loadedSourceRectTextures[sourceRectKey];
+    if (
+      cachedTexture &&
+      !cachedTexture.destroyed &&
+      cachedTexture.baseTexture === texture.baseTexture
+    ) {
+      return cachedTexture;
+    }
+
+    try {
+      const frame = new PIXI.Rectangle(
+        sourceRect.x,
+        sourceRect.y,
+        sourceRect.width,
+        sourceRect.height
+      );
+      return (loadedSourceRectTextures[sourceRectKey] = new PIXI.Texture(
+        texture,
+        frame
+      ));
+    } catch (error) {
+      console.error(
+        `Unable to create a texture for source rectangle in "${resourceName}":`,
+        error
+      );
+      return invalidTexture;
+    }
   }
 
   /**

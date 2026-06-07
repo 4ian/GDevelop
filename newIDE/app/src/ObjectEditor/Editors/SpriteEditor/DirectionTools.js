@@ -21,6 +21,10 @@ import Edit from '../../../UI/CustomSvgIcons/Edit';
 import Play from '../../../UI/CustomSvgIcons/Play';
 import { toFixedWithoutTrailingZeros } from '../../../Utils/Mathematics';
 import GDevelopThemeContext from '../../../UI/Theme/GDevelopThemeContext';
+import {
+  getSourceRectFromSprite,
+  type SpriteSourceRect,
+} from '../../../Utils/SpriteSourceRect';
 
 const styles = {
   container: {
@@ -106,6 +110,13 @@ const DirectionTools = ({
 
   const hasSprites = direction.getSpritesCount();
   const { isMobile } = useResponsiveWindowSize();
+  const getSpriteSourceRects = (): Array<?SpriteSourceRect> => {
+    const sourceRects: Array<?SpriteSourceRect> = [];
+    for (let index = 0; index < direction.getSpritesCount(); index++) {
+      sourceRects.push(getSourceRectFromSprite(direction.getSprite(index)));
+    }
+    return sourceRects;
+  };
 
   return (
     <I18n>
@@ -205,6 +216,7 @@ const DirectionTools = ({
               <AnimationPreview
                 animationName={animationName}
                 resourceNames={direction.getSpriteNames().toJSArray()}
+                sourceRects={getSpriteSourceRects()}
                 getImageResourceSource={(name: string) =>
                   resourcesLoader.getResourceFullUrl(project, name, {})
                 }

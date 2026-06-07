@@ -98,6 +98,14 @@ void Direction::UnserializeFrom(const gd::SerializerElement& element) {
     Sprite sprite;
 
     sprite.SetImageName(spriteElement.GetStringAttribute("image"));
+    if (spriteElement.HasChild("sourceRect")) {
+      const gd::SerializerElement& sourceRectElement =
+          spriteElement.GetChild("sourceRect");
+      sprite.SetCustomSourceRect(sourceRectElement.GetDoubleAttribute("x"),
+                                 sourceRectElement.GetDoubleAttribute("y"),
+                                 sourceRectElement.GetDoubleAttribute("width"),
+                                 sourceRectElement.GetDoubleAttribute("height"));
+    }
     OpenPointsSprites(sprite.GetAllNonDefaultPoints(),
                       spriteElement.GetChild("points", 0, "Points"));
 
@@ -164,6 +172,15 @@ void SaveSpritesDirection(const vector<Sprite>& sprites,
     gd::SerializerElement& spriteElement = element.AddChild("sprite");
 
     spriteElement.SetAttribute("image", sprites[i].GetImageName());
+    if (sprites[i].HasCustomSourceRect()) {
+      gd::SerializerElement& sourceRectElement =
+          spriteElement.AddChild("sourceRect");
+      sourceRectElement.SetAttribute("x", sprites[i].GetSourceRectX());
+      sourceRectElement.SetAttribute("y", sprites[i].GetSourceRectY());
+      sourceRectElement.SetAttribute("width", sprites[i].GetSourceRectWidth());
+      sourceRectElement.SetAttribute("height",
+                                     sprites[i].GetSourceRectHeight());
+    }
     SavePointsSprites(sprites[i].GetAllNonDefaultPoints(),
                       spriteElement.AddChild("points"));
 

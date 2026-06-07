@@ -121,6 +121,55 @@ namespace gdjs {
     }
 
     /**
+     * Return a PIXI texture for a rectangle inside an image resource.
+     * The returned texture shares the same base texture as the full image.
+     */
+    getPIXITextureForSourceRect(
+      resourceName: string,
+      sourceRect: gdjs.SpriteFrameSourceRectData
+    ): PIXI.Texture {
+      const texture = this.getPIXITexture(resourceName);
+      if (
+        texture === this._invalidTexture ||
+        !texture.baseTexture ||
+        !texture.baseTexture.valid ||
+        texture.destroyed ||
+        sourceRect.width <= 0 ||
+        sourceRect.height <= 0
+      ) {
+        return texture;
+      }
+
+      const key = `sourceRect:${resourceName}:${sourceRect.x}:${sourceRect.y}:${sourceRect.width}:${sourceRect.height}`;
+      const existingTexture = this._rectangleTextures.get(key);
+      if (
+        existingTexture &&
+        !existingTexture.destroyed &&
+        existingTexture.baseTexture === texture.baseTexture
+      ) {
+        return existingTexture;
+      }
+
+      try {
+        const frame = new PIXI.Rectangle(
+          sourceRect.x,
+          sourceRect.y,
+          sourceRect.width,
+          sourceRect.height
+        );
+        const sourceRectTexture = new PIXI.Texture(texture.baseTexture, frame);
+        this._rectangleTextures.set(key, sourceRectTexture);
+        return sourceRectTexture;
+      } catch (error) {
+        logger.error(
+          `Unable to create a texture for source rectangle in "${resourceName}".`,
+          error
+        );
+        return this._invalidTexture;
+      }
+    }
+
+    /**
      * Return the PIXI texture associated to the specified resource name.
      * If not found in the loaded textures, this method will try to load it.
      * Warning: this method should only be used in specific cases that cannot rely on

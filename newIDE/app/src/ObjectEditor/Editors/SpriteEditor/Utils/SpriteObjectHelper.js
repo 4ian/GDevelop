@@ -1,6 +1,7 @@
 // @flow
 import { mapVector, mapFor } from '../../../../Utils/MapFor';
 import every from 'lodash/every';
+import { copySpriteSourceRect } from '../../../../Utils/SpriteSourceRect';
 
 const gd: libGDevelop = global.gd;
 
@@ -401,6 +402,7 @@ export const duplicateSpritesInAnimation = (
         const spriteToDuplicate = direction.getSprite(spriteIndex);
         const newSprite = new gd.Sprite();
         newSprite.setImageName(spriteToDuplicate.getImageName());
+        copySpriteSourceRect(spriteToDuplicate, newSprite);
         copySpritePoints(spriteToDuplicate, newSprite);
         copySpritePolygons(spriteToDuplicate, newSprite);
 

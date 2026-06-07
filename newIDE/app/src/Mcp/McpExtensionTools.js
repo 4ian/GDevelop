@@ -7,6 +7,7 @@ import {
   unserializeFromJSObject,
 } from '../Utils/Serializer';
 import { validateEventsJson } from './McpEventKnowledge';
+import { findEventsInEventsList } from './McpEventTools';
 
 const gd: libGDevelop = global.gd;
 
@@ -297,40 +298,48 @@ const summarizeParameters = (
 
 const summarizeProperty = (
   property: gdNamedPropertyDescriptor,
-  index: number
-): Object => ({
-  index,
-  name: property.getName(),
-  type: property.getType(),
-  value: property.getValue(),
-  label: property.getLabel(),
-  description: property.getDescription(),
-  measurementUnit: getOptionalString(property, 'getMeasurementUnit') || '',
-  group: getOptionalString(property, 'getGroup') || '',
-  isHidden: !!getOptionalBoolean(property, 'isHidden'),
-  isAdvanced: !!getOptionalBoolean(property, 'isAdvanced'),
-  isDeprecated: !!getOptionalBoolean(property, 'isDeprecated'),
-  extraInfo: getVectorStringArray(property.getExtraInfo()),
-  choices: mapVector(property.getChoices(), choice => ({
-    value: choice.getValue(),
-    label: choice.getLabel(),
-  })),
-  serializedProperty: serializeToJSObject(property),
-});
+  index: number,
+  includeSerialized: boolean = true
+): Object => {
+  const summary = {
+    index,
+    name: property.getName(),
+    type: property.getType(),
+    value: property.getValue(),
+    label: property.getLabel(),
+    description: property.getDescription(),
+    measurementUnit: getOptionalString(property, 'getMeasurementUnit') || '',
+    group: getOptionalString(property, 'getGroup') || '',
+    isHidden: !!getOptionalBoolean(property, 'isHidden'),
+    isAdvanced: !!getOptionalBoolean(property, 'isAdvanced'),
+    isDeprecated: !!getOptionalBoolean(property, 'isDeprecated'),
+    extraInfo: getVectorStringArray(property.getExtraInfo()),
+    choices: mapVector(property.getChoices(), choice => ({
+      value: choice.getValue(),
+      label: choice.getLabel(),
+    })),
+  };
+  if (includeSerialized) {
+    summary.serializedProperty = serializeToJSObject(property);
+  }
+  return summary;
+};
 
 const summarizeProperties = (
-  properties: gdPropertiesContainer
+  properties: gdPropertiesContainer,
+  includeSerialized: boolean = true
 ): Array<Object> =>
   mapFor(0, properties.getCount(), index =>
-    summarizeProperty(properties.getAt(index), index)
+    summarizeProperty(properties.getAt(index), index, includeSerialized)
   );
 
 const summarizeEventsFunction = (
   eventsFunction: gdEventsFunction,
-  includeEvents: boolean = true
+  includeEvents: boolean = true,
+  includeSerialized: boolean = true
 ): Object => {
   const events = eventsFunction.getEvents();
-  return {
+  const summary = {
     name: eventsFunction.getName(),
     functionType: functionTypeToName(eventsFunction.getFunctionType()),
     functionTypeValue: eventsFunction.getFunctionType(),
@@ -351,8 +360,11 @@ const summarizeEventsFunction = (
       ? renderNonTranslatedEventsAsText({ eventsList: events })
       : undefined,
     eventsJson: includeEvents ? serializeToJSON(events) : undefined,
-    serializedFunction: serializeToJSObject(eventsFunction),
   };
+  if (includeSerialized) {
+    summary.serializedFunction = serializeToJSObject(eventsFunction);
+  }
+  return summary;
 };
 
 const getEventsFunctionSentenceValidation = (
@@ -473,79 +485,113 @@ const assertEventsFunctionSentenceIsValid = (
 
 const summarizeFunctions = (
   container: gdEventsFunctionsContainer,
-  includeEvents: boolean = true
+  includeEvents: boolean = true,
+  includeSerialized: boolean = true
 ): Array<Object> =>
   mapFor(0, container.getEventsFunctionsCount(), index =>
-    summarizeEventsFunction(container.getEventsFunctionAt(index), includeEvents)
+    summarizeEventsFunction(
+      container.getEventsFunctionAt(index),
+      includeEvents,
+      includeSerialized
+    )
   );
 
 const summarizeBehavior = (
   behavior: gdEventsBasedBehavior,
-  includeEvents: boolean = true
-): Object => ({
-  name: behavior.getName(),
-  fullName: behavior.getFullName(),
-  description: behavior.getDescription(),
-  objectType: behavior.getObjectType(),
-  isPrivate: behavior.isPrivate(),
-  iconUrl: getOptionalString(behavior, 'getIconUrl') || '',
-  previewIconUrl: getOptionalString(behavior, 'getPreviewIconUrl') || '',
-  properties: summarizeProperties(behavior.getPropertyDescriptors()),
-  sharedProperties: summarizeProperties(
-    behavior.getSharedPropertyDescriptors()
-  ),
-  functions: summarizeFunctions(behavior.getEventsFunctions(), includeEvents),
-  serializedBehavior: serializeToJSObject(behavior),
-});
+  includeEvents: boolean = true,
+  includeSerialized: boolean = true
+): Object => {
+  const summary = {
+    name: behavior.getName(),
+    fullName: behavior.getFullName(),
+    description: behavior.getDescription(),
+    objectType: behavior.getObjectType(),
+    isPrivate: behavior.isPrivate(),
+    iconUrl: getOptionalString(behavior, 'getIconUrl') || '',
+    previewIconUrl: getOptionalString(behavior, 'getPreviewIconUrl') || '',
+    properties: summarizeProperties(
+      behavior.getPropertyDescriptors(),
+      includeSerialized
+    ),
+    sharedProperties: summarizeProperties(
+      behavior.getSharedPropertyDescriptors(),
+      includeSerialized
+    ),
+    functions: summarizeFunctions(
+      behavior.getEventsFunctions(),
+      includeEvents,
+      includeSerialized
+    ),
+  };
+  if (includeSerialized) {
+    summary.serializedBehavior = serializeToJSObject(behavior);
+  }
+  return summary;
+};
 
 const summarizeBehaviors = (
   extension: gdEventsFunctionsExtension,
-  includeEvents: boolean = true
+  includeEvents: boolean = true,
+  includeSerialized: boolean = true
 ): Array<Object> => {
   const behaviors = extension.getEventsBasedBehaviors();
   return mapFor(0, behaviors.getCount(), index =>
-    summarizeBehavior(behaviors.getAt(index), includeEvents)
+    summarizeBehavior(behaviors.getAt(index), includeEvents, includeSerialized)
   );
 };
 
 const summarizeObject = (
   object: gdEventsBasedObject,
-  includeEvents: boolean = true
-): Object => ({
-  name: object.getName(),
-  fullName: object.getFullName(),
-  description: object.getDescription(),
-  defaultName: object.getDefaultName(),
-  isRenderedIn3D: object.isRenderedIn3D(),
-  isPrivate: object.isPrivate(),
-  isInnerAreaFollowingParentSize: object.isInnerAreaFollowingParentSize(),
-  isTextContainer: object.isTextContainer(),
-  isAnimatable: object.isAnimatable(),
-  iconUrl: getOptionalString(object, 'getIconUrl') || '',
-  previewIconUrl: getOptionalString(object, 'getPreviewIconUrl') || '',
-  area: {
-    minX: object.getAreaMinX(),
-    minY: object.getAreaMinY(),
-    minZ: object.getAreaMinZ(),
-    maxX: object.getAreaMaxX(),
-    maxY: object.getAreaMaxY(),
-    maxZ: object.getAreaMaxZ(),
-  },
-  childObjectsCount: object.getObjects().getObjectsCount(),
-  initialInstancesCount: object.getInitialInstances().getInstancesCount(),
-  variantsCount: object.getVariants().getVariantsCount(),
-  properties: summarizeProperties(object.getPropertyDescriptors()),
-  functions: summarizeFunctions(object.getEventsFunctions(), includeEvents),
-  serializedObject: serializeToJSObject(object),
-});
+  includeEvents: boolean = true,
+  includeSerialized: boolean = true
+): Object => {
+  const summary = {
+    name: object.getName(),
+    fullName: object.getFullName(),
+    description: object.getDescription(),
+    defaultName: object.getDefaultName(),
+    isRenderedIn3D: object.isRenderedIn3D(),
+    isPrivate: object.isPrivate(),
+    isInnerAreaFollowingParentSize: object.isInnerAreaFollowingParentSize(),
+    isTextContainer: object.isTextContainer(),
+    isAnimatable: object.isAnimatable(),
+    iconUrl: getOptionalString(object, 'getIconUrl') || '',
+    previewIconUrl: getOptionalString(object, 'getPreviewIconUrl') || '',
+    area: {
+      minX: object.getAreaMinX(),
+      minY: object.getAreaMinY(),
+      minZ: object.getAreaMinZ(),
+      maxX: object.getAreaMaxX(),
+      maxY: object.getAreaMaxY(),
+      maxZ: object.getAreaMaxZ(),
+    },
+    childObjectsCount: object.getObjects().getObjectsCount(),
+    initialInstancesCount: object.getInitialInstances().getInstancesCount(),
+    variantsCount: object.getVariants().getVariantsCount(),
+    properties: summarizeProperties(
+      object.getPropertyDescriptors(),
+      includeSerialized
+    ),
+    functions: summarizeFunctions(
+      object.getEventsFunctions(),
+      includeEvents,
+      includeSerialized
+    ),
+  };
+  if (includeSerialized) {
+    summary.serializedObject = serializeToJSObject(object);
+  }
+  return summary;
+};
 
 const summarizeObjects = (
   extension: gdEventsFunctionsExtension,
-  includeEvents: boolean = true
+  includeEvents: boolean = true,
+  includeSerialized: boolean = true
 ): Array<Object> => {
   const objects = extension.getEventsBasedObjects();
   return mapFor(0, objects.getCount(), index =>
-    summarizeObject(objects.getAt(index), includeEvents)
+    summarizeObject(objects.getAt(index), includeEvents, includeSerialized)
   );
 };
 
@@ -573,6 +619,81 @@ export const listProjectExtensions = (project: gdProject): Object => ({
   ),
 });
 
+const getInspectOptions = (
+  args: Object
+): {| includeEvents: boolean, includeSerialized: boolean |} => {
+  const compactMode = !!(
+    args &&
+    (args.summary_only ||
+      args.list_functions_only ||
+      args.list_objects_only ||
+      args.list_behaviors_only)
+  );
+  return {
+    includeEvents:
+      args && args.include_events !== undefined
+        ? !!args.include_events
+        : !compactMode,
+    includeSerialized:
+      args && args.include_serialized !== undefined
+        ? !!args.include_serialized
+        : !compactMode,
+  };
+};
+
+const listExtensionFunctions = (
+  extension: gdEventsFunctionsExtension,
+  includeEvents: boolean,
+  includeSerialized: boolean
+): Array<Object> => {
+  const functions = summarizeFunctions(
+    extension.getEventsFunctions(),
+    includeEvents,
+    includeSerialized
+  ).map(eventsFunction => ({
+    scope: 'extension',
+    parentKind: 'extension',
+    parentName: null,
+    ...eventsFunction,
+  }));
+
+  const behaviors = extension.getEventsBasedBehaviors();
+  for (let index = 0; index < behaviors.getCount(); index++) {
+    const behavior = behaviors.getAt(index);
+    summarizeFunctions(
+      behavior.getEventsFunctions(),
+      includeEvents,
+      includeSerialized
+    ).forEach(eventsFunction =>
+      functions.push({
+        scope: 'behavior',
+        parentKind: 'behavior',
+        parentName: behavior.getName(),
+        ...eventsFunction,
+      })
+    );
+  }
+
+  const objects = extension.getEventsBasedObjects();
+  for (let index = 0; index < objects.getCount(); index++) {
+    const object = objects.getAt(index);
+    summarizeFunctions(
+      object.getEventsFunctions(),
+      includeEvents,
+      includeSerialized
+    ).forEach(eventsFunction =>
+      functions.push({
+        scope: 'object',
+        parentKind: 'object',
+        parentName: object.getName(),
+        ...eventsFunction,
+      })
+    );
+  }
+
+  return functions;
+};
+
 export const inspectProjectExtension = (
   project: gdProject,
   args: Object
@@ -582,13 +703,93 @@ export const inspectProjectExtension = (
     'extension_name'
   );
   const extension = getExtension(project, extensionName);
+  const { includeEvents, includeSerialized } = getInspectOptions(args || {});
+  const summaryOnly = !!(args && args.summary_only);
+  const listFunctionsOnly = !!(args && args.list_functions_only);
+  const listObjectsOnly = !!(args && args.list_objects_only);
+  const listBehaviorsOnly = !!(args && args.list_behaviors_only);
+
+  if (summaryOnly) {
+    return {
+      extension: summarizeExtension(extension),
+      mode: 'summary_only',
+      freeFunctions: mapFor(
+        0,
+        extension.getEventsFunctions().getEventsFunctionsCount(),
+        index => extension.getEventsFunctions().getEventsFunctionAt(index).getName()
+      ),
+      behaviors: mapFor(0, extension.getEventsBasedBehaviors().getCount(), index => {
+        const behavior = extension.getEventsBasedBehaviors().getAt(index);
+        return {
+          name: behavior.getName(),
+          functionsCount: behavior
+            .getEventsFunctions()
+            .getEventsFunctionsCount(),
+          propertiesCount: behavior.getPropertyDescriptors().getCount(),
+          sharedPropertiesCount: behavior
+            .getSharedPropertyDescriptors()
+            .getCount(),
+        };
+      }),
+      objects: mapFor(0, extension.getEventsBasedObjects().getCount(), index => {
+        const object = extension.getEventsBasedObjects().getAt(index);
+        return {
+          name: object.getName(),
+          functionsCount: object.getEventsFunctions().getEventsFunctionsCount(),
+          childObjectsCount: object.getObjects().getObjectsCount(),
+          initialInstancesCount: object
+            .getInitialInstances()
+            .getInstancesCount(),
+          propertiesCount: object.getPropertyDescriptors().getCount(),
+        };
+      }),
+    };
+  }
+
+  if (listFunctionsOnly) {
+    return {
+      extension: summarizeExtension(extension),
+      mode: 'list_functions_only',
+      functions: listExtensionFunctions(
+        extension,
+        includeEvents,
+        includeSerialized
+      ),
+    };
+  }
+
+  if (listObjectsOnly) {
+    return {
+      extension: summarizeExtension(extension),
+      mode: 'list_objects_only',
+      objects: summarizeObjects(extension, includeEvents, includeSerialized),
+    };
+  }
+
+  if (listBehaviorsOnly) {
+    return {
+      extension: summarizeExtension(extension),
+      mode: 'list_behaviors_only',
+      behaviors: summarizeBehaviors(
+        extension,
+        includeEvents,
+        includeSerialized
+      ),
+    };
+  }
 
   return {
     extension: summarizeExtension(extension),
-    freeFunctions: summarizeFunctions(extension.getEventsFunctions(), true),
-    behaviors: summarizeBehaviors(extension, true),
-    objects: summarizeObjects(extension, true),
-    serializedExtension: serializeToJSObject(extension),
+    freeFunctions: summarizeFunctions(
+      extension.getEventsFunctions(),
+      includeEvents,
+      includeSerialized
+    ),
+    behaviors: summarizeBehaviors(extension, includeEvents, includeSerialized),
+    objects: summarizeObjects(extension, includeEvents, includeSerialized),
+    serializedExtension: includeSerialized
+      ? serializeToJSObject(extension)
+      : undefined,
   };
 };
 
@@ -653,6 +854,7 @@ export const inspectExtensionFunction = (
   args: Object
 ): Object => {
   const { parentKind, container } = getFunctionParent(project, args);
+  const { includeEvents, includeSerialized } = getInspectOptions(args || {});
   const functionName = normalizeRequiredName(
     args.function_name,
     'function_name'
@@ -665,7 +867,8 @@ export const inspectExtensionFunction = (
     parentKind,
     function: summarizeEventsFunction(
       container.getEventsFunction(functionName),
-      true
+      includeEvents,
+      includeSerialized
     ),
   };
 };
@@ -689,8 +892,13 @@ export const inspectExtensionBehavior = (
   if (!behaviors.has(behaviorName)) {
     throw new Error(`Events-based behavior not found: "${behaviorName}".`);
   }
+  const { includeEvents, includeSerialized } = getInspectOptions(args || {});
   return {
-    behavior: summarizeBehavior(behaviors.get(behaviorName), true),
+    behavior: summarizeBehavior(
+      behaviors.get(behaviorName),
+      includeEvents,
+      includeSerialized
+    ),
   };
 };
 
@@ -707,8 +915,188 @@ export const inspectExtensionObject = (
   if (!objects.has(objectName)) {
     throw new Error(`Events-based object not found: "${objectName}".`);
   }
+  const { includeEvents, includeSerialized } = getInspectOptions(args || {});
   return {
-    object: summarizeObject(objects.get(objectName), true),
+    object: summarizeObject(
+      objects.get(objectName),
+      includeEvents,
+      includeSerialized
+    ),
+  };
+};
+
+const getSearchLimit = (args: Object, defaultLimit: number = 100): number =>
+  typeof args.limit === 'number' && Number.isFinite(args.limit)
+    ? Math.max(1, Math.min(500, Math.floor(args.limit)))
+    : defaultLimit;
+
+const addExtensionFunctionEventSources = (
+  extensionName: string,
+  parentKind: string,
+  parentName: ?string,
+  container: gdEventsFunctionsContainer,
+  args: Object,
+  sources: Array<Object>
+) => {
+  const requestedParentKind =
+    args && typeof args.parent_kind === 'string'
+      ? normalizeParentKind(args.parent_kind)
+      : null;
+  if (requestedParentKind && requestedParentKind !== parentKind) return;
+
+  const requestedParentName =
+    args && typeof args.parent_name === 'string'
+      ? normalizeRequiredName(args.parent_name, 'parent_name')
+      : null;
+  if (requestedParentName && requestedParentName !== parentName) return;
+
+  const requestedFunctionName =
+    args && typeof args.function_name === 'string'
+      ? normalizeRequiredName(args.function_name, 'function_name')
+      : null;
+
+  for (let index = 0; index < container.getEventsFunctionsCount(); index++) {
+    const eventsFunction = container.getEventsFunctionAt(index);
+    if (
+      requestedFunctionName &&
+      requestedFunctionName !== eventsFunction.getName()
+    ) {
+      continue;
+    }
+    sources.push({
+      eventsList: eventsFunction.getEvents(),
+      owner: {
+        scope: 'extension',
+        extensionName,
+        parentKind,
+        parentName,
+        functionName: eventsFunction.getName(),
+        functionType: functionTypeToName(eventsFunction.getFunctionType()),
+      },
+    });
+  }
+};
+
+const collectExtensionEventSources = (
+  extension: gdEventsFunctionsExtension,
+  args: Object
+): Array<Object> => {
+  const extensionName = extension.getName();
+  const sources = [];
+  addExtensionFunctionEventSources(
+    extensionName,
+    'extension',
+    null,
+    extension.getEventsFunctions(),
+    args,
+    sources
+  );
+
+  const behaviors = extension.getEventsBasedBehaviors();
+  for (let index = 0; index < behaviors.getCount(); index++) {
+    const behavior = behaviors.getAt(index);
+    addExtensionFunctionEventSources(
+      extensionName,
+      'behavior',
+      behavior.getName(),
+      behavior.getEventsFunctions(),
+      args,
+      sources
+    );
+  }
+
+  const objects = extension.getEventsBasedObjects();
+  for (let index = 0; index < objects.getCount(); index++) {
+    const object = objects.getAt(index);
+    addExtensionFunctionEventSources(
+      extensionName,
+      'object',
+      object.getName(),
+      object.getEventsFunctions(),
+      args,
+      sources
+    );
+  }
+
+  return sources;
+};
+
+export const findExtensionEvents = (
+  project: gdProject,
+  args: Object
+): Object => {
+  const extensionName = normalizeRequiredName(
+    args.extension_name,
+    'extension_name'
+  );
+  const extension = getExtension(project, extensionName);
+  const limit = getSearchLimit(args);
+  const matches = [];
+  collectExtensionEventSources(extension, args).forEach(source => {
+    findEventsInEventsList({
+      eventsList: source.eventsList,
+      args,
+      owner: source.owner,
+      defaultIncludeSerialized: false,
+    }).forEach(match => matches.push(match));
+  });
+
+  return {
+    success: true,
+    extensionName,
+    count: Math.min(matches.length, limit),
+    totalMatches: matches.length,
+    truncated: matches.length > limit,
+    matches: matches.slice(0, limit),
+  };
+};
+
+export const findProjectEvents = (
+  project: gdProject,
+  args: Object
+): Object => {
+  const limit = getSearchLimit(args);
+  const matches = [];
+  const sceneName =
+    args && typeof args.scene_name === 'string' ? args.scene_name : null;
+  for (let index = 0; index < project.getLayoutsCount(); index++) {
+    const scene = project.getLayoutAt(index);
+    if (sceneName && scene.getName() !== sceneName) continue;
+    findEventsInEventsList({
+      eventsList: scene.getEvents(),
+      args,
+      owner: { scope: 'scene', sceneName: scene.getName() },
+      defaultIncludeSerialized: false,
+    }).forEach(match => matches.push(match));
+  }
+
+  const extensionName =
+    args && typeof args.extension_name === 'string'
+      ? normalizeRequiredName(args.extension_name, 'extension_name')
+      : null;
+  for (
+    let index = 0;
+    index < project.getEventsFunctionsExtensionsCount();
+    index++
+  ) {
+    const extension = project.getEventsFunctionsExtensionAt(index);
+    if (extensionName && extension.getName() !== extensionName) continue;
+    collectExtensionEventSources(extension, args).forEach(source => {
+      findEventsInEventsList({
+        eventsList: source.eventsList,
+        args,
+        owner: source.owner,
+        defaultIncludeSerialized: false,
+      }).forEach(match => matches.push(match));
+    });
+  }
+
+  return {
+    success: true,
+    count: Math.min(matches.length, limit),
+    totalMatches: matches.length,
+    truncated: matches.length > limit,
+    matches: matches.slice(0, limit),
   };
 };
 
@@ -1141,12 +1529,28 @@ export const createOrUpdateExtensionFunction = (
       );
     }
 
-    return {
+    const summaryOnly = !!(args && args.summary_only);
+    const result = {
       success: true,
+      dryRun: !!(args && args.dry_run),
       created,
+      wouldCreate: created,
       parentKind,
-      function: summarizeEventsFunction(eventsFunction, true),
+      function: summarizeEventsFunction(
+        eventsFunction,
+        !summaryOnly,
+        !summaryOnly
+      ),
     };
+    if (args && args.dry_run) {
+      unserializeFromJSObject(
+        extension,
+        serializedExtensionBefore,
+        'unserializeFrom',
+        project
+      );
+    }
+    return result;
   } catch (error) {
     unserializeFromJSObject(
       extension,
@@ -1319,48 +1723,72 @@ export const createOrUpdateExtensionObject = (
   const extension = getExtension(project, extensionName);
   const objectName = normalizeRequiredName(args.object_name, 'object_name');
   const objects = extension.getEventsBasedObjects();
-  const created = !objects.has(objectName);
-  let object = created
-    ? objects.insertNew(objectName, objects.getCount())
-    : objects.get(objectName);
+  const serializedExtensionBefore = serializeToJSObject(extension);
 
-  if (args.serialized_object && typeof args.serialized_object === 'object') {
+  try {
+    const created = !objects.has(objectName);
+    let object = created
+      ? objects.insertNew(objectName, objects.getCount())
+      : objects.get(objectName);
+
+    if (args.serialized_object && typeof args.serialized_object === 'object') {
+      unserializeFromJSObject(
+        object,
+        args.serialized_object,
+        'unserializeFrom',
+        project
+      );
+      object.setName(objectName);
+    }
+
+    const newObjectName = normalizeOptionalName(
+      args.new_object_name,
+      'new_object_name'
+    );
+    if (newObjectName && newObjectName !== object.getName()) {
+      const safeAndUniqueName = getSafeUniqueName(
+        newObjectName,
+        name => objects.has(name),
+        object.getName()
+      );
+      gd.WholeProjectRefactorer.renameEventsBasedObject(
+        project,
+        extension,
+        object.getName(),
+        safeAndUniqueName
+      );
+      object.setName(safeAndUniqueName);
+      object = objects.get(safeAndUniqueName);
+    }
+
+    applyObjectFields(object, args);
+
+    const summaryOnly = !!(args && args.summary_only);
+    const result = {
+      success: true,
+      dryRun: !!(args && args.dry_run),
+      created,
+      wouldCreate: created,
+      object: summarizeObject(object, !summaryOnly, !summaryOnly),
+    };
+    if (args && args.dry_run) {
+      unserializeFromJSObject(
+        extension,
+        serializedExtensionBefore,
+        'unserializeFrom',
+        project
+      );
+    }
+    return result;
+  } catch (error) {
     unserializeFromJSObject(
-      object,
-      args.serialized_object,
+      extension,
+      serializedExtensionBefore,
       'unserializeFrom',
       project
     );
-    object.setName(objectName);
+    throw error;
   }
-
-  const newObjectName = normalizeOptionalName(
-    args.new_object_name,
-    'new_object_name'
-  );
-  if (newObjectName && newObjectName !== object.getName()) {
-    const safeAndUniqueName = getSafeUniqueName(
-      newObjectName,
-      name => objects.has(name),
-      object.getName()
-    );
-    gd.WholeProjectRefactorer.renameEventsBasedObject(
-      project,
-      extension,
-      object.getName(),
-      safeAndUniqueName
-    );
-    object.setName(safeAndUniqueName);
-    object = objects.get(safeAndUniqueName);
-  }
-
-  applyObjectFields(object, args);
-
-  return {
-    success: true,
-    created,
-    object: summarizeObject(object, true),
-  };
 };
 
 export const deleteExtensionObject = (

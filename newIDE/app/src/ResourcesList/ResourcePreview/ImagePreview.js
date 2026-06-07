@@ -30,6 +30,12 @@ const imagePreviewMaxZoom = 4;
 const imagePreviewMinZoom = 1 / 4;
 
 type Point = { x: number, y: number };
+type SourceRect = {|
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+|};
 
 const getDistanceBetweenPoints = (point1: Point, point2: Point) => {
   return Math.sqrt((point2.x - point1.x) ** 2 + (point2.y - point1.y) ** 2);
@@ -81,6 +87,7 @@ type Props = {|
   resourceName: string,
   imageResourceSource: string,
   isImageResourceSmooth: boolean,
+  sourceRect?: ?SourceRect,
   displaySpacedView?: boolean,
   fixedHeight?: number,
   fixedWidth?: number,
@@ -125,6 +132,7 @@ const ImagePreview = ({
   resourceName,
   imageResourceSource,
   isImageResourceSmooth,
+  sourceRect,
   fixedHeight,
   fixedWidth,
   renderOverlay,
@@ -383,7 +391,7 @@ const ImagePreview = ({
     () => {
       hasZoomBeenAdaptedToImageRef.current = false;
     },
-    [imageResourceSource]
+    [imageResourceSource, sourceRect]
   );
 
   const containerCenter = React.useMemo(
@@ -416,12 +424,16 @@ const ImagePreview = ({
       const newImageHeight = imgElement
         ? imgElement.naturalHeight || imgElement.clientHeight
         : 0;
-      setImageHeight(newImageHeight);
-      setImageWidth(newImageWidth);
-      if (onImageSize) onImageSize([newImageWidth, newImageHeight]);
+      const displayedImageWidth = sourceRect ? sourceRect.width : newImageWidth;
+      const displayedImageHeight = sourceRect
+        ? sourceRect.height
+        : newImageHeight;
+      setImageHeight(displayedImageHeight);
+      setImageWidth(displayedImageWidth);
+      if (onImageSize) onImageSize([displayedImageWidth, displayedImageHeight]);
       if (onImageLoaded) onImageLoaded();
     },
-    [onImageLoaded, onImageSize]
+    [onImageLoaded, onImageSize, sourceRect]
   );
 
   const onTouchEnd = React.useCallback((event: TouchEvent) => {
@@ -513,6 +525,7 @@ const ImagePreview = ({
     height: imageHeight,
     transformOrigin: '0 0',
     display: 'flex',
+    overflow: sourceRect ? 'hidden' : undefined,
   };
 
   const imageStyle = {
@@ -520,6 +533,10 @@ const ImagePreview = ({
     visibility,
     ...(!isImageResourceSmooth ? styles.previewImagePixelated : undefined),
     cursor: forcedCursor,
+    flexShrink: 0,
+    transform: sourceRect
+      ? `translate(${-sourceRect.x}px, ${-sourceRect.y}px)`
+      : undefined,
   };
 
   const overlayStyle = {

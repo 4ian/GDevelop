@@ -2891,6 +2891,13 @@ export class Sprite extends EmscriptenObject {
   constructor();
   setImageName(name: string): void;
   getImageName(): string;
+  hasCustomSourceRect(): boolean;
+  setCustomSourceRect(x: number, y: number, width: number, height: number): void;
+  clearCustomSourceRect(): void;
+  getSourceRectX(): number;
+  getSourceRectY(): number;
+  getSourceRectWidth(): number;
+  getSourceRectHeight(): number;
   getOrigin(): Point;
   getCenter(): Point;
   isDefaultCenterPoint(): boolean;

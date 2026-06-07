@@ -3910,6 +3910,14 @@ interface Sprite {
     void SetImageName([Const] DOMString name);
     [Const, Ref] DOMString GetImageName();
 
+    boolean HasCustomSourceRect();
+    void SetCustomSourceRect(double x, double y, double width, double height);
+    void ClearCustomSourceRect();
+    double GetSourceRectX();
+    double GetSourceRectY();
+    double GetSourceRectWidth();
+    double GetSourceRectHeight();
+
     [Ref] Point GetOrigin();
     [Ref] Point GetCenter();
     boolean IsDefaultCenterPoint();

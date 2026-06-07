@@ -16,7 +16,12 @@ namespace gd {
 Point Sprite::badPoint("");
 
 Sprite::Sprite()
-    : fullImageCollisionMask(false),
+    : hasCustomSourceRect(false),
+      sourceRectX(0),
+      sourceRectY(0),
+      sourceRectWidth(0),
+      sourceRectHeight(0),
+      fullImageCollisionMask(false),
       origine("origine"),
       centre("centre"),
       automaticCentre(true) {}
@@ -69,6 +74,25 @@ Point& Sprite::GetPoint(const gd::String& name) {
 bool Sprite::SetDefaultCenterPoint(bool enabled) {
   automaticCentre = enabled;
   return true;
+}
+
+void Sprite::SetCustomSourceRect(double x,
+                                 double y,
+                                 double width,
+                                 double height) {
+  hasCustomSourceRect = true;
+  sourceRectX = x;
+  sourceRectY = y;
+  sourceRectWidth = width;
+  sourceRectHeight = height;
+}
+
+void Sprite::ClearCustomSourceRect() {
+  hasCustomSourceRect = false;
+  sourceRectX = 0;
+  sourceRectY = 0;
+  sourceRectWidth = 0;
+  sourceRectHeight = 0;
 }
 
 std::vector<Polygon2d> Sprite::GetCollisionMask() const {

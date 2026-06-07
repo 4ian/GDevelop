@@ -37,6 +37,9 @@ import {
   deleteExtensionFunction,
   deleteExtensionObject,
   deleteExtensionProperty,
+  extractPrefabFromObject,
+  findExtensionEvents,
+  findProjectEvents,
   inspectExtensionBehavior,
   inspectExtensionFunction,
   inspectExtensionObject,
@@ -104,6 +107,8 @@ import optionalRequire from '../Utils/OptionalRequire';
 const gd: libGDevelop = global.gd;
 const fs = optionalRequire('fs');
 const path = optionalRequire('path');
+const electron = optionalRequire('electron');
+const nativeImage = electron && electron.nativeImage;
 
 // Monotonic id used to match targeted preview request/response messages.
 let nextTargetedRequestId = 1;
@@ -484,6 +489,125 @@ const summarizeRuntimeGameDump = (payload: any, options?: Object): Object => {
   }
 };
 
+const buildPreviewDiagnostics = ({
+  running,
+  previewIds,
+  targetId,
+  dumpPayload,
+  status,
+  logs,
+  timedOut,
+  operation,
+}: {|
+  running: boolean,
+  previewIds?: ?Array<string>,
+  targetId?: ?string,
+  dumpPayload?: any,
+  status?: any,
+  logs?: ?Array<Object>,
+  timedOut?: boolean,
+  operation: string,
+|}): Object => {
+  const errors = (logs || []).filter(
+    entry =>
+      entry.command === 'uncaughtException' ||
+      entry.command === 'game.crashed' ||
+      entry.command === 'error' ||
+      (entry.command === 'console.log' &&
+        entry.payload &&
+        entry.payload.type === 'error' &&
+        !entry.payload.internal)
+  );
+  if (!running) {
+    return {
+      classification: 'no-running-preview',
+      likelyCauses: [
+        'No preview window has connected to the debugger yet.',
+        'Preview compilation/loading may still be in progress.',
+      ],
+      recommendedActions: ['launch_preview { start_paused: true }'],
+    };
+  }
+  if (!previewIds || !previewIds.length) {
+    return {
+      classification: 'preview-not-connected-or-compiling',
+      likelyCauses: [
+        'The preview server is started but no runtime websocket is connected.',
+        'The preview is still compiling/loading, failed before connecting, or was closed.',
+      ],
+      recommendedActions: [
+        'retry after a short delay',
+        'launch_preview { start_paused: true }',
+      ],
+    };
+  }
+  if (errors.length) {
+    return {
+      classification: 'runtime-error-or-crash',
+      targetDebuggerId: targetId,
+      errorCount: errors.length,
+      likelyCauses: [
+        'The preview runtime reported an uncaught exception, crash, or error-level log.',
+      ],
+      recommendedActions: [
+        'inspect the errors/logs fields',
+        'fix the runtime error, then relaunch the preview',
+      ],
+    };
+  }
+  if (dumpPayload) {
+    return {
+      classification: 'responsive',
+      targetDebuggerId: targetId,
+      likelyCauses: [],
+      recommendedActions: [],
+    };
+  }
+  if (status) {
+    return {
+      classification: 'status-only-no-runtime-dump',
+      targetDebuggerId: targetId,
+      likelyCauses: [
+        'The debugger socket answered status but did not return a runtime dump.',
+        'The runtime may be busy, paused during loading, or the debugger dump path is unhealthy.',
+      ],
+      recommendedActions: [
+        'increase timeout_ms',
+        'retry gdevelop_inspect_running_preview',
+        'close all previews and relaunch a single paused preview',
+      ],
+    };
+  }
+  if (timedOut) {
+    return {
+      classification: 'debugger-channel-timeout',
+      operation,
+      targetDebuggerId: targetId,
+      likelyCauses: [
+        'The targeted preview did not answer the debugger request before timeout.',
+        'The window may still be loading, suspended/occluded, or its debugger channel is broken.',
+      ],
+      recommendedActions: [
+        'preview_health_check',
+        'control_preview { action: "focus" }',
+        'control_preview { action: "close", close_all: true } then launch_preview { start_paused: true }',
+      ],
+    };
+  }
+  return {
+    classification: 'connected-unresponsive',
+    targetDebuggerId: targetId,
+    likelyCauses: [
+      'The preview is connected but has not emitted status, logs, or a dump.',
+    ],
+    recommendedActions: [
+      'increase timeout_ms',
+      'focus the preview',
+      'close all previews and relaunch',
+    ],
+  };
+};
+
 // Capture runtime state from a running preview. Returns a promise that resolves
 // to the inspection result (or an error-shaped object). timeoutMs bounds the
 // wait for the dump reply.
@@ -498,6 +622,11 @@ const captureRunningPreviewState = (
         running: false,
         error:
           'No preview debugger server is available in this editor build. Runtime inspection is unsupported here.',
+        diagnostics: {
+          classification: 'debugger-server-unavailable',
+          likelyCauses: ['This editor build did not expose a preview debugger server.'],
+          recommendedActions: [],
+        },
       });
       return;
     }
@@ -507,6 +636,10 @@ const captureRunningPreviewState = (
         running: false,
         error:
           'No preview is running. Launch a preview first with gdevelop_run_command { commandName: "LAUNCH_NEW_PREVIEW" }, then inspect it.',
+        diagnostics: buildPreviewDiagnostics({
+          running: false,
+          operation: 'inspect',
+        }),
       });
       return;
     }
@@ -521,6 +654,11 @@ const captureRunningPreviewState = (
         running: false,
         error:
           'No preview is currently connected. Launch a preview first with gdevelop_run_command { commandName: "LAUNCH_NEW_PREVIEW" }.',
+        diagnostics: buildPreviewDiagnostics({
+          running: true,
+          previewIds: [],
+          operation: 'inspect',
+        }),
       });
       return;
     }
@@ -556,6 +694,16 @@ const captureRunningPreviewState = (
       } catch (error) {
         // Ignore unregister failures.
       }
+      const errors = logs.filter(
+        entry =>
+          entry.command === 'uncaughtException' ||
+          entry.command === 'game.crashed' ||
+          entry.command === 'error' ||
+          (entry.command === 'console.log' &&
+            entry.payload &&
+            entry.payload.type === 'error' &&
+            !entry.payload.internal)
+      );
       resolve({
         success: true,
         running: true,
@@ -594,16 +742,17 @@ const captureRunningPreviewState = (
         // Surface runtime errors/crashes prominently: error-type console logs,
         // uncaught exceptions and crash reports. This is the closest available
         // signal to "an expression failed at runtime".
-        errors: logs.filter(
-          entry =>
-            entry.command === 'uncaughtException' ||
-            entry.command === 'game.crashed' ||
-            entry.command === 'error' ||
-            (entry.command === 'console.log' &&
-              entry.payload &&
-              entry.payload.type === 'error' &&
-              !entry.payload.internal)
-        ),
+        errors,
+        diagnostics: buildPreviewDiagnostics({
+          running: true,
+          previewIds,
+          targetId,
+          dumpPayload,
+          status,
+          logs,
+          timedOut: !dumpPayload,
+          operation: 'inspect',
+        }),
         note: dumpPayload
           ? undefined
           : 'No runtime dump was received before the timeout — the preview connected but did not respond (commonly because the OS throttled a backgrounded/unfocused preview window). Remediation: close all previews with control_preview { action: "close", close_all: true }, then LAUNCH_NEW_PREVIEW again and inspect promptly; or increase timeout_ms. status/logs may still be useful.',
@@ -683,6 +832,66 @@ const captureRunningPreviewState = (
 // it does not run JS in the (possibly OS-suspended) renderer of an occluded
 // preview window. Falls back to the renderer-side canvas.toDataURL debugger
 // command when main-process capture is unavailable or fails.
+const resizeScreenshotDataUrlIfNeeded = (
+  dataUrl: string,
+  width: number,
+  height: number,
+  args: Object
+): {| dataUrl: string, width: number, height: number, resizeWarning?: string |} => {
+  const targetWidth =
+    args && typeof args.target_width === 'number'
+      ? Math.max(1, Math.floor(args.target_width))
+      : args && typeof args.width === 'number'
+      ? Math.max(1, Math.floor(args.width))
+      : null;
+  const targetHeight =
+    args && typeof args.target_height === 'number'
+      ? Math.max(1, Math.floor(args.target_height))
+      : args && typeof args.height === 'number'
+      ? Math.max(1, Math.floor(args.height))
+      : null;
+  if (!targetWidth && !targetHeight) {
+    return { dataUrl, width, height };
+  }
+  if (!targetWidth || !targetHeight) {
+    return {
+      dataUrl,
+      width,
+      height,
+      resizeWarning:
+        'Both target_width and target_height are required for fixed-size screenshot resizing.',
+    };
+  }
+  if (width === targetWidth && height === targetHeight) {
+    return { dataUrl, width, height };
+  }
+  if (!nativeImage) {
+    return {
+      dataUrl,
+      width,
+      height,
+      resizeWarning:
+        'Electron nativeImage is unavailable, so the screenshot could not be resized. Use canvas_only:true to get the canvas intrinsic size when possible.',
+    };
+  }
+  try {
+    const image = nativeImage.createFromDataURL(dataUrl);
+    const resized = image.resize({ width: targetWidth, height: targetHeight });
+    return {
+      dataUrl: resized.toDataURL(),
+      width: targetWidth,
+      height: targetHeight,
+    };
+  } catch (error) {
+    return {
+      dataUrl,
+      width,
+      height,
+      resizeWarning: `Could not resize screenshot: ${error.message}`,
+    };
+  }
+};
+
 const writeOrReturnScreenshot = (
   dataUrl,
   width,
@@ -691,17 +900,22 @@ const writeOrReturnScreenshot = (
   source,
   extra
 ) => {
-  const base64 = dataUrl.replace(/^data:image\/png;base64,/, '');
+  const resized = resizeScreenshotDataUrlIfNeeded(dataUrl, width, height, args);
+  const finalDataUrl = resized.dataUrl;
+  const finalWidth = resized.width;
+  const finalHeight = resized.height;
+  const base64 = finalDataUrl.replace(/^data:image\/png;base64,/, '');
   const filePath =
     args && typeof args.file_path === 'string' ? args.file_path : null;
   if (!filePath || !fs) {
     return {
       success: true,
       running: true,
-      width,
-      height,
-      dataUrl,
+      width: finalWidth,
+      height: finalHeight,
+      dataUrl: finalDataUrl,
       source,
+      resizeWarning: resized.resizeWarning,
       ...(extra || {}),
       note: filePath
         ? 'Filesystem access is unavailable; returning the data URL instead of writing a file.'
@@ -721,18 +935,20 @@ const writeOrReturnScreenshot = (
       success: false,
       running: true,
       error: `Could not write screenshot to "${filePath}": ${error.message}`,
-      width,
-      height,
-      dataUrl,
+      width: finalWidth,
+      height: finalHeight,
+      dataUrl: finalDataUrl,
+      resizeWarning: resized.resizeWarning,
     };
   }
   return {
     success: true,
     running: true,
     filePath,
-    width,
-    height,
+    width: finalWidth,
+    height: finalHeight,
     source,
+    resizeWarning: resized.resizeWarning,
     ...(extra || {}),
   };
 };
@@ -773,7 +989,10 @@ const capturePreviewScreenshot = async (
   // 1. Try the main-process capturePage path first — it works even when the
   // preview renderer is suspended (occluded window). It captures the latest
   // preview window when no specific id is mapped.
-  if (typeof capturePreviewPage === 'function') {
+  if (
+    !(args && (args.canvas_only || args.capture_mode === 'canvas')) &&
+    typeof capturePreviewPage === 'function'
+  ) {
     try {
       const mainResult = await capturePreviewPage(null);
       if (mainResult && mainResult.dataUrl) {
@@ -807,6 +1026,13 @@ const capturePreviewScreenshot = async (
       debuggerId: targetId,
       error:
         'Screenshot request timed out: the targeted preview did not reply (a backgrounded/occluded window may be suspended). Try control_preview { action: "focus" } first, or rely on run_frames/inspect which do not need rendering.',
+      diagnostics: buildPreviewDiagnostics({
+        running: true,
+        previewIds: guard.previewIds,
+        targetId,
+        timedOut: true,
+        operation: 'capture_preview_screenshot',
+      }),
     };
   }
 
@@ -820,6 +1046,18 @@ const capturePreviewScreenshot = async (
         'The preview did not return image data. The game canvas may not be ready yet.',
       width: payload.width,
       height: payload.height,
+      diagnostics: {
+        classification: 'canvas-not-ready',
+        targetDebuggerId: targetId,
+        likelyCauses: [
+          'The renderer replied, but no canvas image data was available.',
+          'The game may still be loading or has not rendered a frame yet.',
+        ],
+        recommendedActions: [
+          'retry after the preview renders',
+          'use render_scene_to_png for static layout checks',
+        ],
+      },
     };
   }
 
@@ -1085,6 +1323,13 @@ const runPreviewFrames = async (
       debuggerId: targetId,
       error:
         'run_frames timed out: the targeted preview did not reply. The window may still be loading; retry, or close all previews and relaunch.',
+      diagnostics: buildPreviewDiagnostics({
+        running: true,
+        previewIds: guard.previewIds,
+        targetId,
+        timedOut: true,
+        operation: 'run_frames',
+      }),
     };
   }
 
@@ -1132,6 +1377,11 @@ const requireRunningPreview = (
         success: false,
         running: false,
         error: 'No preview debugger server is available in this editor build.',
+        diagnostics: {
+          classification: 'debugger-server-unavailable',
+          likelyCauses: ['This editor build did not expose a preview debugger server.'],
+          recommendedActions: [],
+        },
       },
     };
   }
@@ -1143,6 +1393,10 @@ const requireRunningPreview = (
         running: false,
         error:
           'No preview is running. Launch a preview first with gdevelop_run_command { commandName: "LAUNCH_NEW_PREVIEW" }.',
+        diagnostics: buildPreviewDiagnostics({
+          running: false,
+          operation: 'runtime-request',
+        }),
       },
     };
   }
@@ -1157,6 +1411,11 @@ const requireRunningPreview = (
         success: false,
         running: false,
         error: 'No preview is currently connected.',
+        diagnostics: buildPreviewDiagnostics({
+          running: true,
+          previewIds: [],
+          operation: 'runtime-request',
+        }),
       },
     };
   }
@@ -1175,6 +1434,11 @@ const previewHealthCheck = (previewDebuggerServer: ?Object): Object => {
       serverState: 'unavailable',
       availableDebuggerIds: [],
       recommendedActions: ['launch_preview'],
+      diagnostics: {
+        classification: 'debugger-server-unavailable',
+        likelyCauses: ['This editor build did not expose a preview debugger server.'],
+        recommendedActions: [],
+      },
       note: 'No preview debugger server is available in this editor build.',
     };
   }
@@ -1203,6 +1467,12 @@ const previewHealthCheck = (previewDebuggerServer: ?Object): Object => {
     serverState,
     availableDebuggerIds: previewIds,
     latestDebuggerId: previewIds.length ? previewIds[previewIds.length - 1] : null,
+    diagnostics: buildPreviewDiagnostics({
+      running: serverState === 'started',
+      previewIds,
+      targetId: previewIds.length ? previewIds[previewIds.length - 1] : null,
+      operation: 'health_check',
+    }),
     recommendedActions,
     recovery:
       running && previewIds.length > 1
@@ -2572,6 +2842,24 @@ const callMcpTool = async ({
     }
   }
 
+  if (toolName === 'find_extension_events') {
+    if (!project) return errorResult('No project opened.');
+    try {
+      return textResult(findExtensionEvents(project, args || {}));
+    } catch (error) {
+      return errorResult(error.message);
+    }
+  }
+
+  if (toolName === 'find_project_events') {
+    if (!project) return errorResult('No project opened.');
+    try {
+      return textResult(findProjectEvents(project, args || {}));
+    } catch (error) {
+      return errorResult(error.message);
+    }
+  }
+
   if (toolName === 'lint_scene_events') {
     if (!project) return errorResult('No project opened.');
     try {
@@ -2723,6 +3011,8 @@ const callMcpTool = async ({
     extensionWriteToolHandler = createOrUpdateExtensionObject;
   } else if (toolName === 'gdevelop_delete_extension_object') {
     extensionWriteToolHandler = deleteExtensionObject;
+  } else if (toolName === 'gdevelop_extract_prefab_from_object') {
+    extensionWriteToolHandler = extractPrefabFromObject;
   } else if (toolName === 'gdevelop_create_or_update_extension_property') {
     extensionWriteToolHandler = createOrUpdateExtensionProperty;
   } else if (toolName === 'gdevelop_delete_extension_property') {
@@ -2739,6 +3029,7 @@ const callMcpTool = async ({
         (typeof args.events_json === 'string' ||
           (args.serialized_function &&
             typeof args.serialized_function === 'object')) &&
+        !result.dryRun &&
         context.onExtensionFunctionEventsModifiedOutsideEditor
       ) {
         context.onExtensionFunctionEventsModifiedOutsideEditor({
@@ -2756,7 +3047,9 @@ const callMcpTool = async ({
           newOrChangedAiGeneratedEventIds: new Set(),
         });
       }
-      context.triggerUnsavedChanges();
+      if (!result.dryRun) {
+        context.triggerUnsavedChanges();
+      }
       return textResult(
         withStaleStateAdvisory(
           result,

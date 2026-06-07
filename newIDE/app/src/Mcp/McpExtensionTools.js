@@ -24,11 +24,6 @@ const getOptionalBoolean = (object: any, methodName: string): ?boolean =>
     ? object[methodName]()
     : undefined;
 
-const getOptionalNumber = (object: any, methodName: string): ?number =>
-  object && typeof object[methodName] === 'function'
-    ? object[methodName]()
-    : undefined;
-
 const setStringIfProvided = (
   target: any,
   setterName: string,
@@ -1100,6 +1095,694 @@ export const findProjectEvents = (
   };
 };
 
+const shouldSkipCloneValidation = (args: Object): boolean =>
+  !!(args && args.__mcp_skip_clone_validation);
+
+const TEMP_EXTENSION_PREFIX = '__McpValidation_';
+
+const runOnTemporaryExtensionCopy = <T>(
+  project: gdProject,
+  extensionName: string,
+  allowMissingExtension: boolean,
+  callback: (string, boolean) => T
+): T => {
+  const sourceExtensionExists = project.hasEventsFunctionsExtensionNamed(
+    extensionName
+  );
+  if (!sourceExtensionExists && !allowMissingExtension) {
+    throw new Error(`Extension not found: "${extensionName}".`);
+  }
+
+  const temporaryExtensionName = getSafeUniqueName(
+    `${TEMP_EXTENSION_PREFIX}${extensionName}`,
+    name => project.hasEventsFunctionsExtensionNamed(name)
+  );
+  const temporaryExtension = project.insertNewEventsFunctionsExtension(
+    temporaryExtensionName,
+    project.getEventsFunctionsExtensionsCount()
+  );
+  try {
+    if (sourceExtensionExists) {
+      unserializeFromJSObject(
+        temporaryExtension,
+        serializeToJSObject(project.getEventsFunctionsExtension(extensionName)),
+        'unserializeFrom',
+        project
+      );
+      temporaryExtension.setName(temporaryExtensionName);
+    }
+    return callback(temporaryExtensionName, sourceExtensionExists);
+  } finally {
+    if (project.hasEventsFunctionsExtensionNamed(temporaryExtensionName)) {
+      project.removeEventsFunctionsExtension(temporaryExtensionName);
+    }
+  }
+};
+
+const getOrCreateExtension = (
+  project: gdProject,
+  extensionName: string
+): {| extension: gdEventsFunctionsExtension, created: boolean |} => {
+  if (project.hasEventsFunctionsExtensionNamed(extensionName)) {
+    return {
+      extension: project.getEventsFunctionsExtension(extensionName),
+      created: false,
+    };
+  }
+  return {
+    extension: project.insertNewEventsFunctionsExtension(
+      extensionName,
+      project.getEventsFunctionsExtensionsCount()
+    ),
+    created: true,
+  };
+};
+
+const getScene = (project: gdProject, sceneName: string): gdLayout => {
+  if (!project.hasLayoutNamed(sceneName)) {
+    throw new Error(`Scene not found: "${sceneName}".`);
+  }
+  return project.getLayout(sceneName);
+};
+
+const getObjectFromContainers = (
+  project: gdProject,
+  scene: ?gdLayout,
+  objectName: string
+): ?gdObject => {
+  if (scene && scene.getObjects().hasObjectNamed(objectName)) {
+    return scene.getObjects().getObject(objectName);
+  }
+  if (project.getObjects().hasObjectNamed(objectName)) {
+    return project.getObjects().getObject(objectName);
+  }
+  return null;
+};
+
+const iterateInitialInstances = (
+  initialInstances: gdInitialInstancesContainer,
+  callback: gdInitialInstance => void
+) => {
+  const instanceGetter = new gd.InitialInstanceJSFunctor();
+  // $FlowFixMe[cannot-write]
+  instanceGetter.invoke = instancePtr => {
+    const instance: gdInitialInstance = gd.wrapPointer(
+      // $FlowFixMe[incompatible-type]
+      instancePtr,
+      gd.InitialInstance
+    );
+    callback(instance);
+  };
+  // $FlowFixMe[incompatible-type]
+  initialInstances.iterateOverInstances(instanceGetter);
+  instanceGetter.delete();
+};
+
+const getInitialInstanceSize = (
+  instance: gdInitialInstance
+): {| width: number, height: number, depth: number |} => {
+  const width = instance.hasCustomSize()
+    ? instance.getCustomWidth()
+    : instance.getDefaultWidth();
+  const height = instance.hasCustomSize()
+    ? instance.getCustomHeight()
+    : instance.getDefaultHeight();
+  const depth = instance.hasCustomDepth()
+    ? instance.getCustomDepth()
+    : instance.getDefaultDepth();
+  return {
+    width: width && width > 0 ? width : 32,
+    height: height && height > 0 ? height : 32,
+    depth: depth && depth > 0 ? depth : 0,
+  };
+};
+
+const computeInstancesAabb = (
+  instances: Array<gdInitialInstance>,
+  fallbackArea?: ?Object
+): {| minX: number, minY: number, minZ: number, maxX: number, maxY: number, maxZ: number |} => {
+  if (!instances.length) {
+    return {
+      minX: fallbackArea && typeof fallbackArea.minX === 'number' ? fallbackArea.minX : 0,
+      minY: fallbackArea && typeof fallbackArea.minY === 'number' ? fallbackArea.minY : 0,
+      minZ: fallbackArea && typeof fallbackArea.minZ === 'number' ? fallbackArea.minZ : 0,
+      maxX: fallbackArea && typeof fallbackArea.maxX === 'number' ? fallbackArea.maxX : 64,
+      maxY: fallbackArea && typeof fallbackArea.maxY === 'number' ? fallbackArea.maxY : 64,
+      maxZ: fallbackArea && typeof fallbackArea.maxZ === 'number' ? fallbackArea.maxZ : 64,
+    };
+  }
+  let minX = Infinity;
+  let minY = Infinity;
+  let minZ = Infinity;
+  let maxX = -Infinity;
+  let maxY = -Infinity;
+  let maxZ = -Infinity;
+  instances.forEach(instance => {
+    const { width, height, depth } = getInitialInstanceSize(instance);
+    minX = Math.min(minX, instance.getX());
+    minY = Math.min(minY, instance.getY());
+    minZ = Math.min(minZ, instance.getZ());
+    maxX = Math.max(maxX, instance.getX() + width);
+    maxY = Math.max(maxY, instance.getY() + height);
+    maxZ = Math.max(maxZ, instance.getZ() + depth);
+  });
+  return { minX, minY, minZ, maxX, maxY, maxZ };
+};
+
+const setEventsBasedObjectArea = (
+  object: gdEventsBasedObject,
+  area: Object,
+  normalizeOrigin: boolean
+) => {
+  object.setAreaMinX(0);
+  object.setAreaMinY(0);
+  object.setAreaMinZ(0);
+  object.setAreaMaxX(
+    normalizeOrigin ? Math.max(1, area.maxX - area.minX) : area.maxX
+  );
+  object.setAreaMaxY(
+    normalizeOrigin ? Math.max(1, area.maxY - area.minY) : area.maxY
+  );
+  object.setAreaMaxZ(
+    normalizeOrigin ? Math.max(0, area.maxZ - area.minZ) : area.maxZ
+  );
+};
+
+const copyObjectDefinition = (
+  project: gdProject,
+  sourceObject: gdObject,
+  targetObjects: gdObjectsContainer
+) => {
+  const objectName = sourceObject.getName();
+  if (targetObjects.hasObjectNamed(objectName)) return;
+  const targetObject = targetObjects.insertNewObject(
+    project,
+    sourceObject.getType(),
+    objectName,
+    targetObjects.getObjectsCount()
+  );
+  unserializeFromJSObject(
+    targetObject,
+    serializeToJSObject(sourceObject),
+    'unserializeFrom',
+    project
+  );
+  targetObject.resetPersistentUuid();
+};
+
+const copyNormalizedInstance = (
+  project: gdProject,
+  sourceInstance: gdInitialInstance,
+  targetInstances: gdInitialInstancesContainer,
+  area: Object,
+  normalizeOrigin: boolean
+) => {
+  const instance = new gd.InitialInstance();
+  try {
+    unserializeFromJSObject(
+      instance,
+      serializeToJSObject(sourceInstance),
+      'unserializeFrom',
+      project
+    );
+    if (normalizeOrigin) {
+      instance.setX(instance.getX() - area.minX);
+      instance.setY(instance.getY() - area.minY);
+      instance.setZ(instance.getZ() - area.minZ);
+    }
+    instance.setLayer('');
+    targetInstances.insertInitialInstance(instance).resetPersistentUuid();
+  } finally {
+    instance.delete();
+  }
+};
+
+const removeInstances = (
+  initialInstances: gdInitialInstancesContainer,
+  instances: Array<gdInitialInstance>
+) => {
+  instances.forEach(instance => initialInstances.removeInstance(instance));
+};
+
+const removeUnusedObjects = (
+  objects: gdObjectsContainer,
+  initialInstances: gdInitialInstancesContainer,
+  objectNames: Array<string>
+) => {
+  objectNames.forEach(objectName => {
+    if (
+      objects.hasObjectNamed(objectName) &&
+      !initialInstances.hasInstancesOfObject(objectName)
+    ) {
+      objects.removeObject(objectName);
+    }
+  });
+};
+
+const createTargetEventsBasedObject = (
+  extension: gdEventsFunctionsExtension,
+  objectName: string,
+  replaceExisting: boolean
+): {| object: gdEventsBasedObject, replacedExisting: boolean |} => {
+  const objects = extension.getEventsBasedObjects();
+  const replacedExisting = objects.has(objectName);
+  if (replacedExisting && !replaceExisting) {
+    throw new Error(
+      `Events-based object "${objectName}" already exists in extension "${extension.getName()}". Pass replace_existing:true to overwrite it.`
+    );
+  }
+  if (replacedExisting) {
+    objects.remove(objectName);
+  }
+  return {
+    object: objects.insertNew(objectName, objects.getCount()),
+    replacedExisting,
+  };
+};
+
+const getObjectNamesArg = (
+  args: Object,
+  names: Array<string>,
+  requiredLabel: string
+): Array<string> => {
+  for (const name of names) {
+    if (Array.isArray(args[name])) {
+      const values = args[name]
+        .filter(value => typeof value === 'string' && value.trim())
+        .map(value => normalizeRequiredName(value, `${name} item`));
+      if (values.length) return Array.from(new Set(values));
+    }
+    if (typeof args[name] === 'string' && args[name].trim()) {
+      return [normalizeRequiredName(args[name], name)];
+    }
+  }
+  throw new Error(`Missing ${requiredLabel}.`);
+};
+
+const extractPrefabFromSceneInstances = ({
+  project,
+  args,
+  targetObject,
+}: {|
+  project: gdProject,
+  args: Object,
+  targetObject: gdEventsBasedObject,
+|}): Object => {
+  const sceneName = normalizeRequiredName(args.scene_name, 'scene_name');
+  const scene = getScene(project, sceneName);
+  const sourceObjectNames = getObjectNamesArg(
+    args,
+    ['source_object_names', 'source_objects', 'child_object_names'],
+    'source_object_names'
+  );
+  const sourceObjectNameSet = new Set(sourceObjectNames);
+  const selectedInstances = [];
+  iterateInitialInstances(scene.getInitialInstances(), instance => {
+    if (sourceObjectNameSet.has(instance.getObjectName())) {
+      selectedInstances.push(instance);
+    }
+  });
+  if (!selectedInstances.length) {
+    throw new Error(
+      `No initial instances found in scene "${sceneName}" for: ${sourceObjectNames.join(
+        ', '
+      )}.`
+    );
+  }
+
+  const area = computeInstancesAabb(selectedInstances);
+  const normalizeOrigin = !(args && args.normalize_origin === false);
+  setEventsBasedObjectArea(targetObject, area, normalizeOrigin);
+  const childObjects = targetObject.getObjects();
+  sourceObjectNames.forEach(objectName => {
+    const sourceObject = getObjectFromContainers(project, scene, objectName);
+    if (!sourceObject) {
+      throw new Error(`Object not found in scene/global scope: "${objectName}".`);
+    }
+    copyObjectDefinition(project, sourceObject, childObjects);
+  });
+  selectedInstances.forEach(instance =>
+    copyNormalizedInstance(
+      project,
+      instance,
+      targetObject.getInitialInstances(),
+      area,
+      normalizeOrigin
+    )
+  );
+
+  const migrationWarnings = [];
+  if (args && args.replace_in_scene_with_prefab_instance) {
+    const prefabObjectName = getSafeUniqueName(
+      args.prefab_scene_object_name || targetObject.getDefaultName() || targetObject.getName(),
+      name =>
+        scene.getObjects().hasObjectNamed(name) ||
+        project.getObjects().hasObjectNamed(name)
+    );
+    const prefabType = gd.PlatformExtension.getObjectFullType(
+      normalizeRequiredName(args.extension_name, 'extension_name'),
+      targetObject.getName()
+    );
+    scene
+      .getObjects()
+      .insertNewObject(project, prefabType, prefabObjectName, 0);
+    const prefabInstance = scene.getInitialInstances().insertNewInitialInstance();
+    prefabInstance.setObjectName(prefabObjectName);
+    prefabInstance.setX(area.minX);
+    prefabInstance.setY(area.minY);
+    prefabInstance.setZ(area.minZ);
+    prefabInstance.setLayer(selectedInstances[0].getLayer());
+    prefabInstance.setZOrder(
+      Math.max(...selectedInstances.map(instance => instance.getZOrder()))
+    );
+    removeInstances(scene.getInitialInstances(), selectedInstances);
+    if (args.remove_scene_objects_when_unused) {
+      removeUnusedObjects(
+        scene.getObjects(),
+        scene.getInitialInstances(),
+        sourceObjectNames
+      );
+    }
+    migrationWarnings.push(
+      'Scene events that directly reference the extracted child object names were not rewritten. Use find_project_events/find_scene_events to migrate those references manually.'
+    );
+  }
+
+  return {
+    sourceKind: 'scene_instances',
+    sceneName,
+    sourceObjectNames,
+    extractedInstancesCount: selectedInstances.length,
+    migrationWarnings,
+  };
+};
+
+const extractPrefabFromExtensionObject = ({
+  project,
+  args,
+  targetObject,
+}: {|
+  project: gdProject,
+  args: Object,
+  targetObject: gdEventsBasedObject,
+|}): Object => {
+  const sourceExtensionName = normalizeRequiredName(
+    args.source_extension_name || args.extension_name,
+    'source_extension_name'
+  );
+  const sourceObjectName = normalizeRequiredName(
+    args.source_object_name,
+    'source_object_name'
+  );
+  const sourceExtension = getExtension(project, sourceExtensionName);
+  const sourceObjects = sourceExtension.getEventsBasedObjects();
+  if (!sourceObjects.has(sourceObjectName)) {
+    throw new Error(`Source events-based object not found: "${sourceObjectName}".`);
+  }
+  const sourceObject = sourceObjects.get(sourceObjectName);
+  let childObjectNames;
+  if (args.child_object_names || args.source_child_object_names) {
+    childObjectNames = getObjectNamesArg(
+      args,
+      ['child_object_names', 'source_child_object_names'],
+      'child_object_names'
+    );
+  } else {
+    childObjectNames = mapFor(0, sourceObject.getObjects().getObjectsCount(), index =>
+      sourceObject.getObjects().getObjectAt(index).getName()
+    );
+  }
+  if (!childObjectNames.length) {
+    throw new Error(
+      `Source events-based object "${sourceObjectName}" has no child objects to extract.`
+    );
+  }
+  const childObjectNameSet = new Set(childObjectNames);
+  const selectedInstances = [];
+  iterateInitialInstances(sourceObject.getInitialInstances(), instance => {
+    if (childObjectNameSet.has(instance.getObjectName())) {
+      selectedInstances.push(instance);
+    }
+  });
+
+  const area = computeInstancesAabb(selectedInstances, {
+    minX: sourceObject.getAreaMinX(),
+    minY: sourceObject.getAreaMinY(),
+    minZ: sourceObject.getAreaMinZ(),
+    maxX: sourceObject.getAreaMaxX(),
+    maxY: sourceObject.getAreaMaxY(),
+    maxZ: sourceObject.getAreaMaxZ(),
+  });
+  const normalizeOrigin = !(args && args.normalize_origin === false);
+  setEventsBasedObjectArea(targetObject, area, normalizeOrigin);
+  const targetChildObjects = targetObject.getObjects();
+  childObjectNames.forEach(objectName => {
+    const sourceChildObjects = sourceObject.getObjects();
+    if (!sourceChildObjects.hasObjectNamed(objectName)) {
+      throw new Error(
+        `Child object "${objectName}" not found in "${sourceObjectName}".`
+      );
+    }
+    copyObjectDefinition(
+      project,
+      sourceChildObjects.getObject(objectName),
+      targetChildObjects
+    );
+  });
+  selectedInstances.forEach(instance =>
+    copyNormalizedInstance(
+      project,
+      instance,
+      targetObject.getInitialInstances(),
+      area,
+      normalizeOrigin
+    )
+  );
+
+  const migrationWarnings = [];
+  if (args && args.replace_in_source_with_prefab_instance) {
+    const prefabChildObjectName = getSafeUniqueName(
+      args.prefab_child_object_name || targetObject.getDefaultName() || targetObject.getName(),
+      name => sourceObject.getObjects().hasObjectNamed(name)
+    );
+    const prefabType = gd.PlatformExtension.getObjectFullType(
+      normalizeRequiredName(args.extension_name, 'extension_name'),
+      targetObject.getName()
+    );
+    sourceObject
+      .getObjects()
+      .insertNewObject(project, prefabType, prefabChildObjectName, 0);
+    const prefabInstance = sourceObject
+      .getInitialInstances()
+      .insertNewInitialInstance();
+    prefabInstance.setObjectName(prefabChildObjectName);
+    prefabInstance.setX(area.minX);
+    prefabInstance.setY(area.minY);
+    prefabInstance.setZ(area.minZ);
+    prefabInstance.setZOrder(
+      selectedInstances.length
+        ? Math.max(...selectedInstances.map(instance => instance.getZOrder()))
+        : 0
+    );
+    removeInstances(sourceObject.getInitialInstances(), selectedInstances);
+    if (args.remove_extracted_children) {
+      removeUnusedObjects(
+        sourceObject.getObjects(),
+        sourceObject.getInitialInstances(),
+        childObjectNames
+      );
+    }
+    migrationWarnings.push(
+      'Extension events that directly reference the extracted child object names were not rewritten. Use find_extension_events/find_project_events to migrate those references manually.'
+    );
+  }
+
+  return {
+    sourceKind: 'extension_object',
+    sourceExtensionName,
+    sourceObjectName,
+    childObjectNames,
+    extractedInstancesCount: selectedInstances.length,
+    migrationWarnings,
+  };
+};
+
+export const extractPrefabFromObject = (
+  project: gdProject,
+  args: Object
+): Object => {
+  const extensionName = normalizeRequiredName(
+    args.extension_name,
+    'extension_name'
+  );
+  const getValidationArgs = (temporaryExtensionName: string): Object => {
+    const sourceKind =
+      args && typeof args.source_kind === 'string'
+        ? args.source_kind
+        : args && args.scene_name
+        ? 'scene_instances'
+        : 'extension_object';
+    const validationArgs = {
+      ...args,
+      extension_name: temporaryExtensionName,
+      dry_run: false,
+      __mcp_skip_clone_validation: true,
+      replace_in_scene_with_prefab_instance: false,
+      replace_in_source_with_prefab_instance: false,
+      remove_scene_objects_when_unused: false,
+      remove_extracted_children: false,
+    };
+    if (
+      sourceKind === 'extension_object' &&
+      (!args.source_extension_name || args.source_extension_name === extensionName)
+    ) {
+      validationArgs.source_extension_name = temporaryExtensionName;
+    }
+    return validationArgs;
+  };
+
+  const dryRun = !!(args && args.dry_run);
+  if (dryRun) {
+    return runOnTemporaryExtensionCopy(
+      project,
+      extensionName,
+      true,
+      (temporaryExtensionName, sourceExtensionExists) => {
+        const result = extractPrefabFromObject(
+          project,
+          getValidationArgs(temporaryExtensionName)
+        );
+        const migrationWarnings = [...((result.migrationWarnings: any) || [])];
+        if (
+          args.replace_in_scene_with_prefab_instance ||
+          args.replace_in_source_with_prefab_instance
+        ) {
+          migrationWarnings.push(
+            'Dry-run validates extraction and target prefab creation, but does not mutate source scene/extension containers. Re-run without dry_run to apply requested replacement flags.'
+          );
+        }
+        return {
+          ...result,
+          dryRun: true,
+          extensionName,
+          createdExtension: !sourceExtensionExists,
+          prefabType: gd.PlatformExtension.getObjectFullType(
+            extensionName,
+            result.objectName
+          ),
+          migrationWarnings,
+          dryRunNote:
+            'Validated on a temporary extension copy; the live project was not mutated.',
+        };
+      }
+    );
+  }
+
+  if (!shouldSkipCloneValidation(args)) {
+    runOnTemporaryExtensionCopy(
+      project,
+      extensionName,
+      true,
+      temporaryExtensionName =>
+        extractPrefabFromObject(project, getValidationArgs(temporaryExtensionName))
+    );
+  }
+
+  const objectName = normalizeRequiredName(args.object_name, 'object_name');
+  const { extension, created: createdExtension } = getOrCreateExtension(
+    project,
+    extensionName
+  );
+  const { object, replacedExisting } = createTargetEventsBasedObject(
+    extension,
+    objectName,
+    !!(args && args.replace_existing)
+  );
+  applyObjectFields(object, args);
+  if (!object.getDefaultName()) object.setDefaultName(objectName);
+
+  const sourceKind =
+    args && typeof args.source_kind === 'string'
+      ? args.source_kind
+      : args && args.scene_name
+      ? 'scene_instances'
+      : 'extension_object';
+  let sourceResult;
+  if (sourceKind === 'scene_instances') {
+    sourceResult = extractPrefabFromSceneInstances({
+      project,
+      args,
+      targetObject: object,
+    });
+  } else if (sourceKind === 'extension_object') {
+    sourceResult = extractPrefabFromExtensionObject({
+      project,
+      args,
+      targetObject: object,
+    });
+  } else if (sourceKind === 'scene_object') {
+    const sceneName = normalizeRequiredName(args.scene_name, 'scene_name');
+    const sourceObjectName = normalizeRequiredName(
+      args.source_object_name,
+      'source_object_name'
+    );
+    const sourceScene = getScene(project, sceneName);
+    const sourceObject = getObjectFromContainers(
+      project,
+      sourceScene,
+      sourceObjectName
+    );
+    if (!sourceObject) {
+      throw new Error(`Scene/global object not found: "${sourceObjectName}".`);
+    }
+    if (!project.hasEventsBasedObject(sourceObject.getType())) {
+      throw new Error(
+        `Scene/global object "${sourceObjectName}" has type "${sourceObject.getType()}", which is not an events-based object type. Use source_kind:"scene_instances" with source_object_names to extract ordinary scene objects.`
+      );
+    }
+    const sourceExtensionName = gd.PlatformExtension.getExtensionFromFullObjectType(
+      sourceObject.getType()
+    );
+    const eventsBasedObjectName = gd.PlatformExtension.getObjectNameFromFullObjectType(
+      sourceObject.getType()
+    );
+    sourceResult = extractPrefabFromExtensionObject({
+      project,
+      args: {
+        ...args,
+        source_extension_name: sourceExtensionName,
+        source_object_name: eventsBasedObjectName,
+        child_object_names:
+          args.child_object_names || args.source_child_object_names,
+      },
+      targetObject: object,
+    });
+    sourceResult.sourceKind = 'scene_object';
+    sourceResult.sceneName = sceneName;
+    sourceResult.sourceObjectName = sourceObjectName;
+  } else {
+    throw new Error(
+      'source_kind must be scene_instances, scene_object, or extension_object.'
+    );
+  }
+
+  return {
+    success: true,
+    dryRun: false,
+    extensionName,
+    objectName,
+    createdExtension,
+    replacedExisting,
+    prefabType: gd.PlatformExtension.getObjectFullType(extensionName, objectName),
+    ...sourceResult,
+    object: summarizeObject(
+      object,
+      !(args && args.summary_only),
+      !(args && args.summary_only)
+    ),
+  };
+};
+
 const getPropertiesContainer = (
   project: gdProject,
   args: Object
@@ -1446,6 +2129,46 @@ export const createOrUpdateExtensionFunction = (
   project: gdProject,
   args: Object
 ): Object => {
+  const extensionNameForValidation = normalizeRequiredName(
+    args.extension_name,
+    'extension_name'
+  );
+  if (args && args.dry_run) {
+    return runOnTemporaryExtensionCopy(
+      project,
+      extensionNameForValidation,
+      false,
+      temporaryExtensionName => {
+        const result = createOrUpdateExtensionFunction(project, {
+          ...args,
+          extension_name: temporaryExtensionName,
+          dry_run: false,
+          __mcp_skip_clone_validation: true,
+        });
+        return {
+          ...result,
+          dryRun: true,
+          dryRunNote:
+            'Validated on a temporary extension copy; the live extension was not mutated.',
+        };
+      }
+    );
+  }
+
+  if (!shouldSkipCloneValidation(args)) {
+    runOnTemporaryExtensionCopy(
+      project,
+      extensionNameForValidation,
+      false,
+      temporaryExtensionName =>
+        createOrUpdateExtensionFunction(project, {
+          ...args,
+          extension_name: temporaryExtensionName,
+          __mcp_skip_clone_validation: true,
+        })
+    );
+  }
+
   const parsedEventsJson = parseValidatedEventsJson(project, args.events_json);
   const { extension, parentKind, parent, container } = getFunctionParent(
     project,
@@ -1455,111 +2178,91 @@ export const createOrUpdateExtensionFunction = (
     args.function_name,
     'function_name'
   );
-  const serializedExtensionBefore = serializeToJSObject(extension);
 
-  try {
-    const created = !container.hasEventsFunctionNamed(functionName);
-    let eventsFunction = created
-      ? container.insertNewEventsFunction(
-          functionName,
-          container.getEventsFunctionsCount()
-        )
-      : container.getEventsFunction(functionName);
+  const created = !container.hasEventsFunctionNamed(functionName);
+  let eventsFunction = created
+    ? container.insertNewEventsFunction(
+        functionName,
+        container.getEventsFunctionsCount()
+      )
+    : container.getEventsFunction(functionName);
 
-    if (
-      args.serialized_function &&
-      typeof args.serialized_function === 'object'
-    ) {
-      unserializeFromJSObject(
-        eventsFunction,
-        args.serialized_function,
-        'unserializeFrom',
-        project
-      );
-      eventsFunction.setName(functionName);
-    }
-
-    const newFunctionName = normalizeOptionalName(
-      args.new_function_name,
-      'new_function_name'
-    );
-    if (newFunctionName && newFunctionName !== eventsFunction.getName()) {
-      const safeAndUniqueName = getSafeUniqueName(
-        newFunctionName,
-        name => container.hasEventsFunctionNamed(name),
-        eventsFunction.getName()
-      );
-      renameEventsFunction({
-        project,
-        extension,
-        parentKind,
-        parent,
-        eventsFunction,
-        newName: safeAndUniqueName,
-      });
-      eventsFunction = container.getEventsFunction(safeAndUniqueName);
-    }
-
-    const functionType = normalizeFunctionType(args.function_type);
-    if (functionType != null) {
-      eventsFunction.setFunctionType(functionType);
-    }
-    if (parentKind === 'behavior') {
-      gd.WholeProjectRefactorer.ensureBehaviorEventsFunctionsProperParameters(
-        extension,
-        ((parent: any): gdEventsBasedBehavior)
-      );
-    } else if (parentKind === 'object') {
-      gd.WholeProjectRefactorer.ensureObjectEventsFunctionsProperParameters(
-        extension,
-        ((parent: any): gdEventsBasedObject)
-      );
-    }
-
-    applyEventsFunctionFields(project, eventsFunction, args, parsedEventsJson);
-    assertEventsFunctionSentenceIsValid(parentKind, eventsFunction);
-    if (
-      created &&
-      eventsFunction.isCondition() &&
-      !eventsFunction.isExpression()
-    ) {
-      gd.PropertyFunctionGenerator.generateConditionSkeleton(
-        project,
-        eventsFunction
-      );
-    }
-
-    const summaryOnly = !!(args && args.summary_only);
-    const result = {
-      success: true,
-      dryRun: !!(args && args.dry_run),
-      created,
-      wouldCreate: created,
-      parentKind,
-      function: summarizeEventsFunction(
-        eventsFunction,
-        !summaryOnly,
-        !summaryOnly
-      ),
-    };
-    if (args && args.dry_run) {
-      unserializeFromJSObject(
-        extension,
-        serializedExtensionBefore,
-        'unserializeFrom',
-        project
-      );
-    }
-    return result;
-  } catch (error) {
+  if (
+    args.serialized_function &&
+    typeof args.serialized_function === 'object'
+  ) {
     unserializeFromJSObject(
-      extension,
-      serializedExtensionBefore,
+      eventsFunction,
+      args.serialized_function,
       'unserializeFrom',
       project
     );
-    throw error;
+    eventsFunction.setName(functionName);
   }
+
+  const newFunctionName = normalizeOptionalName(
+    args.new_function_name,
+    'new_function_name'
+  );
+  if (newFunctionName && newFunctionName !== eventsFunction.getName()) {
+    const safeAndUniqueName = getSafeUniqueName(
+      newFunctionName,
+      name => container.hasEventsFunctionNamed(name),
+      eventsFunction.getName()
+    );
+    renameEventsFunction({
+      project,
+      extension,
+      parentKind,
+      parent,
+      eventsFunction,
+      newName: safeAndUniqueName,
+    });
+    eventsFunction = container.getEventsFunction(safeAndUniqueName);
+  }
+
+  const functionType = normalizeFunctionType(args.function_type);
+  if (functionType != null) {
+    eventsFunction.setFunctionType(functionType);
+  }
+  if (parentKind === 'behavior') {
+    gd.WholeProjectRefactorer.ensureBehaviorEventsFunctionsProperParameters(
+      extension,
+      ((parent: any): gdEventsBasedBehavior)
+    );
+  } else if (parentKind === 'object') {
+    gd.WholeProjectRefactorer.ensureObjectEventsFunctionsProperParameters(
+      extension,
+      ((parent: any): gdEventsBasedObject)
+    );
+  }
+
+  applyEventsFunctionFields(project, eventsFunction, args, parsedEventsJson);
+  assertEventsFunctionSentenceIsValid(parentKind, eventsFunction);
+  if (
+    created &&
+    eventsFunction.isCondition() &&
+    !eventsFunction.isExpression()
+  ) {
+    gd.PropertyFunctionGenerator.generateConditionSkeleton(
+      project,
+      eventsFunction
+    );
+  }
+
+  const summaryOnly = !!(args && args.summary_only);
+  return {
+    success: true,
+    dryRun: false,
+    created,
+    wouldCreate: created,
+    parentKind,
+    function: summarizeEventsFunction(
+      eventsFunction,
+      !summaryOnly,
+      !summaryOnly
+    ),
+  };
 };
 
 export const deleteExtensionFunction = (
@@ -1720,75 +2423,91 @@ export const createOrUpdateExtensionObject = (
     args.extension_name,
     'extension_name'
   );
+  if (args && args.dry_run) {
+    return runOnTemporaryExtensionCopy(
+      project,
+      extensionName,
+      false,
+      temporaryExtensionName => {
+        const result = createOrUpdateExtensionObject(project, {
+          ...args,
+          extension_name: temporaryExtensionName,
+          dry_run: false,
+          __mcp_skip_clone_validation: true,
+        });
+        return {
+          ...result,
+          dryRun: true,
+          dryRunNote:
+            'Validated on a temporary extension copy; the live extension was not mutated.',
+        };
+      }
+    );
+  }
+
+  if (!shouldSkipCloneValidation(args)) {
+    runOnTemporaryExtensionCopy(
+      project,
+      extensionName,
+      false,
+      temporaryExtensionName =>
+        createOrUpdateExtensionObject(project, {
+          ...args,
+          extension_name: temporaryExtensionName,
+          __mcp_skip_clone_validation: true,
+        })
+    );
+  }
+
   const extension = getExtension(project, extensionName);
   const objectName = normalizeRequiredName(args.object_name, 'object_name');
   const objects = extension.getEventsBasedObjects();
-  const serializedExtensionBefore = serializeToJSObject(extension);
 
-  try {
-    const created = !objects.has(objectName);
-    let object = created
-      ? objects.insertNew(objectName, objects.getCount())
-      : objects.get(objectName);
+  const created = !objects.has(objectName);
+  let object = created
+    ? objects.insertNew(objectName, objects.getCount())
+    : objects.get(objectName);
 
-    if (args.serialized_object && typeof args.serialized_object === 'object') {
-      unserializeFromJSObject(
-        object,
-        args.serialized_object,
-        'unserializeFrom',
-        project
-      );
-      object.setName(objectName);
-    }
-
-    const newObjectName = normalizeOptionalName(
-      args.new_object_name,
-      'new_object_name'
-    );
-    if (newObjectName && newObjectName !== object.getName()) {
-      const safeAndUniqueName = getSafeUniqueName(
-        newObjectName,
-        name => objects.has(name),
-        object.getName()
-      );
-      gd.WholeProjectRefactorer.renameEventsBasedObject(
-        project,
-        extension,
-        object.getName(),
-        safeAndUniqueName
-      );
-      object.setName(safeAndUniqueName);
-      object = objects.get(safeAndUniqueName);
-    }
-
-    applyObjectFields(object, args);
-
-    const summaryOnly = !!(args && args.summary_only);
-    const result = {
-      success: true,
-      dryRun: !!(args && args.dry_run),
-      created,
-      wouldCreate: created,
-      object: summarizeObject(object, !summaryOnly, !summaryOnly),
-    };
-    if (args && args.dry_run) {
-      unserializeFromJSObject(
-        extension,
-        serializedExtensionBefore,
-        'unserializeFrom',
-        project
-      );
-    }
-    return result;
-  } catch (error) {
+  if (args.serialized_object && typeof args.serialized_object === 'object') {
     unserializeFromJSObject(
-      extension,
-      serializedExtensionBefore,
+      object,
+      args.serialized_object,
       'unserializeFrom',
       project
     );
-    throw error;
+    object.setName(objectName);
   }
+
+  const newObjectName = normalizeOptionalName(
+    args.new_object_name,
+    'new_object_name'
+  );
+  if (newObjectName && newObjectName !== object.getName()) {
+    const safeAndUniqueName = getSafeUniqueName(
+      newObjectName,
+      name => objects.has(name),
+      object.getName()
+    );
+    gd.WholeProjectRefactorer.renameEventsBasedObject(
+      project,
+      extension,
+      object.getName(),
+      safeAndUniqueName
+    );
+    object.setName(safeAndUniqueName);
+    object = objects.get(safeAndUniqueName);
+  }
+
+  applyObjectFields(object, args);
+
+  const summaryOnly = !!(args && args.summary_only);
+  return {
+    success: true,
+    dryRun: false,
+    created,
+    wouldCreate: created,
+    object: summarizeObject(object, !summaryOnly, !summaryOnly),
+  };
 };
 
 export const deleteExtensionObject = (

@@ -1165,6 +1165,285 @@ describe('McpEditorBridge', () => {
     }
   });
 
+  it('supports compact extension inspect and dry-run extension object writes', async () => {
+    // $FlowFixMe[invalid-constructor]
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    const extension = project.insertNewEventsFunctionsExtension('McpExt', 0);
+    const liveObjectBeforeDryRun = extension
+      .getEventsBasedObjects()
+      .insertNew('AlreadyOpenPrefab', 0);
+    liveObjectBeforeDryRun.setAreaMinX(0);
+    liveObjectBeforeDryRun.setAreaMinY(0);
+    liveObjectBeforeDryRun.setAreaMaxX(32);
+    liveObjectBeforeDryRun.setAreaMaxY(16);
+    const triggerUnsavedChanges: any = jest.fn();
+
+    try {
+      const bridge = makeBridge({
+        getProject: () => project,
+        getPermissions: () => ({
+          allowWriteTools: true,
+          allowCommandTools: false,
+        }),
+        triggerUnsavedChanges,
+      });
+
+      const dryRunResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'gdevelop_create_or_update_extension_object',
+          arguments: {
+            extension_name: 'McpExt',
+            object_name: 'DryPrefab',
+            full_name: 'Dry prefab',
+            dry_run: true,
+            summary_only: true,
+            serialized_object: {
+              name: 'DryPrefab',
+              defaultName: 'DryPrefab',
+              areaMinX: 0,
+              areaMinY: 0,
+              areaMaxX: 64,
+              areaMaxY: 16,
+              objects: [],
+              instances: [],
+              eventsFunctions: [],
+              propertyDescriptors: [],
+              variants: [],
+            },
+          },
+        },
+      });
+      const dryRunResult = JSON.parse(dryRunResponse.content[0].text);
+
+      expect(dryRunResponse.isError).not.toBe(true);
+      expect(dryRunResult.dryRun).toBe(true);
+      expect(
+        project
+          .getEventsFunctionsExtension('McpExt')
+          .getEventsBasedObjects()
+          .has('DryPrefab')
+      ).toBe(false);
+      expect(
+        project.hasEventsFunctionsExtensionNamed('__McpValidation_McpExt')
+      ).toBe(false);
+      expect(liveObjectBeforeDryRun.getName()).toBe('AlreadyOpenPrefab');
+      expect(
+        liveObjectBeforeDryRun.getVariants().hasVariantNamed('MissingVariant')
+      ).toBe(false);
+      expect(triggerUnsavedChanges).not.toHaveBeenCalled();
+
+      await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'gdevelop_create_or_update_extension_object',
+          arguments: {
+            extension_name: 'McpExt',
+            object_name: 'RealPrefab',
+            full_name: 'Real prefab',
+            summary_only: true,
+            area: { min_x: 0, min_y: 0, max_x: 32, max_y: 12 },
+          },
+        },
+      });
+
+      const inspectResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'gdevelop_inspect_extension',
+          arguments: {
+            extension_name: 'McpExt',
+            summary_only: true,
+          },
+        },
+      });
+      const inspected = JSON.parse(inspectResponse.content[0].text);
+
+      expect(inspected.mode).toBe('summary_only');
+      expect(inspected.objects).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            name: 'AlreadyOpenPrefab',
+            childObjectsCount: 0,
+          }),
+          expect.objectContaining({
+            name: 'RealPrefab',
+            childObjectsCount: 0,
+          }),
+        ])
+      );
+      expect(inspected.serializedExtension).toBeUndefined();
+      expect(triggerUnsavedChanges).toHaveBeenCalledTimes(1);
+    } finally {
+      project.delete();
+    }
+  });
+
+  it('finds matching events in extension functions and across the project', async () => {
+    // $FlowFixMe[invalid-constructor]
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    const layout = project.insertNewLayout('Level1', 0);
+    layout
+      .getEvents()
+      .insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 0)
+      .setAiGeneratedEventId('scene-event');
+    const extension = project.insertNewEventsFunctionsExtension('McpExt', 0);
+    const eventsFunction = extension
+      .getEventsFunctions()
+      .insertNewEventsFunction('UpdateHealthBar', 0);
+    eventsFunction.setFunctionType(gd.EventsFunction.Action);
+    const standard = gd.asStandardEvent(
+      eventsFunction
+        .getEvents()
+        .insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 0)
+    );
+    const action = new gd.Instruction();
+    action.setType('SetNumberVariable');
+    action.setParametersCount(3);
+    action.setParameter(0, 'HealthBarValue');
+    action.setParameter(1, '=');
+    action.setParameter(2, '100');
+    standard.getActions().insert(action, 0);
+    action.delete();
+
+    try {
+      const bridge = makeBridge({
+        getProject: () => project,
+        getPermissions: () => ({
+          allowWriteTools: true,
+          allowCommandTools: false,
+        }),
+      });
+
+      const extensionSearchResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'find_extension_events',
+          arguments: {
+            extension_name: 'McpExt',
+            parameter_contains: 'HealthBarValue',
+            summary_only: true,
+          },
+        },
+      });
+      const extensionSearch = JSON.parse(
+        extensionSearchResponse.content[0].text
+      );
+      expect(extensionSearch.count).toBe(1);
+      expect(extensionSearch.matches[0]).toEqual(
+        expect.objectContaining({
+          extensionName: 'McpExt',
+          parentKind: 'extension',
+          functionName: 'UpdateHealthBar',
+        })
+      );
+      expect(extensionSearch.matches[0].serializedEvent).toBeUndefined();
+
+      const projectSearchResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'find_project_events',
+          arguments: {
+            text_contains: 'HealthBarValue',
+            summary_only: true,
+          },
+        },
+      });
+      const projectSearch = JSON.parse(projectSearchResponse.content[0].text);
+      expect(projectSearch.count).toBe(1);
+      expect(projectSearch.matches[0].scope).toBe('extension');
+    } finally {
+      project.delete();
+    }
+  });
+
+  it('extracts scene instances into an events-based object prefab', async () => {
+    // $FlowFixMe[invalid-constructor]
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    const layout = project.insertNewLayout('Level1', 0);
+    layout.getObjects().insertNewObject(project, 'Sprite', 'HealthBar', 0);
+    layout.getObjects().insertNewObject(project, 'TextObject::Text', 'Label', 1);
+    const healthBar = layout.getInitialInstances().insertNewInitialInstance();
+    healthBar.setObjectName('HealthBar');
+    healthBar.setX(200);
+    healthBar.setY(100);
+    healthBar.setHasCustomSize(true);
+    healthBar.setCustomWidth(80);
+    healthBar.setCustomHeight(12);
+    const label = layout.getInitialInstances().insertNewInitialInstance();
+    label.setObjectName('Label');
+    label.setX(200);
+    label.setY(84);
+    label.setHasCustomSize(true);
+    label.setCustomWidth(80);
+    label.setCustomHeight(12);
+
+    try {
+      const bridge = makeBridge({
+        getProject: () => project,
+        getPermissions: () => ({
+          allowWriteTools: true,
+          allowCommandTools: false,
+        }),
+      });
+
+      const dryRunResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'gdevelop_extract_prefab_from_object',
+          arguments: {
+            extension_name: 'UI',
+            object_name: 'HealthBadge',
+            source_kind: 'scene_instances',
+            scene_name: 'Level1',
+            source_object_names: ['HealthBar', 'Label'],
+            dry_run: true,
+            summary_only: true,
+          },
+        },
+      });
+      const dryRunResult = JSON.parse(dryRunResponse.content[0].text);
+      expect(dryRunResponse.isError).not.toBe(true);
+      expect(dryRunResult.dryRun).toBe(true);
+      expect(project.hasEventsFunctionsExtensionNamed('UI')).toBe(false);
+      expect(project.hasEventsFunctionsExtensionNamed('__McpValidation_UI')).toBe(
+        false
+      );
+
+      const extractResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'gdevelop_extract_prefab_from_object',
+          arguments: {
+            extension_name: 'UI',
+            object_name: 'HealthBadge',
+            source_kind: 'scene_instances',
+            scene_name: 'Level1',
+            source_object_names: ['HealthBar', 'Label'],
+            replace_in_scene_with_prefab_instance: true,
+            summary_only: true,
+          },
+        },
+      });
+      const result = JSON.parse(extractResponse.content[0].text);
+      const prefab = project
+        .getEventsFunctionsExtension('UI')
+        .getEventsBasedObjects()
+        .get('HealthBadge');
+
+      expect(extractResponse.isError).not.toBe(true);
+      expect(result.prefabType).toBe('UI::HealthBadge');
+      expect(prefab.getObjects().getObjectsCount()).toBe(2);
+      expect(prefab.getInitialInstances().getInstancesCount()).toBe(2);
+      expect(prefab.getAreaMaxX()).toBe(80);
+      expect(prefab.getAreaMaxY()).toBe(28);
+      expect(layout.getObjects().hasObjectNamed('HealthBadge')).toBe(true);
+      expect(layout.getInitialInstances().getInstancesCount()).toBe(1);
+    } finally {
+      project.delete();
+    }
+  });
+
   it('notifies opened extension editors when MCP replaces extension function events', async () => {
     // $FlowFixMe[invalid-constructor]
     const project = new gd.ProjectHelper.createNewGDJSProject();
@@ -3031,6 +3310,7 @@ describe('McpEditorBridge', () => {
     const result = JSON.parse(response.content[0].text);
     expect(result.running).toBe(false);
     expect(result.error).toContain('LAUNCH_NEW_PREVIEW');
+    expect(result.diagnostics.classification).toBe('no-running-preview');
   });
 
   it('captures a preview screenshot as a base64 data URL', async () => {
@@ -3065,6 +3345,48 @@ describe('McpEditorBridge', () => {
     expect(result.width).toBe(1);
     expect(result.height).toBe(1);
     expect(result.dataUrl).toBe(onePixelPng);
+  });
+
+  it('captures the renderer canvas when canvas_only is requested', async () => {
+    const onePixelPng =
+      'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+M8AAAMCAQDLuRBYAAAAAElFTkSuQmCC';
+    const capturePreviewPage: any = jest.fn(async () => ({
+      dataUrl: onePixelPng,
+      width: 10,
+      height: 10,
+    }));
+    const previewDebuggerServer = makeTargetedPreviewServer({
+      responders: {
+        captureScreenshot: {
+          dataUrl: onePixelPng,
+          width: 1,
+          height: 1,
+          error: null,
+        },
+        refresh: {
+          __fullMessage: { payload: { _sceneStack: { _stack: [] } } },
+        },
+      },
+    });
+
+    const bridge = makeBridge({
+      getPreviewDebuggerServer: () => previewDebuggerServer,
+      capturePreviewPage,
+    });
+
+    const response = await bridge.handleRendererMcpRequest({
+      method: 'tools/call',
+      params: {
+        name: 'capture_preview_screenshot',
+        arguments: { canvas_only: true },
+      },
+    });
+    const result = JSON.parse(response.content[0].text);
+
+    expect(response.isError).not.toBe(true);
+    expect(result.source).toBe('renderer-canvas');
+    expect(result.width).toBe(1);
+    expect(capturePreviewPage).not.toHaveBeenCalled();
   });
 
   it('captures a screenshot from the requested debugger_id', async () => {

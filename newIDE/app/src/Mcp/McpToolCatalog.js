@@ -1438,7 +1438,7 @@ const inspectRunningPreviewSchema = {
     timeout_ms: {
       type: 'number',
       description:
-        'How long to wait (200-10000 ms, default 2500) for the runtime dump reply before returning status/logs only.',
+        'How long to wait (200-10000 ms, default 2500) for the runtime dump reply before returning status/logs/diagnostics only.',
     },
     include_raw_dump: {
       type: 'boolean',
@@ -1472,6 +1472,26 @@ const capturePreviewScreenshotSchema = {
       type: 'string',
       description:
         'Optional preview/debugger id to capture. Defaults to the latest launched preview, so you do not capture a stale game-over window. See availableDebuggerIds from gdevelop_inspect_running_preview.',
+    },
+    canvas_only: {
+      type: 'boolean',
+      description:
+        'Default false. When true, skip window/webContents capture and request the game canvas PNG from the renderer, so the result is the canvas content rather than the preview window.',
+    },
+    capture_mode: {
+      type: 'string',
+      description:
+        'Optional capture mode. Use "canvas" as an alias for canvas_only:true; omit for auto (main-process window capture first, renderer canvas fallback).',
+    },
+    target_width: {
+      type: 'number',
+      description:
+        'Optional fixed output PNG width. Must be used with target_height. Resizes the captured PNG when Electron nativeImage is available.',
+    },
+    target_height: {
+      type: 'number',
+      description:
+        'Optional fixed output PNG height. Must be used with target_width. For pixel-level game-canvas checks, prefer canvas_only:true plus the game resolution (for example 800x450).',
     },
   },
   additionalProperties: false,
@@ -2265,6 +2285,45 @@ const extensionNameSchema = {
   additionalProperties: true,
 };
 
+const extensionInspectSchema = {
+  type: 'object',
+  properties: {
+    extension_name: extensionNameSchema.properties.extension_name,
+    summary_only: {
+      type: 'boolean',
+      description:
+        'Return only extension counts plus function/object/behavior names. Omits events and serialized JSON by default.',
+    },
+    list_functions_only: {
+      type: 'boolean',
+      description:
+        'Return only free/behavior/object functions in a flat list. Omits events and serialized JSON by default unless include_events/include_serialized are true.',
+    },
+    list_objects_only: {
+      type: 'boolean',
+      description:
+        'Return only events-based objects. Omits function events and serialized JSON by default unless include_events/include_serialized are true.',
+    },
+    list_behaviors_only: {
+      type: 'boolean',
+      description:
+        'Return only events-based behaviors. Omits function events and serialized JSON by default unless include_events/include_serialized are true.',
+    },
+    include_events: {
+      type: 'boolean',
+      description:
+        'Override whether function eventsAsText/eventsJson are included. Default true for full inspect, false for compact modes.',
+    },
+    include_serialized: {
+      type: 'boolean',
+      description:
+        'Override whether serializedExtension/serializedFunction/serializedObject/serializedProperty fields are included. Default true for full inspect, false for compact modes.',
+    },
+  },
+  required: ['extension_name'],
+  additionalProperties: true,
+};
+
 const extensionFunctionSchema = {
   type: 'object',
   properties: {
@@ -2341,6 +2400,18 @@ const extensionFunctionSchema = {
         'Complete serialized events function for advanced edits. Other provided fields are applied afterward.',
       additionalProperties: true,
     },
+    dry_run: {
+      type: 'boolean',
+      description:
+        'Validate and summarize the final function without modifying the project. Uses the same unserialize/apply/sentence validation path as a real write, then rolls back.',
+    },
+    summary_only: {
+      type: 'boolean',
+      description:
+        'When true, omit eventsJson/eventsAsText and serializedFunction from create/update or inspect responses.',
+    },
+    include_events: extensionInspectSchema.properties.include_events,
+    include_serialized: extensionInspectSchema.properties.include_serialized,
   },
   required: ['extension_name', 'function_name'],
   additionalProperties: true,
@@ -2367,6 +2438,283 @@ const extensionObjectSchema = {
       type: 'string',
       description: 'Internal name of the events-based object.',
     },
+    new_object_name: {
+      type: 'string',
+      description:
+        'Optional new internal name for renaming the events-based object.',
+    },
+    full_name: {
+      type: 'string',
+      description: 'Display name shown in the editor/object picker.',
+    },
+    description: {
+      type: 'string',
+      description: 'Description shown in the editor/object picker.',
+    },
+    default_name: {
+      type: 'string',
+      description:
+        'Default scene object name proposed when adding this prefab/custom object.',
+    },
+    is_rendered_in_3d: {
+      type: 'boolean',
+      description:
+        'Maps to markAsRenderedIn3D. Controls whether the events-based object is treated as a 3D-rendered object.',
+    },
+    is_private: {
+      type: 'boolean',
+      description: 'Maps to setPrivate. Hides the object from public listings.',
+    },
+    is_inner_area_following_parent_size: {
+      type: 'boolean',
+      description:
+        'Maps to markAsInnerAreaFollowingParentSize for responsive child layouting.',
+    },
+    is_text_container: {
+      type: 'boolean',
+      description:
+        'Maps to markAsTextContainer so text-container actions can apply.',
+    },
+    is_animatable: {
+      type: 'boolean',
+      description:
+        'Maps to markAsAnimatable so object animations can apply.',
+    },
+    icon_url: {
+      type: 'string',
+      description: 'Icon URL/path shown in the editor.',
+    },
+    preview_icon_url: {
+      type: 'string',
+      description: 'Preview icon URL/path shown in the editor.',
+    },
+    area: {
+      type: 'object',
+      description:
+        'Inner area bounds. Effective numeric fields: min_x, min_y, min_z, max_x, max_y, max_z.',
+      properties: {
+        min_x: { type: 'number' },
+        min_y: { type: 'number' },
+        min_z: { type: 'number' },
+        max_x: { type: 'number' },
+        max_y: { type: 'number' },
+        max_z: { type: 'number' },
+      },
+      additionalProperties: false,
+    },
+    serialized_object: {
+      type: 'object',
+      description:
+        'Complete serialized events-based object for advanced edits. The object is unserialized first, then object_name/new_object_name/full_name/description/default_name/flags/icons/area are applied afterward. Effective top-level serialized fields include name, fullName, description, defaultName, areaMinX/Y/Z, areaMaxX/Y/Z, objects, instances, layers, propertyDescriptors, eventsFunctions, variants, is3D, isAnimatable, isTextContainer, and isInnerAreaFollowingParentSize.',
+      examples: [
+        {
+          name: 'HealthBarPrefab',
+          fullName: 'Health bar prefab',
+          description: 'Reusable health bar composed from child objects.',
+          defaultName: 'HealthBar',
+          areaMinX: 0,
+          areaMinY: 0,
+          areaMaxX: 96,
+          areaMaxY: 12,
+          objects: [
+            {
+              name: 'Fill',
+              type: 'PanelSpriteObject::PanelSprite',
+              variables: [],
+              effects: [],
+              behaviors: [],
+            },
+          ],
+          instances: [
+            {
+              objectName: 'Fill',
+              x: 0,
+              y: 0,
+            },
+          ],
+          eventsFunctions: [],
+          propertyDescriptors: [],
+          variants: [],
+        },
+      ],
+      additionalProperties: true,
+    },
+    dry_run: {
+      type: 'boolean',
+      description:
+        'Validate and summarize the final object without modifying the project. Uses the same unserialize/apply path as a real write, then rolls back.',
+    },
+    summary_only: {
+      type: 'boolean',
+      description:
+        'When true, omit function events and serializedObject from create/update or inspect responses.',
+    },
+    include_events: extensionInspectSchema.properties.include_events,
+    include_serialized: extensionInspectSchema.properties.include_serialized,
+  },
+  required: ['extension_name', 'object_name'],
+  additionalProperties: true,
+};
+
+const findExtensionEventsSchema = {
+  type: 'object',
+  properties: {
+    extension_name: extensionNameSchema.properties.extension_name,
+    parent_kind: extensionFunctionSchema.properties.parent_kind,
+    parent_name: extensionFunctionSchema.properties.parent_name,
+    function_name: extensionFunctionSchema.properties.function_name,
+    event_path: eventTargetSchema.properties.event_path,
+    ai_generated_event_id: eventTargetSchema.properties.ai_generated_event_id,
+    event_type: findSceneEventsSchema.properties.event_type,
+    group_name: eventTargetSchema.properties.group_name,
+    action_type: eventTargetSchema.properties.action_type,
+    condition_type: eventTargetSchema.properties.condition_type,
+    parameter_contains: eventTargetSchema.properties.parameter_contains,
+    text_contains: eventTargetSchema.properties.text_contains,
+    limit: findSceneEventsSchema.properties.limit,
+    summary_only: {
+      type: 'boolean',
+      description:
+        'When true, omit serializedEvent from matches. New extension/project searches are compact by default.',
+    },
+    include_serialized: {
+      type: 'boolean',
+      description:
+        'When true, include serializedEvent for each match. Default false for extension/project searches.',
+    },
+  },
+  required: ['extension_name'],
+  additionalProperties: true,
+};
+
+const findProjectEventsSchema = {
+  type: 'object',
+  properties: {
+    scene_name: {
+      type: 'string',
+      description: 'Optional scene name to restrict scene-event search.',
+    },
+    extension_name: {
+      type: 'string',
+      description: 'Optional extension name to restrict extension-event search.',
+    },
+    parent_kind: extensionFunctionSchema.properties.parent_kind,
+    parent_name: extensionFunctionSchema.properties.parent_name,
+    function_name: extensionFunctionSchema.properties.function_name,
+    event_path: eventTargetSchema.properties.event_path,
+    ai_generated_event_id: eventTargetSchema.properties.ai_generated_event_id,
+    event_type: findSceneEventsSchema.properties.event_type,
+    group_name: eventTargetSchema.properties.group_name,
+    action_type: eventTargetSchema.properties.action_type,
+    condition_type: eventTargetSchema.properties.condition_type,
+    parameter_contains: eventTargetSchema.properties.parameter_contains,
+    text_contains: eventTargetSchema.properties.text_contains,
+    limit: {
+      type: 'number',
+      description: 'Maximum aggregate matches to return. Defaults to 100.',
+    },
+    summary_only: findExtensionEventsSchema.properties.summary_only,
+    include_serialized: findExtensionEventsSchema.properties.include_serialized,
+  },
+  additionalProperties: true,
+};
+
+const extractPrefabFromObjectSchema = {
+  type: 'object',
+  properties: {
+    extension_name: extensionNameSchema.properties.extension_name,
+    object_name: {
+      type: 'string',
+      description:
+        'Internal name of the new events-based object prefab to create.',
+    },
+    source_kind: {
+      type: 'string',
+      description:
+        'Source mode: scene_instances, scene_object, or extension_object. Defaults to scene_instances when scene_name is present, otherwise extension_object.',
+    },
+    scene_name: {
+      type: 'string',
+      description:
+        'Scene name for source_kind scene_instances or scene_object.',
+    },
+    source_object_names: {
+      type: 'array',
+      items: { type: 'string' },
+      description:
+        'For source_kind scene_instances: scene/global object names whose initial instances are extracted into the prefab.',
+    },
+    source_extension_name: {
+      type: 'string',
+      description:
+        'For source_kind extension_object: extension containing the source events-based object. Defaults to extension_name.',
+    },
+    source_object_name: {
+      type: 'string',
+      description:
+        'For source_kind extension_object/scene_object: source object name to inspect/copy from.',
+    },
+    child_object_names: {
+      type: 'array',
+      items: { type: 'string' },
+      description:
+        'For extension_object/scene_object: child object names to extract. If omitted, all child objects are copied.',
+    },
+    replace_existing: {
+      type: 'boolean',
+      description:
+        'Overwrite an existing target events-based object with object_name. Default false.',
+    },
+    normalize_origin: {
+      type: 'boolean',
+      description:
+        'Default true. Subtract the extracted AABB min from child instances so the new prefab starts at 0,0,0.',
+    },
+    replace_in_scene_with_prefab_instance: {
+      type: 'boolean',
+      description:
+        'For source_kind scene_instances: remove extracted scene instances and insert one instance of the new prefab at their old AABB origin.',
+    },
+    prefab_scene_object_name: {
+      type: 'string',
+      description:
+        'Optional scene object name to use when replace_in_scene_with_prefab_instance is true.',
+    },
+    remove_scene_objects_when_unused: {
+      type: 'boolean',
+      description:
+        'For scene migration: remove extracted scene object definitions when no initial instances of them remain.',
+    },
+    replace_in_source_with_prefab_instance: {
+      type: 'boolean',
+      description:
+        'For source_kind extension_object/scene_object: replace extracted child instances in the source object with one child instance of the new prefab.',
+    },
+    prefab_child_object_name: {
+      type: 'string',
+      description:
+        'Optional child object name to use in the source object when replace_in_source_with_prefab_instance is true.',
+    },
+    remove_extracted_children: {
+      type: 'boolean',
+      description:
+        'For extension-object migration: remove extracted child object definitions from the source object when no child instances of them remain.',
+    },
+    dry_run: {
+      type: 'boolean',
+      description:
+        'Validate and summarize the extraction/migration without modifying the project.',
+    },
+    summary_only: {
+      type: 'boolean',
+      description: 'Omit the full serializedObject from the response.',
+    },
+    full_name: extensionObjectSchema.properties.full_name,
+    description: extensionObjectSchema.properties.description,
+    default_name: extensionObjectSchema.properties.default_name,
+    is_rendered_in_3d: extensionObjectSchema.properties.is_rendered_in_3d,
+    is_private: extensionObjectSchema.properties.is_private,
+    area: extensionObjectSchema.properties.area,
   },
   required: ['extension_name', 'object_name'],
   additionalProperties: true,
@@ -2471,8 +2819,8 @@ const readTools: Array<McpTool> = [
   {
     name: 'gdevelop_inspect_extension',
     description:
-      'Inspect a project-specific extension, including free functions, events-based behaviors, events-based objects, properties, parameters, events, and serialized JSON.',
-    inputSchema: extensionNameSchema,
+      'Inspect a project-specific extension. Defaults to full detail, but supports summary_only, list_functions_only, list_objects_only, list_behaviors_only, include_events, and include_serialized to avoid huge/truncated responses.',
+    inputSchema: extensionInspectSchema,
   },
   {
     name: 'gdevelop_inspect_extension_function',
@@ -2876,6 +3224,18 @@ const readTools: Array<McpTool> = [
     description:
       'Find scene events by stable id, path, group name, event type, action type, condition type, parameter text, or serialized text.',
     inputSchema: findSceneEventsSchema,
+  },
+  {
+    name: 'find_extension_events',
+    description:
+      'Find events inside project extension functions (free, behavior, and object functions) by stable id, path, group name, action/condition type, parameter text, or serialized text.',
+    inputSchema: findExtensionEventsSchema,
+  },
+  {
+    name: 'find_project_events',
+    description:
+      'Find matching events across all scenes and project extension functions. Optionally restrict by scene_name, extension_name, parent_kind, parent_name, or function_name.',
+    inputSchema: findProjectEventsSchema,
   },
   {
     name: 'inspect_gameplay_rules',
@@ -3316,13 +3676,19 @@ const writeTools: Array<McpTool> = [
   {
     name: 'gdevelop_create_or_update_extension_object',
     description:
-      'Create or update an events-based object inside an extension, including metadata, 2D/3D flags, default name, and inner area bounds.',
+      'Create or update an events-based object inside an extension, including metadata, 2D/3D flags, default name, inner area bounds, and advanced serialized_object. Supports dry_run validation.',
     inputSchema: extensionObjectSchema,
   },
   {
     name: 'gdevelop_delete_extension_object',
     description: 'Delete an events-based object inside an extension.',
     inputSchema: extensionObjectSchema,
+  },
+  {
+    name: 'gdevelop_extract_prefab_from_object',
+    description:
+      'Extract existing scene instances or extension-object child objects into a new reusable events-based object prefab, with optional dry-run and explicit migration/replacement flags.',
+    inputSchema: extractPrefabFromObjectSchema,
   },
   {
     name: 'gdevelop_create_or_update_extension_property',
@@ -3933,6 +4299,103 @@ const toolUsageExamples: { [string]: Array<Object> } = {
       },
     },
   ],
+  gdevelop_inspect_extension: [
+    {
+      description:
+        'Inspect only extension functions without dumping every serialized object/event tree.',
+      arguments: {
+        extension_name: 'GameplayUI',
+        list_functions_only: true,
+      },
+    },
+    {
+      description:
+        'Return a compact extension summary when the full inspect output is too large.',
+      arguments: {
+        extension_name: 'GameplayUI',
+        summary_only: true,
+      },
+    },
+  ],
+  gdevelop_create_or_update_extension_object: [
+    {
+      description:
+        'Dry-run validate a serialized events-based object before writing it.',
+      arguments: {
+        extension_name: 'GameplayUI',
+        object_name: 'HealthBarPrefab',
+        dry_run: true,
+        summary_only: true,
+        serialized_object: {
+          name: 'HealthBarPrefab',
+          defaultName: 'HealthBar',
+          areaMinX: 0,
+          areaMinY: 0,
+          areaMaxX: 96,
+          areaMaxY: 12,
+          objects: [],
+          instances: [],
+          eventsFunctions: [],
+          propertyDescriptors: [],
+          variants: [],
+        },
+      },
+    },
+  ],
+  find_extension_events: [
+    {
+      description:
+        'Find extension-object functions that still mention a child health bar object.',
+      arguments: {
+        extension_name: 'GameplayUI',
+        parent_kind: 'object',
+        parent_name: 'EnemyPanel',
+        parameter_contains: 'HealthBar',
+        summary_only: true,
+      },
+    },
+  ],
+  find_project_events: [
+    {
+      description:
+        'Search all scenes and extension functions for direct health bar references.',
+      arguments: {
+        text_contains: 'HealthBar',
+        limit: 100,
+        summary_only: true,
+      },
+    },
+  ],
+  gdevelop_extract_prefab_from_object: [
+    {
+      description:
+        'Dry-run extract all EnemyHealthBar/EnemyHealthText scene instances into a reusable prefab.',
+      arguments: {
+        extension_name: 'GameplayUI',
+        object_name: 'EnemyHealthBadge',
+        source_kind: 'scene_instances',
+        scene_name: 'Level1',
+        source_object_names: ['EnemyHealthBar', 'EnemyHealthText'],
+        dry_run: true,
+        summary_only: true,
+      },
+    },
+    {
+      description:
+        'Extract selected child objects from an existing extension object and replace them in the source with one prefab child instance.',
+      arguments: {
+        extension_name: 'GameplayUI',
+        object_name: 'EnemyHealthBadge',
+        source_kind: 'extension_object',
+        source_extension_name: 'GameplayUI',
+        source_object_name: 'EnemyPanel',
+        child_object_names: ['HealthBar', 'HealthText'],
+        replace_in_source_with_prefab_instance: true,
+        remove_extracted_children: true,
+        summary_only: true,
+      },
+    },
+  ],
   gdevelop_inspect_running_preview: [
     {
       description:
@@ -3967,6 +4430,16 @@ const toolUsageExamples: { [string]: Array<Object> } = {
       description:
         'Return the screenshot as a base64 data URL instead of writing a file.',
       arguments: {},
+    },
+    {
+      description:
+        'Capture only the game canvas and resize the PNG to the project resolution for pixel checks.',
+      arguments: {
+        file_path: '/tmp/gdevelop-canvas.png',
+        canvas_only: true,
+        target_width: 800,
+        target_height: 450,
+      },
     },
   ],
   simulate_preview_input: [
@@ -4393,6 +4866,8 @@ export const getCapabilitiesSummary = (
       'describe_instances',
       'inspect_scene_draw_order',
       'find_scene_events',
+      'find_extension_events',
+      'find_project_events',
       'inspect_object_properties',
       'list_available_behaviors',
       'inspect_project_resources',
@@ -4421,6 +4896,7 @@ export const getCapabilitiesSummary = (
       'replace_project_resource',
       'put_2d_instances',
       'add_behavior',
+      'gdevelop_extract_prefab_from_object',
     ],
     'Author events': [
       'create_action',

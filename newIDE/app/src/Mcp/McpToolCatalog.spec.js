@@ -35,6 +35,8 @@ describe('McpToolCatalog', () => {
     expect(toolNames).toContain('inspect_project_resources');
     expect(toolNames).toContain('inspect_project_cleanup');
     expect(toolNames).toContain('find_scene_events');
+    expect(toolNames).toContain('find_extension_events');
+    expect(toolNames).toContain('find_project_events');
     expect(toolNames).toContain('validate_events_json_file');
     expect(toolNames).toContain('lint_scene_events');
     expect(toolNames).toContain('get_tilemap_tiles');
@@ -99,6 +101,7 @@ describe('McpToolCatalog', () => {
     expect(toolNames).toContain('gdevelop_create_or_update_extension_function');
     expect(toolNames).toContain('gdevelop_create_or_update_extension_behavior');
     expect(toolNames).toContain('gdevelop_create_or_update_extension_object');
+    expect(toolNames).toContain('gdevelop_extract_prefab_from_object');
     expect(toolNames).toContain('gdevelop_create_or_update_extension_property');
     expect(toolNames).toContain('gdevelop_run_command');
     expect(toolNames).toContain('gdevelop_save_project_and_wait');
@@ -135,12 +138,15 @@ describe('McpToolCatalog', () => {
     expect(isWriteTool('validate_events_json_file')).toBe(false);
     expect(isWriteTool('lint_scene_events')).toBe(false);
     expect(isWriteTool('gdevelop_create_or_update_extension')).toBe(true);
+    expect(isWriteTool('gdevelop_extract_prefab_from_object')).toBe(true);
     expect(isWriteTool('read_scene_events')).toBe(false);
     expect(isWriteTool('gdevelop_list_extensions')).toBe(false);
     expect(isCommandTool('gdevelop_run_command')).toBe(true);
     expect(isKnownMcpTool('inspect_object_properties')).toBe(true);
     expect(isKnownMcpTool('gdevelop_inspect_extension')).toBe(true);
     expect(isKnownMcpTool('find_scene_events')).toBe(true);
+    expect(isKnownMcpTool('find_extension_events')).toBe(true);
+    expect(isKnownMcpTool('find_project_events')).toBe(true);
     expect(isCommandTool('gdevelop_save_project_and_wait')).toBe(true);
     expect(isKnownMcpTool('totally_unknown_tool')).toBe(false);
   });

@@ -1106,6 +1106,37 @@ describe('libGD.js', function () {
       expect(variable.getString()).toBe('Hello');
       expect(variable.getType()).toBe(gd.Variable.String);
     });
+    it('can have an enum value', function () {
+      variable.setString('Idle');
+      variable.castTo('enum');
+      const enumValues = new gd.VectorString();
+      enumValues.push_back('Idle');
+      enumValues.push_back('Running');
+      variable.setEnumValues(enumValues);
+      enumValues.delete();
+      expect(variable.getString()).toBe('Idle');
+      expect(variable.getType()).toBe(gd.Variable.Enum);
+      expect(variable.getEnumValues().toJSArray()).toEqual([
+        'Idle',
+        'Running',
+      ]);
+      expect(variable.isValidEnumValue('Running')).toBe(true);
+      expect(variable.isValidEnumValue('Jumping')).toBe(false);
+      expect(gd.Variable.isPrimitive(variable.getType())).toBe(true);
+      expect(gd.Variable.typeAsString(variable.getType())).toBe('enum');
+
+      variable.setString('Running');
+      expect(variable.getString()).toBe('Running');
+      expect(variable.getType()).toBe(gd.Variable.Enum);
+
+      variable.setString('Jumping');
+      expect(variable.getString()).toBe('Idle');
+
+      variable.castTo('string');
+      expect(variable.getString()).toBe('Idle');
+      expect(variable.getType()).toBe(gd.Variable.String);
+      expect(variable.getEnumValues().toJSArray()).toEqual([]);
+    });
     it('can have a boolean value', function () {
       variable.setBool(true);
       expect(variable.getBool()).toBe(true);

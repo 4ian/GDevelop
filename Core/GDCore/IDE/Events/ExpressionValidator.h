@@ -533,7 +533,8 @@ private:
   void ReadChildTypeFromVariable(gd::Variable::Type variableType) {
     if (variableType == gd::Variable::Number) {
       childType = Type::Number;
-    } else if (variableType == gd::Variable::String) {
+    } else if (variableType == gd::Variable::String ||
+               variableType == gd::Variable::Enum) {
       childType = Type::String;
     } else {
       // Nothing - we don't know the precise type (this could be used as a string or as a number).

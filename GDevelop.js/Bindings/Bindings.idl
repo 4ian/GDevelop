@@ -238,7 +238,8 @@ enum Variable_Type {
     "Variable::Number",
     "Variable::Boolean",
     "Variable::Structure",
-    "Variable::Array"
+    "Variable::Array",
+    "Variable::Enum"
 };
 
 interface VariableInstructionSwitcher {
@@ -269,6 +270,12 @@ interface Variable {
 
     void SetString([Const] DOMString str);
     [Const, Ref] DOMString GetString();
+    [Const, Ref] VectorString GetEnumValues();
+    void SetEnumValues([Const, Ref] VectorString values);
+    void AddEnumValue([Const] DOMString value);
+    void RemoveEnumValueAt([Const] unsigned long index);
+    void ClearEnumValues();
+    boolean IsValidEnumValue([Const] DOMString value);
     void SetValue([Const] double val);
     double GetValue();
     void SetBool([Const] boolean val);

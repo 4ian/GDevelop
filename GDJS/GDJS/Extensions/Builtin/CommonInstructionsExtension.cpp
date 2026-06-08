@@ -1240,6 +1240,20 @@ void CommonInstructionsExtension::GenerateLocalVariableInitializationCode(
     code += variableCodeName + ".setString(" +
             EventsCodeGenerator::ConvertToStringExplicit(variable.GetString()) +
             ");\n";
+  } else if (variable.GetType() == gd::Variable::Enum) {
+    code += variableCodeName + ".setString(" +
+            EventsCodeGenerator::ConvertToStringExplicit(variable.GetString()) +
+            ");\n";
+    code += variableCodeName + ".castTo(\"enum\");\n";
+    const auto &enumValues = variable.GetEnumValues();
+    if (!enumValues.empty()) {
+      code += variableCodeName + ".setEnumValues([";
+      for (std::size_t i = 0; i < enumValues.size(); ++i) {
+        if (i != 0) code += ", ";
+        code += EventsCodeGenerator::ConvertToStringExplicit(enumValues[i]);
+      }
+      code += "]);\n";
+    }
   } else if (variable.GetType() == gd::Variable::Structure) {
     const auto &childrenNames = variable.GetAllChildrenNames();
     for (const auto &childName : variable.GetAllChildrenNames()) {

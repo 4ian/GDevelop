@@ -6,6 +6,7 @@
 
 #include "GDCore/Project/Variable.h"
 
+#include <algorithm>
 #include <sstream>
 
 #include "GDCore/Serialization/Serializer.h"
@@ -23,6 +24,8 @@ gd::String Variable::TypeAsString(Type t) {
   switch (t) {
     case Type::String:
       return "string";
+    case Type::Enum:
+      return "enum";
     case Type::Number:
       return "number";
     case Type::Boolean:
@@ -41,6 +44,8 @@ gd::String Variable::TypeAsString(Type t) {
 Variable::Type Variable::StringAsType(const gd::String& str) {
   if (str == "string")
     return Type::String;
+  else if (str == "enum")
+    return Type::Enum;
   else if (str == "number")
     return Type::Number;
   else if (str == "boolean")
@@ -57,19 +62,27 @@ Variable::Type Variable::StringAsType(const gd::String& str) {
 }
 
 bool Variable::IsPrimitive(const Type type) {
-  return type == Type::String || type == Type::Number || type == Type::Boolean;
+  return type == Type::String || type == Type::Number ||
+         type == Type::Boolean || type == Type::Enum;
 }
 
 void Variable::CastTo(const Type newType) {
   hasMixedValues = false;
   if (newType == Type::Number)
     SetValue(GetValue());
-  else if (newType == Type::String)
-    SetString(GetString());
-  else if (newType == Type::Boolean)
+  else if (newType == Type::String) {
+    str = GetString();
+    type = Type::String;
+    enumValues.clear();
+  } else if (newType == Type::Enum) {
+    str = GetString();
+    type = Type::Enum;
+    NormalizeEnumValue();
+  } else if (newType == Type::Boolean)
     SetBool(GetBool());
   else if (newType == Type::Structure) {
     children.clear();
+    enumValues.clear();
 
     // Conversion is only possible for non primitive types
     if (type == Type::Array)
@@ -82,6 +95,7 @@ void Variable::CastTo(const Type newType) {
     childrenArray.clear();
   } else if (newType == Type::Array) {
     childrenArray.clear();
+    enumValues.clear();
 
     // Conversion is only possible for non primitive types
     if (type == Type::Structure)
@@ -93,6 +107,7 @@ void Variable::CastTo(const Type newType) {
     children.clear();
   } else if (newType == Type::MixedTypes) {
     type = Type::MixedTypes;
+    enumValues.clear();
     hasMixedValues = true;
   }
 }
@@ -100,7 +115,7 @@ void Variable::CastTo(const Type newType) {
 double Variable::GetValue() const {
   if (type == Type::Number) {
     return value;
-  } else if (type == Type::String) {
+  } else if (type == Type::String || type == Type::Enum) {
     double retVal = str.empty() ? 0.0 : str.To<double>();
     if (std::isnan(retVal)) retVal = 0.0;
     return retVal;
@@ -117,16 +132,67 @@ const gd::String& Variable::GetString() const {
     str = gd::String::From(value);
   else if (type == Type::Boolean)
     str = boolVal ? "1" : "0";
-  else if (type != Type::String)
+  else if (type != Type::String && type != Type::Enum)
     str.clear();
 
   return str;
 }
 
+void Variable::SetString(const gd::String& newStr) {
+  str = newStr;
+  type = type == Type::Enum ? Type::Enum : Type::String;
+  hasMixedValues = false;
+  NormalizeEnumValue();
+}
+
+void Variable::SetEnumValues(const std::vector<gd::String>& values) {
+  enumValues.clear();
+  for (const auto& value : values) {
+    if (std::find(enumValues.begin(), enumValues.end(), value) ==
+        enumValues.end()) {
+      enumValues.push_back(value);
+    }
+  }
+  NormalizeEnumValue();
+}
+
+void Variable::AddEnumValue(const gd::String& value) {
+  if (std::find(enumValues.begin(), enumValues.end(), value) ==
+      enumValues.end()) {
+    enumValues.push_back(value);
+  }
+  NormalizeEnumValue();
+}
+
+void Variable::RemoveEnumValueAt(size_t index) {
+  if (index >= enumValues.size()) return;
+
+  enumValues.erase(enumValues.begin() + index);
+  NormalizeEnumValue();
+}
+
+void Variable::ClearEnumValues() {
+  enumValues.clear();
+}
+
+bool Variable::IsValidEnumValue(const gd::String& value) const {
+  return enumValues.empty() ||
+         std::find(enumValues.begin(), enumValues.end(), value) !=
+             enumValues.end();
+}
+
+void Variable::NormalizeEnumValue() {
+  if (type != Type::Enum || enumValues.empty() || IsValidEnumValue(str)) {
+    return;
+  }
+
+  str = enumValues[0];
+}
+
 bool Variable::GetBool() const {
   if (type == Type::Boolean) {
     return boolVal;
-  } else if (type == Type::String) {
+  } else if (type == Type::String || type == Type::Enum) {
     return !str.empty();
   } else if (type == Type::Number) {
     return value != 0;
@@ -152,6 +218,7 @@ Variable& Variable::GetChild(const gd::String& name) {
 
   type = Type::Structure;
   hasMixedValues = false;
+  enumValues.clear();
   children[name] = std::make_shared<gd::Variable>();
   return *children[name];
 }
@@ -167,6 +234,7 @@ const Variable& Variable::GetChild(const gd::String& name) const {
   if (it != children.end()) return *it->second;
 
   type = Type::Structure;
+  enumValues.clear();
   children[name] = std::make_shared<gd::Variable>();
   return *children[name];
 }
@@ -189,6 +257,7 @@ bool Variable::RenameChild(const gd::String& oldName,
 
 Variable& Variable::GetAtIndex(const size_t index) {
   type = Type::Array;
+  enumValues.clear();
   while (childrenArray.size() <= index)
     childrenArray.push_back(std::make_shared<gd::Variable>());
   return *childrenArray[index];
@@ -215,10 +284,11 @@ Variable& Variable::PushNew() {
     hasMixedValues = false;
     const auto childType = GetAtIndex(count - 1).type;
     variable.type = childType;
+    variable.enumValues = GetAtIndex(count - 1).enumValues;
     if (childType == Type::Number) {
       variable.SetValue(0);
     }
-    else if (childType == Type::String) {
+    else if (childType == Type::String || childType == Type::Enum) {
       variable.SetString("");
     }
     else if (childType == Type::Boolean) {
@@ -264,8 +334,15 @@ void Variable::SerializeTo(SerializerElement& element) const {
   if (canonical || !persistentUuid.empty())
     element.SetStringAttribute("persistentUuid", persistentUuid);
 
-  if (type == Type::String) {
+  if (type == Type::String || type == Type::Enum) {
     element.SetStringAttribute("value", GetString());
+    if (type == Type::Enum && (canonical || !enumValues.empty())) {
+      SerializerElement& enumValuesElement = element.AddChild("values");
+      enumValuesElement.ConsiderAsArrayOf("");
+      for (const auto& enumValue : enumValues) {
+        enumValuesElement.AddChild("").SetStringValue(enumValue);
+      }
+    }
   } else if (type == Type::Number) {
     element.SetDoubleAttribute("value", GetValue());
   } else if (type == Type::Boolean) {
@@ -292,6 +369,7 @@ void Variable::SerializeTo(SerializerElement& element) const {
 
 void Variable::UnserializeFrom(const SerializerElement& element) {
   type = StringAsType(element.GetStringAttribute("type", "string"));
+  enumValues.clear();
 
   persistentUuid = element.GetStringAttribute("persistentUuid");
 
@@ -313,6 +391,23 @@ void Variable::UnserializeFrom(const SerializerElement& element) {
       // used "0" as the implicit default for string variables. The project flag
       // useDeprecatedZeroAsDefaultStringVariable controls runtime behavior.
       SetString(element.GetStringAttribute("value", "0", "Value"));
+    } else if (type == Type::Enum) {
+      str = element.GetStringAttribute("value", "", "Value");
+      if (element.HasChild("values")) {
+        const SerializerElement& enumValuesElement = element.GetChild("values");
+        enumValuesElement.ConsiderAsArrayOf("");
+        for (std::size_t i = 0; i < enumValuesElement.GetChildrenCount();
+             ++i) {
+          const gd::String enumValue =
+              enumValuesElement.GetChild(i).GetStringValue();
+          if (std::find(enumValues.begin(), enumValues.end(), enumValue) ==
+              enumValues.end()) {
+            enumValues.push_back(enumValue);
+          }
+        }
+      }
+      NormalizeEnumValue();
+      hasMixedValues = false;
     } else if (type == Type::Number) {
       SetValue(element.GetDoubleAttribute("value", 0.0, "Value"));
     } else if (type == Type::Boolean) {
@@ -409,6 +504,7 @@ Variable::Variable(const Variable& other)
       boolVal(other.boolVal),
       type(other.type),
       persistentUuid(other.persistentUuid),
+      enumValues(other.enumValues),
       hasMixedValues(other.hasMixedValues) {
   CopyChildren(other);
 }
@@ -421,6 +517,7 @@ Variable& Variable::operator=(const Variable& other) {
     boolVal = other.boolVal;
     type = other.type;
     persistentUuid = other.persistentUuid;
+    enumValues = other.enumValues;
     hasMixedValues = other.hasMixedValues;
     CopyChildren(other);
   }
@@ -445,8 +542,8 @@ bool Variable::operator==(const gd::Variable &variable) const {
   if (type == Variable::Type::Number) {
     return value == variable.value;
   }
-  if (type == Variable::Type::String) {
-    return str == variable.str;
+  if (type == Variable::Type::String || type == Variable::Type::Enum) {
+    return str == variable.str && enumValues == variable.enumValues;
   }
   if (type == Variable::Type::Boolean) {
     return boolVal == variable.boolVal;
@@ -491,6 +588,7 @@ bool Variable::operator!=(const gd::Variable &variable) const {
 
 void Variable::MarkAsMixedValues() {
   hasMixedValues = true;
+  enumValues.clear();
   ClearChildren();
 }
 

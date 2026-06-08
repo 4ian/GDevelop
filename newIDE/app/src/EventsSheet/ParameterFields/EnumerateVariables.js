@@ -32,6 +32,7 @@ export type EnumeratedVariable = {|
   isValidName: boolean,
   type: Variable_Type,
   source: VariablesContainer_SourceType,
+  enumValues: Array<string>,
 |};
 
 // $FlowFixMe[missing-local-annot]
@@ -119,7 +120,14 @@ export const enumerateVariables = (
       ? isValidIdentifier(fullName)
       : isFullNameValid;
     const type = variable.getType();
-    const enumeratedVariable = { name: fullName, isValidName, type, source };
+    const enumeratedVariable = {
+      name: fullName,
+      isValidName,
+      type,
+      source,
+      enumValues:
+        type === gd.Variable.Enum ? variable.getEnumValues().toJSArray() : [],
+    };
 
     if (type === gd.Variable.Structure) {
       return [

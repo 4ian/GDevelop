@@ -30,7 +30,7 @@ import TrueFalseField, {
   renderInlineTrueFalse,
 } from './ParameterFields/TrueFalseField';
 import ExpressionField from './ParameterFields/ExpressionField';
-import StringField from './ParameterFields/StringField';
+import EnumVariableValueField from './ParameterFields/EnumVariableValueField';
 import StringWithSelectorField from './ParameterFields/StringWithSelectorField';
 import NumberWithChoicesField from './ParameterFields/NumberWithChoicesField';
 import BehaviorField from './ParameterFields/BehaviorField';
@@ -110,7 +110,7 @@ const components: {
   trueorfalse: TrueFalseField,
   number: ExpressionField,
   expression: ExpressionField,
-  string: StringField,
+  string: EnumVariableValueField,
   stringWithSelector: StringWithSelectorField,
   numberWithChoices: NumberWithChoicesField,
   behavior: BehaviorField,

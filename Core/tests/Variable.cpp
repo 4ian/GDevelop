@@ -12,6 +12,7 @@
 
 #include "GDCore/CommonTools.h"
 #include "GDCore/Project/VariablesContainer.h"
+#include "GDCore/Serialization/SerializerElement.h"
 #include "catch.hpp"
 
 TEST_CASE("Variable", "[common][variables]") {
@@ -43,6 +44,74 @@ TEST_CASE("Variable", "[common][variables]") {
     variable.CastTo(gd::Variable::Type::Number);
     REQUIRE(variable.GetType() == gd::Variable::Type::Number);
     REQUIRE(variable.GetValue() == 0);
+  }
+  SECTION("Enum variables use string-backed semantics") {
+    gd::Variable variable;
+    variable.SetString("Idle");
+    variable.CastTo(gd::Variable::Type::Enum);
+    variable.SetEnumValues({"Idle", "Running"});
+    REQUIRE(variable.GetType() == gd::Variable::Type::Enum);
+    REQUIRE(variable.GetString() == "Idle");
+    REQUIRE(variable.GetEnumValues().size() == 2);
+    REQUIRE(variable.GetEnumValues()[0] == "Idle");
+    REQUIRE(variable.GetEnumValues()[1] == "Running");
+    REQUIRE(variable.IsValidEnumValue("Running") == true);
+    REQUIRE(variable.IsValidEnumValue("Jumping") == false);
+    REQUIRE(variable.GetBool() == true);
+    REQUIRE(gd::Variable::IsPrimitive(variable.GetType()) == true);
+    REQUIRE(gd::Variable::TypeAsString(variable.GetType()) == "enum");
+
+    variable.SetString("Running");
+    REQUIRE(variable.GetType() == gd::Variable::Type::Enum);
+    REQUIRE(variable.GetString() == "Running");
+
+    variable.SetString("Jumping");
+    REQUIRE(variable.GetType() == gd::Variable::Type::Enum);
+    REQUIRE(variable.GetString() == "Idle");
+
+    variable.CastTo(gd::Variable::Type::String);
+    REQUIRE(variable.GetType() == gd::Variable::Type::String);
+    REQUIRE(variable.GetString() == "Idle");
+    REQUIRE(variable.GetEnumValues().empty());
+
+    variable.CastTo(gd::Variable::Type::Enum);
+    variable.SetEnumValues({"Idle", "Running"});
+    variable.SetString("Running");
+    gd::SerializerElement element;
+    variable.SerializeTo(element);
+    REQUIRE(element.GetStringAttribute("type") == "enum");
+    REQUIRE(element.GetStringAttribute("value") == "Running");
+    REQUIRE(element.GetChild("values").GetChildrenCount() == 2);
+    REQUIRE(element.GetChild("values").GetChild(0).GetStringValue() == "Idle");
+    REQUIRE(element.GetChild("values").GetChild(1).GetStringValue() ==
+            "Running");
+
+    gd::Variable unserializedVariable;
+    unserializedVariable.UnserializeFrom(element);
+    REQUIRE(unserializedVariable.GetType() == gd::Variable::Type::Enum);
+    REQUIRE(unserializedVariable.GetString() == "Running");
+    REQUIRE(unserializedVariable.GetEnumValues().size() == 2);
+    REQUIRE(unserializedVariable.GetEnumValues()[0] == "Idle");
+    REQUIRE(unserializedVariable.GetEnumValues()[1] == "Running");
+    REQUIRE(unserializedVariable == variable);
+
+    unserializedVariable.RemoveEnumValueAt(1);
+    REQUIRE(unserializedVariable.GetString() == "Idle");
+    REQUIRE(unserializedVariable != variable);
+
+    gd::Variable unrestrictedEnum;
+    unrestrictedEnum.CastTo(gd::Variable::Type::Enum);
+    unrestrictedEnum.SetString("AnyString");
+    REQUIRE(unrestrictedEnum.GetString() == "AnyString");
+
+    gd::Variable enumArray;
+    enumArray.GetAtIndex(0).CastTo(gd::Variable::Type::Enum);
+    enumArray.GetAtIndex(0).SetEnumValues({"Idle", "Running"});
+    enumArray.GetAtIndex(0).SetString("Idle");
+    gd::Variable& newEnumChild = enumArray.PushNew();
+    REQUIRE(newEnumChild.GetType() == gd::Variable::Type::Enum);
+    REQUIRE(newEnumChild.GetString() == "Idle");
+    REQUIRE(newEnumChild.GetEnumValues().size() == 2);
   }
   SECTION("Use with int and string like semantics") {
     gd::Variable variable;

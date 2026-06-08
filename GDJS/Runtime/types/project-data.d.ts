@@ -150,6 +150,7 @@ declare type TimerNetworkSyncData = {
 
 declare type VariableType =
   | 'string'
+  | 'enum'
   | 'number'
   | 'boolean'
   | 'structure'
@@ -161,6 +162,8 @@ declare type VariableData = Readonly<{
   name?: string;
   /** The value of the variable. Leave blank for structures. */
   value?: string | float | boolean;
+  /** The allowed values of an enum variable. Leave blank for unrestricted enums. */
+  values?: string[];
   /** The children of the structure. Leave blank if value is defined. */
   children?: VariableData[];
   /** The type of the variable. Defaults to number. */

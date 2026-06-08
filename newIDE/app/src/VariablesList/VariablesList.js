@@ -85,6 +85,9 @@ import { MarkdownText } from '../UI/MarkdownText';
 import Paper from '../UI/Paper';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 import ContextMenu, { type ContextMenuInterface } from '../UI/Menu/ContextMenu';
+import SelectField from '../UI/SelectField';
+import SelectOption from '../UI/SelectOption';
+import { EnumVariableEditorDialog } from './EnumVariableEditorDialog';
 
 const gd: libGDevelop = global.gd;
 
@@ -190,7 +193,9 @@ type VariableRowProps = {|
   hasMixedValues: boolean,
   valueAsString: string | null,
   valueAsBool: boolean | null,
+  enumValues: Array<string>,
   onChangeValue: (string, nodeId: string) => void,
+  onChangeEnumDefinition: (Array<string>, string, nodeId: string) => void,
   isCollection: boolean,
   variablePointer: number,
   onAddChild: string => void,
@@ -234,7 +239,9 @@ const VariableRow = React.memo<VariableRowProps>(
     hasMixedValues,
     valueAsString,
     valueAsBool,
+    enumValues,
     onChangeValue,
+    onChangeEnumDefinition,
     isCollection,
     variablePointer,
     onAddChild,
@@ -261,6 +268,7 @@ const VariableRow = React.memo<VariableRowProps>(
     const [editInMultilineEditor, setEditInMultilineEditor] = React.useState(
       false
     );
+    const [editEnumValues, setEditEnumValues] = React.useState(false);
     const forceUpdate = useForceUpdate();
     const hasLineBreaks = valueAsString
       ? valueAsString.indexOf('\n') !== -1
@@ -442,6 +450,41 @@ const VariableRow = React.memo<VariableRowProps>(
                                 </Text>
                               </span>
                             </Line>
+                          ) : type === gd.Variable.Enum &&
+                            enumValues.length > 0 ? (
+                            <SelectField
+                              fullWidth
+                              margin="none"
+                              stopPropagationOnClick
+                              value={hasMixedValues ? '' : valueAsString || ''}
+                              translatableHintText={
+                                hasMixedValues ? t`Mixed values` : t`Choose a value`
+                              }
+                              onChange={event =>
+                                onChangeValue(event.target.value, nodeId)
+                              }
+                              disabled={
+                                isCollection ||
+                                (isInherited && !isTopLevel) ||
+                                hasMixedValues
+                              }
+                              inputStyle={{
+                                fontSize: 14,
+                                color: isSelected
+                                  ? gdevelopTheme.listItem.selectedTextColor
+                                  : undefined,
+                              }}
+                              id={`variable-${index}-enum-value`}
+                            >
+                              {enumValues.map(enumValue => (
+                                <SelectOption
+                                  key={enumValue}
+                                  value={enumValue}
+                                  label={enumValue}
+                                  shouldNotTranslate
+                                />
+                              ))}
+                            </SelectField>
                           ) : type === gd.Variable.Boolean ? (
                             <Line noMargin alignItems="center">
                               <span
@@ -541,18 +584,27 @@ const VariableRow = React.memo<VariableRowProps>(
                             />
                           )}
                         </Column>
-                        {// Only show the large edit button for string variables,
-                        // and not for those who are in an inherited structure or array.
-                        type === gd.Variable.String &&
-                        !(isInherited && !isTopLevel) ? (
+                        {// Only show the large edit button for string variables
+                        // and the enum values editor for enum variables.
+                        ((type === gd.Variable.String &&
+                          !(isInherited && !isTopLevel)) ||
+                          (type === gd.Variable.Enum && !isInherited)) ? (
                           // $FlowFixMe[incompatible-type]
                           <IconButton
                             size="small"
                             style={styles.inlineIcon}
-                            tooltip={t`Open in a larger editor`}
+                            tooltip={
+                              type === gd.Variable.Enum
+                                ? t`Edit enum values`
+                                : t`Open in a larger editor`
+                            }
                             onClick={event => {
                               stopEventPropagation(event);
-                              setEditInMultilineEditor(true);
+                              if (type === gd.Variable.Enum) {
+                                setEditEnumValues(true);
+                              } else {
+                                setEditInMultilineEditor(true);
+                              }
                             }}
                           >
                             <Edit
@@ -638,6 +690,23 @@ const VariableRow = React.memo<VariableRowProps>(
                     onClose={(newValue: string) => {
                       onChangeValue(newValue, nodeId);
                       setEditInMultilineEditor(false);
+                      forceUpdate();
+                    }}
+                  />
+                )}
+                {editEnumValues && (
+                  <EnumVariableEditorDialog
+                    initialValue={valueAsString || ''}
+                    initialValues={enumValues}
+                    onClose={result => {
+                      if (result) {
+                        onChangeEnumDefinition(
+                          result.values,
+                          result.value,
+                          nodeId
+                        );
+                      }
+                      setEditEnumValues(false);
                       forceUpdate();
                     }}
                   />
@@ -1690,7 +1759,7 @@ const VariablesList: React.ComponentType<{
             ? t`1 child`
             : t`${variable.getChildrenCount()} children`
         )
-      : type === gd.Variable.String
+      : type === gd.Variable.String || type === gd.Variable.Enum
       ? variable.getString()
       : type === gd.Variable.Number
       ? variable.getValue().toString()
@@ -1736,7 +1805,11 @@ const VariablesList: React.ComponentType<{
         hasMixedValues={hasMixedValues}
         valueAsString={valueAsString}
         valueAsBool={valueAsBool}
+        enumValues={
+          type === gd.Variable.Enum ? variable.getEnumValues().toJSArray() : []
+        }
         onChangeValue={onChangeValue}
+        onChangeEnumDefinition={onChangeEnumDefinition}
         isCollection={isCollection}
         onAddChild={onAddChild}
         editInheritedVariable={editInheritedVariable}
@@ -1889,13 +1962,52 @@ const VariablesList: React.ComponentType<{
       const oldType = variable.getType();
       variable.castTo(newType);
       // When changing type to String, reset to an empty string.
-      if (newType === 'string' && oldType === gd.Variable.Number) {
+      if (
+        (newType === 'string' || newType === 'enum') &&
+        oldType === gd.Variable.Number
+      ) {
         variable.setString('');
+        variable.castTo(newType);
+      }
+      if (newType === 'enum' && oldType !== gd.Variable.Enum) {
+        const defaultValue = variable.getString() || 'New Option';
+        const enumValues = new gd.VectorString();
+        enumValues.push_back(defaultValue);
+        variable.setEnumValues(enumValues);
+        enumValues.delete();
+        variable.setString(defaultValue);
       }
       // When changing type to Number, reset to 0.
-      if (newType === 'number' && oldType === gd.Variable.String) {
+      if (
+        newType === 'number' &&
+        (oldType === gd.Variable.String || oldType === gd.Variable.Enum)
+      ) {
         variable.setValue(0);
       }
+      _onChange();
+      forceUpdate();
+    },
+    [_onChange, forceUpdate, props.variablesContainer]
+  );
+
+  const onChangeEnumDefinition = React.useCallback(
+    (newEnumValues: Array<string>, newValue: string, nodeId: string) => {
+      if (nodeId.startsWith(inheritedPrefix)) return;
+
+      const { variable } = getVariableContextFromNodeId(
+        nodeId,
+        props.variablesContainer
+      );
+      if (!variable || variable.getType() !== gd.Variable.Enum) return;
+
+      const enumValues = new gd.VectorString();
+      newEnumValues.forEach(enumValue => {
+        enumValues.push_back(enumValue);
+      });
+      variable.setEnumValues(enumValues);
+      enumValues.delete();
+      variable.setString(newValue);
+
       _onChange();
       forceUpdate();
     },
@@ -1937,6 +2049,7 @@ const VariablesList: React.ComponentType<{
         if (!name || !changedInheritedVariable || depth > 0) return;
         switch (changedInheritedVariable.getType()) {
           case gd.Variable.String:
+          case gd.Variable.Enum:
             if (changedInheritedVariable.getString() === newValue) return;
             break;
           case gd.Variable.Number:
@@ -1989,6 +2102,7 @@ const VariablesList: React.ComponentType<{
       }
       switch (variable.getType()) {
         case gd.Variable.String:
+        case gd.Variable.Enum:
           if (variable.getString() === newValue) return;
           variable.setString(newValue);
           break;

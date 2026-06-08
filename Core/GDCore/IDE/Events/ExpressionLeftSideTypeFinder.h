@@ -205,7 +205,8 @@ class GD_CORE_API ExpressionLeftSideTypeFinder : public ExpressionParser2NodeWor
   void ReadTypeFromVariable(gd::Variable::Type variableType) {
     if (variableType == gd::Variable::Number) {
       type = "number";
-    } else if (variableType == gd::Variable::String) {
+    } else if (variableType == gd::Variable::String ||
+               variableType == gd::Variable::Enum) {
       type = "string";
     }
   }

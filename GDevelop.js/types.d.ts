@@ -27,6 +27,7 @@ export enum Variable_Type {
   Boolean = 4,
   Structure = 5,
   Array = 6,
+  Enum = 7,
 }
 
 export enum VariablesContainer_SourceType {
@@ -344,6 +345,12 @@ export class Variable extends EmscriptenObject {
   castTo(type: string): void;
   setString(str: string): void;
   getString(): string;
+  getEnumValues(): VectorString;
+  setEnumValues(values: VectorString): void;
+  addEnumValue(value: string): void;
+  removeEnumValueAt(index: number): void;
+  clearEnumValues(): void;
+  isValidEnumValue(value: string): boolean;
   setValue(val: number): void;
   getValue(): number;
   setBool(val: boolean): void;

@@ -15,6 +15,7 @@ type SimplifiedVariable = {|
   variableName: string,
   type: string,
   value?: string,
+  enumValues?: Array<string>,
   variableChildren?: Array<SimplifiedVariable>,
 |};
 
@@ -91,6 +92,8 @@ export const makeSimplifiedProjectBuilder = (
     const type = variable.getType();
     return type === gd.Variable.String
       ? 'String'
+      : type === gd.Variable.Enum
+      ? 'Enum'
       : type === gd.Variable.Number
       ? 'Number'
       : type === gd.Variable.Boolean
@@ -110,7 +113,7 @@ export const makeSimplifiedProjectBuilder = (
         : variable.getChildrenCount() === 1
         ? `1 child`
         : `${variable.getChildrenCount()} children`
-      : type === gd.Variable.String
+      : type === gd.Variable.String || type === gd.Variable.Enum
       ? variable.getString()
       : type === gd.Variable.Number
       ? variable.getValue().toString()
@@ -162,6 +165,10 @@ export const makeSimplifiedProjectBuilder = (
       variableName: name,
       type: getVariableType(variable),
       value: getVariableValueAsString(variable),
+      enumValues:
+        variable.getType() === gd.Variable.Enum
+          ? variable.getEnumValues().toJSArray()
+          : undefined,
     };
   };
 

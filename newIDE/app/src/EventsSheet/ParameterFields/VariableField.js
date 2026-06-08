@@ -62,6 +62,7 @@ const getVariableTypeName = (
     case gd.Variable.Boolean:
       return 'boolean';
     case gd.Variable.String:
+    case gd.Variable.Enum:
     default:
       return 'string';
   }
@@ -240,6 +241,7 @@ export const getVariableTypeIcon = (variableType: Variable_Type): any => {
     case gd.Variable.Number:
       return VariableNumberIcon;
     case gd.Variable.String:
+    case gd.Variable.Enum:
       return VariableStringIcon;
     case gd.Variable.Boolean:
       return VariableBooleanIcon;
@@ -469,6 +471,7 @@ export default (React.forwardRef<Props, VariableFieldInterface>(
       isSwitchableInstruction &&
       variableType !== gd.Variable.Number &&
       variableType !== gd.Variable.String &&
+      variableType !== gd.Variable.Enum &&
       variableType !== gd.Variable.Boolean &&
       !errorText &&
       value;

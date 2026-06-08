@@ -116,8 +116,13 @@ class Variable {
   constructor(data) {
     /** @type {string|number} */
     this._value = data ? data.value : 0;
+    this._type = data && data.type ? data.type : 'number';
+    this._enumValues = data && data.values ? [...data.values] : [];
     this._children = {};
     this._childrenArray = [];
+    if (this._type === 'enum') {
+      this._normalizeEnumValue();
+    }
   }
 
   add(value) {
@@ -126,6 +131,8 @@ class Variable {
 
   setNumber(value) {
     this._value = value;
+    this._type = 'number';
+    this._enumValues = [];
   }
 
   getAsNumber() {
@@ -133,15 +140,29 @@ class Variable {
   }
 
   getValue() {
+    if (this._type === 'string' || this._type === 'enum') {
+      return this.getAsString();
+    }
+    if (this._type === 'boolean') {
+      return this.getAsBoolean();
+    }
     return this.getAsNumber();
   }
 
   setValue(value) {
-    this.setNumber(value);
+    if (this._type === 'string' || this._type === 'enum') {
+      this.setString(value);
+    } else if (this._type === 'boolean') {
+      this.setBoolean(!!value);
+    } else {
+      this.setNumber(value);
+    }
   }
 
   setBoolean(value) {
     this._value = value;
+    this._type = 'boolean';
+    this._enumValues = [];
   }
 
   toggle(value) {
@@ -191,13 +212,28 @@ class Variable {
   }
 
   castTo(newType) {
-    if (newType === 'string' || newType === 'number' || newType === 'boolean') {
+    if (
+      newType === 'string' ||
+      newType === 'number' ||
+      newType === 'boolean' ||
+      newType === 'enum'
+    ) {
       this._children = {};
       this._childrenArray = [];
+      this._type = newType;
+      if (newType === 'enum') {
+        this._normalizeEnumValue();
+      } else {
+        this._enumValues = [];
+      }
     } else if (newType === 'structure') {
       this._childrenArray = [];
+      this._type = newType;
+      this._enumValues = [];
     } else if (newType === 'array') {
       this._children = {};
+      this._type = newType;
+      this._enumValues = [];
     }
   }
 
@@ -215,7 +251,7 @@ class Variable {
     if (Object.keys(this._children).length > 0) {
       return 'structure';
     }
-    return 'number';
+    return this._type;
   }
 
   removeChild(childName) {
@@ -270,6 +306,8 @@ class Variable {
 
   setString(value) {
     this._value = value;
+    this._type = this._type === 'enum' ? 'enum' : 'string';
+    this._normalizeEnumValue();
   }
 
   getAsString() {
@@ -282,6 +320,50 @@ class Variable {
 
   getAsNumberOrString() {
     return this._value;
+  }
+
+  getEnumValues() {
+    return {
+      toJSArray: () => [...this._enumValues],
+    };
+  }
+
+  setEnumValues(values) {
+    this._enumValues =
+      values && values.toJSArray ? values.toJSArray() : [...values];
+    this._normalizeEnumValue();
+  }
+
+  addEnumValue(value) {
+    if (!this._enumValues.includes(value)) {
+      this._enumValues.push(value);
+    }
+    this._normalizeEnumValue();
+  }
+
+  removeEnumValueAt(index) {
+    if (index >= 0 && index < this._enumValues.length) {
+      this._enumValues.splice(index, 1);
+      this._normalizeEnumValue();
+    }
+  }
+
+  clearEnumValues() {
+    this._enumValues = [];
+  }
+
+  isValidEnumValue(value) {
+    return this._enumValues.length === 0 || this._enumValues.includes(value);
+  }
+
+  _normalizeEnumValue() {
+    if (
+      this._type === 'enum' &&
+      this._enumValues.length > 0 &&
+      !this._enumValues.includes('' + this._value)
+    ) {
+      this._value = this._enumValues[0];
+    }
   }
 
   /**
@@ -328,6 +410,9 @@ class Variable {
   static copy(source, target, merge) {
     if (!merge) target.clearChildren();
     target.castTo(source.getType());
+    if (source.getType() === 'enum') {
+      target.setEnumValues(source.getEnumValues());
+    }
     if (source.isPrimitive()) {
       target.setValue(source.getValue());
     } else if (source.getType() === 'structure') {
@@ -352,7 +437,10 @@ class VariablesContainer {
       const setupVariableFromVariableData = (variable, variableData) => {
         if (variableData.type === 'number') {
           variable.setNumber(variableData.value);
-        } else if (variableData.type === 'string') {
+        } else if (
+          variableData.type === 'string' ||
+          variableData.type === 'enum'
+        ) {
           variable.setString(variableData.value);
         } else if (variableData.type === 'boolean') {
           variable.setBoolean(variableData.value);

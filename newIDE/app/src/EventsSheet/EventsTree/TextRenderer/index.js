@@ -284,7 +284,10 @@ ${padding}${actions}`,
 
 // $FlowFixMe[recursive-definition]
 const convertVariableToJsObject = (variable: gdVariable) => {
-  if (variable.getType() === gd.Variable.String) {
+  if (
+    variable.getType() === gd.Variable.String ||
+    variable.getType() === gd.Variable.Enum
+  ) {
     return variable.getString();
   } else if (variable.getType() === gd.Variable.Number) {
     return variable.getValue();

@@ -7,6 +7,7 @@ declare class gdVariable {
   static Boolean: 4;
   static Structure: 5;
   static Array: 6;
+  static Enum: 7;
   constructor(): void;
   static isPrimitive(type: Variable_Type): boolean;
   static typeAsString(type: Variable_Type): string;
@@ -14,6 +15,12 @@ declare class gdVariable {
   castTo(type: string): void;
   setString(str: string): void;
   getString(): string;
+  getEnumValues(): gdVectorString;
+  setEnumValues(values: gdVectorString): void;
+  addEnumValue(value: string): void;
+  removeEnumValueAt(index: number): void;
+  clearEnumValues(): void;
+  isValidEnumValue(value: string): boolean;
   setValue(val: number): void;
   getValue(): number;
   setBool(val: boolean): void;

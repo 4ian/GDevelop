@@ -95,6 +95,20 @@ describe('applyVariableChange', () => {
       expect(variable.getType()).toBe(gd.Variable.String);
       expect(variable.getString()).toBe('123');
     });
+
+    it('should respect forced enum variable type', () => {
+      const result = applyVariableChange({
+        variablePath: 'forcedEnum',
+        forcedVariableType: 'Enum',
+        variablesContainer,
+        value: 'Idle',
+      });
+
+      expect(result.addedNewVariable).toBe(true);
+      const variable = variablesContainer.get('forcedEnum');
+      expect(variable.getType()).toBe(gd.Variable.Enum);
+      expect(variable.getString()).toBe('Idle');
+    });
   });
 
   describe('Structure child modification', () => {

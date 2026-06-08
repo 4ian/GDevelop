@@ -162,6 +162,16 @@ const styles = {
     // Remove the scroll capability of the grid, the scroll view handles it.
     overflow: 'unset',
   },
+  centeredGrid: {
+    // Avoid tiles taking too much space on large screens.
+    maxWidth: MAX_SECTION_WIDTH,
+    width: `calc(100% + ${cellSpacing}px)`, // This is needed to compensate for the `margin: -5px` added by MUI related to spacing.
+    // Remove the scroll capability of the grid, the scroll view handles it.
+    overflow: 'unset',
+    // Center the (fixed size) asset tiles within the grid, as the MUI GridList
+    // root is a flex container that would otherwise align them to the start.
+    justifyContent: 'center',
+  },
   scrollView: {
     display: 'flex',
     flexDirection: 'column',
@@ -977,11 +987,12 @@ const AssetsList: React.ComponentType<{
         {isNavigatingInsideFolder ? (
           <PlaceholderLoader />
         ) : assetTiles && assetTiles.length ? (
-          <Line justifyContent="center" noMargin>
-            <GridList style={styles.grid} cellHeight="auto">
-              {assetTiles}
-            </GridList>
-          </Line>
+          <GridList
+            style={styles.centeredGrid}
+            cellHeight="auto"
+          >
+            {assetTiles}
+          </GridList>
         ) : openedAssetPack &&
           openedAssetPack.content &&
           isAssetPackAudioOnly(openedAssetPack) ? (

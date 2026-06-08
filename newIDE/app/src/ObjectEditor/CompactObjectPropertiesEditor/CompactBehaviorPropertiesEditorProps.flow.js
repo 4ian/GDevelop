@@ -8,7 +8,7 @@ export type CompactBehaviorPropertiesEditorProps = {|
   project: gdProject,
   behaviorMetadata: gdBehaviorMetadata,
   behavior: gdBehavior,
-  object: gdObject,
+  object: gdObject | null,
   layersContainer: gdLayersContainer,
   behaviorOverriding: gdBehavior | null,
   initialInstance: gdInitialInstance | null,

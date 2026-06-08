@@ -798,7 +798,7 @@ export default class SceneEditor extends React.Component<Props, State> {
           redo={this.redo}
           onOpenSettings={this.openSceneProperties}
           settingsIcon={editSceneIconReactNode}
-          onOpenSceneVariables={this.editLayoutVariables}
+          onOpenSceneVariables={this.openSceneVariables}
         />
       );
     } else {
@@ -828,7 +828,7 @@ export default class SceneEditor extends React.Component<Props, State> {
           redo={this.redo}
           onOpenSettings={this.openSceneProperties}
           settingsIcon={editSceneIconReactNode}
-          onOpenSceneVariables={this.editLayoutVariables}
+          onOpenSceneVariables={this.openSceneVariables}
         />
       );
     }
@@ -956,7 +956,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     this.setState({ variablesEditedInstance: instance });
   };
 
-  editLayoutVariables = (open: boolean = true) => {
+  openSceneVariables = (open: boolean = true) => {
     this.setState({ layoutVariablesDialogOpen: open });
   };
 
@@ -1749,6 +1749,8 @@ export default class SceneEditor extends React.Component<Props, State> {
   };
 
   _sendSetBackgroundColor = () => {
+    this.forceUpdatePropertiesEditor();
+    this.forceUpdateLayersList();
     const { previewDebuggerServer, layout } = this.props;
     if (!layout) {
       return;
@@ -3133,6 +3135,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                     onEventsBasedObjectChildrenEdited={
                       this.props.onEventsBasedObjectChildrenEdited
                     }
+                    openSceneVariables={this.openSceneVariables}
                   />
                   <React.Fragment>
                     {editedObjectWithContext && (
@@ -3416,7 +3419,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                       layout={layout}
                       onClose={() => this.openSceneProperties(false)}
                       onApply={() => this.openSceneProperties(false)}
-                      onEditVariables={() => this.editLayoutVariables(true)}
+                      onEditVariables={() => this.openSceneVariables(true)}
                       onOpenMoreSettings={this.props.onOpenMoreSettings}
                       resourceManagementProps={
                         this.props.resourceManagementProps
@@ -3473,8 +3476,8 @@ export default class SceneEditor extends React.Component<Props, State> {
                       open
                       project={project}
                       layout={layout}
-                      onApply={() => this.editLayoutVariables(false)}
-                      onCancel={() => this.editLayoutVariables(false)}
+                      onApply={() => this.openSceneVariables(false)}
+                      onCancel={() => this.openSceneVariables(false)}
                       hotReloadPreviewButtonProps={
                         this.props.hotReloadPreviewButtonProps
                       }

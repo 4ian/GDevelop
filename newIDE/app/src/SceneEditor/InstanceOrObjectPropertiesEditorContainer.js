@@ -10,7 +10,10 @@ import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/Even
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import { type HistoryHandler } from '../VariablesList/VariablesList';
 import { type TileMapTileSelection } from '../InstancesEditor/TileSetVisualizer';
-import { CompactObjectPropertiesEditor } from '../ObjectEditor/CompactObjectPropertiesEditor';
+import {
+  CompactObjectPropertiesEditor,
+  CompactObjectPropertiesEditorContent,
+} from '../ObjectEditor/CompactObjectPropertiesEditor';
 import { type ObjectEditorTab } from '../ObjectEditor/ObjectEditorDialog';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import { CompactLayerPropertiesEditor } from '../LayersList/CompactLayerPropertiesEditor';
@@ -164,6 +167,39 @@ export const InstanceOrObjectPropertiesEditorContainer: React.ComponentType<{
           <CompactInstancePropertiesEditor
             instances={instances}
             editObjectInPropertiesPanel={editObjectInPropertiesPanel}
+            renderObjectProperties={object => (
+              <CompactObjectPropertiesEditorContent
+                objects={[object]}
+                onEditObject={onEditObject}
+                onObjectsModified={onObjectsModified}
+                onEffectAdded={onEffectAdded}
+                resourceManagementProps={resourceManagementProps}
+                eventsFunctionsExtension={eventsFunctionsExtension}
+                onUpdateBehaviorsSharedData={onUpdateBehaviorsSharedData}
+                onWillInstallExtension={onWillInstallExtension}
+                onExtensionInstalled={onExtensionInstalled}
+                isBehaviorListLocked={isBehaviorListLocked}
+                onOpenEventBasedObjectVariantEditor={
+                  onOpenEventBasedObjectVariantEditor
+                }
+                onDeleteEventsBasedObjectVariant={
+                  onDeleteEventsBasedObjectVariant
+                }
+                historyHandler={historyHandler}
+                isVariableListLocked={isVariableListLocked}
+                layout={layout}
+                objectsContainer={objectsContainer}
+                globalObjectsContainer={globalObjectsContainer}
+                layersContainer={layersContainer}
+                project={project}
+                projectScopedContainersAccessor={
+                  projectScopedContainersAccessor
+                }
+                unsavedChanges={unsavedChanges}
+                i18n={i18n}
+                expand={false}
+              />
+            )}
             onInstancesModified={onInstancesModified}
             onGetInstanceSize={onGetInstanceSize}
             editInstanceVariables={editInstanceVariables}

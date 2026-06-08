@@ -3295,8 +3295,6 @@ module.exports = {
             default:
               [x, y] = noRepeatTextureVertexIndexToUvMapping[vertexIndex % 4];
           }
-          // When the texture is tiled, the tile scale enlarges (or shrinks)
-          // each tile, which means fewer (or more) repetitions over the face.
           if (shouldRepeatTexture && tileScale !== 1) {
             x /= tileScale;
             y /= tileScale;

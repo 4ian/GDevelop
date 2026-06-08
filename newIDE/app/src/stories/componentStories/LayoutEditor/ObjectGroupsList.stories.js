@@ -30,6 +30,7 @@ export const Default = (): React.Node => (
             testProject.testSceneProjectScopedContainersAccessor
           }
           objectGroups={testProject.testLayout.getObjects().getObjectGroups()}
+          onSelectObjectGroup={action('onSelectObjectGroup')}
           onCreateGroup={action('onCreateGroup')}
           onEditGroup={action('onEditGroup')}
           onRenameGroup={action('onRenameGroup')}
@@ -54,6 +55,7 @@ export const Locked = (): React.Node => (
             testProject.testSceneProjectScopedContainersAccessor
           }
           objectGroups={testProject.testLayout.getObjects().getObjectGroups()}
+          onSelectObjectGroup={action('onSelectObjectGroup')}
           onCreateGroup={action('onCreateGroup')}
           onEditGroup={action('onEditGroup')}
           onRenameGroup={action('onRenameGroup')}

@@ -16,6 +16,9 @@ import { CompactLayerPropertiesEditor } from '../LayersList/CompactLayerProperti
 import { CompactEventsBasedObjectVariantPropertiesEditor } from '../SceneEditor/CompactEventsBasedObjectVariantPropertiesEditor';
 import { CompactScenePropertiesEditor } from './CompactScenePropertiesEditor';
 import Rectangle from '../Utils/Rectangle';
+import { type LastSelectionType } from './EditorsDisplay.flow';
+import { CompactObjectGroupPropertiesEditor } from '../ObjectGroupEditor/CompactObjectGroupPropertiesEditor';
+import { type ObjectGroupEditorTab } from '../ObjectGroupEditor/EditedObjectGroupEditorDialog';
 
 export const styles = {
   paper: {
@@ -34,7 +37,7 @@ type Props = {|
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   unsavedChanges?: ?UnsavedChanges,
   i18n: I18nType,
-  lastSelectionType: 'instance' | 'object' | 'layer',
+  lastSelectionType: LastSelectionType,
   historyHandler?: HistoryHandler,
   isVariableListLocked: boolean,
   layout?: ?gdLayout,
@@ -88,6 +91,14 @@ type Props = {|
   // For scenes
   onBackgroundColorChanged: () => void,
   openSceneVariables: () => void,
+
+  // For object groups
+  objectGroup: gdObjectGroup | null,
+  isObjectGroupObjectListLocked: boolean,
+  onEditObjectGroup: (
+    objectGroup: gdObjectGroup,
+    initialTab: ?ObjectGroupEditorTab
+  ) => void,
 |};
 
 export type InstanceOrObjectPropertiesEditorInterface = {|
@@ -112,6 +123,8 @@ export const InstanceOrObjectPropertiesEditorContainer: React.ComponentType<{
             <Trans>Object properties</Trans>
           ) : lastSelectionType === 'layer' ? (
             <Trans>Layer properties</Trans>
+          ) : lastSelectionType === 'objectGroup' ? (
+            <Trans>Object group properties</Trans>
           ) : (
             <Trans>Scene properties</Trans>
           ),
@@ -172,6 +185,11 @@ export const InstanceOrObjectPropertiesEditorContainer: React.ComponentType<{
       // For scenes
       onBackgroundColorChanged,
       openSceneVariables,
+
+      // For object groups
+      objectGroup,
+      isObjectGroupObjectListLocked,
+      onEditObjectGroup,
     } = props;
 
     return (
@@ -232,6 +250,25 @@ export const InstanceOrObjectPropertiesEditorContainer: React.ComponentType<{
             projectScopedContainersAccessor={projectScopedContainersAccessor}
             unsavedChanges={unsavedChanges}
             i18n={i18n}
+          />
+        ) : objectGroup && lastSelectionType === 'objectGroup' ? (
+          <CompactObjectGroupPropertiesEditor
+            project={project}
+            resourceManagementProps={resourceManagementProps}
+            eventsFunctionsExtension={eventsFunctionsExtension}
+            eventsBasedObject={eventsBasedObject}
+            onUpdateBehaviorsSharedData={onUpdateBehaviorsSharedData}
+            objectsContainer={objectsContainer}
+            globalObjectsContainer={globalObjectsContainer}
+            initialInstances={initialInstances}
+            projectScopedContainersAccessor={projectScopedContainersAccessor}
+            unsavedChanges={unsavedChanges}
+            i18n={i18n}
+            historyHandler={historyHandler}
+            objectGroup={objectGroup}
+            isObjectListLocked={isObjectGroupObjectListLocked}
+            isVariableListLocked={isVariableListLocked}
+            onEditObjectGroup={onEditObjectGroup}
           />
         ) : layer && lastSelectionType === 'layer' ? (
           <CompactLayerPropertiesEditor

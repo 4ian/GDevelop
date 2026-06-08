@@ -99,6 +99,7 @@ type Props = {|
   globalObjectGroups: gdObjectGroupsContainer | null,
   objectGroups: gdObjectGroupsContainer,
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
+  onSelectObjectGroup: gdObjectGroup => void,
   onDeleteGroup: (groupWithContext: GroupWithContext, cb: Function) => void,
   onEditGroup: gdObjectGroup => void,
   onCreateGroup: () => void,
@@ -122,6 +123,7 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
       globalObjectGroups,
       projectScopedContainersAccessor,
       objectGroups,
+      onSelectObjectGroup,
       onCreateGroup,
       onDeleteGroup,
       onGroupRemoved,
@@ -136,8 +138,17 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
     } = props;
     const [
       selectedGroupWithContext,
-      setSelectedGroupWithContext,
+      setSelectedGroupWithContextState,
     ] = React.useState<?GroupWithContext>(null);
+    const setSelectedGroupWithContext = React.useCallback(
+      (groupWithContext: GroupWithContext | null) => {
+        setSelectedGroupWithContextState(groupWithContext);
+        if (groupWithContext) {
+          onSelectObjectGroup(groupWithContext.group);
+        }
+      },
+      [onSelectObjectGroup]
+    );
     const [searchText, setSearchText] = React.useState<string>('');
     const treeViewRef = React.useRef<?TreeViewInterface<TreeViewItem>>(null);
     const forceUpdate = useForceUpdate();
@@ -279,7 +290,13 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
         onEditName({ group: newGroup, global });
         onObjectGroupModified();
       },
-      [globalObjectGroups, objectGroups, onObjectGroupModified, onEditName]
+      [
+        globalObjectGroups,
+        objectGroups,
+        setSelectedGroupWithContext,
+        onEditName,
+        onObjectGroupModified,
+      ]
     );
 
     const onRename = React.useCallback(
@@ -460,6 +477,14 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
         selectedGroupWithContext,
         setAsGlobalGroup,
       ]
+    );
+
+    const onClickItem = React.useCallback(
+      (item: TreeViewItem) => {
+        if (item.isRoot || item.isPlaceholder) return;
+        onSelectObjectGroup(item.group);
+      },
+      [onSelectObjectGroup]
     );
 
     const editItem = React.useCallback(
@@ -676,6 +701,7 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
                         getItemChildren={getTreeViewItemChildren}
                         multiSelect={false}
                         getItemId={getTreeViewItemId}
+                        onClickItem={onClickItem}
                         onEditItem={editItem}
                         selectedItems={
                           selectedGroupWithContext

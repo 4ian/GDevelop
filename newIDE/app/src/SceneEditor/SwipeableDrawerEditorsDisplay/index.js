@@ -82,6 +82,7 @@ const SwipeableDrawerEditorsDisplay: React.ComponentType<{
       initialInstances,
       chosenLayer,
       selectedLayer,
+      selectedObjectGroup,
       onSelectInstances,
       onInstancesModified,
 
@@ -470,11 +471,13 @@ const SwipeableDrawerEditorsDisplay: React.ComponentType<{
                         objects={selectedObjects}
                         instances={selectedInstances}
                         layer={selectedLayer}
+                        objectGroup={selectedObjectGroup}
                         editInstanceVariables={props.editInstanceVariables}
                         editObjectInPropertiesPanel={
                           props.editObjectInPropertiesPanel
                         }
                         onEditObject={props.onEditObject}
+                        onEditObjectGroup={props.onEditObjectGroup}
                         onObjectsModified={props.onObjectsModified}
                         onEffectAdded={props.onEffectAdded}
                         onInstancesModified={forceUpdateInstancesList}
@@ -494,6 +497,7 @@ const SwipeableDrawerEditorsDisplay: React.ComponentType<{
                         }
                         isVariableListLocked={isCustomVariant}
                         isBehaviorListLocked={isCustomVariant}
+                        isObjectGroupObjectListLocked={isCustomVariant}
                         onEditLayerEffects={props.editLayerEffects}
                         onEditLayer={props.editLayer}
                         onLayersModified={props.onLayersModified}
@@ -530,6 +534,7 @@ const SwipeableDrawerEditorsDisplay: React.ComponentType<{
                           projectScopedContainersAccessor
                         }
                         objectGroups={objectsContainer.getObjectGroups()}
+                        onSelectObjectGroup={props.onSelectObjectGroup}
                         onCreateGroup={props.onCreateObjectGroup}
                         onEditGroup={props.onEditObjectGroup}
                         onDeleteGroup={props.onDeleteObjectGroup}

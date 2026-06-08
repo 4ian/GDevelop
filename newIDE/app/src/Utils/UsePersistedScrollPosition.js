@@ -7,7 +7,11 @@ type Props = {|
   project: gdProject,
   scrollViewRef: {| current: ?ScrollViewInterface |},
   scrollKey: string,
-  persistedScrollType: 'instances-of-object' | 'object' | 'scene',
+  persistedScrollType:
+    | 'instances-of-object'
+    | 'object'
+    | 'scene'
+    | 'objectGroup',
   persistedScrollId: string | null,
   saveDebounceTimeInMs?: number,
 |};

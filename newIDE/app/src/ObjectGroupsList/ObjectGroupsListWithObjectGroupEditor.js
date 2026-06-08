@@ -72,6 +72,8 @@ const ObjectGroupsListWithObjectGroupEditor = ({
         canSetAsGlobalGroup={canSetAsGlobalGroup}
         unsavedChanges={unsavedChanges}
         isListLocked={false}
+        // In the function editor, selection has no effect.
+        onSelectObjectGroup={() => {}}
       />
       {(editedGroup || isCreatingNewGroup) && (
         <ObjectGroupEditorDialog

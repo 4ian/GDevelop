@@ -103,6 +103,8 @@ import {
   getImageResourceNamesForEditedObject,
   shouldResetObjectRendererForCustomObjectChildrenEdit,
 } from './CustomObjectResourceReload';
+import { type LastSelectionType } from './EditorsDisplay.flow';
+import { type ObjectGroupEditorTab } from '../ObjectGroupEditor/EditedObjectGroupEditorDialog';
 
 const gd: libGDevelop = global.gd;
 
@@ -283,6 +285,7 @@ type State = {|
 
   editedGroup: gdObjectGroup | null,
   isCreatingNewGroup: boolean,
+  editedGroupInitialTab: ObjectGroupEditorTab | null,
 
   instancesEditorSettings: InstancesEditorSettings,
   history: HistoryState,
@@ -294,10 +297,11 @@ type State = {|
   selectedObjectFolderOrObjectsWithContext: Array<ObjectFolderOrObjectWithContext>,
   chosenLayer: string,
   selectedLayer: gdLayer | null,
+  selectedObjectGroup: gdObjectGroup | null,
 
   tileMapTileSelection: ?TileMapTileSelection,
 
-  lastSelectionType: 'instance' | 'object' | 'layer',
+  lastSelectionType: LastSelectionType,
 |};
 
 type CopyCutPasteOptions = {|
@@ -339,6 +343,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       newObjectInstanceSceneCoordinates: null,
       editedGroup: null,
       isCreatingNewGroup: false,
+      editedGroupInitialTab: null,
       extractAsExternalLayoutDialogOpen: false,
       extractAsCustomObjectDialogOpen: false,
 
@@ -361,6 +366,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       chosenLayer:
         initialInstancesEditorSettings.selectedLayer || BASE_LAYER_NAME,
       selectedLayer: null,
+      selectedObjectGroup: null,
       invisibleLayerOnWhichInstancesHaveJustBeenAdded: null,
 
       lastSelectionType: 'instance',
@@ -1057,8 +1063,15 @@ export default class SceneEditor extends React.Component<Props, State> {
       this.editorDisplay.ensureEditorVisible('properties');
   };
 
-  _editObjectGroup = (group: ?gdObjectGroup) => {
-    this.setState({ editedGroup: group, isCreatingNewGroup: false });
+  _editObjectGroup = (
+    group: gdObjectGroup,
+    initialTab: ?ObjectGroupEditorTab
+  ) => {
+    this.setState({
+      editedGroup: group,
+      editedGroupInitialTab: initialTab,
+      isCreatingNewGroup: false,
+    });
   };
 
   _createObjectGroup = () => {
@@ -1811,6 +1824,13 @@ export default class SceneEditor extends React.Component<Props, State> {
     this.setState({
       selectedLayer: layer,
       lastSelectionType: 'layer',
+    });
+  };
+
+  _onSelectObjectGroup = (objectGroup: gdObjectGroup | null) => {
+    this.setState({
+      selectedObjectGroup: objectGroup,
+      lastSelectionType: 'objectGroup',
     });
   };
 
@@ -3024,6 +3044,8 @@ export default class SceneEditor extends React.Component<Props, State> {
                     onSelectLayer={this._onSelectLayer}
                     editLayer={this.editLayer}
                     editLayerEffects={this.editLayerEffects}
+                    selectedObjectGroup={this.state.selectedObjectGroup}
+                    onSelectObjectGroup={this._onSelectObjectGroup}
                     editInstanceVariables={this.editInstanceVariables}
                     editObjectByName={this.editObjectByName}
                     editObjectInPropertiesPanel={
@@ -3286,6 +3308,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                         projectScopedContainersAccessor
                       }
                       group={this.state.editedGroup}
+                      initialTab={this.state.editedGroupInitialTab}
                       objectsContainer={this.props.objectsContainer}
                       globalObjectsContainer={this.props.globalObjectsContainer}
                       initialInstances={this.props.initialInstances}
@@ -3303,7 +3326,6 @@ export default class SceneEditor extends React.Component<Props, State> {
                           global: false,
                         });
                       }}
-                      initialTab={'objects'}
                       onComputeAllVariableNames={() => {
                         const { editedGroup } = this.state;
                         if (!editedGroup) return [];

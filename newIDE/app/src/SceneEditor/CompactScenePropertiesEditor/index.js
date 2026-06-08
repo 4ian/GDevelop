@@ -128,6 +128,9 @@ export const CompactScenePropertiesEditor = ({
     objectName: null,
     eventsBasedObject: null,
     enabled: true,
+    objectGroup: null,
+    objectsContainer: null,
+    globalObjectsContainer: null,
   });
 
   const propertiesSchema = React.useMemo(

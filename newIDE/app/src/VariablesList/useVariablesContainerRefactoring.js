@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react';
+import { exceptionallyGuardAgainstDeadObject } from '../Utils/IsNullPtr';
 
 const gd: libGDevelop = global.gd;
 
@@ -67,8 +68,10 @@ const useVariablesContainerRefactoring = ({
 
   const applyPendingRefactoring = React.useCallback(() => {
     const snapshot = snapshotRef.current;
-    const container = variablesContainerRef.current;
-    if (!snapshot) return;
+    const container = exceptionallyGuardAgainstDeadObject(
+      variablesContainerRef.current
+    );
+    if (!snapshot || !container) return;
 
     try {
       const changeset = gd.WholeProjectRefactorer.computeChangesetForVariablesContainer(

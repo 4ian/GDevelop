@@ -9,7 +9,6 @@ import { testProject } from '../../GDevelopJsInitializerDecorator';
 
 import paperDecorator from '../../PaperDecorator';
 import { CompactScenePropertiesEditor } from '../../../SceneEditor/CompactScenePropertiesEditor';
-import SerializedObjectDisplay from '../../SerializedObjectDisplay';
 import DragAndDropContextProvider from '../../../UI/DragAndDrop/DragAndDropContextProvider';
 import fakeResourceManagementProps from '../../FakeResourceManagement';
 
@@ -23,19 +22,17 @@ export const Default = (): React.Node => (
   <DragAndDropContextProvider>
     <I18n>
       {({ i18n }) => (
-        <SerializedObjectDisplay object={testProject.testLayout}>
-          <CompactScenePropertiesEditor
-            scene={testProject.testLayout}
-            resourceManagementProps={fakeResourceManagementProps}
-            project={testProject.project}
-            projectScopedContainersAccessor={
-              testProject.testSceneProjectScopedContainersAccessor
-            }
-            i18n={i18n}
-            onBackgroundColorChanged={action('onBackgroundColorChanged')}
-            openSceneVariables={action('openSceneVariables')}
-          />
-        </SerializedObjectDisplay>
+        <CompactScenePropertiesEditor
+          scene={testProject.testLayout}
+          resourceManagementProps={fakeResourceManagementProps}
+          project={testProject.project}
+          projectScopedContainersAccessor={
+            testProject.testSceneProjectScopedContainersAccessor
+          }
+          i18n={i18n}
+          onBackgroundColorChanged={action('onBackgroundColorChanged')}
+          openSceneVariables={action('openSceneVariables')}
+        />
       )}
     </I18n>
   </DragAndDropContextProvider>
@@ -45,19 +42,17 @@ export const Empty = (): React.Node => (
   <DragAndDropContextProvider>
     <I18n>
       {({ i18n }) => (
-        <SerializedObjectDisplay object={testProject.emptyLayout}>
-          <CompactScenePropertiesEditor
-            scene={testProject.emptyLayout}
-            resourceManagementProps={fakeResourceManagementProps}
-            project={testProject.project}
-            projectScopedContainersAccessor={
-              testProject.testSceneProjectScopedContainersAccessor
-            }
-            i18n={i18n}
-            onBackgroundColorChanged={action('onBackgroundColorChanged')}
-            openSceneVariables={action('openSceneVariables')}
-          />
-        </SerializedObjectDisplay>
+        <CompactScenePropertiesEditor
+          scene={testProject.emptyLayout}
+          resourceManagementProps={fakeResourceManagementProps}
+          project={testProject.project}
+          projectScopedContainersAccessor={
+            testProject.testSceneProjectScopedContainersAccessor
+          }
+          i18n={i18n}
+          onBackgroundColorChanged={action('onBackgroundColorChanged')}
+          openSceneVariables={action('openSceneVariables')}
+        />
       )}
     </I18n>
   </DragAndDropContextProvider>

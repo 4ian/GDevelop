@@ -31,6 +31,7 @@ export const Sprite2d = (): React.Node => (
             eventsFunctionsExtension={null}
             objectsContainer={testProject.testLayout.getObjects()}
             globalObjectsContainer={testProject.project.getObjects()}
+            initialInstances={testProject.testLayout.getInitialInstances()}
             layersContainer={testProject.testLayout.getLayers()}
             projectScopedContainersAccessor={
               testProject.testSceneProjectScopedContainersAccessor
@@ -70,6 +71,7 @@ export const Cube3d = (): React.Node => (
             eventsFunctionsExtension={null}
             objectsContainer={testProject.testLayout.getObjects()}
             globalObjectsContainer={testProject.project.getObjects()}
+            initialInstances={testProject.testLayout.getInitialInstances()}
             layersContainer={testProject.testLayout.getLayers()}
             projectScopedContainersAccessor={
               testProject.testSceneProjectScopedContainersAccessor
@@ -109,6 +111,7 @@ export const TextInput = (): React.Node => (
             eventsFunctionsExtension={null}
             objectsContainer={testProject.testLayout.getObjects()}
             globalObjectsContainer={testProject.project.getObjects()}
+            initialInstances={testProject.testLayout.getInitialInstances()}
             layersContainer={testProject.testLayout.getLayers()}
             projectScopedContainersAccessor={
               testProject.testSceneProjectScopedContainersAccessor
@@ -148,6 +151,7 @@ export const CustomObject = (): React.Node => (
             eventsFunctionsExtension={null}
             objectsContainer={testProject.testLayout.getObjects()}
             globalObjectsContainer={testProject.project.getObjects()}
+            initialInstances={testProject.testLayout.getInitialInstances()}
             layersContainer={testProject.testLayout.getLayers()}
             projectScopedContainersAccessor={
               testProject.testSceneProjectScopedContainersAccessor

@@ -114,20 +114,19 @@ const styles = {
 export const AssetCardTile = ({
   assetShortHeader,
   onOpenDetails,
-  size,
-  margin,
+  style,
   hideShortDescription,
   disabled,
 }: {|
   assetShortHeader: AssetShortHeader,
   onOpenDetails: () => void,
-  size: number,
-  margin?: number,
+  /** Props needed so that GridList component can adjust tile size */
+  style?: any,
   hideShortDescription?: boolean,
   disabled?: boolean,
 |}): React.Node => {
   return (
-    <GridListTile style={{ margin }}>
+    <GridListTile style={style}>
       <CardWidget
         onClick={!disabled ? onOpenDetails : undefined}
         size="large"
@@ -137,7 +136,6 @@ export const AssetCardTile = ({
         <AssetCard
           id={`asset-card-${assetShortHeader.name.replace(/\s/g, '-')}`}
           assetShortHeader={assetShortHeader}
-          size={size}
           hideShortDescription={hideShortDescription}
         />
       </CardWidget>

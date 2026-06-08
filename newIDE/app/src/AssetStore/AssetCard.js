@@ -36,7 +36,9 @@ const styles = {
 
 type Props = {|
   id?: string,
-  size: number,
+  // If a size is given, the card is displayed at this fixed (square) size.
+  // Otherwise, it fills the width of its container and stays square.
+  size?: number,
   assetShortHeader: AssetShortHeader,
   hideShortDescription?: boolean,
 |};
@@ -50,9 +52,16 @@ export const AssetCard = ({
   const displayShortDescription =
     !hideShortDescription && !!assetShortHeader.shortDescription;
 
+  const sizeStyle =
+    size != null
+      ? { width: size, height: size }
+      : { width: '100%', aspectRatio: '1 / 1' };
+
   return (
-    <div id={id} style={{ ...styles.cardContainer, width: size, height: size }}>
-      <div style={{ ...styles.previewContainer, width: size, height: size }}>
+    <div id={id} style={{ ...styles.cardContainer, ...sizeStyle }}>
+      <div
+        style={{ ...styles.previewContainer, width: '100%', height: '100%' }}
+      >
         <CheckeredBackground />
         <AssetPreviewImage
           assetShortHeader={assetShortHeader}

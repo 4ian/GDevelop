@@ -57,17 +57,21 @@ import { LARGE_WIDGET_SIZE } from '../MainFrame/EditorContainers/HomePage/CardWi
 
 const ASSETS_DISPLAY_LIMIT = 60;
 
-const getAssetSize = (windowSize: WindowSizeType) => {
+const getAssetColumns = (windowSize: WindowSizeType, isLandscape: boolean) => {
+  // Assets are smaller than packs/game templates, so we display more of them
+  // per row. The number of columns depends on the window size (breakpoints),
+  // and the tiles slightly adapt their size in between to always fill the row.
   switch (windowSize) {
     case 'small':
-      return 80;
+      return isLandscape ? 4 : 3;
     case 'medium':
-      return 120;
+      return 5;
     case 'large':
+      return 8;
     case 'xlarge':
-      return 130;
+      return 10;
     default:
-      return 120;
+      return 3;
   }
 };
 
@@ -161,16 +165,6 @@ const styles = {
     width: `calc(100% + ${cellSpacing}px)`, // This is needed to compensate for the `margin: -5px` added by MUI related to spacing.
     // Remove the scroll capability of the grid, the scroll view handles it.
     overflow: 'unset',
-  },
-  centeredGrid: {
-    // Avoid tiles taking too much space on large screens.
-    maxWidth: MAX_SECTION_WIDTH,
-    width: `calc(100% + ${cellSpacing}px)`, // This is needed to compensate for the `margin: -5px` added by MUI related to spacing.
-    // Remove the scroll capability of the grid, the scroll view handles it.
-    overflow: 'unset',
-    // Center the (fixed size) asset tiles within the grid, as the MUI GridList
-    // root is a flex container that would otherwise align them to the start.
-    justifyContent: 'center',
   },
   scrollView: {
     display: 'flex',
@@ -536,7 +530,6 @@ const AssetsList: React.ComponentType<{
         // Don't show assets if filtering on asset packs.)
         // $FlowFixMe[missing-empty-array-annot]
         if (hasAssetPackFiltersApplied && !openedAssetPack) return [];
-        const assetSize = getAssetSize(windowSize);
 
         return getAssetShortHeadersToDisplay(
           assetShortHeaders,
@@ -546,9 +539,7 @@ const AssetsList: React.ComponentType<{
           <AssetCardTile
             assetShortHeader={assetShortHeader}
             onOpenDetails={() => onOpenDetails(assetShortHeader)}
-            size={assetSize}
             key={assetShortHeader.id}
-            margin={cellSpacing / 2}
             hideShortDescription={!!hideDetails}
           />
         ));
@@ -559,7 +550,6 @@ const AssetsList: React.ComponentType<{
         openedAssetPack,
         selectedFolders,
         pageBreakIndex,
-        windowSize,
         onOpenDetails,
         hideDetails,
       ]
@@ -988,8 +978,10 @@ const AssetsList: React.ComponentType<{
           <PlaceholderLoader />
         ) : assetTiles && assetTiles.length ? (
           <GridList
-            style={styles.centeredGrid}
+            style={styles.grid}
             cellHeight="auto"
+            cols={getAssetColumns(windowSize, isLandscape)}
+            spacing={cellSpacing}
           >
             {assetTiles}
           </GridList>

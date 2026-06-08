@@ -114,7 +114,7 @@ Event/introspection helpers:
 
 Write tools:
 
-- `initialize_project`: create a project.
+- `initialize_project`: create and OPEN a new project (it becomes the current project, so later tools operate on it). Pass `project_name` (required); omit `template_slug` (or use `""`/`"none"`/`"empty"`) for a blank one-scene project, or give an example slug to start from. On desktop the project is SAVED to local disk on creation (in the user's "GDevelop projects" folder; the path is returned as `projectFile`). It replaces the currently open project and discards an unsaved one without confirmation — save first if needed.
 - `create_scene` / `delete_scene`: scene management.
 - `rename_scene`: safely rename a scene/layout (`scene_name` → `new_scene_name`), updating references (change-scene actions) across the project and closing its open tabs. Use this instead of leaving placeholder names like "Untitled scene".
 - `set_first_layout`: set the project startup scene/layout in the editor model. Use this instead of patching saved JSON.

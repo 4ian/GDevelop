@@ -198,6 +198,7 @@ import { addDefaultLightToAllLayers } from '../ProjectCreation/CreateProject';
 import { type NewProjectSetup } from '../ProjectCreation/NewProjectSetupDialog';
 import { listAllExamples } from '../Utils/GDevelopServices/Example';
 import UrlStorageProvider from '../ProjectsStorage/UrlStorageProvider';
+import { findEmptyPathInWorkspaceFolder } from '../ProjectsStorage/LocalFileStorageProvider/LocalPathFinder';
 import useEditorTabsStateSaving from './EditorTabs/UseEditorTabsStateSaving';
 import PixiResourcesLoader from '../ObjectsRendering/PixiResourcesLoader';
 import useResourcesWatcher from './ResourcesWatcher';
@@ -253,6 +254,8 @@ import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/Even
 import { useAutomatedRegularInGameEditorRestart } from '../EmbeddedGame/UseAutomatedRegularInGameEditorRestart';
 const electron = optionalRequire('electron');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
+const remote = optionalRequire('@electron/remote');
+const electronApp = remote ? remote.app : null;
 const ipcRendererForUpdates = ipcRenderer;
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
@@ -5079,10 +5082,40 @@ const MainFrame = (props: Props): React.MixedElement => {
       name: string,
       exampleSlug: string | null,
     |}) => {
+      // On desktop, create the project with the local-file storage provider and
+      // a default path so it is WRITTEN to disk immediately (createProject calls
+      // the provider's onSaveProjectAs). On web there is no local provider, so
+      // fall back to the in-memory Url provider (project opens but is not saved).
+      const localFileStorageProvider = props.storageProviders.find(
+        provider => provider.internalName === 'LocalFile'
+      );
+      let storageProvider = UrlStorageProvider;
+      let saveAsLocation = null;
+      if (
+        localFileStorageProvider &&
+        localFileStorageProvider.getProjectLocation
+      ) {
+        // A fresh, unique subfolder under the user's "GDevelop projects" folder,
+        // matching the editor's own new-project flow so repeated AI creations
+        // don't overwrite each other.
+        const newProjectsDefaultFolder = electronApp
+          ? findEmptyPathInWorkspaceFolder(
+              electronApp,
+              preferences.values.newProjectsDefaultFolder || ''
+            )
+          : preferences.values.newProjectsDefaultFolder || '';
+        storageProvider = localFileStorageProvider;
+        saveAsLocation = localFileStorageProvider.getProjectLocation({
+          projectName: name,
+          saveAsLocation: null,
+          newProjectsDefaultFolder,
+        });
+      }
+
       const newProjectSetup: NewProjectSetup = {
         projectName: name,
-        storageProvider: UrlStorageProvider,
-        saveAsLocation: null,
+        storageProvider,
+        saveAsLocation,
         creationSource: 'ai-agent-request',
       };
 
@@ -5104,7 +5137,13 @@ const MainFrame = (props: Props): React.MixedElement => {
       const { createdProject } = await createEmptyProject(newProjectSetup);
       return { exampleSlug: null, createdProject };
     },
-    [createProjectFromExample, createEmptyProject, i18n]
+    [
+      createProjectFromExample,
+      createEmptyProject,
+      i18n,
+      props.storageProviders,
+      preferences,
+    ]
   );
 
   const mcpEditorCallbacks: EditorCallbacks = React.useMemo(

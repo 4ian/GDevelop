@@ -1311,7 +1311,8 @@ const compareImageFilesSchema = {
   properties: {
     reference_file: {
       type: 'string',
-      description: 'Reference PNG/JPG/WebP/BMP file, project-relative or absolute.',
+      description:
+        'Reference PNG/JPG/WebP/BMP file, project-relative or absolute.',
     },
     actual_file: {
       type: 'string',
@@ -1320,7 +1321,8 @@ const compareImageFilesSchema = {
     },
     reference_region: {
       type: 'object',
-      description: 'Optional { x, y, width, height } crop in the reference file.',
+      description:
+        'Optional { x, y, width, height } crop in the reference file.',
       additionalProperties: true,
     },
     actual_region: {
@@ -1912,7 +1914,8 @@ const patchSceneEventInstructionSchema = {
     instruction_kind: {
       type: 'string',
       enum: ['action', 'condition'],
-      description: 'Whether to edit an action or a condition. Defaults to action.',
+      description:
+        'Whether to edit an action or a condition. Defaults to action.',
     },
     instruction_type: {
       type: 'string',
@@ -1955,7 +1958,8 @@ const attachObjectToObjectTopSchema = {
     },
     x_offset: {
       type: 'number',
-      description: 'Horizontal pixel offset added after centering. Defaults to 0.',
+      description:
+        'Horizontal pixel offset added after centering. Defaults to 0.',
     },
     y_offset: {
       type: 'number',
@@ -2344,7 +2348,8 @@ const extensionFunctionSchema = {
     },
     new_function_name: {
       type: 'string',
-      description: 'Optional new internal name for renaming the events function.',
+      description:
+        'Optional new internal name for renaming the events function.',
     },
     function_type: {
       type: 'string',
@@ -2477,8 +2482,7 @@ const extensionObjectSchema = {
     },
     is_animatable: {
       type: 'boolean',
-      description:
-        'Maps to markAsAnimatable so object animations can apply.',
+      description: 'Maps to markAsAnimatable so object animations can apply.',
     },
     icon_url: {
       type: 'string',
@@ -2596,7 +2600,8 @@ const findProjectEventsSchema = {
     },
     extension_name: {
       type: 'string',
-      description: 'Optional extension name to restrict extension-event search.',
+      description:
+        'Optional extension name to restrict extension-event search.',
     },
     parent_kind: extensionFunctionSchema.properties.parent_kind,
     parent_name: extensionFunctionSchema.properties.parent_name,
@@ -3322,8 +3327,28 @@ const writeTools: Array<McpTool> = [
   {
     name: 'initialize_project',
     description:
-      'Create a new GDevelop project, optionally from a template slug.',
-    inputSchema: emptyObjectSchema,
+      'Create and open a NEW GDevelop project (it becomes the current project, so subsequent tools operate on it). By default an empty project with one scene; pass template_slug to start from an example. On desktop it is SAVED to local disk immediately (under the user\'s "GDevelop projects" folder; the saved path is returned as projectFile). NOTE: this replaces the currently open project — an unsaved open project is discarded without confirmation, so save first if needed.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        project_name: {
+          type: 'string',
+          description: 'Name for the new project.',
+        },
+        template_slug: {
+          type: 'string',
+          description:
+            'Optional example/template slug to start from. Omit, or use "" / "none" / "empty", for a blank project with one scene.',
+        },
+        also_read_existing_events: {
+          type: 'boolean',
+          description:
+            'When true (mainly for template-based projects), return the events of each created scene as text.',
+        },
+      },
+      required: ['project_name'],
+      additionalProperties: true,
+    },
   },
   {
     name: 'create_scene',
@@ -3761,6 +3786,16 @@ const toolUsageExamples: { [string]: Array<Object> } = {
       },
     },
   ],
+  initialize_project: [
+    {
+      description: 'Create and open a new, empty project.',
+      arguments: { project_name: 'My Game' },
+    },
+    {
+      description: 'Create a new project starting from an example/template.',
+      arguments: { project_name: 'My Platformer', template_slug: 'platformer' },
+    },
+  ],
   set_first_layout: [
     {
       description:
@@ -4001,10 +4036,7 @@ const toolUsageExamples: { [string]: Array<Object> } = {
       arguments: {
         scene_name: 'Level1',
         object_name: 'GroundTilemap',
-        tiles: [
-          { x: 4, y: 8, tile: 5 },
-          { x: 5, y: 8, tile: 5 },
-        ],
+        tiles: [{ x: 4, y: 8, tile: 5 }, { x: 5, y: 8, tile: 5 }],
         summary_only: true,
       },
     },
@@ -4264,8 +4296,7 @@ const toolUsageExamples: { [string]: Array<Object> } = {
   ],
   crop_scene_object_image: [
     {
-      description:
-        'Crop and zoom a health bar from a full preview screenshot.',
+      description: 'Crop and zoom a health bar from a full preview screenshot.',
       arguments: {
         scene_name: 'Level1',
         object_name: 'EnemyHealthBar',

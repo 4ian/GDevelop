@@ -5897,7 +5897,10 @@ const initializeProject: EditorFunctionWithoutProject = {
   },
   launchFunction: async ({ args, editorCallbacks, i18n }) => {
     const project_name = extractRequiredString(args, 'project_name');
-    const template_slug = extractRequiredString(args, 'template_slug');
+    // template_slug is OPTIONAL: omit it (or use ''/'none'/'empty') to create a
+    // blank project; otherwise it is an example/template slug to start from.
+    const template_slug =
+      SafeExtractor.extractStringProperty(args, 'template_slug') || '';
     const also_read_existing_events = SafeExtractor.extractBooleanProperty(
       args,
       'also_read_existing_events'
@@ -5942,19 +5945,24 @@ const initializeProject: EditorFunctionWithoutProject = {
         output.eventsAsTextByScene = eventsAsTextByScene;
       }
 
+      output.initializedProject = true;
+      // On desktop the project is saved to local disk on creation, so report the
+      // file path. On web (no local storage) there is no file yet.
+      const savedProjectFile =
+        typeof createdProject.getProjectFile === 'function'
+          ? createdProject.getProjectFile()
+          : '';
       if (exampleSlug) {
-        output.message = `Initialized project from template "${exampleSlug}".`;
-        output.initializedProject = true;
+        output.message = savedProjectFile
+          ? `Initialized project from template "${exampleSlug}" and saved it to ${savedProjectFile}.`
+          : `Initialized project from template "${exampleSlug}".`;
         output.initializedFromTemplateSlug = exampleSlug;
       } else {
-        if (template_slug) {
-          output.message = `Initialized empty project (1 scene).`;
-          output.initializedProject = true;
-        } else {
-          output.message = `Initialized empty project (1 scene).`;
-          output.initializedProject = true;
-        }
+        output.message = savedProjectFile
+          ? `Initialized empty project (1 scene) and saved it to ${savedProjectFile}.`
+          : `Initialized empty project (1 scene).`;
       }
+      if (savedProjectFile) output.projectFile = savedProjectFile;
       output.meta = {
         // Do not include the scene names, as the project will automatically
         // open the scenes.

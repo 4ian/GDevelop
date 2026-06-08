@@ -3,6 +3,7 @@ import { fakeAssetShortHeader1 } from '../fixtures/GDevelopServicesTestData';
 import { PixiResourcesLoaderMock } from '../fixtures/TestPixiResourcesLoader';
 import {
   editorFunctions,
+  editorFunctionsWithoutProject,
   type EditorFunctionGenericOutput,
   type LaunchFunctionOptionsWithProject,
 } from './index';
@@ -1994,6 +1995,65 @@ describe('editorFunctions', () => {
       });
       expect(result.success).toBe(false);
       expect(project.hasLayoutNamed('Untitled scene')).toBe(true);
+    });
+  });
+
+  describe('initialize_project', () => {
+    const makeOptions = (args, onCreateProject) => ({
+      args,
+      i18n: makeFakeI18n(),
+      editorCallbacks: {
+        onOpenLayout: jest.fn(),
+        onCreateProject,
+      },
+      relatedAiRequestId: 'fake-ai-request-id',
+      getRelatedAiRequestLastMessages: () => ({
+        lastUserMessage: null,
+        lastAssistantMessages: [],
+      }),
+    });
+
+    it('creates an empty project from just a name (template_slug optional)', async () => {
+      const createdProject = gd.ProjectHelper.createNewGDJSProject();
+      createdProject.insertNewLayout('Scene', 0);
+      const onCreateProject = jest.fn(async ({ name, exampleSlug }) => ({
+        createdProject,
+        exampleSlug,
+      }));
+
+      const result = await editorFunctionsWithoutProject.initialize_project.launchFunction(
+        makeOptions({ project_name: 'My Game' }, onCreateProject)
+      );
+
+      expect(result.success).toBe(true);
+      // No template → empty project, exampleSlug null.
+      expect(onCreateProject).toHaveBeenCalledWith({
+        name: 'My Game',
+        exampleSlug: null,
+      });
+      createdProject.delete();
+    });
+
+    it('passes a template slug through when provided', async () => {
+      const createdProject = gd.ProjectHelper.createNewGDJSProject();
+      const onCreateProject = jest.fn(async ({ name, exampleSlug }) => ({
+        createdProject,
+        exampleSlug,
+      }));
+
+      const result = await editorFunctionsWithoutProject.initialize_project.launchFunction(
+        makeOptions(
+          { project_name: 'Platformer', template_slug: 'platformer' },
+          onCreateProject
+        )
+      );
+
+      expect(result.success).toBe(true);
+      expect(onCreateProject).toHaveBeenCalledWith({
+        name: 'Platformer',
+        exampleSlug: 'platformer',
+      });
+      createdProject.delete();
     });
   });
 });

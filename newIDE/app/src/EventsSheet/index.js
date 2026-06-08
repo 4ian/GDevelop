@@ -13,6 +13,11 @@ import EventTextDialog, {
   filterEditableWithEventTextDialog,
 } from './InstructionEditor/EventTextDialog';
 import Toolbar from './Toolbar';
+import GeneratedCodeDialog from './GeneratedCodeDialog';
+import {
+  generateEventsCodeForScope,
+  canGenerateEventsCodeForScope,
+} from './GenerateEventsCode';
 import KeyboardShortcuts from '../UI/KeyboardShortcuts';
 import { getShortcutDisplayName, useShortcutMap } from '../KeyboardShortcuts';
 import { type ShortcutMap } from '../KeyboardShortcuts/DefaultShortcuts';
@@ -274,6 +279,13 @@ type State = {|
 
   layoutVariablesDialogOpen: boolean,
 
+  generatedCode: ?{|
+    name: string,
+    code: ?string,
+    error: ?string,
+    isWholeEntity?: boolean,
+  |},
+
   allEventsMetadata: Array<EventMetadata>,
 
   fontSize: number,
@@ -394,6 +406,14 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     catalogBlinkNonce: 0,
 
     layoutVariablesDialogOpen: false,
+
+    // When set, the "generated JavaScript code" dialog is shown.
+    generatedCode: (null: ?{|
+      name: string,
+      code: ?string,
+      error: ?string,
+      isWholeEntity?: boolean,
+    |}),
 
     allEventsMetadata: ([]: Array<empty>),
 
@@ -613,9 +633,28 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
         canMoveEventsIntoNewGroup={hasSomethingSelected(this.state.selection)}
         moveEventsIntoNewGroup={this.moveEventsIntoNewGroup}
         onOpenSceneVariables={this.editLayoutVariables}
+        onShowGeneratedCode={
+          // Available for scenes AND extension events-functions (free, behavior
+          // and object functions); not for external events.
+          canGenerateEventsCodeForScope(this.props.scope)
+            ? this._showGeneratedCode
+            : null
+        }
       />
     );
   }
+
+  _showGeneratedCode = () => {
+    const { project, scope } = this.props;
+    // Generate the JS for the current scope (scene or extension function) using
+    // the same code generators the preview/export/extension-loader use.
+    const generated = generateEventsCodeForScope(project, scope);
+    this.setState({ generatedCode: generated });
+  };
+
+  _closeGeneratedCodeDialog = () => {
+    this.setState({ generatedCode: null });
+  };
 
   _addStandardEvent = () => {
     this.addNewEvent('BuiltinCommonInstructions::Standard');
@@ -3205,6 +3244,15 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
               this.closeEventTextDialog();
             }}
             onClose={this.closeEventTextDialog}
+          />
+        )}
+        {this.state.generatedCode && (
+          <GeneratedCodeDialog
+            name={this.state.generatedCode.name}
+            code={this.state.generatedCode.code}
+            error={this.state.generatedCode.error}
+            isWholeEntity={this.state.generatedCode.isWholeEntity}
+            onClose={this._closeGeneratedCodeDialog}
           />
         )}
       </>

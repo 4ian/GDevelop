@@ -21,6 +21,7 @@ import { getShortcutDisplayName, useShortcutMap } from '../KeyboardShortcuts';
 import AddLocalVariableIcon from '../UI/CustomSvgIcons/LocalVariable';
 import GraphsIcon from '../UI/CustomSvgIcons/Graphs';
 import VariableTreeIcon from '../UI/CustomSvgIcons/VariableTree';
+import ConsoleIcon from '../UI/CustomSvgIcons/Console';
 
 type Props = {|
   onAddStandardEvent: () => void,
@@ -49,6 +50,7 @@ type Props = {|
   moveEventsIntoNewGroup: () => void,
   canMoveEventsIntoNewGroup: boolean,
   onOpenSceneVariables: () => void,
+  onShowGeneratedCode?: ?() => void,
 |};
 
 const Toolbar: React.ComponentType<Props> = React.memo<Props>(function Toolbar({
@@ -78,6 +80,7 @@ const Toolbar: React.ComponentType<Props> = React.memo<Props>(function Toolbar({
   moveEventsIntoNewGroup,
   canMoveEventsIntoNewGroup,
   onOpenSceneVariables,
+  onShowGeneratedCode,
 }: Props) {
   const shortcutMap = useShortcutMap();
 
@@ -244,6 +247,17 @@ const Toolbar: React.ComponentType<Props> = React.memo<Props>(function Toolbar({
         >
           <ToolbarSearchIcon />
         </IconButton>
+        {onShowGeneratedCode && (
+          <IconButton
+            size="small"
+            color="default"
+            onClick={onShowGeneratedCode}
+            id="toolbar-show-generated-code-button"
+            tooltip={t`Show the generated JavaScript code for these events`}
+          >
+            <ConsoleIcon />
+          </IconButton>
+        )}
         <FlatButton
           primary={isGraphPreviewVisible}
           noBorder={!isGraphPreviewVisible}

@@ -200,11 +200,8 @@ export const useProcessFunctionCalls = ({
   );
   const getAssetStoreTagForNewObject = React.useCallback(
     (objectType: string): string | null => {
-      // Prefer the live, installed object metadata (same source as the
-      // "New object" dialog in the editor), so that a tag set via
-      // `setAssetStoreTag` on the C++ object metadata is honored even when
-      // the remote objects registry doesn't carry it (which is notably the
-      // case for built-in objects like the 3D Box).
+      // Prefer the installed object metadata (same source as the
+      // "New object" dialog in the editor).
       const installedObjectMetadata = project
         ? enumerateObjectTypes(project, null).find(
             enumeratedObjectMetadata =>

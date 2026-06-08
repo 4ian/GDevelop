@@ -262,6 +262,8 @@ type Props = {|
   resourceManagementProps: ResourceManagementProps,
   layout?: ?gdLayout,
   eventsFunctionsExtension: gdEventsFunctionsExtension | null,
+  /** Only set when a default variant is edited */
+  eventsBasedObject: gdEventsBasedObject | null,
   onUpdateBehaviorsSharedData: () => void,
   objectsContainer: gdObjectsContainer,
   globalObjectsContainer: gdObjectsContainer | null,
@@ -297,6 +299,7 @@ export const CompactObjectPropertiesEditor = ({
   resourceManagementProps,
   layout,
   eventsFunctionsExtension,
+  eventsBasedObject,
   onUpdateBehaviorsSharedData,
   objectsContainer,
   globalObjectsContainer,
@@ -381,6 +384,11 @@ export const CompactObjectPropertiesEditor = ({
     .filter(behavior => !behavior.isDefaultBehavior());
 
   // Events based object children:
+  /** The events-based object according to the selected object type.
+   *
+   * This is not the same as `eventsBasedObject` which is the events-based
+   * object of the edited variant.
+   */
   const customObjectEventsBasedObject = project.hasEventsBasedObject(
     objectConfiguration.getType()
   )
@@ -547,7 +555,7 @@ export const CompactObjectPropertiesEditor = ({
     variablesContainer: object.getVariables(),
     initialInstances,
     objectName: object.getName(),
-    eventsBasedObject: customObjectEventsBasedObject,
+    eventsBasedObject,
     enabled: objects.length === 1,
   });
 

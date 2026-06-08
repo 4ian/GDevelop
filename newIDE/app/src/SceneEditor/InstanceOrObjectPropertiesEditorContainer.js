@@ -205,6 +205,14 @@ export const InstanceOrObjectPropertiesEditorContainer: React.ComponentType<{
             onEffectAdded={onEffectAdded}
             resourceManagementProps={resourceManagementProps}
             eventsFunctionsExtension={eventsFunctionsExtension}
+            // This EventsBasedObject is used to refactor variables in all
+            // variants when editing the default variant.
+            eventsBasedObject={
+              eventsBasedObject &&
+              eventsBasedObject.getDefaultVariant() === eventsBasedObjectVariant
+                ? eventsBasedObject
+                : null
+            }
             onUpdateBehaviorsSharedData={onUpdateBehaviorsSharedData}
             onWillInstallExtension={onWillInstallExtension}
             onExtensionInstalled={onExtensionInstalled}

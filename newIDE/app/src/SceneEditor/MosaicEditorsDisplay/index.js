@@ -301,6 +301,7 @@ const MosaicEditorsDisplay: React.ComponentType<{
                 onUpdateBehaviorsSharedData={updateBehaviorsSharedData}
                 objectsContainer={objectsContainer}
                 globalObjectsContainer={globalObjectsContainer}
+                initialInstances={initialInstances}
                 layersContainer={layersContainer}
                 projectScopedContainersAccessor={
                   projectScopedContainersAccessor

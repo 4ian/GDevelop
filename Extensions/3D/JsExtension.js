@@ -1322,6 +1322,7 @@ module.exports = {
         Cube3DObject
       )
       .setCategory('General')
+      .setAssetStoreTag('3d cubes')
       .setHelpPath('/objects/3d-box')
       // Effects are unsupported because the object is not rendered with PIXI.
       .addDefaultBehavior('ResizableCapability::ResizableBehavior')

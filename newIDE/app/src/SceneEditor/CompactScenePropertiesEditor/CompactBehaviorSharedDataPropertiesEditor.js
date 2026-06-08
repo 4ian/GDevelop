@@ -41,6 +41,7 @@ export const CompactBehaviorSharedDataPropertiesEditor = ({
           instance.updateProperty(name, value);
         },
         object: null,
+        layersContainer: null,
         visibility: 'All',
       });
     },

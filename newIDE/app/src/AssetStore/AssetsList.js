@@ -977,9 +977,11 @@ const AssetsList: React.ComponentType<{
         {isNavigatingInsideFolder ? (
           <PlaceholderLoader />
         ) : assetTiles && assetTiles.length ? (
-          <GridList style={styles.grid} cellHeight="auto">
-            {assetTiles}
-          </GridList>
+          <Line justifyContent="center" noMargin>
+            <GridList style={styles.grid} cellHeight="auto">
+              {assetTiles}
+            </GridList>
+          </Line>
         ) : openedAssetPack &&
           openedAssetPack.content &&
           isAssetPackAudioOnly(openedAssetPack) ? (

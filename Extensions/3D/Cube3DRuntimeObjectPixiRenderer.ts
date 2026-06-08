@@ -161,6 +161,7 @@ namespace gdjs {
         faceIndex === undefined
           ? 23
           : faceIndexToMaterialIndex[faceIndex] * 4 + 3;
+      const tileScale = this._cube3DRuntimeObject.getTileScale() || 1;
       for (
         let vertexIndex = startIndex;
         vertexIndex <= endIndex;
@@ -325,6 +326,12 @@ namespace gdjs {
             break;
           default:
             [x, y] = noRepeatTextureVertexIndexToUvMapping[vertexIndex % 4];
+        }
+        // When the texture is tiled, the tile scale enlarges (or shrinks) each
+        // tile, which means fewer (or more) repetitions over the face.
+        if (shouldRepeatTexture && tileScale !== 1) {
+          x /= tileScale;
+          y /= tileScale;
         }
         uvMapping.setXY(vertexIndex, x, y);
       }

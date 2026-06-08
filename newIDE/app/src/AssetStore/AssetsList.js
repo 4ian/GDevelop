@@ -58,9 +58,6 @@ import { LARGE_WIDGET_SIZE } from '../MainFrame/EditorContainers/HomePage/CardWi
 const ASSETS_DISPLAY_LIMIT = 60;
 
 const getAssetColumns = (windowSize: WindowSizeType, isLandscape: boolean) => {
-  // Assets are smaller than packs/game templates, so we display more of them
-  // per row. The number of columns depends on the window size (breakpoints),
-  // and the tiles slightly adapt their size in between to always fill the row.
   switch (windowSize) {
     case 'small':
       return isLandscape ? 4 : 3;

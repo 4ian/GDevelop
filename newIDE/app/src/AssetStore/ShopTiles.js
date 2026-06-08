@@ -120,7 +120,7 @@ export const AssetCardTile = ({
 }: {|
   assetShortHeader: AssetShortHeader,
   onOpenDetails: () => void,
-  /** Props needed so that GridList component can adjust tile size */
+  /** Prop injected by GridList so it can adjust tile size. */
   style?: any,
   hideShortDescription?: boolean,
   disabled?: boolean,

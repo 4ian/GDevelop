@@ -1,9 +1,11 @@
 // @flow
 import {
+  getLocalResourceFullPath,
   parseLocalFilePathOrExtensionFromMetadata,
   renameResourcesInProject,
   updateResourceJsonMetadata,
 } from './ResourceUtils';
+import ResourcesLoader from '../ResourcesLoader';
 const gd: libGDevelop = global.gd;
 
 const addNewAnimationWithImageToSpriteObject = (
@@ -22,6 +24,20 @@ const addNewAnimationWithImageToSpriteObject = (
 };
 
 describe('ResourceUtils', () => {
+  it('decodes local resource paths from file URLs', () => {
+    const getResourceFullUrlSpy = jest
+      .spyOn(ResourcesLoader, 'getResourceFullUrl')
+      .mockReturnValue(
+        'file:///Users/me/Game%20Jam%20%231/sprite%20%231.png?cache=123'
+      );
+
+    expect(getLocalResourceFullPath((null: any), 'sprite #1.png')).toBe(
+      '/Users/me/Game Jam #1/sprite #1.png'
+    );
+
+    getResourceFullUrlSpy.mockRestore();
+  });
+
   it('can rename a resource in the whole project', () => {
     const project = gd.ProjectHelper.createNewGDJSProject();
 

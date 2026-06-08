@@ -29,6 +29,7 @@ export const styles = {
 type Props = {|
   project: gdProject,
   resourceManagementProps: ResourceManagementProps,
+  initialInstances: gdInitialInstancesContainer,
   layersContainer: gdLayersContainer,
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   unsavedChanges?: ?UnsavedChanges,
@@ -120,6 +121,7 @@ export const InstanceOrObjectPropertiesEditorContainer: React.ComponentType<{
     const {
       project,
       layersContainer,
+      initialInstances,
       projectScopedContainersAccessor,
       unsavedChanges,
       i18n,
@@ -216,6 +218,7 @@ export const InstanceOrObjectPropertiesEditorContainer: React.ComponentType<{
             layout={layout}
             objectsContainer={objectsContainer}
             globalObjectsContainer={globalObjectsContainer}
+            initialInstances={initialInstances}
             layersContainer={layersContainer}
             project={project}
             projectScopedContainersAccessor={projectScopedContainersAccessor}

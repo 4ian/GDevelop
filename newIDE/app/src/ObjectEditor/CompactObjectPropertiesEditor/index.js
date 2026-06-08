@@ -265,6 +265,7 @@ type Props = {|
   onUpdateBehaviorsSharedData: () => void,
   objectsContainer: gdObjectsContainer,
   globalObjectsContainer: gdObjectsContainer | null,
+  initialInstances: gdInitialInstancesContainer,
   layersContainer: gdLayersContainer,
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   unsavedChanges?: ?UnsavedChanges,
@@ -299,6 +300,7 @@ export const CompactObjectPropertiesEditor = ({
   onUpdateBehaviorsSharedData,
   objectsContainer,
   globalObjectsContainer,
+  initialInstances,
   layersContainer,
   projectScopedContainersAccessor,
   unsavedChanges,
@@ -540,11 +542,6 @@ export const CompactObjectPropertiesEditor = ({
   });
 
   // Variable refactoring: snapshot on object selection, apply on deselection/unmount.
-  const initialInstances =
-    (layout && layout.getInitialInstances()) ||
-    (customObjectEventsBasedObject &&
-      customObjectEventsBasedObject.getInitialInstances()) ||
-    null;
   const { onVariablesUpdated } = useVariablesContainerRefactoring({
     project,
     variablesContainer: object.getVariables(),

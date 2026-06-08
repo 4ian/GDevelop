@@ -731,6 +731,14 @@ export const AssetStore: React.ComponentType<{
             <>
               <LineStackLayout alignItems="center">
                 {!(assetSwappedObject && minimalUI) && (
+                  <TextButton
+                    icon={<ChevronArrowLeft />}
+                    label={<Trans>Back</Trans>}
+                    onClick={onBack}
+                    disabled={shopNavigationState.isRootPage}
+                  />
+                )}
+                {!(assetSwappedObject && minimalUI) && (
                   <IconButton
                     id="home-button"
                     key="back-discover"
@@ -745,19 +753,10 @@ export const AssetStore: React.ComponentType<{
                       setIsFiltersPanelOpen(false);
                     }}
                     size="small"
+                    color="default"
                   >
                     <Home />
                   </IconButton>
-                )}
-                {!(assetSwappedObject && minimalUI) && (
-                  <TextButton
-                    icon={<ChevronArrowLeft />}
-                    label={<Trans>Back</Trans>}
-                    onClick={onBack}
-                    // Always show the back button, but disable it when there is
-                    // no previous page to go back to.
-                    disabled={shopNavigationState.isRootPage}
-                  />
                 )}
                 <Column expand useFullHeight noMargin>
                   <SearchBar
@@ -817,23 +816,22 @@ export const AssetStore: React.ComponentType<{
                     noMargin
                     alignItems="center"
                   >
-                    {!openedAssetPack &&
-                      !openedPrivateAssetPackListingData && (
-                        // Only show the category name if we're not on an asset pack page.
-                        <>
-                          {/* Empty column to keep the category name centered. */}
-                          <Column expand noMargin />
-                          <Column expand alignItems="center">
-                            <Text size="block-title" noMargin>
-                              {filtersState.chosenCategory
-                                ? capitalize(
-                                    filtersState.chosenCategory.node.name
-                                  )
-                                : ''}
-                            </Text>
-                          </Column>
-                        </>
-                      )}
+                    {!openedAssetPack && !openedPrivateAssetPackListingData && (
+                      // Only show the category name if we're not on an asset pack page.
+                      <>
+                        {/* Empty column to keep the category name centered. */}
+                        <Column expand noMargin />
+                        <Column expand alignItems="center">
+                          <Text size="block-title" noMargin>
+                            {filtersState.chosenCategory
+                              ? capitalize(
+                                  filtersState.chosenCategory.node.name
+                                )
+                              : ''}
+                          </Text>
+                        </Column>
+                      </>
+                    )}
                     <Column
                       expand
                       alignItems="flex-end"

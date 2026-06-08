@@ -81,7 +81,7 @@ export const CustomObjectPackResults = ({
 
   return (
     <Column noMargin expand>
-      <LineStackLayout noMargin alignItems="center">
+      <LineStackLayout alignItems="center">
         <TextButton
           icon={<ChevronArrowLeft />}
           label={<Trans>Back</Trans>}

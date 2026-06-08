@@ -16,7 +16,7 @@ import sys
 import time
 from pathlib import Path
 
-from libgd_build import LIBGD_VARIANTS, build_libgd
+from libgd_build import LIBGD_VARIANTS, build_libgd, is_libgd_stale
 
 
 DEV_PORTS = (3000, 5002)
@@ -355,13 +355,31 @@ def main() -> int:
         stop_existing_processes(repo_root, electron_exe, args.dry_run)
         ensure_electron_dependencies(repo_root, electron_app_dir, electron_exe, args.dry_run)
         ensure_react_app_dependencies(app_dir, args.dry_run)
+        # Only allow reusing the existing libGD.js when it is actually up to date
+        # with the C++/bindings sources. If it is stale (or missing), the build is
+        # REQUIRED: we must not silently launch with an out-of-date engine, so we
+        # also try to auto-install Emscripten and let a failure stop startup.
+        libgd_stale, libgd_reason = is_libgd_stale(repo_root)
+        if build and libgd_stale:
+            print(
+                f"libGD.js needs rebuilding ({libgd_reason}); "
+                "it will be rebuilt before launch.",
+                flush=True,
+            )
+        elif build:
+            print(
+                f"libGD.js is up to date ({libgd_reason}).",
+                flush=True,
+            )
         build_libgd(
             repo_root,
             skip_build=not build,
             variant=args.libgd_variant,
             dry_run=args.dry_run,
-            required=False,
-            auto_install_emscripten=False,
+            # A stale/missing libGD.js makes the build mandatory; a fresh one may
+            # be reused even if Emscripten is unavailable.
+            required=libgd_stale,
+            auto_install_emscripten=libgd_stale,
             skip_message="Fast launch: reusing existing libGD.js because --skip-build was set.",
         )
         build_react_app(app_dir, build, args.dry_run)

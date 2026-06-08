@@ -14,9 +14,93 @@ from pathlib import Path
 EMSCRIPTEN_VERSION = "3.1.21"
 LIBGD_VARIANTS = ("release", "dev", "debug", "debug-assertions", "debug-sanitizers")
 
+# C++/bindings source trees that libGD.js is compiled from. If any file here is
+# newer than the built libGD.js, the existing libGD.js is stale and must NOT be
+# reused silently.
+LIBGD_SOURCE_DIRS = ("Core", "GDJS", "GDCpp", "Extensions", "GDevelop.js/Bindings")
+LIBGD_SOURCE_SUFFIXES = (
+    ".cpp",
+    ".h",
+    ".hpp",
+    ".inl",
+    ".js",
+    ".cmake",
+    "CMakeLists.txt",
+)
+# The built artifact the app actually loads.
+LIBGD_OUTPUT_RELATIVE_PATH = Path("newIDE") / "app" / "public" / "libGD.js"
+
 
 class EmscriptenUnavailableError(RuntimeError):
     """Raised when the Emscripten toolchain cannot be loaded."""
+
+
+def _newest_source_mtime(repo_root: Path) -> float | None:
+    """The most recent modification time across libGD.js C++/bindings sources.
+
+    Returns None if no source directory could be scanned.
+    """
+    newest: float | None = None
+    scanned_any = False
+    for relative_dir in LIBGD_SOURCE_DIRS:
+        source_dir = repo_root / relative_dir
+        if not source_dir.is_dir():
+            continue
+        scanned_any = True
+        for current_root, dir_names, file_names in os.walk(source_dir):
+            # Skip generated/build/dependency folders for speed and correctness.
+            dir_names[:] = [
+                name
+                for name in dir_names
+                if name
+                not in {
+                    "node_modules",
+                    "build",
+                    "Build",
+                    ".git",
+                    "__pycache__",
+                }
+            ]
+            for file_name in file_names:
+                if not file_name.endswith(LIBGD_SOURCE_SUFFIXES):
+                    continue
+                try:
+                    mtime = (Path(current_root) / file_name).stat().st_mtime
+                except OSError:
+                    continue
+                if newest is None or mtime > newest:
+                    newest = mtime
+    return newest if scanned_any else None
+
+
+def is_libgd_stale(repo_root: Path) -> tuple[bool, str]:
+    """Whether the built libGD.js is missing or older than its C++ sources.
+
+    Returns (stale, reason). When the freshness cannot be determined (e.g. the
+    output or sources are unreadable), errs on the side of stale=True so the
+    build is not silently skipped.
+    """
+    output = repo_root / LIBGD_OUTPUT_RELATIVE_PATH
+    if not output.exists():
+        return True, f"{LIBGD_OUTPUT_RELATIVE_PATH} does not exist yet"
+
+    try:
+        output_mtime = output.stat().st_mtime
+    except OSError:
+        return True, f"could not read {LIBGD_OUTPUT_RELATIVE_PATH}"
+
+    newest_source = _newest_source_mtime(repo_root)
+    if newest_source is None:
+        # No sources found to compare against — cannot prove freshness.
+        return True, "could not scan libGD.js C++ sources to compare timestamps"
+
+    if newest_source > output_mtime:
+        return (
+            True,
+            "C++/bindings sources are newer than the built "
+            f"{LIBGD_OUTPUT_RELATIVE_PATH.name}",
+        )
+    return False, "built libGD.js is up to date with its C++ sources"
 
 
 def step(title: str) -> None:
@@ -57,6 +141,9 @@ def run_windows_cmd_command(command: str, *, cwd: Path, dry_run: bool) -> None:
     subprocess.run(command, cwd=cwd, shell=True, check=True)
 
 
+EMSDK_REPOSITORY_URL = "https://github.com/emscripten-core/emsdk.git"
+
+
 def find_emsdk_env_script(repo_root: Path) -> Path | None:
     candidates: list[Path] = []
     if os.environ.get("EMSDK"):
@@ -71,6 +158,82 @@ def find_emsdk_env_script(repo_root: Path) -> Path | None:
         if script.exists():
             return script
     return None
+
+
+def clone_emsdk(repo_root: Path, dry_run: bool) -> Path:
+    """Clone the emsdk repository to a default location and return its env script.
+
+    Used when no emsdk checkout exists anywhere this script looks. The clone goes
+    to ``~/emsdk`` (the location documented by Emscripten and already probed by
+    ``find_emsdk_env_script``). Raises ``EmscriptenUnavailableError`` on failure.
+    """
+    target_dir = Path.home() / "emsdk"
+    print(
+        f"No emsdk found; cloning Emscripten SDK into {target_dir} ...",
+        flush=True,
+    )
+    if dry_run:
+        return target_dir / ("emsdk_env.bat" if os.name == "nt" else "emsdk_env.sh")
+
+    if not target_dir.exists():
+        try:
+            run_command(
+                [resolve_tool("git"), "clone", EMSDK_REPOSITORY_URL, str(target_dir)],
+                cwd=repo_root,
+                dry_run=dry_run,
+            )
+        except (subprocess.CalledProcessError, RuntimeError) as error:
+            raise EmscriptenUnavailableError(
+                f"Failed to clone emsdk from {EMSDK_REPOSITORY_URL} into {target_dir}: "
+                f"{error}. Install Emscripten manually, then rerun."
+            ) from error
+
+    script_name = "emsdk_env.bat" if os.name == "nt" else "emsdk_env.sh"
+    script = target_dir / script_name
+    if not script.exists():
+        raise EmscriptenUnavailableError(
+            f"Cloned emsdk but {script} was not found. The clone may be incomplete; "
+            f"remove {target_dir} and rerun, or install Emscripten manually."
+        )
+    return script
+
+
+def ensure_python_shim(dry_run: bool) -> Path | None:
+    """Ensure a `python` executable is on PATH (mapping to `python3`).
+
+    Returns a directory to prepend to PATH that contains a `python` shim, or None
+    when `python` is already available (or cannot be shimmed). The GDevelop.js
+    build's WebIDL binder calls `python`, which modern macOS no longer provides.
+    """
+    if os.name == "nt":
+        return None
+    if shutil.which("python"):
+        return None
+
+    python3 = shutil.which("python3")
+    if not python3:
+        # Nothing we can do; let the build fail with its own error.
+        return None
+
+    shim_dir = Path(repo_root_shim_dir())
+    if dry_run:
+        return shim_dir
+
+    shim_dir.mkdir(parents=True, exist_ok=True)
+    shim = shim_dir / "python"
+    # Use an exec WRAPPER, not a symlink: macOS's /usr/bin/python3 is an argv0-
+    # sensitive stub that re-triggers the Command Line Tools install prompt when
+    # invoked as `python`. The wrapper execs it as `python3`, avoiding that.
+    if shim.exists() or shim.is_symlink():
+        shim.unlink()
+    shim.write_text(f'#!/bin/sh\nexec {shlex.quote(python3)} "$@"\n')
+    shim.chmod(0o755)
+    return shim_dir
+
+
+def repo_root_shim_dir() -> str:
+    """A stable, writable directory to hold build shims (e.g. the python shim)."""
+    return str(Path.home() / ".cache" / "gdevelop-build-shims")
 
 
 def quote_windows_cmd_arg(argument: str) -> str:
@@ -151,16 +314,26 @@ def ensure_emscripten_available(
         return None
 
     emsdk_env_script = find_emsdk_env_script(repo_root)
+    needs_setup = False
     if not emsdk_env_script:
-        example = "D:\\emsdk" if os.name == "nt" else "~/emsdk"
-        raise EmscriptenUnavailableError(
-            "Could not find Emscripten. Install and activate emsdk, or put emsdk "
-            f"where this script can find it (for example {example})."
-        )
+        if not auto_install:
+            example = "D:\\emsdk" if os.name == "nt" else "~/emsdk"
+            raise EmscriptenUnavailableError(
+                "Could not find Emscripten. Install and activate emsdk, or put emsdk "
+                f"where this script can find it (for example {example})."
+            )
+        # No emsdk anywhere: clone it automatically, then it will need install+activate.
+        emsdk_env_script = clone_emsdk(repo_root, dry_run)
+        needs_setup = True
 
     print(f"Using Emscripten environment: {emsdk_env_script}", flush=True)
     if dry_run:
         return emsdk_env_script
+
+    # A freshly cloned emsdk has no installed/activated toolchain yet, so set it
+    # up before probing (avoids a guaranteed-failing probe).
+    if needs_setup and auto_install:
+        run_emsdk_setup(emsdk_env_script, dry_run)
 
     result = probe_emscripten_tools(repo_root, emsdk_env_script)
     if result.returncode != 0:
@@ -215,8 +388,16 @@ def run_libgd_build_command(
         )
         run_windows_cmd_command(command_text, cwd=cwd, dry_run=dry_run)
     else:
+        # GDevelop.js's WebIDL binder invokes `python` (the Python 2 era name),
+        # but modern macOS ships only `python3`. Ensure a `python` is on PATH for
+        # the build subprocess by prepending a tiny shim dir if needed.
+        path_prefix = ""
+        python_shim_dir = ensure_python_shim(dry_run)
+        if python_shim_dir:
+            path_prefix = f"export PATH={shlex.quote(str(python_shim_dir))}:$PATH && "
         command_text = (
             f". {shlex.quote(str(emsdk_env_script))} >/dev/null && "
+            + path_prefix
             + " ".join(shlex.quote(argument) for argument in command)
         )
         run_command([resolve_tool("bash"), "-lc", command_text], cwd=cwd, dry_run=dry_run)

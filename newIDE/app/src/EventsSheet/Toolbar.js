@@ -1,10 +1,9 @@
 //@flow
-import { t, Trans } from '@lingui/macro';
+import { t } from '@lingui/macro';
 import * as React from 'react';
 import { ToolbarGroup } from '../UI/Toolbar';
 import ToolbarSeparator from '../UI/ToolbarSeparator';
 import IconButton from '../UI/IconButton';
-import FlatButton from '../UI/FlatButton';
 import ElementWithMenu from '../UI/Menu/ElementWithMenu';
 import ToolbarCommands from './ToolbarCommands';
 import { type EventMetadata } from './EnumerateEventsMetadata';
@@ -258,15 +257,16 @@ const Toolbar: React.ComponentType<Props> = React.memo<Props>(function Toolbar({
             <ConsoleIcon />
           </IconButton>
         )}
-        <FlatButton
-          primary={isGraphPreviewVisible}
-          noBorder={!isGraphPreviewVisible}
-          noBackground={!isGraphPreviewVisible}
+        <IconButton
+          size="small"
+          color="default"
+          selected={isGraphPreviewVisible}
           onClick={onToggleGraphPreview}
-          leftIcon={<GraphsIcon />}
-          label={<Trans>Catalog</Trans>}
+          tooltip={t`Catalog`}
           id="toolbar-toggle-events-graph-preview-button"
-        />
+        >
+          <GraphsIcon />
+        </IconButton>
         {onOpenSettings && <ToolbarSeparator />}
         {onOpenSettings && (
           <IconButton

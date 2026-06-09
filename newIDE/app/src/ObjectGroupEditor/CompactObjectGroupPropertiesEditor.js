@@ -12,50 +12,31 @@ import ScrollView, { type ScrollViewInterface } from '../UI/ScrollView';
 import { Column, Line, Spacer, marginsSize } from '../UI/Grid';
 import { Separator } from '../CompactPropertiesEditor';
 import Text from '../UI/Text';
-import { Trans, t } from '@lingui/macro';
+import { Trans } from '@lingui/macro';
 import IconButton from '../UI/IconButton';
 import ShareExternal from '../UI/CustomSvgIcons/ShareExternal';
-import EventsRootVariablesFinder from '../Utils/EventsRootVariablesFinder';
-import { type ObjectEditorTab } from '../ObjectEditor/ObjectEditorDialog';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import Paper from '../UI/Paper';
 import { ColumnStackLayout, LineStackLayout } from '../UI/Layout';
-import { IconContainer } from '../UI/IconContainer';
-import RemoveIcon from '../UI/CustomSvgIcons/Remove';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import ChevronArrowRight from '../UI/CustomSvgIcons/ChevronArrowRight';
 import ChevronArrowBottom from '../UI/CustomSvgIcons/ChevronArrowBottom';
 import ChevronArrowDownWithRoundedBorder from '../UI/CustomSvgIcons/ChevronArrowDownWithRoundedBorder';
 import ChevronArrowRightWithRoundedBorder from '../UI/CustomSvgIcons/ChevronArrowRightWithRoundedBorder';
 import Add from '../UI/CustomSvgIcons/Add';
-import Trash from '../UI/CustomSvgIcons/Trash';
-import Edit from '../UI/CustomSvgIcons/ShareExternal';
-import { useManageObjectBehaviors } from '../BehaviorsEditor';
 import ObjectGroup from '../UI/CustomSvgIcons/ObjectGroup';
-import { mapFor } from '../Utils/MapFor';
 import { usePersistedScrollPosition } from '../Utils/UsePersistedScrollPosition';
-import CompactSelectField from '../UI/CompactSelectField';
-import SelectOption from '../UI/SelectOption';
 import Help from '../UI/CustomSvgIcons/Help';
 import { getHelpLink } from '../Utils/HelpLink';
 import Window from '../Utils/Window';
 import CompactTextField from '../UI/CompactTextField';
 import { textEllipsisStyle } from '../UI/TextEllipsis';
 import Link from '../UI/Link';
-import useAlertDialog from '../UI/Alert/useAlertDialog';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
-import { CompactEffectsListEditor } from '../LayersList/CompactLayerPropertiesEditor/CompactEffectsListEditor';
-import { CompactPropertiesEditorByVisibility } from '../CompactPropertiesEditor/CompactPropertiesEditorByVisibility';
-import propertiesMapToSchema from '../PropertiesEditor/PropertiesMapToSchema';
-import { useForceRecompute } from '../Utils/UseForceUpdate';
-import { exceptionallyGuardAgainstDeadObject } from '../Utils/IsNullPtr';
-import {
-  type Field,
-  type FieldChoices,
-} from '../PropertiesEditor/PropertiesEditorSchema';
 import useVariablesContainerRefactoring from '../VariablesList/useVariablesContainerRefactoring';
 import useValueWithInit from '../Utils/UseRefInitHook';
 import { type ObjectGroupEditorTab } from './EditedObjectGroupEditorDialog';
+import CompactObjectGroupEditor from './CompactObjectGroupEditor';
 
 const gd: libGDevelop = global.gd;
 
@@ -259,7 +240,6 @@ export const CompactObjectGroupPropertiesEditor = ({
   const forceUpdate = useForceUpdate();
   const [isObjectsFolded, setIsObjectsFolded] = React.useState(false);
   const [isVariablesFolded, setIsVariablesFolded] = React.useState(false);
-  const { showDeleteConfirmation } = useAlertDialog();
   const variablesListRef = React.useRef<?VariablesListInterface>(null);
 
   const groupVariablesContainer = useValueWithInit(
@@ -299,6 +279,22 @@ export const CompactObjectGroupPropertiesEditor = ({
     globalObjectsContainer,
     objectName: null,
   });
+
+  const removeObject = React.useCallback(
+    (objectName: string) => {
+      objectGroup.removeObject(objectName);
+      forceUpdate();
+    },
+    [forceUpdate, objectGroup]
+  );
+
+  const addObject = React.useCallback(
+    (objectName: string) => {
+      objectGroup.addObject(objectName);
+      forceUpdate();
+    },
+    [forceUpdate, objectGroup]
+  );
 
   return (
     <ErrorBoundary
@@ -349,7 +345,20 @@ export const CompactObjectGroupPropertiesEditor = ({
             onOpenFullEditor={openFullEditor}
             renderContent={() => (
               <ColumnStackLayout noMargin noOverflowParent>
-                <></>
+                <CompactObjectGroupEditor
+                  project={project}
+                  projectScopedContainersAccessor={
+                    projectScopedContainersAccessor
+                  }
+                  globalObjectsContainer={globalObjectsContainer}
+                  objectsContainer={objectsContainer}
+                  groupObjectNames={objectGroup
+                    .getAllObjectsNames()
+                    .toJSArray()}
+                  onObjectAdded={addObject}
+                  onObjectRemoved={removeObject}
+                  isObjectListLocked={isObjectListLocked}
+                />
               </ColumnStackLayout>
             )}
           />

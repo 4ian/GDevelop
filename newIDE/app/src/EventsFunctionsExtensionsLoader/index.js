@@ -28,6 +28,7 @@ type Options = {
 type OptionsForGeneration = {
   ...Options,
   skipCodeGeneration?: boolean,
+  generateForPreview?: boolean,
 };
 
 type CodeGenerationContext = {|
@@ -41,7 +42,8 @@ type CodeGenerationContext = {|
 export const loadProjectEventsFunctionsExtensions = (
   project: gdProject,
   eventsFunctionCodeWriter: EventsFunctionCodeWriter,
-  i18n: I18nType
+  i18n: I18nType,
+  generateForPreview: boolean = true
 ): Promise<Array<void>> => {
   return Promise.all(
     // First pass: generate extensions from the events functions extensions,
@@ -66,6 +68,7 @@ export const loadProjectEventsFunctionsExtensions = (
             skipCodeGeneration: false,
             eventsFunctionCodeWriter,
             i18n,
+            generateForPreview,
           }
         );
       })
@@ -338,9 +341,9 @@ const generateFreeFunction = (
       eventsFunction,
       codeNamespace,
       includeFiles,
-      // Generate in preview mode so breakpoint checks are injected.
-      // In production the calls are no-ops (_breakpointIndices is null).
-      false
+      // compilationForRuntime=false enables breakpoint/profiler instrumentation;
+      // use runtime mode for export so shipped code is clean.
+      !options.generateForPreview
     );
 
     // Add any include file required by the function to the list
@@ -553,10 +556,9 @@ function generateObject(
         codeNamespace,
         objectMethodMangledNames,
         includeFiles,
-        // Preview mode so breakpoint checks are injected.
-        // The generated code guards runtimeScene with a null check
-        // since _instanceContainer may be undefined during construction.
-        false
+        // compilationForRuntime=false enables breakpoint/profiler instrumentation;
+        // use runtime mode for export so shipped code is clean.
+        !options.generateForPreview
       );
       objectCodeGenerator.delete();
       objectMethodMangledNames.delete();

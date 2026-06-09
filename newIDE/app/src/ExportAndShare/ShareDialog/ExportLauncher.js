@@ -302,7 +302,12 @@ export default class ExportLauncher extends Component<Props, State> {
           }
         : undefined;
 
-      await eventsFunctionsExtensionsState.ensureLoadFinished();
+      // Regenerate extension code in runtime mode (compilationForRuntime=true)
+      // so exported games don't contain breakpoint/profiler instrumentation.
+      await eventsFunctionsExtensionsState.reloadProjectEventsFunctionsExtensions(
+        project,
+        false
+      );
 
       const exportOutput = await exportPipeline.launchExport(
         exportPipelineContext,

@@ -59,6 +59,7 @@ type ProcessEditorFunctionCallsOptions = {|
   searchAndInstallResources: (
     options: ResourceSearchAndInstallOptions
   ) => Promise<ResourceSearchAndInstallResult>,
+  getAssetStoreTagForNewObject: (objectType: string) => string | null,
 |};
 
 export const processEditorFunctionCalls = async ({
@@ -79,6 +80,7 @@ export const processEditorFunctionCalls = async ({
   onExtensionInstalled,
   searchAndInstallAsset,
   searchAndInstallResources,
+  getAssetStoreTagForNewObject,
 }: ProcessEditorFunctionCallsOptions): Promise<{|
   results: Array<EditorFunctionCallResult>,
   createdSceneNames: Array<string>,
@@ -178,6 +180,7 @@ export const processEditorFunctionCalls = async ({
         onExtensionInstalled,
         searchAndInstallAsset,
         searchAndInstallResources,
+        getAssetStoreTagForNewObject,
         PixiResourcesLoader,
       };
 

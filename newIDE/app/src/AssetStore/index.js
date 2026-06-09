@@ -729,7 +729,15 @@ export const AssetStore: React.ComponentType<{
             id="asset-store"
           >
             <>
-              <LineStackLayout>
+              <LineStackLayout alignItems="center">
+                {!(assetSwappedObject && minimalUI) && (
+                  <TextButton
+                    icon={<ChevronArrowLeft />}
+                    label={<Trans>Back</Trans>}
+                    onClick={onBack}
+                    disabled={shopNavigationState.isRootPage}
+                  />
+                )}
                 {!(assetSwappedObject && minimalUI) && (
                   <IconButton
                     id="home-button"
@@ -745,6 +753,7 @@ export const AssetStore: React.ComponentType<{
                       setIsFiltersPanelOpen(false);
                     }}
                     size="small"
+                    color="default"
                   >
                     <Home />
                   </IconButton>
@@ -797,60 +806,50 @@ export const AssetStore: React.ComponentType<{
               </LineStackLayout>
               <Spacer />
             </>
-            <Column noMargin>
-              <Line justifyContent="space-between" noMargin alignItems="center">
-                {(!isOnHomePage || !!openedShopCategory) &&
-                  !(assetSwappedObject && minimalUI) && (
-                    <>
-                      {shopNavigationState.isRootPage ||
-                      // Don't show back action on bundle pages, as it's handled by the page itself.
-                      openedBundleListingData ? null : (
-                        <Column expand alignItems="flex-start" noMargin>
-                          <TextButton
-                            icon={<ChevronArrowLeft />}
-                            label={<Trans>Back</Trans>}
-                            onClick={onBack}
-                          />
+            {(openedAssetPack ||
+              openedPrivateAssetPackListingData ||
+              filtersState.chosenCategory) &&
+              !(assetSwappedObject && minimalUI) && (
+                <Column noMargin>
+                  <Line
+                    justifyContent="space-between"
+                    noMargin
+                    alignItems="center"
+                  >
+                    {!openedAssetPack && !openedPrivateAssetPackListingData && (
+                      // Only show the category name if we're not on an asset pack page.
+                      <>
+                        {/* Empty column to keep the category name centered. */}
+                        <Column expand noMargin />
+                        <Column expand alignItems="center">
+                          <Text size="block-title" noMargin>
+                            {filtersState.chosenCategory
+                              ? capitalize(
+                                  filtersState.chosenCategory.node.name
+                                )
+                              : ''}
+                          </Text>
                         </Column>
-                      )}
-                      {(openedAssetPack ||
-                        openedPrivateAssetPackListingData ||
-                        filtersState.chosenCategory) && (
-                        <>
-                          {!openedAssetPack &&
-                            !openedPrivateAssetPackListingData && (
-                              // Only show the category name if we're not on an asset pack page.
-                              <Column expand alignItems="center">
-                                <Text size="block-title" noMargin>
-                                  {filtersState.chosenCategory
-                                    ? capitalize(
-                                        filtersState.chosenCategory.node.name
-                                      )
-                                    : ''}
-                                </Text>
-                              </Column>
-                            )}
-                          <Column
-                            expand
-                            alignItems="flex-end"
-                            noMargin
-                            justifyContent="center"
-                          >
-                            {openedAssetPack &&
-                            openedAssetPack.content &&
-                            doesAssetPackContainAudio(openedAssetPack) &&
-                            !isAssetPackAudioOnly(openedAssetPack) ? (
-                              <PrivateAssetPackAudioFilesDownloadButton
-                                assetPack={openedAssetPack}
-                              />
-                            ) : null}
-                          </Column>
-                        </>
-                      )}
-                    </>
-                  )}
-              </Line>
-            </Column>
+                      </>
+                    )}
+                    <Column
+                      expand
+                      alignItems="flex-end"
+                      noMargin
+                      justifyContent="center"
+                    >
+                      {openedAssetPack &&
+                      openedAssetPack.content &&
+                      doesAssetPackContainAudio(openedAssetPack) &&
+                      !isAssetPackAudioOnly(openedAssetPack) ? (
+                        <PrivateAssetPackAudioFilesDownloadButton
+                          assetPack={openedAssetPack}
+                        />
+                      ) : null}
+                    </Column>
+                  </Line>
+                </Column>
+              )}
             <Line
               expand
               noMargin

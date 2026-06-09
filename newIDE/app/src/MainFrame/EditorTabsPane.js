@@ -177,7 +177,7 @@ export type EditorTabsPaneCommonProps = {|
       | 'scene-events-editor'
       | 'extension-events-editor'
       | 'external-events-editor'
-  ) => void,
+  ) => Promise<void>,
   openInstructionOrExpression: (
     extension: gdPlatformExtension,
     type: string
@@ -263,11 +263,13 @@ export type EditorTabsPaneCommonProps = {|
     variant: gdEventsBasedObjectVariant
   ) => void,
   onEventsBasedObjectChildrenEdited: (
-    eventsBasedObject: gdEventsBasedObject
+    eventsBasedObject: gdEventsBasedObject,
+    options?: {| editedObject?: ?gdObject, hasResourceChanged?: boolean |}
   ) => void,
   onSceneObjectEdited: (
     scene: gdLayout,
-    objectWithContext: ObjectWithContext
+    objectWithContext: ObjectWithContext,
+    hasResourceChanged?: boolean
   ) => void,
   onSceneObjectsDeleted: (scene: gdLayout) => void,
   onSceneEventsModifiedOutsideEditor: (

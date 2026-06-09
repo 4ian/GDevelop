@@ -69,7 +69,6 @@ type Props = {|
     parameterName: string
   ) => void,
   unsavedChanges?: ?UnsavedChanges,
-  getFunctionGroupNames?: () => string[],
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
 |};
@@ -102,7 +101,6 @@ const EventsFunctionConfigurationEditor: React.ComponentType<{
       onFunctionParameterWillBeRenamed,
       onFunctionParameterTypeChanged,
       unsavedChanges,
-      getFunctionGroupNames,
       onWillInstallExtension,
       onExtensionInstalled,
     },
@@ -241,7 +239,6 @@ const EventsFunctionConfigurationEditor: React.ComponentType<{
                     forceUpdate();
                   }}
                   freezeEventsFunctionType={freezeEventsFunctionType}
-                  getFunctionGroupNames={getFunctionGroupNames}
                 />
               </CompactEventsFunctionParametersEditor>
             ) : null}

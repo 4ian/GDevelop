@@ -7,6 +7,8 @@ import {
 import { mapVector } from '../Utils/MapFor';
 import flatten from 'lodash/flatten';
 import { getExtensionPrefix } from './EnumerateInstructions';
+import { shouldHideExtension } from '../Version';
+
 const gd: libGDevelop = global.gd;
 
 const GROUP_DELIMITER = ' ❯ ';
@@ -56,6 +58,7 @@ const enumerateExpressionMetadataMap = (
 /** Enumerate all the free expressions available. */
 export const enumerateFreeExpressions = (
   type: string,
+  project: gdProject,
   i18n: I18nType
 ): Array<EnumeratedExpressionMetadata> => {
   const allExtensions = gd
@@ -64,6 +67,9 @@ export const enumerateFreeExpressions = (
 
   return flatten(
     mapVector(allExtensions, extension => {
+      if (shouldHideExtension(project, extension)) {
+        return [];
+      }
       const prefix = getExtensionPrefix(extension, i18n);
       const scope: InstructionOrExpressionScope = {
         extension: { name: extension.getName() },
@@ -195,16 +201,20 @@ export const enumerateBehaviorExpressions = (
 /** Enumerate all the expressions available. */
 export const enumerateAllExpressions = (
   type: string,
+  project: gdProject,
   i18n: I18nType
 ): Array<EnumeratedExpressionMetadata> => {
   const objectsExpressions: Array<EnumeratedExpressionMetadata> = [];
   const behaviorsExpressions: Array<EnumeratedExpressionMetadata> = [];
-  const freeExpressions = enumerateFreeExpressions(type, i18n);
+  const freeExpressions = enumerateFreeExpressions(type, project, i18n);
 
   const allExtensions = gd
     .asPlatform(gd.JsPlatform.get())
     .getAllPlatformExtensions();
   mapVector(allExtensions, extension => {
+    if (shouldHideExtension(project, extension)) {
+      return;
+    }
     const prefix = getExtensionPrefix(extension, i18n);
 
     //Objects expressions:

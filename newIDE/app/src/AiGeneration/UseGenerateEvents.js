@@ -8,20 +8,24 @@ import {
   createAiGeneratedEvent,
 } from '../Utils/GDevelopServices/Generation';
 
-import { type EventsGenerationResult } from '../EditorFunctions';
+import {
+  type EventsGenerationResult,
+  type EventBatch,
+} from '../EditorFunctions';
 import { makeSimplifiedProjectBuilder } from '../EditorFunctions/SimplifiedProject/SimplifiedProject';
 import { prepareAiUserContent } from './PrepareAiUserContent';
 
 const gd: libGDevelop = global.gd;
 
-type _UseGenerateEventsReturnType = {
+type UseGenerateEventsReturnType = {
   generateEvents: ({
-    eventsDescription: string,
+    eventsDescription: string | null,
+    eventBatches: Array<EventBatch> | null,
     existingEventsAsText: string,
     existingEventsJson: string | null,
     extensionNamesList: string,
     objectsList: string,
-    placementHint: string,
+    placementHint: string | null,
     relatedAiRequestId: string,
     sceneName: string,
     estimatedComplexity: number | null,
@@ -31,7 +35,7 @@ export const useGenerateEvents = ({
   project,
 }: {|
   project: ?gdProject,
-|}): _UseGenerateEventsReturnType => {
+|}): UseGenerateEventsReturnType => {
   const { profile, getAuthorizationHeader } = React.useContext(
     AuthenticatedUserContext
   );
@@ -40,6 +44,7 @@ export const useGenerateEvents = ({
     async ({
       sceneName,
       eventsDescription,
+      eventBatches,
       extensionNamesList,
       objectsList,
       existingEventsAsText,
@@ -49,12 +54,13 @@ export const useGenerateEvents = ({
       estimatedComplexity,
     }: {|
       sceneName: string,
-      eventsDescription: string,
+      eventsDescription: string | null,
+      eventBatches: Array<EventBatch> | null,
       extensionNamesList: string,
       objectsList: string,
       existingEventsAsText: string,
       existingEventsJson: string | null,
-      placementHint: string,
+      placementHint: string | null,
       relatedAiRequestId: string,
       estimatedComplexity: number | null,
     |}): Promise<EventsGenerationResult> => {
@@ -95,6 +101,7 @@ export const useGenerateEvents = ({
               existingEventsJson: preparedAiUserContent.eventsJson,
               sceneName,
               eventsDescription,
+              eventBatches,
               extensionNamesList,
               objectsList,
               existingEventsAsText,

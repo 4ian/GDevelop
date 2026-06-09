@@ -192,7 +192,16 @@ export const CodeEditor = ({
   }
 
   if (!MonacoEditor) {
-    return <PlaceholderLoader />;
+    // Reserve the same dimensions as the editor that will replace this loader,
+    // so that the surrounding container keeps a stable height while Monaco is
+    // being loaded asynchronously. Without this, the height would grow once the
+    // editor mounts, which - in the events sheet - reports a new event height
+    // and makes the virtualized list jump the scroll position.
+    return (
+      <div style={{ width: width || 600, height: height || 200 }}>
+        <PlaceholderLoader />
+      </div>
+    );
   }
 
   return (

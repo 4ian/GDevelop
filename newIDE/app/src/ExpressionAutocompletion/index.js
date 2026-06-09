@@ -127,13 +127,14 @@ const getAutocompletionsForExpressions = (
 const getAutocompletionsForFreeExpressions = function(
   expressionAutocompletionContext: ExpressionAutocompletionContext,
   completionDescription: gdExpressionCompletionDescription,
+  project: gdProject,
   i18n: I18nType
 ): Array<ExpressionAutocompletion> {
   const prefix: string = completionDescription.getPrefix();
   const type: string = completionDescription.getType();
   const isExact: boolean = completionDescription.isExact();
 
-  const freeExpressions = enumerateFreeExpressions(type, i18n);
+  const freeExpressions = enumerateFreeExpressions(type, project, i18n);
 
   const filteredFreeExpressions = filterEnumeratedInstructionOrExpressionMetadataByScope(
     filterExpressions(freeExpressions, prefix),
@@ -441,6 +442,7 @@ const getAutocompletionsForBehavior = function(
 export const getAutocompletionsFromDescriptions = (
   expressionAutocompletionContext: ExpressionAutocompletionContext,
   expressionCompletionDescriptions: gdVectorExpressionCompletionDescription,
+  project: gdProject,
   i18n: I18nType
 ): Array<ExpressionAutocompletion> => {
   const { gd } = expressionAutocompletionContext;
@@ -470,6 +472,7 @@ export const getAutocompletionsFromDescriptions = (
           return getAutocompletionsForFreeExpressions(
             expressionAutocompletionContext,
             completionDescription,
+            project,
             i18n
           );
         }

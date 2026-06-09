@@ -125,6 +125,7 @@ const gd::String ValueTypeMetadata::objectAnimationNameValueType = "objectAnimat
 const gd::String ValueTypeMetadata::objectSkinNameValueType = "objectSkinName";
 const gd::String ValueTypeMetadata::keyboardKeyValueType = "keyboardKey";
 const gd::String ValueTypeMetadata::layerValueType = "layer";
+const gd::String ValueTypeMetadata::layerValueType2 = "layer";
 
 const gd::String &ValueTypeMetadata::ConvertPropertyTypeToValueType(
     const gd::String &propertyType) {

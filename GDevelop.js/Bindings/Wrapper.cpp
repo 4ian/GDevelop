@@ -40,6 +40,7 @@
 #include <GDCore/IDE/Events/EventsTypesLister.h>
 #include <GDCore/IDE/Events/EventsVariablesFinder.h>
 #include <GDCore/IDE/Events/ExpressionCompletionFinder.h>
+#include <GDCore/IDE/Events/ExpressionSyntaxColoringHelper.h>
 #include <GDCore/IDE/Events/ExpressionNodeLocationFinder.h>
 #include <GDCore/IDE/Events/ExpressionTypeFinder.h>
 #include <GDCore/IDE/Events/ExpressionValidator.h>
@@ -512,6 +513,10 @@ typedef ExpressionCompletionDescription::CompletionKind
     ExpressionCompletionDescription_CompletionKind;
 typedef std::vector<gd::ExpressionCompletionDescription>
     VectorExpressionCompletionDescription;
+typedef ExpressionColorationDescription::ColorationKind
+    ExpressionColorationDescription_ColorationKind;
+typedef std::vector<gd::ExpressionColorationDescription>
+    VectorExpressionColorationDescription;
 typedef std::map<gd::String, std::map<gd::String, gd::PropertyDescriptor>>
     MapExtensionProperties;
 typedef gd::Variable::Type Variable_Type;
@@ -606,6 +611,8 @@ typedef std::vector<gd::PropertyDescriptorChoice> VectorPropertyDescriptorChoice
 #define STATIC_GetSafeName GetSafeName
 #define STATIC_ToJSON ToJSON
 #define STATIC_FromJSON(x) FromJSON(x)
+#define STATIC_SetCanonicalMode SetCanonicalMode
+#define STATIC_IsCanonicalMode IsCanonicalMode
 #define STATIC_SerializeTo SerializeTo
 #define STATIC_IsObject IsObject
 #define STATIC_IsBehavior IsBehavior
@@ -752,6 +759,8 @@ typedef std::vector<gd::PropertyDescriptorChoice> VectorPropertyDescriptorChoice
 #define STATIC_GenerateObjectGetterAndSetter GenerateObjectGetterAndSetter
 #define STATIC_CanGenerateGetterAndSetter CanGenerateGetterAndSetter
 #define STATIC_GenerateConditionSkeleton GenerateConditionSkeleton
+#define STATIC_GenerateExpressionSkeleton GenerateExpressionSkeleton
+#define STATIC_UpdateReturnActionType UpdateReturnActionType
 #define STATIC_CreateRectangle CreateRectangle
 #define STATIC_SanityCheckBehaviorProperty SanityCheckBehaviorProperty
 #define STATIC_SanityCheckObjectProperty SanityCheckObjectProperty
@@ -896,6 +905,7 @@ typedef std::vector<gd::PropertyDescriptorChoice> VectorPropertyDescriptorChoice
   IsExtensionLifecycleEventsFunction
 
 #define STATIC_GetCompletionDescriptionsFor GetCompletionDescriptionsFor
+#define STATIC_GetColorationDescriptionsFor GetColorationDescriptionsFor
 #define STATIC_GetType GetType
 #define STATIC_GetNodeAtPosition GetNodeAtPosition
 

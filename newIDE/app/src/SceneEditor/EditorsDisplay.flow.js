@@ -76,6 +76,7 @@ export type SceneEditorsDisplayProps = {|
   onLayersModified: () => void,
   onLayersVisibilityInEditorChanged: () => void,
   onBackgroundColorChanged: () => void,
+  openSceneVariables: () => void,
   onObjectCreated: (
     objects: Array<gdObject>,
     isTheFirstOfItsTypeInProject: boolean
@@ -161,7 +162,10 @@ export type SceneEditorsDisplayProps = {|
   onOpenedEditorsChanged: () => void,
   onRestartInGameEditor: (reason: string) => void,
   showRestartInGameEditorAfterErrorButton: boolean,
-  onEventsBasedObjectChildrenEdited: gdEventsBasedObject => void,
+  onEventsBasedObjectChildrenEdited: (
+    eventsBasedObject: gdEventsBasedObject,
+    options?: {| editedObject?: ?gdObject, hasResourceChanged?: boolean |}
+  ) => void,
 |};
 
 export type SceneEditorsDisplayInterface = {|

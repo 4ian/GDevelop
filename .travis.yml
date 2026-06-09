@@ -9,6 +9,9 @@ language: cpp
 sudo: false
 compiler:
   - clang
+branches:
+  only:
+    - master
 
 # Cache .npm folder for faster npm install
 cache:

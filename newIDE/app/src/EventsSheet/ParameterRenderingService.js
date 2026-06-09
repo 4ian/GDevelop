@@ -53,7 +53,9 @@ import ObjectVariableField, {
   renderInlineObjectVariable,
 } from './ParameterFields/ObjectVariableField';
 import LayerField from './ParameterFields/LayerField';
-import ImageResourceField from './ParameterFields/ImageResourceField';
+import ImageResourceField, {
+  renderInlineResourceField,
+} from './ParameterFields/ImageResourceField';
 import AudioResourceField from './ParameterFields/AudioResourceField';
 import VideoResourceField from './ParameterFields/VideoResourceField';
 import JsonResourceField from './ParameterFields/JsonResourceField';
@@ -164,6 +166,7 @@ const inlineRenderers: { [string]: ParameterInlineRenderer } = {
   mouse: renderInlineMouse,
   mouseButton: renderInlineMouseButton,
   object: renderInlineObjectWithThumbnail,
+  resource: renderInlineResourceField,
   yesorno: renderInlineYesNo,
   trueorfalse: renderInlineTrueFalse,
   operator: renderInlineOperator,
@@ -229,10 +232,12 @@ const ParameterRenderingService = {
     else return components.default;
   },
   renderInlineParameter: (props: ParameterInlineRendererProps): React.Node => {
-    const rawType = props.parameterMetadata.getType();
-    const fieldType = gd.ParameterMetadata.isObject(rawType)
+    const valueTypeMetadata = props.parameterMetadata.getValueTypeMetadata();
+    const fieldType = valueTypeMetadata.isObject()
       ? 'object'
-      : rawType;
+      : valueTypeMetadata.isResource()
+      ? 'resource'
+      : valueTypeMetadata.getName();
 
     const inlineRenderer =
       inlineRenderers[fieldType] || inlineRenderers.default;

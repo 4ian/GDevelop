@@ -141,7 +141,7 @@ TEST_CASE("ExpressionNodeLocationFinder", "[common][events]") {
 
   SECTION("Valid unary operators") {
     SECTION("Test 1") {
-      REQUIRE(CheckNodeAtLocationIs<gd::UnaryOperatorNode>(
+      REQUIRE(CheckNodeAtLocationIs<gd::NumberNode>(
                   parser, "-123", 0) == true);
       REQUIRE(CheckNodeAtLocationIs<gd::UnaryOperatorNode>(
                   parser, "+123", 0) == true);
@@ -158,7 +158,7 @@ TEST_CASE("ExpressionNodeLocationFinder", "[common][events]") {
                   parser, "-+-123", 0) == true);
       REQUIRE(CheckNodeAtLocationIs<gd::UnaryOperatorNode>(
                   parser, "-+-123", 1) == true);
-      REQUIRE(CheckNodeAtLocationIs<gd::UnaryOperatorNode>(
+      REQUIRE(CheckNodeAtLocationIs<gd::NumberNode>(
                   parser, "-+-123", 2) == true);
       REQUIRE(CheckNodeAtLocationIs<gd::NumberNode>(
                   parser, "-+-123", 3) == true);

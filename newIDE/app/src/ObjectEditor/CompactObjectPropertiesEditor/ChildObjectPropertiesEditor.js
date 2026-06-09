@@ -90,7 +90,6 @@ export const ChildObjectPropertiesEditor = ({
         onInstancesModified={() => {
           // TODO: undo/redo?
         }}
-        // $FlowFixMe[incompatible-type]
         onRefreshAllFields={forceRecomputeSchema}
         placeholder={<Trans>This object has no properties.</Trans>}
         customizeBasicSchema={schema =>

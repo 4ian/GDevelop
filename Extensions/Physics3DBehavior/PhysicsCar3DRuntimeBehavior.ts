@@ -348,6 +348,11 @@ namespace gdjs {
         return result;
       }
       const { behavior } = physics3D;
+      // Same as for characters:
+      // - the body is at the object center on X and Y (the shape is offset
+      //   when the object center is not the geometric center of the object)
+      // - the origin is used for Z because, when the car is made smaller,
+      //   it must stay on the ground and not fall from its old size.
       result.Set(
         this.owner3D.getCenterXInScene() * this._sharedData.worldInvScale,
         this.owner3D.getCenterYInScene() * this._sharedData.worldInvScale,

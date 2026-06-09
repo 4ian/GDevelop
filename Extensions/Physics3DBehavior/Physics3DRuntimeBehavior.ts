@@ -1090,6 +1090,11 @@ namespace gdjs {
       this._objectOldWidth = this.owner3D.getWidth();
       this._objectOldHeight = this.owner3D.getHeight();
       this._objectOldDepth = this.owner3D.getDepth();
+      // The old center must NOT be refreshed here: when the center moved,
+      // the body position (which is the object center) must still be updated
+      // by `bodyUpdater.updateBodyFromObject` which relies on
+      // `_hasObjectCenterChanged`. It's refreshed by `updateObjectFromBody`
+      // after the physics step.
     }
 
     getShapeScale(): float {
@@ -1268,13 +1273,16 @@ namespace gdjs {
       // The width has changed and there is no custom dimension A (box: width, circle: radius, edge: length) or
       // The height has changed, the shape is not an edge (edges doesn't have height),
       // it isn't a box with custom height or a circle with custom radius
+      // The shape automatic offset depends on the object center,
+      // so the shape must be recreated when the center moved
+      // (even when shapes have custom dimensions).
       if (
         this._needToRecreateShape ||
+        this._hasObjectCenterChanged() ||
         (!this.hasCustomShapeDimension() &&
           (this._objectOldWidth !== this.owner3D.getWidth() ||
             this._objectOldHeight !== this.owner3D.getHeight() ||
-            this._objectOldDepth !== this.owner3D.getDepth() ||
-            this._hasObjectCenterChanged()))
+            this._objectOldDepth !== this.owner3D.getDepth()))
       ) {
         this._needToRecreateShape = false;
         this._recreateShape();

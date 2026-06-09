@@ -2678,10 +2678,6 @@ module.exports = {
       _defaultHeight;
       /** @type {number} */
       _defaultDepth;
-      /** @type {number} */
-      _centerX = 0;
-      /** @type {number} */
-      _centerY = 0;
       /** @type {[number, number, number]} */
       _originPoint = [0, 0, 0];
       /** @type {[number, number, number]} */
@@ -2798,8 +2794,6 @@ module.exports = {
             textureName
           );
           this._pixiTexturedObject.texture = texture;
-          this._centerX = texture.frame.width / 2;
-          this._centerY = texture.frame.height / 2;
           this._renderedResourceName = textureName;
 
           if (!texture.baseTexture.valid) {

@@ -26,7 +26,8 @@ namespace gdjs {
 
   const applyThreeTextureSettings = (
     threeTexture: THREE.Texture,
-    resourceData: ResourceData | null
+    resourceData: ResourceData | null,
+    useMipmaps: boolean
   ) => {
     if (resourceData && resourceData.smoothed === false) {
       threeTexture.magFilter = THREE.NearestFilter;
@@ -34,8 +35,10 @@ namespace gdjs {
       threeTexture.generateMipmaps = false;
     } else {
       threeTexture.magFilter = THREE.LinearFilter;
-      threeTexture.minFilter = THREE.LinearMipmapLinearFilter;
-      threeTexture.generateMipmaps = true;
+      threeTexture.minFilter = useMipmaps
+        ? THREE.LinearMipmapLinearFilter
+        : THREE.LinearFilter;
+      threeTexture.generateMipmaps = useMipmaps;
     }
   };
 
@@ -205,7 +208,7 @@ namespace gdjs {
 
       const resource = this._getImageResource(resourceName);
 
-      applyThreeTextureSettings(threeTexture, resource);
+      applyThreeTextureSettings(threeTexture, resource, true);
       threeTexture.needsUpdate = true;
       this._loadedThreeTextures.put(resourceName, threeTexture);
 
@@ -275,12 +278,12 @@ namespace gdjs {
       cubeTexture.images[5] = this._getImageSource(zNegativeResourceName);
       // The images also need to be mirrored horizontally by users.
 
-      // Skyboxes/cube maps should keep the previous non-mipmapped filtering:
-      // mip chains add memory pressure and can blur horizons between faces.
-      cubeTexture.magFilter = THREE.LinearFilter;
-      cubeTexture.minFilter = THREE.LinearFilter;
-      cubeTexture.generateMipmaps = false;
       cubeTexture.colorSpace = THREE.SRGBColorSpace;
+
+      const resource = this._getImageResource(xPositiveResourceName);
+      // Skyboxes/cube maps are never minified enough to need mipmaps and
+      // mip chains can create visible seams between faces.
+      applyThreeTextureSettings(cubeTexture, resource, false);
       cubeTexture.needsUpdate = true;
       this._loadedThreeCubeTextures.set(key, cubeTexture);
       this._loadedThreeCubeTextureKeysByResourceName.add(

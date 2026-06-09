@@ -7,11 +7,13 @@ import { action } from '@storybook/addon-actions';
 import { testProject } from '../../GDevelopJsInitializerDecorator';
 import fakeResourceManagementProps from '../../FakeResourceManagement';
 
+import paperDecorator from '../../PaperDecorator';
 import { CompactObjectGroupPropertiesEditor } from '../../../ObjectGroupEditor/CompactObjectGroupPropertiesEditor';
 
 export default {
   title: 'LayoutEditor/CompactObjectGroupPropertiesEditor',
   component: CompactObjectGroupPropertiesEditor,
+  decorators: [paperDecorator],
 };
 
 export const Default = (): React.Node => (

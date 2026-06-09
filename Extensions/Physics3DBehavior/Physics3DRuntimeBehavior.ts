@@ -697,16 +697,20 @@ namespace gdjs {
         new gdjs.Physics3DRuntimeBehavior.DefaultCollisionChecker(this);
     }
 
-    createShape(): Jolt.Shape {
+    createShape(applyObjectCenterOffsetOnZ: boolean = true): Jolt.Shape {
       if (
         this.massCenterOffsetX === 0 &&
         this.massCenterOffsetY === 0 &&
         this.massCenterOffsetZ === 0
       ) {
-        return this.createShapeWithoutMassCenterOffset();
+        return this.createShapeWithoutMassCenterOffset(
+          applyObjectCenterOffsetOnZ
+        );
       }
       const rotatedShapeSettings =
-        this._createNewShapeSettingsWithoutMassCenterOffset();
+        this._createNewShapeSettingsWithoutMassCenterOffset(
+          applyObjectCenterOffsetOnZ
+        );
       const shapeScale = this.shapeScale * this._sharedData.worldInvScale;
       const offsetCenterShapeSettings =
         new Jolt.OffsetCenterOfMassShapeSettings(
@@ -722,15 +726,21 @@ namespace gdjs {
       return shape;
     }
 
-    createShapeWithoutMassCenterOffset(): Jolt.Shape {
+    createShapeWithoutMassCenterOffset(
+      applyObjectCenterOffsetOnZ: boolean = true
+    ): Jolt.Shape {
       const rotatedShapeSettings =
-        this._createNewShapeSettingsWithoutMassCenterOffset();
+        this._createNewShapeSettingsWithoutMassCenterOffset(
+          applyObjectCenterOffsetOnZ
+        );
       const shape = rotatedShapeSettings.Create().Get();
       Jolt.destroy(rotatedShapeSettings);
       return shape;
     }
 
-    private _createNewShapeSettingsWithoutMassCenterOffset(): Jolt.RotatedTranslatedShapeSettings {
+    private _createNewShapeSettingsWithoutMassCenterOffset(
+      applyObjectCenterOffsetOnZ: boolean
+    ): Jolt.RotatedTranslatedShapeSettings {
       let width = this.owner3D.getWidth() * this._sharedData.worldInvScale;
       let height = this.owner3D.getHeight() * this._sharedData.worldInvScale;
       let depth = this.owner3D.getDepth() * this._sharedData.worldInvScale;
@@ -904,7 +914,7 @@ namespace gdjs {
           : (this.owner3D.getHeight() / 2 - this.owner3D.getCenterY()) *
             this._sharedData.worldInvScale;
       const automaticShapeOffsetZ =
-        this._shape === 'Mesh'
+        this._shape === 'Mesh' || !applyObjectCenterOffsetOnZ
           ? 0
           : (this.owner3D.getDepth() / 2 - this.owner3D.getCenterZ()) *
             this._sharedData.worldInvScale;

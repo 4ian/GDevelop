@@ -10,7 +10,7 @@ describe('Physics3DRuntimeBehavior', () => {
     expect(Math.abs(actual - expected) < epsilon).to.be(true);
   };
 
-  const makePhysicsBehaviorData = () => ({
+  const makePhysicsBehaviorData = (overrides = {}) => ({
     name: physicsBehaviorName,
     type: 'Physics3D::Physics3DBehavior',
     bodyType: 'Dynamic',
@@ -37,6 +37,27 @@ describe('Physics3DRuntimeBehavior', () => {
     gravityScale: 0,
     layers: (1 << 4) | (1 << 0),
     masks: (1 << 4) | (1 << 0),
+    ...overrides,
+  });
+
+  const makeCharacterBehaviorData = () => ({
+    name: 'Character3D',
+    type: 'Physics3D::PhysicsCharacter3D',
+    physics3D: physicsBehaviorName,
+    jumpHeight: 80,
+    jumpSustainTime: 0,
+    gravity: 1000,
+    maxFallingSpeed: 1000,
+    forwardAcceleration: 1500,
+    forwardDeceleration: 1500,
+    forwardSpeedMax: 250,
+    sidewaysAcceleration: 1500,
+    sidewaysDeceleration: 1500,
+    sidewaysSpeedMax: 250,
+    slopeMaxAngle: 50,
+    stairHeightMax: 20,
+    shouldBindObjectAndForwardAngle: true,
+    canBePushed: true,
   });
 
   const createSceneWithPhysics = async () => {
@@ -100,6 +121,24 @@ describe('Physics3DRuntimeBehavior', () => {
     },
   });
 
+  const makeCharacterCubeObjectData = (content) => ({
+    name: 'CharacterCube',
+    type: 'Scene3D::Cube3DObject',
+    effects: [],
+    variables: [],
+    behaviors: [makePhysicsBehaviorData(), makeCharacterBehaviorData()],
+    // @ts-ignore - The test only sets the Cube properties it needs.
+    content: {
+      width: 50,
+      height: 50,
+      depth: 100,
+      enableTextureTransparency: false,
+      originLocation: 'TopLeft',
+      centerLocation: 'BottomCenterZ',
+      ...content,
+    },
+  });
+
   const makeModelObjectData = (content) => ({
     name: 'Model',
     type: 'Scene3D::Model3DObject',
@@ -140,6 +179,43 @@ describe('Physics3DRuntimeBehavior', () => {
     );
     behavior.updateBodyFromObject();
     return { runtimeScene, object, behavior };
+  };
+
+  const addCube = (runtimeScene, objectData, x, y, z) => {
+    const object = new gdjs.Cube3DRuntimeObject(runtimeScene, objectData);
+    runtimeScene.addObject(object);
+    object.setPosition(x, y);
+    object.setZ(z);
+    return object;
+  };
+
+  const addStaticFloor = (runtimeScene) => {
+    const floor = addCube(
+      runtimeScene,
+      makeCubeObjectData({
+        width: 1000,
+        height: 1000,
+        depth: 20,
+        originLocation: 'TopLeft',
+        centerLocation: 'ObjectCenter',
+      }),
+      -500,
+      -500,
+      0
+    );
+    const behavior = /** @type {gdjs.Physics3DRuntimeBehavior} */ (
+      floor.getBehavior(physicsBehaviorName)
+    );
+    behavior.bodyType = 'Static';
+    behavior.updateBodyFromObject();
+    return floor;
+  };
+
+  const stepPhysics = (runtimeScene, seconds) => {
+    if (!runtimeScene.physics3DSharedData) {
+      throw new Error('Physics3D shared data should have been created.');
+    }
+    runtimeScene.physics3DSharedData.step(seconds);
   };
 
   const assertBodyMatchesObject = (object, behavior) => {
@@ -266,6 +342,45 @@ describe('Physics3DRuntimeBehavior', () => {
       behavior.updateBodyFromObject();
 
       assertBodyMatchesObject(object, behavior);
+    } finally {
+      disposePhysics(runtimeScene);
+    }
+  });
+
+  it('keeps a bottom-centered Cube3D character on the floor after landing', async () => {
+    const runtimeScene = await createSceneWithPhysics();
+    addStaticFloor(runtimeScene);
+    const characterObject = addCube(
+      runtimeScene,
+      makeCharacterCubeObjectData({}),
+      -25,
+      -25,
+      20
+    );
+    const characterBehavior =
+      /** @type {gdjs.PhysicsCharacter3DRuntimeBehavior} */ (
+        characterObject.getBehavior('Character3D')
+      );
+    const physicsBehavior = /** @type {gdjs.Physics3DRuntimeBehavior} */ (
+      characterObject.getBehavior(physicsBehaviorName)
+    );
+
+    try {
+      characterBehavior.getPhysics3D();
+      physicsBehavior.updateBodyFromObject();
+      for (let index = 0; index < 5; index++) {
+        stepPhysics(runtimeScene, 1 / 60);
+      }
+      expect(characterBehavior.isOnFloor()).to.be(true);
+
+      characterBehavior.simulateJumpKey();
+      stepPhysics(runtimeScene, 1 / 60);
+      expect(characterBehavior.isOnFloor()).to.be(false);
+
+      for (let index = 0; index < 120; index++) {
+        stepPhysics(runtimeScene, 1 / 60);
+      }
+      expect(characterBehavior.isOnFloor()).to.be(true);
     } finally {
       disposePhysics(runtimeScene);
     }

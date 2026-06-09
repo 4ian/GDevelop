@@ -395,10 +395,12 @@ namespace gdjs {
         result.Set(0, 0, 0);
         return result;
       }
+      const { behavior } = physics3D;
       result.Set(
         this.owner3D.getCenterXInScene() * this._sharedData.worldInvScale,
         this.owner3D.getCenterYInScene() * this._sharedData.worldInvScale,
-        this.owner3D.getCenterZInScene() * this._sharedData.worldInvScale
+        this.owner3D.getZ() * this._sharedData.worldInvScale +
+          behavior._shapeHalfDepth
       );
       return result;
     }
@@ -423,14 +425,16 @@ namespace gdjs {
       if (!physics3D) {
         return;
       }
+      const { behavior } = physics3D;
       this.owner3D.setCenterXInScene(
         physicsPosition.GetX() * this._sharedData.worldScale
       );
       this.owner3D.setCenterYInScene(
         physicsPosition.GetY() * this._sharedData.worldScale
       );
-      this.owner3D.setCenterZInScene(
-        physicsPosition.GetZ() * this._sharedData.worldScale
+      this.owner3D.setZ(
+        (physicsPosition.GetZ() - behavior._shapeHalfDepth) *
+          this._sharedData.worldScale
       );
     }
 
@@ -1576,7 +1580,7 @@ namespace gdjs {
         const { _slopeMaxAngle, owner3D, _sharedData } = this.characterBehavior;
 
         // Jolt doesn't support center of mass offset for characters.
-        const shape = behavior.createShapeWithoutMassCenterOffset();
+        const shape = behavior.createShapeWithoutMassCenterOffset(false);
 
         const settings = new Jolt.CharacterVirtualSettings();
         // Characters innerBody are Kinematic body, they don't allow other
@@ -1832,7 +1836,7 @@ namespace gdjs {
         if (!character) {
           return;
         }
-        const shape = behavior.createShapeWithoutMassCenterOffset();
+        const shape = behavior.createShapeWithoutMassCenterOffset(false);
         const isShapeValid = character.SetShape(
           shape,
           Number.MAX_VALUE,

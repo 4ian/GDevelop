@@ -347,10 +347,12 @@ namespace gdjs {
         result.Set(0, 0, 0);
         return result;
       }
+      const { behavior } = physics3D;
       result.Set(
         this.owner3D.getCenterXInScene() * this._sharedData.worldInvScale,
         this.owner3D.getCenterYInScene() * this._sharedData.worldInvScale,
-        this.owner3D.getCenterZInScene() * this._sharedData.worldInvScale
+        this.owner3D.getZ() * this._sharedData.worldInvScale +
+          behavior._shapeHalfDepth
       );
       return result;
     }
@@ -967,7 +969,7 @@ namespace gdjs {
         const { behavior } = physics3D;
         const { _sharedData } = this.carBehavior;
 
-        const carShape = behavior.createShape();
+        const carShape = behavior.createShape(false);
 
         // Create car body
         const carBodySettings = new Jolt.BodyCreationSettings(

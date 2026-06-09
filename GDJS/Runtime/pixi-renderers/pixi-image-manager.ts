@@ -28,9 +28,14 @@ namespace gdjs {
     threeTexture: THREE.Texture,
     resourceData: ResourceData | null
   ) => {
-    if (resourceData && !resourceData.smoothed) {
+    if (resourceData && resourceData.smoothed === false) {
       threeTexture.magFilter = THREE.NearestFilter;
       threeTexture.minFilter = THREE.NearestFilter;
+      threeTexture.generateMipmaps = false;
+    } else {
+      threeTexture.magFilter = THREE.LinearFilter;
+      threeTexture.minFilter = THREE.LinearMipmapLinearFilter;
+      threeTexture.generateMipmaps = true;
     }
   };
 
@@ -194,16 +199,14 @@ namespace gdjs {
       const image = this._getImageSource(resourceName);
 
       const threeTexture = new THREE.Texture(image);
-      threeTexture.magFilter = THREE.LinearFilter;
-      threeTexture.minFilter = THREE.LinearFilter;
       threeTexture.wrapS = THREE.RepeatWrapping;
       threeTexture.wrapT = THREE.RepeatWrapping;
       threeTexture.colorSpace = THREE.SRGBColorSpace;
-      threeTexture.needsUpdate = true;
 
       const resource = this._getImageResource(resourceName);
 
       applyThreeTextureSettings(threeTexture, resource);
+      threeTexture.needsUpdate = true;
       this._loadedThreeTextures.put(resourceName, threeTexture);
 
       return threeTexture;
@@ -272,13 +275,11 @@ namespace gdjs {
       cubeTexture.images[5] = this._getImageSource(zNegativeResourceName);
       // The images also need to be mirrored horizontally by users.
 
-      cubeTexture.magFilter = THREE.LinearFilter;
-      cubeTexture.minFilter = THREE.LinearFilter;
       cubeTexture.colorSpace = THREE.SRGBColorSpace;
-      cubeTexture.needsUpdate = true;
 
       const resource = this._getImageResource(xPositiveResourceName);
       applyThreeTextureSettings(cubeTexture, resource);
+      cubeTexture.needsUpdate = true;
       this._loadedThreeCubeTextures.set(key, cubeTexture);
       this._loadedThreeCubeTextureKeysByResourceName.add(
         xPositiveResourceName,

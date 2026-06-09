@@ -101,6 +101,8 @@ const Cube3DEditor = ({
   const backFaceUpThroughWhichAxisRotationChoices = properties
     .get('backFaceUpThroughWhichAxisRotation')
     .getChoices();
+  const originLocationChoices = properties.get('originLocation').getChoices();
+  const centerLocationChoices = properties.get('centerLocation').getChoices();
 
   return (
     <ColumnStackLayout noMargin>
@@ -142,6 +144,41 @@ const Cube3DEditor = ({
             </Column>
           );
         })}
+      </ResponsiveLineStackLayout>
+      <Text size="block-title" noMargin>
+        <Trans>Points</Trans>
+      </Text>
+      <ResponsiveLineStackLayout expand noColumnMargin noResponsiveLandscape>
+        <SelectField
+          value={properties.get('originLocation').getValue()}
+          floatingLabelText={properties.get('originLocation').getLabel()}
+          onChange={(event, index, newValue) => {
+            onChangeProperty('originLocation', newValue);
+          }}
+        >
+          {mapVector(originLocationChoices, choice => (
+            <SelectOption
+              label={choice.getLabel()}
+              value={choice.getValue()}
+              key={choice.getValue()}
+            />
+          ))}
+        </SelectField>
+        <SelectField
+          value={properties.get('centerLocation').getValue()}
+          floatingLabelText={properties.get('centerLocation').getLabel()}
+          onChange={(event, index, newValue) => {
+            onChangeProperty('centerLocation', newValue);
+          }}
+        >
+          {mapVector(centerLocationChoices, choice => (
+            <SelectOption
+              label={choice.getLabel()}
+              value={choice.getValue()}
+              key={choice.getValue()}
+            />
+          ))}
+        </SelectField>
       </ResponsiveLineStackLayout>
       <Text size="block-title" noMargin>
         <Trans>Settings</Trans>

@@ -82,8 +82,10 @@ namespace gdjs {
           getFaceMaterial(runtimeObject, materialIndexToFaceIndex[index])
         );
       const boxMesh = new THREE.Mesh(geometry, materials);
+      const group = new THREE.Group();
+      group.add(boxMesh);
 
-      super(runtimeObject, instanceContainer, boxMesh);
+      super(runtimeObject, instanceContainer, group);
       this._boxMesh = boxMesh;
       this._cube3DRuntimeObject = runtimeObject;
 
@@ -93,6 +95,31 @@ namespace gdjs {
       this.updatePosition();
       this.updateRotation();
       this.updateTint();
+    }
+
+    private _updateBoxMeshPosition(): void {
+      const centerPoint = this._cube3DRuntimeObject._centerPoint;
+      this._boxMesh.position.set(
+        0.5 - centerPoint[0],
+        0.5 - centerPoint[1],
+        0.5 - centerPoint[2]
+      );
+    }
+
+    override updatePosition(): void {
+      const object = this._cube3DRuntimeObject;
+      const originPoint = object._originPoint;
+      const centerPoint = object._centerPoint;
+      this.get3DRendererObject().position.set(
+        object.getX() - object.getWidth() * (originPoint[0] - centerPoint[0]),
+        object.getY() - object.getHeight() * (originPoint[1] - centerPoint[1]),
+        object.getZ() - object.getDepth() * (originPoint[2] - centerPoint[2])
+      );
+    }
+
+    updateOriginAndCenter(): void {
+      this._updateBoxMeshPosition();
+      this.updatePosition();
     }
 
     updateTint() {
@@ -138,6 +165,7 @@ namespace gdjs {
 
     updateSize(): void {
       super.updateSize();
+      this._updateBoxMeshPosition();
       this.updateTextureUvMapping();
     }
 
@@ -155,6 +183,7 @@ namespace gdjs {
       // @ts-ignore - uv is stored as a Float32BufferAttribute
       const uvMapping: THREE.BufferAttribute =
         this._boxMesh.geometry.getAttribute('uv');
+      const scale = this.get3DRendererObject().scale;
       const startIndex =
         faceIndex === undefined ? 0 : faceIndexToMaterialIndex[faceIndex] * 4;
       const endIndex =
@@ -192,17 +221,17 @@ namespace gdjs {
             if (shouldRepeatTexture) {
               if (shouldOrientateFacesTowardsY) {
                 x =
-                  -(this._boxMesh.scale.z / material.map.source.data.width) *
+                  -(scale.z / material.map.source.data.width) *
                   (pos.getZ(vertexIndex) - 0.5);
                 y =
-                  -(this._boxMesh.scale.y / material.map.source.data.height) *
+                  -(scale.y / material.map.source.data.height) *
                   (pos.getY(vertexIndex) + 0.5);
               } else {
                 x =
-                  -(this._boxMesh.scale.y / material.map.source.data.width) *
+                  -(scale.y / material.map.source.data.width) *
                   (pos.getY(vertexIndex) - 0.5);
                 y =
-                  (this._boxMesh.scale.z / material.map.source.data.height) *
+                  (scale.z / material.map.source.data.height) *
                   (pos.getZ(vertexIndex) - 0.5);
               }
             } else {
@@ -221,17 +250,17 @@ namespace gdjs {
             if (shouldRepeatTexture) {
               if (shouldOrientateFacesTowardsY) {
                 x =
-                  (this._boxMesh.scale.z / material.map.source.data.width) *
+                  (scale.z / material.map.source.data.width) *
                   (pos.getZ(vertexIndex) + 0.5);
                 y =
-                  -(this._boxMesh.scale.y / material.map.source.data.height) *
+                  -(scale.y / material.map.source.data.height) *
                   (pos.getY(vertexIndex) + 0.5);
               } else {
                 x =
-                  (this._boxMesh.scale.y / material.map.source.data.width) *
+                  (scale.y / material.map.source.data.width) *
                   (pos.getY(vertexIndex) + 0.5);
                 y =
-                  (this._boxMesh.scale.z / material.map.source.data.height) *
+                  (scale.z / material.map.source.data.height) *
                   (pos.getZ(vertexIndex) - 0.5);
               }
             } else {
@@ -251,10 +280,10 @@ namespace gdjs {
             // Bottom face
             if (shouldRepeatTexture) {
               x =
-                (this._boxMesh.scale.x / material.map.source.data.width) *
+                (scale.x / material.map.source.data.width) *
                 (pos.getX(vertexIndex) + 0.5);
               y =
-                (this._boxMesh.scale.z / material.map.source.data.height) *
+                (scale.z / material.map.source.data.height) *
                 (pos.getZ(vertexIndex) - 0.5);
             } else {
               [x, y] = noRepeatTextureVertexIndexToUvMapping[vertexIndex % 4];
@@ -265,17 +294,17 @@ namespace gdjs {
             if (shouldRepeatTexture) {
               if (shouldOrientateFacesTowardsY) {
                 x =
-                  (this._boxMesh.scale.x / material.map.source.data.width) *
+                  (scale.x / material.map.source.data.width) *
                   (pos.getX(vertexIndex) + 0.5);
                 y =
-                  -(this._boxMesh.scale.z / material.map.source.data.height) *
+                  -(scale.z / material.map.source.data.height) *
                   (pos.getZ(vertexIndex) + 0.5);
               } else {
                 x =
-                  -(this._boxMesh.scale.x / material.map.source.data.width) *
+                  -(scale.x / material.map.source.data.width) *
                   (pos.getX(vertexIndex) - 0.5);
                 y =
-                  (this._boxMesh.scale.z / material.map.source.data.height) *
+                  (scale.z / material.map.source.data.height) *
                   (pos.getZ(vertexIndex) - 0.5);
               }
             } else {
@@ -290,10 +319,10 @@ namespace gdjs {
             // Front face
             if (shouldRepeatTexture) {
               x =
-                (this._boxMesh.scale.x / material.map.source.data.width) *
+                (scale.x / material.map.source.data.width) *
                 (pos.getX(vertexIndex) + 0.5);
               y =
-                -(this._boxMesh.scale.y / material.map.source.data.height) *
+                -(scale.y / material.map.source.data.height) *
                 (pos.getY(vertexIndex) + 0.5);
             } else {
               [x, y] = noRepeatTextureVertexIndexToUvMapping[vertexIndex % 4];
@@ -308,12 +337,12 @@ namespace gdjs {
             if (shouldRepeatTexture) {
               x =
                 (shouldBackFaceBeUpThroughXAxisRotation ? 1 : -1) *
-                (this._boxMesh.scale.x / material.map.source.data.width) *
+                (scale.x / material.map.source.data.width) *
                 (pos.getX(vertexIndex) +
                   (shouldBackFaceBeUpThroughXAxisRotation ? 1 : -1) * 0.5);
               y =
                 (shouldBackFaceBeUpThroughXAxisRotation ? 1 : -1) *
-                (this._boxMesh.scale.y / material.map.source.data.height) *
+                (scale.y / material.map.source.data.height) *
                 (pos.getY(vertexIndex) +
                   (shouldBackFaceBeUpThroughXAxisRotation ? -1 : 1) * 0.5);
             } else {

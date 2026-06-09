@@ -239,6 +239,11 @@ const applyThreeTextureSettings = (
   if (!imageResource.isSmooth()) {
     threeTexture.magFilter = THREE.NearestFilter;
     threeTexture.minFilter = THREE.NearestFilter;
+    threeTexture.generateMipmaps = false;
+  } else {
+    threeTexture.magFilter = THREE.LinearFilter;
+    threeTexture.minFilter = THREE.LinearMipmapLinearFilter;
+    threeTexture.generateMipmaps = true;
   }
 };
 
@@ -844,15 +849,13 @@ export default class PixiResourcesLoader {
     }
 
     const threeTexture = new THREE.Texture(image);
-    threeTexture.magFilter = THREE.LinearFilter;
-    threeTexture.minFilter = THREE.LinearFilter;
     threeTexture.wrapS = THREE.RepeatWrapping;
     threeTexture.wrapT = THREE.RepeatWrapping;
     threeTexture.colorSpace = THREE.SRGBColorSpace;
-    threeTexture.needsUpdate = true;
 
     const resource = project.getResourcesManager().getResource(resourceName);
     applyThreeTextureSettings(resource, threeTexture);
+    threeTexture.needsUpdate = true;
 
     return (loadedOrLoadingThreeTextures[resourceName] = Promise.resolve(
       threeTexture

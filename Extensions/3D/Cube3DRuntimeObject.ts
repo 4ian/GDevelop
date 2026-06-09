@@ -22,6 +22,18 @@ namespace gdjs {
       topFaceResourceRepeat: boolean | undefined;
       bottomFaceResourceRepeat: boolean | undefined;
       tileScale: number | undefined;
+      originLocation:
+        | 'TopLeft'
+        | 'ObjectCenter'
+        | 'BottomCenterZ'
+        | 'BottomCenterY'
+        | undefined;
+      centerLocation:
+        | 'TopLeft'
+        | 'ObjectCenter'
+        | 'BottomCenterZ'
+        | 'BottomCenterY'
+        | undefined;
       frontFaceVisible: boolean;
       backFaceVisible: boolean;
       leftFaceVisible: boolean;
@@ -47,6 +59,8 @@ namespace gdjs {
   type Cube3DObjectNetworkSyncDataType = {
     fo: 'Y' | 'Z';
     bfu: 'X' | 'Y';
+    op: Cube3DLocationPoint;
+    cp: Cube3DLocationPoint;
     vfb: integer;
     trfb: integer;
     ts: number;
@@ -57,6 +71,22 @@ namespace gdjs {
 
   type Cube3DObjectNetworkSyncData = Object3DNetworkSyncData &
     Cube3DObjectNetworkSyncDataType;
+
+  type Cube3DLocationPoint = [float, float, float];
+
+  const getPointForLocation = (location: string): Cube3DLocationPoint => {
+    switch (location) {
+      case 'ObjectCenter':
+        return [0.5, 0.5, 0.5];
+      case 'BottomCenterZ':
+        return [0.5, 0.5, 0];
+      case 'BottomCenterY':
+        return [0.5, 1, 0.5];
+      case 'TopLeft':
+      default:
+        return [0, 0, 0];
+    }
+  };
 
   /**
    * Shows a 3D box object.
@@ -71,6 +101,8 @@ namespace gdjs {
     private _visibleFacesBitmask: integer;
     private _textureRepeatFacesBitmask: integer;
     private _tileScale: number;
+    _originPoint: Cube3DLocationPoint;
+    _centerPoint: Cube3DLocationPoint;
     private _faceResourceNames: [
       string,
       string,
@@ -124,6 +156,12 @@ namespace gdjs {
       this._tileScale = objectData.content.tileScale || 1;
       this._backFaceUpThroughWhichAxisRotation =
         objectData.content.backFaceUpThroughWhichAxisRotation || 'X';
+      this._originPoint = getPointForLocation(
+        objectData.content.originLocation || 'TopLeft'
+      );
+      this._centerPoint = getPointForLocation(
+        objectData.content.centerLocation || 'ObjectCenter'
+      );
       this._faceResourceNames = [
         objectData.content.frontFaceResourceName,
         objectData.content.backFaceResourceName,
@@ -460,6 +498,24 @@ namespace gdjs {
         this.setTileScale(newObjectData.content.tileScale || 1);
       }
       if (
+        oldObjectData.content.originLocation !==
+        newObjectData.content.originLocation
+      ) {
+        this._originPoint = getPointForLocation(
+          newObjectData.content.originLocation || 'TopLeft'
+        );
+        this._renderer.updateOriginAndCenter();
+      }
+      if (
+        oldObjectData.content.centerLocation !==
+        newObjectData.content.centerLocation
+      ) {
+        this._centerPoint = getPointForLocation(
+          newObjectData.content.centerLocation || 'ObjectCenter'
+        );
+        this._renderer.updateOriginAndCenter();
+      }
+      if (
         oldObjectData.content.materialType !==
         newObjectData.content.materialType
       ) {
@@ -489,6 +545,8 @@ namespace gdjs {
         mt: this._materialType,
         fo: this._facesOrientation,
         bfu: this._backFaceUpThroughWhichAxisRotation,
+        op: this._originPoint,
+        cp: this._centerPoint,
         vfb: this._visibleFacesBitmask,
         trfb: this._textureRepeatFacesBitmask,
         ts: this._tileScale,
@@ -515,6 +573,14 @@ namespace gdjs {
         if (this._backFaceUpThroughWhichAxisRotation !== networkSyncData.bfu) {
           this.setBackFaceUpThroughWhichAxisRotation(networkSyncData.bfu);
         }
+      }
+      if (networkSyncData.op !== undefined) {
+        this._originPoint = networkSyncData.op;
+        this._renderer.updateOriginAndCenter();
+      }
+      if (networkSyncData.cp !== undefined) {
+        this._centerPoint = networkSyncData.cp;
+        this._renderer.updateOriginAndCenter();
       }
       if (networkSyncData.vfb !== undefined) {
         // If it is different, update all the faces.
@@ -592,6 +658,30 @@ namespace gdjs {
     updateShadowReceiving(value: boolean) {
       this._isReceivingShadow = value;
       this._renderer.updateShadowReceiving();
+    }
+
+    getCenterX(): float {
+      return this.getWidth() * this._centerPoint[0];
+    }
+
+    getCenterY(): float {
+      return this.getHeight() * this._centerPoint[1];
+    }
+
+    getCenterZ(): float {
+      return this.getDepth() * this._centerPoint[2];
+    }
+
+    getDrawableX(): float {
+      return this.getX() - this.getWidth() * this._originPoint[0];
+    }
+
+    getDrawableY(): float {
+      return this.getY() - this.getHeight() * this._originPoint[1];
+    }
+
+    getDrawableZ(): float {
+      return this.getZ() - this.getDepth() * this._originPoint[2];
     }
   }
 

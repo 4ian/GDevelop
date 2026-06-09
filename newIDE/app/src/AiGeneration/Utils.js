@@ -145,7 +145,9 @@ const renderFunctionCallLabel = ({
     editorFunctions[functionCall.name] ||
     editorFunctionsWithoutProject[functionCall.name] ||
     null;
-  if (!editorFunction) return functionCall.name;
+  if (!editorFunction || !editorFunction.renderForEditor) {
+    return functionCall.name;
+  }
   try {
     const result = editorFunction.renderForEditor({
       project,

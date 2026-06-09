@@ -133,6 +133,10 @@ const EditorFunctionCallRow = ({
         The AI tried to use a function of the editor that is unknown.
       </Trans>
     );
+  } else if (!editorFunction.renderForEditor) {
+    // Functions with no renderForEditor (e.g. handled on the backend) render
+    // nothing.
+    return null;
   } else {
     try {
       const result = editorFunction.renderForEditor({
@@ -329,7 +333,7 @@ const SubAgentFunctionCallRow = ({
     editorFunctionsWithoutProject[functionCall.name] ||
     null;
   let text;
-  if (!editorFunction) {
+  if (!editorFunction || !editorFunction.renderForEditor) {
     text = functionCall.name;
   } else {
     try {

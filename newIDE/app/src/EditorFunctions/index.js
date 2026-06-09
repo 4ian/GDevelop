@@ -309,7 +309,10 @@ export type LaunchFunctionOptionsWithProject = {|
  * A function that does something in the editor on the given project.
  */
 export type EditorFunction = {|
-  renderForEditor: (
+  // Optional: a function with no renderForEditor renders nothing in the chat
+  // (e.g. backend-only tools, or the plan shown separately). Such calls are
+  // skipped in ChatMessages so they don't create an empty bubble.
+  renderForEditor?: (
     options: RenderForEditorOptions
   ) => {|
     text: React.Node,
@@ -327,7 +330,10 @@ export type EditorFunction = {|
  * A function that does something in the editor.
  */
 export type EditorFunctionWithoutProject = {|
-  renderForEditor: (
+  // Optional: a function with no renderForEditor renders nothing in the chat
+  // (e.g. backend-only tools, or the plan shown separately). Such calls are
+  // skipped in ChatMessages so they don't create an empty bubble.
+  renderForEditor?: (
     options: RenderForEditorOptions
   ) => {|
     text: React.Node,
@@ -5281,11 +5287,8 @@ const addOrEditVariable: EditorFunction = {
 };
 
 const createOrUpdatePlan: EditorFunction = {
-  renderForEditor: ({ args }) => {
-    return {
-      text: <Trans>Update the plan.</Trans>,
-    };
-  },
+  // No renderForEditor: handled server-side and shown separately via the
+  // OrchestratorPlan component, so nothing to render as a function call.
   launchFunction: async ({ args }) => {
     return makeGenericFailure(
       `Unable to create or update plan - this is handled server-side.`
@@ -5322,6 +5325,17 @@ const searchDocs: EditorFunction = {
   launchFunction: async ({ args }) => {
     return makeGenericFailure(
       `Unable to read full documentation - continue with your existing GDevelop knowledge.`
+    );
+  },
+  modifiesProject: false,
+};
+
+const getGameStarterSummary: EditorFunctionWithoutProject = {
+  // No renderForEditor: handled entirely on the backend to inform planning,
+  // nothing to show to the user.
+  launchFunction: async () => {
+    return makeGenericFailure(
+      'get_game_starter_summary is handled on the backend.'
     );
   },
   modifiesProject: false,
@@ -5528,4 +5542,5 @@ export const editorFunctionsWithoutProject: {
   [string]: EditorFunctionWithoutProject,
 } = {
   initialize_project: initializeProject,
+  get_game_starter_summary: getGameStarterSummary,
 };

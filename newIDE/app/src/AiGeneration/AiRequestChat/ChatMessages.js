@@ -395,9 +395,20 @@ export const ChatMessages: React.ComponentType<Props> = React.memo<Props>(
                     )) ||
                   null;
 
-                // Don't display create_or_update_plan calls — the plan is shown
-                // separately via the OrchestratorPlan component.
-                if (messageContent.name === 'create_or_update_plan') {
+                // Don't display function calls that render nothing for the user
+                // (no renderForEditor): the plan is shown separately, and
+                // backend-only tools like get_game_starter_summary have nothing
+                // to show. Skipping them here avoids an empty chat bubble.
+                const editorFunctionForDisplay =
+                  // $FlowFixMe[incompatible-type]
+                  editorFunctions[messageContent.name] ||
+                  // $FlowFixMe[incompatible-type]
+                  editorFunctionsWithoutProject[messageContent.name] ||
+                  null;
+                if (
+                  editorFunctionForDisplay &&
+                  !editorFunctionForDisplay.renderForEditor
+                ) {
                   return;
                 }
 
@@ -587,7 +598,7 @@ export const ChatMessages: React.ComponentType<Props> = React.memo<Props>(
               // $FlowFixMe[incompatible-type]
               editorFunctionsWithoutProject[messageContent.name] ||
               null;
-            if (!editorFunction) continue;
+            if (!editorFunction || !editorFunction.renderForEditor) continue;
             try {
               const result = editorFunction.renderForEditor({
                 project,

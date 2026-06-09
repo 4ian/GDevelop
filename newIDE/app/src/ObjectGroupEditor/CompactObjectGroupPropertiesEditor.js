@@ -1,5 +1,4 @@
 // @flow
-import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import VariablesList, {
@@ -201,13 +200,11 @@ type Props = {|
   eventsFunctionsExtension: gdEventsFunctionsExtension | null,
   /** Only set when a default variant is edited */
   eventsBasedObject: gdEventsBasedObject | null,
-  onUpdateBehaviorsSharedData: () => void,
   objectsContainer: gdObjectsContainer,
   globalObjectsContainer: gdObjectsContainer | null,
   initialInstances: gdInitialInstancesContainer,
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   unsavedChanges?: ?UnsavedChanges,
-  i18n: I18nType,
   historyHandler?: HistoryHandler,
 
   objectGroup: gdObjectGroup,
@@ -224,13 +221,11 @@ export const CompactObjectGroupPropertiesEditor = ({
   resourceManagementProps,
   eventsFunctionsExtension,
   eventsBasedObject,
-  onUpdateBehaviorsSharedData,
   objectsContainer,
   globalObjectsContainer,
   initialInstances,
   projectScopedContainersAccessor,
   unsavedChanges,
-  i18n,
   historyHandler,
   objectGroup,
   isObjectListLocked,

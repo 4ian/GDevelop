@@ -257,7 +257,6 @@ export const InstanceOrObjectPropertiesEditorContainer: React.ComponentType<{
             resourceManagementProps={resourceManagementProps}
             eventsFunctionsExtension={eventsFunctionsExtension}
             eventsBasedObject={eventsBasedObject}
-            onUpdateBehaviorsSharedData={onUpdateBehaviorsSharedData}
             objectsContainer={objectsContainer}
             globalObjectsContainer={globalObjectsContainer}
             initialInstances={initialInstances}

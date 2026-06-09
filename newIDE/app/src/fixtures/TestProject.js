@@ -25,6 +25,7 @@ export type TestProject = {|
   group1: gdObjectGroup,
   group2: gdObjectGroup,
   group4WithLongsNames: gdObjectGroup,
+  emptyGroup: gdObjectGroup,
   testLayoutInstance1: gdInitialInstance,
   testLayoutInstance2: gdInitialInstance,
   testLayoutInstance3: gdInitialInstance,
@@ -374,6 +375,9 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     'MySpriteObject_With_A_Veeeerrryyyyyyyyy_Looooooooooooong_Name'
   );
   group4WithLongsNames.addObject('MySpriteObjectWithoutBehaviors');
+  const emptyGroup = new gd.ObjectGroup();
+  emptyGroup.setName('EmptyGroup');
+
   testLayout
     .getObjects()
     .getObjectGroups()
@@ -390,6 +394,10 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     .getObjects()
     .getObjectGroups()
     .insert(group4WithLongsNames, 3);
+  testLayout
+    .getObjects()
+    .getObjectGroups()
+    .insert(emptyGroup, 4);
 
   const testLayoutInstance1 = testLayout
     .getInitialInstances()
@@ -988,6 +996,7 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     group1,
     group2,
     group4WithLongsNames,
+    emptyGroup,
     testLayoutInstance1,
     testLayoutInstance2,
     testLayoutInstance3,

@@ -12,35 +12,33 @@ import type { EventPath } from '../Utils/EventPath';
 const gd: libGDevelop = global.gd;
 
 /**
- * Recursively searches for an event with the given aiGeneratedEventId in the events list.
- * Returns the path to the event as an array of indices, or null if not found.
+ * Recursively collects the paths of all events sharing the given aiGeneratedEventId.
+ * A whole generation batch shares one id, so an id can match several events.
  */
-const findEventPathByAiGeneratedEventId = (
+const findAllEventPathsByAiGeneratedEventId = (
   eventsList: gdEventsList,
   targetId: string,
-  currentPath: EventPath = []
-): EventPath | null => {
+  currentPath: EventPath = [],
+  foundPaths: Array<EventPath> = []
+): Array<EventPath> => {
   for (let i = 0; i < eventsList.getEventsCount(); i++) {
     const event = eventsList.getEventAt(i);
     const eventPath = [...currentPath, i];
 
     if (event.getAiGeneratedEventId() === targetId) {
-      return eventPath;
+      foundPaths.push(eventPath);
     }
 
     if (event.canHaveSubEvents()) {
-      const subEvents = event.getSubEvents();
-      const foundPath = findEventPathByAiGeneratedEventId(
-        subEvents,
+      findAllEventPathsByAiGeneratedEventId(
+        event.getSubEvents(),
         targetId,
-        eventPath
+        eventPath,
+        foundPaths
       );
-      if (foundPath) {
-        return foundPath;
-      }
     }
   }
-  return null;
+  return foundPaths;
 };
 
 /**
@@ -288,11 +286,23 @@ export const applyEventsChanges = (
           .map(t => t.trim())
           .filter(t => t.length > 0);
         for (const target of targets) {
-          let targetPath = findEventPathByAiGeneratedEventId(
+          let targetPath = null;
+          const matchingPaths = findAllEventPathsByAiGeneratedEventId(
             sceneEvents,
             target
           );
-          if (!targetPath) {
+          if (matchingPaths.length === 1) {
+            targetPath = matchingPaths[0];
+          } else if (matchingPaths.length > 1) {
+            // A whole generation batch shares one aiGeneratedEventId, so it can
+            // match several events. Refuse to guess instead of deleting the wrong one.
+            errors.push(
+              `aiGeneratedEventId "${target}" matches ${
+                matchingPaths.length
+              } events. Target a single event by its path (e.g. "event-7") instead. Skipping deletion of "${target}".`
+            );
+            continue;
+          } else {
             try {
               targetPath = parseEventPath(target);
             } catch (pathParseError) {
@@ -308,13 +318,24 @@ export const applyEventsChanges = (
       }
 
       if (operationTargetEvent) {
-        // First search for an event with the exact aiGeneratedEventId.
-        parsedPath = findEventPathByAiGeneratedEventId(
+        // First search for events with the exact aiGeneratedEventId.
+        const matchingPaths = findAllEventPathsByAiGeneratedEventId(
           sceneEvents,
           operationTargetEvent
         );
 
-        if (!parsedPath) {
+        if (matchingPaths.length === 1) {
+          parsedPath = matchingPaths[0];
+        } else if (matchingPaths.length > 1) {
+          // A whole generation batch shares one aiGeneratedEventId, so it can
+          // match several events. Refuse to guess instead of editing the wrong one.
+          errors.push(
+            `aiGeneratedEventId "${operationTargetEvent}" matches ${
+              matchingPaths.length
+            } events. Target a single event by its path (e.g. "event-7") instead. Skipping operation "${operationName}".`
+          );
+          return;
+        } else {
           // Then try to parse as a path string (e.g., "event-0.1.2" or "0.1.2")
           try {
             parsedPath = parseEventPath(operationTargetEvent);

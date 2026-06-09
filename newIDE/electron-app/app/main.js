@@ -304,9 +304,7 @@ function createNewWindow(windowArgs = args) {
       // Extract the theme background color passed via the features string
       // by WindowPortal (e.g. "...,themeBackgroundColor=%23282828").
       let backgroundColor = '#000';
-      const match = details.features.match(
-        /themeBackgroundColor=([^,]*)/
-      );
+      const match = details.features.match(/themeBackgroundColor=([^,]*)/);
       if (match) {
         try {
           backgroundColor = decodeURIComponent(match[1]);
@@ -347,8 +345,15 @@ function createNewWindow(windowArgs = args) {
   newWindow.webContents.on('did-create-window', (childWindow, details) => {
     require('@electron/remote/main').enable(childWindow.webContents);
 
-    if (!details.frameName || !details.frameName.startsWith('GDevelopWindowPortal')) {
-      console.warn(`Unexpected frameName for child window: ${details.frameName} - verify handling on Electron side.`);
+    if (
+      !details.frameName ||
+      !details.frameName.startsWith('GDevelopWindowPortal')
+    ) {
+      console.warn(
+        `Unexpected frameName for child window: ${
+          details.frameName
+        } - verify handling on Electron side.`
+      );
     }
 
     // Track child window by frameName so the renderer can look up its
@@ -457,22 +462,17 @@ app.on('ready', function() {
     return closeAllPreviewWindows();
   });
 
-  // Resume V8 that has been paused on a `debugger;` statement emitted by
-  // the breakpoints codegen. `windowId` is the BrowserWindow id of the
-  // preview that is currently paused.
   ipcMain.handle('preview-debugger-resume', async (event, { windowId }) => {
     return resumePreviewDebugger(windowId);
   });
 
-  // Write stepping state into the paused runtime via CDP Runtime.evaluate,
-  // then resume V8 so the next `__checkBreakpoint` trips on the target event.
-  ipcMain.handle('preview-debugger-step', async (event, { windowId, payload }) => {
-    return stepPreviewDebugger(windowId, payload);
-  });
+  ipcMain.handle(
+    'preview-debugger-step',
+    async (event, { windowId, payload }) => {
+      return stepPreviewDebugger(windowId, payload);
+    }
+  );
 
-  // Push the full session breakpoint payload into the runtime via CDP.
-  // `Runtime.evaluate` applies atomically and works even while V8 is paused
-  // on a `debugger;` statement.
   ipcMain.handle(
     'preview-debugger-set-breakpoints',
     async (event, { windowId, breakpoints }) => {
@@ -480,9 +480,6 @@ app.on('ready', function() {
     }
   );
 
-  // Schedule "pause at next event" in a *running* preview (F10 while not
-  // paused). Writes the stepping FSM via CDP Runtime.evaluate; no
-  // Debugger.resume is issued because V8 is not paused.
   ipcMain.handle(
     'preview-debugger-schedule-pause',
     async (event, { windowId }) => {

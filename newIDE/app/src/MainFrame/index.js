@@ -2920,9 +2920,8 @@ const MainFrame = (props: Props): React.MixedElement => {
   const previewPausedRef = React.useRef<boolean>(false);
   const lastHitEventIndexRef = React.useRef<number>(-1);
   const lastHitFunctionIdRef = React.useRef<string>('');
-  // Kept in sync with `state.editorTabs` so the breakpoint-hit handler can
-  // focus an already-open extension editor without re-subscribing to the
-  // debugger whenever tabs change.
+  // Ref so the breakpoint-hit handler sees the current tabs without needing
+  // to re-subscribe every time tabs change.
   const editorTabsRef = React.useRef(state.editorTabs);
   React.useEffect(
     () => {
@@ -2931,10 +2930,8 @@ const MainFrame = (props: Props): React.MixedElement => {
     [state.editorTabs]
   );
 
-  // Focus an extension editor on a specific function (free, behavior, or
-  // object method). If the tab is already open, we cannot rely on
-  // `initiallyFocused*` props (they are only consumed on mount), so we
-  // call `selectEventsFunctionByName` on the live editor ref directly.
+  // Open / focus an extension function editor. When the tab is already open,
+  // drives it via the live ref since `initiallyFocused*` props are mount-only.
   const focusOnExtensionFunction = React.useCallback(
     (
       extensionName: string,
@@ -2978,9 +2975,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     [currentProject, setState, openEventsFunctionsExtension]
   );
 
-  // Navigate to the events tab when a breakpoint is hit; track paused
-  // state. Pause / step is CDP-driven — see `ElectronCDPBridge.js` and
-  // `PreviewWindow.js`.
+  // Navigate to the events tab on a breakpoint hit and track paused state.
   type BreakpointHitHandler = (
     functionId: string,
     eventIndex: number,
@@ -2998,10 +2993,8 @@ const MainFrame = (props: Props): React.MixedElement => {
         lastHitEventIndexRef.current = eventIndex;
         lastHitFunctionIdRef.current = functionId;
 
-        // If the hit is inside a local extension function, open its editor.
-        // We try free functions first, then methods of custom objects.
-        // Behavior methods are compiled with `compilationForRuntime: true`
-        // so they never emit breakpoint checks — we don't look for them.
+        // If the hit is inside an extension function, open its editor.
+        // Behavior methods use compilationForRuntime=true and are never matched.
         if (functionId.startsWith('gdjs.evtsExt__') && currentProject) {
           try {
             const count = currentProject.getEventsFunctionsExtensionsCount();
@@ -3075,12 +3068,8 @@ const MainFrame = (props: Props): React.MixedElement => {
       handleBreakpointHitRef.current = handleBreakpointHit;
 
       if (!previewDebuggerServer) return;
-      // `previewPausedRef` is driven authoritatively by
-      // `onPreviewDebuggerPauseChange`. The preview server connection
-      // lifecycle is used here only as a safety net: when the preview
-      // window closes, CDP detach does not emit a synthetic
-      // `Debugger.resumed`, so the refs would otherwise stay set to the
-      // last pause snapshot.
+      // Safety net: CDP detach doesn't emit a synthetic `Debugger.resumed`,
+      // so reset the refs when the preview connection closes.
       const resetPauseRefs = () => {
         previewPausedRef.current = false;
         lastHitEventIndexRef.current = -1;
@@ -3105,9 +3094,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     ]
   );
 
-  // CDP pause / resume forwarded from Electron main — fires reliably
-  // even while V8 is frozen on a `debugger;` statement and carries the
-  // current breakpoint snapshot for UI navigation.
+  // CDP pause / resume events forwarded from Electron main.
   React.useEffect(() => {
     const unregister = onPreviewDebuggerPauseChange((isPaused, payload) => {
       const breakpoint = payload && payload.breakpoint;
@@ -3132,11 +3119,8 @@ const MainFrame = (props: Props): React.MixedElement => {
     return unregister;
   }, []);
 
-  // Breakpoints, Pause / Next Event all require V8 to truly freeze on
-  // `debugger;` — that is only possible when Electron's main process is
-  // attached via CDP. In web / remote previews we surface a one-shot
-  // notification instead (suggested by the user: "notify that the feature
-  // isn't supported and ask to use local preview").
+  // Pause / step require CDP (local Electron preview only). Show a
+  // notification in web / remote previews.
   const notifyBreakpointsUnsupported = React.useCallback(
     () => {
       showAlert({
@@ -3158,9 +3142,7 @@ const MainFrame = (props: Props): React.MixedElement => {
         resumePausedPreview();
         previewPausedRef.current = false;
       } else {
-        // Scheduling "pause at next event" via CDP Runtime.evaluate. The
-        // preview is running, so V8 processes the write immediately and the
-        // actual pause happens inside the next `__checkBreakpoint` call.
+        // Preview is running; the actual pause fires in the next __checkBreakpoint.
         schedulePauseAtNextEvent();
       }
     },

@@ -1102,11 +1102,8 @@ gd::String EventsCodeGenerator::GenerateEventsListCode(
     if (event.IsDisabled() || !event.IsExecutable())
       continue;
 
-    // Synthetic AsyncEvent wrappers are invisible to the user (inserted by
-    // PreprocessAsyncActions), so skip emitting a breakpoint check for them.
-    // This keeps flat event indices aligned with the IDE's simple DFS walk
-    // over the user-authored events tree, and prevents stepping from pausing
-    // on an event with no counterpart in the editor.
+    // Synthetic AsyncEvent wrappers (inserted by PreprocessAsyncActions) are
+    // not user-visible; skip so flat indices stay aligned with the IDE's DFS walk.
     gd::String breakpointCode;
     if (event.GetType() != "BuiltinAsync::Async") {
       size_t breakpointIndex = GetNextBreakpointEventIndex();

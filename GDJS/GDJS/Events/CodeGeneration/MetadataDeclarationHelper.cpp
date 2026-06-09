@@ -1610,12 +1610,6 @@ gd::String MetadataDeclarationHelper::GetObjectFunctionCodeNamespace(
          EventsCodeNameMangler::GetMangledName(eventsBasedObject.GetName());
 }
 
-/**
- * Build the fully qualified context namespace used as `functionId` at runtime
- * for a method of an events-based object. Must stay in sync with the layout
- * produced in ObjectCodeGenerator (`<objectCodeNamespace>.<objectName>.`
- * `prototype.<mangledFunctionName>Context`).
- */
 gd::String
 MetadataDeclarationHelper::GetObjectEventsFunctionFullyQualifiedContextName(
     const gd::EventsBasedObject &eventsBasedObject,

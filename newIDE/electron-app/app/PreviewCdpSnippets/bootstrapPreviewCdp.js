@@ -5,23 +5,13 @@
  */
 
 /**
- * Runs inside the preview window's V8 before generated event code executes.
- * It does three things:
- *   1. Sets `window.__gdjsInitialBreakpoints` so RuntimeGame's constructor
- *      can consume them synchronously via `_consumeInitialBreakpoints` —
- *      the only path that guarantees frame-0 events honour a breakpoint.
- *   2. Polls the `gdjs` namespace and sets `gdjs.__cdpAttached = true` so
- *      the breakpoints codegen switches to the `debugger;` branch.
- *   3. Late-path fallback: if the constructor ran before this script (e.g.
- *      `Page.addScriptToEvaluateOnNewDocument` lost the timing race and the
- *      script is instead delivered via `Runtime.evaluate` on
- *      `Runtime.executionContextCreated`), writes the payload directly into
- *      `gdjs.game._debugState.breakpointIndices`.
+ * Sets `gdjs.__cdpAttached`, seeds initial breakpoints into `_debugState`,
+ * and handles the timing race between `addScriptToEvaluateOnNewDocument`
+ * and `Runtime.executionContextCreated` delivery.
  *
- * This function is stringified (`.toString()`) and evaluated in the preview
- * renderer. It MUST be self-contained: every identifier it uses is either a
- * parameter or a preview-side global (`window`, `gdjs`, `Map`, `Set`,
- * `setInterval`, `clearInterval`).
+ * MUST be self-contained: every identifier it uses is either a parameter or
+ * a preview-side global (`window`, `gdjs`, `Map`, `Set`, `setInterval`,
+ * `clearInterval`). Stringified via `.toString()` and sent over CDP.
  *
  * @param {Array<BreakpointEntry>} bps
  * @returns {void}
@@ -56,7 +46,7 @@ function bootstrapPreviewCdp(bps) {
   flagDone = setFlag();
   if (flagDone && !bpsDone) bpsDone = setBps();
   if (flagDone && bpsDone) return;
-  var intervalId = setInterval(function () {
+  var intervalId = setInterval(function() {
     if (!flagDone) flagDone = setFlag();
     if (flagDone && !bpsDone) bpsDone = setBps();
     if (flagDone && bpsDone) clearInterval(intervalId);

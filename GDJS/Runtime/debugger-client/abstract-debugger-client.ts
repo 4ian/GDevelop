@@ -687,12 +687,9 @@ namespace gdjs {
     sendRuntimeGameDump(): void {
       const that = this;
 
-      // Collect scene-level local variable stacks. Each generated scene code
-      // namespace (`gdjs.<mangled>Code`) holds a `localVariables` array that
-      // is pushed/popped as events enter and leave "Declare local" scopes.
-      // Extension function locals live on the per-call `eventsFunctionContext`
-      // and are not reachable from globals — the IDE tooltip falls back to
-      // the generic "variable" label for them.
+      // Each generated scene code namespace holds a `localVariables` stack for
+      // "Declare local" scopes. Extension function locals aren't reachable from
+      // globals and are omitted.
       const activeLocalVariables: { [key: string]: any[] } = {};
       for (const key in gdjs) {
         if (!Object.prototype.hasOwnProperty.call(gdjs, key)) continue;
@@ -759,8 +756,7 @@ namespace gdjs {
           ) {
             return '[Removed from the debugger]';
           }
-          // Map instances (e.g. _variablesByExtensionName) don't serialize
-          // to JSON. Convert them to plain objects for the debugger dump.
+          // Map instances don't serialize to JSON natively.
           if (value instanceof Map) {
             const obj: Record<string, any> = {};
             value.forEach((v, k) => {

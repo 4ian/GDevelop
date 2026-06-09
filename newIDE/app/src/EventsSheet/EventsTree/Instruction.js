@@ -259,11 +259,8 @@ const Instruction = (props: Props): React.Node => {
     );
     const parametersCount = metadata.getParametersCount();
 
-    // For each parameter, remember the most recent `object`-typed
-    // parameter value that precedes it in the same instruction. This is
-    // what `objectvar` tooltips need to resolve `<object>.<variable>`
-    // values at pause time — the `objectvar` parameter on its own only
-    // carries the variable path.
+    // Track the preceding object-typed parameter so `objectvar` tooltips
+    // can resolve the variable name (the parameter only carries the variable path).
     const lastObjectNamePerParameter: Array<?string> = new Array<?string>(
       parametersCount
     ).fill(null);

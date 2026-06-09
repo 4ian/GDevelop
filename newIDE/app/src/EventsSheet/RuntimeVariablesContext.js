@@ -16,17 +16,10 @@ export type RuntimeVariablesMap = {|
   scene: { [string]: RuntimeVariable },
   extensionGlobal: { [string]: { [string]: RuntimeVariable } },
   extensionScene: { [string]: { [string]: RuntimeVariable } },
-  // Scene-level local variables captured at pause time, grouped by the
-  // generated scene code namespace (e.g. `gdjs.<mangled>Code`). Each entry
-  // is the live push/pop stack of containers — lookup walks it top-down
-  // so inner scopes shadow outer ones, mirroring the runtime resolution
-  // order. Extension function locals aren't reachable from globals and
-  // are intentionally omitted (see `sendRuntimeGameDump`).
+  // Keyed by scene code namespace; stack walked top-down so inner scopes
+  // shadow outer ones. Extension function locals are omitted (unreachable from globals).
   localByCodeNamespace: { [string]: Array<{ [string]: RuntimeVariable }> },
-  // Object variables captured at pause time, keyed by object name.
-  // Only the *first* live instance of each object in the calling
-  // container is serialized — the tooltip is a quick-peek, not a full
-  // inspector (see `_buildBreakpointDumpJson` in runtimegame.ts).
+  // First live instance per object name in the calling container.
   object: { [string]: { [string]: RuntimeVariable } },
 |};
 
@@ -122,9 +115,6 @@ export const lookupVariable = (
   const rootName = parts[0];
 
   let variable: RuntimeVariable | null = null;
-  // For object scope the caller is expected to supply the object name
-  // (pulled from the preceding `object` parameter of the same
-  // instruction). The value only carries the variable path.
   let childPathStart = 1;
 
   if (scope === 'object' && objectName) {

@@ -35,13 +35,8 @@ namespace gdjs {
   };
 
   /**
-   * Free function (not a method) so the class carries no debug surface in
-   * non-preview builds. Exposes `gdjs.game` and `gdjs.__buildBreakpointDumpJson`
-   * for CDP `Runtime.evaluate` from Electron main, and seeds
-   * `_debugState.breakpointIndices` from breakpoints injected via
-   * `Page.addScriptToEvaluateOnNewDocument` before the first frame runs.
-   *
-   * Called from the RuntimeGame constructor, gated on `_isPreview`.
+   * Free function (not a method) so RuntimeGame carries no debug surface in
+   * non-preview builds. Called from the constructor, gated on `_isPreview`.
    */
   export const installBreakpointDebugSupport = (
     game: gdjs.RuntimeGame
@@ -78,9 +73,8 @@ namespace gdjs {
       const topScene: gdjs.RuntimeScene | null =
         sceneArray.length > 0 ? sceneArray[sceneArray.length - 1] : null;
 
-      // For custom-object methods the picked objects live in the custom
-      // object's `_instances`, not the scene's — hence the override set by
-      // `_triggerBreakpoint`. Falls back to the top scene for scene events.
+      // Custom-object methods use the sub-container; scene events use the
+      // top scene. The override is set by RuntimeInstanceContainer.__checkBreakpoint.
       const callingContainer:
         | gdjs.RuntimeInstanceContainer
         | gdjs.RuntimeScene
@@ -94,8 +88,7 @@ namespace gdjs {
           if (!Object.prototype.hasOwnProperty.call(items, objName)) continue;
           const list = items[objName];
           if (!list || list.length === 0) continue;
-          // Tooltip is a quick-peek; full multi-instance view lives in the
-          // Debugger panel.
+          // First instance only; use the Debugger panel for full inspection.
           const firstInstance = list[0];
           if (firstInstance) {
             objectVariablesByName[objName] = firstInstance.getVariables();

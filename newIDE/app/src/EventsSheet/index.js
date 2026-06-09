@@ -494,13 +494,8 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     this.resourceExternallyChangedCallbackId = registerOnResourceExternallyChangedCallback(
       this.onResourceExternallyChanged.bind(this)
     );
-    // Paused-UI state (red frame, variable tooltips, breakpoint row marker)
-    // is driven by CDP `preview-debugger-paused` / `-resumed` events
-    // forwarded from the Electron main process; these fire reliably even
-    // while V8 is frozen on a `debugger;` statement.
-    // When the preview window is closed, drop per-session ephemeral UI
-    // state: currently the dragged "Paused in debugger" toast position,
-    // so the next preview session starts from the default anchor.
+    // Reset per-session ephemeral UI (dragged toast position) when the
+    // preview window is closed.
     this._unregisterCdpClosedListener = onPreviewDebuggerClosed(() => {
       if (this.state.pausedToastPosition !== null) {
         this.setState({ pausedToastPosition: null });
@@ -536,9 +531,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
         }
       }
     );
-    // Push the full session breakpoint payload into the preview runtime now,
-    // in case a preview is already running when this sheet mounts. Goes
-    // through the CDP bridge, which is a no-op when no preview is attached.
+    // Sync breakpoints to the runtime in case a preview is already running.
     this._sendAllSessionBreakpointsToRuntime();
   }
   componentWillUnmount() {
@@ -1846,9 +1839,8 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     );
   };
 
-  // Drag state for the "Paused in debugger" Snackbar. Lives outside of React
-  // state to avoid re-rendering the whole EventsSheet on every mousemove
-  // frame; only the final position is committed via setState.
+  // Drag state stored outside React state to avoid re-rendering on every
+  // mousemove; the final position is committed via setState.
   _pausedToastDragState: ?{|
     startX: number,
     startY: number,
@@ -1878,8 +1870,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     if (!drag) return;
     const dx = event.clientX - drag.startX;
     const dy = event.clientY - drag.startY;
-    // Clamp to viewport so the toast can't be lost off-screen. Leaves a
-    // small margin so the drag area is always reachable with the cursor.
+    // Clamp so the toast stays reachable within the viewport.
     const MIN_VISIBLE_EDGE = 40;
     const x = Math.max(
       -1 * (window.innerWidth - MIN_VISIBLE_EDGE),
@@ -1899,10 +1890,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     this.setState({ isDraggingPausedToast: false });
   };
 
-  // Resume / step are only reachable from the paused-overlay buttons or
-  // the auto-step path for non-breakpointable events. Both assume V8 is
-  // paused on `debugger;`, which only ever happens in Electron preview
-  // with CDP attached — so these always route through the CDP bridge.
+  // Resume / step always route through CDP (only available in Electron local preview).
   _resumeExecution = () => {
     resumePausedPreview();
   };
@@ -1919,10 +1907,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     this._sendStepNextEvent(this.state.pausedOnEventIndex);
   };
 
-  // Push the full session payload to the runtime via CDP. `Runtime.evaluate`
-  // applies the latest state atomically and works even while V8 is paused
-  // on a `debugger;` statement. Initial breakpoints at preview launch are
-  // seeded separately via `Page.addScriptToEvaluateOnNewDocument`.
+  // Atomically replaces the runtime's breakpoint set via CDP (works while paused).
   _sendAllSessionBreakpointsToRuntime = () => {
     setPreviewBreakpointsViaCdp(buildAllBreakpointsPayload());
   };
@@ -1935,11 +1920,8 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   _scrollToEvent = (event: gdBaseEvent) => {
     if (!this._eventsTree) return;
     this._eventsTree.unfoldForEvent(event);
-    // The row map is populated during render, which hasn't flushed yet.
-    // Retry a few rAF ticks in case `forceUpdate` + virtualized-list commit
-    // haven't landed yet — otherwise `getEventRow` returns -1 and the
-    // scroll is silently dropped (e.g. when stepping into a freshly
-    // unfolded sub-event on a slow machine).
+    // The row map may not be populated yet after forceUpdate; retry until
+    // the virtualized list has flushed (otherwise getEventRow returns -1).
     const MAX_ATTEMPTS = 5;
     const tryScroll = (attempt: number) => {
       const eventsTree = this._eventsTree;
@@ -1965,9 +1947,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     });
   };
 
-  // Handle a breakpoint hit notification from the CDP `Debugger.paused`
-  // IPC listener: resolve the event path for the flat index carried by the
-  // payload, scroll to it, and mark the paused row.
+  // On a breakpoint hit: resolve the flat-index → path, scroll to the event, mark the row.
   _applyBreakpointHit = (hitFunctionId: string, eventIndex: number) => {
     if (hitFunctionId !== getFunctionIdFromScope(this.props.scope)) return;
 
@@ -1987,9 +1967,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
         pausedOnEventPath: path,
         pausedOnEventIndex: eventIndex,
         isPausedInDebugger: true,
-        // `pausedToastPosition` is intentionally preserved across pauses:
-        // once the user has dragged the toast, that position is kept for
-        // every subsequent breakpoint hit in this editor session.
+        // Toast position is preserved across pauses once the user has dragged it.
       },
       () => {
         if (this._eventsTree) this._eventsTree.forceEventsUpdate();
@@ -3434,10 +3412,8 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
         <Snackbar
           open={this.state.isPausedInDebugger}
           anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-          // When the user has dragged the toast, override MUI's default
-          // "stretch horizontally + center content" layout with an
-          // absolute left/top so the draggable anchor follows the cursor.
-          // `transform: none` cancels MUI's translateX(-50%).
+          // When dragged: override MUI's default centering with absolute
+          // positioning and cancel its translateX(-50%).
           style={
             this.state.pausedToastPosition
               ? {

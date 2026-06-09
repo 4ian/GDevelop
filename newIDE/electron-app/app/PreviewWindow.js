@@ -84,18 +84,11 @@ const buildBootstrapSource = initialBreakpoints =>
   );
 
 /**
- * Fire-and-forget: attaches CDP to the preview window and wires all event
- * handlers. The caller invokes `loadURL` immediately after — synchronous
- * `wc.debugger.attach('1.3')` already puts the inspector in place, so the
- * async commands that follow (Runtime.enable, Debugger.enable, addScript)
- * race with page parsing without blocking it. The bootstrap gets into the
- * page via *two* paths to cover both outcomes of that race:
- *   - `Page.addScriptToEvaluateOnNewDocument` if it lands first (future docs).
- *   - `Runtime.executionContextCreated` listener + `Runtime.evaluate` if the
- *     context is created before addScript registers (current doc fallback).
- * Must stay non-awaitable: `addScript` can hang silently (target state,
- * Electron debugger quirks), so awaiting it before `loadURL` risks a
- * black-screen deadlock.
+ * Fire-and-forget: attaches CDP and wires event handlers. Must NOT be
+ * awaited before `loadURL` — `addScriptToEvaluateOnNewDocument` can hang
+ * silently, and awaiting it would cause a black-screen deadlock. The bootstrap
+ * is delivered via both `addScript` and `Runtime.executionContextCreated` to
+ * cover the race between CDP setup and page parsing.
  *
  * @param {BrowserWindow} previewWindow
  * @param {number | null} parentWindowId
@@ -115,7 +108,11 @@ const attachCdpToPreview = (
     console.warn('[preview-cdp] attach failed for window', windowId, e);
     return;
   }
-  cdpSessions.set(windowId, { isAttached: true, isPaused: false, parentWindowId });
+  cdpSessions.set(windowId, {
+    isAttached: true,
+    isPaused: false,
+    parentWindowId,
+  });
 
   const bootstrapSource = buildBootstrapSource(initialBreakpoints);
 
@@ -123,28 +120,20 @@ const attachCdpToPreview = (
     const entry = cdpSessions.get(windowId);
     const wasPaused = !!(entry && entry.isPaused);
     cdpSessions.delete(windowId);
-    // CDP doesn't emit a synthetic `Debugger.resumed` on detach, so
-    // listeners that mirror pause state from CDP only would keep a stale
-    // "paused" flag after the preview closes. Forward a synthetic resume
-    // notification so the IDE can clear its paused UI.
+    // CDP doesn't emit `Debugger.resumed` on detach; send it synthetically
+    // so the IDE can clear its paused UI.
     if (wasPaused) {
       sendToParent(parentWindowId, 'preview-debugger-resumed', { windowId });
     }
-    // Always signal that the preview window lost its CDP session — the IDE
-    // uses this to reset per-session ephemeral UI state (e.g. the dragged
-    // "Paused in debugger" toast position). Independent of `wasPaused`
-    // because the user may have resumed manually before closing.
+    // Always notify the IDE so it can reset per-session ephemeral UI state.
     sendToParent(parentWindowId, 'preview-debugger-closed', { windowId });
   });
 
   wc.debugger.on('message', (_event, method, params) => {
     switch (method) {
       case 'Runtime.executionContextCreated': {
-        // Fresh context (initial navigation, hot reload, etc.) — re-inject
-        // the bootstrap so a breakpoint set before preview launch is
-        // applied in time for the first frame.
-        const contextId =
-          params && params.context && params.context.id;
+        // Fresh context (navigation, hot reload) — re-inject bootstrap.
+        const contextId = params && params.context && params.context.id;
         wc.debugger
           .sendCommand('Runtime.evaluate', {
             expression: bootstrapSource,
@@ -246,11 +235,9 @@ const sendCdpCommand = async (windowId, method, commandParams) => {
 };
 
 /**
- * Resolves the target preview window for a resume/step command. Prefers a
- * paused session when known, but falls back to any attached session — the
- * `Debugger.paused` event is the only source of truth for `isPaused` and
- * can be missed on races, so trying `Debugger.resume` on a running session
- * is safer than refusing to resume at all (Chromium returns an error which
+ * Resolves the target window for a resume/step command. Falls back to any
+ * attached session: `isPaused` can be missed on races, so trying
+ * `Debugger.resume` on a running session is safer (Chromium returns an error
  * we log and swallow).
  *
  * @param {number | null | undefined} explicitWindowId
@@ -452,9 +439,8 @@ const openPreviewWindow = ({
     // Enable `@electron/remote` module for renderer process
     require('@electron/remote/main').enable(previewWindow.webContents);
 
-    // Order matters: `attachCdpToPreview` is fire-and-forget and must run
-    // before `loadURL` so its synchronous `wc.debugger.attach('1.3')`
-    // installs the inspector before the page starts parsing.
+    // Must call before `loadURL`: synchronous `wc.debugger.attach` needs to
+    // run before the page starts parsing.
     attachCdpToPreview(
       previewWindow,
       parentWindow ? parentWindow.id : null,

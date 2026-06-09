@@ -520,10 +520,8 @@ namespace gdjs {
       }
       if (this._eventsFunction !== null) this._eventsFunction(this);
 
-      // Stepping was armed but no breakpoint was hit this frame (e.g. the
-      // target function never ran, or events ended early). When a breakpoint
-      // *does* fire, the stepping FSM has already cleared `stepNextEvent`
-      // in `__checkBreakpoint`, so we never take this branch after a real pause.
+      // Stepping was armed but the target event wasn't reached this frame.
+      // (When a breakpoint fires, `__checkBreakpoint` already cleared `stepNextEvent`.)
       const ds = this._runtimeGame._debugState;
       if (ds.stepNextEvent) {
         if (ds.stepCurrentFunctionId.startsWith('gdjs.evtsExt__')) {

@@ -115,13 +115,8 @@ export default class LocalPreviewLauncher extends React.Component<
 
     if (!ipcRenderer) return;
 
-    // Snapshot session breakpoints once, at launch time, so the Electron
-    // main process can inject them into the preview via CDP's
-    // Page.addScriptToEvaluateOnNewDocument. Without this injection the
-    // only path for breakpoint delivery is the WebSocket `setBreakpoints`
-    // frame which arrives *after* the first renderAndStep, making any
-    // breakpoint on a frame-0 event (e.g. events gated by TriggerOnce or
-    // "At beginning of scene") silently un-hittable on first launch.
+    // Inject at launch via addScriptToEvaluateOnNewDocument so frame-0
+    // breakpoints are hittable (WS delivery arrives after the first frame).
     const initialBreakpoints = buildAllBreakpointsPayload();
 
     ipcRenderer.invoke('preview-open', {

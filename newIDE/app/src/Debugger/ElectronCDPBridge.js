@@ -4,17 +4,7 @@ import optionalRequire from '../Utils/OptionalRequire';
 const electron = optionalRequire('electron');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
 
-/**
- * Ask the Electron main process to resume the V8 renderer of the paused
- * preview window (it was frozen on a `debugger;` statement emitted by the
- * breakpoints codegen).
- *
- * Returns true when a paused preview was found and resumed. Returns false
- * when running outside Electron or when no paused preview is currently
- * attached — callers should guard their UI with `isElectronCDPBridgeAvailable`
- * and `previewPausedRef` rather than depend on this return value, because
- * pause/step are only meaningful in local Electron preview.
- */
+/** Resume the paused preview V8 (frozen on a `debugger;` statement). */
 export const resumePausedPreview = async (): Promise<boolean> => {
   if (!ipcRenderer) return false;
   try {
@@ -72,13 +62,9 @@ export type CDPPausePayload = {|
   dumpJson: string,
 |};
 
-// Latest pause state tracked at module scope so subscribers that mount
-// AFTER a `preview-debugger-paused` IPC has already fired still receive it.
-// This happens when a breakpoint hits inside an extension function whose
-// `EventsSheet` isn't mounted yet: MainFrame navigates to the tab, which
-// mounts a fresh sheet whose `componentDidMount`/subscribe runs after the
-// IPC event was already delivered — without the replay, the paused frame
-// and variable tooltips never appear on that sheet.
+// Module-level cache so subscribers that attach after the IPC was already
+// delivered (e.g. an EventsSheet mounted as a result of breakpoint navigation)
+// still receive the current pause state via the replay in onPreviewDebuggerPauseChange.
 let lastPaused: boolean = false;
 let lastPayload: ?CDPPausePayload = null;
 
@@ -97,16 +83,8 @@ if (ipcRenderer) {
 }
 
 /**
- * Subscribe to CDP pause/resume events forwarded from main. The payload
- * comes from `gdjs.__lastBreakpoint` + `gdjs.__lastDumpJson` read via
- * `Runtime.evaluate` on pause — see `PreviewWindow.js`. This is the
- * authoritative notification for paused-UI state and variable tooltips.
- *
- * If the preview is already paused at subscription time, the current
- * pause payload is replayed asynchronously so late subscribers (e.g. an
- * `EventsSheet` that was just mounted as a result of the breakpoint
- * navigation) still get a chance to render the paused UI.
- *
+ * Subscribe to CDP pause/resume events forwarded from Electron main.
+ * Replays the current pause payload asynchronously to late subscribers.
  * Returns an unsubscribe function.
  */
 export const onPreviewDebuggerPauseChange = (
@@ -123,10 +101,8 @@ export const onPreviewDebuggerPauseChange = (
   ipcRenderer.on('preview-debugger-resumed', onResumed);
 
   if (lastPaused && lastPayload) {
-    // Deferred so the subscriber can finish its own mount/setup before the
-    // callback fires (avoids setState-during-mount warnings). Re-read the
-    // cache on the microtask: a `resumed` or newer `paused` IPC may have
-    // arrived in between.
+    // Deferred to avoid setState-during-mount; re-reads cache on the microtask
+    // in case a newer IPC arrived between subscribe and the Promise tick.
     Promise.resolve().then(() => {
       if (lastPaused && lastPayload) callback(true, lastPayload);
     });
@@ -139,12 +115,8 @@ export const onPreviewDebuggerPauseChange = (
 };
 
 /**
- * Subscribe to preview-window CDP detach events (fired on preview close).
- * Used to reset per-session ephemeral UI state in the IDE, such as the
- * dragged "Paused in debugger" toast position — each fresh preview
- * session should start with the toast docked at its default anchor.
- *
- * Returns an unsubscribe function.
+ * Subscribe to preview-window CDP detach (preview closed). Used to reset
+ * per-session ephemeral UI state. Returns an unsubscribe function.
  */
 export const onPreviewDebuggerClosed = (callback: () => void): (() => void) => {
   if (!ipcRenderer) return () => {};

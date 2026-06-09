@@ -683,10 +683,8 @@ export const renderVariableWithIcon = (
 
   let effectiveTooltip = tooltip;
   if (runtimeVariables && value) {
-    // Prefer `sourceType` (actual container kind resolved from the scope)
-    // over the legacy `tooltip` string for scope selection — the tooltip
-    // is just free-form text in most callers. This also lets us detect
-    // the Local / Object cases which have no dedicated wrapper field.
+    // Use `sourceType` (resolved container kind) for scope selection;
+    // fall back to the tooltip string for callers that don't set sourceType.
     let varScope: 'global' | 'scene' | 'local' | 'object' | 'any';
     if (
       sourceType === gd.VariablesContainer.Global ||
@@ -714,20 +712,14 @@ export const renderVariableWithIcon = (
     const extName = scope.eventsFunctionsExtension
       ? scope.eventsFunctionsExtension.getName()
       : undefined;
-    // Local lookup requires the scene's generated code namespace to match
-    // the one the runtime keyed its `localVariables` stack under. Only
-    // scene-scoped sheets are supported — extension function locals live
-    // on the per-call `eventsFunctionContext` and aren't reachable from
-    // globals, so the dump omits them.
+    // Scene-scoped locals only; extension function locals are omitted from the dump.
     const codeNamespace =
       varScope === 'local' && scope.layout && !scope.eventsFunctionsExtension
         ? gd.MetadataDeclarationHelper.getSceneCodeNamespace(
             scope.layout.getName()
           )
         : undefined;
-    // Object variables need the preceding `object` parameter from the
-    // same instruction to disambiguate — `value` only carries the
-    // variable path, not the object name.
+    // Object scope requires lastObjectName; value only carries the variable path.
     const runtimeVar =
       varScope === 'object' && !lastObjectName
         ? null

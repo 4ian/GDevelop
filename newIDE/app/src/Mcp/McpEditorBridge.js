@@ -1467,7 +1467,10 @@ const requireRunningPreview = (
   return { ok: true, targetId, previewIds };
 };
 
-const previewHealthCheck = (previewDebuggerServer: ?Object): Object => {
+const previewHealthCheck = async (
+  previewDebuggerServer: ?Object,
+  args: Object
+): Promise<Object> => {
   if (!previewDebuggerServer) {
     return {
       success: true,
@@ -1497,25 +1500,67 @@ const previewHealthCheck = (previewDebuggerServer: ?Object): Object => {
           : previewDebuggerServer.getExistingDebuggerIds()) || []
       : [];
   const running = serverState === 'started' && previewIds.length > 0;
-  const recommendedActions = running
+  const latestDebuggerId = previewIds.length
+    ? previewIds[previewIds.length - 1]
+    : null;
+  const requestedDebuggerId =
+    args && typeof args.debugger_id === 'string' ? args.debugger_id : null;
+  const targetId =
+    requestedDebuggerId && previewIds.indexOf(requestedDebuggerId) !== -1
+      ? requestedDebuggerId
+      : latestDebuggerId;
+  const timeoutMs =
+    args && typeof args.timeout_ms === 'number'
+      ? Math.max(200, Math.min(5000, args.timeout_ms))
+      : 1000;
+
+  let matched = false;
+  let status = null;
+  if (running && targetId) {
+    const ping = await sendTargetedRequest(
+      previewDebuggerServer,
+      targetId,
+      { command: 'getStatus' },
+      { timeoutMs }
+    );
+    matched = ping.matched;
+    status = matched ? ping.payload : null;
+  }
+
+  const responsive = running && matched;
+  const recommendedActions = responsive
     ? [
         'gdevelop_inspect_running_preview',
         'run_frames',
         'capture_preview_screenshot',
+      ]
+    : running
+    ? [
+        'control_preview { action: "focus" }',
+        'control_preview { action: "close", close_all: true }',
+        'launch_preview { start_paused: true }',
       ]
     : ['launch_preview'];
   return {
     success: true,
     running,
     serverState,
+    responsive,
+    previewHealth: running
+      ? responsive
+        ? 'responsive'
+        : 'connected-unresponsive'
+      : 'not-running',
     availableDebuggerIds: previewIds,
-    latestDebuggerId: previewIds.length
-      ? previewIds[previewIds.length - 1]
-      : null,
+    latestDebuggerId,
+    targetDebuggerId: targetId,
+    status: status || undefined,
     diagnostics: buildPreviewDiagnostics({
       running: serverState === 'started',
       previewIds,
-      targetId: previewIds.length ? previewIds[previewIds.length - 1] : null,
+      targetId,
+      status,
+      timedOut: running && !responsive,
       operation: 'health_check',
     }),
     recommendedActions,
@@ -1529,8 +1574,9 @@ const previewHealthCheck = (previewDebuggerServer: ?Object): Object => {
             'launch_preview { start_paused: true }',
             'control_preview { action: "focus" }',
           ],
-    note:
-      'Use this before screenshots/runtime tests when the debugger channel looks stale. For a connected-but-unresponsive preview, close all previews and relaunch a single paused preview.',
+    note: responsive
+      ? 'The selected preview replied to a debugger status ping.'
+      : 'Use this before screenshots/runtime tests when the debugger channel looks stale. For a connected-but-unresponsive preview, close all previews and relaunch a single paused preview.',
   };
 };
 
@@ -1794,6 +1840,12 @@ const sendTargetedRequest = (
   });
 };
 
+const getConnectionDebuggerId = (connection: any): ?string => {
+  if (typeof connection === 'string') return connection;
+  if (connection && typeof connection.id === 'string') return connection.id;
+  return null;
+};
+
 // Launch a new preview and (optionally) pause it the moment it connects, so
 // runtime tests can start near frame 0 instead of after the real-time clock has
 // already advanced (the game keeps running between MCP calls otherwise). This is
@@ -1843,6 +1895,7 @@ const launchPreview = async (
   // start_paused: register a connection watcher BEFORE launching.
   return new Promise(resolve => {
     let settled = false;
+    let pauseRequestedForId = null;
     let unregister = () => {};
     const finish = result => {
       if (settled) return;
@@ -1859,22 +1912,36 @@ const launchPreview = async (
         onErrorReceived: () => {},
         onServerStateChanged: () => {},
         onConnectionClosed: () => {},
-        onConnectionOpened: id => {
+        onConnectionOpened: connection => {
+          const id = getConnectionDebuggerId(connection);
+          if (!id) return;
           if (existingIds.has(id)) return; // not the new one
-          // Pause the new preview ASAP. Send a couple of times across a short
-          // window since the very first frames may still process.
-          try {
-            previewDebuggerServer.sendMessage(id, { command: 'pause' });
-          } catch (error) {
-            // ignore
-          }
-          finish({
-            success: true,
-            launched: true,
-            startPaused: true,
-            debuggerId: id,
-            note:
-              'Preview launched and paused on connect. Use run_frames / control_preview { action:"step" } to advance deterministically, or control_preview { action:"play" } to run in real time.',
+          if (pauseRequestedForId) return;
+          pauseRequestedForId = id;
+          const pauseTimeoutMs = Math.min(2000, Math.max(500, timeoutMs));
+          sendTargetedRequest(
+            previewDebuggerServer,
+            id,
+            { command: 'pause' },
+            { timeoutMs: pauseTimeoutMs }
+          ).then(({ matched, payload }) => {
+            const pauseConfirmed = !!(
+              matched &&
+              payload &&
+              payload.isPaused === true
+            );
+            finish({
+              success: true,
+              launched: true,
+              startPaused: pauseConfirmed,
+              pauseRequested: true,
+              pauseConfirmed,
+              debuggerId: id,
+              status: matched ? payload : undefined,
+              note: pauseConfirmed
+                ? 'Preview launched and pause was confirmed on the new debugger connection. Use run_frames / control_preview { action:"step" } to advance deterministically, or control_preview { action:"play" } to run in real time.'
+                : 'Preview launched and a pause was requested on the new debugger connection, but the runtime did not confirm it before the timeout. It may already be running in real time; retry control_preview { action:"pause" } or close all previews and relaunch.',
+            });
           });
         },
         onConnectionErrored: () => {},
@@ -1930,15 +1997,34 @@ const controlPreview = async (
   const action = args && typeof args.action === 'string' ? args.action : 'step';
 
   if (action === 'pause' || action === 'play') {
-    try {
-      // $FlowFixMe
-      previewDebuggerServer.sendMessage(targetId, {
-        command: action === 'pause' ? 'pause' : 'play',
-      });
-    } catch (error) {
-      return { success: false, running: true, error: error.message };
+    const command = action === 'pause' ? 'pause' : 'play';
+    const { matched, payload } = await sendTargetedRequest(
+      (previewDebuggerServer: any),
+      targetId,
+      { command },
+      { timeoutMs: 1500 }
+    );
+    if (!matched) {
+      return {
+        success: true,
+        running: true,
+        debuggerId: targetId,
+        action,
+        confirmed: false,
+        note:
+          'Command sent but not confirmed (no status reply from the targeted preview before timeout).',
+      };
     }
-    return { success: true, running: true, debuggerId: targetId, action };
+    return {
+      success: !payload.error,
+      running: true,
+      debuggerId: targetId,
+      action,
+      confirmed: true,
+      status: payload,
+      isPaused: payload.isPaused,
+      error: payload.error || undefined,
+    };
   }
 
   // Note: action === 'close' is handled at the tool-handler level (it closes
@@ -2578,7 +2664,9 @@ const callMcpTool = async ({
     const previewDebuggerServer = context.getPreviewDebuggerServer
       ? context.getPreviewDebuggerServer()
       : null;
-    return textResult(previewHealthCheck(previewDebuggerServer));
+    return textResult(
+      await previewHealthCheck(previewDebuggerServer, args || {})
+    );
   }
 
   if (toolName === 'create_action' || toolName === 'create_condition') {

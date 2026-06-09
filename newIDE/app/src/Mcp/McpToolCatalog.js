@@ -1462,6 +1462,19 @@ const inspectRunningPreviewSchema = {
   additionalProperties: false,
 };
 
+const previewHealthCheckSchema = {
+  type: 'object',
+  properties: {
+    debugger_id: inspectRunningPreviewSchema.properties.debugger_id,
+    timeout_ms: {
+      type: 'number',
+      description:
+        'How long to wait (200-5000 ms, default 1000) for a targeted getStatus reply before classifying the connected preview as unresponsive.',
+    },
+  },
+  additionalProperties: false,
+};
+
 const capturePreviewScreenshotSchema = {
   type: 'object',
   properties: {
@@ -3210,8 +3223,8 @@ const readTools: Array<McpTool> = [
   {
     name: 'preview_health_check',
     description:
-      'Report preview/debugger channel health before runtime calls: whether a preview is connected, available debugger ids, likely stale/disconnected state, and recommended recovery actions such as launch_preview, focus, close, or relaunch.',
-    inputSchema: emptyObjectSchema,
+      'Ping the selected preview/debugger channel before runtime calls: reports whether a preview is connected and responsive, available debugger ids, likely stale/disconnected state, and recommended recovery actions such as launch_preview, focus, close, or relaunch.',
+    inputSchema: previewHealthCheckSchema,
   },
   {
     name: 'capture_preview_screenshot',

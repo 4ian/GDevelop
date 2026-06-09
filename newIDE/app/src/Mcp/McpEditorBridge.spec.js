@@ -172,6 +172,60 @@ describe('McpEditorBridge', () => {
     expect(result.recommendedActions).toContain('launch_preview');
   });
 
+  it('pings a running preview for health checks', async () => {
+    const previewDebuggerServer = makeTargetedPreviewServer({
+      debuggerIds: ['preview-ws-0'],
+      responders: {
+        getStatus: { isPaused: true, sceneName: 'Level1' },
+      },
+    });
+    const bridge = makeBridge({
+      getPreviewDebuggerServer: () => previewDebuggerServer,
+    });
+
+    const response = await bridge.handleRendererMcpRequest({
+      method: 'tools/call',
+      params: {
+        name: 'preview_health_check',
+        arguments: { timeout_ms: 1000 },
+      },
+    });
+    const result = JSON.parse(response.content[0].text);
+
+    expect(response.isError).not.toBe(true);
+    expect(result.running).toBe(true);
+    expect(result.responsive).toBe(true);
+    expect(result.previewHealth).toBe('responsive');
+    expect(result.status.sceneName).toBe('Level1');
+  });
+
+  it('reports a connected but unresponsive preview in health checks', async () => {
+    const previewDebuggerServer = makeTargetedPreviewServer({
+      debuggerIds: ['preview-ws-0'],
+      responders: {},
+    });
+    const bridge = makeBridge({
+      getPreviewDebuggerServer: () => previewDebuggerServer,
+    });
+
+    const response = await bridge.handleRendererMcpRequest({
+      method: 'tools/call',
+      params: {
+        name: 'preview_health_check',
+        arguments: { timeout_ms: 200 },
+      },
+    });
+    const result = JSON.parse(response.content[0].text);
+
+    expect(response.isError).not.toBe(true);
+    expect(result.running).toBe(true);
+    expect(result.responsive).toBe(false);
+    expect(result.previewHealth).toBe('connected-unresponsive');
+    expect(result.recommendedActions).toContain(
+      'control_preview { action: "close", close_all: true }'
+    );
+  });
+
   it('returns editor state without an open project', async () => {
     const bridge = makeBridge();
 
@@ -4042,7 +4096,10 @@ describe('McpEditorBridge', () => {
       if (commandName === 'LAUNCH_NEW_PREVIEW' && callbacks) {
         setTimeout(() => {
           if (callbacks && callbacks.onConnectionOpened)
-            callbacks.onConnectionOpened('preview-ws-0');
+            callbacks.onConnectionOpened({
+              id: 'preview-ws-0',
+              debuggerIds: ['preview-ws-0'],
+            });
         }, 2);
       }
       return true;
@@ -4059,6 +4116,19 @@ describe('McpEditorBridge', () => {
       },
       sendMessage: (id, message) => {
         sent.push({ id, message });
+        if (message.command === 'pause' && message.messageId && callbacks) {
+          setTimeout(() => {
+            if (!callbacks) return;
+            callbacks.onHandleParsedMessage({
+              id,
+              parsedMessage: {
+                command: 'status',
+                messageId: message.messageId,
+                payload: { isPaused: true, sceneName: 'Level1' },
+              },
+            });
+          }, 2);
+        }
       },
     };
     const bridge = makeBridge({
@@ -4077,6 +4147,7 @@ describe('McpEditorBridge', () => {
     expect(response.isError).not.toBe(true);
     expect(result.launched).toBe(true);
     expect(result.startPaused).toBe(true);
+    expect(result.pauseConfirmed).toBe(true);
     expect(result.debuggerId).toBe('preview-ws-0');
     expect(runCommand).toHaveBeenCalledWith('LAUNCH_NEW_PREVIEW');
     // A pause command was sent to the newly-connected preview.
@@ -4549,6 +4620,8 @@ describe('McpEditorBridge', () => {
           payload = { steppedFrames: message.count, deltaMs: 16, paused: true };
         } else if (message.command === 'setRuntimeState') {
           payload = { applied: ['setVariable:scene.GameOver'], error: null };
+        } else if (message.command === 'pause') {
+          payload = { isPaused: true, sceneName: 'Level1' };
         }
         if (payload && message.messageId && callbacks) {
           setTimeout(
@@ -4587,7 +4660,10 @@ describe('McpEditorBridge', () => {
       method: 'tools/call',
       params: { name: 'control_preview', arguments: { action: 'pause' } },
     });
-    expect(JSON.parse(pauseResponse.content[0].text).success).toBe(true);
+    const pauseResult = JSON.parse(pauseResponse.content[0].text);
+    expect(pauseResult.success).toBe(true);
+    expect(pauseResult.confirmed).toBe(true);
+    expect(pauseResult.isPaused).toBe(true);
     expect(sent.find(m => m.command === 'pause')).toBeDefined();
 
     const stateResponse = await bridge.handleRendererMcpRequest({

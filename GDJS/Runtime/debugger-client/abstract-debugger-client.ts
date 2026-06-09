@@ -249,13 +249,19 @@ namespace gdjs {
       try {
         if (data.command === 'play') {
           runtimeGame.pause(false);
+          if (data.messageId) {
+            that.sendRuntimeGameStatus(data.messageId);
+          }
         } else if (data.command === 'pause') {
           runtimeGame.pause(true);
+          if (data.messageId) {
+            that.sendRuntimeGameStatus(data.messageId);
+          }
           that.sendRuntimeGameDump();
         } else if (data.command === 'refresh') {
           that.sendRuntimeGameDump();
         } else if (data.command === 'getStatus') {
-          that.sendRuntimeGameStatus();
+          that.sendRuntimeGameStatus(data.messageId);
         } else if (data.command === 'set') {
           that.set(data.path, data.newValue);
         } else if (data.command === 'call') {
@@ -685,7 +691,7 @@ namespace gdjs {
       return true;
     }
 
-    sendRuntimeGameStatus(): void {
+    sendRuntimeGameStatus(messageId?: number): void {
       const currentScene = this._runtimegame.getSceneStack().getCurrentScene();
       // Recently played sounds since the last status (cleared after reporting),
       // so a harness can confirm a PlaySound action actually fired.
@@ -706,6 +712,7 @@ namespace gdjs {
       this._sendMessage(
         circularSafeStringify({
           command: 'status',
+          messageId,
           payload: {
             isPaused: this._runtimegame.isPaused(),
             isInGameEdition: this._runtimegame.isInGameEdition(),
@@ -1271,7 +1278,11 @@ namespace gdjs {
      * normal rAF loop only renders; each manual step runs full event logic. This
      * lets a harness do: pause → inject input → step N frames → read state.
      */
-    stepFrames(count: number, fakeElapsedTimeMs: number, messageId: number): void {
+    stepFrames(
+      count: number,
+      fakeElapsedTimeMs: number,
+      messageId: number
+    ): void {
       const frames = Math.max(1, Math.min(1000, count || 1));
       // 16.667 ms ≈ one 60 FPS frame. Kept per-frame small so TimeManager's
       // minimal-framerate clamp does not distort the delta.
@@ -1328,8 +1339,8 @@ namespace gdjs {
               op.scope === 'global'
                 ? this._runtimegame.getVariables()
                 : scene
-                ? scene.getVariables()
-                : null;
+                  ? scene.getVariables()
+                  : null;
             if (!container) {
               applied.push('setVariable:no-scene');
               return;
@@ -1370,7 +1381,9 @@ namespace gdjs {
           } else if (op.type === 'deleteAllInstances' && scene) {
             // Delete every live instance of the object in one op (no need to
             // know the count or call index-by-index).
-            const instances = (scene.getInstancesOf(op.objectName) || []).slice();
+            const instances = (
+              scene.getInstancesOf(op.objectName) || []
+            ).slice();
             for (const instance of instances) {
               instance.deleteFromScene();
             }

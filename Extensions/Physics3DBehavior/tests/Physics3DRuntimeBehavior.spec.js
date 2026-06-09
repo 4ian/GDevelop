@@ -47,7 +47,7 @@ describe('Physics3DRuntimeBehavior', () => {
     jumpHeight: 80,
     jumpSustainTime: 0,
     gravity: 1000,
-    maxFallingSpeed: 1000,
+    fallingSpeedMax: 1000,
     forwardAcceleration: 1500,
     forwardDeceleration: 1500,
     forwardSpeedMax: 250,

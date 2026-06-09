@@ -45,6 +45,7 @@ import {
   ProjectScopedContainersAccessor,
 } from '../../InstructionOrExpression/EventsScope';
 import { enumerateParametersUsableInExpressions } from '../ParameterFields/EnumerateFunctionParameters';
+import { getLastObjectParameterValue } from '../ParameterFields/ParameterMetadataTools';
 import { getFunctionNameFromType } from '../../EventsFunctionsExtensionsLoader';
 import { ExtensionStoreContext } from '../../AssetStore/ExtensionStore/ExtensionStoreContext';
 import Warning from '../../UI/CustomSvgIcons/Warning';
@@ -259,20 +260,6 @@ const Instruction = (props: Props): React.Node => {
     );
     const parametersCount = metadata.getParametersCount();
 
-    // Track the preceding object-typed parameter so `objectvar` tooltips
-    // can resolve the variable name (the parameter only carries the variable path).
-    const lastObjectNamePerParameter: Array<?string> = new Array<?string>(
-      parametersCount
-    ).fill(null);
-    let trackedLastObjectName: ?string = null;
-    for (let p = 0; p < parametersCount; p++) {
-      lastObjectNamePerParameter[p] = trackedLastObjectName;
-      const paramType = metadata.getParameter(p).getType();
-      if (gd.ParameterMetadata.isObject(paramType)) {
-        trackedLastObjectName = instruction.getParameter(p).getPlainString();
-      }
-    }
-
     return (
       <span
         className={classNames({
@@ -440,7 +427,13 @@ const Instruction = (props: Props): React.Node => {
                 highlightedSearchText: props.highlightedSearchText,
                 highlightedSearchMatchCase: props.highlightedSearchMatchCase,
                 runtimeVariables,
-                lastObjectName: lastObjectNamePerParameter[parameterIndex],
+                lastObjectName: getLastObjectParameterValue({
+                  instructionMetadata: metadata,
+                  instruction,
+                  expressionMetadata: null,
+                  expression: null,
+                  parameterIndex,
+                }),
               })}
             </span>
           );

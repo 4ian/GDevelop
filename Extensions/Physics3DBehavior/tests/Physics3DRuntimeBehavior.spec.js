@@ -53,14 +53,19 @@ describe('Physics3DRuntimeBehavior', () => {
       isLightingLayer: false,
       followBaseLayerCamera: false,
     });
-    runtimeScene.setInitialSharedDataForBehavior(physicsBehaviorName, {
+    /** @type {BehaviorSharedData & {gravityX: number, gravityY: number, gravityZ: number, worldScale: number}} */
+    const sharedData = {
       name: physicsBehaviorName,
       type: 'Physics3D::Physics3DBehavior',
       gravityX: 0,
       gravityY: 0,
       gravityZ: 0,
       worldScale,
-    });
+    };
+    runtimeScene.setInitialSharedDataForBehavior(
+      physicsBehaviorName,
+      sharedData
+    );
     return runtimeScene;
   };
 
@@ -117,7 +122,9 @@ describe('Physics3DRuntimeBehavior', () => {
     runtimeScene.addObject(object);
     object.setPosition(10, 20);
     object.setZ(30);
-    const behavior = object.getBehavior(physicsBehaviorName);
+    const behavior = /** @type {gdjs.Physics3DRuntimeBehavior} */ (
+      object.getBehavior(physicsBehaviorName)
+    );
     behavior.updateBodyFromObject();
     return { object, behavior };
   };

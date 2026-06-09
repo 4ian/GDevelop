@@ -3177,6 +3177,31 @@ const readTools: Array<McpTool> = [
     inputSchema: listAvailableBehaviorsSchema,
   },
   {
+    name: 'search_behavior_store',
+    description:
+      'Search the COMMUNITY behavior registry (asset store) for behaviors — including ones not yet installed in the project. Returns each behavior\'s full behaviorType (e.g. "Flash::Flash") to pass to add_behavior, which installs the required extension automatically. Use this to find ready-made behaviors (jump, flash, health, platformer, draggable, screen-wrap, etc.) instead of writing events from scratch. For behaviors already in the project, prefer list_available_behaviors. Requires network access.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        query: {
+          type: 'string',
+          description:
+            'Space-separated search terms matched against behavior name/full name/description/category/extension/tags (all terms must match). Omit to browse.',
+        },
+        object_type: {
+          type: 'string',
+          description:
+            'Optional object type (e.g. "Sprite") to only return behaviors compatible with it. Behaviors that apply to any object are always included.',
+        },
+        limit: {
+          type: 'number',
+          description: 'Maximum number of behaviors to return (default 20).',
+        },
+      },
+      additionalProperties: false,
+    },
+  },
+  {
     name: 'gdevelop_inspect_running_preview',
     description:
       'Inspect a currently running preview to verify runtime behavior: returns whether a preview is running (defaulting to the latest launched one), its status, captured console logs, a separate errors list (uncaught exceptions, crashes, error-level logs), recentSounds (history since last inspect), activeSounds (sounds/musics currently playing incl. looping BGM), inputState (live pressed keys/mouse), and a compact runtime snapshot (running scene name, sceneElapsedTimeSeconds, per-object live instance counts, scene/global variable values). Launch a preview first with gdevelop_run_command { commandName: "LAUNCH_NEW_PREVIEW" }. Use this to confirm a game actually runs and behaves, not just that a preview was launched.',
@@ -3554,7 +3579,7 @@ const writeTools: Array<McpTool> = [
   {
     name: 'add_behavior',
     description:
-      'Add a behavior to an object. Requires behavior_type (the internal type). Use list_available_behaviors to find compatible behavior types.',
+      'Add a behavior to an object. Requires behavior_type (the internal type). Use list_available_behaviors for built-in/installed behaviors, or search_behavior_store for community ones. If behavior_type belongs to a community extension that is not installed yet, it is installed automatically (along with any required behaviors). Then configure it without events via inspect_behavior_properties / change_behavior_property.',
     inputSchema: addBehaviorSchema,
   },
   {
@@ -4314,6 +4339,17 @@ const toolUsageExamples: { [string]: Array<Object> } = {
       arguments: {},
     },
   ],
+  search_behavior_store: [
+    {
+      description:
+        'Find a ready-made "flash on hit" behavior in the community store, then add it with add_behavior using the returned behaviorType.',
+      arguments: { query: 'flash blink' },
+    },
+    {
+      description: 'Find Sprite-compatible health/lives behaviors.',
+      arguments: { query: 'health lives', object_type: 'Sprite' },
+    },
+  ],
   list_available_behaviors: [
     {
       description:
@@ -4901,6 +4937,7 @@ export const getCapabilitiesSummary = (
       'find_project_events',
       'inspect_object_properties',
       'list_available_behaviors',
+      'search_behavior_store',
       'inspect_project_resources',
       'inspect_resource_images',
       'audit_project_asset_sources',

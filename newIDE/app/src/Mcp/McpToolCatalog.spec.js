@@ -49,6 +49,7 @@ describe('McpToolCatalog', () => {
     expect(toolNames).toContain('crop_scene_object_image');
     expect(toolNames).toContain('inspect_scene_draw_order');
     expect(toolNames).toContain('inspect_gameplay_rules');
+    expect(toolNames).toContain('search_behavior_store');
     expect(toolNames).toContain('preview_health_check');
     expect(toolNames).toContain('gdevelop_refresh_tool_catalog');
     expect(toolNames).toContain('gdevelop_capabilities');

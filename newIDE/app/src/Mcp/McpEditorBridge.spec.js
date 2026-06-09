@@ -5,6 +5,13 @@ import {
   serializeToJSObject,
   unserializeFromJSObject,
 } from '../Utils/Serializer';
+import { getBehaviorsRegistry } from '../Utils/GDevelopServices/Extension';
+
+// Mock the behavior store registry fetch (search_behavior_store) so the test
+// does not hit the network.
+jest.mock('../Utils/GDevelopServices/Extension', () => ({
+  getBehaviorsRegistry: jest.fn(),
+}));
 
 const fs = require('fs');
 const os = require('os');
@@ -1362,7 +1369,9 @@ describe('McpEditorBridge', () => {
     const project = new gd.ProjectHelper.createNewGDJSProject();
     const layout = project.insertNewLayout('Level1', 0);
     layout.getObjects().insertNewObject(project, 'Sprite', 'HealthBar', 0);
-    layout.getObjects().insertNewObject(project, 'TextObject::Text', 'Label', 1);
+    layout
+      .getObjects()
+      .insertNewObject(project, 'TextObject::Text', 'Label', 1);
     const healthBar = layout.getInitialInstances().insertNewInitialInstance();
     healthBar.setObjectName('HealthBar');
     healthBar.setX(200);
@@ -1406,9 +1415,9 @@ describe('McpEditorBridge', () => {
       expect(dryRunResponse.isError).not.toBe(true);
       expect(dryRunResult.dryRun).toBe(true);
       expect(project.hasEventsFunctionsExtensionNamed('UI')).toBe(false);
-      expect(project.hasEventsFunctionsExtensionNamed('__McpValidation_UI')).toBe(
-        false
-      );
+      expect(
+        project.hasEventsFunctionsExtensionNamed('__McpValidation_UI')
+      ).toBe(false);
 
       const extractResponse = await bridge.handleRendererMcpRequest({
         method: 'tools/call',
@@ -3602,10 +3611,7 @@ describe('McpEditorBridge', () => {
             map_width: 4,
             map_height: 3,
             fill: { x: 0, y: 0, width: 4, height: 3, tile: 0 },
-            tiles: [
-              { x: 1, y: 1, tile: 5 },
-              { x: 2, y: 1, tile: 5 },
-            ],
+            tiles: [{ x: 1, y: 1, tile: 5 }, { x: 2, y: 1, tile: 5 }],
           },
         },
       });
@@ -3812,7 +3818,11 @@ describe('McpEditorBridge', () => {
             instruction_kind: 'action',
             instruction_type: 'MettreX',
             object_name: 'HealthBar',
-            parameters: ['HealthBar', '=', 'Enemy.CenterX()-HealthBar.Width()/2'],
+            parameters: [
+              'HealthBar',
+              '=',
+              'Enemy.CenterX()-HealthBar.Width()/2',
+            ],
             summary_only: true,
           },
         },
@@ -3874,8 +3884,18 @@ describe('McpEditorBridge', () => {
 
       const event = gd.asStandardEvent(layout.getEvents().getEventAt(0));
       expect(event.getAiGeneratedEventId()).toBe('enemy-healthbar-follow');
-      expect(event.getActions().get(0).getType()).toBe('MettreX');
-      expect(event.getActions().get(1).getType()).toBe('MettreY');
+      expect(
+        event
+          .getActions()
+          .get(0)
+          .getType()
+      ).toBe('MettreX');
+      expect(
+        event
+          .getActions()
+          .get(1)
+          .getType()
+      ).toBe('MettreY');
 
       const rulesResponse = await bridge.handleRendererMcpRequest({
         method: 'tools/call',
@@ -3915,9 +3935,18 @@ describe('McpEditorBridge', () => {
     fs.mkdirSync(path.join(tempDir, 'assets', 'Warrior', 'Run'), {
       recursive: true,
     });
-    fs.writeFileSync(path.join(tempDir, 'assets', 'Warrior', 'Idle', '0.png'), '');
-    fs.writeFileSync(path.join(tempDir, 'assets', 'Warrior', 'Idle', '1.png'), '');
-    fs.writeFileSync(path.join(tempDir, 'assets', 'Warrior', 'Run', '0.png'), '');
+    fs.writeFileSync(
+      path.join(tempDir, 'assets', 'Warrior', 'Idle', '0.png'),
+      ''
+    );
+    fs.writeFileSync(
+      path.join(tempDir, 'assets', 'Warrior', 'Idle', '1.png'),
+      ''
+    );
+    fs.writeFileSync(
+      path.join(tempDir, 'assets', 'Warrior', 'Run', '0.png'),
+      ''
+    );
 
     try {
       const bridge = makeBridge({
@@ -3945,11 +3974,14 @@ describe('McpEditorBridge', () => {
         expect.objectContaining({ name: 'Idle', frameCount: 2 }),
         expect.objectContaining({ name: 'Run', frameCount: 1 }),
       ]);
-      expect(project.getResourcesManager().hasResource('Warrior_Idle_0_0')).toBe(
-        true
-      );
+      expect(
+        project.getResourcesManager().hasResource('Warrior_Idle_0_0')
+      ).toBe(true);
       const sprite = gd.asSpriteConfiguration(
-        layout.getObjects().getObject('Warrior').getConfiguration()
+        layout
+          .getObjects()
+          .getObject('Warrior')
+          .getConfiguration()
       );
       expect(sprite.getAnimations().getAnimationsCount()).toBe(2);
     } finally {
@@ -4805,6 +4837,89 @@ describe('McpEditorBridge', () => {
     } finally {
       project.delete();
       fs.rmSync(tempDir, { recursive: true, force: true });
+    }
+  });
+
+  it('searches the community behavior store and returns usable behaviorTypes', async () => {
+    // $FlowFixMe[invalid-constructor]
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    project.insertNewLayout('Level1', 0);
+    // $FlowFixMe — mocked module.
+    getBehaviorsRegistry.mockResolvedValue({
+      headers: [
+        {
+          type: 'Flash::Flash',
+          name: 'Flash',
+          fullName: 'Flash (blink) object',
+          description: 'Make the object blink/flash for a duration.',
+          category: 'Visual effect',
+          extensionName: 'Flash',
+          objectType: '',
+          tier: 'reviewed',
+          allRequiredBehaviorTypes: [],
+        },
+        {
+          type: 'Health::Health',
+          name: 'Health',
+          fullName: 'Health points',
+          description: 'Give health/lives to an object.',
+          category: 'Game mechanic',
+          extensionName: 'Health',
+          objectType: 'Sprite',
+          tier: 'reviewed',
+          allRequiredBehaviorTypes: [],
+        },
+        {
+          type: 'Old::Deprecated',
+          name: 'Deprecated',
+          fullName: 'Old flash thing',
+          description: 'flash',
+          extensionName: 'Old',
+          objectType: '',
+          isDeprecated: true,
+        },
+      ],
+    });
+
+    try {
+      const bridge = makeBridge({ getProject: () => project });
+
+      const response = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'search_behavior_store',
+          arguments: { query: 'flash' },
+        },
+      });
+      const result = JSON.parse(response.content[0].text);
+      expect(response.isError).not.toBe(true);
+      expect(result.success).toBe(true);
+      // Matched the Flash behavior, exposed its full behaviorType, and excluded
+      // the deprecated one.
+      const types = result.behaviors.map(b => b.behaviorType);
+      expect(types).toContain('Flash::Flash');
+      expect(types).not.toContain('Old::Deprecated');
+      const flash = result.behaviors.find(
+        b => b.behaviorType === 'Flash::Flash'
+      );
+      expect(flash.extensionName).toBe('Flash');
+      expect(typeof flash.alreadyInstalled).toBe('boolean');
+
+      // object_type filters out behaviors that require a different object type.
+      const filtered = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'search_behavior_store',
+          arguments: { object_type: 'TextObject::Text' },
+        },
+      });
+      const filteredResult = JSON.parse(filtered.content[0].text);
+      const filteredTypes = filteredResult.behaviors.map(b => b.behaviorType);
+      // Flash applies to any object (objectType ''), Health requires Sprite.
+      expect(filteredTypes).toContain('Flash::Flash');
+      expect(filteredTypes).not.toContain('Health::Health');
+    } finally {
+      project.delete();
     }
   });
 });

@@ -102,6 +102,7 @@ import {
   snapshotProject,
   restoreProjectSnapshot,
 } from './McpProjectTools';
+import { getBehaviorsRegistry } from '../Utils/GDevelopServices/Extension';
 import optionalRequire from '../Utils/OptionalRequire';
 
 const gd: libGDevelop = global.gd;
@@ -112,6 +113,37 @@ const nativeImage = electron && electron.nativeImage;
 
 // Monotonic id used to match targeted preview request/response messages.
 let nextTargetedRequestId = 1;
+
+// Score a behavior store header against space-separated query tokens. Returns 0
+// for no match; higher is a better match. Every token must match somewhere.
+const scoreBehaviorHeaderMatch = (header: Object, query: string): number => {
+  const tokens = query
+    .toLowerCase()
+    .split(/\s+/)
+    .filter(Boolean);
+  if (!tokens.length) return 1; // no query → everything matches (browse mode)
+  const haystackParts = [
+    header.type,
+    header.name,
+    header.fullName,
+    header.description,
+    header.category,
+    header.extensionName,
+    Array.isArray(header.tags) ? header.tags.join(' ') : '',
+  ]
+    .filter(Boolean)
+    .map(value => String(value).toLowerCase());
+  const haystack = haystackParts.join(' ');
+  let score = 0;
+  for (const token of tokens) {
+    if (!haystack.includes(token)) return 0; // AND semantics
+    // Bonus for matching the most identifying fields.
+    if ((header.fullName || '').toLowerCase().includes(token)) score += 3;
+    if ((header.name || '').toLowerCase().includes(token)) score += 2;
+    score += 1;
+  }
+  return score;
+};
 
 const getDefaultProcessEditorFunctionCalls = (): Function => {
   // Lazily require the runner so focused MCP unit tests do not load the full
@@ -624,7 +656,9 @@ const captureRunningPreviewState = (
           'No preview debugger server is available in this editor build. Runtime inspection is unsupported here.',
         diagnostics: {
           classification: 'debugger-server-unavailable',
-          likelyCauses: ['This editor build did not expose a preview debugger server.'],
+          likelyCauses: [
+            'This editor build did not expose a preview debugger server.',
+          ],
           recommendedActions: [],
         },
       });
@@ -837,7 +871,12 @@ const resizeScreenshotDataUrlIfNeeded = (
   width: number,
   height: number,
   args: Object
-): {| dataUrl: string, width: number, height: number, resizeWarning?: string |} => {
+): {|
+  dataUrl: string,
+  width: number,
+  height: number,
+  resizeWarning?: string,
+|} => {
   const targetWidth =
     args && typeof args.target_width === 'number'
       ? Math.max(1, Math.floor(args.target_width))
@@ -1379,7 +1418,9 @@ const requireRunningPreview = (
         error: 'No preview debugger server is available in this editor build.',
         diagnostics: {
           classification: 'debugger-server-unavailable',
-          likelyCauses: ['This editor build did not expose a preview debugger server.'],
+          likelyCauses: [
+            'This editor build did not expose a preview debugger server.',
+          ],
           recommendedActions: [],
         },
       },
@@ -1436,7 +1477,9 @@ const previewHealthCheck = (previewDebuggerServer: ?Object): Object => {
       recommendedActions: ['launch_preview'],
       diagnostics: {
         classification: 'debugger-server-unavailable',
-        likelyCauses: ['This editor build did not expose a preview debugger server.'],
+        likelyCauses: [
+          'This editor build did not expose a preview debugger server.',
+        ],
         recommendedActions: [],
       },
       note: 'No preview debugger server is available in this editor build.',
@@ -1466,7 +1509,9 @@ const previewHealthCheck = (previewDebuggerServer: ?Object): Object => {
     running,
     serverState,
     availableDebuggerIds: previewIds,
-    latestDebuggerId: previewIds.length ? previewIds[previewIds.length - 1] : null,
+    latestDebuggerId: previewIds.length
+      ? previewIds[previewIds.length - 1]
+      : null,
     diagnostics: buildPreviewDiagnostics({
       running: serverState === 'started',
       previewIds,
@@ -1489,7 +1534,9 @@ const previewHealthCheck = (previewDebuggerServer: ?Object): Object => {
   };
 };
 
-const getPreviewDebuggerIds = (previewDebuggerServer: ?Object): Array<string> => {
+const getPreviewDebuggerIds = (
+  previewDebuggerServer: ?Object
+): Array<string> => {
   if (
     !previewDebuggerServer ||
     typeof previewDebuggerServer.getServerState !== 'function' ||
@@ -1558,9 +1605,7 @@ const getStaleStateTargetForTool = (
           ? null
           : getStringArg(args, ['parent_name', 'parentName']),
       functionName:
-        result &&
-        result.function &&
-        typeof result.function.name === 'string'
+        result && result.function && typeof result.function.name === 'string'
           ? result.function.name
           : getStringArg(args, [
               'new_function_name',
@@ -2676,6 +2721,89 @@ const callMcpTool = async ({
       return textResult(listAvailableBehaviors(project, args || {}));
     } catch (error) {
       return errorResult(error.message);
+    }
+  }
+
+  if (toolName === 'search_behavior_store') {
+    // Search the COMMUNITY behavior registry (asset store) for behaviors that
+    // may not be installed yet. Returns each behavior's full `behavior_type` to
+    // pass to add_behavior, which installs the extension automatically.
+    try {
+      const query = args && typeof args.query === 'string' ? args.query : '';
+      const objectType = (args && (args.object_type || args.objectType)) || '';
+      const limit =
+        args && typeof args.limit === 'number'
+          ? Math.max(1, Math.min(50, Math.floor(args.limit)))
+          : 20;
+
+      const registry = await getBehaviorsRegistry();
+      const headers = Array.isArray(registry.headers) ? registry.headers : [];
+
+      // Which extensions are already installed in this project's platform.
+      const platform =
+        project && project.getCurrentPlatform
+          ? project.getCurrentPlatform()
+          : null;
+      const isInstalled = (extensionName: string): boolean => {
+        if (!platform || !extensionName) return false;
+        try {
+          return platform.isExtensionLoaded(extensionName);
+        } catch (e) {
+          return false;
+        }
+      };
+
+      const scored = headers
+        .filter(
+          header =>
+            !header.isDeprecated &&
+            // If an object type is given, only behaviors that apply to it (or to
+            // any object — empty objectType means "any").
+            (!objectType ||
+              !header.objectType ||
+              header.objectType === objectType)
+        )
+        .map(header => ({
+          score: scoreBehaviorHeaderMatch(header, query),
+          header,
+        }))
+        .filter(entry => entry.score > 0)
+        .sort((a, b) => b.score - a.score)
+        .slice(0, limit)
+        .map(({ header }) => ({
+          // The exact value to pass to add_behavior as behavior_type.
+          behaviorType: header.type,
+          name: header.name,
+          fullName: header.fullName,
+          description: header.description,
+          category: header.category || undefined,
+          extensionName: header.extensionName,
+          // Empty objectType means it works on any object type.
+          requiredObjectType: header.objectType || '',
+          tier: header.tier || undefined,
+          requiredBehaviorTypes:
+            header.allRequiredBehaviorTypes &&
+            header.allRequiredBehaviorTypes.length
+              ? header.allRequiredBehaviorTypes
+              : undefined,
+          alreadyInstalled: isInstalled(header.extensionName),
+        }));
+
+      return textResult({
+        success: true,
+        query,
+        objectType: objectType || undefined,
+        totalMatches: scored.length,
+        behaviors: scored,
+        note:
+          'Community behaviors from the asset store. To use one, call add_behavior with its behaviorType (and scene_name + object_name) — the extension is installed automatically. For behaviors already in the project, prefer list_available_behaviors. Do NOT write events from scratch to replicate a behavior; install and configure it instead (inspect_behavior_properties / change_behavior_property).',
+      });
+    } catch (error) {
+      return errorResult(
+        `Could not fetch the behavior store registry: ${
+          error && error.message ? error.message : String(error)
+        }. (Requires network access.)`
+      );
     }
   }
 

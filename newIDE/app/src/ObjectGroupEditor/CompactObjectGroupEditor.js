@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react';
-import { t, Trans } from '@lingui/macro';
+import { t } from '@lingui/macro';
+import { I18n } from '@lingui/react';
 
 import { List, ListItem } from '../UI/List';
 import CompactObjectSelector from '../ObjectsList/CompactObjectSelector';
@@ -8,11 +9,14 @@ import ListIcon from '../UI/ListIcon';
 import ObjectsRenderingService from '../ObjectsRendering/ObjectsRenderingService';
 import getObjectByName from '../Utils/GetObjectByName';
 import { ColumnStackLayout } from '../UI/Layout';
-import AlertMessage from '../UI/AlertMessage';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
+import CompactPropertiesEditorRowField from '../CompactPropertiesEditor/CompactPropertiesEditorRowField';
+import CompactTextField from '../UI/CompactTextField';
+
+const gd: libGDevelop = global.gd;
 
 type Props = {|
-  project: ?gdProject,
+  project: gdProject,
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   globalObjectsContainer: gdObjectsContainer | null,
   objectsContainer: gdObjectsContainer,
@@ -44,104 +48,104 @@ const CompactObjectGroupEditor = ({
     [onObjectAdded]
   );
 
-  const renderExplanation = () => {
-    let type = undefined;
-    if (groupObjectNames.length === 0) {
-      return null;
-    }
-    groupObjectNames.forEach(objectName => {
-      const objectType = projectScopedContainersAccessor
-        .get()
-        .getObjectsContainersList()
-        .getTypeOfObject(objectName);
-      // $FlowFixMe[invalid-compare]
-      // $FlowFixMe[incompatible-type]
-      if (type === undefined || objectType === type) type = objectType;
-      // $FlowFixMe[incompatible-type]
-      else type = '';
-    });
-
-    const message =
-      type === '' ? (
-        <>
-          <Trans>
-            This group contains objects of different kinds. You'll only be able
-            to use actions and conditions common to all objects with this group.
-          </Trans>{' '}
-          <Trans>
-            Variables declared in all objects of the group will be visible in
-            event expressions.
-          </Trans>
-        </>
-      ) : (
-        <>
-          <Trans>
-            This group contains objects of the same kind ({type}). You can use
-            actions and conditions related to this kind of objects in events
-            with this group.
-          </Trans>{' '}
-          <Trans>
-            Variables declared in all objects of the group will be visible in
-            event expressions.
-          </Trans>
-        </>
+  const type = React.useMemo(
+    () => {
+      let type = null;
+      for (const objectName of groupObjectNames) {
+        const objectType = projectScopedContainersAccessor
+          .get()
+          .getObjectsContainersList()
+          .getTypeOfObject(objectName);
+        if (type === null || objectType === type) {
+          type = objectType;
+        } else {
+          return 'Object';
+        }
+      }
+      if (!type) {
+        return null;
+      }
+      const objectMetadata = gd.MetadataProvider.getObjectMetadata(
+        project.getCurrentPlatform(),
+        type
       );
-
-    return <AlertMessage kind="info">{message}</AlertMessage>;
-  };
+      return objectMetadata.getFullName();
+    },
+    [groupObjectNames, project, projectScopedContainersAccessor]
+  );
 
   return (
-    <ColumnStackLayout noMargin>
-      {renderExplanation()}
-      <List>
-        {groupObjectNames.map(objectName => {
-          let object = getObjectByName(
-            globalObjectsContainer,
-            objectsContainer,
-            objectName
-          );
-          const icon =
-            project && object ? (
-              <ListIcon
-                iconSize={20}
-                src={ObjectsRenderingService.getThumbnail(
-                  project,
-                  object.getConfiguration()
-                )}
-              />
-            ) : null;
-          return isObjectListLocked ? (
-            <ListItem
-              key={objectName}
-              primaryText={objectName}
-              leftIcon={icon}
+    <I18n>
+      {({ i18n }) => (
+        <ColumnStackLayout noMargin>
+          {type ? (
+            <CompactPropertiesEditorRowField
+              label={i18n._(t`Inferred type`)}
+              markdownDescription={
+                type === 'Object'
+                  ? i18n._(
+                      t`This group contains objects of different kinds. You'll only be able to use actions and conditions common to all objects with this group.`
+                    )
+                  : i18n._(
+                      t`This group contains objects of the same kind (${type}). You can use actions and conditions related to this kind of objects in events with this group.`
+                    )
+              }
+              field={
+                <CompactTextField value={type} onChange={() => {}} disabled />
+              }
             />
-          ) : (
-            <ListItem
-              key={objectName}
-              primaryText={objectName}
-              displayRemoveButton
-              onRemove={() => onObjectRemoved(objectName)}
-              leftIcon={icon}
-            />
-          );
-        })}
-      </List>
-      <CompactObjectSelector
-        id="add-object-to-group"
-        label=""
-        project={project}
-        projectScopedContainersAccessor={projectScopedContainersAccessor}
-        value={objectName}
-        excludedObjectOrGroupNames={groupObjectNames}
-        onChange={setObjectName}
-        onChoose={addObject}
-        noGroups
-        hintText={t`Choose an object to add to the group`}
-        fullWidth
-        disabled={isObjectListLocked}
-      />
-    </ColumnStackLayout>
+          ) : null}
+          <List>
+            {groupObjectNames.map(objectName => {
+              let object = getObjectByName(
+                globalObjectsContainer,
+                objectsContainer,
+                objectName
+              );
+              const icon =
+                project && object ? (
+                  <ListIcon
+                    iconSize={20}
+                    src={ObjectsRenderingService.getThumbnail(
+                      project,
+                      object.getConfiguration()
+                    )}
+                  />
+                ) : null;
+              return isObjectListLocked ? (
+                <ListItem
+                  key={objectName}
+                  primaryText={objectName}
+                  leftIcon={icon}
+                />
+              ) : (
+                <ListItem
+                  key={objectName}
+                  primaryText={objectName}
+                  displayRemoveButton
+                  onRemove={() => onObjectRemoved(objectName)}
+                  leftIcon={icon}
+                />
+              );
+            })}
+          </List>
+          <CompactObjectSelector
+            id="add-object-to-group"
+            label=""
+            project={project}
+            projectScopedContainersAccessor={projectScopedContainersAccessor}
+            value={objectName}
+            excludedObjectOrGroupNames={groupObjectNames}
+            onChange={setObjectName}
+            onChoose={addObject}
+            noGroups
+            hintText={t`Choose an object to add to the group`}
+            fullWidth
+            disabled={isObjectListLocked}
+          />
+        </ColumnStackLayout>
+      )}
+    </I18n>
   );
 };
 

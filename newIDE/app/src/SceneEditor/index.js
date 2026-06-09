@@ -1057,6 +1057,7 @@ export default class SceneEditor extends React.Component<Props, State> {
         objectFolderOrObjectWithContext,
       ],
       selectedLayer: null,
+      selectedObjectGroup: null,
       lastSelectionType: 'object',
     });
     if (this.editorDisplay)
@@ -1216,6 +1217,7 @@ export default class SceneEditor extends React.Component<Props, State> {
         lastSelectionType: 'object',
         selectedObjectFolderOrObjectsWithContext,
         selectedLayer: null,
+        selectedObjectGroup: null,
       },
       () => {
         // We update the toolbar because we need to update the objects selected
@@ -1353,6 +1355,7 @@ export default class SceneEditor extends React.Component<Props, State> {
           lastSelectionType: 'instance',
           selectedObjectFolderOrObjectsWithContext: [],
           selectedLayer: null,
+          selectedObjectGroup: null,
         },
         this.updateToolbar
       );
@@ -1379,6 +1382,7 @@ export default class SceneEditor extends React.Component<Props, State> {
             },
           ],
           selectedLayer: null,
+          selectedObjectGroup: null,
         },
         this.updateToolbar
       );
@@ -1395,6 +1399,7 @@ export default class SceneEditor extends React.Component<Props, State> {
             },
           ],
           selectedLayer: null,
+          selectedObjectGroup: null,
         },
         this.updateToolbar
       );
@@ -1824,6 +1829,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     this.setState({
       selectedLayer: layer,
       lastSelectionType: 'layer',
+      selectedObjectGroup: null,
     });
   };
 
@@ -1831,6 +1837,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     this.setState({
       selectedObjectGroup: objectGroup,
       lastSelectionType: 'objectGroup',
+      selectedLayer: null,
     });
   };
 

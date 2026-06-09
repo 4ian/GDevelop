@@ -262,7 +262,6 @@ export const InstanceOrObjectPropertiesEditorContainer: React.ComponentType<{
             initialInstances={initialInstances}
             projectScopedContainersAccessor={projectScopedContainersAccessor}
             unsavedChanges={unsavedChanges}
-            i18n={i18n}
             historyHandler={historyHandler}
             objectGroup={objectGroup}
             isObjectListLocked={isObjectGroupObjectListLocked}

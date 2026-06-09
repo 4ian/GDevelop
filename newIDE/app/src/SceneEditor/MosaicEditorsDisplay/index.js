@@ -542,6 +542,7 @@ const MosaicEditorsDisplay: React.ComponentType<{
                 }
                 objectGroups={objectsContainer.getObjectGroups()}
                 onCreateGroup={props.onCreateObjectGroup}
+                selectedObjectGroup={selectedObjectGroup}
                 onSelectObjectGroup={props.onSelectObjectGroup}
                 onEditGroup={props.onEditObjectGroup}
                 onDeleteGroup={props.onDeleteObjectGroup}

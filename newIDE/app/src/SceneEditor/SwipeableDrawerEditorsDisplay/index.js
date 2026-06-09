@@ -534,6 +534,7 @@ const SwipeableDrawerEditorsDisplay: React.ComponentType<{
                           projectScopedContainersAccessor
                         }
                         objectGroups={objectsContainer.getObjectGroups()}
+                        selectedObjectGroup={props.selectedObjectGroup}
                         onSelectObjectGroup={props.onSelectObjectGroup}
                         onCreateGroup={props.onCreateObjectGroup}
                         onEditGroup={props.onEditObjectGroup}

@@ -275,10 +275,12 @@ namespace gdjs {
       cubeTexture.images[5] = this._getImageSource(zNegativeResourceName);
       // The images also need to be mirrored horizontally by users.
 
+      // Skyboxes/cube maps should keep the previous non-mipmapped filtering:
+      // mip chains add memory pressure and can blur horizons between faces.
+      cubeTexture.magFilter = THREE.LinearFilter;
+      cubeTexture.minFilter = THREE.LinearFilter;
+      cubeTexture.generateMipmaps = false;
       cubeTexture.colorSpace = THREE.SRGBColorSpace;
-
-      const resource = this._getImageResource(xPositiveResourceName);
-      applyThreeTextureSettings(cubeTexture, resource);
       cubeTexture.needsUpdate = true;
       this._loadedThreeCubeTextures.set(key, cubeTexture);
       this._loadedThreeCubeTextureKeysByResourceName.add(

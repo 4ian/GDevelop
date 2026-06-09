@@ -110,4 +110,22 @@ describe('gdjs.Cube3DRuntimeObject', function () {
     expect(texture.minFilter).to.be(THREE.LinearMipmapLinearFilter);
     expect(texture.generateMipmaps).to.be(true);
   });
+
+  it('keeps cube-map textures non-mipmapped', async () => {
+    const runtimeGame = await gdjs.getPixiRuntimeGameWithAssets();
+    const texture = runtimeGame
+      .getImageManager()
+      .getThreeCubeTexture(
+        'base/tests-utils/assets/64x64.jpg',
+        'base/tests-utils/assets/64x64.jpg',
+        'base/tests-utils/assets/64x64.jpg',
+        'base/tests-utils/assets/64x64.jpg',
+        'base/tests-utils/assets/64x64.jpg',
+        'base/tests-utils/assets/64x64.jpg'
+      );
+
+    expect(texture.magFilter).to.be(THREE.LinearFilter);
+    expect(texture.minFilter).to.be(THREE.LinearFilter);
+    expect(texture.generateMipmaps).to.be(false);
+  });
 });

@@ -3826,8 +3826,17 @@ module.exports = {
      * @returns {[number, number, number]}
      */
     const getPointForCubeLocation = (location) => {
-      const point = getPointForLocation(location);
-      return [point[0] || 0, point[1] || 0, point[2] || 0];
+      switch (location) {
+        case 'ObjectCenter':
+          return [0.5, 0.5, 0.5];
+        case 'BottomCenterZ':
+          return [0.5, 0.5, 0];
+        case 'BottomCenterY':
+          return [0.5, 1, 0.5];
+        case 'TopLeft':
+        default:
+          return [0, 0, 0];
+      }
     };
 
     class Model3DRendered3DInstance extends Rendered3DInstance {

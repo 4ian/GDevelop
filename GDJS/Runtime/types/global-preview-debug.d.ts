@@ -19,19 +19,32 @@ declare namespace gdjs {
    */
   var __cdpAttached: boolean | undefined;
 
-  /**
-   * Installed at preview startup by `installBreakpointDebugSupport`. Called
-   * over CDP `Runtime.evaluate` while V8 is paused to serialize the minimal
-   * variables dump for the IDE.
-   */
+  /** @deprecated Use `gdjs.Debugger.buildDumpJson` instead. */
   var __buildBreakpointDumpJson: (() => string) | undefined;
 
-  /**
-   * Last-created preview `RuntimeGame`. Exposed so the IDE and the CDP
-   * bootstrap fallback can reach `_debugState` without traversing the
-   * renderer.
-   */
+  /** @deprecated Use `gdjs.Debugger.game` instead. */
   var game: gdjs.RuntimeGame | undefined;
+
+  /**
+   * Public debugger API. Preview-only globals previously scattered on the
+   * `gdjs` namespace now live here. All fields are `undefined` in exported
+   * (non-preview) builds.
+   */
+  namespace Debugger {
+    var game: gdjs.RuntimeGame | undefined;
+    var buildDumpJson: (() => string) | undefined;
+
+    function pushFunction(
+      functionId: string,
+      scene: gdjs.RuntimeScene | null | undefined
+    ): void;
+    function popFunction(scene: gdjs.RuntimeScene | null | undefined): void;
+    function checkBreakpoint(
+      functionId: string,
+      eventIndex: number,
+      container: gdjs.RuntimeInstanceContainer | null | undefined
+    ): boolean;
+  }
 }
 
 /**

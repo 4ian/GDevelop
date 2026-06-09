@@ -83,9 +83,9 @@ gd::String EventsCodeGenerator::GenerateEventsListCompleteFunctionCode(
   gd::String bpFinallyCode;
   if (!codeGenerator.GenerateCodeForRuntime()) {
     gd::String ns = codeGenerator.ConvertToStringExplicit(codeGenerator.GetCodeNamespace());
-    bpPushCode = "if (runtimeScene) runtimeScene.__pushBpFunction(" + ns + ");\n";
+    bpPushCode = "gdjs.Debugger.pushFunction(" + ns + ", runtimeScene);\n";
     bpTryCode = "try {\n";
-    bpFinallyCode = "} finally { if (runtimeScene) runtimeScene.__popBpFunction(); }\n";
+    bpFinallyCode = "} finally { gdjs.Debugger.popFunction(runtimeScene); }\n";
   }
 
   gd::String output =
@@ -1594,10 +1594,10 @@ gd::String EventsCodeGenerator::GenerateBreakpointCode(size_t eventIndex) {
 
   // `__checkBreakpoint` returns false unless CDP is attached (Electron local
   // preview only), so the `debugger;` is dead code in web/remote previews.
-  return "if (runtimeScene && runtimeScene.__checkBreakpoint(" +
+  return "if (gdjs.Debugger.checkBreakpoint(" +
          ConvertToStringExplicit(GetCodeNamespace()) + ", " +
          gd::String::From(eventIndex) +
-         ")) debugger;\n";
+         ", runtimeScene)) debugger;\n";
 }
 
 gd::String EventsCodeGenerator::GeneratePropertySetterWithoutCasting(

@@ -35,15 +35,72 @@ namespace gdjs {
   };
 
   /**
+   * Public debugger API exposed on the `gdjs` namespace. All preview-only
+   * globals that were previously scattered on `gdjs` (`gdjs.game`,
+   * `gdjs.__buildBreakpointDumpJson`) and on `RuntimeScene`
+   * (`__pushBpFunction`, `__popBpFunction`, `__checkBreakpoint`) live here.
+   *
+   * Generated event code calls `gdjs.Debugger.pushFunction`,
+   * `gdjs.Debugger.popFunction`, and `gdjs.Debugger.checkBreakpoint`.
+   * Fields are `undefined` in non-preview (exported) builds.
+   */
+  export namespace Debugger {
+    /** The current preview RuntimeGame. */
+    export let game: gdjs.RuntimeGame | undefined;
+
+    /**
+     * Serializes runtime state for the IDE variable tooltip while V8 is
+     * paused. Set by `installBreakpointDebugSupport`.
+     */
+    export let buildDumpJson: (() => string) | undefined;
+
+    /**
+     * Called by generated code when entering an events-function scope.
+     * Delegates to `RuntimeScene.__pushBpFunction`.
+     */
+    export const pushFunction = (
+      functionId: string,
+      scene: gdjs.RuntimeScene | null | undefined
+    ): void => {
+      if (scene) scene.__pushBpFunction(functionId);
+    };
+
+    /**
+     * Called by generated code when leaving an events-function scope.
+     * Delegates to `RuntimeScene.__popBpFunction`.
+     */
+    export const popFunction = (
+      scene: gdjs.RuntimeScene | null | undefined
+    ): void => {
+      if (scene) scene.__popBpFunction();
+    };
+
+    /**
+     * Called by generated code before each event.
+     * Returns `true` if the `debugger;` statement should fire.
+     * Delegates to `RuntimeInstanceContainer.__checkBreakpoint`.
+     */
+    export const checkBreakpoint = (
+      functionId: string,
+      eventIndex: number,
+      container: gdjs.RuntimeInstanceContainer | null | undefined
+    ): boolean => {
+      if (!container) return false;
+      return container.__checkBreakpoint(functionId, eventIndex);
+    };
+  }
+
+  /**
    * Free function (not a method) so RuntimeGame carries no debug surface in
    * non-preview builds. Called from the constructor, gated on `_isPreview`.
    */
   export const installBreakpointDebugSupport = (
     game: gdjs.RuntimeGame
   ): void => {
-    gdjs.game = game;
+    gdjs.Debugger.game = game;
+    gdjs.game = game; // backward-compat alias
 
-    gdjs.__buildBreakpointDumpJson = (): string => {
+    gdjs.Debugger.buildDumpJson = (): string => {
       const activeLocalVariables: {
         [namespaceKey: string]: gdjs.VariablesContainer[];
       } = {};
@@ -131,6 +188,7 @@ namespace gdjs {
         return value;
       });
     };
+    gdjs.__buildBreakpointDumpJson = gdjs.Debugger.buildDumpJson; // backward-compat alias
 
     if (typeof window === 'undefined') return;
 

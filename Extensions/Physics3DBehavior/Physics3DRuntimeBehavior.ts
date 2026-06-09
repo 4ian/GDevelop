@@ -399,6 +399,9 @@ namespace gdjs {
     _objectOldCenterX: float = 0;
     _objectOldCenterY: float = 0;
     _objectOldCenterZ: float = 0;
+    _objectOldOriginOffsetX: float = 0;
+    _objectOldOriginOffsetY: float = 0;
+    _objectOldOriginOffsetZ: float = 0;
 
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
@@ -462,18 +465,38 @@ namespace gdjs {
       return tempQuat;
     }
 
-    _hasObjectCenterChanged(): boolean {
+    /**
+     * Check if the object origin or center points moved relatively to the
+     * object position (it can happen on hot-reload or with a network update).
+     *
+     * The center is where the body is, and the automatic shape offset is
+     * evaluated from both points (see
+     * `_createNewShapeSettingsWithoutMassCenterOffset`).
+     */
+    _hasObjectOriginOrCenterChanged(): boolean {
       return (
         this._objectOldCenterX !== this.owner3D.getCenterX() ||
         this._objectOldCenterY !== this.owner3D.getCenterY() ||
-        this._objectOldCenterZ !== this.owner3D.getCenterZ()
+        this._objectOldCenterZ !== this.owner3D.getCenterZ() ||
+        this._objectOldOriginOffsetX !==
+          this.owner3D.getX() - this.owner3D.getDrawableX() ||
+        this._objectOldOriginOffsetY !==
+          this.owner3D.getY() - this.owner3D.getDrawableY() ||
+        this._objectOldOriginOffsetZ !==
+          this.owner3D.getZ() - this.owner3D.getDrawableZ()
       );
     }
 
-    _updateObjectOldCenter(): void {
+    _updateObjectOldOriginAndCenter(): void {
       this._objectOldCenterX = this.owner3D.getCenterX();
       this._objectOldCenterY = this.owner3D.getCenterY();
       this._objectOldCenterZ = this.owner3D.getCenterZ();
+      this._objectOldOriginOffsetX =
+        this.owner3D.getX() - this.owner3D.getDrawableX();
+      this._objectOldOriginOffsetY =
+        this.owner3D.getY() - this.owner3D.getDrawableY();
+      this._objectOldOriginOffsetZ =
+        this.owner3D.getZ() - this.owner3D.getDrawableZ();
     }
 
     override applyBehaviorOverriding(behaviorData): boolean {
@@ -903,31 +926,48 @@ namespace gdjs {
         convexShapeSettings.mDensity = this.density;
         shapeSettings = convexShapeSettings;
       }
-      const automaticShapeOffsetX =
-        this._shape === 'Mesh'
-          ? 0
-          : (this.owner3D.getWidth() / 2 - this.owner3D.getCenterX()) *
-            this._sharedData.worldInvScale;
-      const automaticShapeOffsetY =
-        this._shape === 'Mesh'
-          ? 0
-          : (this.owner3D.getHeight() / 2 - this.owner3D.getCenterY()) *
-            this._sharedData.worldInvScale;
-      const automaticShapeOffsetZ =
-        this._shape === 'Mesh' || !applyObjectCenterOffsetOnZ
-          ? 0
-          : (this.owner3D.getDepth() / 2 - this.owner3D.getCenterZ()) *
-            this._sharedData.worldInvScale;
-
       return new Jolt.RotatedTranslatedShapeSettings(
         this.getVec3(
-          this.shapeOffsetX * shapeScale + automaticShapeOffsetX,
-          this.shapeOffsetY * shapeScale + automaticShapeOffsetY,
-          this.shapeOffsetZ * shapeScale + automaticShapeOffsetZ
+          this.shapeOffsetX * shapeScale + this.getAutomaticShapeOffsetX(),
+          this.shapeOffsetY * shapeScale + this.getAutomaticShapeOffsetY(),
+          this.shapeOffsetZ * shapeScale +
+            (applyObjectCenterOffsetOnZ ? this.getAutomaticShapeOffsetZ() : 0)
         ),
         quat,
         shapeSettings
       );
+    }
+
+    /**
+     * The offset to apply on the shape (in physics world coordinates) to keep
+     * it aligned with the object bounding box, as the body is positioned at
+     * the object center which may not be the geometric center of the object.
+     *
+     * Mesh shapes don't need it because their vertices are already expressed
+     * relatively to the object center point
+     * (see `Model3DRuntimeObject3DRenderer.stretchModelIntoUnitaryCube`).
+     */
+    getAutomaticShapeOffsetX(): float {
+      return this._shape === 'Mesh'
+        ? 0
+        : (this.owner3D.getWidth() / 2 - this.owner3D.getCenterX()) *
+            this._sharedData.worldInvScale;
+    }
+
+    /** @see getAutomaticShapeOffsetX */
+    getAutomaticShapeOffsetY(): float {
+      return this._shape === 'Mesh'
+        ? 0
+        : (this.owner3D.getHeight() / 2 - this.owner3D.getCenterY()) *
+            this._sharedData.worldInvScale;
+    }
+
+    /** @see getAutomaticShapeOffsetX */
+    getAutomaticShapeOffsetZ(): float {
+      return this._shape === 'Mesh'
+        ? 0
+        : (this.owner3D.getDepth() / 2 - this.owner3D.getCenterZ()) *
+            this._sharedData.worldInvScale;
     }
 
     private getMeshShapeSettings(
@@ -1093,7 +1133,7 @@ namespace gdjs {
       // The old center must NOT be refreshed here: when the center moved,
       // the body position (which is the object center) must still be updated
       // by `bodyUpdater.updateBodyFromObject` which relies on
-      // `_hasObjectCenterChanged`. It's refreshed by `updateObjectFromBody`
+      // `_hasObjectOriginOrCenterChanged`. It's refreshed by `updateObjectFromBody`
       // after the physics step.
     }
 
@@ -1131,7 +1171,7 @@ namespace gdjs {
       this._objectOldWidth = this.owner3D.getWidth();
       this._objectOldHeight = this.owner3D.getHeight();
       this._objectOldDepth = this.owner3D.getDepth();
-      this._updateObjectOldCenter();
+      this._updateObjectOldOriginAndCenter();
       return true;
     }
 
@@ -1257,7 +1297,7 @@ namespace gdjs {
       this._objectOldRotationX = this.owner3D.getRotationX();
       this._objectOldRotationY = this.owner3D.getRotationY();
       this._objectOldRotationZ = this.owner3D.getAngle();
-      this._updateObjectOldCenter();
+      this._updateObjectOldOriginAndCenter();
     }
 
     updateBodyFromObject() {
@@ -1278,7 +1318,7 @@ namespace gdjs {
       // (even when shapes have custom dimensions).
       if (
         this._needToRecreateShape ||
-        this._hasObjectCenterChanged() ||
+        this._hasObjectOriginOrCenterChanged() ||
         (!this.hasCustomShapeDimension() &&
           (this._objectOldWidth !== this.owner3D.getWidth() ||
             this._objectOldHeight !== this.owner3D.getHeight() ||
@@ -2275,7 +2315,7 @@ namespace gdjs {
           this.behavior._objectOldRotationX !== owner3D.getRotationX() ||
           this.behavior._objectOldRotationY !== owner3D.getRotationY() ||
           this.behavior._objectOldRotationZ !== owner3D.getAngle() ||
-          this.behavior._hasObjectCenterChanged()
+          this.behavior._hasObjectOriginOrCenterChanged()
         ) {
           _sharedData.bodyInterface.SetPositionAndRotationWhenChanged(
             body.GetID(),

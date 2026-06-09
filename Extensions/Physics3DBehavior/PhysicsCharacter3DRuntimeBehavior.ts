@@ -398,12 +398,13 @@ namespace gdjs {
       const { behavior } = physics3D;
       // The body is at the object center on X and Y (the shape is offset
       // when the object center is not the geometric center of the object).
-      // The character origin is at its feet on Z: when the character is made
-      // smaller, it must stay on the ground and not fall from its old size.
+      // The character feet are at the bottom of the object on Z
+      // (`getDrawableZ`): when the character is made smaller, it must stay
+      // on the ground and not fall from its old size.
       result.Set(
         this.owner3D.getCenterXInScene() * this._sharedData.worldInvScale,
         this.owner3D.getCenterYInScene() * this._sharedData.worldInvScale,
-        this.owner3D.getZ() * this._sharedData.worldInvScale +
+        this.owner3D.getDrawableZ() * this._sharedData.worldInvScale +
           behavior._shapeHalfDepth
       );
       return result;
@@ -436,9 +437,14 @@ namespace gdjs {
       this.owner3D.setCenterYInScene(
         physicsPosition.GetY() * this._sharedData.worldScale
       );
+      // The character feet (the bottom of the shape) are at the bottom of
+      // the object (`getDrawableZ`). `getZ() - getDrawableZ()` converts the
+      // bottom of the object back to the object position (it only depends on
+      // the object origin point and depth, not on its position).
       this.owner3D.setZ(
         (physicsPosition.GetZ() - behavior._shapeHalfDepth) *
-          this._sharedData.worldScale
+          this._sharedData.worldScale +
+          (this.owner3D.getZ() - this.owner3D.getDrawableZ())
       );
     }
 
@@ -1795,7 +1801,7 @@ namespace gdjs {
           behavior._objectOldX !== owner3D.getX() ||
           behavior._objectOldY !== owner3D.getY() ||
           behavior._objectOldZ !== owner3D.getZ() ||
-          behavior._hasObjectCenterChanged()
+          behavior._hasObjectOriginOrCenterChanged()
         ) {
           this.updateCharacterPosition();
         }

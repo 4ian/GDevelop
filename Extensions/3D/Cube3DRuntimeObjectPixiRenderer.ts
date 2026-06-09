@@ -106,17 +106,6 @@ namespace gdjs {
       );
     }
 
-    override updatePosition(): void {
-      const object = this._cube3DRuntimeObject;
-      const originPoint = object._originPoint;
-      const centerPoint = object._centerPoint;
-      this.get3DRendererObject().position.set(
-        object.getX() - object.getWidth() * (originPoint[0] - centerPoint[0]),
-        object.getY() - object.getHeight() * (originPoint[1] - centerPoint[1]),
-        object.getZ() - object.getDepth() * (originPoint[2] - centerPoint[2])
-      );
-    }
-
     updateOriginAndCenter(): void {
       this._updateBoxMeshPosition();
       this.updatePosition();

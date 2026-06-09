@@ -118,6 +118,10 @@ namespace gdjs {
     }
 
     override updatePosition() {
+      // Same as `RuntimeObject3DRenderer.updatePosition`, but using the
+      // renderer points directly because this method is called during the
+      // renderer construction, before `_renderer` is set on the object
+      // (which `Model3DRuntimeObject.getDrawableX` and others rely on).
       const originPoint = this.getOriginPoint();
       const centerPoint = this.getCenterPoint();
       this.get3DRendererObject().position.set(

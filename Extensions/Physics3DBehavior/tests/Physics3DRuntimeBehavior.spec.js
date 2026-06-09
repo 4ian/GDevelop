@@ -371,41 +371,80 @@ describe('Physics3DRuntimeBehavior', () => {
     }
   });
 
-  it('keeps a bottom-centered Cube3D character on the floor after landing', async () => {
-    const runtimeScene = await createSceneWithPhysics();
-    addStaticFloor(runtimeScene);
-    const characterObject = addCube(
-      runtimeScene,
-      makeCharacterCubeObjectData({}),
-      -25,
-      -25,
-      20
-    );
-    const characterBehavior =
-      /** @type {gdjs.PhysicsCharacter3DRuntimeBehavior} */ (
-        characterObject.getBehavior('Character3D')
-      );
-    const physicsBehavior = /** @type {gdjs.Physics3DRuntimeBehavior} */ (
-      characterObject.getBehavior(physicsBehaviorName)
-    );
+  const characterCases = [
+    {
+      label: 'with the default origin and a bottom-center-on-Z center',
+      content: { originLocation: 'TopLeft', centerLocation: 'BottomCenterZ' },
+      // The character feet start on the floor top (z = 20).
+      startZ: 20,
+    },
+    {
+      label: 'with an object-center origin and center',
+      content: {
+        originLocation: 'ObjectCenter',
+        centerLocation: 'ObjectCenter',
+      },
+      // The origin is at the middle of the 100 pixels depth: start the
+      // character with its feet a bit above the floor top (z = 20).
+      startZ: 75,
+    },
+    {
+      label: 'with a bottom-center-on-Y origin and center',
+      content: {
+        originLocation: 'BottomCenterY',
+        centerLocation: 'BottomCenterY',
+      },
+      startZ: 75,
+    },
+  ];
 
-    try {
-      characterBehavior.getPhysics3D();
-      physicsBehavior.updateBodyFromObject();
-      expect(stepUntilOnFloor(runtimeScene, characterBehavior, 120)).to.be(
-        true
+  for (const { label, content, startZ } of characterCases) {
+    it(`keeps a Cube3D character ${label} on the floor after landing`, async () => {
+      const runtimeScene = await createSceneWithPhysics();
+      addStaticFloor(runtimeScene);
+      const characterObject = addCube(
+        runtimeScene,
+        makeCharacterCubeObjectData(content),
+        -25,
+        -25,
+        startZ
+      );
+      const characterBehavior =
+        /** @type {gdjs.PhysicsCharacter3DRuntimeBehavior} */ (
+          characterObject.getBehavior('Character3D')
+        );
+      const physicsBehavior = /** @type {gdjs.Physics3DRuntimeBehavior} */ (
+        characterObject.getBehavior(physicsBehaviorName)
       );
 
-      characterBehavior.simulateJumpKey();
-      expect(stepUntilNotOnFloor(runtimeScene, characterBehavior, 10)).to.be(
-        true
-      );
+      // The bottom of the character must rest on the floor top (z = 20),
+      // whatever the object origin and center are. A small gap can be left
+      // by the character padding used by the physics engine.
+      const expectFeetOnFloorTop = () => {
+        const distanceToFloor = Math.abs(characterObject.getDrawableZ() - 20);
+        expect(distanceToFloor <= 5).to.be(true);
+      };
 
-      expect(stepUntilOnFloor(runtimeScene, characterBehavior, 240)).to.be(
-        true
-      );
-    } finally {
-      disposePhysics(runtimeScene);
-    }
-  });
+      try {
+        characterBehavior.getPhysics3D();
+        physicsBehavior.updateBodyFromObject();
+        expect(stepUntilOnFloor(runtimeScene, characterBehavior, 120)).to.be(
+          true
+        );
+        expectFeetOnFloorTop();
+
+        characterBehavior.simulateJumpKey();
+        expect(stepUntilNotOnFloor(runtimeScene, characterBehavior, 10)).to.be(
+          true
+        );
+
+        expect(stepUntilOnFloor(runtimeScene, characterBehavior, 240)).to.be(
+          true
+        );
+        expectFeetOnFloorTop();
+      } finally {
+        disposePhysics(runtimeScene);
+      }
+    });
+  }
 });

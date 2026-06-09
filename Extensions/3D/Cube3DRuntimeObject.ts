@@ -74,6 +74,12 @@ namespace gdjs {
 
   type Cube3DLocationPoint = [float, float, float];
 
+  const isSamePoint = (
+    point: Cube3DLocationPoint,
+    other: Cube3DLocationPoint
+  ): boolean =>
+    point[0] === other[0] && point[1] === other[1] && point[2] === other[2];
+
   const getPointForLocation = (location: string): Cube3DLocationPoint => {
     switch (location) {
       case 'ObjectCenter':
@@ -576,13 +582,22 @@ namespace gdjs {
           this.setBackFaceUpThroughWhichAxisRotation(networkSyncData.bfu);
         }
       }
-      if (networkSyncData.op !== undefined) {
+      let havePointsChanged = false;
+      if (
+        networkSyncData.op !== undefined &&
+        !isSamePoint(networkSyncData.op, this._originPoint)
+      ) {
         this._originPoint = networkSyncData.op;
-        this._renderer.updateOriginAndCenter();
-        this.invalidateHitboxes();
+        havePointsChanged = true;
       }
-      if (networkSyncData.cp !== undefined) {
+      if (
+        networkSyncData.cp !== undefined &&
+        !isSamePoint(networkSyncData.cp, this._centerPoint)
+      ) {
         this._centerPoint = networkSyncData.cp;
+        havePointsChanged = true;
+      }
+      if (havePointsChanged) {
         this._renderer.updateOriginAndCenter();
         this.invalidateHitboxes();
       }

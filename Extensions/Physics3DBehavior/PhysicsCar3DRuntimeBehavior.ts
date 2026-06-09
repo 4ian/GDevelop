@@ -341,27 +341,6 @@ namespace gdjs {
       this._clearInputsBetweenFrames = !!options.clearInputs;
     }
 
-    _getPhysicsPosition(result: Jolt.RVec3): Jolt.RVec3 {
-      const physics3D = this.getPhysics3D();
-      if (!physics3D) {
-        result.Set(0, 0, 0);
-        return result;
-      }
-      const { behavior } = physics3D;
-      // Same as for characters:
-      // - the body is at the object center on X and Y (the shape is offset
-      //   when the object center is not the geometric center of the object)
-      // - the origin is used for Z because, when the car is made smaller,
-      //   it must stay on the ground and not fall from its old size.
-      result.Set(
-        this.owner3D.getCenterXInScene() * this._sharedData.worldInvScale,
-        this.owner3D.getCenterYInScene() * this._sharedData.worldInvScale,
-        this.owner3D.getZ() * this._sharedData.worldInvScale +
-          behavior._shapeHalfDepth
-      );
-      return result;
-    }
-
     override onDeActivate() {
       if (!this._physics3D) {
         return;
@@ -897,30 +876,36 @@ namespace gdjs {
       const suspensionMinLength = wheelRadius;
       const suspensionMaxLength = 1.5 * suspensionMinLength;
 
+      // Wheels are positioned relatively to the body (which is at the object
+      // center): follow the same automatic offset as the car shape.
+      const shapeOffsetX = behavior.getAutomaticShapeOffsetX();
+      const shapeOffsetY = behavior.getAutomaticShapeOffsetY();
+      const shapeOffsetZ = behavior.getAutomaticShapeOffsetZ();
+
       const constraint = this._vehicleController.GetConstraint();
       const fl = constraint.GetWheel(0).GetSettings();
       fl.mPosition = this.getVec3(
-        frontWheelOffsetX,
-        -wheelOffsetY,
-        -wheelOffsetZ
+        shapeOffsetX + frontWheelOffsetX,
+        shapeOffsetY - wheelOffsetY,
+        shapeOffsetZ - wheelOffsetZ
       );
       const fr = constraint.GetWheel(1).GetSettings();
       fr.mPosition = this.getVec3(
-        frontWheelOffsetX,
-        wheelOffsetY,
-        -wheelOffsetZ
+        shapeOffsetX + frontWheelOffsetX,
+        shapeOffsetY + wheelOffsetY,
+        shapeOffsetZ - wheelOffsetZ
       );
       const bl = constraint.GetWheel(2).GetSettings();
       bl.mPosition = this.getVec3(
-        -backWheelOffsetX,
-        -wheelOffsetY,
-        -wheelOffsetZ
+        shapeOffsetX - backWheelOffsetX,
+        shapeOffsetY - wheelOffsetY,
+        shapeOffsetZ - wheelOffsetZ
       );
       const br = constraint.GetWheel(3).GetSettings();
       br.mPosition = this.getVec3(
-        -backWheelOffsetX,
-        wheelOffsetY,
-        -wheelOffsetZ
+        shapeOffsetX - backWheelOffsetX,
+        shapeOffsetY + wheelOffsetY,
+        shapeOffsetZ - wheelOffsetZ
       );
       for (let index = 0; index < 4; index++) {
         const wheel = Jolt.castObject(
@@ -974,12 +959,16 @@ namespace gdjs {
         const { behavior } = physics3D;
         const { _sharedData } = this.carBehavior;
 
-        const carShape = behavior.createShape(false);
+        const carShape = behavior.createShape();
 
-        // Create car body
+        // Create car body.
+        // The body is at the object center (like any default physics body,
+        // as `DefaultBodyUpdater` is used to keep the object and the body
+        // in sync). The shape is offset when the object center is not the
+        // geometric center of the object.
         const carBodySettings = new Jolt.BodyCreationSettings(
           carShape,
-          this.carBehavior._getPhysicsPosition(_sharedData.getRVec3(0, 0, 0)),
+          behavior._getPhysicsPosition(_sharedData.getRVec3(0, 0, 0)),
           behavior._getPhysicsRotation(_sharedData.getQuat(0, 0, 0, 1)),
           Jolt.EMotionType_Dynamic,
           behavior.getBodyLayer()

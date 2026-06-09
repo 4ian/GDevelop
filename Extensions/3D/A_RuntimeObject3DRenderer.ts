@@ -28,10 +28,14 @@ namespace gdjs {
     }
 
     updatePosition() {
+      // The 3D object is positioned at the center point of the object, as
+      // objects rotate around it. Objects with a custom origin or center
+      // (like 3D models or boxes) only have to override `getDrawableX` and
+      // `getCenterX` (and the Y and Z variants).
       this._threeObject3D.position.set(
-        this._object.getX() + this._object.getWidth() / 2,
-        this._object.getY() + this._object.getHeight() / 2,
-        this._object.getZ() + this._object.getDepth() / 2
+        this._object.getDrawableX() + this._object.getCenterX(),
+        this._object.getDrawableY() + this._object.getCenterY(),
+        this._object.getDrawableZ() + this._object.getCenterZ()
       );
     }
 

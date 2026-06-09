@@ -100,6 +100,29 @@ describe('gdjs.Cube3DRuntimeObject', function () {
     expect(cube.get3DRendererObject().position.z).to.be(30);
   });
 
+  it('keeps the rendered box aligned with the object bounds for custom origin and center', async () => {
+    const { cube } = await makeCube({
+      originLocation: 'BottomCenterY',
+      centerLocation: 'BottomCenterZ',
+    });
+
+    // The 3D object is at the center point of the object.
+    const threeObject = cube.get3DRendererObject();
+    expect(threeObject.position.x).to.be(cube.getCenterXInScene());
+    expect(threeObject.position.y).to.be(cube.getCenterYInScene());
+    expect(threeObject.position.z).to.be(cube.getCenterZInScene());
+
+    // The rendered box must cover the object bounding box.
+    threeObject.updateMatrixWorld(true);
+    const aabb = new THREE.Box3().setFromObject(threeObject);
+    expect(aabb.min.x).to.be(cube.getDrawableX());
+    expect(aabb.min.y).to.be(cube.getDrawableY());
+    expect(aabb.min.z).to.be(cube.getDrawableZ());
+    expect(aabb.max.x).to.be(cube.getDrawableX() + cube.getWidth());
+    expect(aabb.max.y).to.be(cube.getDrawableY() + cube.getHeight());
+    expect(aabb.max.z).to.be(cube.getDrawableZ() + cube.getDepth());
+  });
+
   it('uses mipmapped linear filtering unless smoothing is explicitly disabled', async () => {
     const runtimeGame = await gdjs.getPixiRuntimeGameWithAssets();
     const texture = runtimeGame

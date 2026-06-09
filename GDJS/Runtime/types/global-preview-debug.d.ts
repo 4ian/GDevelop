@@ -46,4 +46,11 @@ declare type InitialBreakpointEntry = {
 
 interface Window {
   __gdjsInitialBreakpoints?: InitialBreakpointEntry[];
+  /**
+   * Set by the CDP bootstrap script via `addScriptToEvaluateOnNewDocument`
+   * before the game loads. `installBreakpointDebugSupport` reads this to set
+   * `gdjs.__cdpAttached = true` synchronously, replacing the old poll-based
+   * bootstrap approach.
+   */
+  __gdjsWaitForCdp?: boolean;
 }

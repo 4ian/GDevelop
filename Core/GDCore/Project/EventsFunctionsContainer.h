@@ -183,6 +183,11 @@ public:
 
   gd::FunctionFolderOrFunction &GetRootFolder() { return *rootFolder; }
 
+  /**
+   * \brief Rebuild the folder structure from the function groups.
+   */
+  void ReinitializeFolderStructure();
+
   void AddMissingFunctionsInRootFolder();
 
   /**

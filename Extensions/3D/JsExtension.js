@@ -998,6 +998,34 @@ module.exports = {
         }
         return false;
       }
+      if (propertyName === 'originLocation') {
+        const normalizedValue = newValue.toLowerCase();
+        if (normalizedValue === 'topleft') {
+          objectContent.originLocation = 'TopLeft';
+        } else if (normalizedValue === 'objectcenter') {
+          objectContent.originLocation = 'ObjectCenter';
+        } else if (normalizedValue === 'bottomcenterz') {
+          objectContent.originLocation = 'BottomCenterZ';
+        } else if (normalizedValue === 'bottomcentery') {
+          objectContent.originLocation = 'BottomCenterY';
+        } else {
+          return false;
+        }
+        return true;
+      }
+      if (propertyName === 'centerLocation') {
+        const normalizedValue = newValue.toLowerCase();
+        if (normalizedValue === 'objectcenter') {
+          objectContent.centerLocation = 'ObjectCenter';
+        } else if (normalizedValue === 'bottomcenterz') {
+          objectContent.centerLocation = 'BottomCenterZ';
+        } else if (normalizedValue === 'bottomcentery') {
+          objectContent.centerLocation = 'BottomCenterY';
+        } else {
+          return false;
+        }
+        return true;
+      }
       if (
         propertyName === 'frontFaceResourceName' ||
         propertyName === 'backFaceResourceName' ||
@@ -1285,6 +1313,29 @@ module.exports = {
         .setLabel(_('Shadow receiving'))
         .setGroup(_('Lighting'));
 
+      objectProperties
+        .getOrCreate('originLocation')
+        .setValue(objectContent.originLocation || 'TopLeft')
+        .setType('choice')
+        .addChoice('TopLeft', _('Top-left'))
+        .addChoice('ObjectCenter', _('Object center'))
+        .addChoice('BottomCenterZ', _('Bottom center (Z)'))
+        .addChoice('BottomCenterY', _('Bottom center (Y)'))
+        .setLabel(_('Origin point'))
+        .setGroup(_('Points'))
+        .setAdvanced(true);
+
+      objectProperties
+        .getOrCreate('centerLocation')
+        .setValue(objectContent.centerLocation || 'ObjectCenter')
+        .setType('choice')
+        .addChoice('ObjectCenter', _('Object center'))
+        .addChoice('BottomCenterZ', _('Bottom center (Z)'))
+        .addChoice('BottomCenterY', _('Bottom center (Y)'))
+        .setLabel(_('Center point'))
+        .setGroup(_('Points'))
+        .setAdvanced(true);
+
       return objectProperties;
     };
     Cube3DObject.content = {
@@ -1317,6 +1368,8 @@ module.exports = {
       tint: '255;255;255',
       isCastingShadow: true,
       isReceivingShadow: true,
+      originLocation: 'TopLeft',
+      centerLocation: 'ObjectCenter',
     };
 
     Cube3DObject.updateInitialInstanceProperty = function (
@@ -2571,6 +2624,28 @@ module.exports = {
     };
 
     /**
+     * Returns the point of a 3D box (as ratios of its dimensions, between 0 and
+     * 1 on each axis) for the given origin/center location name. The names match
+     * the ones used by the 3D Model object so that both objects are consistent.
+     * @param {string | undefined} location
+     * @param {string} defaultLocation
+     * @returns {[number, number, number]}
+     */
+    const getCube3DPointForLocation = (location, defaultLocation) => {
+      switch (location || defaultLocation) {
+        case 'ObjectCenter':
+          return [0.5, 0.5, 0.5];
+        case 'BottomCenterZ':
+          return [0.5, 0.5, 0];
+        case 'BottomCenterY':
+          return [0.5, 1, 0.5];
+        case 'TopLeft':
+        default:
+          return [0, 0, 0];
+      }
+    };
+
+    /**
      * @param {*} objectConfiguration
      * @returns {string | null}
      */
@@ -2763,11 +2838,14 @@ module.exports = {
         this._pixiTexturedObject.scale.x = scaleX;
         this._pixiTexturedObject.scale.y = scaleY;
 
+        const originPoint = this._getOriginPoint();
         this._pixiTexturedObject.position.x =
-          this._instance.getX() +
+          this._instance.getX() -
+          width * originPoint[0] +
           this._centerX * Math.abs(this._pixiTexturedObject.scale.x);
         this._pixiTexturedObject.position.y =
-          this._instance.getY() +
+          this._instance.getY() -
+          height * originPoint[1] +
           this._centerY * Math.abs(this._pixiTexturedObject.scale.y);
       }
 
@@ -2784,9 +2862,11 @@ module.exports = {
         this._pixiFallbackObject.lineTo(-width / 2, height / 2);
         this._pixiFallbackObject.endFill();
 
-        this._pixiFallbackObject.position.x = this._instance.getX() + width / 2;
+        const originPoint = this._getOriginPoint();
+        this._pixiFallbackObject.position.x =
+          this._instance.getX() - width * originPoint[0] + width / 2;
         this._pixiFallbackObject.position.y =
-          this._instance.getY() + height / 2;
+          this._instance.getY() - height * originPoint[1] + height / 2;
         this._pixiFallbackObject.angle = this._instance.getAngle();
 
         if (this._instance.isFlippedX()) this._pixiFallbackObject.scale.x = -1;
@@ -2833,6 +2913,30 @@ module.exports = {
           return this._centerY * this._pixiTexturedObject.scale.y;
         }
       }
+
+      /**
+       * The origin point of the box (as ratios of its dimensions). Only the X
+       * and Y axes are relevant in this top-down 2D representation.
+       * @returns {[number, number, number]}
+       */
+      _getOriginPoint() {
+        const object = gd.castObject(
+          this._associatedObjectConfiguration,
+          gd.ObjectJsImplementation
+        );
+        return getCube3DPointForLocation(
+          object.content.originLocation,
+          'TopLeft'
+        );
+      }
+
+      getOriginX() {
+        return this.getWidth() * this._getOriginPoint()[0];
+      }
+
+      getOriginY() {
+        return this.getHeight() * this._getOriginPoint()[1];
+      }
     }
 
     class RenderedCube3DObject3DInstance extends Rendered3DInstance {
@@ -2847,6 +2951,10 @@ module.exports = {
       _backFaceUpThroughWhichAxisRotation = 'X';
       _shouldUseTransparentTexture = false;
       _tint = '';
+      /** @type {[number, number, number]} */
+      _originPoint = [0, 0, 0];
+      /** @type {[number, number, number]} */
+      _centerPoint = [0.5, 0.5, 0.5];
 
       constructor(
         project,
@@ -2876,11 +2984,48 @@ module.exports = {
           getTransparentMaterial(),
           getTransparentMaterial(),
         ];
-        this._threeObject = new THREE.Mesh(geometry, materials);
+        this._boxMesh = new THREE.Mesh(geometry, materials);
+        // The box is wrapped in a group so that the origin and the rotation
+        // center (pivot) can be configured independently, mirroring the runtime
+        // Cube3DRuntimeObjectPixiRenderer and the 3D Model object.
+        this._threeObject = new THREE.Group();
         this._threeObject.rotation.order = 'ZYX';
+        this._threeObject.add(this._boxMesh);
         this._threeGroup.add(this._threeObject);
 
         this.updateThreeObject();
+      }
+
+      getOriginX() {
+        return this.getWidth() * this._originPoint[0];
+      }
+
+      getOriginY() {
+        return this.getHeight() * this._originPoint[1];
+      }
+
+      getOriginZ() {
+        return this.getDepth() * this._originPoint[2];
+      }
+
+      getCenterX() {
+        return this.getWidth() * this._centerPoint[0];
+      }
+
+      getCenterY() {
+        return this.getHeight() * this._centerPoint[1];
+      }
+
+      getCenterZ() {
+        return this.getDepth() * this._centerPoint[2];
+      }
+
+      getOriginPoint() {
+        return this._originPoint;
+      }
+
+      getCenterPoint() {
+        return this._centerPoint;
       }
 
       async _updateThreeObjectMaterials() {
@@ -2908,12 +3053,12 @@ module.exports = {
         ]);
         if (this._wasDestroyed) return;
 
-        this._threeObject.material[0] = materials[0];
-        this._threeObject.material[1] = materials[1];
-        this._threeObject.material[2] = materials[2];
-        this._threeObject.material[3] = materials[3];
-        this._threeObject.material[4] = materials[4];
-        this._threeObject.material[5] = materials[5];
+        this._boxMesh.material[0] = materials[0];
+        this._boxMesh.material[1] = materials[1];
+        this._boxMesh.material[2] = materials[2];
+        this._boxMesh.material[3] = materials[3];
+        this._boxMesh.material[4] = materials[4];
+        this._boxMesh.material[5] = materials[5];
 
         this._updateTextureUvMapping();
       }
@@ -2928,13 +3073,13 @@ module.exports = {
 
         for (
           let i = 0;
-          i < this._threeObject.geometry.attributes.position.count;
+          i < this._boxMesh.geometry.attributes.position.count;
           i++
         ) {
           tints.push(...normalizedTint);
         }
 
-        this._threeObject.geometry.setAttribute(
+        this._boxMesh.geometry.setAttribute(
           'color',
           new THREE.BufferAttribute(new Float32Array(tints), 3)
         );
@@ -2960,16 +3105,13 @@ module.exports = {
         const height = this.getHeight();
         const depth = this.getDepth();
 
-        this._threeObject.position.set(
-          this._instance.getX() + width / 2,
-          this._instance.getY() + height / 2,
-          this._instance.getZ() + depth / 2
+        this._originPoint = getCube3DPointForLocation(
+          object.content.originLocation,
+          'TopLeft'
         );
-
-        this._threeObject.rotation.set(
-          RenderedInstance.toRad(this._instance.getRotationX()),
-          RenderedInstance.toRad(this._instance.getRotationY()),
-          RenderedInstance.toRad(this._instance.getAngle())
+        this._centerPoint = getCube3DPointForLocation(
+          object.content.centerLocation,
+          'ObjectCenter'
         );
 
         let materialsDirty = false;
@@ -3076,17 +3218,57 @@ module.exports = {
         const scaleY = height * (this._instance.isFlippedY() ? -1 : 1);
         const scaleZ = depth * (this._instance.isFlippedZ() ? -1 : 1);
         if (
-          scaleX !== this._threeObject.scale.x ||
-          scaleY !== this._threeObject.scale.y ||
-          scaleZ !== this._threeObject.scale.z
+          scaleX !== this._boxMesh.scale.x ||
+          scaleY !== this._boxMesh.scale.y ||
+          scaleZ !== this._boxMesh.scale.z
         ) {
-          this._threeObject.scale.set(scaleX, scaleY, scaleZ);
           uvMappingDirty = true;
         }
+
+        // Position, rotation and size (including the rotation pivot offset)
+        // are applied here so that they always reflect the latest origin and
+        // center points.
+        this._updateThreeObjectPosition();
 
         if (materialsDirty) this._updateThreeObjectMaterials();
         if (uvMappingDirty) this._updateTextureUvMapping();
         if (tintDirty) this._updateTint();
+      }
+
+      _updateThreeObjectPosition() {
+        const width = this.getWidth();
+        const height = this.getHeight();
+        const depth = this.getDepth();
+        const originPoint = this.getOriginPoint();
+        const centerPoint = this.getCenterPoint();
+
+        // Place the wrapping group so that the box center point is at the
+        // instance position offset by (origin - center). As the group holds the
+        // rotation, the box rotates around its center point.
+        this._threeObject.position.set(
+          this._instance.getX() - width * (originPoint[0] - centerPoint[0]),
+          this._instance.getY() - height * (originPoint[1] - centerPoint[1]),
+          this._instance.getZ() - depth * (originPoint[2] - centerPoint[2])
+        );
+
+        this._threeObject.rotation.set(
+          RenderedInstance.toRad(this._instance.getRotationX()),
+          RenderedInstance.toRad(this._instance.getRotationY()),
+          RenderedInstance.toRad(this._instance.getAngle())
+        );
+
+        const scaleX = width * (this._instance.isFlippedX() ? -1 : 1);
+        const scaleY = height * (this._instance.isFlippedY() ? -1 : 1);
+        const scaleZ = depth * (this._instance.isFlippedZ() ? -1 : 1);
+        this._boxMesh.scale.set(scaleX, scaleY, scaleZ);
+
+        // Offset the box inside the group so that the center point is at the
+        // group origin (the rotation pivot). The signed scale handles flipping.
+        this._boxMesh.position.set(
+          scaleX * (0.5 - centerPoint[0]),
+          scaleY * (0.5 - centerPoint[1]),
+          scaleZ * (0.5 - centerPoint[2])
+        );
       }
 
       /**
@@ -3098,10 +3280,10 @@ module.exports = {
       _updateTextureUvMapping() {
         /** @type {THREE.BufferAttribute} */
         // @ts-ignore - position is stored as a Float32BufferAttribute
-        const pos = this._threeObject.geometry.getAttribute('position');
+        const pos = this._boxMesh.geometry.getAttribute('position');
         /** @type {THREE.BufferAttribute} */
         // @ts-ignore - uv is stored as a Float32BufferAttribute
-        const uvMapping = this._threeObject.geometry.getAttribute('uv');
+        const uvMapping = this._boxMesh.geometry.getAttribute('uv');
         const startIndex = 0;
         const endIndex = 23;
         const tileScale = this._tileScale || 1;
@@ -3115,7 +3297,7 @@ module.exports = {
               // Each face of the cube has 4 points
               4
           );
-          const material = this._threeObject.material[materialIndex];
+          const material = this._boxMesh.material[materialIndex];
           if (!material || !material.map) {
             continue;
           }
@@ -3135,25 +3317,17 @@ module.exports = {
               if (shouldRepeatTexture) {
                 if (shouldOrientateFacesTowardsY) {
                   x =
-                    -(
-                      this._threeObject.scale.z / material.map.source.data.width
-                    ) *
+                    -(this._boxMesh.scale.z / material.map.source.data.width) *
                     (pos.getZ(vertexIndex) - 0.5);
                   y =
-                    -(
-                      this._threeObject.scale.y /
-                      material.map.source.data.height
-                    ) *
+                    -(this._boxMesh.scale.y / material.map.source.data.height) *
                     (pos.getY(vertexIndex) + 0.5);
                 } else {
                   x =
-                    -(
-                      this._threeObject.scale.y / material.map.source.data.width
-                    ) *
+                    -(this._boxMesh.scale.y / material.map.source.data.width) *
                     (pos.getY(vertexIndex) - 0.5);
                   y =
-                    (this._threeObject.scale.z /
-                      material.map.source.data.height) *
+                    (this._boxMesh.scale.z / material.map.source.data.height) *
                     (pos.getZ(vertexIndex) - 0.5);
                 }
               } else {
@@ -3173,23 +3347,17 @@ module.exports = {
               if (shouldRepeatTexture) {
                 if (shouldOrientateFacesTowardsY) {
                   x =
-                    (this._threeObject.scale.z /
-                      material.map.source.data.width) *
+                    (this._boxMesh.scale.z / material.map.source.data.width) *
                     (pos.getZ(vertexIndex) + 0.5);
                   y =
-                    -(
-                      this._threeObject.scale.y /
-                      material.map.source.data.height
-                    ) *
+                    -(this._boxMesh.scale.y / material.map.source.data.height) *
                     (pos.getY(vertexIndex) + 0.5);
                 } else {
                   x =
-                    (this._threeObject.scale.y /
-                      material.map.source.data.width) *
+                    (this._boxMesh.scale.y / material.map.source.data.width) *
                     (pos.getY(vertexIndex) + 0.5);
                   y =
-                    (this._threeObject.scale.z /
-                      material.map.source.data.height) *
+                    (this._boxMesh.scale.z / material.map.source.data.height) *
                     (pos.getZ(vertexIndex) - 0.5);
                 }
               } else {
@@ -3210,11 +3378,10 @@ module.exports = {
               // Bottom face
               if (shouldRepeatTexture) {
                 x =
-                  (this._threeObject.scale.x / material.map.source.data.width) *
+                  (this._boxMesh.scale.x / material.map.source.data.width) *
                   (pos.getX(vertexIndex) + 0.5);
                 y =
-                  (this._threeObject.scale.z /
-                    material.map.source.data.height) *
+                  (this._boxMesh.scale.z / material.map.source.data.height) *
                   (pos.getZ(vertexIndex) - 0.5);
               } else {
                 [x, y] = noRepeatTextureVertexIndexToUvMapping[vertexIndex % 4];
@@ -3225,24 +3392,17 @@ module.exports = {
               if (shouldRepeatTexture) {
                 if (shouldOrientateFacesTowardsY) {
                   x =
-                    (this._threeObject.scale.x /
-                      material.map.source.data.width) *
+                    (this._boxMesh.scale.x / material.map.source.data.width) *
                     (pos.getX(vertexIndex) + 0.5);
                   y =
-                    -(
-                      this._threeObject.scale.z /
-                      material.map.source.data.height
-                    ) *
+                    -(this._boxMesh.scale.z / material.map.source.data.height) *
                     (pos.getZ(vertexIndex) + 0.5);
                 } else {
                   x =
-                    -(
-                      this._threeObject.scale.x / material.map.source.data.width
-                    ) *
+                    -(this._boxMesh.scale.x / material.map.source.data.width) *
                     (pos.getX(vertexIndex) - 0.5);
                   y =
-                    (this._threeObject.scale.z /
-                      material.map.source.data.height) *
+                    (this._boxMesh.scale.z / material.map.source.data.height) *
                     (pos.getZ(vertexIndex) - 0.5);
                 }
               } else {
@@ -3257,12 +3417,10 @@ module.exports = {
               // Front face
               if (shouldRepeatTexture) {
                 x =
-                  (this._threeObject.scale.x / material.map.source.data.width) *
+                  (this._boxMesh.scale.x / material.map.source.data.width) *
                   (pos.getX(vertexIndex) + 0.5);
                 y =
-                  -(
-                    this._threeObject.scale.y / material.map.source.data.height
-                  ) *
+                  -(this._boxMesh.scale.y / material.map.source.data.height) *
                   (pos.getY(vertexIndex) + 0.5);
               } else {
                 [x, y] = noRepeatTextureVertexIndexToUvMapping[vertexIndex % 4];
@@ -3276,13 +3434,12 @@ module.exports = {
               if (shouldRepeatTexture) {
                 x =
                   (shouldBackFaceBeUpThroughXAxisRotation ? 1 : -1) *
-                  (this._threeObject.scale.x / material.map.source.data.width) *
+                  (this._boxMesh.scale.x / material.map.source.data.width) *
                   (pos.getX(vertexIndex) +
                     (shouldBackFaceBeUpThroughXAxisRotation ? 1 : -1) * 0.5);
                 y =
                   (shouldBackFaceBeUpThroughXAxisRotation ? 1 : -1) *
-                  (this._threeObject.scale.y /
-                    material.map.source.data.height) *
+                  (this._boxMesh.scale.y / material.map.source.data.height) *
                   (pos.getY(vertexIndex) +
                     (shouldBackFaceBeUpThroughXAxisRotation ? -1 : 1) * 0.5);
               } else {
@@ -3308,18 +3465,28 @@ module.exports = {
       updatePixiObject() {
         const width = this.getWidth();
         const height = this.getHeight();
+        const centerPoint = this.getCenterPoint();
+        const centerX = width * centerPoint[0];
+        const centerY = height * centerPoint[1];
 
+        const minX = 0 - centerX;
+        const minY = 0 - centerY;
+        const maxX = width - centerX;
+        const maxY = height - centerY;
         this._pixiObject.clear();
         this._pixiObject.beginFill(0x999999, 0.2);
         this._pixiObject.lineStyle(1, 0xffd900, 0);
-        this._pixiObject.moveTo(-width / 2, -height / 2);
-        this._pixiObject.lineTo(width / 2, -height / 2);
-        this._pixiObject.lineTo(width / 2, height / 2);
-        this._pixiObject.lineTo(-width / 2, height / 2);
+        this._pixiObject.moveTo(minX, minY);
+        this._pixiObject.lineTo(maxX, minY);
+        this._pixiObject.lineTo(maxX, maxY);
+        this._pixiObject.lineTo(minX, maxY);
         this._pixiObject.endFill();
 
-        this._pixiObject.position.x = this._instance.getX() + width / 2;
-        this._pixiObject.position.y = this._instance.getY() + height / 2;
+        const originPoint = this.getOriginPoint();
+        this._pixiObject.position.x =
+          this._instance.getX() - width * (originPoint[0] - centerPoint[0]);
+        this._pixiObject.position.y =
+          this._instance.getY() - height * (originPoint[1] - centerPoint[1]);
         this._pixiObject.angle = this._instance.getAngle();
       }
 

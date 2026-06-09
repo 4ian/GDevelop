@@ -32,9 +32,45 @@ namespace gdjs {
       isCastingShadow: boolean;
       isReceivingShadow: boolean;
       materialType: 'Basic' | 'StandardWithoutMetalness';
+      originLocation:
+        | 'ObjectCenter'
+        | 'BottomCenterZ'
+        | 'BottomCenterY'
+        | 'TopLeft'
+        | undefined;
+      centerLocation:
+        | 'ObjectCenter'
+        | 'BottomCenterZ'
+        | 'BottomCenterY'
+        | undefined;
     };
   }
   type FaceName = 'front' | 'back' | 'left' | 'right' | 'top' | 'bottom';
+
+  /**
+   * A point of the box expressed as a ratio of its dimensions (between 0 and 1
+   * on each axis), used to configure the origin and the center (rotation pivot)
+   * of a 3D box. The location names match the ones of the 3D Model object so
+   * that both objects behave consistently.
+   */
+  type LocationPoint = [float, float, float];
+
+  const getPointForLocation = (
+    location: string | undefined,
+    defaultLocation: string
+  ): LocationPoint => {
+    switch (location || defaultLocation) {
+      case 'ObjectCenter':
+        return [0.5, 0.5, 0.5];
+      case 'BottomCenterZ':
+        return [0.5, 0.5, 0];
+      case 'BottomCenterY':
+        return [0.5, 1, 0.5];
+      case 'TopLeft':
+      default:
+        return [0, 0, 0];
+    }
+  };
   const faceNameToBitmaskIndex = {
     front: 0,
     back: 1,
@@ -84,6 +120,18 @@ namespace gdjs {
     _tint: string;
     _isCastingShadow: boolean = true;
     _isReceivingShadow: boolean = true;
+    /**
+     * The local point of the box that is at the object position.
+     * Coordinates are between 0 and 1. Defaults to the top-left of the bottom
+     * face (`[0, 0, 0]`) to keep the legacy behavior.
+     */
+    _originPoint: LocationPoint;
+    /**
+     * The local point of the box used as rotation center.
+     * Coordinates are between 0 and 1. Defaults to the object center
+     * (`[0.5, 0.5, 0.5]`) to keep the legacy behavior.
+     */
+    _centerPoint: LocationPoint;
 
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
@@ -139,6 +187,15 @@ namespace gdjs {
 
       this._materialType = this._convertMaterialType(
         objectData.content.materialType
+      );
+
+      this._originPoint = getPointForLocation(
+        objectData.content.originLocation,
+        'TopLeft'
+      );
+      this._centerPoint = getPointForLocation(
+        objectData.content.centerLocation,
+        'ObjectCenter'
       );
 
       this._renderer = new gdjs.Cube3DRuntimeObjectRenderer(
@@ -237,6 +294,24 @@ namespace gdjs {
 
     getColor(): string {
       return this._tint;
+    }
+
+    /**
+     * The local point of the box (between 0 and 1 on each axis) that is placed
+     * at the object position.
+     * @internal
+     */
+    getOriginPoint(): LocationPoint {
+      return this._originPoint;
+    }
+
+    /**
+     * The local point of the box (between 0 and 1 on each axis) used as the
+     * rotation center.
+     * @internal
+     */
+    getCenterPoint(): LocationPoint {
+      return this._centerPoint;
     }
 
     /** @internal */
@@ -476,6 +551,22 @@ namespace gdjs {
         newObjectData.content.isReceivingShadow
       ) {
         this.updateShadowReceiving(newObjectData.content.isReceivingShadow);
+      }
+      if (
+        oldObjectData.content.originLocation !==
+          newObjectData.content.originLocation ||
+        oldObjectData.content.centerLocation !==
+          newObjectData.content.centerLocation
+      ) {
+        this._originPoint = getPointForLocation(
+          newObjectData.content.originLocation,
+          'TopLeft'
+        );
+        this._centerPoint = getPointForLocation(
+          newObjectData.content.centerLocation,
+          'ObjectCenter'
+        );
+        this._renderer.updatePosition();
       }
 
       return true;

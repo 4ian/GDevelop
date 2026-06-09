@@ -24,13 +24,34 @@ namespace gdjs {
     }
   };
 
-  const applyThreeTextureSettings = (
+  /**
+   * Apply the filtering settings to a Three.js texture used by 3D objects.
+   *
+   * Smooth textures use trilinear filtering (mipmaps) and anisotropic
+   * filtering. This matches the default filtering of textures loaded for 3D
+   * models (loaded by Three.js `GLTFLoader`) and avoids the shimmering and
+   * aliasing that "nearest"/"linear without mipmaps" filtering produces at
+   * grazing camera angles (for instance from a first person camera) or at a
+   * distance.
+   *
+   * Textures that are not smoothed (typically pixel-art) keep a crisp
+   * "nearest" filtering, without mipmaps.
+   */
+  const applyThreeTextureFiltering = (
     threeTexture: THREE.Texture,
-    resourceData: ResourceData | null
+    resourceData: ResourceData | null,
+    maxAnisotropy: number
   ) => {
     if (resourceData && !resourceData.smoothed) {
       threeTexture.magFilter = THREE.NearestFilter;
       threeTexture.minFilter = THREE.NearestFilter;
+      threeTexture.generateMipmaps = false;
+      threeTexture.anisotropy = 1;
+    } else {
+      threeTexture.magFilter = THREE.LinearFilter;
+      threeTexture.minFilter = THREE.LinearMipmapLinearFilter;
+      threeTexture.generateMipmaps = true;
+      threeTexture.anisotropy = maxAnisotropy;
     }
   };
 
@@ -194,8 +215,6 @@ namespace gdjs {
       const image = this._getImageSource(resourceName);
 
       const threeTexture = new THREE.Texture(image);
-      threeTexture.magFilter = THREE.LinearFilter;
-      threeTexture.minFilter = THREE.LinearFilter;
       threeTexture.wrapS = THREE.RepeatWrapping;
       threeTexture.wrapT = THREE.RepeatWrapping;
       threeTexture.colorSpace = THREE.SRGBColorSpace;
@@ -203,10 +222,26 @@ namespace gdjs {
 
       const resource = this._getImageResource(resourceName);
 
-      applyThreeTextureSettings(threeTexture, resource);
+      applyThreeTextureFiltering(
+        threeTexture,
+        resource,
+        this._getMaxAnisotropy()
+      );
       this._loadedThreeTextures.put(resourceName, threeTexture);
 
       return threeTexture;
+    }
+
+    /**
+     * Return the maximum anisotropy supported by the WebGL renderer, used to
+     * give 3D textures a sharper appearance at grazing camera angles.
+     * Returns 1 (no anisotropic filtering) if the renderer is not ready.
+     */
+    private _getMaxAnisotropy(): number {
+      const threeRenderer = this._resourceLoader._runtimeGame
+        .getRenderer()
+        .getThreeRenderer();
+      return threeRenderer ? threeRenderer.capabilities.getMaxAnisotropy() : 1;
     }
 
     private _getImageSource(resourceName: string): HTMLImageElement {
@@ -278,7 +313,10 @@ namespace gdjs {
       cubeTexture.needsUpdate = true;
 
       const resource = this._getImageResource(xPositiveResourceName);
-      applyThreeTextureSettings(cubeTexture, resource);
+      if (resource && !resource.smoothed) {
+        cubeTexture.magFilter = THREE.NearestFilter;
+        cubeTexture.minFilter = THREE.NearestFilter;
+      }
       this._loadedThreeCubeTextures.set(key, cubeTexture);
       this._loadedThreeCubeTextureKeysByResourceName.add(
         xPositiveResourceName,

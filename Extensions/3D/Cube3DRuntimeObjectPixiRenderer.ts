@@ -83,7 +83,15 @@ namespace gdjs {
         );
       const boxMesh = new THREE.Mesh(geometry, materials);
 
-      super(runtimeObject, instanceContainer, boxMesh);
+      // The box mesh is wrapped in a group so that its origin and its rotation
+      // center (pivot) can be configured independently, like the 3D Model
+      // object. The group holds the position and rotation, while the box mesh
+      // holds the size (scale) and is offset inside the group so that the
+      // configured center point is at the group origin.
+      const group = new THREE.Group();
+      group.add(boxMesh);
+
+      super(runtimeObject, instanceContainer, group);
       this._boxMesh = boxMesh;
       this._cube3DRuntimeObject = runtimeObject;
 
@@ -137,8 +145,44 @@ namespace gdjs {
     }
 
     updateSize(): void {
-      super.updateSize();
+      const object = this._cube3DRuntimeObject;
+      // The size (and flipping) is applied to the box mesh, not to the wrapping
+      // group, so that the texture UV mapping (which reads the mesh scale) and
+      // the rotation pivot offset keep working.
+      this._boxMesh.scale.set(
+        object.isFlippedX() ? -object.getWidth() : object.getWidth(),
+        object.isFlippedY() ? -object.getHeight() : object.getHeight(),
+        object.isFlippedZ() ? -object.getDepth() : object.getDepth()
+      );
+      this.updatePosition();
       this.updateTextureUvMapping();
+    }
+
+    updatePosition(): void {
+      const object = this._cube3DRuntimeObject;
+      const width = object.getWidth();
+      const height = object.getHeight();
+      const depth = object.getDepth();
+      const originPoint = object.getOriginPoint();
+      const centerPoint = object.getCenterPoint();
+
+      // Place the wrapping group so that the box center point is at the object
+      // position offset by (origin - center). As the group holds the rotation,
+      // the box rotates around its center point.
+      this.get3DRendererObject().position.set(
+        object.getX() - width * (originPoint[0] - centerPoint[0]),
+        object.getY() - height * (originPoint[1] - centerPoint[1]),
+        object.getZ() - depth * (originPoint[2] - centerPoint[2])
+      );
+
+      // Offset the box inside the group so that the center point is at the
+      // group origin (the rotation pivot). The signed scale is used so that
+      // flipped boxes are handled correctly.
+      this._boxMesh.position.set(
+        this._boxMesh.scale.x * (0.5 - centerPoint[0]),
+        this._boxMesh.scale.y * (0.5 - centerPoint[1]),
+        this._boxMesh.scale.z * (0.5 - centerPoint[2])
+      );
     }
 
     /**

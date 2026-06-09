@@ -228,6 +228,15 @@ const applyPixiTextureSettings = (resource: gdResource, texture: any) => {
   }
 };
 
+// The anisotropy is clamped by Three.js to the maximum supported by the GPU
+// when the texture is uploaded, so a high value can be safely requested here.
+const maxThreeTextureAnisotropy = 16;
+
+// Apply the filtering settings to a Three.js texture used by 3D objects.
+// Smooth textures use trilinear filtering (mipmaps) and anisotropic filtering
+// so they match the filtering of 3D models (loaded by Three.js `GLTFLoader`)
+// and avoid shimmering/aliasing at grazing camera angles or at a distance.
+// Textures that are not smoothed (pixel-art) keep a crisp "nearest" filtering.
 const applyThreeTextureSettings = (
   resource: gdResource,
   // $FlowFixMe[value-as-type]
@@ -239,6 +248,13 @@ const applyThreeTextureSettings = (
   if (!imageResource.isSmooth()) {
     threeTexture.magFilter = THREE.NearestFilter;
     threeTexture.minFilter = THREE.NearestFilter;
+    threeTexture.generateMipmaps = false;
+    threeTexture.anisotropy = 1;
+  } else {
+    threeTexture.magFilter = THREE.LinearFilter;
+    threeTexture.minFilter = THREE.LinearMipmapLinearFilter;
+    threeTexture.generateMipmaps = true;
+    threeTexture.anisotropy = maxThreeTextureAnisotropy;
   }
 };
 
@@ -844,8 +860,6 @@ export default class PixiResourcesLoader {
     }
 
     const threeTexture = new THREE.Texture(image);
-    threeTexture.magFilter = THREE.LinearFilter;
-    threeTexture.minFilter = THREE.LinearFilter;
     threeTexture.wrapS = THREE.RepeatWrapping;
     threeTexture.wrapT = THREE.RepeatWrapping;
     threeTexture.colorSpace = THREE.SRGBColorSpace;

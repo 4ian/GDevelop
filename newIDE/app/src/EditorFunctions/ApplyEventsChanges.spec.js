@@ -430,6 +430,72 @@ describe('applyEventsChanges', () => {
     expect(result.errors).toEqual([]);
   });
 
+  it('should skip a comma-separated delete target whose aiGeneratedEventId matches several events', () => {
+    sceneEventsList.clear();
+    unserializeFromJSObject(
+      sceneEventsList,
+      [
+        {
+          type: 'BuiltinCommonInstructions::Standard',
+          conditions: [],
+          actions: [{ type: { value: 'Hide' }, parameters: ['Obj1'] }],
+        },
+        {
+          aiGeneratedEventId: 'shared-batch-id',
+          type: 'BuiltinCommonInstructions::Comment',
+          conditions: [],
+          actions: [],
+        },
+        {
+          aiGeneratedEventId: 'shared-batch-id',
+          type: 'BuiltinCommonInstructions::Repeat',
+          conditions: [],
+          actions: [{ type: { value: 'Hide' }, parameters: ['Obj2'] }],
+        },
+        {
+          type: 'BuiltinCommonInstructions::While',
+          conditions: [],
+          actions: [{ type: { value: 'Hide' }, parameters: ['Obj3'] }],
+          whileConditions: [],
+        },
+      ],
+      'unserializeFrom',
+      project
+    );
+    const eventOperations: Array<AiGeneratedEventChange> = [
+      {
+        operationName: 'delete_event',
+        operationTargetEvent: 'shared-batch-id,event-3',
+        generatedEvents: null,
+        isEventsJsonValid: null,
+        areEventsValid: null,
+        diagnosticLines: [],
+        extensionNames: [],
+        undeclaredVariables: [],
+        undeclaredObjectVariables: {},
+        missingObjectBehaviors: {},
+        missingResources: [],
+      },
+    ];
+    const result = applyEventsChanges(
+      project,
+      sceneEventsList,
+      eventOperations,
+      fakeGeneratedEventId
+    );
+
+    // The ambiguous id is skipped, but the unambiguous path is still deleted.
+    expect(getEventTypes(sceneEventsList)).toEqual([
+      'BuiltinCommonInstructions::Standard',
+      'BuiltinCommonInstructions::Comment',
+      'BuiltinCommonInstructions::Repeat',
+    ]);
+    expect(result.applied).toBe(1);
+    expect(result.errors).toEqual(
+      expect.arrayContaining([expect.stringContaining('matches 2 events')])
+    );
+  });
+
   it('should delete comma-separated events mixed with a traditional single delete', () => {
     setupInitialSceneEvents([
       'BuiltinCommonInstructions::Standard',
@@ -1678,6 +1744,56 @@ describe('applyEventsChanges', () => {
     ).toBe('BuiltinCommonInstructions::Comment');
     expect(result.applied).toBe(1);
     expect(result.errors).toEqual([]);
+  });
+
+  it('should skip operation when an aiGeneratedEventId matches several events', () => {
+    sceneEventsList.clear();
+    const event1 = sceneEventsList.insertNewEvent(
+      project,
+      'BuiltinCommonInstructions::Standard',
+      0
+    );
+    event1.setAiGeneratedEventId('shared-batch-id');
+    const event2 = sceneEventsList.insertNewEvent(
+      project,
+      'BuiltinCommonInstructions::Repeat',
+      1
+    );
+    event2.setAiGeneratedEventId('shared-batch-id');
+
+    const eventOperations: Array<AiGeneratedEventChange> = [
+      {
+        operationName: 'insert_and_replace_event',
+        operationTargetEvent: 'shared-batch-id',
+        generatedEvents:
+          '[{"type":"BuiltinCommonInstructions::Comment","conditions":[],"actions":[]}]',
+        isEventsJsonValid: true,
+        areEventsValid: true,
+        diagnosticLines: [],
+        extensionNames: [],
+        undeclaredVariables: [],
+        undeclaredObjectVariables: {},
+        missingObjectBehaviors: {},
+        missingResources: [],
+      },
+    ];
+    const result = applyEventsChanges(
+      project,
+      sceneEventsList,
+      eventOperations,
+      fakeGeneratedEventId
+    );
+
+    // Nothing changes: the ambiguous id must not silently edit the first match.
+    expect(sceneEventsList.getEventsCount()).toBe(2);
+    expect(getEventTypes(sceneEventsList)).toEqual([
+      'BuiltinCommonInstructions::Standard',
+      'BuiltinCommonInstructions::Repeat',
+    ]);
+    expect(result.applied).toBe(0);
+    expect(result.errors).toEqual(
+      expect.arrayContaining([expect.stringContaining('matches 2 events')])
+    );
   });
 
   it('should skip operation if event with aiGeneratedEventId is not found and return error', () => {

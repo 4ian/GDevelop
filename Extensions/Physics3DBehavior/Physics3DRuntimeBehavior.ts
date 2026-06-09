@@ -396,6 +396,9 @@ namespace gdjs {
     _objectOldWidth: float = 0;
     _objectOldHeight: float = 0;
     _objectOldDepth: float = 0;
+    _objectOldCenterX: float = 0;
+    _objectOldCenterY: float = 0;
+    _objectOldCenterZ: float = 0;
 
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
@@ -457,6 +460,20 @@ namespace gdjs {
       const tempQuat = this._sharedData._tempQuat;
       tempQuat.Set(x, y, z, w);
       return tempQuat;
+    }
+
+    _hasObjectCenterChanged(): boolean {
+      return (
+        this._objectOldCenterX !== this.owner3D.getCenterX() ||
+        this._objectOldCenterY !== this.owner3D.getCenterY() ||
+        this._objectOldCenterZ !== this.owner3D.getCenterZ()
+      );
+    }
+
+    _updateObjectOldCenter(): void {
+      this._objectOldCenterX = this.owner3D.getCenterX();
+      this._objectOldCenterY = this.owner3D.getCenterY();
+      this._objectOldCenterZ = this.owner3D.getCenterZ();
     }
 
     override applyBehaviorOverriding(behaviorData): boolean {
@@ -876,11 +893,27 @@ namespace gdjs {
         convexShapeSettings.mDensity = this.density;
         shapeSettings = convexShapeSettings;
       }
+      const automaticShapeOffsetX =
+        this._shape === 'Mesh'
+          ? 0
+          : (this.owner3D.getWidth() / 2 - this.owner3D.getCenterX()) *
+            this._sharedData.worldInvScale;
+      const automaticShapeOffsetY =
+        this._shape === 'Mesh'
+          ? 0
+          : (this.owner3D.getHeight() / 2 - this.owner3D.getCenterY()) *
+            this._sharedData.worldInvScale;
+      const automaticShapeOffsetZ =
+        this._shape === 'Mesh'
+          ? 0
+          : (this.owner3D.getDepth() / 2 - this.owner3D.getCenterZ()) *
+            this._sharedData.worldInvScale;
+
       return new Jolt.RotatedTranslatedShapeSettings(
         this.getVec3(
-          this.shapeOffsetX * shapeScale,
-          this.shapeOffsetY * shapeScale,
-          this.shapeOffsetZ * shapeScale
+          this.shapeOffsetX * shapeScale + automaticShapeOffsetX,
+          this.shapeOffsetY * shapeScale + automaticShapeOffsetY,
+          this.shapeOffsetZ * shapeScale + automaticShapeOffsetZ
         ),
         quat,
         shapeSettings
@@ -1083,6 +1116,7 @@ namespace gdjs {
       this._objectOldWidth = this.owner3D.getWidth();
       this._objectOldHeight = this.owner3D.getHeight();
       this._objectOldDepth = this.owner3D.getDepth();
+      this._updateObjectOldCenter();
       return true;
     }
 
@@ -1208,6 +1242,7 @@ namespace gdjs {
       this._objectOldRotationX = this.owner3D.getRotationX();
       this._objectOldRotationY = this.owner3D.getRotationY();
       this._objectOldRotationZ = this.owner3D.getAngle();
+      this._updateObjectOldCenter();
     }
 
     updateBodyFromObject() {
@@ -1228,7 +1263,8 @@ namespace gdjs {
         (!this.hasCustomShapeDimension() &&
           (this._objectOldWidth !== this.owner3D.getWidth() ||
             this._objectOldHeight !== this.owner3D.getHeight() ||
-            this._objectOldDepth !== this.owner3D.getDepth()))
+            this._objectOldDepth !== this.owner3D.getDepth() ||
+            this._hasObjectCenterChanged()))
       ) {
         this._needToRecreateShape = false;
         this._recreateShape();
@@ -2220,7 +2256,8 @@ namespace gdjs {
           this.behavior._objectOldZ !== owner3D.getZ() ||
           this.behavior._objectOldRotationX !== owner3D.getRotationX() ||
           this.behavior._objectOldRotationY !== owner3D.getRotationY() ||
-          this.behavior._objectOldRotationZ !== owner3D.getAngle()
+          this.behavior._objectOldRotationZ !== owner3D.getAngle() ||
+          this.behavior._hasObjectCenterChanged()
         ) {
           _sharedData.bodyInterface.SetPositionAndRotationWhenChanged(
             body.GetID(),

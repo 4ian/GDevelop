@@ -395,16 +395,10 @@ namespace gdjs {
         result.Set(0, 0, 0);
         return result;
       }
-      const { behavior } = physics3D;
-      // The character origin is at its feet:
-      // - the center is used for X and Y because Box3D origin is at the top-left corner
-      // - the origin is used for Z because, when the character is made smaller,
-      //   it must stay on the ground and not fell from its old size.
       result.Set(
         this.owner3D.getCenterXInScene() * this._sharedData.worldInvScale,
         this.owner3D.getCenterYInScene() * this._sharedData.worldInvScale,
-        this.owner3D.getZ() * this._sharedData.worldInvScale +
-          behavior._shapeHalfDepth
+        this.owner3D.getCenterZInScene() * this._sharedData.worldInvScale
       );
       return result;
     }
@@ -429,16 +423,14 @@ namespace gdjs {
       if (!physics3D) {
         return;
       }
-      const { behavior } = physics3D;
       this.owner3D.setCenterXInScene(
         physicsPosition.GetX() * this._sharedData.worldScale
       );
       this.owner3D.setCenterYInScene(
         physicsPosition.GetY() * this._sharedData.worldScale
       );
-      this.owner3D.setZ(
-        (physicsPosition.GetZ() - behavior._shapeHalfDepth) *
-          this._sharedData.worldScale
+      this.owner3D.setCenterZInScene(
+        physicsPosition.GetZ() * this._sharedData.worldScale
       );
     }
 
@@ -1794,7 +1786,8 @@ namespace gdjs {
         if (
           behavior._objectOldX !== owner3D.getX() ||
           behavior._objectOldY !== owner3D.getY() ||
-          behavior._objectOldZ !== owner3D.getZ()
+          behavior._objectOldZ !== owner3D.getZ() ||
+          behavior._hasObjectCenterChanged()
         ) {
           this.updateCharacterPosition();
         }

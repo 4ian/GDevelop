@@ -133,8 +133,9 @@ import { TutorialContext } from '../Tutorial/TutorialContext';
 import { type Tutorial } from '../Utils/GDevelopServices/Tutorial';
 import AlertMessage from '../UI/AlertMessage';
 import { Column, Line } from '../UI/Grid';
-import Snackbar from '@material-ui/core/Snackbar';
-import SnackbarContent from '@material-ui/core/SnackbarContent';
+import DraggableSnackBar, {
+  type DraggableSnackBarInterface,
+} from './DraggableSnackBar';
 import Button from '@material-ui/core/Button';
 import PlayIcon from '../UI/CustomSvgIcons/Preview';
 import SkipNextIcon from '@material-ui/icons/SkipNext';
@@ -348,13 +349,6 @@ type State = {|
   pausedOnEventIndex: number,
   isPausedInDebugger: boolean,
   runtimeVariables: any,
-
-  // Absolute viewport position of the paused-in-debugger Snackbar when the
-  // user has dragged it; `null` means "use the default top/center anchor".
-  // Persisted across pauses inside the same editor session so the user
-  // doesn't have to re-position the toast on every breakpoint hit.
-  pausedToastPosition: { x: number, y: number } | null,
-  isDraggingPausedToast: boolean,
 |};
 
 type EventInsertionContext = {|
@@ -410,6 +404,9 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   resourceExternallyChangedCallbackId: ?string;
   _unregisterCdpPauseListener: ?() => void = null;
   _unregisterCdpClosedListener: ?() => void = null;
+  _draggableSnackBarRef: {|
+    current: ?DraggableSnackBarInterface,
+  |} = React.createRef();
   instructionContextMenu: ?ContextMenuInterface;
   addNewEvent: (
     type: string,
@@ -469,9 +466,6 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     pausedOnEventIndex: -1,
     isPausedInDebugger: false,
     runtimeVariables: null,
-
-    pausedToastPosition: null,
-    isDraggingPausedToast: false,
   };
 
   constructor(props: ComponentProps) {
@@ -497,8 +491,8 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     // Reset per-session ephemeral UI (dragged toast position) when the
     // preview window is closed.
     this._unregisterCdpClosedListener = onPreviewDebuggerClosed(() => {
-      if (this.state.pausedToastPosition !== null) {
-        this.setState({ pausedToastPosition: null });
+      if (this._draggableSnackBarRef.current) {
+        this._draggableSnackBarRef.current.resetPosition();
       }
     });
     this._unregisterCdpPauseListener = onPreviewDebuggerPauseChange(
@@ -546,8 +540,6 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       this._unregisterCdpClosedListener();
       this._unregisterCdpClosedListener = null;
     }
-    window.removeEventListener('mousemove', this._onPausedToastMouseMove);
-    window.removeEventListener('mouseup', this._onPausedToastMouseUp);
   }
 
   componentDidUpdate(prevProps: ComponentProps, prevState: State) {
@@ -1837,57 +1829,6 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
         this._sendAllSessionBreakpointsToRuntime();
       }
     );
-  };
-
-  // Drag state stored outside React state to avoid re-rendering on every
-  // mousemove; the final position is committed via setState.
-  _pausedToastDragState: ?{|
-    startX: number,
-    startY: number,
-    initialX: number,
-    initialY: number,
-  |} = null;
-
-  _onPausedToastMouseDown = (event: SyntheticMouseEvent<HTMLElement>) => {
-    // Don't hijack clicks on the action buttons inside the toast.
-    const target: any = event.target;
-    if (target && target.closest && target.closest('button')) return;
-    event.preventDefault();
-    const rect = event.currentTarget.getBoundingClientRect();
-    this._pausedToastDragState = {
-      startX: event.clientX,
-      startY: event.clientY,
-      initialX: rect.left,
-      initialY: rect.top,
-    };
-    window.addEventListener('mousemove', this._onPausedToastMouseMove);
-    window.addEventListener('mouseup', this._onPausedToastMouseUp);
-    this.setState({ isDraggingPausedToast: true });
-  };
-
-  _onPausedToastMouseMove = (event: MouseEvent) => {
-    const drag = this._pausedToastDragState;
-    if (!drag) return;
-    const dx = event.clientX - drag.startX;
-    const dy = event.clientY - drag.startY;
-    // Clamp so the toast stays reachable within the viewport.
-    const MIN_VISIBLE_EDGE = 40;
-    const x = Math.max(
-      -1 * (window.innerWidth - MIN_VISIBLE_EDGE),
-      Math.min(window.innerWidth - MIN_VISIBLE_EDGE, drag.initialX + dx)
-    );
-    const y = Math.max(
-      0,
-      Math.min(window.innerHeight - MIN_VISIBLE_EDGE, drag.initialY + dy)
-    );
-    this.setState({ pausedToastPosition: { x, y } });
-  };
-
-  _onPausedToastMouseUp = () => {
-    this._pausedToastDragState = null;
-    window.removeEventListener('mousemove', this._onPausedToastMouseMove);
-    window.removeEventListener('mouseup', this._onPausedToastMouseUp);
-    this.setState({ isDraggingPausedToast: false });
   };
 
   // Resume / step always route through CDP (only available in Electron local preview).
@@ -3398,52 +3339,31 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
             onClose={this.closeEventTextDialog}
           />
         )}
-        <Snackbar
+        <DraggableSnackBar
+          ref={this._draggableSnackBarRef}
           open={this.state.isPausedInDebugger}
-          anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-          // When dragged: override MUI's default centering with absolute
-          // positioning and cancel its translateX(-50%).
-          style={
-            this.state.pausedToastPosition
-              ? {
-                  top: this.state.pausedToastPosition.y,
-                  left: this.state.pausedToastPosition.x,
-                  right: 'auto',
-                  justifyContent: 'flex-start',
-                  transform: 'none',
-                }
-              : { top: 96 }
+          message={<Trans>Paused in debugger</Trans>}
+          action={
+            <>
+              <Button
+                color="secondary"
+                size="small"
+                onClick={this._resumeExecution}
+                startIcon={<PlayIcon />}
+              >
+                <Trans>Resume</Trans>
+              </Button>
+              <Button
+                color="secondary"
+                size="small"
+                onClick={this._stepNextEvent}
+                startIcon={<SkipNextIcon />}
+              >
+                <Trans>Next event</Trans>
+              </Button>
+            </>
           }
-        >
-          <SnackbarContent
-            onMouseDown={this._onPausedToastMouseDown}
-            style={{
-              cursor: this.state.isDraggingPausedToast ? 'grabbing' : 'grab',
-              userSelect: 'none',
-            }}
-            message={<Trans>Paused in debugger</Trans>}
-            action={
-              <>
-                <Button
-                  color="secondary"
-                  size="small"
-                  onClick={this._resumeExecution}
-                  startIcon={<PlayIcon />}
-                >
-                  <Trans>Resume</Trans>
-                </Button>
-                <Button
-                  color="secondary"
-                  size="small"
-                  onClick={this._stepNextEvent}
-                  startIcon={<SkipNextIcon />}
-                >
-                  <Trans>Next event</Trans>
-                </Button>
-              </>
-            }
-          />
-        </Snackbar>
+        />
       </>
     );
   }

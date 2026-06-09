@@ -24,13 +24,25 @@ namespace gdjs {
     }
   };
 
+  /**
+   * The anisotropy level requested for 3D textures. It is clamped by Three.js
+   * to the maximum value supported by the GPU. A value greater than 1 enables
+   * anisotropic filtering which greatly improves texture quality when seen at
+   * grazing (e.g. first person camera) angles.
+   */
+  const default3DTextureAnisotropy = 8;
+
   const applyThreeTextureSettings = (
     threeTexture: THREE.Texture,
     resourceData: ResourceData | null
   ) => {
     if (resourceData && !resourceData.smoothed) {
+      // Pixel art textures keep a crisp look without mipmaps so their
+      // rendering is left unchanged (backward compatible).
       threeTexture.magFilter = THREE.NearestFilter;
       threeTexture.minFilter = THREE.NearestFilter;
+      threeTexture.generateMipmaps = false;
+      threeTexture.anisotropy = 1;
     }
   };
 
@@ -194,8 +206,13 @@ namespace gdjs {
       const image = this._getImageSource(resourceName);
 
       const threeTexture = new THREE.Texture(image);
+      // Use mipmaps and anisotropic filtering so that 3D objects (3D Box,
+      // 3D custom objects...) get the same high quality texture filtering as
+      // 3D Model objects, especially when seen from grazing angles.
       threeTexture.magFilter = THREE.LinearFilter;
-      threeTexture.minFilter = THREE.LinearFilter;
+      threeTexture.minFilter = THREE.LinearMipmapLinearFilter;
+      threeTexture.generateMipmaps = true;
+      threeTexture.anisotropy = default3DTextureAnisotropy;
       threeTexture.wrapS = THREE.RepeatWrapping;
       threeTexture.wrapT = THREE.RepeatWrapping;
       threeTexture.colorSpace = THREE.SRGBColorSpace;

@@ -22,6 +22,20 @@ namespace gdjs {
       topFaceResourceRepeat: boolean | undefined;
       bottomFaceResourceRepeat: boolean | undefined;
       tileScale: number | undefined;
+      originLocation:
+        | 'TopLeft'
+        | 'ObjectCenter'
+        | 'CenteredOnZ'
+        | 'BottomCenterZ'
+        | 'BottomCenterY'
+        | undefined;
+      centerLocation:
+        | 'TopLeft'
+        | 'ObjectCenter'
+        | 'CenteredOnZ'
+        | 'BottomCenterZ'
+        | 'BottomCenterY'
+        | undefined;
       frontFaceVisible: boolean;
       backFaceVisible: boolean;
       leftFaceVisible: boolean;
@@ -44,12 +58,44 @@ namespace gdjs {
     bottom: 5,
   };
 
+  /**
+   * A point of the cube expressed in coordinates between 0 and 1, relative to
+   * the cube dimensions.
+   */
+  type Cube3DPoint = [float, float, float];
+
+  /**
+   * Returns the point of the cube corresponding to a given location name.
+   * Coordinates are between 0 and 1, relative to the cube dimensions.
+   */
+  const getPointForCubeLocation = (
+    location: string | undefined
+  ): Cube3DPoint => {
+    switch (location) {
+      case 'ObjectCenter':
+        return [0.5, 0.5, 0.5];
+      case 'CenteredOnZ':
+        // Keep the historical top-left origin on X/Y but center on Z.
+        return [0, 0, 0.5];
+      case 'BottomCenterZ':
+        return [0.5, 0.5, 0];
+      case 'BottomCenterY':
+        return [0.5, 1, 0.5];
+      case 'TopLeft':
+        return [0, 0, 0];
+      default:
+        return [0, 0, 0];
+    }
+  };
+
   type Cube3DObjectNetworkSyncDataType = {
     fo: 'Y' | 'Z';
     bfu: 'X' | 'Y';
     vfb: integer;
     trfb: integer;
     ts: number;
+    op: Cube3DPoint;
+    cp: Cube3DPoint;
     frn: [string, string, string, string, string, string];
     mt: number;
     tint: string;
@@ -71,6 +117,16 @@ namespace gdjs {
     private _visibleFacesBitmask: integer;
     private _textureRepeatFacesBitmask: integer;
     private _tileScale: number;
+    /**
+     * The local point of the cube that is at the object position.
+     * Coordinates are between 0 and 1.
+     */
+    _originPoint: Cube3DPoint;
+    /**
+     * The local point of the cube that is used as rotation center.
+     * Coordinates are between 0 and 1.
+     */
+    _centerPoint: Cube3DPoint;
     private _faceResourceNames: [
       string,
       string,
@@ -122,6 +178,12 @@ namespace gdjs {
         this._textureRepeatFacesBitmask |=
           1 << faceNameToBitmaskIndex['bottom'];
       this._tileScale = objectData.content.tileScale || 1;
+      this._originPoint = getPointForCubeLocation(
+        objectData.content.originLocation || 'TopLeft'
+      );
+      this._centerPoint = getPointForCubeLocation(
+        objectData.content.centerLocation || 'ObjectCenter'
+      );
       this._backFaceUpThroughWhichAxisRotation =
         objectData.content.backFaceUpThroughWhichAxisRotation || 'X';
       this._faceResourceNames = [
@@ -272,6 +334,74 @@ namespace gdjs {
       }
       this._tileScale = tileScale;
       this._renderer.updateTextureUvMapping();
+    }
+
+    /**
+     * The local point of the cube (coordinates between 0 and 1) that is at the
+     * object position.
+     * @internal
+     */
+    getOriginPoint(): Cube3DPoint {
+      return this._originPoint;
+    }
+
+    /**
+     * The local point of the cube (coordinates between 0 and 1) that is used as
+     * rotation center.
+     * @internal
+     */
+    getCenterPoint(): Cube3DPoint {
+      return this._centerPoint;
+    }
+
+    private _setOriginPoint(originPoint: Cube3DPoint): void {
+      if (
+        this._originPoint[0] === originPoint[0] &&
+        this._originPoint[1] === originPoint[1] &&
+        this._originPoint[2] === originPoint[2]
+      ) {
+        return;
+      }
+      this._originPoint = originPoint;
+      this._renderer.updatePosition();
+      this.invalidateHitboxes();
+    }
+
+    private _setCenterPoint(centerPoint: Cube3DPoint): void {
+      if (
+        this._centerPoint[0] === centerPoint[0] &&
+        this._centerPoint[1] === centerPoint[1] &&
+        this._centerPoint[2] === centerPoint[2]
+      ) {
+        return;
+      }
+      this._centerPoint = centerPoint;
+      this._renderer.updatePosition();
+      this.invalidateHitboxes();
+    }
+
+    getCenterX(): float {
+      return this.getWidth() * this._centerPoint[0];
+    }
+
+    getCenterY(): float {
+      return this.getHeight() * this._centerPoint[1];
+    }
+
+    getCenterZ(): float {
+      return this.getDepth() * this._centerPoint[2];
+    }
+
+    getDrawableX(): float {
+      return this.getX() - this.getWidth() * this._originPoint[0];
+    }
+
+    getDrawableY(): float {
+      return this.getY() - this.getHeight() * this._originPoint[1];
+    }
+
+    getDrawableZ(): float {
+      return this.getZ() - this.getDepth() * this._originPoint[2];
     }
 
     getFacesOrientation(): 'Y' | 'Z' {
@@ -460,6 +590,26 @@ namespace gdjs {
         this.setTileScale(newObjectData.content.tileScale || 1);
       }
       if (
+        oldObjectData.content.originLocation !==
+        newObjectData.content.originLocation
+      ) {
+        this._setOriginPoint(
+          getPointForCubeLocation(
+            newObjectData.content.originLocation || 'TopLeft'
+          )
+        );
+      }
+      if (
+        oldObjectData.content.centerLocation !==
+        newObjectData.content.centerLocation
+      ) {
+        this._setCenterPoint(
+          getPointForCubeLocation(
+            newObjectData.content.centerLocation || 'ObjectCenter'
+          )
+        );
+      }
+      if (
         oldObjectData.content.materialType !==
         newObjectData.content.materialType
       ) {
@@ -492,6 +642,8 @@ namespace gdjs {
         vfb: this._visibleFacesBitmask,
         trfb: this._textureRepeatFacesBitmask,
         ts: this._tileScale,
+        op: this._originPoint,
+        cp: this._centerPoint,
         frn: this._faceResourceNames,
         tint: this._tint,
       };
@@ -536,6 +688,12 @@ namespace gdjs {
       }
       if (networkSyncData.ts !== undefined) {
         this.setTileScale(networkSyncData.ts);
+      }
+      if (networkSyncData.op !== undefined) {
+        this._setOriginPoint(networkSyncData.op);
+      }
+      if (networkSyncData.cp !== undefined) {
+        this._setCenterPoint(networkSyncData.cp);
       }
       if (networkSyncData.frn !== undefined) {
         // If one element is different, update all the faces.

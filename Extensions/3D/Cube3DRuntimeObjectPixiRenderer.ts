@@ -83,7 +83,13 @@ namespace gdjs {
         );
       const boxMesh = new THREE.Mesh(geometry, materials);
 
-      super(runtimeObject, instanceContainer, boxMesh);
+      // The box mesh is wrapped in a group so that the group origin can be
+      // used as the rotation center (configured by the "center point") while
+      // the box mesh is offset inside the group accordingly.
+      const group = new THREE.Group();
+      group.add(boxMesh);
+
+      super(runtimeObject, instanceContainer, group);
       this._boxMesh = boxMesh;
       this._cube3DRuntimeObject = runtimeObject;
 
@@ -93,6 +99,33 @@ namespace gdjs {
       this.updatePosition();
       this.updateRotation();
       this.updateTint();
+    }
+
+    updatePosition(): void {
+      const object = this._cube3DRuntimeObject;
+      const width = object.getWidth();
+      const height = object.getHeight();
+      const depth = object.getDepth();
+      const originPoint = object.getOriginPoint();
+      const centerPoint = object.getCenterPoint();
+
+      // Position the group (the rotation center) at the scene position of the
+      // center point.
+      this.get3DRendererObject().position.set(
+        object.getX() + width * (centerPoint[0] - originPoint[0]),
+        object.getY() + height * (centerPoint[1] - originPoint[1]),
+        object.getZ() + depth * (centerPoint[2] - originPoint[2])
+      );
+
+      // Offset the box mesh inside the group so that the center point ends up
+      // at the group origin (which is the rotation center). The box geometry is
+      // centered, so its geometric center (0.5, 0.5, 0.5) is at the box mesh
+      // local origin.
+      this._boxMesh.position.set(
+        (0.5 - centerPoint[0]) * width,
+        (0.5 - centerPoint[1]) * height,
+        (0.5 - centerPoint[2]) * depth
+      );
     }
 
     updateTint() {
@@ -137,7 +170,16 @@ namespace gdjs {
     }
 
     updateSize(): void {
-      super.updateSize();
+      const object = this._cube3DRuntimeObject;
+      // The size is applied to the box mesh (not the group, which only holds
+      // the rotation and position) so that the texture UV mapping computation
+      // (which reads the box mesh scale) keeps working.
+      this._boxMesh.scale.set(
+        object.isFlippedX() ? -object.getWidth() : object.getWidth(),
+        object.isFlippedY() ? -object.getHeight() : object.getHeight(),
+        object.isFlippedZ() ? -object.getDepth() : object.getDepth()
+      );
+      this.updatePosition();
       this.updateTextureUvMapping();
     }
 

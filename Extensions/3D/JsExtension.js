@@ -2740,10 +2740,10 @@ module.exports = {
           this._associatedObjectConfiguration,
           gd.ObjectJsImplementation
         );
-        this._originPoint = getPointForLocation(
+        this._originPoint = getPointForCubeLocation(
           object.content.originLocation || 'TopLeft'
         );
-        this._centerPoint = getPointForLocation(
+        this._centerPoint = getPointForCubeLocation(
           object.content.centerLocation || 'ObjectCenter'
         );
       }
@@ -2931,7 +2931,9 @@ module.exports = {
       _backFaceUpThroughWhichAxisRotation = 'X';
       _shouldUseTransparentTexture = false;
       _tint = '';
+      /** @type {[number, number, number]} */
       _originPoint = [0, 0, 0];
+      /** @type {[number, number, number]} */
       _centerPoint = [0.5, 0.5, 0.5];
 
       constructor(
@@ -3086,13 +3088,13 @@ module.exports = {
           this._tint = tint;
           tintDirty = true;
         }
-        const newOriginPoint = getPointForLocation(
+        const newOriginPoint = getPointForCubeLocation(
           object.content.originLocation || 'TopLeft'
         );
         if (!isSamePoint(newOriginPoint, this._originPoint)) {
           this._originPoint = newOriginPoint;
         }
-        const newCenterPoint = getPointForLocation(
+        const newCenterPoint = getPointForCubeLocation(
           object.content.centerLocation || 'ObjectCenter'
         );
         if (!isSamePoint(newCenterPoint, this._centerPoint)) {
@@ -3256,20 +3258,14 @@ module.exports = {
               if (shouldRepeatTexture) {
                 if (shouldOrientateFacesTowardsY) {
                   x =
-                    -(
-                      scale.z / material.map.source.data.width
-                    ) *
+                    -(scale.z / material.map.source.data.width) *
                     (pos.getZ(vertexIndex) - 0.5);
                   y =
-                    -(
-                      scale.y / material.map.source.data.height
-                    ) *
+                    -(scale.y / material.map.source.data.height) *
                     (pos.getY(vertexIndex) + 0.5);
                 } else {
                   x =
-                    -(
-                      scale.y / material.map.source.data.width
-                    ) *
+                    -(scale.y / material.map.source.data.width) *
                     (pos.getY(vertexIndex) - 0.5);
                   y =
                     (scale.z / material.map.source.data.height) *
@@ -3295,9 +3291,7 @@ module.exports = {
                     (scale.z / material.map.source.data.width) *
                     (pos.getZ(vertexIndex) + 0.5);
                   y =
-                    -(
-                      scale.y / material.map.source.data.height
-                    ) *
+                    -(scale.y / material.map.source.data.height) *
                     (pos.getY(vertexIndex) + 0.5);
                 } else {
                   x =
@@ -3342,15 +3336,11 @@ module.exports = {
                     (scale.x / material.map.source.data.width) *
                     (pos.getX(vertexIndex) + 0.5);
                   y =
-                    -(
-                      scale.z / material.map.source.data.height
-                    ) *
+                    -(scale.z / material.map.source.data.height) *
                     (pos.getZ(vertexIndex) + 0.5);
                 } else {
                   x =
-                    -(
-                      scale.x / material.map.source.data.width
-                    ) *
+                    -(scale.x / material.map.source.data.width) *
                     (pos.getX(vertexIndex) - 0.5);
                   y =
                     (scale.z / material.map.source.data.height) *
@@ -3371,9 +3361,7 @@ module.exports = {
                   (scale.x / material.map.source.data.width) *
                   (pos.getX(vertexIndex) + 0.5);
                 y =
-                  -(
-                    scale.y / material.map.source.data.height
-                  ) *
+                  -(scale.y / material.map.source.data.height) *
                   (pos.getY(vertexIndex) + 0.5);
               } else {
                 [x, y] = noRepeatTextureVertexIndexToUvMapping[vertexIndex % 4];
@@ -3831,6 +3819,15 @@ module.exports = {
         default:
           return [null, null, null];
       }
+    };
+
+    /**
+     * @param {string} location
+     * @returns {[number, number, number]}
+     */
+    const getPointForCubeLocation = (location) => {
+      const point = getPointForLocation(location);
+      return [point[0] || 0, point[1] || 0, point[2] || 0];
     };
 
     class Model3DRendered3DInstance extends Rendered3DInstance {

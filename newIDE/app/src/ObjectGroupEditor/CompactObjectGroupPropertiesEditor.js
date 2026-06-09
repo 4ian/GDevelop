@@ -8,34 +8,26 @@ import VariablesList, {
 import { type ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 import ErrorBoundary from '../UI/ErrorBoundary';
 import ScrollView, { type ScrollViewInterface } from '../UI/ScrollView';
-import { Column, Line, Spacer, marginsSize } from '../UI/Grid';
-import { Separator } from '../CompactPropertiesEditor';
+import { Column, marginsSize } from '../UI/Grid';
 import Text from '../UI/Text';
 import { Trans } from '@lingui/macro';
 import IconButton from '../UI/IconButton';
-import ShareExternal from '../UI/CustomSvgIcons/ShareExternal';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
-import Paper from '../UI/Paper';
 import { ColumnStackLayout, LineStackLayout } from '../UI/Layout';
 import useForceUpdate from '../Utils/UseForceUpdate';
-import ChevronArrowRight from '../UI/CustomSvgIcons/ChevronArrowRight';
-import ChevronArrowBottom from '../UI/CustomSvgIcons/ChevronArrowBottom';
-import ChevronArrowDownWithRoundedBorder from '../UI/CustomSvgIcons/ChevronArrowDownWithRoundedBorder';
-import ChevronArrowRightWithRoundedBorder from '../UI/CustomSvgIcons/ChevronArrowRightWithRoundedBorder';
-import Add from '../UI/CustomSvgIcons/Add';
 import ObjectGroup from '../UI/CustomSvgIcons/ObjectGroup';
 import { usePersistedScrollPosition } from '../Utils/UsePersistedScrollPosition';
 import Help from '../UI/CustomSvgIcons/Help';
 import { getHelpLink } from '../Utils/HelpLink';
 import Window from '../Utils/Window';
 import CompactTextField from '../UI/CompactTextField';
-import { textEllipsisStyle } from '../UI/TextEllipsis';
 import Link from '../UI/Link';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import useVariablesContainerRefactoring from '../VariablesList/useVariablesContainerRefactoring';
 import useValueWithInit from '../Utils/UseRefInitHook';
 import { type ObjectGroupEditorTab } from './EditedObjectGroupEditorDialog';
 import CompactObjectGroupEditor from './CompactObjectGroupEditor';
+import { TopLevelCollapsibleSection } from '../ObjectEditor/CompactObjectPropertiesEditor';
 
 const gd: libGDevelop = global.gd;
 
@@ -71,128 +63,6 @@ export type TitleBarButton = {|
   label?: MessageDescriptor,
   onClick?: () => void,
 |};
-
-export const CollapsibleSubPanel = ({
-  renderContent,
-  isFolded,
-  toggleFolded,
-  title,
-  titleIcon,
-  titleBarButtons,
-}: {|
-  renderContent: () => React.Node,
-  isFolded: boolean,
-  toggleFolded: () => void,
-  titleIcon?: ?React.Node,
-  title: string,
-  titleBarButtons?: Array<TitleBarButton>,
-|}): React.Node => (
-  <Paper background="medium">
-    <Line expand>
-      <ColumnStackLayout noMargin expand noOverflowParent>
-        <LineStackLayout noMargin justifyContent="space-between">
-          <Line noMargin alignItems="center">
-            <IconButton onClick={toggleFolded} size="small">
-              {isFolded ? (
-                <ChevronArrowRight style={styles.icon} />
-              ) : (
-                <ChevronArrowBottom style={styles.icon} />
-              )}
-            </IconButton>
-
-            {titleIcon}
-            {titleIcon && <Spacer />}
-            <Text noMargin size="body" style={textEllipsisStyle}>
-              {title}
-            </Text>
-          </Line>
-          <Line noMargin>
-            {titleBarButtons &&
-              titleBarButtons.map(button => {
-                const Icon = button.icon;
-                return (
-                  <IconButton
-                    key={button.id}
-                    id={button.id}
-                    tooltip={button.label}
-                    onClick={button.onClick}
-                    size="small"
-                  >
-                    <Icon style={styles.icon} />
-                  </IconButton>
-                );
-              })}
-            <Spacer />
-          </Line>
-        </LineStackLayout>
-        {isFolded ? null : (
-          <div style={styles.subPanelContentContainer}>{renderContent()}</div>
-        )}
-      </ColumnStackLayout>
-    </Line>
-  </Paper>
-);
-
-export const TopLevelCollapsibleSection = ({
-  title,
-  isFolded,
-  toggleFolded,
-  renderContent,
-  renderContentAsHiddenWhenFolded,
-  noContentMargin,
-  onOpenFullEditor,
-  onAdd,
-}: {|
-  title: React.Node,
-  isFolded: boolean,
-  toggleFolded: () => void,
-  renderContent: () => React.Node,
-  renderContentAsHiddenWhenFolded?: boolean,
-  noContentMargin?: boolean,
-  onOpenFullEditor?: () => void,
-  onAdd?: (() => void) | null,
-|}): React.Node => (
-  <>
-    <Separator />
-    <Column noOverflowParent>
-      <LineStackLayout alignItems="center" justifyContent="space-between">
-        <LineStackLayout noMargin alignItems="center">
-          <IconButton size="small" onClick={toggleFolded}>
-            {isFolded ? (
-              <ChevronArrowRightWithRoundedBorder style={styles.icon} />
-            ) : (
-              <ChevronArrowDownWithRoundedBorder style={styles.icon} />
-            )}
-          </IconButton>
-          <Text size="sub-title" noMargin style={textEllipsisStyle}>
-            {title}
-          </Text>
-        </LineStackLayout>
-        <Line alignItems="center" noMargin>
-          {onOpenFullEditor && (
-            <IconButton size="small" onClick={onOpenFullEditor}>
-              <ShareExternal style={styles.icon} />
-            </IconButton>
-          )}
-          {onAdd && (
-            <IconButton size="small" onClick={onAdd}>
-              <Add style={styles.icon} />
-            </IconButton>
-          )}
-        </Line>
-      </LineStackLayout>
-    </Column>
-    <Column noMargin={noContentMargin}>
-      {isFolded ? (
-        renderContentAsHiddenWhenFolded ? (
-          <div style={styles.hiddenContent}>{renderContent()}</div>
-        ) : null
-      ) : (
-        renderContent()
-      )}
-    </Column>
-  </>
-);
 
 type Props = {|
   project: gdProject,

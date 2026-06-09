@@ -231,17 +231,7 @@ const ElectronMainMenu = ({
   });
   useIPCEventListener({
     ipcEvent: 'main-menu-select-all',
-    callback: () => {
-      const active = document.activeElement;
-      if (
-        active instanceof HTMLInputElement ||
-        active instanceof HTMLTextAreaElement
-      ) {
-        active.select();
-      } else {
-        callbacks.onSelectAll();
-      }
-    },
+    callback: callbacks.onSelectAll,
     shouldApply: isFocusedOnMainWindow,
   });
   useIPCEventListener({

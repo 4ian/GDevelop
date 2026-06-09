@@ -125,17 +125,6 @@ export const CompactTextAreaFieldWithControls: React.ComponentType<{
           return;
         }
 
-        // Stop propagation for text-editing Cmd/Ctrl combos (select all, copy,
-        // paste, cut, undo, redo) so parent keyboard shortcut handlers don't
-        // intercept them. Other combos (Cmd+S, Cmd+P...) still reach the app.
-        if (
-          (e.metaKey || e.ctrlKey) &&
-          ['a', 'c', 'v', 'x', 'z', 'y'].includes(e.key.toLowerCase())
-        ) {
-          e.stopPropagation();
-          return;
-        }
-
         if (!onNavigateHistory) {
           return;
         }

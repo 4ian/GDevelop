@@ -1,4 +1,5 @@
 // @ts-check
+/// <reference path="../jolt-physics.d.ts" />
 
 describe('Physics3DRuntimeBehavior', () => {
   const physicsBehaviorName = 'Physics3D';
@@ -69,6 +70,18 @@ describe('Physics3DRuntimeBehavior', () => {
     return runtimeScene;
   };
 
+  const disposePhysics = (runtimeScene) => {
+    const physics3DSharedData = runtimeScene.physics3DSharedData;
+    if (!physics3DSharedData) return;
+
+    Jolt.destroy(physics3DSharedData.contactListener);
+    Jolt.destroy(physics3DSharedData._tempVec3);
+    Jolt.destroy(physics3DSharedData._tempRVec3);
+    Jolt.destroy(physics3DSharedData._tempQuat);
+    Jolt.destroy(physics3DSharedData.jolt);
+    runtimeScene.physics3DSharedData = null;
+  };
+
   const makeCubeObjectData = (content) => ({
     name: 'Cube',
     type: 'Scene3D::Cube3DObject',
@@ -126,7 +139,7 @@ describe('Physics3DRuntimeBehavior', () => {
       object.getBehavior(physicsBehaviorName)
     );
     behavior.updateBodyFromObject();
-    return { object, behavior };
+    return { runtimeScene, object, behavior };
   };
 
   const assertBodyMatchesObject = (object, behavior) => {
@@ -210,21 +223,29 @@ describe('Physics3DRuntimeBehavior', () => {
 
   for (const { label, content } of cubeObjectCases) {
     it(`keeps a Cube3D ${label} physics body aligned with its object bounds`, async () => {
-      const { object, behavior } = await addPhysicsObject(
+      const { runtimeScene, object, behavior } = await addPhysicsObject(
         makeCubeObjectData(content)
       );
 
-      assertBodyMatchesObject(object, behavior);
+      try {
+        assertBodyMatchesObject(object, behavior);
+      } finally {
+        disposePhysics(runtimeScene);
+      }
     });
   }
 
   for (const { label, content } of modelObjectCases) {
     it(`keeps a Model3D ${label} physics body aligned with its object bounds`, async () => {
-      const { object, behavior } = await addPhysicsObject(
+      const { runtimeScene, object, behavior } = await addPhysicsObject(
         makeModelObjectData(content)
       );
 
-      assertBodyMatchesObject(object, behavior);
+      try {
+        assertBodyMatchesObject(object, behavior);
+      } finally {
+        disposePhysics(runtimeScene);
+      }
     });
   }
 
@@ -233,15 +254,20 @@ describe('Physics3DRuntimeBehavior', () => {
       originLocation: 'TopLeft',
       centerLocation: 'ObjectCenter',
     });
-    const { object, behavior } = await addPhysicsObject(oldObjectData);
+    const { runtimeScene, object, behavior } =
+      await addPhysicsObject(oldObjectData);
     const newObjectData = makeCubeObjectData({
       originLocation: 'TopLeft',
       centerLocation: 'TopLeft',
     });
 
-    object.updateFromObjectData(oldObjectData, newObjectData);
-    behavior.updateBodyFromObject();
+    try {
+      object.updateFromObjectData(oldObjectData, newObjectData);
+      behavior.updateBodyFromObject();
 
-    assertBodyMatchesObject(object, behavior);
+      assertBodyMatchesObject(object, behavior);
+    } finally {
+      disposePhysics(runtimeScene);
+    }
   });
 });

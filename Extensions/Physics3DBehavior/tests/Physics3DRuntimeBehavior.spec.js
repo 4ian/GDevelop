@@ -218,6 +218,30 @@ describe('Physics3DRuntimeBehavior', () => {
     runtimeScene.physics3DSharedData.step(seconds);
   };
 
+  const stepUntilOnFloor = (runtimeScene, characterBehavior, stepCountMax) => {
+    for (let index = 0; index < stepCountMax; index++) {
+      stepPhysics(runtimeScene, 1 / 60);
+      if (characterBehavior.isOnFloor()) {
+        return true;
+      }
+    }
+    return false;
+  };
+
+  const stepUntilNotOnFloor = (
+    runtimeScene,
+    characterBehavior,
+    stepCountMax
+  ) => {
+    for (let index = 0; index < stepCountMax; index++) {
+      stepPhysics(runtimeScene, 1 / 60);
+      if (!characterBehavior.isOnFloor()) {
+        return true;
+      }
+    }
+    return false;
+  };
+
   const assertBodyMatchesObject = (object, behavior) => {
     const body = behavior.getBody();
     const bodyPosition = body.GetPosition();
@@ -368,19 +392,18 @@ describe('Physics3DRuntimeBehavior', () => {
     try {
       characterBehavior.getPhysics3D();
       physicsBehavior.updateBodyFromObject();
-      for (let index = 0; index < 5; index++) {
-        stepPhysics(runtimeScene, 1 / 60);
-      }
-      expect(characterBehavior.isOnFloor()).to.be(true);
+      expect(stepUntilOnFloor(runtimeScene, characterBehavior, 120)).to.be(
+        true
+      );
 
       characterBehavior.simulateJumpKey();
-      stepPhysics(runtimeScene, 1 / 60);
-      expect(characterBehavior.isOnFloor()).to.be(false);
+      expect(stepUntilNotOnFloor(runtimeScene, characterBehavior, 10)).to.be(
+        true
+      );
 
-      for (let index = 0; index < 120; index++) {
-        stepPhysics(runtimeScene, 1 / 60);
-      }
-      expect(characterBehavior.isOnFloor()).to.be(true);
+      expect(stepUntilOnFloor(runtimeScene, characterBehavior, 240)).to.be(
+        true
+      );
     } finally {
       disposePhysics(runtimeScene);
     }

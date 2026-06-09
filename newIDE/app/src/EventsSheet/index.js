@@ -1918,24 +1918,13 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   };
 
   _scrollToEvent = (event: gdBaseEvent) => {
-    if (!this._eventsTree) return;
-    this._eventsTree.unfoldForEvent(event);
-    // The row map may not be populated yet after forceUpdate; retry until
-    // the virtualized list has flushed (otherwise getEventRow returns -1).
-    const MAX_ATTEMPTS = 5;
-    const tryScroll = (attempt: number) => {
-      const eventsTree = this._eventsTree;
-      if (!eventsTree) return;
+    const eventsTree = this._eventsTree;
+    if (!eventsTree) return;
+    eventsTree.unfoldForEvent(event);
+    setTimeout(() => {
       const row = eventsTree.getEventRow(event);
-      if (row !== -1) {
-        eventsTree.scrollToRow(row);
-        return;
-      }
-      if (attempt < MAX_ATTEMPTS) {
-        window.requestAnimationFrame(() => tryScroll(attempt + 1));
-      }
-    };
-    window.requestAnimationFrame(() => tryScroll(1));
+      if (row !== -1) eventsTree.scrollToRow(row);
+    }, 100 /* Give some time for the events sheet to render before scrolling */);
   };
 
   _clearPausedState = () => {

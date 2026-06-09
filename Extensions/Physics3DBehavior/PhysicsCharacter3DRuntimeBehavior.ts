@@ -396,6 +396,10 @@ namespace gdjs {
         return result;
       }
       const { behavior } = physics3D;
+      // The body is at the object center on X and Y (the shape is offset
+      // when the object center is not the geometric center of the object).
+      // The character origin is at its feet on Z: when the character is made
+      // smaller, it must stay on the ground and not fall from its old size.
       result.Set(
         this.owner3D.getCenterXInScene() * this._sharedData.worldInvScale,
         this.owner3D.getCenterYInScene() * this._sharedData.worldInvScale,

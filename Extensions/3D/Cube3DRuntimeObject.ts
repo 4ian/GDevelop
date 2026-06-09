@@ -505,6 +505,7 @@ namespace gdjs {
           newObjectData.content.originLocation || 'TopLeft'
         );
         this._renderer.updateOriginAndCenter();
+        this.invalidateHitboxes();
       }
       if (
         oldObjectData.content.centerLocation !==
@@ -514,6 +515,7 @@ namespace gdjs {
           newObjectData.content.centerLocation || 'ObjectCenter'
         );
         this._renderer.updateOriginAndCenter();
+        this.invalidateHitboxes();
       }
       if (
         oldObjectData.content.materialType !==
@@ -577,10 +579,12 @@ namespace gdjs {
       if (networkSyncData.op !== undefined) {
         this._originPoint = networkSyncData.op;
         this._renderer.updateOriginAndCenter();
+        this.invalidateHitboxes();
       }
       if (networkSyncData.cp !== undefined) {
         this._centerPoint = networkSyncData.cp;
         this._renderer.updateOriginAndCenter();
+        this.invalidateHitboxes();
       }
       if (networkSyncData.vfb !== undefined) {
         // If it is different, update all the faces.

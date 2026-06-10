@@ -16,6 +16,11 @@
 namespace gd {
 
 void UsedExtensionsResult::AddUsedExtension(const gd::PlatformExtension& extension) {
+  if (extension.GetName().empty()) {
+    // The extension was not found and `extension` is
+    // `gd::MetadataProvider::badExtension`.
+    return;
+  }
   usedExtensions.insert(extension.GetName());
 
   usedSourceFiles.insert(usedSourceFiles.end(),
@@ -216,20 +221,8 @@ void UsedExtensionsFinder::OnVisitVariableBracketAccessorNode(
   if (node.child) node.child->Visit(*this);
 };
 
-// Add extensions bound to Objects/Behaviors/Functions
 void UsedExtensionsFinder::OnVisitIdentifierNode(IdentifierNode &node) {
-  auto type = gd::ExpressionTypeFinder::GetType(
-      project.GetCurrentPlatform(), GetProjectScopedContainers(), rootType, node);
-  if (gd::ParameterMetadata::IsObject(type) ||
-      GetObjectsContainersList().HasObjectOrGroupNamed(node.identifierName)) {
-    // An object or object variable is used.
-    auto metadata = gd::MetadataProvider::GetExtensionAndObjectMetadata(
-        project.GetCurrentPlatform(), node.identifierName);
-    result.AddUsedExtension(metadata.GetExtension());
-    for (auto &&includeFile : metadata.GetMetadata().includeFiles) {
-      result.AddUsedIncludeFiles(includeFile);
-    }
-  }
+  // Object parameters or object variables won't help detect extension usages.
 };
 
 void UsedExtensionsFinder::OnVisitFunctionCallNode(FunctionCallNode& node) {

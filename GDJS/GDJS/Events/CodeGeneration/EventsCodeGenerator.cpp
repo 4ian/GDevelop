@@ -83,9 +83,9 @@ gd::String EventsCodeGenerator::GenerateEventsListCompleteFunctionCode(
   gd::String bpFinallyCode;
   if (!codeGenerator.GenerateCodeForRuntime()) {
     gd::String ns = codeGenerator.ConvertToStringExplicit(codeGenerator.GetCodeNamespace());
-    bpPushCode = "runtimeScene.getBreakpointManager().pushBreakpointFunction(" + ns + ");\n";
+    bpPushCode = "if (runtimeScene) runtimeScene.getBreakpointManager().pushBreakpointFunction(" + ns + ");\n";
     bpTryCode = "try {\n";
-    bpFinallyCode = "} finally { runtimeScene.getBreakpointManager().popBreakpointFunction(); }\n";
+    bpFinallyCode = "} finally { if (runtimeScene) runtimeScene.getBreakpointManager().popBreakpointFunction(); }\n";
   }
 
   gd::String output =
@@ -1592,9 +1592,11 @@ gd::String EventsCodeGenerator::GenerateProfilerSectionEnd(
 gd::String EventsCodeGenerator::GenerateBreakpointCode(size_t eventIndex) {
   if (GenerateCodeForRuntime()) return "";
 
+  // The `runtimeScene &&` guard matches the push/pop and profiler code: the
+  // local can be undefined during custom-object construction.
   // checkBreakpoint returns false unless CDP is attached (Electron local
   // preview only), so the `debugger;` is dead code in web/remote previews.
-  return "if (runtimeScene.getBreakpointManager().checkBreakpoint(" +
+  return "if (runtimeScene && runtimeScene.getBreakpointManager().checkBreakpoint(" +
          ConvertToStringExplicit(GetCodeNamespace()) + ", " +
          gd::String::From(eventIndex) +
          ", runtimeScene)) debugger;\n";

@@ -21,6 +21,7 @@ const electron = optionalRequire('electron');
 
 const isElectronApp = !!electron;
 const isDev = Window.isDev();
+const analyticsDisabled = process.env.REACT_APP_DISABLE_ANALYTICS === 'true';
 
 // Flag helpful to know if posthog is ready to send events.
 let posthogLoaded = false;
@@ -41,6 +42,8 @@ let gdevelopEditorAnalytics: {|
 let gdevelopEditorAnalyticsPromise: Promise<void> | null = null;
 
 const ensureGDevelopEditorAnalyticsReady = async () => {
+  if (analyticsDisabled) return;
+
   if (gdevelopEditorAnalytics) {
     // Already loaded.
     return;
@@ -110,7 +113,7 @@ const makeCanSendEvent = (options: {| minimumTimeBetweenEvents: number |}) => {
  * This function will retry to send the event if the analytics service is not ready.
  */
 const recordEvent = (name: string, metadata?: { [string]: any }) => {
-  if (isDev) {
+  if (analyticsDisabled || isDev) {
     // Uncomment to inspect analytics in development.
     // console.log(`Should have sent analytics event "${name}"`, metadata);
     return;
@@ -158,8 +161,8 @@ const recordEvent = (name: string, metadata?: { [string]: any }) => {
  * Used once at the beginning of the app to initialize the analytics.
  */
 export const installAnalyticsEvents = () => {
-  if (isDev) {
-    console.info('Development build - Analytics disabled');
+  if (analyticsDisabled || isDev) {
+    console.info('Analytics disabled');
     return;
   }
 
@@ -185,8 +188,8 @@ export const installAnalyticsEvents = () => {
 export const identifyUserForAnalytics = (
   authenticatedUser: AuthenticatedUser
 ) => {
-  if (isDev) {
-    console.info('Development build - Analytics disabled');
+  if (analyticsDisabled || isDev) {
+    console.info('Analytics disabled');
     return;
   }
 
@@ -262,8 +265,8 @@ export const aliasUserForAnalyticsAfterSignUp = (
   // $FlowFixMe[value-as-type]
   firebaseUser: FirebaseUser
 ) => {
-  if (isDev) {
-    console.info('Development build - Analytics disabled');
+  if (analyticsDisabled || isDev) {
+    console.info('Analytics disabled');
     return;
   }
 
@@ -283,8 +286,8 @@ export const aliasUserForAnalyticsAfterSignUp = (
 };
 
 export const onUserLogoutForAnalytics = () => {
-  if (isDev) {
-    console.info('Development build - Analytics disabled');
+  if (analyticsDisabled || isDev) {
+    console.info('Analytics disabled');
     return;
   }
 

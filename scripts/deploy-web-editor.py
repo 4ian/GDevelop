@@ -87,6 +87,14 @@ def parse_args() -> argparse.Namespace:
         help="Nginx server_name value. Defaults to '<host> _'.",
     )
     parser.add_argument(
+        "--public-origin",
+        help=(
+            "Public browser origin used when rewriting proxied GDevelop URLs, "
+            "for example https://gd.zhouzhipeng.com. Defaults to the first "
+            "--server-name entry, or http://<host>."
+        ),
+    )
+    parser.add_argument(
         "--nginx-port",
         type=int,
         default=80,
@@ -128,6 +136,30 @@ def run_local_build(args: argparse.Namespace) -> float:
 
     env = os.environ.copy()
     env.setdefault("CI", "false")
+    env.setdefault("REACT_APP_DISABLE_ANALYTICS", "true")
+    env.setdefault("REACT_APP_GDEVELOP_API_PROXY_PATH", "/gdevelop-api")
+    env.setdefault("REACT_APP_GDEVELOP_API_WS_PROXY_PATH", "/gdevelop-api-ws")
+    env.setdefault("REACT_APP_GDEVELOP_RESOURCES_PROXY_PATH", "/gdevelop-resources")
+    env.setdefault(
+        "REACT_APP_GDEVELOP_PUBLIC_RESOURCES_PROXY_PATH",
+        "/gdevelop-public-resources",
+    )
+    env.setdefault(
+        "REACT_APP_GDEVELOP_PROJECT_RESOURCES_PROXY_PATH",
+        "/gdevelop-project-resources",
+    )
+    env.setdefault(
+        "REACT_APP_GDEVELOP_PRIVATE_ASSETS_PROXY_PATH",
+        "/gdevelop-private-assets",
+    )
+    env.setdefault(
+        "REACT_APP_GDEVELOP_PRIVATE_GAME_TEMPLATES_PROXY_PATH",
+        "/gdevelop-private-game-templates",
+    )
+    env.setdefault(
+        "REACT_APP_GDEVELOP_ASSET_RESOURCES_PROXY_PATH",
+        "/gdevelop-asset-resources",
+    )
     build_started_at = time.time()
     print(f"Building web editor with '{args.build_command}' in {app_dir}...")
     result = subprocess.run(args.build_command, cwd=str(app_dir), env=env, shell=True)
@@ -242,17 +274,69 @@ def sftp_mkdir_p(sftp, path: str) -> None:
             sftp.mkdir(current)
 
 
-def upload_archive(client, archive_path: pathlib.Path, remote_dir: str) -> str:
+def remote_file_size(client, remote_path: str) -> Optional[int]:
+    try:
+        with client.open_sftp() as sftp:
+            return sftp.stat(remote_path).st_size
+    except Exception:
+        return None
+
+
+def upload_archive(client, args: argparse.Namespace, archive_path: pathlib.Path, remote_dir: str):
     remote_archive = posixpath.join(remote_dir, archive_path.name)
+    local_size = archive_path.stat().st_size
     print(f"Uploading archive to {remote_archive}...")
-    with client.open_sftp() as sftp:
-        sftp_mkdir_p(sftp, remote_dir)
-        sftp.put(str(archive_path), remote_archive)
-    return remote_archive
+
+    try:
+        with client.open_sftp() as sftp:
+            sftp_mkdir_p(sftp, remote_dir)
+            sftp.put(str(archive_path), remote_archive, confirm=False)
+    except Exception as error:
+        print(f"Upload connection dropped; checking remote archive size ({error})...")
+        try:
+            client.close()
+        except Exception:
+            pass
+        client = connect(args)
+
+        remote_size = remote_file_size(client, remote_archive)
+        if remote_size == local_size:
+            print("Remote archive is complete; continuing deployment.")
+            return client, remote_archive
+
+        print("Remote archive was incomplete; retrying upload once.")
+        with client.open_sftp() as sftp:
+            sftp_mkdir_p(sftp, remote_dir)
+            try:
+                sftp.remove(remote_archive)
+            except IOError:
+                pass
+            sftp.put(str(archive_path), remote_archive, confirm=False)
+
+    remote_size = remote_file_size(client, remote_archive)
+    if remote_size != local_size:
+        raise SystemExit(
+            f"Remote archive size mismatch after upload: expected {local_size}, got {remote_size}."
+        )
+    return client, remote_archive
+
+
+def infer_public_origin(args: argparse.Namespace) -> str:
+    if args.public_origin:
+        return args.public_origin.rstrip("/")
+
+    if args.server_name:
+        for name in args.server_name.split():
+            if name != "_" and not re.fullmatch(r"[0-9.]+", name):
+                return f"https://{name}"
+
+    port_suffix = "" if args.nginx_port == 80 else f":{args.nginx_port}"
+    return f"http://{args.host}{port_suffix}"
 
 
 def nginx_config(args: argparse.Namespace, document_root: str) -> str:
     server_name = args.server_name or f"{args.host} _"
+    public_origin = infer_public_origin(args)
     return f"""server {{
     listen {args.nginx_port};
     listen [::]:{args.nginx_port};
@@ -260,6 +344,85 @@ def nginx_config(args: argparse.Namespace, document_root: str) -> str:
 
     root {document_root};
     index index.html;
+
+    location ^~ /gdevelop-api/ {{
+        proxy_pass https://api.gdevelop.io/;
+        proxy_http_version 1.1;
+        proxy_ssl_server_name on;
+        proxy_set_header Host api.gdevelop.io;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Accept-Encoding "";
+        proxy_buffering off;
+        proxy_redirect off;
+        sub_filter_once off;
+        sub_filter_types application/json text/plain;
+        sub_filter 'https://api.gdevelop.io' '{public_origin}/gdevelop-api';
+        sub_filter 'wss://api-ws.gdevelop.io' 'wss://{public_origin.removeprefix("https://").removeprefix("http://")}/gdevelop-api-ws';
+        sub_filter 'https://resources.gdevelop-app.com' '{public_origin}/gdevelop-resources';
+        sub_filter 'https://public-resources.gdevelop.io' '{public_origin}/gdevelop-public-resources';
+        sub_filter 'https://project-resources.gdevelop.io' '{public_origin}/gdevelop-project-resources';
+        sub_filter 'https://private-assets.gdevelop.io' '{public_origin}/gdevelop-private-assets';
+        sub_filter 'https://private-game-templates.gdevelop.io' '{public_origin}/gdevelop-private-game-templates';
+        sub_filter 'https://asset-resources.gdevelop.io' '{public_origin}/gdevelop-asset-resources';
+    }}
+
+    location ^~ /gdevelop-api-ws/ {{
+        proxy_pass https://api-ws.gdevelop.io/;
+        proxy_http_version 1.1;
+        proxy_ssl_server_name on;
+        proxy_set_header Host api-ws.gdevelop.io;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_buffering off;
+        proxy_read_timeout 3600s;
+    }}
+
+    location ^~ /gdevelop-resources/ {{
+        proxy_pass https://resources.gdevelop-app.com/;
+        proxy_ssl_server_name on;
+        proxy_set_header Host resources.gdevelop-app.com;
+        proxy_redirect off;
+    }}
+
+    location ^~ /gdevelop-public-resources/ {{
+        proxy_pass https://public-resources.gdevelop.io/;
+        proxy_ssl_server_name on;
+        proxy_set_header Host public-resources.gdevelop.io;
+        proxy_redirect off;
+    }}
+
+    location ^~ /gdevelop-project-resources/ {{
+        proxy_pass https://project-resources.gdevelop.io/;
+        proxy_ssl_server_name on;
+        proxy_set_header Host project-resources.gdevelop.io;
+        proxy_redirect off;
+    }}
+
+    location ^~ /gdevelop-private-assets/ {{
+        proxy_pass https://private-assets.gdevelop.io/;
+        proxy_ssl_server_name on;
+        proxy_set_header Host private-assets.gdevelop.io;
+        proxy_redirect off;
+    }}
+
+    location ^~ /gdevelop-private-game-templates/ {{
+        proxy_pass https://private-game-templates.gdevelop.io/;
+        proxy_ssl_server_name on;
+        proxy_set_header Host private-game-templates.gdevelop.io;
+        proxy_redirect off;
+    }}
+
+    location ^~ /gdevelop-asset-resources/ {{
+        proxy_pass https://asset-resources.gdevelop.io/;
+        proxy_ssl_server_name on;
+        proxy_set_header Host asset-resources.gdevelop.io;
+        proxy_redirect off;
+    }}
 
     location = /service-worker.js {{
         add_header Cache-Control "no-cache";
@@ -371,7 +534,7 @@ def main() -> None:
 
     client = connect(args)
     try:
-        remote_archive = upload_archive(client, archive_path, args.remote_path)
+        client, remote_archive = upload_archive(client, args, archive_path, args.remote_path)
         current_link = deploy_release(client, args, remote_archive)
         if not args.no_nginx:
             configure_nginx(client, args, current_link)

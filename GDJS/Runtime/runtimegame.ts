@@ -103,6 +103,12 @@ namespace gdjs {
     /** if true, game is run as a preview launched from an editor. */
     isPreview?: boolean;
 
+    /**
+     * if true, a CDP debugger is attached (local Electron preview), so the
+     * generated `debugger;` statements are live and breakpoints can fire.
+     */
+    cdpDebuggerEnabled?: boolean;
+
     /** if set, the status of the game to be restored. */
     initialRuntimeGameStatus?: RuntimeGameStatus;
 
@@ -417,6 +423,10 @@ namespace gdjs {
       }
 
       if (this._isPreview) {
+        // CDP is attached before the page loads, so the flag is reliable here.
+        if (this._options.cdpDebuggerEnabled) {
+          gdjs.__cdpAttached = true;
+        }
         gdjs.installBreakpointDebugSupport(this);
       }
     }

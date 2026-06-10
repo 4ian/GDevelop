@@ -375,6 +375,10 @@ void ExporterHelper::SerializeRuntimeGameOptions(
     gd::SerializerElement &runtimeGameOptions) {
   // Create the setup options passed to the gdjs.RuntimeGame
   runtimeGameOptions.AddChild("isPreview").SetBoolValue(true);
+  // Tells the runtime a CDP debugger is attached so `debugger;` statements
+  // are live (local Electron preview only).
+  runtimeGameOptions.AddChild("cdpDebuggerEnabled")
+      .SetBoolValue(options.cdpDebuggerEnabled);
 
   auto &initialRuntimeGameStatus =
       runtimeGameOptions.AddChild("initialRuntimeGameStatus");

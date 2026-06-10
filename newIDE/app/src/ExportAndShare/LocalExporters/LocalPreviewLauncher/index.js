@@ -285,6 +285,9 @@ export default class LocalPreviewLauncher extends React.Component<
           '' + previewDebuggerServerAddress.port
         );
       }
+      // The preview window always has a CDP debugger attached (see
+      // attachCdpToPreview), so the generated `debugger;` statements are live.
+      previewExportOptions.setCdpDebuggerEnabled(true);
     }
 
     const includeFileHashs = this.props.getIncludeFileHashs();

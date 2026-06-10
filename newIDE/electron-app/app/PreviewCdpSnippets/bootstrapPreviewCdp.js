@@ -5,9 +5,11 @@
  */
 
 /**
- * Sets `gdjs.__cdpAttached`, seeds initial breakpoints into `_debugState`,
- * and handles the timing race between `addScriptToEvaluateOnNewDocument`
- * and `Runtime.executionContextCreated` delivery.
+ * Seeds the initial breakpoints into the preview runtime.
+ *
+ * Handles both delivery paths: early (`addScriptToEvaluateOnNewDocument`, gdjs
+ * not yet defined) stashes them on `window`; late (`Runtime.evaluate`, game
+ * already running) writes straight into `_debugState`.
  *
  * MUST be self-contained: every identifier it uses is either a parameter or
  * a preview-side global (`window`, `gdjs`, `Map`, `Set`). Stringified via
@@ -17,19 +19,17 @@
  * @returns {void}
  */
 function bootstrapPreviewCdp(bps) {
+  if (bps.length === 0) return;
+
   if (typeof window !== 'undefined') {
-    // Early path: signal the game to mark CDP as attached in its constructor.
-    window.__gdjsWaitForCdp = true;
-    if (bps.length > 0) {
-      window.__gdjsInitialBreakpoints = bps;
-    }
+    // Early path: gdjs not defined yet; installBreakpointDebugSupport consumes this.
+    window.__gdjsInitialBreakpoints = bps;
   }
 
   if (typeof gdjs !== 'undefined') {
-    // Late path (Runtime.evaluate): game already running, set directly.
-    gdjs.__cdpAttached = true;
+    // Late path: game already running, write directly.
     var g = gdjs.Debugger ? gdjs.Debugger.game : null;
-    if (g && g._debugState && bps.length > 0) {
+    if (g && g._debugState) {
       var map = new Map();
       for (var i = 0; i < bps.length; i++) {
         var e = bps[i];

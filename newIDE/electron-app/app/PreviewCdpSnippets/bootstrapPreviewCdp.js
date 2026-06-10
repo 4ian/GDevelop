@@ -18,9 +18,7 @@
  */
 function bootstrapPreviewCdp(bps) {
   if (typeof window !== 'undefined') {
-    // Early path (addScriptToEvaluateOnNewDocument): gdjs is not yet defined.
-    // Signal the game that CDP is ready; installBreakpointDebugSupport will
-    // set gdjs.__cdpAttached = true when the game constructor runs.
+    // Early path: signal the game to mark CDP as attached in its constructor.
     window.__gdjsWaitForCdp = true;
     if (bps.length > 0) {
       window.__gdjsInitialBreakpoints = bps;
@@ -28,7 +26,7 @@ function bootstrapPreviewCdp(bps) {
   }
 
   if (typeof gdjs !== 'undefined') {
-    // Late path (Runtime.evaluate): game already initialized, set directly.
+    // Late path (Runtime.evaluate): game already running, set directly.
     gdjs.__cdpAttached = true;
     if (gdjs.game && gdjs.game._debugState && bps.length > 0) {
       var map = new Map();

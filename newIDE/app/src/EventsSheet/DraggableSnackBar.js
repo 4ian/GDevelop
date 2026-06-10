@@ -20,8 +20,7 @@ type DragState = {|
   initialY: number,
 |};
 
-// Minimum pixels that must remain visible inside the viewport on any edge.
-const MIN_VISIBLE_EDGE = 40;
+const MIN_VISIBLE_EDGE = 40; // px kept visible on each viewport edge after drag
 
 /**
  * A Snackbar that the user can drag to any position. The parent can reset the

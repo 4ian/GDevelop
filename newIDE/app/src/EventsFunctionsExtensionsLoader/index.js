@@ -341,9 +341,7 @@ const generateFreeFunction = (
       eventsFunction,
       codeNamespace,
       includeFiles,
-      // compilationForRuntime=false enables breakpoint/profiler instrumentation;
-      // use runtime mode for export so shipped code is clean.
-      !options.generateForPreview
+      !options.generateForPreview // compilationForRuntime: true strips instrumentation (export), false keeps it (preview)
     );
 
     // Add any include file required by the function to the list
@@ -556,9 +554,7 @@ function generateObject(
         codeNamespace,
         objectMethodMangledNames,
         includeFiles,
-        // compilationForRuntime=false enables breakpoint/profiler instrumentation;
-        // use runtime mode for export so shipped code is clean.
-        !options.generateForPreview
+        !options.generateForPreview // compilationForRuntime: true strips instrumentation (export), false keeps it (preview)
       );
       objectCodeGenerator.delete();
       objectMethodMangledNames.delete();

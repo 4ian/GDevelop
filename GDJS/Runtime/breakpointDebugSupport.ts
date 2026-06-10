@@ -35,29 +35,18 @@ namespace gdjs {
   };
 
   /**
-   * Public debugger API exposed on the `gdjs` namespace. All preview-only
-   * globals that were previously scattered on `gdjs` (`gdjs.game`,
-   * `gdjs.__buildBreakpointDumpJson`) and on `RuntimeScene`
-   * (`__pushBpFunction`, `__popBpFunction`, `__checkBreakpoint`) live here.
-   *
-   * Generated event code calls `gdjs.Debugger.pushFunction`,
-   * `gdjs.Debugger.popFunction`, and `gdjs.Debugger.checkBreakpoint`.
-   * Fields are `undefined` in non-preview (exported) builds.
+   * Public debugger API for preview builds. Generated event code calls
+   * `pushFunction`, `popFunction`, and `checkBreakpoint`. All fields are
+   * `undefined` in exported builds.
    */
   export namespace Debugger {
     /** The current preview RuntimeGame. */
     export let game: gdjs.RuntimeGame | undefined;
 
-    /**
-     * Serializes runtime state for the IDE variable tooltip while V8 is
-     * paused. Set by `installBreakpointDebugSupport`.
-     */
+    /** Serializes runtime state for the IDE variable tooltip while V8 is paused. */
     export let buildDumpJson: (() => string) | undefined;
 
-    /**
-     * Called by generated code when entering an events-function scope.
-     * Delegates to `RuntimeScene.__pushBpFunction`.
-     */
+    /** Called by generated code when entering an events-function scope. */
     export const pushFunction = (
       functionId: string,
       scene: gdjs.RuntimeScene | null | undefined
@@ -65,10 +54,7 @@ namespace gdjs {
       if (scene) scene.__pushBpFunction(functionId);
     };
 
-    /**
-     * Called by generated code when leaving an events-function scope.
-     * Delegates to `RuntimeScene.__popBpFunction`.
-     */
+    /** Called by generated code when leaving an events-function scope. */
     export const popFunction = (
       scene: gdjs.RuntimeScene | null | undefined
     ): void => {
@@ -78,7 +64,6 @@ namespace gdjs {
     /**
      * Called by generated code before each event.
      * Returns `true` if the `debugger;` statement should fire.
-     * Delegates to `RuntimeInstanceContainer.__checkBreakpoint`.
      */
     export const checkBreakpoint = (
       functionId: string,
@@ -192,9 +177,7 @@ namespace gdjs {
 
     if (typeof window === 'undefined') return;
 
-    // If the CDP bootstrap ran via addScriptToEvaluateOnNewDocument before
-    // this script, it set window.__gdjsWaitForCdp. Mark CDP as attached here
-    // synchronously instead of relying on setInterval polling in the bootstrap.
+    // Bootstrap set this flag before game code ran; mark CDP as attached now.
     if (window.__gdjsWaitForCdp) {
       gdjs.__cdpAttached = true;
       try {

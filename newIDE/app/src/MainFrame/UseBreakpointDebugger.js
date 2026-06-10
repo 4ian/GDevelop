@@ -69,8 +69,8 @@ const useBreakpointDebugger = ({
         lastHitEventIndexRef.current = eventIndex;
         lastHitFunctionIdRef.current = functionId;
 
-        // If the hit is inside an extension function, open its editor.
-        // Behavior methods use compilationForRuntime=true and are never matched.
+        // Behavior object methods are compiled with compilationForRuntime=true
+        // and never appear as extension function hits; skip them.
         if (functionId.startsWith('gdjs.evtsExt__') && currentProject) {
           try {
             const count = currentProject.getEventsFunctionsExtensionsCount();
@@ -216,7 +216,7 @@ const useBreakpointDebugger = ({
         resumePausedPreview();
         previewPausedRef.current = false;
       } else {
-        // Preview is running; the actual pause fires in the next __checkBreakpoint.
+        // Pause fires in the next checkBreakpoint call inside the running preview.
         schedulePauseAtNextEvent();
       }
     },

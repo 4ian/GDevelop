@@ -302,8 +302,7 @@ export default class ExportLauncher extends Component<Props, State> {
           }
         : undefined;
 
-      // Regenerate extension code in runtime mode (compilationForRuntime=true)
-      // so exported games don't contain breakpoint/profiler instrumentation.
+      // Regenerate extensions without preview instrumentation (generateForPreview=false).
       await eventsFunctionsExtensionsState.reloadProjectEventsFunctionsExtensions(
         project,
         false

@@ -25,11 +25,7 @@ declare namespace gdjs {
   /** @deprecated Use `gdjs.Debugger.game` instead. */
   var game: gdjs.RuntimeGame | undefined;
 
-  /**
-   * Public debugger API. Preview-only globals previously scattered on the
-   * `gdjs` namespace now live here. All fields are `undefined` in exported
-   * (non-preview) builds.
-   */
+  /** Public debugger API for preview builds. Undefined in exported builds. */
   namespace Debugger {
     var game: gdjs.RuntimeGame | undefined;
     var buildDumpJson: (() => string) | undefined;
@@ -59,11 +55,6 @@ declare type InitialBreakpointEntry = {
 
 interface Window {
   __gdjsInitialBreakpoints?: InitialBreakpointEntry[];
-  /**
-   * Set by the CDP bootstrap script via `addScriptToEvaluateOnNewDocument`
-   * before the game loads. `installBreakpointDebugSupport` reads this to set
-   * `gdjs.__cdpAttached = true` synchronously, replacing the old poll-based
-   * bootstrap approach.
-   */
+  /** Set by the bootstrap before game code runs; consumed by `installBreakpointDebugSupport` to set `gdjs.__cdpAttached`. */
   __gdjsWaitForCdp?: boolean;
 }

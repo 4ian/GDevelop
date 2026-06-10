@@ -50,6 +50,11 @@ namespace gdjs {
     // Set to `new gdjs.Profiler()` to have profiling done on the scene.
     _onProfilerStopped: null | ((oldProfiler: gdjs.Profiler) => void) = null;
 
+    // Stack of generated-code namespaces currently executing events
+    // (pushed by `__pushBpFunction`, popped by `__popBpFunction`).
+    // Used by the stepping FSM to detect scope changes.
+    _bpFunctionStack: string[] = [];
+
     _cachedGameResolutionWidth: integer;
     _cachedGameResolutionHeight: integer;
 
@@ -379,6 +384,99 @@ namespace gdjs {
       this._eventsFunction = func;
     }
 
+    __pushBpFunction(functionId: string): void {
+      this._bpFunctionStack.push(functionId);
+    }
+
+    __popBpFunction(): void {
+      this._bpFunctionStack.pop();
+    }
+
+    /**
+     * Called by generated code before each event.
+     * Returns true if execution should stop (breakpoint hit or stepping).
+     */
+    __checkBreakpoint(functionId: string, eventIndex: number): boolean {
+      // Without CDP attached, `debugger;` is a no-op — skip the FSM.
+      if (!gdjs.__cdpAttached) return false;
+
+      const ds = this._runtimeGame._debugState;
+
+      if (ds.stepNextEvent) {
+        const depth = this._bpFunctionStack.length;
+
+        if (ds.stepStartDepth < 0) {
+          if (!ds.stepCurrentFunctionId) {
+            // F10 from resumed state: stop only at scene-level events,
+            // not deep inside extensions.
+            if (functionId.startsWith('gdjs.evtsExt__')) return false;
+            ds.stepStartDepth = depth;
+          } else if (functionId === ds.stepCurrentFunctionId) {
+            ds.stepStartDepth = depth;
+          } else {
+            return false;
+          }
+        }
+
+        if (depth > ds.stepStartDepth) return false;
+
+        // Left the target scope — abandon stepping, resume the game.
+        if (depth < ds.stepStartDepth) {
+          ds.stepNextEvent = false;
+          return false;
+        }
+
+        // F10 from a fresh pause with no pinned event to step past.
+        if (ds.stepCurrentEventIndex < 0) {
+          ds.stepNextEvent = false;
+          return this._triggerBreakpoint(functionId, eventIndex);
+        }
+
+        if (
+          functionId === ds.stepCurrentFunctionId &&
+          eventIndex === ds.stepCurrentEventIndex
+        ) {
+          ds.stepPassedCurrentEvent = true;
+          return false;
+        }
+        if (ds.stepPassedCurrentEvent) {
+          ds.stepNextEvent = false;
+          ds.stepPassedCurrentEvent = false;
+          ds.stepCurrentEventIndex = -1;
+          return this._triggerBreakpoint(functionId, eventIndex);
+        }
+        return false;
+      }
+
+      const bpMap = ds.breakpointIndices;
+      if (bpMap) {
+        const fnSet = bpMap.get(functionId);
+        if (fnSet && fnSet.has(eventIndex)) {
+          return this._triggerBreakpoint(functionId, eventIndex);
+        }
+      }
+      return false;
+    }
+
+    private _triggerBreakpoint(
+      functionId: string,
+      eventIndex: number
+    ): boolean {
+      // Hit info only; the dump is built lazily from Electron main over
+      // CDP once V8 is paused, keeping the `debugger;` path cheap.
+      const ds = this._runtimeGame._debugState;
+      ds.lastBreakpoint = {
+        eventIndex,
+        sceneName: this._name,
+        functionId,
+      };
+      // Default to this scene. `RuntimeInstanceContainer.__checkBreakpoint`
+      // overrides with its sub-container when the event fired inside a
+      // custom object.
+      ds.lastBpCallingContainer = this;
+      return true;
+    }
+
     /**
      * Step (execute the game logic) and render the scene.
      * @param elapsedTime In milliseconds
@@ -421,6 +519,21 @@ namespace gdjs {
         this._profiler.begin('events');
       }
       if (this._eventsFunction !== null) this._eventsFunction(this);
+
+      // Stepping was armed but the target event wasn't reached this frame.
+      // (When a breakpoint fires, `__checkBreakpoint` already cleared `stepNextEvent`.)
+      const ds = this._runtimeGame._debugState;
+      if (ds.stepNextEvent) {
+        if (ds.stepCurrentFunctionId.startsWith('gdjs.evtsExt__')) {
+          // Extension scope: stop stepping and let the game resume.
+          ds.stepNextEvent = false;
+        } else {
+          // Scene scope: reset to "stop at first event" so stepping wraps
+          // to the top of the next frame.
+          ds.stepCurrentEventIndex = -1;
+          ds.stepStartDepth = -1;
+        }
+      }
       if (this._profiler) {
         this._profiler.end('events');
       }

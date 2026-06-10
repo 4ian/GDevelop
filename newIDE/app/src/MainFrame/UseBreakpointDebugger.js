@@ -9,6 +9,7 @@ import {
   isElectronCDPBridgeAvailable,
 } from '../Debugger/ElectronCDPBridge';
 import { type PreviewDebuggerServer } from '../ExportAndShare/PreviewLauncher.flow';
+import { type ShowAlertDialogOptions } from '../UI/Alert/AlertContext';
 
 const gd: libGDevelop = global.gd;
 
@@ -21,7 +22,11 @@ type Params = {|
     options: {|
       openEventsEditor: boolean,
       openSceneEditor: boolean,
-      focusWhenOpened: string,
+      focusWhenOpened:
+        | 'scene-or-events-otherwise'
+        | 'scene'
+        | 'events'
+        | 'none',
     |}
   ) => void,
   focusOnExtensionFunction: (
@@ -30,7 +35,7 @@ type Params = {|
     behaviorName: ?string,
     objectName: ?string
   ) => void,
-  showAlert: (options: {| title: any, message: any |}) => Promise<void>,
+  showAlert: (options: ShowAlertDialogOptions) => Promise<void>,
 |};
 
 type Result = {|

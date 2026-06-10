@@ -314,7 +314,7 @@ void FunctionFolderOrFunction::UnserializeFrom(const SerializerElement &element,
             childrenElements.GetChild(i), functionsContainer);
         if (!childFunctionFolderOrFunction->IsFolder() &&
             childFunctionFolderOrFunction->function == nullptr) {
-          // Ignore invalid references to missing objects, that can happen
+          // Ignore invalid references to missing functions, that can happen
           // after manual edits or merges.
           continue;
         }

@@ -103,6 +103,12 @@ namespace gdjs {
     /** if true, game is run as a preview launched from an editor. */
     isPreview?: boolean;
 
+    /**
+     * if true, a CDP debugger is attached (local Electron preview), so the
+     * generated `debugger;` statements are live and breakpoints can fire.
+     */
+    cdpDebuggerEnabled?: boolean;
+
     /** if set, the status of the game to be restored. */
     initialRuntimeGameStatus?: RuntimeGameStatus;
 
@@ -184,6 +190,30 @@ namespace gdjs {
     environment?: 'dev';
   };
 
+  /** Breakpoints and stepping state used by the preview debugger. */
+  export type DebuggerState = {
+    breakpointIndices: Map<string, Set<number>> | null;
+    stepNextEvent: boolean;
+    stepPassedCurrentEvent: boolean;
+    stepCurrentEventIndex: number;
+    stepCurrentFunctionId: string;
+    stepStartDepth: number;
+    /** Hit info of the breakpoint currently frozen on `debugger;`. */
+    lastBreakpoint: {
+      functionId: string;
+      eventIndex: number;
+      sceneName: string;
+    } | null;
+    /** Container that was executing when the breakpoint fired — scene for
+     * scene events, custom-object sub-container for object-method events.
+     * Typed as the union because `RuntimeScene` widens `getProfiler()`'s
+     * return type, so it is not strictly assignable to the abstract base. */
+    lastBpCallingContainer:
+      | gdjs.RuntimeInstanceContainer
+      | gdjs.RuntimeScene
+      | null;
+  };
+
   /**
    * Represents a game being played.
    * @category Core Engine > Game
@@ -257,6 +287,22 @@ namespace gdjs {
      * Optional client to connect to a debugger server.
      */
     _debuggerClient: gdjs.AbstractDebuggerClient | null;
+
+    /**
+     * Breakpoints and stepping state used by the preview debugger.
+     * Accessed directly by RuntimeScene.__checkBreakpoint and
+     * AbstractDebuggerClient command handlers for performance.
+     */
+    _debugState: gdjs.DebuggerState = {
+      breakpointIndices: null,
+      stepNextEvent: false,
+      stepPassedCurrentEvent: false,
+      stepCurrentEventIndex: -1,
+      stepCurrentFunctionId: '',
+      stepStartDepth: 0,
+      lastBreakpoint: null,
+      lastBpCallingContainer: null,
+    };
     _sessionMetricsInitialized: boolean = false;
     _disableMetrics: boolean = false;
     _isPreview: boolean;
@@ -374,6 +420,14 @@ namespace gdjs {
         logger.info(
           'This game will run on the development version of GDevelop APIs.'
         );
+      }
+
+      if (this._isPreview) {
+        // CDP is attached before the page loads, so the flag is reliable here.
+        if (this._options.cdpDebuggerEnabled) {
+          gdjs.__cdpAttached = true;
+        }
+        gdjs.installBreakpointDebugSupport(this);
       }
     }
 
@@ -904,6 +958,10 @@ namespace gdjs {
       if (this._debuggerClient) {
         this._debuggerClient.sendRuntimeGameStatus();
       }
+    }
+
+    getDebuggerClient(): gdjs.AbstractDebuggerClient | null {
+      return this._debuggerClient;
     }
 
     /**

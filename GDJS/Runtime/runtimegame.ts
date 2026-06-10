@@ -386,10 +386,6 @@ namespace gdjs {
       }
 
       if (this._isPreview) {
-        // CDP is attached before the page loads, so the flag is reliable here.
-        if (this._options.cdpDebuggerEnabled) {
-          gdjs.__cdpAttached = true;
-        }
         gdjs.installBreakpointDebugSupport(this);
       }
     }

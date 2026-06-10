@@ -57,6 +57,10 @@ namespace gdjs {
   export class DebuggerBreakpointManager {
     private _game: gdjs.RuntimeGame;
 
+    /** True when a CDP debugger drives the preview (local Electron preview).
+     * Without it the generated `debugger;` is a no-op, so the FSM is skipped. */
+    private _cdpAttached: boolean;
+
     /** Event indices that should pause, keyed by events-function id. */
     private _breakpointIndices: Map<string, Set<number>> | null = null;
 
@@ -83,6 +87,7 @@ namespace gdjs {
 
     constructor(game: gdjs.RuntimeGame) {
       this._game = game;
+      this._cdpAttached = !!game._options.cdpDebuggerEnabled;
     }
 
     pushBreakpointFunction(functionId: string): void {
@@ -103,8 +108,7 @@ namespace gdjs {
       eventIndex: number,
       container: gdjs.RuntimeInstanceContainer
     ): boolean {
-      // Without CDP attached, `debugger;` is a no-op — skip the FSM.
-      if (!gdjs.__cdpAttached) return false;
+      if (!this._cdpAttached) return false;
 
       if (this._stepNextEvent) {
         const depth = this._functionStack.length;
@@ -205,6 +209,24 @@ namespace gdjs {
         }
       }
       this._breakpointIndices = map.size > 0 ? map : null;
+    }
+
+    /**
+     * Applies the breakpoints seeded on `window` by the CDP bootstrap before
+     * the runtime loaded (see bootstrapPreviewCdp), then clears them. `window`
+     * is the only carrier available that early - the runtime didn't exist yet.
+     */
+    consumeInitialBreakpoints(): void {
+      if (typeof window === 'undefined') return;
+      const initial = window.__gdjsInitialBreakpoints;
+      if (Array.isArray(initial) && initial.length > 0) {
+        this.setBreakpoints(initial);
+      }
+      try {
+        delete window.__gdjsInitialBreakpoints;
+      } catch (_) {
+        window.__gdjsInitialBreakpoints = undefined;
+      }
     }
 
     /**
@@ -411,16 +433,6 @@ namespace gdjs {
       );
     };
 
-    if (typeof window === 'undefined') return;
-
-    const initial = window.__gdjsInitialBreakpoints;
-    if (Array.isArray(initial) && initial.length > 0) {
-      game.getBreakpointManager().setBreakpoints(initial);
-    }
-    try {
-      delete window.__gdjsInitialBreakpoints;
-    } catch (_) {
-      window.__gdjsInitialBreakpoints = undefined;
-    }
+    game.getBreakpointManager().consumeInitialBreakpoints();
   };
 }

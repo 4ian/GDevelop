@@ -59,6 +59,25 @@ require('@electron/remote/main').initialize();
 
 log.info('GDevelop Electron app starting...');
 
+// Keep preview (and editor) renderers alive when their window is occluded or
+// backgrounded. Chromium normally detects a fully-covered window (native window
+// occlusion, Windows in particular) and freezes its renderer's JS/timer/event
+// loop to save resources. For a preview that opened behind the editor this kills
+// the debugger websocket pump: pause/inspect/run_frames/health-check all stop
+// getting answered (the renderer never runs `ws.onmessage` -> handleCommand),
+// while a main-process webContents.capturePage() screenshot still succeeds (it
+// reads the last composited frame, not renderer JS) — so the preview *looks*
+// alive but the debugger channel is silent. These switches must be set before
+// the app is ready. They complement (do not replace) the per-window
+// backgroundThrottling:false option and the powerSaveBlocker held while a
+// preview is open.
+app.commandLine.appendSwitch(
+  'disable-features',
+  'CalculateNativeWinOcclusion'
+);
+app.commandLine.appendSwitch('disable-renderer-backgrounding');
+app.commandLine.appendSwitch('disable-backgrounding-occluded-windows');
+
 // Logs made with electron-logs can be found
 // on Linux: ~/.config/<app name>/log.log
 // on OS X: ~/Library/Logs/<app name>/log.log

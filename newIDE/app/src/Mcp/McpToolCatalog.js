@@ -1660,7 +1660,12 @@ const launchPreviewSchema = {
     start_paused: {
       type: 'boolean',
       description:
-        'When true, pause the preview as soon as it connects to the debugger, so you can run a deterministic test near frame 0 (the game otherwise runs in real time immediately and may end before your next call). Then use run_frames / control_preview step to advance, or control_preview play to run normally.',
+        'When true, pause the preview as soon as it connects to the debugger, so you can run a deterministic test near frame 0 (the game otherwise runs in real time immediately and may end before your next call). Then use run_frames / control_preview step to advance, or control_preview play to run normally. When attaching to an already-running preview, it is paused in place instead.',
+    },
+    force_new: {
+      type: 'boolean',
+      description:
+        'When true, always open a NEW preview window. By default (false) this attaches to an already-running preview (the editor shares one debugger channel), avoiding duplicate windows and stale game-over windows; set this only when you specifically need a fresh window.',
     },
     timeout_ms: {
       type: 'number',
@@ -3253,7 +3258,7 @@ const readTools: Array<McpTool> = [
   {
     name: 'launch_preview',
     description:
-      'Launch a new game preview, optionally paused on connect (start_paused:true) so you can run a deterministic test near frame 0 — the game otherwise runs in real time the instant it loads, and may already be game-over by your next MCP call. With start_paused, advance with run_frames / control_preview step, or control_preview play to run normally. Equivalent to gdevelop_run_command { commandName:"LAUNCH_NEW_PREVIEW" } but adds the pause-on-connect handshake.',
+      'Launch or attach to a game preview, optionally paused on connect (start_paused:true) so you can run a deterministic test near frame 0 — the game otherwise runs in real time the instant it loads, and may already be game-over by your next MCP call. By default it ATTACHES to an already-running preview (the editor shares one debugger channel) instead of opening a duplicate window; pass force_new:true to always open a fresh window. With start_paused, advance with run_frames / control_preview step, or control_preview play to run normally. Equivalent to gdevelop_run_command { commandName:"LAUNCH_NEW_PREVIEW" } but adds the attach + pause-on-connect handshake.',
     inputSchema: launchPreviewSchema,
   },
   {

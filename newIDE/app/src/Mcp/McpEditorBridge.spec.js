@@ -4156,6 +4156,85 @@ describe('McpEditorBridge', () => {
     ).toBe(true);
   });
 
+  it('launch_preview attaches to an already-running preview instead of opening a new window', async () => {
+    const runCommand = jest.fn(() => true);
+    const previewDebuggerServer = makeTargetedPreviewServer({
+      debuggerIds: ['preview-ws-0'],
+      responders: {},
+    });
+    const bridge = makeBridge({
+      runCommand,
+      getPreviewDebuggerServer: () => previewDebuggerServer,
+    });
+
+    const response = await bridge.handleRendererMcpRequest({
+      method: 'tools/call',
+      params: { name: 'launch_preview', arguments: {} },
+    });
+    const result = JSON.parse(response.content[0].text);
+
+    expect(response.isError).not.toBe(true);
+    expect(result.attached).toBe(true);
+    expect(result.launched).toBe(false);
+    expect(result.debuggerId).toBe('preview-ws-0');
+    // No new preview window was opened.
+    expect(runCommand).not.toHaveBeenCalled();
+  });
+
+  it('launch_preview attaches and pauses an existing preview in place with start_paused', async () => {
+    const runCommand = jest.fn(() => true);
+    const previewDebuggerServer = makeTargetedPreviewServer({
+      debuggerIds: ['preview-ws-0'],
+      responders: {
+        pause: { isPaused: true, sceneName: 'Level1' },
+      },
+    });
+    const bridge = makeBridge({
+      runCommand,
+      getPreviewDebuggerServer: () => previewDebuggerServer,
+    });
+
+    const response = await bridge.handleRendererMcpRequest({
+      method: 'tools/call',
+      params: {
+        name: 'launch_preview',
+        arguments: { start_paused: true, timeout_ms: 1000 },
+      },
+    });
+    const result = JSON.parse(response.content[0].text);
+
+    expect(response.isError).not.toBe(true);
+    expect(result.attached).toBe(true);
+    expect(result.launched).toBe(false);
+    expect(result.startPaused).toBe(true);
+    expect(result.pauseConfirmed).toBe(true);
+    expect(result.debuggerId).toBe('preview-ws-0');
+    expect(runCommand).not.toHaveBeenCalled();
+  });
+
+  it('launch_preview with force_new opens a new window even if a preview is connected', async () => {
+    const runCommand = jest.fn(() => true);
+    const previewDebuggerServer = makeTargetedPreviewServer({
+      debuggerIds: ['preview-ws-0'],
+      responders: {},
+    });
+    const bridge = makeBridge({
+      runCommand,
+      getPreviewDebuggerServer: () => previewDebuggerServer,
+    });
+
+    const response = await bridge.handleRendererMcpRequest({
+      method: 'tools/call',
+      params: { name: 'launch_preview', arguments: { force_new: true } },
+    });
+    const result = JSON.parse(response.content[0].text);
+
+    expect(response.isError).not.toBe(true);
+    expect(result.attached).not.toBe(true);
+    expect(result.launched).toBe(true);
+    expect(runCommand).toHaveBeenCalledWith('LAUNCH_NEW_PREVIEW');
+  });
+
   it('writes a preview screenshot to a file when file_path is given', async () => {
     const onePixelPng =
       'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+M8AAAMCAQDLuRBYAAAAAElFTkSuQmCC';

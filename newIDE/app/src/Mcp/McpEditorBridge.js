@@ -1852,6 +1852,12 @@ const getConnectionDebuggerId = (connection: any): ?string => {
 // MCP-level: it triggers LAUNCH_NEW_PREVIEW, then registers a one-shot callback
 // that sends `pause` to the newly-connected debugger id. It is "pause ASAP",
 // not a guaranteed frame-0 pause — combine with run_frames for full determinism.
+//
+// By default it ATTACHES to an already-running preview (e.g. one the user
+// started with the editor's ▶ button, or a previous launch) instead of opening
+// yet another window — MCP shares the editor's own debugger channel, so a second
+// window is rarely wanted and just adds a stale game-over window to step around.
+// Pass force_new:true to always open a fresh window.
 const launchPreview = async (
   previewDebuggerServer: ?Object,
   runCommand: ?(string) => boolean,
@@ -1864,10 +1870,59 @@ const launchPreview = async (
     };
   }
   const startPaused = !!(args && (args.start_paused || args.startPaused));
+  const forceNew = !!(args && (args.force_new || args.forceNew));
   const timeoutMs =
     args && typeof args.timeout_ms === 'number'
       ? Math.max(500, Math.min(15000, args.timeout_ms))
       : 6000;
+
+  // Attach to an existing preview unless the caller forces a new window. This
+  // keeps MCP working against the editor's current preview rather than spawning
+  // duplicates.
+  if (!forceNew && previewDebuggerServer) {
+    const connectedIds = getPreviewDebuggerIds(previewDebuggerServer);
+    if (connectedIds.length) {
+      const attachId = connectedIds[connectedIds.length - 1];
+      if (!startPaused) {
+        return {
+          success: true,
+          launched: false,
+          attached: true,
+          debuggerId: attachId,
+          availableDebuggerIds: connectedIds,
+          startPaused: false,
+          note:
+            'Attached to the already-running preview (no new window opened). It keeps running in real time — for deterministic tests use run_frames, or pass start_paused:true to pause it now, or force_new:true to open a fresh window.',
+        };
+      }
+      // start_paused on an existing preview: pause it in place.
+      const { matched, payload } = await sendTargetedRequest(
+        (previewDebuggerServer: any),
+        attachId,
+        { command: 'pause' },
+        { timeoutMs: Math.min(2000, Math.max(500, timeoutMs)) }
+      );
+      const pauseConfirmed = !!(
+        matched &&
+        payload &&
+        payload.isPaused === true
+      );
+      return {
+        success: true,
+        launched: false,
+        attached: true,
+        debuggerId: attachId,
+        availableDebuggerIds: connectedIds,
+        startPaused: pauseConfirmed,
+        pauseRequested: true,
+        pauseConfirmed,
+        status: matched ? payload : undefined,
+        note: pauseConfirmed
+          ? 'Attached to the already-running preview and paused it (no new window opened). Use run_frames / control_preview { action:"step" } to advance, or control_preview { action:"play" } to resume. Pass force_new:true to open a fresh window instead.'
+          : 'Attached to the already-running preview and requested a pause, but it did not confirm before the timeout (its debugger channel may be throttled — try control_preview { action:"focus" }, or relaunch with force_new:true). It may still be running in real time.',
+      };
+    }
+  }
 
   // Snapshot the already-connected ids so we can detect the NEW preview.
   const existingIds = new Set(

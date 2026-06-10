@@ -16,6 +16,11 @@
 namespace gd {
 
 void UsedExtensionsResult::AddUsedExtension(const gd::PlatformExtension& extension) {
+  // Ignore the placeholder extension returned by gd::MetadataProvider when
+  // no metadata was found (it has an empty name and is not loaded in the
+  // platform).
+  if (extension.GetName().empty()) return;
+
   usedExtensions.insert(extension.GetName());
 
   usedSourceFiles.insert(usedSourceFiles.end(),

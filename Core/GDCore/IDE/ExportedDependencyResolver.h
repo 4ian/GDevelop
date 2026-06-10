@@ -49,6 +49,11 @@ class ExportedDependencyResolver {
     std::vector<DependencyMetadataAndExtension> dependenciesWithProperType;
     for (const gd::String &extensionName : usedExtensions) {
       auto extension = project.GetCurrentPlatform().GetExtension(extensionName);
+      // An extension that was detected as used can be missing from the
+      // platform (for example, an events-based extension that failed to be
+      // generated, or an unknown object/behavior/instruction type).
+      if (!extension) continue;
+
       for (gd::DependencyMetadata &dependency :
            extension->GetAllDependencies()) {
         if (dependency.GetDependencyType() == dependencyType) {

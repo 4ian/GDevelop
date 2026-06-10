@@ -232,8 +232,6 @@ TEST_CASE("ArbitraryResourceWorker", "[common][resources]") {
       ArbitraryResourceWorkerTest worker(project.GetResourcesManager());
 
       // External events that is not associated with any layout
-      // It won't happen in practice since resources are global to the project
-      // so it should still work.
       auto& externalEvents = project.InsertNewExternalEvents("MyExternalEvents", 0);
 
       gd::StandardEvent standardEvent;

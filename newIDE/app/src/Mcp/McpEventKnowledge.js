@@ -40,8 +40,8 @@ const normalizeLimit = (limit: any): number => {
 const normalizeText = (text: string): string => text.toLowerCase();
 
 // Alias map: free-text intent terms a model is likely to type, mapped to extra
-// terms that actually appear in GDevelop instruction metadata (including the
-// French/legacy internal type fragments like MettreX, ModVarObjet, Scene). When
+// terms that actually appear in GDevelop instruction metadata (including
+// compatibility fragments so searches can still find current replacements). When
 // any alias key token is present in the query, its values are added to the set
 // of acceptable match terms so a single query token can be satisfied by any of
 // them. This fixes "play sound effect", "delete object", "change position",
@@ -162,7 +162,7 @@ const COMMON_TASK_HINTS: Array<{|
   {
     keywords: ['music', 'bgm', 'background', 'loop', 'looping'],
     kind: 'action',
-    type: 'PlayMusicCanal',
+    type: 'PlayMusicOnChannel',
     title: 'Play looping background music on a channel',
     parametersTemplate: ['', 'bgm', '0', 'yes', '100', '1'],
     note:
@@ -180,11 +180,11 @@ const COMMON_TASK_HINTS: Array<{|
   {
     keywords: ['hide', 'invisible', 'visible', 'visibility'],
     kind: 'action',
-    type: 'Cache',
+    type: 'Hide',
     title: 'Hide an object',
     parametersTemplate: ['MyObject'],
     note:
-      'Hide takes just [objectName]. The twin action Show ("Montre") has an extra hidden code-only 2nd parameter — pass "" for it.',
+      'Hide takes just [objectName]. The twin action Show has an extra hidden code-only 2nd parameter — pass "" for it.',
   },
   {
     keywords: [
@@ -576,6 +576,131 @@ const summarizeParameter = (
   return parameter;
 };
 
+const isDeprecatedOrHiddenInstructionMetadata = (
+  metadata: gdInstructionMetadata
+): boolean => metadata.isHidden() || !!metadata.getDeprecationMessage();
+
+const getRawInstructionMetadata = (
+  project: gdProject,
+  type: string,
+  kind: 'action' | 'condition'
+): ?gdInstructionMetadata => {
+  const metadata =
+    kind === 'condition'
+      ? gd.MetadataProvider.getConditionMetadata(
+          project.getCurrentPlatform(),
+          type
+        )
+      : gd.MetadataProvider.getActionMetadata(
+          project.getCurrentPlatform(),
+          type
+        );
+  return gd.MetadataProvider.isBadInstructionMetadata(metadata)
+    ? null
+    : metadata;
+};
+
+const findReplacementInstructionTypes = ({
+  project,
+  i18n,
+  type,
+  kind,
+  metadata,
+}: {|
+  project: gdProject,
+  i18n?: any,
+  type: string,
+  kind: 'action' | 'condition',
+  metadata: gdInstructionMetadata,
+|}): Array<string> => {
+  let visibleInstructions = [];
+  try {
+    visibleInstructions = enumerateAllInstructions(
+      kind === 'condition',
+      project,
+      i18n
+    );
+  } catch (error) {
+    return [];
+  }
+
+  const fullName = metadata.getFullName();
+  const description = metadata.getDescription();
+  const sentence = metadata.getSentence();
+  const scored = [];
+  visibleInstructions.forEach(instruction => {
+    if (instruction.type === type) return;
+    if (isDeprecatedOrHiddenInstructionMetadata(instruction.metadata)) return;
+
+    let score = 0;
+    if (instruction.metadata.getFullName() === fullName) score += 4;
+    if (instruction.metadata.getSentence() === sentence) score += 3;
+    if (instruction.metadata.getDescription() === description) score += 2;
+    if (score > 0) {
+      scored.push({ type: instruction.type, score });
+    }
+  });
+
+  scored.sort((left, right) =>
+    right.score !== left.score
+      ? right.score - left.score
+      : left.type.localeCompare(right.type)
+  );
+
+  const replacementTypes = [];
+  scored.forEach(entry => {
+    if (replacementTypes.indexOf(entry.type) === -1) {
+      replacementTypes.push(entry.type);
+    }
+  });
+  return replacementTypes.slice(0, 3);
+};
+
+const getDeprecatedInstructionDiagnostic = ({
+  project,
+  i18n,
+  type,
+  kind,
+  metadata,
+}: {|
+  project: gdProject,
+  i18n?: any,
+  type: string,
+  kind: 'action' | 'condition',
+  metadata: gdInstructionMetadata,
+|}): Object => {
+  const deprecationMessage = metadata.getDeprecationMessage() || undefined;
+  const replacementTypes = findReplacementInstructionTypes({
+    project,
+    i18n,
+    type,
+    kind,
+    metadata,
+  });
+  const replacementSuggestion = replacementTypes.length
+    ? replacementTypes.length === 1
+      ? `Use ${kind} type "${replacementTypes[0]}" instead.`
+      : `Use one of these ${kind} types instead: ${replacementTypes
+          .map(replacementType => `"${replacementType}"`)
+          .join(', ')}.`
+    : null;
+  const suggestion =
+    [deprecationMessage, replacementSuggestion].filter(Boolean).join(' ') ||
+    `Use gdevelop_search_instruction_metadata with kind "${kind}" and query "${metadata.getFullName() ||
+      type}" to find a current replacement.`;
+
+  return {
+    deprecated: true,
+    error: `The ${kind} type "${type}" is deprecated or hidden and cannot be used by MCP.`,
+    suggestion,
+    replacementTypes: replacementTypes.length ? replacementTypes : undefined,
+    deprecationMessage,
+  };
+};
+
+const formatDeprecatedInstructionDiagnostic = (diagnostic: Object): string =>
+  `${diagnostic.error} Suggestion: ${diagnostic.suggestion}`;
+
 const summarizeInstructionMetadata = ({
   type,
   kind,
@@ -911,7 +1036,7 @@ const createWithInitEventExample = [
         parameters: ['', 'Enemy', '320', '0', ''],
       },
       {
-        type: { value: 'ModVarObjet' },
+        type: { value: 'SetNumberObjectVariable' },
         parameters: ['Enemy', 'speed', '=', 'RandomInRange(80, 160)'],
       },
       {
@@ -999,7 +1124,7 @@ const orConditionEventExample = [
     ],
     actions: [
       {
-        type: { value: 'MettreX' },
+        type: { value: 'SetX' },
         parameters: ['Player', '-', '5'],
       },
     ],
@@ -1094,7 +1219,7 @@ export const getEventsJsonExamples = ({
     {
       name: 'Create an object WITH initial values',
       purpose:
-        "GDevelop's Create action cannot set variables/animation. To create AND initialize, Create the object, then act on it in the SAME event (the just-created instance is the picked one): set object variables (ModVarObjet) and animation. This is the standard 2-step — there is no single create-with-values action.",
+        "GDevelop's Create action cannot set variables/animation. To create AND initialize, Create the object, then act on it in the SAME event (the just-created instance is the picked one): set object variables (SetNumberObjectVariable/SetStringObjectVariable) and animation. This is the standard 2-step — there is no single create-with-values action.",
       events_json: JSON.stringify(createWithInitEventExample, null, 2),
     },
     {
@@ -1184,14 +1309,15 @@ export const getEventsJsonExamples = ({
     },
     commonInstructionTypes: {
       summary:
-        'GDevelop internal types are sometimes French/legacy and hard to guess. Common ones (verify with gdevelop_get_instruction_metadata):',
-      setObjectPositionX: 'MettreX (action)',
-      setObjectPositionY: 'MettreY (action)',
-      setObjectPosition: 'MettreXY (action)',
+        'Common current GDevelop internal instruction types (verify parameter order with gdevelop_get_instruction_metadata):',
+      setObjectPositionX: 'SetX (action)',
+      setObjectPositionY: 'SetY (action)',
+      setObjectPosition: 'SetXY (action)',
       objectPositionXCondition: 'PosX (condition)',
       objectPositionYCondition: 'PosY (condition)',
-      setObjectAngle: 'MettreAngle (action)',
-      setObjectVariable: 'ModVarObjet (action), VarObjet (condition)',
+      setObjectAngle: 'SetAngle (action)',
+      setObjectVariable:
+        'SetNumberObjectVariable/SetStringObjectVariable/SetBooleanObjectVariable (actions), NumberObjectVariable/StringObjectVariable/BooleanObjectVariable (conditions)',
       setSceneVariableNumber: 'SetNumberVariable (action)',
       setSceneVariableString: 'SetStringVariable (action)',
       setSceneVariableBoolean:
@@ -1230,11 +1356,8 @@ const getInstructionMetadata = (
   compact?: boolean
 ): ?Object => {
   if (kind === 'condition') {
-    const metadata = gd.MetadataProvider.getConditionMetadata(
-      project.getCurrentPlatform(),
-      type
-    );
-    return gd.MetadataProvider.isBadInstructionMetadata(metadata)
+    const metadata = getRawInstructionMetadata(project, type, 'condition');
+    return !metadata
       ? null
       : summarizeInstructionMetadata({
           type,
@@ -1245,11 +1368,8 @@ const getInstructionMetadata = (
   }
 
   if (kind === 'action') {
-    const metadata = gd.MetadataProvider.getActionMetadata(
-      project.getCurrentPlatform(),
-      type
-    );
-    return gd.MetadataProvider.isBadInstructionMetadata(metadata)
+    const metadata = getRawInstructionMetadata(project, type, 'action');
+    return !metadata
       ? null
       : summarizeInstructionMetadata({
           type,
@@ -1294,11 +1414,13 @@ const getInstructionMetadata = (
 
 export const getExactInstructionMetadata = ({
   project,
+  i18n,
   type,
   kind,
   compact,
 }: {|
   project: gdProject,
+  i18n?: any,
   type?: ?string,
   kind?: ?string,
   compact?: boolean,
@@ -1312,6 +1434,24 @@ export const getExactInstructionMetadata = ({
     return {
       error: 'Missing kind. Use action, condition, or expression.',
     };
+  }
+
+  if (kind === 'action' || kind === 'condition') {
+    const rawMetadata = getRawInstructionMetadata(project, type, kind);
+    if (!rawMetadata) {
+      return {
+        error: `No ${kind} metadata found for "${type}". Use gdevelop_search_instruction_metadata first to find exact types.`,
+      };
+    }
+    if (isDeprecatedOrHiddenInstructionMetadata(rawMetadata)) {
+      return getDeprecatedInstructionDiagnostic({
+        project,
+        i18n,
+        type,
+        kind,
+        metadata: rawMetadata,
+      });
+    }
   }
 
   const metadata = getInstructionMetadata(project, type, kind, compact);
@@ -1371,6 +1511,7 @@ export const searchInstructionMetadata = ({
   let order = 0;
 
   const considerInstruction = (instruction, instructionKind) => {
+    if (isDeprecatedOrHiddenInstructionMetadata(instruction.metadata)) return;
     const score = scoreMatch(
       [
         instruction.type,
@@ -1472,18 +1613,11 @@ const getInstructionMetadataForValidation = (
   instructionType: string,
   isCondition: boolean
 ): ?gdInstructionMetadata => {
-  const metadata = isCondition
-    ? gd.MetadataProvider.getConditionMetadata(
-        project.getCurrentPlatform(),
-        instructionType
-      )
-    : gd.MetadataProvider.getActionMetadata(
-        project.getCurrentPlatform(),
-        instructionType
-      );
-  return gd.MetadataProvider.isBadInstructionMetadata(metadata)
-    ? null
-    : metadata;
+  return getRawInstructionMetadata(
+    project,
+    instructionType,
+    isCondition ? 'condition' : 'action'
+  );
 };
 
 // High-level instruction builder (#8): given an instruction type + a map of
@@ -1495,11 +1629,13 @@ const getInstructionMetadataForValidation = (
 // unknown type / unfillable required parameter.
 export const buildInstruction = ({
   project,
+  i18n,
   type,
   kind,
   parameters,
 }: {|
   project: gdProject,
+  i18n?: any,
   type: string,
   kind: 'action' | 'condition',
   parameters: Object,
@@ -1513,6 +1649,19 @@ export const buildInstruction = ({
   if (!metadata) {
     throw new Error(
       `Unknown ${kind} type "${type}". Use gdevelop_search_instruction_metadata to find the exact type.`
+    );
+  }
+  if (isDeprecatedOrHiddenInstructionMetadata(metadata)) {
+    throw new Error(
+      formatDeprecatedInstructionDiagnostic(
+        getDeprecatedInstructionDiagnostic({
+          project,
+          i18n,
+          type,
+          kind,
+          metadata,
+        })
+      )
     );
   }
   const named = parameters && typeof parameters === 'object' ? parameters : {};

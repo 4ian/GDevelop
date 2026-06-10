@@ -1933,7 +1933,7 @@ const patchSceneEventInstructionSchema = {
     instruction_type: {
       type: 'string',
       description:
-        'Exact GDevelop instruction type to edit, for example MettreX, SetNumberVariable, or KeyPressed.',
+        'Exact GDevelop instruction type to edit, for example SetX, SetNumberVariable, or KeyPressed.',
     },
     object_name: {
       type: 'string',
@@ -4259,7 +4259,7 @@ const toolUsageExamples: { [string]: Array<Object> } = {
         scene_name: 'Level1',
         event_id: 'health-follow',
         instruction_kind: 'action',
-        instruction_type: 'MettreX',
+        instruction_type: 'SetX',
         object_name: 'HealthBar',
         parameters: ['HealthBar', '=', 'Enemy.CenterX()-HealthBar.Width()/2'],
         summary_only: true,

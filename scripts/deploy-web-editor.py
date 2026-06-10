@@ -9,7 +9,6 @@ when requested, and switches the remote web root atomically through a
 from __future__ import annotations
 
 import argparse
-import getpass
 import os
 import pathlib
 import posixpath
@@ -41,18 +40,17 @@ if hasattr(sys.stderr, "reconfigure"):
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Build and deploy the GDevelop web editor to a remote server."
+        description="Build and deploy the GDevelop web editor to a remote server.",
+        epilog='Usage: python scripts\\deploy-web-editor.py --host 8.153.146.11 --user root --password "<password>"',
+        formatter_class=argparse.RawTextHelpFormatter,
     )
     parser.add_argument("--host", required=True, help="Remote server host or IP.")
-    parser.add_argument("--user", default="root", help="SSH user. Defaults to root.")
+    parser.add_argument("--user", required=True, help="SSH user.")
     parser.add_argument("--port", type=int, default=22, help="SSH port. Defaults to 22.")
     parser.add_argument(
         "--password",
-        default=os.environ.get("GDEVELOP_DEPLOY_PASSWORD"),
-        help=(
-            "SSH password. Prefer setting GDEVELOP_DEPLOY_PASSWORD so the password "
-            "is not stored in shell history."
-        ),
+        required=True,
+        help="SSH password.",
     )
     parser.add_argument(
         "--remote-path",
@@ -168,10 +166,6 @@ def create_archive(build_dir: pathlib.Path, build_started_at: float) -> pathlib.
 
 
 def connect(args: argparse.Namespace):
-    password = args.password
-    if password is None:
-        password = getpass.getpass(f"Password for {args.user}@{args.host}: ")
-
     client = paramiko.SSHClient()
     client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     print(f"Connecting to {args.user}@{args.host}:{args.port}...")
@@ -179,7 +173,7 @@ def connect(args: argparse.Namespace):
         args.host,
         port=args.port,
         username=args.user,
-        password=password,
+        password=args.password,
         look_for_keys=False,
         allow_agent=False,
         timeout=30,

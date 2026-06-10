@@ -1263,10 +1263,8 @@ export const ChatMessages: React.ComponentType<Props> = React.memo<Props>(
               </Trans>
             </AlertMessage>
           </Line>
-        ) : isWaitingForEditApproval ? // Paused on the inline "Apply this edit?" prompt (rendered below by
-        // EditApprovalRow): suppress the working/thinking indicators.
-        null : aiRequest.status === 'suspended' &&
-          !shouldBeWorkingIfNotPaused ? (
+        ) : isWaitingForEditApproval ? null : aiRequest.status === // EditApprovalRow): suppress the working/thinking indicators. // Paused on the inline "Apply this edit?" prompt (rendered below by
+            'suspended' && !shouldBeWorkingIfNotPaused ? (
           <Line justifyContent="flex-start">
             <div className={classes.suspendedIndicator}>
               <div className={classes.suspendedDot} />

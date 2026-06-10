@@ -48,6 +48,13 @@ const styles = {
     width: '100%',
     gap: 24,
   },
+  subheader: {
+    // The default ListSubheader line-height (48px) makes the header taller than
+    // the items themselves - shrink it so it reads as a compact label.
+    lineHeight: '20px',
+    paddingTop: 4,
+    paddingBottom: 4,
+  },
   freeBadge: {
     fontSize: 12,
     opacity: 0.7,
@@ -176,8 +183,9 @@ export const ReasoningLevelSelector = ({
             anchorEl={anchorEl}
             open={isMenuOpen}
             onClose={() => setAnchorEl(null)}
+            MenuListProps={{ dense: true }}
           >
-            <ListSubheader disableSticky>
+            <ListSubheader disableSticky style={styles.subheader}>
               <Trans>Reasoning level:</Trans>
             </ListSubheader>
             {orchestratorPresets.map(preset => (

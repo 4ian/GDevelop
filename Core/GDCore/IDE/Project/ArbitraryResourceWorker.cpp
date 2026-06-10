@@ -238,6 +238,9 @@ bool ResourceWorkerInEventsWorker::DoVisitInstruction(gd::Instruction& instructi
         const auto resourceSourceType =
             resourcesContainersList.GetResourcesContainerSourceType(
                 parameterValue);
+        // The actual resources referred by parameters or properties into
+        // events of extensions are detected on the instructions or objects
+        // that use these extensions.
         if (resourceSourceType ==
                 gd::ResourcesContainer::SourceType::Properties ||
             resourceSourceType ==

@@ -201,6 +201,8 @@ void ProjectBrowserHelper::ExposeProjectEventsWithoutExtensions(
                       project, project.GetLayout(associatedLayout))
             : gd::ProjectScopedContainers::
                   MakeNewProjectScopedContainersForProject(project);
+    projectScopedContainers.SetScopeExternalEventsName(
+        externalEvents.GetName());
     worker.Launch(externalEvents.GetEvents(), projectScopedContainers);
   }
 }
@@ -226,6 +228,8 @@ void ProjectBrowserHelper::ExposeProjectEventsWithoutExtensions(
                       project, project.GetLayout(associatedLayout))
             : gd::ProjectScopedContainers::
                   MakeNewProjectScopedContainersForProject(project);
+    projectScopedContainers.SetScopeExternalEventsName(
+        externalEvents.GetName());
     worker.Launch(externalEvents.GetEvents(), projectScopedContainers);
   }
 }

@@ -178,7 +178,7 @@ const getInstructionListLabel = (
 
 // Maps flat DFS index (matching the C++ code generator's traversal) back to
 // its serialized EventPath (e.g. "0/2/1"). Synthetic AsyncEvent wrappers are
-// absent from the user-authored tree and don't call __checkBreakpoint, so
+// absent from the user-authored tree and don't call checkBreakpoint, so
 // no extra accounting is needed here.
 const buildFlatIndexToPathMap = (events: gdEventsList): Map<number, string> => {
   const map = new Map<number, string>();

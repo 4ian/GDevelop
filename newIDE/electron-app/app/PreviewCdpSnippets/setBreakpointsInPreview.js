@@ -5,30 +5,18 @@
  */
 
 /**
- * Pushes the full breakpoint payload into the preview runtime. Applied
- * atomically via `Runtime.evaluate`, which works even while V8 is paused on
- * a `debugger;` statement.
+ * Pushes the full breakpoint payload into the preview runtime. Thin wrapper
+ * over `gdjs.Debugger.setBreakpoints`. Applied via `Runtime.evaluate`, which
+ * works even while V8 is paused on a `debugger;` statement.
  *
  * Runs inside the preview V8 — see the `.toString()` caveats in `cdpEval.js`.
  *
  * @param {Array<BreakpointEntry>} entries
- * @returns {boolean} `true` if the payload was applied, `false` if
- *   `gdjs.Debugger.game` or its debug state isn't available yet (can happen
- *   during very early navigation races).
+ * @returns {boolean} `true` if applied, `false` if the runtime debugger isn't ready yet.
  */
 function setBreakpointsInPreview(entries) {
-  var g =
-    typeof gdjs !== 'undefined' && gdjs.Debugger ? gdjs.Debugger.game : null;
-  if (!g || !g._debugState) return false;
-  var map = new Map();
-  for (var i = 0; i < entries.length; i++) {
-    var e = entries[i];
-    if (e && e.functionId && e.eventIndices && e.eventIndices.length > 0) {
-      map.set(e.functionId, new Set(e.eventIndices));
-    }
-  }
-  g._debugState.breakpointIndices = map.size > 0 ? map : null;
-  return true;
+  if (typeof gdjs === 'undefined' || !gdjs.Debugger) return false;
+  return gdjs.Debugger.setBreakpoints(entries);
 }
 
 module.exports = {

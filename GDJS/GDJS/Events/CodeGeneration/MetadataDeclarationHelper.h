@@ -96,8 +96,8 @@ public:
   /**
    * Generate the fully qualified context namespace for an events function
    * defined on an events-based object. This matches the `functionId` that the
-   * runtime-generated code passes to `__checkBreakpoint` /
-   * `__pushBpFunction` for methods of a custom object.
+   * runtime-generated code passes to the breakpoint manager's
+   * `checkBreakpoint` / `pushBreakpointFunction` for methods of a custom object.
    *
    * Shape:
    *   <objectCodeNamespace>.<objectName>.prototype.<mangledFunctionName>Context

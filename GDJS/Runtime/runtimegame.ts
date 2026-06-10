@@ -190,30 +190,6 @@ namespace gdjs {
     environment?: 'dev';
   };
 
-  /** Breakpoints and stepping state used by the preview debugger. */
-  export type DebuggerState = {
-    breakpointIndices: Map<string, Set<number>> | null;
-    stepNextEvent: boolean;
-    stepPassedCurrentEvent: boolean;
-    stepCurrentEventIndex: number;
-    stepCurrentFunctionId: string;
-    stepStartDepth: number;
-    /** Hit info of the breakpoint currently frozen on `debugger;`. */
-    lastBreakpoint: {
-      functionId: string;
-      eventIndex: number;
-      sceneName: string;
-    } | null;
-    /** Container that was executing when the breakpoint fired — scene for
-     * scene events, custom-object sub-container for object-method events.
-     * Typed as the union because `RuntimeScene` widens `getProfiler()`'s
-     * return type, so it is not strictly assignable to the abstract base. */
-    lastBpCallingContainer:
-      | gdjs.RuntimeInstanceContainer
-      | gdjs.RuntimeScene
-      | null;
-  };
-
   /**
    * Represents a game being played.
    * @category Core Engine > Game
@@ -288,21 +264,8 @@ namespace gdjs {
      */
     _debuggerClient: gdjs.AbstractDebuggerClient | null;
 
-    /**
-     * Breakpoints and stepping state used by the preview debugger.
-     * Accessed directly by RuntimeScene.__checkBreakpoint and
-     * AbstractDebuggerClient command handlers for performance.
-     */
-    _debugState: gdjs.DebuggerState = {
-      breakpointIndices: null,
-      stepNextEvent: false,
-      stepPassedCurrentEvent: false,
-      stepCurrentEventIndex: -1,
-      stepCurrentFunctionId: '',
-      stepStartDepth: 0,
-      lastBreakpoint: null,
-      lastBpCallingContainer: null,
-    };
+    /** Preview debugger's breakpoint manager; see `getBreakpointManager`. */
+    _breakpointManager: gdjs.DebuggerBreakpointManager | null = null;
     _sessionMetricsInitialized: boolean = false;
     _disableMetrics: boolean = false;
     _isPreview: boolean;
@@ -962,6 +925,14 @@ namespace gdjs {
 
     getDebuggerClient(): gdjs.AbstractDebuggerClient | null {
       return this._debuggerClient;
+    }
+
+    /** Returns the breakpoint manager, creating it on first use. */
+    getBreakpointManager(): gdjs.DebuggerBreakpointManager {
+      if (!this._breakpointManager) {
+        this._breakpointManager = new gdjs.DebuggerBreakpointManager(this);
+      }
+      return this._breakpointManager;
     }
 
     /**

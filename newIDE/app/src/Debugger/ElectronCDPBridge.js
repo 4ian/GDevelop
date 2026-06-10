@@ -17,7 +17,7 @@ export const resumePausedPreview = async (): Promise<boolean> => {
 
 /**
  * Program the stepping state inside the paused preview runtime and resume
- * V8 so `__checkBreakpoint` trips on the target event.
+ * V8 so the next `checkBreakpoint` trips on the target event.
  */
 export const stepPausedPreview = async (payload: {|
   currentEventIndex: number,
@@ -36,7 +36,7 @@ export const stepPausedPreview = async (payload: {|
  * Schedule "pause at next event" inside a *running* preview. Writes the
  * stepping FSM via CDP Runtime.evaluate; V8 is not paused, so no
  * Debugger.resume is issued. Used by F10 when the preview is not currently
- * paused — the actual pause fires inside the next `__checkBreakpoint` call.
+ * paused — the actual pause fires inside the next `checkBreakpoint` call.
  */
 export const schedulePauseAtNextEvent = async (): Promise<boolean> => {
   if (!ipcRenderer) return false;

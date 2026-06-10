@@ -110,22 +110,13 @@ namespace gdjs {
       return null;
     }
 
-    // Delegate breakpoint calls to the owning RuntimeScene.
-    // RuntimeScene overrides these with real implementations.
-    __pushBpFunction(functionId: string): void {
-      this.getScene().__pushBpFunction(functionId);
-    }
-    __popBpFunction(): void {
-      this.getScene().__popBpFunction();
-    }
-    __checkBreakpoint(functionId: string, eventIndex: number): boolean {
-      const scene = this.getScene();
-      const result = scene.__checkBreakpoint(functionId, eventIndex);
-      // Scene's `_triggerBreakpoint` stashed itself as the calling container.
-      // Override here so the dump builder reads object instances from the
-      // actual sub-container (custom-object internals are not on the scene).
-      if (result) scene._runtimeGame._debugState.lastBpCallingContainer = this;
-      return result;
+    /**
+     * The preview breakpoint manager (owned by the game). Generated event code
+     * calls this on whichever container runs the events (scene or custom-object
+     * sub-container), so the manager records the right calling container.
+     */
+    getBreakpointManager(): gdjs.DebuggerBreakpointManager {
+      return this.getGame().getBreakpointManager();
     }
 
     /**

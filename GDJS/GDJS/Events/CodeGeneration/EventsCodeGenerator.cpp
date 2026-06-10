@@ -83,9 +83,9 @@ gd::String EventsCodeGenerator::GenerateEventsListCompleteFunctionCode(
   gd::String bpFinallyCode;
   if (!codeGenerator.GenerateCodeForRuntime()) {
     gd::String ns = codeGenerator.ConvertToStringExplicit(codeGenerator.GetCodeNamespace());
-    bpPushCode = "gdjs.Debugger.pushFunction(" + ns + ", runtimeScene);\n";
+    bpPushCode = "runtimeScene.getBreakpointManager().pushBreakpointFunction(" + ns + ");\n";
     bpTryCode = "try {\n";
-    bpFinallyCode = "} finally { gdjs.Debugger.popFunction(runtimeScene); }\n";
+    bpFinallyCode = "} finally { runtimeScene.getBreakpointManager().popBreakpointFunction(); }\n";
   }
 
   gd::String output =
@@ -99,7 +99,7 @@ gd::String EventsCodeGenerator::GenerateEventsListCompleteFunctionCode(
       fullyQualifiedFunctionName + " = function(" +
         functionArgumentsCode +
       ") {\n" +
-        // Prelude must run before __pushBpFunction: object methods declare
+        // Prelude must run before pushBreakpointFunction: object methods declare
         // `var runtimeScene = this._instanceContainer;` there, so pushing
         // earlier would hit a var-hoisted undefined and silently no-op.
         functionPreEventsCode + "\n" +
@@ -1592,9 +1592,9 @@ gd::String EventsCodeGenerator::GenerateProfilerSectionEnd(
 gd::String EventsCodeGenerator::GenerateBreakpointCode(size_t eventIndex) {
   if (GenerateCodeForRuntime()) return "";
 
-  // `__checkBreakpoint` returns false unless CDP is attached (Electron local
+  // checkBreakpoint returns false unless CDP is attached (Electron local
   // preview only), so the `debugger;` is dead code in web/remote previews.
-  return "if (gdjs.Debugger.checkBreakpoint(" +
+  return "if (runtimeScene.getBreakpointManager().checkBreakpoint(" +
          ConvertToStringExplicit(GetCodeNamespace()) + ", " +
          gd::String::From(eventIndex) +
          ", runtimeScene)) debugger;\n";

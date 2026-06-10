@@ -8,10 +8,11 @@
  * Runs inside the preview V8 — see the `.toString()` caveats in `cdpEval.js`.
  *
  * @returns {boolean} `true` if the payload was applied, `false` if
- *   `gdjs.game` or its debug state isn't available yet.
+ *   `gdjs.Debugger.game` or its debug state isn't available yet.
  */
 function schedulePauseAtNextEventInPreview() {
-  var g = typeof gdjs !== 'undefined' ? gdjs.game : null;
+  var g =
+    typeof gdjs !== 'undefined' && gdjs.Debugger ? gdjs.Debugger.game : null;
   if (!g || !g._debugState) return false;
   var ds = g._debugState;
   ds.stepNextEvent = true;

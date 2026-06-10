@@ -16,31 +16,11 @@ declare namespace gdjs {
    * Set to `true` by the CDP bootstrap script once Electron main's debugger
    * is driving the preview window. Generated event code gates the
    * `debugger;` branch on this flag.
+   *
+   * The `gdjs.Debugger` namespace itself is implemented (and typed) in
+   * `breakpointDebugSupport.ts`; it must not be redeclared here.
    */
   var __cdpAttached: boolean | undefined;
-
-  /** @deprecated Use `gdjs.Debugger.buildDumpJson` instead. */
-  var __buildBreakpointDumpJson: (() => string) | undefined;
-
-  /** @deprecated Use `gdjs.Debugger.game` instead. */
-  var game: gdjs.RuntimeGame | undefined;
-
-  /** Public debugger API for preview builds. Undefined in exported builds. */
-  namespace Debugger {
-    var game: gdjs.RuntimeGame | undefined;
-    var buildDumpJson: (() => string) | undefined;
-
-    function pushFunction(
-      functionId: string,
-      scene: gdjs.RuntimeScene | null | undefined
-    ): void;
-    function popFunction(scene: gdjs.RuntimeScene | null | undefined): void;
-    function checkBreakpoint(
-      functionId: string,
-      eventIndex: number,
-      container: gdjs.RuntimeInstanceContainer | null | undefined
-    ): boolean;
-  }
 }
 
 /**

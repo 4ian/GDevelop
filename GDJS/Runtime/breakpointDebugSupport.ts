@@ -83,7 +83,6 @@ namespace gdjs {
     game: gdjs.RuntimeGame
   ): void => {
     gdjs.Debugger.game = game;
-    gdjs.game = game; // backward-compat alias
 
     gdjs.Debugger.buildDumpJson = (): string => {
       const activeLocalVariables: {
@@ -173,7 +172,6 @@ namespace gdjs {
         return value;
       });
     };
-    gdjs.__buildBreakpointDumpJson = gdjs.Debugger.buildDumpJson; // backward-compat alias
 
     if (typeof window === 'undefined') return;
 

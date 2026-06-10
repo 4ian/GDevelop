@@ -12,12 +12,13 @@
  * Runs inside the preview V8 — see the `.toString()` caveats in `cdpEval.js`.
  *
  * @param {Array<BreakpointEntry>} entries
- * @returns {boolean} `true` if the payload was applied, `false` if `gdjs.game`
- *   or its debug state isn't available yet (can happen during very early
- *   navigation races).
+ * @returns {boolean} `true` if the payload was applied, `false` if
+ *   `gdjs.Debugger.game` or its debug state isn't available yet (can happen
+ *   during very early navigation races).
  */
 function setBreakpointsInPreview(entries) {
-  var g = typeof gdjs !== 'undefined' ? gdjs.game : null;
+  var g =
+    typeof gdjs !== 'undefined' && gdjs.Debugger ? gdjs.Debugger.game : null;
   if (!g || !g._debugState) return false;
   var map = new Map();
   for (var i = 0; i < entries.length; i++) {

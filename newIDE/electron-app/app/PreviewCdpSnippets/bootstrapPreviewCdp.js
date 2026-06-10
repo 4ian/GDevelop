@@ -28,7 +28,8 @@ function bootstrapPreviewCdp(bps) {
   if (typeof gdjs !== 'undefined') {
     // Late path (Runtime.evaluate): game already running, set directly.
     gdjs.__cdpAttached = true;
-    if (gdjs.game && gdjs.game._debugState && bps.length > 0) {
+    var g = gdjs.Debugger ? gdjs.Debugger.game : null;
+    if (g && g._debugState && bps.length > 0) {
       var map = new Map();
       for (var i = 0; i < bps.length; i++) {
         var e = bps[i];
@@ -36,7 +37,7 @@ function bootstrapPreviewCdp(bps) {
           map.set(e.functionId, new Set(e.eventIndices));
         }
       }
-      if (map.size > 0) gdjs.game._debugState.breakpointIndices = map;
+      if (map.size > 0) g._debugState.breakpointIndices = map;
     }
   }
 }

@@ -66,6 +66,9 @@ public:
       const gd::EventsBasedObject &eventsBasedObject,
       std::map<gd::String, gd::String> &objectMethodMangledNames);
 
+  /** Get the code namespace for a scene (layout). */
+  static gd::String GetSceneCodeNamespace(const gd::String &sceneName);
+
   /** Generate the namespace prefix for an extension. */
   static gd::String GetExtensionCodeNamespacePrefix(
       const gd::EventsFunctionsExtension &eventsFunctionsExtension);
@@ -89,6 +92,20 @@ public:
   static gd::String
   GetObjectFunctionCodeNamespace(const gd::EventsBasedObject &eventsBasedObject,
                                  const gd::String &codeNamespacePrefix);
+
+  /**
+   * Generate the fully qualified context namespace for an events function
+   * defined on an events-based object. This matches the `functionId` that the
+   * runtime-generated code passes to `__checkBreakpoint` /
+   * `__pushBpFunction` for methods of a custom object.
+   *
+   * Shape:
+   *   <objectCodeNamespace>.<objectName>.prototype.<mangledFunctionName>Context
+   */
+  static gd::String GetObjectEventsFunctionFullyQualifiedContextName(
+      const gd::EventsBasedObject &eventsBasedObject,
+      const gd::EventsFunction &eventsFunction,
+      const gd::String &codeNamespacePrefix);
 
   /**
    * Declare an extension from an events based extension.

@@ -28,6 +28,7 @@ type Options = {
 type OptionsForGeneration = {
   ...Options,
   skipCodeGeneration?: boolean,
+  generateForPreview?: boolean,
 };
 
 type CodeGenerationContext = {|
@@ -41,7 +42,8 @@ type CodeGenerationContext = {|
 export const loadProjectEventsFunctionsExtensions = (
   project: gdProject,
   eventsFunctionCodeWriter: EventsFunctionCodeWriter,
-  i18n: I18nType
+  i18n: I18nType,
+  generateForPreview: boolean = true
 ): Promise<Array<void>> => {
   return Promise.all(
     // First pass: generate extensions from the events functions extensions,
@@ -66,6 +68,7 @@ export const loadProjectEventsFunctionsExtensions = (
             skipCodeGeneration: false,
             eventsFunctionCodeWriter,
             i18n,
+            generateForPreview,
           }
         );
       })
@@ -338,10 +341,7 @@ const generateFreeFunction = (
       eventsFunction,
       codeNamespace,
       includeFiles,
-      // For now, always generate functions for runtime (this disables
-      // generation of profiling for groups (see EventsCodeGenerator))
-      // as extensions generated can be used either for preview or export.
-      true
+      !options.generateForPreview // compilationForRuntime: true strips instrumentation (export), false keeps it (preview)
     );
 
     // Add any include file required by the function to the list
@@ -554,11 +554,7 @@ function generateObject(
         codeNamespace,
         objectMethodMangledNames,
         includeFiles,
-
-        // For now, always generate functions for runtime (this disables
-        // generation of profiling for groups (see EventsCodeGenerator))
-        // as extensions generated can be used either for preview or export.
-        true
+        !options.generateForPreview // compilationForRuntime: true strips instrumentation (export), false keeps it (preview)
       );
       objectCodeGenerator.delete();
       objectMethodMangledNames.delete();

@@ -975,6 +975,80 @@ describe('McpEditorBridge', () => {
     }
   });
 
+  it('hides deprecated instruction aliases and rejects creating them', async () => {
+    // $FlowFixMe[invalid-constructor]
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    project.insertNewLayout('Level1', 0);
+
+    try {
+      const bridge = makeBridge({
+        getProject: () => project,
+      });
+
+      const searchResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'gdevelop_search_instruction_metadata',
+          arguments: {
+            query: 'Hide',
+            kind: 'action',
+            limit: 10,
+          },
+        },
+      });
+      const search = JSON.parse(searchResponse.content[0].text);
+      const resultTypes = search.results.map(result => result.type);
+      expect(resultTypes).toContain('Hide');
+      expect(resultTypes).not.toContain('Cache');
+
+      const metadataResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'gdevelop_get_instruction_metadata',
+          arguments: {
+            kind: 'action',
+            type: 'Cache',
+          },
+        },
+      });
+      const metadata = JSON.parse(metadataResponse.content[0].text);
+      expect(metadata.deprecated).toBe(true);
+      expect(metadata.error).toContain('Cache');
+      expect(metadata.suggestion).toContain('Hide');
+      expect(metadata.replacementTypes).toContain('Hide');
+
+      const actionResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'create_action',
+          arguments: {
+            type: 'Cache',
+            parameters: { '0': 'Player' },
+          },
+        },
+      });
+      expect(actionResponse.isError).toBe(true);
+      expect(actionResponse.content[0].text).toContain('Cache');
+      expect(actionResponse.content[0].text).toContain('Hide');
+
+      const conditionResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'create_condition',
+          arguments: {
+            type: 'DepartScene',
+            parameters: {},
+          },
+        },
+      });
+      expect(conditionResponse.isError).toBe(true);
+      expect(conditionResponse.content[0].text).toContain('DepartScene');
+      expect(conditionResponse.content[0].text).toContain('SceneJustBegins');
+    } finally {
+      project.delete();
+    }
+  });
+
   it('creates, updates, inspects, and deletes project extension content', async () => {
     // $FlowFixMe[invalid-constructor]
     const project = new gd.ProjectHelper.createNewGDJSProject();
@@ -3846,7 +3920,7 @@ describe('McpEditorBridge', () => {
     );
     standard.setAiGeneratedEventId('health-follow');
     const action = new gd.Instruction();
-    action.setType('MettreX');
+    action.setType('SetX');
     action.setParametersCount(3);
     action.setParameter(0, 'HealthBar');
     action.setParameter(1, '=');
@@ -3870,7 +3944,7 @@ describe('McpEditorBridge', () => {
             scene_name: 'Level1',
             event_id: 'health-follow',
             instruction_kind: 'action',
-            instruction_type: 'MettreX',
+            instruction_type: 'SetX',
             object_name: 'HealthBar',
             parameters: [
               'HealthBar',
@@ -3943,13 +4017,13 @@ describe('McpEditorBridge', () => {
           .getActions()
           .get(0)
           .getType()
-      ).toBe('MettreX');
+      ).toBe('SetX');
       expect(
         event
           .getActions()
           .get(1)
           .getType()
-      ).toBe('MettreY');
+      ).toBe('SetY');
 
       const rulesResponse = await bridge.handleRendererMcpRequest({
         method: 'tools/call',

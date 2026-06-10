@@ -2658,6 +2658,7 @@ const callMcpTool = async ({
     return textResult(
       getExactInstructionMetadata({
         project,
+        i18n: context.i18n,
         type: args && typeof args.type === 'string' ? args.type : null,
         kind: args && typeof args.kind === 'string' ? args.kind : null,
         compact: !!(args && args.compact),
@@ -2731,6 +2732,7 @@ const callMcpTool = async ({
     try {
       const built = buildInstruction({
         project,
+        i18n: context.i18n,
         type,
         kind: toolName === 'create_condition' ? 'condition' : 'action',
         parameters: (args && args.parameters) || {},

@@ -1556,8 +1556,8 @@ export const attachObjectToObjectTop = (
     instruction.delete();
   };
   const actions = [
-    { type: 'MettreX', parameters: [followerName, '=', xExpression] },
-    { type: 'MettreY', parameters: [followerName, '=', yExpression] },
+    { type: 'SetX', parameters: [followerName, '=', xExpression] },
+    { type: 'SetY', parameters: [followerName, '=', yExpression] },
   ];
   actions.forEach(action => addAction(action.type, action.parameters));
   notifyEventsChanged(scene, callbacks);
@@ -1607,13 +1607,13 @@ export const inspectGameplayRules = (
     const hasX =
       follower &&
       target &&
-      serializedText.includes('MettreX') &&
+      serializedText.includes('SetX') &&
       serializedText.includes(follower) &&
       serializedText.includes(`${target}.CenterX()`);
     const hasY =
       follower &&
       target &&
-      serializedText.includes('MettreY') &&
+      serializedText.includes('SetY') &&
       serializedText.includes(follower) &&
       serializedText.includes(`${target}.Y()`);
     const ok = !!(hasX && hasY);

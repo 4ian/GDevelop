@@ -182,24 +182,27 @@ void ProjectBrowserHelper::ExposeProjectEventsWithoutExtensions(
 }
 
 void ProjectBrowserHelper::ExposeProjectEventsWithoutExtensions(
-    gd::Project& project, gd::ArbitraryEventsWorkerWithContext& worker) {
+    gd::Project &project, gd::ArbitraryEventsWorkerWithContext &worker) {
   // Add layouts events
   for (std::size_t s = 0; s < project.GetLayoutsCount(); s++) {
     auto &layout = project.GetLayout(s);
-    auto projectScopedContainers =
-      gd::ProjectScopedContainers::MakeNewProjectScopedContainersForProjectAndLayout(project, layout);
+    auto projectScopedContainers = gd::ProjectScopedContainers::
+        MakeNewProjectScopedContainersForProjectAndLayout(project, layout);
     worker.Launch(layout.GetEvents(), projectScopedContainers);
   }
   // Add external events events
   for (std::size_t s = 0; s < project.GetExternalEventsCount(); s++) {
     const auto &externalEvents = project.GetExternalEvents(s);
     const gd::String &associatedLayout = externalEvents.GetAssociatedLayout();
-    if (project.HasLayoutNamed(associatedLayout)) {
-      auto &layout = project.GetLayout(associatedLayout);
-      auto projectScopedContainers =
-        gd::ProjectScopedContainers::MakeNewProjectScopedContainersForProjectAndLayout(project, layout);
-      worker.Launch(project.GetExternalEvents(s).GetEvents(), projectScopedContainers);
-    }
+    auto projectScopedContainers =
+        project.HasLayoutNamed(associatedLayout)
+            ? gd::ProjectScopedContainers::
+                  MakeNewProjectScopedContainersForProjectAndLayout(
+                      project, project.GetLayout(associatedLayout))
+            : gd::ProjectScopedContainers::
+                  MakeNewProjectScopedContainersForProject(project);
+    worker.Launch(project.GetExternalEvents(s).GetEvents(),
+                  projectScopedContainers);
   }
 }
 

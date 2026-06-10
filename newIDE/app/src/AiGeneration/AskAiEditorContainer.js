@@ -895,7 +895,10 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
         [selectedAiRequest, activeSubAgents, aiRequests]
       );
 
-      const { onProcessFunctionCalls } = useProcessFunctionCalls({
+      const {
+        onProcessFunctionCalls,
+        clearApprovedEditBatches,
+      } = useProcessFunctionCalls({
         project,
         resourceManagementProps,
         editorCallbacks,
@@ -1475,6 +1478,10 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
                 }}
                 onIsAutoEditEnabledChange={enabled => {
                   isAutoEditEnabledRef.current = enabled;
+                  // Toggling auto-edit revokes any blanket approvals already
+                  // granted in the current sub-agent batch, so turning it on
+                  // then off again re-prompts for the upcoming edits.
+                  clearApprovedEditBatches();
                 }}
                 pendingEditApproval={pendingEditApproval}
                 onResolveEditApproval={resolveEditApproval}

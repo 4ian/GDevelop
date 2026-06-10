@@ -270,6 +270,7 @@ export const useProcessFunctionCalls = ({
     aiRequest: AiRequest,
     functionCalls: Array<AiRequestMessageAssistantFunctionCall>
   ) => Promise<void>,
+  clearApprovedEditBatches: () => void,
 } => {
   const { ensureExtensionInstalled } = useEnsureExtensionInstalled({
     project,
@@ -343,6 +344,14 @@ export const useProcessFunctionCalls = ({
   // Keys are `req:<aiRequestId>` (for a whole edit agent) or
   // `call:<callId>` (for a single direct modifying call like generate_events).
   const approvedEditBatchKeysRef = React.useRef<Set<string>>(new Set());
+
+  // Forget all previously-granted edit approvals so the next modifying call
+  // asks again. Called when the user toggles auto-edit: turning it on then off
+  // again means they want to review the upcoming edits, even within a sub-agent
+  // whose batch was already approved.
+  const clearApprovedEditBatches = React.useCallback(() => {
+    approvedEditBatchKeysRef.current.clear();
+  }, []);
 
   const onProcessFunctionCalls = React.useCallback(
     async (
@@ -585,6 +594,7 @@ export const useProcessFunctionCalls = ({
 
   return {
     onProcessFunctionCalls,
+    clearApprovedEditBatches,
   };
 };
 

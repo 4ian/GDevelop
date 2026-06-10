@@ -312,6 +312,12 @@ void FunctionFolderOrFunction::UnserializeFrom(const SerializerElement &element,
                 make_unique<FunctionFolderOrFunction>();
         childFunctionFolderOrFunction->UnserializeFrom(
             childrenElements.GetChild(i), functionsContainer);
+        if (!childFunctionFolderOrFunction->IsFolder() &&
+            childFunctionFolderOrFunction->function == nullptr) {
+          // Ignore invalid references to missing functions, that can happen
+          // after manual edits or merges.
+          continue;
+        }
         childFunctionFolderOrFunction->parent = this;
         children.push_back(std::move(childFunctionFolderOrFunction));
       }

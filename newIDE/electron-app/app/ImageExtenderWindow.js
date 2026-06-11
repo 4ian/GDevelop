@@ -166,7 +166,7 @@ const openImageExtenderWindow = async ({ parentWindow, devTools }) => {
     width: parentWindow ? Math.floor(parentWindow.getSize()[0] * 0.82) : 1200,
     height: parentWindow ? Math.floor(parentWindow.getSize()[1] * 0.9) : 860,
     backgroundColor: '#09090b',
-    modal: !!parentWindow,
+    modal: false,
     center: true,
     show: false,
     webPreferences: {

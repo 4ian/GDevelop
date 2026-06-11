@@ -11,6 +11,7 @@ import FlatButton from '../UI/FlatButton';
 import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
 import MiniToolbar, { MiniToolbarText } from '../UI/MiniToolbar';
+import Link from '../UI/Link';
 import { Tabs } from '../UI/Tabs';
 import PreferencesContext, {
   defaultResourcesToolsSettings,
@@ -29,6 +30,7 @@ import {
   type ProjectFileSelection,
 } from './ProjectFilesPanel';
 import optionalRequire from '../Utils/OptionalRequire';
+import Window from '../Utils/Window';
 import { openFilePicker } from '../Utils/FileSystem';
 import { type WorkingDeskToolTabUpdate } from './WorkingDeskTabTypes';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
@@ -48,6 +50,7 @@ const buffer = optionalRequire('buffer');
 const electron = optionalRequire('electron');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
 const projectFileDragDataMimeType = 'application/x-gdevelop-project-file';
+const imageExtenderGitHubUrl = 'https://github.com/zhouzhipeng/image-extender';
 
 type Props = {|
   project: gdProject,
@@ -1811,6 +1814,14 @@ const ToolsPanel = ({
       </MiniToolbar>
       {!!imageExtenderError && <Text color="error">{imageExtenderError}</Text>}
       {!!imageExtenderStatus && <Text>{imageExtenderStatus}</Text>}
+      <Text>
+        <Link
+          href={imageExtenderGitHubUrl}
+          onClick={() => Window.openExternalURL(imageExtenderGitHubUrl)}
+        >
+          {imageExtenderGitHubUrl}
+        </Link>
+      </Text>
     </div>
   );
 

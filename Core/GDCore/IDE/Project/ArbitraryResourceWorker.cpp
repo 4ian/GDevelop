@@ -226,13 +226,27 @@ bool ResourceWorkerInEventsWorker::DoVisitInstruction(gd::Instruction& instructi
                               : gd::MetadataProvider::GetActionMetadata(
                                     platform, instruction.GetType());
 
+  auto& resourcesContainersList = GetProjectScopedContainers().GetResourcesContainersList();
+
   gd::ParameterMetadataTools::IterateOverParametersWithIndex(
       instruction.GetParameters(), metadata.GetParameters(),
-      [this, &instruction](
+      [this, &instruction, &resourcesContainersList](
           const gd::ParameterMetadata &parameterMetadata,
           const gd::Expression &parameterExpression, size_t parameterIndex,
           const gd::String &lastObjectName, size_t lastObjectIndex) {
         const String& parameterValue = parameterExpression.GetPlainString();
+        const auto resourceSourceType =
+            resourcesContainersList.GetResourcesContainerSourceType(
+                parameterValue);
+        // The actual resources referred by parameters or properties into
+        // events of extensions are detected on the instructions or objects
+        // that use these extensions.
+        if (resourceSourceType ==
+                gd::ResourcesContainer::SourceType::Properties ||
+            resourceSourceType ==
+                gd::ResourcesContainer::SourceType::Parameters) {
+          return;
+        }
         if (parameterMetadata.GetType() == "fontResource") {
           gd::String updatedParameterValue = parameterValue;
           worker.ExposeFont(updatedParameterValue);

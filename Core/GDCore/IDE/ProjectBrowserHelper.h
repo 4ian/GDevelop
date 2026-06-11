@@ -101,6 +101,15 @@ public:
                                     gd::ArbitraryEventsWorker &worker);
 
   /**
+   * \brief Call the specified worker on all events of a layout and
+   * its dependencies according to EventLink (external events or other layout
+   * events).
+   */
+  static void ExposeLayoutEventsAndDependencies(
+      gd::Project &project, gd::Layout &layout,
+      gd::ArbitraryEventsWorkerWithContext &worker);
+
+  /**
    * \brief Call the specified worker on all events of the event-based
    * extension.
    *

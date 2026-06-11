@@ -175,10 +175,17 @@ type EventOperationType =
   | 'insertActionsConditionsAtStart'
   | 'replaceAllActions'
   | 'replaceAllConditions';
+type EventInsertKind = 'replacement' | 'before' | 'after';
 type EventOperation = {|
   type: EventOperationType,
   path: EventPath,
   eventsToInsert?: gdEventsList,
+  // For 'insert' operations, how the insertion point was defined relatively
+  // to the existing events (used to disambiguate insertions sharing a path).
+  insertKind?: EventInsertKind,
+  // Position of the change in the input, to keep the order of the changes
+  // when several of them target the same insertion point.
+  order?: number,
 |};
 
 /**
@@ -255,6 +262,20 @@ const getOperationPriorityForSamePath = (type: EventOperationType): number => {
   if (type === 'insert') return 2;
   if (type === 'delete') return 1;
   return 0;
+};
+
+/**
+ * At the same insertion point, the events inserted first end up after those
+ * inserted later. Insertions are then applied so that events end up in this
+ * order: events inserted after the previous sibling, then events inserted
+ * before the next sibling, then the replacement of the next sibling.
+ */
+const getInsertKindPriorityForSamePath = (
+  insertKind?: EventInsertKind
+): number => {
+  if (insertKind === 'replacement') return 0;
+  if (insertKind === 'before') return 1;
+  return 2;
 };
 
 const comparePathsReverseLexicographically = (
@@ -407,6 +428,7 @@ export const applyEventsChanges = (
             type: 'insert',
             path: parsedPath,
             eventsToInsert: localEventsToInsert || undefined,
+            insertKind: 'replacement',
           });
           // localEventsToInsert is now "owned" by the 'insert' operation,
           // it should not be deleted here in the switch case.
@@ -437,6 +459,7 @@ export const applyEventsChanges = (
             type: 'insert',
             path: parsedPath,
             eventsToInsert: localEventsToInsert || undefined,
+            insertKind: 'before',
           });
           break;
         case 'insert_after_event':
@@ -454,6 +477,7 @@ export const applyEventsChanges = (
             type: 'insert',
             path: insertAfterPath,
             eventsToInsert: localEventsToInsert || undefined,
+            insertKind: 'after',
           });
           break;
         case 'insert_as_sub_event':
@@ -549,6 +573,7 @@ export const applyEventsChanges = (
             type: 'insert',
             path: [sceneEvents.getEventsCount()],
             eventsToInsert: localEventsToInsert || undefined,
+            insertKind: 'after',
           });
           break;
         default:
@@ -570,20 +595,52 @@ export const applyEventsChanges = (
     }
   });
 
-  operations.sort((opA, opB) => {
+  // The same event can be targeted for deletion by several changes (for
+  // example, a duplicated target in a comma separated list, or two
+  // "insert_and_replace_event" on the same event). Only keep the first
+  // deletion for a given path: applying it twice would delete the event
+  // that took the place of the deleted one.
+  const seenDeletionPaths = new Set<string>();
+  const deduplicatedOperations = operations.filter(op => {
+    if (op.type !== 'delete') return true;
+    const pathKey = op.path.join('.');
+    if (seenDeletionPaths.has(pathKey)) return false;
+    seenDeletionPaths.add(pathKey);
+    return true;
+  });
+
+  deduplicatedOperations.forEach((op, index) => {
+    op.order = index;
+  });
+
+  deduplicatedOperations.sort((opA, opB) => {
     const pathComparison = comparePathsReverseLexicographically(
       opA.path,
       opB.path
     );
     if (pathComparison !== 0) return pathComparison;
-    return (
+
+    const priorityDifference =
       getOperationPriorityForSamePath(opA.type) -
-      getOperationPriorityForSamePath(opB.type)
-    );
+      getOperationPriorityForSamePath(opB.type);
+    if (priorityDifference !== 0) return priorityDifference;
+
+    if (opA.type === 'insert' && opB.type === 'insert') {
+      const insertKindDifference =
+        getInsertKindPriorityForSamePath(opA.insertKind) -
+        getInsertKindPriorityForSamePath(opB.insertKind);
+      if (insertKindDifference !== 0) return insertKindDifference;
+
+      // Apply the last change first so that, at the same insertion point,
+      // the events end up in the order of the changes.
+      return (opB.order || 0) - (opA.order || 0);
+    }
+
+    return 0;
   });
 
   let applied = 0;
-  operations.forEach(op => {
+  deduplicatedOperations.forEach(op => {
     const pathForLog = op.path.join('.');
     try {
       if (op.type === 'delete') {

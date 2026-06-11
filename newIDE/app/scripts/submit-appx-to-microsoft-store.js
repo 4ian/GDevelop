@@ -48,7 +48,7 @@ const os = require('os');
 const path = require('path');
 const https = require('https');
 const shell = require('shelljs');
-const axios = require('axios');
+const { default: axios } = require('axios');
 const AdmZip = require('adm-zip');
 const args = require('minimist')(process.argv.slice(2));
 

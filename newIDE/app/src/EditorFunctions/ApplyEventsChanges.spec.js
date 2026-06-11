@@ -1645,6 +1645,260 @@ describe('applyEventsChanges', () => {
     });
   });
 
+  it('should insert events after the last event even when it is deleted', () => {
+    setupMarkedSceneEvents(['Event0', 'Event1']);
+    const eventOperations: Array<AiGeneratedEventChange> = [
+      makeChange({
+        operationName: 'delete_event',
+        operationTargetEvent: 'event-1',
+      }),
+      makeChange({
+        operationName: 'insert_after_event',
+        operationTargetEvent: 'event-1',
+        generatedEvents: `[${makeStandardEventJson('InsertedAfter')}]`,
+      }),
+    ];
+    const result = applyEventsChanges(
+      project,
+      sceneEventsList,
+      eventOperations,
+      fakeGeneratedEventId
+    );
+    expect(getFirstActionTypes(sceneEventsList)).toEqual([
+      'Event0',
+      'InsertedAfter',
+    ]);
+    expect(result.applied).toBe(2);
+    expect(result.errors).toEqual([]);
+  });
+
+  it('should drop sub-events inserted into a deleted event, whatever the order of the changes', () => {
+    [[0, 1], [1, 0]].forEach(perm => {
+      setupMarkedSceneEvents(['Event0', 'Event1', 'Event2']);
+      const changeFactories = [
+        () =>
+          makeChange({
+            operationName: 'delete_event',
+            operationTargetEvent: 'event-1',
+          }),
+        () =>
+          makeChange({
+            operationName: 'insert_as_sub_event',
+            operationTargetEvent: 'event-1',
+            generatedEvents: `[${makeStandardEventJson('InsertedSub')}]`,
+          }),
+      ];
+      const result = applyEventsChanges(
+        project,
+        sceneEventsList,
+        perm.map(i => changeFactories[i]()),
+        fakeGeneratedEventId
+      );
+      const permDescription = perm.join(',');
+      // The inserted sub-events disappear with the deleted event, without
+      // touching the neighbor events.
+      expect({
+        permDescription,
+        firstActionTypes: getFirstActionTypes(sceneEventsList),
+      }).toEqual({ permDescription, firstActionTypes: ['Event0', 'Event2'] });
+      expect({ permDescription, applied: result.applied }).toEqual({
+        permDescription,
+        applied: 2,
+      });
+      expect({ permDescription, errors: result.errors }).toEqual({
+        permDescription,
+        errors: [],
+      });
+    });
+  });
+
+  it('should drop insertions inside a deleted parent event', () => {
+    sceneEventsList.clear();
+    unserializeFromJSObject(
+      sceneEventsList,
+      [
+        {
+          ...JSON.parse(makeStandardEventJson('Parent')),
+          events: [JSON.parse(makeStandardEventJson('Sub0'))],
+        },
+        JSON.parse(makeStandardEventJson('Event1')),
+      ],
+      'unserializeFrom',
+      project
+    );
+    const eventOperations: Array<AiGeneratedEventChange> = [
+      makeChange({
+        operationName: 'delete_event',
+        operationTargetEvent: 'event-0',
+      }),
+      makeChange({
+        operationName: 'insert_after_event',
+        operationTargetEvent: 'event-0.0',
+        generatedEvents: `[${makeStandardEventJson('InsertedSub')}]`,
+      }),
+    ];
+    const result = applyEventsChanges(
+      project,
+      sceneEventsList,
+      eventOperations,
+      fakeGeneratedEventId
+    );
+    expect(getFirstActionTypes(sceneEventsList)).toEqual(['Event1']);
+    expect(result.applied).toBe(2);
+    expect(result.errors).toEqual([]);
+  });
+
+  it('should delete an event even when another change edits it, whatever the order of the changes', () => {
+    [[0, 1], [1, 0]].forEach(perm => {
+      setupMarkedSceneEvents(['Event0', 'Event1', 'Event2']);
+      const changeFactories = [
+        () =>
+          makeChange({
+            operationName: 'delete_event',
+            operationTargetEvent: 'event-1',
+          }),
+        () =>
+          makeChange({
+            operationName: 'replace_all_actions',
+            operationTargetEvent: 'event-1',
+            generatedEvents: `[${makeStandardEventJson('Edited')}]`,
+          }),
+      ];
+      const result = applyEventsChanges(
+        project,
+        sceneEventsList,
+        perm.map(i => changeFactories[i]()),
+        fakeGeneratedEventId
+      );
+      const permDescription = perm.join(',');
+      // The edit is applied to the event before it is deleted: the deletion
+      // wins, without touching the neighbor events.
+      expect({
+        permDescription,
+        firstActionTypes: getFirstActionTypes(sceneEventsList),
+      }).toEqual({ permDescription, firstActionTypes: ['Event0', 'Event2'] });
+      expect({ permDescription, applied: result.applied }).toEqual({
+        permDescription,
+        applied: 2,
+      });
+      expect({ permDescription, errors: result.errors }).toEqual({
+        permDescription,
+        errors: [],
+      });
+    });
+  });
+
+  it('should keep sub-events inserted into an event replaced keeping its sub-events, whatever the order of the changes', () => {
+    [[0, 1], [1, 0]].forEach(perm => {
+      sceneEventsList.clear();
+      unserializeFromJSObject(
+        sceneEventsList,
+        [
+          {
+            ...JSON.parse(makeStandardEventJson('Parent')),
+            events: [JSON.parse(makeStandardEventJson('Sub0'))],
+          },
+        ],
+        'unserializeFrom',
+        project
+      );
+      const changeFactories = [
+        () =>
+          makeChange({
+            operationName: 'insert_as_sub_event',
+            operationTargetEvent: 'event-0',
+            generatedEvents: `[${makeStandardEventJson('InsertedSub')}]`,
+          }),
+        () =>
+          makeChange({
+            operationName: 'replace_event_but_keep_existing_sub_events',
+            operationTargetEvent: 'event-0',
+            generatedEvents: `[${makeStandardEventJson('EditedParent')}]`,
+          }),
+      ];
+      const result = applyEventsChanges(
+        project,
+        sceneEventsList,
+        perm.map(i => changeFactories[i]()),
+        fakeGeneratedEventId
+      );
+      const permDescription = perm.join(',');
+      expect({
+        permDescription,
+        firstActionTypes: getFirstActionTypes(sceneEventsList),
+      }).toEqual({ permDescription, firstActionTypes: ['EditedParent'] });
+      expect({
+        permDescription,
+        subFirstActionTypes: getFirstActionTypes(
+          sceneEventsList.getEventAt(0).getSubEvents()
+        ),
+      }).toEqual({
+        permDescription,
+        subFirstActionTypes: ['Sub0', 'InsertedSub'],
+      });
+      expect({ permDescription, applied: result.applied }).toEqual({
+        permDescription,
+        applied: 2,
+      });
+      expect({ permDescription, errors: result.errors }).toEqual({
+        permDescription,
+        errors: [],
+      });
+    });
+  });
+
+  it('should apply two edits of different kinds on the same event', () => {
+    sceneEventsList.clear();
+    unserializeFromJSObject(
+      sceneEventsList,
+      [
+        {
+          type: 'BuiltinCommonInstructions::Standard',
+          conditions: [{ type: { value: 'OriginalCondition' } }],
+          actions: [{ type: { value: 'OriginalAction' } }],
+        },
+      ],
+      'unserializeFrom',
+      project
+    );
+    const eventOperations: Array<AiGeneratedEventChange> = [
+      makeChange({
+        operationName: 'replace_all_actions',
+        operationTargetEvent: 'event-0',
+        generatedEvents: `[${makeStandardEventJson('NewAction')}]`,
+      }),
+      makeChange({
+        operationName: 'replace_all_conditions',
+        operationTargetEvent: 'event-0',
+        generatedEvents:
+          '[{"type":"BuiltinCommonInstructions::Standard","conditions":[{"type":{"value":"NewCondition"}}],"actions":[]}]',
+      }),
+    ];
+    const result = applyEventsChanges(
+      project,
+      sceneEventsList,
+      eventOperations,
+      fakeGeneratedEventId
+    );
+    const resultEvent = gd.asStandardEvent(sceneEventsList.getEventAt(0));
+    expect(resultEvent.getActions().size()).toBe(1);
+    expect(
+      resultEvent
+        .getActions()
+        .get(0)
+        .getType()
+    ).toBe('NewAction');
+    expect(resultEvent.getConditions().size()).toBe(1);
+    expect(
+      resultEvent
+        .getConditions()
+        .get(0)
+        .getType()
+    ).toBe('NewCondition');
+    expect(result.applied).toBe(2);
+    expect(result.errors).toEqual([]);
+  });
+
   it('should keep the edit of a sub-event when its parent event is replaced keeping its sub-events', () => {
     [[0, 1], [1, 0]].forEach(perm => {
       sceneEventsList.clear();

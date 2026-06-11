@@ -1581,6 +1581,70 @@ describe('applyEventsChanges', () => {
     expect(result.errors).toEqual([]);
   });
 
+  it('should keep insertions anchored to a deleted event, whatever the order of the changes', () => {
+    // The anchor event is deleted, but other changes use it as the target of
+    // insertions: the inserted events take the place of the deleted event,
+    // keeping the "before" events before the "after" events.
+    const changeFactories = [
+      () =>
+        makeChange({
+          operationName: 'delete_event',
+          operationTargetEvent: 'event-1',
+        }),
+      () =>
+        makeChange({
+          operationName: 'insert_after_event',
+          operationTargetEvent: 'event-1',
+          generatedEvents: `[${makeStandardEventJson('InsertedAfter')}]`,
+        }),
+      () =>
+        makeChange({
+          operationName: 'insert_before_event',
+          operationTargetEvent: 'event-1',
+          generatedEvents: `[${makeStandardEventJson('InsertedBefore')}]`,
+        }),
+    ];
+    const allPermutations = [
+      [0, 1, 2],
+      [0, 2, 1],
+      [1, 0, 2],
+      [1, 2, 0],
+      [2, 0, 1],
+      [2, 1, 0],
+    ];
+
+    allPermutations.forEach(perm => {
+      setupMarkedSceneEvents(['Event0', 'Event1', 'Event2']);
+      const result = applyEventsChanges(
+        project,
+        sceneEventsList,
+        perm.map(i => changeFactories[i]()),
+        fakeGeneratedEventId
+      );
+      const permDescription = perm.join(',');
+      expect({
+        permDescription,
+        firstActionTypes: getFirstActionTypes(sceneEventsList),
+      }).toEqual({
+        permDescription,
+        firstActionTypes: [
+          'Event0',
+          'InsertedBefore',
+          'InsertedAfter',
+          'Event2',
+        ],
+      });
+      expect({ permDescription, applied: result.applied }).toEqual({
+        permDescription,
+        applied: 3,
+      });
+      expect({ permDescription, errors: result.errors }).toEqual({
+        permDescription,
+        errors: [],
+      });
+    });
+  });
+
   it('should keep the edit of a sub-event when its parent event is replaced keeping its sub-events', () => {
     [[0, 1], [1, 0]].forEach(perm => {
       sceneEventsList.clear();

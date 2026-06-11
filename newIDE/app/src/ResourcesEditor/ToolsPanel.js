@@ -30,6 +30,7 @@ import {
 import optionalRequire from '../Utils/OptionalRequire';
 import { openFilePicker } from '../Utils/FileSystem';
 import { type WorkingDeskToolTabUpdate } from './WorkingDeskTabTypes';
+import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import {
   drawLocalImageOperationToCanvas,
   getLocalImageOutputBaseName,
@@ -1577,12 +1578,12 @@ const ToolsPanel = ({
 
   const localExpandDirectionOptions: Array<{|
     value: LocalImageExpandDirection,
-    label: React.Node,
+    label: MessageDescriptor,
   |}> = [
-    { value: 'left', label: <Trans>Left</Trans> },
-    { value: 'right', label: <Trans>Right</Trans> },
-    { value: 'top', label: <Trans>Top</Trans> },
-    { value: 'bottom', label: <Trans>Bottom</Trans> },
+    { value: 'left', label: t`Left` },
+    { value: 'right', label: t`Right` },
+    { value: 'top', label: t`Top` },
+    { value: 'bottom', label: t`Bottom` },
   ];
 
   const renderImageToolSelector = () => (
@@ -1871,15 +1872,26 @@ const ToolsPanel = ({
         </div>
       ) : (
         <>
-          <div style={styles.segmentedRow}>
-            {localExpandDirectionOptions.map(({ value, label }) => (
-              <FlatButton
-                key={value}
-                label={label}
-                onClick={() => setLocalExpandDirection(value)}
-                primary={localExpandDirection === value}
-              />
-            ))}
+          <div style={styles.toolSelector}>
+            <SelectField
+              floatingLabelText={<Trans>Direction</Trans>}
+              value={localExpandDirection}
+              onChange={(event, index, value: string) => {
+                if (
+                  value === 'left' ||
+                  value === 'right' ||
+                  value === 'top' ||
+                  value === 'bottom'
+                ) {
+                  setLocalExpandDirection(value);
+                }
+              }}
+              fullWidth
+            >
+              {localExpandDirectionOptions.map(({ value, label }) => (
+                <SelectOption key={value} value={value} label={label} />
+              ))}
+            </SelectField>
           </div>
           <TextField
             type="number"

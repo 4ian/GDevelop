@@ -263,6 +263,29 @@ describe('McpEditorBridge', () => {
               },
             ],
           },
+          {
+            paneIdentifier: 'right',
+            tabKey: 'resources',
+            editorKind: 'resources',
+            projectItemName: null,
+            selectionProvider: 'ResourcesEditor',
+            isActive: true,
+            selectedProjectFile: {
+              id: 'D:/Project/assets/coin.png',
+              name: 'coin.png',
+              absolutePath: 'D:\\Project\\assets\\coin.png',
+              relativePath: 'assets/coin.png',
+              type: 'file',
+              extension: '.png',
+              resourceName: 'coin',
+              resourceKind: 'image',
+            },
+            selectedResource: {
+              name: 'coin',
+              kind: 'image',
+              file: 'assets/coin.png',
+            },
+          },
         ],
       }),
     });
@@ -279,6 +302,11 @@ describe('McpEditorBridge', () => {
     expect(selection.hasActiveSelectionProvider).toBe(true);
     expect(selection.selections[0].selectedObjectNames).toEqual(['Player']);
     expect(selection.selections[0].selectedInstances[0].id).toBe('abcdef1234');
+    expect(selection.selections[1].selectionProvider).toBe('ResourcesEditor');
+    expect(selection.selections[1].selectedProjectFile.relativePath).toBe(
+      'assets/coin.png'
+    );
+    expect(selection.selections[1].selectedResource.name).toBe('coin');
   });
 
   it('returns a project summary when a project is open', async () => {

@@ -9,6 +9,7 @@ import ResourcePropertiesEditor, {
 import FilePropertiesPanel from './FilePropertiesPanel';
 import ProjectFilesPanel, {
   type ProjectFilesPanelInterface,
+  type ProjectFileNode,
   type ProjectFileSelection,
 } from './ProjectFilesPanel';
 import WorkingDesk from './WorkingDesk';
@@ -156,6 +157,54 @@ type Props = {|
   storageProvider: StorageProvider,
 |};
 
+export type ResourcesEditorProjectFileSelectionSnapshot = {|
+  id: string,
+  name: string,
+  absolutePath: string,
+  relativePath: string,
+  type: 'folder' | 'file',
+  extension: string,
+  resourceName: ?string,
+  resourceKind: ?string,
+|};
+
+export type ResourcesEditorResourceSelectionSnapshot = {|
+  name: string,
+  kind: string,
+  file: string,
+|};
+
+export type ResourcesEditorSelectionSnapshot = {|
+  selectionProvider: 'ResourcesEditor',
+  isActive?: boolean,
+  selectedProjectFile: ?ResourcesEditorProjectFileSelectionSnapshot,
+  selectedResource: ?ResourcesEditorResourceSelectionSnapshot,
+|};
+
+const serializeProjectFileNodeForSelection = (
+  node: ProjectFileNode
+): ResourcesEditorProjectFileSelectionSnapshot => ({
+  id: node.id,
+  name: node.name,
+  absolutePath: node.absolutePath,
+  relativePath: node.relativePath,
+  type: node.type,
+  extension: node.extension,
+  resourceName: node.resourceName || null,
+  resourceKind: node.resourceKind || null,
+});
+
+const serializeResourceForSelection = (
+  resource: ?gdResource
+): ?ResourcesEditorResourceSelectionSnapshot =>
+  resource
+    ? {
+        name: resource.getName(),
+        kind: resource.getKind(),
+        file: resource.getFile(),
+      }
+    : null;
+
 export default class ResourcesEditor extends React.Component<Props, State> {
   static contextType: React.Context<ConfirmState> = AlertContext;
   // $FlowFixMe[missing-local-annot]
@@ -196,6 +245,20 @@ export default class ResourcesEditor extends React.Component<Props, State> {
   refreshResourcesList = async (): Promise<void> => {
     if (this._projectFilesPanel) await this._projectFilesPanel.refresh();
   };
+
+  getEditorSelectionSnapshot(): ResourcesEditorSelectionSnapshot {
+    const { selectedProjectFile } = this.state;
+
+    return {
+      selectionProvider: 'ResourcesEditor',
+      selectedProjectFile: selectedProjectFile
+        ? serializeProjectFileNodeForSelection(selectedProjectFile.node)
+        : null,
+      selectedResource: selectedProjectFile
+        ? serializeResourceForSelection(selectedProjectFile.resource)
+        : null,
+    };
+  }
 
   updateToolbar = () => {
     this.props.setToolbar(

@@ -58,7 +58,7 @@ This map is a reference for tool names and intent. A listed tool may still requi
 Read-only context:
 
 - `gdevelop_get_editor_state`: project presence, scene names, permissions, and the absolute `projectFile` / `projectFolder` of the open project. Relative resource paths (`add_or_update_resource`, `bulk_edit_scene_assets`) resolve against `projectFolder`, which may differ from your cwd — read it first to avoid missing-file errors.
-- `gdevelop_get_editor_selection`: current editor UI selection state, including active scene-like editor panes, selected objects, selected layers, selected scene instances, and selected events/instructions when an events sheet is active.
+- `gdevelop_get_editor_selection`: current editor UI selection state, including active scene-like editor panes, selected objects, selected layers, selected scene instances, selected events/instructions when an events sheet is active, and the selected project-file asset/resource when the Resources editor is active.
 - `gdevelop_get_project_summary`: compact project structure (also returns absolute `projectFile` / `projectFolder`), optionally scoped by `sceneName`.
 - `gdevelop_read_project_json`: full project JSON; use sparingly and with `maxLength` for large projects.
 - `gdevelop_list_scenes`: all scenes/layouts.

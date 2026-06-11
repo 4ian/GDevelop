@@ -58,6 +58,15 @@ describe('McpToolCatalog', () => {
     expect(toolNames).not.toContain('create_scene');
     expect(toolNames).not.toContain('gdevelop_create_or_update_extension');
     expect(toolNames).not.toContain('gdevelop_run_command');
+    const editorSelectionTool = tools.find(
+      tool => tool.name === 'gdevelop_get_editor_selection'
+    );
+    if (!editorSelectionTool) {
+      throw new Error('gdevelop_get_editor_selection should be listed.');
+    }
+    expect(editorSelectionTool.description).toContain(
+      'selected project-file assets'
+    );
   });
 
   it('includes write and command tools only when allowed', () => {

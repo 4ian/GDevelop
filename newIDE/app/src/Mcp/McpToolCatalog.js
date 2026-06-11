@@ -2779,7 +2779,7 @@ const readTools: Array<McpTool> = [
   {
     name: 'gdevelop_get_editor_selection',
     description:
-      'Return the current editor UI selection state, including selected objects, scene instances, layers, and selected events/instructions when supported by the active editor.',
+      'Return the current editor UI selection state, including selected objects, scene instances, layers, selected events/instructions, and selected project-file assets in the Resources editor when supported by the active editor.',
     inputSchema: emptyObjectSchema,
   },
   {

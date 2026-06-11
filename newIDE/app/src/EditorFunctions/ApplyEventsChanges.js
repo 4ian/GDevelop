@@ -242,6 +242,21 @@ const getEventWhileConditions = (
   return null;
 };
 
+/**
+ * When several operations have the same path, the path means different things:
+ * for an insertion, it's an insertion point (a "gap"), while for the other
+ * operations it designates the existing event at this index. Operations on the
+ * existing event must then run first, otherwise the inserted events would take
+ * its place and be wrongly edited or deleted. Deletions still run just before
+ * insertions, so that the delete+insert pair generated for
+ * "insert_and_replace_event" stays in order.
+ */
+const getOperationPriorityForSamePath = (type: EventOperationType): number => {
+  if (type === 'insert') return 2;
+  if (type === 'delete') return 1;
+  return 0;
+};
+
 const comparePathsReverseLexicographically = (
   p1: EventPath,
   p2: EventPath
@@ -561,9 +576,10 @@ export const applyEventsChanges = (
       opB.path
     );
     if (pathComparison !== 0) return pathComparison;
-    if (opA.type === 'delete' && opB.type !== 'delete') return -1;
-    if (opA.type !== 'delete' && opB.type === 'delete') return 1;
-    return 0;
+    return (
+      getOperationPriorityForSamePath(opA.type) -
+      getOperationPriorityForSamePath(opB.type)
+    );
   });
 
   let applied = 0;

@@ -1277,6 +1277,120 @@ describe('applyEventsChanges', () => {
     expect(result.errors).toEqual([]);
   });
 
+  it('should not let an insert_after_event clobber an edit of the next sibling (same insertion path)', () => {
+    // Mirrors a real failure: edit event-1, insert new events after event-1,
+    // and edit event-2. The insertion point of "insert_after_event event-1"
+    // is index 2, the same path as the edit of event-2. The edit must apply
+    // to the existing event-2, not to the freshly inserted events.
+    const makeStandardEventJson = (actionType: string) =>
+      `{"type":"BuiltinCommonInstructions::Standard","conditions":[],"actions":[{"type":{"value":"${actionType}"}}]}`;
+
+    const operationFactories: Array<() => AiGeneratedEventChange> = [
+      () => ({
+        operationName: 'replace_event_but_keep_existing_sub_events',
+        operationTargetEvent: 'event-1',
+        generatedEvents: `[${makeStandardEventJson('EditedEvent1')}]`,
+        isEventsJsonValid: true,
+        areEventsValid: true,
+        diagnosticLines: [],
+        extensionNames: [],
+        undeclaredVariables: [],
+        undeclaredObjectVariables: {},
+        missingObjectBehaviors: {},
+        missingResources: [],
+      }),
+      () => ({
+        operationName: 'insert_after_event',
+        operationTargetEvent: 'event-1',
+        generatedEvents: `[${makeStandardEventJson('InsertedEvent')}]`,
+        isEventsJsonValid: true,
+        areEventsValid: true,
+        diagnosticLines: [],
+        extensionNames: [],
+        undeclaredVariables: [],
+        undeclaredObjectVariables: {},
+        missingObjectBehaviors: {},
+        missingResources: [],
+      }),
+      () => ({
+        operationName: 'replace_event_but_keep_existing_sub_events',
+        operationTargetEvent: 'event-2',
+        generatedEvents: `[${makeStandardEventJson('EditedEvent2')}]`,
+        isEventsJsonValid: true,
+        areEventsValid: true,
+        diagnosticLines: [],
+        extensionNames: [],
+        undeclaredVariables: [],
+        undeclaredObjectVariables: {},
+        missingObjectBehaviors: {},
+        missingResources: [],
+      }),
+    ];
+
+    // The result must be the same whatever the order of the changes.
+    const allPermutations = [
+      [0, 1, 2],
+      [0, 2, 1],
+      [1, 0, 2],
+      [1, 2, 0],
+      [2, 0, 1],
+      [2, 1, 0],
+    ];
+
+    allPermutations.forEach(perm => {
+      sceneEventsList.clear();
+      unserializeFromJSObject(
+        sceneEventsList,
+        [
+          JSON.parse(makeStandardEventJson('OriginalEvent0')),
+          JSON.parse(makeStandardEventJson('OriginalEvent1')),
+          JSON.parse(makeStandardEventJson('OriginalEvent2')),
+        ],
+        'unserializeFrom',
+        project
+      );
+
+      const eventOperations: Array<AiGeneratedEventChange> = perm.map(i =>
+        operationFactories[i]()
+      );
+      const result = applyEventsChanges(
+        project,
+        sceneEventsList,
+        eventOperations,
+        fakeGeneratedEventId
+      );
+
+      const permDescription = perm.join(',');
+      const firstActionTypes = [];
+      for (let i = 0; i < sceneEventsList.getEventsCount(); i++) {
+        firstActionTypes.push(
+          gd
+            .asStandardEvent(sceneEventsList.getEventAt(i))
+            .getActions()
+            .get(0)
+            .getType()
+        );
+      }
+      expect({ permDescription, firstActionTypes }).toEqual({
+        permDescription,
+        firstActionTypes: [
+          'OriginalEvent0',
+          'EditedEvent1',
+          'InsertedEvent',
+          'EditedEvent2',
+        ],
+      });
+      expect({ permDescription, applied: result.applied }).toEqual({
+        permDescription,
+        applied: 3,
+      });
+      expect({ permDescription, errors: result.errors }).toEqual({
+        permDescription,
+        errors: [],
+      });
+    });
+  });
+
   it('should copy actions and conditions at end with insert_actions_conditions_at_end', () => {
     sceneEventsList.clear();
     const standardEvent = gd.asStandardEvent(

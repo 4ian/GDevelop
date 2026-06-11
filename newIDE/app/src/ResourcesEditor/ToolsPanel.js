@@ -45,6 +45,8 @@ import {
 const fs = optionalRequire('fs');
 const path = optionalRequire('path');
 const buffer = optionalRequire('buffer');
+const electron = optionalRequire('electron');
+const ipcRenderer = electron ? electron.ipcRenderer : null;
 const projectFileDragDataMimeType = 'application/x-gdevelop-project-file';
 
 type Props = {|
@@ -55,7 +57,7 @@ type Props = {|
 |};
 
 type ToolCategory = 'image' | 'sound';
-type ImageTool = 'nano-banana' | 'local-tools';
+type ImageTool = 'nano-banana' | 'local-tools' | 'image-extender';
 type SoundTool = 'elevenlabs';
 export type ImageAttachment = {|
   absolutePath: string,
@@ -522,8 +524,10 @@ export const getResourcesToolsSettingsWithDefaults = (
       ? 'sound'
       : defaultResourcesToolsSettings.activeToolCategory,
   selectedImageTool:
-    settings && settings.selectedImageTool === 'local-tools'
-      ? 'local-tools'
+    settings &&
+    (settings.selectedImageTool === 'local-tools' ||
+      settings.selectedImageTool === 'image-extender')
+      ? settings.selectedImageTool
       : defaultResourcesToolsSettings.selectedImageTool,
   selectedSoundTool: defaultResourcesToolsSettings.selectedSoundTool,
   geminiApiKey:
@@ -681,6 +685,12 @@ const ToolsPanel = ({
     imageGenerationError,
     setImageGenerationError,
   ] = React.useState<?string>(null);
+  const [imageExtenderStatus, setImageExtenderStatus] = React.useState<?string>(
+    null
+  );
+  const [imageExtenderError, setImageExtenderError] = React.useState<?string>(
+    null
+  );
   const [
     localImageOperation,
     setLocalImageOperation,
@@ -796,6 +806,8 @@ const ToolsPanel = ({
     () => {
       setImageGenerationStatus(null);
       setImageGenerationError(null);
+      setImageExtenderStatus(null);
+      setImageExtenderError(null);
       setAudioGenerationStatus(null);
       setAudioGenerationError(null);
       setLocalImageStatus(null);
@@ -1595,6 +1607,27 @@ const ToolsPanel = ({
     ]
   );
 
+  const openImageExtender = React.useCallback(async () => {
+    if (!ipcRenderer) {
+      setImageExtenderError(
+        'Image Extender is only available in the desktop app.'
+      );
+      return;
+    }
+
+    setImageExtenderError(null);
+    setImageExtenderStatus('Opening Image Extender...');
+    try {
+      await ipcRenderer.invoke('image-extender-load');
+      setImageExtenderStatus('Image Extender opened.');
+    } catch (error) {
+      setImageExtenderError(
+        error && error.message ? error.message : String(error)
+      );
+      setImageExtenderStatus(null);
+    }
+  }, []);
+
   const localCrop: LocalImageCrop = {
     x: parsePixelField(localCropX),
     y: parsePixelField(localCropY),
@@ -1618,13 +1651,18 @@ const ToolsPanel = ({
         floatingLabelText={<Trans>Image tool</Trans>}
         value={selectedImageTool}
         onChange={(event, index, value: string) => {
-          if (value === 'nano-banana' || value === 'local-tools') {
+          if (
+            value === 'nano-banana' ||
+            value === 'local-tools' ||
+            value === 'image-extender'
+          ) {
             setSelectedImageTool(value);
           }
         }}
         fullWidth
       >
         <SelectOption value="nano-banana" label={t`Nano Banana`} />
+        <SelectOption value="image-extender" label={t`Image Extender`} />
         <SelectOption value="local-tools" label={t`Local tools`} />
       </SelectField>
     </div>
@@ -1751,6 +1789,28 @@ const ToolsPanel = ({
         <Text color="error">{imageGenerationError}</Text>
       )}
       {!!imageGenerationStatus && <Text>{imageGenerationStatus}</Text>}
+    </div>
+  );
+
+  const renderImageExtender = () => (
+    <div style={styles.section}>
+      {renderImageToolSelector()}
+      <MiniToolbar noPadding>
+        <SparkleIcon />
+        <MiniToolbarText>
+          <Trans>Image Extender</Trans>
+        </MiniToolbarText>
+      </MiniToolbar>
+      <MiniToolbar noPadding>
+        <RaisedButton
+          label={<Trans>Open Image Extender</Trans>}
+          icon={<SparkleIcon />}
+          color="ai"
+          onClick={openImageExtender}
+        />
+      </MiniToolbar>
+      {!!imageExtenderError && <Text color="error">{imageExtenderError}</Text>}
+      {!!imageExtenderStatus && <Text>{imageExtenderStatus}</Text>}
     </div>
   );
 
@@ -2115,6 +2175,8 @@ const ToolsPanel = ({
           {activeToolCategory === 'image'
             ? selectedImageTool === 'nano-banana'
               ? renderNanoBanana()
+              : selectedImageTool === 'image-extender'
+              ? renderImageExtender()
               : selectedImageTool === 'local-tools'
               ? renderLocalImageTools()
               : null

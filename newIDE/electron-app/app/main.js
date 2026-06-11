@@ -48,6 +48,10 @@ const {
   capturePreviewPage,
 } = require('./PreviewWindow');
 const {
+  imageExtenderScheme,
+  openImageExtenderWindow,
+} = require('./ImageExtenderWindow');
+const {
   setupLocalGDJSDevelopmentWatcher,
   closeLocalGDJSDevelopmentWatcher,
   onLocalGDJSDevelopmentWatcherRuntimeUpdated,
@@ -71,10 +75,7 @@ log.info('GDevelop Electron app starting...');
 // the app is ready. They complement (do not replace) the per-window
 // backgroundThrottling:false option and the powerSaveBlocker held while a
 // preview is open.
-app.commandLine.appendSwitch(
-  'disable-features',
-  'CalculateNativeWinOcclusion'
-);
+app.commandLine.appendSwitch('disable-features', 'CalculateNativeWinOcclusion');
 app.commandLine.appendSwitch('disable-renderer-backgrounding');
 app.commandLine.appendSwitch('disable-backgrounding-occluded-windows');
 
@@ -158,8 +159,20 @@ const args = parseArgs(
 
 const devTools = !!args['dev-tools'];
 
-// See registerGdideProtocol (used for HTML modules support)
-protocol.registerSchemesAsPrivileged([{ scheme: 'gdide' }]);
+// See registerGdideProtocol (used for HTML modules support). Image Extender
+// uses a custom secure scheme so the bundled app can call /api without a port.
+protocol.registerSchemesAsPrivileged([
+  { scheme: 'gdide' },
+  {
+    scheme: imageExtenderScheme,
+    privileges: {
+      standard: true,
+      secure: true,
+      supportFetchAPI: true,
+      corsEnabled: true,
+    },
+  },
+]);
 
 // Notifications on Microsoft Windows platforms show the app user model id.
 // If not set, defaults to `electron.app.{app.name}`.
@@ -679,6 +692,15 @@ app.on('ready', function() {
       devTools,
       indexSubPath: 'yarn/yarn-electron-index.html',
       externalEditorInput,
+    });
+  });
+
+  // Image Extender executable app
+  ipcMain.handle('image-extender-load', event => {
+    const parentWindow = BrowserWindow.fromWebContents(event.sender);
+    return openImageExtenderWindow({
+      parentWindow,
+      devTools,
     });
   });
 

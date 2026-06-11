@@ -287,12 +287,42 @@ describe('ToolsPanel', () => {
     ).toBe('local-tools');
   });
 
+  it('persists the Image Extender image tool selection', () => {
+    expect(
+      buildResourcesToolsSettings({
+        activeToolCategory: 'image',
+        selectedImageTool: 'image-extender',
+        selectedSoundTool: 'elevenlabs',
+        geminiApiKey: 'gemini-key',
+        nanoBananaModel: 'gemini-image',
+        nanoBananaPrompt: 'make a coin',
+        imageAttachment: null,
+        elevenLabsApiKey: 'eleven-key',
+        elevenLabsMode: 'sound-effect',
+        elevenLabsText: 'laser',
+        elevenLabsVoiceId: 'voice',
+        elevenLabsModel: 'speech-model',
+        elevenLabsSoundModel: 'sound-model',
+        elevenLabsOutputFormat: 'mp3_44100_128',
+        elevenLabsDuration: '2.5',
+      }).selectedImageTool
+    ).toBe('image-extender');
+  });
+
   it('normalizes persisted Local tools settings', () => {
     expect(
       getResourcesToolsSettingsWithDefaults({
         selectedImageTool: 'local-tools',
       }).selectedImageTool
     ).toBe('local-tools');
+  });
+
+  it('normalizes persisted Image Extender settings', () => {
+    expect(
+      getResourcesToolsSettingsWithDefaults({
+        selectedImageTool: 'image-extender',
+      }).selectedImageTool
+    ).toBe('image-extender');
   });
 
   it('normalizes persisted Tools settings when older preferences are incomplete', () => {

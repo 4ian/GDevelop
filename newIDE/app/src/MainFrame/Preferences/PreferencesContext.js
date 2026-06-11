@@ -185,7 +185,7 @@ export type EditorStateForProjectUpdate = $Shape<EditorStateForProject>;
 
 export type ResourcesToolsSettings = {|
   activeToolCategory: 'image' | 'sound',
-  selectedImageTool: 'nano-banana' | 'local-tools',
+  selectedImageTool: 'nano-banana' | 'local-tools' | 'image-extender',
   selectedSoundTool: 'elevenlabs',
   geminiApiKey: string,
   nanoBananaModel: string,

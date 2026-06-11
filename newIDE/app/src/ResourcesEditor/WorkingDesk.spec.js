@@ -253,8 +253,9 @@ describe('WorkingDesk', () => {
 
     expect(source).toContain('toolTabUpdate');
     expect(source).toContain("selectedItem.node.type !== 'file'");
-    expect(source).toContain("kind: 'nano-banana'");
+    expect(source).toContain("'nano-banana'");
     expect(source).toContain("'elevenlabs-audio'");
+    expect(source).toContain("'local-image'");
   });
 
   it('uses white text for HTTP request and response details', () => {

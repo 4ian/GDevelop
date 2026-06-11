@@ -5,6 +5,7 @@ import * as React from 'react';
 import Background from '../UI/Background';
 import Text from '../UI/Text';
 import TextField from '../UI/TextField';
+import ColorField from '../UI/ColorField';
 import RaisedButton from '../UI/RaisedButton';
 import FlatButton from '../UI/FlatButton';
 import SelectField from '../UI/SelectField';
@@ -693,6 +694,13 @@ const ToolsPanel = ({
     setLocalExpandDirection,
   ] = React.useState<LocalImageExpandDirection>('right');
   const [localExpandAmount, setLocalExpandAmount] = React.useState('32');
+  const [localExpandFillColor, setLocalExpandFillColor] = React.useState(
+    '0;0;0'
+  );
+  const [
+    localExpandFillAlpha,
+    setLocalExpandFillAlpha,
+  ] = React.useState<number>(0);
   const [localImageSize, setLocalImageSize] = React.useState<?LocalImageSize>(
     null
   );
@@ -1526,6 +1534,10 @@ const ToolsPanel = ({
           crop,
           expandDirection: localExpandDirection,
           expandAmount,
+          expandFill: {
+            color: localExpandFillColor,
+            alpha: localExpandFillAlpha,
+          },
         });
         const outputBlob = await canvasToPngBlob(canvas);
         const outputFolderPath = await getImageGenerationOutputFolderPath({
@@ -1542,9 +1554,20 @@ const ToolsPanel = ({
         });
 
         await fs.promises.writeFile(outputPath, await blobToBuffer(outputBlob));
-        setLocalImageStatus(`Saved ${normalizeSlashes(outputPath)}`);
-        setLocalImageResultPath(normalizeSlashes(outputPath));
-        setLocalImageResultUrl(getFileUrl(outputPath));
+        const normalizedOutputPath = normalizeSlashes(outputPath);
+        const outputUrl = getFileUrl(outputPath);
+        setLocalImageStatus(`Saved ${normalizedOutputPath}`);
+        setLocalImageResultPath(normalizedOutputPath);
+        setLocalImageResultUrl(outputUrl);
+        onOpenWorkingDeskTask({
+          id: `local-image:${outputPath}`,
+          kind: 'local-image',
+          title: path.basename(outputPath),
+          status: 'success',
+          statusText: 'Image saved.',
+          generatedImagePath: normalizedOutputPath,
+          generatedImageUrl: outputUrl,
+        });
         await onProjectFilesChanged();
       } catch (error) {
         setLocalImageError(
@@ -1563,7 +1586,10 @@ const ToolsPanel = ({
       localCropY,
       localExpandAmount,
       localExpandDirection,
+      localExpandFillAlpha,
+      localExpandFillColor,
       localImageOperation,
+      onOpenWorkingDeskTask,
       onProjectFilesChanged,
       project,
     ]
@@ -1899,6 +1925,20 @@ const ToolsPanel = ({
             onChange={(event, value) => setLocalExpandAmount(value)}
             floatingLabelText={<Trans>Pixels to add</Trans>}
             min={1}
+            fullWidth
+          />
+          <ColorField
+            floatingLabelText={<Trans>Fill color</Trans>}
+            color={localExpandFillColor}
+            alpha={localExpandFillAlpha}
+            onChange={(color, alpha) => {
+              setLocalExpandFillColor(color);
+              setLocalExpandFillAlpha(
+                alpha !== undefined && alpha !== null
+                  ? alpha
+                  : localExpandFillAlpha
+              );
+            }}
             fullWidth
           />
         </>

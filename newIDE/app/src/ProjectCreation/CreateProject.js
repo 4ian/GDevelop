@@ -43,7 +43,7 @@ export type NewProjectSource = {|
 |};
 
 export const emptyProjectTemplateFilesSource: ProjectTemplateFilesSource = {
-  // The empty-project template (incl. the gdevelop-mcp skill and AGENTS.md) is
+  // The empty-project template (incl. skills/gdevelop-mcp and AGENTS.md) is
   // bundled with the app and copied locally on creation. This avoids any network
   // dependency and keeps working in the released binary.
   type: 'local-folder',

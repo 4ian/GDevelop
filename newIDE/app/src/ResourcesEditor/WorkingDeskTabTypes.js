@@ -1,6 +1,9 @@
 // @flow
 
-export type WorkingDeskToolTabKind = 'nano-banana' | 'elevenlabs-audio';
+export type WorkingDeskToolTabKind =
+  | 'nano-banana'
+  | 'elevenlabs-audio'
+  | 'local-image';
 export type WorkingDeskToolTabStatus = 'running' | 'success' | 'error';
 
 export type WorkingDeskToolTabUpdate = {|

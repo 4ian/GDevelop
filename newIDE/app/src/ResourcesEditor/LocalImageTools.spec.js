@@ -137,9 +137,11 @@ describe('LocalImageTools', () => {
   });
 
   it('draws crop and expansion operations to a canvas', () => {
-    const context = {
+    const context: any = {
       clearRect: jest.fn(),
+      fillRect: jest.fn(),
       drawImage: jest.fn(),
+      fillStyle: '',
     };
     const canvas = {
       width: 0,
@@ -174,6 +176,7 @@ describe('LocalImageTools', () => {
     );
 
     context.clearRect.mockClear();
+    context.fillRect.mockClear();
     context.drawImage.mockClear();
 
     drawLocalImageOperationToCanvas({
@@ -184,11 +187,17 @@ describe('LocalImageTools', () => {
       crop: { x: 0, y: 0, width: 10, height: 10 },
       expandDirection: 'left',
       expandAmount: 16,
+      expandFill: {
+        color: '10;20;30',
+        alpha: 0.5,
+      },
     });
 
     expect(canvas.width).toBe(116);
     expect(canvas.height).toBe(80);
     expect(context.clearRect).toHaveBeenCalledWith(0, 0, 116, 80);
+    expect(context.fillStyle).toBe('rgba(10, 20, 30, 0.5)');
+    expect(context.fillRect).toHaveBeenCalledWith(0, 0, 116, 80);
     expect(context.drawImage).toHaveBeenCalledWith(image, 16, 0);
   });
 });

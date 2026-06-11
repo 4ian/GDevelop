@@ -98,6 +98,9 @@ describe('ToolsPanel source policies', () => {
     );
     expect(runLocalImageToolSection).toContain('getUniqueOutputPath');
     expect(runLocalImageToolSection).toContain('fs.promises.writeFile');
+    expect(runLocalImageToolSection).toContain('onOpenWorkingDeskTask');
+    expect(runLocalImageToolSection).toContain("kind: 'local-image'");
+    expect(runLocalImageToolSection).toContain('generatedImageUrl');
     expect(runLocalImageToolSection).not.toContain('addResourceForFile');
     expect(runLocalImageToolSection).not.toContain(
       'fs.promises.writeFile(imageAttachment.absolutePath'

@@ -1,5 +1,7 @@
 // @flow
 
+import { rgbStringAndAlphaToRGBColor } from '../Utils/ColorTransformer';
+
 export type LocalImageOperation = 'crop' | 'expand-canvas';
 export type LocalImageExpandDirection = 'left' | 'right' | 'top' | 'bottom';
 export type LocalImageSize = {| width: number, height: number |};
@@ -20,6 +22,15 @@ export type LocalImageExpandGeometry = {|
   sourceX: number,
   sourceY: number,
 |};
+export type LocalImageExpandFill = {|
+  color: string,
+  alpha: number,
+|};
+
+const defaultLocalImageExpandFill = {
+  color: '0;0;0',
+  alpha: 0,
+};
 
 const clamp = (value: number, min: number, max: number): number =>
   Math.min(Math.max(value, min), max);
@@ -123,6 +134,28 @@ export const shouldDisableLocalImageApplyButton = ({
   return toPixelInteger(expandAmount) <= 0;
 };
 
+const getCanvasFillStyle = ({ color, alpha }: LocalImageExpandFill): string => {
+  const rgbColor = rgbStringAndAlphaToRGBColor(color, alpha);
+  if (!rgbColor) {
+    throw new Error('Enter a fill color as R;G;B, like 100;200;180.');
+  }
+  const alphaValue = rgbColor.a;
+  const normalizedAlpha =
+    typeof alphaValue === 'number' && Number.isFinite(alphaValue)
+      ? alphaValue
+      : 0;
+
+  return `rgba(${clamp(toPixelInteger(rgbColor.r), 0, 255)}, ${clamp(
+    toPixelInteger(rgbColor.g),
+    0,
+    255
+  )}, ${clamp(toPixelInteger(rgbColor.b), 0, 255)}, ${clamp(
+    normalizedAlpha,
+    0,
+    1
+  )})`;
+};
+
 export const drawLocalImageOperationToCanvas = ({
   canvas,
   image,
@@ -131,6 +164,7 @@ export const drawLocalImageOperationToCanvas = ({
   crop,
   expandDirection,
   expandAmount,
+  expandFill,
 }: {|
   canvas: any,
   image: any,
@@ -139,6 +173,7 @@ export const drawLocalImageOperationToCanvas = ({
   crop: LocalImageCrop,
   expandDirection: LocalImageExpandDirection,
   expandAmount: number,
+  expandFill?: LocalImageExpandFill,
 |}) => {
   const context = canvas.getContext('2d');
   if (!context) throw new Error('Unable to create an image canvas.');
@@ -174,5 +209,9 @@ export const drawLocalImageOperationToCanvas = ({
   canvas.width = geometry.width;
   canvas.height = geometry.height;
   context.clearRect(0, 0, canvas.width, canvas.height);
+  context.fillStyle = getCanvasFillStyle(
+    expandFill || defaultLocalImageExpandFill
+  );
+  context.fillRect(0, 0, canvas.width, canvas.height);
   context.drawImage(image, geometry.sourceX, geometry.sourceY);
 };

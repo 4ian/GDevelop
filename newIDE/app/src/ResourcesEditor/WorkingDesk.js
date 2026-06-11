@@ -44,7 +44,10 @@ import {
   imageZoomMinFactor,
   shouldShowWorkingDeskImageZoomToolbar,
 } from './WorkingDeskZoomUtils';
-import { type WorkingDeskToolTabUpdate } from './WorkingDeskTabTypes';
+import {
+  type WorkingDeskToolTabKind,
+  type WorkingDeskToolTabUpdate,
+} from './WorkingDeskTabTypes';
 import './WorkingDesk.css';
 
 const fs = optionalRequire('fs');
@@ -68,7 +71,7 @@ type WorkingDeskToolTab = {|
   id: string,
   tabKind: 'tool',
   title: string,
-  kind: 'nano-banana' | 'elevenlabs-audio',
+  kind: WorkingDeskToolTabKind,
   status: 'running' | 'success' | 'error',
   statusText: ?string,
   requestText: ?string,
@@ -491,7 +494,9 @@ const WorkingDesk = ({
 
   const renderTabIcon = (tab: WorkingDeskTab): React.Node => {
     if (tab.tabKind === 'tool') {
-      return tab.kind === 'elevenlabs-audio' ? <MusicIcon /> : <SparkleIcon />;
+      if (tab.kind === 'elevenlabs-audio') return <MusicIcon />;
+      if (tab.kind === 'local-image') return <PictureIcon />;
+      return <SparkleIcon />;
     }
 
     const node = tab.selectedItem.node;
@@ -786,11 +791,25 @@ const WorkingDesk = ({
     );
   };
 
+  const getToolTaskDefaultStatusText = (
+    kind: WorkingDeskToolTabKind
+  ): string => {
+    switch (kind) {
+      case 'nano-banana':
+        return 'Nano Banana task';
+      case 'elevenlabs-audio':
+        return 'ElevenLabs task';
+      case 'local-image':
+        return 'Local image tool';
+      default:
+        return 'Tool task';
+    }
+  };
+
   const renderToolTaskContent = (toolTab: WorkingDeskToolTab) => {
     const isRunning = toolTab.status === 'running';
     const statusText =
-      toolTab.statusText ||
-      (toolTab.kind === 'nano-banana' ? 'Nano Banana task' : 'ElevenLabs task');
+      toolTab.statusText || getToolTaskDefaultStatusText(toolTab.kind);
 
     return (
       <div style={styles.toolTaskContent}>
@@ -822,7 +841,7 @@ const WorkingDesk = ({
             {!!toolTab.generatedImageUrl && (
               <img
                 src={toolTab.generatedImageUrl}
-                alt="Generated Nano Banana result"
+                alt="Generated result"
                 style={styles.generatedImage}
                 draggable="false"
               />

@@ -427,12 +427,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
         onRefreshLimits,
         subscription,
       } = authenticatedUser;
-      const {
-        service: aiServiceConfig,
-        userId,
-        getAuthorizationHeader,
-        isGDevelopCloudService,
-      } = useAiGenerationService();
+      const { userId, getAuthorizationHeader } = useAiGenerationService();
 
       const { isRefreshingLimits, refreshLimits } = useRefreshLimits(
         onRefreshLimits
@@ -441,17 +436,12 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
         false
       );
 
-      const availableCredits =
-        isGDevelopCloudService && limits
-          ? limits.credits.userBalance.amount
-          : 0;
+      const availableCredits = limits ? limits.credits.userBalance.amount : 0;
       const quota =
-        (isGDevelopCloudService &&
-          (limits && limits.quotas && limits.quotas['consumed-ai-credits'])) ||
+        (limits && limits.quotas && limits.quotas['consumed-ai-credits']) ||
         null;
       const aiRequestPrice =
-        (isGDevelopCloudService &&
-          (limits && limits.credits && limits.credits.prices['ai-request'])) ||
+        (limits && limits.credits && limits.credits.prices['ai-request']) ||
         null;
       const aiRequestPriceInCredits = aiRequestPrice
         ? aiRequestPrice.priceInCredits
@@ -461,11 +451,11 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
       // we display the proper quota and credits information for the user.
       React.useEffect(
         () => {
-          if (isActive && isGDevelopCloudService) {
+          if (isActive) {
             refreshLimits();
           }
         },
-        [isActive, isGDevelopCloudService, refreshLimits]
+        [isActive, refreshLimits]
       );
 
       // Trigger the start of the new AI request if the user has requested it
@@ -478,9 +468,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
             console.info('Starting a new AI request...');
 
             if (!userId) {
-              if (isGDevelopCloudService) {
-                onOpenCreateAccountDialog();
-              }
+              onOpenCreateAccountDialog();
               startNewAiRequest(null);
               return;
             }
@@ -496,12 +484,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
             // Ensure the user has enough credits to pay for the request, or ask them
             // to buy some more.
             let payWithCredits = false;
-            if (
-              isGDevelopCloudService &&
-              quota &&
-              quota.limitReached &&
-              aiRequestPriceInCredits
-            ) {
+            if (quota && quota.limitReached && aiRequestPriceInCredits) {
               payWithCredits = true;
               const doesNotHaveEnoughCreditsToContinue =
                 availableCredits < aiRequestPriceInCredits;
@@ -535,42 +518,35 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
 
               const preparedAiUserContent = await prepareAiUserContent({
                 getAuthorizationHeader,
-                aiServiceConfig,
                 userId,
                 simplifiedProjectJson,
                 projectSpecificExtensionsSummaryJson,
                 eventsJson: null,
               });
 
-              const aiRequest = await createAiRequest(
-                getAuthorizationHeader,
-                {
-                  userRequest: userRequest,
-                  userId,
-                  gameProjectJsonUserRelativeKey:
-                    preparedAiUserContent.gameProjectJsonUserRelativeKey,
-                  gameProjectJson: preparedAiUserContent.gameProjectJson,
-                  projectSpecificExtensionsSummaryJsonUserRelativeKey:
-                    preparedAiUserContent.projectSpecificExtensionsSummaryJsonUserRelativeKey,
-                  projectSpecificExtensionsSummaryJson:
-                    preparedAiUserContent.projectSpecificExtensionsSummaryJson,
-                  payWithCredits,
-                  gameId: project ? project.getProjectUuid() : null,
-                  // $FlowFixMe[incompatible-type]
-                  fileMetadata,
-                  storageProviderName,
-                  mode,
-                  toolsVersion: getToolsVersionForAiRequestMode(mode),
-                  aiConfiguration: aiConfigurationPresetId
-                    ? {
-                        presetId: aiConfigurationPresetId,
-                      }
-                    : null,
-                },
-                {
-                  aiServiceConfig,
-                }
-              );
+              const aiRequest = await createAiRequest(getAuthorizationHeader, {
+                userRequest: userRequest,
+                userId,
+                gameProjectJsonUserRelativeKey:
+                  preparedAiUserContent.gameProjectJsonUserRelativeKey,
+                gameProjectJson: preparedAiUserContent.gameProjectJson,
+                projectSpecificExtensionsSummaryJsonUserRelativeKey:
+                  preparedAiUserContent.projectSpecificExtensionsSummaryJsonUserRelativeKey,
+                projectSpecificExtensionsSummaryJson:
+                  preparedAiUserContent.projectSpecificExtensionsSummaryJson,
+                payWithCredits,
+                gameId: project ? project.getProjectUuid() : null,
+                // $FlowFixMe[incompatible-type]
+                fileMetadata,
+                storageProviderName,
+                mode,
+                toolsVersion: getToolsVersionForAiRequestMode(mode),
+                aiConfiguration: aiConfigurationPresetId
+                  ? {
+                      presetId: aiConfigurationPresetId,
+                    }
+                  : null,
+              });
 
               console.info('Successfully created a new AI request:', aiRequest);
               setSendingAiRequest(null, false);
@@ -609,18 +585,14 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
 
             // Refresh the user limits, to ensure quota and credits information
             // is up-to-date after an AI request.
-            if (isGDevelopCloudService) {
-              await delay(500);
-              await refreshLimits({ withRetry: true });
-            }
+            await delay(500);
+            await refreshLimits({ withRetry: true });
           })();
         },
         [
           aiRequestPriceInCredits,
           availableCredits,
-          aiServiceConfig,
           getAuthorizationHeader,
-          isGDevelopCloudService,
           onOpenCreateAccountDialog,
           refreshLimits,
           userId,
@@ -707,7 +679,6 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
           let payWithCredits = false;
           if (
             userMessage &&
-            isGDevelopCloudService &&
             quota &&
             quota.limitReached &&
             aiRequestPriceInCredits
@@ -749,7 +720,6 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
 
             const preparedAiUserContent = await prepareAiUserContent({
               getAuthorizationHeader,
-              aiServiceConfig,
               userId,
               simplifiedProjectJson,
               projectSpecificExtensionsSummaryJson,
@@ -781,36 +751,30 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
               newMode || aiRequestForMessage.mode || 'chat';
 
             const aiRequest: AiRequest = await retryIfFailed({ times: 2 }, () =>
-              addMessageToAiRequest(
-                getAuthorizationHeader,
-                {
-                  userId,
-                  aiRequestId,
-                  functionCallOutputs,
-                  gameProjectJsonUserRelativeKey:
-                    preparedAiUserContent.gameProjectJsonUserRelativeKey,
-                  gameProjectJson: preparedAiUserContent.gameProjectJson,
-                  projectSpecificExtensionsSummaryJsonUserRelativeKey:
-                    preparedAiUserContent.projectSpecificExtensionsSummaryJsonUserRelativeKey,
-                  projectSpecificExtensionsSummaryJson:
-                    preparedAiUserContent.projectSpecificExtensionsSummaryJson,
-                  gameId: upToDateProject
-                    ? upToDateProject.getProjectUuid()
-                    : undefined,
-                  payWithCredits,
-                  userMessage,
-                  paused:
-                    hasJustInitializedProject && modeForThisMessage === 'agent',
-                  //  These are defined only if there is a mode change:
-                  mode: newMode,
-                  toolsVersion: newMode
-                    ? getToolsVersionForAiRequestMode(newMode)
-                    : undefined,
-                },
-                {
-                  aiServiceConfig,
-                }
-              )
+              addMessageToAiRequest(getAuthorizationHeader, {
+                userId,
+                aiRequestId,
+                functionCallOutputs,
+                gameProjectJsonUserRelativeKey:
+                  preparedAiUserContent.gameProjectJsonUserRelativeKey,
+                gameProjectJson: preparedAiUserContent.gameProjectJson,
+                projectSpecificExtensionsSummaryJsonUserRelativeKey:
+                  preparedAiUserContent.projectSpecificExtensionsSummaryJsonUserRelativeKey,
+                projectSpecificExtensionsSummaryJson:
+                  preparedAiUserContent.projectSpecificExtensionsSummaryJson,
+                gameId: upToDateProject
+                  ? upToDateProject.getProjectUuid()
+                  : undefined,
+                payWithCredits,
+                userMessage,
+                paused:
+                  hasJustInitializedProject && modeForThisMessage === 'agent',
+                //  These are defined only if there is a mode change:
+                mode: newMode,
+                toolsVersion: newMode
+                  ? getToolsVersionForAiRequestMode(newMode)
+                  : undefined,
+              })
             );
             updateAiRequest(aiRequest.id, () => aiRequest);
             setSendingAiRequest(aiRequest.id, false);
@@ -848,10 +812,8 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
 
           // Refresh the user limits, to ensure quota and credits information
           // is up-to-date after an AI request.
-          if (isGDevelopCloudService) {
-            await delay(500);
-            await refreshLimits({ withRetry: true });
-          }
+          await delay(500);
+          await refreshLimits({ withRetry: true });
 
           if (createdSceneNames && createdSceneNames.length > 0) {
             createdSceneNames.forEach(sceneName => {
@@ -865,14 +827,12 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
         },
         [
           userId,
-          aiServiceConfig,
           selectedAiRequestId,
           aiRequests,
           isSendingAiRequest,
           quota,
           aiRequestPriceInCredits,
           availableCredits,
-          isGDevelopCloudService,
           setSendingAiRequest,
           setIsSendingUserMessage,
           updateAiRequest,
@@ -1072,26 +1032,20 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
           if (!userId) return;
           try {
             await retryIfFailed({ times: 2 }, () =>
-              sendAiRequestFeedback(
-                getAuthorizationHeader,
-                {
-                  userId,
-                  aiRequestId,
-                  messageIndex,
-                  feedback,
-                  reason,
-                  freeFormDetails,
-                },
-                {
-                  aiServiceConfig,
-                }
-              )
+              sendAiRequestFeedback(getAuthorizationHeader, {
+                userId,
+                aiRequestId,
+                messageIndex,
+                feedback,
+                reason,
+                freeFormDetails,
+              })
             );
           } catch (error) {
             console.error('Error sending feedback: ', error);
           }
         },
-        [getAuthorizationHeader, userId, aiServiceConfig]
+        [getAuthorizationHeader, userId]
       );
 
       const onStop = React.useCallback(
@@ -1122,9 +1076,6 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
             {
               userId,
               aiRequestId: requestIdToSuspend,
-            },
-            {
-              aiServiceConfig,
             }
           );
           updateAiRequest(suspendedRequest.id, () => suspendedRequest);
@@ -1132,7 +1083,6 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
         [
           selectedAiRequest,
           userId,
-          aiServiceConfig,
           getAuthorizationHeader,
           updateAiRequest,
           clearEditorFunctionCallResults,
@@ -1149,16 +1099,10 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
         () => {
           if (!selectedAiRequest || !userId) return;
           retryIfFailed({ times: 2 }, () =>
-            getAiRequest(
-              getAuthorizationHeader,
-              {
-                userId,
-                aiRequestId: selectedAiRequest.id,
-              },
-              {
-                aiServiceConfig,
-              }
-            )
+            getAiRequest(getAuthorizationHeader, {
+              userId,
+              aiRequestId: selectedAiRequest.id,
+            })
           )
             .then(aiRequest => {
               updateAiRequest(aiRequest.id, () => aiRequest);
@@ -1400,17 +1344,11 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
                   const forkedAiRequest: AiRequest = await retryIfFailed(
                     { times: 2 },
                     () =>
-                      forkAiRequest(
-                        getAuthorizationHeader,
-                        {
-                          userId,
-                          aiRequestId: aiRequest.id,
-                          upToMessageId: forkToMessageId || undefined,
-                        },
-                        {
-                          aiServiceConfig,
-                        }
-                      )
+                      forkAiRequest(getAuthorizationHeader, {
+                        userId,
+                        aiRequestId: aiRequest.id,
+                        upToMessageId: forkToMessageId || undefined,
+                      })
                   );
                   updateAiRequest(forkedAiRequest.id, () => forkedAiRequest);
 
@@ -1452,7 +1390,6 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
           profile,
           userId,
           getAuthorizationHeader,
-          aiServiceConfig,
           updateAiRequest,
           onStartOrOpenChat,
           setForkingState,
@@ -1468,11 +1405,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
             <div style={styles.chatContainer}>
               <AiRequestChat
                 aiConfigurationPresetsWithAvailability={getAiConfigurationPresetsWithAvailability(
-                  {
-                    limits,
-                    getAiSettings,
-                    aiGenerationServiceConfig: aiServiceConfig,
-                  }
+                  { limits, getAiSettings }
                 )}
                 project={project}
                 fileMetadata={fileMetadata}
@@ -1501,9 +1434,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
                 lastSendError={getLastSendError(selectedAiRequestId)}
                 quota={quota}
                 increaseQuotaOffering={
-                  !isGDevelopCloudService
-                    ? 'none'
-                    : !hasValidSubscriptionPlan(subscription)
+                  !hasValidSubscriptionPlan(subscription)
                     ? 'subscribe'
                     : canUpgradeSubscription(subscription)
                     ? 'upgrade'
@@ -1552,9 +1483,6 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
                     {
                       userId,
                       aiRequestId: aiRequest.id,
-                    },
-                    {
-                      aiServiceConfig,
                     }
                   );
                   clearEditorFunctionCallResults(requestToOpen.id);

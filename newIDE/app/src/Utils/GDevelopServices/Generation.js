@@ -4,7 +4,6 @@ import { GDevelopAiCdn, GDevelopGenerationApi } from './ApiConfigs';
 import { type MessageByLocale } from '../i18n/MessageByLocale';
 import { getIDEVersionWithHash } from '../../Version';
 import { extractNextPageUriFromLinkHeader } from './Play';
-import { type AiGenerationServiceConfig } from '../../AiGeneration/AiService';
 import {
   ensureIsArray,
   ensureIsObject,
@@ -277,17 +276,6 @@ export const apiClient: Axios = axios.create({
 });
 
 type GetAuthorizationHeader = () => Promise<?string>;
-type GenerationApiOptions = {| aiServiceConfig?: AiGenerationServiceConfig |};
-
-const getGenerationApiBaseUrl = (options?: GenerationApiOptions): string =>
-  options && options.aiServiceConfig
-    ? options.aiServiceConfig.baseUrl
-    : GDevelopGenerationApi.baseUrl;
-
-const getGenerationApiClient = (options?: GenerationApiOptions): any =>
-  axios.create({
-    baseURL: getGenerationApiBaseUrl(options),
-  });
 
 const makeAuthorizationHeaders = (authorizationHeader: ?string): Object =>
   authorizationHeader ? { Authorization: authorizationHeader } : {};
@@ -300,20 +288,16 @@ export const getAiRequest = async (
   }: {|
     userId: string,
     aiRequestId: string,
-  |},
-  options?: GenerationApiOptions
+  |}
 ): Promise<AiRequest> => {
   const authorizationHeader = await getAuthorizationHeader();
   // $FlowFixMe[underconstrained-implicit-instantiation]
-  const response = await axios.get(
-    `${getGenerationApiBaseUrl(options)}/ai-request/${aiRequestId}`,
-    {
-      params: {
-        userId,
-      },
-      headers: makeAuthorizationHeaders(authorizationHeader),
-    }
-  );
+  const response = await apiClient.get(`/ai-request/${aiRequestId}`, {
+    params: {
+      userId,
+    },
+    headers: makeAuthorizationHeaders(authorizationHeader),
+  });
   return ensureObjectHasProperty({
     data: response.data,
     propertyName: 'id',
@@ -331,22 +315,18 @@ export const getPartialAiRequest = async (
     userId: string,
     aiRequestId: string,
     include: string,
-  |},
-  options?: GenerationApiOptions
+  |}
 ): // $FlowFixMe[deprecated-utility]
 Promise<$Shape<AiRequest>> => {
   const authorizationHeader = await getAuthorizationHeader();
   // $FlowFixMe[underconstrained-implicit-instantiation]
-  const response = await axios.get(
-    `${getGenerationApiBaseUrl(options)}/ai-request/${aiRequestId}`,
-    {
-      params: {
-        userId,
-        include,
-      },
-      headers: makeAuthorizationHeaders(authorizationHeader),
-    }
-  );
+  const response = await apiClient.get(`/ai-request/${aiRequestId}`, {
+    params: {
+      userId,
+      include,
+    },
+    headers: makeAuthorizationHeaders(authorizationHeader),
+  });
   return ensureObjectHasProperty({
     data: response.data,
     propertyName: 'id',
@@ -362,8 +342,7 @@ export const getAiRequests = async (
   }: {|
     userId: string,
     forceUri: ?string,
-  |},
-  options?: GenerationApiOptions
+  |}
 ): Promise<{
   aiRequests: Array<AiRequest>,
   nextPageUri: ?string,
@@ -372,7 +351,7 @@ export const getAiRequests = async (
   const uri = forceUri || '/ai-request';
 
   // $FlowFixMe[incompatible-type]
-  const response = await getGenerationApiClient(options).get(uri, {
+  const response = await apiClient.get(uri, {
     headers: makeAuthorizationHeaders(authorizationHeader),
     params: forceUri ? { userId } : { userId, perPage: 10 },
   });
@@ -425,11 +404,10 @@ export const createAiRequest = async (
     },
     storageProviderName: ?string,
     toolsVersion: string,
-  |},
-  options?: GenerationApiOptions
+  |}
 ): Promise<AiRequest> => {
   const authorizationHeader = await getAuthorizationHeader();
-  const response = await getGenerationApiClient(options).post(
+  const response = await apiClient.post(
     '/ai-request',
     {
       gdevelopVersionWithHash: getIDEVersionWithHash(),
@@ -494,11 +472,10 @@ export const addMessageToAiRequest = async (
     paused?: boolean,
     mode?: 'chat' | 'agent' | 'orchestrator',
     toolsVersion?: string,
-  |},
-  options?: GenerationApiOptions
+  |}
 ): Promise<AiRequest> => {
   const authorizationHeader = await getAuthorizationHeader();
-  const response = await getGenerationApiClient(options).post(
+  const response = await apiClient.post(
     `/ai-request/${aiRequestId}/action/add-message`,
     {
       gdevelopVersionWithHash: getIDEVersionWithHash(),
@@ -532,11 +509,10 @@ export const addMessageToAiRequest = async (
 
 export const suspendAiRequest = async (
   getAuthorizationHeader: GetAuthorizationHeader,
-  { userId, aiRequestId }: {| userId: string, aiRequestId: string |},
-  options?: GenerationApiOptions
+  { userId, aiRequestId }: {| userId: string, aiRequestId: string |}
 ): Promise<AiRequest> => {
   const authorizationHeader = await getAuthorizationHeader();
-  const response = await getGenerationApiClient(options).post(
+  const response = await apiClient.post(
     `/ai-request/${aiRequestId}/action/suspend`,
     {},
     {
@@ -565,11 +541,10 @@ export const updateAiRequestMessage = async (
     aiRequestMessageId: string,
     projectVersionIdBeforeMessage?: ?string,
     projectVersionIdAfterMessage?: ?string,
-  |},
-  options?: GenerationApiOptions
+  |}
 ): Promise<void> => {
   const authorizationHeader = await getAuthorizationHeader();
-  await getGenerationApiClient(options).patch(
+  await apiClient.patch(
     `/ai-request/${aiRequestId}/message/${aiRequestMessageId}`,
     {
       projectVersionIdBeforeMessage,
@@ -600,11 +575,10 @@ export const sendAiRequestFeedback = async (
     feedback: 'like' | 'dislike',
     reason?: string,
     freeFormDetails?: string,
-  |},
-  options?: GenerationApiOptions
+  |}
 ): Promise<AiRequest> => {
   const authorizationHeader = await getAuthorizationHeader();
-  const response = await getGenerationApiClient(options).post(
+  const response = await apiClient.post(
     `/ai-request/${aiRequestId}/action/set-feedback`,
     {
       gdevelopVersionWithHash: getIDEVersionWithHash(),
@@ -645,11 +619,10 @@ export const getAiRequestSuggestions = async (
     gameProjectJsonUserRelativeKey: string | null,
     projectSpecificExtensionsSummaryJson: string | null,
     projectSpecificExtensionsSummaryJsonUserRelativeKey: string | null,
-  |},
-  options?: GenerationApiOptions
+  |}
 ): Promise<AiRequest> => {
   const authorizationHeader = await getAuthorizationHeader();
-  const response = await getGenerationApiClient(options).post(
+  const response = await apiClient.post(
     `/ai-request/${aiRequestId}/action/get-suggestions`,
     {
       suggestionsType,
@@ -719,11 +692,10 @@ export const createAiGeneratedEvent = async (
     placementHint: string | null,
     relatedAiRequestId: string,
     estimatedComplexity: number | null,
-  |},
-  options?: GenerationApiOptions
+  |}
 ): Promise<CreateAiGeneratedEventResult> => {
   const authorizationHeader = await getAuthorizationHeader();
-  const response = await getGenerationApiClient(options).post(
+  const response = await apiClient.post(
     `/ai-generated-event`,
     {
       gdevelopVersionWithHash: getIDEVersionWithHash(),
@@ -786,11 +758,10 @@ export const getAiGeneratedEvent = async (
   }: {|
     userId: string,
     aiGeneratedEventId: string,
-  |},
-  options?: GenerationApiOptions
+  |}
 ): Promise<AiGeneratedEvent> => {
   const authorizationHeader = await getAuthorizationHeader();
-  const response = await getGenerationApiClient(options).get(
+  const response = await apiClient.get(
     `/ai-generated-event/${aiGeneratedEventId}`,
     {
       params: {
@@ -828,11 +799,10 @@ export const createAssetSearch = async (
     relatedAiRequestId?: string | null,
     lastUserMessage?: string | null,
     lastAssistantMessages?: string[],
-  |},
-  options?: GenerationApiOptions
+  |}
 ): Promise<AssetSearch> => {
   const authorizationHeader = await getAuthorizationHeader();
-  const response = await getGenerationApiClient(options).post(
+  const response = await apiClient.post(
     `/asset-search`,
     {
       gdevelopVersionWithHash: getIDEVersionWithHash(),
@@ -869,11 +839,10 @@ export const createResourceSearch = async (
     userId: string,
     searchTerms: string,
     resourceKind: string,
-  |},
-  options?: GenerationApiOptions
+  |}
 ): Promise<ResourceSearch> => {
   const authorizationHeader = await getAuthorizationHeader();
-  const response = await getGenerationApiClient(options).post(
+  const response = await apiClient.post(
     `/resource-search`,
     {
       gdevelopVersionWithHash: getIDEVersionWithHash(),
@@ -915,11 +884,10 @@ export const createAiUserContentPresignedUrls = async (
     gameProjectJsonHash: string | null,
     projectSpecificExtensionsSummaryJsonHash: string | null,
     eventsJsonHash: string | null,
-  |},
-  options?: GenerationApiOptions
+  |}
 ): Promise<AiUserContentPresignedUrlsResult> => {
   const authorizationHeader = await getAuthorizationHeader();
-  const response = await getGenerationApiClient(options).post(
+  const response = await apiClient.post(
     `/ai-user-content/action/create-presigned-urls`,
     {
       gdevelopVersionWithHash: getIDEVersionWithHash(),
@@ -965,11 +933,10 @@ export const forkAiRequest = async (
     userId: string,
     aiRequestId: string,
     upToMessageId?: string,
-  |},
-  options?: GenerationApiOptions
+  |}
 ): Promise<AiRequest> => {
   const authorizationHeader = await getAuthorizationHeader();
-  const response = await getGenerationApiClient(options).post(
+  const response = await apiClient.post(
     `/ai-request/${aiRequestId}/action/fork`,
     {
       upToMessageId,

@@ -86,6 +86,8 @@ import { isMacLike } from '../Utils/Platform';
 import optionalRequire from '../Utils/OptionalRequire';
 import { useShouldAutofocusInput } from '../UI/Responsive/ScreenTypeMeasurer';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
+import PreferencesIcon from '../UI/CustomSvgIcons/Preferences';
+import classes from './ProjectManager.module.css';
 
 const electron = optionalRequire('electron');
 
@@ -95,7 +97,6 @@ export const getProjectManagerItemId = (identifier: string): string =>
 const gameSettingsRootFolderId = getProjectManagerItemId('game-settings');
 const gamePropertiesItemId = getProjectManagerItemId('game-properties');
 const gameDashboardItemId = 'manage';
-const globalVariablesItemId = getProjectManagerItemId('global-variables');
 const gameResourcesItemId = getProjectManagerItemId('game-resources');
 export const scenesRootFolderId: string = getProjectManagerItemId('scenes');
 export const extensionsRootFolderId: string = getProjectManagerItemId(
@@ -1063,14 +1064,6 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                     ),
                     new LeafTreeViewItem(
                       new ActionTreeViewItemContent(
-                        globalVariablesItemId,
-                        i18n._(t`Global variables`),
-                        openProjectVariables,
-                        'res/icons_default/global_variable24_black.svg'
-                      )
-                    ),
-                    new LeafTreeViewItem(
-                      new ActionTreeViewItemContent(
                         gameResourcesItemId,
                         i18n._(t`Resources`),
                         onOpenResources,
@@ -1248,7 +1241,6 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         onOpenGamesDashboardDialog,
         onOpenResources,
         openProjectProperties,
-        openProjectVariables,
         openSearchExtensionDialog,
         project,
         sceneTreeViewItemProps,
@@ -1319,6 +1311,13 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
     ] = React.useState<Array<number>>([]);
     const isNavigatingInMainMenuItem = selectedMainMenuItemIndices.length > 0;
     const shouldHideMainMenu = isMacLike() && !!electron;
+    const openPreferencesFromQuickLink = React.useCallback(
+      () => {
+        mainMenuCallbacks.onOpenPreferences(true);
+        toggleProjectManager();
+      },
+      [mainMenuCallbacks, toggleProjectManager]
+    );
 
     // Unselect items when the project manager is closed.
     React.useEffect(
@@ -1364,6 +1363,23 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                   />
                 </Column>
               </Line>
+            )}
+            {!isNavigatingInMainMenuItem && project && (
+              <div className={classes.quickLinkContainer}>
+                <button
+                  type="button"
+                  className={classes.quickLinkButton}
+                  onClick={openPreferencesFromQuickLink}
+                >
+                  <PreferencesIcon
+                    className={classes.quickLinkIcon}
+                    fontSize="small"
+                  />
+                  <span className={classes.quickLinkLabel}>
+                    <Trans>Preferences</Trans>
+                  </span>
+                </button>
+              </div>
             )}
             <I18n>
               {({ i18n }) => (

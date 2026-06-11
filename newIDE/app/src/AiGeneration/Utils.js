@@ -475,12 +475,7 @@ export const useAiRequestState = ({
 } => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const { profile } = authenticatedUser;
-  const {
-    service: aiServiceConfig,
-    userId,
-    getAuthorizationHeader,
-    isGDevelopCloudService,
-  } = useAiGenerationService();
+  const { userId, getAuthorizationHeader } = useAiGenerationService();
   const {
     aiRequestStorage,
     editorFunctionCallResultsStorage,
@@ -627,7 +622,6 @@ export const useAiRequestState = ({
           : null;
         const preparedAiUserContent = await prepareAiUserContent({
           getAuthorizationHeader,
-          aiServiceConfig,
           userId,
           simplifiedProjectJson,
           projectSpecificExtensionsSummaryJson,
@@ -653,9 +647,6 @@ export const useAiRequestState = ({
                 preparedAiUserContent.projectSpecificExtensionsSummaryJsonUserRelativeKey,
               projectSpecificExtensionsSummaryJson:
                 preparedAiUserContent.projectSpecificExtensionsSummaryJson,
-            },
-            {
-              aiServiceConfig,
             }
           );
 
@@ -700,7 +691,6 @@ export const useAiRequestState = ({
       selectedAiRequest,
       userId,
       getAuthorizationHeader,
-      aiServiceConfig,
       project,
       getEditorFunctionCallResults,
       updateAiRequest,
@@ -723,7 +713,7 @@ export const useAiRequestState = ({
         shouldSaveVersionBeforeMessage: boolean,
         shouldSaveVersionAfterMessage: boolean,
       |}) {
-        if (!selectedAiRequest || !profile || !isGDevelopCloudService) return;
+        if (!selectedAiRequest || !profile) return;
 
         const projectVersionIdBeforeMessage = shouldSaveVersionBeforeMessage
           ? version
@@ -732,19 +722,13 @@ export const useAiRequestState = ({
           ? version
           : undefined;
 
-        await updateAiRequestMessage(
-          getAuthorizationHeader,
-          {
-            userId: profile.id,
-            aiRequestId: selectedAiRequest.id,
-            aiRequestMessageId: lastMessageId,
-            projectVersionIdBeforeMessage,
-            projectVersionIdAfterMessage,
-          },
-          {
-            aiServiceConfig,
-          }
-        );
+        await updateAiRequestMessage(getAuthorizationHeader, {
+          userId: profile.id,
+          aiRequestId: selectedAiRequest.id,
+          aiRequestMessageId: lastMessageId,
+          projectVersionIdBeforeMessage,
+          projectVersionIdAfterMessage,
+        });
         // Update the request with the project version, merging with the latest state
         updateAiRequest(selectedAiRequest.id, prevRequest => {
           if (!prevRequest) {
@@ -799,7 +783,6 @@ export const useAiRequestState = ({
           isSendingAiRequest(selectedAiRequest.id) ||
           !selectedAiRequest.output ||
           selectedAiRequest.output.length === 0 ||
-          !isGDevelopCloudService ||
           !profile ||
           !project ||
           !onSave ||
@@ -992,8 +975,6 @@ export const useAiRequestState = ({
       selectedAiRequest,
       profile,
       getAuthorizationHeader,
-      aiServiceConfig,
-      isGDevelopCloudService,
       project,
       getEditorFunctionCallResults,
       updateAiRequest,
@@ -1010,7 +991,7 @@ export const useAiRequestState = ({
 
   React.useEffect(
     () => {
-      // Reset selected request if the selected AI service cannot be used.
+      // Reset selected request if the user is not logged in.
       if (!userId) {
         setSelectedAiRequestId(null);
       }
@@ -1025,16 +1006,10 @@ export const useAiRequestState = ({
       if (selectedAiRequestId && !selectedAiRequest && userId) {
         (async () => {
           try {
-            const fetchedRequest = await getAiRequest(
-              getAuthorizationHeader,
-              {
-                userId,
-                aiRequestId: selectedAiRequestId,
-              },
-              {
-                aiServiceConfig,
-              }
-            );
+            const fetchedRequest = await getAiRequest(getAuthorizationHeader, {
+              userId,
+              aiRequestId: selectedAiRequestId,
+            });
             // Add it to the storage
             updateAiRequest(selectedAiRequestId, () => fetchedRequest);
           } catch (error) {
@@ -1053,7 +1028,6 @@ export const useAiRequestState = ({
       selectedAiRequest,
       userId,
       getAuthorizationHeader,
-      aiServiceConfig,
       updateAiRequest,
       setSelectedAiRequestId,
     ]

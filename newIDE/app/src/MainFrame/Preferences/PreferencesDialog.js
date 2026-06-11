@@ -28,14 +28,6 @@ import AlertMessage from '../../UI/AlertMessage';
 import ErrorBoundary from '../../UI/ErrorBoundary';
 import CompactSelectField from '../../UI/CompactSelectField';
 import TextField from '../../UI/TextField';
-import {
-  createCustomAiServiceConfig,
-  getAiServiceConfigs,
-  gdevelopCloudAiServiceId,
-  parseAiGenerationServicePresets,
-  serializeAiGenerationServicePresets,
-  type AiGenerationServiceConfig,
-} from '../../AiGeneration/AiService';
 const electron = optionalRequire('electron');
 
 type Props = {|
@@ -95,8 +87,6 @@ const PreferencesDialog = ({
     setTakeScreenshotOnPreview,
     setShowAiAskButtonInTitleBar,
     setAutomaticallyUseCreditsForAiRequests,
-    setAiGenerationServices,
-    setSelectedAiGenerationServiceId,
     setEnableMcpServer,
     setMcpServerPort,
     setMcpServerAuthorizationToken,
@@ -110,22 +100,6 @@ const PreferencesDialog = ({
   } = React.useContext(PreferencesContext);
 
   const initialUse3DEditor = React.useRef<boolean>(values.use3DEditor);
-  const aiGenerationServices = getAiServiceConfigs({
-    aiGenerationServices: values.aiGenerationServices,
-  });
-  const selectedAiGenerationServiceId = aiGenerationServices.some(
-    service => service.id === values.selectedAiGenerationServiceId
-  )
-    ? values.selectedAiGenerationServiceId
-    : gdevelopCloudAiServiceId;
-  const selectedCustomAiGenerationService =
-    values.aiGenerationServices.find(
-      service => service.id === selectedAiGenerationServiceId
-    ) || null;
-  const [
-    aiGenerationServicePresetsText,
-    setAiGenerationServicePresetsText,
-  ] = React.useState<string>('');
   const [mcpServerState, setMcpServerState] = React.useState<{
     isRunning: boolean,
     port: ?number,
@@ -138,42 +112,22 @@ const PreferencesDialog = ({
     error: null,
   });
 
-  const refreshMcpServerState = React.useCallback(
-    () => {
-      if (!electron || !electron.ipcRenderer) return;
-      electron.ipcRenderer
-        .invoke('mcp-server-get-state')
-        .then(state => {
-          if (state) setMcpServerState(state);
-        })
-        .catch(error => {
-          setMcpServerState({
-            isRunning: false,
-            port: null,
-            url: null,
-            error: error && error.message ? error.message : String(error),
-          });
+  const refreshMcpServerState = React.useCallback(() => {
+    if (!electron || !electron.ipcRenderer) return;
+    electron.ipcRenderer
+      .invoke('mcp-server-get-state')
+      .then(state => {
+        if (state) setMcpServerState(state);
+      })
+      .catch(error => {
+        setMcpServerState({
+          isRunning: false,
+          port: null,
+          url: null,
+          error: error && error.message ? error.message : String(error),
         });
-    },
-    []
-  );
-
-  React.useEffect(
-    () => {
-      setAiGenerationServicePresetsText(
-        selectedCustomAiGenerationService
-          ? serializeAiGenerationServicePresets(
-              selectedCustomAiGenerationService.aiConfigurationPresets
-            )
-          : ''
-      );
-    },
-    [
-      selectedCustomAiGenerationService
-        ? selectedCustomAiGenerationService.id
-        : null,
-    ]
-  );
+      });
+  }, []);
 
   React.useEffect(
     () => {
@@ -186,151 +140,6 @@ const PreferencesDialog = ({
       values.mcpServerPort,
       values.mcpServerAuthorizationToken,
     ]
-  );
-
-  const updateSelectedCustomAiGenerationService = (
-    updates: Partial<AiGenerationServiceConfig>
-  ) => {
-    if (!selectedCustomAiGenerationService) return;
-
-    setAiGenerationServices(
-      values.aiGenerationServices.map(service =>
-        service.id === selectedCustomAiGenerationService.id
-          ? {
-              ...service,
-              ...updates,
-            }
-          : service
-      )
-    );
-  };
-
-  const addCustomAiGenerationService = () => {
-    const service = createCustomAiServiceConfig({
-      id: `custom-${Date.now()}`,
-    });
-
-    setAiGenerationServices([...values.aiGenerationServices, service]);
-    setSelectedAiGenerationServiceId(service.id);
-  };
-
-  const removeSelectedCustomAiGenerationService = () => {
-    if (!selectedCustomAiGenerationService) return;
-
-    setAiGenerationServices(
-      values.aiGenerationServices.filter(
-        service => service.id !== selectedCustomAiGenerationService.id
-      )
-    );
-    setSelectedAiGenerationServiceId(gdevelopCloudAiServiceId);
-  };
-
-  const aiServicesPreferences = (
-    <ColumnStackLayout noMargin>
-      <Text size="block-title">
-        <Trans>AI services</Trans>
-      </Text>
-      <LineStackLayout noMargin alignItems="center">
-        <Column noMargin expand>
-          <Text noMargin>
-            <Trans>AI service</Trans>
-          </Text>
-        </Column>
-        <Column noMargin expand>
-          <CompactSelectField
-            value={selectedAiGenerationServiceId}
-            onChange={(value: string) =>
-              setSelectedAiGenerationServiceId(value)
-            }
-          >
-            {aiGenerationServices.map(service => (
-              <SelectOption
-                key={service.id}
-                value={service.id}
-                label={service.name}
-              />
-            ))}
-          </CompactSelectField>
-        </Column>
-      </LineStackLayout>
-      <LineStackLayout noMargin>
-        <FlatButton
-          label={<Trans>Add local AI service</Trans>}
-          primary={false}
-          onClick={addCustomAiGenerationService}
-        />
-        <FlatButton
-          label={<Trans>Remove selected AI service</Trans>}
-          primary={false}
-          disabled={!selectedCustomAiGenerationService}
-          onClick={removeSelectedCustomAiGenerationService}
-        />
-      </LineStackLayout>
-      {selectedCustomAiGenerationService && (
-        <ColumnStackLayout noMargin>
-          <TextField
-            value={selectedCustomAiGenerationService.name}
-            floatingLabelText={<Trans>Name</Trans>}
-            onChange={(event, value) =>
-              updateSelectedCustomAiGenerationService({ name: value })
-            }
-            fullWidth
-          />
-          <TextField
-            value={selectedCustomAiGenerationService.baseUrl}
-            floatingLabelText={<Trans>Base URL</Trans>}
-            hintText="http://localhost:3210/generation"
-            onChange={(event, value) =>
-              updateSelectedCustomAiGenerationService({
-                baseUrl: value,
-              })
-            }
-            fullWidth
-          />
-          <TextField
-            value={selectedCustomAiGenerationService.authorizationHeader}
-            floatingLabelText={<Trans>Authorization header</Trans>}
-            hintText="Bearer ..."
-            onChange={(event, value) =>
-              updateSelectedCustomAiGenerationService({
-                authorizationHeader: value,
-              })
-            }
-            fullWidth
-          />
-          <TextField
-            value={selectedCustomAiGenerationService.userId}
-            floatingLabelText={<Trans>User ID</Trans>}
-            hintText="local-user"
-            onChange={(event, value) =>
-              updateSelectedCustomAiGenerationService({
-                userId: value,
-              })
-            }
-            fullWidth
-          />
-          <TextField
-            value={aiGenerationServicePresetsText}
-            floatingLabelText={
-              <Trans>AI configuration presets (optional)</Trans>
-            }
-            hintText="default|chat|Default|default"
-            helperMarkdownText={i18n._(
-              t`One preset per line: id|mode|name|default. Modes: chat, agent or orchestrator. Leave empty to hide the selector.`
-            )}
-            multiline
-            rows={3}
-            onChange={(event, value) => {
-              setAiGenerationServicePresetsText(value);
-              updateSelectedCustomAiGenerationService({
-                aiConfigurationPresets: parseAiGenerationServicePresets(value),
-              });
-            }}
-            fullWidth
-          />
-        </ColumnStackLayout>
-      )}
-    </ColumnStackLayout>
   );
 
   const mcpServerPreferences = (
@@ -445,7 +254,6 @@ const PreferencesDialog = ({
           onChange={setCurrentTab}
           options={[
             { value: 'preferences', label: <Trans>Preferences</Trans> },
-            { value: 'ai-services', label: <Trans>AI services</Trans> },
             ...(electron
               ? [{ value: 'mcp-server', label: <Trans>MCP server</Trans> }]
               : []),
@@ -1029,7 +837,6 @@ const PreferencesDialog = ({
           )}
         </ColumnStackLayout>
       )}
-      {currentTab === 'ai-services' && aiServicesPreferences}
       {electron && currentTab === 'mcp-server' && mcpServerPreferences}
       {currentTab === 'shortcuts' && (
         <Line expand>

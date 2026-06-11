@@ -29,11 +29,7 @@ export const useSearchAndInstallAsset = ({
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
 |}): _FuncReturnType => {
-  const {
-    service: aiServiceConfig,
-    userId,
-    getAuthorizationHeader,
-  } = useAiGenerationService();
+  const { userId, getAuthorizationHeader } = useAiGenerationService();
   const { getAssetShortHeaderFromId } = React.useContext(AssetStoreContext);
   const installAsset = useInstallAsset({
     project,
@@ -51,7 +47,7 @@ export const useSearchAndInstallAsset = ({
         exactOrPartialAssetId,
         ...assetSearchOptions
       }: AssetSearchAndInstallOptions): Promise<AssetSearchAndInstallResult> => {
-        if (!userId) throw new Error('AI service should be configured.');
+        if (!userId) throw new Error('You must be logged in to use AI.');
 
         let assetShortHeader;
         if (exactOrPartialAssetId) {
@@ -91,18 +87,12 @@ export const useSearchAndInstallAsset = ({
           const assetSearch: AssetSearch = await retryIfFailed(
             { times: 3, backoff: { initialDelay: 300, factor: 2 } },
             () =>
-              createAssetSearch(
-                getAuthorizationHeader,
-                {
-                  userId,
-                  objectType,
-                  exactOrPartialAssetId,
-                  ...assetSearchOptions,
-                },
-                {
-                  aiServiceConfig,
-                }
-              )
+              createAssetSearch(getAuthorizationHeader, {
+                userId,
+                objectType,
+                exactOrPartialAssetId,
+                ...assetSearchOptions,
+              })
           );
           if (!assetSearch.results || assetSearch.results.length === 0) {
             return {
@@ -150,13 +140,7 @@ export const useSearchAndInstallAsset = ({
             installOutput.isTheFirstOfItsTypeInProject,
         };
       },
-      [
-        installAsset,
-        userId,
-        getAuthorizationHeader,
-        aiServiceConfig,
-        getAssetShortHeaderFromId,
-      ]
+      [installAsset, userId, getAuthorizationHeader, getAssetShortHeaderFromId]
     ),
   };
 };

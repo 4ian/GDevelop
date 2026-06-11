@@ -5,7 +5,6 @@ import {
   createAiUserContentPresignedUrls,
   type AiUserContentPresignedUrlsResult,
 } from '../Utils/GDevelopServices/Generation';
-import { type AiGenerationServiceConfig } from './AiService';
 import jsSHA from '../Utils/Sha256';
 
 type UploadInfo = {
@@ -124,14 +123,12 @@ const computeSha256 = (payload: string): string => {
  */
 export const prepareAiUserContent = async ({
   getAuthorizationHeader,
-  aiServiceConfig,
   userId,
   simplifiedProjectJson,
   projectSpecificExtensionsSummaryJson,
   eventsJson,
 }: {|
   getAuthorizationHeader: () => Promise<?string>,
-  aiServiceConfig?: AiGenerationServiceConfig,
   userId: string,
   simplifiedProjectJson: string | null,
   projectSpecificExtensionsSummaryJson: string | null,
@@ -156,9 +153,7 @@ export const prepareAiUserContent = async ({
     : null;
   const eventsJsonHash = eventsJson ? computeSha256(eventsJson) : null;
   const endTime = Date.now();
-  const uploadCacheNamespace = aiServiceConfig
-    ? `${aiServiceConfig.id}:${aiServiceConfig.baseUrl}:${userId}`
-    : `default:${userId}`;
+  const uploadCacheNamespace = `default:${userId}`;
   console.info(
     `Hash of simplified project json and project specific extensions summary json took ${(
       endTime - startTime
@@ -203,22 +198,16 @@ export const prepareAiUserContent = async ({
     }: AiUserContentPresignedUrlsResult = await retryIfFailed(
       { times: 3 },
       () =>
-        createAiUserContentPresignedUrls(
-          getAuthorizationHeader,
-          {
-            userId,
-            gameProjectJsonHash: shouldUploadGameProjectJson
-              ? gameProjectJsonHash
-              : null,
-            projectSpecificExtensionsSummaryJsonHash: shouldUploadProjectSpecificExtensionsSummary
-              ? projectSpecificExtensionsSummaryJsonHash
-              : null,
-            eventsJsonHash: shouldUploadEventsJson ? eventsJsonHash : null,
-          },
-          {
-            aiServiceConfig,
-          }
-        )
+        createAiUserContentPresignedUrls(getAuthorizationHeader, {
+          userId,
+          gameProjectJsonHash: shouldUploadGameProjectJson
+            ? gameProjectJsonHash
+            : null,
+          projectSpecificExtensionsSummaryJsonHash: shouldUploadProjectSpecificExtensionsSummary
+            ? projectSpecificExtensionsSummaryJsonHash
+            : null,
+          eventsJsonHash: shouldUploadEventsJson ? eventsJsonHash : null,
+        })
     );
 
     const uploadedAt = Date.now();

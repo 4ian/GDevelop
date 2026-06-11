@@ -142,11 +142,7 @@ const emptyPaginationState: PaginationState = {
 };
 
 export const useAiRequestsStorage = (): AiRequestStorage => {
-  const {
-    service: aiServiceConfig,
-    userId,
-    getAuthorizationHeader,
-  } = useAiGenerationService();
+  const { userId, getAuthorizationHeader } = useAiGenerationService();
 
   const [state, setState] = React.useState<PaginationState>(
     emptyPaginationState
@@ -166,16 +162,10 @@ export const useAiRequestsStorage = (): AiRequestStorage => {
       setError(null);
 
       try {
-        const history = await getAiRequests(
-          getAuthorizationHeader,
-          {
-            userId,
-            forceUri: null, // Fetch the first page.
-          },
-          {
-            aiServiceConfig,
-          }
-        );
+        const history = await getAiRequests(getAuthorizationHeader, {
+          userId,
+          forceUri: null, // Fetch the first page.
+        });
         if (!history) return;
         const aiRequestsById = history.aiRequests.reduce(
           (accumulator, aiRequest) => {
@@ -196,7 +186,7 @@ export const useAiRequestsStorage = (): AiRequestStorage => {
         setIsLoading(false);
       }
     },
-    [userId, getAuthorizationHeader, aiServiceConfig]
+    [userId, getAuthorizationHeader]
   );
 
   const onLoadMoreAiRequests = React.useCallback(
@@ -207,16 +197,10 @@ export const useAiRequestsStorage = (): AiRequestStorage => {
       setError(null);
 
       try {
-        const history = await getAiRequests(
-          getAuthorizationHeader,
-          {
-            userId,
-            forceUri: state.nextPageUri,
-          },
-          {
-            aiServiceConfig,
-          }
-        );
+        const history = await getAiRequests(getAuthorizationHeader, {
+          userId,
+          forceUri: state.nextPageUri,
+        });
         if (!history) return;
         const newRequests = history.aiRequests;
         const currentRequestsById = state.aiRequests;
@@ -238,13 +222,7 @@ export const useAiRequestsStorage = (): AiRequestStorage => {
         setIsLoading(false);
       }
     },
-    [
-      userId,
-      getAuthorizationHeader,
-      aiServiceConfig,
-      state.nextPageUri,
-      state.aiRequests,
-    ]
+    [userId, getAuthorizationHeader, state.nextPageUri, state.aiRequests]
   );
 
   const updateAiRequest = React.useCallback(
@@ -274,16 +252,10 @@ export const useAiRequestsStorage = (): AiRequestStorage => {
       if (!userId) return;
 
       try {
-        const updatedAiRequest = await getAiRequest(
-          getAuthorizationHeader,
-          {
-            userId,
-            aiRequestId: aiRequestId,
-          },
-          {
-            aiServiceConfig,
-          }
-        );
+        const updatedAiRequest = await getAiRequest(getAuthorizationHeader, {
+          userId,
+          aiRequestId: aiRequestId,
+        });
         updateAiRequest(updatedAiRequest.id, () => updatedAiRequest);
       } catch (error) {
         console.error(
@@ -292,7 +264,7 @@ export const useAiRequestsStorage = (): AiRequestStorage => {
         );
       }
     },
-    [getAuthorizationHeader, userId, aiServiceConfig, updateAiRequest]
+    [getAuthorizationHeader, userId, updateAiRequest]
   );
 
   React.useEffect(
@@ -300,7 +272,7 @@ export const useAiRequestsStorage = (): AiRequestStorage => {
       setState(emptyPaginationState);
       setForkingState(null);
     },
-    [aiServiceConfig.id, aiServiceConfig.baseUrl, userId]
+    [userId]
   );
 
   // Store send states in a ref so that isSendingAiRequest reads are
@@ -548,11 +520,7 @@ export const AiRequestProvider = ({
   const aiRequestStorage = useAiRequestsStorage();
   const aiRequestHistory = useAiRequestHistory(aiRequestStorage);
 
-  const {
-    service: aiServiceConfig,
-    userId,
-    getAuthorizationHeader,
-  } = useAiGenerationService();
+  const { userId, getAuthorizationHeader } = useAiGenerationService();
   const [selectedAiRequestId, setSelectedAiRequestId] = React.useState<
     string | null
   >(null);
@@ -564,7 +532,7 @@ export const AiRequestProvider = ({
     () => {
       setSelectedAiRequestId(null);
     },
-    [aiServiceConfig.id, aiServiceConfig.baseUrl, userId]
+    [userId]
   );
 
   const [shouldWatchRequest, setShouldWatchRequest] = React.useState<boolean>(
@@ -607,16 +575,10 @@ export const AiRequestProvider = ({
       if (shouldDoFullFetch) {
         lastFullFetchTimeRef.current = now;
         const aiRequest = await retryIfFailed({ times: 2 }, () =>
-          getAiRequest(
-            getAuthorizationHeader,
-            {
-              userId,
-              aiRequestId: selectedAiRequestId,
-            },
-            {
-              aiServiceConfig,
-            }
-          )
+          getAiRequest(getAuthorizationHeader, {
+            userId,
+            aiRequestId: selectedAiRequestId,
+          })
         );
 
         updateAiRequest(selectedAiRequestId, () => aiRequest);
@@ -629,9 +591,6 @@ export const AiRequestProvider = ({
             userId,
             aiRequestId: selectedAiRequestId,
             include: 'status',
-          },
-          {
-            aiServiceConfig,
           }
         );
 
@@ -645,16 +604,10 @@ export const AiRequestProvider = ({
           // Status changed — do a full fetch immediately to get the latest data.
           lastFullFetchTimeRef.current = now;
           const aiRequest = await retryIfFailed({ times: 2 }, () =>
-            getAiRequest(
-              getAuthorizationHeader,
-              {
-                userId,
-                aiRequestId: selectedAiRequestId,
-              },
-              {
-                aiServiceConfig,
-              }
-            )
+            getAiRequest(getAuthorizationHeader, {
+              userId,
+              aiRequestId: selectedAiRequestId,
+            })
           );
 
           updateAiRequest(selectedAiRequestId, () => aiRequest);
@@ -808,16 +761,10 @@ export const AiRequestProvider = ({
         const doFullFetch = async () => {
           subAgentLastFullFetchTimeRef.current[subAgentId] = now;
           const aiRequest = await retryIfFailed({ times: 2 }, () =>
-            getAiRequest(
-              getAuthorizationHeader,
-              {
-                userId,
-                aiRequestId: subAgentId,
-              },
-              {
-                aiServiceConfig,
-              }
-            )
+            getAiRequest(getAuthorizationHeader, {
+              userId,
+              aiRequestId: subAgentId,
+            })
           );
           updateAiRequest(subAgentId, () => aiRequest);
 
@@ -836,9 +783,6 @@ export const AiRequestProvider = ({
                 userId,
                 aiRequestId: subAgentId,
                 include: 'status',
-              },
-              {
-                aiServiceConfig,
               }
             );
 

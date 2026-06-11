@@ -190,12 +190,7 @@ export const AskAiStandAloneForm = ({
     onRefreshLimits,
     subscription,
   } = React.useContext(AuthenticatedUserContext);
-  const {
-    service: aiServiceConfig,
-    userId,
-    getAuthorizationHeader,
-    isGDevelopCloudService,
-  } = useAiGenerationService();
+  const { userId, getAuthorizationHeader } = useAiGenerationService();
 
   const { isRefreshingLimits, refreshLimits } = useRefreshLimits(
     onRefreshLimits
@@ -207,20 +202,11 @@ export const AskAiStandAloneForm = ({
     !!limits.capabilities.classrooms &&
     limits.capabilities.classrooms.hideAskAi;
 
-  const availableCredits =
-    isGDevelopCloudService && limits ? limits.credits.userBalance.amount : 0;
+  const availableCredits = limits ? limits.credits.userBalance.amount : 0;
   const quota =
-    (isGDevelopCloudService &&
-      limits &&
-      limits.quotas &&
-      limits.quotas['consumed-ai-credits']) ||
-    null;
+    (limits && limits.quotas && limits.quotas['consumed-ai-credits']) || null;
   const aiRequestPrice =
-    (isGDevelopCloudService &&
-      limits &&
-      limits.credits &&
-      limits.credits.prices['ai-request']) ||
-    null;
+    (limits && limits.credits && limits.credits.prices['ai-request']) || null;
   const aiRequestPriceInCredits = aiRequestPrice
     ? aiRequestPrice.priceInCredits
     : null;
@@ -229,12 +215,10 @@ export const AskAiStandAloneForm = ({
   // we display the proper quota and credits information for the user.
   React.useEffect(
     () => {
-      if (isGDevelopCloudService) {
-        refreshLimits();
-      }
+      refreshLimits();
     },
     // Only on mount, we'll refresh again when sending an AI request.
-    [isGDevelopCloudService, refreshLimits]
+    [refreshLimits]
   );
 
   // Trigger the start of the new AI request if the user has requested it
@@ -247,9 +231,7 @@ export const AskAiStandAloneForm = ({
         console.info('Starting a new AI request...');
 
         if (!userId) {
-          if (isGDevelopCloudService) {
-            onOpenCreateAccountDialog();
-          }
+          onOpenCreateAccountDialog();
           startNewAiRequest(null);
           return;
         }
@@ -265,12 +247,7 @@ export const AskAiStandAloneForm = ({
         // Ensure the user has enough credits to pay for the request, or ask them
         // to buy some more.
         let payWithCredits = false;
-        if (
-          isGDevelopCloudService &&
-          quota &&
-          quota.limitReached &&
-          aiRequestPriceInCredits
-        ) {
+        if (quota && quota.limitReached && aiRequestPriceInCredits) {
           payWithCredits = true;
           const doesNotHaveEnoughCreditsToContinue =
             availableCredits < aiRequestPriceInCredits;
@@ -294,41 +271,34 @@ export const AskAiStandAloneForm = ({
 
           const preparedAiUserContent = await prepareAiUserContent({
             getAuthorizationHeader,
-            aiServiceConfig,
             userId,
             simplifiedProjectJson: null,
             projectSpecificExtensionsSummaryJson: null,
             eventsJson: null,
           });
 
-          const aiRequest = await createAiRequest(
-            getAuthorizationHeader,
-            {
-              userRequest: userRequest,
-              userId,
-              gameProjectJsonUserRelativeKey:
-                preparedAiUserContent.gameProjectJsonUserRelativeKey,
-              gameProjectJson: preparedAiUserContent.gameProjectJson,
-              projectSpecificExtensionsSummaryJsonUserRelativeKey:
-                preparedAiUserContent.projectSpecificExtensionsSummaryJsonUserRelativeKey,
-              projectSpecificExtensionsSummaryJson:
-                preparedAiUserContent.projectSpecificExtensionsSummaryJson,
-              payWithCredits,
-              gameId: null, // No game associated when starting from the standalone form.
-              fileMetadata: null, // No file metadata when starting from the standalone form.
-              storageProviderName,
-              mode: aiRequestModeForForm,
-              toolsVersion: AI_ORCHESTRATOR_TOOLS_VERSION,
-              aiConfiguration: aiConfigurationPresetId
-                ? {
-                    presetId: aiConfigurationPresetId,
-                  }
-                : null,
-            },
-            {
-              aiServiceConfig,
-            }
-          );
+          const aiRequest = await createAiRequest(getAuthorizationHeader, {
+            userRequest: userRequest,
+            userId,
+            gameProjectJsonUserRelativeKey:
+              preparedAiUserContent.gameProjectJsonUserRelativeKey,
+            gameProjectJson: preparedAiUserContent.gameProjectJson,
+            projectSpecificExtensionsSummaryJsonUserRelativeKey:
+              preparedAiUserContent.projectSpecificExtensionsSummaryJsonUserRelativeKey,
+            projectSpecificExtensionsSummaryJson:
+              preparedAiUserContent.projectSpecificExtensionsSummaryJson,
+            payWithCredits,
+            gameId: null, // No game associated when starting from the standalone form.
+            fileMetadata: null, // No file metadata when starting from the standalone form.
+            storageProviderName,
+            mode: aiRequestModeForForm,
+            toolsVersion: AI_ORCHESTRATOR_TOOLS_VERSION,
+            aiConfiguration: aiConfigurationPresetId
+              ? {
+                  presetId: aiConfigurationPresetId,
+                }
+              : null,
+          });
 
           console.info('Successfully created a new AI request:', aiRequest);
           setSendingAiRequest(null, false);
@@ -360,18 +330,14 @@ export const AskAiStandAloneForm = ({
 
         // Refresh the user limits, to ensure quota and credits information
         // is up-to-date after an AI request.
-        if (isGDevelopCloudService) {
-          await delay(500);
-          await refreshLimits({ withRetry: true });
-        }
+        await delay(500);
+        await refreshLimits({ withRetry: true });
       })();
     },
     [
       aiRequestPriceInCredits,
       availableCredits,
-      aiServiceConfig,
       getAuthorizationHeader,
-      isGDevelopCloudService,
       onOpenCreateAccountDialog,
       refreshLimits,
       userId,
@@ -463,7 +429,6 @@ export const AskAiStandAloneForm = ({
 
         const preparedAiUserContent = await prepareAiUserContent({
           getAuthorizationHeader,
-          aiServiceConfig,
           userId,
           simplifiedProjectJson,
           projectSpecificExtensionsSummaryJson,
@@ -471,35 +436,29 @@ export const AskAiStandAloneForm = ({
         });
 
         const aiRequest: AiRequest = await retryIfFailed({ times: 2 }, () =>
-          addMessageToAiRequest(
-            getAuthorizationHeader,
-            {
-              userId,
-              aiRequestId,
-              functionCallOutputs,
-              gameProjectJsonUserRelativeKey:
-                preparedAiUserContent.gameProjectJsonUserRelativeKey,
-              gameProjectJson: preparedAiUserContent.gameProjectJson,
-              projectSpecificExtensionsSummaryJsonUserRelativeKey:
-                preparedAiUserContent.projectSpecificExtensionsSummaryJsonUserRelativeKey,
-              projectSpecificExtensionsSummaryJson:
-                preparedAiUserContent.projectSpecificExtensionsSummaryJson,
-              gameId: upToDateProject
-                ? upToDateProject.getProjectUuid()
-                : undefined,
-              payWithCredits: false,
-              userMessage: '', // No user message when sending only function call outputs.
-              // We don't pause when creating the request as we are in orchestrator mode.
-              // If we switch back to agent mode for the standalone form in the future,
-              // check if it has just initialized the project to mark it as paused.
-              paused: false,
-              mode: aiRequestModeForForm,
-              toolsVersion: AI_ORCHESTRATOR_TOOLS_VERSION,
-            },
-            {
-              aiServiceConfig,
-            }
-          )
+          addMessageToAiRequest(getAuthorizationHeader, {
+            userId,
+            aiRequestId,
+            functionCallOutputs,
+            gameProjectJsonUserRelativeKey:
+              preparedAiUserContent.gameProjectJsonUserRelativeKey,
+            gameProjectJson: preparedAiUserContent.gameProjectJson,
+            projectSpecificExtensionsSummaryJsonUserRelativeKey:
+              preparedAiUserContent.projectSpecificExtensionsSummaryJsonUserRelativeKey,
+            projectSpecificExtensionsSummaryJson:
+              preparedAiUserContent.projectSpecificExtensionsSummaryJson,
+            gameId: upToDateProject
+              ? upToDateProject.getProjectUuid()
+              : undefined,
+            payWithCredits: false,
+            userMessage: '', // No user message when sending only function call outputs.
+            // We don't pause when creating the request as we are in orchestrator mode.
+            // If we switch back to agent mode for the standalone form in the future,
+            // check if it has just initialized the project to mark it as paused.
+            paused: false,
+            mode: aiRequestModeForForm,
+            toolsVersion: AI_ORCHESTRATOR_TOOLS_VERSION,
+          })
         );
         updateAiRequest(aiRequest.id, () => aiRequest);
         setSendingAiRequest(aiRequest.id, false);
@@ -521,14 +480,11 @@ export const AskAiStandAloneForm = ({
 
       // Refresh the user limits, to ensure quota and credits information
       // is up-to-date after an AI request.
-      if (isGDevelopCloudService) {
-        await delay(500);
-        await refreshLimits({ withRetry: true });
-      }
+      await delay(500);
+      await refreshLimits({ withRetry: true });
     },
     [
       userId,
-      aiServiceConfig,
       aiRequestIdForForm,
       aiRequests,
       isSendingAiRequest,
@@ -538,7 +494,6 @@ export const AskAiStandAloneForm = ({
       getAuthorizationHeader,
       setLastSendError,
       project,
-      isGDevelopCloudService,
       refreshLimits,
     ]
   );
@@ -637,7 +592,7 @@ export const AskAiStandAloneForm = ({
       </LineStackLayout>
       <AiRequestChat
         aiConfigurationPresetsWithAvailability={getAiConfigurationPresetsWithAvailability(
-          { limits, getAiSettings, aiGenerationServiceConfig: aiServiceConfig }
+          { limits, getAiSettings }
         )}
         project={project}
         fileMetadata={fileMetadata}
@@ -666,9 +621,7 @@ export const AskAiStandAloneForm = ({
         lastSendError={getLastSendError(aiRequestIdForForm)}
         quota={quota}
         increaseQuotaOffering={
-          !isGDevelopCloudService
-            ? 'none'
-            : !hasValidSubscriptionPlan(subscription)
+          !hasValidSubscriptionPlan(subscription)
             ? 'subscribe'
             : canUpgradeSubscription(subscription)
             ? 'upgrade'

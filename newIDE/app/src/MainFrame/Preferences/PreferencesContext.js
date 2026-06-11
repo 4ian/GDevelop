@@ -11,7 +11,6 @@ import { type ShortcutMap } from '../../KeyboardShortcuts/DefaultShortcuts';
 import { type CommandName } from '../../CommandPalette/CommandsList';
 import { type EditorTabsPersistedState } from '../EditorTabs/EditorTabsHandler';
 import { type GamesDashboardOrderBy } from '../../GameDashboard/GamesList';
-import { type AiGenerationServiceConfig } from '../../AiGeneration/AiService';
 import optionalRequire from '../../Utils/OptionalRequire';
 import { findDefaultFolder } from '../../ProjectsStorage/LocalFileStorageProvider/LocalPathFinder';
 import { isWebGLSupported } from '../../Utils/WebGL';
@@ -278,8 +277,6 @@ export type PreferencesValues = {|
   takeScreenshotOnPreview: boolean,
   showAiAskButtonInTitleBar: boolean,
   automaticallyUseCreditsForAiRequests: boolean,
-  aiGenerationServices: Array<AiGenerationServiceConfig>,
-  selectedAiGenerationServiceId: string,
   enableMcpServer: boolean,
   mcpServerPort: number,
   mcpServerAuthorizationToken: string,
@@ -411,12 +408,6 @@ export type Preferences = {|
   setTakeScreenshotOnPreview: (enabled: boolean) => void,
   setShowAiAskButtonInTitleBar: (enabled: boolean) => void,
   setAutomaticallyUseCreditsForAiRequests: (enabled: boolean) => void,
-  setAiGenerationServices: (
-    aiGenerationServices: Array<AiGenerationServiceConfig>
-  ) => void,
-  setSelectedAiGenerationServiceId: (
-    selectedAiGenerationServiceId: string
-  ) => void,
   setEnableMcpServer: (enabled: boolean) => void,
   setMcpServerPort: (port: number) => void,
   setMcpServerAuthorizationToken: (token: string) => void,
@@ -488,8 +479,6 @@ export const initialPreferences = {
     takeScreenshotOnPreview: true,
     showAiAskButtonInTitleBar: true,
     automaticallyUseCreditsForAiRequests: false,
-    aiGenerationServices: ([]: Array<AiGenerationServiceConfig>),
-    selectedAiGenerationServiceId: 'gdevelop-cloud',
     enableMcpServer: false,
     mcpServerPort: 32110,
     mcpServerAuthorizationToken: '',
@@ -584,8 +573,6 @@ export const initialPreferences = {
   setTakeScreenshotOnPreview: (enabled: boolean) => {},
   setShowAiAskButtonInTitleBar: (enabled: boolean) => {},
   setAutomaticallyUseCreditsForAiRequests: (enabled: boolean) => {},
-  setAiGenerationServices: () => {},
-  setSelectedAiGenerationServiceId: () => {},
   setEnableMcpServer: (enabled: boolean) => {},
   setMcpServerPort: (port: number) => {},
   setMcpServerAuthorizationToken: (token: string) => {},

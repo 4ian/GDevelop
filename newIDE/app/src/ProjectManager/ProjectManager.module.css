@@ -1,0 +1,40 @@
+.quickLinkContainer {
+  padding: 4px 8px;
+}
+
+.quickLinkButton {
+  align-items: center;
+  background-color: transparent;
+  border: 0;
+  border-radius: 6px;
+  color: var(--theme-text-default-color);
+  cursor: pointer;
+  display: flex;
+  font-family: var(--gdevelop-modern-font-family);
+  font-size: 14px;
+  gap: 6px;
+  height: 32px;
+  padding: 0 21px;
+  text-align: left;
+  width: 100%;
+}
+
+.quickLinkButton:hover,
+.quickLinkButton:focus-visible {
+  background-color: var(--theme-list-item-hover-background-color);
+}
+
+.quickLinkButton:focus {
+  outline: none;
+}
+
+.quickLinkIcon {
+  color: var(--theme-text-default-color);
+  flex-shrink: 0;
+}
+
+.quickLinkLabel {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

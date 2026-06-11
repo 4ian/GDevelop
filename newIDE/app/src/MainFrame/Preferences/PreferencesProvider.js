@@ -87,7 +87,6 @@ export const loadPreferencesFromLocalStorage = (): ?PreferencesValues => {
 export const getInitialPreferences = (): {
   autoDisplayChangelog: boolean,
   autoDownloadUpdates: boolean,
-  aiGenerationServices: Array<any>,
   autoOpenMostRecentProject: boolean,
   automaticallyUseCreditsForAiRequests: boolean,
   autosaveOnPreview: boolean,
@@ -138,7 +137,6 @@ export const getInitialPreferences = (): {
   showEffectParameterNames: boolean,
   showExperimentalExtensions: boolean,
   showInAppTutorialDeveloperMode: boolean,
-  selectedAiGenerationServiceId: string,
   takeScreenshotOnPreview: boolean,
   themeName: any,
   use3DEditor: any,
@@ -434,12 +432,6 @@ export default class PreferencesProvider extends React.Component<Props, State> {
       this
     ): any),
     // $FlowFixMe[method-unbinding]
-    setAiGenerationServices: (this._setAiGenerationServices.bind(this): any),
-    // $FlowFixMe[method-unbinding]
-    setSelectedAiGenerationServiceId: (this._setSelectedAiGenerationServiceId.bind(
-      this
-    ): any),
-    // $FlowFixMe[method-unbinding]
     setEnableMcpServer: (this._setEnableMcpServer.bind(this): any),
     // $FlowFixMe[method-unbinding]
     setMcpServerPort: (this._setMcpServerPort.bind(this): any),
@@ -480,9 +472,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
   }
 
   componentDidUpdate(prevProps: Props, prevState: State) {
-    if (
-      hasMcpServerConfigurationChanged(prevState.values, this.state.values)
-    ) {
+    if (hasMcpServerConfigurationChanged(prevState.values, this.state.values)) {
       this._notifyMcpServerConfiguration();
     }
   }
@@ -1488,30 +1478,6 @@ export default class PreferencesProvider extends React.Component<Props, State> {
         values: {
           ...state.values,
           automaticallyUseCreditsForAiRequests: newValue,
-        },
-      }),
-      () => this._persistValuesToLocalStorage(this.state)
-    );
-  }
-
-  _setAiGenerationServices(newValue: any) {
-    this.setState(
-      state => ({
-        values: {
-          ...state.values,
-          aiGenerationServices: newValue,
-        },
-      }),
-      () => this._persistValuesToLocalStorage(this.state)
-    );
-  }
-
-  _setSelectedAiGenerationServiceId(newValue: string) {
-    this.setState(
-      state => ({
-        values: {
-          ...state.values,
-          selectedAiGenerationServiceId: newValue,
         },
       }),
       () => this._persistValuesToLocalStorage(this.state)

@@ -36,11 +36,7 @@ export const useGenerateEvents = ({
 }: {|
   project: ?gdProject,
 |}): UseGenerateEventsReturnType => {
-  const {
-    service: aiServiceConfig,
-    userId,
-    getAuthorizationHeader,
-  } = useAiGenerationService();
+  const { userId, getAuthorizationHeader } = useAiGenerationService();
 
   const generateEvents = React.useCallback(
     async ({
@@ -67,7 +63,7 @@ export const useGenerateEvents = ({
       estimatedComplexity: number | null,
     |}): Promise<EventsGenerationResult> => {
       if (!project) throw new Error('No project is opened.');
-      if (!userId) throw new Error('AI service should be configured.');
+      if (!userId) throw new Error('You must be logged in to use AI.');
 
       const simplifiedProjectBuilder = makeSimplifiedProjectBuilder(gd);
       const simplifiedProjectJson = JSON.stringify(
@@ -80,7 +76,6 @@ export const useGenerateEvents = ({
       try {
         const preparedAiUserContent = await prepareAiUserContent({
           getAuthorizationHeader,
-          aiServiceConfig,
           userId,
           simplifiedProjectJson,
           projectSpecificExtensionsSummaryJson,
@@ -90,34 +85,28 @@ export const useGenerateEvents = ({
         const createResult = await retryIfFailed(
           { times: 3, backoff: { initialDelay: 200, factor: 2 } },
           () =>
-            createAiGeneratedEvent(
-              getAuthorizationHeader,
-              {
-                userId,
-                gameProjectJsonUserRelativeKey:
-                  preparedAiUserContent.gameProjectJsonUserRelativeKey,
-                gameProjectJson: preparedAiUserContent.gameProjectJson,
-                projectSpecificExtensionsSummaryJsonUserRelativeKey:
-                  preparedAiUserContent.projectSpecificExtensionsSummaryJsonUserRelativeKey,
-                projectSpecificExtensionsSummaryJson:
-                  preparedAiUserContent.projectSpecificExtensionsSummaryJson,
-                existingEventsJsonUserRelativeKey:
-                  preparedAiUserContent.eventsJsonUserRelativeKey,
-                existingEventsJson: preparedAiUserContent.eventsJson,
-                sceneName,
-                eventsDescription,
-                eventBatches,
-                extensionNamesList,
-                objectsList,
-                existingEventsAsText,
-                placementHint,
-                relatedAiRequestId,
-                estimatedComplexity,
-              },
-              {
-                aiServiceConfig,
-              }
-            )
+            createAiGeneratedEvent(getAuthorizationHeader, {
+              userId,
+              gameProjectJsonUserRelativeKey:
+                preparedAiUserContent.gameProjectJsonUserRelativeKey,
+              gameProjectJson: preparedAiUserContent.gameProjectJson,
+              projectSpecificExtensionsSummaryJsonUserRelativeKey:
+                preparedAiUserContent.projectSpecificExtensionsSummaryJsonUserRelativeKey,
+              projectSpecificExtensionsSummaryJson:
+                preparedAiUserContent.projectSpecificExtensionsSummaryJson,
+              existingEventsJsonUserRelativeKey:
+                preparedAiUserContent.eventsJsonUserRelativeKey,
+              existingEventsJson: preparedAiUserContent.eventsJson,
+              sceneName,
+              eventsDescription,
+              eventBatches,
+              extensionNamesList,
+              objectsList,
+              existingEventsAsText,
+              placementHint,
+              relatedAiRequestId,
+              estimatedComplexity,
+            })
         );
 
         if (!createResult.creationSucceeded) {
@@ -139,9 +128,6 @@ export const useGenerateEvents = ({
               {
                 userId,
                 aiGeneratedEventId: aiGeneratedEvent.id,
-              },
-              {
-                aiServiceConfig,
               }
             );
           } catch (error) {
@@ -174,7 +160,7 @@ export const useGenerateEvents = ({
         };
       }
     },
-    [getAuthorizationHeader, project, userId, aiServiceConfig]
+    [getAuthorizationHeader, project, userId]
   );
 
   return { generateEvents };

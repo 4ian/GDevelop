@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react';
 import { type I18n as I18nType } from '@lingui/core';
+import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import { exceptionallyGuardAgainstDeadObject } from '../Utils/IsNullPtr';
 import { I18n } from '@lingui/react';
 import {
@@ -18,7 +19,7 @@ import {
   createAiRequest,
   sendAiRequestFeedback,
   forkAiRequest,
-  suspendAiRequest,
+  suspendAiRequest as apiSuspendAiRequest,
   getAiRequest,
   type AiRequest,
   type AiRequestMessage,
@@ -41,7 +42,6 @@ import { retryIfFailed } from '../Utils/RetryIfFailed';
 import { type EditorCallbacks } from '../EditorFunctions';
 import {
   aiRequestHasWorkInProgress,
-  getFunctionCallNameByCallId,
   getFunctionCallOutputsFromEditorFunctionCallResults,
   getFunctionCallsToProcess,
 } from './AiRequestUtils';
@@ -79,11 +79,12 @@ import {
   useActivatePendingSubAgents,
   useLoadSubAgentRequests,
   useRefreshLimits,
-  getToolsVersionForAiRequestMode,
+  AI_ORCHESTRATOR_TOOLS_VERSION,
 } from './Utils';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import UnsavedChangesContext from '../MainFrame/UnsavedChangesContext';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
+import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import { t } from '@lingui/macro';
 import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/Errors';
 import { SubscriptionContext } from '../Profile/Subscription/SubscriptionContext';
@@ -214,17 +215,19 @@ export type AskAiEditorInterface = {|
   notifyChangesToInGameEditor: (hotReloadSteps: HotReloadSteps) => void,
   switchInGameEditorIfNoHotReloadIsNeeded: () => void,
   /**
-   * Call before closing this tab to reposition it to a different pane.
-   * Prevents the unmount cleanup from suspending the active AI request,
-   * since the tab is being moved rather than intentionally closed.
+   * Call whenever the AI editor is about to be closed (tab cross, pane close,
+   * mobile drawer close, "close all/other tabs", project close...). If an AI
+   * request is currently working, the user is asked to confirm — closing stops
+   * the AI — and the request is suspended on confirmation. Returns true if the
+   * close should proceed, false if the user cancelled (keep the editor open).
+   *
+   * This is the single place where a running AI request is suspended on close.
+   * Suspending is therefore only ever triggered by explicit, known user actions
+   * (this method or the "Stop" button), never as a side effect of unmounting —
+   * so repositioning the tab or switching between the mobile/desktop layouts
+   * never stops the AI.
    */
-  prepareToReposition: () => void,
-  /**
-   * Call when the mobile drawer is closed. On mobile the component is never
-   * unmounted, so the unmount cleanup never fires — this method provides the
-   * equivalent suspend trigger for the drawer close event.
-   */
-  suspendOnDrawerClose: () => void,
+  requestClose: () => Promise<boolean>,
 |};
 
 const noop = () => {};
@@ -345,6 +348,16 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
         startNewAiRequest,
       ] = React.useState<NewAiRequestOptions | null>(null);
 
+      // "Auto edit" is a frontend-only toggle owned by the chat UI. We keep its
+      // live value in a ref here so function-call processing can gate
+      // project-modifying tools behind a confirmation when it is off, without
+      // re-rendering the whole container on every toggle.
+      const isAutoEditEnabledRef = React.useRef<boolean>(true);
+      const getIsAutoEditEnabled = React.useCallback(
+        () => isAutoEditEnabledRef.current,
+        []
+      );
+
       const [isHistoryOpen, setIsHistoryOpen] = React.useState<boolean>(false);
 
       const { openSubscriptionDialog } = React.useContext(SubscriptionContext);
@@ -363,7 +376,8 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
         [forkingState, selectedAiRequest, setForkingState]
       );
 
-      const { showAlert, showConfirmation } = useAlertDialog();
+      const { showAlert, showConfirmation, showYesNoCancel } = useAlertDialog();
+      const { isMobile } = useResponsiveWindowSize();
 
       const [
         isReadyToProcessFunctionCalls,
@@ -399,6 +413,10 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
         aiRequestStorage,
         editorFunctionCallResultsStorage,
         getAiSettings,
+        suspendAiRequest,
+        pendingEditApproval,
+        requestEditApproval,
+        resolveEditApproval,
       } = React.useContext(AiRequestContext);
       const {
         getEditorFunctionCallResults,
@@ -454,11 +472,11 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
       // we display the proper quota and credits information for the user.
       React.useEffect(
         () => {
-          if (isActive) {
+          if (isActive && profile) {
             refreshLimits();
           }
         },
-        [isActive, refreshLimits]
+        [isActive, profile, refreshLimits]
       );
 
       // Trigger the start of the new AI request if the user has requested it
@@ -543,7 +561,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
                 fileMetadata,
                 storageProviderName,
                 mode,
-                toolsVersion: getToolsVersionForAiRequestMode(mode),
+                toolsVersion: AI_ORCHESTRATOR_TOOLS_VERSION,
                 aiConfiguration: {
                   presetId: aiConfigurationPresetId,
                 },
@@ -622,14 +640,12 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
           createdSceneNames,
           createdProject,
           editorFunctionCallResults,
-          newMode,
         }: {|
           aiRequestId: string,
           userMessage: string,
           createdSceneNames?: Array<string>,
           createdProject?: ?gdProject,
           editorFunctionCallResults: Array<EditorFunctionCallResult>,
-          newMode?: 'chat' | 'agent' | 'orchestrator',
         |}) => {
           if (!profile) return;
 
@@ -727,17 +743,6 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
               eventsJson: null,
             });
 
-            // If we're updating the request, following a function call to initialize the project,
-            // pause the request, so that suggestions can be given by the agent.
-            const hasJustInitializedProject =
-              functionCallOutputs.length > 0 &&
-              functionCallOutputs.some(
-                output =>
-                  getFunctionCallNameByCallId({
-                    aiRequest: aiRequestForMessage,
-                    callId: output.call_id,
-                  }) === 'initialize_project'
-              );
             if (
               editorFunctionCallResults &&
               editorFunctionCallResults.some(
@@ -747,9 +752,6 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
             ) {
               triggerUnsavedChanges();
             }
-
-            const modeForThisMessage =
-              newMode || aiRequestForMessage.mode || 'chat';
 
             const aiRequest: AiRequest = await retryIfFailed({ times: 2 }, () =>
               addMessageToAiRequest(getAuthorizationHeader, {
@@ -768,12 +770,14 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
                   : undefined,
                 payWithCredits,
                 userMessage,
-                paused:
-                  hasJustInitializedProject && modeForThisMessage === 'agent',
-                //  These are defined only if there is a mode change:
-                mode: newMode,
-                toolsVersion: newMode
-                  ? getToolsVersionForAiRequestMode(newMode)
+                // All requests made by the user are in orchestrator mode: set
+                // it (and the tools version) when a user message is sent, in
+                // case an older request made with another mode is being
+                // continued. Don't set it otherwise, as this can be a message
+                // sent to a sub-agent request (explorer or edit agent).
+                mode: userMessage ? 'orchestrator' : undefined,
+                toolsVersion: userMessage
+                  ? AI_ORCHESTRATOR_TOOLS_VERSION
                   : undefined,
               })
             );
@@ -791,7 +795,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
                   ? projectSpecificExtensionsSummaryJson.length
                   : 0,
                 payWithCredits,
-                mode: modeForThisMessage,
+                mode: 'orchestrator',
                 aiRequestId: aiRequest.id,
                 outputLength: aiRequest.output ? aiRequest.output.length : 0,
               });
@@ -891,7 +895,10 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
         [selectedAiRequest, activeSubAgents, aiRequests]
       );
 
-      const { onProcessFunctionCalls } = useProcessFunctionCalls({
+      const {
+        onProcessFunctionCalls,
+        clearApprovedEditBatches,
+      } = useProcessFunctionCalls({
         project,
         resourceManagementProps,
         editorCallbacks,
@@ -907,6 +914,9 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
         onWillInstallExtension,
         onExtensionInstalled,
         isReadyToProcessFunctionCalls,
+        getIsAutoEditEnabled,
+        suspendAiRequest,
+        requestEditApproval,
       });
 
       // Wrap onProcessFunctionCalls to bind the selected AI request for the chat UI.
@@ -939,26 +949,28 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
             aiRequestId: string | null,
           |}
         ) => {
-          if (options) {
-            // Suspend the current request when navigating away from it.
-            // upToDateOnStop is defined below - it is always up-to-date via the ref.
-            if (
-              selectedAiRequest &&
-              options.aiRequestId !== selectedAiRequest.id
-            ) {
-              // upToDateOnStop is declared below this callback, but it is only
-              // ever called at event-handler time (post-render), so it is always
-              // initialised by the time this runs.
-              // eslint-disable-next-line no-use-before-define
-              upToDateOnStop.current().catch(err => {
-                console.error(
-                  'Failed to suspend AI request when starting new chat:',
-                  err
-                );
+          if (!options) return;
+          const { aiRequestId } = options;
+          // When navigating away from a working request, ask the user to confirm
+          // stopping it (or to cancel). Unlike closing the editor, we do NOT
+          // offer to keep it running in the background here: a request you have
+          // navigated away from while opening another chat would be confusing.
+          if (selectedAiRequest && aiRequestId !== selectedAiRequest.id) {
+            // upToDateConfirmStopping is declared below this callback, but it is
+            // only ever called at event-handler time (post-render), so it is
+            // always initialised by the time this runs.
+            // eslint-disable-next-line no-use-before-define
+            upToDateConfirmStopping
+              .current({
+                title: t`Open another chat?`,
+                message: t`The AI is currently working on your project. Opening another chat will stop it. Do you want to continue?`,
+              })
+              .then(shouldProceed => {
+                if (shouldProceed) setSelectedAiRequestId(aiRequestId);
               });
-            }
-            setSelectedAiRequestId(options.aiRequestId);
+            return;
           }
+          setSelectedAiRequestId(aiRequestId);
         },
         // eslint-disable-next-line react-hooks/exhaustive-deps
         [setSelectedAiRequestId, selectedAiRequest]
@@ -1006,15 +1018,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
         startOrOpenChat: onStartOrOpenChat,
         notifyChangesToInGameEditor: setEditorHotReloadNeeded,
         switchInGameEditorIfNoHotReloadIsNeeded: noop,
-        prepareToReposition: () => {
-          skipSuspendOnCloseRef.current = true;
-        },
-        suspendOnDrawerClose: () => {
-          if (skipSuspendOnCloseRef.current) return;
-          upToDateOnStop.current().catch(err => {
-            console.error('Failed to suspend AI request on drawer close:', err);
-          });
-        },
+        requestClose,
       }));
 
       const onSendFeedback = React.useCallback(
@@ -1049,49 +1053,115 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
         [getAuthorizationHeader, profile]
       );
 
-      const onStop = React.useCallback(
-        async () => {
-          if (!selectedAiRequest || !profile) return;
+      const getHasWorkInProgress = React.useCallback(
+        () => {
+          if (!selectedAiRequest) return false;
           const editorFunctionCallResultsForRequest =
             getEditorFunctionCallResults(selectedAiRequest.id) || [];
-          if (
-            !aiRequestHasWorkInProgress(
-              selectedAiRequest,
-              editorFunctionCallResultsForRequest
-            )
-          )
-            return;
-          // Optimistic update: mark as suspended locally immediately so that
-          // any in-flight async code (e.g. processEditorFunctionCalls,
-          // prepareAiUserContent) sees the suspended status after the next
-          // React render — before the API call even completes.
-          const requestIdToSuspend = selectedAiRequest.id;
-          updateAiRequest(requestIdToSuspend, prevRequest => ({
-            ...(prevRequest || selectedAiRequest),
-            status: 'suspended',
-          }));
-          clearEditorFunctionCallResults(requestIdToSuspend);
-
-          const suspendedRequest = await suspendAiRequest(
-            getAuthorizationHeader,
-            {
-              userId: profile.id,
-              aiRequestId: requestIdToSuspend,
-            }
+          return aiRequestHasWorkInProgress(
+            selectedAiRequest,
+            editorFunctionCallResultsForRequest
           );
-          updateAiRequest(suspendedRequest.id, () => suspendedRequest);
         },
-        [
-          selectedAiRequest,
-          profile,
-          getAuthorizationHeader,
-          updateAiRequest,
-          clearEditorFunctionCallResults,
-          getEditorFunctionCallResults,
-        ]
+        [selectedAiRequest, getEditorFunctionCallResults]
+      );
+
+      const onStop = React.useCallback(
+        async () => {
+          if (!selectedAiRequest) return;
+          if (!getHasWorkInProgress()) return;
+          // Delegates to the provider so the suspend logic lives in a single
+          // place and also works when triggered outside of this editor.
+          await suspendAiRequest(selectedAiRequest.id);
+        },
+        [selectedAiRequest, getHasWorkInProgress, suspendAiRequest]
       );
 
       const upToDateOnStop = useStableUpToDateRef(onStop);
+
+      // Shared confirmation used whenever the user leaves a working AI request —
+      // either by closing the editor or by opening another chat. Asks whether
+      // the AI should keep working in the background, be stopped, or whether the
+      // action should be cancelled. Returns true if the caller should proceed
+      // (and suspends the request when the user chose "Stop working"). This is
+      // the only place, besides the "Stop" button, that suspends a request.
+      const confirmLeavingWorkingRequest = React.useCallback(
+        async ({
+          title,
+          message,
+        }: {|
+          title: MessageDescriptor,
+          message: MessageDescriptor,
+        |}): Promise<boolean> => {
+          if (!getHasWorkInProgress()) return true;
+          const answer = await showYesNoCancel({
+            title,
+            message,
+            // Primary action (right): keep the request running. Shorter labels
+            // on mobile so the three buttons don't wrap onto two lines.
+            yesButtonLabel: isMobile ? t`Continue` : t`Continue working`,
+            // Secondary action (right): stop the request, then proceed.
+            noButtonLabel: isMobile ? t`Stop` : t`Stop working`,
+            // Left action: do not proceed.
+            cancelButtonLabel: t`Cancel`,
+          });
+          // showYesNoCancel resolves with 0 (yes), 1 (no) or 2 (cancel).
+          // $FlowFixMe[invalid-compare] - resolves to a number, not a boolean.
+          if (answer === 2) {
+            // Cancel: do nothing, keep the request and the editor as-is.
+            return false;
+          }
+          // $FlowFixMe[invalid-compare] - resolves to a number, not a boolean.
+          if (answer === 1) {
+            // Stop working: suspend the request, then allow the action.
+            await upToDateOnStop.current();
+          }
+          // Continue working (0): proceed without suspending — the request keeps
+          // running in the background.
+          return true;
+        },
+        [getHasWorkInProgress, showYesNoCancel, upToDateOnStop, isMobile]
+      );
+
+      // Called when the AI editor is about to be closed by an explicit user
+      // action (see AskAiEditorInterface.requestClose).
+      const requestClose = React.useCallback(
+        (): Promise<boolean> =>
+          confirmLeavingWorkingRequest({
+            title: t`Close the AI chat?`,
+            message: t`The AI is currently working on your project. Should it continue working while the tab is closed?`,
+          }),
+        [confirmLeavingWorkingRequest]
+      );
+
+      // Used when leaving a working request in a context where keeping it
+      // running in the background would be confusing (opening another chat, or
+      // closing the project that the AI is working on). Only offers to stop the
+      // request or cancel. Returns true if the action should proceed.
+      const confirmStoppingWorkingRequest = React.useCallback(
+        async ({
+          title,
+          message,
+        }: {|
+          title: MessageDescriptor,
+          message: MessageDescriptor,
+        |}): Promise<boolean> => {
+          if (!getHasWorkInProgress()) return true;
+          const shouldStop = await showConfirmation({
+            title,
+            message,
+            confirmButtonLabel: t`Stop working`,
+            dismissButtonLabel: t`Cancel`,
+          });
+          if (!shouldStop) return false;
+          await upToDateOnStop.current();
+          return true;
+        },
+        [getHasWorkInProgress, showConfirmation, upToDateOnStop]
+      );
+      const upToDateConfirmStopping = useStableUpToDateRef(
+        confirmStoppingWorkingRequest
+      );
 
       // Do a full fetch when the tab is opened to ensure the UI starts with
       // up-to-date server state (e.g. request may have been suspended while
@@ -1116,31 +1186,11 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
         []
       );
 
-      // When set to true before unmount, the cleanup will skip suspending the
-      // AI request (used when the tab is being repositioned to another pane).
-      const skipSuspendOnCloseRef = React.useRef(false);
-
-      // Suspend any running AI request when this editor tab is closed.
-      React.useEffect(
-        () => {
-          return () => {
-            if (skipSuspendOnCloseRef.current) {
-              // Tab is being repositioned to another pane — do not suspend.
-              return;
-            }
-            // Fire and forget - cannot await in a cleanup function.
-            // We intentionally read upToDateOnStop.current at cleanup time so
-            // we get the latest selectedAiRequest snapshot (that's the point of
-            // the stable ref).
-            // eslint-disable-next-line react-hooks/exhaustive-deps
-            upToDateOnStop.current().catch(err => {
-              console.error('Failed to suspend AI request on tab close:', err);
-            });
-          };
-        },
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        []
-      );
+      // NB: the AI request is intentionally NOT suspended on unmount. Suspending
+      // only happens through explicit user actions — the "Stop" button or
+      // requestClose() (tab/pane/drawer/project close) — so unmounting for any
+      // other reason (repositioning the tab, switching between the mobile and
+      // desktop layouts, re-rendering...) never stops a running request.
 
       const onRestore = React.useCallback(
         async ({
@@ -1414,21 +1464,27 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
                 onStartNewAiRequest={startNewAiRequest}
                 onSendUserMessage={async ({
                   userMessage,
-                  mode,
                 }: {|
                   userMessage: string,
-                  mode: 'chat' | 'agent' | 'orchestrator',
                 |}) => {
                   if (!selectedAiRequestId) return;
                   await onSendMessage({
                     aiRequestId: selectedAiRequestId,
                     userMessage,
-                    newMode: mode,
                     editorFunctionCallResults: selectedAiRequest
                       ? getEditorFunctionCallResults(selectedAiRequest.id) || []
                       : [],
                   });
                 }}
+                onIsAutoEditEnabledChange={enabled => {
+                  isAutoEditEnabledRef.current = enabled;
+                  // Toggling auto-edit revokes any blanket approvals already
+                  // granted in the current sub-agent batch, so turning it on
+                  // then off again re-prompts for the upcoming edits.
+                  clearApprovedEditBatches();
+                }}
+                pendingEditApproval={pendingEditApproval}
+                onResolveEditApproval={resolveEditApproval}
                 isSending={isSendingAiRequest(selectedAiRequestId)}
                 isSendingUserMessage={isSendingUserMessage}
                 lastSendError={getLastSendError(selectedAiRequestId)}
@@ -1478,7 +1534,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
                 profile
               ) {
                 try {
-                  requestToOpen = await suspendAiRequest(
+                  requestToOpen = await apiSuspendAiRequest(
                     getAuthorizationHeader,
                     {
                       userId: profile.id,

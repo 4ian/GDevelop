@@ -644,6 +644,28 @@
           "comment": "Palette/Grey/30 and alpha"
         }
       }
+    },
+    "auto-edit": {
+      "off": {
+        "background-color": {
+          "value": "#C5C5C9",
+          "comment": "Palette/Grey/30"
+        },
+        "text-color": {
+          "value": "#A6A6AB",
+          "comment": "Palette/Grey/40"
+        }
+      },
+      "on": {
+        "background-color": {
+          "value": "#45D9A1",
+          "comment": "Palette/Green/40"
+        },
+        "text-color": {
+          "value": "#1D1D26",
+          "comment": "Palette/Grey/100"
+        }
+      }
     }
   },
   "input": {

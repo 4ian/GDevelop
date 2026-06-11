@@ -20,6 +20,7 @@ import { useIsMounted } from '../Utils/UseIsMounted';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import Window from '../Utils/Window';
 import { isMacLike } from '../Utils/Platform';
+import { AiRequestContext } from '../AiGeneration/AiRequestContext';
 
 const WINDOW_DRAGGABLE_PART_CLASS_NAME = 'title-bar-draggable-part';
 const WINDOW_NON_DRAGGABLE_PART_CLASS_NAME = 'title-bar-non-draggable-part';
@@ -118,6 +119,10 @@ export default function TabsTitlebar({
   const isTouchscreen = useScreenType() === 'touch';
   const preferences = React.useContext(PreferencesContext);
   const { limits } = React.useContext(AuthenticatedUserContext);
+  const { getWorkingAiRequest } = React.useContext(AiRequestContext);
+  // True when an AI request is still working — even if its tab/panel is closed,
+  // since the request lives in the app-level AiRequestContext.
+  const isAiWorking = !!getWorkingAiRequest();
   const [tooltipData, setTooltipData] = React.useState<?{|
     element: HTMLElement,
     editorTab: EditorTab,
@@ -223,6 +228,10 @@ export default function TabsTitlebar({
     [shouldDisplayAskAi, triggerGlow]
   );
 
+  // While an AI request is working (and the button is shown), flash the button
+  // every 5 seconds to keep signalling that it is still working.
+  useInterval(triggerGlow, shouldDisplayAskAi && isAiWorking ? 5000 : null);
+
   const handleDoubleClick = React.useCallback(() => {
     // On macOS, double-clicking the title bar should maximize/restore the window
     if (isMacLike()) {
@@ -267,7 +276,12 @@ export default function TabsTitlebar({
         >
           <div className={isGlowing ? classes.askAiGlow : undefined}>
             <TextButton
-              icon={<RobotIcon size={16} rotating={isAskAiIconAnimated} />}
+              icon={
+                <RobotIcon
+                  size={16}
+                  rotating={isAskAiIconAnimated || isAiWorking}
+                />
+              }
               label={'Ask AI'}
               onClick={onAskAiClicked}
             />

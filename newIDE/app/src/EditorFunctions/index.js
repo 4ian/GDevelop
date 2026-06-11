@@ -36,6 +36,7 @@ import {
 import { retryIfFailed } from '../Utils/RetryIfFailed';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import { type AssetShortHeader } from '../Utils/GDevelopServices/Asset';
+import { type ExampleShortHeader } from '../Utils/GDevelopServices/Example';
 import { swapAsset } from '../AssetStore/AssetSwapper';
 import { type EnsureExtensionInstalledOptions } from '../AiGeneration/UseEnsureExtensionInstalled';
 import { getObjectFolderOrObjectWithContextFromObjectName } from '../SceneEditor/ObjectFolderOrObjectsSelection';
@@ -249,6 +250,9 @@ type RenderForEditorOptions = {|
   editorCallbacks: EditorCallbacks,
   shouldShowDetails: boolean,
   editorFunctionCallResultOutput: any,
+  // Loaded examples from the example store, when available, so a function can
+  // resolve a template slug to its display name. May be null while still loading.
+  exampleShortHeaders?: ?Array<ExampleShortHeader>,
 |};
 
 export type RelatedAiRequestLastMessages = {|
@@ -309,7 +313,10 @@ export type LaunchFunctionOptionsWithProject = {|
  * A function that does something in the editor on the given project.
  */
 export type EditorFunction = {|
-  renderForEditor: (
+  // Optional: a function with no renderForEditor renders nothing in the chat
+  // (e.g. backend-only tools, or the plan shown separately). Such calls are
+  // skipped in ChatMessages so they don't create an empty bubble.
+  renderForEditor?: (
     options: RenderForEditorOptions
   ) => {|
     text: React.Node,
@@ -327,7 +334,10 @@ export type EditorFunction = {|
  * A function that does something in the editor.
  */
 export type EditorFunctionWithoutProject = {|
-  renderForEditor: (
+  // Optional: a function with no renderForEditor renders nothing in the chat
+  // (e.g. backend-only tools, or the plan shown separately). Such calls are
+  // skipped in ChatMessages so they don't create an empty bubble.
+  renderForEditor?: (
     options: RenderForEditorOptions
   ) => {|
     text: React.Node,
@@ -5281,11 +5291,8 @@ const addOrEditVariable: EditorFunction = {
 };
 
 const createOrUpdatePlan: EditorFunction = {
-  renderForEditor: ({ args }) => {
-    return {
-      text: <Trans>Update the plan.</Trans>,
-    };
-  },
+  // No renderForEditor: handled server-side and shown separately via the
+  // OrchestratorPlan component, so nothing to render as a function call.
   launchFunction: async ({ args }) => {
     return makeGenericFailure(
       `Unable to create or update plan - this is handled server-side.`
@@ -5322,6 +5329,49 @@ const searchDocs: EditorFunction = {
   launchFunction: async ({ args }) => {
     return makeGenericFailure(
       `Unable to read full documentation - continue with your existing GDevelop knowledge.`
+    );
+  },
+  modifiesProject: false,
+};
+
+const getGameStarterSummary: EditorFunctionWithoutProject = {
+  // Handled entirely on the backend to inform planning, but still shown in the
+  // chat so the user can see the AI is studying a starter template.
+  renderForEditor: ({ args, exampleShortHeaders }) => {
+    const templateSlug = SafeExtractor.extractStringProperty(
+      args,
+      'template_slug'
+    );
+
+    // Prefer the real example name from the store (when loaded). Otherwise fall
+    // back to humanizing the slug (e.g. "starting-first-person-shooter" ->
+    // "First Person Shooter"), then to a generic label.
+    const matchingExample =
+      templateSlug && exampleShortHeaders
+        ? exampleShortHeaders.find(
+            exampleShortHeader => exampleShortHeader.slug === templateSlug
+          )
+        : null;
+    const templateName =
+      (matchingExample && matchingExample.name) ||
+      (templateSlug
+        ? templateSlug
+            .replace(/^starting-/, '')
+            .replace(/-/g, ' ')
+            .replace(/\b\w/g, letter => letter.toUpperCase())
+        : null);
+
+    return {
+      text: templateName ? (
+        <Trans>Reviewing the {templateName} starter template.</Trans>
+      ) : (
+        <Trans>Reviewing a starter game template.</Trans>
+      ),
+    };
+  },
+  launchFunction: async () => {
+    return makeGenericFailure(
+      'get_game_starter_summary is handled on the backend.'
     );
   },
   modifiesProject: false,
@@ -5528,4 +5578,5 @@ export const editorFunctionsWithoutProject: {
   [string]: EditorFunctionWithoutProject,
 } = {
   initialize_project: initializeProject,
+  get_game_starter_summary: getGameStarterSummary,
 };

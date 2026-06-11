@@ -121,6 +121,9 @@ type Props = {|
   onStartOrOpenChat: (options: ?{| aiRequestId: string | null |}) => void,
   isFetchingSuggestions: boolean,
   isSending?: boolean,
+  // True while the request is paused waiting for the user to answer the inline
+  // "Apply this edit?" prompt. Replaces the working/thinking indicators.
+  isWaitingForEditApproval?: boolean,
   savingProjectForMessageId: ?string,
   forkingState: ?{| aiRequestId: string, messageId: string |},
   onRestore: ({|
@@ -203,6 +206,7 @@ export const ChatMessages: React.ComponentType<Props> = React.memo<Props>(
     onStartOrOpenChat,
     isFetchingSuggestions,
     isSending,
+    isWaitingForEditApproval,
     savingProjectForMessageId,
     forkingState,
     onRestore,
@@ -391,9 +395,20 @@ export const ChatMessages: React.ComponentType<Props> = React.memo<Props>(
                     )) ||
                   null;
 
-                // Don't display create_or_update_plan calls — the plan is shown
-                // separately via the OrchestratorPlan component.
-                if (messageContent.name === 'create_or_update_plan') {
+                // Don't display function calls that render nothing for the user
+                // (no renderForEditor): e.g. create_or_update_plan, whose plan
+                // is shown separately. Skipping them here avoids an empty chat
+                // bubble.
+                const editorFunctionForDisplay =
+                  // $FlowFixMe[incompatible-type]
+                  editorFunctions[messageContent.name] ||
+                  // $FlowFixMe[incompatible-type]
+                  editorFunctionsWithoutProject[messageContent.name] ||
+                  null;
+                if (
+                  editorFunctionForDisplay &&
+                  !editorFunctionForDisplay.renderForEditor
+                ) {
                   return;
                 }
 
@@ -583,7 +598,7 @@ export const ChatMessages: React.ComponentType<Props> = React.memo<Props>(
               // $FlowFixMe[incompatible-type]
               editorFunctionsWithoutProject[messageContent.name] ||
               null;
-            if (!editorFunction) continue;
+            if (!editorFunction || !editorFunction.renderForEditor) continue;
             try {
               const result = editorFunction.renderForEditor({
                 project,
@@ -1248,7 +1263,8 @@ export const ChatMessages: React.ComponentType<Props> = React.memo<Props>(
               </Trans>
             </AlertMessage>
           </Line>
-        ) : aiRequest.status === 'suspended' && !shouldBeWorkingIfNotPaused ? (
+        ) : isWaitingForEditApproval ? null : aiRequest.status === // EditApprovalRow): suppress the working/thinking indicators. // Paused on the inline "Apply this edit?" prompt (rendered below by
+            'suspended' && !shouldBeWorkingIfNotPaused ? (
           <Line justifyContent="flex-start">
             <div className={classes.suspendedIndicator}>
               <div className={classes.suspendedDot} />

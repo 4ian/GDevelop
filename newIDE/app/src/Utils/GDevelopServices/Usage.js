@@ -68,6 +68,7 @@ type AiCapability = {
     id: string,
     disabled?: boolean,
     enableWith?: 'higher-tier-plan',
+    enabledWithPlans?: Array<string>,
   }>,
   versionHistory?: { retentionDays: number },
 };

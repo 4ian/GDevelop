@@ -9,6 +9,7 @@ export type AiConfigurationPresetWithAvailability = {|
   ...AiConfigurationPreset,
   disabled: boolean,
   enableWith: 'higher-tier-plan' | null,
+  enabledWithPlans: Array<string>,
 |};
 
 export const getAiConfigurationPresetsWithAvailability = ({
@@ -27,6 +28,7 @@ export const getAiConfigurationPresetsWithAvailability = ({
     return aiSettings.aiRequest.presets.map(preset => ({
       ...preset,
       enableWith: null,
+      enabledWithPlans: [],
       disabled: preset.isDefault ? false : true,
     }));
   }
@@ -45,6 +47,8 @@ export const getAiConfigurationPresetsWithAvailability = ({
           ? presetAvailability.disabled
           : preset.disabled,
       enableWith: (presetAvailability && presetAvailability.enableWith) || null,
+      enabledWithPlans:
+        (presetAvailability && presetAvailability.enabledWithPlans) || [],
     };
   });
 };

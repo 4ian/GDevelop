@@ -2508,7 +2508,9 @@ describe('applyEventsChanges', () => {
       const perm = [...identity];
       for (let i = perm.length - 1; i > 0; i--) {
         const j = Math.floor(random() * (i + 1));
-        [perm[i], perm[j]] = [perm[j], perm[i]];
+        const swapped = perm[i];
+        perm[i] = perm[j];
+        perm[j] = swapped;
       }
       allPermutations.push(perm);
     }

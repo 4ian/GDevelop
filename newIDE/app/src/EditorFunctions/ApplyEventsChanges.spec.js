@@ -2374,6 +2374,233 @@ describe('applyEventsChanges', () => {
     expect(result.errors).toEqual([]);
   });
 
+  it('should apply a complex mix of changes on a deep tree, whatever the order of the changes', () => {
+    // Stress test mixing every operation kind, including the tricky
+    // combinations: edits and insertions sharing a path, insertions anchored
+    // to deleted events, duplicated deletions, replacement combined with an
+    // insertion before the same event, and changes on sub-events.
+    const setupStressSceneEvents = () => {
+      sceneEventsList.clear();
+      unserializeFromJSObject(
+        sceneEventsList,
+        [
+          {
+            ...JSON.parse(makeStandardEventJson('Event0')),
+            events: [
+              JSON.parse(makeStandardEventJson('Event0Sub0')),
+              JSON.parse(makeStandardEventJson('Event0Sub1')),
+            ],
+          },
+          JSON.parse(makeStandardEventJson('Event1')),
+          {
+            ...JSON.parse(makeStandardEventJson('Event2')),
+            events: [JSON.parse(makeStandardEventJson('Event2Sub0'))],
+          },
+          {
+            ...JSON.parse(makeStandardEventJson('Event3')),
+            conditions: [{ type: { value: 'OriginalCondition3' } }],
+          },
+          JSON.parse(makeStandardEventJson('Event4')),
+          {
+            ...JSON.parse(makeStandardEventJson('Event5')),
+            events: [JSON.parse(makeStandardEventJson('Event5Sub0'))],
+          },
+        ],
+        'unserializeFrom',
+        project
+      );
+    };
+
+    const changeFactories = [
+      // Replace Event0 but keep its (modified) sub-events.
+      () =>
+        makeChange({
+          operationName: 'replace_event_but_keep_existing_sub_events',
+          operationTargetEvent: 'event-0',
+          generatedEvents: `[${makeStandardEventJson('EditedEvent0')}]`,
+        }),
+      // Edit a sub-event of Event0...
+      () =>
+        makeChange({
+          operationName: 'replace_all_actions',
+          operationTargetEvent: 'event-0.1',
+          generatedEvents: `[${makeStandardEventJson('EditedEvent0Sub1')}]`,
+        }),
+      // ...while inserting another sub-event at the same path (the gap
+      // after event-0.0 is the path of event-0.1).
+      () =>
+        makeChange({
+          operationName: 'insert_after_event',
+          operationTargetEvent: 'event-0.0',
+          generatedEvents: `[${makeStandardEventJson(
+            'InsertedSubAfterEvent0Sub0'
+          )}]`,
+        }),
+      // Delete Event1, also used as the anchor of two insertions.
+      () =>
+        makeChange({
+          operationName: 'delete_event',
+          operationTargetEvent: 'event-1',
+        }),
+      () =>
+        makeChange({
+          operationName: 'insert_before_event',
+          operationTargetEvent: 'event-1',
+          generatedEvents: `[${makeStandardEventJson('InsertedBefore1')}]`,
+        }),
+      () =>
+        makeChange({
+          operationName: 'insert_after_event',
+          operationTargetEvent: 'event-1',
+          generatedEvents: `[${makeStandardEventJson('InsertedAfter1')}]`,
+        }),
+      // Insert before Event2, which is also entirely replaced.
+      () =>
+        makeChange({
+          operationName: 'insert_before_event',
+          operationTargetEvent: 'event-2',
+          generatedEvents: `[${makeStandardEventJson('InsertedBefore2')}]`,
+        }),
+      () =>
+        makeChange({
+          operationName: 'insert_and_replace_event',
+          operationTargetEvent: 'event-2',
+          generatedEvents: `[${makeStandardEventJson('ReplacementEvent2')}]`,
+        }),
+      // Two independent edits on Event3.
+      () =>
+        makeChange({
+          operationName: 'insert_as_sub_event',
+          operationTargetEvent: 'event-3',
+          generatedEvents: `[${makeStandardEventJson('InsertedSub3')}]`,
+        }),
+      () =>
+        makeChange({
+          operationName: 'replace_all_conditions',
+          operationTargetEvent: 'event-3',
+          generatedEvents:
+            '[{"type":"BuiltinCommonInstructions::Standard","conditions":[{"type":{"value":"NewCondition3"}}],"actions":[]}]',
+        }),
+      // Comma-separated deletion, with a target duplicating the deletion
+      // of Event1, and deleting Event4 and the sub-event of Event5.
+      () =>
+        makeChange({
+          operationName: 'delete_event',
+          operationTargetEvent: 'event-1,event-4,event-5.0',
+        }),
+      () =>
+        makeChange({
+          operationName: 'insert_at_end',
+          operationTargetEvent: null,
+          generatedEvents: `[${makeStandardEventJson('Appended')}]`,
+        }),
+    ];
+
+    // Identity, reverse, and reproducible random shuffles of the changes.
+    const identity = changeFactories.map((_, i) => i);
+    const allPermutations = [identity, [...identity].reverse()];
+    let seed = 42;
+    const random = () => {
+      seed = (seed * 1664525 + 1013904223) % 4294967296;
+      return seed / 4294967296;
+    };
+    for (let s = 0; s < 28; s++) {
+      const perm = [...identity];
+      for (let i = perm.length - 1; i > 0; i--) {
+        const j = Math.floor(random() * (i + 1));
+        [perm[i], perm[j]] = [perm[j], perm[i]];
+      }
+      allPermutations.push(perm);
+    }
+
+    allPermutations.forEach(perm => {
+      setupStressSceneEvents();
+      const result = applyEventsChanges(
+        project,
+        sceneEventsList,
+        perm.map(i => changeFactories[i]()),
+        fakeGeneratedEventId
+      );
+      const permDescription = perm.join(',');
+
+      expect({
+        permDescription,
+        firstActionTypes: getFirstActionTypes(sceneEventsList),
+      }).toEqual({
+        permDescription,
+        firstActionTypes: [
+          'EditedEvent0',
+          'InsertedBefore1',
+          'InsertedAfter1',
+          'InsertedBefore2',
+          'ReplacementEvent2',
+          'Event3',
+          'Event5',
+          'Appended',
+        ],
+      });
+      expect({
+        permDescription,
+        event0SubTypes: getFirstActionTypes(
+          sceneEventsList.getEventAt(0).getSubEvents()
+        ),
+      }).toEqual({
+        permDescription,
+        event0SubTypes: [
+          'Event0Sub0',
+          'InsertedSubAfterEvent0Sub0',
+          'EditedEvent0Sub1',
+        ],
+      });
+      // The replacement of Event2 also dropped its sub-events.
+      expect({
+        permDescription,
+        replacementSubEventsCount: sceneEventsList
+          .getEventAt(4)
+          .getSubEvents()
+          .getEventsCount(),
+      }).toEqual({ permDescription, replacementSubEventsCount: 0 });
+      // Event3 got a new sub-event and its conditions replaced.
+      expect({
+        permDescription,
+        event3SubTypes: getFirstActionTypes(
+          sceneEventsList.getEventAt(5).getSubEvents()
+        ),
+      }).toEqual({ permDescription, event3SubTypes: ['InsertedSub3'] });
+      const event3 = gd.asStandardEvent(sceneEventsList.getEventAt(5));
+      expect({
+        permDescription,
+        event3ConditionTypes: [
+          event3
+            .getConditions()
+            .get(0)
+            .getType(),
+        ],
+        event3ConditionsCount: event3.getConditions().size(),
+      }).toEqual({
+        permDescription,
+        event3ConditionTypes: ['NewCondition3'],
+        event3ConditionsCount: 1,
+      });
+      // The sub-event of Event5 was deleted.
+      expect({
+        permDescription,
+        event5SubEventsCount: sceneEventsList
+          .getEventAt(6)
+          .getSubEvents()
+          .getEventsCount(),
+      }).toEqual({ permDescription, event5SubEventsCount: 0 });
+      expect({ permDescription, applied: result.applied }).toEqual({
+        permDescription,
+        applied: 14,
+      });
+      expect({ permDescription, errors: result.errors }).toEqual({
+        permDescription,
+        errors: [],
+      });
+    });
+  });
+
   it('should target event by aiGeneratedEventId instead of path', () => {
     sceneEventsList.clear();
     const event1 = sceneEventsList.insertNewEvent(

@@ -470,6 +470,37 @@ export const useProcessFunctionCalls = ({
         }))
       );
 
+      // The "modified outside editor" callbacks each refresh the editor and can
+      // trigger an in-game editor hot reload. Firing them once per function
+      // call would, for a batch of modifying calls (e.g. a sub-agent adding 20
+      // objects), hot reload the editor 20 times. Instead, accumulate the
+      // changes per scene while the batch is processed, then flush a single
+      // coalesced notification per change type once it is done.
+      const accumulatedSceneEventsChanges: Map<
+        gdLayout,
+        Set<string>
+      > = new Map();
+      const accumulatedInstancesScenes: Set<gdLayout> = new Set();
+      const accumulatedObjectsChanges: Map<gdLayout, boolean> = new Map();
+      const accumulatedObjectGroupsScenes: Set<gdLayout> = new Set();
+      const flushAccumulatedOutsideEditorChanges = () => {
+        accumulatedSceneEventsChanges.forEach((eventIds, scene) =>
+          onSceneEventsModifiedOutsideEditor({
+            scene,
+            newOrChangedAiGeneratedEventIds: eventIds,
+          })
+        );
+        accumulatedInstancesScenes.forEach(scene =>
+          onInstancesModifiedOutsideEditor({ scene })
+        );
+        accumulatedObjectsChanges.forEach((isNewObjectTypeUsed, scene) =>
+          onObjectsModifiedOutsideEditor({ scene, isNewObjectTypeUsed })
+        );
+        accumulatedObjectGroupsScenes.forEach(scene =>
+          onObjectGroupsModifiedOutsideEditor({ scene })
+        );
+      };
+
       try {
         const {
           results,
@@ -490,10 +521,35 @@ export const useProcessFunctionCalls = ({
           getRelatedAiRequestLastMessages: () =>
             getLastMessagesFromAiRequestOutput(aiRequest.output || []),
           generateEvents,
-          onSceneEventsModifiedOutsideEditor,
-          onInstancesModifiedOutsideEditor,
-          onObjectsModifiedOutsideEditor,
-          onObjectGroupsModifiedOutsideEditor,
+          onSceneEventsModifiedOutsideEditor: changes => {
+            const existingEventIds = accumulatedSceneEventsChanges.get(
+              changes.scene
+            );
+            if (existingEventIds) {
+              changes.newOrChangedAiGeneratedEventIds.forEach(eventId =>
+                existingEventIds.add(eventId)
+              );
+            } else {
+              accumulatedSceneEventsChanges.set(
+                changes.scene,
+                new Set(changes.newOrChangedAiGeneratedEventIds)
+              );
+            }
+          },
+          onInstancesModifiedOutsideEditor: changes => {
+            accumulatedInstancesScenes.add(changes.scene);
+          },
+          onObjectsModifiedOutsideEditor: changes => {
+            accumulatedObjectsChanges.set(
+              changes.scene,
+              accumulatedObjectsChanges.get(changes.scene) ||
+                false ||
+                changes.isNewObjectTypeUsed
+            );
+          },
+          onObjectGroupsModifiedOutsideEditor: changes => {
+            accumulatedObjectGroupsScenes.add(changes.scene);
+          },
           ensureExtensionInstalled,
           onWillInstallExtension,
           onExtensionInstalled,
@@ -519,6 +575,12 @@ export const useProcessFunctionCalls = ({
           createdProject,
         });
       } finally {
+        // Flush the coalesced editor notifications for everything modified in
+        // this batch (one hot reload instead of one per call). In `finally` so
+        // the editor is still refreshed for whatever was modified even if the
+        // batch was aborted or threw, matching the previous inline behavior.
+        flushAccumulatedOutsideEditorChanges();
+
         // Release the lock so these calls can be retried if needed
         // (e.g. after an error or a suspension).
         functionCallsToProcess.forEach(functionCall => {

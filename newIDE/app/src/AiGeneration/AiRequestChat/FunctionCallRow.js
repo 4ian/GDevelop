@@ -26,6 +26,7 @@ import ChevronArrowBottom from '../../UI/CustomSvgIcons/ChevronArrowBottom';
 import { SafeExtractor } from '../../Utils/SafeExtractor';
 import CircledAdd from '../../UI/CustomSvgIcons/CircledAdd';
 import { AiRequestContext } from '../AiRequestContext';
+import { ExampleStoreContext } from '../../AssetStore/ExampleStore/ExampleStoreContext';
 import {
   getFunctionCallToFunctionCallOutputMap,
   aiRequestHasWorkInProgress,
@@ -68,6 +69,7 @@ const EditorFunctionCallRow = ({
 }: Props) => {
   const [showDetails, setShowDetails] = React.useState(false);
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
+  const { exampleShortHeaders } = React.useContext(ExampleStoreContext);
 
   let existingParsedOutput;
   try {
@@ -145,6 +147,7 @@ const EditorFunctionCallRow = ({
         editorCallbacks,
         shouldShowDetails: showDetails,
         editorFunctionCallResultOutput,
+        exampleShortHeaders,
       });
 
       text = result.text;

@@ -36,6 +36,7 @@ import {
 import { retryIfFailed } from '../Utils/RetryIfFailed';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import { type AssetShortHeader } from '../Utils/GDevelopServices/Asset';
+import { type ExampleShortHeader } from '../Utils/GDevelopServices/Example';
 import { swapAsset } from '../AssetStore/AssetSwapper';
 import { type EnsureExtensionInstalledOptions } from '../AiGeneration/UseEnsureExtensionInstalled';
 import { getObjectFolderOrObjectWithContextFromObjectName } from '../SceneEditor/ObjectFolderOrObjectsSelection';
@@ -249,6 +250,9 @@ type RenderForEditorOptions = {|
   editorCallbacks: EditorCallbacks,
   shouldShowDetails: boolean,
   editorFunctionCallResultOutput: any,
+  // Loaded examples from the example store, when available, so a function can
+  // resolve a template slug to its display name. May be null while still loading.
+  exampleShortHeaders?: ?Array<ExampleShortHeader>,
 |};
 
 export type RelatedAiRequestLastMessages = {|
@@ -5331,8 +5335,40 @@ const searchDocs: EditorFunction = {
 };
 
 const getGameStarterSummary: EditorFunctionWithoutProject = {
-  // No renderForEditor: handled entirely on the backend to inform planning,
-  // nothing to show to the user.
+  // Handled entirely on the backend to inform planning, but still shown in the
+  // chat so the user can see the AI is studying a starter template.
+  renderForEditor: ({ args, exampleShortHeaders }) => {
+    const templateSlug = SafeExtractor.extractStringProperty(
+      args,
+      'template_slug'
+    );
+
+    // Prefer the real example name from the store (when loaded). Otherwise fall
+    // back to humanizing the slug (e.g. "starting-first-person-shooter" ->
+    // "First Person Shooter"), then to a generic label.
+    const matchingExample =
+      templateSlug && exampleShortHeaders
+        ? exampleShortHeaders.find(
+            exampleShortHeader => exampleShortHeader.slug === templateSlug
+          )
+        : null;
+    const templateName =
+      (matchingExample && matchingExample.name) ||
+      (templateSlug
+        ? templateSlug
+            .replace(/^starting-/, '')
+            .replace(/-/g, ' ')
+            .replace(/\b\w/g, letter => letter.toUpperCase())
+        : null);
+
+    return {
+      text: templateName ? (
+        <Trans>Reviewing the {templateName} starter template.</Trans>
+      ) : (
+        <Trans>Reviewing a starter game template.</Trans>
+      ),
+    };
+  },
   launchFunction: async () => {
     return makeGenericFailure(
       'get_game_starter_summary is handled on the backend.'

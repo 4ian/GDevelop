@@ -396,9 +396,9 @@ export const ChatMessages: React.ComponentType<Props> = React.memo<Props>(
                   null;
 
                 // Don't display function calls that render nothing for the user
-                // (no renderForEditor): the plan is shown separately, and
-                // backend-only tools like get_game_starter_summary have nothing
-                // to show. Skipping them here avoids an empty chat bubble.
+                // (no renderForEditor): e.g. create_or_update_plan, whose plan
+                // is shown separately. Skipping them here avoids an empty chat
+                // bubble.
                 const editorFunctionForDisplay =
                   // $FlowFixMe[incompatible-type]
                   editorFunctions[messageContent.name] ||

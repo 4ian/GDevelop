@@ -361,6 +361,8 @@ export const ObjectStoreStateProvider = ({
               requiredExtensions: repositoryObjectMetadata.requiredExtensions,
 
               // Attributes from the installed extension
+              isDependentWithParent:
+                installedObjectMetadata.isDependentWithParent,
 
               // These ones are less important but its better to use the icon of
               // the installed extension since it's used everywhere in the editor.

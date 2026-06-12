@@ -171,7 +171,6 @@ export default function NewObjectFromScratch({
               eventsBasedObject
             );
           }
-          // $FlowFixMe[incompatible-type]
           return {
             type: object.type,
             fullName: object.fullName,

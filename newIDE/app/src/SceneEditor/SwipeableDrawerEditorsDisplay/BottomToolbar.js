@@ -1,6 +1,7 @@
 // @flow
 
 import * as React from 'react';
+import TimelineIcon from '@material-ui/icons/Timeline';
 import { Toolbar, ToolbarGroup } from '../../UI/Toolbar';
 import ObjectIcon from '../../UI/CustomSvgIcons/Object';
 import ObjectGroupIcon from '../../UI/CustomSvgIcons/ObjectGroup';
@@ -14,6 +15,7 @@ import {
   OPEN_OBJECT_GROUPS_PANEL_BUTTON_ID,
   OPEN_OBJECTS_PANEL_BUTTON_ID,
   OPEN_PROPERTIES_PANEL_BUTTON_ID,
+  OPEN_TIMELINE_PANEL_BUTTON_ID,
   type EditorId,
 } from '../utils';
 import Paper from '../../UI/Paper';
@@ -66,6 +68,10 @@ const editors = {
   'layers-list': {
     buttonId: OPEN_LAYERS_PANEL_BUTTON_ID,
     icon: <LayersIcon fontSize="inherit" />,
+  },
+  timeline: {
+    buttonId: OPEN_TIMELINE_PANEL_BUTTON_ID,
+    icon: <TimelineIcon fontSize="inherit" />,
   },
 };
 

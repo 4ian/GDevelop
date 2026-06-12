@@ -266,7 +266,7 @@ export const CompactObjectGroupPropertiesEditor = ({
                 toolbarIconStyle={styles.icon}
                 compactEmptyPlaceholderText={
                   <Trans>
-                    There are no{' '}
+                    There are no common{' '}
                     <Link
                       href={objectVariablesHelpLink}
                       onClick={() =>
@@ -275,7 +275,7 @@ export const CompactObjectGroupPropertiesEditor = ({
                     >
                       variables
                     </Link>{' '}
-                    on this object.
+                    on this group objects.
                   </Trans>
                 }
                 isListLocked={isVariableListLocked}

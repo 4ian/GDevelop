@@ -173,7 +173,12 @@ export const CompactObjectGroupPropertiesEditor = ({
         key={scrollKey}
         onScroll={onScroll}
       >
-        <Column expand noMargin id="object-properties-editor" noOverflowParent>
+        <Column
+          expand
+          noMargin
+          id="object-group-properties-editor"
+          noOverflowParent
+        >
           <ColumnStackLayout expand noOverflowParent>
             <LineStackLayout
               noMargin

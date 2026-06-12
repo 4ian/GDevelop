@@ -163,8 +163,8 @@ export const CompactObjectGroupPropertiesEditor = ({
 
   return (
     <ErrorBoundary
-      componentTitle={<Trans>Object properties</Trans>}
-      scope="scene-editor-object-properties"
+      componentTitle={<Trans>Object group properties</Trans>}
+      scope="scene-editor-object-group-properties"
     >
       <ScrollView
         ref={scrollViewRef}

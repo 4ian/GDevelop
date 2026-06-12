@@ -839,6 +839,20 @@ const MainFrame = (props: Props): React.MixedElement => {
     [i18n, props.storageProviders]
   );
 
+  const getEditorTabsStateWithResources = React.useCallback(
+    (editorTabs: EditorTabsState): EditorTabsState =>
+      openEditorTab(
+        editorTabs,
+        // $FlowFixMe[incompatible-type]
+        getEditorOpeningOptions({
+          kind: 'resources',
+          name: '',
+          dontFocusTab: true,
+        })
+      ),
+    [getEditorOpeningOptions]
+  );
+
   const setEditorTabs = React.useCallback(
     // $FlowFixMe[missing-local-annot]
     newEditorTabs => {
@@ -1532,14 +1546,17 @@ const MainFrame = (props: Props): React.MixedElement => {
         openLeaderboardReplacerDialogIfNeeded(project, oldProjectId);
         configureMultiplayerLobbiesIfNeeded(project, oldProjectId);
       }
+      const editorTabsWithResources = getEditorTabsStateWithResources(
+        editorTabs
+      );
       options.openAllScenes || options.openQuickCustomizationDialog
         ? openAllScenes({
             currentProject: project,
-            editorTabs,
+            editorTabs: editorTabsWithResources,
           })
         : openSceneOrProjectManager({
             currentProject: project,
-            editorTabs,
+            editorTabs: editorTabsWithResources,
           });
       // If Ask AI editor was opened, reposition it.
       const openedAskAIEditor = getOpenedAskAiEditor(editorTabs);

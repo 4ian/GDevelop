@@ -9,6 +9,9 @@ const config = {
     buildResources: 'build',
     output: 'dist',
   },
+  // Bundled tool apps are ASAR files themselves. Keep them outside the main
+  // app.asar so Electron can read their internal files after packaging.
+  asarUnpack: ['external/**/*'],
   extraResources: [
     {
       from: '../app/resources/GDJS',

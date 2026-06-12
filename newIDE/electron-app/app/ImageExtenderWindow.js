@@ -1,4 +1,5 @@
 const electron = require('electron');
+const app = electron.app;
 const BrowserWindow = electron.BrowserWindow;
 const protocol = electron.protocol;
 const fs = require('fs');
@@ -10,11 +11,23 @@ let isImageExtenderProtocolRegistered = false;
 
 const imageExtenderScheme = 'image-extender';
 const imageExtenderOrigin = `${imageExtenderScheme}://app`;
-const imageExtenderBundlePath = path.join(
-  __dirname,
-  'external',
-  'image-extender.asar'
-);
+const getBundledExternalPath = name => {
+  if (app.isPackaged && process.resourcesPath) {
+    const unpackedPath = path.join(
+      process.resourcesPath,
+      'app.asar.unpacked',
+      'external',
+      name
+    );
+    if (fs.existsSync(unpackedPath)) {
+      return unpackedPath;
+    }
+  }
+
+  return path.join(__dirname, 'external', name);
+};
+
+const imageExtenderBundlePath = getBundledExternalPath('image-extender.asar');
 const imageExtenderNextPath = path.join(imageExtenderBundlePath, '.next');
 const imageExtenderStaticPath = path.join(imageExtenderNextPath, 'static');
 const imageExtenderServerAppPath = path.join(

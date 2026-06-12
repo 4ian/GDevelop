@@ -17,9 +17,23 @@ const pendingGDevelopExtensionImports = new Map();
 
 const aiGameWorkbenchScheme = 'ai-game-workbench';
 const aiGameWorkbenchOrigin = `${aiGameWorkbenchScheme}://app`;
-const aiGameWorkbenchBundlePath = path.join(
-  __dirname,
-  'external',
+const getBundledExternalPath = name => {
+  if (app.isPackaged && process.resourcesPath) {
+    const unpackedPath = path.join(
+      process.resourcesPath,
+      'app.asar.unpacked',
+      'external',
+      name
+    );
+    if (fs.existsSync(unpackedPath)) {
+      return unpackedPath;
+    }
+  }
+
+  return path.join(__dirname, 'external', name);
+};
+
+const aiGameWorkbenchBundlePath = getBundledExternalPath(
   'ai-game-workbench.asar'
 );
 const aiGameWorkbenchUnpackedPath = `${aiGameWorkbenchBundlePath}.unpacked`;
@@ -32,7 +46,10 @@ const aiGameWorkbenchServerEntryPath = path.join(
   aiGameWorkbenchServerPath,
   'app.js'
 );
-const aiGameWorkbenchPreloadPath = path.join(__dirname, 'AiGameWorkbenchPreload.js');
+const aiGameWorkbenchPreloadPath = path.join(
+  __dirname,
+  'AiGameWorkbenchPreload.js'
+);
 const aiGameWorkbenchBundledPresetsPath = path.join(
   aiGameWorkbenchServerPath,
   'presets'
@@ -264,14 +281,18 @@ const registerAiGameWorkbenchIpc = () => {
         aiGameWorkbenchWindow.isDestroyed() ||
         event.sender !== aiGameWorkbenchWindow.webContents
       ) {
-        throw new Error('GDevelop extension import is only available from AI Game Workbench.');
+        throw new Error(
+          'GDevelop extension import is only available from AI Game Workbench.'
+        );
       }
 
       if (
         !aiGameWorkbenchParentWebContents ||
         aiGameWorkbenchParentWebContents.isDestroyed()
       ) {
-        throw new Error('No active GDevelop project window is available for import.');
+        throw new Error(
+          'No active GDevelop project window is available for import.'
+        );
       }
 
       const requestId = `${Date.now()}-${Math.random()

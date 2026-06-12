@@ -6,3 +6,4 @@
 -   **GenerateAllDocs.[bat|sh]**: Calls doxygen to generate all documentation into _docs_ folder.
 -   **ExtractTranslations.[bat|sh]**: Creates the _source.pot_ file containing the strings to be translated using [Crowdin](https://crowdin.com/project/gdevelop).
 -   **ImageExtenderElectronSteps.md**: Documents how to refresh `zhouzhipeng/image-extender` and rebuild the Electron ASAR artifact without copying upstream source code or starting a localhost server.
+-   **AiGameWorkbenchElectronSteps.md**: Documents how to refresh `zhouzhipeng/ai_game_workbench` and rebuild the Electron ASAR artifact without copying upstream source code or starting a localhost server.

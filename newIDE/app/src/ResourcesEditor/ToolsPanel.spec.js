@@ -309,6 +309,28 @@ describe('ToolsPanel', () => {
     ).toBe('image-extender');
   });
 
+  it('persists the AI Game Workbench image tool selection', () => {
+    expect(
+      buildResourcesToolsSettings({
+        activeToolCategory: 'image',
+        selectedImageTool: 'ai-game-workbench',
+        selectedSoundTool: 'elevenlabs',
+        geminiApiKey: 'gemini-key',
+        nanoBananaModel: 'gemini-image',
+        nanoBananaPrompt: 'make a coin',
+        imageAttachment: null,
+        elevenLabsApiKey: 'eleven-key',
+        elevenLabsMode: 'sound-effect',
+        elevenLabsText: 'laser',
+        elevenLabsVoiceId: 'voice',
+        elevenLabsModel: 'speech-model',
+        elevenLabsSoundModel: 'sound-model',
+        elevenLabsOutputFormat: 'mp3_44100_128',
+        elevenLabsDuration: '2.5',
+      }).selectedImageTool
+    ).toBe('ai-game-workbench');
+  });
+
   it('normalizes persisted Local tools settings', () => {
     expect(
       getResourcesToolsSettingsWithDefaults({
@@ -323,6 +345,14 @@ describe('ToolsPanel', () => {
         selectedImageTool: 'image-extender',
       }).selectedImageTool
     ).toBe('image-extender');
+  });
+
+  it('normalizes persisted AI Game Workbench settings', () => {
+    expect(
+      getResourcesToolsSettingsWithDefaults({
+        selectedImageTool: 'ai-game-workbench',
+      }).selectedImageTool
+    ).toBe('ai-game-workbench');
   });
 
   it('normalizes persisted Tools settings when older preferences are incomplete', () => {

@@ -51,6 +51,8 @@ const electron = optionalRequire('electron');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
 const projectFileDragDataMimeType = 'application/x-gdevelop-project-file';
 const imageExtenderGitHubUrl = 'https://github.com/zhouzhipeng/image-extender';
+const aiGameWorkbenchGitHubUrl =
+  'https://github.com/zhouzhipeng/ai_game_workbench';
 
 type Props = {|
   project: gdProject,
@@ -60,7 +62,11 @@ type Props = {|
 |};
 
 type ToolCategory = 'image' | 'sound';
-type ImageTool = 'nano-banana' | 'local-tools' | 'image-extender';
+type ImageTool =
+  | 'nano-banana'
+  | 'local-tools'
+  | 'image-extender'
+  | 'ai-game-workbench';
 type SoundTool = 'elevenlabs';
 export type ImageAttachment = {|
   absolutePath: string,
@@ -529,7 +535,8 @@ export const getResourcesToolsSettingsWithDefaults = (
   selectedImageTool:
     settings &&
     (settings.selectedImageTool === 'local-tools' ||
-      settings.selectedImageTool === 'image-extender')
+      settings.selectedImageTool === 'image-extender' ||
+      settings.selectedImageTool === 'ai-game-workbench')
       ? settings.selectedImageTool
       : defaultResourcesToolsSettings.selectedImageTool,
   selectedSoundTool: defaultResourcesToolsSettings.selectedSoundTool,
@@ -695,6 +702,14 @@ const ToolsPanel = ({
     null
   );
   const [
+    aiGameWorkbenchStatus,
+    setAiGameWorkbenchStatus,
+  ] = React.useState<?string>(null);
+  const [
+    aiGameWorkbenchError,
+    setAiGameWorkbenchError,
+  ] = React.useState<?string>(null);
+  const [
     localImageOperation,
     setLocalImageOperation,
   ] = React.useState<LocalImageOperation>('crop');
@@ -811,6 +826,8 @@ const ToolsPanel = ({
       setImageGenerationError(null);
       setImageExtenderStatus(null);
       setImageExtenderError(null);
+      setAiGameWorkbenchStatus(null);
+      setAiGameWorkbenchError(null);
       setAudioGenerationStatus(null);
       setAudioGenerationError(null);
       setLocalImageStatus(null);
@@ -1631,6 +1648,27 @@ const ToolsPanel = ({
     }
   }, []);
 
+  const openAiGameWorkbench = React.useCallback(async () => {
+    if (!ipcRenderer) {
+      setAiGameWorkbenchError(
+        'AI Game Workbench is only available in the desktop app.'
+      );
+      return;
+    }
+
+    setAiGameWorkbenchError(null);
+    setAiGameWorkbenchStatus('Opening AI Game Workbench...');
+    try {
+      await ipcRenderer.invoke('ai-game-workbench-load');
+      setAiGameWorkbenchStatus('AI Game Workbench opened.');
+    } catch (error) {
+      setAiGameWorkbenchError(
+        error && error.message ? error.message : String(error)
+      );
+      setAiGameWorkbenchStatus(null);
+    }
+  }, []);
+
   const localCrop: LocalImageCrop = {
     x: parsePixelField(localCropX),
     y: parsePixelField(localCropY),
@@ -1657,7 +1695,8 @@ const ToolsPanel = ({
           if (
             value === 'nano-banana' ||
             value === 'local-tools' ||
-            value === 'image-extender'
+            value === 'image-extender' ||
+            value === 'ai-game-workbench'
           ) {
             setSelectedImageTool(value);
           }
@@ -1666,6 +1705,7 @@ const ToolsPanel = ({
       >
         <SelectOption value="nano-banana" label={t`Nano Banana`} />
         <SelectOption value="image-extender" label={t`Image Extender`} />
+        <SelectOption value="ai-game-workbench" label={t`AI Game Workbench`} />
         <SelectOption value="local-tools" label={t`Local tools`} />
       </SelectField>
     </div>
@@ -1820,6 +1860,38 @@ const ToolsPanel = ({
           onClick={() => Window.openExternalURL(imageExtenderGitHubUrl)}
         >
           {imageExtenderGitHubUrl}
+        </Link>
+      </Text>
+    </div>
+  );
+
+  const renderAiGameWorkbench = () => (
+    <div style={styles.section}>
+      {renderImageToolSelector()}
+      <MiniToolbar noPadding>
+        <SparkleIcon />
+        <MiniToolbarText>
+          <Trans>AI Game Workbench</Trans>
+        </MiniToolbarText>
+      </MiniToolbar>
+      <MiniToolbar noPadding>
+        <RaisedButton
+          label={<Trans>Open AI Game Workbench</Trans>}
+          icon={<SparkleIcon />}
+          color="ai"
+          onClick={openAiGameWorkbench}
+        />
+      </MiniToolbar>
+      {!!aiGameWorkbenchError && (
+        <Text color="error">{aiGameWorkbenchError}</Text>
+      )}
+      {!!aiGameWorkbenchStatus && <Text>{aiGameWorkbenchStatus}</Text>}
+      <Text>
+        <Link
+          href={aiGameWorkbenchGitHubUrl}
+          onClick={() => Window.openExternalURL(aiGameWorkbenchGitHubUrl)}
+        >
+          {aiGameWorkbenchGitHubUrl}
         </Link>
       </Text>
     </div>
@@ -2188,6 +2260,8 @@ const ToolsPanel = ({
               ? renderNanoBanana()
               : selectedImageTool === 'image-extender'
               ? renderImageExtender()
+              : selectedImageTool === 'ai-game-workbench'
+              ? renderAiGameWorkbench()
               : selectedImageTool === 'local-tools'
               ? renderLocalImageTools()
               : null

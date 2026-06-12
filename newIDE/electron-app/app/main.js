@@ -1,5 +1,6 @@
 const electron = require('electron');
 const path = require('path');
+const fs = require('fs');
 const child_process = require('child_process');
 const app = electron.app; // Module to control application life.
 const BrowserWindow = electron.BrowserWindow; // Module to create native browser window.
@@ -51,6 +52,10 @@ const {
   imageExtenderScheme,
   openImageExtenderWindow,
 } = require('./ImageExtenderWindow');
+const {
+  aiGameWorkbenchScheme,
+  openAiGameWorkbenchWindow,
+} = require('./AiGameWorkbenchWindow');
 const {
   setupLocalGDJSDevelopmentWatcher,
   closeLocalGDJSDevelopmentWatcher,
@@ -158,13 +163,27 @@ const args = parseArgs(
 );
 
 const devTools = !!args['dev-tools'];
+const windowsAppIconPath = path.join(__dirname, '..', 'build', 'icon.ico');
+const appWindowIcon =
+  process.platform === 'win32' && fs.existsSync(windowsAppIconPath)
+    ? windowsAppIconPath
+    : undefined;
 
-// See registerGdideProtocol (used for HTML modules support). Image Extender
-// uses a custom secure scheme so the bundled app can call /api without a port.
+// See registerGdideProtocol (used for HTML modules support). Bundled tools use
+// custom secure schemes so they can call /api without a localhost server.
 protocol.registerSchemesAsPrivileged([
   { scheme: 'gdide' },
   {
     scheme: imageExtenderScheme,
+    privileges: {
+      standard: true,
+      secure: true,
+      supportFetchAPI: true,
+      corsEnabled: true,
+    },
+  },
+  {
+    scheme: aiGameWorkbenchScheme,
     privileges: {
       standard: true,
       secure: true,
@@ -272,6 +291,7 @@ function createNewWindow(windowArgs = args) {
     enableLargerThanScreen: true,
     backgroundColor: '#000',
   };
+  if (appWindowIcon) options.icon = appWindowIcon;
 
   // First window (windowCounter === 0) uses default storage for backwards compatibility
   // Additional windows get unique partitions for independent auth AND separate renderer processes
@@ -699,6 +719,15 @@ app.on('ready', function() {
   ipcMain.handle('image-extender-load', event => {
     const parentWindow = BrowserWindow.fromWebContents(event.sender);
     return openImageExtenderWindow({
+      parentWindow,
+      devTools,
+    });
+  });
+
+  // AI Game Workbench executable app
+  ipcMain.handle('ai-game-workbench-load', event => {
+    const parentWindow = BrowserWindow.fromWebContents(event.sender);
+    return openAiGameWorkbenchWindow({
       parentWindow,
       devTools,
     });

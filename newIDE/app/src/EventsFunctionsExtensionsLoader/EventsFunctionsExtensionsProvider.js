@@ -81,7 +81,10 @@ export const EventsFunctionsExtensionsProvider = ({
   }, []);
 
   const _loadProjectEventsFunctionsExtensions = React.useCallback(
-    (project: ?gdProject): Promise<void> => {
+    (
+      project: ?gdProject,
+      generateForPreview: boolean = true
+    ): Promise<void> => {
       if (!project || !eventsFunctionCodeWriter) return Promise.resolve();
 
       const previousLastLoadPromise =
@@ -96,7 +99,8 @@ export const EventsFunctionsExtensionsProvider = ({
           return loadProjectEventsFunctionsExtensions(
             project,
             eventsFunctionCodeWriter,
-            i18n
+            i18n,
+            generateForPreview
           );
         })
         .then(() => setEventsFunctionsExtensionsError(null))
@@ -169,11 +173,14 @@ export const EventsFunctionsExtensionsProvider = ({
   );
 
   const _reloadProjectEventsFunctionsExtensions = React.useCallback(
-    (project: ?gdProject): Promise<void> => {
+    (
+      project: ?gdProject,
+      generateForPreview: boolean = true
+    ): Promise<void> => {
       if (project) {
         _unloadProjectEventsFunctionsExtensions(project);
       }
-      return _loadProjectEventsFunctionsExtensions(project);
+      return _loadProjectEventsFunctionsExtensions(project, generateForPreview);
     },
     [
       _loadProjectEventsFunctionsExtensions,

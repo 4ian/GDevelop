@@ -10,6 +10,7 @@ import {
   getImageAttachmentPreviewUrl,
   getGeneratedImagesFolderPath,
   getResourcesToolsSettingsWithDefaults,
+  getAiGameWorkbenchAssetRelativePath,
   hasProjectFileDragData,
   shouldShowClearImageAttachmentButton,
   shouldDisableNanoBananaButton,
@@ -136,6 +137,32 @@ describe('ToolsPanel', () => {
     expect(getGeneratedImagesFolderPath('D:\\Project')).toBe(
       'D:\\Project\\generated'
     );
+  });
+
+  it('imports AI Game Workbench assets under the project assets folder', () => {
+    expect(
+      getAiGameWorkbenchAssetRelativePath({
+        resourceName: 'ai-game-workbench/Hero/size-256/walk/down/000.png',
+        relativePath: 'ai-game-workbench/Hero/size-256/walk/down/000.png',
+        sourcePath: 'C:\\Temp\\000.png',
+      })
+    ).toBe('assets/ai-game-workbench/Hero/size-256/walk/down/000.png');
+    expect(
+      getAiGameWorkbenchAssetRelativePath({
+        resourceName:
+          'assets/ai-game-workbench/Hero/size-256/walk/down/000.png',
+        relativePath:
+          'assets/ai-game-workbench/Hero/size-256/walk/down/000.png',
+        sourcePath: 'C:\\Temp\\000.png',
+      })
+    ).toBe('assets/ai-game-workbench/Hero/size-256/walk/down/000.png');
+    expect(
+      getAiGameWorkbenchAssetRelativePath({
+        resourceName: '../outside.png',
+        relativePath: '../outside.png',
+        sourcePath: 'C:\\Temp\\outside.png',
+      })
+    ).toBe('');
   });
 
   it('builds Nano Banana HTTP debug details', () => {

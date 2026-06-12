@@ -493,6 +493,27 @@ const isAbsolutePathInside = (
   );
 };
 
+export const getAiGameWorkbenchAssetRelativePath = (
+  assetFile: AiGameWorkbenchExtensionAssetFile
+): string => {
+  if (!path) return '';
+  const rawRelativePath = normalizeSlashes(
+    assetFile.relativePath || assetFile.resourceName || ''
+  );
+  const pathSegments = rawRelativePath.split('/').filter(Boolean);
+  if (
+    !pathSegments.length ||
+    path.isAbsolute(rawRelativePath) ||
+    pathSegments.includes('..')
+  ) {
+    return '';
+  }
+
+  const assetPathSegments =
+    pathSegments[0] === 'assets' ? pathSegments : ['assets', ...pathSegments];
+  return normalizeSlashes(path.join(...assetPathSegments));
+};
+
 const copyAiGameWorkbenchExtensionAssetsToProject = async ({
   project,
   assetFiles,
@@ -511,7 +532,7 @@ const copyAiGameWorkbenchExtensionAssetsToProject = async ({
 
   const resourcesManager = project.getResourcesManager();
   for (const assetFile of assetFiles) {
-    const relativePath = normalizeSlashes(assetFile.relativePath || '');
+    const relativePath = getAiGameWorkbenchAssetRelativePath(assetFile);
     const resourceName = assetFile.resourceName || relativePath;
     if (!relativePath || !resourceName) {
       throw new Error('Generated asset is missing its resource path.');

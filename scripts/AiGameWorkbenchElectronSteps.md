@@ -44,6 +44,19 @@ Video generation also needs one Electron-specific compatibility change:
   video input guard with a model-aware guard: HTTPS is accepted for every
   provider, and local workbench asset URLs are accepted for `apimart/*` models.
 
+The module 01 export page is GDevelop-specific:
+
+- Replace the Godot export route/UI with `/api/export/gdevelop-extension`.
+- The route generates `gdevelop-extension.json`, `manifest.json`, and
+  `gdevelop-extension-package.zip`.
+- The extension JSON contains one events-based object named `Character`; its
+  child Sprite object has named animations like `idle_down`, `walk_left`,
+  `run_right`, `attack1_up`, and `jump_down`.
+- Direct import is handled by the GDevelop Electron bridge. The workbench sends
+  the generated extension JSON and local PNG asset paths to the current
+  GDevelop project window, which copies the PNGs into the saved project folder,
+  registers image resources, and inserts or replaces the extension.
+
 Patch only the temporary upstream checkout:
 
 ```powershell
@@ -129,6 +142,17 @@ Remove-Item Env:\STAGING, Env:\STORAGE -ErrorAction SilentlyContinue
 
 Expected output: `200 true`.
 
+For export-route verification, create a temporary character folder with at least
+one transparent idle/walk PNG for each direction and inject:
+
+```powershell
+$env:STAGING = $staging
+node --input-type=module -e "import fs from 'node:fs'; import os from 'node:os'; import path from 'node:path'; import { pathToFileURL } from 'node:url'; const staging = process.env.STAGING; const sharp = (await import(pathToFileURL(path.join(staging, 'node_modules', 'sharp', 'lib', 'index.js')).href)).default; const root = fs.mkdtempSync(path.join(os.tmpdir(), 'ai-gdevelop-staged-')); const storageDir = path.join(root, 'storage'); const exportDir = path.join(root, 'exports'); const characterId = 'Hero'; const png = await sharp({ create: { width: 4, height: 4, channels: 4, background: { r: 0, g: 255, b: 0, alpha: 1 } } }).png().toBuffer(); const characterRoot = path.join(storageDir, 'characters', characterId); for (const dir of ['down', 'up', 'left', 'right']) { const idleDir = path.join(characterRoot, 'base-character', 'loop-export', 'idle', 'transparent'); fs.mkdirSync(idleDir, { recursive: true }); fs.writeFileSync(path.join(idleDir, dir + '.png'), png); const walkDir = path.join(characterRoot, 'base-character', 'loop-export', 'transparent', dir); fs.mkdirSync(walkDir, { recursive: true }); fs.writeFileSync(path.join(walkDir, '000.png'), png); } const mod = await import(pathToFileURL(path.join(staging, 'server', 'app.js')).href); const app = mod.createApp({ storageDir, presetsDir: path.join(staging, 'server', 'presets'), ffmpegPath: path.join(staging, 'bin', 'ffmpeg.exe'), module01CharacterExportDir: exportDir, port: 0 }); await app.ready(); const res = await app.inject({ method: 'POST', url: '/api/export/gdevelop-extension', payload: { characterId, exportSize: 256 } }); const body = res.json(); console.log(res.statusCode, body.extensionName, body.animationCount, body.assetCount, Boolean(body.extension?.eventsBasedObjects?.[0]?.objects?.[0]?.animations?.length)); await app.close();"
+Remove-Item Env:\STAGING -ErrorAction SilentlyContinue
+```
+
+Expected output shape: `200 AICharacter_Hero 8 8 true`.
+
 ## 6. Pack The ASAR
 
 Make sure Electron dependencies are installed once:
@@ -164,6 +188,7 @@ Run these checks from the GDevelop repository root:
 
 ```powershell
 node -c newIDE\electron-app\app\AiGameWorkbenchWindow.js
+node -c newIDE\electron-app\app\AiGameWorkbenchPreload.js
 node -c newIDE\electron-app\app\main.js
 
 $env:ELECTRON_RUN_AS_NODE='1'

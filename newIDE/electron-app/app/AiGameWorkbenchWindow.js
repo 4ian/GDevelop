@@ -1,6 +1,7 @@
 const electron = require('electron');
 const app = electron.app;
 const BrowserWindow = electron.BrowserWindow;
+const ipcMain = electron.ipcMain;
 const protocol = electron.protocol;
 const fs = require('fs');
 const path = require('path');
@@ -8,8 +9,11 @@ const { pathToFileURL } = require('url');
 const log = require('electron-log');
 
 let aiGameWorkbenchWindow = null;
+let aiGameWorkbenchParentWebContents = null;
 let aiGameWorkbenchAppPromise = null;
 let isAiGameWorkbenchProtocolRegistered = false;
+let isAiGameWorkbenchIpcRegistered = false;
+const pendingGDevelopExtensionImports = new Map();
 
 const aiGameWorkbenchScheme = 'ai-game-workbench';
 const aiGameWorkbenchOrigin = `${aiGameWorkbenchScheme}://app`;
@@ -28,6 +32,7 @@ const aiGameWorkbenchServerEntryPath = path.join(
   aiGameWorkbenchServerPath,
   'app.js'
 );
+const aiGameWorkbenchPreloadPath = path.join(__dirname, 'AiGameWorkbenchPreload.js');
 const aiGameWorkbenchBundledPresetsPath = path.join(
   aiGameWorkbenchServerPath,
   'presets'
@@ -248,8 +253,80 @@ const registerAiGameWorkbenchProtocol = () => {
   isAiGameWorkbenchProtocolRegistered = true;
 };
 
+const registerAiGameWorkbenchIpc = () => {
+  if (isAiGameWorkbenchIpcRegistered) return;
+
+  ipcMain.handle(
+    'ai-game-workbench-import-gdevelop-extension',
+    async (event, payload) => {
+      if (
+        !aiGameWorkbenchWindow ||
+        aiGameWorkbenchWindow.isDestroyed() ||
+        event.sender !== aiGameWorkbenchWindow.webContents
+      ) {
+        throw new Error('GDevelop extension import is only available from AI Game Workbench.');
+      }
+
+      if (
+        !aiGameWorkbenchParentWebContents ||
+        aiGameWorkbenchParentWebContents.isDestroyed()
+      ) {
+        throw new Error('No active GDevelop project window is available for import.');
+      }
+
+      const requestId = `${Date.now()}-${Math.random()
+        .toString(36)
+        .slice(2)}`;
+      return new Promise((resolve, reject) => {
+        const timeout = setTimeout(() => {
+          pendingGDevelopExtensionImports.delete(requestId);
+          reject(new Error('Timed out while importing into GDevelop.'));
+        }, 120000);
+
+        pendingGDevelopExtensionImports.set(requestId, {
+          resolve,
+          reject,
+          timeout,
+        });
+        aiGameWorkbenchParentWebContents.send(
+          'ai-game-workbench-import-gdevelop-extension-request',
+          { requestId, payload }
+        );
+      });
+    }
+  );
+
+  ipcMain.on(
+    'ai-game-workbench-import-gdevelop-extension-response',
+    (event, response) => {
+      if (event.sender !== aiGameWorkbenchParentWebContents) {
+        return;
+      }
+      const requestId = response && response.requestId;
+      if (!requestId || !pendingGDevelopExtensionImports.has(requestId)) {
+        return;
+      }
+
+      const pending = pendingGDevelopExtensionImports.get(requestId);
+      pendingGDevelopExtensionImports.delete(requestId);
+      clearTimeout(pending.timeout);
+      if (response.error) {
+        pending.reject(new Error(response.error));
+      } else {
+        pending.resolve(response.result);
+      }
+    }
+  );
+
+  isAiGameWorkbenchIpcRegistered = true;
+};
+
 const openAiGameWorkbenchWindow = async ({ parentWindow, devTools }) => {
   registerAiGameWorkbenchProtocol();
+  registerAiGameWorkbenchIpc();
+  aiGameWorkbenchParentWebContents = parentWindow
+    ? parentWindow.webContents
+    : null;
 
   if (aiGameWorkbenchWindow && !aiGameWorkbenchWindow.isDestroyed()) {
     aiGameWorkbenchWindow.focus();
@@ -267,6 +344,7 @@ const openAiGameWorkbenchWindow = async ({ parentWindow, devTools }) => {
     webPreferences: {
       contextIsolation: true,
       nodeIntegration: false,
+      preload: aiGameWorkbenchPreloadPath,
       webSecurity: true,
     },
   });
@@ -291,7 +369,13 @@ const openAiGameWorkbenchWindow = async ({ parentWindow, devTools }) => {
   });
 
   aiGameWorkbenchWindow.on('closed', () => {
+    for (const pending of pendingGDevelopExtensionImports.values()) {
+      clearTimeout(pending.timeout);
+      pending.reject(new Error('AI Game Workbench was closed.'));
+    }
+    pendingGDevelopExtensionImports.clear();
     aiGameWorkbenchWindow = null;
+    aiGameWorkbenchParentWebContents = null;
   });
 
   await aiGameWorkbenchWindow.loadURL(`${aiGameWorkbenchOrigin}/index.html`);

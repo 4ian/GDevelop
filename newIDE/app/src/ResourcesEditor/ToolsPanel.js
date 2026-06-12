@@ -34,6 +34,8 @@ import Window from '../Utils/Window';
 import { openFilePicker } from '../Utils/FileSystem';
 import { type WorkingDeskToolTabUpdate } from './WorkingDeskTabTypes';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
+import EventsFunctionsExtensionsContext from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
+import { addSerializedExtensionsToProject } from '../AssetStore/ExtensionStore/InstallExtension';
 import {
   drawLocalImageOperationToCanvas,
   getLocalImageOutputBaseName,
@@ -49,6 +51,7 @@ const path = optionalRequire('path');
 const buffer = optionalRequire('buffer');
 const electron = optionalRequire('electron');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
+const gd: libGDevelop = global.gd;
 const projectFileDragDataMimeType = 'application/x-gdevelop-project-file';
 const imageExtenderGitHubUrl = 'https://github.com/zhouzhipeng/image-extender';
 const aiGameWorkbenchGitHubUrl =
@@ -72,6 +75,18 @@ export type ImageAttachment = {|
   absolutePath: string,
   name: string,
   extension: string,
+|};
+type AiGameWorkbenchExtensionAssetFile = {|
+  resourceName: string,
+  relativePath: string,
+  sourcePath: string,
+|};
+type AiGameWorkbenchExtensionImportPayload = {|
+  characterId: string,
+  extensionName: string,
+  extensionVersion: string,
+  extension: any,
+  assetFiles: Array<AiGameWorkbenchExtensionAssetFile>,
 |};
 export type NanoBananaDebugDetails = {|
   statusText: ?string,
@@ -464,6 +479,67 @@ export const getGeneratedImagesFolderPath = (projectRootPath: string): string =>
     ? path.join(projectRootPath, 'generated')
     : `${projectRootPath}/generated`;
 
+const isAbsolutePathInside = (
+  parentPath: string,
+  childPath: string
+): boolean => {
+  if (!path) return false;
+  const relativePath = path.relative(parentPath, childPath);
+  return (
+    relativePath === '' ||
+    (!!relativePath &&
+      !relativePath.startsWith('..') &&
+      !path.isAbsolute(relativePath))
+  );
+};
+
+const copyAiGameWorkbenchExtensionAssetsToProject = async ({
+  project,
+  assetFiles,
+}: {|
+  project: gdProject,
+  assetFiles: Array<AiGameWorkbenchExtensionAssetFile>,
+|}): Promise<void> => {
+  if (!fs || !path) {
+    throw new Error('Filesystem paths are not supported.');
+  }
+
+  const projectRootPath = getProjectRootPath(project);
+  if (!projectRootPath) {
+    throw new Error('Save the project before importing generated assets.');
+  }
+
+  const resourcesManager = project.getResourcesManager();
+  for (const assetFile of assetFiles) {
+    const relativePath = normalizeSlashes(assetFile.relativePath || '');
+    const resourceName = assetFile.resourceName || relativePath;
+    if (!relativePath || !resourceName) {
+      throw new Error('Generated asset is missing its resource path.');
+    }
+
+    const sourcePath = path.resolve(assetFile.sourcePath);
+    const destinationPath = path.resolve(projectRootPath, relativePath);
+    if (!isAbsolutePathInside(projectRootPath, destinationPath)) {
+      throw new Error(
+        `Generated asset path escapes the project folder: ${relativePath}`
+      );
+    }
+
+    await fs.promises.mkdir(path.dirname(destinationPath), { recursive: true });
+    await fs.promises.copyFile(sourcePath, destinationPath);
+
+    if (resourcesManager.hasResource(resourceName)) {
+      resourcesManager.removeResource(resourceName);
+    }
+    const resource = new gd.ImageResource();
+    resource.setName(resourceName);
+    resource.setFile(relativePath);
+    resource.setSmooth(project.getScaleMode() !== 'nearest');
+    resourcesManager.addResource(resource);
+    resource.delete();
+  }
+};
+
 const getImageGenerationOutputFolderPath = async ({
   project,
 }: {|
@@ -648,6 +724,9 @@ const ToolsPanel = ({
   onProjectFilesChanged,
 }: Props): React.Node => {
   const preferences = React.useContext(PreferencesContext);
+  const eventsFunctionsExtensionsState = React.useContext(
+    EventsFunctionsExtensionsContext
+  );
   const savedToolsSettings = React.useMemo(
     () =>
       getResourcesToolsSettingsWithDefaults(
@@ -1668,6 +1747,97 @@ const ToolsPanel = ({
       setAiGameWorkbenchStatus(null);
     }
   }, []);
+
+  const importAiGameWorkbenchGDevelopExtension = React.useCallback(
+    async (
+      payload: AiGameWorkbenchExtensionImportPayload
+    ): Promise<{|
+      extensionName: string,
+      extensionVersion: string,
+      assetCount: number,
+      replaced: boolean,
+    |}> => {
+      if (!payload || !payload.extension || !payload.extension.name) {
+        throw new Error('The generated GDevelop extension payload is invalid.');
+      }
+
+      const extensionName = String(payload.extension.name);
+      const extensionVersion = String(
+        payload.extension.version || payload.extensionVersion || ''
+      );
+      const replaced = project.hasEventsFunctionsExtensionNamed(extensionName);
+      setAiGameWorkbenchError(null);
+      setAiGameWorkbenchStatus(
+        `${replaced ? 'Updating' : 'Importing'} ${extensionName}...`
+      );
+
+      await copyAiGameWorkbenchExtensionAssetsToProject({
+        project,
+        assetFiles: payload.assetFiles || [],
+      });
+      await addSerializedExtensionsToProject(
+        eventsFunctionsExtensionsState,
+        project,
+        [payload.extension],
+        []
+      );
+      await onProjectFilesChanged();
+
+      setAiGameWorkbenchStatus(
+        `${replaced ? 'Updated' : 'Imported'} ${extensionName}${
+          extensionVersion ? ` v${extensionVersion}` : ''
+        }.`
+      );
+      return {
+        extensionName,
+        extensionVersion,
+        assetCount: payload.assetFiles ? payload.assetFiles.length : 0,
+        replaced,
+      };
+    },
+    [eventsFunctionsExtensionsState, onProjectFilesChanged, project]
+  );
+
+  React.useEffect(
+    () => {
+      if (!ipcRenderer) return;
+
+      const handleImportRequest = (event, request) => {
+        const requestId = request && request.requestId;
+        if (!requestId) return;
+
+        importAiGameWorkbenchGDevelopExtension(request.payload)
+          .then(result => {
+            ipcRenderer.send(
+              'ai-game-workbench-import-gdevelop-extension-response',
+              { requestId, result }
+            );
+          })
+          .catch(error => {
+            const message =
+              error && error.message ? error.message : String(error);
+            setAiGameWorkbenchError(message);
+            setAiGameWorkbenchStatus(null);
+            ipcRenderer.send(
+              'ai-game-workbench-import-gdevelop-extension-response',
+              { requestId, error: message }
+            );
+          });
+      };
+
+      ipcRenderer.on(
+        'ai-game-workbench-import-gdevelop-extension-request',
+        handleImportRequest
+      );
+      return () => {
+        ipcRenderer.removeListener(
+          'ai-game-workbench-import-gdevelop-extension-request',
+          handleImportRequest
+        );
+      };
+    },
+    [importAiGameWorkbenchGDevelopExtension]
+  );
 
   const localCrop: LocalImageCrop = {
     x: parsePixelField(localCropX),

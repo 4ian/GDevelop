@@ -12,6 +12,7 @@ import {
 } from './EditorTabsHandler';
 import PreferencesContext from '../Preferences/PreferencesContext';
 import { useDebounce } from '../../Utils/UseDebounce';
+import { getTimelineByIdOrName } from '../../TimelineEditor/TimelineProjectStorage';
 
 type Props = {|
   editorTabs: EditorTabsState,
@@ -61,6 +62,8 @@ const projectHasItem = ({
             .getVariants()
             .getVariant(variantName))
       );
+    case 'timeline':
+      return !!getTimelineByIdOrName(project, name);
     default:
       return false;
   }

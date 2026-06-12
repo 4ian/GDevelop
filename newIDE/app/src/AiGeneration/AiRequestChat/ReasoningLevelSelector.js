@@ -55,10 +55,6 @@ const styles = {
     paddingTop: 4,
     paddingBottom: 4,
   },
-  freeBadge: {
-    fontSize: 12,
-    opacity: 0.7,
-  },
   networkIcon: {
     fontSize: 20,
   },
@@ -80,11 +76,7 @@ const getSubscriptionBadge = (
       // Plans unknown (e.g. not signed in): show a generic subscription hint.
       return <Crown style={styles.subscriptionIcon} />;
     }
-    return (
-      <span style={styles.freeBadge}>
-        <Trans>Free</Trans>
-      </span>
-    );
+    return null;
   }
   if (
     enabledWithPlans.some(

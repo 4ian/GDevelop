@@ -119,7 +119,6 @@ type Props = {|
   onSwitchedToGDevelopCredits: () => void,
 
   onStartOrOpenChat: (options: ?{| aiRequestId: string | null |}) => void,
-  isFetchingSuggestions: boolean,
   isSending?: boolean,
   // True while the request is paused waiting for the user to answer the inline
   // "Apply this edit?" prompt. Replaces the working/thinking indicators.
@@ -204,7 +203,6 @@ export const ChatMessages: React.ComponentType<Props> = React.memo<Props>(
     hasStartedRequestButCannotContinue,
     onSwitchedToGDevelopCredits,
     onStartOrOpenChat,
-    isFetchingSuggestions,
     isSending,
     isWaitingForEditApproval,
     savingProjectForMessageId,
@@ -275,7 +273,6 @@ export const ChatMessages: React.ComponentType<Props> = React.memo<Props>(
       () => {
         if (
           shouldShowCreditsOrSubscriptionPrompt ||
-          isFetchingSuggestions ||
           shouldBeWorkingIfNotPaused
         ) {
           onScrollToBottom();
@@ -283,7 +280,6 @@ export const ChatMessages: React.ComponentType<Props> = React.memo<Props>(
       },
       [
         shouldShowCreditsOrSubscriptionPrompt,
-        isFetchingSuggestions,
         shouldBeWorkingIfNotPaused,
         onScrollToBottom,
       ]
@@ -647,7 +643,7 @@ export const ChatMessages: React.ComponentType<Props> = React.memo<Props>(
     }
 
     // Compute here (not inside JSX) so the ref is always up to date regardless
-    // of which render branch is active (e.g. isFetchingSuggestions vs working).
+    // of which render branch is active (e.g. sending vs working).
     const textsToShow = hasWorkingFunctionCallTexts
       ? lastWorkingFunctionCallTextsRef.current
       : thinkingPhrases;
@@ -657,8 +653,7 @@ export const ChatMessages: React.ComponentType<Props> = React.memo<Props>(
     const textsToShowRef = React.useRef<Array<React.Node>>(textsToShow);
     textsToShowRef.current = textsToShow;
 
-    const isActivelyWorking =
-      !!shouldBeWorkingIfNotPaused || isFetchingSuggestions;
+    const isActivelyWorking = !!shouldBeWorkingIfNotPaused;
 
     React.useEffect(
       () => {
@@ -1276,26 +1271,6 @@ export const ChatMessages: React.ComponentType<Props> = React.memo<Props>(
                 color="secondary"
               >
                 <Trans>Stopped. Ready when you are.</Trans>
-              </Text>
-            </div>
-          </Line>
-        ) : isFetchingSuggestions ? (
-          <Line justifyContent="flex-start">
-            <div className={classes.thinkingText}>
-              <RobotIcon rotating size={14} />
-              <Spacer />
-              <Text
-                noMargin
-                displayInlineAsSpan
-                size="body-small"
-                color="inherit"
-              >
-                <span className={classes.cursorWrapper}>
-                  <span>
-                    <Trans>Thinking...</Trans>
-                  </span>
-                  <span className={classes.cursor} />
-                </span>
               </Text>
             </div>
           </Line>

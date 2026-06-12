@@ -417,6 +417,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
         pendingEditApproval,
         requestEditApproval,
         resolveEditApproval,
+        setIsFetchingSuggestions,
       } = React.useContext(AiRequestContext);
       const {
         getEditorFunctionCallResults,
@@ -714,6 +715,10 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
 
           try {
             setSendingAiRequest(aiRequestId, true);
+            // Sending takes over the UI: drop any in-flight best-effort
+            // suggestions fetch so its "working" state can't keep the input
+            // enabled while the real request runs.
+            setIsFetchingSuggestions(false);
             if (userMessage) setIsSendingUserMessage(true);
 
             const upToDateProject = createdProject || project;
@@ -839,6 +844,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
           aiRequestPriceInCredits,
           availableCredits,
           setSendingAiRequest,
+          setIsFetchingSuggestions,
           setIsSendingUserMessage,
           updateAiRequest,
           clearEditorFunctionCallResults,

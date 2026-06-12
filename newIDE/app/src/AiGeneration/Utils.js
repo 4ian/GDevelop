@@ -773,6 +773,11 @@ export const useAiRequestState = ({
     setSavingProjectForMessageId,
   ] = React.useState<?string>(null);
 
+  // Best-effort suggestions are attempted at most once per message; this tracks
+  // which messages were already attempted (key: aiRequestId + last message id),
+  // so that a transient failure cannot loop now that the input stays enabled.
+  const attemptedSuggestionMessageIdsRef = React.useRef<Set<string>>(new Set());
+
   const prevProjectRef = React.useRef(project);
   React.useEffect(
     () => {
@@ -871,6 +876,18 @@ export const useAiRequestState = ({
           return;
         }
 
+        const lastMessageKey = lastMessage.messageId
+          ? lastMessage.messageId
+          : `index-${outputForSuggestions.length}`;
+        const suggestionAttemptKey = `${
+          selectedAiRequest.id
+        }:${lastMessageKey}`;
+        if (
+          attemptedSuggestionMessageIdsRef.current.has(suggestionAttemptKey)
+        ) {
+          return;
+        }
+
         const isLastMessageFunctionCallOutputProjectInitialization =
           lastMessage.type === 'function_call_output' &&
           getFunctionCallNameByCallId({
@@ -916,6 +933,7 @@ export const useAiRequestState = ({
           // The request will switch from "ready" to "working" while suggestions are generated.
           // It will be watched and eventually return to "ready" with suggestions.
           setIsFetchingSuggestions(true);
+          attemptedSuggestionMessageIdsRef.current.add(suggestionAttemptKey);
           const aiRequestWorkingForSuggestions = await getAiRequestSuggestions(
             getAuthorizationHeader,
             {
@@ -934,11 +952,19 @@ export const useAiRequestState = ({
             }
           );
 
-          // Merge with the latest state to preserve any concurrent updates (e.g., projectVersionId)
-          updateAiRequest(selectedAiRequest.id, prevRequest => ({
-            ...(prevRequest || {}),
-            ...aiRequestWorkingForSuggestions,
-          }));
+          // While we were fetching, the user may have sent a new message. If the
+          // conversation advanced, drop the stale snapshot: the newer message wins.
+          const snapshotOutput = aiRequestWorkingForSuggestions.output || [];
+          updateAiRequest(selectedAiRequest.id, prevRequest => {
+            if (!prevRequest) return aiRequestWorkingForSuggestions;
+            if (isSendingAiRequest(selectedAiRequest.id)) return prevRequest;
+            const prevOutput = prevRequest.output || [];
+            if (prevOutput.length !== snapshotOutput.length) return prevRequest;
+            return {
+              ...prevRequest,
+              ...aiRequestWorkingForSuggestions,
+            };
+          });
 
           // If the request is already ready with suggestions, clear the flag immediately
           // Otherwise, it will be watched and cleared when it becomes ready

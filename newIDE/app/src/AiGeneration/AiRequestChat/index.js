@@ -726,7 +726,9 @@ export const AiRequestChat: React.ComponentType<{
       !!hasWorkingFunctionCalls ||
       !!hasFunctionsCallsToProcess ||
       hasActiveSubAgents ||
-      (!!aiRequest && aiRequest.status === 'working');
+      // Fetching suggestions also flips the request to "working" on the backend,
+      // but that is best-effort background work and must not block the input.
+      (!!aiRequest && aiRequest.status === 'working' && !isFetchingSuggestions);
     const isWorking = isSending || hasWorkToProcess;
     const canRequestBeStopped = isWorking && !!aiRequest;
 
@@ -1167,7 +1169,6 @@ export const AiRequestChat: React.ComponentType<{
               setHasSwitchedToGDevelopCreditsMidChat(true)
             }
             onStartOrOpenChat={onStartOrOpenChat}
-            isFetchingSuggestions={isFetchingSuggestions}
             isSending={isSendingUserMessage}
             isWaitingForEditApproval={!!pendingEditApproval}
             savingProjectForMessageId={savingProjectForMessageId}

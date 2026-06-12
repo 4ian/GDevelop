@@ -1685,7 +1685,7 @@ describe('editorFunctions', () => {
       expect(result.success).toBe(true);
       expect(result.message).toEqual(
         expect.stringContaining(
-          'Created 2 new instances of object "Player" using point brush at 50, 60 on layer "base" (size 64x64, rotation 45°, opacity 128/255, z-order 5).'
+          'Created 2 new instances of object "Player" using point brush at 50, 60 on layer "base" (size 64x64, rotation 45°, opacity 128/255, z-order 5, origin at this position, each occupies X 50 to 114, Y 60 to 124).'
         )
       );
     });
@@ -1724,9 +1724,56 @@ describe('editorFunctions', () => {
       expect(result.success).toBe(true);
       expect(result.message).toEqual(
         expect.stringContaining(
-          'Created 1 new instance of object "Player" using point brush at 10, 20, 30 on layer "base" (size 8x16x24, rotation (15°, 30°, 45°)).'
+          'Created 1 new instance of object "Player" using point brush at 10, 20, 30 on layer "base" (size 8x16x24, rotation (15°, 30°, 45°), origin at this position, each occupies X 10 to 18, Y 20 to 36, Z 30 to 54).'
         )
       );
+    });
+  });
+
+  describe('describe_instances (position semantics)', () => {
+    let project: gdProject;
+    let testScene: gdLayout;
+
+    beforeEach(() => {
+      // $FlowFixMe[invalid-constructor]
+      project = new gd.ProjectHelper.createNewGDJSProject();
+      testScene = project.insertNewLayout('TestScene', 0);
+      testScene.getObjects().insertNewObject(project, 'Sprite', 'Player', 0);
+    });
+
+    afterEach(() => {
+      project.delete();
+    });
+
+    it('exposes z (even when 0), object size info and position semantics', async () => {
+      const instance = testScene
+        .getInitialInstances()
+        .insertNewInitialInstance();
+      instance.setObjectName('Player');
+      instance.setX(100);
+      instance.setY(200);
+      instance.setHasCustomSize(true);
+      instance.setHasCustomDepth(true);
+      instance.setCustomWidth(32);
+      instance.setCustomHeight(48);
+      instance.setCustomDepth(64);
+
+      const result = await editorFunctions.describe_instances.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: { scene_name: 'TestScene' },
+      });
+
+      expect(result.success).toBe(true);
+      const instances = result.instances || [];
+      expect(instances).toHaveLength(1);
+      expect(instances[0].z).toBe(0);
+      expect(instances[0].width).toBe(32);
+      expect(instances[0].height).toBe(48);
+      expect(instances[0].depth).toBe(64);
+      expect(result.positionSemantics).toEqual(
+        expect.stringContaining('origin, NOT its center')
+      );
+      expect(result.objectSizeInfo).toEqual({ Player: null });
     });
   });
 

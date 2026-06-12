@@ -348,7 +348,7 @@ describe('SimplifiedProject', () => {
                   "MySpriteObject",
                   "MySpriteObject_With_A_Veeeerrryyyyyyyyy_Looooooooooooong_Name",
                   "MySpriteObjectWithoutBehaviors",
- group-               ],
+                ],
                 "variables": undefined,
               },
               Object {

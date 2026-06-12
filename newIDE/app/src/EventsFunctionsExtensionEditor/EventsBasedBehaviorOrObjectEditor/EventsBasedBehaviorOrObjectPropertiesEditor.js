@@ -7,7 +7,7 @@ import { Column, Line } from '../../UI/Grid';
 import SelectOption from '../../UI/SelectOption';
 import { mapFor, mapVector } from '../../Utils/MapFor';
 import newNameGenerator from '../../Utils/NewNameGenerator';
-import { ResponsiveLineStackLayout, ColumnStackLayout } from '../../UI/Layout';
+import { LineStackLayout, ColumnStackLayout } from '../../UI/Layout';
 import ChoicesEditor, { type Choice } from '../../ChoicesEditor';
 import { CompactColorField } from '../../UI/CompactColorField';
 import CompactBehaviorTypeSelector from '../../BehaviorTypeSelector/CompactBehaviorTypeSelector';
@@ -346,11 +346,7 @@ export const EventsBasedBehaviorOrObjectPropertiesEditor: React.ComponentType<{
                             }}
                           >
                             <Column expand noOverflowParent>
-                              <ResponsiveLineStackLayout
-                                expand
-                                noOverflowParent
-                                noMargin
-                              >
+                              <LineStackLayout expand noMargin>
                                 <Line noMargin expand alignItems="center">
                                   <CompactSemiControlledTextField
                                     commitOnBlur
@@ -457,7 +453,7 @@ export const EventsBasedBehaviorOrObjectPropertiesEditor: React.ComponentType<{
                                     />
                                   </CompactSelectField>
                                 </Line>
-                              </ResponsiveLineStackLayout>
+                              </LineStackLayout>
                             </Column>
                           </div>
                           <Line expand>

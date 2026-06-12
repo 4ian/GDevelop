@@ -19,8 +19,7 @@ namespace gdjs {
   export class SpineAtlasManager implements gdjs.ResourceManager {
     private _imageManager: ImageManager;
     private _resourceLoader: ResourceLoader;
-    private _loadedSpineAtlases =
-      new gdjs.ResourceCache<spine.TextureAtlas>();
+    private _loadedSpineAtlases = new gdjs.ResourceCache<spine.TextureAtlas>();
     private _loadingSpineAtlases = new gdjs.ResourceCache<
       Promise<spine.TextureAtlas>
     >();
@@ -98,8 +97,9 @@ namespace gdjs {
         // The v7 atlas loader expects BaseTexture instances when sharing pages
         // with already-loaded textures.
         imagesMap[embeddedResourceName] =
-          this._imageManager.getOrLoadPIXITexture(mappedResourceName)
-            .baseTexture;
+          this._imageManager.getOrLoadPIXITexture(
+            mappedResourceName
+          ).baseTexture;
         return imagesMap;
       }, {});
 

@@ -79,6 +79,21 @@ const isLocalFile = (urlOrFilename: string) => {
   );
 };
 
+export const getLocalFileUrl = (resourceAbsolutePath: string): string => {
+  const normalizedPath = resourceAbsolutePath.replace(/\\/g, '/');
+  const pathWithLeadingSlash = normalizedPath.startsWith('/')
+    ? normalizedPath
+    : '/' + normalizedPath;
+
+  return (
+    'file://' +
+    pathWithLeadingSlash
+      .split('/')
+      .map(pathSegment => encodeURIComponent(pathSegment).replace(/%3A/g, ':'))
+      .join('/')
+  );
+};
+
 /**
  * A class globally used in the whole IDE to get URLs to resources of games
  * (notably images).
@@ -140,7 +155,7 @@ export default class ResourcesLoader {
       return this._cache.cacheLocalFileUrl(
         project,
         urlOrFilename,
-        'file://' + resourceAbsolutePath,
+        getLocalFileUrl(resourceAbsolutePath),
         !!disableCacheBurst
       );
     }

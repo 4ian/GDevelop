@@ -159,21 +159,16 @@ namespace gdjs {
     }
 
     unloadResource(resourceData: ResourceData): void {
-      const loadedSpineAtlas = this._loadedSpineAtlases.getFromName(
-        resourceData.name
-      );
-      if (loadedSpineAtlas) {
-        loadedSpineAtlas.dispose();
-        this._loadedSpineAtlases.delete(resourceData);
+      const resource = this._getAtlasResource(resourceData.name);
+      // PIXI.Assets.unload disposes the TextureAtlas and clears the cache entry,
+      // preventing a stale atlas from being reused on the next load.
+      if (resource) {
+        const alias = this._resourceLoader.getFullUrl(resource.file);
+        PIXI.Assets.unload(alias).catch(() => {});
       }
 
-      const loadingSpineAtlas = this._loadingSpineAtlases.getFromName(
-        resourceData.name
-      );
-      if (loadingSpineAtlas) {
-        loadingSpineAtlas.then((atlas) => atlas.dispose()).catch(() => {});
-        this._loadingSpineAtlases.delete(resourceData);
-      }
+      this._loadedSpineAtlases.delete(resourceData);
+      this._loadingSpineAtlases.delete(resourceData);
     }
   }
 }

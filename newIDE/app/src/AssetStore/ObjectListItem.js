@@ -175,18 +175,14 @@ export const ObjectListItem = ({
                     </Trans>
                   }
                 >
-                  <IconButton
-                    size="small"
-                    onClick={e => {
-                      e.stopPropagation();
-                    }}
-                  >
+                  <span>
                     <Chip
                       size="small"
                       label={<Trans>No cycle</Trans>}
                       variant="outlined"
+                      onClick={() => {}}
                     />
-                  </IconButton>
+                  </span>
                 </Tooltip>
               )}
             </LineStackLayout>

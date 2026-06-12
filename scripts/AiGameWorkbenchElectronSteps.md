@@ -50,8 +50,10 @@ The module 01 export page is GDevelop-specific:
 - The route generates `gdevelop-extension.json`, `manifest.json`, and
   `gdevelop-extension-package.zip`.
 - The extension JSON contains one events-based object named `Character`; its
-  child Sprite object has named animations like `idle_down`, `walk_left`,
-  `run_right`, `attack1_up`, and `jump_down`.
+  default variant contains a child Sprite object with named animations like
+  `idle_down`, `walk_left`, `run_right`, `attack1_up`, and `jump_down`.
+- The Sprite child must be stored in `eventsBasedObjects[].variants[]`, not in
+  the deprecated root children configuration.
 - Generated image resources use project-relative paths under
   `assets/ai-game-workbench/...`; the integration must not create an
   `ai-game-workbench` folder at the project root.
@@ -151,11 +153,11 @@ one transparent idle/walk PNG for each direction and inject:
 
 ```powershell
 $env:STAGING = $staging
-node --input-type=module -e "import fs from 'node:fs'; import os from 'node:os'; import path from 'node:path'; import { pathToFileURL } from 'node:url'; const staging = process.env.STAGING; const sharp = (await import(pathToFileURL(path.join(staging, 'node_modules', 'sharp', 'lib', 'index.js')).href)).default; const root = fs.mkdtempSync(path.join(os.tmpdir(), 'ai-gdevelop-staged-')); const storageDir = path.join(root, 'storage'); const exportDir = path.join(root, 'exports'); const characterId = 'Hero'; const png = await sharp({ create: { width: 4, height: 4, channels: 4, background: { r: 0, g: 255, b: 0, alpha: 1 } } }).png().toBuffer(); const characterRoot = path.join(storageDir, 'characters', characterId); for (const dir of ['down', 'up', 'left', 'right']) { const idleDir = path.join(characterRoot, 'base-character', 'loop-export', 'idle', 'transparent'); fs.mkdirSync(idleDir, { recursive: true }); fs.writeFileSync(path.join(idleDir, dir + '.png'), png); const walkDir = path.join(characterRoot, 'base-character', 'loop-export', 'transparent', dir); fs.mkdirSync(walkDir, { recursive: true }); fs.writeFileSync(path.join(walkDir, '000.png'), png); } const mod = await import(pathToFileURL(path.join(staging, 'server', 'app.js')).href); const app = mod.createApp({ storageDir, presetsDir: path.join(staging, 'server', 'presets'), ffmpegPath: path.join(staging, 'bin', 'ffmpeg.exe'), module01CharacterExportDir: exportDir, port: 0 }); await app.ready(); const res = await app.inject({ method: 'POST', url: '/api/export/gdevelop-extension', payload: { characterId, exportSize: 256 } }); const body = res.json(); console.log(res.statusCode, body.extensionName, body.animationCount, body.assetCount, Boolean(body.extension?.eventsBasedObjects?.[0]?.objects?.[0]?.animations?.length), body.assetFiles.every(file => file.relativePath.startsWith('assets/ai-game-workbench/'))); await app.close();"
+node --input-type=module -e "import fs from 'node:fs'; import os from 'node:os'; import path from 'node:path'; import { pathToFileURL } from 'node:url'; const staging = process.env.STAGING; const sharp = (await import(pathToFileURL(path.join(staging, 'node_modules', 'sharp', 'lib', 'index.js')).href)).default; const root = fs.mkdtempSync(path.join(os.tmpdir(), 'ai-gdevelop-staged-')); const storageDir = path.join(root, 'storage'); const exportDir = path.join(root, 'exports'); const characterId = 'Hero'; const png = await sharp({ create: { width: 4, height: 4, channels: 4, background: { r: 0, g: 255, b: 0, alpha: 1 } } }).png().toBuffer(); const characterRoot = path.join(storageDir, 'characters', characterId); for (const dir of ['down', 'up', 'left', 'right']) { const idleDir = path.join(characterRoot, 'base-character', 'loop-export', 'idle', 'transparent'); fs.mkdirSync(idleDir, { recursive: true }); fs.writeFileSync(path.join(idleDir, dir + '.png'), png); const walkDir = path.join(characterRoot, 'base-character', 'loop-export', 'transparent', dir); fs.mkdirSync(walkDir, { recursive: true }); fs.writeFileSync(path.join(walkDir, '000.png'), png); } const mod = await import(pathToFileURL(path.join(staging, 'server', 'app.js')).href); const app = mod.createApp({ storageDir, presetsDir: path.join(staging, 'server', 'presets'), ffmpegPath: path.join(staging, 'bin', 'ffmpeg.exe'), module01CharacterExportDir: exportDir, port: 0 }); await app.ready(); const res = await app.inject({ method: 'POST', url: '/api/export/gdevelop-extension', payload: { characterId, exportSize: 256 } }); const body = res.json(); const ebo = body.extension?.eventsBasedObjects?.[0]; console.log(res.statusCode, body.extensionName, body.animationCount, body.assetCount, ebo?.objects?.length === 0, Boolean(ebo?.variants?.[0]?.objects?.[0]?.animations?.length), body.assetFiles.every(file => file.relativePath.startsWith('assets/ai-game-workbench/'))); await app.close();"
 Remove-Item Env:\STAGING -ErrorAction SilentlyContinue
 ```
 
-Expected output shape: `200 AICharacter_Hero 8 8 true true`.
+Expected output shape: `200 AICharacter_Hero 8 8 true true true`.
 
 ## 6. Pack The ASAR
 

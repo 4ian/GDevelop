@@ -8,8 +8,8 @@ type NotNullTranslationFunction = string => string;
 // Descriptions/sentences coming from third-party events extensions may legitimately
 // contain `{x}` / `{x, y}` substrings that look like placeholders but are not real
 // ones (e.g. `Output format: {key, value}`). Such strings throw inside `i18n._`
-// (`formatters[type] is not a function`), aborting metadata generation for the
-// whole extension. Fall back to the raw string in that case.
+// (`formatters[type] is not a function`), which is something we never want.
+// Fall back to the raw string in that case.
 const safeTranslate = (i18nModule: I18n, str: string): string => {
   try {
     return i18nModule._(str);

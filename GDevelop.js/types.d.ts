@@ -2212,6 +2212,7 @@ export class ObjectTools extends EmscriptenObject {
 
 export class EventsBasedObjectDependencyFinder extends EmscriptenObject {
   static isDependentFromEventsBasedObject(project: Project, eventsBasedObject: EventsBasedObject, dependency: EventsBasedObject): boolean;
+  static getExtensionDependencyCycleCreatedByObject(project: Project, parentExtensionName: string, objectType: string): VectorString;
 }
 
 export class PropertyFunctionGenerator extends EmscriptenObject {

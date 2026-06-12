@@ -180,7 +180,8 @@ export type EditorId =
   | 'properties'
   | 'object-groups-list'
   | 'instances-list'
-  | 'layers-list';
+  | 'layers-list'
+  | 'timeline';
 
 const styles = {
   container: {
@@ -791,6 +792,8 @@ export default class SceneEditor extends React.Component<Props, State> {
           isInstancesListShown={editorDisplay.isEditorVisible('instances-list')}
           toggleLayersList={this.toggleLayersList}
           isLayersListShown={editorDisplay.isEditorVisible('layers-list')}
+          toggleTimelinePanel={this.toggleTimelinePanel}
+          isTimelinePanelShown={editorDisplay.isEditorVisible('timeline')}
           toggleWindowMask={this.toggleWindowMask}
           isWindowMaskShown={!!this.state.instancesEditorSettings.windowMask}
           toggleGrid={this.toggleGrid}
@@ -901,6 +904,11 @@ export default class SceneEditor extends React.Component<Props, State> {
   toggleLayersList = () => {
     if (!this.editorDisplay) return;
     this.editorDisplay.toggleEditorView('layers-list');
+  };
+
+  toggleTimelinePanel = () => {
+    if (!this.editorDisplay) return;
+    this.editorDisplay.toggleEditorView('timeline');
   };
 
   toggleWindowMask = () => {

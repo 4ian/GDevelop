@@ -1875,6 +1875,10 @@ export default class InstancesEditor extends Component<Props, State> {
     startPIXITicker();
   };
 
+  notifyTimelinePreviewFrame = () => {
+    this.fpsLimiter.notifyInteractionHappened();
+  };
+
   getInstanceSize = (
     initialInstance: gdInitialInstance
   ): [number, number, number] => {

@@ -113,6 +113,12 @@ export type ObjectShortHeader = {
    * @see adaptObjectHeader
    */
   type: string,
+  /**
+   * This attribute is computed for `installed` extensions: true when using
+   * the object would create a dependency cycle with the edited
+   * events-based object.
+   */
+  isDependentWithParent?: boolean,
 };
 
 /**

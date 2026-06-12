@@ -22,6 +22,10 @@ import type { ObjectWithContext } from '../ObjectsList/EnumerateObjects';
 import { type HTMLDataset } from '../Utils/HTMLDataset';
 import { isVariantEditable } from '../ObjectEditor/Editors/CustomObjectPropertiesEditor';
 import { exceptionallyGuardAgainstDeadObject } from '../Utils/IsNullPtr';
+import {
+  getDependencyCycleCreatedByObject,
+  getDependencyCycleAlertOptions,
+} from '../Utils/ExtensionDependencyCycle';
 
 const gd: libGDevelop = global.gd;
 
@@ -67,6 +71,8 @@ export type ObjectTreeViewItemCallbacks = {|
 export type ObjectTreeViewItemProps = {|
   ...ObjectTreeViewItemCallbacks,
   project: gdProject,
+  eventsFunctionsExtension: gdEventsFunctionsExtension | null,
+  eventsBasedObject: gdEventsBasedObject | null,
   globalObjectsContainer: gdObjectsContainer | null,
   objectsContainer: gdObjectsContainer,
   swapObjectAsset: (objectWithContext: ObjectWithContext) => void,
@@ -88,6 +94,7 @@ export type ObjectTreeViewItemProps = {|
     folder?: gdObjectFolderOrObject,
   |}) => void,
   showDeleteConfirmation: (options: any) => Promise<boolean>,
+  showAlert: (options: any) => Promise<void>,
   selectObjectFolderOrObjectWithContext: (
     objectFolderOrObjectWithContext: ?ObjectFolderOrObjectWithContext
   ) => void,
@@ -656,12 +663,27 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
 
     const {
       project,
+      eventsFunctionsExtension,
+      eventsBasedObject,
       globalObjectsContainer,
       objectsContainer,
       onObjectPasted,
       onObjectModified,
       onObjectCreated,
+      showAlert,
     } = this.props;
+
+    // A cycle between extensions would make the project unable to load them.
+    const dependencyCycle = getDependencyCycleCreatedByObject(
+      project,
+      eventsFunctionsExtension,
+      eventsBasedObject,
+      objectType
+    );
+    if (dependencyCycle) {
+      showAlert(getDependencyCycleAlertOptions(dependencyCycle));
+      return;
+    }
 
     const isTheFirstOfItsTypeInProject = !gd.UsedObjectTypeFinder.scanProject(
       project,

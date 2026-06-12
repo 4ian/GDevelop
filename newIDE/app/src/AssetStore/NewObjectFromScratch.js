@@ -32,6 +32,7 @@ import ElementWithMenu from '../UI/Menu/ElementWithMenu';
 import IconButton from '../UI/IconButton';
 import ThreeDotsMenu from '../UI/CustomSvgIcons/ThreeDotsMenu';
 import ExtensionInstallDialog from './ExtensionStore/ExtensionInstallDialog';
+import { getDependencyCycleCreatedByObject } from '../Utils/ExtensionDependencyCycle';
 
 const gd: libGDevelop = global.gd;
 
@@ -190,17 +191,12 @@ export default function NewObjectFromScratch({
       return objectMetadataList
         .filter(object => !object.objectMetadata.isHidden() && object.type)
         .map(object => {
-          let isDependentWithParent = false;
-          if (eventsBasedObject && project.hasEventsBasedObject(object.name)) {
-            const otherEventBasedObject = project.getEventsBasedObject(
-              object.name
-            );
-            isDependentWithParent = gd.EventsBasedObjectDependencyFinder.isDependentFromEventsBasedObject(
-              project,
-              otherEventBasedObject,
-              eventsBasedObject
-            );
-          }
+          const isDependentWithParent = !!getDependencyCycleCreatedByObject(
+            project,
+            eventsFunctionsExtension,
+            eventsBasedObject,
+            object.type
+          );
           // $FlowFixMe[incompatible-type]
           return {
             type: object.type,

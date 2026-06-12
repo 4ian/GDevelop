@@ -57,6 +57,10 @@ import type { MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import type { EventsScope } from '../InstructionOrExpression/EventsScope';
 import { type InstallAssetOutput } from '../AssetStore/InstallAsset';
 import { exceptionallyGuardAgainstDeadObject } from '../Utils/IsNullPtr';
+import {
+  getDependencyCycleCreatedByObject,
+  getDependencyCycleAlertOptions,
+} from '../Utils/ExtensionDependencyCycle';
 
 const gd: libGDevelop = global.gd;
 
@@ -568,7 +572,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       InAppTutorialContext
     );
     const [searchText, setSearchText] = React.useState('');
-    const { showDeleteConfirmation } = useAlertDialog();
+    const { showDeleteConfirmation, showAlert } = useAlertDialog();
     const treeViewRef = React.useRef<?TreeViewInterface<TreeViewItem>>(null);
     const forceUpdate = useForceUpdate();
     const { isMobile } = useResponsiveWindowSize();
@@ -621,6 +625,21 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
 
     const addObject = React.useCallback(
       (objectType: string) => {
+        // The dialog filters out objects that would create a dependency
+        // cycle, but check again in case this is called from elsewhere:
+        // a cycle between extensions would make the project unable to
+        // load them.
+        const dependencyCycle = getDependencyCycleCreatedByObject(
+          project,
+          eventsFunctionsExtension,
+          eventsBasedObject,
+          objectType
+        );
+        if (dependencyCycle) {
+          showAlert(getDependencyCycleAlertOptions(dependencyCycle));
+          return;
+        }
+
         const defaultName = project.hasEventsBasedObject(objectType)
           ? 'New' +
             (project.getEventsBasedObject(objectType).getDefaultName() ||
@@ -710,6 +729,9 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       },
       [
         project,
+        eventsFunctionsExtension,
+        eventsBasedObject,
+        showAlert,
         newObjectDialogOpen,
         onEditObject,
         objectsContainer,
@@ -1031,6 +1053,8 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
     const objectTreeViewItemProps = React.useMemo<ObjectTreeViewItemProps>(
       () => ({
         project,
+        eventsFunctionsExtension,
+        eventsBasedObject,
         globalObjectsContainer,
         objectsContainer,
         onObjectPasted,
@@ -1052,6 +1076,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         setAsGlobalObject,
         getThumbnail,
         showDeleteConfirmation,
+        showAlert,
         selectObjectFolderOrObjectWithContext,
         addFolder,
         forceUpdateList,
@@ -1060,6 +1085,8 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       }),
       [
         project,
+        eventsFunctionsExtension,
+        eventsBasedObject,
         globalObjectsContainer,
         objectsContainer,
         onObjectPasted,
@@ -1081,6 +1108,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         setAsGlobalObject,
         getThumbnail,
         showDeleteConfirmation,
+        showAlert,
         selectObjectFolderOrObjectWithContext,
         addFolder,
         forceUpdateList,
@@ -1092,6 +1120,8 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
     const objectFolderTreeViewItemProps = React.useMemo<ObjectFolderTreeViewItemProps>(
       () => ({
         project,
+        eventsFunctionsExtension,
+        eventsBasedObject,
         globalObjectsContainer,
         objectsContainer,
         onObjectPasted,
@@ -1106,12 +1136,15 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         onDeleteObjects,
         selectObjectFolderOrObjectWithContext,
         showDeleteConfirmation,
+        showAlert,
         forceUpdateList,
         forceUpdate,
         isListLocked,
       }),
       [
         project,
+        eventsFunctionsExtension,
+        eventsBasedObject,
         globalObjectsContainer,
         objectsContainer,
         onObjectPasted,
@@ -1126,6 +1159,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         onDeleteObjects,
         selectObjectFolderOrObjectWithContext,
         showDeleteConfirmation,
+        showAlert,
         forceUpdateList,
         forceUpdate,
         isListLocked,

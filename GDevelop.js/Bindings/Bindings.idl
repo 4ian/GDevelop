@@ -3063,6 +3063,10 @@ interface EventsBasedObjectDependencyFinder {
     [Const, Ref] Project project,
     [Const, Ref] EventsBasedObject eventsBasedObject,
     [Const, Ref] EventsBasedObject dependency);
+  [Value] VectorString STATIC_GetExtensionDependencyCycleCreatedByObject(
+    [Const, Ref] Project project,
+    [Const] DOMString parentExtensionName,
+    [Const] DOMString objectType);
 };
 
 interface PropertyFunctionGenerator {

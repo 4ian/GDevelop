@@ -374,6 +374,10 @@ export const ObjectStoreStateProvider = ({
               type: installedObjectMetadata.type,
               name: installedObjectMetadata.name,
               extensionName: installedObjectMetadata.extensionName,
+              // Computed from the objects of the project, so only the
+              // installed extension knows it.
+              isDependentWithParent:
+                installedObjectMetadata.isDependentWithParent,
 
               // Attributes switching between both
 

@@ -79,7 +79,8 @@ export const ObjectListItem = ({
     );
   };
 
-  const isEnabled = isEngineCompatible;
+  const isDependentWithParent = !!objectShortHeader.isDependentWithParent;
+  const isEnabled = isEngineCompatible && !isDependentWithParent;
 
   const chooseObject = React.useCallback(
     () => {
@@ -92,7 +93,7 @@ export const ObjectListItem = ({
 
   const [hover, setHover] = React.useState(false);
 
-  return (
+  const button = (
     <ButtonBase
       id={id}
       onClick={chooseObject}
@@ -179,5 +180,20 @@ export const ObjectListItem = ({
         </LineStackLayout>
       </div>
     </ButtonBase>
+  );
+
+  return isDependentWithParent ? (
+    <Tooltip
+      title={
+        <Trans>
+          This object can't be used here because it would create a circular
+          dependency, with the object being edited or between their extensions.
+        </Trans>
+      }
+    >
+      {button}
+    </Tooltip>
+  ) : (
+    button
   );
 };

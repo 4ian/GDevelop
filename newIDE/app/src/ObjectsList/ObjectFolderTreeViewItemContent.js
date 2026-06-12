@@ -21,6 +21,10 @@ import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import type { ObjectWithContext } from '../ObjectsList/EnumerateObjects';
 import { type HTMLDataset } from '../Utils/HTMLDataset';
 import { exceptionallyGuardAgainstDeadObject } from '../Utils/IsNullPtr';
+import {
+  getDependencyCycleCreatedByObject,
+  getDependencyCycleAlertOptions,
+} from '../Utils/ExtensionDependencyCycle';
 
 const gd: libGDevelop = global.gd;
 
@@ -58,6 +62,8 @@ export type ObjectFolderTreeViewItemCallbacks = {|
 export type ObjectFolderTreeViewItemProps = {|
   ...ObjectFolderTreeViewItemCallbacks,
   project: gdProject,
+  eventsFunctionsExtension: gdEventsFunctionsExtension | null,
+  eventsBasedObject: gdEventsBasedObject | null,
   globalObjectsContainer: gdObjectsContainer | null,
   objectsContainer: gdObjectsContainer,
   editName: (itemId: string) => void,
@@ -75,6 +81,7 @@ export type ObjectFolderTreeViewItemProps = {|
     objectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext
   ) => void,
   showDeleteConfirmation: (options: any) => Promise<boolean>,
+  showAlert: (options: any) => Promise<void>,
   selectObjectFolderOrObjectWithContext: (
     objectFolderOrObjectWithContext: ?ObjectFolderOrObjectWithContext
   ) => void,
@@ -431,13 +438,28 @@ export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
 
     const {
       project,
+      eventsFunctionsExtension,
+      eventsBasedObject,
       globalObjectsContainer,
       objectsContainer,
       onObjectPasted,
       expandFolders,
       onObjectModified,
       onObjectCreated,
+      showAlert,
     } = this.props;
+
+    // A cycle between extensions would make the project unable to load them.
+    const dependencyCycle = getDependencyCycleCreatedByObject(
+      project,
+      eventsFunctionsExtension,
+      eventsBasedObject,
+      objectType
+    );
+    if (dependencyCycle) {
+      showAlert(getDependencyCycleAlertOptions(dependencyCycle));
+      return;
+    }
 
     const isTheFirstOfItsTypeInProject = !gd.UsedObjectTypeFinder.scanProject(
       project,

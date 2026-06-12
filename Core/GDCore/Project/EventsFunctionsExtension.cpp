@@ -236,9 +236,13 @@ void EventsFunctionsExtension::UnserializeExtensionImplementationFrom(
     eventsFunctionsContainer.UnserializeFoldersFrom(
         element.GetChild("eventsFunctionsFolderStructure", 0));
   }
-  // Compatibility with GD <= 5.6.261
+  else {
+    // Compatibility with GD <= 5.6.261
+    eventsFunctionsContainer.ReinitializeFolderStructure();
+    // end of compatibility code
+  }
+  // Just in case
   eventsFunctionsContainer.AddMissingFunctionsInRootFolder();
-  // end of compatibility code
 
   eventsBasedBehaviors.UnserializeElementsFrom(
       "eventsBasedBehavior", project, element.GetChild("eventsBasedBehaviors"));

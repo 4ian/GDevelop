@@ -29,8 +29,7 @@ namespace gd {
 gd::String ExpressionParser2::NAMESPACE_SEPARATOR = "::";
 
 ExpressionParser2::ExpressionParser2()
-    : expression(""),
-      currentPosition(0) {}
+    : currentPosition(0) {}
 
 std::unique_ptr<TextNode> ExpressionParser2::ReadText() {
   size_t textStartPosition = GetCurrentPosition();
@@ -87,8 +86,11 @@ std::unique_ptr<TextNode> ExpressionParser2::ReadText() {
   return text;
 }
 
-std::unique_ptr<NumberNode> ExpressionParser2::ReadNumber() {
-  size_t numberStartPosition = GetCurrentPosition();
+std::unique_ptr<NumberNode>
+ExpressionParser2::ReadNumber(size_t minusSignPosition) {
+  bool isNegative = minusSignPosition != -1;
+  size_t numberStartPosition =
+      isNegative ? minusSignPosition : GetCurrentPosition();
   SkipAllWhitespaces();
   gd::String parsedNumber;
 
@@ -131,7 +133,8 @@ std::unique_ptr<NumberNode> ExpressionParser2::ReadNumber() {
   // Note that parsedNumber can finish by a dot (1., 2., 0.). This is
   // valid in most languages so we allow this.
 
-  auto number = gd::make_unique<NumberNode>(parsedNumber);
+  auto number = gd::make_unique<NumberNode>(isNegative ? "-" + parsedNumber
+                                                       : parsedNumber);
   number->location =
       ExpressionParserLocation(numberStartPosition, GetCurrentPosition());
   if (!numberHasStarted || !digitFound) {

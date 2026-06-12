@@ -7,6 +7,8 @@ declare class gdBehaviorsSharedData {
   getProperties(): gdMapStringPropertyDescriptor;
   updateProperty(name: string, value: string): boolean;
   initializeContent(): void;
+  isFolded(): boolean;
+  setFolded(folded: boolean): void;
   getPropertiesQuickCustomizationVisibilities(): gdQuickCustomizationVisibilitiesContainer;
   delete(): void;
   ptr: number;

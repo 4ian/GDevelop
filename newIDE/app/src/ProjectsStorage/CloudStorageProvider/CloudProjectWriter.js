@@ -43,17 +43,25 @@ import { getUserPublicProfile } from '../../Utils/GDevelopServices/User';
 const zipProject = async ({
   project,
   useBackgroundSerializer,
+  canonicalEventSerialization,
 }: {
   project: gdProject,
   useBackgroundSerializer: boolean,
+  canonicalEventSerialization: boolean,
 }): Promise<{ zippedProject: Blob, projectJson: string }> => {
   const startTime = Date.now();
 
   let projectJson: string;
   if (useBackgroundSerializer) {
+    // Canonical mode is currently not propagated to the background
+    // serializer worker (which uses its own libGD instance). Background
+    // serialization is hardcoded off in MainFrame so this is not
+    // exercised in production yet.
     projectJson = await serializeToJSONInBackground(project);
   } else {
-    projectJson = serializeToJSON(project);
+    projectJson = serializeToJSON(project, 'serializeTo', {
+      canonicalEventSerialization,
+    });
   }
 
   projectJson = addFinalNewline(projectJson);
@@ -108,6 +116,8 @@ const zipAndPrepareProjectVersionForCommit = async ({
     zipProject({
       project,
       useBackgroundSerializer: !!options && !!options.useBackgroundSerializer,
+      canonicalEventSerialization:
+        !!options && !!options.canonicalEventSerialization,
     }),
   ]);
 

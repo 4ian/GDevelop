@@ -8,6 +8,7 @@
 
 #include <sstream>
 
+#include "GDCore/Serialization/Serializer.h"
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/String.h"
 #include "GDCore/Tools/UUID/UUID.h"
@@ -255,10 +256,12 @@ bool Variable::InsertChild(const gd::String& name,
 };
 
 void Variable::SerializeTo(SerializerElement& element) const {
+  const bool canonical = gd::Serializer::IsCanonicalMode();
   element.SetStringAttribute("type", TypeAsString(GetType()));
-  if (IsFolded()) element.SetBoolAttribute("folded", true);
+  if (canonical || IsFolded())
+    element.SetBoolAttribute("folded", IsFolded());
 
-  if (!persistentUuid.empty())
+  if (canonical || !persistentUuid.empty())
     element.SetStringAttribute("persistentUuid", persistentUuid);
 
   if (type == Type::String) {

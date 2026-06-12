@@ -14,6 +14,7 @@ import {
   icon,
   nameAndIconContainer,
   instructionWarningParameter,
+  instructionParameter,
 } from '../EventsTree/ClassNames';
 import SemiControlledAutoComplete, {
   type SemiControlledAutoCompleteInterface,
@@ -21,7 +22,12 @@ import SemiControlledAutoComplete, {
 } from '../../UI/SemiControlledAutoComplete';
 import { TextFieldWithButtonLayout } from '../../UI/Layout';
 import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
-import { highlightSearchText } from '../../Utils/HighlightSearchText';
+import {
+  renderStylizedText,
+  mergeStylizedText,
+  getHighlightSearchTextParts,
+  applySyntaxColoring,
+} from '../../Utils/HighlightSearchText';
 import ShareExternal from '../../UI/CustomSvgIcons/ShareExternal';
 import SelectField from '../../UI/SelectField';
 import SelectOption from '../../UI/SelectOption';
@@ -353,10 +359,9 @@ export default (React.forwardRef<Props, VariableFieldInterface>(
         onChange(fieldCurrentValue);
         onOpenDialog({
           variableName: fieldCurrentValue,
-          shouldCreate: !isRootVariableDeclared(
-            fieldCurrentValue,
-            variablesContainers
-          ),
+          shouldCreate:
+            !!fieldCurrentValue &&
+            !isRootVariableDeclared(fieldCurrentValue, variablesContainers),
           variableType: getVariableTypeName(variableType),
         });
       },
@@ -642,6 +647,7 @@ export default (React.forwardRef<Props, VariableFieldInterface>(
 export const renderVariableWithIcon = (
   {
     value,
+    expression,
     parameterMetadata,
     expressionIsValid,
     hasDeprecationWarning,
@@ -651,6 +657,7 @@ export const renderVariableWithIcon = (
     projectScopedContainersAccessor,
     highlightedSearchText,
     highlightedSearchMatchCase,
+    scope,
   }: ParameterInlineRendererProps,
   tooltip: string,
   getVariableSourceFromIdentifier: (
@@ -691,11 +698,29 @@ export const renderVariableWithIcon = (
         <VariableIcon
           className={classNames({
             [icon]: true,
+            [instructionParameter]: expressionIsValid,
+            variable: true,
           })}
         />
-        {highlightSearchText(value, highlightedSearchText, {
-          matchCase: highlightedSearchMatchCase,
-        })}
+        {renderStylizedText(
+          value,
+          expressionIsValid
+            ? mergeStylizedText(
+                getHighlightSearchTextParts(value, highlightedSearchText, {
+                  matchCase: highlightedSearchMatchCase,
+                }),
+                applySyntaxColoring({
+                  text: value,
+                  rootNode: expression.getRootNode(),
+                  rootType: parameterMetadata.getValueTypeMetadata().getName(),
+                  platform: scope.project.getCurrentPlatform(),
+                  projectScopedContainers: projectScopedContainersAccessor.get(),
+                })
+              )
+            : getHighlightSearchTextParts(value, highlightedSearchText, {
+                matchCase: highlightedSearchMatchCase,
+              })
+        )}
       </IconAndNameContainer>
     </span>
   );

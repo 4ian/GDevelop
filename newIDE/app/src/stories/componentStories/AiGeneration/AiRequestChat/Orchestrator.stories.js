@@ -3,6 +3,7 @@ import * as React from 'react';
 import { I18n } from '@lingui/react';
 import paperDecorator from '../../../PaperDecorator';
 import { AiRequestChat } from '../../../../AiGeneration/AiRequestChat';
+import { type AiRequest } from '../../../../Utils/GDevelopServices/Generation';
 import FixedHeightFlexContainer from '../../../FixedHeightFlexContainer';
 import FixedWidthFlexContainer from '../../../FixedWidthFlexContainer';
 import {
@@ -26,48 +27,59 @@ import PreferencesContext, {
 } from '../../../../MainFrame/Preferences/PreferencesContext';
 import { CreditsPackageStoreStateProvider } from '../../../../AssetStore/CreditsPackages/CreditsPackageStoreContext';
 
+// Chat and Agent modes were merged into a single "orchestrator" mode: these
+// stories exercise that unique mode (the conversational replies, the function
+// calls run by the orchestrator and its edit sub-agents, and the inline
+// "Apply this edit?" approval shown when auto edit is off).
 export default {
-  title: 'EventsFunctionsExtensionEditor/AiRequestChat/Agent',
+  title: 'EventsFunctionsExtensionEditor/AiRequestChat/Orchestrator',
   component: AiRequestChat,
   decorators: [paperDecorator],
+  // `commonProps` is a shared fixture re-used by other stories, not a story
+  // itself - keep Storybook from rendering it as one.
+  excludeStories: ['commonProps'],
 };
 
 export const commonProps = {
+  // Chat and Agent modes were merged into a single "orchestrator" mode, with
+  // the preset now choosing a reasoning level (see ReasoningLevelSelector).
   aiConfigurationPresetsWithAvailability: [
     {
+      mode: 'orchestrator',
       id: 'default',
       nameByLocale: { en: 'Default' },
-      mode: 'chat',
+      reasoningLevelByLocale: { en: 'Medium' },
+      reasoningLevel: 1,
+      isDefault: true,
       disabled: false,
       enableWith: null,
+      enabledWithPlans: ([]: Array<string>),
     },
     {
-      id: 'expert-mode',
-      nameByLocale: { en: 'Expert Mode' },
-      mode: 'chat',
+      mode: 'orchestrator',
+      id: 'high-reasoning',
+      nameByLocale: { en: 'High reasoning' },
+      reasoningLevelByLocale: { en: 'High' },
+      reasoningLevel: 2,
+      isDefault: false,
       disabled: false,
       enableWith: null,
+      enabledWithPlans: ([]: Array<string>),
     },
     {
-      id: 'default',
-      nameByLocale: { en: 'Default' },
-      mode: 'agent',
-      disabled: false,
-      enableWith: null,
-    },
-    {
-      id: 'extended-thinking',
-      nameByLocale: { en: 'Extended Thinking' },
-      mode: 'agent',
-      disabled: false,
-      enableWith: null,
-    },
-    {
+      mode: 'orchestrator',
       id: 'max-mode',
       nameByLocale: { en: 'MAX mode' },
-      mode: 'agent',
+      reasoningLevelByLocale: { en: 'Maximum' },
+      reasoningLevel: 3,
+      isDefault: false,
       disabled: true,
       enableWith: 'higher-tier-plan',
+      enabledWithPlans: [
+        'gdevelop_gold',
+        'gdevelop_startup',
+        'gdevelop_education',
+      ],
     },
   ],
   editorCallbacks: {
@@ -91,13 +103,7 @@ export const commonProps = {
   price: {
     priceInCredits: 3,
     variablePrice: {
-      agent: {
-        default: {
-          minimumPriceInCredits: 3,
-          maximumPriceInCredits: 20,
-        },
-      },
-      chat: {
+      orchestrator: {
         default: {
           minimumPriceInCredits: 3,
           maximumPriceInCredits: 20,
@@ -108,21 +114,26 @@ export const commonProps = {
   lastSendError: null,
   availableCredits: 400,
   onSendFeedback: async () => {},
-  hasOpenedProject: false,
+  // These stories all represent a chat within an opened project, so the
+  // left-side controls (the "Auto edit" button and reasoning selector) show.
+  hasOpenedProject: true,
   editorFunctionCallResults: ([]: Array<empty>),
   increaseQuotaOffering: 'subscribe',
   onProcessFunctionCalls: async () => {},
   onStop: async () => {},
   onStartOrOpenChat: () => {},
-  aiRequestMode: 'agent',
   saveProject: async () => {},
   onRestore: async () => {},
 };
 
+// Wraps AiRequestChat with all the contexts it needs. Stories can drive the
+// "Auto edit" toggle through the `automaticallyApplyAiRequestEdits` preference
+// (with a project opened, so it isn't forced on like in the no-project flow).
 const WrappedChatComponent = (allProps: any) => {
   const {
     authenticatedUser,
     automaticallyUseCreditsForAiRequests,
+    automaticallyApplyAiRequestEdits,
     ...chatProps
   } = allProps;
   const authenticatedUserToUse =
@@ -130,6 +141,10 @@ const WrappedChatComponent = (allProps: any) => {
   const [automaticallyUseCredits, setAutomaticallyUseCredits] = React.useState(
     automaticallyUseCreditsForAiRequests || false
   );
+  const applyEdits =
+    typeof automaticallyApplyAiRequestEdits === 'boolean'
+      ? automaticallyApplyAiRequestEdits
+      : initialPreferences.values.automaticallyApplyAiRequestEdits;
   return (
     <FixedHeightFlexContainer height={800}>
       <FixedWidthFlexContainer width={600}>
@@ -141,6 +156,7 @@ const WrappedChatComponent = (allProps: any) => {
             values: {
               ...initialPreferences.values,
               automaticallyUseCreditsForAiRequests: automaticallyUseCredits,
+              automaticallyApplyAiRequestEdits: applyEdits,
             },
             setAutomaticallyUseCreditsForAiRequests: (value: boolean) => {
               setAutomaticallyUseCredits(value);
@@ -183,9 +199,123 @@ const fakeOutputWithUserRequestOnly = [
   },
 ];
 
+const fakeAiRequest: AiRequest = {
+  createdAt: '',
+  updatedAt: '',
+  id: 'fake-working-new-ai-request',
+  status: 'ready',
+  userId: 'fake-user-id',
+  gameProjectJson: 'FAKE DATA',
+  // $FlowFixMe[incompatible-type]
+  output: fakeOutputWithUserRequestOnly,
+  error: null,
+};
+
+// A long, markdown-rich assistant reply (the orchestrator answering a broad
+// question), used to check the message rendering of links, lists and code.
+const fakeOutputWithAiResponses = [
+  ...fakeOutputWithUserRequestOnly,
+  {
+    type: 'message',
+    status: 'completed',
+    role: 'assistant',
+    content: [
+      {
+        type: 'output_text',
+        status: 'completed',
+        text:
+          'Creating a GTA-style game is a complex undertaking, but here\'s a breakdown of the key elements and how you can approach them in GDevelop:\n\n**1. Core Mechanics:**\n\n*   **Open World Environment:**\n    *   Create a large scene using [TiledSpriteObject::TiledSprite](object_type:TiledSpriteObject::TiledSprite) for the ground and buildings.\n    *   Consider using multiple scenes and the action [Scene](action:Scene) to load the scenes instead of the current one.\n*   **Character Control:**\n    *   Use a [Sprite](object_type:Sprite) for the player character.\n    *   Add a [PlatformBehavior::PlatformerObjectBehavior](behavior_type:PlatformBehavior::PlatformerObjectBehavior) or [Physics2::Physics2Behavior](behavior_type:Physics2::Physics2Behavior) to the player object for movement.\n*   **Weapons and Combat:**\n    *   Use the "Fire bullets" extension to create projectiles.\n    *   Use the [Health::Health](behavior_type:Health::Health) behavior to manage health and damage.\n\nRemember to break down the development into smaller, manageable tasks. Start with the core mechanics and gradually add more features as you progress.\n\n By the way, this is a test for a link inside a code block:\n```\n[Create](action:Create) and a [Text object](object_type:TextObject::Text)\n```\n',
+        annotations: [],
+      },
+    ],
+  },
+];
+const aiRequestWithAiResponses: AiRequest = {
+  ...fakeAiRequest,
+  // $FlowFixMe[incompatible-type]
+  output: fakeOutputWithAiResponses,
+};
+
+const fakeOutputWithMoreAiResponses = [
+  ...fakeOutputWithUserRequestOnly,
+  // $FlowFixMe[underconstrained-implicit-instantiation]
+  ...new Array(7)
+    .fill([
+      {
+        type: 'message',
+        status: 'completed',
+        role: 'user',
+        content: [
+          {
+            type: 'user_request',
+            status: 'completed',
+            text: 'Some follow up question. Lorem ipsum user.',
+          },
+        ],
+      },
+      {
+        type: 'message',
+        status: 'completed',
+        role: 'assistant',
+        content: [
+          {
+            type: 'output_text',
+            status: 'completed',
+            text: 'Some **answer** from the AI. Lorem ipsum AI.',
+            annotations: [],
+          },
+        ],
+      },
+    ])
+    .flat(),
+];
+const aiRequestWithMoreAiResponses: AiRequest = {
+  ...fakeAiRequest,
+  // $FlowFixMe[incompatible-type]
+  output: fakeOutputWithMoreAiResponses,
+};
+
+const fakeOutputWithEvenMoreAiResponses = [
+  ...fakeOutputWithUserRequestOnly,
+  // $FlowFixMe[underconstrained-implicit-instantiation]
+  ...new Array(15)
+    .fill([
+      {
+        type: 'message',
+        status: 'completed',
+        role: 'user',
+        content: [
+          {
+            type: 'user_request',
+            status: 'completed',
+            text: 'Some follow up question. Lorem ipsum user.',
+          },
+        ],
+      },
+      {
+        type: 'message',
+        status: 'completed',
+        role: 'assistant',
+        content: [
+          {
+            type: 'output_text',
+            status: 'completed',
+            text: 'Some **answer** from the AI. Lorem ipsum AI.',
+            annotations: [],
+          },
+        ],
+      },
+    ])
+    .flat(),
+];
+const aiRequestWithEvenMoreAiResponses: AiRequest = {
+  ...fakeAiRequest,
+  // $FlowFixMe[incompatible-type]
+  output: fakeOutputWithEvenMoreAiResponses,
+};
+
 const fakeFunctionCallId = 'fake_function_call_1';
 
-// Function call example outputs
 const fakeOutputWithFunctionCall = [
   ...fakeOutputWithUserRequestOnly,
   {
@@ -212,28 +342,7 @@ const fakeOutputWithFunctionCall = [
 ];
 
 const fakeOutputWithFunctionCallAndOutput = [
-  ...fakeOutputWithUserRequestOnly,
-  {
-    type: 'message',
-    status: 'completed',
-    role: 'assistant',
-    content: [
-      {
-        type: 'output_text',
-        status: 'completed',
-        text:
-          'I can help you add a leaderboard. Let me check the objects in your scene first.',
-        annotations: [],
-      },
-      {
-        type: 'function_call',
-        status: 'completed',
-        call_id: fakeFunctionCallId,
-        name: 'describe_instances',
-        arguments: '{"scene_name": "Game"}',
-      },
-    ],
-  },
+  ...fakeOutputWithFunctionCall,
   {
     type: 'function_call_output',
     call_id: fakeFunctionCallId,
@@ -281,21 +390,82 @@ const fakeOutputWithFunctionCallWithSameCallId = [
   },
 ];
 
-export const ReadyAiRequestWithFunctionCallWithoutAutoProcess = (): React.Node => (
+// A request whose modifying function call is waiting to run: used both to show
+// the call on its own and (with `pendingEditApproval`) the approval prompt.
+const fakeOutputWithModifyingFunctionCall = [
+  ...fakeOutputWithUserRequestOnly,
+  {
+    type: 'message',
+    status: 'completed',
+    role: 'assistant',
+    content: [
+      {
+        type: 'output_text',
+        status: 'completed',
+        text:
+          'I will add the score display and the events to update it when coins are collected.',
+        annotations: [],
+      },
+      {
+        type: 'function_call',
+        status: 'completed',
+        call_id: 'fake_modifying_call_1',
+        name: 'generate_scene_events',
+        arguments: '{"scene_name": "Game"}',
+      },
+    ],
+  },
+];
+
+const aiRequestWithModifyingFunctionCall: AiRequest = {
+  ...fakeAiRequest,
+  // $FlowFixMe[incompatible-type]
+  output: fakeOutputWithModifyingFunctionCall,
+};
+
+// Without a project
+// ------------------
+
+// A chat started before any project is open (the no-project flow): auto edit is
+// forced on and its button is hidden, since there is nothing to gate edits on
+// until the project is created.
+export const ChatStartedWithoutProject = (): React.Node => (
   <WrappedChatComponent
-    aiRequest={{
-      createdAt: '',
-      updatedAt: '',
-      id: 'fake-working-new-ai-request',
-      mode: 'agent',
-      status: 'ready',
-      userId: 'fake-user-id',
-      gameProjectJson: 'FAKE DATA',
-      output: fakeOutputWithFunctionCall,
-      error: null,
+    hasOpenedProject={false}
+    aiRequest={aiRequestWithAiResponses}
+  />
+);
+
+// Conversational replies
+// ----------------------
+
+export const ReadyAiRequest = (): React.Node => (
+  <WrappedChatComponent
+    aiRequest={fakeAiRequest}
+    quota={{
+      limitReached: false,
+      current: 10,
+      max: 50,
+      resetsAt: Date.now() + 1000 * 60 * 60 * 24 * 2,
+      period: '7days',
     }}
   />
 );
+
+export const ReadyAiRequestWithAiResponses = (): React.Node => (
+  <WrappedChatComponent aiRequest={aiRequestWithAiResponses} />
+);
+
+export const ReadyAiRequestWithMoreAiResponses = (): React.Node => (
+  <WrappedChatComponent aiRequest={aiRequestWithMoreAiResponses} />
+);
+
+export const ReadyAiRequestWithEvenMoreAiResponses = (): React.Node => (
+  <WrappedChatComponent aiRequest={aiRequestWithEvenMoreAiResponses} />
+);
+
+// Function calls run by the orchestrator
+// ---------------------------------------
 
 export const ReadyAiRequestWithWorkingFunctionCall = (): React.Node => (
   <WrappedChatComponent
@@ -303,7 +473,7 @@ export const ReadyAiRequestWithWorkingFunctionCall = (): React.Node => (
       createdAt: '',
       updatedAt: '',
       id: 'fake-working-new-ai-request',
-      mode: 'agent',
+      mode: 'orchestrator',
       status: 'ready',
       userId: 'fake-user-id',
       gameProjectJson: 'FAKE DATA',
@@ -318,13 +488,14 @@ export const ReadyAiRequestWithWorkingFunctionCall = (): React.Node => (
     ]}
   />
 );
+
 export const ReadyAiRequestWithFinishedFunctionCallAndLaunchingRequest = (): React.Node => (
   <WrappedChatComponent
     aiRequest={{
       createdAt: '',
       updatedAt: '',
       id: 'fake-working-new-ai-request',
-      mode: 'agent',
+      mode: 'orchestrator',
       status: 'ready',
       userId: 'fake-user-id',
       gameProjectJson: 'FAKE DATA',
@@ -351,7 +522,7 @@ export const WorkingAiRequestWithFinishedFunctionCall = (): React.Node => (
       createdAt: '',
       updatedAt: '',
       id: 'fake-working-new-ai-request',
-      mode: 'agent',
+      mode: 'orchestrator',
       status: 'working',
       userId: 'fake-user-id',
       gameProjectJson: 'FAKE DATA',
@@ -371,13 +542,13 @@ export const WorkingAiRequestWithFinishedFunctionCall = (): React.Node => (
   />
 );
 
-export const ReadyAiRequestWithIgnoredFunctionCall = (): React.Node => (
+export const ReadyAiRequestWithAbortedFunctionCall = (): React.Node => (
   <WrappedChatComponent
     aiRequest={{
       createdAt: '',
       updatedAt: '',
       id: 'fake-working-new-ai-request',
-      mode: 'agent',
+      mode: 'orchestrator',
       status: 'ready',
       userId: 'fake-user-id',
       gameProjectJson: 'FAKE DATA',
@@ -386,7 +557,7 @@ export const ReadyAiRequestWithIgnoredFunctionCall = (): React.Node => (
     }}
     editorFunctionCallResults={[
       {
-        status: 'ignored',
+        status: 'aborted',
         call_id: fakeFunctionCallId,
       },
     ]}
@@ -399,7 +570,7 @@ export const ReadyAiRequestWithFailedFunctionCall = (): React.Node => (
       createdAt: '',
       updatedAt: '',
       id: 'fake-working-new-ai-request',
-      mode: 'agent',
+      mode: 'orchestrator',
       status: 'ready',
       userId: 'fake-user-id',
       gameProjectJson: 'FAKE DATA',
@@ -425,7 +596,7 @@ export const ReadyAiRequestWithFunctionCallAndOutput = (): React.Node => (
       createdAt: '',
       updatedAt: '',
       id: 'fake-working-new-ai-request',
-      mode: 'agent',
+      mode: 'orchestrator',
       status: 'ready',
       userId: 'fake-user-id',
       gameProjectJson: 'FAKE DATA',
@@ -441,7 +612,7 @@ export const ReadyAiRequestWithFunctionCallWithSameCallId = (): React.Node => (
       createdAt: '',
       updatedAt: '',
       id: 'fake-working-new-ai-request',
-      mode: 'agent',
+      mode: 'orchestrator',
       status: 'ready',
       userId: 'fake-user-id',
       gameProjectJson: 'FAKE DATA',
@@ -481,6 +652,53 @@ export const LongReadyAiRequestWithFunctionCallToDo = (): React.Node => (
   <WrappedChatComponent aiRequest={agentAiRequestWithFunctionCallToDo} />
 );
 
+// Auto edit on / off
+// ------------------
+
+export const AutoEditEnabledWithWorkingFunctionCall = (): React.Node => (
+  <WrappedChatComponent
+    automaticallyApplyAiRequestEdits={true}
+    aiRequest={aiRequestWithModifyingFunctionCall}
+    editorFunctionCallResults={[
+      {
+        status: 'working',
+        call_id: 'fake_modifying_call_1',
+      },
+    ]}
+  />
+);
+
+export const AutoEditDisabledWithPendingEditApproval = (): React.Node => (
+  <WrappedChatComponent
+    automaticallyApplyAiRequestEdits={false}
+    aiRequest={aiRequestWithModifyingFunctionCall}
+    pendingEditApproval={{
+      aiRequestId: 'fake-working-new-ai-request',
+      callIds: ['fake_modifying_call_1'],
+      // Edit sub-agent case: the label is the agent's name (its short title).
+      label: 'Add a score display and update it on coin pickup',
+    }}
+    onResolveEditApproval={action('onResolveEditApproval')}
+  />
+);
+
+export const AutoEditDisabledWithPendingEditApprovalForTool = (): React.Node => (
+  <WrappedChatComponent
+    automaticallyApplyAiRequestEdits={false}
+    aiRequest={aiRequestWithModifyingFunctionCall}
+    pendingEditApproval={{
+      aiRequestId: 'fake-working-new-ai-request',
+      callIds: ['fake_modifying_call_1'],
+      // Direct modifying call case: the label is the tool's own label.
+      label: 'Generate events for the Game scene',
+    }}
+    onResolveEditApproval={action('onResolveEditApproval')}
+  />
+);
+
+// Sending / errors
+// ----------------
+
 export const LaunchingFollowupAiRequest = (): React.Node => (
   <WrappedChatComponent aiRequest={agentAiRequest} isSending={true} />
 );
@@ -491,6 +709,9 @@ export const ErrorLaunchingFollowupAiRequest = (): React.Node => (
     lastSendError={new Error('fake error while sending request')}
   />
 );
+
+// Quota limits
+// ------------
 
 export const QuotaLimitsReachedAndAutomaticallyUsingCredits = (): React.Node => {
   const quota = {

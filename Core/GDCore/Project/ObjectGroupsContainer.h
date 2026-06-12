@@ -4,8 +4,8 @@
  * reserved. This project is released under the MIT License.
  */
 
-#ifndef GDCORE_OBJECTGROUPSCONTAINER_H
-#define GDCORE_OBJECTGROUPSCONTAINER_H
+#pragma once
+
 #include <algorithm>
 #include <memory>
 #include <vector>
@@ -195,4 +195,3 @@ class GD_CORE_API ObjectGroupsContainer {
 
 }  // namespace gd
 
-#endif  // GDCORE_OBJECTGROUPSCONTAINER_H

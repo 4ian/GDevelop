@@ -97,11 +97,18 @@ export class EventsEditorContainer extends React.Component<RenderEditorContainer
     // No updates to be done.
   }
 
-  onEventsBasedObjectChildrenEdited() {
+  onEventsBasedObjectChildrenEdited(
+    eventsBasedObject: gdEventsBasedObject,
+    options?: {| editedObject?: ?gdObject, hasResourceChanged?: boolean |}
+  ) {
     // No thing to be done.
   }
 
-  onSceneObjectEdited(scene: gdLayout, objectWithContext: ObjectWithContext) {
+  onSceneObjectEdited(
+    scene: gdLayout,
+    objectWithContext: ObjectWithContext,
+    hasResourceChanged?: boolean
+  ) {
     // No thing to be done.
   }
 
@@ -158,11 +165,11 @@ export class EventsEditorContainer extends React.Component<RenderEditorContainer
     });
   };
 
-  onCreateEventsFunction = (
+  onCreateEventsFunction = async (
     extensionName: string,
     eventsFunction: gdEventsFunction
   ) => {
-    this.props.onCreateEventsFunction(
+    await this.props.onCreateEventsFunction(
       extensionName,
       eventsFunction,
       'scene-events-editor'

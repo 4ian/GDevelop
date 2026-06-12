@@ -51,7 +51,62 @@ type ResourcePromise<T> = { [resourceName: string]: Promise<T> };
 
 let loadedBitmapFonts = {};
 let loadedFontFamilies = {};
-let loadedTextures: { [string]: any } = {};
+
+type LoadedTexture = {|
+  pixiTexture: any,
+  // The URL the texture was loaded from. Left undefined when it's not meaningful
+  // for change detection (the invalid placeholder texture, video textures…).
+  // When set, it's used to detect whether a resource actually changed and skip
+  // reload when we can.
+  loadedFromUrl?: string,
+|};
+
+// The PIXI textures loaded (or loading) for image/video resources, by name.
+const loadedOrLoadingPixiTextures = (() => {
+  let entriesByResourceName: { [resourceName: string]: LoadedTexture } = {};
+  return {
+    clear() {
+      entriesByResourceName = {};
+    },
+    get(resourceName: string): LoadedTexture | void {
+      return entriesByResourceName[resourceName];
+    },
+    getPixiTexture(resourceName: string): any {
+      const entry = entriesByResourceName[resourceName];
+      return entry ? entry.pixiTexture : undefined;
+    },
+    // Store a texture, optionally with the URL it was loaded from. Omit
+    // `loadedFromUrl` for textures whose changes must never be detected from the
+    // URL (the invalid placeholder, video textures…), so they're always reloaded.
+    set({
+      resourceName,
+      pixiTexture,
+      loadedFromUrl,
+    }: {|
+      resourceName: string,
+      pixiTexture: any,
+      loadedFromUrl?: string,
+    |}) {
+      entriesByResourceName[resourceName] = { pixiTexture, loadedFromUrl };
+    },
+    delete(resourceName: string) {
+      delete entriesByResourceName[resourceName];
+    },
+    // Names of resources (other than `resourceName`) whose texture is the
+    // very same object, i.e. that point to the same loaded file/URL.
+    getResourceNamesSharingPixiTexture(
+      resourceName: string,
+      pixiTexture: any
+    ): Array<string> {
+      return Object.keys(entriesByResourceName).filter(
+        otherName =>
+          otherName !== resourceName &&
+          entriesByResourceName[otherName].pixiTexture === pixiTexture
+      );
+    },
+  };
+})();
+
 const invalidTexture = PIXI.Texture.from('res/invalid_texture.png');
 const loadingTexture = PIXI.Texture.from(
   'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAIAQMAAAD+wSzIAAAAA1BMVEXX19f5cgrAAAAAAXRSTlMz/za5cAAAAApJREFUCNdjQAMAABAAAbSqgB8AAAAASUVORK5CYII='
@@ -288,7 +343,7 @@ export default class PixiResourcesLoader {
   static burstCache() {
     loadedBitmapFonts = {};
     loadedFontFamilies = {};
-    loadedTextures = {};
+    loadedOrLoadingPixiTextures.clear();
     loadedOrLoadingThreeTextures = {};
     loadedOrLoadingThreeMaterials = {};
     loadedOrLoading3DModelPromises = {};
@@ -333,22 +388,62 @@ export default class PixiResourcesLoader {
   }
 
   static async _doReloadResource(project: gdProject, resourceName: string) {
-    const loadedTexture = loadedTextures[resourceName];
+    const loadedEntry = loadedOrLoadingPixiTextures.get(resourceName);
+    const loadedTexture = loadedEntry ? loadedEntry.pixiTexture : undefined;
+
+    // Optimization: if this is an image resource whose resolved URL did not
+    // change since it was loaded, its content is identical and there's no need
+    // to unload and re-fetch it (which is expensive and visually disruptive).
+    // This makes reloading "every resource of an edited object" cheap when only
+    // a few of them actually changed: editing one animation no longer re-fetches
+    // every other animation's frames.
+    //
+    // It's only safe to skip when we are *certain* the content is unchanged:
+    // - cloud projects: any change yields a new immutable URL;
+    // - local files: the URL carries a cache-busting token that only changes
+    //   when `burstUrlsCacheForResources`/`burstAllUrlsCache` was called (which
+    //   every "resource content changed" code path does).
+    // In any other case (texture not loaded yet, invalid/loading texture, no
+    // recorded URL, or a non-image resource), we fall back to a full reload.
+    const resourcesManager = project.getResourcesManager();
+    if (
+      loadedEntry &&
+      loadedEntry.loadedFromUrl !== undefined &&
+      loadedEntry.pixiTexture !== invalidTexture &&
+      loadedEntry.pixiTexture !== loadingTexture &&
+      loadedEntry.pixiTexture.baseTexture &&
+      !loadedEntry.pixiTexture.baseTexture.destroyed &&
+      resourcesManager.hasResource(resourceName) &&
+      resourcesManager.getResource(resourceName).getKind() === 'image'
+    ) {
+      const currentUrl = ResourcesLoader.getResourceFullUrl(
+        project,
+        resourceName,
+        { isResourceForPixi: true }
+      );
+      if (currentUrl === loadedEntry.loadedFromUrl) {
+        console.info(
+          `Resource "${resourceName}" file/URL is unchanged: keeping the already loaded texture (no reload needed).`
+        );
+        return;
+      }
+    }
+
     if (loadedTexture) {
-      // Remove the cached texture BEFORE awaiting the unload.
+      // Remove the cached texture (and its URL) BEFORE awaiting the unload.
       // PIXI.Assets.unload destroys the BaseTexture synchronously, which sets
       // baseTexture to null on the texture. If getPIXITexture is called before
       // the cache entry is removed, it would return the destroyed texture.
-      // $FlowFixMe[prop-missing]
-      delete loadedTextures[resourceName];
+      loadedOrLoadingPixiTextures.delete(resourceName);
 
       // Check if another resource still references the same texture object
       // (happens when multiple resources point to the same file/URL).
       // If so, skip PIXI.Assets.unload to avoid destroying the shared
       // BaseTexture — the other resource's entry still needs it.
-      const otherResourcesWithSameLoadedTexture = Object.keys(
-        loadedTextures
-      ).filter(otherName => loadedTextures[otherName] === loadedTexture);
+      const otherResourcesWithSameLoadedTexture = loadedOrLoadingPixiTextures.getResourceNamesSharingPixiTexture(
+        resourceName,
+        loadedTexture
+      );
 
       if (otherResourcesWithSameLoadedTexture.length > 0) {
         console.info(
@@ -556,11 +651,18 @@ export default class PixiResourcesLoader {
             );
           }
 
-          loadedTextures[resourceName] = loadedTexture;
+          loadedOrLoadingPixiTextures.set({
+            resourceName,
+            pixiTexture: loadedTexture,
+            loadedFromUrl: url,
+          });
           // TODO What if 2 assets share the same file with different settings?
           applyPixiTextureSettings(resource, loadedTexture);
         } catch (error) {
-          loadedTextures[resourceName] = invalidTexture;
+          loadedOrLoadingPixiTextures.set({
+            resourceName,
+            pixiTexture: invalidTexture,
+          });
           console.error(
             `Unable to load file ${resource.getFile()} for image resource ${resourceName}:`,
             error ? error : '(unknown error)'
@@ -578,7 +680,7 @@ export default class PixiResourcesLoader {
             }
           );
 
-          loadedTextures[resourceName] = PIXI.Texture.from(url, {
+          const videoTexture = PIXI.Texture.from(url, {
             scaleMode: PIXI.SCALE_MODES.LINEAR,
             resourceOptions: {
               autoPlay: false,
@@ -591,20 +693,28 @@ export default class PixiResourcesLoader {
               crossorigin: determineCrossOrigin(url),
             },
           });
-          if (!loadedTextures[resourceName]) {
+          if (!videoTexture) {
             console.error(`Texture loading for ${url} returned nothing`);
-            loadedTextures[resourceName] = invalidTexture;
-          }
-
-          loadedTextures[resourceName].baseTexture.resource
-            .load()
-            .catch(error => {
+            loadedOrLoadingPixiTextures.set({
+              resourceName,
+              pixiTexture: invalidTexture,
+            });
+          } else {
+            loadedOrLoadingPixiTextures.set({
+              resourceName,
+              pixiTexture: videoTexture,
+            });
+            videoTexture.baseTexture.resource.load().catch(error => {
               console.error(
                 `Unable to load video texture from url ${url}:`,
                 error
               );
-              loadedTextures[resourceName] = invalidTexture;
+              loadedOrLoadingPixiTextures.set({
+                resourceName,
+                pixiTexture: invalidTexture,
+              });
             });
+          }
         } catch (error) {
           console.error(
             `Unable to load file ${resource.getFile()} for video resource ${resourceName}:`,
@@ -623,22 +733,24 @@ export default class PixiResourcesLoader {
    * if this event is triggered.
    */
   static getPIXITexture(project: gdProject, resourceName: string): any {
-    // $FlowFixMe[invalid-computed-prop]
-    if (loadedTextures[resourceName]) {
+    const existingPixiTexture = loadedOrLoadingPixiTextures.getPixiTexture(
+      resourceName
+    );
+    if (existingPixiTexture) {
       // Extra safety: If the texture's baseTexture was destroyed somehow,
       // evict it from the cache and recreate it below.
       if (
-        !loadedTextures[resourceName].baseTexture ||
-        loadedTextures[resourceName].baseTexture.destroyed
+        !existingPixiTexture.baseTexture ||
+        existingPixiTexture.baseTexture.destroyed
       ) {
         console.warn(
           `Texture for resource "${resourceName}" was requested but destroyed. Evicting it from the cache and recreating it.`
         );
-        delete loadedTextures[resourceName];
+        loadedOrLoadingPixiTextures.delete(resourceName);
 
         // Then we let the new texture be loaded below.
       } else {
-        return loadedTextures[resourceName];
+        return existingPixiTexture;
       }
     }
 
@@ -654,36 +766,43 @@ export default class PixiResourcesLoader {
     const url = ResourcesLoader.getResourceFullUrl(project, resourceName, {
       isResourceForPixi: true,
     });
-    loadedTextures[resourceName] = PIXI.Texture.from(url, {
+    const pixiTexture = PIXI.Texture.from(url, {
       resourceOptions: {
         crossorigin: determineCrossOrigin(url),
         autoLoad: false,
       },
     });
-    if (!loadedTextures[resourceName]) {
+    if (!pixiTexture) {
       console.error(`Texture loading for ${url} returned nothing`);
-      loadedTextures[resourceName] = invalidTexture;
-      return loadedTextures[resourceName];
+      loadedOrLoadingPixiTextures.set({
+        resourceName,
+        pixiTexture: invalidTexture,
+      });
+      return invalidTexture;
     }
-    loadedTextures[resourceName].baseTexture.resource.load().catch(error => {
+    loadedOrLoadingPixiTextures.set({
+      resourceName,
+      pixiTexture,
+      loadedFromUrl: url,
+    });
+    pixiTexture.baseTexture.resource.load().catch(error => {
       console.error(`Unable to load texture from url ${url}:`, error);
-      loadedTextures[resourceName] = invalidTexture;
+      loadedOrLoadingPixiTextures.set({
+        resourceName,
+        pixiTexture: invalidTexture,
+      });
     });
 
-    applyPixiTextureSettings(resource, loadedTextures[resourceName]);
+    applyPixiTextureSettings(resource, pixiTexture);
 
-    if (
-      !loadedTextures[resourceName].baseTexture ||
-      loadedTextures[resourceName].baseTexture.destroyed
-    ) {
+    if (!pixiTexture.baseTexture || pixiTexture.baseTexture.destroyed) {
       console.error(
         `Texture for resource "${resourceName}" was requested, loaded, but still has no baseTexture.`
       );
       return invalidTexture;
     }
 
-    // $FlowFixMe[invalid-computed-prop]
-    return loadedTextures[resourceName];
+    return pixiTexture;
   }
 
   /**
@@ -1064,22 +1183,24 @@ export default class PixiResourcesLoader {
    * if this event is triggered.
    */
   static getPIXIVideoTexture(project: gdProject, resourceName: string): any {
-    if (loadedTextures[resourceName]) {
+    const existingPixiTexture = loadedOrLoadingPixiTextures.getPixiTexture(
+      resourceName
+    );
+    if (existingPixiTexture) {
       // Extra safety: If the texture's baseTexture was destroyed somehow,
       // evict it from the cache and recreate it below.
       if (
-        !loadedTextures[resourceName].baseTexture ||
-        loadedTextures[resourceName].baseTexture.destroyed
+        !existingPixiTexture.baseTexture ||
+        existingPixiTexture.baseTexture.destroyed
       ) {
         console.warn(
           `Texture for resource "${resourceName}" was requested but destroyed. Evicting it from the cache and recreating it.`
         );
-        // $FlowFixMe[prop-missing]
-        delete loadedTextures[resourceName];
+        loadedOrLoadingPixiTextures.delete(resourceName);
 
         // Then we let the new texture be loaded below.
       } else {
-        return loadedTextures[resourceName];
+        return existingPixiTexture;
       }
     }
 
@@ -1096,8 +1217,7 @@ export default class PixiResourcesLoader {
       isResourceForPixi: true,
     });
 
-    // $FlowFixMe[prop-missing]
-    loadedTextures[resourceName] = PIXI.Texture.from(url, {
+    const videoTexture = PIXI.Texture.from(url, {
       scaleMode: PIXI.SCALE_MODES.LINEAR,
       resourceOptions: {
         autoPlay: false,
@@ -1108,23 +1228,28 @@ export default class PixiResourcesLoader {
         crossorigin: determineCrossOrigin(url),
       },
     });
-    // $FlowFixMe[invalid-computed-prop]
-    if (!loadedTextures[resourceName]) {
+    if (!videoTexture) {
       console.error(`Texture loading for ${url} returned nothing`);
-      // $FlowFixMe[prop-missing]
-      loadedTextures[resourceName] = invalidTexture;
-      // $FlowFixMe[invalid-computed-prop]
-      return loadedTextures[resourceName];
+      loadedOrLoadingPixiTextures.set({
+        resourceName,
+        pixiTexture: invalidTexture,
+      });
+      return invalidTexture;
     }
 
-    loadedTextures[resourceName].baseTexture.resource.load().catch(error => {
+    loadedOrLoadingPixiTextures.set({
+      resourceName,
+      pixiTexture: videoTexture,
+    });
+    videoTexture.baseTexture.resource.load().catch(error => {
       console.error(`Unable to load video texture from url ${url}:`, error);
-      // $FlowFixMe[prop-missing]
-      loadedTextures[resourceName] = invalidTexture;
+      loadedOrLoadingPixiTextures.set({
+        resourceName,
+        pixiTexture: invalidTexture,
+      });
     });
 
-    // $FlowFixMe[invalid-computed-prop]
-    return loadedTextures[resourceName];
+    return videoTexture;
   }
 
   /**

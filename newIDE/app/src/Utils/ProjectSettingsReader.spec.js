@@ -138,6 +138,14 @@ preferences:
       expect(mockSetMultipleValues).not.toHaveBeenCalled();
     });
 
+    test('canonicalEventSerialization is in the allowlist', () => {
+      const filtered = filterAllowedPreferences({
+        canonicalEventSerialization: true,
+        someUnknownPreference: true,
+      });
+      expect(filtered).toEqual({ canonicalEventSerialization: true });
+    });
+
     test('readProjectSettings would return null when preferences section is missing', () => {
       const yamlContent = `
 # Project settings without preferences

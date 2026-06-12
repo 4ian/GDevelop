@@ -88,6 +88,7 @@ export const getInitialPreferences = (): {
   autoDisplayChangelog: boolean,
   autoDownloadUpdates: boolean,
   autoOpenMostRecentProject: boolean,
+  automaticallyApplyAiRequestEdits: boolean,
   automaticallyUseCreditsForAiRequests: boolean,
   autosaveOnPreview: boolean,
   backdropClickBehavior: string,
@@ -136,6 +137,7 @@ export const getInitialPreferences = (): {
   use3DEditor: any,
   useBackgroundSerializerForSaving: boolean,
   showJsTypeError: boolean,
+  canonicalEventSerialization: boolean,
   useGDJSDevelopmentWatcher: boolean,
   useShortcutToClosePreviewWindow: boolean,
   userShortcutMap: {},
@@ -401,11 +403,19 @@ export default class PreferencesProvider extends React.Component<Props, State> {
       this
     ): any),
     // $FlowFixMe[method-unbinding]
+    setAutomaticallyApplyAiRequestEdits: (this._setAutomaticallyApplyAiRequestEdits.bind(
+      this
+    ): any),
+    // $FlowFixMe[method-unbinding]
     setUseBackgroundSerializerForSaving: (this._setUseBackgroundSerializerForSaving.bind(
       this
     ): any),
     // $FlowFixMe[method-unbinding]
     setShowJsTypeError: (this._setShowJsTypeError.bind(this): any),
+    // $FlowFixMe[method-unbinding]
+    setCanonicalEventSerialization: (this._setCanonicalEventSerialization.bind(
+      this
+    ): any),
   };
 
   componentDidMount() {
@@ -1277,6 +1287,15 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     );
   }
 
+  _setCanonicalEventSerialization(newValue: boolean) {
+    this.setState(
+      state => ({
+        values: { ...state.values, canonicalEventSerialization: newValue },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
   _getEditorStateForProject(projectId: string): any {
     const editorState = this.state.values.editorStateByProject[projectId];
     if (!editorState) return null;
@@ -1392,6 +1411,18 @@ export default class PreferencesProvider extends React.Component<Props, State> {
         values: {
           ...state.values,
           automaticallyUseCreditsForAiRequests: newValue,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _setAutomaticallyApplyAiRequestEdits(newValue: boolean) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          automaticallyApplyAiRequestEdits: newValue,
         },
       }),
       () => this._persistValuesToLocalStorage(this.state)

@@ -369,6 +369,7 @@ module.exports = {
           new gd.Model3DObjectConfiguration()
         )
         .setCategory('General')
+        .setHelpPath('/objects/3d-model')
         // Effects are unsupported because the object is not rendered with PIXI.
         .addDefaultBehavior('ResizableCapability::ResizableBehavior')
         .addDefaultBehavior('ScalableCapability::ScalableBehavior')
@@ -963,6 +964,12 @@ module.exports = {
         objectContent[propertyName] = parseFloat(newValue);
         return true;
       }
+      if (propertyName === 'tileScale') {
+        const newTileScale = parseFloat(newValue);
+        objectContent.tileScale =
+          isNaN(newTileScale) || newTileScale <= 0 ? 1 : newTileScale;
+        return true;
+      }
       if (propertyName === 'facesOrientation') {
         const normalizedValue = newValue.toUpperCase();
         if (normalizedValue === 'Y' || normalizedValue === 'Z') {
@@ -1193,6 +1200,18 @@ module.exports = {
         .setGroup(_('Textures'));
 
       objectProperties
+        .getOrCreate('tileScale')
+        .setValue((objectContent.tileScale || 1).toString())
+        .setType('number')
+        .setLabel(_('Tile scale'))
+        .setDescription(
+          _(
+            'The scale applied to tiled textures. A value of 1 displays them at the same size as in 2D.'
+          )
+        )
+        .setGroup(_('Textures'));
+
+      objectProperties
         .getOrCreate('frontFaceVisible')
         .setValue(objectContent.frontFaceVisible ? 'true' : 'false')
         .setType('boolean')
@@ -1293,6 +1312,7 @@ module.exports = {
       rightFaceResourceRepeat: false,
       topFaceResourceRepeat: false,
       bottomFaceResourceRepeat: false,
+      tileScale: 1,
       materialType: 'StandardWithoutMetalness',
       tint: '255;255;255',
       isCastingShadow: true,
@@ -1321,6 +1341,8 @@ module.exports = {
         Cube3DObject
       )
       .setCategory('General')
+      .setAssetStoreTag('3d cubes')
+      .setHelpPath('/objects/3d-box')
       // Effects are unsupported because the object is not rendered with PIXI.
       .addDefaultBehavior('ResizableCapability::ResizableBehavior')
       .addDefaultBehavior('ScalableCapability::ScalableBehavior')
@@ -2200,6 +2222,7 @@ module.exports = {
         )
         .markAsNotWorkingForObjects()
         .markAsOnlyWorkingFor3D()
+        .setHelpPath('/objects/3d-light')
         .addIncludeFile('Extensions/3D/AmbientLight.js');
       const properties = effect.getProperties();
       properties
@@ -2224,6 +2247,7 @@ module.exports = {
         )
         .markAsNotWorkingForObjects()
         .markAsOnlyWorkingFor3D()
+        .setHelpPath('/objects/3d-light')
         .addIncludeFile('Extensions/3D/DirectionalLight.js');
       const properties = effect.getProperties();
       properties
@@ -2314,6 +2338,7 @@ module.exports = {
         )
         .markAsNotWorkingForObjects()
         .markAsOnlyWorkingFor3D()
+        .setHelpPath('/objects/3d-light')
         .addIncludeFile('Extensions/3D/HemisphereLight.js');
       const properties = effect.getProperties();
       properties
@@ -2817,6 +2842,7 @@ module.exports = {
       _faceResourceNames = new Array(6).fill(null);
       _faceVisibilities = new Array(6).fill(null);
       _shouldRepeatTextureOnFace = new Array(6).fill(null);
+      _tileScale = 1;
       _facesOrientation = 'Y';
       _backFaceUpThroughWhichAxisRotation = 'X';
       _shouldUseTransparentTexture = false;
@@ -3023,6 +3049,12 @@ module.exports = {
           uvMappingDirty = true;
         }
 
+        const tileScale = object.content.tileScale || 1;
+        if (tileScale !== this._tileScale) {
+          this._tileScale = tileScale;
+          uvMappingDirty = true;
+        }
+
         const backFaceUpThroughWhichAxisRotation =
           object.content.backFaceUpThroughWhichAxisRotation || 'X';
         if (
@@ -3072,6 +3104,7 @@ module.exports = {
         const uvMapping = this._threeObject.geometry.getAttribute('uv');
         const startIndex = 0;
         const endIndex = 23;
+        const tileScale = this._tileScale || 1;
         for (
           let vertexIndex = startIndex;
           vertexIndex <= endIndex;
@@ -3262,6 +3295,10 @@ module.exports = {
               break;
             default:
               [x, y] = noRepeatTextureVertexIndexToUvMapping[vertexIndex % 4];
+          }
+          if (shouldRepeatTexture && tileScale !== 1) {
+            x /= tileScale;
+            y /= tileScale;
           }
           uvMapping.setXY(vertexIndex, x, y);
         }

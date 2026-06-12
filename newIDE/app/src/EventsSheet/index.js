@@ -187,7 +187,7 @@ type Props = {|
   onCreateEventsFunction: (
     extensionName: string,
     eventsFunction: gdEventsFunction
-  ) => void,
+  ) => Promise<void>,
   onBeginCreateEventsFunction: () => void,
   unsavedChanges?: ?UnsavedChanges,
   isActive: boolean,
@@ -568,7 +568,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
         onToggleSearchPanel={this._toggleSearchPanel}
         canMoveEventsIntoNewGroup={hasSomethingSelected(this.state.selection)}
         moveEventsIntoNewGroup={this.moveEventsIntoNewGroup}
-        onOpenSceneVariables={this.editLayoutVariables}
+        onOpenSceneVariables={this.openSceneVariables}
       />
     );
   }
@@ -897,7 +897,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     });
   };
 
-  editLayoutVariables = (open: boolean = true) => {
+  openSceneVariables = (open: boolean = true) => {
     this.setState({ layoutVariablesDialogOpen: open });
   };
 
@@ -1738,7 +1738,10 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   };
 
   copySelection = () => {
-    copySelectionToClipboard(this.state.selection);
+    copySelectionToClipboard(
+      this.state.selection,
+      (events: Array<gdBaseEvent>) => this._getChangedEventRows(events)
+    );
   };
 
   cutSelection = () => {
@@ -2970,8 +2973,8 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
               })
             }
             serializedEvents={this.state.serializedEventsToExtract}
-            onCreate={(extensionName, eventsFunction) => {
-              onCreateEventsFunction(extensionName, eventsFunction);
+            onCreate={async (extensionName, eventsFunction) => {
+              await onCreateEventsFunction(extensionName, eventsFunction);
               this._replaceSelectionByEventsFunction(
                 extensionName,
                 eventsFunction
@@ -3041,8 +3044,8 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
           <GlobalAndSceneVariablesDialog
             projectScopedContainersAccessor={projectScopedContainersAccessor}
             open
-            onCancel={() => this.editLayoutVariables(false)}
-            onApply={() => this.editLayoutVariables(false)}
+            onCancel={() => this.openSceneVariables(false)}
+            onApply={() => this.openSceneVariables(false)}
             hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
             isListLocked={false}
             initiallySelectedVariable={null}

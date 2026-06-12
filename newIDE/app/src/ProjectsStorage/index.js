@@ -55,6 +55,13 @@ export type SaveProjectOptions = {|
   restoredFromVersionId?: string,
   useBackgroundSerializer?: boolean,
   skipNewVersionWarning?: boolean,
+  /**
+   * When true, the serializer writes object keys alphabetically and
+   * always emits default values for omitted properties (disabled, folded,
+   * empty events/variables arrays, etc.) so that diffs are minimal and
+   * shift-free when toggling flags.
+   */
+  canonicalEventSerialization?: boolean,
 |};
 
 export type SaveAsOptions = {|

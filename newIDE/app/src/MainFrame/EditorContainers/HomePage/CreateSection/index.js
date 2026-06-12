@@ -55,6 +55,7 @@ import { deleteCloudProject } from '../../../../Utils/GDevelopServices/Project';
 import { getDefaultRegisterGameProperties } from '../../../../Utils/UseGameAndBuildsManager';
 import { type CreateProjectResult } from '../../../../Utils/UseCreateProject';
 import { AskAiStandAloneForm } from '../../../../AiGeneration/AskAiStandAloneForm';
+import { type OpenAskAiOptions } from '../../../../AiGeneration/Utils';
 import { AiRequestContext } from '../../../../AiGeneration/AiRequestContext';
 
 const getExampleItemsColumns = (
@@ -100,6 +101,7 @@ type Props = {|
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
   onCloseAskAi: () => void,
+  onOpenAskAi: (?OpenAskAiOptions) => void,
   closeProject: () => Promise<void>,
   canOpen: boolean,
   onOpenProfile: () => void,
@@ -138,6 +140,7 @@ const CreateSection = ({
   onWillInstallExtension,
   onExtensionInstalled,
   onCloseAskAi,
+  onOpenAskAi,
   closeProject,
   canOpen,
   onOpenProfile,
@@ -509,6 +512,8 @@ const CreateSection = ({
               onWillInstallExtension={onWillInstallExtension}
               onExtensionInstalled={onExtensionInstalled}
               onCloseAskAi={onCloseAskAi}
+              onOpenAskAi={onOpenAskAi}
+              closeProject={closeProject}
               dismissableIdentifier="home-page-create-section"
             />
             <ColumnStackLayout noMargin>

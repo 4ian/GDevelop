@@ -215,6 +215,17 @@ export default class InstancesAdder {
   };
 
   /**
+   * Check if the given instance is one of the temporary instances added while
+   * an object is being dragged over the scene.
+   */
+  isTemporaryInstance(instance: ?gdInitialInstance): boolean {
+    if (!instance) return false;
+    return this._temporaryInstances.some(
+      temporaryInstance => temporaryInstance.ptr === instance.ptr
+    );
+  }
+
+  /**
    * Delete the temporary instances.
    */
   deleteTemporaryInstances() {

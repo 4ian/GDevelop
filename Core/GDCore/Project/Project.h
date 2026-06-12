@@ -678,6 +678,11 @@ class GD_CORE_API Project {
    */
   unsigned int GetLastSaveGDBuildVersion() { return gdBuildVersion; };
 
+  /**
+   * Get the version of GDevelop used to create the project.
+   */
+  const gd::String& GetInitialGDVersion() const { return initialGDVersion; };
+
   /** \name External events management
    * Members functions related to external events management.
    */
@@ -847,6 +852,18 @@ class GD_CORE_API Project {
    * Get the first layout of the project.
    */
   const gd::String& GetFirstLayout() { return firstLayout; }
+
+  /**
+   * Set the layout used by the IDE to start all previews.
+   * An empty string means there is no preview override.
+   */
+  void SetPreviewLayout(const gd::String& name) { previewLayout = name; }
+
+  /**
+   * Get the layout used by the IDE to start all previews.
+   * Returns an empty string if there is no preview override.
+   */
+  const gd::String& GetPreviewLayout() const { return previewLayout; }
 
   ///@}
 
@@ -1159,6 +1176,8 @@ class GD_CORE_API Project {
   std::vector<gd::Platform*>
       platforms;  ///< Pointers to the platforms this project supports.
   gd::String firstLayout;
+  gd::String previewLayout;  ///< Editor-only: layout used by the IDE to start
+                             ///< all previews. Empty if not set.
   gd::String author;        ///< Game author name, for publishing purpose.
   std::vector<gd::String>
       authorIds;  ///< Game author ids, from GDevelop users DB.
@@ -1203,6 +1222,7 @@ class GD_CORE_API Project {
   mutable unsigned int gdBuildVersion =
       0;  ///< The GD build version used the last
           ///< time the project was saved.
+  gd::String initialGDVersion; ///< The GD version used to create the project.
   bool areEffectsHiddenInEditor =
       false; ///< When false effects are not shown and a default light is used
              ///< for 3D layers.

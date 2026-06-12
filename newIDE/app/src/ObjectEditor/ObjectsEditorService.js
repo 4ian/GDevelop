@@ -11,6 +11,7 @@ import CustomObjectPropertiesEditor from './Editors/CustomObjectPropertiesEditor
 import Cube3DEditor from './Editors/Cube3DEditor';
 import Model3DEditor from './Editors/Model3DEditor';
 import SpineEditor from './Editors/SpineEditor';
+import Spine43Editor from './Editors/Spine43Editor';
 import SimpleTileMapEditor from './Editors/SimpleTileMapEditor';
 
 const gd: libGDevelop = global.gd;
@@ -167,6 +168,21 @@ const ObjectsEditorService = {
       ): gdObjectJsImplementation =>
         gd.asObjectJsImplementation(objectConfiguration),
       helpPagePath: '/objects/spine',
+    },
+    'Spine43Object::Spine43Object': {
+      component: Spine43Editor,
+      createNewObject: (
+        objectConfiguration: gdObjectConfiguration
+      ): gdObjectConfiguration =>
+        gd
+          .asObjectJsImplementation(objectConfiguration)
+          .clone()
+          .release(),
+      castToObjectType: (
+        objectConfiguration: gdObjectConfiguration
+      ): gdObjectJsImplementation =>
+        gd.asObjectJsImplementation(objectConfiguration),
+      helpPagePath: '/objects/spine43',
     },
     'TileMap::SimpleTileMap': {
       component: SimpleTileMapEditor,

@@ -2,6 +2,7 @@
 import { t, Trans } from '@lingui/macro';
 import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
+import TimelineIcon from '@material-ui/icons/Timeline';
 import { ToolbarGroup } from '../../UI/Toolbar';
 import ToolbarSeparator from '../../UI/ToolbarSeparator';
 import IconButton from '../../UI/IconButton';
@@ -25,6 +26,7 @@ import {
   OPEN_OBJECT_GROUPS_PANEL_BUTTON_ID,
   OPEN_OBJECTS_PANEL_BUTTON_ID,
   OPEN_PROPERTIES_PANEL_BUTTON_ID,
+  OPEN_TIMELINE_PANEL_BUTTON_ID,
 } from '../utils';
 import CompactToggleButtons from '../../UI/CompactToggleButtons';
 import Grid2d from '../../UI/CustomSvgIcons/Grid2d';
@@ -49,6 +51,8 @@ type Props = {|
   isInstancesListShown: boolean,
   toggleLayersList: () => void,
   isLayersListShown: boolean,
+  toggleTimelinePanel: () => void,
+  isTimelinePanelShown: boolean,
   isWindowMaskShown: boolean,
   toggleWindowMask: () => void,
   isGridShown: boolean,
@@ -180,6 +184,20 @@ const Toolbar: React.ComponentType<Props> = React.memo<Props>(function Toolbar(
           }
         >
           <LayersIcon />
+        </IconButton>
+        <IconButton
+          size="small"
+          color="default"
+          id={OPEN_TIMELINE_PANEL_BUTTON_ID}
+          onClick={props.toggleTimelinePanel}
+          selected={props.isTimelinePanelShown}
+          tooltip={
+            props.isTimelinePanelShown
+              ? t`Close Timeline Panel`
+              : t`Open Timeline Panel`
+          }
+        >
+          <TimelineIcon style={{ fontSize: 18 }} />
         </IconButton>
         <ElementWithMenu
           element={

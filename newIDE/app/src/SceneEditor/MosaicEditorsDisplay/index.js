@@ -20,6 +20,8 @@ import InstancesList, {
   type InstancesListInterface,
 } from '../../InstancesEditor/InstancesList';
 import ObjectsRenderingService from '../../ObjectsRendering/ObjectsRenderingService';
+import TimelineEditor from '../../TimelineEditor';
+import { getTimelines } from '../../TimelineEditor/TimelineProjectStorage';
 
 import Rectangle from '../../Utils/Rectangle';
 import { type EditorId } from '../utils';
@@ -65,6 +67,9 @@ const defaultPanelConfigByEditor = {
   },
   'layers-list': {
     position: 'right',
+  },
+  timeline: {
+    position: 'bottom',
   },
 };
 
@@ -142,6 +147,7 @@ const MosaicEditorsDisplay: React.ComponentType<{
     const forceUpdateLayersList = React.useCallback(() => {
       if (layersListRef.current) layersListRef.current.forceUpdateList();
     }, []);
+    const lastTimelinePreviewPanelUpdateTimeRef = React.useRef(0);
     const getInstanceSize = React.useCallback((instance: gdInitialInstance) => {
       return editorRef.current
         ? editorRef.current.getInstanceSize(instance)
@@ -158,6 +164,23 @@ const MosaicEditorsDisplay: React.ComponentType<{
         forceUpdateInstancesList();
       },
       [onInstancesModified, forceUpdateInstancesList]
+    );
+    const onTimelinePreviewInstancesModified = React.useCallback(
+      () => {
+        if (editorRef.current) {
+          editorRef.current.notifyTimelinePreviewFrame();
+        }
+
+        const now = performance.now();
+        if (now - lastTimelinePreviewPanelUpdateTimeRef.current < 100) {
+          return;
+        }
+
+        lastTimelinePreviewPanelUpdateTimeRef.current = now;
+        forceUpdateInstancesList();
+        forceUpdatePropertiesEditor();
+      },
+      [forceUpdateInstancesList, forceUpdatePropertiesEditor]
     );
     const toggleEditorView = React.useCallback((editorId: EditorId) => {
       if (!editorMosaicRef.current) return;
@@ -285,6 +308,7 @@ const MosaicEditorsDisplay: React.ComponentType<{
     const isCustomVariant = eventsBasedObject
       ? eventsBasedObject.getDefaultVariant() !== eventsBasedObjectVariant
       : false;
+    const firstTimeline = getTimelines(project)[0];
 
     const editors = {
       properties: {
@@ -396,6 +420,25 @@ const MosaicEditorsDisplay: React.ComponentType<{
             onSelectInstances={selectInstances}
             onInstancesModified={onInstancesModified || noop}
             ref={instancesListRef}
+          />
+        ),
+      },
+      timeline: {
+        type: 'secondary',
+        title: t`Timeline`,
+        renderEditor: () => (
+          <TimelineEditor
+            project={project}
+            timelineIdOrName={firstTimeline ? firstTimeline.id : null}
+            setToolbar={noop}
+            unsavedChanges={props.unsavedChanges || null}
+            objectsContainer={objectsContainer}
+            globalObjectsContainer={globalObjectsContainer}
+            initialInstances={initialInstances}
+            selectedInstances={selectedInstances}
+            onGetInstanceSize={getInstanceSize}
+            onInstancesModified={_onInstancesModified}
+            onPreviewInstancesModified={onTimelinePreviewInstancesModified}
           />
         ),
       },

@@ -66,7 +66,30 @@ if (shell.test('-f', path.join(sourceDirectory, 'libGD.js'))) {
     return branch;
   };
 
-  // Try to download libGD.js from a specific commit on the current branch
+  const getCommitBranchesToTry = branch => {
+    const branches = [];
+    if (branch && branch !== 'unknown-branch') {
+      branches.push(branch);
+    }
+    if (branches.indexOf('master') === -1) {
+      branches.push('master');
+    }
+    return branches;
+  };
+
+  const downloadCommitLibGdJsFromBranches = (branches, hash) => {
+    const branch = branches.shift();
+    if (!branch) {
+      return Promise.reject();
+    }
+
+    return downloadLibGdJs(
+      `https://s3.amazonaws.com/gdevelop-gdevelop.js/${branch}/commit/${hash}`
+    ).catch(() => downloadCommitLibGdJsFromBranches(branches, hash));
+  };
+
+  // Try to download libGD.js from a specific commit on the current branch,
+  // falling back to the master commit bucket for detached CI merge commits.
   const downloadCommitLibGdJs = (branch, gitRef) =>
     new Promise((resolve, reject) => {
       shell.echo(`ℹ️ Trying to download libGD.js for ${gitRef}.`);
@@ -75,8 +98,7 @@ if (shell.test('-f', path.join(sourceDirectory, 'libGD.js'))) {
         silent: true,
       });
       const hash = (hashShellString.stdout || 'unknown-hash').trim();
-      const branch = getBranchFromGitRef(gitRef);
-      if (hashShellString.stderr || hashShellString.code || !branch) {
+      if (hashShellString.stderr || hashShellString.code) {
         shell.echo(
           `⚠️ Can't find the hash or branch of the associated commit.`
         );
@@ -85,9 +107,7 @@ if (shell.test('-f', path.join(sourceDirectory, 'libGD.js'))) {
       }
 
       resolve(
-        downloadLibGdJs(
-          `https://s3.amazonaws.com/gdevelop-gdevelop.js/${branch}/commit/${hash}`
-        )
+        downloadCommitLibGdJsFromBranches(getCommitBranchesToTry(branch), hash)
       );
     });
 

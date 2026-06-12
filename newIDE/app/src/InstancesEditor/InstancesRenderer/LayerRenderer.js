@@ -24,6 +24,10 @@ import {
 } from './BasicProfilingCounters';
 const gd: libGDevelop = global.gd;
 
+const isSpine43ObjectType = (objectType: string): boolean =>
+  objectType === 'Spine43Object' ||
+  objectType === 'Spine43Object::Spine43Object';
+
 export default class LayerRenderer {
   project: gdProject;
   instances: gdInitialInstancesContainer;
@@ -309,20 +313,43 @@ export default class LayerRenderer {
     );
   };
 
+  _isSpine43Instance(instance: gdInitialInstance): boolean {
+    const associatedObject = getObjectByName(
+      this.globalObjectsContainer,
+      this.objectsContainer,
+      instance.getObjectName()
+    );
+    return (
+      !!associatedObject && isSpine43ObjectType(associatedObject.getType())
+    );
+  }
+
   getUnrotatedInstanceSize = (instance: gdInitialInstance): any => {
     const renderedInstance = this.getOrCreateRendererOfInstance(instance);
     const hasCustomSize = instance.hasCustomSize();
     const hasCustomDepth = instance.hasCustomDepth();
-    const width = hasCustomSize
-      ? instance.getCustomWidth()
-      : renderedInstance
+    const renderedDefaultWidth = renderedInstance
       ? renderedInstance.getDefaultWidth()
       : 0;
-    const height = hasCustomSize
-      ? instance.getCustomHeight()
-      : renderedInstance
+    const renderedDefaultHeight = renderedInstance
       ? renderedInstance.getDefaultHeight()
       : 0;
+    const customWidth = hasCustomSize ? instance.getCustomWidth() : 0;
+    const customHeight = hasCustomSize ? instance.getCustomHeight() : 0;
+    const shouldUseDefaultSizeForZeroCustomSize =
+      hasCustomSize &&
+      (customWidth <= 0 || customHeight <= 0) &&
+      this._isSpine43Instance(instance);
+    const width =
+      hasCustomSize &&
+      !(shouldUseDefaultSizeForZeroCustomSize && customWidth <= 0)
+        ? customWidth
+        : renderedDefaultWidth;
+    const height =
+      hasCustomSize &&
+      !(shouldUseDefaultSizeForZeroCustomSize && customHeight <= 0)
+        ? customHeight
+        : renderedDefaultHeight;
     const depth = hasCustomDepth
       ? instance.getCustomDepth()
       : renderedInstance

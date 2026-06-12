@@ -249,6 +249,9 @@ type DialogProps = {|
   actionsFullWidthOnMobile?: boolean,
   // Useful when the content of the dialog can change and we want to avoid layout shifts.
   forceScrollVisible?: boolean,
+  transitionDuration?:
+    | number
+    | {| appear?: number, enter?: number, exit?: number |},
 
   id?: ?string,
 |};
@@ -278,6 +281,7 @@ const DialogWithoutWindowSizeProvider = ({
   noPadding,
   actionsFullWidthOnMobile,
   forceScrollVisible,
+  transitionDuration,
   topBackgroundSrc,
 }: DialogProps) => {
   const preferences = React.useContext(PreferencesContext);
@@ -451,6 +455,7 @@ const DialogWithoutWindowSizeProvider = ({
       disableBackdropClick={false}
       onKeyDown={handleKeyDown}
       container={portalContainer}
+      transitionDuration={transitionDuration}
     >
       {topBackgroundSrc && (
         <div

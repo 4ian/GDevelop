@@ -196,6 +196,12 @@ const jsExtensions = [
     objectsRenderingServiceModules: {},
   },
   {
+    name: 'Spine43Object',
+    // $FlowFixMe[cannot-resolve-module]
+    extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/Spine43Object/JsExtension.js'),
+    objectsRenderingServiceModules: {},
+  },
+  {
     name: 'Steamworks',
     // $FlowFixMe[cannot-resolve-module]
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/Steamworks/JsExtension.js'),

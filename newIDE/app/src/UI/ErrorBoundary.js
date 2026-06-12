@@ -47,6 +47,7 @@ type ErrorBoundaryScope =
   | 'scene-editor-scene-properties'
   | 'scene-editor-instance-properties'
   | 'scene-editor-object-properties'
+  | 'scene-editor-object-group-properties'
   | 'scene-editor-layer-properties'
   | 'scene-editor-events-based-object-variant-properties'
   | 'scene-editor-objects-list'

@@ -351,6 +351,13 @@ describe('SimplifiedProject', () => {
                 ],
                 "variables": undefined,
               },
+              Object {
+                "behaviors": undefined,
+                "objectGroupName": "EmptyGroup",
+                "objectGroupType": "",
+                "objectNames": Array [],
+                "variables": undefined,
+              },
             ],
             "objects": Array [
               Object {

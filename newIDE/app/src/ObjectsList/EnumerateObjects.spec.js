@@ -85,7 +85,7 @@ describe('EnumerateObjects', () => {
       testLayout.getObjects().getObjectGroups()
     );
 
-    expect(allGroupsList).toHaveLength(4);
+    expect(allGroupsList).toHaveLength(5);
   });
 
   it('can do a case-insensitive search in the lists of objects', () => {

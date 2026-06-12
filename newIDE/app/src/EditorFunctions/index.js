@@ -137,6 +137,9 @@ export type EditorFunctionGenericOutput = {|
   // Default size, origin and center of the object(s) being operated on, keyed by object name:
   objectSizeInfo?: { [string]: ObjectSizeInfo | null },
 
+  // Explanation of the coordinate semantics of `instances` positions:
+  positionSemantics?: string,
+
   hints?: Array<HintEntry>,
 
   // Set to true when the function call was aborted mid-execution (e.g. the AI
@@ -379,6 +382,45 @@ const injectObjectSizeInfo = (
     output.hints = output.hints ? [...output.hints, ...hints] : hints;
   }
   return output;
+};
+
+const INSTANCE_POSITION_SEMANTICS_MESSAGE =
+  'Each instance x;y;z is its origin, NOT its center. Unless `objectSizeInfo` indicates a custom origin, the origin is the minimum corner: an instance occupies x to x+width, y to y+height and (in 3D) z to z+depth, so its center is at position + size/2. To center an instance A on top of an instance B: A.x = B.x + (B.width - A.width)/2, A.y = B.y + (B.height - A.height)/2, A.z = B.z + B.depth.';
+
+const getOccupiedSpaceDescription = (
+  position: $ReadOnlyArray<number>,
+  size: $ReadOnlyArray<number>,
+  objectSizeInfo: ObjectSizeInfo | null
+): string => {
+  const round = (value: number) => Math.round(value * 100) / 100;
+  const axes = ['X', 'Y', 'Z'];
+  const originOffsets = [0, 0, 0];
+  if (objectSizeInfo) {
+    const defaultSizes = [
+      objectSizeInfo.width,
+      objectSizeInfo.height,
+      objectSizeInfo.depth,
+    ];
+    const origins = [
+      objectSizeInfo.originX,
+      objectSizeInfo.originY,
+      objectSizeInfo.originZ,
+    ];
+    for (let i = 0; i < size.length; i++) {
+      const defaultSize = defaultSizes[i];
+      const origin = origins[i];
+      // Origin offsets are given for the default size - scale them to the actual size.
+      if (origin && defaultSize) {
+        originOffsets[i] = origin * (size[i] / defaultSize);
+      }
+    }
+  }
+  return size
+    .map((sizeOnAxis, i) => {
+      const min = position[i] - originOffsets[i];
+      return `${axes[i]} ${round(min)} to ${round(min + sizeOnAxis)}`;
+    })
+    .join(', ');
 };
 
 const makeGenericSuccess = (message: string): EditorFunctionGenericOutput => ({
@@ -2488,6 +2530,7 @@ const describeInstances: EditorFunction = {
     const initialInstances = layout.getInitialInstances();
 
     const instances = [];
+    const objectSizeInfoByName: { [string]: ObjectSizeInfo | null } = {};
 
     // For each layer
     mapFor(0, layout.getLayersCount(), i => {
@@ -2511,8 +2554,15 @@ const describeInstances: EditorFunction = {
             object = globalObjects.getObject(objectName);
           }
 
-          const defaultSize = object
+          const sizeInfo = object
             ? getObjectSizeInfo(object, project, PixiResourcesLoader)
+            : null;
+          if (object && !(objectName in objectSizeInfoByName)) {
+            objectSizeInfoByName[objectName] = sizeInfo;
+          }
+
+          const defaultSize = object
+            ? sizeInfo
             : { width: 0, height: 0, depth: 0 };
 
           const width = instance.hasCustomSize()
@@ -2537,6 +2587,8 @@ const describeInstances: EditorFunction = {
             // Replace persistentUuid by id:
             persistentUuid: undefined,
             id: instance.getPersistentUuid().slice(0, 10),
+            // The serializer omits z when it's 0 - always expose it for 3D objects:
+            z: depth !== null ? instance.getZ() : undefined,
             // Actual computed dimensions (accounting for default size when no custom size is set):
             width,
             height,
@@ -2550,20 +2602,16 @@ const describeInstances: EditorFunction = {
       );
     });
 
+    const result: EditorFunctionGenericOutput = {
+      success: true,
+      instances: instances,
+      instancesForSceneNamed: scene_name,
+      positionSemantics: INSTANCE_POSITION_SEMANTICS_MESSAGE,
+    };
     if (objectNames.size > 0) {
-      return {
-        success: true,
-        instances: instances,
-        instancesForSceneNamed: scene_name,
-        instancesOnlyForObjectsNamed: [...objectNames].sort().join(','),
-      };
-    } else {
-      return {
-        success: true,
-        instances: instances,
-        instancesForSceneNamed: scene_name,
-      };
+      result.instancesOnlyForObjectsNamed = [...objectNames].sort().join(',');
     }
+    return injectObjectSizeInfo(result, objectSizeInfoByName);
   },
   modifiesProject: false,
 };
@@ -3028,6 +3076,22 @@ const put2dInstances: EditorFunction = {
           attrs.push(`opacity ${instancesOpacity}/255`);
         if (instances_z_order !== null)
           attrs.push(`z-order ${instances_z_order}`);
+        const effectiveSize = instancesSize
+          ? instancesSize
+          : objectSizeInfo &&
+            objectSizeInfo.width !== null &&
+            objectSizeInfo.height !== null
+          ? [objectSizeInfo.width, objectSizeInfo.height]
+          : null;
+        if (brush_kind === 'point' && effectiveSize) {
+          attrs.push(
+            `origin at this position, each occupies ${getOccupiedSpaceDescription(
+              brushPosition,
+              effectiveSize,
+              objectSizeInfo
+            )}`
+          );
+        }
         changes.push(
           `Created ${newInstancesCount} new instance${
             newInstancesCount > 1 ? 's' : ''
@@ -3595,6 +3659,23 @@ const put3dInstances: EditorFunction = {
               instancesRotationArray[1]
             }°, ${instancesRotationArray[2]}°)`
           );
+        const effectiveSize = instancesSizeArray
+          ? instancesSizeArray
+          : objectSizeInfo &&
+            objectSizeInfo.width !== null &&
+            objectSizeInfo.height !== null &&
+            objectSizeInfo.depth !== null
+          ? [objectSizeInfo.width, objectSizeInfo.height, objectSizeInfo.depth]
+          : null;
+        if (brush_kind === 'point' && effectiveSize) {
+          attrs.push(
+            `origin at this position, each occupies ${getOccupiedSpaceDescription(
+              brushPosition,
+              effectiveSize,
+              objectSizeInfo
+            )}`
+          );
+        }
         changes.push(
           `Created ${newInstancesCount} new instance${
             newInstancesCount > 1 ? 's' : ''

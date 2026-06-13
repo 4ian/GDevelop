@@ -53,6 +53,9 @@ Video generation also needs one Electron-specific compatibility change:
   Codex does not always expose a video-generation tool. Enable it only in an
   environment with a real Codex/Sora video tool by setting
   `LOCAL_GPT_SORA_USE_CODEX=1`.
+- `/api/provider-models` hides `local/gpt-sora` unless `LOCAL_GPT_SORA_BIN`,
+  `LOCAL_SORA_BIN`, or `LOCAL_GPT_SORA_USE_CODEX=1` is configured. This keeps
+  the video dropdown from showing a local model that cannot run.
 - In `apps/server/src/routes/generation.ts`, upload those local APIMart images
   to `POST {APIMart baseUrl}/uploads/images` before calling the video
   generation endpoint, then pass the returned URL.

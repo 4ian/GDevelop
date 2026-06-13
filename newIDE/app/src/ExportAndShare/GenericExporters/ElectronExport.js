@@ -2,6 +2,7 @@
 import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import Text from '../../UI/Text';
+import Checkbox from '../../UI/Checkbox';
 import { Column, Line } from '../../UI/Grid';
 import { ColumnStackLayout, LineStackLayout } from '../../UI/Layout';
 import Check from '../../UI/CustomSvgIcons/Check';
@@ -11,6 +12,137 @@ import { getHelpLink } from '../../Utils/HelpLink';
 import Window from '../../Utils/Window';
 import RaisedButton from '../../UI/RaisedButton';
 import { type ExportFlowProps } from '../ExportPipeline.flow';
+
+export type ElectronWindowOptions = {|
+  transparentWindow: boolean,
+  framelessWindow: boolean,
+  transparentRuntimeBackground: boolean,
+  disableWindowShadow: boolean,
+  disableHardwareAcceleration: boolean,
+|};
+
+export const getDefaultElectronWindowOptions = (): ElectronWindowOptions => ({
+  transparentWindow: false,
+  framelessWindow: false,
+  transparentRuntimeBackground: false,
+  disableWindowShadow: false,
+  disableHardwareAcceleration: false,
+});
+
+export const applyElectronWindowOptionsToExportOptions = (
+  exportOptions: gdExportOptions,
+  electronWindowOptions: ElectronWindowOptions
+) => {
+  exportOptions
+    .setElectronTransparentWindow(electronWindowOptions.transparentWindow)
+    .setElectronFramelessWindow(electronWindowOptions.framelessWindow)
+    .setElectronTransparentRuntimeBackground(
+      electronWindowOptions.transparentRuntimeBackground
+    )
+    .setElectronDisableWindowShadow(electronWindowOptions.disableWindowShadow)
+    .setElectronDisableHardwareAcceleration(
+      electronWindowOptions.disableHardwareAcceleration
+    );
+};
+
+export const ElectronWindowOptionsEditor = ({
+  electronWindowOptions,
+  onChange,
+  disabled,
+}: {|
+  electronWindowOptions: ElectronWindowOptions,
+  onChange: (electronWindowOptions: ElectronWindowOptions) => void,
+  disabled: boolean,
+|}): React.Node => {
+  const setOption = (
+    optionName: $Keys<ElectronWindowOptions>,
+    checked: boolean
+  ) => {
+    const nextElectronWindowOptions: ElectronWindowOptions = {
+      ...electronWindowOptions,
+      transparentWindow:
+        optionName === 'transparentWindow'
+          ? checked
+          : electronWindowOptions.transparentWindow,
+      framelessWindow:
+        optionName === 'framelessWindow'
+          ? checked
+          : electronWindowOptions.framelessWindow,
+      transparentRuntimeBackground:
+        optionName === 'transparentRuntimeBackground'
+          ? checked
+          : electronWindowOptions.transparentRuntimeBackground,
+      disableWindowShadow:
+        optionName === 'disableWindowShadow'
+          ? checked
+          : electronWindowOptions.disableWindowShadow,
+      disableHardwareAcceleration:
+        optionName === 'disableHardwareAcceleration'
+          ? checked
+          : electronWindowOptions.disableHardwareAcceleration,
+    };
+
+    if (optionName === 'transparentWindow' && checked) {
+      nextElectronWindowOptions.transparentRuntimeBackground = true;
+    }
+
+    onChange(nextElectronWindowOptions);
+  };
+
+  return (
+    <Column noMargin>
+      <Line>
+        <Text>
+          <Trans>Desktop window options</Trans>
+        </Text>
+      </Line>
+      <Checkbox
+        label={<Trans>Transparent native window</Trans>}
+        checked={electronWindowOptions.transparentWindow}
+        onCheck={(e, checked) => setOption('transparentWindow', checked)}
+        disabled={disabled}
+        tooltipOrHelperText={
+          <Trans>
+            Creates the Electron window with native transparency enabled.
+          </Trans>
+        }
+      />
+      <Checkbox
+        label={<Trans>Frameless window</Trans>}
+        checked={electronWindowOptions.framelessWindow}
+        onCheck={(e, checked) => setOption('framelessWindow', checked)}
+        disabled={disabled}
+      />
+      <Checkbox
+        label={<Trans>Transparent game background</Trans>}
+        checked={electronWindowOptions.transparentRuntimeBackground}
+        onCheck={(e, checked) =>
+          setOption('transparentRuntimeBackground', checked)
+        }
+        disabled={disabled}
+      />
+      <Checkbox
+        label={<Trans>Disable window shadow</Trans>}
+        checked={electronWindowOptions.disableWindowShadow}
+        onCheck={(e, checked) => setOption('disableWindowShadow', checked)}
+        disabled={disabled}
+      />
+      <Checkbox
+        label={<Trans>Disable hardware acceleration</Trans>}
+        checked={electronWindowOptions.disableHardwareAcceleration}
+        onCheck={(e, checked) =>
+          setOption('disableHardwareAcceleration', checked)
+        }
+        disabled={disabled}
+        tooltipOrHelperText={
+          <Trans>
+            Use only as a compatibility option for transparent windows.
+          </Trans>
+        }
+      />
+    </Column>
+  );
+};
 
 export const ExplanationHeader = (): React.Node => (
   <Text align="center">

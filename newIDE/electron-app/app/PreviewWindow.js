@@ -42,14 +42,34 @@ const openPreviewWindow = ({
     4: { x: screenWidth / 2, y: screenHeight / 2 },
   };
   for (let i = 0; i < numberOfWindows; i++) {
+    const isTransparentPreviewWindow =
+      !!previewBrowserWindowOptions.transparent;
+    const isFramelessTransparentPreviewWindow =
+      isTransparentPreviewWindow && previewBrowserWindowOptions.frame === false;
     const browserWindowOptions = {
       ...previewBrowserWindowOptions,
-      parent: alwaysOnTop ? parentWindow : null,
+      backgroundColor: previewBrowserWindowOptions.transparent
+        ? '#00000000'
+        : previewBrowserWindowOptions.backgroundColor,
+      parent: isFramelessTransparentPreviewWindow
+        ? null
+        : alwaysOnTop
+          ? parentWindow
+          : null,
+      skipTaskbar: isFramelessTransparentPreviewWindow
+        ? false
+        : previewBrowserWindowOptions.skipTaskbar,
       x: numberOfWindows > 1 ? positions[i + 1].x : undefined,
       y: numberOfWindows > 1 ? positions[i + 1].y : undefined,
     };
 
     let previewWindow = new BrowserWindow(browserWindowOptions);
+    if (browserWindowOptions.transparent) {
+      previewWindow.setBackgroundColor('#00000000');
+    }
+    if (isFramelessTransparentPreviewWindow) {
+      previewWindow.setSkipTaskbar(false);
+    }
 
     previewWindow.setMenuBarVisibility(hideMenuBar);
     previewWindow.webContents.on('devtools-opened', () => {
@@ -76,6 +96,8 @@ const openPreviewWindow = ({
     previewWindows.push({
       previewWindow: previewWindow,
       parentWindowId: parentWindow ? parentWindow.id : null,
+      isTransparentPreviewWindow,
+      isFramelessTransparentPreviewWindow,
     });
 
     previewWindow.on('closed', closeEvent => {
@@ -115,6 +137,119 @@ const closePreviewWindowsForParent = parentWindowId => {
   });
 };
 
+const resetPreviewWindowState = ({
+  previewWindow,
+  parentWindow,
+  alwaysOnTop,
+  hideMenuBar,
+}) => {
+  try {
+    previewWindow.setIgnoreMouseEvents(false);
+  } catch (error) {}
+  try {
+    previewWindow.setSkipTaskbar(false);
+  } catch (error) {}
+  try {
+    previewWindow.setBackgroundColor('#000000');
+  } catch (error) {}
+  try {
+    previewWindow.setHasShadow(true);
+  } catch (error) {}
+  try {
+    previewWindow.setOpacity(1);
+  } catch (error) {}
+  try {
+    previewWindow.setKiosk(false);
+  } catch (error) {}
+  try {
+    previewWindow.setFullScreen(false);
+  } catch (error) {}
+  try {
+    previewWindow.setFocusable(true);
+  } catch (error) {}
+  try {
+    previewWindow.setEnabled(true);
+  } catch (error) {}
+  try {
+    previewWindow.setMovable(true);
+  } catch (error) {}
+  try {
+    previewWindow.setResizable(true);
+  } catch (error) {}
+  try {
+    previewWindow.setMaximizable(true);
+  } catch (error) {}
+  try {
+    previewWindow.setMinimizable(true);
+  } catch (error) {}
+  try {
+    previewWindow.setClosable(true);
+  } catch (error) {}
+  try {
+    previewWindow.setMenuBarVisibility(hideMenuBar);
+    previewWindow.setAutoHideMenuBar(!hideMenuBar);
+  } catch (error) {}
+  try {
+    if (typeof previewWindow.setParentWindow === 'function') {
+      previewWindow.setParentWindow(alwaysOnTop ? parentWindow : null);
+    }
+  } catch (error) {}
+  try {
+    previewWindow.setAlwaysOnTop(false);
+  } catch (error) {}
+};
+
+const resetPreviewWindowsForPreviewMode = ({
+  parentWindow,
+  alwaysOnTop,
+  hideMenuBar,
+  useTransparentPreviewWindow,
+  useFramelessTransparentPreviewWindow,
+}) => {
+  const parentWindowId = parentWindow ? parentWindow.id : null;
+  let closedPreviewWindows = false;
+  const entriesToReset = previewWindows.filter(
+    entry => entry.parentWindowId === parentWindowId
+  );
+
+  entriesToReset.forEach(entry => {
+    try {
+      if (!entry.previewWindow || entry.previewWindow.isDestroyed()) return;
+
+      const shouldReopenPreviewWindow =
+        entry.isTransparentPreviewWindow !== useTransparentPreviewWindow ||
+        entry.isFramelessTransparentPreviewWindow !==
+          useFramelessTransparentPreviewWindow;
+      if (shouldReopenPreviewWindow) {
+        // Electron can't reliably turn a transparent frameless window back
+        // into a regular framed window, so reopen the preview when the mode changes.
+        closedPreviewWindows = true;
+        resetPreviewWindowState({
+          previewWindow: entry.previewWindow,
+          parentWindow,
+          alwaysOnTop,
+          hideMenuBar,
+        });
+        entry.previewWindow.close();
+        return;
+      }
+
+      if (useFramelessTransparentPreviewWindow) return;
+
+      resetPreviewWindowState({
+        previewWindow: entry.previewWindow,
+        parentWindow,
+        alwaysOnTop,
+        hideMenuBar,
+      });
+    } catch (error) {
+      console.warn('Ignoring exception when resetting preview window:', error);
+    }
+  });
+
+  return { closedPreviewWindows };
+};
+
 const closeAllPreviewWindows = () => {
   previewWindows.forEach(entry => {
     try {
@@ -132,4 +267,5 @@ module.exports = {
   closePreviewWindow,
   closePreviewWindowsForParent,
   closeAllPreviewWindows,
+  resetPreviewWindowsForPreviewMode,
 };

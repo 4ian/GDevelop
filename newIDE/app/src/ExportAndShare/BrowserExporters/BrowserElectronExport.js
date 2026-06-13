@@ -17,19 +17,26 @@ import {
   type ExportPipelineContext,
 } from '../ExportPipeline.flow';
 import RaisedButton from '../../UI/RaisedButton';
+import { Column, Line } from '../../UI/Grid';
 import {
   BlobDownloadUrlHolder,
   openBlobDownloadUrl,
 } from '../../Utils/BlobDownloadUrlHolder';
 import {
+  type ElectronWindowOptions,
   ExplanationHeader,
   DoneFooter,
   ExportFlow,
+  getDefaultElectronWindowOptions,
+  ElectronWindowOptionsEditor,
+  applyElectronWindowOptionsToExportOptions,
 } from '../GenericExporters/ElectronExport';
 
 const gd: libGDevelop = global.gd;
 
-type ExportState = null;
+type ExportState = {|
+  electronWindowOptions: ElectronWindowOptions,
+|};
 
 type PreparedExporter = {|
   exporter: gdjsExporter,
@@ -61,13 +68,35 @@ export const browserElectronExportPipeline: ExportPipeline<
   name: exportPipelineName,
   packageNameWarningType: 'desktop',
 
-  getInitialExportState: () => null,
+  getInitialExportState: () => ({
+    electronWindowOptions: getDefaultElectronWindowOptions(),
+  }),
 
   canLaunchBuild: () => true,
 
   isNavigationDisabled: () => false,
 
-  renderHeader: () => <ExplanationHeader />,
+  renderHeader: ({ exportState, updateExportState, isExporting }) => (
+    <Column noMargin expand>
+      <Line>
+        <Column noMargin>
+          <ExplanationHeader />
+        </Column>
+      </Line>
+      <Line>
+        <ElectronWindowOptionsEditor
+          electronWindowOptions={exportState.electronWindowOptions}
+          onChange={electronWindowOptions => {
+            updateExportState(prevExportState => ({
+              ...prevExportState,
+              electronWindowOptions,
+            }));
+          }}
+          disabled={isExporting}
+        />
+      </Line>
+    </Column>
+  ),
 
   renderExportFlow: (props: ExportFlowProps) => (
     <ExportFlow {...props} exportPipelineName={exportPipelineName} />
@@ -106,6 +135,10 @@ export const browserElectronExportPipeline: ExportPipeline<
     const { project } = context;
     const exportOptions = new gd.ExportOptions(project, outputDir);
     exportOptions.setTarget('electron');
+    applyElectronWindowOptionsToExportOptions(
+      exportOptions,
+      context.exportState.electronWindowOptions
+    );
     if (fallbackAuthor) {
       exportOptions.setFallbackAuthor(
         fallbackAuthor.id,

@@ -21,6 +21,128 @@ namespace gdjs {
         }
       };
 
+      const getElectron = (runtimeScene: gdjs.RuntimeScene) => {
+        try {
+          return runtimeScene.getGame().getRenderer().getElectron();
+        } catch (error) {
+          return null;
+        }
+      };
+
+      const isGDevelopPreview = (runtimeScene: gdjs.RuntimeScene): boolean => {
+        try {
+          return !!runtimeScene.getGame().isPreview();
+        } catch (error) {
+          return false;
+        }
+      };
+
+      const getElectronBrowserWindowBounds = (
+        runtimeScene: gdjs.RuntimeScene
+      ): { x: number; y: number; width: number; height: number } | null => {
+        const electronBrowserWindow = getElectronBrowserWindow(runtimeScene);
+        if (!electronBrowserWindow) return null;
+
+        try {
+          if (typeof electronBrowserWindow.getBounds === 'function') {
+            return electronBrowserWindow.getBounds();
+          }
+
+          const position = electronBrowserWindow.getPosition();
+          const size = electronBrowserWindow.getSize();
+          return {
+            x: position[0],
+            y: position[1],
+            width: size[0],
+            height: size[1],
+          };
+        } catch (error) {
+          return null;
+        }
+      };
+
+      const getCurrentDisplayWorkArea = (
+        runtimeScene: gdjs.RuntimeScene
+      ): { x: number; y: number; width: number; height: number } | null => {
+        const electron = getElectron(runtimeScene);
+        const screen = electron ? electron.screen : null;
+        if (!screen) return null;
+
+        try {
+          const bounds = getElectronBrowserWindowBounds(runtimeScene);
+          const fallbackDisplay = screen.getPrimaryDisplay();
+          if (!bounds) {
+            return fallbackDisplay && fallbackDisplay.workArea
+              ? fallbackDisplay.workArea
+              : null;
+          }
+
+          const centerPoint = {
+            x: bounds.x + Math.round(bounds.width / 2),
+            y: bounds.y + Math.round(bounds.height / 2),
+          };
+          const display =
+            screen.getDisplayNearestPoint(centerPoint) || fallbackDisplay;
+          return display && display.workArea ? display.workArea : null;
+        } catch (error) {
+          return null;
+        }
+      };
+
+      const computeDockedWindowPosition = (
+        dockPosition: string,
+        workArea: { x: number; y: number; width: number; height: number },
+        bounds: { x: number; y: number; width: number; height: number },
+        cornerOffsetX: float,
+        cornerOffsetY: float,
+        customX: float,
+        customY: float
+      ): { x: number; y: number } => {
+        switch (dockPosition) {
+          case 'TopLeft':
+          case 'top-left':
+            return {
+              x: workArea.x + cornerOffsetX,
+              y: workArea.y + cornerOffsetY,
+            };
+          case 'TopRight':
+          case 'top-right':
+            return {
+              x: workArea.x + workArea.width - bounds.width - cornerOffsetX,
+              y: workArea.y + cornerOffsetY,
+            };
+          case 'BottomLeft':
+          case 'bottom-left':
+            return {
+              x: workArea.x + cornerOffsetX,
+              y: workArea.y + workArea.height - bounds.height - cornerOffsetY,
+            };
+          case 'BottomRight':
+          case 'bottom-right':
+            return {
+              x: workArea.x + workArea.width - bounds.width - cornerOffsetX,
+              y: workArea.y + workArea.height - bounds.height - cornerOffsetY,
+            };
+          case 'Center':
+          case 'center':
+            return {
+              x: workArea.x + Math.round((workArea.width - bounds.width) / 2),
+              y: workArea.y + Math.round((workArea.height - bounds.height) / 2),
+            };
+          case 'Custom':
+          case 'custom':
+            return {
+              x: customX,
+              y: customY,
+            };
+          default:
+            return {
+              x: bounds.x,
+              y: bounds.y,
+            };
+        }
+      };
+
       export const focus = function (
         activate: boolean,
         runtimeScene: gdjs.RuntimeScene
@@ -406,6 +528,163 @@ namespace gdjs {
         if (electronBrowserWindow) {
           electronBrowserWindow.setFocusable(activate);
         }
+      };
+
+      export const setSkipTaskbar = function (
+        activate: boolean,
+        runtimeScene: gdjs.RuntimeScene
+      ) {
+        const electronBrowserWindow = getElectronBrowserWindow(runtimeScene);
+        if (electronBrowserWindow) {
+          if (activate && isGDevelopPreview(runtimeScene)) {
+            electronBrowserWindow.setSkipTaskbar(false);
+            return;
+          }
+          electronBrowserWindow.setSkipTaskbar(activate);
+        }
+      };
+
+      export const setTaskbarVisible = function (
+        visible: boolean,
+        runtimeScene: gdjs.RuntimeScene
+      ) {
+        setSkipTaskbar(!visible, runtimeScene);
+      };
+
+      export const setIgnoreMouseEvents = function (
+        activate: boolean,
+        forward: boolean,
+        runtimeScene: gdjs.RuntimeScene
+      ) {
+        const electronBrowserWindow = getElectronBrowserWindow(runtimeScene);
+        if (electronBrowserWindow) {
+          if (activate) {
+            electronBrowserWindow.setIgnoreMouseEvents(true, { forward });
+          } else {
+            electronBrowserWindow.setIgnoreMouseEvents(false);
+          }
+        }
+      };
+
+      export const setWindowBackgroundColor = function (
+        backgroundColor: string,
+        runtimeScene: gdjs.RuntimeScene
+      ) {
+        const electronBrowserWindow = getElectronBrowserWindow(runtimeScene);
+        if (electronBrowserWindow) {
+          electronBrowserWindow.setBackgroundColor(backgroundColor);
+        }
+      };
+
+      export const setMenuBarVisible = function (
+        visible: boolean,
+        runtimeScene: gdjs.RuntimeScene
+      ) {
+        const electronBrowserWindow = getElectronBrowserWindow(runtimeScene);
+        if (electronBrowserWindow) {
+          if (typeof electronBrowserWindow.setAutoHideMenuBar === 'function') {
+            electronBrowserWindow.setAutoHideMenuBar(!visible);
+          }
+          if (
+            typeof electronBrowserWindow.setMenuBarVisibility === 'function'
+          ) {
+            electronBrowserWindow.setMenuBarVisibility(visible);
+          }
+        }
+      };
+
+      export const dockWindow = function (
+        dockPosition: string,
+        cornerOffsetX: float,
+        cornerOffsetY: float,
+        customX: float,
+        customY: float,
+        runtimeScene: gdjs.RuntimeScene
+      ) {
+        const electronBrowserWindow = getElectronBrowserWindow(runtimeScene);
+        const workArea = getCurrentDisplayWorkArea(runtimeScene);
+        const bounds = getElectronBrowserWindowBounds(runtimeScene);
+        if (!electronBrowserWindow || !bounds) return;
+
+        if (!workArea) {
+          if (dockPosition !== 'Custom' && dockPosition !== 'custom') return;
+          electronBrowserWindow.setPosition(
+            Math.round(customX),
+            Math.round(customY)
+          );
+          return;
+        }
+
+        const targetPosition = computeDockedWindowPosition(
+          dockPosition,
+          workArea,
+          bounds,
+          cornerOffsetX,
+          cornerOffsetY,
+          customX,
+          customY
+        );
+
+        electronBrowserWindow.setPosition(
+          Math.round(targetPosition.x),
+          Math.round(targetPosition.y)
+        );
+      };
+
+      export const getWorkAreaX = function (
+        runtimeScene: gdjs.RuntimeScene
+      ): number {
+        const workArea = getCurrentDisplayWorkArea(runtimeScene);
+        return workArea ? workArea.x : 0;
+      };
+
+      export const getWorkAreaY = function (
+        runtimeScene: gdjs.RuntimeScene
+      ): number {
+        const workArea = getCurrentDisplayWorkArea(runtimeScene);
+        return workArea ? workArea.y : 0;
+      };
+
+      export const getWorkAreaWidth = function (
+        runtimeScene: gdjs.RuntimeScene
+      ): number {
+        const workArea = getCurrentDisplayWorkArea(runtimeScene);
+        return workArea ? workArea.width : 0;
+      };
+
+      export const getWorkAreaHeight = function (
+        runtimeScene: gdjs.RuntimeScene
+      ): number {
+        const workArea = getCurrentDisplayWorkArea(runtimeScene);
+        return workArea ? workArea.height : 0;
+      };
+
+      export const applyDesktopPetWindowMode = function (
+        dockPosition: string,
+        cornerOffsetX: float,
+        cornerOffsetY: float,
+        customX: float,
+        customY: float,
+        alwaysOnTop: boolean,
+        showInTaskbar: boolean,
+        clickThrough: boolean,
+        showMenuBar: boolean,
+        runtimeScene: gdjs.RuntimeScene
+      ) {
+        setWindowBackgroundColor('#00000000', runtimeScene);
+        setAlwaysOnTop(alwaysOnTop, 'floating', runtimeScene);
+        setHasShadow(false, runtimeScene);
+        setTaskbarVisible(showInTaskbar, runtimeScene);
+        setIgnoreMouseEvents(clickThrough, true, runtimeScene);
+        setMenuBarVisible(showMenuBar, runtimeScene);
+        dockWindow(
+          dockPosition,
+          cornerOffsetX,
+          cornerOffsetY,
+          customX,
+          customY,
+          runtimeScene
+        );
       };
     }
   }

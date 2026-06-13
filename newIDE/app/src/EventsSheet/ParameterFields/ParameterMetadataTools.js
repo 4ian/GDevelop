@@ -153,15 +153,46 @@ export const getParameterChoiceAutocompletions = (
     completion: `"${choice}"`,
   }));
 
-export const getParameterChoiceValues = (
+type ParameterChoice = {|
+  value: string,
+  label: ?string,
+|};
+
+export const getParameterChoices = (
   parameterMetadata: ?gdParameterMetadata
-): Array<string> => {
+): Array<ParameterChoice> => {
   if (!parameterMetadata) {
     return [];
   }
 
   try {
-    return JSON.parse(parameterMetadata.getExtraInfo());
+    const parsedChoices = JSON.parse(parameterMetadata.getExtraInfo());
+    if (!Array.isArray(parsedChoices)) {
+      return [];
+    }
+
+    const choices: Array<ParameterChoice> = [];
+    parsedChoices.forEach(choice => {
+      if (typeof choice === 'string') {
+        choices.push({ value: choice, label: null });
+        return;
+      }
+
+      if (choice && typeof choice === 'object') {
+        const choiceObject = (choice: any);
+        if (typeof choiceObject.value === 'string') {
+          choices.push({
+            value: choiceObject.value,
+            label:
+              typeof choiceObject.label === 'string'
+                ? choiceObject.label
+                : null,
+          });
+        }
+      }
+    });
+
+    return choices;
   } catch (exception) {
     console.error(
       'The parameter seems misconfigured, as an array of choices could not be extracted - verify that your properly wrote a list of choices in JSON format. Full exception is:',
@@ -171,3 +202,8 @@ export const getParameterChoiceValues = (
 
   return [];
 };
+
+export const getParameterChoiceValues = (
+  parameterMetadata: ?gdParameterMetadata
+): Array<string> =>
+  getParameterChoices(parameterMetadata).map(choice => choice.value);

@@ -28,9 +28,11 @@ module.exports = {
         'MIT'
       )
       .setShortDescription(
-        'Window focus, position, size, always-on-top, minimize/maximize, content protection. Desktop only.'
+        _(
+          'Window focus, position, size, always-on-top, minimize/maximize, desktop pet controls, content protection. Desktop only.'
+        )
       )
-      .setCategory('User interface');
+      .setCategory(_('User interface'));
     extension
       .addInstructionOrExpressionGroupMetadata(_('Advanced window management'))
       .setIcon('res/actions/window24.png');
@@ -432,14 +434,23 @@ module.exports = {
       .setFunctionName('gdjs.evtTools.advancedWindow.isClosable');
 
     const levelChoices = JSON.stringify([
-      'normal',
-      'floating',
-      'torn-off-menu',
-      'modal-panel',
-      'main-menu',
-      'status',
-      'pop-up-menu',
-      'screen-saver',
+      { value: 'normal', label: _('Normal') },
+      { value: 'floating', label: _('Floating') },
+      { value: 'torn-off-menu', label: _('Torn-off menu') },
+      { value: 'modal-panel', label: _('Modal panel') },
+      { value: 'main-menu', label: _('Main menu') },
+      { value: 'status', label: _('Status') },
+      { value: 'pop-up-menu', label: _('Pop-up menu') },
+      { value: 'screen-saver', label: _('Screen saver') },
+    ]);
+
+    const dockPositionChoices = JSON.stringify([
+      { value: 'BottomRight', label: _('Bottom right') },
+      { value: 'TopRight', label: _('Top right') },
+      { value: 'BottomLeft', label: _('Bottom left') },
+      { value: 'TopLeft', label: _('Top left') },
+      { value: 'Center', label: _('Center') },
+      { value: 'Custom', label: _('Custom') },
     ]);
 
     extension
@@ -457,14 +468,16 @@ module.exports = {
       .addParameter('stringWithSelector', _('Level'), levelChoices, false)
       .setDefaultValue('floating')
       .setParameterLongDescription(
-        'The level is like a layer in GDevelop but for the OS. ' +
-          'The further down the list, the higher it will be. ' +
-          'When disabling always on top, the level will be set to normal. ' +
-          'From "floating" to "status" included, ' +
-          'the window is placed below the Dock on macOS and below the taskbar on Windows. ' +
-          'Starting from "pop-up-menu", it is shown above the Dock on macOS and ' +
-          'above the taskbar on Windows. ' +
-          'This parameter is ignored on linux.'
+        _(
+          'The level is like a layer in GDevelop but for the OS. ' +
+            'The further down the list, the higher it will be. ' +
+            'When disabling always on top, the level will be set to normal. ' +
+            'From "floating" to "status" included, ' +
+            'the window is placed below the Dock on macOS and below the taskbar on Windows. ' +
+            'Starting from "pop-up-menu", it is shown above the Dock on macOS and ' +
+            'above the taskbar on Windows. ' +
+            'This parameter is ignored on linux.'
+        )
       )
       .addCodeOnlyParameter('currentScene', '')
       .getCodeExtraInformation()
@@ -606,6 +619,93 @@ module.exports = {
 
     extension
       .addAction(
+        'SetWindowTaskbarVisibility',
+        _('Show in taskbar'),
+        _('Shows or hides the window in the operating system taskbar.'),
+        _('Show window in taskbar: _PARAM0_'),
+        _('Windows, Linux, macOS'),
+        'res/actions/window24.png',
+        'res/actions/window.png'
+      )
+      .addParameter('yesorno', _('Show in taskbar?'), '', false)
+      .setDefaultValue('true')
+      .addCodeOnlyParameter('currentScene', '')
+      .getCodeExtraInformation()
+      .setIncludeFile(
+        'Extensions/AdvancedWindow/electron-advancedwindowtools.js'
+      )
+      .setFunctionName('gdjs.evtTools.advancedWindow.setTaskbarVisible');
+
+    extension
+      .addAction(
+        'SetIgnoreMouseEvents',
+        _('Ignore mouse events'),
+        _(
+          'Makes the window ignore mouse events so clicks can go through to windows behind it.'
+        ),
+        _('Ignore mouse events: _PARAM0_, forward mouse movement: _PARAM1_'),
+        _('Windows, Linux, macOS'),
+        'res/actions/window24.png',
+        'res/actions/window.png'
+      )
+      .addParameter('yesorno', _('Ignore mouse events?'), '', false)
+      .setDefaultValue('false')
+      .addParameter(
+        'yesorno',
+        _('Forward mouse movement events to the game?'),
+        '',
+        false
+      )
+      .setDefaultValue('true')
+      .addCodeOnlyParameter('currentScene', '')
+      .getCodeExtraInformation()
+      .setIncludeFile(
+        'Extensions/AdvancedWindow/electron-advancedwindowtools.js'
+      )
+      .setFunctionName('gdjs.evtTools.advancedWindow.setIgnoreMouseEvents');
+
+    extension
+      .addAction(
+        'SetWindowBackgroundColor',
+        _('Window background color'),
+        _(
+          'Changes the native window background color. Use #00000000 for a transparent window background.'
+        ),
+        _('Set the native window background color to _PARAM0_'),
+        _('Windows, Linux, macOS'),
+        'res/actions/window24.png',
+        'res/actions/window.png'
+      )
+      .addParameter('string', _('Background color'), '', false)
+      .setDefaultValue('#00000000')
+      .addCodeOnlyParameter('currentScene', '')
+      .getCodeExtraInformation()
+      .setIncludeFile(
+        'Extensions/AdvancedWindow/electron-advancedwindowtools.js'
+      )
+      .setFunctionName('gdjs.evtTools.advancedWindow.setWindowBackgroundColor');
+
+    extension
+      .addAction(
+        'SetMenuBarVisible',
+        _('Show menu bar'),
+        _('Shows or hides the native menu bar of the window.'),
+        _('Show window menu bar: _PARAM0_'),
+        _('Windows, Linux, macOS'),
+        'res/actions/window24.png',
+        'res/actions/window.png'
+      )
+      .addParameter('yesorno', _('Show menu bar?'), '', false)
+      .setDefaultValue('true')
+      .addCodeOnlyParameter('currentScene', '')
+      .getCodeExtraInformation()
+      .setIncludeFile(
+        'Extensions/AdvancedWindow/electron-advancedwindowtools.js'
+      )
+      .setFunctionName('gdjs.evtTools.advancedWindow.setMenuBarVisible');
+
+    extension
+      .addAction(
         'Flash',
         _('Flash the window'),
         _('Make the window flash or end flashing.'),
@@ -635,7 +735,7 @@ module.exports = {
       )
       .addParameter('expression', _('New opacity'), '', false)
       .setParameterLongDescription(
-        'A number between 0 (fully transparent) and 1 (fully opaque).'
+        _('A number between 0 (fully transparent) and 1 (fully opaque).')
       )
       .addCodeOnlyParameter('currentScene', '')
       .getCodeExtraInformation()
@@ -662,6 +762,88 @@ module.exports = {
         'Extensions/AdvancedWindow/electron-advancedwindowtools.js'
       )
       .setFunctionName('gdjs.evtTools.advancedWindow.setPosition');
+
+    extension
+      .addAction(
+        'DockWindow',
+        _('Dock window to screen work area'),
+        _(
+          'Moves the window to a corner, the center, or custom coordinates on the current screen work area.'
+        ),
+        _(
+          'Dock the window to _PARAM0_ with offset _PARAM1_;_PARAM2_ and custom position _PARAM3_;_PARAM4_'
+        ),
+        _('Windows, Linux, macOS'),
+        'res/actions/window24.png',
+        'res/actions/window.png'
+      )
+      .addParameter(
+        'stringWithSelector',
+        _('Dock position'),
+        dockPositionChoices,
+        false
+      )
+      .setDefaultValue('BottomRight')
+      .addParameter('expression', _('Corner X offset'), '', false)
+      .setDefaultValue('0')
+      .addParameter('expression', _('Corner Y offset'), '', false)
+      .setDefaultValue('0')
+      .addParameter('expression', _('Custom X position'), '', false)
+      .setDefaultValue('0')
+      .addParameter('expression', _('Custom Y position'), '', false)
+      .setDefaultValue('0')
+      .addCodeOnlyParameter('currentScene', '')
+      .getCodeExtraInformation()
+      .setIncludeFile(
+        'Extensions/AdvancedWindow/electron-advancedwindowtools.js'
+      )
+      .setFunctionName('gdjs.evtTools.advancedWindow.dockWindow');
+
+    extension
+      .addAction(
+        'ApplyDesktopPetWindowMode',
+        _('Apply desktop pet window mode'),
+        _(
+          'Applies common desktop pet window settings: transparent native background, no shadow, optional always-on-top, taskbar hiding, mouse click-through, menu bar hiding, and docking.'
+        ),
+        _(
+          'Apply desktop pet window mode at _PARAM0_ with offset _PARAM1_;_PARAM2_, custom position _PARAM3_;_PARAM4_, always on top: _PARAM5_, show in taskbar: _PARAM6_, click-through: _PARAM7_, show menu bar: _PARAM8_'
+        ),
+        _('Windows, Linux, macOS'),
+        'res/actions/window24.png',
+        'res/actions/window.png'
+      )
+      .addParameter(
+        'stringWithSelector',
+        _('Dock position'),
+        dockPositionChoices,
+        false
+      )
+      .setDefaultValue('BottomRight')
+      .addParameter('expression', _('Corner X offset'), '', false)
+      .setDefaultValue('0')
+      .addParameter('expression', _('Corner Y offset'), '', false)
+      .setDefaultValue('0')
+      .addParameter('expression', _('Custom X position'), '', false)
+      .setDefaultValue('0')
+      .addParameter('expression', _('Custom Y position'), '', false)
+      .setDefaultValue('0')
+      .addParameter('yesorno', _('Always on top?'), '', false)
+      .setDefaultValue('true')
+      .addParameter('yesorno', _('Show in taskbar?'), '', false)
+      .setDefaultValue('false')
+      .addParameter('yesorno', _('Click-through?'), '', false)
+      .setDefaultValue('false')
+      .addParameter('yesorno', _('Show menu bar?'), '', false)
+      .setDefaultValue('false')
+      .addCodeOnlyParameter('currentScene', '')
+      .getCodeExtraInformation()
+      .setIncludeFile(
+        'Extensions/AdvancedWindow/electron-advancedwindowtools.js'
+      )
+      .setFunctionName(
+        'gdjs.evtTools.advancedWindow.applyDesktopPetWindowMode'
+      );
 
     extension
       .addExpression(
@@ -692,6 +874,66 @@ module.exports = {
         'Extensions/AdvancedWindow/electron-advancedwindowtools.js'
       )
       .setFunctionName('gdjs.evtTools.advancedWindow.getPositionY');
+
+    extension
+      .addExpression(
+        'WorkAreaX',
+        _('Screen work area X position'),
+        _('Returns the X position of the current screen work area.'),
+        _('Windows, Linux, macOS'),
+        'res/actions/window.png'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .getCodeExtraInformation()
+      .setIncludeFile(
+        'Extensions/AdvancedWindow/electron-advancedwindowtools.js'
+      )
+      .setFunctionName('gdjs.evtTools.advancedWindow.getWorkAreaX');
+
+    extension
+      .addExpression(
+        'WorkAreaY',
+        _('Screen work area Y position'),
+        _('Returns the Y position of the current screen work area.'),
+        _('Windows, Linux, macOS'),
+        'res/actions/window.png'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .getCodeExtraInformation()
+      .setIncludeFile(
+        'Extensions/AdvancedWindow/electron-advancedwindowtools.js'
+      )
+      .setFunctionName('gdjs.evtTools.advancedWindow.getWorkAreaY');
+
+    extension
+      .addExpression(
+        'WorkAreaWidth',
+        _('Screen work area width'),
+        _('Returns the width of the current screen work area.'),
+        _('Windows, Linux, macOS'),
+        'res/actions/window.png'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .getCodeExtraInformation()
+      .setIncludeFile(
+        'Extensions/AdvancedWindow/electron-advancedwindowtools.js'
+      )
+      .setFunctionName('gdjs.evtTools.advancedWindow.getWorkAreaWidth');
+
+    extension
+      .addExpression(
+        'WorkAreaHeight',
+        _('Screen work area height'),
+        _('Returns the height of the current screen work area.'),
+        _('Windows, Linux, macOS'),
+        'res/actions/window.png'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .getCodeExtraInformation()
+      .setIncludeFile(
+        'Extensions/AdvancedWindow/electron-advancedwindowtools.js'
+      )
+      .setFunctionName('gdjs.evtTools.advancedWindow.getWorkAreaHeight');
 
     extension
       .addExpression(

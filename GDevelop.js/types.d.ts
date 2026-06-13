@@ -3264,6 +3264,7 @@ export class PreviewExportOptions extends EmscriptenObject {
   setFullLoadingScreen(enable: boolean): PreviewExportOptions;
   setIsDevelopmentEnvironment(enable: boolean): PreviewExportOptions;
   setIsInGameEdition(enable: boolean): PreviewExportOptions;
+  setTransparentRuntimeBackground(enable: boolean): PreviewExportOptions;
   setInGameEditorSettingsJson(inGameEditorSettingsJson: string): PreviewExportOptions;
   setEditorId(editorId: string): PreviewExportOptions;
   setEditorCameraState3D(cameraMode: string, positionX: number, positionY: number, positionZ: number, rotationAngle: number, elevationAngle: number, distance: number): PreviewExportOptions;
@@ -3283,6 +3284,11 @@ export class ExportOptions extends EmscriptenObject {
   constructor(project: Project, outputPath: string);
   setFallbackAuthor(id: string, username: string): ExportOptions;
   setTarget(target: string): ExportOptions;
+  setElectronTransparentWindow(enable: boolean): ExportOptions;
+  setElectronFramelessWindow(enable: boolean): ExportOptions;
+  setElectronDisableWindowShadow(enable: boolean): ExportOptions;
+  setElectronTransparentRuntimeBackground(enable: boolean): ExportOptions;
+  setElectronDisableHardwareAcceleration(enable: boolean): ExportOptions;
 }
 
 export class Exporter extends EmscriptenObject {

@@ -142,6 +142,12 @@ const jsExtensions = [
     },
   },
   {
+    name: 'TimelineSequencer',
+    // $FlowFixMe[cannot-resolve-module]
+    extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/TimelineSequencer/JsExtension.js'),
+    objectsRenderingServiceModules: {},
+  },
+  {
     name: 'Effects',
     // $FlowFixMe[cannot-resolve-module]
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/Effects/JsExtension.js'),
@@ -193,6 +199,12 @@ const jsExtensions = [
     name: 'SpineObject',
     // $FlowFixMe[cannot-resolve-module]
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/Spine/JsExtension.js'),
+    objectsRenderingServiceModules: {},
+  },
+  {
+    name: 'Spine43Object',
+    // $FlowFixMe[cannot-resolve-module]
+    extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/Spine43Object/JsExtension.js'),
     objectsRenderingServiceModules: {},
   },
   {

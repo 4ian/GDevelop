@@ -67,6 +67,7 @@ type BridgeCall = {|
 
 type BridgeSocket = WebSocket & {
   _gdevelopMcpBridgeIsOpen?: boolean,
+  ...
 };
 
 const getBridgeUrl = (): string | null => {
@@ -146,7 +147,7 @@ const summarizeEditorTab = (tab: EditorTab, paneIdentifier: string) => ({
 });
 
 const summarizeEditorTabs = (editorTabs: EditorTabsState) => {
-  const panes = {};
+  const panes: { [string]: any } = {};
   for (const paneIdentifier in editorTabs.panes) {
     const pane = editorTabs.panes[paneIdentifier];
     const currentTab = getCurrentTabForPane(editorTabs, paneIdentifier);
@@ -523,12 +524,13 @@ const getFileNameFromPath = (file: string): string => {
 };
 
 const guessResourceKind = (file: string): ResourceKind => {
-  const extension = file
+  const extensionParts = file
     .split('?')[0]
     .split('#')[0]
-    .split('.')
-    .pop()
-    .toLowerCase();
+    .split('.');
+  const extension = (
+    extensionParts[extensionParts.length - 1] || ''
+  ).toLowerCase();
   if (['png', 'jpg', 'jpeg', 'webp', 'gif'].includes(extension)) return 'image';
   if (['aac', 'wav', 'mp3', 'ogg', 'flac'].includes(extension)) return 'audio';
   if (['ttf', 'otf', 'woff', 'woff2'].includes(extension)) return 'font';
@@ -786,7 +788,7 @@ const buildLiveReflectionCatalog = (
     ? props.project.getCurrentPlatform()
     : gd.JsPlatform.get();
   const extensions = platform.getAllPlatformExtensions();
-  const entries = [];
+  const entries: Array<Object> = [];
 
   try {
     for (let index = 0; index < extensions.size(); index++) {
@@ -1036,7 +1038,10 @@ const updateSelectedInstances = (props: Props, params: { [string]: any }) => {
   const layout = sceneEditorContainer.getLayout();
   if (!layout) throw new Error('No active layout is available.');
 
-  const selectedInstances = sceneEditorContainer.editor.instancesSelection.getSelectedInstances();
+  const sceneEditor = sceneEditorContainer.editor;
+  if (!sceneEditor) throw new Error('The active editor is not a scene editor.');
+
+  const selectedInstances = sceneEditor.instancesSelection.getSelectedInstances();
   if (!selectedInstances.length) {
     throw new Error('No scene instances are currently selected.');
   }
@@ -1582,7 +1587,9 @@ export default function AIEditorBridge(props: Props): React.Node {
 
       const connect = () => {
         if (closed) return;
-        const socket: BridgeSocket = new WebSocket(bridgeUrl);
+        const socket: BridgeSocket = ((new WebSocket(
+          bridgeUrl
+        ): any): BridgeSocket);
         socketRef.current = socket;
 
         socket.onopen = () => {

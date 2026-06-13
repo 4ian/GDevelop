@@ -58,9 +58,28 @@ export const ElectronWindowOptionsEditor = ({
     optionName: $Keys<ElectronWindowOptions>,
     checked: boolean
   ) => {
-    const nextElectronWindowOptions = {
+    const nextElectronWindowOptions: ElectronWindowOptions = {
       ...electronWindowOptions,
-      [optionName]: checked,
+      transparentWindow:
+        optionName === 'transparentWindow'
+          ? checked
+          : electronWindowOptions.transparentWindow,
+      framelessWindow:
+        optionName === 'framelessWindow'
+          ? checked
+          : electronWindowOptions.framelessWindow,
+      transparentRuntimeBackground:
+        optionName === 'transparentRuntimeBackground'
+          ? checked
+          : electronWindowOptions.transparentRuntimeBackground,
+      disableWindowShadow:
+        optionName === 'disableWindowShadow'
+          ? checked
+          : electronWindowOptions.disableWindowShadow,
+      disableHardwareAcceleration:
+        optionName === 'disableHardwareAcceleration'
+          ? checked
+          : electronWindowOptions.disableHardwareAcceleration,
     };
 
     if (optionName === 'transparentWindow' && checked) {

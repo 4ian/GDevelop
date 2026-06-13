@@ -23,10 +23,7 @@ namespace gdjs {
 
       const getElectron = (runtimeScene: gdjs.RuntimeScene) => {
         try {
-          return runtimeScene
-            .getGame()
-            .getRenderer()
-            .getElectron();
+          return runtimeScene.getGame().getRenderer().getElectron();
         } catch (error) {
           return null;
         }
@@ -146,7 +143,7 @@ namespace gdjs {
         }
       };
 
-      export const focus = function(
+      export const focus = function (
         activate: boolean,
         runtimeScene: gdjs.RuntimeScene
       ) {
@@ -160,7 +157,7 @@ namespace gdjs {
         }
       };
 
-      export const isFocused = function(
+      export const isFocused = function (
         runtimeScene: gdjs.RuntimeScene
       ): boolean {
         const electronBrowserWindow = getElectronBrowserWindow(runtimeScene);
@@ -170,7 +167,7 @@ namespace gdjs {
         return false;
       };
 
-      export const show = function(
+      export const show = function (
         activate: boolean,
         runtimeScene: gdjs.RuntimeScene
       ) {
@@ -184,7 +181,7 @@ namespace gdjs {
         }
       };
 
-      export const isVisible = function(
+      export const isVisible = function (
         runtimeScene: gdjs.RuntimeScene
       ): boolean {
         const electronBrowserWindow = getElectronBrowserWindow(runtimeScene);
@@ -194,7 +191,7 @@ namespace gdjs {
         return false;
       };
 
-      export const maximize = function(
+      export const maximize = function (
         activate: boolean,
         runtimeScene: gdjs.RuntimeScene
       ) {
@@ -208,7 +205,7 @@ namespace gdjs {
         }
       };
 
-      export const isMaximized = function(
+      export const isMaximized = function (
         runtimeScene: gdjs.RuntimeScene
       ): boolean {
         const electronBrowserWindow = getElectronBrowserWindow(runtimeScene);
@@ -218,7 +215,7 @@ namespace gdjs {
         return false;
       };
 
-      export const minimize = function(
+      export const minimize = function (
         activate: boolean,
         runtimeScene: gdjs.RuntimeScene
       ) {
@@ -232,7 +229,7 @@ namespace gdjs {
         }
       };
 
-      export const isMinimized = function(
+      export const isMinimized = function (
         runtimeScene: gdjs.RuntimeScene
       ): boolean {
         const electronBrowserWindow = getElectronBrowserWindow(runtimeScene);
@@ -242,7 +239,7 @@ namespace gdjs {
         return false;
       };
 
-      export const enable = function(
+      export const enable = function (
         activate: boolean,
         runtimeScene: gdjs.RuntimeScene
       ) {
@@ -252,7 +249,7 @@ namespace gdjs {
         }
       };
 
-      export const isEnabled = function(
+      export const isEnabled = function (
         runtimeScene: gdjs.RuntimeScene
       ): boolean {
         const electronBrowserWindow = getElectronBrowserWindow(runtimeScene);
@@ -262,7 +259,7 @@ namespace gdjs {
         return false;
       };
 
-      export const setResizable = function(
+      export const setResizable = function (
         activate: boolean,
         runtimeScene: gdjs.RuntimeScene
       ) {
@@ -272,7 +269,7 @@ namespace gdjs {
         }
       };
 
-      export const isResizable = function(
+      export const isResizable = function (
         runtimeScene: gdjs.RuntimeScene
       ): boolean {
         const electronBrowserWindow = getElectronBrowserWindow(runtimeScene);
@@ -282,7 +279,7 @@ namespace gdjs {
         return false;
       };
 
-      export const setMovable = function(
+      export const setMovable = function (
         activate: boolean,
         runtimeScene: gdjs.RuntimeScene
       ) {
@@ -292,7 +289,7 @@ namespace gdjs {
         }
       };
 
-      export const isMovable = function(
+      export const isMovable = function (
         runtimeScene: gdjs.RuntimeScene
       ): boolean {
         const electronBrowserWindow = getElectronBrowserWindow(runtimeScene);
@@ -302,7 +299,7 @@ namespace gdjs {
         return false;
       };
 
-      export const setMaximizable = function(
+      export const setMaximizable = function (
         activate: boolean,
         runtimeScene: gdjs.RuntimeScene
       ) {
@@ -312,7 +309,7 @@ namespace gdjs {
         }
       };
 
-      export const isMaximizable = function(
+      export const isMaximizable = function (
         runtimeScene: gdjs.RuntimeScene
       ): boolean {
         const electronBrowserWindow = getElectronBrowserWindow(runtimeScene);
@@ -322,7 +319,7 @@ namespace gdjs {
         return false;
       };
 
-      export const setMinimizable = function(
+      export const setMinimizable = function (
         activate: boolean,
         runtimeScene: gdjs.RuntimeScene
       ) {
@@ -332,7 +329,7 @@ namespace gdjs {
         }
       };
 
-      export const isMinimizable = function(
+      export const isMinimizable = function (
         runtimeScene: gdjs.RuntimeScene
       ): boolean {
         const electronBrowserWindow = getElectronBrowserWindow(runtimeScene);
@@ -342,7 +339,7 @@ namespace gdjs {
         return false;
       };
 
-      export const setFullScreenable = function(
+      export const setFullScreenable = function (
         activate: boolean,
         runtimeScene: gdjs.RuntimeScene
       ) {
@@ -352,7 +349,7 @@ namespace gdjs {
         }
       };
 
-      export const isFullScreenable = function(
+      export const isFullScreenable = function (
         runtimeScene: gdjs.RuntimeScene
       ): boolean {
         const electronBrowserWindow = getElectronBrowserWindow(runtimeScene);
@@ -362,7 +359,7 @@ namespace gdjs {
         return false;
       };
 
-      export const setClosable = function(
+      export const setClosable = function (
         activate: boolean,
         runtimeScene: gdjs.RuntimeScene
       ) {
@@ -372,7 +369,7 @@ namespace gdjs {
         }
       };
 
-      export const isClosable = function(
+      export const isClosable = function (
         runtimeScene: gdjs.RuntimeScene
       ): boolean {
         const electronBrowserWindow = getElectronBrowserWindow(runtimeScene);
@@ -382,7 +379,7 @@ namespace gdjs {
         return false;
       };
 
-      export const setAlwaysOnTop = function(
+      export const setAlwaysOnTop = function (
         activate: boolean,
         level:
           | 'normal'
@@ -401,7 +398,7 @@ namespace gdjs {
         }
       };
 
-      export const isAlwaysOnTop = function(
+      export const isAlwaysOnTop = function (
         runtimeScene: gdjs.RuntimeScene
       ): boolean {
         const electronBrowserWindow = getElectronBrowserWindow(runtimeScene);
@@ -411,7 +408,7 @@ namespace gdjs {
         return false;
       };
 
-      export const setPosition = function(
+      export const setPosition = function (
         x: float,
         y: float,
         runtimeScene: gdjs.RuntimeScene
@@ -423,7 +420,7 @@ namespace gdjs {
         }
       };
 
-      export const getPositionX = function(
+      export const getPositionX = function (
         runtimeScene: gdjs.RuntimeScene
       ): number {
         const electronBrowserWindow = getElectronBrowserWindow(runtimeScene);
@@ -433,7 +430,7 @@ namespace gdjs {
         return 0;
       };
 
-      export const getPositionY = function(
+      export const getPositionY = function (
         runtimeScene: gdjs.RuntimeScene
       ): number {
         const electronBrowserWindow = getElectronBrowserWindow(runtimeScene);
@@ -443,7 +440,7 @@ namespace gdjs {
         return 0;
       };
 
-      export const setKiosk = function(
+      export const setKiosk = function (
         activate: boolean,
         runtimeScene: gdjs.RuntimeScene
       ) {
@@ -453,7 +450,7 @@ namespace gdjs {
         }
       };
 
-      export const isKiosk = function(
+      export const isKiosk = function (
         runtimeScene: gdjs.RuntimeScene
       ): boolean {
         const electronBrowserWindow = getElectronBrowserWindow(runtimeScene);
@@ -463,7 +460,7 @@ namespace gdjs {
         return false;
       };
 
-      export const flash = function(
+      export const flash = function (
         activate: boolean,
         runtimeScene: gdjs.RuntimeScene
       ) {
@@ -473,7 +470,7 @@ namespace gdjs {
         }
       };
 
-      export const setHasShadow = function(
+      export const setHasShadow = function (
         activate: boolean,
         runtimeScene: gdjs.RuntimeScene
       ) {
@@ -483,7 +480,7 @@ namespace gdjs {
         }
       };
 
-      export const hasShadow = function(
+      export const hasShadow = function (
         runtimeScene: gdjs.RuntimeScene
       ): boolean {
         const electronBrowserWindow = getElectronBrowserWindow(runtimeScene);
@@ -493,7 +490,7 @@ namespace gdjs {
         return false;
       };
 
-      export const setOpacity = function(
+      export const setOpacity = function (
         opacity: float,
         runtimeScene: gdjs.RuntimeScene
       ) {
@@ -503,7 +500,7 @@ namespace gdjs {
         }
       };
 
-      export const getOpacity = function(
+      export const getOpacity = function (
         runtimeScene: gdjs.RuntimeScene
       ): number {
         const electronBrowserWindow = getElectronBrowserWindow(runtimeScene);
@@ -513,7 +510,7 @@ namespace gdjs {
         return 1;
       };
 
-      export const setContentProtection = function(
+      export const setContentProtection = function (
         activate: boolean,
         runtimeScene: gdjs.RuntimeScene
       ) {
@@ -523,7 +520,7 @@ namespace gdjs {
         }
       };
 
-      export const setFocusable = function(
+      export const setFocusable = function (
         activate: boolean,
         runtimeScene: gdjs.RuntimeScene
       ) {
@@ -533,7 +530,7 @@ namespace gdjs {
         }
       };
 
-      export const setSkipTaskbar = function(
+      export const setSkipTaskbar = function (
         activate: boolean,
         runtimeScene: gdjs.RuntimeScene
       ) {
@@ -547,14 +544,14 @@ namespace gdjs {
         }
       };
 
-      export const setTaskbarVisible = function(
+      export const setTaskbarVisible = function (
         visible: boolean,
         runtimeScene: gdjs.RuntimeScene
       ) {
         setSkipTaskbar(!visible, runtimeScene);
       };
 
-      export const setIgnoreMouseEvents = function(
+      export const setIgnoreMouseEvents = function (
         activate: boolean,
         forward: boolean,
         runtimeScene: gdjs.RuntimeScene
@@ -569,7 +566,7 @@ namespace gdjs {
         }
       };
 
-      export const setWindowBackgroundColor = function(
+      export const setWindowBackgroundColor = function (
         backgroundColor: string,
         runtimeScene: gdjs.RuntimeScene
       ) {
@@ -579,7 +576,7 @@ namespace gdjs {
         }
       };
 
-      export const setMenuBarVisible = function(
+      export const setMenuBarVisible = function (
         visible: boolean,
         runtimeScene: gdjs.RuntimeScene
       ) {
@@ -596,7 +593,7 @@ namespace gdjs {
         }
       };
 
-      export const dockWindow = function(
+      export const dockWindow = function (
         dockPosition: string,
         cornerOffsetX: float,
         cornerOffsetY: float,
@@ -634,35 +631,35 @@ namespace gdjs {
         );
       };
 
-      export const getWorkAreaX = function(
+      export const getWorkAreaX = function (
         runtimeScene: gdjs.RuntimeScene
       ): number {
         const workArea = getCurrentDisplayWorkArea(runtimeScene);
         return workArea ? workArea.x : 0;
       };
 
-      export const getWorkAreaY = function(
+      export const getWorkAreaY = function (
         runtimeScene: gdjs.RuntimeScene
       ): number {
         const workArea = getCurrentDisplayWorkArea(runtimeScene);
         return workArea ? workArea.y : 0;
       };
 
-      export const getWorkAreaWidth = function(
+      export const getWorkAreaWidth = function (
         runtimeScene: gdjs.RuntimeScene
       ): number {
         const workArea = getCurrentDisplayWorkArea(runtimeScene);
         return workArea ? workArea.width : 0;
       };
 
-      export const getWorkAreaHeight = function(
+      export const getWorkAreaHeight = function (
         runtimeScene: gdjs.RuntimeScene
       ): number {
         const workArea = getCurrentDisplayWorkArea(runtimeScene);
         return workArea ? workArea.height : 0;
       };
 
-      export const applyDesktopPetWindowMode = function(
+      export const applyDesktopPetWindowMode = function (
         dockPosition: string,
         cornerOffsetX: float,
         cornerOffsetY: float,

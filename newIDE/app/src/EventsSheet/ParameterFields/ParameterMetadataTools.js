@@ -171,7 +171,7 @@ export const getParameterChoices = (
       return [];
     }
 
-    const choices = [];
+    const choices: Array<ParameterChoice> = [];
     parsedChoices.forEach(choice => {
       if (typeof choice === 'string') {
         choices.push({ value: choice, label: null });

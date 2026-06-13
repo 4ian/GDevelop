@@ -79,9 +79,10 @@ const getTransparentPreviewWindowSettingsForProject = (
       continue;
     }
 
-    if (value.disabled === true) continue;
+    const inspectedValue = (value: any);
+    if (inspectedValue.disabled === true) continue;
 
-    const instructionType = value.type;
+    const instructionType = inspectedValue.type;
     if (
       instructionType &&
       typeof instructionType === 'object' &&
@@ -98,11 +99,9 @@ const getTransparentPreviewWindowSettingsForProject = (
       }
     }
 
-    for (const key in value) {
-      if (Object.prototype.hasOwnProperty.call(value, key)) {
-        valuesToInspect.push(value[key]);
-      }
-    }
+    Object.keys(inspectedValue).forEach(key => {
+      valuesToInspect.push(inspectedValue[key]);
+    });
   }
 
   return transparentPreviewWindowSettings;
@@ -333,10 +332,9 @@ export default class LocalPreviewLauncher extends React.Component<
       useContentSize: true,
       title: `Preview of ${project.getName()}`,
       backgroundColor: useTransparentPreviewWindow ? '#00000000' : '#000000',
-      ...(useTransparentPreviewWindow ? { transparent: true } : {}),
-      ...(useFramelessTransparentPreviewWindow
-        ? { frame: false, hasShadow: false }
-        : {}),
+      transparent: useTransparentPreviewWindow ? true : undefined,
+      frame: useFramelessTransparentPreviewWindow ? false : undefined,
+      hasShadow: useFramelessTransparentPreviewWindow ? false : undefined,
       webPreferences: {
         webSecurity: false, // Allow to access to local files,
         // Allow Node.js API access in renderer process, as long
@@ -437,15 +435,18 @@ export default class LocalPreviewLauncher extends React.Component<
       ? defaultTransparentPreviewWindowSettings
       : getTransparentPreviewWindowSettingsForProject(project);
     const { useTransparentPreviewWindow } = transparentPreviewWindowSettings;
+    const previewExportOptionsWithTransparentRuntimeBackground = (previewExportOptions: any);
     const hasTransparentRuntimeBackgroundExportOption =
-      typeof previewExportOptions.setTransparentRuntimeBackground ===
+      typeof previewExportOptionsWithTransparentRuntimeBackground.setTransparentRuntimeBackground ===
       'function';
     if (useTransparentPreviewWindow) {
       console.info(
         'Transparent preview window enabled from AdvancedWindow events.'
       );
       if (hasTransparentRuntimeBackgroundExportOption) {
-        previewExportOptions.setTransparentRuntimeBackground(true);
+        previewExportOptionsWithTransparentRuntimeBackground.setTransparentRuntimeBackground(
+          true
+        );
       } else {
         console.info(
           'Transparent preview runtime export option is unavailable in the current libGD build. A post-export patch will be used instead.'

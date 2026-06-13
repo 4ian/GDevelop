@@ -15,7 +15,7 @@
 
 /** @type {ExtensionModule} */
 module.exports = {
-  createExtension: function(_, gd) {
+  createExtension: function (_, gd) {
     const extension = new gd.PlatformExtension();
     extension
       .setExtensionInformation(
@@ -954,7 +954,7 @@ module.exports = {
 
     return extension;
   },
-  runExtensionSanityTests: function(gd, extension) {
+  runExtensionSanityTests: function (gd, extension) {
     return [];
   },
 };

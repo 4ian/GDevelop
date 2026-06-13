@@ -40,7 +40,7 @@ export const getDefaultElectronWindowOptions = (): ElectronWindowOptions => ({
   disableHardwareAcceleration: false,
 });
 
-const normalizeInstructionParameter = parameter => {
+const normalizeInstructionParameter = (parameter: mixed): string => {
   if (typeof parameter !== 'string') return '';
 
   return parameter
@@ -50,10 +50,10 @@ const normalizeInstructionParameter = parameter => {
 };
 
 const isYesNoInstructionParameterEnabled = (
-  parameters,
-  index,
-  defaultValue
-) => {
+  parameters: mixed,
+  index: number,
+  defaultValue: boolean
+): boolean => {
   if (!Array.isArray(parameters)) return defaultValue;
 
   const value = normalizeInstructionParameter(parameters[index]);
@@ -62,7 +62,7 @@ const isYesNoInstructionParameterEnabled = (
   return value === 'yes' || value === 'true' || value === '1';
 };
 
-const isTransparentBackgroundColorParameter = parameters => {
+const isTransparentBackgroundColorParameter = (parameters: mixed): boolean => {
   if (!Array.isArray(parameters)) return false;
 
   const value = normalizeInstructionParameter(parameters[0]);
@@ -89,7 +89,7 @@ const getSerializedEventsForElectronWindowOptions = (
     return [serializeToJSObject(project.getLayout(sceneName).getEvents())];
   }
 
-  const serializedEvents = [];
+  const serializedEvents: Array<any> = [];
   for (let index = 0; index < project.getLayoutsCount(); index++) {
     serializedEvents.push(
       serializeToJSObject(project.getLayoutAt(index).getEvents())
@@ -108,7 +108,7 @@ export const getElectronWindowOptionsFromProjectEvents = (
   project: gdProject,
   sceneName?: ?string
 ): ElectronWindowOptions => {
-  let serializedEventsContainers = [];
+  let serializedEventsContainers: Array<any> = [];
   try {
     serializedEventsContainers = getSerializedEventsForElectronWindowOptions(
       project,

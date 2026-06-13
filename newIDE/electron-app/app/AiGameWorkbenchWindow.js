@@ -83,9 +83,20 @@ const findAiGameWorkbenchOverrideBundlePath = () => {
   }
 };
 
+const getDefaultAiGameWorkbenchBundlePath = () => {
+  const currentBundlePath = getBundledExternalPath(
+    'ai-game-workbench.wan22.asar'
+  );
+  if (fs.existsSync(currentBundlePath)) {
+    return currentBundlePath;
+  }
+
+  return getBundledExternalPath('ai-game-workbench.asar');
+};
+
 const aiGameWorkbenchBundlePath =
   findAiGameWorkbenchOverrideBundlePath() ??
-  getBundledExternalPath('ai-game-workbench.asar');
+  getDefaultAiGameWorkbenchBundlePath();
 const aiGameWorkbenchUnpackedPath = `${aiGameWorkbenchBundlePath}.unpacked`;
 const aiGameWorkbenchWebPath = path.join(aiGameWorkbenchBundlePath, 'web');
 const aiGameWorkbenchServerPath = path.join(

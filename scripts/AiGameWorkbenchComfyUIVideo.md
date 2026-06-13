@@ -8,12 +8,52 @@ This documents the local ComfyUI video backend for AI Game Workbench.
 - GPU: NVIDIA GeForce RTX 5060 Ti with about 16 GB VRAM.
 - Current local model inventory includes `z_image_turbo_bf16.safetensors`, which
   is image-only.
-- No local LTXV, Wan, Hunyuan, CogVideo, or AnimateDiff video weights were found
-  under `D:\comfyui_data\models`.
+- LTXV video weights are installed and remain available as a fallback.
+- Wan2.2 5B TI2V weights are the preferred local video path for better
+  sprite-sheet quality and prompt following.
 
-Because of this, AI Game Workbench does not hard-code a fake local video model.
-It exposes a ComfyUI workflow video option only when a ComfyUI API-format
-workflow is configured.
+AI Game Workbench does not hard-code a fake local video model. It exposes a
+ComfyUI workflow video option only when a ComfyUI API-format workflow is
+configured.
+
+## Installed Wan2.2 Workflow
+
+This machine is configured with the native ComfyUI Wan2.2 5B TI2V
+image-to-video path:
+
+- Diffusion model:
+  `D:\comfyui_data\models\diffusion_models\wan2.2_ti2v_5B_fp16.safetensors`
+- Text encoder:
+  `D:\comfyui_data\models\text_encoders\umt5_xxl_fp8_e4m3fn_scaled.safetensors`
+- VAE:
+  `D:\comfyui_data\models\vae\wan2.2_vae.safetensors`
+- Workbench API workflow:
+  `D:\comfyui_data\user\default\workflows\ai-game-workbench-wan22-ti2v-api.json`
+
+The workflow is adapted from the official ComfyUI Wan2.2 5B TI2V native graph:
+`UNETLoader` -> `CLIPLoader` -> `Wan22ImageToVideoLatent` ->
+`ModelSamplingSD3` -> `KSampler` -> `VAEDecode` -> `CreateVideo` ->
+`SaveVideo`.
+
+Workbench sprite-sheet defaults use `640x640`, 4 seconds, 12 FPS, and 30
+sampling steps. The prompt wrapper explicitly preserves the 2x2 grid, green
+background, fixed orthographic camera, and per-quadrant facing directions.
+
+The bundled workbench auto-detects this workflow first. If it is missing, it
+falls back to `ai-game-workbench-ltxv-i2v-api.json`.
+
+Download helpers:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File D:\code\GDevelop\scripts\download-wan22-comfyui-models.ps1
+```
+
+If Hugging Face/Xet stalls on this network, use the ranged fallback. It resumes
+already downloaded chunks and removes temporary `.parts` folders after joining:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File D:\code\GDevelop\scripts\download-wan22-comfyui-models-ranged.ps1 -Parallel 96 -ChunkMB 16
+```
 
 ## Installed LTXV Workflow
 
@@ -33,14 +73,15 @@ the model card identifies the 2B distilled line as the light-VRAM option and the
 FP8 file is smaller than the full precision checkpoint. The workflow runs at
 512x512, 12 FPS, and uses 8 sampler steps by default.
 
-The bundled workbench also auto-detects this workflow path, so the ComfyUI video
-entry can appear even when GDevelop was launched without the environment
-variable in its process environment.
+The bundled workbench also auto-detects this fallback workflow path, so the
+ComfyUI video entry can appear even when GDevelop was launched without the
+environment variable in its process environment.
 
 ## Electron ASAR selection
 
 GDevelop loads the tracked Electron bundle at
-`newIDE/electron-app/app/external/ai-game-workbench.asar` by default. Local test
+`newIDE/electron-app/app/external/ai-game-workbench.wan22.asar` when present,
+falling back to `ai-game-workbench.asar` for older local checkouts. Local test
 bundles named `ai-game-workbench.local*.asar` are ignored unless one of these
 environment variables is set before launching Electron:
 
@@ -61,9 +102,9 @@ Set these user environment variables, then close and reopen GDevelop/Electron:
 
 ```powershell
 [Environment]::SetEnvironmentVariable("LOCAL_COMFYUI_URL", "http://127.0.0.1:8000", "User")
-[Environment]::SetEnvironmentVariable("LOCAL_COMFYUI_VIDEO_WORKFLOW", "D:\comfyui_data\user\default\workflows\ai-game-workbench-ltxv-i2v-api.json", "User")
+[Environment]::SetEnvironmentVariable("LOCAL_COMFYUI_VIDEO_WORKFLOW", "D:\comfyui_data\user\default\workflows\ai-game-workbench-wan22-ti2v-api.json", "User")
 [Environment]::SetEnvironmentVariable("LOCAL_COMFYUI_VIDEO_FPS", "12", "User")
-[Environment]::SetEnvironmentVariable("LOCAL_COMFYUI_VIDEO_NEGATIVE_PROMPT", "worst quality, inconsistent motion, blurry, jittery, distorted, deformed, extra limbs, text, watermark", "User")
+[Environment]::SetEnvironmentVariable("LOCAL_COMFYUI_VIDEO_NEGATIVE_PROMPT", "worst quality, low quality, blurry, washed out, inconsistent motion, jittery, distorted, deformed, extra limbs, text, watermark, camera movement, zoom, rotation, background flicker", "User")
 ```
 
 Alternatively, set `LOCAL_COMFYUI_VIDEO_WORKFLOW_JSON` to the workflow JSON
@@ -108,8 +149,10 @@ first/last/reference images passed by the workbench are available as
 
 For local 16 GB usage, prefer an image-to-video workflow using one of:
 
-- LTXV image-to-video at 512px, short duration, low steps.
-- Wan 1.3B/low-VRAM or GGUF/FP8 image-to-video at 480p/512px.
+- Wan2.2 5B TI2V at 640px/768px, short duration, native ComfyUI offloading.
+- LTXV image-to-video at 512px, short duration, low steps as a fallback.
+- Wan 1.3B/low-VRAM or GGUF/FP8 image-to-video at 480p/512px when the native
+  Wan2.2 5B path does not fit.
 - AnimateDiff only if you already have a compatible SD checkpoint and motion
   model installed.
 

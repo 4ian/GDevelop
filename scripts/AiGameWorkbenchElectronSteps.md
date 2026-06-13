@@ -8,8 +8,9 @@ The integration must stay source-free in GDevelop:
 - Do not copy the upstream source tree into this repository.
 - Do not start a localhost server or reserve any TCP port.
 - Ship the compiled ASAR artifact and native runtime sidecar:
-  `newIDE/electron-app/app/external/ai-game-workbench.asar`
-  `newIDE/electron-app/app/external/ai-game-workbench.asar.unpacked`
+  `newIDE/electron-app/app/external/ai-game-workbench.wan22.asar`
+  `newIDE/electron-app/app/external/ai-game-workbench.wan22.asar.unpacked`
+- `ai-game-workbench.asar` remains a fallback bundle for older local checkouts.
 
 ## 1. Refresh Upstream
 
@@ -65,6 +66,10 @@ Video generation also needs one Electron-specific compatibility change:
   `{{prompt}}`, `{{inputImage}}`, `{{inputImage0}}`, `{{inputImage1}}`,
   `{{width}}`, `{{height}}`, `{{frames}}`, `{{fps}}`, and
   `{{filenamePrefix}}`.
+- Without an explicit env var, the bundled provider auto-detects
+  `ai-game-workbench-wan22-ti2v-api.json` first and
+  `ai-game-workbench-ltxv-i2v-api.json` as fallback under the ComfyUI base
+  workflow directory.
 - `/api/provider-models` hides `local/comfyui-video-workflow` until a workflow
   is configured. This keeps the UI compatible with machines that have ComfyUI
   installed but do not yet have local video weights or a video workflow.
@@ -217,7 +222,7 @@ Pack the staged runtime. Native `.node` modules and `ffmpeg.exe` must be
 unpacked so Electron can load or execute them.
 
 ```powershell
-$asarPath = "newIDE\electron-app\app\external\ai-game-workbench.asar"
+$asarPath = "newIDE\electron-app\app\external\ai-game-workbench.wan22.asar"
 $unpackedPath = "$asarPath.unpacked"
 New-Item -ItemType Directory -Force -Path (Split-Path $asarPath) | Out-Null
 if (Test-Path -LiteralPath $asarPath) {

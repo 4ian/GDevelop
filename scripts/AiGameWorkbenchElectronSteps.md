@@ -56,13 +56,25 @@ Video generation also needs one Electron-specific compatibility change:
 - `/api/provider-models` hides `local/gpt-sora` unless `LOCAL_GPT_SORA_BIN`,
   `LOCAL_SORA_BIN`, or `LOCAL_GPT_SORA_USE_CODEX=1` is configured. This keeps
   the video dropdown from showing a local model that cannot run.
+- Add the `local/comfyui-video-workflow` model (`ComfyUI workflow`) as a local
+  ComfyUI video option. It calls an already-running ComfyUI instance and does
+  not start a new port.
+- Configure it with `LOCAL_COMFYUI_URL` and either
+  `LOCAL_COMFYUI_VIDEO_WORKFLOW` or `LOCAL_COMFYUI_VIDEO_WORKFLOW_JSON`. The
+  workflow must be ComfyUI API format and can use placeholders such as
+  `{{prompt}}`, `{{inputImage}}`, `{{inputImage0}}`, `{{inputImage1}}`,
+  `{{width}}`, `{{height}}`, `{{frames}}`, `{{fps}}`, and
+  `{{filenamePrefix}}`.
+- `/api/provider-models` hides `local/comfyui-video-workflow` until a workflow
+  is configured. This keeps the UI compatible with machines that have ComfyUI
+  installed but do not yet have local video weights or a video workflow.
 - In `apps/server/src/routes/generation.ts`, upload those local APIMart images
   to `POST {APIMart baseUrl}/uploads/images` before calling the video
   generation endpoint, then pass the returned URL.
 - In `apps/web/src/components/SpriteAnimator.tsx`, replace the public-HTTPS-only
   video input guard with a model-aware guard: HTTPS is accepted for every
-  provider, and local workbench asset URLs are accepted for `apimart/*` and
-  `local/gpt-sora` models.
+  provider, and local workbench asset URLs are accepted for `apimart/*`,
+  `local/gpt-sora`, and `local/comfyui-video-workflow` models.
 - Local GPT Sora video polling uses `local-sora-*` job ids and must not require
   provider API credentials; the status route should resolve these jobs before
   hosted provider validation.

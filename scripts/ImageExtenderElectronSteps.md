@@ -9,6 +9,9 @@ The integration must stay source-free in GDevelop:
 - Do not start a localhost server or reserve any TCP port.
 - Ship only the compiled ASAR artifact:
   `newIDE/electron-app/app/external/image-extender.asar`.
+- The `Local GPT Image` model is implemented inside the compiled API routes. It
+  shells out to the local Codex image generator with `--image` inputs and does
+  not require a Gemini API key.
 
 ## 1. Refresh Upstream
 
@@ -82,6 +85,10 @@ if (Test-Path -LiteralPath $asarPath) {
 }
 .\newIDE\electron-app\node_modules\.bin\asar.cmd pack $staging $asarPath
 ```
+
+If Windows reports that `image-extender.asar` is in use, close any open Image
+Extender window and rerun the pack command. The app can hold the ASAR open while
+the custom protocol is serving files.
 
 Do not commit `$upstream`, `$staging`, or an expanded
 `newIDE/electron-app/app/external/image-extender/` folder.

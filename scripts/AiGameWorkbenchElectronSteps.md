@@ -37,12 +37,21 @@ Video generation also needs one Electron-specific compatibility change:
 - Keep OpenRouter video inputs on public HTTPS URLs.
 - For APIMart video inputs, allow local workbench asset URLs such as
   `/characters/...`, `/assets/...`, and `/jobs/...`.
+- Add the `local/gpt-sora` model (`Local GPT Sora`) as a local Codex video
+  model. It accepts local workbench asset URLs directly, shells out to the
+  local Codex/Sora video generator, and stores completed jobs under
+  `storage/jobs/local-sora-*` before copying the video back into the character
+  folder.
 - In `apps/server/src/routes/generation.ts`, upload those local APIMart images
   to `POST {APIMart baseUrl}/uploads/images` before calling the video
   generation endpoint, then pass the returned URL.
 - In `apps/web/src/components/SpriteAnimator.tsx`, replace the public-HTTPS-only
   video input guard with a model-aware guard: HTTPS is accepted for every
-  provider, and local workbench asset URLs are accepted for `apimart/*` models.
+  provider, and local workbench asset URLs are accepted for `apimart/*` and
+  `local/gpt-sora` models.
+- Local GPT Sora video polling uses `local-sora-*` job ids and must not require
+  provider API credentials; the status route should resolve these jobs before
+  hosted provider validation.
 
 The module 01 export page is GDevelop-specific:
 

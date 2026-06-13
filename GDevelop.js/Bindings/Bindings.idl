@@ -4385,6 +4385,7 @@ interface PreviewExportOptions {
     [Ref] PreviewExportOptions SetFullLoadingScreen(boolean enable);
     [Ref] PreviewExportOptions SetIsDevelopmentEnvironment(boolean enable);
     [Ref] PreviewExportOptions SetIsInGameEdition(boolean enable);
+    [Ref] PreviewExportOptions SetTransparentRuntimeBackground(boolean enable);
     [Ref] PreviewExportOptions SetInGameEditorSettingsJson([Const] DOMString inGameEditorSettingsJson);
     [Ref] PreviewExportOptions SetEditorId([Const] DOMString editorId);
     [Ref] PreviewExportOptions SetEditorCameraState3D(
@@ -4412,6 +4413,11 @@ interface ExportOptions {
     void ExportOptions([Ref] Project project, [Const] DOMString outputPath);
     [Ref] ExportOptions SetFallbackAuthor([Const] DOMString id, [Const] DOMString username);
     [Ref] ExportOptions SetTarget([Const] DOMString target);
+    [Ref] ExportOptions SetElectronTransparentWindow(boolean enable);
+    [Ref] ExportOptions SetElectronFramelessWindow(boolean enable);
+    [Ref] ExportOptions SetElectronDisableWindowShadow(boolean enable);
+    [Ref] ExportOptions SetElectronTransparentRuntimeBackground(boolean enable);
+    [Ref] ExportOptions SetElectronDisableHardwareAcceleration(boolean enable);
 };
 
 [Prefix="gdjs::"]

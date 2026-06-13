@@ -38,6 +38,7 @@ const {
   closePreviewWindow,
   closePreviewWindowsForParent,
   closeAllPreviewWindows,
+  resetPreviewWindowsForPreviewMode,
 } = require('./PreviewWindow');
 const {
   setupLocalGDJSDevelopmentWatcher,
@@ -259,13 +260,18 @@ function createNewWindow(windowArgs = args) {
       path.join(__dirname, 'extensions/ReactDeveloperTools/4.24.3_0/')
     );
 
-  // Load the index.html of the app.
-  load({
-    window: newWindow,
-    isDev,
-    path: '/index.html',
-    devTools,
-  });
+  const loadIndexHtml = () =>
+    load({
+      window: newWindow,
+      isDev,
+      path: '/index.html',
+      devTools,
+    });
+
+  // Development builds can keep stale failed downloads in Electron's cache
+  // (notably libGD.js), so clear it before loading localhost.
+  if (isDev) newWindow.webContents.session.clearCache().then(loadIndexHtml);
+  else loadIndexHtml();
 
   newWindow.on('closed', function() {
     // Remove from tracked windows
@@ -451,6 +457,21 @@ app.on('ready', function() {
   ipcMain.handle('preview-close-all', async () => {
     return closeAllPreviewWindows();
   });
+
+  ipcMain.handle(
+    'preview-reset-preview-window-mode',
+    async (event, options) => {
+      const parentWindow = BrowserWindow.fromWebContents(event.sender);
+      return resetPreviewWindowsForPreviewMode({
+        parentWindow,
+        alwaysOnTop: options.alwaysOnTop,
+        hideMenuBar: options.hideMenuBar,
+        useTransparentPreviewWindow: options.useTransparentPreviewWindow,
+        useFramelessTransparentPreviewWindow:
+          options.useFramelessTransparentPreviewWindow,
+      });
+    }
+  );
 
   // Piskel image editor
   ipcMain.handle('piskel-load', (event, externalEditorInput) => {

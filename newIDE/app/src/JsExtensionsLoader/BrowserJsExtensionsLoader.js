@@ -142,6 +142,12 @@ const jsExtensions = [
     },
   },
   {
+    name: 'TimelineSequencer',
+    // $FlowFixMe[cannot-resolve-module]
+    extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/TimelineSequencer/JsExtension.js'),
+    objectsRenderingServiceModules: {},
+  },
+  {
     name: 'Effects',
     // $FlowFixMe[cannot-resolve-module]
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/Effects/JsExtension.js'),

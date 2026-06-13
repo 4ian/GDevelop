@@ -217,6 +217,7 @@ import { readProjectSettings } from '../Utils/ProjectSettingsReader';
 import { getTimelineByIdOrName } from '../TimelineEditor/TimelineProjectStorage';
 import useNpmScriptRunner from './NpmScriptRunner/useNpmScriptRunner';
 import { applyProjectPreferences } from '../Utils/ApplyProjectPreferences';
+import AIEditorBridge from '../AIEditorBridge';
 import {
   EmbeddedGameFrame,
   setEditorHotReloadNeeded,
@@ -5833,6 +5834,26 @@ const MainFrame = (props: Props): React.MixedElement => {
           onClose={() => setMemoryTrackedRegistryDialogOpen(false)}
         />
       )}
+      <AIEditorBridge
+        project={currentProject}
+        currentFileMetadata={currentFileMetadata}
+        editorTabs={state.editorTabs}
+        hasUnsavedChanges={hasUnsavedChanges}
+        unsavedChanges={unsavedChanges}
+        previewState={{
+          hasNonEditionPreviewsRunning,
+          nonEditionPreviewsCount,
+          gameHotReloadLogs,
+          editorHotReloadLogs,
+          editorUncaughtError,
+        }}
+        onSceneEventsModifiedOutsideEditor={onSceneEventsModifiedOutsideEditor}
+        onInstancesModifiedOutsideEditor={onInstancesModifiedOutsideEditor}
+        onObjectsModifiedOutsideEditor={onObjectsModifiedOutsideEditor}
+        onNewResourcesAdded={onNewResourcesAdded}
+        onSave={saveProject}
+        onLaunchPreview={launchPreview}
+      />
       <CustomDragLayer />
     </div>
   );

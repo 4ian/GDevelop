@@ -100,6 +100,9 @@ namespace gdjs {
     /** if true, force fullscreen. */
     forceFullscreen?: boolean;
 
+    /** if true, render the game background with transparency. */
+    transparentBackground?: boolean;
+
     /** if true, game is run as a preview launched from an editor. */
     isPreview?: boolean;
 

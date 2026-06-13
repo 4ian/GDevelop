@@ -74,9 +74,13 @@ const getBridgeUrl = (): string | null => {
   if (typeof window === 'undefined' || !window.WebSocket) return null;
 
   const searchParams = new URLSearchParams(window.location.search);
-  if (searchParams.get('gdevelopMcpBridge') === '0') return null;
+  const bridgeMode = searchParams.get('gdevelopMcpBridge');
+  if (bridgeMode === '0' || bridgeMode === 'false') return null;
 
+  const shouldUseDefaultBridge = bridgeMode === '1' || bridgeMode === 'true';
   const explicitUrl = searchParams.get('gdevelopMcpBridgeUrl');
+  if (!explicitUrl && !shouldUseDefaultBridge) return null;
+
   const token = searchParams.get('gdevelopMcpBridgeToken');
   const url = explicitUrl || DEFAULT_BRIDGE_URL;
   if (!token) return url;

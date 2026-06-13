@@ -37,6 +37,24 @@ The bundled workbench also auto-detects this workflow path, so the ComfyUI video
 entry can appear even when GDevelop was launched without the environment
 variable in its process environment.
 
+## Electron ASAR selection
+
+GDevelop loads the tracked Electron bundle at
+`newIDE/electron-app/app/external/ai-game-workbench.asar` by default. Local test
+bundles named `ai-game-workbench.local*.asar` are ignored unless one of these
+environment variables is set before launching Electron:
+
+```powershell
+$env:AI_GAME_WORKBENCH_USE_LOCAL_ASAR = "1"
+$env:AI_GAME_WORKBENCH_ASAR_PATH = "D:\path\to\ai-game-workbench.local.asar"
+```
+
+Use `AI_GAME_WORKBENCH_USE_LOCAL_ASAR=1` to let Electron pick the newest
+`ai-game-workbench.local*.asar` in the external folder. Use
+`AI_GAME_WORKBENCH_ASAR_PATH` to point at one exact ASAR file. Leave both unset
+for normal runs so stale local bundles cannot hide newly bundled models such as
+`ComfyUI workflow`.
+
 ## Configure
 
 Set these user environment variables, then close and reopen GDevelop/Electron:

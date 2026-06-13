@@ -33,7 +33,32 @@ const getBundledExternalPath = name => {
   return path.join(__dirname, 'external', name);
 };
 
+const getExplicitAiGameWorkbenchOverrideBundlePath = () => {
+  const explicitPath = process.env.AI_GAME_WORKBENCH_ASAR_PATH?.trim();
+  if (!explicitPath) {
+    return undefined;
+  }
+
+  if (fs.existsSync(explicitPath)) {
+    return explicitPath;
+  }
+
+  log.warn(
+    `AI Game Workbench override ASAR does not exist: ${explicitPath}`
+  );
+  return undefined;
+};
+
 const findAiGameWorkbenchOverrideBundlePath = () => {
+  const explicitOverridePath = getExplicitAiGameWorkbenchOverrideBundlePath();
+  if (explicitOverridePath) {
+    return explicitOverridePath;
+  }
+
+  if (process.env.AI_GAME_WORKBENCH_USE_LOCAL_ASAR !== '1') {
+    return undefined;
+  }
+
   const externalPath = path.dirname(
     getBundledExternalPath('ai-game-workbench.asar')
   );
@@ -91,6 +116,8 @@ const aiGameWorkbenchBundleVersion = (() => {
     return String(Date.now());
   }
 })();
+
+log.info(`AI Game Workbench bundle: ${aiGameWorkbenchBundlePath}`);
 
 const serverRoutePrefixes = [
   '/api/',

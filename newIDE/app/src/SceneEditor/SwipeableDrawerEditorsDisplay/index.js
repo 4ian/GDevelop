@@ -14,6 +14,8 @@ import InstancesList, {
   type InstancesListInterface,
 } from '../../InstancesEditor/InstancesList';
 import ObjectsRenderingService from '../../ObjectsRendering/ObjectsRenderingService';
+import TimelineEditor from '../../TimelineEditor';
+import { getTimelines } from '../../TimelineEditor/TimelineProjectStorage';
 
 import Rectangle from '../../Utils/Rectangle';
 import SwipeableDrawer from './SwipeableDrawer';
@@ -44,6 +46,7 @@ const editorTitleById = {
   'object-groups-list': <Trans>Objects groups</Trans>,
   'instances-list': <Trans>Instances</Trans>,
   'layers-list': <Trans>Layers</Trans>,
+  timeline: <Trans>Timeline</Trans>,
 };
 
 const noop = () => {};
@@ -58,6 +61,7 @@ const styles = {
     pointerEvents: 'all',
   },
   instancesListContainer: { display: 'flex', flex: 1 },
+  timelineContainer: { display: 'flex', flex: 1, minHeight: 240 },
 };
 
 // Forward ref to allow Scene editor to force update some editors
@@ -159,6 +163,7 @@ const SwipeableDrawerEditorsDisplay: React.ComponentType<{
     const forceUpdateLayersList = React.useCallback(() => {
       if (layersListRef.current) layersListRef.current.forceUpdateList();
     }, []);
+    const lastTimelinePreviewPanelUpdateTimeRef = React.useRef(0);
     const getInstanceSize = React.useCallback((instance: gdInitialInstance) => {
       return editorRef.current
         ? editorRef.current.getInstanceSize(instance)
@@ -210,6 +215,23 @@ const SwipeableDrawerEditorsDisplay: React.ComponentType<{
         else editor.pauseSceneRendering(reason);
       },
       []
+    );
+    const onTimelinePreviewInstancesModified = React.useCallback(
+      () => {
+        if (editorRef.current) {
+          editorRef.current.notifyTimelinePreviewFrame();
+        }
+
+        const now = performance.now();
+        if (now - lastTimelinePreviewPanelUpdateTimeRef.current < 100) {
+          return;
+        }
+
+        lastTimelinePreviewPanelUpdateTimeRef.current = now;
+        forceUpdateInstancesList();
+        forceUpdatePropertiesEditor();
+      },
+      [forceUpdateInstancesList, forceUpdatePropertiesEditor]
     );
 
     React.useLayoutEffect(
@@ -310,6 +332,7 @@ const SwipeableDrawerEditorsDisplay: React.ComponentType<{
     const isCustomVariant = eventsBasedObject
       ? eventsBasedObject.getDefaultVariant() !== eventsBasedObjectVariant
       : false;
+    const firstTimeline = getTimelines(project)[0];
 
     return (
       <FullSizeMeasurer>
@@ -598,6 +621,29 @@ const SwipeableDrawerEditorsDisplay: React.ComponentType<{
                     onBackgroundColorChanged={props.onBackgroundColorChanged}
                     gameEditorMode={props.gameEditorMode}
                   />
+                )}
+                {selectedEditorId === 'timeline' && (
+                  <Paper
+                    background="medium"
+                    square
+                    style={styles.timelineContainer}
+                  >
+                    <TimelineEditor
+                      project={project}
+                      timelineIdOrName={firstTimeline ? firstTimeline.id : null}
+                      setToolbar={noop}
+                      unsavedChanges={props.unsavedChanges || null}
+                      objectsContainer={objectsContainer}
+                      globalObjectsContainer={globalObjectsContainer}
+                      initialInstances={initialInstances}
+                      selectedInstances={selectedInstances}
+                      onGetInstanceSize={getInstanceSize}
+                      onInstancesModified={onInstancesModified || noop}
+                      onPreviewInstancesModified={
+                        onTimelinePreviewInstancesModified
+                      }
+                    />
+                  </Paper>
                 )}
               </SwipeableDrawer>
               <BottomToolbar

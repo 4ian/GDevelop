@@ -22,12 +22,145 @@ import {
 import Window from '../../../Utils/Window';
 import { getIDEVersionWithHash } from '../../../Version';
 import { setEmbeddedGameFramePreviewLocation } from '../../../EmbeddedGame/EmbeddedGameFrame';
+import { serializeToJSObject } from '../../../Utils/Serializer';
 const electron = optionalRequire('electron');
 const path = optionalRequire('path');
+const fs = optionalRequire('fs');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
 const gd: libGDevelop = global.gd;
 
 let nextPreviewId = 1;
+
+const transparentPreviewWindowInstructionTypes = new Set([
+  'AdvancedWindow::ApplyDesktopPetWindowMode',
+  'AdvancedWindow::SetWindowBackgroundColor',
+]);
+
+const framelessTransparentPreviewWindowInstructionTypes = new Set([
+  'AdvancedWindow::ApplyDesktopPetWindowMode',
+]);
+
+type TransparentPreviewWindowSettings = {|
+  useTransparentPreviewWindow: boolean,
+  useFramelessTransparentPreviewWindow: boolean,
+|};
+
+const defaultTransparentPreviewWindowSettings = {
+  useTransparentPreviewWindow: false,
+  useFramelessTransparentPreviewWindow: false,
+};
+
+const getTransparentPreviewWindowSettingsForProject = (
+  project: gdProject
+): TransparentPreviewWindowSettings => {
+  let serializedProject = null;
+  try {
+    serializedProject = serializeToJSObject(project);
+  } catch (error) {
+    console.warn(
+      'Unable to inspect events for transparent preview window settings:',
+      error
+    );
+    return defaultTransparentPreviewWindowSettings;
+  }
+
+  const transparentPreviewWindowSettings = {
+    ...defaultTransparentPreviewWindowSettings,
+  };
+  const valuesToInspect: Array<any> = [serializedProject];
+  while (valuesToInspect.length) {
+    const value = valuesToInspect.pop();
+    if (!value || typeof value !== 'object') continue;
+
+    if (Array.isArray(value)) {
+      for (let index = 0; index < value.length; index++) {
+        valuesToInspect.push(value[index]);
+      }
+      continue;
+    }
+
+    if (value.disabled === true) continue;
+
+    const instructionType = value.type;
+    if (
+      instructionType &&
+      typeof instructionType === 'object' &&
+      transparentPreviewWindowInstructionTypes.has(instructionType.value)
+    ) {
+      transparentPreviewWindowSettings.useTransparentPreviewWindow = true;
+      if (
+        framelessTransparentPreviewWindowInstructionTypes.has(
+          instructionType.value
+        )
+      ) {
+        transparentPreviewWindowSettings.useFramelessTransparentPreviewWindow = true;
+        return transparentPreviewWindowSettings;
+      }
+    }
+
+    for (const key in value) {
+      if (Object.prototype.hasOwnProperty.call(value, key)) {
+        valuesToInspect.push(value[key]);
+      }
+    }
+  }
+
+  return transparentPreviewWindowSettings;
+};
+
+const transparentPreviewRuntimeStyle = `html, body {
+			background: transparent;
+			background-color: transparent;
+		}
+		canvas {
+			background: transparent;
+			background-color: transparent;
+		}`;
+
+const patchTransparentPreviewOutput = (outputDir: string): void => {
+  if (!fs) return;
+
+  try {
+    const indexHtmlPath = path.join(outputDir, 'index.html');
+    if (fs.existsSync(indexHtmlPath)) {
+      let indexHtml = fs.readFileSync(indexHtmlPath, 'utf8');
+      if (indexHtml.includes('/* GDJS_TRANSPARENT_BACKGROUND_STYLE */')) {
+        indexHtml = indexHtml.replace(
+          '/* GDJS_TRANSPARENT_BACKGROUND_STYLE */',
+          transparentPreviewRuntimeStyle
+        );
+      } else if (!indexHtml.includes('background: transparent;')) {
+        const fallbackTransparentStyle = `<style>${transparentPreviewRuntimeStyle}</style>`;
+        indexHtml = indexHtml.includes('</head>')
+          ? indexHtml.replace('</head>', `${fallbackTransparentStyle}</head>`)
+          : `${fallbackTransparentStyle}${indexHtml}`;
+      }
+      fs.writeFileSync(indexHtmlPath, indexHtml, 'utf8');
+    }
+
+    const dataJsPath = path.join(outputDir, 'data.js');
+    if (fs.existsSync(dataJsPath)) {
+      let dataJs = fs.readFileSync(dataJsPath, 'utf8');
+      if (/"transparentBackground"\s*:\s*false/.test(dataJs)) {
+        dataJs = dataJs.replace(
+          /"transparentBackground"\s*:\s*false/g,
+          '"transparentBackground":true'
+        );
+      } else if (!/"transparentBackground"\s*:/.test(dataJs)) {
+        dataJs = dataJs.replace(
+          /gdjs\.runtimeGameOptions\s*=\s*\{/,
+          'gdjs.runtimeGameOptions = {"transparentBackground":true,'
+        );
+      }
+      fs.writeFileSync(dataJsPath, dataJs, 'utf8');
+    }
+  } catch (error) {
+    console.warn(
+      'Unable to patch transparent preview runtime output. Continuing without the runtime background patch:',
+      error
+    );
+  }
+};
 
 type State = {|
   networkPreviewDialogOpen: boolean,
@@ -42,6 +175,15 @@ type State = {|
     useContentSize: boolean,
     title: string,
     backgroundColor: string,
+    transparent?: boolean,
+    frame?: boolean,
+    hasShadow?: boolean,
+    webPreferences: {
+      webSecurity: boolean,
+      nodeIntegration: boolean,
+      contextIsolation: boolean,
+      backgroundThrottling: boolean,
+    },
   },
   hideMenuBar: boolean,
   alwaysOnTop: boolean,
@@ -150,29 +292,65 @@ export default class LocalPreviewLauncher extends React.Component<
     }
   };
 
+  _resetPreviewWindowsForPreviewMode = async (
+    options: PreviewOptions,
+    transparentPreviewWindowSettings: TransparentPreviewWindowSettings
+  ): Promise<boolean> => {
+    if (!ipcRenderer) return false;
+
+    try {
+      const result = await ipcRenderer.invoke(
+        'preview-reset-preview-window-mode',
+        {
+          alwaysOnTop: options.getIsAlwaysOnTopInPreview(),
+          hideMenuBar: !options.getIsMenuBarHiddenInPreview(),
+          ...transparentPreviewWindowSettings,
+        }
+      );
+      return !!(result && result.closedPreviewWindows);
+    } catch (error) {
+      console.info(
+        'Unable to reset preview windows to the requested window mode - ignoring.',
+        error
+      );
+      return false;
+    }
+  };
+
   _openPreviewWindow = (
     project: gdProject,
     gamePath: string,
-    options: PreviewOptions
+    options: PreviewOptions,
+    transparentPreviewWindowSettings: TransparentPreviewWindowSettings
   ): void => {
+    const {
+      useTransparentPreviewWindow,
+      useFramelessTransparentPreviewWindow,
+    } = transparentPreviewWindowSettings;
+    const previewBrowserWindowOptions = {
+      width: project.getGameResolutionWidth(),
+      height: project.getGameResolutionHeight(),
+      useContentSize: true,
+      title: `Preview of ${project.getName()}`,
+      backgroundColor: useTransparentPreviewWindow ? '#00000000' : '#000000',
+      ...(useTransparentPreviewWindow ? { transparent: true } : {}),
+      ...(useFramelessTransparentPreviewWindow
+        ? { frame: false, hasShadow: false }
+        : {}),
+      webPreferences: {
+        webSecurity: false, // Allow to access to local files,
+        // Allow Node.js API access in renderer process, as long
+        // as we've not removed dependency on it and on "@electron/remote".
+        nodeIntegration: true,
+        contextIsolation: false,
+        backgroundThrottling: false,
+      },
+    };
+
     this.setState(
       // $FlowFixMe[incompatible-type]
       {
-        previewBrowserWindowOptions: {
-          width: project.getGameResolutionWidth(),
-          height: project.getGameResolutionHeight(),
-          useContentSize: true,
-          title: `Preview of ${project.getName()}`,
-          backgroundColor: '#000000',
-          webPreferences: {
-            webSecurity: false, // Allow to access to local files,
-            // Allow Node.js API access in renderer process, as long
-            // as we've not removed dependency on it and on "@electron/remote".
-            nodeIntegration: true,
-            contextIsolation: false,
-            backgroundThrottling: false,
-          },
-        },
+        previewBrowserWindowOptions,
         previewGamePath: gamePath,
         hideMenuBar: !options.getIsMenuBarHiddenInPreview(),
         alwaysOnTop: options.getIsAlwaysOnTopInPreview(),
@@ -255,6 +433,31 @@ export default class LocalPreviewLauncher extends React.Component<
       project,
       outputDir
     );
+    const transparentPreviewWindowSettings = previewOptions.isForInGameEdition
+      ? defaultTransparentPreviewWindowSettings
+      : getTransparentPreviewWindowSettingsForProject(project);
+    const { useTransparentPreviewWindow } = transparentPreviewWindowSettings;
+    const hasTransparentRuntimeBackgroundExportOption =
+      typeof previewExportOptions.setTransparentRuntimeBackground ===
+      'function';
+    if (useTransparentPreviewWindow) {
+      console.info(
+        'Transparent preview window enabled from AdvancedWindow events.'
+      );
+      if (hasTransparentRuntimeBackgroundExportOption) {
+        previewExportOptions.setTransparentRuntimeBackground(true);
+      } else {
+        console.info(
+          'Transparent preview runtime export option is unavailable in the current libGD build. A post-export patch will be used instead.'
+        );
+      }
+    }
+    const closedPreviewWindows = !previewOptions.isForInGameEdition
+      ? await this._resetPreviewWindowsForPreviewMode(
+          previewOptions,
+          transparentPreviewWindowSettings
+        )
+      : false;
     previewExportOptions.setIsDevelopmentEnvironment(Window.isDev());
     previewExportOptions.setLayoutName(sceneName);
     previewExportOptions.setIsInGameEdition(previewOptions.isForInGameEdition);
@@ -306,7 +509,8 @@ export default class LocalPreviewLauncher extends React.Component<
     const debuggerIds = previewOptions.isForInGameEdition
       ? this.getPreviewDebuggerServer().getExistingEmbeddedGameFrameDebuggerIds()
       : this.getPreviewDebuggerServer().getExistingPreviewDebuggerIds();
-    const shouldHotReload = previewOptions.hotReload && !!debuggerIds.length;
+    const shouldHotReload =
+      previewOptions.hotReload && !!debuggerIds.length && !closedPreviewWindows;
     if (shouldHotReload) {
       previewExportOptions.setShouldClearExportFolder(
         previewOptions.shouldHardReload
@@ -381,6 +585,12 @@ export default class LocalPreviewLauncher extends React.Component<
     }
 
     exporter.exportProjectForPixiPreview(previewExportOptions);
+    if (
+      useTransparentPreviewWindow &&
+      !hasTransparentRuntimeBackgroundExportOption
+    ) {
+      patchTransparentPreviewOutput(outputDir);
+    }
 
     if (shouldHotReload) {
       const projectDataElement = new gd.SerializerElement();
@@ -401,6 +611,12 @@ export default class LocalPreviewLauncher extends React.Component<
         gd.Serializer.toJSON(runtimeGameOptionsElement)
       );
       runtimeGameOptionsElement.delete();
+      if (
+        useTransparentPreviewWindow &&
+        !hasTransparentRuntimeBackgroundExportOption
+      ) {
+        runtimeGameOptions.transparentBackground = true;
+      }
 
       if (previewOptions.shouldHardReload) {
         console.log(
@@ -445,7 +661,12 @@ export default class LocalPreviewLauncher extends React.Component<
       }
 
       if (previewOptions.numberOfWindows >= 1) {
-        this._openPreviewWindow(project, outputDir, previewOptions);
+        this._openPreviewWindow(
+          project,
+          outputDir,
+          previewOptions,
+          transparentPreviewWindowSettings
+        );
       }
     }
 

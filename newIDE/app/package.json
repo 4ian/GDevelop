@@ -125,6 +125,7 @@
     "make-service-worker": "cd scripts && node make-service-worker.js",
     "start": "npm run import-resources && concurrently \"react-app-rewired start\" \"node scripts/watch-serve-GDJS-runtime.js\" -n \"editor,game engine\" --kill-others",
     "electron-app": "cd ../electron-app && npm run start",
+    "electron-app-devtools": "cd ../electron-app && npm run start -- --dev-tools",
     "build": "npm run import-resources && react-app-rewired build",
     "format": "prettier --write \"src/!(locales)/**/*.js\"",
     "check-format": "prettier --list-different \"src/!(locales)/**/*.js\"",

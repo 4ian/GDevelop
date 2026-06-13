@@ -1,6 +1,7 @@
 const shell = require('shelljs');
 const { downloadLocalFile } = require('./lib/DownloadLocalFile');
 const path = require('path');
+const fs = require('fs');
 
 const sourceDirectory = '../../../Binaries/embuild/GDevelop.js';
 const destinationTestDirectory = '../node_modules/libGD.js-for-tests-only';
@@ -12,6 +13,53 @@ const alreadyHasLibGdJs =
 
 if (shell.mkdir('-p', destinationTestDirectory).stderr) {
   shell.echo('❌ Error while creating node_modules folder for libGD.js');
+}
+
+const hasUsableExistingLibGdJs = () => {
+  if (
+    !shell.test('-f', '../public/libGD.js') ||
+    !shell.test('-f', '../public/libGD.wasm')
+  ) {
+    return false;
+  }
+
+  try {
+    if (
+      fs.statSync('../public/libGD.js').size < 1000000 ||
+      fs.statSync('../public/libGD.wasm').size < 1000000
+    ) {
+      return false;
+    }
+  } catch (error) {
+    return false;
+  }
+
+  const syntaxCheck = shell.exec('node --check ../public/libGD.js', {
+    silent: true,
+  });
+  return !syntaxCheck.stderr && !syntaxCheck.code;
+};
+
+const copyExistingLibGdJsToTests = () => {
+  if (
+    !shell.cp('../public/libGD.js', destinationTestDirectory + '/index.js')
+      .stderr &&
+    !shell.cp(
+      '../public/libGD.wasm',
+      destinationTestDirectory + '/libGD.wasm'
+    ).stderr
+  ) {
+    shell.echo('✅ Reused existing libGD.js and copied it to node_modules');
+    return true;
+  }
+
+  shell.echo('❌ Error while copying existing libGD.js to node_modules folder');
+  return false;
+};
+
+if (!process.env.REQUIRES_EXACT_LIBGD_JS_VERSION && hasUsableExistingLibGdJs()) {
+  shell.echo('ℹ️ Existing public/libGD.js is valid - skipping download.');
+  shell.exit(copyExistingLibGdJsToTests() ? 0 : 1);
 }
 
 if (shell.test('-f', path.join(sourceDirectory, 'libGD.js'))) {
@@ -47,12 +95,16 @@ if (shell.test('-f', path.join(sourceDirectory, 'libGD.js'))) {
     }
 
     let branch = (branchShellString.stdout || '').trim();
-    if (branch === 'HEAD') {
+    if (branch === 'HEAD' || !branch) {
       // We're in detached HEAD. Try to read the branch from the CI environment variables.
       if (process.env.APPVEYOR_PULL_REQUEST_HEAD_REPO_BRANCH) {
         branch = process.env.APPVEYOR_PULL_REQUEST_HEAD_REPO_BRANCH;
       } else if (process.env.APPVEYOR_REPO_BRANCH) {
         branch = process.env.APPVEYOR_REPO_BRANCH;
+      } else {
+        branch =
+          getRemoteBranchContainingGitRef(gitRef) ||
+          (/^HEAD~\d+$/.test(gitRef) ? 'master' : null);
       }
     }
 
@@ -64,6 +116,41 @@ if (shell.test('-f', path.join(sourceDirectory, 'libGD.js'))) {
     }
 
     return branch;
+  };
+
+  const getRemoteBranchContainingGitRef = gitRef => {
+    const hashShellString = shell.exec(`git rev-parse "${gitRef}"`, {
+      silent: true,
+    });
+    const hash = (hashShellString.stdout || '').trim();
+    if (hashShellString.stderr || hashShellString.code || !hash) {
+      return null;
+    }
+
+    const remoteBranchesShellString = shell.exec(
+      `git branch -r --contains "${hash}"`,
+      {
+        silent: true,
+      }
+    );
+    if (remoteBranchesShellString.stderr || remoteBranchesShellString.code) {
+      return null;
+    }
+
+    const remoteBranches = (remoteBranchesShellString.stdout || '')
+      .split('\n')
+      .map(branch => branch.trim())
+      .filter(Boolean)
+      .filter(branch => !branch.includes(' -> '));
+    const remoteBranch =
+      remoteBranches.find(branch => branch.endsWith('/master')) ||
+      remoteBranches.find(branch => branch.endsWith('/main')) ||
+      remoteBranches[0];
+    if (!remoteBranch) {
+      return null;
+    }
+
+    return remoteBranch.replace(/^[^/]+\//, '');
   };
 
   // Try to download libGD.js from a specific commit on the current branch
@@ -107,7 +194,21 @@ if (shell.test('-f', path.join(sourceDirectory, 'libGD.js'))) {
       downloadLocalFile(baseUrl + '/libGD.js', '../public/libGD.js'),
       downloadLocalFile(baseUrl + '/libGD.wasm', '../public/libGD.wasm'),
     ]).then(
-      responses => {},
+      responses => {
+        const syntaxCheck = shell.exec('node --check ../public/libGD.js', {
+          silent: true,
+        });
+        if (syntaxCheck.stderr || syntaxCheck.code) {
+          shell.echo(
+            `⚠️ Downloaded libGD.js from ${baseUrl} failed the JavaScript syntax check.`
+          );
+          throw new Error(
+            syntaxCheck.stderr ||
+              syntaxCheck.stdout ||
+              'Downloaded libGD.js failed the JavaScript syntax check.'
+          );
+        }
+      },
       error => {
         if (error.statusCode === 403) {
           shell.echo(

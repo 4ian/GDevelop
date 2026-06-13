@@ -38,10 +38,21 @@ Video generation also needs one Electron-specific compatibility change:
 - For APIMart video inputs, allow local workbench asset URLs such as
   `/characters/...`, `/assets/...`, and `/jobs/...`.
 - Add the `local/gpt-sora` model (`Local GPT Sora`) as a local Codex video
-  model. It accepts local workbench asset URLs directly, shells out to the
-  local Codex/Sora video generator, and stores completed jobs under
+  model. It accepts local workbench asset URLs directly, shells out to a real
+  local Sora/GPT video executable when configured, and stores completed jobs under
   `storage/jobs/local-sora-*` before copying the video back into the character
   folder.
+- Configure the local video executable with `LOCAL_GPT_SORA_BIN`. By default
+  the server calls:
+  `LOCAL_GPT_SORA_BIN --prompt-file <prompt.txt> --output <output.mp4> --duration <seconds> --resolution <resolution> --image <path>...`
+  If the local generator uses different flags, set `LOCAL_GPT_SORA_ARGS` to a
+  JSON string array. Supported placeholders are `{prompt}`, `{promptFile}`,
+  `{output}`, `{duration}`, `{resolution}`, `{images}`, `{imageArgs}`, and
+  `{image0}`, `{image1}`, etc.
+- The old experimental Codex prompt fallback is disabled by default because
+  Codex does not always expose a video-generation tool. Enable it only in an
+  environment with a real Codex/Sora video tool by setting
+  `LOCAL_GPT_SORA_USE_CODEX=1`.
 - In `apps/server/src/routes/generation.ts`, upload those local APIMart images
   to `POST {APIMart baseUrl}/uploads/images` before calling the video
   generation endpoint, then pass the returned URL.

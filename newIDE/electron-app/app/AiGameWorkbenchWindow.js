@@ -33,9 +33,34 @@ const getBundledExternalPath = name => {
   return path.join(__dirname, 'external', name);
 };
 
-const aiGameWorkbenchBundlePath = getBundledExternalPath(
-  'ai-game-workbench.asar'
-);
+const findAiGameWorkbenchOverrideBundlePath = () => {
+  const externalPath = path.dirname(
+    getBundledExternalPath('ai-game-workbench.asar')
+  );
+  try {
+    return fs
+      .readdirSync(externalPath, { withFileTypes: true })
+      .filter(
+        entry =>
+          entry.isFile() &&
+          /^ai-game-workbench\.local(?:[.-].+)?\.asar$/.test(entry.name)
+      )
+      .map(entry => {
+        const filePath = path.join(externalPath, entry.name);
+        return {
+          filePath,
+          mtimeMs: fs.statSync(filePath).mtimeMs,
+        };
+      })
+      .sort((a, b) => b.mtimeMs - a.mtimeMs)[0]?.filePath;
+  } catch (error) {
+    return undefined;
+  }
+};
+
+const aiGameWorkbenchBundlePath =
+  findAiGameWorkbenchOverrideBundlePath() ??
+  getBundledExternalPath('ai-game-workbench.asar');
 const aiGameWorkbenchUnpackedPath = `${aiGameWorkbenchBundlePath}.unpacked`;
 const aiGameWorkbenchWebPath = path.join(aiGameWorkbenchBundlePath, 'web');
 const aiGameWorkbenchServerPath = path.join(

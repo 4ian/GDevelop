@@ -576,6 +576,18 @@ namespace gdjs {
         }
       };
 
+      export const setWindowFrameless = function (
+        activate: boolean,
+        runtimeScene: gdjs.RuntimeScene
+      ) {
+        const electronBrowserWindow = getElectronBrowserWindow(runtimeScene);
+        if (!electronBrowserWindow || !activate) return;
+
+        try {
+          electronBrowserWindow.setHasShadow(false);
+        } catch (error) {}
+      };
+
       export const setMenuBarVisible = function (
         visible: boolean,
         runtimeScene: gdjs.RuntimeScene

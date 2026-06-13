@@ -42,21 +42,20 @@ const openPreviewWindow = ({
     4: { x: screenWidth / 2, y: screenHeight / 2 },
   };
   for (let i = 0; i < numberOfWindows; i++) {
-    const isTransparentPreviewWindow =
-      !!previewBrowserWindowOptions.transparent;
-    const isFramelessTransparentPreviewWindow =
-      isTransparentPreviewWindow && previewBrowserWindowOptions.frame === false;
+    const isTransparentPreviewWindow = !!previewBrowserWindowOptions.transparent;
+    const isFramelessPreviewWindow =
+      previewBrowserWindowOptions.frame === false;
     const browserWindowOptions = {
       ...previewBrowserWindowOptions,
       backgroundColor: previewBrowserWindowOptions.transparent
         ? '#00000000'
         : previewBrowserWindowOptions.backgroundColor,
-      parent: isFramelessTransparentPreviewWindow
+      parent: isFramelessPreviewWindow
         ? null
         : alwaysOnTop
-          ? parentWindow
-          : null,
-      skipTaskbar: isFramelessTransparentPreviewWindow
+        ? parentWindow
+        : null,
+      skipTaskbar: isFramelessPreviewWindow
         ? false
         : previewBrowserWindowOptions.skipTaskbar,
       x: numberOfWindows > 1 ? positions[i + 1].x : undefined,
@@ -67,7 +66,7 @@ const openPreviewWindow = ({
     if (browserWindowOptions.transparent) {
       previewWindow.setBackgroundColor('#00000000');
     }
-    if (isFramelessTransparentPreviewWindow) {
+    if (isFramelessPreviewWindow) {
       previewWindow.setSkipTaskbar(false);
     }
 
@@ -97,7 +96,7 @@ const openPreviewWindow = ({
       previewWindow: previewWindow,
       parentWindowId: parentWindow ? parentWindow.id : null,
       isTransparentPreviewWindow,
-      isFramelessTransparentPreviewWindow,
+      isFramelessPreviewWindow,
     });
 
     previewWindow.on('closed', closeEvent => {
@@ -204,7 +203,7 @@ const resetPreviewWindowsForPreviewMode = ({
   alwaysOnTop,
   hideMenuBar,
   useTransparentPreviewWindow,
-  useFramelessTransparentPreviewWindow,
+  useFramelessPreviewWindow,
 }) => {
   const parentWindowId = parentWindow ? parentWindow.id : null;
   let closedPreviewWindows = false;
@@ -218,8 +217,7 @@ const resetPreviewWindowsForPreviewMode = ({
 
       const shouldReopenPreviewWindow =
         entry.isTransparentPreviewWindow !== useTransparentPreviewWindow ||
-        entry.isFramelessTransparentPreviewWindow !==
-          useFramelessTransparentPreviewWindow;
+        entry.isFramelessPreviewWindow !== useFramelessPreviewWindow;
       if (shouldReopenPreviewWindow) {
         // Electron can't reliably turn a transparent frameless window back
         // into a regular framed window, so reopen the preview when the mode changes.
@@ -234,7 +232,7 @@ const resetPreviewWindowsForPreviewMode = ({
         return;
       }
 
-      if (useFramelessTransparentPreviewWindow) return;
+      if (useFramelessPreviewWindow) return;
 
       resetPreviewWindowState({
         previewWindow: entry.previewWindow,

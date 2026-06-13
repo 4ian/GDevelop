@@ -687,6 +687,27 @@ module.exports = {
 
     extension
       .addAction(
+        'SetWindowFrameless',
+        _('Frameless game window'),
+        _(
+          'Requests the preview and exported desktop game windows to be created without the native window frame.'
+        ),
+        _('Enable frameless game window: _PARAM0_'),
+        _('Windows, Linux, macOS'),
+        'res/actions/window24.png',
+        'res/actions/window.png'
+      )
+      .addParameter('yesorno', _('Enable frameless game window?'), '', false)
+      .setDefaultValue('false')
+      .addCodeOnlyParameter('currentScene', '')
+      .getCodeExtraInformation()
+      .setIncludeFile(
+        'Extensions/AdvancedWindow/electron-advancedwindowtools.js'
+      )
+      .setFunctionName('gdjs.evtTools.advancedWindow.setWindowFrameless');
+
+    extension
+      .addAction(
         'SetMenuBarVisible',
         _('Show menu bar'),
         _('Shows or hides the native menu bar of the window.'),

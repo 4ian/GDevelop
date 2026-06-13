@@ -22,7 +22,11 @@ import {
 import Window from '../../../Utils/Window';
 import { getIDEVersionWithHash } from '../../../Version';
 import { setEmbeddedGameFramePreviewLocation } from '../../../EmbeddedGame/EmbeddedGameFrame';
-import { serializeToJSObject } from '../../../Utils/Serializer';
+import {
+  type ElectronWindowOptions,
+  getDefaultElectronWindowOptions,
+  getElectronWindowOptionsFromProjectEvents,
+} from '../../GenericExporters/ElectronExport';
 const electron = optionalRequire('electron');
 const path = optionalRequire('path');
 const fs = optionalRequire('fs');
@@ -30,82 +34,6 @@ const ipcRenderer = electron ? electron.ipcRenderer : null;
 const gd: libGDevelop = global.gd;
 
 let nextPreviewId = 1;
-
-const transparentPreviewWindowInstructionTypes = new Set([
-  'AdvancedWindow::ApplyDesktopPetWindowMode',
-  'AdvancedWindow::SetWindowBackgroundColor',
-]);
-
-const framelessTransparentPreviewWindowInstructionTypes = new Set([
-  'AdvancedWindow::ApplyDesktopPetWindowMode',
-]);
-
-type TransparentPreviewWindowSettings = {|
-  useTransparentPreviewWindow: boolean,
-  useFramelessTransparentPreviewWindow: boolean,
-|};
-
-const defaultTransparentPreviewWindowSettings = {
-  useTransparentPreviewWindow: false,
-  useFramelessTransparentPreviewWindow: false,
-};
-
-const getTransparentPreviewWindowSettingsForProject = (
-  project: gdProject
-): TransparentPreviewWindowSettings => {
-  let serializedProject = null;
-  try {
-    serializedProject = serializeToJSObject(project);
-  } catch (error) {
-    console.warn(
-      'Unable to inspect events for transparent preview window settings:',
-      error
-    );
-    return defaultTransparentPreviewWindowSettings;
-  }
-
-  const transparentPreviewWindowSettings = {
-    ...defaultTransparentPreviewWindowSettings,
-  };
-  const valuesToInspect: Array<any> = [serializedProject];
-  while (valuesToInspect.length) {
-    const value = valuesToInspect.pop();
-    if (!value || typeof value !== 'object') continue;
-
-    if (Array.isArray(value)) {
-      for (let index = 0; index < value.length; index++) {
-        valuesToInspect.push(value[index]);
-      }
-      continue;
-    }
-
-    const inspectedValue = (value: any);
-    if (inspectedValue.disabled === true) continue;
-
-    const instructionType = inspectedValue.type;
-    if (
-      instructionType &&
-      typeof instructionType === 'object' &&
-      transparentPreviewWindowInstructionTypes.has(instructionType.value)
-    ) {
-      transparentPreviewWindowSettings.useTransparentPreviewWindow = true;
-      if (
-        framelessTransparentPreviewWindowInstructionTypes.has(
-          instructionType.value
-        )
-      ) {
-        transparentPreviewWindowSettings.useFramelessTransparentPreviewWindow = true;
-        return transparentPreviewWindowSettings;
-      }
-    }
-
-    Object.keys(inspectedValue).forEach(key => {
-      valuesToInspect.push(inspectedValue[key]);
-    });
-  }
-
-  return transparentPreviewWindowSettings;
-};
 
 const transparentPreviewRuntimeStyle = `html, body {
 			background: transparent;
@@ -293,7 +221,7 @@ export default class LocalPreviewLauncher extends React.Component<
 
   _resetPreviewWindowsForPreviewMode = async (
     options: PreviewOptions,
-    transparentPreviewWindowSettings: TransparentPreviewWindowSettings
+    electronWindowOptions: ElectronWindowOptions
   ): Promise<boolean> => {
     if (!ipcRenderer) return false;
 
@@ -303,7 +231,8 @@ export default class LocalPreviewLauncher extends React.Component<
         {
           alwaysOnTop: options.getIsAlwaysOnTopInPreview(),
           hideMenuBar: !options.getIsMenuBarHiddenInPreview(),
-          ...transparentPreviewWindowSettings,
+          useTransparentPreviewWindow: electronWindowOptions.transparentWindow,
+          useFramelessPreviewWindow: electronWindowOptions.framelessWindow,
         }
       );
       return !!(result && result.closedPreviewWindows);
@@ -320,12 +249,10 @@ export default class LocalPreviewLauncher extends React.Component<
     project: gdProject,
     gamePath: string,
     options: PreviewOptions,
-    transparentPreviewWindowSettings: TransparentPreviewWindowSettings
+    electronWindowOptions: ElectronWindowOptions
   ): void => {
-    const {
-      useTransparentPreviewWindow,
-      useFramelessTransparentPreviewWindow,
-    } = transparentPreviewWindowSettings;
+    const useTransparentPreviewWindow = electronWindowOptions.transparentWindow;
+    const useFramelessPreviewWindow = electronWindowOptions.framelessWindow;
     const previewBrowserWindowOptions = {
       width: project.getGameResolutionWidth(),
       height: project.getGameResolutionHeight(),
@@ -333,8 +260,8 @@ export default class LocalPreviewLauncher extends React.Component<
       title: `Preview of ${project.getName()}`,
       backgroundColor: useTransparentPreviewWindow ? '#00000000' : '#000000',
       transparent: useTransparentPreviewWindow ? true : undefined,
-      frame: useFramelessTransparentPreviewWindow ? false : undefined,
-      hasShadow: useFramelessTransparentPreviewWindow ? false : undefined,
+      frame: useFramelessPreviewWindow ? false : true,
+      hasShadow: useFramelessPreviewWindow ? false : true,
       webPreferences: {
         webSecurity: false, // Allow to access to local files,
         // Allow Node.js API access in renderer process, as long
@@ -431,10 +358,10 @@ export default class LocalPreviewLauncher extends React.Component<
       project,
       outputDir
     );
-    const transparentPreviewWindowSettings = previewOptions.isForInGameEdition
-      ? defaultTransparentPreviewWindowSettings
-      : getTransparentPreviewWindowSettingsForProject(project);
-    const { useTransparentPreviewWindow } = transparentPreviewWindowSettings;
+    const electronWindowOptions = previewOptions.isForInGameEdition
+      ? getDefaultElectronWindowOptions()
+      : getElectronWindowOptionsFromProjectEvents(project, sceneName);
+    const useTransparentPreviewWindow = electronWindowOptions.transparentWindow;
     const previewExportOptionsWithTransparentRuntimeBackground = (previewExportOptions: any);
     const hasTransparentRuntimeBackgroundExportOption =
       typeof previewExportOptionsWithTransparentRuntimeBackground.setTransparentRuntimeBackground ===
@@ -456,7 +383,7 @@ export default class LocalPreviewLauncher extends React.Component<
     const closedPreviewWindows = !previewOptions.isForInGameEdition
       ? await this._resetPreviewWindowsForPreviewMode(
           previewOptions,
-          transparentPreviewWindowSettings
+          electronWindowOptions
         )
       : false;
     previewExportOptions.setIsDevelopmentEnvironment(Window.isDev());
@@ -666,7 +593,7 @@ export default class LocalPreviewLauncher extends React.Component<
           project,
           outputDir,
           previewOptions,
-          transparentPreviewWindowSettings
+          electronWindowOptions
         );
       }
     }

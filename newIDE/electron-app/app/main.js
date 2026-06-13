@@ -467,7 +467,8 @@ app.on('ready', function() {
         alwaysOnTop: options.alwaysOnTop,
         hideMenuBar: options.hideMenuBar,
         useTransparentPreviewWindow: options.useTransparentPreviewWindow,
-        useFramelessTransparentPreviewWindow:
+        useFramelessPreviewWindow:
+          options.useFramelessPreviewWindow ||
           options.useFramelessTransparentPreviewWindow,
       });
     }

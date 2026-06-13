@@ -30,6 +30,8 @@ import {
   getDefaultElectronWindowOptions,
   ElectronWindowOptionsEditor,
   applyElectronWindowOptionsToExportOptions,
+  getElectronWindowOptionsFromProjectEvents,
+  mergeElectronWindowOptions,
 } from '../GenericExporters/ElectronExport';
 
 const gd: libGDevelop = global.gd;
@@ -135,9 +137,13 @@ export const browserElectronExportPipeline: ExportPipeline<
     const { project } = context;
     const exportOptions = new gd.ExportOptions(project, outputDir);
     exportOptions.setTarget('electron');
+    const electronWindowOptions = mergeElectronWindowOptions(
+      context.exportState.electronWindowOptions,
+      getElectronWindowOptionsFromProjectEvents(project)
+    );
     applyElectronWindowOptionsToExportOptions(
       exportOptions,
-      context.exportState.electronWindowOptions
+      electronWindowOptions
     );
     if (fallbackAuthor) {
       exportOptions.setFallbackAuthor(

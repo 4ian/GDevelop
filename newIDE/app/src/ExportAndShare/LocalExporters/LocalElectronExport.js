@@ -22,6 +22,8 @@ import {
   getDefaultElectronWindowOptions,
   ElectronWindowOptionsEditor,
   applyElectronWindowOptionsToExportOptions,
+  getElectronWindowOptionsFromProjectEvents,
+  mergeElectronWindowOptions,
 } from '../GenericExporters/ElectronExport';
 import { downloadUrlsToLocalFiles } from '../../Utils/LocalFileDownloader';
 // It's important to use remote and not electron for folder actions,
@@ -152,9 +154,13 @@ export const localElectronExportPipeline: ExportPipeline<
       context.exportState.outputDir
     );
     exportOptions.setTarget('electron');
+    const electronWindowOptions = mergeElectronWindowOptions(
+      context.exportState.electronWindowOptions,
+      getElectronWindowOptionsFromProjectEvents(context.project)
+    );
     applyElectronWindowOptionsToExportOptions(
       exportOptions,
-      context.exportState.electronWindowOptions
+      electronWindowOptions
     );
     if (fallbackAuthor) {
       exportOptions.setFallbackAuthor(

@@ -12,6 +12,17 @@ import { getHelpLink } from '../../Utils/HelpLink';
 import Window from '../../Utils/Window';
 import RaisedButton from '../../UI/RaisedButton';
 import { type ExportFlowProps } from '../ExportPipeline.flow';
+import { serializeToJSObject } from '../../Utils/Serializer';
+
+const transparentWindowInstructionTypes = new Set([
+  'AdvancedWindow::ApplyDesktopPetWindowMode',
+  'AdvancedWindow::SetWindowBackgroundColor',
+]);
+
+const framelessWindowInstructionTypes = new Set([
+  'AdvancedWindow::ApplyDesktopPetWindowMode',
+  'AdvancedWindow::SetWindowFrameless',
+]);
 
 export type ElectronWindowOptions = {|
   transparentWindow: boolean,
@@ -27,6 +38,159 @@ export const getDefaultElectronWindowOptions = (): ElectronWindowOptions => ({
   transparentRuntimeBackground: false,
   disableWindowShadow: false,
   disableHardwareAcceleration: false,
+});
+
+const normalizeInstructionParameter = parameter => {
+  if (typeof parameter !== 'string') return '';
+
+  return parameter
+    .replace(/^"(.*)"$/, '$1')
+    .trim()
+    .toLowerCase();
+};
+
+const isYesNoInstructionParameterEnabled = (
+  parameters,
+  index,
+  defaultValue
+) => {
+  if (!Array.isArray(parameters)) return defaultValue;
+
+  const value = normalizeInstructionParameter(parameters[index]);
+  if (!value) return defaultValue;
+
+  return value === 'yes' || value === 'true' || value === '1';
+};
+
+const isTransparentBackgroundColorParameter = parameters => {
+  if (!Array.isArray(parameters)) return false;
+
+  const value = normalizeInstructionParameter(parameters[0]);
+  if (!value) {
+    // SetWindowBackgroundColor defaults to #00000000.
+    return true;
+  }
+
+  return (
+    value === 'transparent' ||
+    value === '#00000000' ||
+    value === '00000000' ||
+    ((value.length === 9 || value.length === 8) && value.endsWith('00'))
+  );
+};
+
+const getSerializedEventsForElectronWindowOptions = (
+  project: gdProject,
+  sceneName?: ?string
+): Array<any> => {
+  if (sceneName) {
+    if (!project.hasLayoutNamed(sceneName)) return [];
+
+    return [serializeToJSObject(project.getLayout(sceneName).getEvents())];
+  }
+
+  const serializedEvents = [];
+  for (let index = 0; index < project.getLayoutsCount(); index++) {
+    serializedEvents.push(
+      serializeToJSObject(project.getLayoutAt(index).getEvents())
+    );
+  }
+  for (let index = 0; index < project.getExternalEventsCount(); index++) {
+    serializedEvents.push(
+      serializeToJSObject(project.getExternalEventsAt(index).getEvents())
+    );
+  }
+
+  return serializedEvents;
+};
+
+export const getElectronWindowOptionsFromProjectEvents = (
+  project: gdProject,
+  sceneName?: ?string
+): ElectronWindowOptions => {
+  let serializedEventsContainers = [];
+  try {
+    serializedEventsContainers = getSerializedEventsForElectronWindowOptions(
+      project,
+      sceneName
+    );
+  } catch (error) {
+    console.warn(
+      'Unable to inspect events for Electron window settings:',
+      error
+    );
+    return getDefaultElectronWindowOptions();
+  }
+
+  const electronWindowOptions = getDefaultElectronWindowOptions();
+  const valuesToInspect: Array<any> = serializedEventsContainers.slice();
+  while (valuesToInspect.length) {
+    const value = valuesToInspect.pop();
+    if (!value || typeof value !== 'object') continue;
+
+    if (Array.isArray(value)) {
+      for (let index = 0; index < value.length; index++) {
+        valuesToInspect.push(value[index]);
+      }
+      continue;
+    }
+
+    const inspectedValue = (value: any);
+    if (inspectedValue.disabled === true) continue;
+
+    const instructionType = inspectedValue.type;
+    if (instructionType && typeof instructionType === 'object') {
+      if (transparentWindowInstructionTypes.has(instructionType.value)) {
+        const shouldEnableTransparentWindow =
+          instructionType.value ===
+            'AdvancedWindow::ApplyDesktopPetWindowMode' ||
+          isTransparentBackgroundColorParameter(inspectedValue.parameters);
+        if (shouldEnableTransparentWindow) {
+          electronWindowOptions.transparentWindow = true;
+          electronWindowOptions.transparentRuntimeBackground = true;
+        }
+      }
+
+      if (framelessWindowInstructionTypes.has(instructionType.value)) {
+        const shouldEnableFramelessWindow =
+          instructionType.value ===
+            'AdvancedWindow::ApplyDesktopPetWindowMode' ||
+          isYesNoInstructionParameterEnabled(
+            inspectedValue.parameters,
+            0,
+            false
+          );
+        if (shouldEnableFramelessWindow) {
+          electronWindowOptions.framelessWindow = true;
+          electronWindowOptions.disableWindowShadow = true;
+        }
+      }
+    }
+
+    Object.keys(inspectedValue).forEach(key => {
+      valuesToInspect.push(inspectedValue[key]);
+    });
+  }
+
+  return electronWindowOptions;
+};
+
+export const mergeElectronWindowOptions = (
+  firstOptions: ElectronWindowOptions,
+  secondOptions: ElectronWindowOptions
+): ElectronWindowOptions => ({
+  transparentWindow:
+    firstOptions.transparentWindow || secondOptions.transparentWindow,
+  framelessWindow:
+    firstOptions.framelessWindow || secondOptions.framelessWindow,
+  transparentRuntimeBackground:
+    firstOptions.transparentRuntimeBackground ||
+    secondOptions.transparentRuntimeBackground,
+  disableWindowShadow:
+    firstOptions.disableWindowShadow || secondOptions.disableWindowShadow,
+  disableHardwareAcceleration:
+    firstOptions.disableHardwareAcceleration ||
+    secondOptions.disableHardwareAcceleration,
 });
 
 export const applyElectronWindowOptionsToExportOptions = (

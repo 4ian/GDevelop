@@ -9,8 +9,9 @@ This documents the local ComfyUI video backend for AI Game Workbench.
 - Current local model inventory includes `z_image_turbo_bf16.safetensors`, which
   is image-only.
 - LTXV video weights are installed and remain available as a fallback.
-- Wan2.2 5B TI2V weights are the preferred local video path for better
-  sprite-sheet quality and prompt following.
+- Wan2.2 5B TI2V weights are installed for generative ComfyUI video tests.
+- Walk sprite sheets use the workbench exact-preserve path by default because
+  Wan/LTXV reinterpret the 2x2 sheet as a scene after the first frame.
 
 AI Game Workbench does not hard-code a fake local video model. It exposes a
 ComfyUI workflow video option only when a ComfyUI API-format workflow is
@@ -35,12 +36,46 @@ The workflow is adapted from the official ComfyUI Wan2.2 5B TI2V native graph:
 `ModelSamplingSD3` -> `KSampler` -> `VAEDecode` -> `CreateVideo` ->
 `SaveVideo`.
 
-Workbench sprite-sheet defaults use `640x640`, 4 seconds, 12 FPS, and 30
-sampling steps. The prompt wrapper explicitly preserves the 2x2 grid, green
-background, fixed orthographic camera, and per-quadrant facing directions.
+The Wan workflow is still auto-detected and can be forced for testing by setting
+`LOCAL_COMFYUI_VIDEO_EXACT_SHEET_MODE=off`. In tests on this machine, even low
+denoise values kept only the first sheet area and turned later frames into
+background noise, so the bundled workbench now defaults walk-style prompts to an
+exact sprite-sheet preservation path.
+
+Workbench sprite-sheet defaults use `768x768`, 4 seconds, 12 FPS, and 30
+sampling steps for the generative workflow. The prompt wrapper explicitly
+preserves the 2x2 grid, green background, fixed orthographic camera, and
+per-quadrant facing directions.
 
 The bundled workbench auto-detects this workflow first. If it is missing, it
 falls back to `ai-game-workbench-ltxv-i2v-api.json`.
+
+## Exact-Preserve Walk Sheet Mode
+
+For walk prompts (`walk` or `步行`), the local ComfyUI model now generates the
+MP4 from the original 2x2 PNG with a deterministic sheet-preserving pass. This
+keeps the character art, outfit, green background, and quadrant layout matching
+the input instead of allowing the video model to repaint the character.
+
+Control it with:
+
+```powershell
+[Environment]::SetEnvironmentVariable("LOCAL_COMFYUI_VIDEO_EXACT_SHEET_MODE", "auto", "User")
+```
+
+Values:
+
+- `auto`: default. Use exact preservation for walk-sheet prompts, otherwise run
+  the configured ComfyUI workflow.
+- `off`: always run the ComfyUI workflow.
+- `always`: force exact preservation for every local ComfyUI video request.
+
+Verification sample from this machine:
+
+- Exact-preserve output:
+  `D:\comfyui_data\output\ai-game-workbench-wan22-test\walk-exact-preserve.mp4`
+- Contact sheet:
+  `D:\comfyui_data\output\ai-game-workbench-wan22-test\frames-exact-preserve\contact.jpg`
 
 Download helpers:
 
@@ -80,10 +115,11 @@ environment variable in its process environment.
 ## Electron ASAR selection
 
 GDevelop loads the tracked Electron bundle at
-`newIDE/electron-app/app/external/ai-game-workbench.wan22.asar` when present,
-falling back to `ai-game-workbench.asar` for older local checkouts. Local test
-bundles named `ai-game-workbench.local*.asar` are ignored unless one of these
-environment variables is set before launching Electron:
+`newIDE/electron-app/app/external/ai-game-workbench.preserve.asar` when
+present, then falls back to `ai-game-workbench.wan22.asar`, then
+`ai-game-workbench.asar` for older local checkouts. Local test bundles named
+`ai-game-workbench.local*.asar` are ignored unless one of these environment
+variables is set before launching Electron:
 
 ```powershell
 $env:AI_GAME_WORKBENCH_USE_LOCAL_ASAR = "1"
@@ -104,6 +140,7 @@ Set these user environment variables, then close and reopen GDevelop/Electron:
 [Environment]::SetEnvironmentVariable("LOCAL_COMFYUI_URL", "http://127.0.0.1:8000", "User")
 [Environment]::SetEnvironmentVariable("LOCAL_COMFYUI_VIDEO_WORKFLOW", "D:\comfyui_data\user\default\workflows\ai-game-workbench-wan22-ti2v-api.json", "User")
 [Environment]::SetEnvironmentVariable("LOCAL_COMFYUI_VIDEO_FPS", "12", "User")
+[Environment]::SetEnvironmentVariable("LOCAL_COMFYUI_VIDEO_EXACT_SHEET_MODE", "auto", "User")
 [Environment]::SetEnvironmentVariable("LOCAL_COMFYUI_VIDEO_NEGATIVE_PROMPT", "worst quality, low quality, blurry, washed out, inconsistent motion, jittery, distorted, deformed, extra limbs, text, watermark, camera movement, zoom, rotation, background flicker", "User")
 ```
 
@@ -137,7 +174,9 @@ The workflow JSON can use these placeholders in node inputs:
 - `{{seed}}`
 - `{{filenamePrefix}}`
 
-For a 16 GB GPU, start with `512x512`, `4` seconds, `12` FPS. The workbench
+For a 16 GB GPU, start with `768x768`, `4` seconds, `12` FPS for the
+exact-preserve path, or `512x512`/`640x640` if forcing the generative ComfyUI
+workflow. The workbench
 normalizes frame count to `8n+1`, so 4 seconds at 12 FPS becomes 49 frames,
 which is compatible with common LTXV/Wan-style video workflows.
 

@@ -84,6 +84,13 @@ const findAiGameWorkbenchOverrideBundlePath = () => {
 };
 
 const getDefaultAiGameWorkbenchBundlePath = () => {
+  const preserveBundlePath = getBundledExternalPath(
+    'ai-game-workbench.preserve.asar'
+  );
+  if (fs.existsSync(preserveBundlePath)) {
+    return preserveBundlePath;
+  }
+
   const currentBundlePath = getBundledExternalPath(
     'ai-game-workbench.wan22.asar'
   );

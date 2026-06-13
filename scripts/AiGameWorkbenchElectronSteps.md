@@ -8,9 +8,10 @@ The integration must stay source-free in GDevelop:
 - Do not copy the upstream source tree into this repository.
 - Do not start a localhost server or reserve any TCP port.
 - Ship the compiled ASAR artifact and native runtime sidecar:
-  `newIDE/electron-app/app/external/ai-game-workbench.wan22.asar`
-  `newIDE/electron-app/app/external/ai-game-workbench.wan22.asar.unpacked`
-- `ai-game-workbench.asar` remains a fallback bundle for older local checkouts.
+  `newIDE/electron-app/app/external/ai-game-workbench.preserve.asar`
+  `newIDE/electron-app/app/external/ai-game-workbench.preserve.asar.unpacked`
+- `ai-game-workbench.wan22.asar` and `ai-game-workbench.asar` remain fallback
+  bundles for older local checkouts.
 
 ## 1. Refresh Upstream
 
@@ -60,6 +61,11 @@ Video generation also needs one Electron-specific compatibility change:
 - Add the `local/comfyui-video-workflow` model (`ComfyUI workflow`) as a local
   ComfyUI video option. It calls an already-running ComfyUI instance and does
   not start a new port.
+- The local ComfyUI provider defaults walk/`步行` sprite-sheet prompts to an
+  exact-preserve MP4 path (`LOCAL_COMFYUI_VIDEO_EXACT_SHEET_MODE=auto`). This
+  keeps the original 2x2 sheet art intact after Wan2.2/LTXV tests showed
+  identity drift and noisy later frames. Set the variable to `off` to force the
+  actual ComfyUI workflow, or `always` to force exact preservation.
 - Configure it with `LOCAL_COMFYUI_URL` and either
   `LOCAL_COMFYUI_VIDEO_WORKFLOW` or `LOCAL_COMFYUI_VIDEO_WORKFLOW_JSON`. The
   workflow must be ComfyUI API format and can use placeholders such as
@@ -222,7 +228,7 @@ Pack the staged runtime. Native `.node` modules and `ffmpeg.exe` must be
 unpacked so Electron can load or execute them.
 
 ```powershell
-$asarPath = "newIDE\electron-app\app\external\ai-game-workbench.wan22.asar"
+$asarPath = "newIDE\electron-app\app\external\ai-game-workbench.preserve.asar"
 $unpackedPath = "$asarPath.unpacked"
 New-Item -ItemType Directory -Force -Path (Split-Path $asarPath) | Out-Null
 if (Test-Path -LiteralPath $asarPath) {
@@ -247,7 +253,7 @@ node -c newIDE\electron-app\app\AiGameWorkbenchPreload.js
 node -c newIDE\electron-app\app\main.js
 
 $env:ELECTRON_RUN_AS_NODE='1'
-.\newIDE\electron-app\node_modules\.bin\electron.cmd -e "const path = require('path'); const { pathToFileURL } = require('url'); (async () => { const bundle = path.resolve('newIDE/electron-app/app/external/ai-game-workbench.asar'); const mod = await import(pathToFileURL(path.join(bundle, 'server', 'app.js')).href); const storageDir = path.join(process.env.TEMP, 'ai-game-workbench-asar-smoke-storage'); const app = mod.createApp({ storageDir, presetsDir: path.join(bundle, 'server', 'presets'), ffmpegPath: path.resolve('newIDE/electron-app/app/external/ai-game-workbench.asar.unpacked/bin/ffmpeg.exe'), module01CharacterExportDir: path.join(storageDir, 'exports', 'Character_2D'), port: 0 }); await app.ready(); const res = await app.inject({ method: 'GET', url: '/api/health' }); console.log(res.statusCode, res.json().ok); await app.close(); })().catch(error => { console.error(error); process.exit(1); });"
+.\newIDE\electron-app\node_modules\.bin\electron.cmd -e "const path = require('path'); const { pathToFileURL } = require('url'); (async () => { const bundle = path.resolve('newIDE/electron-app/app/external/ai-game-workbench.preserve.asar'); const mod = await import(pathToFileURL(path.join(bundle, 'server', 'app.js')).href); const storageDir = path.join(process.env.TEMP, 'ai-game-workbench-asar-smoke-storage'); const app = mod.createApp({ storageDir, presetsDir: path.join(bundle, 'server', 'presets'), ffmpegPath: path.resolve('newIDE/electron-app/app/external/ai-game-workbench.preserve.asar.unpacked/bin/ffmpeg.exe'), module01CharacterExportDir: path.join(storageDir, 'exports', 'Character_2D'), port: 0 }); await app.ready(); const res = await app.inject({ method: 'GET', url: '/api/health' }); console.log(res.statusCode, res.json().ok); await app.close(); })().catch(error => { console.error(error); process.exit(1); });"
 Remove-Item Env:\ELECTRON_RUN_AS_NODE
 
 cd newIDE\app

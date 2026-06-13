@@ -33,6 +33,10 @@ the model card identifies the 2B distilled line as the light-VRAM option and the
 FP8 file is smaller than the full precision checkpoint. The workflow runs at
 512x512, 12 FPS, and uses 8 sampler steps by default.
 
+The bundled workbench also auto-detects this workflow path, so the ComfyUI video
+entry can appear even when GDevelop was launched without the environment
+variable in its process environment.
+
 ## Configure
 
 Set these user environment variables, then close and reopen GDevelop/Electron:

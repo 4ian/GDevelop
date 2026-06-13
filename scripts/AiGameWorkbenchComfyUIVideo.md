@@ -15,14 +15,33 @@ Because of this, AI Game Workbench does not hard-code a fake local video model.
 It exposes a ComfyUI workflow video option only when a ComfyUI API-format
 workflow is configured.
 
+## Installed LTXV Workflow
+
+This machine is configured with the native ComfyUI LTXV image-to-video path:
+
+- Checkpoint:
+  `D:\comfyui_data\models\checkpoints\ltxv-2b-0.9.8-distilled-fp8.safetensors`
+- Text encoder:
+  `D:\comfyui_data\models\text_encoders\t5xxl_fp8_e4m3fn_scaled.safetensors`
+- Workbench API workflow:
+  `D:\comfyui_data\user\default\workflows\ai-game-workbench-ltxv-i2v-api.json`
+- Test output:
+  `D:\comfyui_data\output\ai_game_workbench_ltxv_demo\character_a_ltxv_provider_copy.mp4`
+
+The checkpoint is Lightricks LTX-Video 2B 0.9.8 distilled FP8, chosen because
+the model card identifies the 2B distilled line as the light-VRAM option and the
+FP8 file is smaller than the full precision checkpoint. The workflow runs at
+512x512, 12 FPS, and uses 8 sampler steps by default.
+
 ## Configure
 
 Set these user environment variables, then close and reopen GDevelop/Electron:
 
 ```powershell
 [Environment]::SetEnvironmentVariable("LOCAL_COMFYUI_URL", "http://127.0.0.1:8000", "User")
-[Environment]::SetEnvironmentVariable("LOCAL_COMFYUI_VIDEO_WORKFLOW", "D:\comfyui_data\user\default\workflows\ai-game-workbench-video-api.json", "User")
+[Environment]::SetEnvironmentVariable("LOCAL_COMFYUI_VIDEO_WORKFLOW", "D:\comfyui_data\user\default\workflows\ai-game-workbench-ltxv-i2v-api.json", "User")
 [Environment]::SetEnvironmentVariable("LOCAL_COMFYUI_VIDEO_FPS", "12", "User")
+[Environment]::SetEnvironmentVariable("LOCAL_COMFYUI_VIDEO_NEGATIVE_PROMPT", "worst quality, inconsistent motion, blurry, jittery, distorted, deformed, extra limbs, text, watermark", "User")
 ```
 
 Alternatively, set `LOCAL_COMFYUI_VIDEO_WORKFLOW_JSON` to the workflow JSON

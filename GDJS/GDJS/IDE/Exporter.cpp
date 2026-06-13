@@ -136,10 +136,16 @@ bool Exporter::ExportWholePixiProject(const ExportOptions &options) {
     }
 
     //...and export it
-    gd::SerializerElement noRuntimeGameOptions;
+    gd::SerializerElement runtimeGameOptions;
+    const bool useTransparentRuntimeBackground =
+        options.target == "electron" &&
+        options.electronTransparentRuntimeBackground;
+    if (useTransparentRuntimeBackground) {
+      runtimeGameOptions.SetAttribute("transparentBackground", true);
+    }
     std::vector<gd::InGameEditorResourceMetadata> noInGameEditorResources;
     helper.ExportProjectData(fs, exportedProject, codeOutputDir + "/data.js",
-                             noRuntimeGameOptions, false, noInGameEditorResources);
+                             runtimeGameOptions, false, noInGameEditorResources);
     includesFiles.push_back(codeOutputDir + "/data.js");
 
     helper.ExportIncludesAndLibs(includesFiles, exportDir, false);
@@ -152,12 +158,15 @@ bool Exporter::ExportWholePixiProject(const ExportOptions &options) {
       source = gdjsRoot + "/Runtime/FacebookInstantGames/index.html";
 
     if (!helper.ExportIndexFile(exportedProject,
-                                    source,
-                                    exportDir,
-                                    includesFiles,
-                                    usedExtensionsResult.GetUsedSourceFiles(),
-                                    /*nonRuntimeScriptsCacheBurst=*/0,
-                                    "")) {
+                                     source,
+                                     exportDir,
+                                     includesFiles,
+                                     usedExtensionsResult.GetUsedSourceFiles(),
+                                     /*nonRuntimeScriptsCacheBurst=*/0,
+                                     useTransparentRuntimeBackground
+                                         ? "gdjs.runtimeGameOptions"
+                                         : "",
+                                     useTransparentRuntimeBackground)) {
       gd::LogError(_("Error during export:\n") + lastError);
       return false;
     }
@@ -180,7 +189,7 @@ bool Exporter::ExportWholePixiProject(const ExportOptions &options) {
     if (!exportProject(options.exportPath + "/app")) return false;
 
     if (!helper.ExportElectronFiles(
-            exportedProject, options.exportPath, usedExtensions))
+            exportedProject, options.exportPath, usedExtensions, options))
       return false;
 
     if (!helper.ExportBuildResourcesElectronFiles(exportedProject,

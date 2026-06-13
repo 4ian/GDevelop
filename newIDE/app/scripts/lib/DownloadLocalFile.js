@@ -8,7 +8,12 @@ const {default: axios} = require('axios');
  * @returns {Promise<void>}
  */
 const downloadLocalFile = async (url, outputPath) => {
-  const writer = fs.createWriteStream(outputPath);
+  const temporaryOutputPath = outputPath + '.download';
+  if (fs.existsSync(temporaryOutputPath)) {
+    fs.unlinkSync(temporaryOutputPath);
+  }
+
+  const writer = fs.createWriteStream(temporaryOutputPath);
   const response = await axios.get(url, {
     responseType: 'stream',
   });
@@ -23,6 +28,7 @@ const downloadLocalFile = async (url, outputPath) => {
     });
     writer.on('close', () => {
       if (!error) {
+        fs.renameSync(temporaryOutputPath, outputPath);
         resolve();
       }
 

@@ -73,9 +73,10 @@ export const WithMultipleExtensionErrors = (): React.Node => {
 export const WithGenericError = (): React.Node => {
   // $FlowFixMe[missing-empty-array-annot]
   const erroredExtensionLoadingResults = [];
-  const genericError = new Error(
-    'Some extension modules could not be loaded. Please check the console for more details.'
-  );
+  const genericError = {
+    expectedNumberOfJSExtensionModulesLoaded: 31,
+    numberOfJSExtensionModulesLoaded: 30,
+  };
 
   return (
     <ExtensionLoadErrorDialog
@@ -98,9 +99,10 @@ export const WithBothExtensionAndGenericErrors = (): React.Node => {
       },
     },
   ];
-  const genericError = new Error(
-    'Some extension modules could not be loaded. Please check the console for more details.'
-  );
+  const genericError = {
+    expectedNumberOfJSExtensionModulesLoaded: 31,
+    numberOfJSExtensionModulesLoaded: 30,
+  };
 
   return (
     <ExtensionLoadErrorDialog

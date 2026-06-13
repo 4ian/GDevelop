@@ -84,6 +84,13 @@ const aiGameWorkbenchFfmpegPath = path.join(
   'bin',
   'ffmpeg.exe'
 );
+const aiGameWorkbenchBundleVersion = (() => {
+  try {
+    return String(Math.floor(fs.statSync(aiGameWorkbenchBundlePath).mtimeMs));
+  } catch (error) {
+    return String(Date.now());
+  }
+})();
 
 const serverRoutePrefixes = [
   '/api/',
@@ -142,6 +149,9 @@ const createFileResponse = async filePath => {
   return new Response(fileBuffer, {
     headers: {
       'content-type': getContentType(filePath),
+      'cache-control': 'no-store, no-cache, must-revalidate, max-age=0',
+      pragma: 'no-cache',
+      expires: '0',
     },
   });
 };
@@ -254,9 +264,16 @@ const handleAiGameWorkbenchServerRequest = async (request, parsedUrl) => {
   }
 
   const response = await workbenchApp.inject(requestOptions);
+  const responseHeaders = createHeadersFromFastifyResponse(response);
+  responseHeaders.set(
+    'cache-control',
+    'no-store, no-cache, must-revalidate, max-age=0'
+  );
+  responseHeaders.set('pragma', 'no-cache');
+  responseHeaders.set('expires', '0');
   return new Response(response.rawPayload || response.payload, {
     status: response.statusCode,
-    headers: createHeadersFromFastifyResponse(response),
+    headers: responseHeaders,
   });
 };
 
@@ -424,7 +441,17 @@ const openAiGameWorkbenchWindow = async ({ parentWindow, devTools }) => {
     aiGameWorkbenchParentWebContents = null;
   });
 
-  await aiGameWorkbenchWindow.loadURL(`${aiGameWorkbenchOrigin}/index.html`);
+  try {
+    await aiGameWorkbenchWindow.webContents.session.clearCache();
+  } catch (error) {
+    log.warn('Failed to clear AI Game Workbench cache.', error);
+  }
+
+  await aiGameWorkbenchWindow.loadURL(
+    `${aiGameWorkbenchOrigin}/index.html?v=${encodeURIComponent(
+      aiGameWorkbenchBundleVersion
+    )}`
+  );
   return { url: aiGameWorkbenchOrigin };
 };
 

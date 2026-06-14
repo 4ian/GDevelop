@@ -2541,6 +2541,318 @@ export const deleteSceneObject = (
   };
 };
 
+type VariablePathSegment = {| type: 'property' | 'index', value: string |};
+
+const parseVariablePathForDeletion = (
+  variablePath: string
+): Array<VariablePathSegment> => {
+  const segments = [];
+  let currentSegment = '';
+  let i = 0;
+
+  while (i < variablePath.length) {
+    const char = variablePath[i];
+    if (char === '.' || char === '/') {
+      if (currentSegment.trim()) {
+        segments.push({ type: 'property', value: currentSegment.trim() });
+        currentSegment = '';
+      }
+      i++;
+    } else if (char === '[') {
+      if (currentSegment.trim()) {
+        segments.push({ type: 'property', value: currentSegment.trim() });
+        currentSegment = '';
+      }
+      i++;
+      let indexContent = '';
+      while (i < variablePath.length && variablePath[i] !== ']') {
+        indexContent += variablePath[i];
+        i++;
+      }
+      if (i >= variablePath.length || variablePath[i] !== ']') {
+        throw new Error(
+          'Improperly formatted array index. Use paths like Inventory[0].Name.'
+        );
+      }
+      const indexValue = indexContent.trim();
+      if (!indexValue || !Number.isInteger(Number(indexValue))) {
+        throw new Error(
+          `Content of the index is invalid ("${indexValue}") - it should be a number.`
+        );
+      }
+      segments.push({ type: 'index', value: indexValue });
+      i++;
+    } else {
+      currentSegment += char;
+      i++;
+    }
+  }
+
+  if (currentSegment.trim()) {
+    segments.push({ type: 'property', value: currentSegment.trim() });
+  }
+  if (!segments.length || segments[0].type !== 'property') {
+    throw new Error('Variable path must start with a variable name.');
+  }
+
+  // $FlowFixMe[incompatible-type]
+  return segments;
+};
+
+const getVariableNameOrPath = (args: Object): string => {
+  return (
+    getOptionalString(args, 'variable_name_or_path') ||
+    getOptionalString(args, 'variableNameOrPath') ||
+    getOptionalString(args, 'variable_path') ||
+    getOptionalString(args, 'variablePath') ||
+    getOptionalString(args, 'name') ||
+    getRequiredString(args, 'variable_name')
+  );
+};
+
+const makeVariableNotFoundResult = (
+  variablePath: string,
+  reason?: string
+): Object => ({
+  deleted: false,
+  variableNameOrPath: variablePath,
+  reason: reason || 'Variable path not found.',
+});
+
+const deleteVariablePathFromContainer = (
+  variablesContainer: gdVariablesContainer,
+  variablePath: string
+): Object => {
+  const segments = parseVariablePathForDeletion(variablePath);
+  const rootName = segments[0].value;
+  if (!variablesContainer.has(rootName)) {
+    return makeVariableNotFoundResult(variablePath);
+  }
+
+  if (segments.length === 1) {
+    const deletedVariable = serializeToJSObject(
+      variablesContainer.get(rootName)
+    );
+    variablesContainer.remove(rootName);
+    return {
+      deleted: true,
+      variableNameOrPath: variablePath,
+      deletedVariable,
+    };
+  }
+
+  let variable = variablesContainer.get(rootName);
+  for (let index = 1; index < segments.length - 1; index++) {
+    const segment = segments[index];
+    if (segment.type === 'property') {
+      if (!variable.hasChild(segment.value)) {
+        return makeVariableNotFoundResult(variablePath);
+      }
+      variable = variable.getChild(segment.value);
+    } else {
+      const childIndex = Number(segment.value);
+      if (
+        variable.getType() !== gd.Variable.Array ||
+        childIndex < 0 ||
+        childIndex >= variable.getChildrenCount()
+      ) {
+        return makeVariableNotFoundResult(variablePath);
+      }
+      variable = variable.getAtIndex(childIndex);
+    }
+  }
+
+  const lastSegment = segments[segments.length - 1];
+  if (lastSegment.type === 'property') {
+    if (!variable.hasChild(lastSegment.value)) {
+      return makeVariableNotFoundResult(variablePath);
+    }
+    const deletedVariable = serializeToJSObject(
+      variable.getChild(lastSegment.value)
+    );
+    variable.removeChild(lastSegment.value);
+    return {
+      deleted: true,
+      variableNameOrPath: variablePath,
+      deletedVariable,
+    };
+  }
+
+  const childIndex = Number(lastSegment.value);
+  if (
+    variable.getType() !== gd.Variable.Array ||
+    childIndex < 0 ||
+    childIndex >= variable.getChildrenCount()
+  ) {
+    return makeVariableNotFoundResult(variablePath);
+  }
+  const deletedVariable = serializeToJSObject(variable.getAtIndex(childIndex));
+  variable.removeAtIndex(childIndex);
+  return {
+    deleted: true,
+    variableNameOrPath: variablePath,
+    deletedVariable,
+  };
+};
+
+export const deleteSceneVariable = (
+  project: gdProject,
+  args: Object
+): Object => {
+  const sceneName = getRequiredString(args, 'scene_name');
+  const variablePath = getVariableNameOrPath(args);
+  const scene = getScene(project, sceneName);
+  const result = deleteVariablePathFromContainer(
+    scene.getVariables(),
+    variablePath
+  );
+
+  return {
+    success: true,
+    didModifyProject: !!result.deleted,
+    scope: 'scene',
+    sceneName,
+    ...result,
+  };
+};
+
+export const deleteObjectVariable = (
+  project: gdProject,
+  args: Object,
+  callbacks: SceneToolCallbacks = ({}: any)
+): Object => {
+  const sceneName = getRequiredString(args, 'scene_name');
+  const objectName = getRequiredString(args, 'object_name');
+  const variablePath = getVariableNameOrPath(args);
+  const scene = getScene(project, sceneName);
+  const { object, isGlobal } = getSceneObject(project, scene, objectName);
+  const result = deleteVariablePathFromContainer(
+    object.getVariables(),
+    variablePath
+  );
+
+  if (result.deleted && callbacks.onObjectsModifiedOutsideEditor) {
+    callbacks.onObjectsModifiedOutsideEditor({
+      scene,
+      isNewObjectTypeUsed: false,
+    });
+  }
+
+  return {
+    success: true,
+    didModifyProject: !!result.deleted,
+    scope: 'object',
+    sceneName,
+    objectName,
+    isGlobalObject: isGlobal,
+    ...result,
+  };
+};
+
+const getInitialInstanceTarget = (
+  scene: gdLayout,
+  args: Object
+): {|
+  instance: gdInitialInstance,
+  sourceIndex: number,
+  instanceId: string,
+|} => {
+  const initialInstances = scene.getInitialInstances();
+  const instanceId =
+    getOptionalString(args, 'instance_id') ||
+    getOptionalString(args, 'instanceId') ||
+    getOptionalString(args, 'id');
+  if (instanceId) {
+    let found = null;
+    let foundIndex = -1;
+    let sourceIndex = 0;
+    iterateInitialInstances(initialInstances, instance => {
+      if (!found && instance.getPersistentUuid().startsWith(instanceId)) {
+        found = instance;
+        foundIndex = sourceIndex;
+      }
+      sourceIndex++;
+    });
+    if (!found) {
+      throw new Error(`Initial instance not found for id "${instanceId}".`);
+    }
+    return {
+      instance: found,
+      sourceIndex: foundIndex,
+      instanceId: found.getPersistentUuid().slice(0, 10),
+    };
+  }
+
+  const objectName = getRequiredString(args, 'object_name');
+  const requestedIndex =
+    typeof args.instance_index === 'number' &&
+    Number.isFinite(args.instance_index)
+      ? Math.max(0, Math.floor(args.instance_index))
+      : typeof args.instanceIndex === 'number' &&
+        Number.isFinite(args.instanceIndex)
+      ? Math.max(0, Math.floor(args.instanceIndex))
+      : 0;
+  let matchingIndex = 0;
+  let sourceIndex = 0;
+  let found = null;
+  let foundSourceIndex = -1;
+  iterateInitialInstances(initialInstances, instance => {
+    if (found || instance.getObjectName() !== objectName) {
+      sourceIndex++;
+      return;
+    }
+    if (matchingIndex === requestedIndex) {
+      found = instance;
+      foundSourceIndex = sourceIndex;
+      sourceIndex++;
+      return;
+    }
+    matchingIndex++;
+    sourceIndex++;
+  });
+  if (!found) {
+    throw new Error(
+      `Initial instance ${requestedIndex} of object "${objectName}" not found.`
+    );
+  }
+
+  return {
+    instance: found,
+    sourceIndex: foundSourceIndex,
+    instanceId: found.getPersistentUuid().slice(0, 10),
+  };
+};
+
+export const deleteInstanceVariable = (
+  project: gdProject,
+  args: Object,
+  callbacks: SceneToolCallbacks = ({}: any)
+): Object => {
+  const sceneName = getRequiredString(args, 'scene_name');
+  const variablePath = getVariableNameOrPath(args);
+  const scene = getScene(project, sceneName);
+  const target = getInitialInstanceTarget(scene, args);
+  const result = deleteVariablePathFromContainer(
+    target.instance.getVariables(),
+    variablePath
+  );
+
+  if (result.deleted && callbacks.onInstancesModifiedOutsideEditor) {
+    callbacks.onInstancesModifiedOutsideEditor({ scene });
+  }
+
+  return {
+    success: true,
+    didModifyProject: !!result.deleted,
+    scope: 'instance',
+    sceneName,
+    objectName: target.instance.getObjectName(),
+    instanceId: target.instanceId,
+    sourceIndex: target.sourceIndex,
+    ...result,
+  };
+};
+
 const findObjectPropertyName = (
   properties: any,
   requestedName: string

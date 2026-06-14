@@ -313,7 +313,14 @@ describe('McpEditorBridge', () => {
     // $FlowFixMe[invalid-constructor]
     const project = new gd.ProjectHelper.createNewGDJSProject();
     project.setName('MCP Test Game');
-    project.insertNewLayout('Level1', 0);
+    const layout = project.insertNewLayout('Level1', 0);
+    layout.getObjects().insertNewObject(project, 'Sprite', 'Player', 0);
+    const instance = layout.getInitialInstances().insertNewInitialInstance();
+    instance.setObjectName('Player');
+    instance
+      .getVariables()
+      .insertNew('IsAnchor', 0)
+      .setBool(true);
 
     try {
       const bridge = makeBridge({
@@ -328,8 +335,33 @@ describe('McpEditorBridge', () => {
         },
       });
 
-      expect(response.content[0].text).toContain('MCP Test Game');
-      expect(response.content[0].text).toContain('Level1');
+      const summary = JSON.parse(response.content[0].text);
+      expect(summary.projectName).toBe('MCP Test Game');
+      expect(summary.scenes[0].sceneName).toBe('Level1');
+      expect(summary.behaviorSourceLegend.defaultCapabilityInferred).toContain(
+        'default GDevelop object capability'
+      );
+      const player = summary.scenes[0].objects.find(
+        object => object.objectName === 'Player'
+      );
+      expect(player.behaviors[0]).toEqual(
+        expect.objectContaining({
+          behaviorSource: expect.any(String),
+          isDefaultCapability: expect.any(Boolean),
+        })
+      );
+      expect(summary.scenes[0].instanceInitialVariables).toEqual([
+        expect.objectContaining({
+          objectName: 'Player',
+          sourceIndex: 0,
+          initialVariables: [
+            expect.objectContaining({
+              name: 'IsAnchor',
+              type: 'boolean',
+            }),
+          ],
+        }),
+      ]);
     } finally {
       project.delete();
     }
@@ -2487,6 +2519,103 @@ describe('McpEditorBridge', () => {
     }
   });
 
+  it('deletes scene, object, and initial instance variables with focused tools', async () => {
+    // $FlowFixMe[invalid-constructor]
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    const layout = project.insertNewLayout('Level1', 0);
+    const object = layout
+      .getObjects()
+      .insertNewObject(project, 'Sprite', 'GroundSlot', 0);
+    layout
+      .getVariables()
+      .insertNew('SceneFlag', 0)
+      .setBool(true);
+    object
+      .getVariables()
+      .insertNew('ObjectFlag', 0)
+      .setBool(true);
+    const instance = layout.getInitialInstances().insertNewInitialInstance();
+    instance.setObjectName('GroundSlot');
+    instance
+      .getVariables()
+      .insertNew('IsAnchor', 0)
+      .setBool(true);
+    const instanceId = instance.getPersistentUuid().slice(0, 10);
+    const onObjectsModifiedOutsideEditor: any = jest.fn();
+    const onInstancesModifiedOutsideEditor: any = jest.fn();
+
+    try {
+      const bridge = makeBridge({
+        getProject: () => project,
+        getPermissions: () => ({
+          allowWriteTools: true,
+          allowCommandTools: false,
+        }),
+        onObjectsModifiedOutsideEditor,
+        onInstancesModifiedOutsideEditor,
+      });
+
+      const sceneVariableResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'delete_scene_variable',
+          arguments: {
+            scene_name: 'Level1',
+            variable_name_or_path: 'SceneFlag',
+          },
+        },
+      });
+      const sceneVariableResult = JSON.parse(
+        sceneVariableResponse.content[0].text
+      );
+      expect(sceneVariableResponse.isError).not.toBe(true);
+      expect(sceneVariableResult.deleted).toBe(true);
+      expect(layout.getVariables().has('SceneFlag')).toBe(false);
+
+      const objectVariableResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'delete_object_variable',
+          arguments: {
+            scene_name: 'Level1',
+            object_name: 'GroundSlot',
+            variable_name_or_path: 'ObjectFlag',
+          },
+        },
+      });
+      const objectVariableResult = JSON.parse(
+        objectVariableResponse.content[0].text
+      );
+      expect(objectVariableResponse.isError).not.toBe(true);
+      expect(objectVariableResult.deleted).toBe(true);
+      expect(object.getVariables().has('ObjectFlag')).toBe(false);
+      expect(onObjectsModifiedOutsideEditor).toHaveBeenCalled();
+
+      const instanceVariableResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'delete_instance_variable',
+          arguments: {
+            scene_name: 'Level1',
+            instance_id: instanceId,
+            variable_name_or_path: 'IsAnchor',
+          },
+        },
+      });
+      const instanceVariableResult = JSON.parse(
+        instanceVariableResponse.content[0].text
+      );
+      expect(instanceVariableResponse.isError).not.toBe(true);
+      expect(instanceVariableResult.deleted).toBe(true);
+      expect(instance.getVariables().has('IsAnchor')).toBe(false);
+      expect(onInstancesModifiedOutsideEditor).toHaveBeenCalledWith({
+        scene: layout,
+      });
+    } finally {
+      project.delete();
+    }
+  });
+
   it('returns compact resource audits and can batch create scene assets', async () => {
     // $FlowFixMe[invalid-constructor]
     const project = new gd.ProjectHelper.createNewGDJSProject();
@@ -2840,6 +2969,30 @@ describe('McpEditorBridge', () => {
           .getType()
       ).toBe('TextObject::Text');
 
+      const dryRunPatchResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'apply_validated_scene_patch',
+          arguments: {
+            scene_name: 'Level1',
+            dry_run: true,
+            patch: [
+              {
+                op: 'replace',
+                path: '/objects/0/name',
+                value: 'LabelDryRun',
+              },
+            ],
+          },
+        },
+      });
+      const dryRunPatch = JSON.parse(dryRunPatchResponse.content[0].text);
+      expect(dryRunPatchResponse.isError).not.toBe(true);
+      expect(dryRunPatch.dryRun).toBe(true);
+      expect(dryRunPatch.staleStateAdvisory).toBeUndefined();
+      expect(dryRunPatch.projectStateChanged).toBeUndefined();
+      expect(layout.getObjects().hasObjectNamed('LabelDryRun')).toBe(false);
+
       const validPatchResponse = await bridge.handleRendererMcpRequest({
         method: 'tools/call',
         params: {
@@ -3160,6 +3313,60 @@ describe('McpEditorBridge', () => {
     expect(processEditorFunctionCalls).not.toHaveBeenCalled();
   });
 
+  it('forwards structured add_scene_events payloads without requiring JSON strings', async () => {
+    const processEditorFunctionCalls: any = jest.fn(async () => ({
+      results: [
+        {
+          status: 'finished',
+          call_id: 'mcp-call',
+          success: true,
+          didModifyProject: false,
+          output: {
+            success: true,
+          },
+        },
+      ],
+    }));
+    const bridge = makeBridge({
+      getPermissions: () => ({
+        allowWriteTools: true,
+        allowCommandTools: false,
+      }),
+      processEditorFunctionCalls,
+    });
+
+    const structuredEvents = [
+      {
+        type: 'BuiltinCommonInstructions::Comment',
+        comment: 'Structured payload.',
+        aiGeneratedEventId: 'structured-event-id',
+      },
+    ];
+    const response = await bridge.handleRendererMcpRequest({
+      method: 'tools/call',
+      params: {
+        name: 'add_scene_events',
+        arguments: {
+          scene_name: 'Level1',
+          event_changes: [
+            {
+              operation_name: 'insert_at_end',
+              generated_events: structuredEvents,
+            },
+          ],
+        },
+      },
+    });
+
+    expect(response.isError).not.toBe(true);
+    const editorCall =
+      processEditorFunctionCalls.mock.calls[0][0].functionCalls[0];
+    const forwardedArguments = JSON.parse(editorCall.arguments);
+    expect(forwardedArguments.event_changes[0].generated_events).toEqual(
+      structuredEvents
+    );
+  });
+
   it('reads resource URIs', async () => {
     const bridge = makeBridge();
 
@@ -3474,7 +3681,7 @@ describe('McpEditorBridge', () => {
     });
     const result = JSON.parse(response.content[0].text);
     expect(result.running).toBe(false);
-    expect(result.error).toContain('LAUNCH_NEW_PREVIEW');
+    expect(result.error).toContain('launch_preview');
     expect(result.diagnostics.classification).toBe('no-running-preview');
   });
 
@@ -4002,6 +4209,54 @@ describe('McpEditorBridge', () => {
     }
   });
 
+  it('replaces JavaScript event code by stable event id', async () => {
+    // $FlowFixMe[invalid-constructor]
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    const layout = project.insertNewLayout('Level1', 0);
+    const baseEvent = layout
+      .getEvents()
+      .insertNewEvent(project, 'BuiltinCommonInstructions::JsCode', 0);
+    baseEvent.setAiGeneratedEventId('level-script');
+    const jsEvent = gd.asJsCodeEvent(baseEvent);
+    jsEvent.setInlineCode(
+      'runtimeScene.getVariables().get("Old").setNumber(1);'
+    );
+
+    try {
+      const bridge = makeBridge({
+        getProject: () => project,
+        getPermissions: () => ({
+          allowWriteTools: true,
+          allowCommandTools: false,
+        }),
+      });
+      const response = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'replace_javascript_event_code',
+          arguments: {
+            scene_name: 'Level1',
+            event_id: 'level-script',
+            code_string: 'runtimeScene.getVariables().get("Score").add(1);',
+          },
+        },
+      });
+      const result = JSON.parse(response.content[0].text);
+      expect(response.isError).not.toBe(true);
+      expect(result.success).toBe(true);
+      expect(result.eventPath).toBe('event-0');
+      expect(result.before.code).toContain('"Old"');
+      expect(result.after.code).toContain('"Score"');
+      expect(result.eventsAsText).toContain('JavaScript event');
+      expect(result.eventsAsText).not.toContain('unknown/unsupported');
+      expect(
+        gd.asJsCodeEvent(layout.getEvents().getEventAt(0)).getInlineCode()
+      ).toBe('runtimeScene.getVariables().get("Score").add(1);');
+    } finally {
+      project.delete();
+    }
+  });
+
   it('attaches a UI object to an object top and reports gameplay rule checks', async () => {
     // $FlowFixMe[invalid-constructor]
     const project = new gd.ProjectHelper.createNewGDJSProject();
@@ -4394,7 +4649,7 @@ describe('McpEditorBridge', () => {
     });
     const result = JSON.parse(response.content[0].text);
     expect(result.success).toBe(false);
-    expect(result.error).toContain('LAUNCH_NEW_PREVIEW');
+    expect(result.error).toContain('launch_preview');
   });
 
   it('auto-quotes bare identifier-like string parameters', () => {

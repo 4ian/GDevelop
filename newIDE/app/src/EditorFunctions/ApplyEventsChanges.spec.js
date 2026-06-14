@@ -81,6 +81,44 @@ describe('applyEventsChanges', () => {
     expect(result.errors).toEqual([]);
   });
 
+  it('preserves provided aiGeneratedEventId values when inserting events', () => {
+    const eventOperations: Array<AiGeneratedEventChange> = [
+      {
+        operationName: 'insert_at_end',
+        operationTargetEvent: null,
+        generatedEvents: JSON.stringify([
+          {
+            type: 'BuiltinCommonInstructions::Comment',
+            comment: 'Keep my stable id.',
+            aiGeneratedEventId: 'custom-comment-id',
+          },
+        ]),
+        isEventsJsonValid: true,
+        areEventsValid: true,
+        diagnosticLines: [],
+        extensionNames: [],
+        undeclaredVariables: [],
+        undeclaredObjectVariables: {},
+        missingObjectBehaviors: {},
+        missingResources: [],
+      },
+    ];
+
+    const result = applyEventsChanges(
+      project,
+      sceneEventsList,
+      eventOperations,
+      fakeGeneratedEventId
+    );
+
+    expect(result.applied).toBe(1);
+    expect(result.errors).toEqual([]);
+    expect(sceneEventsList.getEventAt(0).getAiGeneratedEventId()).toBe(
+      'custom-comment-id'
+    );
+    expect(result.aiGeneratedEventIds).toEqual(['custom-comment-id']);
+  });
+
   it('should delete a sub-event', () => {
     sceneEventsList.clear();
     const parentEvent = gd.asGroupEvent(

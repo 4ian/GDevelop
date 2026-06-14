@@ -83,7 +83,7 @@ Read-only context:
 - `compare_image_files`: compare a reference image and current screenshot/render, optionally writing a red diff heatmap for 1:1 remake work.
 - `crop_scene_object_image`: crop and nearest-neighbor zoom a screenshot/render around a scene initial instance by object name, with optional bounds overlay.
 - `inspect_project_cleanup`: read-only cleanup candidates: empty scenes, possibly unused scene objects, invalid resources, unused resources, missing Sprite frame references, and `suspiciousCollisionMasks` (empty custom masks that disable collisions).
-- `describe_instances`: object instances in a scene; use before `put_2d_instances` or `put_3d_instances`.
+- `describe_instances`: object instances in a scene, including non-empty per-instance `initialVariables`; use before `put_2d_instances`, `put_3d_instances`, or `delete_instance_variable`.
 - `inspect_scene_draw_order`: static draw order by layer/zOrder with bounds. Use it to debug overlap/visibility before guessing.
 - `inspect_object_properties`: object properties, behaviors, animations, size hints.
 - `inspect_behavior_properties`: behavior details on an object.
@@ -140,8 +140,9 @@ Write tools:
 - `add_behavior` / `remove_behavior` / `change_behavior_property`: behavior management. `add_behavior` requires `behavior_type` (the internal type, e.g. `PlatformBehavior::PlatformerObjectBehavior`); discover built-in/installed types with `list_available_behaviors`, or community ones with `search_behavior_store`. If `behavior_type` belongs to a community extension that is not installed, `add_behavior` installs it automatically (with any required behaviors). `remove_behavior` and `change_behavior_property` take the behavior NAME (the instance name on the object), not the type. After adding, configure the behavior WITHOUT events via `inspect_behavior_properties` + `change_behavior_property`.
 - `put_2d_instances` / `put_3d_instances`: place, move, update, or erase scene instances. Per-instance, use `align` (`"center"`, `"center-x"`, `"bottom center"`, `"top"`, `"left"`, etc.) to position by the scene resolution without computing `(sceneWidth - objectWidth)/2` yourself, and `initially_hidden:true` to start it not drawn (opacity 0 — note this does NOT stop collisions; for a fully inert hidden object also add a `SceneJustBegins -> Hide` event). Pass `summary_only:true` to omit the full serialized instance list (it grows with every instance in the scene).
 - `add_or_edit_variable`: create or modify global, scene, object, behavior variables.
+- `delete_scene_variable` / `delete_object_variable` / `delete_instance_variable`: delete one variable by name or nested path using focused containers instead of raw serialized patches. Use `delete_instance_variable` for initial-instance `initialVariables` that can remain after object/scene variables are removed.
 - `change_scene_properties_layers_effects_groups`: scene/game properties, layers, effects, object groups. Pass `changed_properties` / `changed_layers` / `changed_layer_effects` / `changed_groups` arrays (see `get_tool_usage_examples`). Create a layer (e.g. a HUD layer) by naming a `layer_name` that does not exist yet in `changed_layers`.
-- `add_scene_events`: direct event sheet edits. Prefer `events_json` or `event_changes`.
+- `add_scene_events`: direct event sheet edits. Prefer `events_json` or `event_changes`; both accept JSON strings or real serialized event arrays/objects.
 - `generate_events`: alias for `add_scene_events`.
 - `create_group`: create an empty scene event Group.
 - `wrap_events_in_group`: create a Group and move sibling target events into it.
@@ -356,7 +357,13 @@ For append-at-end:
 ```json
 {
   "scene_name": "Level1",
-  "events_json": "[{\"type\":\"BuiltinCommonInstructions::Standard\",\"conditions\":[],\"actions\":[]}]"
+  "events_json": [
+    {
+      "type": "BuiltinCommonInstructions::Standard",
+      "conditions": [],
+      "actions": []
+    }
+  ]
 }
 ```
 
@@ -369,7 +376,13 @@ For precise edits:
     {
       "operation_name": "insert_after_event",
       "operation_target_event": "event-0",
-      "generated_events": "[{\"type\":\"BuiltinCommonInstructions::Standard\",\"conditions\":[],\"actions\":[]}]"
+      "generated_events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": []
+        }
+      ]
     }
   ]
 }
@@ -550,7 +563,7 @@ Run a command:
 
 Verify runtime behavior:
 
-1. Launch a preview with `launch_preview` (use `start_paused:true` for a deterministic test from ~frame 0 — the game otherwise runs in real time the instant it loads). Or `gdevelop_run_command { commandName: "LAUNCH_NEW_PREVIEW" }` if you want it running immediately (requires command tools enabled).
+1. Launch a preview with `launch_preview { start_paused: true }` for deterministic tests from ~frame 0. Use raw `gdevelop_run_command { commandName: "LAUNCH_NEW_PREVIEW" }` only when you explicitly want an immediately-running preview and do not need the debugger attach/pause handshake.
 2. Call `gdevelop_inspect_running_preview`. It defaults to the most recently launched preview (`latestDebuggerId`); if several previews are open and you need another, pass `debugger_id`. If `running` is false, relaunch and retry, increasing `timeout_ms` if needed.
 3. Read the result: `status`, `errors` (uncaught exceptions, crashes, error logs — check this first), `logs`, and `runtime` (running scene name, `sceneElapsedTimeSeconds`, `objectInstanceCounts` per object from live instances, and scene/global variable values). The counts are real live-instance counts; you do not need `include_raw_dump`. Use `instance_positions_for: ["Player"]` to read live coordinates. Use `sceneElapsedTimeSeconds` (game time) to judge game speed — do NOT infer it from MCP round-trip latency.
 4. For DETERMINISTIC, reproducible tests, do not race the wall clock (the game keeps running between your MCP calls, so a stand-still player may already be dead by your next call). The simplest robust way is `run_frames` — one call that injects inputs, steps N frames, and returns the resulting state. While any preview is open the desktop app holds a power-save blocker so even a backgrounded/occluded preview's event loop keeps running and `run_frames`/inspect keep working; if a window still won't respond, `control_preview { action: "focus" }` or close-all + relaunch. The longer form (`control_preview { action: "pause" }` → inject input/state → `control_preview { action: "step", frames: N }` → inspect) is equivalent but is several calls. If the live preview is entirely unavailable, you can still check LAYOUT (placement/size) with `render_scene_to_png`, which renders a static diagram without running the game.

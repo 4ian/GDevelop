@@ -280,6 +280,29 @@ ${padding}${actions}`,
       content: `${padding}(link to events in events sheet called "${event.getTarget()}")`,
     };
   },
+  'BuiltinCommonInstructions::JsCode': ({ event, padding }) => {
+    const jsCodeEvent = gd.asJsCodeEvent(event);
+    const inlineCode = jsCodeEvent.getInlineCode();
+    const parameterObjects = jsCodeEvent.getParameterObjects();
+    const maxLines = 6;
+    const codeLines = inlineCode.split(/\r?\n/);
+    const previewLines = codeLines
+      .slice(0, maxLines)
+      .map(line => `${padding}  ${line || ''}`);
+    const codePreview = previewLines.length
+      ? previewLines.join('\n')
+      : `${padding}  (empty)`;
+    const omittedLineCount = Math.max(0, codeLines.length - maxLines);
+    const omittedText = omittedLineCount
+      ? `\n${padding}  [cut - ${omittedLineCount} more line(s)]`
+      : '';
+    const parameterObjectsText = parameterObjects
+      ? ` (objects: ${parameterObjects})`
+      : '';
+    return {
+      content: `${padding}JavaScript event${parameterObjectsText}:\n${codePreview}${omittedText}`,
+    };
+  },
 };
 
 // $FlowFixMe[recursive-definition]

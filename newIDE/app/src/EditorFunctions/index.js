@@ -124,6 +124,10 @@ export type EditorFunctionGenericOutput = {|
   animationNames?: string,
   generatedEventsErrorDiagnostics?: string,
   aiGeneratedEventId?: string,
+  aiGeneratedEventIds?: Array<string>,
+  requestedOperations?: Array<Object>,
+  operationSummary?: { [string]: number },
+  lowLevelMutations?: number,
   warnings?: string,
   errors?: Array<string>,
 
@@ -2534,6 +2538,11 @@ const describeInstances: EditorFunction = {
             : null;
 
           const serializedInstance = serializeToJSObject(instance);
+          const initialVariables =
+            Array.isArray(serializedInstance.initialVariables) &&
+            serializedInstance.initialVariables.length > 0
+              ? serializedInstance.initialVariables
+              : undefined;
           instances.push({
             ...serializedInstance,
             // Replace persistentUuid by id:
@@ -2543,8 +2552,12 @@ const describeInstances: EditorFunction = {
             width,
             height,
             depth,
+            initialVariables,
+            hasInitialVariables: !!initialVariables,
+            instanceVariablesCount: initialVariables
+              ? initialVariables.length
+              : 0,
             // For now, don't expose these:
-            initialVariables: undefined,
             numberProperties: undefined,
             stringProperties: undefined,
           });
@@ -3912,7 +3925,11 @@ const makeDirectEventChange = (
 const makeDirectEventChanges = (
   args: any
 ): Array<AiGeneratedEventChange> | null => {
-  const eventsJson = SafeExtractor.extractStringProperty(args, 'events_json');
+  const eventsJson = getJsonStringPropertyWithAliases(args, [
+    'events_json',
+    'eventsJson',
+    'events',
+  ]);
   if (eventsJson) {
     return [
       {
@@ -3973,6 +3990,15 @@ const formatEventValidationError = (error: ValidationError): string => {
   }`;
 };
 
+const normalizeSerializedEventsInput = (value: any): any => {
+  if (Array.isArray(value)) return value;
+  if (value && typeof value === 'object') {
+    if (Array.isArray(value.events)) return value.events;
+    if (typeof value.type === 'string') return [value];
+  }
+  return value;
+};
+
 const validateDirectEventChangesBeforeApply = ({
   project,
   scene,
@@ -3997,7 +4023,9 @@ const validateDirectEventChangesBeforeApply = ({
 
     let parsedEvents;
     try {
-      parsedEvents = JSON.parse(generatedEvents);
+      parsedEvents = normalizeSerializedEventsInput(
+        JSON.parse(generatedEvents)
+      );
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : String(error);
@@ -4010,7 +4038,7 @@ const validateDirectEventChangesBeforeApply = ({
     if (!Array.isArray(parsedEvents)) {
       errors.push(
         `Event change ${changeIndex +
-          1} generated_events must be a JSON array of serialized events.`
+          1} generated_events must be a serialized event array, a single serialized event object, or an object with an events array.`
       );
       return;
     }
@@ -4426,7 +4454,7 @@ const addSceneEvents: EditorFunction = {
           };
         }
 
-        const { applied, errors } = applyEventsChanges(
+        const { applied, errors, aiGeneratedEventIds } = applyEventsChanges(
           project,
           currentSceneEvents,
           directEventChanges,
@@ -4441,9 +4469,13 @@ const addSceneEvents: EditorFunction = {
           };
         }
 
+        const changedAiGeneratedEventIds =
+          aiGeneratedEventIds.length > 0
+            ? aiGeneratedEventIds
+            : [directGeneratedEventId];
         onSceneEventsModifiedOutsideEditor({
           scene,
-          newOrChangedAiGeneratedEventIds: new Set([directGeneratedEventId]),
+          newOrChangedAiGeneratedEventIds: new Set(changedAiGeneratedEventIds),
         });
 
         const allMissingResources = directEventChanges.flatMap(
@@ -4463,10 +4495,11 @@ const addSceneEvents: EditorFunction = {
           operation: change.operationName,
           target: change.operationTargetEvent || null,
         }));
-        const operationSummary = requestedOperations.reduce((acc, op) => {
-          acc[op.operation] = (acc[op.operation] || 0) + 1;
-          return acc;
-        }, {});
+        const operationSummary: { [string]: number } = {};
+        requestedOperations.forEach(op => {
+          operationSummary[op.operation] =
+            (operationSummary[op.operation] || 0) + 1;
+        });
 
         return {
           success: true,
@@ -4478,7 +4511,8 @@ const addSceneEvents: EditorFunction = {
           requestedOperations,
           operationSummary,
           lowLevelMutations: applied,
-          aiGeneratedEventId: directGeneratedEventId,
+          aiGeneratedEventId: changedAiGeneratedEventIds[0],
+          aiGeneratedEventIds: changedAiGeneratedEventIds,
           newlyAddedResources,
           ...(errors.length > 0 ? { errors } : undefined),
         };

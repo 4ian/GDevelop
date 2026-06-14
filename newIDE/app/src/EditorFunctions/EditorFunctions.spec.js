@@ -1272,6 +1272,9 @@ describe('editorFunctions', () => {
       expect(result).toMatchInlineSnapshot(`
         Object {
           "aiGeneratedEventId": "mcp-direct-event",
+          "aiGeneratedEventIds": Array [
+            "mcp-direct-event",
+          ],
           "lowLevelMutations": 1,
           "message": "Applied 1 requested event operation(s) (insert_at_end: 1); 1 low-level event mutation(s).",
           "newlyAddedResources": Array [
@@ -1298,6 +1301,48 @@ describe('editorFunctions', () => {
       expect(onSceneEventsModifiedOutsideEditor).toHaveBeenCalledWith({
         scene: testScene,
         newOrChangedAiGeneratedEventIds: new Set(['mcp-direct-event']),
+      });
+    });
+
+    it('accepts a direct structured events_json array and preserves event ids', async () => {
+      // $FlowFixMe[underconstrained-implicit-instantiation]
+      const generateEvents = jest.fn();
+      // $FlowFixMe[underconstrained-implicit-instantiation]
+      const onSceneEventsModifiedOutsideEditor = jest.fn();
+
+      const result = await editorFunctions.add_scene_events.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          events_json: [
+            {
+              type: 'BuiltinCommonInstructions::Comment',
+              comment: 'Structured event array.',
+              aiGeneratedEventId: 'structured-comment-id',
+            },
+          ],
+        },
+        relatedAiRequestId: null,
+        generateEvents,
+        onSceneEventsModifiedOutsideEditor,
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.aiGeneratedEventId).toBe('structured-comment-id');
+      expect((result: any).aiGeneratedEventIds).toEqual([
+        'structured-comment-id',
+      ]);
+      expect(testScene.getEvents().getEventsCount()).toBe(1);
+      expect(
+        testScene
+          .getEvents()
+          .getEventAt(0)
+          .getAiGeneratedEventId()
+      ).toBe('structured-comment-id');
+      expect(generateEvents).not.toHaveBeenCalled();
+      expect(onSceneEventsModifiedOutsideEditor).toHaveBeenCalledWith({
+        scene: testScene,
+        newOrChangedAiGeneratedEventIds: new Set(['structured-comment-id']),
       });
     });
 
@@ -1344,6 +1389,47 @@ describe('editorFunctions', () => {
       expect(testScene.getEvents().getEventsCount()).toBe(0);
       expect(generateEvents).not.toHaveBeenCalled();
       expect(onSceneEventsModifiedOutsideEditor).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('describe_instances', () => {
+    it('reports non-empty initial instance variables', async () => {
+      // $FlowFixMe[invalid-constructor]
+      const project = new gd.ProjectHelper.createNewGDJSProject();
+      const scene = project.insertNewLayout('TestScene', 0);
+      scene.getObjects().insertNewObject(project, 'Sprite', 'GroundSlot', 0);
+      const instance = scene.getInitialInstances().insertNewInitialInstance();
+      instance.setObjectName('GroundSlot');
+      instance
+        .getVariables()
+        .insertNew('IsAnchor', 0)
+        .setBool(true);
+
+      try {
+        const result = await editorFunctions.describe_instances.launchFunction({
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+          },
+        });
+
+        expect(result.success).toBe(true);
+        expect((result: any).instances[0]).toEqual(
+          expect.objectContaining({
+            name: 'GroundSlot',
+            hasInitialVariables: true,
+            instanceVariablesCount: 1,
+            initialVariables: [
+              expect.objectContaining({
+                name: 'IsAnchor',
+                type: 'boolean',
+              }),
+            ],
+          })
+        );
+      } finally {
+        project.delete();
+      }
     });
   });
 

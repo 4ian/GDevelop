@@ -1961,6 +1961,39 @@ const patchSceneEventInstructionSchema = {
   additionalProperties: true,
 };
 
+const replaceJavascriptEventCodeSchema = {
+  type: 'object',
+  properties: {
+    scene_name: sceneNameSchema.properties.scene_name,
+    event: {
+      type: 'object',
+      description:
+        'Stable event target. Prefer { ai_generated_event_id } or { event_path }.',
+      additionalProperties: true,
+    },
+    event_id: {
+      type: 'string',
+      description: 'Alias for event.ai_generated_event_id.',
+    },
+    event_path: {
+      type: 'string',
+      description: 'Alias for event.event_path, for example event-0.1.',
+    },
+    code_string: {
+      type: 'string',
+      description: 'Complete replacement JavaScript inline code.',
+    },
+    parameter_objects: {
+      type: 'string',
+      description:
+        'Optional comma-separated object names exposed to the JavaScript event.',
+    },
+    summary_only: patchSceneEventInstructionSchema.properties.summary_only,
+  },
+  required: ['scene_name', 'code_string'],
+  additionalProperties: true,
+};
+
 const attachObjectToObjectTopSchema = {
   type: 'object',
   properties: {
@@ -2235,16 +2268,47 @@ const addSceneEventsSchema = {
   properties: {
     scene_name: sceneNameSchema.properties.scene_name,
     events_json: {
-      type: 'string',
+      oneOf: [
+        { type: 'string' },
+        {
+          type: 'array',
+          items: { type: 'object', additionalProperties: true },
+        },
+        { type: 'object', additionalProperties: true },
+      ],
       description:
-        'Serialized GDevelop events JSON array to insert directly. Prefer this for MCP clients that already generated the events, as it does not call the GDevelop event generation service.',
+        'Serialized GDevelop events to insert directly. Accepts a JSON string, an events array, a single serialized event object, or { events: [...] }. Prefer this for MCP clients that already generated the events, as it does not call the GDevelop event generation service.',
     },
     event_changes: {
       type: 'array',
       description:
-        'Advanced direct event operations. Each change can include operation_name, operation_target_event, generated_events, extension_names, missing_resources, undeclared_variables, undeclared_object_variables, and missing_object_behaviors.',
+        'Advanced direct event operations. Each change can include operation_name, operation_target_event, generated_events, extension_names, missing_resources, undeclared_variables, undeclared_object_variables, and missing_object_behaviors. generated_events accepts a JSON string, events array, a single serialized event object, or { events: [...] }.',
       items: {
         type: 'object',
+        properties: {
+          operation_name: {
+            type: 'string',
+            description:
+              'Operation such as insert_at_end, insert_before_event, insert_after_event, replace_entire_event_and_sub_events, replace_event_but_keep_existing_sub_events, or delete_event.',
+          },
+          operation_target_event: {
+            type: 'string',
+            description:
+              'Stable aiGeneratedEventId or event path target. Not required for insert_at_end.',
+          },
+          generated_events: {
+            oneOf: [
+              { type: 'string' },
+              {
+                type: 'array',
+                items: { type: 'object', additionalProperties: true },
+              },
+              { type: 'object', additionalProperties: true },
+            ],
+            description:
+              'Events to insert/replace. Accepts a JSON string, an events array, a single serialized event object, or { events: [...] }.',
+          },
+        },
         additionalProperties: true,
       },
     },
@@ -2255,6 +2319,61 @@ const addSceneEventsSchema = {
     },
   },
   required: ['scene_name'],
+  additionalProperties: true,
+};
+
+const deleteSceneVariableSchema = {
+  type: 'object',
+  properties: {
+    scene_name: sceneNameSchema.properties.scene_name,
+    variable_name_or_path: {
+      type: 'string',
+      description:
+        'Scene variable name or nested path, for example Score, State.Mode, or Inventory[0].Name.',
+    },
+  },
+  required: ['scene_name', 'variable_name_or_path'],
+  additionalProperties: true,
+};
+
+const deleteObjectVariableSchema = {
+  type: 'object',
+  properties: {
+    scene_name: sceneNameSchema.properties.scene_name,
+    object_name: {
+      type: 'string',
+      description: 'Scene or global object whose object variable is deleted.',
+    },
+    variable_name_or_path:
+      deleteSceneVariableSchema.properties.variable_name_or_path,
+  },
+  required: ['scene_name', 'object_name', 'variable_name_or_path'],
+  additionalProperties: true,
+};
+
+const deleteInstanceVariableSchema = {
+  type: 'object',
+  properties: {
+    scene_name: sceneNameSchema.properties.scene_name,
+    instance_id: {
+      type: 'string',
+      description:
+        'Short instance id from describe_instances. Prefer this when available.',
+    },
+    object_name: {
+      type: 'string',
+      description:
+        'Object name used when instance_id is omitted. Targets the first matching instance unless instance_index is provided.',
+    },
+    instance_index: {
+      type: 'number',
+      description:
+        'Zero-based index among initial instances of object_name. Defaults to 0.',
+    },
+    variable_name_or_path:
+      deleteSceneVariableSchema.properties.variable_name_or_path,
+  },
+  required: ['scene_name', 'variable_name_or_path'],
   additionalProperties: true,
 };
 
@@ -3222,7 +3341,7 @@ const readTools: Array<McpTool> = [
   {
     name: 'gdevelop_inspect_running_preview',
     description:
-      'Inspect a currently running preview to verify runtime behavior: returns whether a preview is running (defaulting to the latest launched one), its status, captured console logs, a separate errors list (uncaught exceptions, crashes, error-level logs), recentSounds (history since last inspect), activeSounds (sounds/musics currently playing incl. looping BGM), inputState (live pressed keys/mouse), and a compact runtime snapshot (running scene name, sceneElapsedTimeSeconds, per-object live instance counts, scene/global variable values). Launch a preview first with gdevelop_run_command { commandName: "LAUNCH_NEW_PREVIEW" }. Use this to confirm a game actually runs and behaves, not just that a preview was launched.',
+      'Inspect a currently running preview to verify runtime behavior: returns whether a preview is running (defaulting to the latest launched one), its status, captured console logs, a separate errors list (uncaught exceptions, crashes, error-level logs), recentSounds (history since last inspect), activeSounds (sounds/musics currently playing incl. looping BGM), inputState (live pressed keys/mouse), and a compact runtime snapshot (running scene name, sceneElapsedTimeSeconds, per-object live instance counts, scene/global variable values). Launch first with launch_preview { start_paused: true }, then advance with run_frames for deterministic tests. Use this to confirm a game actually runs and behaves, not just that a preview was launched.',
     inputSchema: inspectRunningPreviewSchema,
   },
   {
@@ -3234,7 +3353,7 @@ const readTools: Array<McpTool> = [
   {
     name: 'capture_preview_screenshot',
     description:
-      'Capture a PNG screenshot of the current rendered frame from a running preview, to visually verify sprites, layout, and colors. Captured from the MAIN process (webContents.capturePage) when available, so it works even for a backgrounded preview whose renderer is suspended; falls back to the in-game canvas otherwise. Writes the PNG to file_path (recommended) or returns it as a base64 data URL. Note: a screenshot reflects the last RENDERED frame — for state verification that does not need rendering, use run_frames / gdevelop_inspect_running_preview. Launch a preview first with gdevelop_run_command { commandName: "LAUNCH_NEW_PREVIEW" }.',
+      'Capture a PNG screenshot of the current rendered frame from a running preview, to visually verify sprites, layout, and colors. Captured from the MAIN process (webContents.capturePage) when available, so it works even for a backgrounded preview whose renderer is suspended; falls back to the in-game canvas otherwise. Writes the PNG to file_path (recommended) or returns it as a base64 data URL. Note: a screenshot reflects the last RENDERED frame — for state verification that does not need rendering, use run_frames / gdevelop_inspect_running_preview. Launch first with launch_preview { start_paused: true }, then advance with run_frames if needed.',
     inputSchema: capturePreviewScreenshotSchema,
   },
   {
@@ -3649,6 +3768,12 @@ const writeTools: Array<McpTool> = [
     inputSchema: patchSceneEventInstructionSchema,
   },
   {
+    name: 'replace_javascript_event_code',
+    description:
+      'Replace the inline code of one existing JavaScript event by stable event id/path, without replacing the whole parent event.',
+    inputSchema: replaceJavascriptEventCodeSchema,
+  },
+  {
     name: 'attach_object_to_object_top',
     description:
       'Add a high-level follow event that keeps one object centered above another object top, useful for health bars/nameplates without hand-written X()-40/Y()-38 formulas.',
@@ -3695,6 +3820,24 @@ const writeTools: Array<McpTool> = [
     description:
       'Add or edit ONE global, scene, object, or behavior variable. To declare MANY variables at once (e.g. an object with hp/points/speed), prefer bulk_edit_scene_assets with its variables array (supports scope "scene"/"global"/"object") — one call instead of N.',
     inputSchema: variableSchema,
+  },
+  {
+    name: 'delete_scene_variable',
+    description:
+      'Delete one scene variable by name or nested path using the scene variable container, without applying a raw serialized scene patch.',
+    inputSchema: deleteSceneVariableSchema,
+  },
+  {
+    name: 'delete_object_variable',
+    description:
+      'Delete one object variable by name or nested path from a scene/global object, without replacing the whole object definition.',
+    inputSchema: deleteObjectVariableSchema,
+  },
+  {
+    name: 'delete_instance_variable',
+    description:
+      'Delete one initial instance variable by instance id or object/index, so per-instance initialVariables are not missed.',
+    inputSchema: deleteInstanceVariableSchema,
   },
   {
     name: 'create_or_update_plan',
@@ -4239,6 +4382,42 @@ const toolUsageExamples: { [string]: Array<Object> } = {
       },
     },
   ],
+  add_scene_events: [
+    {
+      description:
+        'Append a serialized event array directly. aiGeneratedEventId values in the events are preserved.',
+      arguments: {
+        scene_name: 'Level1',
+        events_json: [
+          {
+            type: 'BuiltinCommonInstructions::Comment',
+            aiGeneratedEventId: 'intro-comment',
+            comment: 'Initialize the level state.',
+          },
+        ],
+      },
+    },
+    {
+      description:
+        'Insert events after a target event using event_changes with a real JSON array, not a JSON string.',
+      arguments: {
+        scene_name: 'Level1',
+        event_changes: [
+          {
+            operation_name: 'insert_after_event',
+            operation_target_event: 'intro-comment',
+            generated_events: [
+              {
+                type: 'BuiltinCommonInstructions::Comment',
+                aiGeneratedEventId: 'after-intro-comment',
+                comment: 'Spawn the first wave.',
+              },
+            ],
+          },
+        ],
+      },
+    },
+  ],
   apply_validated_scene_patch: [
     {
       description:
@@ -4267,6 +4446,19 @@ const toolUsageExamples: { [string]: Array<Object> } = {
         instruction_type: 'SetX',
         object_name: 'HealthBar',
         parameters: ['HealthBar', '=', 'Enemy.CenterX()-HealthBar.Width()/2'],
+        summary_only: true,
+      },
+    },
+  ],
+  replace_javascript_event_code: [
+    {
+      description:
+        'Replace only the inline code of an existing JavaScript event.',
+      arguments: {
+        scene_name: 'Level1',
+        event_id: 'level-script',
+        code_string:
+          'const dt = runtimeScene.getElapsedTime() / 1000;\\nruntimeScene.getVariables().get("Elapsed").add(dt);',
         summary_only: true,
       },
     },
@@ -4780,6 +4972,47 @@ const toolUsageExamples: { [string]: Array<Object> } = {
       },
     },
   ],
+  delete_scene_variable: [
+    {
+      description:
+        'Delete a scene variable by name or nested path without a serialized scene patch.',
+      arguments: {
+        scene_name: 'Level1',
+        variable_name_or_path: 'Score',
+      },
+    },
+  ],
+  delete_object_variable: [
+    {
+      description:
+        'Delete an object variable without replacing the full object definition.',
+      arguments: {
+        scene_name: 'Level1',
+        object_name: 'Player',
+        variable_name_or_path: 'Health',
+      },
+    },
+  ],
+  delete_instance_variable: [
+    {
+      description:
+        'Delete a per-instance initial variable using an id from describe_instances.',
+      arguments: {
+        scene_name: 'Level1',
+        instance_id: 'abcdef1234',
+        variable_name_or_path: 'IsAnchor',
+      },
+    },
+    {
+      description:
+        'Delete a per-instance initial variable from the first instance of an object.',
+      arguments: {
+        scene_name: 'Level1',
+        object_name: 'GroundSlot',
+        variable_name_or_path: 'IsAnchor',
+      },
+    },
+  ],
   add_behavior: [
     {
       description:
@@ -4989,6 +5222,7 @@ export const getCapabilitiesSummary = (
       'create_condition',
       'add_scene_events',
       'patch_scene_event_instruction',
+      'replace_javascript_event_code',
       'attach_object_to_object_top',
       'validate_events_json_file',
       'lint_scene_events',
@@ -4997,6 +5231,9 @@ export const getCapabilitiesSummary = (
     ],
     'Variables & scenes': [
       'add_or_edit_variable',
+      'delete_scene_variable',
+      'delete_object_variable',
+      'delete_instance_variable',
       'create_scene',
       'rename_scene',
       'set_first_layout',

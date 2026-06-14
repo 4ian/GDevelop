@@ -852,7 +852,7 @@ export const getEventOperationReference = (): Object => ({
   targetPathFormat:
     'Use event-0 for the first root event, event-0.1 for the second sub-event of the first root event, or an aiGeneratedEventId previously assigned by GDevelop.',
   generatedEventsFormat:
-    'generated_events must be a JSON string containing an array of serialized GDevelop events. The same array string can also be passed as events_json when using add_scene_events.',
+    'generated_events can be a JSON string, a serialized events array, a single serialized event object, or { events: [...] }. The same value can also be passed as events_json when using add_scene_events.',
   operations: [
     {
       name: 'insert_at_end',

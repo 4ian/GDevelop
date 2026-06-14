@@ -12,7 +12,7 @@ import {
   type McpPermissionOptions,
 } from './McpToolCatalog';
 import { makeSimplifiedProjectBuilder } from '../EditorFunctions/SimplifiedProject/SimplifiedProject';
-import { serializeToJSON } from '../Utils/Serializer';
+import { serializeToJSON, serializeToJSObject } from '../Utils/Serializer';
 import { renderNonTranslatedEventsAsText } from '../EventsSheet/EventsTree/TextRenderer';
 import { mapFor } from '../Utils/MapFor';
 import { type EditorCallbacks } from '../EditorFunctions';
@@ -55,6 +55,9 @@ import {
   createSpriteObjectFromResource,
   createTextObject,
   deleteSceneObject,
+  deleteSceneVariable,
+  deleteObjectVariable,
+  deleteInstanceVariable,
   generatePlaceholderAsset,
   renderSceneToPng,
   inspectProjectCleanup,
@@ -93,6 +96,7 @@ import {
   moveEventsToGroup,
   patchSceneEventInstruction,
   renameGroup,
+  replaceJavascriptEventCode,
   replaceSceneEventsFromFile,
   wrapEventsInGroup,
 } from './McpEventTools';
@@ -300,15 +304,129 @@ const getEditorState = (
 const getProjectSummary = (project: gdProject, sceneName?: ?string): Object => {
   const simplifiedProjectBuilder = makeSimplifiedProjectBuilder(gd);
   const { projectFile, projectFolder } = getProjectFileLocation(project);
+  const simplifiedProject = simplifiedProjectBuilder.getSimplifiedProject(
+    project,
+    {
+      scopeToScene: sceneName || undefined,
+    }
+  );
+  annotateSummaryBehaviorSources(project, simplifiedProject);
+  annotateSummaryInstanceVariables(project, simplifiedProject);
   return {
     projectName: project.getName(),
     projectUuid: project.getProjectUuid(),
     projectFile,
     projectFolder,
-    ...simplifiedProjectBuilder.getSimplifiedProject(project, {
-      scopeToScene: sceneName || undefined,
-    }),
+    behaviorSourceLegend: {
+      explicitSerialized:
+        'Behavior is explicitly stored on the object in serialized project data.',
+      defaultCapabilityInferred:
+        'Behavior is a default GDevelop object capability surfaced by the object API; read_serialized_scene may still show behaviors: [] because only explicit serialized behaviors are stored there.',
+    },
+    ...simplifiedProject,
   };
+};
+
+const annotateSimplifiedObjectBehaviorSources = (
+  object: gdObject,
+  simplifiedObject: Object
+) => {
+  if (!simplifiedObject || !Array.isArray(simplifiedObject.behaviors)) return;
+  simplifiedObject.behaviors = simplifiedObject.behaviors.map(behavior => {
+    let isDefaultCapability = false;
+    try {
+      if (object.hasBehaviorNamed(behavior.behaviorName)) {
+        const gdBehavior = object.getBehavior(behavior.behaviorName);
+        isDefaultCapability = gdBehavior.isDefaultBehavior();
+      }
+    } catch (error) {
+      isDefaultCapability = false;
+    }
+    return {
+      ...behavior,
+      behaviorSource: isDefaultCapability
+        ? 'defaultCapabilityInferred'
+        : 'explicitSerialized',
+      isDefaultCapability,
+    };
+  });
+};
+
+const annotateSimplifiedObjectsBehaviorSources = (
+  objects: gdObjectsContainer,
+  simplifiedObjects: ?Array<Object>
+) => {
+  if (!Array.isArray(simplifiedObjects)) return;
+  simplifiedObjects.forEach(simplifiedObject => {
+    const objectName = simplifiedObject && simplifiedObject.objectName;
+    if (!objectName || !objects.hasObjectNamed(objectName)) return;
+    annotateSimplifiedObjectBehaviorSources(
+      objects.getObject(objectName),
+      simplifiedObject
+    );
+  });
+};
+
+const annotateSummaryBehaviorSources = (
+  project: gdProject,
+  simplifiedProject: Object
+) => {
+  annotateSimplifiedObjectsBehaviorSources(
+    project.getObjects(),
+    simplifiedProject.globalObjects
+  );
+  if (!Array.isArray(simplifiedProject.scenes)) return;
+  simplifiedProject.scenes.forEach(sceneSummary => {
+    const sceneName = sceneSummary && sceneSummary.sceneName;
+    if (!sceneName || !project.hasLayoutNamed(sceneName)) return;
+    annotateSimplifiedObjectsBehaviorSources(
+      project.getLayout(sceneName).getObjects(),
+      sceneSummary.objects
+    );
+  });
+};
+
+const collectInitialInstanceVariablesSummary = (
+  scene: gdLayout
+): Array<Object> => {
+  const serializedScene = serializeToJSObject(scene);
+  const instances = Array.isArray(serializedScene.instances)
+    ? serializedScene.instances
+    : [];
+  return instances
+    .map((instance, sourceIndex) => {
+      const initialVariables = Array.isArray(instance.initialVariables)
+        ? instance.initialVariables
+        : [];
+      if (!initialVariables.length) return null;
+      return {
+        objectName: instance.name || instance.objectName || '',
+        sourceIndex,
+        instanceId:
+          typeof instance.persistentUuid === 'string'
+            ? instance.persistentUuid.slice(0, 10)
+            : undefined,
+        initialVariables,
+      };
+    })
+    .filter(Boolean);
+};
+
+const annotateSummaryInstanceVariables = (
+  project: gdProject,
+  simplifiedProject: Object
+) => {
+  if (!Array.isArray(simplifiedProject.scenes)) return;
+  simplifiedProject.scenes.forEach(sceneSummary => {
+    const sceneName = sceneSummary && sceneSummary.sceneName;
+    if (!sceneName || !project.hasLayoutNamed(sceneName)) return;
+    const instanceInitialVariables = collectInitialInstanceVariablesSummary(
+      project.getLayout(sceneName)
+    );
+    if (instanceInitialVariables.length) {
+      sceneSummary.instanceInitialVariables = instanceInitialVariables;
+    }
+  });
 };
 
 const getProjectExtensionsSummary = (project: gdProject): Object => {
@@ -669,7 +787,7 @@ const captureRunningPreviewState = (
         success: false,
         running: false,
         error:
-          'No preview is running. Launch a preview first with gdevelop_run_command { commandName: "LAUNCH_NEW_PREVIEW" }, then inspect it.',
+          'No preview is running. Launch a preview first with launch_preview { start_paused: true }, then inspect it or advance with run_frames.',
         diagnostics: buildPreviewDiagnostics({
           running: false,
           operation: 'inspect',
@@ -687,7 +805,7 @@ const captureRunningPreviewState = (
         success: false,
         running: false,
         error:
-          'No preview is currently connected. Launch a preview first with gdevelop_run_command { commandName: "LAUNCH_NEW_PREVIEW" }.',
+          'No preview is currently connected. Launch a preview first with launch_preview { start_paused: true }.',
         diagnostics: buildPreviewDiagnostics({
           running: true,
           previewIds: [],
@@ -789,7 +907,7 @@ const captureRunningPreviewState = (
         }),
         note: dumpPayload
           ? undefined
-          : 'No runtime dump was received before the timeout — the preview connected but did not respond (commonly because the OS throttled a backgrounded/unfocused preview window). Remediation: close all previews with control_preview { action: "close", close_all: true }, then LAUNCH_NEW_PREVIEW again and inspect promptly; or increase timeout_ms. status/logs may still be useful.',
+          : 'No runtime dump was received before the timeout — the preview connected but did not respond. Remediation: close all previews with control_preview { action: "close", close_all: true }, then launch_preview { start_paused: true } and advance with run_frames; or increase timeout_ms. status/logs may still be useful.',
       });
     };
 
@@ -1433,7 +1551,7 @@ const requireRunningPreview = (
         success: false,
         running: false,
         error:
-          'No preview is running. Launch a preview first with gdevelop_run_command { commandName: "LAUNCH_NEW_PREVIEW" }.',
+          'No preview is running. Launch a preview first with launch_preview { start_paused: true }, then use run_frames.',
         diagnostics: buildPreviewDiagnostics({
           running: false,
           operation: 'runtime-request',
@@ -2179,39 +2297,87 @@ const autoQuoteAddSceneEventsArgs = (
   args: Object
 ): Object => {
   if (!project || !args) return args;
-  const normalizeJsonString = (jsonString: any): any => {
-    if (typeof jsonString !== 'string' || !jsonString.trim()) return jsonString;
+  const normalizeEventsPayload = (eventsPayload: any): any => {
+    if (
+      typeof eventsPayload !== 'string' &&
+      !Array.isArray(eventsPayload) &&
+      !(eventsPayload && typeof eventsPayload === 'object')
+    ) {
+      return eventsPayload;
+    }
+
+    const originalWasString = typeof eventsPayload === 'string';
+    let parsed;
     try {
-      const parsed = JSON.parse(jsonString);
-      if (!Array.isArray(parsed)) return jsonString;
+      parsed = originalWasString
+        ? JSON.parse(eventsPayload)
+        : JSON.parse(JSON.stringify(eventsPayload));
+      if (parsed && !Array.isArray(parsed) && Array.isArray(parsed.events)) {
+        parsed = parsed.events;
+      } else if (
+        parsed &&
+        !Array.isArray(parsed) &&
+        typeof parsed.type === 'string'
+      ) {
+        parsed = [parsed];
+      }
+      if (!Array.isArray(parsed)) return eventsPayload;
       const changed = autoQuoteEventParameters(project, parsed);
-      return changed > 0 ? JSON.stringify(parsed) : jsonString;
+      if (originalWasString) {
+        return changed > 0 ? JSON.stringify(parsed) : eventsPayload;
+      }
+      return changed > 0 ? parsed : eventsPayload;
     } catch (error) {
       // Leave invalid JSON untouched; validation will report it.
-      return jsonString;
+      return eventsPayload;
     }
   };
 
   const next = { ...args };
-  if (typeof next.events_json === 'string') {
-    next.events_json = normalizeJsonString(next.events_json);
+  if (
+    typeof next.events_json === 'string' ||
+    Array.isArray(next.events_json) ||
+    (next.events_json && typeof next.events_json === 'object')
+  ) {
+    next.events_json = normalizeEventsPayload(next.events_json);
   }
   if (Array.isArray(next.event_changes)) {
     next.event_changes = next.event_changes.map(change => {
       if (!change || typeof change !== 'object') return change;
       const updated = { ...change };
-      if (typeof updated.generated_events === 'string') {
-        updated.generated_events = normalizeJsonString(
+      if (
+        typeof updated.generated_events === 'string' ||
+        Array.isArray(updated.generated_events) ||
+        (updated.generated_events &&
+          typeof updated.generated_events === 'object')
+      ) {
+        updated.generated_events = normalizeEventsPayload(
           updated.generated_events
         );
       }
-      if (typeof updated.generatedEvents === 'string') {
-        updated.generatedEvents = normalizeJsonString(updated.generatedEvents);
+      if (
+        typeof updated.generatedEvents === 'string' ||
+        Array.isArray(updated.generatedEvents) ||
+        (updated.generatedEvents && typeof updated.generatedEvents === 'object')
+      ) {
+        updated.generatedEvents = normalizeEventsPayload(
+          updated.generatedEvents
+        );
       }
       return updated;
     });
   }
   return next;
+};
+
+const getEventsJsonArgument = (args: ?Object): string | null => {
+  if (!args) return null;
+  const eventsJson = args.events_json || args.eventsJson || args.events;
+  if (typeof eventsJson === 'string') return eventsJson;
+  if (eventsJson !== null && eventsJson !== undefined) {
+    return JSON.stringify(eventsJson);
+  }
+  return null;
 };
 
 const getPrompt = (name: string) => {
@@ -2611,10 +2777,7 @@ const callMcpTool = async ({
         project,
         sceneName:
           args && typeof args.scene_name === 'string' ? args.scene_name : null,
-        eventsJson:
-          args && typeof args.events_json === 'string'
-            ? args.events_json
-            : null,
+        eventsJson: getEventsJsonArgument(args),
         allowJavaScriptEvents: !!(args && args.allow_javascript_events),
         dedupeErrors: !!(args && args.dedupe_errors),
       })
@@ -3177,7 +3340,16 @@ const callMcpTool = async ({
     }
     const didRun = context.runCommand(commandName);
     return didRun
-      ? textResult({ commandName, launched: true })
+      ? textResult({
+          commandName,
+          launched: true,
+          ...(commandName === 'LAUNCH_NEW_PREVIEW'
+            ? {
+                note:
+                  'For MCP runtime tests, prefer launch_preview { start_paused: true }, then run_frames. It attaches to the debugger and avoids stale or already-running previews.',
+              }
+            : undefined),
+        })
       : errorResult(`Unknown or unavailable command: ${commandName}.`);
   }
 
@@ -3241,7 +3413,7 @@ const callMcpTool = async ({
     }
     if (
       (args.name === 'add_scene_events' || args.name === 'generate_events') &&
-      !editorFunctionArgs.events_json &&
+      !getEventsJsonArgument(editorFunctionArgs) &&
       !editorFunctionArgs.event_changes
     ) {
       return errorResult(mcpDirectEventsRequiredMessage);
@@ -3261,7 +3433,7 @@ const callMcpTool = async ({
 
   if (
     (toolName === 'add_scene_events' || toolName === 'generate_events') &&
-    !args.events_json &&
+    !getEventsJsonArgument(args) &&
     !args.event_changes
   ) {
     return errorResult(mcpDirectEventsRequiredMessage);
@@ -3415,6 +3587,12 @@ const callMcpTool = async ({
     sceneWriteToolHandler = replaceObjectDefinition;
   } else if (toolName === 'delete_scene_object') {
     sceneWriteToolHandler = deleteSceneObject;
+  } else if (toolName === 'delete_scene_variable') {
+    sceneWriteToolHandler = deleteSceneVariable;
+  } else if (toolName === 'delete_object_variable') {
+    sceneWriteToolHandler = deleteObjectVariable;
+  } else if (toolName === 'delete_instance_variable') {
+    sceneWriteToolHandler = deleteInstanceVariable;
   } else if (toolName === 'set_object_properties') {
     sceneWriteToolHandler = setObjectProperties;
   } else if (toolName === 'set_text_object_properties') {
@@ -3429,6 +3607,8 @@ const callMcpTool = async ({
     sceneWriteToolHandler = applyValidatedScenePatch;
   } else if (toolName === 'patch_scene_event_instruction') {
     sceneWriteToolHandler = patchSceneEventInstruction;
+  } else if (toolName === 'replace_javascript_event_code') {
+    sceneWriteToolHandler = replaceJavascriptEventCode;
   } else if (toolName === 'attach_object_to_object_top') {
     sceneWriteToolHandler = attachObjectToObjectTop;
   } else if (toolName === 'create_group') {
@@ -3448,14 +3628,19 @@ const callMcpTool = async ({
   if (sceneWriteToolHandler) {
     if (!project) return errorResult('No project opened.');
     try {
-      const result = sceneWriteToolHandler(project, args || {}, {
+      const runSceneWriteTool: (
+        project: gdProject,
+        args: Object,
+        callbacks: Object
+      ) => Object = (sceneWriteToolHandler: any);
+      const result = runSceneWriteTool(project, args || {}, {
         onSceneEventsModifiedOutsideEditor:
           context.onSceneEventsModifiedOutsideEditor,
         onInstancesModifiedOutsideEditor:
           context.onInstancesModifiedOutsideEditor,
         onObjectsModifiedOutsideEditor: context.onObjectsModifiedOutsideEditor,
       });
-      // A dry_run handler returns without mutating — don't mark the project
+      // A dry_run handler returns without mutating - don't mark the project
       // dirty and don't run any follow-up writes (e.g. the bulk events step).
       const isDryRun = !!(
         args &&
@@ -3463,11 +3648,12 @@ const callMcpTool = async ({
         result &&
         result.dryRun === true
       );
-      if (!isDryRun) context.triggerUnsavedChanges();
+      const didModifyProject = !(result && result.didModifyProject === false);
+      if (!isDryRun && didModifyProject) context.triggerUnsavedChanges();
 
       // bulk_edit_scene_assets can also write events in the same call. Events are
       // applied LAST (after resources/objects/animations/behaviors/variables/
-      // instances) and go through the SAME validated add_scene_events path — no
+      // instances) and go through the SAME validated add_scene_events path - no
       // structural validation (e.g. Or/And subInstructions checks) is bypassed.
       // CRITICAL: when dry_run is set, the assets handler returned WITHOUT
       // mutating; we must NOT write events either, or dry_run would still change
@@ -3476,16 +3662,11 @@ const callMcpTool = async ({
         !isDryRun &&
         toolName === 'bulk_edit_scene_assets' &&
         args &&
-        (typeof args.events_json === 'string' ||
+        (getEventsJsonArgument(args) ||
           Array.isArray(args.events) ||
           Array.isArray(args.event_changes))
       ) {
-        const eventsJson =
-          typeof args.events_json === 'string'
-            ? args.events_json
-            : Array.isArray(args.events)
-            ? JSON.stringify(args.events)
-            : undefined;
+        const eventsJson = getEventsJsonArgument(args);
         const eventsArgs = {
           scene_name: args.scene_name,
           events_json: eventsJson,
@@ -3511,6 +3692,10 @@ const callMcpTool = async ({
             getStaleStateTargetForTool('add_scene_events', eventsArgs, result)
           )
         );
+      }
+
+      if (isDryRun || !didModifyProject) {
+        return textResult(result);
       }
 
       return textResult(

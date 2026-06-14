@@ -480,6 +480,10 @@ const MainFrame = (props: Props): React.MixedElement => {
   const preferences = React.useContext(PreferencesContext);
   const { setHasProjectOpened } = preferences;
   const { previewLoadingRef, setPreviewLoading } = usePreviewLoadingState();
+  const previewLaunchInProgressRef = React.useRef<boolean>(false);
+  const saveProjectRef = React.useRef<?(options?: {|
+    skipNewVersionWarning: boolean,
+  |}) => Promise<?FileMetadata>>(null);
   const shortcutMap = useShortcutMap();
   const [
     diagnosticReportDialogOpen,
@@ -2330,14 +2334,22 @@ const MainFrame = (props: Props): React.MixedElement => {
   const autosaveProjectIfNeeded = React.useCallback(
     async () => {
       if (!currentProject) return;
+      if (
+        !hasUnsavedChanges ||
+        !preferences.values.autosaveOnPreview ||
+        !currentFileMetadata
+      ) {
+        return;
+      }
+
+      if (saveProjectRef.current) {
+        // Use the normal save path so preview persists the project file.
+        await saveProjectRef.current();
+        return;
+      }
 
       const storageProviderOperations = getStorageProviderOperations();
-      if (
-        hasUnsavedChanges && // Only create an autosave if there are unsaved changes.
-        preferences.values.autosaveOnPreview &&
-        storageProviderOperations.onAutoSaveProject &&
-        currentFileMetadata
-      ) {
+      if (storageProviderOperations.onAutoSaveProject) {
         try {
           await storageProviderOperations.onAutoSaveProject(
             currentProject,
@@ -2384,205 +2396,226 @@ const MainFrame = (props: Props): React.MixedElement => {
       if (!currentProject) return;
       if (currentProject.getLayoutsCount() === 0) return;
 
-      if (
-        await checkDiagnosticErrorsAndIfShouldBlock(currentProject, 'preview')
-      ) {
-        return;
-      }
-
-      console.info(
-        `Launching a new ${
-          isForInGameEdition ? 'in-game edition preview' : 'preview'
-        } with options:`,
-        {
-          networkPreview,
-          numberOfWindows,
-          hotReload,
-          shouldReloadProjectData,
-          shouldReloadLibraries,
-          shouldGenerateScenesEventsCode,
-          shouldReloadResources,
-          shouldHardReload,
-          fullLoadingScreen,
-          forceDiagnosticReport,
-          launchCaptureOptions,
-          isForInGameEdition,
-        }
-      );
-
-      const previewLauncher = _previewLauncher.current;
-      if (!previewLauncher) {
-        console.error('Preview launcher not found.');
-        return;
-      }
-
-      if (previewLoadingRef.current) {
+      if (previewLaunchInProgressRef.current || previewLoadingRef.current) {
         console.error(
           'Preview already loading. Ignoring but it should not be even possible to launch a preview while another one is loading, as this could break the game of the first preview when it is loading or reading files.'
         );
-        // Note that in an ideal situation, each previewed game could continue to load
-        // without being impacted by a new preview being worked on.
-        // The main issue currently is files being erased/copied by the second preview,
-        // which can break the game of the first preview,
-        // when the game is loading its resources or reading files.
         return;
       }
 
-      // Open the preview windows immediately, if required by the preview launcher.
-      // This is because some browsers (like Safari or Firefox) will block the
-      // window opening if done after an asynchronous operation.
-      const previewWindows = previewLauncher.immediatelyPreparePreviewWindows
-        ? previewLauncher.immediatelyPreparePreviewWindows({
-            project: currentProject,
-            hotReload: !!hotReload,
-            numberOfWindows: numberOfWindows || 1,
-            isForInGameEdition: !!isForInGameEdition,
-          })
-        : null;
-
-      // Mark the preview as loading. Note that it's important that nothing is asynchronous
-      // before this point (no asynchronous work, no delay):
-      // - to ensure the state is changed as soon as possible (avoid wrongly launching two previews),
-      // - and to ensure preview windows are opened on browsers following a "user gesture".
-      setPreviewLoading(
-        isForInGameEdition && hotReload
-          ? 'hot-reload-for-in-game-edition'
-          : 'preview'
-      );
-
-      notifyPreviewOrExportWillStart(state.editorTabs);
-
-      const sceneName = isForInGameEdition
-        ? isForInGameEdition.forcedSceneName
-        : previewState.isPreviewOverriden
-        ? previewState.overridenPreviewLayoutName
-        : previewState.previewLayoutName;
-      const externalLayoutName = isForInGameEdition
-        ? isForInGameEdition.forcedExternalLayoutName
-        : previewState.isPreviewOverriden
-        ? previewState.overridenPreviewExternalLayoutName
-        : previewState.previewExternalLayoutName;
-
-      if (!isForInGameEdition) {
-        autosaveProjectIfNeeded().catch(err => {
-          console.error('Error while auto-saving the project. Ignoring.', err);
-        });
-      }
-
-      // Note that in the future, this kind of checks could be done
-      // and stored in a "diagnostic report", rather than hiding errors
-      // from the user.
-      findAndLogProjectPreviewErrors(currentProject);
-
-      const fallbackAuthor = authenticatedUser.profile
-        ? {
-            username: authenticatedUser.profile.username || '',
-            id: authenticatedUser.profile.id,
-          }
-        : null;
-
-      const [authenticatedPlayer, captureOptions] = await Promise.all([
-        isForInGameEdition ? null : getAuthenticatedPlayerForPreview(),
-        isForInGameEdition
-          ? null
-          : createCaptureOptionsForPreview(launchCaptureOptions),
-      ]);
-
+      previewLaunchInProgressRef.current = true;
       try {
-        await eventsFunctionsExtensionsState.ensureLoadFinished();
-
-        const startTime = Date.now();
-        let inAppTutorialMessageInPreview = { message: '', position: '' };
-        if (inAppTutorialOrchestratorRef.current) {
-          inAppTutorialMessageInPreview =
-            inAppTutorialOrchestratorRef.current.getPreviewMessage() ||
-            inAppTutorialMessageInPreview;
+        if (
+          await checkDiagnosticErrorsAndIfShouldBlock(currentProject, 'preview')
+        ) {
+          return;
         }
-        await previewLauncher.launchPreview({
-          project: currentProject,
-          sceneName: sceneName || currentProject.getLayoutAt(0).getName(),
-          externalLayoutName: externalLayoutName || null,
-          eventsBasedObjectType: isForInGameEdition
-            ? isForInGameEdition.eventsBasedObjectType
-            : null,
-          eventsBasedObjectVariantName: isForInGameEdition
-            ? isForInGameEdition.eventsBasedObjectVariantName
-            : null,
-          networkPreview: !!networkPreview,
-          hotReload: !!hotReload,
-          shouldReloadProjectData:
-            shouldReloadProjectData === undefined
-              ? true
-              : shouldReloadProjectData,
-          shouldReloadLibraries:
-            shouldReloadLibraries === undefined ? true : shouldReloadLibraries,
-          shouldGenerateScenesEventsCode:
-            shouldGenerateScenesEventsCode === undefined
-              ? true
-              : shouldGenerateScenesEventsCode,
-          shouldReloadResources: !!shouldReloadResources,
-          shouldHardReload: !!shouldHardReload,
-          fullLoadingScreen: !!fullLoadingScreen,
-          fallbackAuthor,
-          authenticatedPlayer,
-          getIsMenuBarHiddenInPreview: preferences.getIsMenuBarHiddenInPreview,
-          getIsAlwaysOnTopInPreview: preferences.getIsAlwaysOnTopInPreview,
-          numberOfWindows: numberOfWindows === undefined ? 1 : numberOfWindows,
-          isForInGameEdition: !!isForInGameEdition,
-          editorId: isForInGameEdition ? isForInGameEdition.editorId : '',
-          editorCameraState3D: isForInGameEdition
-            ? isForInGameEdition.editorCameraState3D
-            : null,
-          inGameEditorSettings: isForInGameEdition
-            ? inGameEditorSettings
-            : null,
-          inAppTutorialMessageInPreview: inAppTutorialMessageInPreview.message,
-          inAppTutorialMessagePositionInPreview:
-            inAppTutorialMessageInPreview.position,
-          captureOptions,
-          onCaptureFinished,
 
-          previewWindows,
-        });
+        console.info(
+          `Launching a new ${
+            isForInGameEdition ? 'in-game edition preview' : 'preview'
+          } with options:`,
+          {
+            networkPreview,
+            numberOfWindows,
+            hotReload,
+            shouldReloadProjectData,
+            shouldReloadLibraries,
+            shouldGenerateScenesEventsCode,
+            shouldReloadResources,
+            shouldHardReload,
+            fullLoadingScreen,
+            forceDiagnosticReport,
+            launchCaptureOptions,
+            isForInGameEdition,
+          }
+        );
 
-        setPreviewLoading(null);
+        const previewLauncher = _previewLauncher.current;
+        if (!previewLauncher) {
+          console.error('Preview launcher not found.');
+          return;
+        }
 
-        if (!isForInGameEdition)
-          sendPreviewStarted({
-            quickCustomizationGameId:
-              quickCustomizationDialogOpenedFromGameId || null,
+        if (previewLoadingRef.current) {
+          console.error(
+            'Preview already loading. Ignoring but it should not be even possible to launch a preview while another one is loading, as this could break the game of the first preview when it is loading or reading files.'
+          );
+          // Note that in an ideal situation, each previewed game could continue to load
+          // without being impacted by a new preview being worked on.
+          // The main issue currently is files being erased/copied by the second preview,
+          // which can break the game of the first preview,
+          // when the game is loading its resources or reading files.
+          return;
+        }
+
+        // Open the preview windows immediately, if required by the preview launcher.
+        // This is because some browsers (like Safari or Firefox) will block the
+        // window opening if done after an asynchronous operation.
+        const previewWindows = previewLauncher.immediatelyPreparePreviewWindows
+          ? previewLauncher.immediatelyPreparePreviewWindows({
+              project: currentProject,
+              hotReload: !!hotReload,
+              numberOfWindows: numberOfWindows || 1,
+              isForInGameEdition: !!isForInGameEdition,
+            })
+          : null;
+
+        if (!isForInGameEdition) {
+          try {
+            await autosaveProjectIfNeeded();
+          } catch (err) {
+            console.error(
+              'Error while auto-saving the project. Ignoring.',
+              err
+            );
+          }
+        }
+
+        // Mark the preview as loading after the optional save. The
+        // `previewLaunchInProgressRef` above prevents duplicate launches while
+        // saving without displaying the preview loader over save dialogs.
+        setPreviewLoading(
+          isForInGameEdition && hotReload
+            ? 'hot-reload-for-in-game-edition'
+            : 'preview'
+        );
+
+        notifyPreviewOrExportWillStart(state.editorTabs);
+
+        const sceneName = isForInGameEdition
+          ? isForInGameEdition.forcedSceneName
+          : previewState.isPreviewOverriden
+          ? previewState.overridenPreviewLayoutName
+          : previewState.previewLayoutName;
+        const externalLayoutName = isForInGameEdition
+          ? isForInGameEdition.forcedExternalLayoutName
+          : previewState.isPreviewOverriden
+          ? previewState.overridenPreviewExternalLayoutName
+          : previewState.previewExternalLayoutName;
+
+        // Note that in the future, this kind of checks could be done
+        // and stored in a "diagnostic report", rather than hiding errors
+        // from the user.
+        findAndLogProjectPreviewErrors(currentProject);
+
+        const fallbackAuthor = authenticatedUser.profile
+          ? {
+              username: authenticatedUser.profile.username || '',
+              id: authenticatedUser.profile.id,
+            }
+          : null;
+
+        const [authenticatedPlayer, captureOptions] = await Promise.all([
+          isForInGameEdition ? null : getAuthenticatedPlayerForPreview(),
+          isForInGameEdition
+            ? null
+            : createCaptureOptionsForPreview(launchCaptureOptions),
+        ]);
+
+        try {
+          await eventsFunctionsExtensionsState.ensureLoadFinished();
+
+          const startTime = Date.now();
+          let inAppTutorialMessageInPreview = { message: '', position: '' };
+          if (inAppTutorialOrchestratorRef.current) {
+            inAppTutorialMessageInPreview =
+              inAppTutorialOrchestratorRef.current.getPreviewMessage() ||
+              inAppTutorialMessageInPreview;
+          }
+          await previewLauncher.launchPreview({
+            project: currentProject,
+            sceneName: sceneName || currentProject.getLayoutAt(0).getName(),
+            externalLayoutName: externalLayoutName || null,
+            eventsBasedObjectType: isForInGameEdition
+              ? isForInGameEdition.eventsBasedObjectType
+              : null,
+            eventsBasedObjectVariantName: isForInGameEdition
+              ? isForInGameEdition.eventsBasedObjectVariantName
+              : null,
             networkPreview: !!networkPreview,
             hotReload: !!hotReload,
-            projectDataOnlyExport:
+            shouldReloadProjectData:
+              shouldReloadProjectData === undefined
+                ? true
+                : shouldReloadProjectData,
+            shouldReloadLibraries:
+              shouldReloadLibraries === undefined
+                ? true
+                : shouldReloadLibraries,
+            shouldGenerateScenesEventsCode:
               shouldGenerateScenesEventsCode === undefined
-                ? false
-                : !shouldGenerateScenesEventsCode,
+                ? true
+                : shouldGenerateScenesEventsCode,
+            shouldReloadResources: !!shouldReloadResources,
+            shouldHardReload: !!shouldHardReload,
             fullLoadingScreen: !!fullLoadingScreen,
-            numberOfWindows: numberOfWindows || 1,
-            forceDiagnosticReport: !!forceDiagnosticReport,
-            previewLaunchDuration: Date.now() - startTime,
+            fallbackAuthor,
+            authenticatedPlayer,
+            getIsMenuBarHiddenInPreview:
+              preferences.getIsMenuBarHiddenInPreview,
+            getIsAlwaysOnTopInPreview: preferences.getIsAlwaysOnTopInPreview,
+            numberOfWindows:
+              numberOfWindows === undefined ? 1 : numberOfWindows,
+            isForInGameEdition: !!isForInGameEdition,
+            editorId: isForInGameEdition ? isForInGameEdition.editorId : '',
+            editorCameraState3D: isForInGameEdition
+              ? isForInGameEdition.editorCameraState3D
+              : null,
+            inGameEditorSettings: isForInGameEdition
+              ? inGameEditorSettings
+              : null,
+            inAppTutorialMessageInPreview:
+              inAppTutorialMessageInPreview.message,
+            inAppTutorialMessagePositionInPreview:
+              inAppTutorialMessageInPreview.position,
+            captureOptions,
+            onCaptureFinished,
+
+            previewWindows,
           });
 
-        if (inAppTutorialOrchestratorRef.current) {
-          inAppTutorialOrchestratorRef.current.onPreviewLaunch();
-        }
-        if (!currentlyRunningInAppTutorial) {
-          const wholeProjectDiagnosticReport = currentProject.getWholeProjectDiagnosticReport();
-          if (
-            !isForInGameEdition &&
-            (forceDiagnosticReport ||
-              preferences.values.openDiagnosticReportAutomatically) &&
-            wholeProjectDiagnosticReport.hasAnyIssue()
-          ) {
-            setDiagnosticReportDialogOpen(true);
+          setPreviewLoading(null);
+
+          if (!isForInGameEdition)
+            sendPreviewStarted({
+              quickCustomizationGameId:
+                quickCustomizationDialogOpenedFromGameId || null,
+              networkPreview: !!networkPreview,
+              hotReload: !!hotReload,
+              projectDataOnlyExport:
+                shouldGenerateScenesEventsCode === undefined
+                  ? false
+                  : !shouldGenerateScenesEventsCode,
+              fullLoadingScreen: !!fullLoadingScreen,
+              numberOfWindows: numberOfWindows || 1,
+              forceDiagnosticReport: !!forceDiagnosticReport,
+              previewLaunchDuration: Date.now() - startTime,
+            });
+
+          if (inAppTutorialOrchestratorRef.current) {
+            inAppTutorialOrchestratorRef.current.onPreviewLaunch();
           }
+          if (!currentlyRunningInAppTutorial) {
+            const wholeProjectDiagnosticReport = currentProject.getWholeProjectDiagnosticReport();
+            if (
+              !isForInGameEdition &&
+              (forceDiagnosticReport ||
+                preferences.values.openDiagnosticReportAutomatically) &&
+              wholeProjectDiagnosticReport.hasAnyIssue()
+            ) {
+              setDiagnosticReportDialogOpen(true);
+            }
+          }
+        } catch (error) {
+          setPreviewLoading(null);
+          console.error(
+            'Error caught while launching preview, this should never happen.',
+            error
+          );
         }
-      } catch (error) {
-        setPreviewLoading(null);
-        console.error(
-          'Error caught while launching preview, this should never happen.',
-          error
-        );
+      } finally {
+        previewLaunchInProgressRef.current = false;
       }
     },
     [
@@ -4447,6 +4480,13 @@ const MainFrame = (props: Props): React.MixedElement => {
       gamesList,
       hasExtensionLoadErrors,
     ]
+  );
+
+  React.useEffect(
+    () => {
+      saveProjectRef.current = saveProject;
+    },
+    [saveProject]
   );
 
   const renderSaveReminder = useSaveReminder({

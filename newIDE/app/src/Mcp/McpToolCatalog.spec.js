@@ -7,6 +7,7 @@ import {
   isKnownMcpTool,
   isWriteTool,
   canCallMcpTool,
+  getMcpToolUsageExamples,
 } from './McpToolCatalog';
 
 describe('McpToolCatalog', () => {
@@ -94,12 +95,16 @@ describe('McpToolCatalog', () => {
     expect(toolNames).toContain('restore_project_snapshot');
     expect(toolNames).toContain('replace_object_definition');
     expect(toolNames).toContain('delete_scene_object');
+    expect(toolNames).toContain('delete_scene_variable');
+    expect(toolNames).toContain('delete_object_variable');
+    expect(toolNames).toContain('delete_instance_variable');
     expect(toolNames).toContain('set_object_properties');
     expect(toolNames).toContain('set_text_object_properties');
     expect(toolNames).toContain('create_sprite_object_from_resource');
     expect(toolNames).toContain('create_text_object');
     expect(toolNames).toContain('apply_validated_scene_patch');
     expect(toolNames).toContain('patch_scene_event_instruction');
+    expect(toolNames).toContain('replace_javascript_event_code');
     expect(toolNames).toContain('attach_object_to_object_top');
     expect(toolNames).toContain('create_group');
     expect(toolNames).toContain('wrap_events_in_group');
@@ -131,6 +136,10 @@ describe('McpToolCatalog', () => {
     expect(isWriteTool('bind_sprite_animations_from_directory')).toBe(true);
     expect(isWriteTool('set_tilemap_collision_tiles')).toBe(true);
     expect(isWriteTool('patch_scene_event_instruction')).toBe(true);
+    expect(isWriteTool('replace_javascript_event_code')).toBe(true);
+    expect(isWriteTool('delete_scene_variable')).toBe(true);
+    expect(isWriteTool('delete_object_variable')).toBe(true);
+    expect(isWriteTool('delete_instance_variable')).toBe(true);
     expect(isWriteTool('attach_object_to_object_top')).toBe(true);
     expect(isWriteTool('read_serialized_scene')).toBe(false);
     expect(isWriteTool('inspect_project_cleanup')).toBe(false);
@@ -193,6 +202,23 @@ describe('McpToolCatalog', () => {
     expect(getMcpPrompts().map(prompt => prompt.name)).toContain(
       'implement-game-feature'
     );
+  });
+
+  it('returns examples for direct event editing and focused deletes', () => {
+    const examples = getMcpToolUsageExamples('add_scene_events');
+    expect(examples.add_scene_events.length).toBeGreaterThan(0);
+    expect(examples.add_scene_events[0].arguments.events_json).toEqual(
+      expect.any(Array)
+    );
+
+    expect(
+      getMcpToolUsageExamples('delete_instance_variable')
+        .delete_instance_variable.length
+    ).toBeGreaterThan(0);
+    expect(
+      getMcpToolUsageExamples('replace_javascript_event_code')
+        .replace_javascript_event_code.length
+    ).toBeGreaterThan(0);
   });
 
   it('uses OpenAI-compatible top-level input schemas for every tool', () => {

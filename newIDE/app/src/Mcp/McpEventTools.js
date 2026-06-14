@@ -374,6 +374,76 @@ const getSingleEventReference = (
   return matches[0];
 };
 
+export const replaceJavascriptEventCode = (
+  project: gdProject,
+  args: Object,
+  callbacks: EventToolCallbacks = ({}: any)
+): Object => {
+  const sceneName = getRequiredString(args, 'scene_name');
+  const code =
+    getOptionalString(args, 'code_string') ||
+    getOptionalString(args, 'codeString') ||
+    getOptionalString(args, 'inline_code') ||
+    getOptionalString(args, 'inlineCode') ||
+    getOptionalString(args, 'code');
+  if (code === null) {
+    throw new Error('Missing code_string.');
+  }
+
+  const scene = getScene(project, sceneName);
+  const eventReference = getSingleEventReference(
+    scene.getEvents(),
+    args.event || args.event_id || args.eventId || args,
+    'JavaScript event'
+  );
+  if (eventReference.event.getType() !== 'BuiltinCommonInstructions::JsCode') {
+    throw new Error(
+      `Target event is "${eventReference.event.getType()}", not a JavaScript event.`
+    );
+  }
+
+  const jsCodeEvent = gd.asJsCodeEvent(eventReference.event);
+  const beforeCode = jsCodeEvent.getInlineCode();
+  const beforeParameterObjects = jsCodeEvent.getParameterObjects();
+  jsCodeEvent.setInlineCode(code);
+
+  const parameterObjects =
+    getOptionalString(args, 'parameter_objects') ||
+    getOptionalString(args, 'parameterObjects');
+  if (parameterObjects !== null) {
+    jsCodeEvent.setParameterObjects(parameterObjects);
+  }
+
+  notifyEventsChanged(scene, callbacks);
+
+  const result = {
+    success: true,
+    sceneName,
+    eventPath: formatEventPath(eventReference.path),
+    aiGeneratedEventId: eventReference.event.getAiGeneratedEventId() || null,
+    before: {
+      code: beforeCode,
+      parameterObjects: beforeParameterObjects,
+    },
+    after: {
+      code: jsCodeEvent.getInlineCode(),
+      parameterObjects: jsCodeEvent.getParameterObjects(),
+    },
+  };
+
+  if (args && (args.summary_only === true || args.summaryOnly === true)) {
+    return result;
+  }
+
+  return {
+    ...result,
+    serializedEvents: serializeToJSObject(scene.getEvents()),
+    eventsAsText: renderNonTranslatedEventsAsText({
+      eventsList: scene.getEvents(),
+    }),
+  };
+};
+
 const getGroupReference = (
   eventsList: gdEventsList,
   args: Object
@@ -1362,7 +1432,8 @@ const getPatchableInstructionLists = (
   instructionKind: string
 ): Array<gdInstructionsList> => {
   const eventType = event.getType();
-  const wantsAction = instructionKind === 'action' || instructionKind === 'actions';
+  const wantsAction =
+    instructionKind === 'action' || instructionKind === 'actions';
   const wantsCondition =
     instructionKind === 'condition' || instructionKind === 'conditions';
   if (eventType === 'BuiltinCommonInstructions::Standard') {
@@ -1421,7 +1492,8 @@ export const patchSceneEventInstruction = (
     'event'
   );
   const objectName =
-    getOptionalString(args, 'object_name') || getOptionalString(args, 'objectName');
+    getOptionalString(args, 'object_name') ||
+    getOptionalString(args, 'objectName');
   const instructionLists = getPatchableInstructionLists(
     eventReference.event,
     instructionKind
@@ -1444,7 +1516,9 @@ export const patchSceneEventInstruction = (
   }
   if (matches.length > 1) {
     throw new Error(
-      `Ambiguous instruction target: ${matches.length} instructions matched. Add object_name or narrow the event target.`
+      `Ambiguous instruction target: ${
+        matches.length
+      } instructions matched. Add object_name or narrow the event target.`
     );
   }
 
@@ -1526,7 +1600,10 @@ export const attachObjectToObjectTop = (
   const scene = getScene(project, sceneName);
   const insertIndex =
     typeof args.insert_index === 'number' && Number.isFinite(args.insert_index)
-      ? Math.max(0, Math.min(scene.getEvents().getEventsCount(), args.insert_index))
+      ? Math.max(
+          0,
+          Math.min(scene.getEvents().getEventsCount(), args.insert_index)
+        )
       : scene.getEvents().getEventsCount();
   const eventId =
     getOptionalString(args, 'ai_generated_event_id') ||
@@ -1542,7 +1619,11 @@ export const attachObjectToObjectTop = (
   const event = gd.asStandardEvent(
     scene
       .getEvents()
-      .insertNewEvent(project, 'BuiltinCommonInstructions::Standard', insertIndex)
+      .insertNewEvent(
+        project,
+        'BuiltinCommonInstructions::Standard',
+        insertIndex
+      )
   );
   event.setAiGeneratedEventId(eventId);
   const addAction = (type, parameters) => {
@@ -1649,11 +1730,14 @@ export const inspectGameplayRules = (
     const states = Array.isArray(machine && machine.states)
       ? machine.states.map(String)
       : [];
-    const mentionedStates = states.filter(state => serializedText.includes(state));
+    const mentionedStates = states.filter(state =>
+      serializedText.includes(state)
+    );
     const variableMentioned =
       serializedText.includes(variableName) &&
       (!objectName || serializedText.includes(objectName));
-    const ok = variableMentioned && (!states.length || mentionedStates.length > 0);
+    const ok =
+      variableMentioned && (!states.length || mentionedStates.length > 0);
     checks.push({
       kind: 'state_machine',
       index,

@@ -84,6 +84,20 @@ const findAiGameWorkbenchOverrideBundlePath = () => {
 };
 
 const getDefaultAiGameWorkbenchBundlePath = () => {
+  const storageOpenBundlePath = getBundledExternalPath(
+    'ai-game-workbench.storage-open.asar'
+  );
+  if (fs.existsSync(storageOpenBundlePath)) {
+    return storageOpenBundlePath;
+  }
+
+  const storageBundlePath = getBundledExternalPath(
+    'ai-game-workbench.storage.asar'
+  );
+  if (fs.existsSync(storageBundlePath)) {
+    return storageBundlePath;
+  }
+
   const preserveBundlePath = getBundledExternalPath(
     'ai-game-workbench.preserve.asar'
   );
@@ -359,6 +373,36 @@ const registerAiGameWorkbenchProtocol = () => {
 
 const registerAiGameWorkbenchIpc = () => {
   if (isAiGameWorkbenchIpcRegistered) return;
+
+  ipcMain.handle(
+    'ai-game-workbench-open-storage-directory',
+    async event => {
+      if (
+        !aiGameWorkbenchWindow ||
+        aiGameWorkbenchWindow.isDestroyed() ||
+        event.sender !== aiGameWorkbenchWindow.webContents
+      ) {
+        throw new Error(
+          'Storage directory can only be opened from AI Game Workbench.'
+        );
+      }
+
+      const storageDir = path.join(
+        getAiGameWorkbenchUserDataPath(),
+        'storage'
+      );
+      await fs.promises.mkdir(storageDir, { recursive: true });
+      const openError = await electron.shell.openPath(storageDir);
+      if (openError) {
+        throw new Error(openError);
+      }
+
+      return {
+        ok: true,
+        storageDir,
+      };
+    }
+  );
 
   ipcMain.handle(
     'ai-game-workbench-import-gdevelop-extension',

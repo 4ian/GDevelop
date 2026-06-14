@@ -115,8 +115,9 @@ environment variable in its process environment.
 ## Electron ASAR selection
 
 GDevelop loads the tracked Electron bundle at
-`newIDE/electron-app/app/external/ai-game-workbench.preserve.asar` when
-present, then falls back to `ai-game-workbench.wan22.asar`, then
+`newIDE/electron-app/app/external/ai-game-workbench.storage-open.asar` when
+present, then falls back to `ai-game-workbench.storage.asar`,
+`ai-game-workbench.preserve.asar`, `ai-game-workbench.wan22.asar`, then
 `ai-game-workbench.asar` for older local checkouts. Local test bundles named
 `ai-game-workbench.local*.asar` are ignored unless one of these environment
 variables is set before launching Electron:

@@ -8,10 +8,18 @@ The integration must stay source-free in GDevelop:
 - Do not copy the upstream source tree into this repository.
 - Do not start a localhost server or reserve any TCP port.
 - Ship the compiled ASAR artifact and native runtime sidecar:
-  `newIDE/electron-app/app/external/ai-game-workbench.preserve.asar`
-  `newIDE/electron-app/app/external/ai-game-workbench.preserve.asar.unpacked`
-- `ai-game-workbench.wan22.asar` and `ai-game-workbench.asar` remain fallback
+  `newIDE/electron-app/app/external/ai-game-workbench.storage-open.asar`
+  `newIDE/electron-app/app/external/ai-game-workbench.storage-open.asar.unpacked`
+- `ai-game-workbench.storage.asar`,
+  `ai-game-workbench.storage.asar.unpacked`,
+  `ai-game-workbench.preserve.asar`,
+- `ai-game-workbench.preserve.asar`,
+  `ai-game-workbench.preserve.asar.unpacked`,
+  `ai-game-workbench.wan22.asar`, and `ai-game-workbench.asar` remain fallback
   bundles for older local checkouts.
+- Older notes may still mention the preserve bundle as the primary artifact.
+  New builds should use the storage bundle name so a running Electron process
+  holding the old preserve sidecar open does not block refreshes.
 
 ## 1. Refresh Upstream
 
@@ -228,7 +236,7 @@ Pack the staged runtime. Native `.node` modules and `ffmpeg.exe` must be
 unpacked so Electron can load or execute them.
 
 ```powershell
-$asarPath = "newIDE\electron-app\app\external\ai-game-workbench.preserve.asar"
+$asarPath = "newIDE\electron-app\app\external\ai-game-workbench.storage-open.asar"
 $unpackedPath = "$asarPath.unpacked"
 New-Item -ItemType Directory -Force -Path (Split-Path $asarPath) | Out-Null
 if (Test-Path -LiteralPath $asarPath) {
@@ -253,7 +261,7 @@ node -c newIDE\electron-app\app\AiGameWorkbenchPreload.js
 node -c newIDE\electron-app\app\main.js
 
 $env:ELECTRON_RUN_AS_NODE='1'
-.\newIDE\electron-app\node_modules\.bin\electron.cmd -e "const path = require('path'); const { pathToFileURL } = require('url'); (async () => { const bundle = path.resolve('newIDE/electron-app/app/external/ai-game-workbench.preserve.asar'); const mod = await import(pathToFileURL(path.join(bundle, 'server', 'app.js')).href); const storageDir = path.join(process.env.TEMP, 'ai-game-workbench-asar-smoke-storage'); const app = mod.createApp({ storageDir, presetsDir: path.join(bundle, 'server', 'presets'), ffmpegPath: path.resolve('newIDE/electron-app/app/external/ai-game-workbench.preserve.asar.unpacked/bin/ffmpeg.exe'), module01CharacterExportDir: path.join(storageDir, 'exports', 'Character_2D'), port: 0 }); await app.ready(); const res = await app.inject({ method: 'GET', url: '/api/health' }); console.log(res.statusCode, res.json().ok); await app.close(); })().catch(error => { console.error(error); process.exit(1); });"
+.\newIDE\electron-app\node_modules\.bin\electron.cmd -e "const path = require('path'); const { pathToFileURL } = require('url'); (async () => { const bundle = path.resolve('newIDE/electron-app/app/external/ai-game-workbench.storage-open.asar'); const mod = await import(pathToFileURL(path.join(bundle, 'server', 'app.js')).href); const storageDir = path.join(process.env.TEMP, 'ai-game-workbench-asar-smoke-storage'); const app = mod.createApp({ storageDir, presetsDir: path.join(bundle, 'server', 'presets'), ffmpegPath: path.resolve('newIDE/electron-app/app/external/ai-game-workbench.storage-open.asar.unpacked/bin/ffmpeg.exe'), module01CharacterExportDir: path.join(storageDir, 'exports', 'Character_2D'), port: 0 }); await app.ready(); const res = await app.inject({ method: 'GET', url: '/api/health' }); console.log(res.statusCode, res.json().ok); await app.close(); })().catch(error => { console.error(error); process.exit(1); });"
 Remove-Item Env:\ELECTRON_RUN_AS_NODE
 
 cd newIDE\app

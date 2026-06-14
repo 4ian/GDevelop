@@ -26,6 +26,11 @@ namespace gdjs {
       ? true
       : false;
 
+  const getCanvasResolution = (): number =>
+    typeof window === 'undefined'
+      ? 1
+      : Math.max(1, window.devicePixelRatio || 1);
+
   /**
    * The renderer for a gdjs.RuntimeGame using Pixi.js.
    * @category Renderers > Game
@@ -51,6 +56,7 @@ namespace gdjs {
     _canvasWidth: float = 0;
     // Current height of the canvas (might be scaled down/up compared to renderer)
     _canvasHeight: float = 0;
+    private _canvasResolution: float = 1;
 
     _keepRatio: boolean = true;
     _marginLeft: any;
@@ -104,6 +110,9 @@ namespace gdjs {
     initializeRenderers(gameCanvas: HTMLCanvasElement): void {
       this._throwIfDisposed();
 
+      const canvasResolution = getCanvasResolution();
+      this._canvasResolution = canvasResolution;
+
       if (typeof THREE !== 'undefined') {
         this._threeRenderer = new THREE.WebGLRenderer({
           canvas: gameCanvas,
@@ -117,7 +126,7 @@ namespace gdjs {
         this._threeRenderer.shadowMap.type = THREE.PCFSoftShadowMap;
         this._threeRenderer.useLegacyLights = true;
         this._threeRenderer.autoClear = false;
-        this._threeRenderer.pixelRatio = window.devicePixelRatio;
+        this._threeRenderer.setPixelRatio(canvasResolution);
         this._threeRenderer.setSize(
           this._game.getGameResolutionWidth(),
           this._game.getGameResolutionHeight()
@@ -136,7 +145,7 @@ namespace gdjs {
           preserveDrawingBuffer: true, // Keep to true to allow screenshots.
           antialias: false,
           backgroundAlpha: 0,
-          // TODO (3D): add a setting for pixel ratio (`resolution: window.devicePixelRatio`)
+          resolution: canvasResolution,
         });
       } else {
         // Create the renderer and setup the rendering area.
@@ -148,6 +157,7 @@ namespace gdjs {
           view: gameCanvas,
           preserveDrawingBuffer: true,
           antialias: false,
+          resolution: canvasResolution,
         }) as PIXI.Renderer;
       }
 
@@ -287,26 +297,35 @@ namespace gdjs {
     private _resizeCanvas() {
       if (!this._pixiRenderer || !this._domElementsContainer) return;
 
+      const canvasResolution = getCanvasResolution();
+
       // Set the Pixi (and/or Three) renderer size to the game size.
       // There is no "smart" resizing to be done here: the rendering of the game
       // should be done with the size set on the game.
       if (
-        this._pixiRenderer.width !== this._game.getGameResolutionWidth() ||
-        this._pixiRenderer.height !== this._game.getGameResolutionHeight()
+        this._pixiRenderer.screen.width !==
+          this._game.getGameResolutionWidth() ||
+        this._pixiRenderer.screen.height !==
+          this._game.getGameResolutionHeight() ||
+        canvasResolution !== this._canvasResolution
       ) {
         // TODO (3D): It might be useful to resize pixi view in 3D depending on FOV value
         // to enable a mode where pixi always fills the whole screen.
+        this._pixiRenderer.resolution = canvasResolution;
         this._pixiRenderer.resize(
           this._game.getGameResolutionWidth(),
           this._game.getGameResolutionHeight()
         );
 
-        if (this._threeRenderer) {
-          this._threeRenderer.setSize(
+        const threeRenderer = this._threeRenderer;
+        if (threeRenderer) {
+          threeRenderer.setPixelRatio(canvasResolution);
+          threeRenderer.setSize(
             this._game.getGameResolutionWidth(),
             this._game.getGameResolutionHeight()
           );
         }
+        this._canvasResolution = canvasResolution;
       }
 
       // Set the canvas size.

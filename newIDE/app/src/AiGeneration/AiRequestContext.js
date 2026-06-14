@@ -891,7 +891,9 @@ export const AiRequestProvider = ({
       // picked up), so a returned count > 1 means there is at least one new
       // message; when there was no known message yet, any returned message is
       // new.
-      const previousStatus = previousAiRequest ? previousAiRequest.status : null;
+      const previousStatus = previousAiRequest
+        ? previousAiRequest.status
+        : null;
       const fetchedOutputCount =
         (fetchedAiRequest.output && fetchedAiRequest.output.length) || 0;
       const fetchedNewMessageCount = outputFromMessageId

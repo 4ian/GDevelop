@@ -17,6 +17,7 @@ import { AI_SETTINGS_FETCH_TIMEOUT } from '../Utils/GlobalFetchTimeouts';
 import { useAsyncLazyMemo } from '../Utils/UseLazyMemo';
 import { retryIfFailed } from '../Utils/RetryIfFailed';
 import { useInterval } from '../Utils/UseInterval';
+import { useAdaptivePollingInterval } from '../Utils/UseAdaptivePollingInterval';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import {
   aiRequestShouldBeWatched,
@@ -687,27 +688,27 @@ export const AiRequestProvider = ({
   // request and all its sub-agents are status-polled in one batched request per
   // tick instead of one request per entity.
   //
-  // The polling interval is adaptive: it stays fast while the agent is actively
-  // producing output (new messages or status changes) so the editor reacts
-  // quickly, but backs off (up to `maxWatchPollingIntervalInMs`) during long
-  // idle waits — typically while the backend is blocked on a single LLM call
-  // that produces nothing in the meantime. Any observed change snaps it back to
-  // the base interval, so the many fast sequential steps of an agent run are
-  // never slowed down. This keeps latency essentially flat while cutting the
-  // number of (billed) polling requests during otherwise-idle waits.
+  // The polling interval is adaptive (see useAdaptivePollingInterval): it stays
+  // fast while the agent is actively producing output (new messages or status
+  // changes) so the editor reacts quickly, but backs off during long idle waits
+  // — typically while the backend is blocked on a single LLM call that produces
+  // nothing in the meantime. Any observed change snaps it back to the base
+  // interval, so the many fast sequential steps of an agent run are never slowed
+  // down. This keeps latency essentially flat while cutting the number of
+  // (billed) polling requests during otherwise-idle waits.
   const baseWatchPollingIntervalInMs =
     (selectedAiRequest &&
       selectedAiRequest.toolOptions &&
       selectedAiRequest.toolOptions.watchPollingIntervalInMs) ||
     1400;
-  const maxWatchPollingIntervalInMs = Math.max(
-    baseWatchPollingIntervalInMs,
-    5000
-  );
-  const [
-    currentWatchPollingIntervalInMs,
-    setCurrentWatchPollingIntervalInMs,
-  ] = React.useState<number>(baseWatchPollingIntervalInMs);
+  const {
+    intervalInMs: currentWatchPollingIntervalInMs,
+    reportTick: reportWatchPollingTick,
+    resetToBase: resetWatchPollingInterval,
+  } = useAdaptivePollingInterval({
+    baseIntervalInMs: baseWatchPollingIntervalInMs,
+    maxIntervalInMs: Math.max(baseWatchPollingIntervalInMs, 5000),
+  });
 
   // Restart polling at the fast base interval whenever a new request becomes
   // watched or the watched request changes, so the first updates are picked up
@@ -715,9 +716,9 @@ export const AiRequestProvider = ({
   // dependencies change during routine polling, so this never resets mid-flight.
   React.useEffect(
     () => {
-      setCurrentWatchPollingIntervalInMs(baseWatchPollingIntervalInMs);
+      resetWatchPollingInterval();
     },
-    [selectedAiRequestId, shouldWatchRequest, baseWatchPollingIntervalInMs]
+    [selectedAiRequestId, shouldWatchRequest, resetWatchPollingInterval]
   );
 
   React.useEffect(
@@ -993,20 +994,8 @@ export const AiRequestProvider = ({
       );
     }
 
-    // Adapt the polling interval: snap back to the fast base interval on any
-    // observed activity, otherwise gently back off (×1.5) up to the cap so idle
-    // waits cost fewer requests. Returning the same number is a no-op for React,
-    // so a stable backed-off or base interval does not trigger re-renders.
-    setCurrentWatchPollingIntervalInMs(previousInterval =>
-      sawChangeThisTick
-        ? baseWatchPollingIntervalInMs
-        : Math.min(
-            Math.round(
-              (previousInterval || baseWatchPollingIntervalInMs) * 1.5
-            ),
-            maxWatchPollingIntervalInMs
-          )
-    );
+    // Adapt the polling interval based on whether this tick saw any activity.
+    reportWatchPollingTick(sawChangeThisTick);
   };
 
   useInterval(

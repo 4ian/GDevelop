@@ -3,6 +3,7 @@ import * as React from 'react';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import { retryIfFailed } from '../Utils/RetryIfFailed';
 import { delay } from '../Utils/Delay';
+import { getBackedOffIntervalInMs } from '../Utils/UseAdaptivePollingInterval';
 import {
   getAiGeneratedEvent,
   createAiGeneratedEvent,
@@ -146,8 +147,8 @@ export const useGenerateEvents = ({
               error
             );
           }
-          pollIntervalMs = Math.min(
-            Math.round(pollIntervalMs * 1.5),
+          pollIntervalMs = getBackedOffIntervalInMs(
+            pollIntervalMs,
             maxPollIntervalMs
           );
           if (Date.now() - startTime >= maxTotalWaitMs) {

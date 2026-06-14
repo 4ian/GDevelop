@@ -27,6 +27,10 @@ import {
   SetupExportHeader,
   ExportFlow,
 } from '../GenericExporters/OnlineElectronExport';
+import {
+  applyElectronWindowOptionsToExportOptions,
+  getElectronWindowOptionsFromProjectEvents,
+} from '../GenericExporters/ElectronExport';
 
 const gd: libGDevelop = global.gd;
 
@@ -115,6 +119,10 @@ export const browserOnlineElectronExportPipeline: ExportPipeline<
     const { project } = context;
     const exportOptions = new gd.ExportOptions(project, outputDir);
     exportOptions.setTarget('electron');
+    applyElectronWindowOptionsToExportOptions(
+      exportOptions,
+      getElectronWindowOptionsFromProjectEvents(project)
+    );
     if (fallbackAuthor) {
       exportOptions.setFallbackAuthor(
         fallbackAuthor.id,

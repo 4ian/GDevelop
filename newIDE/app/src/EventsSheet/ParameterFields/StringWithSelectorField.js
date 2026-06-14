@@ -15,7 +15,7 @@ import RaisedButton from '../../UI/RaisedButton';
 import Functions from '@material-ui/icons/Functions';
 import FlatButton from '../../UI/FlatButton';
 import TypeCursorSelect from '../../UI/CustomSvgIcons/TypeCursorSelect';
-import { getParameterChoiceValues } from './ParameterMetadataTools';
+import { getParameterChoices } from './ParameterMetadataTools';
 
 export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function StringWithSelectorField(props: ParameterFieldProps, ref) {
@@ -41,10 +41,10 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
 
     // The list is not kept with a memo because choices could be changed by
     // another component without this one to know.
-    const choices = getParameterChoiceValues(parameterMetadata);
+    const choices = getParameterChoices(parameterMetadata);
 
     const isCurrentValueInList = choices.some(
-      choice => `"${choice}"` === value
+      choice => `"${choice.value}"` === value
     );
 
     // If the current value is not in the list, display an expression field.
@@ -55,7 +55,7 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
     React.useEffect(
       () => {
         if (!isExpressionField && !value && choices.length > 0) {
-          onChange(`"${choices[0]}"`);
+          onChange(`"${choices[0].value}"`);
         }
       },
       [choices, isExpressionField, onChange, value]
@@ -77,10 +77,10 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
     const selectOptions = choices.map(choice => {
       return (
         <SelectOption
-          key={choice}
-          value={`"${choice}"`}
-          label={choice}
-          shouldNotTranslate={true}
+          key={choice.value}
+          value={`"${choice.value}"`}
+          label={choice.label || choice.value}
+          shouldNotTranslate={!choice.label}
         />
       );
     });

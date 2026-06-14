@@ -1,0 +1,6 @@
+[submodule "thirdParties/ai_game_workbench"]
+	path = thirdParties/ai_game_workbench
+	url = https://github.com/zhouzhipeng/ai_game_workbench.git
+[submodule "thirdParties/image-extender"]
+	path = thirdParties/image-extender
+	url = https://github.com/zhouzhipeng/image-extender.git

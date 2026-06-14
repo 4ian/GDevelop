@@ -1,11 +1,12 @@
 # Image Extender Electron Bundle Steps
 
-This documents how to refresh `zhouzhipeng/image-extender` and rebuild the
+This documents how to refresh `thirdParties/image-extender` and rebuild the
 Electron-bundled executable artifact used by the Resource Working Desk.
 
-The integration must stay source-free in GDevelop:
+The integration must keep runtime source out of GDevelop's Electron app:
 
-- Do not copy the upstream source tree into this repository.
+- Keep the upstream source checkout only in the `thirdParties/image-extender`
+  git submodule.
 - Do not start a localhost server or reserve any TCP port.
 - Ship only the compiled ASAR artifact:
   `newIDE/electron-app/app/external/image-extender.asar`.
@@ -18,12 +19,9 @@ The integration must stay source-free in GDevelop:
 Run from the GDevelop repository root in PowerShell:
 
 ```powershell
-$upstream = Join-Path $env:TEMP "image-extender-src"
-if (Test-Path -LiteralPath $upstream) {
-  git -C $upstream pull --ff-only
-} else {
-  git clone https://github.com/zhouzhipeng/image-extender.git $upstream
-}
+git submodule update --init --recursive thirdParties/image-extender
+$upstream = (Resolve-Path "thirdParties\image-extender").Path
+git -C $upstream pull --ff-only
 git -C $upstream log -1 --oneline
 ```
 
@@ -34,7 +32,7 @@ compiled API route modules directly through a custom Electron protocol. Next mus
 emit a standalone build so traced runtime dependencies are available for ASAR
 packing.
 
-Patch only the temporary upstream checkout:
+Patch only the submodule checkout:
 
 ```powershell
 Push-Location $upstream
@@ -90,8 +88,10 @@ If Windows reports that `image-extender.asar` is in use, close any open Image
 Extender window and rerun the pack command. The app can hold the ASAR open while
 the custom protocol is serving files.
 
-Do not commit `$upstream`, `$staging`, or an expanded
-`newIDE/electron-app/app/external/image-extender/` folder.
+Do not commit `$staging` or an expanded
+`newIDE/electron-app/app/external/image-extender/` folder. Commit the
+`thirdParties/image-extender` submodule pointer only after the upstream changes
+are committed in that submodule.
 
 ## 5. Verify
 

@@ -1,11 +1,12 @@
 # AI Game Workbench Electron Bundle Steps
 
-This documents how to refresh `zhouzhipeng/ai_game_workbench` and rebuild the
+This documents how to refresh `thirdParties/ai_game_workbench` and rebuild the
 Electron-bundled executable artifact used by the Resource Working Desk.
 
-The integration must stay source-free in GDevelop:
+The integration must keep runtime source out of GDevelop's Electron app:
 
-- Do not copy the upstream source tree into this repository.
+- Keep the upstream source checkout only in the `thirdParties/ai_game_workbench`
+  git submodule.
 - Do not start a localhost server or reserve any TCP port.
 - Ship the compiled ASAR artifact and native runtime sidecar:
   `newIDE/electron-app/app/external/ai-game-workbench.storage-open.asar`
@@ -26,12 +27,9 @@ The integration must stay source-free in GDevelop:
 Run from the GDevelop repository root in PowerShell:
 
 ```powershell
-$upstream = Join-Path $env:TEMP "ai-game-workbench-src"
-if (Test-Path -LiteralPath $upstream) {
-  git -C $upstream pull --ff-only
-} else {
-  git clone https://github.com/zhouzhipeng/ai_game_workbench.git $upstream
-}
+git submodule update --init --recursive thirdParties/ai_game_workbench
+$upstream = (Resolve-Path "thirdParties\ai_game_workbench").Path
+git -C $upstream pull --ff-only
 git -C $upstream log -1 --oneline
 ```
 
@@ -126,7 +124,7 @@ The module 01 export page is GDevelop-specific:
   `assets` folder, registers image resources, and inserts or replaces the
   extension.
 
-Patch only the temporary upstream checkout:
+Patch only the submodule checkout:
 
 ```powershell
 Push-Location $upstream
@@ -248,8 +246,10 @@ if (Test-Path -LiteralPath $unpackedPath) {
 .\newIDE\electron-app\node_modules\.bin\asar.cmd pack --unpack "**\*.{node,dll,exe}" $staging $asarPath
 ```
 
-Do not commit `$upstream`, `$staging`, or an expanded
-`newIDE/electron-app/app/external/ai-game-workbench/` folder.
+Do not commit `$staging` or an expanded
+`newIDE/electron-app/app/external/ai-game-workbench/` folder. Commit the
+`thirdParties/ai_game_workbench` submodule pointer only after the upstream
+changes are committed in that submodule.
 
 ## 7. Verify
 

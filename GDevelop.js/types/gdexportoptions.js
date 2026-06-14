@@ -3,6 +3,11 @@ declare class gdExportOptions {
   constructor(project: gdProject, outputPath: string): void;
   setFallbackAuthor(id: string, username: string): gdExportOptions;
   setTarget(target: string): gdExportOptions;
+  setElectronTransparentWindow(enable: boolean): gdExportOptions;
+  setElectronFramelessWindow(enable: boolean): gdExportOptions;
+  setElectronDisableWindowShadow(enable: boolean): gdExportOptions;
+  setElectronTransparentRuntimeBackground(enable: boolean): gdExportOptions;
+  setElectronDisableHardwareAcceleration(enable: boolean): gdExportOptions;
   delete(): void;
   ptr: number;
 };

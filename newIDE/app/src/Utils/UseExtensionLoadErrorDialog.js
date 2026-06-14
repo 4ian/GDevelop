@@ -25,9 +25,14 @@ type ExtensionLoadingResultWithPath = {|
   result: ExtensionLoadingResult,
 |};
 
+type GenericExtensionLoadError = {|
+  expectedNumberOfJSExtensionModulesLoaded: number,
+  numberOfJSExtensionModulesLoaded: number,
+|};
+
 type ExtensionLoadErrorDialogProps = {|
   erroredExtensionLoadingResults: Array<ExtensionLoadingResultWithPath>,
-  genericError: ?Error,
+  genericError: ?GenericExtensionLoadError,
   onClose: () => void,
 |};
 
@@ -129,7 +134,13 @@ export const ExtensionLoadErrorDialog = ({
                 <TableRowColumn
                   style={{ width: '35%', wordBreak: 'break-word' }}
                 >
-                  {genericError.toString()}
+                  <Trans>
+                    Some extensions could not be loaded. Expected{' '}
+                    {genericError.expectedNumberOfJSExtensionModulesLoaded} JS
+                    extension modules, got{' '}
+                    {genericError.numberOfJSExtensionModulesLoaded}. Please
+                    check the console for more details.
+                  </Trans>
                 </TableRowColumn>
                 <TableRowColumn style={{ width: '40%' }}>-</TableRowColumn>
               </TableRow>
@@ -155,7 +166,10 @@ export const useExtensionLoadErrorDialog = (): UseExtensionLoadErrorDialogOutput
     erroredExtensionLoadingResults,
     setErroredExtensionLoadingResults,
   ] = React.useState<?Array<ExtensionLoadingResultWithPath>>(null);
-  const [genericError, setGenericError] = React.useState<?Error>(null);
+  const [
+    genericError,
+    setGenericError,
+  ] = React.useState<?GenericExtensionLoadError>(null);
   const [isForcedHidden, setIsForcedHidden] = React.useState(false);
 
   const setExtensionLoadingResults = React.useCallback(
@@ -171,11 +185,12 @@ export const useExtensionLoadErrorDialog = (): UseExtensionLoadErrorDialogOutput
         extensionLoadingResults.expectedNumberOfJSExtensionModulesLoaded !==
         extensionLoadingResults.results.length;
       if (hasMissingExtensionModules) {
-        setGenericError(
-          new Error(
-            'Some extensions could not be loaded. Please check the console for more details.'
-          )
-        );
+        setGenericError({
+          expectedNumberOfJSExtensionModulesLoaded:
+            extensionLoadingResults.expectedNumberOfJSExtensionModulesLoaded,
+          numberOfJSExtensionModulesLoaded:
+            extensionLoadingResults.results.length,
+        });
       } else {
         setGenericError(null);
       }
@@ -197,7 +212,13 @@ export const useExtensionLoadErrorDialog = (): UseExtensionLoadErrorDialogOutput
     () => {
       if (hasExtensionLoadErrors) {
         let message = 'Extensions loaded with errors: \n';
-        if (genericError) message += genericError.toString();
+        if (genericError) {
+          message += `Some extensions could not be loaded. Expected ${
+            genericError.expectedNumberOfJSExtensionModulesLoaded
+          } JS extension modules, got ${
+            genericError.numberOfJSExtensionModulesLoaded
+          }. Please check the console for more details.`;
+        }
         if (erroredExtensionLoadingResults)
           message += erroredExtensionLoadingResults
             .map(({ extensionModulePath, result }) => {

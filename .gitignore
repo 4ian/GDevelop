@@ -25,11 +25,11 @@
 !/ExtLibs/SFML/extlibs/**/*.a
 **/.DS_Store
 **/node_modules/
-!/newIDE/electron-app/app/external/ai-game-workbench.asar.unpacked/
-!/newIDE/electron-app/app/external/ai-game-workbench.asar.unpacked/bin/
-!/newIDE/electron-app/app/external/ai-game-workbench.asar.unpacked/bin/**
-!/newIDE/electron-app/app/external/ai-game-workbench.asar.unpacked/node_modules/
-!/newIDE/electron-app/app/external/ai-game-workbench.asar.unpacked/node_modules/**
+!/newIDE/electron-app/app/external/ai-game-workbench.storage-open.asar.unpacked/
+!/newIDE/electron-app/app/external/ai-game-workbench.storage-open.asar.unpacked/bin/
+!/newIDE/electron-app/app/external/ai-game-workbench.storage-open.asar.unpacked/bin/**
+!/newIDE/electron-app/app/external/ai-game-workbench.storage-open.asar.unpacked/node_modules/
+!/newIDE/electron-app/app/external/ai-game-workbench.storage-open.asar.unpacked/node_modules/**
 .idea
 .vscode/ipch
 /newIDE/app/src/UI/Theme/**/*ThemeVariables.*

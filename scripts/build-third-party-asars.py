@@ -16,6 +16,7 @@ from __future__ import annotations
 import argparse
 import os
 import shutil
+import signal
 import subprocess
 import sys
 import tempfile
@@ -98,6 +99,229 @@ def remove_safe(path: Path, allowed_root: Path) -> None:
         shutil.rmtree(path)
     else:
         path.unlink()
+
+
+def find_windows_processes_locking_path(path: Path) -> list[int]:
+    import ctypes
+    from ctypes import wintypes
+    from uuid import uuid4
+
+    ERROR_MORE_DATA = 234
+    ERROR_SUCCESS = 0
+    CCH_RM_MAX_APP_NAME = 255
+    CCH_RM_MAX_SVC_NAME = 63
+
+    class RM_UNIQUE_PROCESS(ctypes.Structure):
+        _fields_ = [
+            ("dwProcessId", wintypes.DWORD),
+            ("ProcessStartTime", wintypes.FILETIME),
+        ]
+
+    class RM_PROCESS_INFO(ctypes.Structure):
+        _fields_ = [
+            ("Process", RM_UNIQUE_PROCESS),
+            ("strAppName", wintypes.WCHAR * (CCH_RM_MAX_APP_NAME + 1)),
+            ("strServiceShortName", wintypes.WCHAR * (CCH_RM_MAX_SVC_NAME + 1)),
+            ("ApplicationType", wintypes.DWORD),
+            ("AppStatus", wintypes.ULONG),
+            ("TSSessionId", wintypes.DWORD),
+            ("bRestartable", wintypes.BOOL),
+        ]
+
+    rstrtmgr = ctypes.WinDLL("rstrtmgr")
+    session_handle = wintypes.DWORD()
+    session_key = ctypes.create_unicode_buffer(uuid4().hex)
+    result = rstrtmgr.RmStartSession(
+        ctypes.byref(session_handle),
+        0,
+        session_key,
+    )
+    if result != ERROR_SUCCESS:
+        return []
+
+    try:
+        resource = ctypes.c_wchar_p(str(path.resolve()))
+        result = rstrtmgr.RmRegisterResources(
+            session_handle,
+            1,
+            ctypes.byref(resource),
+            0,
+            None,
+            0,
+            None,
+        )
+        if result != ERROR_SUCCESS:
+            return []
+
+        proc_info_needed = wintypes.UINT(0)
+        proc_info_count = wintypes.UINT(0)
+        reboot_reasons = wintypes.DWORD(0)
+        result = rstrtmgr.RmGetList(
+            session_handle,
+            ctypes.byref(proc_info_needed),
+            ctypes.byref(proc_info_count),
+            None,
+            ctypes.byref(reboot_reasons),
+        )
+        if result == ERROR_SUCCESS:
+            return []
+        if result != ERROR_MORE_DATA:
+            return []
+
+        process_info = (RM_PROCESS_INFO * proc_info_needed.value)()
+        proc_info_count = wintypes.UINT(proc_info_needed.value)
+        result = rstrtmgr.RmGetList(
+            session_handle,
+            ctypes.byref(proc_info_needed),
+            ctypes.byref(proc_info_count),
+            process_info,
+            ctypes.byref(reboot_reasons),
+        )
+        if result != ERROR_SUCCESS:
+            return []
+
+        return [
+            int(process_info[index].Process.dwProcessId)
+            for index in range(proc_info_count.value)
+            if int(process_info[index].Process.dwProcessId) != os.getpid()
+        ]
+    finally:
+        rstrtmgr.RmEndSession(session_handle)
+
+
+def find_processes_locking_path(path: Path) -> list[int]:
+    if IS_WINDOWS:
+        return find_windows_processes_locking_path(path)
+
+    lsof = shutil.which("lsof")
+    if not lsof:
+        return []
+
+    result = subprocess.run(
+        [lsof, "-t", str(path.resolve())],
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.DEVNULL,
+        check=False,
+    )
+    process_ids: list[int] = []
+    for line in result.stdout.splitlines():
+        try:
+            process_id = int(line.strip())
+        except ValueError:
+            continue
+        if process_id != os.getpid():
+            process_ids.append(process_id)
+    return process_ids
+
+
+def get_parent_process_id(process_id: int) -> int | None:
+    if IS_WINDOWS:
+        powershell = shutil.which("powershell") or shutil.which("pwsh")
+        if not powershell:
+            return None
+
+        result = subprocess.run(
+            [
+                powershell,
+                "-NoProfile",
+                "-Command",
+                (
+                    "try { "
+                    f"(Get-CimInstance Win32_Process -Filter \"ProcessId={process_id}\").ParentProcessId "
+                    "} catch { '' }"
+                ),
+            ],
+            text=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.DEVNULL,
+            check=False,
+        )
+    else:
+        ps = shutil.which("ps")
+        if not ps:
+            return None
+
+        result = subprocess.run(
+            [ps, "-o", "ppid=", "-p", str(process_id)],
+            text=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.DEVNULL,
+            check=False,
+        )
+
+    value = result.stdout.strip()
+    if not value:
+        return None
+
+    try:
+        parent_process_id = int(value.splitlines()[0].strip())
+    except ValueError:
+        return None
+
+    return parent_process_id if parent_process_id > 0 else None
+
+
+def get_current_process_family_ids() -> set[int]:
+    process_ids = {os.getpid()}
+    current_process_id = os.getpid()
+
+    for _ in range(32):
+        parent_process_id = get_parent_process_id(current_process_id)
+        if parent_process_id is None or parent_process_id in process_ids:
+            break
+        process_ids.add(parent_process_id)
+        current_process_id = parent_process_id
+
+    return process_ids
+
+
+def kill_processes(process_ids: list[int], reason: str) -> None:
+    protected_process_ids = get_current_process_family_ids()
+    skipped_process_ids = sorted(set(process_ids) & protected_process_ids)
+    unique_process_ids = sorted(set(process_ids) - protected_process_ids)
+
+    if skipped_process_ids:
+        log(
+            "Skipping current Codex process family while unlocking "
+            f"{reason}: {', '.join(map(str, skipped_process_ids))}"
+        )
+
+    if not unique_process_ids:
+        if skipped_process_ids:
+            raise RuntimeError(
+                f"{reason} is locked by the current Codex process family "
+                f"({', '.join(map(str, skipped_process_ids))}). Close the "
+                "Codex in-app preview or restart Codex, then rerun the build. "
+                "The builder will not terminate Codex itself."
+            )
+        raise RuntimeError(f"Could not identify the process locking {reason}.")
+
+    log(
+        f"Terminating processes locking {reason}: "
+        f"{', '.join(map(str, unique_process_ids))}"
+    )
+    for process_id in unique_process_ids:
+        if IS_WINDOWS:
+            subprocess.run(
+                ["taskkill", "/PID", str(process_id), "/T", "/F"],
+                check=False,
+            )
+        else:
+            try:
+                os.kill(process_id, signal.SIGKILL)
+            except ProcessLookupError:
+                pass
+
+
+def remove_safe_with_lock_kill(path: Path, allowed_root: Path) -> None:
+    try:
+        remove_safe(path, allowed_root)
+        return
+    except PermissionError:
+        process_ids = find_processes_locking_path(path)
+        kill_processes(process_ids, str(path))
+        remove_safe(path, allowed_root)
 
 
 def copy_file(source: Path, destination: Path) -> None:
@@ -397,8 +621,9 @@ def build_ai_game_workbench(args: argparse.Namespace) -> None:
     unpacked_path = Path(f"{asar_path}.unpacked")
 
     log(f"Packing {asar_path}")
-    remove_safe(asar_path, EXTERNAL_DIR)
-    remove_safe(unpacked_path, EXTERNAL_DIR)
+    remove_safe_with_lock_kill(asar_path, EXTERNAL_DIR)
+    remove_safe_with_lock_kill(unpacked_path, EXTERNAL_DIR)
+
     run(
         [
             electron_bin("asar"),

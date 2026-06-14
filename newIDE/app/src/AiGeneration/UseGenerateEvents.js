@@ -119,12 +119,8 @@ export const useGenerateEvents = ({
           };
         }
 
-        // Poll for the generation result with an exponential backoff: stay fast
-        // initially (most generations complete within a few seconds) but back
-        // off up to a cap so long-running generations don't cost dozens of
-        // (billed) requests. The loop is bounded by a total time budget rather
-        // than a fixed attempt count, so the maximum wait stays predictable
-        // regardless of the interval.
+        // Poll with exponential backoff (fast initially, capped), bounded by a
+        // total time budget rather than a fixed attempt count.
         const maxTotalWaitMs = 60000;
         const maxPollIntervalMs = 5000;
         const startTime = Date.now();

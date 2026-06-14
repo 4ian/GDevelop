@@ -1,60 +1,26 @@
 // @flow
 import * as React from 'react';
 
-/**
- * Back off an interval by `backoffFactor`, capped at `maxIntervalInMs`.
- */
+const BACKOFF_FACTOR = 1.5;
+
+/** Back off an interval by a fixed factor, capped at `maxIntervalInMs`. */
 export const getBackedOffIntervalInMs = (
   currentIntervalInMs: number,
-  maxIntervalInMs: number,
-  backoffFactor?: number = 1.5
+  maxIntervalInMs: number
 ): number =>
-  Math.min(Math.round(currentIntervalInMs * backoffFactor), maxIntervalInMs);
+  Math.min(Math.round(currentIntervalInMs * BACKOFF_FACTOR), maxIntervalInMs);
 
 /**
- * Compute the next polling interval: snap back to `baseIntervalInMs` when there
- * was activity this tick, otherwise back off (up to `maxIntervalInMs`).
- */
-export const getNextPollingIntervalInMs = ({
-  currentIntervalInMs,
-  baseIntervalInMs,
-  maxIntervalInMs,
-  sawActivity,
-  backoffFactor,
-}: {|
-  currentIntervalInMs: number,
-  baseIntervalInMs: number,
-  maxIntervalInMs: number,
-  sawActivity: boolean,
-  backoffFactor?: number,
-|}): number =>
-  sawActivity
-    ? baseIntervalInMs
-    : getBackedOffIntervalInMs(
-        currentIntervalInMs,
-        maxIntervalInMs,
-        backoffFactor
-      );
-
-/**
- * Manage an adaptive polling interval as React state. The interval stays at the
- * fast `baseIntervalInMs` while activity is observed and backs off up to
- * `maxIntervalInMs` during idle periods — so a frequent poller costs fewer
- * requests when nothing is happening, without adding latency when something is.
- *
- * Usage: call `reportTick(sawActivity)` once per poll (`true` resets to the base
- * interval, `false` backs off), and `resetToBase()` to force the fast interval
- * (e.g. when a new entity starts being polled). Returning the same value is a
- * no-op for React, so a stable interval does not trigger re-renders.
+ * Adaptive polling interval: stays at `baseIntervalInMs` while active and backs
+ * off up to `maxIntervalInMs` when idle. Call `reportTick(sawActivity)` once per
+ * poll (true resets to fast, false backs off) and `resetToBase()` to reset.
  */
 export const useAdaptivePollingInterval = ({
   baseIntervalInMs,
   maxIntervalInMs,
-  backoffFactor,
 }: {|
   baseIntervalInMs: number,
   maxIntervalInMs: number,
-  backoffFactor?: number,
 |}): {|
   intervalInMs: number,
   reportTick: (sawActivity: boolean) => void,
@@ -74,16 +40,12 @@ export const useAdaptivePollingInterval = ({
   const reportTick = React.useCallback(
     (sawActivity: boolean) => {
       setIntervalInMs(currentIntervalInMs =>
-        getNextPollingIntervalInMs({
-          currentIntervalInMs,
-          baseIntervalInMs,
-          maxIntervalInMs,
-          sawActivity,
-          backoffFactor,
-        })
+        sawActivity
+          ? baseIntervalInMs
+          : getBackedOffIntervalInMs(currentIntervalInMs, maxIntervalInMs)
       );
     },
-    [baseIntervalInMs, maxIntervalInMs, backoffFactor]
+    [baseIntervalInMs, maxIntervalInMs]
   );
 
   return { intervalInMs, reportTick, resetToBase };

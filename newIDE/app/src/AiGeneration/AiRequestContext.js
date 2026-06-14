@@ -686,16 +686,9 @@ export const AiRequestProvider = ({
   // The selected AI request and its active sub-agents are watched together by a
   // single polling loop defined further below (see `onWatch`), so that a parent
   // request and all its sub-agents are status-polled in one batched request per
-  // tick instead of one request per entity.
-  //
-  // The polling interval is adaptive (see useAdaptivePollingInterval): it stays
-  // fast while the agent is actively producing output (new messages or status
-  // changes) so the editor reacts quickly, but backs off during long idle waits
-  // — typically while the backend is blocked on a single LLM call that produces
-  // nothing in the meantime. Any observed change snaps it back to the base
-  // interval, so the many fast sequential steps of an agent run are never slowed
-  // down. This keeps latency essentially flat while cutting the number of
-  // (billed) polling requests during otherwise-idle waits.
+  // tick instead of one request per entity. The interval is adaptive (see
+  // useAdaptivePollingInterval): fast while the agent produces output, backing
+  // off during idle waits to cut polling requests.
   const baseWatchPollingIntervalInMs =
     (selectedAiRequest &&
       selectedAiRequest.toolOptions &&
@@ -710,10 +703,8 @@ export const AiRequestProvider = ({
     maxIntervalInMs: Math.max(baseWatchPollingIntervalInMs, 5000),
   });
 
-  // Restart polling at the fast base interval whenever a new request becomes
-  // watched or the watched request changes, so the first updates are picked up
-  // quickly even if the interval had previously backed off. None of these
-  // dependencies change during routine polling, so this never resets mid-flight.
+  // Reset to the fast interval when a new request becomes watched or changes, so
+  // the first updates are picked up quickly. These deps are stable during polling.
   React.useEffect(
     () => {
       resetWatchPollingInterval();
@@ -886,12 +877,9 @@ export const AiRequestProvider = ({
           outputFromMessageId,
         })
       );
-      // Detect activity to drive the adaptive polling interval. A status change,
-      // or genuinely new messages, counts as activity. The incremental fetch
-      // echoes the last already-known message (so its in-place updates are
-      // picked up), so a returned count > 1 means there is at least one new
-      // message; when there was no known message yet, any returned message is
-      // new.
+      // Activity = status change or new messages. The incremental fetch echoes
+      // the last known message, so a count > 1 means at least one new message
+      // (and any returned message is new when none was known yet).
       const previousStatus = previousAiRequest
         ? previousAiRequest.status
         : null;

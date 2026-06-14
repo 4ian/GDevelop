@@ -182,7 +182,9 @@ const SwipeableDrawerEditorsDisplay: React.ComponentType<{
       [halfOpenOrCloseDrawerOnEditor, isEditorVisible]
     );
     const openNewObjectDialog = React.useCallback(
-      () => {
+      (options?: {|
+        instanceSceneCoordinates?: ?[number, number],
+      |}) => {
         if (!isEditorVisible('objects-list')) {
           // Objects list is not opened. Open it now.
           halfOpenOrCloseDrawerOnEditor('objects-list');
@@ -190,7 +192,7 @@ const SwipeableDrawerEditorsDisplay: React.ComponentType<{
 
         // Open the new object dialog when the objects list is opened.
         objectsListDoNowOrAfterRender((objectsList: ?ObjectsListInterface) => {
-          if (objectsList) objectsList.openNewObjectDialog();
+          if (objectsList) objectsList.openNewObjectDialog(options);
         });
       },
       [

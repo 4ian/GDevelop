@@ -274,7 +274,6 @@ type State = {|
   editedObjectWithContext: ?ObjectWithContext,
   editedObjectInitialTab: ?ObjectEditorTab,
   variablesEditedInstance: ?gdInitialInstance,
-  newObjectInstanceSceneCoordinates: ?[number, number],
   invisibleLayerOnWhichInstancesHaveJustBeenAdded: string | null,
   extractAsExternalLayoutDialogOpen: boolean,
   extractAsCustomObjectDialogOpen: boolean,
@@ -371,7 +370,6 @@ export default class SceneEditor extends React.Component<Props, State> {
       editedObjectWithContext: null,
       editedObjectInitialTab: 'properties',
       variablesEditedInstance: null,
-      newObjectInstanceSceneCoordinates: null,
       editedGroup: null,
       isCreatingNewGroup: false,
       extractAsExternalLayoutDialogOpen: false,
@@ -1314,11 +1312,10 @@ export default class SceneEditor extends React.Component<Props, State> {
       return;
     }
 
-    // Remember where to create the instance, when the object will be created.
-    this.setState({
-      newObjectInstanceSceneCoordinates: editorDisplay.viewControls.getLastCursorSceneCoordinates(),
+    const { viewControls } = editorDisplay;
+    editorDisplay.openNewObjectDialog({
+      instanceSceneCoordinates: viewControls.getLastCursorSceneCoordinates(),
     });
-    editorDisplay.openNewObjectDialog();
   };
 
   addInstanceOnTheScene = (
@@ -1737,33 +1734,41 @@ export default class SceneEditor extends React.Component<Props, State> {
   };
 
   /**
-   * Create an instance of the given object at the position previously chosen
-   * (see `newObjectInstanceSceneCoordinates`), or at the canvas center.
+   * Create an instance of the given object at the given position,
+   * or at the canvas center.
    */
-  _addInstanceForNewObject = (object: gdObject) => {
-    const { newObjectInstanceSceneCoordinates } = this.state;
+  _addInstanceForNewObject = (
+    object: gdObject,
+    instanceSceneCoordinates?: ?[number, number]
+  ) => {
     const instancePosition =
-      newObjectInstanceSceneCoordinates ||
-      this._getCanvasCenterSceneCoordinates();
+      instanceSceneCoordinates || this._getCanvasCenterSceneCoordinates();
 
     if (!instancePosition) {
-      this.setState({ newObjectInstanceSceneCoordinates: null });
       return;
     }
 
     this._addInstancesForObjectsAtPosition([object], instancePosition);
-    this.setState({ newObjectInstanceSceneCoordinates: null });
   };
 
   _onObjectCreated = (
     objects: Array<gdObject>,
-    isTheFirstOfItsTypeInProject: boolean
+    isTheFirstOfItsTypeInProject: boolean,
+    options?: {|
+      shouldCreateInstance?: boolean,
+      instanceSceneCoordinates?: ?[number, number],
+    |}
   ) => {
     if (objects.length === 0) {
       return;
     }
     this._onObjectsCreated(objects, isTheFirstOfItsTypeInProject);
-    this._addInstanceForNewObject(objects[0]);
+    if (options && options.shouldCreateInstance) {
+      this._addInstanceForNewObject(
+        objects[0],
+        options.instanceSceneCoordinates
+      );
+    }
   };
 
   _onObjectsCreated = (

@@ -76,7 +76,10 @@ export type ObjectTreeViewItemProps = {|
   onObjectCreated: (
     objects: Array<gdObject>,
     isTheFirstOfItsTypeInProject: boolean,
-    options?: {| shouldCreateInstance?: boolean |}
+    options?: {|
+      shouldCreateInstance?: boolean,
+      instanceSceneCoordinates?: ?[number, number],
+    |}
   ) => void,
   onMovedObjectFolderOrObjectToAnotherFolderInSameContainer: (
     objectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext

@@ -438,7 +438,9 @@ const objectTypeToDefaultName = {
 
 export type ObjectsListInterface = {|
   forceUpdateList: () => void,
-  openNewObjectDialog: () => void,
+  openNewObjectDialog: (options?: {|
+    instanceSceneCoordinates?: ?[number, number],
+  |}) => void,
   closeNewObjectDialog: () => void,
 |};
 
@@ -499,7 +501,10 @@ type Props = {|
   onObjectCreated: (
     objects: Array<gdObject>,
     isTheFirstOfItsTypeInProject: boolean,
-    options?: {| shouldCreateInstance?: boolean |}
+    options?: {|
+      shouldCreateInstance?: boolean,
+      instanceSceneCoordinates?: ?[number, number],
+    |}
   ) => void,
   onObjectEdited: (
     objectWithContext: ObjectWithContext,
@@ -584,6 +589,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
 
     const [newObjectDialogOpen, setNewObjectDialogOpen] = React.useState<{
       from: ObjectFolderOrObjectWithContext | null,
+      instanceSceneCoordinates: ?[number, number],
     } | null>(null);
 
     React.useImperativeHandle(ref, () => ({
@@ -591,8 +597,13 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         forceUpdate();
         if (treeViewRef.current) treeViewRef.current.forceUpdateList();
       },
-      openNewObjectDialog: () => {
-        setNewObjectDialogOpen({ from: null });
+      openNewObjectDialog: options => {
+        setNewObjectDialogOpen({
+          from: null,
+          instanceSceneCoordinates: options
+            ? options.instanceSceneCoordinates || null
+            : null,
+        });
       },
       closeNewObjectDialog: () => {
         setNewObjectDialogOpen(null);
@@ -709,6 +720,9 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         }
         onObjectCreated([object], isTheFirstOfItsTypeInProject, {
           shouldCreateInstance: true,
+          instanceSceneCoordinates: newObjectDialogOpen
+            ? newObjectDialogOpen.instanceSceneCoordinates
+            : null,
         });
       },
       [
@@ -732,6 +746,9 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
 
         onObjectCreated(objects, isTheFirstOfItsTypeInProject, {
           shouldCreateInstance: true,
+          instanceSceneCoordinates: newObjectDialogOpen
+            ? newObjectDialogOpen.instanceSceneCoordinates
+            : null,
         });
 
         // Here, the last object in the array might not be the last object
@@ -775,7 +792,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
 
     const onAddNewObject = React.useCallback(
       (item: ObjectFolderOrObjectWithContext | null) => {
-        setNewObjectDialogOpen({ from: item });
+        setNewObjectDialogOpen({ from: item, instanceSceneCoordinates: null });
       },
       []
     );

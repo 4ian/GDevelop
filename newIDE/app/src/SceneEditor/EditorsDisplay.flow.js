@@ -79,7 +79,10 @@ export type SceneEditorsDisplayProps = {|
   onObjectCreated: (
     objects: Array<gdObject>,
     isTheFirstOfItsTypeInProject: boolean,
-    options?: {| shouldCreateInstance?: boolean |}
+    options?: {|
+      shouldCreateInstance?: boolean,
+      instanceSceneCoordinates?: ?[number, number],
+    |}
   ) => void,
   onObjectsModified: (objects: Array<gdObject>) => void,
   onObjectEdited: (
@@ -177,7 +180,9 @@ export type SceneEditorsDisplayInterface = {|
   forceUpdateObjectGroupsList: () => void,
   scrollObjectGroupsListToObjectGroup: (objectGroup: gdObjectGroup) => void,
   forceUpdateLayersList: () => void,
-  openNewObjectDialog: () => void,
+  openNewObjectDialog: (options?: {|
+    instanceSceneCoordinates?: ?[number, number],
+  |}) => void,
   toggleEditorView: (editorId: EditorId) => void,
   isEditorVisible: (editorId: EditorId) => boolean,
   ensureEditorVisible: (editorId: EditorId) => void,

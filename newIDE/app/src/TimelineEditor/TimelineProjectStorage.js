@@ -6,6 +6,7 @@ export const timelinesPropertyName = 'timelines';
 export type TimelinePoint = {|
   x: number,
   y: number,
+  z?: number,
 |};
 
 export type TimelineCurveDefinition = any;

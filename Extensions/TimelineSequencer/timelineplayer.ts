@@ -501,6 +501,9 @@ namespace gdjs {
                   typeof value.x === 'number' ? value.x : object.getX(),
                   typeof value.y === 'number' ? value.y : object.getY()
                 );
+                if (typeof value.z === 'number') {
+                  setRuntimeObjectNumber(object, 'setZ', value.z);
+                }
               }
               break;
             case 'x':
@@ -515,10 +518,45 @@ namespace gdjs {
                 gdjs.evtTools.timeline.valueAsNumber(value, object.getY())
               );
               break;
+            case 'z':
+            case 'Z':
+              setRuntimeObjectNumber(
+                object,
+                'setZ',
+                gdjs.evtTools.timeline.valueAsNumber(
+                  value,
+                  getRuntimeObjectNumber(object, 'getZ', 0)
+                )
+              );
+              break;
             case 'angle':
             case 'Angle':
+            case 'rotationZ':
+            case 'RotationZ':
               object.setAngle(
                 gdjs.evtTools.timeline.valueAsNumber(value, object.getAngle())
+              );
+              break;
+            case 'rotationX':
+            case 'RotationX':
+              setRuntimeObjectNumber(
+                object,
+                'setRotationX',
+                gdjs.evtTools.timeline.valueAsNumber(
+                  value,
+                  getRuntimeObjectNumber(object, 'getRotationX', 0)
+                )
+              );
+              break;
+            case 'rotationY':
+            case 'RotationY':
+              setRuntimeObjectNumber(
+                object,
+                'setRotationY',
+                gdjs.evtTools.timeline.valueAsNumber(
+                  value,
+                  getRuntimeObjectNumber(object, 'getRotationY', 0)
+                )
               );
               break;
             case 'scaleX':
@@ -543,6 +581,20 @@ namespace gdjs {
                 );
               }
               break;
+            case 'scaleZ':
+            case 'ScaleZ':
+              setRuntimeObjectNumber(
+                object,
+                'setScaleZ',
+                Math.max(
+                  0,
+                  gdjs.evtTools.timeline.valueAsNumber(
+                    value,
+                    getRuntimeObjectNumber(object, 'getScaleZ', 1)
+                  )
+                )
+              );
+              break;
             case 'scale':
             case 'Scale':
               if (isScalable(object)) {
@@ -557,6 +609,9 @@ namespace gdjs {
                   object.setScaleY(
                     typeof value.y === 'number' ? value.y : object.getScaleY()
                   );
+                  if (typeof value.z === 'number') {
+                    setRuntimeObjectNumber(object, 'setScaleZ', value.z);
+                  }
                 } else {
                   const scale = gdjs.evtTools.timeline.valueAsNumber(
                     value,
@@ -564,6 +619,7 @@ namespace gdjs {
                   );
                   object.setScaleX(scale);
                   object.setScaleY(scale);
+                  setRuntimeObjectNumber(object, 'setScaleZ', scale);
                 }
               }
               break;
@@ -606,6 +662,20 @@ namespace gdjs {
                   gdjs.evtTools.timeline.valueAsNumber(
                     value,
                     getRuntimeObjectNumber(object, 'getHeight', 0)
+                  )
+                )
+              );
+              break;
+            case 'depth':
+            case 'Depth':
+              setRuntimeObjectNumber(
+                object,
+                'setDepth',
+                Math.max(
+                  0,
+                  gdjs.evtTools.timeline.valueAsNumber(
+                    value,
+                    getRuntimeObjectNumber(object, 'getDepth', 0)
                   )
                 )
               );

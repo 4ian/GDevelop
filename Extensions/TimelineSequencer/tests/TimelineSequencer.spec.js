@@ -30,6 +30,36 @@ describe('gdjs.evtTools.timeline', () => {
     return scalableObject;
   };
 
+  const create3DObject = (runtimeScene) => {
+    const object = createObject(runtimeScene);
+    object._z = 0;
+    object._depth = 10;
+    object._rotationX = 0;
+    object._rotationY = 0;
+    object._scaleZ = 1;
+    object.setZ = (z) => {
+      object._z = z;
+    };
+    object.getZ = () => object._z;
+    object.setDepth = (depth) => {
+      object._depth = depth;
+    };
+    object.getDepth = () => object._depth;
+    object.setRotationX = (angle) => {
+      object._rotationX = angle;
+    };
+    object.getRotationX = () => object._rotationX;
+    object.setRotationY = (angle) => {
+      object._rotationY = angle;
+    };
+    object.getRotationY = () => object._rotationY;
+    object.setScaleZ = (scale) => {
+      object._scaleZ = scale;
+    };
+    object.getScaleZ = () => object._scaleZ;
+    return object;
+  };
+
   const timelineJson = JSON.stringify({
     timelines: [
       {
@@ -520,6 +550,80 @@ describe('gdjs.evtTools.timeline', () => {
     expect(object._volume).to.be(40);
     expect(object._playbackSpeed).to.be(1.75);
     expect(object._currentTime).to.be(5);
+  });
+
+  it('can apply 3D object transform properties', () => {
+    const runtimeScene = createScene(500);
+    const object = create3DObject(runtimeScene);
+
+    gdjs.evtTools.timeline.registerTimelineJson(
+      runtimeScene,
+      JSON.stringify({
+        timelines: [
+          {
+            name: '3DObject',
+            duration: 1,
+            tracks: [
+              {
+                type: 'object',
+                target: {
+                  mode: 'objectName',
+                  objectName: 'Hero',
+                  selection: 'first',
+                },
+                propertyTracks: [
+                  {
+                    property: 'position',
+                    keyframes: [
+                      { time: 0, value: { x: 0, y: 0, z: 0 } },
+                      { time: 1, value: { x: 80, y: 20, z: 40 } },
+                    ],
+                  },
+                  {
+                    property: 'rotationX',
+                    keyframes: [
+                      { time: 0, value: 0 },
+                      { time: 1, value: 30 },
+                    ],
+                  },
+                  {
+                    property: 'rotationY',
+                    keyframes: [
+                      { time: 0, value: 0 },
+                      { time: 1, value: 60 },
+                    ],
+                  },
+                  {
+                    property: 'depth',
+                    keyframes: [
+                      { time: 0, value: 10 },
+                      { time: 1, value: 30 },
+                    ],
+                  },
+                  {
+                    property: 'scaleZ',
+                    keyframes: [
+                      { time: 0, value: 1 },
+                      { time: 1, value: 4 },
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      })
+    );
+
+    gdjs.evtTools.timeline.seekTimeline(runtimeScene, '3DObject', 0.5);
+
+    expect(object.getX()).to.be(40);
+    expect(object.getY()).to.be(10);
+    expect(object.getZ()).to.be(20);
+    expect(object.getRotationX()).to.be(15);
+    expect(object.getRotationY()).to.be(30);
+    expect(object.getDepth()).to.be(20);
+    expect(object.getScaleZ()).to.be(2.5);
   });
 
   it('smoothly interpolates sprite animation frames between sparse keyframes', () => {

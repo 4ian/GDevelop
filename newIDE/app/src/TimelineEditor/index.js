@@ -60,11 +60,13 @@ type InitialInstancesIndex = {|
 type TimelineScaleBaseDimensions = {|
   width: number,
   height: number,
+  depth: number,
 |};
 
 type AnyObject = { [string]: any, ... };
-type TimelineValue = number | {| x: number, y: number |};
-type TimelineValueChannel = 'x' | 'y' | 'value';
+type TimelinePointValue = { x: number, y: number, z?: number, ... };
+type TimelineValue = number | TimelinePointValue;
+type TimelineValueChannel = 'x' | 'y' | 'z' | 'value';
 type TimelineValueRange = {| min: number, max: number, range: number |};
 
 type KeyframeDragSnapshot = {|
@@ -109,6 +111,25 @@ const commonTimelineProperties: Array<string> = [
   'angle',
   'scaleX',
   'scaleY',
+];
+const threeDTransformTimelineProperties: Array<string> = [
+  'x',
+  'y',
+  'z',
+  'angle',
+  'rotationX',
+  'rotationY',
+  'scaleX',
+  'scaleY',
+  'scaleZ',
+  'width',
+  'height',
+  'depth',
+];
+const model3DTimelineProperties: Array<string> = [
+  ...threeDTransformTimelineProperties,
+  'animationIndex',
+  'animationSpeedScale',
 ];
 const spriteTimelineProperties: Array<string> = [
   ...commonTimelineProperties,
@@ -393,7 +414,7 @@ const getCurveGraphPath = (curve: TimelineCurveDefinition | null): string => {
 const getKeyframeValueAtTime = (
   propertyTrack: TimelinePropertyTrack,
   time: number
-): number | {| x: number, y: number |} => {
+): TimelineValue => {
   const firstKeyframe = propertyTrack.keyframes[0];
   if (!firstKeyframe || timeToFrame(time) === 0) {
     return getPropertyTrackInitialValue(propertyTrack);
@@ -429,14 +450,14 @@ const createPropertyTrackId = (): string =>
     .toString(36)
     .slice(2, 8)}`;
 
-const cloneTimelineValue = (
-  value: number | {| x: number, y: number |}
-): number | {| x: number, y: number |} =>
-  typeof value === 'object' ? { x: value.x, y: value.y } : value;
+const cloneTimelineValue = (value: TimelineValue): TimelineValue =>
+  typeof value === 'object'
+    ? typeof value.z === 'number'
+      ? { x: value.x, y: value.y, z: value.z }
+      : { x: value.x, y: value.y }
+    : value;
 
-const getDefaultTimelinePropertyValue = (
-  property: string
-): number | {| x: number, y: number |} => {
+const getDefaultTimelinePropertyValue = (property: string): TimelineValue => {
   switch (property) {
     case 'position':
       return { x: 0, y: 0 };
@@ -444,11 +465,13 @@ const getDefaultTimelinePropertyValue = (
       return { x: 1, y: 1 };
     case 'scaleX':
     case 'scaleY':
+    case 'scaleZ':
       return 1;
     case 'opacity':
       return 255;
     case 'width':
     case 'height':
+    case 'depth':
       return fallbackTimelineScaleBaseSize;
     case 'animationSpeedScale':
     case 'playbackSpeed':
@@ -466,8 +489,8 @@ const getDefaultTimelinePropertyValue = (
 const normalizeTimelineValueForProperty = (
   property: string,
   value: any,
-  fallbackValue?: number | {| x: number, y: number |}
-): number | {| x: number, y: number |} => {
+  fallbackValue?: TimelineValue
+): TimelineValue => {
   const fallback =
     fallbackValue !== undefined
       ? fallbackValue
@@ -481,6 +504,17 @@ const normalizeTimelineValueForProperty = (
         ? {
             x: getFiniteNumber(value.x, fallbackPosition.x),
             y: getFiniteNumber(value.y, fallbackPosition.y),
+            ...(typeof value.z === 'number' ||
+            typeof fallbackPosition.z === 'number'
+              ? {
+                  z: getFiniteNumber(
+                    value.z,
+                    typeof fallbackPosition.z === 'number'
+                      ? fallbackPosition.z
+                      : 0
+                  ),
+                }
+              : {}),
           }
         : fallbackPosition;
     }
@@ -488,15 +522,21 @@ const normalizeTimelineValueForProperty = (
       const fallbackScale =
         typeof fallback === 'object' ? fallback : { x: 1, y: 1 };
       if (!value || typeof value !== 'object') {
-        return {
+        const normalizedFallbackScale = {
           x: Math.max(minimumTimelineScale, fallbackScale.x),
           y: Math.max(minimumTimelineScale, fallbackScale.y),
         };
+        return typeof fallbackScale.z === 'number'
+          ? {
+              ...normalizedFallbackScale,
+              z: Math.max(minimumTimelineScale, fallbackScale.z),
+            }
+          : normalizedFallbackScale;
       }
 
       const rawScaleX = getFiniteNumber(value.x, fallbackScale.x);
       const rawScaleY = getFiniteNumber(value.y, fallbackScale.y);
-      return {
+      const normalizedScale = {
         x: Math.max(
           minimumTimelineScale,
           rawScaleX > 0 ? rawScaleX : fallbackScale.x
@@ -506,9 +546,24 @@ const normalizeTimelineValueForProperty = (
           rawScaleY > 0 ? rawScaleY : fallbackScale.y
         ),
       };
+      if (typeof value.z === 'number') {
+        const fallbackScaleZ =
+          typeof fallbackScale.z === 'number' ? fallbackScale.z : 1;
+        const rawScaleZ = getFiniteNumber(value.z, fallbackScaleZ);
+        return {
+          ...normalizedScale,
+          z: Math.max(
+            minimumTimelineScale,
+            rawScaleZ > 0 ? rawScaleZ : fallbackScaleZ
+          ),
+        };
+      }
+
+      return normalizedScale;
     }
     case 'scaleX':
     case 'scaleY':
+    case 'scaleZ':
       return Math.max(
         minimumTimelineScale,
         getFiniteNumber(value, typeof fallback === 'number' ? fallback : 1)
@@ -524,7 +579,8 @@ const normalizeTimelineValueForProperty = (
         255
       );
     case 'width':
-    case 'height': {
+    case 'height':
+    case 'depth': {
       const fallbackDimension =
         typeof fallback === 'number' ? fallback : fallbackTimelineScaleBaseSize;
       const dimension = getFiniteNumber(value, fallbackDimension);
@@ -596,7 +652,7 @@ const normalizeTimelineNumberValueForProperty = (
 };
 
 const normalizeTimelineScaleAxisValue = (
-  property: 'scaleX' | 'scaleY',
+  property: 'scaleX' | 'scaleY' | 'scaleZ',
   value: number,
   fallbackValue: number = 1
 ): number => {
@@ -612,7 +668,7 @@ const normalizeTimelineScaleAxisValue = (
 
 const createPropertyTrack = (
   property: string,
-  value: number | {| x: number, y: number |}
+  value: TimelineValue
 ): TimelinePropertyTrack => {
   const isDiscrete = isDiscreteTimelineProperty(property);
   const normalizedValue = normalizeTimelineValueForProperty(property, value);
@@ -654,20 +710,27 @@ const getFrameStyle = (
 });
 
 const getTimelineValueChannelValue = (
-  value: number | {| x: number, y: number |},
-  channel: 'x' | 'y' | 'value'
+  value: TimelineValue,
+  channel: TimelineValueChannel
 ): number => {
   if (typeof value === 'object') {
+    if (channel === 'z') return getFiniteNumber(value.z, 0);
     return channel === 'y' ? value.y : value.x;
   }
   return value;
 };
 
 const getTimelineValueChannels = (
-  value: number | {| x: number, y: number |}
-): Array<{| channel: 'x' | 'y' | 'value', color: string |}> =>
+  value: TimelineValue
+): Array<{| channel: TimelineValueChannel, color: string |}> =>
   typeof value === 'object'
-    ? [{ channel: 'x', color: '#18A8FF' }, { channel: 'y', color: '#04D4F4' }]
+    ? [
+        { channel: 'x', color: '#18A8FF' },
+        { channel: 'y', color: '#04D4F4' },
+        ...(typeof value.z === 'number'
+          ? [{ channel: 'z', color: '#B478FF' }]
+          : []),
+      ]
     : [{ channel: 'value', color: '#18A8FF' }];
 
 const getKeyframeFrameKey = (time: number): string =>
@@ -707,7 +770,7 @@ const getInitialKeyframeId = (propertyTrack: TimelinePropertyTrack): string =>
 
 const getPropertyTrackInitialValue = (
   propertyTrack: TimelinePropertyTrack
-): number | {| x: number, y: number |} => {
+): TimelineValue => {
   if (propertyTrack.initialValue !== undefined) {
     return normalizeTimelineValueForProperty(
       propertyTrack.property,
@@ -838,8 +901,8 @@ const upsertPropertyTrackKeyframe = (
 
 const getTimelineValueChannelYFromRange = (
   range: {| min: number, max: number, range: number |},
-  value: number | {| x: number, y: number |},
-  channel: 'x' | 'y' | 'value'
+  value: TimelineValue,
+  channel: TimelineValueChannel
 ): number => {
   const channelValue = getTimelineValueChannelValue(value, channel);
   return 86 - ((channelValue - range.min) / range.range) * 72;
@@ -847,7 +910,7 @@ const getTimelineValueChannelYFromRange = (
 
 const getPropertyTrackChannelRange = (
   propertyTrack: TimelinePropertyTrack,
-  channel: 'x' | 'y' | 'value'
+  channel: TimelineValueChannel
 ): {| min: number, max: number, range: number |} => {
   const keyframes = getSamplingTimelineKeyframes(propertyTrack);
   if (!keyframes.length) return { min: 0, max: 1, range: 1 };
@@ -872,7 +935,7 @@ const getTimelineGraphFrameX = (
 const getTimelineGraphPoint = (
   propertyTrack: TimelinePropertyTrack,
   keyframe: TimelineKeyframe,
-  channel: 'x' | 'y' | 'value',
+  channel: TimelineValueChannel,
   graphRange: {| min: number, max: number, range: number |},
   viewStartFrame: number,
   visibleFrames: number
@@ -949,8 +1012,8 @@ const buildPropertyTrackGraphPaths = (
 
 const getTimelineValueChannelY = (
   propertyTrack: TimelinePropertyTrack,
-  value: number | {| x: number, y: number |},
-  channel: 'x' | 'y' | 'value'
+  value: TimelineValue,
+  channel: TimelineValueChannel
 ): number => {
   const range = getPropertyTrackChannelRange(propertyTrack, channel);
   return getTimelineValueChannelYFromRange(range, value, channel);
@@ -961,7 +1024,7 @@ const getNearestTimelineValueChannel = (
   keyframe: TimelineKeyframe,
   clientY: number,
   element: HTMLDivElement
-): 'x' | 'y' | 'value' => {
+): TimelineValueChannel => {
   if (typeof keyframe.value !== 'object') return 'value';
 
   const rect = element.getBoundingClientRect();
@@ -986,27 +1049,33 @@ const getNearestTimelineValueChannel = (
 
 const normalizeDraggedTimelineValue = (
   property: string,
-  value: number | {| x: number, y: number |}
-): number | {| x: number, y: number |} => {
+  value: TimelineValue
+): TimelineValue => {
   if (typeof value === 'object') {
     if (property === 'scale') {
-      return {
+      const normalizedScale = {
         x: Math.max(minimumTimelineScale, getFiniteNumber(value.x, 1)),
         y: Math.max(minimumTimelineScale, getFiniteNumber(value.y, 1)),
       };
+      return typeof value.z === 'number'
+        ? {
+            ...normalizedScale,
+            z: Math.max(minimumTimelineScale, getFiniteNumber(value.z, 1)),
+          }
+        : normalizedScale;
     }
     return value;
   }
 
   if (property === 'opacity') return clamp(value, 0, 255);
   if (property === 'volume') return clamp(value, 0, 100);
-  if (property === 'width' || property === 'height') {
+  if (property === 'width' || property === 'height' || property === 'depth') {
     return Math.max(minimumTimelineDimension, getFiniteNumber(value, 1));
   }
   if (property === 'playbackSpeed' || property === 'animationSpeedScale') {
     return Math.max(minimumTimelineScale, getFiniteNumber(value, 1));
   }
-  if (property === 'scaleX' || property === 'scaleY') {
+  if (property === 'scaleX' || property === 'scaleY' || property === 'scaleZ') {
     return Math.max(minimumTimelineScale, getFiniteNumber(value, 1));
   }
   return getFiniteNumber(value, 0);
@@ -1014,14 +1083,16 @@ const normalizeDraggedTimelineValue = (
 
 const offsetTimelineValueChannel = (
   property: string,
-  value: number | {| x: number, y: number |},
-  channel: 'x' | 'y' | 'value',
+  value: TimelineValue,
+  channel: TimelineValueChannel,
   deltaValue: number
-): number | {| x: number, y: number |} => {
+): TimelineValue => {
   if (typeof value === 'object') {
     const nextValue =
       channel === 'x'
         ? { ...value, x: value.x + deltaValue }
+        : channel === 'z'
+        ? { ...value, z: getFiniteNumber(value.z, 0) + deltaValue }
         : { ...value, y: value.y + deltaValue };
     return normalizeDraggedTimelineValue(property, nextValue);
   }
@@ -1079,10 +1150,17 @@ const isSpine43ObjectType = (objectType: ?string): boolean =>
   objectType === 'Spine43Object' ||
   objectType === 'Spine43Object::Spine43Object';
 
+const isCube3DObjectType = (objectType: ?string): boolean =>
+  objectType === 'Scene3D::Cube3DObject' ||
+  objectType === 'FakeScene3D::Cube3DObject';
+
+const isModel3DObjectType = (objectType: ?string): boolean =>
+  objectType === 'Scene3D::Model3DObject';
+
 const getRenderedInstanceDimension = (
   instance: gdInitialInstance,
   onGetInstanceSize: ?(gdInitialInstance) => [number, number, number],
-  dimensionIndex: 0 | 1
+  dimensionIndex: 0 | 1 | 2
 ): number => {
   if (!onGetInstanceSize) return 0;
 
@@ -1100,14 +1178,18 @@ const getInstanceRawHeight = (instance: gdInitialInstance): number =>
     ? instance.getCustomHeight()
     : instance.getDefaultHeight();
 
+const getInstanceRawDepth = (instance: gdInitialInstance): number =>
+  instance.hasCustomDepth()
+    ? instance.getCustomDepth()
+    : instance.getDefaultDepth();
+
 const getPositiveDimension = (value: number, fallback: number): number =>
   Number.isFinite(value) && value > 0 ? value : fallback;
 
-const areTimelineScaleValuesIdentity = (value: {|
-  x: number,
-  y: number,
-|}): boolean =>
-  Math.abs(value.x - 1) < 0.0001 && Math.abs(value.y - 1) < 0.0001;
+const areTimelineScaleValuesIdentity = (value: TimelinePointValue): boolean =>
+  Math.abs(value.x - 1) < 0.0001 &&
+  Math.abs(value.y - 1) < 0.0001 &&
+  (typeof value.z !== 'number' || Math.abs(value.z - 1) < 0.0001);
 
 const getInstanceScaleBaseWidth = (
   instance: gdInitialInstance,
@@ -1145,6 +1227,24 @@ const getInstanceScaleBaseHeight = (
     )
   );
 
+const getInstanceScaleBaseDepth = (
+  instance: gdInitialInstance,
+  onGetInstanceSize?: ?(gdInitialInstance) => [number, number, number],
+  objectType?: ?string
+): number =>
+  getPositiveDimension(
+    instance.getDefaultDepth(),
+    getPositiveDimension(
+      instance.hasCustomDepth() ? instance.getCustomDepth() : 0,
+      getPositiveDimension(
+        isSpine43ObjectType(objectType)
+          ? 0
+          : getRenderedInstanceDimension(instance, onGetInstanceSize, 2),
+        fallbackTimelineScaleBaseSize
+      )
+    )
+  );
+
 const getInstanceWidth = (
   instance: gdInitialInstance,
   onGetInstanceSize?: ?(gdInitialInstance) => [number, number, number],
@@ -1165,11 +1265,21 @@ const getInstanceHeight = (
     getInstanceScaleBaseHeight(instance, onGetInstanceSize, objectType)
   );
 
+const getInstanceDepth = (
+  instance: gdInitialInstance,
+  onGetInstanceSize?: ?(gdInitialInstance) => [number, number, number],
+  objectType?: ?string
+): number =>
+  getPositiveDimension(
+    getInstanceRawDepth(instance),
+    getInstanceScaleBaseDepth(instance, onGetInstanceSize, objectType)
+  );
+
 const getInstanceScale = (
   instance: gdInitialInstance,
   onGetInstanceSize?: ?(gdInitialInstance) => [number, number, number],
   objectType?: ?string
-): {| x: number, y: number |} => {
+): TimelinePointValue => {
   const defaultWidth = getInstanceScaleBaseWidth(
     instance,
     onGetInstanceSize,
@@ -1180,11 +1290,18 @@ const getInstanceScale = (
     onGetInstanceSize,
     objectType
   );
+  const defaultDepth = getInstanceScaleBaseDepth(
+    instance,
+    onGetInstanceSize,
+    objectType
+  );
   const width = getInstanceWidth(instance, onGetInstanceSize, objectType);
   const height = getInstanceHeight(instance, onGetInstanceSize, objectType);
+  const depth = getInstanceDepth(instance, onGetInstanceSize, objectType);
   return {
     x: getPositiveDimension(width / defaultWidth, 1),
     y: getPositiveDimension(height / defaultHeight, 1),
+    z: getPositiveDimension(depth / defaultDepth, 1),
   };
 };
 
@@ -1211,6 +1328,11 @@ const getInstanceTimelineScaleBaseDimensions = (
     onGetInstanceSize,
     1
   );
+  const renderedDepth = getRenderedInstanceDimension(
+    instance,
+    onGetInstanceSize,
+    2
+  );
 
   if (isSpine43ObjectType(objectType)) {
     return {
@@ -1222,12 +1344,17 @@ const getInstanceTimelineScaleBaseDimensions = (
         renderedHeight,
         getInstanceScaleBaseHeight(instance, onGetInstanceSize, objectType)
       ),
+      depth: getPositiveDimension(
+        renderedDepth,
+        getInstanceScaleBaseDepth(instance, onGetInstanceSize, objectType)
+      ),
     };
   }
 
   return {
     width: getInstanceScaleBaseWidth(instance, onGetInstanceSize, objectType),
     height: getInstanceScaleBaseHeight(instance, onGetInstanceSize, objectType),
+    depth: getInstanceScaleBaseDepth(instance, onGetInstanceSize, objectType),
   };
 };
 
@@ -1271,10 +1398,13 @@ const getSelectedInstancesSignature = (
 
 const getTimelineValueIdentity = (value: any): string =>
   value && typeof value === 'object'
-    ? `${getFiniteNumber(value.x, 0).toFixed(3)},${getFiniteNumber(
-        value.y,
-        0
-      ).toFixed(3)}`
+    ? [
+        getFiniteNumber(value.x, 0),
+        getFiniteNumber(value.y, 0),
+        ...(typeof value.z === 'number' ? [value.z] : []),
+      ]
+        .map(channelValue => getFiniteNumber(channelValue, 0).toFixed(3))
+        .join(',')
     : getFiniteNumber(value, 0).toFixed(3);
 
 const normalizeTimelinePropertyTrack = (
@@ -1396,12 +1526,35 @@ const splitLegacyVectorPropertyTrack = (
     return { propertyTracks: [propertyTrack], changed: false };
   }
 
-  const firstProperty = propertyTrack.property === 'position' ? 'x' : 'scaleX';
-  const secondProperty = propertyTrack.property === 'position' ? 'y' : 'scaleY';
+  const hasZChannel =
+    (propertyTrack.initialValue &&
+      typeof propertyTrack.initialValue === 'object' &&
+      typeof propertyTrack.initialValue.z === 'number') ||
+    propertyTrack.keyframes.some(
+      keyframe =>
+        keyframe.value &&
+        typeof keyframe.value === 'object' &&
+        typeof keyframe.value.z === 'number'
+    );
+  const channelProperties: Array<{|
+    property: string,
+    channel: 'x' | 'y' | 'z',
+  |}> =
+    propertyTrack.property === 'position'
+      ? [
+          { property: 'x', channel: 'x' },
+          { property: 'y', channel: 'y' },
+          ...(hasZChannel ? [{ property: 'z', channel: 'z' }] : []),
+        ]
+      : [
+          { property: 'scaleX', channel: 'x' },
+          { property: 'scaleY', channel: 'y' },
+          ...(hasZChannel ? [{ property: 'scaleZ', channel: 'z' }] : []),
+        ];
 
   const createScalarTrack = (
     property: string,
-    channel: 'x' | 'y',
+    channel: 'x' | 'y' | 'z',
     keepExistingIds: boolean
   ): TimelinePropertyTrack => {
     const fallbackValue = getDefaultTimelinePropertyValue(
@@ -1417,6 +1570,17 @@ const splitLegacyVectorPropertyTrack = (
         : fallbackValue && typeof fallbackValue === 'object'
         ? fallbackValue
         : { x: 0, y: 0 };
+    const getLegacyChannelValue = (legacyValue: TimelineValue): number => {
+      const fallbackChannelValue =
+        channel === 'z'
+          ? propertyTrack.property === 'scale'
+            ? 1
+            : 0
+          : getFiniteNumber(legacyInitialValue[channel], 0);
+      return typeof legacyValue === 'object'
+        ? getFiniteNumber(legacyValue[channel], fallbackChannelValue)
+        : fallbackChannelValue;
+    };
 
     return {
       ...propertyTrack,
@@ -1424,7 +1588,7 @@ const splitLegacyVectorPropertyTrack = (
       property,
       initialValue: normalizeTimelineValueForProperty(
         property,
-        legacyInitialValue[channel]
+        getLegacyChannelValue(legacyInitialValue)
       ),
       keyframes: propertyTrack.keyframes.map(keyframe => {
         const fallbackValue = getDefaultTimelinePropertyValue(
@@ -1441,7 +1605,7 @@ const splitLegacyVectorPropertyTrack = (
           id: keepExistingIds ? keyframe.id : createKeyframeId(),
           value: normalizeTimelineValueForProperty(
             property,
-            legacyValue[channel]
+            getLegacyChannelValue(legacyValue)
           ),
         };
       }),
@@ -1449,10 +1613,13 @@ const splitLegacyVectorPropertyTrack = (
   };
 
   return {
-    propertyTracks: [
-      createScalarTrack(firstProperty, 'x', true),
-      createScalarTrack(secondProperty, 'y', false),
-    ],
+    propertyTracks: channelProperties.map((channelProperty, index) =>
+      createScalarTrack(
+        channelProperty.property,
+        channelProperty.channel,
+        index === 0
+      )
+    ),
     changed: true,
   };
 };
@@ -1629,7 +1796,7 @@ const getTrackPropertyValueFromInstance = (
   property: string,
   onGetInstanceSize?: ?(gdInitialInstance) => [number, number, number],
   objectType?: ?string
-): number | {| x: number, y: number |} => {
+): TimelineValue => {
   if (!instance) {
     return getDefaultTimelinePropertyValue(property);
   }
@@ -1645,8 +1812,20 @@ const getTrackPropertyValueFromInstance = (
       return normalizeTimelineValueForProperty(property, instance.getX());
     case 'y':
       return normalizeTimelineValueForProperty(property, instance.getY());
+    case 'z':
+      return normalizeTimelineValueForProperty(property, instance.getZ());
     case 'angle':
       return normalizeTimelineValueForProperty(property, instance.getAngle());
+    case 'rotationX':
+      return normalizeTimelineValueForProperty(
+        property,
+        instance.getRotationX()
+      );
+    case 'rotationY':
+      return normalizeTimelineValueForProperty(
+        property,
+        instance.getRotationY()
+      );
     case 'scale':
       return getInstanceScale(instance, onGetInstanceSize, objectType);
     case 'scaleX':
@@ -1659,6 +1838,11 @@ const getTrackPropertyValueFromInstance = (
         'scaleY',
         getInstanceScale(instance, onGetInstanceSize, objectType).y
       );
+    case 'scaleZ':
+      return normalizeTimelineScaleAxisValue(
+        'scaleZ',
+        getInstanceScale(instance, onGetInstanceSize, objectType).z || 1
+      );
     case 'opacity':
       return normalizeTimelineValueForProperty(
         property,
@@ -1670,6 +1854,8 @@ const getTrackPropertyValueFromInstance = (
       return getInstanceWidth(instance, onGetInstanceSize, objectType);
     case 'height':
       return getInstanceHeight(instance, onGetInstanceSize, objectType);
+    case 'depth':
+      return getInstanceDepth(instance, onGetInstanceSize, objectType);
     default:
       return getDefaultTimelinePropertyValue(property);
   }
@@ -1678,6 +1864,13 @@ const getTrackPropertyValueFromInstance = (
 const getTimelinePropertiesForObjectType = (
   objectType: ?string
 ): Array<string> => {
+  if (isModel3DObjectType(objectType)) {
+    return model3DTimelineProperties;
+  }
+  if (isCube3DObjectType(objectType)) {
+    return threeDTransformTimelineProperties;
+  }
+
   switch (objectType) {
     case 'Sprite':
     case 'TiledSpriteObject::TiledSprite':
@@ -1789,6 +1982,12 @@ const getPropertyLabel = (property: string): React.Node => {
       return <Trans>Position</Trans>;
     case 'angle':
       return <Trans>Angle</Trans>;
+    case 'rotationX':
+      return <Trans>X rotation</Trans>;
+    case 'rotationY':
+      return <Trans>Y rotation</Trans>;
+    case 'rotationZ':
+      return <Trans>Z rotation</Trans>;
     case 'opacity':
       return <Trans>Opacity</Trans>;
     case 'scale':
@@ -1797,10 +1996,14 @@ const getPropertyLabel = (property: string): React.Node => {
       return <Trans>X scale</Trans>;
     case 'scaleY':
       return <Trans>Y scale</Trans>;
+    case 'scaleZ':
+      return <Trans>Z scale</Trans>;
     case 'width':
       return <Trans>Width</Trans>;
     case 'height':
       return <Trans>Height</Trans>;
+    case 'depth':
+      return <Trans>Depth</Trans>;
     case 'animationIndex':
       return <Trans>Animation</Trans>;
     case 'animationFrame':
@@ -1821,6 +2024,8 @@ const getPropertyLabel = (property: string): React.Node => {
       return <Trans>X position</Trans>;
     case 'y':
       return <Trans>Y position</Trans>;
+    case 'z':
+      return <Trans>Z position</Trans>;
     default:
       return property;
   }
@@ -2093,7 +2298,7 @@ const findTimelineKeyframePair = (
 const interpolateTimelineValue = (
   propertyTrack: TimelinePropertyTrack,
   time: number
-): number | {| x: number, y: number |} | null => {
+): TimelineValue | null => {
   const keyframes = getSamplingTimelineKeyframes(propertyTrack);
   if (!keyframes.length) return null;
 
@@ -2113,10 +2318,19 @@ const interpolateTimelineValue = (
 
   const easedT = evaluateTimelineCurve(getKeyframeCurve(from), localT);
   if (typeof from.value === 'object' && typeof to.value === 'object') {
-    return {
+    const value = {
       x: from.value.x + (to.value.x - from.value.x) * easedT,
       y: from.value.y + (to.value.y - from.value.y) * easedT,
     };
+    if (typeof from.value.z === 'number' || typeof to.value.z === 'number') {
+      const fromZ = getFiniteNumber(from.value.z, 0);
+      const toZ = getFiniteNumber(to.value.z, fromZ);
+      return {
+        ...value,
+        z: fromZ + (toZ - fromZ) * easedT,
+      };
+    }
+    return value;
   }
   if (typeof from.value === 'number' && typeof to.value === 'number') {
     return from.value + (to.value - from.value) * easedT;
@@ -2129,7 +2343,7 @@ const getPropertyValueFromInitialInstance = (
   propertyName: string,
   onGetInstanceSize?: ?(gdInitialInstance) => [number, number, number],
   objectType?: ?string
-): number | {| x: number, y: number |} | null => {
+): TimelineValue | null => {
   const instanceAsAny = (instance: any);
   if (propertyName === 'position') {
     return normalizeTimelineValueForProperty(propertyName, {
@@ -2143,7 +2357,25 @@ const getPropertyValueFromInitialInstance = (
   if (propertyName === 'y' || propertyName === 'Y') {
     return getFiniteNumber(instance.getY(), 0);
   }
+  if (propertyName === 'z' || propertyName === 'Z') {
+    return normalizeTimelineValueForProperty('z', instance.getZ());
+  }
   if (propertyName === 'angle' || propertyName === 'Angle') {
+    return normalizeTimelineValueForProperty('angle', instance.getAngle());
+  }
+  if (propertyName === 'rotationX' || propertyName === 'RotationX') {
+    return normalizeTimelineValueForProperty(
+      'rotationX',
+      instance.getRotationX()
+    );
+  }
+  if (propertyName === 'rotationY' || propertyName === 'RotationY') {
+    return normalizeTimelineValueForProperty(
+      'rotationY',
+      instance.getRotationY()
+    );
+  }
+  if (propertyName === 'rotationZ' || propertyName === 'RotationZ') {
     return normalizeTimelineValueForProperty('angle', instance.getAngle());
   }
   if (propertyName === 'scale' || propertyName === 'Scale') {
@@ -2161,11 +2393,20 @@ const getPropertyValueFromInitialInstance = (
       getInstanceScale(instance, onGetInstanceSize, objectType).y
     );
   }
+  if (propertyName === 'scaleZ' || propertyName === 'ScaleZ') {
+    return normalizeTimelineScaleAxisValue(
+      'scaleZ',
+      getInstanceScale(instance, onGetInstanceSize, objectType).z || 1
+    );
+  }
   if (propertyName === 'width' || propertyName === 'Width') {
     return getInstanceWidth(instance, onGetInstanceSize, objectType);
   }
   if (propertyName === 'height' || propertyName === 'Height') {
     return getInstanceHeight(instance, onGetInstanceSize, objectType);
+  }
+  if (propertyName === 'depth' || propertyName === 'Depth') {
+    return getInstanceDepth(instance, onGetInstanceSize, objectType);
   }
   if (
     (propertyName === 'opacity' || propertyName === 'Opacity') &&
@@ -2219,12 +2460,14 @@ const isTimelineScaleProperty = (propertyName: string): boolean =>
   propertyName === 'scaleX' ||
   propertyName === 'ScaleX' ||
   propertyName === 'scaleY' ||
-  propertyName === 'ScaleY';
+  propertyName === 'ScaleY' ||
+  propertyName === 'scaleZ' ||
+  propertyName === 'ScaleZ';
 
 const applyValueToInitialInstance = (
   instance: gdInitialInstance,
   propertyName: string,
-  value: number | {| x: number, y: number |},
+  value: TimelineValue,
   onGetInstanceSize?: ?(gdInitialInstance) => [number, number, number],
   objectType?: ?string,
   scaleBaseDimensions?: ?TimelineScaleBaseDimensions
@@ -2238,6 +2481,9 @@ const applyValueToInitialInstance = (
     if (typeof normalizedValue === 'object') {
       instance.setX(normalizedValue.x);
       instance.setY(normalizedValue.y);
+      if (typeof normalizedValue.z === 'number') {
+        instance.setZ(normalizedValue.z);
+      }
     }
   } else if (
     (propertyName === 'x' || propertyName === 'X') &&
@@ -2250,7 +2496,31 @@ const applyValueToInitialInstance = (
   ) {
     instance.setY(getFiniteNumber(value, instance.getY()));
   } else if (
+    (propertyName === 'z' || propertyName === 'Z') &&
+    typeof value === 'number'
+  ) {
+    instance.setZ(normalizeTimelineNumberValueForProperty('z', value));
+  } else if (
     (propertyName === 'angle' || propertyName === 'Angle') &&
+    typeof value === 'number'
+  ) {
+    instance.setAngle(normalizeTimelineNumberValueForProperty('angle', value));
+  } else if (
+    (propertyName === 'rotationX' || propertyName === 'RotationX') &&
+    typeof value === 'number'
+  ) {
+    instance.setRotationX(
+      normalizeTimelineNumberValueForProperty('rotationX', value)
+    );
+  } else if (
+    (propertyName === 'rotationY' || propertyName === 'RotationY') &&
+    typeof value === 'number'
+  ) {
+    instance.setRotationY(
+      normalizeTimelineNumberValueForProperty('rotationY', value)
+    );
+  } else if (
+    (propertyName === 'rotationZ' || propertyName === 'RotationZ') &&
     typeof value === 'number'
   ) {
     instance.setAngle(normalizeTimelineNumberValueForProperty('angle', value));
@@ -2287,6 +2557,38 @@ const applyValueToInitialInstance = (
     );
     instance.setCustomHeight(
       Math.max(minimumTimelineDimension, baseHeight * normalizedValue.y)
+    );
+    if (typeof normalizedValue.z === 'number') {
+      const baseDepth =
+        scaleBaseDimensions && scaleBaseDimensions.depth > 0
+          ? scaleBaseDimensions.depth
+          : getInstanceScaleBaseDepth(instance, onGetInstanceSize, objectType);
+      instance.setHasCustomDepth(true);
+      instance.setCustomDepth(
+        Math.max(minimumTimelineDimension, baseDepth * normalizedValue.z)
+      );
+    }
+  } else if (
+    (propertyName === 'scaleZ' || propertyName === 'ScaleZ') &&
+    typeof value === 'number'
+  ) {
+    const currentScale = getInstanceScale(
+      instance,
+      onGetInstanceSize,
+      objectType
+    );
+    const nextScaleZ = normalizeTimelineScaleAxisValue(
+      'scaleZ',
+      value,
+      currentScale.z || 1
+    );
+    const baseDepth =
+      scaleBaseDimensions && scaleBaseDimensions.depth > 0
+        ? scaleBaseDimensions.depth
+        : getInstanceScaleBaseDepth(instance, onGetInstanceSize, objectType);
+    instance.setHasCustomDepth(true);
+    instance.setCustomDepth(
+      Math.max(minimumTimelineDimension, baseDepth * nextScaleZ)
     );
   } else if (
     (propertyName === 'scaleX' ||
@@ -2359,6 +2661,18 @@ const applyValueToInitialInstance = (
       )
     );
   } else if (
+    (propertyName === 'depth' || propertyName === 'Depth') &&
+    typeof value === 'number'
+  ) {
+    instance.setHasCustomDepth(true);
+    instance.setCustomDepth(
+      normalizeTimelineNumberValueForProperty(
+        'depth',
+        value,
+        getInstanceDepth(instance, onGetInstanceSize, objectType)
+      )
+    );
+  } else if (
     (propertyName === 'opacity' || propertyName === 'Opacity') &&
     typeof value === 'number' &&
     typeof instanceAsAny.setOpacity === 'function'
@@ -2390,10 +2704,10 @@ const applyValueToInitialInstance = (
 const normalizeValueForInitialInstance = (
   instance: gdInitialInstance,
   propertyName: string,
-  value: number | {| x: number, y: number |},
+  value: TimelineValue,
   onGetInstanceSize?: ?(gdInitialInstance) => [number, number, number],
   objectType?: ?string
-): number | {| x: number, y: number |} => {
+): TimelineValue => {
   if (
     (propertyName === 'scale' || propertyName === 'Scale') &&
     typeof value === 'object'
@@ -2417,7 +2731,9 @@ const normalizeValueForInitialInstance = (
       onGetInstanceSize,
       objectType
     );
-    return propertyName === 'scaleY' || propertyName === 'ScaleY'
+    return propertyName === 'scaleZ' || propertyName === 'ScaleZ'
+      ? normalizeTimelineScaleAxisValue('scaleZ', value, currentScale.z || 1)
+      : propertyName === 'scaleY' || propertyName === 'ScaleY'
       ? normalizeTimelineScaleAxisValue('scaleY', value, currentScale.y)
       : normalizeTimelineScaleAxisValue('scaleX', value, currentScale.x);
   }
@@ -2434,6 +2750,8 @@ const normalizeValueForInitialInstance = (
       propertyName === 'Width' ||
       propertyName === 'height' ||
       propertyName === 'Height' ||
+      propertyName === 'depth' ||
+      propertyName === 'Depth' ||
       propertyName === 'currentTime') &&
     typeof value === 'number'
   ) {
@@ -2442,12 +2760,16 @@ const normalizeValueForInitialInstance = (
         ? 'width'
         : propertyName === 'Height'
         ? 'height'
+        : propertyName === 'Depth'
+        ? 'depth'
         : propertyName;
     const fallback =
       canonicalProperty === 'width'
         ? getInstanceWidth(instance, onGetInstanceSize, objectType)
         : canonicalProperty === 'height'
         ? getInstanceHeight(instance, onGetInstanceSize, objectType)
+        : canonicalProperty === 'depth'
+        ? getInstanceDepth(instance, onGetInstanceSize, objectType)
         : undefined;
     return normalizeTimelineValueForProperty(
       canonicalProperty,
@@ -3735,7 +4057,7 @@ export default function TimelineEditor({
 
       const getReferenceValue = (
         propertyTrack: TimelinePropertyTrack
-      ): number | {| x: number, y: number |} => {
+      ): TimelineValue => {
         const interpolatedTimelineValue = interpolateTimelineValue(
           propertyTrack,
           keyframeTime
@@ -3747,7 +4069,7 @@ export default function TimelineEditor({
 
       const getCurrentValue = (
         propertyTrack: TimelinePropertyTrack
-      ): number | {| x: number, y: number |} => {
+      ): TimelineValue => {
         const fallbackValue = getReferenceValue(propertyTrack);
         const currentInstanceValue = targetInitialInstance
           ? getPropertyValueFromInitialInstance(

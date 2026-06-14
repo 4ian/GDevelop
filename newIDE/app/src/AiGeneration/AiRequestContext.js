@@ -686,11 +686,39 @@ export const AiRequestProvider = ({
   // single polling loop defined further below (see `onWatch`), so that a parent
   // request and all its sub-agents are status-polled in one batched request per
   // tick instead of one request per entity.
-  const watchPollingIntervalInMs =
+  //
+  // The polling interval is adaptive: it stays fast while the agent is actively
+  // producing output (new messages or status changes) so the editor reacts
+  // quickly, but backs off (up to `maxWatchPollingIntervalInMs`) during long
+  // idle waits — typically while the backend is blocked on a single LLM call
+  // that produces nothing in the meantime. Any observed change snaps it back to
+  // the base interval, so the many fast sequential steps of an agent run are
+  // never slowed down. This keeps latency essentially flat while cutting the
+  // number of (billed) polling requests during otherwise-idle waits.
+  const baseWatchPollingIntervalInMs =
     (selectedAiRequest &&
       selectedAiRequest.toolOptions &&
       selectedAiRequest.toolOptions.watchPollingIntervalInMs) ||
     1400;
+  const maxWatchPollingIntervalInMs = Math.max(
+    baseWatchPollingIntervalInMs,
+    5000
+  );
+  const [
+    currentWatchPollingIntervalInMs,
+    setCurrentWatchPollingIntervalInMs,
+  ] = React.useState<number>(baseWatchPollingIntervalInMs);
+
+  // Restart polling at the fast base interval whenever a new request becomes
+  // watched or the watched request changes, so the first updates are picked up
+  // quickly even if the interval had previously backed off. None of these
+  // dependencies change during routine polling, so this never resets mid-flight.
+  React.useEffect(
+    () => {
+      setCurrentWatchPollingIntervalInMs(baseWatchPollingIntervalInMs);
+    },
+    [selectedAiRequestId, shouldWatchRequest, baseWatchPollingIntervalInMs]
+  );
 
   React.useEffect(
     () => {
@@ -811,6 +839,10 @@ export const AiRequestProvider = ({
     if (!profile) return;
     const now = Date.now();
 
+    // Set to true whenever this tick observes activity (a status change or new
+    // messages). Used at the end of the tick to drive the adaptive interval.
+    let sawChangeThisTick = false;
+
     const clearFetchingSuggestionsIfDone = (aiRequest: AiRequest) => {
       if (!isFetchingSuggestions) return;
       const output = aiRequest.output || [];
@@ -838,7 +870,8 @@ export const AiRequestProvider = ({
       // Only fetch the messages we don't have yet: ask for everything from the
       // last message we already have onward (re-fetched so its in-place
       // updates, like suggestions, are picked up).
-      const currentOutput = (aiRequests[aiRequestId] || {}).output;
+      const previousAiRequest = aiRequests[aiRequestId];
+      const currentOutput = (previousAiRequest || {}).output;
       const lastMessage =
         currentOutput && currentOutput.length > 0
           ? currentOutput[currentOutput.length - 1]
@@ -852,9 +885,27 @@ export const AiRequestProvider = ({
           outputFromMessageId,
         })
       );
-      updateAiRequest(aiRequestId, previousAiRequest =>
+      // Detect activity to drive the adaptive polling interval. A status change,
+      // or genuinely new messages, counts as activity. The incremental fetch
+      // echoes the last already-known message (so its in-place updates are
+      // picked up), so a returned count > 1 means there is at least one new
+      // message; when there was no known message yet, any returned message is
+      // new.
+      const previousStatus = previousAiRequest ? previousAiRequest.status : null;
+      const fetchedOutputCount =
+        (fetchedAiRequest.output && fetchedAiRequest.output.length) || 0;
+      const fetchedNewMessageCount = outputFromMessageId
+        ? Math.max(0, fetchedOutputCount - 1)
+        : fetchedOutputCount;
+      if (
+        fetchedAiRequest.status !== previousStatus ||
+        fetchedNewMessageCount > 0
+      ) {
+        sawChangeThisTick = true;
+      }
+      updateAiRequest(aiRequestId, previousAiRequestToMerge =>
         mergeIncrementalAiRequest(
-          previousAiRequest,
+          previousAiRequestToMerge,
           fetchedAiRequest,
           outputFromMessageId
         )
@@ -919,6 +970,7 @@ export const AiRequestProvider = ({
           if (!currentRequest) return;
           if (newStatus !== currentRequest.status) {
             // Status changed — full fetch immediately to pick up new messages.
+            sawChangeThisTick = true;
             await doFullFetch(aiRequestId);
           } else {
             updateAiRequest(aiRequestId, prevRequest => ({
@@ -938,6 +990,21 @@ export const AiRequestProvider = ({
         error
       );
     }
+
+    // Adapt the polling interval: snap back to the fast base interval on any
+    // observed activity, otherwise gently back off (×1.5) up to the cap so idle
+    // waits cost fewer requests. Returning the same number is a no-op for React,
+    // so a stable backed-off or base interval does not trigger re-renders.
+    setCurrentWatchPollingIntervalInMs(previousInterval =>
+      sawChangeThisTick
+        ? baseWatchPollingIntervalInMs
+        : Math.min(
+            Math.round(
+              (previousInterval || baseWatchPollingIntervalInMs) * 1.5
+            ),
+            maxWatchPollingIntervalInMs
+          )
+    );
   };
 
   useInterval(
@@ -945,7 +1012,7 @@ export const AiRequestProvider = ({
       onWatch();
     },
     (shouldWatchRequest || hasActiveSubAgents) && !pendingEditApproval
-      ? watchPollingIntervalInMs
+      ? currentWatchPollingIntervalInMs
       : null
   );
 

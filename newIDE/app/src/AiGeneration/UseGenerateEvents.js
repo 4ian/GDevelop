@@ -118,11 +118,19 @@ export const useGenerateEvents = ({
           };
         }
 
-        let remainingAttempts = 50;
+        // Poll for the generation result with an exponential backoff: stay fast
+        // initially (most generations complete within a few seconds) but back
+        // off up to a cap so long-running generations don't cost dozens of
+        // (billed) requests. The loop is bounded by a total time budget rather
+        // than a fixed attempt count, so the maximum wait stays predictable
+        // regardless of the interval.
+        const maxTotalWaitMs = 60000;
+        const maxPollIntervalMs = 5000;
+        const startTime = Date.now();
+        let pollIntervalMs = 1000;
         let aiGeneratedEvent = createResult.aiGeneratedEvent;
         while (aiGeneratedEvent.status === 'working') {
-          remainingAttempts--;
-          await delay(1000);
+          await delay(pollIntervalMs);
 
           try {
             aiGeneratedEvent = await getAiGeneratedEvent(
@@ -138,7 +146,11 @@ export const useGenerateEvents = ({
               error
             );
           }
-          if (remainingAttempts <= 0) {
+          pollIntervalMs = Math.min(
+            Math.round(pollIntervalMs * 1.5),
+            maxPollIntervalMs
+          );
+          if (Date.now() - startTime >= maxTotalWaitMs) {
             return {
               generationCompleted: false,
               errorMessage:

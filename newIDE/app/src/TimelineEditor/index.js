@@ -2578,14 +2578,15 @@ const applyValueToInitialInstance = (
     instance.setCustomHeight(
       Math.max(minimumTimelineDimension, baseHeight * normalizedValue.y)
     );
-    if (typeof normalizedValue.z === 'number') {
+    const normalizedScaleZ = normalizedValue.z;
+    if (typeof normalizedScaleZ === 'number') {
       const baseDepth =
         scaleBaseDimensions && scaleBaseDimensions.depth > 0
           ? scaleBaseDimensions.depth
           : getInstanceScaleBaseDepth(instance, onGetInstanceSize, objectType);
       instance.setHasCustomDepth(true);
       instance.setCustomDepth(
-        Math.max(minimumTimelineDimension, baseDepth * normalizedValue.z)
+        Math.max(minimumTimelineDimension, baseDepth * normalizedScaleZ)
       );
     }
   } else if (
@@ -2622,16 +2623,15 @@ const applyValueToInitialInstance = (
       onGetInstanceSize,
       objectType
     );
-    const nextScale = {
-      x:
-        propertyName === 'scaleX' || propertyName === 'ScaleX'
-          ? normalizeTimelineScaleAxisValue('scaleX', value, currentScale.x)
-          : currentScale.x,
-      y:
-        propertyName === 'scaleY' || propertyName === 'ScaleY'
-          ? normalizeTimelineScaleAxisValue('scaleY', value, currentScale.y)
-          : currentScale.y,
-    };
+    const nextScale = createTimelinePointValue(
+      propertyName === 'scaleX' || propertyName === 'ScaleX'
+        ? normalizeTimelineScaleAxisValue('scaleX', value, currentScale.x)
+        : currentScale.x,
+      propertyName === 'scaleY' || propertyName === 'ScaleY'
+        ? normalizeTimelineScaleAxisValue('scaleY', value, currentScale.y)
+        : currentScale.y,
+      typeof currentScale.z === 'number' ? currentScale.z : undefined
+    );
 
     if (
       isSpine43ObjectType(objectType) &&
@@ -2743,7 +2743,9 @@ const normalizeValueForInitialInstance = (
     (propertyName === 'scaleX' ||
       propertyName === 'ScaleX' ||
       propertyName === 'scaleY' ||
-      propertyName === 'ScaleY') &&
+      propertyName === 'ScaleY' ||
+      propertyName === 'scaleZ' ||
+      propertyName === 'ScaleZ') &&
     typeof value === 'number'
   ) {
     const currentScale = getInstanceScale(
@@ -5420,7 +5422,7 @@ export default function TimelineEditor({
       propertyTrack: TimelinePropertyTrack,
       keyframe: TimelineKeyframe,
       nextSelectedKeyframeIds: Array<string>,
-      draggedChannel?: 'x' | 'y' | 'value'
+      draggedChannel?: TimelineValueChannel
     ) => {
       const laneElement = event.currentTarget.parentElement;
       if (!laneElement) return;

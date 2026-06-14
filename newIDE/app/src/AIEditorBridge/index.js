@@ -504,6 +504,49 @@ const getLayerName = (value: any): string => {
   return typeof value === 'string' ? value : '';
 };
 
+const setInitialInstanceDepth = (
+  instance: gdInitialInstance,
+  depth: number
+) => {
+  instance.setHasCustomDepth(true);
+  instance.setCustomDepth(Math.max(0, depth));
+};
+
+const applyInitialInstance3DProperties = (
+  instance: gdInitialInstance,
+  params: { [string]: any },
+  allowDeltas: boolean = false
+) => {
+  if (typeof params.z === 'number') instance.setZ(params.z);
+  if (allowDeltas && typeof params.deltaZ === 'number') {
+    instance.setZ(instance.getZ() + params.deltaZ);
+  }
+
+  if (typeof params.rotationX === 'number') {
+    instance.setRotationX(params.rotationX);
+  }
+  if (allowDeltas && typeof params.deltaRotationX === 'number') {
+    instance.setRotationX(instance.getRotationX() + params.deltaRotationX);
+  }
+
+  if (typeof params.rotationY === 'number') {
+    instance.setRotationY(params.rotationY);
+  }
+  if (allowDeltas && typeof params.deltaRotationY === 'number') {
+    instance.setRotationY(instance.getRotationY() + params.deltaRotationY);
+  }
+
+  if (typeof params.depth === 'number') {
+    setInitialInstanceDepth(instance, params.depth);
+  }
+  if (allowDeltas && typeof params.deltaDepth === 'number') {
+    setInitialInstanceDepth(
+      instance,
+      instance.getCustomDepth() + params.deltaDepth
+    );
+  }
+};
+
 const resourceKinds: Array<ResourceKind> = [
   'audio',
   'image',
@@ -953,6 +996,7 @@ const createInstance = (props: Props, params: { [string]: any }) => {
   instance.setY(getNumberOrDefault(params.y, 0));
   instance.setAngle(getNumberOrDefault(params.angle, 0));
   instance.setLayer(getLayerName(params.layer));
+  applyInitialInstance3DProperties(instance, params);
   if (typeof params.zOrder === 'number' && Number.isInteger(params.zOrder)) {
     instance.setZOrder(params.zOrder);
   }
@@ -1063,6 +1107,7 @@ const updateSelectedInstances = (props: Props, params: { [string]: any }) => {
     if (typeof params.deltaAngle === 'number') {
       instance.setAngle(instance.getAngle() + params.deltaAngle);
     }
+    applyInitialInstance3DProperties(instance, params, true);
     if (typeof params.layer === 'string') instance.setLayer(params.layer);
     if (typeof params.zOrder === 'number' && Number.isInteger(params.zOrder)) {
       instance.setZOrder(params.zOrder);
@@ -1510,7 +1555,12 @@ const summarizeSelection = (editorTabs: EditorTabsState) => {
     persistentUuid: instance.getPersistentUuid(),
     x: instance.getX(),
     y: instance.getY(),
+    z: instance.getZ(),
     angle: instance.getAngle(),
+    rotationX: instance.getRotationX(),
+    rotationY: instance.getRotationY(),
+    hasCustomDepth: instance.hasCustomDepth(),
+    depth: instance.hasCustomDepth() ? instance.getCustomDepth() : null,
     layer: instance.getLayer(),
     zOrder: instance.getZOrder(),
   }));

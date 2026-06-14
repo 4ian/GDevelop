@@ -25,6 +25,14 @@ jest.mock('../Utils/GDevelopServices/Generation');
 const mockFn = (fn: any): JestMockFn<any, any> => fn;
 
 const POLLING_INTERVAL_IN_MS = 1400;
+// After an idle tick the adaptive polling interval backs off ×1.5 (see
+// useAdaptivePollingInterval), so later ticks fire after a longer delay.
+const POLLING_INTERVAL_AFTER_BACKOFF_IN_MS = Math.round(
+  POLLING_INTERVAL_IN_MS * 1.5
+); // 2100
+const POLLING_INTERVAL_AFTER_2X_BACKOFF_IN_MS = Math.round(
+  POLLING_INTERVAL_AFTER_BACKOFF_IN_MS * 1.5
+); // 3150
 
 const makeAiRequest = (
   id: string,
@@ -155,18 +163,23 @@ describe('AiRequestProvider sub-agent polling', () => {
     expect(mockFn(getAiRequest)).toHaveBeenCalledTimes(1);
     expect(mockFn(getAiRequestStatuses)).toHaveBeenCalledTimes(0);
 
-    // Subsequent ticks within the 5s full-fetch window: each must do a
-    // (batched) status-only fetch only. Because the status matches the cached
-    // status, no additional full fetch should happen.
-    for (let i = 0; i < 3; i++) {
+    // Subsequent ticks within the full-fetch window do a (batched) status-only
+    // fetch only. Because the status matches the cached status, no additional
+    // full fetch should happen. The interval backs off after each idle tick, so
+    // advance by the backed-off amount to fire each tick (still within the 7s
+    // window: 1400 + 2100 + 3150 = 6650ms).
+    for (const intervalMs of [
+      POLLING_INTERVAL_AFTER_BACKOFF_IN_MS,
+      POLLING_INTERVAL_AFTER_2X_BACKOFF_IN_MS,
+    ]) {
       // eslint-disable-next-line no-await-in-loop
       await act(async () => {
-        jest.advanceTimersByTime(POLLING_INTERVAL_IN_MS);
+        jest.advanceTimersByTime(intervalMs);
         await flushPromises();
       });
     }
 
-    expect(mockFn(getAiRequestStatuses)).toHaveBeenCalledTimes(3);
+    expect(mockFn(getAiRequestStatuses)).toHaveBeenCalledTimes(2);
     // Critical assertion: still only the initial full fetch — the bug
     // would have caused one full fetch per tick after the sub-agent
     // reached `ready`.
@@ -204,14 +217,14 @@ describe('AiRequestProvider sub-agent polling', () => {
 
     // Now backend switches the sub-agent to `ready`. The batched status fetch
     // reports the new status, so the polling loop should immediately do another
-    // full fetch even though the 5s window has not elapsed.
+    // full fetch even though the full-fetch window has not elapsed.
     mockFn(getAiRequest).mockResolvedValue(subAgentReady);
     mockFn(getAiRequestStatuses).mockResolvedValue([
       { id: 'sub-1', status: 'ready', userId: 'user-1' },
     ]);
 
     await act(async () => {
-      jest.advanceTimersByTime(POLLING_INTERVAL_IN_MS);
+      jest.advanceTimersByTime(POLLING_INTERVAL_AFTER_BACKOFF_IN_MS);
       await flushPromises();
     });
 
@@ -259,7 +272,7 @@ describe('AiRequestProvider sub-agent polling', () => {
 
     // Second tick: everyone is status-only → one batched request for all ids.
     await act(async () => {
-      jest.advanceTimersByTime(POLLING_INTERVAL_IN_MS);
+      jest.advanceTimersByTime(POLLING_INTERVAL_AFTER_BACKOFF_IN_MS);
       await flushPromises();
     });
 
@@ -309,7 +322,7 @@ describe('AiRequestProvider sub-agent polling', () => {
     ]);
 
     await act(async () => {
-      jest.advanceTimersByTime(POLLING_INTERVAL_IN_MS);
+      jest.advanceTimersByTime(POLLING_INTERVAL_AFTER_BACKOFF_IN_MS);
       await flushPromises();
     });
 
@@ -352,7 +365,7 @@ describe('AiRequestProvider sub-agent polling', () => {
     ]);
 
     await act(async () => {
-      jest.advanceTimersByTime(POLLING_INTERVAL_IN_MS);
+      jest.advanceTimersByTime(POLLING_INTERVAL_AFTER_BACKOFF_IN_MS);
       await flushPromises();
     });
 

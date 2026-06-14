@@ -1723,17 +1723,35 @@ export default class SceneEditor extends React.Component<Props, State> {
     }
   };
 
+  _getCanvasCenterSceneCoordinates = (): ?[number, number] => {
+    const { editorDisplay } = this;
+    if (!editorDisplay) return null;
+
+    const viewPosition = editorDisplay.viewControls.getViewPosition();
+    if (!viewPosition) return null;
+
+    return viewPosition.toSceneCoordinates(
+      viewPosition.getWidth() / 2,
+      viewPosition.getHeight() / 2
+    );
+  };
+
   /**
-   * Create an instance of the given object, at the position
-   * previously chosen (see `newObjectInstanceSceneCoordinates`).
+   * Create an instance of the given object at the position previously chosen
+   * (see `newObjectInstanceSceneCoordinates`), or at the canvas center.
    */
-  _addInstanceForNewObject = (newObjectName: string) => {
+  _addInstanceForNewObject = (object: gdObject) => {
     const { newObjectInstanceSceneCoordinates } = this.state;
-    if (!newObjectInstanceSceneCoordinates) {
+    const instancePosition =
+      newObjectInstanceSceneCoordinates ||
+      this._getCanvasCenterSceneCoordinates();
+
+    if (!instancePosition) {
+      this.setState({ newObjectInstanceSceneCoordinates: null });
       return;
     }
 
-    this._addInstance(newObjectInstanceSceneCoordinates, newObjectName);
+    this._addInstancesForObjectsAtPosition([object], instancePosition);
     this.setState({ newObjectInstanceSceneCoordinates: null });
   };
 
@@ -1745,7 +1763,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       return;
     }
     this._onObjectsCreated(objects, isTheFirstOfItsTypeInProject);
-    this._addInstanceForNewObject(objects[0].getName());
+    this._addInstanceForNewObject(objects[0]);
   };
 
   _onObjectsCreated = (

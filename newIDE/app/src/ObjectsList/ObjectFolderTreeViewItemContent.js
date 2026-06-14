@@ -64,7 +64,8 @@ export type ObjectFolderTreeViewItemProps = {|
   onObjectModified: (shouldForceUpdateList: boolean) => void,
   onObjectCreated: (
     objects: Array<gdObject>,
-    isTheFirstOfItsTypeInProject: boolean
+    isTheFirstOfItsTypeInProject: boolean,
+    options?: {| shouldCreateInstance?: boolean |}
   ) => void,
   expandFolders: (
     objectFolderOrObjectWithContexts: Array<ObjectFolderOrObjectWithContext>

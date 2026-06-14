@@ -74,6 +74,9 @@ const styles = {
   dropCursor: { cursor: 'copy' },
 };
 
+const getCanvasResolution = (): number =>
+  Math.max(1, window.devicePixelRatio || 1);
+
 const DropTarget = makeDropTarget<{||}>(objectWithContextReactDndType);
 
 export type EditorViewPosition2D = {|
@@ -199,6 +202,7 @@ export default class InstancesEditor extends Component<Props, State> {
   contextMenuLongTouchTimeoutID: TimeoutID;
   hasCursorMovedSinceItIsDown = false;
   _showObjectInstancesIn3D: boolean = false;
+  _canvasResolution: number = 1;
   _previousToolBeforePicker: ?TileMapTileSelection = null;
 
   // $FlowFixMe[missing-local-annot]
@@ -262,6 +266,8 @@ export default class InstancesEditor extends Component<Props, State> {
     // and can cause shader creation to fail on some platforms (e.g. Windows with ANGLE).
     const initialWidth = this.props.width || 1;
     const initialHeight = this.props.height || 1;
+    const canvasResolution = getCanvasResolution();
+    this._canvasResolution = canvasResolution;
     // TODO (3D): Should it handle preference changes without needing to reopen tabs?
     if (this._showObjectInstancesIn3D) {
       gameCanvas = document.createElement('canvas');
@@ -270,6 +276,7 @@ export default class InstancesEditor extends Component<Props, State> {
       });
       threeRenderer.useLegacyLights = true;
       threeRenderer.autoClear = false;
+      threeRenderer.setPixelRatio(canvasResolution);
       threeRenderer.setSize(initialWidth, initialHeight);
 
       // Create a PixiJS renderer that use the same GL context as Three.js
@@ -287,7 +294,8 @@ export default class InstancesEditor extends Component<Props, State> {
         // It's the default value, but it's better to make it explicit.
         // It allows instances composed of several pixi objects to detect hovering.
         eventMode: 'auto',
-        // TODO (3D): add a setting for pixel ratio (`resolution: window.devicePixelRatio`)
+        resolution: canvasResolution,
+        autoDensity: true,
       });
 
       this.threeRenderer = threeRenderer;
@@ -302,6 +310,8 @@ export default class InstancesEditor extends Component<Props, State> {
         antialias: false,
         clearBeforeRender: false,
         backgroundAlpha: 0,
+        resolution: canvasResolution,
+        autoDensity: true,
       });
 
       gameCanvas = this.pixiRenderer.view;
@@ -687,9 +697,11 @@ export default class InstancesEditor extends Component<Props, State> {
 
   // To be updated, see https://reactjs.org/docs/react-component.html#unsafe_componentwillreceiveprops.
   UNSAFE_componentWillReceiveProps(nextProps: Props) {
+    const canvasResolution = getCanvasResolution();
     if (
       nextProps.width !== this.props.width ||
-      nextProps.height !== this.props.height
+      nextProps.height !== this.props.height ||
+      canvasResolution !== this._canvasResolution
     ) {
       // Ensure we don't resize to 0, which is invalid for PixiJS/WebGL.
       const width = nextProps.width || 1;
@@ -711,10 +723,14 @@ export default class InstancesEditor extends Component<Props, State> {
           // this.pixiRenderer.reset();
         }
 
+        this.pixiRenderer.resolution = canvasResolution;
         this.pixiRenderer.resize(width, height);
-        if (this.threeRenderer) {
-          this.threeRenderer.setSize(width, height);
+        const threeRenderer = this.threeRenderer;
+        if (threeRenderer) {
+          threeRenderer.setPixelRatio(canvasResolution);
+          threeRenderer.setSize(width, height);
         }
+        this._canvasResolution = canvasResolution;
       } catch (error) {
         console.error(
           'Error while resizing the renderers, will be retried on next frame:',

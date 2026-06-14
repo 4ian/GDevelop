@@ -498,7 +498,8 @@ type Props = {|
   onImportAssets: () => void,
   onObjectCreated: (
     objects: Array<gdObject>,
-    isTheFirstOfItsTypeInProject: boolean
+    isTheFirstOfItsTypeInProject: boolean,
+    options?: {| shouldCreateInstance?: boolean |}
   ) => void,
   onObjectEdited: (
     objectWithContext: ObjectWithContext,
@@ -706,7 +707,9 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             objectFolderOrObjectWithContext
           );
         }
-        onObjectCreated([object], isTheFirstOfItsTypeInProject);
+        onObjectCreated([object], isTheFirstOfItsTypeInProject, {
+          shouldCreateInstance: true,
+        });
       },
       [
         project,
@@ -727,7 +730,9 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       }: InstallAssetOutput) => {
         if (objects.length === 0) return;
 
-        onObjectCreated(objects, isTheFirstOfItsTypeInProject);
+        onObjectCreated(objects, isTheFirstOfItsTypeInProject, {
+          shouldCreateInstance: true,
+        });
 
         // Here, the last object in the array might not be the last object
         // in the tree view, given the fact that assets are added in parallel

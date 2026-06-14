@@ -78,7 +78,8 @@ export type SceneEditorsDisplayProps = {|
   onBackgroundColorChanged: () => void,
   onObjectCreated: (
     objects: Array<gdObject>,
-    isTheFirstOfItsTypeInProject: boolean
+    isTheFirstOfItsTypeInProject: boolean,
+    options?: {| shouldCreateInstance?: boolean |}
   ) => void,
   onObjectsModified: (objects: Array<gdObject>) => void,
   onObjectEdited: (

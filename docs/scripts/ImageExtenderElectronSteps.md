@@ -14,6 +14,17 @@ The integration must keep runtime source out of GDevelop's Electron app:
   shells out to the local Codex image generator with `--image` inputs and does
   not require a Gemini API key.
 
+## Preferred Build Script
+
+Run the cross-platform Python builder from the GDevelop repository root:
+
+```bash
+python scripts/build-third-party-asars.py --target image-extender
+```
+
+Use `--pull` to update the submodule first. The manual commands below are kept
+as implementation notes for debugging the build process.
+
 ## 1. Refresh Upstream
 
 Run from the GDevelop repository root in PowerShell:

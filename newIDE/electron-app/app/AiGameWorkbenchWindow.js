@@ -136,10 +136,12 @@ const aiGameWorkbenchBundledPresetsPath = path.join(
   aiGameWorkbenchServerPath,
   'presets'
 );
+const aiGameWorkbenchFfmpegFileName =
+  process.platform === 'win32' ? 'ffmpeg.exe' : 'ffmpeg';
 const aiGameWorkbenchFfmpegPath = path.join(
   aiGameWorkbenchUnpackedPath,
   'bin',
-  'ffmpeg.exe'
+  aiGameWorkbenchFfmpegFileName
 );
 const aiGameWorkbenchBundleVersion = (() => {
   try {

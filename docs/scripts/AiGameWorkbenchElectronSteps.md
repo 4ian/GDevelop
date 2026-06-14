@@ -22,6 +22,21 @@ The integration must keep runtime source out of GDevelop's Electron app:
   New builds should use the storage bundle name so a running Electron process
   holding the old preserve sidecar open does not block refreshes.
 
+## Preferred Build Script
+
+Run the cross-platform Python builder from the GDevelop repository root:
+
+```bash
+python scripts/build-third-party-asars.py --target ai-game-workbench
+```
+
+Use `--pull` to update the submodule first. The script works on Windows and
+macOS, and copies the platform ffmpeg binary to the ASAR sidecar as
+`ffmpeg.exe` on Windows or `ffmpeg` on macOS/Linux.
+
+The manual commands below are kept as implementation notes for debugging the
+build process.
+
 ## 1. Refresh Upstream
 
 Run from the GDevelop repository root in PowerShell:
@@ -37,7 +52,7 @@ git -C $upstream log -1 --oneline
 
 The Electron integration serves the web UI and API from the same custom
 protocol, so the web build must not hard-code `127.0.0.1`. The server bundle
-also receives a direct Electron-packaged `ffmpeg.exe` path, so it must not
+also receives a direct Electron-packaged ffmpeg path, so it must not
 import `ffmpeg-static`.
 
 Video generation also needs one Electron-specific compatibility change:

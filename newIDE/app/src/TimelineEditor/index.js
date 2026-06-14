@@ -33,6 +33,7 @@ import {
   type TimelineTrack,
   type TimelinePropertyTrack,
   type TimelineKeyframe,
+  type TimelinePoint,
   type TimelineCurveDefinition,
 } from './TimelineProjectStorage';
 
@@ -64,7 +65,7 @@ type TimelineScaleBaseDimensions = {|
 |};
 
 type AnyObject = { [string]: any, ... };
-type TimelinePointValue = { x: number, y: number, z?: number, ... };
+type TimelinePointValue = TimelinePoint;
 type TimelineValue = number | TimelinePointValue;
 type TimelineValueChannel = 'x' | 'y' | 'z' | 'value';
 type TimelineValueRange = {| min: number, max: number, range: number |};
@@ -104,6 +105,21 @@ const timelineEdgeHitPadding = 24;
 const fallbackTimelineScaleBaseSize = 256;
 const minimumTimelineScale = 0.0001;
 const minimumTimelineDimension = 0.0001;
+
+const createTimelinePointValue = (
+  x: number,
+  y: number,
+  z?: ?number
+): TimelinePointValue => (typeof z === 'number' ? { x, y, z } : { x, y });
+
+const cloneTimelinePointValue = (
+  value: TimelinePointValue
+): TimelinePointValue =>
+  createTimelinePointValue(
+    value.x,
+    value.y,
+    typeof value.z === 'number' ? value.z : undefined
+  );
 
 const commonTimelineProperties: Array<string> = [
   'x',
@@ -451,18 +467,14 @@ const createPropertyTrackId = (): string =>
     .slice(2, 8)}`;
 
 const cloneTimelineValue = (value: TimelineValue): TimelineValue =>
-  typeof value === 'object'
-    ? typeof value.z === 'number'
-      ? { x: value.x, y: value.y, z: value.z }
-      : { x: value.x, y: value.y }
-    : value;
+  typeof value === 'object' ? cloneTimelinePointValue(value) : value;
 
 const getDefaultTimelinePropertyValue = (property: string): TimelineValue => {
   switch (property) {
     case 'position':
-      return { x: 0, y: 0 };
+      return createTimelinePointValue(0, 0);
     case 'scale':
-      return { x: 1, y: 1 };
+      return createTimelinePointValue(1, 1);
     case 'scaleX':
     case 'scaleY':
     case 'scaleZ':
@@ -498,65 +510,65 @@ const normalizeTimelineValueForProperty = (
 
   switch (property) {
     case 'position': {
-      const fallbackPosition =
-        typeof fallback === 'object' ? fallback : { x: 0, y: 0 };
+      const fallbackPosition: TimelinePointValue =
+        typeof fallback === 'object'
+          ? fallback
+          : createTimelinePointValue(0, 0);
       return value && typeof value === 'object'
-        ? {
-            x: getFiniteNumber(value.x, fallbackPosition.x),
-            y: getFiniteNumber(value.y, fallbackPosition.y),
-            ...(typeof value.z === 'number' ||
-            typeof fallbackPosition.z === 'number'
-              ? {
-                  z: getFiniteNumber(
-                    value.z,
-                    typeof fallbackPosition.z === 'number'
-                      ? fallbackPosition.z
-                      : 0
-                  ),
-                }
-              : {}),
-          }
+        ? createTimelinePointValue(
+            getFiniteNumber(value.x, fallbackPosition.x),
+            getFiniteNumber(value.y, fallbackPosition.y),
+            typeof value.z === 'number' ||
+              typeof fallbackPosition.z === 'number'
+              ? getFiniteNumber(
+                  value.z,
+                  typeof fallbackPosition.z === 'number'
+                    ? fallbackPosition.z
+                    : 0
+                )
+              : undefined
+          )
         : fallbackPosition;
     }
     case 'scale': {
-      const fallbackScale =
-        typeof fallback === 'object' ? fallback : { x: 1, y: 1 };
+      const fallbackScale: TimelinePointValue =
+        typeof fallback === 'object'
+          ? fallback
+          : createTimelinePointValue(1, 1);
       if (!value || typeof value !== 'object') {
-        const normalizedFallbackScale = {
-          x: Math.max(minimumTimelineScale, fallbackScale.x),
-          y: Math.max(minimumTimelineScale, fallbackScale.y),
-        };
-        return typeof fallbackScale.z === 'number'
-          ? {
-              ...normalizedFallbackScale,
-              z: Math.max(minimumTimelineScale, fallbackScale.z),
-            }
-          : normalizedFallbackScale;
+        return createTimelinePointValue(
+          Math.max(minimumTimelineScale, fallbackScale.x),
+          Math.max(minimumTimelineScale, fallbackScale.y),
+          typeof fallbackScale.z === 'number'
+            ? Math.max(minimumTimelineScale, fallbackScale.z)
+            : undefined
+        );
       }
 
       const rawScaleX = getFiniteNumber(value.x, fallbackScale.x);
       const rawScaleY = getFiniteNumber(value.y, fallbackScale.y);
-      const normalizedScale = {
-        x: Math.max(
+      const normalizedScale = createTimelinePointValue(
+        Math.max(
           minimumTimelineScale,
           rawScaleX > 0 ? rawScaleX : fallbackScale.x
         ),
-        y: Math.max(
+        Math.max(
           minimumTimelineScale,
           rawScaleY > 0 ? rawScaleY : fallbackScale.y
-        ),
-      };
+        )
+      );
       if (typeof value.z === 'number') {
         const fallbackScaleZ =
           typeof fallbackScale.z === 'number' ? fallbackScale.z : 1;
         const rawScaleZ = getFiniteNumber(value.z, fallbackScaleZ);
-        return {
-          ...normalizedScale,
-          z: Math.max(
+        return createTimelinePointValue(
+          normalizedScale.x,
+          normalizedScale.y,
+          Math.max(
             minimumTimelineScale,
             rawScaleZ > 0 ? rawScaleZ : fallbackScaleZ
-          ),
-        };
+          )
+        );
       }
 
       return normalizedScale;
@@ -755,11 +767,12 @@ const getRenderableTimelineKeyframes = (
       propertyTrack.property,
       keyframe.value
     );
-    keyframeByFrame.set(getKeyframeFrameKey(snappedTime), {
+    const normalizedKeyframe: TimelineKeyframe = {
       ...keyframe,
       time: snappedTime,
       value: normalizedValue,
-    });
+    };
+    keyframeByFrame.set(getKeyframeFrameKey(snappedTime), normalizedKeyframe);
   }
 
   return Array.from(keyframeByFrame.values()).sort((a, b) => a.time - b.time);
@@ -845,7 +858,7 @@ const upsertPropertyTrackKeyframe = (
   keyframe: TimelineKeyframe
 ): {| propertyTrack: TimelinePropertyTrack, keyframeId: string |} => {
   const snappedTime = snapTimeToTimelineFrame(keyframe.time);
-  const normalizedKeyframe = {
+  const normalizedKeyframe: TimelineKeyframe = {
     ...keyframe,
     time: snappedTime,
     value: normalizeTimelineValueForProperty(
@@ -869,7 +882,7 @@ const upsertPropertyTrackKeyframe = (
       timeToFrame(existingKeyframe.time) === timeToFrame(snappedTime)
   );
   const keyframeId = existingKeyframe ? existingKeyframe.id : keyframe.id;
-  const nextKeyframe = existingKeyframe
+  const nextKeyframe: TimelineKeyframe = existingKeyframe
     ? {
         ...existingKeyframe,
         time: normalizedKeyframe.time,
@@ -1053,16 +1066,13 @@ const normalizeDraggedTimelineValue = (
 ): TimelineValue => {
   if (typeof value === 'object') {
     if (property === 'scale') {
-      const normalizedScale = {
-        x: Math.max(minimumTimelineScale, getFiniteNumber(value.x, 1)),
-        y: Math.max(minimumTimelineScale, getFiniteNumber(value.y, 1)),
-      };
-      return typeof value.z === 'number'
-        ? {
-            ...normalizedScale,
-            z: Math.max(minimumTimelineScale, getFiniteNumber(value.z, 1)),
-          }
-        : normalizedScale;
+      return createTimelinePointValue(
+        Math.max(minimumTimelineScale, getFiniteNumber(value.x, 1)),
+        Math.max(minimumTimelineScale, getFiniteNumber(value.y, 1)),
+        typeof value.z === 'number'
+          ? Math.max(minimumTimelineScale, getFiniteNumber(value.z, 1))
+          : undefined
+      );
     }
     return value;
   }
@@ -1090,10 +1100,22 @@ const offsetTimelineValueChannel = (
   if (typeof value === 'object') {
     const nextValue =
       channel === 'x'
-        ? { ...value, x: value.x + deltaValue }
+        ? createTimelinePointValue(
+            value.x + deltaValue,
+            value.y,
+            typeof value.z === 'number' ? value.z : undefined
+          )
         : channel === 'z'
-        ? { ...value, z: getFiniteNumber(value.z, 0) + deltaValue }
-        : { ...value, y: value.y + deltaValue };
+        ? createTimelinePointValue(
+            value.x,
+            value.y,
+            getFiniteNumber(value.z, 0) + deltaValue
+          )
+        : createTimelinePointValue(
+            value.x,
+            value.y + deltaValue,
+            typeof value.z === 'number' ? value.z : undefined
+          );
     return normalizeDraggedTimelineValue(property, nextValue);
   }
 
@@ -1451,7 +1473,7 @@ const normalizeTimelinePropertyTrack = (
   for (const keyframe of keyframes) {
     const snappedTime = snapTimeToTimelineFrame(keyframe.time);
     const frameKey = getKeyframeFrameKey(snappedTime);
-    const normalizedKeyframe =
+    const normalizedKeyframe: TimelineKeyframe =
       Math.abs(snappedTime - keyframe.time) > 0.000001
         ? { ...keyframe, time: snappedTime }
         : keyframe;
@@ -1459,7 +1481,7 @@ const normalizeTimelinePropertyTrack = (
       propertyTrack.property,
       normalizedKeyframe.value
     );
-    const normalizedValueKeyframe =
+    const normalizedValueKeyframe: TimelineKeyframe =
       getTimelineValueIdentity(normalizedValue) !==
       getTimelineValueIdentity(normalizedKeyframe.value)
         ? {
@@ -1564,13 +1586,13 @@ const splitLegacyVectorPropertyTrack = (
       propertyTrack.initialValue !== undefined
         ? propertyTrack.initialValue
         : fallbackValue;
-    const legacyInitialValue =
+    const legacyInitialValue: TimelinePointValue =
       sourceInitialValue && typeof sourceInitialValue === 'object'
         ? sourceInitialValue
         : fallbackValue && typeof fallbackValue === 'object'
         ? fallbackValue
-        : { x: 0, y: 0 };
-    const getLegacyChannelValue = (legacyValue: TimelineValue): number => {
+        : createTimelinePointValue(0, 0);
+    const getLegacyChannelValue = (legacyValue: TimelinePointValue): number => {
       const fallbackChannelValue =
         channel === 'z'
           ? propertyTrack.property === 'scale'
@@ -1594,13 +1616,13 @@ const splitLegacyVectorPropertyTrack = (
         const fallbackValue = getDefaultTimelinePropertyValue(
           propertyTrack.property
         );
-        const legacyValue =
+        const legacyValue: TimelinePointValue =
           keyframe.value && typeof keyframe.value === 'object'
             ? keyframe.value
             : fallbackValue && typeof fallbackValue === 'object'
             ? fallbackValue
-            : { x: 0, y: 0 };
-        return {
+            : createTimelinePointValue(0, 0);
+        const nextKeyframe: TimelineKeyframe = {
           ...keyframe,
           id: keepExistingIds ? keyframe.id : createKeyframeId(),
           value: normalizeTimelineValueForProperty(
@@ -1608,6 +1630,7 @@ const splitLegacyVectorPropertyTrack = (
             getLegacyChannelValue(legacyValue)
           ),
         };
+        return nextKeyframe;
       }),
     };
   };
@@ -1654,7 +1677,7 @@ const mergeTimelinePropertyTracks = (
       keptPropertyTrack.id
     );
 
-    let nextKeptPropertyTrack = keptPropertyTrack;
+    let nextKeptPropertyTrack: TimelinePropertyTrack = keptPropertyTrack;
     if (
       keptPropertyTrack.initialValue === undefined &&
       incomingPropertyTrack.initialValue !== undefined
@@ -2317,25 +2340,22 @@ const interpolateTimelineValue = (
   }
 
   const easedT = evaluateTimelineCurve(getKeyframeCurve(from), localT);
-  if (typeof from.value === 'object' && typeof to.value === 'object') {
-    const value = {
-      x: from.value.x + (to.value.x - from.value.x) * easedT,
-      y: from.value.y + (to.value.y - from.value.y) * easedT,
-    };
-    if (typeof from.value.z === 'number' || typeof to.value.z === 'number') {
-      const fromZ = getFiniteNumber(from.value.z, 0);
-      const toZ = getFiniteNumber(to.value.z, fromZ);
-      return {
-        ...value,
-        z: fromZ + (toZ - fromZ) * easedT,
-      };
+  const fromValue = from.value;
+  const toValue = to.value;
+  if (typeof fromValue === 'object' && typeof toValue === 'object') {
+    const x = fromValue.x + (toValue.x - fromValue.x) * easedT;
+    const y = fromValue.y + (toValue.y - fromValue.y) * easedT;
+    if (typeof fromValue.z === 'number' || typeof toValue.z === 'number') {
+      const fromZ = getFiniteNumber(fromValue.z, 0);
+      const toZ = getFiniteNumber(toValue.z, fromZ);
+      return createTimelinePointValue(x, y, fromZ + (toZ - fromZ) * easedT);
     }
-    return value;
+    return createTimelinePointValue(x, y);
   }
-  if (typeof from.value === 'number' && typeof to.value === 'number') {
-    return from.value + (to.value - from.value) * easedT;
+  if (typeof fromValue === 'number' && typeof toValue === 'number') {
+    return fromValue + (toValue - fromValue) * easedT;
   }
-  return from.value;
+  return fromValue;
 };
 
 const getPropertyValueFromInitialInstance = (

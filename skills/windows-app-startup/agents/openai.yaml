@@ -1,4 +1,0 @@
-interface:
-  display_name: "Windows App Startup"
-  short_description: "Start the GDevelop Windows Electron app with the local startup script."
-  default_prompt: "Start the GDevelop Windows app by running .\\scripts\\start-windows-app.py from the repository root."

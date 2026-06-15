@@ -80,7 +80,7 @@ export const BehaviorListItem = ({
         // Behavior parameters and properties don't need to declare all
         // capabilities, they will be required by transitivity when attaching
         // the behavior to the object.
-        (shouldCheckCapabilityBehaviors ||
+        (!shouldCheckCapabilityBehaviors ||
           !behaviorMetadata.isHidden() ||
           objectBehaviorsTypes.includes(requiredBehaviorType))
       );

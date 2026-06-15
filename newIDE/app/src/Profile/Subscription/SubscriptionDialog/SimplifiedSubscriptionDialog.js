@@ -18,7 +18,6 @@ import {
 } from '../../../UI/Layout';
 import PlaceholderLoader from '../../../UI/PlaceholderLoader';
 import RaisedButton from '../../../UI/RaisedButton';
-import FlatButton from '../../../UI/FlatButton';
 import LeftLoader from '../../../UI/LeftLoader';
 import { formatPriceWithCurrency } from '../PlanSmallCard';
 import GoldIcon from '../Icons/Gold';
@@ -132,6 +131,13 @@ const styles = {
     fontWeight: 'bold',
     padding: '3px 8px',
     borderRadius: 6,
+  },
+  continueForFree: {
+    cursor: 'pointer',
+  },
+  continueForFreeDisabled: {
+    cursor: 'default',
+    opacity: 0.5,
   },
 };
 
@@ -287,7 +293,7 @@ export default function SimplifiedSubscriptionDialog({
                 <Trans>You've reached your free limit</Trans>
               </span>
             </Text>
-            <Text noMargin size="bold-title">
+            <Text noMargin size="section-title">
               <Trans>Upgrade to GDevelop Gold</Trans>
             </Text>
           </Column>
@@ -386,7 +392,7 @@ export default function SimplifiedSubscriptionDialog({
               <ColumnStackLayout noMargin>
                 <LineStackLayout noMargin alignItems="baseline">
                   {mainPriceText && (
-                    <Text noMargin size="bold-title">
+                    <Text noMargin size="title">
                       {mainPriceText}
                     </Text>
                   )}
@@ -426,11 +432,19 @@ export default function SimplifiedSubscriptionDialog({
                 }
                 onClick={onClickUpgrade}
               />
-              <FlatButton
-                label={<Trans>Continue for free</Trans>}
-                onClick={onClose}
-                disabled={isLoading}
-              />
+              <Spacer />
+              <div
+                style={
+                  isLoading
+                    ? styles.continueForFreeDisabled
+                    : styles.continueForFree
+                }
+                onClick={isLoading ? undefined : onClose}
+              >
+                <Text noMargin color="secondary" size="body-small">
+                  <Trans>Continue for free</Trans>
+                </Text>
+              </div>
             </Column>
           </ResponsiveLineStackLayout>
         </div>

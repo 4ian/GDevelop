@@ -40,7 +40,7 @@ function generateGlueFromBinding(cb) {
     }
 
     exec(
-      'python "' + webIdlBinderPath + '" Bindings/Bindings.idl Bindings/glue',
+      'python3 "' + webIdlBinderPath + '" Bindings/Bindings.idl Bindings/glue',
       function(err, stdout, stderr) {
         if (err) {
           cb({ message: 'Error while running WebIDL binder:', output: err });

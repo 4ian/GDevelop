@@ -22,6 +22,7 @@ import useForceUpdate from '../Utils/UseForceUpdate';
 import {
   aiRequestShouldBeWatched,
   aiRequestHasWorkInProgress,
+  aiRequestPollSawActivity,
 } from './AiRequestUtils';
 import { type EditApprovalRequest } from './Utils';
 
@@ -877,21 +878,8 @@ export const AiRequestProvider = ({
           outputFromMessageId,
         })
       );
-      // Activity = status change or new messages. The incremental fetch echoes
-      // the last known message, so a count > 1 means at least one new message
-      // (and any returned message is new when none was known yet).
-      const previousStatus = previousAiRequest
-        ? previousAiRequest.status
-        : null;
-      const fetchedOutputCount =
-        (fetchedAiRequest.output && fetchedAiRequest.output.length) || 0;
-      const fetchedNewMessageCount = outputFromMessageId
-        ? Math.max(0, fetchedOutputCount - 1)
-        : fetchedOutputCount;
-      if (
-        fetchedAiRequest.status !== previousStatus ||
-        fetchedNewMessageCount > 0
-      ) {
+      // Drive the adaptive polling interval: fast while there is activity.
+      if (aiRequestPollSawActivity(previousAiRequest, fetchedAiRequest)) {
         sawChangeThisTick = true;
       }
       updateAiRequest(aiRequestId, previousAiRequestToMerge =>

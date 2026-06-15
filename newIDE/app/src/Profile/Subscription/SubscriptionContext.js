@@ -5,6 +5,7 @@ import {
   sendSubscriptionDialogShown,
   type SubscriptionDialogDisplayReason,
   type SubscriptionPlacementId,
+  type SubscriptionDialogVariant,
 } from '../../Utils/Analytics/EventSender';
 import { isNativeMobileApp } from '../../Utils/Platform';
 import {
@@ -19,6 +20,7 @@ import {
 import AuthenticatedUserContext from '../AuthenticatedUserContext';
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
 import SubscriptionDialog from './SubscriptionDialog';
+import SimplifiedSubscriptionDialog from './SubscriptionDialog/SimplifiedSubscriptionDialog';
 import SubscriptionPendingDialog from './SubscriptionPendingDialog';
 import LoaderModal from '../../UI/LoaderModal';
 import { useAsyncLazyMemo } from '../../Utils/UseLazyMemo';
@@ -31,7 +33,44 @@ export type SubscriptionAnalyticsMetadata = {|
   recommendedPlanId?: string,
   placementId: SubscriptionPlacementId,
   preStep?: 'subscriptionChecker',
+  // Which version of the subscription dialog was shown. Computed when the dialog
+  // is opened (see `getSubscriptionDialogVariant`) and sent with analytics events.
+  dialogVariant?: SubscriptionDialogVariant,
 |};
+
+/**
+ * Placements for which the simplified subscription dialog must always be shown,
+ * regardless of the A/B test value.
+ */
+const placementIdsAlwaysShowingSimplifiedDialog: Array<SubscriptionPlacementId> = [];
+
+/**
+ * Whether the simplified subscription dialog should be shown by default (i.e for
+ * placements not forcing a given variant).
+ *
+ * This is a placeholder for an A/B test value that will later be provided by the
+ * backend. Flipping this boolean switches every "neutral" placement to the
+ * simplified dialog.
+ */
+const isSimplifiedSubscriptionDialogEnabledByDefault = false;
+
+/**
+ * Decides which subscription dialog variant to show for a given placement.
+ * Some placements always use the simplified dialog; the rest follow the (future)
+ * A/B test value.
+ */
+export const getSubscriptionDialogVariant = ({
+  placementId,
+  isSimplifiedDialogEnabled = isSimplifiedSubscriptionDialogEnabledByDefault,
+}: {|
+  placementId: SubscriptionPlacementId,
+  isSimplifiedDialogEnabled?: boolean,
+|}): SubscriptionDialogVariant => {
+  if (placementIdsAlwaysShowingSimplifiedDialog.includes(placementId)) {
+    return 'simplified';
+  }
+  return isSimplifiedDialogEnabled ? 'simplified' : 'standard';
+};
 
 const mergeSubscriptionPlansWithPrices = (
   subscriptionPlans: SubscriptionPlan[],
@@ -250,7 +289,10 @@ export const SubscriptionProvider = ({
 
         // Would present App Store screen.
       } else {
-        setAnalyticsMetadata(metadata);
+        const dialogVariant =
+          metadata.dialogVariant ||
+          getSubscriptionDialogVariant({ placementId: metadata.placementId });
+        setAnalyticsMetadata({ ...metadata, dialogVariant });
         setCouponCode(coupon || null);
       }
     },
@@ -355,6 +397,13 @@ export const SubscriptionProvider = ({
       {analyticsMetadata ? (
         authenticatedUser.loginState === 'loggingIn' ? (
           <LoaderModal showImmediately />
+        ) : analyticsMetadata.dialogVariant === 'simplified' ? (
+          <SimplifiedSubscriptionDialog
+            availableSubscriptionPlansWithPrices={getSubscriptionPlansWithPricingSystems()}
+            onClose={closeSubscriptionDialog}
+            onOpenPendingDialog={openSubscriptionPendingDialog}
+            couponCode={couponCode}
+          />
         ) : (
           <SubscriptionDialog
             availableSubscriptionPlansWithPrices={getSubscriptionPlansWithPricingSystems()}

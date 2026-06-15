@@ -545,6 +545,10 @@ export type SubscriptionDialogDisplayReason =
   | 'AI requests history'
   | 'Coupon code entered';
 
+// Which version of the subscription dialog is shown to the user. This is used
+// to run A/B tests between the standard (detailed) dialog and a simplified one.
+export type SubscriptionDialogVariant = 'standard' | 'simplified';
+
 export type SubscriptionPlacementId =
   | 'builds'
   | 'debugger'
@@ -613,6 +617,7 @@ export const sendShowcaseGameLinkOpened = (title: string, linkType: string) => {
 export const sendChoosePlanClicked = (metadata: {|
   planId: string | null,
   pricingSystemId: string | null,
+  dialogVariant?: SubscriptionDialogVariant,
 |}) => {
   recordEvent('choose-plan-click', metadata);
 };

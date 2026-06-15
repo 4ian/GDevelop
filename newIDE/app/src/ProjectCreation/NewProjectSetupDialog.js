@@ -69,6 +69,9 @@ const electron = optionalRequire('electron');
 const remote = optionalRequire('@electron/remote');
 const app = remote ? remote.app : null;
 
+const ASK_AI_STANDALONE_FORM_DISMISSABLE_IDENTIFIER =
+  'new-project-setup-dialog';
+
 export const getItemsColumns = (
   windowSize: WindowSizeType,
   isLandscape: boolean
@@ -215,6 +218,16 @@ const NewProjectSetupDialog = ({
   const { values, setNewProjectsDefaultStorageProviderName } = React.useContext(
     PreferencesContext
   );
+  const { limits } = authenticatedUser;
+  const isAskAiHiddenByClassroom =
+    !!limits &&
+    !!limits.capabilities.classrooms &&
+    limits.capabilities.classrooms.hideAskAi;
+  const isAskAiStandAloneFormHidden =
+    isAskAiHiddenByClassroom ||
+    !!values.hiddenAskAiStandAloneForms[
+      ASK_AI_STANDALONE_FORM_DISMISSABLE_IDENTIFIER
+    ];
   const { currentlyRunningInAppTutorial } = React.useContext(
     InAppTutorialContext
   );
@@ -685,6 +698,9 @@ const NewProjectSetupDialog = ({
                   onOpenAskAi={onOpenAskAi}
                   onCloseDialog={onClose}
                   closeProject={closeProject}
+                  dismissableIdentifier={
+                    ASK_AI_STANDALONE_FORM_DISMISSABLE_IDENTIFIER
+                  }
                 />
                 <EmptyAndStartingPointProjects
                   onSelectExampleShortHeader={exampleShortHeader => {
@@ -697,6 +713,13 @@ const NewProjectSetupDialog = ({
                   onSeeAll={() => {
                     setStartersSelected(true);
                   }}
+                  title={
+                    isAskAiStandAloneFormHidden ? (
+                      <Trans>Start from a template</Trans>
+                    ) : (
+                      <Trans>Continue with Human Intelligence</Trans>
+                    )
+                  }
                 />
                 {isOnline ? (
                   <>
@@ -754,6 +777,7 @@ const NewProjectSetupDialog = ({
                   setEmptyProjectSelected(true);
                 }}
                 disabled={isLoading}
+                title={<Trans>Start from a template</Trans>}
               />
             )}
             {shouldShowCreateActions && (

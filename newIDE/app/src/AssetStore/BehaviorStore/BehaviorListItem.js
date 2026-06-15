@@ -35,7 +35,7 @@ type Props = {|
   objectType: string,
   objectBehaviorsTypes: Array<string>,
   isChildObject: boolean,
-  canAddCapabilityBehaviors: boolean,
+  shouldCheckCapabilityBehaviors: boolean,
   behaviorShortHeader: BehaviorShortHeader,
   matches: ?Array<SearchMatch>,
   onChoose: () => void,
@@ -49,7 +49,7 @@ export const BehaviorListItem = ({
   objectType,
   objectBehaviorsTypes,
   isChildObject,
-  canAddCapabilityBehaviors,
+  shouldCheckCapabilityBehaviors,
   behaviorShortHeader,
   matches,
   onChoose,
@@ -80,7 +80,7 @@ export const BehaviorListItem = ({
         // Behavior parameters and properties don't need to declare all
         // capabilities, they will be required by transitivity when attaching
         // the behavior to the object.
-        (canAddCapabilityBehaviors ||
+        (shouldCheckCapabilityBehaviors ||
           !behaviorMetadata.isHidden() ||
           objectBehaviorsTypes.includes(requiredBehaviorType))
       );

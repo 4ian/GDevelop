@@ -71,7 +71,7 @@ type Props = {|
   deprecatedBehaviorMetadataList: Array<BehaviorShortHeader>,
   onInstall: (behaviorShortHeader: BehaviorShortHeader) => Promise<boolean>,
   onChoose: (behaviorType: string) => void,
-  canAddCapabilityBehaviors: boolean,
+  shouldCheckCapabilityBehaviors: boolean,
 |};
 
 const getBehaviorType = (behaviorShortHeader: BehaviorShortHeader) =>
@@ -87,7 +87,7 @@ export const BehaviorStore = ({
   deprecatedBehaviorMetadataList,
   onInstall,
   onChoose,
-  canAddCapabilityBehaviors,
+  shouldCheckCapabilityBehaviors,
 }: Props): React.Node => {
   const preferences = React.useContext(PreferencesContext);
   const [
@@ -319,7 +319,7 @@ export const BehaviorStore = ({
               objectType={objectType}
               objectBehaviorsTypes={objectBehaviorsTypes}
               isChildObject={isChildObject}
-              canAddCapabilityBehaviors={canAddCapabilityBehaviors}
+              shouldCheckCapabilityBehaviors={shouldCheckCapabilityBehaviors}
               onHeightComputed={onHeightComputed}
               behaviorShortHeader={behaviorShortHeader}
               matches={getExtensionsMatches(behaviorShortHeader)}

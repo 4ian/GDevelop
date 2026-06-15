@@ -566,9 +566,14 @@ export type SubscriptionPlacementId =
   | 'ai-requests'
   | 'redeem-code';
 
-export const sendSubscriptionDialogShown = (
-  metadata: SubscriptionAnalyticsMetadata
-) => {
+// Identifies which subscription dialog design is shown to the user. Useful to
+// segment analytics events when running an A/B test between the dialogs.
+export type SubscriptionDialogVariant = 'standard' | 'simplified-gold';
+
+export const sendSubscriptionDialogShown = (metadata: {|
+  ...SubscriptionAnalyticsMetadata,
+  subscriptionDialogVariant: SubscriptionDialogVariant,
+|}) => {
   recordEvent('subscription-dialog-shown', metadata);
 };
 

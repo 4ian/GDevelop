@@ -5,6 +5,7 @@ import {
   sendSubscriptionDialogShown,
   type SubscriptionDialogDisplayReason,
   type SubscriptionPlacementId,
+  type SubscriptionDialogVariant,
 } from '../../Utils/Analytics/EventSender';
 import { isNativeMobileApp } from '../../Utils/Platform';
 import {
@@ -19,6 +20,7 @@ import {
 import AuthenticatedUserContext from '../AuthenticatedUserContext';
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
 import SubscriptionDialog from './SubscriptionDialog';
+import SimplifiedSubscriptionDialog from './SubscriptionDialog/SimplifiedSubscriptionDialog';
 import SubscriptionPendingDialog from './SubscriptionPendingDialog';
 import LoaderModal from '../../UI/LoaderModal';
 import { useAsyncLazyMemo } from '../../Utils/UseLazyMemo';
@@ -74,6 +76,35 @@ const filterAvailableSubscriptionPlansWithPrices = (
     })
   );
   return availableSubscriptionPlansWithPrices;
+};
+
+// Placements for which we always want to show the simplified Gold upgrade
+// dialog, regardless of the A/B test value.
+const PLACEMENT_IDS_ALWAYS_USING_SIMPLIFIED_DIALOG: Array<SubscriptionPlacementId> = [];
+
+// TODO: plug this to an A/B test value coming from the backend. For now the
+// simplified dialog is only shown for the placements listed above.
+const isSimplifiedSubscriptionDialogEnabledByAbTest = (): boolean => false;
+
+/**
+ * Decides which subscription dialog design should be shown. The simplified
+ * Gold upgrade dialog is shown when forced for a given placement, or when
+ * enabled by the A/B test. Otherwise, the standard dialog is shown.
+ */
+export const getSubscriptionDialogVariant = ({
+  placementId,
+  isSimplifiedDialogEnabledByAbTest,
+}: {|
+  placementId: ?SubscriptionPlacementId,
+  isSimplifiedDialogEnabledByAbTest: boolean,
+|}): SubscriptionDialogVariant => {
+  if (
+    placementId &&
+    PLACEMENT_IDS_ALWAYS_USING_SIMPLIFIED_DIALOG.includes(placementId)
+  ) {
+    return 'simplified-gold';
+  }
+  return isSimplifiedDialogEnabledByAbTest ? 'simplified-gold' : 'standard';
 };
 
 type SubscriptionState = {|
@@ -137,6 +168,16 @@ export const SubscriptionProvider = ({
   const recommendedPlanId = analyticsMetadata
     ? analyticsMetadata.recommendedPlanId
     : null;
+  const subscriptionDialogVariant: ?SubscriptionDialogVariant = React.useMemo(
+    () =>
+      analyticsMetadata
+        ? getSubscriptionDialogVariant({
+            placementId: analyticsMetadata.placementId,
+            isSimplifiedDialogEnabledByAbTest: isSimplifiedSubscriptionDialogEnabledByAbTest(),
+          })
+        : null,
+    [analyticsMetadata]
+  );
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const { showAlert } = useAlertDialog();
   const [
@@ -328,11 +369,14 @@ export const SubscriptionProvider = ({
   // When the analyticsMetadata is set, a dialog is shown so we can send an event.
   React.useEffect(
     () => {
-      if (analyticsMetadata) {
-        sendSubscriptionDialogShown(analyticsMetadata);
+      if (analyticsMetadata && subscriptionDialogVariant) {
+        sendSubscriptionDialogShown({
+          ...analyticsMetadata,
+          subscriptionDialogVariant,
+        });
       }
     },
-    [analyticsMetadata]
+    [analyticsMetadata, subscriptionDialogVariant]
   );
 
   return (
@@ -355,6 +399,13 @@ export const SubscriptionProvider = ({
       {analyticsMetadata ? (
         authenticatedUser.loginState === 'loggingIn' ? (
           <LoaderModal showImmediately />
+        ) : subscriptionDialogVariant === 'simplified-gold' ? (
+          <SimplifiedSubscriptionDialog
+            availableSubscriptionPlansWithPrices={getSubscriptionPlansWithPricingSystems()}
+            onClose={closeSubscriptionDialog}
+            onOpenPendingDialog={openSubscriptionPendingDialog}
+            couponCode={couponCode}
+          />
         ) : (
           <SubscriptionDialog
             availableSubscriptionPlansWithPrices={getSubscriptionPlansWithPricingSystems()}

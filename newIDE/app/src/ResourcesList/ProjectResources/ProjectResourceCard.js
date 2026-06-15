@@ -59,15 +59,16 @@ type ImagePreviewProps = {|
 |};
 const ImagePreview = ({ resource, project }: ImagePreviewProps) => {
   const resourceName = resource.getName();
-  const resourceThumbnail = ResourcesLoader.getResourceFullUrl(
-    project,
-    resourceName,
-    {}
-  );
-  const isImageResourceSmooth = isProjectImageResourceSmooth(
-    project,
-    resourceName
-  );
+  const resourceThumbnail = project
+    .getResourcesManager()
+    .hasResource(resourceName)
+    ? ResourcesLoader.getResourceFullUrl(project, resourceName, {})
+    : ResourcesLoader.getFullUrl(project, resource.getFile(), {});
+  const isImageResourceSmooth = project
+    .getResourcesManager()
+    .hasResource(resourceName)
+    ? isProjectImageResourceSmooth(project, resourceName)
+    : false;
   return (
     <>
       <CheckeredBackground />

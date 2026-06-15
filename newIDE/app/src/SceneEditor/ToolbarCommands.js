@@ -5,6 +5,7 @@ type Props = {|
   toggleObjectsList: () => void,
   toggleObjectGroupsList: () => void,
   togglePropertiesPanel: () => void,
+  toggleAllPanels: () => void,
   toggleInstancesList: () => void,
   toggleLayersList: () => void,
   undo: () => void,
@@ -30,6 +31,10 @@ const ToolbarCommands = (props: Props): null => {
 
   useCommand('OPEN_PROPERTIES_PANEL', true, {
     handler: props.togglePropertiesPanel,
+  });
+
+  useCommand('TOGGLE_ALL_PANELS', true, {
+    handler: props.toggleAllPanels,
   });
 
   useCommand('TOGGLE_INSTANCES_PANEL', true, {

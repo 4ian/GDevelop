@@ -103,7 +103,7 @@ const memoized = memoizeOne((initialValue, callback) => callback());
 const styles = { inlineIcon: { padding: 0 }, handlePlaceholder: { width: 24 } };
 
 export type HistoryHandler = {|
-  saveToHistory: () => void,
+  saveToHistory: (changeContext?: any) => void,
   undo: () => void,
   redo: () => void,
   canUndo: () => boolean,
@@ -742,6 +742,11 @@ const VariablesList: React.ComponentType<{
   const historyRef = useRefWithInit(() =>
     getHistoryInitialState(props.variablesContainer, {
       historyMaxSize: 50,
+      historyContext: {
+        editor: props.areObjectVariables
+          ? 'Object variables editor'
+          : 'Variables editor',
+      },
     })
   );
 
@@ -895,15 +900,26 @@ const VariablesList: React.ComponentType<{
 
   const _onChange = React.useCallback(
     () => {
-      if (historyHandler) historyHandler.saveToHistory();
+      const operationLabel = areObjectVariables
+        ? 'Edit object variables'
+        : 'Edit variables';
+      if (historyHandler) historyHandler.saveToHistory({ operationLabel });
       else
         historyRef.current = saveToHistory(
           historyRef.current,
-          variablesContainer
+          variablesContainer,
+          'EDIT',
+          { operationLabel }
         );
       if (onVariablesUpdated) onVariablesUpdated();
     },
-    [historyRef, historyHandler, onVariablesUpdated, variablesContainer]
+    [
+      historyRef,
+      historyHandler,
+      onVariablesUpdated,
+      variablesContainer,
+      areObjectVariables,
+    ]
   );
 
   const _undo = React.useCallback(

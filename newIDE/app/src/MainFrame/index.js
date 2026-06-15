@@ -4001,6 +4001,7 @@ const MainFrame = (props: Props): React.MixedElement => {
   } = useVersionHistory({
     getStorageProvider,
     isSavingProject,
+    project: currentProject,
     fileMetadata: currentFileMetadata,
     onOpenCloudProjectOnSpecificVersion,
   });

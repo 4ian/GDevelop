@@ -181,6 +181,20 @@ const SwipeableDrawerEditorsDisplay: React.ComponentType<{
       },
       [halfOpenOrCloseDrawerOnEditor, isEditorVisible]
     );
+    const setEditorViewsVisibility = React.useCallback(
+      (editorVisibilityChanges: Array<{| editorId: EditorId, visible: boolean |}>) => {
+        const editorToShow = editorVisibilityChanges.find(
+          ({ visible }) => visible
+        );
+        if (editorToShow) {
+          setSelectedEditorId(editorToShow.editorId);
+          setDrawerOpeningState('halfOpen');
+        } else {
+          setDrawerOpeningState('closed');
+        }
+      },
+      []
+    );
     const openNewObjectDialog = React.useCallback(
       (options?: {|
         instanceSceneCoordinates?: ?[number, number],
@@ -238,6 +252,7 @@ const SwipeableDrawerEditorsDisplay: React.ComponentType<{
         forceUpdateLayersList,
         openNewObjectDialog,
         toggleEditorView: halfOpenOrCloseDrawerOnEditor,
+        setEditorViewsVisibility,
         isEditorVisible,
         ensureEditorVisible,
         startSceneRendering,
@@ -257,6 +272,9 @@ const SwipeableDrawerEditorsDisplay: React.ComponentType<{
             ? editor.getLastContextMenuSceneCoordinates
             : () => [0, 0],
           getViewPosition: editor ? editor.getViewPosition : noop,
+          keepCanvasTopLeftSceneCoordinatesOnNextResize: editor
+            ? editor.keepCanvasTopLeftSceneCoordinatesOnNextResize
+            : noop,
         },
         instancesHandlers: {
           getContentAABB: editor ? editor.getContentAABB : () => null,

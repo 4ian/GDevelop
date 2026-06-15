@@ -1,7 +1,7 @@
 // @flow
 
 import * as React from 'react';
-import { t, Trans } from '@lingui/macro';
+import { t } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import Drawer from '@material-ui/core/Drawer';
 import HistoryIcon from '../UI/CustomSvgIcons/History';
@@ -9,7 +9,6 @@ import DrawerTopBar from '../UI/DrawerTopBar';
 import {
   listVersionsOfProject,
   type ExpandedCloudProjectVersion,
-  updateCloudProjectVersion,
   getCloudProjectFileMetadataIdentifier,
   getCloudProjectVersion,
 } from '../Utils/GDevelopServices/Project';
@@ -19,18 +18,13 @@ import {
   getAiVersionHistoryRetentionDays,
   getCloudProjectHistoryRetentionDays,
 } from '../Utils/GDevelopServices/Usage';
-import { Column, Line } from '../UI/Grid';
-import VersionHistory, { type OpenedVersionStatus } from '.';
+import { type OpenedVersionStatus } from '.';
 import UnsavedChangesContext from '../MainFrame/UnsavedChangesContext';
-import AlertMessage from '../UI/AlertMessage';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
-import PlaceholderLoader from '../UI/PlaceholderLoader';
 import type { MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
-import PlaceholderError from '../UI/PlaceholderError';
 import CloudStorageProvider from '../ProjectsStorage/CloudStorageProvider';
-import GetSubscriptionCard from '../Profile/Subscription/GetSubscriptionCard';
-import Text from '../UI/Text';
-import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/Errors';
+import EditorOperationHistory from './EditorOperationHistory';
+import { clearEditorOperationHistory } from '../Utils/EditorOperationHistory';
 
 const styles = {
   drawerContent: {
@@ -76,6 +70,7 @@ const emptyPaginationState: PaginationState = {
 type Props = {|
   getStorageProvider: () => StorageProvider,
   fileMetadata: ?FileMetadata,
+  project: ?gdProject,
   isSavingProject: boolean,
   onOpenCloudProjectOnSpecificVersion: ({|
     fileMetadata: FileMetadata,
@@ -87,6 +82,7 @@ type Props = {|
 |};
 
 const useVersionHistory = ({
+  project,
   fileMetadata,
   isSavingProject,
   getStorageProvider,
@@ -106,10 +102,6 @@ const useVersionHistory = ({
 |} => {
   const { hasUnsavedChanges } = React.useContext(UnsavedChangesContext);
   const { showAlert } = useAlertDialog();
-  const [
-    versionsFetchingError,
-    setVersionsFetchingError,
-  ] = React.useState<?React.Node>(null);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const ignoreFileMetadataChangesRef = React.useRef<boolean>(false);
   const freezeWhileLoadingSpecificVersionRef = React.useRef<boolean>(false);
@@ -149,6 +141,18 @@ const useVersionHistory = ({
   const latestVersionId =
     state.versions && state.versions[0] ? state.versions[0].id : null;
   const authenticatedUserId = profile ? profile.id : null;
+  const currentProjectId = project ? project.ptr : null;
+  const previousProjectIdRef = React.useRef<?number>(currentProjectId);
+
+  React.useEffect(
+    () => {
+      if (previousProjectIdRef.current === currentProjectId) return;
+
+      clearEditorOperationHistory();
+      previousProjectIdRef.current = currentProjectId;
+    },
+    [currentProjectId]
+  );
 
   // This effect is used to avoid having cloudProjectId and cloudProjectLastModifiedDate
   // set to null when checking out a version, unmounting the VersionHistory component,
@@ -181,7 +185,6 @@ const useVersionHistory = ({
           setState(emptyPaginationState);
           return;
         }
-        setVersionsFetchingError(null);
         try {
           const listing = await listVersionsOfProject(
             getAuthorizationHeader,
@@ -218,24 +221,6 @@ const useVersionHistory = ({
           console.error(
             'An error occurred while fetching project versions:',
             error
-          );
-          const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
-            error
-          );
-          if (extractedStatusAndCode && extractedStatusAndCode.status === 403) {
-            setVersionsFetchingError(
-              <Trans>
-                You don't have the rights to access the version history of this
-                project. Are you connected with the right account?
-              </Trans>
-            );
-            return;
-          }
-          setVersionsFetchingError(
-            <Trans>
-              Could not load the project versions. Verify your internet
-              connection or try again later.
-            </Trans>
           );
         }
       })();
@@ -306,44 +291,6 @@ const useVersionHistory = ({
       }
     },
     [fileMetadata]
-  );
-
-  const onLoadMoreVersions = React.useCallback(
-    async () => {
-      if (!cloudProjectId) return;
-
-      setVersionsFetchingError(null);
-      try {
-        const listing = await listVersionsOfProject(
-          getAuthorizationHeader,
-          authenticatedUserId,
-          cloudProjectId,
-          { forceUri: state.nextPageUri }
-        );
-        if (!listing) return;
-
-        const newVersions = mergeVersionsLists(
-          state.versions || [],
-          listing.versions
-        );
-        setState({
-          versions: newVersions,
-          nextPageUri: listing.nextPageUri,
-        });
-      } catch (error) {
-        console.error(
-          'An error occurred while fetching more project versions:',
-          error
-        );
-        setVersionsFetchingError(
-          <Trans>
-            Could not load the project versions. Verify your internet connection
-            or try again later.
-          </Trans>
-        );
-      }
-    },
-    [getAuthorizationHeader, authenticatedUserId, cloudProjectId, state]
   );
 
   const openVersionHistoryPanel = React.useCallback(() => {
@@ -434,34 +381,6 @@ const useVersionHistory = ({
     ]
   );
 
-  const onRenameVersion = React.useCallback(
-    async (
-      version: ExpandedCloudProjectVersion,
-      attributes: {| label: string |}
-    ) => {
-      if (!cloudProjectId) return;
-      const updatedVersion = await updateCloudProjectVersion(
-        authenticatedUser,
-        cloudProjectId,
-        version.id,
-        attributes
-      );
-      if (!updatedVersion) return;
-      setState(currentState => {
-        if (!currentState.versions) return currentState;
-        return {
-          versions: currentState.versions.map(version =>
-            version.id === updatedVersion.id
-              ? { ...version, label: updatedVersion.label }
-              : version
-          ),
-          nextPageUri: currentState.nextPageUri,
-        };
-      });
-    },
-    [authenticatedUser, cloudProjectId]
-  );
-
   const addVersionToList = React.useCallback(
     (version: ExpandedCloudProjectVersion) => {
       setState(currentState => {
@@ -548,86 +467,7 @@ const useVersionHistory = ({
               onClose={() => setVersionHistoryPanelOpen(false)}
               id="version-history-drawer"
             />
-            {!cloudProjectId ? (
-              <Line>
-                <Column expand>
-                  <AlertMessage kind="info">
-                    <Trans>
-                      The version history is available for cloud projects only.
-                    </Trans>
-                  </AlertMessage>
-                </Column>
-              </Line>
-            ) : historyRetentionDays === 0 ? (
-              <Line>
-                <Column expand>
-                  <GetSubscriptionCard
-                    subscriptionDialogOpeningReason="Version history"
-                    forceColumnLayout
-                    recommendedPlanId="gdevelop_gold"
-                    placementId="version-history"
-                  >
-                    <Text>
-                      <Trans>
-                        Access project history, name saves, restore older
-                        versions.
-                        <br />
-                        Get a subscription to enable this feature.
-                      </Trans>
-                    </Text>
-                  </GetSubscriptionCard>
-                </Column>
-              </Line>
-            ) : !state.versions && versionsFetchingError ? (
-              <Line>
-                <Column expand>
-                  <PlaceholderError onRetry={onLoadMoreVersions}>
-                    {versionsFetchingError}
-                  </PlaceholderError>
-                </Column>
-              </Line>
-            ) : state.versions ? (
-              <Column>
-                {historyRetentionDays !== -1 && (
-                  <Line>
-                    <Column expand>
-                      <GetSubscriptionCard
-                        subscriptionDialogOpeningReason="Version history"
-                        forceColumnLayout
-                        filter="team"
-                        placementId="version-history"
-                      >
-                        <Text>
-                          <Trans>
-                            Your current subscription plan allows restoring
-                            versions from the last {historyRetentionDays} days.
-                            <br />
-                            Get a higher plan to access older versions.
-                          </Trans>
-                        </Text>
-                      </GetSubscriptionCard>
-                    </Column>
-                  </Line>
-                )}
-                <VersionHistory
-                  authenticatedUserId={
-                    authenticatedUser.profile
-                      ? authenticatedUser.profile.id
-                      : ''
-                  }
-                  isVisible={versionHistoryPanelOpen}
-                  projectId={fileMetadata ? fileMetadata.fileIdentifier : ''}
-                  canLoadMore={!!state.nextPageUri}
-                  onCheckoutVersion={onCheckoutVersion}
-                  onLoadMore={onLoadMoreVersions}
-                  onRenameVersion={onRenameVersion}
-                  openedVersionStatus={checkedOutVersionStatus}
-                  versions={state.versions}
-                />
-              </Column>
-            ) : (
-              <PlaceholderLoader />
-            )}
+            <EditorOperationHistory />
           </Drawer>
         )}
       </I18n>

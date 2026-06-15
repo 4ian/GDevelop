@@ -98,6 +98,7 @@ const gameSettingsRootFolderId = getProjectManagerItemId('game-settings');
 const gamePropertiesItemId = getProjectManagerItemId('game-properties');
 const gameDashboardItemId = 'manage';
 const gameResourcesItemId = getProjectManagerItemId('game-resources');
+const gameShareItemId = getProjectManagerItemId('game-share');
 export const scenesRootFolderId: string = getProjectManagerItemId('scenes');
 export const extensionsRootFolderId: string = getProjectManagerItemId(
   'extensions'
@@ -1078,6 +1079,14 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                         'res/icons_default/graphs_black.svg'
                       )
                     ),
+                    new LeafTreeViewItem(
+                      new ActionTreeViewItemContent(
+                        gameShareItemId,
+                        i18n._(t`Share`),
+                        onShareProject,
+                        'res/icons_default/publish_black.svg'
+                      )
+                    ),
                   ];
                 },
               },
@@ -1240,6 +1249,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         externalLayoutTreeViewItemProps,
         onOpenGamesDashboardDialog,
         onOpenResources,
+        onShareProject,
         openProjectProperties,
         openSearchExtensionDialog,
         project,

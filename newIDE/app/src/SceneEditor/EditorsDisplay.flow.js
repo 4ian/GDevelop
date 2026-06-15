@@ -184,6 +184,9 @@ export type SceneEditorsDisplayInterface = {|
     instanceSceneCoordinates?: ?[number, number],
   |}) => void,
   toggleEditorView: (editorId: EditorId) => void,
+  setEditorViewsVisibility: (
+    Array<{| editorId: EditorId, visible: boolean |}>
+  ) => void,
   isEditorVisible: (editorId: EditorId) => boolean,
   ensureEditorVisible: (editorId: EditorId) => void,
   viewControls: {|
@@ -199,6 +202,7 @@ export type SceneEditorsDisplayInterface = {|
     getLastCursorSceneCoordinates: () => [number, number],
     getLastContextMenuSceneCoordinates: () => [number, number],
     getViewPosition: () => ?ViewPosition,
+    keepCanvasTopLeftSceneCoordinatesOnNextResize: () => void,
   |},
   startSceneRendering: (start: boolean, reason: string) => void,
   instancesHandlers: {|

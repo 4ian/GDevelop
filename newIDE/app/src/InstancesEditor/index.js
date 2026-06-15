@@ -204,6 +204,7 @@ export default class InstancesEditor extends Component<Props, State> {
   _showObjectInstancesIn3D: boolean = false;
   _canvasResolution: number = 1;
   _previousToolBeforePicker: ?TileMapTileSelection = null;
+  _canvasTopLeftSceneCoordinatesToKeepAfterResize: ?[number, number] = null;
 
   // $FlowFixMe[missing-local-annot]
   state = {
@@ -738,6 +739,23 @@ export default class InstancesEditor extends Component<Props, State> {
         );
       }
       this.viewPosition.resize(width, height);
+      const canvasTopLeftSceneCoordinatesToKeep = this
+        ._canvasTopLeftSceneCoordinatesToKeepAfterResize;
+      this._canvasTopLeftSceneCoordinatesToKeepAfterResize = null;
+      let hasAdjustedViewPosition = false;
+      if (canvasTopLeftSceneCoordinatesToKeep) {
+        const canvasTopLeftSceneCoordinates = this.viewPosition.toSceneCoordinates(
+          0,
+          0
+        );
+        this.viewPosition.scrollBy(
+          canvasTopLeftSceneCoordinatesToKeep[0] -
+            canvasTopLeftSceneCoordinates[0],
+          canvasTopLeftSceneCoordinatesToKeep[1] -
+            canvasTopLeftSceneCoordinates[1]
+        );
+        hasAdjustedViewPosition = true;
+      }
       this.statusBar.resize(width, height);
       this.backgroundArea.hitArea = new PIXI.Rectangle(0, 0, width, height);
       this.background.resize(width, height);
@@ -745,6 +763,9 @@ export default class InstancesEditor extends Component<Props, State> {
       // Avoid flickering that could happen while waiting for next animation frame.
       this.fpsLimiter.forceNextUpdate();
       this._renderScene();
+      if (hasAdjustedViewPosition && this.props.onViewPositionChanged) {
+        this.props.onViewPositionChanged(this.viewPosition);
+      }
     }
 
     if (
@@ -1701,10 +1722,13 @@ export default class InstancesEditor extends Component<Props, State> {
 
   fitViewToRectangle(
     rectangle: Rectangle,
-    { adaptZoom }: {| adaptZoom: boolean |}
+    {
+      adaptZoom,
+      zoomFactorMultiplier = 1,
+    }: {| adaptZoom: boolean, zoomFactorMultiplier?: number |}
   ) {
     const idealZoom = this.viewPosition.fitToRectangle(rectangle);
-    if (adaptZoom) this.setZoomFactor(idealZoom);
+    if (adaptZoom) this.setZoomFactor(idealZoom * zoomFactorMultiplier);
     if (this.props.onViewPositionChanged) {
       this.props.onViewPositionChanged(this.viewPosition);
     }
@@ -1750,7 +1774,12 @@ export default class InstancesEditor extends Component<Props, State> {
 
   zoomToFitContent = () => {
     const contentAABB = this.getContentAABB();
-    if (contentAABB) this.fitViewToRectangle(contentAABB, { adaptZoom: true });
+    if (contentAABB) {
+      this.fitViewToRectangle(contentAABB, {
+        adaptZoom: true,
+        zoomFactorMultiplier: 1 / Math.max(1, this._canvasResolution),
+      });
+    }
   };
 
   _getAreaRectangle = (): Rectangle => {
@@ -1834,6 +1863,14 @@ export default class InstancesEditor extends Component<Props, State> {
 
   getViewPosition = (): ?ViewPosition => {
     return this.viewPosition;
+  };
+
+  keepCanvasTopLeftSceneCoordinatesOnNextResize = () => {
+    if (!this.viewPosition) return;
+    this._canvasTopLeftSceneCoordinatesToKeepAfterResize = this.viewPosition.toSceneCoordinates(
+      0,
+      0
+    );
   };
 
   _renderScene = () => {

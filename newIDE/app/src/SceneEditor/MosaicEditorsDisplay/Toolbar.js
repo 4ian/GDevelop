@@ -8,37 +8,25 @@ import IconButton from '../../UI/IconButton';
 import ElementWithMenu from '../../UI/Menu/ElementWithMenu';
 import ToolbarCommands from '../ToolbarCommands';
 import { type MenuItemTemplate } from '../../UI/Menu/Menu.flow';
-import ObjectIcon from '../../UI/CustomSvgIcons/Object';
-import ObjectGroupIcon from '../../UI/CustomSvgIcons/ObjectGroup';
-import EditIcon from '../../UI/CustomSvgIcons/Edit';
-import InstancesListIcon from '../../UI/CustomSvgIcons/InstancesList';
-import LayersIcon from '../../UI/CustomSvgIcons/Layers';
+import ShowAllPanelsIcon from '../../UI/CustomSvgIcons/ShowAllPanels';
 import UndoIcon from '../../UI/CustomSvgIcons/Undo';
 import RedoIcon from '../../UI/CustomSvgIcons/Redo';
 import TrashIcon from '../../UI/CustomSvgIcons/Trash';
 import GridIcon from '../../UI/CustomSvgIcons/Grid';
 import ZoomInIcon from '../../UI/CustomSvgIcons/ZoomIn';
 import EditSceneIcon from '../../UI/CustomSvgIcons/EditScene';
-import {
-  OPEN_INSTANCES_PANEL_BUTTON_ID,
-  OPEN_LAYERS_PANEL_BUTTON_ID,
-  OPEN_OBJECT_GROUPS_PANEL_BUTTON_ID,
-  OPEN_OBJECTS_PANEL_BUTTON_ID,
-  OPEN_PROPERTIES_PANEL_BUTTON_ID,
-} from '../utils';
+import { TOGGLE_ALL_PANELS_BUTTON_ID } from '../utils';
 import CompactToggleButtons from '../../UI/CompactToggleButtons';
 import Grid2d from '../../UI/CustomSvgIcons/Grid2d';
 import Grid3d from '../../UI/CustomSvgIcons/Grid3d';
+import { getShortcutDisplayName, useShortcutMap } from '../../KeyboardShortcuts';
 
 type Props = {|
   gameEditorMode: 'embedded-game' | 'instances-editor',
   setGameEditorMode: ('embedded-game' | 'instances-editor') => void,
   toggleObjectsList: () => void,
-  isObjectsListShown: boolean,
   toggleObjectGroupsList: () => void,
-  isObjectGroupsListShown: boolean,
   toggleProperties: () => void,
-  isPropertiesShown: boolean,
   undo: () => void,
   canUndo: boolean,
   redo: () => void,
@@ -46,9 +34,9 @@ type Props = {|
   deleteSelection: () => void,
   selectedInstancesCount: number,
   toggleInstancesList: () => void,
-  isInstancesListShown: boolean,
   toggleLayersList: () => void,
-  isLayersListShown: boolean,
+  toggleAllPanels: () => void,
+  areAllPanelsShown: boolean,
   isWindowMaskShown: boolean,
   toggleWindowMask: () => void,
   isGridShown: boolean,
@@ -64,12 +52,15 @@ type Props = {|
 const Toolbar: React.ComponentType<Props> = React.memo<Props>(function Toolbar(
   props
 ) {
+  const shortcutMap = useShortcutMap();
+
   return (
     <>
       <ToolbarCommands
         toggleObjectsList={props.toggleObjectsList}
         toggleObjectGroupsList={props.toggleObjectGroupsList}
         togglePropertiesPanel={props.toggleProperties}
+        toggleAllPanels={props.toggleAllPanels}
         toggleInstancesList={props.toggleInstancesList}
         toggleLayersList={props.toggleLayersList}
         undo={props.undo}
@@ -114,72 +105,17 @@ const Toolbar: React.ComponentType<Props> = React.memo<Props>(function Toolbar(
         <IconButton
           size="small"
           color="default"
-          id={OPEN_OBJECTS_PANEL_BUTTON_ID}
-          onClick={props.toggleObjectsList}
-          selected={props.isObjectsListShown}
+          id={TOGGLE_ALL_PANELS_BUTTON_ID}
+          onClick={props.toggleAllPanels}
+          selected={props.areAllPanelsShown}
           tooltip={
-            props.isObjectsListShown
-              ? t`Close Objects Panel`
-              : t`Open Objects Panel`
+            props.areAllPanelsShown ? t`Hide all panels` : t`Show all panels`
           }
+          acceleratorString={getShortcutDisplayName(
+            shortcutMap['TOGGLE_ALL_PANELS']
+          )}
         >
-          <ObjectIcon />
-        </IconButton>
-        <IconButton
-          size="small"
-          color="default"
-          id={OPEN_OBJECT_GROUPS_PANEL_BUTTON_ID}
-          onClick={props.toggleObjectGroupsList}
-          selected={props.isObjectGroupsListShown}
-          tooltip={
-            props.isObjectGroupsListShown
-              ? t`Close Object Groups Panel`
-              : t`Open Object Groups Panel`
-          }
-        >
-          <ObjectGroupIcon />
-        </IconButton>
-        <IconButton
-          size="small"
-          color="default"
-          id={OPEN_PROPERTIES_PANEL_BUTTON_ID}
-          onClick={props.toggleProperties}
-          selected={props.isPropertiesShown}
-          tooltip={
-            props.isPropertiesShown
-              ? t`Close Properties Panel`
-              : t`Open Properties Panel`
-          }
-        >
-          <EditIcon />
-        </IconButton>
-        <IconButton
-          size="small"
-          color="default"
-          id={OPEN_INSTANCES_PANEL_BUTTON_ID}
-          onClick={props.toggleInstancesList}
-          selected={props.isInstancesListShown}
-          tooltip={
-            props.isInstancesListShown
-              ? t`Close Instances List Panel`
-              : t`Open Instances List Panel`
-          }
-        >
-          <InstancesListIcon />
-        </IconButton>
-        <IconButton
-          size="small"
-          color="default"
-          id={OPEN_LAYERS_PANEL_BUTTON_ID}
-          onClick={props.toggleLayersList}
-          selected={props.isLayersListShown}
-          tooltip={
-            props.isLayersListShown
-              ? t`Close Layers Panel`
-              : t`Open Layers Panel`
-          }
-        >
-          <LayersIcon />
+          <ShowAllPanelsIcon />
         </IconButton>
         <ElementWithMenu
           element={

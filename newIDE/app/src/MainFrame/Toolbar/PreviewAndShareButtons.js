@@ -6,7 +6,7 @@ import { LineStackLayout } from '../../UI/Layout';
 import { type PreviewState } from '../PreviewState';
 import PreviewIcon from '../../UI/CustomSvgIcons/Preview';
 import UpdateIcon from '../../UI/CustomSvgIcons/Update';
-import PublishIcon from '../../UI/CustomSvgIcons/Publish';
+import DebuggerIcon from '../../UI/CustomSvgIcons/Debug';
 import FlatButtonWithSplitMenu from '../../UI/FlatButtonWithSplitMenu';
 import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 import ResponsiveRaisedButton from '../../UI/ResponsiveRaisedButton';
@@ -45,8 +45,6 @@ const PreviewAndShareButtons: React.ComponentType<PreviewAndShareButtonsProps> =
     hasPreviewsRunning,
     previewState,
     setPreviewOverride,
-    openShareDialog,
-    isSharingEnabled,
   }: PreviewAndShareButtonsProps) {
     const preferences = React.useContext(PreferencesContext);
     const { isMobile } = useResponsiveWindowSize();
@@ -58,10 +56,6 @@ const PreviewAndShareButtons: React.ComponentType<PreviewAndShareButtonsProps> =
             label: i18n._(t`Start Network Preview (Preview over WiFi/LAN)`),
             click: onNetworkPreview,
             enabled: canDoNetworkPreview,
-          },
-          {
-            label: i18n._(t`Start Preview and Debugger`),
-            click: onOpenDebugger,
           },
           preferences.values.openDiagnosticReportAutomatically
             ? null
@@ -157,7 +151,6 @@ const PreviewAndShareButtons: React.ComponentType<PreviewAndShareButtonsProps> =
       [
         onNetworkPreview,
         canDoNetworkPreview,
-        onOpenDebugger,
         onPreviewWithoutHotReload,
         isPreviewEnabled,
         hasPreviewsRunning,
@@ -170,15 +163,6 @@ const PreviewAndShareButtons: React.ComponentType<PreviewAndShareButtonsProps> =
         previewState.previewLayoutName,
         setPreviewOverride,
       ]
-    );
-
-    // Create a separate function to avoid the button passing its event as
-    // the first argument.
-    const onShareClick = React.useCallback(
-      () => {
-        openShareDialog();
-      },
-      [openShareDialog]
     );
 
     return (
@@ -205,13 +189,11 @@ const PreviewAndShareButtons: React.ComponentType<PreviewAndShareButtonsProps> =
           buildMenuTemplate={previewBuildMenuTemplate}
         />
         <ResponsiveRaisedButton
-          primary
-          onClick={onShareClick}
-          disabled={!isSharingEnabled}
-          icon={<PublishIcon />}
-          label={<Trans>Share</Trans>}
-          // This ID is used for guided lessons, let's keep it stable.
-          id="toolbar-publish-button"
+          onClick={onOpenDebugger}
+          disabled={!isPreviewEnabled}
+          icon={<DebuggerIcon />}
+          label={<Trans>Debug</Trans>}
+          id="toolbar-debug-button"
         />
       </LineStackLayout>
     );

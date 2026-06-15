@@ -288,6 +288,7 @@ const browserResourceSources: Array<ResourceSource> = [
           resourceKind={kind}
           key={`project-resources-${kind}`}
           multiSelection={props.options.multiSelection}
+          includeProjectAssetsFolder={props.options.includeProjectAssetsFolder}
         />
       ),
       renderPrimaryAction: ({

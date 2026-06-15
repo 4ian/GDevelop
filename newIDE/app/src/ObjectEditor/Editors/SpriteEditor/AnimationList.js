@@ -7,6 +7,7 @@ import * as React from 'react';
 import SpritesList, {
   addAnimationFrame,
   addAnimationFrameWithResourceName,
+  addMissingResourcesToProject,
   applyPointsAndMasksToSpriteIfNecessary,
 } from './SpritesList';
 import IconButton from '../../../UI/IconButton';
@@ -527,6 +528,7 @@ const AnimationList: React.ComponentType<{
           multiSelection: false,
           resourceKind: 'image',
           importedResourcesFolder: 'assets',
+          includeProjectAssetsFolder: true,
         });
 
         if (!selectedResources.length) return;
@@ -539,18 +541,28 @@ const AnimationList: React.ComponentType<{
         }
 
         let hasCreatedResource = false;
+        let resourcesToDeleteAfterUse: Array<gdResource> = [];
         if (selectedResourceSource.shouldCreateResource) {
           applyResourceDefaults(project, selectedResource);
           hasCreatedResource = project
             .getResourcesManager()
             .addResource(selectedResource);
+          resourcesToDeleteAfterUse = selectedResources;
+        } else {
+          const addMissingResourcesResult = addMissingResourcesToProject(
+            project,
+            selectedResources
+          );
+          hasCreatedResource = addMissingResourcesResult.hasCreatedAnyResource;
+          resourcesToDeleteAfterUse =
+            addMissingResourcesResult.resourcesToDeleteAfterUse;
         }
 
         const resourceName = selectedResource.getName();
-        if (selectedResourceSource.shouldCreateResource) {
+        if (resourcesToDeleteAfterUse.length) {
           // Important, we are responsible for deleting the resources that were given to us.
           // Otherwise we have a memory leak, as calling addResource is making a copy of the resource.
-          selectedResources.forEach(resource => resource.delete());
+          resourcesToDeleteAfterUse.forEach(resource => resource.delete());
         }
 
         if (hasCreatedResource) {
@@ -671,6 +683,7 @@ const AnimationList: React.ComponentType<{
           initialSourceName: initialResourceSource.name,
           multiSelection: true,
           resourceKind: 'image',
+          includeProjectAssetsFolder: true,
         });
 
         if (!selectedResources.length) return;
@@ -703,9 +716,21 @@ const AnimationList: React.ComponentType<{
             resourceManagementProps.onNewResourcesAdded();
           }
         } else {
+          const addMissingResourcesResult = addMissingResourcesToProject(
+            project,
+            selectedResources
+          );
           const resourcesByAnimation = new Map<string, Array<gdResource>>();
           resourcesByAnimation.set('default', selectedResources);
           addAnimations(resourcesByAnimation);
+          addMissingResourcesResult.resourcesToDeleteAfterUse.forEach(
+            resource => resource.delete()
+          );
+
+          if (addMissingResourcesResult.hasCreatedAnyResource) {
+            await resourceManagementProps.onFetchNewlyAddedResources();
+            resourceManagementProps.onNewResourcesAdded();
+          }
         }
 
         forceUpdate();

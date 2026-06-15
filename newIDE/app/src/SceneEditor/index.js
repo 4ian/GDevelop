@@ -182,6 +182,14 @@ export type EditorId =
   | 'instances-list'
   | 'layers-list';
 
+const PANEL_EDITOR_IDS: Array<EditorId> = [
+  'objects-list',
+  'object-groups-list',
+  'properties',
+  'instances-list',
+  'layers-list',
+];
+
 const styles = {
   container: {
     display: 'flex',
@@ -297,6 +305,42 @@ type State = {|
   lastSelectionType: 'instance' | 'object' | 'layer',
 |};
 
+const getSceneEditorHistoryContext = (
+  props: Props
+): {| editor: string, subject?: string |} => {
+  if (props.layout) {
+    return {
+      editor: 'Scene editor',
+      subject: props.layout.getName(),
+    };
+  }
+  if (props.externalLayout) {
+    return {
+      editor: 'External layout editor',
+      subject: props.externalLayout.getName(),
+    };
+  }
+  if (props.eventsBasedObjectVariant) {
+    return {
+      editor: 'Custom object variant editor',
+      subject: props.eventsBasedObjectVariant.getName(),
+    };
+  }
+  if (props.eventsBasedObject) {
+    return {
+      editor: 'Custom object editor',
+      subject: props.eventsBasedObject.getName(),
+    };
+  }
+
+  return {
+    editor: 'Scene editor',
+  };
+};
+
+const getInstanceOperationLabel = (verb: string, instancesCount: number) =>
+  `${verb} ${instancesCount === 1 ? 'instance' : 'instances'}`;
+
 type CopyCutPasteOptions = {|
   useLastCursorPosition?: boolean,
   pasteInTheForeground?: boolean,
@@ -378,6 +422,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       instancesEditorSettings: initialInstancesEditorSettings,
       history: getHistoryInitialState(props.initialInstances, {
         historyMaxSize: 50,
+        historyContext: getSceneEditorHistoryContext(props),
       }),
 
       layoutVariablesDialogOpen: false,
@@ -688,7 +733,13 @@ export default class SceneEditor extends React.Component<Props, State> {
           history: saveToHistory(
             this.state.history,
             this.props.initialInstances,
-            'DELETE'
+            'DELETE',
+            {
+              operationLabel: getInstanceOperationLabel(
+                'Delete',
+                justRemovedInstances.length
+              ),
+            }
           ),
         },
         () => {
@@ -867,18 +918,15 @@ export default class SceneEditor extends React.Component<Props, State> {
             this.instancesSelection.getSelectedInstances().length
           }
           toggleObjectsList={this.toggleObjectsList}
-          isObjectsListShown={editorDisplay.isEditorVisible('objects-list')}
           toggleObjectGroupsList={this.toggleObjectGroupsList}
-          isObjectGroupsListShown={editorDisplay.isEditorVisible(
-            'object-groups-list'
-          )}
           toggleProperties={this.toggleProperties}
-          isPropertiesShown={editorDisplay.isEditorVisible('properties')}
           deleteSelection={this.deleteSelection}
           toggleInstancesList={this.toggleInstancesList}
-          isInstancesListShown={editorDisplay.isEditorVisible('instances-list')}
           toggleLayersList={this.toggleLayersList}
-          isLayersListShown={editorDisplay.isEditorVisible('layers-list')}
+          toggleAllPanels={this.toggleAllPanels}
+          areAllPanelsShown={PANEL_EDITOR_IDS.every(editorId =>
+            editorDisplay.isEditorVisible(editorId)
+          )}
           toggleWindowMask={this.toggleWindowMask}
           isWindowMaskShown={!!this.state.instancesEditorSettings.windowMask}
           toggleGrid={this.toggleGrid}
@@ -909,6 +957,7 @@ export default class SceneEditor extends React.Component<Props, State> {
           deleteSelection={this.deleteSelection}
           toggleInstancesList={this.toggleInstancesList}
           toggleLayersList={this.toggleLayersList}
+          toggleAllPanels={this.toggleAllPanels}
           toggleWindowMask={this.toggleWindowMask}
           isWindowMaskShown={!!this.state.instancesEditorSettings.windowMask}
           toggleGrid={this.toggleGrid}
@@ -989,6 +1038,21 @@ export default class SceneEditor extends React.Component<Props, State> {
   toggleLayersList = () => {
     if (!this.editorDisplay) return;
     this.editorDisplay.toggleEditorView('layers-list');
+  };
+
+  toggleAllPanels = () => {
+    const { editorDisplay } = this;
+    if (!editorDisplay) return;
+    editorDisplay.viewControls.keepCanvasTopLeftSceneCoordinatesOnNextResize();
+    const shouldShowAllPanels = PANEL_EDITOR_IDS.some(
+      editorId => !editorDisplay.isEditorVisible(editorId)
+    );
+    editorDisplay.setEditorViewsVisibility(
+      PANEL_EDITOR_IDS.map(editorId => ({
+        editorId,
+        visible: shouldShowAllPanels,
+      }))
+    );
   };
 
   toggleWindowMask = () => {
@@ -1420,7 +1484,10 @@ export default class SceneEditor extends React.Component<Props, State> {
         history: saveToHistory(
           this.state.history,
           this.props.initialInstances,
-          'ADD'
+          'ADD',
+          {
+            operationLabel: getInstanceOperationLabel('Add', instances.length),
+          }
         ),
       },
       () => this.updateToolbar()
@@ -1531,7 +1598,10 @@ export default class SceneEditor extends React.Component<Props, State> {
         history: saveToHistory(
           this.state.history,
           this.props.initialInstances,
-          'EDIT'
+          'EDIT',
+          {
+            operationLabel: getInstanceOperationLabel('Move', instances.length),
+          }
         ),
       },
       () => this.forceUpdatePropertiesEditor()
@@ -1545,7 +1615,13 @@ export default class SceneEditor extends React.Component<Props, State> {
         history: saveToHistory(
           this.state.history,
           this.props.initialInstances,
-          'EDIT'
+          'EDIT',
+          {
+            operationLabel: getInstanceOperationLabel(
+              'Resize',
+              instances.length
+            ),
+          }
         ),
       },
       () => this.forceUpdatePropertiesEditor()
@@ -1559,7 +1635,13 @@ export default class SceneEditor extends React.Component<Props, State> {
         history: saveToHistory(
           this.state.history,
           this.props.initialInstances,
-          'EDIT'
+          'EDIT',
+          {
+            operationLabel: getInstanceOperationLabel(
+              'Rotate',
+              instances.length
+            ),
+          }
         ),
       },
       () => this.forceUpdatePropertiesEditor()
@@ -2388,7 +2470,13 @@ export default class SceneEditor extends React.Component<Props, State> {
         history: saveToHistory(
           this.state.history,
           this.props.initialInstances,
-          'DELETE'
+          'DELETE',
+          {
+            operationLabel: getInstanceOperationLabel(
+              'Delete',
+              instancesToDelete.length
+            ),
+          }
         ),
       },
       () => {
@@ -3333,11 +3421,15 @@ export default class SceneEditor extends React.Component<Props, State> {
                       redo: this.redo,
                       canUndo: () => canUndo(this.state.history),
                       canRedo: () => canRedo(this.state.history),
-                      saveToHistory: () =>
+                      saveToHistory: (changeContext?: any) =>
                         this.setState({
                           history: saveToHistory(
                             this.state.history,
-                            this.props.initialInstances
+                            this.props.initialInstances,
+                            'EDIT',
+                            changeContext || {
+                              operationLabel: 'Edit properties',
+                            }
                           ),
                         }),
                     }}

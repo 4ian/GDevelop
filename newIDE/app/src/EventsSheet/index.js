@@ -291,6 +291,51 @@ type State = {|
   fontSize: number,
 |};
 
+const getEventsHistoryContext = (
+  scope: EventsScope
+): {| editor: string, subject?: string |} => {
+  if (scope.layout) {
+    return {
+      editor: 'Events editor',
+      subject: scope.layout.getName(),
+    };
+  }
+  if (scope.externalEvents) {
+    return {
+      editor: 'External events editor',
+      subject: scope.externalEvents.getName(),
+    };
+  }
+  if (scope.eventsFunction) {
+    return {
+      editor: 'Function events editor',
+      subject: scope.eventsFunction.getName(),
+    };
+  }
+  if (scope.eventsBasedObject) {
+    return {
+      editor: 'Custom object events editor',
+      subject: scope.eventsBasedObject.getName(),
+    };
+  }
+  if (scope.eventsBasedBehavior) {
+    return {
+      editor: 'Behavior events editor',
+      subject: scope.eventsBasedBehavior.getName(),
+    };
+  }
+  if (scope.eventsFunctionsExtension) {
+    return {
+      editor: 'Extension events editor',
+      subject: scope.eventsFunctionsExtension.getName(),
+    };
+  }
+
+  return {
+    editor: 'Events editor',
+  };
+};
+
 type EventInsertionContext = {|
   eventsList: gdEventsList,
   indexInList: number,
@@ -366,6 +411,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   state = {
     eventsHistory: (getHistoryInitialState(this.props.events, {
       historyMaxSize: 100,
+      historyContext: getEventsHistoryContext(this.props.scope),
     }): HistoryState),
 
     editedInstruction: {
@@ -2150,7 +2196,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
           state.eventsHistory,
           this.props.events,
           actionType,
-          { positions }
+          { positions, operationLabel: 'Edit events' }
         ),
         eventsGraphPreviewUpdateId: state.eventsGraphPreviewUpdateId + 1,
       }),

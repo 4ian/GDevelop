@@ -314,6 +314,29 @@ export const addAnimationFrame = (
   );
 };
 
+export const addMissingResourcesToProject = (
+  project: gdProject,
+  resources: Array<gdResource>
+): {|
+  hasCreatedAnyResource: boolean,
+  resourcesToDeleteAfterUse: Array<gdResource>,
+|} => {
+  let hasCreatedAnyResource = false;
+  const resourcesToDeleteAfterUse: Array<gdResource> = [];
+  const resourcesManager = project.getResourcesManager();
+
+  resources.forEach(resource => {
+    if (resourcesManager.hasResource(resource.getName())) return;
+
+    applyResourceDefaults(project, resource);
+    const hasCreatedResource = resourcesManager.addResource(resource);
+    hasCreatedAnyResource = hasCreatedAnyResource || hasCreatedResource;
+    resourcesToDeleteAfterUse.push(resource);
+  });
+
+  return { hasCreatedAnyResource, resourcesToDeleteAfterUse };
+};
+
 type RawSpriteSheetImportState = {|
   resourceName: string,
   sheetWidth: number,
@@ -476,6 +499,8 @@ const SpritesList = ({
         initialSourceName: initialResourceSource.name,
         multiSelection: true,
         resourceKind: 'image',
+        importedResourcesFolder: 'assets',
+        includeProjectAssetsFolder: true,
       });
 
       if (!selectedResources.length) return;
@@ -485,6 +510,7 @@ const SpritesList = ({
       if (!selectedResourceSource) return;
 
       let hasCreatedAnyResource = false;
+      let resourcesToDeleteAfterUse: Array<gdResource> = [];
       if (selectedResourceSource.shouldCreateResource) {
         selectedResources.forEach(resource => {
           applyResourceDefaults(project, resource);
@@ -493,6 +519,17 @@ const SpritesList = ({
             .addResource(resource);
           hasCreatedAnyResource = hasCreatedAnyResource || hasCreatedResource;
         });
+        resourcesToDeleteAfterUse = selectedResources;
+      } else {
+        const addMissingResourcesResult = addMissingResourcesToProject(
+          project,
+          selectedResources
+        );
+        hasCreatedAnyResource =
+          hasCreatedAnyResource ||
+          addMissingResourcesResult.hasCreatedAnyResource;
+        resourcesToDeleteAfterUse =
+          addMissingResourcesResult.resourcesToDeleteAfterUse;
       }
 
       if (
@@ -519,10 +556,10 @@ const SpritesList = ({
         }
       }
 
-      if (selectedResourceSource.shouldCreateResource) {
+      if (resourcesToDeleteAfterUse.length) {
         // Important, we are responsible for deleting the resources that were given to us.
         // Otherwise we have a memory leak, as calling addResource is making a copy of the resource.
-        selectedResources.forEach(resource => resource.delete());
+        resourcesToDeleteAfterUse.forEach(resource => resource.delete());
       }
 
       forceUpdate();
@@ -562,6 +599,7 @@ const SpritesList = ({
         multiSelection: false,
         resourceKind: 'image',
         importedResourcesFolder: 'assets',
+        includeProjectAssetsFolder: true,
       });
 
       if (!selectedResources.length) return;
@@ -574,18 +612,28 @@ const SpritesList = ({
       }
 
       let hasCreatedResource = false;
+      let resourcesToDeleteAfterUse: Array<gdResource> = [];
       if (selectedResourceSource.shouldCreateResource) {
         applyResourceDefaults(project, selectedResource);
         hasCreatedResource = project
           .getResourcesManager()
           .addResource(selectedResource);
+        resourcesToDeleteAfterUse = selectedResources;
+      } else {
+        const addMissingResourcesResult = addMissingResourcesToProject(
+          project,
+          selectedResources
+        );
+        hasCreatedResource = addMissingResourcesResult.hasCreatedAnyResource;
+        resourcesToDeleteAfterUse =
+          addMissingResourcesResult.resourcesToDeleteAfterUse;
       }
 
       const resourceName = selectedResource.getName();
-      if (selectedResourceSource.shouldCreateResource) {
+      if (resourcesToDeleteAfterUse.length) {
         // Important, we are responsible for deleting the resources that were given to us.
         // Otherwise we have a memory leak, as calling addResource is making a copy of the resource.
-        selectedResources.forEach(resource => resource.delete());
+        resourcesToDeleteAfterUse.forEach(resource => resource.delete());
       }
 
       if (hasCreatedResource) {

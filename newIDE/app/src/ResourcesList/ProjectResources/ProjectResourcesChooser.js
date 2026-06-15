@@ -10,6 +10,7 @@ import SearchBar from '../../UI/SearchBar';
 import PlaceholderLoader from '../../UI/PlaceholderLoader';
 import { type ResourceKind } from '../ResourceSource';
 import EmptyMessage from '../../UI/EmptyMessage';
+import { getProjectAssetsFolderResources } from './ProjectAssetsFolderResources';
 
 type ProjectResourcesListProps = {|
   project: gdProject,
@@ -62,6 +63,7 @@ type Props = {|
   onResourcesSelected?: (gdResource[]) => void,
   resourceKind: ResourceKind,
   multiSelection: boolean,
+  includeProjectAssetsFolder?: boolean,
 |};
 
 const ProjectResourcesChooser = ({
@@ -69,8 +71,49 @@ const ProjectResourcesChooser = ({
   onResourcesSelected,
   resourceKind,
   multiSelection,
+  includeProjectAssetsFolder,
 }: Props): React.Node => {
   const [searchText, setSearchText] = React.useState<string>('');
+  const [
+    projectAssetsFolderResources,
+    setProjectAssetsFolderResources,
+  ] = React.useState<Array<gdResource>>([]);
+
+  React.useEffect(
+    () => {
+      if (!includeProjectAssetsFolder) {
+        setProjectAssetsFolderResources([]);
+        return;
+      }
+
+      let wasCancelled = false;
+      (async () => {
+        try {
+          const resources = await getProjectAssetsFolderResources({
+            project,
+            resourceKind,
+          });
+          if (wasCancelled) {
+            resources.forEach(resource => resource.delete());
+            return;
+          }
+          setProjectAssetsFolderResources(resources);
+        } catch (error) {
+          console.error(
+            'Unable to list project assets folder resources:',
+            error
+          );
+          if (wasCancelled) return;
+          setProjectAssetsFolderResources([]);
+        }
+      })();
+
+      return () => {
+        wasCancelled = true;
+      };
+    },
+    [project, resourceKind, includeProjectAssetsFolder]
+  );
 
   const searchResults = React.useMemo(
     () => {
@@ -79,10 +122,11 @@ const ProjectResourcesChooser = ({
         .getAllResourceNames()
         .toJSArray()
         .map(resourceName => resourcesManager.getResource(resourceName))
-        .filter(resource => resource.getKind() === resourceKind);
+        .filter(resource => resource.getKind() === resourceKind)
+        .concat(projectAssetsFolderResources);
       return filterResourcesList(allResourcesList, searchText);
     },
-    [project, searchText, resourceKind]
+    [project, searchText, resourceKind, projectAssetsFolderResources]
   );
 
   const [selectedResources, setSelectedResources] = React.useState<

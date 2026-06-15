@@ -268,7 +268,6 @@ export const useKeyboardShortcuts = ({
         // Extract shortcut from event object and check if it's valid
         // $FlowFixMe[incompatible-exact]
         const shortcutData = getShortcutMetadataFromEvent(e);
-        if (!shortcutData.isValid) return;
 
         // Get corresponding command, if it exists
         const commandName =
@@ -280,6 +279,15 @@ export const useKeyboardShortcuts = ({
               defaultSecondaryShortcuts[name] === shortcutData.shortcutString
           );
         if (!commandName) return;
+        if (
+          !shortcutData.isValid &&
+          !(
+            commandName === 'TOGGLE_ALL_PANELS' &&
+            shortcutData.shortcutString === 'Tab'
+          )
+        ) {
+          return;
+        }
 
         // On desktop app, ignore shortcuts that are handled by Electron,
         // unless ignoreHandledByElectron is set (for external windows where
@@ -352,7 +360,6 @@ export const useKeyboardShortcuts = ({
             altKey,
             shiftKey,
           });
-          if (!shortcutData.isValid) return;
 
           // Get corresponding command, if it exists
           const commandName =
@@ -361,9 +368,18 @@ export const useKeyboardShortcuts = ({
             ) ||
             Object.keys(defaultSecondaryShortcuts).find(
               name =>
-                defaultSecondaryShortcuts[name] === shortcutData.shortcutString
+              defaultSecondaryShortcuts[name] === shortcutData.shortcutString
             );
           if (!commandName) return;
+          if (
+            !shortcutData.isValid &&
+            !(
+              commandName === 'TOGGLE_ALL_PANELS' &&
+              shortcutData.shortcutString === 'Tab'
+            )
+          ) {
+            return;
+          }
 
           const command = commandsList[commandName];
           if (!command) return;

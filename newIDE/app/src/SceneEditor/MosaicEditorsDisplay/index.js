@@ -167,6 +167,23 @@ const MosaicEditorsDisplay: React.ComponentType<{
         config.position
       );
     }, []);
+    const setEditorViewsVisibility = React.useCallback(
+      (editorVisibilityChanges: Array<{| editorId: EditorId, visible: boolean |}>) => {
+        if (!editorMosaicRef.current) return;
+        editorMosaicRef.current.setEditorsVisibility(
+          editorVisibilityChanges.map(({ editorId, visible }) => {
+            const config = defaultPanelConfigByEditor[editorId];
+            return {
+              editorName: editorId,
+              // $FlowFixMe[incompatible-type]
+              position: config.position,
+              visible,
+            };
+          })
+        );
+      },
+      []
+    );
     const isEditorVisible = React.useCallback((editorId: EditorId) => {
       if (!editorMosaicRef.current) return false;
       return editorMosaicRef.current.getOpenedEditorNames().includes(editorId);
@@ -220,6 +237,7 @@ const MosaicEditorsDisplay: React.ComponentType<{
         forceUpdateLayersList,
         openNewObjectDialog,
         toggleEditorView,
+        setEditorViewsVisibility,
         isEditorVisible,
         ensureEditorVisible,
         startSceneRendering,
@@ -239,6 +257,9 @@ const MosaicEditorsDisplay: React.ComponentType<{
             ? editor.getLastContextMenuSceneCoordinates
             : () => [0, 0],
           getViewPosition: editor ? editor.getViewPosition : noop,
+          keepCanvasTopLeftSceneCoordinatesOnNextResize: editor
+            ? editor.keepCanvasTopLeftSceneCoordinatesOnNextResize
+            : noop,
         },
         instancesHandlers: {
           getContentAABB: editor ? editor.getContentAABB : () => null,

@@ -132,6 +132,7 @@ export type ChooseResourceOptions = {|
   multiSelection: boolean,
   resourceKind: ResourceKind,
   importedResourcesFolder?: string,
+  includeProjectAssetsFolder?: boolean,
 |};
 
 export type ResourceImportationBehavior = 'import' | 'relative' | 'ask';

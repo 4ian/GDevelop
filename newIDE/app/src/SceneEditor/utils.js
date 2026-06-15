@@ -7,7 +7,9 @@ export const OPEN_PROPERTIES_PANEL_BUTTON_ID =
 export const OPEN_INSTANCES_PANEL_BUTTON_ID =
   'toolbar-open-instances-list-panel-button';
 export const OPEN_LAYERS_PANEL_BUTTON_ID = 'toolbar-open-layers-panel-button';
+export const TOGGLE_ALL_PANELS_BUTTON_ID = 'toolbar-toggle-all-panels-button';
 export const TOOLBAR_COMMON_FORMATTED_BUTTON_IDS = [
+  `#${TOGGLE_ALL_PANELS_BUTTON_ID}`,
   `#${OPEN_OBJECTS_PANEL_BUTTON_ID}`,
   `#${OPEN_OBJECT_GROUPS_PANEL_BUTTON_ID}`,
   `#${OPEN_PROPERTIES_PANEL_BUTTON_ID}`,

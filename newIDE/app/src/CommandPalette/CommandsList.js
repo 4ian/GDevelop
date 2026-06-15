@@ -40,6 +40,7 @@ export type CommandName =
   | 'OPEN_OBJECTS_PANEL'
   | 'OPEN_OBJECT_GROUPS_PANEL'
   | 'OPEN_PROPERTIES_PANEL'
+  | 'TOGGLE_ALL_PANELS'
   | 'TOGGLE_INSTANCES_PANEL'
   | 'TOGGLE_LAYERS_PANEL'
   | 'SCENE_EDITOR_UNDO'
@@ -250,6 +251,10 @@ const commandsList: { [CommandName]: CommandMetadata } = {
   OPEN_PROPERTIES_PANEL: {
     area: 'SCENE',
     displayText: t`Toggle Properties Panel`,
+  },
+  TOGGLE_ALL_PANELS: {
+    area: 'SCENE',
+    displayText: t`Toggle all panels`,
   },
   TOGGLE_INSTANCES_PANEL: {
     area: 'SCENE',

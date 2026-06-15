@@ -11,6 +11,7 @@ import {
 } from '../../../Utils/GDevelopServices/Usage';
 import Text from '../../../UI/Text';
 import { Column, Line, Spacer } from '../../../UI/Grid';
+import CheckCircleFilled from '../../../UI/CustomSvgIcons/CheckCircleFilled';
 import {
   ColumnStackLayout,
   LineStackLayout,
@@ -69,10 +70,8 @@ const styles = {
     background: colors.goldBadgeBackground,
     color: colors.goldBadgeText,
     fontSize: 11,
-    fontWeight: 'bold',
-    letterSpacing: '0.06em',
     textTransform: 'uppercase',
-    padding: '4px 10px',
+    padding: '3px 10px',
     borderRadius: 999,
   },
   bulletLine: {
@@ -83,11 +82,14 @@ const styles = {
   check: {
     color: colors.green,
     fontWeight: 'bold',
-    lineHeight: '20px',
+    lineHeight: '15px',
+    paddingTop: 2,
   },
   mutedBullet: {
     color: colors.mutedBullet,
     lineHeight: '20px',
+    paddingLeft: 3,
+    width: 12,
   },
   greenLabel: {
     color: colors.green,
@@ -107,7 +109,7 @@ const styles = {
     gap: 6,
     background: 'rgba(255, 255, 255, 0.08)',
     borderRadius: 8,
-    padding: '5px 9px',
+    padding: '3px 9px',
     fontSize: 12,
     fontWeight: 600,
   },
@@ -119,17 +121,24 @@ const styles = {
     background: colors.gdevelopBadge,
     display: 'inline-block',
   },
+  topPart: {
+    paddingTop: 24,
+    paddingLeft: 24,
+    paddingRight: 24,
+  },
   priceBar: {
     borderTop: '1px solid rgba(255, 255, 255, 0.08)',
     paddingTop: 16,
+    paddingBottom: 24,
+    paddingLeft: 24,
+    paddingRight: 24,
   },
-  strikethrough: { textDecoration: 'line-through' },
+  strikethrough: { textDecoration: 'line-through', opacity: 0.8 },
   discountBadge: {
     background: colors.green,
     color: '#08231B',
     fontSize: 12,
-    fontWeight: 'bold',
-    padding: '3px 8px',
+    padding: '2px 8px',
     borderRadius: 6,
   },
   continueForFree: {
@@ -150,7 +159,7 @@ const Bullet = ({
 |}) => (
   <div style={styles.bulletLine}>
     <span style={enabled ? styles.check : styles.mutedBullet}>
-      {enabled ? '✓' : '●'}
+      {enabled ? <CheckCircleFilled fontSize="small" /> : '●'}
     </span>
     <Text noMargin color={enabled ? 'primary' : 'secondary'}>
       {children}
@@ -284,102 +293,122 @@ export default function SimplifiedSubscriptionDialog({
 
     return (
       <ColumnStackLayout noMargin>
-        {/* Header */}
-        <LineStackLayout noMargin alignItems="center">
-          <GoldIcon style={{ width: 40, height: 40 }} />
-          <Column noMargin>
-            <Text noMargin size="body-small">
-              <span style={styles.greenLabel}>
-                <Trans>You've reached your free limit</Trans>
-              </span>
-            </Text>
-            <Text noMargin size="section-title">
-              <Trans>Upgrade to GDevelop Gold</Trans>
-            </Text>
-          </Column>
-        </LineStackLayout>
-
-        {/* Comparison columns */}
-        <ResponsiveLineStackLayout noMargin noColumnMargin>
-          {/* Free column */}
-          <div style={{ ...styles.column, ...styles.freeColumn }}>
-            <Text noMargin size="body-small" color="secondary">
-              <span
-                style={{ textTransform: 'uppercase', letterSpacing: '0.1em' }}
-              >
-                <b>
-                  <Trans>Free</Trans>
-                </b>
-              </span>
-            </Text>
+        <div style={styles.topPart}>
+          <ColumnStackLayout noMargin>
+            {/* Header */}
+            <LineStackLayout noMargin alignItems="center">
+              <GoldIcon style={{ width: 40, height: 40 }} />
+              <Column noMargin>
+                <Text noMargin size="body-small">
+                  <span style={styles.greenLabel}>
+                    <Trans>You've reached your free limit</Trans>
+                  </span>
+                </Text>
+                <Text noMargin size="section-title">
+                  <Trans>Upgrade to GDevelop Gold</Trans>
+                </Text>
+              </Column>
+            </LineStackLayout>
             <Spacer />
-            <ColumnStackLayout noMargin>
-              <Bullet enabled>
-                <Trans>Unlimited game creation in the editor</Trans>
-              </Bullet>
-              <Bullet enabled={false}>
-                <Trans>
-                  AI assistant — <b>3 prompts</b>
-                </Trans>
-              </Bullet>
-              <Bullet enabled={false}>
-                <Trans>
-                  Publishing on the <b>GDevelop store</b> only
-                </Trans>
-              </Bullet>
-            </ColumnStackLayout>
-          </div>
 
-          {/* Gold column */}
-          <div style={{ ...styles.column, ...styles.goldColumn }}>
-            <span style={styles.goldBadge}>Gold</span>
-            <Text noMargin size="body-small">
-              <span style={styles.goldLabel}>
-                <Trans>Everything unlocked</Trans>
-              </span>
-            </Text>
-            <Spacer />
-            <ColumnStackLayout noMargin>
-              <Bullet enabled>
-                <Trans>Unlimited game creation in the editor</Trans>
-              </Bullet>
-              <Bullet enabled>
-                <Trans>
-                  Extended AI assistant —{' '}
-                  <b style={{ color: colors.goldText }}>1,000 prompts</b>
-                </Trans>
-              </Bullet>
-              <Bullet enabled>
+            {/* Comparison columns */}
+            <ResponsiveLineStackLayout noMargin noColumnMargin>
+              {/* Free column */}
+              <div style={{ ...styles.column, ...styles.freeColumn }}>
+                <Text noMargin size="body-small" color="secondary">
+                  <span
+                    style={{
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.1em',
+                    }}
+                  >
+                    <b>
+                      <Trans>Free (OSS)</Trans>
+                    </b>
+                  </span>
+                </Text>
+                <Spacer />
                 <ColumnStackLayout noMargin>
-                  <Text noMargin>
+                  <Bullet enabled>
+                    <Trans>Unlimited game creation in the editor</Trans>
+                  </Bullet>
+                  <Bullet enabled={false}>
                     <Trans>
-                      Publish to{' '}
-                      <b style={{ color: colors.goldText }}>all stores</b>
+                      AI assistant — <b>limited trial prompts</b>
                     </Trans>
-                  </Text>
-                  <LineStackLayout noMargin>
-                    <StoreBadge
-                      icon={<Apple style={styles.storeIcon} />}
-                      label="iOS"
-                    />
-                    <StoreBadge
-                      icon={<GooglePlay style={styles.storeIcon} />}
-                      label="Android"
-                    />
-                    <StoreBadge
-                      icon={<Steam style={styles.storeIcon} />}
-                      label="Steam"
-                    />
-                    <StoreBadge
-                      icon={<span style={styles.gdevelopBadgeSquare} />}
-                      label="GDevelop"
-                    />
-                  </LineStackLayout>
+                  </Bullet>
+                  <Bullet enabled={false}>
+                    <Trans>
+                      No automated, one-click publishing - <b>gd.games</b> only
+                    </Trans>
+                  </Bullet>
                 </ColumnStackLayout>
-              </Bullet>
-            </ColumnStackLayout>
-          </div>
-        </ResponsiveLineStackLayout>
+              </div>
+
+              {/* Gold column */}
+              <div style={{ ...styles.column, ...styles.goldColumn }}>
+                <span style={styles.goldBadge}>
+                  <Text
+                    noMargin
+                    color="inherit"
+                    size="body-small"
+                    style={{ fontWeight: 'bold' }}
+                  >
+                    Gold
+                  </Text>
+                </span>
+                <Text noMargin size="body-small">
+                  <span style={styles.goldLabel}>
+                    {/* TODO: another slogan */}
+                    <Trans>Everything unlocked</Trans>
+                  </span>
+                </Text>
+                <Spacer />
+                <ColumnStackLayout noMargin>
+                  <Bullet enabled>
+                    <Trans>Unlimited game creation in the editor</Trans>
+                  </Bullet>
+                  <Bullet enabled>
+                    <Trans>
+                      Extended AI assistant —{' '}
+                      <b style={{ color: colors.goldText }}>1,000 prompts</b>
+                    </Trans>
+                  </Bullet>
+                  <Bullet enabled>
+                    <ColumnStackLayout noMargin>
+                      <Text noMargin>
+                        <Trans>
+                          Publish to{' '}
+                          <b style={{ color: colors.goldText }}>all stores</b>
+                        </Trans>
+                      </Text>
+                      <LineStackLayout noMargin>
+                        <StoreBadge
+                          icon={<Apple style={styles.storeIcon} />}
+                          label="iOS"
+                        />
+                        <StoreBadge
+                          icon={<GooglePlay style={styles.storeIcon} />}
+                          label="Android"
+                        />
+                        <StoreBadge
+                          icon={<Steam style={styles.storeIcon} />}
+                          label="Steam"
+                        />
+                        <StoreBadge
+                          icon={<span style={styles.gdevelopBadgeSquare} />}
+                          label="gd.games"
+                        />
+                      </LineStackLayout>
+                    </ColumnStackLayout>
+                  </Bullet>
+                </ColumnStackLayout>
+              </div>
+            </ResponsiveLineStackLayout>
+          </ColumnStackLayout>
+        </div>
+
+        <Spacer />
 
         {/* Price + CTA bar */}
         <div style={styles.priceBar}>
@@ -410,7 +439,16 @@ export default function SimplifiedSubscriptionDialog({
                     </Text>
                   )}
                   {discountText && (
-                    <span style={styles.discountBadge}>{discountText}</span>
+                    <span style={styles.discountBadge}>
+                      <Text
+                        color="inherit"
+                        noMargin
+                        style={{ fontWeight: 'bold' }}
+                        size="body-small"
+                      >
+                        {discountText}
+                      </Text>
+                    </span>
                   )}
                 </LineStackLayout>
                 {yearlyPricingSystem && (
@@ -422,7 +460,7 @@ export default function SimplifiedSubscriptionDialog({
             </Line>
             <Column noMargin alignItems="flex-end">
               <RaisedButton
-                color="success"
+                color="premium"
                 size="large"
                 disabled={isLoading}
                 label={
@@ -442,7 +480,7 @@ export default function SimplifiedSubscriptionDialog({
                 onClick={isLoading ? undefined : onClose}
               >
                 <Text noMargin color="secondary" size="body-small">
-                  <Trans>Continue for free</Trans>
+                  <Trans>Not for now</Trans>
                 </Text>
               </div>
             </Column>
@@ -455,13 +493,7 @@ export default function SimplifiedSubscriptionDialog({
   return (
     <I18n>
       {({ i18n }) => (
-        <Dialog
-          title={null}
-          open
-          onRequestClose={onClose}
-          maxWidth="md"
-          flexColumnBody
-        >
+        <Dialog title={null} open maxWidth="md" flexColumnBody noPadding>
           {renderContent(i18n)}
         </Dialog>
       )}

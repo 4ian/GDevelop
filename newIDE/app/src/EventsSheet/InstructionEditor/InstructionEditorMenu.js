@@ -64,6 +64,7 @@ type Props = {|
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
   editEventsFunctionParameter: VariableDialogOpeningProps => void,
+  editEventsBasedEntityProperty: VariableDialogOpeningProps => void,
 |};
 
 /**

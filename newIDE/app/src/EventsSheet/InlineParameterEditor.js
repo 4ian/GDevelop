@@ -42,6 +42,7 @@ type Props = {|
 
   resourceManagementProps: ResourceManagementProps,
   editEventsFunctionParameter: VariableDialogOpeningProps => void,
+  editEventsBasedEntityProperty: VariableDialogOpeningProps => void,
 |};
 
 const InlineParameterEditor = ({
@@ -60,6 +61,7 @@ const InlineParameterEditor = ({
   anchorEl,
   resourceManagementProps,
   editEventsFunctionParameter,
+  editEventsBasedEntityProperty,
 }: Props): null | React.Node => {
   const portalContainer = React.useContext(PortalContainerContext);
   const [
@@ -191,6 +193,7 @@ const InlineParameterEditor = ({
       isInline
       resourceManagementProps={resourceManagementProps}
       editEventsFunctionParameter={editEventsFunctionParameter}
+      editEventsBasedEntityProperty={editEventsBasedEntityProperty}
     />
   );
 

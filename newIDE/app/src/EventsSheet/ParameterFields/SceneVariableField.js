@@ -98,6 +98,7 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           }
           getVariableSourceFromIdentifier={getVariableSourceFromIdentifier}
           editEventsFunctionParameter={null}
+          editEventsBasedEntityProperty={null}
         />
         {editorOpen && layout && project && (
           <SceneVariablesDialog

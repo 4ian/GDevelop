@@ -42,6 +42,7 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       onChange,
       value,
       editEventsFunctionParameter,
+      editEventsBasedEntityProperty,
     } = props;
 
     const enumerateGlobalAndSceneVariables = React.useCallback(
@@ -131,6 +132,7 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           onInstructionTypeChanged={onInstructionTypeChanged}
           getVariableSourceFromIdentifier={getVariableSourceFromIdentifier}
           editEventsFunctionParameter={editEventsFunctionParameter || null}
+          editEventsBasedEntityProperty={editEventsBasedEntityProperty || null}
         />
         {editorOpen &&
           (variableSourceType === gd.VariablesContainer.Local ? (

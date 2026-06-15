@@ -79,6 +79,7 @@ type Props = {
   forceDeclaration?: boolean,
   onOpenDialog: (VariableDialogOpeningProps => void) | null,
   editEventsFunctionParameter: (VariableDialogOpeningProps => void) | null,
+  editEventsBasedEntityProperty: (VariableDialogOpeningProps => void) | null,
 };
 
 type VariableNameQuickAnalyzeResult = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7;
@@ -273,6 +274,7 @@ export default (React.forwardRef<Props, VariableFieldInterface>(
       getVariableSourceFromIdentifier,
       onOpenDialog,
       editEventsFunctionParameter,
+      editEventsBasedEntityProperty,
     } = props;
 
     const field = React.useRef<?SemiControlledAutoCompleteInterface>(null);
@@ -396,6 +398,36 @@ export default (React.forwardRef<Props, VariableFieldInterface>(
       ]
     );
 
+    const openPropertyEditor = React.useCallback(
+      () => {
+        if (!editEventsBasedEntityProperty) {
+          return;
+        }
+        // Access to the input directly because the value
+        // may not have been sent to onChange yet.
+        const fieldCurrentValue = field.current
+          ? field.current.getInputValue()
+          : value;
+
+        onChange(fieldCurrentValue);
+        editEventsBasedEntityProperty({
+          variableName: fieldCurrentValue,
+          shouldCreate: !isRootVariableDeclared(
+            fieldCurrentValue,
+            variablesContainers
+          ),
+          variableType: getVariableTypeName(variableType),
+        });
+      },
+      [
+        editEventsBasedEntityProperty,
+        value,
+        onChange,
+        variablesContainers,
+        variableType,
+      ]
+    );
+
     const description = parameterMetadata
       ? parameterMetadata.getDescription()
       : undefined;
@@ -505,10 +537,10 @@ export default (React.forwardRef<Props, VariableFieldInterface>(
             ? ['edit-parameters']
             : variableSourceType === gd.VariablesContainer.Properties
             ? // TODO Allow to edit properties from the event sheet.
-              []
+              ['edit-properties']
             : ['edit-variables']
           : fieldCurrentValue
-          ? ['add-variable', 'add-parameter']
+          ? ['add-variable', 'add-parameter', 'add-property']
           : ['edit-or-add-variables'];
 
         return optionIds.includes(id);
@@ -587,6 +619,26 @@ export default (React.forwardRef<Props, VariableFieldInterface>(
                             value: '',
                             renderIcon: () => <Add />,
                             onClick: openParameterEditor,
+                          },
+                        ]
+                      : []),
+                    ...(editEventsBasedEntityProperty
+                      ? [
+                          {
+                            id: 'edit-properties',
+                            translatableValue: t`Edit properties...`,
+                            text: '',
+                            value: '',
+                            renderIcon: () => <Add />,
+                            onClick: openPropertyEditor,
+                          },
+                          {
+                            id: 'add-property',
+                            translatableValue: t`Add property...`,
+                            text: '',
+                            value: '',
+                            renderIcon: () => <Add />,
+                            onClick: openPropertyEditor,
                           },
                         ]
                       : []),

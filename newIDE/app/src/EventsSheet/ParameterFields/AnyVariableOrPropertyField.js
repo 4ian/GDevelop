@@ -41,6 +41,7 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       projectScopedContainersAccessor,
       onChange,
       value,
+      editEventsBasedEntityProperty,
     } = props;
 
     const enumerateGlobalAndSceneVariables = React.useCallback(
@@ -127,6 +128,7 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           onInstructionTypeChanged={onInstructionTypeChanged}
           getVariableSourceFromIdentifier={getVariableSourceFromIdentifier}
           editEventsFunctionParameter={null}
+          editEventsBasedEntityProperty={editEventsBasedEntityProperty || null}
         />
         {editorOpen &&
           (variableSourceType === gd.VariablesContainer.Local ? (

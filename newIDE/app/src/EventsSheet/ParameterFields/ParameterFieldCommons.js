@@ -58,6 +58,7 @@ export type ParameterFieldProps = {|
   parameterIndex?: number,
   onInstructionTypeChanged?: () => void,
   editEventsFunctionParameter?: VariableDialogOpeningProps => void,
+  editEventsBasedEntityProperty?: VariableDialogOpeningProps => void,
 |};
 
 export type FieldFocusFunction = (

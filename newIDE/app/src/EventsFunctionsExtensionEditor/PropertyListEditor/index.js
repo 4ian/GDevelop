@@ -53,6 +53,7 @@ import {
   getFoldersAscendanceWithoutRootFolder,
   enumerateFoldersInContainer,
 } from './EnumeratePropertyFolderOrProperty';
+import { type VariableDialogOpeningProps } from '../../VariablesList/VariablesEditorDialog';
 
 const configurationItemId = 'events-based-entity-configuration';
 export const propertiesRootFolderId = 'properties';
@@ -504,6 +505,7 @@ type Props = {|
   onOpenConfiguration: () => void,
   onOpenProperty: (name: string, isSharedProperties: boolean) => void,
   onEventsFunctionsAdded: () => void,
+  initiallySelectedProperty: VariableDialogOpeningProps | null,
 |};
 
 const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
@@ -519,6 +521,7 @@ const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
       onOpenConfiguration,
       onOpenProperty,
       onEventsFunctionsAdded,
+      initiallySelectedProperty,
     },
     ref
   ) => {
@@ -600,11 +603,13 @@ const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
         properties: gdPropertiesContainer,
         isSharedProperties: boolean,
         parentFolder: gdPropertyFolderOrProperty,
-        index: number
+        index: number,
+        name?: string,
+        type?: string | null
       ) => {
         if (!properties) return;
 
-        const newName = newNameGenerator('Property', name =>
+        const newName = newNameGenerator(name || 'Property', name =>
           properties.has(name)
         );
         const property = properties.insertNewPropertyInFolder(
@@ -612,7 +617,7 @@ const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
           parentFolder,
           index
         );
-        property.setType('Number');
+        property.setType(type || 'Number');
 
         onPropertiesUpdated();
 
@@ -1183,6 +1188,35 @@ const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
         };
       },
     }));
+
+    React.useEffect(
+      () => {
+        if (!initiallySelectedProperty || !properties) {
+          return;
+        }
+        if (initiallySelectedProperty.shouldCreate) {
+          const propertyType =
+            initiallySelectedProperty.variableType === 'number'
+              ? 'Number'
+              : initiallySelectedProperty.variableType === 'string'
+              ? 'String'
+              : initiallySelectedProperty.variableType === 'boolean'
+              ? 'Boolean'
+              : initiallySelectedProperty.variableType;
+          addProperty(
+            properties,
+            false,
+            properties.getRootFolder(),
+            0,
+            initiallySelectedProperty.variableName,
+            propertyType
+          );
+        } else {
+          setSelectedProperty(initiallySelectedProperty.variableName, false);
+        }
+      },
+      [addProperty, initiallySelectedProperty, properties, setSelectedProperty]
+    );
 
     const canMoveSelectionTo = React.useCallback(
       (destinationItem: TreeViewItem, where: 'before' | 'inside' | 'after') =>

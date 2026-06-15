@@ -66,6 +66,7 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           scope={scope}
           getVariableSourceFromIdentifier={getVariableSourceFromIdentifier}
           editEventsFunctionParameter={null}
+          editEventsBasedEntityProperty={null}
         />
         {editorOpen && project && (
           <GlobalVariablesDialog

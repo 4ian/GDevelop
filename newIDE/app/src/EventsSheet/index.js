@@ -195,6 +195,7 @@ type Props = {|
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
   editEventsFunctionParameter: VariableDialogOpeningProps => void,
+  editEventsBasedEntityProperty: VariableDialogOpeningProps => void,
 |};
 
 type ComponentProps = {|
@@ -2520,6 +2521,9 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
             onWillInstallExtension={this.props.onWillInstallExtension}
             onExtensionInstalled={this.props.onExtensionInstalled}
             editEventsFunctionParameter={this.props.editEventsFunctionParameter}
+            editEventsBasedEntityProperty={
+              this.props.editEventsBasedEntityProperty
+            }
           />
         )}
       </I18n>
@@ -2603,6 +2607,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       screenType,
       highlightedAiGeneratedEventIds,
       editEventsFunctionParameter,
+      editEventsBasedEntityProperty,
     } = this.props;
     if (!project) return null;
 
@@ -2937,6 +2942,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                   }}
                   resourceManagementProps={resourceManagementProps}
                   editEventsFunctionParameter={editEventsFunctionParameter}
+                  editEventsBasedEntityProperty={editEventsBasedEntityProperty}
                 />
                 <ContextMenu
                   ref={eventContextMenu =>

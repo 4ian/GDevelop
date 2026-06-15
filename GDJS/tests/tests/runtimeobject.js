@@ -40,6 +40,77 @@ describe('gdjs.RuntimeObject', () => {
     expect(object.getAngleToPosition(-110, 200)).to.be(124.77783136636388);
   });
 
+  it('should get and set enum variables', () => {
+    const expectToThrowWithMessage = (callback, message) => {
+      let error = null;
+      try {
+        callback();
+      } catch (exception) {
+        error = exception;
+      }
+
+      expect(error).not.to.be(null);
+      expect(error.message).to.contain(message);
+    };
+    const object = new gdjs.TestRuntimeObject(runtimeScene, {
+      name: 'obj1',
+      type: '',
+      variables: [
+        {
+          name: 'State',
+          type: 'enum',
+          value: 'Idle',
+          values: ['Idle', 'Running'],
+        },
+      ],
+      behaviors: [],
+      effects: [],
+    });
+    const variable = object.getVariables().get('State');
+
+    expect(gdjs.RuntimeObject.getVariableEnum(variable)).to.be('Idle');
+    expect(object.getVariableEnum(variable)).to.be('Idle');
+
+    gdjs.RuntimeObject.setVariableEnum(variable, 'Running');
+    expect(gdjs.RuntimeObject.getVariableEnum(variable)).to.be('Running');
+    expect(variable.getType()).to.be('enum');
+
+    expectToThrowWithMessage(
+      () => object.setVariableEnum(variable, 'Jumping'),
+      'is not a valid enum value'
+    );
+    expect(object.getVariableEnum(variable)).to.be('Running');
+    expect(variable.getType()).to.be('enum');
+
+    variable._str = 'Jumping';
+    expectToThrowWithMessage(
+      () => gdjs.RuntimeObject.getVariableEnum(variable),
+      'is not a valid enum value'
+    );
+
+    const stringVariable = new gdjs.Variable({
+      value: 'Running',
+      type: 'string',
+    });
+    expectToThrowWithMessage(
+      () => gdjs.RuntimeObject.getVariableEnum(stringVariable),
+      'Expected an enum variable'
+    );
+    expectToThrowWithMessage(
+      () => gdjs.RuntimeObject.setVariableEnum(stringVariable, 'Running'),
+      'Expected an enum variable'
+    );
+
+    const unrestrictedEnumVariable = new gdjs.Variable({
+      value: 'Custom',
+      type: 'enum',
+    });
+    gdjs.RuntimeObject.setVariableEnum(unrestrictedEnumVariable, 'Other');
+    expect(gdjs.RuntimeObject.getVariableEnum(unrestrictedEnumVariable)).to.be(
+      'Other'
+    );
+  });
+
   it('should compute AABB properly', () => {
     const object = new gdjs.TestRuntimeObject(runtimeScene, {
       name: 'obj1',

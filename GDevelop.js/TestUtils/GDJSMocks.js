@@ -594,6 +594,52 @@ class RuntimeObject {
     return variable.getAsString();
   }
 
+  static _getVariableEnumValues(variable) {
+    const enumValues = variable.getEnumValues();
+    return enumValues && enumValues.toJSArray
+      ? enumValues.toJSArray()
+      : enumValues;
+  }
+
+  static _validateVariableEnumValue(variable, value) {
+    value = '' + value;
+    const enumValues = RuntimeObject._getVariableEnumValues(variable);
+    if (variable.getType() !== 'enum') {
+      throw new Error(
+        `Expected an enum variable, but got a ${variable.getType()} variable.`
+      );
+    }
+    if (enumValues.length > 0 && enumValues.indexOf(value) === -1) {
+      throw new Error(
+        `"${value}" is not a valid enum value. Allowed values are: ${enumValues.join(
+          ', '
+        )}.`
+      );
+    }
+  }
+
+  static getVariableEnum(variable) {
+    const value = variable.getAsString();
+    RuntimeObject._validateVariableEnumValue(variable, value);
+    return value;
+  }
+
+  getVariableEnum(variable) {
+    const value = variable.getAsString();
+    RuntimeObject._validateVariableEnumValue(variable, value);
+    return value;
+  }
+
+  static setVariableEnum(variable, value) {
+    RuntimeObject._validateVariableEnumValue(variable, value);
+    variable.setString(value);
+  }
+
+  setVariableEnum(variable, value) {
+    RuntimeObject._validateVariableEnumValue(variable, value);
+    variable.setString(value);
+  }
+
   static getVariableBoolean(variable) {
     return variable.getAsBoolean();
   }

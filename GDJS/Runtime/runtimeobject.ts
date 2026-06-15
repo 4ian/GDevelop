@@ -1079,6 +1079,38 @@ namespace gdjs {
       return variable.getAsString();
     }
 
+    private static validateVariableEnumValue(
+      variable: gdjs.Variable,
+      value: string
+    ): void {
+      value = '' + value;
+      const enumValues = variable.getEnumValues();
+      if (variable.getType() !== 'enum') {
+        throw new Error(
+          `Expected an enum variable, but got a ${variable.getType()} variable.`
+        );
+      }
+      if (enumValues.length > 0 && enumValues.indexOf(value) === -1) {
+        throw new Error(
+          `"${value}" is not a valid enum value. Allowed values are: ${enumValues.join(
+            ', '
+          )}.`
+        );
+      }
+    }
+
+    /**
+     * Get the value of a variable considered as an enum.
+     * @param variable The variable to be accessed
+     * @return The enum value of the specified variable
+     * @static
+     */
+    static getVariableEnum(variable: gdjs.Variable): string {
+      const value = variable.getAsString();
+      RuntimeObject.validateVariableEnumValue(variable, value);
+      return value;
+    }
+
     /**
      * Shortcut to set the value of a variable considered as a boolean.
      * This shortcut function is needed for events code generation.
@@ -1147,6 +1179,16 @@ namespace gdjs {
      * @param newValue {String} The value to be set
      */
     static setVariableString(variable: gdjs.Variable, newValue: string) {
+      variable.setString(newValue);
+    }
+
+    /**
+     * Shortcut to set the value of a variable considered as an enum.
+     * @param variable The variable to be changed
+     * @param newValue The value to be set
+     */
+    static setVariableEnum(variable: gdjs.Variable, newValue: string) {
+      RuntimeObject.validateVariableEnumValue(variable, newValue);
       variable.setString(newValue);
     }
 
@@ -2922,8 +2964,10 @@ namespace gdjs {
     getVariableNumber = RuntimeObject.getVariableNumber;
     returnVariable = RuntimeObject.returnVariable;
     getVariableString = RuntimeObject.getVariableString;
+    getVariableEnum = RuntimeObject.getVariableEnum;
     setVariableNumber = RuntimeObject.setVariableNumber;
     setVariableString = RuntimeObject.setVariableString;
+    setVariableEnum = RuntimeObject.setVariableEnum;
     getVariableBoolean = RuntimeObject.getVariableBoolean;
     setVariableBoolean = RuntimeObject.setVariableBoolean;
     getVariableChildCount = RuntimeObject.getVariableChildCount;

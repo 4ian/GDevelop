@@ -613,6 +613,7 @@ export const sendShowcaseGameLinkOpened = (title: string, linkType: string) => {
 export const sendChoosePlanClicked = (metadata: {|
   planId: string | null,
   pricingSystemId: string | null,
+  dialogVariant?: string,
 |}) => {
   recordEvent('choose-plan-click', metadata);
 };
@@ -620,6 +621,7 @@ export const sendChoosePlanClicked = (metadata: {|
 export const sendCancelSubscriptionToChange = (metadata: {|
   planId: string,
   pricingSystemId: string | null,
+  dialogVariant?: string,
 |}) => {
   recordEvent('cancel-subscription-to-change', metadata);
 };

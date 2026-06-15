@@ -38,6 +38,8 @@ import { selectMessageByLocale } from '../../../Utils/i18n/MessageByLocale';
 import FlatButton from '../../../UI/FlatButton';
 import CancelReasonDialog from '../CancelReasonDialog';
 import { uniq } from 'lodash';
+import SimplifiedGoldSubscriptionDialog from './SimplifiedGoldSubscriptionDialog';
+import { type SubscriptionDialogVariant } from '../SubscriptionContext';
 
 const styles = {
   currentPlanPaper: {
@@ -106,6 +108,7 @@ type Props = {|
   recommendedPlanId: ?string,
   onOpenPendingDialog: (open: boolean) => void,
   couponCode?: ?string,
+  dialogVariant?: SubscriptionDialogVariant,
 |};
 
 export default function SubscriptionDialog({
@@ -115,6 +118,7 @@ export default function SubscriptionDialog({
   recommendedPlanId,
   onOpenPendingDialog,
   couponCode,
+  dialogVariant = 'default',
 }: Props): React.Node {
   const [isChangingSubscription, setIsChangingSubscription] = React.useState(
     false
@@ -178,6 +182,7 @@ export default function SubscriptionDialog({
       pricingSystemId: subscriptionPlanPricingSystem
         ? subscriptionPlanPricingSystem.id
         : null,
+      dialogVariant,
     });
 
     // Subscribing from an account without a subscription
@@ -246,6 +251,7 @@ export default function SubscriptionDialog({
     await sendCancelSubscriptionToChange({
       planId: subscriptionPlanPricingSystem.planId,
       pricingSystemId: subscriptionPlanPricingSystem.id,
+      dialogVariant,
     });
     try {
       await changeUserSubscription(
@@ -414,218 +420,239 @@ export default function SubscriptionDialog({
     <I18n>
       {({ i18n }) => (
         <>
-          <Dialog
-            title={<Trans>Get GDevelop Premium</Trans>}
-            subtitle={
-              <Trans>
-                Choose a subscription to enjoy the best of game creation.
-              </Trans>
-            }
-            open
-            onRequestClose={onClose}
-            minHeight="lg"
-            maxWidth="lg"
-            flexColumnBody
-            topBackgroundSrc={'res/premium/premium_dialog_background.png'}
-          >
-            {isPlanValid && userSubscriptionPlanEvenIfLegacy && (
-              <Column noMargin>
-                <Text>
-                  <Trans>Your plan:</Trans>
-                </Text>
-                <Paper
-                  background="medium"
-                  variant="outlined"
-                  style={styles.currentPlanPaper}
-                >
-                  <Line
-                    justifyContent="space-between"
-                    alignItems="center"
-                    noMargin
+          {dialogVariant === 'simplified-gold' ? (
+            <SimplifiedGoldSubscriptionDialog
+              availableSubscriptionPlansWithPrices={
+                purchasablePlansWithPricingSystems
+              }
+              disabled={isLoading}
+              onClose={onClose}
+              onClickChoosePlan={async pricingSystem => {
+                if (!authenticatedUser.authenticated) {
+                  authenticatedUser.onOpenCreateAccountDialog();
+                } else {
+                  await buyUpdateOrCancelPlan(i18n, pricingSystem);
+                }
+              }}
+            />
+          ) : (
+            <Dialog
+              title={<Trans>Get GDevelop Premium</Trans>}
+              subtitle={
+                <Trans>
+                  Choose a subscription to enjoy the best of game creation.
+                </Trans>
+              }
+              open
+              onRequestClose={onClose}
+              minHeight="lg"
+              maxWidth="lg"
+              flexColumnBody
+              topBackgroundSrc={'res/premium/premium_dialog_background.png'}
+            >
+              {isPlanValid && userSubscriptionPlanEvenIfLegacy && (
+                <Column noMargin>
+                  <Text>
+                    <Trans>Your plan:</Trans>
+                  </Text>
+                  <Paper
+                    background="medium"
+                    variant="outlined"
+                    style={styles.currentPlanPaper}
                   >
-                    <Line alignItems="center" noMargin>
-                      {getPlanIcon({
-                        planId: userSubscriptionPlanEvenIfLegacy.id,
-                        logoSize: 20,
-                      })}
-                      <Text size="block-title">
-                        {selectMessageByLocale(
-                          i18n,
-                          userSubscriptionPlanEvenIfLegacy.nameByLocale
-                        )}
-                      </Text>
-                      <Spacer />
-                      {subscriptionPricingSystem && (
-                        <Text color="secondary" size="sub-title">
-                          (
-                          {subscriptionPricingSystem.period === 'year' ? (
-                            !subscriptionPricingSystem.isPerUser ? (
-                              <Trans>
-                                Yearly,
-                                {formatPriceWithCurrency(
-                                  subscriptionPricingSystem.amountInCents,
-                                  subscriptionPricingSystem.currency
-                                )}
-                              </Trans>
-                            ) : (
-                              <Trans>
-                                Yearly,
-                                {formatPriceWithCurrency(
-                                  subscriptionPricingSystem.amountInCents,
-                                  subscriptionPricingSystem.currency
-                                )}{' '}
-                                per seat
-                              </Trans>
-                            )
-                          ) : subscriptionPricingSystem.period === 'month' ? (
-                            !subscriptionPricingSystem.isPerUser ? (
-                              <Trans>
-                                Monthly,
-                                {formatPriceWithCurrency(
-                                  subscriptionPricingSystem.amountInCents,
-                                  subscriptionPricingSystem.currency
-                                )}
-                              </Trans>
-                            ) : (
-                              <Trans>
-                                Monthly,
-                                {formatPriceWithCurrency(
-                                  subscriptionPricingSystem.amountInCents,
-                                  subscriptionPricingSystem.currency
-                                )}{' '}
-                                per seat
-                              </Trans>
-                            )
-                          ) : (
-                            formatPriceWithCurrency(
-                              subscriptionPricingSystem.amountInCents,
-                              subscriptionPricingSystem.currency
-                            )
+                    <Line
+                      justifyContent="space-between"
+                      alignItems="center"
+                      noMargin
+                    >
+                      <Line alignItems="center" noMargin>
+                        {getPlanIcon({
+                          planId: userSubscriptionPlanEvenIfLegacy.id,
+                          logoSize: 20,
+                        })}
+                        <Text size="block-title">
+                          {selectMessageByLocale(
+                            i18n,
+                            userSubscriptionPlanEvenIfLegacy.nameByLocale
                           )}
-                          )
                         </Text>
-                      )}
-                    </Line>
-                    {!hasSubscriptionBeenManuallyAdded(
-                      authenticatedUser.subscription
-                    ) &&
-                      !isSubscriptionComingFromTeam(
+                        <Spacer />
+                        {subscriptionPricingSystem && (
+                          <Text color="secondary" size="sub-title">
+                            (
+                            {subscriptionPricingSystem.period === 'year' ? (
+                              !subscriptionPricingSystem.isPerUser ? (
+                                <Trans>
+                                  Yearly,
+                                  {formatPriceWithCurrency(
+                                    subscriptionPricingSystem.amountInCents,
+                                    subscriptionPricingSystem.currency
+                                  )}
+                                </Trans>
+                              ) : (
+                                <Trans>
+                                  Yearly,
+                                  {formatPriceWithCurrency(
+                                    subscriptionPricingSystem.amountInCents,
+                                    subscriptionPricingSystem.currency
+                                  )}{' '}
+                                  per seat
+                                </Trans>
+                              )
+                            ) : subscriptionPricingSystem.period === 'month' ? (
+                              !subscriptionPricingSystem.isPerUser ? (
+                                <Trans>
+                                  Monthly,
+                                  {formatPriceWithCurrency(
+                                    subscriptionPricingSystem.amountInCents,
+                                    subscriptionPricingSystem.currency
+                                  )}
+                                </Trans>
+                              ) : (
+                                <Trans>
+                                  Monthly,
+                                  {formatPriceWithCurrency(
+                                    subscriptionPricingSystem.amountInCents,
+                                    subscriptionPricingSystem.currency
+                                  )}{' '}
+                                  per seat
+                                </Trans>
+                              )
+                            ) : (
+                              formatPriceWithCurrency(
+                                subscriptionPricingSystem.amountInCents,
+                                subscriptionPricingSystem.currency
+                              )
+                            )}
+                            )
+                          </Text>
+                        )}
+                      </Line>
+                      {!hasSubscriptionBeenManuallyAdded(
                         authenticatedUser.subscription
                       ) &&
-                      !willCancelAtPeriodEnd &&
-                      userPricingSystemId !== 'REDEMPTION_CODE' && (
-                        <FlatButton
-                          primary
-                          label={<Trans>Cancel subscription</Trans>}
-                          onClick={() => buyUpdateOrCancelPlan(i18n, null)}
-                        />
-                      )}
-                    {authenticatedUser.subscription &&
-                      authenticatedUser.subscription.pricingSystemId ===
-                        'REDEMPTION_CODE' &&
-                      authenticatedUser.subscription
-                        .redemptionCodeValidUntil && (
+                        !isSubscriptionComingFromTeam(
+                          authenticatedUser.subscription
+                        ) &&
+                        !willCancelAtPeriodEnd &&
+                        userPricingSystemId !== 'REDEMPTION_CODE' && (
+                          <FlatButton
+                            primary
+                            label={<Trans>Cancel subscription</Trans>}
+                            onClick={() => buyUpdateOrCancelPlan(i18n, null)}
+                          />
+                        )}
+                      {authenticatedUser.subscription &&
+                        authenticatedUser.subscription.pricingSystemId ===
+                          'REDEMPTION_CODE' &&
+                        authenticatedUser.subscription
+                          .redemptionCodeValidUntil && (
+                          <Text color="secondary">
+                            <Trans>
+                              Redeemed code valid until{' '}
+                              {new Date(
+                                authenticatedUser.subscription.redemptionCodeValidUntil
+                              ).toLocaleDateString()}
+                              .
+                            </Trans>
+                          </Text>
+                        )}
+                      {willCancelAtPeriodEnd && (
                         <Text color="secondary">
                           <Trans>
-                            Redeemed code valid until{' '}
-                            {new Date(
-                              authenticatedUser.subscription.redemptionCodeValidUntil
-                            ).toLocaleDateString()}
-                            .
+                            Cancelled - Your subscription will end at the end of
+                            the paid period.
                           </Trans>
                         </Text>
                       )}
-                    {willCancelAtPeriodEnd && (
-                      <Text color="secondary">
-                        <Trans>
-                          Cancelled - Your subscription will end at the end of
-                          the paid period.
-                        </Trans>
-                      </Text>
-                    )}
-                  </Line>
-                </Paper>
-              </Column>
-            )}
-            {!purchasablePlansWithPricingSystems ||
-            !displayedPlan ||
-            !selectedPlanId ||
-            authenticatedUser.loginState === 'loggingIn' ? (
-              <PlaceholderLoader />
-            ) : (
-              <ColumnStackLayout noMargin justifyContent="space-between" expand>
-                <ColumnStackLayout expand noMargin>
-                  <SubscriptionPlan
-                    onClickRedeemCode={
-                      !authenticatedUser.authenticated
-                        ? authenticatedUser.onOpenCreateAccountDialog
-                        : () => openRedeemCodeDialog()
-                    }
-                    subscriptionPlanWithPricingSystems={displayedPlan}
-                    disabled={isLoading}
-                    onClickChoosePlan={async pricingSystem => {
-                      if (!authenticatedUser.authenticated) {
-                        authenticatedUser.onOpenCreateAccountDialog();
-                      } else {
-                        await buyUpdateOrCancelPlan(i18n, pricingSystem);
+                    </Line>
+                  </Paper>
+                </Column>
+              )}
+              {!purchasablePlansWithPricingSystems ||
+              !displayedPlan ||
+              !selectedPlanId ||
+              authenticatedUser.loginState === 'loggingIn' ? (
+                <PlaceholderLoader />
+              ) : (
+                <ColumnStackLayout
+                  noMargin
+                  justifyContent="space-between"
+                  expand
+                >
+                  <ColumnStackLayout expand noMargin>
+                    <SubscriptionPlan
+                      onClickRedeemCode={
+                        !authenticatedUser.authenticated
+                          ? authenticatedUser.onOpenCreateAccountDialog
+                          : () => openRedeemCodeDialog()
                       }
-                    }}
-                    seatsCount={educationPlanSeatsCount}
-                    setSeatsCount={setEducationPlanSeatsCount}
-                    couponCode={couponCode}
-                    pricingSystemDiscounts={pricingSystemDiscounts}
-                    couponErrorMessage={couponErrorMessage}
-                    isValidatingCoupon={isValidatingCoupon}
-                    onClearCoupon={onClearCoupon}
-                  />
-                  <SubscriptionOptions
-                    subscriptionPlansWithPricingSystems={
-                      purchasablePlansWithPricingSystems
-                    }
-                    ownedPlanId={userPlanId}
-                    selectedPlanId={selectedPlanId}
-                    recommendedPlanId={availableRecommendedPlanId}
-                    // $FlowFixMe[incompatible-type]
-                    onClick={setSelectedPlanId}
-                    disabled={isLoading}
-                  />
-                </ColumnStackLayout>
-                <Line>
-                  <ColumnStackLayout noMargin>
-                    <Column noMargin>
-                      <LineStackLayout noMargin>
-                        <Text size="sub-title">❤️</Text>
-                        <Text size="sub-title">
-                          <Trans>Support What You Love</Trans>
-                        </Text>
-                      </LineStackLayout>
-                      <Text size="body" color="secondary">
-                        <Trans>
-                          The GDevelop project is open-source, powered by
-                          passion and community. Your membership helps the
-                          GDevelop company maintain servers, build new features,
-                          develop commercial offerings and keep the open-source
-                          project thriving. Our goal: make game development
-                          fast, fun and accessible to all.
-                        </Trans>
-                      </Text>
-                    </Column>
-                    {getPlanSpecificRequirements(
-                      i18n,
-                      availableSubscriptionPlansWithPrices
-                    ).map(planSpecificRequirements => (
-                      <AlertMessage
-                        kind="info"
-                        key={planSpecificRequirements.substring(0, 25)}
-                      >
-                        {planSpecificRequirements}
-                      </AlertMessage>
-                    ))}
+                      subscriptionPlanWithPricingSystems={displayedPlan}
+                      disabled={isLoading}
+                      onClickChoosePlan={async pricingSystem => {
+                        if (!authenticatedUser.authenticated) {
+                          authenticatedUser.onOpenCreateAccountDialog();
+                        } else {
+                          await buyUpdateOrCancelPlan(i18n, pricingSystem);
+                        }
+                      }}
+                      seatsCount={educationPlanSeatsCount}
+                      setSeatsCount={setEducationPlanSeatsCount}
+                      couponCode={couponCode}
+                      pricingSystemDiscounts={pricingSystemDiscounts}
+                      couponErrorMessage={couponErrorMessage}
+                      isValidatingCoupon={isValidatingCoupon}
+                      onClearCoupon={onClearCoupon}
+                    />
+                    <SubscriptionOptions
+                      subscriptionPlansWithPricingSystems={
+                        purchasablePlansWithPricingSystems
+                      }
+                      ownedPlanId={userPlanId}
+                      selectedPlanId={selectedPlanId}
+                      recommendedPlanId={availableRecommendedPlanId}
+                      // $FlowFixMe[incompatible-type]
+                      onClick={setSelectedPlanId}
+                      disabled={isLoading}
+                    />
                   </ColumnStackLayout>
-                </Line>
-              </ColumnStackLayout>
-            )}
-          </Dialog>
+                  <Line>
+                    <ColumnStackLayout noMargin>
+                      <Column noMargin>
+                        <LineStackLayout noMargin>
+                          <Text size="sub-title">❤️</Text>
+                          <Text size="sub-title">
+                            <Trans>Support What You Love</Trans>
+                          </Text>
+                        </LineStackLayout>
+                        <Text size="body" color="secondary">
+                          <Trans>
+                            The GDevelop project is open-source, powered by
+                            passion and community. Your membership helps the
+                            GDevelop company maintain servers, build new
+                            features, develop commercial offerings and keep the
+                            open-source project thriving. Our goal: make game
+                            development fast, fun and accessible to all.
+                          </Trans>
+                        </Text>
+                      </Column>
+                      {getPlanSpecificRequirements(
+                        i18n,
+                        availableSubscriptionPlansWithPrices
+                      ).map(planSpecificRequirements => (
+                        <AlertMessage
+                          kind="info"
+                          key={planSpecificRequirements.substring(0, 25)}
+                        >
+                          {planSpecificRequirements}
+                        </AlertMessage>
+                      ))}
+                    </ColumnStackLayout>
+                  </Line>
+                </ColumnStackLayout>
+              )}
+            </Dialog>
+          )}
           {hasMobileAppStoreSubscriptionPlan(
             authenticatedUser.subscription
           ) && (

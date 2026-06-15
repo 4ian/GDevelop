@@ -25,13 +25,27 @@ import { useAsyncLazyMemo } from '../../Utils/UseLazyMemo';
 import RedeemCodeDialog from '../RedeemCodeDialog';
 
 export type SubscriptionType = 'individual' | 'team' | 'education';
+export type SubscriptionDialogVariant = 'default' | 'simplified-gold';
 
 export type SubscriptionAnalyticsMetadata = {|
   reason: SubscriptionDialogDisplayReason,
   recommendedPlanId?: string,
   placementId: SubscriptionPlacementId,
   preStep?: 'subscriptionChecker',
+  dialogVariant?: SubscriptionDialogVariant,
 |};
+
+export const shouldShowSimplifiedGoldSubscriptionDialog = ({
+  placementId,
+  showSimplifiedGoldSubscriptionDialog,
+  simplifiedGoldSubscriptionDialogPlacementIds,
+}: {|
+  placementId: SubscriptionPlacementId,
+  showSimplifiedGoldSubscriptionDialog: boolean,
+  simplifiedGoldSubscriptionDialogPlacementIds: Array<SubscriptionPlacementId>,
+|}): boolean =>
+  showSimplifiedGoldSubscriptionDialog ||
+  simplifiedGoldSubscriptionDialogPlacementIds.includes(placementId);
 
 const mergeSubscriptionPlansWithPrices = (
   subscriptionPlans: SubscriptionPlan[],
@@ -123,11 +137,15 @@ export const SubscriptionContext: React.Context<SubscriptionState> = React.creat
 type SubscriptionProviderProps = {|
   children: React.Node,
   simulateMobileApp?: true,
+  showSimplifiedGoldSubscriptionDialog?: boolean,
+  simplifiedGoldSubscriptionDialogPlacementIds?: Array<SubscriptionPlacementId>,
 |};
 
 export const SubscriptionProvider = ({
   children,
   simulateMobileApp,
+  showSimplifiedGoldSubscriptionDialog,
+  simplifiedGoldSubscriptionDialogPlacementIds,
 }: SubscriptionProviderProps): React.MixedElement => {
   const [
     analyticsMetadata,
@@ -137,6 +155,16 @@ export const SubscriptionProvider = ({
   const recommendedPlanId = analyticsMetadata
     ? analyticsMetadata.recommendedPlanId
     : null;
+  const subscriptionDialogVariant: SubscriptionDialogVariant = analyticsMetadata
+    ? shouldShowSimplifiedGoldSubscriptionDialog({
+        placementId: analyticsMetadata.placementId,
+        showSimplifiedGoldSubscriptionDialog: !!showSimplifiedGoldSubscriptionDialog,
+        simplifiedGoldSubscriptionDialogPlacementIds:
+          simplifiedGoldSubscriptionDialogPlacementIds || [],
+      })
+      ? 'simplified-gold'
+      : 'default'
+    : 'default';
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const { showAlert } = useAlertDialog();
   const [
@@ -329,10 +357,13 @@ export const SubscriptionProvider = ({
   React.useEffect(
     () => {
       if (analyticsMetadata) {
-        sendSubscriptionDialogShown(analyticsMetadata);
+        sendSubscriptionDialogShown({
+          ...analyticsMetadata,
+          dialogVariant: subscriptionDialogVariant,
+        });
       }
     },
-    [analyticsMetadata]
+    [analyticsMetadata, subscriptionDialogVariant]
   );
 
   return (
@@ -363,6 +394,7 @@ export const SubscriptionProvider = ({
             recommendedPlanId={recommendedPlanId}
             onOpenPendingDialog={openSubscriptionPendingDialog}
             couponCode={couponCode}
+            dialogVariant={subscriptionDialogVariant}
           />
         )
       ) : null}

@@ -1,0 +1,345 @@
+.dialogPaper {
+  background: transparent;
+  color: white;
+  overflow: visible;
+  border-radius: 24px;
+}
+
+.dialogContent {
+  padding: 0;
+  overflow: visible;
+}
+
+.container {
+  width: 100%;
+  overflow: hidden;
+  border-radius: 24px;
+  background: linear-gradient(165deg, #23203a 0%, #16131f 100%);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  box-shadow: 0 32px 80px -24px rgba(22, 19, 31, 0.55);
+}
+
+.mainContent {
+  position: relative;
+  padding: 34px 40px 28px;
+}
+
+.closeButton {
+  position: absolute;
+  top: 22px;
+  right: 24px;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.07);
+  color: #9d9ab5;
+  cursor: pointer;
+}
+
+.closeButton:hover {
+  background: rgba(255, 255, 255, 0.11);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+  padding-right: 44px;
+}
+
+.goldIconContainer {
+  display: inline-flex;
+  width: 46px;
+  height: 46px;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: 13px;
+  background: radial-gradient(circle at 35% 28%, #3a3358, #211d33);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+.eyebrow {
+  color: #1fe0a8;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.title {
+  margin: 2px 0 0;
+  color: white;
+  font-size: 27px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.comparisonGrid {
+  display: grid;
+  grid-template-columns: 1fr 1.25fr;
+  gap: 16px;
+}
+
+.freeCard,
+.goldCard {
+  border-radius: 16px;
+  padding: 22px 20px;
+}
+
+.freeCard {
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.goldCard {
+  position: relative;
+  border: 1.5px solid rgba(255, 194, 75, 0.55);
+  background: linear-gradient(
+    180deg,
+    rgba(255, 194, 75, 0.1),
+    rgba(255, 194, 75, 0.02)
+  );
+}
+
+.goldBadge {
+  position: absolute;
+  top: -11px;
+  left: 20px;
+  border-radius: 999px;
+  padding: 4px 10px;
+  background: linear-gradient(90deg, #ffc24b, #f59e1b);
+  color: #2a1b00;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.cardTitle,
+.goldCardTitle {
+  margin-bottom: 18px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.cardTitle {
+  color: #9d9ab5;
+}
+
+.goldCardTitle {
+  color: #ffd789;
+}
+
+.benefitsList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.benefit {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  color: #c8c6d6;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.benefitContent {
+  min-width: 0;
+}
+
+.mutedBenefit {
+  color: #9d9ab5;
+}
+
+.goldBenefit {
+  color: white;
+}
+
+.checkIcon,
+.goldCheckIcon,
+.dotIcon {
+  width: 16px;
+  height: 16px;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.checkIcon {
+  color: #6fe3c0;
+}
+
+.goldCheckIcon {
+  color: #1fe0a8;
+}
+
+.dotIcon {
+  display: inline-block;
+  width: 13px;
+  height: 13px;
+  margin-left: 2px;
+  border-radius: 50%;
+  background: #6e6b85;
+}
+
+.highlight {
+  color: white;
+  font-weight: 800;
+}
+
+.goldHighlight {
+  color: #ffd789;
+  font-weight: 800;
+}
+
+.storeBadges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.storeBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 8px;
+  padding: 5px 9px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #edecf4;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.storeBadgeIcon {
+  width: 14px;
+  height: 14px;
+  color: white;
+}
+
+.gdevelopBadgeIcon {
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+  background: linear-gradient(135deg, #6c56f0, #8b57f0);
+}
+
+.priceBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 22px 40px;
+  background: rgba(0, 0, 0, 0.22);
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.priceDetails {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.price {
+  color: white;
+  font-size: 30px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.period {
+  color: #9d9ab5;
+  font-size: 14px;
+}
+
+.originalPrice {
+  color: #6e6b85;
+  font-size: 14px;
+  text-decoration: line-through;
+}
+
+.discountBadge {
+  border-radius: 6px;
+  padding: 3px 8px;
+  background: #1fe0a8;
+  color: #08231b;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.billingNote {
+  width: 100%;
+  margin-top: 2px;
+  color: #7c7993;
+  font-size: 12.5px;
+}
+
+.ctaColumn {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.ctaButton {
+  border: 0;
+  border-radius: 12px;
+  padding: 15px 34px;
+  background: linear-gradient(90deg, #1fe0a8, #10b981);
+  color: #06241b;
+  box-shadow: 0 12px 26px -8px rgba(31, 224, 168, 0.6);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.ctaButton:disabled {
+  cursor: default;
+  filter: grayscale(1);
+  opacity: 0.65;
+}
+
+.continueButton {
+  border: 0;
+  padding: 0;
+  background: none;
+  color: #7c7993;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 12.5px;
+}
+
+@media (max-width: 720px) {
+  .mainContent,
+  .priceBar {
+    padding-left: 22px;
+    padding-right: 22px;
+  }
+
+  .comparisonGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .priceBar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .ctaColumn {
+    align-items: stretch;
+  }
+
+  .continueButton {
+    align-self: center;
+  }
+}

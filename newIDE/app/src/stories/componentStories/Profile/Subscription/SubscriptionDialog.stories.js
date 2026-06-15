@@ -31,6 +31,7 @@ import {
   proMonthlyPricingSystem,
   fakeGoldWithPurchaselyAuthenticatedUser,
 } from '../../../../fixtures/GDevelopServicesTestData';
+import { type SubscriptionPlanWithPricingSystems } from '../../../../Utils/GDevelopServices/Usage';
 import SubscriptionDialog from '../../../../Profile/Subscription/SubscriptionDialog';
 import AlertProvider from '../../../../UI/Alert/AlertProvider';
 import {
@@ -87,6 +88,10 @@ export default {
       control: 'radio',
       options: ['None', 'gdevelop_silver', 'gdevelop_gold', 'gdevelop_startup'],
     },
+    dialogVariant: {
+      control: 'radio',
+      options: ['default', 'simplified-gold'],
+    },
     availableSubscriptionPlansWithPrices: {
       table: { disable: true },
     },
@@ -100,6 +105,23 @@ export default {
       table: { disable: true },
     },
   },
+};
+
+const goldSubscriptionPlanWithPricingSystems: SubscriptionPlanWithPricingSystems = {
+  id: 'gdevelop_gold',
+  isLegacy: false,
+  nameByLocale: {
+    en: 'Gold',
+  },
+  descriptionByLocale: {
+    en: 'More publishing, AI and growth features.',
+  },
+  bulletPointsByLocale: [],
+  targetAudiences: ['PRO'],
+  fullFeatures: [],
+  pillarNamesPerLocale: {},
+  featureNamesByLocale: {},
+  pricingSystems: [goldYearlyPricingSystem, goldMonthlyPricingSystem],
 };
 
 const getUserFromState = (userState: string) => {
@@ -132,12 +154,14 @@ export const Default = ({
   pricingSystem,
   recommendedPlanId,
   excludePlanId,
+  dialogVariant,
 }: {
   userState: string,
   cancelAtPeriodEnd: boolean,
   pricingSystem: string,
   recommendedPlanId: string,
   excludePlanId: string,
+  dialogVariant: 'default' | 'simplified-gold',
 }): React.Node => {
   const Component = () => {
     const {
@@ -168,6 +192,7 @@ export const Default = ({
         onClose={() => action('on close')()}
         recommendedPlanId={recommendedPlanIdFinal}
         onOpenPendingDialog={() => action('on open pending dialog')()}
+        dialogVariant={dialogVariant}
       />
     );
   };
@@ -272,4 +297,39 @@ Default.args = {
   pricingSystem: 'monthly',
   recommendedPlanId: 'gdevelop_silver',
   excludePlanId: 'None',
+  dialogVariant: 'default',
+};
+
+export const SimplifiedGold = (): React.Node => {
+  return (
+    <AlertProvider>
+      <AuthenticatedUserContext.Provider
+        value={fakeAuthenticatedUserWithNoSubscription}
+      >
+        <SubscriptionContext.Provider
+          value={{
+            getSubscriptionPlansWithPricingSystems: () => [
+              goldSubscriptionPlanWithPricingSystems,
+            ],
+            getUserSubscriptionPlanEvenIfLegacy: () => null,
+            openSubscriptionDialog: () => {},
+            getCouponCode: () => null,
+            clearCouponCode: () => {},
+            openRedeemCodeDialog: () => {},
+          }}
+        >
+          <SubscriptionDialog
+            availableSubscriptionPlansWithPrices={[
+              goldSubscriptionPlanWithPricingSystems,
+            ]}
+            userSubscriptionPlanEvenIfLegacy={null}
+            onClose={() => action('on close')()}
+            recommendedPlanId="gdevelop_gold"
+            onOpenPendingDialog={() => action('on open pending dialog')()}
+            dialogVariant="simplified-gold"
+          />
+        </SubscriptionContext.Provider>
+      </AuthenticatedUserContext.Provider>
+    </AlertProvider>
+  );
 };

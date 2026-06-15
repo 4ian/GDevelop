@@ -1459,6 +1459,35 @@ const runPreviewFrames = async (
 
   // A longer default timeout: stepping many frames + serializing the dump can
   // take a moment, and this is the resilient path for throttled windows.
+  const timeoutMs = clampTimeoutMs(
+    args && args.timeout_ms,
+    6000,
+    500,
+    30000
+  );
+  if (!(args && args.skip_ready_check === true)) {
+    const readiness = await waitForPreviewRuntimeReady(
+      (previewDebuggerServer: any),
+      targetId,
+      {
+        timeoutMs: Math.min(3000, timeoutMs),
+        operation: 'run_frames.ready-check',
+      }
+    );
+    if (!readiness.ready) {
+      return {
+        success: false,
+        running: true,
+        ready: false,
+        runtimeReady: false,
+        debuggerId: targetId,
+        error:
+          'run_frames aborted: the targeted preview is connected but did not answer getStatus, so the runtime debugger channel is not ready.',
+        ...readiness,
+      };
+    }
+  }
+
   const autoRelease = !!(args && (args.auto_release || args.autoRelease));
   const { matched, payload } = await sendTargetedRequest(
     (previewDebuggerServer: any),
@@ -1470,13 +1499,16 @@ const runPreviewFrames = async (
       fakeElapsedTimeMs: frameDeltaMs,
       autoRelease,
     },
-    { timeoutMs: 6000, returnFullMessage: true }
+    { timeoutMs, returnFullMessage: true }
   );
 
   if (!matched) {
     return {
       success: false,
       running: true,
+      ready: true,
+      runtimeReady: true,
+      failurePhase: 'renderer-response',
       debuggerId: targetId,
       error:
         'run_frames timed out: the targeted preview did not reply. The window may still be loading; retry, or close all previews and relaunch.',
@@ -1582,6 +1614,35 @@ const requireRunningPreview = (
     args && typeof args.debugger_id === 'string'
       ? args.debugger_id
       : previewIds[previewIds.length - 1];
+  if (
+    args &&
+    typeof args.debugger_id === 'string' &&
+    previewIds.indexOf(targetId) === -1
+  ) {
+    return {
+      ok: false,
+      result: {
+        success: false,
+        running: true,
+        error: `Preview debugger id "${targetId}" is not connected.`,
+        debuggerId: targetId,
+        availableDebuggerIds: previewIds,
+        diagnostics: {
+          classification: 'requested-debugger-id-not-connected',
+          targetDebuggerId: targetId,
+          likelyCauses: [
+            'The requested preview was closed.',
+            'The debugger id is stale from a previous launch.',
+          ],
+          recommendedActions: [
+            'use the latestDebuggerId from launch_preview or preview_health_check',
+            'control_preview { action: "close", close_all: true }',
+            'launch_preview { start_paused: true }',
+          ],
+        },
+      },
+    };
+  }
   return { ok: true, targetId, previewIds };
 };
 
@@ -1695,6 +1756,37 @@ const previewHealthCheck = async (
     note: responsive
       ? 'The selected preview replied to a debugger status ping.'
       : 'Use this before screenshots/runtime tests when the debugger channel looks stale. For a connected-but-unresponsive preview, close all previews and relaunch a single paused preview.',
+  };
+};
+
+const waitUntilPreviewReady = async (
+  previewDebuggerServer: ?Object,
+  args: Object
+): Promise<Object> => {
+  const guard = requireRunningPreview(previewDebuggerServer, args);
+  if (!guard.ok) return guard.result;
+  const timeoutMs = getPreviewReadinessTimeoutMs(args, 6000);
+  const readiness = await waitForPreviewRuntimeReady(
+    (previewDebuggerServer: any),
+    guard.targetId,
+    {
+      timeoutMs,
+      requirePaused: !!(args && (args.require_paused || args.requirePaused)),
+      operation: 'wait_until_preview_ready',
+    }
+  );
+
+  return {
+    success: !!readiness.ready,
+    running: true,
+    ready: !!readiness.ready,
+    runtimeReady: !!readiness.ready,
+    debuggerId: guard.targetId,
+    availableDebuggerIds: guard.previewIds,
+    ...readiness,
+    note: readiness.ready
+      ? 'The selected preview replied to getStatus and is ready for run_frames / inspect.'
+      : 'The selected preview is connected but did not answer getStatus before the timeout. Close all previews and relaunch a single paused preview.',
   };
 };
 
@@ -1964,18 +2056,296 @@ const getConnectionDebuggerId = (connection: any): ?string => {
   return null;
 };
 
-// Launch a new preview and (optionally) pause it the moment it connects, so
-// runtime tests can start near frame 0 instead of after the real-time clock has
-// already advanced (the game keeps running between MCP calls otherwise). This is
-// MCP-level: it triggers LAUNCH_NEW_PREVIEW, then registers a one-shot callback
-// that sends `pause` to the newly-connected debugger id. It is "pause ASAP",
-// not a guaranteed frame-0 pause — combine with run_frames for full determinism.
-//
-// By default it ATTACHES to an already-running preview (e.g. one the user
-// started with the editor's ▶ button, or a previous launch) instead of opening
-// yet another window — MCP shares the editor's own debugger channel, so a second
-// window is rarely wanted and just adds a stale game-over window to step around.
-// Pass force_new:true to always open a fresh window.
+const wait = (timeoutMs: number): Promise<void> =>
+  new Promise(resolve => setTimeout(resolve, timeoutMs));
+
+const clampTimeoutMs = (
+  value: any,
+  defaultValue: number,
+  minValue: number,
+  maxValue: number
+): number =>
+  typeof value === 'number' && Number.isFinite(value)
+    ? Math.max(minValue, Math.min(maxValue, value))
+    : defaultValue;
+
+const getPreviewReadinessTimeoutMs = (
+  args: Object,
+  defaultValue: number = 6000
+): number =>
+  clampTimeoutMs(
+    args && (args.ready_timeout_ms || args.readyTimeoutMs || args.timeout_ms),
+    defaultValue,
+    500,
+    30000
+  );
+
+const makePreviewRuntimeNotReadyResult = ({
+  previewDebuggerServer,
+  targetId,
+  timeoutMs,
+  attempts,
+  status,
+  operation,
+  failurePhase,
+}: {|
+  previewDebuggerServer: Object,
+  targetId: string,
+  timeoutMs: number,
+  attempts: number,
+  status: any,
+  operation: string,
+  failurePhase: string,
+|}): Object => {
+  const previewIds = getPreviewDebuggerIds(previewDebuggerServer);
+  return {
+    ready: false,
+    responsive: false,
+    previewHealth: status ? 'connected-status-only' : 'connected-unresponsive',
+    failurePhase,
+    attempts,
+    timeoutMs,
+    status: status || undefined,
+    diagnostics: buildPreviewDiagnostics({
+      running: true,
+      previewIds,
+      targetId,
+      status,
+      timedOut: true,
+      operation,
+    }),
+  };
+};
+
+const waitForPreviewRuntimeReady = async (
+  previewDebuggerServer: Object,
+  targetId: string,
+  options?: {|
+    timeoutMs?: number,
+    pollIntervalMs?: number,
+    requirePaused?: boolean,
+    operation?: string,
+  |}
+): Promise<Object> => {
+  const timeoutMs = (options && options.timeoutMs) || 6000;
+  const pollIntervalMs = (options && options.pollIntervalMs) || 150;
+  const requirePaused = !!(options && options.requirePaused);
+  const operation = (options && options.operation) || 'wait_until_preview_ready';
+  const startedAt = Date.now();
+  let attempts = 0;
+  let lastStatus = null;
+
+  while (Date.now() - startedAt < timeoutMs) {
+    attempts++;
+    const elapsedMs = Date.now() - startedAt;
+    const remainingMs = Math.max(1, timeoutMs - elapsedMs);
+    const probeTimeoutMs = Math.max(100, Math.min(1000, remainingMs));
+    const { matched, payload } = await sendTargetedRequest(
+      previewDebuggerServer,
+      targetId,
+      { command: 'getStatus' },
+      { timeoutMs: probeTimeoutMs }
+    );
+    if (matched) {
+      lastStatus = payload;
+      if (!requirePaused || (payload && payload.isPaused === true)) {
+        return {
+          ready: true,
+          responsive: true,
+          previewHealth: 'responsive',
+          debuggerId: targetId,
+          status: payload,
+          attempts,
+          elapsedMs: Date.now() - startedAt,
+        };
+      }
+    }
+
+    const remainingAfterProbeMs = timeoutMs - (Date.now() - startedAt);
+    if (remainingAfterProbeMs <= 0) break;
+    await wait(Math.min(pollIntervalMs, remainingAfterProbeMs));
+  }
+
+  return makePreviewRuntimeNotReadyResult({
+    previewDebuggerServer,
+    targetId,
+    timeoutMs,
+    attempts,
+    status: lastStatus,
+    operation,
+    failurePhase: requirePaused ? 'pause-confirmation' : 'runtime-ready',
+  });
+};
+
+const waitForNewPreviewDebuggerId = (
+  previewDebuggerServer: Object,
+  existingIds: Set<string>,
+  timeoutMs: number
+): Promise<Object> => {
+  const startedAt = Date.now();
+  return new Promise(resolve => {
+    let settled = false;
+    let unregister = () => {};
+    let intervalId = null;
+    let timeoutId = null;
+    let lastConnectionError = null;
+    const finish = result => {
+      if (settled) return;
+      settled = true;
+      if (intervalId !== null) clearInterval(intervalId);
+      if (timeoutId !== null) clearTimeout(timeoutId);
+      try {
+        unregister();
+      } catch (error) {
+        // ignore
+      }
+      resolve({
+        ...result,
+        elapsedMs: Date.now() - startedAt,
+      });
+    };
+    const checkForNewIds = () => {
+      const previewIds = getPreviewDebuggerIds(previewDebuggerServer);
+      const newId = previewIds.find(id => !existingIds.has(id));
+      if (newId) {
+        finish({
+          connected: true,
+          debuggerId: newId,
+          availableDebuggerIds: previewIds,
+        });
+      }
+    };
+
+    try {
+      unregister = previewDebuggerServer.registerCallbacks({
+        onErrorReceived: () => {},
+        onServerStateChanged: () => {},
+        onConnectionClosed: () => {},
+        onConnectionOpened: connection => {
+          const id = getConnectionDebuggerId(connection);
+          if (id && !existingIds.has(id)) {
+            finish({
+              connected: true,
+              debuggerId: id,
+              availableDebuggerIds:
+                connection && Array.isArray(connection.debuggerIds)
+                  ? connection.debuggerIds
+                  : getPreviewDebuggerIds(previewDebuggerServer),
+            });
+            return;
+          }
+          checkForNewIds();
+        },
+        onConnectionErrored: ({ id, errorMessage }) => {
+          lastConnectionError = { id, errorMessage };
+        },
+        onHandleParsedMessage: () => {},
+      });
+    } catch (error) {
+      finish({
+        connected: false,
+        failurePhase: 'debugger-connect',
+        error: `Could not watch preview debugger connections: ${error.message}`,
+      });
+      return;
+    }
+
+    checkForNewIds();
+    intervalId = setInterval(checkForNewIds, 100);
+    timeoutId = setTimeout(
+      () =>
+        finish({
+          connected: false,
+          failurePhase: 'debugger-connect',
+          availableDebuggerIds: getPreviewDebuggerIds(previewDebuggerServer),
+          connectionError: lastConnectionError || undefined,
+        }),
+      timeoutMs
+    );
+  });
+};
+
+const pausePreviewAndConfirm = async (
+  previewDebuggerServer: Object,
+  targetId: string,
+  timeoutMs: number,
+  operation: string
+): Promise<Object> => {
+  const pauseTimeoutMs = Math.min(2000, Math.max(500, timeoutMs));
+  const { matched, payload } = await sendTargetedRequest(
+    previewDebuggerServer,
+    targetId,
+    { command: 'pause' },
+    { timeoutMs: pauseTimeoutMs }
+  );
+  if (matched && payload && payload.isPaused === true) {
+    return {
+      pauseRequested: true,
+      pauseConfirmed: true,
+      startPaused: true,
+      status: payload,
+    };
+  }
+
+  const statusConfirmation = await waitForPreviewRuntimeReady(
+    previewDebuggerServer,
+    targetId,
+    {
+      timeoutMs: Math.max(500, timeoutMs - pauseTimeoutMs),
+      requirePaused: true,
+      operation,
+    }
+  );
+  if (statusConfirmation.ready) {
+    return {
+      pauseRequested: true,
+      pauseConfirmed: true,
+      startPaused: true,
+      status: statusConfirmation.status,
+    };
+  }
+
+  return {
+    ...statusConfirmation,
+    pauseRequested: true,
+    pauseConfirmed: false,
+    startPaused: false,
+    status: matched ? payload : statusConfirmation.status,
+    failurePhase: 'pause-confirmation',
+  };
+};
+
+const makeLaunchPreviewNotReadyResult = ({
+  launched,
+  attached,
+  debuggerId,
+  availableDebuggerIds,
+  readiness,
+  startPaused,
+  note,
+}: {|
+  launched: boolean,
+  attached?: boolean,
+  debuggerId?: ?string,
+  availableDebuggerIds?: ?Array<string>,
+  readiness: Object,
+  startPaused: boolean,
+  note: string,
+|}): Object => ({
+  success: false,
+  launched,
+  attached: !!attached,
+  ready: false,
+  runtimeReady: false,
+  startPaused: false,
+  pauseRequested: !!startPaused,
+  pauseConfirmed: false,
+  debuggerId,
+  availableDebuggerIds,
+  ...readiness,
+  note,
+});
+
 const launchPreview = async (
   previewDebuggerServer: ?Object,
   runCommand: ?(string) => boolean,
@@ -1984,177 +2354,223 @@ const launchPreview = async (
   if (typeof runCommand !== 'function') {
     return {
       success: false,
+      ready: false,
+      failurePhase: 'window-launch',
       error: 'Launching previews is not supported in this editor build.',
     };
   }
+
   const startPaused = !!(args && (args.start_paused || args.startPaused));
   const forceNew = !!(args && (args.force_new || args.forceNew));
-  const timeoutMs =
-    args && typeof args.timeout_ms === 'number'
-      ? Math.max(500, Math.min(15000, args.timeout_ms))
-      : 6000;
+  const timeoutMs = getPreviewReadinessTimeoutMs(args, 6000);
 
-  // Attach to an existing preview unless the caller forces a new window. This
-  // keeps MCP working against the editor's current preview rather than spawning
-  // duplicates.
   if (!forceNew && previewDebuggerServer) {
     const connectedIds = getPreviewDebuggerIds(previewDebuggerServer);
     if (connectedIds.length) {
       const attachId = connectedIds[connectedIds.length - 1];
-      if (!startPaused) {
-        return {
-          success: true,
+      const readiness = await waitForPreviewRuntimeReady(
+        (previewDebuggerServer: any),
+        attachId,
+        { timeoutMs, operation: 'launch_preview.attach' }
+      );
+      if (!readiness.ready) {
+        return makeLaunchPreviewNotReadyResult({
           launched: false,
           attached: true,
           debuggerId: attachId,
           availableDebuggerIds: connectedIds,
+          readiness,
+          startPaused,
+          note:
+            'Attached to an already-connected preview window, but its runtime debugger did not answer getStatus. Close all previews and relaunch a single paused preview.',
+        });
+      }
+
+      if (!startPaused) {
+        return {
+          success: true,
+          ready: true,
+          runtimeReady: true,
+          launched: false,
+          attached: true,
+          debuggerId: attachId,
+          availableDebuggerIds: connectedIds,
+          status: readiness.status,
           startPaused: false,
           note:
-            'Attached to the already-running preview (no new window opened). It keeps running in real time — for deterministic tests use run_frames, or pass start_paused:true to pause it now, or force_new:true to open a fresh window.',
+            'Attached to the already-running preview (no new window opened). The runtime answered getStatus. It keeps running in real time; for deterministic tests use run_frames, or pass start_paused:true to pause it now, or force_new:true to open a fresh window.',
         };
       }
-      // start_paused on an existing preview: pause it in place.
-      const { matched, payload } = await sendTargetedRequest(
+
+      const pause = await pausePreviewAndConfirm(
         (previewDebuggerServer: any),
         attachId,
-        { command: 'pause' },
-        { timeoutMs: Math.min(2000, Math.max(500, timeoutMs)) }
+        timeoutMs,
+        'launch_preview.attach.pause'
       );
-      const pauseConfirmed = !!(
-        matched &&
-        payload &&
-        payload.isPaused === true
-      );
+      if (!pause.pauseConfirmed) {
+        return makeLaunchPreviewNotReadyResult({
+          launched: false,
+          attached: true,
+          debuggerId: attachId,
+          availableDebuggerIds: connectedIds,
+          readiness: pause,
+          startPaused: true,
+          note:
+            'Attached to the already-running preview, but start_paused was requested and the pause was not confirmed. The preview may already be running in real time.',
+        });
+      }
+
       return {
         success: true,
+        ready: true,
+        runtimeReady: true,
         launched: false,
         attached: true,
         debuggerId: attachId,
         availableDebuggerIds: connectedIds,
-        startPaused: pauseConfirmed,
+        startPaused: true,
         pauseRequested: true,
-        pauseConfirmed,
-        status: matched ? payload : undefined,
-        note: pauseConfirmed
-          ? 'Attached to the already-running preview and paused it (no new window opened). Use run_frames / control_preview { action:"step" } to advance, or control_preview { action:"play" } to resume. Pass force_new:true to open a fresh window instead.'
-          : 'Attached to the already-running preview and requested a pause, but it did not confirm before the timeout (its debugger channel may be throttled — try control_preview { action:"focus" }, or relaunch with force_new:true). It may still be running in real time.',
+        pauseConfirmed: true,
+        status: pause.status,
+        note:
+          'Attached to the already-running preview and paused it (no new window opened). Use run_frames / control_preview { action:"step" } to advance, or control_preview { action:"play" } to resume. Pass force_new:true to open a fresh window instead.',
       };
     }
   }
 
-  // Snapshot the already-connected ids so we can detect the NEW preview.
   const existingIds = new Set(
-    previewDebuggerServer && startPaused
-      ? (typeof previewDebuggerServer.getExistingPreviewDebuggerIds ===
-        'function'
-          ? previewDebuggerServer.getExistingPreviewDebuggerIds()
-          : previewDebuggerServer.getExistingDebuggerIds()) || []
-      : []
+    previewDebuggerServer ? getPreviewDebuggerIds(previewDebuggerServer) : []
   );
 
-  if (!startPaused || !previewDebuggerServer) {
-    const didRun = runCommand('LAUNCH_NEW_PREVIEW');
-    return didRun
-      ? {
-          success: true,
-          launched: true,
-          startPaused: false,
-          note:
-            'Preview launched. It runs in real time immediately — for deterministic tests use run_frames, or relaunch with start_paused:true.',
-        }
-      : { success: false, error: 'Could not launch a preview.' };
-  }
-
-  // start_paused: register a connection watcher BEFORE launching.
-  return new Promise(resolve => {
-    let settled = false;
-    let pauseRequestedForId = null;
-    let unregister = () => {};
-    const finish = result => {
-      if (settled) return;
-      settled = true;
-      try {
-        unregister();
-      } catch (error) {
-        // ignore
-      }
-      resolve(result);
-    };
-    try {
-      unregister = previewDebuggerServer.registerCallbacks({
-        onErrorReceived: () => {},
-        onServerStateChanged: () => {},
-        onConnectionClosed: () => {},
-        onConnectionOpened: connection => {
-          const id = getConnectionDebuggerId(connection);
-          if (!id) return;
-          if (existingIds.has(id)) return; // not the new one
-          if (pauseRequestedForId) return;
-          pauseRequestedForId = id;
-          const pauseTimeoutMs = Math.min(2000, Math.max(500, timeoutMs));
-          sendTargetedRequest(
-            previewDebuggerServer,
-            id,
-            { command: 'pause' },
-            { timeoutMs: pauseTimeoutMs }
-          ).then(({ matched, payload }) => {
-            const pauseConfirmed = !!(
-              matched &&
-              payload &&
-              payload.isPaused === true
-            );
-            finish({
-              success: true,
-              launched: true,
-              startPaused: pauseConfirmed,
-              pauseRequested: true,
-              pauseConfirmed,
-              debuggerId: id,
-              status: matched ? payload : undefined,
-              note: pauseConfirmed
-                ? 'Preview launched and pause was confirmed on the new debugger connection. Use run_frames / control_preview { action:"step" } to advance deterministically, or control_preview { action:"play" } to run in real time.'
-                : 'Preview launched and a pause was requested on the new debugger connection, but the runtime did not confirm it before the timeout. It may already be running in real time; retry control_preview { action:"pause" } or close all previews and relaunch.',
-            });
-          });
-        },
-        onConnectionErrored: () => {},
-        onHandleParsedMessage: () => {},
-      });
-    } catch (error) {
-      // Could not watch connections — launch anyway, unpaused.
-      const didRun = runCommand('LAUNCH_NEW_PREVIEW');
-      finish(
-        didRun
-          ? {
-              success: true,
-              launched: true,
-              startPaused: false,
-              note:
-                'Preview launched, but could not register a pause-on-connect watcher; it is running in real time.',
-            }
-          : { success: false, error: 'Could not launch a preview.' }
-      );
-      return;
-    }
-
+  if (!previewDebuggerServer) {
     const didRun = runCommand('LAUNCH_NEW_PREVIEW');
     if (!didRun) {
-      finish({ success: false, error: 'Could not launch a preview.' });
-      return;
+      return {
+        success: false,
+        launched: false,
+        ready: false,
+        failurePhase: 'window-launch',
+        error: 'Could not launch a preview.',
+      };
     }
-    // If no new connection arrives in time, report launched-but-not-confirmed.
-    setTimeout(
-      () =>
-        finish({
-          success: true,
-          launched: true,
-          startPaused: false,
-          note:
-            'Preview launched, but it did not connect to the debugger within the timeout, so it could not be paused on connect. It may be running in real time; you can control_preview { action:"pause" } once it responds.',
-        }),
-      timeoutMs
+
+    return {
+      success: !startPaused,
+      launched: true,
+      ready: false,
+      runtimeReady: false,
+      startPaused: false,
+      pauseRequested: startPaused || undefined,
+      pauseConfirmed: false,
+      failurePhase: 'debugger-server-unavailable',
+      note: startPaused
+        ? 'Preview launch was requested, but no preview debugger server is available, so MCP cannot confirm runtime readiness or pause it.'
+        : 'Preview launch was requested, but no preview debugger server is available, so MCP cannot confirm runtime readiness.',
+    };
+  }
+
+  const connectionPromise = waitForNewPreviewDebuggerId(
+    (previewDebuggerServer: any),
+    existingIds,
+    timeoutMs
+  );
+  const didRun = runCommand('LAUNCH_NEW_PREVIEW');
+  if (!didRun) {
+    return {
+      success: false,
+      launched: false,
+      ready: false,
+      failurePhase: 'window-launch',
+      error: 'Could not launch a preview.',
+    };
+  }
+
+  const connection = await connectionPromise;
+  if (!connection.connected || !connection.debuggerId) {
+    return {
+      success: false,
+      launched: true,
+      ready: false,
+      runtimeReady: false,
+      startPaused: false,
+      pauseRequested: startPaused || undefined,
+      pauseConfirmed: false,
+      failurePhase: connection.failurePhase || 'debugger-connect',
+      availableDebuggerIds: connection.availableDebuggerIds,
+      connectionError: connection.connectionError,
+      note:
+        'Preview launch command ran, but no new preview debugger id connected before the timeout. The preview may still be compiling or the window launch failed.',
+    };
+  }
+
+  const readiness = await waitForPreviewRuntimeReady(
+    (previewDebuggerServer: any),
+    connection.debuggerId,
+    {
+      timeoutMs: Math.max(500, timeoutMs - (connection.elapsedMs || 0)),
+      operation: 'launch_preview.runtime-ready',
+    }
+  );
+  if (!readiness.ready) {
+    return makeLaunchPreviewNotReadyResult({
+      launched: true,
+      debuggerId: connection.debuggerId,
+      availableDebuggerIds: connection.availableDebuggerIds,
+      readiness,
+      startPaused,
+      note:
+        'Preview window/debugger id connected, but the runtime did not answer getStatus before the timeout. Treat this preview as not ready; close all previews and relaunch.',
+    });
+  }
+
+  if (startPaused) {
+    const pause = await pausePreviewAndConfirm(
+      (previewDebuggerServer: any),
+      connection.debuggerId,
+      Math.max(500, timeoutMs - (readiness.elapsedMs || 0)),
+      'launch_preview.pause'
     );
-  });
+    if (!pause.pauseConfirmed) {
+      return makeLaunchPreviewNotReadyResult({
+        launched: true,
+        debuggerId: connection.debuggerId,
+        availableDebuggerIds: connection.availableDebuggerIds,
+        readiness: pause,
+        startPaused: true,
+        note:
+          'Preview runtime answered getStatus, but start_paused was requested and the pause was not confirmed before the timeout.',
+      });
+    }
+
+    return {
+      success: true,
+      launched: true,
+      ready: true,
+      runtimeReady: true,
+      startPaused: true,
+      pauseRequested: true,
+      pauseConfirmed: true,
+      debuggerId: connection.debuggerId,
+      availableDebuggerIds: connection.availableDebuggerIds,
+      status: pause.status,
+      note:
+        'Preview launched, runtime readiness was confirmed with getStatus, and pause was confirmed. Use run_frames / control_preview { action:"step" } to advance deterministically, or control_preview { action:"play" } to run in real time.',
+    };
+  }
+
+  return {
+    success: true,
+    launched: true,
+    ready: true,
+    runtimeReady: true,
+    startPaused: false,
+    debuggerId: connection.debuggerId,
+    availableDebuggerIds: connection.availableDebuggerIds,
+    status: readiness.status,
+    note:
+      'Preview launched and runtime readiness was confirmed with getStatus. It is running in real time; use run_frames for deterministic stepping.',
+  };
 };
 
 // Deterministic preview control: pause / play / step N frames. Pausing then
@@ -2888,6 +3304,15 @@ const callMcpTool = async ({
     );
   }
 
+  if (toolName === 'wait_until_preview_ready') {
+    const previewDebuggerServer = context.getPreviewDebuggerServer
+      ? context.getPreviewDebuggerServer()
+      : null;
+    return textResult(
+      await waitUntilPreviewReady(previewDebuggerServer, args || {})
+    );
+  }
+
   if (toolName === 'create_action' || toolName === 'create_condition') {
     if (!project) return errorResult('No project opened.');
     const type = args && typeof args.type === 'string' ? args.type : '';
@@ -3212,15 +3637,30 @@ const callMcpTool = async ({
     // Closing actual preview WINDOWS goes through the preview launcher, not the
     // debugger server. Handle it here where the context callback is available.
     if (args && args.action === 'close') {
+      let closedWindows = false;
+      let closedDebuggerConnections = false;
       if (typeof context.closeAllPreviews === 'function') {
         context.closeAllPreviews();
+        closedWindows = true;
+      }
+      if (
+        previewDebuggerServer &&
+        typeof previewDebuggerServer.closeAllConnections === 'function'
+      ) {
+        previewDebuggerServer.closeAllConnections();
+        closedDebuggerConnections = true;
+      }
+      if (closedWindows || closedDebuggerConnections) {
         return textResult({
           success: true,
           running: false,
           action: 'close',
           closedAll: true,
+          closedWindows,
+          closedDebuggerConnections,
+          remainingDebuggerIds: getPreviewDebuggerIds(previewDebuggerServer),
           note:
-            'Closed all running previews. (Closing a single preview window is not supported; relaunch the ones you need.)',
+            'Closed all running previews and cleared debugger connections. Relaunch with launch_preview { start_paused: true } before runtime checks.',
         });
       }
       return errorResult(

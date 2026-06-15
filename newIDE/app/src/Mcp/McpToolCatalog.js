@@ -1475,6 +1475,24 @@ const previewHealthCheckSchema = {
   additionalProperties: false,
 };
 
+const waitUntilPreviewReadySchema = {
+  type: 'object',
+  properties: {
+    debugger_id: inspectRunningPreviewSchema.properties.debugger_id,
+    timeout_ms: {
+      type: 'number',
+      description:
+        'How long to wait (500-30000 ms, default 6000) for a targeted getStatus reply before reporting the preview as connected-unresponsive.',
+    },
+    require_paused: {
+      type: 'boolean',
+      description:
+        'Default false. When true, readiness requires getStatus to report isPaused:true.',
+    },
+  },
+  additionalProperties: false,
+};
+
 const capturePreviewScreenshotSchema = {
   type: 'object',
   properties: {
@@ -1599,6 +1617,16 @@ const controlPreviewSchema = {
       description:
         'Optional preview/debugger id. Defaults to the latest running preview.',
     },
+    timeout_ms: {
+      type: 'number',
+      description:
+        'Total timeout for the runFrames reply (500-30000 ms, default 6000). A getStatus readiness preflight uses up to the first 3000 ms.',
+    },
+    skip_ready_check: {
+      type: 'boolean',
+      description:
+        'Default false. When true, skip the getStatus readiness preflight and send runFrames immediately.',
+    },
   },
   additionalProperties: false,
 };
@@ -1670,7 +1698,7 @@ const launchPreviewSchema = {
     timeout_ms: {
       type: 'number',
       description:
-        'How long to wait for the new preview to connect (for start_paused). Default 6000.',
+        'How long to wait for debugger connection and runtime getStatus readiness (500-30000 ms, default 6000). If start_paused is true, pause must also be confirmed before success:true is returned.',
     },
   },
   additionalProperties: false,
@@ -3351,6 +3379,12 @@ const readTools: Array<McpTool> = [
     inputSchema: previewHealthCheckSchema,
   },
   {
+    name: 'wait_until_preview_ready',
+    description:
+      'Wait until the selected preview debugger channel answers getStatus. Use after launch_preview or before run_frames when a preview is still compiling/loading; returns success:false with failurePhase/runtime diagnostics if the connected preview stays unresponsive.',
+    inputSchema: waitUntilPreviewReadySchema,
+  },
+  {
     name: 'capture_preview_screenshot',
     description:
       'Capture a PNG screenshot of the current rendered frame from a running preview, to visually verify sprites, layout, and colors. Captured from the MAIN process (webContents.capturePage) when available, so it works even for a backgrounded preview whose renderer is suspended; falls back to the in-game canvas otherwise. Writes the PNG to file_path (recommended) or returns it as a base64 data URL. Note: a screenshot reflects the last RENDERED frame — for state verification that does not need rendering, use run_frames / gdevelop_inspect_running_preview. Launch first with launch_preview { start_paused: true }, then advance with run_frames if needed.',
@@ -3377,13 +3411,13 @@ const readTools: Array<McpTool> = [
   {
     name: 'launch_preview',
     description:
-      'Launch or attach to a game preview, optionally paused on connect (start_paused:true) so you can run a deterministic test near frame 0 — the game otherwise runs in real time the instant it loads, and may already be game-over by your next MCP call. By default it ATTACHES to an already-running preview (the editor shares one debugger channel) instead of opening a duplicate window; pass force_new:true to always open a fresh window. With start_paused, advance with run_frames / control_preview step, or control_preview play to run normally. Equivalent to gdevelop_run_command { commandName:"LAUNCH_NEW_PREVIEW" } but adds the attach + pause-on-connect handshake.',
+      'Launch or attach to a game preview and confirm the runtime debugger is ready by waiting for getStatus. With start_paused:true, success also requires the pause to be confirmed. Returns success:false with failurePhase details if the window/debugger connects but the runtime stays unresponsive. By default it attaches to an already-running preview; pass force_new:true to always open a fresh window.',
     inputSchema: launchPreviewSchema,
   },
   {
     name: 'run_frames',
     description:
-      'ATOMIC runtime test: inject inputs, step exactly N frames, and return the resulting live state (instance counts, variables, optional instance positions) in ONE call. This replaces the fragile pause→simulate_input→step→inspect multi-call loop where any single call failing aborts the test. Crucially, it drives the simulation directly on the debugger channel (NOT requestAnimationFrame), so it keeps working even when the OS throttled a backgrounded/occluded preview window — the exact case where inspect/screenshot time out for the 2nd+ preview. The game is left paused (use control_preview play to resume). Screenshots still need a rendered (focused) window; everything else does not. Launch a preview first.',
+      'ATOMIC runtime test: first preflight the selected preview with getStatus, then inject inputs, step exactly N frames, and return the resulting live state in one call. If the preview is connected but unresponsive, it fails before sending runFrames so stale debugger ids are visible. Use after launch_preview success or wait_until_preview_ready.',
     inputSchema: runFramesSchema,
   },
   {
@@ -4417,6 +4451,42 @@ const toolUsageExamples: { [string]: Array<Object> } = {
         ],
       },
     },
+    {
+      description:
+        'Append a standard event that declares and uses an event-local variable.',
+      arguments: {
+        scene_name: 'Level1',
+        events_json: [
+          {
+            type: 'BuiltinCommonInstructions::Standard',
+            aiGeneratedEventId: 'local-damage-example',
+            variables: [
+              {
+                name: 'DamageThisTick',
+                type: 'number',
+                value: 0,
+              },
+            ],
+            conditions: [
+              {
+                type: { value: 'SceneJustBegins' },
+                parameters: [''],
+              },
+            ],
+            actions: [
+              {
+                type: { value: 'SetNumberVariable' },
+                parameters: ['DamageThisTick', '=', '25'],
+              },
+              {
+                type: { value: 'SetNumberVariable' },
+                parameters: ['Score', '+', 'Variable(DamageThisTick)'],
+              },
+            ],
+          },
+        ],
+      },
+    },
   ],
   apply_validated_scene_patch: [
     {
@@ -4695,6 +4765,24 @@ const toolUsageExamples: { [string]: Array<Object> } = {
       arguments: {},
     },
   ],
+  wait_until_preview_ready: [
+    {
+      description:
+        'Block until the latest preview answers getStatus before runtime checks.',
+      arguments: {
+        timeout_ms: 12000,
+      },
+    },
+    {
+      description:
+        'Wait for a specific preview id and require that it is paused.',
+      arguments: {
+        debugger_id: 'preview-ws-23',
+        timeout_ms: 12000,
+        require_paused: true,
+      },
+    },
+  ],
   capture_preview_screenshot: [
     {
       description:
@@ -4791,6 +4879,7 @@ const toolUsageExamples: { [string]: Array<Object> } = {
       arguments: {
         inputs: [{ type: 'keyPressed', key: 'Left' }],
         frames: 30,
+        timeout_ms: 10000,
         instance_positions_for: ['Player'],
       },
     },
@@ -5240,6 +5329,7 @@ export const getCapabilitiesSummary = (
     ],
     'Runtime verification': [
       'launch_preview',
+      'wait_until_preview_ready',
       'run_frames',
       'preview_health_check',
       'gdevelop_inspect_running_preview',

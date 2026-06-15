@@ -52,6 +52,7 @@ describe('McpToolCatalog', () => {
     expect(toolNames).toContain('inspect_gameplay_rules');
     expect(toolNames).toContain('search_behavior_store');
     expect(toolNames).toContain('preview_health_check');
+    expect(toolNames).toContain('wait_until_preview_ready');
     expect(toolNames).toContain('gdevelop_refresh_tool_catalog');
     expect(toolNames).toContain('gdevelop_capabilities');
     expect(toolNames).toContain('create_action');
@@ -153,6 +154,7 @@ describe('McpToolCatalog', () => {
     expect(isWriteTool('inspect_scene_draw_order')).toBe(false);
     expect(isWriteTool('inspect_gameplay_rules')).toBe(false);
     expect(isWriteTool('preview_health_check')).toBe(false);
+    expect(isWriteTool('wait_until_preview_ready')).toBe(false);
     expect(isWriteTool('gdevelop_refresh_tool_catalog')).toBe(false);
     expect(isWriteTool('validate_events_json_file')).toBe(false);
     expect(isWriteTool('lint_scene_events')).toBe(false);
@@ -210,6 +212,21 @@ describe('McpToolCatalog', () => {
     expect(examples.add_scene_events[0].arguments.events_json).toEqual(
       expect.any(Array)
     );
+    expect(
+      examples.add_scene_events.some(example => {
+        const eventsJson = example.arguments && example.arguments.events_json;
+        return (
+          Array.isArray(eventsJson) &&
+          eventsJson.some(
+            event =>
+              Array.isArray(event.variables) &&
+              event.variables.some(
+                variable => variable.name === 'DamageThisTick'
+              )
+          )
+        );
+      })
+    ).toBe(true);
 
     expect(
       getMcpToolUsageExamples('delete_instance_variable')

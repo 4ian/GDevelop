@@ -958,6 +958,35 @@ const standardEventWithInstructionExample = [
   },
 ];
 
+const localVariableEventExample = [
+  {
+    type: 'BuiltinCommonInstructions::Standard',
+    variables: [
+      {
+        name: 'DamageThisTick',
+        type: 'number',
+        value: 0,
+      },
+    ],
+    conditions: [
+      {
+        type: { value: 'SceneJustBegins' },
+        parameters: [''],
+      },
+    ],
+    actions: [
+      {
+        type: { value: 'SetNumberVariable' },
+        parameters: ['DamageThisTick', '=', '25'],
+      },
+      {
+        type: { value: 'SetNumberVariable' },
+        parameters: ['Score', '+', 'Variable(DamageThisTick)'],
+      },
+    ],
+  },
+];
+
 const commentEventExample = [
   {
     type: 'BuiltinCommonInstructions::Comment',
@@ -1182,6 +1211,18 @@ export const getEventsJsonExamples = ({
       ],
     },
     {
+      name: 'Standard event with a local variable',
+      purpose:
+        'Declare variables on the event itself with a variables array. They are local to that event and its sub-events; reference them by bare name in variable parameters and with Variable(Name) in expressions. Do not add them as scene variables.',
+      events_json: JSON.stringify(localVariableEventExample, null, 2),
+      event_changes: [
+        {
+          operation_name: 'insert_at_end',
+          generated_events: JSON.stringify(localVariableEventExample, null, 2),
+        },
+      ],
+    },
+    {
       name: 'Append a comment event',
       purpose: 'Use comments to explain or separate generated event blocks.',
       events_json: commentEventsJson,
@@ -1302,6 +1343,8 @@ export const getEventsJsonExamples = ({
         'Reference a scene variable by its bare name: Variable(Score) in a number/string expression, or just Score where a variable parameter is expected. Do NOT write SceneVariable(Score).',
       globalVariable:
         'Reference a global variable with GlobalVariable(MyGlobal). Do NOT write Variable(...) for globals.',
+      localVariable:
+        'Declare event-local variables in the event variables array. Reference a local variable by bare name in variable parameters, or Variable(Name) inside number/string expressions. Local variables shadow scene/global variables with the same name and are only available in that event and its sub-events.',
       objectVariable:
         'Reference an object variable as Object.VariableName, e.g. Player.Life or Enemy.Health (in expressions). For a variable PARAMETER, the object variable instructions take the object name and a bare variable name. Do NOT write VarObjet(Player, Life).',
       childVariable:

@@ -70,10 +70,11 @@ describe('McpEditorBridge', () => {
     responders = {},
   }: Object = {}) => {
     let callbacks = null;
+    let currentDebuggerIds = debuggerIds;
     return {
       getServerState: () => 'started',
-      getExistingPreviewDebuggerIds: () => debuggerIds,
-      getExistingDebuggerIds: () => debuggerIds,
+      getExistingPreviewDebuggerIds: () => currentDebuggerIds,
+      getExistingDebuggerIds: () => currentDebuggerIds,
       registerCallbacks: registered => {
         callbacks = registered;
         return () => {
@@ -110,6 +111,15 @@ describe('McpEditorBridge', () => {
                 },
           });
         }, 2);
+      },
+      closeAllConnections: () => {
+        const previousIds = currentDebuggerIds;
+        currentDebuggerIds = [];
+        if (callbacks) {
+          previousIds.forEach(id =>
+            callbacks.onConnectionClosed({ id, debuggerIds: [] })
+          );
+        }
       },
     };
   };
@@ -224,6 +234,33 @@ describe('McpEditorBridge', () => {
     expect(result.recommendedActions).toContain(
       'control_preview { action: "close", close_all: true }'
     );
+  });
+
+  it('waits until a selected preview answers getStatus', async () => {
+    const previewDebuggerServer = makeTargetedPreviewServer({
+      debuggerIds: ['preview-ws-0'],
+      responders: {
+        getStatus: { isPaused: true, sceneName: 'Level1' },
+      },
+    });
+    const bridge = makeBridge({
+      getPreviewDebuggerServer: () => previewDebuggerServer,
+    });
+
+    const response = await bridge.handleRendererMcpRequest({
+      method: 'tools/call',
+      params: {
+        name: 'wait_until_preview_ready',
+        arguments: { require_paused: true, timeout_ms: 1000 },
+      },
+    });
+    const result = JSON.parse(response.content[0].text);
+
+    expect(response.isError).not.toBe(true);
+    expect(result.success).toBe(true);
+    expect(result.ready).toBe(true);
+    expect(result.debuggerId).toBe('preview-ws-0');
+    expect(result.status.sceneName).toBe('Level1');
   });
 
   it('returns editor state without an open project', async () => {
@@ -394,6 +431,15 @@ describe('McpEditorBridge', () => {
       expect(examples.examples[0].events_json).toContain('SceneJustBegins');
       expect(examples.examples[0].event_changes[0].operation_name).toBe(
         'insert_at_end'
+      );
+      const localVariableExample = examples.examples.find(
+        example => example.name === 'Standard event with a local variable'
+      );
+      if (!localVariableExample) throw new Error('Missing local variable example');
+      expect(localVariableExample.events_json).toContain('"variables"');
+      expect(localVariableExample.events_json).toContain('DamageThisTick');
+      expect(examples.variableExpressionSyntax.localVariable).toContain(
+        'event-local variables'
       );
 
       const operationResponse = await bridge.handleRendererMcpRequest({
@@ -4473,7 +4519,11 @@ describe('McpEditorBridge', () => {
       },
       sendMessage: (id, message) => {
         sent.push({ id, message });
-        if (message.command === 'pause' && message.messageId && callbacks) {
+        if (
+          (message.command === 'getStatus' || message.command === 'pause') &&
+          message.messageId &&
+          callbacks
+        ) {
           setTimeout(() => {
             if (!callbacks) return;
             callbacks.onHandleParsedMessage({
@@ -4481,7 +4531,10 @@ describe('McpEditorBridge', () => {
               parsedMessage: {
                 command: 'status',
                 messageId: message.messageId,
-                payload: { isPaused: true, sceneName: 'Level1' },
+                payload: {
+                  isPaused: message.command === 'pause',
+                  sceneName: 'Level1',
+                },
               },
             });
           }, 2);
@@ -4517,7 +4570,9 @@ describe('McpEditorBridge', () => {
     const runCommand = jest.fn(() => true);
     const previewDebuggerServer = makeTargetedPreviewServer({
       debuggerIds: ['preview-ws-0'],
-      responders: {},
+      responders: {
+        getStatus: { isPaused: false, sceneName: 'Level1' },
+      },
     });
     const bridge = makeBridge({
       runCommand,
@@ -4543,6 +4598,7 @@ describe('McpEditorBridge', () => {
     const previewDebuggerServer = makeTargetedPreviewServer({
       debuggerIds: ['preview-ws-0'],
       responders: {
+        getStatus: { isPaused: false, sceneName: 'Level1' },
         pause: { isPaused: true, sceneName: 'Level1' },
       },
     });
@@ -4570,11 +4626,47 @@ describe('McpEditorBridge', () => {
   });
 
   it('launch_preview with force_new opens a new window even if a preview is connected', async () => {
-    const runCommand = jest.fn(() => true);
-    const previewDebuggerServer = makeTargetedPreviewServer({
-      debuggerIds: ['preview-ws-0'],
-      responders: {},
+    let callbacks = null;
+    let debuggerIds = ['preview-ws-0'];
+    const runCommand = jest.fn(commandName => {
+      if (commandName === 'LAUNCH_NEW_PREVIEW' && callbacks) {
+        setTimeout(() => {
+          debuggerIds = ['preview-ws-0', 'preview-ws-1'];
+          callbacks &&
+            callbacks.onConnectionOpened({
+              id: 'preview-ws-1',
+              debuggerIds,
+            });
+        }, 2);
+      }
+      return true;
     });
+    const previewDebuggerServer = {
+      getServerState: () => 'started',
+      getExistingPreviewDebuggerIds: () => debuggerIds,
+      getExistingDebuggerIds: () => debuggerIds,
+      registerCallbacks: registered => {
+        callbacks = registered;
+        return () => {
+          callbacks = null;
+        };
+      },
+      sendMessage: (id, message) => {
+        if (message.command === 'getStatus' && message.messageId && callbacks) {
+          setTimeout(() => {
+            callbacks &&
+              callbacks.onHandleParsedMessage({
+                id,
+                parsedMessage: {
+                  command: 'status',
+                  messageId: message.messageId,
+                  payload: { isPaused: false, sceneName: 'Level1' },
+                },
+              });
+          }, 2);
+        }
+      },
+    };
     const bridge = makeBridge({
       runCommand,
       getPreviewDebuggerServer: () => previewDebuggerServer,
@@ -4589,7 +4681,62 @@ describe('McpEditorBridge', () => {
     expect(response.isError).not.toBe(true);
     expect(result.attached).not.toBe(true);
     expect(result.launched).toBe(true);
+    expect(result.ready).toBe(true);
+    expect(result.debuggerId).toBe('preview-ws-1');
     expect(runCommand).toHaveBeenCalledWith('LAUNCH_NEW_PREVIEW');
+  });
+
+  it('launch_preview reports not ready when a new preview connects but never answers getStatus', async () => {
+    let callbacks = null;
+    let debuggerIds = [];
+    const runCommand = jest.fn(commandName => {
+      if (commandName === 'LAUNCH_NEW_PREVIEW' && callbacks) {
+        setTimeout(() => {
+          debuggerIds = ['preview-ws-23'];
+          callbacks &&
+            callbacks.onConnectionOpened({
+              id: 'preview-ws-23',
+              debuggerIds,
+            });
+        }, 2);
+      }
+      return true;
+    });
+    const previewDebuggerServer = {
+      getServerState: () => 'started',
+      getExistingPreviewDebuggerIds: () => debuggerIds,
+      getExistingDebuggerIds: () => debuggerIds,
+      registerCallbacks: registered => {
+        callbacks = registered;
+        return () => {
+          callbacks = null;
+        };
+      },
+      sendMessage: jest.fn(),
+    };
+    const bridge = makeBridge({
+      runCommand,
+      getPreviewDebuggerServer: () => previewDebuggerServer,
+    });
+
+    const response = await bridge.handleRendererMcpRequest({
+      method: 'tools/call',
+      params: {
+        name: 'launch_preview',
+        arguments: { force_new: true, start_paused: true, timeout_ms: 250 },
+      },
+    });
+    const result = JSON.parse(response.content[0].text);
+
+    expect(response.isError).not.toBe(true);
+    expect(result.success).toBe(false);
+    expect(result.launched).toBe(true);
+    expect(result.ready).toBe(false);
+    expect(result.startPaused).toBe(false);
+    expect(result.pauseConfirmed).toBe(false);
+    expect(result.debuggerId).toBe('preview-ws-23');
+    expect(result.failurePhase).toBe('runtime-ready');
+    expect(result.previewHealth).toBe('connected-unresponsive');
   });
 
   it('writes a preview screenshot to a file when file_path is given', async () => {
@@ -4766,6 +4913,7 @@ describe('McpEditorBridge', () => {
     };
     const previewDebuggerServer = makeTargetedPreviewServer({
       responders: {
+        getStatus: { isPaused: true, sceneName: 'Level1' },
         runFrames: message => {
           capturedRunFrames = message;
           // Reply with the full framesRan message shape: run metadata as a
@@ -4814,6 +4962,48 @@ describe('McpEditorBridge', () => {
     expect(result.runtime.available).toBe(true);
     expect(result.runtime.scenes[0].objectInstanceCounts).toEqual(
       expect.objectContaining({ Bullet: 3 })
+    );
+  });
+
+  it('run_frames fails during readiness preflight when the connected preview is unresponsive', async () => {
+    const sent = [];
+    const previewDebuggerServer = makeTargetedPreviewServer({
+      debuggerIds: ['preview-ws-23'],
+      responders: {},
+    });
+    const originalSendMessage = previewDebuggerServer.sendMessage;
+    previewDebuggerServer.sendMessage = (id, message) => {
+      sent.push({ id, message });
+      originalSendMessage(id, message);
+    };
+    const bridge = makeBridge({
+      getPreviewDebuggerServer: () => previewDebuggerServer,
+    });
+
+    const response = await bridge.handleRendererMcpRequest({
+      method: 'tools/call',
+      params: {
+        name: 'run_frames',
+        arguments: {
+          debugger_id: 'preview-ws-23',
+          frames: 1,
+          timeout_ms: 250,
+          instance_positions_for: ['GroundSlot'],
+        },
+      },
+    });
+    const result = JSON.parse(response.content[0].text);
+
+    expect(response.isError).not.toBe(true);
+    expect(result.success).toBe(false);
+    expect(result.ready).toBe(false);
+    expect(result.failurePhase).toBe('runtime-ready');
+    expect(result.previewHealth).toBe('connected-unresponsive');
+    expect(sent.some(entry => entry.message.command === 'getStatus')).toBe(
+      true
+    );
+    expect(sent.some(entry => entry.message.command === 'runFrames')).toBe(
+      false
     );
   });
 
@@ -5120,9 +5310,12 @@ describe('McpEditorBridge', () => {
 
   it('closes all previews via control_preview close', async () => {
     const closeAllPreviews = jest.fn();
+    const previewDebuggerServer = makeTargetedPreviewServer({
+      debuggerIds: ['preview-ws-0'],
+      responders: {},
+    });
     const bridge = makeBridge({
-      getPreviewDebuggerServer: () =>
-        makeTargetedPreviewServer({ responders: {} }),
+      getPreviewDebuggerServer: () => previewDebuggerServer,
       closeAllPreviews,
     });
     const response = await bridge.handleRendererMcpRequest({
@@ -5132,6 +5325,8 @@ describe('McpEditorBridge', () => {
     const result = JSON.parse(response.content[0].text);
     expect(result.success).toBe(true);
     expect(result.closedAll).toBe(true);
+    expect(result.closedDebuggerConnections).toBe(true);
+    expect(result.remainingDebuggerIds).toEqual([]);
     expect(closeAllPreviews).toHaveBeenCalled();
   });
 

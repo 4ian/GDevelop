@@ -217,6 +217,7 @@ const DirectionTools = ({
                 animationName={animationName}
                 resourceNames={direction.getSpriteNames().toJSArray()}
                 sourceRects={getSpriteSourceRects()}
+                project={project}
                 getImageResourceSource={(name: string) =>
                   resourcesLoader.getResourceFullUrl(project, name, {})
                 }

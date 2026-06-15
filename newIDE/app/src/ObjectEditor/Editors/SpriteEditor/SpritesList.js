@@ -42,6 +42,7 @@ import { type ResourceExternalEditor } from '../../../ResourcesList/ResourceExte
 import RawSpriteSheetImportDialog, {
   type RawSpriteSheetImportOptions,
 } from './RawSpriteSheetImportDialog';
+import { importRawGifToProjectResources } from './GifImportHelper';
 import {
   createSpriteSheetSourceRects,
   getSourceRectFromSprite,
@@ -49,6 +50,7 @@ import {
   setSpriteSourceRect,
   type SpriteSourceRect,
 } from '../../../Utils/SpriteSourceRect';
+import { openFilePicker } from '../../../Utils/FileSystem';
 
 const gd: libGDevelop = global.gd;
 
@@ -74,6 +76,8 @@ const SortableSpriteThumbnail = SortableElement(
     onSelect,
     onContextMenu,
     isFirst,
+    sourceRect,
+    imageFrameIndex,
   }) => (
     <ImageThumbnail
       selectable
@@ -81,7 +85,8 @@ const SortableSpriteThumbnail = SortableElement(
       onSelect={onSelect}
       onContextMenu={onContextMenu}
       resourceName={sprite.getImageName()}
-      sourceRect={getSourceRectFromSprite(sprite)}
+      sourceRect={sourceRect}
+      imageFrameIndex={imageFrameIndex}
       resourcesLoader={resourcesLoader}
       project={project}
       style={isFirst ? {} : styles.thumbnailExtraStyle}
@@ -102,11 +107,35 @@ const SortableList = SortableContainer(
   }) => {
     const spritesCount = direction.getSpritesCount();
     const hasMoreThanOneSprite = spritesCount > 1;
+    let previousWholeImageName: ?string = null;
+    let consecutiveWholeImageFrameIndex = 0;
+    const getImageFrameIndex = (
+      sprite: gdSprite,
+      sourceRect: ?SpriteSourceRect
+    ) => {
+      const imageName = sprite.getImageName();
+      if (!sourceRect && imageName) {
+        if (imageName === previousWholeImageName) {
+          consecutiveWholeImageFrameIndex++;
+        } else {
+          previousWholeImageName = imageName;
+          consecutiveWholeImageFrameIndex = 0;
+        }
+        return consecutiveWholeImageFrameIndex;
+      }
+
+      previousWholeImageName = null;
+      consecutiveWholeImageFrameIndex = 0;
+      return 0;
+    };
+
     return (
       <div style={styles.spritesList}>
         {[
           ...mapFor(0, spritesCount, i => {
             const sprite = direction.getSprite(i);
+            const sourceRect = getSourceRectFromSprite(sprite);
+            const imageFrameIndex = getImageFrameIndex(sprite, sourceRect);
             return hasMoreThanOneSprite ? (
               <SortableSpriteThumbnail
                 sprite={sprite}
@@ -116,6 +145,8 @@ const SortableList = SortableContainer(
                 selected={!!selectedSprites[sprite.ptr]}
                 onContextMenu={(x, y) => onOpenSpriteContextMenu(x, y, sprite)}
                 onSelect={selected => onSelectSprite(sprite, selected)}
+                sourceRect={sourceRect}
+                imageFrameIndex={imageFrameIndex}
                 resourcesLoader={resourcesLoader}
                 project={project}
               />
@@ -128,7 +159,8 @@ const SortableList = SortableContainer(
                 onSelect={selected => onSelectSprite(sprite, selected)}
                 onContextMenu={(x, y) => onOpenSpriteContextMenu(x, y, sprite)}
                 resourceName={sprite.getImageName()}
-                sourceRect={getSourceRectFromSprite(sprite)}
+                sourceRect={sourceRect}
+                imageFrameIndex={imageFrameIndex}
                 resourcesLoader={resourcesLoader}
                 project={project}
                 size={SPRITE_SIZE}
@@ -341,6 +373,7 @@ const SpritesList = ({
   const { showAlert, showConfirmation } = useAlertDialog();
 
   const storageProvider = resourceManagementProps.getStorageProvider();
+  const canImportGif = storageProvider.internalName === 'LocalFile';
   const resourceSources = resourceManagementProps.resourceSources
     .filter(source => source.kind === 'image')
     .filter(
@@ -528,6 +561,7 @@ const SpritesList = ({
         initialSourceName: initialResourceSource.name,
         multiSelection: false,
         resourceKind: 'image',
+        importedResourcesFolder: 'assets',
       });
 
       if (!selectedResources.length) return;
@@ -629,6 +663,89 @@ const SpritesList = ({
       onSpriteAdded,
       onSpriteUpdated,
       rawSpriteSheetImport,
+    ]
+  );
+
+  const onImportGif = React.useCallback(
+    async (i18n: I18nType) => {
+      if (!canImportGif || !project.getProjectFile()) {
+        await showAlert({
+          title: t`Unable to import the GIF`,
+          message: t`GIF import is only available for saved local projects.`,
+          dismissButtonLabel: t`Close`,
+        });
+        return;
+      }
+
+      try {
+        const gifFilePath = await openFilePicker({
+          title: i18n._(t`Choose a GIF file`),
+          properties: ['openFile'],
+          message: i18n._(
+            t`Choose the GIF file to import as a raw animated sprite.`
+          ),
+          filters: [{ name: i18n._(t`GIF files`), extensions: ['gif'] }],
+        });
+        if (!gifFilePath || typeof gifFilePath !== 'string') return;
+
+        const directionSpritesCountBeforeAdding = direction.getSpritesCount();
+        const {
+          resourceName,
+          frameCount,
+          timeBetweenFrames,
+        } = await importRawGifToProjectResources({
+          project,
+          gifFilePath,
+        });
+
+        for (let frameIndex = 0; frameIndex < frameCount; frameIndex++) {
+          addAnimationFrameWithResourceName(
+            animations,
+            direction,
+            resourceName,
+            onSpriteAdded
+          );
+        }
+
+        if (frameCount > 1) {
+          direction.setTimeBetweenFrames(timeBetweenFrames);
+          if (directionSpritesCountBeforeAdding === 0) {
+            direction.setLoop(true);
+          }
+        }
+
+        forceUpdate();
+        await resourceManagementProps.onFetchNewlyAddedResources();
+        resourceManagementProps.onNewResourcesAdded();
+
+        if (frameCount && onSpriteUpdated) onSpriteUpdated();
+        if (
+          directionSpritesCountBeforeAdding === 0 &&
+          frameCount &&
+          onFirstSpriteUpdated
+        ) {
+          onFirstSpriteUpdated();
+        }
+      } catch (error) {
+        console.error('Unable to import GIF:', error);
+        await showAlert({
+          title: t`Unable to import the GIF`,
+          message: t`The GIF could not be imported.`,
+          dismissButtonLabel: t`Close`,
+        });
+      }
+    },
+    [
+      animations,
+      canImportGif,
+      direction,
+      forceUpdate,
+      onFirstSpriteUpdated,
+      onSpriteAdded,
+      onSpriteUpdated,
+      project,
+      resourceManagementProps,
+      showAlert,
     ]
   );
 
@@ -804,6 +921,14 @@ const SpritesList = ({
               if (resourceSources.length) {
                 menuTemplate.push(
                   { type: 'separator' },
+                  ...(canImportGif
+                    ? [
+                        {
+                          label: i18n._(t`Import GIF...`),
+                          click: () => onImportGif(i18n),
+                        },
+                      ]
+                    : []),
                   {
                     label: i18n._(t`Import raw sprite sheet...`),
                     click: () => onImportRawSpriteSheet(resourceSources[0]),

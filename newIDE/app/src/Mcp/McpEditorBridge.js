@@ -758,6 +758,54 @@ const buildPreviewDiagnostics = ({
   };
 };
 
+const getDebuggerLogKey = (entry: Object): string => {
+  const payload = entry && entry.payload ? entry.payload : {};
+  return [
+    entry.command || '',
+    payload.timestamp != null ? payload.timestamp : '',
+    payload.group || '',
+    payload.type || '',
+    payload.message || '',
+  ].join('\u0001');
+};
+
+const mergeUniqueDebuggerLogs = (
+  ...logLists: Array<?Array<Object>>
+): Array<Object> => {
+  const result = [];
+  const seen = new Set();
+  logLists.forEach(logList => {
+    if (!Array.isArray(logList)) return;
+    logList.forEach(entry => {
+      if (!entry || typeof entry !== 'object') return;
+      const key = getDebuggerLogKey(entry);
+      if (seen.has(key)) return;
+      seen.add(key);
+      result.push(entry);
+    });
+  });
+  return result;
+};
+
+const getRecentDebuggerLogs = (
+  previewDebuggerServer: Object,
+  targetId: string
+): Array<Object> => {
+  if (
+    !previewDebuggerServer ||
+    typeof previewDebuggerServer.getRecentLogs !== 'function'
+  ) {
+    return [];
+  }
+
+  try {
+    const recentLogs = previewDebuggerServer.getRecentLogs(targetId);
+    return Array.isArray(recentLogs) ? recentLogs : [];
+  } catch (error) {
+    return [];
+  }
+};
+
 // Capture runtime state from a running preview. Returns a promise that resolves
 // to the inspection result (or an error-shaped object). timeoutMs bounds the
 // wait for the dump reply.
@@ -846,7 +894,9 @@ const captureRunningPreviewState = (
       } catch (error) {
         // Ignore unregister failures.
       }
-      const errors = logs.filter(
+      const recentLogs = getRecentDebuggerLogs(previewDebuggerServer, targetId);
+      const allLogs = mergeUniqueDebuggerLogs(recentLogs, logs);
+      const errors = allLogs.filter(
         entry =>
           entry.command === 'uncaughtException' ||
           entry.command === 'game.crashed' ||
@@ -890,7 +940,8 @@ const captureRunningPreviewState = (
         includeRawDump: !!(args && args.include_raw_dump),
         rawDump:
           args && args.include_raw_dump ? dumpPayload || undefined : undefined,
-        logs,
+        logs: allLogs,
+        recentLogs,
         // Surface runtime errors/crashes prominently: error-type console logs,
         // uncaught exceptions and crash reports. This is the closest available
         // signal to "an expression failed at runtime".
@@ -901,7 +952,7 @@ const captureRunningPreviewState = (
           targetId,
           dumpPayload,
           status,
-          logs,
+          logs: allLogs,
           timedOut: !dumpPayload,
           operation: 'inspect',
         }),
@@ -946,6 +997,7 @@ const captureRunningPreviewState = (
             status = parsedMessage.payload || parsedMessage.status || null;
           } else if (
             parsedMessage.command === 'console.log' ||
+            parsedMessage.command === 'hotReloader.logs' ||
             parsedMessage.command === 'hotReloaderLogs' ||
             parsedMessage.command === 'uncaughtException' ||
             parsedMessage.command === 'game.crashed'
@@ -2444,7 +2496,7 @@ const launchPreview = async (
   );
 
   if (!previewDebuggerServer) {
-    const didRun = runCommand('LAUNCH_NEW_PREVIEW');
+    const didRun = runCommand('LAUNCH_DEBUG_PREVIEW');
     if (!didRun) {
       return {
         success: false,
@@ -2475,7 +2527,7 @@ const launchPreview = async (
     existingIds,
     timeoutMs
   );
-  const didRun = runCommand('LAUNCH_NEW_PREVIEW');
+  const didRun = runCommand('LAUNCH_DEBUG_PREVIEW');
   if (!didRun) {
     return {
       success: false,
@@ -3783,7 +3835,8 @@ const callMcpTool = async ({
       ? textResult({
           commandName,
           launched: true,
-          ...(commandName === 'LAUNCH_NEW_PREVIEW'
+          ...((commandName === 'LAUNCH_NEW_PREVIEW' ||
+            commandName === 'LAUNCH_DEBUG_PREVIEW')
             ? {
                 note:
                   'For MCP runtime tests, prefer launch_preview { start_paused: true }, then run_frames. It attaches to the debugger and avoids stale or already-running previews.',

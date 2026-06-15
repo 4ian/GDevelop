@@ -7,6 +7,8 @@ import {
 
 let debuggerServerState: 'started' | 'stopped' = 'stopped';
 const callbacksList: Array<PreviewDebuggerServerCallbacks> = [];
+const recentLogsByDebuggerId: { [DebuggerId]: Array<Object> } = {};
+const maxRecentLogsPerDebugger = 200;
 
 let nextDebuggerId = 0;
 
@@ -55,11 +57,43 @@ const stopWindowClosedPolling = () => {
 };
 
 const notifyConnectionClosed = (id: DebuggerId) => {
+  delete recentLogsByDebuggerId[id];
   callbacksList.forEach(({ onConnectionClosed }) =>
     onConnectionClosed({
       id,
       debuggerIds: getExistingDebuggerIds(),
     })
+  );
+};
+
+const handleParsedMessage = (
+  id: DebuggerId,
+  parsedMessage: Object | null
+): void => {
+  if (!parsedMessage) return;
+
+  if (
+    parsedMessage.command === 'console.log' ||
+    parsedMessage.command === 'hotReloader.logs' ||
+    parsedMessage.command === 'uncaughtException' ||
+    parsedMessage.command === 'game.crashed'
+  ) {
+    const recentLogs = recentLogsByDebuggerId[id] || [];
+    recentLogs.push(parsedMessage);
+    if (recentLogs.length > maxRecentLogsPerDebugger) {
+      recentLogs.splice(0, recentLogs.length - maxRecentLogsPerDebugger);
+    }
+    recentLogsByDebuggerId[id] = recentLogs;
+  }
+
+  const answerCallback = responseCallbacks.get(parsedMessage.messageId);
+  if (answerCallback) {
+    answerCallback(parsedMessage);
+    responseCallbacks.delete(parsedMessage.messageId);
+  }
+
+  callbacksList.forEach(({ onHandleParsedMessage }) =>
+    onHandleParsedMessage({ id, parsedMessage })
   );
 };
 
@@ -110,14 +144,7 @@ class BrowserPreviewDebuggerServer {
 
       try {
         const parsedMessage = JSON.parse(event.data);
-        const answerCallback = responseCallbacks.get(parsedMessage.messageId);
-        if (answerCallback) {
-          answerCallback(parsedMessage);
-          responseCallbacks.delete(parsedMessage.messageId);
-        }
-        callbacksList.forEach(({ onHandleParsedMessage }) =>
-          onHandleParsedMessage({ id, parsedMessage })
-        );
+        handleParsedMessage(id, parsedMessage);
       } catch (error) {
         console.error(
           'Error while parsing messages coming from a preview:',
@@ -184,6 +211,10 @@ class BrowserPreviewDebuggerServer {
     return getExistingPreviewDebuggerIds();
   }
   // $FlowFixMe[missing-local-annot]
+  getRecentLogs(id: DebuggerId) {
+    return [...(recentLogsByDebuggerId[id] || [])];
+  }
+  // $FlowFixMe[missing-local-annot]
   registerCallbacks(callbacks: PreviewDebuggerServerCallbacks) {
     callbacksList.push(callbacks);
 
@@ -199,6 +230,7 @@ class BrowserPreviewDebuggerServer {
       'Registered the embedded game frame window in the debugger server.'
     );
     embbededGameFrameWindow = window;
+    recentLogsByDebuggerId['embedded-game-frame'] = [];
   }
   unregisterEmbeddedGameFrame(window: WindowProxy) {
     if (embbededGameFrameWindow !== window) {
@@ -263,6 +295,7 @@ export const registerNewPreviewWindow = (
   // Associate this window with a new debugger id.
   const id = 'preview-window-' + nextDebuggerId++;
   existingPreviewWindows[id] = previewWindow;
+  recentLogsByDebuggerId[id] = [];
 
   setupWindowClosedPolling();
 

@@ -3369,7 +3369,7 @@ const readTools: Array<McpTool> = [
   {
     name: 'gdevelop_inspect_running_preview',
     description:
-      'Inspect a currently running preview to verify runtime behavior: returns whether a preview is running (defaulting to the latest launched one), its status, captured console logs, a separate errors list (uncaught exceptions, crashes, error-level logs), recentSounds (history since last inspect), activeSounds (sounds/musics currently playing incl. looping BGM), inputState (live pressed keys/mouse), and a compact runtime snapshot (running scene name, sceneElapsedTimeSeconds, per-object live instance counts, scene/global variable values). Launch first with launch_preview { start_paused: true }, then advance with run_frames for deterministic tests. Use this to confirm a game actually runs and behaves, not just that a preview was launched.',
+      'Inspect a currently running preview to verify runtime behavior: returns whether a preview is running (defaulting to the latest launched one), its status, recent captured console/debugger logs for that preview, a separate errors list (uncaught exceptions, crashes, error-level logs), recentSounds (history since last inspect), activeSounds (sounds/musics currently playing incl. looping BGM), inputState (live pressed keys/mouse), and a compact runtime snapshot (running scene name, sceneElapsedTimeSeconds, per-object live instance counts, scene/global variable values). Launch first with launch_preview { start_paused: true }, then advance with run_frames for deterministic tests. Use this to confirm a game actually runs and behaves, not just that a preview was launched.',
     inputSchema: inspectRunningPreviewSchema,
   },
   {
@@ -3411,7 +3411,7 @@ const readTools: Array<McpTool> = [
   {
     name: 'launch_preview',
     description:
-      'Launch or attach to a game preview and confirm the runtime debugger is ready by waiting for getStatus. With start_paused:true, success also requires the pause to be confirmed. Returns success:false with failurePhase details if the window/debugger connects but the runtime stays unresponsive. By default it attaches to an already-running preview; pass force_new:true to always open a fresh window.',
+      'Launch or attach to a game preview and confirm the runtime debugger is ready by waiting for getStatus. New preview windows are opened through the same "Start Preview and Debugger" command used by the UI. With start_paused:true, success also requires the pause to be confirmed. Returns success:false with failurePhase details if the window/debugger connects but the runtime stays unresponsive. By default it attaches to an already-running preview; pass force_new:true to always open a fresh window.',
     inputSchema: launchPreviewSchema,
   },
   {

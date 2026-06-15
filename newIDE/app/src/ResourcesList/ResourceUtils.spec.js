@@ -1,10 +1,16 @@
 // @flow
 import {
+  copyAllToProjectFolder,
   parseLocalFilePathOrExtensionFromMetadata,
+  removeAllUnusedResources,
   renameResourcesInProject,
   updateResourceJsonMetadata,
 } from './ResourceUtils';
+import optionalRequire from '../Utils/OptionalRequire';
 const gd: libGDevelop = global.gd;
+const fs = optionalRequire('fs');
+const os = optionalRequire('os');
+const path = optionalRequire('path');
 
 const addNewAnimationWithImageToSpriteObject = (
   object: gdObject,
@@ -22,6 +28,82 @@ const addNewAnimationWithImageToSpriteObject = (
 };
 
 describe('ResourceUtils', () => {
+  describe('copyAllToProjectFolder', () => {
+    let tempDir: ?string = null;
+
+    afterEach(() => {
+      if (tempDir) {
+        fs.rmSync(tempDir, { recursive: true, force: true });
+        tempDir = null;
+      }
+    });
+
+    it('copies files to the requested imported resources folder', async () => {
+      const createdTempDir = fs.mkdtempSync(
+        path.join(os.tmpdir(), 'gd-resource-utils-')
+      );
+      tempDir = createdTempDir;
+      const projectFolder = path.join(createdTempDir, 'project');
+      fs.mkdirSync(projectFolder);
+      const project = gd.ProjectHelper.createNewGDJSProject();
+      project.setProjectFile(path.join(projectFolder, 'game.json'));
+
+      const spriteSheetPath = path.join(projectFolder, 'sheet.png');
+      fs.writeFileSync(spriteSheetPath, 'fake image content');
+
+      const newToOldFilePaths = new Map<string, string>();
+      const copiedPaths = await copyAllToProjectFolder(
+        project,
+        [spriteSheetPath],
+        newToOldFilePaths,
+        'assets'
+      );
+
+      const expectedCopiedPath = path.join(
+        projectFolder,
+        'assets',
+        'sheet.png'
+      );
+      expect(copiedPaths).toEqual([expectedCopiedPath]);
+      expect(fs.existsSync(expectedCopiedPath)).toBe(true);
+      expect(newToOldFilePaths.get(expectedCopiedPath)).toBe(spriteSheetPath);
+
+      project.delete();
+    });
+  });
+
+  it('can remove unused resources for every kind in the project', () => {
+    const project = gd.ProjectHelper.createNewGDJSProject();
+
+    const usedImage = new gd.ImageResource();
+    const unusedImage = new gd.ImageResource();
+    const unusedAudio = new gd.AudioResource();
+    usedImage.setName('UsedImage');
+    unusedImage.setName('UnusedImage');
+    unusedAudio.setName('UnusedAudio');
+    project.getResourcesManager().addResource(usedImage);
+    project.getResourcesManager().addResource(unusedImage);
+    project.getResourcesManager().addResource(unusedAudio);
+
+    const object = project
+      .getObjects()
+      .insertNewObject(project, 'Sprite', 'MyObject', 0);
+    addNewAnimationWithImageToSpriteObject(object, 'UsedImage');
+
+    const removedResourceNames = removeAllUnusedResources(project).sort();
+
+    expect(removedResourceNames).toEqual(['UnusedAudio', 'UnusedImage']);
+    expect(project.getResourcesManager().hasResource('UsedImage')).toBe(true);
+    expect(project.getResourcesManager().hasResource('UnusedImage')).toBe(
+      false
+    );
+    expect(project.getResourcesManager().hasResource('UnusedAudio')).toBe(
+      false
+    );
+
+    project.delete();
+  });
+
   it('can rename a resource in the whole project', () => {
     const project = gd.ProjectHelper.createNewGDJSProject();
 

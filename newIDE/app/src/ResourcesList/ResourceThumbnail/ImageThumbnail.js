@@ -6,6 +6,10 @@ import { CorsAwareImage } from '../../UI/CorsAwareImage';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import { useLongTouch } from '../../Utils/UseLongTouch';
 import CheckeredBackground from '../CheckeredBackground';
+import {
+  getRenderedGifFrameDataUrl,
+  isGifResource,
+} from '../../Utils/GifFrameRenderer';
 
 type SourceRect = {|
   x: number,
@@ -53,6 +57,7 @@ type Props = {|
   onContextMenu?: (x: number, y: number) => void,
   size?: number,
   sourceRect?: ?SourceRect,
+  imageFrameIndex?: number,
 |};
 
 const ImageThumbnail = (props: Props): React.MixedElement => {
@@ -60,6 +65,61 @@ const ImageThumbnail = (props: Props): React.MixedElement => {
   const theme = React.useContext(GDevelopThemeContext);
   const [error, setError] = React.useState(false);
   const [imageSize, setImageSize] = React.useState<?[number, number]>(null);
+  const [
+    staticGifFrameSource,
+    setStaticGifFrameSource,
+  ] = React.useState<?string>(null);
+  const resourceSource = resourcesLoader.getResourceFullUrl(
+    project,
+    resourceName,
+    {}
+  );
+  const shouldRenderStaticGifFrame = isGifResource(project, resourceName);
+
+  React.useEffect(
+    () => {
+      if (!shouldRenderStaticGifFrame) {
+        setStaticGifFrameSource(null);
+        return;
+      }
+
+      let wasCancelled = false;
+      setError(false);
+      setStaticGifFrameSource(null);
+      getRenderedGifFrameDataUrl(
+        {
+          project,
+          resourceName,
+          resourceUrl: resourceSource,
+        },
+        props.imageFrameIndex || 0
+      ).then(
+        dataUrl => {
+          if (wasCancelled) return;
+          setStaticGifFrameSource(dataUrl);
+        },
+        error => {
+          if (wasCancelled) return;
+          console.error(
+            `Unable to render GIF frame for resource "${resourceName}":`,
+            error
+          );
+          setError(true);
+        }
+      );
+
+      return () => {
+        wasCancelled = true;
+      };
+    },
+    [
+      project,
+      props.imageFrameIndex,
+      resourceName,
+      resourceSource,
+      shouldRenderStaticGifFrame,
+    ]
+  );
 
   // Allow a long press to show the context menu
   const { contextMenuProps: longTouchForContextMenuProps } = useLongTouch(
@@ -88,6 +148,9 @@ const ImageThumbnail = (props: Props): React.MixedElement => {
   };
   const thumbnailSize = props.size || 100;
   const sourceRect = props.sourceRect;
+  const imageSource = shouldRenderStaticGifFrame
+    ? staticGifFrameSource
+    : resourceSource;
   const displaySourceRect = sourceRect && imageSize ? sourceRect : null;
   const sourceRectScale =
     sourceRect && imageSize
@@ -96,14 +159,13 @@ const ImageThumbnail = (props: Props): React.MixedElement => {
           thumbnailSize / sourceRect.height
         )
       : 1;
-  const sourceRectContainerStyle =
-    displaySourceRect
-      ? {
-          ...styles.sourceRectContainer,
-          width: displaySourceRect.width * sourceRectScale,
-          height: displaySourceRect.height * sourceRectScale,
-        }
-      : null;
+  const sourceRectContainerStyle = displaySourceRect
+    ? {
+        ...styles.sourceRectContainer,
+        width: displaySourceRect.width * sourceRectScale,
+        height: displaySourceRect.height * sourceRectScale,
+      }
+    : null;
 
   return (
     <div
@@ -116,7 +178,7 @@ const ImageThumbnail = (props: Props): React.MixedElement => {
       {...longTouchForContextMenuProps}
     >
       <CheckeredBackground borderRadius={4} />
-      {sourceRectContainerStyle && displaySourceRect ? (
+      {imageSource && sourceRectContainerStyle && displaySourceRect ? (
         <div style={sourceRectContainerStyle}>
           <CorsAwareImage
             style={{
@@ -132,7 +194,7 @@ const ImageThumbnail = (props: Props): React.MixedElement => {
               transformOrigin: 'top left',
             }}
             alt={resourceName}
-            src={resourcesLoader.getResourceFullUrl(project, resourceName, {})}
+            src={imageSource}
             onError={error => {
               // $FlowFixMe[incompatible-type]
               setError(error);
@@ -147,7 +209,7 @@ const ImageThumbnail = (props: Props): React.MixedElement => {
             }}
           />
         </div>
-      ) : (
+      ) : imageSource ? (
         <CorsAwareImage
           style={{
             ...styles.spriteThumbnailImage,
@@ -156,7 +218,7 @@ const ImageThumbnail = (props: Props): React.MixedElement => {
             display: error ? 'none' : undefined,
           }}
           alt={resourceName}
-          src={resourcesLoader.getResourceFullUrl(project, resourceName, {})}
+          src={imageSource}
           onError={error => {
             // $FlowFixMe[incompatible-type]
             setError(error);
@@ -170,7 +232,7 @@ const ImageThumbnail = (props: Props): React.MixedElement => {
             setError(false);
           }}
         />
-      )}
+      ) : null}
       {props.selectable && (
         <div style={styles.checkboxContainer}>
           <Checkbox

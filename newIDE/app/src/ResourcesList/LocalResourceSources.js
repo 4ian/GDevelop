@@ -93,9 +93,10 @@ const localResourceSources: Array<ResourceSource> = [
         // $FlowFixMe[incompatible-type]
         setLastUsedPath(project, kind, lastUsedPath);
 
-        let hasFilesOutsideProjectFolder = filePaths.some(
-          path => !isPathInProjectFolder(project, path)
-        );
+        const importedResourcesFolder = options.importedResourcesFolder;
+        let shouldHandleFileCopy =
+          !!importedResourcesFolder ||
+          filePaths.some(filePath => !isPathInProjectFolder(project, filePath));
 
         // Some resources, like tilemaps, can have references to other files.
         // We parse these files, optionally copy them, then create a mapping from the previous file name
@@ -139,7 +140,7 @@ const localResourceSources: Array<ResourceSource> = [
               filesWithEmbeddedResources.set(filePath, embeddedResources);
 
               if (embeddedResources.hasAnyEmbeddedResourceOutsideProjectFolder)
-                hasFilesOutsideProjectFolder = true;
+                shouldHandleFileCopy = true;
             }
           }
         }
@@ -147,10 +148,12 @@ const localResourceSources: Array<ResourceSource> = [
         // Check if files should be copied in the project folder.
         const newToOldFilePaths = new Map<string, string>();
         let filesWithMappedResources = new Map<string, MappedResources>();
-        if (hasFilesOutsideProjectFolder) {
+        if (shouldHandleFileCopy) {
           let answer: boolean;
 
-          if (resourcesImporationBehavior === 'relative') {
+          if (importedResourcesFolder) {
+            answer = true;
+          } else if (resourcesImporationBehavior === 'relative') {
             answer = false;
           } else if (resourcesImporationBehavior === 'import') {
             answer = true;
@@ -166,7 +169,8 @@ const localResourceSources: Array<ResourceSource> = [
             filePaths = await copyAllToProjectFolder(
               project,
               filePaths,
-              newToOldFilePaths
+              newToOldFilePaths,
+              importedResourcesFolder
             );
 
             await copyAllEmbeddedResourcesToProjectFolder(

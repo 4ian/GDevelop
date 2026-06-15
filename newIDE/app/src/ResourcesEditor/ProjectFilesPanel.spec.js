@@ -9,9 +9,11 @@ import {
   canDeleteProjectFolder,
   canMoveProjectFileToFolder,
   canRenameProjectFileNode,
+  canUpdateProjectFolderFromTemplate,
   getExternalFileCopyDestinationPath,
   getExternalFileDropPaths,
   getMovedProjectFilePath,
+  getProjectTemplateSkillsFolderUpdatePaths,
   getProjectFolderDropOperation,
   getProjectFileDragEffectAllowed,
   getRenamedProjectFilePath,
@@ -26,7 +28,9 @@ import {
 
 describe('ProjectFilesPanel', () => {
   const getSource = () =>
-    fs.readFileSync(path.join(__dirname, 'ProjectFilesPanel.js'), 'utf8');
+    fs
+      .readFileSync(path.join(__dirname, 'ProjectFilesPanel.js'), 'utf8')
+      .replace(/\r\n/g, '\n');
 
   const fileNode: ProjectFileNode = {
     id: 'project/assets/coin.png',
@@ -124,6 +128,34 @@ describe('ProjectFilesPanel', () => {
       'placeholder={t`Search project files`}'
     );
     expect(projectFilesHeaderSection).toContain('<MiniToolbar noPadding>');
+  });
+
+  it('uses the cleanup-aware refresh handler in the header toolbar', () => {
+    const source = getSource();
+
+    expect(source).toContain(
+      'onRefreshProjectFiles: () => void | Promise<void>'
+    );
+    expect(source).toContain(
+      'onProjectFilesRefreshed: ProjectFileNode => void'
+    );
+    expect(source).toContain('onClick={onRefreshProjectFiles}');
+    expect(source).toContain(
+      'tooltip={t`Refresh project files and remove unused resources`}'
+    );
+  });
+
+  it('refreshes registered file badges when project resources change', () => {
+    const source = getSource();
+
+    expect(source).toContain(
+      "import useResourcesChangedWatcher from '../ResourcesList/UseResourcesChangedWatcher'"
+    );
+    expect(source).toContain('onProjectFilesRefreshed(newRootNode)');
+    expect(source).toContain(
+      'const refreshOnResourceChange = React.useCallback'
+    );
+    expect(source).toContain('callback: refreshOnResourceChange');
   });
 
   it('allows moving a file to a different folder', () => {
@@ -319,6 +351,44 @@ describe('ProjectFilesPanel', () => {
     expect(canRenameProjectFileNode(fileNode)).toBe(true);
     expect(canRenameProjectFileNode(sourceFolderNode)).toBe(true);
     expect(canRenameProjectFileNode(rootFolderNode)).toBe(false);
+  });
+
+  it('allows updating from template only on the project root folder', () => {
+    const rootFolderNode: ProjectFileNode = {
+      id: 'project',
+      name: 'Project',
+      absolutePath: 'D:\\Project',
+      relativePath: '',
+      type: 'folder',
+      extension: '',
+      children: [],
+    };
+
+    expect(canUpdateProjectFolderFromTemplate(rootFolderNode)).toBe(true);
+    expect(canUpdateProjectFolderFromTemplate(sourceFolderNode)).toBe(false);
+    expect(canUpdateProjectFolderFromTemplate(fileNode)).toBe(false);
+  });
+
+  it('computes skills folder paths for project template updates', () => {
+    expect(
+      getProjectTemplateSkillsFolderUpdatePaths({
+        projectRootPath: 'D:\\Project',
+        projectTemplatePath:
+          'D:\\GDevelop\\newIDE\\app\\resources\\gd-project-template',
+      })
+    ).toEqual({
+      sourceSkillsFolderPath:
+        'D:\\GDevelop\\newIDE\\app\\resources\\gd-project-template\\skills',
+      targetSkillsFolderPath: 'D:\\Project\\skills',
+    });
+  });
+
+  it('shows the update from template context menu action for root folders', () => {
+    const source = getSource();
+
+    expect(source).toContain('canUpdateProjectFolderFromTemplate(node)');
+    expect(source).toContain('label: i18n._(t`Update from template`)');
+    expect(source).toContain('updateProjectSkillsFolderFromTemplate(node);');
   });
 
   it('does not auto-select a newly created folder', () => {

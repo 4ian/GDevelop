@@ -15,6 +15,8 @@ const callbacksList: Array<PreviewDebuggerServerCallbacks> = [];
 const debuggerIds: Array<DebuggerId> = [];
 const responseCallbacks = new Map<number, (value: Object) => void>();
 let nextMessageWithResponseId = 1;
+const recentLogsByDebuggerId: { [DebuggerId]: Array<Object> } = {};
+const maxRecentLogsPerDebugger = 200;
 
 let embeddedGameFrameWindow: WindowProxy | null = null;
 let isWindowMessageListenerRegistered = false;
@@ -34,6 +36,20 @@ const handleParsedMessage = (
   parsedMessage: Object | null
 ): void => {
   if (!parsedMessage) return;
+
+  if (
+    parsedMessage.command === 'console.log' ||
+    parsedMessage.command === 'hotReloader.logs' ||
+    parsedMessage.command === 'uncaughtException' ||
+    parsedMessage.command === 'game.crashed'
+  ) {
+    const recentLogs = recentLogsByDebuggerId[id] || [];
+    recentLogs.push(parsedMessage);
+    if (recentLogs.length > maxRecentLogsPerDebugger) {
+      recentLogs.splice(0, recentLogs.length - maxRecentLogsPerDebugger);
+    }
+    recentLogsByDebuggerId[id] = recentLogs;
+  }
 
   if (parsedMessage.messageId) {
     const answerCallback = responseCallbacks.get(parsedMessage.messageId);
@@ -123,12 +139,14 @@ class LocalPreviewDebuggerServer {
       ipcRenderer.on('debugger-connection-closed', (event, { id }) => {
         const debuggerIdIndex = debuggerIds.indexOf(id);
         if (debuggerIdIndex !== -1) debuggerIds.splice(debuggerIdIndex, 1);
+        delete recentLogsByDebuggerId[id];
 
         notifyConnectionClosed(id);
       });
 
       ipcRenderer.on('debugger-connection-opened', (event, { id }) => {
         debuggerIds.push(id);
+        recentLogsByDebuggerId[id] = [];
         callbacksList.forEach(({ onConnectionOpened }) =>
           onConnectionOpened({
             id,
@@ -254,6 +272,10 @@ class LocalPreviewDebuggerServer {
     return getExistingPreviewDebuggerIds();
   }
   // $FlowFixMe[missing-local-annot]
+  getRecentLogs(id: DebuggerId) {
+    return [...(recentLogsByDebuggerId[id] || [])];
+  }
+  // $FlowFixMe[missing-local-annot]
   registerCallbacks(callbacks: PreviewDebuggerServerCallbacks) {
     callbacksList.push(callbacks);
 
@@ -272,6 +294,7 @@ class LocalPreviewDebuggerServer {
     }
 
     embeddedGameFrameWindow = embeddedWindow;
+    recentLogsByDebuggerId['embedded-game-frame'] = [];
     callbacksList.forEach(({ onConnectionOpened }) =>
       onConnectionOpened({
         id: 'embedded-game-frame',
@@ -290,6 +313,7 @@ class LocalPreviewDebuggerServer {
     }
 
     embeddedGameFrameWindow = null;
+    delete recentLogsByDebuggerId['embedded-game-frame'];
     notifyConnectionClosed('embedded-game-frame');
   }
   closeAllConnections() {
@@ -297,6 +321,7 @@ class LocalPreviewDebuggerServer {
     debuggerIds.length = 0;
 
     previousDebuggerIds.forEach(id => {
+      delete recentLogsByDebuggerId[id];
       notifyConnectionClosed(id);
     });
 
@@ -308,6 +333,7 @@ class LocalPreviewDebuggerServer {
 
     if (embeddedGameFrameWindow) {
       embeddedGameFrameWindow = null;
+      delete recentLogsByDebuggerId['embedded-game-frame'];
       notifyConnectionClosed('embedded-game-frame');
     }
   }

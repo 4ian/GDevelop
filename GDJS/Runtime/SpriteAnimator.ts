@@ -120,7 +120,8 @@ namespace gdjs {
   export interface AnimationFrameTextureManager<T> {
     getAnimationFrameTexture(
       imageName: string,
-      sourceRect?: SpriteFrameSourceRectData | null
+      sourceRect?: SpriteFrameSourceRectData | null,
+      imageFrameIndex?: integer
     ): T;
     getAnimationFrameWidth(pixiTexture: T);
     getAnimationFrameHeight(pixiTexture: T);
@@ -151,17 +152,19 @@ namespace gdjs {
      */
     constructor(
       frameData: SpriteFrameData,
-      textureManager: gdjs.AnimationFrameTextureManager<T>
+      textureManager: gdjs.AnimationFrameTextureManager<T>,
+      imageFrameIndex: integer = 0
     ) {
       this.image = frameData ? frameData.image : '';
       this.sourceRect =
         frameData && frameData.sourceRect ? { ...frameData.sourceRect } : null;
       this.texture = textureManager.getAnimationFrameTexture(
         this.image,
-        this.sourceRect
+        this.sourceRect,
+        imageFrameIndex
       );
       this.points = new Hashtable();
-      this.reinitialize(frameData, textureManager);
+      this.reinitialize(frameData, textureManager, imageFrameIndex);
     }
 
     /**
@@ -170,7 +173,8 @@ namespace gdjs {
      */
     reinitialize(
       frameData: SpriteFrameData,
-      textureManager: gdjs.AnimationFrameTextureManager<T>
+      textureManager: gdjs.AnimationFrameTextureManager<T>,
+      imageFrameIndex: integer = 0
     ) {
       this.image = frameData.image;
       this.sourceRect = frameData.sourceRect
@@ -178,7 +182,8 @@ namespace gdjs {
         : null;
       this.texture = textureManager.getAnimationFrameTexture(
         this.image,
-        this.sourceRect
+        this.sourceRect,
+        imageFrameIndex
       );
 
       this.points.clear();
@@ -287,13 +292,36 @@ namespace gdjs {
         : 1.0;
       this.loop = !!directionData.looping;
       let i = 0;
+      let previousWholeImageName: string | null = null;
+      let consecutiveWholeImageFrameIndex: integer = 0;
       for (const len = directionData.sprites.length; i < len; ++i) {
         const frameData = directionData.sprites[i];
+        let imageFrameIndex: integer = 0;
+        if (!frameData.sourceRect && frameData.image) {
+          if (frameData.image === previousWholeImageName) {
+            consecutiveWholeImageFrameIndex++;
+          } else {
+            previousWholeImageName = frameData.image;
+            consecutiveWholeImageFrameIndex = 0;
+          }
+          imageFrameIndex = consecutiveWholeImageFrameIndex;
+        } else {
+          previousWholeImageName = null;
+          consecutiveWholeImageFrameIndex = 0;
+        }
         if (i < this.frames.length) {
-          this.frames[i].reinitialize(frameData, textureManager);
+          this.frames[i].reinitialize(
+            frameData,
+            textureManager,
+            imageFrameIndex
+          );
         } else {
           this.frames.push(
-            new gdjs.SpriteAnimationFrame<T>(frameData, textureManager)
+            new gdjs.SpriteAnimationFrame<T>(
+              frameData,
+              textureManager,
+              imageFrameIndex
+            )
           );
         }
       }

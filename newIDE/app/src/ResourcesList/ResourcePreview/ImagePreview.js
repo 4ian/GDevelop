@@ -23,6 +23,11 @@ import {
   zoomOutFactor,
 } from '../../Utils/ZoomUtils';
 import KeyboardShortcuts from '../../UI/KeyboardShortcuts';
+import {
+  getRenderedGifFrameDataUrl,
+  isGifPath,
+  isGifResource,
+} from '../../Utils/GifFrameRenderer';
 
 const gd: libGDevelop = global.gd;
 
@@ -106,6 +111,8 @@ type Props = {|
   isImagePrivate?: boolean,
   onImageLoaded?: () => void,
   hideLoader?: boolean,
+  project?: gdProject,
+  imageFrameIndex?: number,
 |};
 
 export const isProjectImageResourceSmooth = (
@@ -143,10 +150,18 @@ const ImagePreview = ({
   isImagePrivate,
   onImageLoaded,
   hideLoader,
+  project,
+  imageFrameIndex,
 }: Props): React.Node => {
   const [errored, setErrored] = React.useState<boolean>(false);
   const [imageWidth, setImageWidth] = React.useState<?number>(null);
   const [imageHeight, setImageHeight] = React.useState<?number>(null);
+  const [fullImageWidth, setFullImageWidth] = React.useState<?number>(null);
+  const [fullImageHeight, setFullImageHeight] = React.useState<?number>(null);
+  const [
+    staticGifFrameSource,
+    setStaticGifFrameSource,
+  ] = React.useState<?string>(null);
   const [containerWidth, setContainerWidth] = React.useState<?number>(null);
   const [containerHeight, setContainerHeight] = React.useState<?number>(null);
   const [zoomState, setZoomState] = React.useState<ZoomState>({
@@ -160,10 +175,13 @@ const ImagePreview = ({
   const previousPointerCoordinates = React.useRef<?[number, number]>(null);
   const hasZoomBeenAdaptedToImageRef = React.useRef<boolean>(false);
   const containerRef = React.useRef<?HTMLDivElement>(null);
+  const previousGifResourceKeyRef = React.useRef<?string>(null);
   const handleImageError = () => {
     setErrored(true);
   };
   const [shouldMoveView, setShouldMoveView] = React.useState<boolean>(false);
+  const sourceRectWidth = sourceRect ? sourceRect.width : null;
+  const sourceRectHeight = sourceRect ? sourceRect.height : null;
   const keyboardShortcuts = React.useRef<KeyboardShortcuts>(
     new KeyboardShortcuts({
       isActive: () => !deactivateControls,
@@ -171,6 +189,65 @@ const ImagePreview = ({
         onToggleGrabbingTool: setShouldMoveView,
       },
     })
+  );
+  const shouldRenderStaticGifFrame =
+    !isImagePrivate &&
+    !sourceRect &&
+    (project
+      ? isGifResource(project, resourceName)
+      : isGifPath(resourceName) || isGifPath(imageResourceSource));
+
+  React.useEffect(
+    () => {
+      if (!shouldRenderStaticGifFrame) {
+        setStaticGifFrameSource(null);
+        return;
+      }
+
+      let wasCancelled = false;
+      const gifResourceKey = `${resourceName}:${imageResourceSource}`;
+      if (previousGifResourceKeyRef.current !== gifResourceKey) {
+        previousGifResourceKeyRef.current = gifResourceKey;
+        setImageWidth(null);
+        setImageHeight(null);
+        setFullImageWidth(null);
+        setFullImageHeight(null);
+        setStaticGifFrameSource(null);
+      }
+      setErrored(false);
+      getRenderedGifFrameDataUrl(
+        {
+          project,
+          resourceName,
+          resourceUrl: imageResourceSource,
+        },
+        imageFrameIndex || 0
+      ).then(
+        dataUrl => {
+          if (wasCancelled) return;
+          setStaticGifFrameSource(dataUrl);
+        },
+        error => {
+          if (wasCancelled) return;
+          console.error(
+            `Unable to render GIF frame for resource "${resourceName}":`,
+            error
+          );
+          setErrored(true);
+        }
+      );
+
+      return () => {
+        wasCancelled = true;
+      };
+    },
+    [
+      imageFrameIndex,
+      imageResourceSource,
+      project,
+      resourceName,
+      shouldRenderStaticGifFrame,
+    ]
   );
 
   const getZoomFactorToFitImage = React.useCallback(
@@ -391,7 +468,7 @@ const ImagePreview = ({
     () => {
       hasZoomBeenAdaptedToImageRef.current = false;
     },
-    [imageResourceSource, sourceRect]
+    [imageResourceSource, sourceRectWidth, sourceRectHeight]
   );
 
   const containerCenter = React.useMemo(
@@ -424,16 +501,29 @@ const ImagePreview = ({
       const newImageHeight = imgElement
         ? imgElement.naturalHeight || imgElement.clientHeight
         : 0;
-      const displayedImageWidth = sourceRect ? sourceRect.width : newImageWidth;
-      const displayedImageHeight = sourceRect
-        ? sourceRect.height
-        : newImageHeight;
+      setFullImageWidth(newImageWidth);
+      setFullImageHeight(newImageHeight);
+      const displayedImageWidth =
+        sourceRectWidth != null ? sourceRectWidth : newImageWidth;
+      const displayedImageHeight =
+        sourceRectHeight != null ? sourceRectHeight : newImageHeight;
       setImageHeight(displayedImageHeight);
       setImageWidth(displayedImageWidth);
       if (onImageSize) onImageSize([displayedImageWidth, displayedImageHeight]);
       if (onImageLoaded) onImageLoaded();
     },
-    [onImageLoaded, onImageSize, sourceRect]
+    [onImageLoaded, onImageSize, sourceRectWidth, sourceRectHeight]
+  );
+
+  React.useEffect(
+    () => {
+      if (sourceRectWidth == null || sourceRectHeight == null) return;
+
+      setImageHeight(sourceRectHeight);
+      setImageWidth(sourceRectWidth);
+      if (onImageSize) onImageSize([sourceRectWidth, sourceRectHeight]);
+    },
+    [onImageSize, sourceRectWidth, sourceRectHeight]
   );
 
   const onTouchEnd = React.useCallback((event: TouchEvent) => {
@@ -528,12 +618,20 @@ const ImagePreview = ({
     overflow: sourceRect ? 'hidden' : undefined,
   };
 
+  const imageSource = shouldRenderStaticGifFrame
+    ? staticGifFrameSource
+    : imageResourceSource;
+
   const imageStyle = {
     ...styles.spriteThumbnailImage,
     visibility,
     ...(!isImageResourceSmooth ? styles.previewImagePixelated : undefined),
     cursor: forcedCursor,
     flexShrink: 0,
+    maxWidth: sourceRect ? 'none' : undefined,
+    maxHeight: sourceRect ? 'none' : undefined,
+    width: sourceRect && fullImageWidth ? fullImageWidth : undefined,
+    height: sourceRect && fullImageHeight ? fullImageHeight : undefined,
     transform: sourceRect
       ? `translate(${-sourceRect.x}px, ${-sourceRect.y}px)`
       : undefined,
@@ -647,14 +745,14 @@ const ImagePreview = ({
                     </Text>
                   </PlaceholderMessage>
                 )}
-                {!errored && (
+                {!errored && imageSource && (
                   <div style={imageContainerBorderStyle}>
                     <div style={imageContainerStyle}>
                       {isImagePrivate ? (
                         <AuthorizedAssetImage
                           style={imageStyle}
                           alt={resourceName}
-                          url={imageResourceSource}
+                          url={imageSource}
                           onError={handleImageError}
                           onLoad={handleImageLoaded}
                           hideLoader={hideLoader}
@@ -663,7 +761,7 @@ const ImagePreview = ({
                         <CorsAwareImage
                           style={imageStyle}
                           alt={resourceName}
-                          src={imageResourceSource}
+                          src={imageSource}
                           onError={handleImageError}
                           onLoad={handleImageLoaded}
                         />

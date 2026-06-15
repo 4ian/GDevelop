@@ -6,6 +6,7 @@ import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import SpritesList, {
   addAnimationFrame,
+  addAnimationFrameWithResourceName,
   applyPointsAndMasksToSpriteIfNecessary,
 } from './SpritesList';
 import IconButton from '../../../UI/IconButton';
@@ -47,6 +48,16 @@ import {
 import { type ScrollViewInterface } from '../../../UI/ScrollView';
 import ThreeDotsMenu from '../../../UI/CustomSvgIcons/ThreeDotsMenu';
 import ElementWithMenu from '../../../UI/Menu/ElementWithMenu';
+import RawSpriteSheetImportDialog, {
+  type RawSpriteSheetImportOptions,
+} from './RawSpriteSheetImportDialog';
+import {
+  createSpriteSheetSourceRects,
+  loadImageSize,
+  type SpriteSourceRect,
+} from '../../../Utils/SpriteSourceRect';
+import { openFilePicker } from '../../../Utils/FileSystem';
+import { importRawGifToProjectResources } from './GifImportHelper';
 
 const gd: libGDevelop = global.gd;
 
@@ -117,6 +128,12 @@ type AnimationListProps = {|
   onCreateMatchingSpriteCollisionMask: () => Promise<void>,
 |};
 
+type RawSpriteSheetImportState = {|
+  resourceName: string,
+  sheetWidth: number,
+  sheetHeight: number,
+|};
+
 const AnimationList: React.ComponentType<{
   ...AnimationListProps,
   +ref?: React.RefSetter<AnimationListInterface>,
@@ -145,7 +162,7 @@ const AnimationList: React.ComponentType<{
     const abortControllerRef = React.useRef<?AbortController>(null);
     const forceUpdate = useForceUpdate();
     const { isMobile } = useResponsiveWindowSize();
-    const { showConfirmation } = useAlertDialog();
+    const { showAlert, showConfirmation } = useAlertDialog();
     const animationsCount = animations.getAnimationsCount();
     const animationsIndices = new Array<number>(animationsCount)
       .fill(0)
@@ -156,6 +173,10 @@ const AnimationList: React.ComponentType<{
       setJustAddedAnimationName,
     ] = React.useState<?string>(null);
     const justAddedAnimationElement = React.useRef<?any>(null);
+    const [
+      rawSpriteSheetImport,
+      setRawSpriteSheetImport,
+    ] = React.useState<?RawSpriteSheetImportState>(null);
 
     React.useEffect(
       () => {
@@ -426,6 +447,7 @@ const AnimationList: React.ComponentType<{
     );
 
     const storageProvider = resourceManagementProps.getStorageProvider();
+    const canImportGif = storageProvider.internalName === 'LocalFile';
     const resourceSources = resourceManagementProps.resourceSources
       .filter(source => source.kind === 'image')
       .filter(
@@ -441,6 +463,203 @@ const AnimationList: React.ComponentType<{
         }
       },
       [onCreateMatchingSpriteCollisionMask, animations]
+    );
+
+    const addAnimationWithResourceFrames = React.useCallback(
+      ({
+        resourceName,
+        sourceRects,
+        timeBetweenFrames,
+        loop,
+      }: {|
+        resourceName: string,
+        sourceRects: $ReadOnlyArray<?SpriteSourceRect>,
+        timeBetweenFrames?: number,
+        loop?: boolean,
+      |}) => {
+        setNameErrors({});
+
+        const animation = new gd.Animation();
+        animation.setDirectionsCount(1);
+        const direction = animation.getDirection(0);
+
+        for (const sourceRect of sourceRects) {
+          addAnimationFrameWithResourceName(
+            animations,
+            direction,
+            resourceName,
+            onSpriteAdded,
+            sourceRect
+          );
+        }
+
+        if (timeBetweenFrames != null && sourceRects.length > 1) {
+          direction.setTimeBetweenFrames(timeBetweenFrames);
+        }
+        if (loop) {
+          direction.setLoop(true);
+        }
+
+        animations.addAnimation(animation);
+        animation.delete();
+        forceUpdate();
+        onSizeUpdated();
+        if (onObjectUpdated) onObjectUpdated();
+        adaptCollisionMaskIfNeeded();
+      },
+      [
+        adaptCollisionMaskIfNeeded,
+        animations,
+        forceUpdate,
+        onObjectUpdated,
+        onSizeUpdated,
+        onSpriteAdded,
+      ]
+    );
+
+    const onImportRawSpriteSheet = React.useCallback(
+      async (initialResourceSource: ResourceSource) => {
+        const {
+          selectedResources,
+          selectedSourceName,
+        } = await resourceManagementProps.onChooseResource({
+          initialSourceName: initialResourceSource.name,
+          multiSelection: false,
+          resourceKind: 'image',
+          importedResourcesFolder: 'assets',
+        });
+
+        if (!selectedResources.length) return;
+        const selectedResource = selectedResources[0];
+        const selectedResourceSource = resourceSources.find(
+          source => source.name === selectedSourceName
+        );
+        if (!selectedResourceSource) {
+          return;
+        }
+
+        let hasCreatedResource = false;
+        if (selectedResourceSource.shouldCreateResource) {
+          applyResourceDefaults(project, selectedResource);
+          hasCreatedResource = project
+            .getResourcesManager()
+            .addResource(selectedResource);
+        }
+
+        const resourceName = selectedResource.getName();
+        if (selectedResourceSource.shouldCreateResource) {
+          // Important, we are responsible for deleting the resources that were given to us.
+          // Otherwise we have a memory leak, as calling addResource is making a copy of the resource.
+          selectedResources.forEach(resource => resource.delete());
+        }
+
+        if (hasCreatedResource) {
+          await resourceManagementProps.onFetchNewlyAddedResources();
+          resourceManagementProps.onNewResourcesAdded();
+        }
+
+        try {
+          const [sheetWidth, sheetHeight] = await loadImageSize(
+            ResourcesLoader.getResourceFullUrl(project, resourceName, {})
+          );
+          setRawSpriteSheetImport({
+            resourceName,
+            sheetWidth,
+            sheetHeight,
+          });
+        } catch (error) {
+          console.error('Unable to load raw sprite sheet image size:', error);
+          await showAlert({
+            title: t`Unable to import the sprite sheet`,
+            message: t`The image size could not be read.`,
+            dismissButtonLabel: t`Close`,
+          });
+        }
+      },
+      [project, resourceManagementProps, resourceSources, showAlert]
+    );
+
+    const addRawSpriteSheetAnimation = React.useCallback(
+      (options: RawSpriteSheetImportOptions) => {
+        if (!rawSpriteSheetImport) return;
+
+        const sourceRects = createSpriteSheetSourceRects({
+          columns: options.columns,
+          rows: options.rows,
+          frameCount: options.frameCount,
+          sheetWidth: rawSpriteSheetImport.sheetWidth,
+          sheetHeight: rawSpriteSheetImport.sheetHeight,
+        });
+
+        addAnimationWithResourceFrames({
+          resourceName: rawSpriteSheetImport.resourceName,
+          sourceRects,
+        });
+        setRawSpriteSheetImport(null);
+      },
+      [addAnimationWithResourceFrames, rawSpriteSheetImport]
+    );
+
+    const onImportGif = React.useCallback(
+      async (i18n: I18nType) => {
+        if (!canImportGif || !project.getProjectFile()) {
+          await showAlert({
+            title: t`Unable to import the GIF`,
+            message: t`GIF import is only available for saved local projects.`,
+            dismissButtonLabel: t`Close`,
+          });
+          return;
+        }
+
+        try {
+          const gifFilePath = await openFilePicker({
+            title: i18n._(t`Choose a GIF file`),
+            properties: ['openFile'],
+            message: i18n._(
+              t`Choose the GIF file to import as a raw animated sprite.`
+            ),
+            filters: [{ name: i18n._(t`GIF files`), extensions: ['gif'] }],
+          });
+          if (!gifFilePath || typeof gifFilePath !== 'string') return;
+
+          const {
+            resourceName,
+            frameCount,
+            timeBetweenFrames,
+          } = await importRawGifToProjectResources({
+            project,
+            gifFilePath,
+          });
+
+          const sourceRects: Array<?SpriteSourceRect> = [];
+          for (let frameIndex = 0; frameIndex < frameCount; frameIndex++) {
+            sourceRects.push(null);
+          }
+          addAnimationWithResourceFrames({
+            resourceName,
+            sourceRects,
+            timeBetweenFrames,
+            loop: frameCount > 1,
+          });
+
+          await resourceManagementProps.onFetchNewlyAddedResources();
+          resourceManagementProps.onNewResourcesAdded();
+        } catch (error) {
+          console.error('Unable to import GIF:', error);
+          await showAlert({
+            title: t`Unable to import the GIF`,
+            message: t`The GIF could not be imported.`,
+            dismissButtonLabel: t`Close`,
+          });
+        }
+      },
+      [
+        addAnimationWithResourceFrames,
+        canImportGif,
+        project,
+        resourceManagementProps,
+        showAlert,
+      ]
     );
 
     const importImages = React.useCallback(
@@ -501,6 +720,44 @@ const AnimationList: React.ComponentType<{
         adaptCollisionMaskIfNeeded,
         onObjectUpdated,
         project,
+        resourceSources,
+      ]
+    );
+
+    const buildImportImagesSplitMenuTemplate = React.useCallback(
+      (i18n: I18nType) => {
+        const menuTemplate: Array<any> = resourceSources.map(
+          resourceSource => ({
+            label: i18n._(resourceSource.displayName),
+            click: () => importImages(resourceSource),
+          })
+        );
+
+        if (resourceSources.length) {
+          menuTemplate.push(
+            { type: 'separator' },
+            ...(canImportGif
+              ? [
+                  {
+                    label: i18n._(t`Import GIF...`),
+                    click: () => onImportGif(i18n),
+                  },
+                ]
+              : []),
+            {
+              label: i18n._(t`Import raw sprite sheet...`),
+              click: () => onImportRawSpriteSheet(resourceSources[0]),
+            }
+          );
+        }
+
+        return menuTemplate;
+      },
+      [
+        canImportGif,
+        importImages,
+        onImportGif,
+        onImportRawSpriteSheet,
         resourceSources,
       ]
     );
@@ -690,16 +947,13 @@ const AnimationList: React.ComponentType<{
                   helpPagePath="/objects/sprite"
                   tutorialId="intermediate-changing-animations"
                   onAction={() => {
+                    if (!resourceSources.length) return;
                     importImages(resourceSources[0]);
                   }}
                   actionBuildSplitMenuTemplate={
-                    resourceSources.length < 2
-                      ? undefined
-                      : i18n =>
-                          resourceSources.map(resourceSource => ({
-                            label: i18n._(resourceSource.displayName),
-                            click: () => importImages(resourceSource),
-                          }))
+                    resourceSources.length
+                      ? buildImportImagesSplitMenuTemplate
+                      : undefined
                   }
                   onSecondaryAction={() => {
                     createAnimationWith(i18n, imageResourceExternalEditors[0]);
@@ -901,6 +1155,15 @@ const AnimationList: React.ComponentType<{
             {externalEditorOpened && (
               <ExternalEditorOpenedDialog
                 onClose={cancelEditingWithExternalEditor}
+              />
+            )}
+            {rawSpriteSheetImport && (
+              <RawSpriteSheetImportDialog
+                resourceName={rawSpriteSheetImport.resourceName}
+                sheetWidth={rawSpriteSheetImport.sheetWidth}
+                sheetHeight={rawSpriteSheetImport.sheetHeight}
+                onApply={addRawSpriteSheetAnimation}
+                onRequestClose={() => setRawSpriteSheetImport(null)}
               />
             )}
           </>

@@ -137,6 +137,7 @@ export interface PreviewDebuggerServer {
   getExistingDebuggerIds(): Array<DebuggerId>;
   getExistingEmbeddedGameFrameDebuggerIds(): Array<DebuggerId>;
   getExistingPreviewDebuggerIds(): Array<DebuggerId>;
+  getRecentLogs(id: DebuggerId): Array<Object>;
   sendMessage(id: DebuggerId, message: Object): void;
   sendMessageWithResponse(message: Object): Promise<Object>;
   registerCallbacks(callbacks: PreviewDebuggerServerCallbacks): () => void;

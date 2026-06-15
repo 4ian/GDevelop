@@ -31,6 +31,8 @@ import ProjectFileRenameDialog from './ProjectFileRenameDialog';
 import ContextMenu, { type ContextMenuInterface } from '../UI/Menu/ContextMenu';
 import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
+import useResourcesChangedWatcher from '../ResourcesList/UseResourcesChangedWatcher';
+import { findLocalProjectTemplatePath } from '../ProjectCreation/LocalProjectTemplateFinder';
 
 const gd: libGDevelop = global.gd;
 const fs = optionalRequire('fs');
@@ -92,6 +94,8 @@ type Props = {|
   selectedItem: ?ProjectFileSelection,
   onSelectProjectFile: (?ProjectFileSelection) => void,
   onViewProjectFileProperties: ProjectFileSelection => void,
+  onRefreshProjectFiles: () => void | Promise<void>,
+  onProjectFilesRefreshed: ProjectFileNode => void,
 |};
 
 const projectFilesLayoutStorageKey =
@@ -564,7 +568,7 @@ const readDirectory = async ({
   return sortNodes(nodes);
 };
 
-const findNodeByAbsolutePath = (
+export const findNodeByAbsolutePath = (
   node: ProjectFileNode,
   absolutePath: string
 ): ?ProjectFileNode => {
@@ -605,7 +609,7 @@ const findParentNodeByAbsolutePath = (
   return null;
 };
 
-const getResourceFromNode = (
+export const getResourceFromNode = (
   project: gdProject,
   node: ProjectFileNode
 ): ?gdResource => {
@@ -929,6 +933,10 @@ export const canDeleteProjectFolder = (node: ProjectFileNode): boolean =>
   !!node.relativePath &&
   (!node.children || node.children.length === 0);
 
+export const canUpdateProjectFolderFromTemplate = (
+  node: ProjectFileNode
+): boolean => node.type === 'folder' && !node.relativePath;
+
 export const shouldSelectProjectFileNode = (node: ProjectFileNode): boolean =>
   node.type === 'file' || node.type === 'folder';
 
@@ -1067,6 +1075,24 @@ export const getRenamedProjectFilePath = ({
     ? path.join(path.dirname(node.absolutePath), newName)
     : `${node.absolutePath}/${newName}`;
 
+export const getProjectTemplateSkillsFolderUpdatePaths = ({
+  projectRootPath,
+  projectTemplatePath,
+}: {|
+  projectRootPath: string,
+  projectTemplatePath: string,
+|}): ?{|
+  sourceSkillsFolderPath: string,
+  targetSkillsFolderPath: string,
+|} => {
+  if (!path) return null;
+
+  return {
+    sourceSkillsFolderPath: path.join(projectTemplatePath, 'skills'),
+    targetSkillsFolderPath: path.join(projectRootPath, 'skills'),
+  };
+};
+
 export const getResourceFileAfterProjectFileMove = ({
   projectRootPath,
   previousResourceFile,
@@ -1184,6 +1210,41 @@ const buildFileMoveBlockersMessage = (
     blockers
   )}`;
 
+const copyDirectoryContents = async ({
+  sourcePath,
+  targetPath,
+}: {|
+  sourcePath: string,
+  targetPath: string,
+|}): Promise<void> => {
+  if (!fs || !path) return;
+
+  await fs.promises.mkdir(targetPath, { recursive: true });
+  const entries = await fs.promises.readdir(sourcePath, {
+    withFileTypes: true,
+  });
+
+  for (const entry of entries) {
+    const sourceEntryPath = path.join(sourcePath, entry.name);
+    const targetEntryPath = path.join(targetPath, entry.name);
+
+    if (entry.isDirectory()) {
+      await copyDirectoryContents({
+        sourcePath: sourceEntryPath,
+        targetPath: targetEntryPath,
+      });
+      continue;
+    }
+
+    if (entry.isFile()) {
+      await fs.promises.mkdir(path.dirname(targetEntryPath), {
+        recursive: true,
+      });
+      await fs.promises.copyFile(sourceEntryPath, targetEntryPath);
+    }
+  }
+};
+
 const updateResourcesAfterProjectFileMove = ({
   project,
   sourceAbsolutePath,
@@ -1257,6 +1318,8 @@ const ProjectFilesPanel: React.ComponentType<{
       selectedItem,
       onSelectProjectFile,
       onViewProjectFileProperties,
+      onRefreshProjectFiles,
+      onProjectFilesRefreshed,
     },
     ref
   ) => {
@@ -1344,6 +1407,7 @@ const ProjectFilesPanel: React.ComponentType<{
             return [newRootNode.id, ...openedNodeIds];
           });
           setIsTruncated(counter.truncated);
+          onProjectFilesRefreshed(newRootNode);
           return newRootNode;
         } catch (error) {
           setError(error.message);
@@ -1352,8 +1416,20 @@ const ProjectFilesPanel: React.ComponentType<{
           setIsLoading(false);
         }
       },
-      [project]
+      [project, onProjectFilesRefreshed]
     );
+
+    const refreshOnResourceChange = React.useCallback(
+      () => {
+        if (canBrowseProjectFiles) refresh();
+      },
+      [canBrowseProjectFiles, refresh]
+    );
+
+    useResourcesChangedWatcher({
+      project,
+      callback: refreshOnResourceChange,
+    });
 
     React.useImperativeHandle(ref, () => ({ refresh }));
 
@@ -2102,6 +2178,60 @@ const ProjectFilesPanel: React.ComponentType<{
       [project]
     );
 
+    const updateProjectSkillsFolderFromTemplate = React.useCallback(
+      async (node: ProjectFileNode) => {
+        if (!canUpdateProjectFolderFromTemplate(node)) return;
+
+        if (!fs || !path) {
+          await showAlert({
+            title: t`Unable to update from template`,
+            message: t`Project template update is available only for local projects saved on disk.`,
+          });
+          return;
+        }
+
+        const projectTemplatePath = findLocalProjectTemplatePath();
+        const updatePaths = projectTemplatePath
+          ? getProjectTemplateSkillsFolderUpdatePaths({
+              projectRootPath: node.absolutePath,
+              projectTemplatePath,
+            })
+          : null;
+        if (!updatePaths) {
+          await showAlert({
+            title: t`Unable to update from template`,
+            message: t`The bundled project template could not be found.`,
+          });
+          return;
+        }
+
+        try {
+          await copyDirectoryContents({
+            sourcePath: updatePaths.sourceSkillsFolderPath,
+            targetPath: updatePaths.targetSkillsFolderPath,
+          });
+          setOpenedNodeIds(openedNodeIds =>
+            Array.from(
+              new Set([
+                normalizeSlashes(node.absolutePath),
+                normalizeSlashes(updatePaths.targetSkillsFolderPath),
+                ...openedNodeIds,
+              ])
+            )
+          );
+          await refresh();
+        } catch (error) {
+          await showAlert({
+            title: t`Unable to update from template`,
+            message: `The skills folder could not be updated from the bundled template:\n\n${
+              error.message
+            }`,
+          });
+        }
+      },
+      [refresh, showAlert]
+    );
+
     const updateTreeWidth = React.useCallback((treeWidth: number) => {
       setTreeWidth(treeWidth);
       persistTreeWidth(treeWidth);
@@ -2153,7 +2283,7 @@ const ProjectFilesPanel: React.ComponentType<{
         const node = options.node;
         if (!node) return [];
 
-        return [
+        const menu: Array<MenuItemTemplate> = [
           {
             label: i18n._(t`View properties`),
             click: () => viewPropertiesForNode(node),
@@ -2172,6 +2302,21 @@ const ProjectFilesPanel: React.ComponentType<{
             label: i18n._(t`New Markdown`),
             click: () => openMarkdownDialogForNode(node),
           },
+        ];
+
+        if (canUpdateProjectFolderFromTemplate(node)) {
+          menu.push(
+            { type: 'separator' },
+            {
+              label: i18n._(t`Update from template`),
+              click: () => {
+                updateProjectSkillsFolderFromTemplate(node);
+              },
+            }
+          );
+        }
+
+        menu.push(
           { type: 'separator' },
           {
             label:
@@ -2189,8 +2334,10 @@ const ProjectFilesPanel: React.ComponentType<{
 
               deleteProjectFile(node);
             },
-          },
-        ];
+          }
+        );
+
+        return menu;
       },
       [
         deleteProjectFolder,
@@ -2198,6 +2345,7 @@ const ProjectFilesPanel: React.ComponentType<{
         openFolderDialogForNode,
         openMarkdownDialogForNode,
         openRenameDialogForNode,
+        updateProjectSkillsFolderFromTemplate,
         viewPropertiesForNode,
       ]
     );
@@ -2544,10 +2692,8 @@ const ProjectFilesPanel: React.ComponentType<{
             </IconButton>
             <IconButton
               size="small"
-              onClick={() => {
-                refresh();
-              }}
-              tooltip={t`Refresh project files`}
+              onClick={onRefreshProjectFiles}
+              tooltip={t`Refresh project files and remove unused resources`}
             >
               <RefreshIcon />
             </IconButton>

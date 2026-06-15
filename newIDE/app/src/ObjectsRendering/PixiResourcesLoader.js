@@ -12,6 +12,10 @@ import ResourcesLoader from '../ResourcesLoader';
 import { loadFontFace } from '../Utils/FontFaceLoader';
 import { checkIfCredentialsRequired } from '../Utils/CrossOrigin';
 import { type ResourceKind } from '../ResourcesList/ResourceSource';
+import {
+  getRenderedGifFrameCanvases,
+  isGifResource,
+} from '../Utils/GifFrameRenderer';
 const gd: libGDevelop = global.gd;
 
 type SpineTextureAtlasOrLoadingError = {|
@@ -46,6 +50,8 @@ let loadedBitmapFonts = {};
 let loadedFontFamilies = {};
 let loadedTextures: { [string]: any } = {};
 let loadedSourceRectTextures: { [string]: any } = {};
+let loadedGifFrameTextures: { [string]: Array<any> } = {};
+let loadingGifTextures: { [string]: any } = {};
 const invalidTexture = PIXI.Texture.from('res/invalid_texture.png');
 const loadingTexture = PIXI.Texture.from(
   'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAIAQMAAAD+wSzIAAAAA1BMVEXX19f5cgrAAAAAAXRSTlMz/za5cAAAAApJREFUCNdjQAMAABAAAbSqgB8AAAAASUVORK5CYII='
@@ -284,6 +290,8 @@ export default class PixiResourcesLoader {
     loadedFontFamilies = {};
     loadedTextures = {};
     loadedSourceRectTextures = {};
+    loadedGifFrameTextures = {};
+    loadingGifTextures = {};
     loadedOrLoadingThreeTextures = {};
     loadedOrLoadingThreeMaterials = {};
     loadedOrLoading3DModelPromises = {};
@@ -333,6 +341,8 @@ export default class PixiResourcesLoader {
         delete loadedSourceRectTextures[key];
       }
     });
+    delete loadedGifFrameTextures[resourceName];
+    delete loadingGifTextures[resourceName];
 
     const loadedTexture = loadedTextures[resourceName];
     if (loadedTexture) {
@@ -549,6 +559,34 @@ export default class PixiResourcesLoader {
               isResourceForPixi: true,
             }
           );
+          if (isGifResource(project, resourceName)) {
+            const frameCanvases = await getRenderedGifFrameCanvases({
+              project,
+              resourceName,
+              resourceUrl: url,
+            });
+            const frameTextures = frameCanvases.map(frameCanvas =>
+              PIXI.Texture.from(frameCanvas)
+            );
+            if (!frameTextures.length) {
+              throw new Error(
+                `GIF decoding for "${url}" returned no renderable frames.`
+              );
+            }
+
+            frameTextures.forEach(frameTexture =>
+              applyPixiTextureSettings(resource, frameTexture)
+            );
+            loadedGifFrameTextures[resourceName] = frameTextures;
+            loadedTextures[resourceName] = frameTextures[0];
+            const loadingGifTexture = loadingGifTextures[resourceName];
+            if (loadingGifTexture) {
+              loadingGifTexture.emit('update');
+              delete loadingGifTextures[resourceName];
+            }
+            return;
+          }
+
           PIXI.Assets.setPreferences({
             preferWorkers: false,
             preferCreateImageBitmap: false,
@@ -566,6 +604,11 @@ export default class PixiResourcesLoader {
           applyPixiTextureSettings(resource, loadedTexture);
         } catch (error) {
           loadedTextures[resourceName] = invalidTexture;
+          const loadingGifTexture = loadingGifTextures[resourceName];
+          if (loadingGifTexture) {
+            loadingGifTexture.emit('update');
+            delete loadingGifTextures[resourceName];
+          }
           console.error(
             `Unable to load file ${resource.getFile()} for image resource ${resourceName}:`,
             error ? error : '(unknown error)'
@@ -656,6 +699,22 @@ export default class PixiResourcesLoader {
     const resource = project.getResourcesManager().getResource(resourceName);
     if (resource.getKind() !== 'image') return invalidTexture;
 
+    if (isGifResource(project, resourceName)) {
+      if (loadingGifTextures[resourceName]) {
+        return loadingGifTextures[resourceName];
+      }
+
+      const deferredTexture = new PIXI.Texture(new PIXI.BaseTexture());
+      loadingGifTextures[resourceName] = deferredTexture;
+      PixiResourcesLoader.loadTextures(project, [resourceName]).catch(error => {
+        console.error(`Unable to load GIF texture "${resourceName}":`, error);
+        loadedTextures[resourceName] = invalidTexture;
+        deferredTexture.emit('update');
+        delete loadingGifTextures[resourceName];
+      });
+      return deferredTexture;
+    }
+
     const url = ResourcesLoader.getResourceFullUrl(project, resourceName, {
       isResourceForPixi: true,
     });
@@ -692,6 +751,35 @@ export default class PixiResourcesLoader {
   }
 
   /**
+   * Return a PIXI texture for a frame inside an animated image resource.
+   * It falls back to the whole-image texture for non-animated images.
+   */
+  static getPIXITextureForImageFrame(
+    project: gdProject,
+    resourceName: string,
+    imageFrameIndex: number
+  ): any {
+    const gifFrameTextures = loadedGifFrameTextures[resourceName];
+    if (gifFrameTextures && gifFrameTextures.length) {
+      const wrappedFrameIndex =
+        ((imageFrameIndex % gifFrameTextures.length) +
+          gifFrameTextures.length) %
+        gifFrameTextures.length;
+      const frameTexture = gifFrameTextures[wrappedFrameIndex];
+      if (
+        frameTexture &&
+        !frameTexture.destroyed &&
+        frameTexture.baseTexture &&
+        !frameTexture.baseTexture.destroyed
+      ) {
+        return frameTexture;
+      }
+    }
+
+    return PixiResourcesLoader.getPIXITexture(project, resourceName);
+  }
+
+  /**
    * Return a PIXI texture for a rectangle inside an image resource.
    * The returned texture shares the same base texture as the full image.
    */
@@ -716,7 +804,9 @@ export default class PixiResourcesLoader {
       return texture;
     }
 
-    const sourceRectKey = `sourceRect:${resourceName}:${sourceRect.x}:${sourceRect.y}:${sourceRect.width}:${sourceRect.height}`;
+    const sourceRectKey = `sourceRect:${resourceName}:${sourceRect.x}:${
+      sourceRect.y
+    }:${sourceRect.width}:${sourceRect.height}`;
     const cachedTexture = loadedSourceRectTextures[sourceRectKey];
     if (
       cachedTexture &&

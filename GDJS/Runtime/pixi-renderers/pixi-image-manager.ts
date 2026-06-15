@@ -34,7 +34,19 @@ namespace gdjs {
     }
   };
 
+  const isGifResource = (resourceData: ResourceData): boolean => {
+    const resourcePaths = [resourceData.file, resourceData.name];
+    return resourcePaths.some((resourcePath) =>
+      resourcePath.split('?')[0].toLowerCase().endsWith('.gif')
+    );
+  };
+
   const resourceKinds: Array<ResourceKind> = ['image', 'video'];
+
+  type ImageDecoderConstructor = new (options: {
+    data: ArrayBuffer;
+    type: string;
+  }) => any;
 
   /**
    * PixiImageManager loads and stores textures that can be used by the Pixi.js renderers.
@@ -51,6 +63,8 @@ namespace gdjs {
      * Map associating a resource name to the loaded PixiJS texture.
      */
     private _loadedTextures = new gdjs.ResourceCache<PIXI.Texture>();
+    private _loadedGifFrameTextures = new gdjs.ResourceCache<PIXI.Texture[]>();
+    private _loadedGifFrameTextureSets = new Set<PIXI.Texture[]>();
 
     /**
      * Map associating a resource name to the loaded Three.js texture.
@@ -121,6 +135,37 @@ namespace gdjs {
     }
 
     /**
+     * Return a PIXI texture for a frame inside an animated image resource.
+     * It falls back to the whole-image texture for non-animated images.
+     */
+    getPIXITextureForImageFrame(
+      resourceName: string,
+      imageFrameIndex: integer
+    ): PIXI.Texture {
+      const resource = this._getImageResource(resourceName);
+      if (!resource) {
+        logger.warn(
+          'Unable to find texture for resource "' + resourceName + '".'
+        );
+        return this._invalidTexture;
+      }
+
+      const gifFrameTextures = this._loadedGifFrameTextures.get(resource);
+      if (gifFrameTextures && gifFrameTextures.length) {
+        const wrappedFrameIndex =
+          ((imageFrameIndex % gifFrameTextures.length) +
+            gifFrameTextures.length) %
+          gifFrameTextures.length;
+        const frameTexture = gifFrameTextures[wrappedFrameIndex];
+        if (frameTexture && !frameTexture.destroyed && frameTexture.valid) {
+          return frameTexture;
+        }
+      }
+
+      return this.getPIXITexture(resourceName);
+    }
+
+    /**
      * Return a PIXI texture for a rectangle inside an image resource.
      * The returned texture shares the same base texture as the full image.
      */
@@ -140,7 +185,9 @@ namespace gdjs {
         return texture;
       }
 
-      const key = `sourceRect:${resourceName}:${sourceRect.x}:${sourceRect.y}:${sourceRect.width}:${sourceRect.height}`;
+      const key = `sourceRect:${resourceName}:${sourceRect.x}:${sourceRect.y}:${
+        sourceRect.width
+      }:${sourceRect.height}`;
       const existingTexture = this._rectangleTextures.get(key);
       if (
         existingTexture &&
@@ -457,6 +504,93 @@ namespace gdjs {
       // Do nothing because images are light enough to be parsed in background.
     }
 
+    private async _loadGifFrameTextures(
+      resource: ResourceData,
+      resourceUrl: string
+    ): Promise<PIXI.Texture[] | null> {
+      if (!isGifResource(resource)) {
+        return null;
+      }
+
+      const ImageDecoderClass = (globalThis as any).ImageDecoder as
+        | ImageDecoderConstructor
+        | undefined;
+      if (!ImageDecoderClass) {
+        return null;
+      }
+
+      let decoder: any = null;
+      try {
+        const response = await fetch(resourceUrl, {
+          credentials: this._resourceLoader.checkIfCredentialsRequired(
+            resource.file
+          )
+            ? 'include'
+            : 'same-origin',
+        });
+        if (!response.ok) {
+          throw new Error(
+            `Failed to fetch GIF "${resource.file}": ${response.status} ${
+              response.statusText
+            }`
+          );
+        }
+
+        const arrayBuffer = await response.arrayBuffer();
+        decoder = new ImageDecoderClass({
+          data: arrayBuffer,
+          type: 'image/gif',
+        });
+        if (decoder.tracks && decoder.tracks.ready) {
+          await decoder.tracks.ready;
+        }
+
+        const selectedTrack = decoder.tracks
+          ? decoder.tracks.selectedTrack
+          : null;
+        const frameCount =
+          selectedTrack &&
+          Number.isFinite(selectedTrack.frameCount) &&
+          selectedTrack.frameCount > 0
+            ? selectedTrack.frameCount
+            : 1;
+        const frameTextures: PIXI.Texture[] = [];
+
+        for (let frameIndex = 0; frameIndex < frameCount; frameIndex++) {
+          const decodedFrame = await decoder.decode({ frameIndex });
+          const image = decodedFrame.image;
+          const width = image.displayWidth || image.codedWidth || image.width;
+          const height =
+            image.displayHeight || image.codedHeight || image.height;
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          const context = canvas.getContext('2d');
+          if (!context) {
+            if (typeof image.close === 'function') {
+              image.close();
+            }
+            throw new Error('Unable to create a canvas context for a GIF.');
+          }
+
+          context.drawImage(image, 0, 0);
+          if (typeof image.close === 'function') {
+            image.close();
+          }
+
+          const texture = PIXI.Texture.from(canvas);
+          applyTextureSettings(texture, resource);
+          frameTextures.push(texture);
+        }
+
+        return frameTextures.length ? frameTextures : null;
+      } finally {
+        if (decoder && typeof decoder.close === 'function') {
+          decoder.close();
+        }
+      }
+    }
+
     /**
      * Load the specified resources, so that textures are loaded and can then be
      * used by calling `getPIXITexture`.
@@ -500,6 +634,26 @@ namespace gdjs {
               });
           });
         } else {
+          try {
+            const gifFrameTextures = await this._loadGifFrameTextures(
+              resource,
+              resourceUrl
+            );
+            if (gifFrameTextures && gifFrameTextures.length) {
+              this._loadedGifFrameTextures.set(resource, gifFrameTextures);
+              this._loadedGifFrameTextureSets.add(gifFrameTextures);
+              this._loadedTextures.set(resource, gifFrameTextures[0]);
+              return;
+            }
+          } catch (error) {
+            logger.warn(
+              'Unable to decode GIF frames for file ' +
+                resource.file +
+                '. Falling back to a standard texture.',
+              error
+            );
+          }
+
           // If the file has no extension, PIXI.assets.load cannot find
           // an adequate load parser and does not load the file although
           // we would like to force it to load (we are confident it's an image).
@@ -609,11 +763,37 @@ namespace gdjs {
       return particleTexture;
     }
 
+    private _destroyGifFrameTextures(gifFrameTextures: PIXI.Texture[]): void {
+      for (const gifFrameTexture of gifFrameTextures) {
+        if (gifFrameTexture.destroyed) {
+          continue;
+        }
+
+        gifFrameTexture.destroy(true);
+      }
+    }
+
+    private _destroyLoadedGifFrameTextures(resourceData: ResourceData): void {
+      const gifFrameTextures = this._loadedGifFrameTextures.get(resourceData);
+      if (!gifFrameTextures) {
+        return;
+      }
+
+      this._destroyGifFrameTextures(gifFrameTextures);
+      this._loadedGifFrameTextures.delete(resourceData);
+      this._loadedGifFrameTextureSets.delete(gifFrameTextures);
+    }
+
     /**
      * To be called when the game is disposed.
      * Clear caches of loaded textures and materials.
      */
     dispose(): void {
+      for (const gifFrameTextures of this._loadedGifFrameTextureSets.values()) {
+        this._destroyGifFrameTextures(gifFrameTextures);
+      }
+      this._loadedGifFrameTextureSets.clear();
+      this._loadedGifFrameTextures.clear();
       this._loadedTextures.clear();
 
       const threeTextures: THREE.Texture[] = [];
@@ -660,9 +840,13 @@ namespace gdjs {
 
     unloadResource(resourceData: ResourceData): void {
       const resourceName = resourceData.name;
+      this._destroyLoadedGifFrameTextures(resourceData);
+
       const texture = this._loadedTextures.getFromName(resourceName);
       if (texture) {
-        texture.destroy(true);
+        if (!texture.destroyed) {
+          texture.destroy(true);
+        }
         this._loadedTextures.delete(resourceData);
       }
 

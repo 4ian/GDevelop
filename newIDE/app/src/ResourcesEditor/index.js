@@ -8,6 +8,8 @@ import ResourcePropertiesEditor, {
 } from './ResourcePropertiesEditor';
 import FilePropertiesPanel from './FilePropertiesPanel';
 import ProjectFilesPanel, {
+  findNodeByAbsolutePath,
+  getResourceFromNode,
   type ProjectFilesPanelInterface,
   type ProjectFileNode,
   type ProjectFileSelection,
@@ -25,7 +27,11 @@ import {
   type ResourceKind,
 } from '../ResourcesList/ResourceSource';
 import { type FileMetadata } from '../ProjectsStorage';
-import { getResourceFilePathStatus } from '../ResourcesList/ResourceUtils';
+import {
+  getResourceFilePathStatus,
+  removeAllUnusedResources,
+  removeUnusedResources,
+} from '../ResourcesList/ResourceUtils';
 import type { StorageProvider } from '../ProjectsStorage';
 import {
   registerOnResourceExternallyChangedCallback,
@@ -33,7 +39,6 @@ import {
 } from '../MainFrame/ResourcesWatcher';
 import { showWarningBox } from '../UI/Messages/MessageBox';
 
-const gd: libGDevelop = global.gd;
 const layoutStorageKey = 'gdevelop.resourcesEditor.layout.v1';
 const minWorkingDeskHeight = 220;
 const minProjectFilesHeight = 150;
@@ -243,7 +248,13 @@ export default class ResourcesEditor extends React.Component<Props, State> {
   }
 
   refreshResourcesList = async (): Promise<void> => {
-    if (this._projectFilesPanel) await this._projectFilesPanel.refresh();
+    if (!this._projectFilesPanel) return;
+    await this._projectFilesPanel.refresh();
+  };
+
+  refreshResourcesListAndRemoveUnusedResources = async (): Promise<void> => {
+    this._removeUnusedResourcesFromProject();
+    await this.refreshResourcesList();
   };
 
   getEditorSelectionSnapshot(): ResourcesEditorSelectionSnapshot {
@@ -266,6 +277,45 @@ export default class ResourcesEditor extends React.Component<Props, State> {
         onToggleProperties={this.toggleProperties}
         isPropertiesShown={this.state.isPropertiesShown}
       />
+    );
+  };
+
+  _updateSelectedProjectFileFromRootNode = (rootNode: ProjectFileNode) => {
+    const { project } = this.props;
+    const { selectedProjectFile } = this.state;
+    if (!selectedProjectFile) return;
+
+    const refreshedNode = findNodeByAbsolutePath(
+      rootNode,
+      selectedProjectFile.node.absolutePath
+    );
+    if (!refreshedNode) {
+      this.setState(
+        {
+          selectedResource: null,
+          selectedProjectFile: null,
+        },
+        () => {
+          if (this._propertiesEditor) this._propertiesEditor.forceUpdate();
+          this.updateToolbar();
+        }
+      );
+      return;
+    }
+
+    const refreshedResource = getResourceFromNode(project, refreshedNode);
+    this.setState(
+      {
+        selectedProjectFile: {
+          node: refreshedNode,
+          resource: refreshedResource,
+        },
+        selectedResource: refreshedResource,
+      },
+      () => {
+        if (this._propertiesEditor) this._propertiesEditor.forceUpdate();
+        this.updateToolbar();
+      }
     );
   };
 
@@ -336,24 +386,20 @@ export default class ResourcesEditor extends React.Component<Props, State> {
     });
   };
 
-  _removeUnusedResources = (resourceKind: ResourceKind) => {
-    const { project } = this.props;
+  _removeUnusedResourcesFromProject = (
+    resourceKind?: ResourceKind
+  ): Array<string> => {
+    const { project, resourceManagementProps } = this.props;
     const selectedResourceName = this.state.selectedResource
       ? this.state.selectedResource.getName()
       : null;
 
-    const removedResourceNames = gd.ProjectResourcesAdder.getAllUseless(
-      project,
-      resourceKind
-    ).toJSArray();
-    console.info(
-      `Removing ${
-        removedResourceNames.length
-      } unused ${resourceKind} resource(s):`,
-      removedResourceNames
-    );
+    const removedResourceNames = resourceKind
+      ? removeUnusedResources(project, resourceKind)
+      : removeAllUnusedResources(project);
+    if (!removedResourceNames.length) return removedResourceNames;
 
-    gd.ProjectResourcesAdder.removeAllUseless(project, resourceKind);
+    console.info('Removing unused resource(s):', removedResourceNames);
 
     // The selectedResource might be *invalid* now if it was removed.
     // Be sure to drop the reference to it if that's the case.
@@ -369,6 +415,14 @@ export default class ResourcesEditor extends React.Component<Props, State> {
           : null,
       });
     }
+
+    resourceManagementProps.onResourceUsageChanged();
+
+    return removedResourceNames;
+  };
+
+  _removeUnusedResources = (resourceKind: ResourceKind) => {
+    this._removeUnusedResourcesFromProject(resourceKind);
 
     // Force update of the resources list as otherwise it could render
     // resources that were just deleted.
@@ -650,6 +704,12 @@ export default class ResourcesEditor extends React.Component<Props, State> {
               selectedItem={selectedProjectFile}
               onSelectProjectFile={this._onProjectFileSelected}
               onViewProjectFileProperties={this._openPropertiesDialog}
+              onRefreshProjectFiles={
+                this.refreshResourcesListAndRemoveUnusedResources
+              }
+              onProjectFilesRefreshed={
+                this._updateSelectedProjectFileFromRootNode
+              }
               ref={projectFilesPanel =>
                 (this._projectFilesPanel = projectFilesPanel)
               }

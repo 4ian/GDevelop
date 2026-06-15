@@ -3653,12 +3653,24 @@ describe('McpEditorBridge', () => {
         ],
       },
     };
+    const recentCustomLog = {
+      command: 'console.log',
+      payload: {
+        message:
+          'GroundSlot clicked: index=0, row=0, column=0, occupied=false',
+        type: 'info',
+        group: 'DebuggerTools',
+        internal: false,
+        timestamp: 1234,
+      },
+    };
 
     let callbacks = null;
     const previewDebuggerServer = {
       getServerState: () => 'started',
       getExistingPreviewDebuggerIds: () => ['preview-ws-0', 'preview-ws-1'],
       getExistingDebuggerIds: () => ['preview-ws-0', 'preview-ws-1'],
+      getRecentLogs: id => (id === 'preview-ws-1' ? [recentCustomLog] : []),
       registerCallbacks: registered => {
         callbacks = registered;
         return () => {
@@ -3705,6 +3717,8 @@ describe('McpEditorBridge', () => {
     expect(result.runtime.scenes[0].totalInstances).toBe(3);
     expect(result.runtime.scenes[0].sceneVariables.Score).toBe(42);
     expect(result.runtime.globalVariables.Coins).toBe(7);
+    expect(result.recentLogs).toEqual([recentCustomLog]);
+    expect(result.logs).toEqual(expect.arrayContaining([recentCustomLog]));
   });
 
   it('reports when no preview is running for runtime inspection', async () => {
@@ -4496,7 +4510,7 @@ describe('McpEditorBridge', () => {
     const sent = [];
     const runCommand = jest.fn(commandName => {
       // Simulate the new preview connecting shortly after launch.
-      if (commandName === 'LAUNCH_NEW_PREVIEW' && callbacks) {
+      if (commandName === 'LAUNCH_DEBUG_PREVIEW' && callbacks) {
         setTimeout(() => {
           if (callbacks && callbacks.onConnectionOpened)
             callbacks.onConnectionOpened({
@@ -4559,7 +4573,7 @@ describe('McpEditorBridge', () => {
     expect(result.startPaused).toBe(true);
     expect(result.pauseConfirmed).toBe(true);
     expect(result.debuggerId).toBe('preview-ws-0');
-    expect(runCommand).toHaveBeenCalledWith('LAUNCH_NEW_PREVIEW');
+    expect(runCommand).toHaveBeenCalledWith('LAUNCH_DEBUG_PREVIEW');
     // A pause command was sent to the newly-connected preview.
     expect(
       sent.some(s => s.id === 'preview-ws-0' && s.message.command === 'pause')
@@ -4629,7 +4643,7 @@ describe('McpEditorBridge', () => {
     let callbacks = null;
     let debuggerIds = ['preview-ws-0'];
     const runCommand = jest.fn(commandName => {
-      if (commandName === 'LAUNCH_NEW_PREVIEW' && callbacks) {
+      if (commandName === 'LAUNCH_DEBUG_PREVIEW' && callbacks) {
         setTimeout(() => {
           debuggerIds = ['preview-ws-0', 'preview-ws-1'];
           callbacks &&
@@ -4683,14 +4697,14 @@ describe('McpEditorBridge', () => {
     expect(result.launched).toBe(true);
     expect(result.ready).toBe(true);
     expect(result.debuggerId).toBe('preview-ws-1');
-    expect(runCommand).toHaveBeenCalledWith('LAUNCH_NEW_PREVIEW');
+    expect(runCommand).toHaveBeenCalledWith('LAUNCH_DEBUG_PREVIEW');
   });
 
   it('launch_preview reports not ready when a new preview connects but never answers getStatus', async () => {
     let callbacks = null;
     let debuggerIds = [];
     const runCommand = jest.fn(commandName => {
-      if (commandName === 'LAUNCH_NEW_PREVIEW' && callbacks) {
+      if (commandName === 'LAUNCH_DEBUG_PREVIEW' && callbacks) {
         setTimeout(() => {
           debuggerIds = ['preview-ws-23'];
           callbacks &&

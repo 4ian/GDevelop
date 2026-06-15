@@ -17,10 +17,12 @@ import { AI_SETTINGS_FETCH_TIMEOUT } from '../Utils/GlobalFetchTimeouts';
 import { useAsyncLazyMemo } from '../Utils/UseLazyMemo';
 import { retryIfFailed } from '../Utils/RetryIfFailed';
 import { useInterval } from '../Utils/UseInterval';
+import { useAdaptivePollingInterval } from '../Utils/UseAdaptivePollingInterval';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import {
   aiRequestShouldBeWatched,
   aiRequestHasWorkInProgress,
+  aiRequestPollSawActivity,
 } from './AiRequestUtils';
 import { type EditApprovalRequest } from './Utils';
 
@@ -685,12 +687,31 @@ export const AiRequestProvider = ({
   // The selected AI request and its active sub-agents are watched together by a
   // single polling loop defined further below (see `onWatch`), so that a parent
   // request and all its sub-agents are status-polled in one batched request per
-  // tick instead of one request per entity.
-  const watchPollingIntervalInMs =
+  // tick instead of one request per entity. The interval is adaptive (see
+  // useAdaptivePollingInterval): fast while the agent produces output, backing
+  // off during idle waits to cut polling requests.
+  const baseWatchPollingIntervalInMs =
     (selectedAiRequest &&
       selectedAiRequest.toolOptions &&
       selectedAiRequest.toolOptions.watchPollingIntervalInMs) ||
     1400;
+  const {
+    intervalInMs: currentWatchPollingIntervalInMs,
+    reportTick: reportWatchPollingTick,
+    resetToBase: resetWatchPollingInterval,
+  } = useAdaptivePollingInterval({
+    baseIntervalInMs: baseWatchPollingIntervalInMs,
+    maxIntervalInMs: Math.max(baseWatchPollingIntervalInMs, 5000),
+  });
+
+  // Reset to the fast interval when a new request becomes watched or changes, so
+  // the first updates are picked up quickly. These deps are stable during polling.
+  React.useEffect(
+    () => {
+      resetWatchPollingInterval();
+    },
+    [selectedAiRequestId, shouldWatchRequest, resetWatchPollingInterval]
+  );
 
   React.useEffect(
     () => {
@@ -811,6 +832,10 @@ export const AiRequestProvider = ({
     if (!profile) return;
     const now = Date.now();
 
+    // Set to true whenever this tick observes activity (a status change or new
+    // messages). Used at the end of the tick to drive the adaptive interval.
+    let sawChangeThisTick = false;
+
     const clearFetchingSuggestionsIfDone = (aiRequest: AiRequest) => {
       if (!isFetchingSuggestions) return;
       const output = aiRequest.output || [];
@@ -838,7 +863,8 @@ export const AiRequestProvider = ({
       // Only fetch the messages we don't have yet: ask for everything from the
       // last message we already have onward (re-fetched so its in-place
       // updates, like suggestions, are picked up).
-      const currentOutput = (aiRequests[aiRequestId] || {}).output;
+      const previousAiRequest = aiRequests[aiRequestId];
+      const currentOutput = (previousAiRequest || {}).output;
       const lastMessage =
         currentOutput && currentOutput.length > 0
           ? currentOutput[currentOutput.length - 1]
@@ -852,9 +878,13 @@ export const AiRequestProvider = ({
           outputFromMessageId,
         })
       );
-      updateAiRequest(aiRequestId, previousAiRequest =>
+      // Drive the adaptive polling interval: fast while there is activity.
+      if (aiRequestPollSawActivity(previousAiRequest, fetchedAiRequest)) {
+        sawChangeThisTick = true;
+      }
+      updateAiRequest(aiRequestId, previousAiRequestToMerge =>
         mergeIncrementalAiRequest(
-          previousAiRequest,
+          previousAiRequestToMerge,
           fetchedAiRequest,
           outputFromMessageId
         )
@@ -919,6 +949,7 @@ export const AiRequestProvider = ({
           if (!currentRequest) return;
           if (newStatus !== currentRequest.status) {
             // Status changed — full fetch immediately to pick up new messages.
+            sawChangeThisTick = true;
             await doFullFetch(aiRequestId);
           } else {
             updateAiRequest(aiRequestId, prevRequest => ({
@@ -938,6 +969,9 @@ export const AiRequestProvider = ({
         error
       );
     }
+
+    // Adapt the polling interval based on whether this tick saw any activity.
+    reportWatchPollingTick(sawChangeThisTick);
   };
 
   useInterval(
@@ -945,7 +979,7 @@ export const AiRequestProvider = ({
       onWatch();
     },
     (shouldWatchRequest || hasActiveSubAgents) && !pendingEditApproval
-      ? watchPollingIntervalInMs
+      ? currentWatchPollingIntervalInMs
       : null
   );
 

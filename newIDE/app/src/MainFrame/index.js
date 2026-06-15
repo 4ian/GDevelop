@@ -404,6 +404,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       saveToStorageProviderDialogOpen: false,
       gdjsDevelopmentWatcherEnabled: false,
       toolbarButtons: [],
+      resourcePropertiesSchema: [],
     }: State)
   );
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
@@ -1125,6 +1126,7 @@ const MainFrame = (props: Props): React.MixedElement => {
         currentFileMetadata: null,
         editorTabs: closeProjectTabs(state.editorTabs, currentProject),
         toolbarButtons: [],
+        resourcePropertiesSchema: [],
       }));
 
       // Delete the project from memory. All references to it have been dropped previously
@@ -1247,6 +1249,8 @@ const MainFrame = (props: Props): React.MixedElement => {
             setState(currentState => ({
               ...currentState,
               toolbarButtons: parsedProjectSettings.toolbarButtons || [],
+              resourcePropertiesSchema:
+                parsedProjectSettings.resourceProperties || [],
             }));
           }
         } catch (error) {
@@ -5062,6 +5066,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       canInstallPrivateAsset,
       onNewResourcesAdded,
       onResourceUsageChanged,
+      resourcePropertiesSchema: state.resourcePropertiesSchema,
     }),
     [
       resourceSources,
@@ -5073,6 +5078,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       canInstallPrivateAsset,
       onNewResourcesAdded,
       onResourceUsageChanged,
+      state.resourcePropertiesSchema,
     ]
   );
 

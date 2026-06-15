@@ -9,11 +9,40 @@ const fs = optionalRequire('fs');
 const fsPromises = fs ? fs.promises : null;
 const path = optionalRequire('path');
 
+export type ResourcePropertyType = 'enum' | 'string' | 'boolean' | 'number';
+
+export type ResourcePropertyChoice = {|
+  value: string,
+  label: string,
+|};
+
+export type ResourcePropertyConfig = {|
+  name: string,
+  label: string,
+  type: ResourcePropertyType,
+  description?: string,
+  resourceKinds?: Array<string>,
+  default?: string | number | boolean,
+  choices?: Array<ResourcePropertyChoice>,
+|};
+
 export type ParsedProjectSettings = {
   preferences?: { [string]: boolean | string | number },
   toolbarButtons?: Array<ToolbarButtonConfig>,
   shortcuts?: { [string]: string },
+  resourceProperties?: Array<ResourcePropertyConfig>,
 };
+
+const ALLOWED_RESOURCE_PROPERTY_TYPES: Array<ResourcePropertyType> = [
+  'enum',
+  'string',
+  'boolean',
+  'number',
+];
+
+// Only allow safe characters in property names so they stay clean keys in the
+// resource metadata JSON consumed by the packer.
+const SAFE_PROPERTY_NAME_PATTERN = /^[a-zA-Z0-9_-]+$/;
 
 const SETTINGS_FILE_NAME = 'gdevelop-settings.yaml';
 
@@ -83,6 +112,113 @@ export const parseToolbarButtons = (
   }
 
   return toolbarButtons;
+};
+
+/**
+ * Parses raw `resourceProperties` entries from YAML into validated
+ * ResourcePropertyConfig objects. Invalid entries are skipped with a warning.
+ * Exported for unit testing; file system is not needed.
+ */
+export const parseResourceProperties = (
+  rawResourceProperties: Array<mixed>
+): Array<ResourcePropertyConfig> => {
+  const resourceProperties: Array<ResourcePropertyConfig> = [];
+  const seenNames: Set<string> = new Set();
+
+  for (const rawProperty of rawResourceProperties) {
+    const name = SafeExtractor.extractStringProperty(rawProperty, 'name');
+    const type = SafeExtractor.extractStringProperty(rawProperty, 'type');
+
+    if (!name) {
+      console.warn(
+        '[ProjectSettingsReader] Skipping resource property without a name.'
+      );
+      continue;
+    }
+    if (!SAFE_PROPERTY_NAME_PATTERN.test(name)) {
+      console.warn(
+        `[ProjectSettingsReader] Skipping resource property "${name}": name must match ${SAFE_PROPERTY_NAME_PATTERN.toString()}.`
+      );
+      continue;
+    }
+    if (!type || !ALLOWED_RESOURCE_PROPERTY_TYPES.includes((type: any))) {
+      console.warn(
+        `[ProjectSettingsReader] Skipping resource property "${name}": invalid type "${type ||
+          ''}".`
+      );
+      continue;
+    }
+    // $FlowFixMe[incompatible-type] - type is checked against the allowed list above.
+    const propertyType: ResourcePropertyType = type;
+
+    const label =
+      SafeExtractor.extractStringProperty(rawProperty, 'label') || name;
+    const description =
+      SafeExtractor.extractStringProperty(rawProperty, 'description') ||
+      undefined;
+
+    const config: ResourcePropertyConfig = {
+      name,
+      label,
+      type: propertyType,
+    };
+    if (description) config.description = description;
+
+    const rawResourceKinds = SafeExtractor.extractArrayProperty(
+      rawProperty,
+      'resourceKinds'
+    );
+    if (rawResourceKinds) {
+      const resourceKinds = rawResourceKinds
+        .map(rawKind => (typeof rawKind === 'string' ? rawKind : null))
+        .filter(Boolean);
+      if (resourceKinds.length > 0) config.resourceKinds = resourceKinds;
+    }
+
+    const defaultValue = SafeExtractor.extractNumberOrStringOrBooleanProperty(
+      rawProperty,
+      'default'
+    );
+    if (defaultValue !== null) config.default = defaultValue;
+
+    if (propertyType === 'enum') {
+      const rawChoices = SafeExtractor.extractArrayProperty(
+        rawProperty,
+        'choices'
+      );
+      const choices: Array<ResourcePropertyChoice> = [];
+      if (rawChoices) {
+        for (const rawChoice of rawChoices) {
+          const value = SafeExtractor.extractStringProperty(rawChoice, 'value');
+          if (value === null) continue;
+          const choiceLabel =
+            SafeExtractor.extractStringProperty(rawChoice, 'label') || value;
+          choices.push({ value, label: choiceLabel });
+        }
+      }
+      if (choices.length === 0) {
+        console.warn(
+          `[ProjectSettingsReader] Skipping resource property "${name}": enum type requires at least one choice.`
+        );
+        continue;
+      }
+      config.choices = choices;
+    }
+
+    if (seenNames.has(name)) {
+      console.warn(
+        `[ProjectSettingsReader] Duplicate resource property "${name}": the last definition wins.`
+      );
+      const existingIndex = resourceProperties.findIndex(
+        property => property.name === name
+      );
+      if (existingIndex !== -1) resourceProperties.splice(existingIndex, 1);
+    }
+    seenNames.add(name);
+    resourceProperties.push(config);
+  }
+
+  return resourceProperties;
 };
 
 /**
@@ -184,12 +320,21 @@ export const readProjectSettings = async (
       }
     }
 
+    // Parse resourceProperties section
+    const rawResourceProperties = SafeExtractor.extractArrayProperty(
+      parsed,
+      'resourceProperties'
+    );
+    const resourceProperties = rawResourceProperties
+      ? parseResourceProperties(rawResourceProperties)
+      : [];
+
     console.info(
       `[ProjectSettingsReader] Loaded: ${
         Object.keys(preferences).length
       } preferences, ${toolbarButtons.length} buttons, ${
         Object.keys(shortcuts).length
-      } shortcuts`
+      } shortcuts, ${resourceProperties.length} resource properties`
     );
 
     const result: ParsedProjectSettings = {};
@@ -201,6 +346,9 @@ export const readProjectSettings = async (
     }
     if (Object.keys(shortcuts).length > 0) {
       result.shortcuts = shortcuts;
+    }
+    if (resourceProperties.length > 0) {
+      result.resourceProperties = resourceProperties;
     }
     return result;
   } catch (error) {

@@ -9,12 +9,20 @@ import PropertiesEditor from '../../PropertiesEditor';
 import ResourcePreview from '../../ResourcesList/ResourcePreview';
 import ResourcesLoader from '../../ResourcesLoader';
 import propertiesMapToSchema from '../../PropertiesEditor/PropertiesMapToSchema';
-import { type Schema } from '../../PropertiesEditor/PropertiesEditorSchema';
+import {
+  type Schema,
+  type FieldChoices,
+} from '../../PropertiesEditor/PropertiesEditorSchema';
 
 import {
   type ResourceSource,
   type ResourceManagementProps,
 } from '../../ResourcesList/ResourceSource';
+import { type ResourcePropertyConfig } from '../../Utils/ProjectSettingsReader';
+import {
+  getResourceCustomPropertyValue,
+  setResourceCustomPropertyValue,
+} from '../../ResourcesList/ResourceUtils';
 import useForceUpdate from '../../Utils/UseForceUpdate';
 import { EmbeddedResourcesMappingTable } from './EmbeddedResourcesMappingTable';
 import { Spacer } from '../../UI/Grid';
@@ -33,6 +41,117 @@ type Props = {|
 |};
 
 export type ResourcePropertiesEditorInterface = {| forceUpdate: () => void |};
+
+const buildCustomPropertiesSchema = (
+  resourcePropertiesSchema: Array<ResourcePropertyConfig>,
+  resourceKind: string,
+  forceUpdate: () => void
+): Schema => {
+  const schema: Schema = [];
+
+  resourcePropertiesSchema
+    .filter(
+      config =>
+        !config.resourceKinds ||
+        config.resourceKinds.length === 0 ||
+        config.resourceKinds.includes(resourceKind)
+    )
+    .forEach(config => {
+      const defaultValue = config.default == null ? null : config.default;
+      const getLabel = () => config.label;
+      const getDescription = () =>
+        config.description !== undefined ? config.description : '';
+
+      if (config.type === 'number') {
+        schema.push({
+          name: config.name,
+          getLabel,
+          getDescription,
+          valueType: 'number',
+          getValue: (resource: gdResource): number | null => {
+            const value = getResourceCustomPropertyValue(
+              resource,
+              config.name,
+              defaultValue
+            );
+            if (value === null || value === '') return null;
+            const numberValue = Number(value);
+            return Number.isNaN(numberValue) ? null : numberValue;
+          },
+          setValue: (resource: gdResource, newValue: number) => {
+            setResourceCustomPropertyValue(resource, config.name, newValue);
+            forceUpdate();
+          },
+        });
+        return;
+      }
+
+      if (config.type === 'boolean') {
+        schema.push({
+          name: config.name,
+          getLabel,
+          getDescription,
+          valueType: 'boolean',
+          getValue: (resource: gdResource): boolean => {
+            const value = getResourceCustomPropertyValue(
+              resource,
+              config.name,
+              defaultValue
+            );
+            return value === true || value === 'true' || value === 1;
+          },
+          setValue: (resource: gdResource, newValue: boolean) => {
+            setResourceCustomPropertyValue(resource, config.name, newValue);
+            forceUpdate();
+          },
+        });
+        return;
+      }
+
+      // 'string' and 'enum' are both edited as strings (enum adds choices).
+      const choices: ?Array<FieldChoices> =
+        config.type === 'enum' && config.choices
+          ? config.choices.map(choice => ({
+              value: choice.value,
+              label: choice.label,
+            }))
+          : null;
+      const getValue = (resource: gdResource): string => {
+        const value = getResourceCustomPropertyValue(
+          resource,
+          config.name,
+          defaultValue
+        );
+        return value == null ? '' : String(value);
+      };
+      const setValue = (resource: gdResource, newValue: string) => {
+        setResourceCustomPropertyValue(resource, config.name, newValue);
+        forceUpdate();
+      };
+      if (choices) {
+        schema.push({
+          name: config.name,
+          getLabel,
+          getDescription,
+          valueType: 'string',
+          getChoices: () => choices,
+          getValue,
+          setValue,
+        });
+      } else {
+        schema.push({
+          name: config.name,
+          getLabel,
+          getDescription,
+          valueType: 'string',
+          getValue,
+          setValue,
+        });
+      }
+    });
+
+  return schema;
+};
 
 const renderEmpty = () => {
   return (
@@ -180,14 +299,20 @@ const ResourcePropertiesEditor: React.ComponentType<{
           layersContainer: null,
         });
 
+        const customSchema = buildCustomPropertiesSchema(
+          resourceManagementProps.resourcePropertiesSchema,
+          resources[0].getKind(),
+          forceUpdate
+        );
+
         return (
           <PropertiesEditor
-            schema={schema.concat(resourceSchema)}
+            schema={schema.concat(resourceSchema).concat(customSchema)}
             instances={resources}
           />
         );
       },
-      [resources, schema, forceUpdate]
+      [resources, schema, forceUpdate, resourceManagementProps]
     );
 
     const renderPreview = () => {

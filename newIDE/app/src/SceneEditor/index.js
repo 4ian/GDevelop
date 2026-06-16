@@ -1,3 +1,4 @@
+// Trigger CI
 // @flow
 import { Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
@@ -22,6 +23,7 @@ import { type ObjectEditorTab } from '../ObjectEditor/ObjectEditorDialog';
 import MosaicEditorsDisplayToolbar from './MosaicEditorsDisplay/Toolbar';
 import SwipeableDrawerEditorsDisplayToolbar from './SwipeableDrawerEditorsDisplay/Toolbar';
 import { serializeToJSObject } from '../Utils/Serializer';
+import optionalRequire from '../Utils/OptionalRequire';
 import Clipboard from '../Utils/Clipboard';
 import { SafeExtractor } from '../Utils/SafeExtractor';
 import Window from '../Utils/Window';
@@ -45,6 +47,10 @@ import {
   saveToHistory,
 } from '../Utils/History';
 import PixiResourcesLoader from '../ObjectsRendering/PixiResourcesLoader';
+import ResourcesLoader from '../ResourcesLoader';
+import { checkIfCredentialsRequired } from '../Utils/CrossOrigin';
+import EventsFunctionsExtensionsContext from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
+import { addSerializedExtensionsToProject } from '../AssetStore/ExtensionStore/InstallExtension';
 import {
   type ObjectWithContext,
   type GroupWithContext,
@@ -312,6 +318,7 @@ type CopyCutPasteOptions = {|
 const editSceneIconReactNode = <EditSceneIcon />;
 
 export default class SceneEditor extends React.Component<Props, State> {
+  static contextType = EventsFunctionsExtensionsContext;
   instancesSelection: InstancesSelection;
   contextMenu: ?ContextMenuInterface;
   editorDisplay: ?SceneEditorsDisplayInterface;
@@ -372,6 +379,687 @@ export default class SceneEditor extends React.Component<Props, State> {
       lastSelectionType: 'instance',
     };
   }
+
+  saveCurrentScene = async () => {
+    const { layout, project } = this.props;
+    if (!layout) {
+      Window.showMessageBox('No scene is currently open.');
+      return;
+    }
+
+    const remote = optionalRequire('@electron/remote');
+    const fs = optionalRequire('fs');
+    const path = optionalRequire('path');
+    const isDesktop = !!(remote && fs && path);
+
+    // Costruisci l'export: leggi il blocco scena dal progetto serializzato
+    const serializedProject = serializeToJSObject(project);
+    const sceneJson = (serializedProject.layouts || []).find(
+      l => l.name === layout.getName()
+    );
+
+    if (!sceneJson) {
+      Window.showMessageBox(
+        'Scene not found in the serialized project. Please save the project first (Ctrl+S), then try again.',
+        'warning'
+      );
+      return;
+    }
+
+    // Extract global objects and groups from the serialized project
+    const globalObjects = serializedProject.objects || [];
+    const globalObjectsGroups = serializedProject.objectsGroups || [];
+    const globalObjectsFolderStructure =
+      serializedProject.objectsFolderStructure || null;
+
+    // Detect and serialize extensions used by object behaviors and types
+    // (scan both scene objects AND global objects)
+    const extensionNames = new Set();
+    const allObjectsToScan = [...(sceneJson.objects || []), ...globalObjects];
+    allObjectsToScan.forEach(obj => {
+      (obj.behaviors || []).forEach(b => {
+        const bType = b.type || '';
+        if (bType.includes('::')) {
+          const extName = bType.split('::')[0];
+          if (project.hasEventsFunctionsExtensionNamed(extName)) {
+            extensionNames.add(extName);
+          }
+        }
+      });
+      const objType = obj.type || '';
+      if (objType.includes('::')) {
+        const extName = objType.split('::')[0];
+        if (project.hasEventsFunctionsExtensionNamed(extName)) {
+          extensionNames.add(extName);
+        }
+      }
+    });
+    const extensionsData = [];
+    extensionNames.forEach(extName => {
+      try {
+        const ext = project.getEventsFunctionsExtension(extName);
+        extensionsData.push(serializeToJSObject(ext));
+      } catch (e) {
+        console.warn('Could not serialize extension ' + extName + ':', e);
+      }
+    });
+
+    // Embed resources as base64 (scan scene + extensions)
+    const resourcesManager = project.getResourcesManager();
+    const usedResourceNames = new Set();
+    const scanForResources = val => {
+      if (
+        typeof val === 'string' &&
+        val.length > 0 &&
+        resourcesManager.hasResource(val)
+      ) {
+        usedResourceNames.add(val);
+      } else if (val && typeof val === 'object') {
+        Object.values(val).forEach(scanForResources);
+      }
+    };
+    scanForResources(sceneJson);
+    extensionsData.forEach(scanForResources);
+    globalObjects.forEach(scanForResources);
+
+    // Helper to convert ArrayBuffer to base64 (browser + desktop compatible)
+    const arrayBufferToBase64 = buffer => {
+      const bytes = new Uint8Array(buffer);
+      let binary = '';
+      const chunkSize = 8192;
+      for (let i = 0; i < bytes.length; i += chunkSize) {
+        binary += String.fromCharCode.apply(
+          null,
+          bytes.subarray(i, i + chunkSize)
+        );
+      }
+      return btoa(binary);
+    };
+
+    const resourcesData = [];
+    for (const resourceName of usedResourceNames) {
+      const resource = resourcesManager.getResource(resourceName);
+      const serialized = serializeToJSObject(resource);
+      const resourceFile = serialized.file || '';
+      const resourceKind = resource.getKind();
+      let base64Data = null;
+      try {
+        // 1. Desktop con file locale: prova a leggere dal disco
+        if (isDesktop && resourceFile && !resourceFile.startsWith('http')) {
+          const projectFilePath = project.getProjectFile
+            ? project.getProjectFile()
+            : null;
+          const projectPath = projectFilePath
+            ? path.dirname(projectFilePath)
+            : null;
+          if (projectPath) {
+            const absolutePath = path.isAbsolute(resourceFile)
+              ? resourceFile
+              : path.join(projectPath, resourceFile);
+            if (fs.existsSync(absolutePath)) {
+              base64Data = fs.readFileSync(absolutePath).toString('base64');
+            }
+          }
+        }
+
+        // 2. Se non ancora ottenuto (cloud, URL, o file locale non trovato): fetch via URL GDevelop
+        if (!base64Data) {
+          const fullUrl = ResourcesLoader.getResourceFullUrl(
+            project,
+            resourceName,
+            {
+              isResourceForPixi: true,
+            }
+          );
+          if (fullUrl) {
+            const needsCreds = checkIfCredentialsRequired(fullUrl);
+            try {
+              const response = await fetch(fullUrl, {
+                credentials: needsCreds ? 'include' : 'omit',
+              });
+              if (response.ok) {
+                const buffer = await response.arrayBuffer();
+                base64Data = arrayBufferToBase64(buffer);
+              } else {
+                console.warn(
+                  'Could not fetch resource ' +
+                    resourceName +
+                    ': HTTP ' +
+                    response.status
+                );
+              }
+            } catch (fetchErr) {
+              console.warn(
+                'Could not fetch resource ' + resourceName + ':',
+                fetchErr
+              );
+            }
+          }
+        }
+      } catch (e) {
+        console.warn('Could not embed resource ' + resourceName + ':', e);
+      }
+      resourcesData.push({
+        ...serialized,
+        name: resourceName,
+        kind: resourceKind,
+        base64Data,
+        originalFile: resourceFile,
+      });
+    }
+
+    // Warn if some resources could not be embedded
+    const failedResources = resourcesData.filter(
+      r => !r.base64Data && r.originalFile && r.originalFile.startsWith('http')
+    );
+    if (failedResources.length > 0) {
+      const names = failedResources.map(r => r.name).join(', ');
+      const proceed = Window.showConfirmDialog(
+        'Warning: could not embed these resources: ' +
+          names +
+          '. They may not work after loading. Export anyway?'
+      );
+      if (!proceed) return;
+    }
+
+    const exportData = {
+      _version: 3,
+      _gdevelop: 'scene-export',
+      resources: resourcesData,
+      extensions: extensionsData,
+      globalObjects: globalObjects,
+      globalObjectsGroups: globalObjectsGroups,
+      globalObjectsFolderStructure: globalObjectsFolderStructure,
+      scene: sceneJson,
+    };
+
+    const json = JSON.stringify(exportData, null, 2);
+    const fileName = layout.getName() + '.scene.json';
+
+    if (isDesktop) {
+      // Desktop: usa dialog nativo
+      const result = await remote.dialog.showSaveDialog(
+        remote.getCurrentWindow(),
+        {
+          title: 'Save Scene',
+          defaultPath: fileName,
+          filters: [{ name: 'GDevelop Scene JSON', extensions: ['json'] }],
+        }
+      );
+      const filePath = result.filePath || result;
+      if (!filePath || result.canceled) return;
+      fs.writeFileSync(filePath, json, 'utf8');
+      Window.showMessageBox('Scene exported successfully!', 'info');
+    } else {
+      // Browser/cloud: scarica come file
+      const blob = new Blob([json], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+  };
+
+  loadSceneFromFile = async () => {
+    const { layout, project } = this.props;
+    if (!layout) {
+      Window.showMessageBox('No scene is currently open.');
+      return;
+    }
+
+    const remote = optionalRequire('@electron/remote');
+    const fs = optionalRequire('fs');
+    const path = optionalRequire('path');
+    const isDesktop = !!(remote && fs && path);
+
+    // Leggi il file (desktop o browser)
+    let exportData;
+
+    if (isDesktop) {
+      const result = await remote.dialog.showOpenDialog(
+        remote.getCurrentWindow(),
+        {
+          title: 'Load Scene',
+          filters: [{ name: 'GDevelop Scene JSON', extensions: ['json'] }],
+          properties: ['openFile'],
+        }
+      );
+      const filePaths = result.filePaths || result;
+      if (!filePaths || filePaths.length === 0 || result.canceled) return;
+      try {
+        exportData = JSON.parse(fs.readFileSync(filePaths[0], 'utf8'));
+      } catch (e) {
+        Window.showMessageBox('Could not read the file: ' + e.message, 'error');
+        return;
+      }
+    } else {
+      // Browser: usa input file
+      exportData = await new Promise(resolve => {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.json';
+        input.onchange = e => {
+          const file = e.target.files[0];
+          if (!file) {
+            resolve(null);
+            return;
+          }
+          const reader = new FileReader();
+          reader.onload = ev => {
+            try {
+              resolve(JSON.parse(ev.target.result));
+            } catch (err) {
+              Window.showMessageBox('Invalid JSON file.', 'error');
+              resolve(null);
+            }
+          };
+          reader.readAsText(file);
+        };
+        input.click();
+      });
+      if (!exportData) return;
+    }
+
+    if (!exportData || exportData._gdevelop !== 'scene-export') {
+      Window.showMessageBox(
+        'This file does not appear to be a valid GDevelop scene export.',
+        'error'
+      );
+      return;
+    }
+
+    const isV3 = exportData._version === 3;
+    let needsResourceFetch = false;
+
+    try {
+      // 1. Registra le risorse nel ResourcesManager
+      const resourcesManager = project.getResourcesManager();
+      if (exportData.resources && Array.isArray(exportData.resources)) {
+        const projectFilePath =
+          isDesktop && project.getProjectFile ? project.getProjectFile() : null;
+        const projectPath =
+          isDesktop && projectFilePath && projectFilePath.includes('.json')
+            ? path.dirname(projectFilePath)
+            : null;
+
+        for (const res of exportData.resources) {
+          // Determina il file da usare per la risorsa:
+          // - Desktop con percorso: scrivi su disco e usa percorso relativo
+          // - Cloud o senza percorso: usa l'URL originale (GDevelop lo riscarica)
+          //   oppure il base64 come fallback
+          let fileToUse = res.originalFile || '';
+
+          if (projectPath && res.base64Data) {
+            // Desktop: write file to disk
+            let targetRelativePath =
+              res.originalFile || 'assets/image/' + res.name + '.png';
+            if (targetRelativePath.startsWith('http')) {
+              const ext = res.originalFile
+                ? res.originalFile
+                    .split('.')
+                    .pop()
+                    .split('?')[0]
+                : 'png';
+              targetRelativePath = 'assets/image/' + res.name + '.' + ext;
+            }
+            const absoluteTarget = path.join(projectPath, targetRelativePath);
+            const targetDir = path.dirname(absoluteTarget);
+            if (!fs.existsSync(targetDir))
+              fs.mkdirSync(targetDir, { recursive: true });
+            fs.writeFileSync(
+              absoluteTarget,
+              Buffer.from(res.base64Data, 'base64')
+            );
+            fileToUse = targetRelativePath;
+          } else if (res.base64Data) {
+            // Cloud: convert base64 to same-origin Blob URL.
+            // GDevelop will download and re-upload to cloud on next save.
+            const mimeTypes = {
+              image: 'image/png',
+              audio: 'audio/mpeg',
+              font: 'font/ttf',
+              video: 'video/mp4',
+              json: 'application/json',
+              model3D: 'model/gltf-binary',
+              tilemap: 'application/json',
+              tileset: 'application/json',
+              bitmapFont: 'application/octet-stream',
+              atlas: 'application/octet-stream',
+              spine: 'application/json',
+            };
+            const mime =
+              mimeTypes[res.kind || 'image'] || 'application/octet-stream';
+            const binaryStr = atob(res.base64Data);
+            const bytes = new Uint8Array(binaryStr.length);
+            for (let i = 0; i < binaryStr.length; i++)
+              bytes[i] = binaryStr.charCodeAt(i);
+            const blob = new Blob([bytes], { type: mime });
+            fileToUse = URL.createObjectURL(blob);
+            needsResourceFetch = true;
+          } else if (res.originalFile) {
+            // Fallback: use original URL (public asset store, etc.)
+            fileToUse = res.originalFile;
+            needsResourceFetch = true;
+          }
+
+          // Use the correct constructor based on resource kind
+          if (!resourcesManager.hasResource(res.name)) {
+            let newResource;
+            const kind = res.kind || 'image';
+            if (kind === 'audio') newResource = new gd.AudioResource();
+            else if (kind === 'font') newResource = new gd.FontResource();
+            else if (kind === 'video') newResource = new gd.VideoResource();
+            else if (kind === 'json') newResource = new gd.JsonResource();
+            else if (kind === 'tilemap') newResource = new gd.TilemapResource();
+            else if (kind === 'tileset') newResource = new gd.TilesetResource();
+            else if (kind === 'bitmapFont')
+              newResource = new gd.BitmapFontResource();
+            else if (kind === 'model3D') newResource = new gd.Model3DResource();
+            else if (kind === 'atlas') newResource = new gd.AtlasResource();
+            else if (kind === 'spine') newResource = new gd.SpineResource();
+            else newResource = new gd.ImageResource();
+            newResource.setName(res.name);
+            newResource.setFile(fileToUse);
+            if (res.smoothed !== undefined && newResource.setSmooth) {
+              newResource.setSmooth(res.smoothed);
+            }
+            resourcesManager.addResource(newResource);
+            newResource.delete();
+          } else {
+            resourcesManager.getResource(res.name).setFile(fileToUse);
+          }
+        }
+      }
+
+      // 2. Installa le estensioni mancanti nel progetto (con caricamento completo dei comportamenti)
+      if (
+        exportData.extensions &&
+        Array.isArray(exportData.extensions) &&
+        exportData.extensions.length > 0
+      ) {
+        const missingExtensions = exportData.extensions.filter(
+          extData =>
+            extData.name &&
+            !project.hasEventsFunctionsExtensionNamed(extData.name)
+        );
+        if (missingExtensions.length > 0) {
+          const extNames = missingExtensions.map(e => e.name);
+          if (this.props.onWillInstallExtension)
+            this.props.onWillInstallExtension(extNames);
+          const eventsFunctionsExtensionsState = this.context;
+          if (eventsFunctionsExtensionsState) {
+            await addSerializedExtensionsToProject(
+              eventsFunctionsExtensionsState,
+              project,
+              missingExtensions,
+              []
+            );
+          }
+          if (this.props.onExtensionInstalled)
+            this.props.onExtensionInstalled(extNames);
+        }
+      }
+
+      // 3. Import global objects into the project (if not already present)
+      if (exportData.globalObjects && Array.isArray(exportData.globalObjects)) {
+        const globalObjectsContainer = project.getObjects();
+        exportData.globalObjects.forEach(objData => {
+          const objName = objData.name;
+          const objType = objData.type;
+          if (!objName || !objType) return;
+          if (!globalObjectsContainer.hasObjectNamed(objName)) {
+            try {
+              const newObj = globalObjectsContainer.insertNewObjectInFolder(
+                project,
+                objType,
+                objName,
+                globalObjectsContainer.getRootFolder(),
+                globalObjectsContainer.getObjectsCount()
+              );
+              unserializeFromJSObject(
+                newObj,
+                objData,
+                'unserializeFrom',
+                project
+              );
+              newObj.setName(objName);
+            } catch (e) {
+              console.warn(
+                'Could not import global object ' + objName + ':',
+                e
+              );
+            }
+          }
+        });
+      }
+
+      // 3b. Import global object groups
+      if (
+        exportData.globalObjectsGroups &&
+        Array.isArray(exportData.globalObjectsGroups) &&
+        exportData.globalObjectsGroups.length > 0
+      ) {
+        try {
+          const globalGroupsContainer = project.getObjectGroups();
+          exportData.globalObjectsGroups.forEach(groupData => {
+            if (!groupData.name) return;
+            if (globalGroupsContainer.has(groupData.name)) {
+              globalGroupsContainer.remove(groupData.name);
+            }
+            const newGroup = new gd.ObjectGroup();
+            newGroup.setName(groupData.name);
+            (groupData.objects || []).forEach(objRef => {
+              if (objRef.name) newGroup.addObject(objRef.name);
+            });
+            globalGroupsContainer.insert(
+              newGroup,
+              globalGroupsContainer.count()
+            );
+            newGroup.delete();
+          });
+        } catch (e) {
+          console.warn('Could not import global object groups:', e);
+        }
+      }
+
+      // 4. Import scene objects and instances into memory
+      this.instancesSelection.clearSelection();
+      const objectsContainer = this.props.objectsContainer;
+      const sceneToImport = isV3 ? exportData.scene : exportData;
+      const objectsList = isV3
+        ? sceneToImport.objects || []
+        : exportData.objects || [];
+
+      objectsList.forEach(objData => {
+        const objName = objData.name;
+        const objType = objData.type;
+        if (!objName || !objType) return;
+        if (objectsContainer.hasObjectNamed(objName)) {
+          unserializeFromJSObject(
+            objectsContainer.getObject(objName),
+            objData,
+            'unserializeFrom',
+            project
+          );
+        } else {
+          const newObj = objectsContainer.insertNewObjectInFolder(
+            project,
+            objType,
+            objName,
+            objectsContainer.getRootFolder(),
+            objectsContainer.getObjectsCount()
+          );
+          unserializeFromJSObject(newObj, objData, 'unserializeFrom', project);
+          newObj.setName(objName);
+        }
+      });
+
+      // 2b. Ricostruisci i layer mancanti PRIMA di caricare le istanze
+      const layersList = isV3
+        ? sceneToImport.layers || []
+        : exportData.layers || [];
+      const layersContainer = this.props.layersContainer;
+      if (layersContainer && layersList.length > 0) {
+        layersList.forEach(layerData => {
+          const layerName = layerData.name !== undefined ? layerData.name : '';
+          if (!layersContainer.hasLayerNamed(layerName)) {
+            layersContainer.insertNewLayer(
+              layerName,
+              layersContainer.getLayersCount()
+            );
+          }
+        });
+      }
+
+      const instancesList = isV3
+        ? sceneToImport.instances || []
+        : exportData.instances || [];
+      unserializeFromJSObject(
+        this.props.initialInstances,
+        instancesList,
+        'unserializeFrom',
+        project
+      );
+
+      // 3. Restore scene events in memory (cloud + desktop)
+      const eventsToImport = isV3
+        ? sceneToImport.events || []
+        : exportData.events || [];
+      if (eventsToImport.length > 0) {
+        try {
+          const eventsList = layout.getEvents();
+
+          // Clear existing events
+          while (eventsList.getEventsCount() > 0) {
+            eventsList.removeEventAt(0);
+          }
+
+          // Try different deserialization methods
+          const eventsElement = gd.Serializer.fromJSObject(eventsToImport);
+
+          if (
+            gd.EventsListSerialization &&
+            gd.EventsListSerialization.unserializeEventsFrom
+          ) {
+            gd.EventsListSerialization.unserializeEventsFrom(
+              project,
+              eventsList,
+              eventsElement
+            );
+          } else if (eventsList.unserializeFrom) {
+            eventsList.unserializeFrom(project, eventsElement);
+          } else {
+            console.warn('Could not find a method to import events.');
+          }
+          eventsElement.delete();
+        } catch (eventErr) {
+          console.error('Error importing scene events:', eventErr);
+        }
+      }
+
+      // 4. Restore scene variables
+      const variablesToImport = isV3
+        ? sceneToImport.variables || []
+        : exportData.variables || [];
+      if (variablesToImport.length > 0) {
+        try {
+          const variablesContainer = layout.getVariables();
+          const varElement = gd.Serializer.fromJSObject(variablesToImport);
+          try {
+            variablesContainer.unserializeFrom(varElement);
+          } catch (e1) {
+            try {
+              variablesContainer.unserializeFrom(project, varElement);
+            } catch (e2) {
+              console.warn('Could not restore scene variables:', e2);
+            }
+          }
+          varElement.delete();
+        } catch (varErr) {
+          console.error('Error importing scene variables:', varErr);
+        }
+      }
+
+      // 6. Restore scene object groups
+      const groupsToImport = isV3
+        ? sceneToImport.objectsGroups || []
+        : exportData.objectsGroups || [];
+      if (groupsToImport.length > 0) {
+        try {
+          const groupsContainer = this.props.objectsContainer.getObjectGroups();
+          groupsToImport.forEach(groupData => {
+            if (!groupData.name) return;
+            try {
+              if (groupsContainer.has(groupData.name)) {
+                groupsContainer.remove(groupData.name);
+              }
+              const newGroup = new gd.ObjectGroup();
+              newGroup.setName(groupData.name);
+              (groupData.objects || []).forEach(objRef => {
+                if (objRef.name) newGroup.addObject(objRef.name);
+              });
+              groupsContainer.insert(newGroup, groupsContainer.count());
+              newGroup.delete();
+            } catch (innerErr) {}
+          });
+        } catch (groupErr) {}
+      }
+    } catch (e) {
+      console.error('Failed to restore scene data:', e);
+      Window.showMessageBox(
+        'The scene could not be loaded: ' + e.message,
+        'error'
+      );
+      return;
+    }
+
+    this.setState(
+      {
+        history: saveToHistory(
+          this.state.history,
+          this.props.initialInstances,
+          'EDIT'
+        ),
+      },
+      () => {
+        if (this.editorDisplay)
+          this.editorDisplay.instancesHandlers.forceRemountInstancesRenderers();
+        this.forceUpdateObjectsList();
+        this.forceUpdateObjectGroupsList();
+        this.forceUpdateLayersList();
+        this.updateToolbar();
+        this._sendHotReloadAllInstances();
+        if (this.props.unsavedChanges)
+          this.props.unsavedChanges.triggerUnsavedChanges();
+
+        // Notify GDevelop about new resources and force thumbnail refresh
+        const rmp = this.props.resourceManagementProps;
+        if (rmp) {
+          if (rmp.onNewResourcesAdded) rmp.onNewResourcesAdded();
+          if (rmp.onResourceUsageChanged) rmp.onResourceUsageChanged();
+          if (needsResourceFetch && rmp.onFetchNewlyAddedResources) {
+            rmp
+              .onFetchNewlyAddedResources()
+              .then(() => {
+                if (rmp.onNewResourcesAdded) rmp.onNewResourcesAdded();
+                if (rmp.onResourceUsageChanged) rmp.onResourceUsageChanged();
+                this.forceUpdateObjectsList();
+                if (this.editorDisplay)
+                  this.editorDisplay.instancesHandlers.forceRemountInstancesRenderers();
+              })
+              .catch(e => console.error('Resource fetch failed:', e));
+          }
+        }
+
+        // Trigger automatic project save
+        window.dispatchEvent(new CustomEvent('gdevelop-scene-imported'));
+      }
+    );
+  };
 
   componentDidUpdate(prevProps: Props, prevState: State) {
     if (this.state.history !== prevState.history)
@@ -685,7 +1373,9 @@ export default class SceneEditor extends React.Component<Props, State> {
       editorDisplay.forceUpdateObjectsList();
 
       // Find all the objects using the resources that were reloaded.
-      const objectNames = new Set<string>();
+      /** @type {Set<string>} */
+      const objectNames = new Set();
+
       for (const resourceName of resourceNames) {
         const objectsCollector = new gd.ObjectsUsingResourceCollector(
           project.getResourcesManager(),

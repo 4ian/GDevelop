@@ -1003,6 +1003,7 @@ export const ChatMessages: React.ComponentType<Props> = React.memo<Props>(
                               existingFunctionCallOutput
                             }
                             editorCallbacks={editorCallbacks}
+                            isRequestStopped={aiRequest.status === 'suspended'}
                           />
                         )
                       )}
@@ -1096,6 +1097,9 @@ export const ChatMessages: React.ComponentType<Props> = React.memo<Props>(
                                     existingFunctionCallOutput
                                   }
                                   editorCallbacks={editorCallbacks}
+                                  isRequestStopped={
+                                    aiRequest.status === 'suspended'
+                                  }
                                 />
                               )
                             )}

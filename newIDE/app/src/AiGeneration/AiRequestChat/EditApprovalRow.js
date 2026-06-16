@@ -11,6 +11,7 @@ import { type EditApprovalRequest } from '../Utils';
 type Props = {|
   pendingEditApproval: EditApprovalRequest,
   onResolveEditApproval: (accepted: boolean) => void,
+  onAcceptAndEnableAutoEdit: () => void,
 |};
 
 const styles = {
@@ -23,14 +24,12 @@ const styles = {
 
 /**
  * Inline confirmation shown in the chat when auto-edit is off and the AI is
- * about to modify the project. The first line ("Apply this change: …", styled
- * like the chat's status line) wraps as needed; the second line holds the
- * No (suspends the request so the user can redirect) / Yes (runs the edit and
- * the rest of that edit agent's tools) buttons.
+ * about to modify the project.
  */
 export const EditApprovalRow = ({
   pendingEditApproval,
   onResolveEditApproval,
+  onAcceptAndEnableAutoEdit,
 }: Props): React.Node => (
   <ColumnStackLayout noMargin>
     <LineStackLayout noMargin alignItems="flex-start">
@@ -39,16 +38,20 @@ export const EditApprovalRow = ({
         <Trans>Apply this change:</Trans> {pendingEditApproval.label}
       </Text>
     </LineStackLayout>
-    <LineStackLayout noMargin alignItems="center">
+    <ColumnStackLayout noMargin alignItems="flex-start">
+      <RaisedButton
+        primary
+        label={<Trans>Yes, just this change</Trans>}
+        onClick={() => onResolveEditApproval(true)}
+      />
+      <FlatButton
+        label={<Trans>Yes, and enable auto-edit</Trans>}
+        onClick={onAcceptAndEnableAutoEdit}
+      />
       <FlatButton
         label={<Trans>No</Trans>}
         onClick={() => onResolveEditApproval(false)}
       />
-      <RaisedButton
-        primary
-        label={<Trans>Yes</Trans>}
-        onClick={() => onResolveEditApproval(true)}
-      />
-    </LineStackLayout>
+    </ColumnStackLayout>
   </ColumnStackLayout>
 );

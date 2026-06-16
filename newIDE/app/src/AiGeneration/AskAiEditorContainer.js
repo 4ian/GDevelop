@@ -1099,6 +1099,13 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
           title: MessageDescriptor,
           message: MessageDescriptor,
         |}): Promise<boolean> => {
+          if (pendingEditApproval) {
+            // Paused on an inline edit approval (not actively working): leaving
+            // refuses the pending change, which suspends the request. Don't show
+            // the "is working" prompt.
+            resolveEditApproval(false);
+            return true;
+          }
           if (!getHasWorkInProgress()) return true;
           const answer = await showYesNoCancel({
             title,
@@ -1126,7 +1133,14 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
           // running in the background.
           return true;
         },
-        [getHasWorkInProgress, showYesNoCancel, upToDateOnStop, isMobile]
+        [
+          pendingEditApproval,
+          resolveEditApproval,
+          getHasWorkInProgress,
+          showYesNoCancel,
+          upToDateOnStop,
+          isMobile,
+        ]
       );
 
       // Called when the AI editor is about to be closed by an explicit user
@@ -1152,6 +1166,13 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
           title: MessageDescriptor,
           message: MessageDescriptor,
         |}): Promise<boolean> => {
+          if (pendingEditApproval) {
+            // Paused on an inline edit approval (not actively working): leaving
+            // refuses the pending change, which suspends the request. Don't show
+            // the "is working" prompt.
+            resolveEditApproval(false);
+            return true;
+          }
           if (!getHasWorkInProgress()) return true;
           const shouldStop = await showConfirmation({
             title,
@@ -1163,7 +1184,13 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
           await upToDateOnStop.current();
           return true;
         },
-        [getHasWorkInProgress, showConfirmation, upToDateOnStop]
+        [
+          pendingEditApproval,
+          resolveEditApproval,
+          getHasWorkInProgress,
+          showConfirmation,
+          upToDateOnStop,
+        ]
       );
       const upToDateConfirmStopping = useStableUpToDateRef(
         confirmStoppingWorkingRequest

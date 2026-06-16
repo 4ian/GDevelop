@@ -4409,6 +4409,23 @@ const MainFrame = (props: Props): React.MixedElement => {
     ]
   );
 
+  // Automatically save the project after a scene import, so that newly
+  // added resources are persisted to the storage provider (e.g. cloud).
+  React.useEffect(
+    () => {
+      const handleSceneImported = () => {
+        saveProject();
+      };
+      window.addEventListener('gdevelop-scene-imported', handleSceneImported);
+      return () =>
+        window.removeEventListener(
+          'gdevelop-scene-imported',
+          handleSceneImported
+        );
+    },
+    [saveProject]
+  );
+
   const renderSaveReminder = useSaveReminder({
     onSave: saveProject,
     project: currentProject,
@@ -5172,6 +5189,32 @@ const MainFrame = (props: Props): React.MixedElement => {
     onOpenAskAi: openAskAi,
     onSelectAll: selectAllInActiveEditors,
     setElectronUpdateStatus: setElectronUpdateStatus,
+    onSaveScene: () => {
+      for (const paneIdentifier in state.editorTabs.panes) {
+        const currentTab = getCurrentTabForPane(
+          state.editorTabs,
+          paneIdentifier
+        );
+        const editorRef = currentTab ? currentTab.editorRef : null;
+        if (editorRef && editorRef.saveCurrentScene) {
+          editorRef.saveCurrentScene();
+          return;
+        }
+      }
+    },
+    onLoadScene: () => {
+      for (const paneIdentifier in state.editorTabs.panes) {
+        const currentTab = getCurrentTabForPane(
+          state.editorTabs,
+          paneIdentifier
+        );
+        const editorRef = currentTab ? currentTab.editorRef : null;
+        if (editorRef && editorRef.loadSceneFromFile) {
+          editorRef.loadSceneFromFile();
+          return;
+        }
+      }
+    },
   };
 
   const isProjectOwnedBySomeoneElse =

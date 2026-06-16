@@ -23,7 +23,6 @@ import {
   getResourceCustomPropertyValue,
   setResourceCustomPropertyValue,
 } from '../../ResourcesList/ResourceUtils';
-import ResourceDictionaryPropertyEditor from './ResourceDictionaryPropertyEditor';
 import useForceUpdate from '../../Utils/UseForceUpdate';
 import { EmbeddedResourcesMappingTable } from './EmbeddedResourcesMappingTable';
 import { Spacer } from '../../UI/Grid';
@@ -84,12 +83,6 @@ const buildCustomPropertiesSchema = (
             forceUpdate();
           },
         });
-        return;
-      }
-
-      // Dictionary properties are rendered by a dedicated component (with
-      // add/remove support), not as static schema fields.
-      if (config.type === 'dictionary') {
         return;
       }
 
@@ -313,29 +306,11 @@ const ResourcePropertiesEditor: React.ComponentType<{
           forceUpdate
         );
 
-        const dictionaryConfigs = resourceManagementProps.resourcePropertiesSchema.filter(
-          config =>
-            config.type === 'dictionary' &&
-            (!config.resourceKinds ||
-              config.resourceKinds.length === 0 ||
-              config.resourceKinds.includes(resourceKind))
-        );
-
         return (
-          <React.Fragment>
-            <PropertiesEditor
-              schema={schema.concat(resourceSchema).concat(customSchema)}
-              instances={resources}
-            />
-            {dictionaryConfigs.map(config => (
-              <ResourceDictionaryPropertyEditor
-                key={config.name}
-                resource={resources[0]}
-                config={config}
-                onUpdated={forceUpdate}
-              />
-            ))}
-          </React.Fragment>
+          <PropertiesEditor
+            schema={schema.concat(resourceSchema).concat(customSchema)}
+            instances={resources}
+          />
         );
       },
       [resources, schema, forceUpdate, resourceManagementProps]

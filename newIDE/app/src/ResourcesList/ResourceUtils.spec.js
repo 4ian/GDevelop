@@ -6,9 +6,6 @@ import {
   getResourceCustomProperties,
   getResourceCustomPropertyValue,
   setResourceCustomPropertyValue,
-  getResourceCustomDictionary,
-  setResourceCustomDictionaryValue,
-  removeResourceCustomDictionaryValue,
 } from './ResourceUtils';
 const gd: libGDevelop = global.gd;
 
@@ -279,47 +276,6 @@ describe('ResourceUtils', () => {
         localFilePath: 'test',
       });
       expect(getResourceCustomProperties(r)).toEqual({ noAtlas: true });
-    });
-
-    it('can set and merge dictionary entries without losing other entries', () => {
-      const r = (resource = new gd.Resource());
-      setResourceCustomDictionaryValue(r, 'packScale', '_320p', 0.2);
-      setResourceCustomDictionaryValue(r, 'packScale', '_480p', 0.4);
-
-      expect(getResourceCustomDictionary(r, 'packScale')).toEqual({
-        _320p: 0.2,
-        _480p: 0.4,
-      });
-
-      // Updating one entry preserves the others.
-      setResourceCustomDictionaryValue(r, 'packScale', '_320p', 0.25);
-      expect(getResourceCustomDictionary(r, 'packScale')).toEqual({
-        _320p: 0.25,
-        _480p: 0.4,
-      });
-
-      // Dictionaries coexist with scalar custom properties.
-      setResourceCustomPropertyValue(r, 'scaleMultiplier', 1.5);
-      expect(getResourceCustomProperties(r)).toEqual({
-        packScale: { _320p: 0.25, _480p: 0.4 },
-        scaleMultiplier: 1.5,
-      });
-    });
-
-    it('returns an empty dictionary when none is set', () => {
-      const r = (resource = new gd.Resource());
-      expect(getResourceCustomDictionary(r, 'packScale')).toEqual({});
-    });
-
-    it('can remove a dictionary entry while keeping the others', () => {
-      const r = (resource = new gd.Resource());
-      setResourceCustomDictionaryValue(r, 'packScale', '_320p', 0.2);
-      setResourceCustomDictionaryValue(r, 'packScale', '_480p', 0.4);
-
-      removeResourceCustomDictionaryValue(r, 'packScale', '_320p');
-      expect(getResourceCustomDictionary(r, 'packScale')).toEqual({
-        _480p: 0.4,
-      });
     });
   });
 });

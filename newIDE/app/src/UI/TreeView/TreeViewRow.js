@@ -404,7 +404,25 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
                       />
                     )}
                   </IconButton>
-                  {node.thumbnailSrc && node.thumbnailSrc !== 'FOLDER' ? (
+                  {node.thumbnailSrc === 'NO_ICON' ? (
+                    node.dataset && node.dataset.folderColor ? (
+                      <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 80 60"
+                        style={{ flexShrink: 0, marginRight: 2 }}
+                      >
+                        <path
+                          d="M0,6 Q0,0 6,0 L26,0 L30,6 L74,6 Q80,6 80,12 L80,54 Q80,60 74,60 L6,60 Q0,60 0,54 Z"
+                          fill={node.dataset.folderColor}
+                        />
+                        <path
+                          d="M0,14 L80,14 L80,54 Q80,60 74,60 L6,60 Q0,60 0,54 Z"
+                          fill="rgba(255,255,255,0.18)"
+                        />
+                      </svg>
+                    ) : null
+                  ) : node.thumbnailSrc && node.thumbnailSrc !== 'FOLDER' ? (
                     <div className={classes.thumbnail}>
                       <ListIcon iconSize={20} src={node.thumbnailSrc} />
                     </div>

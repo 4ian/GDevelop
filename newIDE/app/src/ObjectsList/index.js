@@ -49,6 +49,7 @@ import {
   ObjectFolderTreeViewItemContent,
   getObjectFolderTreeViewItemId,
   expandAllSubfolders,
+  folderColors,
   type ObjectFolderTreeViewItemProps,
 } from './ObjectFolderTreeViewItemContent';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
@@ -78,6 +79,102 @@ const styles = {
   },
   autoSizerContainer: { flex: 1 },
   autoSizer: { width: '100%' },
+  colorPickerCard: {
+    position: 'fixed',
+    zIndex: 1000,
+    background: '#1e1e1e',
+    borderRadius: 12,
+    border: '0.5px solid rgba(255,255,255,0.1)',
+    width: 300,
+    overflow: 'hidden',
+    boxShadow: '0 8px 32px rgba(0,0,0,0.6)',
+    userSelect: 'none',
+  },
+  colorPickerHeader: {
+    padding: '14px 16px 12px',
+    borderBottom: '0.5px solid rgba(255,255,255,0.08)',
+    display: 'flex',
+    alignItems: 'center',
+    gap: 10,
+    cursor: 'grab',
+  },
+  colorPickerBody: {
+    padding: 16,
+  },
+  colorPickerGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(7, 1fr)',
+    gap: 6,
+    marginBottom: 14,
+  },
+  colorPickerHexRow: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 14,
+    background: 'rgba(255,255,255,0.05)',
+    border: '0.5px solid rgba(255,255,255,0.1)',
+    borderRadius: 8,
+    padding: '7px 10px',
+  },
+  colorPickerHexDot: {
+    width: 22,
+    height: 22,
+    borderRadius: 4,
+    flexShrink: 0,
+  },
+  colorPickerHexText: {
+    fontSize: 13,
+    color: 'rgba(255,255,255,0.45)',
+    fontFamily: 'monospace',
+  },
+  colorPickerCustomBtn: {
+    marginLeft: 'auto',
+    display: 'flex',
+    alignItems: 'center',
+    gap: 5,
+    padding: '4px 10px',
+    borderRadius: 6,
+    border: '0.5px solid rgba(255,255,255,0.2)',
+    background: 'rgba(255,255,255,0.07)',
+    color: 'rgba(255,255,255,0.6)',
+    fontSize: 12,
+    cursor: 'pointer',
+  },
+  colorPickerActions: {
+    display: 'flex',
+    gap: 8,
+  },
+  colorPickerBtnConfirm: {
+    flex: 1,
+    padding: '8px',
+    borderRadius: 8,
+    border: 'none',
+    background: '#6d28d9',
+    color: 'white',
+    fontSize: 13,
+    fontWeight: 500,
+    cursor: 'pointer',
+  },
+  colorPickerBtnReset: {
+    padding: '8px 14px',
+    borderRadius: 8,
+    border: '0.5px solid rgba(255,255,255,0.15)',
+    background: 'transparent',
+    color: 'rgba(255,255,255,0.5)',
+    fontSize: 20,
+    cursor: 'pointer',
+    lineHeight: 1,
+  },
+  colorPickerBtnCancel: {
+    padding: '8px 14px',
+    borderRadius: 8,
+    border: '0.5px solid rgba(255,255,255,0.15)',
+    background: 'transparent',
+    color: 'rgba(255,255,255,0.5)',
+    fontSize: 13,
+    cursor: 'pointer',
+  },
 };
 
 export const getLabelsForObjectsAndGroupsLists = (
@@ -98,7 +195,7 @@ export const getLabelsForObjectsAndGroupsLists = (
   } else if (scope.eventsBasedObject) {
     return {
       localScopeObjectsTitle: t`Object's children`,
-      higherScopeObjectsTitle: null, // Global objects not accessible from custom object.
+      higherScopeObjectsTitle: null,
       localScopeGroupsTitle: t`Object's groups`,
       higherScopeGroupsTitle: null,
     };
@@ -448,22 +545,7 @@ type Props = {|
   eventsFunctionsExtension: gdEventsFunctionsExtension | null,
   eventsBasedObject: gdEventsBasedObject | null,
   initialInstances?: gdInitialInstancesContainer,
-  /** The objects retrieved from ProjectScopedContainers must never be kept in a
-   * state as they may be temporary copies.
-   * It also contains "fake" objects like "Object" for the parent of custom objects.
-   * It's useful to check if an object name is taken, but not to edit ObjectsContainer.
-   * Also see `ProjectScopedContainers::MakeNewProjectScopedContainersForEventsBasedObject`.
-   * Search for "ProjectScopedContainers wrongly containing temporary objects containers or objects"
-   * in the codebase.
-   */
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
-
-  // These 2 containers always contains the "real" objects.
-  // TODO: they should be replaced by projectScopedContainersAccessor, but we can't use this
-  // as `ProjectScopedContainers` may return temporary objects that can't be edited or have references
-  // to them kept.
-  // Search for "ProjectScopedContainers wrongly containing temporary objects containers or objects"
-  // in the codebase.
   globalObjectsContainer: gdObjectsContainer | null,
   objectsContainer: gdObjectsContainer,
 
@@ -521,6 +603,205 @@ type Props = {|
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
   isListLocked: boolean,
 |};
+
+// ─── Componente ColorPickerDialog ────────────────────────────────────────────
+
+const PRESET_COLORS = [
+  '#ef4444',
+  '#f97316',
+  '#eab308',
+  '#22c55e',
+  '#3b82f6',
+  '#a855f7',
+  '#ec4899',
+  '#14b8a6',
+  '#6366f1',
+  '#f43f5e',
+  '#84cc16',
+  '#06b6d4',
+  '#f59e0b',
+  '#78716c',
+];
+
+type ColorPickerDialogProps = {|
+  objectFolder: gdObjectFolderOrObject,
+  isGlobal: boolean,
+  onClose: () => void,
+  onForceUpdate: () => void,
+|};
+
+const ColorPickerDialog = ({
+  objectFolder,
+  isGlobal,
+  onClose,
+  onForceUpdate,
+}: ColorPickerDialogProps) => {
+  const currentColor = folderColors.get(objectFolder, isGlobal) || '#a855f7';
+  const [selectedColor, setSelectedColor] = React.useState(currentColor);
+  const nativeInputRef = React.useRef<HTMLInputElement | null>(null);
+
+  const [pos, setPos] = React.useState({
+    x: window.innerWidth / 2 - 150,
+    y: window.innerHeight / 2 - 160,
+  });
+  const dragging = React.useRef(false);
+  const dragOffset = React.useRef({ x: 0, y: 0 });
+
+  const onMouseDown = (e: MouseEvent) => {
+    dragging.current = true;
+    dragOffset.current = { x: e.clientX - pos.x, y: e.clientY - pos.y };
+    e.preventDefault();
+  };
+
+  React.useEffect(() => {
+    const onMouseMove = (e: MouseEvent) => {
+      if (!dragging.current) return;
+      setPos({
+        x: e.clientX - dragOffset.current.x,
+        y: e.clientY - dragOffset.current.y,
+      });
+    };
+    const onMouseUp = () => {
+      dragging.current = false;
+    };
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
+    return () => {
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', onMouseUp);
+    };
+  }, []);
+
+  const handleConfirm = () => {
+    folderColors.set(objectFolder, isGlobal, selectedColor);
+    onForceUpdate();
+    onClose();
+  };
+
+  const handleReset = () => {
+    // Reset to default grey instead of removing, so the SVG folder icon is kept
+    folderColors.set(objectFolder, isGlobal, '#6b7280');
+    onForceUpdate();
+    onClose();
+  };
+
+  const handleCustomPick = () => {
+    if (nativeInputRef.current) nativeInputRef.current.click();
+  };
+
+  const folderName = objectFolder.getFolderName();
+
+  return (
+    <div
+      style={{ ...styles.colorPickerCard, left: pos.x, top: pos.y }}
+      onClick={e => e.stopPropagation()}
+    >
+      <div style={styles.colorPickerHeader} onMouseDown={onMouseDown}>
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 80 60"
+          style={{ flexShrink: 0 }}
+        >
+          <path
+            d="M0,6 Q0,0 6,0 L26,0 L30,6 L74,6 Q80,6 80,12 L80,54 Q80,60 74,60 L6,60 Q0,60 0,54 Z"
+            fill={selectedColor}
+          />
+          <path
+            d="M0,14 L80,14 L80,54 Q80,60 74,60 L6,60 Q0,60 0,54 Z"
+            fill="rgba(255,255,255,0.18)"
+          />
+        </svg>
+        <span style={{ fontSize: 14, fontWeight: 500, color: '#e5e5e5' }}>
+          Folder color
+        </span>
+        <span
+          style={{
+            fontSize: 13,
+            color: 'rgba(255,255,255,0.4)',
+            marginLeft: 'auto',
+          }}
+        >
+          {folderName}
+        </span>
+      </div>
+
+      <div style={styles.colorPickerBody}>
+        <div style={styles.colorPickerGrid}>
+          {PRESET_COLORS.map(color => (
+            <div
+              key={color}
+              style={{
+                width: 32,
+                height: 32,
+                borderRadius: 6,
+                cursor: 'pointer',
+                background: color,
+                boxSizing: 'border-box',
+                border:
+                  selectedColor === color
+                    ? '2px solid white'
+                    : '2px solid transparent',
+                boxShadow:
+                  selectedColor === color
+                    ? '0 0 0 1px rgba(255,255,255,0.3)'
+                    : 'none',
+              }}
+              onClick={() => setSelectedColor(color)}
+            />
+          ))}
+        </div>
+
+        <div style={styles.colorPickerHexRow}>
+          <div
+            style={{ ...styles.colorPickerHexDot, background: selectedColor }}
+          />
+          <span style={styles.colorPickerHexText}>{selectedColor}</span>
+          <button
+            style={styles.colorPickerCustomBtn}
+            onClick={handleCustomPick}
+          >
+            ✎ Custom
+          </button>
+          <input
+            ref={nativeInputRef}
+            type="color"
+            value={selectedColor}
+            onChange={e => setSelectedColor(e.target.value)}
+            style={{
+              position: 'absolute',
+              opacity: 0,
+              width: 0,
+              height: 0,
+              pointerEvents: 'none',
+            }}
+          />
+        </div>
+
+        <div style={styles.colorPickerActions}>
+          <button style={styles.colorPickerBtnConfirm} onClick={handleConfirm}>
+            Confirm
+          </button>
+          <button
+            style={styles.colorPickerBtnReset}
+            onClick={handleReset}
+            title="Reset color"
+          >
+            🗑
+          </button>
+          <button
+            style={styles.colorPickerBtnCancel}
+            onClick={onClose}
+            title="Cancel"
+          >
+            ✕
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+// ─────────────────────────────────────────────────────────────────────────────
 
 const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
   (
@@ -585,6 +866,13 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       from: ObjectFolderOrObjectWithContext | null,
     } | null>(null);
 
+    // ── STATO COLOR PICKER ──────────────────────────────────────────────────
+    const [colorPickerOpen, setColorPickerOpen] = React.useState<{
+      objectFolder: gdObjectFolderOrObject,
+      isGlobal: boolean,
+    } | null>(null);
+    // ────────────────────────────────────────────────────────────────────────
+
     React.useImperativeHandle(ref, () => ({
       forceUpdateList: () => {
         forceUpdate();
@@ -603,10 +891,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       setObjectAssetSwappingDialogOpen,
     ] = React.useState<{ objectWithContext: ObjectWithContext } | null>(null);
 
-    // Initialize keyboard shortcuts as empty.
-    // onDelete, onDuplicate and onRename callbacks are set in an effect because it applies
-    // to the selected item (that is a props). As it is stored in a ref, the keyboard shortcut
-    // instance does not update with selectedObjectFolderOrObjectsWithContext changes.
     const keyboardShortcutsRef = React.useRef<KeyboardShortcuts>(
       new KeyboardShortcuts({
         shortcutCallbacks: {},
@@ -645,7 +929,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         if (
           newObjectDialogOpen &&
           newObjectDialogOpen.from &&
-          // If a scene objectFolderOrObject is selected, insert new object next to or inside it.
           !newObjectDialogOpen.from.global
         ) {
           const selectedItem = newObjectDialogOpen.from.objectFolderOrObject;
@@ -689,16 +972,11 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         if (treeViewRef.current)
           treeViewRef.current.openItems([sceneObjectsRootFolderId]);
 
-        // Scroll to the new object.
-        // Ideally, we'd wait for the list to be updated to scroll, but
-        // to simplify the code, we just wait a few ms for a new render
-        // to be done.
         setTimeout(() => {
           scrollToItem(getObjectTreeViewItemId(object));
-        }, 100); // A few ms is enough for a new render to be done.
+        }, 100);
 
         setNewObjectDialogOpen(null);
-        // TODO Should it be called later?
         // $FlowFixMe[constant-condition]
         if (onEditObject) {
           onEditObject(object);
@@ -729,9 +1007,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
 
         onObjectCreated(objects, isTheFirstOfItsTypeInProject);
 
-        // Here, the last object in the array might not be the last object
-        // in the tree view, given the fact that assets are added in parallel
-        // See (AssetPackInstallDialog.onInstallAssets).
         const lastObject = objects[objects.length - 1];
 
         if (newObjectDialogOpen && newObjectDialogOpen.from) {
@@ -750,13 +1025,9 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             treeViewRef.current.openItems([sceneObjectsRootFolderId]);
           }
         }
-        // Scroll to the new object.
-        // Ideally, we'd wait for the list to be updated to scroll, but
-        // to simplify the code, we just wait a few ms for a new render
-        // to be done.
         setTimeout(() => {
           scrollToItem(getObjectTreeViewItemId(lastObject));
-        }, 100); // A few ms is enough for a new render to be done.
+        }, 100);
       },
       [onObjectCreated, scrollToItem, newObjectDialogOpen]
     );
@@ -774,6 +1045,15 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       },
       []
     );
+
+    // ── CALLBACK OPEN COLOR PICKER ──────────────────────────────────────────
+    const openColorPicker = React.useCallback(
+      (objectFolder: gdObjectFolderOrObject, isGlobal: boolean) => {
+        setColorPickerOpen({ objectFolder, isGlobal });
+      },
+      []
+    );
+    // ────────────────────────────────────────────────────────────────────────
 
     const onObjectModified = React.useCallback(
       (shouldForceUpdateList: boolean) => {
@@ -799,8 +1079,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         const treeView = treeViewRef.current;
         if (treeView) {
           if (isMobile) {
-            // Position item at top of the screen to make sure it will be visible
-            // once the keyboard is open.
             treeView.scrollToItemFromId(itemId, 'start');
           }
           treeView.renameItemFromId(itemId);
@@ -827,10 +1105,9 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         false
       );
       if (firstClosedFolderIndex === -1) {
-        // If all parents are open, return the objectFolderOrObject given as input.
         return getTreeViewItemIdFromObjectFolderOrObject(objectFolderOrObject);
       }
-      // $FlowFixMe[incompatible-type] - We are confident this TreeView item is in fact a ObjectFolderOrObjectWithContext
+      // $FlowFixMe[incompatible-type]
       return topToBottomAscendanceId[firstClosedFolderIndex];
     };
 
@@ -882,9 +1159,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         );
         if (!answer) return;
 
-        // It's safe to call moveObjectFolderOrObjectToAnotherContainerInFolder because
-        // it does not invalidate the references to the object in memory - so other editors
-        // like InstancesRenderer can continue to work.
         objectsContainer.moveObjectFolderOrObjectToAnotherContainerInFolder(
           objectFolderOrObject,
           globalObjectsContainer,
@@ -905,13 +1179,9 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           newObjectFolderOrObjectWithContext
         );
 
-        // Scroll to the moved object.
-        // Ideally, we'd wait for the list to be updated to scroll, but
-        // to simplify the code, we just wait a few ms for a new render
-        // to be done.
         setTimeout(() => {
           scrollToItem(getObjectTreeViewItemId(object));
-        }, 100); // A few ms is enough for a new render to be done.
+        }, 100);
       },
       [
         project,
@@ -942,6 +1212,8 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
               objectFolderOrObject: newFolder,
               global,
             };
+            // Assign default grey color to new folder
+            folderColors.set(newFolder, global, '#6b7280');
             if (treeViewRef.current) {
               treeViewRef.current.openItems([
                 getObjectFolderTreeViewItemId(items[0].objectFolderOrObject),
@@ -957,6 +1229,8 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
               objectFolderOrObject: newFolder,
               global,
             };
+            // Assign default grey color to new folder
+            folderColors.set(newFolder, global, '#6b7280');
           }
         } else {
           const rootFolder = objectsContainer.getRootFolder();
@@ -965,6 +1239,8 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             objectFolderOrObject: newFolder,
             global: false,
           };
+          // Assign default grey color to new folder
+          folderColors.set(newFolder, false, '#6b7280');
         }
         selectObjectFolderOrObjectWithContext(
           newObjectFolderOrObjectWithContext
@@ -1109,6 +1385,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         forceUpdateList,
         forceUpdate,
         isListLocked,
+        openColorPicker, // <-- AGGIUNTO
       }),
       [
         project,
@@ -1129,6 +1406,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         forceUpdateList,
         forceUpdate,
         isListLocked,
+        openColorPicker, // <-- AGGIUNTO
       ]
     );
 
@@ -1345,14 +1623,11 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             selectedItems.length === 1 &&
             !selectedItems[0].content.isGlobal()
           ) {
-            // In that case, the user is drag n dropping a scene object on the
-            // empty placeholder of the global objects section.
             const objectFolderOrObject = selectedItems[0].content.getObjectFolderOrObject();
             return !!objectFolderOrObject && !objectFolderOrObject.isFolder();
           }
           return false;
         }
-        // Check if at least one element in the selection can be moved.
         if (
           selectedItems.every(
             selectedItem =>
@@ -1446,7 +1721,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           return;
         }
 
-        // At this point, the move is done from within the same container.
         if (
           selectedItem.content.isGlobal() === destinationItem.content.isGlobal()
         ) {
@@ -1499,10 +1773,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       [onObjectModified, selectedItems, setAsGlobalObject]
     );
 
-    /**
-     * Unselect item if one of the parent is collapsed (folded) so that the item
-     * does not stay selected and not visible to the user.
-     */
     const onCollapseItem = React.useCallback(
       (item: TreeViewItem) => {
         if (!selectedItems || selectedItems.length !== 1) return;
@@ -1515,9 +1785,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       [selectObjectFolderOrObjectWithContext, selectedItems]
     );
 
-    // Force List component to be mounted again if project or objectsContainer
-    // has been changed. Avoid accessing to invalid objects that could
-    // crash the app.
     const listKey = project.ptr + ';' + objectsContainer.ptr;
     const initiallyOpenedNodeIds = [
       globalObjectsRootFolder && globalObjectsRootFolder.getChildrenCount() > 0
@@ -1587,11 +1854,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
                     <TreeView
                       key={listKey}
                       ref={treeViewRef}
-                      items={
-                        // TreeView typing has issues, so we use any for now.
-                        // Search for "treeview typing issues" in the codebase.
-                        (getTreeViewData(i18n): any)
-                      }
+                      items={(getTreeViewData(i18n): any)}
                       height={height}
                       forceAllOpened={!!currentlyRunningInAppTutorial}
                       searchText={searchText}
@@ -1643,6 +1906,8 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             )}
           </I18n>
         </div>
+
+        {/* Dialog nuovi oggetti */}
         {newObjectDialogOpen && (
           <NewObjectDialog
             onClose={() => setNewObjectDialogOpen(null)}
@@ -1659,6 +1924,8 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             onExtensionInstalled={onExtensionInstalled}
           />
         )}
+
+        {/* Dialog swap asset */}
         {objectAssetSwappingDialogOpen && (
           <AssetSwappingDialog
             onClose={({ swappingDone }) => {
@@ -1679,18 +1946,23 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             onExtensionInstalled={onExtensionInstalled}
           />
         )}
+
+        {/* ── COLOR PICKER DIALOG ── */}
+        {colorPickerOpen && (
+          <ColorPickerDialog
+            objectFolder={colorPickerOpen.objectFolder}
+            isGlobal={colorPickerOpen.isGlobal}
+            onClose={() => setColorPickerOpen(null)}
+            onForceUpdate={forceUpdateList}
+          />
+        )}
+        {/* ───────────────────────── */}
       </Background>
     );
   }
 );
 
 const arePropsEqual = (prevProps: Props, nextProps: Props): boolean =>
-  // The component is costly to render, so avoid any re-rendering as much
-  // as possible.
-  // We make the assumption that no changes to objects list is made outside
-  // from the component.
-  // If a change is made, the component won't notice it: you have to manually
-  // call forceUpdate.
   prevProps.selectedObjectFolderOrObjectsWithContext ===
     nextProps.selectedObjectFolderOrObjectsWithContext &&
   prevProps.project === nextProps.project &&

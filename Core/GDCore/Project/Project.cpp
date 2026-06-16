@@ -47,38 +47,27 @@ using namespace std;
 namespace gd {
 
 Project::Project()
-    : name(_("Project")),
-      version("1.0.0"),
-      packageName("com.example.gamename"),
-      templateSlug(""),
-      orientation("landscape"),
-      folderProject(false),
-      windowWidth(800),
-      windowHeight(600),
-      maxFPS(60),
-      minFPS(20),
-      verticalSync(false),
-      scaleMode("linear"),
-      pixelsRounding(false),
-      adaptGameResolutionAtRuntime(true),
-      sizeOnStartupMode("adaptWidth"),
-      antialiasingMode("MSAA"),
-      isAntialisingEnabledOnMobile(false),
-      projectUuid(""),
-      useDeprecatedZeroAsDefaultZOrder(false),
+    : name(_("Project")), version("1.0.0"), packageName("com.example.gamename"),
+      templateSlug(""), orientation("landscape"), folderProject(false),
+      windowWidth(800), windowHeight(600), maxFPS(60), minFPS(20),
+      verticalSync(false), scaleMode("linear"), pixelsRounding(false),
+      adaptGameResolutionAtRuntime(true), sizeOnStartupMode("adaptWidth"),
+      antialiasingMode("MSAA"), isAntialisingEnabledOnMobile(false),
+      projectUuid(""), useDeprecatedZeroAsDefaultZOrder(false),
       useDeprecatedZeroAsDefaultStringVariable(false),
-      isPlayableWithKeyboard(false),
-      isPlayableWithGamepad(false),
-      isPlayableWithMobile(false),
-      currentPlatform(nullptr),
+      isPlayableWithKeyboard(false), isPlayableWithGamepad(false),
+      isPlayableWithMobile(false), currentPlatform(nullptr),
       gdMajorVersion(gd::VersionWrapper::Major()),
       gdMinorVersion(gd::VersionWrapper::Minor()),
       gdBuildVersion(gd::VersionWrapper::Build()),
+      initialGDVersion(gd::String::From(gd::VersionWrapper::Major()) + "." +
+                       gd::String::From(gd::VersionWrapper::Minor()) + "." +
+                       gd::String::From(gd::VersionWrapper::Build())),
       variables(gd::VariablesContainer::SourceType::Global),
       objectsContainer(gd::ObjectsContainer::SourceType::Global),
       resourcesContainer(gd::ResourcesContainer::SourceType::Global),
-      sceneResourcesPreloading("at-startup"),
-      sceneResourcesUnloading("never") {}
+      sceneResourcesPreloading("at-startup"), sceneResourcesUnloading("never") {
+}
 
 Project::~Project() {}
 
@@ -704,6 +693,13 @@ void Project::UnserializeFrom(const SerializerElement& element) {
     }
   }
 
+  if (element.HasChild("initialGDVersion")) {
+    initialGDVersion =
+        element.GetChild("initialGDVersion").GetValue().GetString();
+  } else {
+    initialGDVersion = "";
+  }
+
   const SerializerElement& propElement =
       element.GetChild("properties", 0, "Info");
   SetName(propElement.GetChild("name", 0, "Nom").GetValue().GetString());
@@ -937,7 +933,6 @@ void Project::UnserializeAndInsertExtensionsFrom(
   eventsFunctionsExtensionsElement.ConsiderAsArrayOf(
       "eventsFunctionsExtension");
 
-  std::map<gd::String, size_t> extensionNameToElementIndex;
   std::map<gd::String, gd::SerializerElement> objectTypeToVariantsElement;
 
   // First, only unserialize behaviors and objects names.
@@ -950,7 +945,6 @@ void Project::UnserializeAndInsertExtensionsFrom(
     const SerializerElement& eventsFunctionsExtensionElement =
         eventsFunctionsExtensionsElement.GetChild(i);
     const gd::String& name = eventsFunctionsExtensionElement.GetStringAttribute("name");
-    extensionNameToElementIndex[name] = i;
 
     gd::EventsFunctionsExtension& eventsFunctionsExtension =
         HasEventsFunctionsExtensionNamed(name)
@@ -971,9 +965,14 @@ void Project::UnserializeAndInsertExtensionsFrom(
         *this, eventsFunctionsExtensionElement);
   }
 
-  // Then unserialize functions, behaviors and objects content.
-  for (gd::String &extensionName :
-       GetUnserializingOrderExtensionNames(eventsFunctionsExtensionsElement)) {
+  // Then unserialize default variants to be able to parse legacy children
+  // overridings in the next step.
+    for (std::size_t elementIndex = 0;
+       elementIndex < eventsFunctionsExtensionsElement.GetChildrenCount();
+       ++elementIndex) {
+    const SerializerElement& eventsFunctionsExtensionElement =
+        eventsFunctionsExtensionsElement.GetChild(elementIndex);
+    const gd::String& extensionName = eventsFunctionsExtensionElement.GetStringAttribute("name");
 
     size_t extensionIndex = GetEventsFunctionsExtensionPosition(extensionName);
     if (extensionIndex == gd::String::npos) {
@@ -982,19 +981,46 @@ void Project::UnserializeAndInsertExtensionsFrom(
       continue;
     }
     auto& partiallyLoadedExtension = eventsFunctionsExtensions.at(extensionIndex);
+    partiallyLoadedExtension
+        ->UnserializeExtensionDefaultVariantsFrom(
+            *this, eventsFunctionsExtensionElement);
+  }
 
-    if (extensionNameToElementIndex.find(extensionName) == extensionNameToElementIndex.end()) {
-      // Should never happen because the extension element is present.
-      gd::LogError("Can't find extension element to unserialize for " + extensionName + " in second pass of unserialization.");
+  // Then unserialize functions, behaviors and objects content.
+    for (std::size_t elementIndex = 0;
+       elementIndex < eventsFunctionsExtensionsElement.GetChildrenCount();
+       ++elementIndex) {
+    const SerializerElement& eventsFunctionsExtensionElement =
+        eventsFunctionsExtensionsElement.GetChild(elementIndex);
+    const gd::String& extensionName = eventsFunctionsExtensionElement.GetStringAttribute("name");
+
+    size_t extensionIndex = GetEventsFunctionsExtensionPosition(extensionName);
+    if (extensionIndex == gd::String::npos) {
+      // Should never happen because the extension was added in the first pass.
+      gd::LogError("Can't find extension " + extensionName + " in the list of extensions in second pass of unserialization.");
       continue;
     }
-    size_t elementIndex = extensionNameToElementIndex[extensionName];
-    const SerializerElement &eventsFunctionsExtensionElement =
-        eventsFunctionsExtensionsElement.GetChild(elementIndex);
-
+    auto& partiallyLoadedExtension = eventsFunctionsExtensions.at(extensionIndex);
     partiallyLoadedExtension
         ->UnserializeExtensionImplementationFrom(
             *this, eventsFunctionsExtensionElement);
+  }
+
+  // Unserialize variants at the end in case their objects has children overriding.
+    for (std::size_t elementIndex = 0;
+       elementIndex < eventsFunctionsExtensionsElement.GetChildrenCount();
+       ++elementIndex) {
+    const SerializerElement& eventsFunctionsExtensionElement =
+        eventsFunctionsExtensionsElement.GetChild(elementIndex);
+    const gd::String& extensionName = eventsFunctionsExtensionElement.GetStringAttribute("name");
+
+    size_t extensionIndex = GetEventsFunctionsExtensionPosition(extensionName);
+    if (extensionIndex == gd::String::npos) {
+      // Should never happen because the extension was added in the first pass.
+      gd::LogError("Can't find extension " + extensionName + " in the list of extensions in third pass of unserialization.");
+      continue;
+    }
+    auto& partiallyLoadedExtension = eventsFunctionsExtensions.at(extensionIndex);
 
     for (auto &pair : objectTypeToVariantsElement) {
       auto &objectType = pair.first;
@@ -1007,97 +1033,16 @@ void Project::UnserializeAndInsertExtensionsFrom(
   }
 }
 
-std::vector<gd::String> Project::GetUnserializingOrderExtensionNames(
-    const gd::SerializerElement &eventsFunctionsExtensionsElement) {
-  eventsFunctionsExtensionsElement.ConsiderAsArrayOf(
-      "eventsFunctionsExtension");
-
-  // Some extension have custom objects, which have child objects coming from other extension.
-  // These child objects must be loaded completely before the parent custom obejct can be unserialized.
-  // This implies: an order on the extension unserialization (and no cycles).
-
-  // At the beginning, everything is yet to be loaded.
-  std::map<gd::String, size_t> extensionNameToElementIndex;
-  std::vector<gd::String> remainingExtensionNames(
-      eventsFunctionsExtensionsElement.GetChildrenCount());
-  for (std::size_t i = 0; i < eventsFunctionsExtensionsElement.GetChildrenCount(); ++i) {
-    const SerializerElement& eventsFunctionsExtensionElement =
-        eventsFunctionsExtensionsElement.GetChild(i);
-    const gd::String& name = eventsFunctionsExtensionElement.GetStringAttribute("name");
-
-    remainingExtensionNames[i] = name;
-    extensionNameToElementIndex[name] = i;
-  }
-
-  // Helper allowing to find if an extension has an object that depends on
-  // at least one other object from another extension that is not loaded yet.
-  auto isDependentFromRemainingExtensions =
-      [&remainingExtensionNames](
-          const gd::SerializerElement &eventsFunctionsExtensionElement) {
-        auto &eventsBasedObjectsElement =
-            eventsFunctionsExtensionElement.GetChild("eventsBasedObjects");
-        eventsBasedObjectsElement.ConsiderAsArrayOf("eventsBasedObject");
-        for (std::size_t eventsBasedObjectsIndex = 0;
-             eventsBasedObjectsIndex <
-             eventsBasedObjectsElement.GetChildrenCount();
-             ++eventsBasedObjectsIndex) {
-          auto &objectsElement =
-              eventsBasedObjectsElement.GetChild(eventsBasedObjectsIndex)
-                  .GetChild("objects");
-          objectsElement.ConsiderAsArrayOf("object");
-
-          for (std::size_t objectIndex = 0;
-               objectIndex < objectsElement.GetChildrenCount(); ++objectIndex) {
-            const gd::String &objectType =
-                objectsElement.GetChild(objectIndex).GetStringAttribute("type");
-
-            gd::String extensionName =
-                eventsFunctionsExtensionElement.GetStringAttribute("name");
-            gd::String usedExtensionName =
-                gd::PlatformExtension::GetExtensionFromFullObjectType(objectType);
-
-            if (usedExtensionName != extensionName &&
-                std::find(remainingExtensionNames.begin(),
-                          remainingExtensionNames.end(),
-                          usedExtensionName) != remainingExtensionNames.end()) {
-              return true;
-            }
-          }
-        }
-        return false;
-      };
-
-  // Find the order of loading so that the extensions are loaded when all the other
-  // extensions they depend on are already loaded.
-  std::vector<gd::String> loadOrderExtensionNames;
-  bool foundAnyExtension = true;
-  while (foundAnyExtension) {
-    foundAnyExtension = false;
-    for (std::size_t i = 0; i < remainingExtensionNames.size(); ++i) {
-      auto extensionName = remainingExtensionNames[i];
-
-      size_t elementIndex = extensionNameToElementIndex[extensionName];
-      const SerializerElement &eventsFunctionsExtensionElement =
-          eventsFunctionsExtensionsElement.GetChild(elementIndex);
-
-      if (!isDependentFromRemainingExtensions(
-              eventsFunctionsExtensionElement)) {
-        loadOrderExtensionNames.push_back(extensionName);
-        remainingExtensionNames.erase(remainingExtensionNames.begin() + i);
-        i--;
-        foundAnyExtension = true;
-      }
-    }
-  }
-  return loadOrderExtensionNames;
-}
-
 void Project::SerializeTo(SerializerElement& element) const {
   SerializerElement& versionElement = element.AddChild("gdVersion");
   versionElement.SetAttribute("major", gd::VersionWrapper::Major());
   versionElement.SetAttribute("minor", gd::VersionWrapper::Minor());
   versionElement.SetAttribute("build", gd::VersionWrapper::Build());
   versionElement.SetAttribute("revision", gd::VersionWrapper::Revision());
+
+  if (!GetInitialGDVersion().empty()) {
+    element.AddChild("initialGDVersion").SetValue(GetInitialGDVersion());
+  }
 
   SerializerElement& propElement = element.AddChild("properties");
   propElement.AddChild("name").SetValue(GetName());
@@ -1331,6 +1276,8 @@ void Project::Init(const gd::Project& game) {
   gdMajorVersion = game.gdMajorVersion;
   gdMinorVersion = game.gdMinorVersion;
   gdBuildVersion = game.gdBuildVersion;
+
+  initialGDVersion = game.initialGDVersion;
 
   currentPlatform = game.currentPlatform;
   platforms = game.platforms;

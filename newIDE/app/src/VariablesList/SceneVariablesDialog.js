@@ -2,7 +2,9 @@
 import * as React from 'react';
 import { t, Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
-import VariablesEditorDialog from './VariablesEditorDialog';
+import VariablesEditorDialog, {
+  type VariableDialogOpeningProps,
+} from './VariablesEditorDialog';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 import EventsRootVariablesFinder from '../Utils/EventsRootVariablesFinder';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
@@ -14,8 +16,7 @@ type Props = {|
   onApply: (selectedVariableName: string | null) => void,
   onCancel: () => void,
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps | null,
-  initiallySelectedVariableName?: string,
-  shouldCreateInitiallySelectedVariable?: boolean,
+  initiallySelectedVariable: VariableDialogOpeningProps | null,
   isListLocked: boolean,
 |};
 
@@ -26,8 +27,7 @@ const SceneVariablesDialog = ({
   onCancel,
   onApply,
   hotReloadPreviewButtonProps,
-  initiallySelectedVariableName,
-  shouldCreateInitiallySelectedVariable,
+  initiallySelectedVariable,
   isListLocked,
 }: Props): React.Node => {
   const onComputeAllVariableNames = React.useCallback(
@@ -77,10 +77,7 @@ const SceneVariablesDialog = ({
           title={<Trans>{layout.getName()} variables</Trans>}
           // $FlowFixMe[incompatible-type]
           tabs={tabs}
-          initiallySelectedVariableName={initiallySelectedVariableName}
-          shouldCreateInitiallySelectedVariable={
-            shouldCreateInitiallySelectedVariable
-          }
+          initiallySelectedVariable={initiallySelectedVariable}
           helpPagePath={'/all-features/variables/scene-variables'}
           scopeName={i18n._(t`Scene variables`)}
           hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}

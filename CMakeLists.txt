@@ -19,6 +19,7 @@ gd_set_option(BUILD_CORE TRUE BOOL "TRUE to build GDevelop Core library")
 gd_set_option(BUILD_GDJS TRUE BOOL "TRUE to build GDevelop JS Platform")
 gd_set_option(BUILD_EXTENSIONS TRUE BOOL "TRUE to build the extensions")
 gd_set_option(BUILD_TESTS TRUE BOOL "TRUE to build the tests")
+gd_set_option(USE_SANITIZERS "" STRING "Comma-separated sanitizers to enable for native builds (e.g. \"address,undefined\"). Empty to disable. Ignored when building with Emscripten.")
 
 # Disable deprecated code
 set(NO_GUI TRUE CACHE BOOL "" FORCE) # Force disable old GUI related code.
@@ -85,6 +86,21 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 		# Make as much warnings considered as errors as possible (only one for now).
 		-Werror=return-stack-address
 		-Werror=return-type)
+endif()
+
+# Sanitizers (ASan/UBSan) for native builds. Use e.g.:
+#   cmake -DUSE_SANITIZERS="address,undefined" -DCMAKE_BUILD_TYPE=Debug ..
+# Then run with:
+#   ASAN_OPTIONS=detect_leaks=0:abort_on_error=1 ./GDCore_tests
+# Some checks (use-after-scope) need at least -O1; the Debug build type's -O0
+# still catches use-after-free, heap-buffer-overflow and the UBSan checks.
+if(USE_SANITIZERS AND NOT EMSCRIPTEN)
+	message(STATUS "Enabling sanitizers: ${USE_SANITIZERS}")
+	add_compile_options(-fsanitize=${USE_SANITIZERS} -fno-omit-frame-pointer -fno-sanitize-recover=all)
+	# add_link_options requires CMake >= 3.13; append to linker flag vars for wider compatibility.
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=${USE_SANITIZERS}")
+	set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -fsanitize=${USE_SANITIZERS}")
+	set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -fsanitize=${USE_SANITIZERS}")
 endif()
 
 # Define common directories:

@@ -607,6 +607,7 @@ export class Project extends EmscriptenObject {
   getUseDeprecatedZeroAsDefaultStringVariable(): boolean;
   areEffectsHiddenInEditor(): boolean;
   setEffectsHiddenInEditor(enable: boolean): void;
+  getInitialGDVersion(): string;
   setLastCompilationDirectory(path: string): void;
   getLastCompilationDirectory(): string;
   getExtensionProperties(): ExtensionProperties;
@@ -625,6 +626,8 @@ export class Project extends EmscriptenObject {
   removeLayout(name: string): void;
   setFirstLayout(name: string): void;
   getFirstLayout(): string;
+  setPreviewLayout(name: string): void;
+  getPreviewLayout(): string;
   getLayoutPosition(name: string): number;
   hasExternalEventsNamed(name: string): boolean;
   getExternalEvents(name: string): ExternalEvents;
@@ -759,6 +762,8 @@ export class BehaviorsSharedData extends EmscriptenObject {
   getProperties(): MapStringPropertyDescriptor;
   updateProperty(name: string, value: string): boolean;
   initializeContent(): void;
+  isFolded(): boolean;
+  setFolded(folded: boolean): void;
   getPropertiesQuickCustomizationVisibilities(): QuickCustomizationVisibilitiesContainer;
 }
 
@@ -1697,6 +1702,7 @@ export class ObjectMetadata extends EmscriptenObject {
   getHelpPath(): string;
   getCategory(): string;
   getAssetStoreTag(): string;
+  setHelpPath(helpPath: string): ObjectMetadata;
   setCategory(categoryFullName: string): ObjectMetadata;
   setAssetStoreTag(assetStoreTag: string): ObjectMetadata;
   addInGameEditorResource(): InGameEditorResourceMetadata;
@@ -1767,6 +1773,7 @@ export class BehaviorMetadata extends EmscriptenObject {
   getGroup(): string;
   getIconFilename(): string;
   getHelpPath(): string;
+  setHelpPath(helpPath: string): BehaviorMetadata;
   addScopedCondition(name: string, fullname: string, description: string, sentence: string, group: string, icon: string, smallicon: string): InstructionMetadata;
   addScopedAction(name: string, fullname: string, description: string, sentence: string, group: string, icon: string, smallicon: string): InstructionMetadata;
   addCondition(name: string, fullname: string, description: string, sentence: string, group: string, icon: string, smallicon: string): InstructionMetadata;
@@ -1845,7 +1852,9 @@ export class PlatformExtension extends EmscriptenObject {
   setDimension(dimension: string): PlatformExtension;
   getDimension(): string;
   addInstructionOrExpressionGroupMetadata(name: string): InstructionOrExpressionGroupMetadata;
-  markAsDeprecated(): void;
+  markAsDeprecatedSince(version: string): PlatformExtension;
+  isDeprecated(): boolean;
+  getDeprecationGDVersion(): string;
   getTags(): VectorString;
   setTags(csvTags: string): PlatformExtension;
   addExpressionAndCondition(type: string, name: string, fullname: string, description: string, sentenceName: string, group: string, icon: string): MultipleInstructionMetadata;
@@ -2209,7 +2218,9 @@ export class PropertyFunctionGenerator extends EmscriptenObject {
   static generateBehaviorGetterAndSetter(project: Project, extension: EventsFunctionsExtension, eventsBasedBehavior: EventsBasedBehavior, property: NamedPropertyDescriptor, isSharedProperties: boolean): void;
   static generateObjectGetterAndSetter(project: Project, extension: EventsFunctionsExtension, eventsBasedObject: EventsBasedObject, property: NamedPropertyDescriptor): void;
   static canGenerateGetterAndSetter(eventsBasedBehavior: AbstractEventsBasedEntity, property: NamedPropertyDescriptor): boolean;
-  static generateConditionSkeleton(project: Project, eventFunction: EventsFunction): void;
+  static generateConditionSkeleton(project: Project, eventsFunction: EventsFunction): void;
+  static generateExpressionSkeleton(project: Project, eventsFunction: EventsFunction): void;
+  static updateReturnActionType(project: Project, eventsFunction: EventsFunction): void;
 }
 
 export class UsedExtensionsResult extends EmscriptenObject {

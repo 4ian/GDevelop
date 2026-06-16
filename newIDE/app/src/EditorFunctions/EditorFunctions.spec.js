@@ -80,6 +80,7 @@ describe('editorFunctions', () => {
     onObjectsModifiedOutsideEditor: jest.fn(),
     onWillInstallExtension: jest.fn(),
     onExtensionInstalled: jest.fn(),
+    getAssetStoreTagForNewObject: () => null,
     PixiResourcesLoader: PixiResourcesLoaderMock,
   });
 
@@ -113,7 +114,7 @@ describe('editorFunctions', () => {
       project.delete();
     });
 
-    it('creates a new object (from the asset store)', async () => {
+    it('creates a new object (from scratch, because only object_type was provided)', async () => {
       // $FlowFixMe[underconstrained-implicit-instantiation]
       const onObjectsModifiedOutsideEditor = jest.fn();
 
@@ -130,7 +131,7 @@ describe('editorFunctions', () => {
       );
 
       expect(result.message).toMatchInlineSnapshot(
-        `"Created (from the asset store) object \\"MyNewTextObject\\" of type \\"TextObject::Text\\" in scene \\"TestScene\\". It has the following properties: bold: false (boolean), characterSize: 20 (Pixel), color: 0;0;0 (color), font:  (resource), isOutlineEnabled: false (boolean), isShadowEnabled: false (boolean), italic: false (boolean), lineHeight: 0 (Pixel), outlineColor: 255;255;255 (color), outlineThickness: 2 (Pixel), shadowAngle: 90 (DegreeAngle), shadowBlurRadius: 2 (Pixel), shadowColor: 0;0;0 (color), shadowDistance: 4 (Pixel), shadowOpacity: 127 (Pixel), text: Text (multilinestring), textAlignment: left (choice, one of: [\\"left\\", \\"center\\", \\"right\\"]), verticalTextAlignment: top (choice, one of: [\\"top\\", \\"center\\", \\"bottom\\"])."`
+        `"Created object \\"MyNewTextObject\\" (type \\"TextObject::Text\\", scene \\"TestScene\\") from scratch. Properties: bold: false, characterSize: 20 (px), color: 0;0;0 (color), isOutlineEnabled: false, isShadowEnabled: false, italic: false, lineHeight: 0 (px), outlineColor: 255;255;255 (color), outlineThickness: 2 (px), shadowAngle: 90 (deg), shadowBlurRadius: 2 (px), shadowColor: 0;0;0 (color), shadowDistance: 4 (px), shadowOpacity: 127 (px), text: Text (multilinestring), textAlignment: left (choice, one of: [\\"left\\", \\"center\\", \\"right\\"]), verticalTextAlignment: top (choice, one of: [\\"top\\", \\"center\\", \\"bottom\\"]). Empty: font (resource)."`
       );
       expect(result.success).toBe(true);
       expect(onObjectsModifiedOutsideEditor).toHaveBeenCalledWith({
@@ -139,7 +140,60 @@ describe('editorFunctions', () => {
       });
     });
 
-    it('creates a new object (from scratch if not found in the asset store)', async () => {
+    it('creates a new object (from the asset store, with search_terms and object_type provided)', async () => {
+      // $FlowFixMe[underconstrained-implicit-instantiation]
+      const onObjectsModifiedOutsideEditor = jest.fn();
+
+      const result: EditorFunctionGenericOutput = await editorFunctions.create_or_replace_object.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_type: 'TextObject::Text',
+            object_name: 'MyNewTextObject',
+            search_terms: 'Very cool text object',
+          },
+          onObjectsModifiedOutsideEditor,
+        }
+      );
+
+      expect(result.message).toMatchInlineSnapshot(
+        `"Created object \\"MyNewTextObject\\" (type \\"TextObject::Text\\", scene \\"TestScene\\") from asset store. Properties: bold: false, characterSize: 20 (px), color: 0;0;0 (color), isOutlineEnabled: false, isShadowEnabled: false, italic: false, lineHeight: 0 (px), outlineColor: 255;255;255 (color), outlineThickness: 2 (px), shadowAngle: 90 (deg), shadowBlurRadius: 2 (px), shadowColor: 0;0;0 (color), shadowDistance: 4 (px), shadowOpacity: 127 (px), text: Text (multilinestring), textAlignment: left (choice, one of: [\\"left\\", \\"center\\", \\"right\\"]), verticalTextAlignment: top (choice, one of: [\\"top\\", \\"center\\", \\"bottom\\"]). Empty: font (resource)."`
+      );
+      expect(result.success).toBe(true);
+      expect(onObjectsModifiedOutsideEditor).toHaveBeenCalledWith({
+        scene: testScene,
+        isNewObjectTypeUsed: true,
+      });
+    });
+
+    it('creates a new object (from the asset store, with search_terms but without any specified object type)', async () => {
+      // $FlowFixMe[underconstrained-implicit-instantiation]
+      const onObjectsModifiedOutsideEditor = jest.fn();
+
+      const result: EditorFunctionGenericOutput = await editorFunctions.create_or_replace_object.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'SomeNewObject',
+            search_terms: 'A very cool sprite for my player in my game',
+          },
+          onObjectsModifiedOutsideEditor,
+        }
+      );
+
+      expect(result.message).toMatchInlineSnapshot(
+        `"Created object \\"SomeNewObject\\" (type \\"Sprite\\", scene \\"TestScene\\") from asset store. Properties: ."`
+      );
+      expect(result.success).toBe(true);
+      expect(onObjectsModifiedOutsideEditor).toHaveBeenCalledWith({
+        scene: testScene,
+        isNewObjectTypeUsed: false,
+      });
+    });
+
+    it('creates a new object (from scratch, fallback if not found in the asset store)', async () => {
       // $FlowFixMe[underconstrained-implicit-instantiation]
       const onObjectsModifiedOutsideEditor = jest.fn();
 
@@ -169,7 +223,7 @@ describe('editorFunctions', () => {
       );
 
       expect(result.message).toMatchInlineSnapshot(
-        `"Created a new object (from scratch) called \\"MyNewTextObject\\" of type \\"TextObject::Text\\" in scene \\"TestScene\\". It has the following properties: bold: false (boolean), characterSize: 20 (Pixel), color: 0;0;0 (color), font:  (resource), isOutlineEnabled: false (boolean), isShadowEnabled: false (boolean), italic: false (boolean), lineHeight: 0 (Pixel), outlineColor: 255;255;255 (color), outlineThickness: 2 (Pixel), shadowAngle: 90 (DegreeAngle), shadowBlurRadius: 2 (Pixel), shadowColor: 0;0;0 (color), shadowDistance: 4 (Pixel), shadowOpacity: 127 (Pixel), text: Text (multilinestring), textAlignment: left (choice, one of: [\\"left\\", \\"center\\", \\"right\\"]), verticalTextAlignment: top (choice, one of: [\\"top\\", \\"center\\", \\"bottom\\"])."`
+        `"Created object \\"MyNewTextObject\\" (type \\"TextObject::Text\\", scene \\"TestScene\\") from scratch. Properties: bold: false, characterSize: 20 (px), color: 0;0;0 (color), isOutlineEnabled: false, isShadowEnabled: false, italic: false, lineHeight: 0 (px), outlineColor: 255;255;255 (color), outlineThickness: 2 (px), shadowAngle: 90 (deg), shadowBlurRadius: 2 (px), shadowColor: 0;0;0 (color), shadowDistance: 4 (px), shadowOpacity: 127 (px), text: Text (multilinestring), textAlignment: left (choice, one of: [\\"left\\", \\"center\\", \\"right\\"]), verticalTextAlignment: top (choice, one of: [\\"top\\", \\"center\\", \\"bottom\\"]). Empty: font (resource)."`
       );
       expect(result.success).toBe(true);
       expect(onObjectsModifiedOutsideEditor).toHaveBeenCalledWith({
@@ -196,7 +250,7 @@ describe('editorFunctions', () => {
 
       expect(result.success).toBe(true);
       expect(result.message).toMatchInlineSnapshot(
-        `"Object with name \\"Player\\" already exists, no need to re-create it."`
+        `"Object \\"Player\\" already exists."`
       );
       expect(onObjectsModifiedOutsideEditor).toHaveBeenCalledWith({
         scene: testScene,
@@ -225,7 +279,7 @@ describe('editorFunctions', () => {
       expect(testScene.getObjects().hasObjectNamed('TheNewPlayer')).toBe(true);
       expect(result.success).toBe(true);
       expect(result.message).toMatchInlineSnapshot(
-        `"Duplicated object \\"Player\\" (from scene \\"TestScene\\") as \\"TheNewPlayer\\" (to scene \\"TestScene\\"). The new object \\"TheNewPlayer\\" has the same type, behaviors, properties and effects as the one it was duplicated from."`
+        `"Duplicated \\"Player\\" (scene \\"TestScene\\") as \\"TheNewPlayer\\" (scene \\"TestScene\\"); same type/behaviors/properties/effects."`
       );
       expect(onObjectsModifiedOutsideEditor).toHaveBeenCalledWith({
         scene: testScene,
@@ -255,7 +309,7 @@ describe('editorFunctions', () => {
       expect(testScene.getObjects().hasObjectNamed('TheNewPlayer')).toBe(false);
       expect(result.success).toBe(true);
       expect(result.message).toMatchInlineSnapshot(
-        `"Duplicated object \\"Player\\" (from scene \\"TestScene\\") as \\"TheNewPlayer\\" (to the global objects). The new object \\"TheNewPlayer\\" has the same type, behaviors, properties and effects as the one it was duplicated from."`
+        `"Duplicated \\"Player\\" (scene \\"TestScene\\") as \\"TheNewPlayer\\" (global objects); same type/behaviors/properties/effects."`
       );
       expect(onObjectsModifiedOutsideEditor).toHaveBeenCalledWith({
         scene: testScene,
@@ -306,7 +360,7 @@ describe('editorFunctions', () => {
       );
       expect(result.success).toBe(true);
       expect(result.message).toMatchInlineSnapshot(
-        `"Duplicated object \\"OtherScenePlayer\\" (from scene \\"OtherScene\\") as \\"TheNewPlayer\\" (to scene \\"TestScene\\"). The new object \\"TheNewPlayer\\" has the same type, behaviors, properties and effects as the one it was duplicated from."`
+        `"Duplicated \\"OtherScenePlayer\\" (scene \\"OtherScene\\") as \\"TheNewPlayer\\" (scene \\"TestScene\\"); same type/behaviors/properties/effects."`
       );
       expect(onObjectsModifiedOutsideEditor).toHaveBeenCalledWith({
         scene: testScene,
@@ -333,7 +387,7 @@ describe('editorFunctions', () => {
 
       expect(result.success).toBe(false);
       expect(result.message).toMatchInlineSnapshot(
-        `"Object not found: \\"DoesNotExist\\" in scene \\"OtherScene\\" or as a global object. Nothing was duplicated."`
+        `"Object \\"DoesNotExist\\" not found in scene \\"OtherScene\\" nor globally. Not duplicated."`
       );
     });
 
@@ -354,7 +408,7 @@ describe('editorFunctions', () => {
 
       expect(result.success).toBe(false);
       expect(result.message).toMatchInlineSnapshot(
-        `"Object not found: \\"DoesNotExist\\" in scene \\"TestScene\\" or as a global object. Nothing was duplicated."`
+        `"Object \\"DoesNotExist\\" not found in scene \\"TestScene\\" nor globally. Not duplicated."`
       );
     });
 
@@ -385,7 +439,7 @@ describe('editorFunctions', () => {
       );
       expect(testScene.getObjects().hasObjectNamed('Player')).toBe(true);
       expect(result.message).toMatchInlineSnapshot(
-        `"Replaced object \\"Player\\" by an object from the asset store fitting the search, with the same type (\\"Sprite\\")."`
+        `"Replaced scene \\"TestScene\\" object \\"Player\\" with asset store object (same type \\"Sprite\\")."`
       );
       expect(result.success).toBe(true);
       expect(onObjectsModifiedOutsideEditor).toHaveBeenCalledWith({
@@ -422,7 +476,7 @@ describe('editorFunctions', () => {
       );
       expect(testScene.getObjects().hasObjectNamed('Player')).toBe(false);
       expect(result.message).toMatchInlineSnapshot(
-        `"Moved object \\"Player\\" to the global objects. Its type, behaviors, properties and effects are unchanged."`
+        `"Moved \\"Player\\" to global objects; type/behaviors/properties/effects unchanged."`
       );
       expect(result.success).toBe(true);
       expect(onObjectsModifiedOutsideEditor).toHaveBeenCalledWith({
@@ -457,7 +511,7 @@ describe('editorFunctions', () => {
       );
 
       expect(result.message).toMatchInlineSnapshot(
-        `"Object \\"GlobalObjectPlayer\\" already exists in the global objects. Nothing was changed."`
+        `"Object \\"GlobalObjectPlayer\\" already exists globally. No change."`
       );
       expect(project.getObjects().hasObjectNamed('GlobalObjectPlayer')).toBe(
         true
@@ -487,7 +541,7 @@ describe('editorFunctions', () => {
       );
 
       expect(result.message).toMatchInlineSnapshot(
-        `"Object \\"GlobalObjectPlayer\\" is a global object. Global objects can't be moved, so it cannot be moved to the scene \\"TestScene\\"."`
+        `"\\"GlobalObjectPlayer\\" is global; global objects cannot be moved to scene \\"TestScene\\"."`
       );
       expect(project.getObjects().hasObjectNamed('GlobalObjectPlayer')).toBe(
         true
@@ -556,7 +610,7 @@ describe('editorFunctions', () => {
       expect(testScene.getObjects().hasObjectNamed('MyAssetObject')).toBe(true);
     });
 
-    it('fails when creating a new object without object_type nor asset_id', async () => {
+    it('fails when creating a new object without object_type, search_terms nor asset_id', async () => {
       const result: EditorFunctionGenericOutput = await editorFunctions.create_or_replace_object.launchFunction(
         {
           ...makeFakeLaunchFunctionOptionsWithProject(project),
@@ -569,7 +623,7 @@ describe('editorFunctions', () => {
 
       expect(result.success).toBe(false);
       expect(result.message).toMatchInlineSnapshot(
-        `"Cannot create object \\"MyAssetObject\\": specify either \\"object_type\\" or \\"asset_id\\"."`
+        `"No search_terms or asset_id provided for \\"MyAssetObject\\". Not created."`
       );
     });
 
@@ -592,7 +646,7 @@ describe('editorFunctions', () => {
 
       expect(result.success).toBe(true);
       expect(result.message).toMatchInlineSnapshot(
-        `"Replaced object \\"Player\\" by an object from the asset store fitting the search, with the same type (\\"Sprite\\")."`
+        `"Replaced scene \\"TestScene\\" object \\"Player\\" with asset store object (same type \\"Sprite\\")."`
       );
     });
 
@@ -610,7 +664,61 @@ describe('editorFunctions', () => {
 
       expect(result.success).toBe(false);
       expect(result.message).toMatchInlineSnapshot(
-        `"Object with name \\"Player\\" already exists in scene \\"TestScene\\" with type \\"Sprite\\". It cannot be (re)created or replaced as type \\"TextObject::Text\\"."`
+        `"Object \\"Player\\" already exists in scene \\"TestScene\\" with type \\"Sprite\\". Cannot (re)create as type \\"TextObject::Text\\"."`
+      );
+    });
+
+    it('reports global scope when creating a global object from scratch', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.create_or_replace_object.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          searchAndInstallAsset: async () =>
+            Promise.resolve({
+              status: 'nothing-found',
+              message: '',
+              createdObjects: [],
+              assetShortHeader: null,
+              isTheFirstOfItsTypeInProject: false,
+            }),
+          args: {
+            scene_name: 'TestScene',
+            object_type: 'TextObject::Text',
+            object_name: 'GlobalText',
+            target_object_scope: 'global',
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(project.getObjects().hasObjectNamed('GlobalText')).toBe(true);
+      expect(testScene.getObjects().hasObjectNamed('GlobalText')).toBe(false);
+      expect(result.message).toEqual(
+        expect.stringContaining(
+          'Created object "GlobalText" (type "TextObject::Text", global) from scratch.'
+        )
+      );
+    });
+
+    it('reports global scope when creating a global object from the asset store', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.create_or_replace_object.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_type: 'Sprite',
+            object_name: 'GlobalSprite',
+            target_object_scope: 'global',
+            search_terms: 'cool sprite',
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(project.getObjects().hasObjectNamed('GlobalSprite')).toBe(true);
+      expect(result.message).toEqual(
+        expect.stringContaining(
+          'Created object "GlobalSprite" (type "Sprite", global) from asset store.'
+        )
       );
     });
   });
@@ -673,8 +781,8 @@ describe('editorFunctions', () => {
 
       expect(result.success).toBe(true);
       expect(result.message).toMatchInlineSnapshot(`
-        "Successfully done the changes.
-        Changed property \\"font\\" of object \\"MyTextObject\\" to \\"font2.ttf\\"."
+        "Done.
+        Set \\"font\\" on \\"MyTextObject\\" = \\"font2.ttf\\"."
       `);
 
       // Verify the property was actually changed
@@ -705,8 +813,8 @@ describe('editorFunctions', () => {
 
       expect(result.success).toBe(false);
       expect(result.message).toMatchInlineSnapshot(`
-        "No changes were made because of these issues:
-        Could not change property \\"font\\" of object \\"MyTextObject\\" to \\"non-existing-font.ttf\\" because the resource \\"non-existing-font.ttf\\" does not exist in the project. New resources can't be added just by setting a new name that does not exist. Instead, use \`create_or_replace_object\` to replace the assets of an existing object by new one(s) that will be searched and imported from the asset store (this will keep the object properties, behaviors, events, etc. unchanged)."
+        "No changes. Issues:
+        \\"font\\" on \\"MyTextObject\\" -> \\"non-existing-font.ttf\\": resource \\"non-existing-font.ttf\\" does not exist. New resources cannot be added just by name; use \`create_or_replace_object\` to import assets from the asset store (preserving properties/behaviors/events)."
       `);
 
       // Verify the property was NOT changed (still the original value)
@@ -737,8 +845,8 @@ describe('editorFunctions', () => {
 
       expect(result.success).toBe(false);
       expect(result.message).toMatchInlineSnapshot(`
-        "No changes were made because of these issues:
-        Could not change property \\"font\\" of object \\"MyTextObject\\" to \\"audio1.aac\\" because the resource \\"audio1.aac\\" exists in project but has type \\"audio\\", which is not the expected type \\"font\\"."
+        "No changes. Issues:
+        \\"font\\" on \\"MyTextObject\\" -> \\"audio1.aac\\": resource \\"audio1.aac\\" has kind \\"audio\\" but expected \\"font\\"."
       `);
 
       // Verify the property was NOT changed (still the original value)
@@ -844,21 +952,21 @@ describe('editorFunctions', () => {
       // The operation should succeed overall (some changes were made)
       expect(result.success).toBe(true);
       expect(result.message).toMatchInlineSnapshot(`
-        "Successfully done some changes but some issues were found - see the warnings.
-        Changed property \\"characterSize\\" of object \\"MyTextObject\\" to \\"56\\".
-        Changed property \\"verticalTextAlignment\\" of object \\"MyTextObject\\" to \\"bottom\\".
-        Changed property \\"bold\\" of object \\"MyTextObject\\" to \\"true\\".
-        Changed property \\"isShadowEnabled\\" of object \\"MyTextObject\\" to \\"true\\".
-        Changed property \\"italic\\" of object \\"MyTextObject\\" to \\"false\\".
-        Changed property \\"shadowAngle\\" of object \\"MyTextObject\\" to \\"20\\".
-        Changed property \\"shadowDistance\\" of object \\"MyTextObject\\" to \\"0\\".
-        Changed property \\"shadowBlurRadius\\" of object \\"MyTextObject\\" to \\"20.41\\".
+        "Done with warnings.
+        Set \\"characterSize\\" on \\"MyTextObject\\" = \\"56\\".
+        Set \\"verticalTextAlignment\\" on \\"MyTextObject\\" = \\"bottom\\".
+        Set \\"bold\\" on \\"MyTextObject\\" = \\"true\\".
+        Set \\"isShadowEnabled\\" on \\"MyTextObject\\" = \\"true\\".
+        Set \\"italic\\" on \\"MyTextObject\\" = \\"false\\".
+        Set \\"shadowAngle\\" on \\"MyTextObject\\" = \\"20\\".
+        Set \\"shadowDistance\\" on \\"MyTextObject\\" = \\"0\\".
+        Set \\"shadowBlurRadius\\" on \\"MyTextObject\\" = \\"20.41\\".
         Warnings:
-        Could not change property \\"textAlignment\\" of object \\"MyTextObject\\". The value might be invalid, of the wrong type or not allowed.
-        Property not found: nonExistingProperty on object MyTextObject.
-        Property \\"shadowAngle\\" of object \\"MyTextObject\\" was changed to 20 - but the original requested value (20,40 , 50) looks like a size with multiple dimensions. This is not supported, only a number is allowed here.
-        Property \\"shadowDistance\\" of object \\"MyTextObject\\" was changed to 0 - but the original requested value (20X   40 X 50) looks like a size with multiple dimensions. This is not supported, only a number is allowed here.
-        Property \\"shadowBlurRadius\\" of object \\"MyTextObject\\" was changed to 20.41 - but the original requested value (20.41 × 50) looks like a size with multiple dimensions. This is not supported, only a number is allowed here."
+        Could not set \\"textAlignment\\" on \\"MyTextObject\\": invalid value or type.
+        Property \\"nonExistingProperty\\" not found on object \\"MyTextObject\\".
+        \\"shadowAngle\\" on \\"MyTextObject\\" = \\"20\\", but requested \\"20,40 , 50\\" looks multi-dimensional; only a single number is allowed.
+        \\"shadowDistance\\" on \\"MyTextObject\\" = \\"0\\", but requested \\"20X   40 X 50\\" looks multi-dimensional; only a single number is allowed.
+        \\"shadowBlurRadius\\" on \\"MyTextObject\\" = \\"20.41\\", but requested \\"20.41 × 50\\" looks multi-dimensional; only a single number is allowed."
       `);
 
       // Verify the properties were actually changed
@@ -869,6 +977,46 @@ describe('editorFunctions', () => {
       expect(properties.get('bold').getValue()).toBe('true');
       expect(properties.get('italic').getValue()).toBe('false');
       expect(properties.get('shadowAngle').getValue()).toBe('20');
+    });
+
+    it('reports the FINAL renamed name when a collision forces a suffix', async () => {
+      // The scene already has another object named "Foo": renaming
+      // MyTextObject -> Foo must collide and end up as "Foo2".
+      testScene
+        .getObjects()
+        .insertNewObject(
+          project,
+          'Sprite',
+          'Foo',
+          testScene.getObjects().getObjectsCount()
+        );
+
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_object_property.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'MyTextObject',
+            changed_properties: [
+              {
+                property_name: 'name',
+                new_value: 'Foo',
+              },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      // Final name reported is "Foo2", not the requested "Foo".
+      expect(result.message).toMatchInlineSnapshot(`
+        "Done.
+        Renamed object \\"MyTextObject\\" to \\"Foo2\\" (events and references updated)."
+      `);
+      // Original "Foo" still exists; the renamed one is "Foo2".
+      expect(testScene.getObjects().hasObjectNamed('Foo')).toBe(true);
+      expect(testScene.getObjects().hasObjectNamed('Foo2')).toBe(true);
+      expect(testScene.getObjects().hasObjectNamed('MyTextObject')).toBe(false);
     });
   });
 
@@ -947,15 +1095,15 @@ describe('editorFunctions', () => {
       // The operation should succeed overall (some changes were made)
       expect(result.success).toBe(true);
       expect(result.message).toMatchInlineSnapshot(`
-        "Successfully done some changes but some issues were found - see the warnings.
-        Changed property \\"Gravity\\" of behavior \\"PlatformerObject\\" to \\"1500\\".
-        Changed property \\"JumpSpeed\\" of behavior \\"PlatformerObject\\" to \\"800\\".
-        Changed property \\"MaxSpeed\\" of behavior \\"PlatformerObject\\" to \\"300\\".
-        Changed property \\"CanGrabPlatforms\\" of behavior \\"PlatformerObject\\" to \\"true\\".
-        Changed property \\"IgnoreDefaultControls\\" of behavior \\"PlatformerObject\\" to \\"false\\".
+        "Done with warnings.
+        Set \\"Gravity\\" on behavior \\"PlatformerObject\\" = \\"1500\\".
+        Set \\"JumpSpeed\\" on behavior \\"PlatformerObject\\" = \\"800\\".
+        Set \\"MaxSpeed\\" on behavior \\"PlatformerObject\\" = \\"300\\".
+        Set \\"CanGrabPlatforms\\" on behavior \\"PlatformerObject\\" = \\"true\\".
+        Set \\"IgnoreDefaultControls\\" on behavior \\"PlatformerObject\\" = \\"false\\".
         Warnings:
-        Property \\"MaxSpeed\\" of behavior \\"PlatformerObject\\" was changed to 300 - but the original requested value (300 x 20) looks like a size with multiple dimensions. This is not supported, only a number is allowed here.
-        Property \\"nonExistingProperty\\" not found on behavior \\"PlatformerObject\\" of object \\"MySprite\\"."
+        \\"MaxSpeed\\" on behavior \\"PlatformerObject\\" = \\"300\\", but requested \\"300 x 20\\" looks multi-dimensional; only a single number is allowed.
+        Property \\"nonExistingProperty\\" not on behavior \\"PlatformerObject\\" of \\"MySprite\\"."
       `);
 
       // Verify the behavior properties were actually changed
@@ -1116,6 +1264,221 @@ describe('editorFunctions', () => {
       project.delete();
     });
 
+    it('reports scope and new value for a global variable (added)', async () => {
+      const result = await editorFunctions.add_or_edit_variable.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          variable_name_or_path: 'score',
+          variable_scope: 'global',
+          value: '42',
+        },
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.message).toMatchInlineSnapshot(
+        `"Added global variable \\"score\\" (Number) = 42"`
+      );
+    });
+
+    it('reports scope and new value for a scene variable (added)', async () => {
+      const result = await editorFunctions.add_or_edit_variable.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          variable_name_or_path: 'lives',
+          variable_scope: 'scene',
+          scene_name: 'TestScene',
+          value: '3',
+        },
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.message).toMatchInlineSnapshot(
+        `"Added scene \\"TestScene\\" variable \\"lives\\" (Number) = 3"`
+      );
+    });
+
+    it('reports scope and new value for a scene-object variable (added)', async () => {
+      const result = await editorFunctions.add_or_edit_variable.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          variable_name_or_path: 'health',
+          variable_scope: 'object',
+          scene_name: 'TestScene',
+          object_name: 'Player',
+          value: '100',
+        },
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.message).toMatchInlineSnapshot(
+        `"Added scene \\"TestScene\\" object \\"Player\\" variable \\"health\\" (Number) = 100"`
+      );
+    });
+
+    it('reports scope and new value for a global-object variable (added)', async () => {
+      const result = await editorFunctions.add_or_edit_variable.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          variable_name_or_path: 'speed',
+          variable_scope: 'object',
+          object_name: 'GlobalEnemy',
+          value: '50',
+        },
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.message).toMatchInlineSnapshot(
+        `"Added global object \\"GlobalEnemy\\" variable \\"speed\\" (Number) = 50"`
+      );
+    });
+
+    it('truncates the value to 200 chars in the success message', async () => {
+      const longValue = 'x'.repeat(450);
+      const result = await editorFunctions.add_or_edit_variable.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          variable_name_or_path: 'longText',
+          variable_scope: 'global',
+          value: longValue,
+        },
+      });
+
+      expect(result.success).toBe(true);
+      // 200 'x' kept, then the truncation tag mentioning the remaining 250 chars.
+      expect(result.message).toBe(
+        `Added global variable "longText" (String) = ${'x'.repeat(
+          200
+        )}[...truncated - 250 more characters]`
+      );
+    });
+
+    it('does not truncate when value is exactly 200 chars', async () => {
+      const value = 'a'.repeat(200);
+      const result = await editorFunctions.add_or_edit_variable.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          variable_name_or_path: 'edgeCase',
+          variable_scope: 'global',
+          value,
+        },
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.message).toBe(
+        `Added global variable "edgeCase" (String) = ${value}`
+      );
+    });
+
+    it('reports the new value when editing an existing variable', async () => {
+      const variables = project.getVariables();
+      variables.insertNew('greeting', 0).setString('hi');
+
+      const result = await editorFunctions.add_or_edit_variable.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          variable_name_or_path: 'greeting',
+          variable_scope: 'global',
+          value: 'hello world',
+        },
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.message).toMatchInlineSnapshot(
+        `"Edited global variable \\"greeting\\" = hello world"`
+      );
+    });
+
+    it('creates a structure variable from a JSON object value', async () => {
+      const value = '{"hp": 10, "name": "Hero", "alive": true}';
+      const result = await editorFunctions.add_or_edit_variable.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          variable_name_or_path: 'stats',
+          variable_scope: 'global',
+          value,
+        },
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.message).toBe(
+        `Added global variable "stats" (Structure) = ${value}`
+      );
+
+      // The variable is actually persisted as a structure with each child set.
+      const variable = project.getVariables().get('stats');
+      expect(variable.getType()).toBe(gd.Variable.Structure);
+      expect(variable.getChild('hp').getValue()).toBe(10);
+      expect(variable.getChild('name').getString()).toBe('Hero');
+      expect(variable.getChild('alive').getBool()).toBe(true);
+    });
+
+    it('sets a nested field inside an existing structure', async () => {
+      // Pre-populate a structure with a child field.
+      const variables = project.getVariables();
+      const struct = variables.insertNew('player', 0);
+      struct.castTo('Structure');
+      struct.getChild('hp').setValue(10);
+
+      const result = await editorFunctions.add_or_edit_variable.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          variable_name_or_path: 'player.hp',
+          variable_scope: 'global',
+          value: '42',
+        },
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.message).toMatchInlineSnapshot(
+        `"Edited global variable \\"player.hp\\" = 42"`
+      );
+      expect(struct.getChild('hp').getValue()).toBe(42);
+    });
+
+    it('adds a deeply nested structure path (path-based creation)', async () => {
+      const result = await editorFunctions.add_or_edit_variable.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          variable_name_or_path: 'config.audio.volume',
+          variable_scope: 'global',
+          value: '0.8',
+        },
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.message).toMatchInlineSnapshot(
+        `"Added global variable \\"config.audio.volume\\" (Number) = 0.8"`
+      );
+      const config = project.getVariables().get('config');
+      expect(config.getType()).toBe(gd.Variable.Structure);
+      expect(
+        config
+          .getChild('audio')
+          .getChild('volume')
+          .getValue()
+      ).toBeCloseTo(0.8);
+    });
+
+    it('sets an element of an array variable', async () => {
+      const result = await editorFunctions.add_or_edit_variable.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          variable_name_or_path: 'inventory[2]',
+          variable_scope: 'global',
+          value: 'Magic Sword',
+        },
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.message).toMatchInlineSnapshot(
+        `"Added global variable \\"inventory[2]\\" (String) = Magic Sword"`
+      );
+      const inventory = project.getVariables().get('inventory');
+      expect(inventory.getType()).toBe(gd.Variable.Array);
+      expect(inventory.getChildrenCount()).toBe(3);
+      expect(inventory.getAtIndex(2).getString()).toBe('Magic Sword');
+    });
+
     it('preserves existing sibling fields when editing one field of a structure', async () => {
       // Pre-populate a structure with multiple children to ensure none are lost.
       const variables = project.getVariables();
@@ -1136,7 +1499,7 @@ describe('editorFunctions', () => {
 
       expect(result.success).toBe(true);
       expect(result.message).toMatchInlineSnapshot(
-        `"Properly edited variable \\"player.hp\\"."`
+        `"Edited global variable \\"player.hp\\" = 42"`
       );
       expect(struct.getType()).toBe(gd.Variable.Structure);
       expect(struct.getChild('hp').getValue()).toBe(42);
@@ -1167,7 +1530,7 @@ describe('editorFunctions', () => {
 
       expect(result.success).toBe(true);
       expect(result.message).toMatchInlineSnapshot(
-        `"Properly edited variable \\"inventory[1]\\"."`
+        `"Edited global variable \\"inventory[1]\\" = Magic Shield"`
       );
       expect(array.getType()).toBe(gd.Variable.Array);
       // Other elements must still be intact (no data loss from cast).
@@ -1190,13 +1553,282 @@ describe('editorFunctions', () => {
 
       expect(result.success).toBe(true);
       expect(result.message).toMatchInlineSnapshot(
-        `"Properly added variable \\"players[0].name\\" of type \\"String\\"."`
+        `"Added scene \\"TestScene\\" variable \\"players[0].name\\" (String) = Alice"`
       );
       const players = testScene.getVariables().get('players');
       expect(players.getType()).toBe(gd.Variable.Array);
       const player0 = players.getAtIndex(0);
       expect(player0.getType()).toBe(gd.Variable.Structure);
       expect(player0.getChild('name').getString()).toBe('Alice');
+    });
+  });
+
+  describe('inspect_object_properties (property listing format)', () => {
+    let project: gdProject;
+    let testScene: gdLayout;
+
+    beforeEach(() => {
+      // $FlowFixMe[invalid-constructor]
+      project = new gd.ProjectHelper.createNewGDJSProject();
+      testScene = project.insertNewLayout('TestScene', 0);
+
+      const sceneObjects = testScene.getObjects();
+      sceneObjects.insertNewObject(
+        project,
+        'TextObject::Text',
+        'MyText',
+        sceneObjects.getObjectsCount()
+      );
+    });
+
+    afterEach(() => {
+      project.delete();
+    });
+
+    it('formats new object properties: short units, no boolean type tag, empty grouped at end', async () => {
+      // The TextObject::Text new-from-scratch path uses `formatPropertiesList`,
+      // and is fully populated by GD core - making it a stable check.
+      const sceneObjects = testScene.getObjects();
+      sceneObjects.removeObject('MyText');
+
+      const result = await editorFunctions.create_or_replace_object.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_type: 'TextObject::Text',
+            object_name: 'NewText',
+          },
+          searchAndInstallAsset: async () =>
+            Promise.resolve({
+              status: 'nothing-found',
+              message: '',
+              createdObjects: [],
+              assetShortHeader: null,
+              isTheFirstOfItsTypeInProject: false,
+            }),
+        }
+      );
+
+      expect(result.success).toBe(true);
+      // Booleans omit the "(boolean)" tag entirely.
+      expect(result.message).toEqual(expect.stringContaining('bold: false,'));
+      expect(result.message).not.toEqual(expect.stringContaining('(boolean)'));
+      // Pixel units are abbreviated to "(px)" everywhere.
+      expect(result.message).toEqual(expect.stringContaining('(px)'));
+      expect(result.message).not.toEqual(expect.stringContaining('(Pixel)'));
+      // DegreeAngle is abbreviated to "(deg)".
+      expect(result.message).toEqual(expect.stringContaining('(deg)'));
+      expect(result.message).not.toEqual(
+        expect.stringContaining('(DegreeAngle)')
+      );
+      // Empty properties (here: `font`) are grouped at the end.
+      expect(result.message).toEqual(
+        expect.stringContaining('Empty: font (resource).')
+      );
+    });
+  });
+
+  describe('put_2d_instances (new-instance attributes in message)', () => {
+    let project: gdProject;
+    let testScene: gdLayout;
+
+    beforeEach(() => {
+      // $FlowFixMe[invalid-constructor]
+      project = new gd.ProjectHelper.createNewGDJSProject();
+      testScene = project.insertNewLayout('TestScene', 0);
+      testScene.getObjects().insertNewObject(project, 'Sprite', 'Player', 0);
+    });
+
+    afterEach(() => {
+      project.delete();
+    });
+
+    it('omits the attributes parenthetical when none of size/rotation/opacity/z-order are specified', async () => {
+      const result = await editorFunctions.put_2d_instances.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          object_name: 'Player',
+          layer_name: '',
+          brush_kind: 'point',
+          brush_position: '100,200',
+          new_instances_count: 1,
+        },
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.message).toEqual(
+        expect.stringContaining(
+          'Created 1 new instance of object "Player" using point brush at 100, 200 on layer "base".'
+        )
+      );
+    });
+
+    it('includes size/rotation/opacity/z-order in the new-instance message', async () => {
+      const result = await editorFunctions.put_2d_instances.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          object_name: 'Player',
+          layer_name: '',
+          brush_kind: 'point',
+          brush_position: '50,60',
+          new_instances_count: 2,
+          instances_size: '64,64',
+          instances_rotation: 45,
+          instances_opacity: 128,
+          instances_z_order: 5,
+        },
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.message).toEqual(
+        expect.stringContaining(
+          'Created 2 new instances of object "Player" using point brush at 50, 60 on layer "base" (size 64x64, rotation 45°, opacity 128/255, z-order 5, origin at this position, each occupies X 50 to 114, Y 60 to 124).'
+        )
+      );
+    });
+  });
+
+  describe('put_3d_instances (new-instance attributes in message)', () => {
+    let project: gdProject;
+    let testScene: gdLayout;
+
+    beforeEach(() => {
+      // $FlowFixMe[invalid-constructor]
+      project = new gd.ProjectHelper.createNewGDJSProject();
+      testScene = project.insertNewLayout('TestScene', 0);
+      testScene.getObjects().insertNewObject(project, 'Sprite', 'Player', 0);
+    });
+
+    afterEach(() => {
+      project.delete();
+    });
+
+    it('includes size and rotation in the new-instance message', async () => {
+      const result = await editorFunctions.put_3d_instances.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          object_name: 'Player',
+          layer_name: '',
+          brush_kind: 'point',
+          brush_position: '10,20,30',
+          new_instances_count: 1,
+          instances_size: '8,16,24',
+          instances_rotation: '15,30,45',
+        },
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.message).toEqual(
+        expect.stringContaining(
+          'Created 1 new instance of object "Player" using point brush at 10, 20, 30 on layer "base" (size 8x16x24, rotation (15°, 30°, 45°), origin at this position, each occupies X 10 to 18, Y 20 to 36, Z 30 to 54).'
+        )
+      );
+    });
+  });
+
+  describe('describe_instances (position semantics)', () => {
+    let project: gdProject;
+    let testScene: gdLayout;
+
+    beforeEach(() => {
+      // $FlowFixMe[invalid-constructor]
+      project = new gd.ProjectHelper.createNewGDJSProject();
+      testScene = project.insertNewLayout('TestScene', 0);
+      testScene.getObjects().insertNewObject(project, 'Sprite', 'Player', 0);
+    });
+
+    afterEach(() => {
+      project.delete();
+    });
+
+    it('exposes z (even when 0), object size info and position semantics', async () => {
+      const instance = testScene
+        .getInitialInstances()
+        .insertNewInitialInstance();
+      instance.setObjectName('Player');
+      instance.setX(100);
+      instance.setY(200);
+      instance.setHasCustomSize(true);
+      instance.setHasCustomDepth(true);
+      instance.setCustomWidth(32);
+      instance.setCustomHeight(48);
+      instance.setCustomDepth(64);
+
+      const result = await editorFunctions.describe_instances.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: { scene_name: 'TestScene' },
+      });
+
+      expect(result.success).toBe(true);
+      const instances = result.instances || [];
+      expect(instances).toHaveLength(1);
+      expect(instances[0].z).toBe(0);
+      expect(instances[0].width).toBe(32);
+      expect(instances[0].height).toBe(48);
+      expect(instances[0].depth).toBe(64);
+      expect(result.positionSemantics).toEqual(
+        expect.stringContaining('origin, NOT its center')
+      );
+      expect(result.objectSizeInfo).toEqual({ Player: null });
+    });
+  });
+
+  describe('change_scene_properties_layers_effects_groups (echo new values)', () => {
+    let project: gdProject;
+    let testScene: gdLayout;
+
+    beforeEach(() => {
+      // $FlowFixMe[invalid-constructor]
+      project = new gd.ProjectHelper.createNewGDJSProject();
+      testScene = project.insertNewLayout('TestScene', 0);
+    });
+
+    afterEach(() => {
+      project.delete();
+    });
+
+    it('echoes the new values for background color and game resolution', async () => {
+      const result = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            changed_properties: [
+              { property_name: 'backgroundColor', new_value: '#ff0080' },
+              { property_name: 'gameResolutionWidth', new_value: '1920' },
+              { property_name: 'gameResolutionHeight', new_value: '1080' },
+              { property_name: 'stopSoundsOnStartup', new_value: 'true' },
+              { property_name: 'gameOrientation', new_value: 'landscape' },
+              { property_name: 'gameScaleMode', new_value: 'nearest' },
+              { property_name: 'gameName', new_value: 'My Game' },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).toMatchInlineSnapshot(`
+        "Done.
+        Set scene background color to #ff0080.
+        Set game resolution width to 1920.
+        Set game resolution height to 1080.
+        Set stopSoundsOnStartup to true.
+        Set game orientation to landscape.
+        Set game scale mode to nearest.
+        Set game name to \\"My Game\\"."
+      `);
+
+      // The properties are also actually applied to the project.
+      expect(project.getGameResolutionWidth()).toBe(1920);
+      expect(project.getGameResolutionHeight()).toBe(1080);
+      expect(testScene.stopSoundsOnStartup()).toBe(true);
+      expect(project.getOrientation()).toBe('landscape');
+      expect(project.getScaleMode()).toBe('nearest');
+      expect(project.getName()).toBe('My Game');
     });
   });
 });

@@ -1,7 +1,6 @@
 // @flow
 import { t, Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
-import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import Text from '../../UI/Text';
 import { Column, Line } from '../../UI/Grid';

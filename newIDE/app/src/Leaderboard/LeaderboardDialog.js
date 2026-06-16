@@ -7,7 +7,6 @@ import FlatButton from '../UI/FlatButton';
 import HelpButton from '../UI/HelpButton';
 import { t, Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
-import { type I18n as I18nType } from '@lingui/core';
 
 type Props = {|
   onClose: () => void,

@@ -388,6 +388,9 @@ class GD_CORE_API EventsBasedObject: public AbstractEventsBasedEntity {
   void UnserializeFrom(gd::Project& project,
                        const SerializerElement& element) override;
 
+  void UnserializeDefaultVariantFrom(gd::Project &project,
+                                     const SerializerElement &element);
+
  private:
   gd::String defaultName;
   gd::String assetStoreTag;

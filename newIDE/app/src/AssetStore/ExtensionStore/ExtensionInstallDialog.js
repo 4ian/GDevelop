@@ -121,6 +121,7 @@ const ExtensionInstallDialog = ({
             ),
           ].filter(Boolean)}
           open
+          maxWidth="sm"
           cannotBeDismissed={isInstalling}
           onRequestClose={onClose}
           onApply={onInstall ? onInstallExtension : onClose}

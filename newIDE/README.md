@@ -99,6 +99,35 @@ Cloud storage providers are set up with development keys when you're running GDe
 
 > This is only necessary if you want to have cloud storage providers working in development. If not done, GDevelop will simply display an error while trying to use them.
 
+## (Optional) Building a portable bundle for CI / headless usage 🤖
+
+Build a self-contained zip (no installer, no code-signing) that can be
+extracted on a CI runner and used to execute CLI commands:
+
+```bash
+cd newIDE/electron-app
+npm install
+
+# Linux / macOS
+GD_PORTABLE_BUILD=true npm run build -- --publish never
+
+# Windows (PowerShell)
+$Env:GD_PORTABLE_BUILD='true'; npm run build -- --publish never
+```
+
+The resulting zip contains the full editor. After extracting, run commands like:
+
+```bash
+# Windows
+GDevelop.exe --disable-update-check --run-command EXPORT_HTML5_EXTERNAL path\to\game.json
+
+# Linux (install required libs: sudo apt install -y libnss3 libasound2t64)
+./gdevelop --no-sandbox --disable-update-check \
+  --run-command EXPORT_HTML5_EXTERNAL /path/to/game.json
+```
+
+Extra flags: `--keep-open` (don't quit after command), `--dev-tools` (open DevTools).
+
 ## (Optional) Building and deploying the standalone app 📦
 
 > 🖐 This section is only for maintainers that want to deploy the "official app" on the GDevelop website. If you're working on contributions for GDevelop, you won't need it. You can download ["Nightly Builds" of GDevelop here too](./docs/Nightly-Builds-and-continuous-deployment.md).

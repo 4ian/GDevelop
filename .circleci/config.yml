@@ -171,6 +171,25 @@ jobs:
       - store_artifacts:
           path: newIDE/electron-app/dist
 
+      # Stage just the x64 portable zip for the downstream
+      # cli-html5-export-linux job (avoid sharing the much larger
+      # .AppImage/.deb installers via the workspace).
+      - run:
+          name: Stage portable zip for downstream cli-html5-export-linux job
+          command: |
+            mkdir -p build-linux-workspace
+            for f in newIDE/electron-app/dist/gdevelop-*.zip; do
+              case "$f" in
+                *arm64*) ;;
+                *) cp "$f" build-linux-workspace/ ;;
+              esac
+            done
+            ls -lh build-linux-workspace
+      - persist_to_workspace:
+          root: build-linux-workspace
+          paths:
+            - .
+
       # Upload artifacts (AWS)
       - run:
           name: Deploy to S3 (specific commit)
@@ -194,7 +213,7 @@ jobs:
       # System dependencies (for Emscripten)
       - run:
           name: Install dependencies for Emscripten
-          command: sudo apt-get update && sudo apt install cmake
+          command: sudo apt-get update && sudo apt install cmake ccache
 
       - run:
           name: Install Emscripten (for GDevelop.js)
@@ -211,11 +230,37 @@ jobs:
           name: Install GDevelop.js dependencies and build it
           command: cd GDevelop.js && npm install && cd ..
 
-      # Build GDevelop.js (and run tests to ensure it works)
+      # Cache emcc/em++ output via ccache (keyed by content hash, immune to
+      # git checkout resetting source mtimes).
+      - restore_cache:
+          name: Restore ccache (Emscripten)
+          keys:
+            - gdevelop.js-emscripten-ccache-v1-{{ .Branch }}-{{ .Revision }}
+            - gdevelop.js-emscripten-ccache-v1-{{ .Branch }}-
+            - gdevelop.js-emscripten-ccache-v1-
+
+      # Build GDevelop.js
       - run:
           name: Build GDevelop.js
-          # Use "--runInBand" as it's faster and avoid deadlocks on CircleCI Linux machines (probably because limited in processes number).
-          command: cd GDevelop.js && source ../emsdk/emsdk_env.sh && npm run build && npm test -- --runInBand && cd ..
+          # CMAKE_(C|CXX)_COMPILER_LAUNCHER are read by CMake (>=3.17) from the
+          # environment and prepended to every compiler invocation.
+          command: |
+            export CMAKE_C_COMPILER_LAUNCHER=ccache
+            export CMAKE_CXX_COMPILER_LAUNCHER=ccache
+            cd GDevelop.js && source ../emsdk/emsdk_env.sh && npm run build && cd ..
+            ccache --show-stats
+
+      - save_cache:
+          name: Save ccache (Emscripten)
+          key: gdevelop.js-emscripten-ccache-v1-{{ .Branch }}-{{ .Revision }}
+          paths:
+            - ~/.cache/ccache
+
+      # "--runInBand" is faster and avoids deadlocks on CircleCI Linux machines
+      # (probably because of limited process numbers).
+      - run:
+          name: Run GDevelop.js tests
+          command: cd GDevelop.js && source ../emsdk/emsdk_env.sh && npm test -- --runInBand && cd ..
 
       - save_cache:
           paths:
@@ -291,6 +336,74 @@ jobs:
       - run:
           name: Deploy to S3 (specific commit)
           command: aws s3 sync Binaries/embuild/GDevelop.js s3://gdevelop-gdevelop.js/$(git rev-parse --abbrev-ref HEAD)/variant/debug-sanitizers/commit/$(git rev-parse HEAD)/
+
+  # Build and run the native GDCore_tests with AddressSanitizer + UBSan, to
+  # catch heap-use-after-free, buffer overflows and undefined behaviour that
+  # only sometimes manifest as flaky segfaults. 
+  # The Emscripten build has its own sanitizer job:
+  # build-gdevelop_js-debug-sanitizers-and-extra-checks.
+  build-gdcore-tests-sanitizers:
+    resource_class: medium+
+    docker:
+      - image: cimg/base:current
+
+    working_directory: ~/GDevelop
+
+    steps:
+      - checkout
+
+      - run:
+          name: Install build dependencies (cmake, clang, ccache, libstdc++ dev)
+          command: |
+            sudo apt-get update
+            sudo apt-get install -y cmake clang ccache libstdc++-12-dev
+
+      # Cache the compiler output via ccache (keyed by content hash, so it is
+      # immune to the fact that 'git checkout' resets every source file's mtime
+      # to "now" on each run).
+      - restore_cache:
+          name: Restore ccache
+          keys:
+            - gdcore-tests-asan-ccache-v1-{{ .Branch }}-{{ .Revision }}
+            - gdcore-tests-asan-ccache-v1-{{ .Branch }}-
+            - gdcore-tests-asan-ccache-v1-
+
+      - run:
+          name: Configure GDCore_tests with ASan + UBSan (Debug)
+          command: |
+            mkdir -p .build-tests-asan
+            cd .build-tests-asan
+            cmake \
+              -DBUILD_GDJS=FALSE \
+              -DBUILD_EXTENSIONS=FALSE \
+              -DBUILD_TESTS=TRUE \
+              -DCMAKE_BUILD_TYPE=Debug \
+              -DUSE_SANITIZERS="address,undefined" \
+              -DCMAKE_CXX_COMPILER=$(which clang++) \
+              -DCMAKE_C_COMPILER=$(which clang) \
+              -DCMAKE_C_COMPILER_LAUNCHER=ccache \
+              -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
+              ..
+
+      - run:
+          name: Build GDCore_tests
+          command: |
+            cd .build-tests-asan && make -j 4 GDCore_tests
+            ccache --show-stats
+
+      - save_cache:
+          name: Save ccache
+          key: gdcore-tests-asan-ccache-v1-{{ .Branch }}-{{ .Revision }}
+          paths:
+            - ~/.cache/ccache
+
+      - run:
+          name: Run GDCore_tests with sanitizers
+          command: |
+            cd .build-tests-asan
+            export ASAN_OPTIONS=detect_leaks=0:abort_on_error=1:print_stacktrace=1
+            export UBSAN_OPTIONS=print_stacktrace=1
+            Core/GDCore_tests
 
   # Trigger AppVeyor build, which also does a Windows build (keep it for redundancy).
   trigger-appveyor-windows-build:
@@ -451,6 +564,24 @@ jobs:
             node scripts/build.js --skip-app-build --win appx --publish=never
 
             cd ..\..
+      - run:
+          name: Build portable zip (without code signing)
+          command: |
+            cd newIDE\electron-app
+
+            $Env:GD_SIGNTOOL_THUMBPRINT = ''
+
+            $Env:GD_SIGNTOOL_SUBJECT_NAME = ''
+
+            $Env:CSC_LINK = ''
+
+            $Env:CSC_KEY_PASSWORD = ''
+
+            $Env:GD_PORTABLE_BUILD = 'true'
+
+            node scripts/build.js --skip-app-build --win zip --publish=never
+
+            cd ..\..
 
       - run:
           name: Clean binaries
@@ -488,6 +619,96 @@ jobs:
       - store_artifacts:
           path: newIDE/electron-app/dist
 
+  # End-to-end test that runs the GDevelop CLI to export an example game
+  # to HTML5, using either the portable Linux build just produced by
+  # build-linux (use-local-build=true) or the latest one downloaded from S3.
+  run-cli-html5-export-linux:
+    parameters:
+      use-local-build:
+        description: When true, attach the workspace produced by build-linux and use its portable zip instead of downloading the latest one from S3.
+        type: boolean
+        default: false
+    resource_class: medium
+    docker:
+      - image: cimg/node:24.13.0
+
+    working_directory: ~/GDevelop
+
+    steps:
+      - checkout
+
+      - when:
+          condition: << parameters.use-local-build >>
+          steps:
+            - attach_workspace:
+                at: ~/GDevelop/build-linux-workspace
+
+      # Runtime libraries required by Electron (headless still needs nss /
+      # alsa to even start up).
+      - run:
+          name: Install Electron runtime dependencies
+          command: |
+            sudo apt-get update
+            sudo apt-get install -y \
+              libnss3 \
+              libasound2t64 \
+              libgbm1 \
+              libgtk-3-0 \
+              libxss1 \
+              libatk-bridge2.0-0 \
+              libdrm2 \
+              libxkbcommon0 \
+              xvfb
+
+      # The script reuses the helpers from `newIDE/app/scripts` which
+      # depend on axios, minimist, shelljs and adm-zip. Rather than running
+      # a full `npm install` of `newIDE/app` (huge), we install just the
+      # four packages we need into a scratch directory and expose it via
+      # NODE_PATH so the script and its `./lib/*` helpers can `require` them.
+      - run:
+          name: Install minimal script deps (axios, minimist, shelljs, adm-zip)
+          command: |
+            mkdir -p cli-html5-export-deps
+            cd cli-html5-export-deps
+            npm init -y > /dev/null
+            npm install --no-audit --no-fund --silent \
+              axios@^0.18.1 \
+              minimist@^1.2.5 \
+              shelljs@^0.8.4 \
+              adm-zip@^0.5.10
+
+      - run:
+          name: Run CLI HTML5 export
+          # Wrap with xvfb-run as a safety net: even though the editor hides
+          # its BrowserWindow in --run-command mode, Electron itself still
+          # needs a usable display for some GPU/graphics initialization on
+          # headless Linux runners.
+          no_output_timeout: 20m
+          command: |
+            export NODE_PATH="$PWD/cli-html5-export-deps/node_modules"
+            if [ "<< parameters.use-local-build >>" = "true" ]; then
+              ZIP_PATH=$(ls ~/GDevelop/build-linux-workspace/gdevelop-*.zip | grep -v -- '-arm64' | head -1)
+              if [ -z "$ZIP_PATH" ]; then
+                echo "No portable zip found in build-linux workspace." >&2
+                exit 1
+              fi
+              echo "Using locally built portable zip: $ZIP_PATH"
+              EXTRA_ARGS="--zipPath=$ZIP_PATH"
+            else
+              echo "No local build available; will download the latest portable zip from S3."
+              EXTRA_ARGS="--branch=master"
+            fi
+            xvfb-run -a --server-args="-screen 0 1280x800x24" \
+              node newIDE/app/scripts/test-portable-cli-export.js \
+              $EXTRA_ARGS \
+              --example=3d-platformer \
+              --workDir=./cli-html5-export-work \
+              --artifactsDir=./cli-html5-export-artifacts
+
+      - store_artifacts:
+          path: ./cli-html5-export-artifacts
+          destination: cli-html5-export-artifacts
+
 workflows:
   gdevelop_js-wasm-extra-checks:
     jobs:
@@ -499,6 +720,10 @@ workflows:
                 - master
                 - stable
                 - /experimental-build.*/
+  tests:
+    jobs:
+      - build-gdcore-tests-sanitizers
+
   builds:
     jobs:
       - build-gdevelop_js-wasm-only
@@ -516,6 +741,19 @@ workflows:
       - build-linux:
           requires:
             - build-gdevelop_js-wasm-only
+          filters:
+            branches:
+              only:
+                - master
+                - stable
+                - /experimental-build.*/
+      # Right after build-linux, run the CLI HTML5 export against the
+      # portable zip it just produced (via the attached workspace).
+      - run-cli-html5-export-linux:
+          name: cli-html5-export-linux
+          use-local-build: true
+          requires:
+            - build-linux
           filters:
             branches:
               only:
@@ -540,3 +778,17 @@ workflows:
                 - master
                 - stable
                 - /experimental-build.*/
+
+  # Daily end-to-end test of the GDevelop CLI HTML5 export. Runs every day
+  # at 16:00 UTC (4pm UTC) against the latest portable build uploaded to S3
+  # for master.
+  daily-cli-html5-export-linux:
+    triggers:
+      - schedule:
+          cron: "0 16 * * *"
+          filters:
+            branches:
+              only:
+                - master
+    jobs:
+      - run-cli-html5-export-linux

@@ -153,7 +153,7 @@ protected:
  * Launch the specified resource worker on every resource referenced in the
  * events.
  */
-class ResourceWorkerInEventsWorker : public gd::ArbitraryEventsWorker {
+class ResourceWorkerInEventsWorker : public gd::ArbitraryEventsWorkerWithContext {
 public:
   ResourceWorkerInEventsWorker(const gd::Project &project_,
                                gd::ArbitraryResourceWorker &worker_)

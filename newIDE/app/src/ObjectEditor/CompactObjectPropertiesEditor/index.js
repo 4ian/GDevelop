@@ -65,6 +65,7 @@ import {
   type Field,
   type FieldChoices,
 } from '../../PropertiesEditor/PropertiesEditorSchema';
+import useVariablesContainerRefactoring from '../../VariablesList/useVariablesContainerRefactoring';
 
 const gd: libGDevelop = global.gd;
 
@@ -261,9 +262,12 @@ type Props = {|
   resourceManagementProps: ResourceManagementProps,
   layout?: ?gdLayout,
   eventsFunctionsExtension: gdEventsFunctionsExtension | null,
+  /** Only set when a default variant is edited */
+  eventsBasedObject: gdEventsBasedObject | null,
   onUpdateBehaviorsSharedData: () => void,
   objectsContainer: gdObjectsContainer,
   globalObjectsContainer: gdObjectsContainer | null,
+  initialInstances: gdInitialInstancesContainer,
   layersContainer: gdLayersContainer,
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   unsavedChanges?: ?UnsavedChanges,
@@ -295,9 +299,11 @@ export const CompactObjectPropertiesEditor = ({
   resourceManagementProps,
   layout,
   eventsFunctionsExtension,
+  eventsBasedObject,
   onUpdateBehaviorsSharedData,
   objectsContainer,
   globalObjectsContainer,
+  initialInstances,
   layersContainer,
   projectScopedContainersAccessor,
   unsavedChanges,
@@ -378,6 +384,11 @@ export const CompactObjectPropertiesEditor = ({
     .filter(behavior => !behavior.isDefaultBehavior());
 
   // Events based object children:
+  /** The events-based object according to the selected object type.
+   *
+   * This is not the same as `eventsBasedObject` which is the events-based
+   * object of the edited variant.
+   */
   const customObjectEventsBasedObject = project.hasEventsBasedObject(
     objectConfiguration.getType()
   )
@@ -538,6 +549,19 @@ export const CompactObjectPropertiesEditor = ({
     persistedScrollType: 'object',
   });
 
+  // Variable refactoring: snapshot on object selection, apply on deselection/unmount.
+  const { onVariablesUpdated } = useVariablesContainerRefactoring({
+    project,
+    variablesContainer: object.getVariables(),
+    initialInstances,
+    objectName: object.getName(),
+    eventsBasedObject,
+    enabled: objects.length === 1,
+    objectGroup: null,
+    objectsContainer: null,
+    globalObjectsContainer: null,
+  });
+
   const propertiesSchema = React.useMemo(
     () => {
       if (schemaRecomputeTrigger) {
@@ -654,7 +678,6 @@ export const CompactObjectPropertiesEditor = ({
                       onEditObject,
                     })
                   }
-                  // $FlowFixMe[incompatible-type]
                   onRefreshAllFields={forceRecomputeSchema}
                 />
                 {shouldDisplayVariant && (
@@ -892,7 +915,7 @@ export const CompactObjectPropertiesEditor = ({
                     projectScopedContainersAccessor
                   }
                   directlyStoreValueChangesWhileEditing
-                  variablesContainer={variablesContainer}
+                  variablesContainer={object.getVariables()}
                   areObjectVariables
                   size="compact"
                   onComputeAllVariableNames={() =>
@@ -906,6 +929,7 @@ export const CompactObjectPropertiesEditor = ({
                       : []
                   }
                   historyHandler={historyHandler}
+                  onVariablesUpdated={onVariablesUpdated}
                   toolbarIconStyle={styles.icon}
                   compactEmptyPlaceholderText={
                     <Trans>

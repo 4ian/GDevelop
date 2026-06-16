@@ -678,6 +678,11 @@ class GD_CORE_API Project {
    */
   unsigned int GetLastSaveGDBuildVersion() { return gdBuildVersion; };
 
+  /**
+   * Get the version of GDevelop used to create the project.
+   */
+  const gd::String& GetInitialGDVersion() const { return initialGDVersion; };
+
   /** \name External events management
    * Members functions related to external events management.
    */
@@ -1096,18 +1101,6 @@ class GD_CORE_API Project {
     return wholeProjectDiagnosticReport;
   }
 
-  /**
-   * @brief Get the project extensions names in the order they have to be
-   * unserialized.
-   *
-   * Child-objects need the event-based objects they use to be loaded completely
-   * before they are unserialized.
-   *
-   * \warning This is only public to allow testing - don't use it in the editor.
-   */
-  static std::vector<gd::String> GetUnserializingOrderExtensionNames(
-      const gd::SerializerElement& eventsFunctionsExtensionsElement);
-
  private:
   /**
    * Initialize from another game. Used by copy-ctor and assign-op.
@@ -1217,6 +1210,7 @@ class GD_CORE_API Project {
   mutable unsigned int gdBuildVersion =
       0;  ///< The GD build version used the last
           ///< time the project was saved.
+  gd::String initialGDVersion; ///< The GD version used to create the project.
   bool areEffectsHiddenInEditor =
       false; ///< When false effects are not shown and a default light is used
              ///< for 3D layers.

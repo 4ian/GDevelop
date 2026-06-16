@@ -2,7 +2,9 @@
 import * as React from 'react';
 import { t, Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
-import VariablesEditorDialog from './VariablesEditorDialog';
+import VariablesEditorDialog, {
+  type VariableDialogOpeningProps,
+} from './VariablesEditorDialog';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 
 type Props = {|
@@ -15,8 +17,7 @@ type Props = {|
   onRemoveLoopIndexVariable?: () => void,
   onApply: (selectedVariableName: string | null) => void,
   onCancel: () => void,
-  initiallySelectedVariableName: string,
-  shouldCreateInitiallySelectedVariable?: boolean,
+  initiallySelectedVariable: VariableDialogOpeningProps | null,
   isListLocked: boolean,
 |};
 
@@ -30,8 +31,7 @@ const LocalVariablesDialog = ({
   open,
   onCancel,
   onApply,
-  initiallySelectedVariableName,
-  shouldCreateInitiallySelectedVariable,
+  initiallySelectedVariable,
   isListLocked,
 }: Props): React.Node => {
   const tabs = React.useMemo(
@@ -70,10 +70,7 @@ const LocalVariablesDialog = ({
           helpPagePath={'/all-features/variables/local-variables'}
           scopeName={i18n._(t`Local variables`)}
           id="local-variables-dialog"
-          initiallySelectedVariableName={initiallySelectedVariableName}
-          shouldCreateInitiallySelectedVariable={
-            shouldCreateInitiallySelectedVariable
-          }
+          initiallySelectedVariable={initiallySelectedVariable}
           hotReloadPreviewButtonProps={null}
           isListLocked={isListLocked}
         />

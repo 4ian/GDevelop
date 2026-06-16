@@ -125,6 +125,7 @@ import SaveToStorageProviderDialog from '../ProjectsStorage/SaveToStorageProvide
 import { useOpenConfirmDialog } from '../ProjectsStorage/OpenConfirmDialog';
 import verifyProjectContent from '../ProjectsStorage/ProjectContentChecker';
 import UnsavedChangesContext from './UnsavedChangesContext';
+import { AiRequestContext } from '../AiGeneration/AiRequestContext';
 import {
   type BuildMainMenuProps,
   type MainMenuCallbacks,
@@ -240,6 +241,7 @@ import StandaloneDialog from './StandAloneDialog';
 import { useInGameEditorSettings } from '../EmbeddedGame/InGameEditorSettings';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 import { useAutomatedRegularInGameEditorRestart } from '../EmbeddedGame/UseAutomatedRegularInGameEditorRestart';
+import isUserTyping from '../KeyboardShortcuts/IsUserTyping';
 const electron = optionalRequire('electron');
 const ipcRendererForUpdates = electron ? electron.ipcRenderer : null;
 
@@ -377,6 +379,12 @@ export type Props = {|
   initialExampleSlugToOpen: ?string,
   quickPublishOnlineWebExporter: Exporter,
   i18n: I18n,
+  useCliCommandRunner: ({|
+    project: ?gdProject,
+    i18n: I18n,
+    commandPaletteRef: {| current: ?CommandPaletteInterface |},
+  |}) => void,
+  onExportHtml5External?: (project: gdProject, i18n: I18n) => Promise<void>,
 |};
 
 const MainFrame = (props: Props): React.MixedElement => {
@@ -557,6 +565,10 @@ const MainFrame = (props: Props): React.MixedElement => {
   );
   const unsavedChanges = React.useContext(UnsavedChangesContext);
   const {
+    getWorkingAiRequest,
+    suspendAiRequest: suspendWorkingAiRequest,
+  } = React.useContext(AiRequestContext);
+  const {
     hasUnsavedChanges,
     sealUnsavedChanges,
     triggerUnsavedChanges,
@@ -645,6 +657,8 @@ const MainFrame = (props: Props): React.MixedElement => {
     renderGDJSDevelopmentWatcher,
     renderMainMenu,
     quickPublishOnlineWebExporter,
+    useCliCommandRunner,
+    onExportHtml5External,
   } = props;
 
   const {
@@ -931,7 +945,9 @@ const MainFrame = (props: Props): React.MixedElement => {
     // We use the current storage provider, as it's supposed to be able to open
     // the initial file metadata. Indeed, it's the responsibility of the `ProjectStorageProviders`
     // to set the initial storage provider if an initial file metadata is set.
-    const state = await openFromFileMetadata(initialFileMetadataToOpen);
+    const state = await openFromFileMetadata(initialFileMetadataToOpen, {
+      ignoreAutoSave: Window.isRunningCommandFromCli(),
+    });
     if (state)
       openSceneOrProjectManager({
         currentProject: state.currentProject,
@@ -1006,12 +1022,9 @@ const MainFrame = (props: Props): React.MixedElement => {
         if (openedEditor) {
           if (openedEditor.paneIdentifier !== newPaneIdentifier) {
             // The editor is opened, but not at the right position, close it.
-            // It will re-open in the right pane.
-            // Tell the editor not to suspend the AI request on close, since
-            // we're just repositioning it, not intentionally closing it.
-            if (openedEditor.askAiEditor) {
-              openedEditor.askAiEditor.prepareToReposition();
-            }
+            // It will re-open in the right pane. Repositioning unmounts then
+            // remounts the editor, but that never suspends the AI request:
+            // suspending is only triggered by explicit close/stop actions.
             newEditorTabs = closeEditorTab(
               newEditorTabs,
               openedEditor.editorTab
@@ -1181,21 +1194,28 @@ const MainFrame = (props: Props): React.MixedElement => {
       ResourcesLoader.burstAllUrlsCache();
       PixiResourcesLoader.burstCache();
 
+      // Set the on-disk path before exposing the project via state so that
+      // consumers (like the CLI command dispatcher) can call getProjectFile()
+      // immediately after the re-render triggered by setState.
+      if (updatedFileMetadata) {
+        project.setProjectFile(updatedFileMetadata.fileIdentifier);
+      }
+
+      // Start extension code generation before exposing the project via state.
+      // This ensures that when the CLI useEffect fires (triggered by the
+      // setState below), ensureLoadFinished() will see the pending promise
+      // and wait for generation to complete.
+      eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(
+        project
+      );
+
       const state = await setState(state => ({
         ...state,
         currentProject: project,
         currentFileMetadata: updatedFileMetadata,
       }));
 
-      // Load all the EventsFunctionsExtension when the game is loaded. If they are modified,
-      // their editor will take care of reloading them.
-      eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(
-        project
-      );
-
       if (updatedFileMetadata) {
-        project.setProjectFile(updatedFileMetadata.fileIdentifier);
-
         const storageProvider = getStorageProvider();
         const storageProviderOperations = getStorageProviderOperations(
           storageProvider
@@ -3412,7 +3432,10 @@ const MainFrame = (props: Props): React.MixedElement => {
   );
 
   const onEventsBasedObjectChildrenEdited = React.useCallback(
-    (eventsBasedObject: gdEventsBasedObject) => {
+    (
+      eventsBasedObject: gdEventsBasedObject,
+      options?: {| editedObject?: ?gdObject, hasResourceChanged?: boolean |}
+    ) => {
       const project = state.currentProject;
       if (!project) {
         return;
@@ -3425,7 +3448,10 @@ const MainFrame = (props: Props): React.MixedElement => {
       for (const editor of getAllEditorTabs(state.editorTabs)) {
         const { editorRef } = editor;
         if (editorRef) {
-          editorRef.onEventsBasedObjectChildrenEdited();
+          editorRef.onEventsBasedObjectChildrenEdited(
+            eventsBasedObject,
+            options
+          );
         }
       }
     },
@@ -3433,11 +3459,19 @@ const MainFrame = (props: Props): React.MixedElement => {
   );
 
   const onSceneObjectEdited = React.useCallback(
-    (scene: gdLayout, objectWithContext: ObjectWithContext) => {
+    (
+      scene: gdLayout,
+      objectWithContext: ObjectWithContext,
+      hasResourceChanged?: boolean
+    ) => {
       for (const editor of getAllEditorTabs(state.editorTabs)) {
         const { editorRef } = editor;
         if (editorRef) {
-          editorRef.onSceneObjectEdited(scene, objectWithContext);
+          editorRef.onSceneObjectEdited(
+            scene,
+            objectWithContext,
+            hasResourceChanged
+          );
         }
       }
     },
@@ -3509,6 +3543,11 @@ const MainFrame = (props: Props): React.MixedElement => {
 
   const selectAllInActiveEditors = React.useCallback(
     () => {
+      if (isUserTyping()) {
+        document.execCommand('selectAll');
+        return;
+      }
+
       for (const paneIdentifier in state.editorTabs.panes) {
         const currentTab = getCurrentTabForPane(
           state.editorTabs,
@@ -3528,7 +3567,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     forceUpdate();
   };
 
-  const onCreateEventsFunction = (
+  const onCreateEventsFunction = async (
     extensionName: string,
     eventsFunction: gdEventsFunction,
     editorIdentifier:
@@ -3560,7 +3599,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     }
 
     extension.getEventsFunctions().insertEventsFunction(eventsFunction, 0);
-    eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(
+    await eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(
       currentProject
     );
     setEditorHotReloadNeeded({
@@ -4391,10 +4430,56 @@ const MainFrame = (props: Props): React.MixedElement => {
         );
         if (!answer) return false;
       }
+
+      // If the AI is working on this project, ask the user to stop it (or cancel
+      // the close) first. Done here — on the explicit user close — rather than in
+      // closeProject(), which is also called programmatically while *opening* a
+      // project (and would wrongly prompt during e.g. AI-driven project opening).
+      const workingAiRequest = getWorkingAiRequest();
+      if (workingAiRequest) {
+        const shouldStopAndClose = await showConfirmation({
+          title: t`Close the project?`,
+          message: t`The AI is currently working on your project. Closing the project will stop it. Do you want to continue?`,
+          confirmButtonLabel: t`Stop working`,
+          dismissButtonLabel: t`Cancel`,
+          level: 'warning',
+        });
+        if (!shouldStopAndClose) return false;
+        await suspendWorkingAiRequest(workingAiRequest.id);
+      }
+
       await closeProject();
       return true;
     },
-    [currentProject, hasUnsavedChanges, i18n, closeProject]
+    [
+      currentProject,
+      hasUnsavedChanges,
+      i18n,
+      closeProject,
+      getWorkingAiRequest,
+      suspendWorkingAiRequest,
+      showConfirmation,
+    ]
+  );
+
+  // Asked before a side drawer is hidden by a swipe: if the Ask AI editor is in
+  // that pane and a request is working, let it confirm/suspend first. Returns
+  // whether the drawer should actually be hidden. Hiding the drawer does not
+  // unmount the editor, so the AI keeps running if the user keeps it.
+  const requestCloseAskAiDrawerInPane = React.useCallback(
+    (paneIdentifier: string): Promise<boolean> => {
+      const openedAskAiEditor = getOpenedAskAiEditor(state.editorTabs);
+      if (
+        openedAskAiEditor &&
+        openedAskAiEditor.paneIdentifier === paneIdentifier &&
+        openedAskAiEditor.askAiEditor &&
+        openedAskAiEditor.askAiEditor.requestClose
+      ) {
+        return openedAskAiEditor.askAiEditor.requestClose();
+      }
+      return Promise.resolve(true);
+    },
+    [state.editorTabs]
   );
 
   const reloadProject = React.useCallback(
@@ -4935,6 +5020,15 @@ const MainFrame = (props: Props): React.MixedElement => {
     onExportGame: () => {
       openShareDialog('publish');
     },
+    onExportHtml5External: async () => {
+      const project = state.currentProject;
+      if (!project || !onExportHtml5External) return;
+      try {
+        await onExportHtml5External(project, i18n);
+      } catch (error) {
+        console.error('Headless HTML5 export failed:', error);
+      }
+    },
     onInviteCollaborators: () => {
       openShareDialog('invite');
     },
@@ -4949,6 +5043,12 @@ const MainFrame = (props: Props): React.MixedElement => {
     onRestartInGameEditor,
     onOpenGlobalSearch: openGlobalSearch,
     onOpenMemoryTrackerRegistry: () => setMemoryTrackedRegistryDialogOpen(true),
+  });
+
+  useCliCommandRunner({
+    project: state.currentProject,
+    i18n,
+    commandPaletteRef,
   });
 
   const resourceManagementProps: ResourceManagementProps = React.useMemo(
@@ -5001,6 +5101,8 @@ const MainFrame = (props: Props): React.MixedElement => {
     createProjectFromExample,
     createProjectFromPrivateGameTemplate,
     closeAskAi,
+    openAskAi,
+    closeProject,
     storageProviders: props.storageProviders,
     storageProvider: getStorageProvider(),
     resourceManagementProps,
@@ -5293,6 +5395,7 @@ const MainFrame = (props: Props): React.MixedElement => {
         <PanesContainer
           hasEditorsInLeftPane={hasEditorsInLeftPane}
           hasEditorsInRightPane={hasEditorsInRightPane}
+          onRequestDrawerClose={requestCloseAskAiDrawerInPane}
           renderPane={({
             paneIdentifier,
             isLeftMostPane,
@@ -5469,7 +5572,7 @@ const MainFrame = (props: Props): React.MixedElement => {
         language={props.i18n.language}
         hasUnsavedChanges={hasUnsavedChanges}
       />
-      <ChangelogDialogContainer />
+      {!Window.isRunningCommandFromCli() && <ChangelogDialogContainer />}
       {selectedInAppTutorialInfo && (
         <StartInAppTutorialDialog
           open

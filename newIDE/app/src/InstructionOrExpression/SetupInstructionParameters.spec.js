@@ -33,6 +33,7 @@ describe('setupInstructionParameters', () => {
     // Simulate that we select an instruction
     const enumeratedInstructions = enumerateFreeInstructions(
       false,
+      project,
       makeFakeI18n()
     );
     const playMusicInstruction = enumeratedInstructions.find(
@@ -80,6 +81,7 @@ describe('setupInstructionParameters', () => {
       project.getObjects(),
       layout.getObjects(),
       objectName,
+      project,
       makeFakeI18n()
     );
     const setAnimationNameInstruction = enumeratedInstructions.find(
@@ -137,6 +139,7 @@ describe('setupInstructionParameters', () => {
       project.getObjects(),
       layout.getObjects(),
       objectName,
+      project,
       makeFakeI18n()
     );
     const jumpSpeedInstruction = enumeratedInstructions.find(
@@ -198,6 +201,7 @@ describe('setupInstructionParameters', () => {
       project.getObjects(),
       layout.getObjects(),
       objectName,
+      project,
       makeFakeI18n()
     );
     const jumpSpeedInstruction = enumeratedInstructions.find(
@@ -257,6 +261,7 @@ describe('setupInstructionParameters', () => {
       project.getObjects(),
       layout.getObjects(),
       objectName,
+      project,
       makeFakeI18n()
     );
     const jumpSpeedInstruction = enumeratedInstructions.find(
@@ -319,6 +324,7 @@ describe('setupInstructionParameters', () => {
       project.getObjects(),
       layout.getObjects(),
       objectName,
+      project,
       makeFakeI18n()
     );
     const jumpSpeedInstruction = enumeratedInstructions.find(

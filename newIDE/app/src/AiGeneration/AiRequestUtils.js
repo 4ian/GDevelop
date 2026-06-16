@@ -102,6 +102,9 @@ export const getFunctionCallsToProcess = ({
           const functionCall = functionCalls[j];
           if (functionCall.type !== 'function_call') continue;
 
+          // A function call which launched a sub-agent AI request is not processed by the editor.
+          if (functionCall.subAgentAiRequestId) continue;
+
           if (
             !alreadyProcessedFunctionCallIds.has(functionCall.call_id) &&
             !appliedFunctionCallIds.has(functionCall.call_id)
@@ -117,6 +120,55 @@ export const getFunctionCallsToProcess = ({
   }
 
   return functionCallsToProcess;
+};
+
+/**
+ * Returns all sub-agent function calls (those with a subAgentAiRequestId) in
+ * the AI request output, regardless of whether their sub-agent has completed.
+ */
+export const getAllSubAgentFunctionCalls = ({
+  aiRequest,
+}: {|
+  aiRequest: AiRequest,
+|}): Array<AiRequestMessageAssistantFunctionCall> => {
+  const subAgentCalls: AiRequestMessageAssistantFunctionCall[] = [];
+
+  const output = aiRequest.output || [];
+  for (let i = 0; i < output.length; i++) {
+    const message = output[i];
+    if (message.type === 'message' && message.role === 'assistant') {
+      for (const content of message.content) {
+        if (content.type === 'function_call' && content.subAgentAiRequestId) {
+          subAgentCalls.push(content);
+        }
+      }
+    }
+  }
+
+  return subAgentCalls;
+};
+
+/**
+ * Returns sub-agent function calls (those with a subAgentAiRequestId)
+ * that don't yet have a corresponding function_call_output in the AI request output.
+ */
+export const getPendingSubAgentFunctionCalls = ({
+  aiRequest,
+}: {|
+  aiRequest: AiRequest,
+|}): Array<AiRequestMessageAssistantFunctionCall> => {
+  const processedCallIds = new Set<string>();
+  const output = aiRequest.output || [];
+  for (let i = 0; i < output.length; i++) {
+    const message = output[i];
+    if (message.type === 'function_call_output') {
+      processedCallIds.add(message.call_id);
+    }
+  }
+
+  return getAllSubAgentFunctionCalls({ aiRequest }).filter(
+    call => !processedCallIds.has(call.call_id)
+  );
 };
 
 export const getFunctionCallNameByCallId = ({
@@ -176,8 +228,57 @@ export const getLatestActivePlan = (
 };
 
 /**
+ * Returns true if the AI request needs to be polled for updates:
+ * - The server is actively processing (status === 'working')
+ * - OR the request is 'ready' but has sub-agent calls without a
+ *   function_call_output yet (sub-agents are still running and the backend
+ *   will add output to the parent when they complete)
+ */
+export const aiRequestShouldBeWatched = (aiRequest: AiRequest): boolean => {
+  if (aiRequest.status === 'working') return true;
+  if (aiRequest.status === 'ready') {
+    return getPendingSubAgentFunctionCalls({ aiRequest }).length > 0;
+  }
+  return false;
+};
+
+/**
+ * Whether a poll observed activity (a status change or new messages) for an AI
+ * request, used to drive adaptive polling.
+ *
+ * A full fetch is incremental from the last already-known message, which is
+ * echoed back: so when there was a known message, a returned count > 1 means at
+ * least one new message; when there was no known message yet, every returned
+ * message is new.
+ */
+export const aiRequestPollSawActivity = (
+  previousAiRequest: ?AiRequest,
+  fetchedAiRequest: AiRequest
+): boolean => {
+  const previousOutput = (previousAiRequest && previousAiRequest.output) || [];
+  const lastKnownMessage =
+    previousOutput.length > 0
+      ? previousOutput[previousOutput.length - 1]
+      : null;
+  const wasIncrementalFetch = !!(
+    lastKnownMessage && lastKnownMessage.messageId
+  );
+  const fetchedMessageCount =
+    (fetchedAiRequest.output && fetchedAiRequest.output.length) || 0;
+  const newMessageCount = wasIncrementalFetch
+    ? Math.max(0, fetchedMessageCount - 1)
+    : fetchedMessageCount;
+
+  const previousStatus = previousAiRequest ? previousAiRequest.status : null;
+  return fetchedAiRequest.status !== previousStatus || newMessageCount > 0;
+};
+
+// TODO: can we merge these two functions?
+
+/**
  * Returns true if the AI request has work in progress that should be suspended:
  * - The server is actively processing (status === 'working')
+ * - OR the request has sub-agent calls still running
  * - OR the request is ready with function calls that still need to be processed and sent back
  */
 export const aiRequestHasWorkInProgress = (
@@ -185,7 +286,7 @@ export const aiRequestHasWorkInProgress = (
   editorFunctionCallResults: Array<EditorFunctionCallResult> | null
 ): boolean => {
   if (aiRequest.status === 'working') return true;
-  // A function call is either either being processed or has been processed by the editor but not yet sent back
+  // A function call is either being processed or has been processed by the editor but not yet sent back
   // (e.g. generateEvents that finished execution but the output hasn't been sent back to the AI with the follow-up request).
   // This means there's still work in progress from the AI perspective, even if the editor is not actively working on a function call.
   if (
@@ -196,6 +297,7 @@ export const aiRequestHasWorkInProgress = (
   )
     return true;
   if (aiRequest.status === 'ready') {
+    if (getPendingSubAgentFunctionCalls({ aiRequest }).length > 0) return true;
     return (
       getFunctionCallsToProcess({
         aiRequest,

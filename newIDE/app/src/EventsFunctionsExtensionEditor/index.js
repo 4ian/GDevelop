@@ -78,7 +78,7 @@ type Props = {|
       | 'scene-events-editor'
       | 'extension-events-editor'
       | 'external-events-editor'
-  ) => void,
+  ) => Promise<void>,
   onBehaviorEdited?: () => void,
   onObjectEdited?: () => void,
   onFunctionEdited?: () => void,
@@ -1302,63 +1302,6 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     }
   };
 
-  _getFunctionGroupNames = (): Array<string> => {
-    const groupNames = new Set<string>();
-    // Look only in the edited function container because
-    // functions from the extension or different behaviors
-    // won't use the same groups names.
-    // An independent autocompletion is done for each of them.
-    const {
-      selectedEventsBasedBehavior,
-      selectedEventsBasedObject,
-    } = this.state;
-    if (selectedEventsBasedBehavior) {
-      const eventFunctionContainer = selectedEventsBasedBehavior.getEventsFunctions();
-      for (
-        let index = 0;
-        index < eventFunctionContainer.getEventsFunctionsCount();
-        index++
-      ) {
-        const groupName = eventFunctionContainer
-          .getEventsFunctionAt(index)
-          .getGroup();
-        if (groupName) {
-          groupNames.add(groupName);
-        }
-      }
-    } else if (selectedEventsBasedObject) {
-      const eventFunctionContainer = selectedEventsBasedObject.getEventsFunctions();
-      for (
-        let index = 0;
-        index < eventFunctionContainer.getEventsFunctionsCount();
-        index++
-      ) {
-        const groupName = eventFunctionContainer
-          .getEventsFunctionAt(index)
-          .getGroup();
-        if (groupName) {
-          groupNames.add(groupName);
-        }
-      }
-    } else {
-      const { eventsFunctionsExtension } = this.props;
-      const freeEventsFunctions = eventsFunctionsExtension.getEventsFunctions();
-      for (
-        let index = 0;
-        index < freeEventsFunctions.getEventsFunctionsCount();
-        index++
-      ) {
-        const groupName = freeEventsFunctions
-          .getEventsFunctionAt(index)
-          .getGroup();
-        if (groupName) {
-          groupNames.add(groupName);
-        }
-      }
-    }
-    return [...groupNames].sort((a, b) => a.localeCompare(b));
-  };
-
   _onConfigurationUpdated = (
     attribute: ?ExtensionItemConfigurationAttribute
   ) => {
@@ -1381,11 +1324,11 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     });
   };
 
-  onCreateEventsFunction = (
+  onCreateEventsFunction = async (
     extensionName: string,
     eventsFunction: gdEventsFunction
   ) => {
-    this.props.onCreateEventsFunction(
+    await this.props.onCreateEventsFunction(
       extensionName,
       eventsFunction,
       'extension-events-editor'
@@ -1492,7 +1435,6 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                     onWillInstallExtension={this.props.onWillInstallExtension}
                     onExtensionInstalled={this.props.onExtensionInstalled}
                     unsavedChanges={this.props.unsavedChanges}
-                    getFunctionGroupNames={this._getFunctionGroupNames}
                   />
                 ) : (selectedEventsBasedObject ||
                     selectedEventsBasedBehavior) &&

@@ -456,12 +456,14 @@ export class EventsFunctionFolderTreeViewItemContent
   cut(): void {}
 
   paste(): void {
-    const newEventsFunction = pasteEventsFunction(
-      this.props.project,
-      this.props.eventsFunctionsContainer,
-      this.functionFolder,
-      this.getIndex() + 1
-    );
+    const newEventsFunction = pasteEventsFunction({
+      project: this.props.project,
+      eventsFunctionsContainer: this.props.eventsFunctionsContainer,
+      parentFolder: this.functionFolder,
+      insertionIndex: this.getIndex() + 1,
+      isTargetFreeFunction:
+        !this.props.eventsBasedBehavior && !this.props.eventsBasedObject,
+    });
     if (!newEventsFunction) {
       return;
     }

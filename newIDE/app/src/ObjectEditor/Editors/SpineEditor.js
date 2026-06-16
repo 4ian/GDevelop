@@ -24,9 +24,7 @@ import { makeDragSourceAndDropTarget } from '../../UI/DragAndDrop/DragSourceAndD
 import { DragHandleIcon } from '../../UI/DragHandle';
 import DropIndicator from '../../UI/SortableVirtualizedItemList/DropIndicator';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
-import PixiResourcesLoader, {
-  type SpineDataOrLoadingError,
-} from '../../ObjectsRendering/PixiResourcesLoader';
+import PixiResourcesLoader from '../../ObjectsRendering/PixiResourcesLoader';
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
 import { PropertyResourceSelector, PropertyField } from './PropertyFields';
 import AlertMessage from '../../UI/AlertMessage';
@@ -102,8 +100,24 @@ const SpineEditor = ({
     {}
   );
 
-  const [spineData, setSpineData] = React.useState<SpineDataOrLoadingError>({
-    skeleton: null,
+  type SpineLoadingState = {|
+    isLoaded: boolean,
+    loadingError: ?Error,
+    loadingErrorReason:
+      | null
+      | 'invalid-spine-resource'
+      | 'missing-texture-atlas-name'
+      | 'spine-resource-loading-error'
+      | 'invalid-atlas-resource'
+      | 'missing-texture-resources'
+      | 'atlas-resource-loading-error',
+  |};
+
+  const [spineVersion, setSpineVersion] = React.useState<?string>(null);
+  const [skinNames, setSkinNames] = React.useState<Array<string>>([]);
+  const [animationNames, setAnimationNames] = React.useState<Array<string>>([]);
+  const [spineData, setSpineData] = React.useState<SpineLoadingState>({
+    isLoaded: false,
     loadingError: null,
     loadingErrorReason: null,
   });
@@ -115,41 +129,78 @@ const SpineEditor = ({
 
   React.useEffect(
     () => {
+      let cancelled = false;
       (async () => {
-        const spineData = await PixiResourcesLoader.getSpineData(
+        const result = await PixiResourcesLoader.getSpineData(
           project,
           spineResourceName
         );
+        if (cancelled) return;
 
-        setSpineData(spineData);
+        if (!result.aliases) {
+          setSpineData({
+            isLoaded: false,
+            loadingError: result.loadingError,
+            loadingErrorReason: result.loadingErrorReason,
+          });
+          setSourceSelectOptions([]);
+          setSkinNames([]);
+          setSpineVersion(null);
+          return;
+        }
 
-        if (spineData.skeleton) {
+        const spine = await PixiResourcesLoader.createSpine(
+          project,
+          spineResourceName
+        );
+        if (cancelled) {
+          if (spine) spine.destroy();
+          return;
+        }
+
+        if (spine) {
+          const skeletonData = spine.skeleton.data;
+          setSpineVersion(skeletonData.version || null);
+          const animations = skeletonData.animations.map(
+            animation => animation.name
+          );
+          setAnimationNames(animations);
           setSourceSelectOptions(
-            spineData.skeleton.animations.map(animation => (
+            animations.map(animationName => (
               <SelectOption
-                key={animation.name}
-                value={animation.name}
-                label={animation.name}
+                key={animationName}
+                value={animationName}
+                label={animationName}
                 shouldNotTranslate
               />
             ))
           );
+          setSkinNames(skeletonData.skins.map(skin => skin.name));
+          setSpineData({
+            isLoaded: true,
+            loadingError: null,
+            loadingErrorReason: null,
+          });
+          spine.destroy();
+        } else {
+          setSourceSelectOptions([]);
+          setSkinNames([]);
+          setAnimationNames([]);
+          setSpineData({
+            isLoaded: false,
+            loadingError: null,
+            loadingErrorReason: 'spine-resource-loading-error',
+          });
         }
       })();
+      return () => {
+        cancelled = true;
+      };
     },
     [project, spineResourceName, setSourceSelectOptions]
   );
 
-  const skinsSelectOptionsList: Array<string> = React.useMemo(
-    () => {
-      if (spineData.skeleton && spineData.skeleton.skins) {
-        return spineData.skeleton.skins.map(skin => skin.name);
-      } else {
-        return [];
-      }
-    },
-    [spineData.skeleton]
-  );
+  const skinsSelectOptionsList: Array<string> = skinNames;
 
   const skinName = spineConfiguration.getSkinName();
 
@@ -186,8 +237,7 @@ const SpineEditor = ({
 
   const scanNewAnimations = React.useCallback(
     () => {
-      const { skeleton } = spineData;
-      if (!skeleton) return;
+      if (!spineData.isLoaded || animationNames.length === 0) return;
 
       setNameErrors({});
 
@@ -199,19 +249,19 @@ const SpineEditor = ({
       );
 
       let hasAddedAnimation = false;
-      for (const resourceAnimation of skeleton.animations) {
-        if (animationSources.includes(resourceAnimation.name)) {
+      for (const resourceAnimationName of animationNames) {
+        if (animationSources.includes(resourceAnimationName)) {
           continue;
         }
         const newAnimationName = spineConfiguration.hasAnimationNamed(
-          resourceAnimation.name
+          resourceAnimationName
         )
           ? ''
-          : resourceAnimation.name;
+          : resourceAnimationName;
 
         const newAnimation = new gd.SpineAnimation();
         newAnimation.setName(newAnimationName);
-        newAnimation.setSource(resourceAnimation.name);
+        newAnimation.setSource(resourceAnimationName);
         spineConfiguration.addAnimation(newAnimation);
         newAnimation.delete();
         hasAddedAnimation = true;
@@ -239,7 +289,8 @@ const SpineEditor = ({
     },
     [
       forceUpdate,
-      spineData,
+      spineData.isLoaded,
+      animationNames,
       spineConfiguration,
       onObjectUpdated,
       onSizeUpdated,
@@ -391,7 +442,7 @@ const SpineEditor = ({
           projectScopedContainersAccessor={projectScopedContainersAccessor}
           onChange={onChangeSpineResourceName}
         />
-        {!spineData.skeleton && spineData.loadingErrorReason ? (
+        {!spineData.isLoaded && spineData.loadingErrorReason ? (
           <AlertMessage kind="error">
             {spineData.loadingErrorReason === 'invalid-spine-resource' ? (
               <Trans>
@@ -425,6 +476,15 @@ const SpineEditor = ({
                 ).
               </Trans>
             ) : null}
+          </AlertMessage>
+        ) : null}
+        {spineVersion && !spineVersion.startsWith('4.2') ? (
+          <AlertMessage kind="warning">
+            <Trans>
+              This Spine resource was exported with Spine {spineVersion}. The
+              runtime requires data exported from Spine 4.2. Animations may not
+              work correctly — please re-export from Spine 4.2.
+            </Trans>
           </AlertMessage>
         ) : null}
         <Text size="block-title" noMargin>

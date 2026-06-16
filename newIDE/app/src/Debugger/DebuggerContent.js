@@ -278,8 +278,8 @@ export default class DebuggerContent extends React.Component<Props, State> {
                   editors={editors}
                   centralNodeId="selected-inspector"
                   initialNodes={
-                    // $FlowFixMe[incompatible-type]
                     getDefaultEditorMosaicNode('debugger') ||
+                    // $FlowFixMe[incompatible-type]
                     initialMosaicEditorNodes
                   }
                   onPersistNodes={node =>

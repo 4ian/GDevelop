@@ -3,25 +3,30 @@ import * as React from 'react';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import { retryIfFailed } from '../Utils/RetryIfFailed';
 import { delay } from '../Utils/Delay';
+import { getBackedOffIntervalInMs } from '../Utils/UseAdaptivePollingInterval';
 import {
   getAiGeneratedEvent,
   createAiGeneratedEvent,
 } from '../Utils/GDevelopServices/Generation';
 
-import { type EventsGenerationResult } from '../EditorFunctions';
+import {
+  type EventsGenerationResult,
+  type EventBatch,
+} from '../EditorFunctions';
 import { makeSimplifiedProjectBuilder } from '../EditorFunctions/SimplifiedProject/SimplifiedProject';
 import { prepareAiUserContent } from './PrepareAiUserContent';
 
 const gd: libGDevelop = global.gd;
 
-type _UseGenerateEventsReturnType = {
+type UseGenerateEventsReturnType = {
   generateEvents: ({
-    eventsDescription: string,
+    eventsDescription: string | null,
+    eventBatches: Array<EventBatch> | null,
     existingEventsAsText: string,
     existingEventsJson: string | null,
     extensionNamesList: string,
     objectsList: string,
-    placementHint: string,
+    placementHint: string | null,
     relatedAiRequestId: string,
     sceneName: string,
     estimatedComplexity: number | null,
@@ -31,7 +36,7 @@ export const useGenerateEvents = ({
   project,
 }: {|
   project: ?gdProject,
-|}): _UseGenerateEventsReturnType => {
+|}): UseGenerateEventsReturnType => {
   const { profile, getAuthorizationHeader } = React.useContext(
     AuthenticatedUserContext
   );
@@ -40,6 +45,7 @@ export const useGenerateEvents = ({
     async ({
       sceneName,
       eventsDescription,
+      eventBatches,
       extensionNamesList,
       objectsList,
       existingEventsAsText,
@@ -49,12 +55,13 @@ export const useGenerateEvents = ({
       estimatedComplexity,
     }: {|
       sceneName: string,
-      eventsDescription: string,
+      eventsDescription: string | null,
+      eventBatches: Array<EventBatch> | null,
       extensionNamesList: string,
       objectsList: string,
       existingEventsAsText: string,
       existingEventsJson: string | null,
-      placementHint: string,
+      placementHint: string | null,
       relatedAiRequestId: string,
       estimatedComplexity: number | null,
     |}): Promise<EventsGenerationResult> => {
@@ -95,6 +102,7 @@ export const useGenerateEvents = ({
               existingEventsJson: preparedAiUserContent.eventsJson,
               sceneName,
               eventsDescription,
+              eventBatches,
               extensionNamesList,
               objectsList,
               existingEventsAsText,
@@ -111,11 +119,15 @@ export const useGenerateEvents = ({
           };
         }
 
-        let remainingAttempts = 50;
+        // Poll with exponential backoff (fast initially, capped), bounded by a
+        // total time budget rather than a fixed attempt count.
+        const maxTotalWaitMs = 60000;
+        const maxPollIntervalMs = 5000;
+        const startTime = Date.now();
+        let pollIntervalMs = 1000;
         let aiGeneratedEvent = createResult.aiGeneratedEvent;
         while (aiGeneratedEvent.status === 'working') {
-          remainingAttempts--;
-          await delay(1000);
+          await delay(pollIntervalMs);
 
           try {
             aiGeneratedEvent = await getAiGeneratedEvent(
@@ -131,7 +143,11 @@ export const useGenerateEvents = ({
               error
             );
           }
-          if (remainingAttempts <= 0) {
+          pollIntervalMs = getBackedOffIntervalInMs(
+            pollIntervalMs,
+            maxPollIntervalMs
+          );
+          if (Date.now() - startTime >= maxTotalWaitMs) {
             return {
               generationCompleted: false,
               errorMessage:

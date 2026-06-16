@@ -1,35 +1,20 @@
 namespace gdjs {
-  const isSpine = (obj: any): obj is pixi_spine.Spine =>
-    obj instanceof pixi_spine.Spine;
-
-  // See https://github.com/pixijs/spine/issues/562
-  // IPointAttachment is not declared and exported but its implementation does exist and it is used in runtime
-  interface IPointAttachment extends pixi_spine.IVertexAttachment {
-    computeWorldPosition(
-      bone: pixi_spine.IBone,
-      point: pixi_spine.Vector2
-    ): pixi_spine.Vector2;
-    computeWorldRotation(bone: pixi_spine.IBone): number;
-  }
-
-  interface IExtendedBone extends pixi_spine.IBone {
-    scaleX: number;
-    scaleY: number;
-    rotation: number;
-    parent: IExtendedBone | null;
-  }
+  const isSpine = (obj: any): obj is spine.Spine =>
+    typeof spine !== 'undefined' && obj instanceof spine.Spine;
 
   const isPointAttachment = (
-    attachment: pixi_spine.IAttachment
-  ): attachment is IPointAttachment =>
-    !!attachment && attachment.type === pixi_spine.AttachmentType.Point;
+    attachment: spine.Attachment | null
+  ): attachment is spine.PointAttachment =>
+    typeof spine !== 'undefined' &&
+    !!attachment &&
+    attachment instanceof spine.PointAttachment;
 
   /**
    * @category Renderers > Spine
    */
   export class SpineRuntimeObjectPixiRenderer {
     private _object: gdjs.SpineRuntimeObject;
-    private _rendererObject: pixi_spine.Spine | PIXI.Container;
+    private _rendererObject: spine.Spine | PIXI.Container;
     private _isAnimationComplete = true;
 
     /**
@@ -64,7 +49,7 @@ namespace gdjs {
       this._rendererObject.update(timeDelta);
     }
 
-    getRendererObject(): pixi_spine.Spine | PIXI.Container {
+    getRendererObject(): spine.Spine | PIXI.Container {
       return this._rendererObject;
     }
 
@@ -146,33 +131,33 @@ namespace gdjs {
     setMixing(from: string, to: string, duration: number): void {
       if (!isSpine(this._rendererObject)) return;
 
-      this._rendererObject.stateData.setMix(from, to, duration);
+      this._rendererObject.state.data.setMix(from, to, duration);
     }
 
     setAnimation(animation: string, loop: boolean): void {
-      if (isSpine(this._rendererObject)) {
-        const onCompleteListener: pixi_spine.IAnimationStateListener = {
-          complete: () => {
-            this._isAnimationComplete = true;
-            (this._rendererObject as pixi_spine.Spine).state.removeListener(
-              onCompleteListener
-            );
-          },
-        };
+      if (!isSpine(this._rendererObject)) return;
 
-        this._isAnimationComplete = false;
-        this._rendererObject.state.addListener(onCompleteListener);
-        this._rendererObject.state.setAnimation(0, animation, loop);
-        this._rendererObject.update(0);
-      }
+      const onCompleteListener: spine.AnimationStateListener = {
+        complete: () => {
+          this._isAnimationComplete = true;
+          (this._rendererObject as spine.Spine).state.removeListener(
+            onCompleteListener
+          );
+        },
+      };
+
+      this._isAnimationComplete = false;
+      this._rendererObject.state.addListener(onCompleteListener);
+      this._rendererObject.state.setAnimation(0, animation, loop);
+      this._rendererObject.update(0);
     }
 
-    getAnimationDuration(sourceAnimationName: string) {
+    getAnimationDuration(sourceAnimationName: string): number {
       if (!isSpine(this._rendererObject)) {
         return 0;
       }
       const animation =
-        this._rendererObject.spineData.findAnimation(sourceAnimationName);
+        this._rendererObject.skeleton.data.findAnimation(sourceAnimationName);
       return animation ? animation.duration : 0;
     }
 
@@ -184,9 +169,11 @@ namespace gdjs {
       if (tracks.length === 0) {
         return 0;
       }
-      // This should be fine because only 1 track is used.
+      // Only one track is used.
       const track = tracks[0];
-      // @ts-ignore TrackEntry.getAnimationTime is not exposed.
+      if (!track) {
+        return 0;
+      }
       return track.getAnimationTime();
     }
 
@@ -199,6 +186,7 @@ namespace gdjs {
         return;
       }
       const track = tracks[0];
+      if (!track) return;
       track.trackTime = time;
     }
 
@@ -216,12 +204,12 @@ namespace gdjs {
     getPointAttachmentPosition(
       attachmentName: string,
       slotName?: string
-    ): pixi_spine.Vector2 {
+    ): spine.Vector2 {
       if (!slotName) {
         slotName = attachmentName;
       }
       if (!isSpine(this._rendererObject)) {
-        return new pixi_spine.Vector2(
+        return new spine.Vector2(
           this._rendererObject.x,
           this._rendererObject.y
         );
@@ -234,13 +222,17 @@ namespace gdjs {
           this._rendererObject
         );
 
-      return new PIXI.Matrix()
+      const worldPoint = attachment.computeWorldPosition(
+        slot.bone,
+        new spine.Vector2()
+      );
+      const transformed = new PIXI.Matrix()
         .rotate(this._rendererObject.rotation)
         .scale(this._rendererObject.scale.x, this._rendererObject.scale.y)
         .translate(this._rendererObject.x, this._rendererObject.y)
-        .apply(
-          attachment.computeWorldPosition(slot.bone, new pixi_spine.Vector2())
-        );
+        .apply({ x: worldPoint.x, y: worldPoint.y });
+
+      return new spine.Vector2(transformed.x, transformed.y);
     }
 
     getPointAttachmentRotation(
@@ -262,8 +254,6 @@ namespace gdjs {
           this._rendererObject
         );
 
-      const bone = slot.bone as IExtendedBone;
-
       if (isWorld) {
         return (
           gdjs.toDegrees(this._rendererObject.rotation) +
@@ -271,19 +261,19 @@ namespace gdjs {
         );
       }
 
-      return bone.rotation;
+      return slot.bone.rotation;
     }
 
     getPointAttachmentScale(
       attachmentName: string,
       slotName?: string,
       isWorld?: boolean
-    ): pixi_spine.Vector2 {
+    ): spine.Vector2 {
       if (!slotName) {
         slotName = attachmentName;
       }
       if (!isSpine(this._rendererObject)) {
-        return new pixi_spine.Vector2(
+        return new spine.Vector2(
           this._rendererObject.scale.x,
           this._rendererObject.scale.y
         );
@@ -296,29 +286,22 @@ namespace gdjs {
           this._rendererObject
         );
 
-      let scaleX = 1;
-      let scaleY = 1;
-
-      const bone = slot.bone as IExtendedBone;
-
-      scaleX = bone.scaleX;
-      scaleY = bone.scaleY;
+      let scaleX = slot.bone.scaleX;
+      let scaleY = slot.bone.scaleY;
 
       if (isWorld) {
-        let parent = bone.parent;
+        let parent = slot.bone.parent;
         while (parent) {
-          if (parent) {
-            scaleX *= parent.scaleX;
-            scaleY *= parent.scaleY;
-          }
+          scaleX *= parent.scaleX;
+          scaleY *= parent.scaleY;
           parent = parent.parent;
         }
 
-        scaleX = scaleX * this._rendererObject.scale.x;
-        scaleY = scaleY * this._rendererObject.scale.y;
+        scaleX *= this._rendererObject.scale.x;
+        scaleY *= this._rendererObject.scale.y;
       }
 
-      return new pixi_spine.Vector2(scaleX, scaleY);
+      return new spine.Vector2(scaleX, scaleY);
     }
 
     setSkin(skinName: string): void {
@@ -340,15 +323,17 @@ namespace gdjs {
 
     getSkin(): string {
       if (!isSpine(this._rendererObject)) return '';
-      return this._rendererObject.skeleton.skin.name;
+      return this._rendererObject.skeleton.skin
+        ? this._rendererObject.skeleton.skin.name
+        : '';
     }
 
     getAvailableSkins(): string[] {
       if (!isSpine(this._rendererObject)) return [];
-      return this._rendererObject.skeleton.data.skins.map((skin) => skin.name);
+      return this._rendererObject.skeleton.data.skins.map((s) => s.name);
     }
 
-    private constructRendererObject(): pixi_spine.Spine | PIXI.Container {
+    private constructRendererObject(): spine.Spine | PIXI.Container {
       const game = this.instanceContainer.getGame();
       const spineManager = game.getSpineManager();
 
@@ -359,16 +344,43 @@ namespace gdjs {
         return new PIXI.Container();
       }
 
-      return new pixi_spine.Spine(
-        spineManager.getSpine(this._object.spineResourceName)!
+      const aliases = spineManager.getSpineAliases(
+        this._object.spineResourceName
       );
+      if (!aliases) {
+        return new PIXI.Container();
+      }
+
+      try {
+        const spineObject = spine.Spine.from({
+          skeleton: aliases.skeletonAlias,
+          atlas: aliases.atlasAlias,
+          autoUpdate: false,
+        });
+
+        const version = spineObject.skeleton.data.version;
+        if (version && !version.startsWith('4.2')) {
+          console.warn(
+            `[Spine] Resource '${this._object.spineResourceName}' was exported with Spine ${version}. ` +
+              `The runtime requires Spine 4.2. Animations may not work correctly.`
+          );
+        }
+
+        return spineObject;
+      } catch (error) {
+        console.error(
+          `Unable to instantiate Spine container for resource '${this._object.spineResourceName}':`,
+          error
+        );
+        return new PIXI.Container();
+      }
     }
 
     private static getSlotAndAttachmentFromRenderObject(
       attachmentName: string,
       slotName: string,
-      renderObject: pixi_spine.Spine
-    ): { slot: pixi_spine.ISlot; attachment: IPointAttachment } {
+      renderObject: spine.Spine
+    ): { slot: spine.Slot; attachment: spine.PointAttachment } {
       const slot = renderObject.skeleton.findSlot(slotName);
       if (!slot) {
         throw new Error(

@@ -2,7 +2,6 @@
 import React from 'react';
 import { t, Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
-import { type I18n as I18nType } from '@lingui/core';
 import { type EventsScope } from '../../../InstructionOrExpression/EventsScope';
 import ExpressionParametersEditor from './ExpressionParametersEditor';
 import Dialog, { DialogPrimaryButton } from '../../../UI/Dialog';

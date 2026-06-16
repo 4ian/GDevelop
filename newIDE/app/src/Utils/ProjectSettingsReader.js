@@ -71,6 +71,13 @@ export const parseToolbarButtons = (
       if (matchedHook) {
         toolbarButtonConfig.hook = matchedHook;
       }
+      const keepTerminalOpen = SafeExtractor.extractBooleanProperty(
+        rawButton,
+        'keepTerminalOpen'
+      );
+      if (keepTerminalOpen === true) {
+        toolbarButtonConfig.keepTerminalOpen = true;
+      }
       toolbarButtons.push(toolbarButtonConfig);
     }
   }

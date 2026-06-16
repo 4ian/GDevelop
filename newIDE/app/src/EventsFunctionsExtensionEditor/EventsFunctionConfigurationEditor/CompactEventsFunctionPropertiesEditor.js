@@ -39,7 +39,6 @@ type Props = {|
   helpPagePath?: string,
   onConfigurationUpdated?: (?ExtensionItemConfigurationAttribute) => void,
   freezeEventsFunctionType?: boolean,
-  getFunctionGroupNames?: () => string[],
 |};
 
 const getFullNameHintText = (
@@ -80,7 +79,6 @@ export const CompactEventsFunctionPropertiesEditor = ({
   helpPagePath,
   eventsBasedBehavior,
   eventsBasedObject,
-  getFunctionGroupNames,
   eventsFunctionsContainer,
 }: Props): React.Node => {
   const forceUpdate = useForceUpdate();
@@ -372,7 +370,11 @@ export const CompactEventsFunctionPropertiesEditor = ({
               valueTypeMetadata={eventsFunction.getExpressionType()}
               isTypeSelectorShown={true}
               onTypeUpdated={() => {
-                if (onConfigurationUpdated) onConfigurationUpdated();
+                gd.PropertyFunctionGenerator.updateReturnActionType(
+                  project,
+                  eventsFunction
+                );
+                if (onConfigurationUpdated) onConfigurationUpdated('type');
               }}
               getLastObjectParameterObjectType={() => ''}
               // Expression can't return behaviors

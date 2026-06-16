@@ -16,7 +16,7 @@ import TextField from '../../UI/TextField';
 import { discordUsernameConfig } from '../../Utils/GDevelopServices/User';
 import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
 import LeftLoader from '../../UI/LeftLoader';
-import { canBenefitFromDiscordRole } from '../../Utils/GDevelopServices/Usage';
+import { canBenefitFromSocialRole } from '../../Utils/GDevelopServices/Usage';
 
 type Props = {|
   onClose: () => void,
@@ -43,7 +43,7 @@ export default function SubscriptionPendingDialog({
     immediatelyShowSuccessMessage || userPlanId !== userPlanIdAtOpening.current;
   const canUserBenefitFromDiscordRole =
     !!authenticatedUser &&
-    canBenefitFromDiscordRole(authenticatedUser.subscription);
+    canBenefitFromSocialRole(authenticatedUser.subscription);
 
   useInterval(
     () => {
@@ -211,7 +211,9 @@ export default function SubscriptionPendingDialog({
                     disabled={isLoading}
                     maxLength={discordUsernameConfig.maxLength}
                     helperMarkdownText={i18n._(
-                      t`Add your Discord username to get access to a dedicated channel! Join the [GDevelop Discord](https://discord.gg/gdevelop).`
+                      userPlanId === 'gdevelop_silver'
+                        ? t`Add your Discord username to get a special role on the GDevelop Discord! Join the [GDevelop Discord](https://discord.gg/gdevelop).`
+                        : t`Add your Discord username to get access to a dedicated channel! Join the [GDevelop Discord](https://discord.gg/gdevelop).`
                     )}
                   />
                 </Line>

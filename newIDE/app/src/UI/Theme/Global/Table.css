@@ -25,7 +25,7 @@
 }
 .gd-table .tableOddRow {
   /* Alternating ("zebra") row color. Odd rows use a subtly tinted background
-   * (dark #25252E / light #F5F5F7) to improve readability while keeping the hover
+   * (dark #23232A / light #FAFAFA) to improve readability while keeping the hover
    * state visible. These two table-row tokens are dedicated to this table. */
   background-color: var(--table-row-odd-background-color);
 }

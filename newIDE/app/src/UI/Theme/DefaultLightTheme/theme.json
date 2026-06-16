@@ -944,7 +944,7 @@
     "row": {
       "odd": {
         "background-color": {
-          "value": "#F5F5F7"
+          "value": "#FAFAFA"
         }
       },
       "even": {

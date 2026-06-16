@@ -50,7 +50,7 @@ const ALLOWED_RESOURCE_PROPERTY_TYPES: Array<ResourcePropertyType> = [
 ];
 
 // Only allow safe characters in property names so they stay clean keys in the
-// resource metadata JSON consumed by the packer.
+// resource metadata JSON.
 const SAFE_PROPERTY_NAME_PATTERN = /^[a-zA-Z0-9_-]+$/;
 
 const SETTINGS_FILE_NAME = 'gdevelop-settings.yaml';

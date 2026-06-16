@@ -242,12 +242,12 @@ export const updateResourceJsonMetadata = (
 // Key under which the project-configurable custom resource properties
 // (defined in gdevelop-settings.yaml) are stored inside the resource metadata
 // JSON. Kept separate from other metadata keys (e.g. localFilePath) to avoid
-// collisions. These values are intended to be consumed by external packing tools.
+// collisions.
 export const CUSTOM_PROPERTIES_METADATA_KEY = 'customProperties';
 
 export type CustomPropertyScalar = string | number | boolean;
 // A custom property value is either a scalar or, for "dictionary" properties, a
-// flat map of scalars (e.g. resolution -> scale factor).
+// flat map of scalars.
 export type CustomPropertyValue =
   | CustomPropertyScalar
   | { [string]: CustomPropertyScalar };
@@ -312,8 +312,8 @@ export const setResourceCustomPropertyValue = (
 };
 
 /**
- * Returns the stored map for a "dictionary" custom property (e.g. a
- * resolution -> scale factor map), or an empty object if none is set.
+ * Returns the stored map for a "dictionary" custom property, or an empty object
+ * if none is set.
  */
 export const getResourceCustomDictionary = (
   resource: gdResource,

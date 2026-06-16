@@ -212,7 +212,10 @@ import { QuickCustomizationDialog } from '../QuickCustomization/QuickCustomizati
 import { type ObjectWithContext } from '../ObjectsList/EnumerateObjects';
 import useGamesList from '../GameDashboard/UseGamesList';
 import useCapturesManager from './UseCapturesManager';
-import { readProjectSettings } from '../Utils/ProjectSettingsReader';
+import {
+  readProjectSettings,
+  type ResourcePropertyConfig,
+} from '../Utils/ProjectSettingsReader';
 import useNpmScriptRunner from './NpmScriptRunner/useNpmScriptRunner';
 import { applyProjectPreferences } from '../Utils/ApplyProjectPreferences';
 import {
@@ -404,9 +407,14 @@ const MainFrame = (props: Props): React.MixedElement => {
       saveToStorageProviderDialogOpen: false,
       gdjsDevelopmentWatcherEnabled: false,
       toolbarButtons: [],
-      resourcePropertiesSchema: [],
     }: State)
   );
+  // Schema of custom resource properties, loaded from gdevelop-settings.yaml
+  // when a project is opened (see below).
+  const [
+    resourcePropertiesSchema,
+    setResourcePropertiesSchema,
+  ] = React.useState<Array<ResourcePropertyConfig>>([]);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const [
     cloudProjectFileMetadataToRecover,
@@ -1126,8 +1134,8 @@ const MainFrame = (props: Props): React.MixedElement => {
         currentFileMetadata: null,
         editorTabs: closeProjectTabs(state.editorTabs, currentProject),
         toolbarButtons: [],
-        resourcePropertiesSchema: [],
       }));
+      setResourcePropertiesSchema([]);
 
       // Delete the project from memory. All references to it have been dropped previously
       // by the setState.
@@ -1249,9 +1257,10 @@ const MainFrame = (props: Props): React.MixedElement => {
             setState(currentState => ({
               ...currentState,
               toolbarButtons: parsedProjectSettings.toolbarButtons || [],
-              resourcePropertiesSchema:
-                parsedProjectSettings.resourceProperties || [],
             }));
+            setResourcePropertiesSchema(
+              parsedProjectSettings.resourceProperties || []
+            );
           }
         } catch (error) {
           console.warn(
@@ -5066,7 +5075,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       canInstallPrivateAsset,
       onNewResourcesAdded,
       onResourceUsageChanged,
-      resourcePropertiesSchema: state.resourcePropertiesSchema,
+      resourcePropertiesSchema,
     }),
     [
       resourceSources,
@@ -5078,7 +5087,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       canInstallPrivateAsset,
       onNewResourcesAdded,
       onResourceUsageChanged,
-      state.resourcePropertiesSchema,
+      resourcePropertiesSchema,
     ]
   );
 

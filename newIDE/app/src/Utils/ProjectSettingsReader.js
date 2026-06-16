@@ -124,6 +124,37 @@ export const parseToolbarButtons = (
 };
 
 /**
+ * Parses a YAML list of `{ value, label }` entries (used by both the enum
+ * `choices` and the dictionary `keys` of a resource property). Entries without
+ * a value are skipped; when `validateValueAsKey` is set, values must be safe
+ * keys (they end up as keys in the resource metadata JSON).
+ */
+const parseValueLabelList = (
+  rawList: ?Array<mixed>,
+  {
+    validateValueAsKey,
+    ownerName,
+  }: {| validateValueAsKey: boolean, ownerName: string |}
+): Array<ResourcePropertyChoice> => {
+  const result: Array<ResourcePropertyChoice> = [];
+  if (!rawList) return result;
+  for (const rawEntry of rawList) {
+    const value = SafeExtractor.extractStringProperty(rawEntry, 'value');
+    if (value === null) continue;
+    if (validateValueAsKey && !SAFE_PROPERTY_NAME_PATTERN.test(value)) {
+      console.warn(
+        `[ProjectSettingsReader] Skipping dictionary key "${value}" of resource property "${ownerName}": key must match ${SAFE_PROPERTY_NAME_PATTERN.toString()}.`
+      );
+      continue;
+    }
+    const label =
+      SafeExtractor.extractStringProperty(rawEntry, 'label') || value;
+    result.push({ value, label });
+  }
+  return result;
+};
+
+/**
  * Parses raw `resourceProperties` entries from YAML into validated
  * ResourcePropertyConfig objects. Invalid entries are skipped with a warning.
  * Exported for unit testing; file system is not needed.
@@ -191,20 +222,10 @@ export const parseResourceProperties = (
     if (defaultValue !== null) config.default = defaultValue;
 
     if (propertyType === 'enum') {
-      const rawChoices = SafeExtractor.extractArrayProperty(
-        rawProperty,
-        'choices'
+      const choices = parseValueLabelList(
+        SafeExtractor.extractArrayProperty(rawProperty, 'choices'),
+        { validateValueAsKey: false, ownerName: name }
       );
-      const choices: Array<ResourcePropertyChoice> = [];
-      if (rawChoices) {
-        for (const rawChoice of rawChoices) {
-          const value = SafeExtractor.extractStringProperty(rawChoice, 'value');
-          if (value === null) continue;
-          const choiceLabel =
-            SafeExtractor.extractStringProperty(rawChoice, 'label') || value;
-          choices.push({ value, label: choiceLabel });
-        }
-      }
       if (choices.length === 0) {
         console.warn(
           `[ProjectSettingsReader] Skipping resource property "${name}": enum type requires at least one choice.`
@@ -217,23 +238,10 @@ export const parseResourceProperties = (
     if (propertyType === 'dictionary') {
       // The dictionary starts empty on each resource; `keys` only defines the
       // allowed keys the user can pick from when adding entries.
-      const rawKeys = SafeExtractor.extractArrayProperty(rawProperty, 'keys');
-      const keys: Array<ResourcePropertyChoice> = [];
-      if (rawKeys) {
-        for (const rawKey of rawKeys) {
-          const value = SafeExtractor.extractStringProperty(rawKey, 'value');
-          if (value === null) continue;
-          if (!SAFE_PROPERTY_NAME_PATTERN.test(value)) {
-            console.warn(
-              `[ProjectSettingsReader] Skipping dictionary key "${value}" of resource property "${name}": key must match ${SAFE_PROPERTY_NAME_PATTERN.toString()}.`
-            );
-            continue;
-          }
-          const keyLabel =
-            SafeExtractor.extractStringProperty(rawKey, 'label') || value;
-          keys.push({ value, label: keyLabel });
-        }
-      }
+      const keys = parseValueLabelList(
+        SafeExtractor.extractArrayProperty(rawProperty, 'keys'),
+        { validateValueAsKey: true, ownerName: name }
+      );
       if (keys.length > 0) config.keys = keys;
     }
 

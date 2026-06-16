@@ -4,7 +4,6 @@ import { type EditorTabsState } from './EditorTabs/EditorTabsHandler';
 import { type ElectronUpdateStatus } from './UpdaterTools';
 import { type FileMetadata } from '../ProjectsStorage';
 import { type ToolbarButtonConfig } from './CustomToolbarButton';
-import { type ResourcePropertyConfig } from '../Utils/ProjectSettingsReader';
 
 // Note: avoid adding to this state. Prefer using hooks in MainFrame.
 export type State = {|
@@ -19,5 +18,4 @@ export type State = {|
   saveToStorageProviderDialogOpen: boolean,
   gdjsDevelopmentWatcherEnabled: boolean,
   toolbarButtons: Array<ToolbarButtonConfig>,
-  resourcePropertiesSchema: Array<ResourcePropertyConfig>,
 |};

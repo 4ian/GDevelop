@@ -130,11 +130,11 @@ const EditorFunctionCallRow = ({
   let details;
   let hasDetailsToShow = false;
   if (!editorFunction) {
-    text = (
-      <Trans>
-        The AI tried to use a function of the editor that is unknown.
-      </Trans>
-    );
+    // Unknown to this version of the editor: this is a function handled on the
+    // backend (e.g. a newly shipped server-side tool that this frontend doesn't
+    // know about yet). Render nothing rather than an "unknown function" message,
+    // so backend tools can be added without requiring a frontend release.
+    return null;
   } else if (!editorFunction.renderForEditor) {
     // Functions with no renderForEditor (e.g. handled on the backend) render
     // nothing.

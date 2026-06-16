@@ -5382,6 +5382,16 @@ const createOrUpdatePlan: EditorFunction = {
   modifiesProject: false,
 };
 
+const reportFulfilmentProblem: EditorFunction = {
+  // No renderForEditor: backend-only telemetry, nothing to show to the user.
+  launchFunction: async ({ args }) => {
+    return makeGenericFailure(
+      `Unable to report a fulfilment problem - this is handled server-side.`
+    );
+  },
+  modifiesProject: false,
+};
+
 const readFullDocs: EditorFunction = {
   renderForEditor: ({ args }) => {
     const extension_names = SafeExtractor.extractStringProperty(
@@ -5653,6 +5663,8 @@ export const editorFunctions: { [string]: EditorFunction } = {
   search_object_asset_store: searchObjectAssetStore,
 
   generate_events: addSceneEvents,
+
+  report_fulfilment_problem: reportFulfilmentProblem,
 };
 
 export const editorFunctionsWithoutProject: {

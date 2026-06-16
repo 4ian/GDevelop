@@ -242,6 +242,37 @@ export const aiRequestShouldBeWatched = (aiRequest: AiRequest): boolean => {
   return false;
 };
 
+/**
+ * Whether a poll observed activity (a status change or new messages) for an AI
+ * request, used to drive adaptive polling.
+ *
+ * A full fetch is incremental from the last already-known message, which is
+ * echoed back: so when there was a known message, a returned count > 1 means at
+ * least one new message; when there was no known message yet, every returned
+ * message is new.
+ */
+export const aiRequestPollSawActivity = (
+  previousAiRequest: ?AiRequest,
+  fetchedAiRequest: AiRequest
+): boolean => {
+  const previousOutput = (previousAiRequest && previousAiRequest.output) || [];
+  const lastKnownMessage =
+    previousOutput.length > 0
+      ? previousOutput[previousOutput.length - 1]
+      : null;
+  const wasIncrementalFetch = !!(
+    lastKnownMessage && lastKnownMessage.messageId
+  );
+  const fetchedMessageCount =
+    (fetchedAiRequest.output && fetchedAiRequest.output.length) || 0;
+  const newMessageCount = wasIncrementalFetch
+    ? Math.max(0, fetchedMessageCount - 1)
+    : fetchedMessageCount;
+
+  const previousStatus = previousAiRequest ? previousAiRequest.status : null;
+  return fetchedAiRequest.status !== previousStatus || newMessageCount > 0;
+};
+
 // TODO: can we merge these two functions?
 
 /**

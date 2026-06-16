@@ -48,10 +48,11 @@ import {
 import { ColumnStackLayout, LineStackLayout } from '../UI/Layout';
 import RobotIcon from '../ProjectCreation/RobotIcon';
 import Text from '../UI/Text';
-import { Trans } from '@lingui/macro';
+import { Trans, t } from '@lingui/macro';
 import IconButton from '../UI/IconButton';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import Cross from '../UI/CustomSvgIcons/Cross';
+import useAlertDialog from '../UI/Alert/useAlertDialog';
 
 const gd: libGDevelop = global.gd;
 
@@ -609,6 +610,7 @@ export const AskAiStandAloneForm = ({
   const { values, showAskAiStandAloneForm } = React.useContext(
     PreferencesContext
   );
+  const { showConfirmation } = useAlertDialog();
 
   if (
     dismissableIdentifier &&
@@ -636,7 +638,13 @@ export const AskAiStandAloneForm = ({
         </LineStackLayout>
         {dismissableIdentifier && (
           <IconButton
-            onClick={() => {
+            onClick={async () => {
+              const answer = await showConfirmation({
+                title: t`Hide the AI assistant?`,
+                message: t`You won't see it here anymore, unless you re-activate it from the preferences.`,
+              });
+              if (!answer) return;
+
               showAskAiStandAloneForm(dismissableIdentifier, false);
             }}
             size="small"

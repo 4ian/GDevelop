@@ -71,6 +71,7 @@ type Props = {|
   deprecatedBehaviorMetadataList: Array<BehaviorShortHeader>,
   onInstall: (behaviorShortHeader: BehaviorShortHeader) => Promise<boolean>,
   onChoose: (behaviorType: string) => void,
+  shouldCheckCapabilityBehaviors: boolean,
 |};
 
 const getBehaviorType = (behaviorShortHeader: BehaviorShortHeader) =>
@@ -86,6 +87,7 @@ export const BehaviorStore = ({
   deprecatedBehaviorMetadataList,
   onInstall,
   onChoose,
+  shouldCheckCapabilityBehaviors,
 }: Props): React.Node => {
   const preferences = React.useContext(PreferencesContext);
   const [
@@ -305,8 +307,10 @@ export const BehaviorStore = ({
             filteredSearchResults.map(({ item }) => item)
           }
           getSearchItemUniqueId={getBehaviorType}
-          // $FlowFixMe[missing-local-annot]
-          renderSearchItem={(behaviorShortHeader, onHeightComputed) => (
+          renderSearchItem={(
+            behaviorShortHeader: BehaviorShortHeader,
+            onHeightComputed
+          ): React.Node => (
             <BehaviorListItem
               id={
                 'behavior-item-' + behaviorShortHeader.type.replace(/:/g, '-')
@@ -315,6 +319,7 @@ export const BehaviorStore = ({
               objectType={objectType}
               objectBehaviorsTypes={objectBehaviorsTypes}
               isChildObject={isChildObject}
+              shouldCheckCapabilityBehaviors={shouldCheckCapabilityBehaviors}
               onHeightComputed={onHeightComputed}
               behaviorShortHeader={behaviorShortHeader}
               matches={getExtensionsMatches(behaviorShortHeader)}

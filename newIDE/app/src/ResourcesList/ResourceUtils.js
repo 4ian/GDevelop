@@ -239,6 +239,124 @@ export const updateResourceJsonMetadata = (
   resource.setMetadata(JSON.stringify(newMetadata));
 };
 
+// Key under which the project-configurable custom resource properties
+// (defined in gdevelop-settings.yaml) are stored inside the resource metadata
+// JSON. Kept separate from other metadata keys (e.g. localFilePath) to avoid
+// collisions. These values are intended to be consumed by external packing tools.
+export const CUSTOM_PROPERTIES_METADATA_KEY = 'customProperties';
+
+export type CustomPropertyScalar = string | number | boolean;
+// A custom property value is either a scalar or, for "dictionary" properties, a
+// flat map of scalars (e.g. resolution -> scale factor).
+export type CustomPropertyValue =
+  | CustomPropertyScalar
+  | { [string]: CustomPropertyScalar };
+
+/**
+ * Returns the map of custom property values stored on a resource, or an empty
+ * object if none are set or the metadata is malformed.
+ */
+export const getResourceCustomProperties = (
+  resource: gdResource
+): { [string]: CustomPropertyValue } => {
+  const metadataAsString = resource.getMetadata();
+  if (!metadataAsString) return {};
+  try {
+    const metadata = JSON.parse(metadataAsString);
+    if (
+      metadata &&
+      typeof metadata === 'object' &&
+      metadata[CUSTOM_PROPERTIES_METADATA_KEY] &&
+      typeof metadata[CUSTOM_PROPERTIES_METADATA_KEY] === 'object'
+    ) {
+      return metadata[CUSTOM_PROPERTIES_METADATA_KEY];
+    }
+  } catch (error) {
+    // Malformed metadata: treat as if no custom properties were set.
+  }
+  return {};
+};
+
+/**
+ * Returns the stored value for a single custom property, falling back to the
+ * provided default value (typically from the YAML schema) if it is not set.
+ */
+export const getResourceCustomPropertyValue = (
+  resource: gdResource,
+  name: string,
+  defaultValue: ?CustomPropertyValue
+): ?CustomPropertyValue => {
+  const customProperties = getResourceCustomProperties(resource);
+  if (customProperties[name] !== undefined) {
+    return customProperties[name];
+  }
+  return defaultValue == null ? null : defaultValue;
+};
+
+/**
+ * Sets (or merges) a single custom property value on a resource, storing it in
+ * the resource metadata JSON under CUSTOM_PROPERTIES_METADATA_KEY.
+ */
+export const setResourceCustomPropertyValue = (
+  resource: gdResource,
+  name: string,
+  value: CustomPropertyValue
+) => {
+  const customProperties = {
+    ...getResourceCustomProperties(resource),
+    [name]: value,
+  };
+  updateResourceJsonMetadata(resource, {
+    [CUSTOM_PROPERTIES_METADATA_KEY]: customProperties,
+  });
+};
+
+/**
+ * Returns the stored map for a "dictionary" custom property (e.g. a
+ * resolution -> scale factor map), or an empty object if none is set.
+ */
+export const getResourceCustomDictionary = (
+  resource: gdResource,
+  name: string
+): { [string]: CustomPropertyScalar } => {
+  const value = getResourceCustomProperties(resource)[name];
+  if (value && typeof value === 'object') {
+    // $FlowFixMe[incompatible-return] - dictionary properties store a map of scalars.
+    return value;
+  }
+  return {};
+};
+
+/**
+ * Sets (or merges) a single entry of a "dictionary" custom property, preserving
+ * the other entries already stored on the resource.
+ */
+export const setResourceCustomDictionaryValue = (
+  resource: gdResource,
+  name: string,
+  key: string,
+  value: CustomPropertyScalar
+) => {
+  const dictionary = {
+    ...getResourceCustomDictionary(resource, name),
+    [key]: value,
+  };
+  setResourceCustomPropertyValue(resource, name, dictionary);
+};
+
+/**
+ * Removes a single entry from a "dictionary" custom property.
+ */
+export const removeResourceCustomDictionaryValue = (
+  resource: gdResource,
+  name: string,
+  key: string
+) => {
+  const dictionary = { ...getResourceCustomDictionary(resource, name) };
+  delete dictionary[key];
+  setResourceCustomPropertyValue(resource, name, dictionary);
+};
+
 export const isFetchableUrl = (url: string): boolean => {
   return (
     url.startsWith('http://') ||

@@ -3,6 +3,12 @@ import {
   parseLocalFilePathOrExtensionFromMetadata,
   renameResourcesInProject,
   updateResourceJsonMetadata,
+  getResourceCustomProperties,
+  getResourceCustomPropertyValue,
+  setResourceCustomPropertyValue,
+  getResourceCustomDictionary,
+  setResourceCustomDictionaryValue,
+  removeResourceCustomDictionaryValue,
 } from './ResourceUtils';
 const gd: libGDevelop = global.gd;
 
@@ -221,6 +227,99 @@ describe('ResourceUtils', () => {
           "localFilePath": null,
         }
       `);
+    });
+  });
+
+  describe('Resource custom properties', () => {
+    let resource = null;
+    afterEach(() => {
+      if (resource) resource.delete();
+      resource = null;
+    });
+
+    it('returns an empty object when no custom properties are set', () => {
+      const r = (resource = new gd.Resource());
+      expect(getResourceCustomProperties(r)).toEqual({});
+    });
+
+    it('can set and read custom property values of different types', () => {
+      const r = (resource = new gd.Resource());
+      setResourceCustomPropertyValue(r, 'packScale', '_480p');
+      setResourceCustomPropertyValue(r, 'customScale', 0.3);
+      setResourceCustomPropertyValue(r, 'noResize', true);
+
+      expect(getResourceCustomProperties(r)).toEqual({
+        packScale: '_480p',
+        customScale: 0.3,
+        noResize: true,
+      });
+      expect(getResourceCustomPropertyValue(r, 'packScale', null)).toBe(
+        '_480p'
+      );
+      expect(getResourceCustomPropertyValue(r, 'customScale', null)).toBe(0.3);
+      expect(getResourceCustomPropertyValue(r, 'noResize', null)).toBe(true);
+    });
+
+    it('falls back to the provided default when a property is not set', () => {
+      const r = (resource = new gd.Resource());
+      expect(getResourceCustomPropertyValue(r, 'packScale', '_320p')).toBe(
+        '_320p'
+      );
+      expect(getResourceCustomPropertyValue(r, 'missing', null)).toBeNull();
+    });
+
+    it('does not collide with other metadata keys', () => {
+      const r = (resource = new gd.Resource());
+      updateResourceJsonMetadata(r, { localFilePath: 'test' });
+      setResourceCustomPropertyValue(r, 'noAtlas', true);
+
+      // $FlowFixMe[incompatible-type]
+      expect(parseLocalFilePathOrExtensionFromMetadata(r)).toEqual({
+        extension: null,
+        localFilePath: 'test',
+      });
+      expect(getResourceCustomProperties(r)).toEqual({ noAtlas: true });
+    });
+
+    it('can set and merge dictionary entries without losing other entries', () => {
+      const r = (resource = new gd.Resource());
+      setResourceCustomDictionaryValue(r, 'packScale', '_320p', 0.2);
+      setResourceCustomDictionaryValue(r, 'packScale', '_480p', 0.4);
+
+      expect(getResourceCustomDictionary(r, 'packScale')).toEqual({
+        _320p: 0.2,
+        _480p: 0.4,
+      });
+
+      // Updating one entry preserves the others.
+      setResourceCustomDictionaryValue(r, 'packScale', '_320p', 0.25);
+      expect(getResourceCustomDictionary(r, 'packScale')).toEqual({
+        _320p: 0.25,
+        _480p: 0.4,
+      });
+
+      // Dictionaries coexist with scalar custom properties.
+      setResourceCustomPropertyValue(r, 'scaleMultiplier', 1.5);
+      expect(getResourceCustomProperties(r)).toEqual({
+        packScale: { _320p: 0.25, _480p: 0.4 },
+        scaleMultiplier: 1.5,
+      });
+    });
+
+    it('returns an empty dictionary when none is set', () => {
+      const r = (resource = new gd.Resource());
+      expect(getResourceCustomDictionary(r, 'packScale')).toEqual({});
+    });
+
+    it('can remove a dictionary entry while keeping the others', () => {
+      const r = (resource = new gd.Resource());
+      setResourceCustomDictionaryValue(r, 'packScale', '_320p', 0.2);
+      setResourceCustomDictionaryValue(r, 'packScale', '_480p', 0.4);
+
+      removeResourceCustomDictionaryValue(r, 'packScale', '_320p');
+      expect(getResourceCustomDictionary(r, 'packScale')).toEqual({
+        _480p: 0.4,
+      });
     });
   });
 });

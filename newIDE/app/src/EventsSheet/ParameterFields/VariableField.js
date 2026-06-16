@@ -416,15 +416,21 @@ export default (React.forwardRef<Props, VariableFieldInterface>(
             fieldCurrentValue,
             variablesContainers
           ),
-          variableType: getVariableTypeName(variableType),
+          variableType: instruction
+            ? getVariableTypeName(
+                gd.VariableInstructionSwitcher.getSwitchableInstructionVariableType(
+                  instruction.getType()
+                )
+              )
+            : 'number',
         });
       },
       [
         editEventsBasedEntityProperty,
         value,
         onChange,
+        instruction,
         variablesContainers,
-        variableType,
       ]
     );
 

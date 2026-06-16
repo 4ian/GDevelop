@@ -1215,7 +1215,8 @@ const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
           setSelectedProperty(initiallySelectedProperty.variableName, false);
         }
       },
-      [addProperty, initiallySelectedProperty, properties, setSelectedProperty]
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      []
     );
 
     const canMoveSelectionTo = React.useCallback(

@@ -1939,7 +1939,9 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                   propertyName
                 );
               }}
-              onPropertiesUpdated={() => {}}
+              onPropertiesUpdated={() => {
+                this.forceUpdate();
+              }}
               onEventsFunctionsAdded={() => {
                 if (this.eventsFunctionList) {
                   this.eventsFunctionList.forceUpdateList();
@@ -1982,7 +1984,9 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                   propertyName
                 );
               }}
-              onPropertiesUpdated={() => {}}
+              onPropertiesUpdated={() => {
+                this.forceUpdate();
+              }}
               onEventsFunctionsAdded={() => {
                 if (this.eventsFunctionList) {
                   this.eventsFunctionList.forceUpdateList();

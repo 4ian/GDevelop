@@ -57,7 +57,10 @@ import {
 import { renderDebuggerEditorContainer } from './EditorContainers/DebuggerEditorContainer';
 import { renderEventsEditorContainer } from './EditorContainers/EventsEditorContainer';
 import { renderExternalEventsEditorContainer } from './EditorContainers/ExternalEventsEditorContainer';
-import { renderSceneEditorContainer } from './EditorContainers/SceneEditorContainer';
+import {
+  renderSceneEditorContainer,
+  SceneEditorContainer,
+} from './EditorContainers/SceneEditorContainer';
 import { renderExternalLayoutEditorContainer } from './EditorContainers/ExternalLayoutEditorContainer';
 import { renderEventsFunctionsExtensionEditorContainer } from './EditorContainers/EventsFunctionsExtensionEditorContainer';
 import { renderCustomObjectEditorContainer } from './EditorContainers/CustomObjectEditorContainer';
@@ -5196,7 +5199,7 @@ const MainFrame = (props: Props): React.MixedElement => {
           paneIdentifier
         );
         const editorRef = currentTab ? currentTab.editorRef : null;
-        if (editorRef && editorRef.saveCurrentScene) {
+        if (editorRef instanceof SceneEditorContainer) {
           editorRef.saveCurrentScene();
           return;
         }
@@ -5209,7 +5212,7 @@ const MainFrame = (props: Props): React.MixedElement => {
           paneIdentifier
         );
         const editorRef = currentTab ? currentTab.editorRef : null;
-        if (editorRef && editorRef.loadSceneFromFile) {
+        if (editorRef instanceof SceneEditorContainer) {
           editorRef.loadSceneFromFile();
           return;
         }

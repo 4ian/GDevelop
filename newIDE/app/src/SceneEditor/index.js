@@ -1,4 +1,3 @@
-// Trigger CI
 // @flow
 import { Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
@@ -318,6 +317,7 @@ type CopyCutPasteOptions = {|
 const editSceneIconReactNode = <EditSceneIcon />;
 
 export default class SceneEditor extends React.Component<Props, State> {
+  // $FlowFixMe[missing-local-annot]
   static contextType = EventsFunctionsExtensionsContext;
   instancesSelection: InstancesSelection;
   contextMenu: ?ContextMenuInterface;
@@ -414,7 +414,7 @@ export default class SceneEditor extends React.Component<Props, State> {
 
     // Detect and serialize extensions used by object behaviors and types
     // (scan both scene objects AND global objects)
-    const extensionNames = new Set();
+    const extensionNames = new Set<string>();
     const allObjectsToScan = [...(sceneJson.objects || []), ...globalObjects];
     allObjectsToScan.forEach(obj => {
       (obj.behaviors || []).forEach(b => {
@@ -446,8 +446,8 @@ export default class SceneEditor extends React.Component<Props, State> {
 
     // Embed resources as base64 (scan scene + extensions)
     const resourcesManager = project.getResourcesManager();
-    const usedResourceNames = new Set();
-    const scanForResources = val => {
+    const usedResourceNames = new Set<string>();
+    const scanForResources = (val: mixed) => {
       if (
         typeof val === 'string' &&
         val.length > 0 &&
@@ -463,7 +463,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     globalObjects.forEach(scanForResources);
 
     // Helper to convert ArrayBuffer to base64 (browser + desktop compatible)
-    const arrayBufferToBase64 = buffer => {
+    const arrayBufferToBase64 = (buffer: ArrayBuffer) => {
       const bytes = new Uint8Array(buffer);
       let binary = '';
       const chunkSize = 8192;
@@ -486,9 +486,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       try {
         // 1. Desktop con file locale: prova a leggere dal disco
         if (isDesktop && resourceFile && !resourceFile.startsWith('http')) {
-          const projectFilePath = project.getProjectFile
-            ? project.getProjectFile()
-            : null;
+          const projectFilePath = project.getProjectFile();
           const projectPath = projectFilePath
             ? path.dirname(projectFilePath)
             : null;
@@ -597,9 +595,12 @@ export default class SceneEditor extends React.Component<Props, State> {
       const a = document.createElement('a');
       a.href = url;
       a.download = fileName;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
+      const body = document.body;
+      if (body) {
+        body.appendChild(a);
+        a.click();
+        body.removeChild(a);
+      }
       URL.revokeObjectURL(url);
     }
   };
@@ -617,7 +618,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     const isDesktop = !!(remote && fs && path);
 
     // Leggi il file (desktop o browser)
-    let exportData;
+    let exportData: any = null;
 
     if (isDesktop) {
       const result = await remote.dialog.showOpenDialog(
@@ -643,7 +644,8 @@ export default class SceneEditor extends React.Component<Props, State> {
         input.type = 'file';
         input.accept = '.json';
         input.onchange = e => {
-          const file = e.target.files[0];
+          const inputEl = (e.target: any);
+          const file = inputEl && inputEl.files ? inputEl.files[0] : null;
           if (!file) {
             resolve(null);
             return;
@@ -651,7 +653,8 @@ export default class SceneEditor extends React.Component<Props, State> {
           const reader = new FileReader();
           reader.onload = ev => {
             try {
-              resolve(JSON.parse(ev.target.result));
+              const readerEl = (ev.target: any);
+              resolve(JSON.parse(readerEl ? readerEl.result : ''));
             } catch (err) {
               Window.showMessageBox('Invalid JSON file.', 'error');
               resolve(null);
@@ -679,8 +682,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       // 1. Registra le risorse nel ResourcesManager
       const resourcesManager = project.getResourcesManager();
       if (exportData.resources && Array.isArray(exportData.resources)) {
-        const projectFilePath =
-          isDesktop && project.getProjectFile ? project.getProjectFile() : null;
+        const projectFilePath = isDesktop ? project.getProjectFile() : null;
         const projectPath =
           isDesktop && projectFilePath && projectFilePath.includes('.json')
             ? path.dirname(projectFilePath)
@@ -710,10 +712,12 @@ export default class SceneEditor extends React.Component<Props, State> {
             const targetDir = path.dirname(absoluteTarget);
             if (!fs.existsSync(targetDir))
               fs.mkdirSync(targetDir, { recursive: true });
-            fs.writeFileSync(
-              absoluteTarget,
-              Buffer.from(res.base64Data, 'base64')
-            );
+            const binaryStr = atob(res.base64Data);
+            const bytes = new Uint8Array(binaryStr.length);
+            for (let i = 0; i < binaryStr.length; i++) {
+              bytes[i] = binaryStr.charCodeAt(i);
+            }
+            fs.writeFileSync(absoluteTarget, bytes);
             fileToUse = targetRelativePath;
           } else if (res.base64Data) {
             // Cloud: convert base64 to same-origin Blob URL.
@@ -764,8 +768,9 @@ export default class SceneEditor extends React.Component<Props, State> {
             else newResource = new gd.ImageResource();
             newResource.setName(res.name);
             newResource.setFile(fileToUse);
-            if (res.smoothed !== undefined && newResource.setSmooth) {
-              newResource.setSmooth(res.smoothed);
+            if (res.smoothed !== undefined) {
+              // $FlowFixMe[prop-missing] setSmooth is only on ImageResource
+              (newResource: any).setSmooth(res.smoothed);
             }
             resourcesManager.addResource(newResource);
             newResource.delete();
@@ -844,7 +849,7 @@ export default class SceneEditor extends React.Component<Props, State> {
         exportData.globalObjectsGroups.length > 0
       ) {
         try {
-          const globalGroupsContainer = project.getObjectGroups();
+          const globalGroupsContainer = project.getObjects().getObjectGroups();
           exportData.globalObjectsGroups.forEach(groupData => {
             if (!groupData.name) return;
             if (globalGroupsContainer.has(groupData.name)) {
@@ -941,19 +946,16 @@ export default class SceneEditor extends React.Component<Props, State> {
           // Try different deserialization methods
           const eventsElement = gd.Serializer.fromJSObject(eventsToImport);
 
-          if (
-            gd.EventsListSerialization &&
-            gd.EventsListSerialization.unserializeEventsFrom
-          ) {
+          // $FlowFixMe[prop-missing]
+          if (gd.EventsListSerialization) {
+            // $FlowFixMe[incompatible-use]
             gd.EventsListSerialization.unserializeEventsFrom(
               project,
               eventsList,
               eventsElement
             );
-          } else if (eventsList.unserializeFrom) {
-            eventsList.unserializeFrom(project, eventsElement);
           } else {
-            console.warn('Could not find a method to import events.');
+            eventsList.unserializeFrom(project, eventsElement);
           }
           eventsElement.delete();
         } catch (eventErr) {
@@ -969,15 +971,7 @@ export default class SceneEditor extends React.Component<Props, State> {
         try {
           const variablesContainer = layout.getVariables();
           const varElement = gd.Serializer.fromJSObject(variablesToImport);
-          try {
-            variablesContainer.unserializeFrom(varElement);
-          } catch (e1) {
-            try {
-              variablesContainer.unserializeFrom(project, varElement);
-            } catch (e2) {
-              console.warn('Could not restore scene variables:', e2);
-            }
-          }
+          variablesContainer.unserializeFrom(varElement);
           varElement.delete();
         } catch (varErr) {
           console.error('Error importing scene variables:', varErr);
@@ -1373,8 +1367,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       editorDisplay.forceUpdateObjectsList();
 
       // Find all the objects using the resources that were reloaded.
-      /** @type {Set<string>} */
-      const objectNames = new Set();
+      const objectNames = new Set<string>();
 
       for (const resourceName of resourceNames) {
         const objectsCollector = new gd.ObjectsUsingResourceCollector(

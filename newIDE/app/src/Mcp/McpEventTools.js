@@ -203,6 +203,20 @@ const getEventInstructions = (
   };
 };
 
+const serializeSingleEventToJSObject = (event: gdBaseEvent): Object => {
+  const eventsList = new gd.EventsList();
+  try {
+    eventsList.insertEvent(event, 0);
+    const serializedEvents = serializeToJSObject(eventsList);
+    if (Array.isArray(serializedEvents) && serializedEvents[0]) {
+      return serializedEvents[0];
+    }
+    return serializeToJSObject(event);
+  } finally {
+    eventsList.delete();
+  }
+};
+
 const summarizeEventReference = (
   reference: EventReference,
   options?: {| includeSerialized?: boolean |}
@@ -220,7 +234,7 @@ const summarizeEventReference = (
     actions: instructions.actions,
   };
   if (includeSerialized) {
-    summary.serializedEvent = serializeToJSObject(event);
+    summary.serializedEvent = serializeSingleEventToJSObject(event);
   }
 
   if (eventType === 'BuiltinCommonInstructions::Group') {
@@ -230,7 +244,7 @@ const summarizeEventReference = (
   if (eventType === 'BuiltinCommonInstructions::Comment') {
     const serializedEvent = includeSerialized
       ? summary.serializedEvent
-      : serializeToJSObject(event);
+      : serializeSingleEventToJSObject(event);
     summary.comment = serializedEvent.comment || '';
   }
 
@@ -238,7 +252,7 @@ const summarizeEventReference = (
 };
 
 const serializeEventPreservingStableId = (event: gdBaseEvent): Object => {
-  const serializedEvent = serializeToJSObject(event);
+  const serializedEvent = serializeSingleEventToJSObject(event);
   const aiGeneratedEventId = event.getAiGeneratedEventId();
   if (aiGeneratedEventId) {
     serializedEvent.aiGeneratedEventId = aiGeneratedEventId;
@@ -251,7 +265,9 @@ const eventMatchesCriteria = (
   criteria: Object
 ): boolean => {
   const event = reference.event;
-  const serializedEventText = JSON.stringify(serializeToJSObject(event));
+  const serializedEventText = JSON.stringify(
+    serializeSingleEventToJSObject(event)
+  );
   const aiGeneratedEventId =
     getOptionalString(criteria, 'ai_generated_event_id') ||
     getOptionalString(criteria, 'aiGeneratedEventId') ||

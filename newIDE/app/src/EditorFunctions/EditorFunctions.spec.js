@@ -1346,6 +1346,56 @@ describe('editorFunctions', () => {
       });
     });
 
+    it('accepts a direct structured single Group event without unwrapping sub-events', async () => {
+      // $FlowFixMe[underconstrained-implicit-instantiation]
+      const generateEvents = jest.fn();
+      // $FlowFixMe[underconstrained-implicit-instantiation]
+      const onSceneEventsModifiedOutsideEditor = jest.fn();
+
+      const result = await editorFunctions.add_scene_events.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          events_json: {
+            type: 'BuiltinCommonInstructions::Group',
+            name: 'Gameplay',
+            aiGeneratedEventId: 'structured-group-id',
+            events: [
+              {
+                type: 'BuiltinCommonInstructions::Comment',
+                comment: 'Keep inside the group.',
+                aiGeneratedEventId: 'structured-child-id',
+              },
+            ],
+          },
+        },
+        relatedAiRequestId: null,
+        generateEvents,
+        onSceneEventsModifiedOutsideEditor,
+      });
+
+      expect(result.success).toBe(true);
+      expect(testScene.getEvents().getEventsCount()).toBe(1);
+      const groupEvent = testScene.getEvents().getEventAt(0);
+      expect(groupEvent.getType()).toBe('BuiltinCommonInstructions::Group');
+      expect(gd.asGroupEvent(groupEvent).getName()).toBe('Gameplay');
+      expect(groupEvent.getSubEvents().getEventsCount()).toBe(1);
+      expect(
+        groupEvent
+          .getSubEvents()
+          .getEventAt(0)
+          .getType()
+      ).toBe('BuiltinCommonInstructions::Comment');
+      expect(generateEvents).not.toHaveBeenCalled();
+      expect(onSceneEventsModifiedOutsideEditor).toHaveBeenCalledWith({
+        scene: testScene,
+        newOrChangedAiGeneratedEventIds: new Set([
+          'structured-group-id',
+          'structured-child-id',
+        ]),
+      });
+    });
+
     it('rejects direct events JSON with invalid parameter values before writing', async () => {
       testScene
         .getObjects()

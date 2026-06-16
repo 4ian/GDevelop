@@ -25,6 +25,7 @@ import {
   validateEventsJson,
   autoQuoteEventParameters,
   buildInstruction,
+  collectSerializedEventJsonIssues,
 } from './McpEventKnowledge';
 import {
   createOrUpdateExtension,
@@ -2780,14 +2781,18 @@ const autoQuoteAddSceneEventsArgs = (
       parsed = originalWasString
         ? JSON.parse(eventsPayload)
         : JSON.parse(JSON.stringify(eventsPayload));
-      if (parsed && !Array.isArray(parsed) && Array.isArray(parsed.events)) {
-        parsed = parsed.events;
-      } else if (
+      if (
         parsed &&
         !Array.isArray(parsed) &&
         typeof parsed.type === 'string'
       ) {
         parsed = [parsed];
+      } else if (
+        parsed &&
+        !Array.isArray(parsed) &&
+        Array.isArray(parsed.events)
+      ) {
+        parsed = parsed.events;
       }
       if (!Array.isArray(parsed)) return eventsPayload;
       const changed = autoQuoteEventParameters(project, parsed);
@@ -2846,6 +2851,101 @@ const getEventsJsonArgument = (args: ?Object): string | null => {
     return JSON.stringify(eventsJson);
   }
   return null;
+};
+
+const normalizeSerializedEventsInputForValidation = (value: any): any => {
+  if (Array.isArray(value)) return value;
+  if (value && typeof value === 'object') {
+    if (typeof value.type === 'string') return [value];
+    if (Array.isArray(value.events)) return value.events;
+  }
+  return value;
+};
+
+const getGeneratedEventsPayload = (change: Object): any => {
+  if (!change || typeof change !== 'object') return undefined;
+  if (Object.prototype.hasOwnProperty.call(change, 'generated_events')) {
+    return change.generated_events;
+  }
+  if (Object.prototype.hasOwnProperty.call(change, 'generatedEvents')) {
+    return change.generatedEvents;
+  }
+  return undefined;
+};
+
+const collectAddSceneEventsRawIssues = (args: ?Object): Array<Object> => {
+  if (!args) return [];
+  const issues = [];
+  const validatePayload = (source: string, payload: any) => {
+    if (payload === null || payload === undefined) return;
+    if (typeof payload === 'string' && payload.trim() === '') return;
+
+    let parsed;
+    try {
+      parsed =
+        typeof payload === 'string'
+          ? JSON.parse(payload)
+          : JSON.parse(JSON.stringify(payload));
+    } catch (error) {
+      issues.push({
+        severity: 'error',
+        type: 'invalid-events-json',
+        source,
+        suggestion: `Fix ${source}: it must be valid serialized events JSON.`,
+        error: error && error.message ? error.message : String(error),
+      });
+      return;
+    }
+
+    const normalized = normalizeSerializedEventsInputForValidation(parsed);
+    if (!Array.isArray(normalized)) {
+      issues.push({
+        severity: 'error',
+        type: 'invalid-events-json-shape',
+        source,
+        suggestion: `Fix ${source}: use a serialized events array, a single serialized event object, or { events: [...] } before calling add_scene_events.`,
+      });
+      return;
+    }
+
+    collectSerializedEventJsonIssues(normalized).forEach(issue => {
+      issues.push({
+        ...issue,
+        source,
+      });
+    });
+  };
+
+  validatePayload('events_json', args.events_json);
+  validatePayload('eventsJson', args.eventsJson);
+  validatePayload('events', args.events);
+
+  if (Array.isArray(args.event_changes)) {
+    args.event_changes.forEach((change, index) => {
+      const payload = getGeneratedEventsPayload(change);
+      if (payload === undefined || payload === null) return;
+      validatePayload(`event_changes[${index}].generated_events`, payload);
+    });
+  }
+
+  return issues;
+};
+
+const makeAddSceneEventsPreflightFailure = (args: ?Object): ?Object => {
+  const issues = collectAddSceneEventsRawIssues(args).filter(
+    issue => issue.severity === 'error'
+  );
+  if (!issues.length) return null;
+  return {
+    success: false,
+    valid: false,
+    error:
+      'add_scene_events validation failed before writing. No events were created.',
+    errors: issues,
+    issues,
+    note:
+      'Fix the serialized event JSON and retry. In scene/layout events, use current instruction types such as BooleanObjectVariable instead of legacy function-only forms such as ObjectVariableAsBoolean.',
+  };
 };
 
 const getPrompt = (name: string) => {
@@ -4121,6 +4221,31 @@ const callMcpTool = async ({
   if (sceneWriteToolHandler) {
     if (!project) return errorResult('No project opened.');
     try {
+      if (
+        toolName === 'bulk_edit_scene_assets' &&
+        args &&
+        (getEventsJsonArgument(args) || Array.isArray(args.event_changes))
+      ) {
+        const eventsJson = getEventsJsonArgument(args);
+        const eventsArgs = {
+          scene_name: args.scene_name,
+          events_json: eventsJson,
+          event_changes: Array.isArray(args.event_changes)
+            ? args.event_changes
+            : undefined,
+        };
+        const preflightFailure = makeAddSceneEventsPreflightFailure(
+          autoQuoteAddSceneEventsArgs(project, eventsArgs)
+        );
+        if (preflightFailure) {
+          return textResult({
+            ...preflightFailure,
+            error:
+              'bulk_edit_scene_assets event validation failed before writing. No scene asset or event changes were applied.',
+          });
+        }
+      }
+
       const runSceneWriteTool: (
         project: gdProject,
         args: Object,
@@ -4203,13 +4328,18 @@ const callMcpTool = async ({
     }
   }
 
+  const finalArgs =
+    (toolName === 'add_scene_events' || toolName === 'generate_events') && args
+      ? autoQuoteAddSceneEventsArgs(project, args)
+      : args || {};
+  if (toolName === 'add_scene_events' || toolName === 'generate_events') {
+    const preflightFailure = makeAddSceneEventsPreflightFailure(finalArgs);
+    if (preflightFailure) return textResult(preflightFailure);
+  }
+
   return callEditorFunction({
     toolName,
-    args:
-      (toolName === 'add_scene_events' || toolName === 'generate_events') &&
-      args
-        ? autoQuoteAddSceneEventsArgs(project, args)
-        : args || {},
+    args: finalArgs,
     context,
   });
 };

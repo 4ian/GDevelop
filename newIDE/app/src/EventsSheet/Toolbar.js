@@ -6,8 +6,6 @@ import ToolbarSeparator from '../UI/ToolbarSeparator';
 import IconButton from '../UI/IconButton';
 import ToolbarCommands from './ToolbarCommands';
 import { type EventMetadata } from './EnumerateEventsMetadata';
-import UndoIcon from '../UI/CustomSvgIcons/Undo';
-import RedoIcon from '../UI/CustomSvgIcons/Redo';
 import ToolbarSearchIcon from '../UI/CustomSvgIcons/ToolbarSearch';
 import EditSceneIcon from '../UI/CustomSvgIcons/EditScene';
 import { getShortcutDisplayName, useShortcutMap } from '../KeyboardShortcuts';
@@ -117,30 +115,6 @@ const Toolbar: React.ComponentType<Props> = React.memo<Props>(function Toolbar({
           <VariableTreeIcon />
         </IconButton>
         <ToolbarSeparator />
-
-        <IconButton
-          size="small"
-          color="default"
-          onClick={undo}
-          disabled={!canUndo}
-          tooltip={t`Undo the last changes`}
-          acceleratorString={'CmdOrCtrl+Z'}
-        >
-          <UndoIcon />
-        </IconButton>
-
-        <IconButton
-          size="small"
-          color="default"
-          onClick={redo}
-          disabled={!canRedo}
-          tooltip={t`Redo the last changes`}
-          acceleratorString={'CmdOrCtrl+Shift+Z'}
-        >
-          <RedoIcon />
-        </IconButton>
-        <ToolbarSeparator />
-
         <IconButton
           size="small"
           color="default"

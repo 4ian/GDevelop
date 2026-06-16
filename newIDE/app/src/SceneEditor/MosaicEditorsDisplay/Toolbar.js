@@ -9,9 +9,6 @@ import ElementWithMenu from '../../UI/Menu/ElementWithMenu';
 import ToolbarCommands from '../ToolbarCommands';
 import { type MenuItemTemplate } from '../../UI/Menu/Menu.flow';
 import ShowAllPanelsIcon from '../../UI/CustomSvgIcons/ShowAllPanels';
-import UndoIcon from '../../UI/CustomSvgIcons/Undo';
-import RedoIcon from '../../UI/CustomSvgIcons/Redo';
-import TrashIcon from '../../UI/CustomSvgIcons/Trash';
 import GridIcon from '../../UI/CustomSvgIcons/Grid';
 import ZoomInIcon from '../../UI/CustomSvgIcons/ZoomIn';
 import EditSceneIcon from '../../UI/CustomSvgIcons/EditScene';
@@ -148,24 +145,6 @@ const Toolbar: React.ComponentType<Props> = React.memo<Props>(function Toolbar(
           ]}
         />
         <ToolbarSeparator />
-        <IconButton
-          size="small"
-          color="default"
-          onClick={props.undo}
-          disabled={!props.canUndo}
-          tooltip={t`Undo the last changes`}
-        >
-          <UndoIcon />
-        </IconButton>
-        <IconButton
-          size="small"
-          color="default"
-          onClick={props.redo}
-          disabled={!props.canRedo}
-          tooltip={t`Redo the last changes`}
-        >
-          <RedoIcon />
-        </IconButton>
         <ElementWithMenu
           element={
             <IconButton
@@ -189,15 +168,6 @@ const Toolbar: React.ComponentType<Props> = React.memo<Props>(function Toolbar(
             { label: '400%', click: () => props.setZoomFactor(4.0) },
           ]}
         />
-        <IconButton
-          size="small"
-          color="default"
-          onClick={props.deleteSelection}
-          disabled={!props.selectedInstancesCount}
-          tooltip={t`Delete the selected instances from the scene`}
-        >
-          <TrashIcon />
-        </IconButton>
         {props.onOpenSettings && <ToolbarSeparator />}
         {props.onOpenSettings && (
           <IconButton

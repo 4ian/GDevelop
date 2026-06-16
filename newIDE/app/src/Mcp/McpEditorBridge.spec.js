@@ -576,7 +576,60 @@ describe('McpEditorBridge', () => {
         invalidTextResponse.content[0].text
       );
       expect(invalidTextValidation.valid).toBe(false);
-      expect(invalidTextValidation.issues[0].suggestion).toContain('NewLine()');
+      expect(invalidTextValidation.issues[0].suggestion).toContain(
+        'NewLine()'
+      );
+
+      layout.getObjects().insertNewObject(project, 'Sprite', 'GroundSlot', 2);
+      layout
+        .getObjects()
+        .getObject('GroundSlot')
+        .getVariables()
+        .insertNew('Occupied', 0)
+        .setBool(false);
+      const legacyObjectVariableResponse = await bridge.handleRendererMcpRequest(
+        {
+          method: 'tools/call',
+          params: {
+            name: 'gdevelop_validate_events_json',
+            arguments: {
+              scene_name: 'Level1',
+              events_json: JSON.stringify([
+                {
+                  type: 'BuiltinCommonInstructions::Standard',
+                  conditions: [
+                    {
+                      type: { value: 'ObjectVariableAsBoolean' },
+                      parameters: ['GroundSlot', 'Occupied', 'false'],
+                    },
+                  ],
+                  actions: [],
+                },
+              ]),
+            },
+          },
+        }
+      );
+      const legacyObjectVariableValidation = JSON.parse(
+        legacyObjectVariableResponse.content[0].text
+      );
+      expect(legacyObjectVariableValidation.valid).toBe(false);
+      expect(legacyObjectVariableValidation.issues).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            type: 'legacy-function-only-instruction-in-scene-events',
+            instructionType: 'ObjectVariableAsBoolean',
+            replacementType: 'BooleanObjectVariable',
+          }),
+        ])
+      );
+      expect(
+        legacyObjectVariableValidation.issues.find(
+          issue =>
+            issue.type ===
+            'legacy-function-only-instruction-in-scene-events'
+        ).suggestion
+      ).toContain('BooleanObjectVariable');
     } finally {
       project.delete();
     }
@@ -2420,12 +2473,18 @@ describe('McpEditorBridge', () => {
       });
       expect(moveResponse.isError).not.toBe(true);
       expect(layout.getEvents().getEventsCount()).toBe(1);
-      expect(
-        gd
-          .asGroupEvent(layout.getEvents().getEventAt(0))
-          .getSubEvents()
-          .getEventsCount()
-      ).toBe(3);
+      const movedSubEvents = gd
+        .asGroupEvent(layout.getEvents().getEventAt(0))
+        .getSubEvents();
+      expect(movedSubEvents.getEventsCount()).toBe(3);
+      const movedEvent = movedSubEvents.getEventAt(2);
+      expect(movedEvent.getType()).toBe('BuiltinCommonInstructions::Comment');
+      expect(serializeToJSObject(movedSubEvents)[2]).toEqual(
+        expect.objectContaining({
+          type: 'BuiltinCommonInstructions::Comment',
+          comment: 'Leave this outside the group',
+        })
+      );
       expect(onSceneEventsModifiedOutsideEditor).toHaveBeenCalled();
     } finally {
       project.delete();
@@ -3411,6 +3470,151 @@ describe('McpEditorBridge', () => {
     expect(forwardedArguments.event_changes[0].generated_events).toEqual(
       structuredEvents
     );
+  });
+
+  it('preserves a structured single Group event while auto-quoting its child events', async () => {
+    // $FlowFixMe[invalid-constructor]
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    project.insertNewLayout('Level1', 0);
+    const processEditorFunctionCalls: any = jest.fn(async () => ({
+      results: [
+        {
+          status: 'finished',
+          call_id: 'mcp-call',
+          success: true,
+          didModifyProject: false,
+          output: {
+            success: true,
+          },
+        },
+      ],
+    }));
+
+    try {
+      const bridge = makeBridge({
+        getProject: () => project,
+        getPermissions: () => ({
+          allowWriteTools: true,
+          allowCommandTools: false,
+        }),
+        processEditorFunctionCalls,
+      });
+
+      const response = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'add_scene_events',
+          arguments: {
+            scene_name: 'Level1',
+            event_changes: [
+              {
+                operation_name: 'insert_at_end',
+                generated_events: {
+                  type: 'BuiltinCommonInstructions::Group',
+                  name: 'Timers',
+                  aiGeneratedEventId: 'timers-group-id',
+                  events: [
+                    {
+                      type: 'BuiltinCommonInstructions::Standard',
+                      conditions: [],
+                      actions: [
+                        {
+                          type: { value: 'ResetTimer' },
+                          parameters: ['', 'GameTimer'],
+                        },
+                      ],
+                    },
+                  ],
+                },
+              },
+            ],
+          },
+        },
+      });
+
+      expect(response.isError).not.toBe(true);
+      const editorCall =
+        processEditorFunctionCalls.mock.calls[0][0].functionCalls[0];
+      const forwardedArguments = JSON.parse(editorCall.arguments);
+      const forwardedEvents = Array.isArray(
+        forwardedArguments.event_changes[0].generated_events
+      )
+        ? forwardedArguments.event_changes[0].generated_events
+        : [forwardedArguments.event_changes[0].generated_events];
+      expect(forwardedEvents).toHaveLength(1);
+      const forwardedGroup = forwardedEvents[0];
+      expect(forwardedGroup).toEqual(
+        expect.objectContaining({
+          type: 'BuiltinCommonInstructions::Group',
+          name: 'Timers',
+          aiGeneratedEventId: 'timers-group-id',
+        })
+      );
+      expect(forwardedGroup.events).toHaveLength(1);
+      expect(forwardedGroup.events[0].actions[0].parameters[1]).toBe(
+        '"GameTimer"'
+      );
+    } finally {
+      project.delete();
+    }
+  });
+
+  it('blocks legacy object-variable boolean conditions before add_scene_events writes', async () => {
+    // $FlowFixMe[invalid-constructor]
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    const layout = project.insertNewLayout('Level1', 0);
+    const processEditorFunctionCalls: any = (jest.fn(): any);
+
+    try {
+      const bridge = makeBridge({
+        getProject: () => project,
+        getPermissions: () => ({
+          allowWriteTools: true,
+          allowCommandTools: false,
+        }),
+        processEditorFunctionCalls,
+      });
+
+      const response = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'add_scene_events',
+          arguments: {
+            scene_name: 'Level1',
+            events_json: JSON.stringify([
+              {
+                type: 'BuiltinCommonInstructions::Standard',
+                conditions: [
+                  {
+                    type: { value: 'ObjectVariableAsBoolean' },
+                    parameters: ['GroundSlot', 'Occupied', 'false'],
+                  },
+                ],
+                actions: [],
+              },
+            ]),
+          },
+        },
+      });
+      const result = JSON.parse(response.content[0].text);
+
+      expect(response.isError).not.toBe(true);
+      expect(result.success).toBe(false);
+      expect(result.valid).toBe(false);
+      expect(result.errors).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            type: 'legacy-function-only-instruction-in-scene-events',
+            instructionType: 'ObjectVariableAsBoolean',
+            replacementType: 'BooleanObjectVariable',
+          }),
+        ])
+      );
+      expect(processEditorFunctionCalls).not.toHaveBeenCalled();
+      expect(layout.getEvents().getEventsCount()).toBe(0);
+    } finally {
+      project.delete();
+    }
   });
 
   it('reads resource URIs', async () => {
@@ -5234,6 +5438,66 @@ describe('McpEditorBridge', () => {
       expect(processEditorFunctionCalls).toHaveBeenCalled();
       expect(editorCall.name).toBe('add_scene_events');
       expect(editorCall.arguments).toContain('SetNumberVariable');
+    } finally {
+      project.delete();
+    }
+  });
+
+  it('blocks bulk_edit_scene_assets legacy event payloads before mutating assets', async () => {
+    // $FlowFixMe[invalid-constructor]
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    const layout = project.insertNewLayout('Level1', 0);
+    const processEditorFunctionCalls: any = (jest.fn(): any);
+
+    try {
+      const bridge = makeBridge({
+        getProject: () => project,
+        getPermissions: () => ({
+          allowWriteTools: true,
+          allowCommandTools: false,
+        }),
+        processEditorFunctionCalls,
+      });
+
+      const response = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'bulk_edit_scene_assets',
+          arguments: {
+            scene_name: 'Level1',
+            variables: [
+              { scope: 'scene', name: 'Score', value: 0, type: 'number' },
+            ],
+            events: [
+              {
+                type: 'BuiltinCommonInstructions::Standard',
+                conditions: [
+                  {
+                    type: { value: 'ObjectVariableAsBoolean' },
+                    parameters: ['GroundSlot', 'Occupied', 'false'],
+                  },
+                ],
+                actions: [],
+              },
+            ],
+          },
+        },
+      });
+      const result = JSON.parse(response.content[0].text);
+
+      expect(response.isError).not.toBe(true);
+      expect(result.success).toBe(false);
+      expect(result.error).toContain('event validation failed');
+      expect(result.errors[0]).toEqual(
+        expect.objectContaining({
+          type: 'legacy-function-only-instruction-in-scene-events',
+          instructionType: 'ObjectVariableAsBoolean',
+          replacementType: 'BooleanObjectVariable',
+        })
+      );
+      expect(layout.getVariables().has('Score')).toBe(false);
+      expect(layout.getEvents().getEventsCount()).toBe(0);
+      expect(processEditorFunctionCalls).not.toHaveBeenCalled();
     } finally {
       project.delete();
     }

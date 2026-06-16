@@ -327,7 +327,10 @@ class LocalPreviewDebuggerServer {
 
     responseCallbacks.clear();
 
-    if (ipcRenderer && previousDebuggerIds.length) {
+    // The main process can still have websocket connections even when the
+    // renderer-side list is empty (for example after a renderer reload or a
+    // missed close event). Always ask it to close its side of the bridge.
+    if (ipcRenderer) {
       ipcRenderer.send('debugger-close-all-connections');
     }
 

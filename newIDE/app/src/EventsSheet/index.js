@@ -13,6 +13,8 @@ import EventTextDialog, {
   filterEditableWithEventTextDialog,
 } from './InstructionEditor/EventTextDialog';
 import Toolbar from './Toolbar';
+import { SplitEditorToolbar } from '../MainFrame/Toolbar/SplitEditorToolbar';
+import ToolbarUndoRedoButtons from '../UI/ToolbarUndoRedoButtons';
 import GeneratedCodeDialog from './GeneratedCodeDialog';
 import {
   generateEventsCodeForScope,
@@ -647,44 +649,60 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     const canAddSubEvent = this._selectionCanHaveSubEvents();
 
     this.props.setToolbar(
-      <Toolbar
-        allEventsMetadata={this.state.allEventsMetadata}
-        onAddStandardEvent={this._addStandardEvent}
-        onAddSubEvent={this.addSubEvent}
-        canAddSubEvent={canAddSubEvent}
-        onAddLocalVariable={this.addLocalVariable}
-        canAddLocalVariable={this._selectionCanHaveLocalVariables()}
-        canToggleEventDisabled={
-          hasEventSelected(this.state.selection) &&
-          this._selectionCanToggleDisabled()
+      <SplitEditorToolbar
+        leadingToolbar={
+          <ToolbarUndoRedoButtons
+            undo={this.undo}
+            canUndo={canUndo(this.state.eventsHistory)}
+            redo={this.redo}
+            canRedo={canRedo(this.state.eventsHistory)}
+            undoAcceleratorString={'CmdOrCtrl+Z'}
+            redoAcceleratorString={'CmdOrCtrl+Shift+Z'}
+          />
         }
-        canToggleInstructionInverted={hasInstructionSelected(
-          this.state.selection
-        )}
-        onAddCommentEvent={this._addCommentEvent}
-        onAddEvent={this.addNewEvent}
-        onToggleInvertedCondition={this._invertSelectedConditions}
-        onToggleDisabledEvent={this.toggleDisabled}
-        canRemove={hasSomethingSelected(this.state.selection)}
-        onRemove={this.deleteSelection}
-        canUndo={canUndo(this.state.eventsHistory)}
-        canRedo={canRedo(this.state.eventsHistory)}
-        undo={this.undo}
-        redo={this.redo}
-        onOpenSettings={this.props.onOpenSettings}
-        settingsIcon={this.props.settingsIcon}
-        onToggleSearchPanel={this._toggleSearchPanel}
-        onToggleGraphPreview={this._toggleEventsGraphPreview}
-        isGraphPreviewVisible={this.state.showEventsGraphPreview}
-        canMoveEventsIntoNewGroup={hasSomethingSelected(this.state.selection)}
-        moveEventsIntoNewGroup={this.moveEventsIntoNewGroup}
-        onOpenSceneVariables={this.editLayoutVariables}
-        onShowGeneratedCode={
-          // Available for scenes AND extension events-functions (free, behavior
-          // and object functions); not for external events.
-          canGenerateEventsCodeForScope(this.props.scope)
-            ? this._showGeneratedCode
-            : null
+        trailingToolbar={
+          <Toolbar
+            allEventsMetadata={this.state.allEventsMetadata}
+            onAddStandardEvent={this._addStandardEvent}
+            onAddSubEvent={this.addSubEvent}
+            canAddSubEvent={canAddSubEvent}
+            onAddLocalVariable={this.addLocalVariable}
+            canAddLocalVariable={this._selectionCanHaveLocalVariables()}
+            canToggleEventDisabled={
+              hasEventSelected(this.state.selection) &&
+              this._selectionCanToggleDisabled()
+            }
+            canToggleInstructionInverted={hasInstructionSelected(
+              this.state.selection
+            )}
+            onAddCommentEvent={this._addCommentEvent}
+            onAddEvent={this.addNewEvent}
+            onToggleInvertedCondition={this._invertSelectedConditions}
+            onToggleDisabledEvent={this.toggleDisabled}
+            canRemove={hasSomethingSelected(this.state.selection)}
+            onRemove={this.deleteSelection}
+            canUndo={canUndo(this.state.eventsHistory)}
+            canRedo={canRedo(this.state.eventsHistory)}
+            undo={this.undo}
+            redo={this.redo}
+            onOpenSettings={this.props.onOpenSettings}
+            settingsIcon={this.props.settingsIcon}
+            onToggleSearchPanel={this._toggleSearchPanel}
+            onToggleGraphPreview={this._toggleEventsGraphPreview}
+            isGraphPreviewVisible={this.state.showEventsGraphPreview}
+            canMoveEventsIntoNewGroup={hasSomethingSelected(
+              this.state.selection
+            )}
+            moveEventsIntoNewGroup={this.moveEventsIntoNewGroup}
+            onOpenSceneVariables={this.editLayoutVariables}
+            onShowGeneratedCode={
+              // Available for scenes AND extension events-functions (free, behavior
+              // and object functions); not for external events.
+              canGenerateEventsCodeForScope(this.props.scope)
+                ? this._showGeneratedCode
+                : null
+            }
+          />
         }
       />
     );

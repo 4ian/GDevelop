@@ -16,6 +16,7 @@ import SaveProjectIcon from '../SaveProjectIcon';
 import CustomToolbarButton, {
   type ToolbarButtonConfig,
 } from '../CustomToolbarButton';
+import { getSplitEditorToolbar } from './SplitEditorToolbar';
 import { type FileMetadata } from '../../ProjectsStorage';
 import { type TriggerNpmScript } from '../NpmScriptRunner/useNpmScriptRunner';
 
@@ -54,6 +55,7 @@ type LeftButtonsToolbarGroupProps = {|
   toolbarButtons: Array<ToolbarButtonConfig>,
   projectPath: ?string,
   triggerNpmScript: TriggerNpmScript,
+  leadingEditorToolbar: ?React.Node,
 |};
 
 const LeftButtonsToolbarGroup = React.memo<LeftButtonsToolbarGroupProps>(
@@ -78,6 +80,7 @@ const LeftButtonsToolbarGroup = React.memo<LeftButtonsToolbarGroupProps>(
             onSave={props.onSave}
             canSave={props.canSave}
           />
+          {props.leadingEditorToolbar}
           {toolbarButtons.map((button, index) => (
             <CustomToolbarButton
               key={index}
@@ -117,6 +120,10 @@ export default (React.forwardRef<MainFrameToolbarProps, ToolbarInterface>(
   function MainframeToolbar(props: MainFrameToolbarProps, ref) {
     const gdevelopTheme = React.useContext(GDevelopThemeContext);
     const [editorToolbar, setEditorToolbar] = React.useState<?React.Node>(null);
+    const {
+      leadingToolbar: leadingEditorToolbar,
+      trailingToolbar: trailingEditorToolbar,
+    } = getSplitEditorToolbar(editorToolbar);
 
     // $FlowFixMe[incompatible-type]
     React.useImperativeHandle(ref, () => ({
@@ -148,6 +155,7 @@ export default (React.forwardRef<MainFrameToolbarProps, ToolbarInterface>(
               toolbarButtons={props.toolbarButtons}
               projectPath={props.projectPath}
               triggerNpmScript={props.triggerNpmScript}
+              leadingEditorToolbar={leadingEditorToolbar}
             />
             <ToolbarGroup>
               <Spacer />
@@ -170,8 +178,10 @@ export default (React.forwardRef<MainFrameToolbarProps, ToolbarInterface>(
               <Spacer />
             </ToolbarGroup>
           </>
+        ) : leadingEditorToolbar ? (
+          <ToolbarGroup firstChild>{leadingEditorToolbar}</ToolbarGroup>
         ) : null}
-        {editorToolbar || <ToolbarGroup />}
+        {trailingEditorToolbar || <ToolbarGroup />}
       </Toolbar>
     );
   }

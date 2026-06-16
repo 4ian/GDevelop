@@ -261,8 +261,8 @@ const comparePathsReverseLexicographically = (
 const normalizeSerializedEventsInput = (value: any): any => {
   if (Array.isArray(value)) return value;
   if (value && typeof value === 'object') {
-    if (Array.isArray(value.events)) return value.events;
     if (typeof value.type === 'string') return [value];
+    if (Array.isArray(value.events)) return value.events;
   }
   return value;
 };

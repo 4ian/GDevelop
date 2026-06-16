@@ -852,7 +852,7 @@ export const getEventOperationReference = (): Object => ({
   targetPathFormat:
     'Use event-0 for the first root event, event-0.1 for the second sub-event of the first root event, or an aiGeneratedEventId previously assigned by GDevelop.',
   generatedEventsFormat:
-    'generated_events can be a JSON string, a serialized events array, a single serialized event object, or { events: [...] }. The same value can also be passed as events_json when using add_scene_events.',
+    'generated_events can be a JSON string, a serialized events array, a single serialized event object, or { events: [...] }. A Group event object with type and events is treated as one event; { events: [...] } is only a wrapper when there is no type. The same value can also be passed as events_json when using add_scene_events.',
   operations: [
     {
       name: 'insert_at_end',
@@ -2414,6 +2414,27 @@ const SUBINSTRUCTION_LOGICAL_TYPES = new Set([
   'BuiltinCommonInstructions::Not',
 ]);
 
+const LEGACY_LAYOUT_EVENT_INSTRUCTION_REPLACEMENTS = {
+  ObjectVariableAsBoolean: {
+    replacementType: 'BooleanObjectVariable',
+    replacementKind: 'condition',
+    suggestion:
+      'Use condition type "BooleanObjectVariable" for scene/layout events. Keep the same user parameters [objectName, variableName, true/false]. "ObjectVariableAsBoolean" is a legacy/function-events-only form and will render with a warning/deprecated background in scene events.',
+  },
+  SetObjectVariableAsBoolean: {
+    replacementType: 'SetBooleanObjectVariable',
+    replacementKind: 'action',
+    suggestion:
+      'Use action type "SetBooleanObjectVariable" for scene/layout events. Parameters are [objectName, variableName, "True" or "False"] (or "Toggle" when toggling). "SetObjectVariableAsBoolean" is a legacy/function-events-only form and will render with a warning/deprecated background in scene events.',
+  },
+  ToggleObjectVariableAsBoolean: {
+    replacementType: 'SetBooleanObjectVariable',
+    replacementKind: 'action',
+    suggestion:
+      'Use action type "SetBooleanObjectVariable" with parameters [objectName, variableName, "Toggle"] for scene/layout events. "ToggleObjectVariableAsBoolean" is a legacy/function-events-only form and will render with a warning/deprecated background in scene events.',
+  },
+};
+
 // Walk the PARSED events JSON (before unserialization, which silently drops
 // unknown keys) and flag structural mistakes that the gd serializer would
 // otherwise swallow — most importantly Or/And/Not whose child conditions were
@@ -2424,9 +2445,24 @@ export const collectSerializedEventJsonIssues = (
 ): Array<Object> => {
   const issues = [];
 
-  const checkInstruction = (instruction, isCondition, path) => {
+  const checkInstruction = (instruction, isCondition, path, instructionPath) => {
     if (!instruction || typeof instruction !== 'object') return;
     const type = getSerializedInstructionTypeValue(instruction);
+    const legacyReplacement =
+      LEGACY_LAYOUT_EVENT_INSTRUCTION_REPLACEMENTS[type];
+    if (legacyReplacement) {
+      issues.push({
+        severity: 'error',
+        type: 'legacy-function-only-instruction-in-scene-events',
+        instructionType: type,
+        isCondition,
+        eventPath: path,
+        instructionPath,
+        replacementType: legacyReplacement.replacementType,
+        replacementKind: legacyReplacement.replacementKind,
+        suggestion: legacyReplacement.suggestion,
+      });
+    }
     if (SUBINSTRUCTION_LOGICAL_TYPES.has(type)) {
       const sub = instruction.subInstructions;
       const hasSub = Array.isArray(sub) && sub.length > 0;
@@ -2448,7 +2484,14 @@ export const collectSerializedEventJsonIssues = (
       }
       // Recurse into the (correct) sub-instructions.
       if (Array.isArray(sub)) {
-        sub.forEach(child => checkInstruction(child, isCondition, path));
+        sub.forEach((child, childIndex) =>
+          checkInstruction(
+            child,
+            isCondition,
+            path,
+            `${instructionPath}.subInstructions.${childIndex}`
+          )
+        );
       }
     }
     // Recurse into any nested subInstructions for non-logical instructions too.
@@ -2456,8 +2499,13 @@ export const collectSerializedEventJsonIssues = (
       !SUBINSTRUCTION_LOGICAL_TYPES.has(type) &&
       Array.isArray(instruction.subInstructions)
     ) {
-      instruction.subInstructions.forEach(child =>
-        checkInstruction(child, isCondition, path)
+      instruction.subInstructions.forEach((child, childIndex) =>
+        checkInstruction(
+          child,
+          isCondition,
+          path,
+          `${instructionPath}.subInstructions.${childIndex}`
+        )
       );
     }
   };
@@ -2468,17 +2516,32 @@ export const collectSerializedEventJsonIssues = (
       if (!event || typeof event !== 'object') return;
       const eventPath = path ? `${path}.${index}` : `event-${index}`;
       if (Array.isArray(event.conditions))
-        event.conditions.forEach(condition =>
-          checkInstruction(condition, true, eventPath)
+        event.conditions.forEach((condition, conditionIndex) =>
+          checkInstruction(
+            condition,
+            true,
+            eventPath,
+            `${eventPath}.conditions.${conditionIndex}`
+          )
         );
       if (Array.isArray(event.actions))
-        event.actions.forEach(action =>
-          checkInstruction(action, false, eventPath)
+        event.actions.forEach((action, actionIndex) =>
+          checkInstruction(
+            action,
+            false,
+            eventPath,
+            `${eventPath}.actions.${actionIndex}`
+          )
         );
       // While events keep conditions in whileConditions.
       if (Array.isArray(event.whileConditions))
-        event.whileConditions.forEach(condition =>
-          checkInstruction(condition, true, eventPath)
+        event.whileConditions.forEach((condition, conditionIndex) =>
+          checkInstruction(
+            condition,
+            true,
+            eventPath,
+            `${eventPath}.whileConditions.${conditionIndex}`
+          )
         );
       if (Array.isArray(event.events)) checkEvents(event.events, eventPath);
     });

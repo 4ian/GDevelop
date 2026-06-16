@@ -59,7 +59,7 @@ module.exports = {
             log.info(
               `Debugger connection with id "${id}" closed for window ${windowId}.`
             );
-            webSockets[id] = null;
+            delete webSockets[id];
             options.onConnectionClose({ id });
           });
 
@@ -114,6 +114,7 @@ module.exports = {
 
     Object.keys(serverData.webSockets).forEach(id => {
       const webSocket = serverData.webSockets[id];
+      delete serverData.webSockets[id];
       if (!webSocket) return;
 
       try {
@@ -125,8 +126,6 @@ module.exports = {
         );
       }
     });
-
-    serverData.webSockets = {};
   },
 
   sendMessage: (windowId, { id, message }, cb) => {

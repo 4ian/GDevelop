@@ -7,6 +7,7 @@ import { t } from '@lingui/macro';
 import * as React from 'react';
 import LayerRemoveDialog from '../LayersList/LayerRemoveDialog';
 import LayerEditorDialog from '../LayersList/LayerEditorDialog';
+import enumerateLayers from '../LayersList/EnumerateLayers';
 import ObjectInstanceVariablesDialog from '../VariablesList/ObjectInstanceVariablesDialog';
 import ObjectEditorDialog from '../ObjectEditor/ObjectEditorDialog';
 import ObjectExporterDialog from '../ObjectEditor/ObjectExporterDialog';
@@ -21,6 +22,8 @@ import ExtractAsCustomObjectDialog from './CustomObjectExtractor/ExtractAsCustom
 import { type ObjectEditorTab } from '../ObjectEditor/ObjectEditorDialog';
 import MosaicEditorsDisplayToolbar from './MosaicEditorsDisplay/Toolbar';
 import SwipeableDrawerEditorsDisplayToolbar from './SwipeableDrawerEditorsDisplay/Toolbar';
+import { SplitEditorToolbar } from '../MainFrame/Toolbar/SplitEditorToolbar';
+import ToolbarUndoRedoButtons from '../UI/ToolbarUndoRedoButtons';
 import { serializeToJSObject } from '../Utils/Serializer';
 import Clipboard from '../Utils/Clipboard';
 import { SafeExtractor } from '../Utils/SafeExtractor';
@@ -340,6 +343,13 @@ const getSceneEditorHistoryContext = (
 
 const getInstanceOperationLabel = (verb: string, instancesCount: number) =>
   `${verb} ${instancesCount === 1 ? 'instance' : 'instances'}`;
+
+const getMoveInstancesToLayerOperationLabel = (
+  layerName: string,
+  instancesCount: number
+) =>
+  `Move ${instancesCount === 1 ? 'instance' : 'instances'} to ${layerName ||
+    'Base layer'}`;
 
 type CopyCutPasteOptions = {|
   useLastCursorPosition?: boolean,
@@ -911,36 +921,48 @@ export default class SceneEditor extends React.Component<Props, State> {
 
     if (editorDisplay.getName() === 'mosaic') {
       this.props.setToolbar(
-        <MosaicEditorsDisplayToolbar
-          gameEditorMode={this.state.instancesEditorSettings.gameEditorMode}
-          setGameEditorMode={this.setGameEditorMode}
-          selectedInstancesCount={
-            this.instancesSelection.getSelectedInstances().length
+        <SplitEditorToolbar
+          leadingToolbar={
+            <ToolbarUndoRedoButtons
+              undo={this.undo}
+              canUndo={canUndo(this.state.history)}
+              redo={this.redo}
+              canRedo={canRedo(this.state.history)}
+            />
           }
-          toggleObjectsList={this.toggleObjectsList}
-          toggleObjectGroupsList={this.toggleObjectGroupsList}
-          toggleProperties={this.toggleProperties}
-          deleteSelection={this.deleteSelection}
-          toggleInstancesList={this.toggleInstancesList}
-          toggleLayersList={this.toggleLayersList}
-          toggleAllPanels={this.toggleAllPanels}
-          areAllPanelsShown={PANEL_EDITOR_IDS.every(editorId =>
-            editorDisplay.isEditorVisible(editorId)
-          )}
-          toggleWindowMask={this.toggleWindowMask}
-          isWindowMaskShown={!!this.state.instancesEditorSettings.windowMask}
-          toggleGrid={this.toggleGrid}
-          isGridShown={!!this.state.instancesEditorSettings.grid}
-          openSetupGrid={this.openSetupGrid}
-          setZoomFactor={this.setZoomFactor}
-          getContextMenuZoomItems={this.getContextMenuZoomItems}
-          canUndo={canUndo(this.state.history)}
-          canRedo={canRedo(this.state.history)}
-          undo={this.undo}
-          redo={this.redo}
-          onOpenSettings={this.openSceneProperties}
-          settingsIcon={editSceneIconReactNode}
-          onOpenSceneVariables={this.editLayoutVariables}
+          trailingToolbar={
+            <MosaicEditorsDisplayToolbar
+              gameEditorMode={this.state.instancesEditorSettings.gameEditorMode}
+              setGameEditorMode={this.setGameEditorMode}
+              selectedInstancesCount={
+                this.instancesSelection.getSelectedInstances().length
+              }
+              toggleObjectsList={this.toggleObjectsList}
+              toggleObjectGroupsList={this.toggleObjectGroupsList}
+              toggleProperties={this.toggleProperties}
+              deleteSelection={this.deleteSelection}
+              toggleInstancesList={this.toggleInstancesList}
+              toggleLayersList={this.toggleLayersList}
+              toggleAllPanels={this.toggleAllPanels}
+              areAllPanelsShown={PANEL_EDITOR_IDS.every(editorId =>
+                editorDisplay.isEditorVisible(editorId)
+              )}
+              toggleWindowMask={this.toggleWindowMask}
+              isWindowMaskShown={!!this.state.instancesEditorSettings.windowMask}
+              toggleGrid={this.toggleGrid}
+              isGridShown={!!this.state.instancesEditorSettings.grid}
+              openSetupGrid={this.openSetupGrid}
+              setZoomFactor={this.setZoomFactor}
+              getContextMenuZoomItems={this.getContextMenuZoomItems}
+              canUndo={canUndo(this.state.history)}
+              canRedo={canRedo(this.state.history)}
+              undo={this.undo}
+              redo={this.redo}
+              onOpenSettings={this.openSceneProperties}
+              settingsIcon={editSceneIconReactNode}
+              onOpenSceneVariables={this.editLayoutVariables}
+            />
+          }
         />
       );
     } else {
@@ -2347,6 +2369,43 @@ export default class SceneEditor extends React.Component<Props, State> {
     this.forceUpdatePropertiesEditor();
   };
 
+  _onMoveInstancesToLayer = (layerName: string) => {
+    const selectedInstances = this.instancesSelection.getSelectedInstances();
+    const instancesToMove = selectedInstances.filter(
+      instance => !instance.isLocked() && instance.getLayer() !== layerName
+    );
+    if (!instancesToMove.length) return;
+
+    instancesToMove.forEach(instance => {
+      instance.setLayer(layerName);
+    });
+
+    this.setState(
+      {
+        history: saveToHistory(
+          this.state.history,
+          this.props.initialInstances,
+          'EDIT',
+          {
+            operationLabel: getMoveInstancesToLayerOperationLabel(
+              layerName,
+              instancesToMove.length
+            ),
+          }
+        ),
+      },
+      () => {
+        if (this.editorDisplay) {
+          this.editorDisplay.instancesHandlers.forceRemountInstancesRenderers();
+        }
+        this.forceUpdateInstancesList();
+        this.forceUpdatePropertiesEditor();
+        this.updateToolbar();
+        this._sendHotReloadAllInstances();
+      }
+    );
+  };
+
   _onDeleteObjectGroup = (
     groupWithContext: GroupWithContext,
     done: boolean => void
@@ -2581,6 +2640,10 @@ export default class SceneEditor extends React.Component<Props, State> {
 
   getContextMenuInstancesWiseItems = (i18n: I18nType): any => {
     const hasSelectedInstances = this.instancesSelection.hasSelectedInstances();
+    const selectedInstances = this.instancesSelection.getSelectedInstances();
+    const unlockedSelectedInstances = selectedInstances.filter(
+      instance => !instance.isLocked()
+    );
     return [
       {
         label: i18n._(t`Copy`),
@@ -2628,6 +2691,25 @@ export default class SceneEditor extends React.Component<Props, State> {
         click: () => {
           this._onMoveInstancesZOrder('back');
         },
+      },
+      {
+        label: i18n._(t`Layer`),
+        submenu: enumerateLayers(this.props.layersContainer).map(layer => {
+          const areAllUnlockedInstancesAlreadyOnLayer =
+            !!unlockedSelectedInstances.length &&
+            unlockedSelectedInstances.every(
+              instance => instance.getLayer() === layer.value
+            );
+          return {
+            type: 'checkbox',
+            label: layer.label,
+            checked: areAllUnlockedInstancesAlreadyOnLayer,
+            enabled:
+              !!unlockedSelectedInstances.length &&
+              !areAllUnlockedInstancesAlreadyOnLayer,
+            click: () => this._onMoveInstancesToLayer(layer.value),
+          };
+        }),
       },
       { type: 'separator' },
       {

@@ -366,6 +366,45 @@ preferences:
       warnSpy.mockRestore();
     });
 
+    test('parses a dictionary property with an enum of allowed keys', () => {
+      // $FlowFixMe[incompatible-call]
+      const raw = ([
+        {
+          name: 'packScale',
+          label: 'Packing scale',
+          type: 'dictionary',
+          resourceKinds: ['image'],
+          keys: [
+            { value: '_320p', label: '320p' },
+            { value: '_480p', label: '480p' },
+            { value: '_640p' },
+          ],
+        },
+      ]: any);
+      const result = parseResourceProperties(raw);
+      expect(result).toEqual([
+        {
+          name: 'packScale',
+          label: 'Packing scale',
+          type: 'dictionary',
+          resourceKinds: ['image'],
+          keys: [
+            { value: '_320p', label: '320p' },
+            { value: '_480p', label: '480p' },
+            { value: '_640p', label: '_640p' },
+          ],
+        },
+      ]);
+    });
+
+    test('parses a dictionary property without keys (free-form)', () => {
+      // $FlowFixMe[incompatible-call]
+      const raw = ([{ name: 'tags', label: 'Tags', type: 'dictionary' }]: any);
+      expect(parseResourceProperties(raw)).toEqual([
+        { name: 'tags', label: 'Tags', type: 'dictionary' },
+      ]);
+    });
+
     test('deduplicates by name, last definition wins', () => {
       const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
       // $FlowFixMe[incompatible-call]

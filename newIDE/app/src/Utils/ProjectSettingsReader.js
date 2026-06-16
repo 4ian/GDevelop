@@ -9,7 +9,12 @@ const fs = optionalRequire('fs');
 const fsPromises = fs ? fs.promises : null;
 const path = optionalRequire('path');
 
-export type ResourcePropertyType = 'enum' | 'string' | 'boolean' | 'number';
+export type ResourcePropertyType =
+  | 'enum'
+  | 'string'
+  | 'boolean'
+  | 'number'
+  | 'dictionary';
 
 export type ResourcePropertyChoice = {|
   value: string,
@@ -24,6 +29,9 @@ export type ResourcePropertyConfig = {|
   resourceKinds?: Array<string>,
   default?: string | number | boolean,
   choices?: Array<ResourcePropertyChoice>,
+  // For "dictionary" properties: the list of allowed keys (an enum). When
+  // omitted, keys can be entered freely.
+  keys?: Array<ResourcePropertyChoice>,
 |};
 
 export type ParsedProjectSettings = {
@@ -38,6 +46,7 @@ const ALLOWED_RESOURCE_PROPERTY_TYPES: Array<ResourcePropertyType> = [
   'string',
   'boolean',
   'number',
+  'dictionary',
 ];
 
 // Only allow safe characters in property names so they stay clean keys in the
@@ -203,6 +212,29 @@ export const parseResourceProperties = (
         continue;
       }
       config.choices = choices;
+    }
+
+    if (propertyType === 'dictionary') {
+      // The dictionary starts empty on each resource; `keys` only defines the
+      // allowed keys the user can pick from when adding entries.
+      const rawKeys = SafeExtractor.extractArrayProperty(rawProperty, 'keys');
+      const keys: Array<ResourcePropertyChoice> = [];
+      if (rawKeys) {
+        for (const rawKey of rawKeys) {
+          const value = SafeExtractor.extractStringProperty(rawKey, 'value');
+          if (value === null) continue;
+          if (!SAFE_PROPERTY_NAME_PATTERN.test(value)) {
+            console.warn(
+              `[ProjectSettingsReader] Skipping dictionary key "${value}" of resource property "${name}": key must match ${SAFE_PROPERTY_NAME_PATTERN.toString()}.`
+            );
+            continue;
+          }
+          const keyLabel =
+            SafeExtractor.extractStringProperty(rawKey, 'label') || value;
+          keys.push({ value, label: keyLabel });
+        }
+      }
+      if (keys.length > 0) config.keys = keys;
     }
 
     if (seenNames.has(name)) {

@@ -48,6 +48,7 @@ type Props = {|
   editorFunctionCallResult: ?EditorFunctionCallResult,
   existingFunctionCallOutput: ?AiRequestFunctionCallOutput,
   editorCallbacks: EditorCallbacks,
+  isRequestStopped?: boolean,
 |};
 
 export const FunctionCallRow: React.ComponentType<Props> = React.memo<Props>(
@@ -66,10 +67,16 @@ const EditorFunctionCallRow = ({
   editorFunctionCallResult,
   existingFunctionCallOutput,
   editorCallbacks,
+  isRequestStopped,
 }: Props) => {
   const [showDetails, setShowDetails] = React.useState(false);
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const { exampleShortHeaders } = React.useContext(ExampleStoreContext);
+  const { pendingEditApproval } = React.useContext(AiRequestContext);
+
+  const isAwaitingApproval =
+    !!pendingEditApproval &&
+    pendingEditApproval.callIds.includes(functionCall.call_id);
 
   let existingParsedOutput;
   try {
@@ -82,14 +89,17 @@ const EditorFunctionCallRow = ({
     existingParsedOutput = null;
   }
 
-  const isAborted =
-    (!!editorFunctionCallResult &&
-      editorFunctionCallResult.status === 'aborted') ||
-    (existingParsedOutput && !!existingParsedOutput.stopped);
   const isFinished =
     !!existingFunctionCallOutput ||
     (!!editorFunctionCallResult &&
       editorFunctionCallResult.status === 'finished');
+  const isAborted =
+    (!!editorFunctionCallResult &&
+      editorFunctionCallResult.status === 'aborted') ||
+    (existingParsedOutput && !!existingParsedOutput.stopped) ||
+    // The request was suspended before this call ran (no output): treat it as
+    // aborted rather than leaving a pending spinner.
+    (!!isRequestStopped && !isFinished);
   const functionCallResultIsErrored =
     editorFunctionCallResult &&
     editorFunctionCallResult.status === 'finished' &&
@@ -98,6 +108,7 @@ const EditorFunctionCallRow = ({
     functionCallResultIsErrored ||
     (existingParsedOutput && existingParsedOutput.success === false);
   const isWorking =
+    !isAwaitingApproval &&
     !isFinished &&
     !!editorFunctionCallResult &&
     editorFunctionCallResult.status === 'working';
@@ -170,9 +181,13 @@ const EditorFunctionCallRow = ({
     <div className={classes.functionCallContainer}>
       <div className={classes.functionCallRow}>
         <Tooltip
-          title={JSON.stringify(
+          title={
             existingFunctionCallOutput || editorFunctionCallResult
-          )}
+              ? JSON.stringify(
+                  existingFunctionCallOutput || editorFunctionCallResult
+                )
+              : ''
+          }
         >
           <span className={classes.statusIconContainer}>
             {hasErrored ? (
@@ -279,12 +294,14 @@ const SubAgentFunctionCallRow = ({
   functionCall,
   existingFunctionCallOutput,
   editorCallbacks,
+  isRequestStopped,
 }: Props) => {
   const [showDetails, setShowDetails] = React.useState(false);
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const {
     aiRequestStorage,
     editorFunctionCallResultsStorage,
+    pendingEditApproval,
   } = React.useContext(AiRequestContext);
   const { aiRequests } = aiRequestStorage;
   const { getEditorFunctionCallResults } = editorFunctionCallResultsStorage;
@@ -300,6 +317,10 @@ const SubAgentFunctionCallRow = ({
   } catch (error) {
     existingParsedOutput = null;
   }
+
+  const isAwaitingApproval =
+    !!pendingEditApproval &&
+    pendingEditApproval.aiRequestId === subAgentAiRequestId;
 
   const isStopped = existingParsedOutput && !!existingParsedOutput.stopped;
   const hasErrored =
@@ -327,6 +348,7 @@ const SubAgentFunctionCallRow = ({
       (subAgentRequest.status === 'ready' ||
         subAgentRequest.status === 'error'));
   const isWorking =
+    !isAwaitingApproval &&
     !isFinished &&
     ((subAgentRequest && subAgentRequest.status === 'working') ||
       hasWorkInProgress);
@@ -502,6 +524,9 @@ const SubAgentFunctionCallRow = ({
                 editorFunctionCallResult={item.editorFunctionCallResult}
                 existingFunctionCallOutput={item.existingFunctionCallOutput}
                 editorCallbacks={editorCallbacks}
+                isRequestStopped={
+                  isRequestStopped || !!isStopped || !!hasErrored
+                }
               />
             ) : (
               <SubAgentTextRow

@@ -105,36 +105,6 @@ const useEditorFunctionCallResultsStorage = (): EditorFunctionCallResultsStorage
   };
 };
 
-// "Auto edit" is a frontend-only toggle. Its live value is remembered per AI
-// request here (in the app-level provider) so it survives the Ask AI editor
-// being unmounted/remounted — e.g. when a no-project request creates a project
-// and the editor is repositioned from the center to the right pane. Without
-// this, the toggle would re-initialize from the saved preference (and could
-// wrongly switch off mid-build). `null` means "no value remembered yet".
-type AutoEditEnabledStorage = {|
-  getAutoEditEnabled: (aiRequestId: string) => boolean | null,
-  setAutoEditEnabled: (aiRequestId: string, enabled: boolean) => void,
-|};
-
-const useAutoEditEnabledStorage = (): AutoEditEnabledStorage => {
-  const autoEditEnabledPerRequestRef = React.useRef<{
-    [aiRequestId: string]: boolean,
-  }>({});
-
-  return {
-    getAutoEditEnabled: React.useCallback((aiRequestId: string) => {
-      const value = autoEditEnabledPerRequestRef.current[aiRequestId];
-      return value === undefined ? null : value;
-    }, []),
-    setAutoEditEnabled: React.useCallback(
-      (aiRequestId: string, enabled: boolean) => {
-        autoEditEnabledPerRequestRef.current[aiRequestId] = enabled;
-      },
-      []
-    ),
-  };
-};
-
 type AiRequestStorage = {|
   fetchAiRequests: () => Promise<void>,
   onLoadMoreAiRequests: () => Promise<void>,
@@ -498,7 +468,6 @@ export type AiRequestContextState = {|
   aiRequestStorage: AiRequestStorage,
   aiRequestHistory: AiRequestHistory,
   editorFunctionCallResultsStorage: EditorFunctionCallResultsStorage,
-  autoEditEnabledStorage: AutoEditEnabledStorage,
   getAiSettings: () => AiSettings | null,
   isFetchingSuggestions: boolean,
   setIsFetchingSuggestions: (value: boolean) => void,
@@ -563,10 +532,6 @@ export const initialAiRequestContextState: AiRequestContextState = {
     addEditorFunctionCallResults: () => [],
     clearEditorFunctionCallResults: () => {},
   },
-  autoEditEnabledStorage: {
-    getAutoEditEnabled: () => null,
-    setAutoEditEnabled: () => {},
-  },
   getAiSettings: () => null,
   isFetchingSuggestions: false,
   setIsFetchingSuggestions: () => {},
@@ -622,7 +587,6 @@ export const AiRequestProvider = ({
   children,
 }: AiRequestProviderProps): React.MixedElement => {
   const editorFunctionCallResultsStorage = useEditorFunctionCallResultsStorage();
-  const autoEditEnabledStorage = useAutoEditEnabledStorage();
   const aiRequestStorage = useAiRequestsStorage();
   const aiRequestHistory = useAiRequestHistory(aiRequestStorage);
 
@@ -1111,7 +1075,6 @@ export const AiRequestProvider = ({
       aiRequestStorage,
       aiRequestHistory,
       editorFunctionCallResultsStorage,
-      autoEditEnabledStorage,
       getAiSettings,
       isFetchingSuggestions,
       setIsFetchingSuggestions,
@@ -1130,7 +1093,6 @@ export const AiRequestProvider = ({
       aiRequestStorage,
       aiRequestHistory,
       editorFunctionCallResultsStorage,
-      autoEditEnabledStorage,
       getAiSettings,
       isFetchingSuggestions,
       setIsFetchingSuggestions,

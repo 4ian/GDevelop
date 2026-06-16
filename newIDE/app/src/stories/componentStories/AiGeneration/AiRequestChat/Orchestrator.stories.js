@@ -26,6 +26,7 @@ import PreferencesContext, {
   initialPreferences,
 } from '../../../../MainFrame/Preferences/PreferencesContext';
 import { CreditsPackageStoreStateProvider } from '../../../../AssetStore/CreditsPackages/CreditsPackageStoreContext';
+import { testProject } from '../../../GDevelopJsInitializerDecorator';
 
 // Chat and Agent modes were merged into a single "orchestrator" mode: these
 // stories exercise that unique mode (the conversational replies, the function
@@ -127,8 +128,9 @@ export const commonProps = {
 };
 
 // Wraps AiRequestChat with all the contexts it needs. Stories can drive the
-// "Auto edit" toggle through the `automaticallyApplyAiRequestEdits` preference
-// (with a project opened, so it isn't forced on like in the no-project flow).
+// "Auto edit" toggle through the `automaticallyApplyAiRequestEdits` boolean,
+// turned into a per-project override keyed by the chat's project UUID (the
+// stories pass a real project so it isn't forced on like in the no-project flow).
 const WrappedChatComponent = (allProps: any) => {
   const {
     authenticatedUser,
@@ -141,10 +143,14 @@ const WrappedChatComponent = (allProps: any) => {
   const [automaticallyUseCredits, setAutomaticallyUseCredits] = React.useState(
     automaticallyUseCreditsForAiRequests || false
   );
-  const applyEdits =
+  const chatProjectId = chatProps.project
+    ? chatProps.project.getProjectUuid()
+    : null;
+  const automaticallyApplyAiRequestEditsByProjectId =
+    chatProjectId != null &&
     typeof automaticallyApplyAiRequestEdits === 'boolean'
-      ? automaticallyApplyAiRequestEdits
-      : initialPreferences.values.automaticallyApplyAiRequestEdits;
+      ? { [chatProjectId]: automaticallyApplyAiRequestEdits }
+      : {};
   return (
     <FixedHeightFlexContainer height={800}>
       <FixedWidthFlexContainer width={600}>
@@ -156,7 +162,7 @@ const WrappedChatComponent = (allProps: any) => {
             values: {
               ...initialPreferences.values,
               automaticallyUseCreditsForAiRequests: automaticallyUseCredits,
-              automaticallyApplyAiRequestEdits: applyEdits,
+              automaticallyApplyAiRequestEditsByProjectId,
             },
             setAutomaticallyUseCreditsForAiRequests: (value: boolean) => {
               setAutomaticallyUseCredits(value);
@@ -657,6 +663,7 @@ export const LongReadyAiRequestWithFunctionCallToDo = (): React.Node => (
 
 export const AutoEditEnabledWithWorkingFunctionCall = (): React.Node => (
   <WrappedChatComponent
+    project={testProject.project}
     automaticallyApplyAiRequestEdits={true}
     aiRequest={aiRequestWithModifyingFunctionCall}
     editorFunctionCallResults={[
@@ -670,6 +677,7 @@ export const AutoEditEnabledWithWorkingFunctionCall = (): React.Node => (
 
 export const AutoEditDisabledWithPendingEditApproval = (): React.Node => (
   <WrappedChatComponent
+    project={testProject.project}
     automaticallyApplyAiRequestEdits={false}
     aiRequest={aiRequestWithModifyingFunctionCall}
     pendingEditApproval={{
@@ -684,6 +692,7 @@ export const AutoEditDisabledWithPendingEditApproval = (): React.Node => (
 
 export const AutoEditDisabledWithPendingEditApprovalForTool = (): React.Node => (
   <WrappedChatComponent
+    project={testProject.project}
     automaticallyApplyAiRequestEdits={false}
     aiRequest={aiRequestWithModifyingFunctionCall}
     pendingEditApproval={{

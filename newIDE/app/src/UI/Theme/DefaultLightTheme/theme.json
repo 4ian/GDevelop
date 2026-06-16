@@ -936,6 +936,11 @@
         "value": "rgb(158, 158, 158)"
       }
     },
+    "header": {
+      "background-color": {
+        "value": "#F5F5F7"
+      }
+    },
     "row": {
       "odd": {
         "background-color": {
@@ -944,7 +949,7 @@
       },
       "even": {
         "background-color": {
-          "value": "#F5F5F7"
+          "value": "#FFFFFF"
         }
       },
       "selected": {

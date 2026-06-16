@@ -49,13 +49,15 @@ const styles = {
     flexDirection: 'column',
     alignItems: 'stretch',
     minWidth: 0,
-    backgroundColor: 'var(--theme-surface-window-background-color)',
+    // Search-bar band: matches the column-header band, kept distinct from the
+    // alternating row colors so it stays stable when the rows change.
+    backgroundColor: 'var(--table-header-background-color)',
   },
   tableContainer: {
     flex: 1,
     overflowX: 'auto',
     overflowY: 'hidden',
-    backgroundColor: 'var(--table-row-odd-background-color)',
+    backgroundColor: 'var(--table-header-background-color)',
   },
 };
 
@@ -319,7 +321,7 @@ class InstancesList extends Component<Props, State> {
                 className={`gd-table`}
                 headerClassName={'tableHeaderColumn'}
                 headerStyle={{
-                  backgroundColor: 'var(--table-row-odd-background-color)',
+                  backgroundColor: 'var(--table-header-background-color)',
                 }}
                 rowCount={this.renderedRows.length}
                 rowGetter={this._rowGetter}

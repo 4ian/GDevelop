@@ -4,7 +4,9 @@
 .gd-table {
   font-family: var(--gdevelop-classic-font-family);
   color: var(--table-text-color);
-  background-color: var(--table-row-odd-background-color);
+  /* Backdrop behind the table matches the header/search band (a stable color
+   * decoupled from the alternating row colors). */
+  background-color: var(--table-header-background-color);
 }
 
 .gd-table .tableHeaderRow {
@@ -22,10 +24,13 @@
   border-bottom: 1px solid var(--table-border-color);
 }
 .gd-table .tableOddRow {
-  background-color: var(--theme-surface-canvas-background-color);
+  /* Alternating ("zebra") row color. Odd rows use a subtly tinted background
+   * (dark #25252E / light #F5F5F7) to improve readability while keeping the hover
+   * state visible. These two table-row tokens are dedicated to this table. */
+  background-color: var(--table-row-odd-background-color);
 }
 .gd-table .tableEvenRow {
-  background-color: var(--theme-surface-canvas-background-color);
+  background-color: var(--table-row-even-background-color);
 }
 .gd-table .tableSelectedRow {
   background-color: var(--table-row-selected-background-color); /*OS X selection*/

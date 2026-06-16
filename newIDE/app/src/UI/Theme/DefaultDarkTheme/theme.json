@@ -937,10 +937,15 @@
         "value": "#D6DEEC"
       }
     },
+    "header": {
+      "background-color": {
+        "value": "#25252E"
+      }
+    },
     "row": {
       "odd": {
         "background-color": {
-          "value": "#1D1D26"
+          "value": "#25252E"
         }
       },
       "even": {

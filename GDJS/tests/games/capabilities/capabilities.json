@@ -5203,11 +5203,6 @@
               },
               {
                 "loop": false,
-                "name": "hit",
-                "source": "hit"
-              },
-              {
-                "loop": false,
                 "name": "shoot",
                 "source": "shoot"
               }

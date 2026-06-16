@@ -1,10 +1,8 @@
 // @flow
-import 'pixi-spine';
 import slugs from 'slugs';
 import axios from 'axios';
 import * as PIXI from 'pixi.js-legacy';
-import * as PIXI_SPINE from 'pixi-spine';
-import { ISkeleton, TextureAtlas } from 'pixi-spine';
+import { Spine, TextureAtlas } from '@esotericsoftware/spine-pixi-v7';
 import * as THREE from 'three';
 import { GLTFLoader, GLTF } from 'three/examples/jsm/loaders/GLTFLoader';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
@@ -17,6 +15,7 @@ const gd: libGDevelop = global.gd;
 type SpineTextureAtlasOrLoadingError = {|
   // $FlowFixMe[value-as-type]
   textureAtlas: ?TextureAtlas,
+  atlasAlias: ?string,
   loadingError: ?Error,
   loadingErrorReason:
     | null
@@ -25,9 +24,17 @@ type SpineTextureAtlasOrLoadingError = {|
     | 'atlas-resource-loading-error',
 |};
 
+/**
+ * Aliases registered into `PIXI.Assets`. Pass them to `Spine.from(...)` to
+ * instantiate a Spine container.
+ */
+export type SpineAliases = {|
+  skeletonAlias: string,
+  atlasAlias: string,
+|};
+
 export type SpineDataOrLoadingError = {|
-  // $FlowFixMe[value-as-type]
-  skeleton: ?ISkeleton,
+  aliases: ?SpineAliases,
   loadingError: ?Error,
   loadingErrorReason:
     | null
@@ -492,25 +499,21 @@ export default class PixiResourcesLoader {
     }
     if (spineAtlasPromises[resourceName]) {
       // TODO: only unload if no other resources pointing to the same Spine Atlas?
-
-      await PIXI.Assets.unload(resourceName).catch(async () => {
-        // Workaround:
-        // This is an expected error due to https://github.com/pixijs/spine/issues/537 issue (read comments
-        // and search the other mentions to this issue in the codebase):
-        // A string, instead of a TextureAtlas, is stored as the loaded atlas resource (which is the root cause of this exception).
-        // pixi-spine considers it acts on a TextureAtlas and tries to call dispose on it that causes a TypeError.
-        const { textureAtlas } = await spineAtlasPromises[resourceName];
-        if (textureAtlas) {
-          textureAtlas.dispose(); // Workaround by doing `dispose` ourselves.
-        }
-      });
+      await PIXI.Assets.unload(resourceName).catch(() => {});
       delete spineAtlasPromises[resourceName];
 
       // Also reload any resource embedding this resource:
       await this._reloadEmbedderResources(project, resourceName, 'spine');
     }
     if (spineDataPromises[resourceName]) {
-      // TODO: only unload if no other resources pointing to the same Spine Data?
+      // Drop SkeletonData entries cached by Spine.from for this skeleton alias,
+      // so that next instantiation re-parses with the (possibly updated) atlas.
+      const cachePrefix = `${resourceName}-`;
+      for (const cacheKey of Object.keys(Spine.skeletonCache)) {
+        if (cacheKey.startsWith(cachePrefix)) {
+          delete Spine.skeletonCache[cacheKey];
+        }
+      }
 
       await PIXI.Assets.unload(resourceName);
       delete spineDataPromises[resourceName];
@@ -918,10 +921,14 @@ export default class PixiResourcesLoader {
   }
 
   /**
-   * Return the Pixi spine texture atlas of the specified resource names.
+   * Pre-load the texture atlas for a Spine asset and register it in PIXI.Assets
+   * under the resource name as alias.
+   *
+   * The texture pages already loaded by ImageManager are forwarded via the
+   * `data.images` metadata so the v7 atlas loader does not re-fetch them.
+   *
    * @param project The project
    * @param spineTextureAtlasName The name of the atlas texture resource.
-   * @returns The requested texture atlas, or null if it could not be loaded.
    */
   static async _getSpineTextureAtlas(
     project: gdProject,
@@ -934,6 +941,7 @@ export default class PixiResourcesLoader {
     if (!spineTextureAtlasName) {
       return {
         textureAtlas: null,
+        atlasAlias: null,
         loadingError: null,
         loadingErrorReason: 'invalid-atlas-resource',
       };
@@ -946,6 +954,7 @@ export default class PixiResourcesLoader {
     ) {
       return {
         textureAtlas: null,
+        atlasAlias: null,
         loadingError: null,
         loadingErrorReason: 'invalid-atlas-resource',
       };
@@ -955,6 +964,7 @@ export default class PixiResourcesLoader {
     if (resource.getKind() !== 'atlas') {
       return {
         textureAtlas: null,
+        atlasAlias: null,
         loadingError: null,
         loadingErrorReason: 'invalid-atlas-resource',
       };
@@ -967,21 +977,22 @@ export default class PixiResourcesLoader {
     if (!textureAtlasMappingEntries.length) {
       return {
         textureAtlas: null,
+        atlasAlias: null,
         loadingError: null,
         loadingErrorReason: 'missing-texture-resources',
       };
     }
 
+    // The v7 atlas loader expects BaseTexture instances when sharing pages
+    // with already-loaded textures.
     const images = textureAtlasMappingEntries.reduce(
       (imagesMapping, [relatedPath, resourceName]) => {
-        // flow check
         if (typeof resourceName === 'string') {
           imagesMapping[relatedPath] = this.getPIXITexture(
             project,
             resourceName
-          );
+          ).baseTexture;
         }
-
         return imagesMapping;
       },
       {}
@@ -1007,32 +1018,13 @@ export default class PixiResourcesLoader {
         data: { images },
       });
       PIXI.Assets.load(spineTextureAtlasName).then(
-        atlas => {
-          // Ideally atlas of type `TextureAtlas` should be passed here.
-          // But there is a known issue in case of preloaded images (see https://github.com/pixijs/spine/issues/537
-          // and search the other mentions to this issue in the codebase).
-          //
-          // This branching covers all possible ways to make it work fine,
-          // if issue is fixed in pixi-spine or after migration to spine-pixi.
-          if (typeof atlas === 'string') {
-            new PIXI_SPINE.TextureAtlas(
-              atlas,
-              (textureName, textureCb) =>
-                textureCb(images[textureName].baseTexture),
-              textureAtlas =>
-                resolve({
-                  textureAtlas,
-                  loadingError: null,
-                  loadingErrorReason: null,
-                })
-            );
-          } else {
-            resolve({
-              textureAtlas: atlas,
-              loadingError: null,
-              loadingErrorReason: null,
-            });
-          }
+        textureAtlas => {
+          resolve({
+            textureAtlas,
+            atlasAlias: spineTextureAtlasName,
+            loadingError: null,
+            loadingErrorReason: null,
+          });
         },
         err => {
           console.error(
@@ -1040,6 +1032,7 @@ export default class PixiResourcesLoader {
           );
           resolve({
             textureAtlas: null,
+            atlasAlias: null,
             loadingError: err,
             loadingErrorReason: 'atlas-resource-loading-error',
           });
@@ -1049,10 +1042,12 @@ export default class PixiResourcesLoader {
   }
 
   /**
-   * Return the Pixi spine data for the specified resource name.
+   * Pre-load a Spine skeleton (`.json`/`.skel`) and its atlas, registering both
+   * in `PIXI.Assets`. The returned aliases can be passed directly to
+   * `Spine.from(...)` to instantiate a Spine container.
+   *
    * @param project The project
-   * @param spineName The name of the spine json resource
-   * @returns The requested spine skeleton.
+   * @param spineName The name of the spine resource
    */
   static async getSpineData(
     project: gdProject,
@@ -1065,7 +1060,7 @@ export default class PixiResourcesLoader {
     const resourceManager = project.getResourcesManager();
     if (!spineName || !resourceManager.hasResource(spineName)) {
       return {
-        skeleton: null,
+        aliases: null,
         loadingError: null,
         loadingErrorReason: 'invalid-spine-resource',
       };
@@ -1074,7 +1069,7 @@ export default class PixiResourcesLoader {
     const resource = resourceManager.getResource(spineName);
     if (resource.getKind() !== 'spine') {
       return {
-        skeleton: null,
+        aliases: null,
         loadingError: null,
         loadingErrorReason: 'invalid-spine-resource',
       };
@@ -1086,7 +1081,7 @@ export default class PixiResourcesLoader {
       : null;
     if (typeof spineTextureAtlasName !== 'string') {
       return {
-        skeleton: null,
+        aliases: null,
         loadingError: null,
         loadingErrorReason: 'missing-texture-atlas-name',
       };
@@ -1095,14 +1090,15 @@ export default class PixiResourcesLoader {
     return (spineDataPromises[spineName] = new Promise(resolve => {
       this._getSpineTextureAtlas(project, spineTextureAtlasName).then(
         textureAtlasOrLoadingError => {
-          if (!textureAtlasOrLoadingError.textureAtlas) {
+          if (!textureAtlasOrLoadingError.atlasAlias) {
             return resolve({
-              skeleton: null,
+              aliases: null,
               loadingError: textureAtlasOrLoadingError.loadingError,
               loadingErrorReason: textureAtlasOrLoadingError.loadingErrorReason,
             });
           }
 
+          const atlasAlias = textureAtlasOrLoadingError.atlasAlias;
           const spineUrl = ResourcesLoader.getResourceFullUrl(
             project,
             spineName,
@@ -1119,24 +1115,21 @@ export default class PixiResourcesLoader {
           PIXI.Assets.add({
             alias: spineName,
             src: spineUrl,
-            data: {
-              spineAtlas: textureAtlasOrLoadingError.textureAtlas,
-            },
           });
           PIXI.Assets.load(spineName).then(
-            jsonData => {
+            () => {
               resolve({
-                skeleton: jsonData.spineData,
+                aliases: { skeletonAlias: spineName, atlasAlias },
                 loadingError: null,
                 loadingErrorReason: null,
               });
             },
             err => {
               console.error(
-                `Error while loading Spine data "${spineName}": ${err}.\nCheck if you selected correct files.`
+                `Error while loading Spine data "${spineName}": ${err}.\nCheck if you selected correct files. Note that spine-pixi-v7 only supports skeletons exported from Spine 4.2.`
               );
               resolve({
-                skeleton: null,
+                aliases: null,
                 loadingError: err,
                 loadingErrorReason: 'spine-resource-loading-error',
               });
@@ -1145,6 +1138,41 @@ export default class PixiResourcesLoader {
         }
       );
     }));
+  }
+
+  /**
+   * Instantiate a Spine container from the loaded skeleton + atlas resources.
+   * Returns `null` if the resource cannot be loaded.
+   *
+   * @param project The project
+   * @param spineName The name of the spine resource
+   */
+  static async createSpine(
+    project: gdProject,
+    spineName: string
+    // $FlowFixMe[value-as-type]
+  ): Promise<Spine | null> {
+    const result = await this.getSpineData(project, spineName);
+    if (!result.aliases) {
+      console.error(
+        `Unable to load Spine "${spineName}" (${result.loadingErrorReason ||
+          'unknown reason'})`,
+        result.loadingError
+      );
+      return null;
+    }
+    try {
+      return Spine.from({
+        skeleton: result.aliases.skeletonAlias,
+        atlas: result.aliases.atlasAlias,
+      });
+    } catch (error) {
+      console.error(
+        `Exception while instantiating Spine "${spineName}":`,
+        error
+      );
+      return null;
+    }
   }
 
   /**

@@ -1189,36 +1189,6 @@ const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
       },
     }));
 
-    React.useEffect(
-      () => {
-        if (!initiallySelectedProperty || !properties) {
-          return;
-        }
-        if (initiallySelectedProperty.shouldCreate) {
-          const propertyType =
-            initiallySelectedProperty.variableType === 'number'
-              ? 'Number'
-              : initiallySelectedProperty.variableType === 'string'
-              ? 'String'
-              : initiallySelectedProperty.variableType === 'boolean'
-              ? 'Boolean'
-              : initiallySelectedProperty.variableType;
-          addProperty(
-            properties,
-            false,
-            properties.getRootFolder(),
-            0,
-            initiallySelectedProperty.variableName,
-            propertyType
-          );
-        } else {
-          setSelectedProperty(initiallySelectedProperty.variableName, false);
-        }
-      },
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-      []
-    );
-
     const canMoveSelectionTo = React.useCallback(
       (destinationItem: TreeViewItem, where: 'before' | 'inside' | 'after') =>
         selectedItems.every(item => {

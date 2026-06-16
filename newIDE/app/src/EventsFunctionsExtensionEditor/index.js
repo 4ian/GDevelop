@@ -10,6 +10,7 @@ import EditorMosaic, {
   type EditorMosaicInterface,
   mosaicContainsNode,
 } from '../UI/EditorMosaic';
+import { type Editor } from '../UI/EditorMosaic';
 import EmptyMessage from '../UI/EmptyMessage';
 import EventsFunctionConfigurationEditor, {
   type EventsFunctionConfigurationEditorInterface,
@@ -1380,7 +1381,9 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     const selectedEventsBasedEntity =
       selectedEventsBasedBehavior || selectedEventsBasedObject;
 
-    const editors = {
+    const editors: {
+      [string]: Editor,
+    } = {
       parameters: {
         type: 'primary',
         title: selectedEventsFunction
@@ -1769,7 +1772,6 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                 ref={editorNavigator =>
                   (this._editorNavigator = editorNavigator)
                 }
-                // $FlowFixMe[incompatible-type]
                 editors={editors}
                 initialEditorName={'functions-list'}
                 transitions={{

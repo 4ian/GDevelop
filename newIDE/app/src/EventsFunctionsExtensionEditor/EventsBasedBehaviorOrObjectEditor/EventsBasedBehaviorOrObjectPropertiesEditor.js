@@ -41,6 +41,7 @@ import VariableStringIcon from '../../VariablesList/Icons/VariableStringIcon';
 import VariableNumberIcon from '../../VariablesList/Icons/VariableNumberIcon';
 import VariableBooleanIcon from '../../VariablesList/Icons/VariableBooleanIcon';
 import NewBehaviorDialog from '../../BehaviorsEditor/NewBehaviorDialog';
+import { type CompactTextFieldInterface } from '../../UI/CompactTextField';
 
 const gd: libGDevelop = global.gd;
 
@@ -179,6 +180,7 @@ const getChoicesArray = (
 export type EventsBasedBehaviorOrObjectPropertiesEditorInterface = {|
   forceUpdate: () => void,
   getPropertyEditorRef: (propertyName: string) => React.ElementRef<any>,
+  focusOnProperty: (propertyName: string) => void,
 |};
 
 export const EventsBasedBehaviorOrObjectPropertiesEditor: React.ComponentType<{
@@ -214,7 +216,19 @@ export const EventsBasedBehaviorOrObjectPropertiesEditor: React.ComponentType<{
       forceUpdate,
       getPropertyEditorRef: (propertyName: string) =>
         propertyRefs ? propertyRefs.current.get(propertyName) : null,
+      focusOnProperty: (propertyName: string) => {
+        const propertyNameField = propertyNameFieldRefs.current.get(
+          propertyName
+        );
+        if (propertyNameField) {
+          propertyNameField.focus();
+          propertyNameField.select();
+        }
+      },
     }));
+    const propertyNameFieldRefs = React.useRef(
+      new Map<string, CompactTextFieldInterface | null>()
+    );
 
     const [newBehaviorDialogOpen, setNewBehaviorDialogOpen] = React.useState<{
       behaviorProperty: gdNamedPropertyDescriptor,
@@ -309,6 +323,7 @@ export const EventsBasedBehaviorOrObjectPropertiesEditor: React.ComponentType<{
     );
 
     propertyRefs.current.clear();
+    propertyNameFieldRefs.current.clear();
 
     return (
       <I18n>
@@ -349,6 +364,12 @@ export const EventsBasedBehaviorOrObjectPropertiesEditor: React.ComponentType<{
                               <LineStackLayout expand noMargin>
                                 <Line noMargin expand alignItems="center">
                                   <CompactSemiControlledTextField
+                                    ref={ref => {
+                                      propertyNameFieldRefs.current.set(
+                                        property.getName(),
+                                        ref
+                                      );
+                                    }}
                                     commitOnBlur
                                     placeholder={i18n._(
                                       t`Enter the property name`

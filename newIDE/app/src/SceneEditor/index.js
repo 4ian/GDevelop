@@ -1,3 +1,4 @@
+// Trigger CI
 // @flow
 import { Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
@@ -1372,7 +1373,9 @@ export default class SceneEditor extends React.Component<Props, State> {
       editorDisplay.forceUpdateObjectsList();
 
       // Find all the objects using the resources that were reloaded.
-      const objectNames = new Set<string>();
+      /** @type {Set<string>} */
+      const objectNames = new Set();
+
       for (const resourceName of resourceNames) {
         const objectsCollector = new gd.ObjectsUsingResourceCollector(
           project.getResourcesManager(),

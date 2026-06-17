@@ -1755,7 +1755,7 @@ describe('editorFunctions', () => {
       return instances;
     };
 
-    const putInstances = async args => {
+    const putInstances = async (args: any) => {
       const result = await editorFunctions.put_2d_instances.launchFunction({
         ...makeFakeLaunchFunctionOptionsWithProject(project),
         args: {
@@ -2114,7 +2114,7 @@ describe('editorFunctions', () => {
       return positions.sort((a, b) => a.x - b.x || a.y - b.y || a.z - b.z);
     };
 
-    const putInstances = async args => {
+    const putInstances = async (args: any) => {
       const result = await editorFunctions.put_3d_instances.launchFunction({
         ...makeFakeLaunchFunctionOptionsWithProject(project),
         args: {

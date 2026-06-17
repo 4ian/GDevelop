@@ -3009,27 +3009,28 @@ const put2dInstances: EditorFunction = {
           // brush rectangle so a wide area gets more columns and a flat line
           // (zero width or height) gets a single row/column. A naive sqrt split
           // would stack instances on top of each other for a thin rectangle.
-          let gridColumnCount = columnCount;
-          let gridRowCount = rowCount;
-          if (!gridColumnCount || !gridRowCount) {
-            const absWidth = Math.abs(brushWidth);
-            const absHeight = Math.abs(brushHeight);
-            if (absHeight === 0) {
-              gridColumnCount = gridColumnCount || instancesCount;
-              gridRowCount = gridRowCount || 1;
-            } else if (absWidth === 0) {
-              gridRowCount = gridRowCount || instancesCount;
-              gridColumnCount = gridColumnCount || 1;
-            } else {
-              gridColumnCount =
-                gridColumnCount ||
-                Math.max(
-                  1,
-                  Math.round(Math.sqrt((instancesCount * absWidth) / absHeight))
-                );
-              gridRowCount =
-                gridRowCount || Math.ceil(instancesCount / gridColumnCount);
-            }
+          const absWidth = Math.abs(brushWidth);
+          const absHeight = Math.abs(brushHeight);
+          let gridColumnCount: number;
+          let gridRowCount: number;
+          if (columnCount && rowCount) {
+            gridColumnCount = columnCount;
+            gridRowCount = rowCount;
+          } else if (absHeight === 0) {
+            gridColumnCount = columnCount || instancesCount;
+            gridRowCount = rowCount || 1;
+          } else if (absWidth === 0) {
+            gridRowCount = rowCount || instancesCount;
+            gridColumnCount = columnCount || 1;
+          } else {
+            gridColumnCount =
+              columnCount ||
+              Math.max(
+                1,
+                Math.round(Math.sqrt((instancesCount * absWidth) / absHeight))
+              );
+            gridRowCount =
+              rowCount || Math.ceil(instancesCount / gridColumnCount);
           }
 
           // Spread columns along X and rows along Y. Divide by (count - 1) so

@@ -139,6 +139,49 @@ const Physics3DEditor = (props: Props): React.Node => {
   const masksValues = parseInt(properties.get('masks').getValue(), 10);
 
   const isStatic = properties.get('bodyType').getValue() === 'Static';
+  const isJointEditorSupportedObjectType =
+    object.getType() === 'Scene3D::Model3DObject' ||
+    object.getType() === 'Scene3D::Cube3DObject';
+  const hasJointEditorProperties = properties.has('jointEditorEnabled');
+  const hasRagdollRoleProperty = properties.has('ragdollRole');
+  const hasRagdollGroupTagProperty = properties.has('ragdollGroupTag');
+  const hasJointAutoWakeBodiesProperty = properties.has('jointAutoWakeBodies');
+  const hasJointAutoStabilityPresetProperty = properties.has(
+    'jointAutoStabilityPreset'
+  );
+  const hasJointAutoBreakForceProperty = properties.has('jointAutoBreakForce');
+  const hasJointAutoBreakTorqueProperty = properties.has(
+    'jointAutoBreakTorque'
+  );
+  const hasRagdollAndJointRealismProperties =
+    hasRagdollRoleProperty ||
+    hasRagdollGroupTagProperty ||
+    hasJointAutoWakeBodiesProperty ||
+    hasJointAutoStabilityPresetProperty ||
+    hasJointAutoBreakForceProperty ||
+    hasJointAutoBreakTorqueProperty;
+  const isRagdollSectionExpandedByDefault =
+    (hasRagdollRoleProperty &&
+      properties.get('ragdollRole').getValue() !== 'None') ||
+    (hasRagdollGroupTagProperty &&
+      !!properties
+        .get('ragdollGroupTag')
+        .getValue()
+        .trim());
+  const isJointAutoWakeBodiesEnabled =
+    hasJointAutoWakeBodiesProperty &&
+    properties.get('jointAutoWakeBodies').getValue() === 'true';
+  const isJointEditorEnabled =
+    hasJointEditorProperties &&
+    properties.get('jointEditorEnabled').getValue() === 'true';
+  const isJointEditorPreviewEnabled =
+    hasJointEditorProperties &&
+    properties.has('jointEditorPreviewEnabled') &&
+    properties.get('jointEditorPreviewEnabled').getValue() === 'true';
+  const isJointEditorUsingCustomAxis =
+    hasJointEditorProperties &&
+    properties.has('jointEditorUseCustomAxis') &&
+    properties.get('jointEditorUseCustomAxis').getValue() === 'true';
 
   const canShapeBeOriented =
     properties.get('shape').getValue() !== 'Sphere' &&
@@ -493,6 +536,339 @@ const Physics3DEditor = (props: Props): React.Node => {
           disabled={isStatic}
         />
       </Line>
+      {hasRagdollAndJointRealismProperties && (
+        <Accordion defaultExpanded={isRagdollSectionExpandedByDefault} noMargin>
+          <AccordionHeader noMargin>
+            <Text size="sub-title">
+              <Trans>Ragdoll & Joint Realism</Trans>
+            </Text>
+          </AccordionHeader>
+          <AccordionBody disableGutters>
+            <Column expand noMargin>
+              {hasRagdollRoleProperty && (
+                <ResponsiveLineStackLayout>
+                  <ChoiceProperty
+                    id="physics3d-ragdoll-role"
+                    properties={properties}
+                    propertyName={'ragdollRole'}
+                    onUpdate={(e, i, newValue: string) =>
+                      updateBehaviorProperty('ragdollRole', newValue)
+                    }
+                  />
+                </ResponsiveLineStackLayout>
+              )}
+              {hasRagdollGroupTagProperty && (
+                <ResponsiveLineStackLayout>
+                  <SemiControlledTextField
+                    id="physics3d-ragdoll-group-tag"
+                    fullWidth
+                    value={properties.get('ragdollGroupTag').getValue()}
+                    floatingLabelText={properties
+                      .get('ragdollGroupTag')
+                      .getLabel()}
+                    onChange={newValue =>
+                      updateBehaviorProperty('ragdollGroupTag', newValue)
+                    }
+                  />
+                </ResponsiveLineStackLayout>
+              )}
+              {hasJointAutoWakeBodiesProperty && (
+                <ResponsiveLineStackLayout>
+                  <Checkbox
+                    label={properties.get('jointAutoWakeBodies').getLabel()}
+                    checked={isJointAutoWakeBodiesEnabled}
+                    onCheck={(e, checked) =>
+                      updateBehaviorProperty(
+                        'jointAutoWakeBodies',
+                        checked ? '1' : '0'
+                      )
+                    }
+                  />
+                </ResponsiveLineStackLayout>
+              )}
+              {hasJointAutoStabilityPresetProperty && (
+                <ResponsiveLineStackLayout>
+                  <ChoiceProperty
+                    id="physics3d-joint-auto-stability-preset"
+                    properties={properties}
+                    propertyName={'jointAutoStabilityPreset'}
+                    onUpdate={(e, i, newValue: string) =>
+                      updateBehaviorProperty(
+                        'jointAutoStabilityPreset',
+                        newValue
+                      )
+                    }
+                  />
+                </ResponsiveLineStackLayout>
+              )}
+              {(hasJointAutoBreakForceProperty ||
+                hasJointAutoBreakTorqueProperty) && (
+                <ResponsiveLineStackLayout>
+                  {hasJointAutoBreakForceProperty && (
+                    <NumericProperty
+                      id="physics3d-joint-auto-break-force"
+                      properties={properties}
+                      propertyName={'jointAutoBreakForce'}
+                      step={0.1}
+                      onUpdate={newValue =>
+                        updateBehaviorProperty('jointAutoBreakForce', newValue)
+                      }
+                    />
+                  )}
+                  {hasJointAutoBreakTorqueProperty && (
+                    <NumericProperty
+                      id="physics3d-joint-auto-break-torque"
+                      properties={properties}
+                      propertyName={'jointAutoBreakTorque'}
+                      step={0.1}
+                      onUpdate={newValue =>
+                        updateBehaviorProperty('jointAutoBreakTorque', newValue)
+                      }
+                    />
+                  )}
+                </ResponsiveLineStackLayout>
+              )}
+            </Column>
+          </AccordionBody>
+        </Accordion>
+      )}
+      {hasJointEditorProperties && !isJointEditorSupportedObjectType && (
+        <Line>
+          <AlertMessage kind="info">
+            <Trans>
+              Joint editor is available only for 3D Model and 3D Box objects.
+            </Trans>
+          </AlertMessage>
+        </Line>
+      )}
+      {hasJointEditorProperties && isJointEditorSupportedObjectType && (
+        <Accordion defaultExpanded={isJointEditorEnabled} noMargin>
+          <AccordionHeader noMargin>
+            <Text size="sub-title">
+              <Trans>Joint Editor</Trans>
+            </Text>
+          </AccordionHeader>
+          <AccordionBody disableGutters>
+            <Column expand noMargin>
+              <ResponsiveLineStackLayout>
+                <Checkbox
+                  label={properties.get('jointEditorEnabled').getLabel()}
+                  checked={isJointEditorEnabled}
+                  onCheck={(e, checked) =>
+                    updateBehaviorProperty(
+                      'jointEditorEnabled',
+                      checked ? '1' : '0'
+                    )
+                  }
+                />
+                {properties.has('jointEditorPreviewEnabled') && (
+                  <Checkbox
+                    label={properties
+                      .get('jointEditorPreviewEnabled')
+                      .getLabel()}
+                    checked={isJointEditorPreviewEnabled}
+                    onCheck={(e, checked) =>
+                      updateBehaviorProperty(
+                        'jointEditorPreviewEnabled',
+                        checked ? '1' : '0'
+                      )
+                    }
+                  />
+                )}
+              </ResponsiveLineStackLayout>
+              <ResponsiveLineStackLayout>
+                <ChoiceProperty
+                  id="physics3d-joint-editor-type"
+                  properties={properties}
+                  propertyName={'jointEditorType'}
+                  onUpdate={(e, i, newValue: string) =>
+                    updateBehaviorProperty('jointEditorType', newValue)
+                  }
+                />
+                <SemiControlledTextField
+                  id="physics3d-joint-editor-target-name"
+                  fullWidth
+                  value={properties
+                    .get('jointEditorTargetObjectName')
+                    .getValue()}
+                  floatingLabelText={properties
+                    .get('jointEditorTargetObjectName')
+                    .getLabel()}
+                  onChange={newValue =>
+                    updateBehaviorProperty(
+                      'jointEditorTargetObjectName',
+                      newValue
+                    )
+                  }
+                />
+              </ResponsiveLineStackLayout>
+              {properties.has('jointEditorPreviewSize') && (
+                <ResponsiveLineStackLayout>
+                  <NumericProperty
+                    id="physics3d-joint-editor-preview-size"
+                    properties={properties}
+                    propertyName={'jointEditorPreviewSize'}
+                    step={0.5}
+                    onUpdate={newValue =>
+                      updateBehaviorProperty('jointEditorPreviewSize', newValue)
+                    }
+                  />
+                </ResponsiveLineStackLayout>
+              )}
+              <ResponsiveLineStackLayout>
+                <NumericProperty
+                  id="physics3d-joint-editor-anchor-offset-x"
+                  properties={properties}
+                  propertyName={'jointEditorAnchorOffsetX'}
+                  step={1}
+                  onUpdate={newValue =>
+                    updateBehaviorProperty('jointEditorAnchorOffsetX', newValue)
+                  }
+                />
+                <NumericProperty
+                  id="physics3d-joint-editor-anchor-offset-y"
+                  properties={properties}
+                  propertyName={'jointEditorAnchorOffsetY'}
+                  step={1}
+                  onUpdate={newValue =>
+                    updateBehaviorProperty('jointEditorAnchorOffsetY', newValue)
+                  }
+                />
+                <NumericProperty
+                  id="physics3d-joint-editor-anchor-offset-z"
+                  properties={properties}
+                  propertyName={'jointEditorAnchorOffsetZ'}
+                  step={1}
+                  onUpdate={newValue =>
+                    updateBehaviorProperty('jointEditorAnchorOffsetZ', newValue)
+                  }
+                />
+              </ResponsiveLineStackLayout>
+              <ResponsiveLineStackLayout>
+                <NumericProperty
+                  id="physics3d-joint-editor-target-anchor-offset-x"
+                  properties={properties}
+                  propertyName={'jointEditorTargetAnchorOffsetX'}
+                  step={1}
+                  onUpdate={newValue =>
+                    updateBehaviorProperty(
+                      'jointEditorTargetAnchorOffsetX',
+                      newValue
+                    )
+                  }
+                />
+                <NumericProperty
+                  id="physics3d-joint-editor-target-anchor-offset-y"
+                  properties={properties}
+                  propertyName={'jointEditorTargetAnchorOffsetY'}
+                  step={1}
+                  onUpdate={newValue =>
+                    updateBehaviorProperty(
+                      'jointEditorTargetAnchorOffsetY',
+                      newValue
+                    )
+                  }
+                />
+                <NumericProperty
+                  id="physics3d-joint-editor-target-anchor-offset-z"
+                  properties={properties}
+                  propertyName={'jointEditorTargetAnchorOffsetZ'}
+                  step={1}
+                  onUpdate={newValue =>
+                    updateBehaviorProperty(
+                      'jointEditorTargetAnchorOffsetZ',
+                      newValue
+                    )
+                  }
+                />
+              </ResponsiveLineStackLayout>
+              <ResponsiveLineStackLayout>
+                <Checkbox
+                  label={properties.get('jointEditorUseCustomAxis').getLabel()}
+                  checked={isJointEditorUsingCustomAxis}
+                  onCheck={(e, checked) =>
+                    updateBehaviorProperty(
+                      'jointEditorUseCustomAxis',
+                      checked ? '1' : '0'
+                    )
+                  }
+                />
+              </ResponsiveLineStackLayout>
+              {isJointEditorUsingCustomAxis && (
+                <ResponsiveLineStackLayout>
+                  <NumericProperty
+                    id="physics3d-joint-editor-axis-x"
+                    properties={properties}
+                    propertyName={'jointEditorAxisX'}
+                    step={0.1}
+                    onUpdate={newValue =>
+                      updateBehaviorProperty('jointEditorAxisX', newValue)
+                    }
+                  />
+                  <NumericProperty
+                    id="physics3d-joint-editor-axis-y"
+                    properties={properties}
+                    propertyName={'jointEditorAxisY'}
+                    step={0.1}
+                    onUpdate={newValue =>
+                      updateBehaviorProperty('jointEditorAxisY', newValue)
+                    }
+                  />
+                  <NumericProperty
+                    id="physics3d-joint-editor-axis-z"
+                    properties={properties}
+                    propertyName={'jointEditorAxisZ'}
+                    step={0.1}
+                    onUpdate={newValue =>
+                      updateBehaviorProperty('jointEditorAxisZ', newValue)
+                    }
+                  />
+                </ResponsiveLineStackLayout>
+              )}
+              <ResponsiveLineStackLayout>
+                <NumericProperty
+                  id="physics3d-joint-editor-hinge-min-angle"
+                  properties={properties}
+                  propertyName={'jointEditorHingeMinAngle'}
+                  step={1}
+                  onUpdate={newValue =>
+                    updateBehaviorProperty('jointEditorHingeMinAngle', newValue)
+                  }
+                />
+                <NumericProperty
+                  id="physics3d-joint-editor-hinge-max-angle"
+                  properties={properties}
+                  propertyName={'jointEditorHingeMaxAngle'}
+                  step={1}
+                  onUpdate={newValue =>
+                    updateBehaviorProperty('jointEditorHingeMaxAngle', newValue)
+                  }
+                />
+              </ResponsiveLineStackLayout>
+              <ResponsiveLineStackLayout>
+                <NumericProperty
+                  id="physics3d-joint-editor-distance-min"
+                  properties={properties}
+                  propertyName={'jointEditorDistanceMin'}
+                  step={1}
+                  onUpdate={newValue =>
+                    updateBehaviorProperty('jointEditorDistanceMin', newValue)
+                  }
+                />
+                <NumericProperty
+                  id="physics3d-joint-editor-distance-max"
+                  properties={properties}
+                  propertyName={'jointEditorDistanceMax'}
+                  step={1}
+                  onUpdate={newValue =>
+                    updateBehaviorProperty('jointEditorDistanceMax', newValue)
+                  }
+                />
+              </ResponsiveLineStackLayout>
+            </Column>
+          </AccordionBody>
+        </Accordion>
+      )}
       <Accordion
         defaultExpanded={areAdvancedPropertiesExpandedByDefault}
         noMargin

@@ -91,7 +91,9 @@ export type VariableFieldInterface = {|
   updateAutocompletions: () => void,
 |};
 
-export const VariableNameQuickAnalyzeResults = {
+export const VariableNameQuickAnalyzeResults: {
+  [string]: VariableNameQuickAnalyzeResult,
+} = {
   OK: 0,
   WRONG_QUOTE: 1,
   WRONG_SPACE: 2,
@@ -142,7 +144,6 @@ export const quicklyAnalyzeVariableName = (
   projectScopedContainersAccessor?: ProjectScopedContainersAccessor,
   isObjectVariable: boolean = false
 ): VariableNameQuickAnalyzeResult => {
-  // $FlowFixMe[incompatible-type]
   if (!name) return VariableNameQuickAnalyzeResults.OK;
 
   for (let i = 0; i < name.length; ++i) {
@@ -152,10 +153,8 @@ export const quicklyAnalyzeVariableName = (
       // This probably starts an expression, so stop the analysis.
       break;
     } else if (character === ' ') {
-      // $FlowFixMe[incompatible-type]
       return VariableNameQuickAnalyzeResults.WRONG_SPACE;
     } else if (character === '"') {
-      // $FlowFixMe[incompatible-type]
       return VariableNameQuickAnalyzeResults.WRONG_QUOTE;
     } else if (
       character === '(' ||
@@ -164,7 +163,6 @@ export const quicklyAnalyzeVariableName = (
       character === '/' ||
       character === '*'
     ) {
-      // $FlowFixMe[incompatible-type]
       return VariableNameQuickAnalyzeResults.WRONG_EXPRESSION;
     }
   }
@@ -172,12 +170,10 @@ export const quicklyAnalyzeVariableName = (
   const rootVariableName = getRootVariableName(name);
   // Check at least the name of the root variable, it's the best we can do.
   if (!isRootVariableDeclared(rootVariableName, variablesContainers)) {
-    // $FlowFixMe[incompatible-type]
     return VariableNameQuickAnalyzeResults.UNDECLARED_VARIABLE;
   }
 
   if (!projectScopedContainersAccessor) {
-    // $FlowFixMe[incompatible-type]
     return VariableNameQuickAnalyzeResults.OK;
   }
   const projectScopedContainers = projectScopedContainersAccessor.get();
@@ -188,7 +184,6 @@ export const quicklyAnalyzeVariableName = (
       .getObjectsContainersList()
       .hasObjectOrGroupNamed(rootVariableName)
   ) {
-    // $FlowFixMe[incompatible-type]
     return VariableNameQuickAnalyzeResults.NAME_COLLISION_WITH_OBJECT;
   }
 
@@ -202,16 +197,13 @@ export const quicklyAnalyzeVariableName = (
     );
 
     if (variableSource === gd.VariablesContainer.Parameters) {
-      // $FlowFixMe[incompatible-type]
       return VariableNameQuickAnalyzeResults.PARAMETER_WITH_CHILD;
     }
     if (variableSource === gd.VariablesContainer.Properties) {
-      // $FlowFixMe[incompatible-type]
       return VariableNameQuickAnalyzeResults.PROPERTY_WITH_CHILD;
     }
   }
 
-  // $FlowFixMe[incompatible-type]
   return VariableNameQuickAnalyzeResults.OK;
 };
 
@@ -584,7 +576,6 @@ export default (React.forwardRef<Props, VariableFieldInterface>(
                   onRequestClose={onRequestClose}
                   onApply={onApply}
                   filterOptionById={filterOptionById}
-                  // $FlowFixMe[incompatible-type]
                   dataSource={[
                     ...autocompletionVariableNames,
                     ...(editEventsFunctionParameter

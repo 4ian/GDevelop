@@ -1019,6 +1019,32 @@ export default class PixiResourcesLoader {
       });
       PIXI.Assets.load(spineTextureAtlasName).then(
         textureAtlas => {
+          // The spine-pixi-v7 tint shader always samples atlas textures as if
+          // they were premultiplied. The shared textures loaded by the engine
+          // are uploaded with PIXI's default UNPACK mode (premultiply-on-upload),
+          // so atlases exported with premultiplied alpha (`pma: true`) would be
+          // premultiplied a second time, producing dark fringes/halos
+          // ("shadows") around the rendered parts. Align each shared texture's
+          // alpha mode with what the atlas page declares.
+          const imageNames = Object.keys(images);
+          for (const page of textureAtlas.pages) {
+            const baseTexture =
+              images[page.name] ||
+              (textureAtlas.pages.length === 1 && imageNames.length === 1
+                ? images[imageNames[0]]
+                : undefined);
+            if (!baseTexture) continue;
+
+            const expectedAlphaMode = page.pma
+              ? PIXI.ALPHA_MODES.PMA
+              : PIXI.ALPHA_MODES.UNPACK;
+            if (baseTexture.alphaMode !== expectedAlphaMode) {
+              baseTexture.alphaMode = expectedAlphaMode;
+              // Force a re-upload to the GPU so the new alpha mode takes effect.
+              baseTexture.update();
+            }
+          }
+
           resolve({
             textureAtlas,
             atlasAlias: spineTextureAtlasName,

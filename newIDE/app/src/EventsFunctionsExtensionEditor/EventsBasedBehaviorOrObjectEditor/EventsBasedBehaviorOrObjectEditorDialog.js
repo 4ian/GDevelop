@@ -24,6 +24,7 @@ import TuneIcon from '../../UI/CustomSvgIcons/Tune';
 import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 import AddIcon from '../../UI/CustomSvgIcons/Add';
 import newNameGenerator from '../../Utils/NewNameGenerator';
+import { Divider } from '@material-ui/core';
 
 const styles = {
   simpleSizeContainer: {
@@ -267,7 +268,14 @@ export default function EventsBasedBehaviorOrObjectEditorDialog({
     <Dialog
       title={<Trans>Properties</Trans>}
       secondaryActions={[
-        <HelpButton helpPagePath="/objects" key="help" />,
+        <HelpButton
+          helpPagePath={
+            eventsBasedBehavior
+              ? '/behaviors/events-based-behaviors'
+              : '/objects/custom-objects-prefab-template'
+          }
+          key="help"
+        />,
         <FlatButton
           primary
           label={<Trans>Add a property</Trans>}
@@ -361,6 +369,7 @@ export default function EventsBasedBehaviorOrObjectEditorDialog({
             <div style={styles.doubleSizeContainer}>
               {editors.propertyEditor.renderEditor()}
             </div>
+            <Divider orientation="vertical" />
             <div style={styles.simpleSizeContainer}>
               {editors.propertyList.renderEditor()}
             </div>

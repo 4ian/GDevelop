@@ -9,6 +9,7 @@ import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
 import { type MenuButton } from '../UI/TreeView';
 import { type HTMLDataset } from '../Utils/HTMLDataset';
 import { getFunctionIconUrl } from '../EventsFunctionsList/EventsFunctionTreeViewItemContent';
+import { type ProjectItemUsageTarget } from './ProjectItemUsageFinder';
 
 export type FunctionShortcutTreeViewItemCallbacks = {|
   onOpenEventsFunctionsExtension: (
@@ -19,8 +20,13 @@ export type FunctionShortcutTreeViewItemCallbacks = {|
   ) => void,
 |};
 
+type ProjectItemUsageCallbacks = {|
+  onFindUsage: ProjectItemUsageTarget => void,
+|};
+
 export type FunctionShortcutTreeViewItemProps = {|
   ...FunctionShortcutTreeViewItemCallbacks,
+  ...ProjectItemUsageCallbacks,
 |};
 
 export const getFunctionShortcutTreeViewItemId = (
@@ -96,6 +102,15 @@ export class FunctionShortcutTreeViewItemContent
       {
         label: i18n._(t`Open function`),
         click: () => this.onClick(),
+      },
+      {
+        label: i18n._(t`Find usage`),
+        click: () =>
+          this.props.onFindUsage({
+            kind: 'events-function',
+            eventsFunctionsExtension: this.eventsFunctionsExtension,
+            eventsFunction: this.eventsFunction,
+          }),
       },
     ];
   }

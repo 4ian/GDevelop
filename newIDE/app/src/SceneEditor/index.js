@@ -1389,15 +1389,32 @@ export default class SceneEditor extends React.Component<Props, State> {
     objectFolderOrObjectWithContext: ?ObjectFolderOrObjectWithContext = null
   ) => {
     const selectedObjectFolderOrObjectsWithContext = [];
-    if (
-      objectFolderOrObjectWithContext &&
-      exceptionallyGuardAgainstDeadObject(
-        objectFolderOrObjectWithContext.objectFolderOrObject
-      )
-    ) {
-      selectedObjectFolderOrObjectsWithContext.push(
-        objectFolderOrObjectWithContext
-      );
+    const objectFolderOrObject = objectFolderOrObjectWithContext
+      ? exceptionallyGuardAgainstDeadObject(
+          objectFolderOrObjectWithContext.objectFolderOrObject
+        )
+      : null;
+
+    const instancesToSelect =
+      objectFolderOrObject && !objectFolderOrObject.isFolder()
+        ? getInstancesInLayoutForObject(
+            this.props.initialInstances,
+            objectFolderOrObject.getObject().getName()
+          )
+        : [];
+    this.instancesSelection.selectInstances({
+      instances: instancesToSelect,
+      multiSelect: false,
+      layersLocks: null,
+      ignoreSeal: true,
+    });
+    this._sendSelectedInstances();
+
+    if (objectFolderOrObjectWithContext && objectFolderOrObject) {
+      selectedObjectFolderOrObjectsWithContext.push({
+        ...objectFolderOrObjectWithContext,
+        objectFolderOrObject,
+      });
     }
 
     this.setState(
@@ -1407,6 +1424,7 @@ export default class SceneEditor extends React.Component<Props, State> {
         selectedLayer: null,
       },
       () => {
+        this.forceUpdateInstancesList();
         // We update the toolbar because we need to update the objects selected
         // (for the rename shortcut)
         this.updateToolbar();

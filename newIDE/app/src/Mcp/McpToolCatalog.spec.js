@@ -39,6 +39,7 @@ describe('McpToolCatalog', () => {
     expect(toolNames).toContain('find_extension_events');
     expect(toolNames).toContain('find_project_events');
     expect(toolNames).toContain('validate_events_json_file');
+    expect(toolNames).toContain('gdevelop_validate_extension_events_json');
     expect(toolNames).toContain('lint_scene_events');
     expect(toolNames).toContain('lint_extension_function_events');
     expect(toolNames).toContain('get_tilemap_tiles');
@@ -162,6 +163,7 @@ describe('McpToolCatalog', () => {
     expect(isWriteTool('wait_until_preview_ready')).toBe(false);
     expect(isWriteTool('gdevelop_refresh_tool_catalog')).toBe(false);
     expect(isWriteTool('validate_events_json_file')).toBe(false);
+    expect(isWriteTool('gdevelop_validate_extension_events_json')).toBe(false);
     expect(isWriteTool('lint_scene_events')).toBe(false);
     expect(isWriteTool('lint_extension_function_events')).toBe(false);
     expect(isWriteTool('gdevelop_create_or_update_extension')).toBe(true);
@@ -251,6 +253,15 @@ describe('McpToolCatalog', () => {
         .gdevelop_create_or_update_extension_function[0].arguments.events_json[0]
         .variables[0].name
     ).toBe('LocalSunCount');
+    expect(
+      getMcpToolUsageExamples('gdevelop_validate_extension_events_json')
+        .gdevelop_validate_extension_events_json.length
+    ).toBeGreaterThan(0);
+    expect(
+      getMcpToolUsageExamples('gdevelop_create_or_update_extension_property')
+        .gdevelop_create_or_update_extension_property[0].arguments
+        .property_type
+    ).toBe('Number');
   });
 
   it('uses OpenAI-compatible top-level input schemas for every tool', () => {

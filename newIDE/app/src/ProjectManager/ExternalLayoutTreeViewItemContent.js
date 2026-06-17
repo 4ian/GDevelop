@@ -16,6 +16,7 @@ import {
   externalLayoutsRootFolderId,
 } from '.';
 import { type HTMLDataset } from '../Utils/HTMLDataset';
+import { type ProjectItemUsageTarget } from './ProjectItemUsageFinder';
 
 const EXTERNAL_LAYOUT_CLIPBOARD_KIND = 'External layout';
 
@@ -26,9 +27,14 @@ export type ExternalLayoutTreeViewItemCallbacks = {|
   onOpenExternalLayout: string => void,
 |};
 
+type ProjectItemUsageCallbacks = {|
+  onFindUsage: ProjectItemUsageTarget => void,
+|};
+
 export type ExternalLayoutTreeViewItemCommonProps = {|
   ...TreeItemProps,
   ...ExternalLayoutTreeViewItemCallbacks,
+  ...ProjectItemUsageCallbacks,
 |};
 
 export type ExternalLayoutTreeViewItemProps = {|
@@ -104,6 +110,17 @@ export class ExternalLayoutTreeViewItemContent implements TreeViewItemContent {
 
   buildMenuTemplate(i18n: I18nType, index: number): any {
     return [
+      {
+        label: i18n._(t`Find usage`),
+        click: () =>
+          this.props.onFindUsage({
+            kind: 'external-layout',
+            externalLayout: this.externalLayout,
+          }),
+      },
+      {
+        type: 'separator',
+      },
       {
         label: i18n._(t`Rename`),
         click: () => this.edit(),

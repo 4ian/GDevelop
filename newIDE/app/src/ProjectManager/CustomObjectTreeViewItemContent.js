@@ -17,6 +17,7 @@ import {
 import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
 import { type MenuButton } from '../UI/TreeView';
 import { type HTMLDataset } from '../Utils/HTMLDataset';
+import { type ProjectItemUsageTarget } from './ProjectItemUsageFinder';
 
 const gd: libGDevelop = global.gd;
 
@@ -47,9 +48,14 @@ export type CustomObjectTreeViewItemCallbacks = {|
   onEventBasedObjectTypeChanged: () => void,
 |};
 
+type ProjectItemUsageCallbacks = {|
+  onFindUsage: ProjectItemUsageTarget => void,
+|};
+
 export type CustomObjectTreeViewItemProps = {|
   ...TreeItemProps,
   ...CustomObjectTreeViewItemCallbacks,
+  ...ProjectItemUsageCallbacks,
 |};
 
 export const getCustomObjectTreeViewItemId = (
@@ -227,6 +233,15 @@ export class CustomObjectTreeViewItemContent implements TreeViewItemContent {
       {
         label: i18n._(t`Open visual editor`),
         click: () => this.onClick(),
+      },
+      {
+        label: i18n._(t`Find usage`),
+        click: () =>
+          this.props.onFindUsage({
+            kind: 'custom-object',
+            eventsFunctionsExtension: this.eventsFunctionsExtension,
+            eventsBasedObject: this.eventsBasedObject,
+          }),
       },
       {
         label: i18n._(t`Create variant`),

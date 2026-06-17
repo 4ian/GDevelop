@@ -1129,6 +1129,33 @@ describe('McpEditorBridge', () => {
       expect(metadata.kind).toBe('action');
       expect(metadata.parameters.length).toBeGreaterThan(0);
       expect(metadata.parameters[0].type).toBe('variableOrProperty');
+
+      const scopedMetadataResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'gdevelop_get_instruction_metadata',
+          arguments: {
+            kind: 'condition',
+            type: 'BooleanObjectVariable',
+            target_scope: 'object_function',
+            compact: true,
+          },
+        },
+      });
+      const scopedMetadata = JSON.parse(
+        scopedMetadataResponse.content[0].text
+      );
+
+      expect(scopedMetadata.eventScopes.scene.label).toContain('Scene');
+      expect(scopedMetadata.eventScopes.objectFunction.label).toContain(
+        'object function'
+      );
+      expect(scopedMetadata.targetScopeCompatibility).toEqual(
+        expect.objectContaining({
+          targetScope: 'object_function',
+          valid: expect.any(Boolean),
+        })
+      );
     } finally {
       project.delete();
     }
@@ -1387,6 +1414,42 @@ describe('McpEditorBridge', () => {
       );
       expect(inspectedExtension.objects[0].area.maxX).toBe(64);
       expect(triggerUnsavedChanges).toHaveBeenCalled();
+
+      await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'gdevelop_create_or_update_extension_function',
+          arguments: {
+            extension_name: 'McpExt',
+            function_name: 'OtherPower',
+            parent_kind: 'behavior',
+            parent_name: 'PowerBehavior',
+            function_type: 'action',
+            sentence: 'Other power action for _PARAM0_',
+            events_json:
+              '[{"type":"BuiltinCommonInstructions::Standard","conditions":[],"actions":[]}]',
+            summary_only: true,
+          },
+        },
+      });
+      const filteredBehaviorResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'gdevelop_inspect_extension_behavior',
+          arguments: {
+            extension_name: 'McpExt',
+            behavior_name: 'PowerBehavior',
+            function_name: 'SetPower',
+          },
+        },
+      });
+      const filteredBehavior = JSON.parse(
+        filteredBehaviorResponse.content[0].text
+      );
+      expect(filteredBehavior.behavior.functions.map(fn => fn.name)).toEqual([
+        'SetPower',
+      ]);
+      expect(filteredBehavior.behavior.serializedBehavior).toBeUndefined();
 
       const deletePropertyResponse = await bridge.handleRendererMcpRequest({
         method: 'tools/call',
@@ -1762,6 +1825,155 @@ describe('McpEditorBridge', () => {
           .hasEventsFunctionNamed('BadAddSunDryRun')
       ).toBe(false);
       expect(triggerUnsavedChanges).not.toHaveBeenCalled();
+    } finally {
+      project.delete();
+    }
+  });
+
+  it('validates extension events JSON without using the write tool', async () => {
+    // $FlowFixMe[invalid-constructor]
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    const extension = project.insertNewEventsFunctionsExtension('McpExt', 0);
+
+    try {
+      const bridge = makeBridge({
+        getProject: () => project,
+        getPermissions: () => ({
+          allowWriteTools: false,
+          allowCommandTools: false,
+        }),
+      });
+
+      const response = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'gdevelop_validate_extension_events_json',
+          arguments: {
+            extension_name: 'McpExt',
+            function_name: 'BadAddSun',
+            function_type: 'action',
+            sentence: 'Add sun to _PARAM1_',
+            parameters: [
+              {
+                name: 'SunCountVariable',
+                type: 'variable',
+              },
+            ],
+            events_json: [
+              {
+                type: 'BuiltinCommonInstructions::Standard',
+                conditions: [
+                  {
+                    type: { value: 'NumberVariable' },
+                    parameters: ['SunCountVariable', '>', '0'],
+                  },
+                ],
+                actions: [],
+              },
+            ],
+            summary_only: true,
+          },
+        },
+      });
+      const validation = JSON.parse(response.content[0].text);
+
+      expect(response.isError).not.toBe(true);
+      expect(validation.valid).toBe(false);
+      expect(validation.errors[0]).toContain(
+        'function-variable-parameter-used-as-direct-variable'
+      );
+      expect(
+        extension.getEventsFunctions().hasEventsFunctionNamed('BadAddSun')
+      ).toBe(false);
+      expect(
+        project.hasEventsFunctionsExtensionNamed('__McpValidation_McpExt')
+      ).toBe(false);
+    } finally {
+      project.delete();
+    }
+  });
+
+  it('warns when an object function creates an external object parameter', async () => {
+    // $FlowFixMe[invalid-constructor]
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    project.insertNewEventsFunctionsExtension('McpExt', 0);
+
+    try {
+      const bridge = makeBridge({
+        getProject: () => project,
+        getPermissions: () => ({
+          allowWriteTools: true,
+          allowCommandTools: false,
+        }),
+      });
+
+      await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'gdevelop_create_or_update_extension_object',
+          arguments: {
+            extension_name: 'McpExt',
+            object_name: 'PlantCard',
+            full_name: 'Plant card',
+            summary_only: true,
+          },
+        },
+      });
+      const createFunctionResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'gdevelop_create_or_update_extension_function',
+          arguments: {
+            extension_name: 'McpExt',
+            parent_kind: 'object',
+            parent_name: 'PlantCard',
+            function_name: 'PlacePlant',
+            function_type: 'action',
+            sentence: 'Place _PARAM1_ from _PARAM0_',
+            parameters: [{ name: 'Sunflower', type: 'object' }],
+            events_json: [
+              {
+                type: 'BuiltinCommonInstructions::Standard',
+                conditions: [],
+                actions: [
+                  {
+                    type: { value: 'Create' },
+                    parameters: ['', 'Sunflower', '0', '0', ''],
+                  },
+                ],
+              },
+            ],
+            summary_only: true,
+          },
+        },
+      });
+      expect(createFunctionResponse.isError).not.toBe(true);
+
+      const lintResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'lint_extension_function_events',
+          arguments: {
+            extension_name: 'McpExt',
+            parent_kind: 'object',
+            parent_name: 'PlantCard',
+            function_name: 'PlacePlant',
+          },
+        },
+      });
+      const lintResult = JSON.parse(lintResponse.content[0].text);
+
+      expect(lintResult.valid).toBe(true);
+      expect(lintResult.issues).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            severity: 'warning',
+            type: 'object-function-create-external-object-parameter',
+            parameterName: 'Sunflower',
+            parameterIndex: 1,
+          }),
+        ])
+      );
     } finally {
       project.delete();
     }
@@ -2234,6 +2446,34 @@ describe('McpEditorBridge', () => {
       expect(eventsFunction.getFullName()).toBe('Update enemy warrior AI');
       expect(eventsFunction.getEvents().getEventsCount()).toBe(1);
 
+      const removeParameterResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'gdevelop_create_or_update_extension_function',
+          arguments: {
+            extension_name: 'McpExt',
+            function_name: 'UpdateEnemyWarrior',
+            function_type: 'action',
+            sentence:
+              'Update enemy warrior systems for _PARAM1_, _PARAM2_, _PARAM3_, _PARAM4_',
+            parameters: [
+              { name: 'Player', type: 'object' },
+              { name: 'Enemy_Warrior', type: 'object' },
+              { name: 'HealthBar', type: 'object' },
+              { name: 'AttackDamage', type: 'expression' },
+            ],
+            events_json:
+              '[{"type":"BuiltinCommonInstructions::Standard","conditions":[],"actions":[]}]',
+          },
+        },
+      });
+
+      expect(removeParameterResponse.isError).not.toBe(true);
+      expect(eventsFunction.getParameters().getParametersCount()).toBe(4);
+      expect(eventsFunction.getParameters().hasParameterNamed('DeltaTime')).toBe(
+        false
+      );
+
       const invalidUpdateResponse = await bridge.handleRendererMcpRequest({
         method: 'tools/call',
         params: {
@@ -2258,7 +2498,10 @@ describe('McpEditorBridge', () => {
         'Update enemy warrior AI'
       );
       expect(restoredEventsFunction.getEvents().getEventsCount()).toBe(1);
-      expect(triggerUnsavedChanges).toHaveBeenCalledTimes(1);
+      expect(restoredEventsFunction.getParameters().getParametersCount()).toBe(
+        4
+      );
+      expect(triggerUnsavedChanges).toHaveBeenCalledTimes(2);
     } finally {
       project.delete();
     }
@@ -5478,6 +5721,82 @@ describe('McpEditorBridge', () => {
     );
     expect(result.runtime.scenes[0].instancePositions.Bullet[0]).toEqual(
       expect.objectContaining({ x: 10, y: 20, layer: 'HUD', zOrder: 7 })
+    );
+  });
+
+  it('run_frames expands clickAndHold and returns cursor world coordinates', async () => {
+    let capturedRunFrames = null;
+    const previewDebuggerServer = makeTargetedPreviewServer({
+      responders: {
+        getStatus: { isPaused: true, sceneName: 'Level1' },
+        runFrames: message => {
+          capturedRunFrames = message;
+          return {
+            __fullMessage: {
+              runFrames: {
+                applied: [
+                  'mouseMove',
+                  'mouseButtonPressed:0',
+                  'mouseButtonReleased:0',
+                ],
+                steppedFrames: 3,
+                stoppedEarly: false,
+                deltaMs: 1000 / 60,
+                heldKeys: [],
+                cursorWorldCoordinates: {
+                  sceneName: 'Level1',
+                  canvasX: 420,
+                  canvasY: 180,
+                  layers: [
+                    {
+                      layerName: 'HUD',
+                      exists: true,
+                      worldX: 300,
+                      worldY: 100,
+                    },
+                  ],
+                },
+                error: null,
+              },
+              payload: {
+                _paused: true,
+                _sceneStack: { _stack: [] },
+              },
+            },
+          };
+        },
+      },
+    });
+    const bridge = makeBridge({
+      getPreviewDebuggerServer: () => previewDebuggerServer,
+    });
+
+    const response = await bridge.handleRendererMcpRequest({
+      method: 'tools/call',
+      params: {
+        name: 'run_frames',
+        arguments: {
+          inputs: [{ type: 'clickAndHold', x: 420, y: 180, button: 'left' }],
+          frames: 3,
+          include_cursor_world_coordinates: true,
+          cursor_layers: ['HUD'],
+        },
+      },
+    });
+    const result = JSON.parse(response.content[0].text);
+
+    expect(response.isError).not.toBe(true);
+    expect(capturedRunFrames.inputs).toEqual([
+      { type: 'mouseMove', x: 420, y: 180 },
+      { type: 'mouseButtonPressed', button: 0 },
+    ]);
+    expect(capturedRunFrames.postInputs).toEqual([
+      { type: 'mouseButtonReleased', button: 0 },
+    ]);
+    expect(capturedRunFrames.includeCursorWorldCoordinates).toBe(true);
+    expect(capturedRunFrames.cursorLayers).toEqual(['HUD']);
+    expect(result.cursorWorldCoordinates.layers[0]).toEqual(
+      expect.objectContaining({ layerName: 'HUD', worldX: 300 })
     );
   });
 

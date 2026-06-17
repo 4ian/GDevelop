@@ -25,6 +25,10 @@ type Props = {|
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   selection: SelectionState,
   onSelectEvent: EventContext => void,
+  onSetVisibleGroupEventsFolded: (
+    groupEvents: Array<gdBaseEvent>,
+    folded: boolean
+  ) => void,
   width: number,
 |};
 
@@ -45,6 +49,20 @@ const getGroupPathStrings = (
     groupPathStrings.push(...getGroupPathStrings(item.children));
     return groupPathStrings;
   }, []);
+
+const getGroupItems = (
+  items: Array<EventsGraphPreviewItem>
+): Array<EventsGraphPreviewGroupItem> => {
+  const groupItems: Array<EventsGraphPreviewGroupItem> = [];
+  items.forEach(item => {
+    if (item.itemType === 'group') {
+      groupItems.push(item);
+    }
+
+    groupItems.push(...getGroupItems(item.children));
+  });
+  return groupItems;
+};
 
 const findSelectedItem = (
   items: Array<EventsGraphPreviewItem>,
@@ -360,6 +378,7 @@ export default function EventsGraphPreviewPanel({
   projectScopedContainersAccessor,
   selection,
   onSelectEvent,
+  onSetVisibleGroupEventsFolded,
   width,
 }: Props): React.Node {
   const [, setCatalogRefreshNonce] = React.useState<number>(0);
@@ -384,7 +403,10 @@ export default function EventsGraphPreviewPanel({
   const itemsCount = getItemsCount(items);
   const filteredItemsCount = getItemsCount(filteredItems);
   const isSearching = searchText.trim().length > 0;
-  const visibleGroupPathStrings = getGroupPathStrings(filteredItems);
+  const visibleGroupItems = getGroupItems(filteredItems);
+  const visibleGroupPathStrings = visibleGroupItems.map(
+    groupItem => groupItem.pathString
+  );
   const areAllVisibleGroupsCollapsed =
     visibleGroupPathStrings.length > 0 &&
     visibleGroupPathStrings.every(pathString =>
@@ -431,14 +453,12 @@ export default function EventsGraphPreviewPanel({
   }, []);
 
   const toggleAllVisibleGroups = () => {
-    setCollapsedGroupPaths(previousCollapsedGroupPaths => {
-      if (visibleGroupPathStrings.length === 0) {
-        return previousCollapsedGroupPaths;
-      }
+    if (visibleGroupPathStrings.length === 0) {
+      return;
+    }
 
-      const shouldExpandAll = visibleGroupPathStrings.every(pathString =>
-        previousCollapsedGroupPaths.has(pathString)
-      );
+    const shouldExpandAll = areAllVisibleGroupsCollapsed;
+    setCollapsedGroupPaths(previousCollapsedGroupPaths => {
       const nextCollapsedGroupPaths = new Set(previousCollapsedGroupPaths);
       visibleGroupPathStrings.forEach(pathString => {
         if (shouldExpandAll) {
@@ -449,6 +469,10 @@ export default function EventsGraphPreviewPanel({
       });
       return nextCollapsedGroupPaths;
     });
+    onSetVisibleGroupEventsFolded(
+      visibleGroupItems.map(groupItem => groupItem.eventContext.event),
+      !shouldExpandAll
+    );
   };
 
   return (

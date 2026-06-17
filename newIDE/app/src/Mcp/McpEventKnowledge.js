@@ -701,18 +701,107 @@ const getDeprecatedInstructionDiagnostic = ({
 const formatDeprecatedInstructionDiagnostic = (diagnostic: Object): string =>
   `${diagnostic.error} Suggestion: ${diagnostic.suggestion}`;
 
+const normalizeTargetScope = (targetScope?: ?string): ?string => {
+  if (!targetScope) return null;
+  const normalized = String(targetScope)
+    .trim()
+    .toLowerCase()
+    .replace(/[-\s]+/g, '_');
+  if (normalized === 'scene' || normalized === 'layout') return 'scene';
+  if (
+    normalized === 'function' ||
+    normalized === 'extension_function' ||
+    normalized === 'free_function'
+  ) {
+    return 'extension_function';
+  }
+  if (normalized === 'behavior' || normalized === 'behavior_function') {
+    return 'behavior_function';
+  }
+  if (
+    normalized === 'object' ||
+    normalized === 'custom_object' ||
+    normalized === 'object_function'
+  ) {
+    return 'object_function';
+  }
+  if (normalized === 'async' || normalized === 'async_function') {
+    return 'async_function';
+  }
+  return null;
+};
+
+const buildEventScopeCompatibility = (metadata: any): Object => {
+  const scene = metadata.isRelevantForLayoutEvents();
+  const functionEvents = metadata.isRelevantForFunctionEvents();
+  const asyncFunctionEvents = metadata.isRelevantForAsynchronousFunctionEvents();
+  const customObjectEvents = metadata.isRelevantForCustomObjectEvents();
+  return {
+    scene: {
+      valid: scene,
+      label: 'Scene/external events',
+    },
+    extensionFunction: {
+      valid: functionEvents,
+      label: 'Free extension function events',
+    },
+    behaviorFunction: {
+      valid: functionEvents,
+      label: 'Events-based behavior function events',
+    },
+    objectFunction: {
+      valid: functionEvents || customObjectEvents,
+      label: 'Events-based object function events',
+    },
+    asyncFunction: {
+      valid: functionEvents || asyncFunctionEvents,
+      label: 'Asynchronous function events',
+    },
+    customObjectInternal: {
+      valid: customObjectEvents,
+      label: 'Custom object internal events',
+    },
+    note:
+      'Use the valid flags for the event sheet you are editing. A type can be valid in scene events but rejected in behavior/object/free extension function events.',
+  };
+};
+
+const getTargetScopeCompatibility = (
+  eventScopes: Object,
+  targetScope?: ?string
+): ?Object => {
+  const normalizedTargetScope = normalizeTargetScope(targetScope);
+  if (!normalizedTargetScope) return null;
+  const keyByScope: { [string]: string } = {
+    scene: 'scene',
+    extension_function: 'extensionFunction',
+    behavior_function: 'behaviorFunction',
+    object_function: 'objectFunction',
+    async_function: 'asyncFunction',
+  };
+  const key = keyByScope[normalizedTargetScope];
+  if (!key || !eventScopes[key]) return null;
+  return {
+    targetScope: normalizedTargetScope,
+    valid: !!eventScopes[key].valid,
+    label: eventScopes[key].label,
+  };
+};
+
 const summarizeInstructionMetadata = ({
   type,
   kind,
   metadata,
   fullGroupName,
   compact,
+  targetScope,
 }: {|
   type: string,
   kind: 'action' | 'condition',
   metadata: gdInstructionMetadata,
   fullGroupName?: ?string,
   compact?: boolean,
+  targetScope?: ?string,
 |}): Object => {
   // Parameter-shape summary: GDevelop instructions mix user-fillable parameters
   // with hidden "code-only" ones (e.g. an inlineCode slot) that must still get a
@@ -748,6 +837,11 @@ const summarizeInstructionMetadata = ({
         )} — pass "" (empty string) for each in the serialized parameters array. The serialized array length must equal totalParameterCount (${totalParameterCount}). Use parameterTemplate as a starting point: code-only slots are already "", replace the <type> placeholders.`
       : undefined,
   };
+  const eventScopes = buildEventScopeCompatibility(metadata);
+  const targetScopeCompatibility = getTargetScopeCompatibility(
+    eventScopes,
+    targetScope
+  );
   if (compact) {
     return {
       kind,
@@ -758,6 +852,8 @@ const summarizeInstructionMetadata = ({
       group: fullGroupName || metadata.getGroup(),
       // True when usable in a scene (layout) or external events sheet.
       isRelevantForSceneEvents: metadata.isRelevantForLayoutEvents(),
+      eventScopes,
+      targetScopeCompatibility: targetScopeCompatibility || undefined,
       parameterShape,
       parameters: mapFor(0, metadata.getParametersCount(), index =>
         summarizeParameter(metadata.getParameter(index), index, {
@@ -790,6 +886,8 @@ const summarizeInstructionMetadata = ({
     isRelevantForFunctionEvents: metadata.isRelevantForFunctionEvents(),
     isRelevantForAsynchronousFunctionEvents: metadata.isRelevantForAsynchronousFunctionEvents(),
     isRelevantForCustomObjectEvents: metadata.isRelevantForCustomObjectEvents(),
+    eventScopes,
+    targetScopeCompatibility: targetScopeCompatibility || undefined,
     usageComplexity: metadata.getUsageComplexity(),
     deprecationMessage: metadata.getDeprecationMessage() || undefined,
     parameterShape,
@@ -804,12 +902,19 @@ const summarizeExpressionMetadata = ({
   metadata,
   fullGroupName,
   compact,
+  targetScope,
 }: {|
   type: string,
   metadata: gdExpressionMetadata,
   fullGroupName?: ?string,
   compact?: boolean,
+  targetScope?: ?string,
 |}): Object => {
+  const eventScopes = buildEventScopeCompatibility(metadata);
+  const targetScopeCompatibility = getTargetScopeCompatibility(
+    eventScopes,
+    targetScope
+  );
   if (compact) {
     return {
       kind: 'expression',
@@ -818,6 +923,8 @@ const summarizeExpressionMetadata = ({
       description: metadata.getDescription(),
       group: fullGroupName || metadata.getGroup(),
       returnType: metadata.getReturnType(),
+      eventScopes,
+      targetScopeCompatibility: targetScopeCompatibility || undefined,
       parameters: mapFor(0, metadata.getParametersCount(), index =>
         summarizeParameter(metadata.getParameter(index), index, {
           compact: true,
@@ -841,6 +948,8 @@ const summarizeExpressionMetadata = ({
     isRelevantForFunctionEvents: metadata.isRelevantForFunctionEvents(),
     isRelevantForAsynchronousFunctionEvents: metadata.isRelevantForAsynchronousFunctionEvents(),
     isRelevantForCustomObjectEvents: metadata.isRelevantForCustomObjectEvents(),
+    eventScopes,
+    targetScopeCompatibility: targetScopeCompatibility || undefined,
     deprecationMessage: metadata.getDeprecationMessage() || undefined,
     parameters: mapFor(0, metadata.getParametersCount(), index =>
       summarizeParameter(metadata.getParameter(index), index)
@@ -1396,7 +1505,8 @@ const getInstructionMetadata = (
   project: gdProject,
   type: string,
   kind: string,
-  compact?: boolean
+  compact?: boolean,
+  targetScope?: ?string
 ): ?Object => {
   if (kind === 'condition') {
     const metadata = getRawInstructionMetadata(project, type, 'condition');
@@ -1407,6 +1517,7 @@ const getInstructionMetadata = (
           kind: 'condition',
           metadata,
           compact: !!compact,
+          targetScope,
         });
   }
 
@@ -1419,6 +1530,7 @@ const getInstructionMetadata = (
           kind: 'action',
           metadata,
           compact: !!compact,
+          targetScope,
         });
   }
 
@@ -1434,6 +1546,7 @@ const getInstructionMetadata = (
         type,
         metadata: numberExpressionMetadata,
         compact: !!compact,
+        targetScope,
       });
     }
 
@@ -1448,6 +1561,7 @@ const getInstructionMetadata = (
         type,
         metadata: stringExpressionMetadata,
         compact: !!compact,
+        targetScope,
       });
     }
   }
@@ -1461,12 +1575,14 @@ export const getExactInstructionMetadata = ({
   type,
   kind,
   compact,
+  targetScope,
 }: {|
   project: gdProject,
   i18n?: any,
   type?: ?string,
   kind?: ?string,
   compact?: boolean,
+  targetScope?: ?string,
 |}): Object => {
   if (!type) {
     return {
@@ -1497,7 +1613,13 @@ export const getExactInstructionMetadata = ({
     }
   }
 
-  const metadata = getInstructionMetadata(project, type, kind, compact);
+  const metadata = getInstructionMetadata(
+    project,
+    type,
+    kind,
+    compact,
+    targetScope
+  );
   if (!metadata) {
     return {
       error: `No ${kind} metadata found for "${type}". Use gdevelop_search_instruction_metadata first to find exact types.`,
@@ -1523,6 +1645,7 @@ export const searchInstructionMetadata = ({
   kind,
   limit,
   compact,
+  targetScope,
 }: {|
   project: gdProject,
   i18n: any,
@@ -1530,6 +1653,7 @@ export const searchInstructionMetadata = ({
   kind?: ?string,
   limit?: ?number,
   compact?: boolean,
+  targetScope?: ?string,
 |}): Object => {
   const normalizedKind = kind || 'all';
   const resultLimit = normalizeLimit(limit);
@@ -1579,6 +1703,7 @@ export const searchInstructionMetadata = ({
           metadata: instruction.metadata,
           fullGroupName: instruction.fullGroupName,
           compact: !!compact,
+          targetScope,
         }),
       });
     }
@@ -1620,6 +1745,7 @@ export const searchInstructionMetadata = ({
             metadata: expression.metadata,
             fullGroupName: expression.fullGroupName,
             compact: !!compact,
+            targetScope,
           }),
         });
       }

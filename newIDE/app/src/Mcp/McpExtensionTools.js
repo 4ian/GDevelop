@@ -669,20 +669,25 @@ const assertEventsFunctionSentenceIsValid = (
 const summarizeFunctions = (
   container: gdEventsFunctionsContainer,
   includeEvents: boolean = true,
-  includeSerialized: boolean = true
+  includeSerialized: boolean = true,
+  onlyFunctionName?: ?string
 ): Array<Object> =>
   mapFor(0, container.getEventsFunctionsCount(), index =>
-    summarizeEventsFunction(
-      container.getEventsFunctionAt(index),
-      includeEvents,
-      includeSerialized
+    container.getEventsFunctionAt(index)
+  )
+    .filter(
+      eventsFunction =>
+        !onlyFunctionName || eventsFunction.getName() === onlyFunctionName
     )
-  );
+    .map(eventsFunction =>
+      summarizeEventsFunction(eventsFunction, includeEvents, includeSerialized)
+    );
 
 const summarizeBehavior = (
   behavior: gdEventsBasedBehavior,
   includeEvents: boolean = true,
-  includeSerialized: boolean = true
+  includeSerialized: boolean = true,
+  onlyFunctionName?: ?string
 ): Object => {
   const summary: Object = {
     name: behavior.getName(),
@@ -703,7 +708,8 @@ const summarizeBehavior = (
     functions: summarizeFunctions(
       behavior.getEventsFunctions(),
       includeEvents,
-      includeSerialized
+      includeSerialized,
+      onlyFunctionName
     ),
   };
   if (includeSerialized) {
@@ -726,7 +732,8 @@ const summarizeBehaviors = (
 const summarizeObject = (
   object: gdEventsBasedObject,
   includeEvents: boolean = true,
-  includeSerialized: boolean = true
+  includeSerialized: boolean = true,
+  onlyFunctionName?: ?string
 ): Object => {
   const summary: Object = {
     name: object.getName(),
@@ -758,7 +765,8 @@ const summarizeObject = (
     functions: summarizeFunctions(
       object.getEventsFunctions(),
       includeEvents,
-      includeSerialized
+      includeSerialized,
+      onlyFunctionName
     ),
   };
   if (includeSerialized) {
@@ -1085,13 +1093,32 @@ export const inspectExtensionBehavior = (
   if (!behaviors.has(behaviorName)) {
     throw new Error(`Events-based behavior not found: "${behaviorName}".`);
   }
-  const { includeEvents, includeSerialized } = getInspectOptions(args || {});
+  const functionName = normalizeOptionalName(
+    args.function_name,
+    'function_name'
+  );
+  const inspectArgs =
+    functionName && !hasOwn(args || {}, 'include_serialized')
+      ? { ...(args || {}), include_serialized: false }
+      : args || {};
+  const { includeEvents, includeSerialized } = getInspectOptions(inspectArgs);
+  if (
+    functionName &&
+    !behaviors
+      .get(behaviorName)
+      .getEventsFunctions()
+      .hasEventsFunctionNamed(functionName)
+  ) {
+    throw new Error(`Events function not found: "${functionName}".`);
+  }
   return {
     behavior: summarizeBehavior(
       behaviors.get(behaviorName),
       includeEvents,
-      includeSerialized
+      includeSerialized,
+      functionName
     ),
+    filteredFunctionName: functionName || undefined,
   };
 };
 
@@ -1108,13 +1135,32 @@ export const inspectExtensionObject = (
   if (!objects.has(objectName)) {
     throw new Error(`Events-based object not found: "${objectName}".`);
   }
-  const { includeEvents, includeSerialized } = getInspectOptions(args || {});
+  const functionName = normalizeOptionalName(
+    args.function_name,
+    'function_name'
+  );
+  const inspectArgs =
+    functionName && !hasOwn(args || {}, 'include_serialized')
+      ? { ...(args || {}), include_serialized: false }
+      : args || {};
+  const { includeEvents, includeSerialized } = getInspectOptions(inspectArgs);
+  if (
+    functionName &&
+    !objects
+      .get(objectName)
+      .getEventsFunctions()
+      .hasEventsFunctionNamed(functionName)
+  ) {
+    throw new Error(`Events function not found: "${functionName}".`);
+  }
   return {
     object: summarizeObject(
       objects.get(objectName),
       includeEvents,
-      includeSerialized
+      includeSerialized,
+      functionName
     ),
+    filteredFunctionName: functionName || undefined,
   };
 };
 
@@ -1585,6 +1631,79 @@ const collectFunctionVariableParameterMisuseIssues = (
   return issues;
 };
 
+const getExternalObjectParameterNames = (
+  parentKind: string,
+  eventsFunction: gdEventsFunction
+): Set<string> => {
+  const objectParameterNames: Set<string> = new Set();
+  if (parentKind !== 'object') return objectParameterNames;
+
+  const parameters = eventsFunction.getParameters();
+  for (let index = 0; index < parameters.getParametersCount(); index++) {
+    const parameter = parameters.getParameterAt(index);
+    if (isAutomaticFunctionParameter(parentKind, parameter, index)) continue;
+    if (isObjectParameter(parameter)) {
+      objectParameterNames.add(parameter.getName());
+    }
+  }
+  return objectParameterNames;
+};
+
+const collectObjectFunctionCreateExternalObjectIssues = (
+  parentKind: string,
+  eventsFunction: gdEventsFunction
+): Array<Object> => {
+  const externalObjectParameterNames = getExternalObjectParameterNames(
+    parentKind,
+    eventsFunction
+  );
+  if (!externalObjectParameterNames.size) return [];
+
+  const issues: Array<Object> = [];
+  collectEventReferences(eventsFunction.getEvents()).forEach(eventReference => {
+    collectEventInstructionReferences(eventReference.event).forEach(
+      instructionReference => {
+        const instruction = instructionReference.instruction;
+        if (
+          instructionReference.instructionKind !== 'action' ||
+          instruction.getType() !== 'Create' ||
+          instruction.getParametersCount() < 1
+        ) {
+          return;
+        }
+
+        const objectParameterIndexes = [1, 0].filter(
+          parameterIndex => parameterIndex < instruction.getParametersCount()
+        );
+        const matchingParameterIndex = objectParameterIndexes.find(
+          parameterIndex =>
+            externalObjectParameterNames.has(
+              instruction.getParameter(parameterIndex).getPlainString()
+            )
+        );
+        if (matchingParameterIndex === undefined) return;
+        const objectName = instruction
+          .getParameter(matchingParameterIndex)
+          .getPlainString();
+
+        issues.push({
+          severity: 'warning',
+          type: 'object-function-create-external-object-parameter',
+          instructionType: instruction.getType(),
+          instructionKind: instructionReference.instructionKind,
+          eventPath: eventReference.path,
+          instructionPath: instructionReference.instructionPath,
+          parameterIndex: matchingParameterIndex,
+          parameterName: objectName,
+          suggestion:
+            'Events-based object functions cannot reliably create instances for an external object parameter. Move the Create action to a scene/free extension function, or create an internal child object/prefab instance owned by the events-based object.',
+        });
+      }
+    );
+  });
+  return issues;
+};
+
 const collectRootGroupIssues = (
   eventsFunction: gdEventsFunction
 ): Array<Object> => {
@@ -1727,6 +1846,12 @@ const lintExtensionFunctionTarget = (
   issues.push(
     ...collectFunctionVariableParameterMisuseIssues(target.eventsFunction)
   );
+  issues.push(
+    ...collectObjectFunctionCreateExternalObjectIssues(
+      target.parentKind,
+      target.eventsFunction
+    )
+  );
   if (!args || args.require_root_groups !== false) {
     issues.push(...collectRootGroupIssues(target.eventsFunction));
   }
@@ -1779,6 +1904,86 @@ export const lintExtensionFunctionEvents = (
     project,
     getExtensionFunctionTarget(project, args),
     args || {}
+  );
+};
+
+export const validateExtensionEventsJson = (
+  project: gdProject,
+  args: Object
+): Object => {
+  const extensionName = normalizeRequiredName(
+    args.extension_name,
+    'extension_name'
+  );
+  const eventsJsonInput = getEventsJsonInput(args);
+
+  if (eventsJsonInput === undefined) {
+    const lintResult = lintExtensionFunctionTarget(
+      project,
+      getExtensionFunctionTarget(project, args),
+      {
+        ...(args || {}),
+        require_root_groups:
+          args && hasOwn(args, 'require_root_groups')
+            ? args.require_root_groups
+            : false,
+      }
+    );
+    return {
+      ...lintResult,
+      validationMode: 'existing-function-events',
+      note:
+        'Validated the existing extension function events without modifying the project. Pass events_json to validate a replacement payload on a temporary extension copy.',
+    };
+  }
+
+  return runOnTemporaryExtensionCopy(
+    project,
+    extensionName,
+    false,
+    temporaryExtensionName => {
+      try {
+        const result = createOrUpdateExtensionFunction(project, {
+          ...(args || {}),
+          extension_name: temporaryExtensionName,
+          dry_run: false,
+          __mcp_skip_clone_validation: true,
+          summary_only: !!(args && args.summary_only),
+        });
+        return {
+          success: true,
+          valid: true,
+          validationMode: 'replacement-events-json',
+          dryRun: true,
+          extensionName,
+          temporaryExtensionName,
+          parentKind: result.parentKind,
+          functionName:
+            result.function && result.function.name
+              ? result.function.name
+              : args.function_name,
+          function: result.function,
+          note:
+            'Validated events_json on a temporary extension copy; the live extension was not mutated.',
+        };
+      } catch (error) {
+        return {
+          success: true,
+          valid: false,
+          validationMode: 'replacement-events-json',
+          dryRun: true,
+          extensionName,
+          temporaryExtensionName,
+          errors: [
+            error && error.message
+              ? error.message
+              : 'Extension events validation failed.',
+          ],
+          note:
+            'Validation failed on a temporary extension copy; the live extension was not mutated.',
+        };
+      }
+    }
   );
 };
 
@@ -2986,17 +3191,96 @@ const applyParameterFields = (
   }
 };
 
-const upsertFunctionParameters = (
+const isObjectParameter = (parameter: gdParameterMetadata): boolean => {
+  const valueTypeMetadata = parameter.getValueTypeMetadata();
+  return (
+    parameter.getType() === 'object' ||
+    !!(valueTypeMetadata && valueTypeMetadata.isObject())
+  );
+};
+
+const isBehaviorParameter = (parameter: gdParameterMetadata): boolean => {
+  const valueTypeMetadata = parameter.getValueTypeMetadata();
+  return (
+    parameter.getType() === 'behavior' ||
+    !!(valueTypeMetadata && valueTypeMetadata.isBehavior())
+  );
+};
+
+const isAutomaticFunctionParameter = (
+  parentKind: string,
+  parameter: gdParameterMetadata,
+  index: number
+): boolean => {
+  if (parentKind === 'behavior') {
+    return (
+      (index === 0 && isObjectParameter(parameter)) ||
+      (index === 1 && isBehaviorParameter(parameter))
+    );
+  }
+  if (parentKind === 'object') {
+    return index === 0 && isObjectParameter(parameter);
+  }
+  return false;
+};
+
+const getAutomaticFunctionParametersCount = (
+  parentKind: string,
+  parameters: gdParameterMetadataContainer
+): number => {
+  let count = 0;
+  for (let index = 0; index < parameters.getParametersCount(); index++) {
+    if (
+      !isAutomaticFunctionParameter(parentKind, parameters.getParameterAt(index), index)
+    ) {
+      break;
+    }
+    count++;
+  }
+  return count;
+};
+
+const applyFunctionParameters = (
   eventsFunction: gdEventsFunction,
-  parametersArgs: Array<any>
+  parametersArgs: Array<any>,
+  parentKind: string,
+  mode: 'replace' | 'upsert'
 ) => {
   const parameters = eventsFunction.getParameters();
+  const normalizedParameterArgs = [];
   parametersArgs.forEach(parameterArgs => {
     if (!parameterArgs || typeof parameterArgs !== 'object') return;
     const parameterName = normalizeRequiredName(
       parameterArgs.name,
       'parameter.name'
     );
+    normalizedParameterArgs.push({
+      parameterName,
+      parameterArgs,
+    });
+  });
+
+  if (mode === 'replace') {
+    const wantedNames = new Set(
+      normalizedParameterArgs.map(({ parameterName }) => parameterName)
+    );
+    const namesToRemove = [];
+    for (let index = 0; index < parameters.getParametersCount(); index++) {
+      const parameter = parameters.getParameterAt(index);
+      if (isAutomaticFunctionParameter(parentKind, parameter, index)) continue;
+      const parameterName = parameter.getName();
+      if (!wantedNames.has(parameterName)) {
+        namesToRemove.push(parameterName);
+      }
+    }
+    namesToRemove.forEach(parameterName => {
+      if (parameters.hasParameterNamed(parameterName)) {
+        parameters.removeParameter(parameterName);
+      }
+    });
+  }
+
+  normalizedParameterArgs.forEach(({ parameterName, parameterArgs }, index) => {
     let parameter;
     if (parameters.hasParameterNamed(parameterName)) {
       parameter = parameters.getParameter(parameterName);
@@ -3007,6 +3291,21 @@ const upsertFunctionParameters = (
       );
     }
     applyParameterFields(parameter, parameterArgs);
+    const automaticParametersCount = getAutomaticFunctionParametersCount(
+      parentKind,
+      parameters
+    );
+    const wantedPosition = Math.min(
+      automaticParametersCount + index,
+      parameters.getParametersCount() - 1
+    );
+    const currentPosition = parameters.getParameterPosition(parameter);
+    if (
+      currentPosition !== wantedPosition &&
+      !isAutomaticFunctionParameter(parentKind, parameter, currentPosition)
+    ) {
+      parameters.moveParameter(currentPosition, wantedPosition);
+    }
   });
 };
 
@@ -3072,6 +3371,7 @@ const applyEventsFunctionFields = (
   project: gdProject,
   eventsFunction: gdEventsFunction,
   args: Object,
+  parentKind: string,
   parsedEventsJson?: ?Array<Object>
 ) => {
   const functionType = normalizeFunctionType(args.function_type);
@@ -3100,7 +3400,12 @@ const applyEventsFunctionFields = (
     );
   }
   if (Array.isArray(args.parameters)) {
-    upsertFunctionParameters(eventsFunction, args.parameters);
+    applyFunctionParameters(
+      eventsFunction,
+      args.parameters,
+      parentKind,
+      args.parameters_mode === 'upsert' ? 'upsert' : 'replace'
+    );
   }
   if (getEventsJsonInput(args) !== undefined) {
     const parsedEvents =
@@ -3232,7 +3537,24 @@ export const createOrUpdateExtensionFunction = (
       );
     }
 
-    applyEventsFunctionFields(project, eventsFunction, args, parsedEventsJson);
+    applyEventsFunctionFields(
+      project,
+      eventsFunction,
+      args,
+      parentKind,
+      parsedEventsJson
+    );
+    if (parentKind === 'behavior') {
+      gd.WholeProjectRefactorer.ensureBehaviorEventsFunctionsProperParameters(
+        extension,
+        ((parent: any): gdEventsBasedBehavior)
+      );
+    } else if (parentKind === 'object') {
+      gd.WholeProjectRefactorer.ensureObjectEventsFunctionsProperParameters(
+        extension,
+        ((parent: any): gdEventsBasedObject)
+      );
+    }
     assertEventsFunctionSentenceIsValid(parentKind, eventsFunction);
     if (
       created &&

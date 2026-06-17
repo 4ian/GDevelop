@@ -16,6 +16,7 @@ import {
   externalEventsRootFolderId,
 } from '.';
 import { type HTMLDataset } from '../Utils/HTMLDataset';
+import { type ProjectItemUsageTarget } from './ProjectItemUsageFinder';
 
 const EXTERNAL_EVENTS_CLIPBOARD_KIND = 'External events';
 
@@ -25,9 +26,14 @@ export type ExternalEventsTreeViewItemCallbacks = {|
   onOpenExternalEvents: string => void,
 |};
 
+type ProjectItemUsageCallbacks = {|
+  onFindUsage: ProjectItemUsageTarget => void,
+|};
+
 export type ExternalEventsTreeViewItemCommonProps = {|
   ...TreeItemProps,
   ...ExternalEventsTreeViewItemCallbacks,
+  ...ProjectItemUsageCallbacks,
 |};
 
 export type ExternalEventsTreeViewItemProps = {|
@@ -103,6 +109,17 @@ export class ExternalEventsTreeViewItemContent implements TreeViewItemContent {
 
   buildMenuTemplate(i18n: I18nType, index: number): any {
     return [
+      {
+        label: i18n._(t`Find usage`),
+        click: () =>
+          this.props.onFindUsage({
+            kind: 'external-events',
+            externalEvents: this.externalEvents,
+          }),
+      },
+      {
+        type: 'separator',
+      },
       {
         label: i18n._(t`Rename`),
         click: () => this.edit(),

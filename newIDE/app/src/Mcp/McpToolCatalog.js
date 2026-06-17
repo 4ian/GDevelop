@@ -1637,7 +1637,7 @@ const runFramesSchema = {
     inputs: {
       type: 'array',
       description:
-        'Optional input events to inject BEFORE stepping (same shape as simulate_preview_input: [{ type, key/key_code/button/x/y, ... }]). Held keys (keyPressed without keyReleased) stay pressed across all stepped frames.',
+        'Optional input events to inject BEFORE stepping (same shape as simulate_preview_input: [{ type, key/key_code/button/x/y, ... }]). Held keys (keyPressed without keyReleased) stay pressed across all stepped frames. run_frames also supports { type:"clickAndHold", x, y, button?, frames? }: it moves the cursor, presses before stepping, releases after stepping, and uses frames as the hold duration when top-level frames is omitted.',
       items: {
         type: 'object',
         properties: {
@@ -1648,6 +1648,8 @@ const runFramesSchema = {
           x: { type: 'number' },
           y: { type: 'number' },
           identifier: { type: 'number' },
+          frames: { type: 'number' },
+          hold_frames: { type: 'number' },
         },
         required: ['type'],
         additionalProperties: true,
@@ -1672,6 +1674,17 @@ const runFramesSchema = {
       items: { type: 'string' },
       description:
         'Object names whose live instance x/y/angle/layer/zOrder to include in the returned runtime snapshot.',
+    },
+    include_cursor_world_coordinates: {
+      type: 'boolean',
+      description:
+        'When true, return cursorWorldCoordinates computed after stepping: canvas cursor x/y plus world x/y for each requested layer. Use this to debug IsCursorOnObject when layers or cameras are shifted/zoomed.',
+    },
+    cursor_layers: {
+      type: 'array',
+      items: { type: 'string' },
+      description:
+        'Optional layer names for include_cursor_world_coordinates. Defaults to all layers in the running scene. Use "" for the base layer.',
     },
     debugger_id: {
       type: 'string',
@@ -2562,7 +2575,7 @@ const extensionFunctionSchema = {
     parameters: {
       type: 'array',
       description:
-        'Function parameter metadata. Items are upserted by name. For behavior/object functions, automatic object/behavior parameters are maintained by GDevelop before sentence validation.',
+        'Function parameter metadata. By default this is the final caller-managed parameter list: old unused parameters are removed. Set parameters_mode:"upsert" for additive edits. For behavior/object functions, automatic object/behavior parameters are maintained by GDevelop before sentence validation.',
       items: {
         type: 'object',
         properties: {
@@ -2583,6 +2596,11 @@ const extensionFunctionSchema = {
         required: ['name'],
         additionalProperties: true,
       },
+    },
+    parameters_mode: {
+      type: 'string',
+      description:
+        'Default "replace": the provided parameters array is the final caller-managed parameter list, so old unused parameters are removed. Use "upsert" only for additive edits that must preserve unspecified existing parameters. Automatic behavior/object parameters are always preserved.',
     },
     events_json: {
       oneOf: [
@@ -2670,6 +2688,28 @@ const lintExtensionFunctionEventsSchema = {
   additionalProperties: true,
 };
 
+const validateExtensionEventsJsonSchema = {
+  type: 'object',
+  properties: {
+    extension_name: extensionNameSchema.properties.extension_name,
+    function_name: extensionFunctionSchema.properties.function_name,
+    parent_kind: extensionFunctionSchema.properties.parent_kind,
+    parent_name: extensionFunctionSchema.properties.parent_name,
+    function_type: extensionFunctionSchema.properties.function_type,
+    sentence: extensionFunctionSchema.properties.sentence,
+    parameters: extensionFunctionSchema.properties.parameters,
+    parameters_mode: extensionFunctionSchema.properties.parameters_mode,
+    events_json: extensionFunctionSchema.properties.events_json,
+    require_root_groups:
+      lintExtensionFunctionEventsSchema.properties.require_root_groups,
+    include_generated_code:
+      lintExtensionFunctionEventsSchema.properties.include_generated_code,
+    summary_only: extensionFunctionSchema.properties.summary_only,
+  },
+  required: ['extension_name', 'function_name'],
+  additionalProperties: true,
+};
+
 const extensionBehaviorSchema = {
   type: 'object',
   properties: {
@@ -2677,6 +2717,11 @@ const extensionBehaviorSchema = {
     behavior_name: {
       type: 'string',
       description: 'Internal name of the events-based behavior.',
+    },
+    function_name: {
+      type: 'string',
+      description:
+        'Optional function name filter for inspect calls. When provided, only this behavior function is returned and serializedBehavior is omitted by default to avoid huge outputs.',
     },
   },
   required: ['extension_name', 'behavior_name'],
@@ -2690,6 +2735,11 @@ const extensionObjectSchema = {
     object_name: {
       type: 'string',
       description: 'Internal name of the events-based object.',
+    },
+    function_name: {
+      type: 'string',
+      description:
+        'Optional function name filter for inspect calls. When provided, only this object function is returned and serializedObject is omitted by default to avoid huge outputs.',
     },
     new_object_name: {
       type: 'string',
@@ -2989,6 +3039,66 @@ const extensionPropertySchema = {
       type: 'string',
       description: 'Internal property name.',
     },
+    new_property_name: {
+      type: 'string',
+      description: 'Optional new internal property name for renaming.',
+    },
+    property_type: {
+      type: 'string',
+      description:
+        'Property type, for example Number, String, Boolean, Choice, Color, or Behavior.',
+    },
+    value: {
+      type: 'string',
+      description:
+        'Default serialized value for the property, for example "10", "true", or a string default.',
+    },
+    label: {
+      type: 'string',
+      description: 'Display label shown in property editors.',
+    },
+    description: {
+      type: 'string',
+      description: 'Property description shown in the editor.',
+    },
+    measurement_unit: {
+      type: 'string',
+      description: 'Optional measurement unit shown next to numeric values.',
+    },
+    group: {
+      type: 'string',
+      description: 'Optional property group/category shown in the editor.',
+    },
+    is_hidden: {
+      type: 'boolean',
+      description: 'When true, hide this property in normal property editors.',
+    },
+    is_advanced: {
+      type: 'boolean',
+      description: 'When true, mark this as an advanced property.',
+    },
+    is_deprecated: {
+      type: 'boolean',
+      description: 'When true, mark this property deprecated.',
+    },
+    extra_info: {
+      type: 'string',
+      description:
+        'Optional type-specific metadata, such as behavior type constraints.',
+    },
+    choices: {
+      type: 'array',
+      description:
+        'Optional choice descriptors for Choice properties: [{ value, label }].',
+      items: {
+        type: 'object',
+        properties: {
+          value: { type: 'string' },
+          label: { type: 'string' },
+        },
+        additionalProperties: true,
+      },
+    },
     is_shared: {
       type: 'boolean',
       description:
@@ -3171,6 +3281,12 @@ const readTools: Array<McpTool> = [
     inputSchema: validateEventsJsonFileSchema,
   },
   {
+    name: 'gdevelop_validate_extension_events_json',
+    description:
+      'Validate extension function events without modifying the project. With events_json, validates a replacement payload on a temporary extension copy using the target function metadata/scope; without events_json, lints the existing function events.',
+    inputSchema: validateExtensionEventsJsonSchema,
+  },
+  {
     name: 'lint_scene_events',
     description:
       'Lint a scene event sheet for MCP authoring rules: mandatory semantic Groups at root, no JavaScript events unless explicitly allowed, likely multi-instance Create-without-ForEach, empty Group names, Group colors (flags Groups left at the default color and distinct Groups sharing the same color — each Group must have a distinct color), and scene timers compared with CompareTimer but never started with ResetTimer (always-false silent bug).',
@@ -3208,6 +3324,11 @@ const readTools: Array<McpTool> = [
           description:
             'When true, omit verbose per-parameter valueType discriminators and metadata flags; keep type, names, descriptions, parameter types, and literalSyntax hints. Greatly reduces response size.',
         },
+        target_scope: {
+          type: 'string',
+          description:
+            'Optional scope compatibility lens: scene, extension_function, behavior_function, object_function, or async_function. Results include eventScopes and targetScopeCompatibility so you can see whether a type is valid in that event sheet.',
+        },
       },
       required: ['query'],
       additionalProperties: false,
@@ -3233,6 +3354,11 @@ const readTools: Array<McpTool> = [
           type: 'boolean',
           description:
             'When true, return a trimmed result (no verbose valueType nesting), keeping parameter types and literalSyntax hints.',
+        },
+        target_scope: {
+          type: 'string',
+          description:
+            'Optional scope compatibility lens: scene, extension_function, behavior_function, object_function, or async_function. The result includes eventScopes and targetScopeCompatibility so you can see whether this exact type is valid in that event sheet.',
         },
       },
       required: ['type', 'kind'],
@@ -4842,6 +4968,73 @@ const toolUsageExamples: { [string]: Array<Object> } = {
       },
     },
   ],
+  gdevelop_validate_extension_events_json: [
+    {
+      description:
+        'Validate a replacement extension function event body without mutating the live extension.',
+      arguments: {
+        extension_name: 'GameplayLogic',
+        function_name: 'AddSun',
+        function_type: 'action',
+        sentence: 'Add sun to _PARAM1_',
+        parameters: [
+          {
+            name: 'SunCountVariable',
+            type: 'variable',
+          },
+        ],
+        events_json: [
+          {
+            type: 'BuiltinCommonInstructions::Standard',
+            variables: [{ name: 'LocalSunCount', type: 'number', value: 0 }],
+            conditions: [],
+            actions: [
+              {
+                type: { value: 'CopyArgumentToVariable2' },
+                parameters: ['"SunCountVariable"', 'LocalSunCount'],
+              },
+            ],
+          },
+        ],
+        summary_only: true,
+      },
+    },
+  ],
+  gdevelop_create_or_update_extension_property: [
+    {
+      description:
+        'Create a visible numeric instance property on an events-based behavior.',
+      arguments: {
+        extension_name: 'GameplayLogic',
+        target_kind: 'behavior',
+        target_name: 'PlantBehavior',
+        property_name: 'SunCost',
+        property_type: 'Number',
+        value: '50',
+        label: 'Sun cost',
+        description: 'Amount of sun deducted when this plant is placed.',
+        is_hidden: false,
+        is_advanced: false,
+        is_shared: false,
+      },
+    },
+    {
+      description: 'Create a Choice property with explicit selectable values.',
+      arguments: {
+        extension_name: 'GameplayLogic',
+        target_kind: 'object',
+        target_name: 'PlantCard',
+        property_name: 'PlantKind',
+        property_type: 'Choice',
+        value: 'Sunflower',
+        label: 'Plant kind',
+        choices: [
+          { value: 'Sunflower', label: 'Sunflower' },
+          { value: 'Peashooter', label: 'Peashooter' },
+        ],
+      },
+    },
+  ],
   gdevelop_create_or_update_extension_object: [
     {
       description:
@@ -5073,6 +5266,16 @@ const toolUsageExamples: { [string]: Array<Object> } = {
         inputs: [{ type: 'keyPressed', key: 'Space' }],
         frames: 5,
         instance_positions_for: ['Bullet'],
+      },
+    },
+    {
+      description:
+        'Click and hold on a shifted HUD/game layer long enough for IsCursorOnObject to see the press, then inspect cursor world coordinates per layer.',
+      arguments: {
+        inputs: [{ type: 'clickAndHold', x: 420, y: 180, button: 'left' }],
+        frames: 3,
+        include_cursor_world_coordinates: true,
+        cursor_layers: ['', 'HUD'],
       },
     },
   ],
@@ -5472,6 +5675,7 @@ export const getCapabilitiesSummary = (
       'find_scene_events',
       'find_extension_events',
       'find_project_events',
+      'gdevelop_validate_extension_events_json',
       'lint_extension_function_events',
       'inspect_object_properties',
       'list_available_behaviors',
@@ -5513,6 +5717,7 @@ export const getCapabilitiesSummary = (
       'replace_javascript_event_code',
       'attach_object_to_object_top',
       'validate_events_json_file',
+      'gdevelop_validate_extension_events_json',
       'lint_scene_events',
       'lint_extension_function_events',
       'inspect_gameplay_rules',

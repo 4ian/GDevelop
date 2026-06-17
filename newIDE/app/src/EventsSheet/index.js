@@ -1290,6 +1290,16 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     if (this._eventsTree) this._eventsTree.unfoldToLevel(level);
   };
 
+  _setGraphPreviewGroupEventsFolded = (
+    groupEvents: Array<gdBaseEvent>,
+    folded: boolean
+  ) => {
+    groupEvents.forEach(groupEvent => {
+      groupEvent.setFolded(folded);
+    });
+    if (this._eventsTree) this._eventsTree.forceEventsUpdate();
+  };
+
   _buildEventContextMenu = (i18n: I18nType): any => [
     {
       label: i18n._(t`Edit`),
@@ -3077,6 +3087,9 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                         }
                         selection={this.state.selection}
                         onSelectEvent={this._selectEventFromGraphPreview}
+                        onSetVisibleGroupEventsFolded={
+                          this._setGraphPreviewGroupEventsFolded
+                        }
                         width={graphPreviewWidth}
                       />
                     )}

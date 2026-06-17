@@ -503,10 +503,13 @@ namespace gdjs {
         } else if (data.command === 'runFrames') {
           this.runFrames(
             data.inputs,
+            data.postInputs,
             data.count,
             data.fakeElapsedTimeMs,
             data.messageId,
-            data.autoRelease
+            data.autoRelease,
+            data.includeCursorWorldCoordinates,
+            data.cursorLayers
           );
         } else if (data.command === 'setRuntimeState') {
           this.setRuntimeState(data.operations, data.messageId);
@@ -1137,10 +1140,13 @@ namespace gdjs {
      */
     runFrames(
       inputs: Array<any>,
+      postInputs: Array<any>,
       count: number,
       fakeElapsedTimeMs: number,
       messageId: number,
-      autoRelease?: boolean
+      autoRelease?: boolean,
+      includeCursorWorldCoordinates?: boolean,
+      cursorLayers?: Array<string>
     ): void {
       const applied: Array<string> = [];
       let error: string | null = null;
@@ -1169,6 +1175,12 @@ namespace gdjs {
             break;
           }
         }
+        // Apply release/post inputs after the stepped frames. This lets
+        // run_frames expose clickAndHold semantics: press before stepping, let
+        // game events observe the held button, then release in the same call.
+        (postInputs || []).forEach((input) => {
+          this._applySimulatedInput(input, applied);
+        });
         // 4. Optionally release all held keys, so a held key from this call does
         // NOT silently carry over and keep driving the player on later calls
         // (a counter-intuitive footgun). Default behavior keeps keys held.
@@ -1195,6 +1207,9 @@ namespace gdjs {
           stoppedEarly,
           paused: this._runtimegame.isPaused(),
           heldKeys: this._getHeldKeyCodes(),
+          cursorWorldCoordinates: includeCursorWorldCoordinates
+            ? this._getCursorWorldCoordinates(cursorLayers)
+            : undefined,
           error,
         },
       });
@@ -1222,6 +1237,83 @@ namespace gdjs {
         // ignore
       }
       return held;
+    }
+
+    private _getCursorWorldCoordinates(cursorLayers?: Array<string>): Object {
+      const payload: any = {
+        sceneName: null,
+        canvasX: 0,
+        canvasY: 0,
+        layers: [],
+        error: null,
+      };
+      try {
+        const inputManager: any = this._runtimegame.getInputManager();
+        payload.canvasX = inputManager.getCursorX
+          ? inputManager.getCursorX()
+          : 0;
+        payload.canvasY = inputManager.getCursorY
+          ? inputManager.getCursorY()
+          : 0;
+
+        const scene = this._runtimegame.getSceneStack().getCurrentScene();
+        if (!scene) {
+          payload.error = 'No current scene.';
+          return payload;
+        }
+        payload.sceneName = scene.getName();
+
+        const layerNames =
+          cursorLayers && cursorLayers.length ? cursorLayers.slice(0, 50) : [];
+        if (!layerNames.length) {
+          scene.getAllLayerNames(layerNames);
+        }
+
+        layerNames.forEach((layerName) => {
+          const exists = scene.hasLayer(layerName);
+          if (!exists) {
+            payload.layers.push({
+              layerName,
+              exists,
+              error: 'Layer does not exist.',
+            });
+            return;
+          }
+          const layer = scene.getLayer(layerName);
+          const point = layer.convertCoords(
+            payload.canvasX,
+            payload.canvasY,
+            0,
+            [0, 0]
+          );
+          payload.layers.push({
+            layerName,
+            exists,
+            worldX: point[0],
+            worldY: point[1],
+            cameraX:
+              typeof layer.getCameraX === 'function'
+                ? layer.getCameraX(0)
+                : undefined,
+            cameraY:
+              typeof layer.getCameraY === 'function'
+                ? layer.getCameraY(0)
+                : undefined,
+            cameraZoom:
+              typeof layer.getCameraZoom === 'function'
+                ? layer.getCameraZoom(0)
+                : undefined,
+            cameraRotation:
+              typeof layer.getCameraRotation === 'function'
+                ? layer.getCameraRotation(0)
+                : undefined,
+          });
+        });
+      } catch (e) {
+        payload.error =
+          (e as Error).message || 'Failed to read cursor coordinates.';
+      }
+      return payload;
     }
 
     /**

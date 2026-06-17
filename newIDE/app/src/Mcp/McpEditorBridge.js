@@ -49,6 +49,7 @@ import {
   listProjectExtensions,
   lintExtensionFunctionEvents,
   patchExtensionEventInstruction,
+  validateExtensionEventsJson,
 } from './McpExtensionTools';
 import {
   addOrUpdateResource,
@@ -1411,6 +1412,45 @@ const resolveSimulatedInput = (raw: any): Object => {
   return { ok: false, error: `Unknown input type: "${type}".` };
 };
 
+const expandRunFramesInput = (raw: any): Object => {
+  const type =
+    raw && typeof raw.type === 'string' ? raw.type.trim() : '';
+  if (
+    type === 'clickAndHold' ||
+    type === 'mouseClickAndHold' ||
+    type === 'click_and_hold'
+  ) {
+    const preInputs: Array<Object> = [];
+    const postInputs: Array<Object> = [];
+    if (typeof raw.x === 'number' && typeof raw.y === 'number') {
+      preInputs.push({ type: 'mouseMove', x: raw.x, y: raw.y });
+    }
+    const button =
+      typeof raw.button === 'number'
+        ? raw.button
+        : typeof raw.button === 'string'
+        ? MOUSE_BUTTON_NAME_TO_CODE[raw.button.toLowerCase()]
+        : 0;
+    preInputs.push({ type: 'mouseButtonPressed', button: button || 0 });
+    postInputs.push({ type: 'mouseButtonReleased', button: button || 0 });
+    return {
+      ok: true,
+      preInputs,
+      postInputs,
+      frames:
+        typeof raw.frames === 'number'
+          ? raw.frames
+          : typeof raw.hold_frames === 'number'
+          ? raw.hold_frames
+          : undefined,
+    };
+  }
+
+  const resolved = resolveSimulatedInput(raw);
+  if (!resolved.ok) return resolved;
+  return { ok: true, preInputs: [resolved.input], postInputs: [] };
+};
+
 // Inject simulated input into a running preview. Sends a 'simulateInput' command
 // (request/response) and returns what was applied.
 const simulatePreviewInput = async (
@@ -1499,18 +1539,26 @@ const runPreviewFrames = async (
 
   // Inputs are optional — runFrames with no inputs just advances the sim.
   const rawInputs = Array.isArray(args && args.inputs) ? args.inputs : [];
-  const resolved = [];
+  const resolved: Array<Object> = [];
+  const postResolved: Array<Object> = [];
+  let suggestedFrames: ?number;
   for (const raw of rawInputs) {
-    const result = resolveSimulatedInput(raw);
+    const result = expandRunFramesInput(raw);
     if (!result.ok) {
       return { success: false, running: true, error: result.error };
     }
-    resolved.push(result.input);
+    resolved.push(...(result.preInputs || []));
+    postResolved.push(...(result.postInputs || []));
+    if (typeof result.frames === 'number' && suggestedFrames === undefined) {
+      suggestedFrames = result.frames;
+    }
   }
 
   const frames =
     args && typeof args.frames === 'number'
       ? Math.max(1, Math.min(2000, Math.floor(args.frames)))
+      : typeof suggestedFrames === 'number'
+      ? Math.max(1, Math.min(2000, Math.floor(suggestedFrames)))
       : 1;
   const frameDeltaMs =
     args && typeof args.frame_delta_ms === 'number'
@@ -1555,9 +1603,16 @@ const runPreviewFrames = async (
     {
       command: 'runFrames',
       inputs: resolved,
+      postInputs: postResolved,
       count: frames,
       fakeElapsedTimeMs: frameDeltaMs,
       autoRelease,
+      includeCursorWorldCoordinates: !!(
+        args && args.include_cursor_world_coordinates
+      ),
+      cursorLayers: Array.isArray(args && args.cursor_layers)
+        ? args.cursor_layers.map(String)
+        : undefined,
     },
     { timeoutMs, returnFullMessage: true }
   );
@@ -1597,6 +1652,7 @@ const runPreviewFrames = async (
     // carries over to subsequent run_frames and keeps driving the game — pass
     // auto_release:true, or send a keyReleased, to clear it.
     heldKeys,
+    cursorWorldCoordinates: runMeta.cursorWorldCoordinates || undefined,
     error: runMeta.error || undefined,
     runtime: summarizeRuntimeGameDump(dumpPayload, {
       positionObjectNames: Array.isArray(args && args.instance_positions_for)
@@ -3372,6 +3428,11 @@ const callMcpTool = async ({
     );
   }
 
+  if (toolName === 'gdevelop_validate_extension_events_json') {
+    if (!project) return errorResult('No project opened.');
+    return textResult(validateExtensionEventsJson(project, args || {}));
+  }
+
   if (toolName === 'validate_events_json_file') {
     if (!project) return errorResult('No project opened.');
     return textResult(
@@ -3400,6 +3461,10 @@ const callMcpTool = async ({
         kind: args && typeof args.kind === 'string' ? args.kind : null,
         limit: args && typeof args.limit === 'number' ? args.limit : null,
         compact: !!(args && args.compact),
+        targetScope:
+          args && typeof args.target_scope === 'string'
+            ? args.target_scope
+            : null,
       })
     );
   }
@@ -3413,6 +3478,10 @@ const callMcpTool = async ({
         type: args && typeof args.type === 'string' ? args.type : null,
         kind: args && typeof args.kind === 'string' ? args.kind : null,
         compact: !!(args && args.compact),
+        targetScope:
+          args && typeof args.target_scope === 'string'
+            ? args.target_scope
+            : null,
       })
     );
   }

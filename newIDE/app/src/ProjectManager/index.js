@@ -10,6 +10,8 @@ import CompactSearchBar, {
 } from '../UI/CompactSearchBar';
 import GlobalVariablesDialog from '../VariablesList/GlobalVariablesDialog';
 import ProjectPropertiesDialog from './ProjectPropertiesDialog';
+import ProjectItemUsageDialog from './ProjectItemUsageDialog';
+import { type ProjectItemUsageTarget } from './ProjectItemUsageFinder';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import ExtensionsSearchDialog from '../AssetStore/ExtensionStore/ExtensionsSearchDialog';
 import ScenePropertiesDialog from '../SceneEditor/ScenePropertiesDialog';
@@ -573,6 +575,13 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
     );
 
     const [searchText, setSearchText] = React.useState('');
+    const [
+      usageTarget,
+      setUsageTarget,
+    ] = React.useState<?ProjectItemUsageTarget>(null);
+    const onFindUsage = React.useCallback((target: ProjectItemUsageTarget) => {
+      setUsageTarget(target);
+    }, []);
 
     const scrollToItem = React.useCallback((itemId: string) => {
       if (treeViewRef.current) {
@@ -1058,6 +1067,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
               onDeletedEventsBasedObjectVariant,
               onEventsBasedObjectChildrenEdited,
               onEventBasedObjectTypeChanged,
+              onFindUsage,
             }
           : null,
       [
@@ -1078,6 +1088,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         onDeletedEventsBasedObjectVariant,
         onEventsBasedObjectChildrenEdited,
         onEventBasedObjectTypeChanged,
+        onFindUsage,
       ]
     );
 
@@ -1086,9 +1097,10 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         project
           ? {
               onOpenEventsFunctionsExtension,
+              onFindUsage,
             }
           : null,
-      [project, onOpenEventsFunctionsExtension]
+      [project, onOpenEventsFunctionsExtension, onFindUsage]
     );
 
     const functionShortcutTreeViewItemProps = React.useMemo<?FunctionShortcutTreeViewItemProps>(
@@ -1096,9 +1108,10 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         project
           ? {
               onOpenEventsFunctionsExtension,
+              onFindUsage,
             }
           : null,
-      [project, onOpenEventsFunctionsExtension]
+      [project, onOpenEventsFunctionsExtension, onFindUsage]
     );
 
     const externalEventsTreeViewItemProps = React.useMemo<?ExternalEventsTreeViewItemProps>(
@@ -1118,6 +1131,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
               onDeleteExternalEvents,
               onRenameExternalEvents,
               onOpenExternalEvents,
+              onFindUsage,
             }
           : null,
       [
@@ -1134,6 +1148,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         onDeleteExternalEvents,
         onRenameExternalEvents,
         onOpenExternalEvents,
+        onFindUsage,
       ]
     );
 
@@ -1155,6 +1170,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
               onDeleteExternalLayout,
               onRenameExternalLayout,
               onOpenExternalLayout,
+              onFindUsage,
             }
           : null,
       [
@@ -1172,6 +1188,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         onDeleteExternalLayout,
         onRenameExternalLayout,
         onOpenExternalLayout,
+        onFindUsage,
       ]
     );
 
@@ -1447,40 +1464,6 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
               {
                 isRoot: true,
                 content: new LabelTreeViewItemContent(
-                  extensionsRootFolderId,
-                  i18n._(t`Extensions`),
-                  {
-                    icon: <Add />,
-                    label: i18n._(t`Create or search for new extensions`),
-                    click: openSearchExtensionDialog,
-                    id: 'project-manager-extension-search-or-create',
-                  }
-                ),
-                getChildren(i18n: I18nType): ?Array<TreeViewItem> {
-                  if (project.getEventsFunctionsExtensionsCount() === 0) {
-                    return [
-                      new PlaceHolderTreeViewItem(
-                        extensionsEmptyPlaceholderId,
-                        i18n._(t`Start by adding a new function.`)
-                      ),
-                    ];
-                  }
-                  return mapFor(
-                    0,
-                    project.getEventsFunctionsExtensionsCount(),
-                    i =>
-                      new LeafTreeViewItem(
-                        new ExtensionTreeViewItemContent(
-                          project.getEventsFunctionsExtensionAt(i),
-                          extensionTreeViewItemProps
-                        )
-                      )
-                  );
-                },
-              },
-              {
-                isRoot: true,
-                content: new LabelTreeViewItemContent(
                   externalEventsRootFolderId,
                   i18n._(t`External events`),
                   {
@@ -1549,6 +1532,40 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                         new ExternalLayoutTreeViewItemContent(
                           project.getExternalLayoutAt(i),
                           externalLayoutTreeViewItemProps
+                        )
+                      )
+                  );
+                },
+              },
+              {
+                isRoot: true,
+                content: new LabelTreeViewItemContent(
+                  extensionsRootFolderId,
+                  i18n._(t`Extensions`),
+                  {
+                    icon: <Add />,
+                    label: i18n._(t`Create or search for new extensions`),
+                    click: openSearchExtensionDialog,
+                    id: 'project-manager-extension-search-or-create',
+                  }
+                ),
+                getChildren(i18n: I18nType): ?Array<TreeViewItem> {
+                  if (project.getEventsFunctionsExtensionsCount() === 0) {
+                    return [
+                      new PlaceHolderTreeViewItem(
+                        extensionsEmptyPlaceholderId,
+                        i18n._(t`Start by adding a new function.`)
+                      ),
+                    ];
+                  }
+                  return mapFor(
+                    0,
+                    project.getEventsFunctionsExtensionsCount(),
+                    i =>
+                      new LeafTreeViewItem(
+                        new ExtensionTreeViewItemContent(
+                          project.getEventsFunctionsExtensionAt(i),
+                          extensionTreeViewItemProps
                         )
                       )
                   );
@@ -1637,9 +1654,9 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
           customObjectsRootFolderId,
           behaviorsRootFolderId,
           functionsRootFolderId,
-          extensionsRootFolderId,
           externalEventsRootFolderId,
           externalLayoutsRootFolderId,
+          extensionsRootFolderId,
         ];
 
         if (!project) return nodeIds;
@@ -1820,6 +1837,13 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                     <EmptyMessage>
                       <Trans>To begin, open or create a new project.</Trans>
                     </EmptyMessage>
+                  )}
+                  {project && usageTarget && (
+                    <ProjectItemUsageDialog
+                      project={project}
+                      target={usageTarget}
+                      onClose={() => setUsageTarget(null)}
+                    />
                   )}
                   {projectPropertiesDialogOpen &&
                     project &&

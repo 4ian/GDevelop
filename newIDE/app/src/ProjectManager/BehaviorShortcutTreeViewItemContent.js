@@ -8,6 +8,7 @@ import { type TreeViewItemContent, behaviorsRootFolderId } from './index';
 import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
 import { type MenuButton } from '../UI/TreeView';
 import { type HTMLDataset } from '../Utils/HTMLDataset';
+import { type ProjectItemUsageTarget } from './ProjectItemUsageFinder';
 
 export type BehaviorShortcutTreeViewItemCallbacks = {|
   onOpenEventsFunctionsExtension: (
@@ -18,8 +19,13 @@ export type BehaviorShortcutTreeViewItemCallbacks = {|
   ) => void,
 |};
 
+type ProjectItemUsageCallbacks = {|
+  onFindUsage: ProjectItemUsageTarget => void,
+|};
+
 export type BehaviorShortcutTreeViewItemProps = {|
   ...BehaviorShortcutTreeViewItemCallbacks,
+  ...ProjectItemUsageCallbacks,
 |};
 
 export const getBehaviorShortcutTreeViewItemId = (
@@ -92,6 +98,15 @@ export class BehaviorShortcutTreeViewItemContent
       {
         label: i18n._(t`Open behavior`),
         click: () => this.onClick(),
+      },
+      {
+        label: i18n._(t`Find usage`),
+        click: () =>
+          this.props.onFindUsage({
+            kind: 'events-based-behavior',
+            eventsFunctionsExtension: this.eventsFunctionsExtension,
+            eventsBasedBehavior: this.eventsBasedBehavior,
+          }),
       },
     ];
   }

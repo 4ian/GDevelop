@@ -553,8 +553,8 @@ export default (React.forwardRef<Props, VariableFieldInterface>(
             ? ['edit-properties']
             : ['edit-variables']
           : fieldCurrentValue
-          ? ['add-variable', 'add-parameter', 'add-property']
-          : ['edit-or-add-variables'];
+          ? ['add-parameter', 'add-property', 'add-variable']
+          : ['edit-or-add-properties', 'edit-or-add-variables'];
 
         return optionIds.includes(id);
       },
@@ -587,34 +587,6 @@ export default (React.forwardRef<Props, VariableFieldInterface>(
                   // $FlowFixMe[incompatible-type]
                   dataSource={[
                     ...autocompletionVariableNames,
-                    ...(openVariableEditorDialog
-                      ? [
-                          {
-                            id: 'edit-variables',
-                            translatableValue: t`Edit variables...`,
-                            text: '',
-                            value: '',
-                            renderIcon: () => <Add />,
-                            onClick: openVariableEditor,
-                          },
-                          {
-                            id: 'add-variable',
-                            translatableValue: t`Add variable...`,
-                            text: '',
-                            value: '',
-                            renderIcon: () => <Add />,
-                            onClick: openVariableEditor,
-                          },
-                          {
-                            id: 'edit-or-add-variables',
-                            translatableValue: t`Edit or add variables...`,
-                            text: '',
-                            value: '',
-                            renderIcon: () => <Add />,
-                            onClick: openVariableEditor,
-                          },
-                        ]
-                      : []),
                     ...(editEventsFunctionParameter
                       ? [
                           {
@@ -652,6 +624,42 @@ export default (React.forwardRef<Props, VariableFieldInterface>(
                             value: '',
                             renderIcon: () => <Add />,
                             onClick: openPropertyEditor,
+                          },
+                          {
+                            id: 'edit-or-add-properties',
+                            translatableValue: t`Edit or add properties...`,
+                            text: '',
+                            value: '',
+                            renderIcon: () => <Add />,
+                            onClick: openPropertyEditor,
+                          },
+                        ]
+                      : []),
+                    ...(openVariableEditorDialog
+                      ? [
+                          {
+                            id: 'edit-variables',
+                            translatableValue: t`Edit variables...`,
+                            text: '',
+                            value: '',
+                            renderIcon: () => <Add />,
+                            onClick: openVariableEditor,
+                          },
+                          {
+                            id: 'add-variable',
+                            translatableValue: t`Add variable...`,
+                            text: '',
+                            value: '',
+                            renderIcon: () => <Add />,
+                            onClick: openVariableEditor,
+                          },
+                          {
+                            id: 'edit-or-add-variables',
+                            translatableValue: t`Edit or add variables...`,
+                            text: '',
+                            value: '',
+                            renderIcon: () => <Add />,
+                            onClick: openVariableEditor,
                           },
                         ]
                       : []),

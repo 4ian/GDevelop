@@ -212,6 +212,9 @@ export const EventsBasedBehaviorOrObjectPropertiesEditor: React.ComponentType<{
   ) => {
     const forceUpdate = useForceUpdate();
     const propertyRefs = React.useRef(new Map<string, React.ElementRef<any>>());
+    const propertyNameFieldRefs = React.useRef(
+      new Map<string, CompactTextFieldInterface | null>()
+    );
     React.useImperativeHandle(ref, () => ({
       forceUpdate,
       getPropertyEditorRef: (propertyName: string) =>
@@ -226,9 +229,6 @@ export const EventsBasedBehaviorOrObjectPropertiesEditor: React.ComponentType<{
         }
       },
     }));
-    const propertyNameFieldRefs = React.useRef(
-      new Map<string, CompactTextFieldInterface | null>()
-    );
 
     const [newBehaviorDialogOpen, setNewBehaviorDialogOpen] = React.useState<{
       behaviorProperty: gdNamedPropertyDescriptor,
@@ -247,7 +247,6 @@ export const EventsBasedBehaviorOrObjectPropertiesEditor: React.ComponentType<{
         property.setType('Number');
         forceUpdate();
         onPropertiesUpdated();
-        //setJustAddedPropertyName(newName);
       },
       [forceUpdate, onPropertiesUpdated, properties]
     );

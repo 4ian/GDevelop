@@ -8,6 +8,7 @@ import * as React from 'react';
 import EventsSheet, { type EventsSheetInterface } from '../EventsSheet';
 import EditorMosaic, {
   type EditorMosaicInterface,
+  type EditorMosaicNode,
   mosaicContainsNode,
 } from '../UI/EditorMosaic';
 import { type Editor } from '../UI/EditorMosaic';
@@ -132,7 +133,7 @@ const extensionEditIconReactNode = <ExtensionEditIcon />;
 
 // The event based object editor is hidden in releases
 // because it's not handled by GDJS.
-const getInitialMosaicEditorNodes = () => ({
+const getInitialMosaicEditorNodes = (): EditorMosaicNode => ({
   direction: 'row',
   first: 'functions-list',
   second: {
@@ -1510,7 +1511,6 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                         this.eventsFunctionList.forceUpdateList();
                       }
                     }}
-                    initiallySelectedProperty={null}
                   />
                 ) : (
                   <EmptyMessage>
@@ -1862,16 +1862,13 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                       mosaicContainsNode(
                         getDefaultEditorMosaicNode(
                           'events-functions-extension-editor'
-                          // $FlowFixMe[incompatible-type]
                         ) || getInitialMosaicEditorNodes(),
                         'functions-list'
                       )
                         ? getDefaultEditorMosaicNode(
                             'events-functions-extension-editor'
-                            // $FlowFixMe[incompatible-type]
                           ) || getInitialMosaicEditorNodes()
                         : // Force the mosaic to reset to default.
-                          // $FlowFixMe[incompatible-type]
                           getInitialMosaicEditorNodes()
                     }
                   />

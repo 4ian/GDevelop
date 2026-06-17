@@ -152,20 +152,26 @@ export default function EventsBasedBehaviorOrObjectEditorDialog({
             : initiallySelectedProperty.variableType;
         addProperty(initiallySelectedProperty.variableName, propertyType);
       } else {
-        const currentPropertyEditor = propertyEditor.current;
-        if (currentPropertyEditor) {
-          currentPropertyEditor.scrollToProperty(
-            initiallySelectedProperty.variableName,
-            false
-          );
-        }
-        const currentPropertyList = propertyList.current;
-        if (currentPropertyList) {
-          currentPropertyList.setSelectedProperty(
-            initiallySelectedProperty.variableName,
-            false
-          );
-        }
+        // Scroll to the selected property.
+        // Ideally, we'd wait for the list to be updated to scroll, but
+        // to simplify the code, we just wait a few ms for a new render
+        // to be done.
+        setTimeout(() => {
+          const currentPropertyEditor = propertyEditor.current;
+          if (currentPropertyEditor) {
+            currentPropertyEditor.scrollToProperty(
+              initiallySelectedProperty.variableName,
+              false
+            );
+          }
+          const currentPropertyList = propertyList.current;
+          if (currentPropertyList) {
+            currentPropertyList.setSelectedProperty(
+              initiallySelectedProperty.variableName,
+              false
+            );
+          }
+        }, 100); // A few ms is enough for a new render to be done.
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -209,7 +215,6 @@ export default function EventsBasedBehaviorOrObjectEditorDialog({
             }
           }}
           onEventsFunctionsAdded={onEventsFunctionsAdded}
-          initiallySelectedProperty={initiallySelectedProperty}
         />
       ),
     },

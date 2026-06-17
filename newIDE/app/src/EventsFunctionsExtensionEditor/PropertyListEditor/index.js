@@ -53,7 +53,6 @@ import {
   getFoldersAscendanceWithoutRootFolder,
   enumerateFoldersInContainer,
 } from './EnumeratePropertyFolderOrProperty';
-import { type VariableDialogOpeningProps } from '../../VariablesList/VariablesEditorDialog';
 
 const configurationItemId = 'events-based-entity-configuration';
 export const propertiesRootFolderId = 'properties';
@@ -505,7 +504,6 @@ type Props = {|
   onOpenConfiguration: () => void,
   onOpenProperty: (name: string, isSharedProperties: boolean) => void,
   onEventsFunctionsAdded: () => void,
-  initiallySelectedProperty: VariableDialogOpeningProps | null,
 |};
 
 const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
@@ -521,7 +519,6 @@ const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
       onOpenConfiguration,
       onOpenProperty,
       onEventsFunctionsAdded,
-      initiallySelectedProperty,
     },
     ref
   ) => {
@@ -603,13 +600,11 @@ const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
         properties: gdPropertiesContainer,
         isSharedProperties: boolean,
         parentFolder: gdPropertyFolderOrProperty,
-        index: number,
-        name?: string,
-        type?: string | null
+        index: number
       ) => {
         if (!properties) return;
 
-        const newName = newNameGenerator(name || 'Property', name =>
+        const newName = newNameGenerator('Property', name =>
           properties.has(name)
         );
         const property = properties.insertNewPropertyInFolder(
@@ -617,7 +612,7 @@ const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
           parentFolder,
           index
         );
-        property.setType(type || 'Number');
+        property.setType('Number');
 
         onPropertiesUpdated();
 

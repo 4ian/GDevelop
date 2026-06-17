@@ -24,6 +24,7 @@ import { ColumnStackLayout, LineStackLayout } from '../../UI/Layout';
 import { IconContainer } from '../../UI/IconContainer';
 import RemoveIcon from '../../UI/CustomSvgIcons/Remove';
 import useForceUpdate from '../../Utils/UseForceUpdate';
+import { useDebounce } from '../../Utils/UseDebounce';
 import ChevronArrowRight from '../../UI/CustomSvgIcons/ChevronArrowRight';
 import ChevronArrowBottom from '../../UI/CustomSvgIcons/ChevronArrowBottom';
 import ChevronArrowDownWithRoundedBorder from '../../UI/CustomSvgIcons/ChevronArrowDownWithRoundedBorder';
@@ -321,6 +322,11 @@ export const CompactObjectPropertiesEditor = ({
   isBehaviorListLocked,
 }: Props): React.Node => {
   const forceUpdate = useForceUpdate();
+  // Debounced to avoid one hot reload per keystroke on fields.
+  const debouncedNotifyBehaviorUpdated = useDebounce(
+    (objectToNotify: gdObject) => onObjectsModified([objectToNotify]),
+    250
+  );
   const [isPropertiesFolded, setIsPropertiesFolded] = React.useState(false);
   const [isBehaviorsFolded, setIsBehaviorsFolded] = React.useState(false);
   const [isVariablesFolded, setIsVariablesFolded] = React.useState(false);
@@ -849,8 +855,10 @@ export const CompactObjectPropertiesEditor = ({
                           behaviorOverriding={null}
                           initialInstance={null}
                           object={object}
+                          onBehaviorUpdated={() =>
+                            debouncedNotifyBehaviorUpdated(object)
+                          }
                           layersContainer={layersContainer}
-                          onBehaviorUpdated={() => {}}
                           resourceManagementProps={resourceManagementProps}
                           onOpenFullEditor={() =>
                             onEditObject(object, 'behaviors')

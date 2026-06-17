@@ -55,6 +55,9 @@ namespace gdjs {
     _debugDrawShowHiddenInstances: boolean = false;
     _debugDrawShowPointsNames: boolean = false;
     _debugDrawShowCustomPoints: boolean = false;
+    _debugDraw3DEnabled: boolean = false;
+    _debugDraw3DColorHex: integer = 0x00ff00;
+    _debugDraw3DDepthTest: boolean = true;
 
     _onceTriggers: OnceTriggers;
 
@@ -246,6 +249,32 @@ namespace gdjs {
       this._debugDrawShowHiddenInstances = showHiddenInstances;
       this._debugDrawShowPointsNames = showPointsNames;
       this._debugDrawShowCustomPoints = showCustomPoints;
+    }
+
+    /**
+     * Activate or deactivate the 3D debug visualization for collision shapes
+     * of objects using the built-in 3D physics behavior.
+     */
+    enableDebugDraw3D(
+      enableDebugDraw: boolean,
+      colorHex: integer,
+      depthTest: boolean
+    ): void {
+      const settingsChanged =
+        this._debugDraw3DColorHex !== colorHex ||
+        this._debugDraw3DDepthTest !== depthTest;
+      if (
+        this._debugDraw3DEnabled &&
+        (!enableDebugDraw || settingsChanged)
+      ) {
+        this.getDebuggerRenderer().clearDebugDraw3D(
+          this.getAdhocListOfAllInstances()
+        );
+      }
+
+      this._debugDraw3DEnabled = enableDebugDraw;
+      this._debugDraw3DColorHex = colorHex;
+      this._debugDraw3DDepthTest = depthTest;
     }
 
     /**

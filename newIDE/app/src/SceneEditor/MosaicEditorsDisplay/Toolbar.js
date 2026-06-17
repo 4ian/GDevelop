@@ -2,6 +2,7 @@
 import { t, Trans } from '@lingui/macro';
 import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
+import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
 import { ToolbarGroup } from '../../UI/Toolbar';
 import ToolbarSeparator from '../../UI/ToolbarSeparator';
 import IconButton from '../../UI/IconButton';
@@ -12,11 +13,15 @@ import ShowAllPanelsIcon from '../../UI/CustomSvgIcons/ShowAllPanels';
 import GridIcon from '../../UI/CustomSvgIcons/Grid';
 import ZoomInIcon from '../../UI/CustomSvgIcons/ZoomIn';
 import EditSceneIcon from '../../UI/CustomSvgIcons/EditScene';
+import EventsIcon from '../../UI/CustomSvgIcons/Events';
 import { TOGGLE_ALL_PANELS_BUTTON_ID } from '../utils';
 import CompactToggleButtons from '../../UI/CompactToggleButtons';
 import Grid2d from '../../UI/CustomSvgIcons/Grid2d';
 import Grid3d from '../../UI/CustomSvgIcons/Grid3d';
-import { getShortcutDisplayName, useShortcutMap } from '../../KeyboardShortcuts';
+import {
+  getShortcutDisplayName,
+  useShortcutMap,
+} from '../../KeyboardShortcuts';
 
 type Props = {|
   gameEditorMode: 'embedded-game' | 'instances-editor',
@@ -41,6 +46,8 @@ type Props = {|
   openSetupGrid: () => void,
   getContextMenuZoomItems: I18nType => Array<MenuItemTemplate>,
   setZoomFactor: number => void,
+  onOpenEvents?: ?() => void,
+  openEventsTooltip?: MessageDescriptor,
   onOpenSettings?: ?() => void,
   settingsIcon?: React.Node,
   onOpenSceneVariables: () => void,
@@ -168,7 +175,18 @@ const Toolbar: React.ComponentType<Props> = React.memo<Props>(function Toolbar(
             { label: '400%', click: () => props.setZoomFactor(4.0) },
           ]}
         />
-        {props.onOpenSettings && <ToolbarSeparator />}
+        {(props.onOpenEvents || props.onOpenSettings) && <ToolbarSeparator />}
+        {props.onOpenEvents && (
+          <IconButton
+            size="small"
+            color="default"
+            onClick={props.onOpenEvents}
+            tooltip={props.openEventsTooltip || t`Open scene events`}
+            id="toolbar-open-scene-events-button"
+          >
+            <EventsIcon />
+          </IconButton>
+        )}
         {props.onOpenSettings && (
           <IconButton
             size="small"

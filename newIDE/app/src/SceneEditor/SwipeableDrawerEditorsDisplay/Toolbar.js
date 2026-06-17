@@ -2,6 +2,7 @@
 import { t, Trans } from '@lingui/macro';
 import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
+import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
 import { ToolbarGroup } from '../../UI/Toolbar';
 import ToolbarSeparator from '../../UI/ToolbarSeparator';
 import IconButton from '../../UI/IconButton';
@@ -13,6 +14,7 @@ import RedoIcon from '../../UI/CustomSvgIcons/Redo';
 import GridIcon from '../../UI/CustomSvgIcons/Grid';
 import ZoomInIcon from '../../UI/CustomSvgIcons/ZoomIn';
 import EditSceneIcon from '../../UI/CustomSvgIcons/EditScene';
+import EventsIcon from '../../UI/CustomSvgIcons/Events';
 import CompactToggleButtons from '../../UI/CompactToggleButtons';
 import Grid2d from '../../UI/CustomSvgIcons/Grid2d';
 import Grid3d from '../../UI/CustomSvgIcons/Grid3d';
@@ -39,6 +41,8 @@ type Props = {|
   openSetupGrid: () => void,
   getContextMenuZoomItems: I18nType => Array<MenuItemTemplate>,
   setZoomFactor: number => void,
+  onOpenEvents?: ?() => void,
+  openEventsTooltip?: MessageDescriptor,
   onOpenSettings: () => void,
   settingsIcon: React.Node,
   onOpenSceneVariables: () => void,
@@ -164,7 +168,18 @@ const Toolbar: React.ComponentType<Props> = React.memo<Props>(function(props) {
             },
           ]}
         />
-        <ToolbarSeparator />
+        {(props.onOpenEvents || props.onOpenSettings) && <ToolbarSeparator />}
+        {props.onOpenEvents && (
+          <IconButton
+            size="small"
+            color="default"
+            onClick={props.onOpenEvents}
+            tooltip={props.openEventsTooltip || t`Open scene events`}
+            id="toolbar-open-scene-events-button"
+          >
+            <EventsIcon />
+          </IconButton>
+        )}
         <IconButton
           size="small"
           color="default"

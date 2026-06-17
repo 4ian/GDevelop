@@ -69,6 +69,8 @@ import {
 } from './ExternalLayoutTreeViewItemContent';
 import {
   CustomObjectTreeViewItemContent,
+  CustomObjectVariantTreeViewItemContent,
+  getCustomObjectTreeViewItemId,
   type CustomObjectTreeViewItemProps,
   type CustomObjectTreeViewItemCallbacks,
 } from './CustomObjectTreeViewItemContent';
@@ -199,6 +201,7 @@ export type TreeItemProps = {|
   project: gdProject,
   editName: (itemId: string) => void,
   scrollToItem: (itemId: string) => void,
+  openItems: (itemIds: Array<string>) => void,
   showDeleteConfirmation: (
     options: ShowConfirmDeleteDialogOptions
   ) => Promise<boolean>,
@@ -213,6 +216,20 @@ class LeafTreeViewItem implements TreeViewItem {
 
   getChildren(i18n: I18nType): ?Array<TreeViewItem> {
     return null;
+  }
+}
+
+class TreeViewItemWithChildren implements TreeViewItem {
+  content: TreeViewItemContent;
+  children: Array<TreeViewItem>;
+
+  constructor(content: TreeViewItemContent, children: Array<TreeViewItem>) {
+    this.content = content;
+    this.children = children;
+  }
+
+  getChildren(i18n: I18nType): ?Array<TreeViewItem> {
+    return this.children;
   }
 }
 
@@ -505,6 +522,12 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       onOpenExternalLayout,
       onOpenEventsFunctionsExtension,
       onOpenCustomObjectEditor,
+      onRenamedEventsBasedObject,
+      onDeletedEventsBasedObject,
+      onRenamedEventsBasedObjectVariant,
+      onDeletedEventsBasedObjectVariant,
+      onEventsBasedObjectChildrenEdited,
+      onEventBasedObjectTypeChanged,
       onOpenResources,
       onReloadEventsFunctionsExtensions,
       isOpen,
@@ -554,6 +577,11 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
     const scrollToItem = React.useCallback((itemId: string) => {
       if (treeViewRef.current) {
         treeViewRef.current.scrollToItemFromId(itemId);
+      }
+    }, []);
+    const openItems = React.useCallback((itemIds: Array<string>) => {
+      if (treeViewRef.current) {
+        treeViewRef.current.openItems(itemIds);
       }
     }, []);
 
@@ -940,6 +968,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
               showDeleteConfirmation,
               editName,
               scrollToItem,
+              openItems,
               onSceneAdded,
               onDeleteLayout,
               onRenameLayout,
@@ -958,6 +987,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         showDeleteConfirmation,
         editName,
         scrollToItem,
+        openItems,
         onSceneAdded,
         onDeleteLayout,
         onRenameLayout,
@@ -980,6 +1010,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
               showDeleteConfirmation,
               editName,
               scrollToItem,
+              openItems,
               onDeleteEventsFunctionsExtension,
               onRenameEventsFunctionsExtension,
               onOpenEventsFunctionsExtension,
@@ -997,6 +1028,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         showDeleteConfirmation,
         editName,
         scrollToItem,
+        openItems,
         onDeleteEventsFunctionsExtension,
         onRenameEventsFunctionsExtension,
         onOpenEventsFunctionsExtension,
@@ -1009,10 +1041,44 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       () =>
         project
           ? {
+              project,
+              unsavedChanges,
+              preferences,
+              gdevelopTheme,
+              forceUpdate,
+              forceUpdateList,
+              showDeleteConfirmation,
+              editName,
+              scrollToItem,
+              openItems,
               onOpenCustomObjectEditor,
+              onRenamedEventsBasedObject,
+              onDeletedEventsBasedObject,
+              onRenamedEventsBasedObjectVariant,
+              onDeletedEventsBasedObjectVariant,
+              onEventsBasedObjectChildrenEdited,
+              onEventBasedObjectTypeChanged,
             }
           : null,
-      [project, onOpenCustomObjectEditor]
+      [
+        project,
+        unsavedChanges,
+        preferences,
+        gdevelopTheme,
+        forceUpdate,
+        forceUpdateList,
+        showDeleteConfirmation,
+        editName,
+        scrollToItem,
+        openItems,
+        onOpenCustomObjectEditor,
+        onRenamedEventsBasedObject,
+        onDeletedEventsBasedObject,
+        onRenamedEventsBasedObjectVariant,
+        onDeletedEventsBasedObjectVariant,
+        onEventsBasedObjectChildrenEdited,
+        onEventBasedObjectTypeChanged,
+      ]
     );
 
     const behaviorShortcutTreeViewItemProps = React.useMemo<?BehaviorShortcutTreeViewItemProps>(
@@ -1048,6 +1114,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
               showDeleteConfirmation,
               editName,
               scrollToItem,
+              openItems,
               onDeleteExternalEvents,
               onRenameExternalEvents,
               onOpenExternalEvents,
@@ -1063,6 +1130,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         showDeleteConfirmation,
         editName,
         scrollToItem,
+        openItems,
         onDeleteExternalEvents,
         onRenameExternalEvents,
         onOpenExternalEvents,
@@ -1082,6 +1150,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
               showDeleteConfirmation,
               editName,
               scrollToItem,
+              openItems,
               onExternalLayoutAdded,
               onDeleteExternalLayout,
               onRenameExternalLayout,
@@ -1098,6 +1167,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         showDeleteConfirmation,
         editName,
         scrollToItem,
+        openItems,
         onExternalLayoutAdded,
         onDeleteExternalLayout,
         onRenameExternalLayout,
@@ -1222,14 +1292,43 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                       objectIndex < eventsBasedObjectsCount;
                       objectIndex++
                     ) {
-                      customObjectItems.push(
-                        new LeafTreeViewItem(
-                          new CustomObjectTreeViewItemContent(
-                            eventsFunctionsExtension,
-                            eventsBasedObjects.at(objectIndex),
-                            customObjectTreeViewItemProps
+                      const eventsBasedObject = eventsBasedObjects.at(
+                        objectIndex
+                      );
+                      const variants = eventsBasedObject.getVariants();
+                      const variantItems: Array<TreeViewItem> = [];
+                      for (
+                        let variantIndex = 0;
+                        variantIndex < variants.getVariantsCount();
+                        variantIndex++
+                      ) {
+                        const variant = variants.getVariantAt(variantIndex);
+                        if (!variant.getName()) continue;
+
+                        variantItems.push(
+                          new LeafTreeViewItem(
+                            new CustomObjectVariantTreeViewItemContent(
+                              eventsFunctionsExtension,
+                              eventsBasedObject,
+                              variant,
+                              customObjectTreeViewItemProps
+                            )
                           )
-                        )
+                        );
+                      }
+
+                      const objectItemContent = new CustomObjectTreeViewItemContent(
+                        eventsFunctionsExtension,
+                        eventsBasedObject,
+                        customObjectTreeViewItemProps
+                      );
+                      customObjectItems.push(
+                        variantItems.length > 0
+                          ? new TreeViewItemWithChildren(
+                              objectItemContent,
+                              variantItems
+                            )
+                          : new LeafTreeViewItem(objectItemContent)
                       );
                     }
                   }
@@ -1530,16 +1629,53 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
     // has been changed. Avoid accessing to invalid objects that could
     // crash the app.
     const listKey = project ? project.ptr : 'no-project';
-    const initiallyOpenedNodeIds = [
-      gameSettingsRootFolderId,
-      scenesRootFolderId,
-      customObjectsRootFolderId,
-      behaviorsRootFolderId,
-      functionsRootFolderId,
-      extensionsRootFolderId,
-      externalEventsRootFolderId,
-      externalLayoutsRootFolderId,
-    ];
+    const initiallyOpenedNodeIds = React.useMemo(
+      () => {
+        const nodeIds = [
+          gameSettingsRootFolderId,
+          scenesRootFolderId,
+          customObjectsRootFolderId,
+          behaviorsRootFolderId,
+          functionsRootFolderId,
+          extensionsRootFolderId,
+          externalEventsRootFolderId,
+          externalLayoutsRootFolderId,
+        ];
+
+        if (!project) return nodeIds;
+
+        const eventsFunctionsExtensionsCount = project.getEventsFunctionsExtensionsCount();
+        for (
+          let extensionIndex = 0;
+          extensionIndex < eventsFunctionsExtensionsCount;
+          extensionIndex++
+        ) {
+          const eventsFunctionsExtension = project.getEventsFunctionsExtensionAt(
+            extensionIndex
+          );
+          const eventsBasedObjects = eventsFunctionsExtension.getEventsBasedObjects();
+          const eventsBasedObjectsCount = eventsBasedObjects.size();
+          for (
+            let objectIndex = 0;
+            objectIndex < eventsBasedObjectsCount;
+            objectIndex++
+          ) {
+            const eventsBasedObject = eventsBasedObjects.at(objectIndex);
+            if (eventsBasedObject.getVariants().getVariantsCount() > 0) {
+              nodeIds.push(
+                getCustomObjectTreeViewItemId(
+                  eventsFunctionsExtension,
+                  eventsBasedObject
+                )
+              );
+            }
+          }
+        }
+
+        return nodeIds;
+      },
+      [project]
+    );
 
     const [
       selectedMainMenuItemIndices,

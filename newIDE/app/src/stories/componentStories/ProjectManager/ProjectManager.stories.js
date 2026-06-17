@@ -63,6 +63,24 @@ export const NoProjectOpen = (): React.Node => {
                     'onOpenEventsFunctionsExtension'
                   )}
                   onOpenCustomObjectEditor={action('onOpenCustomObjectEditor')}
+                  onRenamedEventsBasedObject={action(
+                    'onRenamedEventsBasedObject'
+                  )}
+                  onDeletedEventsBasedObject={action(
+                    'onDeletedEventsBasedObject'
+                  )}
+                  onRenamedEventsBasedObjectVariant={action(
+                    'onRenamedEventsBasedObjectVariant'
+                  )}
+                  onDeletedEventsBasedObjectVariant={action(
+                    'onDeletedEventsBasedObjectVariant'
+                  )}
+                  onEventsBasedObjectChildrenEdited={action(
+                    'onEventsBasedObjectChildrenEdited'
+                  )}
+                  onEventBasedObjectTypeChanged={action(
+                    'onEventBasedObjectTypeChanged'
+                  )}
                   onSceneAdded={action('onSceneAdded')}
                   onExternalLayoutAdded={action('onExternalLayoutAdded')}
                   onDeleteLayout={action('onDeleteLayout')}
@@ -140,6 +158,24 @@ export const ProjectOpen = (): React.Node => {
                     'onOpenEventsFunctionsExtension'
                   )}
                   onOpenCustomObjectEditor={action('onOpenCustomObjectEditor')}
+                  onRenamedEventsBasedObject={action(
+                    'onRenamedEventsBasedObject'
+                  )}
+                  onDeletedEventsBasedObject={action(
+                    'onDeletedEventsBasedObject'
+                  )}
+                  onRenamedEventsBasedObjectVariant={action(
+                    'onRenamedEventsBasedObjectVariant'
+                  )}
+                  onDeletedEventsBasedObjectVariant={action(
+                    'onDeletedEventsBasedObjectVariant'
+                  )}
+                  onEventsBasedObjectChildrenEdited={action(
+                    'onEventsBasedObjectChildrenEdited'
+                  )}
+                  onEventBasedObjectTypeChanged={action(
+                    'onEventBasedObjectTypeChanged'
+                  )}
                   onSceneAdded={action('onSceneAdded')}
                   onExternalLayoutAdded={action('onExternalLayoutAdded')}
                   onDeleteLayout={action('onDeleteLayout')}

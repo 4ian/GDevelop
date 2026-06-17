@@ -2256,6 +2256,33 @@ const MainFrame = (props: Props): React.MixedElement => {
     });
   };
 
+  const onRenamedEventsBasedObjectVariant = (
+    eventsFunctionsExtension: gdEventsFunctionsExtension,
+    eventBasedObject: gdEventsBasedObject,
+    oldName: string,
+    newName: string
+  ): void => {
+    if (oldName === newName) return;
+
+    setState(state => ({
+      ...state,
+      editorTabs: closeEventsBasedObjectVariantTab(
+        state.editorTabs,
+        eventsFunctionsExtension.getName(),
+        eventBasedObject.getName(),
+        oldName
+      ),
+    })).then(state => {
+      notifyChangesToInGameEditor({
+        shouldReloadProjectData: true,
+        shouldReloadLibraries: true,
+        shouldReloadResources: false,
+        shouldHardReload: false,
+        reasons: ['renamed-custom-object-variant'],
+      });
+    });
+  };
+
   const deleteEventsBasedObjectVariant = (
     eventsFunctionsExtension: gdEventsFunctionsExtension,
     eventBasedObject: gdEventsBasedObject,
@@ -2909,6 +2936,46 @@ const MainFrame = (props: Props): React.MixedElement => {
       initiallyFocusedBehaviorName?: ?string,
       initiallyFocusedObjectName?: ?string
     ) => {
+      const editorTabs = state.editorTabs;
+      if (
+        currentProject &&
+        currentProject.hasEventsFunctionsExtensionNamed(name)
+      ) {
+        const eventsFunctionsExtension = currentProject.getEventsFunctionsExtension(
+          name
+        );
+        const foundTab = getEventsFunctionsExtensionEditor(
+          editorTabs,
+          eventsFunctionsExtension
+        );
+        if (foundTab) {
+          if (initiallyFocusedFunctionName) {
+            foundTab.editor.selectEventsFunctionByName(
+              initiallyFocusedFunctionName,
+              initiallyFocusedBehaviorName,
+              initiallyFocusedObjectName
+            );
+          } else if (initiallyFocusedBehaviorName) {
+            foundTab.editor.selectEventsBasedBehaviorByName(
+              initiallyFocusedBehaviorName
+            );
+          } else if (initiallyFocusedObjectName) {
+            foundTab.editor.selectEventsBasedObjectByName(
+              initiallyFocusedObjectName
+            );
+          }
+          setState(state => ({
+            ...state,
+            editorTabs: changeCurrentTab(
+              editorTabs,
+              foundTab.paneIdentifier,
+              foundTab.tabIndex
+            ),
+          }));
+          return;
+        }
+      }
+
       setState(state => ({
         ...state,
         // $FlowFixMe[incompatible-type]
@@ -2926,7 +2993,7 @@ const MainFrame = (props: Props): React.MixedElement => {
         }),
       }));
     },
-    [currentProject, setState, getEditorOpeningOptions]
+    [currentProject, setState, state.editorTabs, getEditorOpeningOptions]
   );
 
   const openResources = React.useCallback(
@@ -3230,7 +3297,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       );
       if (foundTab) {
         // Open the given function and focus the tab
-        foundTab.editor.selectEventsBasedBehaviorByName(objectName);
+        foundTab.editor.selectEventsBasedObjectByName(objectName);
         setState(state => ({
           ...state,
           editorTabs: changeCurrentTab(
@@ -4013,7 +4080,10 @@ const MainFrame = (props: Props): React.MixedElement => {
         // display a picker that does not play nice with material-ui's overlays.
         openProjectManager(false);
       }
-      setState(state => ({ ...state, saveToStorageProviderDialogOpen: open }));
+      setState(state => ({
+        ...state,
+        saveToStorageProviderDialogOpen: open,
+      }));
     },
     [setState]
   );
@@ -5663,6 +5733,12 @@ const MainFrame = (props: Props): React.MixedElement => {
           onOpenExternalLayout={openExternalLayout}
           onOpenEventsFunctionsExtension={openEventsFunctionsExtension}
           onOpenCustomObjectEditor={openCustomObjectEditor}
+          onRenamedEventsBasedObject={onRenamedEventsBasedObject}
+          onDeletedEventsBasedObject={onDeletedEventsBasedObject}
+          onRenamedEventsBasedObjectVariant={onRenamedEventsBasedObjectVariant}
+          onDeletedEventsBasedObjectVariant={deleteEventsBasedObjectVariant}
+          onEventsBasedObjectChildrenEdited={onEventsBasedObjectChildrenEdited}
+          onEventBasedObjectTypeChanged={onEventBasedObjectTypeChanged}
           onDeleteLayout={deleteLayout}
           onDeleteExternalLayout={deleteExternalLayout}
           onDeleteEventsFunctionsExtension={deleteEventsFunctionsExtension}

@@ -242,6 +242,11 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
       this.editor.selectEventsBasedBehaviorByName(eventBasedBehaviorName);
   }
 
+  selectEventsBasedObjectByName(eventBasedObjectName: string) {
+    if (this.editor)
+      this.editor.selectEventsBasedObjectByName(eventBasedObjectName);
+  }
+
   render(): any {
     const { project, projectItemName } = this.props;
     const eventsFunctionsExtension = this.getEventsFunctionsExtension();

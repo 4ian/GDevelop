@@ -558,7 +558,10 @@ export default class SceneEditor extends React.Component<Props, State> {
       global: boolean,
     |}> = this.state.selectedObjectFolderOrObjectsWithContext.map(
       objectFolderOrObjectWithContext => {
-        const { objectFolderOrObject, global } = objectFolderOrObjectWithContext;
+        const {
+          objectFolderOrObject,
+          global,
+        } = objectFolderOrObjectWithContext;
         const kind: 'object' | 'folder' = objectFolderOrObject.isFolder()
           ? 'folder'
           : 'object';
@@ -917,7 +920,13 @@ export default class SceneEditor extends React.Component<Props, State> {
 
   updateToolbar = () => {
     const { editorDisplay } = this;
+    const { eventsBasedObject, layout } = this.props;
     if (!editorDisplay) return;
+
+    const canOpenEvents = !!layout || !!eventsBasedObject;
+    const openEventsTooltip = eventsBasedObject
+      ? t`Open object events`
+      : t`Open scene events`;
 
     if (editorDisplay.getName() === 'mosaic') {
       this.props.setToolbar(
@@ -948,7 +957,9 @@ export default class SceneEditor extends React.Component<Props, State> {
                 editorDisplay.isEditorVisible(editorId)
               )}
               toggleWindowMask={this.toggleWindowMask}
-              isWindowMaskShown={!!this.state.instancesEditorSettings.windowMask}
+              isWindowMaskShown={
+                !!this.state.instancesEditorSettings.windowMask
+              }
               toggleGrid={this.toggleGrid}
               isGridShown={!!this.state.instancesEditorSettings.grid}
               openSetupGrid={this.openSetupGrid}
@@ -958,6 +969,8 @@ export default class SceneEditor extends React.Component<Props, State> {
               canRedo={canRedo(this.state.history)}
               undo={this.undo}
               redo={this.redo}
+              onOpenEvents={canOpenEvents ? this.openEvents : null}
+              openEventsTooltip={openEventsTooltip}
               onOpenSettings={this.openSceneProperties}
               settingsIcon={editSceneIconReactNode}
               onOpenSceneVariables={this.editLayoutVariables}
@@ -991,6 +1004,8 @@ export default class SceneEditor extends React.Component<Props, State> {
           canRedo={canRedo(this.state.history)}
           undo={this.undo}
           redo={this.redo}
+          onOpenEvents={canOpenEvents ? this.openEvents : null}
+          openEventsTooltip={openEventsTooltip}
           onOpenSettings={this.openSceneProperties}
           settingsIcon={editSceneIconReactNode}
           onOpenSceneVariables={this.editLayoutVariables}
@@ -1108,6 +1123,13 @@ export default class SceneEditor extends React.Component<Props, State> {
 
   openSceneProperties = (open: boolean = true) => {
     this.setState({ scenePropertiesDialogOpen: open });
+  };
+
+  openEvents = () => {
+    const { eventsBasedObject, layout } = this.props;
+    if (!layout && !eventsBasedObject) return;
+
+    this.props.onOpenEvents(layout ? layout.getName() : '');
   };
 
   openObjectEditor = () => {

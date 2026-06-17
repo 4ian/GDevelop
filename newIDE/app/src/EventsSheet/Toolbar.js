@@ -11,7 +11,7 @@ import EditSceneIcon from '../UI/CustomSvgIcons/EditScene';
 import { getShortcutDisplayName, useShortcutMap } from '../KeyboardShortcuts';
 import GraphsIcon from '../UI/CustomSvgIcons/Graphs';
 import VariableTreeIcon from '../UI/CustomSvgIcons/VariableTree';
-import ConsoleIcon from '../UI/CustomSvgIcons/Console';
+import JavaScriptIcon from '../UI/CustomSvgIcons/JavaScript';
 
 type Props = {|
   onAddStandardEvent: () => void,
@@ -132,7 +132,7 @@ const Toolbar: React.ComponentType<Props> = React.memo<Props>(function Toolbar({
             id="toolbar-show-generated-code-button"
             tooltip={t`Show the generated JavaScript code for these events`}
           >
-            <ConsoleIcon />
+            <JavaScriptIcon />
           </IconButton>
         )}
         <IconButton

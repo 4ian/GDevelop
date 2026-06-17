@@ -27,7 +27,11 @@ import {
 const path = optionalRequire('path');
 const electron = optionalRequire('electron');
 const gd: libGDevelop = global.gd;
-const PIXI = { ...PIXI_LEGACY, ...PIXI_SPINE };
+// Spine is spread first so that PixiJS legacy keeps ownership of symbols that
+// both packages export (notably `Texture` and `Color`): spine's `Texture` has
+// no `.from` method and would otherwise break `PIXI.Texture.from(...)` calls
+// made by extensions (e.g. the Lighting object icon).
+const PIXI = { ...PIXI_SPINE, ...PIXI_LEGACY };
 
 // Some PixiJS plugins like pixi-tilemap are not distributed as UMD modules,
 // or still require a global PIXI object to be accessible, so we expose PIXI here.

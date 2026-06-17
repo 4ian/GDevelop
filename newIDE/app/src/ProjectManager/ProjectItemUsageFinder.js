@@ -15,6 +15,12 @@ export type ProjectItemUsageTarget =
       eventsBasedObject: gdEventsBasedObject,
     |}
   | {|
+      kind: 'custom-object-variant',
+      eventsFunctionsExtension: gdEventsFunctionsExtension,
+      eventsBasedObject: gdEventsBasedObject,
+      variant: gdEventsBasedObjectVariant,
+    |}
+  | {|
       kind: 'events-based-behavior',
       eventsFunctionsExtension: gdEventsFunctionsExtension,
       eventsBasedBehavior: gdEventsBasedBehavior,
@@ -68,6 +74,15 @@ export const getProjectItemUsageTargetName = (
       return gd.PlatformExtension.getObjectFullType(
         target.eventsFunctionsExtension.getName(),
         target.eventsBasedObject.getName()
+      );
+    case 'custom-object-variant':
+      return (
+        gd.PlatformExtension.getObjectFullType(
+          target.eventsFunctionsExtension.getName(),
+          target.eventsBasedObject.getName()
+        ) +
+        ' / ' +
+        target.variant.getName()
       );
     case 'events-based-behavior':
       return gd.PlatformExtension.getBehaviorFullType(
@@ -421,6 +436,32 @@ const addObjectContainerUsages = (
   });
 };
 
+const addObjectVariantContainerUsages = (
+  objectUsages: Array<ProjectItemUsage>,
+  objectsContainer: gdObjectsContainer,
+  containerLocation: string,
+  objectType: string,
+  variantName: string
+) => {
+  mapFor(0, objectsContainer.getObjectsCount(), objectIndex => {
+    const object = objectsContainer.getObjectAt(objectIndex);
+    if (object.getType() !== objectType) return;
+
+    const customObjectConfiguration = gd.asCustomObjectConfiguration(
+      object.getConfiguration()
+    );
+    if (customObjectConfiguration.getVariantName() !== variantName) return;
+
+    objectUsages.push({
+      id: `${containerLocation}-${object.getName()}-${variantName}-${
+        objectUsages.length
+      }`,
+      location: `${containerLocation} object "${object.getName()}"`,
+      details: `Object variant "${variantName}" of type "${objectType}"`,
+    });
+  });
+};
+
 const addBehaviorContainerUsages = (
   objectUsages: Array<ProjectItemUsage>,
   objectsContainer: gdObjectsContainer,
@@ -500,6 +541,24 @@ const findObjectUsages = (
   return objectUsages;
 };
 
+const findObjectVariantUsages = (
+  project: gdProject,
+  objectType: string,
+  variantName: string
+): Array<ProjectItemUsage> => {
+  const objectUsages: Array<ProjectItemUsage> = [];
+  forEachProjectObjectContainer(project, (objectsContainer, location) => {
+    addObjectVariantContainerUsages(
+      objectUsages,
+      objectsContainer,
+      location,
+      objectType,
+      variantName
+    );
+  });
+  return objectUsages;
+};
+
 const findBehaviorUsages = (
   project: gdProject,
   behaviorType: string
@@ -546,6 +605,18 @@ export const findProjectItemUsages = (
           instructionParametersContain(instruction, objectType)
         );
       });
+      break;
+    }
+    case 'custom-object-variant': {
+      const objectType = gd.PlatformExtension.getObjectFullType(
+        target.eventsFunctionsExtension.getName(),
+        target.eventsBasedObject.getName()
+      );
+      report.objectUsages = findObjectVariantUsages(
+        project,
+        objectType,
+        target.variant.getName()
+      );
       break;
     }
     case 'events-based-behavior': {

@@ -8,12 +8,11 @@ import ToolbarSeparator from '../../UI/ToolbarSeparator';
 import IconButton from '../../UI/IconButton';
 import ElementWithMenu from '../../UI/Menu/ElementWithMenu';
 import ToolbarCommands from '../ToolbarCommands';
-import { type MenuItemTemplate } from '../../UI/Menu/Menu.flow';
 import ShowAllPanelsIcon from '../../UI/CustomSvgIcons/ShowAllPanels';
 import GridIcon from '../../UI/CustomSvgIcons/Grid';
-import ZoomInIcon from '../../UI/CustomSvgIcons/ZoomIn';
 import EditSceneIcon from '../../UI/CustomSvgIcons/EditScene';
 import EventsIcon from '../../UI/CustomSvgIcons/Events';
+import Add from '../../UI/CustomSvgIcons/Add';
 import { TOGGLE_ALL_PANELS_BUTTON_ID } from '../utils';
 import CompactToggleButtons from '../../UI/CompactToggleButtons';
 import Grid2d from '../../UI/CustomSvgIcons/Grid2d';
@@ -26,6 +25,8 @@ import {
 type Props = {|
   gameEditorMode: 'embedded-game' | 'instances-editor',
   setGameEditorMode: ('embedded-game' | 'instances-editor') => void,
+  onAddObject: () => void,
+  canAddObject: boolean,
   toggleObjectsList: () => void,
   toggleObjectGroupsList: () => void,
   toggleProperties: () => void,
@@ -44,8 +45,6 @@ type Props = {|
   isGridShown: boolean,
   toggleGrid: () => void,
   openSetupGrid: () => void,
-  getContextMenuZoomItems: I18nType => Array<MenuItemTemplate>,
-  setZoomFactor: number => void,
   onOpenEvents?: ?() => void,
   openEventsTooltip?: MessageDescriptor,
   onOpenSettings?: ?() => void,
@@ -61,6 +60,8 @@ const Toolbar: React.ComponentType<Props> = React.memo<Props>(function Toolbar(
   return (
     <>
       <ToolbarCommands
+        addObject={props.onAddObject}
+        canAddObject={props.canAddObject}
         toggleObjectsList={props.toggleObjectsList}
         toggleObjectGroupsList={props.toggleObjectGroupsList}
         togglePropertiesPanel={props.toggleProperties}
@@ -79,6 +80,17 @@ const Toolbar: React.ComponentType<Props> = React.memo<Props>(function Toolbar(
         onOpenSceneVariables={props.onOpenSceneVariables}
       />
       <ToolbarGroup lastChild>
+        <IconButton
+          size="small"
+          color="default"
+          id="toolbar-add-object-button"
+          onClick={props.onAddObject}
+          disabled={!props.canAddObject}
+          tooltip={t`Add object`}
+          acceleratorString={getShortcutDisplayName(shortcutMap['ADD_OBJECT'])}
+        >
+          <Add />
+        </IconButton>
         <CompactToggleButtons
           id="game-editor-toggle"
           noSeparator
@@ -149,30 +161,6 @@ const Toolbar: React.ComponentType<Props> = React.memo<Props>(function Toolbar(
               label: i18n._(t`Setup grid`),
               click: () => props.openSetupGrid(),
             },
-          ]}
-        />
-        <ToolbarSeparator />
-        <ElementWithMenu
-          element={
-            <IconButton
-              size="small"
-              color="default"
-              tooltip={t`Change editor zoom`}
-            >
-              <ZoomInIcon />
-            </IconButton>
-          }
-          buildMenuTemplate={(i18n: I18nType) => [
-            ...props.getContextMenuZoomItems(i18n),
-            { type: 'separator' },
-            { label: '5%', click: () => props.setZoomFactor(0.05) },
-            { label: '10%', click: () => props.setZoomFactor(0.1) },
-            { label: '25%', click: () => props.setZoomFactor(0.25) },
-            { label: '50%', click: () => props.setZoomFactor(0.5) },
-            { label: '100%', click: () => props.setZoomFactor(1.0) },
-            { label: '150%', click: () => props.setZoomFactor(1.5) },
-            { label: '200%', click: () => props.setZoomFactor(2.0) },
-            { label: '400%', click: () => props.setZoomFactor(4.0) },
           ]}
         />
         {(props.onOpenEvents || props.onOpenSettings) && <ToolbarSeparator />}

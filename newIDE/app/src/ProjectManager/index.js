@@ -1289,7 +1289,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                 isRoot: true,
                 content: new LabelTreeViewItemContent(
                   customObjectsRootFolderId,
-                  i18n._(t`Custom objects`)
+                  i18n._(t`Prefabs`)
                 ),
                 getChildren(i18n: I18nType): ?Array<TreeViewItem> {
                   const customObjectItems: Array<TreeViewItem> = [];

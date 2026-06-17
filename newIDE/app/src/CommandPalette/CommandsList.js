@@ -37,6 +37,7 @@ export type CommandName =
   | 'OPEN_EXTENSION'
   | 'OPEN_SCENE_PROPERTIES'
   | 'OPEN_SCENE_VARIABLES'
+  | 'ADD_OBJECT'
   | 'OPEN_OBJECTS_PANEL'
   | 'OPEN_OBJECT_GROUPS_PANEL'
   | 'OPEN_PROPERTIES_PANEL'
@@ -237,6 +238,10 @@ const commandsList: { [CommandName]: CommandMetadata } = {
   OPEN_SCENE_VARIABLES: {
     area: 'SCENE',
     displayText: t`Open scene variables`,
+  },
+  ADD_OBJECT: {
+    area: 'SCENE',
+    displayText: t`Add object`,
   },
 
   // Scene editor toolbar commands

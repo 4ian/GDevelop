@@ -114,6 +114,36 @@ const gd: libGDevelop = global.gd;
 const BASE_LAYER_NAME = '';
 const INSTANCES_CLIPBOARD_KIND = 'Instances';
 
+const getTopLayerName = (
+  layersContainer: gdLayersContainer,
+  ignoredLayerName?: string
+): string => {
+  for (
+    let layerIndex = layersContainer.getLayersCount() - 1;
+    layerIndex >= 0;
+    layerIndex--
+  ) {
+    const layerName = layersContainer.getLayerAt(layerIndex).getName();
+    if (layerName !== ignoredLayerName) return layerName;
+  }
+
+  return BASE_LAYER_NAME;
+};
+
+const getInitialChosenLayer = (
+  layersContainer: gdLayersContainer,
+  initialSelectedLayer: string
+): string => {
+  if (
+    initialSelectedLayer &&
+    layersContainer.hasLayerNamed(initialSelectedLayer)
+  ) {
+    return initialSelectedLayer;
+  }
+
+  return getTopLayerName(layersContainer);
+};
+
 interface InstancePersistentUuidData {
   persistentUuid: string;
 }
@@ -446,8 +476,10 @@ export default class SceneEditor extends React.Component<Props, State> {
       tileMapTileSelection: null,
 
       selectedObjectFolderOrObjectsWithContext: [],
-      chosenLayer:
-        initialInstancesEditorSettings.selectedLayer || BASE_LAYER_NAME,
+      chosenLayer: getInitialChosenLayer(
+        props.layersContainer,
+        initialInstancesEditorSettings.selectedLayer
+      ),
       selectedLayer: null,
       invisibleLayerOnWhichInstancesHaveJustBeenAdded: null,
 
@@ -918,12 +950,21 @@ export default class SceneEditor extends React.Component<Props, State> {
     this.forceUpdateObjectGroupsList();
   };
 
+  _canAddObject = () => {
+    const { eventsBasedObject, eventsBasedObjectVariant } = this.props;
+    return (
+      !eventsBasedObject ||
+      eventsBasedObject.getDefaultVariant() === eventsBasedObjectVariant
+    );
+  };
+
   updateToolbar = () => {
     const { editorDisplay } = this;
     const { eventsBasedObject, layout } = this.props;
     if (!editorDisplay) return;
 
     const canOpenEvents = !!layout || !!eventsBasedObject;
+    const canAddObject = this._canAddObject();
     const openEventsTooltip = eventsBasedObject
       ? t`Open object events`
       : t`Open scene events`;
@@ -943,6 +984,8 @@ export default class SceneEditor extends React.Component<Props, State> {
             <MosaicEditorsDisplayToolbar
               gameEditorMode={this.state.instancesEditorSettings.gameEditorMode}
               setGameEditorMode={this.setGameEditorMode}
+              onAddObject={this._openNewObjectDialog}
+              canAddObject={canAddObject}
               selectedInstancesCount={
                 this.instancesSelection.getSelectedInstances().length
               }
@@ -963,8 +1006,6 @@ export default class SceneEditor extends React.Component<Props, State> {
               toggleGrid={this.toggleGrid}
               isGridShown={!!this.state.instancesEditorSettings.grid}
               openSetupGrid={this.openSetupGrid}
-              setZoomFactor={this.setZoomFactor}
-              getContextMenuZoomItems={this.getContextMenuZoomItems}
               canUndo={canUndo(this.state.history)}
               canRedo={canRedo(this.state.history)}
               undo={this.undo}
@@ -983,6 +1024,8 @@ export default class SceneEditor extends React.Component<Props, State> {
         <SwipeableDrawerEditorsDisplayToolbar
           gameEditorMode={this.props.gameEditorMode}
           setGameEditorMode={this.props.setGameEditorMode}
+          onAddObject={this._openNewObjectDialog}
+          canAddObject={canAddObject}
           selectedInstancesCount={
             this.instancesSelection.getSelectedInstances().length
           }
@@ -1442,6 +1485,15 @@ export default class SceneEditor extends React.Component<Props, State> {
     editorDisplay.openNewObjectDialog({
       instanceSceneCoordinates: viewControls.getLastCursorSceneCoordinates(),
     });
+  };
+
+  _openNewObjectDialog = () => {
+    const { editorDisplay } = this;
+    if (!editorDisplay || !this._canAddObject()) {
+      return;
+    }
+
+    editorDisplay.openNewObjectDialog();
   };
 
   addInstanceOnTheScene = (
@@ -1999,7 +2051,10 @@ export default class SceneEditor extends React.Component<Props, State> {
         layerRemoved: null,
       };
       if (doRemove && layerName === this.state.chosenLayer) {
-        newState.chosenLayer = BASE_LAYER_NAME;
+        newState.chosenLayer = getTopLayerName(
+          this.props.layersContainer,
+          layerName
+        );
       }
       if (
         doRemove &&
@@ -2756,7 +2811,7 @@ export default class SceneEditor extends React.Component<Props, State> {
         label: i18n._(t`Extract`),
         submenu: [
           {
-            label: i18n._(t`Extract as a custom object`),
+            label: i18n._(t`Extract as a prefab`),
             click: () =>
               this.setState({ extractAsCustomObjectDialogOpen: true }),
             enabled: hasSelectedInstances,
@@ -2918,6 +2973,30 @@ export default class SceneEditor extends React.Component<Props, State> {
       return [
         ...this.getContextMenuInstancesWiseItems(i18n),
         { type: 'separator' },
+        object && project.hasEventsBasedObject(object.getType())
+          ? {
+              label: i18n._(t`Edit prefab`),
+              enabled: isVariantEditable(
+                gd.asCustomObjectConfiguration(object.getConfiguration()),
+                project.getEventsBasedObject(object.getType()),
+                customObjectExtension
+              ),
+              click: () => {
+                const customObjectConfiguration = gd.asCustomObjectConfiguration(
+                  object.getConfiguration()
+                );
+                this.props.onOpenEventBasedObjectVariantEditor(
+                  gd.PlatformExtension.getExtensionFromFullObjectType(
+                    object.getType()
+                  ),
+                  gd.PlatformExtension.getObjectNameFromFullObjectType(
+                    object.getType()
+                  ),
+                  customObjectConfiguration.getVariantName()
+                );
+              },
+            }
+          : null,
         {
           label: i18n._(t`Edit object ${shortenString(objectName, 14)}`),
           click: () =>
@@ -2957,30 +3036,6 @@ export default class SceneEditor extends React.Component<Props, State> {
               enabled: objectMetadata.hasDefaultBehavior(
                 'EffectCapability::EffectBehavior'
               ),
-            }
-          : null,
-        object && project.hasEventsBasedObject(object.getType())
-          ? {
-              label: i18n._(t`Edit children`),
-              enabled: isVariantEditable(
-                gd.asCustomObjectConfiguration(object.getConfiguration()),
-                project.getEventsBasedObject(object.getType()),
-                customObjectExtension
-              ),
-              click: () => {
-                const customObjectConfiguration = gd.asCustomObjectConfiguration(
-                  object.getConfiguration()
-                );
-                this.props.onOpenEventBasedObjectVariantEditor(
-                  gd.PlatformExtension.getExtensionFromFullObjectType(
-                    object.getType()
-                  ),
-                  gd.PlatformExtension.getObjectNameFromFullObjectType(
-                    object.getType()
-                  ),
-                  customObjectConfiguration.getVariantName()
-                );
-              },
             }
           : null,
         { type: 'separator' },
@@ -3320,7 +3375,9 @@ export default class SceneEditor extends React.Component<Props, State> {
   forceUpdateLayersList = () => {
     // The selected layer could have been deleted when editing a linked external layout.
     if (!this.props.layersContainer.hasLayerNamed(this.state.chosenLayer)) {
-      this.setState({ chosenLayer: BASE_LAYER_NAME });
+      this.setState({
+        chosenLayer: getTopLayerName(this.props.layersContainer),
+      });
     }
     if (this.editorDisplay) this.editorDisplay.forceUpdateLayersList();
   };

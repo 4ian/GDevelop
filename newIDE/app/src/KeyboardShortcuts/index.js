@@ -5,6 +5,7 @@ import { isMacLike } from '../Utils/Platform';
 import reservedShortcuts from './ReservedShortcuts';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import commandsList, { type CommandName } from '../CommandPalette/CommandsList';
+import CommandsContext from '../CommandPalette/CommandsContext';
 import isUserTyping from './IsUserTyping';
 import defaultShortcuts, {
   defaultSecondaryShortcuts,
@@ -261,6 +262,26 @@ export const useKeyboardShortcuts = ({
   ignoreHandledByElectron,
 }: UseKeyboardShortcutsProps) => {
   const shortcutMap = useShortcutMap();
+  const commandManager = React.useContext(CommandsContext);
+
+  const getCommandNameForShortcut = React.useCallback(
+    (shortcutString: string): ?CommandName => {
+      const primaryCommandNames = Object.keys(shortcutMap)
+        .filter(name => shortcutMap[name] === shortcutString)
+        .map(name => ((name: any): CommandName));
+      const secondaryCommandNames = Object.keys(defaultSecondaryShortcuts)
+        .filter(name => defaultSecondaryShortcuts[name] === shortcutString)
+        .map(name => ((name: any): CommandName));
+      const commandNames = primaryCommandNames.concat(secondaryCommandNames);
+
+      return (
+        commandNames.find(commandName =>
+          commandManager.getNamedCommand(commandName)
+        ) || commandNames[0]
+      );
+    },
+    [commandManager, shortcutMap]
+  );
 
   React.useEffect(
     () => {
@@ -270,14 +291,9 @@ export const useKeyboardShortcuts = ({
         const shortcutData = getShortcutMetadataFromEvent(e);
 
         // Get corresponding command, if it exists
-        const commandName =
-          Object.keys(shortcutMap).find(
-            name => shortcutMap[name] === shortcutData.shortcutString
-          ) ||
-          Object.keys(defaultSecondaryShortcuts).find(
-            name =>
-              defaultSecondaryShortcuts[name] === shortcutData.shortcutString
-          );
+        const commandName = getCommandNameForShortcut(
+          shortcutData.shortcutString
+        );
         if (!commandName) return;
         if (
           !shortcutData.isValid &&
@@ -313,7 +329,12 @@ export const useKeyboardShortcuts = ({
       listenerDoc.addEventListener('keydown', handler);
       return () => listenerDoc.removeEventListener('keydown', handler);
     },
-    [onRunCommand, shortcutMap, targetDocument, ignoreHandledByElectron]
+    [
+      onRunCommand,
+      getCommandNameForShortcut,
+      targetDocument,
+      ignoreHandledByElectron,
+    ]
   );
 
   React.useEffect(
@@ -362,14 +383,9 @@ export const useKeyboardShortcuts = ({
           });
 
           // Get corresponding command, if it exists
-          const commandName =
-            Object.keys(shortcutMap).find(
-              name => shortcutMap[name] === shortcutData.shortcutString
-            ) ||
-            Object.keys(defaultSecondaryShortcuts).find(
-              name =>
-              defaultSecondaryShortcuts[name] === shortcutData.shortcutString
-            );
+          const commandName = getCommandNameForShortcut(
+            shortcutData.shortcutString
+          );
           if (!commandName) return;
           if (
             !shortcutData.isValid &&
@@ -402,7 +418,7 @@ export const useKeyboardShortcuts = ({
         unregister();
       };
     },
-    [previewDebuggerServer, shortcutMap, onRunCommand]
+    [previewDebuggerServer, getCommandNameForShortcut, onRunCommand]
   );
 };
 

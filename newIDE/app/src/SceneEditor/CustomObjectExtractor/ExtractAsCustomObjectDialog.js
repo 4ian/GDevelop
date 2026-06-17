@@ -193,7 +193,7 @@ export default function ExtractAsCustomObjectDialog({
     <I18n>
       {({ i18n }) => (
         <Dialog
-          title={<Trans>Extract as a custom object</Trans>}
+          title={<Trans>Extract as a prefab</Trans>}
           actions={[
             <FlatButton
               key="cancel"

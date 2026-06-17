@@ -22,6 +22,8 @@ import Grid3d from '../../UI/CustomSvgIcons/Grid3d';
 type Props = {|
   gameEditorMode: 'embedded-game' | 'instances-editor',
   setGameEditorMode: ('embedded-game' | 'instances-editor') => void,
+  onAddObject: () => void,
+  canAddObject: boolean,
   toggleObjectsList: () => void,
   toggleObjectGroupsList: () => void,
   toggleProperties: () => void,
@@ -52,6 +54,8 @@ const Toolbar: React.ComponentType<Props> = React.memo<Props>(function(props) {
   return (
     <>
       <ToolbarCommands
+        addObject={props.onAddObject}
+        canAddObject={props.canAddObject}
         toggleObjectsList={props.toggleObjectsList}
         toggleObjectGroupsList={props.toggleObjectGroupsList}
         togglePropertiesPanel={props.toggleProperties}

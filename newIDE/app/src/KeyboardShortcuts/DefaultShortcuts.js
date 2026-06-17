@@ -37,6 +37,7 @@ const defaultShortcuts: ShortcutMap = {
 
   OPEN_SCENE_PROPERTIES: '',
   OPEN_SCENE_VARIABLES: 'KeyV',
+  ADD_OBJECT: 'Shift+KeyA',
 
   OPEN_OBJECTS_PANEL: 'KeyO',
   OPEN_OBJECT_GROUPS_PANEL: 'KeyG',

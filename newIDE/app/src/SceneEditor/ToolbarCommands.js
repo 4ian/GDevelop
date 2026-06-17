@@ -2,6 +2,8 @@
 import { useCommand } from '../CommandPalette/CommandHooks';
 
 type Props = {|
+  addObject: () => void,
+  canAddObject: boolean,
   toggleObjectsList: () => void,
   toggleObjectGroupsList: () => void,
   togglePropertiesPanel: () => void,
@@ -21,6 +23,10 @@ type Props = {|
 |};
 
 const ToolbarCommands = (props: Props): null => {
+  useCommand('ADD_OBJECT', props.canAddObject, {
+    handler: props.addObject,
+  });
+
   useCommand('OPEN_OBJECTS_PANEL', true, {
     handler: props.toggleObjectsList,
   });

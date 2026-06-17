@@ -517,6 +517,16 @@ export class CustomObjectVariantTreeViewItemContent
         click: () => this.onClick(),
       },
       {
+        label: i18n._(t`Find usage`),
+        click: () =>
+          this.props.onFindUsage({
+            kind: 'custom-object-variant',
+            eventsFunctionsExtension: this.eventsFunctionsExtension,
+            eventsBasedObject: this.eventsBasedObject,
+            variant: this.variant,
+          }),
+      },
+      {
         type: 'separator',
       },
       {

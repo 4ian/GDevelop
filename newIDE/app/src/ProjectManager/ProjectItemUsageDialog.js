@@ -120,7 +120,7 @@ export default function ProjectItemUsageDialog({
   return (
     <Dialog
       open
-      title={<Trans>Usage of {targetName}</Trans>}
+      title={`Usage of ${targetName}`}
       actions={[
         <DialogPrimaryButton
           key="close"
@@ -135,7 +135,7 @@ export default function ProjectItemUsageDialog({
     >
       <ColumnStackLayout noMargin useLargeSpacer>
         <Text size="body" color="secondary" allowSelection>
-          <Trans>Usages found: {usageCount}</Trans>
+          {`Usages found: ${usageCount}`}
         </Text>
         {usageCount === 0 && (
           <Text size="body">

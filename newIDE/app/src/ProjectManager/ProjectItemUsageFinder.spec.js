@@ -59,6 +59,45 @@ describe('ProjectItemUsageFinder', () => {
     );
   });
 
+  it('finds custom object variant instances', () => {
+    const { project, layout, extension } = makeProject();
+    const eventsBasedObject = extension
+      .getEventsBasedObjects()
+      .insertNew('PlantCardSlot', 0);
+    const variant = eventsBasedObject
+      .getVariants()
+      .insertNewVariant('New variant', 0);
+
+    const baseSlot = layout
+      .getObjects()
+      .insertNewObject(project, 'PlantCards::PlantCardSlot', 'BaseSlot', 0);
+    gd.asCustomObjectConfiguration(baseSlot.getConfiguration()).setVariantName(
+      ''
+    );
+
+    const variantSlot = layout
+      .getObjects()
+      .insertNewObject(project, 'PlantCards::PlantCardSlot', 'VariantSlot', 1);
+    gd.asCustomObjectConfiguration(
+      variantSlot.getConfiguration()
+    ).setVariantName('New variant');
+
+    const report = findProjectItemUsages(project, {
+      kind: 'custom-object-variant',
+      eventsFunctionsExtension: extension,
+      eventsBasedObject,
+      variant,
+    });
+
+    expect(report.objectUsages).toEqual([
+      expect.objectContaining({
+        location: 'Scene "SceneA" object "VariantSlot"',
+        details:
+          'Object variant "New variant" of type "PlantCards::PlantCardSlot"',
+      }),
+    ]);
+  });
+
   it('finds events based behavior instances', () => {
     const { project, layout, extension } = makeProject();
     const eventsBasedBehavior = extension

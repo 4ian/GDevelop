@@ -1691,6 +1691,350 @@ describe('editorFunctions', () => {
     });
   });
 
+  describe('put_2d_instances (brush placement positions)', () => {
+    let project: gdProject;
+    let testScene: gdLayout;
+
+    beforeEach(() => {
+      // $FlowFixMe[invalid-constructor]
+      project = new gd.ProjectHelper.createNewGDJSProject();
+      testScene = project.insertNewLayout('TestScene', 0);
+      testScene.getObjects().insertNewObject(project, 'Sprite', 'Player', 0);
+    });
+
+    afterEach(() => {
+      project.delete();
+    });
+
+    // Collect the (x, y) of every instance on the scene, sorted by x then y so
+    // assertions are independent of insertion order.
+    const getInstancePositions = (
+      scene: gdLayout
+    ): Array<{| x: number, y: number |}> => {
+      const positions = [];
+      const functor = new gd.InitialInstanceJSFunctor();
+      // $FlowFixMe[cannot-write]
+      functor.invoke = instancePtr => {
+        const instance: gdInitialInstance = gd.wrapPointer(
+          // $FlowFixMe[incompatible-type]
+          instancePtr,
+          gd.InitialInstance
+        );
+        positions.push({ x: instance.getX(), y: instance.getY() });
+      };
+      // $FlowFixMe[incompatible-type]
+      scene.getInitialInstances().iterateOverInstances(functor);
+      functor.delete();
+      return positions.sort((a, b) => a.x - b.x || a.y - b.y);
+    };
+
+    // Collect full instances (with their persistent uuid) so tests can target
+    // existing instances by id for move/erase, like the real tool does.
+    const getInstances = (
+      scene: gdLayout
+    ): Array<{| uuid: string, x: number, y: number, layer: string |}> => {
+      const instances = [];
+      const functor = new gd.InitialInstanceJSFunctor();
+      // $FlowFixMe[cannot-write]
+      functor.invoke = instancePtr => {
+        const instance: gdInitialInstance = gd.wrapPointer(
+          // $FlowFixMe[incompatible-type]
+          instancePtr,
+          gd.InitialInstance
+        );
+        instances.push({
+          uuid: instance.getPersistentUuid(),
+          x: instance.getX(),
+          y: instance.getY(),
+          layer: instance.getLayer(),
+        });
+      };
+      // $FlowFixMe[incompatible-type]
+      scene.getInitialInstances().iterateOverInstances(functor);
+      functor.delete();
+      return instances;
+    };
+
+    const putInstances = async (args: any) => {
+      const result = await editorFunctions.put_2d_instances.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          object_name: 'Player',
+          layer_name: '',
+          ...args,
+        },
+      });
+      expect(result.success).toBe(true);
+      return result;
+    };
+
+    it('places a single instance at the exact position with the point brush', async () => {
+      await putInstances({
+        brush_kind: 'point',
+        brush_position: '100,200',
+        new_instances_count: 1,
+      });
+
+      expect(getInstancePositions(testScene)).toEqual([{ x: 100, y: 200 }]);
+    });
+
+    it('distributes instances evenly along a horizontal line brush', async () => {
+      await putInstances({
+        brush_kind: 'line',
+        brush_position: '0,50',
+        brush_end_position: '300,50',
+        new_instances_count: 4,
+      });
+
+      expect(getInstancePositions(testScene)).toEqual([
+        { x: 0, y: 50 },
+        { x: 100, y: 50 },
+        { x: 200, y: 50 },
+        { x: 300, y: 50 },
+      ]);
+    });
+
+    // Regression test: the grid brush used to compute the X step from the Y
+    // span (and vice-versa), so a horizontal request collapsed every instance
+    // onto the same X and marched them down off-screen in Y.
+    it('spreads grid instances along X when start and end share the same Y', async () => {
+      await putInstances({
+        brush_kind: 'grid',
+        brush_position: '128,288',
+        brush_end_position: '320,288',
+        new_instances_count: 4,
+      });
+
+      expect(getInstancePositions(testScene)).toEqual([
+        { x: 128, y: 288 },
+        { x: 192, y: 288 },
+        { x: 256, y: 288 },
+        { x: 320, y: 288 },
+      ]);
+    });
+
+    // Regression test: the flat span must not stack instances on the same spot.
+    it('spreads grid instances along Y when start and end share the same X', async () => {
+      await putInstances({
+        brush_kind: 'grid',
+        brush_position: '100,100',
+        brush_end_position: '100,400',
+        new_instances_count: 4,
+      });
+
+      expect(getInstancePositions(testScene)).toEqual([
+        { x: 100, y: 100 },
+        { x: 100, y: 200 },
+        { x: 100, y: 300 },
+        { x: 100, y: 400 },
+      ]);
+    });
+
+    it('lays out a real 2D grid reaching the end position', async () => {
+      await putInstances({
+        brush_kind: 'grid',
+        brush_position: '0,0',
+        brush_end_position: '200,200',
+        new_instances_count: 9,
+      });
+
+      const positions = getInstancePositions(testScene);
+      expect(positions).toHaveLength(9);
+      // 3x3 grid: both axes use {0, 100, 200} and the last cell reaches the end.
+      expect(new Set(positions.map(p => p.x))).toEqual(new Set([0, 100, 200]));
+      expect(new Set(positions.map(p => p.y))).toEqual(new Set([0, 100, 200]));
+      expect(positions).toContainEqual({ x: 200, y: 200 });
+    });
+
+    it('does not stack grid instances on top of each other', async () => {
+      await putInstances({
+        brush_kind: 'grid',
+        brush_position: '128,288',
+        brush_end_position: '320,288',
+        new_instances_count: 4,
+      });
+
+      const positions = getInstancePositions(testScene);
+      const uniqueKeys = new Set(positions.map(p => `${p.x},${p.y}`));
+      expect(uniqueKeys.size).toBe(positions.length);
+    });
+
+    it('falls back to the scene center when no brush_position is given', async () => {
+      await putInstances({
+        brush_kind: 'point',
+        new_instances_count: 1,
+      });
+
+      expect(getInstancePositions(testScene)).toEqual([
+        {
+          x: project.getGameResolutionWidth() / 2,
+          y: project.getGameResolutionHeight() / 2,
+        },
+      ]);
+    });
+
+    it('scatters instances within the radius for the random_in_circle brush', async () => {
+      const center = { x: 500, y: 400 };
+      const radius = 80;
+      await putInstances({
+        brush_kind: 'random_in_circle',
+        brush_position: `${center.x},${center.y}`,
+        brush_size: radius,
+        new_instances_count: 12,
+      });
+
+      const positions = getInstancePositions(testScene);
+      expect(positions).toHaveLength(12);
+      positions.forEach(({ x, y }) => {
+        const distance = Math.sqrt((x - center.x) ** 2 + (y - center.y) ** 2);
+        expect(distance).toBeLessThanOrEqual(radius);
+      });
+    });
+
+    // line/grid need an end position to spread instances. Omitting it must fail
+    // up front (and create nothing) rather than silently dropping every
+    // instance at the default origin.
+    it('fails without creating instances when line/grid brush lacks brush_end_position', async () => {
+      for (const brush_kind of ['line', 'grid']) {
+        const result = await editorFunctions.put_2d_instances.launchFunction({
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'Player',
+            layer_name: '',
+            brush_kind,
+            brush_position: '50,60',
+            new_instances_count: 3,
+          },
+        });
+
+        expect(result.success).toBe(false);
+        expect(result.message).toEqual(
+          expect.stringContaining('requires brush_end_position')
+        );
+        // Nothing must have been created on the scene.
+        expect(getInstancePositions(testScene)).toEqual([]);
+      }
+    });
+
+    it('moves an existing instance to a new position with the point brush', async () => {
+      await putInstances({
+        brush_kind: 'point',
+        brush_position: '100,200',
+        new_instances_count: 1,
+      });
+      const [created] = getInstances(testScene);
+
+      const result = await putInstances({
+        brush_kind: 'point',
+        brush_position: '640,360',
+        existing_instance_ids: created.uuid,
+      });
+
+      // No new instance is created; the existing one is repositioned.
+      expect(getInstancePositions(testScene)).toEqual([{ x: 640, y: 360 }]);
+      expect(result.message).toEqual(
+        expect.stringContaining('Repositioned 1 instance')
+      );
+    });
+
+    it('reports resize/rotation/opacity/z-order changes for an existing instance', async () => {
+      await putInstances({
+        brush_kind: 'point',
+        brush_position: '100,200',
+        new_instances_count: 1,
+      });
+      const [created] = getInstances(testScene);
+
+      const result = await putInstances({
+        brush_kind: 'none',
+        existing_instance_ids: created.uuid,
+        instances_size: '48,48',
+        instances_rotation: 90,
+        instances_opacity: 128,
+        instances_z_order: 7,
+      });
+
+      expect(result.message).toEqual(expect.stringContaining('Resized 1'));
+      expect(result.message).toEqual(expect.stringContaining('Rotated 1'));
+      expect(result.message).toEqual(
+        expect.stringContaining('Changed opacity of 1 instance to 128/255')
+      );
+      expect(result.message).toEqual(
+        expect.stringContaining('Changed Z-order of 1 instance to 7')
+      );
+    });
+
+    it('erases an existing instance by id', async () => {
+      await putInstances({
+        brush_kind: 'point',
+        brush_position: '100,200',
+        new_instances_count: 2,
+      });
+      const instances = getInstances(testScene);
+      expect(instances).toHaveLength(2);
+
+      const result = await putInstances({
+        brush_kind: 'erase',
+        existing_instance_ids: instances[0].uuid,
+      });
+
+      expect(result.message).toEqual(
+        expect.stringContaining('Erased 1 instance')
+      );
+      expect(getInstances(testScene)).toHaveLength(1);
+    });
+
+    it('erases an instance at an exact position (brush_size 0)', async () => {
+      await putInstances({
+        brush_kind: 'point',
+        brush_position: '100,200',
+        new_instances_count: 1,
+      });
+
+      const result = await putInstances({
+        brush_kind: 'erase',
+        brush_position: '100,200',
+      });
+
+      expect(result.message).toEqual(
+        expect.stringContaining('Erased 1 instance')
+      );
+      expect(getInstancePositions(testScene)).toEqual([]);
+    });
+
+    it('erases instances within the brush radius', async () => {
+      await putInstances({
+        brush_kind: 'point',
+        brush_position: '100,100',
+        new_instances_count: 1,
+      });
+
+      const result = await putInstances({
+        brush_kind: 'erase',
+        brush_position: '120,120',
+        brush_size: 50,
+      });
+
+      expect(result.message).toEqual(
+        expect.stringContaining('Erased 1 instance')
+      );
+      expect(getInstancePositions(testScene)).toEqual([]);
+    });
+
+    it('reports not-found ids when erasing an unknown instance id', async () => {
+      const result = await putInstances({
+        brush_kind: 'erase',
+        existing_instance_ids: 'does-not-exist',
+      });
+
+      expect(result.message).toEqual(
+        expect.stringContaining('Instance ids not found: does-not-exist')
+      );
+    });
+  });
+
   describe('put_3d_instances (new-instance attributes in message)', () => {
     let project: gdProject;
     let testScene: gdLayout;
@@ -1728,6 +2072,109 @@ describe('editorFunctions', () => {
         )
       );
     });
+  });
+
+  describe('put_3d_instances (brush placement positions)', () => {
+    let project: gdProject;
+    let testScene: gdLayout;
+
+    beforeEach(() => {
+      // $FlowFixMe[invalid-constructor]
+      project = new gd.ProjectHelper.createNewGDJSProject();
+      testScene = project.insertNewLayout('TestScene', 0);
+      testScene.getObjects().insertNewObject(project, 'Sprite', 'Player', 0);
+    });
+
+    afterEach(() => {
+      project.delete();
+    });
+
+    // Collect the (x, y, z) of every instance, sorted for order-independence.
+    const getInstancePositions = (
+      scene: gdLayout
+    ): Array<{| x: number, y: number, z: number |}> => {
+      const positions = [];
+      const functor = new gd.InitialInstanceJSFunctor();
+      // $FlowFixMe[cannot-write]
+      functor.invoke = instancePtr => {
+        const instance: gdInitialInstance = gd.wrapPointer(
+          // $FlowFixMe[incompatible-type]
+          instancePtr,
+          gd.InitialInstance
+        );
+        positions.push({
+          x: instance.getX(),
+          y: instance.getY(),
+          z: instance.getZ(),
+        });
+      };
+      // $FlowFixMe[incompatible-type]
+      scene.getInitialInstances().iterateOverInstances(functor);
+      functor.delete();
+      return positions.sort((a, b) => a.x - b.x || a.y - b.y || a.z - b.z);
+    };
+
+    const putInstances = async (args: any) => {
+      const result = await editorFunctions.put_3d_instances.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          object_name: 'Player',
+          layer_name: '',
+          ...args,
+        },
+      });
+      expect(result.success).toBe(true);
+      return result;
+    };
+
+    it('places a single instance at the exact position with the point brush', async () => {
+      await putInstances({
+        brush_kind: 'point',
+        brush_position: '10,20,30',
+        new_instances_count: 1,
+      });
+
+      expect(getInstancePositions(testScene)).toEqual([
+        { x: 10, y: 20, z: 30 },
+      ]);
+    });
+
+    it('distributes instances evenly along a 3D line brush', async () => {
+      await putInstances({
+        brush_kind: 'line',
+        brush_position: '0,0,0',
+        brush_end_position: '300,300,300',
+        new_instances_count: 4,
+      });
+
+      expect(getInstancePositions(testScene)).toEqual([
+        { x: 0, y: 0, z: 0 },
+        { x: 100, y: 100, z: 100 },
+        { x: 200, y: 200, z: 200 },
+        { x: 300, y: 300, z: 300 },
+      ]);
+    });
+
+    it('scatters instances within the radius for the random_in_sphere brush', async () => {
+      const radius = 50;
+      await putInstances({
+        brush_kind: 'random_in_sphere',
+        brush_position: '0,0,0',
+        brush_size: radius,
+        new_instances_count: 10,
+      });
+
+      const positions = getInstancePositions(testScene);
+      expect(positions).toHaveLength(10);
+      positions.forEach(({ x, y, z }) => {
+        expect(Math.sqrt(x * x + y * y + z * z)).toBeLessThanOrEqual(radius);
+      });
+    });
+
+    // Note: there is intentionally no grid test here. `grid` is not part of
+    // supported3dBrushKinds, so the tool schema prevents the model from ever
+    // sending it to put_3d_instances (unlike the 2D variant, which supports it).
   });
 
   describe('describe_instances (position semantics)', () => {

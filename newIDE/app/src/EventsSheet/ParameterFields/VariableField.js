@@ -376,10 +376,9 @@ export default (React.forwardRef<Props, VariableFieldInterface>(
         onChange(fieldCurrentValue);
         editEventsFunctionParameter({
           variableName: fieldCurrentValue,
-          shouldCreate: !isRootVariableDeclared(
-            fieldCurrentValue,
-            variablesContainers
-          ),
+          shouldCreate:
+            !!fieldCurrentValue &&
+            !isRootVariableDeclared(fieldCurrentValue, variablesContainers),
           variableType: instruction
             ? getVariableTypeName(
                 gd.VariableInstructionSwitcher.getSwitchableInstructionVariableType(
@@ -412,10 +411,9 @@ export default (React.forwardRef<Props, VariableFieldInterface>(
         onChange(fieldCurrentValue);
         openEventsBasedEntityPropertyEditorDialog({
           variableName: fieldCurrentValue,
-          shouldCreate: !isRootVariableDeclared(
-            fieldCurrentValue,
-            variablesContainers
-          ),
+          shouldCreate:
+            !!fieldCurrentValue &&
+            !isRootVariableDeclared(fieldCurrentValue, variablesContainers),
           variableType: instruction
             ? getVariableTypeName(
                 gd.VariableInstructionSwitcher.getSwitchableInstructionVariableType(

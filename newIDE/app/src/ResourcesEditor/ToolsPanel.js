@@ -56,6 +56,8 @@ const projectFileDragDataMimeType = 'application/x-gdevelop-project-file';
 const imageExtenderGitHubUrl = 'https://github.com/zhouzhipeng/image-extender';
 const aiGameWorkbenchGitHubUrl =
   'https://github.com/zhouzhipeng/ai_game_workbench';
+const gorestSpritesheetGitHubUrl =
+  'https://github.com/zhouzhipeng/gorest-2d-animation-spritesheet-generator';
 
 type Props = {|
   project: gdProject,
@@ -69,7 +71,8 @@ type ImageTool =
   | 'nano-banana'
   | 'local-tools'
   | 'image-extender'
-  | 'ai-game-workbench';
+  | 'ai-game-workbench'
+  | 'gorest-spritesheet';
 type SoundTool = 'elevenlabs';
 export type ImageAttachment = {|
   absolutePath: string,
@@ -633,7 +636,8 @@ export const getResourcesToolsSettingsWithDefaults = (
     settings &&
     (settings.selectedImageTool === 'local-tools' ||
       settings.selectedImageTool === 'image-extender' ||
-      settings.selectedImageTool === 'ai-game-workbench')
+      settings.selectedImageTool === 'ai-game-workbench' ||
+      settings.selectedImageTool === 'gorest-spritesheet')
       ? settings.selectedImageTool
       : defaultResourcesToolsSettings.selectedImageTool,
   selectedSoundTool: defaultResourcesToolsSettings.selectedSoundTool,
@@ -808,6 +812,14 @@ const ToolsPanel = ({
   const [
     aiGameWorkbenchError,
     setAiGameWorkbenchError,
+  ] = React.useState<?string>(null);
+  const [
+    gorestSpritesheetStatus,
+    setGorestSpritesheetStatus,
+  ] = React.useState<?string>(null);
+  const [
+    gorestSpritesheetError,
+    setGorestSpritesheetError,
   ] = React.useState<?string>(null);
   const [
     localImageOperation,
@@ -1769,6 +1781,27 @@ const ToolsPanel = ({
     }
   }, []);
 
+  const openGorestSpritesheet = React.useCallback(async () => {
+    if (!ipcRenderer) {
+      setGorestSpritesheetError(
+        'Gorest Spritesheet is only available in the desktop app.'
+      );
+      return;
+    }
+
+    setGorestSpritesheetError(null);
+    setGorestSpritesheetStatus('Opening Gorest Spritesheet...');
+    try {
+      await ipcRenderer.invoke('gorest-spritesheet-load');
+      setGorestSpritesheetStatus('Gorest Spritesheet opened.');
+    } catch (error) {
+      setGorestSpritesheetError(
+        error && error.message ? error.message : String(error)
+      );
+      setGorestSpritesheetStatus(null);
+    }
+  }, []);
+
   const importAiGameWorkbenchGDevelopExtension = React.useCallback(
     async (
       payload: AiGameWorkbenchExtensionImportPayload
@@ -1887,7 +1920,8 @@ const ToolsPanel = ({
             value === 'nano-banana' ||
             value === 'local-tools' ||
             value === 'image-extender' ||
-            value === 'ai-game-workbench'
+            value === 'ai-game-workbench' ||
+            value === 'gorest-spritesheet'
           ) {
             setSelectedImageTool(value);
           }
@@ -1897,6 +1931,7 @@ const ToolsPanel = ({
         <SelectOption value="nano-banana" label={t`Nano Banana`} />
         <SelectOption value="image-extender" label={t`Image Extender`} />
         <SelectOption value="ai-game-workbench" label={t`AI Game Workbench`} />
+        <SelectOption value="gorest-spritesheet" label={t`Gorest Spritesheet`} />
         <SelectOption value="local-tools" label={t`Local tools`} />
       </SelectField>
     </div>
@@ -2083,6 +2118,38 @@ const ToolsPanel = ({
           onClick={() => Window.openExternalURL(aiGameWorkbenchGitHubUrl)}
         >
           {aiGameWorkbenchGitHubUrl}
+        </Link>
+      </Text>
+    </div>
+  );
+
+  const renderGorestSpritesheet = () => (
+    <div style={styles.section}>
+      {renderImageToolSelector()}
+      <MiniToolbar noPadding>
+        <SparkleIcon />
+        <MiniToolbarText>
+          <Trans>Gorest Spritesheet</Trans>
+        </MiniToolbarText>
+      </MiniToolbar>
+      <MiniToolbar noPadding>
+        <RaisedButton
+          label={<Trans>Open Gorest Spritesheet</Trans>}
+          icon={<SparkleIcon />}
+          color="ai"
+          onClick={openGorestSpritesheet}
+        />
+      </MiniToolbar>
+      {!!gorestSpritesheetError && (
+        <Text color="error">{gorestSpritesheetError}</Text>
+      )}
+      {!!gorestSpritesheetStatus && <Text>{gorestSpritesheetStatus}</Text>}
+      <Text>
+        <Link
+          href={gorestSpritesheetGitHubUrl}
+          onClick={() => Window.openExternalURL(gorestSpritesheetGitHubUrl)}
+        >
+          {gorestSpritesheetGitHubUrl}
         </Link>
       </Text>
     </div>
@@ -2453,6 +2520,8 @@ const ToolsPanel = ({
               ? renderImageExtender()
               : selectedImageTool === 'ai-game-workbench'
               ? renderAiGameWorkbench()
+              : selectedImageTool === 'gorest-spritesheet'
+              ? renderGorestSpritesheet()
               : selectedImageTool === 'local-tools'
               ? renderLocalImageTools()
               : null

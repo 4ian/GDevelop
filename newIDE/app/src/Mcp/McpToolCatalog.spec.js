@@ -40,6 +40,7 @@ describe('McpToolCatalog', () => {
     expect(toolNames).toContain('find_project_events');
     expect(toolNames).toContain('validate_events_json_file');
     expect(toolNames).toContain('lint_scene_events');
+    expect(toolNames).toContain('lint_extension_function_events');
     expect(toolNames).toContain('get_tilemap_tiles');
     expect(toolNames).toContain('inspect_tilemap_palette');
     expect(toolNames).toContain('inspect_tilemap_collision');
@@ -97,6 +98,7 @@ describe('McpToolCatalog', () => {
     expect(toolNames).toContain('replace_object_definition');
     expect(toolNames).toContain('delete_scene_object');
     expect(toolNames).toContain('delete_scene_variable');
+    expect(toolNames).toContain('batch_delete_scene_variables');
     expect(toolNames).toContain('delete_object_variable');
     expect(toolNames).toContain('delete_instance_variable');
     expect(toolNames).toContain('set_object_properties');
@@ -105,6 +107,7 @@ describe('McpToolCatalog', () => {
     expect(toolNames).toContain('create_text_object');
     expect(toolNames).toContain('apply_validated_scene_patch');
     expect(toolNames).toContain('patch_scene_event_instruction');
+    expect(toolNames).toContain('patch_extension_event_instruction');
     expect(toolNames).toContain('replace_javascript_event_code');
     expect(toolNames).toContain('attach_object_to_object_top');
     expect(toolNames).toContain('create_group');
@@ -137,8 +140,10 @@ describe('McpToolCatalog', () => {
     expect(isWriteTool('bind_sprite_animations_from_directory')).toBe(true);
     expect(isWriteTool('set_tilemap_collision_tiles')).toBe(true);
     expect(isWriteTool('patch_scene_event_instruction')).toBe(true);
+    expect(isWriteTool('patch_extension_event_instruction')).toBe(true);
     expect(isWriteTool('replace_javascript_event_code')).toBe(true);
     expect(isWriteTool('delete_scene_variable')).toBe(true);
+    expect(isWriteTool('batch_delete_scene_variables')).toBe(true);
     expect(isWriteTool('delete_object_variable')).toBe(true);
     expect(isWriteTool('delete_instance_variable')).toBe(true);
     expect(isWriteTool('attach_object_to_object_top')).toBe(true);
@@ -158,6 +163,7 @@ describe('McpToolCatalog', () => {
     expect(isWriteTool('gdevelop_refresh_tool_catalog')).toBe(false);
     expect(isWriteTool('validate_events_json_file')).toBe(false);
     expect(isWriteTool('lint_scene_events')).toBe(false);
+    expect(isWriteTool('lint_extension_function_events')).toBe(false);
     expect(isWriteTool('gdevelop_create_or_update_extension')).toBe(true);
     expect(isWriteTool('gdevelop_extract_prefab_from_object')).toBe(true);
     expect(isWriteTool('read_scene_events')).toBe(false);
@@ -236,6 +242,15 @@ describe('McpToolCatalog', () => {
       getMcpToolUsageExamples('replace_javascript_event_code')
         .replace_javascript_event_code.length
     ).toBeGreaterThan(0);
+    expect(
+      getMcpToolUsageExamples('patch_extension_event_instruction')
+        .patch_extension_event_instruction.length
+    ).toBeGreaterThan(0);
+    expect(
+      getMcpToolUsageExamples('gdevelop_create_or_update_extension_function')
+        .gdevelop_create_or_update_extension_function[0].arguments.events_json[0]
+        .variables[0].name
+    ).toBe('LocalSunCount');
   });
 
   it('uses OpenAI-compatible top-level input schemas for every tool', () => {

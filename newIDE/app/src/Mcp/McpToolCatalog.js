@@ -1451,7 +1451,7 @@ const inspectRunningPreviewSchema = {
       type: 'array',
       items: { type: 'string' },
       description:
-        'Optional object names to include live instance positions (x/y/angle/zOrder, up to 50 each) in the compact summary — e.g. ["Player"] to confirm where the player is, without pulling the raw dump.',
+        'Optional object names to include live instance positions (x/y/angle/layer/zOrder, up to 50 each) in the compact summary — e.g. ["Player"] to confirm where the player is, without pulling the raw dump.',
     },
     include_instance_positions: {
       type: 'boolean',
@@ -1671,7 +1671,7 @@ const runFramesSchema = {
       type: 'array',
       items: { type: 'string' },
       description:
-        'Object names whose live instance x/y/angle to include in the returned runtime snapshot.',
+        'Object names whose live instance x/y/angle/layer/zOrder to include in the returned runtime snapshot.',
     },
     debugger_id: {
       type: 'string',
@@ -2364,6 +2364,31 @@ const deleteSceneVariableSchema = {
   additionalProperties: true,
 };
 
+const batchDeleteSceneVariablesSchema = {
+  type: 'object',
+  properties: {
+    scene_name: sceneNameSchema.properties.scene_name,
+    variable_names_or_paths: {
+      type: 'array',
+      items: { type: 'string' },
+      description:
+        'Scene variable names or nested paths to delete, for example ["OldScore", "State.Mode"]. Each root variable is reference-checked against scene events.',
+    },
+    dry_run: {
+      type: 'boolean',
+      description:
+        'When true, report what would be deleted without modifying the scene.',
+    },
+    ignore_references: {
+      type: 'boolean',
+      description:
+        'Default false. When false, variables whose root name appears in scene events are skipped instead of deleted.',
+    },
+  },
+  required: ['scene_name', 'variable_names_or_paths'],
+  additionalProperties: true,
+};
+
 const deleteObjectVariableSchema = {
   type: 'object',
   properties: {
@@ -2545,7 +2570,7 @@ const extensionFunctionSchema = {
           type: {
             type: 'string',
             description:
-              'GDevelop parameter type, for example object, expression, string, variable, layer, or behavior.',
+              'GDevelop parameter type, for example object, expression, string, variable, layer, or behavior. For type "variable" inside extension functions, use CopyArgumentToVariable2 / CopyVariableToArgument2 in events; do not pass the parameter name directly to NumberVariable or SetNumberVariable.',
           },
           description: { type: 'string' },
           long_description: { type: 'string' },
@@ -2560,9 +2585,16 @@ const extensionFunctionSchema = {
       },
     },
     events_json: {
-      type: 'string',
+      oneOf: [
+        { type: 'string' },
+        {
+          type: 'array',
+          items: { type: 'object', additionalProperties: true },
+        },
+        { type: 'object', additionalProperties: true },
+      ],
       description:
-        'Serialized GDevelop events array to replace the function events. It is validated before writing; function metadata and events are rolled back if sentence validation fails.',
+        'Serialized GDevelop events to replace the function events. Accepts a JSON string, events array, single serialized event object, or { events: [...] }. It is validated before writing, generated JavaScript is preflighted, and function metadata/events are rolled back if validation fails.',
     },
     serialized_function: {
       type: 'object',
@@ -2580,8 +2612,59 @@ const extensionFunctionSchema = {
       description:
         'When true, omit eventsJson/eventsAsText and serializedFunction from create/update or inspect responses.',
     },
+    compact: {
+      type: 'boolean',
+      description:
+        'For inspect, return only function metadata plus compact event/action/condition summaries. Omits eventsAsText, eventsJson, and serializedFunction.',
+    },
     include_events: extensionInspectSchema.properties.include_events,
     include_serialized: extensionInspectSchema.properties.include_serialized,
+  },
+  required: ['extension_name', 'function_name'],
+  additionalProperties: true,
+};
+
+const patchExtensionEventInstructionSchema = {
+  type: 'object',
+  properties: {
+    extension_name: extensionNameSchema.properties.extension_name,
+    function_name: extensionFunctionSchema.properties.function_name,
+    parent_kind: extensionFunctionSchema.properties.parent_kind,
+    parent_name: extensionFunctionSchema.properties.parent_name,
+    event: patchSceneEventInstructionSchema.properties.event,
+    event_id: patchSceneEventInstructionSchema.properties.event_id,
+    event_path: patchSceneEventInstructionSchema.properties.event_path,
+    instruction_kind: patchSceneEventInstructionSchema.properties.instruction_kind,
+    instruction_type: patchSceneEventInstructionSchema.properties.instruction_type,
+    object_name: patchSceneEventInstructionSchema.properties.object_name,
+    parameters: patchSceneEventInstructionSchema.properties.parameters,
+    include_serialized: {
+      type: 'boolean',
+      description:
+        'When true, include serializedFunction and eventsAsText after the patch. Default false keeps the response compact.',
+    },
+  },
+  required: ['extension_name', 'function_name', 'instruction_type', 'parameters'],
+  additionalProperties: true,
+};
+
+const lintExtensionFunctionEventsSchema = {
+  type: 'object',
+  properties: {
+    extension_name: extensionNameSchema.properties.extension_name,
+    function_name: extensionFunctionSchema.properties.function_name,
+    parent_kind: extensionFunctionSchema.properties.parent_kind,
+    parent_name: extensionFunctionSchema.properties.parent_name,
+    require_root_groups: {
+      type: 'boolean',
+      description:
+        'Default true. When true, root extension function events that are not Groups are reported as warnings.',
+    },
+    include_generated_code: {
+      type: 'boolean',
+      description:
+        'Default true. When true, run GDevelop extension JavaScript generation and syntax preflight.',
+    },
   },
   required: ['extension_name', 'function_name'],
   additionalProperties: true,
@@ -3092,6 +3175,12 @@ const readTools: Array<McpTool> = [
     description:
       'Lint a scene event sheet for MCP authoring rules: mandatory semantic Groups at root, no JavaScript events unless explicitly allowed, likely multi-instance Create-without-ForEach, empty Group names, Group colors (flags Groups left at the default color and distinct Groups sharing the same color — each Group must have a distinct color), and scene timers compared with CompareTimer but never started with ResetTimer (always-false silent bug).',
     inputSchema: lintSceneEventsSchema,
+  },
+  {
+    name: 'lint_extension_function_events',
+    description:
+      'Lint one project extension function for extension-scope validation errors, variable-parameter misuse, instructions that render with warning/deprecated styling in the function scope, ungrouped root events, and generated JavaScript/codegen hazards.',
+    inputSchema: lintExtensionFunctionEventsSchema,
   },
   {
     name: 'gdevelop_search_instruction_metadata',
@@ -3802,6 +3891,12 @@ const writeTools: Array<McpTool> = [
     inputSchema: patchSceneEventInstructionSchema,
   },
   {
+    name: 'patch_extension_event_instruction',
+    description:
+      'Patch one action or condition inside an extension function event by stable event id/path plus instruction type, then validate generated extension JavaScript before keeping the edit.',
+    inputSchema: patchExtensionEventInstructionSchema,
+  },
+  {
     name: 'replace_javascript_event_code',
     description:
       'Replace the inline code of one existing JavaScript event by stable event id/path, without replacing the whole parent event.',
@@ -3862,6 +3957,12 @@ const writeTools: Array<McpTool> = [
     inputSchema: deleteSceneVariableSchema,
   },
   {
+    name: 'batch_delete_scene_variables',
+    description:
+      'Delete multiple scene variables or nested paths in one call, with conservative scene-event reference checking before deletion.',
+    inputSchema: batchDeleteSceneVariablesSchema,
+  },
+  {
     name: 'delete_object_variable',
     description:
       'Delete one object variable by name or nested path from a scene/global object, without replacing the whole object definition.',
@@ -3898,7 +3999,7 @@ const writeTools: Array<McpTool> = [
   {
     name: 'gdevelop_create_or_update_extension_function',
     description:
-      'Create or update a free, behavior, or object events function inside an extension, including type, metadata, parameters, sentence placeholder validation, and events_json.',
+      'Create or update a free, behavior, or object events function inside an extension, including type, metadata, parameters, sentence placeholder validation, events_json, extension-scope linting, and generated JavaScript preflight.',
     inputSchema: extensionFunctionSchema,
   },
   {
@@ -4520,6 +4621,30 @@ const toolUsageExamples: { [string]: Array<Object> } = {
       },
     },
   ],
+  patch_extension_event_instruction: [
+    {
+      description:
+        'Patch one extension-function action by stable event id, then validate the generated extension JavaScript.',
+      arguments: {
+        extension_name: 'GameplayLogic',
+        function_name: 'AddSun',
+        event_id: 'add-sun-count',
+        instruction_kind: 'action',
+        instruction_type: 'SetNumberVariable',
+        parameters: ['LocalSunCount', '+', '1'],
+      },
+    },
+  ],
+  lint_extension_function_events: [
+    {
+      description:
+        'Validate one extension function before saving or launching preview.',
+      arguments: {
+        extension_name: 'GameplayLogic',
+        function_name: 'AddSun',
+      },
+    },
+  ],
   replace_javascript_event_code: [
     {
       description:
@@ -4660,6 +4785,59 @@ const toolUsageExamples: { [string]: Array<Object> } = {
         'Return a compact extension summary when the full inspect output is too large.',
       arguments: {
         extension_name: 'GameplayUI',
+        summary_only: true,
+      },
+    },
+  ],
+  gdevelop_inspect_extension_function: [
+    {
+      description:
+        'Inspect a compact structured view of one extension function without duplicated eventsAsText/eventsJson/serializedFunction.',
+      arguments: {
+        extension_name: 'GameplayLogic',
+        function_name: 'AddSun',
+        compact: true,
+      },
+    },
+  ],
+  gdevelop_create_or_update_extension_function: [
+    {
+      description:
+        'Use an event-local variable when working with a variable function parameter.',
+      arguments: {
+        extension_name: 'GameplayLogic',
+        function_name: 'AddSun',
+        function_type: 'action',
+        sentence: 'Add sun to _PARAM1_',
+        parameters: [
+          {
+            name: 'SunCountVariable',
+            type: 'variable',
+            description: 'Variable argument that stores the sun count',
+          },
+        ],
+        events_json: [
+          {
+            type: 'BuiltinCommonInstructions::Standard',
+            aiGeneratedEventId: 'add-sun-count',
+            variables: [{ name: 'LocalSunCount', type: 'number', value: 0 }],
+            conditions: [],
+            actions: [
+              {
+                type: { value: 'CopyArgumentToVariable2' },
+                parameters: ['"SunCountVariable"', 'LocalSunCount'],
+              },
+              {
+                type: { value: 'SetNumberVariable' },
+                parameters: ['LocalSunCount', '+', '1'],
+              },
+              {
+                type: { value: 'CopyVariableToArgument2' },
+                parameters: ['"SunCountVariable"', 'LocalSunCount'],
+              },
+            ],
+          },
+        ],
         summary_only: true,
       },
     },
@@ -5071,6 +5249,25 @@ const toolUsageExamples: { [string]: Array<Object> } = {
       },
     },
   ],
+  batch_delete_scene_variables: [
+    {
+      description:
+        'Delete several unreferenced scene variables in one call, skipping any still referenced by scene events.',
+      arguments: {
+        scene_name: 'Level1',
+        variable_names_or_paths: ['OldScore', 'UnusedState.Mode'],
+      },
+    },
+    {
+      description:
+        'Preview a batch cleanup without modifying the scene.',
+      arguments: {
+        scene_name: 'Level1',
+        variable_names_or_paths: ['OldScore', 'TemporaryFlag'],
+        dry_run: true,
+      },
+    },
+  ],
   delete_object_variable: [
     {
       description:
@@ -5275,6 +5472,7 @@ export const getCapabilitiesSummary = (
       'find_scene_events',
       'find_extension_events',
       'find_project_events',
+      'lint_extension_function_events',
       'inspect_object_properties',
       'list_available_behaviors',
       'search_behavior_store',
@@ -5311,16 +5509,19 @@ export const getCapabilitiesSummary = (
       'create_condition',
       'add_scene_events',
       'patch_scene_event_instruction',
+      'patch_extension_event_instruction',
       'replace_javascript_event_code',
       'attach_object_to_object_top',
       'validate_events_json_file',
       'lint_scene_events',
+      'lint_extension_function_events',
       'inspect_gameplay_rules',
       'create_group',
     ],
     'Variables & scenes': [
       'add_or_edit_variable',
       'delete_scene_variable',
+      'batch_delete_scene_variables',
       'delete_object_variable',
       'delete_instance_variable',
       'create_scene',

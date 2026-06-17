@@ -43,6 +43,7 @@ import {
   imageZoomMaxFactor,
   imageZoomMinFactor,
   shouldShowWorkingDeskImageZoomToolbar,
+  type WorkingDeskImageSize,
 } from './WorkingDeskZoomUtils';
 import {
   type WorkingDeskToolTabKind,
@@ -84,6 +85,15 @@ type WorkingDeskToolTab = {|
 |};
 
 type WorkingDeskTab = WorkingDeskFileTab | WorkingDeskToolTab;
+
+type ImagePanStart = {|
+  pointerId: number,
+  didCapturePointer: boolean,
+  clientX: number,
+  clientY: number,
+  scrollLeft: number,
+  scrollTop: number,
+|};
 
 const styles = {
   container: {
@@ -162,6 +172,7 @@ const styles = {
     minHeight: 0,
     minWidth: 0,
     overflow: 'auto',
+    overscrollBehavior: 'contain',
     zIndex: 1,
   },
   imageZoomCanvas: {
@@ -176,7 +187,7 @@ const styles = {
   },
   image: {
     display: 'block',
-    height: '100%',
+    height: 'auto',
     width: 'auto',
     maxWidth: 'none',
     maxHeight: 'none',
@@ -346,9 +357,16 @@ const WorkingDesk = ({
   const [textPreview, setTextPreview] = React.useState<?string>(null);
   const [textPreviewError, setTextPreviewError] = React.useState<?string>(null);
   const [imageZoomFactor, setImageZoomFactor] = React.useState(1);
+  const [imageNaturalSize, setImageNaturalSize] = React.useState<?WorkingDeskImageSize>(
+    null
+  );
+  const [isImageScrollable, setIsImageScrollable] = React.useState(false);
+  const [isImagePanning, setIsImagePanning] = React.useState(false);
   const [audioPreviewError, setAudioPreviewError] = React.useState<?string>(
     null
   );
+  const imageScrollAreaRef = React.useRef<?HTMLDivElement>(null);
+  const imagePanStartRef = React.useRef<?ImagePanStart>(null);
 
   React.useEffect(
     () => {
@@ -425,6 +443,10 @@ const WorkingDesk = ({
       setTextPreview(null);
       setTextPreviewError(null);
       setImageZoomFactor(1);
+      setImageNaturalSize(null);
+      setIsImageScrollable(false);
+      setIsImagePanning(false);
+      imagePanStartRef.current = null;
       setAudioPreviewError(null);
 
       if (!activeFileItem || activeFileItem.node.type !== 'file') return;
@@ -457,6 +479,152 @@ const WorkingDesk = ({
     },
     [activeFileItem]
   );
+
+  const updateImageScrollable = React.useCallback(() => {
+    const scrollArea = imageScrollAreaRef.current;
+    if (!scrollArea) {
+      setIsImageScrollable(false);
+      return;
+    }
+
+    setIsImageScrollable(
+      scrollArea.scrollWidth > scrollArea.clientWidth + 1 ||
+        scrollArea.scrollHeight > scrollArea.clientHeight + 1
+    );
+  }, []);
+
+  React.useEffect(
+    () => {
+      updateImageScrollable();
+    },
+    [imageNaturalSize, imageZoomFactor, selectedNode, updateImageScrollable]
+  );
+
+  React.useEffect(
+    () => {
+      if (typeof window === 'undefined') return;
+      window.addEventListener('resize', updateImageScrollable);
+      return () => window.removeEventListener('resize', updateImageScrollable);
+    },
+    [updateImageScrollable]
+  );
+
+  const stopImagePanning = React.useCallback(() => {
+    const scrollArea = imageScrollAreaRef.current;
+    if (scrollArea && imagePanStartRef.current) {
+      try {
+        scrollArea.releasePointerCapture(
+          String(imagePanStartRef.current.pointerId)
+        );
+      } catch (error) {
+        // The pointer capture can already be released when the pointer leaves
+        // the document or the browser cancels the gesture.
+      }
+    }
+
+    imagePanStartRef.current = null;
+    setIsImagePanning(false);
+  }, []);
+
+  const handleImagePointerDown = React.useCallback((event: PointerEvent) => {
+    if (event.pointerType === 'mouse' && event.button !== 0) return;
+
+    const scrollArea = imageScrollAreaRef.current;
+    if (!scrollArea) return;
+
+    const canPanImage =
+      scrollArea.scrollWidth > scrollArea.clientWidth + 1 ||
+      scrollArea.scrollHeight > scrollArea.clientHeight + 1;
+    setIsImageScrollable(canPanImage);
+    if (!canPanImage) return;
+
+    event.preventDefault();
+    let didCapturePointer = false;
+    try {
+      scrollArea.setPointerCapture(String(event.pointerId));
+      didCapturePointer = true;
+    } catch (error) {
+      // Pointer capture is not available in every test/browser path.
+    }
+
+    imagePanStartRef.current = {
+      pointerId: event.pointerId,
+      didCapturePointer,
+      clientX: event.clientX,
+      clientY: event.clientY,
+      scrollLeft: scrollArea.scrollLeft,
+      scrollTop: scrollArea.scrollTop,
+    };
+    setIsImagePanning(true);
+  }, []);
+
+  const handleImagePointerMove = React.useCallback((event: PointerEvent) => {
+    const panStart = imagePanStartRef.current;
+    const scrollArea = imageScrollAreaRef.current;
+    if (!panStart || !scrollArea || panStart.pointerId !== event.pointerId) {
+      return;
+    }
+
+    event.preventDefault();
+    scrollArea.scrollLeft =
+      panStart.scrollLeft - (event.clientX - panStart.clientX);
+    scrollArea.scrollTop =
+      panStart.scrollTop - (event.clientY - panStart.clientY);
+  }, []);
+
+  const handleImageWheel = React.useCallback(
+    (event: WheelEvent) => {
+      if (event.deltaY === 0) return;
+
+      const scrollArea = imageScrollAreaRef.current;
+      if (!scrollArea) return;
+
+      event.preventDefault();
+      event.stopPropagation();
+
+      const nextZoomFactor = getNextImageZoomFactor(
+        imageZoomFactor,
+        event.deltaY < 0 ? 'in' : 'out'
+      );
+      if (nextZoomFactor === imageZoomFactor) return;
+
+      const scrollAreaRect = scrollArea.getBoundingClientRect();
+      const pointerX = event.clientX - scrollAreaRect.left;
+      const pointerY = event.clientY - scrollAreaRect.top;
+      const zoomRatio = nextZoomFactor / imageZoomFactor;
+      const previousScrollLeft = scrollArea.scrollLeft;
+      const previousScrollTop = scrollArea.scrollTop;
+
+      setImageZoomFactor(nextZoomFactor);
+      window.requestAnimationFrame(() => {
+        scrollArea.scrollLeft =
+          (previousScrollLeft + pointerX) * zoomRatio - pointerX;
+        scrollArea.scrollTop =
+          (previousScrollTop + pointerY) * zoomRatio - pointerY;
+        updateImageScrollable();
+      });
+    },
+    [imageZoomFactor, updateImageScrollable]
+  );
+
+  const handleImageLoad = React.useCallback(
+    (event: SyntheticEvent<HTMLImageElement>) => {
+      const imageElement = event.currentTarget;
+      setImageNaturalSize({
+        width: imageElement.naturalWidth || imageElement.clientWidth,
+        height: imageElement.naturalHeight || imageElement.clientHeight,
+      });
+      window.requestAnimationFrame(updateImageScrollable);
+    },
+    [updateImageScrollable]
+  );
+
+  const handleImagePointerLeave = React.useCallback(() => {
+    const panStart = imagePanStartRef.current;
+    if (!panStart || panStart.didCapturePointer) return;
+
+    stopImagePanning();
+  }, [stopImagePanning]);
 
   const saveMarkdown = React.useCallback(
     async () => {
@@ -584,7 +752,10 @@ const WorkingDesk = ({
     if (!selectedNode) return null;
     const imageSource = getFileUrl(selectedNode.absolutePath);
     const imageZoomToolbar = renderImageZoomToolbar();
-    const imageZoomStyles = getWorkingDeskImageZoomStyles(imageZoomFactor);
+    const imageZoomStyles = getWorkingDeskImageZoomStyles(
+      imageZoomFactor,
+      imageNaturalSize
+    );
     return (
       <div style={styles.previewColumn}>
         <div style={styles.mediaStage}>
@@ -592,7 +763,25 @@ const WorkingDesk = ({
           {!!imageZoomToolbar && (
             <div style={styles.imageOverlayToolbar}>{imageZoomToolbar}</div>
           )}
-          <div style={styles.imageScrollArea}>
+          <div
+            ref={imageScrollAreaRef}
+            style={{
+              ...styles.imageScrollArea,
+              cursor: isImageScrollable
+                ? isImagePanning
+                  ? 'grabbing'
+                  : 'grab'
+                : 'default',
+              touchAction: isImageScrollable ? 'none' : 'auto',
+              userSelect: isImagePanning ? 'none' : undefined,
+            }}
+            onPointerDown={handleImagePointerDown}
+            onPointerMove={handleImagePointerMove}
+            onPointerUp={stopImagePanning}
+            onPointerCancel={stopImagePanning}
+            onPointerLeave={handleImagePointerLeave}
+            onWheel={handleImageWheel}
+          >
             <div
               style={{
                 ...styles.imageZoomCanvas,
@@ -606,6 +795,8 @@ const WorkingDesk = ({
                   ...styles.image,
                   ...imageZoomStyles.image,
                 }}
+                draggable="false"
+                onLoad={handleImageLoad}
               />
             </div>
           </div>

@@ -137,52 +137,67 @@ describe('WorkingDesk', () => {
   });
 
   it('applies the zoom factor to both the image scroll extent and image itself', () => {
-    expect(getWorkingDeskImageZoomStyles(1)).toEqual({
+    expect(getWorkingDeskImageZoomStyles(1, null)).toEqual({
       canvas: {
         width: '100%',
         height: '100%',
       },
       image: {
-        height: '100%',
-        transform: 'scale(1)',
-        transformOrigin: 'center center',
+        width: 'auto',
+        height: 'auto',
       },
     });
-    expect(getWorkingDeskImageZoomStyles(1.25)).toEqual({
+    expect(
+      getWorkingDeskImageZoomStyles(1, { width: 1200, height: 800 })
+    ).toEqual({
       canvas: {
-        width: '125%',
-        height: '125%',
+        width: '1232px',
+        height: '832px',
       },
       image: {
-        height: '80%',
-        transform: 'scale(1.25)',
-        transformOrigin: 'center center',
+        width: '1200px',
+        height: '800px',
       },
     });
-    expect(getWorkingDeskImageZoomStyles(0.75)).toEqual({
+    expect(
+      getWorkingDeskImageZoomStyles(1.25, { width: 1200, height: 800 })
+    ).toEqual({
       canvas: {
-        width: '100%',
-        height: '100%',
+        width: '1532px',
+        height: '1032px',
       },
       image: {
-        height: '100%',
-        transform: 'scale(0.75)',
-        transformOrigin: 'center center',
+        width: '1500px',
+        height: '1000px',
+      },
+    });
+    expect(
+      getWorkingDeskImageZoomStyles(0.75, { width: 1200, height: 800 })
+    ).toEqual({
+      canvas: {
+        width: '932px',
+        height: '632px',
+      },
+      image: {
+        width: '900px',
+        height: '600px',
       },
     });
   });
 
-  it('fits image previews to the full working desk height by default', () => {
+  it('keeps image previews at natural size by default', () => {
     const source = fs.readFileSync(
       path.join(__dirname, 'WorkingDesk.js'),
       'utf8'
     );
 
-    expect(source).toMatch(/image:\s*\{[\s\S]*height:\s*'100%',/i);
+    expect(source).toMatch(/image:\s*\{[\s\S]*height:\s*'auto',/i);
     expect(source).toMatch(/image:\s*\{[\s\S]*width:\s*'auto',/i);
     expect(source).toMatch(/image:\s*\{[\s\S]*maxWidth:\s*'none',/i);
     expect(source).toMatch(/image:\s*\{[\s\S]*maxHeight:\s*'none',/i);
-    expect(source).not.toMatch(/maxHeight:\s*imageZoomFactor\s*</i);
+    expect(source).toContain('setImageNaturalSize');
+    expect(source).toContain('naturalWidth');
+    expect(source).not.toMatch(/height:\s*'100%',/i);
   });
 
   it('keeps the zoomed image canvas from shrinking back to the viewport', () => {
@@ -192,6 +207,37 @@ describe('WorkingDesk', () => {
     );
 
     expect(source).toMatch(/imageZoomCanvas:\s*\{[\s\S]*flexShrink:\s*0,/i);
+  });
+
+  it('allows oversized image previews to be panned by dragging', () => {
+    const source = fs.readFileSync(
+      path.join(__dirname, 'WorkingDesk.js'),
+      'utf8'
+    );
+
+    expect(source).toContain('imageScrollAreaRef');
+    expect(source).toContain('handleImagePointerDown');
+    expect(source).toContain('handleImagePointerMove');
+    expect(source).toContain('scrollArea.scrollLeft =');
+    expect(source).toContain('scrollArea.scrollTop =');
+    expect(source).toContain('setPointerCapture');
+    expect(source).toContain('releasePointerCapture');
+    expect(source).toContain('onPointerDown={handleImagePointerDown}');
+    expect(source).toContain('onPointerMove={handleImagePointerMove}');
+    expect(source).toContain('draggable="false"');
+  });
+
+  it('zooms image previews with the mouse wheel', () => {
+    const source = fs.readFileSync(
+      path.join(__dirname, 'WorkingDesk.js'),
+      'utf8'
+    );
+
+    expect(source).toContain('handleImageWheel');
+    expect(source).toContain('onWheel={handleImageWheel}');
+    expect(source).toContain('event.deltaY < 0 ?');
+    expect(source).toContain('setImageZoomFactor(nextZoomFactor)');
+    expect(source).toContain('window.requestAnimationFrame');
   });
 
   it('handles images as single files without auto-detecting sprite sequences', () => {

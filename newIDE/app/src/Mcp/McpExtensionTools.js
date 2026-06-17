@@ -6,8 +6,9 @@ import {
   serializeToJSON,
   unserializeFromJSObject,
 } from '../Utils/Serializer';
-import { validateEventsJson } from './McpEventKnowledge';
 import { findEventsInEventsList } from './McpEventTools';
+import { generateEventsCodeForScope } from '../EventsSheet/GenerateEventsCode';
+import { scanProjectForValidationErrors } from '../Utils/EventsValidationScanner';
 
 const gd: libGDevelop = global.gd;
 
@@ -296,7 +297,7 @@ const summarizeProperty = (
   index: number,
   includeSerialized: boolean = true
 ): Object => {
-  const summary = {
+  const summary: Object = {
     index,
     name: property.getName(),
     type: property.getType(),
@@ -334,7 +335,7 @@ const summarizeEventsFunction = (
   includeSerialized: boolean = true
 ): Object => {
   const events = eventsFunction.getEvents();
-  const summary = {
+  const summary: Object = {
     name: eventsFunction.getName(),
     functionType: functionTypeToName(eventsFunction.getFunctionType()),
     functionTypeValue: eventsFunction.getFunctionType(),
@@ -361,6 +362,193 @@ const summarizeEventsFunction = (
   }
   return summary;
 };
+
+type ExtensionEventReference = {|
+  event: gdBaseEvent,
+  parentList: gdEventsList,
+  index: number,
+  path: Array<number>,
+|};
+
+type ExtensionInstructionReference = {|
+  instruction: gdInstruction,
+  instructionKind: 'action' | 'condition',
+  instructionPath: Array<number>,
+|};
+
+type ExtensionFunctionTarget = {
+  extension: gdEventsFunctionsExtension,
+  parentKind: string,
+  parent:
+    | gdEventsFunctionsExtension
+    | gdEventsBasedBehavior
+    | gdEventsBasedObject,
+  eventsFunction: gdEventsFunction,
+  container?: gdEventsFunctionsContainer,
+};
+
+const formatEventPath = (path: Array<number>): string =>
+  `event-${path.join('.')}`;
+
+const parseEventPath = (eventPath: string): Array<number> => {
+  const pathString = eventPath.startsWith('event-')
+    ? eventPath.slice('event-'.length)
+    : eventPath;
+  if (!pathString) {
+    throw new Error(`Invalid event path: "${eventPath}".`);
+  }
+  const parts = pathString.split('.').map(part => Number(part));
+  if (
+    !parts.length ||
+    parts.some(part => !Number.isInteger(part) || part < 0)
+  ) {
+    throw new Error(`Invalid event path: "${eventPath}".`);
+  }
+  return parts;
+};
+
+const collectEventReferences = (
+  eventsList: gdEventsList,
+  parentPath: Array<number> = []
+): Array<ExtensionEventReference> => {
+  const references = [];
+  for (let index = 0; index < eventsList.getEventsCount(); index++) {
+    const event = eventsList.getEventAt(index);
+    const path = [...parentPath, index];
+    references.push({
+      event,
+      parentList: eventsList,
+      index,
+      path,
+    });
+    if (event.canHaveSubEvents()) {
+      references.push(...collectEventReferences(event.getSubEvents(), path));
+    }
+  }
+  return references;
+};
+
+const getInstructionSummaries = (
+  instructionsList: gdInstructionsList
+): Array<Object> => {
+  const instructions = [];
+  for (let index = 0; index < instructionsList.size(); index++) {
+    const instruction = instructionsList.get(index);
+    const parameters: Array<string> = [];
+    for (
+      let parameterIndex = 0;
+      parameterIndex < instruction.getParametersCount();
+      parameterIndex++
+    ) {
+      parameters.push(
+        instruction.getParameter(parameterIndex).getPlainString()
+      );
+    }
+    const subInstructions = instruction.getSubInstructions();
+    instructions.push({
+      index,
+      type: instruction.getType(),
+      parameters,
+      subInstructionsCount: subInstructions ? subInstructions.size() : 0,
+    });
+  }
+  return instructions;
+};
+
+const getEventInstructions = (
+  event: gdBaseEvent
+): {| conditions: Array<Object>, actions: Array<Object> |} => {
+  const eventType = event.getType();
+  if (eventType === 'BuiltinCommonInstructions::Standard') {
+    const standardEvent = gd.asStandardEvent(event);
+    return {
+      conditions: getInstructionSummaries(standardEvent.getConditions()),
+      actions: getInstructionSummaries(standardEvent.getActions()),
+    };
+  }
+  if (eventType === 'BuiltinCommonInstructions::While') {
+    const whileEvent = gd.asWhileEvent(event);
+    return {
+      conditions: getInstructionSummaries(whileEvent.getWhileConditions()),
+      actions: getInstructionSummaries(whileEvent.getActions()),
+    };
+  }
+  return {
+    conditions: [],
+    actions: [],
+  };
+};
+
+const serializeSingleEventToJSObject = (event: gdBaseEvent): Object => {
+  const eventsList = new gd.EventsList();
+  try {
+    eventsList.insertEvent(event, 0);
+    const serializedEvents = serializeToJSObject(eventsList);
+    if (Array.isArray(serializedEvents) && serializedEvents[0]) {
+      return serializedEvents[0];
+    }
+    return serializeToJSObject(event);
+  } finally {
+    eventsList.delete();
+  }
+};
+
+const summarizeCompactEventReference = (
+  reference: ExtensionEventReference
+): Object => {
+  const event = reference.event;
+  const eventType = event.getType();
+  const instructions = getEventInstructions(event);
+  const summary: Object = {
+    eventPath: formatEventPath(reference.path),
+    path: reference.path,
+    type: eventType,
+    aiGeneratedEventId: event.getAiGeneratedEventId() || null,
+    conditions: instructions.conditions,
+    actions: instructions.actions,
+    subEventsCount: event.canHaveSubEvents()
+      ? event.getSubEvents().getEventsCount()
+      : 0,
+  };
+  if (eventType === 'BuiltinCommonInstructions::Group') {
+    summary.groupName = gd.asGroupEvent(event).getName();
+  } else if (eventType === 'BuiltinCommonInstructions::Comment') {
+    summary.comment = serializeSingleEventToJSObject(event).comment || '';
+  } else if (eventType === 'BuiltinCommonInstructions::JsCode') {
+    const serializedEvent = serializeSingleEventToJSObject(event);
+    const code =
+      typeof serializedEvent.inlineCode === 'string'
+        ? serializedEvent.inlineCode
+        : typeof serializedEvent.code === 'string'
+        ? serializedEvent.code
+        : '';
+    summary.javascript = {
+      lines: code.split('\n').slice(0, 5),
+      lineCount: code ? code.split('\n').length : 0,
+    };
+  }
+  return summary;
+};
+
+const summarizeEventsFunctionCompact = (
+  eventsFunction: gdEventsFunction
+): Object => ({
+  name: eventsFunction.getName(),
+  functionType: functionTypeToName(eventsFunction.getFunctionType()),
+  functionTypeValue: eventsFunction.getFunctionType(),
+  fullName: eventsFunction.getFullName(),
+  description: eventsFunction.getDescription(),
+  sentence: eventsFunction.getSentence(),
+  isPrivate: eventsFunction.isPrivate(),
+  isAsync: eventsFunction.isAsync(),
+  isDeprecated: eventsFunction.isDeprecated(),
+  deprecationMessage: eventsFunction.getDeprecationMessage(),
+  parameters: summarizeParameters(eventsFunction.getParameters()),
+  eventsCount: eventsFunction.getEvents().getEventsCount(),
+  events: collectEventReferences(eventsFunction.getEvents()).map(reference =>
+    summarizeCompactEventReference(reference)
+  ),
+});
 
 const getEventsFunctionSentenceValidation = (
   parentKind: string,
@@ -496,7 +684,7 @@ const summarizeBehavior = (
   includeEvents: boolean = true,
   includeSerialized: boolean = true
 ): Object => {
-  const summary = {
+  const summary: Object = {
     name: behavior.getName(),
     fullName: behavior.getFullName(),
     description: behavior.getDescription(),
@@ -540,7 +728,7 @@ const summarizeObject = (
   includeEvents: boolean = true,
   includeSerialized: boolean = true
 ): Object => {
-  const summary = {
+  const summary: Object = {
     name: object.getName(),
     fullName: object.getFullName(),
     description: object.getDescription(),
@@ -619,7 +807,8 @@ const getInspectOptions = (
 ): {| includeEvents: boolean, includeSerialized: boolean |} => {
   const compactMode = !!(
     args &&
-    (args.summary_only ||
+    (args.compact ||
+      args.summary_only ||
       args.list_functions_only ||
       args.list_objects_only ||
       args.list_behaviors_only)
@@ -858,6 +1047,15 @@ export const inspectExtensionFunction = (
     throw new Error(`Events function not found: "${functionName}".`);
   }
 
+  if (args && args.compact === true) {
+    return {
+      parentKind,
+      function: summarizeEventsFunctionCompact(
+        container.getEventsFunction(functionName)
+      ),
+    };
+  }
+
   return {
     parentKind,
     function: summarizeEventsFunction(
@@ -977,7 +1175,7 @@ const collectExtensionEventSources = (
   args: Object
 ): Array<Object> => {
   const extensionName = extension.getName();
-  const sources = [];
+  const sources: Array<Object> = [];
   addExtensionFunctionEventSources(
     extensionName,
     'extension',
@@ -1093,6 +1291,762 @@ export const findProjectEvents = (
     truncated: matches.length > limit,
     matches: matches.slice(0, limit),
   };
+};
+
+const getFunctionParentName = (target: ExtensionFunctionTarget): ?string =>
+  target.parentKind === 'extension'
+    ? null
+    : target.parent && ((target.parent: any): gdEventsBasedBehavior).getName();
+
+const getExtensionFunctionTarget = (
+  project: gdProject,
+  args: Object
+): ExtensionFunctionTarget => {
+  const { extension, parentKind, parent, container } = getFunctionParent(
+    project,
+    args
+  );
+  const functionName = normalizeRequiredName(
+    args.function_name,
+    'function_name'
+  );
+  if (!container.hasEventsFunctionNamed(functionName)) {
+    throw new Error(`Events function not found: "${functionName}".`);
+  }
+  return {
+    extension,
+    parentKind,
+    parent,
+    container,
+    eventsFunction: container.getEventsFunction(functionName),
+  };
+};
+
+const isProjectValidationErrorForTarget = (
+  error: Object,
+  target: ExtensionFunctionTarget
+): boolean => {
+  if (!error || error.locationType !== 'extension') return false;
+  if (error.extensionName !== target.extension.getName()) return false;
+  if (error.functionName !== target.eventsFunction.getName()) return false;
+  const parentName = getFunctionParentName(target);
+  if (target.parentKind === 'behavior') {
+    return error.behaviorName === parentName;
+  }
+  if (target.parentKind === 'object') {
+    return error.objectName === parentName;
+  }
+  return !error.behaviorName && !error.objectName;
+};
+
+const collectInstructionReferences = (
+  instructionsList: gdInstructionsList,
+  path: Array<number> = []
+): Array<{| instruction: gdInstruction, path: Array<number> |}> => {
+  const references: Array<{|
+    instruction: gdInstruction,
+    path: Array<number>,
+  |}> = [];
+  for (let index = 0; index < instructionsList.size(); index++) {
+    const instruction = instructionsList.get(index);
+    const instructionPath = [...path, index];
+    references.push({ instruction, path: instructionPath });
+    const subInstructions = instruction.getSubInstructions();
+    if (subInstructions && subInstructions.size()) {
+      references.push(
+        ...collectInstructionReferences(subInstructions, instructionPath)
+      );
+    }
+  }
+  return references;
+};
+
+const collectEventInstructionReferences = (
+  event: gdBaseEvent
+): Array<ExtensionInstructionReference> => {
+  const eventType = event.getType();
+  const references: Array<ExtensionInstructionReference> = [];
+  if (eventType === 'BuiltinCommonInstructions::Standard') {
+    const standardEvent = gd.asStandardEvent(event);
+    collectInstructionReferences(standardEvent.getConditions()).forEach(
+      reference =>
+        references.push({
+          instruction: reference.instruction,
+          instructionKind: 'condition',
+          instructionPath: reference.path,
+        })
+    );
+    collectInstructionReferences(standardEvent.getActions()).forEach(
+      reference =>
+        references.push({
+          instruction: reference.instruction,
+          instructionKind: 'action',
+          instructionPath: reference.path,
+        })
+    );
+  } else if (eventType === 'BuiltinCommonInstructions::While') {
+    const whileEvent = gd.asWhileEvent(event);
+    collectInstructionReferences(whileEvent.getWhileConditions()).forEach(
+      reference =>
+        references.push({
+          instruction: reference.instruction,
+          instructionKind: 'condition',
+          instructionPath: reference.path,
+        })
+    );
+    collectInstructionReferences(whileEvent.getConditions()).forEach(
+      reference =>
+        references.push({
+          instruction: reference.instruction,
+          instructionKind: 'condition',
+          instructionPath: reference.path,
+        })
+    );
+    collectInstructionReferences(whileEvent.getActions()).forEach(reference =>
+      references.push({
+        instruction: reference.instruction,
+        instructionKind: 'action',
+        instructionPath: reference.path,
+      })
+    );
+  }
+  return references;
+};
+
+const getMetadataForInstruction = (
+  project: gdProject,
+  instruction: gdInstruction,
+  instructionKind: 'action' | 'condition'
+): ?gdInstructionMetadata => {
+  const type = instruction.getType();
+  if (!type) return null;
+  const metadata =
+    instructionKind === 'condition'
+      ? gd.MetadataProvider.getConditionMetadata(project.getCurrentPlatform(), type)
+      : gd.MetadataProvider.getActionMetadata(project.getCurrentPlatform(), type);
+  return gd.MetadataProvider.isBadInstructionMetadata(metadata)
+    ? null
+    : metadata;
+};
+
+const isInstructionVisibleForExtensionFunction = ({
+  metadata,
+  eventsFunction,
+  parentKind,
+}: {|
+  metadata: gdInstructionMetadata,
+  eventsFunction: gdEventsFunction,
+  parentKind: string,
+|}): boolean =>
+  (metadata.isRelevantForFunctionEvents() && !!eventsFunction) ||
+  (metadata.isRelevantForAsynchronousFunctionEvents() &&
+    !!eventsFunction &&
+    eventsFunction.isAsync()) ||
+  (metadata.isRelevantForCustomObjectEvents() && parentKind === 'object');
+
+const collectInstructionScopeIssues = ({
+  project,
+  parentKind,
+  eventsFunction,
+}: {|
+  project: gdProject,
+  parentKind: string,
+  eventsFunction: gdEventsFunction,
+|}): Array<Object> => {
+  const issues: Array<Object> = [];
+  collectEventReferences(eventsFunction.getEvents()).forEach(eventReference => {
+    collectEventInstructionReferences(eventReference.event).forEach(
+      instructionReference => {
+        const metadata = getMetadataForInstruction(
+          project,
+          instructionReference.instruction,
+          instructionReference.instructionKind
+        );
+        if (!metadata) return;
+        const instructionType = instructionReference.instruction.getType();
+        if (
+          !isInstructionVisibleForExtensionFunction({
+            metadata,
+            eventsFunction,
+            parentKind,
+          })
+        ) {
+          issues.push({
+            severity: 'error',
+            type: 'instruction-not-visible-in-extension-function',
+            instructionType,
+            instructionKind: instructionReference.instructionKind,
+            eventPath: eventReference.path,
+            instructionPath: instructionReference.instructionPath,
+            suggestion:
+              'Use an instruction that is relevant for extension function events. Instructions that are not relevant to the current function scope render with GDevelop warning/deprecated styling and can be ignored or compiled incorrectly.',
+          });
+        } else if (metadata.isHidden()) {
+          issues.push({
+            severity: 'error',
+            type: 'hidden-instruction-in-extension-function',
+            instructionType,
+            instructionKind: instructionReference.instructionKind,
+            eventPath: eventReference.path,
+            instructionPath: instructionReference.instructionPath,
+            deprecationMessage: metadata.getDeprecationMessage() || undefined,
+            suggestion:
+              metadata.getDeprecationMessage() ||
+              'Use a currently visible instruction instead of hidden/deprecated metadata.',
+          });
+        } else if (metadata.getDeprecationMessage()) {
+          issues.push({
+            severity: 'warning',
+            type: 'deprecated-instruction-in-extension-function',
+            instructionType,
+            instructionKind: instructionReference.instructionKind,
+            eventPath: eventReference.path,
+            instructionPath: instructionReference.instructionPath,
+            deprecationMessage: metadata.getDeprecationMessage(),
+            suggestion:
+              metadata.getDeprecationMessage() ||
+              'Use a non-deprecated instruction when possible.',
+          });
+        }
+      }
+    );
+  });
+  return issues;
+};
+
+const DIRECT_VARIABLE_PARAMETER_INSTRUCTION_TYPES = new Set([
+  'NumberVariable',
+  'StringVariable',
+  'BooleanVariable',
+  'SetNumberVariable',
+  'SetStringVariable',
+  'SetBooleanVariable',
+]);
+
+const FUNCTION_VARIABLE_PARAMETER_SUGGESTION =
+  'Inside extension functions, variable parameters are function arguments, not scene/local variables. Use CopyArgumentToVariable2 to copy the argument into an event-local variable, read/write that local variable with NumberVariable/SetNumberVariable, then use CopyVariableToArgument2 to write the local value back when needed.';
+
+const getFunctionVariableParameterNames = (
+  eventsFunction: gdEventsFunction
+): Set<string> => {
+  const variableParameterNames: Set<string> = new Set();
+  const parameters = eventsFunction.getParameters();
+  for (let index = 0; index < parameters.getParametersCount(); index++) {
+    const parameter = parameters.getParameterAt(index);
+    const valueTypeMetadata = parameter.getValueTypeMetadata();
+    if (
+      parameter.getType() === 'variable' ||
+      (valueTypeMetadata && valueTypeMetadata.isVariable())
+    ) {
+      variableParameterNames.add(parameter.getName());
+    }
+  }
+  return variableParameterNames;
+};
+
+const collectFunctionVariableParameterMisuseIssues = (
+  eventsFunction: gdEventsFunction
+): Array<Object> => {
+  const variableParameterNames = getFunctionVariableParameterNames(
+    eventsFunction
+  );
+  if (!variableParameterNames.size) return [];
+
+  const issues: Array<Object> = [];
+  collectEventReferences(eventsFunction.getEvents()).forEach(eventReference => {
+    collectEventInstructionReferences(eventReference.event).forEach(
+      instructionReference => {
+        const instruction = instructionReference.instruction;
+        if (
+          !DIRECT_VARIABLE_PARAMETER_INSTRUCTION_TYPES.has(
+            instruction.getType()
+          ) ||
+          instruction.getParametersCount() < 1
+        ) {
+          return;
+        }
+        const firstParameter = instruction.getParameter(0).getPlainString();
+        if (!variableParameterNames.has(firstParameter)) return;
+
+        issues.push({
+          severity: 'error',
+          type: 'function-variable-parameter-used-as-direct-variable',
+          instructionType: instruction.getType(),
+          instructionKind: instructionReference.instructionKind,
+          eventPath: eventReference.path,
+          instructionPath: instructionReference.instructionPath,
+          parameterIndex: 0,
+          parameterName: firstParameter,
+          suggestion: FUNCTION_VARIABLE_PARAMETER_SUGGESTION,
+        });
+      }
+    );
+  });
+  return issues;
+};
+
+const collectRootGroupIssues = (
+  eventsFunction: gdEventsFunction
+): Array<Object> => {
+  const issues: Array<Object> = [];
+  const eventsList = eventsFunction.getEvents();
+  for (let index = 0; index < eventsList.getEventsCount(); index++) {
+    const event = eventsList.getEventAt(index);
+    if (event.getType() === 'BuiltinCommonInstructions::Group') continue;
+    issues.push({
+      severity: 'warning',
+      type: 'root-extension-event-not-group',
+      eventPath: [index],
+      eventType: event.getType(),
+      suggestion:
+        'Keep extension function root events grouped by responsibility so generated edits and future patches can target stable semantic sections.',
+    });
+  }
+  return issues;
+};
+
+const getExtensionFunctionGenerationScope = ({
+  extension,
+  parentKind,
+  parent,
+  eventsFunction,
+}: ExtensionFunctionTarget): Object => {
+  if (parentKind === 'behavior') {
+    return {
+      eventsFunctionsExtension: extension,
+      eventsBasedBehavior: ((parent: any): gdEventsBasedBehavior),
+    };
+  }
+  if (parentKind === 'object') {
+    return {
+      eventsFunctionsExtension: extension,
+      eventsBasedObject: ((parent: any): gdEventsBasedObject),
+    };
+  }
+  return {
+    eventsFunctionsExtension: extension,
+    eventsFunction,
+  };
+};
+
+const collectGeneratedCodeIssues = (
+  project: gdProject,
+  target: ExtensionFunctionTarget
+): {| issues: Array<Object>, generatedCode: Object |} => {
+  const generatedCode = generateEventsCodeForScope(
+    project,
+    (getExtensionFunctionGenerationScope(target): any)
+  );
+  const summary = {
+    available: !!generatedCode.code,
+    name: generatedCode.name,
+    isWholeEntity: !!generatedCode.isWholeEntity,
+    bytes:
+      typeof generatedCode.code === 'string'
+        ? generatedCode.code.length
+        : undefined,
+    error: generatedCode.error || undefined,
+  };
+  if (generatedCode.error || !generatedCode.code) {
+    return {
+      generatedCode: summary,
+      issues: [
+        {
+          severity: 'error',
+          type: 'extension-events-code-generation-failed',
+          error: generatedCode.error || 'No JavaScript code was generated.',
+          suggestion:
+            'Fix the extension function events before saving or launching preview; the generated extension JavaScript could not be produced.',
+        },
+      ],
+    };
+  }
+
+  try {
+    // Parse-only syntax check. References like gdjs are resolved at runtime and
+    // are intentionally not executed here.
+    // eslint-disable-next-line no-new-func
+    new Function(generatedCode.code);
+  } catch (error) {
+    return {
+      generatedCode: summary,
+      issues: [
+        {
+          severity: 'error',
+          type: 'extension-events-javascript-syntax-error',
+          error: error && error.message ? error.message : String(error),
+          suggestion:
+            'Fix the extension events that generate invalid JavaScript before writing or launching preview.',
+        },
+      ],
+    };
+  }
+
+  return {
+    generatedCode: summary,
+    issues: [],
+  };
+};
+
+const summarizeExtensionLintIssues = (issues: Array<Object>): Object => {
+  const byType = {};
+  issues.forEach(issue => {
+    const type = issue.type || 'unknown';
+    byType[type] = (byType[type] || 0) + 1;
+  });
+  return {
+    totalIssues: issues.length,
+    totalErrors: issues.filter(issue => issue.severity === 'error').length,
+    totalWarnings: issues.filter(issue => issue.severity === 'warning').length,
+    byType,
+  };
+};
+
+const lintExtensionFunctionTarget = (
+  project: gdProject,
+  target: ExtensionFunctionTarget,
+  args: Object = {}
+): Object => {
+  const issues: Array<Object> = [];
+  scanProjectForValidationErrors(project)
+    .filter(error => isProjectValidationErrorForTarget(error, target))
+    .forEach(error => {
+      issues.push({
+        severity: 'error',
+        ...error,
+      });
+    });
+
+  issues.push(
+    ...collectInstructionScopeIssues({
+      project,
+      parentKind: target.parentKind,
+      eventsFunction: target.eventsFunction,
+    })
+  );
+  issues.push(
+    ...collectFunctionVariableParameterMisuseIssues(target.eventsFunction)
+  );
+  if (!args || args.require_root_groups !== false) {
+    issues.push(...collectRootGroupIssues(target.eventsFunction));
+  }
+
+  const generatedCodeResult: {| generatedCode: Object, issues: Array<Object> |} =
+    args && args.include_generated_code === false
+      ? { generatedCode: { skipped: true }, issues: [] }
+      : collectGeneratedCodeIssues(project, target);
+  issues.push(...generatedCodeResult.issues);
+
+  const issueSummary = summarizeExtensionLintIssues(issues);
+  const errors = issues.filter(issue => issue.severity === 'error');
+  return {
+    success: true,
+    valid: errors.length === 0,
+    extensionName: target.extension.getName(),
+    parentKind: target.parentKind,
+    parentName: getFunctionParentName(target),
+    functionName: target.eventsFunction.getName(),
+    issueSummary,
+    issues,
+    errors,
+    generatedCode: generatedCodeResult.generatedCode,
+    function: summarizeEventsFunctionCompact(target.eventsFunction),
+    variableParameterUsageHint: FUNCTION_VARIABLE_PARAMETER_SUGGESTION,
+  };
+};
+
+const assertExtensionFunctionEventsAreValid = (
+  project: gdProject,
+  target: ExtensionFunctionTarget
+) => {
+  const lintResult = lintExtensionFunctionTarget(project, target, {
+    require_root_groups: false,
+  });
+  if (!lintResult.valid) {
+    throw new Error(
+      `Invalid extension function events for "${target.extension.getName()}::${target.eventsFunction.getName()}": ${JSON.stringify(
+        lintResult.errors
+      )}`
+    );
+  }
+};
+
+export const lintExtensionFunctionEvents = (
+  project: gdProject,
+  args: Object
+): Object => {
+  return lintExtensionFunctionTarget(
+    project,
+    getExtensionFunctionTarget(project, args),
+    args || {}
+  );
+};
+
+const pathsEqual = (left: Array<number>, right: Array<number>): boolean =>
+  left.length === right.length &&
+  left.every((part, index) => part === right[index]);
+
+const eventReferenceMatchesTarget = (
+  reference: ExtensionEventReference,
+  target: any
+): boolean => {
+  if (typeof target === 'string') {
+    if (target.startsWith('event-')) {
+      return pathsEqual(reference.path, parseEventPath(target));
+    }
+    return reference.event.getAiGeneratedEventId() === target;
+  }
+  if (!target || typeof target !== 'object') return false;
+
+  let hasCriteria = false;
+  const eventPath =
+    typeof target.event_path === 'string'
+      ? target.event_path
+      : typeof target.eventPath === 'string'
+      ? target.eventPath
+      : null;
+  if (eventPath) {
+    hasCriteria = true;
+    if (!pathsEqual(reference.path, parseEventPath(eventPath))) return false;
+  }
+
+  const eventId =
+    typeof target.ai_generated_event_id === 'string'
+      ? target.ai_generated_event_id
+      : typeof target.aiGeneratedEventId === 'string'
+      ? target.aiGeneratedEventId
+      : typeof target.event_id === 'string'
+      ? target.event_id
+      : typeof target.eventId === 'string'
+      ? target.eventId
+      : typeof target.id === 'string'
+      ? target.id
+      : null;
+  if (eventId) {
+    hasCriteria = true;
+    if (reference.event.getAiGeneratedEventId() !== eventId) return false;
+  }
+
+  if (typeof target.event_type === 'string') {
+    hasCriteria = true;
+    if (reference.event.getType() !== target.event_type) return false;
+  }
+  if (typeof target.group_name === 'string') {
+    hasCriteria = true;
+    if (
+      reference.event.getType() !== 'BuiltinCommonInstructions::Group' ||
+      gd.asGroupEvent(reference.event).getName() !== target.group_name
+    ) {
+      return false;
+    }
+  }
+
+  const instructions = getEventInstructions(reference.event);
+  if (typeof target.action_type === 'string') {
+    hasCriteria = true;
+    if (
+      !instructions.actions.some(
+        instruction => instruction.type === target.action_type
+      )
+    ) {
+      return false;
+    }
+  }
+  if (typeof target.condition_type === 'string') {
+    hasCriteria = true;
+    if (
+      !instructions.conditions.some(
+        instruction => instruction.type === target.condition_type
+      )
+    ) {
+      return false;
+    }
+  }
+  if (typeof target.parameter_contains === 'string') {
+    hasCriteria = true;
+    const needle = target.parameter_contains;
+    const hasNeedle = instructions.actions
+      .concat(instructions.conditions)
+      .some(instruction =>
+        instruction.parameters.some(parameter => parameter.includes(needle))
+      );
+    if (!hasNeedle) return false;
+  }
+  if (typeof target.text_contains === 'string') {
+    hasCriteria = true;
+    if (
+      JSON.stringify(serializeSingleEventToJSObject(reference.event)).indexOf(
+        target.text_contains
+      ) === -1
+    ) {
+      return false;
+    }
+  }
+
+  return hasCriteria;
+};
+
+const getEventTargetFromArgs = (args: Object): any => {
+  if (args.event !== undefined) return args.event;
+  if (args.event_id !== undefined) return args.event_id;
+  if (args.eventId !== undefined) return args.eventId;
+  return args;
+};
+
+const getSingleExtensionEventReference = (
+  eventsList: gdEventsList,
+  target: any
+): ExtensionEventReference => {
+  const references = collectEventReferences(eventsList);
+  const matches = references.filter(reference =>
+    eventReferenceMatchesTarget(reference, target)
+  );
+  if (!matches.length && target === undefined && references.length === 1) {
+    return references[0];
+  }
+  if (!matches.length) {
+    throw new Error('No extension function event matched the event target.');
+  }
+  if (matches.length > 1) {
+    throw new Error(
+      `Ambiguous event target: ${
+        matches.length
+      } events matched. Use event_id or event_path.`
+    );
+  }
+  return matches[0];
+};
+
+const instructionContainsParameter = (
+  instruction: gdInstruction,
+  expected: string
+): boolean => {
+  for (let index = 0; index < instruction.getParametersCount(); index++) {
+    if (instruction.getParameter(index).getPlainString() === expected) {
+      return true;
+    }
+  }
+  return false;
+};
+
+export const patchExtensionEventInstruction = (
+  project: gdProject,
+  args: Object
+): Object => {
+  const target = getExtensionFunctionTarget(project, args);
+  const beforeSerializedExtension = serializeToJSObject(target.extension);
+  try {
+    const instructionKind =
+      typeof args.instruction_kind === 'string'
+        ? args.instruction_kind
+        : typeof args.instructionKind === 'string'
+        ? args.instructionKind
+        : 'action';
+    const normalizedInstructionKind =
+      instructionKind === 'condition' || instructionKind === 'conditions'
+        ? 'condition'
+        : 'action';
+    const instructionType =
+      typeof args.instruction_type === 'string'
+        ? args.instruction_type
+        : typeof args.instructionType === 'string'
+        ? args.instructionType
+        : null;
+    if (!instructionType) {
+      throw new Error('Missing instruction_type.');
+    }
+    const replacementParameters = Array.isArray(args.parameters)
+      ? args.parameters.map(parameter => String(parameter))
+      : null;
+    if (!replacementParameters) {
+      throw new Error('Missing parameters array.');
+    }
+
+    const eventReference = getSingleExtensionEventReference(
+      target.eventsFunction.getEvents(),
+      getEventTargetFromArgs(args)
+    );
+    const objectName =
+      typeof args.object_name === 'string'
+        ? args.object_name
+        : typeof args.objectName === 'string'
+        ? args.objectName
+        : null;
+
+    const matches = collectEventInstructionReferences(eventReference.event)
+      .filter(reference => reference.instructionKind === normalizedInstructionKind)
+      .filter(reference => reference.instruction.getType() === instructionType)
+      .filter(reference =>
+        objectName
+          ? instructionContainsParameter(reference.instruction, objectName)
+          : true
+      );
+
+    if (!matches.length) {
+      throw new Error(
+        `No ${normalizedInstructionKind} instruction "${instructionType}" matched the event target.`
+      );
+    }
+    if (matches.length > 1) {
+      throw new Error(
+        `Ambiguous instruction target: ${
+          matches.length
+        } instructions matched. Add object_name or narrow the event target.`
+      );
+    }
+
+    const instruction = matches[0].instruction;
+    const beforeParameters: Array<string> = [];
+    for (let index = 0; index < instruction.getParametersCount(); index++) {
+      beforeParameters.push(instruction.getParameter(index).getPlainString());
+    }
+    instruction.setParametersCount(replacementParameters.length);
+    replacementParameters.forEach((parameter, index) => {
+      instruction.setParameter(index, parameter);
+    });
+
+    assertExtensionFunctionEventsAreValid(project, target);
+
+    const result: Object = {
+      success: true,
+      extensionName: target.extension.getName(),
+      parentKind: target.parentKind,
+      parentName: getFunctionParentName(target),
+      functionName: target.eventsFunction.getName(),
+      eventPath: formatEventPath(eventReference.path),
+      aiGeneratedEventId:
+        eventReference.event.getAiGeneratedEventId() || null,
+      instructionKind: normalizedInstructionKind,
+      instructionType,
+      instructionPath: matches[0].instructionPath,
+      before: {
+        type: instruction.getType(),
+        parameters: beforeParameters,
+      },
+      after: {
+        type: instruction.getType(),
+        parameters: replacementParameters,
+      },
+      function: summarizeEventsFunctionCompact(target.eventsFunction),
+    };
+
+    if (args && args.include_serialized === true) {
+      result.serializedFunction = serializeToJSObject(target.eventsFunction);
+      result.eventsAsText = renderNonTranslatedEventsAsText({
+        eventsList: target.eventsFunction.getEvents(),
+      });
+    }
+
+    return result;
+  } catch (error) {
+    unserializeFromJSObject(
+      target.extension,
+      beforeSerializedExtension,
+      'unserializeFrom',
+      project
+    );
+    throw error;
+  }
 };
 
 const shouldSkipCloneValidation = (args: Object): boolean =>
@@ -2060,23 +3014,59 @@ const parseValidatedEventsJson = (
   project: gdProject,
   eventsJson: any
 ): ?Array<Object> => {
-  if (typeof eventsJson !== 'string') return null;
+  if (eventsJson === undefined || eventsJson === null) return null;
 
-  const validation = validateEventsJson({
-    project,
-    sceneName: null,
-    eventsJson,
-  });
-  if (!validation.valid) {
+  let parsedEvents;
+  if (typeof eventsJson === 'string') {
+    try {
+      parsedEvents = JSON.parse(eventsJson);
+    } catch (error) {
+      throw new Error(`Invalid events_json: ${error.message}`);
+    }
+  } else {
+    parsedEvents = JSON.parse(JSON.stringify(eventsJson));
+  }
+  if (
+    parsedEvents &&
+    !Array.isArray(parsedEvents) &&
+    typeof parsedEvents.type === 'string'
+  ) {
+    parsedEvents = [parsedEvents];
+  } else if (
+    parsedEvents &&
+    !Array.isArray(parsedEvents) &&
+    Array.isArray(parsedEvents.events)
+  ) {
+    parsedEvents = parsedEvents.events;
+  }
+  if (!Array.isArray(parsedEvents)) {
     throw new Error(
-      `Invalid events_json: ${JSON.stringify(
-        validation.errors || validation.issues || []
-      )}`
+      'Invalid events_json: expected an events array, a single serialized event object, or { events: [...] }.'
     );
   }
 
-  return JSON.parse(validation.normalizedEventsJson || eventsJson);
+  const validationEventsList = new gd.EventsList();
+  try {
+    unserializeFromJSObject(
+      validationEventsList,
+      parsedEvents,
+      'unserializeFrom',
+      project
+    );
+    return serializeToJSObject(validationEventsList);
+  } finally {
+    validationEventsList.delete();
+  }
 };
+
+const getEventsJsonInput = (args: Object): any =>
+  hasOwn(args, 'events_json')
+    ? args.events_json
+    : hasOwn(args, 'eventsJson')
+    ? args.eventsJson
+    : hasOwn(args, 'events')
+    ? args.events
+    : undefined;
 
 const applyEventsFunctionFields = (
   project: gdProject,
@@ -2112,9 +3102,9 @@ const applyEventsFunctionFields = (
   if (Array.isArray(args.parameters)) {
     upsertFunctionParameters(eventsFunction, args.parameters);
   }
-  if (typeof args.events_json === 'string') {
+  if (getEventsJsonInput(args) !== undefined) {
     const parsedEvents =
-      parsedEventsJson || parseValidatedEventsJson(project, args.events_json);
+      parsedEventsJson || parseValidatedEventsJson(project, getEventsJsonInput(args));
     eventsFunction.getEvents().clear();
     unserializeFromJSObject(
       eventsFunction.getEvents(),
@@ -2169,100 +3159,120 @@ export const createOrUpdateExtensionFunction = (
     );
   }
 
-  const parsedEventsJson = parseValidatedEventsJson(project, args.events_json);
+  const parsedEventsJson = parseValidatedEventsJson(
+    project,
+    getEventsJsonInput(args)
+  );
   const { extension, parentKind, parent, container } = getFunctionParent(
     project,
     args
   );
+  const beforeSerializedExtension = serializeToJSObject(extension);
   const functionName = normalizeRequiredName(
     args.function_name,
     'function_name'
   );
 
-  const created = !container.hasEventsFunctionNamed(functionName);
-  let eventsFunction = created
-    ? container.insertNewEventsFunction(
-        functionName,
-        container.getEventsFunctionsCount()
-      )
-    : container.getEventsFunction(functionName);
+  try {
+    const created = !container.hasEventsFunctionNamed(functionName);
+    let eventsFunction = created
+      ? container.insertNewEventsFunction(
+          functionName,
+          container.getEventsFunctionsCount()
+        )
+      : container.getEventsFunction(functionName);
 
-  if (
-    args.serialized_function &&
-    typeof args.serialized_function === 'object'
-  ) {
-    unserializeFromJSObject(
-      eventsFunction,
-      args.serialized_function,
-      'unserializeFrom',
-      project
-    );
-    eventsFunction.setName(functionName);
-  }
+    if (
+      args.serialized_function &&
+      typeof args.serialized_function === 'object'
+    ) {
+      unserializeFromJSObject(
+        eventsFunction,
+        args.serialized_function,
+        'unserializeFrom',
+        project
+      );
+      eventsFunction.setName(functionName);
+    }
 
-  const newFunctionName = normalizeOptionalName(
-    args.new_function_name,
-    'new_function_name'
-  );
-  if (newFunctionName && newFunctionName !== eventsFunction.getName()) {
-    const safeAndUniqueName = getSafeUniqueName(
-      newFunctionName,
-      name => container.hasEventsFunctionNamed(name),
-      eventsFunction.getName()
+    const newFunctionName = normalizeOptionalName(
+      args.new_function_name,
+      'new_function_name'
     );
-    renameEventsFunction({
-      project,
+    if (newFunctionName && newFunctionName !== eventsFunction.getName()) {
+      const safeAndUniqueName = getSafeUniqueName(
+        newFunctionName,
+        name => container.hasEventsFunctionNamed(name),
+        eventsFunction.getName()
+      );
+      renameEventsFunction({
+        project,
+        extension,
+        parentKind,
+        parent,
+        eventsFunction,
+        newName: safeAndUniqueName,
+      });
+      eventsFunction = container.getEventsFunction(safeAndUniqueName);
+    }
+
+    const functionType = normalizeFunctionType(args.function_type);
+    if (functionType != null) {
+      eventsFunction.setFunctionType(functionType);
+    }
+    if (parentKind === 'behavior') {
+      gd.WholeProjectRefactorer.ensureBehaviorEventsFunctionsProperParameters(
+        extension,
+        ((parent: any): gdEventsBasedBehavior)
+      );
+    } else if (parentKind === 'object') {
+      gd.WholeProjectRefactorer.ensureObjectEventsFunctionsProperParameters(
+        extension,
+        ((parent: any): gdEventsBasedObject)
+      );
+    }
+
+    applyEventsFunctionFields(project, eventsFunction, args, parsedEventsJson);
+    assertEventsFunctionSentenceIsValid(parentKind, eventsFunction);
+    if (
+      created &&
+      eventsFunction.isCondition() &&
+      !eventsFunction.isExpression()
+    ) {
+      gd.PropertyFunctionGenerator.generateConditionSkeleton(
+        project,
+        eventsFunction
+      );
+    }
+    assertExtensionFunctionEventsAreValid(project, {
       extension,
       parentKind,
       parent,
       eventsFunction,
-      newName: safeAndUniqueName,
     });
-    eventsFunction = container.getEventsFunction(safeAndUniqueName);
-  }
 
-  const functionType = normalizeFunctionType(args.function_type);
-  if (functionType != null) {
-    eventsFunction.setFunctionType(functionType);
-  }
-  if (parentKind === 'behavior') {
-    gd.WholeProjectRefactorer.ensureBehaviorEventsFunctionsProperParameters(
+    const summaryOnly = !!(args && args.summary_only);
+    return {
+      success: true,
+      dryRun: false,
+      created,
+      wouldCreate: created,
+      parentKind,
+      function: summarizeEventsFunction(
+        eventsFunction,
+        !summaryOnly,
+        !summaryOnly
+      ),
+    };
+  } catch (error) {
+    unserializeFromJSObject(
       extension,
-      ((parent: any): gdEventsBasedBehavior)
+      beforeSerializedExtension,
+      'unserializeFrom',
+      project
     );
-  } else if (parentKind === 'object') {
-    gd.WholeProjectRefactorer.ensureObjectEventsFunctionsProperParameters(
-      extension,
-      ((parent: any): gdEventsBasedObject)
-    );
+    throw error;
   }
-
-  applyEventsFunctionFields(project, eventsFunction, args, parsedEventsJson);
-  assertEventsFunctionSentenceIsValid(parentKind, eventsFunction);
-  if (
-    created &&
-    eventsFunction.isCondition() &&
-    !eventsFunction.isExpression()
-  ) {
-    gd.PropertyFunctionGenerator.generateConditionSkeleton(
-      project,
-      eventsFunction
-    );
-  }
-
-  const summaryOnly = !!(args && args.summary_only);
-  return {
-    success: true,
-    dryRun: false,
-    created,
-    wouldCreate: created,
-    parentKind,
-    function: summarizeEventsFunction(
-      eventsFunction,
-      !summaryOnly,
-      !summaryOnly
-    ),
-  };
 };
 
 export const deleteExtensionFunction = (

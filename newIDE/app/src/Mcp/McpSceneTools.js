@@ -2716,6 +2716,96 @@ export const deleteSceneVariable = (
   };
 };
 
+const getBatchVariableNameOrPaths = (args: Object): Array<string> => {
+  const values =
+    (args && Array.isArray(args.variable_names_or_paths)
+      ? args.variable_names_or_paths
+      : null) ||
+    (args && Array.isArray(args.variableNamesOrPaths)
+      ? args.variableNamesOrPaths
+      : null) ||
+    (args && Array.isArray(args.variables) ? args.variables : null) ||
+    (args && Array.isArray(args.names) ? args.names : null);
+  if (!values) {
+    throw new Error('Missing variable_names_or_paths array.');
+  }
+  return values
+    .filter(value => typeof value === 'string')
+    .map(value => value.trim())
+    .filter(Boolean);
+};
+
+const escapeRegExp = (value: string): string =>
+  value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+const sceneEventsMayReferenceVariable = (
+  scene: gdLayout,
+  rootVariableName: string
+): boolean => {
+  const serializedEventsText = JSON.stringify(serializeToJSObject(scene.getEvents()));
+  return new RegExp(
+    `(^|[^A-Za-z0-9_])${escapeRegExp(rootVariableName)}([^A-Za-z0-9_]|$)`
+  ).test(serializedEventsText);
+};
+
+export const batchDeleteSceneVariables = (
+  project: gdProject,
+  args: Object
+): Object => {
+  const sceneName = getRequiredString(args, 'scene_name');
+  const variablePaths = getBatchVariableNameOrPaths(args);
+  const scene = getScene(project, sceneName);
+  const dryRun = !!(args && (args.dry_run === true || args.dryRun === true));
+  const ignoreReferences = !!(
+    args &&
+    (args.ignore_references === true || args.ignoreReferences === true)
+  );
+
+  const results = [];
+  variablePaths.forEach(variablePath => {
+    const segments = parseVariablePathForDeletion(variablePath);
+    const rootName = segments[0].value;
+    const referenced = sceneEventsMayReferenceVariable(scene, rootName);
+    if (referenced && !ignoreReferences) {
+      results.push({
+        deleted: false,
+        skipped: true,
+        variableNameOrPath: variablePath,
+        referenced,
+        reason:
+          'The root variable name appears in scene events. Pass ignore_references:true only after confirming the references are stale.',
+      });
+      return;
+    }
+    if (dryRun) {
+      results.push({
+        deleted: false,
+        wouldDelete: scene.getVariables().has(rootName),
+        variableNameOrPath: variablePath,
+        referenced,
+      });
+      return;
+    }
+    results.push({
+      ...deleteVariablePathFromContainer(scene.getVariables(), variablePath),
+      referenced,
+    });
+  });
+
+  const deletedCount = results.filter(result => result.deleted).length;
+  return {
+    success: true,
+    dryRun,
+    didModifyProject: deletedCount > 0,
+    scope: 'scene',
+    sceneName,
+    requestedCount: variablePaths.length,
+    deletedCount,
+    skippedCount: results.filter(result => result.skipped).length,
+    results,
+  };
+};
+
 export const deleteObjectVariable = (
   project: gdProject,
   args: Object,

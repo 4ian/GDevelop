@@ -3,8 +3,10 @@
 export const imageZoomMinFactor = 0.25;
 export const imageZoomMaxFactor = 4;
 const imageZoomStep = 0.25;
+const imageZoomCanvasPadding = 32;
 
 type ZoomDirection = 'in' | 'out';
+export type WorkingDeskImageSize = {| width: number, height: number |};
 
 const imageFileExtensions = [
   '.png',
@@ -41,33 +43,49 @@ export const formatImageZoomFactor = (zoomFactor: number): string =>
   `${Math.round(zoomFactor * 100)}%`;
 
 export const getWorkingDeskImageZoomStyles = (
-  zoomFactor: number
+  zoomFactor: number,
+  imageSize: ?WorkingDeskImageSize
 ): {|
   canvas: {|
     width: string,
     height: string,
   |},
   image: {|
+    width: string,
     height: string,
-    transform: string,
-    transformOrigin: 'center center',
   |},
 |} => {
   const roundedZoomFactor = roundImageZoomFactor(
     clamp(zoomFactor, imageZoomMinFactor, imageZoomMaxFactor)
   );
-  const canvasZoomFactor = Math.max(1, roundedZoomFactor);
-  const imageHeightFactor = roundedZoomFactor >= 1 ? 1 / roundedZoomFactor : 1;
+
+  if (!imageSize || imageSize.width <= 0 || imageSize.height <= 0) {
+    return {
+      canvas: {
+        width: '100%',
+        height: '100%',
+      },
+      image: {
+        width: 'auto',
+        height: 'auto',
+      },
+    };
+  }
+
+  const imageWidth = Math.max(1, Math.round(imageSize.width * roundedZoomFactor));
+  const imageHeight = Math.max(
+    1,
+    Math.round(imageSize.height * roundedZoomFactor)
+  );
 
   return {
     canvas: {
-      width: formatZoomPercent(canvasZoomFactor),
-      height: formatZoomPercent(canvasZoomFactor),
+      width: `${imageWidth + imageZoomCanvasPadding}px`,
+      height: `${imageHeight + imageZoomCanvasPadding}px`,
     },
     image: {
-      height: formatZoomPercent(imageHeightFactor),
-      transform: `scale(${roundedZoomFactor})`,
-      transformOrigin: 'center center',
+      width: `${imageWidth}px`,
+      height: `${imageHeight}px`,
     },
   };
 };

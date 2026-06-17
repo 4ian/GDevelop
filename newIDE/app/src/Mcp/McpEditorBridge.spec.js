@@ -1651,6 +1651,245 @@ describe('McpEditorBridge', () => {
     }
   });
 
+  it('lints and rejects extension function variable-parameter misuse', async () => {
+    // $FlowFixMe[invalid-constructor]
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    const extension = project.insertNewEventsFunctionsExtension('McpExt', 0);
+    const badFunction = extension
+      .getEventsFunctions()
+      .insertNewEventsFunction('BadAddSun', 0);
+    badFunction.setFunctionType(gd.EventsFunction.Action);
+    badFunction.setSentence('Add sun to _PARAM1_');
+    badFunction
+      .getParameters()
+      .insertNewParameter('SunCountVariable', 0)
+      .setType('variable');
+    const badEvent = gd.asStandardEvent(
+      badFunction
+        .getEvents()
+        .insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 0)
+    );
+    const badCondition = new gd.Instruction();
+    badCondition.setType('NumberVariable');
+    badCondition.setParametersCount(3);
+    badCondition.setParameter(0, 'SunCountVariable');
+    badCondition.setParameter(1, '>');
+    badCondition.setParameter(2, '0');
+    badEvent.getConditions().insert(badCondition, 0);
+    badCondition.delete();
+    const triggerUnsavedChanges: any = jest.fn();
+
+    try {
+      const bridge = makeBridge({
+        getProject: () => project,
+        getPermissions: () => ({
+          allowWriteTools: true,
+          allowCommandTools: false,
+        }),
+        triggerUnsavedChanges,
+      });
+
+      const lintResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'lint_extension_function_events',
+          arguments: {
+            extension_name: 'McpExt',
+            function_name: 'BadAddSun',
+          },
+        },
+      });
+      const lintResult = JSON.parse(lintResponse.content[0].text);
+
+      expect(lintResponse.isError).not.toBe(true);
+      expect(lintResult.valid).toBe(false);
+      expect(lintResult.errors).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            type: 'function-variable-parameter-used-as-direct-variable',
+            parameterName: 'SunCountVariable',
+          }),
+        ])
+      );
+      expect(lintResult.variableParameterUsageHint).toContain(
+        'CopyArgumentToVariable2'
+      );
+
+      const dryRunResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'gdevelop_create_or_update_extension_function',
+          arguments: {
+            extension_name: 'McpExt',
+            function_name: 'BadAddSunDryRun',
+            function_type: 'action',
+            sentence: 'Add sun to _PARAM1_',
+            parameters: [
+              {
+                name: 'SunCountVariable',
+                type: 'variable',
+              },
+            ],
+            events_json: [
+              {
+                type: 'BuiltinCommonInstructions::Standard',
+                aiGeneratedEventId: 'bad-add-sun',
+                conditions: [
+                  {
+                    type: { value: 'NumberVariable' },
+                    parameters: ['SunCountVariable', '>', '0'],
+                  },
+                ],
+                actions: [],
+              },
+            ],
+            dry_run: true,
+            summary_only: true,
+          },
+        },
+      });
+
+      expect(dryRunResponse.isError).toBe(true);
+      expect(dryRunResponse.content[0].text).toContain(
+        'function-variable-parameter-used-as-direct-variable'
+      );
+      expect(dryRunResponse.content[0].text).toContain(
+        'CopyArgumentToVariable2'
+      );
+      expect(
+        extension
+          .getEventsFunctions()
+          .hasEventsFunctionNamed('BadAddSunDryRun')
+      ).toBe(false);
+      expect(triggerUnsavedChanges).not.toHaveBeenCalled();
+    } finally {
+      project.delete();
+    }
+  });
+
+  it('patches extension event instructions and inspects compact function events', async () => {
+    // $FlowFixMe[invalid-constructor]
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    project.insertNewEventsFunctionsExtension('McpExt', 0);
+    const onExtensionFunctionEventsModifiedOutsideEditor: any = jest.fn();
+
+    try {
+      const bridge = makeBridge({
+        getProject: () => project,
+        getPermissions: () => ({
+          allowWriteTools: true,
+          allowCommandTools: false,
+        }),
+        onExtensionFunctionEventsModifiedOutsideEditor,
+      });
+
+      const createResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'gdevelop_create_or_update_extension_function',
+          arguments: {
+            extension_name: 'McpExt',
+            function_name: 'AddSun',
+            function_type: 'action',
+            sentence: 'Add sun to _PARAM1_',
+            parameters: [
+              {
+                name: 'SunCountVariable',
+                type: 'variable',
+              },
+            ],
+            events_json: [
+              {
+                type: 'BuiltinCommonInstructions::Standard',
+                aiGeneratedEventId: 'add-sun-count',
+                variables: [
+                  { name: 'LocalSunCount', type: 'number', value: 0 },
+                ],
+                conditions: [],
+                actions: [
+                  {
+                    type: { value: 'CopyArgumentToVariable2' },
+                    parameters: ['"SunCountVariable"', 'LocalSunCount'],
+                  },
+                  {
+                    type: { value: 'SetNumberVariable' },
+                    parameters: ['LocalSunCount', '+', '1'],
+                  },
+                  {
+                    type: { value: 'CopyVariableToArgument2' },
+                    parameters: ['"SunCountVariable"', 'LocalSunCount'],
+                  },
+                ],
+              },
+            ],
+            summary_only: true,
+          },
+        },
+      });
+      expect(createResponse.isError).not.toBe(true);
+      onExtensionFunctionEventsModifiedOutsideEditor.mockClear();
+
+      const patchResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'patch_extension_event_instruction',
+          arguments: {
+            extension_name: 'McpExt',
+            function_name: 'AddSun',
+            event_id: 'add-sun-count',
+            instruction_kind: 'action',
+            instruction_type: 'SetNumberVariable',
+            parameters: ['LocalSunCount', '+', '2'],
+          },
+        },
+      });
+      const patchResult = JSON.parse(patchResponse.content[0].text);
+
+      expect(patchResponse.isError).not.toBe(true);
+      expect(patchResult.after.parameters).toEqual([
+        'LocalSunCount',
+        '+',
+        '2',
+      ]);
+      expect(
+        onExtensionFunctionEventsModifiedOutsideEditor
+      ).toHaveBeenCalledWith({
+        extensionName: 'McpExt',
+        parentKind: 'extension',
+        parentName: null,
+        functionName: 'AddSun',
+        newOrChangedAiGeneratedEventIds: expect.any(Set),
+      });
+
+      const inspectResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'gdevelop_inspect_extension_function',
+          arguments: {
+            extension_name: 'McpExt',
+            function_name: 'AddSun',
+            compact: true,
+          },
+        },
+      });
+      const inspected = JSON.parse(inspectResponse.content[0].text);
+
+      expect(inspectResponse.isError).not.toBe(true);
+      expect(inspected.function.eventsJson).toBeUndefined();
+      expect(inspected.function.serializedFunction).toBeUndefined();
+      expect(inspected.function.events[0].actions).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            type: 'SetNumberVariable',
+            parameters: ['LocalSunCount', '+', '2'],
+          }),
+        ])
+      );
+    } finally {
+      project.delete();
+    }
+  });
+
   it('extracts scene instances into an events-based object prefab', async () => {
     // $FlowFixMe[invalid-constructor]
     const project = new gd.ProjectHelper.createNewGDJSProject();
@@ -2635,6 +2874,27 @@ describe('McpEditorBridge', () => {
       .getVariables()
       .insertNew('SceneFlag', 0)
       .setBool(true);
+    layout
+      .getVariables()
+      .insertNew('OldFlag', 1)
+      .setBool(true);
+    layout
+      .getVariables()
+      .insertNew('UsedFlag', 2)
+      .setBool(true);
+    const referenceEvent = gd.asStandardEvent(
+      layout
+        .getEvents()
+        .insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 0)
+    );
+    const referenceAction = new gd.Instruction();
+    referenceAction.setType('SetBooleanVariable');
+    referenceAction.setParametersCount(3);
+    referenceAction.setParameter(0, 'UsedFlag');
+    referenceAction.setParameter(1, 'True');
+    referenceAction.setParameter(2, '');
+    referenceEvent.getActions().insert(referenceAction, 0);
+    referenceAction.delete();
     object
       .getVariables()
       .insertNew('ObjectFlag', 0)
@@ -2676,6 +2936,33 @@ describe('McpEditorBridge', () => {
       expect(sceneVariableResponse.isError).not.toBe(true);
       expect(sceneVariableResult.deleted).toBe(true);
       expect(layout.getVariables().has('SceneFlag')).toBe(false);
+
+      const batchSceneVariableResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'batch_delete_scene_variables',
+          arguments: {
+            scene_name: 'Level1',
+            variable_names_or_paths: ['OldFlag', 'UsedFlag'],
+          },
+        },
+      });
+      const batchSceneVariableResult = JSON.parse(
+        batchSceneVariableResponse.content[0].text
+      );
+      expect(batchSceneVariableResponse.isError).not.toBe(true);
+      expect(batchSceneVariableResult.deletedCount).toBe(1);
+      expect(layout.getVariables().has('OldFlag')).toBe(false);
+      expect(layout.getVariables().has('UsedFlag')).toBe(true);
+      expect(batchSceneVariableResult.results).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            variableNameOrPath: 'UsedFlag',
+            skipped: true,
+            referenced: true,
+          }),
+        ])
+      );
 
       const objectVariableResponse = await bridge.handleRendererMcpRequest({
         method: 'tools/call',
@@ -5122,7 +5409,15 @@ describe('McpEditorBridge', () => {
           {
             _name: 'Level1',
             _isLoaded: true,
-            _instances: { items: { Bullet: [{}, {}, {}] } },
+            _instances: {
+              items: {
+                Bullet: [
+                  { x: 10, y: 20, angle: 0, layer: 'HUD', zOrder: 7 },
+                  {},
+                  {},
+                ],
+              },
+            },
             _objects: { items: { Bullet: { name: 'Bullet' } } },
             _variables: { _variables: {} },
           },
@@ -5180,6 +5475,9 @@ describe('McpEditorBridge', () => {
     expect(result.runtime.available).toBe(true);
     expect(result.runtime.scenes[0].objectInstanceCounts).toEqual(
       expect.objectContaining({ Bullet: 3 })
+    );
+    expect(result.runtime.scenes[0].instancePositions.Bullet[0]).toEqual(
+      expect.objectContaining({ x: 10, y: 20, layer: 'HUD', zOrder: 7 })
     );
   });
 

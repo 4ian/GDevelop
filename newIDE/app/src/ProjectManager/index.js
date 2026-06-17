@@ -1082,7 +1082,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                     new LeafTreeViewItem(
                       new ActionTreeViewItemContent(
                         gameShareItemId,
-                        i18n._(t`Share`),
+                        i18n._(t`Export & Share`),
                         onShareProject,
                         'res/icons_default/publish_black.svg'
                       )

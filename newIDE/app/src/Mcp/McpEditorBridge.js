@@ -47,6 +47,8 @@ import {
   inspectExtensionProperty,
   inspectProjectExtension,
   listProjectExtensions,
+  lintExtensionFunctionEvents,
+  patchExtensionEventInstruction,
 } from './McpExtensionTools';
 import {
   addOrUpdateResource,
@@ -55,6 +57,7 @@ import {
   bulkEditSceneAssets,
   createSpriteObjectFromResource,
   createTextObject,
+  batchDeleteSceneVariables,
   deleteSceneObject,
   deleteSceneVariable,
   deleteObjectVariable,
@@ -597,6 +600,10 @@ const summarizeRuntimeGameDump = (payload: any, options?: Object): Object => {
               angle:
                 instance && typeof instance.angle === 'number'
                   ? instance.angle
+                  : undefined,
+              layer:
+                instance && typeof instance.layer === 'string'
+                  ? instance.layer
                   : undefined,
               zOrder:
                 instance && typeof instance.zOrder === 'number'
@@ -1900,7 +1907,10 @@ const getStaleStateTargetForTool = (
     };
   }
 
-  if (toolName === 'gdevelop_create_or_update_extension_function') {
+  if (
+    toolName === 'gdevelop_create_or_update_extension_function' ||
+    toolName === 'patch_extension_event_instruction'
+  ) {
     const parentKind =
       (result && typeof result.parentKind === 'string'
         ? result.parentKind
@@ -1912,9 +1922,13 @@ const getStaleStateTargetForTool = (
       parentName:
         parentKind === 'extension'
           ? null
-          : getStringArg(args, ['parent_name', 'parentName']),
+          : (result && typeof result.parentName === 'string'
+              ? result.parentName
+              : getStringArg(args, ['parent_name', 'parentName'])),
       functionName:
-        result && result.function && typeof result.function.name === 'string'
+        result && typeof result.functionName === 'string'
+          ? result.functionName
+          : result && result.function && typeof result.function.name === 'string'
           ? result.function.name
           : getStringArg(args, [
               'new_function_name',
@@ -1972,7 +1986,7 @@ const buildStaleStateAdvisory = (
       parentName: target.parentName || null,
       functionName: target.functionName || null,
       reason:
-        'An extension function was modified through MCP. If its function/events editor is already open and still shows old data, switch away/back or reopen the extension editor before trusting it.',
+        'An extension function was modified through MCP. Extension instruction metadata and generated preview code can be cached by open editor panels/previews; save/reload or reopen the extension editor before trusting stale function metadata, then relaunch preview before runtime verification.',
     });
   } else if (target.kind === 'scene') {
     editorPanelsMayBeStale.push({
@@ -1993,6 +2007,12 @@ const buildStaleStateAdvisory = (
       : null,
     recommendedActions: previewMayBeStale
       ? [
+          ...(target.kind === 'extension-function'
+            ? [
+                'gdevelop_save_project_and_wait',
+                'reload/reopen the project if extension instruction metadata or generated preview code still looks stale',
+              ]
+            : []),
           'control_preview { action: "close", close_all: true }',
           'launch_preview { start_paused: true }',
           'run runtime checks/screenshots only after relaunching the preview',
@@ -3897,6 +3917,15 @@ const callMcpTool = async ({
     }
   }
 
+  if (toolName === 'lint_extension_function_events') {
+    if (!project) return errorResult('No project opened.');
+    try {
+      return textResult(lintExtensionFunctionEvents(project, args || {}));
+    } catch (error) {
+      return errorResult(error.message);
+    }
+  }
+
   if (toolName === 'compare_scene_events_semantics') {
     if (!project) return errorResult('No project opened.');
     try {
@@ -4039,6 +4068,8 @@ const callMcpTool = async ({
     extensionWriteToolHandler = deleteExtension;
   } else if (toolName === 'gdevelop_create_or_update_extension_function') {
     extensionWriteToolHandler = createOrUpdateExtensionFunction;
+  } else if (toolName === 'patch_extension_event_instruction') {
+    extensionWriteToolHandler = patchExtensionEventInstruction;
   } else if (toolName === 'gdevelop_delete_extension_function') {
     extensionWriteToolHandler = deleteExtensionFunction;
   } else if (toolName === 'gdevelop_create_or_update_extension_behavior') {
@@ -4061,27 +4092,31 @@ const callMcpTool = async ({
     if (!project) return errorResult('No project opened.');
     try {
       const result = extensionWriteToolHandler(project, args || {});
+      const extensionFunctionEventsChanged =
+        toolName === 'patch_extension_event_instruction' ||
+        (toolName === 'gdevelop_create_or_update_extension_function' &&
+          args &&
+          (getEventsJsonArgument(args) ||
+            (args.serialized_function &&
+              typeof args.serialized_function === 'object')));
       if (
-        toolName === 'gdevelop_create_or_update_extension_function' &&
-        args &&
-        (typeof args.events_json === 'string' ||
-          (args.serialized_function &&
-            typeof args.serialized_function === 'object')) &&
+        extensionFunctionEventsChanged &&
         !result.dryRun &&
         context.onExtensionFunctionEventsModifiedOutsideEditor
       ) {
         context.onExtensionFunctionEventsModifiedOutsideEditor({
-          extensionName: args.extension_name,
+          extensionName: result.extensionName || args.extension_name,
           parentKind: result.parentKind || args.parent_kind || 'extension',
           parentName:
             result.parentKind === 'extension' ||
             args.parent_kind === 'extension'
               ? null
-              : args.parent_name || null,
+              : result.parentName || args.parent_name || null,
           functionName:
-            result.function && result.function.name
+            result.functionName ||
+            (result.function && result.function.name
               ? result.function.name
-              : args.new_function_name || args.function_name,
+              : args.new_function_name || args.function_name),
           newOrChangedAiGeneratedEventIds: new Set(),
         });
       }
@@ -4182,6 +4217,8 @@ const callMcpTool = async ({
     sceneWriteToolHandler = deleteSceneObject;
   } else if (toolName === 'delete_scene_variable') {
     sceneWriteToolHandler = deleteSceneVariable;
+  } else if (toolName === 'batch_delete_scene_variables') {
+    sceneWriteToolHandler = batchDeleteSceneVariables;
   } else if (toolName === 'delete_object_variable') {
     sceneWriteToolHandler = deleteObjectVariable;
   } else if (toolName === 'delete_instance_variable') {

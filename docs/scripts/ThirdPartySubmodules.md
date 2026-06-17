@@ -9,6 +9,8 @@ Current submodules:
   `https://github.com/zhouzhipeng/ai_game_workbench.git`
 - `thirdParties/image-extender`:
   `https://github.com/zhouzhipeng/image-extender.git`
+- `thirdParties/gorest-2d-animation-spritesheet-generator`:
+  `https://github.com/zhouzhipeng/gorest-2d-animation-spritesheet-generator.git`
 
 ## Initialize
 
@@ -25,6 +27,7 @@ To pull the latest upstream commits into the local submodule checkouts:
 ```powershell
 git -C thirdParties/ai_game_workbench pull --ff-only
 git -C thirdParties/image-extender pull --ff-only
+git -C thirdParties/gorest-2d-animation-spritesheet-generator pull --ff-only
 git status --short
 ```
 
@@ -46,7 +49,8 @@ git add thirdParties/ai_game_workbench
 git status --short
 ```
 
-Use the same flow for `thirdParties/image-extender`.
+Use the same flow for `thirdParties/image-extender` and
+`thirdParties/gorest-2d-animation-spritesheet-generator`.
 
 ## Packaging
 

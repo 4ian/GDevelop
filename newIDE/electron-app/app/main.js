@@ -57,6 +57,10 @@ const {
   openAiGameWorkbenchWindow,
 } = require('./AiGameWorkbenchWindow');
 const {
+  gorestSpritesheetScheme,
+  openGorestSpritesheetWindow,
+} = require('./GorestSpritesheetWindow');
+const {
   setupLocalGDJSDevelopmentWatcher,
   closeLocalGDJSDevelopmentWatcher,
   onLocalGDJSDevelopmentWatcherRuntimeUpdated,
@@ -184,6 +188,15 @@ protocol.registerSchemesAsPrivileged([
   },
   {
     scheme: aiGameWorkbenchScheme,
+    privileges: {
+      standard: true,
+      secure: true,
+      supportFetchAPI: true,
+      corsEnabled: true,
+    },
+  },
+  {
+    scheme: gorestSpritesheetScheme,
     privileges: {
       standard: true,
       secure: true,
@@ -728,6 +741,15 @@ app.on('ready', function() {
   ipcMain.handle('ai-game-workbench-load', event => {
     const parentWindow = BrowserWindow.fromWebContents(event.sender);
     return openAiGameWorkbenchWindow({
+      parentWindow,
+      devTools,
+    });
+  });
+
+  // Gorest 2D Animation Spritesheet Generator executable app
+  ipcMain.handle('gorest-spritesheet-load', event => {
+    const parentWindow = BrowserWindow.fromWebContents(event.sender);
+    return openGorestSpritesheetWindow({
       parentWindow,
       devTools,
     });

@@ -189,7 +189,8 @@ export type ResourcesToolsSettings = {|
     | 'nano-banana'
     | 'local-tools'
     | 'image-extender'
-    | 'ai-game-workbench',
+    | 'ai-game-workbench'
+    | 'gorest-spritesheet',
   selectedSoundTool: 'elevenlabs',
   geminiApiKey: string,
   nanoBananaModel: string,

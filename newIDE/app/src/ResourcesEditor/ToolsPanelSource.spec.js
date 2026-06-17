@@ -82,6 +82,14 @@ describe('ToolsPanel source policies', () => {
     expect(source).toContain('Local tools');
   });
 
+  it('offers Gorest Spritesheet in the image tool selector', () => {
+    const source = getSource();
+
+    expect(source).toContain('value="gorest-spritesheet"');
+    expect(source).toContain('Gorest Spritesheet');
+    expect(source).toContain('gorest-spritesheet-load');
+  });
+
   it('saves Local tools output as a new generated file', () => {
     const source = getSource();
     const runLocalImageToolStart = source.indexOf('const runLocalImageTool');

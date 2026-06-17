@@ -358,6 +358,28 @@ describe('ToolsPanel', () => {
     ).toBe('ai-game-workbench');
   });
 
+  it('persists the Gorest Spritesheet image tool selection', () => {
+    expect(
+      buildResourcesToolsSettings({
+        activeToolCategory: 'image',
+        selectedImageTool: 'gorest-spritesheet',
+        selectedSoundTool: 'elevenlabs',
+        geminiApiKey: 'gemini-key',
+        nanoBananaModel: 'gemini-image',
+        nanoBananaPrompt: 'make a coin',
+        imageAttachment: null,
+        elevenLabsApiKey: 'eleven-key',
+        elevenLabsMode: 'sound-effect',
+        elevenLabsText: 'laser',
+        elevenLabsVoiceId: 'voice',
+        elevenLabsModel: 'speech-model',
+        elevenLabsSoundModel: 'sound-model',
+        elevenLabsOutputFormat: 'mp3_44100_128',
+        elevenLabsDuration: '2.5',
+      }).selectedImageTool
+    ).toBe('gorest-spritesheet');
+  });
+
   it('normalizes persisted Local tools settings', () => {
     expect(
       getResourcesToolsSettingsWithDefaults({
@@ -380,6 +402,14 @@ describe('ToolsPanel', () => {
         selectedImageTool: 'ai-game-workbench',
       }).selectedImageTool
     ).toBe('ai-game-workbench');
+  });
+
+  it('normalizes persisted Gorest Spritesheet settings', () => {
+    expect(
+      getResourcesToolsSettingsWithDefaults({
+        selectedImageTool: 'gorest-spritesheet',
+      }).selectedImageTool
+    ).toBe('gorest-spritesheet');
   });
 
   it('normalizes persisted Tools settings when older preferences are incomplete', () => {

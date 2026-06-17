@@ -6,6 +6,7 @@ Desk from the git submodules under thirdParties:
 
 - newIDE/electron-app/app/external/image-extender.asar
 - newIDE/electron-app/app/external/ai-game-workbench.storage-open.asar
+- newIDE/electron-app/app/external/gorest-spritesheet.asar
 
 It stages compiled runtime files in the system temp directory. It does not start
 a localhost server or copy expanded upstream source into the Electron app.
@@ -518,6 +519,23 @@ const { pathToFileURL } = require('url');
     run([electron_path, "-e", script], cwd=REPO_ROOT, env=env)
 
 
+def smoke_test_gorest_spritesheet(electron_path: Path) -> None:
+    log("Smoke testing gorest-spritesheet.asar")
+    script = r"""
+const fs = require('fs');
+const path = require('path');
+const bundle = path.resolve('newIDE/electron-app/app/external/gorest-spritesheet.asar');
+const indexPath = path.join(bundle, 'web', 'index.html');
+if (!fs.existsSync(indexPath)) {
+  throw new Error('gorest-spritesheet.asar web/index.html was not found.');
+}
+console.log('gorest-spritesheet.asar smoke:', indexPath);
+"""
+    env = os.environ.copy()
+    env["ELECTRON_RUN_AS_NODE"] = "1"
+    run([electron_path, "-e", script], cwd=REPO_ROOT, env=env)
+
+
 def build_image_extender(args: argparse.Namespace) -> None:
     upstream = ensure_submodule("thirdParties/image-extender", args.pull)
     ensure_next_standalone_output(upstream)
@@ -646,13 +664,54 @@ def build_ai_game_workbench(args: argparse.Namespace) -> None:
         smoke_test_ai_game_workbench(electron_bin("electron"))
 
 
+def build_gorest_spritesheet(args: argparse.Namespace) -> None:
+    upstream = ensure_submodule(
+        "thirdParties/gorest-2d-animation-spritesheet-generator",
+        args.pull,
+    )
+    ensure_npm_install(upstream, args.skip_install)
+
+    if not args.skip_build:
+        log("Building gorest-2d-animation-spritesheet-generator")
+        run([npm_command(), "run", "build"], cwd=upstream)
+
+    dist_dir = upstream / "dist"
+    assert_exists(dist_dir / "index.html", "file")
+
+    staging = Path(tempfile.gettempdir()) / "gdevelop-gorest-spritesheet-electron"
+    log(f"Staging gorest spritesheet runtime in {staging}")
+    remove_safe(staging, Path(tempfile.gettempdir()))
+    (staging / "web").mkdir(parents=True, exist_ok=True)
+
+    copy_directory_contents(dist_dir, staging / "web")
+    copy_file(upstream / "LICENSE", staging / "LICENSE")
+    copy_file(upstream / "README.md", staging / "README.md")
+    copy_file(upstream / "package.json", staging / "package.json")
+
+    ensure_electron_packaging_dependencies(args.skip_install)
+    EXTERNAL_DIR.mkdir(parents=True, exist_ok=True)
+    asar_path = EXTERNAL_DIR / "gorest-spritesheet.asar"
+
+    log(f"Packing {asar_path}")
+    remove_safe_with_lock_kill(asar_path, EXTERNAL_DIR)
+    run([electron_bin("asar"), "pack", staging, asar_path], cwd=REPO_ROOT)
+
+    if not args.skip_smoke_test:
+        smoke_test_gorest_spritesheet(electron_bin("electron"))
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Build third-party Electron ASAR artifacts."
     )
     parser.add_argument(
         "--target",
-        choices=("all", "ai-game-workbench", "image-extender"),
+        choices=(
+            "all",
+            "ai-game-workbench",
+            "image-extender",
+            "gorest-spritesheet",
+        ),
         default="all",
         help="Build all ASARs, or only one target.",
     )
@@ -688,6 +747,8 @@ def main() -> int:
             build_image_extender(args)
         if args.target in ("all", "ai-game-workbench"):
             build_ai_game_workbench(args)
+        if args.target in ("all", "gorest-spritesheet"):
+            build_gorest_spritesheet(args)
     except subprocess.CalledProcessError as error:
         print(f"Command failed with exit code {error.returncode}.", file=sys.stderr)
         return error.returncode

@@ -23,8 +23,8 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function AnyVariableField(props: ParameterFieldProps, ref) {
     const field = React.useRef<?VariableFieldInterface>(null);
     const [
-      editorOpen,
-      setEditorOpen,
+      variableEditorOpen,
+      setVariableEditorOpen,
     ] = React.useState<VariableDialogOpeningProps | null>(null);
     const focus: FieldFocusFunction = options => {
       if (field.current) field.current.focus(options);
@@ -41,7 +41,7 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       projectScopedContainersAccessor,
       onChange,
       value,
-      editEventsBasedEntityProperty,
+      openEventsBasedEntityPropertyEditorDialog,
     } = props;
 
     const enumerateGlobalAndSceneVariables = React.useCallback(
@@ -77,7 +77,7 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         if (selectedVariableName && selectedVariableName.startsWith(value)) {
           onChange(selectedVariableName);
         }
-        setEditorOpen(null);
+        setVariableEditorOpen(null);
         // The variable editor may have refactor the events for a variable type
         // change which may have change the currently edited instruction type.
         if (onInstructionTypeChanged) onInstructionTypeChanged();
@@ -115,7 +115,7 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           onRequestClose={props.onRequestClose}
           onApply={props.onApply}
           ref={field}
-          onOpenDialog={setEditorOpen}
+          openVariableEditorDialog={setVariableEditorOpen}
           globalObjectsContainer={props.globalObjectsContainer}
           objectsContainer={props.objectsContainer}
           projectScopedContainersAccessor={projectScopedContainersAccessor}
@@ -128,9 +128,11 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           onInstructionTypeChanged={onInstructionTypeChanged}
           getVariableSourceFromIdentifier={getVariableSourceFromIdentifier}
           editEventsFunctionParameter={null}
-          editEventsBasedEntityProperty={editEventsBasedEntityProperty || null}
+          openEventsBasedEntityPropertyEditorDialog={
+            openEventsBasedEntityPropertyEditorDialog || null
+          }
         />
-        {editorOpen &&
+        {variableEditorOpen &&
           (variableSourceType === gd.VariablesContainer.Local ? (
             project && (
               <LocalVariablesDialog
@@ -140,9 +142,9 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
                 }
                 variablesContainer={variablesContainer}
                 open
-                onCancel={() => setEditorOpen(null)}
+                onCancel={() => setVariableEditorOpen(null)}
                 onApply={onVariableEditorApply}
-                initiallySelectedVariable={editorOpen}
+                initiallySelectedVariable={variableEditorOpen}
                 isListLocked={false}
               />
             )
@@ -150,13 +152,13 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
             <GlobalAndSceneVariablesDialog
               projectScopedContainersAccessor={projectScopedContainersAccessor}
               open
-              onCancel={() => setEditorOpen(null)}
+              onCancel={() => setVariableEditorOpen(null)}
               onApply={onVariableEditorApply}
               isGlobalTabInitiallyOpen={
                 variableSourceType === gd.VariablesContainer.Global ||
                 variableSourceType === gd.VariablesContainer.ExtensionGlobal
               }
-              initiallySelectedVariable={editorOpen}
+              initiallySelectedVariable={variableEditorOpen}
               hotReloadPreviewButtonProps={null}
               isListLocked={false}
             />

@@ -2058,8 +2058,8 @@ storiesOf('InstructionEditorDialog', module)
           onWillInstallExtension={action('extension will be installed')}
           onExtensionInstalled={action('extension installed')}
           editEventsFunctionParameter={action('editEventsFunctionParameter')}
-          editEventsBasedEntityProperty={action(
-            'editEventsBasedEntityProperty'
+          openEventsBasedEntityPropertyEditorDialog={action(
+            'openEventsBasedEntityPropertyEditorDialog'
           )}
         />
       )}
@@ -2090,8 +2090,8 @@ storiesOf('InstructionEditorDialog', module)
           onWillInstallExtension={action('extension will be installed')}
           onExtensionInstalled={action('extension installed')}
           editEventsFunctionParameter={action('editEventsFunctionParameter')}
-          editEventsBasedEntityProperty={action(
-            'editEventsBasedEntityProperty'
+          openEventsBasedEntityPropertyEditorDialog={action(
+            'openEventsBasedEntityPropertyEditorDialog'
           )}
         />
       )}
@@ -2131,8 +2131,8 @@ storiesOf('InstructionEditorDialog', module)
             onWillInstallExtension={action('extension will be installed')}
             onExtensionInstalled={action('extension installed')}
             editEventsFunctionParameter={action('editEventsFunctionParameter')}
-            editEventsBasedEntityProperty={action(
-              'editEventsBasedEntityProperty'
+            openEventsBasedEntityPropertyEditorDialog={action(
+              'openEventsBasedEntityPropertyEditorDialog'
             )}
           />
         )}
@@ -2185,8 +2185,8 @@ storiesOf('InstructionEditorMenu', module)
                 editEventsFunctionParameter={action(
                   'editEventsFunctionParameter'
                 )}
-                editEventsBasedEntityProperty={action(
-                  'editEventsBasedEntityProperty'
+                openEventsBasedEntityPropertyEditorDialog={action(
+                  'openEventsBasedEntityPropertyEditorDialog'
                 )}
               />
             )}

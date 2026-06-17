@@ -1193,7 +1193,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     });
   };
 
-  _editVariables = (
+  _openVariableEditorDialog = (
     options: { isGlobalTabInitiallyOpen: boolean } | null = {
       isGlobalTabInitiallyOpen: false,
     }
@@ -1346,7 +1346,9 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     this.eventsFunctionConfigurationEditor.editEventsFunctionParameter(props);
   };
 
-  _editEventsBasedEntityProperty = (props: VariableDialogOpeningProps) => {
+  _openEventsBasedEntityPropertyEditorDialog = (
+    props: VariableDialogOpeningProps
+  ) => {
     this.setState({
       eventsBasedEntityPropertiesDialogOpen: props,
     });
@@ -1577,8 +1579,8 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                 onWillInstallExtension={this.props.onWillInstallExtension}
                 onExtensionInstalled={this.props.onExtensionInstalled}
                 editEventsFunctionParameter={this._editEventsFunctionParameter}
-                editEventsBasedEntityProperty={
-                  this._editEventsBasedEntityProperty
+                openEventsBasedEntityPropertyEditorDialog={
+                  this._openEventsBasedEntityPropertyEditorDialog
                 }
               />
             </Background>
@@ -1749,9 +1751,13 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                 onAddEventsBasedObject={this._onAddEventsBasedObject}
                 onSelectExtensionProperties={() => this._editOptions(true)}
                 onSelectExtensionGlobalVariables={() =>
-                  this._editVariables({ isGlobalTabInitiallyOpen: true })
+                  this._openVariableEditorDialog({
+                    isGlobalTabInitiallyOpen: true,
+                  })
                 }
-                onSelectExtensionSceneVariables={() => this._editVariables()}
+                onSelectExtensionSceneVariables={() =>
+                  this._openVariableEditorDialog()
+                }
                 onOpenCustomObjectEditor={this.props.onOpenCustomObjectEditor}
                 onEventBasedObjectTypeChanged={
                   this.props.onEventBasedObjectTypeChanged
@@ -1895,8 +1901,8 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
               })
             }
             open
-            onCancel={() => this._editVariables(null)}
-            onApply={() => this._editVariables(null)}
+            onCancel={() => this._openVariableEditorDialog(null)}
+            onApply={() => this._openVariableEditorDialog(null)}
             hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
             isListLocked={false}
             initiallySelectedVariable={null}

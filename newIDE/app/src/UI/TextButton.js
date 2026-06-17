@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react';
 import Button from '@material-ui/core/Button';
-import { Spacer } from './Grid';
+import { ButtonSpacer } from './Grid';
 import { type ButtonInterface } from './Button';
 
 type Props = {|
@@ -70,10 +70,10 @@ const TextButton: React.ComponentType<{
         ref={ref}
       >
         {icon}
-        {icon && <Spacer />}
+        {icon && <ButtonSpacer />}
         {/* span element is required to prevent browser auto translators to crash the app - See https://github.com/4ian/GDevelop/issues/3453 */}
         {label ? <span>{label}</span> : null}
-        {rightIcon && <Spacer />}
+        {rightIcon && <ButtonSpacer />}
         {rightIcon}
       </Button>
     );

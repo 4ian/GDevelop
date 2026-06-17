@@ -2888,6 +2888,18 @@ const put2dInstances: EditorFunction = {
         brush_end_position
       );
 
+      // The `line` and `grid` brushes need an end position to spread instances.
+      // Fail early (before creating any instance) so the caller retries with a
+      // valid request, instead of silently leaving every instance at the origin.
+      if (
+        (brush_kind === 'line' || brush_kind === 'grid') &&
+        !brushEndPosition
+      ) {
+        return makeGenericFailure(
+          `The "${brush_kind}" brush requires brush_end_position (the end of the ${brush_kind}). Provide it, or use the "point" brush to place instances at a single position.`
+        );
+      }
+
       // Compute the number of instances to create.
       const rowCount = SafeExtractor.extractNumberProperty(args, 'row_count');
       const columnCount = SafeExtractor.extractNumberProperty(
@@ -2990,15 +3002,42 @@ const put2dInstances: EditorFunction = {
         const instancesCount = modifiedAndCreatedInstances.length;
 
         if (brushPosition && brushEndPosition) {
-          // Naively auto-compute the grid column and row count if not specified.
-          const gridRowCount =
-            rowCount || Math.floor(Math.sqrt(instancesCount));
-          const gridRowSize =
-            (brushEndPosition[0] - brushPosition[0]) / gridRowCount;
-          const gridColumnCount =
-            columnCount || Math.ceil(instancesCount / gridRowCount);
+          const brushWidth = brushEndPosition[0] - brushPosition[0];
+          const brushHeight = brushEndPosition[1] - brushPosition[1];
+
+          // Auto-compute the column and row count from the aspect ratio of the
+          // brush rectangle so a wide area gets more columns and a flat line
+          // (zero width or height) gets a single row/column. A naive sqrt split
+          // would stack instances on top of each other for a thin rectangle.
+          let gridColumnCount = columnCount;
+          let gridRowCount = rowCount;
+          if (!gridColumnCount || !gridRowCount) {
+            const absWidth = Math.abs(brushWidth);
+            const absHeight = Math.abs(brushHeight);
+            if (absHeight === 0) {
+              gridColumnCount = gridColumnCount || instancesCount;
+              gridRowCount = gridRowCount || 1;
+            } else if (absWidth === 0) {
+              gridRowCount = gridRowCount || instancesCount;
+              gridColumnCount = gridColumnCount || 1;
+            } else {
+              gridColumnCount =
+                gridColumnCount ||
+                Math.max(
+                  1,
+                  Math.round(Math.sqrt((instancesCount * absWidth) / absHeight))
+                );
+              gridRowCount =
+                gridRowCount || Math.ceil(instancesCount / gridColumnCount);
+            }
+          }
+
+          // Spread columns along X and rows along Y. Divide by (count - 1) so
+          // the last column/row reaches brush_end_position, like the line brush.
           const gridColumnSize =
-            (brushEndPosition[1] - brushPosition[1]) / gridColumnCount;
+            gridColumnCount > 1 ? brushWidth / (gridColumnCount - 1) : 0;
+          const gridRowSize =
+            gridRowCount > 1 ? brushHeight / (gridRowCount - 1) : 0;
 
           modifiedAndCreatedInstances.forEach((instance, i) => {
             const row = Math.floor(i / gridColumnCount);

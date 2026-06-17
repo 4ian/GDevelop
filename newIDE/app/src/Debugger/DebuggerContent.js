@@ -71,10 +71,9 @@ const initialMosaicEditorNodes = {
  * currently selected inspector.
  */
 export default class DebuggerContent extends React.Component<Props, State> {
-  // $FlowFixMe[missing-local-annot]
-  state = {
+  state: State = {
     selectedInspector: null,
-    selectedInspectorFullPath: ([]: Array<empty>),
+    selectedInspectorFullPath: [],
     rawMode: false,
   };
 

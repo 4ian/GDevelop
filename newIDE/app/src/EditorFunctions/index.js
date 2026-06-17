@@ -501,8 +501,8 @@ const findPropertyByName = ({
       foundPropertyName: null,
     };
 
-  // $FlowFixMe[missing-local-annot]
-  const normalizeName = name => name.toLowerCase().replace(/\s|_|-/g, '');
+  const normalizeName = (name: string) =>
+    name.toLowerCase().replace(/\s|_|-/g, '');
   const normalizedName = normalizeName(name);
 
   const propertyNames = properties.keys().toJSArray();

@@ -60,8 +60,7 @@ describe('swapAsset (Sprite)', () => {
 
   const getAnimationNameAndResource = (
     objectConfiguration: gdSpriteObject,
-    // $FlowFixMe[missing-local-annot]
-    animationIndex
+    animationIndex: number
   ) => [
     objectConfiguration
       .getAnimations()
@@ -414,8 +413,7 @@ describe('swapAsset (Model)', () => {
 
   const getAnimationNameAndResource = (
     objectConfiguration: gdModel3DObjectConfiguration,
-    // $FlowFixMe[missing-local-annot]
-    animationIndex
+    animationIndex: number
   ) => [
     objectConfiguration.getAnimation(animationIndex).getName(),
     objectConfiguration.getAnimation(animationIndex).getSource(),

@@ -117,7 +117,11 @@ elseif("${GDEVELOPJS_BUILD_VARIANT}" STREQUAL "debug-sanitizers")
 	target_link_libraries(GD "-fsanitize=return") # Uncomment to auto-detect occurences of undefined behavior - also enable compiling above!
 else()
 	# Production: link time optimizations and full optimization.
-	target_link_libraries(GD "-O3 -flto")
+	# Use -O2 (rather than -O3) at link time: this drastically reduces the
+	# wasm-opt pass time (~3 min -> ~15 s on CI) while only growing the
+	# gzipped wasm by ~0.2% and leaving runtime performance unchanged on
+	# the GDevelop.js test suite.
+	target_link_libraries(GD "-O2 -flto")
 endif()
 
 # Even if we're building an "executable", prefix it by lib as it's used as a library.

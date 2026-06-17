@@ -1918,6 +1918,59 @@ describe('editorFunctions', () => {
       }
     });
 
+    // The brush spreads instance origins, so a step smaller than the instance
+    // size leaves them overlapping. Instances are still created (it is only a
+    // hint), but the message must flag it so the model can switch to `point`.
+    it('hints when a line brush packs instances closer than their size', async () => {
+      const result = await putInstances({
+        brush_kind: 'line',
+        brush_position: '0,0',
+        brush_end_position: '90,0',
+        instances_size: '100,100',
+        new_instances_count: 4,
+      });
+
+      expect(getInstancePositions(testScene)).toHaveLength(4);
+      expect(result.message).toEqual(
+        expect.stringContaining('overlap each other')
+      );
+    });
+
+    it('hints when a grid brush packs instances closer than their size', async () => {
+      const result = await putInstances({
+        brush_kind: 'grid',
+        brush_position: '0,0',
+        brush_end_position: '100,100',
+        instances_size: '100,100',
+        new_instances_count: 9,
+      });
+
+      expect(getInstancePositions(testScene)).toHaveLength(9);
+      expect(result.message).toEqual(
+        expect.stringContaining('overlap each other')
+      );
+    });
+
+    it('does not hint about overlap when instances are spread apart by their size', async () => {
+      const result = await putInstances({
+        brush_kind: 'line',
+        brush_position: '0,0',
+        brush_end_position: '300,0',
+        instances_size: '100,100',
+        new_instances_count: 4,
+      });
+
+      expect(getInstancePositions(testScene)).toEqual([
+        { x: 0, y: 0 },
+        { x: 100, y: 0 },
+        { x: 200, y: 0 },
+        { x: 300, y: 0 },
+      ]);
+      expect(result.message).not.toEqual(
+        expect.stringContaining('overlap each other')
+      );
+    });
+
     it('moves an existing instance to a new position with the point brush', async () => {
       await putInstances({
         brush_kind: 'point',
@@ -2170,6 +2223,24 @@ describe('editorFunctions', () => {
       positions.forEach(({ x, y, z }) => {
         expect(Math.sqrt(x * x + y * y + z * z)).toBeLessThanOrEqual(radius);
       });
+    });
+
+    // A line step smaller than the instance size on every axis leaves the
+    // instances overlapping. They are still created (it is only a hint), but
+    // the message must flag it so the model can switch to `point`.
+    it('hints when a line brush packs instances closer than their size', async () => {
+      const result = await putInstances({
+        brush_kind: 'line',
+        brush_position: '0,0,0',
+        brush_end_position: '90,90,90',
+        instances_size: '100,100,100',
+        new_instances_count: 4,
+      });
+
+      expect(getInstancePositions(testScene)).toHaveLength(4);
+      expect(result.message).toEqual(
+        expect.stringContaining('overlap each other')
+      );
     });
 
     // Note: there is intentionally no grid test here. `grid` is not part of

@@ -72,6 +72,17 @@ export const hasLight = (layout: ?gd.Layout): boolean => {
   if (!layout) {
     return true;
   }
+  const objects = layout.getObjects();
+  for (
+    let objectIndex = 0;
+    objectIndex < objects.getObjectsCount();
+    objectIndex++
+  ) {
+    const object = objects.getObjectAt(objectIndex);
+    if (object.getType() === 'Scene3D::SpotLightObject') {
+      return true;
+    }
+  }
   for (let layerIndex = 0; layerIndex < layout.getLayersCount(); layerIndex++) {
     const layer = layout.getLayerAt(layerIndex);
     if (layer.getRenderingType() === '2d') {

@@ -5662,6 +5662,7 @@ const MainFrame = (props: Props): React.MixedElement => {
           onOpenLayout={(name, options) => openLayout(name, options)}
           onOpenExternalLayout={openExternalLayout}
           onOpenEventsFunctionsExtension={openEventsFunctionsExtension}
+          onOpenCustomObjectEditor={openCustomObjectEditor}
           onDeleteLayout={deleteLayout}
           onDeleteExternalLayout={deleteExternalLayout}
           onDeleteEventsFunctionsExtension={deleteEventsFunctionsExtension}

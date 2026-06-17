@@ -67,6 +67,21 @@ import {
   type ExternalLayoutTreeViewItemProps,
   type ExternalLayoutTreeViewItemCallbacks,
 } from './ExternalLayoutTreeViewItemContent';
+import {
+  CustomObjectTreeViewItemContent,
+  type CustomObjectTreeViewItemProps,
+  type CustomObjectTreeViewItemCallbacks,
+} from './CustomObjectTreeViewItemContent';
+import {
+  BehaviorShortcutTreeViewItemContent,
+  type BehaviorShortcutTreeViewItemProps,
+  type BehaviorShortcutTreeViewItemCallbacks,
+} from './BehaviorShortcutTreeViewItemContent';
+import {
+  FunctionShortcutTreeViewItemContent,
+  type FunctionShortcutTreeViewItemProps,
+  type FunctionShortcutTreeViewItemCallbacks,
+} from './FunctionShortcutTreeViewItemContent';
 import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
 import { type ShowConfirmDeleteDialogOptions } from '../UI/Alert/AlertContext';
@@ -86,6 +101,7 @@ import { isMacLike } from '../Utils/Platform';
 import optionalRequire from '../Utils/OptionalRequire';
 import { useShouldAutofocusInput } from '../UI/Responsive/ScreenTypeMeasurer';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
+import { enumerateFunctionsInFolder } from '../EventsFunctionsList/EnumerateFunctionFolderOrFunction';
 import PreferencesIcon from '../UI/CustomSvgIcons/Preferences';
 import classes from './ProjectManager.module.css';
 
@@ -100,6 +116,15 @@ const gameDashboardItemId = 'manage';
 const gameResourcesItemId = getProjectManagerItemId('game-resources');
 const gameShareItemId = getProjectManagerItemId('game-share');
 export const scenesRootFolderId: string = getProjectManagerItemId('scenes');
+export const customObjectsRootFolderId: string = getProjectManagerItemId(
+  'custom-objects'
+);
+export const behaviorsRootFolderId: string = getProjectManagerItemId(
+  'behaviors'
+);
+export const functionsRootFolderId: string = getProjectManagerItemId(
+  'functions'
+);
 export const extensionsRootFolderId: string = getProjectManagerItemId(
   'extensions'
 );
@@ -111,6 +136,9 @@ export const externalLayoutsRootFolderId: string = getProjectManagerItemId(
 );
 
 const scenesEmptyPlaceholderId = 'scenes-placeholder';
+const customObjectsEmptyPlaceholderId = 'custom-objects-placeholder';
+const behaviorsEmptyPlaceholderId = 'behaviors-placeholder';
+const functionsEmptyPlaceholderId = 'functions-placeholder';
 const extensionsEmptyPlaceholderId = 'extensions-placeholder';
 const externalEventsEmptyPlaceholderId = 'external-events-placeholder';
 const externalLayoutEmptyPlaceholderId = 'external-layout-placeholder';
@@ -127,6 +155,11 @@ const styles = {
 };
 
 const extensionItemReactDndType = 'GD_EXTENSION_ITEM';
+
+const isProjectManagerShortcutRootId = (rootId: string): boolean =>
+  rootId === customObjectsRootFolderId ||
+  rootId === behaviorsRootFolderId ||
+  rootId === functionsRootFolderId;
 
 export interface TreeViewItemContent {
   getName(): string | React.Node;
@@ -425,6 +458,9 @@ type Props = {|
   ...ExtensionTreeViewItemCallbacks,
   ...ExternalEventsTreeViewItemCallbacks,
   ...ExternalLayoutTreeViewItemCallbacks,
+  ...CustomObjectTreeViewItemCallbacks,
+  ...BehaviorShortcutTreeViewItemCallbacks,
+  ...FunctionShortcutTreeViewItemCallbacks,
   onOpenResources: () => void,
   onReloadEventsFunctionsExtensions: () => void,
   isOpen: boolean,
@@ -468,6 +504,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       onOpenExternalEvents,
       onOpenExternalLayout,
       onOpenEventsFunctionsExtension,
+      onOpenCustomObjectEditor,
       onOpenResources,
       onReloadEventsFunctionsExtensions,
       isOpen,
@@ -968,6 +1005,36 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       ]
     );
 
+    const customObjectTreeViewItemProps = React.useMemo<?CustomObjectTreeViewItemProps>(
+      () =>
+        project
+          ? {
+              onOpenCustomObjectEditor,
+            }
+          : null,
+      [project, onOpenCustomObjectEditor]
+    );
+
+    const behaviorShortcutTreeViewItemProps = React.useMemo<?BehaviorShortcutTreeViewItemProps>(
+      () =>
+        project
+          ? {
+              onOpenEventsFunctionsExtension,
+            }
+          : null,
+      [project, onOpenEventsFunctionsExtension]
+    );
+
+    const functionShortcutTreeViewItemProps = React.useMemo<?FunctionShortcutTreeViewItemProps>(
+      () =>
+        project
+          ? {
+              onOpenEventsFunctionsExtension,
+            }
+          : null,
+      [project, onOpenEventsFunctionsExtension]
+    );
+
     const externalEventsTreeViewItemProps = React.useMemo<?ExternalEventsTreeViewItemProps>(
       () =>
         project
@@ -1042,6 +1109,9 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       (i18n: I18nType): Array<TreeViewItem> => {
         return !project ||
           !sceneTreeViewItemProps ||
+          !customObjectTreeViewItemProps ||
+          !behaviorShortcutTreeViewItemProps ||
+          !functionShortcutTreeViewItemProps ||
           !extensionTreeViewItemProps ||
           !externalEventsTreeViewItemProps ||
           !externalLayoutTreeViewItemProps
@@ -1126,6 +1196,153 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                         )
                       )
                   );
+                },
+              },
+              {
+                isRoot: true,
+                content: new LabelTreeViewItemContent(
+                  customObjectsRootFolderId,
+                  i18n._(t`Custom objects`)
+                ),
+                getChildren(i18n: I18nType): ?Array<TreeViewItem> {
+                  const customObjectItems: Array<TreeViewItem> = [];
+                  const eventsFunctionsExtensionsCount = project.getEventsFunctionsExtensionsCount();
+                  for (
+                    let extensionIndex = 0;
+                    extensionIndex < eventsFunctionsExtensionsCount;
+                    extensionIndex++
+                  ) {
+                    const eventsFunctionsExtension = project.getEventsFunctionsExtensionAt(
+                      extensionIndex
+                    );
+                    const eventsBasedObjects = eventsFunctionsExtension.getEventsBasedObjects();
+                    const eventsBasedObjectsCount = eventsBasedObjects.size();
+                    for (
+                      let objectIndex = 0;
+                      objectIndex < eventsBasedObjectsCount;
+                      objectIndex++
+                    ) {
+                      customObjectItems.push(
+                        new LeafTreeViewItem(
+                          new CustomObjectTreeViewItemContent(
+                            eventsFunctionsExtension,
+                            eventsBasedObjects.at(objectIndex),
+                            customObjectTreeViewItemProps
+                          )
+                        )
+                      );
+                    }
+                  }
+
+                  if (customObjectItems.length === 0) {
+                    return [
+                      new PlaceHolderTreeViewItem(
+                        customObjectsEmptyPlaceholderId,
+                        i18n._(t`Start by adding a new custom object.`)
+                      ),
+                    ];
+                  }
+
+                  return customObjectItems;
+                },
+              },
+              {
+                isRoot: true,
+                content: new LabelTreeViewItemContent(
+                  behaviorsRootFolderId,
+                  i18n._(t`Behaviors`)
+                ),
+                getChildren(i18n: I18nType): ?Array<TreeViewItem> {
+                  const behaviorItems: Array<TreeViewItem> = [];
+                  const eventsFunctionsExtensionsCount = project.getEventsFunctionsExtensionsCount();
+                  for (
+                    let extensionIndex = 0;
+                    extensionIndex < eventsFunctionsExtensionsCount;
+                    extensionIndex++
+                  ) {
+                    const eventsFunctionsExtension = project.getEventsFunctionsExtensionAt(
+                      extensionIndex
+                    );
+                    const eventsBasedBehaviors = eventsFunctionsExtension.getEventsBasedBehaviors();
+                    const eventsBasedBehaviorsCount = eventsBasedBehaviors.size();
+                    for (
+                      let behaviorIndex = 0;
+                      behaviorIndex < eventsBasedBehaviorsCount;
+                      behaviorIndex++
+                    ) {
+                      behaviorItems.push(
+                        new LeafTreeViewItem(
+                          new BehaviorShortcutTreeViewItemContent(
+                            eventsFunctionsExtension,
+                            eventsBasedBehaviors.at(behaviorIndex),
+                            behaviorShortcutTreeViewItemProps
+                          )
+                        )
+                      );
+                    }
+                  }
+
+                  if (behaviorItems.length === 0) {
+                    return [
+                      new PlaceHolderTreeViewItem(
+                        behaviorsEmptyPlaceholderId,
+                        i18n._(t`Start by adding a new behavior.`)
+                      ),
+                    ];
+                  }
+
+                  return behaviorItems;
+                },
+              },
+              {
+                isRoot: true,
+                content: new LabelTreeViewItemContent(
+                  functionsRootFolderId,
+                  i18n._(t`Functions`)
+                ),
+                getChildren(i18n: I18nType): ?Array<TreeViewItem> {
+                  const functionItems: Array<TreeViewItem> = [];
+                  const eventsFunctionsExtensionsCount = project.getEventsFunctionsExtensionsCount();
+                  for (
+                    let extensionIndex = 0;
+                    extensionIndex < eventsFunctionsExtensionsCount;
+                    extensionIndex++
+                  ) {
+                    const eventsFunctionsExtension = project.getEventsFunctionsExtensionAt(
+                      extensionIndex
+                    );
+                    const eventsFunctions = enumerateFunctionsInFolder(
+                      eventsFunctionsExtension
+                        .getEventsFunctions()
+                        .getRootFolder()
+                    );
+                    for (
+                      let functionIndex = 0;
+                      functionIndex < eventsFunctions.length;
+                      functionIndex++
+                    ) {
+                      functionItems.push(
+                        new LeafTreeViewItem(
+                          new FunctionShortcutTreeViewItemContent(
+                            eventsFunctionsExtension,
+                            eventsFunctions[functionIndex],
+                            functionShortcutTreeViewItemProps
+                          )
+                        )
+                      );
+                    }
+                  }
+
+                  if (functionItems.length === 0) {
+                    return [
+                      new PlaceHolderTreeViewItem(
+                        functionsEmptyPlaceholderId,
+                        i18n._(t`Start by adding a new function.`)
+                      ),
+                    ];
+                  }
+
+                  return functionItems;
                 },
               },
               {
@@ -1244,9 +1461,12 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         addExternalEvents,
         addExternalLayout,
         addNewScene,
+        behaviorShortcutTreeViewItemProps,
+        customObjectTreeViewItemProps,
         extensionTreeViewItemProps,
         externalEventsTreeViewItemProps,
         externalLayoutTreeViewItemProps,
+        functionShortcutTreeViewItemProps,
         onOpenGamesDashboardDialog,
         onOpenResources,
         onShareProject,
@@ -1260,10 +1480,13 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
     const canMoveSelectionTo = React.useCallback(
       (destinationItem: TreeViewItem, where: 'before' | 'inside' | 'after') =>
         selectedItems.every(item => {
+          const rootId = item.content.getRootId();
           return (
             // Project and game settings children `getRootId` return an empty string.
-            item.content.getRootId().length > 0 &&
-            item.content.getRootId() === destinationItem.content.getRootId()
+            rootId.length > 0 &&
+            // Shortcut rows are not owning project items.
+            !isProjectManagerShortcutRootId(rootId) &&
+            rootId === destinationItem.content.getRootId()
           );
         }),
       [selectedItems]
@@ -1310,6 +1533,9 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
     const initiallyOpenedNodeIds = [
       gameSettingsRootFolderId,
       scenesRootFolderId,
+      customObjectsRootFolderId,
+      behaviorsRootFolderId,
+      functionsRootFolderId,
       extensionsRootFolderId,
       externalEventsRootFolderId,
       externalLayoutsRootFolderId,

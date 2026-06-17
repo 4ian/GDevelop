@@ -5,6 +5,7 @@ import newNameGenerator from '../Utils/NewNameGenerator';
 import { toNewGdMapStringString } from '../Utils/MapStringString';
 const fs = optionalRequire('fs');
 const path = optionalRequire('path');
+const url = optionalRequire('url');
 const gd: libGDevelop = global.gd;
 
 export const createOrUpdateResource = (
@@ -39,7 +40,7 @@ export const getLocalResourceFullPath = (
     project,
     resourceName,
     {}
-  ).substring(7 /* Remove "file://" from the URL to get a local path */);
+  );
 
   if (resourcePath.indexOf('?cache=') !== -1) {
     // Remove, if needed, the cache bursting argument from the URL.
@@ -48,7 +49,14 @@ export const getLocalResourceFullPath = (
       resourcePath.lastIndexOf('?cache=')
     );
   }
-  return resourcePath;
+
+  if (resourcePath.startsWith('file://') && url && url.fileURLToPath) {
+    return url.fileURLToPath(resourcePath);
+  }
+
+  return resourcePath.substring(
+    7 /* Remove "file://" from the URL to get a local path */
+  );
 };
 
 export const isPathInProjectFolder = (

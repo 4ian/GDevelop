@@ -2,6 +2,7 @@
 import { Trans } from '@lingui/macro';
 import { t } from '@lingui/macro';
 import { I18n } from '@lingui/react';
+import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import FlatButton from '../UI/FlatButton';
 import ObjectsEditorService from './ObjectsEditorService';
@@ -202,14 +203,14 @@ const InnerDialog = (props: InnerDialogProps) => {
     return undefined;
   })();
 
-  const contextualLabel = (() => {
-    if (currentTab === 'behaviors') return <Trans>Behaviors</Trans>;
-    if (currentTab === 'variables') return <Trans>Object Variables</Trans>;
-    if (currentTab === 'effects') return <Trans>Effects</Trans>;
-    if (isSpriteObject && spriteHasAnimations) return <Trans>Animations</Trans>;
-    if (objectDisplayName) return <Trans>{objectDisplayName}</Trans>;
-    return undefined;
-  })();
+  const getContextualScopeName = (i18n: I18nType): string => {
+    if (currentTab === 'behaviors') return i18n._(t`Behaviors`);
+    if (currentTab === 'variables') return i18n._(t`Object Variables`);
+    if (currentTab === 'effects') return i18n._(t`Effects`);
+    if (isSpriteObject && spriteHasAnimations) return i18n._(t`Animations`);
+    if (objectDisplayName) return objectDisplayName;
+    return i18n._(t`Objects`);
+  };
 
   const EditorComponent: ?React.ComponentType<EditorProps> =
     props.editorComponent;
@@ -291,7 +292,7 @@ const InnerDialog = (props: InnerDialogProps) => {
 
   return (
     <I18n>
-      {() => (
+      {({ i18n }) => (
         <Dialog
           title={<Trans>Edit {objectName}</Trans>}
           key={object && object.ptr}
@@ -314,7 +315,7 @@ const InnerDialog = (props: InnerDialogProps) => {
               key="help-button"
               helpPagePath={contextualHelpPagePath}
               anchor={contextualHelpAnchor}
-              label={contextualLabel || <Trans>Objects</Trans>}
+              scopeName={getContextualScopeName(i18n)}
             />,
             <HotReloadPreviewButton
               key="hot-reload-preview-button"

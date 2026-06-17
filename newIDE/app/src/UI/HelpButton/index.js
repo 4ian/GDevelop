@@ -37,7 +37,7 @@ const HelpButton = (props: PropsType): null | React.Node => {
       label={
         props.label ||
         (props.scopeName ? (
-          <Trans>About {props.scopeName}</Trans>
+          <Trans>See {props.scopeName}</Trans>
         ) : (
           <Trans>Help</Trans>
         ))

@@ -24,9 +24,6 @@ const clamp = (value: number, min: number, max: number): number =>
 const roundImageZoomFactor = (zoomFactor: number): number =>
   Math.round(zoomFactor * 100) / 100;
 
-const formatZoomPercent = (zoomFactor: number): string =>
-  `${Math.round(roundImageZoomFactor(zoomFactor) * 100)}%`;
-
 export const getNextImageZoomFactor = (
   currentZoomFactor: number,
   direction: ZoomDirection

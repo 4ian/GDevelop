@@ -197,7 +197,7 @@ describe('WorkingDesk', () => {
     expect(source).toMatch(/image:\s*\{[\s\S]*maxHeight:\s*'none',/i);
     expect(source).toContain('setImageNaturalSize');
     expect(source).toContain('naturalWidth');
-    expect(source).not.toMatch(/height:\s*'100%',/i);
+    expect(source).not.toMatch(/image:\s*\{[^}]*height:\s*'100%',/i);
   });
 
   it('keeps the zoomed image canvas from shrinking back to the viewport', () => {
@@ -207,6 +207,22 @@ describe('WorkingDesk', () => {
     );
 
     expect(source).toMatch(/imageZoomCanvas:\s*\{[\s\S]*flexShrink:\s*0,/i);
+  });
+
+  it('uses a block scroll viewport so image previews can overflow vertically', () => {
+    const source = fs.readFileSync(
+      path.join(__dirname, 'WorkingDesk.js'),
+      'utf8'
+    );
+    const imageScrollAreaStyle = source.slice(
+      source.indexOf('imageScrollArea:'),
+      source.indexOf('imageZoomCanvas:')
+    );
+
+    expect(imageScrollAreaStyle).toContain("display: 'block'");
+    expect(imageScrollAreaStyle).toContain("height: '100%'");
+    expect(imageScrollAreaStyle).toContain("overflow: 'auto'");
+    expect(imageScrollAreaStyle).not.toContain("display: 'flex'");
   });
 
   it('allows oversized image previews to be panned by dragging', () => {

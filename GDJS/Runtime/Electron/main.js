@@ -8,6 +8,8 @@ const { app, BrowserWindow, shell, Menu } = require('electron');
 // Initialize `@electron/remote` module
 require('@electron/remote/main').initialize();
 
+/* GDJS_ELECTRON_APP_OPTIONS */
+
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow = null;
@@ -21,7 +23,8 @@ function createWindow() {
     height: 600 /*GDJS_WINDOW_HEIGHT*/,
     useContentSize: true,
     title: 'GDJS_GAME_NAME',
-    backgroundColor: '#000000',
+    backgroundColor: '#000000' /* GDJS_ELECTRON_BACKGROUND_COLOR */,
+    /* GDJS_ELECTRON_BROWSER_WINDOW_OPTIONS */
     webPreferences: {
       // Allow Node.js API access in renderer process, as long
       // as we've not removed dependency on it and on "@electron/remote".
@@ -30,6 +33,8 @@ function createWindow() {
       backgroundThrottling: false,
     },
   });
+
+  /* GDJS_ELECTRON_AFTER_WINDOW_CREATION */
 
   // Enable `@electron/remote` module for renderer process
   require('@electron/remote/main').enable(mainWindow.webContents);

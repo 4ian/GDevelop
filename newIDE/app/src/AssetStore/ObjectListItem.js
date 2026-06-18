@@ -96,6 +96,7 @@ export const ObjectListItem = ({
   return (
     <ButtonBase
       id={id}
+      component="div"
       onClick={chooseObject}
       focusRipple
       style={styles.button}

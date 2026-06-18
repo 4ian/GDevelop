@@ -2,6 +2,7 @@
 /**
  * Launch this script to generate a reference of all expressions supported by GDevelop.
  */
+// @ts-ignore - libGD.js is an Emscripten-generated file downloaded at install time.
 const initializeGDevelopJs = require('../public/libGD.js');
 const { mapVector } = require('./lib/MapFor');
 const makeExtensionsLoader = require('./lib/LocalJsExtensionsLoader');
@@ -82,9 +83,8 @@ const generateAllExtensionReferences = gd => {
   const platformExtensions = gd.JsPlatform.get().getAllPlatformExtensions();
 
   /** @type {Array<ExtensionReference>} */
-  const extensionReferences = mapVector(
-    platformExtensions,
-    (platformExtension) => generateExtensionReference({
+  const extensionReferences = mapVector(platformExtensions, platformExtension =>
+    generateExtensionReference({
       platform: gd.JsPlatform.get(),
       extension: platformExtension,
       eventsFunctionsExtension: null,

@@ -79,6 +79,18 @@ namespace gdjs {
       this._setupOrientation();
     }
 
+    isTransparentBackgroundEnabled(): boolean {
+      return !!this._game.getAdditionalOptions().transparentBackground;
+    }
+
+    private _setTransparentBackgroundStyle(
+      element: HTMLElement | null | undefined
+    ): void {
+      if (!element || !element.style) return;
+      element.style.background = 'transparent';
+      element.style.backgroundColor = 'transparent';
+    }
+
     /**
      * Create the canvas on which the game will be rendered, inside the specified DOM element, and
      * setup the rendering of the game.
@@ -90,6 +102,12 @@ namespace gdjs {
       this._throwIfDisposed();
 
       const gameCanvas = document.createElement('canvas');
+      if (this.isTransparentBackgroundEnabled()) {
+        this._setTransparentBackgroundStyle(document.documentElement);
+        this._setTransparentBackgroundStyle(document.body);
+        this._setTransparentBackgroundStyle(parentElement);
+        this._setTransparentBackgroundStyle(gameCanvas);
+      }
       parentElement.appendChild(gameCanvas);
 
       this.initializeRenderers(gameCanvas);
@@ -103,10 +121,12 @@ namespace gdjs {
      */
     initializeRenderers(gameCanvas: HTMLCanvasElement): void {
       this._throwIfDisposed();
+      const transparentBackground = this.isTransparentBackgroundEnabled();
 
       if (typeof THREE !== 'undefined') {
         this._threeRenderer = new THREE.WebGLRenderer({
           canvas: gameCanvas,
+          alpha: transparentBackground,
           antialias:
             this._game.getAntialiasingMode() !== 'none' &&
             (this._game.isAntialisingEnabledOnMobile() ||
@@ -148,7 +168,14 @@ namespace gdjs {
           view: gameCanvas,
           preserveDrawingBuffer: true,
           antialias: false,
+          backgroundAlpha: transparentBackground ? 0 : 1,
+          backgroundColor: 0,
         }) as PIXI.Renderer;
+      }
+
+      if (transparentBackground) {
+        this._pixiRenderer.background.alpha = 0;
+        this._pixiRenderer.background.color = 0;
       }
 
       // Deactivating accessibility support in PixiJS renderer, as we want to be in control of this.
@@ -166,6 +193,9 @@ namespace gdjs {
       this._gameCanvas = gameCanvas;
 
       gameCanvas.style.position = 'absolute';
+      if (this.isTransparentBackgroundEnabled()) {
+        this._setTransparentBackgroundStyle(gameCanvas);
+      }
 
       // Ensure that the canvas has the focus.
       gameCanvas.tabIndex = 1;
@@ -180,6 +210,9 @@ namespace gdjs {
       domElementsContainer.style.overflow = 'hidden'; // Never show anything outside the container.
       domElementsContainer.style.outline = 'none'; // No selection/focus ring on this container.
       domElementsContainer.style.pointerEvents = 'none'; // Clicks go through the container.
+      if (this.isTransparentBackgroundEnabled()) {
+        this._setTransparentBackgroundStyle(domElementsContainer);
+      }
 
       // The container should *never* scroll.
       // Elements are put inside with the same coordinates (with a scaling factor)

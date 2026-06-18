@@ -9,12 +9,22 @@ import PropertiesEditor from '../../PropertiesEditor';
 import ResourcePreview from '../../ResourcesList/ResourcePreview';
 import ResourcesLoader from '../../ResourcesLoader';
 import propertiesMapToSchema from '../../PropertiesEditor/PropertiesMapToSchema';
-import { type Schema } from '../../PropertiesEditor/PropertiesEditorSchema';
+import {
+  type Schema,
+  type Field,
+  type FieldChoices,
+} from '../../PropertiesEditor/PropertiesEditorSchema';
 
 import {
   type ResourceSource,
   type ResourceManagementProps,
 } from '../../ResourcesList/ResourceSource';
+import { type ResourcePropertyConfig } from '../../Utils/ProjectSettingsReader';
+import {
+  type CustomPropertyValue,
+  getResourceCustomPropertyValue,
+  setResourceCustomPropertyValue,
+} from '../../ResourcesList/ResourceUtils';
 import useForceUpdate from '../../Utils/UseForceUpdate';
 import { EmbeddedResourcesMappingTable } from './EmbeddedResourcesMappingTable';
 import { Spacer } from '../../UI/Grid';
@@ -33,6 +43,89 @@ type Props = {|
 |};
 
 export type ResourcePropertiesEditorInterface = {| forceUpdate: () => void |};
+
+const coerceToBoolean = (value: ?CustomPropertyValue): boolean =>
+  value === true || value === 'true' || value === 1;
+
+const coerceToNumber = (value: ?CustomPropertyValue): number | null => {
+  if (value == null || value === '') return null;
+  const numberValue = Number(value);
+  return Number.isNaN(numberValue) ? null : numberValue;
+};
+
+const coerceToString = (value: ?CustomPropertyValue): string =>
+  value == null ? '' : String(value);
+
+/**
+ * Builds a single PropertiesEditor field from a custom resource property
+ * definition, reading from and writing to the resource metadata.
+ */
+const buildCustomPropertyField = (
+  config: ResourcePropertyConfig,
+  forceUpdate: () => void
+): Field => {
+  const { name, label } = config;
+  const defaultValue = config.default == null ? null : config.default;
+  const getLabel = () => label;
+  const getDescription = () => config.description || '';
+  const readValue = (resource: gdResource): ?CustomPropertyValue =>
+    getResourceCustomPropertyValue(resource, name, defaultValue);
+  const setValue = (resource: gdResource, newValue: CustomPropertyValue) => {
+    setResourceCustomPropertyValue(resource, name, newValue);
+    forceUpdate();
+  };
+
+  if (config.type === 'number') {
+    return {
+      name,
+      getLabel,
+      getDescription,
+      valueType: 'number',
+      getValue: (resource: gdResource) => coerceToNumber(readValue(resource)),
+      setValue,
+    };
+  }
+
+  if (config.type === 'boolean') {
+    return {
+      name,
+      getLabel,
+      getDescription,
+      valueType: 'boolean',
+      getValue: (resource: gdResource) => coerceToBoolean(readValue(resource)),
+      setValue,
+    };
+  }
+
+  // 'string' and 'enum' are both edited as strings; enum adds a list of choices.
+  const choices: ?Array<FieldChoices> =
+    config.type === 'enum' && config.choices
+      ? config.choices.map(({ value, label }) => ({ value, label }))
+      : null;
+  return {
+    name,
+    getLabel,
+    getDescription,
+    valueType: 'string',
+    getValue: (resource: gdResource) => coerceToString(readValue(resource)),
+    setValue,
+    getChoices: choices ? () => choices : undefined,
+  };
+};
+
+const buildCustomPropertiesSchema = (
+  resourcePropertiesSchema: Array<ResourcePropertyConfig>,
+  resourceKind: string,
+  forceUpdate: () => void
+): Schema =>
+  resourcePropertiesSchema
+    .filter(
+      config =>
+        !config.resourceKinds ||
+        config.resourceKinds.length === 0 ||
+        config.resourceKinds.includes(resourceKind)
+    )
+    .map(config => buildCustomPropertyField(config, forceUpdate));
 
 const renderEmpty = () => {
   return (
@@ -180,14 +273,21 @@ const ResourcePropertiesEditor: React.ComponentType<{
           layersContainer: null,
         });
 
+        const resourceKind = resources[0].getKind();
+        const customSchema = buildCustomPropertiesSchema(
+          resourceManagementProps.resourcePropertiesSchema,
+          resourceKind,
+          forceUpdate
+        );
+
         return (
           <PropertiesEditor
-            schema={schema.concat(resourceSchema)}
+            schema={schema.concat(resourceSchema).concat(customSchema)}
             instances={resources}
           />
         );
       },
-      [resources, schema, forceUpdate]
+      [resources, schema, forceUpdate, resourceManagementProps]
     );
 
     const renderPreview = () => {

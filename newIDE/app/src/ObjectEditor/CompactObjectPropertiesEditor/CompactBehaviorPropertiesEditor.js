@@ -151,6 +151,7 @@ export const CompactBehaviorPropertiesEditor = ({
           layersContainer,
           visibility: 'All',
           showcaseNonDefaultValues: true,
+          hideResourceProperties: true,
         });
       }
       const behaviorMetadataProperties = behaviorMetadata.getProperties();

@@ -1399,7 +1399,7 @@ module.exports = {
       ) {
         return Promise.resolve();
       }
-      if (filename === 'spine-pixi-v7.js' && window.spine) {
+      if (filename === 'spine-pixi-v7.js' && getEditorWindow().spine) {
         return Promise.resolve();
       }
 

@@ -59,8 +59,8 @@ exports[`HelpButton renders the button linking to a GDevelop documentation help 
       style={
         Object {
           "flexShrink": 0,
-          "height": 8,
-          "width": 8,
+          "height": 4,
+          "width": 4,
         }
       }
     />

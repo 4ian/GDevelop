@@ -17,10 +17,12 @@ import { AI_SETTINGS_FETCH_TIMEOUT } from '../Utils/GlobalFetchTimeouts';
 import { useAsyncLazyMemo } from '../Utils/UseLazyMemo';
 import { retryIfFailed } from '../Utils/RetryIfFailed';
 import { useInterval } from '../Utils/UseInterval';
+import { useAdaptivePollingInterval } from '../Utils/UseAdaptivePollingInterval';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import {
   aiRequestShouldBeWatched,
   aiRequestHasWorkInProgress,
+  aiRequestPollSawActivity,
 } from './AiRequestUtils';
 import { type EditApprovalRequest } from './Utils';
 
@@ -99,36 +101,6 @@ const useEditorFunctionCallResultsStorage = (): EditorFunctionCallResultsStorage
         forceUpdate();
       },
       [forceUpdate]
-    ),
-  };
-};
-
-// "Auto edit" is a frontend-only toggle. Its live value is remembered per AI
-// request here (in the app-level provider) so it survives the Ask AI editor
-// being unmounted/remounted — e.g. when a no-project request creates a project
-// and the editor is repositioned from the center to the right pane. Without
-// this, the toggle would re-initialize from the saved preference (and could
-// wrongly switch off mid-build). `null` means "no value remembered yet".
-type AutoEditEnabledStorage = {|
-  getAutoEditEnabled: (aiRequestId: string) => boolean | null,
-  setAutoEditEnabled: (aiRequestId: string, enabled: boolean) => void,
-|};
-
-const useAutoEditEnabledStorage = (): AutoEditEnabledStorage => {
-  const autoEditEnabledPerRequestRef = React.useRef<{
-    [aiRequestId: string]: boolean,
-  }>({});
-
-  return {
-    getAutoEditEnabled: React.useCallback((aiRequestId: string) => {
-      const value = autoEditEnabledPerRequestRef.current[aiRequestId];
-      return value === undefined ? null : value;
-    }, []),
-    setAutoEditEnabled: React.useCallback(
-      (aiRequestId: string, enabled: boolean) => {
-        autoEditEnabledPerRequestRef.current[aiRequestId] = enabled;
-      },
-      []
     ),
   };
 };
@@ -496,7 +468,6 @@ export type AiRequestContextState = {|
   aiRequestStorage: AiRequestStorage,
   aiRequestHistory: AiRequestHistory,
   editorFunctionCallResultsStorage: EditorFunctionCallResultsStorage,
-  autoEditEnabledStorage: AutoEditEnabledStorage,
   getAiSettings: () => AiSettings | null,
   isFetchingSuggestions: boolean,
   setIsFetchingSuggestions: (value: boolean) => void,
@@ -561,10 +532,6 @@ export const initialAiRequestContextState: AiRequestContextState = {
     addEditorFunctionCallResults: () => [],
     clearEditorFunctionCallResults: () => {},
   },
-  autoEditEnabledStorage: {
-    getAutoEditEnabled: () => null,
-    setAutoEditEnabled: () => {},
-  },
   getAiSettings: () => null,
   isFetchingSuggestions: false,
   setIsFetchingSuggestions: () => {},
@@ -620,7 +587,6 @@ export const AiRequestProvider = ({
   children,
 }: AiRequestProviderProps): React.MixedElement => {
   const editorFunctionCallResultsStorage = useEditorFunctionCallResultsStorage();
-  const autoEditEnabledStorage = useAutoEditEnabledStorage();
   const aiRequestStorage = useAiRequestsStorage();
   const aiRequestHistory = useAiRequestHistory(aiRequestStorage);
 
@@ -685,12 +651,31 @@ export const AiRequestProvider = ({
   // The selected AI request and its active sub-agents are watched together by a
   // single polling loop defined further below (see `onWatch`), so that a parent
   // request and all its sub-agents are status-polled in one batched request per
-  // tick instead of one request per entity.
-  const watchPollingIntervalInMs =
+  // tick instead of one request per entity. The interval is adaptive (see
+  // useAdaptivePollingInterval): fast while the agent produces output, backing
+  // off during idle waits to cut polling requests.
+  const baseWatchPollingIntervalInMs =
     (selectedAiRequest &&
       selectedAiRequest.toolOptions &&
       selectedAiRequest.toolOptions.watchPollingIntervalInMs) ||
     1400;
+  const {
+    intervalInMs: currentWatchPollingIntervalInMs,
+    reportTick: reportWatchPollingTick,
+    resetToBase: resetWatchPollingInterval,
+  } = useAdaptivePollingInterval({
+    baseIntervalInMs: baseWatchPollingIntervalInMs,
+    maxIntervalInMs: Math.max(baseWatchPollingIntervalInMs, 5000),
+  });
+
+  // Reset to the fast interval when a new request becomes watched or changes, so
+  // the first updates are picked up quickly. These deps are stable during polling.
+  React.useEffect(
+    () => {
+      resetWatchPollingInterval();
+    },
+    [selectedAiRequestId, shouldWatchRequest, resetWatchPollingInterval]
+  );
 
   React.useEffect(
     () => {
@@ -811,6 +796,10 @@ export const AiRequestProvider = ({
     if (!profile) return;
     const now = Date.now();
 
+    // Set to true whenever this tick observes activity (a status change or new
+    // messages). Used at the end of the tick to drive the adaptive interval.
+    let sawChangeThisTick = false;
+
     const clearFetchingSuggestionsIfDone = (aiRequest: AiRequest) => {
       if (!isFetchingSuggestions) return;
       const output = aiRequest.output || [];
@@ -838,7 +827,8 @@ export const AiRequestProvider = ({
       // Only fetch the messages we don't have yet: ask for everything from the
       // last message we already have onward (re-fetched so its in-place
       // updates, like suggestions, are picked up).
-      const currentOutput = (aiRequests[aiRequestId] || {}).output;
+      const previousAiRequest = aiRequests[aiRequestId];
+      const currentOutput = (previousAiRequest || {}).output;
       const lastMessage =
         currentOutput && currentOutput.length > 0
           ? currentOutput[currentOutput.length - 1]
@@ -852,9 +842,13 @@ export const AiRequestProvider = ({
           outputFromMessageId,
         })
       );
-      updateAiRequest(aiRequestId, previousAiRequest =>
+      // Drive the adaptive polling interval: fast while there is activity.
+      if (aiRequestPollSawActivity(previousAiRequest, fetchedAiRequest)) {
+        sawChangeThisTick = true;
+      }
+      updateAiRequest(aiRequestId, previousAiRequestToMerge =>
         mergeIncrementalAiRequest(
-          previousAiRequest,
+          previousAiRequestToMerge,
           fetchedAiRequest,
           outputFromMessageId
         )
@@ -919,6 +913,7 @@ export const AiRequestProvider = ({
           if (!currentRequest) return;
           if (newStatus !== currentRequest.status) {
             // Status changed — full fetch immediately to pick up new messages.
+            sawChangeThisTick = true;
             await doFullFetch(aiRequestId);
           } else {
             updateAiRequest(aiRequestId, prevRequest => ({
@@ -938,6 +933,9 @@ export const AiRequestProvider = ({
         error
       );
     }
+
+    // Adapt the polling interval based on whether this tick saw any activity.
+    reportWatchPollingTick(sawChangeThisTick);
   };
 
   useInterval(
@@ -945,7 +943,7 @@ export const AiRequestProvider = ({
       onWatch();
     },
     (shouldWatchRequest || hasActiveSubAgents) && !pendingEditApproval
-      ? watchPollingIntervalInMs
+      ? currentWatchPollingIntervalInMs
       : null
   );
 
@@ -1077,7 +1075,6 @@ export const AiRequestProvider = ({
       aiRequestStorage,
       aiRequestHistory,
       editorFunctionCallResultsStorage,
-      autoEditEnabledStorage,
       getAiSettings,
       isFetchingSuggestions,
       setIsFetchingSuggestions,
@@ -1096,7 +1093,6 @@ export const AiRequestProvider = ({
       aiRequestStorage,
       aiRequestHistory,
       editorFunctionCallResultsStorage,
-      autoEditEnabledStorage,
       getAiSettings,
       isFetchingSuggestions,
       setIsFetchingSuggestions,

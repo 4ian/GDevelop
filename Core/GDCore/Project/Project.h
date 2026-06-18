@@ -1101,18 +1101,6 @@ class GD_CORE_API Project {
     return wholeProjectDiagnosticReport;
   }
 
-  /**
-   * @brief Get the project extensions names in the order they have to be
-   * unserialized.
-   *
-   * Child-objects need the event-based objects they use to be loaded completely
-   * before they are unserialized.
-   *
-   * \warning This is only public to allow testing - don't use it in the editor.
-   */
-  static std::vector<gd::String> GetUnserializingOrderExtensionNames(
-      const gd::SerializerElement& eventsFunctionsExtensionsElement);
-
  private:
   /**
    * Initialize from another game. Used by copy-ctor and assign-op.

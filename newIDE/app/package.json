@@ -67,7 +67,7 @@
     "lodash": "4.17.4",
     "node-require-function": "^1.2.0",
     "path-browserify": "^1.0.1",
-    "pixi-spine": "4.0.4",
+    "@esotericsoftware/spine-pixi-v7": "~4.2.116",
     "pixi.js-legacy": "7.4.2",
     "posthog-js": "1.275.2",
     "prop-types": "^15.5.10",
@@ -103,14 +103,14 @@
     "@material-ui/styles": "4.11.5"
   },
   "overrides": {
-    "pixi-spine": {
+    "@esotericsoftware/spine-pixi-v7": {
       "@pixi/assets": "7.4.2",
       "@pixi/core": "7.4.2",
       "@pixi/display": "7.4.2",
+      "@pixi/events": "7.4.2",
       "@pixi/graphics": "7.4.2",
       "@pixi/mesh": "7.4.2",
-      "@pixi/mesh-extras": "7.4.2",
-      "@pixi/sprite": "7.4.2"
+      "@pixi/text": "7.4.2"
     },
     "react": "$react",
     "react-dom": "$react-dom",

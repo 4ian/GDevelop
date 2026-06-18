@@ -14,6 +14,7 @@ import {
 } from '../Utils/GDevelopServices/Asset';
 import { type ResourceExternalEditor } from './ResourceExternalEditor';
 import { type OnFetchNewlyAddedResourcesFunction } from '../ProjectsStorage/ResourceFetcher';
+import { type ResourcePropertyConfig } from '../Utils/ProjectSettingsReader';
 
 const gd: libGDevelop = global.gd;
 
@@ -205,6 +206,7 @@ export type ResourceManagementProps = {|
   canInstallPrivateAsset: () => boolean,
   onNewResourcesAdded: () => void,
   onResourceUsageChanged: () => void,
+  resourcePropertiesSchema: Array<ResourcePropertyConfig>,
 |};
 
 export type ResourceStoreChooserProps = {|

@@ -260,6 +260,9 @@ const MosaicEditorsDisplay: React.ComponentType<{
           keepCanvasTopLeftSceneCoordinatesOnNextResize: editor
             ? editor.keepCanvasTopLeftSceneCoordinatesOnNextResize
             : noop,
+          keepCanvasTopCenterScreenCoordinatesOnNextResize: editor
+            ? editor.keepCanvasTopCenterScreenCoordinatesOnNextResize
+            : noop,
         },
         instancesHandlers: {
           getContentAABB: editor ? editor.getContentAABB : () => null,

@@ -1128,6 +1128,7 @@ export default class SceneEditor extends React.Component<Props, State> {
   toggleAllPanels = () => {
     const { editorDisplay } = this;
     if (!editorDisplay) return;
+    editorDisplay.viewControls.keepCanvasTopCenterScreenCoordinatesOnNextResize();
     const shouldShowAllPanels = PANEL_EDITOR_IDS.some(
       editorId => !editorDisplay.isEditorVisible(editorId)
     );

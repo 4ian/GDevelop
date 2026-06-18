@@ -41,6 +41,11 @@ const projectHasItem = ({
   switch (kind) {
     case 'events functions extension':
       return project.hasEventsFunctionsExtensionNamed(name);
+    case 'prefab detail': {
+      const nameElements = name.split('::');
+      const objectType = nameElements[0] + '::' + nameElements[1];
+      return project.hasEventsBasedObject(objectType);
+    }
     case 'layout':
       return project.hasLayoutNamed(name);
     case 'layout events':

@@ -203,6 +203,7 @@ export type SceneEditorsDisplayInterface = {|
     getLastContextMenuSceneCoordinates: () => [number, number],
     getViewPosition: () => ?ViewPosition,
     keepCanvasTopLeftSceneCoordinatesOnNextResize: () => void,
+    keepCanvasTopCenterScreenCoordinatesOnNextResize: () => void,
   |},
   startSceneRendering: (start: boolean, reason: string) => void,
   instancesHandlers: {|

@@ -652,6 +652,7 @@ export type EventsFunctionsListInterface = {|
 type Props = {|
   project: gdProject,
   eventsFunctionsExtension: gdEventsFunctionsExtension,
+  focusedEventsBasedObject?: ?gdEventsBasedObject,
   unsavedChanges?: ?UnsavedChanges,
   forceUpdateEditor: () => void,
   // Objects
@@ -677,6 +678,7 @@ const EventsFunctionsList = React.forwardRef<
     {
       project,
       eventsFunctionsExtension,
+      focusedEventsBasedObject,
       unsavedChanges,
       onSelectEventsFunction,
       onDeleteEventsFunction,
@@ -1331,30 +1333,46 @@ const EventsFunctionsList = React.forwardRef<
       ]
     );
 
-    const objectTreeViewItems = mapFor(
-      0,
-      eventBasedObjects.size(),
-      i =>
-        new EventsBasedObjectTreeViewItem(
-          eventBasedObjects.at(i),
-          eventsBasedObjectProps,
-          eventFunctionCommonProps,
-          eventFunctionFolderCommonProps
-        )
-    );
-    const behaviorTreeViewItems = mapFor(
-      0,
-      eventBasedBehaviors.size(),
-      i =>
-        new BehaviorTreeViewItem(
-          eventBasedBehaviors.at(i),
-          eventBasedBehaviorProps,
-          eventFunctionCommonProps,
-          eventFunctionFolderCommonProps
-        )
-    );
+    const objectTreeViewItems = focusedEventsBasedObject
+      ? [
+          new EventsBasedObjectTreeViewItem(
+            focusedEventsBasedObject,
+            eventsBasedObjectProps,
+            eventFunctionCommonProps,
+            eventFunctionFolderCommonProps
+          ),
+        ]
+      : mapFor(
+          0,
+          eventBasedObjects.size(),
+          i =>
+            new EventsBasedObjectTreeViewItem(
+              eventBasedObjects.at(i),
+              eventsBasedObjectProps,
+              eventFunctionCommonProps,
+              eventFunctionFolderCommonProps
+            )
+        );
+    const behaviorTreeViewItems = focusedEventsBasedObject
+      ? []
+      : mapFor(
+          0,
+          eventBasedBehaviors.size(),
+          i =>
+            new BehaviorTreeViewItem(
+              eventBasedBehaviors.at(i),
+              eventBasedBehaviorProps,
+              eventFunctionCommonProps,
+              eventFunctionFolderCommonProps
+            )
+        );
     const getTreeViewData = React.useCallback(
       (i18n: I18nType): Array<TreeViewItem> => {
+        if (focusedEventsBasedObject) {
+          // $FlowFixMe[incompatible-type]
+          return objectTreeViewItems;
+        }
+
         // $FlowFixMe[incompatible-type]
         return [
           {
@@ -1519,6 +1537,7 @@ const EventsFunctionsList = React.forwardRef<
         onSelectExtensionGlobalVariables,
         onSelectExtensionSceneVariables,
         objectTreeViewItems,
+        focusedEventsBasedObject,
         behaviorTreeViewItems,
         addNewEventsFunction,
         eventsFunctionsExtension,
@@ -1595,16 +1614,24 @@ const EventsFunctionsList = React.forwardRef<
         }
         if (selectedItems[0].content.isDescendantOf(item.content)) {
           setSelectedItems([]);
-          onSelectEventsFunction(null, null, null);
+          if (focusedEventsBasedObject) {
+            onSelectEventsFunction(null, null, focusedEventsBasedObject);
+          } else {
+            onSelectEventsFunction(null, null, null);
+          }
         }
       },
-      [selectedItems, onSelectEventsFunction]
+      [selectedItems, onSelectEventsFunction, focusedEventsBasedObject]
     );
 
     // Force List component to be mounted again if project or objectsContainer
     // has been changed. Avoid accessing to invalid objects that could
     // crash the app.
-    const listKey = project.ptr + ';' + eventsFunctionsExtension.ptr;
+    const listKey =
+      project.ptr +
+      ';' +
+      eventsFunctionsExtension.ptr +
+      (focusedEventsBasedObject ? ';' + focusedEventsBasedObject.ptr : '');
     const initiallyOpenedNodeIds = [
       extensionObjectsRootFolderId,
       extensionBehaviorsRootFolderId,
@@ -1851,7 +1878,8 @@ const arePropsEqual = (prevProps: Props, nextProps: Props): boolean =>
   // call forceUpdate.
   prevProps.selectedEventsFunction === nextProps.selectedEventsFunction &&
   prevProps.project === nextProps.project &&
-  prevProps.eventsFunctionsExtension === nextProps.eventsFunctionsExtension;
+  prevProps.eventsFunctionsExtension === nextProps.eventsFunctionsExtension &&
+  prevProps.focusedEventsBasedObject === nextProps.focusedEventsBasedObject;
 
 // $FlowFixMe[incompatible-type]
 const MemoizedObjectsList = React.memo<Props, EventsFunctionsListInterface>(

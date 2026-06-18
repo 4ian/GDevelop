@@ -157,6 +157,18 @@ type State = {|
   |},
 |};
 
+type CanvasSceneCoordinatesToKeepAfterResize =
+  | {|
+      type: 'canvas-position',
+      canvasCoordinates: [number, number],
+      sceneCoordinates: [number, number],
+    |}
+  | {|
+      type: 'screen-position',
+      clientCoordinates: [number, number],
+      sceneCoordinates: [number, number],
+    |};
+
 export default class InstancesEditor extends Component<Props, State> {
   lastContextMenuX = 0;
   lastContextMenuY = 0;
@@ -204,7 +216,9 @@ export default class InstancesEditor extends Component<Props, State> {
   _showObjectInstancesIn3D: boolean = false;
   _canvasResolution: number = 1;
   _previousToolBeforePicker: ?TileMapTileSelection = null;
-  _canvasTopLeftSceneCoordinatesToKeepAfterResize: ?[number, number] = null;
+  _canvasSceneCoordinatesToKeepAfterResize: ?CanvasSceneCoordinatesToKeepAfterResize =
+    null;
+  _clearCanvasSceneCoordinatesToKeepAfterResizeTimeoutId: ?TimeoutID = null;
 
   // $FlowFixMe[missing-local-annot]
   state = {
@@ -665,6 +679,7 @@ export default class InstancesEditor extends Component<Props, State> {
     // This is an antipattern and is theoretically not needed, but help
     // to protect against renders after the component is unmounted.
     this._unmounted = true;
+    this._cancelClearCanvasSceneCoordinatesToKeepAfterResize();
 
     // We've seen all those elements being undefined in some cases, so
     // by security, check that they are defined before deleting them.
@@ -739,22 +754,46 @@ export default class InstancesEditor extends Component<Props, State> {
         );
       }
       this.viewPosition.resize(width, height);
-      const canvasTopLeftSceneCoordinatesToKeep = this
-        ._canvasTopLeftSceneCoordinatesToKeepAfterResize;
-      this._canvasTopLeftSceneCoordinatesToKeepAfterResize = null;
+      const canvasSceneCoordinatesToKeep = this
+        ._canvasSceneCoordinatesToKeepAfterResize;
+      if (
+        canvasSceneCoordinatesToKeep &&
+        canvasSceneCoordinatesToKeep.type === 'canvas-position'
+      ) {
+        this._canvasSceneCoordinatesToKeepAfterResize = null;
+      }
       let hasAdjustedViewPosition = false;
-      if (canvasTopLeftSceneCoordinatesToKeep) {
-        const canvasTopLeftSceneCoordinates = this.viewPosition.toSceneCoordinates(
-          0,
-          0
-        );
-        this.viewPosition.scrollBy(
-          canvasTopLeftSceneCoordinatesToKeep[0] -
-            canvasTopLeftSceneCoordinates[0],
-          canvasTopLeftSceneCoordinatesToKeep[1] -
-            canvasTopLeftSceneCoordinates[1]
-        );
-        hasAdjustedViewPosition = true;
+      if (canvasSceneCoordinatesToKeep) {
+        let canvasCoordinates: ?[number, number] = null;
+        if (canvasSceneCoordinatesToKeep.type === 'screen-position') {
+          const { canvasArea } = this;
+          if (canvasArea) {
+            const canvasRect = canvasArea.getBoundingClientRect();
+            canvasCoordinates = [
+              canvasSceneCoordinatesToKeep.clientCoordinates[0] -
+                canvasRect.left,
+              canvasSceneCoordinatesToKeep.clientCoordinates[1] -
+                canvasRect.top,
+            ];
+          }
+        } else {
+          canvasCoordinates =
+            canvasSceneCoordinatesToKeep.canvasCoordinates;
+        }
+
+        if (canvasCoordinates) {
+          const canvasSceneCoordinates = this.viewPosition.toSceneCoordinates(
+            canvasCoordinates[0],
+            canvasCoordinates[1]
+          );
+          this.viewPosition.scrollBy(
+            canvasSceneCoordinatesToKeep.sceneCoordinates[0] -
+              canvasSceneCoordinates[0],
+            canvasSceneCoordinatesToKeep.sceneCoordinates[1] -
+              canvasSceneCoordinates[1]
+          );
+          hasAdjustedViewPosition = true;
+        }
       }
       this.statusBar.resize(width, height);
       this.backgroundArea.hitArea = new PIXI.Rectangle(0, 0, width, height);
@@ -765,6 +804,12 @@ export default class InstancesEditor extends Component<Props, State> {
       this._renderScene();
       if (hasAdjustedViewPosition && this.props.onViewPositionChanged) {
         this.props.onViewPositionChanged(this.viewPosition);
+      }
+      if (
+        canvasSceneCoordinatesToKeep &&
+        canvasSceneCoordinatesToKeep.type === 'screen-position'
+      ) {
+        this._clearCanvasSceneCoordinatesToKeepAfterResizeAfterResizeSettled();
       }
     }
 
@@ -1865,12 +1910,47 @@ export default class InstancesEditor extends Component<Props, State> {
     return this.viewPosition;
   };
 
+  _cancelClearCanvasSceneCoordinatesToKeepAfterResize = () => {
+    if (!this._clearCanvasSceneCoordinatesToKeepAfterResizeTimeoutId) return;
+
+    clearTimeout(this._clearCanvasSceneCoordinatesToKeepAfterResizeTimeoutId);
+    this._clearCanvasSceneCoordinatesToKeepAfterResizeTimeoutId = null;
+  };
+
+  _clearCanvasSceneCoordinatesToKeepAfterResizeAfterResizeSettled = () => {
+    this._cancelClearCanvasSceneCoordinatesToKeepAfterResize();
+    this._clearCanvasSceneCoordinatesToKeepAfterResizeTimeoutId = setTimeout(
+      () => {
+        this._clearCanvasSceneCoordinatesToKeepAfterResizeTimeoutId = null;
+        this._canvasSceneCoordinatesToKeepAfterResize = null;
+      },
+      120
+    );
+  };
+
   keepCanvasTopLeftSceneCoordinatesOnNextResize = () => {
     if (!this.viewPosition) return;
-    this._canvasTopLeftSceneCoordinatesToKeepAfterResize = this.viewPosition.toSceneCoordinates(
-      0,
-      0
-    );
+
+    this._cancelClearCanvasSceneCoordinatesToKeepAfterResize();
+    this._canvasSceneCoordinatesToKeepAfterResize = {
+      type: 'canvas-position',
+      canvasCoordinates: [0, 0],
+      sceneCoordinates: this.viewPosition.toSceneCoordinates(0, 0),
+    };
+  };
+
+  keepCanvasTopCenterScreenCoordinatesOnNextResize = () => {
+    const { canvasArea, viewPosition } = this;
+    if (!canvasArea || !viewPosition) return;
+
+    this._cancelClearCanvasSceneCoordinatesToKeepAfterResize();
+    const canvasRect = canvasArea.getBoundingClientRect();
+    const canvasCenterX = viewPosition.getWidth() / 2;
+    this._canvasSceneCoordinatesToKeepAfterResize = {
+      type: 'screen-position',
+      clientCoordinates: [canvasRect.left + canvasCenterX, canvasRect.top],
+      sceneCoordinates: viewPosition.toSceneCoordinates(canvasCenterX, 0),
+    };
   };
 
   _renderScene = () => {

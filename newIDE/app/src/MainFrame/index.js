@@ -45,6 +45,7 @@ import {
   type EditorTabsState,
   type EditorKind,
   getEventsFunctionsExtensionEditor,
+  getPrefabDetailEditor,
   notifyPreviewOrExportWillStart,
   getCurrentTabForPane,
   getCustomObjectEditor,
@@ -63,6 +64,7 @@ import { renderExternalEventsEditorContainer } from './EditorContainers/External
 import { renderSceneEditorContainer } from './EditorContainers/SceneEditorContainer';
 import { renderExternalLayoutEditorContainer } from './EditorContainers/ExternalLayoutEditorContainer';
 import { renderEventsFunctionsExtensionEditorContainer } from './EditorContainers/EventsFunctionsExtensionEditorContainer';
+import { renderPrefabDetailEditorContainer } from './EditorContainers/PrefabDetailEditorContainer';
 import { renderCustomObjectEditorContainer } from './EditorContainers/CustomObjectEditorContainer';
 import { renderHomePageContainer } from './EditorContainers/HomePage';
 import { type OpenAskAiOptions } from '../AiGeneration/Utils';
@@ -274,6 +276,7 @@ const editorKindToRenderer: {
   layout: renderSceneEditorContainer,
   'external layout': renderExternalLayoutEditorContainer,
   'events functions extension': renderEventsFunctionsExtensionEditorContainer,
+  'prefab detail': renderPrefabDetailEditorContainer,
   'custom object': renderCustomObjectEditorContainer,
   'start page': renderHomePageContainer,
   resources: renderResourcesEditorContainer,
@@ -754,6 +757,8 @@ const MainFrame = (props: Props): React.MixedElement => {
           ? i18n._(t`Debugger`)
           : kind === 'layout events'
           ? name + ` ${i18n._(t`(Events)`)}`
+          : kind === 'prefab detail'
+          ? name.split('::')[1] + ` ${i18n._(t`(Prefab)`)}`
           : kind === 'custom object'
           ? name.split('::')[2] ||
             name.split('::')[1] + ` ${i18n._(t`(Object)`)}`
@@ -770,13 +775,18 @@ const MainFrame = (props: Props): React.MixedElement => {
         'external events',
         'external layout',
         'events functions extension',
+        'prefab detail',
         'custom object',
       ].includes(kind)
         ? `${kind} ${name}`
         : kind;
 
       let customIconUrl = '';
-      if (kind === 'events functions extension' || kind === 'custom object') {
+      if (
+        kind === 'events functions extension' ||
+        kind === 'prefab detail' ||
+        kind === 'custom object'
+      ) {
         const extensionName = name.split('::')[0];
         if (
           project &&
@@ -806,6 +816,7 @@ const MainFrame = (props: Props): React.MixedElement => {
         ) : kind === 'external layout' ? (
           <ExternalLayoutIcon />
         ) : kind === 'events functions extension' ||
+          kind === 'prefab detail' ||
           kind === 'custom object' ? (
           <ExtensionIcon />
         ) : kind === 'ask-ai' ? (
@@ -3328,6 +3339,61 @@ const MainFrame = (props: Props): React.MixedElement => {
     [getEditorOpeningOptions, setState, state]
   );
 
+  const openPrefabDetailEditor = React.useCallback(
+    (
+      eventsFunctionsExtension: gdEventsFunctionsExtension,
+      eventsBasedObject: gdEventsBasedObject,
+      initiallyFocusedFunctionName?: ?string
+    ) => {
+      const { currentProject, editorTabs } = state;
+      if (!currentProject) return;
+
+      const foundTab = getPrefabDetailEditor(
+        editorTabs,
+        eventsFunctionsExtension,
+        eventsBasedObject
+      );
+      if (foundTab) {
+        if (initiallyFocusedFunctionName) {
+          foundTab.editor.selectEventsFunctionByName(
+            initiallyFocusedFunctionName
+          );
+        } else {
+          foundTab.editor.selectEventsBasedObjectByName(
+            eventsBasedObject.getName()
+          );
+        }
+        setState(state => ({
+          ...state,
+          editorTabs: changeCurrentTab(
+            editorTabs,
+            foundTab.paneIdentifier,
+            foundTab.tabIndex
+          ),
+        }));
+      } else {
+        setState(state => ({
+          ...state,
+          // $FlowFixMe[incompatible-type]
+          editorTabs: openEditorTab(state.editorTabs, {
+            ...getEditorOpeningOptions({
+              kind: 'prefab detail',
+              name:
+                eventsFunctionsExtension.getName() +
+                '::' +
+                eventsBasedObject.getName(),
+              project: currentProject,
+            }),
+            extraEditorProps: {
+              initiallyFocusedFunctionName,
+            },
+          }),
+        }));
+      }
+    },
+    [getEditorOpeningOptions, setState, state]
+  );
+
   const openCustomObjectAndExtensionEditors = React.useCallback(
     (
       eventsFunctionsExtension: gdEventsFunctionsExtension,
@@ -3337,22 +3403,23 @@ const MainFrame = (props: Props): React.MixedElement => {
       const { currentProject } = state;
       if (!currentProject) return;
 
-      // Open both tabs at the same time to avoid the extension tab to trigger
-      // a code generation when it loses the focus.
+      // Open both tabs at the same time to avoid the prefab detail tab to
+      // trigger code generation when it loses the focus.
       setState(state => ({
         ...state,
         editorTabs: openEditorTab(
           // $FlowFixMe[incompatible-type]
           openEditorTab(state.editorTabs, {
             ...getEditorOpeningOptions({
-              kind: 'events functions extension',
-              name: eventsFunctionsExtension.getName(),
+              kind: 'prefab detail',
+              name:
+                eventsFunctionsExtension.getName() +
+                '::' +
+                eventsBasedObject.getName(),
               project: currentProject,
             }),
             extraEditorProps: {
               initiallyFocusedFunctionName: null,
-              initiallyFocusedBehaviorName: null,
-              initiallyFocusedObjectName: eventsBasedObject.getName(),
             },
           }),
           // $FlowFixMe[incompatible-type]
@@ -3384,13 +3451,19 @@ const MainFrame = (props: Props): React.MixedElement => {
       const eventsFunctionsExtension = currentProject.getEventsFunctionsExtension(
         extensionName
       );
+      const eventsBasedObjects = eventsFunctionsExtension.getEventsBasedObjects();
+      if (!eventsBasedObjects.has(objectName)) {
+        return;
+      }
+      const eventsBasedObject = eventsBasedObjects.get(objectName);
 
-      const foundTab = getEventsFunctionsExtensionEditor(
+      const foundTab = getPrefabDetailEditor(
         editorTabs,
-        eventsFunctionsExtension
+        eventsFunctionsExtension,
+        eventsBasedObject
       );
       if (foundTab) {
-        // Open the given function and focus the tab
+        // Open the prefab configuration and focus the tab.
         foundTab.editor.selectEventsBasedObjectByName(objectName);
         setState(state => ({
           ...state,
@@ -3401,8 +3474,7 @@ const MainFrame = (props: Props): React.MixedElement => {
           ),
         }));
       } else {
-        // Open a new editor for the extension and the given function
-        openEventsFunctionsExtension(extensionName, null, null, objectName);
+        openPrefabDetailEditor(eventsFunctionsExtension, eventsBasedObject);
       }
     } else {
       // It's not an events functions extension, we should not be here.

@@ -19,6 +19,7 @@ const editorKindToLabel: { [kind: EditorKind]: React.Node } = {
   'external layout': <Trans>External layout</Trans>,
   'external events': <Trans>External events</Trans>,
   'events functions extension': <Trans>Extension</Trans>,
+  'prefab detail': <Trans>Prefab detail</Trans>,
   'custom object': <Trans>Object</Trans>,
   debugger: <Trans>Debugger</Trans>,
   resources: <Trans>Resources</Trans>,
@@ -88,6 +89,7 @@ const TabsTitlebarTooltip = ({
       'external layout',
       'external events',
       'events functions extension',
+      'prefab detail',
     ].includes(editorTab.kind)
   ) {
     title = editorTab.projectItemName;

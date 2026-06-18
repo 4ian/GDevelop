@@ -4,6 +4,7 @@ import findIndex from 'lodash/findIndex';
 import { EventsEditorContainer } from '../EditorContainers/EventsEditorContainer';
 import { DebuggerEditorContainer } from '../EditorContainers/DebuggerEditorContainer';
 import { EventsFunctionsExtensionEditorContainer } from '../EditorContainers/EventsFunctionsExtensionEditorContainer';
+import { PrefabDetailEditorContainer } from '../EditorContainers/PrefabDetailEditorContainer';
 import { ExternalEventsEditorContainer } from '../EditorContainers/ExternalEventsEditorContainer';
 import { ExternalLayoutEditorContainer } from '../EditorContainers/ExternalLayoutEditorContainer';
 import { ResourcesEditorContainer } from '../EditorContainers/ResourcesEditorContainer';
@@ -22,6 +23,7 @@ type EditorRef =
   | DebuggerEditorContainer
   | EventsEditorContainer
   | EventsFunctionsExtensionEditorContainer
+  | PrefabDetailEditorContainer
   | ExternalEventsEditorContainer
   | ExternalLayoutEditorContainer
   | ResourcesEditorContainer
@@ -37,6 +39,7 @@ export type EditorKind =
   | 'external layout'
   | 'external events'
   | 'events functions extension'
+  | 'prefab detail'
   | 'custom object'
   | 'debugger'
   | 'resources'
@@ -491,7 +494,10 @@ export const notifyPreviewOrExportWillStart = (state: EditorTabsState) => {
     pane.editors.forEach(editorTab => {
       const editor = editorTab.editorRef;
 
-      if (editor instanceof EventsFunctionsExtensionEditorContainer) {
+      if (
+        editor instanceof EventsFunctionsExtensionEditorContainer ||
+        editor instanceof PrefabDetailEditorContainer
+      ) {
         editor.previewOrExportWillStart();
       }
     });
@@ -578,6 +584,7 @@ export const closeEventsFunctionsExtensionTabs = (
     const editor = editorTab.editorRef;
     if (
       editor instanceof EventsFunctionsExtensionEditorContainer ||
+      editor instanceof PrefabDetailEditorContainer ||
       editor instanceof CustomObjectEditorContainer
     ) {
       return (
@@ -601,7 +608,10 @@ export const closeCustomObjectTab = (
 } => {
   return closeTabsExceptIf(state, editorTab => {
     const editor = editorTab.editorRef;
-    if (editor instanceof CustomObjectEditorContainer) {
+    if (
+      editor instanceof CustomObjectEditorContainer ||
+      editor instanceof PrefabDetailEditorContainer
+    ) {
       return (
         (!editor.getEventsFunctionsExtensionName() ||
           editor.getEventsFunctionsExtensionName() !==
@@ -656,6 +666,32 @@ export const getEventsFunctionsExtensionEditor = (
       if (
         editor instanceof EventsFunctionsExtensionEditorContainer &&
         editor.getEventsFunctionsExtension() === eventsFunctionsExtension
+      ) {
+        return { editor, paneIdentifier, tabIndex };
+      }
+    }
+  }
+
+  return null;
+};
+
+export const getPrefabDetailEditor = (
+  state: EditorTabsState,
+  eventsFunctionsExtension: gdEventsFunctionsExtension,
+  eventsBasedObject: gdEventsBasedObject
+): ?{|
+  editor: PrefabDetailEditorContainer,
+  paneIdentifier: string,
+  tabIndex: number,
+|} => {
+  for (const paneIdentifier in state.panes) {
+    const pane = state.panes[paneIdentifier];
+    for (let tabIndex = 0; tabIndex < pane.editors.length; ++tabIndex) {
+      const editor = pane.editors[tabIndex].editorRef;
+      if (
+        editor instanceof PrefabDetailEditorContainer &&
+        editor.getEventsFunctionsExtension() === eventsFunctionsExtension &&
+        editor.getEventsBasedObject() === eventsBasedObject
       ) {
         return { editor, paneIdentifier, tabIndex };
       }

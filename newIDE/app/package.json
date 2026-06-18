@@ -53,6 +53,7 @@
     "@material-ui/core": "4.11.0",
     "@material-ui/icons": "4.9.1",
     "@material-ui/lab": "4.0.0-alpha.56",
+    "@material-ui/styles": "4.11.5",
     "@supercharge/promise-pool": "^1.6.0",
     "axios": "^0.18.1",
     "blueimp-md5": "^2.10.0",
@@ -100,8 +101,7 @@
     "url-search-params": "^1.0.2",
     "wavesurfer.js": "7.12.6",
     "xxhashjs": "^0.2.2",
-    "yaml": "^2.8.2",
-    "@material-ui/styles": "4.11.5"
+    "yaml": "^2.8.2"
   },
   "overrides": {
     "pixi-spine": {

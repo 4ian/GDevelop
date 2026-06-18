@@ -172,6 +172,12 @@ const appWindowIcon =
   process.platform === 'win32' && fs.existsSync(windowsAppIconPath)
     ? windowsAppIconPath
     : undefined;
+// On macOS, the dock icon is not taken from the BrowserWindow `icon` option:
+// it comes from the app bundle (Info.plist). When running the generic
+// Electron.app (e.g. via scripts/start-macos-app.py), this means the default
+// Electron icon is shown. Set it explicitly at runtime so the dock shows the
+// GDevelop icon, matching the Windows taskbar icon behavior.
+const macAppIconPath = path.join(__dirname, '..', 'build', 'icon.png');
 
 // See registerGdideProtocol (used for HTML modules support). Bundled tools use
 // custom secure schemes so they can call /api without a localhost server.
@@ -539,6 +545,15 @@ app.on('ready', function() {
 
   // Set up dock menu (macOS) for creating new windows
   if (app.dock) {
+    // Show the GDevelop icon in the dock instead of the default Electron icon
+    // when running the generic Electron.app (development launch).
+    if (fs.existsSync(macAppIconPath)) {
+      const dockIcon = electron.nativeImage.createFromPath(macAppIconPath);
+      if (!dockIcon.isEmpty()) {
+        app.dock.setIcon(dockIcon);
+      }
+    }
+
     const dockMenu = Menu.buildFromTemplate([
       {
         label: 'New window',

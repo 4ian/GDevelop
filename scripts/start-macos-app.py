@@ -219,6 +219,42 @@ def ensure_react_app_dependencies(app_dir: Path, dry_run: bool) -> None:
         raise RuntimeError(f"React app node_modules still missing after npm install: {node_modules}")
 
 
+def ensure_dock_icon(electron_app_dir: Path, dry_run: bool) -> None:
+    """Generate the macOS dock icon (PNG) from the committed icon.icns.
+
+    The dock icon of the generic Electron.app is the default Electron atom; the
+    main process sets app.dock.setIcon() from build/icon.png at runtime. That PNG
+    is not committed (only icon.icns/icon.ico are), so derive it here with the
+    native `sips` tool to match the Windows taskbar icon.
+    """
+    step("Ensure macOS dock icon")
+    build_dir = electron_app_dir / "build"
+    icns_path = build_dir / "icon.icns"
+    png_path = build_dir / "icon.png"
+
+    if png_path.exists():
+        print(f"Dock icon already present: {png_path}", flush=True)
+        return
+    if not icns_path.exists():
+        print(
+            f"Source icon missing ({icns_path}); skipping dock icon generation.",
+            flush=True,
+        )
+        return
+
+    run_command(
+        ["sips", "-s", "format", "png", str(icns_path), "--out", str(png_path)],
+        cwd=electron_app_dir,
+        dry_run=dry_run,
+    )
+    if not dry_run and not png_path.exists():
+        print(
+            f"WARNING: dock icon was not created at {png_path}; "
+            "the default Electron icon may be shown.",
+            flush=True,
+        )
+
+
 def build_react_app(app_dir: Path, build: bool, dry_run: bool) -> None:
     step("Build React app")
     if not build:
@@ -355,6 +391,7 @@ def main() -> int:
         stop_existing_processes(repo_root, electron_exe, args.dry_run)
         ensure_electron_dependencies(repo_root, electron_app_dir, electron_exe, args.dry_run)
         ensure_react_app_dependencies(app_dir, args.dry_run)
+        ensure_dock_icon(electron_app_dir, args.dry_run)
         # Only allow reusing the existing libGD.js when it is actually up to date
         # with the C++/bindings sources. If it is stale (or missing), the build is
         # REQUIRED: we must not silently launch with an out-of-date engine, so we

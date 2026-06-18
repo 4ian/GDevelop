@@ -1333,39 +1333,59 @@ const EventsFunctionsList = React.forwardRef<
       ]
     );
 
-    const objectTreeViewItems = focusedEventsBasedObject
-      ? [
-          new EventsBasedObjectTreeViewItem(
-            focusedEventsBasedObject,
-            eventsBasedObjectProps,
-            eventFunctionCommonProps,
-            eventFunctionFolderCommonProps
-          ),
-        ]
-      : mapFor(
-          0,
-          eventBasedObjects.size(),
-          i =>
-            new EventsBasedObjectTreeViewItem(
-              eventBasedObjects.at(i),
-              eventsBasedObjectProps,
-              eventFunctionCommonProps,
-              eventFunctionFolderCommonProps
-            )
-        );
-    const behaviorTreeViewItems = focusedEventsBasedObject
-      ? []
-      : mapFor(
-          0,
-          eventBasedBehaviors.size(),
-          i =>
-            new BehaviorTreeViewItem(
-              eventBasedBehaviors.at(i),
-              eventBasedBehaviorProps,
-              eventFunctionCommonProps,
-              eventFunctionFolderCommonProps
-            )
-        );
+    const objectTreeViewItems = React.useMemo(
+      () =>
+        focusedEventsBasedObject
+          ? [
+              new EventsBasedObjectTreeViewItem(
+                focusedEventsBasedObject,
+                eventsBasedObjectProps,
+                eventFunctionCommonProps,
+                eventFunctionFolderCommonProps
+              ),
+            ]
+          : mapFor(
+              0,
+              eventBasedObjects.size(),
+              i =>
+                new EventsBasedObjectTreeViewItem(
+                  eventBasedObjects.at(i),
+                  eventsBasedObjectProps,
+                  eventFunctionCommonProps,
+                  eventFunctionFolderCommonProps
+                )
+            ),
+      [
+        eventBasedObjects,
+        eventFunctionCommonProps,
+        eventFunctionFolderCommonProps,
+        eventsBasedObjectProps,
+        focusedEventsBasedObject,
+      ]
+    );
+    const behaviorTreeViewItems = React.useMemo<Array<BehaviorTreeViewItem>>(
+      () =>
+        focusedEventsBasedObject
+          ? []
+          : mapFor(
+              0,
+              eventBasedBehaviors.size(),
+              i =>
+                new BehaviorTreeViewItem(
+                  eventBasedBehaviors.at(i),
+                  eventBasedBehaviorProps,
+                  eventFunctionCommonProps,
+                  eventFunctionFolderCommonProps
+                )
+            ),
+      [
+        eventBasedBehaviorProps,
+        eventBasedBehaviors,
+        eventFunctionCommonProps,
+        eventFunctionFolderCommonProps,
+        focusedEventsBasedObject,
+      ]
+    );
     const getTreeViewData = React.useCallback(
       (i18n: I18nType): Array<TreeViewItem> => {
         if (focusedEventsBasedObject) {

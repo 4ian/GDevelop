@@ -213,7 +213,11 @@ export class PrefabDetailEditorContainer extends React.Component<RenderEditorCon
     return projectItemName.split('::')[1] || '';
   }
 
-  selectEventsFunctionByName(eventsFunctionName: string) {
+  selectEventsFunctionByName(
+    eventsFunctionName: string,
+    _eventBasedBehaviorName?: ?string,
+    _eventBasedObjectName?: ?string
+  ) {
     if (this.editor) {
       this.editor.selectEventsFunctionByName(eventsFunctionName);
     }

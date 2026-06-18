@@ -761,7 +761,7 @@ const MainFrame = (props: Props): React.MixedElement => {
           ? name.split('::')[1] + ` ${i18n._(t`(Prefab)`)}`
           : kind === 'custom object'
           ? name.split('::')[2] ||
-            name.split('::')[1] + ` ${i18n._(t`(Object)`)}`
+            name.split('::')[1] + ` ${i18n._(t`(UI)`)}`
           : name;
       const tabOptions =
         kind === 'layout'
@@ -3300,6 +3300,13 @@ const MainFrame = (props: Props): React.MixedElement => {
       const { currentProject, editorTabs } = state;
       if (!currentProject) return;
 
+      const prefabDetailName =
+        eventsFunctionsExtension.getName() + '::' + eventsBasedObject.getName();
+      const customObjectName =
+        prefabDetailName +
+        (eventsBasedObject.getVariants().hasVariantNamed(variantName)
+          ? '::' + variantName
+          : '');
       const foundTab = getCustomObjectEditor(
         editorTabs,
         eventsFunctionsExtension,
@@ -3310,7 +3317,15 @@ const MainFrame = (props: Props): React.MixedElement => {
         setState(state => ({
           ...state,
           editorTabs: changeCurrentTab(
-            editorTabs,
+            // $FlowFixMe[incompatible-type]
+            openEditorTab(editorTabs, {
+              ...getEditorOpeningOptions({
+                kind: 'prefab detail',
+                name: prefabDetailName,
+                project: currentProject,
+                dontFocusTab: true,
+              }),
+            }),
             foundTab.paneIdentifier,
             foundTab.tabIndex
           ),
@@ -3320,19 +3335,25 @@ const MainFrame = (props: Props): React.MixedElement => {
         setState(state => ({
           ...state,
           // $FlowFixMe[incompatible-type]
-          editorTabs: openEditorTab(state.editorTabs, {
-            ...getEditorOpeningOptions({
-              kind: 'custom object',
-              name:
-                eventsFunctionsExtension.getName() +
-                '::' +
-                eventsBasedObject.getName() +
-                (eventsBasedObject.getVariants().hasVariantNamed(variantName)
-                  ? '::' + variantName
-                  : ''),
-              project: currentProject,
+          editorTabs: openEditorTab(
+            // $FlowFixMe[incompatible-type]
+            openEditorTab(state.editorTabs, {
+              ...getEditorOpeningOptions({
+                kind: 'prefab detail',
+                name: prefabDetailName,
+                project: currentProject,
+                dontFocusTab: true,
+              }),
             }),
-          }),
+            // $FlowFixMe[incompatible-type]
+            {
+              ...getEditorOpeningOptions({
+                kind: 'custom object',
+                name: customObjectName,
+                project: currentProject,
+              }),
+            }
+          ),
         }));
       }
     },

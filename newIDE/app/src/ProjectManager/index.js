@@ -198,6 +198,27 @@ export const getProjectManagerTreeViewItemIdForEditorTab = (
             project.getEventsFunctionsExtension(projectItemName)
           )
         : null;
+    case 'prefab detail': {
+      // projectItemName is "extensionName::objectName".
+      if (!projectItemName) return null;
+      const [extensionName, objectName] = projectItemName.split('::');
+      if (
+        !extensionName ||
+        !objectName ||
+        !project.hasEventsFunctionsExtensionNamed(extensionName)
+      ) {
+        return null;
+      }
+      const eventsFunctionsExtension = project.getEventsFunctionsExtension(
+        extensionName
+      );
+      const eventsBasedObjects = eventsFunctionsExtension.getEventsBasedObjects();
+      if (!eventsBasedObjects.has(objectName)) return null;
+      return getCustomObjectTreeViewItemId(
+        eventsFunctionsExtension,
+        eventsBasedObjects.get(objectName)
+      );
+    }
     case 'custom object': {
       // projectItemName is "extensionName::objectName[::variantName]".
       if (!projectItemName) return null;
@@ -1817,13 +1838,6 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         ];
 
         if (!project) return nodeIds;
-
-        const layoutsCount = project.getLayoutsCount();
-        for (let layoutIndex = 0; layoutIndex < layoutsCount; layoutIndex++) {
-          nodeIds.push(
-            getSceneTreeViewItemId(project.getLayoutAt(layoutIndex))
-          );
-        }
 
         const eventsFunctionsExtensionsCount = project.getEventsFunctionsExtensionsCount();
         for (

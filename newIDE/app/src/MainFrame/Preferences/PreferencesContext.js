@@ -50,7 +50,8 @@ export type EditorMosaicName =
   | 'scene-editor'
   | 'debugger'
   | 'resources-editor'
-  | 'events-functions-extension-editor';
+  | 'events-functions-extension-editor'
+  | 'prefab-detail-editor';
 
 export type InAppTutorialUserProgress = {|
   step: number,

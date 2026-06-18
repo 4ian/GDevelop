@@ -20,7 +20,7 @@ const editorKindToLabel: { [kind: EditorKind]: React.Node } = {
   'external events': <Trans>External events</Trans>,
   'events functions extension': <Trans>Extension</Trans>,
   'prefab detail': <Trans>Prefab detail</Trans>,
-  'custom object': <Trans>Object</Trans>,
+  'custom object': <Trans>UI</Trans>,
   debugger: <Trans>Debugger</Trans>,
   resources: <Trans>Resources</Trans>,
   'global-search': <Trans>Global search</Trans>,
@@ -89,11 +89,17 @@ const TabsTitlebarTooltip = ({
       'external layout',
       'external events',
       'events functions extension',
-      'prefab detail',
     ].includes(editorTab.kind)
   ) {
     title = editorTab.projectItemName;
     subtitle = editorKindToLabel[editorTab.kind];
+  } else if (editorTab.kind === 'prefab detail' && editorTab.projectItemName) {
+    const nameParts = editorTab.projectItemName.split('::');
+    const customObjectName = nameParts[1];
+    if (customObjectName) {
+      title = customObjectName;
+      subtitle = editorKindToLabel[editorTab.kind];
+    }
   } else if (editorTab.kind === 'custom object' && editorTab.projectItemName) {
     const nameParts = editorTab.projectItemName.split('::');
     const customObjectName = nameParts[1];

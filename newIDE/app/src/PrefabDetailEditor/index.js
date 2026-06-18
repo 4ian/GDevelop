@@ -10,6 +10,7 @@ import EventsSheet, {
   type EventsSheetSelectionSnapshot,
 } from '../EventsSheet';
 import EditorMosaic, {
+  type EditorMosaicNode,
   type EditorMosaicInterface,
   mosaicContainsNode,
 } from '../UI/EditorMosaic';
@@ -34,7 +35,6 @@ import EditorNavigator, {
 } from '../UI/EditorMosaic/EditorNavigator';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
-import { ParametersIndexOffsets } from '../EventsFunctionsExtensionsLoader';
 import { sendEventsExtractedAsFunction } from '../Utils/Analytics/EventSender';
 import ExtensionEditIcon from '../UI/CustomSvgIcons/ExtensionEdit';
 import Tune from '../UI/CustomSvgIcons/Tune';
@@ -47,9 +47,7 @@ import PropertyListEditor, {
 import type { EventPath } from '../Utils/EventPath';
 import type { SearchFilterParams } from '../Utils/Search';
 import { type VariableDialogOpeningProps } from '../VariablesList/VariablesEditorDialog';
-import {
-  type ExtensionFunctionEventsOutsideEditorChanges,
-} from '../MainFrame/EditorContainers/BaseEditor';
+import { type ExtensionFunctionEventsOutsideEditorChanges } from '../MainFrame/EditorContainers/BaseEditor';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 
 const gd: libGDevelop = global.gd;
@@ -96,7 +94,7 @@ type State = {|
 
 const extensionEditIconReactNode = <ExtensionEditIcon />;
 
-const getInitialMosaicEditorNodes = () => ({
+const getInitialMosaicEditorNodes = (): EditorMosaicNode => ({
   direction: 'row',
   first: 'functions-list',
   second: {
@@ -264,7 +262,11 @@ export default class PrefabDetailEditor extends React.Component<Props, State> {
     }
   };
 
-  selectEventsFunctionByName = (functionName: string) => {
+  selectEventsFunctionByName = (
+    functionName: string,
+    _behaviorName?: ?string,
+    _objectName?: ?string
+  ) => {
     const eventsFunctions = this.props.eventsBasedObject.getEventsFunctions();
     if (eventsFunctions.hasEventsFunctionNamed(functionName)) {
       this._selectEventsFunction(
@@ -288,8 +290,9 @@ export default class PrefabDetailEditor extends React.Component<Props, State> {
       if (this._editorMosaic) {
         this._editorMosaic.uncollapseEditor('parameters', 25);
       }
-      if (this._editorNavigator) {
-        this._editorNavigator.openEditor('events-sheet');
+      const editorNavigator = this._editorNavigator;
+      if (editorNavigator) {
+        editorNavigator.openEditor('events-sheet');
       }
     });
   };
@@ -316,11 +319,12 @@ export default class PrefabDetailEditor extends React.Component<Props, State> {
       if (this._editorMosaic) {
         this._editorMosaic.uncollapseEditor('parameters', 25);
       }
-      if (this._editorNavigator) {
+      const editorNavigator = this._editorNavigator;
+      if (editorNavigator) {
         if (!selectedEventsFunction.getEvents().getEventsCount()) {
-          this._editorNavigator.openEditor('parameters');
+          editorNavigator.openEditor('parameters');
         } else {
-          this._editorNavigator.openEditor('events-sheet');
+          editorNavigator.openEditor('events-sheet');
         }
       }
     });
@@ -786,9 +790,7 @@ export default class PrefabDetailEditor extends React.Component<Props, State> {
                   this._selectPrefabConfiguration()
                 }
                 onDeleteEventsBasedObject={(_object, cb) => cb(false)}
-                onRenameEventsBasedObject={(_object, _newName, cb) =>
-                  cb(false)
-                }
+                onRenameEventsBasedObject={(_object, _newName, cb) => cb(false)}
                 onEventsBasedObjectRenamed={() => {}}
                 onEventsBasedObjectPasted={() => {}}
                 onAddEventsBasedObject={cb => cb(null)}

@@ -1700,6 +1700,11 @@ const runFramesSchema = {
 const launchPreviewSchema = {
   type: 'object',
   properties: {
+    scene_name: {
+      type: 'string',
+      description:
+        "Which scene/layout to preview. When omitted, the project's FIRST scene (firstLayout) is launched — NOT whatever tab happens to be open in the editor. Pass a scene name to preview that specific layout. The result echoes requestedScene/expectedScene/actualScene and sets sceneMismatch:true if the running scene differs, so you can detect a wrong-scene launch instead of it silently succeeding.",
+    },
     start_paused: {
       type: 'boolean',
       description:
@@ -1722,6 +1727,7 @@ const launchPreviewSchema = {
 const saveAndRelaunchPreviewPausedSchema = {
   type: 'object',
   properties: {
+    scene_name: launchPreviewSchema.properties.scene_name,
     timeout_ms: launchPreviewSchema.properties.timeout_ms,
   },
   additionalProperties: true,
@@ -2425,7 +2431,8 @@ const projectJsonPatchSchema = {
     },
     parent_kind: {
       type: 'string',
-      description: 'For extension_function scope: extension, behavior, or object.',
+      description:
+        'For extension_function scope: extension, behavior, or object.',
     },
     parent_name: {
       type: 'string',
@@ -2747,8 +2754,10 @@ const patchExtensionEventInstructionSchema = {
     event: patchSceneEventInstructionSchema.properties.event,
     event_id: patchSceneEventInstructionSchema.properties.event_id,
     event_path: patchSceneEventInstructionSchema.properties.event_path,
-    instruction_kind: patchSceneEventInstructionSchema.properties.instruction_kind,
-    instruction_type: patchSceneEventInstructionSchema.properties.instruction_type,
+    instruction_kind:
+      patchSceneEventInstructionSchema.properties.instruction_kind,
+    instruction_type:
+      patchSceneEventInstructionSchema.properties.instruction_type,
     object_name: patchSceneEventInstructionSchema.properties.object_name,
     parameters: patchSceneEventInstructionSchema.properties.parameters,
     include_serialized: {
@@ -2757,7 +2766,12 @@ const patchExtensionEventInstructionSchema = {
         'When true, include serializedFunction and eventsAsText after the patch. Default false keeps the response compact.',
     },
   },
-  required: ['extension_name', 'function_name', 'instruction_type', 'parameters'],
+  required: [
+    'extension_name',
+    'function_name',
+    'instruction_type',
+    'parameters',
+  ],
   additionalProperties: true,
 };
 
@@ -2812,7 +2826,8 @@ const replaceExtensionFunctionEventsFromFileSchema = {
     function_name: extensionFunctionSchema.properties.function_name,
     parent_kind: extensionFunctionSchema.properties.parent_kind,
     parent_name: extensionFunctionSchema.properties.parent_name,
-    events_json_file: replaceSceneEventsFromFileSchema.properties.events_json_file,
+    events_json_file:
+      replaceSceneEventsFromFileSchema.properties.events_json_file,
     dry_run: replaceSceneEventsFromFileSchema.properties.dry_run,
     summary_only: extensionFunctionSchema.properties.summary_only,
     include_generated_code:
@@ -3318,7 +3333,8 @@ const bindChildSpriteResourcePropertySchema = {
     object_name: extensionObjectSchema.properties.object_name,
     child_object_name: {
       type: 'string',
-      description: 'Child Sprite object whose frame image should use the property default resource.',
+      description:
+        'Child Sprite object whose frame image should use the property default resource.',
     },
     property_name: {
       type: 'string',
@@ -3890,7 +3906,7 @@ const readTools: Array<McpTool> = [
   {
     name: 'launch_preview',
     description:
-      'Launch or attach to a game preview and confirm the runtime debugger is ready by waiting for getStatus. New preview windows are opened through the same "Start Preview and Debugger" command used by the UI. With start_paused:true, success also requires the pause to be confirmed. Returns success:false with failurePhase details if the window/debugger connects but the runtime stays unresponsive. By default it attaches to an already-running preview; pass force_new:true to always open a fresh window.',
+      'Launch or attach to a game preview and confirm the runtime debugger is ready by waiting for getStatus. By DEFAULT it previews the project\'s FIRST scene (firstLayout), independent of which scene tab is open in the editor; pass scene_name to preview a specific layout. New preview windows are opened through the same "Start Preview and Debugger" command used by the UI. With start_paused:true, success also requires the pause to be confirmed. The result reports requestedScene/expectedScene/actualScene and sets sceneMismatch:true when the running scene differs from what was requested. Returns success:false with failurePhase details if the window/debugger connects but the runtime stays unresponsive. By default it attaches to an already-running preview; pass force_new:true to always open a fresh window (when scene_name is given and the running preview is on another scene, a fresh one is launched on the requested scene).',
     inputSchema: launchPreviewSchema,
   },
   {
@@ -4496,7 +4512,7 @@ const commandTools: Array<McpTool> = [
   {
     name: 'save_and_relaunch_preview_paused',
     description:
-      'Save the project, close stale previews, launch a fresh debug preview paused, wait until the runtime is ready, and return debugger id, scene/runtime counts, variables, and errors.',
+      "Save the project, close stale previews, launch a fresh debug preview paused, wait until the runtime is ready, and return debugger id, scene/runtime counts, variables, and errors. By default previews the project's FIRST scene (firstLayout); pass scene_name to relaunch on a specific layout.",
     inputSchema: saveAndRelaunchPreviewPausedSchema,
   },
 ];
@@ -5840,12 +5856,36 @@ const toolUsageExamples: { [string]: Array<Object> } = {
       arguments: {},
     },
   ],
+  launch_preview: [
+    {
+      description:
+        "Launch the project's first scene paused for a deterministic frame-0 test.",
+      arguments: {
+        start_paused: true,
+      },
+    },
+    {
+      description:
+        'Preview a specific scene (independent of the open editor tab), paused.',
+      arguments: {
+        scene_name: 'main',
+        start_paused: true,
+      },
+    },
+  ],
   save_and_relaunch_preview_paused: [
     {
       description:
         'Recover from stale extension edits by saving, closing previews, and relaunching one paused debug preview.',
       arguments: {
         timeout_ms: 10000,
+      },
+    },
+    {
+      description:
+        'Save and relaunch a paused preview on a specific scene after editing it.',
+      arguments: {
+        scene_name: 'main',
       },
     },
   ],
@@ -5892,8 +5932,7 @@ const toolUsageExamples: { [string]: Array<Object> } = {
       },
     },
     {
-      description:
-        'Preview a batch cleanup without modifying the scene.',
+      description: 'Preview a batch cleanup without modifying the scene.',
       arguments: {
         scene_name: 'Level1',
         variable_names_or_paths: ['OldScore', 'TemporaryFlag'],

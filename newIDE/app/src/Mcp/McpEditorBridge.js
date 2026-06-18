@@ -198,6 +198,10 @@ type McpEditorBridgeContext = {|
   processEditorFunctionCalls?: Function,
   triggerUnsavedChanges: () => void,
   runCommand: string => boolean,
+  // Launch a preview of a specific scene, independent of the editor's active
+  // tab. Optional: when absent, launch_preview falls back to runCommand (which
+  // previews the active tab) and flags that scene selection was not honored.
+  launchPreviewForScene?: (sceneName: ?string) => mixed,
   saveProjectAndWait?: () => Promise<any>,
   getEditorSelection?: () => Object,
   getPreviewDebuggerServer?: () => ?Object,
@@ -1427,8 +1431,7 @@ const resolveSimulatedInput = (raw: any): Object => {
 };
 
 const expandRunFramesInput = (raw: any): Object => {
-  const type =
-    raw && typeof raw.type === 'string' ? raw.type.trim() : '';
+  const type = raw && typeof raw.type === 'string' ? raw.type.trim() : '';
   if (
     type === 'clickAndHold' ||
     type === 'mouseClickAndHold' ||
@@ -1581,12 +1584,7 @@ const runPreviewFrames = async (
 
   // A longer default timeout: stepping many frames + serializing the dump can
   // take a moment, and this is the resilient path for throttled windows.
-  const timeoutMs = clampTimeoutMs(
-    args && args.timeout_ms,
-    6000,
-    500,
-    30000
-  );
+  const timeoutMs = clampTimeoutMs(args && args.timeout_ms, 6000, 500, 30000);
   if (!(args && args.skip_ready_check === true)) {
     const readiness = await waitForPreviewRuntimeReady(
       (previewDebuggerServer: any),
@@ -1996,13 +1994,15 @@ const getStaleStateTargetForTool = (
       parentName:
         parentKind === 'extension'
           ? null
-          : (result && typeof result.parentName === 'string'
-              ? result.parentName
-              : getStringArg(args, ['parent_name', 'parentName'])),
+          : result && typeof result.parentName === 'string'
+          ? result.parentName
+          : getStringArg(args, ['parent_name', 'parentName']),
       functionName:
         result && typeof result.functionName === 'string'
           ? result.functionName
-          : result && result.function && typeof result.function.name === 'string'
+          : result &&
+            result.function &&
+            typeof result.function.name === 'string'
           ? result.function.name
           : getStringArg(args, [
               'new_function_name',
@@ -2304,7 +2304,8 @@ const waitForPreviewRuntimeReady = async (
   const timeoutMs = (options && options.timeoutMs) || 6000;
   const pollIntervalMs = (options && options.pollIntervalMs) || 150;
   const requirePaused = !!(options && options.requirePaused);
-  const operation = (options && options.operation) || 'wait_until_preview_ready';
+  const operation =
+    (options && options.operation) || 'wait_until_preview_ready';
   const startedAt = Date.now();
   let attempts = 0;
   let lastStatus = null;
@@ -2520,10 +2521,118 @@ const makeLaunchPreviewNotReadyResult = ({
   note,
 });
 
+// Decide which layout a preview should run, independent of the editor's
+// currently-focused tab. Precedence: explicit scene_name arg → project's first
+// layout → the first layout in the project. Returns the resolved expected scene
+// (or null when no project is available) and, when scene_name is unknown, an
+// error describing the valid scenes so the caller can fail loudly instead of
+// silently previewing the wrong (focused) scene.
+const resolveExpectedPreviewScene = (
+  project: ?gdProject,
+  args: ?Object
+): {|
+  expectedScene: ?string,
+  requestedScene: ?string,
+  firstLayout: ?string,
+  error?: string,
+|} => {
+  const requestedScene = getStringArg(args, ['scene_name', 'sceneName']);
+  if (!project) {
+    return {
+      expectedScene: requestedScene || null,
+      requestedScene,
+      firstLayout: null,
+    };
+  }
+
+  const sceneNames = getSceneNames(project);
+  const firstLayout = project.getFirstLayout() || null;
+
+  if (requestedScene) {
+    if (!project.hasLayoutNamed(requestedScene)) {
+      return {
+        expectedScene: null,
+        requestedScene,
+        firstLayout,
+        error: `Scene not found: "${requestedScene}". Available scenes: ${
+          sceneNames.length ? sceneNames.join(', ') : '(none)'
+        }.`,
+      };
+    }
+    return { expectedScene: requestedScene, requestedScene, firstLayout };
+  }
+
+  // No explicit scene: prefer the configured first layout, then the first scene.
+  const defaultScene =
+    firstLayout && project.hasLayoutNamed(firstLayout)
+      ? firstLayout
+      : sceneNames.length
+      ? sceneNames[0]
+      : null;
+  return { expectedScene: defaultScene, requestedScene: null, firstLayout };
+};
+
+const getStatusSceneName = (status: ?Object): ?string =>
+  status && typeof status.sceneName === 'string' ? status.sceneName : null;
+
+// Annotate a successful launch/attach result with scene-selection facts so a
+// caller can detect when the running scene is NOT the one it expected (the core
+// bug this fixes: launch_preview used to silently report success while running
+// whatever scene the editor tab was focused on).
+const annotateLaunchSceneResult = (
+  result: Object,
+  {
+    expectedScene,
+    requestedScene,
+    firstLayout,
+    sceneSelectionSupported,
+  }: {|
+    expectedScene: ?string,
+    requestedScene: ?string,
+    firstLayout: ?string,
+    sceneSelectionSupported: boolean,
+  |}
+): Object => {
+  const annotated: Object = {
+    ...result,
+    requestedScene: requestedScene || undefined,
+    expectedScene: expectedScene || undefined,
+    firstLayout: firstLayout || undefined,
+    sceneSelectionSupported,
+  };
+  const actualScene = getStatusSceneName(result.status);
+  if (actualScene) annotated.actualScene = actualScene;
+
+  if (expectedScene && actualScene && actualScene !== expectedScene) {
+    annotated.sceneMismatch = true;
+    annotated.note = `${
+      result.note ? result.note + ' ' : ''
+    }WARNING: the running scene is "${actualScene}" but "${expectedScene}" was expected${
+      requestedScene
+        ? ` (requested scene_name="${requestedScene}")`
+        : ' (project first scene)'
+    }.${
+      sceneSelectionSupported
+        ? ''
+        : " This editor build cannot target a scene from MCP, so the preview ran the editor's active tab."
+    }`;
+  } else if (!sceneSelectionSupported && expectedScene && !actualScene) {
+    // Could not confirm the scene and could not select it — warn conservatively.
+    annotated.note = `${
+      result.note ? result.note + ' ' : ''
+    }NOTE: this editor build cannot target a specific scene from MCP; the preview runs the editor's active tab, which may not be "${expectedScene}".`;
+  }
+  return annotated;
+};
+
 const launchPreview = async (
   previewDebuggerServer: ?Object,
   runCommand: ?(string) => boolean,
-  args: Object
+  args: Object,
+  options?: {|
+    getProject?: ?() => ?gdProject,
+    launchPreviewForScene?: ?(sceneName: ?string) => mixed,
+  |}
 ): Promise<Object> => {
   if (typeof runCommand !== 'function') {
     return {
@@ -2538,6 +2647,53 @@ const launchPreview = async (
   const forceNew = !!(args && (args.force_new || args.forceNew));
   const timeoutMs = getPreviewReadinessTimeoutMs(args, 6000);
 
+  const getProject =
+    options && typeof options.getProject === 'function'
+      ? options.getProject
+      : null;
+  const launchPreviewForScene =
+    options && typeof options.launchPreviewForScene === 'function'
+      ? options.launchPreviewForScene
+      : null;
+  const project = getProject ? getProject() : null;
+  const sceneResolution = resolveExpectedPreviewScene(project, args);
+  if (sceneResolution.error) {
+    return {
+      success: false,
+      launched: false,
+      ready: false,
+      failurePhase: 'scene-selection',
+      requestedScene: sceneResolution.requestedScene || undefined,
+      availableScenes: project ? getSceneNames(project) : undefined,
+      error: sceneResolution.error,
+    };
+  }
+  const { expectedScene, requestedScene, firstLayout } = sceneResolution;
+  // We can actually launch a chosen scene only when the host provides the
+  // scene-aware launcher. Otherwise we fall back to the legacy command (active
+  // tab) and flag that scene selection was not honored.
+  const sceneSelectionSupported = !!launchPreviewForScene;
+  const annotate = (result: Object): Object =>
+    annotateLaunchSceneResult(result, {
+      expectedScene,
+      requestedScene,
+      firstLayout,
+      sceneSelectionSupported,
+    });
+  // Launch the preview using the scene-aware launcher when available, falling
+  // back to the legacy command which previews the editor's active tab.
+  const runLaunchCommand = (): boolean => {
+    if (launchPreviewForScene) {
+      try {
+        launchPreviewForScene(expectedScene || null);
+        return true;
+      } catch (error) {
+        return false;
+      }
+    }
+    return runCommand('LAUNCH_DEBUG_PREVIEW');
+  };
+
   if (!forceNew && previewDebuggerServer) {
     const connectedIds = getPreviewDebuggerIds(previewDebuggerServer);
     if (connectedIds.length) {
@@ -2547,7 +2703,72 @@ const launchPreview = async (
         attachId,
         { timeoutMs, operation: 'launch_preview.attach' }
       );
-      if (!readiness.ready) {
+      if (readiness.ready) {
+        // If an explicit scene_name was requested and we can target scenes, but
+        // the already-running preview is on a different scene, don't silently
+        // attach to the wrong scene — fall through to launch a fresh preview on
+        // the requested scene instead.
+        const attachedScene = getStatusSceneName(readiness.status);
+        const needsSceneRelaunch =
+          !!requestedScene &&
+          sceneSelectionSupported &&
+          !!attachedScene &&
+          attachedScene !== requestedScene;
+
+        if (!needsSceneRelaunch) {
+          if (!startPaused) {
+            return annotate({
+              success: true,
+              ready: true,
+              runtimeReady: true,
+              launched: false,
+              attached: true,
+              debuggerId: attachId,
+              availableDebuggerIds: connectedIds,
+              status: readiness.status,
+              startPaused: false,
+              note:
+                'Attached to the already-running preview (no new window opened). The runtime answered getStatus. It keeps running in real time; for deterministic tests use run_frames, or pass start_paused:true to pause it now, or force_new:true to open a fresh window.',
+            });
+          }
+
+          const pause = await pausePreviewAndConfirm(
+            (previewDebuggerServer: any),
+            attachId,
+            timeoutMs,
+            'launch_preview.attach.pause'
+          );
+          if (!pause.pauseConfirmed) {
+            return makeLaunchPreviewNotReadyResult({
+              launched: false,
+              attached: true,
+              debuggerId: attachId,
+              availableDebuggerIds: connectedIds,
+              readiness: pause,
+              startPaused: true,
+              note:
+                'Attached to the already-running preview, but start_paused was requested and the pause was not confirmed. The preview may already be running in real time.',
+            });
+          }
+
+          return annotate({
+            success: true,
+            ready: true,
+            runtimeReady: true,
+            launched: false,
+            attached: true,
+            debuggerId: attachId,
+            availableDebuggerIds: connectedIds,
+            startPaused: true,
+            pauseRequested: true,
+            pauseConfirmed: true,
+            status: pause.status,
+            note:
+              'Attached to the already-running preview and paused it (no new window opened). Use run_frames / control_preview { action:"step" } to advance, or control_preview { action:"play" } to resume. Pass force_new:true to open a fresh window instead.',
+          });
+        }
+        // else: fall through to a fresh launch on the requested scene.
+      } else {
         return makeLaunchPreviewNotReadyResult({
           launched: false,
           attached: true,
@@ -2559,57 +2780,6 @@ const launchPreview = async (
             'Attached to an already-connected preview window, but its runtime debugger did not answer getStatus. Close all previews and relaunch a single paused preview.',
         });
       }
-
-      if (!startPaused) {
-        return {
-          success: true,
-          ready: true,
-          runtimeReady: true,
-          launched: false,
-          attached: true,
-          debuggerId: attachId,
-          availableDebuggerIds: connectedIds,
-          status: readiness.status,
-          startPaused: false,
-          note:
-            'Attached to the already-running preview (no new window opened). The runtime answered getStatus. It keeps running in real time; for deterministic tests use run_frames, or pass start_paused:true to pause it now, or force_new:true to open a fresh window.',
-        };
-      }
-
-      const pause = await pausePreviewAndConfirm(
-        (previewDebuggerServer: any),
-        attachId,
-        timeoutMs,
-        'launch_preview.attach.pause'
-      );
-      if (!pause.pauseConfirmed) {
-        return makeLaunchPreviewNotReadyResult({
-          launched: false,
-          attached: true,
-          debuggerId: attachId,
-          availableDebuggerIds: connectedIds,
-          readiness: pause,
-          startPaused: true,
-          note:
-            'Attached to the already-running preview, but start_paused was requested and the pause was not confirmed. The preview may already be running in real time.',
-        });
-      }
-
-      return {
-        success: true,
-        ready: true,
-        runtimeReady: true,
-        launched: false,
-        attached: true,
-        debuggerId: attachId,
-        availableDebuggerIds: connectedIds,
-        startPaused: true,
-        pauseRequested: true,
-        pauseConfirmed: true,
-        status: pause.status,
-        note:
-          'Attached to the already-running preview and paused it (no new window opened). Use run_frames / control_preview { action:"step" } to advance, or control_preview { action:"play" } to resume. Pass force_new:true to open a fresh window instead.',
-      };
     }
   }
 
@@ -2618,7 +2788,7 @@ const launchPreview = async (
   );
 
   if (!previewDebuggerServer) {
-    const didRun = runCommand('LAUNCH_DEBUG_PREVIEW');
+    const didRun = runLaunchCommand();
     if (!didRun) {
       return {
         success: false,
@@ -2629,7 +2799,7 @@ const launchPreview = async (
       };
     }
 
-    return {
+    return annotate({
       success: !startPaused,
       launched: true,
       ready: false,
@@ -2641,7 +2811,7 @@ const launchPreview = async (
       note: startPaused
         ? 'Preview launch was requested, but no preview debugger server is available, so MCP cannot confirm runtime readiness or pause it.'
         : 'Preview launch was requested, but no preview debugger server is available, so MCP cannot confirm runtime readiness.',
-    };
+    });
   }
 
   const connectionPromise = waitForNewPreviewDebuggerId(
@@ -2649,7 +2819,7 @@ const launchPreview = async (
     existingIds,
     timeoutMs
   );
-  const didRun = runCommand('LAUNCH_DEBUG_PREVIEW');
+  const didRun = runLaunchCommand();
   if (!didRun) {
     return {
       success: false,
@@ -2717,7 +2887,7 @@ const launchPreview = async (
       });
     }
 
-    return {
+    return annotate({
       success: true,
       launched: true,
       ready: true,
@@ -2730,10 +2900,10 @@ const launchPreview = async (
       status: pause.status,
       note:
         'Preview launched, runtime readiness was confirmed with getStatus, and pause was confirmed. Use run_frames / control_preview { action:"step" } to advance deterministically, or control_preview { action:"play" } to run in real time.',
-    };
+    });
   }
 
-  return {
+  return annotate({
     success: true,
     launched: true,
     ready: true,
@@ -2744,7 +2914,7 @@ const launchPreview = async (
     status: readiness.status,
     note:
       'Preview launched and runtime readiness was confirmed with getStatus. It is running in real time; use run_frames for deterministic stepping.',
-  };
+  });
 };
 
 // Deterministic preview control: pause / play / step N frames. Pausing then
@@ -2902,11 +3072,7 @@ const autoQuoteAddSceneEventsArgs = (
       parsed = originalWasString
         ? JSON.parse(eventsPayload)
         : JSON.parse(JSON.stringify(eventsPayload));
-      if (
-        parsed &&
-        !Array.isArray(parsed) &&
-        typeof parsed.type === 'string'
-      ) {
+      if (parsed && !Array.isArray(parsed) && typeof parsed.type === 'string') {
         parsed = [parsed];
       } else if (
         parsed &&
@@ -3486,7 +3652,9 @@ const callMcpTool = async ({
   if (toolName === 'inspect_custom_object_runtime_geometry') {
     if (!project) return errorResult('No project opened.');
     try {
-      return textResult(inspectCustomObjectRuntimeGeometry(project, args || {}));
+      return textResult(
+        inspectCustomObjectRuntimeGeometry(project, args || {})
+      );
     } catch (error) {
       return errorResult(error.message);
     }
@@ -4078,7 +4246,7 @@ const callMcpTool = async ({
     }
     const previewDebuggerServer = context.getPreviewDebuggerServer
       ? context.getPreviewDebuggerServer()
-        : null;
+      : null;
     try {
       const save = await saveProjectAndWait();
       let closedWindows = false;
@@ -4101,6 +4269,10 @@ const callMcpTool = async ({
           ...(args || {}),
           start_paused: true,
           force_new: true,
+        },
+        {
+          getProject: context.getProject,
+          launchPreviewForScene: context.launchPreviewForScene,
         }
       );
       let inspect = null;
@@ -4146,10 +4318,9 @@ const callMcpTool = async ({
               }
             : undefined,
         errors: inspect && inspect.errors ? inspect.errors : undefined,
-        note:
-          launch.success
-            ? 'Saved, closed stale previews, launched a fresh debug preview, confirmed pause/readiness, and inspected the runtime snapshot.'
-            : 'The save/close steps ran, but the fresh paused preview did not become ready. See launch diagnostics.',
+        note: launch.success
+          ? 'Saved, closed stale previews, launched a fresh debug preview, confirmed pause/readiness, and inspected the runtime snapshot.'
+          : 'The save/close steps ran, but the fresh paused preview did not become ready. See launch diagnostics.',
       });
     } catch (error) {
       return errorResult(error.message);
@@ -4164,7 +4335,11 @@ const callMcpTool = async ({
       const result = await launchPreview(
         previewDebuggerServer,
         context.runCommand,
-        args || {}
+        args || {},
+        {
+          getProject: context.getProject,
+          launchPreviewForScene: context.launchPreviewForScene,
+        }
       );
       return textResult(result);
     } catch (error) {
@@ -4185,8 +4360,8 @@ const callMcpTool = async ({
       ? textResult({
           commandName,
           launched: true,
-          ...((commandName === 'LAUNCH_NEW_PREVIEW' ||
-            commandName === 'LAUNCH_DEBUG_PREVIEW')
+          ...(commandName === 'LAUNCH_NEW_PREVIEW' ||
+          commandName === 'LAUNCH_DEBUG_PREVIEW'
             ? {
                 note:
                   'For MCP runtime tests, prefer launch_preview { start_paused: true }, then run_frames. It attaches to the debugger and avoids stale or already-running previews.',

@@ -3181,6 +3181,35 @@ const MainFrame = (props: Props): React.MixedElement => {
     [openDebugger, launchNewPreview]
   );
 
+  // Launch a preview of a specific scene (used by MCP). Opens the debugger so
+  // the preview is attachable, and forces the layout regardless of which editor
+  // tab is currently focused. When sceneName is empty/unknown, falls back to
+  // the editor's normal scene selection.
+  const launchPreviewForScene = React.useCallback(
+    (sceneName: ?string) => {
+      const launchCaptureOptions =
+        currentProject && !hasNonEditionPreviewsRunning
+          ? getHotReloadPreviewLaunchCaptureOptions(
+              currentProject.getProjectUuid()
+            )
+          : undefined;
+      openDebugger();
+      launchPreview({
+        networkPreview: false,
+        forcedPreviewLayoutName: sceneName || null,
+        numberOfWindows: 1,
+        launchCaptureOptions,
+      });
+    },
+    [
+      currentProject,
+      openDebugger,
+      launchPreview,
+      getHotReloadPreviewLaunchCaptureOptions,
+      hasNonEditionPreviewsRunning,
+    ]
+  );
+
   const openInstructionOrExpression = (
     extension: gdPlatformExtension,
     type: string
@@ -5415,6 +5444,8 @@ const MainFrame = (props: Props): React.MixedElement => {
           commandPaletteRef.current.launchCommand((commandName: any));
           return true;
         },
+        launchPreviewForScene: (sceneName: ?string) =>
+          launchPreviewForScene(sceneName),
         saveProjectAndWait: () => saveProject(),
         getEditorSelection: getMcpEditorSelection,
         getPreviewDebuggerServer: () =>
@@ -5461,6 +5492,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       mcpEditorCallbacks,
       triggerUnsavedChanges,
       saveProject,
+      launchPreviewForScene,
       getMcpEditorSelection,
       generateEvents,
       onSceneEventsModifiedOutsideEditor,

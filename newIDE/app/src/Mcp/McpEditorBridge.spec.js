@@ -438,7 +438,8 @@ describe('McpEditorBridge', () => {
       const localVariableExample = examples.examples.find(
         example => example.name === 'Standard event with a local variable'
       );
-      if (!localVariableExample) throw new Error('Missing local variable example');
+      if (!localVariableExample)
+        throw new Error('Missing local variable example');
       expect(localVariableExample.events_json).toContain('"variables"');
       expect(localVariableExample.events_json).toContain('DamageThisTick');
       expect(examples.variableExpressionSyntax.localVariable).toContain(
@@ -579,9 +580,7 @@ describe('McpEditorBridge', () => {
         invalidTextResponse.content[0].text
       );
       expect(invalidTextValidation.valid).toBe(false);
-      expect(invalidTextValidation.issues[0].suggestion).toContain(
-        'NewLine()'
-      );
+      expect(invalidTextValidation.issues[0].suggestion).toContain('NewLine()');
 
       layout.getObjects().insertNewObject(project, 'Sprite', 'GroundSlot', 2);
       layout
@@ -629,8 +628,7 @@ describe('McpEditorBridge', () => {
       expect(
         legacyObjectVariableValidation.issues.find(
           issue =>
-            issue.type ===
-            'legacy-function-only-instruction-in-scene-events'
+            issue.type === 'legacy-function-only-instruction-in-scene-events'
         ).suggestion
       ).toContain('BooleanObjectVariable');
     } finally {
@@ -1257,9 +1255,7 @@ describe('McpEditorBridge', () => {
           },
         },
       });
-      const scopedMetadata = JSON.parse(
-        scopedMetadataResponse.content[0].text
-      );
+      const scopedMetadata = JSON.parse(scopedMetadataResponse.content[0].text);
 
       expect(scopedMetadata.eventScopes.scene.label).toContain('Scene');
       expect(scopedMetadata.eventScopes.objectFunction.label).toContain(
@@ -1935,9 +1931,7 @@ describe('McpEditorBridge', () => {
         'CopyArgumentToVariable2'
       );
       expect(
-        extension
-          .getEventsFunctions()
-          .hasEventsFunctionNamed('BadAddSunDryRun')
+        extension.getEventsFunctions().hasEventsFunctionNamed('BadAddSunDryRun')
       ).toBe(false);
       expect(triggerUnsavedChanges).not.toHaveBeenCalled();
     } finally {
@@ -2173,11 +2167,7 @@ describe('McpEditorBridge', () => {
       const patchResult = JSON.parse(patchResponse.content[0].text);
 
       expect(patchResponse.isError).not.toBe(true);
-      expect(patchResult.after.parameters).toEqual([
-        'LocalSunCount',
-        '+',
-        '2',
-      ]);
+      expect(patchResult.after.parameters).toEqual(['LocalSunCount', '+', '2']);
       expect(
         onExtensionFunctionEventsModifiedOutsideEditor
       ).toHaveBeenCalledWith({
@@ -2327,9 +2317,9 @@ describe('McpEditorBridge', () => {
       const dryRunPatch = JSON.parse(dryRunPatchResponse.content[0].text);
       expect(dryRunPatchResponse.isError).not.toBe(true);
       expect(dryRunPatch.dryRun).toBe(true);
-      expect(project.getEventsFunctionsExtension('McpExt').getFullName()).not.toBe(
-        'Dry Run Extension'
-      );
+      expect(
+        project.getEventsFunctionsExtension('McpExt').getFullName()
+      ).not.toBe('Dry Run Extension');
 
       const patchResponse = await bridge.handleRendererMcpRequest({
         method: 'tools/call',
@@ -2966,9 +2956,9 @@ describe('McpEditorBridge', () => {
 
       expect(removeParameterResponse.isError).not.toBe(true);
       expect(eventsFunction.getParameters().getParametersCount()).toBe(4);
-      expect(eventsFunction.getParameters().hasParameterNamed('DeltaTime')).toBe(
-        false
-      );
+      expect(
+        eventsFunction.getParameters().hasParameterNamed('DeltaTime')
+      ).toBe(false);
 
       const invalidUpdateResponse = await bridge.handleRendererMcpRequest({
         method: 'tools/call',
@@ -4886,8 +4876,7 @@ describe('McpEditorBridge', () => {
     const recentCustomLog = {
       command: 'console.log',
       payload: {
-        message:
-          'GroundSlot clicked: index=0, row=0, column=0, occupied=false',
+        message: 'GroundSlot clicked: index=0, row=0, column=0, occupied=false',
         type: 'info',
         group: 'DebuggerTools',
         internal: false,
@@ -5929,6 +5918,262 @@ describe('McpEditorBridge', () => {
     expect(result.ready).toBe(true);
     expect(result.debuggerId).toBe('preview-ws-1');
     expect(runCommand).toHaveBeenCalledWith('LAUNCH_DEBUG_PREVIEW');
+  });
+
+  it('launch_preview defaults to the project first scene, not the active tab', async () => {
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    project.insertNewLayout('global (for external)', 0);
+    project.insertNewLayout('main', 1);
+    project.setFirstLayout('main');
+
+    const launchedScenes: Array<?string> = [];
+    let callbacks: any = null;
+    const launchPreviewForScene = jest.fn((sceneName: ?string) => {
+      launchedScenes.push(sceneName);
+      // Simulate the new preview connecting and running the requested scene.
+      setTimeout(() => {
+        if (callbacks && callbacks.onConnectionOpened)
+          callbacks.onConnectionOpened({
+            id: 'preview-ws-0',
+            debuggerIds: ['preview-ws-0'],
+          });
+      }, 2);
+    });
+    const previewDebuggerServer = {
+      getServerState: () => 'started',
+      getExistingPreviewDebuggerIds: () => [],
+      getExistingDebuggerIds: () => [],
+      registerCallbacks: (registered: any) => {
+        callbacks = registered;
+        return () => {
+          callbacks = null;
+        };
+      },
+      sendMessage: (id: string, message: any) => {
+        if (
+          (message.command === 'getStatus' || message.command === 'pause') &&
+          message.messageId &&
+          callbacks
+        ) {
+          setTimeout(() => {
+            if (!callbacks) return;
+            callbacks.onHandleParsedMessage({
+              id,
+              parsedMessage: {
+                command: 'status',
+                messageId: message.messageId,
+                payload: {
+                  isPaused: message.command === 'pause',
+                  sceneName: 'main',
+                },
+              },
+            });
+          }, 2);
+        }
+      },
+    };
+    const bridge = makeBridge({
+      getProject: () => project,
+      runCommand: jest.fn(() => true),
+      launchPreviewForScene,
+      getPreviewDebuggerServer: () => previewDebuggerServer,
+    });
+
+    const response = await bridge.handleRendererMcpRequest({
+      method: 'tools/call',
+      params: {
+        name: 'launch_preview',
+        arguments: { start_paused: true, timeout_ms: 1000 },
+      },
+    });
+    const result = JSON.parse(response.content[0].text);
+
+    expect(response.isError).not.toBe(true);
+    expect(result.launched).toBe(true);
+    expect(result.expectedScene).toBe('main');
+    expect(result.firstLayout).toBe('main');
+    expect(result.actualScene).toBe('main');
+    expect(result.sceneMismatch).toBeUndefined();
+    expect(result.sceneSelectionSupported).toBe(true);
+    // The first scene was launched, not the editor's active tab.
+    expect(launchedScenes).toEqual(['main']);
+
+    project.delete();
+  });
+
+  it('launch_preview honors an explicit scene_name', async () => {
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    project.insertNewLayout('main', 0);
+    project.insertNewLayout('Boss', 1);
+    project.setFirstLayout('main');
+
+    const launchedScenes: Array<?string> = [];
+    let callbacks: any = null;
+    const launchPreviewForScene = jest.fn((sceneName: ?string) => {
+      launchedScenes.push(sceneName);
+      setTimeout(() => {
+        if (callbacks && callbacks.onConnectionOpened)
+          callbacks.onConnectionOpened({
+            id: 'preview-ws-0',
+            debuggerIds: ['preview-ws-0'],
+          });
+      }, 2);
+    });
+    const previewDebuggerServer = {
+      getServerState: () => 'started',
+      getExistingPreviewDebuggerIds: () => [],
+      getExistingDebuggerIds: () => [],
+      registerCallbacks: (registered: any) => {
+        callbacks = registered;
+        return () => {
+          callbacks = null;
+        };
+      },
+      sendMessage: (id: string, message: any) => {
+        if (message.command === 'getStatus' && message.messageId && callbacks) {
+          setTimeout(() => {
+            if (!callbacks) return;
+            callbacks.onHandleParsedMessage({
+              id,
+              parsedMessage: {
+                command: 'status',
+                messageId: message.messageId,
+                payload: { isPaused: false, sceneName: 'Boss' },
+              },
+            });
+          }, 2);
+        }
+      },
+    };
+    const bridge = makeBridge({
+      getProject: () => project,
+      runCommand: jest.fn(() => true),
+      launchPreviewForScene,
+      getPreviewDebuggerServer: () => previewDebuggerServer,
+    });
+
+    const response = await bridge.handleRendererMcpRequest({
+      method: 'tools/call',
+      params: {
+        name: 'launch_preview',
+        arguments: { scene_name: 'Boss', timeout_ms: 1000 },
+      },
+    });
+    const result = JSON.parse(response.content[0].text);
+
+    expect(response.isError).not.toBe(true);
+    expect(result.requestedScene).toBe('Boss');
+    expect(result.expectedScene).toBe('Boss');
+    expect(result.actualScene).toBe('Boss');
+    expect(result.sceneMismatch).toBeUndefined();
+    expect(launchedScenes).toEqual(['Boss']);
+
+    project.delete();
+  });
+
+  it('launch_preview rejects an unknown scene_name with the available scenes', async () => {
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    project.insertNewLayout('main', 0);
+    project.setFirstLayout('main');
+
+    const bridge = makeBridge({
+      getProject: () => project,
+      runCommand: jest.fn(() => true),
+      launchPreviewForScene: jest.fn(),
+      getPreviewDebuggerServer: () => null,
+    });
+
+    const response = await bridge.handleRendererMcpRequest({
+      method: 'tools/call',
+      params: {
+        name: 'launch_preview',
+        arguments: { scene_name: 'DoesNotExist' },
+      },
+    });
+    const result = JSON.parse(response.content[0].text);
+
+    expect(result.success).toBe(false);
+    expect(result.failurePhase).toBe('scene-selection');
+    expect(result.error).toContain('DoesNotExist');
+    expect(result.error).toContain('main');
+    expect(result.availableScenes).toEqual(['main']);
+
+    project.delete();
+  });
+
+  it('launch_preview flags a scene mismatch when scene selection is not supported', async () => {
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    project.insertNewLayout('global (for external)', 0);
+    project.insertNewLayout('main', 1);
+    project.setFirstLayout('main');
+
+    // No launchPreviewForScene callback => legacy command path => previews the
+    // editor's active tab, which here is reported as the wrong scene.
+    let callbacks: any = null;
+    const runCommand = jest.fn((commandName: string) => {
+      if (commandName === 'LAUNCH_DEBUG_PREVIEW' && callbacks) {
+        setTimeout(() => {
+          if (callbacks && callbacks.onConnectionOpened)
+            callbacks.onConnectionOpened({
+              id: 'preview-ws-0',
+              debuggerIds: ['preview-ws-0'],
+            });
+        }, 2);
+      }
+      return true;
+    });
+    const previewDebuggerServer = {
+      getServerState: () => 'started',
+      getExistingPreviewDebuggerIds: () => [],
+      getExistingDebuggerIds: () => [],
+      registerCallbacks: (registered: any) => {
+        callbacks = registered;
+        return () => {
+          callbacks = null;
+        };
+      },
+      sendMessage: (id: string, message: any) => {
+        if (message.command === 'getStatus' && message.messageId && callbacks) {
+          setTimeout(() => {
+            if (!callbacks) return;
+            callbacks.onHandleParsedMessage({
+              id,
+              parsedMessage: {
+                command: 'status',
+                messageId: message.messageId,
+                payload: {
+                  isPaused: false,
+                  sceneName: 'global (for external)',
+                },
+              },
+            });
+          }, 2);
+        }
+      },
+    };
+    const bridge = makeBridge({
+      getProject: () => project,
+      runCommand,
+      getPreviewDebuggerServer: () => previewDebuggerServer,
+    });
+
+    const response = await bridge.handleRendererMcpRequest({
+      method: 'tools/call',
+      params: {
+        name: 'launch_preview',
+        arguments: { timeout_ms: 1000 },
+      },
+    });
+    const result = JSON.parse(response.content[0].text);
+
+    expect(result.launched).toBe(true);
+    expect(result.expectedScene).toBe('main');
+    expect(result.actualScene).toBe('global (for external)');
+    expect(result.sceneMismatch).toBe(true);
+    expect(result.sceneSelectionSupported).toBe(false);
+    expect(runCommand).toHaveBeenCalledWith('LAUNCH_DEBUG_PREVIEW');
+
+    project.delete();
   });
 
   it('saves, closes stale previews, relaunches paused, and inspects runtime state', async () => {

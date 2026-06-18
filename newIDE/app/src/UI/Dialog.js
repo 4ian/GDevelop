@@ -340,16 +340,18 @@ const DialogWithoutWindowSizeProvider = ({
     paddingTop: 0, // Let the title container handle the padding, or no padding if there is no title.
     paddingBottom: hasActions || noPadding ? 0 : dialogActionPadding, // Ensure the padding is here if there are no actions.
   };
-  const contentStyle = {
+  const contentStyle: Object = {
     ...styles.dialogContent,
     ...flexStyle,
     ...additionalPaddingStyle,
-    ...(disableContentScroll ? styles.dialogContentWithoutScroll : {}),
   };
+  if (disableContentScroll) {
+    contentStyle.overflowY = 'hidden';
+    contentStyle.minHeight = 0;
+  }
 
-  const dialogContainerStyle = {
+  const dialogContainerStyle: Object = {
     ...styles.dialogContainer,
-    ...(disableContentScroll ? { overflowY: 'hidden' } : {}),
     // Ensure we don't spread an object here, to avoid a styling bug when resizing.
     margin: noPadding
       ? 0
@@ -357,6 +359,9 @@ const DialogWithoutWindowSizeProvider = ({
       ? dialogSmallPadding
       : `${dialogTitlePadding}px ${dialogPaddingX}px ${dialogActionPadding}px ${dialogPaddingX}px`,
   };
+  if (disableContentScroll) {
+    dialogContainerStyle.overflowY = 'hidden';
+  }
 
   const onCloseDialog = React.useCallback(
     (event: any, reason: string) => {

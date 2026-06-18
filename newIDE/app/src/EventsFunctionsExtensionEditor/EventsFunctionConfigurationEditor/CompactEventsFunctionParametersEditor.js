@@ -13,6 +13,7 @@ import EmptyMessage from '../../UI/EmptyMessage';
 import ElementWithMenu from '../../UI/Menu/ElementWithMenu';
 import CompactSemiControlledTextField from '../../UI/CompactSemiControlledTextField';
 import { type CompactTextFieldInterface } from '../../UI/CompactTextField';
+import CompactSearchBar from '../../UI/CompactSearchBar';
 import { ParametersIndexOffsets } from '../../EventsFunctionsExtensionsLoader';
 import DismissableAlertMessage from '../../UI/DismissableAlertMessage';
 import {
@@ -26,6 +27,7 @@ import newNameGenerator from '../../Utils/NewNameGenerator';
 import CompactValueTypeEditor from './CompactValueTypeEditor';
 import ThreeDotsMenu from '../../UI/CustomSvgIcons/ThreeDotsMenu';
 import Add from '../../UI/CustomSvgIcons/Add';
+import ChevronArrowBottom from '../../UI/CustomSvgIcons/ChevronArrowBottom';
 import useForceUpdate from '../../Utils/UseForceUpdate';
 import ScrollView, { type ScrollViewInterface } from '../../UI/ScrollView';
 import { DragHandleIcon } from '../../UI/DragHandle';
@@ -80,7 +82,7 @@ const styles = {
   },
   splitTabContent: {
     display: 'flex',
-    flex: 1,
+    flex: '1 1 0',
     minHeight: 0,
     overflow: 'hidden',
   },
@@ -99,18 +101,52 @@ const styles = {
     maxWidth: 360,
     minHeight: 0,
     overflow: 'hidden',
+    padding: '0 8px 8px 8px',
   },
-  splitSidebarHeader: {
+  splitSidebarTitle: {
+    padding: '8px 16px',
+  },
+  splitSidebarSearch: {
+    flexShrink: 0,
+    padding: '0 8px 8px 8px',
+  },
+  splitParameterGroupHeader: {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: '8px 16px',
+    flexShrink: 0,
+    minHeight: 32,
+    padding: '0 8px',
+  },
+  splitParameterGroupTitle: {
+    display: 'flex',
+    alignItems: 'center',
+    minWidth: 0,
+    flex: 1,
+  },
+  splitParameterGroupChevron: {
+    flexShrink: 0,
+    marginRight: 6,
   },
   splitSidebarList: {
     display: 'flex',
-    flex: 1,
+    flex: '1 1 0',
     minHeight: 0,
     overflow: 'hidden',
+    position: 'relative',
+  },
+  splitSidebarScrollView: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+    height: '100%',
+    minHeight: 0,
+    maxHeight: '100%',
+  },
+  splitListScrollContent: {
+    paddingRight: 8,
   },
   splitDetail: {
     display: 'flex',
@@ -121,13 +157,10 @@ const styles = {
     overflow: 'hidden',
     padding: '8px 16px 16px 16px',
   },
-  splitFooter: {
-    flexShrink: 0,
-    padding: '8px 16px 0 16px',
-  },
   splitListItemButton: {
     width: '100%',
     textAlign: 'left',
+    borderRadius: 6,
   },
   splitListItemContent: {
     display: 'flex',
@@ -135,13 +168,22 @@ const styles = {
     boxSizing: 'border-box',
     width: '100%',
     minWidth: 0,
-    padding: '8px 12px',
+    minHeight: 32,
+    borderRadius: 6,
+    padding: '0 4px 0 28px',
+  },
+  splitParameterReference: {
+    flexShrink: 0,
+    width: 86,
   },
   splitListItemTexts: {
     display: 'flex',
-    flexDirection: 'column',
     minWidth: 0,
     flex: 1,
+  },
+  splitListItemMenu: {
+    flexShrink: 0,
+    marginLeft: 4,
   },
 };
 
@@ -294,6 +336,7 @@ const CompactEventsFunctionParametersEditor: React.ComponentType<{
       selectedParametersEditorTab,
       setSelectedParametersEditorTab,
     ] = React.useState<ParametersEditorTab>('parameters');
+    const [parameterSearchText, setParameterSearchText] = React.useState('');
     const [newBehaviorDialogOpen, setNewBehaviorDialogOpen] = React.useState<{
       objectParameter: gdParameterMetadata | null,
       behaviorParameter: gdParameterMetadata,
@@ -776,6 +819,27 @@ const CompactEventsFunctionParametersEditor: React.ComponentType<{
       : ParametersIndexOffsets.FreeFunction;
     const getParameterReferenceLabel = (index: number): string =>
       `_PARAM${index + parametersIndexOffset}_`;
+    const normalizedParameterSearchText = parameterSearchText
+      .trim()
+      .toLocaleLowerCase();
+    const getIsParameterMatchingSearch = (
+      parameter: gdParameterMetadata,
+      index: number
+    ): boolean => {
+      if (!normalizedParameterSearchText) {
+        return true;
+      }
+
+      return (
+        parameter
+          .getName()
+          .toLocaleLowerCase()
+          .includes(normalizedParameterSearchText) ||
+        getParameterReferenceLabel(index)
+          .toLocaleLowerCase()
+          .includes(normalizedParameterSearchText)
+      );
+    };
 
     const parametersCount = parameters.getParametersCount();
     const firstParameterName =
@@ -916,6 +980,7 @@ const CompactEventsFunctionParametersEditor: React.ComponentType<{
       isSelected,
       onSelect,
       hideDragHandle,
+      transparentBackground,
     }: {|
       i18n: I18nType,
       parameter: gdParameterMetadata,
@@ -924,6 +989,7 @@ const CompactEventsFunctionParametersEditor: React.ComponentType<{
       isSelected?: boolean,
       onSelect?: () => void,
       hideDragHandle?: boolean,
+      transparentBackground?: boolean,
     |}) => {
       const parameterRef =
         parameterLayout !== 'split' &&
@@ -936,7 +1002,9 @@ const CompactEventsFunctionParametersEditor: React.ComponentType<{
           ref={parameterRef}
           style={{
             ...styles.rowContent,
-            backgroundColor: isSelected
+            backgroundColor: transparentBackground
+              ? 'transparent'
+              : isSelected
               ? gdevelopTheme.listItem.selectedBackgroundColor
               : gdevelopTheme.list.itemsBackgroundColor,
           }}
@@ -1112,54 +1180,70 @@ const CompactEventsFunctionParametersEditor: React.ComponentType<{
           }}
         >
           {({ connectDragSource, connectDropTarget, isOver, canDrop }) =>
-            connectDropTarget(
-              <div ref={parameterRef}>
-                {isOver && <DropIndicator canDrop={canDrop} />}
-                <ButtonBase
-                  focusRipple
-                  style={styles.splitListItemButton}
-                  onClick={() => setSelectedParameterName(parameter.getName())}
-                >
-                  <div
-                    style={{
-                      ...styles.splitListItemContent,
-                      backgroundColor: isSelected
-                        ? gdevelopTheme.listItem.selectedBackgroundColor
-                        : gdevelopTheme.list.itemsBackgroundColor,
-                    }}
-                    aria-selected={isSelected}
+            connectDragSource(
+              connectDropTarget(
+                <div ref={parameterRef}>
+                  {isOver && <DropIndicator canDrop={canDrop} />}
+                  <ButtonBase
+                    focusRipple
+                    style={styles.splitListItemButton}
+                    onClick={() =>
+                      setSelectedParameterName(parameter.getName())
+                    }
                   >
-                    {connectDragSource(
-                      <span>
-                        <DragHandleIcon disabled={isParameterDisabled(index)} />
-                      </span>
-                    )}
-                    <Spacer />
-                    <div style={styles.splitListItemTexts}>
-                      <Text
-                        noMargin
-                        color={isSelected ? 'inherit' : 'secondary'}
-                        style={{ whiteSpace: 'nowrap' }}
-                      >
-                        {getParameterReferenceLabel(index)}
-                      </Text>
-                      <Text
-                        noMargin
-                        size="body2"
-                        color={isSelected ? 'inherit' : 'primary'}
-                        style={{
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          whiteSpace: 'nowrap',
-                        }}
-                        allowBrowserAutoTranslate={false}
-                      >
-                        {parameter.getName()}
-                      </Text>
+                    <div
+                      style={{
+                        ...styles.splitListItemContent,
+                        backgroundColor: isSelected
+                          ? gdevelopTheme.listItem.selectedBackgroundColor
+                          : 'transparent',
+                      }}
+                      aria-selected={isSelected}
+                    >
+                      <div style={styles.splitParameterReference}>
+                        <Text
+                          noMargin
+                          color={isSelected ? 'inherit' : 'secondary'}
+                          style={{
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                          }}
+                          allowBrowserAutoTranslate={false}
+                        >
+                          {getParameterReferenceLabel(index)}
+                        </Text>
+                      </div>
+                      <div style={styles.splitListItemTexts}>
+                        <Text
+                          noMargin
+                          color={isSelected ? 'inherit' : 'primary'}
+                          style={{
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                          }}
+                          allowBrowserAutoTranslate={false}
+                        >
+                          {parameter.getName()}
+                        </Text>
+                      </div>
+                      <div style={styles.splitListItemMenu}>
+                        <ElementWithMenu
+                          element={
+                            <IconButton size="small">
+                              <ThreeDotsMenu />
+                            </IconButton>
+                          }
+                          buildMenuTemplate={(i18n: I18nType) =>
+                            buildParameterMenuTemplate(i18n, parameter, index)
+                          }
+                        />
+                      </div>
                     </div>
-                  </div>
-                </ButtonBase>
-              </div>
+                  </ButtonBase>
+                </div>
+              )
             )
           }
         </DragSourceAndDropTarget>
@@ -1167,7 +1251,7 @@ const CompactEventsFunctionParametersEditor: React.ComponentType<{
     };
 
     const renderFooterActions = () =>
-      !freezeParameters ? (
+      parameterLayout !== 'split' && !freezeParameters ? (
         <Column noOverflowParent>
           <Line noMargin>
             <LineStackLayout expand>
@@ -1265,6 +1349,13 @@ const CompactEventsFunctionParametersEditor: React.ComponentType<{
         selectedParameterIndex >= 0
           ? parameters.getParameterAt(selectedParameterIndex)
           : null;
+      const matchingParameterIndexes = mapFor(
+        0,
+        parametersCount,
+        index => index
+      ).filter(index =>
+        getIsParameterMatchingSearch(parameters.getParameterAt(index), index)
+      );
 
       return (
         <div style={styles.splitContainer}>
@@ -1305,10 +1396,29 @@ const CompactEventsFunctionParametersEditor: React.ComponentType<{
                     }`,
                   }}
                 >
-                  <div style={styles.splitSidebarHeader}>
+                  <div style={styles.splitSidebarTitle}>
                     <Text noMargin size="block-title">
                       <Trans>Parameters</Trans>
                     </Text>
+                  </div>
+                  <div style={styles.splitSidebarSearch}>
+                    <CompactSearchBar
+                      value={parameterSearchText}
+                      onChange={setParameterSearchText}
+                      placeholder={t`Search in parameters`}
+                    />
+                  </div>
+                  <div style={styles.splitParameterGroupHeader}>
+                    <div style={styles.splitParameterGroupTitle}>
+                      <ChevronArrowBottom
+                        viewBox="2 2 12 12"
+                        fontSize="small"
+                        style={styles.splitParameterGroupChevron}
+                      />
+                      <Text noMargin size="block-title">
+                        <Trans>Function parameters</Trans>
+                      </Text>
+                    </div>
                     {!freezeParameters && (
                       <IconButton
                         size="small"
@@ -1324,20 +1434,33 @@ const CompactEventsFunctionParametersEditor: React.ComponentType<{
                     )}
                   </div>
                   <div style={styles.splitSidebarList}>
-                    <ScrollView ref={scrollView} autoHideScrollbar>
-                      {parametersCount > 0 ? (
-                        mapFor(0, parametersCount, i =>
-                          renderParameterListItem(i18n, i)
-                        )
-                      ) : (
-                        <Line>
-                          <Column noMargin expand>
-                            <Text color="secondary">
-                              <Trans>No parameters yet.</Trans>
-                            </Text>
-                          </Column>
-                        </Line>
-                      )}
+                    <ScrollView
+                      ref={scrollView}
+                      style={styles.splitSidebarScrollView}
+                    >
+                      <div style={styles.splitListScrollContent}>
+                        {matchingParameterIndexes.length > 0 ? (
+                          matchingParameterIndexes.map(i =>
+                            renderParameterListItem(i18n, i)
+                          )
+                        ) : parametersCount > 0 ? (
+                          <Line>
+                            <Column noMargin expand>
+                              <Text color="secondary">
+                                <Trans>No parameters match your search.</Trans>
+                              </Text>
+                            </Column>
+                          </Line>
+                        ) : (
+                          <Line>
+                            <Column noMargin expand>
+                              <Text color="secondary">
+                                <Trans>No parameters yet.</Trans>
+                              </Text>
+                            </Column>
+                          </Line>
+                        )}
+                      </div>
                     </ScrollView>
                   </div>
                 </div>
@@ -1352,6 +1475,7 @@ const CompactEventsFunctionParametersEditor: React.ComponentType<{
                           connectDragSource: element => element,
                           isSelected: true,
                           hideDragHandle: true,
+                          transparentBackground: true,
                         })}
                         <Line>
                           {renderParameterDetails(
@@ -1400,9 +1524,6 @@ const CompactEventsFunctionParametersEditor: React.ComponentType<{
                   )}
                 </div>
               </div>
-              {parametersCount > 0 ? (
-                <div style={styles.splitFooter}>{renderFooterActions()}</div>
-              ) : null}
             </React.Fragment>
           )}
         </div>

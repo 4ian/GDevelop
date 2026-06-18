@@ -19,6 +19,8 @@ import ScenePropertiesDialog from './ScenePropertiesDialog';
 import EventsBasedObjectScenePropertiesDialog from './EventsBasedObjectScenePropertiesDialog';
 import ExtractAsExternalLayoutDialog from './ExtractAsExternalLayoutDialog';
 import ExtractAsCustomObjectDialog from './CustomObjectExtractor/ExtractAsCustomObjectDialog';
+import NewObjectDialog from '../AssetStore/NewObjectDialog';
+import { type InstallAssetOutput } from '../AssetStore/InstallAsset';
 import { type ObjectEditorTab } from '../ObjectEditor/ObjectEditorDialog';
 import MosaicEditorsDisplayToolbar from './MosaicEditorsDisplay/Toolbar';
 import SwipeableDrawerEditorsDisplayToolbar from './SwipeableDrawerEditorsDisplay/Toolbar';
@@ -81,6 +83,7 @@ import {
   cleanNonExistingObjectFolderOrObjectWithContexts,
   getObjectFolderOrObjectWithContextFromObjectName,
 } from './ObjectFolderOrObjectsSelection';
+import objectTypeToDefaultName from '../ObjectsList/ObjectTypeToDefaultName';
 import {
   registerOnResourceExternallyChangedCallback,
   unregisterOnResourceExternallyChangedCallback,
@@ -318,6 +321,7 @@ type State = {|
   invisibleLayerOnWhichInstancesHaveJustBeenAdded: string | null,
   extractAsExternalLayoutDialogOpen: boolean,
   extractAsCustomObjectDialogOpen: boolean,
+  newObjectDialogOpen: boolean,
 
   editedGroup: gdObjectGroup | null,
   isCreatingNewGroup: boolean,
@@ -458,6 +462,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       isCreatingNewGroup: false,
       extractAsExternalLayoutDialogOpen: false,
       extractAsCustomObjectDialogOpen: false,
+      newObjectDialogOpen: false,
 
       instancesEditorSettings: initialInstancesEditorSettings,
       history: getHistoryInitialState(props.initialInstances, {
@@ -1123,7 +1128,6 @@ export default class SceneEditor extends React.Component<Props, State> {
   toggleAllPanels = () => {
     const { editorDisplay } = this;
     if (!editorDisplay) return;
-    editorDisplay.viewControls.keepCanvasTopLeftSceneCoordinatesOnNextResize();
     const shouldShowAllPanels = PANEL_EDITOR_IDS.some(
       editorId => !editorDisplay.isEditorVisible(editorId)
     );
@@ -1488,12 +1492,69 @@ export default class SceneEditor extends React.Component<Props, State> {
   };
 
   _openNewObjectDialog = () => {
-    const { editorDisplay } = this;
-    if (!editorDisplay || !this._canAddObject()) {
+    if (!this._canAddObject()) {
       return;
     }
 
-    editorDisplay.openNewObjectDialog();
+    this.setState({ newObjectDialogOpen: true });
+  };
+
+  _addObjectFromNewObjectDialog = (objectType: string) => {
+    const { project, objectsContainer, globalObjectsContainer } = this.props;
+
+    const defaultName = project.hasEventsBasedObject(objectType)
+      ? 'New' +
+        (project.getEventsBasedObject(objectType).getDefaultName() ||
+          project.getEventsBasedObject(objectType).getName())
+      : // $FlowFixMe[invalid-computed-prop]
+        objectTypeToDefaultName[objectType] || 'NewObject';
+    const name = newNameGenerator(
+      defaultName,
+      name =>
+        objectsContainer.hasObjectNamed(name) ||
+        (!!globalObjectsContainer &&
+          globalObjectsContainer.hasObjectNamed(name))
+    );
+
+    const isTheFirstOfItsTypeInProject = !gd.UsedObjectTypeFinder.scanProject(
+      project,
+      objectType
+    );
+
+    const object = objectsContainer.insertNewObject(
+      project,
+      objectType,
+      name,
+      objectsContainer.getObjectsCount()
+    );
+    const objectFolderOrObjectWithContext = {
+      objectFolderOrObject: objectsContainer
+        .getRootFolder()
+        .getObjectChild(name),
+      global: false,
+    };
+
+    this.setState({ newObjectDialogOpen: false });
+    this.editObject(object, 'properties');
+    this._onObjectFolderOrObjectWithContextSelected(
+      objectFolderOrObjectWithContext
+    );
+    this._onObjectCreated([object], isTheFirstOfItsTypeInProject, {
+      shouldCreateInstance: true,
+    });
+    this.forceUpdateObjectsList();
+  };
+
+  _onObjectsAddedFromAssetsFromNewObjectDialog = ({
+    createdObjects: objects,
+    isTheFirstOfItsTypeInProject,
+  }: InstallAssetOutput) => {
+    if (!objects.length) return;
+
+    this._onObjectCreated(objects, isTheFirstOfItsTypeInProject, {
+      shouldCreateInstance: true,
+    });
+    this.forceUpdateObjectsList();
   };
 
   addInstanceOnTheScene = (
@@ -2971,8 +3032,6 @@ export default class SceneEditor extends React.Component<Props, State> {
           : null;
 
       return [
-        ...this.getContextMenuInstancesWiseItems(i18n),
-        { type: 'separator' },
         object && project.hasEventsBasedObject(object.getType())
           ? {
               label: i18n._(t`Edit prefab`),
@@ -3038,6 +3097,8 @@ export default class SceneEditor extends React.Component<Props, State> {
               ),
             }
           : null,
+        { type: 'separator' },
+        ...this.getContextMenuInstancesWiseItems(i18n),
         { type: 'separator' },
         ...this.getContextMenuLayoutItems(i18n),
       ].filter(Boolean);
@@ -3849,6 +3910,26 @@ export default class SceneEditor extends React.Component<Props, State> {
                           i18n
                         )
                       }
+                    />
+                  )}
+                  {this.state.newObjectDialogOpen && (
+                    <NewObjectDialog
+                      onClose={() =>
+                        this.setState({ newObjectDialogOpen: false })
+                      }
+                      onCreateNewObject={this._addObjectFromNewObjectDialog}
+                      onObjectsAddedFromAssets={
+                        this._onObjectsAddedFromAssetsFromNewObjectDialog
+                      }
+                      project={project}
+                      layout={layout}
+                      eventsFunctionsExtension={eventsFunctionsExtension}
+                      eventsBasedObject={eventsBasedObject}
+                      objectsContainer={this.props.objectsContainer}
+                      resourceManagementProps={resourceManagementProps}
+                      targetObjectFolderOrObjectWithContext={null}
+                      onWillInstallExtension={this.props.onWillInstallExtension}
+                      onExtensionInstalled={this.props.onExtensionInstalled}
                     />
                   )}
                   {this.state.setupGridOpen && (

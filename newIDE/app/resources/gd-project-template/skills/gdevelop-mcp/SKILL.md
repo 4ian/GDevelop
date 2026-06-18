@@ -69,6 +69,9 @@ Read-only context:
 - `gdevelop_inspect_extension_behavior`: one events-based behavior inside an extension. Pass `function_name` to inspect only one behavior function; this keeps large event payloads out of the response unless you explicitly need them.
 - `gdevelop_inspect_extension_object`: one events-based object inside an extension. Pass `function_name` to inspect only one object function; this keeps large event payloads out of the response unless you explicitly need them.
 - `gdevelop_inspect_extension_property`: one behavior/object property inside an extension.
+- `validate_current_project_json`: serialize the current in-memory project, re-unserialize it into a temporary project, run project validation, and run extension function event/code-generation checks without mutating the live project.
+- `inspect_custom_object_runtime_geometry`: inspect an events-based object prefab's declared area, child instance local coordinates, Sprite frame bounds/points/collision masks, and optional cursor-local hit checks. Use this before changing custom object areas or `IsCursorOnObject` behavior.
+- `inspect_prefab_property_bindings`: inspect behavior/object property descriptors, child Sprite static frame resources, and event references to properties. Use this before assuming a Resource property dynamically drives a child Sprite image.
 - `read_scene_events`: event sheet rendered as text.
 - `read_serialized_scene`: one scene as serialized JSON. Pass `object_name` or `object_names` to return only those objects (and their instances) for a much smaller response, instead of dumping the whole scene to a file.
 - `read_scene_events_serialized`: raw serialized event JSON for a scene, including event types the text renderer cannot describe. Pass `summary_only:true` for just root event counts/types; the JSON string copy is omitted unless you pass `include_json:true` (keeps responses small).
@@ -155,6 +158,8 @@ Write tools:
 - `ensure_scene_event_ids`: assign stable `aiGeneratedEventId` values to events that do not already have one.
 - `replace_scene_events_from_file`: replace a scene event sheet from a local JSON file after validation. Rejects structural mistakes that would silently lose data (e.g. Or/And/Not children under the wrong key) and returns `subInstructionsPreserved` (a write-back check that nested conditions/actions survived). Pass `dry_run: true` to validate and render the result (`eventsAsText`) WITHOUT writing — review it, then re-run to apply.
 - `apply_validated_scene_patch`: apply focused scene JSON patch; for large patches use `patch_file`.
+- `apply_validated_project_json_patch`: apply a JSON Patch to a controlled serialized target inside the in-memory project model (`project`, `scene`, `extension`, `extension_object`, or `extension_function`). It validates on a temporary project first, snapshots before live mutation, and can save only after validation. Use `dry_run:true` first for broad or structural changes.
+- `sync_editor_from_validated_project_json`: load a complete project JSON object/string/file into the editor model only after serialize/unserialize validation and extension code-generation checks pass. This is for deliberate full-project syncs, not routine small edits.
 - `create_or_update_plan`: store/update an AI orchestration plan when the task needs one.
 
 Recent high-level helpers:
@@ -170,6 +175,8 @@ Extension write tools:
 - `gdevelop_create_or_update_extension`: create/update extension metadata. Supports `extension_name`, optional `new_extension_name`, `namespace`, `full_name`, `short_description`, `description`, `version`, `category`, `dimension`, `help_path`, `icon_url`, `preview_icon_url`, `tags`, and advanced `serialized_extension`.
 - `gdevelop_delete_extension`: delete a project-specific extension.
 - `gdevelop_create_or_update_extension_function`: create/update a free, behavior, or object function. Supports `parent_kind` (`extension`, `behavior`, `object`), `parent_name`, `function_type`, `full_name`, `description`, `sentence`, `help_url`, privacy/async/deprecated flags, `parameters`, `parameters_mode`, `expression_type`, `events_json`, and advanced `serialized_function`. By default, `parameters` is the final caller-managed parameter list: old unused parameters are removed while GDevelop-maintained automatic behavior/object parameters are preserved. Set `parameters_mode:"upsert"` only for additive edits that should keep unspecified old parameters. Pass `dry_run:true` to validate the full serialized/function event payload on a temporary extension copy without mutating the live extension. It validates `events_json` and non-empty action/condition sentences before keeping the write.
+- `replace_extension_function_events_from_file`: replace a free, behavior, or object extension function's event body from a local JSON file after validation. Use this for large extension functions instead of inlining escaped `events_json`.
+- `apply_validated_extension_patch`: apply a JSON Patch to a controlled serialized extension target (`extension`, `extension_object`, `extension_behavior`, `extension_function`, or `property`). It validates on a temporary extension copy, checks extension function events/code generation, and snapshots before live mutation.
 - `gdevelop_delete_extension_function`: delete a free, behavior, or object function.
 - `gdevelop_create_or_update_extension_behavior`: create/update an events-based behavior. Supports `behavior_name`, optional rename, display metadata, `object_type`, privacy, icons, and advanced `serialized_behavior`.
 - `gdevelop_delete_extension_behavior`: delete an events-based behavior.
@@ -178,11 +185,13 @@ Extension write tools:
 - `gdevelop_extract_prefab_from_object`: extract existing scene instances or extension-object child objects into a reusable events-based object prefab. `source_kind` is `scene_instances`, `extension_object`, or `scene_object`; use `dry_run:true` first to validate extraction on a temporary extension copy. Replacement/migration is explicit via `replace_in_scene_with_prefab_instance` or `replace_in_source_with_prefab_instance`. Event references are not auto-rewritten, so use `find_project_events`/`find_extension_events` before and after migration.
 - `gdevelop_create_or_update_extension_property`: create/update a behavior/object property. Supports `target_kind`, `target_name`, `property_name`, optional rename, `property_type`, `value`, `label`, `description`, `measurement_unit`, `group`, visibility/advanced/deprecated flags, `extra_info`, `choices`, `is_shared` for behavior shared properties, and advanced `serialized_property`.
 - `gdevelop_delete_extension_property`: delete a behavior/object property.
+- `bind_child_sprite_resource_property`: best-effort helper for prefab Resource properties. It checks the property and child Sprite, then updates the child Sprite's static first-frame resource to the property's default resource. It reports the runtime dynamic-binding limitation instead of pretending a Resource property alone updates the Sprite image.
 
 Command tool:
 
 - `gdevelop_run_command`: run editor command palette commands, for example previewing. Only use after checking `gdevelop_list_commands`; command tools may be disabled.
 - `gdevelop_save_project_and_wait`: save the project and wait for the editor save promise. Prefer this over `gdevelop_run_command` with `SAVE_PROJECT` when available. The result includes a `consistency` block (projectName, projectFile, firstLayout, sceneCount, sceneNames) so you can confirm the saved state matches intent. Note: renaming the game does NOT rename the `.json` file on disk (expected; no MCP capability to rename the file).
+- `save_and_relaunch_preview_paused`: save through the editor, close stale previews/debugger connections, launch a fresh debug preview paused, then inspect the runtime. Use this after extension or project-wide JSON edits before trusting runtime evidence.
 
 Resources:
 
@@ -239,7 +248,35 @@ Tools are permission-gated by the editor:
 - If `gdevelop_run_command` is disabled, do not simulate commands through unrelated write tools.
 - `gdevelop_editor_call` is an escape hatch, not a shortcut around permissions. It still follows the same read/write restrictions.
 
-Hard requirement: never directly edit, patch, overwrite, or otherwise mutate the opened GDevelop project `.json` file on disk. All project mutations must go through MCP tools, then be persisted with `gdevelop_save_project_and_wait`. Reading project JSON for verification is allowed; writing temporary events JSON files for `validate_events_json_file` or `replace_scene_events_from_file` is allowed. Disk-only project JSON edits can be overwritten by the editor and can desynchronize MCP state.
+Hard requirement: never directly edit, patch, overwrite, or otherwise mutate the opened GDevelop project `.json` file on disk. All project mutations must go through MCP tools, then be persisted with `gdevelop_save_project_and_wait` or a write tool's validated save path. Reading project JSON for verification is allowed; writing temporary events/patch JSON files for `validate_events_json_file`, `replace_scene_events_from_file`, `replace_extension_function_events_from_file`, `apply_validated_project_json_patch`, or `apply_validated_extension_patch` is allowed. Disk-only project JSON edits can be overwritten by the editor and can desynchronize MCP state.
+
+## Validated Direct JSON Workflow
+
+Prefer focused MCP tools for ordinary edits. Use direct serialized JSON only when no focused tool covers the required change, when moving large event/function bodies from files, or when syncing a deliberate full-project transform. Never write the opened project `.json` on disk yourself.
+
+Use `validate_current_project_json` before risky work to establish the current serialized project can round-trip. For patch workflows, use `apply_validated_project_json_patch` or `apply_validated_extension_patch` with `dry_run:true` first. These tools apply RFC-6902-style operations (`add`, `replace`, `remove`, `test`) to a scoped in-memory target, validate by serialize/unserialize on a temporary copy, run project validation, and preflight extension function events/generated JavaScript before mutating the live editor model. Non-dry-run mutation creates an MCP snapshot first; if a write fails, do not keep patching blindly - inspect the error and restore the snapshot when needed.
+
+Use `replace_extension_function_events_from_file` for large extension function event bodies. The file should contain a serialized event array. Validate/dry-run first, then apply, read back the function, save, and relaunch stale previews.
+
+Use `sync_editor_from_validated_project_json` only for an intentional complete project replacement into the editor model. It is not a shortcut for small edits. Prefer `summary_only:true` or file-based payloads for large JSON so responses stay small.
+
+After any successful project/extension JSON mutation, assume open editor panels and previews may be stale. Read back through MCP, save through the editor, and use `save_and_relaunch_preview_paused` or close-all plus `launch_preview { start_paused:true }` before runtime verification.
+
+## Custom Object / Prefab Geometry
+
+Events-based object child instances use local prefab coordinates. The custom object's declared area controls its parent runtime bounds and cursor hit area; widening this area can make `IsCursorOnObject(Object)` true even when the cursor is outside the visible child Sprite pixels. Prefer visible child bounds, Sprite points, and collision masks for visual/collision reasoning, and treat the parent area as the coarse container/hit target.
+
+Before changing a prefab area, moving children, or debugging mouse-follow previews, call `inspect_custom_object_runtime_geometry`. Check `parentArea`, child local positions, estimated rendered bounds, Sprite origin/center/custom points, and collision mask bounds. If a cursor feels offset, pass local `cursor_x`/`cursor_y`; when you know the parent instance position, pass `parent_x`/`parent_y` plus `cursor_scene_x`/`cursor_scene_y` to get scene-space child bounds, point coordinates, and scene-to-local cursor checks.
+
+For a mouse-follow preview sprite, keep the parent area close to the visible bounds, put the child Sprite at a clear local origin, set the Sprite origin/center intentionally, and verify with a paused fresh preview plus screenshot. If extension edits changed prefab geometry, stale previews can keep old object code/data; relaunch before trusting screenshots or `IsCursorOnObject` results.
+
+## Resource Property Binding
+
+A Resource property descriptor on a behavior/object is only data; it is not proof that a child Sprite dynamically uses that resource at runtime. Always inspect both the property descriptor and actual child Sprite frame resources.
+
+Use `inspect_prefab_property_bindings` before changing prefab image resources. It reports Resource properties, child Sprite static frame images, event text references to properties, and warnings when a Resource property has no detected dynamic use. Use `bind_child_sprite_resource_property` only when a static default binding is enough: it updates the child Sprite's first-frame image to the property's default resource and reports the limitation that a general runtime set-image-from-resource action may not exist for Sprite objects.
+
+After binding, read back with `inspect_prefab_property_bindings` or `gdevelop_inspect_extension_object`, save, relaunch a fresh paused preview, and visually verify the prefab.
 
 ## Event Editing Workflow
 
@@ -655,12 +692,16 @@ Save the project:
 - For large event sheets, use `read_scene_events_serialized` with `summary_only:true`, or `read_serialized_scene` with `object_name`, to avoid dumping huge JSON into context.
 - Prefer `read_serialized_scene` with `object_name`/`object_names` to inspect a single object instead of dumping the whole scene.
 - File-based tools (`validate_events_json_file`, `replace_scene_events_from_file`, `apply_validated_scene_patch` with `patch_file`) accept project-relative paths (resolved against the project folder), the same as resource `file` paths; absolute paths also work.
+- File-based project/extension JSON tools (`replace_extension_function_events_from_file`, `apply_validated_project_json_patch`, `sync_editor_from_validated_project_json`, `apply_validated_extension_patch`) also accept project-relative paths or absolute paths. Use them instead of inlining huge JSON.
 - Prefer `inspect_project_resources` with `compact: true` before and after asset replacement tasks; request full output only when investigating references.
 - Prefer `create_sprite_object_from_resource` for a simple Sprite from one image resource.
 - Prefer `create_text_object` for new text labels/HUD, and `set_text_object_properties` for existing text objects.
 - Prefer `inspect_project_cleanup` before removing old empty scenes, unused objects, or unused resources.
 - Prefer `lint_scene_events` after any event write.
 - Use `set_first_layout` or `set_project_properties` for project-level changes. Do not edit project JSON on disk.
+- Use validated JSON patch tools only for controlled in-memory editor-model edits. They are not permission to hand-edit the opened `.json` file on disk.
+- For custom object hitboxes and mouse targeting, inspect prefab geometry first; do not widen the parent area just to cover a visible child without understanding the `IsCursorOnObject` side effect.
+- For prefab image resources, a Resource property is not enough by itself. Inspect binding evidence, then bind/read back/preview.
 - Prefer `bulk_edit_scene_assets` for initial game/scene construction with many resources, objects, Sprite animations, and instances.
 - Never directly write the opened project `.json` file, even for small fixes. Use MCP tools and save through the editor.
 - Do not delete or replace large event blocks unless the user requested broad refactoring or the current events are clearly wrong.
@@ -684,6 +725,9 @@ Before claiming completion:
 - If cleanup was requested, `inspect_project_cleanup` was read first and any heuristic candidates were confirmed before deletion.
 - The startup scene is set with `set_first_layout` or verified from `read_game_project_json`; do not rely on a disk-only patch.
 - No opened project `.json` file was directly edited. All project changes went through MCP tools and were saved with `gdevelop_save_project_and_wait` when persistence was required.
+- Any direct JSON patch/sync used `dry_run:true` or validation first, reported no validation/code-generation errors, and was read back after mutation.
+- Custom object geometry changes were checked with `inspect_custom_object_runtime_geometry` when parent area, child bounds, or cursor hit behavior mattered.
+- Prefab Resource property changes were checked with `inspect_prefab_property_bindings`, and any static binding limitation was reported.
 - A write tool reported success or a non-error result.
 - The affected scene/object/instance/event sheet/extension was read back.
 - For save requests, `gdevelop_save_project_and_wait` returned a saved result, or the limitation of command-only saving was reported.
@@ -705,6 +749,7 @@ Before claiming completion:
 - Using JavaScript events to implement normal gameplay logic. Fix: use standard GDevelop events/instructions; only use JavaScript when the user explicitly asks for it.
 - Editing instances without `describe_instances`. Fix: read existing IDs and positions first.
 - Rewriting or patching the opened project JSON file for any change. Fix: use focused MCP tools, then `gdevelop_save_project_and_wait`.
+- Treating validated JSON patch tools as disk-edit permission. Fix: use them only through MCP against the in-memory editor model; never modify the opened `.json` file directly.
 - Replacing all scene events just to group them. Fix: use `wrap_events_in_group`, `move_events_to_group`, and `rename_group`.
 - Continuing to use an old `event-N` path after moving/grouping events. Fix: assign/read `aiGeneratedEventId` and target by ID.
 - Adding an audio resource with an empty `file`. Fix: call `add_or_update_resource` with a real local path and verify with `inspect_project_resources`.
@@ -714,6 +759,8 @@ Before claiming completion:
 - Hand-writing serialized Sprite/Text object JSON for simple objects. Fix: use `create_sprite_object_from_resource` or `create_text_object`.
 - Treating preview launch as runtime verification. Fix: after launching, call `gdevelop_inspect_running_preview` (live counts, variables, `errors`) and `capture_preview_screenshot` (visual check), and report that evidence; a launched preview alone is not a passed smoke test.
 - Ignoring `staleStateAdvisory` after a write. Fix: if it says `previewMayBeStale:true`, close/relaunch previews before runtime verification; if it lists editor panels, read back through MCP and refresh/reopen stale panels before trusting the UI.
+- Trusting a prefab Resource property without checking the child Sprite. Fix: call `inspect_prefab_property_bindings`; if only a static default is needed, use `bind_child_sprite_resource_property` and read back.
+- Making an events-based object parent area huge to catch mouse input. Fix: inspect geometry and prefer visible child bounds/points; remember `IsCursorOnObject(Object)` follows the parent area.
 - Inspecting a stale preview after relaunching. Fix: `gdevelop_inspect_running_preview` and `capture_preview_screenshot` default to the latest preview; if needed target one via `debugger_id`, or `control_preview { action:"close", close_all:true }` before relaunching to remove stale windows entirely.
 - A 2nd+ preview window whose `gdevelop_inspect_running_preview` / `capture_preview_screenshot` / `control_preview step` time out (`runtime` unavailable). Cause: the OS suspended the backgrounded/occluded window's renderer. Mitigations now in place: a power-save blocker keeps the app's event loop alive while a preview is open, and screenshots are taken from the main process — so `run_frames` and `gdevelop_inspect_running_preview` should keep working. If a specific window is still unresponsive, `control_preview { action:"focus" }`, or `close_all` and relaunch a single preview. For layout-only checks, `render_scene_to_png` never needs a running preview.
 - Quoting a resource-name parameter. Fix: sound/music/image/font resource parameters take a BARE name (`Shoot`), not `"Shoot"`; check the param's `literalSyntax`.

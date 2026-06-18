@@ -9,8 +9,11 @@ import {
 import { findEventsInEventsList } from './McpEventTools';
 import { generateEventsCodeForScope } from '../EventsSheet/GenerateEventsCode';
 import { scanProjectForValidationErrors } from '../Utils/EventsValidationScanner';
+import optionalRequire from '../Utils/OptionalRequire';
 
 const gd: libGDevelop = global.gd;
+const fs = optionalRequire('fs');
+const path = optionalRequire('path');
 
 const hasOwn = (object: Object, propertyName: string): boolean =>
   Object.keys(object).includes(propertyName);
@@ -205,6 +208,208 @@ const getExtension = (
     throw new Error(`Extension not found: "${extensionName}".`);
   }
   return project.getEventsFunctionsExtension(extensionName);
+};
+
+const getStringArg = (args: Object, names: Array<string>): ?string => {
+  for (const name of names) {
+    const value = args && args[name];
+    if (typeof value === 'string' && value) return value;
+  }
+  return null;
+};
+
+const getNumberArg = (args: Object, names: Array<string>): ?number => {
+  for (const name of names) {
+    const value = args && args[name];
+    if (typeof value === 'number' && Number.isFinite(value)) return value;
+  }
+  return null;
+};
+
+const readJsonFile = (project: gdProject, file: string): any => {
+  if (!fs) throw new Error('Filesystem access is not available.');
+  const projectFile = project.getProjectFile();
+  const resolvedFile =
+    path && !path.isAbsolute(file) && projectFile
+      ? path.resolve(path.dirname(projectFile), file)
+      : file;
+  if (!fs.existsSync(resolvedFile)) {
+    throw new Error(
+      `File not found: "${file}"${
+        resolvedFile !== file ? ` (resolved to "${resolvedFile}")` : ''
+      }.`
+    );
+  }
+  return JSON.parse(fs.readFileSync(resolvedFile, 'utf8'));
+};
+
+const parseJsonPointer = (pointer: string): Array<string> => {
+  if (pointer === '') return [];
+  if (typeof pointer !== 'string' || !pointer.startsWith('/')) {
+    throw new Error(`JSON patch path must start with "/": "${pointer}".`);
+  }
+  return pointer
+    .slice(1)
+    .split('/')
+    .map(part => part.replace(/~1/g, '/').replace(/~0/g, '~'));
+};
+
+const assertSafePathParts = (parts: Array<string>) => {
+  parts.forEach(part => {
+    if (
+      part === '__proto__' ||
+      part === 'constructor' ||
+      part === 'prototype'
+    ) {
+      throw new Error(`Unsafe JSON patch path segment: "${part}".`);
+    }
+  });
+};
+
+const getPatchTarget = (
+  document: any,
+  pointer: string
+): {| container: any, key: string |} => {
+  const parts = parseJsonPointer(pointer);
+  assertSafePathParts(parts);
+  if (!parts.length) {
+    throw new Error('Patching the scoped root object is not supported.');
+  }
+  let container = document;
+  for (let index = 0; index < parts.length - 1; index++) {
+    const part = parts[index];
+    if (Array.isArray(container)) {
+      const arrayIndex = Number(part);
+      if (
+        !Number.isInteger(arrayIndex) ||
+        arrayIndex < 0 ||
+        arrayIndex >= container.length
+      ) {
+        throw new Error(`Invalid array index in patch path: "${pointer}".`);
+      }
+      container = container[arrayIndex];
+    } else if (
+      container &&
+      typeof container === 'object' &&
+      hasOwn(container, part)
+    ) {
+      container = container[part];
+    } else {
+      throw new Error(`Patch path does not exist: "${pointer}".`);
+    }
+  }
+  return {
+    container,
+    key: parts[parts.length - 1],
+  };
+};
+
+const valuesAreJsonEqual = (left: any, right: any): boolean =>
+  JSON.stringify(left) === JSON.stringify(right);
+
+const applySinglePatchOperation = (document: any, operation: Object) => {
+  if (!operation || typeof operation !== 'object') {
+    throw new Error('Patch operations must be objects.');
+  }
+  const op = typeof operation.op === 'string' ? operation.op : '';
+  const pointer = typeof operation.path === 'string' ? operation.path : '';
+  if (!op) throw new Error('Patch operation is missing op.');
+  if (!pointer) throw new Error('Patch operation is missing path.');
+  const { container, key } = getPatchTarget(document, pointer);
+
+  if (Array.isArray(container)) {
+    if (op === 'add' && key === '-') {
+      container.push(operation.value);
+      return;
+    }
+    const arrayIndex = Number(key);
+    if (!Number.isInteger(arrayIndex) || arrayIndex < 0) {
+      throw new Error(`Invalid array index in patch path: "${pointer}".`);
+    }
+    if (op === 'add') {
+      if (arrayIndex > container.length) {
+        throw new Error(`Array add index out of bounds: "${pointer}".`);
+      }
+      container.splice(arrayIndex, 0, operation.value);
+      return;
+    }
+    if (arrayIndex >= container.length) {
+      throw new Error(`Array index out of bounds: "${pointer}".`);
+    }
+    if (op === 'replace') {
+      container[arrayIndex] = operation.value;
+      return;
+    }
+    if (op === 'remove') {
+      container.splice(arrayIndex, 1);
+      return;
+    }
+    if (op === 'test') {
+      if (!valuesAreJsonEqual(container[arrayIndex], operation.value)) {
+        throw new Error(`JSON patch test failed at "${pointer}".`);
+      }
+      return;
+    }
+  } else if (container && typeof container === 'object') {
+    if (op === 'add' || op === 'replace') {
+      if (
+        op === 'replace' &&
+        !hasOwn(container, key)
+      ) {
+        throw new Error(`Patch replace path does not exist: "${pointer}".`);
+      }
+      container[key] = operation.value;
+      return;
+    }
+    if (op === 'remove') {
+      if (!hasOwn(container, key)) {
+        throw new Error(`Patch remove path does not exist: "${pointer}".`);
+      }
+      delete container[key];
+      return;
+    }
+    if (op === 'test') {
+      if (!hasOwn(container, key)) {
+        throw new Error(`Patch test path does not exist: "${pointer}".`);
+      }
+      if (!valuesAreJsonEqual(container[key], operation.value)) {
+        throw new Error(`JSON patch test failed at "${pointer}".`);
+      }
+      return;
+    }
+  }
+  throw new Error(`Unsupported JSON patch operation: "${op}".`);
+};
+
+const getPatchOperations = (project: gdProject, args: Object): Array<Object> => {
+  if (Array.isArray(args.patch)) return args.patch;
+  if (typeof args.patch === 'string') {
+    const parsedPatch = JSON.parse(args.patch);
+    if (!Array.isArray(parsedPatch)) {
+      throw new Error('patch string must contain a JSON patch array.');
+    }
+    return parsedPatch;
+  }
+  const patchFile = getStringArg(args || {}, ['patch_file', 'patchFile']);
+  if (patchFile) {
+    const parsedPatch = readJsonFile(project, patchFile);
+    if (!Array.isArray(parsedPatch)) {
+      throw new Error('patch_file must contain a JSON patch array.');
+    }
+    return parsedPatch;
+  }
+  throw new Error('Missing patch array, patch string, or patch_file.');
+};
+
+const getNamedItemIndex = (
+  items: any,
+  itemName: string,
+  label: string
+): number => {
+  if (!Array.isArray(items)) throw new Error(`Missing ${label} array.`);
+  const index = items.findIndex(item => item && item.name === itemName);
+  if (index === -1) throw new Error(`${label} not found: "${itemName}".`);
+  return index;
 };
 
 const getVectorStringArray = (vectorString: any): Array<string> => {
@@ -2296,6 +2501,1048 @@ const runOnTemporaryExtensionCopy = <T>(
       project.removeEventsFunctionsExtension(temporaryExtensionName);
     }
   }
+};
+
+const getExtensionPatchTarget = (
+  serializedExtension: Object,
+  args: Object
+): {| target: Object, scope: string, scopeRootPath: string |} => {
+  const scope = String(args.scope || 'extension')
+    .trim()
+    .toLowerCase();
+  if (!scope || scope === 'extension') {
+    return {
+      target: serializedExtension,
+      scope: 'extension',
+      scopeRootPath: '',
+    };
+  }
+
+  if (scope === 'extension_object' || scope === 'object') {
+    const objectName = getStringArg(args, [
+      'object_name',
+      'objectName',
+      'parent_name',
+      'parentName',
+    ]);
+    if (!objectName) {
+      throw new Error(`scope "${scope}" requires object_name.`);
+    }
+    const objectIndex = getNamedItemIndex(
+      serializedExtension.eventsBasedObjects,
+      objectName,
+      'events-based object'
+    );
+    return {
+      target: serializedExtension.eventsBasedObjects[objectIndex],
+      scope: 'extension_object',
+      scopeRootPath: `/eventsBasedObjects/${objectIndex}`,
+    };
+  }
+
+  if (scope === 'extension_behavior' || scope === 'behavior') {
+    const behaviorName = getStringArg(args, [
+      'behavior_name',
+      'behaviorName',
+      'parent_name',
+      'parentName',
+    ]);
+    if (!behaviorName) {
+      throw new Error(`scope "${scope}" requires behavior_name.`);
+    }
+    const behaviorIndex = getNamedItemIndex(
+      serializedExtension.eventsBasedBehaviors,
+      behaviorName,
+      'events-based behavior'
+    );
+    return {
+      target: serializedExtension.eventsBasedBehaviors[behaviorIndex],
+      scope: 'extension_behavior',
+      scopeRootPath: `/eventsBasedBehaviors/${behaviorIndex}`,
+    };
+  }
+
+  if (scope === 'extension_function' || scope === 'function') {
+    const parentKind = normalizeParentKind(args.parent_kind);
+    const functionName = getStringArg(args, [
+      'function_name',
+      'functionName',
+    ]);
+    if (!functionName) throw new Error(`scope "${scope}" requires function_name.`);
+    let container = serializedExtension.eventsFunctions;
+    let scopeRootPath = '/eventsFunctions';
+    if (parentKind === 'object') {
+      const parentName = getStringArg(args, ['parent_name', 'parentName']);
+      if (!parentName) throw new Error('parent_kind "object" requires parent_name.');
+      const objectIndex = getNamedItemIndex(
+        serializedExtension.eventsBasedObjects,
+        parentName,
+        'events-based object'
+      );
+      container =
+        serializedExtension.eventsBasedObjects[objectIndex].eventsFunctions;
+      scopeRootPath = `/eventsBasedObjects/${objectIndex}/eventsFunctions`;
+    } else if (parentKind === 'behavior') {
+      const parentName = getStringArg(args, ['parent_name', 'parentName']);
+      if (!parentName)
+        throw new Error('parent_kind "behavior" requires parent_name.');
+      const behaviorIndex = getNamedItemIndex(
+        serializedExtension.eventsBasedBehaviors,
+        parentName,
+        'events-based behavior'
+      );
+      container =
+        serializedExtension.eventsBasedBehaviors[behaviorIndex].eventsFunctions;
+      scopeRootPath = `/eventsBasedBehaviors/${behaviorIndex}/eventsFunctions`;
+    }
+    const functionIndex = getNamedItemIndex(
+      container,
+      functionName,
+      'events function'
+    );
+    return {
+      target: container[functionIndex],
+      scope: 'extension_function',
+      scopeRootPath: `${scopeRootPath}/${functionIndex}`,
+    };
+  }
+
+  if (scope === 'property' || scope === 'extension_property') {
+    const objectName = getStringArg(args, [
+      'object_name',
+      'objectName',
+      'target_name',
+      'targetName',
+    ]);
+    if (!objectName) {
+      throw new Error(`scope "${scope}" requires object_name or target_name.`);
+    }
+    const propertyName = getStringArg(args, [
+      'property_name',
+      'propertyName',
+    ]);
+    if (!propertyName) {
+      throw new Error(`scope "${scope}" requires property_name.`);
+    }
+    const objectIndex = getNamedItemIndex(
+      serializedExtension.eventsBasedObjects,
+      objectName,
+      'events-based object'
+    );
+    const propertyIndex = getNamedItemIndex(
+      serializedExtension.eventsBasedObjects[objectIndex].propertyDescriptors,
+      propertyName,
+      'property descriptor'
+    );
+    return {
+      target:
+        serializedExtension.eventsBasedObjects[objectIndex].propertyDescriptors[
+          propertyIndex
+        ],
+      scope: 'extension_property',
+      scopeRootPath: `/eventsBasedObjects/${objectIndex}/propertyDescriptors/${propertyIndex}`,
+    };
+  }
+
+  throw new Error(
+    `Unsupported extension patch scope "${scope}". Use extension, extension_object, extension_behavior, extension_function, or property.`
+  );
+};
+
+const collectExtensionFunctionLintFailures = (
+  project: gdProject,
+  extensionName: string,
+  extension: gdEventsFunctionsExtension,
+  includeGeneratedCode: boolean
+): Array<Object> => {
+  const failures = [];
+  const collectContainer = (
+    parentKind: string,
+    parentName: ?string,
+    container: gdEventsFunctionsContainer
+  ) => {
+    for (let index = 0; index < container.getEventsFunctionsCount(); index++) {
+      const eventsFunction = container.getEventsFunctionAt(index);
+      try {
+        const result = lintExtensionFunctionEvents(project, {
+          extension_name: extensionName,
+          parent_kind: parentKind,
+          parent_name: parentName || undefined,
+          function_name: eventsFunction.getName(),
+          require_root_groups: false,
+          include_generated_code: includeGeneratedCode,
+        });
+        if (!result.valid) failures.push(result);
+      } catch (error) {
+        failures.push({
+          success: true,
+          valid: false,
+          extensionName,
+          parentKind,
+          parentName,
+          functionName: eventsFunction.getName(),
+          errors: [
+            {
+              severity: 'error',
+              type: 'extension-function-validation-exception',
+              error: error && error.message ? error.message : String(error),
+            },
+          ],
+        });
+      }
+    }
+  };
+
+  collectContainer('extension', null, extension.getEventsFunctions());
+  const behaviors = extension.getEventsBasedBehaviors();
+  for (let index = 0; index < behaviors.getCount(); index++) {
+    const behavior = behaviors.getAt(index);
+    collectContainer(
+      'behavior',
+      behavior.getName(),
+      behavior.getEventsFunctions()
+    );
+  }
+  const objects = extension.getEventsBasedObjects();
+  for (let index = 0; index < objects.getCount(); index++) {
+    const object = objects.getAt(index);
+    collectContainer('object', object.getName(), object.getEventsFunctions());
+  }
+  return failures;
+};
+
+const validateSerializedExtension = (
+  project: gdProject,
+  extensionName: string,
+  serializedExtension: Object,
+  args: Object
+): Object => {
+  const temporaryExtensionName = getSafeUniqueName(
+    `${TEMP_EXTENSION_PREFIX}${extensionName}`,
+    name => project.hasEventsFunctionsExtensionNamed(name)
+  );
+  const temporaryExtension = project.insertNewEventsFunctionsExtension(
+    temporaryExtensionName,
+    project.getEventsFunctionsExtensionsCount()
+  );
+  try {
+    unserializeFromJSObject(
+      temporaryExtension,
+      serializedExtension,
+      'unserializeFrom',
+      project
+    );
+    temporaryExtension.setName(temporaryExtensionName);
+    const lintFailures =
+      args.include_generated_code === false
+        ? []
+        : collectExtensionFunctionLintFailures(
+            project,
+            temporaryExtensionName,
+            temporaryExtension,
+            true
+          );
+    const errors = [];
+    lintFailures.forEach(result => {
+      if (Array.isArray(result.errors)) {
+        result.errors.forEach(error =>
+          errors.push({
+            ...error,
+            extensionName,
+            parentKind: result.parentKind,
+            parentName: result.parentName,
+            functionName: result.functionName,
+          })
+        );
+      }
+    });
+    return {
+      success: true,
+      valid: errors.length === 0,
+      extensionName,
+      temporaryExtensionName,
+      errors,
+      lintFailures,
+      generatedCodePreflight:
+        args.include_generated_code === false ? 'skipped' : 'checked',
+    };
+  } catch (error) {
+    return {
+      success: true,
+      valid: false,
+      extensionName,
+      temporaryExtensionName,
+      errors: [
+        {
+          severity: 'error',
+          type: 'extension-unserialize-failed',
+          error: error && error.message ? error.message : String(error),
+        },
+      ],
+    };
+  } finally {
+    if (project.hasEventsFunctionsExtensionNamed(temporaryExtensionName)) {
+      project.removeEventsFunctionsExtension(temporaryExtensionName);
+    }
+  }
+};
+
+export const applyValidatedExtensionPatch = (
+  project: gdProject,
+  args: Object
+): Object => {
+  const extensionName = normalizeRequiredName(
+    args.extension_name,
+    'extension_name'
+  );
+  const extension = getExtension(project, extensionName);
+  const patch = getPatchOperations(project, args || {});
+  const beforeSerializedExtension = serializeToJSObject(extension);
+  const patchedSerializedExtension = JSON.parse(
+    JSON.stringify(beforeSerializedExtension)
+  );
+  const scopedTarget = getExtensionPatchTarget(patchedSerializedExtension, args || {});
+  patch.forEach(operation => applySinglePatchOperation(scopedTarget.target, operation));
+
+  const validation = validateSerializedExtension(
+    project,
+    extensionName,
+    patchedSerializedExtension,
+    args || {}
+  );
+  if (!validation.valid) {
+    return {
+      success: false,
+      valid: false,
+      dryRun: !!(args && args.dry_run),
+      extensionName,
+      scope: scopedTarget.scope,
+      scopeRootPath: scopedTarget.scopeRootPath,
+      patchOperations: patch.length,
+      changedPaths: patch.map(operation =>
+        scopedTarget.scopeRootPath
+          ? `${scopedTarget.scopeRootPath}${operation.path}`
+          : operation.path
+      ),
+      validation,
+      note:
+        'Patch was applied only to a temporary serialized extension. Validation failed, so the live extension was not modified.',
+    };
+  }
+
+  const summaryOnly = !!(args && (args.summary_only || args.summaryOnly));
+  if (args && args.dry_run === true) {
+    return {
+      success: true,
+      valid: true,
+      dryRun: true,
+      extensionName,
+      scope: scopedTarget.scope,
+      scopeRootPath: scopedTarget.scopeRootPath,
+      patchOperations: patch.length,
+      changedPaths: patch.map(operation =>
+        scopedTarget.scopeRootPath
+          ? `${scopedTarget.scopeRootPath}${operation.path}`
+          : operation.path
+      ),
+      validation,
+      serializedExtension: summaryOnly ? undefined : patchedSerializedExtension,
+      note:
+        'Patch validated on a temporary extension copy only. The live extension was not modified.',
+    };
+  }
+
+  try {
+    unserializeFromJSObject(
+      extension,
+      patchedSerializedExtension,
+      'unserializeFrom',
+      project
+    );
+  } catch (error) {
+    unserializeFromJSObject(
+      extension,
+      beforeSerializedExtension,
+      'unserializeFrom',
+      project
+    );
+    throw error;
+  }
+
+  return {
+    success: true,
+    valid: true,
+    dryRun: false,
+    extensionName,
+    scope: scopedTarget.scope,
+    scopeRootPath: scopedTarget.scopeRootPath,
+    patchOperations: patch.length,
+    changedPaths: patch.map(operation =>
+      scopedTarget.scopeRootPath
+        ? `${scopedTarget.scopeRootPath}${operation.path}`
+        : operation.path
+    ),
+    validation,
+    extension: summarizeExtension(extension),
+    serializedExtension: summaryOnly ? undefined : serializeToJSObject(extension),
+    note:
+      'Validated extension patch was applied to the editor project model. Relaunch previews after extension edits before runtime verification.',
+  };
+};
+
+export const replaceExtensionFunctionEventsFromFile = (
+  project: gdProject,
+  args: Object
+): Object => {
+  const eventsJsonFile = getStringArg(args || {}, [
+    'events_json_file',
+    'eventsJsonFile',
+  ]);
+  if (!eventsJsonFile) throw new Error('Missing events_json_file.');
+  const target = getExtensionFunctionTarget(project, args || {});
+  const beforeEventsCount = target.eventsFunction.getEvents().getEventsCount();
+  const eventsJson = readJsonFile(project, eventsJsonFile);
+  const result = createOrUpdateExtensionFunction(project, {
+    ...(args || {}),
+    events_json: eventsJson,
+    summary_only: !!(args && args.summary_only),
+  });
+  return {
+    ...result,
+    success: result.success !== false,
+    validationMode: 'replace-extension-function-events-from-file',
+    eventsJsonFile,
+    extensionName: target.extension.getName(),
+    parentKind: target.parentKind,
+    parentName: getFunctionParentName(target),
+    functionName:
+      result.function && result.function.name
+        ? result.function.name
+        : target.eventsFunction.getName(),
+    beforeEventsCount,
+    afterEventsCount:
+      result.function && typeof result.function.eventsCount === 'number'
+        ? result.function.eventsCount
+        : undefined,
+    note:
+      result.dryRun === true
+        ? 'Validated the replacement events on a temporary extension copy; the live function was not modified.'
+        : 'Replaced the extension function events from a local file after extension-scope validation and generated JavaScript preflight.',
+  };
+};
+
+const getExtensionObject = (
+  project: gdProject,
+  args: Object
+): {| extension: gdEventsFunctionsExtension, object: gdEventsBasedObject |} => {
+  const extensionName = normalizeRequiredName(
+    args.extension_name,
+    'extension_name'
+  );
+  const objectName = normalizeRequiredName(args.object_name, 'object_name');
+  const extension = getExtension(project, extensionName);
+  const objects = extension.getEventsBasedObjects();
+  if (!objects.has(objectName)) {
+    throw new Error(`Events-based object not found: "${objectName}".`);
+  }
+  return {
+    extension,
+    object: objects.get(objectName),
+  };
+};
+
+const getFirstSpriteFrameSummary = (serializedChildObject: Object): Object => {
+  const animations = Array.isArray(serializedChildObject.animations)
+    ? serializedChildObject.animations
+    : [];
+  for (let animationIndex = 0; animationIndex < animations.length; animationIndex++) {
+    const animation = animations[animationIndex];
+    const directions = Array.isArray(animation.directions)
+      ? animation.directions
+      : [];
+    for (let directionIndex = 0; directionIndex < directions.length; directionIndex++) {
+      const direction = directions[directionIndex];
+      const sprites = Array.isArray(direction.sprites)
+        ? direction.sprites
+        : [];
+      for (let frameIndex = 0; frameIndex < sprites.length; frameIndex++) {
+        const sprite = sprites[frameIndex];
+        const collisionMask = Array.isArray(sprite.customCollisionMask)
+          ? sprite.customCollisionMask
+          : [];
+        const points: Array<Object> = [];
+        collisionMask.forEach(polygon => {
+          if (Array.isArray(polygon)) {
+            polygon.forEach(point => {
+              if (
+                point &&
+                typeof point.x === 'number' &&
+                typeof point.y === 'number'
+              ) {
+                points.push(point);
+              }
+            });
+          }
+        });
+        const bounds = points.length
+          ? {
+              minX: Math.min(...points.map(point => point.x)),
+              minY: Math.min(...points.map(point => point.y)),
+              maxX: Math.max(...points.map(point => point.x)),
+              maxY: Math.max(...points.map(point => point.y)),
+            }
+          : null;
+        return {
+          animationIndex,
+          animationName: animation.name || '',
+          directionIndex,
+          frameIndex,
+          image: sprite.image || '',
+          originPoint: sprite.originPoint || null,
+          centerPoint: sprite.centerPoint || null,
+          customPoints: Array.isArray(sprite.points) ? sprite.points : [],
+          collisionMaskBounds: bounds,
+          widthHint: bounds ? bounds.maxX - bounds.minX : null,
+          heightHint: bounds ? bounds.maxY - bounds.minY : null,
+          hasCustomCollisionMask: !!sprite.hasCustomCollisionMask,
+        };
+      }
+    }
+  }
+  return {
+    image: '',
+    widthHint: null,
+    heightHint: null,
+  };
+};
+
+const getInstanceObjectName = (instance: Object): string =>
+  instance.name || instance.objectName || '';
+
+const getChildPointCoordinates = (
+  child: Object,
+  parentSceneX: ?number,
+  parentSceneY: ?number
+): Array<Object> => {
+  const points: Array<Object> = [];
+  const childX = child.localPosition.x || 0;
+  const childY = child.localPosition.y || 0;
+  const addPoint = (name: string, point: ?Object, kind: string) => {
+    if (!point || typeof point.x !== 'number' || typeof point.y !== 'number') {
+      return;
+    }
+    const localX = childX + point.x;
+    const localY = childY + point.y;
+    points.push({
+      name,
+      kind,
+      childLocalX: point.x,
+      childLocalY: point.y,
+      customObjectLocalX: localX,
+      customObjectLocalY: localY,
+      sceneX: parentSceneX !== null ? parentSceneX + localX : undefined,
+      sceneY: parentSceneY !== null ? parentSceneY + localY : undefined,
+    });
+  };
+  const spriteFrame = child.spriteFrame || {};
+  addPoint('origine', spriteFrame.originPoint, 'origin');
+  addPoint('centre', spriteFrame.centerPoint, 'center');
+  (Array.isArray(spriteFrame.customPoints)
+    ? spriteFrame.customPoints
+    : []
+  ).forEach(point => addPoint(point.name || '', point, 'custom'));
+  return points;
+};
+
+const summarizeChildGeometry = (
+  serializedObject: Object
+): {| children: Array<Object>, renderedBounds: ?Object |} => {
+  const childObjects: { [string]: Object } = {};
+  (Array.isArray(serializedObject.objects) ? serializedObject.objects : []).forEach(
+    object => {
+      if (object && object.name) childObjects[object.name] = object;
+    }
+  );
+  const children = (Array.isArray(serializedObject.instances)
+    ? serializedObject.instances
+    : []
+  ).map(instance => {
+    const childName = getInstanceObjectName(instance);
+    const childObject = childObjects[childName];
+    const frameSummary = childObject
+      ? getFirstSpriteFrameSummary(childObject)
+      : { image: '', widthHint: null, heightHint: null };
+    const width =
+      instance.customSize && typeof instance.width === 'number'
+        ? instance.width
+        : frameSummary.widthHint;
+    const height =
+      instance.customSize && typeof instance.height === 'number'
+        ? instance.height
+        : frameSummary.heightHint;
+    const bounds =
+      typeof width === 'number' &&
+      typeof height === 'number' &&
+      typeof instance.x === 'number' &&
+      typeof instance.y === 'number'
+        ? {
+            minX: instance.x,
+            minY: instance.y,
+            maxX: instance.x + width,
+            maxY: instance.y + height,
+            width,
+            height,
+          }
+        : null;
+    return {
+      childName,
+      objectType: childObject && childObject.type ? childObject.type : null,
+      localPosition: {
+        x: instance.x || 0,
+        y: instance.y || 0,
+        z: instance.z || 0,
+        zOrder: instance.zOrder || 0,
+        layer: instance.layer || '',
+      },
+      customSize: !!instance.customSize,
+      width,
+      height,
+      bounds,
+      spriteFrame: frameSummary,
+    };
+  });
+  const boundedChildBounds: Array<Object> = [];
+  children.forEach(child => {
+    if (child.bounds) boundedChildBounds.push(child.bounds);
+  });
+  const renderedBounds = boundedChildBounds.length
+    ? (() => {
+        const minX = Math.min(...boundedChildBounds.map(bounds => bounds.minX));
+        const minY = Math.min(...boundedChildBounds.map(bounds => bounds.minY));
+        const maxX = Math.max(...boundedChildBounds.map(bounds => bounds.maxX));
+        const maxY = Math.max(...boundedChildBounds.map(bounds => bounds.maxY));
+        return {
+          minX,
+          minY,
+          maxX,
+          maxY,
+          width: maxX - minX,
+          height: maxY - minY,
+        };
+      })()
+    : null;
+  return { children, renderedBounds };
+};
+
+export const inspectCustomObjectRuntimeGeometry = (
+  project: gdProject,
+  args: Object
+): Object => {
+  const { extension, object } = getExtensionObject(project, args || {});
+  const serializedObject = serializeToJSObject(object);
+  const geometry = summarizeChildGeometry(serializedObject);
+  const parentSceneXArg = getNumberArg(args || {}, [
+    'parent_x',
+    'parentX',
+    'parent_scene_x',
+    'parentSceneX',
+  ]);
+  const parentSceneYArg = getNumberArg(args || {}, [
+    'parent_y',
+    'parentY',
+    'parent_scene_y',
+    'parentSceneY',
+  ]);
+  const parentScenePosition =
+    parentSceneXArg != null && parentSceneYArg != null
+      ? { x: parentSceneXArg, y: parentSceneYArg }
+      : null;
+  const parentArea = {
+    minX: object.getAreaMinX(),
+    minY: object.getAreaMinY(),
+    minZ: object.getAreaMinZ(),
+    maxX: object.getAreaMaxX(),
+    maxY: object.getAreaMaxY(),
+    maxZ: object.getAreaMaxZ(),
+    width: object.getAreaMaxX() - object.getAreaMinX(),
+    height: object.getAreaMaxY() - object.getAreaMinY(),
+  };
+  const parentSceneArea = parentScenePosition
+    ? {
+        minX: parentScenePosition.x + parentArea.minX,
+        minY: parentScenePosition.y + parentArea.minY,
+        maxX: parentScenePosition.x + parentArea.maxX,
+        maxY: parentScenePosition.y + parentArea.maxY,
+        width: parentArea.width,
+        height: parentArea.height,
+      }
+    : undefined;
+  const renderedSceneBounds =
+    parentScenePosition && geometry.renderedBounds
+      ? {
+          minX: parentScenePosition.x + geometry.renderedBounds.minX,
+          minY: parentScenePosition.y + geometry.renderedBounds.minY,
+          maxX: parentScenePosition.x + geometry.renderedBounds.maxX,
+          maxY: parentScenePosition.y + geometry.renderedBounds.maxY,
+          width: geometry.renderedBounds.width,
+          height: geometry.renderedBounds.height,
+        }
+      : undefined;
+  const cursorSceneX = getNumberArg(args || {}, [
+    'cursor_scene_x',
+    'cursorSceneX',
+  ]);
+  const cursorSceneY = getNumberArg(args || {}, [
+    'cursor_scene_y',
+    'cursorSceneY',
+  ]);
+  const cursorLocalXArg = getNumberArg(args || {}, ['cursor_x', 'cursorX']);
+  const cursorLocalYArg = getNumberArg(args || {}, ['cursor_y', 'cursorY']);
+  const cursorX =
+    cursorLocalXArg != null
+      ? cursorLocalXArg
+      : cursorSceneX != null && parentScenePosition
+      ? cursorSceneX - parentScenePosition.x
+      : null;
+  const cursorY =
+    cursorLocalYArg != null
+      ? cursorLocalYArg
+      : cursorSceneY != null && parentScenePosition
+      ? cursorSceneY - parentScenePosition.y
+      : null;
+  const layerName =
+    getStringArg(args || {}, ['layer_name', 'layerName']) || '';
+  let cursor: ?Object = undefined;
+  if (cursorX != null && cursorY != null) {
+    const localCursorX: number = cursorX;
+    const localCursorY: number = cursorY;
+    cursor = {
+      localX: localCursorX,
+      localY: localCursorY,
+      sceneX: cursorSceneX != null ? cursorSceneX : undefined,
+      sceneY: cursorSceneY != null ? cursorSceneY : undefined,
+      layer: layerName,
+      insideParentArea:
+        localCursorX >= parentArea.minX &&
+        localCursorX <= parentArea.maxX &&
+        localCursorY >= parentArea.minY &&
+        localCursorY <= parentArea.maxY,
+      insideRenderedBounds:
+        !!geometry.renderedBounds &&
+        localCursorX >= geometry.renderedBounds.minX &&
+        localCursorX <= geometry.renderedBounds.maxX &&
+        localCursorY >= geometry.renderedBounds.minY &&
+        localCursorY <= geometry.renderedBounds.maxY,
+      coordinateSource:
+        cursorSceneX != null || cursorSceneY != null
+          ? 'scene-coordinates-converted-from-parent-position'
+          : 'custom-object-local',
+    };
+  }
+  const children = geometry.children.map(child => {
+    const scenePosition = parentScenePosition
+      ? {
+          x: parentScenePosition.x + child.localPosition.x,
+          y: parentScenePosition.y + child.localPosition.y,
+          z: child.localPosition.z,
+          zOrder: child.localPosition.zOrder,
+          layer: child.localPosition.layer,
+        }
+      : undefined;
+    const sceneBounds =
+      parentScenePosition && child.bounds
+        ? {
+            minX: parentScenePosition.x + child.bounds.minX,
+            minY: parentScenePosition.y + child.bounds.minY,
+            maxX: parentScenePosition.x + child.bounds.maxX,
+            maxY: parentScenePosition.y + child.bounds.maxY,
+            width: child.bounds.width,
+            height: child.bounds.height,
+          }
+        : undefined;
+    return {
+      ...child,
+      scenePosition,
+      sceneBounds,
+      pointCoordinates: getChildPointCoordinates(
+        child,
+        parentScenePosition ? parentScenePosition.x : null,
+        parentScenePosition ? parentScenePosition.y : null
+      ),
+    };
+  });
+  return {
+    success: true,
+    extensionName: extension.getName(),
+    objectName: object.getName(),
+    parentArea,
+    parentScenePosition: parentScenePosition || undefined,
+    parentSceneArea,
+    renderedBounds: geometry.renderedBounds,
+    renderedSceneBounds,
+    hitTestBounds: {
+      assumedForIsCursorOnObject: parentArea,
+      note:
+        'Events-based object cursor hit testing is driven by the parent/custom object area, not only by visible child pixels. A widened parent area can make IsCursorOnObject(Object) true outside visible children.',
+    },
+    children,
+    cursor,
+    coordinateSpaceNotes: [
+      'Child instance positions are local to the events-based object.',
+      'Inside object functions, Object.X()/Object.Y() refer to the parent custom object, while child names such as Card/MousePreview refer to child objects in the custom object space.',
+      'When parent_x/parent_y are provided, scenePosition and sceneBounds are parent scene coordinates plus child local coordinates.',
+      'For camera/layer transformed cursor world coordinates in a live preview, use run_frames with include_cursor_world_coordinates and pass the resulting cursor coordinates back as cursor_scene_x/cursor_scene_y.',
+      'For visible-child hit testing, compare cursor coordinates against child bounds or child points instead of only IsCursorOnObject(Object).',
+    ],
+  };
+};
+
+const collectChildSpriteResourceUses = (serializedObject: Object): Array<Object> => {
+  const uses: Array<Object> = [];
+  (Array.isArray(serializedObject.objects) ? serializedObject.objects : []).forEach(
+    childObject => {
+      (Array.isArray(childObject.animations) ? childObject.animations : []).forEach(
+        (animation, animationIndex) => {
+          (Array.isArray(animation.directions)
+            ? animation.directions
+            : []
+          ).forEach((direction, directionIndex) => {
+            (Array.isArray(direction.sprites) ? direction.sprites : []).forEach(
+              (sprite, frameIndex) => {
+                if (sprite && typeof sprite.image === 'string' && sprite.image) {
+                  uses.push({
+                    childObjectName: childObject.name,
+                    childObjectType: childObject.type,
+                    animationName: animation.name || '',
+                    animationIndex,
+                    directionIndex,
+                    frameIndex,
+                    resourceName: sprite.image,
+                    bindingKind: 'static-sprite-frame-resource',
+                  });
+                }
+              }
+            );
+          });
+        }
+      );
+    }
+  );
+  return uses;
+};
+
+const collectPropertyEventReferences = (
+  serializedObject: Object,
+  propertyName: string
+): Array<Object> => {
+  const references: Array<Object> = [];
+  (Array.isArray(serializedObject.eventsFunctions)
+    ? serializedObject.eventsFunctions
+    : []
+  ).forEach(eventsFunction => {
+    const serializedEvents = JSON.stringify(eventsFunction.events || []);
+    if (serializedEvents.includes(propertyName)) {
+      references.push({
+        functionName: eventsFunction.name,
+        referenceKind: 'serialized-event-text-match',
+      });
+    }
+  });
+  return references;
+};
+
+export const inspectPrefabPropertyBindings = (
+  project: gdProject,
+  args: Object
+): Object => {
+  const { extension, object } = getExtensionObject(project, args || {});
+  const serializedObject = serializeToJSObject(object);
+  const properties = summarizeProperties(object.getPropertyDescriptors(), true);
+  const childResourceUses = collectChildSpriteResourceUses(serializedObject);
+  const propertyBindings = properties.map(property => {
+    const eventReferences = collectPropertyEventReferences(
+      serializedObject,
+      property.name
+    );
+    const matchingStaticChildResources = childResourceUses.filter(
+      use => use.resourceName === property.value
+    );
+    return {
+      propertyName: property.name,
+      type: property.type,
+      value: property.value,
+      eventReferences,
+      matchingStaticChildResources,
+      isResourceProperty: String(property.type).toLowerCase() === 'resource',
+      hasDynamicUse: eventReferences.length > 0,
+    };
+  });
+  const warnings = propertyBindings
+    .filter(binding => binding.isResourceProperty && !binding.hasDynamicUse)
+    .map(binding => ({
+      propertyName: binding.propertyName,
+      type: 'resource-property-not-dynamically-used',
+      severity: 'warning',
+      message:
+        'This Resource property exists, but no object function events mention it. Matching child Sprite frame resources are static defaults, not a dynamic property binding.',
+    }));
+  return {
+    success: true,
+    extensionName: extension.getName(),
+    objectName: object.getName(),
+    properties,
+    childResourceUses,
+    propertyBindings,
+    warnings,
+    note:
+      'A Resource property is considered dynamically used only when function events reference it. Static child Sprite frame images are reported separately because they do not prove per-instance property binding.',
+  };
+};
+
+const replaceChildSpriteFrameResource = (
+  serializedObject: Object,
+  args: Object,
+  resourceName: string
+): {| replacements: Array<Object>, childObject: Object |} => {
+  const childObjectName = normalizeRequiredName(
+    args.child_object_name || args.childObjectName,
+    'child_object_name'
+  );
+  const childIndex = getNamedItemIndex(
+    serializedObject.objects,
+    childObjectName,
+    'child object'
+  );
+  const childObject = serializedObject.objects[childIndex];
+  if (childObject.type !== 'Sprite') {
+    throw new Error(
+      `Child object "${childObjectName}" is "${childObject.type}", not Sprite.`
+    );
+  }
+  const animationName = getStringArg(args, ['animation_name', 'animationName']);
+  const replaceAllFrames = !!(args.replace_all_frames || args.replaceAllFrames);
+  const requestedFrameIndex =
+    typeof args.frame_index === 'number'
+      ? Math.max(0, Math.floor(args.frame_index))
+      : typeof args.frameIndex === 'number'
+      ? Math.max(0, Math.floor(args.frameIndex))
+      : 0;
+  const replacements: Array<Object> = [];
+  (Array.isArray(childObject.animations) ? childObject.animations : []).forEach(
+    (animation, animationIndex) => {
+      if (animationName && animation.name !== animationName) return;
+      (Array.isArray(animation.directions) ? animation.directions : []).forEach(
+        (direction, directionIndex) => {
+          (Array.isArray(direction.sprites) ? direction.sprites : []).forEach(
+            (sprite, frameIndex) => {
+              if (!replaceAllFrames && frameIndex !== requestedFrameIndex) return;
+              const beforeResourceName = sprite.image || '';
+              sprite.image = resourceName;
+              replacements.push({
+                childObjectName,
+                animationName: animation.name || '',
+                animationIndex,
+                directionIndex,
+                frameIndex,
+                beforeResourceName,
+                afterResourceName: resourceName,
+              });
+            }
+          );
+        }
+      );
+    }
+  );
+  if (!replacements.length) {
+    throw new Error(
+      `No Sprite frame matched child_object_name "${childObjectName}"${
+        animationName ? ` and animation_name "${animationName}"` : ''
+      }.`
+    );
+  }
+  return { replacements, childObject };
+};
+
+export const bindChildSpriteResourceProperty = (
+  project: gdProject,
+  args: Object
+): Object => {
+  const extensionName = normalizeRequiredName(
+    args.extension_name,
+    'extension_name'
+  );
+  const objectName = normalizeRequiredName(args.object_name, 'object_name');
+  const propertyName = normalizeRequiredName(
+    args.property_name,
+    'property_name'
+  );
+  const { object } = getExtensionObject(project, args || {});
+  const properties = object.getPropertyDescriptors();
+  if (!properties.has(propertyName)) {
+    throw new Error(`Property not found: "${propertyName}".`);
+  }
+  const property = properties.get(propertyName);
+  if (String(property.getType()).toLowerCase() !== 'resource') {
+    throw new Error(
+      `Property "${propertyName}" is "${property.getType()}", not Resource.`
+    );
+  }
+  const resourceName =
+    getStringArg(args || {}, ['resource_name', 'resourceName']) ||
+    property.getValue();
+  if (!resourceName) {
+    throw new Error(
+      `Resource property "${propertyName}" has an empty default value. Pass resource_name.`
+    );
+  }
+
+  const serializedObject = serializeToJSObject(object);
+  const { replacements } = replaceChildSpriteFrameResource(
+    serializedObject,
+    args || {},
+    resourceName
+  );
+  if (args && args.dry_run === true) {
+    return {
+      success: true,
+      dryRun: true,
+      extensionName,
+      objectName,
+      propertyName,
+      resourceName,
+      replacements,
+      dynamicBindingCreated: false,
+      nativeBindingAvailable: false,
+      note:
+        'Dry run only. For Sprite children, this helper can update the default frame resource but cannot create a true dynamic Resource-property binding because Sprite has no general runtime set-image-from-resource action.',
+    };
+  }
+
+  const result = createOrUpdateExtensionObject(project, {
+    extension_name: extensionName,
+    object_name: objectName,
+    serialized_object: serializedObject,
+    summary_only: true,
+  });
+  const readback = inspectPrefabPropertyBindings(project, {
+    extension_name: extensionName,
+    object_name: objectName,
+  });
+  return {
+    success: true,
+    dryRun: false,
+    extensionName,
+    objectName,
+    propertyName,
+    resourceName,
+    replacements,
+    updateResult: result,
+    readback,
+    dynamicBindingCreated: false,
+    nativeBindingAvailable: false,
+    limitation:
+      'The child Sprite frame now uses the Resource property default value as its static resource. This does not automatically update per instance if the property value changes at runtime; GDevelop currently exposes runtime resource setters for some object types, but not a general Sprite image-resource setter.',
+  };
 };
 
 const getOrCreateExtension = (

@@ -1200,6 +1200,25 @@ const createTextObjectSchema = {
   additionalProperties: true,
 };
 
+const jsonPatchOperationSchema = {
+  type: 'object',
+  properties: {
+    op: {
+      type: 'string',
+      description: 'Patch operation: add, replace, remove, or test.',
+    },
+    path: {
+      type: 'string',
+      description: 'JSON pointer path, for example /objects/0/name.',
+    },
+    value: {
+      description: 'Value for add, replace, or test.',
+    },
+  },
+  required: ['op', 'path'],
+  additionalProperties: true,
+};
+
 const scenePatchSchema = {
   type: 'object',
   properties: {
@@ -1207,25 +1226,8 @@ const scenePatchSchema = {
     patch: {
       type: 'array',
       description:
-        'RFC-6902-style JSON patch subset for one serialized scene. Supports add, replace, remove with JSON pointer paths.',
-      items: {
-        type: 'object',
-        properties: {
-          op: {
-            type: 'string',
-            description: 'Patch operation: add, replace, or remove.',
-          },
-          path: {
-            type: 'string',
-            description: 'JSON pointer path, for example /objects/0/name.',
-          },
-          value: {
-            description: 'Value for add/replace.',
-          },
-        },
-        required: ['op', 'path'],
-        additionalProperties: true,
-      },
+        'RFC-6902-style JSON patch subset for one serialized scene. Supports add, replace, remove, and test with JSON pointer paths.',
+      items: jsonPatchOperationSchema,
     },
     patch_file: {
       type: 'string',
@@ -1715,6 +1717,14 @@ const launchPreviewSchema = {
     },
   },
   additionalProperties: false,
+};
+
+const saveAndRelaunchPreviewPausedSchema = {
+  type: 'object',
+  properties: {
+    timeout_ms: launchPreviewSchema.properties.timeout_ms,
+  },
+  additionalProperties: true,
 };
 
 const setRuntimeStateSchema = {
@@ -2377,6 +2387,91 @@ const deleteSceneVariableSchema = {
   additionalProperties: true,
 };
 
+const validateCurrentProjectJsonSchema = {
+  type: 'object',
+  properties: {
+    include_generated_code: {
+      type: 'boolean',
+      description:
+        'Default true. When true, extension function generated JavaScript is preflighted as part of validation.',
+    },
+  },
+  additionalProperties: true,
+};
+
+const projectJsonPatchSchema = {
+  type: 'object',
+  properties: {
+    patch: {
+      type: 'array',
+      description:
+        'RFC-6902-style JSON patch array. Paths are relative to the selected scope root; omit scope or use scope:"project" for full project paths.',
+      items: jsonPatchOperationSchema,
+    },
+    patch_file: {
+      type: 'string',
+      description:
+        'Optional local file containing the JSON patch array. Relative paths resolve from the active project folder.',
+    },
+    scope: {
+      type: 'string',
+      description:
+        'Optional scope for relative patch paths: project, scene, extension, extension_object, or extension_function.',
+    },
+    scene_name: sceneNameSchema.properties.scene_name,
+    extension_name: {
+      type: 'string',
+      description: 'Name of the project events-functions extension.',
+    },
+    parent_kind: {
+      type: 'string',
+      description: 'For extension_function scope: extension, behavior, or object.',
+    },
+    parent_name: {
+      type: 'string',
+      description:
+        'For extension_function scope when parent_kind is behavior/object.',
+    },
+    object_name: {
+      type: 'string',
+      description: 'For extension_object scope.',
+    },
+    function_name: {
+      type: 'string',
+      description: 'For extension_function scope.',
+    },
+    dry_run: scenePatchSchema.properties.dry_run,
+    summary_only: scenePatchSchema.properties.summary_only,
+    include_generated_code:
+      validateCurrentProjectJsonSchema.properties.include_generated_code,
+    save: {
+      type: 'boolean',
+      description:
+        'When true, save the editor project after a successful validated apply. Validation failures and dry runs never save.',
+    },
+    snapshot_label: {
+      type: 'string',
+      description:
+        'Optional label for the automatic in-memory snapshot created before a real apply.',
+    },
+  },
+  additionalProperties: true,
+};
+
+const syncEditorFromValidatedProjectJsonSchema = {
+  type: 'object',
+  properties: {
+    dry_run: {
+      type: 'boolean',
+      description:
+        'Validate the saved project JSON and report whether it differs from editor memory without reloading it.',
+    },
+    include_generated_code:
+      validateCurrentProjectJsonSchema.properties.include_generated_code,
+  },
+  additionalProperties: true,
+};
+
 const batchDeleteSceneVariablesSchema = {
   type: 'object',
   properties: {
@@ -2707,6 +2802,58 @@ const validateExtensionEventsJsonSchema = {
     summary_only: extensionFunctionSchema.properties.summary_only,
   },
   required: ['extension_name', 'function_name'],
+  additionalProperties: true,
+};
+
+const replaceExtensionFunctionEventsFromFileSchema = {
+  type: 'object',
+  properties: {
+    extension_name: extensionNameSchema.properties.extension_name,
+    function_name: extensionFunctionSchema.properties.function_name,
+    parent_kind: extensionFunctionSchema.properties.parent_kind,
+    parent_name: extensionFunctionSchema.properties.parent_name,
+    events_json_file: replaceSceneEventsFromFileSchema.properties.events_json_file,
+    dry_run: replaceSceneEventsFromFileSchema.properties.dry_run,
+    summary_only: extensionFunctionSchema.properties.summary_only,
+    include_generated_code:
+      lintExtensionFunctionEventsSchema.properties.include_generated_code,
+  },
+  required: ['extension_name', 'function_name', 'events_json_file'],
+  additionalProperties: true,
+};
+
+const extensionPatchSchema = {
+  type: 'object',
+  properties: {
+    extension_name: extensionNameSchema.properties.extension_name,
+    patch: projectJsonPatchSchema.properties.patch,
+    patch_file: projectJsonPatchSchema.properties.patch_file,
+    scope: {
+      type: 'string',
+      description:
+        'Optional scope for relative patch paths: extension, extension_object, extension_behavior, extension_function, or property.',
+    },
+    object_name: {
+      type: 'string',
+      description: 'Internal name of the events-based object.',
+    },
+    behavior_name: {
+      type: 'string',
+      description: 'Internal name of the events-based behavior.',
+    },
+    parent_kind: extensionFunctionSchema.properties.parent_kind,
+    parent_name: extensionFunctionSchema.properties.parent_name,
+    function_name: extensionFunctionSchema.properties.function_name,
+    property_name: {
+      type: 'string',
+      description: 'For property scope: internal property name.',
+    },
+    dry_run: scenePatchSchema.properties.dry_run,
+    summary_only: scenePatchSchema.properties.summary_only,
+    include_generated_code:
+      lintExtensionFunctionEventsSchema.properties.include_generated_code,
+  },
+  required: ['extension_name'],
   additionalProperties: true,
 };
 
@@ -3109,6 +3256,105 @@ const extensionPropertySchema = {
   additionalProperties: true,
 };
 
+const customObjectRuntimeGeometrySchema = {
+  type: 'object',
+  properties: {
+    extension_name: extensionNameSchema.properties.extension_name,
+    object_name: extensionObjectSchema.properties.object_name,
+    parent_x: {
+      type: 'number',
+      description:
+        'Optional parent custom-object scene X. When provided with parent_y, child scene positions and scene bounds are reported.',
+    },
+    parent_y: {
+      type: 'number',
+      description:
+        'Optional parent custom-object scene Y. When provided with parent_x, child scene positions and scene bounds are reported.',
+    },
+    cursor_x: {
+      type: 'number',
+      description:
+        'Optional local/custom-object-space cursor X to test against parent area and rendered child bounds.',
+    },
+    cursor_y: {
+      type: 'number',
+      description:
+        'Optional local/custom-object-space cursor Y to test against parent area and rendered child bounds.',
+    },
+    cursor_scene_x: {
+      type: 'number',
+      description:
+        'Optional scene/world cursor X. When parent_x is provided, MCP converts this to custom-object local cursor_x.',
+    },
+    cursor_scene_y: {
+      type: 'number',
+      description:
+        'Optional scene/world cursor Y. When parent_y is provided, MCP converts this to custom-object local cursor_y.',
+    },
+    layer_name: {
+      type: 'string',
+      description:
+        'Optional layer name attached to cursor scene coordinates for reporting. Camera/layer conversion should come from runtime tools such as run_frames.',
+    },
+  },
+  required: ['extension_name', 'object_name'],
+  additionalProperties: true,
+};
+
+const prefabPropertyBindingsSchema = {
+  type: 'object',
+  properties: {
+    extension_name: extensionNameSchema.properties.extension_name,
+    object_name: extensionObjectSchema.properties.object_name,
+  },
+  required: ['extension_name', 'object_name'],
+  additionalProperties: true,
+};
+
+const bindChildSpriteResourcePropertySchema = {
+  type: 'object',
+  properties: {
+    extension_name: extensionNameSchema.properties.extension_name,
+    object_name: extensionObjectSchema.properties.object_name,
+    child_object_name: {
+      type: 'string',
+      description: 'Child Sprite object whose frame image should use the property default resource.',
+    },
+    property_name: {
+      type: 'string',
+      description: 'Resource property descriptor on the events-based object.',
+    },
+    resource_name: {
+      type: 'string',
+      description:
+        'Optional resource name to use. Defaults to the Resource property descriptor value.',
+    },
+    animation_name: {
+      type: 'string',
+      description:
+        'Optional Sprite animation name to target. Omit to target the first matching frame.',
+    },
+    frame_index: {
+      type: 'number',
+      description:
+        'Frame index to update when replace_all_frames is false. Defaults to 0.',
+    },
+    replace_all_frames: {
+      type: 'boolean',
+      description:
+        'When true, replace every matching frame resource in the selected child Sprite animation(s).',
+    },
+    dry_run: scenePatchSchema.properties.dry_run,
+  },
+  required: [
+    'extension_name',
+    'object_name',
+    'child_object_name',
+    'property_name',
+  ],
+  additionalProperties: true,
+};
+
 const readTools: Array<McpTool> = [
   {
     name: 'gdevelop_get_editor_state',
@@ -3208,6 +3454,24 @@ const readTools: Array<McpTool> = [
     description:
       'Inspect an events-based behavior/object property inside a project-specific extension.',
     inputSchema: extensionPropertySchema,
+  },
+  {
+    name: 'validate_current_project_json',
+    description:
+      'Validate the currently open in-memory project by serializing it, unserializing it through GDevelop, scanning events/resources, and preflighting generated extension JavaScript when enabled. Does not mutate or save.',
+    inputSchema: validateCurrentProjectJsonSchema,
+  },
+  {
+    name: 'inspect_custom_object_runtime_geometry',
+    description:
+      'Inspect events-based object geometry for prefab coordinate debugging: parent/custom object area, estimated visible child bounds, child local positions, Sprite points/collision masks, and cursor hit-test hints.',
+    inputSchema: customObjectRuntimeGeometrySchema,
+  },
+  {
+    name: 'inspect_prefab_property_bindings',
+    description:
+      'Inspect events-based object public properties, Resource properties, child Sprite static frame resources, and function event references to warn when a Resource property is not actually used dynamically.',
+    inputSchema: prefabPropertyBindingsSchema,
   },
   {
     name: 'gdevelop_list_commands',
@@ -3841,6 +4105,18 @@ const writeTools: Array<McpTool> = [
     },
   },
   {
+    name: 'apply_validated_project_json_patch',
+    description:
+      'Apply a controlled JSON patch to the currently open editor project. MCP creates an automatic in-memory snapshot, validates full GDevelop unserialization/events/generated extension JavaScript first, applies only if valid, optionally saves, and reports a compact semantic diff.',
+    inputSchema: projectJsonPatchSchema,
+  },
+  {
+    name: 'sync_editor_from_validated_project_json',
+    description:
+      'Reload the editor project model from the active project JSON file after validating the saved file through GDevelop. Creates an in-memory snapshot before replacing editor memory and warns when disk differs from current memory.',
+    inputSchema: syncEditorFromValidatedProjectJsonSchema,
+  },
+  {
     name: 'replace_object_definition',
     description:
       'Replace or create a scene object with a complete serialized object definition. This explicitly allows changing the object type. Pass summary_only:true to omit the full serialized object from the response.',
@@ -4071,6 +4347,12 @@ const writeTools: Array<McpTool> = [
     inputSchema: replaceSceneEventsFromFileSchema,
   },
   {
+    name: 'replace_extension_function_events_from_file',
+    description:
+      'Replace a free/behavior/object extension function event body from a local events JSON file, using the active project internally. Validates extension scope and generated JavaScript before applying; dry_run validates without writing.',
+    inputSchema: replaceExtensionFunctionEventsFromFileSchema,
+  },
+  {
     name: 'add_or_edit_variable',
     description:
       'Add or edit ONE global, scene, object, or behavior variable. To declare MANY variables at once (e.g. an object with hp/points/speed), prefer bulk_edit_scene_assets with its variables array (supports scope "scene"/"global"/"object") — one call instead of N.',
@@ -4129,6 +4411,12 @@ const writeTools: Array<McpTool> = [
     inputSchema: extensionFunctionSchema,
   },
   {
+    name: 'apply_validated_extension_patch',
+    description:
+      'Apply a focused JSON patch inside one project extension, events-based object/behavior, function, or property descriptor. Uses a temporary extension copy for GDevelop unserialization and generated-code validation before touching the live extension.',
+    inputSchema: extensionPatchSchema,
+  },
+  {
     name: 'gdevelop_delete_extension_function',
     description:
       'Delete a free, behavior, or object events function inside an extension.',
@@ -4169,6 +4457,12 @@ const writeTools: Array<McpTool> = [
     inputSchema: extensionPropertySchema,
   },
   {
+    name: 'bind_child_sprite_resource_property',
+    description:
+      'Best-effort helper for events-based object Resource properties and Sprite children. It updates the selected child Sprite frame resource to the property default and reads back bindings; for Sprite it reports that this is a static default, not a true dynamic per-instance binding.',
+    inputSchema: bindChildSpriteResourcePropertySchema,
+  },
+  {
     name: 'gdevelop_delete_extension_property',
     description:
       'Delete an events-based behavior/object property inside an extension.',
@@ -4198,6 +4492,12 @@ const commandTools: Array<McpTool> = [
     description:
       'Save the current project and wait for the editor save promise to resolve, returning saved/failed status instead of a launched command.',
     inputSchema: emptyObjectSchema,
+  },
+  {
+    name: 'save_and_relaunch_preview_paused',
+    description:
+      'Save the project, close stale previews, launch a fresh debug preview paused, wait until the runtime is ready, and return debugger id, scene/runtime counts, variables, and errors.',
+    inputSchema: saveAndRelaunchPreviewPausedSchema,
   },
 ];
 
@@ -4729,6 +5029,127 @@ const toolUsageExamples: { [string]: Array<Object> } = {
           },
         ],
         summary_only: true,
+      },
+    },
+  ],
+  validate_current_project_json: [
+    {
+      description:
+        'Validate the open editor project before or after risky generated edits.',
+      arguments: {
+        include_generated_code: true,
+      },
+    },
+  ],
+  apply_validated_project_json_patch: [
+    {
+      description:
+        'Patch one scene through the full-project validator, with paths relative to that scene.',
+      arguments: {
+        scope: 'scene',
+        scene_name: 'Level1',
+        patch: [{ op: 'replace', path: '/name', value: 'LevelOne' }],
+        dry_run: true,
+        summary_only: true,
+      },
+    },
+    {
+      description:
+        'Patch a Resource property inside an events-based object and save only after validation passes.',
+      arguments: {
+        scope: 'extension_object',
+        extension_name: 'PlantCards',
+        object_name: 'PlantCardSlot',
+        patch: [
+          {
+            op: 'replace',
+            path: '/propertyDescriptors/0/value',
+            value: 'SunflowerCard',
+          },
+        ],
+        save: true,
+        summary_only: true,
+      },
+    },
+  ],
+  sync_editor_from_validated_project_json: [
+    {
+      description:
+        'Validate the active project file on disk and report whether reloading it would overwrite editor memory.',
+      arguments: {
+        dry_run: true,
+      },
+    },
+  ],
+  replace_extension_function_events_from_file: [
+    {
+      description:
+        'Replace a large events-based object function from a local JSON file without inlining the event array.',
+      arguments: {
+        extension_name: 'PlantCards',
+        parent_kind: 'object',
+        parent_name: 'PlantCardSlot',
+        function_name: 'Handle',
+        events_json_file: 'D:/tmp/PlantCardSlot_Handle.events.json',
+        summary_only: true,
+      },
+    },
+  ],
+  apply_validated_extension_patch: [
+    {
+      description:
+        'Patch an events-based object area on a temporary extension copy first.',
+      arguments: {
+        extension_name: 'PlantCards',
+        scope: 'extension_object',
+        object_name: 'PlantCardSlot',
+        patch: [
+          { op: 'replace', path: '/areaMinX', value: 0 },
+          { op: 'replace', path: '/areaMinY', value: 0 },
+          { op: 'replace', path: '/areaMaxX', value: 105 },
+          { op: 'replace', path: '/areaMaxY', value: 67 },
+        ],
+        dry_run: true,
+        summary_only: true,
+      },
+    },
+  ],
+  inspect_custom_object_runtime_geometry: [
+    {
+      description:
+        'Inspect parent area versus visible child bounds to debug IsCursorOnObject on a prefab.',
+      arguments: {
+        extension_name: 'PlantCards',
+        object_name: 'PlantCardSlot',
+        parent_x: 320,
+        parent_y: 160,
+        cursor_scene_x: 440,
+        cursor_scene_y: 200,
+        layer_name: 'HUD',
+      },
+    },
+  ],
+  inspect_prefab_property_bindings: [
+    {
+      description:
+        'Check whether Resource properties are static child defaults or actually used in object function events.',
+      arguments: {
+        extension_name: 'PlantCards',
+        object_name: 'PlantCardSlot',
+      },
+    },
+  ],
+  bind_child_sprite_resource_property: [
+    {
+      description:
+        'Use a Resource property default as the static child Sprite frame resource and read back the binding audit.',
+      arguments: {
+        extension_name: 'PlantCards',
+        object_name: 'PlantCardSlot',
+        child_object_name: 'MousePreview',
+        property_name: 'MousePreviewSpriteImage',
+        animation_name: 'Default',
+        frame_index: 0,
       },
     },
   ],
@@ -5419,6 +5840,15 @@ const toolUsageExamples: { [string]: Array<Object> } = {
       arguments: {},
     },
   ],
+  save_and_relaunch_preview_paused: [
+    {
+      description:
+        'Recover from stale extension edits by saving, closing previews, and relaunching one paused debug preview.',
+      arguments: {
+        timeout_ms: 10000,
+      },
+    },
+  ],
   add_or_edit_variable: [
     {
       description: 'Create or update a scene variable before writing events.',
@@ -5648,11 +6078,11 @@ export const getCapabilitiesSummary = (
   permissions: McpPermissionOptions
 ): Object => {
   const available = new Set(getMcpTools(permissions).map(tool => tool.name));
-  const allByName = {};
+  const allByName: { [string]: McpTool } = {};
   getAllMcpToolsForIntrospection().forEach(tool => {
     allByName[tool.name] = tool;
   });
-  const categories = {
+  const categories: { [string]: Array<string> } = {
     'Project & editor state': [
       'gdevelop_get_editor_state',
       'gdevelop_get_project_summary',
@@ -5661,6 +6091,7 @@ export const getCapabilitiesSummary = (
       'gdevelop_get_editor_selection',
       'gdevelop_capabilities',
       'gdevelop_refresh_tool_catalog',
+      'validate_current_project_json',
     ],
     'Read scene / objects / events': [
       'read_serialized_scene',
@@ -5681,6 +6112,8 @@ export const getCapabilitiesSummary = (
       'list_available_behaviors',
       'search_behavior_store',
       'inspect_project_resources',
+      'inspect_custom_object_runtime_geometry',
+      'inspect_prefab_property_bindings',
       'inspect_resource_images',
       'audit_project_asset_sources',
       'compare_image_files',
@@ -5707,6 +6140,7 @@ export const getCapabilitiesSummary = (
       'put_2d_instances',
       'add_behavior',
       'gdevelop_extract_prefab_from_object',
+      'bind_child_sprite_resource_property',
     ],
     'Author events': [
       'create_action',
@@ -5718,6 +6152,8 @@ export const getCapabilitiesSummary = (
       'attach_object_to_object_top',
       'validate_events_json_file',
       'gdevelop_validate_extension_events_json',
+      'replace_extension_function_events_from_file',
+      'apply_validated_extension_patch',
       'lint_scene_events',
       'lint_extension_function_events',
       'inspect_gameplay_rules',
@@ -5739,6 +6175,7 @@ export const getCapabilitiesSummary = (
       'run_frames',
       'preview_health_check',
       'gdevelop_inspect_running_preview',
+      'save_and_relaunch_preview_paused',
       'capture_preview_screenshot',
       'render_scene_to_png',
       'control_preview',
@@ -5748,10 +6185,12 @@ export const getCapabilitiesSummary = (
     'Safety & persistence': [
       'snapshot_project',
       'restore_project_snapshot',
+      'apply_validated_project_json_patch',
+      'sync_editor_from_validated_project_json',
       'gdevelop_save_project_and_wait',
     ],
   };
-  const result = {};
+  const result: { [string]: Array<Object> } = {};
   Object.keys(categories).forEach(category => {
     const entries = categories[category]
       .filter(name => available.has(name))

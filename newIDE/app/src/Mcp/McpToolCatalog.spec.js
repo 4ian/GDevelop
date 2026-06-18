@@ -42,6 +42,9 @@ describe('McpToolCatalog', () => {
     expect(toolNames).toContain('gdevelop_validate_extension_events_json');
     expect(toolNames).toContain('lint_scene_events');
     expect(toolNames).toContain('lint_extension_function_events');
+    expect(toolNames).toContain('validate_current_project_json');
+    expect(toolNames).toContain('inspect_custom_object_runtime_geometry');
+    expect(toolNames).toContain('inspect_prefab_property_bindings');
     expect(toolNames).toContain('get_tilemap_tiles');
     expect(toolNames).toContain('inspect_tilemap_palette');
     expect(toolNames).toContain('inspect_tilemap_collision');
@@ -117,14 +120,20 @@ describe('McpToolCatalog', () => {
     expect(toolNames).toContain('rename_group');
     expect(toolNames).toContain('ensure_scene_event_ids');
     expect(toolNames).toContain('replace_scene_events_from_file');
+    expect(toolNames).toContain('apply_validated_project_json_patch');
+    expect(toolNames).toContain('sync_editor_from_validated_project_json');
     expect(toolNames).toContain('gdevelop_create_or_update_extension');
     expect(toolNames).toContain('gdevelop_create_or_update_extension_function');
+    expect(toolNames).toContain('replace_extension_function_events_from_file');
+    expect(toolNames).toContain('apply_validated_extension_patch');
     expect(toolNames).toContain('gdevelop_create_or_update_extension_behavior');
     expect(toolNames).toContain('gdevelop_create_or_update_extension_object');
     expect(toolNames).toContain('gdevelop_extract_prefab_from_object');
     expect(toolNames).toContain('gdevelop_create_or_update_extension_property');
+    expect(toolNames).toContain('bind_child_sprite_resource_property');
     expect(toolNames).toContain('gdevelop_run_command');
     expect(toolNames).toContain('gdevelop_save_project_and_wait');
+    expect(toolNames).toContain('save_and_relaunch_preview_paused');
   });
 
   it('classifies tool permissions', () => {
@@ -166,14 +175,30 @@ describe('McpToolCatalog', () => {
     expect(isWriteTool('gdevelop_validate_extension_events_json')).toBe(false);
     expect(isWriteTool('lint_scene_events')).toBe(false);
     expect(isWriteTool('lint_extension_function_events')).toBe(false);
+    expect(isWriteTool('validate_current_project_json')).toBe(false);
+    expect(isWriteTool('inspect_custom_object_runtime_geometry')).toBe(false);
+    expect(isWriteTool('inspect_prefab_property_bindings')).toBe(false);
+    expect(isWriteTool('apply_validated_project_json_patch')).toBe(true);
+    expect(isWriteTool('sync_editor_from_validated_project_json')).toBe(true);
     expect(isWriteTool('gdevelop_create_or_update_extension')).toBe(true);
+    expect(isWriteTool('replace_extension_function_events_from_file')).toBe(
+      true
+    );
+    expect(isWriteTool('apply_validated_extension_patch')).toBe(true);
+    expect(isWriteTool('bind_child_sprite_resource_property')).toBe(true);
     expect(isWriteTool('gdevelop_extract_prefab_from_object')).toBe(true);
     expect(isWriteTool('read_scene_events')).toBe(false);
     expect(isWriteTool('gdevelop_list_extensions')).toBe(false);
     expect(isCommandTool('gdevelop_run_command')).toBe(true);
+    expect(isCommandTool('save_and_relaunch_preview_paused')).toBe(true);
     expect(isKnownMcpTool('inspect_object_properties')).toBe(true);
     expect(isKnownMcpTool('gdevelop_inspect_extension')).toBe(true);
     expect(isKnownMcpTool('find_scene_events')).toBe(true);
+    expect(isKnownMcpTool('apply_validated_project_json_patch')).toBe(true);
+    expect(isKnownMcpTool('replace_extension_function_events_from_file')).toBe(
+      true
+    );
+    expect(isKnownMcpTool('save_and_relaunch_preview_paused')).toBe(true);
     expect(isKnownMcpTool('find_extension_events')).toBe(true);
     expect(isKnownMcpTool('find_project_events')).toBe(true);
     expect(isCommandTool('gdevelop_save_project_and_wait')).toBe(true);
@@ -262,6 +287,22 @@ describe('McpToolCatalog', () => {
         .gdevelop_create_or_update_extension_property[0].arguments
         .property_type
     ).toBe('Number');
+    expect(
+      getMcpToolUsageExamples('apply_validated_project_json_patch')
+        .apply_validated_project_json_patch.length
+    ).toBeGreaterThan(0);
+    expect(
+      getMcpToolUsageExamples('replace_extension_function_events_from_file')
+        .replace_extension_function_events_from_file.length
+    ).toBeGreaterThan(0);
+    expect(
+      getMcpToolUsageExamples('bind_child_sprite_resource_property')
+        .bind_child_sprite_resource_property.length
+    ).toBeGreaterThan(0);
+    expect(
+      getMcpToolUsageExamples('save_and_relaunch_preview_paused')
+        .save_and_relaunch_preview_paused.length
+    ).toBeGreaterThan(0);
   });
 
   it('uses OpenAI-compatible top-level input schemas for every tool', () => {

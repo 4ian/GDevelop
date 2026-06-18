@@ -325,7 +325,7 @@ class EventsBasedObjectTreeViewItem implements TreeViewItem {
           new PlaceHolderTreeViewItem(
             'events-object-functions-placeholder.' +
               eventsBasedObject.getName(),
-            i18n._(t`Start by adding a new function.`)
+            i18n._(t`Start by adding a new function in prefab.`)
           ),
         ]
       : mapFor(0, childrenCount, i => {
@@ -1396,7 +1396,7 @@ const EventsFunctionsList = React.forwardRef<
             isRoot: true,
             content: new LabelTreeViewItemContent(
               extensionObjectsRootFolderId,
-              i18n._(t`Objects`),
+              i18n._(t`Prefabs`),
               {
                 icon: <Add />,
                 label: i18n._(t`Add an object`),
@@ -1408,7 +1408,7 @@ const EventsFunctionsList = React.forwardRef<
                 ? [
                     new PlaceHolderTreeViewItem(
                       extensionObjectsEmptyPlaceholderId,
-                      i18n._(t`Start by adding a new object.`)
+                      i18n._(t`Start by adding a new prefab in extension.`)
                     ),
                   ]
                 : // $FlowFixMe[incompatible-type]
@@ -1431,7 +1431,7 @@ const EventsFunctionsList = React.forwardRef<
                 ? [
                     new PlaceHolderTreeViewItem(
                       extensionBehaviorsEmptyPlaceholderId,
-                      i18n._(t`Start by adding a new behavior.`)
+                      i18n._(t`Start by adding a new behavior in extension.`)
                     ),
                   ]
                 : // $FlowFixMe[incompatible-type]
@@ -1486,7 +1486,7 @@ const EventsFunctionsList = React.forwardRef<
                 return [
                   new PlaceHolderTreeViewItem(
                     extensionFunctionsEmptyPlaceholderId,
-                    i18n._(t`Start by adding a new function.`)
+                    i18n._(t`Start by adding a new function in extension.`)
                   ),
                 ];
               }

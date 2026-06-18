@@ -61,6 +61,10 @@ export const getSceneTreeViewItemId = (scene: gdLayout): string => {
   return `scene-${scene.ptr}`;
 };
 
+export const getSceneEventsTreeViewItemId = (scene: gdLayout): string => {
+  return `scene-events-${scene.ptr}`;
+};
+
 export class SceneTreeViewItemContent implements TreeViewItemContent {
   scene: gdLayout;
   props: SceneTreeViewItemProps;
@@ -322,4 +326,94 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
     this.props.project.setFirstLayout(sceneName);
     this.props.forceUpdate();
   }
+}
+
+export class SceneEventsTreeViewItemContent implements TreeViewItemContent {
+  scene: gdLayout;
+  props: SceneTreeViewItemProps;
+  label: string;
+
+  constructor(scene: gdLayout, props: SceneTreeViewItemProps, label: string) {
+    this.scene = scene;
+    this.props = props;
+    this.label = label;
+  }
+
+  isDescendantOf(itemContent: TreeViewItemContent): boolean {
+    const itemId = itemContent.getId();
+    return (
+      itemId === scenesRootFolderId ||
+      itemId === getSceneTreeViewItemId(this.scene)
+    );
+  }
+
+  getRootId(): string {
+    return '';
+  }
+
+  getName(): string | React.Node {
+    return this.label;
+  }
+
+  getId(): string {
+    return getSceneEventsTreeViewItemId(this.scene);
+  }
+
+  getHtmlId(index: number): ?string {
+    return `scene-events-item-${index}`;
+  }
+
+  getDataSet(): ?HTMLDataset {
+    return {
+      scene: this.scene.getName(),
+      sceneEvents: this.scene.getName(),
+    };
+  }
+
+  getThumbnail(): ?string {
+    return 'res/icons_default/events_black.svg';
+  }
+
+  onClick(): void {
+    this.props.onOpenLayout(this.scene.getName(), {
+      openSceneEditor: false,
+      openEventsEditor: true,
+      focusWhenOpened: 'events',
+    });
+  }
+
+  buildMenuTemplate(i18n: I18nType, index: number): any {
+    return [
+      {
+        label: i18n._(t`Open events sheet`),
+        click: () => this.onClick(),
+      },
+    ];
+  }
+
+  renderRightComponent(i18n: I18nType): ?React.Node {
+    return null;
+  }
+
+  getRightButton(i18n: I18nType): any {
+    return null;
+  }
+
+  rename(newName: string): void {}
+
+  edit(): void {}
+
+  delete(): void {}
+
+  copy(): void {}
+
+  paste(): void {}
+
+  cut(): void {}
+
+  getIndex(): number {
+    return 0;
+  }
+
+  moveAt(destinationIndex: number): void {}
 }

@@ -1,7 +1,20 @@
 // @flow
-import { serializeToJSObject } from '../Utils/Serializer';
+import {
+  serializeToJSObject,
+  unserializeFromJSObject,
+} from '../Utils/Serializer';
+import optionalRequire from '../Utils/OptionalRequire';
+import { scanProjectForValidationErrors } from '../Utils/EventsValidationScanner';
+import { lintExtensionFunctionEvents } from './McpExtensionTools';
 
 const gd: libGDevelop = global.gd;
+const fs = optionalRequire('fs');
+const path = optionalRequire('path');
+
+const hasOwn = (object: any, propertyName: string): boolean =>
+  !!object &&
+  typeof object === 'object' &&
+  Object.keys(object).includes(propertyName);
 
 // In-memory project snapshots for a coarse transaction/rollback (#10). A build
 // can snapshot before a multi-step edit and restore on failure. Session-scoped
@@ -53,6 +66,684 @@ export const restoreProjectSnapshot = (
     label: createdLabel,
     note:
       'Project restored in memory from the snapshot. Open scene editors may hold stale references — if the editor UI looks wrong, reopen the affected scene tab. Re-inspect with read_serialized_scene to confirm state. This did not touch disk.',
+  };
+};
+
+const parseJsonPointer = (pointer: string): Array<string> => {
+  if (pointer === '') return [];
+  if (typeof pointer !== 'string' || !pointer.startsWith('/')) {
+    throw new Error(`JSON patch path must start with "/": "${pointer}".`);
+  }
+  return pointer
+    .slice(1)
+    .split('/')
+    .map(part => part.replace(/~1/g, '/').replace(/~0/g, '~'));
+};
+
+const assertSafePathParts = (parts: Array<string>) => {
+  parts.forEach(part => {
+    if (
+      part === '__proto__' ||
+      part === 'constructor' ||
+      part === 'prototype'
+    ) {
+      throw new Error(`Unsafe JSON patch path segment: "${part}".`);
+    }
+  });
+};
+
+const getPatchTarget = (
+  document: any,
+  pointer: string
+): {| container: any, key: string |} => {
+  const parts = parseJsonPointer(pointer);
+  assertSafePathParts(parts);
+  if (!parts.length) {
+    throw new Error('Patching the scoped root object is not supported.');
+  }
+
+  let container = document;
+  for (let index = 0; index < parts.length - 1; index++) {
+    const part = parts[index];
+    if (Array.isArray(container)) {
+      const arrayIndex = Number(part);
+      if (
+        !Number.isInteger(arrayIndex) ||
+        arrayIndex < 0 ||
+        arrayIndex >= container.length
+      ) {
+        throw new Error(`Invalid array index in patch path: "${pointer}".`);
+      }
+      container = container[arrayIndex];
+    } else if (
+      container &&
+      typeof container === 'object' &&
+      hasOwn(container, part)
+    ) {
+      container = container[part];
+    } else {
+      throw new Error(`Patch path does not exist: "${pointer}".`);
+    }
+  }
+
+  return {
+    container,
+    key: parts[parts.length - 1],
+  };
+};
+
+const valuesAreJsonEqual = (left: any, right: any): boolean =>
+  JSON.stringify(left) === JSON.stringify(right);
+
+const applySinglePatchOperation = (document: any, operation: Object) => {
+  if (!operation || typeof operation !== 'object') {
+    throw new Error('Patch operations must be objects.');
+  }
+  const op = getStringWithAliases(operation, ['op']) || '';
+  const pointer = getStringWithAliases(operation, ['path']) || '';
+  if (!op) throw new Error('Patch operation is missing op.');
+  if (!pointer) throw new Error('Patch operation is missing path.');
+
+  const { container, key } = getPatchTarget(document, pointer);
+  if (Array.isArray(container)) {
+    if (op === 'add' && key === '-') {
+      container.push(operation.value);
+      return;
+    }
+    const arrayIndex = Number(key);
+    if (!Number.isInteger(arrayIndex) || arrayIndex < 0) {
+      throw new Error(`Invalid array index in patch path: "${pointer}".`);
+    }
+    if (op === 'add') {
+      if (arrayIndex > container.length) {
+        throw new Error(`Array add index out of bounds: "${pointer}".`);
+      }
+      container.splice(arrayIndex, 0, operation.value);
+      return;
+    }
+    if (arrayIndex >= container.length) {
+      throw new Error(`Array index out of bounds: "${pointer}".`);
+    }
+    if (op === 'replace') {
+      container[arrayIndex] = operation.value;
+      return;
+    }
+    if (op === 'remove') {
+      container.splice(arrayIndex, 1);
+      return;
+    }
+    if (op === 'test') {
+      if (!valuesAreJsonEqual(container[arrayIndex], operation.value)) {
+        throw new Error(`JSON patch test failed at "${pointer}".`);
+      }
+      return;
+    }
+  } else if (container && typeof container === 'object') {
+    if (op === 'add' || op === 'replace') {
+      if (
+        op === 'replace' &&
+        !hasOwn(container, key)
+      ) {
+        throw new Error(`Patch replace path does not exist: "${pointer}".`);
+      }
+      container[key] = operation.value;
+      return;
+    }
+    if (op === 'remove') {
+      if (!hasOwn(container, key)) {
+        throw new Error(`Patch remove path does not exist: "${pointer}".`);
+      }
+      delete container[key];
+      return;
+    }
+    if (op === 'test') {
+      if (!hasOwn(container, key)) {
+        throw new Error(`Patch test path does not exist: "${pointer}".`);
+      }
+      if (!valuesAreJsonEqual(container[key], operation.value)) {
+        throw new Error(`JSON patch test failed at "${pointer}".`);
+      }
+      return;
+    }
+  }
+
+  throw new Error(`Unsupported JSON patch operation: "${op}".`);
+};
+
+const readJsonFile = (project: gdProject, file: string): any => {
+  if (!fs) throw new Error('Filesystem access is not available.');
+  const projectFile = project.getProjectFile();
+  const resolvedFile =
+    path && !path.isAbsolute(file) && projectFile
+      ? path.resolve(path.dirname(projectFile), file)
+      : file;
+  if (!fs.existsSync(resolvedFile)) {
+    throw new Error(
+      `File not found: "${file}"${
+        resolvedFile !== file ? ` (resolved to "${resolvedFile}")` : ''
+      }.`
+    );
+  }
+  return JSON.parse(fs.readFileSync(resolvedFile, 'utf8'));
+};
+
+const getPatchOperations = (project: gdProject, args: Object): Array<Object> => {
+  if (Array.isArray(args.patch)) return args.patch;
+  if (typeof args.patch === 'string') {
+    const parsedPatch = JSON.parse(args.patch);
+    if (!Array.isArray(parsedPatch)) {
+      throw new Error('patch string must contain a JSON patch array.');
+    }
+    return parsedPatch;
+  }
+  const patchFile = getStringWithAliases(args || {}, [
+    'patch_file',
+    'patchFile',
+  ]);
+  if (patchFile) {
+    const parsedPatch = readJsonFile(project, patchFile);
+    if (!Array.isArray(parsedPatch)) {
+      throw new Error('patch_file must contain a JSON patch array.');
+    }
+    return parsedPatch;
+  }
+  throw new Error('Missing patch array, patch string, or patch_file.');
+};
+
+const getNamedArrayIndex = (
+  items: any,
+  name: string,
+  label: string
+): number => {
+  if (!Array.isArray(items)) {
+    throw new Error(`Serialized project is missing ${label} array.`);
+  }
+  const index = items.findIndex(item => item && item.name === name);
+  if (index === -1) throw new Error(`${label} not found: "${name}".`);
+  return index;
+};
+
+const getScopedPatchTarget = (
+  serializedProject: Object,
+  args: Object
+): {| target: Object, scope: string, scopeRootPath: string |} => {
+  const scope = String(args.scope || 'project')
+    .trim()
+    .toLowerCase();
+  if (!scope || scope === 'project') {
+    return {
+      target: serializedProject,
+      scope: 'project',
+      scopeRootPath: '',
+    };
+  }
+
+  if (scope === 'scene' || scope === 'layout') {
+    const sceneName = getStringWithAliases(args, ['scene_name', 'sceneName']);
+    if (!sceneName) throw new Error('scope "scene" requires scene_name.');
+    const layoutIndex = getNamedArrayIndex(
+      serializedProject.layouts,
+      sceneName,
+      'scene/layout'
+    );
+    return {
+      target: serializedProject.layouts[layoutIndex],
+      scope: 'scene',
+      scopeRootPath: `/layouts/${layoutIndex}`,
+    };
+  }
+
+  const extensionName = getStringWithAliases(args, [
+    'extension_name',
+    'extensionName',
+  ]);
+  if (!extensionName) {
+    throw new Error(`scope "${scope}" requires extension_name.`);
+  }
+  const extensionIndex = getNamedArrayIndex(
+    serializedProject.eventsFunctionsExtensions,
+    extensionName,
+    'events-functions extension'
+  );
+  const extension = serializedProject.eventsFunctionsExtensions[extensionIndex];
+  if (scope === 'extension') {
+    return {
+      target: extension,
+      scope: 'extension',
+      scopeRootPath: `/eventsFunctionsExtensions/${extensionIndex}`,
+    };
+  }
+
+  if (scope === 'extension_object' || scope === 'object') {
+    const objectName = getStringWithAliases(args, [
+      'object_name',
+      'objectName',
+      'parent_name',
+      'parentName',
+    ]);
+    if (!objectName) {
+      throw new Error(`scope "${scope}" requires object_name.`);
+    }
+    const objectIndex = getNamedArrayIndex(
+      extension.eventsBasedObjects,
+      objectName,
+      'events-based object'
+    );
+    return {
+      target: extension.eventsBasedObjects[objectIndex],
+      scope: 'extension_object',
+      scopeRootPath: `/eventsFunctionsExtensions/${extensionIndex}/eventsBasedObjects/${objectIndex}`,
+    };
+  }
+
+  if (scope === 'extension_function' || scope === 'function') {
+    const parentKind = String(args.parent_kind || 'extension')
+      .trim()
+      .toLowerCase();
+    const functionName = getStringWithAliases(args, [
+      'function_name',
+      'functionName',
+    ]);
+    if (!functionName) {
+      throw new Error(`scope "${scope}" requires function_name.`);
+    }
+    let container = extension.eventsFunctions;
+    let scopeRootPath = `/eventsFunctionsExtensions/${extensionIndex}/eventsFunctions`;
+    if (parentKind === 'object') {
+      const parentName = getStringWithAliases(args, [
+        'parent_name',
+        'parentName',
+      ]);
+      if (!parentName) throw new Error('parent_kind "object" requires parent_name.');
+      const objectIndex = getNamedArrayIndex(
+        extension.eventsBasedObjects,
+        parentName,
+        'events-based object'
+      );
+      container = extension.eventsBasedObjects[objectIndex].eventsFunctions;
+      scopeRootPath = `/eventsFunctionsExtensions/${extensionIndex}/eventsBasedObjects/${objectIndex}/eventsFunctions`;
+    } else if (parentKind === 'behavior') {
+      const parentName = getStringWithAliases(args, [
+        'parent_name',
+        'parentName',
+      ]);
+      if (!parentName)
+        throw new Error('parent_kind "behavior" requires parent_name.');
+      const behaviorIndex = getNamedArrayIndex(
+        extension.eventsBasedBehaviors,
+        parentName,
+        'events-based behavior'
+      );
+      container = extension.eventsBasedBehaviors[behaviorIndex].eventsFunctions;
+      scopeRootPath = `/eventsFunctionsExtensions/${extensionIndex}/eventsBasedBehaviors/${behaviorIndex}/eventsFunctions`;
+    }
+    const functionIndex = getNamedArrayIndex(
+      container,
+      functionName,
+      'events function'
+    );
+    return {
+      target: container[functionIndex],
+      scope: 'extension_function',
+      scopeRootPath: `${scopeRootPath}/${functionIndex}`,
+    };
+  }
+
+  throw new Error(
+    `Unsupported project patch scope "${scope}". Use project, scene, extension, extension_object, or extension_function.`
+  );
+};
+
+const getProjectSceneNames = (serializedProject: Object): Array<string> =>
+  Array.isArray(serializedProject.layouts)
+    ? serializedProject.layouts
+        .map(layout => (layout && typeof layout.name === 'string' ? layout.name : null))
+        .filter(Boolean)
+    : [];
+
+const summarizeProjectSemanticDiff = (
+  beforeProject: Object,
+  afterProject: Object,
+  changedPaths: Array<string>
+): Object => {
+  const beforeSceneNames = getProjectSceneNames(beforeProject);
+  const afterSceneNames = getProjectSceneNames(afterProject);
+  const beforeExtensions = Array.isArray(beforeProject.eventsFunctionsExtensions)
+    ? beforeProject.eventsFunctionsExtensions.map(extension => extension.name)
+    : [];
+  const afterExtensions = Array.isArray(afterProject.eventsFunctionsExtensions)
+    ? afterProject.eventsFunctionsExtensions.map(extension => extension.name)
+    : [];
+
+  return {
+    changedPaths,
+    sceneCountBefore: beforeSceneNames.length,
+    sceneCountAfter: afterSceneNames.length,
+    addedScenes: afterSceneNames.filter(name => !beforeSceneNames.includes(name)),
+    removedScenes: beforeSceneNames.filter(name => !afterSceneNames.includes(name)),
+    extensionCountBefore: beforeExtensions.length,
+    extensionCountAfter: afterExtensions.length,
+    addedExtensions: afterExtensions.filter(
+      name => !beforeExtensions.includes(name)
+    ),
+    removedExtensions: beforeExtensions.filter(
+      name => !afterExtensions.includes(name)
+    ),
+  };
+};
+
+const collectExtensionFunctionLintResults = (
+  project: gdProject,
+  includeGeneratedCode: boolean
+): Array<Object> => {
+  const results: Array<Object> = [];
+  for (
+    let extensionIndex = 0;
+    extensionIndex < project.getEventsFunctionsExtensionsCount();
+    extensionIndex++
+  ) {
+    const extension = project.getEventsFunctionsExtensionAt(extensionIndex);
+    const extensionName = extension.getName();
+    const collectContainer = (
+      parentKind: string,
+      parentName: ?string,
+      container: gdEventsFunctionsContainer
+    ) => {
+      for (
+        let functionIndex = 0;
+        functionIndex < container.getEventsFunctionsCount();
+        functionIndex++
+      ) {
+        const eventsFunction = container.getEventsFunctionAt(functionIndex);
+        try {
+          const result = lintExtensionFunctionEvents(project, {
+            extension_name: extensionName,
+            parent_kind: parentKind,
+            parent_name: parentName || undefined,
+            function_name: eventsFunction.getName(),
+            require_root_groups: false,
+            include_generated_code: includeGeneratedCode,
+          });
+          if (!result.valid) results.push(result);
+        } catch (error) {
+          results.push({
+            success: true,
+            valid: false,
+            extensionName,
+            parentKind,
+            parentName,
+            functionName: eventsFunction.getName(),
+            errors: [
+              {
+                severity: 'error',
+                type: 'extension-function-validation-exception',
+                error: error && error.message ? error.message : String(error),
+              },
+            ],
+          });
+        }
+      }
+    };
+
+    collectContainer('extension', null, extension.getEventsFunctions());
+
+    const behaviors = extension.getEventsBasedBehaviors();
+    for (let index = 0; index < behaviors.getCount(); index++) {
+      const behavior = behaviors.getAt(index);
+      collectContainer(
+        'behavior',
+        behavior.getName(),
+        behavior.getEventsFunctions()
+      );
+    }
+
+    const objects = extension.getEventsBasedObjects();
+    for (let index = 0; index < objects.getCount(); index++) {
+      const object = objects.getAt(index);
+      collectContainer('object', object.getName(), object.getEventsFunctions());
+    }
+  }
+  return results;
+};
+
+const validateSerializedProject = (
+  serializedProject: Object,
+  args: Object = {}
+): Object => {
+  // $FlowFixMe[invalid-constructor]
+  const validationProject = new gd.ProjectHelper.createNewGDJSProject();
+  try {
+    unserializeFromJSObject(validationProject, serializedProject);
+    // Round-trip serialization catches late serializer crashes and normalizes
+    // the same path the editor will use after a sync/apply.
+    serializeToJSObject(validationProject);
+    const projectValidationErrors = scanProjectForValidationErrors(
+      validationProject
+    );
+    const extensionLintFailures =
+      args.include_generated_code === false
+        ? []
+        : collectExtensionFunctionLintResults(validationProject, true);
+    const extensionErrors: Array<Object> = [];
+    extensionLintFailures.forEach(result => {
+      if (Array.isArray(result.errors)) {
+        result.errors.forEach(error =>
+          extensionErrors.push({
+            ...error,
+            extensionName: result.extensionName,
+            parentKind: result.parentKind,
+            parentName: result.parentName,
+            functionName: result.functionName,
+          })
+        );
+      }
+    });
+    const errors = [
+      ...projectValidationErrors.map(error => ({
+        severity: 'error',
+        ...error,
+      })),
+      ...extensionErrors,
+    ].filter(error => error.severity === 'error' || !error.severity);
+    return {
+      success: true,
+      valid: errors.length === 0,
+      projectName: validationProject.getName(),
+      projectUuid: validationProject.getProjectUuid(),
+      sceneNames: getProjectSceneNames(serializedProject),
+      projectValidationErrors,
+      extensionLintFailures,
+      errors,
+      generatedCodePreflight:
+        args.include_generated_code === false ? 'skipped' : 'checked',
+    };
+  } catch (error) {
+    return {
+      success: true,
+      valid: false,
+      errors: [
+        {
+          severity: 'error',
+          type: 'project-unserialize-failed',
+          error: error && error.message ? error.message : String(error),
+        },
+      ],
+    };
+  } finally {
+    validationProject.delete();
+  }
+};
+
+export const validateCurrentProjectJson = (
+  project: gdProject,
+  args: Object = {}
+): Object => {
+  const serializedProject = serializeToJSObject(project);
+  const validation = validateSerializedProject(serializedProject, args);
+  return {
+    ...validation,
+    validationMode: 'current-editor-project',
+    projectFile:
+      project.getProjectFile() ? project.getProjectFile() : undefined,
+    note:
+      'Validated the currently open in-memory project by serializing it and unserializing it through GDevelop. No project data was modified.',
+  };
+};
+
+export const applyValidatedProjectJsonPatch = (
+  project: gdProject,
+  args: Object = {}
+): Object => {
+  const patch = getPatchOperations(project, args);
+  const beforeSerializedProject = serializeToJSObject(project);
+  const patchedSerializedProject = JSON.parse(
+    JSON.stringify(beforeSerializedProject)
+  );
+  const scopedTarget = getScopedPatchTarget(patchedSerializedProject, args);
+  patch.forEach(operation => applySinglePatchOperation(scopedTarget.target, operation));
+
+  const validation = validateSerializedProject(patchedSerializedProject, args);
+  if (!validation.valid) {
+    return {
+      success: false,
+      valid: false,
+      dryRun: !!args.dry_run,
+      validation,
+      patchOperations: patch.length,
+      changedPaths: patch.map(operation => operation.path),
+      note:
+        'Patch was applied only to a temporary serialized project. Validation failed, so the editor project was not modified.',
+    };
+  }
+
+  const summaryOnly = !!(args.summary_only || args.summaryOnly);
+  const semanticDiff = summarizeProjectSemanticDiff(
+    beforeSerializedProject,
+    patchedSerializedProject,
+    patch.map(operation =>
+      scopedTarget.scopeRootPath
+        ? `${scopedTarget.scopeRootPath}${operation.path}`
+        : operation.path
+    )
+  );
+
+  if (args.dry_run === true) {
+    return {
+      success: true,
+      valid: true,
+      dryRun: true,
+      scope: scopedTarget.scope,
+      scopeRootPath: scopedTarget.scopeRootPath,
+      patchOperations: patch.length,
+      semanticDiff,
+      validation,
+      serializedProject: summaryOnly ? undefined : patchedSerializedProject,
+      note:
+        'Patch validated on a temporary serialized project only. The editor project was not modified.',
+    };
+  }
+
+  const snapshot = snapshotProject(project, {
+    label:
+      getStringWithAliases(args, ['snapshot_label', 'snapshotLabel', 'label']) ||
+      'before-validated-project-json-patch',
+  });
+  try {
+    unserializeFromJSObject(project, patchedSerializedProject);
+  } catch (error) {
+    restoreProjectSnapshot(project, { snapshot_id: snapshot.snapshotId });
+    throw error;
+  }
+
+  return {
+    success: true,
+    valid: true,
+    dryRun: false,
+    scope: scopedTarget.scope,
+    scopeRootPath: scopedTarget.scopeRootPath,
+    patchOperations: patch.length,
+    semanticDiff,
+    validation,
+    snapshot,
+    shouldSave: !!args.save,
+    serializedProject: summaryOnly ? undefined : serializeToJSObject(project),
+    note:
+      'Validated patch was applied to the editor project model. Save only after reviewing the semantic diff; pass save:true to let the MCP bridge save after a successful apply.',
+  };
+};
+
+export const syncEditorFromValidatedProjectJson = (
+  project: gdProject,
+  args: Object = {}
+): Object => {
+  const projectFile =
+    project.getProjectFile() ? project.getProjectFile() : null;
+  if (!projectFile) {
+    throw new Error('The current project has no project file path.');
+  }
+  if (!fs) throw new Error('Filesystem access is not available.');
+  const diskSerializedProject = JSON.parse(fs.readFileSync(projectFile, 'utf8'));
+  const validation = validateSerializedProject(diskSerializedProject, args);
+  const beforeSerializedProject = serializeToJSObject(project);
+  const semanticDiff = summarizeProjectSemanticDiff(
+    beforeSerializedProject,
+    diskSerializedProject,
+    []
+  );
+  const wouldOverwriteCurrentMemory = !valuesAreJsonEqual(
+    beforeSerializedProject,
+    diskSerializedProject
+  );
+  if (!validation.valid) {
+    return {
+      success: false,
+      valid: false,
+      dryRun: !!args.dry_run,
+      projectFile,
+      wouldOverwriteCurrentMemory,
+      validation,
+      semanticDiff,
+      note:
+        'Saved project JSON did not validate through GDevelop. The editor project was not reloaded.',
+    };
+  }
+
+  if (args.dry_run === true) {
+    return {
+      success: true,
+      valid: true,
+      dryRun: true,
+      projectFile,
+      wouldOverwriteCurrentMemory,
+      validation,
+      semanticDiff,
+      note:
+        'Saved project JSON validated. Dry run only; the editor project was not reloaded.',
+    };
+  }
+
+  const snapshot = snapshotProject(project, {
+    label: 'before-sync-editor-from-validated-project-json',
+  });
+  try {
+    unserializeFromJSObject(project, diskSerializedProject);
+    project.setProjectFile(projectFile);
+  } catch (error) {
+    restoreProjectSnapshot(project, { snapshot_id: snapshot.snapshotId });
+    throw error;
+  }
+
+  return {
+    success: true,
+    valid: true,
+    dryRun: false,
+    projectFile,
+    wouldOverwriteCurrentMemory,
+    validation,
+    semanticDiff,
+    snapshot,
+    note:
+      'Saved project JSON validated and was loaded into the editor project model. Any unsaved in-memory differences were replaced; use the snapshot id to roll back during this session.',
   };
 };
 
@@ -125,7 +816,7 @@ export const setFirstLayout = (project: gdProject, args: Object): Object => {
     throw new Error('Missing scene_name.');
   }
 
-  const changes = [];
+  const changes: Array<Object> = [];
   setFirstLayoutValue(project, sceneName, changes);
 
   return {
@@ -143,7 +834,7 @@ export const setProjectProperties = (
   project: gdProject,
   args: Object
 ): Object => {
-  const changes = [];
+  const changes: Array<Object> = [];
 
   const projectName = getStringWithAliases(args || {}, [
     'project_name',

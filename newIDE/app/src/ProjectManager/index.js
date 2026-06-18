@@ -47,6 +47,7 @@ import KeyboardShortcuts from '../UI/KeyboardShortcuts';
 import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import {
   SceneTreeViewItemContent,
+  SceneEventsTreeViewItemContent,
   getSceneTreeViewItemId,
   type SceneTreeViewItemProps,
   type SceneTreeViewItemCallbacks,
@@ -1272,17 +1273,24 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                       ),
                     ];
                   }
-                  return mapFor(
-                    0,
-                    project.getLayoutsCount(),
-                    i =>
-                      new LeafTreeViewItem(
-                        new SceneTreeViewItemContent(
-                          project.getLayoutAt(i),
-                          sceneTreeViewItemProps
-                        )
-                      )
-                  );
+                  return mapFor(0, project.getLayoutsCount(), i => {
+                    const scene = project.getLayoutAt(i);
+                    return new TreeViewItemWithChildren(
+                      new SceneTreeViewItemContent(
+                        scene,
+                        sceneTreeViewItemProps
+                      ),
+                      [
+                        new LeafTreeViewItem(
+                          new SceneEventsTreeViewItemContent(
+                            scene,
+                            sceneTreeViewItemProps,
+                            i18n._(t`Events`)
+                          )
+                        ),
+                      ]
+                    );
+                  });
                 },
               },
               {
@@ -1354,7 +1362,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                     return [
                       new PlaceHolderTreeViewItem(
                         customObjectsEmptyPlaceholderId,
-                        i18n._(t`Start by adding a new custom object.`)
+                        i18n._(t`Start by adding a new prefab in extension.`)
                       ),
                     ];
                   }
@@ -1402,7 +1410,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                     return [
                       new PlaceHolderTreeViewItem(
                         behaviorsEmptyPlaceholderId,
-                        i18n._(t`Start by adding a new behavior.`)
+                        i18n._(t`Start by adding a new behavior in extension.`)
                       ),
                     ];
                   }
@@ -1453,7 +1461,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                     return [
                       new PlaceHolderTreeViewItem(
                         functionsEmptyPlaceholderId,
-                        i18n._(t`Start by adding a new function.`)
+                        i18n._(t`Start by adding a new function in extension.`)
                       ),
                     ];
                   }
@@ -1660,6 +1668,13 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         ];
 
         if (!project) return nodeIds;
+
+        const layoutsCount = project.getLayoutsCount();
+        for (let layoutIndex = 0; layoutIndex < layoutsCount; layoutIndex++) {
+          nodeIds.push(
+            getSceneTreeViewItemId(project.getLayoutAt(layoutIndex))
+          );
+        }
 
         const eventsFunctionsExtensionsCount = project.getEventsFunctionsExtensionsCount();
         for (

@@ -13,8 +13,11 @@ jest.mock('../Utils/GDevelopServices/Extension', () => ({
   getBehaviorsRegistry: jest.fn(),
 }));
 
+// $FlowFixMe[cannot-resolve-module]
 const fs = require('fs');
+// $FlowFixMe[cannot-resolve-module]
 const os = require('os');
+// $FlowFixMe[cannot-resolve-module]
 const path = require('path');
 
 const gd: libGDevelop = global.gd;
@@ -69,19 +72,19 @@ describe('McpEditorBridge', () => {
     debuggerIds = ['preview-ws-0'],
     responders = {},
   }: Object = {}) => {
-    let callbacks = null;
-    let currentDebuggerIds = debuggerIds;
+    let callbacks: any = null;
+    let currentDebuggerIds: Array<string> = debuggerIds;
     return {
       getServerState: () => 'started',
       getExistingPreviewDebuggerIds: () => currentDebuggerIds,
       getExistingDebuggerIds: () => currentDebuggerIds,
-      registerCallbacks: registered => {
+      registerCallbacks: (registered: any) => {
         callbacks = registered;
         return () => {
           callbacks = null;
         };
       },
-      sendMessage: (id, message) => {
+      sendMessage: (id: string, message: any) => {
         const responder = responders[message.command];
         if (responder === undefined || !callbacks) return;
         const payload =
@@ -907,7 +910,7 @@ describe('McpEditorBridge', () => {
       return project;
     };
 
-    const lint = async project => {
+    const lint = async (project: gdProject) => {
       const bridge = makeBridge({ getProject: () => project });
       const response = await bridge.handleRendererMcpRequest({
         method: 'tools/call',
@@ -995,7 +998,7 @@ describe('McpEditorBridge', () => {
     project.insertNewLayout('Level1', 0);
     try {
       const bridge = makeBridge({ getProject: () => project });
-      const make = name =>
+      const make = (name: string) =>
         bridge.handleRendererMcpRequest({
           method: 'tools/call',
           params: {
@@ -1081,6 +1084,118 @@ describe('McpEditorBridge', () => {
       expect(project.getMaximumFPS()).toBe(120);
       expect(propertiesResult.project.name).toBe('Sky Battle Deluxe');
       expect(triggerUnsavedChanges).toHaveBeenCalledTimes(2);
+    } finally {
+      project.delete();
+    }
+  });
+
+  it('validates the current serialized project without write permissions', async () => {
+    // $FlowFixMe[invalid-constructor]
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    project.setName('Serializable Project');
+    project.insertNewLayout('Level1', 0);
+
+    try {
+      const bridge = makeBridge({
+        getProject: () => project,
+      });
+
+      const response = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'validate_current_project_json',
+          arguments: {},
+        },
+      });
+      const result = JSON.parse(response.content[0].text);
+
+      expect(response.isError).not.toBe(true);
+      expect(result.valid).toBe(true);
+      expect(result.validationMode).toBe('current-editor-project');
+      expect(project.getName()).toBe('Serializable Project');
+    } finally {
+      project.delete();
+    }
+  });
+
+  it('applies validated project JSON patches only after dry-run validation', async () => {
+    // $FlowFixMe[invalid-constructor]
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    project.setName('Before Patch');
+    project.insertNewLayout('Level1', 0);
+    const triggerUnsavedChanges: any = jest.fn();
+    const onSceneEventsModifiedOutsideEditor: any = jest.fn();
+    const onObjectsModifiedOutsideEditor: any = jest.fn();
+    const onInstancesModifiedOutsideEditor: any = jest.fn();
+
+    try {
+      const bridge = makeBridge({
+        getProject: () => project,
+        getPermissions: () => ({
+          allowWriteTools: true,
+          allowCommandTools: false,
+        }),
+        triggerUnsavedChanges,
+        onSceneEventsModifiedOutsideEditor,
+        onObjectsModifiedOutsideEditor,
+        onInstancesModifiedOutsideEditor,
+      });
+
+      const dryRunResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'apply_validated_project_json_patch',
+          arguments: {
+            dry_run: true,
+            summary_only: true,
+            patch: [
+              {
+                op: 'replace',
+                path: '/properties/name',
+                value: 'Dry Run Name',
+              },
+            ],
+          },
+        },
+      });
+      const dryRun = JSON.parse(dryRunResponse.content[0].text);
+
+      expect(dryRunResponse.isError).not.toBe(true);
+      expect(dryRun.success).toBe(true);
+      expect(dryRun.dryRun).toBe(true);
+      expect(project.getName()).toBe('Before Patch');
+      expect(triggerUnsavedChanges).not.toHaveBeenCalled();
+      expect(onObjectsModifiedOutsideEditor).not.toHaveBeenCalled();
+
+      const applyResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'apply_validated_project_json_patch',
+          arguments: {
+            summary_only: true,
+            snapshot_label: 'before-name-patch',
+            patch: [
+              {
+                op: 'replace',
+                path: '/properties/name',
+                value: 'After Patch',
+              },
+            ],
+          },
+        },
+      });
+      const applyResult = JSON.parse(applyResponse.content[0].text);
+
+      expect(applyResponse.isError).not.toBe(true);
+      expect(applyResult.success).toBe(true);
+      expect(applyResult.dryRun).toBe(false);
+      expect(applyResult.snapshot.snapshotId).toEqual(expect.any(String));
+      expect(applyResult.staleStateAdvisory.previewMayBeStale).toBe(false);
+      expect(project.getName()).toBe('After Patch');
+      expect(triggerUnsavedChanges).toHaveBeenCalledTimes(1);
+      expect(onSceneEventsModifiedOutsideEditor).toHaveBeenCalled();
+      expect(onObjectsModifiedOutsideEditor).toHaveBeenCalled();
+      expect(onInstancesModifiedOutsideEditor).toHaveBeenCalled();
     } finally {
       project.delete();
     }
@@ -2096,6 +2211,387 @@ describe('McpEditorBridge', () => {
             parameters: ['LocalSunCount', '+', '2'],
           }),
         ])
+      );
+    } finally {
+      project.delete();
+    }
+  });
+
+  it('replaces extension function events from a file and patches extension JSON safely', async () => {
+    // $FlowFixMe[invalid-constructor]
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    project.insertNewEventsFunctionsExtension('McpExt', 0);
+    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gdevelop-mcp-'));
+    const eventsFile = path.join(tempDir, 'replacement-events.json');
+    fs.writeFileSync(
+      eventsFile,
+      JSON.stringify([
+        {
+          type: 'BuiltinCommonInstructions::Standard',
+          aiGeneratedEventId: 'from-file-1',
+          conditions: [],
+          actions: [],
+        },
+        {
+          type: 'BuiltinCommonInstructions::Standard',
+          aiGeneratedEventId: 'from-file-2',
+          conditions: [],
+          actions: [],
+        },
+      ])
+    );
+    const onExtensionFunctionEventsModifiedOutsideEditor: any = jest.fn();
+
+    try {
+      const bridge = makeBridge({
+        getProject: () => project,
+        getPermissions: () => ({
+          allowWriteTools: true,
+          allowCommandTools: false,
+        }),
+        onExtensionFunctionEventsModifiedOutsideEditor,
+      });
+
+      const createResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'gdevelop_create_or_update_extension_function',
+          arguments: {
+            extension_name: 'McpExt',
+            function_name: 'AddSun',
+            function_type: 'action',
+            sentence: 'Add sun',
+            events_json: [
+              {
+                type: 'BuiltinCommonInstructions::Standard',
+                conditions: [],
+                actions: [],
+              },
+            ],
+            summary_only: true,
+          },
+        },
+      });
+      expect(createResponse.isError).not.toBe(true);
+      onExtensionFunctionEventsModifiedOutsideEditor.mockClear();
+
+      const replaceResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'replace_extension_function_events_from_file',
+          arguments: {
+            extension_name: 'McpExt',
+            function_name: 'AddSun',
+            function_type: 'action',
+            events_json_file: eventsFile,
+            summary_only: true,
+          },
+        },
+      });
+      const replaceResult = JSON.parse(replaceResponse.content[0].text);
+
+      expect(replaceResponse.isError).not.toBe(true);
+      expect(replaceResult.validationMode).toBe(
+        'replace-extension-function-events-from-file'
+      );
+      expect(replaceResult.beforeEventsCount).toBe(1);
+      expect(replaceResult.afterEventsCount).toBe(2);
+      expect(
+        onExtensionFunctionEventsModifiedOutsideEditor
+      ).toHaveBeenCalledWith({
+        extensionName: 'McpExt',
+        parentKind: 'extension',
+        parentName: null,
+        functionName: 'AddSun',
+        newOrChangedAiGeneratedEventIds: expect.any(Set),
+      });
+
+      const dryRunPatchResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'apply_validated_extension_patch',
+          arguments: {
+            extension_name: 'McpExt',
+            dry_run: true,
+            summary_only: true,
+            patch: [
+              {
+                op: 'add',
+                path: '/fullName',
+                value: 'Dry Run Extension',
+              },
+            ],
+          },
+        },
+      });
+      const dryRunPatch = JSON.parse(dryRunPatchResponse.content[0].text);
+      expect(dryRunPatchResponse.isError).not.toBe(true);
+      expect(dryRunPatch.dryRun).toBe(true);
+      expect(project.getEventsFunctionsExtension('McpExt').getFullName()).not.toBe(
+        'Dry Run Extension'
+      );
+
+      const patchResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'apply_validated_extension_patch',
+          arguments: {
+            extension_name: 'McpExt',
+            summary_only: true,
+            patch: [
+              {
+                op: 'add',
+                path: '/fullName',
+                value: 'Patched Extension',
+              },
+            ],
+          },
+        },
+      });
+      const patchResult = JSON.parse(patchResponse.content[0].text);
+
+      expect(patchResponse.isError).not.toBe(true);
+      expect(patchResult.success).toBe(true);
+      expect(patchResult.valid).toBe(true);
+      expect(patchResult.snapshot.snapshotId).toEqual(expect.any(String));
+      expect(project.getEventsFunctionsExtension('McpExt').getFullName()).toBe(
+        'Patched Extension'
+      );
+    } finally {
+      fs.rmSync(tempDir, { recursive: true, force: true });
+      project.delete();
+    }
+  });
+
+  it('inspects prefab geometry and binds child Sprite resources from Resource properties', async () => {
+    // $FlowFixMe[invalid-constructor]
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    project.insertNewEventsFunctionsExtension('McpExt', 0);
+
+    try {
+      const bridge = makeBridge({
+        getProject: () => project,
+        getPermissions: () => ({
+          allowWriteTools: true,
+          allowCommandTools: false,
+        }),
+      });
+
+      const createResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'gdevelop_create_or_update_extension_object',
+          arguments: {
+            extension_name: 'McpExt',
+            object_name: 'PlantCardSlot',
+            summary_only: true,
+            serialized_object: {
+              name: 'PlantCardSlot',
+              defaultName: 'PlantCardSlot',
+              fullName: 'Plant card slot',
+              description: 'Reusable plant card slot.',
+              areaMinX: 0,
+              areaMinY: 0,
+              areaMinZ: 0,
+              areaMaxX: 100,
+              areaMaxY: 80,
+              areaMaxZ: 64,
+              objects: [
+                {
+                  adaptCollisionMaskAutomatically: true,
+                  assetStoreId: '',
+                  name: 'MousePreview',
+                  type: 'Sprite',
+                  updateIfNotVisible: false,
+                  variables: [],
+                  effects: [],
+                  behaviors: [],
+                  animations: [
+                    {
+                      name: 'Default',
+                      useMultipleDirections: false,
+                      directions: [
+                        {
+                          looping: false,
+                          timeBetweenFrames: 0.08,
+                          sprites: [
+                            {
+                              hasCustomCollisionMask: true,
+                              image: 'OldPlantImage',
+                              points: [],
+                              originPoint: {
+                                name: 'origine',
+                                x: 0,
+                                y: 0,
+                              },
+                              centerPoint: {
+                                automatic: true,
+                                name: 'centre',
+                                x: 0,
+                                y: 0,
+                              },
+                              customCollisionMask: [
+                                [
+                                  { x: 0, y: 0 },
+                                  { x: 32, y: 0 },
+                                  { x: 32, y: 48 },
+                                  { x: 0, y: 48 },
+                                ],
+                              ],
+                            },
+                          ],
+                        },
+                      ],
+                    },
+                  ],
+                },
+              ],
+              objectsFolderStructure: {
+                folderName: '__ROOT',
+                children: [{ objectName: 'MousePreview' }],
+              },
+              objectsGroups: [],
+              layers: [],
+              instances: [
+                {
+                  angle: 0,
+                  customSize: false,
+                  height: 0,
+                  keepRatio: true,
+                  layer: '',
+                  name: 'MousePreview',
+                  width: 0,
+                  x: 4,
+                  y: 6,
+                  zOrder: 1,
+                  numberProperties: [],
+                  stringProperties: [],
+                  initialVariables: [],
+                },
+              ],
+              eventsFunctions: [],
+              eventsFunctionsFolderStructure: { folderName: '__ROOT' },
+              propertyDescriptors: [
+                {
+                  name: 'MousePreviewSpriteImage',
+                  type: 'Resource',
+                  value: 'NewPlantImage',
+                  label: 'Mouse preview sprite image',
+                  description: 'Image used for the mouse-following preview.',
+                },
+              ],
+              variants: [],
+            },
+          },
+        },
+      });
+      expect(createResponse.isError).not.toBe(true);
+
+      const geometryResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'inspect_custom_object_runtime_geometry',
+          arguments: {
+            extension_name: 'McpExt',
+            object_name: 'PlantCardSlot',
+            parent_x: 100,
+            parent_y: 200,
+            cursor_scene_x: 110,
+            cursor_scene_y: 212,
+            layer_name: 'HUD',
+          },
+        },
+      });
+      const geometry = JSON.parse(geometryResponse.content[0].text);
+
+      expect(geometryResponse.isError).not.toBe(true);
+      expect(geometry.parentArea).toEqual(
+        expect.objectContaining({ minX: 0, minY: 0, maxX: 100, maxY: 80 })
+      );
+      expect(geometry.children[0]).toEqual(
+        expect.objectContaining({
+          childName: 'MousePreview',
+          objectType: 'Sprite',
+        })
+      );
+      expect(geometry.children[0].bounds).toEqual(
+        expect.objectContaining({ minX: 4, minY: 6, width: 32, height: 48 })
+      );
+      expect(geometry.children[0].sceneBounds).toEqual(
+        expect.objectContaining({ minX: 104, minY: 206, width: 32, height: 48 })
+      );
+      expect(geometry.children[0].pointCoordinates).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            name: 'centre',
+            customObjectLocalX: 4,
+            customObjectLocalY: 6,
+            sceneX: 104,
+            sceneY: 206,
+          }),
+        ])
+      );
+      expect(geometry.renderedSceneBounds).toEqual(
+        expect.objectContaining({ minX: 104, minY: 206, width: 32, height: 48 })
+      );
+      expect(geometry.cursor.localX).toBe(10);
+      expect(geometry.cursor.localY).toBe(12);
+      expect(geometry.cursor.sceneX).toBe(110);
+      expect(geometry.cursor.sceneY).toBe(212);
+      expect(geometry.cursor.layer).toBe('HUD');
+      expect(geometry.cursor.insideParentArea).toBe(true);
+      expect(geometry.cursor.insideRenderedBounds).toBe(true);
+
+      const beforeBindingResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'inspect_prefab_property_bindings',
+          arguments: {
+            extension_name: 'McpExt',
+            object_name: 'PlantCardSlot',
+          },
+        },
+      });
+      const beforeBinding = JSON.parse(beforeBindingResponse.content[0].text);
+
+      expect(beforeBindingResponse.isError).not.toBe(true);
+      expect(beforeBinding.childResourceUses[0].resourceName).toBe(
+        'OldPlantImage'
+      );
+      expect(beforeBinding.warnings).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            propertyName: 'MousePreviewSpriteImage',
+            type: 'resource-property-not-dynamically-used',
+          }),
+        ])
+      );
+
+      const bindResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'bind_child_sprite_resource_property',
+          arguments: {
+            extension_name: 'McpExt',
+            object_name: 'PlantCardSlot',
+            child_object_name: 'MousePreview',
+            property_name: 'MousePreviewSpriteImage',
+            animation_name: 'Default',
+          },
+        },
+      });
+      const bindResult = JSON.parse(bindResponse.content[0].text);
+
+      expect(bindResponse.isError).not.toBe(true);
+      expect(bindResult.replacements[0]).toEqual(
+        expect.objectContaining({
+          beforeResourceName: 'OldPlantImage',
+          afterResourceName: 'NewPlantImage',
+        })
+      );
+      expect(bindResult.dynamicBindingCreated).toBe(false);
+      expect(bindResult.readback.childResourceUses[0].resourceName).toBe(
+        'NewPlantImage'
       );
     } finally {
       project.delete();
@@ -4285,7 +4781,7 @@ describe('McpEditorBridge', () => {
     try {
       const bridge = makeBridge({ getProject: () => project });
 
-      const search = async query => {
+      const search = async (query: string) => {
         const response = await bridge.handleRendererMcpRequest({
           method: 'tools/call',
           params: {
@@ -4399,19 +4895,20 @@ describe('McpEditorBridge', () => {
       },
     };
 
-    let callbacks = null;
+    let callbacks: any = null;
     const previewDebuggerServer = {
       getServerState: () => 'started',
       getExistingPreviewDebuggerIds: () => ['preview-ws-0', 'preview-ws-1'],
       getExistingDebuggerIds: () => ['preview-ws-0', 'preview-ws-1'],
-      getRecentLogs: id => (id === 'preview-ws-1' ? [recentCustomLog] : []),
-      registerCallbacks: registered => {
+      getRecentLogs: (id: string) =>
+        id === 'preview-ws-1' ? [recentCustomLog] : [],
+      registerCallbacks: (registered: any) => {
         callbacks = registered;
         return () => {
           callbacks = null;
         };
       },
-      sendMessage: (id, message) => {
+      sendMessage: (id: string, message: any) => {
         if (message.command === 'refresh' && callbacks) {
           // Simulate the running game replying asynchronously with a dump.
           setTimeout(() => {
@@ -4558,19 +5055,19 @@ describe('McpEditorBridge', () => {
   it('captures a screenshot from the requested debugger_id', async () => {
     const onePixelPng =
       'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+M8AAAMCAQDLuRBYAAAAAElFTkSuQmCC';
-    const requestedIds = [];
-    let callbacks = null;
+    const requestedIds: Array<string> = [];
+    let callbacks: any = null;
     const previewDebuggerServer = {
       getServerState: () => 'started',
       getExistingPreviewDebuggerIds: () => ['preview-ws-0', 'preview-ws-1'],
       getExistingDebuggerIds: () => ['preview-ws-0', 'preview-ws-1'],
-      registerCallbacks: registered => {
+      registerCallbacks: (registered: any) => {
         callbacks = registered;
         return () => {
           callbacks = null;
         };
       },
-      sendMessage: (id, message) => {
+      sendMessage: (id: string, message: any) => {
         requestedIds.push(id);
         setTimeout(
           () =>
@@ -5240,9 +5737,9 @@ describe('McpEditorBridge', () => {
   });
 
   it('launch_preview with start_paused pauses the new preview on connect', async () => {
-    let callbacks = null;
-    const sent = [];
-    const runCommand = jest.fn(commandName => {
+    let callbacks: any = null;
+    const sent: Array<any> = [];
+    const runCommand = jest.fn((commandName: string) => {
       // Simulate the new preview connecting shortly after launch.
       if (commandName === 'LAUNCH_DEBUG_PREVIEW' && callbacks) {
         setTimeout(() => {
@@ -5259,13 +5756,13 @@ describe('McpEditorBridge', () => {
       getServerState: () => 'started',
       getExistingPreviewDebuggerIds: () => [],
       getExistingDebuggerIds: () => [],
-      registerCallbacks: registered => {
+      registerCallbacks: (registered: any) => {
         callbacks = registered;
         return () => {
           callbacks = null;
         };
       },
-      sendMessage: (id, message) => {
+      sendMessage: (id: string, message: any) => {
         sent.push({ id, message });
         if (
           (message.command === 'getStatus' || message.command === 'pause') &&
@@ -5374,9 +5871,9 @@ describe('McpEditorBridge', () => {
   });
 
   it('launch_preview with force_new opens a new window even if a preview is connected', async () => {
-    let callbacks = null;
-    let debuggerIds = ['preview-ws-0'];
-    const runCommand = jest.fn(commandName => {
+    let callbacks: any = null;
+    let debuggerIds: Array<string> = ['preview-ws-0'];
+    const runCommand = jest.fn((commandName: string) => {
       if (commandName === 'LAUNCH_DEBUG_PREVIEW' && callbacks) {
         setTimeout(() => {
           debuggerIds = ['preview-ws-0', 'preview-ws-1'];
@@ -5393,13 +5890,13 @@ describe('McpEditorBridge', () => {
       getServerState: () => 'started',
       getExistingPreviewDebuggerIds: () => debuggerIds,
       getExistingDebuggerIds: () => debuggerIds,
-      registerCallbacks: registered => {
+      registerCallbacks: (registered: any) => {
         callbacks = registered;
         return () => {
           callbacks = null;
         };
       },
-      sendMessage: (id, message) => {
+      sendMessage: (id: string, message: any) => {
         if (message.command === 'getStatus' && message.messageId && callbacks) {
           setTimeout(() => {
             callbacks &&
@@ -5434,10 +5931,154 @@ describe('McpEditorBridge', () => {
     expect(runCommand).toHaveBeenCalledWith('LAUNCH_DEBUG_PREVIEW');
   });
 
+  it('saves, closes stale previews, relaunches paused, and inspects runtime state', async () => {
+    const saveProjectAndWait: any = jest.fn(async () => ({
+      saved: true,
+      consistency: { projectName: 'Preview Test' },
+    }));
+    const closeAllPreviews: any = jest.fn();
+    const sent: Array<Object> = [];
+    let callbacks: any = null;
+    let debuggerIds: Array<string> = ['preview-ws-old'];
+    const dumpPayload = {
+      _paused: true,
+      _variables: {
+        _variables: {},
+      },
+      _sceneStack: {
+        _stack: [
+          {
+            _name: 'Level1',
+            _isLoaded: true,
+            _instances: {
+              items: {
+                Player: [{}],
+              },
+            },
+            _objects: {
+              items: {
+                Player: { name: 'Player' },
+              },
+            },
+            _variables: {
+              _variables: {},
+            },
+          },
+        ],
+      },
+    };
+    const runCommand = jest.fn((commandName: string) => {
+      if (commandName === 'LAUNCH_DEBUG_PREVIEW' && callbacks) {
+        setTimeout(() => {
+          debuggerIds = ['preview-ws-new'];
+          callbacks &&
+            callbacks.onConnectionOpened({
+              id: 'preview-ws-new',
+              debuggerIds,
+            });
+        }, 2);
+      }
+      return true;
+    });
+    const closeAllConnections: any = jest.fn(() => {
+      const previousIds = debuggerIds;
+      debuggerIds = [];
+      if (callbacks) {
+        previousIds.forEach(id =>
+          callbacks.onConnectionClosed({ id, debuggerIds: [] })
+        );
+      }
+    });
+    const previewDebuggerServer = {
+      getServerState: () => 'started',
+      getExistingPreviewDebuggerIds: () => debuggerIds,
+      getExistingDebuggerIds: () => debuggerIds,
+      getRecentLogs: () => [],
+      registerCallbacks: (registered: any) => {
+        callbacks = registered;
+        return () => {
+          callbacks = null;
+        };
+      },
+      closeAllConnections,
+      sendMessage: (id: string, message: any) => {
+        sent.push({ id, message });
+        if (
+          (message.command === 'getStatus' || message.command === 'pause') &&
+          message.messageId &&
+          callbacks
+        ) {
+          setTimeout(() => {
+            callbacks &&
+              callbacks.onHandleParsedMessage({
+                id,
+                parsedMessage: {
+                  command: 'status',
+                  messageId: message.messageId,
+                  payload: {
+                    isPaused: message.command === 'pause',
+                    sceneName: 'Level1',
+                  },
+                },
+              });
+          }, 2);
+        }
+        if (message.command === 'refresh' && callbacks) {
+          setTimeout(() => {
+            callbacks &&
+              callbacks.onHandleParsedMessage({
+                id,
+                parsedMessage: { command: 'dump', payload: dumpPayload },
+              });
+          }, 2);
+        }
+      },
+    };
+    const bridge = makeBridge({
+      getPermissions: () => ({
+        allowWriteTools: false,
+        allowCommandTools: true,
+      }),
+      saveProjectAndWait,
+      closeAllPreviews,
+      runCommand,
+      getPreviewDebuggerServer: () => previewDebuggerServer,
+    });
+
+    const response = await bridge.handleRendererMcpRequest({
+      method: 'tools/call',
+      params: {
+        name: 'save_and_relaunch_preview_paused',
+        arguments: { timeout_ms: 1000 },
+      },
+    });
+    const result = JSON.parse(response.content[0].text);
+
+    expect(response.isError).not.toBe(true);
+    expect(result.success).toBe(true);
+    expect(result.saved).toBe(true);
+    expect(result.closedWindows).toBe(true);
+    expect(result.closedDebuggerConnections).toBe(true);
+    expect(result.launch.pauseConfirmed).toBe(true);
+    expect(result.debuggerId).toBe('preview-ws-new');
+    expect(result.sceneName).toBe('Level1');
+    expect(result.runtime.objectInstanceCounts.Player).toBe(1);
+    expect(saveProjectAndWait).toHaveBeenCalled();
+    expect(closeAllPreviews).toHaveBeenCalled();
+    expect(closeAllConnections).toHaveBeenCalled();
+    expect(runCommand).toHaveBeenCalledWith('LAUNCH_DEBUG_PREVIEW');
+    expect(
+      sent.some(
+        entry =>
+          entry.id === 'preview-ws-new' && entry.message.command === 'pause'
+      )
+    ).toBe(true);
+  });
+
   it('launch_preview reports not ready when a new preview connects but never answers getStatus', async () => {
-    let callbacks = null;
-    let debuggerIds = [];
-    const runCommand = jest.fn(commandName => {
+    let callbacks: any = null;
+    let debuggerIds: Array<string> = [];
+    const runCommand = jest.fn((commandName: string) => {
       if (commandName === 'LAUNCH_DEBUG_PREVIEW' && callbacks) {
         setTimeout(() => {
           debuggerIds = ['preview-ws-23'];
@@ -5454,13 +6095,13 @@ describe('McpEditorBridge', () => {
       getServerState: () => 'started',
       getExistingPreviewDebuggerIds: () => debuggerIds,
       getExistingDebuggerIds: () => debuggerIds,
-      registerCallbacks: registered => {
+      registerCallbacks: (registered: any) => {
         callbacks = registered;
         return () => {
           callbacks = null;
         };
       },
-      sendMessage: jest.fn(),
+      sendMessage: (jest.fn(): any),
     };
     const bridge = makeBridge({
       runCommand,
@@ -5591,7 +6232,7 @@ describe('McpEditorBridge', () => {
   });
 
   it('simulates input into a running preview with key-name mapping', async () => {
-    let captured = null;
+    let captured: any = null;
     const previewDebuggerServer = makeTargetedPreviewServer({
       responders: {
         simulateInput: message => {
@@ -5644,7 +6285,7 @@ describe('McpEditorBridge', () => {
   });
 
   it('run_frames injects input, steps frames, and returns runtime state in one call', async () => {
-    let capturedRunFrames = null;
+    let capturedRunFrames: any = null;
     const runDumpPayload = {
       _paused: true,
       _sceneStack: {
@@ -5725,7 +6366,7 @@ describe('McpEditorBridge', () => {
   });
 
   it('run_frames expands clickAndHold and returns cursor world coordinates', async () => {
-    let capturedRunFrames = null;
+    let capturedRunFrames: any = null;
     const previewDebuggerServer = makeTargetedPreviewServer({
       responders: {
         getStatus: { isPaused: true, sceneName: 'Level1' },
@@ -5801,13 +6442,13 @@ describe('McpEditorBridge', () => {
   });
 
   it('run_frames fails during readiness preflight when the connected preview is unresponsive', async () => {
-    const sent = [];
+    const sent: Array<Object> = [];
     const previewDebuggerServer = makeTargetedPreviewServer({
       debuggerIds: ['preview-ws-23'],
       responders: {},
     });
     const originalSendMessage = previewDebuggerServer.sendMessage;
-    previewDebuggerServer.sendMessage = (id, message) => {
+    previewDebuggerServer.sendMessage = (id: string, message: any) => {
       sent.push({ id, message });
       originalSendMessage(id, message);
     };
@@ -5937,7 +6578,7 @@ describe('McpEditorBridge', () => {
     // $FlowFixMe[invalid-constructor]
     const project = new gd.ProjectHelper.createNewGDJSProject();
     const layout = project.insertNewLayout('Level1', 0);
-    const triggerUnsavedChanges = jest.fn();
+    const triggerUnsavedChanges: any = jest.fn();
     // A real processEditorFunctionCalls would write events; assert it is NEVER
     // called under dry_run (the previous bug wrote events despite dry_run).
     const processEditorFunctionCalls = jest.fn(async () => ({ results: [] }));
@@ -5999,7 +6640,7 @@ describe('McpEditorBridge', () => {
       // The events part is routed to the add_scene_events editor function, which
       // is exercised via a mocked processEditorFunctionCalls (the real pipeline
       // is integration-tested elsewhere). We assert bulk forwards the events.
-      let editorCall = null;
+      let editorCall: any = null;
       const processEditorFunctionCalls: any = (jest.fn(
         async ({ functionCalls }) => {
           editorCall = functionCalls[0];
@@ -6121,19 +6762,19 @@ describe('McpEditorBridge', () => {
   });
 
   it('steps frames and sets runtime state via control tools', async () => {
-    const sent = [];
-    let callbacks = null;
+    const sent: Array<any> = [];
+    let callbacks: any = null;
     const previewDebuggerServer = {
       getServerState: () => 'started',
       getExistingPreviewDebuggerIds: () => ['preview-ws-0'],
       getExistingDebuggerIds: () => ['preview-ws-0'],
-      registerCallbacks: registered => {
+      registerCallbacks: (registered: any) => {
         callbacks = registered;
         return () => {
           callbacks = null;
         };
       },
-      sendMessage: (id, message) => {
+      sendMessage: (id: string, message: any) => {
         sent.push(message);
         // Reply (with matching messageId) to request/response commands.
         let payload = null;
@@ -6175,7 +6816,8 @@ describe('McpEditorBridge', () => {
     const stepResult = JSON.parse(stepResponse.content[0].text);
     expect(stepResult.success).toBe(true);
     expect(stepResult.steppedFrames).toBe(30);
-    expect(sent.find(m => m.command === 'stepFrames').count).toBe(30);
+    const stepFramesMessage: any = sent.find(m => m.command === 'stepFrames');
+    expect(stepFramesMessage.count).toBe(30);
 
     const pauseResponse = await bridge.handleRendererMcpRequest({
       method: 'tools/call',
@@ -6204,7 +6846,7 @@ describe('McpEditorBridge', () => {
   });
 
   it('closes all previews via control_preview close', async () => {
-    const closeAllPreviews = jest.fn();
+    const closeAllPreviews: any = jest.fn();
     const previewDebuggerServer = makeTargetedPreviewServer({
       debuggerIds: ['preview-ws-0'],
       responders: {},
@@ -6227,18 +6869,18 @@ describe('McpEditorBridge', () => {
 
   it('reports recent sounds from the preview status', async () => {
     const dumpPayload = { _paused: false, _sceneStack: { _stack: [] } };
-    let callbacks = null;
+    let callbacks: any = null;
     const previewDebuggerServer = {
       getServerState: () => 'started',
       getExistingPreviewDebuggerIds: () => ['preview-ws-0'],
       getExistingDebuggerIds: () => ['preview-ws-0'],
-      registerCallbacks: registered => {
+      registerCallbacks: (registered: any) => {
         callbacks = registered;
         return () => {
           callbacks = null;
         };
       },
-      sendMessage: (id, message) => {
+      sendMessage: (id: string, message: any) => {
         if (!callbacks) return;
         if (message.command === 'getStatus') {
           setTimeout(
@@ -6446,7 +7088,7 @@ describe('McpEditorBridge', () => {
     // $FlowFixMe[invalid-constructor]
     const project = new gd.ProjectHelper.createNewGDJSProject();
     project.insertNewLayout('Level1', 0);
-    // $FlowFixMe — mocked module.
+    // $FlowFixMe[prop-missing] mocked module.
     getBehaviorsRegistry.mockResolvedValue({
       headers: [
         {

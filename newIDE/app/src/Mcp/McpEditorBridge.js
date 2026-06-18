@@ -38,17 +38,22 @@ import {
   deleteExtensionFunction,
   deleteExtensionObject,
   deleteExtensionProperty,
+  applyValidatedExtensionPatch,
+  bindChildSpriteResourceProperty,
   extractPrefabFromObject,
   findExtensionEvents,
   findProjectEvents,
+  inspectCustomObjectRuntimeGeometry,
   inspectExtensionBehavior,
   inspectExtensionFunction,
   inspectExtensionObject,
   inspectExtensionProperty,
+  inspectPrefabPropertyBindings,
   inspectProjectExtension,
   listProjectExtensions,
   lintExtensionFunctionEvents,
   patchExtensionEventInstruction,
+  replaceExtensionFunctionEventsFromFile,
   validateExtensionEventsJson,
 } from './McpExtensionTools';
 import {
@@ -110,6 +115,9 @@ import {
   setProjectProperties,
   snapshotProject,
   restoreProjectSnapshot,
+  applyValidatedProjectJsonPatch,
+  syncEditorFromValidatedProjectJson,
+  validateCurrentProjectJson,
 } from './McpProjectTools';
 import { getBehaviorsRegistry } from '../Utils/GDevelopServices/Extension';
 import optionalRequire from '../Utils/OptionalRequire';
@@ -119,6 +127,11 @@ const fs = optionalRequire('fs');
 const path = optionalRequire('path');
 const electron = optionalRequire('electron');
 const nativeImage = electron && electron.nativeImage;
+
+const hasOwn = (object: any, propertyName: string): boolean =>
+  !!object &&
+  typeof object === 'object' &&
+  Object.keys(object).includes(propertyName);
 
 // Monotonic id used to match targeted preview request/response messages.
 let nextTargetedRequestId = 1;
@@ -271,10 +284,7 @@ const getObjectNames = (objectsContainer: gdObjectsContainer): Array<string> =>
 const getProjectFileLocation = (
   project: gdProject
 ): {| projectFile: ?string, projectFolder: ?string |} => {
-  const projectFile =
-    typeof project.getProjectFile === 'function'
-      ? project.getProjectFile() || null
-      : null;
+  const projectFile = project.getProjectFile() || null;
   const projectFolder = projectFile && path ? path.dirname(projectFile) : null;
   return { projectFile, projectFolder };
 };
@@ -496,7 +506,7 @@ const getCommandSummaries = () =>
 // ---------------------------------------------------------------------------
 
 // Read a GDJS Hashtable-like container ({ items: {...} }) or a plain object map.
-const readRuntimeMap = (container: any): Object => {
+const readRuntimeMap = (container: any): { [string]: any } => {
   if (!container || typeof container !== 'object') return {};
   if (container.items && typeof container.items === 'object')
     return container.items;
@@ -508,7 +518,7 @@ const readRuntimeVariableValue = (variable: any): any => {
   if (!variable || typeof variable !== 'object') return undefined;
   if (variable._isStructure && variable._children) {
     const children = readRuntimeMap(variable._children);
-    const result = {};
+    const result: { [string]: any } = {};
     Object.keys(children).forEach(childName => {
       result[childName] = readRuntimeVariableValue(children[childName]);
     });
@@ -523,10 +533,10 @@ const readRuntimeVariableValue = (variable: any): any => {
 };
 
 const summarizeRuntimeVariables = (variablesContainer: any): Object => {
-  const map = variablesContainer
+  const map: { [string]: any } = variablesContainer
     ? readRuntimeMap(variablesContainer._variables)
     : {};
-  const result = {};
+  const result: { [string]: any } = {};
   Object.keys(map).forEach(name => {
     if (name === 'items') return;
     result[name] = readRuntimeVariableValue(map[name]);
@@ -569,8 +579,8 @@ const summarizeRuntimeGameDump = (payload: any, options?: Object): Object => {
       // bug where every count showed 0. Note `_allInstancesList` is stripped
       // from the dump by the runtime, so totals are summed from `_instances`.
       const instancesMap = readRuntimeMap(scene._instances);
-      const objectInstanceCounts = {};
-      const instancePositions = {};
+      const objectInstanceCounts: { [string]: number } = {};
+      const instancePositions: { [string]: Array<Object> } = {};
       let totalInstances = 0;
       Object.keys(instancesMap).forEach(objectName => {
         if (objectName === 'items') return;
@@ -781,8 +791,8 @@ const getDebuggerLogKey = (entry: Object): string => {
 const mergeUniqueDebuggerLogs = (
   ...logLists: Array<?Array<Object>>
 ): Array<Object> => {
-  const result = [];
-  const seen = new Set();
+  const result: Array<Object> = [];
+  const seen: Set<string> = new Set();
   logLists.forEach(logList => {
     if (!Array.isArray(logList)) return;
     logList.forEach(entry => {
@@ -1111,13 +1121,13 @@ const resizeScreenshotDataUrlIfNeeded = (
 };
 
 const writeOrReturnScreenshot = (
-  dataUrl,
-  width,
-  height,
-  args,
-  source,
-  extra
-) => {
+  dataUrl: string,
+  width: number,
+  height: number,
+  args: Object,
+  source: string,
+  extra?: ?Object
+): Object => {
   const resized = resizeScreenshotDataUrlIfNeeded(dataUrl, width, height, args);
   const finalDataUrl = resized.dataUrl;
   const finalWidth = resized.width;
@@ -1183,7 +1193,11 @@ const capturePreviewScreenshot = async (
   // Quick context so the result is self-describing (#5): which preview + the
   // game scene/time the frame reflects, so a stale capture is obvious. Best
   // effort — a throttled window may not answer, then meta is just { debuggerId }.
-  const meta = { debuggerId: targetId };
+  const meta: {
+    debuggerId: string,
+    sceneName?: any,
+    sceneElapsedTimeSeconds?: any,
+  } = { debuggerId: targetId };
   try {
     const status = await sendTargetedRequest(
       (previewDebuggerServer: any),
@@ -1296,8 +1310,8 @@ const capturePreviewScreenshot = async (
 const KEY_NAME_TO_CODE: {
   [string]: {| code: number, location?: number |},
 } = (() => {
-  const map = {};
-  const add = (name, code, location) => {
+  const map: { [string]: {| code: number, location?: number |} } = {};
+  const add = (name: string, code: number, location?: number) => {
     map[name.toLowerCase()] = location ? { code, location } : { code };
   };
   for (let c = 65; c <= 90; c++) add(String.fromCharCode(c), c); // a-z
@@ -1965,7 +1979,11 @@ const getStaleStateTargetForTool = (
 
   if (
     toolName === 'gdevelop_create_or_update_extension_function' ||
-    toolName === 'patch_extension_event_instruction'
+    toolName === 'patch_extension_event_instruction' ||
+    toolName === 'replace_extension_function_events_from_file' ||
+    (toolName === 'apply_validated_extension_patch' &&
+      result &&
+      result.scope === 'extension_function')
   ) {
     const parentKind =
       (result && typeof result.parentKind === 'string'
@@ -2130,7 +2148,7 @@ const sendTargetedRequest = (
     const messageId = `mcp-${targetId}-${nextTargetedRequestId++}`;
     let settled = false;
     let unregister = () => {};
-    const finish = result => {
+    const finish = (result: Object) => {
       if (settled) return;
       settled = true;
       try {
@@ -2246,6 +2264,33 @@ const makePreviewRuntimeNotReadyResult = ({
   };
 };
 
+const notifyProjectModelChangedOutsideEditor = (
+  project: gdProject,
+  context: McpEditorBridgeContext
+) => {
+  for (let index = 0; index < project.getLayoutsCount(); index++) {
+    const scene = project.getLayoutAt(index);
+    if (context.onSceneEventsModifiedOutsideEditor) {
+      context.onSceneEventsModifiedOutsideEditor({
+        scene,
+        newOrChangedAiGeneratedEventIds: new Set(),
+      });
+    }
+    if (context.onObjectsModifiedOutsideEditor) {
+      context.onObjectsModifiedOutsideEditor({
+        scene,
+        isNewObjectTypeUsed: false,
+      });
+    }
+    if (context.onInstancesModifiedOutsideEditor) {
+      context.onInstancesModifiedOutsideEditor({ scene });
+    }
+    if (context.onObjectGroupsModifiedOutsideEditor) {
+      context.onObjectGroupsModifiedOutsideEditor({ scene });
+    }
+  }
+};
+
 const waitForPreviewRuntimeReady = async (
   previewDebuggerServer: Object,
   targetId: string,
@@ -2318,7 +2363,7 @@ const waitForNewPreviewDebuggerId = (
     let intervalId = null;
     let timeoutId = null;
     let lastConnectionError = null;
-    const finish = result => {
+    const finish = (result: Object) => {
       if (settled) return;
       settled = true;
       if (intervalId !== null) clearInterval(intervalId);
@@ -2940,10 +2985,10 @@ const normalizeSerializedEventsInputForValidation = (value: any): any => {
 
 const getGeneratedEventsPayload = (change: Object): any => {
   if (!change || typeof change !== 'object') return undefined;
-  if (Object.prototype.hasOwnProperty.call(change, 'generated_events')) {
+  if (hasOwn(change, 'generated_events')) {
     return change.generated_events;
   }
-  if (Object.prototype.hasOwnProperty.call(change, 'generatedEvents')) {
+  if (hasOwn(change, 'generatedEvents')) {
     return change.generatedEvents;
   }
   return undefined;
@@ -2951,7 +2996,7 @@ const getGeneratedEventsPayload = (change: Object): any => {
 
 const collectAddSceneEventsRawIssues = (args: ?Object): Array<Object> => {
   if (!args) return [];
-  const issues = [];
+  const issues: Array<Object> = [];
   const validatePayload = (source: string, payload: any) => {
     if (payload === null || payload === undefined) return;
     if (typeof payload === 'string' && payload.trim() === '') return;
@@ -3433,6 +3478,29 @@ const callMcpTool = async ({
     return textResult(validateExtensionEventsJson(project, args || {}));
   }
 
+  if (toolName === 'validate_current_project_json') {
+    if (!project) return errorResult('No project opened.');
+    return textResult(validateCurrentProjectJson(project, args || {}));
+  }
+
+  if (toolName === 'inspect_custom_object_runtime_geometry') {
+    if (!project) return errorResult('No project opened.');
+    try {
+      return textResult(inspectCustomObjectRuntimeGeometry(project, args || {}));
+    } catch (error) {
+      return errorResult(error.message);
+    }
+  }
+
+  if (toolName === 'inspect_prefab_property_bindings') {
+    if (!project) return errorResult('No project opened.');
+    try {
+      return textResult(inspectPrefabPropertyBindings(project, args || {}));
+    } catch (error) {
+      return errorResult(error.message);
+    }
+  }
+
   if (toolName === 'validate_events_json_file') {
     if (!project) return errorResult('No project opened.');
     return textResult(
@@ -3714,10 +3782,7 @@ const callMcpTool = async ({
       const headers = Array.isArray(registry.headers) ? registry.headers : [];
 
       // Which extensions are already installed in this project's platform.
-      const platform =
-        project && project.getCurrentPlatform
-          ? project.getCurrentPlatform()
-          : null;
+      const platform = project ? project.getCurrentPlatform() : null;
       const isInstalled = (extensionName: string): boolean => {
         if (!platform || !extensionName) return false;
         try {
@@ -4004,6 +4069,93 @@ const callMcpTool = async ({
     }
   }
 
+  if (toolName === 'save_and_relaunch_preview_paused') {
+    const saveProjectAndWait = context.saveProjectAndWait;
+    if (!saveProjectAndWait) {
+      return errorResult(
+        'The GDevelop host did not provide saveProjectAndWait, so MCP cannot save before relaunching the preview.'
+      );
+    }
+    const previewDebuggerServer = context.getPreviewDebuggerServer
+      ? context.getPreviewDebuggerServer()
+        : null;
+    try {
+      const save = await saveProjectAndWait();
+      let closedWindows = false;
+      let closedDebuggerConnections = false;
+      if (typeof context.closeAllPreviews === 'function') {
+        context.closeAllPreviews();
+        closedWindows = true;
+      }
+      if (
+        previewDebuggerServer &&
+        typeof previewDebuggerServer.closeAllConnections === 'function'
+      ) {
+        previewDebuggerServer.closeAllConnections();
+        closedDebuggerConnections = true;
+      }
+      const launch = await launchPreview(
+        previewDebuggerServer,
+        context.runCommand,
+        {
+          ...(args || {}),
+          start_paused: true,
+          force_new: true,
+        }
+      );
+      let inspect = null;
+      if (launch.success && launch.debuggerId) {
+        inspect = await captureRunningPreviewState(previewDebuggerServer, {
+          ...(args || {}),
+          debugger_id: launch.debuggerId,
+          timeout_ms: args && args.timeout_ms,
+        });
+      }
+      return textResult({
+        success: !!(save && launch && launch.success),
+        saved: !!save,
+        save,
+        closedWindows,
+        closedDebuggerConnections,
+        launch,
+        debuggerId: launch.debuggerId || null,
+        sceneName:
+          (inspect &&
+            inspect.runtime &&
+            Array.isArray(inspect.runtime.scenes) &&
+            inspect.runtime.scenes[0] &&
+            inspect.runtime.scenes[0].sceneName) ||
+          (launch.status && launch.status.sceneName) ||
+          null,
+        runtime:
+          inspect && inspect.runtime
+            ? {
+                sceneName:
+                  inspect.runtime.scenes &&
+                  inspect.runtime.scenes[0] &&
+                  inspect.runtime.scenes[0].sceneName,
+                objectInstanceCounts:
+                  inspect.runtime.scenes &&
+                  inspect.runtime.scenes[0] &&
+                  inspect.runtime.scenes[0].objectInstanceCounts,
+                sceneVariables:
+                  inspect.runtime.scenes &&
+                  inspect.runtime.scenes[0] &&
+                  inspect.runtime.scenes[0].sceneVariables,
+                globalVariables: inspect.runtime.globalVariables,
+              }
+            : undefined,
+        errors: inspect && inspect.errors ? inspect.errors : undefined,
+        note:
+          launch.success
+            ? 'Saved, closed stale previews, launched a fresh debug preview, confirmed pause/readiness, and inspected the runtime snapshot.'
+            : 'The save/close steps ran, but the fresh paused preview did not become ready. See launch diagnostics.',
+      });
+    } catch (error) {
+      return errorResult(error.message);
+    }
+  }
+
   if (toolName === 'launch_preview') {
     const previewDebuggerServer = context.getPreviewDebuggerServer
       ? context.getPreviewDebuggerServer()
@@ -4057,18 +4209,14 @@ const callMcpTool = async ({
       const project = context.getProject ? context.getProject() : null;
       let consistency;
       if (project) {
-        const sceneNames = [];
+        const sceneNames: Array<string> = [];
         for (let i = 0; i < project.getLayoutsCount(); i++) {
           sceneNames.push(project.getLayoutAt(i).getName());
         }
         consistency = {
-          projectName: project.getName ? project.getName() : undefined,
-          projectFile: project.getProjectFile
-            ? project.getProjectFile() || undefined
-            : undefined,
-          firstLayout: project.getFirstLayout
-            ? project.getFirstLayout() || undefined
-            : undefined,
+          projectName: project.getName(),
+          projectFile: project.getProjectFile() || undefined,
+          firstLayout: project.getFirstLayout() || undefined,
           sceneCount: sceneNames.length,
           sceneNames,
         };
@@ -4137,8 +4285,12 @@ const callMcpTool = async ({
     extensionWriteToolHandler = deleteExtension;
   } else if (toolName === 'gdevelop_create_or_update_extension_function') {
     extensionWriteToolHandler = createOrUpdateExtensionFunction;
+  } else if (toolName === 'replace_extension_function_events_from_file') {
+    extensionWriteToolHandler = replaceExtensionFunctionEventsFromFile;
   } else if (toolName === 'patch_extension_event_instruction') {
     extensionWriteToolHandler = patchExtensionEventInstruction;
+  } else if (toolName === 'apply_validated_extension_patch') {
+    extensionWriteToolHandler = applyValidatedExtensionPatch;
   } else if (toolName === 'gdevelop_delete_extension_function') {
     extensionWriteToolHandler = deleteExtensionFunction;
   } else if (toolName === 'gdevelop_create_or_update_extension_behavior') {
@@ -4155,14 +4307,31 @@ const callMcpTool = async ({
     extensionWriteToolHandler = createOrUpdateExtensionProperty;
   } else if (toolName === 'gdevelop_delete_extension_property') {
     extensionWriteToolHandler = deleteExtensionProperty;
+  } else if (toolName === 'bind_child_sprite_resource_property') {
+    extensionWriteToolHandler = bindChildSpriteResourceProperty;
   }
 
   if (extensionWriteToolHandler) {
     if (!project) return errorResult('No project opened.');
     try {
+      const extensionPatchSnapshot =
+        toolName === 'apply_validated_extension_patch' &&
+        !(args && (args.dry_run === true || args.dryRun === true))
+          ? snapshotProject(project, {
+              label: `before-validated-extension-patch-${(args &&
+                (args.extension_name || args.extensionName)) ||
+                'extension'}`,
+            })
+          : null;
       const result = extensionWriteToolHandler(project, args || {});
+      if (extensionPatchSnapshot && result.success && !result.dryRun) {
+        result.snapshot = extensionPatchSnapshot;
+      }
       const extensionFunctionEventsChanged =
         toolName === 'patch_extension_event_instruction' ||
+        toolName === 'replace_extension_function_events_from_file' ||
+        (toolName === 'apply_validated_extension_patch' &&
+          result.scope === 'extension_function') ||
         (toolName === 'gdevelop_create_or_update_extension_function' &&
           args &&
           (getEventsJsonArgument(args) ||
@@ -4224,12 +4393,50 @@ const callMcpTool = async ({
     try {
       const result = restoreProjectSnapshot(project, args || {});
       context.triggerUnsavedChanges();
+      notifyProjectModelChangedOutsideEditor(project, context);
       return textResult(
         withStaleStateAdvisory(
           result,
           context,
           getStaleStateTargetForTool(toolName, args, result)
         )
+      );
+    } catch (error) {
+      return errorResult(error.message);
+    }
+  }
+
+  if (
+    toolName === 'apply_validated_project_json_patch' ||
+    toolName === 'sync_editor_from_validated_project_json'
+  ) {
+    if (!project) return errorResult('No project opened.');
+    try {
+      const result =
+        toolName === 'apply_validated_project_json_patch'
+          ? applyValidatedProjectJsonPatch(project, args || {})
+          : syncEditorFromValidatedProjectJson(project, args || {});
+      if (result.success && !result.dryRun) {
+        context.triggerUnsavedChanges();
+        notifyProjectModelChangedOutsideEditor(project, context);
+        if (result.shouldSave && context.saveProjectAndWait) {
+          result.save = await context.saveProjectAndWait();
+        } else if (result.shouldSave) {
+          result.save = {
+            saved: false,
+            error:
+              'The GDevelop host did not provide saveProjectAndWait, so MCP could not save after applying the patch.',
+          };
+        }
+      }
+      return textResult(
+        result.success && !result.dryRun
+          ? withStaleStateAdvisory(
+              result,
+              context,
+              getStaleStateTargetForTool(toolName, args, result)
+            )
+          : result
       );
     } catch (error) {
       return errorResult(error.message);

@@ -214,6 +214,10 @@ type McpEditorBridgeContext = {|
   onInstancesModifiedOutsideEditor?: Function,
   onObjectsModifiedOutsideEditor?: Function,
   onObjectGroupsModifiedOutsideEditor?: Function,
+  // Called after an extension is reloaded wholesale (a full unserializeFrom that
+  // frees and rebuilds its child containers), so the editor drops stale wrappers
+  // for that extension's open tabs/panels and avoids a use-after-free.
+  onExtensionModifiedOutsideEditor?: (extensionName: string) => void,
   ensureExtensionInstalled?: Function,
   onWillInstallExtension?: Function,
   onExtensionInstalled?: Function,
@@ -4532,6 +4536,19 @@ const callMcpTool = async ({
               : args.new_function_name || args.function_name),
           newOrChangedAiGeneratedEventIds: new Set(),
         });
+      }
+      // A wholesale extension reload (apply_validated_extension_patch with a
+      // cross-cutting change) frees and rebuilds the extension's C++ child
+      // containers. Tell the editor to drop stale wrappers for that extension's
+      // open tabs/panels, otherwise a later render can use-after-free.
+      if (
+        !result.dryRun &&
+        result.requiresEditorReload &&
+        context.onExtensionModifiedOutsideEditor
+      ) {
+        context.onExtensionModifiedOutsideEditor(
+          result.extensionName || args.extension_name
+        );
       }
       if (!result.dryRun) {
         context.triggerUnsavedChanges();

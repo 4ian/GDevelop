@@ -2347,8 +2347,143 @@ describe('McpEditorBridge', () => {
       expect(project.getEventsFunctionsExtension('McpExt').getFullName()).toBe(
         'Patched Extension'
       );
+      // A declaration-only patch must NOT reload the whole extension (which
+      // would free child containers and crash open panels).
+      expect(patchResult.requiresEditorReload).toBe(false);
     } finally {
       fs.rmSync(tempDir, { recursive: true, force: true });
+      project.delete();
+    }
+  });
+
+  it('applies a function-scoped validated patch without freeing sibling object instances', async () => {
+    // $FlowFixMe[invalid-constructor]
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    const extension = project.insertNewEventsFunctionsExtension('McpExt', 0);
+    // An events-based object WITH an initial instance — exactly the sibling whose
+    // InitialInstancesContainer the old wholesale unserializeFrom would free.
+    const eventsBasedObject = extension
+      .getEventsBasedObjects()
+      .insertNew('MyObject', 0);
+    eventsBasedObject.getInitialInstances().insertNewInitialInstance();
+    // A free function we will patch.
+    const freeFunctions = extension.getEventsFunctions();
+    const freeFunction = freeFunctions.insertNewEventsFunction('DoThing', 0);
+    freeFunction.setFunctionType(0); // Action.
+
+    // Hold a live JS wrapper into the sibling object's instances container, like
+    // an open editor panel would. If a full extension reload runs, this wrapper
+    // is freed and iterateOverInstances throws UseAfterFreeError.
+    const liveInstancesWrapper = eventsBasedObject.getInitialInstances();
+    expect(liveInstancesWrapper.getInstancesCount()).toBe(1);
+
+    const onExtensionModifiedOutsideEditor: any = jest.fn();
+    try {
+      const bridge = makeBridge({
+        getProject: () => project,
+        getPermissions: () => ({
+          allowWriteTools: true,
+          allowCommandTools: false,
+        }),
+        onExtensionModifiedOutsideEditor,
+      });
+
+      const patchResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'apply_validated_extension_patch',
+          arguments: {
+            extension_name: 'McpExt',
+            scope: 'extension_function',
+            function_name: 'DoThing',
+            summary_only: true,
+            patch: [
+              { op: 'replace', path: '/fullName', value: 'Do The Thing' },
+            ],
+          },
+        },
+      });
+      const patchResult = JSON.parse(patchResponse.content[0].text);
+
+      expect(patchResponse.isError).not.toBe(true);
+      expect(patchResult.success).toBe(true);
+      expect(patchResult.scope).toBe('extension_function');
+      // Narrow commit: no whole-extension reload, no editor refresh needed.
+      expect(patchResult.requiresEditorReload).toBe(false);
+      expect(onExtensionModifiedOutsideEditor).not.toHaveBeenCalled();
+      // The patched function actually changed.
+      expect(freeFunctions.getEventsFunction('DoThing').getFullName()).toBe(
+        'Do The Thing'
+      );
+      // The sibling object's instances container wrapper is STILL ALIVE: it was
+      // never freed. This is the use-after-free regression guard.
+      expect(liveInstancesWrapper.getInstancesCount()).toBe(1);
+    } finally {
+      project.delete();
+    }
+  });
+
+  it('reloads the whole extension and asks for an editor refresh on a cross-cutting patch', async () => {
+    // $FlowFixMe[invalid-constructor]
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    const extension = project.insertNewEventsFunctionsExtension('McpExt', 0);
+    extension.getEventsBasedObjects().insertNew('ObjectA', 0);
+    extension.getEventsBasedObjects().insertNew('ObjectB', 1);
+
+    const onExtensionModifiedOutsideEditor: any = jest.fn();
+    try {
+      const bridge = makeBridge({
+        getProject: () => project,
+        getPermissions: () => ({
+          allowWriteTools: true,
+          allowCommandTools: false,
+        }),
+        onExtensionModifiedOutsideEditor,
+      });
+
+      // A whole-extension patch that touches TWO different objects: cannot be
+      // narrowed, so a full reload + editor refresh is expected.
+      const patchResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'apply_validated_extension_patch',
+          arguments: {
+            extension_name: 'McpExt',
+            summary_only: true,
+            patch: [
+              {
+                op: 'replace',
+                path: '/eventsBasedObjects/0/fullName',
+                value: 'A renamed',
+              },
+              {
+                op: 'replace',
+                path: '/eventsBasedObjects/1/fullName',
+                value: 'B renamed',
+              },
+            ],
+          },
+        },
+      });
+      const patchResult = JSON.parse(patchResponse.content[0].text);
+
+      expect(patchResponse.isError).not.toBe(true);
+      expect(patchResult.success).toBe(true);
+      expect(patchResult.requiresEditorReload).toBe(true);
+      expect(onExtensionModifiedOutsideEditor).toHaveBeenCalledWith('McpExt');
+      expect(
+        extension
+          .getEventsBasedObjects()
+          .get('ObjectA')
+          .getFullName()
+      ).toBe('A renamed');
+      expect(
+        extension
+          .getEventsBasedObjects()
+          .get('ObjectB')
+          .getFullName()
+      ).toBe('B renamed');
+    } finally {
       project.delete();
     }
   });

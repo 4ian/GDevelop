@@ -3791,6 +3791,27 @@ const MainFrame = (props: Props): React.MixedElement => {
     [state.editorTabs]
   );
 
+  // An MCP tool reloaded an extension wholesale (its C++ child objects were
+  // freed and rebuilt). Close that extension's open editor tabs so they release
+  // stale wrappers (a render against a freed InitialInstancesContainer would
+  // crash), then reload extensions so dependent editors see fresh data.
+  const onExtensionModifiedOutsideEditor = React.useCallback(
+    (extensionName: string) => {
+      if (!currentProject) return;
+      setState(state => ({
+        ...state,
+        editorTabs: closeEventsFunctionsExtensionTabs(
+          state.editorTabs,
+          extensionName
+        ),
+      }));
+      eventsFunctionsExtensionsState.reloadProjectEventsFunctionsExtensions(
+        currentProject
+      );
+    },
+    [currentProject, eventsFunctionsExtensionsState, setState]
+  );
+
   const _onProjectItemModified = () => {
     triggerUnsavedChanges();
     forceUpdate();
@@ -5477,6 +5498,7 @@ const MainFrame = (props: Props): React.MixedElement => {
         onInstancesModifiedOutsideEditor,
         onObjectsModifiedOutsideEditor,
         onObjectGroupsModifiedOutsideEditor,
+        onExtensionModifiedOutsideEditor,
         ensureExtensionInstalled,
         onWillInstallExtension,
         onExtensionInstalled,
@@ -5500,6 +5522,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       onInstancesModifiedOutsideEditor,
       onObjectsModifiedOutsideEditor,
       onObjectGroupsModifiedOutsideEditor,
+      onExtensionModifiedOutsideEditor,
       ensureExtensionInstalled,
       onWillInstallExtension,
       onExtensionInstalled,

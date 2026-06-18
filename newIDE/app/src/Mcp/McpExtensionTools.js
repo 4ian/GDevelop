@@ -352,10 +352,7 @@ const applySinglePatchOperation = (document: any, operation: Object) => {
     }
   } else if (container && typeof container === 'object') {
     if (op === 'add' || op === 'replace') {
-      if (
-        op === 'replace' &&
-        !hasOwn(container, key)
-      ) {
+      if (op === 'replace' && !hasOwn(container, key)) {
         throw new Error(`Patch replace path does not exist: "${pointer}".`);
       }
       container[key] = operation.value;
@@ -381,7 +378,10 @@ const applySinglePatchOperation = (document: any, operation: Object) => {
   throw new Error(`Unsupported JSON patch operation: "${op}".`);
 };
 
-const getPatchOperations = (project: gdProject, args: Object): Array<Object> => {
+const getPatchOperations = (
+  project: gdProject,
+  args: Object
+): Array<Object> => {
   if (Array.isArray(args.patch)) return args.patch;
   if (typeof args.patch === 'string') {
     const parsedPatch = JSON.parse(args.patch);
@@ -821,10 +821,7 @@ const getEventsFunctionSentenceValidation = (
   for (const paramsMatch of paramsMatches) {
     const paramIndex = parseInt(paramsMatch[1], 10);
     const actualParameterIndex = paramIndex - parametersIndexOffset;
-    if (
-      actualParameterIndex >= parametersCount ||
-      actualParameterIndex < 0
-    ) {
+    if (actualParameterIndex >= parametersCount || actualParameterIndex < 0) {
       nonExpectedParameters.push(paramsMatch[0]);
     }
   }
@@ -1113,33 +1110,47 @@ export const inspectProjectExtension = (
       freeFunctions: mapFor(
         0,
         extension.getEventsFunctions().getEventsFunctionsCount(),
-        index => extension.getEventsFunctions().getEventsFunctionAt(index).getName()
-      ),
-      behaviors: mapFor(0, extension.getEventsBasedBehaviors().getCount(), index => {
-        const behavior = extension.getEventsBasedBehaviors().getAt(index);
-        return {
-          name: behavior.getName(),
-          functionsCount: behavior
+        index =>
+          extension
             .getEventsFunctions()
-            .getEventsFunctionsCount(),
-          propertiesCount: behavior.getPropertyDescriptors().getCount(),
-          sharedPropertiesCount: behavior
-            .getSharedPropertyDescriptors()
-            .getCount(),
-        };
-      }),
-      objects: mapFor(0, extension.getEventsBasedObjects().getCount(), index => {
-        const object = extension.getEventsBasedObjects().getAt(index);
-        return {
-          name: object.getName(),
-          functionsCount: object.getEventsFunctions().getEventsFunctionsCount(),
-          childObjectsCount: object.getObjects().getObjectsCount(),
-          initialInstancesCount: object
-            .getInitialInstances()
-            .getInstancesCount(),
-          propertiesCount: object.getPropertyDescriptors().getCount(),
-        };
-      }),
+            .getEventsFunctionAt(index)
+            .getName()
+      ),
+      behaviors: mapFor(
+        0,
+        extension.getEventsBasedBehaviors().getCount(),
+        index => {
+          const behavior = extension.getEventsBasedBehaviors().getAt(index);
+          return {
+            name: behavior.getName(),
+            functionsCount: behavior
+              .getEventsFunctions()
+              .getEventsFunctionsCount(),
+            propertiesCount: behavior.getPropertyDescriptors().getCount(),
+            sharedPropertiesCount: behavior
+              .getSharedPropertyDescriptors()
+              .getCount(),
+          };
+        }
+      ),
+      objects: mapFor(
+        0,
+        extension.getEventsBasedObjects().getCount(),
+        index => {
+          const object = extension.getEventsBasedObjects().getAt(index);
+          return {
+            name: object.getName(),
+            functionsCount: object
+              .getEventsFunctions()
+              .getEventsFunctionsCount(),
+            childObjectsCount: object.getObjects().getObjectsCount(),
+            initialInstancesCount: object
+              .getInitialInstances()
+              .getInstancesCount(),
+            propertiesCount: object.getPropertyDescriptors().getCount(),
+          };
+        }
+      ),
     };
   }
 
@@ -1495,10 +1506,7 @@ export const findExtensionEvents = (
   };
 };
 
-export const findProjectEvents = (
-  project: gdProject,
-  args: Object
-): Object => {
+export const findProjectEvents = (project: gdProject, args: Object): Object => {
   const limit = getSearchLimit(args);
   const matches = [];
   const sceneName =
@@ -1673,8 +1681,14 @@ const getMetadataForInstruction = (
   if (!type) return null;
   const metadata =
     instructionKind === 'condition'
-      ? gd.MetadataProvider.getConditionMetadata(project.getCurrentPlatform(), type)
-      : gd.MetadataProvider.getActionMetadata(project.getCurrentPlatform(), type);
+      ? gd.MetadataProvider.getConditionMetadata(
+          project.getCurrentPlatform(),
+          type
+        )
+      : gd.MetadataProvider.getActionMetadata(
+          project.getCurrentPlatform(),
+          type
+        );
   return gd.MetadataProvider.isBadInstructionMetadata(metadata)
     ? null
     : metadata;
@@ -2061,7 +2075,10 @@ const lintExtensionFunctionTarget = (
     issues.push(...collectRootGroupIssues(target.eventsFunction));
   }
 
-  const generatedCodeResult: {| generatedCode: Object, issues: Array<Object> |} =
+  const generatedCodeResult: {|
+    generatedCode: Object,
+    issues: Array<Object>,
+  |} =
     args && args.include_generated_code === false
       ? { generatedCode: { skipped: true }, issues: [] }
       : collectGeneratedCodeIssues(project, target);
@@ -2384,7 +2401,9 @@ export const patchExtensionEventInstruction = (
         : null;
 
     const matches = collectEventInstructionReferences(eventReference.event)
-      .filter(reference => reference.instructionKind === normalizedInstructionKind)
+      .filter(
+        reference => reference.instructionKind === normalizedInstructionKind
+      )
       .filter(reference => reference.instruction.getType() === instructionType)
       .filter(reference =>
         objectName
@@ -2424,8 +2443,7 @@ export const patchExtensionEventInstruction = (
       parentName: getFunctionParentName(target),
       functionName: target.eventsFunction.getName(),
       eventPath: formatEventPath(eventReference.path),
-      aiGeneratedEventId:
-        eventReference.event.getAiGeneratedEventId() || null,
+      aiGeneratedEventId: eventReference.event.getAiGeneratedEventId() || null,
       instructionKind: normalizedInstructionKind,
       instructionType,
       instructionPath: matches[0].instructionPath,
@@ -2564,16 +2582,15 @@ const getExtensionPatchTarget = (
 
   if (scope === 'extension_function' || scope === 'function') {
     const parentKind = normalizeParentKind(args.parent_kind);
-    const functionName = getStringArg(args, [
-      'function_name',
-      'functionName',
-    ]);
-    if (!functionName) throw new Error(`scope "${scope}" requires function_name.`);
+    const functionName = getStringArg(args, ['function_name', 'functionName']);
+    if (!functionName)
+      throw new Error(`scope "${scope}" requires function_name.`);
     let container = serializedExtension.eventsFunctions;
     let scopeRootPath = '/eventsFunctions';
     if (parentKind === 'object') {
       const parentName = getStringArg(args, ['parent_name', 'parentName']);
-      if (!parentName) throw new Error('parent_kind "object" requires parent_name.');
+      if (!parentName)
+        throw new Error('parent_kind "object" requires parent_name.');
       const objectIndex = getNamedItemIndex(
         serializedExtension.eventsBasedObjects,
         parentName,
@@ -2617,10 +2634,7 @@ const getExtensionPatchTarget = (
     if (!objectName) {
       throw new Error(`scope "${scope}" requires object_name or target_name.`);
     }
-    const propertyName = getStringArg(args, [
-      'property_name',
-      'propertyName',
-    ]);
+    const propertyName = getStringArg(args, ['property_name', 'propertyName']);
     if (!propertyName) {
       throw new Error(`scope "${scope}" requires property_name.`);
     }
@@ -2787,6 +2801,303 @@ const validateSerializedExtension = (
   }
 };
 
+// Resolve the smallest LIVE GD object that a patch scope maps to, plus the
+// serialized node to load into it. Committing into the narrowest live sub-object
+// (instead of the whole extension) is essential: EventsFunctionsExtension
+// .unserializeFrom Clear()s and rebuilds EVERY child container — including each
+// events-based object's InitialInstancesContainer — which frees C++ objects that
+// open editor panels still hold JS wrappers into (UseAfterFreeError on the next
+// render). The narrow commit only touches what actually changed.
+//
+// Returns null when the scope cannot be narrowed (true cross-cutting
+// whole-extension change), in which case the caller must do a full reload and
+// ask the editor to drop stale wrappers.
+const resolveLiveExtensionPatchCommit = (
+  project: gdProject,
+  extension: gdEventsFunctionsExtension,
+  scopedTarget: {| target: Object, scope: string, scopeRootPath: string |},
+  patchedSerializedExtension: Object,
+  args: Object
+): ?{|
+  liveTarget: gdSerializable,
+  serializedNode: Object,
+  usesProject: boolean,
+|} => {
+  const scope = scopedTarget.scope;
+
+  if (scope === 'extension_object') {
+    const objectName = getStringArg(args, [
+      'object_name',
+      'objectName',
+      'parent_name',
+      'parentName',
+    ]);
+    const objects = extension.getEventsBasedObjects();
+    if (!objectName || !objects.has(objectName)) return null;
+    return {
+      liveTarget: objects.get(objectName),
+      serializedNode: scopedTarget.target,
+      usesProject: true,
+    };
+  }
+
+  if (scope === 'extension_behavior') {
+    const behaviorName = getStringArg(args, [
+      'behavior_name',
+      'behaviorName',
+      'parent_name',
+      'parentName',
+    ]);
+    const behaviors = extension.getEventsBasedBehaviors();
+    if (!behaviorName || !behaviors.has(behaviorName)) return null;
+    return {
+      liveTarget: behaviors.get(behaviorName),
+      serializedNode: scopedTarget.target,
+      usesProject: true,
+    };
+  }
+
+  if (scope === 'extension_function') {
+    let functionParent;
+    try {
+      functionParent = getFunctionParent(project, args);
+    } catch (error) {
+      return null;
+    }
+    const functionName = getStringArg(args, ['function_name', 'functionName']);
+    if (
+      !functionName ||
+      !functionParent.container.hasEventsFunctionNamed(functionName)
+    ) {
+      return null;
+    }
+    return {
+      liveTarget: functionParent.container.getEventsFunction(functionName),
+      serializedNode: scopedTarget.target,
+      usesProject: true,
+    };
+  }
+
+  if (scope === 'extension_property') {
+    const objectName = getStringArg(args, [
+      'object_name',
+      'objectName',
+      'target_name',
+      'targetName',
+    ]);
+    const propertyName = getStringArg(args, ['property_name', 'propertyName']);
+    const objects = extension.getEventsBasedObjects();
+    if (!objectName || !propertyName || !objects.has(objectName)) return null;
+    const properties = objects.get(objectName).getPropertyDescriptors();
+    if (!properties.has(propertyName)) return null;
+    return {
+      // NamedPropertyDescriptor.unserializeFrom takes no project argument.
+      liveTarget: properties.get(propertyName),
+      serializedNode: scopedTarget.target,
+      usesProject: false,
+    };
+  }
+
+  // scope === 'extension': try to redirect to a single sub-object/behavior/
+  // function subtree when every changed path stays inside one of them, so a
+  // narrow change (e.g. tweaking one object) does not reload the whole
+  // extension. Otherwise return null (caller decides: declaration-only updates
+  // apply safely, cross-cutting changes do a full reload + editor refresh).
+  return redirectWholeExtensionScope(
+    project,
+    extension,
+    patchedSerializedExtension,
+    args
+  );
+};
+
+// Parse the patch operations and, when EVERY op targets the same single item
+// inside one sub-tree (eventsBasedObjects/eventsBasedBehaviors/eventsFunctions),
+// return { subTreeKey, itemIndex }. Returns null otherwise (declaration-only,
+// or spanning multiple items / sub-trees).
+const findSingleSubTreeItem = (
+  args: Object
+): ?{| subTreeKey: string, itemIndex: number |} => {
+  const subTreeKeys = new Set([
+    'eventsBasedObjects',
+    'eventsBasedBehaviors',
+    'eventsFunctions',
+  ]);
+  const operations = Array.isArray(args.patch)
+    ? args.patch
+    : Array.isArray(args.operations)
+    ? args.operations
+    : [];
+  let found: ?{| subTreeKey: string, itemIndex: number |} = null;
+  for (const operation of operations) {
+    if (!operation || typeof operation.path !== 'string') return null;
+    const segments = operation.path.split('/').filter(Boolean);
+    if (!segments.length) return null;
+    const subTreeKey = segments[0];
+    if (!subTreeKeys.has(subTreeKey)) return null;
+    // Need an item index to target a single live sub-object: /<key>/<index>/...
+    const itemIndex = Number(segments[1]);
+    if (!Number.isInteger(itemIndex) || itemIndex < 0) return null;
+    if (
+      found &&
+      (found.subTreeKey !== subTreeKey || found.itemIndex !== itemIndex)
+    ) {
+      return null;
+    }
+    found = { subTreeKey, itemIndex };
+  }
+  return found;
+};
+
+// When a whole-extension-scope patch only touches a single events-based object,
+// behavior, or function subtree, return that live sub-object so we can commit
+// narrowly (avoiding the whole-extension reload that frees sibling children).
+// Returns null for declaration-only changes (handled by the caller without a
+// child-freeing reload) or cross-cutting changes spanning multiple sub-objects.
+const redirectWholeExtensionScope = (
+  project: gdProject,
+  extension: gdEventsFunctionsExtension,
+  patchedSerializedExtension: Object,
+  args: Object
+): ?{|
+  liveTarget: gdSerializable,
+  serializedNode: Object,
+  usesProject: boolean,
+|} => {
+  const single = findSingleSubTreeItem(args);
+  if (!single) return null;
+  const { subTreeKey, itemIndex } = single;
+
+  if (subTreeKey === 'eventsBasedObjects') {
+    const objects = extension.getEventsBasedObjects();
+    if (itemIndex >= objects.getCount()) return null;
+    const serializedNode =
+      patchedSerializedExtension.eventsBasedObjects &&
+      patchedSerializedExtension.eventsBasedObjects[itemIndex];
+    if (!serializedNode) return null;
+    return {
+      liveTarget: objects.getAt(itemIndex),
+      serializedNode,
+      usesProject: true,
+    };
+  }
+  if (subTreeKey === 'eventsBasedBehaviors') {
+    const behaviors = extension.getEventsBasedBehaviors();
+    if (itemIndex >= behaviors.getCount()) return null;
+    const serializedNode =
+      patchedSerializedExtension.eventsBasedBehaviors &&
+      patchedSerializedExtension.eventsBasedBehaviors[itemIndex];
+    if (!serializedNode) return null;
+    return {
+      liveTarget: behaviors.getAt(itemIndex),
+      serializedNode,
+      usesProject: true,
+    };
+  }
+  // eventsFunctions (free functions of the extension)
+  const container = extension.getEventsFunctions();
+  if (itemIndex >= container.getEventsFunctionsCount()) return null;
+  const serializedNode =
+    patchedSerializedExtension.eventsFunctions &&
+    patchedSerializedExtension.eventsFunctions[itemIndex];
+  if (!serializedNode) return null;
+  return {
+    liveTarget: container.getEventsFunctionAt(itemIndex),
+    serializedNode,
+    usesProject: true,
+  };
+};
+
+// Declaration-level keys of an extension that can be applied via C++ setters
+// (i.e. WITHOUT a child-freeing unserializeFrom). Mirrors the scalars/arrays
+// handled in EventsFunctionsExtension::UnserializeExtensionDeclarationFrom that
+// have public setters in the bindings.
+const EXTENSION_DECLARATION_KEYS = new Set([
+  'name',
+  'namespace',
+  'extensionNamespace',
+  'version',
+  'fullName',
+  'shortDescription',
+  'description',
+  'category',
+  'author',
+  'previewIconUrl',
+  'iconUrl',
+  'helpPath',
+  'tags',
+  'authorIds',
+]);
+
+// True when every patch op touches only top-level declaration keys (no
+// eventsFunctions / eventsBasedBehaviors / eventsBasedObjects / variables
+// sub-tree), so the change can be applied via setters without freeing children.
+const isDeclarationOnlyExtensionPatch = (args: Object): boolean => {
+  const operations = Array.isArray(args.patch)
+    ? args.patch
+    : Array.isArray(args.operations)
+    ? args.operations
+    : [];
+  if (!operations.length) return false;
+  return operations.every(operation => {
+    if (!operation || typeof operation.path !== 'string') return false;
+    const segments = operation.path.split('/').filter(Boolean);
+    if (!segments.length) return false;
+    return EXTENSION_DECLARATION_KEYS.has(segments[0]);
+  });
+};
+
+// Apply declaration-level fields from a serialized extension onto the live
+// extension using setters (no unserializeFrom → no freed child containers).
+const applyExtensionDeclarationFields = (
+  extension: gdEventsFunctionsExtension,
+  serializedExtension: Object
+) => {
+  const setString = (key: string, setter: string) => {
+    if (typeof serializedExtension[key] === 'string') {
+      // $FlowFixMe[prop-missing] dynamic setter dispatch.
+      extension[setter](serializedExtension[key]);
+    }
+  };
+  setString('name', 'setName');
+  // Serialized key is "extensionNamespace"; setter is SetNamespace.
+  if (typeof serializedExtension.extensionNamespace === 'string') {
+    extension.setNamespace(serializedExtension.extensionNamespace);
+  } else if (typeof serializedExtension.namespace === 'string') {
+    extension.setNamespace(serializedExtension.namespace);
+  }
+  setString('version', 'setVersion');
+  setString('fullName', 'setFullName');
+  setString('shortDescription', 'setShortDescription');
+  setString('category', 'setCategory');
+  setString('author', 'setAuthor');
+  setString('previewIconUrl', 'setPreviewIconUrl');
+  setString('iconUrl', 'setIconUrl');
+  setString('helpPath', 'setHelpPath');
+  // description is a multiline value: a plain string when single-line, or an
+  // array of per-line strings when multiline. The setter takes a plain string
+  // (it re-splits on '\n' when serializing).
+  if (typeof serializedExtension.description === 'string') {
+    extension.setDescription(serializedExtension.description);
+  } else if (Array.isArray(serializedExtension.description)) {
+    extension.setDescription(
+      serializedExtension.description.map(line => String(line)).join('\n')
+    );
+  }
+  if (Array.isArray(serializedExtension.tags)) {
+    replaceVectorString(
+      extension.getTags(),
+      serializedExtension.tags.map(tag => String(tag))
+    );
+  }
+  if (Array.isArray(serializedExtension.authorIds)) {
+    replaceVectorString(
+      extension.getAuthorIds(),
+      serializedExtension.authorIds.map(id => String(id))
+    );
+  }
+};
+
 export const applyValidatedExtensionPatch = (
   project: gdProject,
   args: Object
@@ -2801,8 +3112,13 @@ export const applyValidatedExtensionPatch = (
   const patchedSerializedExtension = JSON.parse(
     JSON.stringify(beforeSerializedExtension)
   );
-  const scopedTarget = getExtensionPatchTarget(patchedSerializedExtension, args || {});
-  patch.forEach(operation => applySinglePatchOperation(scopedTarget.target, operation));
+  const scopedTarget = getExtensionPatchTarget(
+    patchedSerializedExtension,
+    args || {}
+  );
+  patch.forEach(operation =>
+    applySinglePatchOperation(scopedTarget.target, operation)
+  );
 
   const validation = validateSerializedExtension(
     project,
@@ -2852,21 +3168,91 @@ export const applyValidatedExtensionPatch = (
     };
   }
 
-  try {
-    unserializeFromJSObject(
-      extension,
-      patchedSerializedExtension,
-      'unserializeFrom',
-      project
-    );
-  } catch (error) {
-    unserializeFromJSObject(
-      extension,
-      beforeSerializedExtension,
-      'unserializeFrom',
-      project
-    );
-    throw error;
+  const liveCommit = resolveLiveExtensionPatchCommit(
+    project,
+    extension,
+    scopedTarget,
+    patchedSerializedExtension,
+    args || {}
+  );
+
+  let requiresEditorReload = false;
+  if (liveCommit) {
+    // Narrow commit: load only the changed sub-object. Sibling events-based
+    // objects (and their InitialInstancesContainers, which open panels wrap)
+    // are left untouched, so no use-after-free.
+    const beforeNode = serializeToJSObject(liveCommit.liveTarget);
+    try {
+      if (liveCommit.usesProject) {
+        unserializeFromJSObject(
+          liveCommit.liveTarget,
+          liveCommit.serializedNode,
+          'unserializeFrom',
+          project
+        );
+      } else {
+        unserializeFromJSObject(
+          liveCommit.liveTarget,
+          liveCommit.serializedNode,
+          'unserializeFrom'
+        );
+      }
+    } catch (error) {
+      if (liveCommit.usesProject) {
+        unserializeFromJSObject(
+          liveCommit.liveTarget,
+          beforeNode,
+          'unserializeFrom',
+          project
+        );
+      } else {
+        unserializeFromJSObject(
+          liveCommit.liveTarget,
+          beforeNode,
+          'unserializeFrom'
+        );
+      }
+      throw error;
+    }
+  } else if (
+    scopedTarget.scope === 'extension' &&
+    isDeclarationOnlyExtensionPatch(args || {})
+  ) {
+    // Whole-extension scope but only declaration-level fields changed: apply via
+    // setters so child containers (and the wrappers panels hold) are NOT freed.
+    const beforeDeclaration = serializeToJSObject(extension);
+    try {
+      applyExtensionDeclarationFields(extension, patchedSerializedExtension);
+    } catch (error) {
+      unserializeFromJSObject(
+        extension,
+        beforeDeclaration,
+        'unserializeFrom',
+        project
+      );
+      throw error;
+    }
+  } else {
+    // Genuine cross-cutting whole-extension change: the full reload frees and
+    // rebuilds every child container, so any open editor panel for this
+    // extension must drop its stale wrappers (requiresEditorReload).
+    try {
+      unserializeFromJSObject(
+        extension,
+        patchedSerializedExtension,
+        'unserializeFrom',
+        project
+      );
+    } catch (error) {
+      unserializeFromJSObject(
+        extension,
+        beforeSerializedExtension,
+        'unserializeFrom',
+        project
+      );
+      throw error;
+    }
+    requiresEditorReload = true;
   }
 
   return {
@@ -2883,10 +3269,14 @@ export const applyValidatedExtensionPatch = (
         : operation.path
     ),
     validation,
+    requiresEditorReload,
     extension: summarizeExtension(extension),
-    serializedExtension: summaryOnly ? undefined : serializeToJSObject(extension),
-    note:
-      'Validated extension patch was applied to the editor project model. Relaunch previews after extension edits before runtime verification.',
+    serializedExtension: summaryOnly
+      ? undefined
+      : serializeToJSObject(extension),
+    note: requiresEditorReload
+      ? 'Validated extension patch was applied to the editor project model with a full extension reload. Open editor tabs for this extension were refreshed. Relaunch previews after extension edits before runtime verification.'
+      : 'Validated extension patch was applied to the editor project model (narrow commit, sibling objects preserved). Relaunch previews after extension edits before runtime verification.',
   };
 };
 
@@ -2955,16 +3345,22 @@ const getFirstSpriteFrameSummary = (serializedChildObject: Object): Object => {
   const animations = Array.isArray(serializedChildObject.animations)
     ? serializedChildObject.animations
     : [];
-  for (let animationIndex = 0; animationIndex < animations.length; animationIndex++) {
+  for (
+    let animationIndex = 0;
+    animationIndex < animations.length;
+    animationIndex++
+  ) {
     const animation = animations[animationIndex];
     const directions = Array.isArray(animation.directions)
       ? animation.directions
       : [];
-    for (let directionIndex = 0; directionIndex < directions.length; directionIndex++) {
+    for (
+      let directionIndex = 0;
+      directionIndex < directions.length;
+      directionIndex++
+    ) {
       const direction = directions[directionIndex];
-      const sprites = Array.isArray(direction.sprites)
-        ? direction.sprites
-        : [];
+      const sprites = Array.isArray(direction.sprites) ? direction.sprites : [];
       for (let frameIndex = 0; frameIndex < sprites.length; frameIndex++) {
         const sprite = sprites[frameIndex];
         const collisionMask = Array.isArray(sprite.customCollisionMask)
@@ -3058,11 +3454,12 @@ const summarizeChildGeometry = (
   serializedObject: Object
 ): {| children: Array<Object>, renderedBounds: ?Object |} => {
   const childObjects: { [string]: Object } = {};
-  (Array.isArray(serializedObject.objects) ? serializedObject.objects : []).forEach(
-    object => {
-      if (object && object.name) childObjects[object.name] = object;
-    }
-  );
+  (Array.isArray(serializedObject.objects)
+    ? serializedObject.objects
+    : []
+  ).forEach(object => {
+    if (object && object.name) childObjects[object.name] = object;
+  });
   const children = (Array.isArray(serializedObject.instances)
     ? serializedObject.instances
     : []
@@ -3210,8 +3607,7 @@ export const inspectCustomObjectRuntimeGeometry = (
       : cursorSceneY != null && parentScenePosition
       ? cursorSceneY - parentScenePosition.y
       : null;
-  const layerName =
-    getStringArg(args || {}, ['layer_name', 'layerName']) || '';
+  const layerName = getStringArg(args || {}, ['layer_name', 'layerName']) || '';
   let cursor: ?Object = undefined;
   if (cursorX != null && cursorY != null) {
     const localCursorX: number = cursorX;
@@ -3297,37 +3693,40 @@ export const inspectCustomObjectRuntimeGeometry = (
   };
 };
 
-const collectChildSpriteResourceUses = (serializedObject: Object): Array<Object> => {
+const collectChildSpriteResourceUses = (
+  serializedObject: Object
+): Array<Object> => {
   const uses: Array<Object> = [];
-  (Array.isArray(serializedObject.objects) ? serializedObject.objects : []).forEach(
-    childObject => {
-      (Array.isArray(childObject.animations) ? childObject.animations : []).forEach(
-        (animation, animationIndex) => {
-          (Array.isArray(animation.directions)
-            ? animation.directions
-            : []
-          ).forEach((direction, directionIndex) => {
-            (Array.isArray(direction.sprites) ? direction.sprites : []).forEach(
-              (sprite, frameIndex) => {
-                if (sprite && typeof sprite.image === 'string' && sprite.image) {
-                  uses.push({
-                    childObjectName: childObject.name,
-                    childObjectType: childObject.type,
-                    animationName: animation.name || '',
-                    animationIndex,
-                    directionIndex,
-                    frameIndex,
-                    resourceName: sprite.image,
-                    bindingKind: 'static-sprite-frame-resource',
-                  });
-                }
+  (Array.isArray(serializedObject.objects)
+    ? serializedObject.objects
+    : []
+  ).forEach(childObject => {
+    (Array.isArray(childObject.animations)
+      ? childObject.animations
+      : []
+    ).forEach((animation, animationIndex) => {
+      (Array.isArray(animation.directions) ? animation.directions : []).forEach(
+        (direction, directionIndex) => {
+          (Array.isArray(direction.sprites) ? direction.sprites : []).forEach(
+            (sprite, frameIndex) => {
+              if (sprite && typeof sprite.image === 'string' && sprite.image) {
+                uses.push({
+                  childObjectName: childObject.name,
+                  childObjectType: childObject.type,
+                  animationName: animation.name || '',
+                  animationIndex,
+                  directionIndex,
+                  frameIndex,
+                  resourceName: sprite.image,
+                  bindingKind: 'static-sprite-frame-resource',
+                });
               }
-            );
-          });
+            }
+          );
         }
       );
-    }
-  );
+    });
+  });
   return uses;
 };
 
@@ -3435,7 +3834,8 @@ const replaceChildSpriteFrameResource = (
         (direction, directionIndex) => {
           (Array.isArray(direction.sprites) ? direction.sprites : []).forEach(
             (sprite, frameIndex) => {
-              if (!replaceAllFrames && frameIndex !== requestedFrameIndex) return;
+              if (!replaceAllFrames && frameIndex !== requestedFrameIndex)
+                return;
               const beforeResourceName = sprite.image || '';
               sprite.image = resourceName;
               replacements.push({
@@ -3626,15 +4026,40 @@ const getInitialInstanceSize = (
 const computeInstancesAabb = (
   instances: Array<gdInitialInstance>,
   fallbackArea?: ?Object
-): {| minX: number, minY: number, minZ: number, maxX: number, maxY: number, maxZ: number |} => {
+): {|
+  minX: number,
+  minY: number,
+  minZ: number,
+  maxX: number,
+  maxY: number,
+  maxZ: number,
+|} => {
   if (!instances.length) {
     return {
-      minX: fallbackArea && typeof fallbackArea.minX === 'number' ? fallbackArea.minX : 0,
-      minY: fallbackArea && typeof fallbackArea.minY === 'number' ? fallbackArea.minY : 0,
-      minZ: fallbackArea && typeof fallbackArea.minZ === 'number' ? fallbackArea.minZ : 0,
-      maxX: fallbackArea && typeof fallbackArea.maxX === 'number' ? fallbackArea.maxX : 64,
-      maxY: fallbackArea && typeof fallbackArea.maxY === 'number' ? fallbackArea.maxY : 64,
-      maxZ: fallbackArea && typeof fallbackArea.maxZ === 'number' ? fallbackArea.maxZ : 64,
+      minX:
+        fallbackArea && typeof fallbackArea.minX === 'number'
+          ? fallbackArea.minX
+          : 0,
+      minY:
+        fallbackArea && typeof fallbackArea.minY === 'number'
+          ? fallbackArea.minY
+          : 0,
+      minZ:
+        fallbackArea && typeof fallbackArea.minZ === 'number'
+          ? fallbackArea.minZ
+          : 0,
+      maxX:
+        fallbackArea && typeof fallbackArea.maxX === 'number'
+          ? fallbackArea.maxX
+          : 64,
+      maxY:
+        fallbackArea && typeof fallbackArea.maxY === 'number'
+          ? fallbackArea.maxY
+          : 64,
+      maxZ:
+        fallbackArea && typeof fallbackArea.maxZ === 'number'
+          ? fallbackArea.maxZ
+          : 64,
     };
   }
   let minX = Infinity;
@@ -3823,7 +4248,9 @@ const extractPrefabFromSceneInstances = ({
   sourceObjectNames.forEach(objectName => {
     const sourceObject = getObjectFromContainers(project, scene, objectName);
     if (!sourceObject) {
-      throw new Error(`Object not found in scene/global scope: "${objectName}".`);
+      throw new Error(
+        `Object not found in scene/global scope: "${objectName}".`
+      );
     }
     copyObjectDefinition(project, sourceObject, childObjects);
   });
@@ -3840,7 +4267,9 @@ const extractPrefabFromSceneInstances = ({
   const migrationWarnings = [];
   if (args && args.replace_in_scene_with_prefab_instance) {
     const prefabObjectName = getSafeUniqueName(
-      args.prefab_scene_object_name || targetObject.getDefaultName() || targetObject.getName(),
+      args.prefab_scene_object_name ||
+        targetObject.getDefaultName() ||
+        targetObject.getName(),
       name =>
         scene.getObjects().hasObjectNamed(name) ||
         project.getObjects().hasObjectNamed(name)
@@ -3852,7 +4281,9 @@ const extractPrefabFromSceneInstances = ({
     scene
       .getObjects()
       .insertNewObject(project, prefabType, prefabObjectName, 0);
-    const prefabInstance = scene.getInitialInstances().insertNewInitialInstance();
+    const prefabInstance = scene
+      .getInitialInstances()
+      .insertNewInitialInstance();
     prefabInstance.setObjectName(prefabObjectName);
     prefabInstance.setX(area.minX);
     prefabInstance.setY(area.minY);
@@ -3903,7 +4334,9 @@ const extractPrefabFromExtensionObject = ({
   const sourceExtension = getExtension(project, sourceExtensionName);
   const sourceObjects = sourceExtension.getEventsBasedObjects();
   if (!sourceObjects.has(sourceObjectName)) {
-    throw new Error(`Source events-based object not found: "${sourceObjectName}".`);
+    throw new Error(
+      `Source events-based object not found: "${sourceObjectName}".`
+    );
   }
   const sourceObject = sourceObjects.get(sourceObjectName);
   let childObjectNames;
@@ -3914,8 +4347,14 @@ const extractPrefabFromExtensionObject = ({
       'child_object_names'
     );
   } else {
-    childObjectNames = mapFor(0, sourceObject.getObjects().getObjectsCount(), index =>
-      sourceObject.getObjects().getObjectAt(index).getName()
+    childObjectNames = mapFor(
+      0,
+      sourceObject.getObjects().getObjectsCount(),
+      index =>
+        sourceObject
+          .getObjects()
+          .getObjectAt(index)
+          .getName()
     );
   }
   if (!childObjectNames.length) {
@@ -3968,7 +4407,9 @@ const extractPrefabFromExtensionObject = ({
   const migrationWarnings = [];
   if (args && args.replace_in_source_with_prefab_instance) {
     const prefabChildObjectName = getSafeUniqueName(
-      args.prefab_child_object_name || targetObject.getDefaultName() || targetObject.getName(),
+      args.prefab_child_object_name ||
+        targetObject.getDefaultName() ||
+        targetObject.getName(),
       name => sourceObject.getObjects().hasObjectNamed(name)
     );
     const prefabType = gd.PlatformExtension.getObjectFullType(
@@ -4040,7 +4481,8 @@ export const extractPrefabFromObject = (
     };
     if (
       sourceKind === 'extension_object' &&
-      (!args.source_extension_name || args.source_extension_name === extensionName)
+      (!args.source_extension_name ||
+        args.source_extension_name === extensionName)
     ) {
       validationArgs.source_extension_name = temporaryExtensionName;
     }
@@ -4090,7 +4532,10 @@ export const extractPrefabFromObject = (
       extensionName,
       true,
       temporaryExtensionName =>
-        extractPrefabFromObject(project, getValidationArgs(temporaryExtensionName))
+        extractPrefabFromObject(
+          project,
+          getValidationArgs(temporaryExtensionName)
+        )
     );
   }
 
@@ -4179,7 +4624,10 @@ export const extractPrefabFromObject = (
     objectName,
     createdExtension,
     replacedExisting,
-    prefabType: gd.PlatformExtension.getObjectFullType(extensionName, objectName),
+    prefabType: gd.PlatformExtension.getObjectFullType(
+      extensionName,
+      objectName
+    ),
     ...sourceResult,
     object: summarizeObject(
       object,
@@ -4478,7 +4926,11 @@ const getAutomaticFunctionParametersCount = (
   let count = 0;
   for (let index = 0; index < parameters.getParametersCount(); index++) {
     if (
-      !isAutomaticFunctionParameter(parentKind, parameters.getParameterAt(index), index)
+      !isAutomaticFunctionParameter(
+        parentKind,
+        parameters.getParameterAt(index),
+        index
+      )
     ) {
       break;
     }
@@ -4656,7 +5108,8 @@ const applyEventsFunctionFields = (
   }
   if (getEventsJsonInput(args) !== undefined) {
     const parsedEvents =
-      parsedEventsJson || parseValidatedEventsJson(project, getEventsJsonInput(args));
+      parsedEventsJson ||
+      parseValidatedEventsJson(project, getEventsJsonInput(args));
     eventsFunction.getEvents().clear();
     unserializeFromJSObject(
       eventsFunction.getEvents(),

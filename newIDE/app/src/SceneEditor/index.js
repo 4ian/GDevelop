@@ -3454,6 +3454,25 @@ export default class SceneEditor extends React.Component<Props, State> {
   forceUpdateCustomObjectRenderedInstances = async () => {
     const { project, projectScopedContainersAccessor } = this.props;
 
+    // Reset the custom object renderers FIRST, synchronously. When an
+    // events-based object is edited (or an edition is cancelled), its variants'
+    // InitialInstancesContainer is freed and recreated (via
+    // EventsFunctionsExtension.unserializeFrom /
+    // complyVariantsToEventsBasedObject). The cached child renderers still hold
+    // references to the freed instances; if a render frame happens before they
+    // are reset, RenderedCustomObjectInstance.update() iterates over a freed
+    // InitialInstancesContainer and crashes with a use-after-free. Resetting
+    // before the (async) resource reload drops those stale references so the
+    // next frame rebuilds them from the fresh container.
+    const { editorDisplay } = this;
+    if (editorDisplay) {
+      projectScopedContainersAccessor.forEachObject(object => {
+        editorDisplay.instancesHandlers.resetInstanceRenderersFor(
+          object.getName()
+        );
+      });
+    }
+
     const resourcesInUse = new gd.ResourcesInUseHelper(
       project.getResourcesManager()
     );
@@ -3469,10 +3488,13 @@ export default class SceneEditor extends React.Component<Props, State> {
     resourcesInUse.delete();
 
     await this._reloadResources(objectResourceNames, 'custom object edited');
-    const { editorDisplay } = this;
-    if (editorDisplay) {
+    // Reset again after resources have been reloaded so renderers that were
+    // rebuilt (with possibly outdated textures) during the await are refreshed
+    // with the freshly loaded resources.
+    const editorDisplayAfterReload = this.editorDisplay;
+    if (editorDisplayAfterReload) {
       projectScopedContainersAccessor.forEachObject(object => {
-        editorDisplay.instancesHandlers.resetInstanceRenderersFor(
+        editorDisplayAfterReload.instancesHandlers.resetInstanceRenderersFor(
           object.getName()
         );
       });

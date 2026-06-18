@@ -18,7 +18,7 @@ import useForceUpdate from '../Utils/UseForceUpdate';
 import PreferencesContext, {
   type Preferences,
 } from '../MainFrame/Preferences/PreferencesContext';
-import { Column } from '../UI/Grid';
+import { Column, Line } from '../UI/Grid';
 import Add from '../UI/CustomSvgIcons/Add';
 import InAppTutorialContext from '../InAppTutorial/InAppTutorialContext';
 import { mapFor } from '../Utils/MapFor';
@@ -668,6 +668,7 @@ type Props = {|
   onSelectExtensionGlobalVariables: () => void,
   onSelectExtensionSceneVariables: () => void,
   onEventBasedObjectTypeChanged: () => void,
+  headerControls?: React.Node,
 |};
 
 const EventsFunctionsList = React.forwardRef<
@@ -705,6 +706,7 @@ const EventsFunctionsList = React.forwardRef<
       onSelectExtensionSceneVariables,
       onOpenCustomObjectEditor,
       onEventBasedObjectTypeChanged,
+      headerControls,
     }: Props,
     ref
   ) => {
@@ -1824,6 +1826,11 @@ const EventsFunctionsList = React.forwardRef<
               />
             </Column>
           </LineStackLayout>
+          {headerControls && (
+            <Line noMargin justifyContent="flex-end" alignItems="center">
+              {headerControls}
+            </Line>
+          )}
         </Column>
         <div
           style={styles.listContainer}

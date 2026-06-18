@@ -95,6 +95,10 @@ const styles = {
     paddingLeft: 0, // Remove the default padding of MUI DialogContent.
     paddingRight: 0, // Remove the default padding of MUI DialogContent.
   },
+  dialogContentWithoutScroll: {
+    overflowY: 'hidden',
+    minHeight: 0,
+  },
   flexColumnBody: {
     display: 'flex',
     flexDirection: 'column',
@@ -249,6 +253,7 @@ type DialogProps = {|
   actionsFullWidthOnMobile?: boolean,
   // Useful when the content of the dialog can change and we want to avoid layout shifts.
   forceScrollVisible?: boolean,
+  disableContentScroll?: boolean,
 
   id?: ?string,
 |};
@@ -278,6 +283,7 @@ const DialogWithoutWindowSizeProvider = ({
   noPadding,
   actionsFullWidthOnMobile,
   forceScrollVisible,
+  disableContentScroll,
   topBackgroundSrc,
 }: DialogProps) => {
   const preferences = React.useContext(PreferencesContext);
@@ -338,10 +344,12 @@ const DialogWithoutWindowSizeProvider = ({
     ...styles.dialogContent,
     ...flexStyle,
     ...additionalPaddingStyle,
+    ...(disableContentScroll ? styles.dialogContentWithoutScroll : {}),
   };
 
   const dialogContainerStyle = {
     ...styles.dialogContainer,
+    ...(disableContentScroll ? { overflowY: 'hidden' } : {}),
     // Ensure we don't spread an object here, to avoid a styling bug when resizing.
     margin: noPadding
       ? 0

@@ -23,10 +23,9 @@ import EventsFunctionsListWithErrorBoundary, {
 } from '../EventsFunctionsList';
 import { type EventsFunctionCreationParameters } from '../EventsFunctionsList/EventsFunctionTreeViewItemContent';
 import Background from '../UI/Background';
-import {
-  EventsBasedBehaviorOrObjectEditor,
-  type EventsBasedBehaviorOrObjectEditorInterface,
-} from '../EventsFunctionsExtensionEditor/EventsBasedBehaviorOrObjectEditor';
+import { type EventsBasedBehaviorOrObjectEditorInterface } from '../EventsFunctionsExtensionEditor/EventsBasedBehaviorOrObjectEditor';
+import EventsBasedObjectEditor from '../EventsFunctionsExtensionEditor/EventsBasedBehaviorOrObjectEditor/EventsBasedObjectEditor';
+import { EventsBasedBehaviorOrObjectPropertiesEditor } from '../EventsFunctionsExtensionEditor/EventsBasedBehaviorOrObjectEditor/EventsBasedBehaviorOrObjectPropertiesEditor';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import ObjectMethodSelectorDialog from '../EventsFunctionsExtensionEditor/ObjectMethodSelectorDialog';
 import { ResponsiveWindowMeasurer } from '../UI/Responsive/ResponsiveWindowMeasurer';
@@ -36,14 +35,18 @@ import EditorNavigator, {
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import { sendEventsExtractedAsFunction } from '../Utils/Analytics/EventSender';
-import ExtensionEditIcon from '../UI/CustomSvgIcons/ExtensionEdit';
+import SettingsIcon from '../UI/CustomSvgIcons/Settings';
 import Tune from '../UI/CustomSvgIcons/Tune';
-import Mark from '../UI/CustomSvgIcons/Mark';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 import PropertyListEditor, {
   type PropertyListEditorInterface,
 } from '../EventsFunctionsExtensionEditor/PropertyListEditor';
+import Dialog from '../UI/Dialog';
+import FlatButton from '../UI/FlatButton';
+import RaisedButton from '../UI/RaisedButton';
+import Text from '../UI/Text';
+import { Tabs } from '../UI/Tabs';
 import type { EventPath } from '../Utils/EventPath';
 import type { SearchFilterParams } from '../Utils/Search';
 import { type VariableDialogOpeningProps } from '../VariablesList/VariablesEditorDialog';
@@ -84,25 +87,82 @@ type Props = {|
   onExtensionInstalled: (extensionNames: Array<string>) => void,
 |};
 
+type PrefabPropertySelection = {|
+  propertyName: string,
+  isSharedProperties: boolean,
+|};
+type PrefabSettingsTab = 'configuration' | 'properties';
+
+const styles = {
+  centeredContent: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
+    height: '100%',
+  },
+  prefabSettingsContainer: {
+    display: 'flex',
+    flexDirection: 'column',
+    flex: 1,
+    minHeight: 0,
+    overflow: 'hidden',
+  },
+  prefabSettingsConfiguration: {
+    flex: 1,
+    minHeight: 0,
+    overflow: 'auto',
+    padding: '0 16px 16px 16px',
+  },
+  prefabSettingsConfigurationContent: {
+    maxWidth: 1200,
+    margin: '0 auto',
+  },
+  prefabSettingsProperties: {
+    display: 'flex',
+    flex: 1,
+    minHeight: 0,
+    overflow: 'hidden',
+  },
+  prefabSettingsSidebar: {
+    display: 'flex',
+    flexDirection: 'column',
+    flex: '0 0 300px',
+    minWidth: 260,
+    maxWidth: 360,
+    minHeight: 0,
+    borderRight: '1px solid rgba(255, 255, 255, 0.12)',
+  },
+  prefabSettingsSidebarHeader: {
+    padding: '8px 16px',
+  },
+  prefabSettingsDetail: {
+    display: 'flex',
+    flexDirection: 'column',
+    flex: 1,
+    minWidth: 0,
+    minHeight: 0,
+    overflow: 'auto',
+    padding: '8px 16px 16px 16px',
+  },
+};
+
 type State = {|
   selectedEventsFunction: ?gdEventsFunction,
   objectMethodSelectorDialogOpen: boolean,
   onAddEventsFunctionCb: ?(
     parameters: ?EventsFunctionCreationParameters
   ) => void,
+  parametersDialogOpen: boolean,
+  prefabDetailsDialogOpen: boolean,
+  prefabSettingsTab: PrefabSettingsTab,
+  selectedPrefabProperty: ?PrefabPropertySelection,
 |};
-
-const extensionEditIconReactNode = <ExtensionEditIcon />;
 
 const getInitialMosaicEditorNodes = (): EditorMosaicNode => ({
   direction: 'row',
   first: 'functions-list',
-  second: {
-    direction: 'row',
-    first: 'events-sheet',
-    second: 'parameters',
-    splitPercentage: 80,
-  },
+  second: 'events-sheet',
   splitPercentage: 20,
 });
 
@@ -112,11 +172,16 @@ export default class PrefabDetailEditor extends React.Component<Props, State> {
     selectedEventsFunction: null,
     objectMethodSelectorDialogOpen: false,
     onAddEventsFunctionCb: null,
+    parametersDialogOpen: false,
+    prefabDetailsDialogOpen: false,
+    prefabSettingsTab: 'properties',
+    selectedPrefabProperty: null,
   };
   editor: ?EventsSheetInterface;
   eventsFunctionList: ?EventsFunctionsListInterface;
   eventsBasedObjectEditor: ?EventsBasedBehaviorOrObjectEditorInterface;
   propertyListEditor: ?PropertyListEditorInterface;
+  prefabDetailsPropertyListEditor: ?PropertyListEditorInterface;
   eventsFunctionConfigurationEditor: ?EventsFunctionConfigurationEditorInterface;
   _editorMosaic: ?EditorMosaicInterface;
   _editorNavigator: ?EditorNavigatorInterface;
@@ -144,7 +209,7 @@ export default class PrefabDetailEditor extends React.Component<Props, State> {
     if (this.props.initiallyFocusedFunctionName) {
       this.selectEventsFunctionByName(this.props.initiallyFocusedFunctionName);
     } else {
-      this._selectPrefabConfiguration();
+      this._selectFirstEventsFunctionOrPrefabConfiguration();
     }
   }
 
@@ -277,6 +342,43 @@ export default class PrefabDetailEditor extends React.Component<Props, State> {
     }
   };
 
+  _getFirstEventsFunctionInFolder = (
+    functionFolderOrFunction: gdFunctionFolderOrFunction
+  ): ?gdEventsFunction => {
+    for (
+      let childIndex = 0;
+      childIndex < functionFolderOrFunction.getChildrenCount();
+      childIndex++
+    ) {
+      const child = functionFolderOrFunction.getChildAt(childIndex);
+      if (!child.isFolder()) {
+        return child.getFunction();
+      }
+
+      const firstEventsFunction = this._getFirstEventsFunctionInFolder(child);
+      if (firstEventsFunction) {
+        return firstEventsFunction;
+      }
+    }
+
+    return null;
+  };
+
+  _selectFirstEventsFunctionOrPrefabConfiguration = () => {
+    const firstEventsFunction = this._getFirstEventsFunctionInFolder(
+      this.props.eventsBasedObject.getEventsFunctions().getRootFolder()
+    );
+    if (firstEventsFunction) {
+      this._selectEventsFunction(
+        firstEventsFunction,
+        null,
+        this.props.eventsBasedObject
+      );
+    } else {
+      this._selectPrefabConfiguration();
+    }
+  };
+
   selectEventsBasedObjectByName = (eventBasedObjectName: string) => {
     if (this.props.eventsBasedObject.getName() === eventBasedObjectName) {
       this._selectPrefabConfiguration();
@@ -287,9 +389,6 @@ export default class PrefabDetailEditor extends React.Component<Props, State> {
     this._updateProjectScopedContainerFrom({ eventsFunction: null });
     this.setState({ selectedEventsFunction: null }, () => {
       this.updateToolbar();
-      if (this._editorMosaic) {
-        this._editorMosaic.uncollapseEditor('parameters', 25);
-      }
       const editorNavigator = this._editorNavigator;
       if (editorNavigator) {
         editorNavigator.openEditor('events-sheet');
@@ -316,16 +415,9 @@ export default class PrefabDetailEditor extends React.Component<Props, State> {
     });
     this.setState({ selectedEventsFunction }, () => {
       this.updateToolbar();
-      if (this._editorMosaic) {
-        this._editorMosaic.uncollapseEditor('parameters', 25);
-      }
       const editorNavigator = this._editorNavigator;
       if (editorNavigator) {
-        if (!selectedEventsFunction.getEvents().getEventsCount()) {
-          editorNavigator.openEditor('parameters');
-        } else {
-          editorNavigator.openEditor('events-sheet');
-        }
+        editorNavigator.openEditor('events-sheet');
       }
     });
   };
@@ -456,6 +548,19 @@ export default class PrefabDetailEditor extends React.Component<Props, State> {
       oldName,
       newName
     );
+    const { selectedPrefabProperty } = this.state;
+    if (
+      selectedPrefabProperty &&
+      !selectedPrefabProperty.isSharedProperties &&
+      selectedPrefabProperty.propertyName === oldName
+    ) {
+      this.setState({
+        selectedPrefabProperty: {
+          ...selectedPrefabProperty,
+          propertyName: newName,
+        },
+      });
+    }
   };
 
   _onFunctionParameterWillBeRenamed = (
@@ -517,22 +622,180 @@ export default class PrefabDetailEditor extends React.Component<Props, State> {
   };
 
   _editEventsFunctionParameter = (props: VariableDialogOpeningProps) => {
-    if (!this.eventsFunctionConfigurationEditor) {
+    if (!this.state.selectedEventsFunction) {
       return;
     }
-    this.eventsFunctionConfigurationEditor.editEventsFunctionParameter(props);
+    this.setState({ parametersDialogOpen: true }, () => {
+      if (this.eventsFunctionConfigurationEditor) {
+        this.eventsFunctionConfigurationEditor.editEventsFunctionParameter(
+          props
+        );
+      }
+    });
   };
 
   _onEditorNavigatorEditorChanged = (_editorName: string) => {
     this.updateToolbar();
   };
 
+  _openParametersDialog = () => {
+    if (!this.state.selectedEventsFunction) {
+      return;
+    }
+    this.setState({ parametersDialogOpen: true });
+  };
+
+  _closeParametersDialog = () => {
+    this.setState({ parametersDialogOpen: false });
+  };
+
+  _getFirstPrefabPropertySelection = (
+    eventsBasedObject: gdEventsBasedObject
+  ): ?PrefabPropertySelection => {
+    const properties = eventsBasedObject.getPropertyDescriptors();
+    const allPropertyFolderOrProperties = properties.getAllPropertyFolderOrProperty();
+    for (let index = 0; index < allPropertyFolderOrProperties.size(); index++) {
+      const propertyFolderOrProperty = allPropertyFolderOrProperties.at(index);
+      if (!propertyFolderOrProperty.isFolder()) {
+        return {
+          propertyName: propertyFolderOrProperty.getProperty().getName(),
+          isSharedProperties: false,
+        };
+      }
+    }
+
+    return null;
+  };
+
+  _isPrefabPropertySelectionValid = (
+    eventsBasedObject: gdEventsBasedObject,
+    selectedPrefabProperty: ?PrefabPropertySelection
+  ): boolean => {
+    if (!selectedPrefabProperty || selectedPrefabProperty.isSharedProperties) {
+      return false;
+    }
+
+    const allPropertyFolderOrProperties = eventsBasedObject
+      .getPropertyDescriptors()
+      .getAllPropertyFolderOrProperty();
+    for (let index = 0; index < allPropertyFolderOrProperties.size(); index++) {
+      const propertyFolderOrProperty = allPropertyFolderOrProperties.at(index);
+      if (
+        !propertyFolderOrProperty.isFolder() &&
+        propertyFolderOrProperty.getProperty().getName() ===
+          selectedPrefabProperty.propertyName
+      ) {
+        return true;
+      }
+    }
+
+    return false;
+  };
+
+  _syncPrefabDetailsPropertyListSelection = () => {
+    const { selectedPrefabProperty } = this.state;
+    if (!selectedPrefabProperty || !this.prefabDetailsPropertyListEditor) {
+      return;
+    }
+
+    this.prefabDetailsPropertyListEditor.setSelectedProperty(
+      selectedPrefabProperty.propertyName,
+      selectedPrefabProperty.isSharedProperties
+    );
+  };
+
+  _selectPrefabProperty = (
+    propertyName: string,
+    isSharedProperties: boolean
+  ) => {
+    this.setState(
+      {
+        selectedPrefabProperty: {
+          propertyName,
+          isSharedProperties,
+        },
+      },
+      this._syncPrefabDetailsPropertyListSelection
+    );
+  };
+
+  _ensurePrefabPropertySelection = (eventsBasedObject: gdEventsBasedObject) => {
+    if (
+      this._isPrefabPropertySelectionValid(
+        eventsBasedObject,
+        this.state.selectedPrefabProperty
+      )
+    ) {
+      return;
+    }
+
+    this.setState(
+      {
+        selectedPrefabProperty: this._getFirstPrefabPropertySelection(
+          eventsBasedObject
+        ),
+      },
+      this._syncPrefabDetailsPropertyListSelection
+    );
+  };
+
+  _setPrefabSettingsTab = (prefabSettingsTab: PrefabSettingsTab) => {
+    this.setState({ prefabSettingsTab }, () => {
+      if (prefabSettingsTab === 'properties') {
+        this._ensurePrefabPropertySelection(this.props.eventsBasedObject);
+        this._syncPrefabDetailsPropertyListSelection();
+      }
+    });
+  };
+
+  _openPrefabDetailsDialog = (_eventsBasedObject?: ?gdEventsBasedObject) => {
+    this.setState(
+      {
+        prefabDetailsDialogOpen: true,
+        prefabSettingsTab: 'properties',
+        selectedPrefabProperty: this._getFirstPrefabPropertySelection(
+          this.props.eventsBasedObject
+        ),
+      },
+      this._syncPrefabDetailsPropertyListSelection
+    );
+  };
+
+  _closePrefabDetailsDialog = () => {
+    this.setState({ prefabDetailsDialogOpen: false });
+  };
+
+  _makePrefabDetailsProjectScopedContainersAccessor = (): ProjectScopedContainersAccessor =>
+    new ProjectScopedContainersAccessor(
+      {
+        project: this.props.project,
+        layout: null,
+        externalEvents: null,
+        eventsFunctionsExtension: this.props.eventsFunctionsExtension,
+        eventsBasedBehavior: null,
+        eventsBasedObject: this.props.eventsBasedObject,
+        eventsFunction: null,
+      },
+      this._objectsContainer,
+      this._parameterVariablesContainer,
+      this._propertyVariablesContainer,
+      this._parameterResourcesContainer,
+      this._propertyResourcesContainer
+    );
+
   render(): any {
     const { project, eventsFunctionsExtension, eventsBasedObject } = this.props;
     const {
       selectedEventsFunction,
       objectMethodSelectorDialogOpen,
+      parametersDialogOpen,
+      prefabDetailsDialogOpen,
+      prefabSettingsTab,
+      selectedPrefabProperty,
     } = this.state;
+    const prefabDetailsProjectScopedContainersAccessor = prefabDetailsDialogOpen
+      ? this._makePrefabDetailsProjectScopedContainersAccessor()
+      : null;
 
     const scope = {
       project,
@@ -588,6 +851,7 @@ export default class PrefabDetailEditor extends React.Component<Props, State> {
                     onFunctionParameterTypeChanged={
                       this._onFunctionParameterChangedOfType
                     }
+                    parameterLayout="split"
                     onWillInstallExtension={this.props.onWillInstallExtension}
                     onExtensionInstalled={this.props.onExtensionInstalled}
                     unsavedChanges={this.props.unsavedChanges}
@@ -677,7 +941,10 @@ export default class PrefabDetailEditor extends React.Component<Props, State> {
                 setToolbar={this.props.setToolbar}
                 onBeginCreateEventsFunction={this.onBeginCreateEventsFunction}
                 onCreateEventsFunction={this.onCreateEventsFunction}
-                settingsIcon={extensionEditIconReactNode}
+                onOpenSettings={this._openParametersDialog}
+                settingsIcon={<Tune />}
+                settingsTooltip={t`Open parameters`}
+                settingsButtonPosition="start"
                 unsavedChanges={this.props.unsavedChanges}
                 isActive={true}
                 hotReloadPreviewButtonProps={
@@ -688,64 +955,17 @@ export default class PrefabDetailEditor extends React.Component<Props, State> {
                 editEventsFunctionParameter={this._editEventsFunctionParameter}
               />
             </Background>
-          ) : this._projectScopedContainersAccessor ? (
-            <EventsBasedBehaviorOrObjectEditor
-              ref={ref => (this.eventsBasedObjectEditor = ref)}
-              project={project}
-              projectScopedContainersAccessor={
-                this._projectScopedContainersAccessor
-              }
-              eventsFunctionsExtension={eventsFunctionsExtension}
-              eventsBasedObject={eventsBasedObject}
-              unsavedChanges={this.props.unsavedChanges}
-              onRenameProperty={(oldName, newName) =>
-                this._onObjectPropertyRenamed(
-                  eventsBasedObject,
-                  oldName,
-                  newName
-                )
-              }
-              onRenameSharedProperty={() => {}}
-              onPropertyTypeChanged={propertyName => {
-                gd.WholeProjectRefactorer.changeEventsBasedObjectPropertyType(
-                  project,
-                  eventsFunctionsExtension,
-                  eventsBasedObject,
-                  propertyName
-                );
-              }}
-              onPropertiesUpdated={() => {
-                if (this.propertyListEditor) {
-                  this.propertyListEditor.forceUpdateList();
-                }
-              }}
-              onFocusProperty={(propertyName, isSharedProperties) => {
-                if (this.propertyListEditor) {
-                  this.propertyListEditor.setSelectedProperty(
-                    propertyName,
-                    isSharedProperties
-                  );
-                }
-              }}
-              onEventsFunctionsAdded={() => {
-                if (this.eventsFunctionList) {
-                  this.eventsFunctionList.forceUpdateList();
-                }
-              }}
-              onOpenCustomObjectEditor={() =>
-                this.props.onOpenCustomObjectEditor(eventsBasedObject)
-              }
-              onEventsBasedObjectChildrenEdited={
-                this.props.onEventsBasedObjectChildrenEdited
-              }
-              onWillInstallExtension={this.props.onWillInstallExtension}
-              onExtensionInstalled={this.props.onExtensionInstalled}
-            />
           ) : (
             <Background>
-              <EmptyMessage>
-                <Trans>Choose a prefab function to edit it.</Trans>
-              </EmptyMessage>
+              <div style={styles.centeredContent}>
+                <RaisedButton
+                  label={<Trans>Open visual editor for the object</Trans>}
+                  primary
+                  onClick={() =>
+                    this.props.onOpenCustomObjectEditor(eventsBasedObject)
+                  }
+                />
+              </div>
             </Background>
           ),
       },
@@ -783,9 +1003,7 @@ export default class PrefabDetailEditor extends React.Component<Props, State> {
                 }
                 onEventsBasedBehaviorRenamed={() => {}}
                 onEventsBasedBehaviorPasted={() => {}}
-                selectedEventsBasedObject={
-                  selectedEventsFunction ? null : eventsBasedObject
-                }
+                selectedEventsBasedObject={eventsBasedObject}
                 onSelectEventsBasedObject={() =>
                   this._selectPrefabConfiguration()
                 }
@@ -802,6 +1020,15 @@ export default class PrefabDetailEditor extends React.Component<Props, State> {
                 }
                 onEventBasedObjectTypeChanged={
                   this.props.onEventBasedObjectTypeChanged
+                }
+                headerControls={
+                  <FlatButton
+                    fullWidth
+                    label={<Trans>Prefab settings</Trans>}
+                    leftIcon={<SettingsIcon />}
+                    onClick={this._openPrefabDetailsDialog}
+                    id="prefab-settings-button"
+                  />
                 }
               />
             )}
@@ -824,29 +1051,12 @@ export default class PrefabDetailEditor extends React.Component<Props, State> {
                 initialEditorName={'functions-list'}
                 transitions={{
                   'events-sheet': {
-                    nextIcon: <Tune />,
-                    nextLabel: selectedEventsFunction ? (
-                      <Trans>Parameters</Trans>
-                    ) : (
-                      <Trans>Property list</Trans>
-                    ),
-                    nextEditor: 'parameters',
                     previousEditor: () => {
                       if (selectedEventsFunction) {
                         this._selectPrefabConfiguration();
                       }
                       return 'functions-list';
                     },
-                  },
-                  parameters: {
-                    nextIcon: <Mark />,
-                    nextLabel: selectedEventsFunction ? (
-                      <Trans>Validate these parameters</Trans>
-                    ) : null,
-                    nextEditor: selectedEventsFunction ? 'events-sheet' : null,
-                    previousEditor: selectedEventsFunction
-                      ? null
-                      : () => 'events-sheet',
                   },
                 }}
                 onEditorChanged={this._onEditorNavigatorEditorChanged}
@@ -865,18 +1075,17 @@ export default class PrefabDetailEditor extends React.Component<Props, State> {
                     onPersistNodes={node =>
                       setDefaultEditorMosaicNode('prefab-detail-editor', node)
                     }
-                    initialNodes={
-                      mosaicContainsNode(
-                        getDefaultEditorMosaicNode('prefab-detail-editor') ||
-                          getInitialMosaicEditorNodes(),
-                        'functions-list'
-                      )
-                        ? getDefaultEditorMosaicNode('prefab-detail-editor') ||
-                          getInitialMosaicEditorNodes()
-                        : // Force the mosaic to reset to default.
-                          // $FlowFixMe[incompatible-type]
-                          getInitialMosaicEditorNodes()
-                    }
+                    initialNodes={(() => {
+                      const defaultNode = getInitialMosaicEditorNodes();
+                      const savedNode = getDefaultEditorMosaicNode(
+                        'prefab-detail-editor'
+                      );
+                      return savedNode &&
+                        mosaicContainsNode(savedNode, 'functions-list') &&
+                        !mosaicContainsNode(savedNode, 'parameters')
+                        ? savedNode
+                        : defaultNode;
+                    })()}
                   />
                 )}
               </PreferencesContext.Consumer>
@@ -892,6 +1101,192 @@ export default class PrefabDetailEditor extends React.Component<Props, State> {
             }
           />
         )}
+        {parametersDialogOpen && selectedEventsFunction && (
+          <Dialog
+            title={<Trans>Function parameters</Trans>}
+            actions={[
+              <FlatButton
+                key="close"
+                label={<Trans>Close</Trans>}
+                primary
+                keyboardFocused
+                onClick={this._closeParametersDialog}
+              />,
+            ]}
+            open
+            onRequestClose={this._closeParametersDialog}
+            maxWidth="md"
+            fullHeight
+            flexColumnBody
+            disableContentScroll
+          >
+            {editors.parameters.renderEditor()}
+          </Dialog>
+        )}
+        {prefabDetailsDialogOpen &&
+          prefabDetailsProjectScopedContainersAccessor && (
+            <Dialog
+              title={<Trans>Prefab settings</Trans>}
+              actions={[
+                <FlatButton
+                  key="close"
+                  label={<Trans>Close</Trans>}
+                  primary
+                  keyboardFocused
+                  onClick={this._closePrefabDetailsDialog}
+                />,
+              ]}
+              open
+              onRequestClose={this._closePrefabDetailsDialog}
+              maxWidth="lg"
+              fullHeight
+              flexColumnBody
+              fixedContent={
+                <Tabs
+                  value={prefabSettingsTab}
+                  onChange={this._setPrefabSettingsTab}
+                  options={[
+                    {
+                      value: ('properties': PrefabSettingsTab),
+                      label: <Trans>Properties</Trans>,
+                    },
+                    {
+                      value: ('configuration': PrefabSettingsTab),
+                      label: <Trans>Configuration</Trans>,
+                    },
+                  ]}
+                />
+              }
+            >
+              <div style={styles.prefabSettingsContainer}>
+                {prefabSettingsTab === 'configuration' && (
+                  <div style={styles.prefabSettingsConfiguration}>
+                    <div style={styles.prefabSettingsConfigurationContent}>
+                      <EventsBasedObjectEditor
+                        eventsFunctionsExtension={eventsFunctionsExtension}
+                        eventsBasedObject={eventsBasedObject}
+                        unsavedChanges={this.props.unsavedChanges}
+                        onOpenCustomObjectEditor={() =>
+                          this.props.onOpenCustomObjectEditor(eventsBasedObject)
+                        }
+                        onEventsBasedObjectChildrenEdited={
+                          this.props.onEventsBasedObjectChildrenEdited
+                        }
+                        hideOpenVisualEditorButton
+                      />
+                    </div>
+                  </div>
+                )}
+                {prefabSettingsTab === 'properties' && (
+                  <div style={styles.prefabSettingsProperties}>
+                    <div style={styles.prefabSettingsSidebar}>
+                      <div style={styles.prefabSettingsSidebarHeader}>
+                        <Text noMargin size="block-title">
+                          <Trans>Properties</Trans>
+                        </Text>
+                      </div>
+                      <PropertyListEditor
+                        ref={ref =>
+                          (this.prefabDetailsPropertyListEditor = ref)
+                        }
+                        project={project}
+                        projectScopedContainersAccessor={
+                          prefabDetailsProjectScopedContainersAccessor
+                        }
+                        extension={eventsFunctionsExtension}
+                        eventsBasedBehavior={null}
+                        eventsBasedObject={eventsBasedObject}
+                        hideConfigurationItem
+                        onRenameProperty={(oldName, newName) => {
+                          this._onObjectPropertyRenamed(
+                            eventsBasedObject,
+                            oldName,
+                            newName
+                          );
+                        }}
+                        onPropertiesUpdated={() => {
+                          if (this.eventsBasedObjectEditor) {
+                            this.eventsBasedObjectEditor.forceUpdateProperties();
+                          }
+                          this._ensurePrefabPropertySelection(
+                            eventsBasedObject
+                          );
+                          this.forceUpdate();
+                        }}
+                        onOpenConfiguration={() => {}}
+                        onOpenProperty={this._selectPrefabProperty}
+                        onEventsFunctionsAdded={() => {
+                          if (this.eventsFunctionList) {
+                            this.eventsFunctionList.forceUpdateList();
+                          }
+                        }}
+                      />
+                    </div>
+                    <div style={styles.prefabSettingsDetail}>
+                      {selectedPrefabProperty ? (
+                        <EventsBasedBehaviorOrObjectPropertiesEditor
+                          project={project}
+                          projectScopedContainersAccessor={
+                            prefabDetailsProjectScopedContainersAccessor
+                          }
+                          extension={eventsFunctionsExtension}
+                          eventsBasedBehavior={null}
+                          eventsBasedObject={eventsBasedObject}
+                          properties={eventsBasedObject.getPropertyDescriptors()}
+                          behaviorObjectType=""
+                          focusedPropertyName={
+                            selectedPrefabProperty.propertyName
+                          }
+                          onRenameProperty={(oldName, newName) => {
+                            this._onObjectPropertyRenamed(
+                              eventsBasedObject,
+                              oldName,
+                              newName
+                            );
+                          }}
+                          onPropertiesUpdated={() => {
+                            if (this.eventsBasedObjectEditor) {
+                              this.eventsBasedObjectEditor.forceUpdateProperties();
+                            }
+                            if (this.prefabDetailsPropertyListEditor) {
+                              this.prefabDetailsPropertyListEditor.forceUpdateList();
+                            }
+                            this.forceUpdate();
+                          }}
+                          onFocusProperty={propertyName =>
+                            this._selectPrefabProperty(propertyName, false)
+                          }
+                          onPropertyTypeChanged={propertyName => {
+                            gd.WholeProjectRefactorer.changeEventsBasedObjectPropertyType(
+                              project,
+                              eventsFunctionsExtension,
+                              eventsBasedObject,
+                              propertyName
+                            );
+                          }}
+                          onEventsFunctionsAdded={() => {
+                            if (this.eventsFunctionList) {
+                              this.eventsFunctionList.forceUpdateList();
+                            }
+                          }}
+                          onWillInstallExtension={
+                            this.props.onWillInstallExtension
+                          }
+                          onExtensionInstalled={this.props.onExtensionInstalled}
+                        />
+                      ) : (
+                        <div style={styles.centeredContent}>
+                          <Text align="center" color="secondary">
+                            <Trans>Create a property with + to edit it.</Trans>
+                          </Text>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </Dialog>
+          )}
       </React.Fragment>
     );
   }

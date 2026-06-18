@@ -48,7 +48,6 @@ import {
   getPrefabDetailEditor,
   notifyPreviewOrExportWillStart,
   getCurrentTabForPane,
-  getCustomObjectEditor,
   getOpenedAskAiEditor,
   getEditorTabOpenedWithKey,
   changeCurrentTab,
@@ -57,6 +56,7 @@ import {
   closeEditorTab,
   popOutTab,
   popInTab,
+  moveTabToPosition,
 } from './EditorTabs/EditorTabsHandler';
 import { renderDebuggerEditorContainer } from './EditorContainers/DebuggerEditorContainer';
 import { renderEventsEditorContainer } from './EditorContainers/EventsEditorContainer';
@@ -282,6 +282,42 @@ const editorKindToRenderer: {
   resources: renderResourcesEditorContainer,
   'global-search': renderGlobalEventsSearchEditorContainer,
   'ask-ai': renderAskAiEditorContainer,
+};
+
+const movePrefabDetailTabAfterCustomObjectTab = (
+  editorTabs: EditorTabsState,
+  customObjectTabKey: string,
+  prefabDetailTabKey: string
+): EditorTabsState => {
+  const customObjectTab = getEditorTabOpenedWithKey(
+    editorTabs,
+    customObjectTabKey
+  );
+  const prefabDetailTab = getEditorTabOpenedWithKey(
+    editorTabs,
+    prefabDetailTabKey
+  );
+
+  if (
+    !customObjectTab ||
+    !prefabDetailTab ||
+    customObjectTab.paneIdentifier !== prefabDetailTab.paneIdentifier
+  ) {
+    return editorTabs;
+  }
+
+  if (prefabDetailTab.tabIndex === customObjectTab.tabIndex + 1) {
+    return editorTabs;
+  }
+
+  return moveTabToPosition(
+    editorTabs,
+    prefabDetailTab.paneIdentifier,
+    prefabDetailTab.tabIndex,
+    prefabDetailTab.tabIndex < customObjectTab.tabIndex
+      ? customObjectTab.tabIndex
+      : customObjectTab.tabIndex + 1
+  );
 };
 
 const defaultSnackbarAutoHideDuration = 3000;
@@ -760,8 +796,7 @@ const MainFrame = (props: Props): React.MixedElement => {
           : kind === 'prefab detail'
           ? name.split('::')[1] + ` ${i18n._(t`(Prefab)`)}`
           : kind === 'custom object'
-          ? name.split('::')[2] ||
-            name.split('::')[1] + ` ${i18n._(t`(UI)`)}`
+          ? name.split('::')[2] || name.split('::')[1] + ` ${i18n._(t`(UI)`)}`
           : name;
       const tabOptions =
         kind === 'layout'
@@ -3297,7 +3332,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       eventsBasedObject: gdEventsBasedObject,
       variantName: string
     ) => {
-      const { currentProject, editorTabs } = state;
+      const { currentProject } = state;
       if (!currentProject) return;
 
       const prefabDetailName =
@@ -3307,55 +3342,40 @@ const MainFrame = (props: Props): React.MixedElement => {
         (eventsBasedObject.getVariants().hasVariantNamed(variantName)
           ? '::' + variantName
           : '');
-      const foundTab = getCustomObjectEditor(
-        editorTabs,
-        eventsFunctionsExtension,
-        eventsBasedObject,
-        variantName
-      );
-      if (foundTab) {
-        setState(state => ({
-          ...state,
-          editorTabs: changeCurrentTab(
-            // $FlowFixMe[incompatible-type]
-            openEditorTab(editorTabs, {
-              ...getEditorOpeningOptions({
-                kind: 'prefab detail',
-                name: prefabDetailName,
-                project: currentProject,
-                dontFocusTab: true,
-              }),
-            }),
-            foundTab.paneIdentifier,
-            foundTab.tabIndex
-          ),
-        }));
-      } else {
-        // Open a new editor for the extension and the given function
-        setState(state => ({
-          ...state,
+      const customObjectOpeningOptions = getEditorOpeningOptions({
+        kind: 'custom object',
+        name: customObjectName,
+        project: currentProject,
+      });
+      const prefabDetailOpeningOptions = getEditorOpeningOptions({
+        kind: 'prefab detail',
+        name: prefabDetailName,
+        project: currentProject,
+        dontFocusTab: true,
+      });
+
+      setState(state => {
+        let editorTabs = openEditorTab(
+          state.editorTabs,
           // $FlowFixMe[incompatible-type]
-          editorTabs: openEditorTab(
-            // $FlowFixMe[incompatible-type]
-            openEditorTab(state.editorTabs, {
-              ...getEditorOpeningOptions({
-                kind: 'prefab detail',
-                name: prefabDetailName,
-                project: currentProject,
-                dontFocusTab: true,
-              }),
-            }),
-            // $FlowFixMe[incompatible-type]
-            {
-              ...getEditorOpeningOptions({
-                kind: 'custom object',
-                name: customObjectName,
-                project: currentProject,
-              }),
-            }
-          ),
-        }));
-      }
+          customObjectOpeningOptions
+        );
+        editorTabs = openEditorTab(
+          editorTabs,
+          // $FlowFixMe[incompatible-type]
+          prefabDetailOpeningOptions
+        );
+        editorTabs = movePrefabDetailTabAfterCustomObjectTab(
+          editorTabs,
+          customObjectOpeningOptions.key,
+          prefabDetailOpeningOptions.key
+        );
+
+        return {
+          ...state,
+          editorTabs,
+        };
+      });
     },
     [getEditorOpeningOptions, setState, state]
   );
@@ -3425,40 +3445,54 @@ const MainFrame = (props: Props): React.MixedElement => {
       if (!currentProject) return;
 
       // Open both tabs at the same time to avoid the prefab detail tab to
-      // trigger code generation when it loses the focus.
-      setState(state => ({
-        ...state,
-        editorTabs: openEditorTab(
+      // trigger code generation when it loses the focus. The UI tab is opened
+      // first and kept focused, with the prefab settings tab next to it.
+      const prefabDetailName =
+        eventsFunctionsExtension.getName() + '::' + eventsBasedObject.getName();
+      const customObjectName =
+        prefabDetailName +
+        (eventsBasedObject.getVariants().hasVariantNamed(variantName)
+          ? '::' + variantName
+          : '');
+      const customObjectOpeningOptions = getEditorOpeningOptions({
+        kind: 'custom object',
+        name: customObjectName,
+        project: currentProject,
+      });
+      const prefabDetailOpeningOptions = {
+        ...getEditorOpeningOptions({
+          kind: 'prefab detail',
+          name: prefabDetailName,
+          project: currentProject,
+          dontFocusTab: true,
+        }),
+        extraEditorProps: {
+          initiallyFocusedFunctionName: null,
+        },
+      };
+
+      setState(state => {
+        let editorTabs = openEditorTab(
+          state.editorTabs,
           // $FlowFixMe[incompatible-type]
-          openEditorTab(state.editorTabs, {
-            ...getEditorOpeningOptions({
-              kind: 'prefab detail',
-              name:
-                eventsFunctionsExtension.getName() +
-                '::' +
-                eventsBasedObject.getName(),
-              project: currentProject,
-            }),
-            extraEditorProps: {
-              initiallyFocusedFunctionName: null,
-            },
-          }),
+          customObjectOpeningOptions
+        );
+        editorTabs = openEditorTab(
+          editorTabs,
           // $FlowFixMe[incompatible-type]
-          {
-            ...getEditorOpeningOptions({
-              kind: 'custom object',
-              name:
-                eventsFunctionsExtension.getName() +
-                '::' +
-                eventsBasedObject.getName() +
-                (eventsBasedObject.getVariants().hasVariantNamed(variantName)
-                  ? '::' + variantName
-                  : ''),
-              project: currentProject,
-            }),
-          }
-        ),
-      }));
+          prefabDetailOpeningOptions
+        );
+        editorTabs = movePrefabDetailTabAfterCustomObjectTab(
+          editorTabs,
+          customObjectOpeningOptions.key,
+          prefabDetailOpeningOptions.key
+        );
+
+        return {
+          ...state,
+          editorTabs,
+        };
+      });
     },
     [getEditorOpeningOptions, setState, state]
   );

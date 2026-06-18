@@ -5,6 +5,7 @@ import { type I18n as I18nType } from '@lingui/core';
 
 import * as React from 'react';
 import EventsTree, { type EventsTreeInterface } from './EventsTree';
+import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import EventsGraphPreviewPanel from './EventsGraphPreviewPanel';
 import { getInstructionMetadata } from './InstructionEditor/InstructionEditor';
 import InstructionEditorDialog from './InstructionEditor/InstructionEditorDialog';
@@ -191,6 +192,8 @@ type Props = {|
   setToolbar: (?React.Node) => void,
   onOpenSettings?: ?() => void,
   settingsIcon?: React.Node,
+  settingsTooltip?: MessageDescriptor,
+  settingsButtonPosition?: 'start' | 'end',
   onOpenExternalEvents: string => void,
   onOpenLayout: string => void,
   resourceManagementProps: ResourceManagementProps,
@@ -687,6 +690,8 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
             redo={this.redo}
             onOpenSettings={this.props.onOpenSettings}
             settingsIcon={this.props.settingsIcon}
+            settingsTooltip={this.props.settingsTooltip}
+            settingsButtonPosition={this.props.settingsButtonPosition}
             onToggleSearchPanel={this._toggleSearchPanel}
             onToggleGraphPreview={this._toggleEventsGraphPreview}
             isGraphPreviewVisible={this.state.showEventsGraphPreview}

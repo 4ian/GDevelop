@@ -148,13 +148,23 @@ export const getSchemaWithOpenFullEditorButton = ({
 export const CompactCollapsibleAdvancedSection = ({
   children,
   uncollapsedByDefault,
+  showContentWithoutToggle,
 }: {
   children?: React.Node,
   uncollapsedByDefault?: boolean,
+  showContentWithoutToggle?: boolean,
 }): React.Node => {
   const [showAdvancedOptions, setShowAdvancedOptions] = React.useState(
     uncollapsedByDefault
   );
+  if (showContentWithoutToggle) {
+    return (
+      <ColumnStackLayout noMargin expand>
+        {children}
+      </ColumnStackLayout>
+    );
+  }
+
   return showAdvancedOptions ? (
     <ColumnStackLayout noMargin expand>
       {children}

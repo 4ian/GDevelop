@@ -144,6 +144,7 @@ type Props = {|
   behaviorObjectType: string,
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
+  focusedPropertyName?: ?string,
 |};
 
 // Those names are used internally by GDevelop.
@@ -205,6 +206,7 @@ export const EventsBasedBehaviorOrObjectPropertiesEditor: React.ComponentType<{
       behaviorObjectType,
       onWillInstallExtension,
       onExtensionInstalled,
+      focusedPropertyName,
     }: Props,
     ref
   ) => {
@@ -310,18 +312,29 @@ export const EventsBasedBehaviorOrObjectPropertiesEditor: React.ComponentType<{
 
     propertyRefs.current.clear();
 
+    const propertyFolderOrProperties = mapVector(
+      properties.getAllPropertyFolderOrProperty(),
+      propertyFolderOrProperty => propertyFolderOrProperty
+    ).filter(propertyFolderOrProperty => {
+      if (!focusedPropertyName) return true;
+      return (
+        !propertyFolderOrProperty.isFolder() &&
+        propertyFolderOrProperty.getProperty().getName() === focusedPropertyName
+      );
+    });
+
+    const hasPropertyToRender = focusedPropertyName
+      ? propertyFolderOrProperties.length > 0
+      : properties.getCount() > 0;
+
     return (
       <I18n>
         {({ i18n }) => (
           <Column noMargin expand useFullHeight noOverflowParent>
-            {properties.getCount() > 0 ? (
+            {hasPropertyToRender ? (
               <Column noMargin expand noOverflowParent>
-                {mapVector(
-                  properties.getAllPropertyFolderOrProperty(),
-                  (
-                    propertyFolderOrProperty: gdPropertyFolderOrProperty,
-                    i: number
-                  ) => {
+                {propertyFolderOrProperties.map(
+                  (propertyFolderOrProperty: gdPropertyFolderOrProperty) => {
                     if (propertyFolderOrProperty.isFolder()) {
                       return (
                         <Text
@@ -883,6 +896,12 @@ export const EventsBasedBehaviorOrObjectPropertiesEditor: React.ComponentType<{
                     shouldShowCapabilityBehaviors={true}
                   />
                 )}
+              </Column>
+            ) : focusedPropertyName ? (
+              <Column noMargin justifyContent="center" expand noOverflowParent>
+                <Text align="center" color="secondary">
+                  <Trans>Select a property to see details.</Trans>
+                </Text>
               </Column>
             ) : (
               <Column noMargin justifyContent="center" expand noOverflowParent>

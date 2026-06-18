@@ -31,6 +31,7 @@ type Props = {|
   onEventsBasedObjectChildrenEdited: (
     eventsBasedObject: gdEventsBasedObject
   ) => void,
+  hideOpenVisualEditorButton?: boolean,
 |};
 
 export default function EventsBasedObjectEditor({
@@ -39,6 +40,7 @@ export default function EventsBasedObjectEditor({
   onOpenCustomObjectEditor,
   unsavedChanges,
   onEventsBasedObjectChildrenEdited,
+  hideOpenVisualEditorButton,
 }: Props): React.Node {
   const forceUpdate = useForceUpdate();
   const [isLoading, setIsLoading] = React.useState(false);
@@ -212,31 +214,32 @@ export default function EventsBasedObjectEditor({
                   )
             }
           />
-          {eventsFunctionsExtension.getOriginName() ===
-          'gdevelop-extension-store' ? (
-            <AlertMessage
-              kind="error"
-              renderRightButton={() => (
+          {!hideOpenVisualEditorButton &&
+            (eventsFunctionsExtension.getOriginName() ===
+            'gdevelop-extension-store' ? (
+              <AlertMessage
+                kind="error"
+                renderRightButton={() => (
+                  <RaisedButton
+                    label={<Trans>Edit the default variant</Trans>}
+                    primary
+                    onClick={onOpenCustomObjectEditor}
+                  />
+                )}
+              >
+                <Trans>
+                  The default variant is erased when the extension is updated.
+                </Trans>
+              </AlertMessage>
+            ) : (
+              <Line noMargin justifyContent="center">
                 <RaisedButton
-                  label={<Trans>Edit the default variant</Trans>}
+                  label={<Trans>Open visual editor for the object</Trans>}
                   primary
                   onClick={onOpenCustomObjectEditor}
                 />
-              )}
-            >
-              <Trans>
-                The default variant is erased when the extension is updated.
-              </Trans>
-            </AlertMessage>
-          ) : (
-            <Line noMargin justifyContent="center">
-              <RaisedButton
-                label={<Trans>Open visual editor for the object</Trans>}
-                primary
-                onClick={onOpenCustomObjectEditor}
-              />
-            </Line>
-          )}
+              </Line>
+            ))}
           <Line noMargin>
             <HelpButton
               key="help"

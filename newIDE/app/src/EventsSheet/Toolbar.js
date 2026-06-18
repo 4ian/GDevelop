@@ -12,6 +12,7 @@ import { getShortcutDisplayName, useShortcutMap } from '../KeyboardShortcuts';
 import GraphsIcon from '../UI/CustomSvgIcons/Graphs';
 import VariableTreeIcon from '../UI/CustomSvgIcons/VariableTree';
 import JavaScriptIcon from '../UI/CustomSvgIcons/JavaScript';
+import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 
 type Props = {|
   onAddStandardEvent: () => void,
@@ -37,6 +38,8 @@ type Props = {|
   isGraphPreviewVisible: boolean,
   onOpenSettings?: ?() => void,
   settingsIcon?: React.Node,
+  settingsTooltip?: MessageDescriptor,
+  settingsButtonPosition?: 'start' | 'end',
   moveEventsIntoNewGroup: () => void,
   canMoveEventsIntoNewGroup: boolean,
   onOpenSceneVariables: () => void,
@@ -67,12 +70,24 @@ const Toolbar: React.ComponentType<Props> = React.memo<Props>(function Toolbar({
   isGraphPreviewVisible,
   onOpenSettings,
   settingsIcon,
+  settingsTooltip,
+  settingsButtonPosition = 'end',
   moveEventsIntoNewGroup,
   canMoveEventsIntoNewGroup,
   onOpenSceneVariables,
   onShowGeneratedCode,
 }: Props) {
   const shortcutMap = useShortcutMap();
+  const settingsButton = onOpenSettings ? (
+    <IconButton
+      size="small"
+      color="default"
+      onClick={onOpenSettings}
+      tooltip={settingsTooltip || t`Open settings`}
+    >
+      {settingsIcon || <EditSceneIcon />}
+    </IconButton>
+  ) : null;
 
   return (
     <>
@@ -102,6 +117,7 @@ const Toolbar: React.ComponentType<Props> = React.memo<Props>(function Toolbar({
         onOpenSceneVariables={onOpenSceneVariables}
       />
       <ToolbarGroup lastChild>
+        {settingsButtonPosition === 'start' && settingsButton}
         <IconButton
           size="small"
           color="default"
@@ -145,17 +161,10 @@ const Toolbar: React.ComponentType<Props> = React.memo<Props>(function Toolbar({
         >
           <GraphsIcon />
         </IconButton>
-        {onOpenSettings && <ToolbarSeparator />}
-        {onOpenSettings && (
-          <IconButton
-            size="small"
-            color="default"
-            onClick={onOpenSettings}
-            tooltip={t`Open settings`}
-          >
-            {settingsIcon || <EditSceneIcon />}
-          </IconButton>
+        {settingsButtonPosition === 'end' && onOpenSettings && (
+          <ToolbarSeparator />
         )}
+        {settingsButtonPosition === 'end' && settingsButton}
       </ToolbarGroup>
     </>
   );

@@ -273,7 +273,6 @@ const createField = (
       isHighlighted: isHighlightedForString,
     };
   } else if (valueType === 'resource') {
-    console.log('hideResourceProperties ', hideResourceProperties);
     if (hideResourceProperties) {
       return null;
     }

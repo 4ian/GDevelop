@@ -16,7 +16,10 @@ import SearchIcon from '../UI/CustomSvgIcons/Search';
 import ProjectTitlebar from './ProjectTitlebar';
 import PreferencesDialog from './Preferences/PreferencesDialog';
 import AboutDialog from './AboutDialog';
-import ProjectManager from '../ProjectManager';
+import ProjectManager, {
+  type ProjectManagerInterface,
+  getProjectManagerTreeViewItemIdForEditorTab,
+} from '../ProjectManager';
 import LoaderModal from '../UI/LoaderModal';
 import CloseConfirmDialog from '../UI/CloseConfirmDialog';
 import ProfileDialog from '../Profile/ProfileDialog';
@@ -720,6 +723,7 @@ const MainFrame = (props: Props): React.MixedElement => {
    */
   const currentProjectRef = useStableUpToDateRef(currentProject);
   const editorTabsRef = useStableUpToDateRef(state.editorTabs);
+  const projectManagerRef = React.useRef<?ProjectManagerInterface>(null);
 
   const getEditorOpeningOptions = React.useCallback(
     ({
@@ -1611,6 +1615,54 @@ const MainFrame = (props: Props): React.MixedElement => {
     [openProjectManager]
   );
 
+  // When the project manager drawer is opened, highlight and scroll to the item
+  // matching the currently focused editor page (e.g. the open scene), so the
+  // user immediately sees where they are in the project tree.
+  React.useEffect(
+    () => {
+      if (!projectManagerOpen) return;
+
+      const project = currentProjectRef.current;
+      const editorTabs = editorTabsRef.current;
+      if (!project || !editorTabs) return;
+
+      // Find the focused tab, preferring the center pane (the main editor),
+      // then any other non-external pane that maps to a project tree item.
+      const paneIdentifiers = [
+        'center',
+        ...Object.keys(editorTabs.panes).filter(
+          paneIdentifier =>
+            paneIdentifier !== 'center' && paneIdentifier !== 'external'
+        ),
+      ];
+      let itemId = null;
+      for (const paneIdentifier of paneIdentifiers) {
+        if (!editorTabs.panes[paneIdentifier]) continue;
+        const currentTab = getCurrentTabForPane(editorTabs, paneIdentifier);
+        if (!currentTab) continue;
+        itemId = getProjectManagerTreeViewItemIdForEditorTab(
+          project,
+          currentTab.kind,
+          currentTab.projectItemName
+        );
+        if (itemId) break;
+      }
+      if (!itemId) return;
+      const itemIdToSelect = itemId;
+
+      // The drawer's content is kept mounted but the tree view needs a moment
+      // to (re)render its rows when the drawer opens before we can select and
+      // scroll to the item.
+      const timeoutId = setTimeout(() => {
+        if (projectManagerRef.current) {
+          projectManagerRef.current.selectAndScrollToItemFromId(itemIdToSelect);
+        }
+      }, 150);
+      return () => clearTimeout(timeoutId);
+    },
+    [projectManagerOpen, currentProjectRef, editorTabsRef]
+  );
+
   const deleteLayout = (layout: gdLayout) => {
     const { currentProject } = state;
     const { i18n } = props;
@@ -2408,6 +2460,7 @@ const MainFrame = (props: Props): React.MixedElement => {
   const _launchPreview = React.useCallback(
     async ({
       networkPreview,
+      forcedPreviewLayoutName,
       numberOfWindows,
       hotReload,
       shouldReloadProjectData,
@@ -2510,13 +2563,25 @@ const MainFrame = (props: Props): React.MixedElement => {
 
         notifyPreviewOrExportWillStart(state.editorTabs);
 
+        // A forced layout name (e.g. from MCP) takes precedence over the
+        // editor's active/previewed tab, so a preview can be launched on a
+        // specific scene without the corresponding tab being focused. When
+        // forced, there is no associated external layout.
+        const hasForcedPreviewLayout =
+          !isForInGameEdition &&
+          !!forcedPreviewLayoutName &&
+          currentProject.hasLayoutNamed(forcedPreviewLayoutName);
         const sceneName = isForInGameEdition
           ? isForInGameEdition.forcedSceneName
+          : hasForcedPreviewLayout
+          ? forcedPreviewLayoutName
           : previewState.isPreviewOverriden
           ? previewState.overridenPreviewLayoutName
           : previewState.previewLayoutName;
         const externalLayoutName = isForInGameEdition
           ? isForInGameEdition.forcedExternalLayoutName
+          : hasForcedPreviewLayout
+          ? null
           : previewState.isPreviewOverriden
           ? previewState.overridenPreviewExternalLayoutName
           : previewState.previewExternalLayoutName;
@@ -5725,6 +5790,7 @@ const MainFrame = (props: Props): React.MixedElement => {
         }
       >
         <ProjectManager
+          ref={projectManagerRef}
           project={currentProject}
           onChangeProjectName={onChangeProjectName}
           onSaveProjectProperties={onSaveProjectProperties}

@@ -12,6 +12,10 @@ export type LaunchCaptureOptions = {|
 
 export type LaunchPreviewOptions = {
   networkPreview?: boolean,
+  // When set, preview this specific layout instead of the editor's currently
+  // active/previewed tab. Used by MCP so an agent can preview the project's
+  // first scene (or a named scene) without controlling which tab is focused.
+  forcedPreviewLayoutName?: ?string,
   hotReload?: boolean,
   shouldReloadProjectData?: boolean,
   shouldReloadLibraries?: boolean,

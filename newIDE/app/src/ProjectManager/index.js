@@ -49,6 +49,7 @@ import {
   SceneTreeViewItemContent,
   SceneEventsTreeViewItemContent,
   getSceneTreeViewItemId,
+  getSceneEventsTreeViewItemId,
   type SceneTreeViewItemProps,
   type SceneTreeViewItemCallbacks,
 } from './SceneTreeViewItemContent';
@@ -74,6 +75,7 @@ import {
   CustomObjectTreeViewItemContent,
   CustomObjectVariantTreeViewItemContent,
   getCustomObjectTreeViewItemId,
+  getCustomObjectVariantTreeViewItemId,
   type CustomObjectTreeViewItemProps,
   type CustomObjectTreeViewItemCallbacks,
 } from './CustomObjectTreeViewItemContent';
@@ -147,6 +149,93 @@ const functionsEmptyPlaceholderId = 'functions-placeholder';
 const extensionsEmptyPlaceholderId = 'extensions-placeholder';
 const externalEventsEmptyPlaceholderId = 'external-events-placeholder';
 const externalLayoutEmptyPlaceholderId = 'external-layout-placeholder';
+
+/**
+ * Given the currently focused editor tab (its kind and the name of the
+ * layout/external layout/external events/extension/custom object it edits),
+ * returns the id of the matching item in the project manager tree view, or null
+ * if there is no corresponding item. This is used to highlight and scroll to
+ * the item matching the focused page when the project manager is opened.
+ *
+ * `editorKind` and `projectItemName` come from the EditorTab and are kept as
+ * plain values (rather than importing the EditorKind type) to avoid pulling
+ * editor containers into the project manager module.
+ */
+export const getProjectManagerTreeViewItemIdForEditorTab = (
+  project: ?gdProject,
+  editorKind: ?string,
+  projectItemName: ?string
+): ?string => {
+  if (!project || !editorKind) return null;
+
+  switch (editorKind) {
+    case 'resources':
+      return gameResourcesItemId;
+    case 'layout':
+      return projectItemName && project.hasLayoutNamed(projectItemName)
+        ? getSceneTreeViewItemId(project.getLayout(projectItemName))
+        : null;
+    case 'layout events':
+      return projectItemName && project.hasLayoutNamed(projectItemName)
+        ? getSceneEventsTreeViewItemId(project.getLayout(projectItemName))
+        : null;
+    case 'external layout':
+      return projectItemName && project.hasExternalLayoutNamed(projectItemName)
+        ? getExternalLayoutTreeViewItemId(
+            project.getExternalLayout(projectItemName)
+          )
+        : null;
+    case 'external events':
+      return projectItemName && project.hasExternalEventsNamed(projectItemName)
+        ? getExternalEventsTreeViewItemId(
+            project.getExternalEvents(projectItemName)
+          )
+        : null;
+    case 'events functions extension':
+      return projectItemName &&
+        project.hasEventsFunctionsExtensionNamed(projectItemName)
+        ? getExtensionTreeViewItemId(
+            project.getEventsFunctionsExtension(projectItemName)
+          )
+        : null;
+    case 'custom object': {
+      // projectItemName is "extensionName::objectName[::variantName]".
+      if (!projectItemName) return null;
+      const [extensionName, objectName, variantName] = projectItemName.split(
+        '::'
+      );
+      if (
+        !extensionName ||
+        !objectName ||
+        !project.hasEventsFunctionsExtensionNamed(extensionName)
+      ) {
+        return null;
+      }
+      const eventsFunctionsExtension = project.getEventsFunctionsExtension(
+        extensionName
+      );
+      const eventsBasedObjects = eventsFunctionsExtension.getEventsBasedObjects();
+      if (!eventsBasedObjects.has(objectName)) return null;
+      const eventsBasedObject = eventsBasedObjects.get(objectName);
+      if (
+        variantName &&
+        eventsBasedObject.getVariants().hasVariantNamed(variantName)
+      ) {
+        return getCustomObjectVariantTreeViewItemId(
+          eventsFunctionsExtension,
+          eventsBasedObject,
+          eventsBasedObject.getVariants().getVariant(variantName)
+        );
+      }
+      return getCustomObjectTreeViewItemId(
+        eventsFunctionsExtension,
+        eventsBasedObject
+      );
+    }
+    default:
+      return null;
+  }
+};
 
 const styles = {
   listContainer: {
@@ -465,9 +554,37 @@ const deleteItem = (item: TreeViewItem) => {
 const getTreeViewItemRightButton = (i18n: I18nType) => (item: TreeViewItem) =>
   item.content.getRightButton(i18n);
 
+/**
+ * Recursively search the tree for an item with the given id, collecting the
+ * ids of its ancestors along the way (so they can be opened to make the item
+ * visible). Returns null if no matching item is found.
+ */
+const findTreeViewItemById = (
+  items: Array<TreeViewItem>,
+  itemId: string,
+  i18n: I18nType,
+  ancestorIds: Array<string> = []
+): ?{| item: TreeViewItem, ancestorIds: Array<string> |} => {
+  for (const item of items) {
+    if (item.content.getId() === itemId) {
+      return { item, ancestorIds };
+    }
+    const children = item.getChildren(i18n);
+    if (children) {
+      const found = findTreeViewItemById(children, itemId, i18n, [
+        ...ancestorIds,
+        item.content.getId(),
+      ]);
+      if (found) return found;
+    }
+  }
+  return null;
+};
+
 export type ProjectManagerInterface = {|
   forceUpdateList: () => void,
   focusSearchBar: () => void,
+  selectAndScrollToItemFromId: (itemId: string) => void,
 |};
 
 type Props = {|
@@ -561,6 +678,13 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       InAppTutorialContext
     );
     const treeViewRef = React.useRef<?TreeViewInterface<TreeViewItem>>(null);
+    // Keep references to the latest i18n and tree data builder so imperative
+    // methods (which run outside of the render's <I18n> render prop and before
+    // getTreeViewData is declared) can traverse the tree.
+    const i18nRef = React.useRef<?I18nType>(null);
+    const getTreeViewDataRef = React.useRef<?(
+      i18n: I18nType
+    ) => Array<TreeViewItem>>(null);
     const forceUpdate = useForceUpdate();
     const { isMobile } = useResponsiveWindowSize();
     const { showDeleteConfirmation } = useAlertDialog();
@@ -703,6 +827,29 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       },
       focusSearchBar: () => {
         if (searchBarRef.current) searchBarRef.current.focus();
+      },
+      selectAndScrollToItemFromId: (itemId: string) => {
+        const i18n = i18nRef.current;
+        const getTreeViewData = getTreeViewDataRef.current;
+        const treeView = treeViewRef.current;
+        if (!i18n || !getTreeViewData || !treeView) return;
+
+        const found = findTreeViewItemById(getTreeViewData(i18n), itemId, i18n);
+        if (!found) return;
+
+        // Open ancestor folders so the item is visible, then select and scroll
+        // to it. Selecting the actual item (not just the id) keeps keyboard
+        // shortcuts (rename, delete...) working on it.
+        if (found.ancestorIds.length > 0) {
+          treeView.openItems(found.ancestorIds);
+        }
+        setSelectedItems([found.item]);
+        // Wait a few ms for the newly opened folders to render before scrolling.
+        setTimeout(() => {
+          if (treeViewRef.current) {
+            treeViewRef.current.scrollToItemFromId(itemId, 'smart');
+          }
+        }, 100);
       },
     }));
 
@@ -1600,6 +1747,8 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         sceneTreeViewItemProps,
       ]
     );
+    // Expose the latest tree data builder to imperative methods.
+    getTreeViewDataRef.current = getTreeViewData;
 
     const canMoveSelectionTo = React.useCallback(
       (destinationItem: TreeViewItem, where: 'before' | 'inside' | 'after') =>
@@ -1786,186 +1935,195 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
               </div>
             )}
             <I18n>
-              {({ i18n }) => (
-                <>
-                  {isNavigatingInMainMenuItem ? null : project ? (
-                    <div
-                      id="project-manager"
-                      style={{
-                        ...styles.listContainer,
-                        ...styles.autoSizerContainer,
-                      }}
-                      onKeyDown={keyboardShortcutsRef.current.onKeyDown}
-                      onKeyUp={keyboardShortcutsRef.current.onKeyUp}
-                    >
-                      <AutoSizer style={styles.autoSizer} disableWidth>
-                        {({ height }) => (
-                          // $FlowFixMe[incompatible-type]
-                          // $FlowFixMe[incompatible-exact]
-                          <TreeView
-                            key={listKey}
-                            ref={treeViewRef}
-                            items={getTreeViewData(i18n)}
-                            height={height}
-                            forceAllOpened={!!currentlyRunningInAppTutorial}
-                            searchText={searchText}
-                            getItemName={getTreeViewItemName}
-                            getItemThumbnail={getTreeViewItemThumbnail}
-                            getItemChildren={getTreeViewItemChildren(i18n)}
-                            multiSelect={false}
-                            getItemId={getTreeViewItemId}
-                            getItemHtmlId={getTreeViewItemHtmlId}
-                            getItemDataset={getTreeViewItemDataSet}
-                            onEditItem={editItem}
-                            onCollapseItem={onCollapseItem}
-                            selectedItems={selectedItems}
-                            onSelectItems={items => {
-                              const itemToSelect = items[0];
-                              if (!itemToSelect) return;
-                              if (itemToSelect.isRoot) return;
-                              setSelectedItems(items);
-                            }}
-                            onClickItem={onClickItem}
-                            onRenameItem={renameItem}
-                            buildMenuTemplate={buildMenuTemplate(i18n)}
-                            getItemRightButton={getTreeViewItemRightButton(
-                              i18n
-                            )}
-                            renderRightComponent={renderTreeViewItemRightComponent(
-                              i18n
-                            )}
-                            onMoveSelectionToItem={(destinationItem, where) =>
-                              moveSelectionTo(i18n, destinationItem, where)
-                            }
-                            canMoveSelectionToItem={canMoveSelectionTo}
-                            reactDndType={extensionItemReactDndType}
-                            initiallyOpenedNodeIds={initiallyOpenedNodeIds}
-                            forceDefaultDraggingPreview
-                            shouldHideMenuIcon={item =>
-                              !item.content.getRootId()
-                            }
-                          />
-                        )}
-                      </AutoSizer>
-                    </div>
-                  ) : (
-                    <EmptyMessage>
-                      <Trans>To begin, open or create a new project.</Trans>
-                    </EmptyMessage>
-                  )}
-                  {project && usageTarget && (
-                    <ProjectItemUsageDialog
-                      project={project}
-                      target={usageTarget}
-                      onClose={() => setUsageTarget(null)}
-                    />
-                  )}
-                  {projectPropertiesDialogOpen &&
-                    project &&
-                    projectScopedContainersAccessor && (
-                      <ProjectPropertiesDialog
-                        open
-                        // $FlowFixMe[incompatible-type]
-                        initialTab={projectPropertiesDialogInitialTab}
+              {({ i18n }) => {
+                // Capture the latest i18n so imperative methods can traverse
+                // the tree outside of this render prop.
+                i18nRef.current = i18n;
+                return (
+                  <>
+                    {isNavigatingInMainMenuItem ? null : project ? (
+                      <div
+                        id="project-manager"
+                        style={{
+                          ...styles.listContainer,
+                          ...styles.autoSizerContainer,
+                        }}
+                        onKeyDown={keyboardShortcutsRef.current.onKeyDown}
+                        onKeyUp={keyboardShortcutsRef.current.onKeyUp}
+                      >
+                        <AutoSizer style={styles.autoSizer} disableWidth>
+                          {({ height }) => (
+                            // $FlowFixMe[incompatible-type]
+                            // $FlowFixMe[incompatible-exact]
+                            <TreeView
+                              key={listKey}
+                              ref={treeViewRef}
+                              items={getTreeViewData(i18n)}
+                              height={height}
+                              forceAllOpened={!!currentlyRunningInAppTutorial}
+                              searchText={searchText}
+                              getItemName={getTreeViewItemName}
+                              getItemThumbnail={getTreeViewItemThumbnail}
+                              getItemChildren={getTreeViewItemChildren(i18n)}
+                              multiSelect={false}
+                              getItemId={getTreeViewItemId}
+                              getItemHtmlId={getTreeViewItemHtmlId}
+                              getItemDataset={getTreeViewItemDataSet}
+                              onEditItem={editItem}
+                              onCollapseItem={onCollapseItem}
+                              selectedItems={selectedItems}
+                              onSelectItems={items => {
+                                const itemToSelect = items[0];
+                                if (!itemToSelect) return;
+                                if (itemToSelect.isRoot) return;
+                                setSelectedItems(items);
+                              }}
+                              onClickItem={onClickItem}
+                              onRenameItem={renameItem}
+                              buildMenuTemplate={buildMenuTemplate(i18n)}
+                              getItemRightButton={getTreeViewItemRightButton(
+                                i18n
+                              )}
+                              renderRightComponent={renderTreeViewItemRightComponent(
+                                i18n
+                              )}
+                              onMoveSelectionToItem={(destinationItem, where) =>
+                                moveSelectionTo(i18n, destinationItem, where)
+                              }
+                              canMoveSelectionToItem={canMoveSelectionTo}
+                              reactDndType={extensionItemReactDndType}
+                              initiallyOpenedNodeIds={initiallyOpenedNodeIds}
+                              forceDefaultDraggingPreview
+                              shouldHideMenuIcon={item =>
+                                !item.content.getRootId()
+                              }
+                            />
+                          )}
+                        </AutoSizer>
+                      </div>
+                    ) : (
+                      <EmptyMessage>
+                        <Trans>To begin, open or create a new project.</Trans>
+                      </EmptyMessage>
+                    )}
+                    {project && usageTarget && (
+                      <ProjectItemUsageDialog
                         project={project}
-                        onClose={() => setProjectPropertiesDialogOpen(false)}
-                        onApply={onSaveProjectProperties}
-                        onPropertiesApplied={onProjectPropertiesApplied}
-                        resourceManagementProps={resourceManagementProps}
-                        projectScopedContainersAccessor={
-                          projectScopedContainersAccessor
-                        }
+                        target={usageTarget}
+                        onClose={() => setUsageTarget(null)}
+                      />
+                    )}
+                    {projectPropertiesDialogOpen &&
+                      project &&
+                      projectScopedContainersAccessor && (
+                        <ProjectPropertiesDialog
+                          open
+                          // $FlowFixMe[incompatible-type]
+                          initialTab={projectPropertiesDialogInitialTab}
+                          project={project}
+                          onClose={() => setProjectPropertiesDialogOpen(false)}
+                          onApply={onSaveProjectProperties}
+                          onPropertiesApplied={onProjectPropertiesApplied}
+                          resourceManagementProps={resourceManagementProps}
+                          projectScopedContainersAccessor={
+                            projectScopedContainersAccessor
+                          }
+                          hotReloadPreviewButtonProps={
+                            hotReloadPreviewButtonProps
+                          }
+                          i18n={i18n}
+                        />
+                      )}
+                    {project && projectVariablesEditorOpen && (
+                      <GlobalVariablesDialog
+                        project={project}
+                        open
+                        onCancel={() => setProjectVariablesEditorOpen(false)}
+                        onApply={() => {
+                          triggerUnsavedChanges();
+                          setProjectVariablesEditorOpen(false);
+                        }}
                         hotReloadPreviewButtonProps={
                           hotReloadPreviewButtonProps
                         }
-                        i18n={i18n}
+                        isListLocked={false}
+                        initiallySelectedVariable={null}
                       />
                     )}
-                  {project && projectVariablesEditorOpen && (
-                    <GlobalVariablesDialog
-                      project={project}
-                      open
-                      onCancel={() => setProjectVariablesEditorOpen(false)}
-                      onApply={() => {
-                        triggerUnsavedChanges();
-                        setProjectVariablesEditorOpen(false);
-                      }}
-                      hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
-                      isListLocked={false}
-                      initiallySelectedVariable={null}
-                    />
-                  )}
-                  {!!editedPropertiesLayout &&
-                    project &&
-                    projectScopedContainersAccessor && (
-                      <ScenePropertiesDialog
+                    {!!editedPropertiesLayout &&
+                      project &&
+                      projectScopedContainersAccessor && (
+                        <ScenePropertiesDialog
+                          open
+                          layout={editedPropertiesLayout}
+                          project={project}
+                          onApply={() => {
+                            triggerUnsavedChanges();
+                            onOpenLayoutProperties(null);
+                          }}
+                          onClose={() => onOpenLayoutProperties(null)}
+                          onEditVariables={() => {
+                            onOpenLayoutVariables(editedPropertiesLayout);
+                            onOpenLayoutProperties(null);
+                          }}
+                          resourceManagementProps={resourceManagementProps}
+                          projectScopedContainersAccessor={
+                            projectScopedContainersAccessor
+                          }
+                          onBackgroundColorChanged={() => {
+                            // TODO This can probably wait the rework of scene properties.
+                          }}
+                        />
+                      )}
+                    {project && !!editedVariablesLayout && (
+                      <SceneVariablesDialog
                         open
-                        layout={editedPropertiesLayout}
                         project={project}
+                        layout={editedVariablesLayout}
+                        onCancel={() => onOpenLayoutVariables(null)}
                         onApply={() => {
                           triggerUnsavedChanges();
-                          onOpenLayoutProperties(null);
+                          onOpenLayoutVariables(null);
                         }}
-                        onClose={() => onOpenLayoutProperties(null)}
-                        onEditVariables={() => {
-                          onOpenLayoutVariables(editedPropertiesLayout);
-                          onOpenLayoutProperties(null);
-                        }}
-                        resourceManagementProps={resourceManagementProps}
-                        projectScopedContainersAccessor={
-                          projectScopedContainersAccessor
+                        hotReloadPreviewButtonProps={
+                          hotReloadPreviewButtonProps
                         }
-                        onBackgroundColorChanged={() => {
-                          // TODO This can probably wait the rework of scene properties.
-                        }}
+                        isListLocked={false}
+                        initiallySelectedVariable={null}
                       />
                     )}
-                  {project && !!editedVariablesLayout && (
-                    <SceneVariablesDialog
-                      open
-                      project={project}
-                      layout={editedVariablesLayout}
-                      onCancel={() => onOpenLayoutVariables(null)}
-                      onApply={() => {
-                        triggerUnsavedChanges();
-                        onOpenLayoutVariables(null);
-                      }}
-                      hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
-                      isListLocked={false}
-                      initiallySelectedVariable={null}
-                    />
-                  )}
-                  {project && extensionsSearchDialogOpen && (
-                    <ExtensionsSearchDialog
-                      project={project}
-                      onClose={() => setExtensionsSearchDialogOpen(false)}
-                      onWillInstallExtension={onWillInstallExtension}
-                      onCreateNew={() => {
-                        onCreateNewExtension(project, i18n);
-                      }}
-                      onExtensionInstalled={onExtensionInstalled}
-                    />
-                  )}
-                  {project &&
-                    openedExtensionShortHeader &&
-                    openedExtensionName && (
-                      <InstalledExtensionDetails
+                    {project && extensionsSearchDialogOpen && (
+                      <ExtensionsSearchDialog
                         project={project}
-                        onClose={() => {
-                          setOpenedExtensionShortHeader(null);
-                          setOpenedExtensionName(null);
-                        }}
-                        onOpenEventsFunctionsExtension={
-                          onOpenEventsFunctionsExtension
-                        }
-                        extensionShortHeader={openedExtensionShortHeader}
-                        extensionName={openedExtensionName}
+                        onClose={() => setExtensionsSearchDialogOpen(false)}
                         onWillInstallExtension={onWillInstallExtension}
+                        onCreateNew={() => {
+                          onCreateNewExtension(project, i18n);
+                        }}
                         onExtensionInstalled={onExtensionInstalled}
                       />
                     )}
-                </>
-              )}
+                    {project &&
+                      openedExtensionShortHeader &&
+                      openedExtensionName && (
+                        <InstalledExtensionDetails
+                          project={project}
+                          onClose={() => {
+                            setOpenedExtensionShortHeader(null);
+                            setOpenedExtensionName(null);
+                          }}
+                          onOpenEventsFunctionsExtension={
+                            onOpenEventsFunctionsExtension
+                          }
+                          extensionShortHeader={openedExtensionShortHeader}
+                          extensionName={openedExtensionName}
+                          onWillInstallExtension={onWillInstallExtension}
+                          onExtensionInstalled={onExtensionInstalled}
+                        />
+                      )}
+                  </>
+                );
+              }}
             </I18n>
           </ColumnStackLayout>
         </Line>

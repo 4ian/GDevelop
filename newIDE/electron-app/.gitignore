@@ -4,3 +4,4 @@ app/www/
 app/extensions/ReactDeveloperTools
 app/extensions/__MACOSX
 output/
+build/

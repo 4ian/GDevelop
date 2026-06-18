@@ -653,6 +653,8 @@ type Props = {|
   project: gdProject,
   eventsFunctionsExtension: gdEventsFunctionsExtension,
   focusedEventsBasedObject?: ?gdEventsBasedObject,
+  focusedEventsBasedBehavior?: ?gdEventsBasedBehavior,
+  focusedEventsFunction?: ?gdEventsFunction,
   unsavedChanges?: ?UnsavedChanges,
   forceUpdateEditor: () => void,
   // Objects
@@ -680,6 +682,8 @@ const EventsFunctionsList = React.forwardRef<
       project,
       eventsFunctionsExtension,
       focusedEventsBasedObject,
+      focusedEventsBasedBehavior,
+      focusedEventsFunction,
       unsavedChanges,
       onSelectEventsFunction,
       onDeleteEventsFunction,
@@ -1335,9 +1339,13 @@ const EventsFunctionsList = React.forwardRef<
       ]
     );
 
-    const objectTreeViewItems = React.useMemo(
+    const objectTreeViewItems = React.useMemo<
+      Array<EventsBasedObjectTreeViewItem>
+    >(
       () =>
-        focusedEventsBasedObject
+        focusedEventsBasedBehavior || focusedEventsFunction
+          ? []
+          : focusedEventsBasedObject
           ? [
               new EventsBasedObjectTreeViewItem(
                 focusedEventsBasedObject,
@@ -1362,13 +1370,24 @@ const EventsFunctionsList = React.forwardRef<
         eventFunctionCommonProps,
         eventFunctionFolderCommonProps,
         eventsBasedObjectProps,
+        focusedEventsBasedBehavior,
         focusedEventsBasedObject,
+        focusedEventsFunction,
       ]
     );
     const behaviorTreeViewItems = React.useMemo<Array<BehaviorTreeViewItem>>(
       () =>
-        focusedEventsBasedObject
+        focusedEventsBasedObject || focusedEventsFunction
           ? []
+          : focusedEventsBasedBehavior
+          ? [
+              new BehaviorTreeViewItem(
+                focusedEventsBasedBehavior,
+                eventBasedBehaviorProps,
+                eventFunctionCommonProps,
+                eventFunctionFolderCommonProps
+              ),
+            ]
           : mapFor(
               0,
               eventBasedBehaviors.size(),
@@ -1385,7 +1404,45 @@ const EventsFunctionsList = React.forwardRef<
         eventBasedBehaviors,
         eventFunctionCommonProps,
         eventFunctionFolderCommonProps,
+        focusedEventsBasedBehavior,
         focusedEventsBasedObject,
+        focusedEventsFunction,
+      ]
+    );
+    const focusedFunctionTreeViewItem = React.useMemo<?TreeViewItem>(
+      () => {
+        if (!focusedEventsFunction) {
+          return null;
+        }
+
+        const freeEventsFunctions = eventsFunctionsExtension.getEventsFunctions();
+        const rootFolder = freeEventsFunctions.getRootFolder();
+        const functionFolderOrFunction = rootFolder.getFunctionNamed(
+          focusedEventsFunction.getName()
+        );
+        if (!functionFolderOrFunction) {
+          return null;
+        }
+
+        const freeFunctionProps: EventsFunctionProps = {
+          eventsFunctionsContainer: freeEventsFunctions,
+          ...eventFunctionCommonProps,
+        };
+
+        return createTreeViewItem({
+          functionFolderOrFunction,
+          functionFolderTreeViewItemProps: {
+            eventsFunctionsContainer: freeEventsFunctions,
+            ...eventFunctionFolderCommonProps,
+          },
+          functionTreeViewItemProps: freeFunctionProps,
+        });
+      },
+      [
+        eventFunctionCommonProps,
+        eventFunctionFolderCommonProps,
+        eventsFunctionsExtension,
+        focusedEventsFunction,
       ]
     );
     const getTreeViewData = React.useCallback(
@@ -1393,6 +1450,15 @@ const EventsFunctionsList = React.forwardRef<
         if (focusedEventsBasedObject) {
           // $FlowFixMe[incompatible-type]
           return objectTreeViewItems;
+        }
+        if (focusedEventsBasedBehavior) {
+          // $FlowFixMe[incompatible-type]
+          return behaviorTreeViewItems;
+        }
+        if (focusedEventsFunction) {
+          return focusedFunctionTreeViewItem
+            ? [focusedFunctionTreeViewItem]
+            : [];
         }
 
         // $FlowFixMe[incompatible-type]
@@ -1559,7 +1625,10 @@ const EventsFunctionsList = React.forwardRef<
         onSelectExtensionGlobalVariables,
         onSelectExtensionSceneVariables,
         objectTreeViewItems,
+        focusedEventsBasedBehavior,
         focusedEventsBasedObject,
+        focusedEventsFunction,
+        focusedFunctionTreeViewItem,
         behaviorTreeViewItems,
         addNewEventsFunction,
         eventsFunctionsExtension,
@@ -1638,12 +1707,19 @@ const EventsFunctionsList = React.forwardRef<
           setSelectedItems([]);
           if (focusedEventsBasedObject) {
             onSelectEventsFunction(null, null, focusedEventsBasedObject);
+          } else if (focusedEventsBasedBehavior) {
+            onSelectEventsFunction(null, focusedEventsBasedBehavior, null);
           } else {
             onSelectEventsFunction(null, null, null);
           }
         }
       },
-      [selectedItems, onSelectEventsFunction, focusedEventsBasedObject]
+      [
+        selectedItems,
+        onSelectEventsFunction,
+        focusedEventsBasedBehavior,
+        focusedEventsBasedObject,
+      ]
     );
 
     // Force List component to be mounted again if project or objectsContainer
@@ -1653,7 +1729,13 @@ const EventsFunctionsList = React.forwardRef<
       project.ptr +
       ';' +
       eventsFunctionsExtension.ptr +
-      (focusedEventsBasedObject ? ';' + focusedEventsBasedObject.ptr : '');
+      (focusedEventsBasedObject
+        ? ';object-' + focusedEventsBasedObject.ptr
+        : '') +
+      (focusedEventsBasedBehavior
+        ? ';behavior-' + focusedEventsBasedBehavior.ptr
+        : '') +
+      (focusedEventsFunction ? ';function-' + focusedEventsFunction.ptr : '');
     const initiallyOpenedNodeIds = [
       extensionObjectsRootFolderId,
       extensionBehaviorsRootFolderId,
@@ -1906,7 +1988,10 @@ const arePropsEqual = (prevProps: Props, nextProps: Props): boolean =>
   prevProps.selectedEventsFunction === nextProps.selectedEventsFunction &&
   prevProps.project === nextProps.project &&
   prevProps.eventsFunctionsExtension === nextProps.eventsFunctionsExtension &&
-  prevProps.focusedEventsBasedObject === nextProps.focusedEventsBasedObject;
+  prevProps.focusedEventsBasedObject === nextProps.focusedEventsBasedObject &&
+  prevProps.focusedEventsBasedBehavior ===
+    nextProps.focusedEventsBasedBehavior &&
+  prevProps.focusedEventsFunction === nextProps.focusedEventsFunction;
 
 // $FlowFixMe[incompatible-type]
 const MemoizedObjectsList = React.memo<Props, EventsFunctionsListInterface>(

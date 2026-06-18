@@ -50,21 +50,45 @@ export const useNavigationToEvent = ({
           behaviorName,
           objectName,
         } = pendingEventNavigation;
-        const editorKind =
-          locationType === 'layout'
-            ? 'layout events'
-            : locationType === 'external-events'
-            ? 'external events'
-            : 'events functions extension';
+        const getIsMatchingEditor = (editor: any): boolean => {
+          if (locationType === 'layout') {
+            return (
+              editor.kind === 'layout events' && editor.projectItemName === name
+            );
+          }
+          if (locationType === 'external-events') {
+            return (
+              editor.kind === 'external events' &&
+              editor.projectItemName === name
+            );
+          }
+          if (locationType === 'extension' && behaviorName) {
+            return (
+              editor.kind === 'behavior detail' &&
+              editor.projectItemName === name + '::' + behaviorName
+            );
+          }
+          if (
+            locationType === 'extension' &&
+            functionName &&
+            !behaviorName &&
+            !objectName
+          ) {
+            return (
+              editor.kind === 'function detail' &&
+              editor.projectItemName === name + '::' + functionName
+            );
+          }
+          return (
+            editor.kind === 'events functions extension' &&
+            editor.projectItemName === name
+          );
+        };
 
         for (const paneIdentifier in editorTabs.panes) {
           const pane = editorTabs.panes[paneIdentifier];
           for (const editor of pane.editors) {
-            if (
-              editor.kind === editorKind &&
-              editor.projectItemName === name &&
-              editor.editorRef
-            ) {
+            if (getIsMatchingEditor(editor) && editor.editorRef) {
               const ref = editor.editorRef;
 
               if (

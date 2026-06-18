@@ -78,7 +78,9 @@ const useNavigateFromGlobalSearch = ({
           if (
             (editor.kind === 'layout events' ||
               editor.kind === 'external events' ||
-              editor.kind === 'events functions extension') &&
+              editor.kind === 'events functions extension' ||
+              editor.kind === 'behavior detail' ||
+              editor.kind === 'function detail') &&
             editorRef &&
             editorRef.clearGlobalSearchResults
           ) {
@@ -204,12 +206,41 @@ const useNavigateFromGlobalSearch = ({
       const EDITOR_MOUNT_RETRY_INTERVAL_MS = 100;
       const EDITOR_MOUNT_MAX_ATTEMPTS = 25; // ~2.5s total
 
-      const editorKind =
-        locationType === 'layout'
-          ? 'layout events'
-          : locationType === 'external-events'
-          ? 'external events'
-          : 'events functions extension';
+      const getIsMatchingEditor = (editor: any): boolean => {
+        if (locationType === 'layout') {
+          return (
+            editor.kind === 'layout events' && editor.projectItemName === name
+          );
+        }
+        if (locationType === 'external-events') {
+          return (
+            editor.kind === 'external events' && editor.projectItemName === name
+          );
+        }
+        if (locationType === 'extension' && behaviorName) {
+          return (
+            editor.kind === 'behavior detail' &&
+            editor.projectItemName ===
+              (extensionName || name) + '::' + behaviorName
+          );
+        }
+        if (
+          locationType === 'extension' &&
+          functionName &&
+          !behaviorName &&
+          !objectName
+        ) {
+          return (
+            editor.kind === 'function detail' &&
+            editor.projectItemName ===
+              (extensionName || name) + '::' + functionName
+          );
+        }
+        return (
+          editor.kind === 'events functions extension' &&
+          editor.projectItemName === name
+        );
+      };
 
       const tryApplyGlobalSearchResults = (attempt: number) => {
         setState(latestState => {
@@ -218,8 +249,7 @@ const useNavigateFromGlobalSearch = ({
             for (const editor of pane.editors) {
               const editorRef: any = editor.editorRef;
               if (
-                editor.kind === editorKind &&
-                editor.projectItemName === name &&
+                getIsMatchingEditor(editor) &&
                 editorRef &&
                 editorRef.setGlobalSearchResults
               ) {

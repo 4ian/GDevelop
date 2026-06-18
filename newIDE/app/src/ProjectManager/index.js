@@ -81,11 +81,13 @@ import {
 } from './CustomObjectTreeViewItemContent';
 import {
   BehaviorShortcutTreeViewItemContent,
+  getBehaviorShortcutTreeViewItemId,
   type BehaviorShortcutTreeViewItemProps,
   type BehaviorShortcutTreeViewItemCallbacks,
 } from './BehaviorShortcutTreeViewItemContent';
 import {
   FunctionShortcutTreeViewItemContent,
+  getFunctionShortcutTreeViewItemId,
   type FunctionShortcutTreeViewItemProps,
   type FunctionShortcutTreeViewItemCallbacks,
 } from './FunctionShortcutTreeViewItemContent';
@@ -198,6 +200,48 @@ export const getProjectManagerTreeViewItemIdForEditorTab = (
             project.getEventsFunctionsExtension(projectItemName)
           )
         : null;
+    case 'behavior detail': {
+      // projectItemName is "extensionName::behaviorName".
+      if (!projectItemName) return null;
+      const [extensionName, behaviorName] = projectItemName.split('::');
+      if (
+        !extensionName ||
+        !behaviorName ||
+        !project.hasEventsFunctionsExtensionNamed(extensionName)
+      ) {
+        return null;
+      }
+      const eventsFunctionsExtension = project.getEventsFunctionsExtension(
+        extensionName
+      );
+      const eventsBasedBehaviors = eventsFunctionsExtension.getEventsBasedBehaviors();
+      if (!eventsBasedBehaviors.has(behaviorName)) return null;
+      return getBehaviorShortcutTreeViewItemId(
+        eventsFunctionsExtension,
+        eventsBasedBehaviors.get(behaviorName)
+      );
+    }
+    case 'function detail': {
+      // projectItemName is "extensionName::functionName".
+      if (!projectItemName) return null;
+      const [extensionName, functionName] = projectItemName.split('::');
+      if (
+        !extensionName ||
+        !functionName ||
+        !project.hasEventsFunctionsExtensionNamed(extensionName)
+      ) {
+        return null;
+      }
+      const eventsFunctionsExtension = project.getEventsFunctionsExtension(
+        extensionName
+      );
+      const eventsFunctions = eventsFunctionsExtension.getEventsFunctions();
+      if (!eventsFunctions.hasEventsFunctionNamed(functionName)) return null;
+      return getFunctionShortcutTreeViewItemId(
+        eventsFunctionsExtension,
+        eventsFunctions.getEventsFunction(functionName)
+      );
+    }
     case 'prefab detail': {
       // projectItemName is "extensionName::objectName".
       if (!projectItemName) return null;

@@ -51,6 +51,7 @@ export type EditorMosaicName =
   | 'debugger'
   | 'resources-editor'
   | 'events-functions-extension-editor'
+  | 'events-functions-extension-detail-editor'
   | 'prefab-detail-editor';
 
 export type InAppTutorialUserProgress = {|

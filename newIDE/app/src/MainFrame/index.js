@@ -45,6 +45,8 @@ import {
   type EditorTabsState,
   type EditorKind,
   getEventsFunctionsExtensionEditor,
+  getEventsBasedBehaviorDetailEditor,
+  getEventsFunctionDetailEditor,
   getPrefabDetailEditor,
   notifyPreviewOrExportWillStart,
   getCurrentTabForPane,
@@ -64,6 +66,10 @@ import { renderExternalEventsEditorContainer } from './EditorContainers/External
 import { renderSceneEditorContainer } from './EditorContainers/SceneEditorContainer';
 import { renderExternalLayoutEditorContainer } from './EditorContainers/ExternalLayoutEditorContainer';
 import { renderEventsFunctionsExtensionEditorContainer } from './EditorContainers/EventsFunctionsExtensionEditorContainer';
+import {
+  renderBehaviorDetailEditorContainer,
+  renderFunctionDetailEditorContainer,
+} from './EditorContainers/ExtensionItemDetailEditorContainer';
 import { renderPrefabDetailEditorContainer } from './EditorContainers/PrefabDetailEditorContainer';
 import { renderCustomObjectEditorContainer } from './EditorContainers/CustomObjectEditorContainer';
 import { renderHomePageContainer } from './EditorContainers/HomePage';
@@ -276,6 +282,8 @@ const editorKindToRenderer: {
   layout: renderSceneEditorContainer,
   'external layout': renderExternalLayoutEditorContainer,
   'events functions extension': renderEventsFunctionsExtensionEditorContainer,
+  'behavior detail': renderBehaviorDetailEditorContainer,
+  'function detail': renderFunctionDetailEditorContainer,
   'prefab detail': renderPrefabDetailEditorContainer,
   'custom object': renderCustomObjectEditorContainer,
   'start page': renderHomePageContainer,
@@ -793,6 +801,10 @@ const MainFrame = (props: Props): React.MixedElement => {
           ? i18n._(t`Debugger`)
           : kind === 'layout events'
           ? name + ` ${i18n._(t`(Events)`)}`
+          : kind === 'behavior detail'
+          ? name.split('::')[1] + ` ${i18n._(t`(Behavior)`)}`
+          : kind === 'function detail'
+          ? name.split('::')[1] + ` ${i18n._(t`(Function)`)}`
           : kind === 'prefab detail'
           ? name.split('::')[1] + ` ${i18n._(t`(Prefab)`)}`
           : kind === 'custom object'
@@ -810,6 +822,8 @@ const MainFrame = (props: Props): React.MixedElement => {
         'external events',
         'external layout',
         'events functions extension',
+        'behavior detail',
+        'function detail',
         'prefab detail',
         'custom object',
       ].includes(kind)
@@ -819,6 +833,8 @@ const MainFrame = (props: Props): React.MixedElement => {
       let customIconUrl = '';
       if (
         kind === 'events functions extension' ||
+        kind === 'behavior detail' ||
+        kind === 'function detail' ||
         kind === 'prefab detail' ||
         kind === 'custom object'
       ) {
@@ -851,6 +867,8 @@ const MainFrame = (props: Props): React.MixedElement => {
         ) : kind === 'external layout' ? (
           <ExternalLayoutIcon />
         ) : kind === 'events functions extension' ||
+          kind === 'behavior detail' ||
+          kind === 'function detail' ||
           kind === 'prefab detail' ||
           kind === 'custom object' ? (
           <ExtensionIcon />
@@ -3055,6 +3073,114 @@ const MainFrame = (props: Props): React.MixedElement => {
         const eventsFunctionsExtension = currentProject.getEventsFunctionsExtension(
           name
         );
+        if (initiallyFocusedBehaviorName && !initiallyFocusedObjectName) {
+          const eventsBasedBehaviors = eventsFunctionsExtension.getEventsBasedBehaviors();
+          if (eventsBasedBehaviors.has(initiallyFocusedBehaviorName)) {
+            const eventsBasedBehavior = eventsBasedBehaviors.get(
+              initiallyFocusedBehaviorName
+            );
+            const foundBehaviorTab = getEventsBasedBehaviorDetailEditor(
+              editorTabs,
+              eventsFunctionsExtension,
+              eventsBasedBehavior
+            );
+            if (foundBehaviorTab) {
+              if (initiallyFocusedFunctionName) {
+                foundBehaviorTab.editor.selectEventsFunctionByName(
+                  initiallyFocusedFunctionName,
+                  initiallyFocusedBehaviorName,
+                  null
+                );
+              } else {
+                foundBehaviorTab.editor.selectEventsBasedBehaviorByName(
+                  initiallyFocusedBehaviorName
+                );
+              }
+              setState(state => ({
+                ...state,
+                editorTabs: changeCurrentTab(
+                  editorTabs,
+                  foundBehaviorTab.paneIdentifier,
+                  foundBehaviorTab.tabIndex
+                ),
+              }));
+              return;
+            }
+
+            setState(state => ({
+              ...state,
+              // $FlowFixMe[incompatible-type]
+              editorTabs: openEditorTab(state.editorTabs, {
+                ...getEditorOpeningOptions({
+                  kind: 'behavior detail',
+                  name: name + '::' + initiallyFocusedBehaviorName,
+                  project: currentProject,
+                }),
+                extraEditorProps: {
+                  initiallyFocusedFunctionName,
+                  initiallyFocusedBehaviorName,
+                  initiallyFocusedObjectName: null,
+                },
+              }),
+            }));
+            return;
+          }
+        }
+
+        if (
+          initiallyFocusedFunctionName &&
+          !initiallyFocusedBehaviorName &&
+          !initiallyFocusedObjectName
+        ) {
+          const eventsFunctions = eventsFunctionsExtension.getEventsFunctions();
+          if (
+            eventsFunctions.hasEventsFunctionNamed(initiallyFocusedFunctionName)
+          ) {
+            const eventsFunction = eventsFunctions.getEventsFunction(
+              initiallyFocusedFunctionName
+            );
+            const foundFunctionTab = getEventsFunctionDetailEditor(
+              editorTabs,
+              eventsFunctionsExtension,
+              eventsFunction
+            );
+            if (foundFunctionTab) {
+              foundFunctionTab.editor.selectEventsFunctionByName(
+                initiallyFocusedFunctionName,
+                null,
+                null
+              );
+              setState(state => ({
+                ...state,
+                editorTabs: changeCurrentTab(
+                  editorTabs,
+                  foundFunctionTab.paneIdentifier,
+                  foundFunctionTab.tabIndex
+                ),
+              }));
+              return;
+            }
+
+            setState(state => ({
+              ...state,
+              // $FlowFixMe[incompatible-type]
+              editorTabs: openEditorTab(state.editorTabs, {
+                ...getEditorOpeningOptions({
+                  kind: 'function detail',
+                  name: name + '::' + initiallyFocusedFunctionName,
+                  project: currentProject,
+                }),
+                extraEditorProps: {
+                  initiallyFocusedFunctionName,
+                  initiallyFocusedBehaviorName: null,
+                  initiallyFocusedObjectName: null,
+                },
+              }),
+            }));
+            return;
+          }
+        }
+
         const foundTab = getEventsFunctionsExtensionEditor(
           editorTabs,
           eventsFunctionsExtension
@@ -3540,34 +3666,11 @@ const MainFrame = (props: Props): React.MixedElement => {
   };
 
   const openBehaviorEvents = (extensionName: string, behaviorName: string) => {
-    const { currentProject, editorTabs } = state;
+    const { currentProject } = state;
     if (!currentProject) return;
 
     if (currentProject.hasEventsFunctionsExtensionNamed(extensionName)) {
-      // It's an events functions extension, open the editor for it.
-      const eventsFunctionsExtension = currentProject.getEventsFunctionsExtension(
-        extensionName
-      );
-
-      const foundTab = getEventsFunctionsExtensionEditor(
-        editorTabs,
-        eventsFunctionsExtension
-      );
-      if (foundTab) {
-        // Open the given function and focus the tab
-        foundTab.editor.selectEventsBasedBehaviorByName(behaviorName);
-        setState(state => ({
-          ...state,
-          editorTabs: changeCurrentTab(
-            editorTabs,
-            foundTab.paneIdentifier,
-            foundTab.tabIndex
-          ),
-        }));
-      } else {
-        // Open a new editor for the extension and the given function
-        openEventsFunctionsExtension(extensionName, null, behaviorName, null);
-      }
+      openEventsFunctionsExtension(extensionName, null, behaviorName, null);
     } else {
       // It's not an events functions extension, we should not be here.
       console.warn(

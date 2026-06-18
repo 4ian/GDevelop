@@ -41,6 +41,38 @@ const projectHasItem = ({
   switch (kind) {
     case 'events functions extension':
       return project.hasEventsFunctionsExtensionNamed(name);
+    case 'behavior detail': {
+      const nameElements = name.split('::');
+      const extensionName = nameElements[0];
+      const behaviorName = nameElements[1];
+      if (
+        !extensionName ||
+        !behaviorName ||
+        !project.hasEventsFunctionsExtensionNamed(extensionName)
+      ) {
+        return false;
+      }
+      return project
+        .getEventsFunctionsExtension(extensionName)
+        .getEventsBasedBehaviors()
+        .has(behaviorName);
+    }
+    case 'function detail': {
+      const nameElements = name.split('::');
+      const extensionName = nameElements[0];
+      const functionName = nameElements[1];
+      if (
+        !extensionName ||
+        !functionName ||
+        !project.hasEventsFunctionsExtensionNamed(extensionName)
+      ) {
+        return false;
+      }
+      return project
+        .getEventsFunctionsExtension(extensionName)
+        .getEventsFunctions()
+        .hasEventsFunctionNamed(functionName);
+    }
     case 'prefab detail': {
       const nameElements = name.split('::');
       const objectType = nameElements[0] + '::' + nameElements[1];

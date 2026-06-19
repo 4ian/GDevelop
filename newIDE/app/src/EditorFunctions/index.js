@@ -962,6 +962,7 @@ const createOrReplaceObject: EditorFunction = {
       // the asset store, e.g. premade UI objects), use the tag as default
       // search terms.
       let effectiveSearchTerms = search_terms;
+      let assetSearchMissed = false;
       let assetStoreTag: string | null = null;
       if (candidateType && !effectiveSearchTerms && !asset_id) {
         assetStoreTag = getAssetStoreTagForNewObject(candidateType);
@@ -1022,10 +1023,14 @@ const createOrReplaceObject: EditorFunction = {
 
             if (createdObjects.length === 1) {
               const object = createdObjects[0];
+              const renamedNotice =
+                object.getName() !== targetObjectName
+                  ? ` (requested name "${targetObjectName}" was taken; use "${object.getName()}" from now on)`
+                  : '';
               const result: EditorFunctionGenericOutput = {
                 success: true,
                 message: [
-                  `Created object "${object.getName()}" (type "${object.getType()}", ${targetScopeText}) from asset store.`,
+                  `Created object "${object.getName()}" (type "${object.getType()}", ${targetScopeText}) from asset store.${renamedNotice}`,
                   getPropertiesText(object),
                 ].join(' '),
               };
@@ -1061,6 +1066,7 @@ const createOrReplaceObject: EditorFunction = {
             }
 
             // No asset found - we'll create an object from scratch.
+            assetSearchMissed = true;
           }
         } catch (error) {
           return makeGenericFailure(
@@ -1125,10 +1131,14 @@ const createOrReplaceObject: EditorFunction = {
         isNewObjectTypeUsed: isTheFirstOfItsTypeInProject,
       });
 
+      const scratchNotice = assetSearchMissed
+        ? ` No asset matched "${effectiveSearchTerms ||
+            ''}", so this object was created with no resource (no texture/3D model/font/etc...).`
+        : '';
       const scratchResult: EditorFunctionGenericOutput = {
         success: true,
         message: [
-          `Created object "${targetObjectName}" (type "${candidateType}", ${targetScopeText}) from scratch.`,
+          `Created object "${targetObjectName}" (type "${candidateType}", ${targetScopeText}) from scratch.${scratchNotice}`,
           getPropertiesText(object),
         ].join(' '),
       };

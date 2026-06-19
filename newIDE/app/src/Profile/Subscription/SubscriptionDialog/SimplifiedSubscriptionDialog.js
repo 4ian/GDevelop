@@ -8,7 +8,9 @@ import AuthenticatedUserContext from '../../AuthenticatedUserContext';
 import {
   type SubscriptionPlanWithPricingSystems,
   type SubscriptionPlanPricingSystem,
+  type SimplifiedSubscriptionFeatures,
 } from '../../../Utils/GDevelopServices/Usage';
+import { selectMessageByLocale } from '../../../Utils/i18n/MessageByLocale';
 import Text from '../../../UI/Text';
 import { Column, Line, Spacer } from '../../../UI/Grid';
 import CheckCircleFilled from '../../../UI/CustomSvgIcons/CheckCircleFilled';
@@ -27,9 +29,9 @@ import GooglePlay from '../../../UI/CustomSvgIcons/GooglePlay';
 import Steam from '../../../UI/CustomSvgIcons/Steam';
 import { useBuyUpdateOrCancelPlan } from './useBuyUpdateOrCancelPlan';
 
-// The plan featured by this simplified dialog. The benefits below are hardcoded
-// to match this plan ("GDevelop Gold").
-const FEATURED_PLAN_ID = 'gdevelop_gold';
+// Plan featured by this dialog when the backend does not specify one.
+const DEFAULT_FEATURED_PLAN_ID = 'gdevelop_gold';
+const FREE_PLAN_ID = 'free';
 
 // Accent colors taken from the design mockup. They are intentionally hardcoded
 // (rather than read from the theme) to keep the upsell visuals consistent.
@@ -181,6 +183,68 @@ const StoreBadge = ({
   </span>
 );
 
+// Maps a store badge id (sent by the backend) to its icon and (brand) label.
+// Unknown ids are ignored so the dialog degrades gracefully.
+const storeBadgesById: {
+  [string]: {| icon: React.Node, label: string |},
+} = {
+  apple: { icon: <Apple style={styles.storeIcon} />, label: 'iOS' },
+  'google-play': {
+    icon: <GooglePlay style={styles.storeIcon} />,
+    label: 'Android',
+  },
+  steam: { icon: <Steam style={styles.storeIcon} />, label: 'Steam' },
+  'gd-games': {
+    icon: <span style={styles.gdevelopBadgeSquare} />,
+    label: 'gd.games',
+  },
+};
+
+const renderStoreBadges = (storeBadges: Array<string>): React.Node => {
+  const knownBadges = storeBadges
+    .map(badgeId => storeBadgesById[badgeId])
+    .filter(Boolean);
+  if (knownBadges.length === 0) return null;
+  return (
+    <LineStackLayout noMargin>
+      {knownBadges.map((badge, index) => (
+        <StoreBadge key={index} icon={badge.icon} label={badge.label} />
+      ))}
+    </LineStackLayout>
+  );
+};
+
+/**
+ * Renders the bullet points (and optional store badges) of a plan's simplified
+ * features, served and translated by the backend.
+ */
+const SimplifiedBulletPoints = ({
+  i18n,
+  simplifiedFeatures,
+}: {|
+  i18n: I18nType,
+  simplifiedFeatures: SimplifiedSubscriptionFeatures,
+|}) => (
+  <ColumnStackLayout noMargin>
+    {simplifiedFeatures.bulletPoints.map((bulletPoint, index) => {
+      const { storeBadges } = bulletPoint;
+      const message = selectMessageByLocale(i18n, bulletPoint.messageByLocale);
+      return (
+        <Bullet key={index} enabled={bulletPoint.enabled}>
+          {storeBadges && storeBadges.length > 0 ? (
+            <ColumnStackLayout noMargin>
+              <Text noMargin>{message}</Text>
+              {renderStoreBadges(storeBadges)}
+            </ColumnStackLayout>
+          ) : (
+            message
+          )}
+        </Bullet>
+      );
+    })}
+  </ColumnStackLayout>
+);
+
 /**
  * Compute the monthly-equivalent price of a yearly plan (the price shown as
  * "X / month, billed annually").
@@ -209,6 +273,9 @@ const getYearlyDiscountText = (
 type Props = {|
   onClose: Function,
   availableSubscriptionPlansWithPrices: ?(SubscriptionPlanWithPricingSystems[]),
+  // Plan to feature, provided by the backend A/B test config. Falls back to a
+  // default when not provided (e.g. older callers).
+  featuredPlanId?: ?string,
   onOpenPendingDialog: (open: boolean) => void,
   couponCode?: ?string,
 |};
@@ -216,6 +283,7 @@ type Props = {|
 export default function SimplifiedSubscriptionDialog({
   onClose,
   availableSubscriptionPlansWithPrices,
+  featuredPlanId,
   onOpenPendingDialog,
   couponCode,
 }: Props): React.Node {
@@ -237,11 +305,23 @@ export default function SimplifiedSubscriptionDialog({
         plan => plan.pricingSystems.length > 0
       );
       return (
-        plansWithPricing.find(plan => plan.id === FEATURED_PLAN_ID) ||
+        (featuredPlanId &&
+          plansWithPricing.find(plan => plan.id === featuredPlanId)) ||
+        plansWithPricing.find(plan => plan.id === DEFAULT_FEATURED_PLAN_ID) ||
         plansWithPricing[0] ||
         null
       );
     },
+    [availableSubscriptionPlansWithPrices, featuredPlanId]
+  );
+
+  const freePlan = React.useMemo(
+    () =>
+      (availableSubscriptionPlansWithPrices &&
+        availableSubscriptionPlansWithPrices.find(
+          plan => plan.id === FREE_PLAN_ID
+        )) ||
+      null,
     [availableSubscriptionPlansWithPrices]
   );
 
@@ -292,6 +372,26 @@ export default function SimplifiedSubscriptionDialog({
       }
     };
 
+    const featuredPlanName = selectMessageByLocale(
+      i18n,
+      featuredPlan.nameByLocale
+    );
+    const freeSimplifiedFeatures = freePlan
+      ? freePlan.simplifiedFeatures
+      : null;
+    const featuredSimplifiedFeatures = featuredPlan.simplifiedFeatures;
+    const freeColumnTitle =
+      freeSimplifiedFeatures && freeSimplifiedFeatures.titleByLocale
+        ? selectMessageByLocale(i18n, freeSimplifiedFeatures.titleByLocale)
+        : null;
+    const featuredColumnTagline =
+      featuredSimplifiedFeatures && featuredSimplifiedFeatures.taglineByLocale
+        ? selectMessageByLocale(
+            i18n,
+            featuredSimplifiedFeatures.taglineByLocale
+          )
+        : null;
+
     return (
       <ColumnStackLayout noMargin>
         <div style={styles.topPart}>
@@ -306,7 +406,9 @@ export default function SimplifiedSubscriptionDialog({
                   </span>
                 </Text>
                 <Text noMargin size="section-title">
-                  <Trans>Upgrade to GDevelop Gold</Trans>
+                  {/* "Upgrade to […]" is intentionally kept as a client-side
+                  translation, with the plan name served by the backend. */}
+                  <Trans>Upgrade to {featuredPlanName}</Trans>
                 </Text>
               </Column>
             </LineStackLayout>
@@ -316,37 +418,28 @@ export default function SimplifiedSubscriptionDialog({
             <ResponsiveLineStackLayout noMargin noColumnMargin>
               {/* Free column */}
               <div style={{ ...styles.column, ...styles.freeColumn }}>
-                <Text noMargin size="body-small" color="secondary">
-                  <span
-                    style={{
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.1em',
-                    }}
-                  >
-                    <b>
-                      <Trans>Free (OSS)</Trans>
-                    </b>
-                  </span>
-                </Text>
+                {freeColumnTitle && (
+                  <Text noMargin size="body-small" color="secondary">
+                    <span
+                      style={{
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.1em',
+                      }}
+                    >
+                      <b>{freeColumnTitle}</b>
+                    </span>
+                  </Text>
+                )}
                 <Spacer />
-                <ColumnStackLayout noMargin>
-                  <Bullet enabled>
-                    <Trans>Unlimited game creation in the editor</Trans>
-                  </Bullet>
-                  <Bullet enabled={false}>
-                    <Trans>
-                      No AI assistant — <b>limited trial prompts</b>
-                    </Trans>
-                  </Bullet>
-                  <Bullet enabled={false}>
-                    <Trans>
-                      No automated, one-click publishing — <b>gd.games</b> only
-                    </Trans>
-                  </Bullet>
-                </ColumnStackLayout>
+                {freeSimplifiedFeatures && (
+                  <SimplifiedBulletPoints
+                    i18n={i18n}
+                    simplifiedFeatures={freeSimplifiedFeatures}
+                  />
+                )}
               </div>
 
-              {/* Gold column */}
+              {/* Featured plan column */}
               <div style={{ ...styles.column, ...styles.goldColumn }}>
                 <span style={styles.goldBadge}>
                   <Text
@@ -355,56 +448,23 @@ export default function SimplifiedSubscriptionDialog({
                     size="body-small"
                     style={{ fontWeight: 'bold' }}
                   >
-                    Gold
+                    {featuredPlanName}
                   </Text>
                 </span>
-                <Text noMargin size="body-small">
-                  <span style={styles.goldLabel}>
-                    <Trans>Supercharged game creation</Trans>
-                  </span>
-                </Text>
+                {featuredColumnTagline && (
+                  <Text noMargin size="body-small">
+                    <span style={styles.goldLabel}>
+                      {featuredColumnTagline}
+                    </span>
+                  </Text>
+                )}
                 <Spacer />
-                <ColumnStackLayout noMargin>
-                  <Bullet enabled>
-                    <Trans>Unlimited game creation in the editor</Trans>
-                  </Bullet>
-                  <Bullet enabled>
-                    <Trans>
-                      AI assistant — daily usage and{' '}
-                      <b style={{ color: colors.goldText }}>
-                        high intelligence mode
-                      </b>
-                    </Trans>
-                  </Bullet>
-                  <Bullet enabled>
-                    <ColumnStackLayout noMargin>
-                      <Text noMargin>
-                        <Trans>
-                          Publish to{' '}
-                          <b style={{ color: colors.goldText }}>all stores</b>
-                        </Trans>
-                      </Text>
-                      <LineStackLayout noMargin>
-                        <StoreBadge
-                          icon={<Apple style={styles.storeIcon} />}
-                          label="iOS"
-                        />
-                        <StoreBadge
-                          icon={<GooglePlay style={styles.storeIcon} />}
-                          label="Android"
-                        />
-                        <StoreBadge
-                          icon={<Steam style={styles.storeIcon} />}
-                          label="Steam"
-                        />
-                        <StoreBadge
-                          icon={<span style={styles.gdevelopBadgeSquare} />}
-                          label="gd.games"
-                        />
-                      </LineStackLayout>
-                    </ColumnStackLayout>
-                  </Bullet>
-                </ColumnStackLayout>
+                {featuredSimplifiedFeatures && (
+                  <SimplifiedBulletPoints
+                    i18n={i18n}
+                    simplifiedFeatures={featuredSimplifiedFeatures}
+                  />
+                )}
               </div>
             </ResponsiveLineStackLayout>
           </ColumnStackLayout>
@@ -467,7 +527,7 @@ export default function SimplifiedSubscriptionDialog({
                 disabled={isLoading}
                 label={
                   <LeftLoader isLoading={isLoading}>
-                    <Trans>Upgrade to Gold →</Trans>
+                    <Trans>Upgrade to {featuredPlanName} →</Trans>
                   </LeftLoader>
                 }
                 onClick={onClickUpgrade}

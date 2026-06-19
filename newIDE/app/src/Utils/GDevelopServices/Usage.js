@@ -202,6 +202,23 @@ export type SubscriptionPlanPricingSystem = {|
   periodCount: number,
 |};
 
+// Store badges that can be shown next to a simplified bullet point. Kept as a
+// loose string so unknown (future) badges sent by the backend are simply
+// ignored by older clients.
+export type SimplifiedSubscriptionStoreBadge = string;
+
+export type SimplifiedSubscriptionBulletPoint = {|
+  enabled: boolean,
+  messageByLocale: MessageByLocale,
+  storeBadges?: Array<SimplifiedSubscriptionStoreBadge>,
+|};
+
+export type SimplifiedSubscriptionFeatures = {|
+  titleByLocale?: MessageByLocale,
+  taglineByLocale?: MessageByLocale,
+  bulletPoints: Array<SimplifiedSubscriptionBulletPoint>,
+|};
+
 export type SubscriptionPlan = {|
   id: string,
   isLegacy: boolean,
@@ -209,6 +226,9 @@ export type SubscriptionPlan = {|
   descriptionByLocale: MessageByLocale,
   bulletPointsByLocale: Array<MessageByLocale>,
   specificRequirementByLocale?: MessageByLocale,
+  // Optional content for the simplified subscription dialog. Served by the
+  // backend so it can be translated. Absent on older backends.
+  simplifiedFeatures?: SimplifiedSubscriptionFeatures,
   targetAudiences: Array<'CASUAL' | 'PRO' | 'EDUCATION'>,
   fullFeatures: Array<{|
     featureName: string,
@@ -224,6 +244,23 @@ export type SubscriptionPlan = {|
 
   pillarNamesPerLocale: { [key: string]: MessageByLocale },
   featureNamesByLocale: { [key: string]: MessageByLocale },
+|};
+
+// A/B test configuration for the subscription dialog, served by the backend.
+// Forward-compatible: unknown variant types and unconfigured placements fall
+// back to the standard dialog on the client.
+export type SubscriptionDialogVariantConfig = {|
+  type: string,
+  weight: number,
+  featuredPlanId?: string,
+|};
+
+export type SubscriptionDialogPlacementConfig = {|
+  variants: Array<SubscriptionDialogVariantConfig>,
+|};
+
+export type SubscriptionDialogDisplayConfig = {|
+  placements: { [placementId: string]: SubscriptionDialogPlacementConfig },
 |};
 
 export type SubscriptionPlanWithPricingSystems = {|
@@ -313,6 +350,11 @@ export const listSubscriptionPlans = async (options: {|
     })).data,
     endpointName: '/subscription-plan of Usage API',
   });
+};
+
+export const getSubscriptionDialogDisplayConfig = async (): Promise<SubscriptionDialogDisplayConfig> => {
+  const response = await apiClient.get('/subscription-dialog-display-config');
+  return response.data;
 };
 
 export const getSubscriptionPlanPricingSystem = async (

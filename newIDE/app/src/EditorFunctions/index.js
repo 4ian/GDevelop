@@ -1742,6 +1742,33 @@ const changeObjectProperty: EditorFunction = {
       });
 
       if (!foundPropertyName || !foundProperty) {
+        // Position, rotation, opacity, z-order and layer are per-instance
+        // placement attributes, not object properties. A frequent mistake is to
+        // try to set them here; redirect to the right tool instead of a generic
+        // "not found".
+        const normalizedPropertyName = propertyName
+          .toLowerCase()
+          .replace(/\s|_|-/g, '');
+        const instanceOnlyAttributes = [
+          'x',
+          'y',
+          'z',
+          'position',
+          'rotation',
+          'rotationx',
+          'rotationy',
+          'rotationz',
+          'angle',
+          'opacity',
+          'zorder',
+          'layer',
+        ];
+        if (instanceOnlyAttributes.includes(normalizedPropertyName)) {
+          warnings.push(
+            `"${propertyName}" is a per-instance attribute, not a property of object "${object_name}". Use \`put_2d_instances\`/\`put_3d_instances\` to change it.`
+          );
+          return;
+        }
         warnings.push(
           `Property "${propertyName}" not found on object "${object_name}".`
         );
@@ -3246,8 +3273,36 @@ const put2dInstances: EditorFunction = {
       }
 
       if (changes.length === 0) {
-        return makeGenericSuccess(
-          'No instance changes. Specify brush kind/position/count, or exact instance ids to manipulate.'
+        const matchedCount = existingInstanceStates.size;
+        const hasMutationParams =
+          !!instancesSize ||
+          instancesRotation !== null ||
+          instancesOpacity !== null ||
+          instances_z_order !== null;
+        const hasPositionBrush =
+          brush_kind === 'point' ||
+          brush_kind === 'line' ||
+          brush_kind === 'grid' ||
+          brush_kind === 'random_in_circle';
+
+        if (existingInstanceIds.length === 0) {
+          return makeGenericFailure(
+            'No instance changes. To edit existing instances, pass `existing_instance_ids` (from `describe_instances`); to create, pass `object_name` and `new_instances_count`. See the tool parameters for how to move/resize/rotate.'
+          );
+        }
+
+        if (!hasMutationParams && !hasPositionBrush) {
+          return makeGenericFailure(
+            `Matched ${matchedCount} existing instance${
+              matchedCount > 1 ? 's' : ''
+            } but no change was requested — provide a value to modify (see the tool parameters for what can be edited).`
+          );
+        }
+
+        return makeGenericFailure(
+          `Matched ${matchedCount} existing instance${
+            matchedCount > 1 ? 's' : ''
+          } but the requested values are identical to their current ones, so nothing changed.`
         );
       }
 
@@ -3805,7 +3860,35 @@ const put3dInstances: EditorFunction = {
       }
 
       if (changes.length === 0) {
-        return makeGenericSuccess('No instance changes.');
+        const matchedCount = existingInstanceStates.size;
+        const hasMutationParams =
+          !!instancesSizeArray ||
+          (!!instancesRotationArray && instancesRotationArray.length >= 3);
+        const hasPositionBrush =
+          brush_kind === 'point' ||
+          brush_kind === 'line' ||
+          brush_kind === 'grid' ||
+          brush_kind === 'random_in_sphere';
+
+        if (existingInstanceIds.length === 0) {
+          return makeGenericFailure(
+            'No instance changes. To edit existing instances, pass `existing_instance_ids` (from `describe_instances`); to create, pass `object_name` and `new_instances_count`. Instance position and rotation can only be changed here, not with change_object_property. See the tool parameters for how to move/resize/rotate.'
+          );
+        }
+
+        if (!hasMutationParams && !hasPositionBrush) {
+          return makeGenericFailure(
+            `Matched ${matchedCount} existing instance${
+              matchedCount > 1 ? 's' : ''
+            } but no change was requested — provide a value to modify (see the tool parameters for what can be edited).`
+          );
+        }
+
+        return makeGenericFailure(
+          `Matched ${matchedCount} existing instance${
+            matchedCount > 1 ? 's' : ''
+          } but the requested values are identical to their current ones, so nothing changed.`
+        );
       }
 
       // /!\ Tell the editor that some instances have potentially been modified (and even removed).

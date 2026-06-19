@@ -4571,6 +4571,10 @@ const createScene: EditorFunction = {
       'is_first_scene'
     );
 
+    const firstSceneSuffix = is_first_scene
+      ? ' Also set as the first (startup) scene.'
+      : '';
+
     if (project.hasLayoutNamed(scene_name)) {
       const scene = project.getLayout(scene_name);
       if (is_first_scene) {
@@ -4580,11 +4584,13 @@ const createScene: EditorFunction = {
         scene.insertNewLayer('UI', scene.getLayersCount());
         addDefaultLightToLayer(scene.getLayer('UI'));
         return makeGenericSuccess(
-          `Scene "${scene_name}" already exists; added "UI" layer.`
+          `Scene "${scene_name}" already exists; added "UI" layer.${firstSceneSuffix}`
         );
       }
 
-      return makeGenericSuccess(`Scene "${scene_name}" already exists.`);
+      return makeGenericSuccess(
+        `Scene "${scene_name}" already exists.${firstSceneSuffix}`
+      );
     }
 
     const scenesCount = project.getLayoutsCount();
@@ -4605,9 +4611,10 @@ const createScene: EditorFunction = {
 
     return {
       success: true,
-      message: include_ui_layer
-        ? `Created scene "${scene_name}" with base layer + "UI" layer.`
-        : `Created scene "${scene_name}".`,
+      message:
+        (include_ui_layer
+          ? `Created scene "${scene_name}" with base layer + "UI" layer.`
+          : `Created scene "${scene_name}".`) + firstSceneSuffix,
       meta: {
         newSceneNames: [scene_name],
       },

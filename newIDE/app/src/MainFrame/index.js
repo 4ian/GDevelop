@@ -966,6 +966,41 @@ const MainFrame = (props: Props): React.MixedElement => {
     [setState]
   );
 
+  React.useEffect(
+    () => {
+      if (!ipcRenderer) return;
+
+      const onDebuggerPopOutCloseRequested = () => {
+        setState(prevState => {
+          const debuggerTab = getEditorTabOpenedWithKey(
+            prevState.editorTabs,
+            'debugger'
+          );
+          if (!debuggerTab) return prevState;
+
+          return {
+            ...prevState,
+            editorTabs: closeEditorTab(
+              prevState.editorTabs,
+              debuggerTab.editorTab
+            ),
+          };
+        });
+      };
+
+      ipcRenderer.on(
+        'debugger-popout-close-requested',
+        onDebuggerPopOutCloseRequested
+      );
+      return () =>
+        ipcRenderer.removeListener(
+          'debugger-popout-close-requested',
+          onDebuggerPopOutCloseRequested
+        );
+    },
+    [setState]
+  );
+
   const {
     hasAPreviousSaveForEditorTabsState,
     openEditorTabsFromPersistedState,
@@ -3327,14 +3362,22 @@ const MainFrame = (props: Props): React.MixedElement => {
 
   const _openDebugger = React.useCallback(
     () => {
-      setState(state => ({
-        ...state,
-        editorTabs: openEditorTab(
+      setState(state => {
+        const editorTabsWithDebugger = openEditorTab(
           state.editorTabs,
           // $FlowFixMe[incompatible-type]
-          getEditorOpeningOptions({ kind: 'debugger', name: '' })
-        ),
-      }));
+          getEditorOpeningOptions({
+            kind: 'debugger',
+            name: '',
+            dontFocusTab: true,
+          })
+        );
+
+        return {
+          ...state,
+          editorTabs: popOutTab(editorTabsWithDebugger, 'debugger'),
+        };
+      });
     },
     [getEditorOpeningOptions, setState]
   );

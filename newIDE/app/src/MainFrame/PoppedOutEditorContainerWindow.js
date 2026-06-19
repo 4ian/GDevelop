@@ -110,6 +110,7 @@ const PoppedOutEditorContainerWindow = (props: Props): React.Node => {
   return (
     <WindowPortal
       key={`popout-${editorTab.key}`}
+      role={editorTab.kind === 'debugger' ? 'debugger' : undefined}
       title={editorTab.label || 'GDevelop'}
       onClose={() => {
         props.onEditorTabClosing(editorTab);

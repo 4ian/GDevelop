@@ -32,6 +32,8 @@ import {
 let popOutCounter = 0;
 
 type Props = {|
+  /** Optional role used by the desktop app to apply native window behavior. */
+  role?: 'debugger',
   /** The title of the new window. */
   title: string,
   /** The content to render in the new window. */
@@ -61,6 +63,7 @@ type Props = {|
  * When this component unmounts, the external window is closed.
  */
 const WindowPortal = ({
+  role,
   title,
   renderContent,
   onClose,
@@ -97,7 +100,9 @@ const WindowPortal = ({
       themeBackgroundColor
     )}`;
 
-    const targetId = `GDevelopWindowPortal${++popOutCounter}`;
+    const targetId = role
+      ? `GDevelopWindowPortal-${role}-${++popOutCounter}`
+      : `GDevelopWindowPortal${++popOutCounter}`;
     const externalWindow = window.open('', targetId, features);
 
     if (!externalWindow) {

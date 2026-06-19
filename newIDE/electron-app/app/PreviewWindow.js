@@ -12,6 +12,7 @@ const { load } = require('./Utils/UrlLoader');
 // be closed automatically when the JavaScript object is garbage collected.
 // Map of preview windows with their parent window ID: { previewWindow, parentWindowId }
 let previewWindows = [];
+let debuggerPopOutWindows = new Map();
 
 let openDevToolsByDefault = false;
 
@@ -45,6 +46,175 @@ const updatePowerSaveBlocker = () => {
   }
 };
 
+const clamp = (value, min, max) => Math.max(min, Math.min(value, max));
+
+const getLatestPreviewWindow = parentWindowId => {
+  for (let i = previewWindows.length - 1; i >= 0; i--) {
+    if (previewWindows[i].parentWindowId !== parentWindowId) continue;
+    const previewWindow = previewWindows[i].previewWindow;
+    if (previewWindow && !previewWindow.isDestroyed()) return previewWindow;
+  }
+
+  return null;
+};
+
+const showWithoutStealingFocus = window => {
+  if (typeof window.showInactive === 'function') window.showInactive();
+  else window.show();
+};
+
+const keepParentWindowVisibleAfterChildClose = (
+  parentWindowId,
+  parentWasMinimizedBeforeChildClose
+) => {
+  if (parentWindowId === null || parentWasMinimizedBeforeChildClose) return;
+
+  const restoreParentWindow = () => {
+    const parentWindow = BrowserWindow.fromId(parentWindowId);
+    if (!parentWindow || parentWindow.isDestroyed()) return;
+
+    try {
+      if (parentWindow.isMinimized()) parentWindow.restore();
+      showWithoutStealingFocus(parentWindow);
+    } catch (error) {
+      console.warn(
+        'Ignoring exception when restoring parent editor window:',
+        error
+      );
+    }
+  };
+
+  setTimeout(restoreParentWindow, 0);
+  setTimeout(restoreParentWindow, 100);
+};
+
+const arrangeDebuggerPopOutWithLatestPreview = parentWindowId => {
+  const previewWindow = getLatestPreviewWindow(parentWindowId);
+  const debuggerWindow = debuggerPopOutWindows.get(parentWindowId);
+
+  if (
+    !previewWindow ||
+    !debuggerWindow ||
+    previewWindow.isDestroyed() ||
+    debuggerWindow.isDestroyed()
+  ) {
+    return false;
+  }
+
+  try {
+    if (previewWindow.isMinimized()) previewWindow.restore();
+    if (debuggerWindow.isMinimized()) debuggerWindow.restore();
+
+    const previewBounds = previewWindow.getBounds();
+    const workArea = screen.getDisplayMatching(previewBounds).workArea;
+    const preferredDebuggerWidth = 640;
+    const minimumDebuggerWidth = 420;
+    const availableWidthNextToPreview = workArea.width - previewBounds.width;
+    const debuggerWidth =
+      availableWidthNextToPreview >= minimumDebuggerWidth
+        ? Math.min(preferredDebuggerWidth, availableWidthNextToPreview)
+        : Math.min(
+            preferredDebuggerWidth,
+            Math.max(minimumDebuggerWidth, Math.floor(workArea.width * 0.35))
+          );
+    const debuggerHeight = Math.min(previewBounds.height, workArea.height);
+    const combinedWidth = previewBounds.width + debuggerWidth;
+    const maxPreviewX = workArea.x + workArea.width - combinedWidth;
+    const previewX =
+      maxPreviewX >= workArea.x
+        ? clamp(previewBounds.x, workArea.x, maxPreviewX)
+        : workArea.x;
+    const previewY =
+      previewBounds.height <= workArea.height
+        ? clamp(
+            previewBounds.y,
+            workArea.y,
+            workArea.y + workArea.height - previewBounds.height
+          )
+        : workArea.y;
+
+    previewWindow.setPosition(Math.round(previewX), Math.round(previewY));
+    debuggerWindow.setBounds({
+      x: Math.round(
+        Math.min(
+          previewX + previewBounds.width,
+          workArea.x + workArea.width - debuggerWidth
+        )
+      ),
+      y: Math.round(previewY),
+      width: Math.round(debuggerWidth),
+      height: Math.round(debuggerHeight),
+    });
+
+    showWithoutStealingFocus(previewWindow);
+    showWithoutStealingFocus(debuggerWindow);
+    if (typeof previewWindow.moveTop === 'function') previewWindow.moveTop();
+    if (typeof debuggerWindow.moveTop === 'function') debuggerWindow.moveTop();
+    return true;
+  } catch (error) {
+    console.warn(
+      'Ignoring exception when arranging debugger and preview windows:',
+      error
+    );
+    return false;
+  }
+};
+
+const setDebuggerPopOutWindow = (parentWindowId, debuggerWindow) => {
+  debuggerPopOutWindows.set(parentWindowId, debuggerWindow);
+  arrangeDebuggerPopOutWithLatestPreview(parentWindowId);
+
+  debuggerWindow.on('closed', () => {
+    if (debuggerPopOutWindows.get(parentWindowId) === debuggerWindow) {
+      debuggerPopOutWindows.delete(parentWindowId);
+    }
+  });
+};
+
+const sendDebuggerPopOutCloseRequested = parentWindowId => {
+  const parentWindow =
+    parentWindowId !== null ? BrowserWindow.fromId(parentWindowId) : null;
+  if (
+    parentWindow &&
+    !parentWindow.isDestroyed() &&
+    parentWindow.webContents &&
+    !parentWindow.webContents.isDestroyed()
+  ) {
+    parentWindow.webContents.send('debugger-popout-close-requested');
+  }
+};
+
+const closeDebuggerPopOutWindow = (
+  parentWindowId,
+  parentWasMinimizedBeforePreviewClose
+) => {
+  sendDebuggerPopOutCloseRequested(parentWindowId);
+
+  const debuggerWindow = debuggerPopOutWindows.get(parentWindowId);
+  if (!debuggerWindow || debuggerWindow.isDestroyed()) return;
+
+  try {
+    if (typeof debuggerWindow.setParentWindow === 'function') {
+      debuggerWindow.setParentWindow(null);
+    }
+
+    setImmediate(() => {
+      try {
+        if (!debuggerWindow.isDestroyed()) debuggerWindow.close();
+      } catch (error) {
+        console.warn('Ignoring exception when closing debugger window:', error);
+      }
+
+      keepParentWindowVisibleAfterChildClose(
+        parentWindowId,
+        parentWasMinimizedBeforePreviewClose
+      );
+    });
+  } catch (error) {
+    console.warn('Ignoring exception when closing debugger window:', error);
+  }
+};
+
 /**
  * Open 1 or multiple windows running a preview of an exported game.
  */
@@ -73,6 +243,7 @@ const openPreviewWindow = ({
     4: { x: screenWidth / 2, y: screenHeight / 2 },
   };
   for (let i = 0; i < numberOfWindows; i++) {
+    const parentWindowId = parentWindow ? parentWindow.id : null;
     const browserWindowOptions = {
       ...previewBrowserWindowOptions,
       parent: alwaysOnTop ? parentWindow : null,
@@ -81,6 +252,9 @@ const openPreviewWindow = ({
     };
 
     let previewWindow = new BrowserWindow(browserWindowOptions);
+    let parentWasMinimizedBeforePreviewClose = parentWindow
+      ? parentWindow.isMinimized()
+      : false;
 
     previewWindow.setMenuBarVisibility(hideMenuBar);
     previewWindow.webContents.on('devtools-opened', () => {
@@ -103,18 +277,49 @@ const openPreviewWindow = ({
 
     previewWindow.loadURL(previewGameIndexHtmlPath);
 
+    previewWindow.on('close', () => {
+      parentWasMinimizedBeforePreviewClose =
+        !!parentWindow &&
+        !parentWindow.isDestroyed() &&
+        parentWindow.isMinimized();
+
+      if (typeof previewWindow.setParentWindow === 'function') {
+        previewWindow.setParentWindow(null);
+      }
+    });
+
     // Track this preview window with its parent
     previewWindows.push({
       previewWindow: previewWindow,
-      parentWindowId: parentWindow ? parentWindow.id : null,
+      parentWindowId,
     });
     updatePowerSaveBlocker();
+    arrangeDebuggerPopOutWithLatestPreview(parentWindowId);
 
     previewWindow.on('closed', closeEvent => {
       previewWindows = previewWindows.filter(
         entry => entry.previewWindow !== previewWindow
       );
       updatePowerSaveBlocker();
+      if (
+        previewWindows.some(
+          entry =>
+            entry.parentWindowId === parentWindowId &&
+            entry.previewWindow &&
+            !entry.previewWindow.isDestroyed()
+        )
+      ) {
+        arrangeDebuggerPopOutWithLatestPreview(parentWindowId);
+      } else {
+        closeDebuggerPopOutWindow(
+          parentWindowId,
+          parentWasMinimizedBeforePreviewClose
+        );
+      }
+      keepParentWindowVisibleAfterChildClose(
+        parentWindowId,
+        parentWasMinimizedBeforePreviewClose
+      );
       // Only send message if the parent window still exists
       if (openEvent.sender && !openEvent.sender.isDestroyed()) {
         openEvent.sender.send('preview-window-closed');
@@ -223,4 +428,5 @@ module.exports = {
   closeAllPreviewWindows,
   focusAllPreviewWindows,
   capturePreviewPage,
+  setDebuggerPopOutWindow,
 };

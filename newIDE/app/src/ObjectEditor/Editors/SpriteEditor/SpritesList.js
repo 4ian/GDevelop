@@ -589,6 +589,92 @@ const SpritesList = ({
     ]
   );
 
+  const onReplaceSprites = React.useCallback(
+    async (initialResourceSource: ResourceSource) => {
+      const {
+        selectedResources,
+        selectedSourceName,
+      } = await resourceManagementProps.onChooseResource({
+        initialSourceName: initialResourceSource.name,
+        multiSelection: false,
+        resourceKind: 'image',
+        importedResourcesFolder: 'assets',
+        includeProjectAssetsFolder: true,
+      });
+
+      if (!selectedResources.length) return;
+      const selectedResource = selectedResources[0];
+      const selectedResourceSource = resourceSources.find(
+        source => source.name === selectedSourceName
+      );
+      if (!selectedResourceSource) return;
+
+      let hasCreatedResource = false;
+      let resourcesToDeleteAfterUse: Array<gdResource> = [];
+      if (selectedResourceSource.shouldCreateResource) {
+        applyResourceDefaults(project, selectedResource);
+        hasCreatedResource = project
+          .getResourcesManager()
+          .addResource(selectedResource);
+        resourcesToDeleteAfterUse = selectedResources;
+      } else {
+        const addMissingResourcesResult = addMissingResourcesToProject(
+          project,
+          selectedResources
+        );
+        hasCreatedResource = addMissingResourcesResult.hasCreatedAnyResource;
+        resourcesToDeleteAfterUse =
+          addMissingResourcesResult.resourcesToDeleteAfterUse;
+      }
+
+      const resourceName = selectedResource.getName();
+      if (resourcesToDeleteAfterUse.length) {
+        // Important, we are responsible for deleting the resources that were given to us.
+        // Otherwise we have a memory leak, as calling addResource is making a copy of the resource.
+        resourcesToDeleteAfterUse.forEach(resource => resource.delete());
+      }
+
+      const sprites = selectedSprites.current;
+      const firstObjectSprite = getCurrentElements(animations, 0, 0, 0).sprite;
+      const isObjectFirstSpriteReplaced =
+        !!firstObjectSprite && !!sprites[firstObjectSprite.ptr];
+
+      mapFor(0, animations.getAnimationsCount(), animationIndex => {
+        const animation = animations.getAnimation(animationIndex);
+        mapFor(0, animation.getDirectionsCount(), directionIndex => {
+          const direction = animation.getDirection(directionIndex);
+          mapFor(0, direction.getSpritesCount(), spriteIndex => {
+            const sprite = direction.getSprite(spriteIndex);
+            if (!sprites[sprite.ptr]) return;
+
+            sprite.setImageName(resourceName);
+            setSpriteSourceRect(sprite, null);
+          });
+        });
+      });
+
+      forceUpdate();
+
+      if (hasCreatedResource) {
+        await resourceManagementProps.onFetchNewlyAddedResources();
+        resourceManagementProps.onNewResourcesAdded();
+      }
+
+      if (onSpriteUpdated) onSpriteUpdated();
+      if (isObjectFirstSpriteReplaced && onFirstSpriteUpdated)
+        onFirstSpriteUpdated();
+    },
+    [
+      animations,
+      forceUpdate,
+      onFirstSpriteUpdated,
+      onSpriteUpdated,
+      project,
+      resourceManagementProps,
+      resourceSources,
+    ]
+  );
+
   const onImportRawSpriteSheet = React.useCallback(
     async (initialResourceSource: ResourceSource) => {
       const {
@@ -948,6 +1034,16 @@ const SpritesList = ({
             {
               label: i18n._(t`Duplicate selection`),
               click: duplicateSprites,
+            },
+            {
+              label: i18n._(t`Replace image`),
+              click: () => {
+                const initialResourceSource = resourceSources[0];
+                if (initialResourceSource) {
+                  onReplaceSprites(initialResourceSource);
+                }
+              },
+              enabled: resourceSources.length > 0,
             },
           ]}
         />

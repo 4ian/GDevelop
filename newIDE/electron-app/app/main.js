@@ -47,6 +47,7 @@ const {
   closeAllPreviewWindows,
   focusAllPreviewWindows,
   capturePreviewPage,
+  setDebuggerPopOutWindow,
 } = require('./PreviewWindow');
 const {
   imageExtenderScheme,
@@ -445,6 +446,9 @@ function createNewWindow(windowArgs = args) {
   // but open all other URLs in the external browser.
   newWindow.webContents.setWindowOpenHandler(details => {
     if (details.frameName.startsWith('GDevelopWindowPortal')) {
+      const isDebuggerPopOut = details.frameName.startsWith(
+        'GDevelopWindowPortal-debugger-'
+      );
       // Extract the theme background color passed via the features string
       // by WindowPortal (e.g. "...,themeBackgroundColor=%23282828").
       let backgroundColor = '#000';
@@ -467,6 +471,8 @@ function createNewWindow(windowArgs = args) {
           },
           trafficLightPosition: { x: 12, y: 12 },
           backgroundColor,
+          parent: isDebuggerPopOut ? newWindow : undefined,
+          modal: false,
           webPreferences: {
             // No need for Node.js integration or disabled context isolation, because
             // popped-out windows are driven by React portals and don't do any Node operations.
@@ -507,6 +513,13 @@ function createNewWindow(windowArgs = args) {
       childWindow.on('closed', () => {
         windowTargetIdToBrowserWindowIds.delete(details.frameName);
       });
+    }
+
+    if (
+      details.frameName &&
+      details.frameName.startsWith('GDevelopWindowPortal-debugger-')
+    ) {
+      setDebuggerPopOutWindow(newWindow.id, childWindow);
     }
 
     // Remove the menu bar from popped-out editor windows.

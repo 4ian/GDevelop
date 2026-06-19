@@ -162,6 +162,23 @@ export type Quotas = {
   [string]: Quota,
 };
 
+// A/B test configuration for the subscription dialog, served by the backend.
+// Forward-compatible: unknown variant types and unconfigured placements fall
+// back to the standard dialog on the client.
+export type SubscriptionDialogVariantConfig = {|
+  type: string,
+  weight: number,
+  featuredPlanId?: string,
+|};
+
+export type SubscriptionDialogPlacementConfig = {|
+  variants: Array<SubscriptionDialogVariantConfig>,
+|};
+
+export type SubscriptionDialogDisplayConfig = {|
+  placements: { [placementId: string]: SubscriptionDialogPlacementConfig },
+|};
+
 /**
  * The limits communicated by the API for a user.
  */
@@ -174,6 +191,9 @@ export type Limits = {|
     purchasableQuantities: UsagePurchasableQuantities,
   },
   message: string | typeof undefined,
+  // A/B test config for the subscription dialog, served with the limits.
+  // Absent on older backends.
+  subscriptionDialogDisplayConfig?: SubscriptionDialogDisplayConfig,
 |};
 
 export type PlanDetails = {|
@@ -244,23 +264,6 @@ export type SubscriptionPlan = {|
 
   pillarNamesPerLocale: { [key: string]: MessageByLocale },
   featureNamesByLocale: { [key: string]: MessageByLocale },
-|};
-
-// A/B test configuration for the subscription dialog, served by the backend.
-// Forward-compatible: unknown variant types and unconfigured placements fall
-// back to the standard dialog on the client.
-export type SubscriptionDialogVariantConfig = {|
-  type: string,
-  weight: number,
-  featuredPlanId?: string,
-|};
-
-export type SubscriptionDialogPlacementConfig = {|
-  variants: Array<SubscriptionDialogVariantConfig>,
-|};
-
-export type SubscriptionDialogDisplayConfig = {|
-  placements: { [placementId: string]: SubscriptionDialogPlacementConfig },
 |};
 
 export type SubscriptionPlanWithPricingSystems = {|
@@ -350,11 +353,6 @@ export const listSubscriptionPlans = async (options: {|
     })).data,
     endpointName: '/subscription-plan of Usage API',
   });
-};
-
-export const getSubscriptionDialogDisplayConfig = async (): Promise<SubscriptionDialogDisplayConfig> => {
-  const response = await apiClient.get('/subscription-dialog-display-config');
-  return response.data;
 };
 
 export const getSubscriptionPlanPricingSystem = async (

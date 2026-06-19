@@ -13,7 +13,6 @@ import {
   hasValidSubscriptionPlan,
   listSubscriptionPlanPricingSystems,
   listSubscriptionPlans,
-  getSubscriptionDialogDisplayConfig,
   type SubscriptionPlanWithPricingSystems,
   type SubscriptionPlan,
   type SubscriptionPlanPricingSystem,
@@ -254,29 +253,6 @@ export const SubscriptionProvider = ({
     ? authenticatedUser.getAuthorizationHeader
     : null;
 
-  // A/B test configuration for the subscription dialog, fetched once from the
-  // backend. Stored in a ref so `openSubscriptionDialog` always reads the
-  // latest value without being re-created. Null until loaded (or on failure),
-  // in which case we fall back to the standard dialog.
-  const displayConfigRef = React.useRef<?SubscriptionDialogDisplayConfig>(null);
-  React.useEffect(() => {
-    let cancelled = false;
-    getSubscriptionDialogDisplayConfig().then(
-      displayConfig => {
-        if (!cancelled) displayConfigRef.current = displayConfig;
-      },
-      error => {
-        console.warn(
-          'Could not fetch the subscription dialog display config:',
-          error
-        );
-      }
-    );
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
   // Fetch subscription plans lazily - only when requested
   const fetchSubscriptionPlansAndPrices = React.useCallback(
     async (): Promise<{
@@ -372,6 +348,12 @@ export const SubscriptionProvider = ({
         const userSubscriptionPlanId = authenticatedUser.subscription
           ? authenticatedUser.subscription.planId
           : null;
+        // The A/B test config is served with the user limits (fetched once at
+        // startup for authenticated users). Absent for anonymous users or older
+        // backends, in which case we fall back to the standard dialog.
+        const displayConfig = authenticatedUser.limits
+          ? authenticatedUser.limits.subscriptionDialogDisplayConfig
+          : null;
         // A caller can force a variant (and featured plan); otherwise resolve
         // it from the backend A/B test configuration.
         const { dialogVariant, featuredPlanId } = metadata.dialogVariant
@@ -381,14 +363,19 @@ export const SubscriptionProvider = ({
             }
           : resolveSubscriptionDialogDisplay({
               placementId: metadata.placementId,
-              displayConfig: displayConfigRef.current,
+              displayConfig,
               userSubscriptionPlanId,
             });
         setAnalyticsMetadata({ ...metadata, dialogVariant, featuredPlanId });
         setCouponCode(coupon || null);
       }
     },
-    [authenticatedUser.subscription, showAlert, simulateMobileApp]
+    [
+      authenticatedUser.subscription,
+      authenticatedUser.limits,
+      showAlert,
+      simulateMobileApp,
+    ]
   );
 
   const getUserSubscriptionPlanEvenIfLegacy = React.useCallback(

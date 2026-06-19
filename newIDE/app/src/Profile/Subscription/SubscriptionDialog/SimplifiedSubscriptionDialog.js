@@ -303,8 +303,6 @@ const getYearlyDiscountText = (
 type Props = {|
   onClose: Function,
   availableSubscriptionPlansWithPrices: ?(SubscriptionPlanWithPricingSystems[]),
-  // Plan to feature, provided by the backend A/B test config. Falls back to a
-  // default when not provided (e.g. older callers).
   featuredPlanId?: ?string,
   onOpenPendingDialog: (open: boolean) => void,
   couponCode?: ?string,
@@ -371,7 +369,7 @@ export default function SimplifiedSubscriptionDialog({
     );
 
     // We feature the yearly plan (billed annually) when available, as it is the
-    // most advantageous one and matches the mockup.
+    // most advantageous one.
     const pricingSystemToBuy =
       yearlyPricingSystem ||
       monthlyPricingSystem ||

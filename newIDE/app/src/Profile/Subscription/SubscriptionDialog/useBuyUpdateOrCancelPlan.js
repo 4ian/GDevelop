@@ -11,7 +11,6 @@ import {
 import {
   sendCancelSubscriptionToChange,
   sendChoosePlanClicked,
-  type SubscriptionDialogVariant,
 } from '../../../Utils/Analytics/EventSender';
 import Window from '../../../Utils/Window';
 import useAlertDialog from '../../../UI/Alert/useAlertDialog';
@@ -54,7 +53,7 @@ type Props = {|
   // to 1 when not provided (the simplified dialog does not support the education plan).
   getEducationPlanSeatsCount?: () => number,
   // The variant of the dialog from which the action is triggered, for analytics.
-  dialogVariant?: SubscriptionDialogVariant,
+  dialogVariant?: string,
 |};
 
 type BuyUpdateOrCancelPlanState = {|

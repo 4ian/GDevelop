@@ -162,9 +162,6 @@ export type Quotas = {
   [string]: Quota,
 };
 
-// A/B test configuration for the subscription dialog, served by the backend.
-// Forward-compatible: unknown variant types and unconfigured placements fall
-// back to the standard dialog on the client.
 export type SubscriptionDialogVariantConfig = {|
   type: string,
   weight: number,

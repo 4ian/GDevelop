@@ -5,7 +5,6 @@ import {
   sendSubscriptionDialogShown,
   type SubscriptionDialogDisplayReason,
   type SubscriptionPlacementId,
-  type SubscriptionDialogVariant,
 } from '../../Utils/Analytics/EventSender';
 import { isNativeMobileApp } from '../../Utils/Platform';
 import {
@@ -39,13 +38,13 @@ export type SubscriptionAnalyticsMetadata = {|
   // Which version of the subscription dialog was shown. Computed when the dialog
   // is opened (see `resolveSubscriptionDialogDisplay`) and sent with analytics
   // events.
-  dialogVariant?: SubscriptionDialogVariant,
+  dialogVariant?: string,
   // Plan featured by the simplified dialog, when shown.
   featuredPlanId?: string,
 |};
 
 export type SubscriptionDialogDisplay = {|
-  dialogVariant: SubscriptionDialogVariant,
+  dialogVariant: string,
   featuredPlanId?: string,
 |};
 

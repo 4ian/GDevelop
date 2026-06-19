@@ -4566,9 +4566,16 @@ const createScene: EditorFunction = {
       args,
       'background_color'
     );
+    const is_first_scene = SafeExtractor.extractBooleanProperty(
+      args,
+      'is_first_scene'
+    );
 
     if (project.hasLayoutNamed(scene_name)) {
       const scene = project.getLayout(scene_name);
+      if (is_first_scene) {
+        project.setFirstLayout(scene_name);
+      }
       if (include_ui_layer && !scene.hasLayerNamed('UI')) {
         scene.insertNewLayer('UI', scene.getLayersCount());
         addDefaultLightToLayer(scene.getLayer('UI'));
@@ -4592,6 +4599,9 @@ const createScene: EditorFunction = {
       scene.setBackgroundColor(colorAsRgb[0], colorAsRgb[1], colorAsRgb[2]);
     }
     addDefaultLightToAllLayers(scene);
+    if (is_first_scene) {
+      project.setFirstLayout(scene_name);
+    }
 
     return {
       success: true,
@@ -4702,6 +4712,7 @@ const inspectScenePropertiesLayersEffects: EditorFunction = {
           scene.getBackgroundColorBlue()
         ),
         stopSoundsOnStartup: scene.stopSoundsOnStartup(),
+        isFirstScene: project.getFirstLayout() === scene.getName(),
 
         // Also include some project related properties:
         gameResolutionWidth: project.getGameResolutionWidth(),
@@ -4936,6 +4947,11 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
         } else if (isFuzzyMatch(propertyName, 'gameName')) {
           project.setName(newValue);
           changes.push(`Set game name to "${newValue}".`);
+        } else if (isFuzzyMatch(propertyName, 'isFirstScene')) {
+          if (newValue.toLowerCase() === 'true') {
+            project.setFirstLayout(scene_name);
+            changes.push(`Set "${scene_name}" as the first (startup) scene.`);
+          }
         } else {
           warnings.push(`Unknown scene property: "${propertyName}". Skipped.`);
         }

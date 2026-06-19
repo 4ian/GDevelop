@@ -10,6 +10,7 @@ import CompactSearchBar, {
 } from '../UI/CompactSearchBar';
 import GlobalVariablesDialog from '../VariablesList/GlobalVariablesDialog';
 import ProjectPropertiesDialog from './ProjectPropertiesDialog';
+import ProjectExtensionsDialog from './ProjectExtensionsDialog';
 import ProjectItemUsageDialog from './ProjectItemUsageDialog';
 import { type ProjectItemUsageTarget } from './ProjectItemUsageFinder';
 import newNameGenerator from '../Utils/NewNameGenerator';
@@ -28,7 +29,6 @@ import InstalledExtensionDetails from './InstalledExtensionDetails';
 import { addDefaultLightToAllLayers } from '../ProjectCreation/CreateProject';
 import ErrorBoundary from '../UI/ErrorBoundary';
 import useForceUpdate from '../Utils/UseForceUpdate';
-import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 
 import { AutoSizer } from 'react-virtualized';
 import Background from '../UI/Background';
@@ -98,7 +98,6 @@ import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import { type GDevelopTheme } from '../UI/Theme';
 import { ExtensionStoreContext } from '../AssetStore/ExtensionStore/ExtensionStoreContext';
 import { type HTMLDataset } from '../Utils/HTMLDataset';
-import RouterContext from '../MainFrame/RouterContext';
 import {
   type MainMenuCallbacks,
   type BuildMainMenuProps,
@@ -121,8 +120,8 @@ export const getProjectManagerItemId = (identifier: string): string =>
 
 const gameSettingsRootFolderId = getProjectManagerItemId('game-settings');
 const gamePropertiesItemId = getProjectManagerItemId('game-properties');
-const gameDashboardItemId = 'manage';
 const gameResourcesItemId = getProjectManagerItemId('game-resources');
+const gameExtensionsItemId = getProjectManagerItemId('game-extensions');
 const gameShareItemId = getProjectManagerItemId('game-share');
 export const scenesRootFolderId: string = getProjectManagerItemId('scenes');
 export const customObjectsRootFolderId: string = getProjectManagerItemId(
@@ -721,8 +720,6 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       onShareProject,
       resourceManagementProps,
       projectScopedContainersAccessor,
-      gamesList,
-      onOpenHomePage,
       toggleProjectManager,
       mainMenuCallbacks,
       buildMainMenuProps,
@@ -753,8 +750,6 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
     const forceUpdate = useForceUpdate();
     const { isMobile } = useResponsiveWindowSize();
     const { showDeleteConfirmation } = useAlertDialog();
-    const { fetchGames } = gamesList;
-    const { navigateToRoute } = React.useContext(RouterContext);
 
     const forceUpdateList = React.useCallback(
       () => {
@@ -816,37 +811,6 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       [triggerUnsavedChanges, onChangeProjectName]
     );
 
-    const { profile } = React.useContext(AuthenticatedUserContext);
-    const userId = profile ? profile.id : null;
-    React.useEffect(
-      () => {
-        fetchGames();
-      },
-      [fetchGames, userId]
-    );
-    const onOpenGamesDashboardDialog = React.useCallback(
-      () => {
-        if (!project) return;
-
-        navigateToRoute('games-dashboard', {
-          'game-id': project.getProjectUuid(),
-          'games-dashboard-tab': 'details',
-        });
-        onOpenHomePage();
-        toggleProjectManager();
-        // Refresh the games as it could have been modified using the game dashboard
-        // in the "Manage" tab from the home page.
-        fetchGames();
-      },
-      [
-        fetchGames,
-        navigateToRoute,
-        onOpenHomePage,
-        toggleProjectManager,
-        project,
-      ]
-    );
-
     const [
       projectVariablesEditorOpen,
       setProjectVariablesEditorOpen,
@@ -876,6 +840,13 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
     ] = React.useState(false);
     const openSearchExtensionDialog = React.useCallback(() => {
       setExtensionsSearchDialogOpen(true);
+    }, []);
+    const [
+      projectExtensionsDialogOpen,
+      setProjectExtensionsDialogOpen,
+    ] = React.useState(false);
+    const openProjectExtensionsDialog = React.useCallback(() => {
+      setProjectExtensionsDialogOpen(true);
     }, []);
     const [
       openedExtensionShortHeader,
@@ -1443,10 +1414,10 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                     ),
                     new LeafTreeViewItem(
                       new ActionTreeViewItemContent(
-                        gameDashboardItemId,
-                        i18n._(t`Game Dashboard`),
-                        onOpenGamesDashboardDialog,
-                        'res/icons_default/graphs_black.svg'
+                        gameExtensionsItemId,
+                        i18n._(t`Extensions`),
+                        openProjectExtensionsDialog,
+                        'res/functions/extension_black.svg'
                       )
                     ),
                     new LeafTreeViewItem(
@@ -1803,9 +1774,9 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         externalEventsTreeViewItemProps,
         externalLayoutTreeViewItemProps,
         functionShortcutTreeViewItemProps,
-        onOpenGamesDashboardDialog,
         onOpenResources,
         onShareProject,
+        openProjectExtensionsDialog,
         openProjectProperties,
         openSearchExtensionDialog,
         project,
@@ -2148,6 +2119,28 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                         }
                         isListLocked={false}
                         initiallySelectedVariable={null}
+                      />
+                    )}
+                    {project && projectExtensionsDialogOpen && (
+                      <ProjectExtensionsDialog
+                        project={project}
+                        onClose={() => setProjectExtensionsDialogOpen(false)}
+                        onInstallExtension={() => {
+                          setProjectExtensionsDialogOpen(false);
+                          openSearchExtensionDialog();
+                        }}
+                        onShowExtensionStoreDetails={eventsFunctionsExtension => {
+                          setProjectExtensionsDialogOpen(false);
+                          onEditEventsFunctionExtensionOrSeeDetails(
+                            eventsFunctionsExtension
+                          );
+                        }}
+                        onDeleteEventsFunctionsExtension={async eventsFunctionsExtension => {
+                          await onDeleteEventsFunctionsExtension(
+                            eventsFunctionsExtension
+                          );
+                          forceUpdateList();
+                        }}
                       />
                     )}
                     {project && extensionsSearchDialogOpen && (

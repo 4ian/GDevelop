@@ -436,8 +436,6 @@ export default function SimplifiedSubscriptionDialog({
                   </span>
                 </Text>
                 <Text noMargin size="section-title">
-                  {/* "Upgrade to […]" is intentionally kept as a client-side
-                  translation, with the plan name served by the backend. */}
                   <Trans>Upgrade to {featuredPlanName}</Trans>
                 </Text>
               </Column>

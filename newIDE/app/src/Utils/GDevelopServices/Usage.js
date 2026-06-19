@@ -191,8 +191,6 @@ export type Limits = {|
     purchasableQuantities: UsagePurchasableQuantities,
   },
   message: string | typeof undefined,
-  // A/B test config for the subscription dialog, served with the limits.
-  // Absent on older backends.
   subscriptionDialogDisplayConfig?: SubscriptionDialogDisplayConfig,
 |};
 
@@ -222,9 +220,6 @@ export type SubscriptionPlanPricingSystem = {|
   periodCount: number,
 |};
 
-// Store badges that can be shown next to a simplified bullet point. Kept as a
-// loose string so unknown (future) badges sent by the backend are simply
-// ignored by older clients.
 export type SimplifiedSubscriptionStoreBadge = string;
 
 export type SimplifiedSubscriptionBulletPoint = {|
@@ -246,8 +241,6 @@ export type SubscriptionPlan = {|
   descriptionByLocale: MessageByLocale,
   bulletPointsByLocale: Array<MessageByLocale>,
   specificRequirementByLocale?: MessageByLocale,
-  // Optional content for the simplified subscription dialog. Served by the
-  // backend so it can be translated. Absent on older backends.
   simplifiedFeatures?: SimplifiedSubscriptionFeatures,
   targetAudiences: Array<'CASUAL' | 'PRO' | 'EDUCATION'>,
   fullFeatures: Array<{|

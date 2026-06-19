@@ -143,6 +143,7 @@ const styles = {
   },
   continueForFree: {
     cursor: 'pointer',
+    borderBottom: '1px dotted rgba(255, 255, 255, 0.5)',
   },
   continueForFreeDisabled: {
     cursor: 'default',
@@ -334,12 +335,12 @@ export default function SimplifiedSubscriptionDialog({
                   </Bullet>
                   <Bullet enabled={false}>
                     <Trans>
-                      AI assistant — <b>limited trial prompts</b>
+                      No AI assistant — <b>limited trial prompts</b>
                     </Trans>
                   </Bullet>
                   <Bullet enabled={false}>
                     <Trans>
-                      No automated, one-click publishing - <b>gd.games</b> only
+                      No automated, one-click publishing — <b>gd.games</b> only
                     </Trans>
                   </Bullet>
                 </ColumnStackLayout>
@@ -359,8 +360,7 @@ export default function SimplifiedSubscriptionDialog({
                 </span>
                 <Text noMargin size="body-small">
                   <span style={styles.goldLabel}>
-                    {/* TODO: another slogan */}
-                    <Trans>Everything unlocked</Trans>
+                    <Trans>Supercharged game creation</Trans>
                   </span>
                 </Text>
                 <Spacer />
@@ -370,8 +370,10 @@ export default function SimplifiedSubscriptionDialog({
                   </Bullet>
                   <Bullet enabled>
                     <Trans>
-                      Extended AI assistant —{' '}
-                      <b style={{ color: colors.goldText }}>1,000 prompts</b>
+                      AI assistant — daily usage and{' '}
+                      <b style={{ color: colors.goldText }}>
+                        high intelligence mode
+                      </b>
                     </Trans>
                   </Bullet>
                   <Bullet enabled>
@@ -481,6 +483,7 @@ export default function SimplifiedSubscriptionDialog({
               >
                 <Text noMargin color="secondary" size="body-small">
                   <Trans>Not for now</Trans>
+                  {' \u203A'}
                 </Text>
               </div>
             </Column>

@@ -34,7 +34,7 @@ import { DragHandleIcon } from '../../UI/DragHandle';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import DropIndicator from '../../UI/SortableVirtualizedItemList/DropIndicator';
 import { makeDragSourceAndDropTarget } from '../../UI/DragAndDrop/DragSourceAndDropTarget';
-import Clipboard from '../../Utils/Clipboard';
+import Clipboard, { copyTextToClipboard } from '../../Utils/Clipboard';
 import { SafeExtractor } from '../../Utils/SafeExtractor';
 import {
   serializeToJSObject,
@@ -175,6 +175,10 @@ const styles = {
   splitParameterReference: {
     flexShrink: 0,
     width: 86,
+  },
+  parameterReferenceCopyTarget: {
+    cursor: 'copy',
+    userSelect: 'text',
   },
   splitListItemTexts: {
     display: 'flex',
@@ -819,6 +823,18 @@ const CompactEventsFunctionParametersEditor: React.ComponentType<{
       : ParametersIndexOffsets.FreeFunction;
     const getParameterReferenceLabel = (index: number): string =>
       `_PARAM${index + parametersIndexOffset}_`;
+    const copyParameterReferenceLabel = React.useCallback(
+      (parameterReferenceLabel: string) => {
+        try {
+          copyTextToClipboard(parameterReferenceLabel).catch(() => {
+            // The text stays selectable even if the clipboard API is unavailable.
+          });
+        } catch (error) {
+          // The text stays selectable even if the clipboard API is unavailable.
+        }
+      },
+      []
+    );
     const normalizedParameterSearchText = parameterSearchText
       .trim()
       .toLocaleLowerCase();
@@ -972,6 +988,43 @@ const CompactEventsFunctionParametersEditor: React.ComponentType<{
       },
     ];
 
+    const renderParameterReferenceLabel = (
+      i18n: I18nType,
+      index: number,
+      isSelected: ?boolean,
+      noMargin?: boolean
+    ): React.Node => {
+      const parameterReferenceLabel = getParameterReferenceLabel(index);
+
+      return (
+        <Text
+          noMargin={noMargin}
+          color={isSelected ? 'inherit' : 'secondary'}
+          style={{
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+          }}
+          allowSelection
+          allowBrowserAutoTranslate={false}
+        >
+          <span
+            title={i18n._(t`Click to copy`)}
+            style={styles.parameterReferenceCopyTarget}
+            onMouseDown={(event: SyntheticMouseEvent<HTMLSpanElement>) => {
+              event.stopPropagation();
+            }}
+            onClick={(event: SyntheticMouseEvent<HTMLSpanElement>) => {
+              event.stopPropagation();
+              copyParameterReferenceLabel(parameterReferenceLabel);
+            }}
+          >
+            {parameterReferenceLabel}
+          </span>
+        </Text>
+      );
+    };
+
     const renderParameterHeader = ({
       i18n,
       parameter,
@@ -1021,14 +1074,7 @@ const CompactEventsFunctionParametersEditor: React.ComponentType<{
               )}
           <ResponsiveLineStackLayout expand noOverflowParent noMargin>
             <LineStackLayout noMargin expand alignItems="center">
-              <Text
-                color={isSelected ? 'inherit' : 'secondary'}
-                style={{
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                {getParameterReferenceLabel(index)}
-              </Text>
+              {renderParameterReferenceLabel(i18n, index, isSelected)}
               <CompactSemiControlledTextField
                 ref={ref => {
                   parameterNameFieldRefs.current.set(parameter.getName(), ref);
@@ -1201,18 +1247,12 @@ const CompactEventsFunctionParametersEditor: React.ComponentType<{
                       aria-selected={isSelected}
                     >
                       <div style={styles.splitParameterReference}>
-                        <Text
-                          noMargin
-                          color={isSelected ? 'inherit' : 'secondary'}
-                          style={{
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                            whiteSpace: 'nowrap',
-                          }}
-                          allowBrowserAutoTranslate={false}
-                        >
-                          {getParameterReferenceLabel(index)}
-                        </Text>
+                        {renderParameterReferenceLabel(
+                          i18n,
+                          index,
+                          isSelected,
+                          true
+                        )}
                       </div>
                       <div style={styles.splitListItemTexts}>
                         <Text

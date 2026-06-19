@@ -166,6 +166,9 @@ const styles = {
     width: '100%',
     height: '100%',
   },
+  behaviorDetailIntroduction: {
+    maxWidth: 640,
+  },
   detailSettingsContainer: {
     display: 'flex',
     flexDirection: 'column',
@@ -421,6 +424,9 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     if (this.editor) {
       // If the scene editor is open, let it handle the toolbar.
       this.editor.updateToolbar();
+    } else if (this.props.focusedEventsBasedBehavior) {
+      // Behavior detail pages expose behavior settings from the left panel.
+      this.props.setToolbar(null);
     } else {
       // Otherwise, show the extension settings buttons.
       this.props.setToolbar(
@@ -1924,7 +1930,9 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
           (!selectedEventsBasedBehavior && !selectedEventsBasedObject),
         noSoftKeyboardAvoidance: true,
         title: selectedEventsBasedBehavior
-          ? t`Behavior Configuration`
+          ? isBehaviorDetailMode
+            ? t`Behavior introduction`
+            : t`Behavior Configuration`
           : selectedEventsBasedObject
           ? t`Object Configuration`
           : null,
@@ -1978,6 +1986,25 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                 onExtensionInstalled={this.props.onExtensionInstalled}
                 editEventsFunctionParameter={this._editEventsFunctionParameter}
               />
+            </Background>
+          ) : selectedEventsBasedBehavior && isBehaviorDetailMode ? (
+            <Background>
+              <EmptyMessage>
+                <div style={styles.behaviorDetailIntroduction}>
+                  <Text size="block-title" align="center" noMargin>
+                    <Trans>Behavior introduction</Trans>
+                  </Text>
+                  <Text align="center" color="secondary">
+                    <Trans>
+                      Use this page to manage the functions attached to this
+                      behavior. Select a function on the left to edit its
+                      events, use + to create functions, or open Behavior
+                      settings to edit the behavior configuration and
+                      properties.
+                    </Trans>
+                  </Text>
+                </div>
+              </EmptyMessage>
             </Background>
           ) : selectedEventsBasedBehavior &&
             this._projectScopedContainersAccessor ? (
@@ -2103,7 +2130,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       },
       'functions-list': {
         type: 'primary',
-        title: isDetailMode ? t`Functions attached` : t`Functions`,
+        title: t`Functions`,
         toolbarControls: [],
         renderEditor: () => (
           <I18n>

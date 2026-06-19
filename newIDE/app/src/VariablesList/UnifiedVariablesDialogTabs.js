@@ -1,6 +1,8 @@
 // @flow
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 
+const gd: libGDevelop = global.gd;
+
 export type ObjectVariableTab = {|
   id: string,
   objectName: string,
@@ -28,6 +30,9 @@ export const enumerateObjectVariableTabs = ({
     const objectsContainer = objectsContainersList.getObjectsContainer(
       containerIndex
     );
+    if (objectsContainer.getSourceType() === gd.ObjectsContainer.Function) {
+      continue;
+    }
 
     for (
       let objectIndex = 0;

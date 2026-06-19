@@ -1,6 +1,8 @@
 // @flow
 import { enumerateObjectVariableTabs } from './UnifiedVariablesDialogTabs';
 
+const gd: libGDevelop = global.gd;
+
 const makeObject = (name: string, variablesCount: number = 0): any => {
   const variables = {
     id: `${name}-variables`,
@@ -12,7 +14,11 @@ const makeObject = (name: string, variablesCount: number = 0): any => {
   };
 };
 
-const makeObjectsContainer = (objects: Array<any>): any => ({
+const makeObjectsContainer = (
+  objects: Array<any>,
+  sourceType: ObjectsContainer_SourceType = gd.ObjectsContainer.Unknown
+): any => ({
+  getSourceType: () => sourceType,
   getObjectsCount: () => objects.length,
   getObjectAt: (index: number) => objects[index],
 });
@@ -66,6 +72,31 @@ describe('VariablesList/UnifiedVariablesDialogTabs', () => {
         objectName: 'GameManager',
         variablesContainer: globalObject.getVariables(),
         initialInstances,
+      },
+    ]);
+  });
+
+  it('ignores function parameter objects', () => {
+    const parameterObject = makeObject('Parameter', 5);
+    const sceneObject = makeObject('Player', 1);
+    const objectsContainersList = makeObjectsContainersList([
+      makeObjectsContainer([parameterObject], gd.ObjectsContainer.Function),
+      makeObjectsContainer([sceneObject], gd.ObjectsContainer.Scene),
+    ]);
+
+    const tabs = enumerateObjectVariableTabs({
+      projectScopedContainersAccessor: makeProjectScopedContainersAccessor(
+        objectsContainersList
+      ),
+      initialInstances: null,
+    });
+
+    expect(tabs).toEqual([
+      {
+        id: 'object-variables-1-Player',
+        objectName: 'Player',
+        variablesContainer: sceneObject.getVariables(),
+        initialInstances: null,
       },
     ]);
   });

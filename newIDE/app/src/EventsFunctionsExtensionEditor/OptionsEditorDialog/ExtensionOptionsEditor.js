@@ -79,14 +79,23 @@ type Props = {|
   eventsFunctionsExtension: gdEventsFunctionsExtension,
   onLoadChange: (isLoading: boolean) => void,
   isLoading: boolean,
+  onChange?: () => void,
 |};
 
 export const ExtensionOptionsEditor = ({
   eventsFunctionsExtension,
   onLoadChange,
   isLoading,
+  onChange,
 }: Props): React.Node => {
   const forceUpdate = useForceUpdate();
+  const notifyChange = React.useCallback(
+    () => {
+      forceUpdate();
+      if (onChange) onChange();
+    },
+    [forceUpdate, onChange]
+  );
 
   return (
     <I18n>
@@ -110,9 +119,11 @@ export const ExtensionOptionsEditor = ({
             }
             setPreviewIconUrl={value => {
               eventsFunctionsExtension.setPreviewIconUrl(value);
+              notifyChange();
             }}
             setIconUrl={value => {
               eventsFunctionsExtension.setIconUrl(value);
+              notifyChange();
             }}
           />
           <CompactPropertiesEditorRowField
@@ -122,7 +133,7 @@ export const ExtensionOptionsEditor = ({
                 value={eventsFunctionsExtension.getFullName()}
                 onChange={text => {
                   eventsFunctionsExtension.setFullName(text);
-                  forceUpdate();
+                  notifyChange();
                 }}
               />
             }
@@ -132,7 +143,7 @@ export const ExtensionOptionsEditor = ({
             value={eventsFunctionsExtension.getShortDescription()}
             onChange={text => {
               eventsFunctionsExtension.setShortDescription(text);
-              forceUpdate();
+              notifyChange();
             }}
             rows={2}
           />
@@ -141,7 +152,7 @@ export const ExtensionOptionsEditor = ({
             value={eventsFunctionsExtension.getDescription()}
             onChange={text => {
               eventsFunctionsExtension.setDescription(text);
-              forceUpdate();
+              notifyChange();
             }}
             placeholder={i18n._(
               t`Explain and give some examples of what can be achieved with this extension.`
@@ -155,7 +166,7 @@ export const ExtensionOptionsEditor = ({
                 value={eventsFunctionsExtension.getVersion()}
                 onChange={text => {
                   eventsFunctionsExtension.setVersion(text);
-                  forceUpdate();
+                  notifyChange();
                 }}
               />
             }
@@ -167,7 +178,7 @@ export const ExtensionOptionsEditor = ({
                 value={eventsFunctionsExtension.getDimension()}
                 onChange={value => {
                   eventsFunctionsExtension.setDimension(value);
-                  forceUpdate();
+                  notifyChange();
                 }}
               >
                 <SelectOption value="" label={t`Not applicable`} />
@@ -195,7 +206,7 @@ export const ExtensionOptionsEditor = ({
                     .forEach(tag => {
                       tags.push_back(tag);
                     });
-                  forceUpdate();
+                  notifyChange();
                 }}
               />
             }
@@ -205,7 +216,7 @@ export const ExtensionOptionsEditor = ({
             helpPath={eventsFunctionsExtension.getHelpPath()}
             onChangeHelpPath={helpPath => {
               eventsFunctionsExtension.setHelpPath(helpPath);
-              forceUpdate();
+              notifyChange();
             }}
           />
           <SemiControlledAutoComplete
@@ -214,7 +225,7 @@ export const ExtensionOptionsEditor = ({
             value={eventsFunctionsExtension.getCategory()}
             onChange={category => {
               eventsFunctionsExtension.setCategory(category);
-              forceUpdate();
+              notifyChange();
             }}
             // TODO Sort by translated value.
             dataSource={[
@@ -288,6 +299,7 @@ export const ExtensionOptionsEditor = ({
               userIdAndUsernames.forEach(userIdAndUsername =>
                 projectAuthorIds.push_back(userIdAndUsername.userId)
               );
+              notifyChange();
             }}
             floatingLabelText={<Trans>Authors</Trans>}
             helperText={

@@ -11,6 +11,10 @@ import CompactSearchBar, {
 import GlobalVariablesDialog from '../VariablesList/GlobalVariablesDialog';
 import ProjectPropertiesDialog from './ProjectPropertiesDialog';
 import ProjectExtensionsDialog from './ProjectExtensionsDialog';
+import CreateEventsFunctionExtensionItemDialog, {
+  type ExtensionItemKind,
+  type CreateExtensionItemPayload,
+} from './CreateEventsFunctionExtensionItemDialog';
 import ProjectItemUsageDialog from './ProjectItemUsageDialog';
 import { type ProjectItemUsageTarget } from './ProjectItemUsageFinder';
 import newNameGenerator from '../Utils/NewNameGenerator';
@@ -54,9 +58,7 @@ import {
   type SceneTreeViewItemCallbacks,
 } from './SceneTreeViewItemContent';
 import {
-  ExtensionTreeViewItemContent,
   getExtensionTreeViewItemId,
-  type ExtensionTreeViewItemProps,
   type ExtensionTreeViewItemCallbacks,
 } from './ExtensionTreeViewItemContent';
 import {
@@ -114,6 +116,7 @@ import PreferencesIcon from '../UI/CustomSvgIcons/Preferences';
 import classes from './ProjectManager.module.css';
 
 const electron = optionalRequire('electron');
+const gd: libGDevelop = global.gd;
 
 export const getProjectManagerItemId = (identifier: string): string =>
   `project-manager-tab-${identifier}`;
@@ -147,7 +150,6 @@ const scenesEmptyPlaceholderId = 'scenes-placeholder';
 const customObjectsEmptyPlaceholderId = 'custom-objects-placeholder';
 const behaviorsEmptyPlaceholderId = 'behaviors-placeholder';
 const functionsEmptyPlaceholderId = 'functions-placeholder';
-const extensionsEmptyPlaceholderId = 'extensions-placeholder';
 const externalEventsEmptyPlaceholderId = 'external-events-placeholder';
 const externalLayoutEmptyPlaceholderId = 'external-layout-placeholder';
 
@@ -849,6 +851,16 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       setProjectExtensionsDialogOpen(true);
     }, []);
     const [
+      createExtensionItemKind,
+      setCreateExtensionItemKind,
+    ] = React.useState<?ExtensionItemKind>(null);
+    const openCreateExtensionItemDialog = React.useCallback(
+      (itemKind: ExtensionItemKind) => {
+        setCreateExtensionItemKind(itemKind);
+      },
+      []
+    );
+    const [
       openedExtensionShortHeader,
       setOpenedExtensionShortHeader,
     ] = React.useState(null);
@@ -957,28 +969,116 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         );
         setExtensionsSearchDialogOpen(false);
         onProjectItemModified();
-
-        const extensionItemId = getExtensionTreeViewItemId(
-          eventsFunctionsExtension
+        onOpenEventsFunctionsExtension(
+          eventsFunctionsExtension.getName(),
+          null,
+          null,
+          null
         );
-        if (treeViewRef.current) {
-          treeViewRef.current.openItems([
-            extensionItemId,
-            extensionsRootFolderId,
-          ]);
-        }
-        // Scroll to the new behavior.
-        // Ideally, we'd wait for the list to be updated to scroll, but
-        // to simplify the code, we just wait a few ms for a new render
-        // to be done.
-        setTimeout(() => {
-          scrollToItem(extensionItemId);
-        }, 100); // A few ms is enough for a new render to be done.
-
-        // We focus it so the user can edit the name directly.
-        editName(extensionItemId);
       },
-      [editName, onProjectItemModified, scrollToItem]
+      [onOpenEventsFunctionsExtension, onProjectItemModified]
+    );
+
+    const onCreateExtensionItem = React.useCallback(
+      (payload: CreateExtensionItemPayload) => {
+        if (!project) return;
+
+        const eventsFunctionsExtension = payload.newExtensionName
+          ? project.insertNewEventsFunctionsExtension(
+              payload.newExtensionName,
+              project.getEventsFunctionsExtensionsCount()
+            )
+          : project.getEventsFunctionsExtension(payload.extensionName);
+
+        setCreateExtensionItemKind(null);
+
+        if (payload.itemKind === 'prefab') {
+          const eventsBasedObjects = eventsFunctionsExtension.getEventsBasedObjects();
+          const eventsBasedObject = eventsBasedObjects.insertNew(
+            payload.itemName,
+            eventsBasedObjects.getCount()
+          );
+          eventsBasedObject.markAsRenderedIn3D(false);
+          onProjectItemModified();
+          forceUpdateList();
+
+          const itemId = getCustomObjectTreeViewItemId(
+            eventsFunctionsExtension,
+            eventsBasedObject
+          );
+          openItems([customObjectsRootFolderId, itemId]);
+          setTimeout(() => scrollToItem(itemId), 100);
+          onOpenCustomObjectEditor(
+            eventsFunctionsExtension,
+            eventsBasedObject,
+            ''
+          );
+          return;
+        }
+
+        if (payload.itemKind === 'behavior') {
+          const eventsBasedBehaviors = eventsFunctionsExtension.getEventsBasedBehaviors();
+          const eventsBasedBehavior = eventsBasedBehaviors.insertNew(
+            payload.itemName,
+            eventsBasedBehaviors.getCount()
+          );
+          onProjectItemModified();
+          forceUpdateList();
+
+          const itemId = getBehaviorShortcutTreeViewItemId(
+            eventsFunctionsExtension,
+            eventsBasedBehavior
+          );
+          openItems([behaviorsRootFolderId]);
+          setTimeout(() => scrollToItem(itemId), 100);
+          onOpenEventsFunctionsExtension(
+            eventsFunctionsExtension.getName(),
+            null,
+            eventsBasedBehavior.getName(),
+            null
+          );
+          return;
+        }
+
+        const eventsFunctionsContainer = eventsFunctionsExtension.getEventsFunctions();
+        const rootFolder = eventsFunctionsContainer.getRootFolder();
+        const eventsFunction = eventsFunctionsContainer.insertNewEventsFunctionInFolder(
+          payload.itemName,
+          rootFolder,
+          rootFolder.getChildrenCount()
+        );
+        eventsFunction.setFunctionType(payload.functionType);
+        if (eventsFunction.isCondition() && !eventsFunction.isExpression()) {
+          gd.PropertyFunctionGenerator.generateConditionSkeleton(
+            project,
+            eventsFunction
+          );
+        }
+        onProjectItemModified();
+        forceUpdateList();
+
+        const itemId = getFunctionShortcutTreeViewItemId(
+          eventsFunctionsExtension,
+          eventsFunction
+        );
+        openItems([functionsRootFolderId]);
+        setTimeout(() => scrollToItem(itemId), 100);
+        onOpenEventsFunctionsExtension(
+          eventsFunctionsExtension.getName(),
+          eventsFunction.getName(),
+          null,
+          null
+        );
+      },
+      [
+        forceUpdateList,
+        onOpenCustomObjectEditor,
+        onOpenEventsFunctionsExtension,
+        onProjectItemModified,
+        openItems,
+        project,
+        scrollToItem,
+      ]
     );
 
     const { translatedExtensionShortHeadersByName } = React.useContext(
@@ -1190,46 +1290,6 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       ]
     );
 
-    const extensionTreeViewItemProps = React.useMemo<?ExtensionTreeViewItemProps>(
-      () =>
-        project
-          ? {
-              project,
-              unsavedChanges,
-              preferences,
-              gdevelopTheme,
-              forceUpdate,
-              forceUpdateList,
-              showDeleteConfirmation,
-              editName,
-              scrollToItem,
-              openItems,
-              onDeleteEventsFunctionsExtension,
-              onRenameEventsFunctionsExtension,
-              onOpenEventsFunctionsExtension,
-              onReloadEventsFunctionsExtensions,
-              onEditEventsFunctionExtensionOrSeeDetails,
-            }
-          : null,
-      [
-        project,
-        unsavedChanges,
-        preferences,
-        gdevelopTheme,
-        forceUpdate,
-        forceUpdateList,
-        showDeleteConfirmation,
-        editName,
-        scrollToItem,
-        openItems,
-        onDeleteEventsFunctionsExtension,
-        onRenameEventsFunctionsExtension,
-        onOpenEventsFunctionsExtension,
-        onReloadEventsFunctionsExtensions,
-        onEditEventsFunctionExtensionOrSeeDetails,
-      ]
-    );
-
     const customObjectTreeViewItemProps = React.useMemo<?CustomObjectTreeViewItemProps>(
       () =>
         project
@@ -1280,22 +1340,68 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       () =>
         project
           ? {
+              project,
+              unsavedChanges,
+              preferences,
+              gdevelopTheme,
+              forceUpdate,
+              forceUpdateList,
+              showDeleteConfirmation,
+              editName,
+              scrollToItem,
+              openItems,
               onOpenEventsFunctionsExtension,
               onFindUsage,
             }
           : null,
-      [project, onOpenEventsFunctionsExtension, onFindUsage]
+      [
+        project,
+        unsavedChanges,
+        preferences,
+        gdevelopTheme,
+        forceUpdate,
+        forceUpdateList,
+        showDeleteConfirmation,
+        editName,
+        scrollToItem,
+        openItems,
+        onOpenEventsFunctionsExtension,
+        onFindUsage,
+      ]
     );
 
     const functionShortcutTreeViewItemProps = React.useMemo<?FunctionShortcutTreeViewItemProps>(
       () =>
         project
           ? {
+              project,
+              unsavedChanges,
+              preferences,
+              gdevelopTheme,
+              forceUpdate,
+              forceUpdateList,
+              showDeleteConfirmation,
+              editName,
+              scrollToItem,
+              openItems,
               onOpenEventsFunctionsExtension,
               onFindUsage,
             }
           : null,
-      [project, onOpenEventsFunctionsExtension, onFindUsage]
+      [
+        project,
+        unsavedChanges,
+        preferences,
+        gdevelopTheme,
+        forceUpdate,
+        forceUpdateList,
+        showDeleteConfirmation,
+        editName,
+        scrollToItem,
+        openItems,
+        onOpenEventsFunctionsExtension,
+        onFindUsage,
+      ]
     );
 
     const externalEventsTreeViewItemProps = React.useMemo<?ExternalEventsTreeViewItemProps>(
@@ -1383,7 +1489,6 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
           !customObjectTreeViewItemProps ||
           !behaviorShortcutTreeViewItemProps ||
           !functionShortcutTreeViewItemProps ||
-          !extensionTreeViewItemProps ||
           !externalEventsTreeViewItemProps ||
           !externalLayoutTreeViewItemProps
           ? []
@@ -1480,7 +1585,13 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                 isRoot: true,
                 content: new LabelTreeViewItemContent(
                   customObjectsRootFolderId,
-                  i18n._(t`Prefabs`)
+                  i18n._(t`Prefabs`),
+                  {
+                    icon: <Add />,
+                    label: i18n._(t`Create`),
+                    click: () => openCreateExtensionItemDialog('prefab'),
+                    id: 'create-prefab-button',
+                  }
                 ),
                 getChildren(i18n: I18nType): ?Array<TreeViewItem> {
                   const customObjectItems: Array<TreeViewItem> = [];
@@ -1557,7 +1668,13 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                 isRoot: true,
                 content: new LabelTreeViewItemContent(
                   behaviorsRootFolderId,
-                  i18n._(t`Behaviors`)
+                  i18n._(t`Behaviors`),
+                  {
+                    icon: <Add />,
+                    label: i18n._(t`Create`),
+                    click: () => openCreateExtensionItemDialog('behavior'),
+                    id: 'create-behavior-button',
+                  }
                 ),
                 getChildren(i18n: I18nType): ?Array<TreeViewItem> {
                   const behaviorItems: Array<TreeViewItem> = [];
@@ -1605,7 +1722,13 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                 isRoot: true,
                 content: new LabelTreeViewItemContent(
                   functionsRootFolderId,
-                  i18n._(t`Functions`)
+                  i18n._(t`Functions`),
+                  {
+                    icon: <Add />,
+                    label: i18n._(t`Create`),
+                    click: () => openCreateExtensionItemDialog('function'),
+                    id: 'create-function-button',
+                  }
                 ),
                 getChildren(i18n: I18nType): ?Array<TreeViewItem> {
                   const functionItems: Array<TreeViewItem> = [];
@@ -1728,40 +1851,6 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                   );
                 },
               },
-              {
-                isRoot: true,
-                content: new LabelTreeViewItemContent(
-                  extensionsRootFolderId,
-                  i18n._(t`Extensions`),
-                  {
-                    icon: <Add />,
-                    label: i18n._(t`Create or search for new extensions`),
-                    click: openSearchExtensionDialog,
-                    id: 'project-manager-extension-search-or-create',
-                  }
-                ),
-                getChildren(i18n: I18nType): ?Array<TreeViewItem> {
-                  if (project.getEventsFunctionsExtensionsCount() === 0) {
-                    return [
-                      new PlaceHolderTreeViewItem(
-                        extensionsEmptyPlaceholderId,
-                        i18n._(t`Start by adding a new function.`)
-                      ),
-                    ];
-                  }
-                  return mapFor(
-                    0,
-                    project.getEventsFunctionsExtensionsCount(),
-                    i =>
-                      new LeafTreeViewItem(
-                        new ExtensionTreeViewItemContent(
-                          project.getEventsFunctionsExtensionAt(i),
-                          extensionTreeViewItemProps
-                        )
-                      )
-                  );
-                },
-              },
             ];
       },
       [
@@ -1770,7 +1859,6 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         addNewScene,
         behaviorShortcutTreeViewItemProps,
         customObjectTreeViewItemProps,
-        extensionTreeViewItemProps,
         externalEventsTreeViewItemProps,
         externalLayoutTreeViewItemProps,
         functionShortcutTreeViewItemProps,
@@ -1778,7 +1866,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         onShareProject,
         openProjectExtensionsDialog,
         openProjectProperties,
-        openSearchExtensionDialog,
+        openCreateExtensionItemDialog,
         project,
         sceneTreeViewItemProps,
       ]
@@ -1849,7 +1937,6 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
           functionsRootFolderId,
           externalEventsRootFolderId,
           externalLayoutsRootFolderId,
-          extensionsRootFolderId,
         ];
 
         if (!project) return nodeIds;
@@ -2129,6 +2216,10 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                           setProjectExtensionsDialogOpen(false);
                           openSearchExtensionDialog();
                         }}
+                        onExtensionPropertiesChanged={() => {
+                          onProjectItemModified();
+                          forceUpdateList();
+                        }}
                         onShowExtensionStoreDetails={eventsFunctionsExtension => {
                           setProjectExtensionsDialogOpen(false);
                           onEditEventsFunctionExtensionOrSeeDetails(
@@ -2141,6 +2232,14 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                           );
                           forceUpdateList();
                         }}
+                      />
+                    )}
+                    {project && createExtensionItemKind && (
+                      <CreateEventsFunctionExtensionItemDialog
+                        project={project}
+                        itemKind={createExtensionItemKind}
+                        onCancel={() => setCreateExtensionItemKind(null)}
+                        onCreate={onCreateExtensionItem}
                       />
                     )}
                     {project && extensionsSearchDialogOpen && (

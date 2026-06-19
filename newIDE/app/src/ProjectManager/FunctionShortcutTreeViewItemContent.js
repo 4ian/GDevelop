@@ -3,13 +3,23 @@ import { type I18n as I18nType } from '@lingui/core';
 import { t } from '@lingui/macro';
 
 import * as React from 'react';
+import newNameGenerator from '../Utils/NewNameGenerator';
 import Text from '../UI/Text';
-import { type TreeViewItemContent, functionsRootFolderId } from './index';
+import {
+  type TreeViewItemContent,
+  type TreeItemProps,
+  functionsRootFolderId,
+} from './index';
 import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
 import { type MenuButton } from '../UI/TreeView';
 import { type HTMLDataset } from '../Utils/HTMLDataset';
-import { getFunctionIconUrl } from '../EventsFunctionsList/EventsFunctionTreeViewItemContent';
+import {
+  canFunctionBeRenamed,
+  getFunctionIconUrl,
+} from '../EventsFunctionsList/EventsFunctionTreeViewItemContent';
 import { type ProjectItemUsageTarget } from './ProjectItemUsageFinder';
+
+const gd: libGDevelop = global.gd;
 
 export type FunctionShortcutTreeViewItemCallbacks = {|
   onOpenEventsFunctionsExtension: (
@@ -25,6 +35,7 @@ type ProjectItemUsageCallbacks = {|
 |};
 
 export type FunctionShortcutTreeViewItemProps = {|
+  ...TreeItemProps,
   ...FunctionShortcutTreeViewItemCallbacks,
   ...ProjectItemUsageCallbacks,
 |};
@@ -112,6 +123,24 @@ export class FunctionShortcutTreeViewItemContent
             eventsFunction: this.eventsFunction,
           }),
       },
+      {
+        type: 'separator',
+      },
+      {
+        label: i18n._(t`Rename`),
+        click: () => this.edit(),
+        enabled: this.canBeRenamed(),
+        accelerator: 'F2',
+      },
+      {
+        label: i18n._(t`Duplicate`),
+        click: () => this._duplicate(),
+      },
+      {
+        label: i18n._(t`Delete`),
+        click: () => this.delete(),
+        accelerator: 'Backspace',
+      },
     ];
   }
 
@@ -138,11 +167,58 @@ export class FunctionShortcutTreeViewItemContent
     return null;
   }
 
-  rename(newName: string): void {}
+  rename(newName: string): void {
+    if (!this.canBeRenamed()) return;
 
-  edit(): void {}
+    const oldName = this.eventsFunction.getName();
+    if (oldName === newName) return;
 
-  delete(): void {}
+    const eventsFunctionsContainer = this.eventsFunctionsExtension.getEventsFunctions();
+    const safeAndUniqueNewName = newNameGenerator(
+      gd.Project.getSafeName(newName),
+      tentativeNewName =>
+        gd.MetadataDeclarationHelper.isExtensionLifecycleEventsFunction(
+          tentativeNewName
+        ) || eventsFunctionsContainer.hasEventsFunctionNamed(tentativeNewName)
+    );
+    if (oldName === safeAndUniqueNewName) return;
+
+    gd.WholeProjectRefactorer.renameEventsFunction(
+      this.props.project,
+      this.eventsFunctionsExtension,
+      oldName,
+      safeAndUniqueNewName
+    );
+    this.eventsFunction.setName(safeAndUniqueNewName);
+    this._onProjectItemModified();
+  }
+
+  edit(): void {
+    if (this.canBeRenamed()) {
+      this.props.editName(this.getId());
+    }
+  }
+
+  canBeRenamed(): boolean {
+    return canFunctionBeRenamed(this.eventsFunction, 'extension');
+  }
+
+  delete(): void {
+    this._delete();
+  }
+
+  async _delete(): Promise<void> {
+    const answer = await this.props.showDeleteConfirmation({
+      title: t`Remove function`,
+      message: t`Are you sure you want to remove this function? This can't be undone.`,
+    });
+    if (!answer) return;
+
+    this.eventsFunctionsExtension
+      .getEventsFunctions()
+      .removeEventsFunction(this.eventsFunction.getName());
+    this._onProjectItemModified();
+  }
 
   copy(): void {}
 
@@ -155,6 +231,34 @@ export class FunctionShortcutTreeViewItemContent
   }
 
   moveAt(destinationIndex: number): void {}
+
+  _duplicate(): void {
+    const eventsFunctionsContainer = this.eventsFunctionsExtension.getEventsFunctions();
+    const newName = newNameGenerator(this.eventsFunction.getName(), name =>
+      eventsFunctionsContainer.hasEventsFunctionNamed(name)
+    );
+    const newEventsFunction = eventsFunctionsContainer.insertEventsFunction(
+      this.eventsFunction,
+      eventsFunctionsContainer.getEventsFunctionsCount()
+    );
+    newEventsFunction.setName(newName);
+
+    this._onProjectItemModified();
+    this.props.editName(
+      getFunctionShortcutTreeViewItemId(
+        this.eventsFunctionsExtension,
+        newEventsFunction
+      )
+    );
+  }
+
+  _onProjectItemModified(): void {
+    if (this.props.unsavedChanges) {
+      this.props.unsavedChanges.triggerUnsavedChanges();
+    }
+    this.props.forceUpdate();
+    this.props.forceUpdateList();
+  }
 
   isDescendantOf(itemContent: TreeViewItemContent): boolean {
     return itemContent.getId() === functionsRootFolderId;

@@ -14,11 +14,17 @@ import Archive from '../UI/CustomSvgIcons/Archive';
 import Add from '../UI/CustomSvgIcons/Add';
 import Trash from '../UI/CustomSvgIcons/Trash';
 import Store from '../UI/CustomSvgIcons/Store';
+import Upload from '../UI/CustomSvgIcons/Upload';
 import Object2d from '../UI/CustomSvgIcons/Object2d';
 import Behavior from '../UI/CustomSvgIcons/Behavior';
-import Events from '../UI/CustomSvgIcons/Events';
+import Settings from '../UI/CustomSvgIcons/Settings';
 import { enumerateFunctionsInFolder } from '../EventsFunctionsList/EnumerateFunctionFolderOrFunction';
+import { ExtensionOptionsEditor } from '../EventsFunctionsExtensionEditor/OptionsEditorDialog/ExtensionOptionsEditor';
+import ExtensionExporterDialog from '../EventsFunctionsExtensionEditor/OptionsEditorDialog/ExtensionExporterDialog';
+import EventsFunctionsExtensionsContext from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import { mapFor } from '../Utils/MapFor';
+
+const gd: libGDevelop = global.gd;
 
 type ExtensionEntryKind = 'system' | 'third-party' | 'custom';
 
@@ -44,6 +50,12 @@ type ListedEntity = {|
   +name: string,
   +description: string,
   +count?: number,
+|};
+
+type FunctionGroups = {|
+  actions: Array<ListedEntity>,
+  conditions: Array<ListedEntity>,
+  expressions: Array<ListedEntity>,
 |};
 
 const isStoreExtension = (
@@ -229,6 +241,50 @@ const getEntityDisplayName = (
 const getEntityDescription = (
   entity: gdEventsBasedObject | gdEventsBasedBehavior | gdEventsFunction
 ): string => entity.getDescription();
+
+const getFunctionGroupsCount = (functionGroups: FunctionGroups): number =>
+  functionGroups.actions.length +
+  functionGroups.conditions.length +
+  functionGroups.expressions.length;
+
+const getEventsFunctionEntity = (
+  eventsFunction: gdEventsFunction
+): ListedEntity => ({
+  name: getEntityDisplayName(eventsFunction),
+  description: getEntityDescription(eventsFunction),
+});
+
+const getCategorizedEventsFunctionEntities = (
+  eventsFunctions: Array<gdEventsFunction>
+): FunctionGroups => {
+  const functionGroups: FunctionGroups = {
+    actions: [],
+    conditions: [],
+    expressions: [],
+  };
+
+  eventsFunctions.forEach(eventsFunction => {
+    const functionEntity = getEventsFunctionEntity(eventsFunction);
+    const functionType = eventsFunction.getFunctionType();
+
+    if (functionType === gd.EventsFunction.Condition) {
+      functionGroups.conditions.push(functionEntity);
+      return;
+    }
+
+    if (
+      functionType === gd.EventsFunction.Expression ||
+      functionType === gd.EventsFunction.ExpressionAndCondition
+    ) {
+      functionGroups.expressions.push(functionEntity);
+      return;
+    }
+
+    functionGroups.actions.push(functionEntity);
+  });
+
+  return functionGroups;
+};
 
 const getPlatformInstructionNames = (
   instructionMetadataMap: gdMapStringInstructionMetadata
@@ -419,6 +475,9 @@ const styles = {
   sectionBody: {
     padding: '4px 0 8px 0',
   },
+  propertiesEditor: {
+    padding: '12px 14px 14px 52px',
+  },
   entityRow: {
     display: 'grid',
     gridTemplateColumns: '1fr auto',
@@ -430,6 +489,16 @@ const styles = {
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
+  },
+  functionGroup: {
+    padding: '6px 0',
+  },
+  functionGroupHeader: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 12,
+    padding: '8px 14px 8px 52px',
   },
   emptyDetails: {
     height: '100%',
@@ -519,7 +588,7 @@ const ExtensionStats = ({ entry }: {| entry: ExtensionEntry |}) => {
   const statDefinitions =
     entry.kind === 'system'
       ? [
-          { label: <Trans>Objects</Trans>, value: counts.primary },
+          { label: <Trans>Prefabs</Trans>, value: counts.primary },
           { label: <Trans>Behaviors</Trans>, value: counts.secondary },
           { label: <Trans>Functions</Trans>, value: counts.tertiary },
         ]
@@ -559,7 +628,7 @@ const CollapsibleSection = ({
 }: {|
   title: React.Node,
   icon: React.Node,
-  count: number,
+  count?: number,
   children: React.Node,
 |}) => {
   const [expanded, setExpanded] = React.useState(true);
@@ -585,12 +654,39 @@ const CollapsibleSection = ({
         <Text noMargin size="block-title">
           {title}
         </Text>
-        <Text noMargin color="secondary">
-          {count}
-        </Text>
+        {count !== undefined ? (
+          <Text noMargin color="secondary">
+            {count}
+          </Text>
+        ) : (
+          <span />
+        )}
       </button>
       {expanded && <div style={styles.sectionBody}>{children}</div>}
     </div>
+  );
+};
+
+const ProjectExtensionProperties = ({
+  eventsFunctionsExtension,
+  onExtensionPropertiesChanged,
+}: {|
+  eventsFunctionsExtension: gdEventsFunctionsExtension,
+  onExtensionPropertiesChanged: () => void,
+|}) => {
+  const [isLoading, setIsLoading] = React.useState(false);
+
+  return (
+    <CollapsibleSection title={<Trans>Properties</Trans>} icon={<Settings />}>
+      <div style={styles.propertiesEditor}>
+        <ExtensionOptionsEditor
+          eventsFunctionsExtension={eventsFunctionsExtension}
+          onLoadChange={setIsLoading}
+          isLoading={isLoading}
+          onChange={onExtensionPropertiesChanged}
+        />
+      </div>
+    </CollapsibleSection>
   );
 };
 
@@ -641,6 +737,65 @@ const EntityRows = ({
   ));
 };
 
+const FunctionCategoryRows = ({
+  title,
+  entities,
+  emptyMessage,
+}: {|
+  title: React.Node,
+  entities: $ReadOnlyArray<ListedEntity>,
+  emptyMessage: React.Node,
+|}) => {
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
+
+  return (
+    <div style={styles.functionGroup}>
+      <div
+        style={{
+          ...styles.functionGroupHeader,
+          borderTop: `1px solid ${gdevelopTheme.toolbar.separatorColor}`,
+        }}
+      >
+        <Text noMargin size="block-title">
+          {title}
+        </Text>
+        <Text noMargin color="secondary">
+          {entities.length}
+        </Text>
+      </div>
+      <EntityRows entities={entities} emptyMessage={emptyMessage} />
+    </div>
+  );
+};
+
+const FunctionsSection = ({
+  functionGroups,
+}: {|
+  functionGroups: FunctionGroups,
+|}) => (
+  <CollapsibleSection
+    title={<Trans>Functions</Trans>}
+    icon={<FnIcon />}
+    count={getFunctionGroupsCount(functionGroups)}
+  >
+    <FunctionCategoryRows
+      title={<Trans>Actions</Trans>}
+      entities={functionGroups.actions}
+      emptyMessage={<Trans>No actions in this extension.</Trans>}
+    />
+    <FunctionCategoryRows
+      title={<Trans>Conditions</Trans>}
+      entities={functionGroups.conditions}
+      emptyMessage={<Trans>No conditions in this extension.</Trans>}
+    />
+    <FunctionCategoryRows
+      title={<Trans>Expressions</Trans>}
+      entities={functionGroups.expressions}
+      emptyMessage={<Trans>No expressions in this extension.</Trans>}
+    />
+  </CollapsibleSection>
+);
+
 const ProjectExtensionDetails = ({
   eventsFunctionsExtension,
 }: {|
@@ -660,11 +815,8 @@ const ProjectExtensionDetails = ({
       count: getEventsBasedBehaviorFunctions(behavior).length,
     })
   );
-  const functions = getEventsFunctions(eventsFunctionsExtension).map(
-    eventsFunction => ({
-      name: getEntityDisplayName(eventsFunction),
-      description: getEntityDescription(eventsFunction),
-    })
+  const functionGroups = getCategorizedEventsFunctionEntities(
+    getEventsFunctions(eventsFunctionsExtension)
   );
 
   return (
@@ -689,16 +841,7 @@ const ProjectExtensionDetails = ({
           emptyMessage={<Trans>No behaviors in this extension.</Trans>}
         />
       </CollapsibleSection>
-      <CollapsibleSection
-        title={<Trans>Functions</Trans>}
-        icon={<FnIcon />}
-        count={functions.length}
-      >
-        <EntityRows
-          entities={functions}
-          emptyMessage={<Trans>No free functions in this extension.</Trans>}
-        />
-      </CollapsibleSection>
+      <FunctionsSection functionGroups={functionGroups} />
     </React.Fragment>
   );
 };
@@ -718,29 +861,34 @@ const SystemExtensionDetails = ({
     .toJSArray()
     .sort()
     .map(name => ({ name, description: '' }));
-  const actions = getPlatformInstructionNames(
+  const actions: Array<ListedEntity> = getPlatformInstructionNames(
     platformExtension.getAllActions()
   ).map(name => ({ name, description: '' }));
-  const conditions = getPlatformInstructionNames(
+  const conditions: Array<ListedEntity> = getPlatformInstructionNames(
     platformExtension.getAllConditions()
   ).map(name => ({ name, description: '' }));
-  const expressions = [
+  const expressions: Array<ListedEntity> = [
     ...getPlatformExpressionNames(platformExtension.getAllExpressions()),
     ...getPlatformExpressionNames(platformExtension.getAllStrExpressions()),
   ]
     .sort()
     .map(name => ({ name, description: '' }));
+  const functionGroups: FunctionGroups = {
+    actions,
+    conditions,
+    expressions,
+  };
 
   return (
     <React.Fragment>
       <CollapsibleSection
-        title={<Trans>Objects</Trans>}
+        title={<Trans>Prefabs</Trans>}
         icon={<Object2d />}
         count={objects.length}
       >
         <EntityRows
           entities={objects}
-          emptyMessage={<Trans>No objects in this system extension.</Trans>}
+          emptyMessage={<Trans>No prefabs in this system extension.</Trans>}
         />
       </CollapsibleSection>
       <CollapsibleSection
@@ -753,36 +901,7 @@ const SystemExtensionDetails = ({
           emptyMessage={<Trans>No behaviors in this system extension.</Trans>}
         />
       </CollapsibleSection>
-      <CollapsibleSection
-        title={<Trans>Actions</Trans>}
-        icon={<Events />}
-        count={actions.length}
-      >
-        <EntityRows
-          entities={actions}
-          emptyMessage={<Trans>No actions in this system extension.</Trans>}
-        />
-      </CollapsibleSection>
-      <CollapsibleSection
-        title={<Trans>Conditions</Trans>}
-        icon={<Events />}
-        count={conditions.length}
-      >
-        <EntityRows
-          entities={conditions}
-          emptyMessage={<Trans>No conditions in this system extension.</Trans>}
-        />
-      </CollapsibleSection>
-      <CollapsibleSection
-        title={<Trans>Expressions</Trans>}
-        icon={<Events />}
-        count={expressions.length}
-      >
-        <EntityRows
-          entities={expressions}
-          emptyMessage={<Trans>No expressions in this system extension.</Trans>}
-        />
-      </CollapsibleSection>
+      <FunctionsSection functionGroups={functionGroups} />
     </React.Fragment>
   );
 };
@@ -800,7 +919,7 @@ const ExtensionListEntry = ({
   const counts = getEntryCounts(entry);
   const statLine =
     entry.kind === 'system'
-      ? `${counts.primary} objects, ${counts.secondary} behaviors, ${
+      ? `${counts.primary} prefabs, ${counts.secondary} behaviors, ${
           counts.tertiary
         } functions`
       : `${counts.primary} prefabs, ${counts.secondary} behaviors, ${
@@ -896,6 +1015,7 @@ type Props = {|
   project: gdProject,
   onClose: () => void,
   onInstallExtension: () => void,
+  onExtensionPropertiesChanged: () => void,
   onShowExtensionStoreDetails: (
     eventsFunctionsExtension: gdEventsFunctionsExtension
   ) => void,
@@ -908,13 +1028,22 @@ const ProjectExtensionsDialog = ({
   project,
   onClose,
   onInstallExtension,
+  onExtensionPropertiesChanged,
   onShowExtensionStoreDetails,
   onDeleteEventsFunctionsExtension,
 }: Props): React.Node => {
   const [searchText, setSearchText] = React.useState('');
   const [selectedEntryId, setSelectedEntryId] = React.useState<?string>(null);
   const [isUninstalling, setIsUninstalling] = React.useState(false);
+  const [
+    exportedEventsFunctionsExtension,
+    setExportedEventsFunctionsExtension,
+  ] = React.useState<?gdEventsFunctionsExtension>(null);
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
+  const eventsFunctionsExtensionsState = React.useContext(
+    EventsFunctionsExtensionsContext
+  );
+  const canExportExtensions = !!eventsFunctionsExtensionsState.getEventsFunctionsExtensionWriter();
 
   const entries = getExtensionEntries(project);
   const filteredEntries = entries.filter(entry =>
@@ -986,139 +1115,169 @@ const ProjectExtensionsDialog = ({
       disableContentScroll
       maxWidth="lg"
     >
-      <div
-        style={{
-          ...styles.root,
-          backgroundColor: gdevelopTheme.dialog.backgroundColor,
-        }}
-      >
+      <React.Fragment>
         <div
           style={{
-            ...styles.sidebar,
-            borderRightColor: gdevelopTheme.toolbar.separatorColor,
+            ...styles.root,
+            backgroundColor: gdevelopTheme.dialog.backgroundColor,
           }}
         >
-          <div style={styles.sidebarHeader}>
-            <div style={styles.sidebarTitleLine}>
-              <Text noMargin size="title">
-                <Trans>Extensions</Trans>
-              </Text>
-              <RaisedButton
-                primary
-                label={<Trans>Install</Trans>}
-                icon={<Add />}
-                onClick={onInstallExtension}
+          <div
+            style={{
+              ...styles.sidebar,
+              borderRightColor: gdevelopTheme.toolbar.separatorColor,
+            }}
+          >
+            <div style={styles.sidebarHeader}>
+              <div style={styles.sidebarTitleLine}>
+                <Text noMargin size="title">
+                  <Trans>Extensions</Trans>
+                </Text>
+                <RaisedButton
+                  primary
+                  label={<Trans>Install</Trans>}
+                  icon={<Add />}
+                  onClick={onInstallExtension}
+                />
+              </div>
+              <CompactSearchBar
+                value={searchText}
+                onChange={setSearchText}
+                placeholder={t`Search extensions`}
               />
             </div>
-            <CompactSearchBar
-              value={searchText}
-              onChange={setSearchText}
-              placeholder={t`Search extensions`}
-            />
-          </div>
-          <div style={styles.categoryList}>
-            <ExtensionCategory
-              title={<Trans>Custom extensions</Trans>}
-              entries={customEntries}
-              selectedEntryId={selectedEntryId}
-              onSelect={setSelectedEntryId}
-            />
-            <ExtensionCategory
-              title={<Trans>Third-party extensions</Trans>}
-              entries={thirdPartyEntries}
-              selectedEntryId={selectedEntryId}
-              onSelect={setSelectedEntryId}
-            />
-            <ExtensionCategory
-              title={<Trans>System extensions</Trans>}
-              entries={systemEntries}
-              selectedEntryId={selectedEntryId}
-              onSelect={setSelectedEntryId}
-            />
-            {!filteredEntries.length && (
-              <EmptyMessage>
-                <Trans>No extensions match this search.</Trans>
-              </EmptyMessage>
-            )}
-          </div>
-        </div>
-        <div style={styles.details}>
-          {!selectedEntry ? (
-            <div style={styles.emptyDetails}>
-              <EmptyMessage>
-                <Trans>Install an extension to see its contents here.</Trans>
-              </EmptyMessage>
+            <div style={styles.categoryList}>
+              <ExtensionCategory
+                title={<Trans>Custom extensions</Trans>}
+                entries={customEntries}
+                selectedEntryId={selectedEntryId}
+                onSelect={setSelectedEntryId}
+              />
+              <ExtensionCategory
+                title={<Trans>Third-party extensions</Trans>}
+                entries={thirdPartyEntries}
+                selectedEntryId={selectedEntryId}
+                onSelect={setSelectedEntryId}
+              />
+              <ExtensionCategory
+                title={<Trans>System extensions</Trans>}
+                entries={systemEntries}
+                selectedEntryId={selectedEntryId}
+                onSelect={setSelectedEntryId}
+              />
+              {!filteredEntries.length && (
+                <EmptyMessage>
+                  <Trans>No extensions match this search.</Trans>
+                </EmptyMessage>
+              )}
             </div>
-          ) : (
-            <div style={styles.detailsScroll}>
-              <div style={styles.detailsHeader}>
-                <div
-                  style={{
-                    ...styles.detailsIconContainer,
-                    backgroundColor: 'transparent',
-                  }}
-                >
-                  <ExtensionEntryIcon entry={selectedEntry} size="large" />
-                </div>
-                <div style={{ minWidth: 0 }}>
-                  <Text noMargin size="title">
-                    {selectedEntry.displayName}
-                  </Text>
-                  <Text noMargin color="secondary">
-                    {selectedEntry.name}
-                    {!!selectedEntry.category && ` - ${selectedEntry.category}`}
-                  </Text>
-                  {!!selectedEntry.description && (
-                    <Text color="secondary">{selectedEntry.description}</Text>
-                  )}
-                  <span
+          </div>
+          <div style={styles.details}>
+            {!selectedEntry ? (
+              <div style={styles.emptyDetails}>
+                <EmptyMessage>
+                  <Trans>Install an extension to see its contents here.</Trans>
+                </EmptyMessage>
+              </div>
+            ) : (
+              <div style={styles.detailsScroll}>
+                <div style={styles.detailsHeader}>
+                  <div
                     style={{
-                      ...styles.kindBadge,
-                      backgroundColor: gdevelopTheme.listItem.backgroundColor,
-                      color: gdevelopTheme.text.color.secondary,
+                      ...styles.detailsIconContainer,
+                      backgroundColor: 'transparent',
                     }}
                   >
-                    {getEntryKindLabel(selectedEntry.kind)}
-                  </span>
-                </div>
-                <div style={styles.detailsActions}>
-                  {selectedEntry.kind === 'third-party' &&
-                    !!selectedEntry.projectExtension && (
+                    <ExtensionEntryIcon entry={selectedEntry} size="large" />
+                  </div>
+                  <div style={{ minWidth: 0 }}>
+                    <Text noMargin size="title">
+                      {selectedEntry.displayName}
+                    </Text>
+                    <Text noMargin color="secondary">
+                      {selectedEntry.name}
+                      {!!selectedEntry.category &&
+                        ` - ${selectedEntry.category}`}
+                    </Text>
+                    {!!selectedEntry.description && (
+                      <Text color="secondary">{selectedEntry.description}</Text>
+                    )}
+                    <span
+                      style={{
+                        ...styles.kindBadge,
+                        backgroundColor: gdevelopTheme.listItem.backgroundColor,
+                        color: gdevelopTheme.text.color.secondary,
+                      }}
+                    >
+                      {getEntryKindLabel(selectedEntry.kind)}
+                    </span>
+                  </div>
+                  <div style={styles.detailsActions}>
+                    {selectedEntry.kind === 'third-party' &&
+                      !!selectedEntry.projectExtension && (
+                        <FlatButton
+                          label={<Trans>Store details</Trans>}
+                          leftIcon={<Store />}
+                          onClick={() =>
+                            selectedEntry.projectExtension &&
+                            onShowExtensionStoreDetails(
+                              selectedEntry.projectExtension
+                            )
+                          }
+                        />
+                      )}
+                    {!!selectedEntry.projectExtension && (
                       <FlatButton
-                        label={<Trans>Store details</Trans>}
-                        leftIcon={<Store />}
+                        label={<Trans>Export extension</Trans>}
+                        leftIcon={<Upload />}
+                        disabled={!canExportExtensions}
                         onClick={() =>
-                          selectedEntry.projectExtension &&
-                          onShowExtensionStoreDetails(
-                            selectedEntry.projectExtension
+                          setExportedEventsFunctionsExtension(
+                            selectedEntry.projectExtension || null
                           )
                         }
                       />
                     )}
-                  {!!selectedEntry.projectExtension && (
-                    <FlatButton
-                      label={<Trans>Uninstall</Trans>}
-                      leftIcon={<Trash />}
-                      disabled={isUninstalling}
-                      onClick={uninstallSelectedExtension}
-                    />
-                  )}
+                    {!!selectedEntry.projectExtension && (
+                      <FlatButton
+                        label={<Trans>Uninstall</Trans>}
+                        leftIcon={<Trash />}
+                        disabled={isUninstalling}
+                        onClick={uninstallSelectedExtension}
+                      />
+                    )}
+                  </div>
                 </div>
+                <ExtensionStats entry={selectedEntry} />
+                {selectedEntry.projectExtension ? (
+                  <React.Fragment>
+                    <ProjectExtensionProperties
+                      eventsFunctionsExtension={selectedEntry.projectExtension}
+                      onExtensionPropertiesChanged={
+                        onExtensionPropertiesChanged
+                      }
+                    />
+                    <ProjectExtensionDetails
+                      eventsFunctionsExtension={selectedEntry.projectExtension}
+                    />
+                  </React.Fragment>
+                ) : selectedEntry.platformExtension ? (
+                  <SystemExtensionDetails
+                    platformExtension={selectedEntry.platformExtension}
+                  />
+                ) : null}
               </div>
-              <ExtensionStats entry={selectedEntry} />
-              {selectedEntry.projectExtension ? (
-                <ProjectExtensionDetails
-                  eventsFunctionsExtension={selectedEntry.projectExtension}
-                />
-              ) : selectedEntry.platformExtension ? (
-                <SystemExtensionDetails
-                  platformExtension={selectedEntry.platformExtension}
-                />
-              ) : null}
-            </div>
-          )}
+            )}
+          </div>
         </div>
-      </div>
+        {exportedEventsFunctionsExtension && (
+          <ExtensionExporterDialog
+            project={project}
+            eventsFunctionsExtension={exportedEventsFunctionsExtension}
+            onClose={() => setExportedEventsFunctionsExtension(null)}
+          />
+        )}
+      </React.Fragment>
     </Dialog>
   );
 };

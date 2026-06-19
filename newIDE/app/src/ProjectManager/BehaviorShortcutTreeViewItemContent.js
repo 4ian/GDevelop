@@ -3,12 +3,23 @@ import { type I18n as I18nType } from '@lingui/core';
 import { t } from '@lingui/macro';
 
 import * as React from 'react';
+import newNameGenerator from '../Utils/NewNameGenerator';
+import {
+  serializeToJSObject,
+  unserializeFromJSObject,
+} from '../Utils/Serializer';
 import Text from '../UI/Text';
-import { type TreeViewItemContent, behaviorsRootFolderId } from './index';
+import {
+  type TreeViewItemContent,
+  type TreeItemProps,
+  behaviorsRootFolderId,
+} from './index';
 import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
 import { type MenuButton } from '../UI/TreeView';
 import { type HTMLDataset } from '../Utils/HTMLDataset';
 import { type ProjectItemUsageTarget } from './ProjectItemUsageFinder';
+
+const gd: libGDevelop = global.gd;
 
 export type BehaviorShortcutTreeViewItemCallbacks = {|
   onOpenEventsFunctionsExtension: (
@@ -24,6 +35,7 @@ type ProjectItemUsageCallbacks = {|
 |};
 
 export type BehaviorShortcutTreeViewItemProps = {|
+  ...TreeItemProps,
   ...BehaviorShortcutTreeViewItemCallbacks,
   ...ProjectItemUsageCallbacks,
 |};
@@ -108,6 +120,23 @@ export class BehaviorShortcutTreeViewItemContent
             eventsBasedBehavior: this.eventsBasedBehavior,
           }),
       },
+      {
+        type: 'separator',
+      },
+      {
+        label: i18n._(t`Rename`),
+        click: () => this.edit(),
+        accelerator: 'F2',
+      },
+      {
+        label: i18n._(t`Duplicate`),
+        click: () => this._duplicate(),
+      },
+      {
+        label: i18n._(t`Delete`),
+        click: () => this.delete(),
+        accelerator: 'Backspace',
+      },
     ];
   }
 
@@ -134,11 +163,49 @@ export class BehaviorShortcutTreeViewItemContent
     return null;
   }
 
-  rename(newName: string): void {}
+  rename(newName: string): void {
+    const oldName = this.eventsBasedBehavior.getName();
+    if (oldName === newName) return;
 
-  edit(): void {}
+    const safeAndUniqueNewName = newNameGenerator(
+      gd.Project.getSafeName(newName),
+      tentativeNewName =>
+        this.eventsFunctionsExtension
+          .getEventsBasedBehaviors()
+          .has(tentativeNewName)
+    );
+    if (oldName === safeAndUniqueNewName) return;
 
-  delete(): void {}
+    gd.WholeProjectRefactorer.renameEventsBasedBehavior(
+      this.props.project,
+      this.eventsFunctionsExtension,
+      oldName,
+      safeAndUniqueNewName
+    );
+    this.eventsBasedBehavior.setName(safeAndUniqueNewName);
+    this._onProjectItemModified();
+  }
+
+  edit(): void {
+    this.props.editName(this.getId());
+  }
+
+  delete(): void {
+    this._delete();
+  }
+
+  async _delete(): Promise<void> {
+    const answer = await this.props.showDeleteConfirmation({
+      title: t`Remove behavior`,
+      message: t`Are you sure you want to remove this behavior? This can't be undone.`,
+    });
+    if (!answer) return;
+
+    this.eventsFunctionsExtension
+      .getEventsBasedBehaviors()
+      .remove(this.eventsBasedBehavior.getName());
+    this._onProjectItemModified();
+  }
 
   copy(): void {}
 
@@ -147,10 +214,54 @@ export class BehaviorShortcutTreeViewItemContent
   cut(): void {}
 
   getIndex(): number {
-    return 0;
+    return this.eventsFunctionsExtension
+      .getEventsBasedBehaviors()
+      .getPosition(this.eventsBasedBehavior);
   }
 
   moveAt(destinationIndex: number): void {}
+
+  _duplicate(): void {
+    const eventsBasedBehaviors = this.eventsFunctionsExtension.getEventsBasedBehaviors();
+    const oldName = this.eventsBasedBehavior.getName();
+    const newName = newNameGenerator(oldName, name =>
+      eventsBasedBehaviors.has(name)
+    );
+    const newEventsBasedBehavior = eventsBasedBehaviors.insertNew(
+      newName,
+      this.getIndex() + 1
+    );
+
+    unserializeFromJSObject(
+      newEventsBasedBehavior,
+      serializeToJSObject(this.eventsBasedBehavior),
+      'unserializeFrom',
+      this.props.project
+    );
+    newEventsBasedBehavior.setName(newName);
+    gd.WholeProjectRefactorer.updateBehaviorNameInEventsBasedBehavior(
+      this.props.project,
+      this.eventsFunctionsExtension,
+      newEventsBasedBehavior,
+      oldName
+    );
+
+    this._onProjectItemModified();
+    this.props.editName(
+      getBehaviorShortcutTreeViewItemId(
+        this.eventsFunctionsExtension,
+        newEventsBasedBehavior
+      )
+    );
+  }
+
+  _onProjectItemModified(): void {
+    if (this.props.unsavedChanges) {
+      this.props.unsavedChanges.triggerUnsavedChanges();
+    }
+    this.props.forceUpdate();
+    this.props.forceUpdateList();
+  }
 
   isDescendantOf(itemContent: TreeViewItemContent): boolean {
     return itemContent.getId() === behaviorsRootFolderId;

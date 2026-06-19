@@ -5,7 +5,6 @@ import { Trans, t } from '@lingui/macro';
 import Dialog from '../UI/Dialog';
 import FlatButton from '../UI/FlatButton';
 import RaisedButton from '../UI/RaisedButton';
-import Text from '../UI/Text';
 import TextField from '../UI/TextField';
 import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
@@ -15,12 +14,14 @@ import { isExtensionNameTaken } from './EventFunctionExtensionNameVerifier';
 const gd: libGDevelop = global.gd;
 
 export type ExtensionItemKind = 'prefab' | 'behavior' | 'function';
+export type PrefabObjectDimension = '2d' | '3d';
 
 export type CreateExtensionItemPayload = {|
   itemKind: ExtensionItemKind,
   itemName: string,
   extensionName: string,
   newExtensionName: string,
+  prefabObjectDimension: PrefabObjectDimension,
   functionType: EventsFunction_FunctionType,
 |};
 
@@ -105,6 +106,10 @@ const CreateEventsFunctionExtensionItemDialog = ({
   );
   const [newExtensionName, setNewExtensionName] = React.useState('');
   const [functionType, setFunctionType] = React.useState<string>('action');
+  const [
+    prefabObjectDimension,
+    setPrefabObjectDimension,
+  ] = React.useState<PrefabObjectDimension>('2d');
 
   const trimmedItemName = itemName.trim();
   const trimmedNewExtensionName = newExtensionName.trim();
@@ -159,6 +164,7 @@ const CreateEventsFunctionExtensionItemDialog = ({
       itemName: trimmedItemName,
       extensionName: shouldCreateNewExtension ? '' : extensionName,
       newExtensionName: shouldCreateNewExtension ? trimmedNewExtensionName : '',
+      prefabObjectDimension,
       functionType:
         functionType === 'condition'
           ? gd.EventsFunction.Condition
@@ -247,9 +253,17 @@ const CreateEventsFunctionExtensionItemDialog = ({
             </SelectField>
           )}
           {itemKind === 'prefab' && (
-            <Text color="secondary">
-              <Trans>The prefab will be created as a 2D object.</Trans>
-            </Text>
+            <SelectField
+              value={prefabObjectDimension}
+              onChange={(event, index, value) => {
+                setPrefabObjectDimension(value === '3d' ? '3d' : '2d');
+              }}
+              floatingLabelText={<Trans>Object type</Trans>}
+              fullWidth
+            >
+              <SelectOption value="2d" label={t`2D object`} />
+              <SelectOption value="3d" label={t`3D object`} />
+            </SelectField>
           )}
         </ColumnStackLayout>
       </div>

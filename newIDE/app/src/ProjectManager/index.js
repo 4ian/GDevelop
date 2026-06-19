@@ -998,7 +998,9 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
             payload.itemName,
             eventsBasedObjects.getCount()
           );
-          eventsBasedObject.markAsRenderedIn3D(false);
+          eventsBasedObject.markAsRenderedIn3D(
+            payload.prefabObjectDimension === '3d'
+          );
           onProjectItemModified();
           forceUpdateList();
 

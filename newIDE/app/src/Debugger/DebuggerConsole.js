@@ -26,6 +26,7 @@ import WarningIcon from '../UI/CustomSvgIcons/Warning';
 import ErrorIcon from '../UI/CustomSvgIcons/Error';
 import FilterIcon from '../UI/CustomSvgIcons/Filter';
 import FolderIcon from '../UI/CustomSvgIcons/Folder';
+import TrashIcon from '../UI/CustomSvgIcons/Trash';
 import VisibilityIcon from '../UI/CustomSvgIcons/Visibility';
 import VisibilityOffIcon from '../UI/CustomSvgIcons/VisibilityOff';
 import MaximizeIcon from '../UI/CustomSvgIcons/Maximize';
@@ -69,6 +70,12 @@ export class LogsManager {
       setTimeout(this._commitLogs.bind(this), 200);
       this._pendingCommit = true;
     }
+  }
+
+  clearLogs() {
+    this.logs.length = 0;
+    this._pendingLogs.length = 0;
+    this._onNewLog.forEach(f => f());
   }
 
   on(event: 'group' | 'log', handler: () => void) {
@@ -168,6 +175,14 @@ export const DebuggerConsole = ({
     // As the size of the cells have changed, clear the measurer cache to allow remeasuring them.
     cellMeasurerCache.clearAll();
   };
+  const clearLogs = React.useCallback(
+    () => {
+      logsManager.clearLogs();
+      cellMeasurerCache.clearAll();
+      forceUpdate();
+    },
+    [cellMeasurerCache, forceUpdate, logsManager]
+  );
 
   const [editingHiddenGroups, setEditingHiddenGroups] = React.useState(false);
   const hiddenGroups = React.useRef(new Set<string>()).current;
@@ -310,6 +325,14 @@ export const DebuggerConsole = ({
           >
             <FilterIcon />
           </IconButton>
+          <FlatButton
+            label={<Trans>Clear logs</Trans>}
+            leftIcon={<TrashIcon />}
+            onClick={clearLogs}
+            disabled={!logs.length}
+            noBackground
+            noBorder
+          />
         </Line>
       </MiniToolbar>
 

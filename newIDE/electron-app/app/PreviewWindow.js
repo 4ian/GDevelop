@@ -168,6 +168,7 @@ const setDebuggerPopOutWindow = (parentWindowId, debuggerWindow) => {
     if (debuggerPopOutWindows.get(parentWindowId) === debuggerWindow) {
       debuggerPopOutWindows.delete(parentWindowId);
     }
+    closePreviewWindowsForParent(parentWindowId);
   });
 };
 

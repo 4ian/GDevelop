@@ -294,7 +294,7 @@ export default function ExtractAsCustomObjectDialog({
               ) : null}
             </ResponsiveLineStackLayout>
             <TextField
-              floatingLabelText={<Trans>Custom object name</Trans>}
+              floatingLabelText={<Trans>Prefab name</Trans>}
               fullWidth
               value={eventsBasedObjectName}
               onChange={(e, value) => setEventsBasedObjectName(value)}

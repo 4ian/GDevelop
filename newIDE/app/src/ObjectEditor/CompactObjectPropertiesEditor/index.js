@@ -395,6 +395,10 @@ export const CompactObjectPropertiesEditorContent = ({
   const variantName = customObjectConfiguration
     ? getVariantName(customObjectEventsBasedObject, customObjectConfiguration)
     : '';
+  const prefabName = customObjectEventsBasedObject
+    ? customObjectEventsBasedObject.getFullName() ||
+      customObjectEventsBasedObject.getName()
+    : '';
 
   const customObjectExtensionName = customObjectConfiguration
     ? gd.PlatformExtension.getExtensionFromFullObjectType(
@@ -648,6 +652,7 @@ export const CompactObjectPropertiesEditorContent = ({
                   <LineStackLayout noMargin justifyContent="space-between">
                     <Text size="body" noMargin>
                       <Trans>Variant</Trans>
+                      {prefabName ? ` - ${prefabName}` : null}
                     </Text>
                     <LineStackLayout noMargin>
                       <IconButton

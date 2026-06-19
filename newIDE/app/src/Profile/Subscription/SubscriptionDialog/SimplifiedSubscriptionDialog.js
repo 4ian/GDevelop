@@ -215,20 +215,50 @@ const renderStoreBadges = (storeBadges: Array<string>): React.Node => {
 };
 
 /**
+ * Renders text with a minimal markdown-ish syntax: words wrapped in `**...**`
+ * are shown in bold, optionally using the given emphasis color.
+ */
+const renderTextWithEmphasis = (
+  text: string,
+  emphasisColor?: string
+): React.Node => {
+  // Splitting on the capturing group yields normal text at even indices and the
+  // bold content at odd indices.
+  const parts = text.split(/\*\*(.+?)\*\*/g);
+  return parts.map((part, index) =>
+    index % 2 === 1 ? (
+      <b
+        key={index}
+        style={emphasisColor ? { color: emphasisColor } : undefined}
+      >
+        {part}
+      </b>
+    ) : (
+      part
+    )
+  );
+};
+
+/**
  * Renders the bullet points (and optional store badges) of a plan's simplified
  * features, served and translated by the backend.
  */
 const SimplifiedBulletPoints = ({
   i18n,
   simplifiedFeatures,
+  emphasisColor,
 }: {|
   i18n: I18nType,
   simplifiedFeatures: SimplifiedSubscriptionFeatures,
+  emphasisColor?: string,
 |}) => (
   <ColumnStackLayout noMargin>
     {simplifiedFeatures.bulletPoints.map((bulletPoint, index) => {
       const { storeBadges } = bulletPoint;
-      const message = selectMessageByLocale(i18n, bulletPoint.messageByLocale);
+      const message = renderTextWithEmphasis(
+        selectMessageByLocale(i18n, bulletPoint.messageByLocale),
+        emphasisColor
+      );
       return (
         <Bullet key={index} enabled={bulletPoint.enabled}>
           {storeBadges && storeBadges.length > 0 ? (
@@ -463,6 +493,7 @@ export default function SimplifiedSubscriptionDialog({
                   <SimplifiedBulletPoints
                     i18n={i18n}
                     simplifiedFeatures={featuredSimplifiedFeatures}
+                    emphasisColor={colors.goldText}
                   />
                 )}
               </div>

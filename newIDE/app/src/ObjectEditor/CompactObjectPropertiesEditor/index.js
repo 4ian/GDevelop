@@ -1,5 +1,6 @@
 // @flow
 import { type I18n as I18nType } from '@lingui/core';
+import { Trans, t } from '@lingui/macro';
 import * as React from 'react';
 import { type UnsavedChanges } from '../../MainFrame/UnsavedChangesContext';
 import VariablesList, {
@@ -12,7 +13,6 @@ import ScrollView, { type ScrollViewInterface } from '../../UI/ScrollView';
 import { Column, Line, Spacer, marginsSize } from '../../UI/Grid';
 import { Separator } from '../../CompactPropertiesEditor';
 import Text from '../../UI/Text';
-import { Trans, t } from '@lingui/macro';
 import IconButton from '../../UI/IconButton';
 import ShareExternal from '../../UI/CustomSvgIcons/ShareExternal';
 import EventsRootVariablesFinder from '../../Utils/EventsRootVariablesFinder';
@@ -367,7 +367,8 @@ export const CompactObjectPropertiesEditor = ({
     removeBehavior,
   } = useManageObjectBehaviors({
     project,
-    object,
+    projectScopedContainersAccessor,
+    objects: [object],
     isChildObject: !layout,
     eventsFunctionsExtension,
     onUpdate: forceUpdate,
@@ -845,7 +846,7 @@ export const CompactObjectPropertiesEditor = ({
                         <CompactBehaviorComponent
                           project={project}
                           behaviorMetadata={behaviorMetadata}
-                          behavior={behavior}
+                          behaviors={[behavior]}
                           behaviorOverriding={null}
                           initialInstance={null}
                           object={object}

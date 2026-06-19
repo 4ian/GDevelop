@@ -26,7 +26,7 @@ import { IconContainer } from '../UI/IconContainer';
 import { getBehaviorTutorialIds } from '../Utils/GDevelopServices/Tutorial';
 import {
   addBehaviorToObject,
-  listObjectBehaviorsTypes,
+  listObjectsBehaviorsTypes,
 } from '../Utils/Behavior';
 import { sendBehaviorAdded } from '../Utils/Analytics/EventSender';
 import ElementWithMenu from '../UI/Menu/ElementWithMenu';
@@ -48,6 +48,7 @@ import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasur
 import QuickCustomizationPropertiesVisibilityDialog from '../QuickCustomization/QuickCustomizationPropertiesVisibilityDialog';
 import Text from '../UI/Text';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
+import { getAllVisibleBehaviorNames } from '../Utils/Behavior';
 
 const gd: libGDevelop = global.gd;
 
@@ -72,8 +73,8 @@ export const useBehaviorOverridingAlertDialog = (): ((
 type BehaviorConfigurationEditorInterface = {||};
 type BehaviorConfigurationEditorProps = {|
   project: gdProject,
-  object: gdObject,
-  behavior: gdBehavior,
+  object: gdObject | null,
+  behaviors: Array<gdBehavior>,
   isChildObject: boolean,
   resourceManagementProps: ResourceManagementProps,
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
@@ -99,7 +100,7 @@ const BehaviorConfigurationEditor = React.forwardRef<
     {
       project,
       object,
-      behavior,
+      behaviors,
       isChildObject,
       resourceManagementProps,
       projectScopedContainersAccessor,
@@ -118,14 +119,18 @@ const BehaviorConfigurationEditor = React.forwardRef<
   ) => {
     const { values } = React.useContext(PreferencesContext);
     const forceUpdate = useForceUpdate();
-    const behaviorName = behavior.getName();
-    const behaviorTypeName = behavior.getTypeName();
 
-    if (behavior.isDefaultBehavior()) {
+    if (behaviors.length === 0) {
+      return null;
+    }
+    const behaviorName = behaviors[0].getName();
+    const behaviorTypeName = behaviors[0].getTypeName();
+
+    if (behaviors[0].isDefaultBehavior()) {
       return null;
     }
 
-    const expanded = !behavior.isFolded();
+    const expanded = !behaviors[0].isFolded();
 
     const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
       gd.JsPlatform.get(),
@@ -184,7 +189,7 @@ const BehaviorConfigurationEditor = React.forwardRef<
       <Accordion
         expanded={expanded}
         onChange={(_, newExpanded) => {
-          behavior.setFolded(!newExpanded);
+          behaviors[0].setFolded(!newExpanded);
           forceUpdate();
         }}
         id={`behavior-parameters-${behaviorName}`}
@@ -259,7 +264,11 @@ const BehaviorConfigurationEditor = React.forwardRef<
               margin="none"
               fullWidth
               disabled
-              onChange={(e, text) => onChangeBehaviorName(behavior, text)}
+              onChange={(e, text) => {
+                if (behaviors.length === 1) {
+                  onChangeBehaviorName(behaviors[0], text);
+                }
+              }}
               id={`behavior-${behaviorName}-name-text-field`}
             />
           </Column>
@@ -285,7 +294,7 @@ const BehaviorConfigurationEditor = React.forwardRef<
             ) : null}
             <Line>
               <BehaviorComponent
-                behavior={behavior}
+                behaviors={behaviors}
                 project={project}
                 object={object}
                 layersContainer={layersContainer}
@@ -323,7 +332,8 @@ type UseManageBehaviorsState = {|
  */
 export const useManageObjectBehaviors = ({
   project,
-  object,
+  projectScopedContainersAccessor,
+  objects,
   isChildObject,
   eventsFunctionsExtension,
   onUpdate,
@@ -334,7 +344,8 @@ export const useManageObjectBehaviors = ({
   onExtensionInstalled,
 }: {
   project: gdProject,
-  object: gdObject,
+  projectScopedContainersAccessor: ProjectScopedContainersAccessor,
+  objects: Array<gdObject>,
   isChildObject: boolean,
   eventsFunctionsExtension: gdEventsFunctionsExtension | null,
   onUpdate: () => void,
@@ -360,12 +371,16 @@ export const useManageObjectBehaviors = ({
 
   const addBehavior = React.useCallback(
     (type: string, defaultName: string) => {
-      const wasBehaviorAdded = addBehaviorToObject(
-        project,
-        object,
-        type,
-        defaultName
-      );
+      let wasBehaviorAdded = false;
+      for (const object of objects) {
+        wasBehaviorAdded ||= addBehaviorToObject(
+          project,
+          object,
+          type,
+          defaultName,
+          /* shouldSkipExistingBehaviorSilently= */ objects.length > 1
+        );
+      }
 
       if (wasBehaviorAdded) {
         setNewBehaviorDialogOpen(false);
@@ -383,7 +398,7 @@ export const useManageObjectBehaviors = ({
     },
     [
       onUpdate,
-      object,
+      objects,
       onBehaviorsUpdated,
       onSizeUpdated,
       onUpdateBehaviorsSharedData,
@@ -393,50 +408,67 @@ export const useManageObjectBehaviors = ({
 
   const changeBehaviorName = React.useCallback(
     (behavior: gdBehavior, newName: string) => {
-      // TODO: This is disabled for now as there is no proper refactoring
-      // of events after a behavior renaming. Once refactoring is available,
-      // the text field can be enabled again and refactoring calls added here
-      // (or in a parent).
-      // Renaming a behavior is something that is really rare anyway! :)
+      for (const object of objects) {
+        // TODO: This is disabled for now as there is no proper refactoring
+        // of events after a behavior renaming. Once refactoring is available,
+        // the text field can be enabled again and refactoring calls added here
+        // (or in a parent).
+        // Renaming a behavior is something that is really rare anyway! :)
 
-      if (object.hasBehaviorNamed(newName)) return;
-      // TODO Add a refactor operation to update the behavior name in overridings of object instances
-      object.renameBehavior(behavior.getName(), newName);
+        if (object.hasBehaviorNamed(newName)) return;
+        // TODO Add a refactor operation to update the behavior name in overridings of object instances
+        object.renameBehavior(behavior.getName(), newName);
+      }
       onUpdate();
       if (onBehaviorsUpdated) onBehaviorsUpdated();
     },
-    [onUpdate, object, onBehaviorsUpdated]
+    [onUpdate, objects, onBehaviorsUpdated]
   );
 
   const removeBehavior = React.useCallback(
     (behaviorName: string) => {
       let message =
         "Are you sure you want to remove this behavior? This can't be undone.";
-      const dependentBehaviors = gd.WholeProjectRefactorer.findDependentBehaviorNames(
-        project,
-        object,
-        behaviorName
-      ).toJSArray();
-      if (dependentBehaviors.length > 0) {
+      const allDependentBehaviorsSet = new Set<string>();
+      for (const object of objects) {
+        const dependentBehaviors = gd.WholeProjectRefactorer.findDependentBehaviorNames(
+          project,
+          object,
+          behaviorName
+        ).toJSArray();
+        for (const dependentBehavior of dependentBehaviors) {
+          allDependentBehaviorsSet.add(dependentBehavior);
+        }
+      }
+      const allDependentBehaviors = [...allDependentBehaviorsSet];
+      if (allDependentBehaviors.length > 0) {
         message +=
           '\nDependent behaviors will be removed too: ' +
-          dependentBehaviors.join(', ');
+          [...allDependentBehaviors].join(', ');
       }
       const answer = Window.showConfirmDialog(message);
 
       if (answer) {
-        // TODO Add a refactor operation to remove the behavior overridings in object instances
-        object.removeBehavior(behaviorName);
-        dependentBehaviors.forEach(name => object.removeBehavior(name));
+        for (const object of objects) {
+          // TODO Add a refactor operation to remove the behavior overridings in object instances
+          object.removeBehavior(behaviorName);
+          for (const behaviorName of allDependentBehaviors) {
+            object.removeBehavior(behaviorName);
+          }
+        }
         if (onSizeUpdated) onSizeUpdated();
       }
       if (onBehaviorsUpdated) onBehaviorsUpdated();
     },
-    [object, onBehaviorsUpdated, onSizeUpdated, project]
+    [objects, onBehaviorsUpdated, onSizeUpdated, project]
   );
 
   const copyBehavior = React.useCallback(
     (behaviorName: string) => {
+      const object = objects[0];
+      if (!object) {
+        return;
+      }
       const behavior = object.getBehavior(behaviorName);
       Clipboard.set(BEHAVIORS_CLIPBOARD_KIND, [
         {
@@ -447,13 +479,18 @@ export const useManageObjectBehaviors = ({
       ]);
       onUpdate();
     },
-    [onUpdate, object]
+    [onUpdate, objects]
   );
 
   const copyAllBehaviors = React.useCallback(
     () => {
+      const object = objects[0];
+      if (!object) {
+        return;
+      }
       Clipboard.set(
         BEHAVIORS_CLIPBOARD_KIND,
+        // TODO Copy common behaviors only
         mapVector(object.getAllBehaviorNames(), behaviorName => {
           const behavior = object.getBehavior(behaviorName);
           if (behavior.isDefaultBehavior()) {
@@ -468,11 +505,14 @@ export const useManageObjectBehaviors = ({
       );
       onUpdate();
     },
-    [onUpdate, object]
+    [onUpdate, objects]
   );
 
   const pasteBehaviors = React.useCallback(
     async () => {
+      if (objects.length === 0) {
+        return;
+      }
       const clipboardContent = Clipboard.get(BEHAVIORS_CLIPBOARD_KIND);
       const behaviorContents = SafeExtractor.extractArray(clipboardContent);
       if (!behaviorContents) return;
@@ -504,32 +544,28 @@ export const useManageObjectBehaviors = ({
         if (!name || !type || !serializedBehavior) {
           return;
         }
-        if (
-          !gd.ObjectTools.isBehaviorCompatibleWithObject(
-            project.getCurrentPlatform(),
-            object.getType(),
-            type
-          )
-        ) {
-          return;
+
+        for (const object of objects) {
+          if (
+            !gd.ObjectTools.isBehaviorCompatibleWithObject(
+              project.getCurrentPlatform(),
+              object.getType(),
+              type
+            )
+          ) {
+            return;
+          }
         }
 
-        const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
-          project.getCurrentPlatform(),
-          type
-        );
-        if (
-          behaviorMetadata.getObjectType() !== '' &&
-          behaviorMetadata.getObjectType() !== object.getType()
-        ) {
-          return;
-        }
-
-        if (object.hasBehaviorNamed(name)) {
-          const existingBehavior = object.getBehavior(name);
+        if (objects.every(object => object.hasBehaviorNamed(name))) {
+          const existingBehavior = objects[0].getBehavior(name);
           if (existingBehavior.getTypeName() !== type) {
             return;
           }
+          const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
+            project.getCurrentPlatform(),
+            type
+          );
           existingNamedBehaviors.push({ name, type, serializedBehavior });
           existingBehaviorFullNames.push(behaviorMetadata.getFullName());
         } else {
@@ -539,24 +575,28 @@ export const useManageObjectBehaviors = ({
 
       let firstAddedBehaviorName: string | null = null;
       newNamedBehaviors.forEach(({ name, type, serializedBehavior }) => {
-        object.addNewBehavior(project, type, name);
-        if (object.hasBehaviorNamed(name)) {
-          if (!firstAddedBehaviorName) {
-            firstAddedBehaviorName = name;
+        for (const object of objects) {
+          object.addNewBehavior(project, type, name);
+          if (object.hasBehaviorNamed(name)) {
+            if (!firstAddedBehaviorName) {
+              firstAddedBehaviorName = name;
+            }
+            const behavior = object.getBehavior(name);
+            unserializeFromJSObject(behavior, serializedBehavior);
           }
-          const behavior = object.getBehavior(name);
-          unserializeFromJSObject(behavior, serializedBehavior);
         }
       });
-      // Add missing required behaviors as a 2nd step because these behaviors
-      // could have been in the array.
-      newNamedBehaviors.forEach(({ name }) => {
-        gd.WholeProjectRefactorer.addRequiredBehaviorsFor(
-          project,
-          object,
-          name
-        );
-      });
+      for (const object of objects) {
+        // Add missing required behaviors as a 2nd step because these behaviors
+        // could have been in the array.
+        newNamedBehaviors.forEach(({ name }) => {
+          gd.WholeProjectRefactorer.addRequiredBehaviorsFor(
+            project,
+            object,
+            name
+          );
+        });
+      }
 
       let shouldOverrideBehaviors = false;
       if (existingNamedBehaviors.length > 0) {
@@ -567,10 +607,12 @@ export const useManageObjectBehaviors = ({
         if (shouldOverrideBehaviors) {
           existingNamedBehaviors.forEach(
             ({ name, type, serializedBehavior }) => {
-              if (object.hasBehaviorNamed(name)) {
-                const behavior = object.getBehavior(name);
-                // Property values can be replaced directly because the type has been check earlier.
-                unserializeFromJSObject(behavior, serializedBehavior);
+              for (const object of objects) {
+                if (object.hasBehaviorNamed(name)) {
+                  const behavior = object.getBehavior(name);
+                  // Property values can be replaced directly because the type has been check earlier.
+                  unserializeFromJSObject(behavior, serializedBehavior);
+                }
               }
             }
           );
@@ -591,7 +633,7 @@ export const useManageObjectBehaviors = ({
     },
     [
       onUpdate,
-      object,
+      objects,
       onBehaviorsUpdated,
       onSizeUpdated,
       onUpdateBehaviorsSharedData,
@@ -600,11 +642,30 @@ export const useManageObjectBehaviors = ({
     ]
   );
 
+  const objectType = React.useMemo(
+    () => {
+      let type = null;
+      for (const object of objects) {
+        const objectType = projectScopedContainersAccessor
+          .get()
+          .getObjectsContainersList()
+          .getTypeOfObject(object.getName());
+        if (type === null || objectType === type) {
+          type = objectType;
+        } else {
+          return '';
+        }
+      }
+      return type || '';
+    },
+    [objects, projectScopedContainersAccessor]
+  );
+
   const newBehaviorDialog = newBehaviorDialogOpen && (
     <NewBehaviorDialog
       open
-      objectType={object.getType()}
-      objectBehaviorsTypes={listObjectBehaviorsTypes(object)}
+      objectType={objectType}
+      objectBehaviorsTypes={listObjectsBehaviorsTypes(objects)}
       isChildObject={isChildObject}
       onClose={() => setNewBehaviorDialogOpen(false)}
       onChoose={addBehavior}
@@ -636,7 +697,7 @@ export const useManageObjectBehaviors = ({
 type Props = {|
   project: gdProject,
   eventsFunctionsExtension: gdEventsFunctionsExtension | null,
-  object: gdObject,
+  objects: Array<gdObject>,
   layersContainer: gdLayersContainer,
   isChildObject: boolean,
   onUpdateBehaviorsSharedData: () => void,
@@ -661,9 +722,10 @@ const BehaviorsEditor = (props: Props): React.Node => {
   );
 
   const {
-    object,
+    objects,
     isChildObject,
     project,
+    projectScopedContainersAccessor,
     eventsFunctionsExtension,
     layersContainer,
     onSizeUpdated,
@@ -693,7 +755,8 @@ const BehaviorsEditor = (props: Props): React.Node => {
     resetJustAddedBehaviorName,
   } = useManageObjectBehaviors({
     project,
-    object,
+    projectScopedContainersAccessor,
+    objects,
     isChildObject,
     eventsFunctionsExtension,
     onUpdate: forceUpdate,
@@ -719,13 +782,7 @@ const BehaviorsEditor = (props: Props): React.Node => {
     [justAddedBehaviorName, resetJustAddedBehaviorName]
   );
 
-  // As for now, any default behavior is hidden,
-  // it avoids to get behavior metadata to check the "hidden" flag.
-  const allVisibleBehaviors = object
-    .getAllBehaviorNames()
-    .toJSArray()
-    .map(behaviorName => object.getBehavior(behaviorName))
-    .filter(behavior => !behavior.isDefaultBehavior());
+  const allVisibleBehaviorNames = getAllVisibleBehaviorNames(objects);
 
   const openExtension = React.useCallback(
     (behaviorType: string) => {
@@ -749,12 +806,16 @@ const BehaviorsEditor = (props: Props): React.Node => {
 
   const openBehaviorPropertiesQuickCustomizationDialog = React.useCallback(
     (behaviorName: string) => {
+      const object = objects[0];
+      if (!object) {
+        return;
+      }
       if (!object.hasBehaviorNamed(behaviorName)) return;
       const behavior = object.getBehavior(behaviorName);
 
       setSelectedQuickCustomizationPropertiesBehavior(behavior);
     },
-    [object]
+    [objects]
   );
 
   const isClipboardContainingBehaviors = Clipboard.has(
@@ -763,7 +824,7 @@ const BehaviorsEditor = (props: Props): React.Node => {
 
   return (
     <Column noMargin expand useFullHeight noOverflowParent>
-      {allVisibleBehaviors.length === 0 ? (
+      {allVisibleBehaviorNames.length === 0 ? (
         isListLocked ? (
           <Column noMargin expand justifyContent="center">
             <Text size="block-title" align="center">
@@ -802,8 +863,10 @@ const BehaviorsEditor = (props: Props): React.Node => {
       ) : (
         <React.Fragment>
           <ScrollView ref={scrollView}>
-            {allVisibleBehaviors.map((behavior, index) => {
-              const behaviorName = behavior.getName();
+            {allVisibleBehaviorNames.map((behaviorName, index) => {
+              const behaviors = objects.map(object =>
+                object.getBehavior(behaviorName)
+              );
 
               const ref =
                 justAddedBehaviorName === behaviorName
@@ -815,10 +878,10 @@ const BehaviorsEditor = (props: Props): React.Node => {
                   ref={ref}
                   key={behaviorName}
                   project={project}
-                  object={object}
+                  object={objects.length === 1 ? objects[1] : null}
                   layersContainer={layersContainer}
                   isChildObject={isChildObject}
-                  behavior={behavior}
+                  behaviors={behaviors}
                   copyBehavior={copyBehavior}
                   onRemoveBehavior={removeBehavior}
                   onBehaviorsUpdated={onBehaviorsUpdated}

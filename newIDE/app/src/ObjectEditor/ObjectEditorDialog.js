@@ -372,7 +372,7 @@ const InnerDialog = (props: InnerDialogProps) => {
       ) : null}
       {currentTab === 'behaviors' && (
         <BehaviorsEditor
-          object={object}
+          objects={[object]}
           isChildObject={!!eventsBasedObject}
           project={project}
           eventsFunctionsExtension={eventsFunctionsExtension}

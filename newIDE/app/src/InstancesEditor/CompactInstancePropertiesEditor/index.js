@@ -445,7 +445,7 @@ export const CompactInstancePropertiesEditor = ({
                                 <CompactBehaviorComponent
                                   project={project}
                                   behaviorMetadata={behaviorMetadata}
-                                  behavior={behavior}
+                                  behaviors={[behavior]}
                                   behaviorOverriding={behaviorOverriding}
                                   object={object}
                                   layersContainer={layersContainer}

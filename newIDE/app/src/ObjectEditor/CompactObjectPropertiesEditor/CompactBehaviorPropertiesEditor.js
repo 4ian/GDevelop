@@ -116,7 +116,7 @@ export const updateProperty = (
 export const CompactBehaviorPropertiesEditor = ({
   project,
   behaviorMetadata,
-  behavior,
+  behaviors,
   object,
   layersContainer,
   behaviorOverriding,
@@ -133,16 +133,17 @@ export const CompactBehaviorPropertiesEditor = ({
         // schemaRecomputeTrigger allows to invalidate the schema when required.
       }
       if (initialInstance) {
+        const behavior = behaviors[0];
         const behaviorProperties = behavior.getProperties();
         return propertiesMapToSchema({
           properties: behaviorProperties,
           defaultValueProperties: behaviorProperties,
-          getPropertyValue: (instance, propertyName) =>
-            getPropertyValue(behavior, propertyName, initialInstance),
+          getPropertyValue: (instance: gdBehavior, propertyName) =>
+            getPropertyValue(instance, propertyName, initialInstance),
           onUpdateProperty: (instance, propertyName, value) =>
             updateProperty(
               project,
-              behavior,
+              instance,
               propertyName,
               value,
               initialInstance
@@ -177,7 +178,7 @@ export const CompactBehaviorPropertiesEditor = ({
       behaviorMetadata,
       object,
       layersContainer,
-      behavior,
+      behaviors,
       project,
     ]
   );
@@ -188,7 +189,7 @@ export const CompactBehaviorPropertiesEditor = ({
         project={project}
         object={object}
         schema={propertiesSchema}
-        instances={[behavior]}
+        instances={behaviors}
         onInstancesModified={onBehaviorUpdated}
         resourceManagementProps={resourceManagementProps}
         placeholder={<Trans>Nothing to configure for this behavior.</Trans>}
@@ -198,7 +199,7 @@ export const CompactBehaviorPropertiesEditor = ({
                 getSchemaWithOpenFullEditorButton({
                   schema,
                   fullEditorLabel: behaviorMetadata.getOpenFullEditorLabel(),
-                  behavior,
+                  behavior: behaviors[0],
                   onOpenFullEditor,
                 })
             : null

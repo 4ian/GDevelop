@@ -13,7 +13,7 @@ type Props = BehaviorEditorProps;
 
 const BehaviorPropertiesEditor = ({
   project,
-  behavior,
+  behaviors,
   object,
   layersContainer,
   onBehaviorUpdated,
@@ -21,6 +21,8 @@ const BehaviorPropertiesEditor = ({
   projectScopedContainersAccessor,
   isAdvancedSectionInitiallyUncollapsed,
 }: Props): React.Node => {
+  const behavior = behaviors[0];
+
   const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
     gd.JsPlatform.get(),
     behavior.getTypeName()
@@ -52,7 +54,7 @@ const BehaviorPropertiesEditor = ({
         project={project}
         object={object}
         schema={schema}
-        instances={[behavior]}
+        instances={behaviors}
         onInstancesModified={onBehaviorUpdated}
         resourceManagementProps={resourceManagementProps}
         projectScopedContainersAccessor={projectScopedContainersAccessor}

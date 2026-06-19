@@ -16,9 +16,13 @@ export const addBehaviorToObject = (
   project: gdProject,
   object: gdObject,
   type: string,
-  defaultName: string
+  defaultName: string,
+  shouldSkipExistingBehaviorSilently: boolean
 ): boolean => {
   if (hasBehaviorWithType(object, type)) {
+    if (shouldSkipExistingBehaviorSilently) {
+      return false;
+    }
     const answer = Window.showConfirmDialog(
       "There is already a behavior of this type attached to the object. It's possible to add this behavior again, but it's unusual and may not always be supported properly. Are you sure you want to add this behavior again?"
     );
@@ -47,3 +51,34 @@ export const listObjectBehaviorsTypes = (object: gdObject): Array<string> =>
     .getAllBehaviorNames()
     .toJSArray()
     .map(behaviorName => object.getBehavior(behaviorName).getTypeName());
+
+export const listObjectsBehaviorsTypes = (
+  objects: Array<gdObject>
+): Array<string> =>
+  objects.length === 0
+    ? []
+    : objects[0]
+        .getAllBehaviorNames()
+        .toJSArray()
+        .filter(behaviorName =>
+          objects.every(object => object.hasBehaviorNamed(behaviorName))
+        )
+        .map(behaviorName =>
+          objects[0].getBehavior(behaviorName).getTypeName()
+        );
+
+export const getAllVisibleBehaviorNames = (
+  objects: Array<gdObject>
+): Array<string> =>
+  objects.length === 0
+    ? []
+    : objects[0]
+        .getAllBehaviorNames()
+        .toJSArray()
+        .filter(
+          behaviorName =>
+            // As for now, any default behavior is hidden,
+            // it avoids to get behavior metadata to check the "hidden" flag.
+            !objects[0].getBehavior(behaviorName).isDefaultBehavior() &&
+            objects.every(object => object.hasBehaviorNamed(behaviorName))
+        );

@@ -329,6 +329,51 @@ const CustomObjectPropertiesEditor = (props: Props): React.Node => {
       }),
     [customObjectConfiguration, customObjectEventsBasedObject, object]
   );
+  const shouldDisplayVariantSelector = !customObjectConfiguration.isForcedToOverrideEventsBasedObjectChildrenConfiguration();
+  const variantSelector = shouldDisplayVariantSelector ? (
+    <>
+      <Text size="block-title">
+        <Trans>Variant</Trans>
+        {prefabName ? ` - ${prefabName}` : null}
+      </Text>
+      <ColumnStackLayout expand noMargin>
+        <SelectField
+          id={'variant-name'}
+          floatingLabelText={<Trans>Variant</Trans>}
+          value={variantName}
+          onChange={(e, i, value: string) => {
+            customObjectConfiguration.setVariantName(value);
+            if (onObjectUpdated) {
+              onObjectUpdated();
+            }
+            forceUpdate();
+          }}
+        >
+          <SelectOption key="default-variant" value="" label={t`Default`} />
+          {customObjectEventsBasedObject &&
+            mapFor(
+              0,
+              customObjectEventsBasedObject.getVariants().getVariantsCount(),
+              i => {
+                if (!customObjectEventsBasedObject) {
+                  return null;
+                }
+                const variant = customObjectEventsBasedObject
+                  .getVariants()
+                  .getVariantAt(i);
+                return (
+                  <SelectOption
+                    key={'variant-' + variant.getName()}
+                    value={variant.getName()}
+                    label={variant.getName()}
+                  />
+                );
+              }
+            )}
+        </SelectField>
+      </ColumnStackLayout>
+    </>
+  ) : null;
 
   return (
     <I18n>
@@ -336,6 +381,7 @@ const CustomObjectPropertiesEditor = (props: Props): React.Node => {
         <>
           <ScrollView ref={scrollView}>
             <ColumnStackLayout noMargin>
+              {variantSelector}
               {renderObjectNameField && renderObjectNameField()}
               {tutorialIds.map(tutorialId => (
                 <DismissableTutorialMessage
@@ -379,56 +425,6 @@ const CustomObjectPropertiesEditor = (props: Props): React.Node => {
                       ) : null
                     }
                   />
-                  {!customObjectConfiguration.isForcedToOverrideEventsBasedObjectChildrenConfiguration() && (
-                    <>
-                      <Text size="block-title">
-                        <Trans>Variant</Trans>
-                        {prefabName ? ` - ${prefabName}` : null}
-                      </Text>
-                      <ColumnStackLayout expand noMargin>
-                        <SelectField
-                          id={'variant-name'}
-                          floatingLabelText={<Trans>Variant</Trans>}
-                          value={variantName}
-                          onChange={(e, i, value: string) => {
-                            customObjectConfiguration.setVariantName(value);
-                            if (onObjectUpdated) {
-                              onObjectUpdated();
-                            }
-                            forceUpdate();
-                          }}
-                        >
-                          <SelectOption
-                            key="default-variant"
-                            value=""
-                            label={t`Default`}
-                          />
-                          {customObjectEventsBasedObject &&
-                            mapFor(
-                              0,
-                              customObjectEventsBasedObject
-                                .getVariants()
-                                .getVariantsCount(),
-                              i => {
-                                if (!customObjectEventsBasedObject) {
-                                  return null;
-                                }
-                                const variant = customObjectEventsBasedObject
-                                  .getVariants()
-                                  .getVariantAt(i);
-                                return (
-                                  <SelectOption
-                                    key={'variant-' + variant.getName()}
-                                    value={variant.getName()}
-                                    label={variant.getName()}
-                                  />
-                                );
-                              }
-                            )}
-                        </SelectField>
-                      </ColumnStackLayout>
-                    </>
-                  )}
                   {(!variantName ||
                     customObjectConfiguration.isForcedToOverrideEventsBasedObjectChildrenConfiguration()) &&
                     (customObjectEventsBasedObject &&

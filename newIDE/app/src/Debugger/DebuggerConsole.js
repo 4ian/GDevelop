@@ -169,9 +169,9 @@ export const DebuggerConsole = ({
   );
 
   const [hideInternal, setHideInternal] = React.useState(false);
-  const [showDetails, _setShowDetails] = React.useState(true);
-  const setShowDetails = (show: boolean) => {
-    _setShowDetails(show);
+  const [hideDetails, _setHideDetails] = React.useState(true);
+  const setHideDetails = (hide: boolean) => {
+    _setHideDetails(hide);
     // As the size of the cells have changed, clear the measurer cache to allow remeasuring them.
     cellMeasurerCache.clearAll();
   };
@@ -255,7 +255,7 @@ export const DebuggerConsole = ({
                               {filteredLogs[index].message}
                             </div>
                           </Line>
-                          {showDetails && (
+                          {!hideDetails && (
                             <>
                               <Spacer />
                               <Line noMargin>
@@ -298,17 +298,11 @@ export const DebuggerConsole = ({
       <MiniToolbar>
         <Line justifyContent="space-between" alignItems="center" noMargin>
           <Checkbox
-            label={
-              showDetails ? (
-                <Trans>Hide details</Trans>
-              ) : (
-                <Trans>Show details</Trans>
-              )
-            }
+            label={<Trans>Hide details</Trans>}
             checkedIcon={<MinimizeIcon />}
             uncheckedIcon={<MaximizeIcon />}
-            checked={showDetails}
-            onCheck={(_, enabled) => setShowDetails(enabled)}
+            checked={hideDetails}
+            onCheck={(_, enabled) => setHideDetails(enabled)}
           />
           <Checkbox
             label={<Trans>Show internal</Trans>}

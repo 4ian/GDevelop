@@ -3459,6 +3459,17 @@ const MainFrame = (props: Props): React.MixedElement => {
         }
       }
 
+      if (eventBasedObjectName) {
+        const eventsBasedObjects = eventsFunctionsExtension.getEventsBasedObjects();
+        const eventsBasedObject = eventsBasedObjects.get(eventBasedObjectName);
+        openPrefabDetailEditor(
+          eventsFunctionsExtension,
+          eventsBasedObject,
+          functionName.name
+        );
+        return;
+      }
+
       const foundTab = getEventsFunctionsExtensionEditor(
         editorTabs,
         eventsFunctionsExtension

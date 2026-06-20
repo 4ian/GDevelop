@@ -63,6 +63,7 @@ export const NoProjectOpen = (): React.Node => {
                     'onOpenEventsFunctionsExtension'
                   )}
                   onOpenCustomObjectEditor={action('onOpenCustomObjectEditor')}
+                  onOpenPrefabDetailEditor={action('onOpenPrefabDetailEditor')}
                   onRenamedEventsBasedObject={action(
                     'onRenamedEventsBasedObject'
                   )}
@@ -116,7 +117,7 @@ export const NoProjectOpen = (): React.Node => {
                     markGameAsSavedIfRelevant: async () => {},
                   }}
                   onOpenHomePage={action('openHomepage')}
-                  toggleProjectManager={action('toggleProjectManager')}
+                  closeProjectManager={action('closeProjectManager')}
                   buildMainMenuProps={{
                     i18n,
                     project: testProject.project,
@@ -158,6 +159,7 @@ export const ProjectOpen = (): React.Node => {
                     'onOpenEventsFunctionsExtension'
                   )}
                   onOpenCustomObjectEditor={action('onOpenCustomObjectEditor')}
+                  onOpenPrefabDetailEditor={action('onOpenPrefabDetailEditor')}
                   onRenamedEventsBasedObject={action(
                     'onRenamedEventsBasedObject'
                   )}
@@ -211,7 +213,7 @@ export const ProjectOpen = (): React.Node => {
                     markGameAsSavedIfRelevant: async () => {},
                   }}
                   onOpenHomePage={action('openHomepage')}
-                  toggleProjectManager={action('toggleProjectManager')}
+                  closeProjectManager={action('closeProjectManager')}
                   buildMainMenuProps={{
                     i18n,
                     project: testProject.project,

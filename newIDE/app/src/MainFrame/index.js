@@ -6125,6 +6125,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       onOpenExternalLayout={openExternalLayout}
       onOpenEventsFunctionsExtension={openEventsFunctionsExtension}
       onOpenCustomObjectEditor={openCustomObjectEditor}
+      onOpenPrefabDetailEditor={openPrefabDetailEditor}
       onRenamedEventsBasedObject={onRenamedEventsBasedObject}
       onDeletedEventsBasedObject={onDeletedEventsBasedObject}
       onRenamedEventsBasedObjectVariant={onRenamedEventsBasedObjectVariant}

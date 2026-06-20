@@ -389,6 +389,7 @@ export class EventsBasedObjectTreeViewItemContent
       name,
       eventsBasedObjectsList.getCount()
     );
+    newEventsBasedObject.setFullName(name);
     this._onEventsBasedObjectModified();
 
     const newEventsBasedObjectId = getObjectTreeViewItemId(

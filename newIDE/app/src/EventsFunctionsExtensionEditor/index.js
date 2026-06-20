@@ -1025,6 +1025,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       onRenamedEventsBasedObject,
     } = this.props;
     const oldName = eventsBasedObject.getName();
+    const oldFullName = eventsBasedObject.getFullName();
     const safeAndUniqueNewName = newNameGenerator(
       gd.Project.getSafeName(newName),
       tentativeNewName => {
@@ -1045,6 +1046,9 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       safeAndUniqueNewName
     );
     eventsBasedObject.setName(safeAndUniqueNewName);
+    if (oldFullName === oldName) {
+      eventsBasedObject.setFullName(safeAndUniqueNewName);
+    }
 
     done(true);
     onRenamedEventsBasedObject(

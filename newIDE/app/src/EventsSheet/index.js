@@ -148,6 +148,10 @@ import {
   getEventsSheetSelectionSnapshot,
   type EventsSheetSelectionSnapshot,
 } from './SelectionSnapshot';
+import {
+  collectUsedGroupEventColorKeys,
+  setRandomUniqueGroupEventColor,
+} from './GroupEventColorPicker';
 
 export type { EventsSheetSelectionSnapshot } from './SelectionSnapshot';
 
@@ -956,11 +960,23 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       };
     }
 
+    const usedGroupEventColorKeys =
+      type === 'BuiltinCommonInstructions::Group'
+        ? collectUsedGroupEventColorKeys(this.props.events)
+        : null;
+
     const newEvent = insertion.eventsList.insertNewEvent(
       project,
       type,
       insertion.indexInList + 1
     );
+
+    if (type === 'BuiltinCommonInstructions::Group') {
+      setRandomUniqueGroupEventColor(
+        gd.asGroupEvent(newEvent),
+        usedGroupEventColorKeys || new Set()
+      );
+    }
 
     const eventsTree = this._eventsTree;
     if (eventsTree) {
@@ -2561,6 +2577,9 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     if (!eventContext) return;
 
     const { project } = this.props;
+    const usedGroupEventColorKeys = collectUsedGroupEventColorKeys(
+      this.props.events
+    );
 
     const newEvent = eventContext.eventsList.insertNewEvent(
       project,
@@ -2570,6 +2589,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     const groupEvent = gd.asGroupEvent(newEvent);
 
     groupEvent.setName('Grouped events');
+    setRandomUniqueGroupEventColor(groupEvent, usedGroupEventColorKeys);
     groupEvent.setFolded(true);
     groupEvent
       .getSubEvents()

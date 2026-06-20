@@ -44,6 +44,7 @@ type Props = {|
   title: React.Node,
   onClose: () => void,
   id: string,
+  rightAction?: React.Node,
   disableSafeAreaTopMargin?: boolean,
 |};
 
@@ -101,6 +102,7 @@ const DrawerTopBar = (props: Props): React.Node => {
               </Typography>
             )}
           </LineStackLayout>
+          {props.rightAction}
           {closeButton}
           {props.drawerAnchor === 'right' && <TitleBarRightSafeMargins />}
         </Toolbar>

@@ -670,7 +670,7 @@ type Props = {|
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
   onShareProject: () => void,
   onOpenHomePage: () => void,
-  toggleProjectManager: () => void,
+  closeProjectManager: () => void,
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
   onSceneAdded: () => void,
@@ -722,7 +722,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       onShareProject,
       resourceManagementProps,
       projectScopedContainersAccessor,
-      toggleProjectManager,
+      closeProjectManager,
       mainMenuCallbacks,
       buildMainMenuProps,
       onExtensionInstalled,
@@ -1985,9 +1985,9 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
     const openPreferencesFromQuickLink = React.useCallback(
       () => {
         mainMenuCallbacks.onOpenPreferences(true);
-        toggleProjectManager();
+        closeProjectManager();
       },
-      [mainMenuCallbacks, toggleProjectManager]
+      [mainMenuCallbacks, closeProjectManager]
     );
 
     // Unselect items when the project manager is closed.
@@ -2020,7 +2020,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                 buildMainMenuProps={buildMainMenuProps}
                 selectedMainMenuItemIndices={selectedMainMenuItemIndices}
                 setSelectedMainMenuItemIndices={setSelectedMainMenuItemIndices}
-                closeDrawer={toggleProjectManager}
+                closeDrawer={closeProjectManager}
               />
             )}
             {!isNavigatingInMainMenuItem && project && (

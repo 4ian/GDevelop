@@ -492,6 +492,10 @@ const MainFrame = (props: Props): React.MixedElement => {
   const [projectManagerOpen, openProjectManager] = React.useState<boolean>(
     false
   );
+  const [
+    isProjectManagerPinned,
+    setProjectManagerPinned,
+  ] = React.useState<boolean>(false);
   const [languageDialogOpen, openLanguageDialog] = React.useState<boolean>(
     false
   );
@@ -1707,19 +1711,59 @@ const MainFrame = (props: Props): React.MixedElement => {
     return Window.quit();
   }, []);
 
-  const toggleProjectManager = React.useCallback(
+  const closeProjectManagerOverlay = React.useCallback(
     () => {
-      openProjectManager(projectManagerOpen => !projectManagerOpen);
+      openProjectManager(false);
     },
     [openProjectManager]
   );
 
-  // When the project manager drawer is opened, highlight and scroll to the item
+  const closePinnedProjectManager = React.useCallback(
+    () => {
+      openProjectManager(false);
+      setProjectManagerPinned(false);
+    },
+    [openProjectManager]
+  );
+
+  const pinProjectManager = React.useCallback(
+    () => {
+      openProjectManager(false);
+      setProjectManagerPinned(true);
+    },
+    [openProjectManager]
+  );
+
+  const keepPinnedProjectManagerOpen = React.useCallback(() => {}, []);
+
+  const toggleProjectManager = React.useCallback(
+    () => {
+      if (isProjectManagerPinned) {
+        closePinnedProjectManager();
+        return;
+      }
+
+      openProjectManager(projectManagerOpen => !projectManagerOpen);
+    },
+    [closePinnedProjectManager, isProjectManagerPinned, openProjectManager]
+  );
+
+  const showProjectManager = React.useCallback(
+    () => {
+      if (isProjectManagerPinned) return;
+      openProjectManager(true);
+    },
+    [isProjectManagerPinned, openProjectManager]
+  );
+
+  const isProjectManagerVisible = projectManagerOpen || isProjectManagerPinned;
+
+  // When the project manager is shown, highlight and scroll to the item
   // matching the currently focused editor page (e.g. the open scene), so the
   // user immediately sees where they are in the project tree.
   React.useEffect(
     () => {
-      if (!projectManagerOpen) return;
+      if (!isProjectManagerVisible) return;
 
       const project = currentProjectRef.current;
       const editorTabs = editorTabsRef.current;
@@ -1749,9 +1793,8 @@ const MainFrame = (props: Props): React.MixedElement => {
       if (!itemId) return;
       const itemIdToSelect = itemId;
 
-      // The drawer's content is kept mounted but the tree view needs a moment
-      // to (re)render its rows when the drawer opens before we can select and
-      // scroll to the item.
+      // The project manager tree view needs a moment to (re)render its rows
+      // when it is shown before we can select and scroll to the item.
       const timeoutId = setTimeout(() => {
         if (projectManagerRef.current) {
           projectManagerRef.current.selectAndScrollToItemFromId(itemIdToSelect);
@@ -1759,7 +1802,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       }, 150);
       return () => clearTimeout(timeoutId);
     },
-    [projectManagerOpen, currentProjectRef, editorTabsRef]
+    [isProjectManagerVisible, currentProjectRef, editorTabsRef]
   );
 
   const deleteLayout = (layout: gdLayout) => {
@@ -5941,7 +5984,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       openShareDialog('invite');
     },
     onCreateProject: () => setNewProjectSetupDialogOpen(true),
-    onOpenProjectManager: () => openProjectManager(true),
+    onOpenProjectManager: showProjectManager,
     onOpenHomePage: openHomePage,
     onOpenDebugger: openDebugger,
     onOpenGlobalSearch: openGlobalSearch,
@@ -6068,6 +6111,59 @@ const MainFrame = (props: Props): React.MixedElement => {
 
   const hasEditorsInLeftPane = hasEditorsInPane(state.editorTabs, 'left');
   const hasEditorsInRightPane = hasEditorsInPane(state.editorTabs, 'right');
+  const projectManagerTitle = state.currentProject
+    ? state.currentProject.getName()
+    : i18n._(t`Menu`);
+  const projectManagerNode = (
+    <ProjectManager
+      ref={projectManagerRef}
+      project={currentProject}
+      onChangeProjectName={onChangeProjectName}
+      onSaveProjectProperties={onSaveProjectProperties}
+      onOpenExternalEvents={openExternalEvents}
+      onOpenLayout={(name, options) => openLayout(name, options)}
+      onOpenExternalLayout={openExternalLayout}
+      onOpenEventsFunctionsExtension={openEventsFunctionsExtension}
+      onOpenCustomObjectEditor={openCustomObjectEditor}
+      onRenamedEventsBasedObject={onRenamedEventsBasedObject}
+      onDeletedEventsBasedObject={onDeletedEventsBasedObject}
+      onRenamedEventsBasedObjectVariant={onRenamedEventsBasedObjectVariant}
+      onDeletedEventsBasedObjectVariant={deleteEventsBasedObjectVariant}
+      onEventsBasedObjectChildrenEdited={onEventsBasedObjectChildrenEdited}
+      onEventBasedObjectTypeChanged={onEventBasedObjectTypeChanged}
+      onDeleteLayout={deleteLayout}
+      onDeleteExternalLayout={deleteExternalLayout}
+      onDeleteEventsFunctionsExtension={deleteEventsFunctionsExtension}
+      onDeleteExternalEvents={deleteExternalEvents}
+      onRenameLayout={renameLayout}
+      onRenameExternalLayout={renameExternalLayout}
+      onRenameEventsFunctionsExtension={renameEventsFunctionsExtension}
+      onRenameExternalEvents={renameExternalEvents}
+      onOpenResources={openResources}
+      onReloadEventsFunctionsExtensions={onReloadEventsFunctionsExtensions}
+      onWillInstallExtension={onWillInstallExtension}
+      onExtensionInstalled={onExtensionInstalled}
+      onSceneAdded={onSceneAdded}
+      onExternalLayoutAdded={onExternalLayoutAdded}
+      onShareProject={() => {
+        openShareDialog();
+      }}
+      isOpen={isProjectManagerVisible}
+      hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
+      resourceManagementProps={resourceManagementProps}
+      projectScopedContainersAccessor={projectScopedContainersAccessor}
+      gamesList={gamesList}
+      onOpenHomePage={openHomePage}
+      closeProjectManager={
+        isProjectManagerPinned
+          ? keepPinnedProjectManagerOpen
+          : closeProjectManagerOverlay
+      }
+      mainMenuCallbacks={mainMenuCallbacks}
+      // $FlowFixMe[incompatible-type]
+      buildMainMenuProps={buildMainMenuProps}
+    />
+  );
 
   return (
     <div
@@ -6119,99 +6215,70 @@ const MainFrame = (props: Props): React.MixedElement => {
         storageProvider={getStorageProvider()}
         i18n={i18n}
       />
-      <ProjectManagerDrawer
-        projectManagerOpen={projectManagerOpen}
-        toggleProjectManager={toggleProjectManager}
-        title={
-          state.currentProject
-            ? state.currentProject.getName()
-            : i18n._(t`Menu`)
-        }
-      >
-        <ProjectManager
-          ref={projectManagerRef}
-          project={currentProject}
-          onChangeProjectName={onChangeProjectName}
-          onSaveProjectProperties={onSaveProjectProperties}
-          onOpenExternalEvents={openExternalEvents}
-          onOpenLayout={(name, options) => openLayout(name, options)}
-          onOpenExternalLayout={openExternalLayout}
-          onOpenEventsFunctionsExtension={openEventsFunctionsExtension}
-          onOpenCustomObjectEditor={openCustomObjectEditor}
-          onRenamedEventsBasedObject={onRenamedEventsBasedObject}
-          onDeletedEventsBasedObject={onDeletedEventsBasedObject}
-          onRenamedEventsBasedObjectVariant={onRenamedEventsBasedObjectVariant}
-          onDeletedEventsBasedObjectVariant={deleteEventsBasedObjectVariant}
-          onEventsBasedObjectChildrenEdited={onEventsBasedObjectChildrenEdited}
-          onEventBasedObjectTypeChanged={onEventBasedObjectTypeChanged}
-          onDeleteLayout={deleteLayout}
-          onDeleteExternalLayout={deleteExternalLayout}
-          onDeleteEventsFunctionsExtension={deleteEventsFunctionsExtension}
-          onDeleteExternalEvents={deleteExternalEvents}
-          onRenameLayout={renameLayout}
-          onRenameExternalLayout={renameExternalLayout}
-          onRenameEventsFunctionsExtension={renameEventsFunctionsExtension}
-          onRenameExternalEvents={renameExternalEvents}
-          onOpenResources={openResources}
-          onReloadEventsFunctionsExtensions={onReloadEventsFunctionsExtensions}
-          onWillInstallExtension={onWillInstallExtension}
-          onExtensionInstalled={onExtensionInstalled}
-          onSceneAdded={onSceneAdded}
-          onExternalLayoutAdded={onExternalLayoutAdded}
-          onShareProject={() => {
-            openShareDialog();
-          }}
-          isOpen={projectManagerOpen}
-          hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
-          resourceManagementProps={resourceManagementProps}
-          projectScopedContainersAccessor={projectScopedContainersAccessor}
-          gamesList={gamesList}
-          onOpenHomePage={openHomePage}
-          toggleProjectManager={toggleProjectManager}
-          mainMenuCallbacks={mainMenuCallbacks}
-          // $FlowFixMe[incompatible-type]
-          buildMainMenuProps={buildMainMenuProps}
-        />
-      </ProjectManagerDrawer>
+      {!isProjectManagerPinned && (
+        <ProjectManagerDrawer
+          projectManagerOpen={projectManagerOpen}
+          closeProjectManager={closeProjectManagerOverlay}
+          onPinProjectManager={pinProjectManager}
+          title={projectManagerTitle}
+        >
+          {projectManagerNode}
+        </ProjectManagerDrawer>
+      )}
       {// Render games platform frame before the editors, so the editor have priority
       // in what to display (ex: Loader of play section)
       gamesPlatformFrameTools.renderGamesPlatformFrame()}
-      <LeaderboardProvider
-        gameId={currentProject ? currentProject.getProjectUuid() : ''}
-      >
-        {renderNpmScriptConfirmDialog()}
-        <PanesContainer
-          hasEditorsInLeftPane={hasEditorsInLeftPane}
-          hasEditorsInRightPane={hasEditorsInRightPane}
-          renderPane={({
-            paneIdentifier,
-            isLeftMostPane,
-            isRightMostPane,
-            isDrawer,
-            areSidePanesDrawers,
-            onSetPointerEventsNone,
-            onSetPaneDrawerState,
-            onRequestPaneClose,
-            drawerState,
-            rightPaneDrawerOpen,
-          }) => (
-            <EditorTabsPane
-              {...editorTabsPaneProps}
-              paneIdentifier={paneIdentifier}
-              isLeftMostPane={isLeftMostPane}
-              isRightMostPane={isRightMostPane}
-              isDrawer={isDrawer}
-              areSidePanesDrawers={areSidePanesDrawers}
-              onSetPointerEventsNone={onSetPointerEventsNone}
-              onSetPaneDrawerState={onSetPaneDrawerState}
-              onPopOutTab={onPopOutTab}
-              onRequestPaneClose={onRequestPaneClose}
-              drawerState={drawerState}
-              rightPaneDrawerOpen={rightPaneDrawerOpen}
+      <div className="main-frame-content">
+        {isProjectManagerPinned && (
+          <ProjectManagerDrawer
+            isPinned
+            projectManagerOpen={false}
+            closeProjectManager={closePinnedProjectManager}
+            onPinProjectManager={pinProjectManager}
+            title={projectManagerTitle}
+          >
+            {projectManagerNode}
+          </ProjectManagerDrawer>
+        )}
+        <div className="main-frame-editors-content">
+          <LeaderboardProvider
+            gameId={currentProject ? currentProject.getProjectUuid() : ''}
+          >
+            {renderNpmScriptConfirmDialog()}
+            <PanesContainer
+              hasEditorsInLeftPane={hasEditorsInLeftPane}
+              hasEditorsInRightPane={hasEditorsInRightPane}
+              renderPane={({
+                paneIdentifier,
+                isLeftMostPane,
+                isRightMostPane,
+                isDrawer,
+                areSidePanesDrawers,
+                onSetPointerEventsNone,
+                onSetPaneDrawerState,
+                onRequestPaneClose,
+                drawerState,
+                rightPaneDrawerOpen,
+              }) => (
+                <EditorTabsPane
+                  {...editorTabsPaneProps}
+                  paneIdentifier={paneIdentifier}
+                  isLeftMostPane={isLeftMostPane}
+                  isRightMostPane={isRightMostPane}
+                  isDrawer={isDrawer}
+                  areSidePanesDrawers={areSidePanesDrawers}
+                  onSetPointerEventsNone={onSetPointerEventsNone}
+                  onSetPaneDrawerState={onSetPaneDrawerState}
+                  onPopOutTab={onPopOutTab}
+                  onRequestPaneClose={onRequestPaneClose}
+                  drawerState={drawerState}
+                  rightPaneDrawerOpen={rightPaneDrawerOpen}
+                />
+              )}
             />
-          )}
-        />
-      </LeaderboardProvider>
+          </LeaderboardProvider>
+        </div>
+      </div>
       <PoppedOutWindows
         {...editorTabsPaneProps}
         onClose={onExternalWindowClose}

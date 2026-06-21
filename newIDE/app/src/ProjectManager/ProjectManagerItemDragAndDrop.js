@@ -7,6 +7,7 @@ export type CustomObjectDragItem = {|
   name: string,
   thumbnail?: string,
   is3D?: boolean,
+  keepPreviewOnCanvas?: boolean,
   extensionName: string,
   eventsBasedObjectName: string,
   variantName: string,

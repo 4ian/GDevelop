@@ -273,6 +273,8 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
   }, []);
 
   const displayAsFolder = node.canHaveChildren;
+  const itemContent = ((node.item: any).content: any);
+  const hasCustomDragItem = !!(itemContent && itemContent.getDragItem);
 
   // Create an empty pixel image once to override the default drag preview of all items.
   const emptyImage = new Image();
@@ -284,8 +286,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
         beginDrag={() => {
           if (!node.selected) onSelect({ node, exclusive: !node.selected });
 
-          const itemContent = ((node.item: any).content: any);
-          if (itemContent && itemContent.getDragItem) {
+          if (hasCustomDragItem) {
             const dragItem = itemContent.getDragItem();
             if (dragItem) return dragItem;
           }
@@ -450,7 +451,10 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
 
           // If this is an object, connect the drag preview with an empty image
           // to override the default drag preview.
-          if (typeof node.name === 'string' && !displayAsFolder) {
+          if (
+            typeof node.name === 'string' &&
+            (!displayAsFolder || hasCustomDragItem)
+          ) {
             connectDragPreview(emptyImage);
           } else {
             // If not (folder for instance), just use the item row as drag preview.

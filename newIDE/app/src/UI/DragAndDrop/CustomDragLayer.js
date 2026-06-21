@@ -142,7 +142,10 @@ const CustomDragLayer = (): React.Node => {
       if (!item || (!item.name && !item.thumbnail) || !clientOffset)
         return null;
 
-      if (shouldHidePreviewBecauseDraggingOnSceneEditorCanvas(clientOffset)) {
+      if (
+        !item.keepPreviewOnCanvas &&
+        shouldHidePreviewBecauseDraggingOnSceneEditorCanvas(clientOffset)
+      ) {
         return null;
       }
 

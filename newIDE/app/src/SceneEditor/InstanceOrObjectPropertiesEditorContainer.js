@@ -86,6 +86,10 @@ type Props = {|
   onEventsBasedObjectChildrenEdited: (
     eventsBasedObject: gdEventsBasedObject
   ) => void,
+  onOpenPrefabDetailEditor: (
+    gdEventsFunctionsExtension,
+    gdEventsBasedObject
+  ) => void,
 |};
 
 export type InstanceOrObjectPropertiesEditorInterface = {|
@@ -152,6 +156,7 @@ export const InstanceOrObjectPropertiesEditorContainer: React.ComponentType<{
       eventsBasedObjectVariant,
       getContentAABB,
       onEventsBasedObjectChildrenEdited,
+      onOpenPrefabDetailEditor,
 
       // For objects or instances:
       historyHandler,
@@ -265,6 +270,15 @@ export const InstanceOrObjectPropertiesEditorContainer: React.ComponentType<{
             getContentAABB={getContentAABB}
             onEventsBasedObjectChildrenEdited={() =>
               onEventsBasedObjectChildrenEdited(eventsBasedObject)
+            }
+            onOpenPrefabDetailEditor={
+              eventsFunctionsExtension
+                ? () =>
+                    onOpenPrefabDetailEditor(
+                      eventsFunctionsExtension,
+                      eventsBasedObject
+                    )
+                : null
             }
             unsavedChanges={unsavedChanges}
             i18n={i18n}

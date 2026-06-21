@@ -114,6 +114,7 @@ import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/Even
 import { enumerateFunctionsInFolder } from '../EventsFunctionsList/EnumerateFunctionFolderOrFunction';
 import PreferencesIcon from '../UI/CustomSvgIcons/Preferences';
 import classes from './ProjectManager.module.css';
+import { projectManagerItemReactDndType } from './ProjectManagerItemDragAndDrop';
 
 const electron = optionalRequire('electron');
 const gd: libGDevelop = global.gd;
@@ -314,7 +315,7 @@ const styles = {
   autoSizer: { width: '100%' },
 };
 
-const extensionItemReactDndType = 'GD_EXTENSION_ITEM';
+const extensionItemReactDndType = projectManagerItemReactDndType;
 
 const isProjectManagerShortcutRootId = (rootId: string): boolean =>
   rootId === customObjectsRootFolderId ||
@@ -999,6 +1000,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
             payload.itemName,
             eventsBasedObjects.getCount()
           );
+          eventsBasedObject.setFullName(payload.itemName);
           eventsBasedObject.markAsRenderedIn3D(
             payload.prefabObjectDimension === '3d'
           );
@@ -1025,6 +1027,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
             payload.itemName,
             eventsBasedBehaviors.getCount()
           );
+          eventsBasedBehavior.setFullName(payload.itemName);
           onProjectItemModified();
           forceUpdateList();
 

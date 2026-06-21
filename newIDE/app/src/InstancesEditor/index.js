@@ -28,6 +28,11 @@ import CanvasCursor from './CanvasCursor';
 import InstancesAdder from './InstancesAdder';
 import { makeDropTarget } from '../UI/DragAndDrop/DropTarget';
 import { objectWithContextReactDndType } from '../ObjectsList';
+import {
+  projectManagerItemReactDndType,
+  isCustomObjectDragItem,
+  type CustomObjectDragItem,
+} from '../ProjectManager/ProjectManagerItemDragAndDrop';
 import PinchHandler, { shouldBeHandledByPinch } from './PinchHandler';
 import { type ScreenType } from '../UI/Responsive/ScreenTypeMeasurer';
 import InstancesSelection from './InstancesSelection';
@@ -77,7 +82,10 @@ const styles = {
 const getCanvasResolution = (): number =>
   Math.max(1, window.devicePixelRatio || 1);
 
-const DropTarget = makeDropTarget<{||}>(objectWithContextReactDndType);
+const ObjectDropTarget = makeDropTarget<{||}>(objectWithContextReactDndType);
+const ProjectManagerItemDropTarget = makeDropTarget<CustomObjectDragItem>(
+  projectManagerItemReactDndType
+);
 
 export type EditorViewPosition2D = {|
   viewX: number | null,
@@ -125,6 +133,10 @@ export type InstancesEditorPropsWithoutSizeAndScroll = {|
     imageFilePaths: Array<string>,
     position: [number, number]
   ) => void | Promise<void>,
+  onCustomObjectDropped?: (
+    customObjectDragItem: CustomObjectDragItem,
+    position: [number, number]
+  ) => void,
   selectedObjectNames: Array<string>,
   onContextMenu: (
     x: number,
@@ -957,6 +969,72 @@ export default class InstancesEditor extends Component<Props, State> {
       clientX - canvasRect.left,
       clientY - canvasRect.top
     );
+  };
+
+  _getSceneCoordinatesFromDropMonitor = (monitor: any): ?[number, number] => {
+    const clientOffset = monitor.getClientOffset();
+    if (!clientOffset) return null;
+
+    return this._getSceneCoordinatesFromClientPosition(
+      clientOffset.x,
+      clientOffset.y
+    );
+  };
+
+  _onObjectDropHover = (monitor: any) => {
+    this.fpsLimiter.notifyInteractionHappened();
+    const { _instancesAdder } = this;
+    if (!_instancesAdder) return;
+
+    const position = this._getSceneCoordinatesFromDropMonitor(monitor);
+    if (!position) return;
+
+    _instancesAdder.createOrUpdateTemporaryInstancesFromObjectNames(
+      position,
+      this.props.selectedObjectNames,
+      this.props.chosenLayer
+    );
+  };
+
+  _onObjectDrop = (monitor: any) => {
+    this.fpsLimiter.notifyInteractionHappened();
+
+    const { _instancesAdder } = this;
+    if (!_instancesAdder) return;
+
+    const position = this._getSceneCoordinatesFromDropMonitor(monitor);
+    if (!position) {
+      _instancesAdder.deleteTemporaryInstances();
+      return;
+    }
+
+    const instances = _instancesAdder.updateTemporaryInstancePositions(
+      position
+    );
+    _instancesAdder.commitTemporaryInstances();
+    this.props.onInstancesAdded(instances);
+  };
+
+  _onCustomObjectDropHover = (monitor: any) => {
+    this.fpsLimiter.notifyInteractionHappened();
+    if (this._instancesAdder) {
+      this._instancesAdder.deleteTemporaryInstances();
+    }
+  };
+
+  _onCustomObjectDrop = (monitor: any) => {
+    this.fpsLimiter.notifyInteractionHappened();
+
+    const { onCustomObjectDropped } = this.props;
+    if (!onCustomObjectDropped) return;
+
+    const item = monitor.getItem();
+    if (!isCustomObjectDragItem(item)) return;
+
+    const position = this._getSceneCoordinatesFromDropMonitor(monitor);
+    if (!position) return;
+
+    onCustomObjectDropped(item, position);
   };
 
   _hasNativeFiles = (event: DragEvent): boolean => {
@@ -2058,70 +2136,53 @@ export default class InstancesEditor extends Component<Props, State> {
     }
 
     return (
-      <DropTarget
+      <ObjectDropTarget
         canDrop={() => true}
-        hover={monitor => {
-          this.fpsLimiter.notifyInteractionHappened();
-          const { _instancesAdder, viewPosition, canvasArea } = this;
-          if (!_instancesAdder || !canvasArea || !viewPosition) return;
-
-          const { x, y } = monitor.getClientOffset();
-          const canvasRect = canvasArea.getBoundingClientRect();
-          const pos = viewPosition.toSceneCoordinates(
-            x - canvasRect.left,
-            y - canvasRect.top
-          );
-          _instancesAdder.createOrUpdateTemporaryInstancesFromObjectNames(
-            pos,
-            this.props.selectedObjectNames,
-            this.props.chosenLayer
-          );
-        }}
-        drop={monitor => {
-          this.fpsLimiter.notifyInteractionHappened();
-
-          const { _instancesAdder, viewPosition, canvasArea } = this;
-          if (!_instancesAdder || !canvasArea || !viewPosition) return;
-
-          if (monitor.didDrop()) {
-            // Drop was done somewhere else (in a child of the canvas:
-            // should not happen, but still handling this case).
-            _instancesAdder.deleteTemporaryInstances();
-            return;
-          }
-
-          const { x, y } = monitor.getClientOffset();
-          const canvasRect = canvasArea.getBoundingClientRect();
-          const pos = viewPosition.toSceneCoordinates(
-            x - canvasRect.left,
-            y - canvasRect.top
-          );
-          const instances = _instancesAdder.updateTemporaryInstancePositions(
-            pos
-          );
-          _instancesAdder.commitTemporaryInstances();
-          this.props.onInstancesAdded(instances);
-        }}
+        hover={this._onObjectDropHover}
+        drop={this._onObjectDrop}
       >
-        {({ connectDropTarget, isOver }) => {
-          // The children are re-rendered when isOver change:
-          // take this opportunity to delete any temporary instances
-          // if the dragging is not done anymore over the canvas.
-          if (this._instancesAdder && !isOver) {
-            this._instancesAdder.deleteTemporaryInstances();
-          }
+        {({
+          connectDropTarget: connectObjectDropTarget,
+          isOver: isObjectOver,
+        }) => (
+          <ProjectManagerItemDropTarget
+            canDrop={item =>
+              !!this.props.onCustomObjectDropped &&
+              isCustomObjectDragItem(item)
+            }
+            hover={this._onCustomObjectDropHover}
+            drop={this._onCustomObjectDrop}
+          >
+            {({
+              connectDropTarget: connectProjectManagerItemDropTarget,
+              isOver: isProjectManagerItemOver,
+            }) => {
+              // The children are re-rendered when isOver change:
+              // take this opportunity to delete any temporary instances
+              // if the dragging is not done anymore over the canvas.
+              if (
+                this._instancesAdder &&
+                !isObjectOver &&
+                !isProjectManagerItemOver
+              ) {
+                this._instancesAdder.deleteTemporaryInstances();
+              }
 
-          return connectDropTarget(
-            <div
-              ref={canvasArea => (this.canvasArea = canvasArea)}
-              style={styles.canvasArea}
-              id={instancesEditorId}
-              onDragOver={this._onNativeDragOver}
-              onDrop={this._onNativeDrop}
-            />
-          );
-        }}
-      </DropTarget>
+              return connectProjectManagerItemDropTarget(
+                connectObjectDropTarget(
+                  <div
+                    ref={canvasArea => (this.canvasArea = canvasArea)}
+                    style={styles.canvasArea}
+                    id={instancesEditorId}
+                    onDragOver={this._onNativeDragOver}
+                    onDrop={this._onNativeDrop}
+                  />
+                )
+              );
+            }}
+          </ProjectManagerItemDropTarget>
+        )}
+      </ObjectDropTarget>
     );
   }
 }

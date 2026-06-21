@@ -285,6 +285,7 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
         onOpenEventBasedObjectVariantEditor={
           this.props.onOpenEventBasedObjectVariantEditor
         }
+        onOpenPrefabDetailEditor={this.props.onOpenPrefabDetailEditor}
         onWillInstallExtension={this.props.onWillInstallExtension}
         onExtensionInstalled={this.props.onExtensionInstalled}
         onDeleteEventsBasedObjectVariant={

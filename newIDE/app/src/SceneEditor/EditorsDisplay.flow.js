@@ -20,6 +20,7 @@ import { type ObjectFolderOrObjectWithContext } from '../ObjectsList/EnumerateOb
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 import { type TileMapTileSelection } from '../InstancesEditor/TileSetVisualizer';
 import { type EditorViewPosition2D } from '../InstancesEditor';
+import { type CustomObjectDragItem } from '../ProjectManager/ProjectManagerItemDragAndDrop';
 
 export type SceneEditorsDisplayProps = {|
   gameEditorMode: 'embedded-game' | 'instances-editor',
@@ -58,6 +59,10 @@ export type SceneEditorsDisplayProps = {|
     extensionName: string,
     eventsBasedObjectName: string,
     variantName: string
+  ) => void,
+  onOpenPrefabDetailEditor: (
+    gdEventsFunctionsExtension,
+    gdEventsBasedObject
   ) => void,
   onDeleteEventsBasedObjectVariant: (
     eventsFunctionsExtension: gdEventsFunctionsExtension,
@@ -143,6 +148,10 @@ export type SceneEditorsDisplayProps = {|
     imageFilePaths: Array<string>,
     position: [number, number]
   ) => void | Promise<void>,
+  onCustomObjectDropped: (
+    customObjectDragItem: CustomObjectDragItem,
+    position: [number, number]
+  ) => void,
   isInstanceOf3DObject: gdInitialInstance => boolean,
   onSelectAllInstancesOfObjectInLayout: string => void,
 

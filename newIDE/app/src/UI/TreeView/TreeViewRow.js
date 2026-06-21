@@ -284,6 +284,12 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
         beginDrag={() => {
           if (!node.selected) onSelect({ node, exclusive: !node.selected });
 
+          const itemContent = ((node.item: any).content: any);
+          if (itemContent && itemContent.getDragItem) {
+            const dragItem = itemContent.getDragItem();
+            if (dragItem) return dragItem;
+          }
+
           if (forceDefaultDraggingPreview) {
             return {};
           }

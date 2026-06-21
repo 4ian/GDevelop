@@ -7,6 +7,7 @@ import {
   createNewEmptyProject,
   emptyProjectTemplateFilesSource,
   getProjectTemplateFileDestinationPath,
+  initializeLocalProjectGitRepository,
 } from './CreateProject';
 import { findLocalProjectTemplatePath } from './LocalProjectTemplateFinder';
 
@@ -163,11 +164,15 @@ describe('CreateProject template files', () => {
             dirEntry('AGENTS.md'),
             dirEntry('CLAUDE.md'),
             subDirEntry('assets'),
+            subDirEntry('.git'),
             subDirEntry('gdevelop-mcp'),
           ];
         }
         if (dir === '/tpl/assets') {
           return [];
+        }
+        if (dir === '/tpl/.git') {
+          return [dirEntry('config')];
         }
         if (dir === '/tpl/gdevelop-mcp') {
           return [dirEntry('SKILL.md'), subDirEntry('agents')];
@@ -196,7 +201,83 @@ describe('CreateProject template files', () => {
       '/Project/gdevelop-mcp/SKILL.md',
       '/Project/gdevelop-mcp/agents/openai.yaml',
     ]);
+    expect(written).not.toContain('/Project/.git/config');
     expect(fs.ensureDir).toHaveBeenCalledWith('/Project/assets');
+  });
+
+  it('initializes and commits a local project Git repository', async () => {
+    const childProcess = {
+      execFile: jest.fn((command, args, options, callback) => {
+        const stdout =
+          args[0] === 'status'
+            ? 'A  game.json\nA  AGENTS.md\nA  .gitignore\n'
+            : '';
+        callback(null, stdout, '');
+      }),
+    };
+
+    await initializeLocalProjectGitRepository({
+      projectFilePath: '/Project/game.json',
+      childProcess,
+      path: path.posix,
+    });
+
+    expect(childProcess.execFile).toHaveBeenNthCalledWith(
+      1,
+      'git',
+      ['init'],
+      expect.objectContaining({ cwd: '/Project' }),
+      expect.any(Function)
+    );
+    expect(childProcess.execFile).toHaveBeenNthCalledWith(
+      2,
+      'git',
+      ['config', 'user.name'],
+      expect.objectContaining({ cwd: '/Project' }),
+      expect.any(Function)
+    );
+    expect(childProcess.execFile).toHaveBeenNthCalledWith(
+      3,
+      'git',
+      ['config', 'user.name', 'GDevelop'],
+      expect.objectContaining({ cwd: '/Project' }),
+      expect.any(Function)
+    );
+    expect(childProcess.execFile).toHaveBeenNthCalledWith(
+      4,
+      'git',
+      ['config', 'user.email'],
+      expect.objectContaining({ cwd: '/Project' }),
+      expect.any(Function)
+    );
+    expect(childProcess.execFile).toHaveBeenNthCalledWith(
+      5,
+      'git',
+      ['config', 'user.email', 'gdevelop@example.invalid'],
+      expect.objectContaining({ cwd: '/Project' }),
+      expect.any(Function)
+    );
+    expect(childProcess.execFile).toHaveBeenNthCalledWith(
+      6,
+      'git',
+      ['add', '-A'],
+      expect.objectContaining({ cwd: '/Project' }),
+      expect.any(Function)
+    );
+    expect(childProcess.execFile).toHaveBeenNthCalledWith(
+      7,
+      'git',
+      ['status', '--porcelain=v1', '-uall'],
+      expect.objectContaining({ cwd: '/Project' }),
+      expect.any(Function)
+    );
+    expect(childProcess.execFile).toHaveBeenNthCalledWith(
+      8,
+      'git',
+      ['commit', '-m', 'Initial GDevelop project'],
+      expect.objectContaining({ cwd: '/Project' }),
+      expect.any(Function)
+    );
   });
 
   it('copies the bundled local template when no explicit template source is provided', async () => {

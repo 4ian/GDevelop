@@ -168,7 +168,7 @@ export const buildMainMenuDeclarativeTemplate = ({
         enabled: canSaveProjectAs,
       },
       {
-        label: i18n._(t`Show version history`),
+        label: i18n._(t`Show Git tool`),
         onClickSendEvent: 'main-menu-show-version-history',
         enabled: !!project,
       },

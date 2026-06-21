@@ -4500,6 +4500,31 @@ const MainFrame = (props: Props): React.MixedElement => {
     [openFromFileMetadataWithStorageProvider]
   );
 
+  const reloadProjectAfterGitAction = React.useCallback(
+    async (): Promise<void> => {
+      if (!currentProject || !currentFileMetadata) return;
+
+      const storageProviderName = getStorageProvider().internalName;
+      await openFromFileMetadataWithStorageProvider(
+        {
+          fileMetadata: currentFileMetadata,
+          storageProviderName,
+        },
+        {
+          ignoreUnsavedChanges: true,
+          ignoreAutoSave: true,
+          openingMessage: t`Reloading project...`,
+        }
+      );
+    },
+    [
+      currentProject,
+      currentFileMetadata,
+      getStorageProvider,
+      openFromFileMetadataWithStorageProvider,
+    ]
+  );
+
   const {
     renderVersionHistoryPanel,
     openVersionHistoryPanel,
@@ -4513,6 +4538,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     project: currentProject,
     fileMetadata: currentFileMetadata,
     onOpenCloudProjectOnSpecificVersion,
+    onReloadProject: reloadProjectAfterGitAction,
   });
 
   const openSaveToStorageProviderDialog = React.useCallback(
@@ -6054,6 +6080,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     onCreateEventsFunction: onCreateEventsFunction,
     openInstructionOrExpression: openInstructionOrExpression,
     onOpenCustomObjectEditor: openCustomObjectEditor,
+    onOpenPrefabDetailEditor: openPrefabDetailEditor,
     onOpenEventsFunctionsExtension: openEventsFunctionsExtension,
     onRenamedEventsBasedObject: onRenamedEventsBasedObject,
     onDeletedEventsBasedObject: onDeletedEventsBasedObject,

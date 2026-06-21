@@ -182,7 +182,12 @@ const SwipeableDrawerEditorsDisplay: React.ComponentType<{
       [halfOpenOrCloseDrawerOnEditor, isEditorVisible]
     );
     const setEditorViewsVisibility = React.useCallback(
-      (editorVisibilityChanges: Array<{| editorId: EditorId, visible: boolean |}>) => {
+      (
+        editorVisibilityChanges: Array<{|
+          editorId: EditorId,
+          visible: boolean,
+        |}>
+      ) => {
         const editorToShow = editorVisibilityChanges.find(
           ({ visible }) => visible
         );
@@ -196,9 +201,7 @@ const SwipeableDrawerEditorsDisplay: React.ComponentType<{
       []
     );
     const openNewObjectDialog = React.useCallback(
-      (options?: {|
-        instanceSceneCoordinates?: ?[number, number],
-      |}) => {
+      (options?: {| instanceSceneCoordinates?: ?[number, number] |}) => {
         if (!isEditorVisible('objects-list')) {
           // Objects list is not opened. Open it now.
           halfOpenOrCloseDrawerOnEditor('objects-list');
@@ -377,6 +380,7 @@ const SwipeableDrawerEditorsDisplay: React.ComponentType<{
                   onInstancesResized={props.onInstancesResized}
                   onInstancesRotated={props.onInstancesRotated}
                   onImageFilesDropped={props.onImageFilesDropped}
+                  onCustomObjectDropped={props.onCustomObjectDropped}
                   selectedObjectNames={selectedObjectNames}
                   onContextMenu={props.onContextMenu}
                   isInstanceOf3DObject={props.isInstanceOf3DObject}
@@ -511,6 +515,9 @@ const SwipeableDrawerEditorsDisplay: React.ComponentType<{
                         onExtensionInstalled={props.onExtensionInstalled}
                         onOpenEventBasedObjectVariantEditor={
                           props.onOpenEventBasedObjectVariantEditor
+                        }
+                        onOpenPrefabDetailEditor={
+                          props.onOpenPrefabDetailEditor
                         }
                         onDeleteEventsBasedObjectVariant={
                           props.onDeleteEventsBasedObjectVariant

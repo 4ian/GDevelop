@@ -188,6 +188,10 @@ export type EditorTabsPaneCommonProps = {|
     eventsBasedObject: gdEventsBasedObject,
     variantName: string
   ) => void,
+  onOpenPrefabDetailEditor: (
+    eventsFunctionsExtension: gdEventsFunctionsExtension,
+    eventsBasedObject: gdEventsBasedObject
+  ) => void,
   onOpenEventsFunctionsExtension: (
     extensionName: string,
     initiallyFocusedFunctionName?: ?string,
@@ -360,6 +364,7 @@ const EditorTabsPane: React.ComponentType<{
     onCreateEventsFunction,
     openInstructionOrExpression,
     onOpenCustomObjectEditor,
+    onOpenPrefabDetailEditor,
     onOpenEventsFunctionsExtension,
     onRenamedEventsBasedObject,
     onDeletedEventsBasedObject,
@@ -775,6 +780,7 @@ const EditorTabsPane: React.ComponentType<{
                     onCreateEventsFunction,
                     openInstructionOrExpression,
                     onOpenCustomObjectEditor: onOpenCustomObjectEditor,
+                    onOpenPrefabDetailEditor: onOpenPrefabDetailEditor,
                     onOpenEventsFunctionsExtension,
                     onRenamedEventsBasedObject: onRenamedEventsBasedObject,
                     onDeletedEventsBasedObject: onDeletedEventsBasedObject,

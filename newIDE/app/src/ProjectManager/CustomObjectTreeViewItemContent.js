@@ -18,6 +18,7 @@ import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
 import { type MenuButton } from '../UI/TreeView';
 import { type HTMLDataset } from '../Utils/HTMLDataset';
 import { type ProjectItemUsageTarget } from './ProjectItemUsageFinder';
+import { type CustomObjectDragItem } from './ProjectManagerItemDragAndDrop';
 
 const gd: libGDevelop = global.gd;
 
@@ -222,6 +223,20 @@ export class CustomObjectTreeViewItemContent implements TreeViewItemContent {
     return this.eventsBasedObject.isRenderedIn3D()
       ? 'res/functions/object3d_black.svg'
       : 'res/functions/object2d_black.svg';
+  }
+
+  getDragItem(): CustomObjectDragItem {
+    const objectName = this.eventsBasedObject.getName();
+    return {
+      kind: 'custom-object',
+      name: objectName,
+      thumbnail: this.getThumbnail() || undefined,
+      is3D: this.eventsBasedObject.isRenderedIn3D(),
+      extensionName: this.eventsFunctionsExtension.getName(),
+      eventsBasedObjectName: objectName,
+      variantName: '',
+      sceneObjectName: objectName,
+    };
   }
 
   onClick(): void {
@@ -512,6 +527,20 @@ export class CustomObjectVariantTreeViewItemContent
     return this.eventsBasedObject.isRenderedIn3D()
       ? 'res/functions/object3d_black.svg'
       : 'res/functions/object2d_black.svg';
+  }
+
+  getDragItem(): CustomObjectDragItem {
+    const variantName = this.variant.getName();
+    return {
+      kind: 'custom-object',
+      name: variantName,
+      thumbnail: this.getThumbnail() || undefined,
+      is3D: this.eventsBasedObject.isRenderedIn3D(),
+      extensionName: this.eventsFunctionsExtension.getName(),
+      eventsBasedObjectName: this.eventsBasedObject.getName(),
+      variantName,
+      sceneObjectName: variantName,
+    };
   }
 
   onClick(): void {

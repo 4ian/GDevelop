@@ -383,6 +383,7 @@ export class EventsBasedBehaviorTreeViewItemContent
       name,
       eventsBasedBehaviorsList.getCount()
     );
+    newEventsBasedBehavior.setFullName(name);
     this._onEventsBasedBehaviorModified();
 
     const newEventsBasedBehaviorId = getEventsBasedBehaviorTreeViewItemId(

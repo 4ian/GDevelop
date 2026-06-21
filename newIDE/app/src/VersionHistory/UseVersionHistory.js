@@ -4,7 +4,7 @@ import * as React from 'react';
 import { t } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import Drawer from '@material-ui/core/Drawer';
-import HistoryIcon from '../UI/CustomSvgIcons/History';
+import GitHubIcon from '../UI/CustomSvgIcons/GitHub';
 import DrawerTopBar from '../UI/DrawerTopBar';
 import {
   listVersionsOfProject,
@@ -23,8 +23,9 @@ import UnsavedChangesContext from '../MainFrame/UnsavedChangesContext';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
 import type { MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import CloudStorageProvider from '../ProjectsStorage/CloudStorageProvider';
-import EditorOperationHistory from './EditorOperationHistory';
+import GitTool from './GitTool';
 import { clearEditorOperationHistory } from '../Utils/EditorOperationHistory';
+import { localFileStorageProviderInternalName } from '../ProjectsStorage/LocalFileStorageProvider/LocalFileStorageProviderInternalName';
 
 const styles = {
   drawerContent: {
@@ -79,6 +80,7 @@ type Props = {|
     ignoreAutoSave: boolean,
     openingMessage: MessageDescriptor,
   |}) => Promise<void>,
+  onReloadProject: () => Promise<void>,
 |};
 
 const useVersionHistory = ({
@@ -87,6 +89,7 @@ const useVersionHistory = ({
   isSavingProject,
   getStorageProvider,
   onOpenCloudProjectOnSpecificVersion,
+  onReloadProject,
 }: Props): {|
   checkedOutVersionStatus: ?OpenedVersionStatus,
   openVersionHistoryPanel: () => void,
@@ -462,12 +465,19 @@ const useVersionHistory = ({
             onClose={() => setVersionHistoryPanelOpen(false)}
           >
             <DrawerTopBar
-              icon={<HistoryIcon />}
-              title={i18n._(t`File history`)}
+              icon={<GitHubIcon />}
+              title={i18n._(t`Git tool`)}
               onClose={() => setVersionHistoryPanelOpen(false)}
               id="version-history-drawer"
             />
-            <EditorOperationHistory />
+            <GitTool
+              fileMetadata={fileMetadata}
+              isLocalProject={
+                storageProviderInternalName ===
+                localFileStorageProviderInternalName
+              }
+              onReloadProject={onReloadProject}
+            />
           </Drawer>
         )}
       </I18n>

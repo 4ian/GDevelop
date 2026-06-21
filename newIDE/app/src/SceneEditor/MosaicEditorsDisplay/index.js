@@ -168,7 +168,12 @@ const MosaicEditorsDisplay: React.ComponentType<{
       );
     }, []);
     const setEditorViewsVisibility = React.useCallback(
-      (editorVisibilityChanges: Array<{| editorId: EditorId, visible: boolean |}>) => {
+      (
+        editorVisibilityChanges: Array<{|
+          editorId: EditorId,
+          visible: boolean,
+        |}>
+      ) => {
         if (!editorMosaicRef.current) return;
         editorMosaicRef.current.setEditorsVisibility(
           editorVisibilityChanges.map(({ editorId, visible }) => {
@@ -208,9 +213,7 @@ const MosaicEditorsDisplay: React.ComponentType<{
       []
     );
     const openNewObjectDialog = React.useCallback(
-      (options?: {|
-        instanceSceneCoordinates?: ?[number, number],
-      |}) => {
+      (options?: {| instanceSceneCoordinates?: ?[number, number] |}) => {
         if (!isEditorVisible('objects-list')) {
           // Objects list is not opened. Open it now.
           toggleEditorView('objects-list');
@@ -352,6 +355,7 @@ const MosaicEditorsDisplay: React.ComponentType<{
                 onOpenEventBasedObjectVariantEditor={
                   props.onOpenEventBasedObjectVariantEditor
                 }
+                onOpenPrefabDetailEditor={props.onOpenPrefabDetailEditor}
                 onDeleteEventsBasedObjectVariant={
                   props.onDeleteEventsBasedObjectVariant
                 }
@@ -461,6 +465,7 @@ const MosaicEditorsDisplay: React.ComponentType<{
                   onInstancesResized={props.onInstancesResized}
                   onInstancesRotated={props.onInstancesRotated}
                   onImageFilesDropped={props.onImageFilesDropped}
+                  onCustomObjectDropped={props.onCustomObjectDropped}
                   selectedObjectNames={selectedObjectNames}
                   onContextMenu={props.onContextMenu}
                   isInstanceOf3DObject={props.isInstanceOf3DObject}

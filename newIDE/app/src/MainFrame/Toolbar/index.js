@@ -7,7 +7,7 @@ import PreviewAndShareButtons, {
 } from './PreviewAndShareButtons';
 import IconButton from '../../UI/IconButton';
 import { Spacer } from '../../UI/Grid';
-import HistoryIcon from '../../UI/CustomSvgIcons/History';
+import GitHubIcon from '../../UI/CustomSvgIcons/GitHub';
 import OpenedVersionStatusChip from '../../VersionHistory/OpenedVersionStatusChip';
 import type { OpenedVersionStatus } from '../../VersionHistory';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
@@ -70,10 +70,10 @@ const LeftButtonsToolbarGroup = React.memo<LeftButtonsToolbarGroupProps>(
             size="small"
             id="toolbar-history-button"
             onClick={props.onOpenVersionHistory}
-            tooltip={t`Open version history`}
+            tooltip={t`Open Git tool`}
             color="default"
           >
-            <HistoryIcon />
+            <GitHubIcon />
           </IconButton>
           <SaveProjectIcon
             id="toolbar-save-button"

@@ -67,6 +67,7 @@ const {
   onLocalGDJSDevelopmentWatcherRuntimeUpdated,
 } = require('./LocalGDJSDevelopmentWatcher');
 const { setupWatcher, disableWatcher } = require('./LocalFilesystemWatcher');
+const { handleGitToolRequest } = require('./GitTool');
 
 // Initialize `@electron/remote` module
 require('@electron/remote/main').initialize();
@@ -881,6 +882,10 @@ app.on('ready', function() {
       disableWatcher(subscriptionId);
     }
   );
+
+  ipcMain.handle('git-tool-request', async (event, request) => {
+    return handleGitToolRequest(request);
+  });
 
   // ServeFolder events:
   ipcMain.on('serve-folder', (event, options) => {

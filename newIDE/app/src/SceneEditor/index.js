@@ -98,6 +98,7 @@ import { extractAsCustomObject } from './CustomObjectExtractor/CustomObjectExtra
 import { isVariantEditable } from '../ObjectEditor/Editors/CustomObjectPropertiesEditor';
 import { addSerializedInstances } from '../InstancesEditor/InstancesAdder';
 import { type EditorViewPosition2D } from '../InstancesEditor';
+import { type CustomObjectDragItem } from '../ProjectManager/ProjectManagerItemDragAndDrop';
 import {
   createSpriteObjectFromImageFile,
   createSpriteObjectsFromImageFiles,
@@ -285,6 +286,10 @@ type Props = {|
     extensionName: string,
     eventsBasedObjectName: string,
     variantName: string
+  ) => void,
+  onOpenPrefabDetailEditor: (
+    gdEventsFunctionsExtension,
+    gdEventsBasedObject
   ) => void,
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
@@ -955,7 +960,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     this.forceUpdateObjectGroupsList();
   };
 
-  _canAddObject = () => {
+  _canAddObject = (): boolean => {
     const { eventsBasedObject, eventsBasedObjectVariant } = this.props;
     return (
       !eventsBasedObject ||
@@ -1618,6 +1623,157 @@ export default class SceneEditor extends React.Component<Props, State> {
     });
     this._onInstancesSelected(newInstances);
     this.forceUpdatePropertiesEditor();
+  };
+
+  _doesObjectMatchCustomObjectDragItem = (
+    object: gdObject,
+    objectType: string,
+    variantName: string
+  ): boolean => {
+    if (object.getType() !== objectType) return false;
+
+    const customObjectConfiguration = gd.asCustomObjectConfiguration(
+      object.getConfiguration()
+    );
+    return customObjectConfiguration.getVariantName() === variantName;
+  };
+
+  _findObjectMatchingCustomObjectDragItem = (
+    objectType: string,
+    variantName: string
+  ): gdObject | null => {
+    const { globalObjectsContainer, objectsContainer } = this.props;
+    const findInContainer = (container: gdObjectsContainer): gdObject | null => {
+      const objectsCount = container.getObjectsCount();
+      for (let objectIndex = 0; objectIndex < objectsCount; objectIndex++) {
+        const object = container.getObjectAt(objectIndex);
+        if (
+          this._doesObjectMatchCustomObjectDragItem(
+            object,
+            objectType,
+            variantName
+          )
+        ) {
+          return object;
+        }
+      }
+      return null;
+    };
+
+    return (
+      findInContainer(objectsContainer) ||
+      (globalObjectsContainer ? findInContainer(globalObjectsContainer) : null)
+    );
+  };
+
+  _getOrCreateObjectFromCustomObjectDragItem = (
+    customObjectDragItem: CustomObjectDragItem
+  ): gdObject | null => {
+    if (!this._canAddObject()) return null;
+
+    const {
+      extensionName,
+      eventsBasedObjectName,
+      variantName,
+    } = customObjectDragItem;
+    const { project, objectsContainer, globalObjectsContainer } = this.props;
+    const objectType = gd.PlatformExtension.getObjectFullType(
+      extensionName,
+      eventsBasedObjectName
+    );
+
+    if (!project.hasEventsBasedObject(objectType)) return null;
+
+    const eventsBasedObject = project.getEventsBasedObject(objectType);
+    if (
+      variantName &&
+      !eventsBasedObject.getVariants().hasVariantNamed(variantName)
+    ) {
+      return null;
+    }
+
+    const requestedObjectName = gd.Project.getSafeName(
+      customObjectDragItem.sceneObjectName || eventsBasedObjectName
+    );
+    const isRequestedObjectNameTaken =
+      objectsContainer.hasObjectNamed(requestedObjectName) ||
+      (!!globalObjectsContainer &&
+        globalObjectsContainer.hasObjectNamed(requestedObjectName));
+
+    const getMatchingObjectNamed = (objectName: string): gdObject | null => {
+      const object = getObjectByName(
+        globalObjectsContainer,
+        objectsContainer,
+        objectName
+      );
+      if (
+        object &&
+        this._doesObjectMatchCustomObjectDragItem(
+          object,
+          objectType,
+          variantName
+        )
+      ) {
+        return object;
+      }
+      return null;
+    };
+
+    const exactObject = getMatchingObjectNamed(requestedObjectName);
+    if (exactObject) return exactObject;
+
+    // If the requested name is already used by another object, reuse an
+    // existing object with the same prefab/variant instead of creating a new
+    // uniquely suffixed object every time this prefab is dragged.
+    if (isRequestedObjectNameTaken) {
+      const matchingObject = this._findObjectMatchingCustomObjectDragItem(
+        objectType,
+        variantName
+      );
+      if (matchingObject) return matchingObject;
+    }
+
+    const objectName = newNameGenerator(requestedObjectName, name =>
+      objectsContainer.hasObjectNamed(name) ||
+      (!!globalObjectsContainer && globalObjectsContainer.hasObjectNamed(name))
+    );
+
+    const isTheFirstOfItsTypeInProject = !gd.UsedObjectTypeFinder.scanProject(
+      project,
+      objectType
+    );
+
+    const object = objectsContainer.insertNewObject(
+      project,
+      objectType,
+      objectName,
+      objectsContainer.getObjectsCount()
+    );
+    if (variantName) {
+      const customObjectConfiguration = gd.asCustomObjectConfiguration(
+        object.getConfiguration()
+      );
+      customObjectConfiguration.setVariantName(variantName);
+      customObjectConfiguration.setMarkedAsOverridingEventsBasedObjectChildrenConfiguration(
+        false
+      );
+    }
+
+    this._onObjectsCreated([object], isTheFirstOfItsTypeInProject);
+    this.forceUpdateObjectsList();
+    return object;
+  };
+
+  _onCustomObjectDropped = (
+    customObjectDragItem: CustomObjectDragItem,
+    position: [number, number]
+  ) => {
+    const object = this._getOrCreateObjectFromCustomObjectDragItem(
+      customObjectDragItem
+    );
+    if (!object) return;
+
+    this._addInstancesForObjectsAtPosition([object], position);
   };
 
   _onInstancesAddedAndSendToEditor3D = (
@@ -3665,6 +3821,9 @@ export default class SceneEditor extends React.Component<Props, State> {
                     onOpenEventBasedObjectVariantEditor={
                       this.props.onOpenEventBasedObjectVariantEditor
                     }
+                    onOpenPrefabDetailEditor={
+                      this.props.onOpenPrefabDetailEditor
+                    }
                     onDeleteEventsBasedObjectVariant={
                       this.props.onDeleteEventsBasedObjectVariant
                     }
@@ -3723,6 +3882,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                     onInstancesResized={this._onInstancesResized}
                     onInstancesRotated={this._onInstancesRotated}
                     onImageFilesDropped={this._onImageFilesDropped}
+                    onCustomObjectDropped={this._onCustomObjectDropped}
                     isInstanceOf3DObject={this.isInstanceOf3DObject}
                     onSelectAllInstancesOfObjectInLayout={
                       this.onSelectAllInstancesOfObjectInLayout

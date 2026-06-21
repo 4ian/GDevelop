@@ -15,6 +15,7 @@ import { findLocalProjectTemplatePath } from './LocalProjectTemplateFinder';
 const gd: libGDevelop = global.gd;
 const fs = optionalRequire('fs-extra');
 const path = optionalRequire('path');
+const childProcess = optionalRequire('child_process');
 
 export type ProjectTemplateFilesSource =
   | {|
@@ -192,6 +193,87 @@ export const copyGitHubRepositoryFilesToLocalProjectFolder = async ({
   }
 };
 
+const runGitCommand = ({
+  childProcess: childProcessModule,
+  workingDirectory,
+  args,
+}: {|
+  childProcess: any,
+  workingDirectory: string,
+  args: Array<string>,
+|}): Promise<{| stdout: string, stderr: string |}> =>
+  new Promise((resolve, reject) => {
+    childProcessModule.execFile(
+      'git',
+      args,
+      {
+        cwd: workingDirectory,
+        timeout: 120000,
+        maxBuffer: 10 * 1024 * 1024,
+        windowsHide: true,
+      },
+      (error, stdout, stderr) => {
+        if (error) {
+          const message = (stderr || stdout || error.message || '').trim();
+          reject(new Error(message || 'Git command failed.'));
+          return;
+        }
+
+        resolve({
+          stdout: stdout.trimEnd(),
+          stderr: stderr.trimEnd(),
+        });
+      }
+    );
+  });
+
+const ensureGitConfigValue = async (
+  runGit: (Array<string>) => Promise<{| stdout: string, stderr: string |}>,
+  key: string,
+  fallbackValue: string
+): Promise<void> => {
+  try {
+    const result = await runGit(['config', key]);
+    if (result.stdout.trim()) return;
+  } catch (error) {
+    // The value is not configured, so set a local fallback below.
+  }
+
+  await runGit(['config', key, fallbackValue]);
+};
+
+export const initializeLocalProjectGitRepository = async ({
+  projectFilePath,
+  childProcess: childProcessModule = childProcess,
+  path: pathModule = path,
+}: {|
+  projectFilePath: string,
+  childProcess?: any,
+  path?: any,
+|}): Promise<void> => {
+  if (!childProcessModule || !pathModule) {
+    throw new Error('Git is not supported in this environment.');
+  }
+
+  const projectFolder = pathModule.dirname(projectFilePath);
+  const runGit = (args: Array<string>) =>
+    runGitCommand({
+      childProcess: childProcessModule,
+      workingDirectory: projectFolder,
+      args,
+    });
+
+  await runGit(['init']);
+  await ensureGitConfigValue(runGit, 'user.name', 'GDevelop');
+  await ensureGitConfigValue(runGit, 'user.email', 'gdevelop@example.invalid');
+  await runGit(['add', '-A']);
+
+  const statusResult = await runGit(['status', '--porcelain=v1', '-uall']);
+  if (!statusResult.stdout.trim()) return;
+
+  await runGit(['commit', '-m', 'Initial GDevelop project']);
+};
+
 // Recursively copy a bundled local template folder into the new project folder.
 // Used for the empty-project template so creation works offline and in the
 // packaged binary (no network/GitHub dependency).
@@ -227,6 +309,8 @@ export const copyLocalTemplateFilesToLocalProjectFolder = async ({
 
     const entries = await fsModule.readdir(sourceDir, { withFileTypes: true });
     for (const entry of entries) {
+      if (entry.name === '.git') continue;
+
       const entryRelativePath = relativeDir
         ? `${relativeDir}/${entry.name}`
         : entry.name;

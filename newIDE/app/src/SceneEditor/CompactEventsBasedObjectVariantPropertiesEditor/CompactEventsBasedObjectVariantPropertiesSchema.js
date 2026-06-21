@@ -10,6 +10,7 @@ import Rectangle from '../../Utils/Rectangle';
 
 import Object3d from '../../UI/CustomSvgIcons/Object3d';
 import Object2d from '../../UI/CustomSvgIcons/Object2d';
+import ShareExternal from '../../UI/CustomSvgIcons/ShareExternal';
 
 const getFitToContentButton = ({
   i18n,
@@ -49,6 +50,26 @@ const getFitToContentButton = ({
   disabled: 'onValuesDifferent',
   getValue: () => '',
 });
+
+const getOpenPrefabDetailButton = ({
+  i18n,
+  onOpenPrefabDetailEditor,
+}: {|
+  i18n: I18nType,
+  onOpenPrefabDetailEditor: ?() => void,
+|}) => {
+  if (!onOpenPrefabDetailEditor) return null;
+
+  return {
+    label: i18n._(t`Prefab detail`),
+    nonFieldType: 'button',
+    showRightIcon: true,
+    getIcon: (style: {| fontSize: string |}) => <ShareExternal style={style} />,
+    onClick: (_instance: gdInitialInstance) => onOpenPrefabDetailEditor(),
+    disabled: 'onValuesDifferent',
+    getValue: () => '',
+  };
+};
 
 const getTitleRow = ({
   i18n,
@@ -247,6 +268,7 @@ export const makeSchema = ({
   eventsBasedObjectVariant,
   getContentAABB,
   onEventsBasedObjectChildrenEdited,
+  onOpenPrefabDetailEditor,
 }: {|
   i18n: I18nType,
   forceUpdate: () => void,
@@ -254,6 +276,7 @@ export const makeSchema = ({
   eventsBasedObjectVariant: gdEventsBasedObjectVariant,
   getContentAABB: () => Rectangle | null,
   onEventsBasedObjectChildrenEdited: () => void,
+  onOpenPrefabDetailEditor: ?() => void,
 |}): Schema => {
   // $FlowFixMe[incompatible-type]
   return [
@@ -329,6 +352,10 @@ export const makeSchema = ({
       getContentAABB,
       onEventsBasedObjectChildrenEdited,
       forceUpdate,
+    }),
+    getOpenPrefabDetailButton({
+      i18n,
+      onOpenPrefabDetailEditor,
     }),
   ].filter(Boolean);
 };

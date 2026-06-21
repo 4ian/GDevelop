@@ -120,6 +120,10 @@ export type RenderEditorContainerProps = {|
     gdEventsBasedObject,
     variantName: string
   ) => void,
+  onOpenPrefabDetailEditor: (
+    gdEventsFunctionsExtension,
+    gdEventsBasedObject
+  ) => void,
   onOpenEventsFunctionsExtension: (
     extensionName: string,
     initiallyFocusedFunctionName?: ?string,

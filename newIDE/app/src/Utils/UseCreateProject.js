@@ -8,6 +8,7 @@ import {
   createNewProjectFromPrivateGameTemplate,
   createNewProjectFromTutorialTemplate,
   createNewProjectFromCourseChapterTemplate,
+  initializeLocalProjectGitRepository,
   type NewProjectSource,
 } from '../ProjectCreation/CreateProject';
 import {
@@ -288,6 +289,19 @@ const useCreateProject = ({
 
           if (!fileMetadata) {
             return { createdProject: null };
+          }
+
+          if (newProjectSetup.storageProvider.internalName === 'LocalFile') {
+            try {
+              await initializeLocalProjectGitRepository({
+                projectFilePath: fileMetadata.fileIdentifier,
+              });
+            } catch (error) {
+              console.warn(
+                'Unable to initialize Git for the new project:',
+                error
+              );
+            }
           }
 
           updatedFileMetadata = fileMetadata;

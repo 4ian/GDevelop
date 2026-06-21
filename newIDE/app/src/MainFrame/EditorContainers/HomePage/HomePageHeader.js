@@ -17,7 +17,7 @@ import { useResponsiveWindowSize } from '../../../UI/Responsive/ResponsiveWindow
 import SaveProjectIcon from '../../SaveProjectIcon';
 import Mobile from '../../../UI/CustomSvgIcons/Mobile';
 import Desktop from '../../../UI/CustomSvgIcons/Desktop';
-import GitHubIcon from '../../../UI/CustomSvgIcons/GitHub';
+import HistoryIcon from '../../../UI/CustomSvgIcons/History';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
 import { type FileMetadata } from '../../../ProjectsStorage';
 const electron = optionalRequire('electron');
@@ -64,7 +64,7 @@ export const HomePageHeader = ({
                     tooltip={t`Open Git tool`}
                     color="default"
                   >
-                    <GitHubIcon />
+                    <HistoryIcon />
                   </IconButton>
                   <SaveProjectIcon
                     id="main-toolbar-save-button"

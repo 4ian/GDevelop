@@ -6160,6 +6160,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       onDeletedEventsBasedObjectVariant={deleteEventsBasedObjectVariant}
       onEventsBasedObjectChildrenEdited={onEventsBasedObjectChildrenEdited}
       onEventBasedObjectTypeChanged={onEventBasedObjectTypeChanged}
+      onObjectListsModified={onObjectListsModified}
       onDeleteLayout={deleteLayout}
       onDeleteExternalLayout={deleteExternalLayout}
       onDeleteEventsFunctionsExtension={deleteEventsFunctionsExtension}

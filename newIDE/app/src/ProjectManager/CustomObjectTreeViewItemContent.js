@@ -19,6 +19,8 @@ import { type MenuButton } from '../UI/TreeView';
 import { type HTMLDataset } from '../Utils/HTMLDataset';
 import { type ProjectItemUsageTarget } from './ProjectItemUsageFinder';
 import { type CustomObjectDragItem } from './ProjectManagerItemDragAndDrop';
+import Window from '../Utils/Window';
+import { showWarningBox } from '../UI/Messages/MessageBox';
 
 const gd: libGDevelop = global.gd;
 
@@ -51,6 +53,7 @@ export type CustomObjectTreeViewItemCallbacks = {|
   ) => void,
   onEventsBasedObjectChildrenEdited: gdEventsBasedObject => void,
   onEventBasedObjectTypeChanged: () => void,
+  onObjectListsModified: ({ isNewObjectTypeUsed: boolean }) => void,
 |};
 
 type ProjectItemUsageCallbacks = {|
@@ -178,6 +181,77 @@ const updateCustomObjectVariantNameInProject = (
   }
 };
 
+const setEventsBasedObjectAsGlobalObject = ({
+  i18n,
+  project,
+  eventsFunctionsExtension,
+  eventsBasedObject,
+  variantName,
+  onObjectListsModified,
+}: {|
+  i18n: I18nType,
+  project: gdProject,
+  eventsFunctionsExtension: gdEventsFunctionsExtension,
+  eventsBasedObject: gdEventsBasedObject,
+  variantName: string,
+  onObjectListsModified: ({ isNewObjectTypeUsed: boolean }) => void,
+|}): ?gdObject => {
+  const globalObjectsContainer = project.getObjects();
+  const objectName = gd.Project.getSafeName(
+    variantName || eventsBasedObject.getName()
+  );
+  if (!objectName) return null;
+
+  if (globalObjectsContainer.hasObjectNamed(objectName)) {
+    showWarningBox(
+      i18n._(
+        t`A global object with this name already exists. Please rename the prefab before setting it as a global object`
+      ),
+      { delayToNextTick: true }
+    );
+    return null;
+  }
+
+  const answer = Window.showConfirmDialog(
+    i18n._(
+      t`Global objects help manage objects across multiple scenes and are recommended for frequently used objects.
+
+Do you want to create a global object from this prefab?`
+    )
+  );
+  if (!answer) return null;
+
+  const objectType = getEventsBasedObjectFullType(
+    eventsFunctionsExtension,
+    eventsBasedObject
+  );
+  const isTheFirstOfItsTypeInProject = !gd.UsedObjectTypeFinder.scanProject(
+    project,
+    objectType
+  );
+
+  const object = globalObjectsContainer.insertNewObject(
+    project,
+    objectType,
+    objectName,
+    globalObjectsContainer.getObjectsCount()
+  );
+  const customObjectConfiguration = gd.asCustomObjectConfiguration(
+    object.getConfiguration()
+  );
+  if (variantName) {
+    customObjectConfiguration.setVariantName(variantName);
+  }
+  customObjectConfiguration.setMarkedAsOverridingEventsBasedObjectChildrenConfiguration(
+    false
+  );
+
+  onObjectListsModified({
+    isNewObjectTypeUsed: isTheFirstOfItsTypeInProject,
+  });
+  return object;
+};
+
 export class CustomObjectTreeViewItemContent implements TreeViewItemContent {
   eventsFunctionsExtension: gdEventsFunctionsExtension;
   eventsBasedObject: gdEventsBasedObject;
@@ -269,6 +343,10 @@ export class CustomObjectTreeViewItemContent implements TreeViewItemContent {
             eventsFunctionsExtension: this.eventsFunctionsExtension,
             eventsBasedObject: this.eventsBasedObject,
           }),
+      },
+      {
+        label: i18n._(t`Set as global object`),
+        click: () => this._setAsGlobalObject(i18n),
       },
       {
         label: i18n._(t`Create variant`),
@@ -388,6 +466,20 @@ export class CustomObjectTreeViewItemContent implements TreeViewItemContent {
   }
 
   moveAt(destinationIndex: number): void {}
+
+  _setAsGlobalObject(i18n: I18nType): void {
+    const object = setEventsBasedObjectAsGlobalObject({
+      i18n,
+      project: this.props.project,
+      eventsFunctionsExtension: this.eventsFunctionsExtension,
+      eventsBasedObject: this.eventsBasedObject,
+      variantName: '',
+      onObjectListsModified: this.props.onObjectListsModified,
+    });
+    if (!object) return;
+
+    this._onProjectItemModified();
+  }
 
   _createVariant(i18n: I18nType): void {
     const variants = this.eventsBasedObject.getVariants();
@@ -576,6 +668,10 @@ export class CustomObjectVariantTreeViewItemContent
           }),
       },
       {
+        label: i18n._(t`Set as global object`),
+        click: () => this._setAsGlobalObject(i18n),
+      },
+      {
         type: 'separator',
       },
       {
@@ -717,6 +813,20 @@ export class CustomObjectVariantTreeViewItemContent
       this.props.scrollToItem(newVariantItemId);
       this.props.editName(newVariantItemId);
     }, 0);
+  }
+
+  _setAsGlobalObject(i18n: I18nType): void {
+    const object = setEventsBasedObjectAsGlobalObject({
+      i18n,
+      project: this.props.project,
+      eventsFunctionsExtension: this.eventsFunctionsExtension,
+      eventsBasedObject: this.eventsBasedObject,
+      variantName: this.variant.getName(),
+      onObjectListsModified: this.props.onObjectListsModified,
+    });
+    if (!object) return;
+
+    this._onProjectItemModified();
   }
 
   copy(): void {}

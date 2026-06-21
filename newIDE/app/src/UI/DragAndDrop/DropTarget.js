@@ -14,7 +14,7 @@ type Props<DraggedItemType> = {|
     isOverLazy: boolean,
     canDrop: boolean,
   }) => ?React.Node,
-  canDrop: (item: DraggedItemType) => boolean,
+  canDrop: (item: DraggedItemType, monitor?: DropTargetMonitor) => boolean,
   hover?: (monitor: DropTargetMonitor) => void,
   drop: (monitor: DropTargetMonitor) => void,
 |};
@@ -22,6 +22,8 @@ type Props<DraggedItemType> = {|
 export type DropTargetComponent<DraggedItemType> = (
   Props<DraggedItemType>
 ) => React.Node;
+
+type AcceptedDragType = string | Array<string>;
 
 type DropTargetProps = {|
   connectDropTarget: ConnectDropTarget,
@@ -31,12 +33,12 @@ type DropTargetProps = {|
 |};
 
 export const makeDropTarget = <DraggedItemType>(
-  reactDndType: string
+  reactDndType: AcceptedDragType
 ): DropTargetComponent<DraggedItemType> => {
   const targetSpec = {
     canDrop(props: Props<DraggedItemType>, monitor: DropTargetMonitor) {
       const item = monitor.getItem();
-      return item && props.canDrop(item);
+      return item && props.canDrop(item, monitor);
     },
     hover(props: Props<DraggedItemType>, monitor: DropTargetMonitor) {
       if (props.hover) props.hover(monitor);
@@ -63,7 +65,13 @@ export const makeDropTarget = <DraggedItemType>(
 
   // $FlowFixMe[underconstrained-implicit-instantiation]
   // $FlowFixMe[incompatible-variance]
-  const InnerDropTarget = DropTarget(reactDndType, targetSpec, targetCollect)(
+  const InnerDropTarget = DropTarget(
+    // $FlowFixMe[incompatible-call] - react-dnd supports an array of item types.
+    reactDndType,
+    // $FlowFixMe[incompatible-variance]
+    targetSpec,
+    targetCollect
+  )(
     // $FlowFixMe[missing-local-annot]
     ({ children, connectDropTarget, isOver, isOverLazy, canDrop }) => {
       return children({

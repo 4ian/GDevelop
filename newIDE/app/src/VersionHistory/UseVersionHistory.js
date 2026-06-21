@@ -4,7 +4,7 @@ import * as React from 'react';
 import { t } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import Drawer from '@material-ui/core/Drawer';
-import GitHubIcon from '../UI/CustomSvgIcons/GitHub';
+import HistoryIcon from '../UI/CustomSvgIcons/History';
 import DrawerTopBar from '../UI/DrawerTopBar';
 import {
   listVersionsOfProject,
@@ -465,7 +465,7 @@ const useVersionHistory = ({
             onClose={() => setVersionHistoryPanelOpen(false)}
           >
             <DrawerTopBar
-              icon={<GitHubIcon />}
+              icon={<HistoryIcon />}
               title={i18n._(t`Git tool`)}
               onClose={() => setVersionHistoryPanelOpen(false)}
               id="version-history-drawer"

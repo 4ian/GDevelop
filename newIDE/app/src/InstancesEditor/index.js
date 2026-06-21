@@ -82,10 +82,10 @@ const styles = {
 const getCanvasResolution = (): number =>
   Math.max(1, window.devicePixelRatio || 1);
 
-const ObjectDropTarget = makeDropTarget<{||}>(objectWithContextReactDndType);
-const ProjectManagerItemDropTarget = makeDropTarget<CustomObjectDragItem>(
-  projectManagerItemReactDndType
-);
+const CanvasDropTarget = makeDropTarget<any>([
+  objectWithContextReactDndType,
+  projectManagerItemReactDndType,
+]);
 
 export type EditorViewPosition2D = {|
   viewX: number | null,
@@ -1035,6 +1035,43 @@ export default class InstancesEditor extends Component<Props, State> {
     if (!position) return;
 
     onCustomObjectDropped(item, position);
+  };
+
+  _isProjectManagerCustomObjectDrop = (monitor: any): boolean => {
+    return (
+      monitor.getItemType() === projectManagerItemReactDndType &&
+      isCustomObjectDragItem(monitor.getItem())
+    );
+  };
+
+  _canDropOnCanvas = (item: any, monitor?: any): boolean => {
+    if (monitor && monitor.getItemType() === projectManagerItemReactDndType) {
+      return !!this.props.onCustomObjectDropped && isCustomObjectDragItem(item);
+    }
+
+    return true;
+  };
+
+  _onCanvasDropHover = (monitor: any) => {
+    if (monitor.getItemType() === projectManagerItemReactDndType) {
+      if (this._isProjectManagerCustomObjectDrop(monitor)) {
+        this._onCustomObjectDropHover(monitor);
+      }
+      return;
+    }
+
+    this._onObjectDropHover(monitor);
+  };
+
+  _onCanvasDrop = (monitor: any) => {
+    if (monitor.getItemType() === projectManagerItemReactDndType) {
+      if (this._isProjectManagerCustomObjectDrop(monitor)) {
+        this._onCustomObjectDrop(monitor);
+      }
+      return;
+    }
+
+    this._onObjectDrop(monitor);
   };
 
   _hasNativeFiles = (event: DragEvent): boolean => {
@@ -2136,53 +2173,30 @@ export default class InstancesEditor extends Component<Props, State> {
     }
 
     return (
-      <ObjectDropTarget
-        canDrop={() => true}
-        hover={this._onObjectDropHover}
-        drop={this._onObjectDrop}
+      <CanvasDropTarget
+        canDrop={this._canDropOnCanvas}
+        hover={this._onCanvasDropHover}
+        drop={this._onCanvasDrop}
       >
-        {({
-          connectDropTarget: connectObjectDropTarget,
-          isOver: isObjectOver,
-        }) => (
-          <ProjectManagerItemDropTarget
-            canDrop={item =>
-              !!this.props.onCustomObjectDropped &&
-              isCustomObjectDragItem(item)
-            }
-            hover={this._onCustomObjectDropHover}
-            drop={this._onCustomObjectDrop}
-          >
-            {({
-              connectDropTarget: connectProjectManagerItemDropTarget,
-              isOver: isProjectManagerItemOver,
-            }) => {
-              // The children are re-rendered when isOver change:
-              // take this opportunity to delete any temporary instances
-              // if the dragging is not done anymore over the canvas.
-              if (
-                this._instancesAdder &&
-                !isObjectOver &&
-                !isProjectManagerItemOver
-              ) {
-                this._instancesAdder.deleteTemporaryInstances();
-              }
+        {({ connectDropTarget, isOver }) => {
+          // The children are re-rendered when isOver changes: take this
+          // opportunity to delete any temporary instances if the dragging is
+          // not done anymore over the canvas.
+          if (this._instancesAdder && !isOver) {
+            this._instancesAdder.deleteTemporaryInstances();
+          }
 
-              return connectProjectManagerItemDropTarget(
-                connectObjectDropTarget(
-                  <div
-                    ref={canvasArea => (this.canvasArea = canvasArea)}
-                    style={styles.canvasArea}
-                    id={instancesEditorId}
-                    onDragOver={this._onNativeDragOver}
-                    onDrop={this._onNativeDrop}
-                  />
-                )
-              );
-            }}
-          </ProjectManagerItemDropTarget>
-        )}
-      </ObjectDropTarget>
+          return connectDropTarget(
+            <div
+              ref={canvasArea => (this.canvasArea = canvasArea)}
+              style={styles.canvasArea}
+              id={instancesEditorId}
+              onDragOver={this._onNativeDragOver}
+              onDrop={this._onNativeDrop}
+            />
+          );
+        }}
+      </CanvasDropTarget>
     );
   }
 }

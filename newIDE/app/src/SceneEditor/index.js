@@ -1749,15 +1749,15 @@ export default class SceneEditor extends React.Component<Props, State> {
       objectName,
       objectsContainer.getObjectsCount()
     );
+    const customObjectConfiguration = gd.asCustomObjectConfiguration(
+      object.getConfiguration()
+    );
     if (variantName) {
-      const customObjectConfiguration = gd.asCustomObjectConfiguration(
-        object.getConfiguration()
-      );
       customObjectConfiguration.setVariantName(variantName);
-      customObjectConfiguration.setMarkedAsOverridingEventsBasedObjectChildrenConfiguration(
-        false
-      );
     }
+    customObjectConfiguration.setMarkedAsOverridingEventsBasedObjectChildrenConfiguration(
+      false
+    );
 
     this._onObjectsCreated([object], isTheFirstOfItsTypeInProject);
     this.forceUpdateObjectsList();

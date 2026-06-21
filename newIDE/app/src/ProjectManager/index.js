@@ -676,6 +676,7 @@ type Props = {|
   onExtensionInstalled: (extensionNames: Array<string>) => void,
   onSceneAdded: () => void,
   onExternalLayoutAdded: () => void,
+  onObjectListsModified: ({ isNewObjectTypeUsed: boolean }) => void,
 
   // Main menu
   mainMenuCallbacks: MainMenuCallbacks,
@@ -730,6 +731,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       onExtensionInstalled,
       onSceneAdded,
       onExternalLayoutAdded,
+      onObjectListsModified,
     },
     ref
   ) => {
@@ -1318,6 +1320,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
               onDeletedEventsBasedObjectVariant,
               onEventsBasedObjectChildrenEdited,
               onEventBasedObjectTypeChanged,
+              onObjectListsModified,
               onFindUsage,
             }
           : null,
@@ -1340,6 +1343,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         onDeletedEventsBasedObjectVariant,
         onEventsBasedObjectChildrenEdited,
         onEventBasedObjectTypeChanged,
+        onObjectListsModified,
         onFindUsage,
       ]
     );

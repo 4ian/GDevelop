@@ -6022,6 +6022,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       _previewLauncher.current.canDoNetworkPreview(),
     gamesPlatformFrameTools: gamesPlatformFrameTools,
     toggleProjectManager: toggleProjectManager,
+    isProjectManagerPinned: isProjectManagerPinned,
     setEditorTabs: setEditorTabs,
     saveProject: saveProject,
     saveProjectAsWithStorageProvider: saveProjectAsWithStorageProvider,

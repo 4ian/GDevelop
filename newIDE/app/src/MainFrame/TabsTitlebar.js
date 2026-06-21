@@ -57,6 +57,7 @@ type TabsTitlebarProps = {|
   isLeftMostPane: boolean,
   isRightMostPane: boolean,
   displayMenuIcon: boolean,
+  displayLeftSafeMargins: boolean,
 
   displayAskAi: boolean,
   onAskAiClicked: () => void,
@@ -112,6 +113,7 @@ export default function TabsTitlebar({
   isLeftMostPane,
   isRightMostPane,
   displayMenuIcon,
+  displayLeftSafeMargins,
   displayAskAi,
   onAskAiClicked,
 }: TabsTitlebarProps): React.MixedElement {
@@ -242,7 +244,7 @@ export default function TabsTitlebar({
       className={WINDOW_DRAGGABLE_PART_CLASS_NAME}
       onDoubleClick={handleDoubleClick}
     >
-      {isLeftMostPane && <TitleBarLeftSafeMargins />}
+      {isLeftMostPane && displayLeftSafeMargins && <TitleBarLeftSafeMargins />}
       {displayMenuIcon && (
         // $FlowFixMe[incompatible-type]
         <IconButton

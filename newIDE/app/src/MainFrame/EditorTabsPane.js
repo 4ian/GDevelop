@@ -110,6 +110,7 @@ export type EditorTabsPaneCommonProps = {|
 
   // Callbacks from MainFrame
   toggleProjectManager: () => void,
+  isProjectManagerPinned: boolean,
   saveProject: () => Promise<?FileMetadata>,
   saveProjectAsWithStorageProvider: (
     options: ?{|
@@ -331,6 +332,7 @@ const EditorTabsPane: React.ComponentType<{
     canDoNetworkPreview,
     gamesPlatformFrameTools,
     toggleProjectManager,
+    isProjectManagerPinned,
     saveProject,
     saveProjectAsWithStorageProvider,
     onCheckoutVersion,
@@ -617,7 +619,10 @@ const EditorTabsPane: React.ComponentType<{
         <TabsTitlebar
           isLeftMostPane={isLeftMostPane}
           isRightMostPane={isRightMostPane}
-          displayMenuIcon={paneIdentifier === 'center'}
+          displayMenuIcon={
+            paneIdentifier === 'center' && !isProjectManagerPinned
+          }
+          displayLeftSafeMargins={!isProjectManagerPinned}
           hidden={tabsTitleBarAndEditorToolbarHidden}
           toggleProjectManager={toggleProjectManager}
           renderTabs={(onEditorTabHovered, clearTooltipOnTabClose) => (

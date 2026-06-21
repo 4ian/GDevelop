@@ -17,6 +17,9 @@ import CreateEventsFunctionExtensionItemDialog, {
 } from './CreateEventsFunctionExtensionItemDialog';
 import ProjectItemUsageDialog from './ProjectItemUsageDialog';
 import { type ProjectItemUsageTarget } from './ProjectItemUsageFinder';
+import ProjectGlobalsDialog, {
+  type ProjectGlobalsDialogKind,
+} from './ProjectGlobalsDialog';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import ExtensionsSearchDialog from '../AssetStore/ExtensionStore/ExtensionsSearchDialog';
 import ScenePropertiesDialog from '../SceneEditor/ScenePropertiesDialog';
@@ -112,8 +115,6 @@ import optionalRequire from '../Utils/OptionalRequire';
 import { useShouldAutofocusInput } from '../UI/Responsive/ScreenTypeMeasurer';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 import { enumerateFunctionsInFolder } from '../EventsFunctionsList/EnumerateFunctionFolderOrFunction';
-import PreferencesIcon from '../UI/CustomSvgIcons/Preferences';
-import classes from './ProjectManager.module.css';
 import { projectManagerItemReactDndType } from './ProjectManagerItemDragAndDrop';
 
 const electron = optionalRequire('electron');
@@ -127,6 +128,12 @@ const gamePropertiesItemId = getProjectManagerItemId('game-properties');
 const gameResourcesItemId = getProjectManagerItemId('game-resources');
 const gameExtensionsItemId = getProjectManagerItemId('game-extensions');
 const gameShareItemId = getProjectManagerItemId('game-share');
+const globalsRootFolderId = getProjectManagerItemId('globals');
+const globalVariablesItemId = getProjectManagerItemId('global-variables');
+const globalObjectsItemId = getProjectManagerItemId('global-objects');
+const globalObjectGroupsItemId = getProjectManagerItemId(
+  'global-object-groups'
+);
 export const scenesRootFolderId: string = getProjectManagerItemId('scenes');
 export const customObjectsRootFolderId: string = getProjectManagerItemId(
   'custom-objects'
@@ -823,6 +830,16 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
     ] = React.useState(false);
     const openProjectVariables = React.useCallback(() => {
       setProjectVariablesEditorOpen(true);
+    }, []);
+    const [
+      globalsDialogKind,
+      setGlobalsDialogKind,
+    ] = React.useState<?ProjectGlobalsDialogKind>(null);
+    const openGlobalObjectsDialog = React.useCallback(() => {
+      setGlobalsDialogKind('objects');
+    }, []);
+    const openGlobalGroupsDialog = React.useCallback(() => {
+      setGlobalsDialogKind('groups');
     }, []);
 
     const [
@@ -1551,6 +1568,41 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
               {
                 isRoot: true,
                 content: new LabelTreeViewItemContent(
+                  globalsRootFolderId,
+                  i18n._(t`Globals`)
+                ),
+                getChildren(i18n: I18nType): ?Array<TreeViewItem> {
+                  return [
+                    new LeafTreeViewItem(
+                      new ActionTreeViewItemContent(
+                        globalVariablesItemId,
+                        i18n._(t`Global variables`),
+                        openProjectVariables,
+                        'res/icons_default/global_variable24_black.svg'
+                      )
+                    ),
+                    new LeafTreeViewItem(
+                      new ActionTreeViewItemContent(
+                        globalObjectsItemId,
+                        i18n._(t`Global objects`),
+                        openGlobalObjectsDialog,
+                        'res/icons_default/global_object24_black.svg'
+                      )
+                    ),
+                    new LeafTreeViewItem(
+                      new ActionTreeViewItemContent(
+                        globalObjectGroupsItemId,
+                        i18n._(t`Global groups`),
+                        openGlobalGroupsDialog,
+                        'res/icons_default/global_group24_black.svg'
+                      )
+                    ),
+                  ];
+                },
+              },
+              {
+                isRoot: true,
+                content: new LabelTreeViewItemContent(
                   scenesRootFolderId,
                   i18n._(t`Scenes`),
                   {
@@ -1879,6 +1931,9 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         openProjectExtensionsDialog,
         openProjectProperties,
         openCreateExtensionItemDialog,
+        openProjectVariables,
+        openGlobalObjectsDialog,
+        openGlobalGroupsDialog,
         project,
         sceneTreeViewItemProps,
       ]
@@ -1943,6 +1998,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       () => {
         const nodeIds = [
           gameSettingsRootFolderId,
+          globalsRootFolderId,
           scenesRootFolderId,
           customObjectsRootFolderId,
           behaviorsRootFolderId,
@@ -1992,13 +2048,6 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
     ] = React.useState<Array<number>>([]);
     const isNavigatingInMainMenuItem = selectedMainMenuItemIndices.length > 0;
     const shouldHideMainMenu = isMacLike() && !!electron;
-    const openPreferencesFromQuickLink = React.useCallback(
-      () => {
-        mainMenuCallbacks.onOpenPreferences(true);
-        closeProjectManager();
-      },
-      [mainMenuCallbacks, closeProjectManager]
-    );
 
     // Unselect items when the project manager is closed.
     React.useEffect(
@@ -2044,23 +2093,6 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                   />
                 </Column>
               </Line>
-            )}
-            {!isNavigatingInMainMenuItem && project && (
-              <div className={classes.quickLinkContainer}>
-                <button
-                  type="button"
-                  className={classes.quickLinkButton}
-                  onClick={openPreferencesFromQuickLink}
-                >
-                  <PreferencesIcon
-                    className={classes.quickLinkIcon}
-                    fontSize="small"
-                  />
-                  <span className={classes.quickLinkLabel}>
-                    <Trans>Preferences</Trans>
-                  </span>
-                </button>
-              </div>
             )}
             <I18n>
               {({ i18n }) => {
@@ -2176,6 +2208,13 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                         }
                         isListLocked={false}
                         initiallySelectedVariable={null}
+                      />
+                    )}
+                    {project && globalsDialogKind && (
+                      <ProjectGlobalsDialog
+                        project={project}
+                        kind={globalsDialogKind}
+                        onClose={() => setGlobalsDialogKind(null)}
                       />
                     )}
                     {!!editedPropertiesLayout &&

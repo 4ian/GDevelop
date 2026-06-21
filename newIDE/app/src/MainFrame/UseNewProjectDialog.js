@@ -17,6 +17,7 @@ import { type FileMetadata, type StorageProvider } from '../ProjectsStorage';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import RouterContext from './RouterContext';
 import { type CreateProjectResult } from '../Utils/UseCreateProject';
+import { type OpenLayoutHandler } from './EditorContainers/BaseEditor';
 
 type Props = {|
   project: ?gdProject,
@@ -36,18 +37,7 @@ type Props = {|
   closeAskAi: () => void,
   storageProviders: Array<StorageProvider>,
   storageProvider: ?StorageProvider,
-  onOpenLayout: (
-    sceneName: string,
-    options: {|
-      openEventsEditor: boolean,
-      openSceneEditor: boolean,
-      focusWhenOpened:
-        | 'scene-or-events-otherwise'
-        | 'scene'
-        | 'events'
-        | 'none',
-    |}
-  ) => void,
+  onOpenLayout: OpenLayoutHandler,
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
 |};

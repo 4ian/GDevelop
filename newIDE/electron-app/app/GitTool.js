@@ -4,8 +4,9 @@ const path = require('path');
 const gitCommandTimeoutMs = 120000;
 const gitCommandMaxBuffer = 10 * 1024 * 1024;
 
-const runGit = (workingDirectory, args) =>
+const runGit = (workingDirectory, args, options = {}) =>
   new Promise((resolve, reject) => {
+    const allowedExitCodes = options.allowedExitCodes || [0];
     childProcess.execFile(
       'git',
       args,
@@ -16,7 +17,13 @@ const runGit = (workingDirectory, args) =>
         windowsHide: true,
       },
       (error, stdout, stderr) => {
-        if (error) {
+        if (
+          error &&
+          !(
+            typeof error.code === 'number' &&
+            allowedExitCodes.includes(error.code)
+          )
+        ) {
           const message = (stderr || stdout || error.message || '').trim();
           reject(new Error(message || 'Git command failed.'));
           return;
@@ -360,6 +367,68 @@ const resetToCommit = async ({ projectFilePath, commitHash }) => {
   return getStatus(projectFilePath);
 };
 
+const getChangedFileDiff = async ({ projectFilePath, file }) => {
+  if (!file || !file.path) throw new Error('A changed file is required.');
+
+  const status = await ensureGitRepository(projectFilePath);
+  const diffSections = [];
+  const pathArgs = file.oldPath ? [file.oldPath, file.path] : [file.path];
+  const isUntracked =
+    file.status === 'Untracked' ||
+    (file.indexStatus === '?' && file.workingTreeStatus === '?');
+
+  if (isUntracked) {
+    const result = await runGit(
+      status.repoRoot,
+      [
+        'diff',
+        '--no-ext-diff',
+        '--no-color',
+        '--no-index',
+        '--',
+        '/dev/null',
+        file.path,
+      ],
+      { allowedExitCodes: [0, 1] }
+    );
+    diffSections.push(result.stdout);
+  } else {
+    if (file.indexStatus) {
+      const result = await runGit(status.repoRoot, [
+        'diff',
+        '--no-ext-diff',
+        '--no-color',
+        '--cached',
+        '--',
+        ...pathArgs,
+      ]);
+      if (result.stdout) {
+        diffSections.push(`Staged changes\n\n${result.stdout}`);
+      }
+    }
+
+    if (file.workingTreeStatus) {
+      const result = await runGit(status.repoRoot, [
+        'diff',
+        '--no-ext-diff',
+        '--no-color',
+        '--',
+        ...pathArgs,
+      ]);
+      if (result.stdout) {
+        diffSections.push(`Unstaged changes\n\n${result.stdout}`);
+      }
+    }
+  }
+
+  return {
+    path: file.path,
+    oldPath: file.oldPath || null,
+    status: file.status || 'Changed',
+    diff: diffSections.filter(Boolean).join('\n\n'),
+  };
+};
+
 const initializeRepository = async projectFilePath => {
   const projectDirectory = getProjectDirectory(projectFilePath);
   await runGit(projectDirectory, ['init']);
@@ -403,6 +472,11 @@ const handleGitToolRequest = async request => {
       return resetToCommit({
         projectFilePath,
         commitHash: payload.commitHash,
+      });
+    case 'diff':
+      return getChangedFileDiff({
+        projectFilePath,
+        file: payload.file,
       });
     default:
       throw new Error(`Unknown Git tool action: ${action || 'none'}.`);

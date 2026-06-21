@@ -88,6 +88,7 @@ import {
   type ObjectsOutsideEditorChanges,
   type ObjectGroupsOutsideEditorChanges,
 } from './EditorContainers/BaseEditor';
+import { type EditorId as SceneEditorPanelId } from '../SceneEditor/utils';
 import { type Exporter } from '../ExportAndShare/ShareDialog';
 import ResourcesLoader from '../ResourcesLoader/index';
 import {
@@ -789,6 +790,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       project,
       paneIdentifier,
       continueProcessingFunctionCallsOnMount,
+      scenePanelToOpen,
     }: {
       kind: EditorKind,
       name: string,
@@ -796,6 +798,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       project?: ?gdProject,
       paneIdentifier?: 'left' | 'center' | 'right',
       continueProcessingFunctionCallsOnMount?: boolean,
+      scenePanelToOpen?: ?SceneEditorPanelId,
     }) => {
       const label =
         kind === 'resources'
@@ -892,6 +895,11 @@ const MainFrame = (props: Props): React.MixedElement => {
           : kind === 'ask-ai'
           ? {
               continueProcessingFunctionCallsOnMount,
+            }
+          : kind === 'layout' && scenePanelToOpen
+          ? {
+              scenePanelToOpen,
+              scenePanelToOpenRequestId: Date.now(),
             }
           : undefined;
       return {
@@ -3047,6 +3055,7 @@ const MainFrame = (props: Props): React.MixedElement => {
         openEventsEditor,
         openSceneEditor,
         focusWhenOpened,
+        scenePanelToOpen,
       }: {|
         openEventsEditor: boolean,
         openSceneEditor: boolean,
@@ -3055,11 +3064,13 @@ const MainFrame = (props: Props): React.MixedElement => {
           | 'scene'
           | 'events'
           | 'none',
+        scenePanelToOpen?: ?SceneEditorPanelId,
       |}
     ): EditorTabsState => {
       const sceneEditorOptions = getEditorOpeningOptions({
         kind: 'layout',
         name,
+        scenePanelToOpen,
         dontFocusTab: !(
           focusWhenOpened === 'scene' ||
           focusWhenOpened === 'scene-or-events-otherwise'
@@ -3097,6 +3108,7 @@ const MainFrame = (props: Props): React.MixedElement => {
           | 'scene'
           | 'events'
           | 'none',
+        scenePanelToOpen?: ?SceneEditorPanelId,
       |} = {
         openEventsEditor: true,
         openSceneEditor: true,
@@ -3113,6 +3125,7 @@ const MainFrame = (props: Props): React.MixedElement => {
             openEventsEditor: options.openEventsEditor,
             openSceneEditor: options.openSceneEditor,
             focusWhenOpened: options.focusWhenOpened,
+            scenePanelToOpen: options.scenePanelToOpen,
           }
         ),
       }));
@@ -5977,6 +5990,7 @@ const MainFrame = (props: Props): React.MixedElement => {
           | 'scene'
           | 'events'
           | 'none',
+        scenePanelToOpen?: ?SceneEditorPanelId,
       |}
     ) => openLayout(name, options),
     onWillInstallExtension,

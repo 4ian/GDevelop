@@ -12,6 +12,13 @@ export type GitChangedFile = {|
   status: string,
 |};
 
+export type GitDiff = {|
+  path: string,
+  oldPath: ?string,
+  status: string,
+  diff: string,
+|};
+
 export type GitCommit = {|
   hash: string,
   shortHash: string,
@@ -34,7 +41,7 @@ export type GitStatus = {|
   error?: string,
 |};
 
-type GitToolAction =
+type GitToolStatusAction =
   | 'status'
   | 'init'
   | 'commit'
@@ -48,7 +55,7 @@ export const isGitToolSupported = (): boolean =>
 
 export const invokeGitTool = async (
   projectFilePath: string,
-  action: GitToolAction,
+  action: GitToolStatusAction,
   payload?: Object
 ): Promise<GitStatus> => {
   const renderer = ipcRenderer;
@@ -60,5 +67,21 @@ export const invokeGitTool = async (
     projectFilePath,
     action,
     payload: payload || {},
+  });
+};
+
+export const invokeGitToolDiff = async (
+  projectFilePath: string,
+  file: GitChangedFile
+): Promise<GitDiff> => {
+  const renderer = ipcRenderer;
+  if (!renderer || typeof renderer.invoke !== 'function') {
+    throw new Error('The Git tool is only available in the desktop app.');
+  }
+
+  return renderer.invoke('git-tool-request', {
+    projectFilePath,
+    action: 'diff',
+    payload: { file },
   });
 };

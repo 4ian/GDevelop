@@ -63,6 +63,7 @@ import { type CreateProjectResult } from '../Utils/UseCreateProject';
 import { isNativeMobileApp } from '../Utils/Platform';
 import { AskAiStandAloneForm } from '../AiGeneration/AskAiStandAloneForm';
 import { AiRequestContext } from '../AiGeneration/AiRequestContext';
+import { type OpenLayoutHandler } from '../MainFrame/EditorContainers/BaseEditor';
 
 const electron = optionalRequire('electron');
 const remote = optionalRequire('@electron/remote');
@@ -135,18 +136,7 @@ type Props = {|
   storageProvider: ?StorageProvider,
   privateGameTemplateListingDatasFromSameCreator: ?Array<PrivateGameTemplateListingData>,
   preventBackHome?: boolean,
-  onOpenLayout: (
-    sceneName: string,
-    options: {|
-      openEventsEditor: boolean,
-      openSceneEditor: boolean,
-      focusWhenOpened:
-        | 'scene-or-events-otherwise'
-        | 'scene'
-        | 'events'
-        | 'none',
-    |}
-  ) => void,
+  onOpenLayout: OpenLayoutHandler,
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
 |};

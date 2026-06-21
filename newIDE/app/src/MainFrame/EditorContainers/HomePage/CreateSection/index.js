@@ -56,6 +56,7 @@ import { getDefaultRegisterGameProperties } from '../../../../Utils/UseGameAndBu
 import { type CreateProjectResult } from '../../../../Utils/UseCreateProject';
 import { AskAiStandAloneForm } from '../../../../AiGeneration/AskAiStandAloneForm';
 import { AiRequestContext } from '../../../../AiGeneration/AiRequestContext';
+import { type OpenLayoutHandler } from '../../BaseEditor';
 
 const getExampleItemsColumns = (
   windowSize: WindowSizeType,
@@ -85,18 +86,7 @@ type Props = {|
   onCreateEmptyProject: (
     newProjectSetup: NewProjectSetup
   ) => Promise<CreateProjectResult>,
-  onOpenLayout: (
-    sceneName: string,
-    options: {|
-      openEventsEditor: boolean,
-      openSceneEditor: boolean,
-      focusWhenOpened:
-        | 'scene-or-events-otherwise'
-        | 'scene'
-        | 'events'
-        | 'none',
-    |}
-  ) => void,
+  onOpenLayout: OpenLayoutHandler,
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
   onCloseAskAi: () => void,

@@ -162,11 +162,33 @@ export const openEditorTab = (
       editor => editor.key === key
     );
     if (existingEditorId !== -1) {
+      let nextState = state;
+      if (extraEditorProps) {
+        const nextEditors: Array<EditorTab> = pane.editors.slice();
+        const existingEditor = nextEditors[existingEditorId];
+        nextEditors[existingEditorId] = {
+          ...existingEditor,
+          extraEditorProps: {
+            ...(existingEditor.extraEditorProps || {}),
+            ...extraEditorProps,
+          },
+        };
+        nextState = {
+          ...state,
+          panes: {
+            ...state.panes,
+            [statePaneIdentifier]: {
+              ...pane,
+              editors: nextEditors,
+            },
+          },
+        };
+      }
       // If the tab is already open (including in an external/popped-out window),
       // don't re-open or move it — just focus it in its current pane.
       return dontFocusTab
-        ? { ...state }
-        : changeCurrentTab(state, statePaneIdentifier, existingEditorId);
+        ? nextState
+        : changeCurrentTab(nextState, statePaneIdentifier, existingEditorId);
     }
   }
 

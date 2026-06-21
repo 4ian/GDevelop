@@ -37,6 +37,7 @@ import { type SimplifiedBehavior } from './SimplifiedProject/SimplifiedProject';
 import { ColumnStackLayout } from '../UI/Layout';
 import Text from '../UI/Text';
 import { applyVariableChange } from './ApplyVariableChange';
+import { type OpenLayoutHandler } from '../MainFrame/EditorContainers/BaseEditor';
 import {
   addDefaultLightToAllLayers,
   addDefaultLightToLayer,
@@ -211,18 +212,7 @@ export type AssetSearchAndInstallOptions = {|
 |};
 
 export type EditorCallbacks = {|
-  onOpenLayout: (
-    sceneName: string,
-    options: {|
-      openEventsEditor: boolean,
-      openSceneEditor: boolean,
-      focusWhenOpened:
-        | 'scene-or-events-otherwise'
-        | 'scene'
-        | 'events'
-        | 'none',
-    |}
-  ) => void,
+  onOpenLayout: OpenLayoutHandler,
   // Close any open editor tabs (scene + events) for a layout. Must be called
   // before removing the layout from the project, otherwise editors keep a
   // wrapper to a freed C++ object (use-after-free on e.g. LayersContainer).

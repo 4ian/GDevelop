@@ -2,6 +2,7 @@
 import * as React from 'react';
 import { I18n } from '@lingui/react';
 import {
+  type OpenLayoutHandler,
   type RenderEditorContainerPropsWithRef,
   type SceneEventsOutsideEditorChanges,
   type InstancesOutsideEditorChanges,
@@ -177,18 +178,7 @@ type Props = {|
   canSave: boolean,
 
   resourceManagementProps: ResourceManagementProps,
-  onOpenLayout: (
-    sceneName: string,
-    options: {|
-      openEventsEditor: boolean,
-      openSceneEditor: boolean,
-      focusWhenOpened:
-        | 'scene-or-events-otherwise'
-        | 'scene'
-        | 'events'
-        | 'none',
-    |}
-  ) => void,
+  onOpenLayout: OpenLayoutHandler,
 
   gameEditorMode: 'embedded-game' | 'instances-editor',
 |};

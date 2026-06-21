@@ -24,6 +24,7 @@ import { type ObjectWithContext } from '../../ObjectsList/EnumerateObjects';
 import { type CreateProjectResult } from '../../Utils/UseCreateProject';
 import { type OpenAskAiOptions } from '../../AiGeneration/Utils';
 import type { NavigateToEventFromGlobalSearchParams } from '../../Utils/Search';
+import { type EditorId as SceneEditorPanelId } from '../../SceneEditor/utils';
 
 export type EditorContainerExtraProps = {|
   // Events function extension editor
@@ -31,12 +32,28 @@ export type EditorContainerExtraProps = {|
   initiallyFocusedBehaviorName?: ?string,
   initiallyFocusedObjectName?: ?string,
 
+  // Scene editor
+  scenePanelToOpen?: ?SceneEditorPanelId,
+  scenePanelToOpenRequestId?: number,
+
   // Homepage
   storageProviders?: Array<StorageProvider>,
 
   // Ask AI
   continueProcessingFunctionCallsOnMount?: boolean,
 |};
+
+export type OpenLayoutOptions = {|
+  openEventsEditor: boolean,
+  openSceneEditor: boolean,
+  focusWhenOpened: 'scene-or-events-otherwise' | 'scene' | 'events' | 'none',
+  scenePanelToOpen?: ?SceneEditorPanelId,
+|};
+
+export type OpenLayoutHandler = (
+  sceneName: string,
+  options?: OpenLayoutOptions
+) => void;
 
 export type SceneEventsOutsideEditorChanges = {|
   scene: gdLayout,
@@ -98,18 +115,7 @@ export type RenderEditorContainerProps = {|
 
   // Opening other editors:
   onOpenExternalEvents: string => void,
-  onOpenLayout: (
-    sceneName: string,
-    options?: {|
-      openEventsEditor: boolean,
-      openSceneEditor: boolean,
-      focusWhenOpened:
-        | 'scene-or-events-otherwise'
-        | 'scene'
-        | 'events'
-        | 'none',
-    |}
-  ) => void,
+  onOpenLayout: OpenLayoutHandler,
   onOpenEvents: (sceneName: string) => void,
   openInstructionOrExpression: (
     extension: gdPlatformExtension,

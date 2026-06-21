@@ -8,6 +8,7 @@ import type {
   NavigateToEventFromGlobalSearchParams,
   LocationType,
 } from '../Utils/Search';
+import { type OpenLayoutHandler } from './EditorContainers/BaseEditor';
 
 type Props = {|
   editorTabs: EditorTabsState,
@@ -20,18 +21,7 @@ type Props = {|
     behaviorName?: ?string,
     objectName?: ?string,
   |}) => void,
-  openLayout: (
-    name: string,
-    options?: {|
-      openEventsEditor: boolean,
-      openSceneEditor: boolean,
-      focusWhenOpened:
-        | 'scene-or-events-otherwise'
-        | 'scene'
-        | 'events'
-        | 'none',
-    |}
-  ) => void,
+  openLayout: OpenLayoutHandler,
   openExternalEvents: (name: string) => void,
   openEventsFunctionsExtension: (
     name: string,

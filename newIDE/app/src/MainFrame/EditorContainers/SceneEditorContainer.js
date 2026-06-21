@@ -24,6 +24,7 @@ import {
   type HotReloadSteps,
   switchInGameEditorIfNoHotReloadIsNeeded,
 } from '../../EmbeddedGame/EmbeddedGameFrame';
+import { type EditorId as SceneEditorPanelId } from '../../SceneEditor/utils';
 
 export class SceneEditorContainer extends React.Component<RenderEditorContainerProps> {
   editor: ?SceneEditor;
@@ -51,6 +52,27 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
     if (this.props.isActive) {
       this._setPreviewedLayout();
     }
+    this._openRequestedScenePanel();
+  }
+
+  componentDidUpdate(prevProps: RenderEditorContainerProps) {
+    if (
+      prevProps.extraEditorProps !== this.props.extraEditorProps ||
+      prevProps.isActive !== this.props.isActive
+    ) {
+      this._openRequestedScenePanel();
+    }
+  }
+
+  _openRequestedScenePanel() {
+    if (!this.props.isActive) return;
+
+    const scenePanelToOpen: ?SceneEditorPanelId =
+      this.props.extraEditorProps &&
+      this.props.extraEditorProps.scenePanelToOpen;
+    if (!scenePanelToOpen || !this.editor) return;
+
+    this.editor.ensureEditorPanelVisible(scenePanelToOpen);
   }
 
   _setPreviewedLayout() {

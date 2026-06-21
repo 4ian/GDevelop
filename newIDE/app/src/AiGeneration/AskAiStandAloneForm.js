@@ -50,6 +50,7 @@ import { Trans } from '@lingui/macro';
 import IconButton from '../UI/IconButton';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import Cross from '../UI/CustomSvgIcons/Cross';
+import { type OpenLayoutHandler } from '../MainFrame/EditorContainers/BaseEditor';
 
 const gd: libGDevelop = global.gd;
 
@@ -65,18 +66,7 @@ type Props = {|
   onCreateEmptyProject: (
     newProjectSetup: NewProjectSetup
   ) => Promise<CreateProjectResult>,
-  onOpenLayout: (
-    sceneName: string,
-    options: {|
-      openEventsEditor: boolean,
-      openSceneEditor: boolean,
-      focusWhenOpened:
-        | 'scene-or-events-otherwise'
-        | 'scene'
-        | 'events'
-        | 'none',
-    |}
-  ) => void,
+  onOpenLayout: OpenLayoutHandler,
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
   onCloseAskAi: () => void,

@@ -346,7 +346,7 @@ export class CustomObjectTreeViewItemContent implements TreeViewItemContent {
           }),
       },
       {
-        label: i18n._(t`Set as global object`),
+        label: i18n._(t`Create global object`),
         click: () => this._setAsGlobalObject(i18n),
       },
       {
@@ -670,7 +670,7 @@ export class CustomObjectVariantTreeViewItemContent
           }),
       },
       {
-        label: i18n._(t`Set as global object`),
+        label: i18n._(t`Create global object`),
         click: () => this._setAsGlobalObject(i18n),
       },
       {

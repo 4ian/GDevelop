@@ -1145,6 +1145,11 @@ export default class SceneEditor extends React.Component<Props, State> {
     );
   };
 
+  ensureEditorPanelVisible = (editorId: EditorId) => {
+    if (!this.editorDisplay) return;
+    this.editorDisplay.ensureEditorVisible(editorId);
+  };
+
   toggleWindowMask = () => {
     this.setInstancesEditorSettings({
       ...this.state.instancesEditorSettings,
@@ -1643,7 +1648,9 @@ export default class SceneEditor extends React.Component<Props, State> {
     variantName: string
   ): gdObject | null => {
     const { globalObjectsContainer, objectsContainer } = this.props;
-    const findInContainer = (container: gdObjectsContainer): gdObject | null => {
+    const findInContainer = (
+      container: gdObjectsContainer
+    ): gdObject | null => {
       const objectsCount = container.getObjectsCount();
       for (let objectIndex = 0; objectIndex < objectsCount; objectIndex++) {
         const object = container.getObjectAt(objectIndex);
@@ -1733,9 +1740,12 @@ export default class SceneEditor extends React.Component<Props, State> {
       if (matchingObject) return matchingObject;
     }
 
-    const objectName = newNameGenerator(requestedObjectName, name =>
-      objectsContainer.hasObjectNamed(name) ||
-      (!!globalObjectsContainer && globalObjectsContainer.hasObjectNamed(name))
+    const objectName = newNameGenerator(
+      requestedObjectName,
+      name =>
+        objectsContainer.hasObjectNamed(name) ||
+        (!!globalObjectsContainer &&
+          globalObjectsContainer.hasObjectNamed(name))
     );
 
     const isTheFirstOfItsTypeInProject = !gd.UsedObjectTypeFinder.scanProject(

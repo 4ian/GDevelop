@@ -18,6 +18,7 @@ import {
 import Tooltip from '@material-ui/core/Tooltip';
 import Flag from '@material-ui/icons/Flag';
 import { type HTMLDataset } from '../Utils/HTMLDataset';
+import { type OpenLayoutHandler } from '../MainFrame/EditorContainers/BaseEditor';
 
 const SCENE_CLIPBOARD_KIND = 'Layout';
 
@@ -29,18 +30,7 @@ export type SceneTreeViewItemCallbacks = {|
   onSceneAdded: () => void,
   onDeleteLayout: gdLayout => void,
   onRenameLayout: (string, string) => void,
-  onOpenLayout: (
-    name: string,
-    options?: {|
-      openEventsEditor: boolean,
-      openSceneEditor: boolean,
-      focusWhenOpened:
-        | 'scene-or-events-otherwise'
-        | 'scene'
-        | 'events'
-        | 'none',
-    |}
-  ) => void,
+  onOpenLayout: OpenLayoutHandler,
 |};
 
 export type SceneTreeViewItemCommonProps = {|

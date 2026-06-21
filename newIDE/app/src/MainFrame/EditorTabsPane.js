@@ -25,6 +25,7 @@ import {
 } from './EditorTabs/EditorTabsHandler';
 import { type PreviewState } from './PreviewState';
 import {
+  type OpenLayoutHandler,
   type SceneEventsOutsideEditorChanges,
   type InstancesOutsideEditorChanges,
   type ObjectsOutsideEditorChanges,
@@ -151,18 +152,7 @@ export type EditorTabsPaneCommonProps = {|
     eventsBasedObjectVariantName: string | null,
   |}) => void,
   openExternalEvents: (name: string) => void,
-  openLayout: (
-    name: string,
-    options?: {|
-      openEventsEditor: boolean,
-      openSceneEditor: boolean,
-      focusWhenOpened:
-        | 'scene-or-events-otherwise'
-        | 'scene'
-        | 'events'
-        | 'none',
-    |}
-  ) => void,
+  openLayout: OpenLayoutHandler,
   openTemplateFromTutorial: (tutorialId: string) => Promise<void>,
   openTemplateFromCourseChapter: (
     courseChapter: CourseChapter,

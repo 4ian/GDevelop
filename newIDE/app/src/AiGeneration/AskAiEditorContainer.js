@@ -4,6 +4,7 @@ import { type I18n as I18nType } from '@lingui/core';
 import { exceptionallyGuardAgainstDeadObject } from '../Utils/IsNullPtr';
 import { I18n } from '@lingui/react';
 import {
+  type OpenLayoutHandler,
   type RenderEditorContainerPropsWithRef,
   type SceneEventsOutsideEditorChanges,
   type InstancesOutsideEditorChanges,
@@ -128,18 +129,7 @@ type Props = {|
   onCreateEmptyProject: (
     newProjectSetup: NewProjectSetup
   ) => Promise<CreateProjectResult>,
-  onOpenLayout: (
-    sceneName: string,
-    options: {|
-      openEventsEditor: boolean,
-      openSceneEditor: boolean,
-      focusWhenOpened:
-        | 'scene-or-events-otherwise'
-        | 'scene'
-        | 'events'
-        | 'none',
-    |}
-  ) => void,
+  onOpenLayout: OpenLayoutHandler,
   onSceneEventsModifiedOutsideEditor: (
     changes: SceneEventsOutsideEditorChanges
   ) => void,

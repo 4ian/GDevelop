@@ -19,7 +19,9 @@ import Restore from '../UI/CustomSvgIcons/Restore';
 import { type FileMetadata } from '../ProjectsStorage';
 import UnsavedChangesContext from '../MainFrame/UnsavedChangesContext';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
+import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import {
+  invokeGitToolDiff,
   invokeGitTool,
   isGitToolSupported,
   type GitChangedFile,
@@ -61,6 +63,83 @@ const styles = {
     alignItems: 'baseline',
     padding: '4px 0',
   },
+  fileRowButton: {
+    display: 'block',
+    width: '100%',
+    margin: 0,
+    padding: 0,
+    border: 0,
+    background: 'transparent',
+    color: 'inherit',
+    textAlign: 'left',
+    cursor: 'pointer',
+    font: 'inherit',
+    WebkitAppearance: 'none',
+  },
+  diffViewer: {
+    display: 'flex',
+    flexDirection: 'column',
+    flex: 1,
+    minHeight: 0,
+    borderRadius: 4,
+    overflow: 'hidden',
+    border: '1px solid rgba(127, 127, 127, 0.35)',
+    fontFamily: 'Consolas, Monaco, monospace',
+    fontSize: 12,
+    lineHeight: '18px',
+  },
+  diffHeader: {
+    display: 'grid',
+    gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)',
+    borderBottom: '1px solid rgba(127, 127, 127, 0.35)',
+    fontFamily: 'inherit',
+    fontWeight: 600,
+    flexShrink: 0,
+  },
+  diffHeaderCell: {
+    padding: '6px 8px',
+    minWidth: 0,
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+  },
+  diffRows: {
+    overflow: 'auto',
+    flex: 1,
+    minHeight: 0,
+  },
+  diffRow: {
+    display: 'grid',
+    gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)',
+    minWidth: 720,
+  },
+  diffCell: {
+    display: 'grid',
+    gridTemplateColumns: '48px minmax(0, 1fr)',
+    minWidth: 0,
+  },
+  diffLineNumber: {
+    padding: '0 8px',
+    textAlign: 'right',
+    userSelect: 'none',
+    opacity: 0.65,
+    borderRight: '1px solid rgba(127, 127, 127, 0.25)',
+  },
+  diffCode: {
+    padding: '0 8px',
+    whiteSpace: 'pre-wrap',
+    overflowWrap: 'anywhere',
+    userSelect: 'text',
+    minWidth: 0,
+  },
+  diffNoteRow: {
+    minWidth: 720,
+    padding: '2px 8px',
+    fontStyle: 'italic',
+    whiteSpace: 'pre-wrap',
+    overflowWrap: 'anywhere',
+    userSelect: 'text',
+  },
   commitRow: {
     display: 'flex',
     flexDirection: 'column',
@@ -99,23 +178,35 @@ const formatCommitDate = (i18n: I18nType, date: string): string => {
   });
 };
 
-const ChangedFileRow = ({ file }: {| file: GitChangedFile |}) => (
-  <div style={styles.fileRow}>
-    <Chip size="small" label={file.status} variant="outlined" />
-    <Text
-      noMargin
-      size="body-small"
-      allowSelection
-      style={{
-        overflow: 'hidden',
-        textOverflow: 'ellipsis',
-        whiteSpace: 'nowrap',
-      }}
-      tooltip={file.oldPath ? `${file.oldPath} -> ${file.path}` : file.path}
-    >
-      {file.oldPath ? `${file.oldPath} -> ${file.path}` : file.path}
-    </Text>
-  </div>
+const ChangedFileRow = ({
+  file,
+  onOpenDiff,
+}: {|
+  file: GitChangedFile,
+  onOpenDiff: GitChangedFile => mixed,
+|}) => (
+  <button
+    type="button"
+    style={styles.fileRowButton}
+    onClick={() => onOpenDiff(file)}
+  >
+    <div style={styles.fileRow}>
+      <Chip size="small" label={file.status} variant="outlined" />
+      <Text
+        noMargin
+        size="body-small"
+        allowSelection
+        style={{
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          whiteSpace: 'nowrap',
+        }}
+        tooltip={file.oldPath ? `${file.oldPath} -> ${file.path}` : file.path}
+      >
+        {file.oldPath ? `${file.oldPath} -> ${file.path}` : file.path}
+      </Text>
+    </div>
+  </button>
 );
 
 const CommitRow = ({
@@ -174,6 +265,296 @@ const CommitRow = ({
   </div>
 );
 
+type DiffRowKind = 'context' | 'delete' | 'add' | 'changed' | 'note';
+
+type SideBySideDiffRow = {|
+  kind: DiffRowKind,
+  oldLineNumber: ?number,
+  newLineNumber: ?number,
+  oldText: string,
+  newText: string,
+  label: ?string,
+|};
+
+const parseHunkHeader = (
+  line: string
+): ?{| oldLineNumber: number, newLineNumber: number |} => {
+  const match = line.match(/^@@ -(\d+)(?:,\d+)? \+(\d+)(?:,\d+)? @@/);
+  if (!match) return null;
+
+  return {
+    oldLineNumber: Number(match[1]),
+    newLineNumber: Number(match[2]),
+  };
+};
+
+const parseUnifiedDiff = (diffText: string): Array<SideBySideDiffRow> => {
+  const rows: Array<SideBySideDiffRow> = [];
+  const lines = diffText.split(/\r?\n/);
+  let oldLineNumber: number | null = null;
+  let newLineNumber: number | null = null;
+  let index = 0;
+
+  const addChangeRows = (
+    deletedLines: Array<{| lineNumber: number, text: string |}>,
+    addedLines: Array<{| lineNumber: number, text: string |}>
+  ) => {
+    const lineCount = Math.max(deletedLines.length, addedLines.length);
+    for (let lineIndex = 0; lineIndex < lineCount; lineIndex++) {
+      const deletedLine = deletedLines[lineIndex];
+      const addedLine = addedLines[lineIndex];
+      rows.push({
+        kind:
+          deletedLine && addedLine ? 'changed' : deletedLine ? 'delete' : 'add',
+        oldLineNumber: deletedLine ? deletedLine.lineNumber : null,
+        newLineNumber: addedLine ? addedLine.lineNumber : null,
+        oldText: deletedLine ? deletedLine.text : '',
+        newText: addedLine ? addedLine.text : '',
+        label: null,
+      });
+    }
+  };
+
+  while (index < lines.length) {
+    const line = lines[index];
+
+    if (
+      line === 'Staged changes' ||
+      line === 'Unstaged changes' ||
+      line === 'Untracked file'
+    ) {
+      oldLineNumber = null;
+      newLineNumber = null;
+      index++;
+      continue;
+    }
+
+    if (line.startsWith('@@')) {
+      const hunkHeader = parseHunkHeader(line);
+      oldLineNumber = hunkHeader ? hunkHeader.oldLineNumber : null;
+      newLineNumber = hunkHeader ? hunkHeader.newLineNumber : null;
+      index++;
+      continue;
+    }
+
+    if (
+      oldLineNumber !== null &&
+      newLineNumber !== null &&
+      (line.startsWith('-') || line.startsWith('+'))
+    ) {
+      const deletedLines: Array<{| lineNumber: number, text: string |}> = [];
+      const addedLines: Array<{| lineNumber: number, text: string |}> = [];
+      let currentOldLineNumber: number = oldLineNumber;
+      let currentNewLineNumber: number = newLineNumber;
+
+      while (
+        index < lines.length &&
+        (lines[index].startsWith('-') || lines[index].startsWith('+'))
+      ) {
+        const changedLine = lines[index];
+        if (changedLine.startsWith('-')) {
+          deletedLines.push({
+            lineNumber: currentOldLineNumber,
+            text: changedLine.slice(1),
+          });
+          currentOldLineNumber++;
+        } else {
+          addedLines.push({
+            lineNumber: currentNewLineNumber,
+            text: changedLine.slice(1),
+          });
+          currentNewLineNumber++;
+        }
+        index++;
+      }
+
+      oldLineNumber = currentOldLineNumber;
+      newLineNumber = currentNewLineNumber;
+      addChangeRows(deletedLines, addedLines);
+      continue;
+    }
+
+    if (
+      oldLineNumber !== null &&
+      newLineNumber !== null &&
+      line.startsWith(' ')
+    ) {
+      const currentOldLineNumber: number = oldLineNumber;
+      const currentNewLineNumber: number = newLineNumber;
+      rows.push({
+        kind: 'context',
+        oldLineNumber: currentOldLineNumber,
+        newLineNumber: currentNewLineNumber,
+        oldText: line.slice(1),
+        newText: line.slice(1),
+        label: null,
+      });
+      oldLineNumber = currentOldLineNumber + 1;
+      newLineNumber = currentNewLineNumber + 1;
+      index++;
+      continue;
+    }
+
+    if (
+      oldLineNumber !== null &&
+      newLineNumber !== null &&
+      line.startsWith('\\')
+    ) {
+      rows.push({
+        kind: 'note',
+        oldLineNumber: null,
+        newLineNumber: null,
+        oldText: '',
+        newText: '',
+        label: line,
+      });
+      index++;
+      continue;
+    }
+
+    oldLineNumber = null;
+    newLineNumber = null;
+    index++;
+  }
+
+  return rows;
+};
+
+const DiffCodeCell = ({
+  row,
+  side,
+  gdevelopTheme,
+}: {|
+  row: SideBySideDiffRow,
+  side: 'old' | 'new',
+  gdevelopTheme: any,
+|}) => {
+  const isDeleted = side === 'old' && row.kind === 'delete';
+  const isAdded = side === 'new' && row.kind === 'add';
+  const isChanged =
+    row.kind === 'changed' && (side === 'old' || side === 'new');
+  const isEmptyDeletionSide = side === 'new' && row.kind === 'delete';
+  const isEmptyAdditionSide = side === 'old' && row.kind === 'add';
+  const text = side === 'old' ? row.oldText : row.newText;
+  const lineNumber = side === 'old' ? row.oldLineNumber : row.newLineNumber;
+  const marker =
+    isDeleted || (isChanged && side === 'old')
+      ? '-'
+      : isAdded || (isChanged && side === 'new')
+      ? '+'
+      : ' ';
+  const backgroundColor =
+    isDeleted || (isChanged && side === 'old')
+      ? 'rgba(248, 81, 73, 0.18)'
+      : isAdded || (isChanged && side === 'new')
+      ? 'rgba(46, 160, 67, 0.18)'
+      : undefined;
+  const markerColor =
+    marker === '-'
+      ? gdevelopTheme.statusIndicator.error
+      : marker === '+'
+      ? gdevelopTheme.statusIndicator.success
+      : undefined;
+
+  return (
+    <div
+      style={{
+        ...styles.diffCell,
+        backgroundColor,
+        opacity: isEmptyDeletionSide || isEmptyAdditionSide ? 0.55 : undefined,
+      }}
+    >
+      <span style={styles.diffLineNumber}>
+        {lineNumber === null ? '' : lineNumber}
+      </span>
+      <span style={styles.diffCode}>
+        <span style={{ color: markerColor }}>{marker}</span>
+        {text}
+      </span>
+    </div>
+  );
+};
+
+const SideBySideDiffViewer = ({
+  diffText,
+}: {|
+  diffText: string,
+|}): React.Node => {
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
+  const rows = React.useMemo(() => parseUnifiedDiff(diffText), [diffText]);
+
+  if (!diffText.trim() || !rows.length) {
+    return (
+      <Text noMargin color="secondary">
+        <Trans>
+          No textual diff is available for this file. It may be binary or
+          unchanged in the selected Git area.
+        </Trans>
+      </Text>
+    );
+  }
+
+  return (
+    <div
+      style={{
+        ...styles.diffViewer,
+        backgroundColor: gdevelopTheme.paper.backgroundColor.dark,
+      }}
+    >
+      <div
+        style={{
+          ...styles.diffHeader,
+          backgroundColor: gdevelopTheme.paper.backgroundColor.medium,
+        }}
+      >
+        <div
+          style={{
+            ...styles.diffHeaderCell,
+            borderRight: '1px solid rgba(127, 127, 127, 0.25)',
+          }}
+        >
+          <Trans>Original</Trans>
+        </div>
+        <div style={styles.diffHeaderCell}>
+          <Trans>Changed</Trans>
+        </div>
+      </div>
+      <div style={styles.diffRows}>
+        {rows.map((row, index) => {
+          if (row.kind === 'note') {
+            return (
+              <div
+                key={index}
+                style={{
+                  ...styles.diffNoteRow,
+                  color: gdevelopTheme.text.color.secondary,
+                }}
+              >
+                {row.label}
+              </div>
+            );
+          }
+
+          return (
+            <div key={index} style={styles.diffRow}>
+              <DiffCodeCell
+                row={row}
+                side="old"
+                gdevelopTheme={gdevelopTheme}
+              />
+              <DiffCodeCell
+                row={row}
+                side="new"
+                gdevelopTheme={gdevelopTheme}
+              />
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
 const GitTool = ({
   fileMetadata,
   isLocalProject,
@@ -195,6 +576,10 @@ const GitTool = ({
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [runningAction, setRunningAction] = React.useState<?string>(null);
   const [errorMessage, setErrorMessage] = React.useState<?string>(null);
+  const [diffFile, setDiffFile] = React.useState<?GitChangedFile>(null);
+  const [diffText, setDiffText] = React.useState<string>('');
+  const [isDiffLoading, setIsDiffLoading] = React.useState<boolean>(false);
+  const [diffErrorMessage, setDiffErrorMessage] = React.useState<?string>(null);
 
   const projectFilePath = fileMetadata ? fileMetadata.fileIdentifier : null;
   const canUseGitTool =
@@ -227,6 +612,9 @@ const GitTool = ({
       setIsRemoteDialogOpen(false);
       setHasPushSuccessHint(false);
       setErrorMessage(null);
+      setDiffFile(null);
+      setDiffText('');
+      setDiffErrorMessage(null);
       refreshStatus();
     },
     [refreshStatus]
@@ -449,6 +837,32 @@ const GitTool = ({
     ]
   );
 
+  const openChangedFileDiff = React.useCallback(
+    async (file: GitChangedFile) => {
+      if (!projectFilePath) return;
+
+      setDiffFile(file);
+      setDiffText('');
+      setDiffErrorMessage(null);
+      setIsDiffLoading(true);
+      try {
+        const result = await invokeGitToolDiff(projectFilePath, file);
+        setDiffText(result.diff || '');
+      } catch (error) {
+        setDiffErrorMessage(getErrorMessage(error));
+      } finally {
+        setIsDiffLoading(false);
+      }
+    },
+    [projectFilePath]
+  );
+
+  const closeDiffDialog = React.useCallback(() => {
+    setDiffFile(null);
+    setDiffText('');
+    setDiffErrorMessage(null);
+  }, []);
+
   if (!fileMetadata) {
     return (
       <EmptyMessage>
@@ -528,7 +942,6 @@ const GitTool = ({
                       allowSelection
                       style={{
                         overflowWrap: 'anywhere',
-                        whiteSpace: 'normal',
                       }}
                       tooltip={status.repoRoot || ''}
                     >
@@ -613,6 +1026,7 @@ const GitTool = ({
                             file.path
                           }`}
                           file={file}
+                          onOpenDiff={openChangedFileDiff}
                         />
                       ))
                     ) : (
@@ -695,6 +1109,41 @@ const GitTool = ({
               disabled={isBusy}
               autoFocus="desktop"
             />
+          </Dialog>
+          <Dialog
+            open={!!diffFile}
+            title={
+              diffFile ? (
+                <React.Fragment>
+                  <Trans>Diff</Trans>: {diffFile.path}
+                </React.Fragment>
+              ) : (
+                <Trans>Diff</Trans>
+              )
+            }
+            actions={[
+              <FlatButton
+                key="close"
+                label={<Trans>Close</Trans>}
+                onClick={closeDiffDialog}
+              />,
+            ]}
+            onRequestClose={closeDiffDialog}
+            maxWidth="lg"
+            fullHeight
+            flexColumnBody
+          >
+            {isDiffLoading ? (
+              <Text noMargin color="secondary">
+                <Trans>Loading diff...</Trans>
+              </Text>
+            ) : diffErrorMessage ? (
+              <Text noMargin color="error" allowSelection>
+                {diffErrorMessage}
+              </Text>
+            ) : (
+              <SideBySideDiffViewer diffText={diffText} />
+            )}
           </Dialog>
         </>
       )}

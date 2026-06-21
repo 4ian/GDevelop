@@ -12,6 +12,7 @@ import {
 } from './EditorTabsHandler';
 import PreferencesContext from '../Preferences/PreferencesContext';
 import { useDebounce } from '../../Utils/UseDebounce';
+import { type EditorId as SceneEditorPanelId } from '../../SceneEditor/utils';
 
 type Props = {|
   editorTabs: EditorTabsState,
@@ -24,6 +25,7 @@ type Props = {|
     project?: ?gdProject,
     paneIdentifier?: 'left' | 'center' | 'right',
     continueProcessingFunctionCallsOnMount?: boolean,
+    scenePanelToOpen?: ?SceneEditorPanelId,
   |}) => EditorOpeningOptions,
 |};
 

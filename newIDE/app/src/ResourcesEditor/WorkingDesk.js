@@ -359,9 +359,10 @@ const WorkingDesk = ({
   const [textPreview, setTextPreview] = React.useState<?string>(null);
   const [textPreviewError, setTextPreviewError] = React.useState<?string>(null);
   const [imageZoomFactor, setImageZoomFactor] = React.useState(1);
-  const [imageNaturalSize, setImageNaturalSize] = React.useState<?WorkingDeskImageSize>(
-    null
-  );
+  const [
+    imageNaturalSize,
+    setImageNaturalSize,
+  ] = React.useState<?WorkingDeskImageSize>(null);
   const [isImageScrollable, setIsImageScrollable] = React.useState(false);
   const [isImagePanning, setIsImagePanning] = React.useState(false);
   const [audioPreviewError, setAudioPreviewError] = React.useState<?string>(
@@ -369,6 +370,9 @@ const WorkingDesk = ({
   );
   const imageScrollAreaRef = React.useRef<?HTMLDivElement>(null);
   const imagePanStartRef = React.useRef<?ImagePanStart>(null);
+  const markdownSaveGenerationRef = React.useRef<number>(0);
+  const latestMarkdownContentRef = React.useRef<string>('');
+  const latestMarkdownPathRef = React.useRef<?string>(null);
 
   React.useEffect(
     () => {
@@ -423,6 +427,23 @@ const WorkingDesk = ({
   const selectedNode = activeFileItem ? activeFileItem.node : null;
   const selectedResource = activeFileItem ? activeFileItem.resource : null;
 
+  React.useEffect(
+    () => {
+      latestMarkdownContentRef.current = markdownContent;
+    },
+    [markdownContent]
+  );
+
+  React.useEffect(
+    () => {
+      latestMarkdownPathRef.current =
+        selectedNode && isMarkdownFile(selectedNode)
+          ? selectedNode.absolutePath
+          : null;
+    },
+    [selectedNode]
+  );
+
   const renderDeskMessage = (children: React.Node) => (
     <div style={styles.emptyState}>
       <div
@@ -439,6 +460,7 @@ const WorkingDesk = ({
   React.useEffect(
     () => {
       let isMounted = true;
+      markdownSaveGenerationRef.current += 1;
       setMarkdownContent('');
       setMarkdownStatus(null);
       setIsMarkdownDirty(false);
@@ -621,27 +643,56 @@ const WorkingDesk = ({
     [updateImageScrollable]
   );
 
-  const handleImagePointerLeave = React.useCallback(() => {
-    const panStart = imagePanStartRef.current;
-    if (!panStart || panStart.didCapturePointer) return;
+  const handleImagePointerLeave = React.useCallback(
+    () => {
+      const panStart = imagePanStartRef.current;
+      if (!panStart || panStart.didCapturePointer) return;
 
-    stopImagePanning();
-  }, [stopImagePanning]);
+      stopImagePanning();
+    },
+    [stopImagePanning]
+  );
 
   const saveMarkdown = React.useCallback(
-    async () => {
-      if (!fs || !selectedNode || !isMarkdownFile(selectedNode)) return;
+    async (generation?: number, shouldRefreshProjectFiles: boolean = true) => {
+      const pathToSave = latestMarkdownPathRef.current;
+      if (!fs || !pathToSave) return;
+
+      const savedGeneration =
+        typeof generation === 'number'
+          ? generation
+          : markdownSaveGenerationRef.current;
+      const contentToSave = latestMarkdownContentRef.current;
       setMarkdownStatus(null);
-      await fs.promises.writeFile(
-        selectedNode.absolutePath,
-        markdownContent,
-        'utf8'
-      );
-      setIsMarkdownDirty(false);
-      setMarkdownStatus('Saved');
-      await onProjectFilesChanged();
+      setMarkdownStatus('Saving...');
+      await fs.promises.writeFile(pathToSave, contentToSave, 'utf8');
+      if (
+        latestMarkdownPathRef.current === pathToSave &&
+        markdownSaveGenerationRef.current === savedGeneration
+      ) {
+        setIsMarkdownDirty(false);
+        setMarkdownStatus('Saved');
+      }
+      if (shouldRefreshProjectFiles) {
+        await onProjectFilesChanged();
+      }
     },
-    [markdownContent, onProjectFilesChanged, selectedNode]
+    [onProjectFilesChanged]
+  );
+
+  React.useEffect(
+    () => {
+      if (!isMarkdownDirty || !selectedNode || !isMarkdownFile(selectedNode)) {
+        return;
+      }
+
+      const generation = markdownSaveGenerationRef.current;
+      const timeoutId = setTimeout(() => {
+        saveMarkdown(generation, false);
+      }, 500);
+      return () => clearTimeout(timeoutId);
+    },
+    [isMarkdownDirty, markdownContent, saveMarkdown, selectedNode]
   );
 
   const closeTab = React.useCallback(
@@ -861,9 +912,10 @@ const WorkingDesk = ({
               <textarea
                 value={markdownContent}
                 onChange={event => {
+                  markdownSaveGenerationRef.current += 1;
                   setMarkdownContent(event.currentTarget.value);
                   setIsMarkdownDirty(true);
-                  setMarkdownStatus(null);
+                  setMarkdownStatus('Saving...');
                 }}
                 onKeyDown={event => {
                   if ((event.ctrlKey || event.metaKey) && event.key === 's') {

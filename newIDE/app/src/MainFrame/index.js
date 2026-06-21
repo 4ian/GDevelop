@@ -451,6 +451,11 @@ export type Props = {|
 |};
 
 const MainFrame = (props: Props): React.MixedElement => {
+  const preferences = React.useContext(PreferencesContext);
+  const {
+    setHasProjectOpened,
+    setProjectManagerPinned: setProjectManagerPinnedPreference,
+  } = preferences;
   const [state, setState]: [
     State,
     ((State => State) | State) => Promise<State>,
@@ -495,7 +500,7 @@ const MainFrame = (props: Props): React.MixedElement => {
   const [
     isProjectManagerPinned,
     setProjectManagerPinned,
-  ] = React.useState<boolean>(false);
+  ] = React.useState<boolean>(preferences.values.isProjectManagerPinned);
   const [languageDialogOpen, openLanguageDialog] = React.useState<boolean>(
     false
   );
@@ -531,8 +536,6 @@ const MainFrame = (props: Props): React.MixedElement => {
     showAlert,
     showDeleteConfirmation,
   } = useAlertDialog();
-  const preferences = React.useContext(PreferencesContext);
-  const { setHasProjectOpened } = preferences;
   const { previewLoadingRef, setPreviewLoading } = usePreviewLoadingState();
   const previewLaunchInProgressRef = React.useRef<boolean>(false);
   const saveProjectRef = React.useRef<?(options?: {|
@@ -693,6 +696,8 @@ const MainFrame = (props: Props): React.MixedElement => {
   const currentProject = exceptionallyGuardAgainstDeadObject(
     state.currentProject
   );
+  const isProjectManagerPinnedForCurrentProject =
+    !!currentProject && isProjectManagerPinned;
 
   const fileIdentifier = currentFileMetadata
     ? currentFileMetadata.fileIdentifier
@@ -1722,41 +1727,48 @@ const MainFrame = (props: Props): React.MixedElement => {
     () => {
       openProjectManager(false);
       setProjectManagerPinned(false);
+      setProjectManagerPinnedPreference(false);
     },
-    [openProjectManager]
+    [openProjectManager, setProjectManagerPinnedPreference]
   );
 
   const pinProjectManager = React.useCallback(
     () => {
       openProjectManager(false);
       setProjectManagerPinned(true);
+      setProjectManagerPinnedPreference(true);
     },
-    [openProjectManager]
+    [openProjectManager, setProjectManagerPinnedPreference]
   );
 
   const keepPinnedProjectManagerOpen = React.useCallback(() => {}, []);
 
   const toggleProjectManager = React.useCallback(
     () => {
-      if (isProjectManagerPinned) {
+      if (isProjectManagerPinnedForCurrentProject) {
         closePinnedProjectManager();
         return;
       }
 
       openProjectManager(projectManagerOpen => !projectManagerOpen);
     },
-    [closePinnedProjectManager, isProjectManagerPinned, openProjectManager]
+    [
+      closePinnedProjectManager,
+      isProjectManagerPinnedForCurrentProject,
+      openProjectManager,
+    ]
   );
 
   const showProjectManager = React.useCallback(
     () => {
-      if (isProjectManagerPinned) return;
+      if (isProjectManagerPinnedForCurrentProject) return;
       openProjectManager(true);
     },
-    [isProjectManagerPinned, openProjectManager]
+    [isProjectManagerPinnedForCurrentProject, openProjectManager]
   );
 
-  const isProjectManagerVisible = projectManagerOpen || isProjectManagerPinned;
+  const isProjectManagerVisible =
+    projectManagerOpen || isProjectManagerPinnedForCurrentProject;
 
   // When the project manager is shown, highlight and scroll to the item
   // matching the currently focused editor page (e.g. the open scene), so the
@@ -6048,7 +6060,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       _previewLauncher.current.canDoNetworkPreview(),
     gamesPlatformFrameTools: gamesPlatformFrameTools,
     toggleProjectManager: toggleProjectManager,
-    isProjectManagerPinned: isProjectManagerPinned,
+    isProjectManagerPinned: isProjectManagerPinnedForCurrentProject,
     setEditorTabs: setEditorTabs,
     saveProject: saveProject,
     saveProjectAsWithStorageProvider: saveProjectAsWithStorageProvider,
@@ -6185,7 +6197,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       gamesList={gamesList}
       onOpenHomePage={openHomePage}
       closeProjectManager={
-        isProjectManagerPinned
+        isProjectManagerPinnedForCurrentProject
           ? keepPinnedProjectManagerOpen
           : closeProjectManagerOverlay
       }
@@ -6245,7 +6257,7 @@ const MainFrame = (props: Props): React.MixedElement => {
         storageProvider={getStorageProvider()}
         i18n={i18n}
       />
-      {!isProjectManagerPinned && (
+      {!isProjectManagerPinnedForCurrentProject && (
         <ProjectManagerDrawer
           projectManagerOpen={projectManagerOpen}
           closeProjectManager={closeProjectManagerOverlay}
@@ -6259,7 +6271,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       // in what to display (ex: Loader of play section)
       gamesPlatformFrameTools.renderGamesPlatformFrame()}
       <div className="main-frame-content">
-        {isProjectManagerPinned && (
+        {isProjectManagerPinnedForCurrentProject && (
           <ProjectManagerDrawer
             isPinned
             projectManagerOpen={false}

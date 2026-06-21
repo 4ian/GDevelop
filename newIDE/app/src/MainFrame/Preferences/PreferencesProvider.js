@@ -112,6 +112,7 @@ export const getInitialPreferences = (): {
   inAppTutorialsProgress: {},
   isAlwaysOnTopInPreview: boolean,
   isMenuBarHiddenInPreview: boolean,
+  isProjectManagerPinned: boolean,
   language: string,
   lastLaunchedVersion: void,
   enableMcpServer: boolean,
@@ -283,6 +284,8 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     setAutoOpenMostRecentProject: (this._setAutoOpenMostRecentProject.bind(
       this
     ): any),
+    // $FlowFixMe[method-unbinding]
+    setProjectManagerPinned: (this._setProjectManagerPinned.bind(this): any),
     // $FlowFixMe[method-unbinding]
     hadProjectOpenedDuringLastSession: (this._hadProjectOpenedDuringLastSession.bind(
       this
@@ -1145,6 +1148,18 @@ export default class PreferencesProvider extends React.Component<Props, State> {
         values: {
           ...state.values,
           autoOpenMostRecentProject: enabled,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _setProjectManagerPinned(enabled: boolean) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          isProjectManagerPinned: enabled,
         },
       }),
       () => this._persistValuesToLocalStorage(this.state)

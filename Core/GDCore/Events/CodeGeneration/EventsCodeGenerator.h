@@ -6,6 +6,7 @@
 #pragma once
 
 #include <set>
+#include <unordered_map>
 #include <utility>
 #include <vector>
 
@@ -847,9 +848,38 @@ class GD_CORE_API EventsCodeGenerator {
       const gd::String &objectName, const gd::Instruction &instruction,
       const gd::InstructionMetadata &instrInfos, bool isObjectInGroup);
 
+  /**
+   * \brief Return the type of an object, memoizing the result for the lifetime
+   * of this code generator.
+   *
+   * `gd::ObjectsContainersList::GetTypeOfObject` does linear scans over the
+   * objects (and, for groups, over all their members), which becomes very
+   * expensive when many events reference the same objects or large groups. The
+   * objects are immutable during code generation, so caching object name ->
+   * type turns these repeated O(objects) lookups into O(1).
+   */
+  const gd::String &GetCachedTypeOfObject(const gd::String &objectName) const;
+
+  /**
+   * \brief Return the metadata of an object type, memoizing the result for the
+   * lifetime of this code generator.
+   *
+   * `gd::MetadataProvider::GetObjectMetadata` linearly scans every platform
+   * extension (rebuilding a types list each call) to find the type. This is
+   * called once per object (and per group member) during code generation, so
+   * caching object type -> metadata avoids repeating the scan.
+   */
+  const gd::ObjectMetadata &GetCachedObjectMetadata(
+      const gd::String &objectType) const;
+
   const gd::Platform& platform;  ///< The platform being used.
 
   gd::ProjectScopedContainers projectScopedContainers;
+
+  mutable std::unordered_map<gd::String, gd::String>
+      cachedObjectTypes;  ///< Memoization of GetTypeOfObject (see above).
+  mutable std::unordered_map<gd::String, const gd::ObjectMetadata *>
+      cachedObjectMetadata;  ///< Memoization of GetObjectMetadata (see above).
 
   bool hasProjectAndLayout;  ///< true only if project and layout are valid
                              ///< references. If false, they should not be used.

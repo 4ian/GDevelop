@@ -6,6 +6,7 @@ import Dialog from '../UI/Dialog';
 import FlatButton from '../UI/FlatButton';
 import RaisedButton from '../UI/RaisedButton';
 import Text from '../UI/Text';
+import { Tabs, type TabOptions } from '../UI/Tabs';
 import CompactSearchBar from '../UI/CompactSearchBar';
 import EmptyMessage from '../UI/EmptyMessage';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
@@ -17,12 +18,13 @@ import Store from '../UI/CustomSvgIcons/Store';
 import Upload from '../UI/CustomSvgIcons/Upload';
 import Object2d from '../UI/CustomSvgIcons/Object2d';
 import Behavior from '../UI/CustomSvgIcons/Behavior';
-import Settings from '../UI/CustomSvgIcons/Settings';
 import { enumerateFunctionsInFolder } from '../EventsFunctionsList/EnumerateFunctionFolderOrFunction';
 import { ExtensionOptionsEditor } from '../EventsFunctionsExtensionEditor/OptionsEditorDialog/ExtensionOptionsEditor';
+import { ExtensionDependenciesEditor } from '../EventsFunctionsExtensionEditor/OptionsEditorDialog/ExtensionDependenciesEditor';
 import ExtensionExporterDialog from '../EventsFunctionsExtensionEditor/OptionsEditorDialog/ExtensionExporterDialog';
 import EventsFunctionsExtensionsContext from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import { mapFor } from '../Utils/MapFor';
+import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 
 const gd: libGDevelop = global.gd;
 
@@ -57,6 +59,8 @@ type FunctionGroups = {|
   conditions: Array<ListedEntity>,
   expressions: Array<ListedEntity>,
 |};
+
+type ExtensionDetailsTab = 'properties' | 'dependencies' | 'content';
 
 const isStoreExtension = (
   eventsFunctionsExtension: gdEventsFunctionsExtension
@@ -475,8 +479,8 @@ const styles = {
   sectionBody: {
     padding: '4px 0 8px 0',
   },
-  propertiesEditor: {
-    padding: '12px 14px 14px 52px',
+  detailsTabContent: {
+    paddingTop: 8,
   },
   entityRow: {
     display: 'grid',
@@ -677,16 +681,12 @@ const ProjectExtensionProperties = ({
   const [isLoading, setIsLoading] = React.useState(false);
 
   return (
-    <CollapsibleSection title={<Trans>Properties</Trans>} icon={<Settings />}>
-      <div style={styles.propertiesEditor}>
-        <ExtensionOptionsEditor
-          eventsFunctionsExtension={eventsFunctionsExtension}
-          onLoadChange={setIsLoading}
-          isLoading={isLoading}
-          onChange={onExtensionPropertiesChanged}
-        />
-      </div>
-    </CollapsibleSection>
+    <ExtensionOptionsEditor
+      eventsFunctionsExtension={eventsFunctionsExtension}
+      onLoadChange={setIsLoading}
+      isLoading={isLoading}
+      onChange={onExtensionPropertiesChanged}
+    />
   );
 };
 
@@ -906,6 +906,63 @@ const SystemExtensionDetails = ({
   );
 };
 
+const ProjectExtensionDetailsTabs = ({
+  project,
+  resourceManagementProps,
+  eventsFunctionsExtension,
+  onExtensionPropertiesChanged,
+}: {|
+  project: gdProject,
+  resourceManagementProps: ResourceManagementProps,
+  eventsFunctionsExtension: gdEventsFunctionsExtension,
+  onExtensionPropertiesChanged: () => void,
+|}) => {
+  const [currentTab, setCurrentTab] = React.useState<ExtensionDetailsTab>(
+    'properties'
+  );
+  const tabOptions: TabOptions<ExtensionDetailsTab> = [
+    {
+      value: 'properties',
+      label: <Trans>Properties</Trans>,
+    },
+    {
+      value: 'dependencies',
+      label: <Trans>Dependencies</Trans>,
+    },
+    {
+      value: 'content',
+      label: <Trans>Content</Trans>,
+    },
+  ];
+
+  return (
+    <React.Fragment>
+      <Tabs value={currentTab} onChange={setCurrentTab} options={tabOptions} />
+      <div style={styles.detailsTabContent}>
+        {currentTab === 'properties' && (
+          <ProjectExtensionProperties
+            eventsFunctionsExtension={eventsFunctionsExtension}
+            onExtensionPropertiesChanged={onExtensionPropertiesChanged}
+          />
+        )}
+        {currentTab === 'dependencies' && (
+          <ExtensionDependenciesEditor
+            project={project}
+            resourceManagementProps={resourceManagementProps}
+            eventsFunctionsExtension={eventsFunctionsExtension}
+            onChange={onExtensionPropertiesChanged}
+          />
+        )}
+        {currentTab === 'content' && (
+          <ProjectExtensionDetails
+            eventsFunctionsExtension={eventsFunctionsExtension}
+          />
+        )}
+      </div>
+    </React.Fragment>
+  );
+};
+
 const ExtensionListEntry = ({
   entry,
   selected,
@@ -1013,6 +1070,7 @@ const ExtensionCategory = ({
 
 type Props = {|
   project: gdProject,
+  resourceManagementProps: ResourceManagementProps,
   onClose: () => void,
   onInstallExtension: () => void,
   onExtensionPropertiesChanged: () => void,
@@ -1026,6 +1084,7 @@ type Props = {|
 
 const ProjectExtensionsDialog = ({
   project,
+  resourceManagementProps,
   onClose,
   onInstallExtension,
   onExtensionPropertiesChanged,
@@ -1250,17 +1309,13 @@ const ProjectExtensionsDialog = ({
                 </div>
                 <ExtensionStats entry={selectedEntry} />
                 {selectedEntry.projectExtension ? (
-                  <React.Fragment>
-                    <ProjectExtensionProperties
-                      eventsFunctionsExtension={selectedEntry.projectExtension}
-                      onExtensionPropertiesChanged={
-                        onExtensionPropertiesChanged
-                      }
-                    />
-                    <ProjectExtensionDetails
-                      eventsFunctionsExtension={selectedEntry.projectExtension}
-                    />
-                  </React.Fragment>
+                  <ProjectExtensionDetailsTabs
+                    key={selectedEntry.id}
+                    project={project}
+                    resourceManagementProps={resourceManagementProps}
+                    eventsFunctionsExtension={selectedEntry.projectExtension}
+                    onExtensionPropertiesChanged={onExtensionPropertiesChanged}
+                  />
                 ) : selectedEntry.platformExtension ? (
                   <SystemExtensionDetails
                     platformExtension={selectedEntry.platformExtension}

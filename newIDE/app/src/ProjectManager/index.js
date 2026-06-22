@@ -15,6 +15,7 @@ import CreateEventsFunctionExtensionItemDialog, {
   type ExtensionItemKind,
   type CreateExtensionItemPayload,
 } from './CreateEventsFunctionExtensionItemDialog';
+import ExtensionFunctionSelectorDialog from '../EventsFunctionsExtensionEditor/ExtensionFunctionSelectorDialog';
 import CreateExternalDialog, {
   type CreateExternalPayload,
 } from './CreateExternalDialog';
@@ -116,6 +117,7 @@ import optionalRequire from '../Utils/OptionalRequire';
 import { useShouldAutofocusInput } from '../UI/Responsive/ScreenTypeMeasurer';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 import { enumerateFunctionsInFolder } from '../EventsFunctionsList/EnumerateFunctionFolderOrFunction';
+import { type EventsFunctionCreationParameters } from '../EventsFunctionsList/EventsFunctionTreeViewItemContent';
 import { projectManagerItemReactDndType } from './ProjectManagerItemDragAndDrop';
 
 const electron = optionalRequire('electron');
@@ -872,8 +874,26 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       createExtensionItemKind,
       setCreateExtensionItemKind,
     ] = React.useState<?ExtensionItemKind>(null);
+    const [
+      extensionFunctionSelectorDialogOpen,
+      setExtensionFunctionSelectorDialogOpen,
+    ] = React.useState(false);
+    const [
+      createExtensionFunctionParameters,
+      setCreateExtensionFunctionParameters,
+    ] = React.useState<?EventsFunctionCreationParameters>(null);
+    const closeCreateExtensionItemDialog = React.useCallback(() => {
+      setCreateExtensionItemKind(null);
+      setCreateExtensionFunctionParameters(null);
+    }, []);
     const openCreateExtensionItemDialog = React.useCallback(
       (itemKind: ExtensionItemKind) => {
+        setCreateExtensionFunctionParameters(null);
+        if (itemKind === 'function') {
+          setExtensionFunctionSelectorDialogOpen(true);
+          return;
+        }
+
         setCreateExtensionItemKind(itemKind);
       },
       []
@@ -1015,7 +1035,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
             )
           : project.getEventsFunctionsExtension(payload.extensionName);
 
-        setCreateExtensionItemKind(null);
+        closeCreateExtensionItemDialog();
 
         if (payload.itemKind === 'prefab') {
           const eventsBasedObjects = eventsFunctionsExtension.getEventsBasedObjects();
@@ -1107,6 +1127,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         openItems,
         project,
         scrollToItem,
+        closeCreateExtensionItemDialog,
       ]
     );
 
@@ -2249,6 +2270,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                     {project && projectExtensionsDialogOpen && (
                       <ProjectExtensionsDialog
                         project={project}
+                        resourceManagementProps={resourceManagementProps}
                         onClose={() => setProjectExtensionsDialogOpen(false)}
                         onInstallExtension={() => {
                           setProjectExtensionsDialogOpen(false);
@@ -2272,11 +2294,40 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                         }}
                       />
                     )}
+                    {project && extensionFunctionSelectorDialogOpen && (
+                      <ExtensionFunctionSelectorDialog
+                        onCancel={() => {
+                          setExtensionFunctionSelectorDialogOpen(false);
+                          setCreateExtensionFunctionParameters(null);
+                        }}
+                        onChoose={parameters => {
+                          setExtensionFunctionSelectorDialogOpen(false);
+                          setCreateExtensionFunctionParameters(parameters);
+                          setCreateExtensionItemKind('function');
+                        }}
+                      />
+                    )}
                     {project && createExtensionItemKind && (
                       <CreateEventsFunctionExtensionItemDialog
                         project={project}
                         itemKind={createExtensionItemKind}
-                        onCancel={() => setCreateExtensionItemKind(null)}
+                        initialFunctionName={
+                          createExtensionItemKind === 'function' &&
+                          createExtensionFunctionParameters
+                            ? createExtensionFunctionParameters.name
+                            : null
+                        }
+                        initialFunctionType={
+                          createExtensionItemKind === 'function' &&
+                          createExtensionFunctionParameters
+                            ? createExtensionFunctionParameters.functionType
+                            : undefined
+                        }
+                        isFunctionTypeDisabled={
+                          createExtensionItemKind === 'function' &&
+                          !!createExtensionFunctionParameters
+                        }
+                        onCancel={closeCreateExtensionItemDialog}
                         onCreate={onCreateExtensionItem}
                       />
                     )}

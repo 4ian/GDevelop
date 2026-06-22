@@ -17,7 +17,7 @@ import { getFunctionIconUrl } from '../EventsFunctionsList/EventsFunctionTreeVie
 const gd: libGDevelop = global.gd;
 
 type Props = {|
-  eventsFunctionsContainer: gdEventsFunctionsContainer,
+  eventsFunctionsContainer?: ?gdEventsFunctionsContainer,
   onCancel: () => void,
   onChoose: (parameters: EventsFunctionCreationParameters) => void,
 |};
@@ -138,9 +138,12 @@ export default function ExtensionFunctionSelectorDialog({
             <FunctionListItem
               functionType={gd.EventsFunction.Action}
               functionName="onFirstSceneLoaded"
-              disabled={eventsFunctionsContainer.hasEventsFunctionNamed(
-                'onFirstSceneLoaded'
-              )}
+              disabled={
+                !!eventsFunctionsContainer &&
+                eventsFunctionsContainer.hasEventsFunctionNamed(
+                  'onFirstSceneLoaded'
+                )
+              }
               description={
                 <Trans>
                   Events that will be run once when the first scene of the game
@@ -152,9 +155,10 @@ export default function ExtensionFunctionSelectorDialog({
             <FunctionListItem
               functionType={gd.EventsFunction.Action}
               functionName="onSceneLoaded"
-              disabled={eventsFunctionsContainer.hasEventsFunctionNamed(
-                'onSceneLoaded'
-              )}
+              disabled={
+                !!eventsFunctionsContainer &&
+                eventsFunctionsContainer.hasEventsFunctionNamed('onSceneLoaded')
+              }
               description={
                 <Trans>
                   Events that will be run once when a scene of the game is
@@ -166,9 +170,12 @@ export default function ExtensionFunctionSelectorDialog({
             <FunctionListItem
               functionType={gd.EventsFunction.Action}
               functionName="onScenePreEvents"
-              disabled={eventsFunctionsContainer.hasEventsFunctionNamed(
-                'onScenePreEvents'
-              )}
+              disabled={
+                !!eventsFunctionsContainer &&
+                eventsFunctionsContainer.hasEventsFunctionNamed(
+                  'onScenePreEvents'
+                )
+              }
               description={
                 <Trans>
                   Events that will be run at every frame (roughly 60 times per
@@ -180,9 +187,12 @@ export default function ExtensionFunctionSelectorDialog({
             <FunctionListItem
               functionType={gd.EventsFunction.Action}
               functionName="onScenePostEvents"
-              disabled={eventsFunctionsContainer.hasEventsFunctionNamed(
-                'onScenePostEvents'
-              )}
+              disabled={
+                !!eventsFunctionsContainer &&
+                eventsFunctionsContainer.hasEventsFunctionNamed(
+                  'onScenePostEvents'
+                )
+              }
               description={
                 <Trans>
                   Events that will be run at every frame (roughly 60 times per
@@ -194,9 +204,10 @@ export default function ExtensionFunctionSelectorDialog({
             <FunctionListItem
               functionType={gd.EventsFunction.Action}
               functionName="onScenePaused"
-              disabled={eventsFunctionsContainer.hasEventsFunctionNamed(
-                'onScenePaused'
-              )}
+              disabled={
+                !!eventsFunctionsContainer &&
+                eventsFunctionsContainer.hasEventsFunctionNamed('onScenePaused')
+              }
               description={
                 <Trans>
                   Events that will be run once when a scene is paused (another
@@ -208,9 +219,12 @@ export default function ExtensionFunctionSelectorDialog({
             <FunctionListItem
               functionType={gd.EventsFunction.Action}
               functionName="onSceneResumed"
-              disabled={eventsFunctionsContainer.hasEventsFunctionNamed(
-                'onSceneResumed'
-              )}
+              disabled={
+                !!eventsFunctionsContainer &&
+                eventsFunctionsContainer.hasEventsFunctionNamed(
+                  'onSceneResumed'
+                )
+              }
               description={
                 <Trans>
                   Events that will be run once when a scene is resumed (after it
@@ -222,9 +236,12 @@ export default function ExtensionFunctionSelectorDialog({
             <FunctionListItem
               functionType={gd.EventsFunction.Action}
               functionName="onSceneUnloading"
-              disabled={eventsFunctionsContainer.hasEventsFunctionNamed(
-                'onSceneUnloading'
-              )}
+              disabled={
+                !!eventsFunctionsContainer &&
+                eventsFunctionsContainer.hasEventsFunctionNamed(
+                  'onSceneUnloading'
+                )
+              }
               description={
                 <Trans>
                   Events that will be run once when a scene is about to be

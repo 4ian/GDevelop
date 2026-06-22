@@ -28,6 +28,9 @@ export type CreateExtensionItemPayload = {|
 type Props = {|
   project: gdProject,
   itemKind: ExtensionItemKind,
+  initialFunctionName?: ?string,
+  initialFunctionType?: EventsFunction_FunctionType,
+  isFunctionTypeDisabled?: boolean,
   onCancel: () => void,
   onCreate: CreateExtensionItemPayload => void,
 |};
@@ -44,6 +47,25 @@ const getDefaultItemName = (itemKind: ExtensionItemKind): string => {
   if (itemKind === 'prefab') return 'MyObject';
   if (itemKind === 'behavior') return 'MyBehavior';
   return 'Function';
+};
+
+const getFunctionTypeValue = (
+  functionType?: EventsFunction_FunctionType
+): string => {
+  if (functionType === gd.EventsFunction.Condition) return 'condition';
+  if (functionType === gd.EventsFunction.Expression) return 'expression';
+
+  return 'action';
+};
+
+const getFunctionTypeFromValue = (
+  functionType: string
+): EventsFunction_FunctionType => {
+  return functionType === 'condition'
+    ? gd.EventsFunction.Condition
+    : functionType === 'expression'
+    ? gd.EventsFunction.Expression
+    : gd.EventsFunction.Action;
 };
 
 const getDialogTitle = (itemKind: ExtensionItemKind): React.Node => {
@@ -94,18 +116,27 @@ const getExtensionItemExists = (
 const CreateEventsFunctionExtensionItemDialog = ({
   project,
   itemKind,
+  initialFunctionName,
+  initialFunctionType,
+  isFunctionTypeDisabled,
   onCancel,
   onCreate,
 }: Props): React.Node => {
   const projectExtensions = getProjectExtensions(project);
-  const [itemName, setItemName] = React.useState(getDefaultItemName(itemKind));
+  const [itemName, setItemName] = React.useState(
+    itemKind === 'function' && initialFunctionName
+      ? initialFunctionName
+      : getDefaultItemName(itemKind)
+  );
   const [extensionName, setExtensionName] = React.useState(
     projectExtensions.length > 0
       ? projectExtensions[0].getName()
       : createInNewExtensionValue
   );
   const [newExtensionName, setNewExtensionName] = React.useState('');
-  const [functionType, setFunctionType] = React.useState<string>('action');
+  const [functionType, setFunctionType] = React.useState<string>(
+    getFunctionTypeValue(initialFunctionType)
+  );
   const [
     prefabObjectDimension,
     setPrefabObjectDimension,
@@ -165,12 +196,7 @@ const CreateEventsFunctionExtensionItemDialog = ({
       extensionName: shouldCreateNewExtension ? '' : extensionName,
       newExtensionName: shouldCreateNewExtension ? trimmedNewExtensionName : '',
       prefabObjectDimension,
-      functionType:
-        functionType === 'condition'
-          ? gd.EventsFunction.Condition
-          : functionType === 'expression'
-          ? gd.EventsFunction.Expression
-          : gd.EventsFunction.Action,
+      functionType: getFunctionTypeFromValue(functionType),
     });
   };
 
@@ -246,6 +272,7 @@ const CreateEventsFunctionExtensionItemDialog = ({
               onChange={(event, index, value) => setFunctionType(value)}
               floatingLabelText={<Trans>Function type</Trans>}
               fullWidth
+              disabled={isFunctionTypeDisabled}
             >
               <SelectOption value="action" label={t`Action`} />
               <SelectOption value="condition" label={t`Condition`} />

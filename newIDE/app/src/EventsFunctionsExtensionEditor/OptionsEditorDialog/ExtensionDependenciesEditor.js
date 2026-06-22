@@ -45,6 +45,7 @@ const checkNameExists = (
 
 type Props = {|
   eventsFunctionsExtension: gdEventsFunctionsExtension,
+  onChange?: () => void,
 
   // For source files:
   project: gdProject,
@@ -53,11 +54,19 @@ type Props = {|
 
 export const ExtensionDependenciesEditor = ({
   eventsFunctionsExtension,
+  onChange,
   project,
   resourceManagementProps,
 }: Props): React.Node => {
   const deps = eventsFunctionsExtension.getAllDependencies();
   const forceUpdate = useForceUpdate();
+  const notifyChange = React.useCallback(
+    () => {
+      forceUpdate();
+      if (onChange) onChange();
+    },
+    [forceUpdate, onChange]
+  );
 
   const addDependency = () => {
     eventsFunctionsExtension
@@ -70,7 +79,7 @@ export const ExtensionDependenciesEditor = ({
       .setExportName('my-dependency')
       .setVersion('1.0.0')
       .setDependencyType('cordova');
-    forceUpdate();
+    notifyChange();
   };
 
   return (
@@ -127,7 +136,7 @@ export const ExtensionDependenciesEditor = ({
                           );
                         } else {
                           dependency.setName(newName);
-                          forceUpdate();
+                          notifyChange();
                         }
                       }}
                     />
@@ -141,7 +150,7 @@ export const ExtensionDependenciesEditor = ({
                           return;
 
                         dependency.setExportName(newExportName);
-                        forceUpdate();
+                        notifyChange();
                       }}
                     />
                   </TableRowColumn>
@@ -153,7 +162,7 @@ export const ExtensionDependenciesEditor = ({
                         if (newVersion === dependency.getVersion()) return;
 
                         dependency.setVersion(newVersion);
-                        forceUpdate();
+                        notifyChange();
                       }}
                     />
                   </TableRowColumn>
@@ -164,7 +173,7 @@ export const ExtensionDependenciesEditor = ({
                         if (newType === dependency.getDependencyType()) return;
 
                         dependency.setDependencyType(newType);
-                        forceUpdate();
+                        notifyChange();
                       }}
                     >
                       <SelectOption value="npm" label={t`NPM`} />
@@ -176,7 +185,7 @@ export const ExtensionDependenciesEditor = ({
                       tooltip={t`Delete`}
                       onClick={() => {
                         eventsFunctionsExtension.removeDependencyAt(index);
-                        forceUpdate();
+                        notifyChange();
                       }}
                       size="small"
                     >
@@ -249,7 +258,7 @@ export const ExtensionDependenciesEditor = ({
                       resourceName={sourceFile.getResourceName()}
                       onChange={newResourceName => {
                         sourceFile.setResourceName(newResourceName);
-                        forceUpdate();
+                        notifyChange();
                       }}
                     />
                   </TableRowColumn>
@@ -260,7 +269,7 @@ export const ExtensionDependenciesEditor = ({
                         if (newType === sourceFile.getIncludePosition()) return;
 
                         sourceFile.setIncludePosition(newType);
-                        forceUpdate();
+                        notifyChange();
                       }}
                     >
                       <SelectOption
@@ -278,7 +287,7 @@ export const ExtensionDependenciesEditor = ({
                       tooltip={t`Delete`}
                       onClick={() => {
                         eventsFunctionsExtension.removeSourceFileAt(index);
-                        forceUpdate();
+                        notifyChange();
                       }}
                       size="small"
                     >
@@ -298,7 +307,7 @@ export const ExtensionDependenciesEditor = ({
               label={<Trans>Add</Trans>}
               onClick={() => {
                 eventsFunctionsExtension.addSourceFile();
-                forceUpdate();
+                notifyChange();
               }}
             />
           </Line>

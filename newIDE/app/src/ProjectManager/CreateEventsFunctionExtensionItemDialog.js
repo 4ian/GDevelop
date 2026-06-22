@@ -148,6 +148,12 @@ const CreateEventsFunctionExtensionItemDialog = ({
   const selectedExtension = projectExtensions.find(
     extension => extension.getName() === extensionName
   );
+  const isFunctionNameDisabled =
+    itemKind === 'function' &&
+    !!initialFunctionName &&
+    gd.MetadataDeclarationHelper.isExtensionLifecycleEventsFunction(
+      initialFunctionName
+    );
 
   let itemNameError = null;
   if (!trimmedItemName) {
@@ -230,7 +236,8 @@ const CreateEventsFunctionExtensionItemDialog = ({
             floatingLabelText={getItemNameLabel(itemKind)}
             errorText={itemNameError}
             fullWidth
-            autoFocus="desktop"
+            disabled={isFunctionNameDisabled}
+            autoFocus={isFunctionNameDisabled ? undefined : 'desktop'}
           />
           <SelectField
             value={extensionName}

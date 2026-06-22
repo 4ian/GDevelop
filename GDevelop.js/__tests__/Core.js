@@ -2582,6 +2582,26 @@ describe('libGD.js', function () {
 
       action.delete();
     });
+
+    it('should use the default value of optional yes/no parameters when left empty', function () {
+      // `SetFullScreen` has a required yes/no parameter (PARAM1) and an
+      // optional yes/no parameter defaulting to "yes" (PARAM2).
+      let action = new gd.Instruction();
+      action.setType('SetFullScreen');
+      action.setParametersCount(3);
+
+      let formattedTexts = gd.InstructionSentenceFormatter.get().getAsFormattedText(
+        action,
+        gd.MetadataProvider.getActionMetadata(gd.JsPlatform.get(), 'SetFullScreen')
+      );
+
+      // An empty required parameter is rendered as "no"...
+      expect(formattedTexts.getString(1)).toBe('no');
+      // ...while an empty optional parameter falls back to its default value.
+      expect(formattedTexts.getString(3)).toBe('yes');
+
+      action.delete();
+    });
   });
 
   describe('EventsRefactorer', function () {

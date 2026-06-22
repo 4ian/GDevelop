@@ -2211,6 +2211,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                     {project && projectGlobalsDialogOpen && (
                       <ProjectGlobalsDialog
                         project={project}
+                        onChange={triggerUnsavedChanges}
                         onClose={() => setProjectGlobalsDialogOpen(false)}
                       />
                     )}

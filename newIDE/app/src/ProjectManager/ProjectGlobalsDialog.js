@@ -1,18 +1,25 @@
 // @flow
 import * as React from 'react';
-import { Trans } from '@lingui/macro';
+import { Trans, t } from '@lingui/macro';
 import Dialog from '../UI/Dialog';
 import FlatButton from '../UI/FlatButton';
+import IconButton from '../UI/IconButton';
 import Text from '../UI/Text';
 import { ColumnStackLayout } from '../UI/Layout';
 import { mapFor } from '../Utils/MapFor';
+import newNameGenerator from '../Utils/NewNameGenerator';
 import ObjectsRenderingService from '../ObjectsRendering/ObjectsRenderingService';
 import { CorsAwareImage } from '../UI/CorsAwareImage';
 import ListIcon from '../UI/ListIcon';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
+import { makeDragSourceAndDropTarget } from '../UI/DragAndDrop/DragSourceAndDropTarget';
+import { makeDropTarget } from '../UI/DragAndDrop/DropTarget';
+import Add from '../UI/CustomSvgIcons/Add';
+import Cross from '../UI/CustomSvgIcons/Cross';
 
 const globalObjectFallbackIcon = 'res/icons_default/global_object24_black.svg';
 const globalGroupFallbackIcon = 'res/icons_default/global_group24_black.svg';
+const globalObjectCardReactDndType = 'GLOBAL_OBJECT_CARD';
 
 type GlobalObjectRow = {|
   name: string,
@@ -27,13 +34,20 @@ type GlobalGroupObjectPreview = {|
 
 type GlobalGroupRow = {|
   name: string,
+  group: gdObjectGroup,
   objectNames: Array<string>,
   objectPreviews: Array<GlobalGroupObjectPreview>,
 |};
 
 type Props = {|
   project: gdProject,
+  onChange: () => void,
   onClose: () => void,
+|};
+
+type DraggedGlobalObject = {|
+  name: string,
+  thumbnail?: string,
 |};
 
 const styles = {
@@ -57,11 +71,17 @@ const styles = {
   },
   sectionHeader: {
     display: 'flex',
-    alignItems: 'baseline',
+    alignItems: 'center',
     justifyContent: 'space-between',
     gap: 12,
     flexWrap: 'wrap',
     marginBottom: 10,
+  },
+  sectionHeaderTitle: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 8,
+    minWidth: 0,
   },
   list: {
     display: 'grid',
@@ -76,6 +96,9 @@ const styles = {
     borderRadius: 8,
     padding: 12,
     minWidth: 0,
+  },
+  draggableCard: {
+    cursor: 'grab',
   },
   groupCard: {
     alignItems: 'start',
@@ -141,8 +164,21 @@ const styles = {
     borderRadius: 4,
     padding: '2px 6px',
     fontSize: 12,
+    fontFamily: 'inherit',
     lineHeight: '18px',
     overflowWrap: 'anywhere',
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: 'transparent',
+    cursor: 'pointer',
+    margin: 0,
+    textAlign: 'left',
+  },
+  objectBadgeIcon: {
+    width: 14,
+    height: 14,
+    flexShrink: 0,
   },
   emptySection: {
     borderRadius: 8,
@@ -173,6 +209,7 @@ const enumerateGlobalGroups = (project: gdProject): Array<GlobalGroupRow> => {
     const objectNames = group.getAllObjectsNames().toJSArray();
     return {
       name: group.getName(),
+      group,
       objectNames,
       objectPreviews: objectNames
         .filter(objectName => globalObjects.hasObjectNamed(objectName))
@@ -189,6 +226,43 @@ const enumerateGlobalGroups = (project: gdProject): Array<GlobalGroupRow> => {
     };
   });
 };
+
+const hasProjectObjectGroupOrVariableNamed = (
+  project: gdProject,
+  name: string
+): boolean => {
+  const globalObjects = project.getObjects();
+  if (
+    globalObjects.hasObjectNamed(name) ||
+    globalObjects.getObjectGroups().has(name) ||
+    project.getVariables().has(name)
+  ) {
+    return true;
+  }
+
+  for (let index = 0; index < project.getLayoutsCount(); index++) {
+    const layout = project.getLayoutAt(index);
+    const layoutObjects = layout.getObjects();
+    if (
+      layoutObjects.hasObjectNamed(name) ||
+      layoutObjects.getObjectGroups().has(name) ||
+      layout.getVariables().has(name)
+    ) {
+      return true;
+    }
+  }
+
+  return false;
+};
+
+const DraggableGlobalObjectCard = makeDragSourceAndDropTarget<DraggedGlobalObject>(
+  globalObjectCardReactDndType,
+  { vibrate: 30 }
+);
+
+const GlobalGroupDropTarget = makeDropTarget<DraggedGlobalObject>(
+  globalObjectCardReactDndType
+);
 
 const PreviewImage = ({
   thumbnail,
@@ -285,28 +359,196 @@ const GroupPreview = ({ group }: {| group: GlobalGroupRow |}) => {
 const SectionHeader = ({
   title,
   count,
+  action,
 }: {|
   title: React.Node,
   count: number,
+  action?: React.Node,
 |}) => (
   <div style={styles.sectionHeader}>
-    <Text noMargin size="block-title">
-      {title}
-    </Text>
+    <div style={styles.sectionHeaderTitle}>
+      <Text noMargin size="block-title">
+        {title}
+      </Text>
+      {action}
+    </div>
     <Text noMargin size="body-small" color="secondary">
       {count}
     </Text>
   </div>
 );
 
-const ProjectGlobalsDialog = ({ project, onClose }: Props): React.Node => {
+const ObjectCard = ({ object }: {| object: GlobalObjectRow |}) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
-  const globalObjects = React.useMemo(() => enumerateGlobalObjects(project), [
-    project,
-  ]);
-  const globalGroups = React.useMemo(() => enumerateGlobalGroups(project), [
-    project,
-  ]);
+
+  return (
+    <DraggableGlobalObjectCard
+      beginDrag={() => ({
+        name: object.name,
+        thumbnail: object.thumbnail || undefined,
+      })}
+      canDrop={() => false}
+      drop={() => {}}
+    >
+      {({ connectDragSource }) =>
+        connectDragSource(
+          <div
+            style={{
+              ...styles.card,
+              ...styles.draggableCard,
+              backgroundColor: gdevelopTheme.list.itemsBackgroundColor,
+            }}
+          >
+            <ObjectPreview object={object} />
+            <div style={styles.cardText}>
+              <div style={styles.nameLine}>
+                <Text
+                  noMargin
+                  allowSelection
+                  style={{ overflowWrap: 'anywhere' }}
+                >
+                  {object.name}
+                </Text>
+              </div>
+              <Text noMargin size="body-small" color="secondary" allowSelection>
+                <span style={styles.typeText}>{object.type}</span>
+              </Text>
+            </div>
+          </div>
+        )
+      }
+    </DraggableGlobalObjectCard>
+  );
+};
+
+const GroupCard = ({
+  group,
+  onAddObjectToGroup,
+  onRemoveObjectFromGroup,
+}: {|
+  group: GlobalGroupRow,
+  onAddObjectToGroup: (objectName: string, group: GlobalGroupRow) => void,
+  onRemoveObjectFromGroup: (objectName: string, group: GlobalGroupRow) => void,
+|}) => {
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
+
+  return (
+    <GlobalGroupDropTarget
+      canDrop={draggedObject => !group.objectNames.includes(draggedObject.name)}
+      drop={monitor => {
+        const draggedObject = monitor.getItem();
+        if (!draggedObject) return;
+        onAddObjectToGroup(draggedObject.name, group);
+      }}
+    >
+      {({ connectDropTarget, isOver, canDrop }) =>
+        connectDropTarget(
+          <div
+            style={{
+              ...styles.card,
+              ...styles.groupCard,
+              backgroundColor: gdevelopTheme.list.itemsBackgroundColor,
+              outline:
+                isOver && canDrop
+                  ? `2px solid ${gdevelopTheme.dropIndicator.canDrop}`
+                  : isOver
+                  ? `2px solid ${gdevelopTheme.dropIndicator.cannotDrop}`
+                  : undefined,
+            }}
+          >
+            <GroupPreview group={group} />
+            <div style={styles.cardText}>
+              <Text
+                noMargin
+                allowSelection
+                style={{ overflowWrap: 'anywhere' }}
+              >
+                {group.name}
+              </Text>
+              {group.objectNames.length ? (
+                <div style={styles.objects}>
+                  {group.objectNames.map(objectName => (
+                    <button
+                      type="button"
+                      key={objectName}
+                      title="Remove from group"
+                      aria-label={`Remove ${objectName} from group`}
+                      onClick={event => {
+                        event.stopPropagation();
+                        onRemoveObjectFromGroup(objectName, group);
+                      }}
+                      style={{
+                        ...styles.objectBadge,
+                        border: `1px solid ${
+                          gdevelopTheme.listItem.separatorColor
+                        }`,
+                        color: gdevelopTheme.text.color.primary,
+                      }}
+                    >
+                      {objectName}
+                      <Cross style={styles.objectBadgeIcon} />
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <Text noMargin size="body-small" color="secondary">
+                  <Trans>No objects in this group.</Trans>
+                </Text>
+              )}
+            </div>
+          </div>
+        )
+      }
+    </GlobalGroupDropTarget>
+  );
+};
+
+const ProjectGlobalsDialog = ({
+  project,
+  onChange,
+  onClose,
+}: Props): React.Node => {
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
+  const [, forceRefresh] = React.useState(0);
+  const globalObjects = enumerateGlobalObjects(project);
+  const globalGroups = enumerateGlobalGroups(project);
+
+  const onAddObjectToGroup = React.useCallback(
+    (objectName: string, group: GlobalGroupRow) => {
+      if (group.objectNames.includes(objectName)) return;
+
+      group.group.addObject(objectName);
+      onChange();
+      forceRefresh(key => key + 1);
+    },
+    [onChange]
+  );
+
+  const onRemoveObjectFromGroup = React.useCallback(
+    (objectName: string, group: GlobalGroupRow) => {
+      if (!group.objectNames.includes(objectName)) return;
+
+      group.group.removeObject(objectName);
+      onChange();
+      forceRefresh(key => key + 1);
+    },
+    [onChange]
+  );
+
+  const onCreateGroup = React.useCallback(
+    () => {
+      const globalObjectsContainer = project.getObjects();
+      const globalGroups = globalObjectsContainer.getObjectGroups();
+      const newGroupName = newNameGenerator('NewGroup', name =>
+        hasProjectObjectGroupOrVariableNamed(project, name)
+      );
+
+      globalGroups.insertNew(newGroupName, globalGroups.count());
+      onChange();
+      forceRefresh(key => key + 1);
+    },
+    [project, onChange]
+  );
 
   const actions: Array<?React.Node> = [
     <FlatButton key="close" label={<Trans>Close</Trans>} onClick={onClose} />,
@@ -359,34 +601,7 @@ const ProjectGlobalsDialog = ({ project, onClose }: Props): React.Node => {
             {globalObjects.length ? (
               <div style={styles.list}>
                 {globalObjects.map(object => (
-                  <div
-                    key={object.name}
-                    style={{
-                      ...styles.card,
-                      backgroundColor: gdevelopTheme.list.itemsBackgroundColor,
-                    }}
-                  >
-                    <ObjectPreview object={object} />
-                    <div style={styles.cardText}>
-                      <div style={styles.nameLine}>
-                        <Text
-                          noMargin
-                          allowSelection
-                          style={{ overflowWrap: 'anywhere' }}
-                        >
-                          {object.name}
-                        </Text>
-                      </div>
-                      <Text
-                        noMargin
-                        size="body-small"
-                        color="secondary"
-                        allowSelection
-                      >
-                        <span style={styles.typeText}>{object.type}</span>
-                      </Text>
-                    </div>
-                  </div>
+                  <ObjectCard key={object.name} object={object} />
                 ))}
               </div>
             ) : (
@@ -406,50 +621,26 @@ const ProjectGlobalsDialog = ({ project, onClose }: Props): React.Node => {
             <SectionHeader
               title={<Trans>Global groups</Trans>}
               count={globalGroups.length}
+              action={
+                <IconButton
+                  size="small"
+                  tooltip={t`Add a group`}
+                  aria-label="Add a group"
+                  onClick={onCreateGroup}
+                >
+                  <Add />
+                </IconButton>
+              }
             />
             {globalGroups.length ? (
               <div style={styles.list}>
                 {globalGroups.map(group => (
-                  <div
+                  <GroupCard
                     key={group.name}
-                    style={{
-                      ...styles.card,
-                      ...styles.groupCard,
-                      backgroundColor: gdevelopTheme.list.itemsBackgroundColor,
-                    }}
-                  >
-                    <GroupPreview group={group} />
-                    <div style={styles.cardText}>
-                      <Text
-                        noMargin
-                        allowSelection
-                        style={{ overflowWrap: 'anywhere' }}
-                      >
-                        {group.name}
-                      </Text>
-                      {group.objectNames.length ? (
-                        <div style={styles.objects}>
-                          {group.objectNames.map(objectName => (
-                            <span
-                              key={objectName}
-                              style={{
-                                ...styles.objectBadge,
-                                border: `1px solid ${
-                                  gdevelopTheme.listItem.separatorColor
-                                }`,
-                              }}
-                            >
-                              {objectName}
-                            </span>
-                          ))}
-                        </div>
-                      ) : (
-                        <Text noMargin size="body-small" color="secondary">
-                          <Trans>No objects in this group.</Trans>
-                        </Text>
-                      )}
-                    </div>
-                  </div>
+                    group={group}
+                    onAddObjectToGroup={onAddObjectToGroup}
+                    onRemoveObjectFromGroup={onRemoveObjectFromGroup}
+                  />
                 ))}
               </div>
             ) : (

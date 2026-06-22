@@ -17,9 +17,7 @@ import CreateEventsFunctionExtensionItemDialog, {
 } from './CreateEventsFunctionExtensionItemDialog';
 import ProjectItemUsageDialog from './ProjectItemUsageDialog';
 import { type ProjectItemUsageTarget } from './ProjectItemUsageFinder';
-import ProjectGlobalsDialog, {
-  type ProjectGlobalsDialogKind,
-} from './ProjectGlobalsDialog';
+import ProjectGlobalsDialog from './ProjectGlobalsDialog';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import ExtensionsSearchDialog from '../AssetStore/ExtensionStore/ExtensionsSearchDialog';
 import ScenePropertiesDialog from '../SceneEditor/ScenePropertiesDialog';
@@ -131,9 +129,6 @@ const gameShareItemId = getProjectManagerItemId('game-share');
 const globalsRootFolderId = getProjectManagerItemId('globals');
 const globalVariablesItemId = getProjectManagerItemId('global-variables');
 const globalObjectsItemId = getProjectManagerItemId('global-objects');
-const globalObjectGroupsItemId = getProjectManagerItemId(
-  'global-object-groups'
-);
 export const scenesRootFolderId: string = getProjectManagerItemId('scenes');
 export const customObjectsRootFolderId: string = getProjectManagerItemId(
   'custom-objects'
@@ -146,6 +141,9 @@ export const functionsRootFolderId: string = getProjectManagerItemId(
 );
 export const extensionsRootFolderId: string = getProjectManagerItemId(
   'extensions'
+);
+export const externalsRootFolderId: string = getProjectManagerItemId(
+  'externals'
 );
 export const externalEventsRootFolderId: string = getProjectManagerItemId(
   'external-events'
@@ -832,14 +830,11 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       setProjectVariablesEditorOpen(true);
     }, []);
     const [
-      globalsDialogKind,
-      setGlobalsDialogKind,
-    ] = React.useState<?ProjectGlobalsDialogKind>(null);
-    const openGlobalObjectsDialog = React.useCallback(() => {
-      setGlobalsDialogKind('objects');
-    }, []);
-    const openGlobalGroupsDialog = React.useCallback(() => {
-      setGlobalsDialogKind('groups');
+      projectGlobalsDialogOpen,
+      setProjectGlobalsDialogOpen,
+    ] = React.useState(false);
+    const openProjectGlobalsDialog = React.useCallback(() => {
+      setProjectGlobalsDialogOpen(true);
     }, []);
 
     const [
@@ -1157,6 +1152,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         );
         if (treeViewRef.current) {
           treeViewRef.current.openItems([
+            externalsRootFolderId,
             externalEventsItemId,
             externalEventsRootFolderId,
           ]);
@@ -1197,6 +1193,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         );
         if (treeViewRef.current) {
           treeViewRef.current.openItems([
+            externalsRootFolderId,
             externalLayoutItemId,
             externalLayoutsRootFolderId,
           ]);
@@ -1526,7 +1523,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                 isRoot: true,
                 content: new LabelTreeViewItemContent(
                   gameSettingsRootFolderId,
-                  i18n._(t`Game settings`)
+                  i18n._(t`Settings`)
                 ),
                 getChildren(i18n: I18nType): ?Array<TreeViewItem> {
                   return [
@@ -1584,17 +1581,9 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                     new LeafTreeViewItem(
                       new ActionTreeViewItemContent(
                         globalObjectsItemId,
-                        i18n._(t`Global objects`),
-                        openGlobalObjectsDialog,
+                        i18n._(t`Global objects and groups`),
+                        openProjectGlobalsDialog,
                         'res/icons_default/global_object24_black.svg'
-                      )
-                    ),
-                    new LeafTreeViewItem(
-                      new ActionTreeViewItemContent(
-                        globalObjectGroupsItemId,
-                        i18n._(t`Global groups`),
-                        openGlobalGroupsDialog,
-                        'res/icons_default/global_group24_black.svg'
                       )
                     ),
                   ];
@@ -1842,77 +1831,86 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
               {
                 isRoot: true,
                 content: new LabelTreeViewItemContent(
-                  externalEventsRootFolderId,
-                  i18n._(t`External events`),
-                  {
-                    icon: <Add />,
-                    label: i18n._(t`Add external events`),
-                    click: () => {
-                      // TODO Add after selected scene?
-                      const index = project.getExternalEventsCount() - 1;
-                      addExternalEvents(index, i18n);
-                    },
-                    id: 'add-new-external-events-button',
-                  }
+                  externalsRootFolderId,
+                  i18n._(t`Externals`)
                 ),
                 getChildren(i18n: I18nType): ?Array<TreeViewItem> {
-                  if (project.getExternalEventsCount() === 0) {
-                    return [
-                      new PlaceHolderTreeViewItem(
-                        externalEventsEmptyPlaceholderId,
-                        i18n._(t`Start by adding new external events.`)
+                  return [
+                    {
+                      content: new LabelTreeViewItemContent(
+                        externalEventsRootFolderId,
+                        i18n._(t`External events`),
+                        {
+                          icon: <Add />,
+                          label: i18n._(t`Add external events`),
+                          click: () => {
+                            // TODO Add after selected scene?
+                            const index = project.getExternalEventsCount() - 1;
+                            addExternalEvents(index, i18n);
+                          },
+                          id: 'add-new-external-events-button',
+                        }
                       ),
-                    ];
-                  }
-                  return mapFor(
-                    0,
-                    project.getExternalEventsCount(),
-                    i =>
-                      new LeafTreeViewItem(
-                        new ExternalEventsTreeViewItemContent(
-                          project.getExternalEventsAt(i),
-                          externalEventsTreeViewItemProps
-                        )
-                      )
-                  );
-                },
-              },
-              {
-                isRoot: true,
-                content: new LabelTreeViewItemContent(
-                  externalLayoutsRootFolderId,
-                  i18n._(t`External layouts`),
-                  {
-                    icon: <Add />,
-                    label: i18n._(t`Add an external layout`),
-                    click: () => {
-                      // TODO Add after selected scene?
-                      const index = project.getExternalLayoutsCount() - 1;
-                      addExternalLayout(index, i18n);
+                      getChildren(i18n: I18nType): ?Array<TreeViewItem> {
+                        if (project.getExternalEventsCount() === 0) {
+                          return [
+                            new PlaceHolderTreeViewItem(
+                              externalEventsEmptyPlaceholderId,
+                              i18n._(t`Start by adding new external events.`)
+                            ),
+                          ];
+                        }
+                        return mapFor(
+                          0,
+                          project.getExternalEventsCount(),
+                          i =>
+                            new LeafTreeViewItem(
+                              new ExternalEventsTreeViewItemContent(
+                                project.getExternalEventsAt(i),
+                                externalEventsTreeViewItemProps
+                              )
+                            )
+                        );
+                      },
                     },
-                    id: 'add-new-external-layout-button',
-                  }
-                ),
-                getChildren(i18n: I18nType): ?Array<TreeViewItem> {
-                  if (project.getExternalLayoutsCount() === 0) {
-                    return [
-                      new PlaceHolderTreeViewItem(
-                        externalLayoutEmptyPlaceholderId,
-                        i18n._(t`Start by adding a new external layout.`)
+                    {
+                      content: new LabelTreeViewItemContent(
+                        externalLayoutsRootFolderId,
+                        i18n._(t`External layouts`),
+                        {
+                          icon: <Add />,
+                          label: i18n._(t`Add an external layout`),
+                          click: () => {
+                            // TODO Add after selected scene?
+                            const index = project.getExternalLayoutsCount() - 1;
+                            addExternalLayout(index, i18n);
+                          },
+                          id: 'add-new-external-layout-button',
+                        }
                       ),
-                    ];
-                  }
-                  return mapFor(
-                    0,
-                    project.getExternalLayoutsCount(),
-                    i =>
-                      new LeafTreeViewItem(
-                        new ExternalLayoutTreeViewItemContent(
-                          project.getExternalLayoutAt(i),
-                          externalLayoutTreeViewItemProps
-                        )
-                      )
-                  );
+                      getChildren(i18n: I18nType): ?Array<TreeViewItem> {
+                        if (project.getExternalLayoutsCount() === 0) {
+                          return [
+                            new PlaceHolderTreeViewItem(
+                              externalLayoutEmptyPlaceholderId,
+                              i18n._(t`Start by adding a new external layout.`)
+                            ),
+                          ];
+                        }
+                        return mapFor(
+                          0,
+                          project.getExternalLayoutsCount(),
+                          i =>
+                            new LeafTreeViewItem(
+                              new ExternalLayoutTreeViewItemContent(
+                                project.getExternalLayoutAt(i),
+                                externalLayoutTreeViewItemProps
+                              )
+                            )
+                        );
+                      },
+                    },
+                  ];
                 },
               },
             ];
@@ -1932,8 +1930,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         openProjectProperties,
         openCreateExtensionItemDialog,
         openProjectVariables,
-        openGlobalObjectsDialog,
-        openGlobalGroupsDialog,
+        openProjectGlobalsDialog,
         project,
         sceneTreeViewItemProps,
       ]
@@ -2003,6 +2000,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
           customObjectsRootFolderId,
           behaviorsRootFolderId,
           functionsRootFolderId,
+          externalsRootFolderId,
           externalEventsRootFolderId,
           externalLayoutsRootFolderId,
         ];
@@ -2210,11 +2208,10 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                         initiallySelectedVariable={null}
                       />
                     )}
-                    {project && globalsDialogKind && (
+                    {project && projectGlobalsDialogOpen && (
                       <ProjectGlobalsDialog
                         project={project}
-                        kind={globalsDialogKind}
-                        onClose={() => setGlobalsDialogKind(null)}
+                        onClose={() => setProjectGlobalsDialogOpen(false)}
                       />
                     )}
                     {!!editedPropertiesLayout &&

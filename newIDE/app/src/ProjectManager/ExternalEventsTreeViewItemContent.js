@@ -13,6 +13,7 @@ import {
 import {
   type TreeViewItemContent,
   type TreeItemProps,
+  externalsRootFolderId,
   externalEventsRootFolderId,
 } from '.';
 import { type HTMLDataset } from '../Utils/HTMLDataset';
@@ -62,7 +63,10 @@ export class ExternalEventsTreeViewItemContent implements TreeViewItemContent {
   }
 
   isDescendantOf(itemContent: TreeViewItemContent): boolean {
-    return itemContent.getId() === externalEventsRootFolderId;
+    return (
+      itemContent.getId() === externalsRootFolderId ||
+      itemContent.getId() === externalEventsRootFolderId
+    );
   }
 
   getRootId(): string {

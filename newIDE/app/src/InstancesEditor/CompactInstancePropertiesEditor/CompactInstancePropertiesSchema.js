@@ -6,6 +6,7 @@ import { t } from '@lingui/macro';
 
 import {
   type Schema,
+  type Field,
   type SectionTitle,
 } from '../../PropertiesEditor/PropertiesEditorSchema';
 import enumerateLayers from '../../LayersList/EnumerateLayers';
@@ -71,7 +72,11 @@ const getEditObjectButton = ({
     onEditObject(instance.getObjectName()),
 });
 
-const getRotationXAndRotationYFields = ({ i18n }: {| i18n: I18nType |}) => [
+const getRotationXAndRotationYFields = ({
+  i18n,
+}: {|
+  i18n: I18nType,
+|}): Schema => [
   {
     name: 'Rotation X',
     getLabel: () => i18n._(t`Rotation (X)`),
@@ -79,7 +84,6 @@ const getRotationXAndRotationYFields = ({ i18n }: {| i18n: I18nType |}) => [
     getValue: (instance: gdInitialInstance) => instance.getRotationX(),
     setValue: (instance: gdInitialInstance, newValue: number) =>
       instance.setRotationX(newValue),
-    // $FlowFixMe[missing-local-annot]
     renderLeftIcon: className => <RotateX className={className} />,
   },
   {
@@ -89,18 +93,16 @@ const getRotationXAndRotationYFields = ({ i18n }: {| i18n: I18nType |}) => [
     getValue: (instance: gdInitialInstance) => instance.getRotationY(),
     setValue: (instance: gdInitialInstance, newValue: number) =>
       instance.setRotationY(newValue),
-    // $FlowFixMe[missing-local-annot]
     renderLeftIcon: className => <RotateY className={className} />,
   },
 ];
-const getRotationZField = ({ i18n }: {| i18n: I18nType |}) => ({
+const getRotationZField = ({ i18n }: {| i18n: I18nType |}): Field => ({
   name: 'Angle',
   getLabel: () => i18n._(t`Rotation (Z)`),
   valueType: 'number',
   getValue: (instance: gdInitialInstance) => instance.getAngle(),
   setValue: (instance: gdInitialInstance, newValue: number) =>
     instance.setAngle(newValue),
-  // $FlowFixMe[missing-local-annot]
   renderLeftIcon: className => <RotateZ className={className} />,
 });
 const getXAndYFields = ({ i18n }: {| i18n: I18nType |}): Schema => [
@@ -123,14 +125,13 @@ const getXAndYFields = ({ i18n }: {| i18n: I18nType |}): Schema => [
     renderLeftIcon: className => <LetterY className={className} />,
   },
 ];
-const getZField = ({ i18n }: {| i18n: I18nType |}) => ({
+const getZField = ({ i18n }: {| i18n: I18nType |}): Field => ({
   name: 'Z',
   getLabel: () => i18n._(t`Z`),
   valueType: 'number',
   getValue: (instance: gdInitialInstance) => instance.getZ(),
   setValue: (instance: gdInitialInstance, newValue: number) =>
     instance.setZ(newValue),
-  // $FlowFixMe[missing-local-annot]
   renderLeftIcon: className => <LetterZ className={className} />,
 });
 const getLayerField = ({
@@ -139,7 +140,7 @@ const getLayerField = ({
 }: {|
   i18n: I18nType,
   layersContainer: gdLayersContainer,
-|}) => ({
+|}): Field => ({
   name: 'Layer',
   getLabel: () => i18n._(t`Layer`),
   valueType: 'string',
@@ -147,21 +148,19 @@ const getLayerField = ({
   getValue: (instance: gdInitialInstance) => instance.getLayer(),
   setValue: (instance: gdInitialInstance, newValue: string) =>
     instance.setLayer(newValue),
-  // $FlowFixMe[missing-local-annot]
   renderLeftIcon: className => <Layers className={className} />,
 });
-const getZOrderField = ({ i18n }: {| i18n: I18nType |}) => ({
+const getZOrderField = ({ i18n }: {| i18n: I18nType |}): Field => ({
   name: 'Z Order',
   getLabel: () => i18n._(t`Z Order`),
   valueType: 'number',
   getValue: (instance: gdInitialInstance) => instance.getZOrder(),
   setValue: (instance: gdInitialInstance, newValue: number) =>
     instance.setZOrder(newValue),
-  // $FlowFixMe[missing-local-annot]
   renderLeftIcon: className => <LetterZ className={className} />,
 });
 
-const getTitleRow = ({ i18n }: {| i18n: I18nType |}) => ({
+const getTitleRow = ({ i18n }: {| i18n: I18nType |}): Field => ({
   name: 'Title',
   type: 'row',
   preventWrap: true,
@@ -169,7 +168,6 @@ const getTitleRow = ({ i18n }: {| i18n: I18nType |}) => ({
     {
       name: 'Instance',
       title: i18n._(t`Instance`),
-      // $FlowFixMe[missing-local-annot]
       renderLeftIcon: className => (
         <Instance className={className} style={styles.icon} />
       ),
@@ -186,7 +184,6 @@ const getTitleRow = ({ i18n }: {| i18n: I18nType |}) => ({
           ? i18n._(t`Prevent selection in the editor`)
           : i18n._(t`Lock position/angle in the editor`),
       valueType: 'enumIcon',
-      // $FlowFixMe[missing-local-annot]
       renderIcon: value =>
         value === 'sealed' ? (
           <RemoveCircle style={styles.icon} />
@@ -195,7 +192,6 @@ const getTitleRow = ({ i18n }: {| i18n: I18nType |}) => ({
         ) : (
           <LockOpen style={styles.icon} />
         ),
-      // $FlowFixMe[missing-local-annot]
       isHighlighted: value => value === 'locked' || value === 'sealed',
       getValue: (instance: gdInitialInstance) =>
         instance.isSealed()
@@ -235,7 +231,7 @@ const getWidthField = ({
   getInstanceHeight: gdInitialInstance => number,
   getInstanceDepth: gdInitialInstance => number,
   forceUpdate: () => void,
-|}) => ({
+|}): Field => ({
   name: 'Width',
   getLabel: () => i18n._(t`Width`),
   valueType: 'number',
@@ -271,11 +267,9 @@ const getWidthField = ({
     instance.setHasCustomDepth(true);
     forceUpdate();
   },
-  // $FlowFixMe[missing-local-annot]
   renderLeftIcon: className => <LetterW className={className} />,
   getEndAdornmentIcon: (instance: gdInitialInstance) => {
     if (instance.hasCustomDepth() || instance.hasCustomSize()) {
-      // $FlowFixMe[missing-local-annot]
       return className => <Restore className={className} />;
     }
     return null;
@@ -298,7 +292,7 @@ const getHeightField = ({
   getInstanceHeight: gdInitialInstance => number,
   getInstanceDepth: gdInitialInstance => number,
   forceUpdate: () => void,
-|}) => ({
+|}): Field => ({
   name: 'Height',
   getLabel: () => i18n._(t`Height`),
   valueType: 'number',
@@ -334,11 +328,9 @@ const getHeightField = ({
     instance.setHasCustomDepth(true);
     forceUpdate();
   },
-  // $FlowFixMe[missing-local-annot]
   renderLeftIcon: className => <LetterH className={className} />,
   getEndAdornmentIcon: (instance: gdInitialInstance) => {
     if (instance.hasCustomDepth() || instance.hasCustomSize()) {
-      // $FlowFixMe[missing-local-annot]
       return className => <Restore className={className} />;
     }
     return null;
@@ -361,7 +353,7 @@ const getDepthField = ({
   getInstanceHeight: gdInitialInstance => number,
   getInstanceDepth: gdInitialInstance => number,
   forceUpdate: () => void,
-|}) => ({
+|}): Field => ({
   name: 'Depth',
   getLabel: () => i18n._(t`Depth`),
   valueType: 'number',
@@ -397,11 +389,9 @@ const getDepthField = ({
     instance.setHasCustomDepth(true);
     forceUpdate();
   },
-  // $FlowFixMe[missing-local-annot]
   renderLeftIcon: className => <LetterD className={className} />,
   getEndAdornmentIcon: (instance: gdInitialInstance) => {
     if (instance.hasCustomDepth() || instance.hasCustomSize()) {
-      // $FlowFixMe[missing-local-annot]
       return className => <Restore className={className} />;
     }
     return null;
@@ -424,13 +414,11 @@ const getKeepRatioField = ({
   getInstanceHeight: gdInitialInstance => number,
   getInstanceDepth: gdInitialInstance => number,
   forceUpdate: () => void,
-|}) => ({
+|}): Field => ({
   name: 'Keep ratio',
   getLabel: () => i18n._(t`Keep ratio`),
   valueType: 'enumIcon',
-  // $FlowFixMe[missing-local-annot]
   isHighlighted: value => value,
-  // $FlowFixMe[missing-local-annot]
   renderIcon: value =>
     value ? <Link style={styles.icon} /> : <Unlink style={styles.icon} />,
   getValue: (instance: gdInitialInstance) => instance.shouldKeepRatio(),
@@ -439,7 +427,7 @@ const getKeepRatioField = ({
   getNextValue: (currentValue: boolean) => !currentValue,
 });
 
-const getOpacityField = ({ i18n }: {| i18n: I18nType |}) => ({
+const getOpacityField = ({ i18n }: {| i18n: I18nType |}): Field => ({
   name: 'Opacity',
   getLabel: () => i18n._(t`Opacity`),
   valueType: 'number',
@@ -452,7 +440,6 @@ const getOpacityField = ({ i18n }: {| i18n: I18nType |}) => ({
     const opacity = Math.max(0, Math.min(255, newOpacity));
     instance.setOpacity(opacity);
   },
-  // $FlowFixMe[missing-local-annot]
   renderLeftIcon: className => <Opacity className={className} />,
   getDisplayedValueFromValue: (value: string): string => {
     return `${value}%`;
@@ -468,13 +455,12 @@ const getFlippableButtons = ({
 }: {|
   i18n: I18nType,
   canFlipZ: boolean,
-|}) => ({
+|}): Field => ({
   name: 'Flip',
   nonFieldType: 'toggleButtons',
   buttons: [
     {
       name: 'Flip horizontal',
-      // $FlowFixMe[missing-local-annot]
       renderIcon: className => <FlipHorizontal className={className} />,
       tooltip: i18n._(t`Flip horizontally`),
       getValue: (instance: gdInitialInstance): boolean => instance.isFlippedX(),
@@ -484,25 +470,25 @@ const getFlippableButtons = ({
     {
       name: 'Flip vertical',
       tooltip: i18n._(t`Flip vertically`),
-      // $FlowFixMe[missing-local-annot]
       renderIcon: className => <FlipVertical className={className} />,
       getValue: (instance: gdInitialInstance): boolean => instance.isFlippedY(),
       setValue: (instance: gdInitialInstance, newValue: boolean) =>
         instance.setFlippedY(newValue),
     },
-    canFlipZ
-      ? {
-          name: 'Flip Z',
-          tooltip: i18n._(t` Flip along Z axis`),
-          // $FlowFixMe[missing-local-annot]
-          renderIcon: className => <FlipZ className={className} />,
-          getValue: (instance: gdInitialInstance): boolean =>
-            instance.isFlippedZ(),
-          setValue: (instance: gdInitialInstance, newValue: boolean) =>
-            instance.setFlippedZ(newValue),
-        }
-      : null,
-  ].filter(Boolean),
+    ...(canFlipZ
+      ? [
+          {
+            name: 'Flip Z',
+            tooltip: i18n._(t` Flip along Z axis`),
+            renderIcon: className => <FlipZ className={className} />,
+            getValue: (instance: gdInitialInstance): boolean =>
+              instance.isFlippedZ(),
+            setValue: (instance: gdInitialInstance, newValue: boolean) =>
+              instance.setFlippedZ(newValue),
+          },
+        ]
+      : []),
+  ],
 });
 
 export const makeSchema = ({

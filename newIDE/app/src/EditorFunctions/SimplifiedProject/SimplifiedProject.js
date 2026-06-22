@@ -125,8 +125,7 @@ export const makeSimplifiedProjectBuilder = (
   const getSimplifiedVariable = (
     name: string,
     variable: gdVariable,
-    // $FlowFixMe[missing-local-annot]
-    depth = 0
+    depth: number = 0
   ): SimplifiedVariable => {
     const isCollection = isCollectionVariable(variable);
 

@@ -163,8 +163,7 @@ export const CompactInstancePropertiesEditor = ({
     ? exceptionallyGuardAgainstDeadObject(instance.getVariables())
     : null;
 
-  // $FlowFixMe[missing-local-annot]
-  const onScrollY = React.useCallback(deltaY => {
+  const onScrollY = React.useCallback((deltaY: number) => {
     if (scrollViewRef.current) {
       scrollViewRef.current.scrollBy(deltaY);
     }

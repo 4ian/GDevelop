@@ -280,8 +280,7 @@ const CompactPropertiesEditor = ({
             instances,
             field,
           }),
-          // $FlowFixMe[missing-local-annot]
-          onChange: newValue => {
+          onChange: (newValue: number) => {
             // If the value is not a number, the user is probably still typing, adding a dot or a comma.
             // So don't update the value, it will be reverted if they leave the field.
             if (isNaN(newValue)) return;
@@ -423,8 +422,7 @@ const CompactPropertiesEditor = ({
             field,
             mixedValueFallback: '(Multiple values)',
           }),
-          // $FlowFixMe[missing-local-annot]
-          onChange: newValue => {
+          onChange: (newValue: string) => {
             instances.forEach(i => setValue(i, newValue || ''));
             onFieldChanged({
               instances,

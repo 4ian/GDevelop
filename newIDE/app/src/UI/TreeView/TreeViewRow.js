@@ -131,8 +131,9 @@ type Props<Item> = {|
   isScrolling?: boolean,
 |};
 
-// $FlowFixMe[missing-local-annot]
-const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
+const TreeViewRow = <Item: ItemBaseAttributes>(
+  props: Props<Item>
+): React.Node => {
   const { data, index, style } = props;
   const {
     flattenedData,

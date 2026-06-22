@@ -25,6 +25,7 @@ class BehaviorsSharedData;
 class PlatformExtension;
 class LayoutEditorCanvas;
 class ProjectExporter;
+class PlatformMetadataIndex;
 }  // namespace gd
 
 typedef std::function<std::unique_ptr<gd::ObjectConfiguration>()>
@@ -117,6 +118,15 @@ class GD_CORE_API Platform {
   };
 
   /**
+   * \brief Get the (lazily built) index of all the metadata declared by the
+   * platform's extensions, allowing constant-time lookups by gd::MetadataProvider.
+   *
+   * \note The index is discarded whenever extensions change (see AddExtension
+   * and RemoveExtension), so it never returns stale metadata.
+   */
+  const gd::PlatformMetadataIndex& GetMetadataIndex() const;
+
+  /**
    * \brief Remove an extension from the platform.
    *
    * Events, objects, behaviors provided by the extension won't be available
@@ -174,6 +184,12 @@ class GD_CORE_API Platform {
       instructionOrExpressionGroupMetadata;
   static InstructionOrExpressionGroupMetadata badInstructionOrExpressionGroupMetadata;
   bool enableExtensionLoadingLogs;
+
+  /// Lazily built metadata index, discarded whenever extensions change.
+  /// A shared_ptr (rather than unique_ptr) keeps gd::Platform copyable; copies
+  /// share the index until either one changes its extensions, which resets only
+  /// that instance's pointer and rebuilds it independently.
+  mutable std::shared_ptr<gd::PlatformMetadataIndex> metadataIndex;
 };
 
 }  // namespace gd

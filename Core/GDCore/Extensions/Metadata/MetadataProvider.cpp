@@ -11,6 +11,7 @@
 #include "GDCore/Extensions/Metadata/EffectMetadata.h"
 #include "GDCore/Extensions/Metadata/InstructionMetadata.h"
 #include "GDCore/Extensions/Metadata/ObjectMetadata.h"
+#include "GDCore/Extensions/Metadata/PlatformMetadataIndex.h"
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/Project/Layout.h"  // For GetTypeOfObject and GetTypeOfBehavior
@@ -29,319 +30,206 @@ gd::InstructionMetadata MetadataProvider::badInstructionMetadata;
 gd::ExpressionMetadata MetadataProvider::badExpressionMetadata;
 gd::PlatformExtension MetadataProvider::badExtension;
 
+// The lookups below all delegate to the platform's gd::PlatformMetadataIndex,
+// which resolves a type to its metadata in constant time (instead of scanning
+// every extension). The index is rebuilt by the platform whenever its
+// extensions change, so the returned pointers are never stale.
+
 ExtensionAndMetadata<BehaviorMetadata>
 MetadataProvider::GetExtensionAndBehaviorMetadata(const gd::Platform& platform,
                                                   gd::String behaviorType) {
-  for (auto& extension : platform.GetAllPlatformExtensions()) {
-    if (extension->HasBehavior(behaviorType))
-      return ExtensionAndMetadata<BehaviorMetadata>(
-          *extension, extension->GetBehaviorMetadata(behaviorType));
-  }
-
-  return ExtensionAndMetadata<BehaviorMetadata>(badExtension, badBehaviorMetadata);
+  const auto* entry = platform.GetMetadataIndex().GetBehaviorMetadata(behaviorType);
+  if (entry == nullptr)
+    return ExtensionAndMetadata<BehaviorMetadata>(badExtension, badBehaviorMetadata);
+  return ExtensionAndMetadata<BehaviorMetadata>(*entry->extension, *entry->metadata);
 }
 
 const BehaviorMetadata& MetadataProvider::GetBehaviorMetadata(
     const gd::Platform& platform, gd::String behaviorType) {
-  return GetExtensionAndBehaviorMetadata(platform, behaviorType).GetMetadata();
+  const auto* entry = platform.GetMetadataIndex().GetBehaviorMetadata(behaviorType);
+  return entry != nullptr ? *entry->metadata : badBehaviorMetadata;
 }
 
 ExtensionAndMetadata<ObjectMetadata>
 MetadataProvider::GetExtensionAndObjectMetadata(const gd::Platform& platform,
-                                                gd::String objectType) {
-  for (auto& extension : platform.GetAllPlatformExtensions()) {
-    auto objectsTypes = extension->GetExtensionObjectsTypes();
-    for (std::size_t j = 0; j < objectsTypes.size(); ++j) {
-      if (objectsTypes[j] == objectType)
-        return ExtensionAndMetadata<ObjectMetadata>(
-            *extension, extension->GetObjectMetadata(objectType));
-    }
-  }
-
-  return ExtensionAndMetadata<ObjectMetadata>(badExtension, badObjectInfo);
+                                                gd::String type) {
+  const auto* entry = platform.GetMetadataIndex().GetObjectMetadata(type);
+  if (entry == nullptr)
+    return ExtensionAndMetadata<ObjectMetadata>(badExtension, badObjectInfo);
+  return ExtensionAndMetadata<ObjectMetadata>(*entry->extension, *entry->metadata);
 }
 
 const ObjectMetadata& MetadataProvider::GetObjectMetadata(
-    const gd::Platform& platform, gd::String objectType) {
-  return GetExtensionAndObjectMetadata(platform, objectType).GetMetadata();
+    const gd::Platform& platform, gd::String type) {
+  const auto* entry = platform.GetMetadataIndex().GetObjectMetadata(type);
+  return entry != nullptr ? *entry->metadata : badObjectInfo;
 }
 
 ExtensionAndMetadata<EffectMetadata>
 MetadataProvider::GetExtensionAndEffectMetadata(const gd::Platform& platform,
                                                 gd::String type) {
-  for (auto& extension : platform.GetAllPlatformExtensions()) {
-    auto objectsTypes = extension->GetExtensionEffectTypes();
-    for (std::size_t j = 0; j < objectsTypes.size(); ++j) {
-      if (objectsTypes[j] == type)
-        return ExtensionAndMetadata<EffectMetadata>(
-            *extension, extension->GetEffectMetadata(type));
-    }
-  }
-
-  return ExtensionAndMetadata<EffectMetadata>(badExtension, badEffectMetadata);
+  const auto* entry = platform.GetMetadataIndex().GetEffectMetadata(type);
+  if (entry == nullptr)
+    return ExtensionAndMetadata<EffectMetadata>(badExtension, badEffectMetadata);
+  return ExtensionAndMetadata<EffectMetadata>(*entry->extension, *entry->metadata);
 }
 
 const EffectMetadata& MetadataProvider::GetEffectMetadata(
-    const gd::Platform& platform, gd::String objectType) {
-  return GetExtensionAndEffectMetadata(platform, objectType).GetMetadata();
+    const gd::Platform& platform, gd::String type) {
+  const auto* entry = platform.GetMetadataIndex().GetEffectMetadata(type);
+  return entry != nullptr ? *entry->metadata : badEffectMetadata;
 }
 
 ExtensionAndMetadata<InstructionMetadata>
 MetadataProvider::GetExtensionAndActionMetadata(const gd::Platform& platform,
                                                 gd::String actionType) {
-  auto& extensions = platform.GetAllPlatformExtensions();
-  for (auto& extension : extensions) {
-    const auto& allActions = extension->GetAllActions();
-    if (allActions.find(actionType) != allActions.end())
-      return ExtensionAndMetadata<InstructionMetadata>(
-          *extension, allActions.find(actionType)->second);
-
-    const auto& objects = extension->GetExtensionObjectsTypes();
-    for (const gd::String& extObjectType : objects) {
-      const auto& allObjectsActions =
-          extension->GetAllActionsForObject(extObjectType);
-      if (allObjectsActions.find(actionType) != allObjectsActions.end())
-        return ExtensionAndMetadata<InstructionMetadata>(
-            *extension, allObjectsActions.find(actionType)->second);
-    }
-
-    const auto& autos = extension->GetBehaviorsTypes();
-    for (std::size_t j = 0; j < autos.size(); ++j) {
-      const auto& allAutosActions =
-          extension->GetAllActionsForBehavior(autos[j]);
-      if (allAutosActions.find(actionType) != allAutosActions.end())
-        return ExtensionAndMetadata<InstructionMetadata>(
-            *extension, allAutosActions.find(actionType)->second);
-    }
-  }
-
-  return ExtensionAndMetadata<InstructionMetadata>(badExtension,
-                                                   badInstructionMetadata);
+  const auto* entry = platform.GetMetadataIndex().GetActionMetadata(actionType);
+  if (entry == nullptr)
+    return ExtensionAndMetadata<InstructionMetadata>(badExtension,
+                                                     badInstructionMetadata);
+  return ExtensionAndMetadata<InstructionMetadata>(*entry->extension,
+                                                   *entry->metadata);
 }
 
 const gd::InstructionMetadata& MetadataProvider::GetActionMetadata(
     const gd::Platform& platform, gd::String actionType) {
-  return GetExtensionAndActionMetadata(platform, actionType).GetMetadata();
+  const auto* entry = platform.GetMetadataIndex().GetActionMetadata(actionType);
+  return entry != nullptr ? *entry->metadata : badInstructionMetadata;
 }
 
 ExtensionAndMetadata<InstructionMetadata>
 MetadataProvider::GetExtensionAndConditionMetadata(const gd::Platform& platform,
                                                    gd::String conditionType) {
-  auto& extensions = platform.GetAllPlatformExtensions();
-  for (auto& extension : extensions) {
-    const auto& allConditions = extension->GetAllConditions();
-    if (allConditions.find(conditionType) != allConditions.end())
-      return ExtensionAndMetadata<InstructionMetadata>(
-          *extension, allConditions.find(conditionType)->second);
-
-    const auto& objects = extension->GetExtensionObjectsTypes();
-    for (const gd::String& extObjectType : objects) {
-      const auto& allObjectsConditions =
-          extension->GetAllConditionsForObject(extObjectType);
-      if (allObjectsConditions.find(conditionType) != allObjectsConditions.end())
-        return ExtensionAndMetadata<InstructionMetadata>(
-            *extension, allObjectsConditions.find(conditionType)->second);
-    }
-
-    const auto& autos = extension->GetBehaviorsTypes();
-    for (std::size_t j = 0; j < autos.size(); ++j) {
-      const auto& allAutosConditions =
-          extension->GetAllConditionsForBehavior(autos[j]);
-      if (allAutosConditions.find(conditionType) != allAutosConditions.end())
-        return ExtensionAndMetadata<InstructionMetadata>(
-            *extension, allAutosConditions.find(conditionType)->second);
-    }
-  }
-
-  return ExtensionAndMetadata<InstructionMetadata>(badExtension,
-                                                   badInstructionMetadata);
+  const auto* entry =
+      platform.GetMetadataIndex().GetConditionMetadata(conditionType);
+  if (entry == nullptr)
+    return ExtensionAndMetadata<InstructionMetadata>(badExtension,
+                                                     badInstructionMetadata);
+  return ExtensionAndMetadata<InstructionMetadata>(*entry->extension,
+                                                   *entry->metadata);
 }
 
 const gd::InstructionMetadata& MetadataProvider::GetConditionMetadata(
     const gd::Platform& platform, gd::String conditionType) {
-  return GetExtensionAndConditionMetadata(platform, conditionType)
-      .GetMetadata();
+  const auto* entry =
+      platform.GetMetadataIndex().GetConditionMetadata(conditionType);
+  return entry != nullptr ? *entry->metadata : badInstructionMetadata;
 }
 
 ExtensionAndMetadata<ExpressionMetadata>
 MetadataProvider::GetExtensionAndObjectExpressionMetadata(
     const gd::Platform& platform, gd::String objectType, gd::String exprType) {
-  auto& extensions = platform.GetAllPlatformExtensions();
-  for (auto& extension : extensions) {
-    const auto& objects = extension->GetExtensionObjectsTypes();
-    if (find(objects.begin(), objects.end(), objectType) != objects.end()) {
-      const auto& allObjectExpressions =
-          extension->GetAllExpressionsForObject(objectType);
-      if (allObjectExpressions.find(exprType) != allObjectExpressions.end())
-        return ExtensionAndMetadata<ExpressionMetadata>(
-            *extension, allObjectExpressions.find(exprType)->second);
-    }
-  }
-
-  // Then check base
-  for (auto& extension : extensions) {
-    const auto& allObjectExpressions =
-        extension->GetAllExpressionsForObject("");
-    if (allObjectExpressions.find(exprType) != allObjectExpressions.end())
-      return ExtensionAndMetadata<ExpressionMetadata>(
-          *extension, allObjectExpressions.find(exprType)->second);
-  }
-
-  return ExtensionAndMetadata<ExpressionMetadata>(badExtension,
-                                                  badExpressionMetadata);
+  const auto* entry = platform.GetMetadataIndex().GetObjectExpressionMetadata(
+      objectType, exprType);
+  if (entry == nullptr)
+    return ExtensionAndMetadata<ExpressionMetadata>(badExtension,
+                                                    badExpressionMetadata);
+  return ExtensionAndMetadata<ExpressionMetadata>(*entry->extension,
+                                                  *entry->metadata);
 }
 
 const gd::ExpressionMetadata& MetadataProvider::GetObjectExpressionMetadata(
     const gd::Platform& platform, gd::String objectType, gd::String exprType) {
-  return GetExtensionAndObjectExpressionMetadata(platform, objectType, exprType)
-      .GetMetadata();
+  const auto* entry = platform.GetMetadataIndex().GetObjectExpressionMetadata(
+      objectType, exprType);
+  return entry != nullptr ? *entry->metadata : badExpressionMetadata;
 }
 
 ExtensionAndMetadata<ExpressionMetadata>
 MetadataProvider::GetExtensionAndBehaviorExpressionMetadata(
     const gd::Platform& platform, gd::String autoType, gd::String exprType) {
-  auto& extensions = platform.GetAllPlatformExtensions();
-  for (auto& extension : extensions) {
-    if (extension->HasBehavior(autoType)) {
-      const auto& allAutoExpressions =
-          extension->GetAllExpressionsForBehavior(autoType);
-      if (allAutoExpressions.find(exprType) != allAutoExpressions.end())
-        return ExtensionAndMetadata<ExpressionMetadata>(
-            *extension, allAutoExpressions.find(exprType)->second);
-    }
-  }
-
-  // Then check base
-  for (auto& extension : extensions) {
-    const auto& allAutoExpressions =
-        extension->GetAllExpressionsForBehavior("");
-    if (allAutoExpressions.find(exprType) != allAutoExpressions.end())
-      return ExtensionAndMetadata<ExpressionMetadata>(
-          *extension, allAutoExpressions.find(exprType)->second);
-  }
-
-  return ExtensionAndMetadata<ExpressionMetadata>(badExtension,
-                                                  badExpressionMetadata);
+  const auto* entry = platform.GetMetadataIndex().GetBehaviorExpressionMetadata(
+      autoType, exprType);
+  if (entry == nullptr)
+    return ExtensionAndMetadata<ExpressionMetadata>(badExtension,
+                                                    badExpressionMetadata);
+  return ExtensionAndMetadata<ExpressionMetadata>(*entry->extension,
+                                                  *entry->metadata);
 }
 
 const gd::ExpressionMetadata& MetadataProvider::GetBehaviorExpressionMetadata(
     const gd::Platform& platform, gd::String autoType, gd::String exprType) {
-  return GetExtensionAndBehaviorExpressionMetadata(platform, autoType, exprType)
-      .GetMetadata();
+  const auto* entry = platform.GetMetadataIndex().GetBehaviorExpressionMetadata(
+      autoType, exprType);
+  return entry != nullptr ? *entry->metadata : badExpressionMetadata;
 }
 
 ExtensionAndMetadata<ExpressionMetadata>
-MetadataProvider::GetExtensionAndExpressionMetadata(
-    const gd::Platform& platform, gd::String exprType) {
-  auto& extensions = platform.GetAllPlatformExtensions();
-  for (auto& extension : extensions) {
-    const auto& allExpr = extension->GetAllExpressions();
-    if (allExpr.find(exprType) != allExpr.end())
-      return ExtensionAndMetadata<ExpressionMetadata>(
-          *extension, allExpr.find(exprType)->second);
-  }
-
-  return ExtensionAndMetadata<ExpressionMetadata>(badExtension,
-                                                  badExpressionMetadata);
+MetadataProvider::GetExtensionAndExpressionMetadata(const gd::Platform& platform,
+                                                    gd::String exprType) {
+  const auto* entry = platform.GetMetadataIndex().GetExpressionMetadata(exprType);
+  if (entry == nullptr)
+    return ExtensionAndMetadata<ExpressionMetadata>(badExtension,
+                                                    badExpressionMetadata);
+  return ExtensionAndMetadata<ExpressionMetadata>(*entry->extension,
+                                                  *entry->metadata);
 }
 
 const gd::ExpressionMetadata& MetadataProvider::GetExpressionMetadata(
     const gd::Platform& platform, gd::String exprType) {
-  return GetExtensionAndExpressionMetadata(platform, exprType).GetMetadata();
+  const auto* entry = platform.GetMetadataIndex().GetExpressionMetadata(exprType);
+  return entry != nullptr ? *entry->metadata : badExpressionMetadata;
 }
 
 ExtensionAndMetadata<ExpressionMetadata>
 MetadataProvider::GetExtensionAndObjectStrExpressionMetadata(
     const gd::Platform& platform, gd::String objectType, gd::String exprType) {
-  auto& extensions = platform.GetAllPlatformExtensions();
-  for (auto& extension : extensions) {
-    const auto& objects = extension->GetExtensionObjectsTypes();
-    if (find(objects.begin(), objects.end(), objectType) != objects.end()) {
-      const auto& allObjectStrExpressions =
-          extension->GetAllStrExpressionsForObject(objectType);
-      if (allObjectStrExpressions.find(exprType) !=
-          allObjectStrExpressions.end())
-        return ExtensionAndMetadata<ExpressionMetadata>(
-            *extension, allObjectStrExpressions.find(exprType)->second);
-    }
-  }
-
-  // Then check in functions of "Base object".
-  for (auto& extension : extensions) {
-    const auto& allObjectStrExpressions =
-        extension->GetAllStrExpressionsForObject("");
-    if (allObjectStrExpressions.find(exprType) != allObjectStrExpressions.end())
-      return ExtensionAndMetadata<ExpressionMetadata>(
-          *extension, allObjectStrExpressions.find(exprType)->second);
-  }
-
-  return ExtensionAndMetadata<ExpressionMetadata>(badExtension,
-                                                  badExpressionMetadata);
+  const auto* entry = platform.GetMetadataIndex().GetObjectStrExpressionMetadata(
+      objectType, exprType);
+  if (entry == nullptr)
+    return ExtensionAndMetadata<ExpressionMetadata>(badExtension,
+                                                    badExpressionMetadata);
+  return ExtensionAndMetadata<ExpressionMetadata>(*entry->extension,
+                                                  *entry->metadata);
 }
 
 const gd::ExpressionMetadata& MetadataProvider::GetObjectStrExpressionMetadata(
     const gd::Platform& platform, gd::String objectType, gd::String exprType) {
-  return GetExtensionAndObjectStrExpressionMetadata(
-             platform, objectType, exprType)
-      .GetMetadata();
+  const auto* entry = platform.GetMetadataIndex().GetObjectStrExpressionMetadata(
+      objectType, exprType);
+  return entry != nullptr ? *entry->metadata : badExpressionMetadata;
 }
 
 ExtensionAndMetadata<ExpressionMetadata>
 MetadataProvider::GetExtensionAndBehaviorStrExpressionMetadata(
     const gd::Platform& platform, gd::String autoType, gd::String exprType) {
-  auto& extensions = platform.GetAllPlatformExtensions();
-  for (auto& extension : extensions) {
-    if (extension->HasBehavior(autoType)) {
-      const auto& allBehaviorStrExpressions =
-          extension->GetAllStrExpressionsForBehavior(autoType);
-      if (allBehaviorStrExpressions.find(exprType) !=
-          allBehaviorStrExpressions.end())
-        return ExtensionAndMetadata<ExpressionMetadata>(
-            *extension, allBehaviorStrExpressions.find(exprType)->second);
-    }
-  }
-
-  // Then check in functions of "Base object".
-  for (auto& extension : extensions) {
-    const auto& allBehaviorStrExpressions =
-        extension->GetAllStrExpressionsForBehavior("");
-    if (allBehaviorStrExpressions.find(exprType) !=
-        allBehaviorStrExpressions.end())
-      return ExtensionAndMetadata<ExpressionMetadata>(
-          *extension, allBehaviorStrExpressions.find(exprType)->second);
-  }
-
-  return ExtensionAndMetadata<ExpressionMetadata>(badExtension,
-                                                  badExpressionMetadata);
+  const auto* entry =
+      platform.GetMetadataIndex().GetBehaviorStrExpressionMetadata(autoType,
+                                                                   exprType);
+  if (entry == nullptr)
+    return ExtensionAndMetadata<ExpressionMetadata>(badExtension,
+                                                    badExpressionMetadata);
+  return ExtensionAndMetadata<ExpressionMetadata>(*entry->extension,
+                                                  *entry->metadata);
 }
 
 const gd::ExpressionMetadata&
 MetadataProvider::GetBehaviorStrExpressionMetadata(const gd::Platform& platform,
                                                    gd::String autoType,
                                                    gd::String exprType) {
-  return GetExtensionAndBehaviorStrExpressionMetadata(
-             platform, autoType, exprType)
-      .GetMetadata();
+  const auto* entry =
+      platform.GetMetadataIndex().GetBehaviorStrExpressionMetadata(autoType,
+                                                                   exprType);
+  return entry != nullptr ? *entry->metadata : badExpressionMetadata;
 }
 
 ExtensionAndMetadata<ExpressionMetadata>
 MetadataProvider::GetExtensionAndStrExpressionMetadata(
     const gd::Platform& platform, gd::String exprType) {
-  auto& extensions = platform.GetAllPlatformExtensions();
-  for (auto& extension : extensions) {
-    const auto& allExpr = extension->GetAllStrExpressions();
-    if (allExpr.find(exprType) != allExpr.end())
-      return ExtensionAndMetadata<ExpressionMetadata>(
-          *extension, allExpr.find(exprType)->second);
-  }
-
-  return ExtensionAndMetadata<ExpressionMetadata>(badExtension,
-                                                  badExpressionMetadata);
+  const auto* entry =
+      platform.GetMetadataIndex().GetStrExpressionMetadata(exprType);
+  if (entry == nullptr)
+    return ExtensionAndMetadata<ExpressionMetadata>(badExtension,
+                                                    badExpressionMetadata);
+  return ExtensionAndMetadata<ExpressionMetadata>(*entry->extension,
+                                                  *entry->metadata);
 }
 
 const gd::ExpressionMetadata& MetadataProvider::GetStrExpressionMetadata(
     const gd::Platform& platform, gd::String exprType) {
-  return GetExtensionAndStrExpressionMetadata(platform, exprType).GetMetadata();
+  const auto* entry =
+      platform.GetMetadataIndex().GetStrExpressionMetadata(exprType);
+  return entry != nullptr ? *entry->metadata : badExpressionMetadata;
 }
 
 const gd::ExpressionMetadata& MetadataProvider::GetAnyExpressionMetadata(

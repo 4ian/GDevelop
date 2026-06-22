@@ -5,6 +5,7 @@
  */
 #include "Platform.h"
 
+#include "GDCore/Extensions/Metadata/PlatformMetadataIndex.h"
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/Project/Object.h"
 #include "GDCore/Project/ObjectConfiguration.h"
@@ -24,8 +25,18 @@ Platform::Platform() : enableExtensionLoadingLogs(false) {}
 
 Platform::~Platform() {}
 
+const gd::PlatformMetadataIndex& Platform::GetMetadataIndex() const {
+  if (!metadataIndex)
+    metadataIndex.reset(new gd::PlatformMetadataIndex(*this));
+  return *metadataIndex;
+}
+
 bool Platform::AddExtension(std::shared_ptr<gd::PlatformExtension> extension) {
   if (!extension) return false;
+
+  // The set of extensions is changing: discard the metadata index so it is
+  // rebuilt on the next lookup.
+  metadataIndex.reset();
 
   if (enableExtensionLoadingLogs)
     std::cout << "Loading " << extension->GetName() << "...";
@@ -57,6 +68,10 @@ bool Platform::AddExtension(std::shared_ptr<gd::PlatformExtension> extension) {
 }
 
 void Platform::RemoveExtension(const gd::String& name) {
+  // The set of extensions is changing: discard the metadata index so it is
+  // rebuilt on the next lookup.
+  metadataIndex.reset();
+
   // Unload all creation/destruction functions for objects provided by the
   // extension
   for (std::size_t i = 0; i < extensionsLoaded.size(); ++i) {

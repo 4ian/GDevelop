@@ -305,26 +305,6 @@ gd::String EventsCodeGenerator::GenerateMutatorCall(
          rhs + ")";
 }
 
-const gd::String& EventsCodeGenerator::GetCachedTypeOfObject(
-    const gd::String& objectName) const {
-  auto it = cachedObjectTypes.find(objectName);
-  if (it != cachedObjectTypes.end()) return it->second;
-
-  return cachedObjectTypes[objectName] =
-             GetObjectsContainersList().GetTypeOfObject(objectName);
-}
-
-const gd::ObjectMetadata& EventsCodeGenerator::GetCachedObjectMetadata(
-    const gd::String& objectType) const {
-  auto it = cachedObjectMetadata.find(objectType);
-  if (it != cachedObjectMetadata.end()) return *it->second;
-
-  const gd::ObjectMetadata& metadata =
-      MetadataProvider::GetObjectMetadata(platform, objectType);
-  cachedObjectMetadata[objectType] = &metadata;
-  return metadata;
-}
-
 gd::String EventsCodeGenerator::GenerateConditionCode(
     gd::Instruction& condition,
     gd::String returnBoolean,
@@ -371,7 +351,7 @@ gd::String EventsCodeGenerator::GenerateConditionCode(
       const auto& expectedObjectType =
           instrInfos.parameters.GetParameter(pNb).GetExtraInfo();
       const auto& actualObjectType =
-          GetCachedTypeOfObject(objectInParameter);
+          GetObjectsContainersList().GetTypeOfObject(objectInParameter);
       if (!GetObjectsContainersList().HasObjectOrGroupNamed(
               objectInParameter)) {
         gd::ProjectDiagnostic projectDiagnostic(
@@ -408,9 +388,9 @@ gd::String EventsCodeGenerator::GenerateConditionCode(
       for (std::size_t i = 0; i < realObjects.size(); ++i) {
         // Set up the context
         gd::String objectType =
-            GetCachedTypeOfObject(realObjects[i]);
+            GetObjectsContainersList().GetTypeOfObject(realObjects[i]);
         const ObjectMetadata& objInfo =
-            GetCachedObjectMetadata(objectType);
+            MetadataProvider::GetObjectMetadata(platform, objectType);
 
         AddIncludeFiles(objInfo.includeFiles);
         context.SetCurrentObject(realObjects[i]);
@@ -658,7 +638,7 @@ gd::String EventsCodeGenerator::GenerateActionCode(
       const auto& expectedObjectType =
           instrInfos.parameters.GetParameter(pNb).GetExtraInfo();
       const auto& actualObjectType =
-          GetCachedTypeOfObject(objectInParameter);
+          GetObjectsContainersList().GetTypeOfObject(objectInParameter);
       if (!GetObjectsContainersList().HasObjectOrGroupNamed(
               objectInParameter)) {
         gd::ProjectDiagnostic projectDiagnostic(
@@ -697,9 +677,9 @@ gd::String EventsCodeGenerator::GenerateActionCode(
       for (std::size_t i = 0; i < realObjects.size(); ++i) {
         // Setup context
         gd::String objectType =
-            GetCachedTypeOfObject(realObjects[i]);
+            GetObjectsContainersList().GetTypeOfObject(realObjects[i]);
         const ObjectMetadata& objInfo =
-            GetCachedObjectMetadata(objectType);
+            MetadataProvider::GetObjectMetadata(platform, objectType);
 
         AddIncludeFiles(objInfo.includeFiles);
         context.SetCurrentObject(realObjects[i]);

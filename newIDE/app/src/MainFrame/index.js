@@ -781,6 +781,7 @@ const MainFrame = (props: Props): React.MixedElement => {
   const currentProjectRef = useStableUpToDateRef(currentProject);
   const editorTabsRef = useStableUpToDateRef(state.editorTabs);
   const projectManagerRef = React.useRef<?ProjectManagerInterface>(null);
+  const lastSelectedProjectManagerItemIdRef = React.useRef<?string>(null);
 
   const getEditorOpeningOptions = React.useCallback(
     ({
@@ -1761,6 +1762,41 @@ const MainFrame = (props: Props): React.MixedElement => {
   const isProjectManagerVisible =
     projectManagerOpen || isProjectManagerPinnedForCurrentProject;
 
+  const selectProjectManagerItemFromId = React.useCallback(
+    (itemId: string, options?: {| force?: boolean |}) => {
+      if (!isProjectManagerVisible) return;
+
+      const projectManager = projectManagerRef.current;
+      if (!projectManager) return;
+
+      const force = !!(options && options.force);
+      if (!force && lastSelectedProjectManagerItemIdRef.current === itemId) {
+        return;
+      }
+
+      lastSelectedProjectManagerItemIdRef.current = itemId;
+      projectManager.selectAndScrollToItemFromId(itemId);
+    },
+    [isProjectManagerVisible]
+  );
+
+  const selectProjectManagerItemForEditorTab = React.useCallback(
+    (editorTab: EditorTab, options?: {| force?: boolean |}) => {
+      const project = currentProjectRef.current;
+      if (!project) return;
+
+      const itemId = getProjectManagerTreeViewItemIdForEditorTab(
+        project,
+        editorTab.kind,
+        editorTab.projectItemName
+      );
+      if (!itemId) return;
+
+      selectProjectManagerItemFromId(itemId, options);
+    },
+    [currentProjectRef, selectProjectManagerItemFromId]
+  );
+
   // When the project manager is shown, highlight and scroll to the item
   // matching the currently focused editor page (e.g. the open scene), so the
   // user immediately sees where they are in the project tree.
@@ -1799,13 +1835,16 @@ const MainFrame = (props: Props): React.MixedElement => {
       // The project manager tree view needs a moment to (re)render its rows
       // when it is shown before we can select and scroll to the item.
       const timeoutId = setTimeout(() => {
-        if (projectManagerRef.current) {
-          projectManagerRef.current.selectAndScrollToItemFromId(itemIdToSelect);
-        }
+        selectProjectManagerItemFromId(itemIdToSelect, { force: true });
       }, 150);
       return () => clearTimeout(timeoutId);
     },
-    [isProjectManagerVisible, currentProjectRef, editorTabsRef]
+    [
+      isProjectManagerVisible,
+      currentProjectRef,
+      editorTabsRef,
+      selectProjectManagerItemFromId,
+    ]
   );
 
   const deleteLayout = (layout: gdLayout) => {
@@ -6062,6 +6101,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     toggleProjectManager: toggleProjectManager,
     isProjectManagerPinned: isProjectManagerPinnedForCurrentProject,
     setEditorTabs: setEditorTabs,
+    onFocusedEditorTabChange: selectProjectManagerItemForEditorTab,
     saveProject: saveProject,
     saveProjectAsWithStorageProvider: saveProjectAsWithStorageProvider,
     onCheckoutVersion: onCheckoutVersion,

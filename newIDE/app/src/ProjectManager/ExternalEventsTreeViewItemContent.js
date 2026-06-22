@@ -21,6 +21,19 @@ import { type ProjectItemUsageTarget } from './ProjectItemUsageFinder';
 
 const EXTERNAL_EVENTS_CLIPBOARD_KIND = 'External events';
 
+const styles = {
+  kindBadge: {
+    border: '1px solid',
+    borderRadius: 4,
+    fontSize: 10,
+    fontWeight: 600,
+    lineHeight: '16px',
+    padding: '0 6px',
+    textTransform: 'uppercase',
+    whiteSpace: 'nowrap',
+  },
+};
+
 export type ExternalEventsTreeViewItemCallbacks = {|
   onDeleteExternalEvents: gdExternalEvents => void,
   onRenameExternalEvents: (string, string) => void,
@@ -161,7 +174,18 @@ export class ExternalEventsTreeViewItemContent implements TreeViewItemContent {
   }
 
   renderRightComponent(i18n: I18nType): ?React.Node {
-    return null;
+    return (
+      <span
+        style={{
+          ...styles.kindBadge,
+          backgroundColor: this.props.gdevelopTheme.listItem.backgroundColor,
+          borderColor: this.props.gdevelopTheme.listItem.separatorColor,
+          color: this.props.gdevelopTheme.text.color.secondary,
+        }}
+      >
+        {i18n._(t`Events`)}
+      </span>
+    );
   }
 
   delete(): void {

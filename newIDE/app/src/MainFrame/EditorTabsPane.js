@@ -289,6 +289,10 @@ export type EditorTabsPaneCommonProps = {|
   gamesList: GamesList,
 
   setEditorTabs: (editorTabs: EditorTabsState) => void,
+  onFocusedEditorTabChange: (
+    editorTab: EditorTab,
+    options?: {| force?: boolean |}
+  ) => void,
 |};
 
 type Props = {|
@@ -403,6 +407,7 @@ const EditorTabsPane: React.ComponentType<{
     triggerHotReloadInGameEditorIfNeeded,
     gamesList,
     setEditorTabs,
+    onFocusedEditorTabChange,
     onSetPointerEventsNone,
     paneIdentifier,
     isLeftMostPane,
@@ -473,6 +478,9 @@ const EditorTabsPane: React.ComponentType<{
   // Tab management functions
   const onEditorTabActivated = React.useCallback(
     (editorTab: EditorTab) => {
+      if (paneIdentifier === 'center') {
+        onFocusedEditorTabChange(editorTab);
+      }
       updateToolbar();
       // Ensure the editors shown on the screen are updated. This is for
       // example useful if global objects have been updated in another editor.
@@ -480,7 +488,7 @@ const EditorTabsPane: React.ComponentType<{
         editorTab.editorRef.forceUpdateEditor();
       }
     },
-    [updateToolbar]
+    [onFocusedEditorTabChange, paneIdentifier, updateToolbar]
   );
 
   const onChangeEditorTab = React.useCallback(
@@ -490,10 +498,17 @@ const EditorTabsPane: React.ComponentType<{
 
       const newCurrentTab = getCurrentTabForPane(newEditorTabs, paneIdentifier);
       if (newCurrentTab) {
+        onFocusedEditorTabChange(newCurrentTab, { force: true });
         onEditorTabActivated(newCurrentTab);
       }
     },
-    [editorTabs, setEditorTabs, onEditorTabActivated, paneIdentifier]
+    [
+      editorTabs,
+      setEditorTabs,
+      onEditorTabActivated,
+      onFocusedEditorTabChange,
+      paneIdentifier,
+    ]
   );
 
   const onCloseEditorTab = React.useCallback(

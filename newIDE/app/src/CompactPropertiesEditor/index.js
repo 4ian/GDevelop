@@ -273,13 +273,18 @@ const CompactPropertiesEditor = ({
       } else if (field.valueType === 'number') {
         const { setValue, onClickEndAdornment } = field;
 
+        const mixedValues = hasMixedValues({ instances, field });
+        const value: number | '' = mixedValues
+          ? ''
+          : getFieldValue({
+              instances,
+              field,
+            });
         const commonProps = {
           key: field.name,
           id: field.name,
-          value: getFieldValue({
-            instances,
-            field,
-          }),
+          value,
+          placeholder: mixedValues ? '(Multiple values)' : undefined,
           onChange: (newValue: number) => {
             // If the value is not a number, the user is probably still typing, adding a dot or a comma.
             // So don't update the value, it will be reverted if they leave the field.
@@ -337,6 +342,12 @@ const CompactPropertiesEditor = ({
         }
       } else if (field.valueType === 'color') {
         const { setValue } = field;
+
+        const mixedValues = hasMixedValues({ instances, field });
+        const value = getFieldValue({
+          instances,
+          field,
+        });
         return (
           <CompactPropertiesEditorRowField
             key={field.name}
@@ -346,8 +357,12 @@ const CompactPropertiesEditor = ({
               <CompactColorField
                 id={field.name}
                 disableAlpha
-                color={getFieldValue({ instances, field })}
+                color={mixedValues ? '' : value}
+                placeholder={mixedValues ? '(Multiple values)' : undefined}
                 onChange={color => {
+                  if (color === '' && mixedValues) {
+                    return;
+                  }
                   const rgbString =
                     color.length === 0 ? '' : rgbOrHexToRGBString(color);
                   instances.forEach(i => setValue(i, rgbString));
@@ -387,6 +402,7 @@ const CompactPropertiesEditor = ({
         );
       } else if (field.valueType === 'multilinestring') {
         const { setValue } = field;
+        const mixedValues = hasMixedValues({ instances, field });
         return (
           <CompactTextAreaField
             key={field.name}
@@ -398,7 +414,15 @@ const CompactPropertiesEditor = ({
                 hasImpactOnAllOtherFields: field.hasImpactOnAllOtherFields,
               });
             }}
-            value={getFieldValue({ instances, field })}
+            value={
+              mixedValues
+                ? ''
+                : getFieldValue({
+                    instances,
+                    field,
+                  })
+            }
+            placeholder={mixedValues ? '(Multiple values)' : undefined}
             label={getFieldLabel({ instances, field })}
             markdownDescription={getFieldDescription(field)}
             labelColor={
@@ -414,14 +438,17 @@ const CompactPropertiesEditor = ({
           setValue,
           onClickEndAdornment,
         } = field;
+        const mixedValues = hasMixedValues({ instances, field });
         const commonProps = {
           key: field.name,
           id: field.name,
-          value: getFieldValue({
-            instances,
-            field,
-            mixedValueFallback: '(Multiple values)',
-          }),
+          value: mixedValues
+            ? ''
+            : getFieldValue({
+                instances,
+                field,
+              }),
+          placeholder: mixedValues ? '(Multiple values)' : undefined,
           onChange: (newValue: string) => {
             instances.forEach(i => setValue(i, newValue || ''));
             onFieldChanged({
@@ -488,15 +515,36 @@ const CompactPropertiesEditor = ({
         />
       ));
 
+      const mixedValues = hasMixedValues({ instances, field });
+      const value = getFieldValue({
+        instances,
+        field,
+      });
+      if (mixedValues) {
+        children.splice(
+          0,
+          0,
+          <SelectOption
+            key={value}
+            value={'(Multiple values)'}
+            label={'(Multiple values)'}
+            shouldNotTranslate={true}
+          />
+        );
+      }
+
       let compactSelectField;
       if (field.valueType === 'number') {
         const { setValue } = field;
         compactSelectField = (
           <CompactSelectField
             key={field.name}
-            value={'' + getFieldValue({ instances, field })}
+            value={mixedValues ? '(Multiple values)' : '' + value}
             id={field.name}
             onChange={(newValue: string) => {
+              if (mixedValues && newValue === '(Multiple values)') {
+                return;
+              }
               instances.forEach(i => setValue(i, parseFloat(newValue) || 0));
               onFieldChanged({
                 instances,
@@ -513,13 +561,12 @@ const CompactPropertiesEditor = ({
         compactSelectField = (
           <CompactSelectField
             key={field.name}
-            value={getFieldValue({
-              instances,
-              field,
-              mixedValueFallback: '(Multiple values)',
-            })}
+            value={mixedValues ? '(Multiple values)' : value}
             id={field.name}
             onChange={(newValue: string) => {
+              if (mixedValues && newValue === '(Multiple values)') {
+                return;
+              }
               instances.forEach(i => setValue(i, newValue || ''));
               onFieldChanged({
                 instances,
@@ -636,6 +683,7 @@ const CompactPropertiesEditor = ({
     }
 
     const { setValue } = field;
+    const mixedValues = hasMixedValues({ instances, field });
     return (
       <CompactPropertiesEditorRowField
         key={field.name}
@@ -646,11 +694,15 @@ const CompactPropertiesEditor = ({
             project={project}
             resourceManagementProps={resourceManagementProps}
             resourceKind={field.resourceKind}
-            resourceName={getFieldValue({
-              instances,
-              field,
-              mixedValueFallback: '(Multiple values)',
-            })}
+            resourceName={
+              mixedValues
+                ? ''
+                : getFieldValue({
+                    instances,
+                    field,
+                  })
+            }
+            placeholder={mixedValues ? '(Multiple values)' : undefined}
             onChange={newValue => {
               instances.forEach(i => setValue(i, newValue));
               onFieldChanged({
@@ -673,6 +725,7 @@ const CompactPropertiesEditor = ({
     }
 
     const { setValue } = field;
+    const mixedValues = hasMixedValues({ instances, field });
     return (
       <CompactPropertiesEditorRowField
         key={field.name}
@@ -682,11 +735,14 @@ const CompactPropertiesEditor = ({
           <CompactLeaderboardIdPropertyField
             key={field.name}
             project={project}
-            value={getFieldValue({
-              instances,
-              field,
-              mixedValueFallback: '(Multiple values)',
-            })}
+            value={
+              mixedValues
+                ? getFieldValue({
+                    instances,
+                    field,
+                  })
+                : '(Multiple values)'
+            }
             onChange={newValue => {
               instances.forEach(i => setValue(i, newValue));
               onFieldChanged({
@@ -750,11 +806,13 @@ const CompactPropertiesEditor = ({
       let additionalText = null;
 
       if (getValue) {
-        let selectedInstancesValue = getFieldValue({
-          instances,
-          field,
-          mixedValueFallback: field.defaultValue || 'Multiple Values',
-        });
+        const mixedValues = hasMixedValues({ instances, field });
+        let selectedInstancesValue = mixedValues
+          ? field.defaultValue || 'Multiple Values'
+          : getFieldValue({
+              instances,
+              field,
+            });
         if (!!selectedInstancesValue) additionalText = selectedInstancesValue;
       }
 

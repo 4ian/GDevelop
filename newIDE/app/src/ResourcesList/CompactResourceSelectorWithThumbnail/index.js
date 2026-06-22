@@ -40,6 +40,7 @@ type Props = {|
   defaultNewResourceName?: string,
   onChange: string => void,
   id?: string,
+  placeholder?: string,
 |};
 
 export const CompactResourceSelectorWithThumbnail = ({
@@ -50,6 +51,7 @@ export const CompactResourceSelectorWithThumbnail = ({
   defaultNewResourceName,
   onChange,
   id,
+  placeholder,
 }: Props): React.Node => {
   const resourcesLoader = ResourcesLoader;
   const forceUpdate = useForceUpdate();
@@ -282,6 +284,7 @@ export const CompactResourceSelectorWithThumbnail = ({
             spellCheck={false}
             value={resourceName}
             onChange={e => _onChange(e.currentTarget.value)}
+            placeholder={placeholder}
           />
         </div>
       </div>

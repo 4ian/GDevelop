@@ -371,18 +371,19 @@ export const useManageObjectBehaviors = ({
 
   const addBehavior = React.useCallback(
     (type: string, defaultName: string) => {
-      let wasBehaviorAdded = false;
+      let wasAnyBehaviorAdded = false;
       for (const object of objects) {
-        wasBehaviorAdded ||= addBehaviorToObject(
+        const wasBehaviorAdded = addBehaviorToObject(
           project,
           object,
           type,
           defaultName,
           /* shouldSkipExistingBehaviorSilently= */ objects.length > 1
         );
+        wasAnyBehaviorAdded ||= wasBehaviorAdded;
       }
 
-      if (wasBehaviorAdded) {
+      if (wasAnyBehaviorAdded) {
         setNewBehaviorDialogOpen(false);
         sendBehaviorAdded({
           behaviorType: type,

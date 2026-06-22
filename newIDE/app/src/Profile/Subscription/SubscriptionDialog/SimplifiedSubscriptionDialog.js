@@ -435,6 +435,14 @@ export default function SimplifiedSubscriptionDialog({
             featuredSimplifiedFeatures.upgradeTitleByLocale
           )
         : null;
+    const upgradeButtonLabel =
+      featuredSimplifiedFeatures &&
+      featuredSimplifiedFeatures.upgradeButtonLabelByLocale
+        ? selectMessageByLocale(
+            i18n,
+            featuredSimplifiedFeatures.upgradeButtonLabelByLocale
+          )
+        : null;
 
     return (
       <ColumnStackLayout noMargin>
@@ -572,7 +580,11 @@ export default function SimplifiedSubscriptionDialog({
                 disabled={isLoading}
                 label={
                   <LeftLoader isLoading={isLoading}>
-                    <Trans>Upgrade to {featuredPlanName} →</Trans>
+                    {upgradeButtonLabel ? (
+                      `${upgradeButtonLabel} →`
+                    ) : (
+                      <Trans>Upgrade to {featuredPlanName} →</Trans>
+                    )}
                   </LeftLoader>
                 }
                 onClick={onClickUpgrade}

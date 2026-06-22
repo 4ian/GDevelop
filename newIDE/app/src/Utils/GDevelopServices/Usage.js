@@ -230,6 +230,7 @@ export type SimplifiedSubscriptionFeatures = {|
   taglineByLocale?: MessageByLocale,
   upgradeOverlineByLocale?: MessageByLocale,
   upgradeTitleByLocale?: MessageByLocale,
+  upgradeButtonLabelByLocale?: MessageByLocale,
   bulletPoints: Array<SimplifiedSubscriptionBulletPoint>,
 |};
 

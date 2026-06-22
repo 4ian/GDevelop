@@ -60,7 +60,7 @@ type FunctionGroups = {|
   expressions: Array<ListedEntity>,
 |};
 
-type ExtensionDetailsTab = 'properties' | 'dependencies' | 'content';
+type ExtensionDetailsTab = 'content' | 'properties' | 'dependencies';
 
 const isStoreExtension = (
   eventsFunctionsExtension: gdEventsFunctionsExtension
@@ -918,9 +918,13 @@ const ProjectExtensionDetailsTabs = ({
   onExtensionPropertiesChanged: () => void,
 |}) => {
   const [currentTab, setCurrentTab] = React.useState<ExtensionDetailsTab>(
-    'properties'
+    'content'
   );
   const tabOptions: TabOptions<ExtensionDetailsTab> = [
+    {
+      value: 'content',
+      label: <Trans>Content</Trans>,
+    },
     {
       value: 'properties',
       label: <Trans>Properties</Trans>,
@@ -928,10 +932,6 @@ const ProjectExtensionDetailsTabs = ({
     {
       value: 'dependencies',
       label: <Trans>Dependencies</Trans>,
-    },
-    {
-      value: 'content',
-      label: <Trans>Content</Trans>,
     },
   ];
 

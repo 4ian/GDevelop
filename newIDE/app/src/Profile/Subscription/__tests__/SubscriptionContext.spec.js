@@ -101,6 +101,20 @@ describe('resolveSubscriptionDialogDisplay', () => {
     ).toEqual({ dialogVariant: 'simplified', featuredPlanId: 'gdevelop_gold' });
   });
 
+  it('falls back to the standard dialog for a lower-tier app-store subscription', () => {
+    // App-store subscriptions cannot be managed from the web checkout; the
+    // standard dialog blocks them, so the simplified dialog must be skipped.
+    expect(
+      resolveSubscriptionDialogDisplay({
+        placementId: 'ai-requests',
+        displayConfig: configWithSimplifiedAiRequests,
+        userSubscriptionPlanId: 'gdevelop_silver',
+        hasMobileAppStoreSubscription: true,
+        pickVariant: pickFirstVariant,
+      })
+    ).toEqual({ dialogVariant: 'standard' });
+  });
+
   it('falls back to the standard dialog for an unknown (future) variant type', () => {
     const configWithUnknownVariant: SubscriptionDialogDisplayConfig = {
       placements: {

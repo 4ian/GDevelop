@@ -86,11 +86,13 @@ export const resolveSubscriptionDialogDisplay = ({
   placementId,
   displayConfig,
   userSubscriptionPlanId,
+  hasMobileAppStoreSubscription = false,
   pickVariant = pickWeightedVariant,
 }: {|
   placementId: SubscriptionPlacementId,
   displayConfig: ?SubscriptionDialogDisplayConfig,
   userSubscriptionPlanId: ?string,
+  hasMobileAppStoreSubscription?: boolean,
   pickVariant?: (
     variants: Array<SubscriptionDialogVariantConfig>
   ) => ?SubscriptionDialogVariantConfig,
@@ -120,6 +122,10 @@ export const resolveSubscriptionDialogDisplay = ({
     ) {
       return standardDialogDisplay;
     }
+    // Apple/Google Play subscriptions can't be managed from the web checkout.
+    // The standard dialog blocks these users with a dedicated message, so fall
+    // back to it rather than sending them into the cancel/change flow.
+    if (hasMobileAppStoreSubscription) return standardDialogDisplay;
     return { dialogVariant: 'simplified', featuredPlanId };
   }
 
@@ -364,6 +370,9 @@ export const SubscriptionProvider = ({
               placementId: metadata.placementId,
               displayConfig,
               userSubscriptionPlanId,
+              hasMobileAppStoreSubscription: hasMobileAppStoreSubscriptionPlan(
+                authenticatedUser.subscription
+              ),
             });
         setAnalyticsMetadata({ ...metadata, dialogVariant, featuredPlanId });
         setCouponCode(coupon || null);

@@ -102,6 +102,20 @@ export default class RepeatEvent extends React.Component<
     });
   };
 
+  applyEditing = () => {
+    const repeatEvent = gd.asRepeatEvent(this.props.event);
+    const { editingPreviousValue } = this.state;
+    if (
+      editingPreviousValue != null &&
+      editingPreviousValue !==
+        repeatEvent.getRepeatExpression().getPlainString()
+    ) {
+      // Value changed: record the change in the history (this also flags the project as having unsaved changes).
+      this.props.onEndEditingEvent();
+    }
+    this.endEditing();
+  };
+
   render(): any {
     const repeatEvent = gd.asRepeatEvent(this.props.event);
     const expression = repeatEvent.getRepeatExpression();
@@ -276,7 +290,7 @@ export default class RepeatEvent extends React.Component<
           open={this.state.editing}
           anchorEl={this.state.anchorEl}
           onRequestClose={this.cancelEditing}
-          onApply={this.endEditing}
+          onApply={this.applyEditing}
         >
           <ExpressionField
             project={this.props.project}

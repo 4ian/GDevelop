@@ -382,9 +382,16 @@ export default function SimplifiedSubscriptionDialog({
 }: Props): React.Node {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
-  // The light gold accent is unreadable on light themes, so darken it there.
-  const goldTextColor =
-    gdevelopTheme.palette.type === 'light' ? '#8C6500' : colors.goldText;
+  const isLightTheme = gdevelopTheme.palette.type === 'light';
+  // The white-based accents (gold text, borders) are invisible/unreadable on
+  // light themes, so use dark-tinted equivalents there.
+  const goldTextColor = isLightTheme ? '#8C6500' : colors.goldText;
+  const freeColumnBorderColor = isLightTheme
+    ? 'rgba(0, 0, 0, 0.12)'
+    : colors.freeColumnBorder;
+  const separatorColor = isLightTheme
+    ? 'rgba(0, 0, 0, 0.08)'
+    : 'rgba(255, 255, 255, 0.08)';
 
   const {
     buyUpdateOrCancelPlan,
@@ -538,7 +545,13 @@ export default function SimplifiedSubscriptionDialog({
             {/* Comparison columns */}
             <ResponsiveLineStackLayout noMargin noColumnMargin>
               {/* Free column */}
-              <div style={{ ...styles.column, ...styles.freeColumn }}>
+              <div
+                style={{
+                  ...styles.column,
+                  ...styles.freeColumn,
+                  border: `1px solid ${freeColumnBorderColor}`,
+                }}
+              >
                 {freeColumnTitle && (
                   <Text noMargin size="body-small" color="secondary">
                     <span
@@ -595,7 +608,12 @@ export default function SimplifiedSubscriptionDialog({
         <Spacer />
 
         {/* Price + CTA bar */}
-        <div style={styles.priceBar}>
+        <div
+          style={{
+            ...styles.priceBar,
+            borderTop: `1px solid ${separatorColor}`,
+          }}
+        >
           <ResponsiveLineStackLayout
             noMargin
             justifyContent="space-between"

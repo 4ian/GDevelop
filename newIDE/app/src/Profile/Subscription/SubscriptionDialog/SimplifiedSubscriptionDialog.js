@@ -5,6 +5,7 @@ import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import Dialog from '../../../UI/Dialog';
 import AuthenticatedUserContext from '../../AuthenticatedUserContext';
+import GDevelopThemeContext from '../../../UI/Theme/GDevelopThemeContext';
 import {
   type SubscriptionPlanWithPricingSystems,
   type SubscriptionPlanPricingSystem,
@@ -189,12 +190,24 @@ const StoreBadge = ({
 }: {|
   icon: React.Node,
   label: React.Node,
-|}) => (
-  <span style={styles.storeBadge}>
-    {icon}
-    <span>{label}</span>
-  </span>
-);
+|}) => {
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
+  const isLightTheme = gdevelopTheme.palette.type === 'light';
+  return (
+    <span
+      style={{
+        ...styles.storeBadge,
+        // The faint white chip is invisible on light themes, so use a dark tint.
+        background: isLightTheme
+          ? 'rgba(0, 0, 0, 0.08)'
+          : 'rgba(255, 255, 255, 0.08)',
+      }}
+    >
+      {icon}
+      <span>{label}</span>
+    </span>
+  );
+};
 
 // Maps a store badge id (sent by the backend) to its icon and (brand) label.
 // Unknown ids are ignored so the dialog degrades gracefully.
@@ -368,6 +381,10 @@ export default function SimplifiedSubscriptionDialog({
   couponCode,
 }: Props): React.Node {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
+  // The light gold accent is unreadable on light themes, so darken it there.
+  const goldTextColor =
+    gdevelopTheme.palette.type === 'light' ? '#8C6500' : colors.goldText;
 
   const {
     buyUpdateOrCancelPlan,
@@ -557,7 +574,7 @@ export default function SimplifiedSubscriptionDialog({
                 </span>
                 {featuredColumnTagline && (
                   <Text noMargin size="body-small">
-                    <span style={styles.goldLabel}>
+                    <span style={{ ...styles.goldLabel, color: goldTextColor }}>
                       {featuredColumnTagline}
                     </span>
                   </Text>
@@ -567,7 +584,7 @@ export default function SimplifiedSubscriptionDialog({
                   <SimplifiedBulletPoints
                     i18n={i18n}
                     simplifiedFeatures={featuredSimplifiedFeatures}
-                    emphasisColor={colors.goldText}
+                    emphasisColor={goldTextColor}
                   />
                 )}
               </div>

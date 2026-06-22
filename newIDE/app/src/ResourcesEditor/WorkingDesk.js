@@ -95,6 +95,19 @@ type ImagePanStart = {|
   scrollTop: number,
 |};
 
+type MarkdownTabState = {|
+  content: string,
+  isDirty: boolean,
+  isLoaded: boolean,
+  loadError: ?string,
+  saveError: ?string,
+|};
+
+type MarkdownTabStates = { [string]: MarkdownTabState };
+type MarkdownSaveTimeouts = { [string]: TimeoutID };
+type MarkdownSaveGenerations = { [string]: number };
+type MarkdownLoadingPaths = { [string]: boolean };
+
 const styles = {
   container: {
     display: 'flex',
@@ -240,9 +253,6 @@ const styles = {
     fontSize: 13,
     lineHeight: '19px',
   },
-  status: {
-    padding: '0 8px 6px 8px',
-  },
   textPreview: {
     flex: 1,
     overflow: 'auto',
@@ -319,6 +329,14 @@ const readTextFile = async (absolutePath: string): Promise<string> => {
 const getFileTabId = (selectedItem: ProjectFileSelection): string =>
   `file:${selectedItem.node.id}`;
 
+const getInitialMarkdownTabState = (): MarkdownTabState => ({
+  content: '',
+  isDirty: false,
+  isLoaded: false,
+  loadError: null,
+  saveError: null,
+});
+
 const getToolTabFromUpdate = (
   toolTabUpdate: WorkingDeskToolTabUpdate
 ): WorkingDeskToolTab => ({
@@ -345,17 +363,17 @@ const WorkingDesk = ({
   resourcesLoader,
   selectedItem,
   toolTabUpdate,
-  onProjectFilesChanged,
 }: Props): React.Node => {
   const theme = React.useContext(GDevelopThemeContext);
   const [tabs, setTabs] = React.useState<Array<WorkingDeskTab>>([]);
   const [activeTabId, setActiveTabId] = React.useState<?string>(null);
-  const [markdownContent, setMarkdownContent] = React.useState('');
+  const [
+    markdownTabStates,
+    setMarkdownTabStates,
+  ] = React.useState<MarkdownTabStates>({});
   const [markdownMode, setMarkdownMode] = React.useState<
     'split' | 'edit' | 'preview'
   >('split');
-  const [isMarkdownDirty, setIsMarkdownDirty] = React.useState(false);
-  const [markdownStatus, setMarkdownStatus] = React.useState<?string>(null);
   const [textPreview, setTextPreview] = React.useState<?string>(null);
   const [textPreviewError, setTextPreviewError] = React.useState<?string>(null);
   const [imageZoomFactor, setImageZoomFactor] = React.useState(1);
@@ -370,12 +388,35 @@ const WorkingDesk = ({
   );
   const imageScrollAreaRef = React.useRef<?HTMLDivElement>(null);
   const imagePanStartRef = React.useRef<?ImagePanStart>(null);
-  const markdownSaveGenerationRef = React.useRef<number>(0);
-  const latestMarkdownContentRef = React.useRef<string>('');
-  const latestMarkdownPathRef = React.useRef<?string>(null);
+  const markdownSaveTimeoutsRef = React.useRef<MarkdownSaveTimeouts>({});
+  const markdownSaveGenerationsRef = React.useRef<MarkdownSaveGenerations>({});
+  const markdownLoadingPathsRef = React.useRef<MarkdownLoadingPaths>({});
+  const markdownTabStatesRef = React.useRef<MarkdownTabStates>(
+    markdownTabStates
+  );
+  const selectedItemTabId =
+    selectedItem && selectedItem.node.type === 'file'
+      ? getFileTabId(selectedItem)
+      : null;
+  const selectedItemRef = React.useRef<?ProjectFileSelection>(selectedItem);
 
   React.useEffect(
     () => {
+      markdownTabStatesRef.current = markdownTabStates;
+    },
+    [markdownTabStates]
+  );
+
+  React.useEffect(
+    () => {
+      selectedItemRef.current = selectedItem;
+    },
+    [selectedItem]
+  );
+
+  React.useEffect(
+    () => {
+      const selectedItem = selectedItemRef.current;
       if (!selectedItem || selectedItem.node.type !== 'file') return;
 
       const tabId = getFileTabId(selectedItem);
@@ -396,7 +437,7 @@ const WorkingDesk = ({
       });
       setActiveTabId(tabId);
     },
-    [selectedItem]
+    [selectedItemTabId]
   );
 
   React.useEffect(
@@ -426,23 +467,19 @@ const WorkingDesk = ({
     activeTab && activeTab.tabKind === 'tool' ? activeTab : null;
   const selectedNode = activeFileItem ? activeFileItem.node : null;
   const selectedResource = activeFileItem ? activeFileItem.resource : null;
-
-  React.useEffect(
-    () => {
-      latestMarkdownContentRef.current = markdownContent;
-    },
-    [markdownContent]
-  );
-
-  React.useEffect(
-    () => {
-      latestMarkdownPathRef.current =
-        selectedNode && isMarkdownFile(selectedNode)
-          ? selectedNode.absolutePath
-          : null;
-    },
-    [selectedNode]
-  );
+  const activeFilePath =
+    activeFileItem && activeFileItem.node.type === 'file'
+      ? activeFileItem.node.absolutePath
+      : null;
+  const activeMarkdownPath =
+    selectedNode && isMarkdownFile(selectedNode)
+      ? selectedNode.absolutePath
+      : null;
+  const activeMarkdownState = activeMarkdownPath
+    ? markdownTabStates[activeMarkdownPath] || getInitialMarkdownTabState()
+    : null;
+  const activeFileIsMarkdown = !!selectedNode && isMarkdownFile(selectedNode);
+  const activeFileIsTextLike = !!selectedNode && isTextLikeFile(selectedNode);
 
   const renderDeskMessage = (children: React.Node) => (
     <div style={styles.emptyState}>
@@ -460,10 +497,6 @@ const WorkingDesk = ({
   React.useEffect(
     () => {
       let isMounted = true;
-      markdownSaveGenerationRef.current += 1;
-      setMarkdownContent('');
-      setMarkdownStatus(null);
-      setIsMarkdownDirty(false);
       setTextPreview(null);
       setTextPreviewError(null);
       setImageZoomFactor(1);
@@ -473,20 +506,68 @@ const WorkingDesk = ({
       imagePanStartRef.current = null;
       setAudioPreviewError(null);
 
-      if (!activeFileItem || activeFileItem.node.type !== 'file') return;
+      if (!activeFilePath) return;
 
-      if (isMarkdownFile(activeFileItem.node)) {
-        readTextFile(activeFileItem.node.absolutePath)
+      if (activeFileIsMarkdown) {
+        const currentState = markdownTabStatesRef.current[activeFilePath];
+        if (
+          (currentState && (currentState.isLoaded || currentState.isDirty)) ||
+          markdownLoadingPathsRef.current[activeFilePath]
+        ) {
+          return;
+        }
+
+        markdownLoadingPathsRef.current[activeFilePath] = true;
+        setMarkdownTabStates(currentStates => {
+          return {
+            ...currentStates,
+            [activeFilePath]: {
+              ...(currentStates[activeFilePath] ||
+                getInitialMarkdownTabState()),
+              loadError: null,
+            },
+          };
+        });
+
+        readTextFile(activeFilePath)
           .then(content => {
             if (!isMounted) return;
-            setMarkdownContent(content);
+            setMarkdownTabStates(currentStates => {
+              const currentState =
+                currentStates[activeFilePath] || getInitialMarkdownTabState();
+              if (currentState.isDirty) return currentStates;
+
+              return {
+                ...currentStates,
+                [activeFilePath]: {
+                  ...currentState,
+                  content,
+                  isLoaded: true,
+                  loadError: null,
+                },
+              };
+            });
           })
           .catch(error => {
             if (!isMounted) return;
-            setMarkdownStatus(error.message);
+            setMarkdownTabStates(currentStates => {
+              const currentState =
+                currentStates[activeFilePath] || getInitialMarkdownTabState();
+              return {
+                ...currentStates,
+                [activeFilePath]: {
+                  ...currentState,
+                  isLoaded: true,
+                  loadError: error.message,
+                },
+              };
+            });
+          })
+          .finally(() => {
+            delete markdownLoadingPathsRef.current[activeFilePath];
           });
-      } else if (isTextLikeFile(activeFileItem.node)) {
-        readTextFile(activeFileItem.node.absolutePath)
+      } else if (activeFileIsTextLike) {
+        readTextFile(activeFilePath)
           .then(content => {
             if (!isMounted) return;
             setTextPreview(content);
@@ -501,7 +582,7 @@ const WorkingDesk = ({
         isMounted = false;
       };
     },
-    [activeFileItem]
+    [activeFileIsMarkdown, activeFileIsTextLike, activeFilePath]
   );
 
   const updateImageScrollable = React.useCallback(() => {
@@ -653,50 +734,123 @@ const WorkingDesk = ({
     [stopImagePanning]
   );
 
-  const saveMarkdown = React.useCallback(
-    async (generation?: number, shouldRefreshProjectFiles: boolean = true) => {
-      const pathToSave = latestMarkdownPathRef.current;
-      if (!fs || !pathToSave) return;
+  const clearQueuedMarkdownSave = React.useCallback((pathToSave: string) => {
+    const timeoutId = markdownSaveTimeoutsRef.current[pathToSave];
+    if (!timeoutId) return;
 
-      const savedGeneration =
-        typeof generation === 'number'
-          ? generation
-          : markdownSaveGenerationRef.current;
-      const contentToSave = latestMarkdownContentRef.current;
-      setMarkdownStatus(null);
-      setMarkdownStatus('Saving...');
-      await fs.promises.writeFile(pathToSave, contentToSave, 'utf8');
-      if (
-        latestMarkdownPathRef.current === pathToSave &&
-        markdownSaveGenerationRef.current === savedGeneration
-      ) {
-        setIsMarkdownDirty(false);
-        setMarkdownStatus('Saved');
-      }
-      if (shouldRefreshProjectFiles) {
-        await onProjectFilesChanged();
+    clearTimeout(timeoutId);
+    delete markdownSaveTimeoutsRef.current[pathToSave];
+  }, []);
+
+  const saveMarkdownContent = React.useCallback(
+    async (pathToSave: string, contentToSave: string, generation: number) => {
+      if (!fs) return;
+
+      try {
+        await fs.promises.writeFile(pathToSave, contentToSave, 'utf8');
+        setMarkdownTabStates(currentStates => {
+          const currentState = currentStates[pathToSave];
+          if (
+            !currentState ||
+            markdownSaveGenerationsRef.current[pathToSave] !== generation
+          ) {
+            return currentStates;
+          }
+
+          return {
+            ...currentStates,
+            [pathToSave]: {
+              ...currentState,
+              isDirty: false,
+              saveError: null,
+            },
+          };
+        });
+      } catch (error) {
+        setMarkdownTabStates(currentStates => {
+          const currentState = currentStates[pathToSave];
+          if (
+            !currentState ||
+            markdownSaveGenerationsRef.current[pathToSave] !== generation
+          ) {
+            return currentStates;
+          }
+
+          return {
+            ...currentStates,
+            [pathToSave]: {
+              ...currentState,
+              isDirty: true,
+              saveError: error.message,
+            },
+          };
+        });
       }
     },
-    [onProjectFilesChanged]
+    []
   );
 
-  React.useEffect(
-    () => {
-      if (!isMarkdownDirty || !selectedNode || !isMarkdownFile(selectedNode)) {
-        return;
-      }
-
-      const generation = markdownSaveGenerationRef.current;
-      const timeoutId = setTimeout(() => {
-        saveMarkdown(generation, false);
+  const queueMarkdownSave = React.useCallback(
+    (pathToSave: string, contentToSave: string, generation: number) => {
+      clearQueuedMarkdownSave(pathToSave);
+      markdownSaveTimeoutsRef.current[pathToSave] = setTimeout(() => {
+        delete markdownSaveTimeoutsRef.current[pathToSave];
+        saveMarkdownContent(pathToSave, contentToSave, generation);
       }, 500);
-      return () => clearTimeout(timeoutId);
     },
-    [isMarkdownDirty, markdownContent, saveMarkdown, selectedNode]
+    [clearQueuedMarkdownSave, saveMarkdownContent]
   );
+
+  const flushMarkdownSave = React.useCallback(
+    (pathToSave: string) => {
+      const currentState = markdownTabStatesRef.current[pathToSave];
+      if (!currentState || !currentState.isDirty) return;
+
+      clearQueuedMarkdownSave(pathToSave);
+      saveMarkdownContent(
+        pathToSave,
+        currentState.content,
+        markdownSaveGenerationsRef.current[pathToSave] || 0
+      );
+    },
+    [clearQueuedMarkdownSave, saveMarkdownContent]
+  );
+
+  const saveActiveMarkdown = React.useCallback(
+    () => {
+      if (!activeMarkdownPath) return;
+      flushMarkdownSave(activeMarkdownPath);
+    },
+    [activeMarkdownPath, flushMarkdownSave]
+  );
+
+  React.useEffect(() => {
+    return () => {
+      Object.keys(markdownSaveTimeoutsRef.current).forEach(pathToSave => {
+        const timeoutId = markdownSaveTimeoutsRef.current[pathToSave];
+        clearTimeout(timeoutId);
+        const currentState = markdownTabStatesRef.current[pathToSave];
+        if (fs && currentState && currentState.isDirty) {
+          fs.promises
+            .writeFile(pathToSave, currentState.content, 'utf8')
+            .catch(() => {});
+        }
+      });
+      markdownSaveTimeoutsRef.current = {};
+    };
+  }, []);
 
   const closeTab = React.useCallback(
     (tabId: string) => {
+      const tabToClose = tabs.find(tab => tab.id === tabId);
+      if (
+        tabToClose &&
+        tabToClose.tabKind === 'file' &&
+        isMarkdownFile(tabToClose.selectedItem.node)
+      ) {
+        flushMarkdownSave(tabToClose.selectedItem.node.absolutePath);
+      }
+
       setTabs(currentTabs => {
         const tabIndex = currentTabs.findIndex(tab => tab.id === tabId);
         if (tabIndex === -1) return currentTabs;
@@ -710,7 +864,7 @@ const WorkingDesk = ({
         return nextTabs;
       });
     },
-    [activeTabId]
+    [activeTabId, flushMarkdownSave, tabs]
   );
 
   const renderTabIcon = (tab: WorkingDeskTab): React.Node => {
@@ -859,7 +1013,16 @@ const WorkingDesk = ({
   };
 
   const renderMarkdownEditor = () => {
-    if (!selectedNode) return null;
+    if (!selectedNode || !activeMarkdownPath || !activeMarkdownState) {
+      return null;
+    }
+
+    if (activeMarkdownState.loadError) {
+      return renderDeskMessage(
+        <Text noMargin>{activeMarkdownState.loadError}</Text>
+      );
+    }
+
     const showEditor = markdownMode === 'split' || markdownMode === 'edit';
     const showPreview = markdownMode === 'split' || markdownMode === 'preview';
     const textareaStyle = {
@@ -896,31 +1059,57 @@ const WorkingDesk = ({
           </IconButton>
           <IconButton
             size="small"
-            onClick={saveMarkdown}
-            disabled={!isMarkdownDirty}
+            onClick={saveActiveMarkdown}
+            disabled={!activeMarkdownState.isDirty}
             tooltip={t`Save Markdown`}
           >
             <FloppyIcon />
           </IconButton>
-          {!!markdownStatus && (
-            <MiniToolbarText>{markdownStatus}</MiniToolbarText>
+          {!!activeMarkdownState.saveError && (
+            <MiniToolbarText>{activeMarkdownState.saveError}</MiniToolbarText>
           )}
         </MiniToolbar>
         <div style={styles.markdownContainer}>
           {showEditor && (
             <div style={styles.markdownPane}>
               <textarea
-                value={markdownContent}
+                value={activeMarkdownState.content}
                 onChange={event => {
-                  markdownSaveGenerationRef.current += 1;
-                  setMarkdownContent(event.currentTarget.value);
-                  setIsMarkdownDirty(true);
-                  setMarkdownStatus('Saving...');
+                  const nextContent = event.currentTarget.value;
+                  const nextGeneration =
+                    (markdownSaveGenerationsRef.current[activeMarkdownPath] ||
+                      0) + 1;
+                  markdownSaveGenerationsRef.current[
+                    activeMarkdownPath
+                  ] = nextGeneration;
+
+                  setMarkdownTabStates(currentStates => {
+                    const currentState =
+                      currentStates[activeMarkdownPath] ||
+                      getInitialMarkdownTabState();
+
+                    return {
+                      ...currentStates,
+                      [activeMarkdownPath]: {
+                        ...currentState,
+                        content: nextContent,
+                        isDirty: true,
+                        isLoaded: true,
+                        loadError: null,
+                        saveError: null,
+                      },
+                    };
+                  });
+                  queueMarkdownSave(
+                    activeMarkdownPath,
+                    nextContent,
+                    nextGeneration
+                  );
                 }}
                 onKeyDown={event => {
                   if ((event.ctrlKey || event.metaKey) && event.key === 's') {
                     event.preventDefault();
-                    saveMarkdown();
+                    saveActiveMarkdown();
                   }
                 }}
                 style={textareaStyle}
@@ -939,7 +1128,7 @@ const WorkingDesk = ({
               }}
             >
               <MarkdownText
-                source={markdownContent}
+                source={activeMarkdownState.content}
                 isStandaloneText
                 allowParagraphs
               />
@@ -1140,13 +1329,6 @@ const WorkingDesk = ({
           {!tabs.length && renderActiveTabContent()}
         </div>
       </div>
-      {!!activeFileItem && isMarkdownDirty && (
-        <div style={styles.status}>
-          <Text noMargin>
-            <Trans>Markdown changes are not saved.</Trans>
-          </Text>
-        </div>
-      )}
     </div>
   );
 };

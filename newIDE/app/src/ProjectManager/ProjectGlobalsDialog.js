@@ -1,9 +1,10 @@
 // @flow
 import * as React from 'react';
 import { Trans, t } from '@lingui/macro';
-import Dialog from '../UI/Dialog';
+import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import FlatButton from '../UI/FlatButton';
 import IconButton from '../UI/IconButton';
+import TextField from '../UI/TextField';
 import Text from '../UI/Text';
 import { ColumnStackLayout } from '../UI/Layout';
 import { mapFor } from '../Utils/MapFor';
@@ -16,7 +17,11 @@ import { makeDragSourceAndDropTarget } from '../UI/DragAndDrop/DragSourceAndDrop
 import { makeDropTarget } from '../UI/DragAndDrop/DropTarget';
 import Add from '../UI/CustomSvgIcons/Add';
 import Cross from '../UI/CustomSvgIcons/Cross';
+import Edit from '../UI/CustomSvgIcons/Edit';
+import Trash from '../UI/CustomSvgIcons/Trash';
+import useAlertDialog from '../UI/Alert/useAlertDialog';
 
+const gd: libGDevelop = global.gd;
 const globalObjectFallbackIcon = 'res/icons_default/global_object24_black.svg';
 const globalGroupFallbackIcon = 'res/icons_default/global_group24_black.svg';
 const globalObjectCardReactDndType = 'GLOBAL_OBJECT_CARD';
@@ -150,6 +155,23 @@ const styles = {
     minWidth: 0,
     flexWrap: 'wrap',
   },
+  groupNameLine: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 8,
+    minWidth: 0,
+  },
+  groupName: {
+    flex: 1,
+    minWidth: 0,
+    overflowWrap: 'anywhere',
+  },
+  cardActions: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 2,
+    flexShrink: 0,
+  },
   typeText: {
     fontFamily: 'Consolas, Monaco, monospace',
     overflowWrap: 'anywhere',
@@ -229,12 +251,14 @@ const enumerateGlobalGroups = (project: gdProject): Array<GlobalGroupRow> => {
 
 const hasProjectObjectGroupOrVariableNamed = (
   project: gdProject,
-  name: string
+  name: string,
+  ignoredGlobalGroupName?: ?string
 ): boolean => {
   const globalObjects = project.getObjects();
   if (
     globalObjects.hasObjectNamed(name) ||
-    globalObjects.getObjectGroups().has(name) ||
+    (globalObjects.getObjectGroups().has(name) &&
+      name !== ignoredGlobalGroupName) ||
     project.getVariables().has(name)
   ) {
     return true;
@@ -254,6 +278,15 @@ const hasProjectObjectGroupOrVariableNamed = (
 
   return false;
 };
+
+const getValidatedGlobalGroupName = (
+  project: gdProject,
+  newName: string,
+  currentName?: ?string
+): string =>
+  newNameGenerator(gd.Project.getSafeName(newName), name =>
+    hasProjectObjectGroupOrVariableNamed(project, name, currentName)
+  );
 
 const DraggableGlobalObjectCard = makeDragSourceAndDropTarget<DraggedGlobalObject>(
   globalObjectCardReactDndType,
@@ -425,10 +458,14 @@ const GroupCard = ({
   group,
   onAddObjectToGroup,
   onRemoveObjectFromGroup,
+  onRenameGroup,
+  onDeleteGroup,
 }: {|
   group: GlobalGroupRow,
   onAddObjectToGroup: (objectName: string, group: GlobalGroupRow) => void,
   onRemoveObjectFromGroup: (objectName: string, group: GlobalGroupRow) => void,
+  onRenameGroup: (group: GlobalGroupRow) => void,
+  onDeleteGroup: (group: GlobalGroupRow) => Promise<void> | void,
 |}) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
@@ -458,13 +495,41 @@ const GroupCard = ({
           >
             <GroupPreview group={group} />
             <div style={styles.cardText}>
-              <Text
-                noMargin
-                allowSelection
-                style={{ overflowWrap: 'anywhere' }}
-              >
-                {group.name}
-              </Text>
+              <div style={styles.groupNameLine}>
+                <div style={styles.groupName}>
+                  <Text
+                    noMargin
+                    allowSelection
+                    style={{ overflowWrap: 'anywhere' }}
+                  >
+                    {group.name}
+                  </Text>
+                </div>
+                <div style={styles.cardActions}>
+                  <IconButton
+                    size="small"
+                    tooltip={t`Rename group`}
+                    aria-label="Rename group"
+                    onClick={event => {
+                      event.stopPropagation();
+                      onRenameGroup(group);
+                    }}
+                  >
+                    <Edit />
+                  </IconButton>
+                  <IconButton
+                    size="small"
+                    tooltip={t`Delete group`}
+                    aria-label="Delete group"
+                    onClick={event => {
+                      event.stopPropagation();
+                      onDeleteGroup(group);
+                    }}
+                  >
+                    <Trash />
+                  </IconButton>
+                </div>
+              </div>
               {group.objectNames.length ? (
                 <div style={styles.objects}>
                   {group.objectNames.map(objectName => (
@@ -503,13 +568,70 @@ const GroupCard = ({
   );
 };
 
+const RenameGlobalGroupDialog = ({
+  group,
+  onCancel,
+  onApply,
+}: {|
+  group: GlobalGroupRow,
+  onCancel: () => void,
+  onApply: string => void,
+|}) => {
+  const [newName, setNewName] = React.useState<string>(group.name);
+
+  const apply = React.useCallback(
+    () => {
+      onApply(newName);
+    },
+    [newName, onApply]
+  );
+
+  return (
+    <Dialog
+      open
+      title={<Trans>Rename group</Trans>}
+      actions={[
+        <FlatButton
+          key="cancel"
+          label={<Trans>Cancel</Trans>}
+          onClick={onCancel}
+        />,
+        <DialogPrimaryButton
+          key="apply"
+          label={<Trans>Rename</Trans>}
+          primary
+          onClick={apply}
+        />,
+      ]}
+      onRequestClose={onCancel}
+      onApply={apply}
+      maxWidth="sm"
+    >
+      <TextField
+        fullWidth
+        value={newName}
+        floatingLabelText={<Trans>Group name</Trans>}
+        floatingLabelFixed
+        translatableHintText={t`Group name`}
+        onChange={(event, value) => setNewName(value)}
+        autoFocus="desktop"
+      />
+    </Dialog>
+  );
+};
+
 const ProjectGlobalsDialog = ({
   project,
   onChange,
   onClose,
 }: Props): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
+  const { showDeleteConfirmation } = useAlertDialog();
   const [, forceRefresh] = React.useState(0);
+  const [
+    groupBeingRenamed,
+    setGroupBeingRenamed,
+  ] = React.useState<?GlobalGroupRow>(null);
   const globalObjects = enumerateGlobalObjects(project);
   const globalGroups = enumerateGlobalGroups(project);
 
@@ -548,6 +670,67 @@ const ProjectGlobalsDialog = ({
       forceRefresh(key => key + 1);
     },
     [project, onChange]
+  );
+
+  const onRenameGroup = React.useCallback((group: GlobalGroupRow) => {
+    setGroupBeingRenamed(group);
+  }, []);
+
+  const onApplyRenameGroup = React.useCallback(
+    (newName: string) => {
+      if (!groupBeingRenamed) return;
+
+      const currentName = groupBeingRenamed.group.getName();
+      if (newName === currentName) {
+        setGroupBeingRenamed(null);
+        return;
+      }
+
+      const validatedName = getValidatedGlobalGroupName(
+        project,
+        newName,
+        currentName
+      );
+
+      if (currentName !== validatedName) {
+        gd.WholeProjectRefactorer.globalObjectOrGroupRenamed(
+          project,
+          currentName,
+          validatedName,
+          /* isObjectGroup= */ true
+        );
+        groupBeingRenamed.group.setName(validatedName);
+        onChange();
+        forceRefresh(key => key + 1);
+      }
+
+      setGroupBeingRenamed(null);
+    },
+    [groupBeingRenamed, onChange, project]
+  );
+
+  const onDeleteGroup = React.useCallback(
+    async (group: GlobalGroupRow) => {
+      const answer = await showDeleteConfirmation({
+        title: t`Remove group`,
+        message: t`Are you sure you want to remove this group? This can't be undone.`,
+      });
+      if (!answer) return;
+
+      project
+        .getObjects()
+        .getObjectGroups()
+        .remove(group.group.getName());
+      if (
+        groupBeingRenamed &&
+        groupBeingRenamed.group.ptr === group.group.ptr
+      ) {
+        setGroupBeingRenamed(null);
+      }
+      onChange();
+      forceRefresh(key => key + 1);
+    },
+    [groupBeingRenamed, onChange, project, showDeleteConfirmation]
   );
 
   const actions: Array<?React.Node> = [
@@ -640,6 +823,8 @@ const ProjectGlobalsDialog = ({
                     group={group}
                     onAddObjectToGroup={onAddObjectToGroup}
                     onRemoveObjectFromGroup={onRemoveObjectFromGroup}
+                    onRenameGroup={onRenameGroup}
+                    onDeleteGroup={onDeleteGroup}
                   />
                 ))}
               </div>
@@ -658,6 +843,13 @@ const ProjectGlobalsDialog = ({
           </div>
         </ColumnStackLayout>
       </div>
+      {groupBeingRenamed && (
+        <RenameGlobalGroupDialog
+          group={groupBeingRenamed}
+          onCancel={() => setGroupBeingRenamed(null)}
+          onApply={onApplyRenameGroup}
+        />
+      )}
     </Dialog>
   );
 };

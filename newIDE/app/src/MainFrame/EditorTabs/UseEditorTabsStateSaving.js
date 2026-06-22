@@ -126,7 +126,9 @@ const useEditorTabsStateSaving = ({
       const editorState = {
         currentTab: editorTabs.panes.center.currentTab,
         editors: editorTabs.panes.center.editors
-          .filter(editor => editor.key !== 'start page')
+          .filter(
+            editor => editor.key !== 'start page' && editor.kind !== 'resources'
+          )
           .map(editor => ({
             projectItemName: editor.projectItemName,
             editorKind: editor.kind,
@@ -181,6 +183,7 @@ const useEditorTabsStateSaving = ({
       let shouldOpenSavedCurrentTab = true;
 
       const editorsOpeningOptions = editorState.editorTabs.editors
+        .filter(editorMetadata => editorMetadata.editorKind !== 'resources')
         .map(editorMetadata => {
           if (
             projectHasItem({

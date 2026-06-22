@@ -15,6 +15,9 @@ import {
   shouldSubmit,
 } from '../../../UI/KeyboardShortcuts/InteractionKeys';
 import { dataObjectToProps } from '../../../Utils/HTMLDataset';
+import UnsavedChangesContext, {
+  type UnsavedChanges,
+} from '../../../MainFrame/UnsavedChangesContext';
 const gd: libGDevelop = global.gd;
 
 const commentTextStyle = {
@@ -56,6 +59,8 @@ export default class CommentEvent extends React.Component<
   EventRendererProps,
   State
 > {
+  static contextType: React.Context<UnsavedChanges> = UnsavedChangesContext;
+
   // $FlowFixMe[missing-local-annot]
   state = {
     editing: false,
@@ -89,6 +94,11 @@ export default class CommentEvent extends React.Component<
   onChange = (e: any) => {
     const commentEvent = gd.asCommentEvent(this.props.event);
     commentEvent.setComment(e.target.value);
+
+    // The comment is modified live as the user types, so flag the
+    // project as having unsaved changes immediately.
+    const unsavedChanges: UnsavedChanges = this.context;
+    unsavedChanges.triggerUnsavedChanges();
 
     this._autoResizeTextArea();
     this.forceUpdate();

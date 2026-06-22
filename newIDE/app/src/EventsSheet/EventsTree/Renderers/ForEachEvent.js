@@ -109,8 +109,10 @@ export default class ForEachEvent extends React.Component<
     editingObjectPreviousValue: null,
     objectAnchorEl: null,
     editingOrderBy: false,
+    editingOrderByPreviousValue: null,
     orderByAnchorEl: null,
     editingLimit: false,
+    editingLimitPreviousValue: null,
     limitAnchorEl: null,
   };
 
@@ -166,13 +168,28 @@ export default class ForEachEvent extends React.Component<
     });
   };
 
+  applyEditingObject = () => {
+    const forEachEvent = gd.asForEachEvent(this.props.event);
+    const { editingObjectPreviousValue } = this.state;
+    if (
+      editingObjectPreviousValue != null &&
+      editingObjectPreviousValue !== forEachEvent.getObjectToPick()
+    ) {
+      // Value changed: record the change in the history (this also flags the project as having unsaved changes).
+      this.props.onEndEditingEvent();
+    }
+    this.endEditingObject();
+  };
+
   editOrderBy = (domEvent: any) => {
+    const forEachEvent = gd.asForEachEvent(this.props.event);
     const anchorEl = domEvent.currentTarget;
     setTimeout(
       () =>
         this.setState(
           {
             editingOrderBy: true,
+            editingOrderByPreviousValue: forEachEvent.getOrderBy(),
             orderByAnchorEl: anchorEl,
           },
           () => {
@@ -186,23 +203,35 @@ export default class ForEachEvent extends React.Component<
   };
 
   endEditingOrderBy = () => {
-    const { orderByAnchorEl } = this.state;
+    const { orderByAnchorEl, editingOrderByPreviousValue } = this.state;
     // $FlowFixMe[incompatible-type]
     if (orderByAnchorEl) orderByAnchorEl.focus();
 
+    const forEachEvent = gd.asForEachEvent(this.props.event);
+    if (
+      editingOrderByPreviousValue != null &&
+      editingOrderByPreviousValue !== forEachEvent.getOrderBy()
+    ) {
+      // Value changed: record the change in the history (this also flags the project as having unsaved changes).
+      this.props.onEndEditingEvent();
+    }
+
     this.setState({
       editingOrderBy: false,
+      editingOrderByPreviousValue: null,
       orderByAnchorEl: null,
     });
   };
 
   editLimit = (domEvent: any) => {
+    const forEachEvent = gd.asForEachEvent(this.props.event);
     const anchorEl = domEvent.currentTarget;
     setTimeout(
       () =>
         this.setState(
           {
             editingLimit: true,
+            editingLimitPreviousValue: forEachEvent.getLimit(),
             limitAnchorEl: anchorEl,
           },
           () => {
@@ -216,12 +245,22 @@ export default class ForEachEvent extends React.Component<
   };
 
   endEditingLimit = () => {
-    const { limitAnchorEl } = this.state;
+    const { limitAnchorEl, editingLimitPreviousValue } = this.state;
     // $FlowFixMe[incompatible-type]
     if (limitAnchorEl) limitAnchorEl.focus();
 
+    const forEachEvent = gd.asForEachEvent(this.props.event);
+    if (
+      editingLimitPreviousValue != null &&
+      editingLimitPreviousValue !== forEachEvent.getLimit()
+    ) {
+      // Value changed: record the change in the history (this also flags the project as having unsaved changes).
+      this.props.onEndEditingEvent();
+    }
+
     this.setState({
       editingLimit: false,
+      editingLimitPreviousValue: null,
       limitAnchorEl: null,
     });
   };
@@ -386,20 +425,17 @@ export default class ForEachEvent extends React.Component<
                       if (value === 'any') {
                         forEachEvent.setOrderBy('');
                         forEachEvent.setLimit('');
-                        this.props.onUpdate();
-                        this.forceUpdate();
                       } else if (value === 'orderBy') {
                         forEachEvent.setOrderBy(`${objectPrefix}.`);
                         forEachEvent.setOrder('asc');
-                        this.props.onUpdate();
-                        this.forceUpdate();
                       } else {
                         // An example was selected: use its expression.
                         forEachEvent.setOrderBy(value);
                         forEachEvent.setOrder('desc');
-                        this.props.onUpdate();
-                        this.forceUpdate();
                       }
+                      this.props.onEndEditingEvent();
+                      this.props.onUpdate();
+                      this.forceUpdate();
                     }}
                     disabled={this.props.disabled}
                   >
@@ -459,6 +495,7 @@ export default class ForEachEvent extends React.Component<
                     value={order}
                     onChange={value => {
                       forEachEvent.setOrder(value);
+                      this.props.onEndEditingEvent();
                       this.props.onUpdate();
                       this.forceUpdate();
                     }}
@@ -607,7 +644,7 @@ export default class ForEachEvent extends React.Component<
               open={this.state.editingObject}
               anchorEl={this.state.objectAnchorEl}
               onRequestClose={this.cancelEditingObject}
-              onApply={this.endEditingObject}
+              onApply={this.applyEditingObject}
             >
               <ObjectField
                 project={this.props.project}
@@ -624,7 +661,7 @@ export default class ForEachEvent extends React.Component<
                 }}
                 isInline
                 onRequestClose={this.cancelEditingObject}
-                onApply={this.endEditingObject}
+                onApply={this.applyEditingObject}
                 ref={objectField => (this._objectField = objectField)}
               />
             </InlinePopover>

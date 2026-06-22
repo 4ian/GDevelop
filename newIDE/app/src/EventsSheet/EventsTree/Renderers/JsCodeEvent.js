@@ -19,6 +19,9 @@ import { Trans } from '@lingui/macro';
 import ChevronArrowTop from '../../../UI/CustomSvgIcons/ChevronArrowTop';
 import ChevronArrowBottom from '../../../UI/CustomSvgIcons/ChevronArrowBottom';
 import { exceptionallyGuardAgainstDeadObject } from '../../../Utils/IsNullPtr';
+import UnsavedChangesContext, {
+  type UnsavedChanges,
+} from '../../../MainFrame/UnsavedChangesContext';
 
 const gd: libGDevelop = global.gd;
 
@@ -72,6 +75,8 @@ export default class JsCodeEvent extends React.Component<
   EventRendererProps,
   State
 > {
+  static contextType: React.Context<UnsavedChanges> = UnsavedChangesContext;
+
   _objectField: ?ParameterFieldInterface = null;
   // $FlowFixMe[missing-local-annot]
   state = {
@@ -98,6 +103,11 @@ export default class JsCodeEvent extends React.Component<
   onChange = (newValue: string) => {
     const jsCodeEvent = gd.asJsCodeEvent(this.props.event);
     jsCodeEvent.setInlineCode(newValue);
+
+    // The JS Event is modified live as the user types, so flag the
+    // project as having unsaved changes immediately.
+    const unsavedChanges: UnsavedChanges = this.context;
+    unsavedChanges.triggerUnsavedChanges();
   };
 
   saveEditorState = ({

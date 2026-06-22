@@ -419,6 +419,22 @@ export default function SimplifiedSubscriptionDialog({
             featuredSimplifiedFeatures.taglineByLocale
           )
         : null;
+    const upgradeOverline =
+      featuredSimplifiedFeatures &&
+      featuredSimplifiedFeatures.upgradeOverlineByLocale
+        ? selectMessageByLocale(
+            i18n,
+            featuredSimplifiedFeatures.upgradeOverlineByLocale
+          )
+        : null;
+    const upgradeTitle =
+      featuredSimplifiedFeatures &&
+      featuredSimplifiedFeatures.upgradeTitleByLocale
+        ? selectMessageByLocale(
+            i18n,
+            featuredSimplifiedFeatures.upgradeTitleByLocale
+          )
+        : null;
 
     return (
       <ColumnStackLayout noMargin>
@@ -430,11 +446,13 @@ export default function SimplifiedSubscriptionDialog({
               <Column noMargin>
                 <Text noMargin size="body-small">
                   <span style={styles.greenLabel}>
-                    <Trans>You've reached your free limit</Trans>
+                    {upgradeOverline || (
+                      <Trans>You've reached your free limit</Trans>
+                    )}
                   </span>
                 </Text>
                 <Text noMargin size="section-title">
-                  <Trans>Upgrade to {featuredPlanName}</Trans>
+                  {upgradeTitle || <Trans>Upgrade to {featuredPlanName}</Trans>}
                 </Text>
               </Column>
             </LineStackLayout>

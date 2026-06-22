@@ -613,6 +613,7 @@ export const sendShowcaseGameLinkOpened = (title: string, linkType: string) => {
 export const sendChoosePlanClicked = (metadata: {|
   planId: string | null,
   pricingSystemId: string | null,
+  dialogVariant?: string,
 |}) => {
   recordEvent('choose-plan-click', metadata);
 };

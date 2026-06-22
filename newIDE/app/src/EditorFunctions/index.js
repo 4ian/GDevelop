@@ -3017,6 +3017,19 @@ const put2dInstances: EditorFunction = {
       }
 
       // Paint the new/modified instances with the brush.
+      const instancesSize = SafeExtractor.parseCommaSeparatedTwoFiniteNumbers(
+        instances_size
+      );
+      const effectiveBrushSize =
+        instancesSize ||
+        (objectSizeInfo &&
+        objectSizeInfo.width !== null &&
+        objectSizeInfo.height !== null
+          ? [objectSizeInfo.width, objectSizeInfo.height]
+          : null);
+      // Hints surfaced in the success message (e.g. instances ending up
+      // stacked) so the model can correct itself on the next turn.
+      const brushPlacementHints = [];
       if (brush_kind === 'line') {
         const instancesCount = modifiedAndCreatedInstances.length;
 
@@ -3034,6 +3047,24 @@ const put2dInstances: EditorFunction = {
             instance.setX(brushPosition[0] + i * deltaX);
             instance.setY(brushPosition[1] + i * deltaY);
           });
+
+          // The brush spreads instance origins, so a step smaller than the
+          // instance size leaves them overlapping each other - often a mistake
+          // (a single large instance should use the `point` brush).
+          if (
+            effectiveBrushSize &&
+            instancesCount > 1 &&
+            Math.abs(deltaX) < effectiveBrushSize[0] &&
+            Math.abs(deltaY) < effectiveBrushSize[1]
+          ) {
+            brushPlacementHints.push(
+              `Note: these ${instancesCount} instances overlap each other (spacing ${Math.round(
+                Math.hypot(deltaX, deltaY)
+              )}px vs size ${effectiveBrushSize[0]}x${
+                effectiveBrushSize[1]
+              }). If you wanted a single large instance, use the "point" brush with that size; if you wanted them spread out, move brush_end_position further away or lower new_instances_count.`
+            );
+          }
         }
       } else if (brush_kind === 'grid') {
         const instancesCount = modifiedAndCreatedInstances.length;
@@ -3084,6 +3115,27 @@ const put2dInstances: EditorFunction = {
             instance.setX(brushPosition[0] + column * gridColumnSize);
             instance.setY(brushPosition[1] + row * gridRowSize);
           });
+
+          // A column or row step smaller than the instance size leaves the grid
+          // overlapping on that axis - often a mistake (a single large instance
+          // should use the `point` brush).
+          if (
+            effectiveBrushSize &&
+            ((gridColumnCount > 1 &&
+              Math.abs(gridColumnSize) < effectiveBrushSize[0]) ||
+              (gridRowCount > 1 &&
+                Math.abs(gridRowSize) < effectiveBrushSize[1]))
+          ) {
+            brushPlacementHints.push(
+              `Note: these ${instancesCount} instances overlap each other (grid spacing ${Math.round(
+                Math.abs(gridColumnSize)
+              )}x${Math.round(Math.abs(gridRowSize))}px vs size ${
+                effectiveBrushSize[0]
+              }x${
+                effectiveBrushSize[1]
+              }). If you wanted a single large instance, use the "point" brush with that size; if you wanted them spread out, move brush_end_position further away or lower new_instances_count.`
+            );
+          }
         }
       } else if (brush_kind === 'random_in_circle') {
         modifiedAndCreatedInstances.forEach(instance => {
@@ -3113,9 +3165,6 @@ const put2dInstances: EditorFunction = {
         }
       }
 
-      const instancesSize = SafeExtractor.parseCommaSeparatedTwoFiniteNumbers(
-        instances_size
-      );
       const instancesRotation = SafeExtractor.extractNumberProperty(
         args,
         'instances_rotation'
@@ -3153,13 +3202,7 @@ const put2dInstances: EditorFunction = {
           attrs.push(`opacity ${instancesOpacity}/255`);
         if (instances_z_order !== null)
           attrs.push(`z-order ${instances_z_order}`);
-        const effectiveSize = instancesSize
-          ? instancesSize
-          : objectSizeInfo &&
-            objectSizeInfo.width !== null &&
-            objectSizeInfo.height !== null
-          ? [objectSizeInfo.width, objectSizeInfo.height]
-          : null;
+        const effectiveSize = effectiveBrushSize;
         if (brush_kind === 'point' && effectiveSize) {
           attrs.push(
             `origin at this position, each occupies ${getOccupiedSpaceDescription(
@@ -3180,6 +3223,10 @@ const put2dInstances: EditorFunction = {
           }.`
         );
       }
+
+      brushPlacementHints.forEach(hint => {
+        changes.push(hint);
+      });
 
       // Check what changed for existing instances
       let movedToLayerCount = 0;
@@ -3667,6 +3714,20 @@ const put3dInstances: EditorFunction = {
       }
 
       // Paint the new/modified instances with the brush.
+      const instancesSizeArray = SafeExtractor.parseCommaSeparatedThreeFiniteNumbers(
+        instances_size
+      );
+      const effectiveBrushSize =
+        instancesSizeArray ||
+        (objectSizeInfo &&
+        objectSizeInfo.width !== null &&
+        objectSizeInfo.height !== null &&
+        objectSizeInfo.depth !== null
+          ? [objectSizeInfo.width, objectSizeInfo.height, objectSizeInfo.depth]
+          : null);
+      // Hints surfaced in the success message (e.g. instances ending up
+      // stacked) so the model can correct itself on the next turn.
+      const brushPlacementHints = [];
       if (brush_kind === 'line') {
         const instancesCount = modifiedAndCreatedInstances.length;
 
@@ -3689,6 +3750,25 @@ const put3dInstances: EditorFunction = {
             instance.setY(brushPosition[1] + i * deltaY);
             instance.setZ(brushPosition[2] + i * deltaZ);
           });
+
+          // A step smaller than the instance size on every axis leaves the
+          // instances overlapping each other - often a mistake (a single large
+          // instance should use the `point` brush).
+          if (
+            effectiveBrushSize &&
+            instancesCount > 1 &&
+            Math.abs(deltaX) < effectiveBrushSize[0] &&
+            Math.abs(deltaY) < effectiveBrushSize[1] &&
+            Math.abs(deltaZ) < effectiveBrushSize[2]
+          ) {
+            brushPlacementHints.push(
+              `Note: these ${instancesCount} instances overlap each other (spacing ${Math.round(
+                Math.hypot(deltaX, deltaY, deltaZ)
+              )}px vs size ${effectiveBrushSize[0]}x${effectiveBrushSize[1]}x${
+                effectiveBrushSize[2]
+              }). If you wanted a single large instance, use the "point" brush with that size; if you wanted them spread out, move brush_end_position further away or lower new_instances_count.`
+            );
+          }
         }
       } else if (brush_kind === 'random_in_sphere') {
         modifiedAndCreatedInstances.forEach(instance => {
@@ -3727,9 +3807,6 @@ const put3dInstances: EditorFunction = {
         }
       }
 
-      const instancesSizeArray = SafeExtractor.parseCommaSeparatedThreeFiniteNumbers(
-        instances_size
-      );
       const instancesRotationArray = instances_rotation
         ? instances_rotation.split(',').map(coord => parseFloat(coord) || 0)
         : null;
@@ -3764,14 +3841,7 @@ const put3dInstances: EditorFunction = {
               instancesRotationArray[1]
             }°, ${instancesRotationArray[2]}°)`
           );
-        const effectiveSize = instancesSizeArray
-          ? instancesSizeArray
-          : objectSizeInfo &&
-            objectSizeInfo.width !== null &&
-            objectSizeInfo.height !== null &&
-            objectSizeInfo.depth !== null
-          ? [objectSizeInfo.width, objectSizeInfo.height, objectSizeInfo.depth]
-          : null;
+        const effectiveSize = effectiveBrushSize;
         if (brush_kind === 'point' && effectiveSize) {
           attrs.push(
             `origin at this position, each occupies ${getOccupiedSpaceDescription(
@@ -3792,6 +3862,10 @@ const put3dInstances: EditorFunction = {
           }.`
         );
       }
+
+      brushPlacementHints.forEach(hint => {
+        changes.push(hint);
+      });
 
       // Check what changed for existing instances
       let movedToLayerCount = 0;

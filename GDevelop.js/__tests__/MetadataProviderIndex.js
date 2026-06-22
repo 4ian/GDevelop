@@ -2,16 +2,28 @@ const initializeGDevelopJs = require('../../Binaries/embuild/GDevelop.js/libGD.j
 
 // Checks that gd::MetadataProvider lookups (backed by the platform's
 // gd::PlatformMetadataIndex) stay correct when extensions are added, replaced
-// and removed at runtime - i.e. that the index is properly invalidated.
-describe('MetadataProvider index invalidation', () => {
+// and removed at runtime - i.e. that the index is properly invalidated - and
+// that every kind of metadata is indexed and resolved.
+describe('MetadataProvider index', () => {
   let gd = null;
   beforeAll(async () => {
     gd = await initializeGDevelopJs();
   });
 
   const extensionName = 'MetadataIndexTestExtension';
-  const objectType = extensionName + '::IndexTestObject';
-  const actionType = extensionName + '::IndexTestAction';
+  const prefix = extensionName + '::';
+  const objectType = prefix + 'TestObject';
+  const behaviorType = prefix + 'TestBehavior';
+  const actionType = prefix + 'TestAction';
+  const conditionType = prefix + 'TestCondition';
+  const expressionType = prefix + 'TestExpression';
+  const strExpressionType = prefix + 'TestStrExpression';
+  // Object/behavior expression names are not namespaced (they are scoped to the
+  // object/behavior type they belong to).
+  const objectExpressionName = 'TestObjectExpression';
+  const objectStrExpressionName = 'TestObjectStrExpression';
+  const behaviorExpressionName = 'TestBehaviorExpression';
+  const behaviorStrExpressionName = 'TestBehaviorStrExpression';
 
   const makeExtension = (objectFullName) => {
     const extension = new gd.PlatformExtension();
@@ -22,24 +34,68 @@ describe('MetadataProvider index invalidation', () => {
       'Author',
       'MIT'
     );
+
     const objectConfiguration = new gd.ObjectJsImplementation();
-    extension.addObject(
-      'IndexTestObject',
+    const objectMetadata = extension.addObject(
+      'TestObject',
       objectFullName,
       'A test object',
       '',
       objectConfiguration
     );
-    extension.addAction(
-      'IndexTestAction',
-      'Index test action',
-      'Does something',
-      'Does something',
+    objectMetadata.addExpression(objectExpressionName, 'Obj expr', 'd', 'g', '');
+    objectMetadata.addStrExpression(objectStrExpressionName, 'Obj str', 'd', 'g', '');
+
+    const behaviorInstance = new gd.BehaviorJsImplementation();
+    behaviorInstance.initializeContent = function (behaviorContent) {};
+    const behaviorMetadata = extension.addBehavior(
+      'TestBehavior',
+      'Test behavior',
+      'TestBehavior',
+      'A test behavior',
       '',
       '',
-      ''
+      'TestBehavior',
+      behaviorInstance,
+      new gd.BehaviorsSharedData()
     );
+    behaviorMetadata.addExpression(behaviorExpressionName, 'Beh expr', 'd', 'g', '');
+    behaviorMetadata.addStrExpression(behaviorStrExpressionName, 'Beh str', 'd', 'g', '');
+
+    extension.addAction('TestAction', 'Test action', 'Does', 'Does', '', '', '');
+    extension.addCondition('TestCondition', 'Test cond', 'Is', 'Is', '', '', '');
+    extension.addExpression('TestExpression', 'Test expr', 'd', 'g', '');
+    extension.addStrExpression('TestStrExpression', 'Test str', 'd', 'g', '');
+
     return extension;
+  };
+
+  // Asserts every kind of metadata declared by makeExtension is found (when
+  // expectFound) or resolves to the "bad" metadata (when not).
+  const expectAllResolved = (platform, expectFound) => {
+    const P = gd.MetadataProvider;
+    const cases = [
+      P.isBadObjectMetadata(P.getObjectMetadata(platform, objectType)),
+      P.isBadBehaviorMetadata(P.getBehaviorMetadata(platform, behaviorType)),
+      P.isBadInstructionMetadata(P.getActionMetadata(platform, actionType)),
+      P.isBadInstructionMetadata(P.getConditionMetadata(platform, conditionType)),
+      P.isBadExpressionMetadata(P.getExpressionMetadata(platform, expressionType)),
+      P.isBadExpressionMetadata(P.getStrExpressionMetadata(platform, strExpressionType)),
+      P.isBadExpressionMetadata(
+        P.getObjectExpressionMetadata(platform, objectType, objectExpressionName)
+      ),
+      P.isBadExpressionMetadata(
+        P.getObjectStrExpressionMetadata(platform, objectType, objectStrExpressionName)
+      ),
+      P.isBadExpressionMetadata(
+        P.getBehaviorExpressionMetadata(platform, behaviorType, behaviorExpressionName)
+      ),
+      P.isBadExpressionMetadata(
+        P.getBehaviorStrExpressionMetadata(platform, behaviorType, behaviorStrExpressionName)
+      ),
+    ];
+    // When found, none should be "bad"; when not, all should be "bad".
+    for (const isBad of cases) expect(isBad).toBe(!expectFound);
   };
 
   afterEach(() => {
@@ -47,44 +103,23 @@ describe('MetadataProvider index invalidation', () => {
       gd.JsPlatform.get().removeExtension(extensionName);
   });
 
-  it('does not find metadata before the extension is added', () => {
-    const platform = gd.JsPlatform.get();
-    expect(
-      gd.MetadataProvider.isBadObjectMetadata(
-        gd.MetadataProvider.getObjectMetadata(platform, objectType)
-      )
-    ).toBe(true);
-    expect(
-      gd.MetadataProvider.isBadInstructionMetadata(
-        gd.MetadataProvider.getActionMetadata(platform, actionType)
-      )
-    ).toBe(true);
-  });
-
-  it('finds metadata right after the extension is added (index rebuilt)', () => {
+  it('resolves every kind of metadata after the extension is added, and none before/after removal', () => {
     const platform = gd.JsPlatform.get();
 
-    // Build the index once so the test proves it is invalidated, not just
-    // lazily built for the first time.
+    // Build the index once first so we test invalidation, not lazy first build.
     gd.MetadataProvider.getObjectMetadata(platform, 'Sprite');
+
+    expectAllResolved(platform, false);
 
     const extension = makeExtension('First name');
     platform.addNewExtension(extension);
     extension.delete();
 
-    expect(
-      gd.MetadataProvider.isBadObjectMetadata(
-        gd.MetadataProvider.getObjectMetadata(platform, objectType)
-      )
-    ).toBe(false);
-    expect(
-      gd.MetadataProvider.getObjectMetadata(platform, objectType).getFullName()
-    ).toBe('First name');
-    expect(
-      gd.MetadataProvider.isBadInstructionMetadata(
-        gd.MetadataProvider.getActionMetadata(platform, actionType)
-      )
-    ).toBe(false);
+    expectAllResolved(platform, true);
+
+    platform.removeExtension(extensionName);
+
+    expectAllResolved(platform, false);
   });
 
   it('returns updated metadata after the extension is replaced (not stale)', () => {
@@ -94,13 +129,12 @@ describe('MetadataProvider index invalidation', () => {
     platform.addNewExtension(firstExtension);
     firstExtension.delete();
 
-    // Resolve once so the index caches the first version's metadata.
     expect(
       gd.MetadataProvider.getObjectMetadata(platform, objectType).getFullName()
     ).toBe('First name');
 
-    // Replacing an extension goes through RemoveExtension + AddExtension, which
-    // must discard the cached (now dangling) metadata.
+    // Replacing goes through RemoveExtension + AddExtension and must discard the
+    // cached (now dangling) metadata.
     const secondExtension = makeExtension('Second name');
     platform.addNewExtension(secondExtension);
     secondExtension.delete();
@@ -108,33 +142,5 @@ describe('MetadataProvider index invalidation', () => {
     expect(
       gd.MetadataProvider.getObjectMetadata(platform, objectType).getFullName()
     ).toBe('Second name');
-  });
-
-  it('stops finding metadata after the extension is removed', () => {
-    const platform = gd.JsPlatform.get();
-
-    const extension = makeExtension('First name');
-    platform.addNewExtension(extension);
-    extension.delete();
-
-    // Resolve once so the index is populated before removal.
-    expect(
-      gd.MetadataProvider.isBadObjectMetadata(
-        gd.MetadataProvider.getObjectMetadata(platform, objectType)
-      )
-    ).toBe(false);
-
-    platform.removeExtension(extensionName);
-
-    expect(
-      gd.MetadataProvider.isBadObjectMetadata(
-        gd.MetadataProvider.getObjectMetadata(platform, objectType)
-      )
-    ).toBe(true);
-    expect(
-      gd.MetadataProvider.isBadInstructionMetadata(
-        gd.MetadataProvider.getActionMetadata(platform, actionType)
-      )
-    ).toBe(true);
   });
 });

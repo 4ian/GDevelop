@@ -145,11 +145,24 @@ const styles = {
   },
   continueForFree: {
     cursor: 'pointer',
+    background: 'none',
+    border: 'none',
+    font: 'inherit',
+    color: 'inherit',
+    padding: '2px 4px',
+    borderRadius: 4,
     borderBottom: '1px dotted rgba(255, 255, 255, 0.5)',
   },
   continueForFreeDisabled: {
     cursor: 'default',
     opacity: 0.5,
+  },
+  continueForFreeHovered: {
+    borderBottom: '1px solid rgba(255, 255, 255, 0.9)',
+  },
+  continueForFreeFocused: {
+    outline: `2px solid ${colors.green}`,
+    outlineOffset: 2,
   },
 };
 
@@ -274,6 +287,45 @@ const SimplifiedBulletPoints = ({
     })}
   </ColumnStackLayout>
 );
+
+// Subtle "Not for now" dismiss action. Rendered as a real button so it is
+// keyboard-focusable and operable, with visible hover and focus states.
+const ContinueForFreeButton = ({
+  disabled,
+  onClick,
+}: {|
+  disabled: boolean,
+  onClick: () => void,
+|}) => {
+  const [isHovered, setIsHovered] = React.useState(false);
+  const [isFocused, setIsFocused] = React.useState(false);
+  const stateStyle = disabled
+    ? styles.continueForFreeDisabled
+    : isHovered && isFocused
+    ? { ...styles.continueForFreeHovered, ...styles.continueForFreeFocused }
+    : isFocused
+    ? styles.continueForFreeFocused
+    : isHovered
+    ? styles.continueForFreeHovered
+    : null;
+  return (
+    <button
+      type="button"
+      disabled={disabled}
+      onClick={onClick}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      onFocus={() => setIsFocused(true)}
+      onBlur={() => setIsFocused(false)}
+      style={{ ...styles.continueForFree, ...stateStyle }}
+    >
+      <Text noMargin color="secondary" size="body-small">
+        <Trans>Not for now</Trans>
+        {' ›'}
+      </Text>
+    </button>
+  );
+};
 
 /**
  * Compute the monthly-equivalent price of a yearly plan (the price shown as
@@ -590,19 +642,7 @@ export default function SimplifiedSubscriptionDialog({
                 onClick={onClickUpgrade}
               />
               <Spacer />
-              <div
-                style={
-                  isLoading
-                    ? styles.continueForFreeDisabled
-                    : styles.continueForFree
-                }
-                onClick={isLoading ? undefined : onClose}
-              >
-                <Text noMargin color="secondary" size="body-small">
-                  <Trans>Not for now</Trans>
-                  {' \u203A'}
-                </Text>
-              </div>
+              <ContinueForFreeButton disabled={isLoading} onClick={onClose} />
             </Column>
           </ResponsiveLineStackLayout>
         </div>

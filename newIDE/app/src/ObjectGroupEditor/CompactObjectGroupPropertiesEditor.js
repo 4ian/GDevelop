@@ -127,7 +127,7 @@ export const CompactObjectGroupPropertiesEditor = ({
     // The VariablesContainer is returned by value.
     // Thus, the same instance is reused every time.
     () =>
-      gd.ObjectVariableHelper.mergeVariableContainers(
+      gd.ObjectRefactorer.mergeVariableContainers(
         projectScopedContainersAccessor.get().getObjectsContainersList(),
         objectGroup
       ),
@@ -199,7 +199,7 @@ export const CompactObjectGroupPropertiesEditor = ({
   const addObject = React.useCallback(
     (objectName: string) => {
       objectGroup.addObject(objectName);
-      gd.ObjectVariableHelper.fillMissingGroupVariablesToObjects(
+      gd.ObjectRefactorer.fillMissingGroupVariablesToObjects(
         globalObjectsContainer || objectsContainer,
         objectsContainer,
         objectGroup,

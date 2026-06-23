@@ -997,7 +997,7 @@ export const addObjectUndeclaredVariables = ({
     group: gdObjectGroup,
     undeclaredVariable: AiGeneratedEventUndeclaredVariable
   ) => {
-    const groupVariablesContainer = gd.ObjectVariableHelper.mergeVariableContainers(
+    const groupVariablesContainer = gd.ObjectRefactorer.mergeVariableContainers(
       projectScopedContainers.getObjectsContainersList(),
       group
     );

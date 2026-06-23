@@ -366,7 +366,7 @@ interface ObjectGroup {
     void UnserializeFrom([Const, Ref] SerializerElement element);
 };
 
-interface ObjectVariableHelper {
+interface ObjectRefactorer {
     [Value] VariablesContainer STATIC_MergeVariableContainers(
         [Const, Ref] ObjectsContainersList objectsContainersList,
         [Const, Ref] ObjectGroup objectGroup);

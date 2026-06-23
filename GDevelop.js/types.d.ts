@@ -418,7 +418,7 @@ export class ObjectGroup extends EmscriptenObject {
   unserializeFrom(element: SerializerElement): void;
 }
 
-export class ObjectVariableHelper extends EmscriptenObject {
+export class ObjectRefactorer extends EmscriptenObject {
   static mergeVariableContainers(objectsContainersList: ObjectsContainersList, objectGroup: ObjectGroup): VariablesContainer;
   static fillAnyVariableBetweenObjects(globalObjectsContainer: ObjectsContainer, objectsContainer: ObjectsContainer, objectGroup: ObjectGroup): void;
   static applyChangesToVariants(eventsBasedObject: EventsBasedObject, objectName: string, changeset: VariablesChangeset): void;

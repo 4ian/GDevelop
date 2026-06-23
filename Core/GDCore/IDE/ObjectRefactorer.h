@@ -24,7 +24,7 @@ namespace gd {
  *
  * This is used by the object group variable editor.
  */
-class GD_CORE_API ObjectVariableHelper {
+class GD_CORE_API ObjectRefactorer {
 public:
   /**
    * Copy every variable from every object of the group to the other objects
@@ -54,7 +54,7 @@ public:
    * Objects can be added during the group edition and may not necessarily have
    * all the variables initially shared by the group.
    *
-   * \see gd::ObjectVariableHelper::MergeVariableContainers
+   * \see gd::ObjectRefactorer::MergeVariableContainers
    */
   static void FillMissingGroupVariablesToObjects(
       gd::ObjectsContainer &globalObjectsContainer,
@@ -68,7 +68,7 @@ public:
    * Objects can be added during the group edition and may not necessarily have
    * all the variables initially shared by the group.
    *
-   * \see gd::ObjectVariableHelper::MergeVariableContainers
+   * \see gd::ObjectRefactorer::MergeVariableContainers
    */
   static void FillMissingGroupVariablesToObjects(
       gd::ObjectsContainer &globalObjectsContainer,

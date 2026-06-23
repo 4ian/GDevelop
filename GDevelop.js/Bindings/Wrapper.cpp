@@ -52,7 +52,7 @@
 #include <GDCore/IDE/Events/UsedObjectTypeFinder.h>
 #include <GDCore/IDE/Events/ExampleExtensionUsagesFinder.h>
 #include <GDCore/IDE/EventsFunctionTools.h>
-#include <GDCore/IDE/ObjectVariableHelper.h>
+#include <GDCore/IDE/ObjectRefactorer.h>
 #include <GDCore/IDE/EventsBasedObjectVariantHelper.h>
 #include <GDCore/IDE/Project/ArbitraryResourceWorker.h>
 #include <GDCore/IDE/Project/ArbitraryObjectsWorker.h>

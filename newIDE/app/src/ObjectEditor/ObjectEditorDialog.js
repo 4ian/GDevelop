@@ -209,7 +209,7 @@ const InnerDialog = (props: InnerDialogProps) => {
       originalSerializedVariables
     );
     if (eventsBasedObject) {
-      gd.ObjectVariableHelper.applyChangesToVariants(
+      gd.ObjectRefactorer.applyChangesToVariants(
         eventsBasedObject,
         object.getName(),
         changeset

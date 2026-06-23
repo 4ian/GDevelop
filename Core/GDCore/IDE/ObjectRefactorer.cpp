@@ -3,7 +3,7 @@
  * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#include "ObjectVariableHelper.h"
+#include "ObjectRefactorer.h"
 
 #include "GDCore/IDE/WholeProjectRefactorer.h"
 #include "GDCore/Project/EventsBasedObject.h"
@@ -18,7 +18,7 @@
 
 namespace gd {
 
-void ObjectVariableHelper::FillAnyVariableBetweenObjects(
+void ObjectRefactorer::FillAnyVariableBetweenObjects(
     gd::ObjectsContainer &globalObjectsContainer,
     gd::ObjectsContainer &objectsContainer,
     const gd::ObjectGroup &objectGroup) {
@@ -67,7 +67,7 @@ void ObjectVariableHelper::FillAnyVariableBetweenObjects(
   }
 }
 
-gd::VariablesContainer ObjectVariableHelper::MergeVariableContainers(
+gd::VariablesContainer ObjectRefactorer::MergeVariableContainers(
     const gd::ObjectsContainersList &objectsContainersList,
     const gd::ObjectGroup &objectGroup) {
   gd::VariablesContainer mergedVariablesContainer;
@@ -115,18 +115,18 @@ gd::VariablesContainer ObjectVariableHelper::MergeVariableContainers(
   return mergedVariablesContainer;
 }
 
-void ObjectVariableHelper::FillMissingGroupVariablesToObjects(
+void ObjectRefactorer::FillMissingGroupVariablesToObjects(
     gd::ObjectsContainer &globalObjectsContainer,
     gd::ObjectsContainer &objectsContainer, const gd::ObjectGroup &objectGroup,
     const gd::SerializerElement &originalSerializedVariables) {
   gd::VariablesContainer groupVariablesContainer;
   groupVariablesContainer.UnserializeFrom(originalSerializedVariables);
-  gd::ObjectVariableHelper::FillMissingGroupVariablesToObjects(
+  gd::ObjectRefactorer::FillMissingGroupVariablesToObjects(
       globalObjectsContainer, objectsContainer, objectGroup,
       groupVariablesContainer);
 };
 
-void ObjectVariableHelper::FillMissingGroupVariablesToObjects(
+void ObjectRefactorer::FillMissingGroupVariablesToObjects(
     gd::ObjectsContainer &globalObjectsContainer,
     gd::ObjectsContainer &objectsContainer, const gd::ObjectGroup &objectGroup,
     const gd::VariablesContainer& groupVariablesContainer) {
@@ -156,7 +156,7 @@ void ObjectVariableHelper::FillMissingGroupVariablesToObjects(
 // TODO Handle position changes for group variables.
 // We could try to change the order of object variables in a way that the next
 // call to MergeVariableContainers rebuild them in the same order.
-void ObjectVariableHelper::ApplyChangesToObjects(
+void ObjectRefactorer::ApplyChangesToObjects(
     gd::ObjectsContainer &globalObjectsContainer,
     gd::ObjectsContainer &objectsContainer,
     const gd::VariablesContainer &groupVariablesContainer,
@@ -205,7 +205,7 @@ void ObjectVariableHelper::ApplyChangesToObjects(
   }
 }
 
-void ObjectVariableHelper::ApplyChangesToObjectInstances(
+void ObjectRefactorer::ApplyChangesToObjectInstances(
     gd::VariablesContainer &objectVariablesContainer,
     gd::InitialInstancesContainer &initialInstancesContainer,
     const gd::String &objectName, const gd::VariablesChangeset &changeset) {
@@ -252,7 +252,7 @@ void ObjectVariableHelper::ApplyChangesToObjectInstances(
       });
 }
 
-void ObjectVariableHelper::ApplyChangesToVariants(
+void ObjectRefactorer::ApplyChangesToVariants(
     gd::EventsBasedObject &eventsBasedObject, const gd::String &objectName,
     const gd::VariablesChangeset &changeset) {
   auto &defaultVariablesContainer = eventsBasedObject.GetDefaultVariant()
@@ -304,7 +304,7 @@ void ObjectVariableHelper::ApplyChangesToVariants(
       }
     }
 
-    gd::ObjectVariableHelper::ApplyChangesToObjectInstances(
+    gd::ObjectRefactorer::ApplyChangesToObjectInstances(
         variablesContainer, variant->GetInitialInstances(), objectName,
         changeset);
   }

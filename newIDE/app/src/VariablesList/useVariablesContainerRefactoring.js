@@ -117,7 +117,7 @@ const useVariablesContainerRefactoring = ({
           for (const objectName of objectGroup
             .getAllObjectsNames()
             .toJSArray()) {
-            gd.ObjectVariableHelper.applyChangesToVariants(
+            gd.ObjectRefactorer.applyChangesToVariants(
               eventsBasedObject,
               objectName,
               changeset
@@ -134,7 +134,7 @@ const useVariablesContainerRefactoring = ({
           snapshot
         );
         if (eventsBasedObject) {
-          gd.ObjectVariableHelper.applyChangesToVariants(
+          gd.ObjectRefactorer.applyChangesToVariants(
             eventsBasedObject,
             objectName,
             changeset

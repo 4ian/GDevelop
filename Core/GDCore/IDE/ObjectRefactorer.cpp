@@ -155,7 +155,8 @@ void ObjectRefactorer::FillMissingGroupBehaviorToObject(
     gd::ObjectsContainer &globalObjectsContainer,
     gd::ObjectsContainer &objectsContainer, gd::Object &object,
     const gd::ObjectGroup &objectGroup, const gd::String &behaviorName) {
-  if (objectGroup.GetAllObjectsNames().size() == 0) {
+  if (object.HasBehaviorNamed(behaviorName) ||
+      objectGroup.GetAllObjectsNames().size() == 0) {
     return;
   }
   const gd::String &firstObjectName = objectGroup.GetAllObjectsNames()[0];

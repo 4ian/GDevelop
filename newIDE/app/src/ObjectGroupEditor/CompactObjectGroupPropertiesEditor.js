@@ -9,7 +9,7 @@ import VariablesList, {
 import { type ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 import ErrorBoundary from '../UI/ErrorBoundary';
 import ScrollView, { type ScrollViewInterface } from '../UI/ScrollView';
-import { Column, marginsSize } from '../UI/Grid';
+import { Column, Line, marginsSize } from '../UI/Grid';
 import Text from '../UI/Text';
 import IconButton from '../UI/IconButton';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
@@ -36,6 +36,8 @@ import RemoveIcon from '../UI/CustomSvgIcons/Remove';
 import { mapVector } from '../Utils/MapFor';
 import getObjectByName from '../Utils/GetObjectByName';
 import { getAllVisibleBehaviorNames } from '../Utils/Behavior';
+import { EmptyPlaceholder } from '../UI/EmptyPlaceholder';
+import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 
 const gd: libGDevelop = global.gd;
 
@@ -118,6 +120,7 @@ export const CompactObjectGroupPropertiesEditor = ({
   onExtensionInstalled,
 }: Props): React.Node => {
   const forceUpdate = useForceUpdate();
+  const { isMobile } = useResponsiveWindowSize();
   const [isObjectsFolded, setIsObjectsFolded] = React.useState(false);
   const [isVariablesFolded, setIsVariablesFolded] = React.useState(false);
   const [isBehaviorsFolded, setIsBehaviorsFolded] = React.useState(false);
@@ -279,165 +282,188 @@ export const CompactObjectGroupPropertiesEditor = ({
               disabled
             />
           </ColumnStackLayout>
-          <TopLevelCollapsibleSection
-            title={<Trans>Objects</Trans>}
-            isFolded={isObjectsFolded}
-            toggleFolded={() => setIsObjectsFolded(!isObjectsFolded)}
-            onOpenFullEditor={openFullEditor}
-            renderContent={() => (
-              <ColumnStackLayout noMargin noOverflowParent>
-                <CompactObjectGroupEditor
-                  project={project}
-                  projectScopedContainersAccessor={
-                    projectScopedContainersAccessor
+          {objects.length === 0 ? (
+            <Line useFullHeight expand>
+              <Column noMargin expand justifyContent="center" noOverflowParent>
+                <EmptyPlaceholder
+                  title={<Trans>Add objects to this group</Trans>}
+                  description={
+                    <Trans>You can organize objects into groups.</Trans>
                   }
-                  globalObjectsContainer={globalObjectsContainer}
-                  objectsContainer={objectsContainer}
-                  groupObjectNames={objectGroup
-                    .getAllObjectsNames()
-                    .toJSArray()}
-                  onObjectAdded={addObject}
-                  onObjectRemoved={removeObject}
-                  isObjectListLocked={isObjectListLocked}
+                  helpPagePath="/objects/object-groups/"
+                  actionButtonId="add-objects-to-group-button"
+                  actionLabel={
+                    isMobile ? <Trans>Add</Trans> : <Trans>Add objects</Trans>
+                  }
+                  onAction={() => onEditObjectGroup(objectGroup)}
                 />
-              </ColumnStackLayout>
-            )}
-          />
-          <TopLevelCollapsibleSection
-            title={<Trans>Behaviors</Trans>}
-            isFolded={isBehaviorsFolded}
-            toggleFolded={() => setIsBehaviorsFolded(!isBehaviorsFolded)}
-            onOpenFullEditor={undefined}
-            onAdd={isBehaviorListLocked ? null : openNewBehaviorDialog}
-            renderContent={() => (
-              <ColumnStackLayout noMargin>
-                {!allVisibleBehaviorNames.length && (
-                  <Text size="body2" align="center" color="secondary">
-                    <Trans>
-                      There are no{' '}
-                      <Link
-                        href={behaviorsHelpLink}
-                        onClick={() =>
-                          Window.openExternalURL(behaviorsHelpLink)
-                        }
-                      >
-                        behaviors
-                      </Link>{' '}
-                      on this object.
-                    </Trans>
-                  </Text>
-                )}
-                {allVisibleBehaviorNames.map(behaviorName => {
-                  const behaviors = objects.map(object =>
-                    object.getBehavior(behaviorName)
-                  );
-                  const behaviorTypeName = behaviors[0].getTypeName();
-                  const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
-                    gd.JsPlatform.get(),
-                    behaviorTypeName
-                  );
-                  const iconUrl = behaviorMetadata.getIconFilename();
-                  const CompactBehaviorComponent = CompactBehaviorsEditorService.getEditor(
-                    behaviorTypeName
-                  );
-                  return (
-                    <CollapsibleSubPanel
-                      key={behaviors[0].ptr}
-                      renderContent={() => (
-                        <CompactBehaviorComponent
-                          project={project}
-                          behaviorMetadata={behaviorMetadata}
-                          behaviors={behaviors}
-                          behaviorOverriding={null}
-                          initialInstance={null}
-                          object={null}
-                          layersContainer={layersContainer}
-                          onBehaviorUpdated={() => {}}
-                          resourceManagementProps={resourceManagementProps}
-                          onOpenFullEditor={undefined}
-                        />
-                      )}
-                      isFolded={behaviors[0].isFolded()}
-                      toggleFolded={() => {
-                        behaviors[0].setFolded(!behaviors[0].isFolded());
-                        forceUpdate();
-                      }}
-                      titleIcon={
-                        iconUrl ? (
-                          <IconContainer
-                            src={iconUrl}
-                            alt={behaviorMetadata.getFullName()}
-                            size={16}
-                          />
-                        ) : null
+              </Column>
+            </Line>
+          ) : (
+            <Column expand noMargin noOverflowParent>
+              <TopLevelCollapsibleSection
+                title={<Trans>Objects</Trans>}
+                isFolded={isObjectsFolded}
+                toggleFolded={() => setIsObjectsFolded(!isObjectsFolded)}
+                onOpenFullEditor={openFullEditor}
+                renderContent={() => (
+                  <ColumnStackLayout noMargin noOverflowParent>
+                    <CompactObjectGroupEditor
+                      project={project}
+                      projectScopedContainersAccessor={
+                        projectScopedContainersAccessor
                       }
-                      title={behaviors[0].getName()}
-                      titleBarButtons={[
-                        {
-                          id: 'remove-behavior',
-                          icon: RemoveIcon,
-                          label: t`Remove behavior`,
-                          onClick: () => {
-                            removeBehavior(behaviorName);
-                          },
-                        },
-                      ]}
+                      globalObjectsContainer={globalObjectsContainer}
+                      objectsContainer={objectsContainer}
+                      groupObjectNames={objectGroup
+                        .getAllObjectsNames()
+                        .toJSArray()}
+                      onObjectAdded={addObject}
+                      onObjectRemoved={removeObject}
+                      isObjectListLocked={isObjectListLocked}
                     />
-                  );
-                })}
-              </ColumnStackLayout>
-            )}
-          />
-          <TopLevelCollapsibleSection
-            title={<Trans>Object Variables</Trans>}
-            isFolded={isVariablesFolded}
-            toggleFolded={() => setIsVariablesFolded(!isVariablesFolded)}
-            onOpenFullEditor={() => onEditObjectGroup(objectGroup, 'variables')}
-            onAdd={
-              isVariableListLocked
-                ? null
-                : () => {
-                    if (variablesListRef.current) {
-                      variablesListRef.current.addVariable();
-                    }
-                    setIsVariablesFolded(false);
-                  }
-            }
-            renderContentAsHiddenWhenFolded={
-              true /* Allows to keep a ref to the variables list for add button to work. */
-            }
-            noContentMargin
-            renderContent={() => (
-              <VariablesList
-                ref={variablesListRef}
-                projectScopedContainersAccessor={
-                  projectScopedContainersAccessor
-                }
-                directlyStoreValueChangesWhileEditing
-                variablesContainer={groupVariablesContainer}
-                areObjectVariables
-                size="compact"
-                historyHandler={historyHandler}
-                onVariablesUpdated={onVariablesUpdated}
-                toolbarIconStyle={styles.icon}
-                compactEmptyPlaceholderText={
-                  <Trans>
-                    There are no common{' '}
-                    <Link
-                      href={objectVariablesHelpLink}
-                      onClick={() =>
-                        Window.openExternalURL(objectVariablesHelpLink)
-                      }
-                    >
-                      variables
-                    </Link>{' '}
-                    on this group objects.
-                  </Trans>
-                }
-                isListLocked={isVariableListLocked}
+                  </ColumnStackLayout>
+                )}
               />
-            )}
-          />
+              <TopLevelCollapsibleSection
+                title={<Trans>Behaviors</Trans>}
+                isFolded={isBehaviorsFolded}
+                toggleFolded={() => setIsBehaviorsFolded(!isBehaviorsFolded)}
+                onOpenFullEditor={undefined}
+                onAdd={isBehaviorListLocked ? null : openNewBehaviorDialog}
+                renderContent={() => (
+                  <ColumnStackLayout noMargin>
+                    {!allVisibleBehaviorNames.length && (
+                      <Text size="body2" align="center" color="secondary">
+                        <Trans>
+                          There are no{' '}
+                          <Link
+                            href={behaviorsHelpLink}
+                            onClick={() =>
+                              Window.openExternalURL(behaviorsHelpLink)
+                            }
+                          >
+                            behaviors
+                          </Link>{' '}
+                          on this object.
+                        </Trans>
+                      </Text>
+                    )}
+                    {allVisibleBehaviorNames.map(behaviorName => {
+                      const behaviors = objects.map(object =>
+                        object.getBehavior(behaviorName)
+                      );
+                      const behaviorTypeName = behaviors[0].getTypeName();
+                      const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
+                        gd.JsPlatform.get(),
+                        behaviorTypeName
+                      );
+                      const iconUrl = behaviorMetadata.getIconFilename();
+                      const CompactBehaviorComponent = CompactBehaviorsEditorService.getEditor(
+                        behaviorTypeName
+                      );
+                      return (
+                        <CollapsibleSubPanel
+                          key={behaviors[0].ptr}
+                          renderContent={() => (
+                            <CompactBehaviorComponent
+                              project={project}
+                              behaviorMetadata={behaviorMetadata}
+                              behaviors={behaviors}
+                              behaviorOverriding={null}
+                              initialInstance={null}
+                              object={null}
+                              layersContainer={layersContainer}
+                              onBehaviorUpdated={() => {}}
+                              resourceManagementProps={resourceManagementProps}
+                              onOpenFullEditor={undefined}
+                            />
+                          )}
+                          isFolded={behaviors[0].isFolded()}
+                          toggleFolded={() => {
+                            behaviors[0].setFolded(!behaviors[0].isFolded());
+                            forceUpdate();
+                          }}
+                          titleIcon={
+                            iconUrl ? (
+                              <IconContainer
+                                src={iconUrl}
+                                alt={behaviorMetadata.getFullName()}
+                                size={16}
+                              />
+                            ) : null
+                          }
+                          title={behaviors[0].getName()}
+                          titleBarButtons={[
+                            {
+                              id: 'remove-behavior',
+                              icon: RemoveIcon,
+                              label: t`Remove behavior`,
+                              onClick: () => {
+                                removeBehavior(behaviorName);
+                              },
+                            },
+                          ]}
+                        />
+                      );
+                    })}
+                  </ColumnStackLayout>
+                )}
+              />
+              <TopLevelCollapsibleSection
+                title={<Trans>Object Variables</Trans>}
+                isFolded={isVariablesFolded}
+                toggleFolded={() => setIsVariablesFolded(!isVariablesFolded)}
+                onOpenFullEditor={() =>
+                  onEditObjectGroup(objectGroup, 'variables')
+                }
+                onAdd={
+                  isVariableListLocked
+                    ? null
+                    : () => {
+                        if (variablesListRef.current) {
+                          variablesListRef.current.addVariable();
+                        }
+                        setIsVariablesFolded(false);
+                      }
+                }
+                renderContentAsHiddenWhenFolded={
+                  true /* Allows to keep a ref to the variables list for add button to work. */
+                }
+                noContentMargin
+                renderContent={() => (
+                  <VariablesList
+                    ref={variablesListRef}
+                    projectScopedContainersAccessor={
+                      projectScopedContainersAccessor
+                    }
+                    directlyStoreValueChangesWhileEditing
+                    variablesContainer={groupVariablesContainer}
+                    areObjectVariables
+                    size="compact"
+                    historyHandler={historyHandler}
+                    onVariablesUpdated={onVariablesUpdated}
+                    toolbarIconStyle={styles.icon}
+                    compactEmptyPlaceholderText={
+                      <Trans>
+                        There are no common{' '}
+                        <Link
+                          href={objectVariablesHelpLink}
+                          onClick={() =>
+                            Window.openExternalURL(objectVariablesHelpLink)
+                          }
+                        >
+                          variables
+                        </Link>{' '}
+                        on this group objects.
+                      </Trans>
+                    }
+                    isListLocked={isVariableListLocked}
+                  />
+                )}
+              />
+            </Column>
+          )}
         </Column>
       </ScrollView>
       {newBehaviorDialog}

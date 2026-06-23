@@ -20,7 +20,7 @@ module.exports = {
     extension
       .setExtensionInformation(
         'SaveState',
-        _('Save State (experimental)'),
+        _('Save State'),
         _(
           'Allows to save and load the full state of a game, usually on the device storage. A Save State, by default, contains the full state of the game (objects, variables, sounds, music, effects etc.). Using the "Save Configuration" behavior, you can customize which objects should not be saved in a Save State. You can also use the "Change the save configuration of a variable" action to change the save configuration of a variable. Finally, both objects, variables and scene/game data can be given a profile name: in this case, when saving or loading with one or more profile names specified, only the object/variables/data belonging to one of the specified profiles will be saved or loaded.'
         ),
@@ -32,7 +32,7 @@ module.exports = {
       )
       .setExtensionHelpPath('/all-features/save-state')
       .setCategory('Game mechanic')
-      .addInstructionOrExpressionGroupMetadata(_('Save State (experimental)'))
+      .addInstructionOrExpressionGroupMetadata(_('Save State'))
       .setIcon('res/actions/saveDown.svg');
 
     extension
@@ -61,7 +61,8 @@ module.exports = {
       .addIncludeFile(
         'Extensions/SaveState/SaveConfigurationRuntimeBehavior.js'
       )
-      .setFunctionName('gdjs.saveState.createGameSaveStateInVariable');
+      .setFunctionName('gdjs.saveState.createGameSaveStateInVariable')
+      .setAsyncFunctionName('gdjs.saveState.createGameSaveStateInVariable');
 
     extension
       .addAction(
@@ -82,13 +83,13 @@ module.exports = {
           'Comma-separated list of profile names that must be saved. Only objects tagged with at least one of these profiles will be saved. If no profile names are specified, all objects will be saved (unless they have a "Save Configuration" behavior set to "Do not save").'
         )
       )
-      .setDefaultValue('no')
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/SaveState/SaveStateTools.js')
       .addIncludeFile(
         'Extensions/SaveState/SaveConfigurationRuntimeBehavior.js'
       )
-      .setFunctionName('gdjs.saveState.createGameSaveStateInStorage');
+      .setFunctionName('gdjs.saveState.createGameSaveStateInStorage')
+      .setAsyncFunctionName('gdjs.saveState.createGameSaveStateInStorage');
 
     extension
       .addAction(
@@ -125,7 +126,8 @@ module.exports = {
       .addIncludeFile(
         'Extensions/SaveState/SaveConfigurationRuntimeBehavior.js'
       )
-      .setFunctionName('gdjs.saveState.restoreGameSaveStateFromVariable');
+      .setFunctionName('gdjs.saveState.restoreGameSaveStateFromVariable')
+      .setAsyncFunctionName('gdjs.saveState.restoreGameSaveStateFromVariable');
 
     extension
       .addAction(
@@ -165,7 +167,270 @@ module.exports = {
       .addIncludeFile(
         'Extensions/SaveState/SaveConfigurationRuntimeBehavior.js'
       )
-      .setFunctionName('gdjs.saveState.restoreGameSaveStateFromStorage');
+      .setFunctionName('gdjs.saveState.restoreGameSaveStateFromStorage')
+      .setAsyncFunctionName('gdjs.saveState.restoreGameSaveStateFromStorage');
+
+    extension
+      .addAction(
+        'DeleteSaveFromStorage',
+        _('Delete a save from device storage'),
+        _('Delete a save stored on the device storage.'),
+        _('Delete save from device storage named _PARAM1_'),
+        _('Manage saves'),
+        'res/actions/saveDown.svg',
+        'res/actions/saveDown.svg'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .addParameter(
+        'string',
+        _('Storage name of the save to delete'),
+        '',
+        false
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/SaveState/SaveStateTools.js')
+      .addIncludeFile(
+        'Extensions/SaveState/SaveConfigurationRuntimeBehavior.js'
+      )
+      .setFunctionName('gdjs.saveState.deleteSaveFromStorage')
+      .setAsyncFunctionName('gdjs.saveState.deleteSaveFromStorage');
+
+    extension
+      .addAction(
+        'DuplicateSaveInStorage',
+        _('Duplicate a save in device storage'),
+        _('Duplicate a save stored on the device storage to another name.'),
+        _('Duplicate save _PARAM1_ to _PARAM2_ in device storage'),
+        _('Manage saves'),
+        'res/actions/saveDown.svg',
+        'res/actions/saveDown.svg'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .addParameter(
+        'string',
+        _('Storage name of the save to duplicate'),
+        '',
+        false
+      )
+      .addParameter('string', _('Storage name of the new save'), '', false)
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/SaveState/SaveStateTools.js')
+      .addIncludeFile(
+        'Extensions/SaveState/SaveConfigurationRuntimeBehavior.js'
+      )
+      .setFunctionName('gdjs.saveState.duplicateSaveInStorage')
+      .setAsyncFunctionName('gdjs.saveState.duplicateSaveInStorage');
+
+    extension
+      .addAction(
+        'CheckSaveExistsInStorage',
+        _('Check if a save exists in device storage'),
+        _(
+          'Check if a save with the given name exists in the device storage, and store the result (yes/no) in a variable. The check is asynchronous: use the condition "Save existence check completed" to know when the result is available.'
+        ),
+        _(
+          'Check if save _PARAM1_ exists in device storage (result in _PARAM2_)'
+        ),
+        _('Manage saves'),
+        'res/actions/saveDown.svg',
+        'res/actions/saveDown.svg'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .addParameter('string', _('Storage name of the save to check'), '', false)
+      .addParameter(
+        'variable',
+        _('Variable where to store the result (yes/no)'),
+        '',
+        false
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/SaveState/SaveStateTools.js')
+      .addIncludeFile(
+        'Extensions/SaveState/SaveConfigurationRuntimeBehavior.js'
+      )
+      .setFunctionName('gdjs.saveState.checkSaveExistsInStorage')
+      .setAsyncFunctionName('gdjs.saveState.checkSaveExistsInStorage');
+
+    extension
+      .addAction(
+        'ListSavesInVariable',
+        _('List existing saves'),
+        _(
+          'List the saves stored on the device storage and store them in a variable. The check is asynchronous: use the condition "Saves listing completed" to know when the result is available.'
+        ),
+        _('List existing saves in variable _PARAM1_'),
+        _('Manage saves'),
+        'res/actions/saveDown.svg',
+        'res/actions/saveDown.svg'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .addParameter(
+        'variable',
+        _('Variable where to store the list of saves'),
+        '',
+        false
+      )
+      .setParameterLongDescription(
+        _(
+          'The variable will contain an array of structures, one per save, sorted from the most recently updated to the oldest. Each structure has the children: "name" (the save name), "savedAt" and "updatedAt" (timestamps in milliseconds since 1970, or 0 if unknown for older saves).'
+        )
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/SaveState/SaveStateTools.js')
+      .addIncludeFile(
+        'Extensions/SaveState/SaveConfigurationRuntimeBehavior.js'
+      )
+      .setFunctionName('gdjs.saveState.listSavesInVariable')
+      .setAsyncFunctionName('gdjs.saveState.listSavesInVariable');
+
+    extension
+      .addCondition(
+        'DeleteJustSucceeded',
+        _('Delete just succeeded'),
+        _('The last delete attempt just succeeded.'),
+        _('Delete just succeeded'),
+        _('Manage saves'),
+        'res/actions/saveDown.svg',
+        'res/actions/saveDown.svg'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/SaveState/SaveStateTools.js')
+      .addIncludeFile(
+        'Extensions/SaveState/SaveConfigurationRuntimeBehavior.js'
+      )
+      .setFunctionName('gdjs.saveState.hasDeleteJustSucceeded');
+
+    extension
+      .addCondition(
+        'DeleteJustFailed',
+        _('Delete just failed'),
+        _('The last delete attempt just failed.'),
+        _('Delete just failed'),
+        _('Manage saves'),
+        'res/actions/saveDown.svg',
+        'res/actions/saveDown.svg'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/SaveState/SaveStateTools.js')
+      .addIncludeFile(
+        'Extensions/SaveState/SaveConfigurationRuntimeBehavior.js'
+      )
+      .setFunctionName('gdjs.saveState.hasDeleteJustFailed');
+
+    extension
+      .addCondition(
+        'DuplicateJustSucceeded',
+        _('Duplicate just succeeded'),
+        _('The last duplicate attempt just succeeded.'),
+        _('Duplicate just succeeded'),
+        _('Manage saves'),
+        'res/actions/saveDown.svg',
+        'res/actions/saveDown.svg'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/SaveState/SaveStateTools.js')
+      .addIncludeFile(
+        'Extensions/SaveState/SaveConfigurationRuntimeBehavior.js'
+      )
+      .setFunctionName('gdjs.saveState.hasDuplicateJustSucceeded');
+
+    extension
+      .addCondition(
+        'DuplicateJustFailed',
+        _('Duplicate just failed'),
+        _('The last duplicate attempt just failed.'),
+        _('Duplicate just failed'),
+        _('Manage saves'),
+        'res/actions/saveDown.svg',
+        'res/actions/saveDown.svg'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/SaveState/SaveStateTools.js')
+      .addIncludeFile(
+        'Extensions/SaveState/SaveConfigurationRuntimeBehavior.js'
+      )
+      .setFunctionName('gdjs.saveState.hasDuplicateJustFailed');
+
+    extension
+      .addCondition(
+        'CheckJustCompleted',
+        _('Save existence check completed'),
+        _(
+          'The last "Check if a save exists" action just completed (its result is now available).'
+        ),
+        _('Save existence check completed'),
+        _('Manage saves'),
+        'res/actions/saveDown.svg',
+        'res/actions/saveDown.svg'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/SaveState/SaveStateTools.js')
+      .addIncludeFile(
+        'Extensions/SaveState/SaveConfigurationRuntimeBehavior.js'
+      )
+      .setFunctionName('gdjs.saveState.hasCheckJustCompleted');
+
+    extension
+      .addCondition(
+        'CheckedSaveExists',
+        _('Checked save exists'),
+        _(
+          'The save checked by the last completed "Check if a save exists" action does exist.'
+        ),
+        _('Checked save exists'),
+        _('Manage saves'),
+        'res/actions/saveDown.svg',
+        'res/actions/saveDown.svg'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/SaveState/SaveStateTools.js')
+      .addIncludeFile(
+        'Extensions/SaveState/SaveConfigurationRuntimeBehavior.js'
+      )
+      .setFunctionName('gdjs.saveState.doesCheckedSaveExist');
+
+    extension
+      .addCondition(
+        'ListJustCompleted',
+        _('Saves listing completed'),
+        _(
+          'The last "List existing saves" action just completed (the variable now contains the list).'
+        ),
+        _('Saves listing completed'),
+        _('Manage saves'),
+        'res/actions/saveDown.svg',
+        'res/actions/saveDown.svg'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/SaveState/SaveStateTools.js')
+      .addIncludeFile(
+        'Extensions/SaveState/SaveConfigurationRuntimeBehavior.js'
+      )
+      .setFunctionName('gdjs.saveState.hasListJustCompleted');
+
+    extension
+      .addStrExpression(
+        'LastCheckedSaveName',
+        _('Last checked save name'),
+        _(
+          'The name of the save used in the last "Check if a save exists" action.'
+        ),
+        _('Manage saves'),
+        'res/actions/saveDown.svg'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .setIncludeFile('Extensions/SaveState/SaveStateTools.js')
+      .addIncludeFile(
+        'Extensions/SaveState/SaveConfigurationRuntimeBehavior.js'
+      )
+      .setFunctionName('gdjs.saveState.getLastCheckedSaveName');
 
     extension
       .addExpressionAndCondition(

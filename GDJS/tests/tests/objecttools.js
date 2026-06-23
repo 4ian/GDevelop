@@ -124,6 +124,60 @@ describe('gdjs.evtTools.object', function () {
     );
   });
 
+  it('calls onPlacedInScene after creating and placing an object', function () {
+    const runtimeGame = gdjs.getPixiRuntimeGame();
+    const runtimeScene = new gdjs.TestRuntimeScene(runtimeGame);
+    runtimeScene.addLayer({
+      name: 'Ui',
+      visibility: true,
+      cameras: [],
+      effects: [],
+      ambientLightColorR: 0,
+      ambientLightColorG: 0,
+      ambientLightColorB: 0,
+      isLightingLayer: false,
+      followBaseLayerCamera: false,
+    });
+
+    runtimeScene.registerObject({
+      name: 'MyObjectA',
+      type: '',
+      behaviors: [
+        {
+          name: 'TestBehavior',
+          type: 'TestBehavior::TestBehavior',
+        },
+      ],
+      variables: [],
+      effects: [],
+    });
+
+    const pickedObjectList = Hashtable.newFrom({
+      MyObjectA: [],
+    });
+
+    const newObjectA = gdjs.evtTools.object.createObjectOnScene(
+      runtimeScene,
+      pickedObjectList,
+      50,
+      60,
+      'Ui'
+    );
+    if (!newObjectA) {
+      throw new Error('Object was not created.');
+    }
+
+    expect(newObjectA.getVariables().get('lastState').getAsString()).to.be(
+      'placed'
+    );
+    expect(newObjectA.getVariables().get('placedCount').getAsNumber()).to.be(1);
+    expect(newObjectA.getVariables().get('placedX').getAsNumber()).to.be(50);
+    expect(newObjectA.getVariables().get('placedY').getAsNumber()).to.be(60);
+    expect(newObjectA.getVariables().get('placedLayer').getAsString()).to.be(
+      'Ui'
+    );
+  });
+
   it('can create and pick an instance when no instance was picked', function () {
     const runtimeGame = gdjs.getPixiRuntimeGame();
     const runtimeScene = new gdjs.TestRuntimeScene(runtimeGame);

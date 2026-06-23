@@ -538,6 +538,7 @@ namespace gdjs {
           obj.setPosition(x, y);
           obj.setLayer(layerName);
           obj.setZOrder(layer.getDefaultZOrder());
+          obj.onPlacedInScene();
 
           //Let the new object be picked by next actions/conditions.
           if (objectsLists.containsKey(objectName)) {

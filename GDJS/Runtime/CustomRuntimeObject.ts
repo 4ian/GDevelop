@@ -370,6 +370,17 @@ namespace gdjs {
     doStepPreEvents(parent: gdjs.RuntimeInstanceContainer) {}
 
     /**
+     * Called after the custom object has received its final position, layer and
+     * z order in the parent container.
+     *
+     * Custom objects implement this method with code generated from events.
+     */
+    override onPlacedInScene(): void {
+      super.onPlacedInScene();
+      this._instanceContainer._notifyObjectsPlacedInScene();
+    }
+
+    /**
      * This method is called each tick after events are done.
      *
      * Custom objects implement this method with code generated from events.

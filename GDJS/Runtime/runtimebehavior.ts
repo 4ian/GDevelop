@@ -204,6 +204,13 @@ namespace gdjs {
     onCreated(): void {}
 
     /**
+     * Reimplement this to do extra work when the behavior owner has been placed
+     * in its scene or parent container. At this point, the owner's position,
+     * layer and z order have been applied.
+     */
+    onPlacedInScene(): void {}
+
+    /**
      * Return true if the behavior is activated
      */
     activated(): boolean {

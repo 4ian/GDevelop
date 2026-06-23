@@ -103,6 +103,7 @@ export const getFunctionIconUrl = (
         case 'onSceneLoaded':
         case 'onFirstSceneLoaded':
         case 'onCreated':
+        case 'onPlacedInScene':
           return 'res/functions/create_black.svg';
 
         case 'onHotReloading':

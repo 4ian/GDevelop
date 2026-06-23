@@ -399,7 +399,8 @@ gd::ObjectMetadata &MetadataDeclarationHelper::DeclareObjectMetadata(
  */
 bool MetadataDeclarationHelper::IsBehaviorLifecycleEventsFunction(
     const gd::String &functionName) {
-  return functionName == "onCreated" || functionName == "onActivate" ||
+  return functionName == "onCreated" || functionName == "onPlacedInScene" ||
+         functionName == "onActivate" ||
          functionName == "onDeActivate" || functionName == "doStepPreEvents" ||
          functionName == "doStepPostEvents" || functionName == "onDestroy" ||
          // Compatibility with GD <= 5.0 beta 75
@@ -413,8 +414,9 @@ bool MetadataDeclarationHelper::IsBehaviorLifecycleEventsFunction(
  */
 bool MetadataDeclarationHelper::IsObjectLifecycleEventsFunction(
     const gd::String &functionName) {
-  return functionName == "onCreated" || functionName == "doStepPostEvents" ||
-         functionName == "onDestroy" || functionName == "onHotReloading";
+  return functionName == "onCreated" || functionName == "onPlacedInScene" ||
+         functionName == "doStepPostEvents" || functionName == "onDestroy" ||
+         functionName == "onHotReloading";
 }
 
 /**

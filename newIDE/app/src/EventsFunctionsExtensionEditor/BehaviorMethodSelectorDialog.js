@@ -106,6 +106,18 @@ export default function BehaviorMethodSelectorDialog({
         />
         <FunctionListItem
           functionType={gd.EventsFunction.Action}
+          functionName="onPlacedInScene"
+          disabled={eventsFunctions.hasEventsFunctionNamed('onPlacedInScene')}
+          onChoose={onChoose}
+          description={
+            <Trans>
+              Events that will be run once, after an object with this behavior
+              is created and its position, layer and z order are applied.
+            </Trans>
+          }
+        />
+        <FunctionListItem
+          functionType={gd.EventsFunction.Action}
           functionName="doStepPreEvents"
           disabled={eventsFunctions.hasEventsFunctionNamed('doStepPreEvents')}
           onChoose={onChoose}

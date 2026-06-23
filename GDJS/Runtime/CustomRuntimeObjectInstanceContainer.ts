@@ -158,7 +158,10 @@ namespace gdjs {
         0,
         0,
         // TODO EBO: handle hot-reloading for custom objects (including nested custom objects)
-        true
+        true,
+        {
+          skipOnPlacedInScene: true,
+        }
       );
 
       // Set up the default z order (for objects created from events)

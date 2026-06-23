@@ -292,6 +292,61 @@ describe('gdjs.CustomRuntimeObject', function () {
       ]);
     });
 
+    it('calls children onPlacedInScene after the custom object placement', async () => {
+      const runtimeGame = await gdjs.getPixiRuntimeGameWithAssets({
+        customObjectInstances: [
+          {
+            angle: 0,
+            customSize: true,
+            height: 64,
+            layer: '',
+            name: 'MySprite',
+            persistentUuid: 'placed-child-id',
+            width: 64,
+            x: 5,
+            y: 6,
+            zOrder: 1,
+            numberProperties: [],
+            stringProperties: [],
+            initialVariables: [],
+            behaviorOverridings: [],
+          },
+        ],
+      });
+      const eventsBasedObjectData = runtimeGame.getEventsBasedObjectData(
+        'MyExtension::MyEventsBasedObject'
+      );
+      if (!eventsBasedObjectData) {
+        throw new Error('Events-based object data was not found.');
+      }
+      eventsBasedObjectData.objects[0].behaviors = [
+        {
+          name: 'TestBehavior',
+          type: 'TestBehavior::TestBehavior',
+        },
+      ];
+      const runtimeScene = createSceneWithLayer(runtimeGame);
+      const customObject = createCustomObject(runtimeScene);
+      const child = customObject
+        .getChildrenContainer()
+        .getObjects('MySprite')[0];
+
+      expect(child.getVariables().get('placedCount').getAsNumber()).to.be(0);
+
+      customObject.setPosition(100, 200);
+      customObject.onPlacedInScene();
+
+      expect(child.getVariables().get('placedCount').getAsNumber()).to.be(1);
+      expect(child.getVariables().get('placedX').getAsNumber()).to.be(5);
+      expect(child.getVariables().get('placedY').getAsNumber()).to.be(6);
+      expect(child.getVariables().get('placedGlobalX').getAsNumber()).to.be(
+        105
+      );
+      expect(child.getVariables().get('placedGlobalY').getAsNumber()).to.be(
+        206
+      );
+    });
+
     it('properly computes hitboxes and point positions after the scene layer camera has moved', async () => {
       const { runtimeScene, customObject } =
         await makeCustomObjectWith2Children();

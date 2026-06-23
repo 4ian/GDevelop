@@ -339,6 +339,7 @@ namespace gdjs {
       trackByPersistentUuid: boolean,
       options?: {
         excludedObjectNames?: Set<string> | null;
+        skipOnPlacedInScene?: boolean;
       }
     ): void {
       let zOffset: number = zPos;
@@ -383,7 +384,22 @@ namespace gdjs {
             .getVariables()
             .initFrom(instanceData.initialVariables, true);
           newObject.extraInitializationFromInitialInstance(instanceData);
+          if (!options?.skipOnPlacedInScene) {
+            newObject.onPlacedInScene();
+          }
         }
+      }
+    }
+
+    /**
+     * Notify every object living in this container that it has been placed in
+     * its scene. This is used by custom objects once their parent has received
+     * its final scene placement.
+     */
+    _notifyObjectsPlacedInScene(): void {
+      const allInstancesList = this.getAdhocListOfAllInstances();
+      for (let i = 0, len = allInstancesList.length; i < len; ++i) {
+        allInstancesList[i].onPlacedInScene();
       }
     }
 

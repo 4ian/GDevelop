@@ -16,6 +16,7 @@ import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import { makeDragSourceAndDropTarget } from '../UI/DragAndDrop/DragSourceAndDropTarget';
 import { makeDropTarget } from '../UI/DragAndDrop/DropTarget';
 import Add from '../UI/CustomSvgIcons/Add';
+import Copy from '../UI/CustomSvgIcons/Copy';
 import Cross from '../UI/CustomSvgIcons/Cross';
 import Edit from '../UI/CustomSvgIcons/Edit';
 import Trash from '../UI/CustomSvgIcons/Trash';
@@ -25,6 +26,10 @@ import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewB
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 import EventsRootVariablesFinder from '../Utils/EventsRootVariablesFinder';
+import {
+  serializeToJSObject,
+  unserializeFromJSObject,
+} from '../Utils/Serializer';
 
 const gd: libGDevelop = global.gd;
 const globalObjectFallbackIcon = 'res/icons_default/global_object24_black.svg';
@@ -454,9 +459,11 @@ const SectionHeader = ({
 const ObjectCard = ({
   object,
   onEditObject,
+  onDuplicateObject,
 }: {|
   object: GlobalObjectRow,
   onEditObject: gdObject => void,
+  onDuplicateObject: gdObject => void,
 |}) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
@@ -502,6 +509,17 @@ const ObjectCard = ({
                     }}
                   >
                     <Edit />
+                  </IconButton>
+                  <IconButton
+                    size="small"
+                    tooltip={t`Duplicate object`}
+                    aria-label="Duplicate object"
+                    onClick={event => {
+                      event.stopPropagation();
+                      onDuplicateObject(object.object);
+                    }}
+                  >
+                    <Copy />
                   </IconButton>
                 </div>
               </div>
@@ -781,6 +799,35 @@ const ProjectGlobalsDialog = ({
     setEditedObject(object);
   }, []);
 
+  const onDuplicateObject = React.useCallback(
+    (object: gdObject) => {
+      const globalObjectsContainer = project.getObjects();
+      const newName = getValidatedGlobalObjectName(project, object.getName());
+      const serializedObject = serializeToJSObject(object);
+      const newObject = globalObjectsContainer.insertNewObject(
+        project,
+        object.getType(),
+        newName,
+        globalObjectsContainer.getObjectPosition(object.getName()) + 1
+      );
+
+      unserializeFromJSObject(
+        newObject,
+        serializedObject,
+        'unserializeFrom',
+        project
+      );
+      newObject.setName(newName);
+      newObject.resetPersistentUuid();
+
+      onGlobalObjectEdited(newObject);
+      onObjectListsModified({ isNewObjectTypeUsed: false });
+      onChange();
+      forceRefresh(key => key + 1);
+    },
+    [onChange, onGlobalObjectEdited, onObjectListsModified, project]
+  );
+
   const onRenameEditedObject = React.useCallback(
     (newName: string) => {
       if (!editedObject) return;
@@ -958,6 +1005,7 @@ const ProjectGlobalsDialog = ({
                     key={object.name}
                     object={object}
                     onEditObject={onEditObject}
+                    onDuplicateObject={onDuplicateObject}
                   />
                 ))}
               </div>

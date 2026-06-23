@@ -378,6 +378,11 @@ interface ObjectVariableHelper {
         [Ref] EventsBasedObject eventsBasedObject,
         [Const] DOMString objectName,
         [Const, Ref] VariablesChangeset changeset);
+    void STATIC_FillMissingGroupVariablesToObjects(
+        [Ref] ObjectsContainer globalObjectsContainer,
+        [Ref] ObjectsContainer objectsContainer,
+        [ Const, Ref ] ObjectGroup objectGroup,
+        [ Const, Ref ] VariablesContainer groupVariablesContainer);
 };
 
 interface EventsBasedObjectVariantHelper {

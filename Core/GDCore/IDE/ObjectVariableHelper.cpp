@@ -121,6 +121,15 @@ void ObjectVariableHelper::FillMissingGroupVariablesToObjects(
     const gd::SerializerElement &originalSerializedVariables) {
   gd::VariablesContainer groupVariablesContainer;
   groupVariablesContainer.UnserializeFrom(originalSerializedVariables);
+  gd::ObjectVariableHelper::FillMissingGroupVariablesToObjects(
+      globalObjectsContainer, objectsContainer, objectGroup,
+      groupVariablesContainer);
+};
+
+void ObjectVariableHelper::FillMissingGroupVariablesToObjects(
+    gd::ObjectsContainer &globalObjectsContainer,
+    gd::ObjectsContainer &objectsContainer, const gd::ObjectGroup &objectGroup,
+    const gd::VariablesContainer& groupVariablesContainer) {
   // Add missing variables to objects added in the group.
   for (const gd::String &objectName : objectGroup.GetAllObjectsNames()) {
     const bool hasObject = objectsContainer.HasObjectNamed(objectName);

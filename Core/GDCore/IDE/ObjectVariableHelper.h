@@ -63,6 +63,20 @@ public:
       const gd::SerializerElement &originalSerializedVariables);
 
   /**
+   * @brief Copy the variables of the group to all objects.
+   *
+   * Objects can be added during the group edition and may not necessarily have
+   * all the variables initially shared by the group.
+   *
+   * \see gd::ObjectVariableHelper::MergeVariableContainers
+   */
+  static void FillMissingGroupVariablesToObjects(
+      gd::ObjectsContainer &globalObjectsContainer,
+      gd::ObjectsContainer &objectsContainer,
+      const gd::ObjectGroup &objectGroup,
+      const gd::VariablesContainer &groupVariablesContainer);
+
+  /**
    * @brief Apply the changes done with the variables editor to the objects of
    * the group.
    */

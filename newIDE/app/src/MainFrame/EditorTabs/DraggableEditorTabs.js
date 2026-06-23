@@ -108,7 +108,7 @@ export function DraggableEditorTabs({
               label={editorTab.label}
               icon={editorTab.icon}
               renderCustomIcon={editorTab.renderCustomIcon}
-              key={editorTab.key}
+              key={editorTab.id}
               id={getTabId(editorTab)}
               data={
                 editorTab.tabOptions ? editorTab.tabOptions.data : undefined

@@ -742,7 +742,7 @@ const EditorTabsPane: React.ComponentType<{
                   scope={errorBoundaryProps.scope}
                 >
                   {editorTab.renderEditorContainer({
-                    editorId: editorTab.key,
+                    editorId: editorTab.id,
                     gameEditorMode,
                     setGameEditorMode,
                     isActive: isCurrentTab,
@@ -880,7 +880,7 @@ const EditorTabsPane: React.ComponentType<{
 
             return (
               <TabContentContainer
-                key={editorTab.key}
+                key={editorTab.id}
                 active={isCurrentTab}
                 removePointerEvents={
                   // Deactivate pointer events when the play tab is active, so the iframe

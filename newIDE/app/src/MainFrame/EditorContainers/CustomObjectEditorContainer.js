@@ -26,6 +26,10 @@ import {
   serializeToJSObject,
   unserializeFromJSObject,
 } from '../../Utils/Serializer';
+import {
+  parseCustomObjectEditorTabName,
+  getObjectTypeFromCustomObjectEditorTabName,
+} from '../../Utils/CustomObjectEditorTabName';
 
 const gd: libGDevelop = global.gd;
 
@@ -209,7 +213,7 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
   getEventsFunctionsExtension(): ?gdEventsFunctionsExtension {
     const { project, projectItemName } = this.props;
     if (!project || !projectItemName) return null;
-    const extensionName = projectItemName.split('::')[0] || '';
+    const { extensionName } = parseCustomObjectEditorTabName(projectItemName);
 
     if (!project.hasEventsFunctionsExtensionNamed(extensionName)) {
       return null;
@@ -231,7 +235,9 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
     const extension = this.getEventsFunctionsExtension();
     if (!extension) return null;
 
-    const eventsBasedObjectName = projectItemName.split('::')[1] || '';
+    const {
+      objectName: eventsBasedObjectName,
+    } = parseCustomObjectEditorTabName(projectItemName);
 
     if (!extension.getEventsBasedObjects().has(eventsBasedObjectName)) {
       return null;
@@ -241,18 +247,16 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
 
   getEventsBasedObjectType(): string {
     const { projectItemName } = this.props;
-    return (
-      (projectItemName &&
-        projectItemName.split('::')[0] +
-          '::' +
-          projectItemName.split('::')[1]) ||
-      ''
-    );
+    return projectItemName
+      ? getObjectTypeFromCustomObjectEditorTabName(projectItemName)
+      : '';
   }
 
   getVariantName(): string {
     const { projectItemName } = this.props;
-    return (projectItemName && projectItemName.split('::')[2]) || '';
+    return projectItemName
+      ? parseCustomObjectEditorTabName(projectItemName).variantName
+      : '';
   }
 
   getVariant(): ?gdEventsBasedObjectVariant {
@@ -262,7 +266,7 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
     const eventsBasedObject = this.getEventsBasedObject();
     if (!eventsBasedObject) return null;
 
-    const variantName = projectItemName.split('::')[2] || '';
+    const { variantName } = parseCustomObjectEditorTabName(projectItemName);
     return eventsBasedObject.getVariants().hasVariantNamed(variantName)
       ? eventsBasedObject.getVariants().getVariant(variantName)
       : eventsBasedObject.getDefaultVariant();

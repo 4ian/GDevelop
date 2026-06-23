@@ -4072,6 +4072,29 @@ const MainFrame = (props: Props): React.MixedElement => {
     [state.editorTabs]
   );
 
+  const onGlobalObjectEdited = React.useCallback(
+    (object: gdObject) => {
+      const project = state.currentProject;
+      if (!project || project.getLayoutsCount() === 0) return;
+
+      onSceneObjectEdited(project.getLayoutAt(0), {
+        object,
+        global: true,
+      });
+
+      for (const editor of getAllEditorTabs(state.editorTabs)) {
+        const editorRefAny: any = editor.editorRef;
+        if (
+          editorRefAny &&
+          typeof editorRefAny.forceUpdateEditor === 'function'
+        ) {
+          editorRefAny.forceUpdateEditor();
+        }
+      }
+    },
+    [onSceneObjectEdited, state.currentProject, state.editorTabs]
+  );
+
   const onSceneObjectsDeleted = React.useCallback(
     (scene: gdLayout) => {
       for (const editor of getAllEditorTabs(state.editorTabs)) {
@@ -6206,6 +6229,10 @@ const MainFrame = (props: Props): React.MixedElement => {
       onOpenEventsFunctionsExtension={openEventsFunctionsExtension}
       onOpenCustomObjectEditor={openCustomObjectEditor}
       onOpenPrefabDetailEditor={openPrefabDetailEditor}
+      openBehaviorEvents={openBehaviorEvents}
+      onOpenEventBasedObjectEditor={onOpenEventBasedObjectEditor}
+      onOpenEventBasedObjectVariantEditor={onOpenEventBasedObjectVariantEditor}
+      onGlobalObjectEdited={onGlobalObjectEdited}
       onRenamedEventsBasedObject={onRenamedEventsBasedObject}
       onDeletedEventsBasedObject={onDeletedEventsBasedObject}
       onRenamedEventsBasedObjectVariant={onRenamedEventsBasedObjectVariant}
@@ -6227,6 +6254,10 @@ const MainFrame = (props: Props): React.MixedElement => {
       onExtensionInstalled={onExtensionInstalled}
       onSceneAdded={onSceneAdded}
       onExternalLayoutAdded={onExternalLayoutAdded}
+      onEffectAdded={onEffectAdded}
+      triggerHotReloadInGameEditorIfNeeded={
+        triggerHotReloadInGameEditorIfNeeded
+      }
       onShareProject={() => {
         openShareDialog();
       }}

@@ -675,9 +675,22 @@ type Props = {|
   ...BehaviorShortcutTreeViewItemCallbacks,
   ...FunctionShortcutTreeViewItemCallbacks,
   onOpenResources: () => void,
+  openBehaviorEvents: (extensionName: string, behaviorName: string) => void,
+  onOpenEventBasedObjectEditor: (
+    extensionName: string,
+    eventsBasedObjectName: string
+  ) => void,
+  onOpenEventBasedObjectVariantEditor: (
+    extensionName: string,
+    eventsBasedObjectName: string,
+    variantName: string
+  ) => void,
+  onGlobalObjectEdited: (object: gdObject) => void,
   onReloadEventsFunctionsExtensions: () => void,
   isOpen: boolean,
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
+  onEffectAdded: () => void,
+  triggerHotReloadInGameEditorIfNeeded: () => void,
   onShareProject: () => void,
   onOpenHomePage: () => void,
   closeProjectManager: () => void,
@@ -720,6 +733,10 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       onOpenEventsFunctionsExtension,
       onOpenCustomObjectEditor,
       onOpenPrefabDetailEditor,
+      openBehaviorEvents,
+      onOpenEventBasedObjectEditor,
+      onOpenEventBasedObjectVariantEditor,
+      onGlobalObjectEdited,
       onRenamedEventsBasedObject,
       onDeletedEventsBasedObject,
       onRenamedEventsBasedObjectVariant,
@@ -730,6 +747,8 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       onReloadEventsFunctionsExtensions,
       isOpen,
       hotReloadPreviewButtonProps,
+      onEffectAdded,
+      triggerHotReloadInGameEditorIfNeeded,
       onWillInstallExtension,
       onShareProject,
       resourceManagementProps,
@@ -2223,6 +2242,28 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                         project={project}
                         onChange={triggerUnsavedChanges}
                         onClose={() => setProjectGlobalsDialogOpen(false)}
+                        resourceManagementProps={resourceManagementProps}
+                        hotReloadPreviewButtonProps={
+                          hotReloadPreviewButtonProps
+                        }
+                        openBehaviorEvents={openBehaviorEvents}
+                        onWillInstallExtension={onWillInstallExtension}
+                        onExtensionInstalled={onExtensionInstalled}
+                        onOpenEventBasedObjectEditor={
+                          onOpenEventBasedObjectEditor
+                        }
+                        onOpenEventBasedObjectVariantEditor={
+                          onOpenEventBasedObjectVariantEditor
+                        }
+                        onDeleteEventsBasedObjectVariant={
+                          onDeletedEventsBasedObjectVariant
+                        }
+                        onGlobalObjectEdited={onGlobalObjectEdited}
+                        onEffectAdded={onEffectAdded}
+                        onObjectListsModified={onObjectListsModified}
+                        triggerHotReloadInGameEditorIfNeeded={
+                          triggerHotReloadInGameEditorIfNeeded
+                        }
                       />
                     )}
                     {!!editedPropertiesLayout &&

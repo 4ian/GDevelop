@@ -20,6 +20,11 @@ import Cross from '../UI/CustomSvgIcons/Cross';
 import Edit from '../UI/CustomSvgIcons/Edit';
 import Trash from '../UI/CustomSvgIcons/Trash';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
+import ObjectEditorDialog from '../ObjectEditor/ObjectEditorDialog';
+import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
+import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
+import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
+import EventsRootVariablesFinder from '../Utils/EventsRootVariablesFinder';
 
 const gd: libGDevelop = global.gd;
 const globalObjectFallbackIcon = 'res/icons_default/global_object24_black.svg';
@@ -27,6 +32,7 @@ const globalGroupFallbackIcon = 'res/icons_default/global_group24_black.svg';
 const globalObjectCardReactDndType = 'GLOBAL_OBJECT_CARD';
 
 type GlobalObjectRow = {|
+  object: gdObject,
   name: string,
   type: string,
   thumbnail: ?string,
@@ -48,6 +54,29 @@ type Props = {|
   project: gdProject,
   onChange: () => void,
   onClose: () => void,
+  resourceManagementProps: ResourceManagementProps,
+  hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
+  openBehaviorEvents: (extensionName: string, behaviorName: string) => void,
+  onWillInstallExtension: (extensionNames: Array<string>) => void,
+  onExtensionInstalled: (extensionNames: Array<string>) => void,
+  onOpenEventBasedObjectEditor: (
+    extensionName: string,
+    eventsBasedObjectName: string
+  ) => void,
+  onOpenEventBasedObjectVariantEditor: (
+    extensionName: string,
+    eventsBasedObjectName: string,
+    variantName: string
+  ) => void,
+  onDeleteEventsBasedObjectVariant: (
+    eventsFunctionsExtension: gdEventsFunctionsExtension,
+    eventBasedObject: gdEventsBasedObject,
+    variant: gdEventsBasedObjectVariant
+  ) => void,
+  onGlobalObjectEdited: (object: gdObject) => void,
+  onEffectAdded: () => void,
+  onObjectListsModified: ({ isNewObjectTypeUsed: boolean }) => void,
+  triggerHotReloadInGameEditorIfNeeded: () => void,
 |};
 
 type DraggedGlobalObject = {|
@@ -213,6 +242,7 @@ const enumerateGlobalObjects = (project: gdProject): Array<GlobalObjectRow> => {
   return mapFor(0, globalObjects.getObjectsCount(), index => {
     const object = globalObjects.getObjectAt(index);
     return {
+      object,
       name: object.getName(),
       type: object.getType(),
       thumbnail: ObjectsRenderingService.getThumbnail(
@@ -252,11 +282,12 @@ const enumerateGlobalGroups = (project: gdProject): Array<GlobalGroupRow> => {
 const hasProjectObjectGroupOrVariableNamed = (
   project: gdProject,
   name: string,
-  ignoredGlobalGroupName?: ?string
+  ignoredGlobalGroupName?: ?string,
+  ignoredGlobalObjectName?: ?string
 ): boolean => {
   const globalObjects = project.getObjects();
   if (
-    globalObjects.hasObjectNamed(name) ||
+    (globalObjects.hasObjectNamed(name) && name !== ignoredGlobalObjectName) ||
     (globalObjects.getObjectGroups().has(name) &&
       name !== ignoredGlobalGroupName) ||
     project.getVariables().has(name)
@@ -286,6 +317,15 @@ const getValidatedGlobalGroupName = (
 ): string =>
   newNameGenerator(gd.Project.getSafeName(newName), name =>
     hasProjectObjectGroupOrVariableNamed(project, name, currentName)
+  );
+
+const getValidatedGlobalObjectName = (
+  project: gdProject,
+  newName: string,
+  currentName?: ?string
+): string =>
+  newNameGenerator(gd.Project.getSafeName(newName), name =>
+    hasProjectObjectGroupOrVariableNamed(project, name, null, currentName)
   );
 
 const DraggableGlobalObjectCard = makeDragSourceAndDropTarget<DraggedGlobalObject>(
@@ -411,7 +451,13 @@ const SectionHeader = ({
   </div>
 );
 
-const ObjectCard = ({ object }: {| object: GlobalObjectRow |}) => {
+const ObjectCard = ({
+  object,
+  onEditObject,
+}: {|
+  object: GlobalObjectRow,
+  onEditObject: gdObject => void,
+|}) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
   return (
@@ -438,10 +484,26 @@ const ObjectCard = ({ object }: {| object: GlobalObjectRow |}) => {
                 <Text
                   noMargin
                   allowSelection
-                  style={{ overflowWrap: 'anywhere' }}
+                  style={{
+                    flex: 1,
+                    overflowWrap: 'anywhere',
+                  }}
                 >
                   {object.name}
                 </Text>
+                <div style={styles.cardActions}>
+                  <IconButton
+                    size="small"
+                    tooltip={t`Edit object`}
+                    aria-label="Edit object"
+                    onClick={event => {
+                      event.stopPropagation();
+                      onEditObject(object.object);
+                    }}
+                  >
+                    <Edit />
+                  </IconButton>
+                </div>
               </div>
               <Text noMargin size="body-small" color="secondary" allowSelection>
                 <span style={styles.typeText}>{object.type}</span>
@@ -624,6 +686,18 @@ const ProjectGlobalsDialog = ({
   project,
   onChange,
   onClose,
+  resourceManagementProps,
+  hotReloadPreviewButtonProps,
+  openBehaviorEvents,
+  onWillInstallExtension,
+  onExtensionInstalled,
+  onOpenEventBasedObjectEditor,
+  onOpenEventBasedObjectVariantEditor,
+  onDeleteEventsBasedObjectVariant,
+  onGlobalObjectEdited,
+  onEffectAdded,
+  onObjectListsModified,
+  triggerHotReloadInGameEditorIfNeeded,
 }: Props): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const { showDeleteConfirmation } = useAlertDialog();
@@ -632,8 +706,35 @@ const ProjectGlobalsDialog = ({
     groupBeingRenamed,
     setGroupBeingRenamed,
   ] = React.useState<?GlobalGroupRow>(null);
+  const [editedObject, setEditedObject] = React.useState<?gdObject>(null);
   const globalObjects = enumerateGlobalObjects(project);
   const globalGroups = enumerateGlobalGroups(project);
+  const layoutsCount = project.getLayoutsCount();
+  const editorLayout = layoutsCount > 0 ? project.getLayoutAt(0) : null;
+  const temporaryLayoutForLayers = React.useMemo(
+    () => (layoutsCount === 0 ? new gd.Layout() : null),
+    [layoutsCount]
+  );
+  React.useEffect(
+    () => {
+      return () => {
+        if (temporaryLayoutForLayers) temporaryLayoutForLayers.delete();
+      };
+    },
+    [temporaryLayoutForLayers]
+  );
+  const projectScopedContainersAccessor = React.useMemo(
+    () =>
+      new ProjectScopedContainersAccessor(
+        editorLayout ? { project, layout: editorLayout } : { project }
+      ),
+    [project, editorLayout]
+  );
+  const editorLayersContainer = editorLayout
+    ? editorLayout.getLayers()
+    : temporaryLayoutForLayers
+    ? temporaryLayoutForLayers.getLayers()
+    : null;
 
   const onAddObjectToGroup = React.useCallback(
     (objectName: string, group: GlobalGroupRow) => {
@@ -675,6 +776,75 @@ const ProjectGlobalsDialog = ({
   const onRenameGroup = React.useCallback((group: GlobalGroupRow) => {
     setGroupBeingRenamed(group);
   }, []);
+
+  const onEditObject = React.useCallback((object: gdObject) => {
+    setEditedObject(object);
+  }, []);
+
+  const onRenameEditedObject = React.useCallback(
+    (newName: string) => {
+      if (!editedObject) return;
+
+      const currentName = editedObject.getName();
+      if (newName === currentName) return;
+
+      const validatedName = getValidatedGlobalObjectName(
+        project,
+        newName,
+        currentName
+      );
+      if (currentName === validatedName) return;
+
+      gd.WholeProjectRefactorer.globalObjectOrGroupRenamed(
+        project,
+        currentName,
+        validatedName,
+        /* isObjectGroup= */ false
+      );
+      editedObject.setName(validatedName);
+    },
+    [editedObject, project]
+  );
+
+  const finishEditingObject = React.useCallback(
+    (
+      object: gdObject,
+      hasResourceChanged: boolean,
+      hasAnyEffectBeenAdded: boolean
+    ) => {
+      // ObjectEditorDialog applies object variable refactoring and renaming
+      // after calling onApply. Defer follow-up work so it sees the final name.
+      Promise.resolve().then(() => {
+        gd.WholeProjectRefactorer.behaviorsAddedToGlobalObject(
+          project,
+          object.getName()
+        );
+        gd.WholeProjectRefactorer.updateBehaviorsSharedData(project);
+
+        onGlobalObjectEdited(object);
+        onObjectListsModified({ isNewObjectTypeUsed: false });
+        if (hasResourceChanged) {
+          resourceManagementProps.onResourceUsageChanged();
+        } else {
+          triggerHotReloadInGameEditorIfNeeded();
+        }
+        if (hasAnyEffectBeenAdded) {
+          onEffectAdded();
+        }
+        onChange();
+        forceRefresh(key => key + 1);
+      });
+    },
+    [
+      onChange,
+      onEffectAdded,
+      onGlobalObjectEdited,
+      onObjectListsModified,
+      project,
+      resourceManagementProps,
+      triggerHotReloadInGameEditorIfNeeded,
+    ]
+  );
 
   const onApplyRenameGroup = React.useCallback(
     (newName: string) => {
@@ -784,7 +954,11 @@ const ProjectGlobalsDialog = ({
             {globalObjects.length ? (
               <div style={styles.list}>
                 {globalObjects.map(object => (
-                  <ObjectCard key={object.name} object={object} />
+                  <ObjectCard
+                    key={object.name}
+                    object={object}
+                    onEditObject={onEditObject}
+                  />
                 ))}
               </div>
             ) : (
@@ -848,6 +1022,72 @@ const ProjectGlobalsDialog = ({
           group={groupBeingRenamed}
           onCancel={() => setGroupBeingRenamed(null)}
           onApply={onApplyRenameGroup}
+        />
+      )}
+      {editedObject && editorLayersContainer && (
+        <ObjectEditorDialog
+          open
+          object={editedObject}
+          initialTab={null}
+          project={project}
+          layout={editorLayout}
+          eventsFunctionsExtension={null}
+          eventsBasedObject={null}
+          layersContainer={editorLayersContainer}
+          projectScopedContainersAccessor={projectScopedContainersAccessor}
+          resourceManagementProps={resourceManagementProps}
+          onComputeAllVariableNames={() => {
+            if (!editorLayout) return [];
+
+            return EventsRootVariablesFinder.findAllObjectVariables(
+              project.getCurrentPlatform(),
+              project,
+              editorLayout,
+              editedObject.getName()
+            );
+          }}
+          onCancel={() => {
+            const object = editedObject;
+            setEditedObject(null);
+            if (object) {
+              onGlobalObjectEdited(object);
+              triggerHotReloadInGameEditorIfNeeded();
+              forceRefresh(key => key + 1);
+            }
+          }}
+          getValidatedObjectOrGroupName={newName =>
+            getValidatedGlobalObjectName(
+              project,
+              newName,
+              editedObject.getName()
+            )
+          }
+          onRename={onRenameEditedObject}
+          onApply={(hasResourceChanged, hasAnyEffectBeenAdded) => {
+            const object = editedObject;
+            setEditedObject(null);
+            if (!object) return;
+
+            finishEditingObject(
+              object,
+              hasResourceChanged,
+              hasAnyEffectBeenAdded
+            );
+          }}
+          hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
+          onUpdateBehaviorsSharedData={() =>
+            gd.WholeProjectRefactorer.updateBehaviorsSharedData(project)
+          }
+          openBehaviorEvents={openBehaviorEvents}
+          onWillInstallExtension={onWillInstallExtension}
+          onExtensionInstalled={onExtensionInstalled}
+          onOpenEventBasedObjectEditor={onOpenEventBasedObjectEditor}
+          onOpenEventBasedObjectVariantEditor={
+            onOpenEventBasedObjectVariantEditor
+          }
+          onDeleteEventsBasedObjectVariant={onDeleteEventsBasedObjectVariant}
+          isBehaviorListLocked={false}
+          isVariableListLocked={false}
         />
       )}
     </Dialog>

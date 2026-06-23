@@ -64,6 +64,14 @@ export const NoProjectOpen = (): React.Node => {
                   )}
                   onOpenCustomObjectEditor={action('onOpenCustomObjectEditor')}
                   onOpenPrefabDetailEditor={action('onOpenPrefabDetailEditor')}
+                  openBehaviorEvents={action('openBehaviorEvents')}
+                  onOpenEventBasedObjectEditor={action(
+                    'onOpenEventBasedObjectEditor'
+                  )}
+                  onOpenEventBasedObjectVariantEditor={action(
+                    'onOpenEventBasedObjectVariantEditor'
+                  )}
+                  onGlobalObjectEdited={action('onGlobalObjectEdited')}
                   onRenamedEventsBasedObject={action(
                     'onRenamedEventsBasedObject'
                   )}
@@ -103,6 +111,10 @@ export const NoProjectOpen = (): React.Node => {
                   )}
                   onWillInstallExtension={action('extension will be installed')}
                   onExtensionInstalled={action('onExtensionInstalled')}
+                  onEffectAdded={action('onEffectAdded')}
+                  triggerHotReloadInGameEditorIfNeeded={action(
+                    'triggerHotReloadInGameEditorIfNeeded'
+                  )}
                   onShareProject={action('onShareProject')}
                   isOpen
                   hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
@@ -161,6 +173,14 @@ export const ProjectOpen = (): React.Node => {
                   )}
                   onOpenCustomObjectEditor={action('onOpenCustomObjectEditor')}
                   onOpenPrefabDetailEditor={action('onOpenPrefabDetailEditor')}
+                  openBehaviorEvents={action('openBehaviorEvents')}
+                  onOpenEventBasedObjectEditor={action(
+                    'onOpenEventBasedObjectEditor'
+                  )}
+                  onOpenEventBasedObjectVariantEditor={action(
+                    'onOpenEventBasedObjectVariantEditor'
+                  )}
+                  onGlobalObjectEdited={action('onGlobalObjectEdited')}
                   onRenamedEventsBasedObject={action(
                     'onRenamedEventsBasedObject'
                   )}
@@ -200,6 +220,10 @@ export const ProjectOpen = (): React.Node => {
                   )}
                   onWillInstallExtension={action('extension will be installed')}
                   onExtensionInstalled={action('onExtensionInstalled')}
+                  onEffectAdded={action('onEffectAdded')}
+                  triggerHotReloadInGameEditorIfNeeded={action(
+                    'triggerHotReloadInGameEditorIfNeeded'
+                  )}
                   onShareProject={action('onShareProject')}
                   isOpen
                   hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}

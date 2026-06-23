@@ -188,32 +188,29 @@ const InnerDialog = (props: InnerDialogProps) => {
       (layout && layout.getInitialInstances()) ||
       (eventsBasedObject && eventsBasedObject.getInitialInstances()) ||
       null;
-    if (!initialInstances) {
-      // This can't actually happen.
-      return;
-    }
-
-    const originalSerializedVariables = getOriginalContentSerializedElement().getChild(
-      'variables'
-    );
-    const changeset = gd.WholeProjectRefactorer.computeChangesetForVariablesContainer(
-      originalSerializedVariables,
-      object.getVariables()
-    );
-    gd.WholeProjectRefactorer.applyRefactoringForObjectVariablesContainer(
-      project,
-      object.getVariables(),
-      initialInstances,
-      object.getName(),
-      changeset,
-      originalSerializedVariables
-    );
-    if (eventsBasedObject) {
-      gd.ObjectVariableHelper.applyChangesToVariants(
-        eventsBasedObject,
-        object.getName(),
-        changeset
+    if (initialInstances) {
+      const originalSerializedVariables = getOriginalContentSerializedElement().getChild(
+        'variables'
       );
+      const changeset = gd.WholeProjectRefactorer.computeChangesetForVariablesContainer(
+        originalSerializedVariables,
+        object.getVariables()
+      );
+      gd.WholeProjectRefactorer.applyRefactoringForObjectVariablesContainer(
+        project,
+        object.getVariables(),
+        initialInstances,
+        object.getName(),
+        changeset,
+        originalSerializedVariables
+      );
+      if (eventsBasedObject) {
+        gd.ObjectVariableHelper.applyChangesToVariants(
+          eventsBasedObject,
+          object.getName(),
+          changeset
+        );
+      }
     }
 
     // Clear variable UUIDs to avoid them being persisted in the project file.

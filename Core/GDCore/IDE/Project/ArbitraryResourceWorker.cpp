@@ -129,7 +129,6 @@ void ArbitraryResourceWorker::ExposeEmbeddeds(gd::String& resourceName) {
             child.second->GetValue().GetString();
 
         if (resourcesManager->HasResource(targetResourceName)) {
-          std::cout << targetResourceName << std::endl;
           gd::Resource& targetResource =
               resourcesManager->GetResource(targetResourceName);
 
@@ -234,6 +233,14 @@ bool ResourceWorkerInEventsWorker::DoVisitInstruction(gd::Instruction& instructi
           const gd::ParameterMetadata &parameterMetadata,
           const gd::Expression &parameterExpression, size_t parameterIndex,
           const gd::String &lastObjectName, size_t lastObjectIndex) {
+        // Only resource parameters can refer to a resource. Checking this
+        // before looking the value up in the resources containers avoids an
+        // expensive (linear) resources lookup for the many non-resource
+        // parameters (numbers, strings, objects, expressions...).
+        if (!parameterMetadata.GetValueTypeMetadata().IsResource()) {
+          return;
+        }
+
         const String& parameterValue = parameterExpression.GetPlainString();
         const auto resourceSourceType =
             resourcesContainersList.GetResourcesContainerSourceType(

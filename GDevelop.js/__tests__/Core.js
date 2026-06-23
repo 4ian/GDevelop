@@ -2604,6 +2604,57 @@ describe('libGD.js', function () {
     });
   });
 
+  describe('InstructionValidator', function () {
+    let project = null;
+    let layout = null;
+    let projectScopedContainers = null;
+    beforeAll(() => {
+      project = new gd.ProjectHelper.createNewGDJSProject();
+      layout = project.insertNewLayout('Scene', 0);
+      projectScopedContainers = gd.ProjectScopedContainers.makeNewProjectScopedContainersForProjectAndLayout(
+        project,
+        layout
+      );
+    });
+    afterAll(() => {
+      project.delete();
+    });
+
+    const validateVolumeParameter = value => {
+      // `PlaySoundOnChannel` has an optional "expression" parameter (Volume,
+      // PARAM4) defaulting to "100".
+      const action = new gd.Instruction();
+      action.setType('PlaySoundOnChannel');
+      action.setParametersCount(6);
+      action.setParameter(4, value);
+      const result = gd.InstructionValidator.validateParameter(
+        gd.JsPlatform.get(),
+        projectScopedContainers,
+        action,
+        gd.MetadataProvider.getActionMetadata(
+          gd.JsPlatform.get(),
+          'PlaySoundOnChannel'
+        ),
+        4
+      );
+      const isValid = result.isValid();
+      action.delete();
+      return isValid;
+    };
+
+    it('considers an optional parameter left empty as valid', function () {
+      // The default value is used when generating the code, so it must not be
+      // shown as an error in the events sheet.
+      expect(validateVolumeParameter('')).toBe(true);
+    });
+
+    it('still validates the value of a filled optional parameter', function () {
+      expect(validateVolumeParameter('50')).toBe(true);
+      expect(validateVolumeParameter('1 +')).toBe(false);
+      expect(validateVolumeParameter('"Not a number"')).toBe(false);
+    });
+  });
+
   describe('EventsRefactorer', function () {
     describe('SearchInEvents', function () {
       let eventList = null;

@@ -121,15 +121,7 @@ void ObjectRefactorer::FillMissingGroupVariablesToObjects(
     const gd::SerializerElement &originalSerializedVariables) {
   gd::VariablesContainer groupVariablesContainer;
   groupVariablesContainer.UnserializeFrom(originalSerializedVariables);
-  gd::ObjectRefactorer::FillMissingGroupVariablesToObjects(
-      globalObjectsContainer, objectsContainer, objectGroup,
-      groupVariablesContainer);
-};
 
-void ObjectRefactorer::FillMissingGroupVariablesToObjects(
-    gd::ObjectsContainer &globalObjectsContainer,
-    gd::ObjectsContainer &objectsContainer, const gd::ObjectGroup &objectGroup,
-    const gd::VariablesContainer& groupVariablesContainer) {
   // Add missing variables to objects added in the group.
   for (const gd::String &objectName : objectGroup.GetAllObjectsNames()) {
     const bool hasObject = objectsContainer.HasObjectNamed(objectName);
@@ -138,19 +130,26 @@ void ObjectRefactorer::FillMissingGroupVariablesToObjects(
     }
     auto &object = hasObject ? objectsContainer.GetObject(objectName)
                              : globalObjectsContainer.GetObject(objectName);
-    auto &variablesContainer = object.GetVariables();
-    for (std::size_t variableIndex = 0;
-         variableIndex < groupVariablesContainer.Count(); ++variableIndex) {
-      auto &groupVariable = groupVariablesContainer.Get(variableIndex);
-      const auto &variableName =
-          groupVariablesContainer.GetNameAt(variableIndex);
 
-      if (!variablesContainer.Has(variableName)) {
-        variablesContainer.Insert(variableName, groupVariable,
-                                  variablesContainer.Count());
-      }
+    gd::ObjectRefactorer::FillMissingGroupVariablesToObject(
+        object, groupVariablesContainer);
+  }
+};
+
+void ObjectRefactorer::FillMissingGroupVariablesToObject(
+    gd::Object &object, const gd::VariablesContainer &groupVariablesContainer) {
+  auto &variablesContainer = object.GetVariables();
+  for (std::size_t variableIndex = 0;
+       variableIndex < groupVariablesContainer.Count(); ++variableIndex) {
+    auto &groupVariable = groupVariablesContainer.Get(variableIndex);
+    const auto &variableName = groupVariablesContainer.GetNameAt(variableIndex);
+
+    if (!variablesContainer.Has(variableName)) {
+      variablesContainer.Insert(variableName, groupVariable,
+                                variablesContainer.Count());
     }
   }
+}
 };
 
 // TODO Handle position changes for group variables.

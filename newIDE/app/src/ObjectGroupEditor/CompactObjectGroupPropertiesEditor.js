@@ -199,7 +199,7 @@ export const CompactObjectGroupPropertiesEditor = ({
   const addObject = React.useCallback(
     (objectName: string) => {
       objectGroup.addObject(objectName);
-      gd.ObjectRefactorer.fillMissingGroupVariablesToObjects(
+      gd.ObjectRefactorer.fillMissingGroupVariablesToObject(
         globalObjectsContainer || objectsContainer,
         objectsContainer,
         objectGroup,

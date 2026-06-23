@@ -198,16 +198,32 @@ export const CompactObjectGroupPropertiesEditor = ({
 
   const addObject = React.useCallback(
     (objectName: string) => {
+      const object = getObjectByName(
+        globalObjectsContainer,
+        objectsContainer,
+        objectName
+      );
+      if (!object) {
+        return;
+      }
       objectGroup.addObject(objectName);
       gd.ObjectRefactorer.fillMissingGroupVariablesToObject(
-        globalObjectsContainer || objectsContainer,
-        objectsContainer,
-        objectGroup,
+        object,
         groupVariablesContainer
       );
+      for (const behaviorName of allVisibleBehaviorNames) {
+        gd.ObjectRefactorer.fillMissingGroupBehaviorToObject(
+          globalObjectsContainer || objectsContainer,
+          objectsContainer,
+          object,
+          objectGroup,
+          behaviorName
+        );
+      }
       forceUpdate();
     },
     [
+      allVisibleBehaviorNames,
       forceUpdate,
       globalObjectsContainer,
       groupVariablesContainer,

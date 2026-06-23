@@ -134,7 +134,7 @@ void ObjectRefactorer::FillMissingGroupVariablesToObjects(
     gd::ObjectRefactorer::FillMissingGroupVariablesToObject(
         object, groupVariablesContainer);
   }
-};
+}
 
 void ObjectRefactorer::FillMissingGroupVariablesToObject(
     gd::Object &object, const gd::VariablesContainer &groupVariablesContainer) {
@@ -150,7 +150,29 @@ void ObjectRefactorer::FillMissingGroupVariablesToObject(
     }
   }
 }
-};
+
+void ObjectRefactorer::FillMissingGroupBehaviorToObject(
+    gd::ObjectsContainer &globalObjectsContainer,
+    gd::ObjectsContainer &objectsContainer, gd::Object &object,
+    const gd::ObjectGroup &objectGroup, const gd::String &behaviorName) {
+  if (objectGroup.GetAllObjectsNames().size() == 0) {
+    return;
+  }
+  const gd::String &firstObjectName = objectGroup.GetAllObjectsNames()[0];
+  const bool hasObject = objectsContainer.HasObjectNamed(firstObjectName);
+  if (!hasObject && !globalObjectsContainer.HasObjectNamed(firstObjectName)) {
+    return;
+  }
+  auto &firstObject = hasObject
+                          ? objectsContainer.GetObject(firstObjectName)
+                          : globalObjectsContainer.GetObject(firstObjectName);
+
+  if (!firstObject.HasBehaviorNamed(behaviorName)) {
+    return;
+  }
+  object.GetBehaviors().AddBehavior(firstObject.GetBehavior(behaviorName),
+                                    behaviorName);
+}
 
 // TODO Handle position changes for group variables.
 // We could try to change the order of object variables in a way that the next

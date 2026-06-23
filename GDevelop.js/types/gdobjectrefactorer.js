@@ -3,7 +3,8 @@ declare class gdObjectRefactorer {
   static mergeVariableContainers(objectsContainersList: gdObjectsContainersList, objectGroup: gdObjectGroup): gdVariablesContainer;
   static fillAnyVariableBetweenObjects(globalObjectsContainer: gdObjectsContainer, objectsContainer: gdObjectsContainer, objectGroup: gdObjectGroup): void;
   static applyChangesToVariants(eventsBasedObject: gdEventsBasedObject, objectName: string, changeset: gdVariablesChangeset): void;
-  static fillMissingGroupVariablesToObjects(globalObjectsContainer: gdObjectsContainer, objectsContainer: gdObjectsContainer, objectGroup: gdObjectGroup, groupVariablesContainer: gdVariablesContainer): void;
+  static fillMissingGroupVariablesToObject(obj: gdObject, groupVariablesContainer: gdVariablesContainer): void;
+  static fillMissingGroupBehaviorToObject(globalObjectsContainer: gdObjectsContainer, objectsContainer: gdObjectsContainer, obj: gdObject, objectGroup: gdObjectGroup, behaviorName: string): void;
   delete(): void;
   ptr: number;
 };

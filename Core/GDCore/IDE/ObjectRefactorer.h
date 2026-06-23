@@ -10,6 +10,7 @@
 namespace gd {
 class EventsBasedObject;
 class InitialInstancesContainer;
+class Object;
 class ObjectsContainersList;
 class ObjectsContainer;
 class ObjectGroup;
@@ -69,6 +70,15 @@ public:
   static void FillMissingGroupVariablesToObject(
       gd::Object &object,
       const gd::VariablesContainer &groupVariablesContainer);
+
+  /**
+   * @brief Copy the behavior of the group to the object newly added to the
+   * group.
+   */
+  static void FillMissingGroupBehaviorToObject(
+      gd::ObjectsContainer &globalObjectsContainer,
+      gd::ObjectsContainer &objectsContainer, gd::Object &object,
+      const gd::ObjectGroup &objectGroup, const gd::String &behaviorName);
 
   /**
    * @brief Apply the changes done with the variables editor to the objects of

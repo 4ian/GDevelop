@@ -422,7 +422,8 @@ export class ObjectRefactorer extends EmscriptenObject {
   static mergeVariableContainers(objectsContainersList: ObjectsContainersList, objectGroup: ObjectGroup): VariablesContainer;
   static fillAnyVariableBetweenObjects(globalObjectsContainer: ObjectsContainer, objectsContainer: ObjectsContainer, objectGroup: ObjectGroup): void;
   static applyChangesToVariants(eventsBasedObject: EventsBasedObject, objectName: string, changeset: VariablesChangeset): void;
-  static fillMissingGroupVariablesToObjects(globalObjectsContainer: ObjectsContainer, objectsContainer: ObjectsContainer, objectGroup: ObjectGroup, groupVariablesContainer: VariablesContainer): void;
+  static fillMissingGroupVariablesToObject(obj: gdObject, groupVariablesContainer: VariablesContainer): void;
+  static fillMissingGroupBehaviorToObject(globalObjectsContainer: ObjectsContainer, objectsContainer: ObjectsContainer, obj: gdObject, objectGroup: ObjectGroup, behaviorName: string): void;
 }
 
 export class EventsBasedObjectVariantHelper extends EmscriptenObject {

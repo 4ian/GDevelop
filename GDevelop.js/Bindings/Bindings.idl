@@ -379,8 +379,14 @@ interface ObjectRefactorer {
         [Const] DOMString objectName,
         [Const, Ref] VariablesChangeset changeset);
     void STATIC_FillMissingGroupVariablesToObject(
-        [Ref] gdObject object,
+        [Ref] gdObject obj,
         [ Const, Ref ] VariablesContainer groupVariablesContainer);
+    void STATIC_FillMissingGroupBehaviorToObject(
+        [Ref] ObjectsContainer globalObjectsContainer,
+        [Ref] ObjectsContainer objectsContainer,
+        [Ref] gdObject obj,
+        [ Const, Ref ] ObjectGroup objectGroup,
+        [Const] DOMString behaviorName);
 };
 
 interface EventsBasedObjectVariantHelper {

@@ -3033,22 +3033,13 @@ interface InstructionValidator {
     [Const, Ref] ProjectScopedContainers projectScopedContainers,
     [Const, Ref] Instruction instruction,
     [Const, Ref] InstructionMetadata metadata,
-    long parameterIndex,
-    [Const] DOMString value);
+    long parameterIndex);
   boolean STATIC_IsParameterValid(
     [Const, Ref] Platform platform,
     [Const, Ref] ProjectScopedContainers projectScopedContainers,
     [Const, Ref] Instruction instruction,
     [Const, Ref] InstructionMetadata metadata,
-    long parameterIndex,
-    [Const] DOMString value);
-  boolean STATIC_HasDeprecationWarnings(
-    [Const, Ref] Platform platform,
-    [Const, Ref] ProjectScopedContainers projectScopedContainers,
-    [Const, Ref] Instruction instruction,
-    [Const, Ref] InstructionMetadata metadata,
-    long parameterIndex,
-    [Const] DOMString value);
+    long parameterIndex);
 };
 
 interface ObjectTools {

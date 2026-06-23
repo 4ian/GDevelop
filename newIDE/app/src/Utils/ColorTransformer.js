@@ -168,8 +168,7 @@ export const hslToRgb = (h: number, s: number, l: number): number[] => {
   if (s === 0) {
     r = g = b = l; // achromatic
   } else {
-    // $FlowFixMe[missing-local-annot]
-    let hue2rgb = function hue2rgb(p, q, t) {
+    let hue2rgb = function hue2rgb(p: number, q: number, t: number) {
       if (t < 0) t += 1;
       if (t > 1) t -= 1;
       if (t < 1 / 6) return p + (q - p) * 6 * t;

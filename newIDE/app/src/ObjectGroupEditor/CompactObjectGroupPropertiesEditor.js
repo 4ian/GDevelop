@@ -24,7 +24,6 @@ import CompactTextField from '../UI/CompactTextField';
 import Link from '../UI/Link';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import useVariablesContainerRefactoring from '../VariablesList/useVariablesContainerRefactoring';
-import useValueWithInit from '../Utils/UseRefInitHook';
 import { type ObjectGroupEditorTab } from './EditedObjectGroupEditorDialog';
 import CompactObjectGroupEditor from './CompactObjectGroupEditor';
 import { TopLevelCollapsibleSection } from '../ObjectEditor/CompactObjectPropertiesEditor';
@@ -107,14 +106,15 @@ export const CompactObjectGroupPropertiesEditor = ({
   const [isVariablesFolded, setIsVariablesFolded] = React.useState(false);
   const variablesListRef = React.useRef<?VariablesListInterface>(null);
 
-  const groupVariablesContainer = useValueWithInit(
+  const groupVariablesContainer = React.useMemo(
     // The VariablesContainer is returned by value.
     // Thus, the same instance is reused every time.
     () =>
       gd.ObjectVariableHelper.mergeVariableContainers(
         projectScopedContainersAccessor.get().getObjectsContainersList(),
         objectGroup
-      )
+      ),
+    [objectGroup, projectScopedContainersAccessor]
   );
 
   const openFullEditor = React.useCallback(

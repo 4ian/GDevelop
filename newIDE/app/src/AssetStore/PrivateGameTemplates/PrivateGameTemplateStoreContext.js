@@ -155,8 +155,7 @@ export const PrivateGameTemplateStoreStateProvider = ({
             fetchedPrivateGameTemplateListingDatas
           );
           const defaultTags = fetchedPrivateGameTemplateListingDatas.reduce(
-            // $FlowFixMe[missing-local-annot]
-            (allCategories, privateGameTemplateListingData) => {
+            (allCategories: Array<string>, privateGameTemplateListingData) => {
               return allCategories.concat(
                 privateGameTemplateListingData.categories.map(category =>
                   capitalize(category)

@@ -171,10 +171,11 @@ SerializerElement Serializer::FromJSON(const char* json) {
     Document document;
 
     // In-situ parsing, decode strings directly in the source string. Source
-    // must be string.
-    char buffer[len + 1];
-    memcpy(buffer, json, len + 1);
-    if (document.ParseInsitu(buffer).HasParseError()) {
+    // must be a mutable, null-terminated buffer. Heap-allocated because the
+    // input can be very large (big projects) and would overflow the stack.
+    std::vector<char> buffer(len + 1);
+    memcpy(buffer.data(), json, len + 1);
+    if (document.ParseInsitu(buffer.data()).HasParseError()) {
       std::cout << "TODO: error while parsing" << std::endl;
       return element;
     }

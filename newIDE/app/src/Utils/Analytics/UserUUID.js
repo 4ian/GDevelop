@@ -1,7 +1,6 @@
 // @flow
 // See https://gist.github.com/jed/982883
-// $FlowFixMe[missing-local-annot]
-const generateUUID = (a): string => {
+const generateUUID = (a?: number): string => {
   return a
     ? // eslint-disable-next-line
       (a ^ ((Math.random() * 16) >> (a / 4))).toString(16)

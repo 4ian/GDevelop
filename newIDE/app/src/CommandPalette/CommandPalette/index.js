@@ -80,8 +80,7 @@ const CommandPalette: React.ComponentType<any> = React.forwardRef<
     setMode('closed');
   };
 
-  // $FlowFixMe[missing-local-annot]
-  const openPalette = React.useCallback((open? = true) => {
+  const openPalette = React.useCallback((open?: boolean = true) => {
     if (open) setMode('command');
     else setMode('closed');
   }, []);
@@ -91,8 +90,7 @@ const CommandPalette: React.ComponentType<any> = React.forwardRef<
    * manager and launches command accordingly
    */
   const launchCommand = React.useCallback(
-    // $FlowFixMe[missing-local-annot]
-    commandName => {
+    (commandName: CommandName) => {
       const command = commandManager.getNamedCommand(commandName);
       if (!command) return;
       handleCommandChoose(command);

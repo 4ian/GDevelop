@@ -172,11 +172,11 @@ function InAppTutorialStepDisplayer({
   const [assistantImage, setAssistantImage] = React.useState<?HTMLDivElement>(
     null
   );
-  // $FlowFixMe[missing-empty-array-annot]
-  const [blockingLayerHoles, setBlockingLayerHoles] = React.useState([]);
+  const [blockingLayerHoles, setBlockingLayerHoles] = React.useState<
+    Array<HTMLElement>
+  >([]);
 
-  // $FlowFixMe[missing-local-annot]
-  const defineAssistantImage = React.useCallback(node => {
+  const defineAssistantImage = React.useCallback((node: ?HTMLDivElement) => {
     if (node) {
       setAssistantImage(node);
     }

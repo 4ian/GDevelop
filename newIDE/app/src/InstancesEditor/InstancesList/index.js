@@ -123,8 +123,7 @@ type Props = {|
 |};
 
 class InstancesList extends Component<Props, State> {
-  // $FlowFixMe[missing-local-annot]
-  state = {
+  state: State = {
     searchText: '',
     sortBy: 'zOrder',
     sortDirection: SortDirection.DESC,
@@ -132,8 +131,7 @@ class InstancesList extends Component<Props, State> {
   renderedRows: Array<RenderedRowInfo> = [];
   instanceRowRenderer: ?typeof gd.InitialInstanceJSFunctor;
   table: ?typeof RVTable;
-  // $FlowFixMe[missing-local-annot]
-  _keyboardShortcuts = new KeyboardShortcuts({
+  _keyboardShortcuts: KeyboardShortcuts = new KeyboardShortcuts({
     isActive: () => false,
     shortcutCallbacks: {},
   });
@@ -178,13 +176,11 @@ class InstancesList extends Component<Props, State> {
     );
   };
 
-  // $FlowFixMe[missing-local-annot]
-  _rowGetter = ({ index }: {| index: number |}) => {
+  _rowGetter = ({ index }: {| index: number |}): RenderedRowInfo => {
     return this.renderedRows[index];
   };
 
-  // $FlowFixMe[missing-local-annot]
-  _rowClassName = ({ index }: {| index: number |}) => {
+  _rowClassName = ({ index }: {| index: number |}): string => {
     if (index < 0) {
       return 'tableHeaderRow';
     } else {
@@ -200,8 +196,7 @@ class InstancesList extends Component<Props, State> {
     rowData: { instance },
   }: {
     rowData: RenderedRowInfo,
-    // $FlowFixMe[missing-local-annot]
-  }) => {
+  }): React.Node => {
     return (
       <IconButton
         size="small"
@@ -274,8 +269,7 @@ class InstancesList extends Component<Props, State> {
     );
   };
 
-  // $FlowFixMe[missing-local-annot]
-  render() {
+  render(): React.Node {
     const { searchText, sortBy, sortDirection } = this.state;
     const { instances } = this.props;
 

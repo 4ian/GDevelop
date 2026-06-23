@@ -210,8 +210,7 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props): React.Node => {
 
   // When the user releases the thumb, we need to stop listening to mouse move and up events.
   const makeMouseUpXThumbHandler = React.useCallback(
-    // $FlowFixMe[missing-local-annot]
-    mouseMoveHandler =>
+    (mouseMoveHandler: MouseEventListener) =>
       function mouseUpHandler(e: MouseEvent) {
         isDragging.current = false;
         if (
@@ -226,8 +225,7 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props): React.Node => {
     [hideScrollbarsAfterDelay]
   );
   const makeMouseUpYThumbHandler = React.useCallback(
-    // $FlowFixMe[missing-local-annot]
-    mouseMoveHandler =>
+    (mouseMoveHandler: MouseEventListener) =>
       function mouseUpHandler(e: MouseEvent) {
         isDragging.current = false;
         if (

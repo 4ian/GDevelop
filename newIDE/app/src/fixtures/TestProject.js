@@ -532,8 +532,7 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
   jsCodeEvent.setInlineCode('console.log("Hello, World!");');
   jsCodeEvent.setParameterObjects('MyObject');
 
-  // $FlowFixMe[missing-local-annot]
-  const makeKeyPressedCondition = key => {
+  const makeKeyPressedCondition = (key: string) => {
     const condition = new gd.Instruction();
     condition.setType('KeyPressed');
     condition.setParametersCount(2);
@@ -541,8 +540,7 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     return condition; // This leaks memory if not deleted
   };
 
-  // $FlowFixMe[missing-local-annot]
-  const makeMouseButtonPressedCondition = button => {
+  const makeMouseButtonPressedCondition = (button: string) => {
     const condition = new gd.Instruction();
     condition.setType('SourisBouton');
     condition.setParametersCount(2);
@@ -550,8 +548,7 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     return condition; // This leaks memory if not deleted
   };
 
-  // $FlowFixMe[missing-local-annot]
-  const makeDeleteAction = objectToDelete => {
+  const makeDeleteAction = (objectToDelete: string) => {
     var action = new gd.Instruction(); //Add a simple action
     action.setType('Delete');
     action.setParametersCount(2);

@@ -53,7 +53,11 @@ export function DraggableEditorTabs({
   onDropTab,
   onHoverTab,
 }: DraggableEditorTabsProps): React.Node {
-  let draggedTabIndex: ?number = null;
+  // Kept in a ref (not a plain variable) so the index survives any re-render
+  // happening between the drag start and the drop (tooltip hover timeouts, the
+  // Ask AI glow interval, window resize...). Otherwise it would be reset to null
+  // mid-drag and the drop would be silently ignored.
+  const draggedTabIndexRef = React.useRef<?number>(null);
 
   // Ensure the component is re-rendered when the window is resized.
   useOnResize(useForceUpdate());
@@ -132,13 +136,13 @@ export function DraggableEditorTabs({
               onActivated={() => onTabActivated(editorTab)}
               closable={editorTab.closable}
               onBeginDrag={() => {
-                draggedTabIndex = id;
+                draggedTabIndexRef.current = id;
                 return editorTab;
               }}
               onDrop={toHoveredIndex => {
-                if (typeof draggedTabIndex === 'number') {
-                  onDropTab(draggedTabIndex, id);
-                  draggedTabIndex = null;
+                if (typeof draggedTabIndexRef.current === 'number') {
+                  onDropTab(draggedTabIndexRef.current, id);
+                  draggedTabIndexRef.current = null;
                 }
               }}
               maxWidth={maxWidth}

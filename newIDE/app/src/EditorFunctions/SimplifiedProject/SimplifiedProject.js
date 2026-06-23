@@ -60,6 +60,7 @@ type SimplifiedProject = {|
   properties: {|
     gameResolutionWidth: number,
     gameResolutionHeight: number,
+    firstLayout: string,
   |},
   globalObjects: Array<SimplifiedObject>,
   globalObjectGroups: Array<SimplifiedObjectGroup>,
@@ -124,8 +125,7 @@ export const makeSimplifiedProjectBuilder = (
   const getSimplifiedVariable = (
     name: string,
     variable: gdVariable,
-    // $FlowFixMe[missing-local-annot]
-    depth = 0
+    depth: number = 0
   ): SimplifiedVariable => {
     const isCollection = isCollectionVariable(variable);
 
@@ -402,6 +402,7 @@ export const makeSimplifiedProjectBuilder = (
       properties: {
         gameResolutionWidth: project.getGameResolutionWidth(),
         gameResolutionHeight: project.getGameResolutionHeight(),
+        firstLayout: project.getFirstLayout(),
       },
       resources: getSimplifiedResourcesJson(project.getResourcesManager()),
       globalObjects,

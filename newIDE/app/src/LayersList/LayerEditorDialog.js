@@ -104,8 +104,7 @@ const LayerEditorDialog = ({
   const [hasAnyEffectBeenAdded, setAnyEffectBeenAdded] = React.useState(false);
 
   const onChangeCamera3DFieldOfView = React.useCallback(
-    // $FlowFixMe[missing-local-annot]
-    value => {
+    (value: string) => {
       setCamera3DFieldOfViewError(null);
       const newValue = parseFloat(value) || 0;
       if (newValue <= 0 || newValue > 180) {
@@ -125,8 +124,7 @@ const LayerEditorDialog = ({
   );
 
   const checkNearPlaneDistanceError = React.useCallback(
-    // $FlowFixMe[missing-local-annot]
-    value => {
+    (value: number) => {
       setCamera3DNearPlaneDistanceError(null);
       const hasError =
         (value <= 0 && layer.getCameraType() !== 'orthographic') ||
@@ -145,8 +143,7 @@ const LayerEditorDialog = ({
   );
 
   const onChangeCamera3DNearPlaneDistance = React.useCallback(
-    // $FlowFixMe[missing-local-annot]
-    value => {
+    (value: string) => {
       const newValue = parseFloat(value) || 0;
       const hasError = checkNearPlaneDistanceError(newValue);
       if (hasError) {
@@ -161,8 +158,7 @@ const LayerEditorDialog = ({
   );
 
   const onChangeCamera3DFarPlaneDistance = React.useCallback(
-    // $FlowFixMe[missing-local-annot]
-    value => {
+    (value: string) => {
       setCamera3DFarPlaneDistanceError(null);
       const newValue = parseFloat(value) || 0;
       if (newValue <= layer.getCamera3DNearPlaneDistance()) {
@@ -183,8 +179,7 @@ const LayerEditorDialog = ({
   );
 
   const onChangeCamera2DPlaneMaxDrawingDistance = React.useCallback(
-    // $FlowFixMe[missing-local-annot]
-    value => {
+    (value: string) => {
       setCamera2DPlaneMaxDrawingDistanceError(null);
       const newValue = parseFloat(value) || 0;
       if (newValue <= 0) {

@@ -67,9 +67,20 @@ InstructionSentenceFormatter::GetAsFormattedText(
       TextFormatting format;
       format.userData = firstParamIndex;
 
+      const gd::ParameterMetadata &parameterMetadata =
+          metadata.GetParameter(firstParamIndex);
+      const gd::String &parameterValue =
+          instr.GetParameter(firstParamIndex).GetPlainString();
+      // Use the default value when the parameter is left empty, so that the
+      // displayed text matches what is actually generated as code (see
+      // `gd::ParameterMetadataTools::IterateOverParametersWithIndex`).
+      const gd::String &parameterValueOrDefault =
+          parameterValue.empty() && parameterMetadata.IsOptional()
+              ? parameterMetadata.GetDefaultValue()
+              : parameterValue;
+
       gd::String text = GetFormattedParameterValue(
-          instr.GetParameter(firstParamIndex).GetPlainString(),
-          metadata.GetParameter(firstParamIndex).GetType());
+          parameterValueOrDefault, parameterMetadata.GetType());
       std::replace(text.Raw().begin(),
                    text.Raw().end(),
                    '\n',

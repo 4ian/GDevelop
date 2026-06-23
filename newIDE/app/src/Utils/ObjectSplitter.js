@@ -45,8 +45,7 @@ export const split = (
   }: SplitConfiguration
 ): Array<PartialObjectDescription> => {
   const partialObjects = [];
-  // $FlowFixMe[missing-local-annot]
-  const createReference = (reference, object): Reference => {
+  const createReference = (reference: string, object: Object): Reference => {
     partialObjects.push({
       reference,
       object,

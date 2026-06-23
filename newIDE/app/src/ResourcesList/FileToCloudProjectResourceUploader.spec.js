@@ -9,7 +9,7 @@ describe('FileToCloudProjectResourceUploader', () => {
     );
     expect(
       getInputAcceptedMimesAndExtensions('bitmapFont')
-    ).toMatchInlineSnapshot(`".fnt,.xml"`);
+    ).toMatchInlineSnapshot(`"file,.fnt,.xml"`);
     expect(getInputAcceptedMimesAndExtensions('font')).toMatchInlineSnapshot(
       `"font/ttf,font/otf,.ttf,.otf"`
     );
@@ -32,7 +32,7 @@ describe('FileToCloudProjectResourceUploader', () => {
       `"file,.glb"`
     );
     expect(getInputAcceptedMimesAndExtensions('atlas')).toMatchInlineSnapshot(
-      `".atlas"`
+      `"file,.atlas"`
     );
     expect(getInputAcceptedMimesAndExtensions('spine')).toMatchInlineSnapshot(
       `"application/json,.json"`

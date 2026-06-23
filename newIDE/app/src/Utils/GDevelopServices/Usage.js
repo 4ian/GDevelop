@@ -162,6 +162,20 @@ export type Quotas = {
   [string]: Quota,
 };
 
+export type SubscriptionDialogVariantConfig = {|
+  type: string,
+  weight: number,
+  featuredPlanId?: string,
+|};
+
+export type SubscriptionDialogPlacementConfig = {|
+  variants: Array<SubscriptionDialogVariantConfig>,
+|};
+
+export type SubscriptionDialogDisplayConfig = {|
+  placements: { [placementId: string]: SubscriptionDialogPlacementConfig },
+|};
+
 /**
  * The limits communicated by the API for a user.
  */
@@ -174,6 +188,7 @@ export type Limits = {|
     purchasableQuantities: UsagePurchasableQuantities,
   },
   message: string | typeof undefined,
+  subscriptionDialogDisplayConfig?: SubscriptionDialogDisplayConfig,
 |};
 
 export type PlanDetails = {|
@@ -202,6 +217,23 @@ export type SubscriptionPlanPricingSystem = {|
   periodCount: number,
 |};
 
+export type SimplifiedSubscriptionStoreBadge = string;
+
+export type SimplifiedSubscriptionBulletPoint = {|
+  enabled: boolean,
+  messageByLocale: MessageByLocale,
+  storeBadges?: Array<SimplifiedSubscriptionStoreBadge>,
+|};
+
+export type SimplifiedSubscriptionFeatures = {|
+  titleByLocale?: MessageByLocale,
+  taglineByLocale?: MessageByLocale,
+  upgradeOverlineByLocale?: MessageByLocale,
+  upgradeTitleByLocale?: MessageByLocale,
+  upgradeButtonLabelByLocale?: MessageByLocale,
+  bulletPoints: Array<SimplifiedSubscriptionBulletPoint>,
+|};
+
 export type SubscriptionPlan = {|
   id: string,
   isLegacy: boolean,
@@ -209,6 +241,7 @@ export type SubscriptionPlan = {|
   descriptionByLocale: MessageByLocale,
   bulletPointsByLocale: Array<MessageByLocale>,
   specificRequirementByLocale?: MessageByLocale,
+  simplifiedFeatures?: SimplifiedSubscriptionFeatures,
   targetAudiences: Array<'CASUAL' | 'PRO' | 'EDUCATION'>,
   fullFeatures: Array<{|
     featureName: string,

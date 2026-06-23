@@ -167,24 +167,19 @@ class BrowserPreviewDebuggerServer {
     });
     return promise;
   }
-  // $FlowFixMe[missing-local-annot]
-  getServerState() {
+  getServerState(): 'started' | 'stopped' {
     return debuggerServerState;
   }
-  // $FlowFixMe[missing-local-annot]
-  getExistingDebuggerIds() {
+  getExistingDebuggerIds(): Array<DebuggerId> {
     return getExistingDebuggerIds();
   }
-  // $FlowFixMe[missing-local-annot]
-  getExistingEmbeddedGameFrameDebuggerIds() {
+  getExistingEmbeddedGameFrameDebuggerIds(): Array<DebuggerId> {
     return getExistingEmbeddedGameFrameDebuggerIds();
   }
-  // $FlowFixMe[missing-local-annot]
-  getExistingPreviewDebuggerIds() {
+  getExistingPreviewDebuggerIds(): Array<DebuggerId> {
     return getExistingPreviewDebuggerIds();
   }
-  // $FlowFixMe[missing-local-annot]
-  registerCallbacks(callbacks: PreviewDebuggerServerCallbacks) {
+  registerCallbacks(callbacks: PreviewDebuggerServerCallbacks): () => void {
     callbacksList.push(callbacks);
 
     return () => {

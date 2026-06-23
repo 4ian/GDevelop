@@ -230,8 +230,7 @@ type Props = {|
   |}) => void,
 |};
 
-// $FlowFixMe[missing-local-annot]
-const addFor = (map, key, value) => {
+const addFor = (map: Map<string, Set<string>>, key: string, value: string) => {
   let set = map.get(key);
   if (!set) {
     set = new Set<string>();

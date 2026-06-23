@@ -31,8 +31,7 @@ type RuntimeObjectData = {|
   'Is hidden?': boolean,
 |};
 
-// $FlowFixMe[missing-local-annot]
-const transform = runtimeObject => {
+const transform = (runtimeObject: GameData) => {
   if (!runtimeObject) return null;
   const runtimeObjectData: RuntimeObjectData = {
     'X position': runtimeObject.x,

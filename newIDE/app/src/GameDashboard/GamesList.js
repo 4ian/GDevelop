@@ -343,8 +343,7 @@ const GamesList = ({
     ? Math.ceil(allDashboardItems.length / pageSize)
     : 1;
   const onCurrentPageChange = React.useCallback(
-    // $FlowFixMe[missing-local-annot]
-    newPage => {
+    (newPage: number) => {
       const minPage = 1;
       const maxPage = totalNumberOfPages;
       if (newPage < minPage) {

@@ -122,8 +122,7 @@ const Physics3DEditor = (props: Props): React.Node => {
   );
 
   const updateBehaviorProperty = React.useCallback(
-    // $FlowFixMe[missing-local-annot]
-    (property, value) => {
+    (property: string, value: string) => {
       behavior.updateProperty(property, value);
       forceUpdate();
       onBehaviorUpdated();

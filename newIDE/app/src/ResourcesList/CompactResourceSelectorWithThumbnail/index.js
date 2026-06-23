@@ -41,6 +41,7 @@ type Props = {|
   onChange: string => void,
   id?: string,
   placeholder?: string,
+  disabled?: boolean,
 |};
 
 export const CompactResourceSelectorWithThumbnail = ({
@@ -52,6 +53,7 @@ export const CompactResourceSelectorWithThumbnail = ({
   onChange,
   id,
   placeholder,
+  disabled,
 }: Props): React.Node => {
   const resourcesLoader = ResourcesLoader;
   const forceUpdate = useForceUpdate();
@@ -285,12 +287,13 @@ export const CompactResourceSelectorWithThumbnail = ({
             value={resourceName}
             onChange={e => _onChange(e.currentTarget.value)}
             placeholder={placeholder}
+            disabled={disabled}
           />
         </div>
       </div>
       <ElementWithMenu
         element={
-          <IconButton size="small">
+          <IconButton size="small" disabled={disabled}>
             <Edit style={styles.icon} />
           </IconButton>
         }

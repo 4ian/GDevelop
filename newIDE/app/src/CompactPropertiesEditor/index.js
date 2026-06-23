@@ -248,7 +248,7 @@ const CompactPropertiesEditor = ({
 
       if (field.valueType === 'boolean') {
         const { setValue } = field;
-
+        const mixedValues = hasMixedValues({ instances, field });
         return (
           <CompactToggleField
             key={field.name}
@@ -263,7 +263,7 @@ const CompactPropertiesEditor = ({
                 hasImpactOnAllOtherFields: field.hasImpactOnAllOtherFields,
               });
             }}
-            disabled={getDisabled({ instances, field })}
+            disabled={mixedValues || getDisabled({ instances, field })}
             fullWidth
             labelColor={
               isFieldHighlighted({ instances, field }) ? 'primary' : 'secondary'
@@ -295,7 +295,7 @@ const CompactPropertiesEditor = ({
               hasImpactOnAllOtherFields: field.hasImpactOnAllOtherFields,
             });
           },
-          disabled: getDisabled({ instances, field }),
+          disabled: mixedValues || getDisabled({ instances, field }),
           renderEndAdornmentOnHover:
             getFieldEndAdornmentIcon({ instances, field }) || undefined,
           onClickEndAdornment: () => {
@@ -371,6 +371,7 @@ const CompactPropertiesEditor = ({
                     hasImpactOnAllOtherFields: field.hasImpactOnAllOtherFields,
                   });
                 }}
+                disabled={mixedValues || getDisabled({ instances, field })}
               />
             }
             labelColor={
@@ -380,6 +381,7 @@ const CompactPropertiesEditor = ({
         );
       } else if (field.valueType === 'enumIcon') {
         const value = getFieldValue({ instances, field });
+        const mixedValues = hasMixedValues({ instances, field });
         return (
           <IconButton
             key={field.name}
@@ -396,6 +398,7 @@ const CompactPropertiesEditor = ({
                 hasImpactOnAllOtherFields: field.hasImpactOnAllOtherFields,
               });
             }}
+            disabled={mixedValues || getDisabled({ instances, field })}
           >
             {field.renderIcon(value)}
           </IconButton>
@@ -428,6 +431,7 @@ const CompactPropertiesEditor = ({
             labelColor={
               isFieldHighlighted({ instances, field }) ? 'primary' : 'secondary'
             }
+            disabled={mixedValues || getDisabled({ instances, field })}
           />
         );
       } else {
@@ -456,7 +460,7 @@ const CompactPropertiesEditor = ({
               hasImpactOnAllOtherFields: field.hasImpactOnAllOtherFields,
             });
           },
-          disabled: getDisabled({ instances, field }),
+          disabled: mixedValues || getDisabled({ instances, field }),
           renderEndAdornmentOnHover:
             getFieldEndAdornmentIcon({ instances, field }) || undefined,
           onClickEndAdornment: () => {
@@ -551,7 +555,7 @@ const CompactPropertiesEditor = ({
                 hasImpactOnAllOtherFields: field.hasImpactOnAllOtherFields,
               });
             }}
-            disabled={getDisabled({ instances, field })}
+            disabled={mixedValues || getDisabled({ instances, field })}
           >
             {children}
           </CompactSelectField>
@@ -573,7 +577,7 @@ const CompactPropertiesEditor = ({
                 hasImpactOnAllOtherFields: field.hasImpactOnAllOtherFields,
               });
             }}
-            disabled={getDisabled({ instances, field })}
+            disabled={mixedValues || getDisabled({ instances, field })}
             renderLeftIcon={field.renderLeftIcon}
             leftIconTooltip={getFieldLabel({ instances, field })}
           >
@@ -710,6 +714,7 @@ const CompactPropertiesEditor = ({
                 hasImpactOnAllOtherFields: field.hasImpactOnAllOtherFields,
               });
             }}
+            disabled={mixedValues || getDisabled({ instances, field })}
           />
         }
         labelColor={
@@ -750,6 +755,7 @@ const CompactPropertiesEditor = ({
                 hasImpactOnAllOtherFields: field.hasImpactOnAllOtherFields,
               });
             }}
+            disabled={mixedValues || getDisabled({ instances, field })}
           />
         }
         labelColor={

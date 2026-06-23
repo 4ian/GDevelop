@@ -87,18 +87,6 @@ const UnifiedVariablesDialog = ({
   const tabs = React.useMemo(
     () =>
       [
-        globalVariables && {
-          id: 'global-variables',
-          label: <Trans>Global variables</Trans>,
-          variablesContainer: globalVariables,
-          emptyPlaceholderTitle: <Trans>Add your first global variable</Trans>,
-          emptyPlaceholderDescription: (
-            <Trans>
-              These variables hold additional information on a project.
-            </Trans>
-          ),
-          onComputeAllVariableNames: onComputeAllGlobalVariableNames,
-        },
         sceneVariables && {
           id: 'scene-variables',
           label: <Trans>Scene variables</Trans>,
@@ -110,6 +98,18 @@ const UnifiedVariablesDialog = ({
             </Trans>
           ),
           onComputeAllVariableNames: onComputeAllSceneVariableNames,
+        },
+        globalVariables && {
+          id: 'global-variables',
+          label: <Trans>Global variables</Trans>,
+          variablesContainer: globalVariables,
+          emptyPlaceholderTitle: <Trans>Add your first global variable</Trans>,
+          emptyPlaceholderDescription: (
+            <Trans>
+              These variables hold additional information on a project.
+            </Trans>
+          ),
+          onComputeAllVariableNames: onComputeAllGlobalVariableNames,
         },
         ...objectVariableTabs.map(
           ({ id, objectName, variablesContainer, initialInstances }) => ({
@@ -160,9 +160,7 @@ const UnifiedVariablesDialog = ({
       // $FlowFixMe[incompatible-type]
       tabs={tabs}
       initiallyOpenTabId={
-        isGlobalTabInitiallyOpen === false
-          ? 'scene-variables'
-          : 'global-variables'
+        isGlobalTabInitiallyOpen ? 'global-variables' : 'scene-variables'
       }
       initiallySelectedVariable={initiallySelectedVariable}
       helpPagePath={'/all-features/variables'}

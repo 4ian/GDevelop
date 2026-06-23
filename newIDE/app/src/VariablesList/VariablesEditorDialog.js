@@ -119,8 +119,7 @@ const VariablesEditorDialog = ({
     const tabIndex = Math.max(
       0,
       // $FlowFixMe[missing-local-annot]
-      // $FlowFixMe[incompatible-exact]
-      tabs.indexOf(({ id }) => id === initiallyOpenTabId)
+      tabs.findIndex(({ id }) => id === initiallyOpenTabId)
     );
     const { variablesContainer, inheritedVariablesContainer } = tabs[tabIndex];
     const { name: actualVariableName } = insertInVariablesContainer(

@@ -63,6 +63,26 @@ const isBehaviorInheritedFromObjectType = (behavior: gdBehavior): boolean => {
   }
 };
 
+const getBehaviorInheritedFromObjectType = (
+  project: gdProject,
+  object: BehaviorHolder,
+  behaviorName: string,
+  behaviorTypeName: string
+): ?gdBehavior => {
+  if (!object || typeof object.getType !== 'function') return null;
+
+  const objectType = object.getType();
+  if (!objectType || !project.hasEventsBasedObject(objectType)) return null;
+
+  const eventsBasedObject = project.getEventsBasedObject(objectType);
+  if (!eventsBasedObject.hasBehaviorNamed(behaviorName)) return null;
+
+  const inheritedBehavior = eventsBasedObject.getBehavior(behaviorName);
+  if (inheritedBehavior.getTypeName() !== behaviorTypeName) return null;
+
+  return inheritedBehavior;
+};
+
 export const useBehaviorOverridingAlertDialog = (): ((
   existingBehaviorNames: Array<string>
 ) => Promise<boolean>) => {
@@ -134,6 +154,43 @@ const BehaviorConfigurationEditor = React.forwardRef<
     const behaviorTypeName = behavior.getTypeName();
     const isInheritedFromObjectType = isBehaviorInheritedFromObjectType(
       behavior
+    );
+    const canResetInheritedBehaviorValue =
+      isInheritedFromObjectType &&
+      !!getBehaviorInheritedFromObjectType(
+        project,
+        object,
+        behaviorName,
+        behaviorTypeName
+      );
+    const resetInheritedBehaviorValue = React.useCallback(
+      () => {
+        const inheritedBehavior = getBehaviorInheritedFromObjectType(
+          project,
+          object,
+          behaviorName,
+          behaviorTypeName
+        );
+        if (!inheritedBehavior) return;
+
+        unserializeFromJSObject(
+          behavior,
+          serializeToJSObject(inheritedBehavior)
+        );
+        behavior.setInheritedFromObjectType(true);
+
+        onBehaviorsUpdated();
+        forceUpdate();
+      },
+      [
+        behavior,
+        behaviorName,
+        behaviorTypeName,
+        forceUpdate,
+        object,
+        onBehaviorsUpdated,
+        project,
+      ]
     );
 
     if (behavior.isDefaultBehavior()) {
@@ -237,6 +294,15 @@ const BehaviorConfigurationEditor = React.forwardRef<
                   // TODO Allow to paste behaviors that are already in the list.
                   enabled: canPasteBehaviors && !isListLocked,
                 },
+                ...(canResetInheritedBehaviorValue
+                  ? [
+                      { type: 'separator' },
+                      {
+                        label: i18n._(t`Reset value`),
+                        click: resetInheritedBehaviorValue,
+                      },
+                    ]
+                  : []),
                 ...(project.hasEventsBasedBehavior(behaviorTypeName)
                   ? [
                       { type: 'separator' },

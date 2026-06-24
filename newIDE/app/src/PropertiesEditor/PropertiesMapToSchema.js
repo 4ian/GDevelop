@@ -7,6 +7,7 @@ import {
   type FieldVisibility,
   type Field,
   type FieldChoices,
+  type FieldDisablingMethod,
 } from './PropertiesEditorSchema';
 import { type ResourceKind } from '../ResourcesList/ResourceSource';
 import MeasurementUnitDocumentation from '../PropertiesEditor/MeasurementUnitDocumentation';
@@ -40,7 +41,8 @@ const createField = (
   layers: gdLayersContainer | null,
   object: ?gdObject,
   showcaseNonDefaultValues: boolean,
-  hideResourceProperties: boolean
+  hideResourceProperties: boolean,
+  shouldDisabledFieldsWithMixedValues: boolean
 ): ?Field => {
   const propertyName = property.getLabel();
   const getLabel = (instance: Instance) => {
@@ -106,6 +108,10 @@ const createField = (
       showcaseNonDefaultValues && getValueForString(instance) !== defaultValue
     );
   };
+  const disabled = shouldDisabledFieldsWithMixedValues
+    ? (instances: Array<gdInitialInstance>): FieldDisablingMethod =>
+        'onValuesDifferent'
+    : undefined;
 
   const valueType = property.getType().toLowerCase();
   if (valueType === 'number') {
@@ -144,6 +150,7 @@ const createField = (
       onClickEndAdornment,
       visibility,
       isHighlighted: isHighlightedForNumber,
+      disabled,
     };
   } else if (valueType === 'string' || valueType === '') {
     return {
@@ -159,6 +166,7 @@ const createField = (
       hasImpactOnAllOtherFields: property.hasImpactOnOtherProperties(),
       visibility,
       isHighlighted: isHighlightedForString,
+      disabled,
     };
   } else if (valueType === 'boolean') {
     const defaultValueBoolean = defaultValue ? defaultValue === 'true' : null;
@@ -177,6 +185,7 @@ const createField = (
       hasImpactOnAllOtherFields: property.hasImpactOnOtherProperties(),
       visibility,
       isHighlighted: isHighlightedForString,
+      disabled,
     };
   } else if (valueType === 'choice' || valueType === 'numberwithchoices') {
     // Choice is a "string" (with a selector for the user in the UI)
@@ -211,6 +220,7 @@ const createField = (
           hasImpactOnAllOtherFields: property.hasImpactOnOtherProperties(),
           visibility,
           isHighlighted: isHighlightedForNumber,
+          disabled,
         }
       : {
           name,
@@ -225,6 +235,7 @@ const createField = (
           hasImpactOnAllOtherFields: property.hasImpactOnOtherProperties(),
           visibility,
           isHighlighted: isHighlightedForString,
+          disabled,
         };
   } else if (valueType === 'behavior') {
     const behaviorType =
@@ -256,6 +267,7 @@ const createField = (
       hasImpactOnAllOtherFields: property.hasImpactOnOtherProperties(),
       visibility,
       isHighlighted: isHighlightedForString,
+      disabled,
     };
   } else if (valueType === 'leaderboardid') {
     // LeaderboardId is a "string" (with a selector in the UI)
@@ -271,6 +283,7 @@ const createField = (
       hasImpactOnAllOtherFields: property.hasImpactOnOtherProperties(),
       visibility,
       isHighlighted: isHighlightedForString,
+      disabled,
     };
   } else if (valueType === 'resource') {
     if (hideResourceProperties) {
@@ -293,6 +306,7 @@ const createField = (
       hasImpactOnAllOtherFields: property.hasImpactOnOtherProperties(),
       visibility,
       isHighlighted: isHighlightedForString,
+      disabled,
     };
   } else if (valueType === 'color') {
     return {
@@ -307,6 +321,7 @@ const createField = (
       hasImpactOnAllOtherFields: property.hasImpactOnOtherProperties(),
       visibility,
       isHighlighted: isHighlightedForString,
+      disabled,
     };
   } else if (valueType === 'multilinestring') {
     return {
@@ -321,6 +336,7 @@ const createField = (
       hasImpactOnAllOtherFields: property.hasImpactOnOtherProperties(),
       visibility,
       isHighlighted: isHighlightedForString,
+      disabled,
     };
   } else if (valueType === 'objectanimationname') {
     return {
@@ -359,6 +375,7 @@ const createField = (
       getDescription,
       visibility,
       isHighlighted: isHighlightedForString,
+      disabled,
     };
   } else if (valueType === 'layer') {
     return {
@@ -389,6 +406,7 @@ const createField = (
       getDescription,
       visibility,
       isHighlighted: isHighlightedForString,
+      disabled,
     };
   } else if (valueType === 'keyboardkey') {
     return {
@@ -410,6 +428,7 @@ const createField = (
       getDescription,
       visibility,
       isHighlighted: isHighlightedForString,
+      disabled,
     };
   } else {
     console.error(
@@ -539,6 +558,7 @@ export const effectPropertiesMapToSchema = ({
   visibility = 'All',
   quickCustomizationVisibilities,
   hideResourceProperties,
+  showcaseNonDefaultValues,
 }: {
   ...CommonProps,
   defaultValueProperties: gdMapStringPropertyDescriptor,
@@ -551,6 +571,8 @@ export const effectPropertiesMapToSchema = ({
     visibility,
     quickCustomizationVisibilities,
     hideResourceProperties,
+    showcaseNonDefaultValues,
+    shouldDisabledFieldsWithMixedValues: false,
     getNumberValue: (instance: Instance, propertyName: string): number =>
       instance.hasDoubleParameter(propertyName)
         ? instance.getDoubleParameter(propertyName)
@@ -603,6 +625,7 @@ const propertiesMapToSchema = ({
   quickCustomizationVisibilities,
   showcaseNonDefaultValues,
   hideResourceProperties,
+  shouldDisabledFieldsWithMixedValues,
 }: {
   ...CommonProps,
   getPropertyValue: (instance: Instance, propertyName: string) => string,
@@ -613,6 +636,7 @@ const propertiesMapToSchema = ({
     newValue: string
   ) => void,
   layersContainer: gdLayersContainer | null,
+  shouldDisabledFieldsWithMixedValues: boolean,
 }): Schema => {
   return adaptablePropertiesMapToSchema({
     properties,
@@ -623,6 +647,7 @@ const propertiesMapToSchema = ({
     quickCustomizationVisibilities,
     showcaseNonDefaultValues,
     hideResourceProperties,
+    shouldDisabledFieldsWithMixedValues,
     getNumberValue: (instance: Instance, propertyName: string): number => {
       // Consider a missing value as 0 to avoid propagating NaN.
       return parseFloat(getPropertyValue(instance, propertyName)) || 0;
@@ -660,6 +685,7 @@ const adaptablePropertiesMapToSchema = ({
   setNumberValue,
   setStringValue,
   setBooleanValue,
+  shouldDisabledFieldsWithMixedValues,
 }: {|
   ...CommonProps,
   properties: gdMapStringPropertyDescriptor,
@@ -682,6 +708,7 @@ const adaptablePropertiesMapToSchema = ({
     value: boolean
   ) => void,
   layersContainer: gdLayersContainer | null,
+  shouldDisabledFieldsWithMixedValues: boolean,
 |}): Schema => {
   const propertyNames = properties.keys();
   // Aggregate field by groups to be able to build field groups with a title.
@@ -789,7 +816,8 @@ const adaptablePropertiesMapToSchema = ({
               layersContainer,
               object,
               !!showcaseNonDefaultValues,
-              !!hideResourceProperties
+              !!hideResourceProperties,
+              shouldDisabledFieldsWithMixedValues
             );
 
             if (field) {
@@ -829,7 +857,8 @@ const adaptablePropertiesMapToSchema = ({
         layersContainer,
         object,
         !!showcaseNonDefaultValues,
-        !!hideResourceProperties
+        !!hideResourceProperties,
+        shouldDisabledFieldsWithMixedValues
       );
     }
     if (field) {

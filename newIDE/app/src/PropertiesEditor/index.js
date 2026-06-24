@@ -79,18 +79,24 @@ const styles = {
   },
 };
 
-const getDisabled = ({
+export const getDisabled = ({
   instances,
   field,
+  mixedValues,
 }: {|
   instances: Instances,
   field: ValueField,
+  mixedValues: boolean,
 |}): boolean => {
-  return typeof field.disabled === 'boolean'
-    ? field.disabled
-    : typeof field.disabled === 'function'
-    ? field.disabled(instances)
-    : false;
+  const disabled =
+    typeof field.disabled === 'boolean'
+      ? field.disabled
+      : typeof field.disabled === 'function'
+      ? field.disabled(instances)
+      : 'never';
+  return (
+    (disabled === 'onValuesDifferent' && mixedValues) || disabled === 'always'
+  );
 };
 
 export const hasMixedValues = ({
@@ -245,7 +251,7 @@ const PropertiesEditor = ({
               instances.forEach(i => setValue(i, !!newValue));
               _onInstancesModified(instances);
             }}
-            disabled={getDisabled({ instances, field })}
+            disabled={getDisabled({ instances, field, mixedValues: false })}
           />
         );
       } else if (field.valueType === 'number') {
@@ -269,7 +275,7 @@ const PropertiesEditor = ({
             }}
             type="number"
             style={styles.field}
-            disabled={getDisabled({ instances, field })}
+            disabled={getDisabled({ instances, field, mixedValues: false })}
             endAdornment={
               endAdornment && (
                 <Tooltip title={endAdornment.tooltipContent}>
@@ -348,7 +354,7 @@ const PropertiesEditor = ({
                   _onInstancesModified(instances);
                 }}
                 style={styles.field}
-                disabled={getDisabled({ instances, field })}
+                disabled={getDisabled({ instances, field, mixedValues })}
               />
             )}
             renderButton={style =>
@@ -413,7 +419,7 @@ const PropertiesEditor = ({
             }}
             // $FlowFixMe[incompatible-type]
             style={styles.field}
-            disabled={getDisabled({ instances, field })}
+            disabled={getDisabled({ instances, field, mixedValues: false })}
           >
             {children}
           </SelectField>
@@ -441,7 +447,7 @@ const PropertiesEditor = ({
             }}
             // $FlowFixMe[incompatible-type]
             style={styles.field}
-            disabled={getDisabled({ instances, field })}
+            disabled={getDisabled({ instances, field, mixedValues })}
           >
             {children}
           </SelectField>

@@ -587,6 +587,7 @@ export const CompactObjectPropertiesEditor = ({
         object,
         layersContainer,
         visibility: 'All',
+        shouldDisabledFieldsWithMixedValues: false,
       });
 
       if (layout && layout.getObjects().hasObjectNamed(object.getName())) {

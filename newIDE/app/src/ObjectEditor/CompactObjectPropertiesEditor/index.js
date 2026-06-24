@@ -32,6 +32,7 @@ import Add from '../../UI/CustomSvgIcons/Add';
 import Trash from '../../UI/CustomSvgIcons/Trash';
 import Edit from '../../UI/CustomSvgIcons/ShareExternal';
 import { useManageObjectBehaviors } from '../../BehaviorsEditor';
+import { getAllVisibleBehaviorNames } from '../../Utils/Behavior';
 import Object3d from '../../UI/CustomSvgIcons/Object3d';
 import Object2d from '../../UI/CustomSvgIcons/Object2d';
 import { mapFor } from '../../Utils/MapFor';
@@ -361,6 +362,10 @@ export const CompactObjectPropertiesEditor = ({
   );
 
   // Behaviors:
+  const allVisibleBehaviorNames = getAllVisibleBehaviorNames([object]);
+  const allVisibleBehaviors = allVisibleBehaviorNames.map(behaviorName =>
+    object.getBehavior(behaviorName)
+  );
   const {
     openNewBehaviorDialog,
     newBehaviorDialog,
@@ -376,13 +381,8 @@ export const CompactObjectPropertiesEditor = ({
     onUpdateBehaviorsSharedData,
     onWillInstallExtension,
     onExtensionInstalled,
+    allVisibleBehaviorNames,
   });
-
-  const allVisibleBehaviors = object
-    .getAllBehaviorNames()
-    .toJSArray()
-    .map(behaviorName => object.getBehavior(behaviorName))
-    .filter(behavior => !behavior.isDefaultBehavior());
 
   // Events based object children:
   /** The events-based object according to the selected object type.

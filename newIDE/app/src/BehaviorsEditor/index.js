@@ -33,7 +33,6 @@ import ElementWithMenu from '../UI/Menu/ElementWithMenu';
 import ThreeDotsMenu from '../UI/CustomSvgIcons/ThreeDotsMenu';
 import Trash from '../UI/CustomSvgIcons/Trash';
 import Add from '../UI/CustomSvgIcons/Add';
-import { mapVector } from '../Utils/MapFor';
 import Clipboard from '../Utils/Clipboard';
 import { SafeExtractor } from '../Utils/SafeExtractor';
 import {
@@ -342,6 +341,7 @@ export const useManageObjectBehaviors = ({
   onUpdateBehaviorsSharedData,
   onWillInstallExtension,
   onExtensionInstalled,
+  allVisibleBehaviorNames,
 }: {
   project: gdProject,
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
@@ -354,6 +354,7 @@ export const useManageObjectBehaviors = ({
   onUpdateBehaviorsSharedData: () => void,
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
+  allVisibleBehaviorNames: Array<string>,
 }): UseManageBehaviorsState => {
   const [
     justAddedBehaviorName,
@@ -491,22 +492,23 @@ export const useManageObjectBehaviors = ({
       }
       Clipboard.set(
         BEHAVIORS_CLIPBOARD_KIND,
-        // TODO Copy common behaviors only
-        mapVector(object.getAllBehaviorNames(), behaviorName => {
-          const behavior = object.getBehavior(behaviorName);
-          if (behavior.isDefaultBehavior()) {
-            return null;
-          }
-          return {
-            name: behaviorName,
-            type: behavior.getTypeName(),
-            serializedBehavior: serializeToJSObject(behavior),
-          };
-        }).filter(Boolean)
+        allVisibleBehaviorNames
+          .map(behaviorName => {
+            const behavior = object.getBehavior(behaviorName);
+            if (behavior.isDefaultBehavior()) {
+              return null;
+            }
+            return {
+              name: behaviorName,
+              type: behavior.getTypeName(),
+              serializedBehavior: serializeToJSObject(behavior),
+            };
+          })
+          .filter(Boolean)
       );
       onUpdate();
     },
-    [onUpdate, objects]
+    [objects, allVisibleBehaviorNames, onUpdate]
   );
 
   const pasteBehaviors = React.useCallback(
@@ -744,6 +746,7 @@ const BehaviorsEditor = (props: Props): React.Node => {
     setSelectedQuickCustomizationPropertiesBehavior,
   ] = React.useState<?gdBehavior>(null);
 
+  const allVisibleBehaviorNames = getAllVisibleBehaviorNames(objects);
   const {
     changeBehaviorName,
     removeBehavior,
@@ -766,6 +769,7 @@ const BehaviorsEditor = (props: Props): React.Node => {
     onUpdateBehaviorsSharedData,
     onWillInstallExtension,
     onExtensionInstalled,
+    allVisibleBehaviorNames,
   });
 
   React.useEffect(
@@ -782,8 +786,6 @@ const BehaviorsEditor = (props: Props): React.Node => {
     },
     [justAddedBehaviorName, resetJustAddedBehaviorName]
   );
-
-  const allVisibleBehaviorNames = getAllVisibleBehaviorNames(objects);
 
   const openExtension = React.useCallback(
     (behaviorType: string) => {

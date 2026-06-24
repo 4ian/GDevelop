@@ -80,5 +80,6 @@ export const getAllVisibleBehaviorNames = (
             // As for now, any default behavior is hidden,
             // it avoids to get behavior metadata to check the "hidden" flag.
             !objects[0].getBehavior(behaviorName).isDefaultBehavior() &&
-            objects.every(object => object.hasBehaviorNamed(behaviorName))
+            (objects.length === 1 ||
+              objects.every(object => object.hasBehaviorNamed(behaviorName)))
         );

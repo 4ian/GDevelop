@@ -159,6 +159,7 @@ export const CompactObjectGroupPropertiesEditor = ({
   ).filter(Boolean);
 
   // Behaviors:
+  const allVisibleBehaviorNames = getAllVisibleBehaviorNames(objects);
   const {
     openNewBehaviorDialog,
     newBehaviorDialog,
@@ -174,9 +175,8 @@ export const CompactObjectGroupPropertiesEditor = ({
     onUpdateBehaviorsSharedData,
     onWillInstallExtension,
     onExtensionInstalled,
+    allVisibleBehaviorNames,
   });
-
-  const allVisibleBehaviorNames = getAllVisibleBehaviorNames(objects);
 
   // Variable refactoring: snapshot on object selection, apply on deselection/unmount.
   const { onVariablesUpdated } = useVariablesContainerRefactoring({

@@ -78,6 +78,7 @@ type Props = {|
     extensionName: string,
     behaviorName: string
   ) => void | Promise<void>,
+  initiallyOpenSettingsDialog?: boolean,
   onObjectEdited?: () => void,
   onFunctionEdited?: () => void,
   initiallyFocusedFunctionName: ?string,
@@ -225,6 +226,9 @@ export default class PrefabDetailEditor extends React.Component<Props, State> {
       this.selectEventsFunctionByName(this.props.initiallyFocusedFunctionName);
     } else {
       this._selectFirstEventsFunctionOrPrefabConfiguration();
+    }
+    if (this.props.initiallyOpenSettingsDialog) {
+      this._openPrefabDetailsDialog();
     }
   }
 
@@ -771,6 +775,10 @@ export default class PrefabDetailEditor extends React.Component<Props, State> {
         this._syncPrefabDetailsPropertyListSelection();
       }
     });
+  };
+
+  openPrefabSettingsDialog = () => {
+    this._openPrefabDetailsDialog();
   };
 
   _openPrefabDetailsDialog = (_eventsBasedObject?: ?gdEventsBasedObject) => {

@@ -31,6 +31,7 @@ export type EditorContainerExtraProps = {|
   initiallyFocusedFunctionName?: ?string,
   initiallyFocusedBehaviorName?: ?string,
   initiallyFocusedObjectName?: ?string,
+  initiallyOpenSettingsDialog?: boolean,
 
   // Scene editor
   scenePanelToOpen?: ?SceneEditorPanelId,

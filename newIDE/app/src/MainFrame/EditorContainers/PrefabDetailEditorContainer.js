@@ -229,6 +229,12 @@ export class PrefabDetailEditorContainer extends React.Component<RenderEditorCon
     }
   }
 
+  openPrefabSettingsDialog() {
+    if (this.editor) {
+      this.editor.openPrefabSettingsDialog();
+    }
+  }
+
   render(): any {
     const { project, projectItemName } = this.props;
     const eventsFunctionsExtension = this.getEventsFunctionsExtension();
@@ -238,7 +244,8 @@ export class PrefabDetailEditorContainer extends React.Component<RenderEditorCon
       return <div>No prefab called {projectItemName} found!</div>;
     }
 
-    const { initiallyFocusedFunctionName } = this.props.extraEditorProps || {};
+    const { initiallyFocusedFunctionName, initiallyOpenSettingsDialog } =
+      this.props.extraEditorProps || {};
 
     return (
       <div style={styles.container}>
@@ -253,6 +260,7 @@ export class PrefabDetailEditorContainer extends React.Component<RenderEditorCon
           openBehaviorEvents={this.props.openBehaviorEvents}
           onCreateEventsFunction={this.props.onCreateEventsFunction}
           initiallyFocusedFunctionName={initiallyFocusedFunctionName}
+          initiallyOpenSettingsDialog={initiallyOpenSettingsDialog}
           onObjectEdited={this._reloadExtensionMetadata}
           onFunctionEdited={this._reloadExtensionMetadata}
           ref={editor => (this.editor = editor)}

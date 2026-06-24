@@ -34,6 +34,10 @@ export type CustomObjectTreeViewItemCallbacks = {|
     gdEventsFunctionsExtension,
     gdEventsBasedObject
   ) => void,
+  onOpenPrefabSettings: (
+    gdEventsFunctionsExtension,
+    gdEventsBasedObject
+  ) => void,
   onRenamedEventsBasedObject: (
     gdEventsFunctionsExtension,
     string,
@@ -332,6 +336,14 @@ export class CustomObjectTreeViewItemContent implements TreeViewItemContent {
         label: i18n._(t`Open prefab detail`),
         click: () =>
           this.props.onOpenPrefabDetailEditor(
+            this.eventsFunctionsExtension,
+            this.eventsBasedObject
+          ),
+      },
+      {
+        label: i18n._(t`Open prefab settings`),
+        click: () =>
+          this.props.onOpenPrefabSettings(
             this.eventsFunctionsExtension,
             this.eventsBasedObject
           ),
@@ -655,6 +667,14 @@ export class CustomObjectVariantTreeViewItemContent
         label: i18n._(t`Open prefab detail`),
         click: () =>
           this.props.onOpenPrefabDetailEditor(
+            this.eventsFunctionsExtension,
+            this.eventsBasedObject
+          ),
+      },
+      {
+        label: i18n._(t`Open prefab settings`),
+        click: () =>
+          this.props.onOpenPrefabSettings(
             this.eventsFunctionsExtension,
             this.eventsBasedObject
           ),

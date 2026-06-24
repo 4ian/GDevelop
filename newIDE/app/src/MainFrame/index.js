@@ -3708,6 +3708,55 @@ const MainFrame = (props: Props): React.MixedElement => {
     [getEditorOpeningOptions, setState, state]
   );
 
+  const openPrefabSettings = React.useCallback(
+    (
+      eventsFunctionsExtension: gdEventsFunctionsExtension,
+      eventsBasedObject: gdEventsBasedObject
+    ) => {
+      const { currentProject, editorTabs } = state;
+      if (!currentProject) return;
+
+      const foundTab = getPrefabDetailEditor(
+        editorTabs,
+        eventsFunctionsExtension,
+        eventsBasedObject
+      );
+      if (foundTab) {
+        foundTab.editor.selectEventsBasedObjectByName(
+          eventsBasedObject.getName()
+        );
+        foundTab.editor.openPrefabSettingsDialog();
+        setState(state => ({
+          ...state,
+          editorTabs: changeCurrentTab(
+            editorTabs,
+            foundTab.paneIdentifier,
+            foundTab.tabIndex
+          ),
+        }));
+      } else {
+        setState(state => ({
+          ...state,
+          // $FlowFixMe[incompatible-type]
+          editorTabs: openEditorTab(state.editorTabs, {
+            ...getEditorOpeningOptions({
+              kind: 'prefab detail',
+              name:
+                eventsFunctionsExtension.getName() +
+                '::' +
+                eventsBasedObject.getName(),
+              project: currentProject,
+            }),
+            extraEditorProps: {
+              initiallyOpenSettingsDialog: true,
+            },
+          }),
+        }));
+      }
+    },
+    [getEditorOpeningOptions, setState, state]
+  );
+
   const openCustomObjectAndExtensionEditors = React.useCallback(
     (
       eventsFunctionsExtension: gdEventsFunctionsExtension,
@@ -6229,6 +6278,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       onOpenEventsFunctionsExtension={openEventsFunctionsExtension}
       onOpenCustomObjectEditor={openCustomObjectEditor}
       onOpenPrefabDetailEditor={openPrefabDetailEditor}
+      onOpenPrefabSettings={openPrefabSettings}
       openBehaviorEvents={openBehaviorEvents}
       onOpenEventBasedObjectEditor={onOpenEventBasedObjectEditor}
       onOpenEventBasedObjectVariantEditor={onOpenEventBasedObjectVariantEditor}

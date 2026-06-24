@@ -1,3 +1,140 @@
+## GDevelop 架构设计图（源码与官方文档对照）
+
+这部分从源码中的 `Core/GDCore/Project`、`GDJS/Runtime`、`GDJS/GDJS/Events/CodeGeneration`
+以及官方文档中的 [Scene Editor](https://wiki.gdevelop.io/gdevelop5/interface/scene-editor/)、
+[Objects](https://wiki.gdevelop.io/gdevelop5/objects/)、[Behaviors](https://wiki.gdevelop.io/gdevelop5/behaviors/)、
+[Custom Objects ("Prefabs")](https://wiki.gdevelop.io/gdevelop5/objects/custom-objects-prefab-template/)、
+[Functions](https://wiki.gdevelop.io/gdevelop5/events/functions/) 和
+[Object Picking](https://wiki.gdevelop.io/gdevelop5/events/object-picking/) 整理而来。核心分层是：
+**编辑期数据模型 -> IDE/元数据/作用域 -> GDJS code generation -> Runtime 执行模型**。
+
+```mermaid
+flowchart TB
+  subgraph A["编辑期数据模型 Core/GDCore/Project"]
+    P["gd::Project<br/>全局变量/资源/全局对象/Scenes/Extensions"]
+    L["gd::Layout Scene<br/>ObjectsContainer<br/>InitialInstancesContainer<br/>EventsList<br/>Variables<br/>Layers<br/>BehaviorSharedData"]
+    O["gd::Object / ObjectConfiguration<br/>type + variables + behaviors + effects"]
+    I["gd::InitialInstance<br/>objectName + transform/layer/zOrder<br/>initialVariables<br/>behaviorOverridings"]
+    EXT["gd::EventsFunctionsExtension<br/>free functions<br/>events-based behaviors<br/>events-based objects(prefabs)<br/>extension variables"]
+    FN["gd::EventsFunction<br/>Action / Condition / Expression<br/>parameters + events + return value"]
+    EBB["gd::EventsBasedBehavior<br/>properties/shared properties<br/>methods/lifecycle events<br/>optional required Behavior properties"]
+    EBO["gd::EventsBasedObject<br/>Custom Object / Prefab type<br/>properties + methods<br/>default variant + variants"]
+    VAR["gd::EventsBasedObjectVariant<br/>child ObjectsContainer<br/>child InitialInstances<br/>layers + inner area"]
+  end
+
+  subgraph B["IDE / 元数据 / 作用域"]
+    META["MetadataDeclarationHelper<br/>把 extension functions 暴露成<br/>actions / conditions / expressions<br/>object metadata / behavior metadata"]
+    SCOPE["ProjectScopedContainers<br/>决定事件里可见的 objects/variables/properties/resources/parameters"]
+    PICKDOC["Object picking model<br/>picked object lists are scoped per event/sub-event"]
+  end
+
+  subgraph C["编译期 GDJS/GDJS/Events/CodeGeneration"]
+    ECG["EventsCodeGenerator<br/>scene events / free function / behavior method / object method"]
+    CTX["eventsFunctionContext<br/>_objectsMap<br/>_objectArraysMap<br/>_behaviorNamesMap<br/>localVariables<br/>createObject/getObjects/getBehaviorName"]
+    OCG["ObjectCodeGenerator<br/>EventsBasedObject -> JS CustomRuntimeObject subclass"]
+    BCG["BehaviorCodeGenerator<br/>EventsBasedBehavior -> JS RuntimeBehavior subclass"]
+  end
+
+  subgraph D["运行时 GDJS/Runtime"]
+    RG["gdjs.RuntimeGame<br/>game data/resources/extensions/scene stack"]
+    RS["gdjs.RuntimeScene<br/>extends RuntimeInstanceContainer<br/>scene vars/layers/timers/onceTriggers"]
+    RIC["RuntimeInstanceContainer<br/>registered objectData + constructors<br/>_instances<br/>createObject/createObjectsFrom"]
+    RO["RuntimeObject<br/>position/layer/zOrder/variables/effects<br/>_behaviors + lifecycle"]
+    RB["RuntimeBehavior<br/>owner object<br/>properties/sharedData<br/>doStep/onCreated/onDestroy"]
+    CRO["CustomRuntimeObject<br/>a RuntimeObject that owns child container<br/>runs prefab object events/methods"]
+    CCONT["CustomRuntimeObjectInstanceContainer<br/>child object definitions<br/>child instances<br/>custom-object layers"]
+    RENDER["Renderer layer<br/>Pixi/Three renderers<br/>layers/cameras/effects"]
+  end
+
+  P --> L
+  P --> EXT
+  L --> O
+  L --> I
+  I -.references objectName.-> O
+  O --> RB
+  EXT --> FN
+  EXT --> EBB
+  EXT --> EBO
+  EBB --> FN
+  EBO --> FN
+  EBO --> VAR
+  VAR --> O
+  VAR --> I
+
+  A --> META
+  A --> SCOPE
+  META --> ECG
+  SCOPE --> ECG
+  ECG --> CTX
+  ECG --> OCG
+  ECG --> BCG
+
+  OCG --> CRO
+  BCG --> RB
+  P --> RG
+  RG --> RS
+  RS --> RIC
+  RIC --> RO
+  RO --> RB
+  RO --> CRO
+  CRO --> CCONT
+  CCONT --> RIC
+  RO --> RENDER
+  RS --> RENDER
+  CTX --> RIC
+```
+
+运行时一帧的高层执行路径：
+
+```mermaid
+sequenceDiagram
+  participant Scene as RuntimeScene
+  participant Obj as RuntimeObject
+  participant Beh as RuntimeBehavior
+  participant Events as Generated events
+  participant Prefab as CustomRuntimeObject
+  participant Child as Child RuntimeInstanceContainer
+  participant Renderer as Renderer
+
+  Scene->>Obj: stepBehaviorsPreEvents()
+  Obj->>Beh: doStepPreEvents()
+  Scene->>Events: run scene EventsList with picked object lists
+  Events->>Scene: createObject / filter objects / call functions
+  Scene->>Obj: update()
+  Obj->>Prefab: if custom object
+  Prefab->>Child: update child objects pre-events
+  Prefab->>Prefab: run prefab doStepPreEvents/doStepPostEvents
+  Scene->>Obj: stepBehaviorsPostEvents()
+  Scene->>Obj: updatePreRender()
+  Obj->>Renderer: sync render state
+```
+
+关键边界：
+
+- **Object vs Instance**: behavior 列表属于 `ObjectData/ObjectConfiguration`；实例只保存位置、初始变量和 `behaviorOverridings`。官方文档也把对象描述为蓝图，把放进场景的对象称为实例。
+- **Scene vs RuntimeScene**: `gd::Layout` 是编辑期场景数据；`gdjs.RuntimeScene` 是运行时场景容器，继承 `RuntimeInstanceContainer` 并负责创建、缓存、删除和遍历运行时对象。
+- **Function scope**: 普通函数事件只能看到函数参数里的对象；如果要在函数里使用对象行为，需要在 object 参数后增加 behavior 参数。
+- **Behavior scope**: events-based behavior 的事件上下文有约定参数 `Object` 和 `Behavior`；Behavior 类型属性可以表达“这个行为还需要宿主对象上的另一个行为”。
+- **Prefab scope**: events-based object/custom object 的事件上下文能看到 `Object` 自身和 prefab child objects。Prefab 自己是一个 `RuntimeObject`，内部再持有 `CustomRuntimeObjectInstanceContainer` 来管理 child object definitions 和 child instances。
+- **Variant constraint**: 所有 variants 共享同一组 child object definitions，因为它们共享同一套 events；variant 主要改变 child instances、布局、属性和视觉配置。
+- **Object picking**: 事件并不是直接操作全部对象，而是操作当前 event/sub-event 的 picked object lists；条件会过滤后续 actions 可见的对象列表。
+
+源码入口：
+
+- 编辑期场景模型: [`Core/GDCore/Project/Layout.h`](Core/GDCore/Project/Layout.h)
+- 扩展/函数/behavior/prefab 容器: [`Core/GDCore/Project/EventsFunctionsExtension.h`](Core/GDCore/Project/EventsFunctionsExtension.h)
+- Prefab 数据模型: [`Core/GDCore/Project/EventsBasedObject.h`](Core/GDCore/Project/EventsBasedObject.h)
+- 事件作用域: [`Core/GDCore/Project/ProjectScopedContainers.cpp`](Core/GDCore/Project/ProjectScopedContainers.cpp)
+- 函数对象上下文构造: [`Core/GDCore/IDE/EventsFunctionTools.cpp`](Core/GDCore/IDE/EventsFunctionTools.cpp)
+- 事件代码生成: [`GDJS/GDJS/Events/CodeGeneration/EventsCodeGenerator.cpp`](GDJS/GDJS/Events/CodeGeneration/EventsCodeGenerator.cpp)
+- Object/Behavior 代码生成: [`GDJS/GDJS/Events/CodeGeneration/ObjectCodeGenerator.cpp`](GDJS/GDJS/Events/CodeGeneration/ObjectCodeGenerator.cpp),
+  [`GDJS/GDJS/Events/CodeGeneration/BehaviorCodeGenerator.cpp`](GDJS/GDJS/Events/CodeGeneration/BehaviorCodeGenerator.cpp)
+- 运行时实例容器: [`GDJS/Runtime/RuntimeInstanceContainer.ts`](GDJS/Runtime/RuntimeInstanceContainer.ts)
+- 运行时对象/行为: [`GDJS/Runtime/runtimeobject.ts`](GDJS/Runtime/runtimeobject.ts),
+  [`GDJS/Runtime/runtimebehavior.ts`](GDJS/Runtime/runtimebehavior.ts)
+- Prefab 运行时: [`GDJS/Runtime/CustomRuntimeObject.ts`](GDJS/Runtime/CustomRuntimeObject.ts),
+  [`GDJS/Runtime/CustomRuntimeObjectInstanceContainer.ts`](GDJS/Runtime/CustomRuntimeObjectInstanceContainer.ts)
+
 ![GDevelop logo](https://raw.githubusercontent.com/4ian/GDevelop/master/newIDE/GDevelop%20banner.png "GDevelop logo")
 
 GDevelop is a **full-featured, no-code, open-source** game development software. You can build **2D, 3D and multiplayer games** for mobile (iOS, Android), desktop and the web. GDevelop is designed to be fast and incredibly intuitive: make games using an easy-to-understand yet powerful event-based system and modular behaviors. Create with AI that assists or builds alongside you.

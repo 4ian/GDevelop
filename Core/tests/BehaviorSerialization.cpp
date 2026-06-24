@@ -13,6 +13,7 @@
 #include "GDCore/Events/EventsList.h"
 #include "GDCore/Events/Serialization.h"
 #include "GDCore/Extensions/Platform.h"
+#include "GDCore/Project/EventsBasedObject.h"
 #include "GDCore/Project/EventsFunctionsExtension.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Object.h"
@@ -219,5 +220,71 @@ TEST_CASE("BehaviorSerialization", "[common]") {
         readProject
             .GetEventsBasedObject("MyOtherEventsExtension::MyEventsBasedObject")
             .GetObjects());
+  }
+
+  SECTION("Save and load behaviors on an event based object type") {
+    gd::Platform platform;
+    gd::Project writtenProject;
+    SetupProject(writtenProject, platform);
+    AddAnotherEventsBasedExtensionWithDependency(writtenProject);
+
+    auto &eventsBasedObject = writtenProject.GetEventsBasedObject(
+        "MyOtherEventsExtension::MyEventsBasedObject");
+    auto *prefabBehavior = eventsBasedObject.AddNewBehavior(
+        writtenProject, "MyEventsExtension::MyEventsBasedBehavior",
+        "MyPrefabBehavior");
+    prefabBehavior->UpdateProperty("MyProperty", "123456");
+
+    SerializerElement projectElement;
+    writtenProject.SerializeTo(projectElement);
+
+    auto &extensionsElement =
+        projectElement.GetChild("eventsFunctionsExtensions");
+    extensionsElement.ConsiderAsArrayOf("eventsFunctionsExtension");
+    auto &eventsBasedObjectsElement =
+        extensionsElement.GetChild(0).GetChild("eventsBasedObjects");
+    eventsBasedObjectsElement.ConsiderAsArrayOf("eventsBasedObject");
+    auto &eventsBasedObjectElement = eventsBasedObjectsElement.GetChild(0);
+    auto &behaviorsElement = eventsBasedObjectElement.GetChild("behaviors");
+    behaviorsElement.ConsiderAsArrayOf("behavior");
+    REQUIRE(behaviorsElement.GetChildrenCount() == 1);
+    auto &behaviorElement = behaviorsElement.GetChild(0);
+    REQUIRE(behaviorElement.GetStringAttribute("name") == "MyPrefabBehavior");
+    REQUIRE(behaviorElement.GetStringAttribute("type") ==
+            "MyEventsExtension::MyEventsBasedBehavior");
+    REQUIRE(behaviorElement.GetStringAttribute("MyProperty") == "123456");
+
+    gd::Project readProject;
+    readProject.AddPlatform(platform);
+    readProject.UnserializeFrom(projectElement);
+
+    auto &readEventsBasedObject = readProject.GetEventsBasedObject(
+        "MyOtherEventsExtension::MyEventsBasedObject");
+    REQUIRE(readEventsBasedObject.HasBehaviorNamed("MyPrefabBehavior"));
+    REQUIRE(readEventsBasedObject.GetBehavior("MyPrefabBehavior")
+                .GetProperties()
+                .at("MyProperty")
+                .GetValue() == "123456");
+
+    gd::Layout &layout = readProject.InsertNewLayout("PrefabInstances", 0);
+    auto &object = layout.GetObjects().InsertNewObject(
+        readProject, "MyOtherEventsExtension::MyEventsBasedObject",
+        "PrefabInstance", 0);
+    REQUIRE(object.HasBehaviorNamed("MyPrefabBehavior"));
+    auto &objectBehavior = object.GetBehavior("MyPrefabBehavior");
+    REQUIRE(objectBehavior.IsInheritedFromObjectType());
+    REQUIRE(objectBehavior.GetProperties().at("MyProperty").GetValue() ==
+            "123456");
+
+    objectBehavior.UpdateProperty("MyProperty", "654321");
+    readProject.EnsureObjectInheritedBehaviors(object);
+    REQUIRE(object.GetBehavior("MyPrefabBehavior")
+                .GetProperties()
+                .at("MyProperty")
+                .GetValue() == "654321");
+
+    readEventsBasedObject.RemoveBehavior("MyPrefabBehavior");
+    readProject.EnsureObjectInheritedBehaviors(object);
+    REQUIRE(!object.HasBehaviorNamed("MyPrefabBehavior"));
   }
 }

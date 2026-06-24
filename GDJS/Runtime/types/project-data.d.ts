@@ -390,6 +390,7 @@ declare interface EventsBasedObjectData
   extends EventsBasedObjectVariantData,
     InstanceContainerData {
   name: string;
+  behaviors: Array<BehaviorData & any>;
   isInnerAreaFollowingParentSize: boolean;
   variants: Array<EventsBasedObjectVariantData>;
   /** Added at runtime to have the default variant with an empty name instead

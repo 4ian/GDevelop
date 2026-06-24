@@ -144,6 +144,8 @@ void BehaviorsContainer::UnserializeFrom(gd::Project &project,
 
     bool isFolded = behaviorElement.GetBoolAttribute("isFolded", false);
     behavior->SetFolded(isFolded);
+    behavior->SetInheritedFromObjectType(
+        behaviorElement.GetBoolAttribute("isInheritedFromObjectType", false));
 
     // Handle Quick Customization info.
     if (behaviorElement.HasChild("propertiesQuickCustomizationVisibilities")) {
@@ -178,10 +180,14 @@ void BehaviorsContainer::SerializeTo(SerializerElement &element) const {
                                          // name properties, remove them.
     behaviorElement.RemoveChild("name");
     behaviorElement.RemoveChild("isFolded");
+    behaviorElement.RemoveChild("isInheritedFromObjectType");
     behaviorElement.SetAttribute("type", behavior.GetTypeName());
     behaviorElement.SetAttribute("name", behavior.GetName());
     if (behavior.IsFolded())
       behaviorElement.SetAttribute("isFolded", true);
+    if (behavior.IsInheritedFromObjectType()) {
+      behaviorElement.SetAttribute("isInheritedFromObjectType", true);
+    }
 
     // Handle Quick Customization info.
     behaviorElement.RemoveChild("propertiesQuickCustomizationVisibilities");

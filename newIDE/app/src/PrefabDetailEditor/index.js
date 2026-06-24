@@ -42,6 +42,7 @@ import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/Even
 import PropertyListEditor, {
   type PropertyListEditorInterface,
 } from '../EventsFunctionsExtensionEditor/PropertyListEditor';
+import BehaviorsEditor from '../BehaviorsEditor';
 import Dialog from '../UI/Dialog';
 import FlatButton from '../UI/FlatButton';
 import RaisedButton from '../UI/RaisedButton';
@@ -73,6 +74,10 @@ type Props = {|
       | 'extension-events-editor'
       | 'external-events-editor'
   ) => Promise<void>,
+  openBehaviorEvents: (
+    extensionName: string,
+    behaviorName: string
+  ) => void | Promise<void>,
   onObjectEdited?: () => void,
   onFunctionEdited?: () => void,
   initiallyFocusedFunctionName: ?string,
@@ -91,7 +96,7 @@ type PrefabPropertySelection = {|
   propertyName: string,
   isSharedProperties: boolean,
 |};
-type PrefabSettingsTab = 'configuration' | 'properties';
+type PrefabSettingsTab = 'configuration' | 'properties' | 'behaviors';
 
 const styles = {
   centeredContent: {
@@ -117,6 +122,13 @@ const styles = {
   prefabSettingsConfigurationContent: {
     maxWidth: 1200,
     margin: '0 auto',
+  },
+  prefabSettingsBehaviors: {
+    display: 'flex',
+    flex: 1,
+    minHeight: 0,
+    overflow: 'hidden',
+    padding: '8px 16px 16px 16px',
   },
   prefabSettingsProperties: {
     display: 'flex',
@@ -190,6 +202,9 @@ export default class PrefabDetailEditor extends React.Component<Props, State> {
   );
   _objectsContainer: gdObjectsContainer = new gd.ObjectsContainer(
     gd.ObjectsContainer.Function
+  );
+  _prefabBehaviorEditorObjectsContainer: gdObjectsContainer = new gd.ObjectsContainer(
+    gd.ObjectsContainer.Unknown
   );
   _parameterVariablesContainer: gdVariablesContainer = new gd.VariablesContainer(
     gd.VariablesContainer.Parameters
@@ -603,6 +618,16 @@ export default class PrefabDetailEditor extends React.Component<Props, State> {
     this.forceUpdate();
   };
 
+  _onPrefabBehaviorsUpdated = () => {
+    if (this.props.unsavedChanges) {
+      this.props.unsavedChanges.triggerUnsavedChanges();
+    }
+    if (this.props.onObjectEdited) {
+      this.props.onObjectEdited();
+    }
+    this.forceUpdate();
+  };
+
   onBeginCreateEventsFunction = () => {
     sendEventsExtractedAsFunction({
       step: 'begin',
@@ -783,6 +808,31 @@ export default class PrefabDetailEditor extends React.Component<Props, State> {
       this._propertyResourcesContainer
     );
 
+  _getPrefabBehaviorEditorObject = (objectType: string): gdObject => {
+    const objectName = '__PrefabBehaviorEditorObject';
+    if (
+      this._prefabBehaviorEditorObjectsContainer.hasObjectNamed(objectName) &&
+      this._prefabBehaviorEditorObjectsContainer
+        .getObject(objectName)
+        .getType() !== objectType
+    ) {
+      this._prefabBehaviorEditorObjectsContainer.removeObject(objectName);
+    }
+
+    if (
+      !this._prefabBehaviorEditorObjectsContainer.hasObjectNamed(objectName)
+    ) {
+      this._prefabBehaviorEditorObjectsContainer.insertNewObject(
+        this.props.project,
+        objectType,
+        objectName,
+        0
+      );
+    }
+
+    return this._prefabBehaviorEditorObjectsContainer.getObject(objectName);
+  };
+
   render(): any {
     const { project, eventsFunctionsExtension, eventsBasedObject } = this.props;
     const {
@@ -795,6 +845,13 @@ export default class PrefabDetailEditor extends React.Component<Props, State> {
     } = this.state;
     const prefabDetailsProjectScopedContainersAccessor = prefabDetailsDialogOpen
       ? this._makePrefabDetailsProjectScopedContainersAccessor()
+      : null;
+    const prefabObjectType = gd.PlatformExtension.getObjectFullType(
+      eventsFunctionsExtension.getName(),
+      eventsBasedObject.getName()
+    );
+    const prefabBehaviorEditorObject = prefabDetailsDialogOpen
+      ? this._getPrefabBehaviorEditorObject(prefabObjectType)
       : null;
 
     const scope = {
@@ -1151,6 +1208,10 @@ export default class PrefabDetailEditor extends React.Component<Props, State> {
                       label: <Trans>Properties</Trans>,
                     },
                     {
+                      value: ('behaviors': PrefabSettingsTab),
+                      label: <Trans>Behaviors</Trans>,
+                    },
+                    {
                       value: ('configuration': PrefabSettingsTab),
                       label: <Trans>Configuration</Trans>,
                     },
@@ -1175,6 +1236,36 @@ export default class PrefabDetailEditor extends React.Component<Props, State> {
                         hideOpenVisualEditorButton
                       />
                     </div>
+                  </div>
+                )}
+                {prefabSettingsTab === 'behaviors' && (
+                  <div style={styles.prefabSettingsBehaviors}>
+                    <BehaviorsEditor
+                      project={project}
+                      eventsFunctionsExtension={eventsFunctionsExtension}
+                      object={eventsBasedObject}
+                      objectType={prefabObjectType}
+                      behaviorEditorObject={prefabBehaviorEditorObject}
+                      layersContainer={eventsBasedObject.getLayers()}
+                      isChildObject={false}
+                      onUpdateBehaviorsSharedData={() =>
+                        gd.WholeProjectRefactorer.updateBehaviorsSharedData(
+                          project
+                        )
+                      }
+                      resourceManagementProps={
+                        this.props.resourceManagementProps
+                      }
+                      projectScopedContainersAccessor={
+                        prefabDetailsProjectScopedContainersAccessor
+                      }
+                      onBehaviorsUpdated={this._onPrefabBehaviorsUpdated}
+                      openBehaviorEvents={this.props.openBehaviorEvents}
+                      onWillInstallExtension={this.props.onWillInstallExtension}
+                      onExtensionInstalled={this.props.onExtensionInstalled}
+                      isListLocked={false}
+                      canUseWholeProjectRefactorer={false}
+                    />
                   </div>
                 )}
                 {prefabSettingsTab === 'properties' && (

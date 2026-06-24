@@ -1718,6 +1718,7 @@ gd::ObjectMetadata &MetadataDeclarationHelper::GenerateObjectMetadata(
   }
 
   UpdateCustomObjectDefaultBehaviors(project, objectMetadata);
+  UpdateCustomObjectInheritedBehaviors(project, objectMetadata);
 
   return objectMetadata;
 }
@@ -1769,6 +1770,35 @@ void MetadataDeclarationHelper::UpdateCustomObjectDefaultBehaviors(
   gd::WholeProjectBrowser projectBrowser;
   auto defaultBehaviorUpdater = DefaultBehaviorUpdater(project, objectMetadata);
   projectBrowser.ExposeObjects(project, defaultBehaviorUpdater);
+}
+
+class InheritedBehaviorUpdater : public gd::ArbitraryObjectsWorker {
+
+public:
+  InheritedBehaviorUpdater(const gd::Project &project_,
+                           const gd::ObjectMetadata &objectMetadata_)
+      : project(project_), objectMetadata(objectMetadata_){};
+  virtual ~InheritedBehaviorUpdater(){};
+
+private:
+  void DoVisitObject(gd::Object &object) override {
+    if (object.GetType() != objectMetadata.GetName()) {
+      return;
+    }
+
+    project.EnsureObjectInheritedBehaviors(object);
+  }
+
+  const gd::Project &project;
+  const gd::ObjectMetadata &objectMetadata;
+};
+
+void MetadataDeclarationHelper::UpdateCustomObjectInheritedBehaviors(
+    gd::Project &project, const gd::ObjectMetadata &objectMetadata) {
+  gd::WholeProjectBrowser projectBrowser;
+  auto inheritedBehaviorUpdater =
+      InheritedBehaviorUpdater(project, objectMetadata);
+  projectBrowser.ExposeObjects(project, inheritedBehaviorUpdater);
 }
 
 } // namespace gdjs

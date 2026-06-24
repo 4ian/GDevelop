@@ -7,6 +7,7 @@
 
 #include <vector>
 #include "GDCore/Project/AbstractEventsBasedEntity.h"
+#include "GDCore/Project/BehaviorsContainer.h"
 #include "GDCore/Project/EventsBasedObjectVariant.h"
 #include "GDCore/Project/EventsBasedObjectVariantsContainer.h"
 #include "GDCore/Project/ObjectsContainer.h"
@@ -16,6 +17,7 @@
 namespace gd {
 class SerializerElement;
 class Project;
+class Behavior;
 }  // namespace gd
 
 namespace gd {
@@ -251,6 +253,57 @@ class GD_CORE_API EventsBasedObject: public AbstractEventsBasedEntity {
   }
   ///@}
 
+  /** \name Behaviors management
+   * Members functions related to behaviors management.
+   */
+  ///@{
+
+  /**
+   * \brief Return a vector containing the names of all the behaviors used by
+   * the custom object type.
+   */
+  std::vector<gd::String> GetAllBehaviorNames() const;
+
+  /**
+   * \brief Return a reference to the content of the behavior called \a name.
+   */
+  gd::Behavior& GetBehavior(const gd::String& name);
+
+  /**
+   * \brief Return a reference to the content of the behavior called \a name.
+   */
+  const gd::Behavior& GetBehavior(const gd::String& name) const;
+
+  /**
+   * \brief Return true if the custom object type has a behavior called \a name.
+   */
+  bool HasBehaviorNamed(const gd::String& name) const;
+
+  /**
+   * \brief Remove behavior called \a name.
+   */
+  void RemoveBehavior(const gd::String& name);
+
+  /**
+   * \brief Change the name of behavior called name to newName.
+   * \return true if name was successfully changed
+   */
+  bool RenameBehavior(const gd::String& name, const gd::String& newName);
+
+  /**
+   * \brief Add the behavior of the specified \a type with the specified \a
+   * name.
+   *
+   * The project's current platform is used to initialize the content.
+   *
+   * \return A pointer to the newly added behavior content. NULL if the creation
+   * failed.
+   */
+  gd::Behavior* AddNewBehavior(const gd::Project& project,
+                               const gd::String& type,
+                               const gd::String& name);
+  ///@}
+
   /** \name Instances
    */
   ///@{
@@ -398,6 +451,7 @@ class GD_CORE_API EventsBasedObject: public AbstractEventsBasedEntity {
   bool isUsingLegacyInstancesRenderer;
   gd::EventsBasedObjectVariant defaultVariant;
   gd::EventsBasedObjectVariantsContainer variants;
+  gd::BehaviorsContainer behaviors;
 };
 
 }  // namespace gd

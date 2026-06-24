@@ -250,6 +250,7 @@ export class PrefabDetailEditorContainer extends React.Component<RenderEditorCon
           setToolbar={this.props.setToolbar}
           resourceManagementProps={this.props.resourceManagementProps}
           openInstructionOrExpression={this.props.openInstructionOrExpression}
+          openBehaviorEvents={this.props.openBehaviorEvents}
           onCreateEventsFunction={this.props.onCreateEventsFunction}
           initiallyFocusedFunctionName={initiallyFocusedFunctionName}
           onObjectEdited={this._reloadExtensionMetadata}

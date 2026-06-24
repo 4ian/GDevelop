@@ -556,6 +556,12 @@ class GD_CORE_API Project {
   void EnsureObjectDefaultBehaviors(gd::Object& object) const;
 
   /**
+   * Add or remove inherited behaviors on \a object according to its
+   * events-based object type.
+   */
+  void EnsureObjectInheritedBehaviors(gd::Object& object) const;
+
+  /**
    * Create an event of the given type.
    *
    * \note A project can use more than one platform. In this case, the first

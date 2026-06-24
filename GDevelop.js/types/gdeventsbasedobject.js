@@ -27,6 +27,12 @@ declare class gdEventsBasedObject extends gdAbstractEventsBasedEntity {
   getInitialInstances(): gdInitialInstancesContainer;
   getLayers(): gdLayersContainer;
   getObjects(): gdObjectsContainer;
+  getAllBehaviorNames(): gdVectorString;
+  hasBehaviorNamed(name: string): boolean;
+  addNewBehavior(project: gdProject, type: string, name: string): gdBehavior;
+  getBehavior(name: string): gdBehavior;
+  removeBehavior(name: string): void;
+  renameBehavior(oldName: string, name: string): boolean;
   getAreaMinX(): number;
   getAreaMinY(): number;
   getAreaMinZ(): number;

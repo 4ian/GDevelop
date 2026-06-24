@@ -1,22 +1,98 @@
 // @flow
 import newNameGenerator from './NewNameGenerator';
 import Window from './Window';
+import { mapFor } from './MapFor';
 
 const gd: libGDevelop = global.gd;
 
-export const hasBehaviorWithType = (object: gdObject, type: string): number =>
+const getBehaviorNamesWithType = (object: any, type: string): Array<string> =>
   object
     .getAllBehaviorNames()
     .toJSArray()
     .filter(
       behaviorName => object.getBehavior(behaviorName).getTypeName() === type
-    ).length;
+    );
+
+export const hasBehaviorWithType = (object: any, type: string): number =>
+  getBehaviorNamesWithType(object, type).length;
+
+export const addRequiredBehaviorsForBehaviorHolder = (
+  project: gdProject,
+  object: any,
+  behaviorName: string
+) => {
+  if (!object.hasBehaviorNamed(behaviorName)) return;
+
+  const behavior = object.getBehavior(behaviorName);
+  const platform = project.getCurrentPlatform();
+  const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
+    platform,
+    behavior.getTypeName()
+  );
+  if (gd.MetadataProvider.isBadBehaviorMetadata(behaviorMetadata)) {
+    return;
+  }
+
+  behaviorMetadata
+    .getRequiredBehaviorTypes()
+    .toJSArray()
+    .forEach(requiredBehaviorType => {
+      const behaviorNames = getBehaviorNamesWithType(
+        object,
+        requiredBehaviorType
+      );
+      let requiredBehaviorName = behaviorNames[0];
+
+      if (!requiredBehaviorName) {
+        const requiredBehaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
+          platform,
+          requiredBehaviorType
+        );
+        if (
+          gd.MetadataProvider.isBadBehaviorMetadata(requiredBehaviorMetadata)
+        ) {
+          return;
+        }
+
+        requiredBehaviorName = requiredBehaviorMetadata.getDefaultName();
+        object.addNewBehavior(
+          project,
+          requiredBehaviorType,
+          requiredBehaviorName
+        );
+        addRequiredBehaviorsForBehaviorHolder(
+          project,
+          object,
+          requiredBehaviorName
+        );
+      }
+
+      const properties = behavior.getProperties();
+      const propertyNames = properties.keys();
+      mapFor(0, propertyNames.size(), i => {
+        const propertyName = propertyNames.at(i);
+        const property = properties.get(propertyName);
+        if (property.getType() !== 'Behavior') return;
+
+        const extraInfo = property.getExtraInfo();
+        if (
+          extraInfo.size() === 0 ||
+          extraInfo.at(0) !== requiredBehaviorType
+        ) {
+          return;
+        }
+
+        behavior.updateProperty(propertyName, requiredBehaviorName);
+      });
+    });
+};
 
 export const addBehaviorToObject = (
   project: gdProject,
-  object: gdObject,
+  object: any,
   type: string,
-  defaultName: string
+  defaultName: string,
+  options?: {| useWholeProjectRefactorer?: boolean |}
 ): boolean => {
   if (hasBehaviorWithType(object, type)) {
     const answer = Window.showConfirmDialog(
@@ -29,20 +105,29 @@ export const addBehaviorToObject = (
   const name = newNameGenerator(defaultName, name =>
     object.hasBehaviorNamed(name)
   );
-  gd.WholeProjectRefactorer.addBehaviorAndRequiredBehaviors(
-    project,
-    object,
-    type,
-    name
-  );
+  if (!options || options.useWholeProjectRefactorer !== false) {
+    gd.WholeProjectRefactorer.addBehaviorAndRequiredBehaviors(
+      project,
+      object,
+      type,
+      name
+    );
+  } else {
+    if (!object.addNewBehavior(project, type, name)) {
+      return false;
+    }
+    addRequiredBehaviorsForBehaviorHolder(project, object, name);
+  }
 
   // Show the behavior properties in the editor by default, when just added.
-  object.getBehavior(name).setFolded(false);
+  if (object.hasBehaviorNamed(name)) {
+    object.getBehavior(name).setFolded(false);
+  }
 
   return true;
 };
 
-export const listObjectBehaviorsTypes = (object: gdObject): Array<string> =>
+export const listObjectBehaviorsTypes = (object: any): Array<string> =>
   object
     .getAllBehaviorNames()
     .toJSArray()

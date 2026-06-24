@@ -22,6 +22,7 @@
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/IDE/PlatformManager.h"
 #include "GDCore/Project/CustomObjectConfiguration.h"
+#include "GDCore/Project/EventsBasedObject.h"
 #include "GDCore/Project/EventsFunctionsExtension.h"
 #include "GDCore/Project/ExternalEvents.h"
 #include "GDCore/Project/ExternalLayout.h"
@@ -72,6 +73,69 @@ Project::Project()
 Project::~Project() {}
 
 void Project::ResetProjectUuid() { projectUuid = UUID::MakeUuid4(); }
+
+void Project::EnsureObjectInheritedBehaviors(gd::Object& object) const {
+  auto& objectType = object.GetType();
+  if (!HasEventsBasedObject(objectType)) {
+    return;
+  }
+
+  const auto& eventsBasedObject = GetEventsBasedObject(objectType);
+
+  for (const auto& behaviorName : object.GetAllBehaviorNames()) {
+    auto& behavior = object.GetBehavior(behaviorName);
+    if (!behavior.IsInheritedFromObjectType()) {
+      continue;
+    }
+
+    if (!eventsBasedObject.HasBehaviorNamed(behaviorName) ||
+        eventsBasedObject.GetBehavior(behaviorName).GetTypeName() !=
+            behavior.GetTypeName()) {
+      object.RemoveBehavior(behaviorName);
+    }
+  }
+
+  for (const auto& behaviorName : eventsBasedObject.GetAllBehaviorNames()) {
+    const auto& inheritedBehavior = eventsBasedObject.GetBehavior(behaviorName);
+    const auto& inheritedBehaviorType = inheritedBehavior.GetTypeName();
+
+    if (object.HasBehaviorNamed(behaviorName)) {
+      auto& behavior = object.GetBehavior(behaviorName);
+      if (behavior.GetTypeName() == inheritedBehaviorType) {
+        behavior.SetInheritedFromObjectType(true);
+        continue;
+      }
+
+      if (behavior.IsInheritedFromObjectType()) {
+        object.RemoveBehavior(behaviorName);
+      } else {
+        gd::LogWarning("Object: " + object.GetName() + " of type " +
+                       objectType +
+                       " has a behavior named like an inherited prefab "
+                       "behavior, but with another type: " +
+                       behaviorName);
+        continue;
+      }
+    }
+
+    auto* behavior =
+        object.AddNewBehavior(*this, inheritedBehaviorType, behaviorName);
+    if (!behavior) {
+      gd::LogWarning("Object: " + object.GetName() + " of type " +
+                     objectType +
+                     " could not create inherited behavior: " +
+                     inheritedBehaviorType);
+      continue;
+    }
+    behavior->UnserializeFrom(inheritedBehavior.GetContent());
+    behavior->SetFolded(inheritedBehavior.IsFolded());
+    behavior->SetQuickCustomizationVisibility(
+        inheritedBehavior.GetQuickCustomizationVisibility());
+    behavior->GetPropertiesQuickCustomizationVisibilities() =
+        inheritedBehavior.GetPropertiesQuickCustomizationVisibilities();
+    behavior->SetInheritedFromObjectType(true);
+  }
+}
 
 void Project::EnsureObjectDefaultBehaviors(gd::Object& object) const {
   auto& platform = GetCurrentPlatform();
@@ -135,6 +199,8 @@ void Project::EnsureObjectDefaultBehaviors(gd::Object& object) const {
   else if (!project.HasEventsBasedObject(objectType)) {
     gd::LogWarning("Object: " + name + " has an unknown type: " + objectType);
   }
+
+  EnsureObjectInheritedBehaviors(object);
 }
 
 std::unique_ptr<gd::Object> Project::CreateObject(

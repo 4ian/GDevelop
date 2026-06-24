@@ -751,6 +751,8 @@ export class Behavior extends EmscriptenObject {
   isFolded(): boolean;
   setFolded(folded: boolean): void;
   isDefaultBehavior(): boolean;
+  isInheritedFromObjectType(): boolean;
+  setInheritedFromObjectType(isInheritedFromObjectType: boolean): void;
   getPropertiesQuickCustomizationVisibilities(): QuickCustomizationVisibilitiesContainer;
 }
 
@@ -2567,6 +2569,12 @@ export class EventsBasedObject extends AbstractEventsBasedEntity {
   getInitialInstances(): InitialInstancesContainer;
   getLayers(): LayersContainer;
   getObjects(): ObjectsContainer;
+  getAllBehaviorNames(): VectorString;
+  hasBehaviorNamed(name: string): boolean;
+  addNewBehavior(project: Project, type: string, name: string): Behavior;
+  getBehavior(name: string): Behavior;
+  removeBehavior(name: string): void;
+  renameBehavior(oldName: string, name: string): boolean;
   getAreaMinX(): number;
   getAreaMinY(): number;
   getAreaMinZ(): number;

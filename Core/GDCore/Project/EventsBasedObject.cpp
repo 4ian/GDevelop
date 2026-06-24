@@ -4,6 +4,7 @@
  * reserved. This project is released under the MIT License.
  */
 #include "EventsBasedObject.h"
+#include "GDCore/Project/Behavior.h"
 #include "GDCore/Project/Object.h"
 #include "GDCore/Serialization/SerializerElement.h"
 
@@ -22,6 +23,37 @@ EventsBasedObject::EventsBasedObject()
 
 EventsBasedObject::~EventsBasedObject() {}
 
+std::vector<gd::String> EventsBasedObject::GetAllBehaviorNames() const {
+  return behaviors.GetAllBehaviorNames();
+}
+
+gd::Behavior& EventsBasedObject::GetBehavior(const gd::String& name) {
+  return behaviors.GetBehavior(name);
+}
+
+const gd::Behavior& EventsBasedObject::GetBehavior(
+    const gd::String& name) const {
+  return behaviors.GetBehavior(name);
+}
+
+bool EventsBasedObject::HasBehaviorNamed(const gd::String& name) const {
+  return behaviors.HasBehaviorNamed(name);
+}
+
+void EventsBasedObject::RemoveBehavior(const gd::String& name) {
+  behaviors.RemoveBehavior(name);
+}
+
+bool EventsBasedObject::RenameBehavior(const gd::String& name,
+                                       const gd::String& newName) {
+  return behaviors.RenameBehavior(name, newName);
+}
+
+gd::Behavior* EventsBasedObject::AddNewBehavior(const gd::Project& project,
+                                                const gd::String& type,
+                                                const gd::String& name) {
+  return behaviors.AddNewBehavior(project, type, name);
+}
 
 void EventsBasedObject::SerializeToExternal(SerializerElement& element) const {
   element.SetAttribute("defaultName", defaultName);
@@ -45,6 +77,7 @@ void EventsBasedObject::SerializeToExternal(SerializerElement& element) const {
   // The EventsBasedObjectVariant SerializeTo method override the name.
   // AbstractEventsBasedEntity::SerializeTo must be done after.
   defaultVariant.SerializeTo(element);
+  behaviors.SerializeTo(element.AddChild("behaviors"));
   AbstractEventsBasedEntity::SerializeTo(element);
 }
 
@@ -65,6 +98,8 @@ void EventsBasedObject::UnserializeFrom(gd::Project& project,
 
   defaultVariant.UnserializeFrom(project, element);
   defaultVariant.SetName("");
+  behaviors.UnserializeFrom(
+      project, element.GetChild("behaviors", 0, "automatisms"));
   AbstractEventsBasedEntity::UnserializeFrom(project, element);
 
   if (element.HasChild("variants")) {

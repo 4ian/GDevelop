@@ -844,6 +844,8 @@ interface Behavior {
     void SetFolded(boolean folded);
 
     boolean IsDefaultBehavior();
+    boolean IsInheritedFromObjectType();
+    void SetInheritedFromObjectType(boolean isInheritedFromObjectType);
 
     [Ref] QuickCustomizationVisibilitiesContainer GetPropertiesQuickCustomizationVisibilities();
 };
@@ -3519,6 +3521,12 @@ interface EventsBasedObject {
     [Ref] InitialInstancesContainer GetInitialInstances();
     [Ref] LayersContainer GetLayers();
     [Ref] ObjectsContainer GetObjects();
+    [Value] VectorString GetAllBehaviorNames();
+    boolean HasBehaviorNamed([Const] DOMString name);
+    Behavior AddNewBehavior([Ref] Project project, [Const] DOMString type, [Const] DOMString name);
+    [Ref] Behavior GetBehavior([Const] DOMString name);
+    void RemoveBehavior([Const] DOMString name);
+    boolean RenameBehavior([Const] DOMString oldName, [Const] DOMString name);
     double GetAreaMinX();
     double GetAreaMinY();
     double GetAreaMinZ();

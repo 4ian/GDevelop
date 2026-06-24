@@ -326,6 +326,9 @@ private:
   UpdateCustomObjectDefaultBehaviors(gd::Project &project,
                                      const gd::ObjectMetadata &objectMetadata);
 
+  static void UpdateCustomObjectInheritedBehaviors(
+      gd::Project &project, const gd::ObjectMetadata &objectMetadata);
+
   static gd::String RemoveTrailingDot(const gd::String &description);
 
   static gd::String

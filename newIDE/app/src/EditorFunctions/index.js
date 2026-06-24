@@ -3275,6 +3275,20 @@ const put2dInstances: EditorFunction = {
       }
 
       if (notFoundExistingInstanceIds.size > 0) {
+        // If NONE of the requested instances were found and nothing new was
+        // created, the call did nothing. Return a failure so the agent gets a
+        // real error signal instead of a misleading success — a success here
+        // can make the agent retry the same (often malformed) call in a loop.
+        if (existingInstanceStates.size === 0 && newInstancesCount === 0) {
+          return makeGenericFailure(
+            `None of the specified instance ids were found: ${Array.from(
+              notFoundExistingInstanceIds
+            ).join(
+              ', '
+            )}. Nothing was changed. Call \`describe_instances\` to get valid ids (the \`id\` field of each instance), and check the scene and layer names.`
+          );
+        }
+
         changes.push(
           `Instance ids not found: ${Array.from(
             notFoundExistingInstanceIds
@@ -3862,6 +3876,20 @@ const put3dInstances: EditorFunction = {
       }
 
       if (notFoundExistingInstanceIds.size > 0) {
+        // If NONE of the requested instances were found and nothing new was
+        // created, the call did nothing. Return a failure so the agent gets a
+        // real error signal instead of a misleading success — a success here
+        // can make the agent retry the same (often malformed) call in a loop.
+        if (existingInstanceStates.size === 0 && newInstancesCount === 0) {
+          return makeGenericFailure(
+            `None of the specified instance ids were found: ${Array.from(
+              notFoundExistingInstanceIds
+            ).join(
+              ', '
+            )}. Nothing was changed. Call \`describe_instances\` to get valid ids (the \`id\` field of each instance), and check the scene and layer names.`
+          );
+        }
+
         changes.push(
           `Instance ids not found: ${Array.from(
             notFoundExistingInstanceIds

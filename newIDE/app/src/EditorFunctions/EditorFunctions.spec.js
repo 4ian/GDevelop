@@ -2023,14 +2023,26 @@ describe('editorFunctions', () => {
       expect(getInstancePositions(testScene)).toEqual([]);
     });
 
-    it('reports not-found ids when erasing an unknown instance id', async () => {
-      const result = await putInstances({
-        brush_kind: 'erase',
-        existing_instance_ids: 'does-not-exist',
+    it('fails when erasing an unknown instance id (none found, nothing changed)', async () => {
+      // Bypass the `putInstances` helper, which asserts success — here we
+      // expect a failure so the agent gets a real error signal instead of a
+      // misleading success that could make it retry the same call in a loop.
+      const result = await editorFunctions.put_2d_instances.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          object_name: 'Player',
+          layer_name: '',
+          brush_kind: 'erase',
+          existing_instance_ids: 'does-not-exist',
+        },
       });
 
+      expect(result.success).toBe(false);
       expect(result.message).toEqual(
-        expect.stringContaining('Instance ids not found: does-not-exist')
+        expect.stringContaining(
+          'None of the specified instance ids were found: does-not-exist'
+        )
       );
     });
   });
@@ -2170,6 +2182,29 @@ describe('editorFunctions', () => {
       positions.forEach(({ x, y, z }) => {
         expect(Math.sqrt(x * x + y * y + z * z)).toBeLessThanOrEqual(radius);
       });
+    });
+
+    it('fails when no requested instance id is found and nothing is created', async () => {
+      // Bypass the `putInstances` helper, which asserts success — here we
+      // expect a failure so the agent gets a real error signal instead of a
+      // misleading success that could make it retry the same call in a loop.
+      const result = await editorFunctions.put_3d_instances.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          object_name: 'Player',
+          layer_name: '',
+          brush_kind: 'none',
+          existing_instance_ids: 'does-not-exist',
+        },
+      });
+
+      expect(result.success).toBe(false);
+      expect(result.message).toEqual(
+        expect.stringContaining(
+          'None of the specified instance ids were found: does-not-exist'
+        )
+      );
     });
 
     // Note: there is intentionally no grid test here. `grid` is not part of

@@ -163,6 +163,7 @@ import {
   sendInAppTutorialStarted,
   sendEventsExtractedAsFunction,
   sendPreviewStarted,
+  sendProjectOpened,
 } from '../Utils/Analytics/EventSender';
 import { useLeaderboardReplacer } from '../Leaderboard/UseLeaderboardReplacer';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
@@ -1315,6 +1316,10 @@ const MainFrame = (props: Props): React.MixedElement => {
       options?: {|
         openingMessage?: ?MessageDescriptor,
         ignoreAutoSave?: boolean,
+        // Set when this "open" is really the first step of creating a new project
+        // (loading a template/example that will be re-stamped with a new UUID).
+        // In that case we must not report it as the user re-opening a project.
+        doNotTrackAsProjectOpened?: boolean,
       |}
     ): Promise<?State> => {
       const storageProviderOperations = getStorageProviderOperations();
@@ -1435,13 +1440,31 @@ const MainFrame = (props: Props): React.MixedElement => {
         const serializedProject = gd.Serializer.fromJSObject(content);
 
         try {
-          const state = loadFromSerializedProject(
+          const state = await loadFromSerializedProject(
             serializedProject,
             // Note that fileMetadata is the original, unchanged one, even if we're loading
             // an autosave. If we're for some reason loading an autosave, we still consider
             // that we're opening the file that was originally requested by the user.
             fileMetadata
           );
+
+          // Report that the user opened an existing project, so we can tell apart
+          // people coming back to the same project from people creating new ones.
+          // Skipped when this "open" is just loading a template to create a new project.
+          if (
+            state.currentProject &&
+            !(options && options.doNotTrackAsProjectOpened)
+          ) {
+            const lastModifiedDate = fileMetadata.lastModifiedDate;
+            sendProjectOpened({
+              projectUuid: state.currentProject.getProjectUuid(),
+              storageProviderName: getStorageProvider().internalName,
+              timeSinceLastModified: lastModifiedDate
+                ? Date.now() - lastModifiedDate
+                : null,
+            });
+          }
+
           return state;
         } finally {
           sealUnsavedChanges();
@@ -1467,6 +1490,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     [
       i18n,
       getStorageProviderOperations,
+      getStorageProvider,
       loadFromSerializedProject,
       showConfirmation,
       showAlert,
@@ -2512,6 +2536,7 @@ const MainFrame = (props: Props): React.MixedElement => {
 
         if (!isForInGameEdition)
           sendPreviewStarted({
+            projectUuid: currentProject.getProjectUuid(),
             quickCustomizationGameId:
               quickCustomizationDialogOpenedFromGameId || null,
             networkPreview: !!networkPreview,

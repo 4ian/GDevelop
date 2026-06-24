@@ -409,10 +409,9 @@ const MainFrame = (props: Props): React.MixedElement => {
       toolbarButtons: [],
     }: State)
   );
-  const [
-    resourcePropertiesSchema,
-    setResourcePropertiesSchema,
-  ] = React.useState<Array<ResourcePropertyConfig>>([]);
+  const [resourcePropertyConfigs, setResourcePropertyConfigs] = React.useState<
+    Array<ResourcePropertyConfig>
+  >([]);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const [
     cloudProjectFileMetadataToRecover,
@@ -1133,7 +1132,7 @@ const MainFrame = (props: Props): React.MixedElement => {
         editorTabs: closeProjectTabs(state.editorTabs, currentProject),
         toolbarButtons: [],
       }));
-      setResourcePropertiesSchema([]);
+      setResourcePropertyConfigs([]);
 
       // Delete the project from memory. All references to it have been dropped previously
       // by the setState.
@@ -1256,8 +1255,8 @@ const MainFrame = (props: Props): React.MixedElement => {
               ...currentState,
               toolbarButtons: parsedProjectSettings.toolbarButtons || [],
             }));
-            setResourcePropertiesSchema(
-              parsedProjectSettings.resourceProperties || []
+            setResourcePropertyConfigs(
+              parsedProjectSettings.resourceCustomProperties || []
             );
           }
         } catch (error) {
@@ -5073,7 +5072,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       canInstallPrivateAsset,
       onNewResourcesAdded,
       onResourceUsageChanged,
-      resourcePropertiesSchema,
+      resourcePropertyConfigs,
     }),
     [
       resourceSources,
@@ -5085,7 +5084,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       canInstallPrivateAsset,
       onNewResourcesAdded,
       onResourceUsageChanged,
-      resourcePropertiesSchema,
+      resourcePropertyConfigs,
     ]
   );
 

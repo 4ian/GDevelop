@@ -20,7 +20,7 @@ import {
 } from '../../ResourcesList/ResourceSource';
 import { type ResourcePropertyConfig } from '../../Utils/ProjectSettingsReader';
 import {
-  type CustomPropertyValue,
+  type ResourceCustomPropertyValue,
   getResourceCustomPropertyValue,
   setResourceCustomPropertyValue,
 } from '../../ResourcesList/ResourceUtils';
@@ -43,16 +43,18 @@ type Props = {|
 
 export type ResourcePropertiesEditorInterface = {| forceUpdate: () => void |};
 
-const coerceToBoolean = (value: ?CustomPropertyValue): boolean =>
+const coerceToBoolean = (value: ?ResourceCustomPropertyValue): boolean =>
   value === true || value === 'true' || value === 1;
 
-const coerceToNumber = (value: ?CustomPropertyValue): number | null => {
+const coerceToNumberOrNull = (
+  value: ?ResourceCustomPropertyValue
+): number | null => {
   if (value == null || value === '') return null;
   const numberValue = Number(value);
   return Number.isNaN(numberValue) ? null : numberValue;
 };
 
-const coerceToString = (value: ?CustomPropertyValue): string =>
+const coerceToString = (value: ?ResourceCustomPropertyValue): string =>
   value == null ? '' : String(value);
 
 const buildCustomPropertyField = (
@@ -63,9 +65,12 @@ const buildCustomPropertyField = (
   const defaultValue = configDefault == null ? null : configDefault;
   const getLabel = () => label;
   const getDescription = () => description || '';
-  const readValue = (resource: gdResource): ?CustomPropertyValue =>
+  const readValue = (resource: gdResource): ?ResourceCustomPropertyValue =>
     getResourceCustomPropertyValue(resource, name, defaultValue);
-  const setValue = (resource: gdResource, newValue: CustomPropertyValue) => {
+  const setValue = (
+    resource: gdResource,
+    newValue: ResourceCustomPropertyValue
+  ) => {
     setResourceCustomPropertyValue(resource, name, newValue);
     forceUpdate();
   };
@@ -76,7 +81,8 @@ const buildCustomPropertyField = (
       getLabel,
       getDescription,
       valueType: 'number',
-      getValue: (resource: gdResource) => coerceToNumber(readValue(resource)),
+      getValue: (resource: gdResource) =>
+        coerceToNumberOrNull(readValue(resource)),
       setValue,
     };
   }
@@ -103,11 +109,11 @@ const buildCustomPropertyField = (
 };
 
 const buildCustomPropertiesSchema = (
-  resourcePropertiesSchema: Array<ResourcePropertyConfig>,
+  resourcePropertyConfigs: Array<ResourcePropertyConfig>,
   resourceKind: string,
   forceUpdate: () => void
 ): Schema =>
-  resourcePropertiesSchema
+  resourcePropertyConfigs
     .filter(
       config =>
         !config.resourceKinds ||
@@ -263,15 +269,17 @@ const ResourcePropertiesEditor: React.ComponentType<{
         });
 
         const resourceKind = resources[0].getKind();
-        const customSchema = buildCustomPropertiesSchema(
-          resourceManagementProps.resourcePropertiesSchema,
+        const customPropertiesSchema = buildCustomPropertiesSchema(
+          resourceManagementProps.resourcePropertyConfigs,
           resourceKind,
           forceUpdate
         );
 
         return (
           <PropertiesEditor
-            schema={schema.concat(resourceSchema).concat(customSchema)}
+            schema={schema
+              .concat(resourceSchema)
+              .concat(customPropertiesSchema)}
             instances={resources}
           />
         );

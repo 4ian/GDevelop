@@ -24,7 +24,7 @@ export type ParsedProjectSettings = {
   preferences?: { [string]: boolean | string | number },
   toolbarButtons?: Array<ToolbarButtonConfig>,
   shortcuts?: { [string]: string },
-  resourceProperties?: Array<ResourcePropertyConfig>,
+  resourceCustomProperties?: Array<ResourcePropertyConfig>,
 };
 
 const ALLOWED_RESOURCE_PROPERTY_TYPES: Array<ResourcePropertyType> = [
@@ -108,17 +108,17 @@ export const parseToolbarButtons = (
 };
 
 /**
- * Parses raw `resourceProperties` entries from YAML into validated
+ * Parses raw `resourceCustomProperties` entries from YAML into validated
  * ResourcePropertyConfig objects. Invalid entries are skipped with a warning.
  * Exported for unit testing; file system is not needed.
  */
-export const parseResourceProperties = (
-  rawResourceProperties: Array<mixed>
+export const parseResourceCustomProperties = (
+  rawResourceCustomProperties: Array<mixed>
 ): Array<ResourcePropertyConfig> => {
-  const resourceProperties: Array<ResourcePropertyConfig> = [];
+  const resourceCustomProperties: Array<ResourcePropertyConfig> = [];
   const seenNames: Set<string> = new Set();
 
-  for (const rawProperty of rawResourceProperties) {
+  for (const rawProperty of rawResourceCustomProperties) {
     const name = SafeExtractor.extractStringProperty(rawProperty, 'name');
     const type = SafeExtractor.extractStringProperty(rawProperty, 'type');
 
@@ -178,16 +178,17 @@ export const parseResourceProperties = (
       console.warn(
         `[ProjectSettingsReader] Duplicate resource property "${name}": the last definition wins.`
       );
-      const existingIndex = resourceProperties.findIndex(
+      const existingIndex = resourceCustomProperties.findIndex(
         property => property.name === name
       );
-      if (existingIndex !== -1) resourceProperties.splice(existingIndex, 1);
+      if (existingIndex !== -1)
+        resourceCustomProperties.splice(existingIndex, 1);
     }
     seenNames.add(name);
-    resourceProperties.push(config);
+    resourceCustomProperties.push(config);
   }
 
-  return resourceProperties;
+  return resourceCustomProperties;
 };
 
 /**
@@ -289,13 +290,13 @@ export const readProjectSettings = async (
       }
     }
 
-    // Parse resourceProperties section
-    const rawResourceProperties = SafeExtractor.extractArrayProperty(
+    // Parse resourceCustomProperties section
+    const rawResourceCustomProperties = SafeExtractor.extractArrayProperty(
       parsed,
-      'resourceProperties'
+      'resourceCustomProperties'
     );
-    const resourceProperties = rawResourceProperties
-      ? parseResourceProperties(rawResourceProperties)
+    const resourceCustomProperties = rawResourceCustomProperties
+      ? parseResourceCustomProperties(rawResourceCustomProperties)
       : [];
 
     console.info(
@@ -303,7 +304,9 @@ export const readProjectSettings = async (
         Object.keys(preferences).length
       } preferences, ${toolbarButtons.length} buttons, ${
         Object.keys(shortcuts).length
-      } shortcuts, ${resourceProperties.length} resource properties`
+      } shortcuts, ${
+        resourceCustomProperties.length
+      } resource custom properties`
     );
 
     const result: ParsedProjectSettings = {};
@@ -316,8 +319,8 @@ export const readProjectSettings = async (
     if (Object.keys(shortcuts).length > 0) {
       result.shortcuts = shortcuts;
     }
-    if (resourceProperties.length > 0) {
-      result.resourceProperties = resourceProperties;
+    if (resourceCustomProperties.length > 0) {
+      result.resourceCustomProperties = resourceCustomProperties;
     }
     return result;
   } catch (error) {

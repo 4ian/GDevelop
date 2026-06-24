@@ -243,9 +243,10 @@ export const updateResourceJsonMetadata = (
 // (defined in gdevelop-settings.yaml) are stored inside the resource metadata
 // JSON. Kept separate from other metadata keys (e.g. localFilePath) to avoid
 // collisions.
-export const CUSTOM_PROPERTIES_METADATA_KEY = 'customProperties';
+export const RESOURCE_CUSTOM_PROPERTIES_METADATA_KEY =
+  'resourceCustomProperties';
 
-export type CustomPropertyValue = string | number | boolean;
+export type ResourceCustomPropertyValue = string | number | boolean;
 
 /**
  * Returns the map of custom property values stored on a resource, or an empty
@@ -253,7 +254,7 @@ export type CustomPropertyValue = string | number | boolean;
  */
 export const getResourceCustomProperties = (
   resource: gdResource
-): { [string]: CustomPropertyValue } => {
+): { [string]: ResourceCustomPropertyValue } => {
   const metadataAsString = resource.getMetadata();
   if (!metadataAsString) return {};
   try {
@@ -261,10 +262,10 @@ export const getResourceCustomProperties = (
     if (
       metadata &&
       typeof metadata === 'object' &&
-      metadata[CUSTOM_PROPERTIES_METADATA_KEY] &&
-      typeof metadata[CUSTOM_PROPERTIES_METADATA_KEY] === 'object'
+      metadata[RESOURCE_CUSTOM_PROPERTIES_METADATA_KEY] &&
+      typeof metadata[RESOURCE_CUSTOM_PROPERTIES_METADATA_KEY] === 'object'
     ) {
-      return metadata[CUSTOM_PROPERTIES_METADATA_KEY];
+      return metadata[RESOURCE_CUSTOM_PROPERTIES_METADATA_KEY];
     }
   } catch (error) {
     // Malformed metadata: treat as if no custom properties were set.
@@ -279,30 +280,30 @@ export const getResourceCustomProperties = (
 export const getResourceCustomPropertyValue = (
   resource: gdResource,
   name: string,
-  defaultValue: ?CustomPropertyValue
-): ?CustomPropertyValue => {
-  const customProperties = getResourceCustomProperties(resource);
-  if (customProperties[name] !== undefined) {
-    return customProperties[name];
+  defaultValue: ?ResourceCustomPropertyValue
+): ?ResourceCustomPropertyValue => {
+  const resourceCustomProperties = getResourceCustomProperties(resource);
+  if (resourceCustomProperties[name] !== undefined) {
+    return resourceCustomProperties[name];
   }
   return defaultValue == null ? null : defaultValue;
 };
 
 /**
  * Sets (or merges) a single custom property value on a resource, storing it in
- * the resource metadata JSON under CUSTOM_PROPERTIES_METADATA_KEY.
+ * the resource metadata JSON under RESOURCE_CUSTOM_PROPERTIES_METADATA_KEY.
  */
 export const setResourceCustomPropertyValue = (
   resource: gdResource,
   name: string,
-  value: CustomPropertyValue
+  value: ResourceCustomPropertyValue
 ) => {
-  const customProperties = {
+  const resourceCustomProperties = {
     ...getResourceCustomProperties(resource),
     [name]: value,
   };
   updateResourceJsonMetadata(resource, {
-    [CUSTOM_PROPERTIES_METADATA_KEY]: customProperties,
+    [RESOURCE_CUSTOM_PROPERTIES_METADATA_KEY]: resourceCustomProperties,
   });
 };
 

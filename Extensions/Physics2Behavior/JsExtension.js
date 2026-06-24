@@ -503,14 +503,16 @@ module.exports = {
           sharedContent.getChild('gravityX').getDoubleValue().toString(10)
         )
         .setType('Number')
-        .setMeasurementUnit(gd.MeasurementUnit.getNewton());
+        .setMeasurementUnit(gd.MeasurementUnit.getNewton())
+        .setAdvanced(true);
       sharedProperties
         .getOrCreate('gravityY')
         .setValue(
           sharedContent.getChild('gravityY').getDoubleValue().toString(10)
         )
         .setType('Number')
-        .setMeasurementUnit(gd.MeasurementUnit.getNewton());
+        .setMeasurementUnit(gd.MeasurementUnit.getNewton())
+        .setAdvanced(true);
 
       if (!sharedContent.hasChild('worldScale')) {
         sharedContent.addChild('worldScale');
@@ -528,7 +530,8 @@ module.exports = {
         .setValue(
           sharedContent.getChild('worldScale').getDoubleValue().toString(10)
         )
-        .setType('Number');
+        .setType('Number')
+        .setAdvanced(true);
 
       return sharedProperties;
     };
@@ -4296,6 +4299,12 @@ module.exports = {
         sharedData,
         'gravityY',
         '456'
+      ),
+      // Revert back
+      gd.ProjectHelper.sanityCheckBehaviorsSharedDataProperty(
+        sharedData,
+        'gravityY',
+        '9.8'
       ),
     ];
   },

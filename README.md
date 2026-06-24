@@ -8,6 +8,13 @@
 [Object Picking](https://wiki.gdevelop.io/gdevelop5/events/object-picking/) 整理而来。核心分层是：
 **编辑期数据模型 -> IDE/元数据/作用域 -> GDJS code generation -> Runtime 执行模型**。
 
+![GDevelop 主要概念架构图](docs/gdevelop-architecture.svg)
+
+上图按照“产品架构图”的方式组织主要概念：上层是用户直接接触的编辑器入口，中间是 Core 项目数据、对象/事件/扩展/prefab 的抽象模型，下层是 GDJS 代码生成、Runtime 执行模型和最终导出。右侧三列表示贯穿所有层的作用域体系、生命周期体系和数据生成链路。
+
+<details>
+<summary>补充：源码关系图（Mermaid）</summary>
+
 ```mermaid
 flowchart LR
   APP["GDevelop project<br/>.json/.json folder project<br/>game configuration + authored content"]
@@ -163,6 +170,8 @@ flowchart LR
   RO --> REN
   RS --> REN
 ```
+
+</details>
 
 运行时一帧的高层执行路径：
 

@@ -1,0 +1,267 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1900" height="2200" viewBox="0 0 1900 2200" role="img" aria-labelledby="title desc">
+  <title id="title">GDevelop architecture overview</title>
+  <desc id="desc">A layered architecture diagram of GDevelop showing editor concepts, core project model, extension system, prefab internals, code generation, runtime execution, rendering, export targets and cross-cutting systems.</desc>
+  <defs>
+    <style>
+      .page { fill: #ffffff; }
+      .title { font-family: "Segoe UI", "Microsoft YaHei", Arial, sans-serif; font-size: 36px; font-weight: 800; fill: #111827; }
+      .subtitle { font-family: "Segoe UI", "Microsoft YaHei", Arial, sans-serif; font-size: 18px; fill: #4b5563; }
+      .section-title { font-family: "Segoe UI", "Microsoft YaHei", Arial, sans-serif; font-size: 25px; font-weight: 800; fill: #111827; }
+      .section-note { font-family: "Segoe UI", "Microsoft YaHei", Arial, sans-serif; font-size: 16px; fill: #4b5563; }
+      .card-text { font-family: "Segoe UI", "Microsoft YaHei", Arial, sans-serif; font-size: 22px; font-weight: 760; fill: #ffffff; text-anchor: middle; }
+      .card-sub { font-size: 14px; font-weight: 560; opacity: 0.95; }
+      .mini-text { font-family: "Segoe UI", "Microsoft YaHei", Arial, sans-serif; font-size: 17px; font-weight: 730; fill: #ffffff; text-anchor: middle; }
+      .mini-sub { font-size: 12px; font-weight: 560; opacity: 0.95; }
+      .dark-text { font-family: "Segoe UI", "Microsoft YaHei", Arial, sans-serif; font-size: 18px; font-weight: 720; fill: #111827; text-anchor: middle; }
+      .pillar-title { font-family: "Segoe UI", "Microsoft YaHei", Arial, sans-serif; font-size: 25px; font-weight: 800; fill: #f0522b; text-anchor: middle; }
+      .pillar-item { font-family: "Segoe UI", "Microsoft YaHei", Arial, sans-serif; font-size: 17px; font-weight: 650; fill: #b83b19; text-anchor: middle; }
+      .arrow { stroke: #64748b; stroke-width: 3; fill: none; marker-end: url(#arrow); }
+      .thin-arrow { stroke: #94a3b8; stroke-width: 2.2; fill: none; marker-end: url(#arrow); }
+      .flow-label { font-family: "Segoe UI", "Microsoft YaHei", Arial, sans-serif; font-size: 14px; font-weight: 700; fill: #475569; text-anchor: middle; }
+    </style>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b"/>
+    </marker>
+    <filter id="softShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#0f172a" flood-opacity="0.08"/>
+    </filter>
+  </defs>
+
+  <rect class="page" width="1900" height="2200"/>
+  <text class="title" x="950" y="48" text-anchor="middle">GDevelop 主要概念架构图</text>
+  <text class="subtitle" x="950" y="80" text-anchor="middle">从编辑器创作模型，到 Core 项目数据、扩展系统、GDJS 代码生成、运行时对象容器与渲染导出</text>
+
+  <!-- Cross-cutting architecture pillars. -->
+  <rect x="1490" y="110" width="110" height="2040" rx="14" fill="#ffe3d9" stroke="#ff5b2e" stroke-width="3"/>
+  <rect x="1625" y="110" width="110" height="2040" rx="14" fill="#ffe3d9" stroke="#ff5b2e" stroke-width="3"/>
+  <rect x="1760" y="110" width="110" height="2040" rx="14" fill="#ffe3d9" stroke="#ff5b2e" stroke-width="3"/>
+
+  <text class="pillar-title" transform="translate(1545 980) rotate(90)">作用域 / 可见性体系</text>
+  <text class="pillar-item" transform="translate(1545 1225) rotate(90)">对象选择、函数参数、变量、资源、Behavior 名称映射</text>
+
+  <text class="pillar-title" transform="translate(1680 980) rotate(90)">生命周期 / 调度体系</text>
+  <text class="pillar-item" transform="translate(1680 1225) rotate(90)">onCreated、pre events、scene events、post events、onDestroy</text>
+
+  <text class="pillar-title" transform="translate(1815 980) rotate(90)">数据流 / 生成链路</text>
+  <text class="pillar-item" transform="translate(1815 1225) rotate(90)">Project JSON、Core model、metadata、generated JS、runtime data</text>
+
+  <!-- Section 1: editor concepts. -->
+  <rect x="35" y="110" width="1428" height="170" rx="14" fill="#e6f7fa" stroke="#0796a8" stroke-width="3" filter="url(#softShadow)"/>
+  <text class="section-title" x="70" y="153">创作与编辑入口（newIDE）</text>
+  <text class="section-note" x="70" y="178">用户看到的是编辑器工作流；保存后落到 Core 项目数据模型。</text>
+
+  <rect x="75" y="198" width="200" height="62" rx="5" fill="#0796a8"/>
+  <text class="card-text" x="175" y="226"><tspan x="175">项目管理器</tspan><tspan class="card-sub" x="175" dy="1.35em">resources / scenes</tspan></text>
+  <rect x="305" y="198" width="200" height="62" rx="5" fill="#0796a8"/>
+  <text class="card-text" x="405" y="226"><tspan x="405">场景编辑器</tspan><tspan class="card-sub" x="405" dy="1.35em">instances / layers</tspan></text>
+  <rect x="535" y="198" width="200" height="62" rx="5" fill="#0796a8"/>
+  <text class="card-text" x="635" y="226"><tspan x="635">事件编辑器</tspan><tspan class="card-sub" x="635" dy="1.35em">conditions / actions</tspan></text>
+  <rect x="765" y="198" width="200" height="62" rx="5" fill="#0796a8"/>
+  <text class="card-text" x="865" y="226"><tspan x="865">对象编辑器</tspan><tspan class="card-sub" x="865" dy="1.35em">properties / behaviors</tspan></text>
+  <rect x="995" y="198" width="200" height="62" rx="5" fill="#0796a8"/>
+  <text class="card-text" x="1095" y="226"><tspan x="1095">扩展编辑器</tspan><tspan class="card-sub" x="1095" dy="1.35em">functions / prefabs</tspan></text>
+  <rect x="1225" y="198" width="200" height="62" rx="5" fill="#0796a8"/>
+  <text class="card-text" x="1325" y="226"><tspan x="1325">预览与导出</tspan><tspan class="card-sub" x="1325" dy="1.35em">preview / build</tspan></text>
+
+  <line class="arrow" x1="749" y1="280" x2="749" y2="308"/>
+  <text class="flow-label" x="835" y="301">serialize / edit project</text>
+
+  <!-- Section 2: project model. -->
+  <rect x="35" y="310" width="1428" height="300" rx="14" fill="#fff1d9" stroke="#ff9c27" stroke-width="3" filter="url(#softShadow)"/>
+  <text class="section-title" x="70" y="353">项目数据模型（Core/GDCore/Project）</text>
+  <text class="section-note" x="70" y="378">编辑器、验证器、代码生成器共同读取的稳定结构；项目文件是它的序列化结果。</text>
+
+  <rect x="70" y="405" width="190" height="64" rx="5" fill="#ff9c27"/>
+  <text class="card-text" x="165" y="431"><tspan x="165">gd::Project</tspan><tspan class="card-sub" x="165" dy="1.35em">game root</tspan></text>
+  <rect x="285" y="405" width="190" height="64" rx="5" fill="#ff9c27"/>
+  <text class="card-text" x="380" y="431"><tspan x="380">资源表</tspan><tspan class="card-sub" x="380" dy="1.35em">images / audio / fonts</tspan></text>
+  <rect x="500" y="405" width="190" height="64" rx="5" fill="#ff9c27"/>
+  <text class="card-text" x="595" y="431"><tspan x="595">全局变量</tspan><tspan class="card-sub" x="595" dy="1.35em">project variables</tspan></text>
+  <rect x="715" y="405" width="190" height="64" rx="5" fill="#ff9c27"/>
+  <text class="card-text" x="810" y="431"><tspan x="810">全局对象</tspan><tspan class="card-sub" x="810" dy="1.35em">global ObjectsContainer</tspan></text>
+  <rect x="930" y="405" width="190" height="64" rx="5" fill="#ff9c27"/>
+  <text class="card-text" x="1025" y="431"><tspan x="1025">场景列表</tspan><tspan class="card-sub" x="1025" dy="1.35em">layouts / external layouts</tspan></text>
+  <rect x="1145" y="405" width="255" height="64" rx="5" fill="#ff9c27"/>
+  <text class="card-text" x="1272" y="431"><tspan x="1272">扩展集合</tspan><tspan class="card-sub" x="1272" dy="1.35em">EventsFunctionsExtension</tspan></text>
+
+  <rect x="70" y="500" width="190" height="64" rx="5" fill="#f08a00"/>
+  <text class="card-text" x="165" y="526"><tspan x="165">gd::Layout</tspan><tspan class="card-sub" x="165" dy="1.35em">scene data</tspan></text>
+  <rect x="285" y="500" width="190" height="64" rx="5" fill="#f08a00"/>
+  <text class="card-text" x="380" y="526"><tspan x="380">ObjectsContainer</tspan><tspan class="card-sub" x="380" dy="1.35em">object definitions</tspan></text>
+  <rect x="500" y="500" width="190" height="64" rx="5" fill="#f08a00"/>
+  <text class="card-text" x="595" y="526"><tspan x="595">InitialInstances</tspan><tspan class="card-sub" x="595" dy="1.35em">placement data</tspan></text>
+  <rect x="715" y="500" width="190" height="64" rx="5" fill="#f08a00"/>
+  <text class="card-text" x="810" y="526"><tspan x="810">EventsList</tspan><tspan class="card-sub" x="810" dy="1.35em">scene rules</tspan></text>
+  <rect x="930" y="500" width="190" height="64" rx="5" fill="#f08a00"/>
+  <text class="card-text" x="1025" y="526"><tspan x="1025">Layers / Cameras</tspan><tspan class="card-sub" x="1025" dy="1.35em">render space</tspan></text>
+  <rect x="1145" y="500" width="255" height="64" rx="5" fill="#f08a00"/>
+  <text class="card-text" x="1272" y="526"><tspan x="1272">BehaviorSharedData</tspan><tspan class="card-sub" x="1272" dy="1.35em">shared behavior state</tspan></text>
+
+  <line class="arrow" x1="749" y1="610" x2="749" y2="638"/>
+  <text class="flow-label" x="845" y="631">split into core concepts</text>
+
+  <!-- Section 3: main concept map. -->
+  <rect x="35" y="640" width="1428" height="340" rx="14" fill="#fdeff2" stroke="#ef7c8a" stroke-width="3" filter="url(#softShadow)"/>
+  <text class="section-title" x="70" y="683">核心概念中心</text>
+  <text class="section-note" x="70" y="708">场景、对象、事件、扩展在这里形成 GDevelop 的主要抽象边界。</text>
+
+  <rect x="65" y="735" width="430" height="215" rx="10" fill="#fff7f8" stroke="#ef7c8a" stroke-width="2"/>
+  <text class="section-title" x="90" y="770">对象与实例模型</text>
+  <rect x="90" y="795" width="180" height="54" rx="5" fill="#ef7c8a"/>
+  <text class="mini-text" x="180" y="817"><tspan x="180">ObjectData</tspan><tspan class="mini-sub" x="180" dy="1.3em">type + variables</tspan></text>
+  <rect x="290" y="795" width="180" height="54" rx="5" fill="#ef7c8a"/>
+  <text class="mini-text" x="380" y="817"><tspan x="380">InitialInstance</tspan><tspan class="mini-sub" x="380" dy="1.3em">x/y/layer/zOrder</tspan></text>
+  <rect x="90" y="870" width="180" height="54" rx="5" fill="#df6676"/>
+  <text class="mini-text" x="180" y="892"><tspan x="180">Behavior config</tspan><tspan class="mini-sub" x="180" dy="1.3em">name + properties</tspan></text>
+  <rect x="290" y="870" width="180" height="54" rx="5" fill="#df6676"/>
+  <text class="mini-text" x="380" y="892"><tspan x="380">Instance override</tspan><tspan class="mini-sub" x="380" dy="1.3em">initial variables</tspan></text>
+
+  <rect x="520" y="735" width="430" height="215" rx="10" fill="#fff7f8" stroke="#ef7c8a" stroke-width="2"/>
+  <text class="section-title" x="545" y="770">事件与作用域模型</text>
+  <rect x="545" y="795" width="180" height="54" rx="5" fill="#ef7c8a"/>
+  <text class="mini-text" x="635" y="817"><tspan x="635">Conditions</tspan><tspan class="mini-sub" x="635" dy="1.3em">filter object lists</tspan></text>
+  <rect x="745" y="795" width="180" height="54" rx="5" fill="#ef7c8a"/>
+  <text class="mini-text" x="835" y="817"><tspan x="835">Actions</tspan><tspan class="mini-sub" x="835" dy="1.3em">mutate state</tspan></text>
+  <rect x="545" y="870" width="180" height="54" rx="5" fill="#df6676"/>
+  <text class="mini-text" x="635" y="892"><tspan x="635">Expressions</tspan><tspan class="mini-sub" x="635" dy="1.3em">read values</tspan></text>
+  <rect x="745" y="870" width="180" height="54" rx="5" fill="#df6676"/>
+  <text class="mini-text" x="835" y="892"><tspan x="835">Object picking</tspan><tspan class="mini-sub" x="835" dy="1.3em">event/sub-event lists</tspan></text>
+
+  <rect x="975" y="735" width="450" height="215" rx="10" fill="#fff7f8" stroke="#ef7c8a" stroke-width="2"/>
+  <text class="section-title" x="1000" y="770">扩展系统</text>
+  <rect x="1000" y="795" width="185" height="54" rx="5" fill="#ef7c8a"/>
+  <text class="mini-text" x="1092" y="817"><tspan x="1092">Free function</tspan><tspan class="mini-sub" x="1092" dy="1.3em">action / condition</tspan></text>
+  <rect x="1210" y="795" width="185" height="54" rx="5" fill="#ef7c8a"/>
+  <text class="mini-text" x="1302" y="817"><tspan x="1302">EventsFunction</tspan><tspan class="mini-sub" x="1302" dy="1.3em">parameters + events</tspan></text>
+  <rect x="1000" y="870" width="185" height="54" rx="5" fill="#df6676"/>
+  <text class="mini-text" x="1092" y="892"><tspan x="1092">EventsBasedBehavior</tspan><tspan class="mini-sub" x="1092" dy="1.3em">custom behavior</tspan></text>
+  <rect x="1210" y="870" width="185" height="54" rx="5" fill="#df6676"/>
+  <text class="mini-text" x="1302" y="892"><tspan x="1302">EventsBasedObject</tspan><tspan class="mini-sub" x="1302" dy="1.3em">custom object / prefab</tspan></text>
+
+  <line class="arrow" x1="749" y1="980" x2="749" y2="1008"/>
+  <text class="flow-label" x="852" y="1001">prefab is object type + child model</text>
+
+  <!-- Section 4: prefab internals. -->
+  <rect x="35" y="1010" width="1428" height="300" rx="14" fill="#eaf5ff" stroke="#18a6d9" stroke-width="3" filter="url(#softShadow)"/>
+  <text class="section-title" x="70" y="1053">Prefab / Custom Object 内部结构</text>
+  <text class="section-note" x="70" y="1078">Prefab 外层是一个对象类型；内部 child objects 使用自己的定义、实例、层与运行时容器。</text>
+
+  <rect x="70" y="1110" width="190" height="64" rx="5" fill="#18a6d9"/>
+  <text class="card-text" x="165" y="1136"><tspan x="165">Custom Object</tspan><tspan class="card-sub" x="165" dy="1.35em">outer object type</tspan></text>
+  <rect x="285" y="1110" width="190" height="64" rx="5" fill="#18a6d9"/>
+  <text class="card-text" x="380" y="1136"><tspan x="380">Default variant</tspan><tspan class="card-sub" x="380" dy="1.35em">base layout</tspan></text>
+  <rect x="500" y="1110" width="190" height="64" rx="5" fill="#18a6d9"/>
+  <text class="card-text" x="595" y="1136"><tspan x="595">Variants</tspan><tspan class="card-sub" x="595" dy="1.35em">alternate placements</tspan></text>
+  <rect x="715" y="1110" width="190" height="64" rx="5" fill="#18a6d9"/>
+  <text class="card-text" x="810" y="1136"><tspan x="810">Child objects</tspan><tspan class="card-sub" x="810" dy="1.35em">inner definitions</tspan></text>
+  <rect x="930" y="1110" width="190" height="64" rx="5" fill="#18a6d9"/>
+  <text class="card-text" x="1025" y="1136"><tspan x="1025">Child instances</tspan><tspan class="card-sub" x="1025" dy="1.35em">inner placement</tspan></text>
+  <rect x="1145" y="1110" width="255" height="64" rx="5" fill="#18a6d9"/>
+  <text class="card-text" x="1272" y="1136"><tspan x="1272">Object methods</tspan><tspan class="card-sub" x="1272" dy="1.35em">onCreated / actions / expressions</tspan></text>
+
+  <rect x="130" y="1210" width="260" height="58" rx="5" fill="#0987bd"/>
+  <text class="card-text" x="260" y="1234"><tspan x="260">CustomRuntimeObject</tspan><tspan class="card-sub" x="260" dy="1.3em">outer runtime instance</tspan></text>
+  <rect x="430" y="1210" width="330" height="58" rx="5" fill="#0987bd"/>
+  <text class="mini-text" x="595" y="1229"><tspan x="595">CustomRuntimeObject</tspan><tspan x="595" dy="1.25em">InstanceContainer</tspan><tspan class="mini-sub" x="595" dy="1.3em">child runtime world</tspan></text>
+  <rect x="800" y="1210" width="260" height="58" rx="5" fill="#0987bd"/>
+  <text class="card-text" x="930" y="1234"><tspan x="930">Child layers</tspan><tspan class="card-sub" x="930" dy="1.3em">inner rendering space</tspan></text>
+  <rect x="1100" y="1210" width="260" height="58" rx="5" fill="#0987bd"/>
+  <text class="card-text" x="1230" y="1234"><tspan x="1230">Global position</tspan><tspan class="card-sub" x="1230" dy="1.3em">parent transform + child transform</tspan></text>
+
+  <line class="thin-arrow" x1="260" y1="1174" x2="260" y2="1207"/>
+  <line class="thin-arrow" x1="810" y1="1174" x2="595" y2="1207"/>
+  <line class="thin-arrow" x1="1025" y1="1174" x2="595" y2="1207"/>
+  <line class="thin-arrow" x1="1272" y1="1174" x2="1272" y2="1207"/>
+
+  <line class="arrow" x1="749" y1="1310" x2="749" y2="1338"/>
+  <text class="flow-label" x="852" y="1331">metadata + scope prepare codegen</text>
+
+  <!-- Section 5: IDE analysis and code generation. -->
+  <rect x="35" y="1340" width="1428" height="270" rx="14" fill="#edf4ff" stroke="#517ceb" stroke-width="3" filter="url(#softShadow)"/>
+  <text class="section-title" x="70" y="1383">IDE 分析、元数据与 GDJS 代码生成</text>
+  <text class="section-note" x="70" y="1408">编辑期元数据决定可见的动作/条件/表达式；代码生成把事件列表编译成运行时 JavaScript。</text>
+
+  <rect x="70" y="1440" width="255" height="62" rx="5" fill="#517ceb"/>
+  <text class="mini-text" x="197" y="1458"><tspan x="197">Metadata</tspan><tspan x="197" dy="1.25em">DeclarationHelper</tspan><tspan class="mini-sub" x="197" dy="1.3em">declare actions / metadata</tspan></text>
+  <rect x="350" y="1440" width="255" height="62" rx="5" fill="#517ceb"/>
+  <text class="mini-text" x="477" y="1458"><tspan x="477">ProjectScoped</tspan><tspan x="477" dy="1.25em">Containers</tspan><tspan class="mini-sub" x="477" dy="1.3em">visible objects / variables</tspan></text>
+  <rect x="630" y="1440" width="255" height="62" rx="5" fill="#517ceb"/>
+  <text class="card-text" x="757" y="1465"><tspan x="757">Validators / completion</tspan><tspan class="card-sub" x="757" dy="1.35em">check expressions / params</tspan></text>
+  <rect x="910" y="1440" width="255" height="62" rx="5" fill="#517ceb"/>
+  <text class="card-text" x="1037" y="1465"><tspan x="1037">EventsCodeGenerator</tspan><tspan class="card-sub" x="1037" dy="1.35em">EventsList to JS functions</tspan></text>
+  <rect x="1190" y="1440" width="210" height="62" rx="5" fill="#517ceb"/>
+  <text class="card-text" x="1295" y="1465"><tspan x="1295">Generated JS</tspan><tspan class="card-sub" x="1295" dy="1.35em">game code bundle</tspan></text>
+
+  <rect x="210" y="1525" width="255" height="58" rx="5" fill="#3f63d8"/>
+  <text class="mini-text" x="337" y="1544"><tspan x="337">eventsFunction</tspan><tspan x="337" dy="1.25em">Context</tspan><tspan class="mini-sub" x="337" dy="1.3em">objects map / behavior names</tspan></text>
+  <rect x="510" y="1525" width="255" height="58" rx="5" fill="#3f63d8"/>
+  <text class="card-text" x="637" y="1549"><tspan x="637">Function generator</tspan><tspan class="card-sub" x="637" dy="1.3em">free functions</tspan></text>
+  <rect x="810" y="1525" width="255" height="58" rx="5" fill="#3f63d8"/>
+  <text class="card-text" x="937" y="1549"><tspan x="937">Behavior generator</tspan><tspan class="card-sub" x="937" dy="1.3em">RuntimeBehavior subclass</tspan></text>
+  <rect x="1110" y="1525" width="255" height="58" rx="5" fill="#3f63d8"/>
+  <text class="card-text" x="1237" y="1549"><tspan x="1237">Object generator</tspan><tspan class="card-sub" x="1237" dy="1.3em">CustomRuntimeObject subclass</tspan></text>
+
+  <line class="arrow" x1="749" y1="1610" x2="749" y2="1638"/>
+  <text class="flow-label" x="852" y="1631">generated code runs against GDJS runtime</text>
+
+  <!-- Section 6: runtime. -->
+  <rect x="35" y="1640" width="1428" height="330" rx="14" fill="#e9fbf1" stroke="#08af5d" stroke-width="3" filter="url(#softShadow)"/>
+  <text class="section-title" x="70" y="1683">运行时执行模型（GDJS/Runtime）</text>
+  <text class="section-note" x="70" y="1708">运行时不是编辑器对象本身，而是由项目数据和生成代码共同构造出的可执行对象世界。</text>
+
+  <rect x="70" y="1740" width="190" height="62" rx="5" fill="#08af5d"/>
+  <text class="card-text" x="165" y="1765"><tspan x="165">RuntimeGame</tspan><tspan class="card-sub" x="165" dy="1.35em">game data / resources</tspan></text>
+  <rect x="285" y="1740" width="190" height="62" rx="5" fill="#08af5d"/>
+  <text class="card-text" x="380" y="1765"><tspan x="380">RuntimeScene</tspan><tspan class="card-sub" x="380" dy="1.35em">scene vars / timers</tspan></text>
+  <rect x="500" y="1740" width="245" height="62" rx="5" fill="#08af5d"/>
+  <text class="mini-text" x="622" y="1758"><tspan x="622">RuntimeInstance</tspan><tspan x="622" dy="1.25em">Container</tspan><tspan class="mini-sub" x="622" dy="1.3em">create / own instances</tspan></text>
+  <rect x="770" y="1740" width="190" height="62" rx="5" fill="#08af5d"/>
+  <text class="card-text" x="865" y="1765"><tspan x="865">RuntimeObject</tspan><tspan class="card-sub" x="865" dy="1.35em">position / variables</tspan></text>
+  <rect x="985" y="1740" width="190" height="62" rx="5" fill="#08af5d"/>
+  <text class="card-text" x="1080" y="1765"><tspan x="1080">RuntimeBehavior</tspan><tspan class="card-sub" x="1080" dy="1.35em">owner object</tspan></text>
+  <rect x="1200" y="1740" width="200" height="62" rx="5" fill="#08af5d"/>
+  <text class="card-text" x="1300" y="1765"><tspan x="1300">Renderer layer</tspan><tspan class="card-sub" x="1300" dy="1.35em">PixiJS / Three.js</tspan></text>
+
+  <rect x="170" y="1832" width="250" height="56" rx="5" fill="#07944f"/>
+  <text class="card-text" x="295" y="1855"><tspan x="295">CustomRuntimeObject</tspan><tspan class="card-sub" x="295" dy="1.3em">prefab runtime object</tspan></text>
+  <rect x="455" y="1832" width="330" height="56" rx="5" fill="#07944f"/>
+  <text class="card-text" x="620" y="1855"><tspan x="620">CustomObject child container</tspan><tspan class="card-sub" x="620" dy="1.3em">inner runtime instances</tspan></text>
+  <rect x="820" y="1832" width="250" height="56" rx="5" fill="#07944f"/>
+  <text class="card-text" x="945" y="1855"><tspan x="945">Runtime variables</tspan><tspan class="card-sub" x="945" dy="1.3em">scene / object / extension</tspan></text>
+  <rect x="1105" y="1832" width="250" height="56" rx="5" fill="#07944f"/>
+  <text class="card-text" x="1230" y="1855"><tspan x="1230">Layers / cameras</tspan><tspan class="card-sub" x="1230" dy="1.3em">render transforms</tspan></text>
+
+  <rect x="120" y="1915" width="220" height="32" rx="16" fill="#c7f4d9" stroke="#08af5d" stroke-width="2"/>
+  <text class="dark-text" x="230" y="1937">behaviors pre events</text>
+  <line class="thin-arrow" x1="345" y1="1931" x2="430" y2="1931"/>
+  <rect x="435" y="1915" width="220" height="32" rx="16" fill="#c7f4d9" stroke="#08af5d" stroke-width="2"/>
+  <text class="dark-text" x="545" y="1937">scene EventsList</text>
+  <line class="thin-arrow" x1="660" y1="1931" x2="745" y2="1931"/>
+  <rect x="750" y="1915" width="220" height="32" rx="16" fill="#c7f4d9" stroke="#08af5d" stroke-width="2"/>
+  <text class="dark-text" x="860" y="1937">object methods</text>
+  <line class="thin-arrow" x1="975" y1="1931" x2="1060" y2="1931"/>
+  <rect x="1065" y="1915" width="220" height="32" rx="16" fill="#c7f4d9" stroke="#08af5d" stroke-width="2"/>
+  <text class="dark-text" x="1175" y="1937">behaviors post events</text>
+
+  <line class="arrow" x1="749" y1="1970" x2="749" y2="1998"/>
+  <text class="flow-label" x="846" y="1991">preview and export package runtime</text>
+
+  <!-- Section 7: build/export. -->
+  <rect x="35" y="2000" width="1428" height="150" rx="14" fill="#f6e8ff" stroke="#ce6ff1" stroke-width="3" filter="url(#softShadow)"/>
+  <text class="section-title" x="70" y="2043">预览、构建与发布</text>
+  <rect x="85" y="2070" width="255" height="54" rx="5" fill="#c96cea"/>
+  <text class="card-text" x="212" y="2093"><tspan x="212">Preview</tspan><tspan class="card-sub" x="212" dy="1.3em">local game run</tspan></text>
+  <rect x="380" y="2070" width="255" height="54" rx="5" fill="#c96cea"/>
+  <text class="card-text" x="507" y="2093"><tspan x="507">Web export</tspan><tspan class="card-sub" x="507" dy="1.3em">HTML / JS bundle</tspan></text>
+  <rect x="675" y="2070" width="255" height="54" rx="5" fill="#c96cea"/>
+  <text class="card-text" x="802" y="2093"><tspan x="802">Desktop / mobile</tspan><tspan class="card-sub" x="802" dy="1.3em">Electron / Cordova</tspan></text>
+  <rect x="970" y="2070" width="205" height="54" rx="5" fill="#c96cea"/>
+  <text class="card-text" x="1072" y="2093"><tspan x="1072">Assets</tspan><tspan class="card-sub" x="1072" dy="1.3em">resource files</tspan></text>
+  <rect x="1215" y="2070" width="205" height="54" rx="5" fill="#c96cea"/>
+  <text class="card-text" x="1317" y="2093"><tspan x="1317">Exported game</tspan><tspan class="card-sub" x="1317" dy="1.3em">runtime + data</tspan></text>
+
+  <!-- Side data-flow hints. -->
+  <path class="thin-arrow" d="M 1463 195 C 1478 195 1478 460 1463 460"/>
+  <path class="thin-arrow" d="M 1463 760 C 1478 760 1478 1210 1463 1210"/>
+  <path class="thin-arrow" d="M 1463 1485 C 1478 1485 1478 1810 1463 1810"/>
+</svg>

@@ -879,7 +879,7 @@ const BehaviorsEditor = (props: Props): React.Node => {
                   ref={ref}
                   key={behaviorName}
                   project={project}
-                  object={objects.length === 1 ? objects[1] : null}
+                  object={objects.length === 1 ? objects[0] : null}
                   layersContainer={layersContainer}
                   isChildObject={isChildObject}
                   behaviors={behaviors}

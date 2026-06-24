@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react';
-import { Trans } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
+import { I18n } from '@lingui/react';
 import VariablesEditorDialog, {
   type VariableDialogOpeningProps,
 } from './VariablesEditorDialog';
@@ -65,21 +66,26 @@ const SceneVariablesDialog = ({
   );
 
   return (
-    <VariablesEditorDialog
-      project={project}
-      projectScopedContainersAccessor={projectScopedContainersAccessor}
-      open={open}
-      onCancel={onCancel}
-      onApply={onApply}
-      title={<Trans>{layout.getName()} variables</Trans>}
-      // $FlowFixMe[incompatible-type]
-      tabs={tabs}
-      initiallySelectedVariable={initiallySelectedVariable}
-      helpPagePath={'/all-features/variables/scene-variables'}
-      hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
-      id="scene-variables-dialog"
-      isListLocked={isListLocked}
-    />
+    <I18n>
+      {({ i18n }) => (
+        <VariablesEditorDialog
+          project={project}
+          projectScopedContainersAccessor={projectScopedContainersAccessor}
+          open={open}
+          onCancel={onCancel}
+          onApply={onApply}
+          title={<Trans>{layout.getName()} variables</Trans>}
+          // $FlowFixMe[incompatible-type]
+          tabs={tabs}
+          initiallySelectedVariable={initiallySelectedVariable}
+          helpPagePath={'/all-features/variables/scene-variables'}
+          scopeName={i18n._(t`Scene variables`)}
+          hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
+          id="scene-variables-dialog"
+          isListLocked={isListLocked}
+        />
+      )}
+    </I18n>
   );
 };
 

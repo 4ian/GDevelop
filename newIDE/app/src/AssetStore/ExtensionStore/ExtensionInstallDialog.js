@@ -1,5 +1,6 @@
 // @flow
 import { t, Trans } from '@lingui/macro';
+import { I18n } from '@lingui/react';
 import React from 'react';
 import Dialog, { DialogPrimaryButton } from '../../UI/Dialog';
 import FlatButton from '../../UI/FlatButton';
@@ -64,72 +65,77 @@ const ExtensionInstallDialog = ({
   } = extensionDetail;
 
   return (
-    <Dialog
-      title={extensionShortHeader.fullName}
-      id="install-extension-dialog"
-      actions={[
-        <FlatButton
-          key="close"
-          label={<Trans>Back</Trans>}
-          primary={false}
-          onClick={onClose}
-          disabled={isInstalling}
-        />,
-        onInstall ? (
-          <LeftLoader isLoading={isInstalling} key="install">
-            <DialogPrimaryButton
-              id="install-extension-button"
-              label={renderInstallButtonLabel()}
-              primary
-              onClick={onInstallExtension}
-              disabled={!canInstallExtension}
-            />
-          </LeftLoader>
-        ) : null,
-      ]}
-      // $FlowFixMe[incompatible-type]
-      secondaryActions={[
-        onEdit ? (
-          <FlatButton
-            key="edit-extension"
-            label={<Trans>Open in editor</Trans>}
-            onClick={onEdit}
+    <I18n>
+      {({ i18n }) => (
+        <Dialog
+          title={extensionShortHeader.fullName}
+          id="install-extension-dialog"
+          actions={[
+            <FlatButton
+              key="close"
+              label={<Trans>Back</Trans>}
+              primary={false}
+              onClick={onClose}
+              disabled={isInstalling}
+            />,
+            onInstall ? (
+              <LeftLoader isLoading={isInstalling} key="install">
+                <DialogPrimaryButton
+                  id="install-extension-button"
+                  label={renderInstallButtonLabel()}
+                  primary
+                  onClick={onInstallExtension}
+                  disabled={!canInstallExtension}
+                />
+              </LeftLoader>
+            ) : null,
+          ]}
+          // $FlowFixMe[incompatible-type]
+          secondaryActions={[
+            onEdit ? (
+              <FlatButton
+                key="edit-extension"
+                label={<Trans>Open in editor</Trans>}
+                onClick={onEdit}
+              />
+            ) : (
+              undefined
+            ),
+            isAlreadyInstalled ? (
+              <FlatButton
+                key="report-extension"
+                label={<Trans>Report an issue</Trans>}
+                onClick={() => onUserReportIssue()}
+              />
+            ) : (
+              undefined
+            ),
+            extensionHeader && extensionHeader.helpPath ? (
+              <HelpButton
+                key="help-button"
+                helpPagePath={extensionHeader.helpPath}
+                scopeName={i18n._(t`Extension`)}
+              />
+            ) : (
+              undefined
+            ),
+          ].filter(Boolean)}
+          open
+          maxWidth="sm"
+          cannotBeDismissed={isInstalling}
+          onRequestClose={onClose}
+          onApply={onInstall ? onInstallExtension : onClose}
+        >
+          <ExtensionDetailPanel
+            extensionShortHeader={extensionShortHeader}
+            isInstalling={isInstalling}
+            onInstall={onInstall}
+            extensionDetail={extensionDetail}
+            shouldDisplayButtons={false}
           />
-        ) : (
-          undefined
-        ),
-        isAlreadyInstalled ? (
-          <FlatButton
-            key="report-extension"
-            label={<Trans>Report an issue</Trans>}
-            onClick={() => onUserReportIssue()}
-          />
-        ) : (
-          undefined
-        ),
-        extensionHeader && extensionHeader.helpPath ? (
-          <HelpButton
-            key="help-button"
-            helpPagePath={extensionHeader.helpPath}
-          />
-        ) : (
-          undefined
-        ),
-      ].filter(Boolean)}
-      open
-      maxWidth="sm"
-      cannotBeDismissed={isInstalling}
-      onRequestClose={onClose}
-      onApply={onInstall ? onInstallExtension : onClose}
-    >
-      <ExtensionDetailPanel
-        extensionShortHeader={extensionShortHeader}
-        isInstalling={isInstalling}
-        onInstall={onInstall}
-        extensionDetail={extensionDetail}
-        shouldDisplayButtons={false}
-      />
-    </Dialog>
+        </Dialog>
+      )}
+    </I18n>
   );
 };
 

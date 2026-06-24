@@ -1,5 +1,6 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
+import { I18n } from '@lingui/react';
 
 import * as React from 'react';
 import RaisedButton from '../../UI/RaisedButton';
@@ -352,130 +353,149 @@ export class ExternalLayoutEditorContainer extends React.Component<
     );
 
     return (
-      <div style={styles.container}>
-        {layout && (
-          <SceneEditor
-            editorId={this.props.editorId}
-            gameEditorMode={this.props.gameEditorMode}
-            setGameEditorMode={this.props.setGameEditorMode}
-            onRestartInGameEditor={this.props.onRestartInGameEditor}
-            showRestartInGameEditorAfterErrorButton={
-              this.props.showRestartInGameEditorAfterErrorButton
-            }
-            setToolbar={this.props.setToolbar}
-            resourceManagementProps={this.props.resourceManagementProps}
-            unsavedChanges={this.props.unsavedChanges}
-            hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
-            ref={editor => (this.editor = editor)}
-            project={project}
-            projectScopedContainersAccessor={projectScopedContainersAccessor}
-            layout={layout}
-            externalLayout={externalLayout}
-            eventsFunctionsExtension={null}
-            eventsBasedObject={null}
-            eventsBasedObjectVariant={null}
-            globalObjectsContainer={project.getObjects()}
-            objectsContainer={layout.getObjects()}
-            layersContainer={layout.getLayers()}
-            initialInstances={externalLayout.getInitialInstances()}
-            getInitialInstancesEditorSettings={() =>
-              prepareInstancesEditorSettings(
-                serializeToJSObject(
-                  externalLayout.getAssociatedEditorSettings()
-                ),
-                Math.max(
-                  project.getGameResolutionWidth(),
-                  project.getGameResolutionHeight()
-                )
-              )
-            }
-            onOpenEvents={this.props.onOpenEvents}
-            onOpenMoreSettings={this.openExternalPropertiesDialog}
-            isActive={isActive}
-            previewDebuggerServer={this.props.previewDebuggerServer}
-            openBehaviorEvents={this.props.openBehaviorEvents}
-            onExtractAsExternalLayout={this.props.onExtractAsExternalLayout}
-            onExtractAsEventBasedObject={this.props.onExtractAsEventBasedObject}
-            onOpenEventBasedObjectEditor={
-              this.props.onOpenEventBasedObjectEditor
-            }
-            onOpenEventBasedObjectVariantEditor={
-              this.props.onOpenEventBasedObjectVariantEditor
-            }
-            onObjectEdited={(objectWithContext, hasResourceChanged) =>
-              this.props.onSceneObjectEdited(
-                layout,
-                objectWithContext,
-                hasResourceChanged
-              )
-            }
-            onObjectsDeleted={() => this.props.onSceneObjectsDeleted(layout)}
-            // It's only used to refresh events-based object variants.
-            onObjectGroupEdited={() => {}}
-            onObjectGroupsDeleted={() => {}}
-            // Nothing to do as events-based objects can't have external layout.
-            onEventsBasedObjectChildrenEdited={() => {}}
-            onWillInstallExtension={this.props.onWillInstallExtension}
-            onExtensionInstalled={this.props.onExtensionInstalled}
-            onDeleteEventsBasedObjectVariant={
-              this.props.onDeleteEventsBasedObjectVariant
-            }
-            onEffectAdded={this.props.onEffectAdded}
-            onObjectListsModified={this.props.onObjectListsModified}
-            triggerHotReloadInGameEditorIfNeeded={
-              this.props.triggerHotReloadInGameEditorIfNeeded
-            }
-          />
-        )}
-        {!layout && (
-          <Background>
-            <PlaceholderMessage>
-              <Text>
+      <I18n>
+        {({ i18n }) => (
+          <div style={styles.container}>
+            {layout && (
+              <SceneEditor
+                editorId={this.props.editorId}
+                gameEditorMode={this.props.gameEditorMode}
+                setGameEditorMode={this.props.setGameEditorMode}
+                onRestartInGameEditor={this.props.onRestartInGameEditor}
+                showRestartInGameEditorAfterErrorButton={
+                  this.props.showRestartInGameEditorAfterErrorButton
+                }
+                setToolbar={this.props.setToolbar}
+                resourceManagementProps={this.props.resourceManagementProps}
+                unsavedChanges={this.props.unsavedChanges}
+                hotReloadPreviewButtonProps={
+                  this.props.hotReloadPreviewButtonProps
+                }
+                ref={editor => (this.editor = editor)}
+                project={project}
+                projectScopedContainersAccessor={
+                  projectScopedContainersAccessor
+                }
+                layout={layout}
+                externalLayout={externalLayout}
+                eventsFunctionsExtension={null}
+                eventsBasedObject={null}
+                eventsBasedObjectVariant={null}
+                globalObjectsContainer={project.getObjects()}
+                objectsContainer={layout.getObjects()}
+                layersContainer={layout.getLayers()}
+                initialInstances={externalLayout.getInitialInstances()}
+                getInitialInstancesEditorSettings={() =>
+                  prepareInstancesEditorSettings(
+                    serializeToJSObject(
+                      externalLayout.getAssociatedEditorSettings()
+                    ),
+                    Math.max(
+                      project.getGameResolutionWidth(),
+                      project.getGameResolutionHeight()
+                    )
+                  )
+                }
+                onOpenEvents={this.props.onOpenEvents}
+                onOpenMoreSettings={this.openExternalPropertiesDialog}
+                isActive={isActive}
+                previewDebuggerServer={this.props.previewDebuggerServer}
+                openBehaviorEvents={this.props.openBehaviorEvents}
+                onExtractAsExternalLayout={this.props.onExtractAsExternalLayout}
+                onExtractAsEventBasedObject={
+                  this.props.onExtractAsEventBasedObject
+                }
+                onOpenEventBasedObjectEditor={
+                  this.props.onOpenEventBasedObjectEditor
+                }
+                onOpenEventBasedObjectVariantEditor={
+                  this.props.onOpenEventBasedObjectVariantEditor
+                }
+                onObjectEdited={(objectWithContext, hasResourceChanged) =>
+                  this.props.onSceneObjectEdited(
+                    layout,
+                    objectWithContext,
+                    hasResourceChanged
+                  )
+                }
+                onObjectsDeleted={() =>
+                  this.props.onSceneObjectsDeleted(layout)
+                }
+                // It's only used to refresh events-based object variants.
+                onObjectGroupEdited={() => {}}
+                onObjectGroupsDeleted={() => {}}
+                // Nothing to do as events-based objects can't have external layout.
+                onEventsBasedObjectChildrenEdited={() => {}}
+                onWillInstallExtension={this.props.onWillInstallExtension}
+                onExtensionInstalled={this.props.onExtensionInstalled}
+                onDeleteEventsBasedObjectVariant={
+                  this.props.onDeleteEventsBasedObjectVariant
+                }
+                onEffectAdded={this.props.onEffectAdded}
+                onObjectListsModified={this.props.onObjectListsModified}
+                triggerHotReloadInGameEditorIfNeeded={
+                  this.props.triggerHotReloadInGameEditorIfNeeded
+                }
+              />
+            )}
+            {!layout && (
+              <Background>
+                <PlaceholderMessage>
+                  <Text>
+                    <Trans>
+                      To edit the external layout, choose the scene in which it
+                      will be included
+                    </Trans>
+                  </Text>
+                  <Line justifyContent="center">
+                    <RaisedButton
+                      label={<Trans>Choose the scene</Trans>}
+                      primary
+                      onClick={this.openExternalPropertiesDialog}
+                    />
+                  </Line>
+                  <Line justifyContent="flex-start" noMargin>
+                    <TutorialButton
+                      tutorialId="Intermediate-externals"
+                      label={<Trans>Watch tutorial</Trans>}
+                      renderIfNotFound={
+                        <HelpButton
+                          helpPagePath="/interface/events-editor/external-events"
+                          scopeName={i18n._(t`External layouts`)}
+                        />
+                      }
+                    />
+                  </Line>
+                </PlaceholderMessage>
+              </Background>
+            )}
+            <ExternalPropertiesDialog
+              title={<Trans>Configure the external layout</Trans>}
+              helpTexts={[
                 <Trans>
-                  To edit the external layout, choose the scene in which it will
-                  be included
-                </Trans>
-              </Text>
-              <Line justifyContent="center">
-                <RaisedButton
-                  label={<Trans>Choose the scene</Trans>}
-                  primary
-                  onClick={this.openExternalPropertiesDialog}
-                />
-              </Line>
-              <Line justifyContent="flex-start" noMargin>
-                <TutorialButton
-                  tutorialId="Intermediate-externals"
-                  label={<Trans>Watch tutorial</Trans>}
-                  renderIfNotFound={
-                    <HelpButton helpPagePath="/interface/events-editor/external-events" />
-                  }
-                />
-              </Line>
-            </PlaceholderMessage>
-          </Background>
+                  In order to see your objects in the scene, you need to add an
+                  action "Create objects from external layout" in your events
+                  sheet.
+                </Trans>,
+                <Trans>
+                  You can also launch a preview from this external layout, but
+                  remember that it will still create objects from the scene, as
+                  well as trigger its events. Make sure to disable any action
+                  loading the external layout before doing so to avoid having
+                  duplicate objects!
+                </Trans>,
+              ]}
+              open={this.state.externalPropertiesDialogOpen}
+              project={project}
+              layoutName={this.getAssociatedLayoutName()}
+              onChoose={this.saveExternalProperties}
+              onClose={() =>
+                this.setState({ externalPropertiesDialogOpen: false })
+              }
+            />
+          </div>
         )}
-        <ExternalPropertiesDialog
-          title={<Trans>Configure the external layout</Trans>}
-          helpTexts={[
-            <Trans>
-              In order to see your objects in the scene, you need to add an
-              action "Create objects from external layout" in your events sheet.
-            </Trans>,
-            <Trans>
-              You can also launch a preview from this external layout, but
-              remember that it will still create objects from the scene, as well
-              as trigger its events. Make sure to disable any action loading the
-              external layout before doing so to avoid having duplicate objects!
-            </Trans>,
-          ]}
-          open={this.state.externalPropertiesDialogOpen}
-          project={project}
-          layoutName={this.getAssociatedLayoutName()}
-          onChoose={this.saveExternalProperties}
-          onClose={() => this.setState({ externalPropertiesDialogOpen: false })}
-        />
-      </div>
+      </I18n>
     );
   }
 }

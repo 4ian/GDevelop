@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react';
-import { Trans } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
+import { I18n } from '@lingui/react';
 import VariablesEditorDialog, {
   type VariableDialogOpeningProps,
 } from './VariablesEditorDialog';
@@ -105,30 +106,35 @@ const GlobalAndSceneVariablesDialog = ({
   );
 
   return (
-    <VariablesEditorDialog
-      projectScopedContainersAccessor={projectScopedContainersAccessor}
-      project={project}
-      open={open}
-      onCancel={onCancel}
-      onApply={onApply}
-      title={
-        layout ? (
-          <Trans>{layout.getName()} variables</Trans>
-        ) : (
-          <Trans>Extension variables</Trans>
-        )
-      }
-      // $FlowFixMe[incompatible-type]
-      tabs={tabs}
-      initiallyOpenTabId={
-        isGlobalTabInitiallyOpen ? 'global-variables' : 'scene-variables'
-      }
-      initiallySelectedVariable={initiallySelectedVariable}
-      helpPagePath={'/all-features/variables/scene-variables'}
-      hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
-      id="global-and-scene-variables-dialog"
-      isListLocked={isListLocked}
-    />
+    <I18n>
+      {({ i18n }) => (
+        <VariablesEditorDialog
+          projectScopedContainersAccessor={projectScopedContainersAccessor}
+          project={project}
+          open={open}
+          onCancel={onCancel}
+          onApply={onApply}
+          title={
+            layout ? (
+              <Trans>{layout.getName()} variables</Trans>
+            ) : (
+              <Trans>Extension variables</Trans>
+            )
+          }
+          // $FlowFixMe[incompatible-type]
+          tabs={tabs}
+          initiallyOpenTabId={
+            isGlobalTabInitiallyOpen ? 'global-variables' : 'scene-variables'
+          }
+          initiallySelectedVariable={initiallySelectedVariable}
+          helpPagePath={'/all-features/variables/scene-variables'}
+          scopeName={i18n._(t`Variables`)}
+          hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
+          id="global-and-scene-variables-dialog"
+          isListLocked={isListLocked}
+        />
+      )}
+    </I18n>
   );
 };
 

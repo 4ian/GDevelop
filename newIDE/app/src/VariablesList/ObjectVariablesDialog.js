@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react';
-import { Trans } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
+import { I18n } from '@lingui/react';
 import VariablesEditorDialog, {
   type VariableDialogOpeningProps,
 } from './VariablesEditorDialog';
@@ -55,23 +56,28 @@ const ObjectVariablesDialog = ({
   );
 
   return (
-    <VariablesEditorDialog
-      project={project}
-      projectScopedContainersAccessor={projectScopedContainersAccessor}
-      objectName={objectName}
-      initialInstances={initialInstances}
-      open={open}
-      onCancel={onCancel}
-      onApply={onApply}
-      title={<Trans>{objectName} variables</Trans>}
-      // $FlowFixMe[incompatible-type]
-      tabs={tabs}
-      initiallySelectedVariable={initiallySelectedVariable}
-      helpPagePath={'/all-features/variables/object-variables'}
-      hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
-      id="object-variables-dialog"
-      isListLocked={isListLocked}
-    />
+    <I18n>
+      {({ i18n }) => (
+        <VariablesEditorDialog
+          project={project}
+          projectScopedContainersAccessor={projectScopedContainersAccessor}
+          objectName={objectName}
+          initialInstances={initialInstances}
+          open={open}
+          onCancel={onCancel}
+          onApply={onApply}
+          title={<Trans>{objectName} variables</Trans>}
+          // $FlowFixMe[incompatible-type]
+          tabs={tabs}
+          initiallySelectedVariable={initiallySelectedVariable}
+          helpPagePath={'/all-features/variables/object-variables'}
+          scopeName={i18n._(t`Object variables`)}
+          hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
+          id="object-variables-dialog"
+          isListLocked={isListLocked}
+        />
+      )}
+    </I18n>
   );
 };
 

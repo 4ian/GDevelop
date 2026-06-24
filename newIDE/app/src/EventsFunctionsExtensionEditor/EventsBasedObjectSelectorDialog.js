@@ -1,5 +1,6 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
+import { I18n } from '@lingui/react';
 
 import * as React from 'react';
 import { type EventsBasedObjectCreationParameters } from '../EventsFunctionsList/EventsBasedObjectTreeViewItemContent';
@@ -52,56 +53,61 @@ export default function EventsBasedObjectSelectorDialog({
   onCancel,
 }: Props): React.Node {
   return (
-    <Dialog
-      title={<Trans>Choose a new object type</Trans>}
-      actions={[
-        <FlatButton
-          label={<Trans>Cancel</Trans>}
-          keyboardFocused={true}
-          onClick={onCancel}
-          key={'close'}
-        />,
-      ]}
-      secondaryActions={[
-        <HelpButton
-          key="help"
-          helpPagePath="/objects/custom-objects-prefab-template"
-        />,
-      ]}
-      open
-      onRequestClose={onCancel}
-      maxWidth="sm"
-    >
-      <List>
-        <FunctionListItem
-          icon={<Object2DIcon style={styles.icon} />}
-          name={<Trans>2D object</Trans>}
-          onChoose={() =>
-            onChoose({
-              isRenderedIn3D: false,
-            })
-          }
-          description={
-            <Trans>
-              An object that can be moved, rotated and scaled in 2D.
-            </Trans>
-          }
-        />
-        <FunctionListItem
-          icon={<Object3DIcon style={styles.icon} />}
-          name={<Trans>3D object</Trans>}
-          onChoose={() =>
-            onChoose({
-              isRenderedIn3D: true,
-            })
-          }
-          description={
-            <Trans>
-              An object that can be moved, rotated and scaled in 3D.
-            </Trans>
-          }
-        />
-      </List>
-    </Dialog>
+    <I18n>
+      {({ i18n }) => (
+        <Dialog
+          title={<Trans>Choose a new object type</Trans>}
+          actions={[
+            <FlatButton
+              label={<Trans>Cancel</Trans>}
+              keyboardFocused={true}
+              onClick={onCancel}
+              key={'close'}
+            />,
+          ]}
+          secondaryActions={[
+            <HelpButton
+              key="help"
+              helpPagePath="/objects/custom-objects-prefab-template"
+              scopeName={i18n._(t`Custom objects`)}
+            />,
+          ]}
+          open
+          onRequestClose={onCancel}
+          maxWidth="sm"
+        >
+          <List>
+            <FunctionListItem
+              icon={<Object2DIcon style={styles.icon} />}
+              name={<Trans>2D object</Trans>}
+              onChoose={() =>
+                onChoose({
+                  isRenderedIn3D: false,
+                })
+              }
+              description={
+                <Trans>
+                  An object that can be moved, rotated and scaled in 2D.
+                </Trans>
+              }
+            />
+            <FunctionListItem
+              icon={<Object3DIcon style={styles.icon} />}
+              name={<Trans>3D object</Trans>}
+              onChoose={() =>
+                onChoose({
+                  isRenderedIn3D: true,
+                })
+              }
+              description={
+                <Trans>
+                  An object that can be moved, rotated and scaled in 3D.
+                </Trans>
+              }
+            />
+          </List>
+        </Dialog>
+      )}
+    </I18n>
   );
 }

@@ -12,6 +12,7 @@ type PropsType = {
   helpPagePath: ?string,
   label?: React.Node,
   anchor?: string,
+  scopeName?: string,
 };
 
 /**
@@ -33,7 +34,14 @@ const HelpButton = (props: PropsType): null | React.Node => {
     <TextButton
       onClick={onClick}
       target="_blank"
-      label={props.label || <Trans>Help</Trans>}
+      label={
+        props.label ||
+        (props.scopeName ? (
+          <Trans>See {props.scopeName}</Trans>
+        ) : (
+          <Trans>Help</Trans>
+        ))
+      }
       icon={<Help />}
     />
   ) : (

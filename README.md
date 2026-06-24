@@ -9,79 +9,159 @@
 **编辑期数据模型 -> IDE/元数据/作用域 -> GDJS code generation -> Runtime 执行模型**。
 
 ```mermaid
-flowchart TB
-  subgraph A["编辑期数据模型 Core/GDCore/Project"]
-    P["gd::Project<br/>全局变量/资源/全局对象/Scenes/Extensions"]
-    L["gd::Layout Scene<br/>ObjectsContainer<br/>InitialInstancesContainer<br/>EventsList<br/>Variables<br/>Layers<br/>BehaviorSharedData"]
-    O["gd::Object / ObjectConfiguration<br/>type + variables + behaviors + effects"]
-    I["gd::InitialInstance<br/>objectName + transform/layer/zOrder<br/>initialVariables<br/>behaviorOverridings"]
-    EXT["gd::EventsFunctionsExtension<br/>free functions<br/>events-based behaviors<br/>events-based objects(prefabs)<br/>extension variables"]
-    FN["gd::EventsFunction<br/>Action / Condition / Expression<br/>parameters + events + return value"]
-    EBB["gd::EventsBasedBehavior<br/>properties/shared properties<br/>methods/lifecycle events<br/>optional required Behavior properties"]
-    EBO["gd::EventsBasedObject<br/>Custom Object / Prefab type<br/>properties + methods<br/>default variant + variants"]
-    VAR["gd::EventsBasedObjectVariant<br/>child ObjectsContainer<br/>child InitialInstances<br/>layers + inner area"]
+flowchart LR
+  APP["GDevelop project<br/>.json/.json folder project<br/>game configuration + authored content"]
+
+  subgraph IDE["Editor concepts in newIDE"]
+    PM["Project Manager<br/>resources, extensions, scenes"]
+    SE["Scene Editor<br/>place instances, layers, cameras"]
+    EE["Events Editor<br/>conditions/actions/expressions<br/>object picking"]
+    OE["Object Editor<br/>object variables, effects, behaviors"]
+    EXTE["Extension Editor<br/>functions, behaviors, prefabs"]
   end
 
-  subgraph B["IDE / 元数据 / 作用域"]
-    META["MetadataDeclarationHelper<br/>把 extension functions 暴露成<br/>actions / conditions / expressions<br/>object metadata / behavior metadata"]
-    SCOPE["ProjectScopedContainers<br/>决定事件里可见的 objects/variables/properties/resources/parameters"]
-    PICKDOC["Object picking model<br/>picked object lists are scoped per event/sub-event"]
+  subgraph CORE["Core data model in Core/GDCore/Project"]
+    PROJ["gd::Project<br/>global variables<br/>resources<br/>global objects<br/>layouts/scenes<br/>events functions extensions"]
+
+    subgraph SCENE["Scene / gd::Layout"]
+      LAY["Layers + cameras"]
+      SV["Scene variables"]
+      SO["Scene object definitions<br/>gd::ObjectsContainer"]
+      SI["Initial instances<br/>gd::InitialInstancesContainer"]
+      EVL["Scene events<br/>gd::EventsList"]
+      BSD["Behavior shared data<br/>per scene"]
+    end
+
+    subgraph OBJMODEL["Object model"]
+      OBJ["gd::Object / ObjectConfiguration<br/>object type<br/>object variables<br/>effects<br/>behaviors list"]
+      INST["gd::InitialInstance<br/>objectName<br/>x/y/z, angle, layer, zOrder<br/>initial variables<br/>behaviorOverridings"]
+      BEHCFG["gd::Behavior<br/>behavior type<br/>behavior name<br/>properties"]
+      SHARED["gd::BehaviorsSharedData<br/>shared per behavior type/name"]
+    end
+
+    subgraph EXTMODEL["Extension model"]
+      EXT["gd::EventsFunctionsExtension<br/>namespace/name/version<br/>dependencies<br/>extension global/scene variables"]
+      FREEFN["Free EventsFunction<br/>custom action/condition/expression"]
+      EBB["EventsBasedBehavior<br/>custom behavior type<br/>properties + shared properties<br/>methods + lifecycle"]
+      EBO["EventsBasedObject<br/>custom object / prefab type<br/>properties + methods<br/>default variant + variants"]
+      FN["gd::EventsFunction<br/>parameters<br/>events<br/>return value for condition/expression"]
+    end
+
+    subgraph PREFAB["Prefab / Custom Object internals"]
+      VAR["EventsBasedObjectVariant<br/>variant name<br/>inner area<br/>child layers"]
+      CHOBJ["Child object definitions<br/>variant ObjectsContainer"]
+      CHINST["Child initial instances<br/>variant InitialInstancesContainer"]
+      OBJMETHOD["Object methods<br/>onCreated, doStepPostEvents,<br/>actions, conditions, expressions"]
+    end
   end
 
-  subgraph C["编译期 GDJS/GDJS/Events/CodeGeneration"]
-    ECG["EventsCodeGenerator<br/>scene events / free function / behavior method / object method"]
-    CTX["eventsFunctionContext<br/>_objectsMap<br/>_objectArraysMap<br/>_behaviorNamesMap<br/>localVariables<br/>createObject/getObjects/getBehaviorName"]
-    OCG["ObjectCodeGenerator<br/>EventsBasedObject -> JS CustomRuntimeObject subclass"]
-    BCG["BehaviorCodeGenerator<br/>EventsBasedBehavior -> JS RuntimeBehavior subclass"]
+  subgraph IDECORE["IDE analysis / metadata / scope"]
+    META["MetadataDeclarationHelper<br/>declares actions/conditions/expressions<br/>declares object + behavior metadata"]
+    PSC["ProjectScopedContainers<br/>which objects, variables, properties,<br/>resources and parameters are visible"]
+    PICK["Object picking<br/>picked object lists<br/>scoped to event and sub-events"]
+    VALID["Validators / completion / refactorers<br/>InstructionValidator<br/>ExpressionValidator<br/>EventsContextAnalyzer"]
   end
 
-  subgraph D["运行时 GDJS/Runtime"]
-    RG["gdjs.RuntimeGame<br/>game data/resources/extensions/scene stack"]
-    RS["gdjs.RuntimeScene<br/>extends RuntimeInstanceContainer<br/>scene vars/layers/timers/onceTriggers"]
-    RIC["RuntimeInstanceContainer<br/>registered objectData + constructors<br/>_instances<br/>createObject/createObjectsFrom"]
-    RO["RuntimeObject<br/>position/layer/zOrder/variables/effects<br/>_behaviors + lifecycle"]
-    RB["RuntimeBehavior<br/>owner object<br/>properties/sharedData<br/>doStep/onCreated/onDestroy"]
-    CRO["CustomRuntimeObject<br/>a RuntimeObject that owns child container<br/>runs prefab object events/methods"]
-    CCONT["CustomRuntimeObjectInstanceContainer<br/>child object definitions<br/>child instances<br/>custom-object layers"]
-    RENDER["Renderer layer<br/>Pixi/Three renderers<br/>layers/cameras/effects"]
+  subgraph CODEGEN["GDJS code generation"]
+    ECG["EventsCodeGenerator<br/>turns EventsList into JS functions"]
+    FCTX["eventsFunctionContext<br/>_objectsMap<br/>_objectArraysMap<br/>_behaviorNamesMap<br/>localVariables<br/>getObjects/createObject/getBehaviorName"]
+    FCG["EventsFunctionsExtensionCodeGenerator<br/>free functions"]
+    BCG["BehaviorCodeGenerator<br/>EventsBasedBehavior -> RuntimeBehavior subclass"]
+    OCG["ObjectCodeGenerator<br/>EventsBasedObject -> CustomRuntimeObject subclass"]
+    OUT["Generated JS game code<br/>scene event functions<br/>extension functions<br/>object/behavior classes"]
   end
 
-  P --> L
-  P --> EXT
-  L --> O
-  L --> I
-  I -.references objectName.-> O
-  O --> RB
-  EXT --> FN
+  subgraph RUNTIME["Runtime model in GDJS/Runtime"]
+    RG["gdjs.RuntimeGame<br/>game data<br/>resource managers<br/>extension variables<br/>scene stack"]
+    RS["gdjs.RuntimeScene<br/>runtime scene variables<br/>timers/onceTriggers<br/>layers/cameras"]
+    RIC["RuntimeInstanceContainer<br/>registered object data<br/>constructors cache<br/>living instances<br/>createObject/createObjectsFrom"]
+    RO["gdjs.RuntimeObject<br/>runtime position/layer/zOrder<br/>variables/effects<br/>lifecycle<br/>behavior instances"]
+    RB["gdjs.RuntimeBehavior<br/>owner object<br/>properties/shared data<br/>pre/post events lifecycle"]
+    CRO["gdjs.CustomRuntimeObject<br/>prefab object instance<br/>has its own child container<br/>runs object methods/events"]
+    CC["CustomRuntimeObjectInstanceContainer<br/>child registered objects<br/>child runtime instances<br/>child layers"]
+    REN["Renderer layer<br/>PixiJS 2D<br/>Three.js 3D<br/>effects/cameras"]
+  end
+
+  APP --> PM
+  APP --> PROJ
+  PM --> PROJ
+  SE --> SO
+  SE --> SI
+  SE --> LAY
+  EE --> EVL
+  OE --> OBJ
+  EXTE --> EXT
+
+  PROJ --> SO
+  PROJ --> SI
+  PROJ --> SV
+  PROJ --> LAY
+  PROJ --> EVL
+  PROJ --> BSD
+  PROJ --> EXT
+  LAY --> RS
+  SV --> RS
+  SO --> OBJ
+  SO --> RIC
+  SI --> INST
+  INST -.->|references objectName| OBJ
+  OBJ --> BEHCFG
+  BSD --> SHARED
+  BEHCFG --> SHARED
+
+  EXT --> FREEFN
   EXT --> EBB
   EXT --> EBO
+  FREEFN --> FN
   EBB --> FN
   EBO --> FN
   EBO --> VAR
-  VAR --> O
-  VAR --> I
+  EBO --> OBJMETHOD
+  OBJMETHOD --> FN
+  VAR --> CHOBJ
+  VAR --> CHINST
+  CHINST -.->|references child object| CHOBJ
 
-  A --> META
-  A --> SCOPE
-  META --> ECG
-  SCOPE --> ECG
-  ECG --> CTX
-  ECG --> OCG
-  ECG --> BCG
+  PROJ --> META
+  EXT --> META
+  PROJ --> PSC
+  META --> EE
+  META --> OE
+  META --> EXTE
+  PSC --> VALID
+  EE --> PICK
+  PICK --> ECG
+  VALID --> EE
 
-  OCG --> CRO
-  BCG --> RB
-  P --> RG
+  EVL --> ECG
+  FN --> ECG
+  PSC --> ECG
+  ECG --> FCTX
+  FREEFN --> FCG
+  EBB --> BCG
+  EBO --> OCG
+  FCG --> OUT
+  BCG --> OUT
+  OCG --> OUT
+  ECG --> OUT
+
+  PROJ --> RG
+  OUT --> RG
   RG --> RS
   RS --> RIC
   RIC --> RO
+  OBJ --> RIC
+  INST --> RIC
   RO --> RB
-  RO --> CRO
-  CRO --> CCONT
-  CCONT --> RIC
-  RO --> RENDER
-  RS --> RENDER
-  CTX --> RIC
+  BEHCFG --> RB
+  EBO --> CRO
+  CRO --> CC
+  CC --> RIC
+  CHOBJ --> CC
+  CHINST --> CC
+  FCTX --> RIC
+  RO --> REN
+  RS --> REN
 ```
 
 运行时一帧的高层执行路径：

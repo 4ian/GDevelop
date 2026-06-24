@@ -283,6 +283,27 @@ TEST_CASE("BehaviorSerialization", "[common]") {
                 .at("MyProperty")
                 .GetValue() == "654321");
 
+    auto &objectWithExistingBehavior = layout.GetObjects().InsertNewObject(
+        readProject, "MyOtherEventsExtension::MyEventsBasedObject",
+        "PrefabInstanceWithExistingBehavior", 1);
+    objectWithExistingBehavior.RemoveBehavior("MyPrefabBehavior");
+    objectWithExistingBehavior.AddNewBehavior(
+        readProject, "MyEventsExtension::MyEventsBasedBehavior",
+        "MyPrefabBehavior");
+
+    REQUIRE(objectWithExistingBehavior.GetBehavior("MyPrefabBehavior")
+                .GetProperties()
+                .at("MyProperty")
+                .GetValue() == "0");
+
+    readProject.EnsureObjectInheritedBehaviors(objectWithExistingBehavior);
+    REQUIRE(objectWithExistingBehavior.GetBehavior("MyPrefabBehavior")
+                .IsInheritedFromObjectType());
+    REQUIRE(objectWithExistingBehavior.GetBehavior("MyPrefabBehavior")
+                .GetProperties()
+                .at("MyProperty")
+                .GetValue() == "123456");
+
     readEventsBasedObject.RemoveBehavior("MyPrefabBehavior");
     readProject.EnsureObjectInheritedBehaviors(object);
     REQUIRE(!object.HasBehaviorNamed("MyPrefabBehavior"));

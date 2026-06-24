@@ -98,6 +98,13 @@ type PrefabPropertySelection = {|
   isSharedProperties: boolean,
 |};
 type PrefabSettingsTab = 'configuration' | 'properties' | 'behaviors';
+type PrefabBehaviorPropertiesSnapshot = { [propertyName: string]: string };
+type PrefabBehaviorSnapshot = {
+  [behaviorName: string]: {|
+    type: string,
+    properties: PrefabBehaviorPropertiesSnapshot,
+  |},
+};
 
 const styles = {
   centeredContent: {
@@ -207,6 +214,9 @@ export default class PrefabDetailEditor extends React.Component<Props, State> {
   _prefabBehaviorEditorObjectsContainer: gdObjectsContainer = new gd.ObjectsContainer(
     gd.ObjectsContainer.Unknown
   );
+  _prefabBehaviorSnapshotsByObjectType: {
+    [objectType: string]: PrefabBehaviorSnapshot,
+  } = {};
   _parameterVariablesContainer: gdVariablesContainer = new gd.VariablesContainer(
     gd.VariablesContainer.Parameters
   );
@@ -622,7 +632,211 @@ export default class PrefabDetailEditor extends React.Component<Props, State> {
     this.forceUpdate();
   };
 
+  _getPrefabObjectType = (): string =>
+    gd.PlatformExtension.getObjectFullType(
+      this.props.eventsFunctionsExtension.getName(),
+      this.props.eventsBasedObject.getName()
+    );
+
+  _makePrefabBehaviorSnapshot = (
+    eventsBasedObject: gdEventsBasedObject
+  ): PrefabBehaviorSnapshot => {
+    const snapshot: PrefabBehaviorSnapshot = {};
+    eventsBasedObject
+      .getAllBehaviorNames()
+      .toJSArray()
+      .forEach(behaviorName => {
+        const behavior = eventsBasedObject.getBehavior(behaviorName);
+        const properties = behavior.getProperties();
+        const propertySnapshot: PrefabBehaviorPropertiesSnapshot = {};
+        properties
+          .keys()
+          .toJSArray()
+          .forEach(propertyName => {
+            propertySnapshot[propertyName] = properties
+              .get(propertyName)
+              .getValue();
+          });
+        snapshot[behaviorName] = {
+          type: behavior.getTypeName(),
+          properties: propertySnapshot,
+        };
+      });
+
+    return snapshot;
+  };
+
+  _isBehaviorInheritedFromObjectType = (behavior: gdBehavior): boolean => {
+    try {
+      return behavior.isInheritedFromObjectType();
+    } catch (error) {
+      return false;
+    }
+  };
+
+  _syncObjectInheritedBehaviorProperties = (
+    object: gdObject,
+    previousSnapshot: PrefabBehaviorSnapshot,
+    nextSnapshot: PrefabBehaviorSnapshot
+  ): boolean => {
+    const { project } = this.props;
+    let hasObjectChanged = false;
+
+    const behaviorSignatureBefore = object
+      .getAllBehaviorNames()
+      .toJSArray()
+      .map(behaviorName => {
+        const behavior = object.getBehavior(behaviorName);
+        return `${behaviorName}:${behavior.getTypeName()}:${this._isBehaviorInheritedFromObjectType(
+          behavior
+        ).toString()}`;
+      })
+      .join('\n');
+    project.ensureObjectInheritedBehaviors(object);
+    const behaviorSignatureAfter = object
+      .getAllBehaviorNames()
+      .toJSArray()
+      .map(behaviorName => {
+        const behavior = object.getBehavior(behaviorName);
+        return `${behaviorName}:${behavior.getTypeName()}:${this._isBehaviorInheritedFromObjectType(
+          behavior
+        ).toString()}`;
+      })
+      .join('\n');
+    if (behaviorSignatureBefore !== behaviorSignatureAfter) {
+      hasObjectChanged = true;
+    }
+
+    Object.keys(nextSnapshot).forEach(behaviorName => {
+      if (!object.hasBehaviorNamed(behaviorName)) return;
+
+      const behavior = object.getBehavior(behaviorName);
+      if (!this._isBehaviorInheritedFromObjectType(behavior)) return;
+
+      const nextBehaviorSnapshot = nextSnapshot[behaviorName];
+      if (behavior.getTypeName() !== nextBehaviorSnapshot.type) return;
+
+      const previousBehaviorSnapshot = previousSnapshot[behaviorName];
+      if (
+        !previousBehaviorSnapshot ||
+        previousBehaviorSnapshot.type !== nextBehaviorSnapshot.type
+      ) {
+        return;
+      }
+
+      const behaviorProperties = behavior.getProperties();
+      const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
+        gd.JsPlatform.get(),
+        behavior.getTypeName()
+      );
+      const behaviorDefaultProperties = gd.MetadataProvider.isBadBehaviorMetadata(
+        behaviorMetadata
+      )
+        ? null
+        : behaviorMetadata.getProperties();
+      Object.keys(nextBehaviorSnapshot.properties).forEach(propertyName => {
+        if (!behaviorProperties.has(propertyName)) return;
+
+        const previousPropertyValue =
+          previousBehaviorSnapshot.properties[propertyName];
+        const currentObjectPropertyValue = behaviorProperties
+          .get(propertyName)
+          .getValue();
+        const defaultPropertyValue =
+          behaviorDefaultProperties &&
+          behaviorDefaultProperties.has(propertyName)
+            ? behaviorDefaultProperties.get(propertyName).getValue()
+            : undefined;
+
+        if (
+          previousPropertyValue === undefined ||
+          currentObjectPropertyValue === previousPropertyValue ||
+          currentObjectPropertyValue === defaultPropertyValue
+        ) {
+          behavior.updateProperty(
+            propertyName,
+            nextBehaviorSnapshot.properties[propertyName]
+          );
+          hasObjectChanged = true;
+        }
+      });
+    });
+
+    return hasObjectChanged;
+  };
+
+  _syncObjectsContainerInheritedBehaviorProperties = (
+    objectType: string,
+    previousSnapshot: PrefabBehaviorSnapshot,
+    nextSnapshot: PrefabBehaviorSnapshot,
+    objectsContainer: gdObjectsContainer
+  ): boolean => {
+    let hasChanged = false;
+    for (let i = 0; i < objectsContainer.getObjectsCount(); i++) {
+      const object = objectsContainer.getObjectAt(i);
+      if (object.getType() !== objectType) continue;
+
+      hasChanged =
+        this._syncObjectInheritedBehaviorProperties(
+          object,
+          previousSnapshot,
+          nextSnapshot
+        ) || hasChanged;
+    }
+
+    return hasChanged;
+  };
+
+  _syncProjectObjectsInheritedBehaviorProperties = (
+    objectType: string,
+    previousSnapshot: PrefabBehaviorSnapshot,
+    nextSnapshot: PrefabBehaviorSnapshot
+  ): boolean => {
+    const { project } = this.props;
+    let hasChanged = false;
+
+    hasChanged =
+      this._syncObjectsContainerInheritedBehaviorProperties(
+        objectType,
+        previousSnapshot,
+        nextSnapshot,
+        project.getObjects()
+      ) || hasChanged;
+    for (let i = 0; i < project.getLayoutsCount(); i++) {
+      hasChanged =
+        this._syncObjectsContainerInheritedBehaviorProperties(
+          objectType,
+          previousSnapshot,
+          nextSnapshot,
+          project.getLayoutAt(i).getObjects()
+        ) || hasChanged;
+    }
+    hasChanged =
+      this._syncObjectsContainerInheritedBehaviorProperties(
+        objectType,
+        previousSnapshot,
+        nextSnapshot,
+        this._prefabBehaviorEditorObjectsContainer
+      ) || hasChanged;
+
+    return hasChanged;
+  };
+
   _onPrefabBehaviorsUpdated = () => {
+    const objectType = this._getPrefabObjectType();
+    const previousSnapshot =
+      this._prefabBehaviorSnapshotsByObjectType[objectType] || {};
+    const nextSnapshot = this._makePrefabBehaviorSnapshot(
+      this.props.eventsBasedObject
+    );
+
+    this._syncProjectObjectsInheritedBehaviorProperties(
+      objectType,
+      previousSnapshot,
+      nextSnapshot
+    );
+    this._prefabBehaviorSnapshotsByObjectType[objectType] = nextSnapshot;
+
     if (this.props.unsavedChanges) {
       this.props.unsavedChanges.triggerUnsavedChanges();
     }
@@ -782,6 +996,27 @@ export default class PrefabDetailEditor extends React.Component<Props, State> {
   };
 
   _openPrefabDetailsDialog = (_eventsBasedObject?: ?gdEventsBasedObject) => {
+    const objectType = this._getPrefabObjectType();
+    const prefabBehaviorSnapshot = this._makePrefabBehaviorSnapshot(
+      this.props.eventsBasedObject
+    );
+    const hasSyncedExistingObjects = this._syncProjectObjectsInheritedBehaviorProperties(
+      objectType,
+      prefabBehaviorSnapshot,
+      prefabBehaviorSnapshot
+    );
+    this._prefabBehaviorSnapshotsByObjectType[
+      objectType
+    ] = prefabBehaviorSnapshot;
+    if (hasSyncedExistingObjects) {
+      if (this.props.unsavedChanges) {
+        this.props.unsavedChanges.triggerUnsavedChanges();
+      }
+      if (this.props.onObjectEdited) {
+        this.props.onObjectEdited();
+      }
+    }
+
     this.setState(
       {
         prefabDetailsDialogOpen: true,
@@ -854,10 +1089,7 @@ export default class PrefabDetailEditor extends React.Component<Props, State> {
     const prefabDetailsProjectScopedContainersAccessor = prefabDetailsDialogOpen
       ? this._makePrefabDetailsProjectScopedContainersAccessor()
       : null;
-    const prefabObjectType = gd.PlatformExtension.getObjectFullType(
-      eventsFunctionsExtension.getName(),
-      eventsBasedObject.getName()
-    );
+    const prefabObjectType = this._getPrefabObjectType();
     const prefabBehaviorEditorObject = prefabDetailsDialogOpen
       ? this._getPrefabBehaviorEditorObject(prefabObjectType)
       : null;

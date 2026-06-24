@@ -98,11 +98,26 @@ void Project::EnsureObjectInheritedBehaviors(gd::Object& object) const {
   for (const auto& behaviorName : eventsBasedObject.GetAllBehaviorNames()) {
     const auto& inheritedBehavior = eventsBasedObject.GetBehavior(behaviorName);
     const auto& inheritedBehaviorType = inheritedBehavior.GetTypeName();
+    auto copyInheritedBehaviorConfiguration = [&inheritedBehavior](
+                                                  gd::Behavior& behavior) {
+      behavior.UnserializeFrom(inheritedBehavior.GetContent());
+      behavior.SetFolded(inheritedBehavior.IsFolded());
+      behavior.SetQuickCustomizationVisibility(
+          inheritedBehavior.GetQuickCustomizationVisibility());
+      behavior.GetPropertiesQuickCustomizationVisibilities() =
+          inheritedBehavior.GetPropertiesQuickCustomizationVisibilities();
+      behavior.SetDefaultBehavior(false);
+      behavior.SetInheritedFromObjectType(true);
+    };
 
     if (object.HasBehaviorNamed(behaviorName)) {
       auto& behavior = object.GetBehavior(behaviorName);
       if (behavior.GetTypeName() == inheritedBehaviorType) {
-        behavior.SetInheritedFromObjectType(true);
+        if (!behavior.IsInheritedFromObjectType()) {
+          copyInheritedBehaviorConfiguration(behavior);
+        } else {
+          behavior.SetInheritedFromObjectType(true);
+        }
         continue;
       }
 
@@ -127,13 +142,7 @@ void Project::EnsureObjectInheritedBehaviors(gd::Object& object) const {
                      inheritedBehaviorType);
       continue;
     }
-    behavior->UnserializeFrom(inheritedBehavior.GetContent());
-    behavior->SetFolded(inheritedBehavior.IsFolded());
-    behavior->SetQuickCustomizationVisibility(
-        inheritedBehavior.GetQuickCustomizationVisibility());
-    behavior->GetPropertiesQuickCustomizationVisibilities() =
-        inheritedBehavior.GetPropertiesQuickCustomizationVisibilities();
-    behavior->SetInheritedFromObjectType(true);
+    copyInheritedBehaviorConfiguration(*behavior);
   }
 }
 

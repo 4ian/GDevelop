@@ -669,6 +669,7 @@ export class Project extends EmscriptenObject {
   getEventsBasedBehavior(type: string): EventsBasedBehavior;
   hasEventsBasedObject(type: string): boolean;
   getEventsBasedObject(type: string): EventsBasedObject;
+  ensureObjectInheritedBehaviors(objectToUpdate: gdObject): void;
   getVariables(): VariablesContainer;
   getObjects(): ObjectsContainer;
   getResourcesManager(): ResourcesContainer;

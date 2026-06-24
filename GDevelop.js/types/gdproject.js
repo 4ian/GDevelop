@@ -111,6 +111,7 @@ declare class gdProject {
   getEventsBasedBehavior(type: string): gdEventsBasedBehavior;
   hasEventsBasedObject(type: string): boolean;
   getEventsBasedObject(type: string): gdEventsBasedObject;
+  ensureObjectInheritedBehaviors(objectToUpdate: gdObject): void;
   getVariables(): gdVariablesContainer;
   getObjects(): gdObjectsContainer;
   getResourcesManager(): gdResourcesContainer;

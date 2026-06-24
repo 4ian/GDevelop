@@ -681,6 +681,7 @@ interface Project {
     [Ref] EventsBasedBehavior GetEventsBasedBehavior([Const] DOMString type);
     boolean HasEventsBasedObject([Const] DOMString type);
     [Ref] EventsBasedObject GetEventsBasedObject([Const] DOMString type);
+    void EnsureObjectInheritedBehaviors([Ref] gdObject objectToUpdate);
 
     [Ref] VariablesContainer GetVariables();
     [Ref] ObjectsContainer GetObjects();

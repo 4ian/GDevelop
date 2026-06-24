@@ -61,14 +61,6 @@ const gd: libGDevelop = global.gd;
 // completes, to prevent it from flashing on fast calls.
 const REFRESH_LIMITS_SETTLE_DELAY_MS = 200;
 
-// Maximum number of times we will automatically process function calls for a
-// single AI request before pausing it. This is a (deliberately high) safety
-// backstop against a runaway agent loop on the client: a healthy request
-// finishes in far fewer rounds, while a loop would otherwise keep
-// auto-resubmitting indefinitely. When exceeded, the request is suspended so
-// the user can redirect it.
-const MAX_AUTOMATIC_FUNCTION_CALL_ROUNDS = 60;
-
 /**
  * Wraps `onRefreshLimits` with a loading state and a short settle delay so
  * the "Calculating..." indicator doesn't flash on fast network calls.
@@ -345,17 +337,6 @@ export const useProcessFunctionCalls = ({
   // "<requestId>:<callId>" so a call that is already being processed is
   // never started a second time.
   const inFlightFunctionCallIdsRef = React.useRef<Set<string>>(new Set());
-
-  // Backstop against a runaway agent loop on the client side. We count how many
-  // times we have automatically processed function calls for a given request
-  // and stop auto-processing once it goes past a (high) threshold. The backend
-  // also has a guard that stops requests repeating the *same* tool call; this
-  // client-side counter additionally covers "drift" loops (many slightly
-  // different calls) that the backend's identical-call detector cannot catch.
-  // Keyed by aiRequest.id.
-  const automaticFunctionCallRoundsRef = React.useRef<Map<string, number>>(
-    new Map()
-  );
 
   // When auto-edit is off, the user approves edits one batch at a time. Once a
   // batch is approved we remember it here so the rest of that edit agent's
@@ -661,36 +642,6 @@ export const useProcessFunctionCalls = ({
       (async () => {
         for (const { aiRequest, functionCalls } of allFunctionCallsToProcess) {
           if (aiRequest.status === 'suspended') continue;
-
-          // Backstop against a runaway loop: stop auto-processing this request
-          // once it has gone through too many automatic rounds, and suspend it
-          // (the parent orchestrator if this is a sub-agent) so the user can
-          // redirect instead of letting it loop forever.
-          const previousRounds =
-            automaticFunctionCallRoundsRef.current.get(aiRequest.id) || 0;
-          if (previousRounds >= MAX_AUTOMATIC_FUNCTION_CALL_ROUNDS) {
-            console.warn(
-              `AI request ${
-                aiRequest.id
-              } reached the maximum number of automatic function call rounds (${MAX_AUTOMATIC_FUNCTION_CALL_ROUNDS}). Pausing it to avoid a loop.`
-            );
-            const requestToSuspendId =
-              aiRequest.parentAiRequestId || aiRequest.id;
-            try {
-              await suspendAiRequest(requestToSuspendId);
-            } catch (error) {
-              console.error(
-                `Could not suspend AI request ${requestToSuspendId} after reaching the maximum number of automatic function call rounds.`,
-                error
-              );
-            }
-            continue;
-          }
-          automaticFunctionCallRoundsRef.current.set(
-            aiRequest.id,
-            previousRounds + 1
-          );
-
           console.info(
             `Automatically processing AI function calls for request ${
               aiRequest.id
@@ -700,7 +651,7 @@ export const useProcessFunctionCalls = ({
         }
       })();
     },
-    [onProcessFunctionCalls, allFunctionCallsToProcess, suspendAiRequest]
+    [onProcessFunctionCalls, allFunctionCallsToProcess]
   );
 
   return {

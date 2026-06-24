@@ -34,6 +34,8 @@ import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/Even
 
 const gd: libGDevelop = global.gd;
 
+const noop = () => {};
+
 type Props = {|
   open: boolean,
   layout: gdLayout,
@@ -160,30 +162,24 @@ const ScenePropertiesDialog = ({
         behaviorTypeName
       );
 
-      const properties = behaviorSharedData.getProperties();
-      const propertiesSchema = propertiesMapToSchema({
-        properties,
-        defaultValueProperties: behaviorMetadata
-          ? behaviorMetadata.getSharedProperties()
-          : null,
-        getPropertyValue: (sharedDataContent, name) =>
-          behaviorSharedData
-            .getProperties()
-            .get(name)
-            .getValue(),
-        onUpdateProperty: (sharedDataContent, name, value) => {
-          behaviorSharedData.updateProperty(name, value);
-        },
-        layersContainer: layout.getLayers(),
-        shouldDisabledFieldsWithMixedValues: false,
-      });
+      const isEmpty =
+        propertiesMapToSchema({
+          properties: behaviorSharedData.getProperties(),
+          defaultValueProperties: behaviorMetadata
+            ? behaviorMetadata.getSharedProperties()
+            : null,
+          getPropertyValue: () => '',
+          onUpdateProperty: noop,
+          layersContainer: null,
+          shouldDisabledFieldsWithMixedValues: false,
+        }).length === 0;
       const tutorialIds = getBehaviorTutorialIds(behaviorTypeName);
       // TODO Make this a functional component to use PreferencesContext
       const enabledTutorialIds: Array<string> = [];
       const iconUrl = behaviorMetadata.getIconFilename();
 
       return (
-        !!propertiesSchema.length && (
+        !isEmpty && (
           <Accordion
             key={behaviorName}
             defaultExpanded

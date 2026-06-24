@@ -206,7 +206,7 @@ export type ResourceManagementProps = {|
   canInstallPrivateAsset: () => boolean,
   onNewResourcesAdded: () => void,
   onResourceUsageChanged: () => void,
-  resourcePropertiesSchema: Array<ResourcePropertyConfig>,
+  resourcePropertyConfigs: Array<ResourcePropertyConfig>,
 |};
 
 export type ResourceStoreChooserProps = {|

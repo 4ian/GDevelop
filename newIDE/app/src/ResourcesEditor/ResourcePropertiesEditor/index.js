@@ -46,7 +46,7 @@ export type ResourcePropertiesEditorInterface = {| forceUpdate: () => void |};
 const coerceToBoolean = (value: ?CustomPropertyValue): boolean =>
   value === true || value === 'true' || value === 1;
 
-const coerceToNumber = (value: ?CustomPropertyValue): number | null => {
+const coerceToNumberOrNull = (value: ?CustomPropertyValue): number | null => {
   if (value == null || value === '') return null;
   const numberValue = Number(value);
   return Number.isNaN(numberValue) ? null : numberValue;
@@ -76,7 +76,8 @@ const buildCustomPropertyField = (
       getLabel,
       getDescription,
       valueType: 'number',
-      getValue: (resource: gdResource) => coerceToNumber(readValue(resource)),
+      getValue: (resource: gdResource) =>
+        coerceToNumberOrNull(readValue(resource)),
       setValue,
     };
   }
@@ -103,11 +104,11 @@ const buildCustomPropertyField = (
 };
 
 const buildCustomPropertiesSchema = (
-  resourcePropertiesSchema: Array<ResourcePropertyConfig>,
+  resourcePropertyConfigs: Array<ResourcePropertyConfig>,
   resourceKind: string,
   forceUpdate: () => void
 ): Schema =>
-  resourcePropertiesSchema
+  resourcePropertyConfigs
     .filter(
       config =>
         !config.resourceKinds ||
@@ -263,15 +264,17 @@ const ResourcePropertiesEditor: React.ComponentType<{
         });
 
         const resourceKind = resources[0].getKind();
-        const customSchema = buildCustomPropertiesSchema(
-          resourceManagementProps.resourcePropertiesSchema,
+        const customPropertiesSchema = buildCustomPropertiesSchema(
+          resourceManagementProps.resourcePropertyConfigs,
           resourceKind,
           forceUpdate
         );
 
         return (
           <PropertiesEditor
-            schema={schema.concat(resourceSchema).concat(customSchema)}
+            schema={schema
+              .concat(resourceSchema)
+              .concat(customPropertiesSchema)}
             instances={resources}
           />
         );

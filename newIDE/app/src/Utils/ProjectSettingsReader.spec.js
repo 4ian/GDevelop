@@ -5,7 +5,7 @@ import {
 } from './ApplyProjectPreferences';
 import {
   parseToolbarButtons,
-  parseResourceProperties,
+  parseResourceCustomProperties,
 } from './ProjectSettingsReader';
 import YAML from 'yaml';
 import { type Preferences } from '../MainFrame/Preferences/PreferencesContext';
@@ -276,7 +276,7 @@ preferences:
     });
   });
 
-  describe('parseResourceProperties', () => {
+  describe('parseResourceCustomProperties', () => {
     test('parses string, number and boolean properties', () => {
       // $FlowFixMe[incompatible-call]
       const raw = ([
@@ -284,7 +284,7 @@ preferences:
         { name: 'customScale', type: 'number', resourceKinds: ['image'] },
         { name: 'noResize', label: 'Do not resize', type: 'boolean' },
       ]: any);
-      const result = parseResourceProperties(raw);
+      const result = parseResourceCustomProperties(raw);
       expect(result).toEqual([
         { name: 'packTag', label: 'Packing tag', type: 'string' },
         {
@@ -309,7 +309,7 @@ preferences:
           resourceKinds: ['image'],
         },
       ]: any);
-      const result = parseResourceProperties(raw);
+      const result = parseResourceCustomProperties(raw);
       expect(result).toEqual([
         { name: 'no-atlas', label: 'No atlas', type: 'boolean' },
         { name: 'no-resize', label: 'No resize', type: 'boolean' },
@@ -333,7 +333,7 @@ preferences:
           default: 0.5,
         },
       ]: any);
-      const result = parseResourceProperties(raw);
+      const result = parseResourceCustomProperties(raw);
       expect(result).toEqual([
         {
           name: 'scale-multiplier',
@@ -349,7 +349,7 @@ preferences:
       const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
       // $FlowFixMe[incompatible-call]
       const raw = ([{ label: 'No name', type: 'string' }]: any);
-      expect(parseResourceProperties(raw)).toHaveLength(0);
+      expect(parseResourceCustomProperties(raw)).toHaveLength(0);
       warnSpy.mockRestore();
     });
 
@@ -357,7 +357,7 @@ preferences:
       const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
       // $FlowFixMe[incompatible-call]
       const raw = ([{ name: 'weird', type: 'object' }]: any);
-      expect(parseResourceProperties(raw)).toHaveLength(0);
+      expect(parseResourceCustomProperties(raw)).toHaveLength(0);
       expect(warnSpy).toHaveBeenCalledWith(
         expect.stringContaining('invalid type "object"')
       );
@@ -368,7 +368,7 @@ preferences:
       const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
       // $FlowFixMe[incompatible-call]
       const raw = ([{ name: 'bad name!', type: 'string' }]: any);
-      expect(parseResourceProperties(raw)).toHaveLength(0);
+      expect(parseResourceCustomProperties(raw)).toHaveLength(0);
       warnSpy.mockRestore();
     });
 
@@ -379,7 +379,7 @@ preferences:
         { name: 'tag', label: 'First', type: 'string' },
         { name: 'tag', label: 'Second', type: 'number' },
       ]: any);
-      const result = parseResourceProperties(raw);
+      const result = parseResourceCustomProperties(raw);
       expect(result).toEqual([
         { name: 'tag', label: 'Second', type: 'number' },
       ]);

@@ -2886,6 +2886,20 @@ const put2dInstances: EditorFunction = {
         }
       });
 
+      // If specific instance ids were requested but none matched (and the brush
+      // did not select anything either), the call erased nothing. Return a
+      // failure so the agent gets a real error signal instead of a misleading
+      // success that could make it retry the same call in a loop.
+      if (instancesToDelete.size === 0 && notFoundExistingInstanceIds.size > 0) {
+        return makeGenericFailure(
+          `None of the specified instance ids were found: ${Array.from(
+            notFoundExistingInstanceIds
+          ).join(
+            ', '
+          )}. Nothing was changed. Call \`describe_instances\` to get valid ids (the \`id\` field of each instance), and check the scene and layer names.`
+        );
+      }
+
       instancesToDelete.forEach(instance => {
         initialInstances.removeInstance(instance);
       });
@@ -3563,6 +3577,20 @@ const put3dInstances: EditorFunction = {
           }
         }
       });
+
+      // If specific instance ids were requested but none matched (and the brush
+      // did not select anything either), the call erased nothing. Return a
+      // failure so the agent gets a real error signal instead of a misleading
+      // success that could make it retry the same call in a loop.
+      if (instancesToDelete.size === 0 && notFoundExistingInstanceIds.size > 0) {
+        return makeGenericFailure(
+          `None of the specified instance ids were found: ${Array.from(
+            notFoundExistingInstanceIds
+          ).join(
+            ', '
+          )}. Nothing was changed. Call \`describe_instances\` to get valid ids (the \`id\` field of each instance), and check the scene and layer names.`
+        );
+      }
 
       instancesToDelete.forEach(instance => {
         initialInstances.removeInstance(instance);

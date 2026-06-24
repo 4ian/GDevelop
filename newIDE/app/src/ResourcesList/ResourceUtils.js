@@ -7,6 +7,8 @@ const fs = optionalRequire('fs');
 const path = optionalRequire('path');
 const gd: libGDevelop = global.gd;
 
+export const DEFAULT_IMPORTED_RESOURCES_FOLDER = 'assets';
+
 export const createOrUpdateResource = (
   project: gdProject,
   newlyCreatedResource: gdResource,
@@ -83,15 +85,10 @@ export const getLocalResourceFullPath = (
   return resourcePath;
 };
 
-export const isPathInProjectFolder = (
-  project: gdProject,
+export const isPathInFolder = (
+  folderPath: string,
   resourcePath: string
 ): boolean => {
-  const projectPath = path.dirname(project.getProjectFile());
-  return resourcePath.includes(projectPath);
-};
-
-const isPathInFolder = (folderPath: string, resourcePath: string): boolean => {
   const relativePath = path.relative(
     path.resolve(folderPath),
     path.resolve(resourcePath)
@@ -102,6 +99,14 @@ const isPathInFolder = (folderPath: string, resourcePath: string): boolean => {
       !relativePath.startsWith('..') &&
       !path.isAbsolute(relativePath))
   );
+};
+
+export const isPathInProjectFolder = (
+  project: gdProject,
+  resourcePath: string
+): boolean => {
+  const projectPath = path.dirname(project.getProjectFile());
+  return isPathInFolder(projectPath, resourcePath);
 };
 
 export const copyAllToProjectFolder = (
@@ -118,6 +123,39 @@ export const copyAllToProjectFolder = (
   const destinationFolderPath = importedResourcesFolder
     ? path.join(projectPath, importedResourcesFolder)
     : projectPath;
+  const reservedDestinationPaths = new Set<string>();
+
+  const getUniqueResourceDestinationPath = (resourcePath: string): string => {
+    const resourceBasename = path.basename(resourcePath);
+    const fileExtension = path.extname(resourceBasename);
+    const fileNameWithoutExtension = path.basename(
+      resourceBasename,
+      fileExtension
+    );
+
+    const newFileNameWithoutExtension = newNameGenerator(
+      fileNameWithoutExtension,
+      tentativeFileName => {
+        const tentativePath = path.join(
+          destinationFolderPath,
+          tentativeFileName + fileExtension
+        );
+        const normalizedTentativePath = path.resolve(tentativePath);
+        return (
+          reservedDestinationPaths.has(normalizedTentativePath) ||
+          fs.existsSync(tentativePath)
+        );
+      }
+    );
+
+    const resourceNewPath = path.join(
+      destinationFolderPath,
+      newFileNameWithoutExtension + fileExtension
+    );
+    reservedDestinationPaths.add(path.resolve(resourceNewPath));
+
+    return resourceNewPath;
+  };
 
   const copyResources = (): Promise<Array<string>> => {
     // $FlowFixMe[incompatible-type]
@@ -132,27 +170,7 @@ export const copyAllToProjectFolder = (
           return resourcePath;
         }
 
-        const resourceBasename = path.basename(resourcePath),
-          fileExtension = path.extname(resourceBasename),
-          fileNameWithoutExtension = path.basename(
-            resourceBasename,
-            fileExtension
-          );
-
-        const newFileNameWithoutExtension = newNameGenerator(
-          fileNameWithoutExtension,
-          tentativeFileName => {
-            const tentativePath =
-              path.join(destinationFolderPath, tentativeFileName) +
-              fileExtension;
-            return fs.existsSync(tentativePath);
-          }
-        );
-
-        const resourceNewPath = path.join(
-          destinationFolderPath,
-          newFileNameWithoutExtension + fileExtension
-        );
+        const resourceNewPath = getUniqueResourceDestinationPath(resourcePath);
 
         return new Promise(resolve => {
           fs.copyFile(resourcePath, resourceNewPath, err => {

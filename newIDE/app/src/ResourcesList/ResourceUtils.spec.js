@@ -70,6 +70,94 @@ describe('ResourceUtils', () => {
 
       project.delete();
     });
+
+    it('uses a new name when a file already exists in the imported resources folder', async () => {
+      const createdTempDir = fs.mkdtempSync(
+        path.join(os.tmpdir(), 'gd-resource-utils-')
+      );
+      tempDir = createdTempDir;
+      const projectFolder = path.join(createdTempDir, 'project');
+      const sourceFolder = path.join(createdTempDir, 'source');
+      fs.mkdirSync(path.join(projectFolder, 'assets'), { recursive: true });
+      fs.mkdirSync(sourceFolder);
+      const project = gd.ProjectHelper.createNewGDJSProject();
+      project.setProjectFile(path.join(projectFolder, 'game.json'));
+
+      const existingAssetPath = path.join(projectFolder, 'assets', 'hit.wav');
+      fs.writeFileSync(existingAssetPath, 'existing audio content');
+      const sourcePath = path.join(sourceFolder, 'hit.wav');
+      fs.writeFileSync(sourcePath, 'new audio content');
+
+      const newToOldFilePaths = new Map<string, string>();
+      const copiedPaths = await copyAllToProjectFolder(
+        project,
+        [sourcePath],
+        newToOldFilePaths,
+        'assets'
+      );
+
+      const expectedCopiedPath = path.join(projectFolder, 'assets', 'hit2.wav');
+      expect(copiedPaths).toEqual([expectedCopiedPath]);
+      expect(fs.readFileSync(existingAssetPath, 'utf8')).toBe(
+        'existing audio content'
+      );
+      expect(fs.readFileSync(expectedCopiedPath, 'utf8')).toBe(
+        'new audio content'
+      );
+      expect(newToOldFilePaths.get(expectedCopiedPath)).toBe(sourcePath);
+
+      project.delete();
+    });
+
+    it('uses unique names for files with the same basename in the same import', async () => {
+      const createdTempDir = fs.mkdtempSync(
+        path.join(os.tmpdir(), 'gd-resource-utils-')
+      );
+      tempDir = createdTempDir;
+      const projectFolder = path.join(createdTempDir, 'project');
+      const sourceFolder1 = path.join(createdTempDir, 'source-1');
+      const sourceFolder2 = path.join(createdTempDir, 'source-2');
+      fs.mkdirSync(projectFolder);
+      fs.mkdirSync(sourceFolder1);
+      fs.mkdirSync(sourceFolder2);
+      const project = gd.ProjectHelper.createNewGDJSProject();
+      project.setProjectFile(path.join(projectFolder, 'game.json'));
+
+      const sourcePath1 = path.join(sourceFolder1, 'jump.ogg');
+      const sourcePath2 = path.join(sourceFolder2, 'jump.ogg');
+      fs.writeFileSync(sourcePath1, 'first audio content');
+      fs.writeFileSync(sourcePath2, 'second audio content');
+
+      const newToOldFilePaths = new Map<string, string>();
+      const copiedPaths = await copyAllToProjectFolder(
+        project,
+        [sourcePath1, sourcePath2],
+        newToOldFilePaths,
+        'assets'
+      );
+
+      const expectedCopiedPath1 = path.join(
+        projectFolder,
+        'assets',
+        'jump.ogg'
+      );
+      const expectedCopiedPath2 = path.join(
+        projectFolder,
+        'assets',
+        'jump2.ogg'
+      );
+      expect(copiedPaths).toEqual([expectedCopiedPath1, expectedCopiedPath2]);
+      expect(fs.readFileSync(expectedCopiedPath1, 'utf8')).toBe(
+        'first audio content'
+      );
+      expect(fs.readFileSync(expectedCopiedPath2, 'utf8')).toBe(
+        'second audio content'
+      );
+      expect(newToOldFilePaths.get(expectedCopiedPath1)).toBe(sourcePath1);
+      expect(newToOldFilePaths.get(expectedCopiedPath2)).toBe(sourcePath2);
+
+      project.delete();
+    });
   });
 
   it('can remove unused resources for every kind in the project', () => {

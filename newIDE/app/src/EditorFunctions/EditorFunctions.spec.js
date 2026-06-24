@@ -2023,14 +2023,73 @@ describe('editorFunctions', () => {
       expect(getInstancePositions(testScene)).toEqual([]);
     });
 
-    it('reports not-found ids when erasing an unknown instance id', async () => {
-      const result = await putInstances({
-        brush_kind: 'erase',
-        existing_instance_ids: 'does-not-exist',
+    it('fails when erasing an unknown instance id (none found, nothing changed)', async () => {
+      // Bypass the `putInstances` helper, which asserts success — here we
+      // expect a failure so the agent gets a real error signal instead of a
+      // misleading success that could make it retry the same call in a loop.
+      const result = await editorFunctions.put_2d_instances.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          object_name: 'Player',
+          layer_name: '',
+          brush_kind: 'erase',
+          existing_instance_ids: 'does-not-exist',
+        },
       });
 
+      expect(result.success).toBe(false);
+      expect(result.message).toEqual(
+        expect.stringContaining(
+          'None of the specified instance ids were found: does-not-exist'
+        )
+      );
+    });
+
+    it('still succeeds erasing when some ids match and others are unknown', async () => {
+      await putInstances({
+        brush_kind: 'point',
+        brush_position: '100,200',
+        new_instances_count: 1,
+      });
+      const [created] = getInstances(testScene);
+
+      const result = await putInstances({
+        brush_kind: 'erase',
+        existing_instance_ids: `${created.uuid},does-not-exist`,
+      });
+
+      // One id matched (so the call did something and must not fail), the other
+      // is reported as not found.
+      expect(result.message).toEqual(
+        expect.stringContaining('Erased 1 instance')
+      );
       expect(result.message).toEqual(
         expect.stringContaining('Instance ids not found: does-not-exist')
+      );
+      expect(getInstances(testScene)).toHaveLength(0);
+    });
+
+    it('fails when no requested instance id is found and nothing is created', async () => {
+      // Bypass the `putInstances` helper, which asserts success — here we
+      // expect a failure so the agent gets a real error signal instead of a
+      // misleading success that could make it retry the same call in a loop.
+      const result = await editorFunctions.put_2d_instances.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          object_name: 'Player',
+          layer_name: '',
+          brush_kind: 'none',
+          existing_instance_ids: 'does-not-exist',
+        },
+      });
+
+      expect(result.success).toBe(false);
+      expect(result.message).toEqual(
+        expect.stringContaining(
+          'None of the specified instance ids were found: does-not-exist'
+        )
       );
     });
   });
@@ -2114,6 +2173,40 @@ describe('editorFunctions', () => {
       return positions.sort((a, b) => a.x - b.x || a.y - b.y || a.z - b.z);
     };
 
+    // Collect full instances (with their persistent uuid) so tests can target
+    // existing instances by id for move/erase, like the real tool does.
+    const getInstances = (
+      scene: gdLayout
+    ): Array<{|
+      uuid: string,
+      x: number,
+      y: number,
+      z: number,
+      layer: string,
+    |}> => {
+      const instances = [];
+      const functor = new gd.InitialInstanceJSFunctor();
+      // $FlowFixMe[cannot-write]
+      functor.invoke = instancePtr => {
+        const instance: gdInitialInstance = gd.wrapPointer(
+          // $FlowFixMe[incompatible-type]
+          instancePtr,
+          gd.InitialInstance
+        );
+        instances.push({
+          uuid: instance.getPersistentUuid(),
+          x: instance.getX(),
+          y: instance.getY(),
+          z: instance.getZ(),
+          layer: instance.getLayer(),
+        });
+      };
+      // $FlowFixMe[incompatible-type]
+      scene.getInitialInstances().iterateOverInstances(functor);
+      functor.delete();
+      return instances;
+    };
+
     const putInstances = async (args: any) => {
       const result = await editorFunctions.put_3d_instances.launchFunction({
         ...makeFakeLaunchFunctionOptionsWithProject(project),
@@ -2170,6 +2263,104 @@ describe('editorFunctions', () => {
       positions.forEach(({ x, y, z }) => {
         expect(Math.sqrt(x * x + y * y + z * z)).toBeLessThanOrEqual(radius);
       });
+    });
+
+    it('fails when no requested instance id is found and nothing is created', async () => {
+      // Bypass the `putInstances` helper, which asserts success — here we
+      // expect a failure so the agent gets a real error signal instead of a
+      // misleading success that could make it retry the same call in a loop.
+      const result = await editorFunctions.put_3d_instances.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          object_name: 'Player',
+          layer_name: '',
+          brush_kind: 'none',
+          existing_instance_ids: 'does-not-exist',
+        },
+      });
+
+      expect(result.success).toBe(false);
+      expect(result.message).toEqual(
+        expect.stringContaining(
+          'None of the specified instance ids were found: does-not-exist'
+        )
+      );
+    });
+
+    it('erases an existing instance by id', async () => {
+      await putInstances({
+        brush_kind: 'point',
+        brush_position: '10,20,30',
+        new_instances_count: 2,
+      });
+      const instances = getInstances(testScene);
+      expect(instances).toHaveLength(2);
+
+      const result = await putInstances({
+        brush_kind: 'erase',
+        existing_instance_ids: instances[0].uuid,
+      });
+
+      expect(result.message).toEqual(
+        expect.stringContaining('Erased 1 instance')
+      );
+      expect(getInstances(testScene)).toHaveLength(1);
+    });
+
+    it('fails when erasing an unknown instance id (none found, nothing changed)', async () => {
+      await putInstances({
+        brush_kind: 'point',
+        brush_position: '10,20,30',
+        new_instances_count: 1,
+      });
+
+      // Bypass the `putInstances` helper, which asserts success — here we
+      // expect a failure so the agent gets a real error signal instead of a
+      // misleading success that could make it retry the same call in a loop.
+      const result = await editorFunctions.put_3d_instances.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          object_name: 'Player',
+          layer_name: '',
+          brush_kind: 'erase',
+          existing_instance_ids: 'does-not-exist',
+        },
+      });
+
+      expect(result.success).toBe(false);
+      expect(result.message).toEqual(
+        expect.stringContaining(
+          'None of the specified instance ids were found: does-not-exist'
+        )
+      );
+      // Nothing was erased: the existing instance is still there.
+      expect(getInstances(testScene)).toHaveLength(1);
+    });
+
+    it('still succeeds erasing when some ids match and others are unknown', async () => {
+      await putInstances({
+        brush_kind: 'point',
+        brush_position: '10,20,30',
+        new_instances_count: 1,
+      });
+      const [created] = getInstances(testScene);
+
+      const result = await putInstances({
+        brush_kind: 'erase',
+        existing_instance_ids: `${created.uuid},does-not-exist`,
+      });
+
+      // One id matched (so the call did something and must not fail), the other
+      // is reported as not found.
+      expect(result.message).toEqual(
+        expect.stringContaining('Erased 1 instance')
+      );
+      expect(result.message).toEqual(
+        expect.stringContaining('Instance ids not found: does-not-exist')
+      );
+      expect(getInstances(testScene)).toHaveLength(0);
     });
 
     // Note: there is intentionally no grid test here. `grid` is not part of

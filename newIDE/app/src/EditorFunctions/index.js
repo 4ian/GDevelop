@@ -2890,7 +2890,10 @@ const put2dInstances: EditorFunction = {
       // did not select anything either), the call erased nothing. Return a
       // failure so the agent gets a real error signal instead of a misleading
       // success that could make it retry the same call in a loop.
-      if (instancesToDelete.size === 0 && notFoundExistingInstanceIds.size > 0) {
+      if (
+        instancesToDelete.size === 0 &&
+        notFoundExistingInstanceIds.size > 0
+      ) {
         return makeGenericFailure(
           `None of the specified instance ids were found: ${Array.from(
             notFoundExistingInstanceIds
@@ -3582,7 +3585,10 @@ const put3dInstances: EditorFunction = {
       // did not select anything either), the call erased nothing. Return a
       // failure so the agent gets a real error signal instead of a misleading
       // success that could make it retry the same call in a loop.
-      if (instancesToDelete.size === 0 && notFoundExistingInstanceIds.size > 0) {
+      if (
+        instancesToDelete.size === 0 &&
+        notFoundExistingInstanceIds.size > 0
+      ) {
         return makeGenericFailure(
           `None of the specified instance ids were found: ${Array.from(
             notFoundExistingInstanceIds

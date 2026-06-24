@@ -51,11 +51,11 @@ const CompactObjectGroupEditor = ({
   const type = React.useMemo(
     () => {
       let type = null;
+      const objectsContainersList = projectScopedContainersAccessor
+        .get()
+        .getObjectsContainersList();
       for (const objectName of groupObjectNames) {
-        const objectType = projectScopedContainersAccessor
-          .get()
-          .getObjectsContainersList()
-          .getTypeOfObject(objectName);
+        const objectType = objectsContainersList.getTypeOfObject(objectName);
         if (type === null || objectType === type) {
           type = objectType;
         } else {

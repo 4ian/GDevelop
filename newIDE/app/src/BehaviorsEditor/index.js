@@ -648,11 +648,13 @@ export const useManageObjectBehaviors = ({
   const objectType = React.useMemo(
     () => {
       let type = null;
+      const objectsContainersList = projectScopedContainersAccessor
+        .get()
+        .getObjectsContainersList();
       for (const object of objects) {
-        const objectType = projectScopedContainersAccessor
-          .get()
-          .getObjectsContainersList()
-          .getTypeOfObject(object.getName());
+        const objectType = objectsContainersList.getTypeOfObject(
+          object.getName()
+        );
         if (type === null || objectType === type) {
           type = objectType;
         } else {

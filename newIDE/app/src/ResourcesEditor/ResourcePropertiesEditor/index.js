@@ -129,7 +129,7 @@ const ResourcePropertiesEditor: React.ComponentType<{
         {
           name: i18n._(t`Resource name`),
           valueType: 'string',
-          disabled: () => 'never',
+          disabled: () => 'always',
           getValue: (resource: gdResource) => resource.getName(),
           setValue: (resource: gdResource, newValue: string) =>
             resource.setName(newValue),

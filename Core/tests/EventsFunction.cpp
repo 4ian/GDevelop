@@ -6,7 +6,16 @@
 /**
  * @file Tests covering EventsFunction
  */
+#include "DummyPlatform.h"
+#include "GDCore/Extensions/Platform.h"
+#include "GDCore/IDE/EventsFunctionTools.h"
+#include "GDCore/IDE/WholeProjectRefactorer.h"
+#include "GDCore/Project/Behavior.h"
+#include "GDCore/Project/EventsBasedObject.h"
 #include "GDCore/Project/EventsFunction.h"
+#include "GDCore/Project/EventsFunctionsExtension.h"
+#include "GDCore/Project/Object.h"
+#include "GDCore/Project/ObjectsContainer.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/Serialization/SerializerElement.h"
 #include "catch.hpp"
@@ -83,6 +92,38 @@ TEST_CASE("EventsFunction", "[common]") {
     REQUIRE(eventsFunction2.GetFullName() == "My Function");
     REQUIRE(eventsFunction2.GetDescription() == "A test function");
     REQUIRE(eventsFunction2.GetHelpUrl() == "");
+  }
+
+  SECTION("Object events function scope keeps inherited prefab behaviors") {
+    gd::Platform platform;
+    gd::Project project;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    auto &eventsExtension =
+        project.InsertNewEventsFunctionsExtension("MyEventsExtension", 0);
+    auto &eventsBasedObject = eventsExtension.GetEventsBasedObjects().InsertNew(
+        "MyEventsBasedObject", 0);
+    eventsBasedObject.AddNewBehavior(project, "MyExtension::MyBehavior",
+                                     "MyPrefabBehavior");
+
+    auto &eventsFunction =
+        eventsBasedObject.GetEventsFunctions().InsertNewEventsFunction(
+            "MyObjectEventsFunction", 0);
+    gd::WholeProjectRefactorer::EnsureObjectEventsFunctionsProperParameters(
+        eventsExtension, eventsBasedObject);
+
+    gd::ObjectsContainer objectsContainer(gd::ObjectsContainer::Function);
+    gd::EventsFunctionTools::ObjectEventsFunctionToObjectsContainer(
+        project, eventsBasedObject, eventsFunction, objectsContainer);
+
+    REQUIRE(objectsContainer.HasObjectNamed("Object"));
+    auto &object = objectsContainer.GetObject("Object");
+    REQUIRE(object.GetType() == "MyEventsExtension::MyEventsBasedObject");
+    REQUIRE(object.HasBehaviorNamed("MyPrefabBehavior"));
+    REQUIRE(object.GetBehavior("MyPrefabBehavior").GetTypeName() ==
+            "MyExtension::MyBehavior");
+    REQUIRE(
+        object.GetBehavior("MyPrefabBehavior").IsInheritedFromObjectType());
   }
 }
 

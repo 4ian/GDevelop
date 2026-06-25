@@ -49,6 +49,10 @@ import ParameterIcon from '../../UI/CustomSvgIcons/Parameter';
 import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
 import Link from '../../UI/Link';
 import Add from '../../UI/CustomSvgIcons/Add';
+import {
+  lookupVariable,
+  formatVariableValue,
+} from '../RuntimeVariablesContext';
 import { type VariableDialogOpeningProps } from '../../VariablesList/VariablesEditorDialog';
 
 const gd: libGDevelop = global.gd;
@@ -669,7 +673,9 @@ export const renderVariableWithIcon = (
     projectScopedContainersAccessor,
     highlightedSearchText,
     highlightedSearchMatchCase,
+    runtimeVariables,
     scope,
+    lastObjectName,
   }: ParameterInlineRendererProps,
   tooltip: string,
   getVariableSourceFromIdentifier: (
@@ -680,12 +686,71 @@ export const renderVariableWithIcon = (
   if (!value && !parameterMetadata.isOptional()) {
     return <MissingParameterValue />;
   }
-  const VariableIcon = getVariableSourceIcon(
-    getVariableSourceFromIdentifier(
-      value,
-      projectScopedContainersAccessor.get()
-    )
+
+  const sourceType = getVariableSourceFromIdentifier(
+    value,
+    projectScopedContainersAccessor.get()
   );
+  const VariableIcon = getVariableSourceIcon(sourceType);
+
+  let effectiveTooltip = tooltip;
+  if (runtimeVariables && value) {
+    // Use `sourceType` (resolved container kind) for scope selection;
+    // fall back to the tooltip string for callers that don't set sourceType.
+    let varScope: 'global' | 'scene' | 'local' | 'object' | 'any';
+    if (
+      sourceType === gd.VariablesContainer.Global ||
+      sourceType === gd.VariablesContainer.ExtensionGlobal
+    ) {
+      varScope = 'global';
+    } else if (
+      sourceType === gd.VariablesContainer.Scene ||
+      sourceType === gd.VariablesContainer.ExtensionScene
+    ) {
+      varScope = 'scene';
+    } else if (sourceType === gd.VariablesContainer.Local) {
+      varScope = 'local';
+    } else if (sourceType === gd.VariablesContainer.Object) {
+      varScope = 'object';
+    } else if (tooltip === 'global variable') {
+      varScope = 'global';
+    } else if (tooltip === 'scene variable') {
+      varScope = 'scene';
+    } else if (tooltip === 'object variable') {
+      varScope = 'object';
+    } else {
+      varScope = 'any';
+    }
+    const extName = scope.eventsFunctionsExtension
+      ? scope.eventsFunctionsExtension.getName()
+      : undefined;
+    // Scene-scoped locals only; extension function locals are omitted from the dump.
+    const codeNamespace =
+      varScope === 'local' && scope.layout && !scope.eventsFunctionsExtension
+        ? gd.MetadataDeclarationHelper.getSceneCodeNamespace(
+            scope.layout.getName()
+          )
+        : undefined;
+    // Object scope requires lastObjectName; value only carries the variable path.
+    const runtimeVar =
+      varScope === 'object' && !lastObjectName
+        ? null
+        : lookupVariable(
+            runtimeVariables,
+            varScope,
+            value,
+            extName,
+            codeNamespace,
+            lastObjectName
+          );
+    if (runtimeVar) {
+      const displayName =
+        varScope === 'object' && lastObjectName
+          ? `${lastObjectName}.${value}`
+          : value;
+      effectiveTooltip = `${displayName} = ${formatVariableValue(runtimeVar)}`;
+    }
+  }
 
   let IconAndNameContainer;
   if (!expressionIsValid) {
@@ -698,7 +763,7 @@ export const renderVariableWithIcon = (
 
   return (
     <span
-      title={tooltip}
+      title={effectiveTooltip}
       className={classNames({
         [nameAndIconContainer]: true,
         [instructionWarningParameter]:

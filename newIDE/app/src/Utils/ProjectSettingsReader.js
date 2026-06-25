@@ -9,12 +9,12 @@ const fs = optionalRequire('fs');
 const fsPromises = fs ? fs.promises : null;
 const path = optionalRequire('path');
 
-export type ResourcePropertyType = 'string' | 'boolean' | 'number';
+export type ResourceCustomPropertyType = 'string' | 'boolean' | 'number';
 
-export type ResourcePropertyConfig = {|
+export type ResourceCustomPropertyConfig = {|
   name: string,
   label: string,
-  type: ResourcePropertyType,
+  type: ResourceCustomPropertyType,
   description?: string,
   resourceKinds?: Array<string>,
   default?: string | number | boolean,
@@ -24,18 +24,18 @@ export type ParsedProjectSettings = {
   preferences?: { [string]: boolean | string | number },
   toolbarButtons?: Array<ToolbarButtonConfig>,
   shortcuts?: { [string]: string },
-  resourceCustomProperties?: Array<ResourcePropertyConfig>,
+  resourceCustomProperties?: Array<ResourceCustomPropertyConfig>,
 };
 
-const ALLOWED_RESOURCE_PROPERTY_TYPES: Array<ResourcePropertyType> = [
+const ALLOWED_RESOURCE_CUSTOM_PROPERTY_TYPES: Array<ResourceCustomPropertyType> = [
   'string',
   'boolean',
   'number',
 ];
 
-// Only allow safe characters in property names so they stay clean keys in the
-// resource metadata JSON.
-const SAFE_PROPERTY_NAME_PATTERN = /^[a-zA-Z0-9_-]+$/;
+// Only allow safe characters in custom property names so they stay clean keys
+// in the resource metadata JSON.
+const SAFE_CUSTOM_PROPERTY_NAME_PATTERN = /^[a-zA-Z0-9_-]+$/;
 
 const SETTINGS_FILE_NAME = 'gdevelop-settings.yaml';
 
@@ -109,56 +109,59 @@ export const parseToolbarButtons = (
 
 /**
  * Parses raw `resourceCustomProperties` entries from YAML into validated
- * ResourcePropertyConfig objects. Invalid entries are skipped with a warning.
+ * ResourceCustomPropertyConfig objects. Invalid entries are skipped with a warning.
  * Exported for unit testing; file system is not needed.
  */
 export const parseResourceCustomProperties = (
   rawResourceCustomProperties: Array<mixed>
-): Array<ResourcePropertyConfig> => {
-  const resourceCustomProperties: Array<ResourcePropertyConfig> = [];
+): Array<ResourceCustomPropertyConfig> => {
+  const resourceCustomProperties: Array<ResourceCustomPropertyConfig> = [];
   const seenNames: Set<string> = new Set();
 
-  for (const rawProperty of rawResourceCustomProperties) {
-    const name = SafeExtractor.extractStringProperty(rawProperty, 'name');
-    const type = SafeExtractor.extractStringProperty(rawProperty, 'type');
+  for (const rawCustomProperty of rawResourceCustomProperties) {
+    const name = SafeExtractor.extractStringProperty(rawCustomProperty, 'name');
+    const type = SafeExtractor.extractStringProperty(rawCustomProperty, 'type');
 
     if (!name) {
       console.warn(
-        '[ProjectSettingsReader] Skipping resource property without a name.'
+        '[ProjectSettingsReader] Skipping resource custom property without a name.'
       );
       continue;
     }
-    if (!SAFE_PROPERTY_NAME_PATTERN.test(name)) {
+    if (!SAFE_CUSTOM_PROPERTY_NAME_PATTERN.test(name)) {
       console.warn(
-        `[ProjectSettingsReader] Skipping resource property "${name}": name must match ${SAFE_PROPERTY_NAME_PATTERN.toString()}.`
+        `[ProjectSettingsReader] Skipping resource custom property "${name}": name must match ${SAFE_CUSTOM_PROPERTY_NAME_PATTERN.toString()}.`
       );
       continue;
     }
-    if (!type || !ALLOWED_RESOURCE_PROPERTY_TYPES.includes((type: any))) {
+    if (
+      !type ||
+      !ALLOWED_RESOURCE_CUSTOM_PROPERTY_TYPES.includes((type: any))
+    ) {
       console.warn(
-        `[ProjectSettingsReader] Skipping resource property "${name}": invalid type "${type ||
+        `[ProjectSettingsReader] Skipping resource custom property "${name}": invalid type "${type ||
           ''}".`
       );
       continue;
     }
     // $FlowFixMe[incompatible-type] - type is checked against the allowed list above.
-    const propertyType: ResourcePropertyType = type;
+    const customPropertyType: ResourceCustomPropertyType = type;
 
     const label =
-      SafeExtractor.extractStringProperty(rawProperty, 'label') || name;
+      SafeExtractor.extractStringProperty(rawCustomProperty, 'label') || name;
     const description =
-      SafeExtractor.extractStringProperty(rawProperty, 'description') ||
+      SafeExtractor.extractStringProperty(rawCustomProperty, 'description') ||
       undefined;
 
-    const config: ResourcePropertyConfig = {
+    const config: ResourceCustomPropertyConfig = {
       name,
       label,
-      type: propertyType,
+      type: customPropertyType,
     };
     if (description) config.description = description;
 
     const rawResourceKinds = SafeExtractor.extractArrayProperty(
-      rawProperty,
+      rawCustomProperty,
       'resourceKinds'
     );
     if (rawResourceKinds) {
@@ -169,17 +172,17 @@ export const parseResourceCustomProperties = (
     }
 
     const defaultValue = SafeExtractor.extractNumberOrStringOrBooleanProperty(
-      rawProperty,
+      rawCustomProperty,
       'default'
     );
     if (defaultValue !== null) config.default = defaultValue;
 
     if (seenNames.has(name)) {
       console.warn(
-        `[ProjectSettingsReader] Duplicate resource property "${name}": the last definition wins.`
+        `[ProjectSettingsReader] Duplicate resource custom property "${name}": the last definition wins.`
       );
       const existingIndex = resourceCustomProperties.findIndex(
-        property => property.name === name
+        customProperty => customProperty.name === name
       );
       if (existingIndex !== -1)
         resourceCustomProperties.splice(existingIndex, 1);

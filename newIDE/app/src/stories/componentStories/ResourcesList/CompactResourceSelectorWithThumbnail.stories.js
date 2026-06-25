@@ -73,7 +73,7 @@ export const Default = (): React.Node => {
             canInstallPrivateAsset: () => false,
             onNewResourcesAdded: () => {},
             onResourceUsageChanged: () => {},
-            resourcePropertyConfigs: [],
+            resourceCustomPropertyConfigs: [],
           }}
           resourceName="icon128.png"
           onChange={action('on change')}

@@ -18,7 +18,7 @@ import {
   type ResourceSource,
   type ResourceManagementProps,
 } from '../../ResourcesList/ResourceSource';
-import { type ResourcePropertyConfig } from '../../Utils/ProjectSettingsReader';
+import { type ResourceCustomPropertyConfig } from '../../Utils/ProjectSettingsReader';
 import {
   type ResourceCustomPropertyValue,
   getResourceCustomPropertyValue,
@@ -58,7 +58,7 @@ const coerceToString = (value: ?ResourceCustomPropertyValue): string =>
   value == null ? '' : String(value);
 
 const buildCustomPropertyField = (
-  config: ResourcePropertyConfig,
+  config: ResourceCustomPropertyConfig,
   forceUpdate: () => void
 ): Field => {
   const { name, label, description, default: configDefault } = config;
@@ -109,11 +109,11 @@ const buildCustomPropertyField = (
 };
 
 const buildCustomPropertiesSchema = (
-  resourcePropertyConfigs: Array<ResourcePropertyConfig>,
+  resourceCustomPropertyConfigs: Array<ResourceCustomPropertyConfig>,
   resourceKind: string,
   forceUpdate: () => void
 ): Schema =>
-  resourcePropertyConfigs
+  resourceCustomPropertyConfigs
     .filter(
       config =>
         !config.resourceKinds ||
@@ -270,7 +270,7 @@ const ResourcePropertiesEditor: React.ComponentType<{
 
         const resourceKind = resources[0].getKind();
         const customPropertiesSchema = buildCustomPropertiesSchema(
-          resourceManagementProps.resourcePropertyConfigs,
+          resourceManagementProps.resourceCustomPropertyConfigs,
           resourceKind,
           forceUpdate
         );

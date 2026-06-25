@@ -214,7 +214,7 @@ import useGamesList from '../GameDashboard/UseGamesList';
 import useCapturesManager from './UseCapturesManager';
 import {
   readProjectSettings,
-  type ResourcePropertyConfig,
+  type ResourceCustomPropertyConfig,
 } from '../Utils/ProjectSettingsReader';
 import useNpmScriptRunner from './NpmScriptRunner/useNpmScriptRunner';
 import { applyProjectPreferences } from '../Utils/ApplyProjectPreferences';
@@ -409,9 +409,10 @@ const MainFrame = (props: Props): React.MixedElement => {
       toolbarButtons: [],
     }: State)
   );
-  const [resourcePropertyConfigs, setResourcePropertyConfigs] = React.useState<
-    Array<ResourcePropertyConfig>
-  >([]);
+  const [
+    resourceCustomPropertyConfigs,
+    setResourceCustomPropertyConfigs,
+  ] = React.useState<Array<ResourceCustomPropertyConfig>>([]);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const [
     cloudProjectFileMetadataToRecover,
@@ -1132,7 +1133,7 @@ const MainFrame = (props: Props): React.MixedElement => {
         editorTabs: closeProjectTabs(state.editorTabs, currentProject),
         toolbarButtons: [],
       }));
-      setResourcePropertyConfigs([]);
+      setResourceCustomPropertyConfigs([]);
 
       // Delete the project from memory. All references to it have been dropped previously
       // by the setState.
@@ -1255,7 +1256,7 @@ const MainFrame = (props: Props): React.MixedElement => {
               ...currentState,
               toolbarButtons: parsedProjectSettings.toolbarButtons || [],
             }));
-            setResourcePropertyConfigs(
+            setResourceCustomPropertyConfigs(
               parsedProjectSettings.resourceCustomProperties || []
             );
           }
@@ -5072,7 +5073,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       canInstallPrivateAsset,
       onNewResourcesAdded,
       onResourceUsageChanged,
-      resourcePropertyConfigs,
+      resourceCustomPropertyConfigs,
     }),
     [
       resourceSources,
@@ -5084,7 +5085,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       canInstallPrivateAsset,
       onNewResourcesAdded,
       onResourceUsageChanged,
-      resourcePropertyConfigs,
+      resourceCustomPropertyConfigs,
     ]
   );
 

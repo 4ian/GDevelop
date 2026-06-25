@@ -150,7 +150,7 @@ export const withoutEffectsForA2DLayer = (): React.Node => (
           canInstallPrivateAsset: () => false,
           onNewResourcesAdded: () => {},
           onResourceUsageChanged: () => {},
-          resourcePropertyConfigs: [],
+          resourceCustomPropertyConfigs: [],
         }}
         projectScopedContainersAccessor={
           testProject.testSceneProjectScopedContainersAccessor
@@ -181,7 +181,7 @@ export const withoutEffectsForA3DLayer = (): React.Node => (
           canInstallPrivateAsset: () => false,
           onNewResourcesAdded: () => {},
           onResourceUsageChanged: () => {},
-          resourcePropertyConfigs: [],
+          resourceCustomPropertyConfigs: [],
         }}
         projectScopedContainersAccessor={
           testProject.testSceneProjectScopedContainersAccessor

@@ -616,6 +616,7 @@ const MainFrame = (props: Props): React.MixedElement => {
   const {
     hasNonEditionPreviewsRunning,
     nonEditionPreviewsCount,
+    hasInGameEditionPreviewRunning,
     gameHotReloadLogs,
     editorHotReloadLogs,
     editorUncaughtError,
@@ -6216,6 +6217,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     isSharingEnabled:
       !checkedOutVersionStatus && !cloudProjectRecoveryOpenedVersionId,
     hasPreviewsRunning: hasNonEditionPreviewsRunning,
+    hasInGameEditionPreviewRunning,
     previewState: previewState,
     checkedOutVersionStatus: checkedOutVersionStatus,
     canDoNetworkPreview:

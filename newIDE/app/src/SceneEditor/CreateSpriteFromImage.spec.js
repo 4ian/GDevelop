@@ -3,6 +3,7 @@ import fs from 'fs';
 import os from 'os';
 import path from 'path';
 import {
+  addImageFileToProjectResources,
   createSpriteObjectFromImageFile,
   getImageFilePathsFromDataTransfer,
   getSupportedImageFilePaths,
@@ -31,6 +32,23 @@ describe('CreateSpriteFromImage', () => {
         'model.glb',
       ])
     ).toEqual(['hero.PNG', 'enemy.jpeg', 'background.webp']);
+  });
+
+  test('adds a dropped image file to project resources', async () => {
+    const { folder, project } = makeProjectInTempFolder();
+    const sourceFile = path.join(folder, 'Background.png');
+    fs.writeFileSync(sourceFile, Buffer.from('fake image bytes'));
+
+    const resourceName = await addImageFileToProjectResources({
+      project,
+      imageFilePath: sourceFile,
+    });
+
+    expect(resourceName).toBe('assets/Background.png');
+    expect(project.getResourcesManager().hasResource(resourceName)).toBe(true);
+    expect(fs.existsSync(path.join(folder, 'assets', 'Background.png'))).toBe(
+      true
+    );
   });
 
   test('creates an image resource and a Sprite object using the image', async () => {

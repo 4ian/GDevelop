@@ -384,9 +384,14 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
           setIsStayingOver(isOver, canDrop);
 
           const isRenaming = renamedItemId === node.id;
+          const itemNameTooltip =
+            typeof node.name === 'string' && !isRenaming
+              ? node.name
+              : undefined;
 
           let itemRow = (
             <div
+              title={itemNameTooltip}
               className={classNames(classes.rowContentSide, {
                 [classes.rowContentSideLeft]: !node.item.isRoot,
                 [classes.rowContentExtraPadding]: !displayAsFolder,

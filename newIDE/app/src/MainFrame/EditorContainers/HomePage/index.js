@@ -521,8 +521,9 @@ export const HomePage: React.ComponentType<Props> = React.memo<Props>(
       // as the rest of the interface (same React render).
       React.useLayoutEffect(
         () => {
-          // Hide the toolbars when on mobile in the "play" tab.
-          if (activeTab === 'play') {
+          // HomePage stays mounted while another editor tab is active, so only
+          // disable pane input while its Play tab is actually visible.
+          if (isActive && activeTab === 'play') {
             setGamesPlatformFrameShown({ shown: true, isMobile });
           } else {
             setGamesPlatformFrameShown({ shown: false, isMobile });
@@ -534,7 +535,13 @@ export const HomePage: React.ComponentType<Props> = React.memo<Props>(
             setGamesPlatformFrameShown({ shown: false, isMobile });
           };
         },
-        [updateToolbar, activeTab, setGamesPlatformFrameShown, isMobile]
+        [
+          updateToolbar,
+          isActive,
+          activeTab,
+          setGamesPlatformFrameShown,
+          isMobile,
+        ]
       );
 
       // $FlowFixMe[incompatible-type]

@@ -51,6 +51,10 @@ import {
   type SpriteSourceRect,
 } from '../../../Utils/SpriteSourceRect';
 import { openFilePicker } from '../../../Utils/FileSystem';
+import {
+  addImageFileToProjectResources,
+  getImageFilePathsFromDataTransfer,
+} from '../../../SceneEditor/CreateSpriteFromImage';
 
 const gd: libGDevelop = global.gd;
 
@@ -65,6 +69,25 @@ const styles = {
   thumbnailExtraStyle: {
     marginLeft: 5,
   },
+};
+
+const hasNativeFiles = (event: any): boolean => {
+  const { dataTransfer } = event;
+  if (!dataTransfer || !dataTransfer.types) return false;
+
+  if (typeof dataTransfer.types.includes === 'function') {
+    return dataTransfer.types.includes('Files');
+  }
+
+  if (typeof dataTransfer.types.contains === 'function') {
+    return dataTransfer.types.contains('Files');
+  }
+
+  for (let index = 0; index < dataTransfer.types.length; index++) {
+    if (dataTransfer.types[index] === 'Files') return true;
+  }
+
+  return false;
 };
 
 const SortableSpriteThumbnail = SortableElement(
@@ -104,6 +127,8 @@ const SortableList = SortableContainer(
     selectedSprites,
     onSelectSprite,
     onOpenSpriteContextMenu,
+    onNativeDragOver,
+    onNativeDrop,
   }) => {
     const spritesCount = direction.getSpritesCount();
     const hasMoreThanOneSprite = spritesCount > 1;
@@ -130,7 +155,11 @@ const SortableList = SortableContainer(
     };
 
     return (
-      <div style={styles.spritesList}>
+      <div
+        style={styles.spritesList}
+        onDragOver={onNativeDragOver}
+        onDrop={onNativeDrop}
+      >
         {[
           ...mapFor(0, spritesCount, i => {
             const sprite = direction.getSprite(i);
@@ -589,6 +618,97 @@ const SpritesList = ({
     ]
   );
 
+  const onAddImageFilesFromLocalFileSystem = React.useCallback(
+    async (imageFilePaths: Array<string>) => {
+      if (
+        storageProvider.internalName !== 'LocalFile' ||
+        !project.getProjectFile()
+      ) {
+        await showAlert({
+          title: t`Unable to add images`,
+          message: t`Images can only be dropped into saved local projects.`,
+          dismissButtonLabel: t`Close`,
+        });
+        return;
+      }
+
+      const directionSpritesCountBeforeAdding = direction.getSpritesCount();
+      let addedFramesCount = 0;
+      try {
+        for (const imageFilePath of imageFilePaths) {
+          const resourceName = await addImageFileToProjectResources({
+            project,
+            imageFilePath,
+          });
+          addAnimationFrameWithResourceName(
+            animations,
+            direction,
+            resourceName,
+            onSpriteAdded
+          );
+          addedFramesCount++;
+        }
+      } catch (error) {
+        console.error('Unable to add dropped image files to sprite:', error);
+        await showAlert({
+          title: t`Unable to add images`,
+          message: t`The dropped images could not be imported.`,
+          dismissButtonLabel: t`Close`,
+        });
+      }
+
+      if (!addedFramesCount) return;
+
+      forceUpdate();
+      await resourceManagementProps.onFetchNewlyAddedResources();
+      resourceManagementProps.onNewResourcesAdded();
+
+      if (onSpriteUpdated) onSpriteUpdated();
+      if (directionSpritesCountBeforeAdding === 0 && onFirstSpriteUpdated) {
+        onFirstSpriteUpdated();
+      }
+    },
+    [
+      animations,
+      direction,
+      forceUpdate,
+      onFirstSpriteUpdated,
+      onSpriteAdded,
+      onSpriteUpdated,
+      project,
+      resourceManagementProps,
+      showAlert,
+      storageProvider.internalName,
+    ]
+  );
+
+  const onNativeDragOver = React.useCallback((event: any) => {
+    if (!hasNativeFiles(event)) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+    if (event.dataTransfer) {
+      event.dataTransfer.dropEffect = 'copy';
+    }
+  }, []);
+
+  const onNativeDrop = React.useCallback(
+    async (event: any) => {
+      if (!hasNativeFiles(event)) return;
+
+      event.preventDefault();
+      event.stopPropagation();
+
+      const imageFilePaths = getImageFilePathsFromDataTransfer(
+        event.dataTransfer
+      );
+      if (!imageFilePaths.length) return;
+
+      await onAddImageFilesFromLocalFileSystem(imageFilePaths);
+    },
+    [onAddImageFilesFromLocalFileSystem]
+  );
+
   const onReplaceSprites = React.useCallback(
     async (initialResourceSource: ResourceSource) => {
       const {
@@ -1019,6 +1139,8 @@ const SpritesList = ({
           selectedSprites={selectedSprites.current}
           onSelectSprite={addSpriteToSelection}
           onOpenSpriteContextMenu={openSpriteContextMenu}
+          onNativeDragOver={onNativeDragOver}
+          onNativeDrop={onNativeDrop}
           onSortEnd={onSortEnd}
           helperClass="sortable-helper"
           lockAxis="x"

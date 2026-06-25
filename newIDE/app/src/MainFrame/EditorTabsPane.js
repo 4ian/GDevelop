@@ -77,11 +77,13 @@ const styles = {
 
 const shouldRemovePointerEvents = (
   kind: EditorKind,
-  gameEditorMode: 'embedded-game' | 'instances-editor'
+  gameEditorMode: 'embedded-game' | 'instances-editor',
+  hasInGameEditionPreviewRunning: boolean
 ) => {
-  if (gameEditorMode === 'embedded-game') {
+  if (gameEditorMode === 'embedded-game' && hasInGameEditionPreviewRunning) {
     // Scene editors can have an embedded game, so they redefine manually
-    // which components can have clicks/touches.
+    // which components can have clicks/touches. Do this only while the
+    // in-game preview is actually connected, as the saved mode can outlive it.
     return (
       kind === 'layout' ||
       kind === 'external layout' ||
@@ -99,6 +101,7 @@ export type EditorTabsPaneCommonProps = {|
   isSavingProject: boolean,
   isSharingEnabled: boolean,
   hasPreviewsRunning: boolean,
+  hasInGameEditionPreviewRunning: boolean,
   previewState: PreviewState,
   checkedOutVersionStatus: ?OpenedVersionStatus,
   canDoNetworkPreview: boolean,
@@ -325,6 +328,7 @@ const EditorTabsPane: React.ComponentType<{
     isSavingProject,
     isSharingEnabled,
     hasPreviewsRunning,
+    hasInGameEditionPreviewRunning,
     previewState,
     checkedOutVersionStatus,
     canDoNetworkPreview,
@@ -889,7 +893,11 @@ const EditorTabsPane: React.ComponentType<{
                   // Deactivate pointer events when the play tab is active, so the iframe
                   // can be interacted with.
                   gamesPlatformFrameTools.iframeVisible ||
-                  shouldRemovePointerEvents(editorTab.kind, gameEditorMode)
+                  shouldRemovePointerEvents(
+                    editorTab.kind,
+                    gameEditorMode,
+                    hasInGameEditionPreviewRunning
+                  )
                 }
               >
                 {editorContent}

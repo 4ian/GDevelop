@@ -235,6 +235,23 @@ const ensureImageFileIsInAssetsFolder = async ({
   });
 };
 
+export const addImageFileToProjectResources = async ({
+  project,
+  imageFilePath,
+}: {|
+  project: gdProject,
+  imageFilePath: string,
+|}): Promise<string> => {
+  const localImageFilePath = await ensureImageFileIsInAssetsFolder({
+    project,
+    imageFilePath,
+  });
+  return addImageResource({
+    project,
+    imageFilePath: localImageFilePath,
+  });
+};
+
 export const createSpriteObjectFromImageFile = async ({
   project,
   objectsContainer,

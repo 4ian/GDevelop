@@ -264,6 +264,12 @@ export class ExtensionItemDetailEditorContainer extends React.Component<Props> {
     }
   }
 
+  openBehaviorSettingsDialog() {
+    if (this.editor) {
+      this.editor.openBehaviorSettingsDialog();
+    }
+  }
+
   selectEventsBasedObjectByName(eventsBasedObjectName: string) {
     // No object selection in this focused editor.
   }
@@ -290,6 +296,7 @@ export class ExtensionItemDetailEditorContainer extends React.Component<Props> {
       initiallyFocusedFunctionName,
       initiallyFocusedBehaviorName,
       initiallyFocusedObjectName,
+      initiallyOpenSettingsDialog,
     } = this.props.extraEditorProps || {};
 
     return (
@@ -309,6 +316,7 @@ export class ExtensionItemDetailEditorContainer extends React.Component<Props> {
           initiallyFocusedFunctionName={initiallyFocusedFunctionName}
           initiallyFocusedBehaviorName={initiallyFocusedBehaviorName}
           initiallyFocusedObjectName={initiallyFocusedObjectName}
+          initiallyOpenSettingsDialog={initiallyOpenSettingsDialog}
           focusedEventsBasedBehavior={focusedEventsBasedBehavior}
           focusedEventsFunction={focusedEventsFunction}
           onBehaviorEdited={this._reloadExtensionMetadata}

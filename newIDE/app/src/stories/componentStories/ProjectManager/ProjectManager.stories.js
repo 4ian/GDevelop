@@ -65,6 +65,7 @@ export const NoProjectOpen = (): React.Node => {
                   onOpenCustomObjectEditor={action('onOpenCustomObjectEditor')}
                   onOpenPrefabDetailEditor={action('onOpenPrefabDetailEditor')}
                   onOpenPrefabSettings={action('onOpenPrefabSettings')}
+                  onOpenBehaviorSettings={action('onOpenBehaviorSettings')}
                   openBehaviorEvents={action('openBehaviorEvents')}
                   onOpenEventBasedObjectEditor={action(
                     'onOpenEventBasedObjectEditor'
@@ -175,6 +176,7 @@ export const ProjectOpen = (): React.Node => {
                   onOpenCustomObjectEditor={action('onOpenCustomObjectEditor')}
                   onOpenPrefabDetailEditor={action('onOpenPrefabDetailEditor')}
                   onOpenPrefabSettings={action('onOpenPrefabSettings')}
+                  onOpenBehaviorSettings={action('onOpenBehaviorSettings')}
                   openBehaviorEvents={action('openBehaviorEvents')}
                   onOpenEventBasedObjectEditor={action(
                     'onOpenEventBasedObjectEditor'

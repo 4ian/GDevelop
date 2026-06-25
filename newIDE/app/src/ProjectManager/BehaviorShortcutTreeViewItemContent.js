@@ -28,6 +28,10 @@ export type BehaviorShortcutTreeViewItemCallbacks = {|
     initiallyFocusedBehaviorName?: ?string,
     initiallyFocusedObjectName?: ?string
   ) => void,
+  onOpenBehaviorSettings: (
+    gdEventsFunctionsExtension,
+    gdEventsBasedBehavior
+  ) => void,
 |};
 
 type ProjectItemUsageCallbacks = {|
@@ -110,6 +114,14 @@ export class BehaviorShortcutTreeViewItemContent
       {
         label: i18n._(t`Open behavior`),
         click: () => this.onClick(),
+      },
+      {
+        label: i18n._(t`Open behavior settings`),
+        click: () =>
+          this.props.onOpenBehaviorSettings(
+            this.eventsFunctionsExtension,
+            this.eventsBasedBehavior
+          ),
       },
       {
         label: i18n._(t`Find usage`),

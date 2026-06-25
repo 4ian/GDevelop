@@ -106,6 +106,7 @@ type Props = {|
   initiallyFocusedObjectName: ?string,
   focusedEventsBasedBehavior?: ?gdEventsBasedBehavior,
   focusedEventsFunction?: ?gdEventsFunction,
+  initiallyOpenSettingsDialog?: boolean,
   unsavedChanges?: ?UnsavedChanges,
   onOpenCustomObjectEditor: gdEventsBasedObject => void,
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
@@ -367,6 +368,9 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       );
     } else if (this.props.initiallyFocusedObjectName) {
       this.selectEventsBasedObjectByName(this.props.initiallyFocusedObjectName);
+    }
+    if (this.props.initiallyOpenSettingsDialog) {
+      this.openBehaviorSettingsDialog();
     }
   }
 
@@ -1698,6 +1702,10 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
         this._syncDetailPropertyListSelection();
       }
     });
+  };
+
+  openBehaviorSettingsDialog = () => {
+    this._openDetailSettingsDialog();
   };
 
   _openDetailSettingsDialog = () => {

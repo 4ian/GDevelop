@@ -734,6 +734,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       onOpenCustomObjectEditor,
       onOpenPrefabDetailEditor,
       onOpenPrefabSettings,
+      onOpenBehaviorSettings,
       openBehaviorEvents,
       onOpenEventBasedObjectEditor,
       onOpenEventBasedObjectVariantEditor,
@@ -1447,6 +1448,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
               scrollToItem,
               openItems,
               onOpenEventsFunctionsExtension,
+              onOpenBehaviorSettings,
               onFindUsage,
             }
           : null,
@@ -1462,6 +1464,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         scrollToItem,
         openItems,
         onOpenEventsFunctionsExtension,
+        onOpenBehaviorSettings,
         onFindUsage,
       ]
     );

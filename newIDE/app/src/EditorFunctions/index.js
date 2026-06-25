@@ -3128,6 +3128,13 @@ const put2dInstances: EditorFunction = {
             'The brush kind is unknown and was considered to be "none" instead.'
           );
         }
+        // "none" keeps existing instances in place; new ones still need a position.
+        modifiedAndCreatedInstances.forEach(instance => {
+          if (!existingInstanceStates.has(instance)) {
+            instance.setX(brushPosition[0]);
+            instance.setY(brushPosition[1]);
+          }
+        });
       }
 
       const instancesSize = SafeExtractor.parseCommaSeparatedTwoFiniteNumbers(
@@ -3177,7 +3184,10 @@ const put2dInstances: EditorFunction = {
             objectSizeInfo.height !== null
           ? [objectSizeInfo.width, objectSizeInfo.height]
           : null;
-        if (brush_kind === 'point' && effectiveSize) {
+        if (
+          (brush_kind === 'point' || brush_kind === 'none') &&
+          effectiveSize
+        ) {
           attrs.push(
             `origin at this position, each occupies ${getOccupiedSpaceDescription(
               brushPosition,
@@ -3773,6 +3783,14 @@ const put3dInstances: EditorFunction = {
             'The brush kind is unknown and was considered to be "none" instead.'
           );
         }
+        // "none" keeps existing instances in place; new ones still need a position.
+        modifiedAndCreatedInstances.forEach(instance => {
+          if (!existingInstanceStates.has(instance)) {
+            instance.setX(brushPosition[0]);
+            instance.setY(brushPosition[1]);
+            instance.setZ(brushPosition[2]);
+          }
+        });
       }
 
       const instancesSizeArray = SafeExtractor.parseCommaSeparatedThreeFiniteNumbers(
@@ -3820,7 +3838,10 @@ const put3dInstances: EditorFunction = {
             objectSizeInfo.depth !== null
           ? [objectSizeInfo.width, objectSizeInfo.height, objectSizeInfo.depth]
           : null;
-        if (brush_kind === 'point' && effectiveSize) {
+        if (
+          (brush_kind === 'point' || brush_kind === 'none') &&
+          effectiveSize
+        ) {
           attrs.push(
             `origin at this position, each occupies ${getOccupiedSpaceDescription(
               brushPosition,

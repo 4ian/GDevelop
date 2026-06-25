@@ -1892,6 +1892,59 @@ describe('editorFunctions', () => {
       });
     });
 
+    // Regression test: creating instances with the "none" brush used to leave
+    // every new instance at the origin (0,0) instead of at brush_position.
+    it('creates new instances at brush_position with the none brush', async () => {
+      await putInstances({
+        brush_kind: 'none',
+        brush_position: '200,300',
+        new_instances_count: 2,
+      });
+
+      expect(getInstancePositions(testScene)).toEqual([
+        { x: 200, y: 300 },
+        { x: 200, y: 300 },
+      ]);
+    });
+
+    // The none brush must still leave existing instances where they are.
+    it('does not move an existing instance edited with the none brush', async () => {
+      await putInstances({
+        brush_kind: 'point',
+        brush_position: '100,200',
+        new_instances_count: 1,
+      });
+      const [created] = getInstances(testScene);
+
+      await putInstances({
+        brush_kind: 'none',
+        brush_position: '640,360',
+        existing_instance_ids: created.uuid,
+        instances_size: '48,48',
+      });
+
+      expect(getInstancePositions(testScene)).toEqual([{ x: 100, y: 200 }]);
+    });
+
+    // Editing an existing instance with the none brush and no brush_position
+    // must not snap it to the scene-center fallback.
+    it('does not move an existing instance edited with the none brush and no brush_position', async () => {
+      await putInstances({
+        brush_kind: 'point',
+        brush_position: '100,200',
+        new_instances_count: 1,
+      });
+      const [created] = getInstances(testScene);
+
+      await putInstances({
+        brush_kind: 'none',
+        existing_instance_ids: created.uuid,
+        instances_opacity: 128,
+      });
+
+      expect(getInstancePositions(testScene)).toEqual([{ x: 100, y: 200 }]);
+    });
+
     // line/grid need an end position to spread instances. Omitting it must fail
     // up front (and create nothing) rather than silently dropping every
     // instance at the default origin.

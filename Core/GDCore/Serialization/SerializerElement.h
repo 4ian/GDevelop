@@ -409,7 +409,7 @@ class GD_CORE_API SerializerElement {
                               gd::String deprecatedName = "") const;
 
   /**
-   * \brief Get or create a child of the element using its name.
+   * \brief Get or create a child of the element.
    *
    * \param name The name of the child.
    */

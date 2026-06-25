@@ -501,29 +501,23 @@ export const EmbeddedGameFrame = ({
     ]
   );
 
-  // Register the iframe window in the debugger as soon as the iframe is shown.
-  React.useEffect(() => {
-    const iframe = iframeRef.current;
-    const hasSomethingLoaded = !!previewIndexHtmlLocation;
-    if (previewDebuggerServer && iframe && hasSomethingLoaded)
-      previewDebuggerServer.registerEmbeddedGameFrame(iframe.contentWindow);
-  });
-
-  // Unregister the iframe window in the debugger when the EmbeddedGameFrame is unmounted
-  // (or in the unlikely case the previewDebuggerServer is changed).
+  // Register the iframe window in the debugger only while the embedded game
+  // editor is enabled. Otherwise its stale status can keep the editor locked.
   React.useEffect(
     () => {
       const iframe = iframeRef.current;
-      const previousPreviewDebuggerServer = previewDebuggerServer;
+      const hasSomethingLoaded = !!previewIndexHtmlLocation;
+      if (!previewDebuggerServer || !iframe || !hasSomethingLoaded || !enabled)
+        return;
+
+      const iframeWindow = iframe.contentWindow;
+      previewDebuggerServer.registerEmbeddedGameFrame(iframeWindow);
+
       return () => {
-        if (previousPreviewDebuggerServer && iframe) {
-          previousPreviewDebuggerServer.unregisterEmbeddedGameFrame(
-            iframe.contentWindow
-          );
-        }
+        previewDebuggerServer.unregisterEmbeddedGameFrame(iframeWindow);
       };
     },
-    [previewDebuggerServer]
+    [previewDebuggerServer, previewIndexHtmlLocation, enabled]
   );
 
   const [isDraggedItem3D, setDraggedItem3D] = React.useState(false);

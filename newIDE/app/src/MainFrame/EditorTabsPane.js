@@ -64,6 +64,7 @@ import { type CreateProjectResult } from '../Utils/UseCreateProject';
 import { type OpenAskAiOptions } from '../AiGeneration/Utils';
 import { type ToolbarButtonConfig } from './CustomToolbarButton';
 import { type TriggerNpmScript } from './NpmScriptRunner/useNpmScriptRunner';
+import { useActiveEmbeddedGameFrameHoleCount } from '../EmbeddedGame/EmbeddedGameFrameHole';
 
 const styles = {
   container: {
@@ -78,12 +79,12 @@ const styles = {
 const shouldRemovePointerEvents = (
   kind: EditorKind,
   gameEditorMode: 'embedded-game' | 'instances-editor',
-  hasInGameEditionPreviewRunning: boolean
+  hasActiveEmbeddedGameFrameHole: boolean
 ) => {
-  if (gameEditorMode === 'embedded-game' && hasInGameEditionPreviewRunning) {
-    // Scene editors can have an embedded game, so they redefine manually
-    // which components can have clicks/touches. Do this only while the
-    // in-game preview is actually connected, as the saved mode can outlive it.
+  if (gameEditorMode === 'embedded-game' && hasActiveEmbeddedGameFrameHole) {
+    // Scene editors can have an embedded game, so they redefine manually which
+    // components can have clicks/touches. Do this only while the iframe hole is
+    // actually active, as debugger state can outlive the visible editor.
     return (
       kind === 'layout' ||
       kind === 'external layout' ||
@@ -101,7 +102,6 @@ export type EditorTabsPaneCommonProps = {|
   isSavingProject: boolean,
   isSharingEnabled: boolean,
   hasPreviewsRunning: boolean,
-  hasInGameEditionPreviewRunning: boolean,
   previewState: PreviewState,
   checkedOutVersionStatus: ?OpenedVersionStatus,
   canDoNetworkPreview: boolean,
@@ -328,7 +328,6 @@ const EditorTabsPane: React.ComponentType<{
     isSavingProject,
     isSharingEnabled,
     hasPreviewsRunning,
-    hasInGameEditionPreviewRunning,
     previewState,
     checkedOutVersionStatus,
     canDoNetworkPreview,
@@ -431,6 +430,8 @@ const EditorTabsPane: React.ComponentType<{
     rightPaneDrawerOpen,
   } = props;
 
+  const hasActiveEmbeddedGameFrameHole =
+    useActiveEmbeddedGameFrameHoleCount() > 0;
   const toolbarRef = React.useRef<?ToolbarInterface>(null);
   const unsavedChanges = React.useContext(UnsavedChangesContext);
   const askAiPaneIdentifier = getEditorTabOpenedWithKey(editorTabs, 'ask-ai');
@@ -896,7 +897,7 @@ const EditorTabsPane: React.ComponentType<{
                   shouldRemovePointerEvents(
                     editorTab.kind,
                     gameEditorMode,
-                    hasInGameEditionPreviewRunning
+                    hasActiveEmbeddedGameFrameHole
                   )
                 }
               >

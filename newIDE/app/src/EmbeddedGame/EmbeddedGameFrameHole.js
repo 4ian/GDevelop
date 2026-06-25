@@ -31,6 +31,27 @@ const notifyActiveEmbeddedGameFrameHoleCountCallbacks = () => {
   );
 };
 
+export const useActiveEmbeddedGameFrameHoleCount = (): number => {
+  const [
+    currentActiveEmbeddedGameFrameHoleCount,
+    setCurrentActiveEmbeddedGameFrameHoleCount,
+  ] = React.useState(activeEmbeddedGameFrameHoleCount);
+
+  React.useEffect(
+    () =>
+      registerActiveEmbeddedGameFrameHoleCountCallback(
+        ({ activeEmbeddedGameFrameHoleCount }) => {
+          setCurrentActiveEmbeddedGameFrameHoleCount(
+            activeEmbeddedGameFrameHoleCount
+          );
+        }
+      ),
+    []
+  );
+
+  return currentActiveEmbeddedGameFrameHoleCount;
+};
+
 export const getActiveEmbeddedGameFrameHoleRect = (): ?ClientRect => {
   // There is only one embedded game frame hole active at a time,
   // so we don't need to check if the parent scene editor is active.

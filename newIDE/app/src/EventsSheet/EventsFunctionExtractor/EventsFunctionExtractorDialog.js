@@ -36,6 +36,7 @@ type Props = {|
   scope: EventsScope,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
+  projectScopedContainersAccessor?: ProjectScopedContainersAccessor,
   serializedEvents: Object,
   onClose: () => void,
   onCreate: (
@@ -51,6 +52,7 @@ const EventsFunctionExtractorDialog = ({
   scope,
   globalObjectsContainer,
   objectsContainer,
+  projectScopedContainersAccessor,
   serializedEvents,
   onClose,
   onCreate,
@@ -65,7 +67,7 @@ const EventsFunctionExtractorDialog = ({
   // This is only used to check parameter for name conflict,but the parameter
   // editor is locked so users can't actually change parameter names.
   // Thus, it's fine to use the wrong scope.
-  const projectScopedContainersAccessor = React.useMemo<ProjectScopedContainersAccessor>(
+  const parametersEditorProjectScopedContainersAccessor = React.useMemo<ProjectScopedContainersAccessor>(
     () => new ProjectScopedContainersAccessor({ project }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
@@ -80,6 +82,7 @@ const EventsFunctionExtractorDialog = ({
         scope,
         globalObjectsContainer,
         objectsContainer,
+        projectScopedContainersAccessor,
         serializedEvents,
         eventsFunction: newEventsFunction,
       });
@@ -270,7 +273,9 @@ const EventsFunctionExtractorDialog = ({
             />
             <CompactEventsFunctionParametersEditor
               project={project}
-              projectScopedContainersAccessor={projectScopedContainersAccessor}
+              projectScopedContainersAccessor={
+                parametersEditorProjectScopedContainersAccessor
+              }
               eventsFunction={eventsFunction}
               eventsBasedBehavior={null}
               eventsBasedObject={null}

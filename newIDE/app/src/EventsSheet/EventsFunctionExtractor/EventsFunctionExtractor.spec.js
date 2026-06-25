@@ -1,6 +1,10 @@
 // @flow
 import { setupFunctionFromEvents } from '.';
 import { makeTestProject } from '../../fixtures/TestProject';
+import {
+  ProjectScopedContainersAccessor,
+  type EventsScope,
+} from '../../InstructionOrExpression/EventsScope';
 const gd: libGDevelop = global.gd;
 
 const serializedEvents = [
@@ -80,5 +84,82 @@ describe('EventsFunctionExtractor', () => {
         .getParameterAt(3)
         .getName()
     ).toBe('MyTextObject');
+  });
+
+  it('can configure an events function from object function events', () => {
+    const { project, testEventsBasedObject } = makeTestProject(gd);
+    const eventsFunctionsExtension = project.getEventsFunctionsExtension(
+      'Button'
+    );
+    const objectEventsFunction = testEventsBasedObject
+      .getEventsFunctions()
+      .getEventsFunction('MyTestFunction');
+    objectEventsFunction
+      .getParameters()
+      .insertNewParameter('Object', 0)
+      .setType('object');
+    const eventsFunction = new gd.EventsFunction();
+    const parameterObjectsContainer = new gd.ObjectsContainer(
+      gd.ObjectsContainer.Function
+    );
+    const parameterVariablesContainer = new gd.VariablesContainer(
+      gd.VariablesContainer.Parameters
+    );
+    const propertyVariablesContainer = new gd.VariablesContainer(
+      gd.VariablesContainer.Properties
+    );
+    const parameterResourcesContainer = new gd.ResourcesContainer(
+      gd.ResourcesContainer.Parameters
+    );
+    const propertyResourcesContainer = new gd.ResourcesContainer(
+      gd.ResourcesContainer.Properties
+    );
+    const scope: EventsScope = {
+      project,
+      eventsFunctionsExtension,
+      eventsBasedObject: testEventsBasedObject,
+      eventsFunction: objectEventsFunction,
+    };
+    const projectScopedContainersAccessor = new ProjectScopedContainersAccessor(
+      scope,
+      parameterObjectsContainer,
+      parameterVariablesContainer,
+      propertyVariablesContainer,
+      parameterResourcesContainer,
+      propertyResourcesContainer
+    );
+
+    setupFunctionFromEvents({
+      project,
+      scope,
+      globalObjectsContainer: testEventsBasedObject.getObjects(),
+      objectsContainer: parameterObjectsContainer,
+      projectScopedContainersAccessor,
+      serializedEvents: [
+        {
+          disabled: false,
+          folded: false,
+          type: 'BuiltinCommonInstructions::Standard',
+          conditions: [],
+          actions: [
+            {
+              type: { inverted: false, value: 'Cache' },
+              parameters: ['Label'],
+              subInstructions: [],
+            },
+          ],
+          events: [],
+        },
+      ],
+      eventsFunction,
+    });
+
+    expect(eventsFunction.getParameters().getParametersCount()).toBe(1);
+    expect(
+      eventsFunction
+        .getParameters()
+        .getParameterAt(0)
+        .getName()
+    ).toBe('Label');
   });
 });

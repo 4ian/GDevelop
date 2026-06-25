@@ -3255,6 +3255,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
             scope={scope}
             globalObjectsContainer={globalObjectsContainer}
             objectsContainer={objectsContainer}
+            projectScopedContainersAccessor={projectScopedContainersAccessor}
             onClose={() =>
               this.setState({
                 serializedEventsToExtract: null,

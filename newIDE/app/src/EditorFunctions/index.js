@@ -35,6 +35,8 @@ import {
 } from '../ProjectCreation/CreateProject';
 import { retryIfFailed } from '../Utils/RetryIfFailed';
 import newNameGenerator from '../Utils/NewNameGenerator';
+import getObjectByName from '../Utils/GetObjectByName';
+import { getAllVisibleBehaviorNames } from '../Utils/Behavior';
 import { type AssetShortHeader } from '../Utils/GDevelopServices/Asset';
 import { type ExampleShortHeader } from '../Utils/GDevelopServices/Example';
 import { swapAsset } from '../AssetStore/AssetSwapper';
@@ -1843,7 +1845,59 @@ const changeObjectProperty: EditorFunction = {
 };
 
 /**
- * Adds a behavior to an object in a scene
+ * Resolve a name to the object(s) it refers to.
+ *
+ * Object groups are handled "almost like an object": a tool that accepts an
+ * object name also accepts a group name, in which case the operation is applied
+ * to every object of the group. This mirrors how the editor lets the user edit
+ * the behaviors and variables shared in common by all the objects of a group.
+ *
+ * Returns `null` when no object nor group with this name exists. For a group,
+ * `objects` contains all its (resolvable) member objects and `group` is set.
+ */
+const getObjectsConcernedByName = (
+  project: gdProject,
+  layout: gdLayout,
+  objectOrGroupName: string
+): {|
+  objects: Array<gdObject>,
+  group: gdObjectGroup | null,
+|} | null => {
+  const layoutObjects = layout.getObjects();
+  const globalObjects = project.getObjects();
+
+  const object = getObjectByName(
+    globalObjects,
+    layoutObjects,
+    objectOrGroupName
+  );
+  if (object) {
+    return { objects: [object], group: null };
+  }
+
+  const sceneGroups = layoutObjects.getObjectGroups();
+  const globalGroups = globalObjects.getObjectGroups();
+  const group = sceneGroups.has(objectOrGroupName)
+    ? sceneGroups.get(objectOrGroupName)
+    : globalGroups.has(objectOrGroupName)
+    ? globalGroups.get(objectOrGroupName)
+    : null;
+  if (group) {
+    const objects = group
+      .getAllObjectsNames()
+      .toJSArray()
+      .map(objectName =>
+        getObjectByName(globalObjects, layoutObjects, objectName)
+      )
+      .filter(Boolean);
+    return { objects, group };
+  }
+
+  return null;
+};
+
+/**
+ * Adds a behavior to an object (or to all objects of a group) in a scene.
  */
 const addBehavior: EditorFunction = {
   renderForEditor: ({ project, args, editorCallbacks }) => {
@@ -1921,20 +1975,18 @@ const addBehavior: EditorFunction = {
     }
 
     const layout = project.getLayout(scene_name);
-    const layoutObjects = layout.getObjects();
-    const globalObjects = project.getObjects();
 
-    let object: gdObject | null = null;
-
-    if (layoutObjects.hasObjectNamed(object_name)) {
-      object = layoutObjects.getObject(object_name);
-    } else if (globalObjects.hasObjectNamed(object_name)) {
-      object = globalObjects.getObject(object_name);
-    }
-
-    if (!object) {
+    // `object_name` can designate an object or a group (in which case the
+    // behavior is added to every object of the group).
+    const concerned = getObjectsConcernedByName(project, layout, object_name);
+    if (!concerned) {
       return makeGenericFailure(
-        `Object not found: "${object_name}" in scene "${scene_name}" nor globally.`
+        `Object or group not found: "${object_name}" in scene "${scene_name}" nor globally.`
+      );
+    }
+    if (concerned.objects.length === 0) {
+      return makeGenericFailure(
+        `Group "${object_name}" has no object, so the behavior was not added.`
       );
     }
 
@@ -1972,81 +2024,87 @@ const addBehavior: EditorFunction = {
     // allows to share the same behavior shared data between objects).
     const behaviorName =
       optionalBehaviorName || behaviorMetadata.getDefaultName();
+    const isDefaultCapability = isBehaviorDefaultCapability(behaviorMetadata);
 
-    // Check if behavior with this name already exists
-    if (object.hasBehaviorNamed(behaviorName)) {
+    const changes = [];
+    const warnings = [];
+    for (const object of concerned.objects) {
+      const objectName = object.getName();
+
+      // Check if behavior with this name already exists
+      if (object.hasBehaviorNamed(behaviorName)) {
+        const behavior = object.getBehavior(behaviorName);
+        if (behavior.getTypeName() !== behavior_type) {
+          warnings.push(
+            `Behavior "${behaviorName}" already on "${objectName}" with different type ("${behavior_type}").`
+          );
+        } else {
+          changes.push(
+            `Behavior "${behaviorName}" already on "${objectName}".`
+          );
+        }
+        continue;
+      }
+
+      if (isDefaultCapability) {
+        const alreadyHasDefaultCapability = object
+          .getAllBehaviorNames()
+          .toJSArray()
+          .some(
+            name => object.getBehavior(name).getTypeName() === behavior_type
+          );
+        if (alreadyHasDefaultCapability) {
+          changes.push(
+            `Behavior "${behaviorName}" (type "${behavior_type}") is a default capability already on "${objectName}".`
+          );
+        } else {
+          warnings.push(
+            `Behavior "${behaviorName}" (type "${behavior_type}") is a default capability; cannot be added to "${objectName}".`
+          );
+        }
+        continue;
+      }
+
+      if (
+        behaviorMetadata.getObjectType() &&
+        behaviorMetadata.getObjectType() !== object.getType()
+      ) {
+        warnings.push(
+          `Behavior "${behaviorName}" (type "${behavior_type}") requires object type "${behaviorMetadata.getObjectType()}"; "${objectName}" is not.`
+        );
+        continue;
+      }
+
+      // Add the behavior
+      gd.WholeProjectRefactorer.addBehaviorAndRequiredBehaviors(
+        project,
+        object,
+        behavior_type,
+        behaviorName
+      );
+      if (!object.hasBehaviorNamed(behaviorName)) {
+        warnings.push(
+          `Unexpected error: behavior "${behaviorName}" not added to "${objectName}".`
+        );
+        continue;
+      }
+
       const behavior = object.getBehavior(behaviorName);
-      if (behavior.getTypeName() !== behavior_type) {
-        return makeGenericFailure(
-          `Behavior "${behaviorName}" already on "${object_name}" with different type ("${behavior_type}").`
-        );
-      }
-
-      return makeGenericSuccess(
-        `Behavior "${behaviorName}" already on "${object_name}".`
-      );
-    }
-
-    if (isBehaviorDefaultCapability(behaviorMetadata)) {
-      const alreadyHasDefaultCapability = object
-        .getAllBehaviorNames()
-        .toJSArray()
-        .some(behaviorName => {
-          if (!object) return false;
-          const behavior = object.getBehavior(behaviorName);
-          return behavior.getTypeName() === behavior_type;
-        });
-      if (alreadyHasDefaultCapability) {
-        return makeGenericSuccess(
-          `Behavior "${behaviorName}" (type "${behavior_type}") is a default capability already on "${object_name}".`
-        );
-      }
-
-      return makeGenericFailure(
-        `Behavior "${behaviorName}" (type "${behavior_type}") is a default capability; cannot be added to "${object_name}".`
-      );
-    }
-
-    if (
-      behaviorMetadata.getObjectType() &&
-      behaviorMetadata.getObjectType() !== object.getType()
-    ) {
-      return makeGenericFailure(
-        `Behavior "${behaviorName}" (type "${behavior_type}") requires object type "${behaviorMetadata.getObjectType()}"; "${object_name}" is not.`
-      );
-    }
-
-    // Add the behavior
-    gd.WholeProjectRefactorer.addBehaviorAndRequiredBehaviors(
-      project,
-      object,
-      behavior_type,
-      behaviorName
-    );
-    if (!object.hasBehaviorNamed(behaviorName)) {
-      return makeGenericFailure(
-        `Unexpected error: behavior "${behaviorName}" not added to "${object_name}".`
+      changes.push(
+        `Added behavior "${behaviorName}" (type "${behavior_type}") to "${objectName}". Properties: ${formatPropertiesList(
+          behavior.getProperties()
+        )}.`
       );
     }
     layout.updateBehaviorsSharedData(project);
 
-    const behavior = object.getBehavior(behaviorName);
-    const propertiesText = `Properties: ${formatPropertiesList(
-      behavior.getProperties()
-    )}.`;
-
-    return makeGenericSuccess(
-      [
-        `Added behavior "${behaviorName}" (type "${behavior_type}") to "${object_name}".`,
-        propertiesText,
-      ].join(' ')
-    );
+    return makeMultipleChangesOutput(changes, warnings);
   },
   modifiesProject: true,
 };
 
 /**
- * Removes a behavior from an object in a scene
+ * Removes a behavior from an object (or from all objects of a group) in a scene.
  */
 const removeBehavior: EditorFunction = {
   renderForEditor: ({ args }) => {
@@ -2073,55 +2131,56 @@ const removeBehavior: EditorFunction = {
     }
 
     const layout = project.getLayout(scene_name);
-    const layoutObjects = layout.getObjects();
-    const globalObjects = project.getObjects();
 
-    let object: gdObject | null = null;
-
-    if (layoutObjects.hasObjectNamed(object_name)) {
-      object = layoutObjects.getObject(object_name);
-    } else if (globalObjects.hasObjectNamed(object_name)) {
-      object = globalObjects.getObject(object_name);
-    }
-
-    if (!object) {
+    // `object_name` can designate an object or a group (in which case the
+    // behavior is removed from every object of the group that has it).
+    const concerned = getObjectsConcernedByName(project, layout, object_name);
+    if (!concerned) {
       return makeGenericFailure(
-        `Object not found: "${object_name}" in scene "${scene_name}" nor globally.`
+        `Object or group not found: "${object_name}" in scene "${scene_name}" nor globally.`
       );
     }
 
-    if (!object.hasBehaviorNamed(behavior_name)) {
-      return makeGenericFailure(
-        `Behavior "${behavior_name}" not on "${object_name}". Not removed.`
+    const changes = [];
+    const warnings = [];
+    for (const object of concerned.objects) {
+      const objectName = object.getName();
+      if (!object.hasBehaviorNamed(behavior_name)) {
+        warnings.push(
+          `Behavior "${behavior_name}" not on "${objectName}". Not removed.`
+        );
+        continue;
+      }
+
+      const dependentBehaviors = gd.WholeProjectRefactorer.findDependentBehaviorNames(
+        project,
+        object,
+        behavior_name
+      ).toJSArray();
+
+      // Remove the behavior
+      object.removeBehavior(behavior_name);
+      dependentBehaviors.forEach(name => {
+        object.removeBehavior(name);
+      });
+
+      changes.push(
+        dependentBehaviors.length > 0
+          ? `Removed behavior "${behavior_name}" from "${objectName}" (also removed dependents: ${dependentBehaviors.join(
+              ', '
+            )}).`
+          : `Removed behavior "${behavior_name}" from "${objectName}".`
       );
     }
 
-    const dependentBehaviors = gd.WholeProjectRefactorer.findDependentBehaviorNames(
-      project,
-      object,
-      behavior_name
-    ).toJSArray();
-
-    // Remove the behavior
-    object.removeBehavior(behavior_name);
-    dependentBehaviors.forEach(name => {
-      if (!object) return;
-      object.removeBehavior(name);
-    });
-
-    return makeGenericSuccess(
-      dependentBehaviors.length > 0
-        ? `Removed behavior "${behavior_name}" from "${object_name}" (also removed dependents: ${dependentBehaviors.join(
-            ', '
-          )}).`
-        : `Removed behavior "${behavior_name}" from "${object_name}".`
-    );
+    return makeMultipleChangesOutput(changes, warnings);
   },
   modifiesProject: true,
 };
 
 /**
- * Retrieves the properties of a specific behavior attached to an object
+ * Retrieves the properties of a specific behavior attached to an object (or to
+ * the objects of a group).
  */
 const inspectBehaviorProperties: EditorFunction = {
   renderForEditor: ({ args }) => {
@@ -2148,24 +2207,21 @@ const inspectBehaviorProperties: EditorFunction = {
     }
 
     const layout = project.getLayout(scene_name);
-    const layoutObjects = layout.getObjects();
-    const globalObjects = project.getObjects();
 
-    let object: gdObject | null = null;
-
-    if (layoutObjects.hasObjectNamed(object_name)) {
-      object = layoutObjects.getObject(object_name);
-    } else if (globalObjects.hasObjectNamed(object_name)) {
-      object = globalObjects.getObject(object_name);
-    }
-
-    if (!object) {
+    // `object_name` can designate an object or a group. For a group, the
+    // behavior is shared in common by all its objects, so any of them can be
+    // inspected: use the first object that has the behavior.
+    const concerned = getObjectsConcernedByName(project, layout, object_name);
+    if (!concerned) {
       return makeGenericFailure(
-        `Object not found: "${object_name}" in scene "${scene_name}" nor globally.`
+        `Object or group not found: "${object_name}" in scene "${scene_name}" nor globally.`
       );
     }
 
-    if (!object.hasBehaviorNamed(behavior_name)) {
+    const object = concerned.objects.find(object =>
+      object.hasBehaviorNamed(behavior_name)
+    );
+    if (!object) {
       return makeGenericFailure(
         `Behavior "${behavior_name}" not on "${object_name}".`
       );
@@ -2284,25 +2340,15 @@ const changeBehaviorProperty: EditorFunction = {
     }
 
     const layout = project.getLayout(scene_name);
-    const layoutObjects = layout.getObjects();
-    const globalObjects = project.getObjects();
 
-    let object: gdObject | null = null;
-
-    if (layoutObjects.hasObjectNamed(object_name)) {
-      object = layoutObjects.getObject(object_name);
-    } else if (globalObjects.hasObjectNamed(object_name)) {
-      object = globalObjects.getObject(object_name);
-    }
+    // `object_name` can designate an object or a group (which shares the
+    // behavior in common): use any object having the behavior to read labels.
+    const concerned = getObjectsConcernedByName(project, layout, object_name);
+    const object = concerned
+      ? concerned.objects.find(object => object.hasBehaviorNamed(behavior_name))
+      : null;
 
     if (!object) {
-      // $FlowFixMe[incompatible-type]
-      return renderChanges(
-        listLabelAndValuesFromChangedProperties(changed_properties)
-      );
-    }
-
-    if (!object.hasBehaviorNamed(behavior_name)) {
       // $FlowFixMe[incompatible-type]
       return renderChanges(
         listLabelAndValuesFromChangedProperties(changed_properties)
@@ -2380,30 +2426,28 @@ const changeBehaviorProperty: EditorFunction = {
     }
 
     const layout = project.getLayout(scene_name);
-    const layoutObjects = layout.getObjects();
-    const globalObjects = project.getObjects();
 
-    let object: gdObject | null = null;
-
-    if (layoutObjects.hasObjectNamed(object_name)) {
-      object = layoutObjects.getObject(object_name);
-    } else if (globalObjects.hasObjectNamed(object_name)) {
-      object = globalObjects.getObject(object_name);
-    }
-
-    if (!object) {
+    // `object_name` can designate an object or a group (in which case the
+    // property is changed on the behavior of every object of the group).
+    const concerned = getObjectsConcernedByName(project, layout, object_name);
+    if (!concerned) {
       return makeGenericFailure(
-        `Object not found: "${object_name}" in scene "${scene_name}" nor globally.`
+        `Object or group not found: "${object_name}" in scene "${scene_name}" nor globally.`
       );
     }
 
-    if (!object.hasBehaviorNamed(behavior_name)) {
+    const objectsWithBehavior = concerned.objects.filter(object =>
+      object.hasBehaviorNamed(behavior_name)
+    );
+    if (objectsWithBehavior.length === 0) {
       return makeGenericFailure(
         `Behavior "${behavior_name}" not on "${object_name}".`
       );
     }
 
-    const behavior = object.getBehavior(behavior_name);
+    // The behavior is shared in common, so any object's behavior can be used
+    // to look up properties; changes are then applied to all of them.
+    const behavior = objectsWithBehavior[0].getBehavior(behavior_name);
     const behaviorProperties = behavior.getProperties();
 
     const allBehaviorSharedDataNames = layout
@@ -2455,7 +2499,17 @@ const changeBehaviorProperty: EditorFunction = {
           foundProperty,
           newValue
         );
-        if (!behavior.updateProperty(foundPropertyName, sanitizedNewValue)) {
+        let couldUpdate = true;
+        for (const object of objectsWithBehavior) {
+          if (
+            !object
+              .getBehavior(behavior_name)
+              .updateProperty(foundPropertyName, sanitizedNewValue)
+          ) {
+            couldUpdate = false;
+          }
+        }
+        if (!couldUpdate) {
           warnings.push(
             `Could not set "${foundPropertyName}" on behavior "${behavior_name}": invalid value or type.`
           );
@@ -5402,13 +5456,54 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
             });
             const globalObjects = project.getObjects();
             const sceneObjects = scene.getObjects();
+
+            // Capture the variables and behaviors shared in common by the group
+            // (from its objects after removals, before additions), so that any
+            // newly added object can be filled with them - exactly like the
+            // object group editor does. This keeps an object added to a group
+            // consistent with the rest of the group (which is the "intersection"
+            // of its objects: it shows the variables and behaviors in common).
+            const objectsContainersList = gd.ProjectScopedContainers.makeNewProjectScopedContainersForProjectAndLayout(
+              project,
+              scene
+            ).getObjectsContainersList();
+            const groupVariablesContainer = gd.ObjectRefactorer.mergeVariableContainers(
+              objectsContainersList,
+              foundGroup
+            );
+            const existingGroupObjects = foundGroup
+              .getAllObjectsNames()
+              .toJSArray()
+              .map(name => getObjectByName(globalObjects, sceneObjects, name))
+              .filter(Boolean);
+            const groupVisibleBehaviorNames = getAllVisibleBehaviorNames(
+              existingGroupObjects
+            );
+
             newObjectNames.forEach(objectName => {
               if (!currentObjectNames.includes(objectName)) {
-                if (
-                  sceneObjects.hasObjectNamed(objectName) ||
-                  globalObjects.hasObjectNamed(objectName)
-                ) {
+                const object = getObjectByName(
+                  globalObjects,
+                  sceneObjects,
+                  objectName
+                );
+                if (object) {
                   foundGroup.addObject(objectName);
+                  // Give the newly added object the variables and behaviors
+                  // shared in common by the group, if it does not have them yet.
+                  gd.ObjectRefactorer.fillMissingGroupVariablesToObject(
+                    object,
+                    groupVariablesContainer
+                  );
+                  for (const behaviorName of groupVisibleBehaviorNames) {
+                    gd.ObjectRefactorer.fillMissingGroupBehaviorToObject(
+                      globalObjects,
+                      sceneObjects,
+                      object,
+                      foundGroup,
+                      behaviorName
+                    );
+                  }
                 } else {
                   warnings.push(
                     `Object "${objectName}" not found in scene "${scene_name}", so it was not added to group "${groupName}".`
@@ -5492,7 +5587,7 @@ const addOrEditVariable: EditorFunction = {
         details,
         hasDetailsToShow: true,
       };
-    } else if (variable_scope === 'object') {
+    } else if (variable_scope === 'object' || variable_scope === 'group') {
       return {
         text: (
           <Trans>
@@ -5539,7 +5634,12 @@ const addOrEditVariable: EditorFunction = {
     );
     const scene_name = SafeExtractor.extractStringProperty(args, 'scene_name');
 
-    let variablesContainer;
+    // A variable change is applied to one or more variables containers.
+    // A group is handled "almost like an object": a group variable is a variable
+    // shared in common by all the objects of the group, so the change is applied
+    // to each object of the group. `object` and `group` scopes are equivalent
+    // (the name is resolved to whichever exists).
+    let variablesContainers: Array<gdVariablesContainer> = [];
     let scopeDescription;
     if (variable_scope === 'scene') {
       if (!scene_name) {
@@ -5550,55 +5650,90 @@ const addOrEditVariable: EditorFunction = {
       if (!project.hasLayoutNamed(scene_name)) {
         return makeGenericFailure(`Scene not found: "${scene_name}".`);
       }
-      variablesContainer = project.getLayout(scene_name).getVariables();
+      variablesContainers = [project.getLayout(scene_name).getVariables()];
       scopeDescription = `scene "${scene_name}"`;
-    } else if (variable_scope === 'object') {
+    } else if (variable_scope === 'object' || variable_scope === 'group') {
       if (!object_name) {
         return makeGenericFailure(
-          `Missing "object_name" (required for object variable).`
+          `Missing "object_name" (required for an object or group variable).`
         );
       }
 
-      let objectsContainer;
+      let concernedObjects: Array<gdObject> = [];
+      let isGroup = false;
       if (scene_name) {
         if (!project.hasLayoutNamed(scene_name)) {
           return makeGenericFailure(`Scene not found: "${scene_name}".`);
         }
-        objectsContainer = project.getLayout(scene_name).getObjects();
-        if (!objectsContainer.hasObjectNamed(object_name)) {
+        const concerned = getObjectsConcernedByName(
+          project,
+          project.getLayout(scene_name),
+          object_name
+        );
+        if (!concerned) {
           return makeGenericFailure(
-            `Object "${object_name}" not in scene "${scene_name}". For a global object, omit scene_name.`
+            `Object or group "${object_name}" not in scene "${scene_name}". For a global object, omit scene_name.`
           );
         }
-        scopeDescription = `scene "${scene_name}" object "${object_name}"`;
+        concernedObjects = concerned.objects;
+        isGroup = !!concerned.group;
       } else {
-        objectsContainer = project.getObjects();
-        if (!objectsContainer.hasObjectNamed(object_name)) {
+        const globalObjects = project.getObjects();
+        if (globalObjects.hasObjectNamed(object_name)) {
+          concernedObjects = [globalObjects.getObject(object_name)];
+        } else if (globalObjects.getObjectGroups().has(object_name)) {
+          isGroup = true;
+          concernedObjects = globalObjects
+            .getObjectGroups()
+            .get(object_name)
+            .getAllObjectsNames()
+            .toJSArray()
+            .map(name => getObjectByName(globalObjects, null, name))
+            .filter(Boolean);
+        } else {
           return makeGenericFailure(
-            `Object "${object_name}" not found globally. Did you forget to specify scene_name?`
+            `Object or group "${object_name}" not found globally. Did you forget to specify scene_name?`
           );
         }
-        scopeDescription = `global object "${object_name}"`;
       }
 
-      variablesContainer = objectsContainer
-        .getObject(object_name)
-        .getVariables();
+      if (concernedObjects.length === 0) {
+        return makeGenericFailure(
+          `Group "${object_name}" has no object, so the variable was not changed.`
+        );
+      }
+
+      variablesContainers = concernedObjects.map(object =>
+        object.getVariables()
+      );
+      const objectOrGroupLabel = isGroup
+        ? `group "${object_name}"`
+        : `object "${object_name}"`;
+      scopeDescription = scene_name
+        ? `scene "${scene_name}" ${objectOrGroupLabel}`
+        : `global ${objectOrGroupLabel}`;
     } else if (variable_scope === 'global') {
-      variablesContainer = project.getVariables();
+      variablesContainers = [project.getVariables()];
       scopeDescription = 'global';
     } else {
       return makeGenericFailure(
-        `Invalid "variable_scope": "${variable_scope}". Use \`scene\`, \`object\` or \`global\`.`
+        `Invalid "variable_scope": "${variable_scope}". Use \`scene\`, \`object\`, \`group\` or \`global\`.`
       );
     }
 
-    const { addedNewVariable, variableType } = applyVariableChange({
-      variablePath: variable_name_or_path,
-      forcedVariableType: variable_type,
-      variablesContainer,
-      value,
-    });
+    let addedNewVariable = false;
+    // The containers list is always non-empty here, so this is overwritten.
+    let variableType = '';
+    for (const variablesContainer of variablesContainers) {
+      const result = applyVariableChange({
+        variablePath: variable_name_or_path,
+        forcedVariableType: variable_type,
+        variablesContainer,
+        value,
+      });
+      addedNewVariable = addedNewVariable || result.addedNewVariable;
+      variableType = result.variableType;
+    }
 
     const truncatedValue = truncateValue(value);
     return makeGenericSuccess(

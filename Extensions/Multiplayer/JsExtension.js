@@ -1255,7 +1255,9 @@ module.exports = {
       }
       if (propertyName === 'playerNumber') {
         const numberValue = newValue === 'Host' ? 0 : parseInt(newValue, 10);
-        behaviorContent.getOrCreateChild('playerNumber').setIntValue(numberValue);
+        behaviorContent
+          .getOrCreateChild('playerNumber')
+          .setIntValue(numberValue);
         return true;
       }
 

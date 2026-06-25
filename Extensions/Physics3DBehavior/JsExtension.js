@@ -59,7 +59,9 @@ module.exports = {
           else if (normalizedValue === 'kinematic') bodyTypeValue = 'Kinematic';
           else return false;
 
-          behaviorContent.getOrCreateChild('bodyType').setStringValue(bodyTypeValue);
+          behaviorContent
+            .getOrCreateChild('bodyType')
+            .setStringValue(bodyTypeValue);
           if (
             bodyTypeValue !== 'Static' &&
             behaviorContent.getChild('shape').getStringValue().toLowerCase() ===
@@ -71,7 +73,9 @@ module.exports = {
         }
 
         if (propertyName === 'bullet') {
-          behaviorContent.getOrCreateChild('bullet').setBoolValue(newValue === '1');
+          behaviorContent
+            .getOrCreateChild('bullet')
+            .setBoolValue(newValue === '1');
           return true;
         }
 
@@ -94,7 +98,9 @@ module.exports = {
 
           behaviorContent.getOrCreateChild('shape').setStringValue(shapeValue);
           if (shapeValue === 'Mesh') {
-            behaviorContent.getOrCreateChild('bodyType').setStringValue('Static');
+            behaviorContent
+              .getOrCreateChild('bodyType')
+              .setStringValue('Static');
           }
           return true;
         }
@@ -218,7 +224,9 @@ module.exports = {
         if (propertyName === 'friction') {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
-          behaviorContent.getOrCreateChild('friction').setDoubleValue(newValueAsNumber);
+          behaviorContent
+            .getOrCreateChild('friction')
+            .setDoubleValue(newValueAsNumber);
           return true;
         }
 
@@ -266,7 +274,9 @@ module.exports = {
         }
 
         if (propertyName === 'masks') {
-          behaviorContent.getOrCreateChild('masks').setIntValue(parseInt(newValue, 10));
+          behaviorContent
+            .getOrCreateChild('masks')
+            .setIntValue(parseInt(newValue, 10));
           return true;
         }
 
@@ -1766,7 +1776,9 @@ module.exports = {
         newValue
       ) {
         if (propertyName === 'physics3D') {
-          behaviorContent.getOrCreateChild('physics3D').setStringValue(newValue);
+          behaviorContent
+            .getOrCreateChild('physics3D')
+            .setStringValue(newValue);
           return true;
         }
 
@@ -1791,7 +1803,9 @@ module.exports = {
         if (propertyName === 'gravity') {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
-          behaviorContent.getOrCreateChild('gravity').setDoubleValue(newValueAsNumber);
+          behaviorContent
+            .getOrCreateChild('gravity')
+            .setDoubleValue(newValueAsNumber);
           return true;
         }
 
@@ -2807,7 +2821,9 @@ module.exports = {
         newValue
       ) {
         if (propertyName === 'physics3D') {
-          behaviorContent.getOrCreateChild('physics3D').setStringValue(newValue);
+          behaviorContent
+            .getOrCreateChild('physics3D')
+            .setStringValue(newValue);
           return true;
         }
 

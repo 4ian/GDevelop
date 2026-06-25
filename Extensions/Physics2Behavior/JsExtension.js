@@ -54,12 +54,16 @@ module.exports = {
         else if (normalizedValue === 'kinematic') bodyTypeValue = 'Kinematic';
         else return false;
 
-        behaviorContent.getOrCreateChild('bodyType').setStringValue(bodyTypeValue);
+        behaviorContent
+          .getOrCreateChild('bodyType')
+          .setStringValue(bodyTypeValue);
         return true;
       }
 
       if (propertyName === 'bullet') {
-        behaviorContent.getOrCreateChild('bullet').setBoolValue(newValue === '1');
+        behaviorContent
+          .getOrCreateChild('bullet')
+          .setBoolValue(newValue === '1');
         return true;
       }
 
@@ -71,7 +75,9 @@ module.exports = {
       }
 
       if (propertyName === 'canSleep') {
-        behaviorContent.getOrCreateChild('canSleep').setBoolValue(newValue === '1');
+        behaviorContent
+          .getOrCreateChild('canSleep')
+          .setBoolValue(newValue === '1');
         return true;
       }
 
@@ -152,7 +158,9 @@ module.exports = {
       if (propertyName === 'friction') {
         const newValueAsNumber = parseFloat(newValue);
         if (newValueAsNumber !== newValueAsNumber) return false;
-        behaviorContent.getOrCreateChild('friction').setDoubleValue(newValueAsNumber);
+        behaviorContent
+          .getOrCreateChild('friction')
+          .setDoubleValue(newValueAsNumber);
         return true;
       }
 
@@ -193,12 +201,16 @@ module.exports = {
       }
 
       if (propertyName === 'layers') {
-        behaviorContent.getOrCreateChild('layers').setIntValue(parseInt(newValue, 10));
+        behaviorContent
+          .getOrCreateChild('layers')
+          .setIntValue(parseInt(newValue, 10));
         return true;
       }
 
       if (propertyName === 'masks') {
-        behaviorContent.getOrCreateChild('masks').setIntValue(parseInt(newValue, 10));
+        behaviorContent
+          .getOrCreateChild('masks')
+          .setIntValue(parseInt(newValue, 10));
         return true;
       }
 

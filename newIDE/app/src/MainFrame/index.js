@@ -32,7 +32,7 @@ import {
   openEditorTab,
   closeProjectTabs,
   closeLayoutTabs,
-  mapEditorTabs,
+  renameEditorTabs,
   closeExternalLayoutTabs,
   closeExternalEventsTabs,
   closeEventsFunctionsExtensionTabs,
@@ -70,6 +70,14 @@ import {
   makeCustomObjectEditorTabName,
   parseCustomObjectEditorTabName,
 } from '../Utils/CustomObjectEditorTabName';
+import {
+  getRenamedLayoutTabProjectItemName,
+  getRenamedExternalLayoutTabProjectItemName,
+  getRenamedExternalEventsTabProjectItemName,
+  getRenamedExtensionTabProjectItemName,
+  getRenamedEventsBasedObjectTabProjectItemName,
+  type RenamableTab,
+} from './EditorTabs/EditorTabsRenaming';
 import { renderAskAiEditorContainer } from '../AiGeneration/AskAiEditorContainer';
 import { renderResourcesEditorContainer } from './EditorContainers/ResourcesEditorContainer';
 import { renderGlobalEventsSearchEditorContainer } from './EditorContainers/GlobalEventsSearchEditorContainer';
@@ -2042,19 +2050,21 @@ const MainFrame = (props: Props): React.MixedElement => {
   const getEditorTabsWithRenamedProjectItem = (
     editorTabs: EditorTabsState,
     project: gdProject,
-    shouldRename: (editorTab: EditorTab) => boolean,
-    getNewProjectItemName: (editorTab: EditorTab) => string
+    getNewProjectItemName: (tab: RenamableTab) => ?string
   ): EditorTabsState =>
-    mapEditorTabs(editorTabs, editorTab => {
-      if (!shouldRename(editorTab)) return editorTab;
+    renameEditorTabs(editorTabs, editorTab => {
+      const newProjectItemName = getNewProjectItemName({
+        kind: editorTab.kind,
+        projectItemName: editorTab.projectItemName,
+      });
+      if (!newProjectItemName) return null;
       // $FlowFixMe[incompatible-type] - same Flow invariance as the openEditorTab calls.
       const newOptions: EditorOpeningOptions = getEditorOpeningOptions({
         kind: editorTab.kind,
-        name: getNewProjectItemName(editorTab),
+        name: newProjectItemName,
         project,
       });
       return {
-        ...editorTab,
         key: newOptions.key,
         label: newOptions.label,
         projectItemName: newOptions.projectItemName,
@@ -2104,9 +2114,7 @@ const MainFrame = (props: Props): React.MixedElement => {
         state.editorTabs,
         currentProject,
         editorTab =>
-          editorTab.projectItemName === oldName &&
-          (editorTab.kind === 'layout' || editorTab.kind === 'layout events'),
-        () => uniqueNewName
+          getRenamedLayoutTabProjectItemName(editorTab, oldName, uniqueNewName)
       ),
     })).then(() => {
       notifyChangesToInGameEditor({
@@ -2148,9 +2156,11 @@ const MainFrame = (props: Props): React.MixedElement => {
         state.editorTabs,
         currentProject,
         editorTab =>
-          editorTab.kind === 'external layout' &&
-          editorTab.projectItemName === oldName,
-        () => uniqueNewName
+          getRenamedExternalLayoutTabProjectItemName(
+            editorTab,
+            oldName,
+            uniqueNewName
+          )
       ),
     })).then(() => {
       notifyChangesToInGameEditor({
@@ -2192,9 +2202,11 @@ const MainFrame = (props: Props): React.MixedElement => {
         state.editorTabs,
         currentProject,
         editorTab =>
-          editorTab.kind === 'external events' &&
-          editorTab.projectItemName === oldName,
-        () => uniqueNewName
+          getRenamedExternalEventsTabProjectItemName(
+            editorTab,
+            oldName,
+            uniqueNewName
+          )
       ),
     })).then(() => {
       _onProjectItemModified();
@@ -2243,28 +2255,12 @@ const MainFrame = (props: Props): React.MixedElement => {
       editorTabs: getEditorTabsWithRenamedProjectItem(
         state.editorTabs,
         currentProject,
-        editorTab => {
-          const itemName = editorTab.projectItemName;
-          if (!itemName) return false;
-          if (editorTab.kind === 'events functions extension')
-            return itemName === oldName;
-          if (editorTab.kind === 'custom object')
-            return (
-              parseCustomObjectEditorTabName(itemName).extensionName === oldName
-            );
-          return false;
-        },
-        editorTab => {
-          if (editorTab.kind === 'events functions extension')
-            return safeAndUniqueNewName;
-          const parsed = parseCustomObjectEditorTabName(
-            editorTab.projectItemName || ''
-          );
-          return makeCustomObjectEditorTabName({
-            ...parsed,
-            extensionName: safeAndUniqueNewName,
-          });
-        }
+        editorTab =>
+          getRenamedExtensionTabProjectItemName(
+            editorTab,
+            oldName,
+            safeAndUniqueNewName
+          )
       ),
     })).then(async () => {
       await eventsFunctionsExtensionsState.reloadProjectEventsFunctionsExtensions(
@@ -2296,24 +2292,13 @@ const MainFrame = (props: Props): React.MixedElement => {
       editorTabs: getEditorTabsWithRenamedProjectItem(
         state.editorTabs,
         currentProject,
-        editorTab => {
-          const itemName = editorTab.projectItemName;
-          if (editorTab.kind !== 'custom object' || !itemName) return false;
-          const parsed = parseCustomObjectEditorTabName(itemName);
-          return (
-            parsed.extensionName === extensionName &&
-            parsed.objectName === oldName
-          );
-        },
-        editorTab => {
-          const parsed = parseCustomObjectEditorTabName(
-            editorTab.projectItemName || ''
-          );
-          return makeCustomObjectEditorTabName({
-            ...parsed,
-            objectName: newName,
-          });
-        }
+        editorTab =>
+          getRenamedEventsBasedObjectTabProjectItemName(
+            editorTab,
+            extensionName,
+            oldName,
+            newName
+          )
       ),
     })).then(() => {
       notifyChangesToInGameEditor({

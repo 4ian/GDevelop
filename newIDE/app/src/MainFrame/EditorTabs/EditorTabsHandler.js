@@ -530,20 +530,36 @@ export const closeLayoutTabs = (
   });
 };
 
+// The name-derived subset of EditorTab a rename may replace; id/editorRef and the
+// rest are preserved. Kept explicit (not $Shape<EditorTab>) so callers can't touch
+// id/editorRef.
+type RenamedEditorTabFields = {|
+  key: string,
+  label?: string,
+  projectItemName: ?string,
+  tabOptions?: TabOptions,
+  icon?: React.Node,
+  renderCustomIcon: ?(brightness: number) => React.Node,
+|};
+
 /**
- * Map every editor tab to a new one (e.g. to rename tabs in place). The mapper
- * MUST preserve `id` and `editorRef` — spreading the received tab does this.
+ * Rename tabs in place: each renamed tab keeps its stable `id` and `editorRef`
+ * (so its editor stays mounted), only its name-derived fields are replaced.
+ * `getRenamedFields` returns null to leave a tab unchanged.
  */
-export const mapEditorTabs = (
+export const renameEditorTabs = (
   state: EditorTabsState,
-  mapper: (editorTab: EditorTab) => EditorTab
+  getRenamedFields: (editorTab: EditorTab) => ?RenamedEditorTabFields
 ): EditorTabsState => {
   const newPanes = { ...state.panes };
   for (const paneIdentifier in state.panes) {
     const pane = state.panes[paneIdentifier];
     newPanes[paneIdentifier] = {
       ...pane,
-      editors: pane.editors.map(mapper),
+      editors: pane.editors.map(editorTab => {
+        const renamedFields = getRenamedFields(editorTab);
+        return renamedFields ? { ...editorTab, ...renamedFields } : editorTab;
+      }),
     };
   }
   return {

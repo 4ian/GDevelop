@@ -5,13 +5,10 @@ import { type I18n as I18nType } from '@lingui/core';
 
 import * as React from 'react';
 import EventsTree, { type EventsTreeInterface } from './EventsTree';
-import {
-  onPreviewDebuggerPauseChange,
-  onPreviewDebuggerClosed,
-  resumePausedPreview,
-  stepPausedPreview,
-  setPreviewBreakpointsViaCdp,
-} from '../Debugger/ElectronCDPBridge';
+import BreakpointSessionController, {
+  isBreakpointableEvent,
+  type BreakpointHit,
+} from './BreakpointSessionController';
 import { getInstructionMetadata } from './InstructionEditor/InstructionEditor';
 import InstructionEditorDialog from './InstructionEditor/InstructionEditorDialog';
 import InstructionEditorMenu from './InstructionEditor/InstructionEditorMenu';
@@ -96,12 +93,6 @@ import { createNewInstructionForEventsFunction } from './EventsFunctionExtractor
 import { type EventsScope } from '../InstructionOrExpression/EventsScope';
 import type { EventPath } from '../Utils/EventPath';
 import {
-  getBreakpoints as getSessionBreakpoints,
-  updateEntry as updateBreakpointsSessionEntry,
-  buildAllBreakpointsPayload,
-  walkEventsInGeneratorOrder,
-} from './BreakpointsSessionStore';
-import {
   pasteEventsFromClipboardInSelection,
   copySelectionToClipboard,
   pasteInstructionsFromClipboardInSelection,
@@ -152,9 +143,7 @@ import { useHighlightedAiGeneratedEvent } from './UseHighlightedAiGeneratedEvent
 import { findEventByPath } from '../Utils/EventsValidationScanner';
 import type { SearchFilterParams } from '../Utils/Search';
 import type { InitialSearchFilterParams } from './SearchPanel';
-import RuntimeVariablesContext, {
-  extractVariablesFromDump,
-} from './RuntimeVariablesContext';
+import RuntimeVariablesContext from './RuntimeVariablesContext';
 import { isNullPtr } from '../Utils/IsNullPtr';
 import { type VariableDialogOpeningProps } from '../VariablesList/VariablesEditorDialog';
 
@@ -174,60 +163,6 @@ const getInstructionListLabel = (
   if (!isNullPtr(gd, whileList) && whileList.ptr === instrsList.ptr)
     return 'whileConditions';
   return 'conditions';
-};
-
-// Maps flat DFS index (matching the C++ code generator's traversal) back to
-// its serialized EventPath (e.g. "0/2/1"). Synthetic AsyncEvent wrappers are
-// absent from the user-authored tree and don't call checkBreakpoint, so
-// no extra accounting is needed here.
-const buildFlatIndexToPathMap = (events: gdEventsList): Map<number, string> => {
-  const map = new Map<number, string>();
-  walkEventsInGeneratorOrder(events, (_event, idx, path) => {
-    map.set(idx, path);
-  });
-  return map;
-};
-
-const NON_BREAKPOINTABLE_TYPES = [
-  'BuiltinCommonInstructions::Comment',
-  'BuiltinCommonInstructions::Group',
-];
-
-const isBreakpointableEvent = (event: gdBaseEvent): boolean =>
-  event.isExecutable() && !NON_BREAKPOINTABLE_TYPES.includes(event.getType());
-
-const getFunctionIdFromScope = (scope: EventsScope): string => {
-  const { eventsFunctionsExtension, eventsFunction } = scope;
-  if (eventsFunctionsExtension && eventsFunction) {
-    const prefix = gd.MetadataDeclarationHelper.getExtensionCodeNamespacePrefix(
-      eventsFunctionsExtension
-    );
-    // Method of a custom (events-based) object: the runtime uses a fully
-    // qualified namespace `<prefix>__<Obj>.<Obj>.prototype.<Func>Context`.
-    if (scope.eventsBasedObject) {
-      return gd.MetadataDeclarationHelper.getObjectEventsFunctionFullyQualifiedContextName(
-        scope.eventsBasedObject,
-        eventsFunction,
-        prefix
-      );
-    }
-    // Behavior methods are compiled with `compilationForRuntime: true`, so
-    // breakpoint instrumentation is not injected — intentionally return an
-    // empty id so any incoming `breakpoint.hit` does not falsely match.
-    if (scope.eventsBasedBehavior) {
-      return '';
-    }
-    return gd.MetadataDeclarationHelper.getFreeFunctionCodeNamespace(
-      eventsFunction,
-      prefix
-    );
-  }
-  if (scope.layout) {
-    return gd.MetadataDeclarationHelper.getSceneCodeNamespace(
-      scope.layout.getName()
-    );
-  }
-  return '';
 };
 
 const zoomLevel = { min: 1, max: 50 };
@@ -402,8 +337,24 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
 
   eventContextMenu: ?ContextMenuInterface;
   resourceExternallyChangedCallbackId: ?string;
-  _unregisterCdpPauseListener: ?() => void = null;
-  _unregisterCdpClosedListener: ?() => void = null;
+  _breakpointSession: BreakpointSessionController = new BreakpointSessionController(
+    {
+      getEvents: () => this.props.events,
+      getScope: () => this.props.scope,
+      onBreakpointHit: hit => this._onBreakpointHit(hit),
+      onResumed: () => {
+        this._clearPausedState();
+        if (this._eventsTree) this._eventsTree.forceEventsUpdate();
+      },
+      onRuntimeVariables: runtimeVariables =>
+        this.setState({ runtimeVariables }),
+      onPreviewClosed: () => {
+        if (this._draggableSnackBarRef.current) {
+          this._draggableSnackBarRef.current.resetPosition();
+        }
+      },
+    }
+  );
   _draggableSnackBarRef: {|
     current: ?DraggableSnackBarInterface,
   |} = React.createRef();
@@ -475,11 +426,11 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       TRIVIAL_FIRST_EVENT,
       this._addNewEvent
     );
-    // Restore breakpoints saved earlier this editor session (tab previously
-    // opened, debugger previously attached, etc.).
     this.state = {
       ...this.state,
-      breakpoints: getSessionBreakpoints(this.props.events.ptr),
+      breakpoints: BreakpointSessionController.getInitialBreakpoints(
+        this.props.events
+      ),
     };
   }
 
@@ -488,58 +439,13 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     this.resourceExternallyChangedCallbackId = registerOnResourceExternallyChangedCallback(
       this.onResourceExternallyChanged.bind(this)
     );
-    // Reset per-session ephemeral UI (dragged toast position) when the
-    // preview window is closed.
-    this._unregisterCdpClosedListener = onPreviewDebuggerClosed(() => {
-      if (this._draggableSnackBarRef.current) {
-        this._draggableSnackBarRef.current.resetPosition();
-      }
-    });
-    this._unregisterCdpPauseListener = onPreviewDebuggerPauseChange(
-      (isPaused, payload) => {
-        if (isPaused) {
-          const breakpoint = payload && payload.breakpoint;
-          if (
-            breakpoint &&
-            typeof breakpoint.eventIndex === 'number' &&
-            typeof breakpoint.functionId === 'string'
-          ) {
-            this._applyBreakpointHit(
-              breakpoint.functionId,
-              breakpoint.eventIndex
-            );
-          }
-          const dumpJson = payload && payload.dumpJson;
-          if (dumpJson) {
-            try {
-              const parsed = JSON.parse(dumpJson);
-              if (parsed && parsed.command === 'dump') {
-                const vars = extractVariablesFromDump(parsed);
-                if (vars) this.setState({ runtimeVariables: vars });
-              }
-            } catch (_) {}
-          }
-        } else if (this.state.isPausedInDebugger) {
-          this._clearPausedState();
-          if (this._eventsTree) this._eventsTree.forceEventsUpdate();
-        }
-      }
-    );
-    // Sync breakpoints to the runtime in case a preview is already running.
-    this._sendAllSessionBreakpointsToRuntime();
+    this._breakpointSession.start();
   }
   componentWillUnmount() {
     unregisterOnResourceExternallyChangedCallback(
       this.resourceExternallyChangedCallbackId
     );
-    if (this._unregisterCdpPauseListener) {
-      this._unregisterCdpPauseListener();
-      this._unregisterCdpPauseListener = null;
-    }
-    if (this._unregisterCdpClosedListener) {
-      this._unregisterCdpClosedListener();
-      this._unregisterCdpClosedListener = null;
-    }
+    this._breakpointSession.dispose();
   }
 
   componentDidUpdate(prevProps: ComponentProps, prevState: State) {
@@ -1805,62 +1711,34 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     if (selectedEvents.length === 0) return;
 
     this.setState(
-      prevState => {
-        const newBreakpoints = new Set(prevState.breakpoints);
-        selectedEvents.forEach(event => {
-          if (!isBreakpointableEvent(event)) return;
-          const ptr = event.ptr;
-          if (newBreakpoints.has(ptr)) {
-            newBreakpoints.delete(ptr);
-          } else {
-            newBreakpoints.add(ptr);
-          }
-        });
-        return { breakpoints: newBreakpoints };
-      },
+      prevState => ({
+        breakpoints: this._breakpointSession.toggleBreakpointsForEvents(
+          prevState.breakpoints,
+          selectedEvents
+        ),
+      }),
       () => {
-        updateBreakpointsSessionEntry(
-          this.props.events.ptr,
-          this.props.events,
-          getFunctionIdFromScope(this.props.scope),
-          this.state.breakpoints
-        );
+        this._breakpointSession.persistBreakpoints(this.state.breakpoints);
         if (this._eventsTree) this._eventsTree.forceEventsUpdate();
-        this._sendAllSessionBreakpointsToRuntime();
       }
     );
   };
 
-  // Resume / step always route through CDP (only available in Electron local preview).
   _resumeExecution = () => {
-    resumePausedPreview();
-  };
-
-  _sendStepNextEvent = (eventIndex: number) => {
-    stepPausedPreview({
-      currentEventIndex: eventIndex,
-      currentFunctionId: getFunctionIdFromScope(this.props.scope),
-    });
+    this._breakpointSession.resume();
   };
 
   _stepNextEvent = () => {
     if (!this.state.isPausedInDebugger) return;
-    this._sendStepNextEvent(this.state.pausedOnEventIndex);
+    this._breakpointSession.step(this.state.pausedOnEventIndex);
   };
 
-  // Atomically replaces the runtime's breakpoint set via CDP (works while paused).
-  _sendAllSessionBreakpointsToRuntime = () => {
-    setPreviewBreakpointsViaCdp(buildAllBreakpointsPayload());
-  };
-
-  _findEventAtPath = (path: string): ?gdBaseEvent => {
-    const eventPath: EventPath = path.split('/').map(Number);
-    return findEventByPath(this.props.events, eventPath);
-  };
-
-  _scrollToEvent = (event: gdBaseEvent) => {
+  _scrollToPausedEvent = (path: string) => {
     const eventsTree = this._eventsTree;
     if (!eventsTree) return;
+    const eventPath: EventPath = path.split('/').map(Number);
+    const event = findEventByPath(this.props.events, eventPath);
+    if (!event) return;
     eventsTree.unfoldForEvent(event);
     setTimeout(() => {
       const row = eventsTree.getEventRow(event);
@@ -1877,21 +1755,8 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     });
   };
 
-  // On a breakpoint hit: resolve the flat-index → path, scroll to the event, mark the row.
-  _applyBreakpointHit = (hitFunctionId: string, eventIndex: number) => {
-    if (hitFunctionId !== getFunctionIdFromScope(this.props.scope)) return;
-
-    const reverseMap = buildFlatIndexToPathMap(this.props.events);
-    const path = reverseMap.get(eventIndex) || null;
-
-    if (path) {
-      const event = this._findEventAtPath(path);
-      if (event && !isBreakpointableEvent(event)) {
-        this._sendStepNextEvent(eventIndex);
-        return;
-      }
-    }
-
+  // Mark the paused event row and scroll it into view.
+  _onBreakpointHit = ({ path, eventIndex }: BreakpointHit) => {
     this.setState(
       {
         pausedOnEventPath: path,
@@ -1901,10 +1766,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       },
       () => {
         if (this._eventsTree) this._eventsTree.forceEventsUpdate();
-        if (path) {
-          const event = this._findEventAtPath(path);
-          if (event) this._scrollToEvent(event);
-        }
+        if (path) this._scrollToPausedEvent(path);
       }
     );
   };

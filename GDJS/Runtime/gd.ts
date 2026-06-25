@@ -30,6 +30,17 @@ namespace gdjs {
   /** @internal */
   export const behaviorsTypes = new Hashtable<typeof gdjs.RuntimeBehavior>();
 
+  /**
+   * Local variable container stacks registered by generated scene code, keyed
+   * by their code namespace (e.g. `gdjs.mySceneCode`). Lets the debugger
+   * inspect "Declare local variable" scopes while paused. Only populated in
+   * previews - the registration call is stripped from exported games.
+   * @internal
+   */
+  export const registeredLocalVariablesContainers: {
+    [codeNamespace: string]: Array<gdjs.VariablesContainer>;
+  } = {};
+
   type RuntimeSceneCallback = (runtimeScene: gdjs.RuntimeScene) => void;
   type InGameEditorCallback = (editor: gdjs.InGameEditor) => void;
   type RuntimeSceneRuntimeObjectCallback = (
@@ -358,6 +369,21 @@ namespace gdjs {
     Ctor: typeof gdjs.RuntimeBehavior
   ): void {
     gdjs.behaviorsTypes.put(behaviorTypeName, Ctor);
+  };
+
+  /**
+   * Register a scene's local variable container stack so the debugger can
+   * inspect it while paused. Called by generated scene code in previews.
+   *
+   * @param codeNamespace The scene code namespace owning the stack.
+   * @param container The `localVariables` stack of that namespace.
+   * @category Core Engine > Debugger
+   */
+  export const registerLocalVariablesContainer = function (
+    codeNamespace: string,
+    container: Array<gdjs.VariablesContainer>
+  ): void {
+    gdjs.registeredLocalVariablesContainers[codeNamespace] = container;
   };
 
   /**

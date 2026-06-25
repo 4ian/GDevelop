@@ -4,13 +4,6 @@
  * This project is released under the MIT License.
  */
 namespace gdjs {
-  /** Entry recognized inside the `gdjs` namespace for active extension
-   * function frames. Each extension's generated namespace exposes a
-   * `localVariables` stack pushed/popped around function invocation. */
-  type ExtensionFunctionFrame = {
-    localVariables: gdjs.VariablesContainer[];
-  };
-
   /** Dump shape consumed by `extractVariablesFromDump` on the IDE side. */
   type BreakpointDumpPayload = {
     _variables: gdjs.VariablesContainer;
@@ -347,23 +340,11 @@ namespace gdjs {
       const activeLocalVariables: {
         [namespaceKey: string]: gdjs.VariablesContainer[];
       } = {};
-      const namespaceEntries = gdjs as unknown as Record<string, unknown>;
-      for (const key in namespaceEntries) {
-        if (!Object.prototype.hasOwnProperty.call(namespaceEntries, key)) {
-          continue;
-        }
-        const entry = namespaceEntries[key];
-        if (
-          entry !== null &&
-          typeof entry === 'object' &&
-          Array.isArray(
-            (entry as Partial<ExtensionFunctionFrame>).localVariables
-          ) &&
-          (entry as ExtensionFunctionFrame).localVariables.length > 0
-        ) {
-          activeLocalVariables['gdjs.' + key] = (
-            entry as ExtensionFunctionFrame
-          ).localVariables;
+      const registeredContainers = gdjs.registeredLocalVariablesContainers;
+      for (const codeNamespace in registeredContainers) {
+        const container = registeredContainers[codeNamespace];
+        if (container.length > 0) {
+          activeLocalVariables[codeNamespace] = container;
         }
       }
 

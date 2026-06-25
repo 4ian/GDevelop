@@ -70,8 +70,16 @@ gd::String EventsCodeGenerator::GenerateEventsListCompleteFunctionCode(
 
   gd::String localVariablesInitializationCode;
   if (codeGenerator.HasProjectAndLayout()) {
-    localVariablesInitializationCode +=
-        codeGenerator.GetCodeNamespace() + ".localVariables = [];\n";
+    gd::String ns = codeGenerator.GetCodeNamespace();
+    localVariablesInitializationCode += ns + ".localVariables = [];\n";
+    // In previews, expose the stack to the debugger so it can inspect
+    // "Declare local variable" scopes.
+    if (!codeGenerator.GenerateCodeForRuntime()) {
+      localVariablesInitializationCode +=
+          "gdjs.registerLocalVariablesContainer(" +
+          codeGenerator.ConvertToStringExplicit(ns) + ", " + ns +
+          ".localVariables);\n";
+    }
   }
 
   gd::String idToCallbackMapCode;

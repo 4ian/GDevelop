@@ -4,12 +4,14 @@ import { type ResourceManagementProps } from '../../ResourcesList/ResourceSource
 /**
  * The props given to any behavior editor
  */
-export type CompactBehaviorPropertiesEditorProps = {|
+export type CompactInstanceBehaviorPropertiesEditorProps = {|
   project: gdProject,
   behaviorMetadata: gdBehaviorMetadata,
-  behaviors: Array<gdBehavior>,
+  behavior: gdBehavior,
   object: gdObject | null,
   layersContainer: gdLayersContainer,
+  behaviorOverriding: gdBehavior | null,
+  initialInstances: Array<gdInitialInstance>,
   onOpenFullEditor?: () => void,
   onBehaviorUpdated: () => void,
   resourceManagementProps: ResourceManagementProps,

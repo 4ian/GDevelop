@@ -42,8 +42,9 @@ import Window from '../../Utils/Window';
 import { type ResourceManagementProps } from '../../ResourcesList/ResourceSource';
 import { usePersistedScrollPosition } from '../../Utils/UsePersistedScrollPosition';
 import EmptyMessage from '../../UI/EmptyMessage';
-import CompactBehaviorsEditorService from '../../ObjectEditor/CompactObjectPropertiesEditor/CompactBehaviorsEditorService';
+import CompactInstanceBehaviorsEditorService from '../../ObjectEditor/CompactObjectPropertiesEditor/CompactInstanceBehaviorsEditorService';
 import { exceptionallyGuardAgainstDeadObject } from '../../Utils/IsNullPtr';
+import { getAllVisibleBehaviorNames } from '../../Utils/Behavior';
 
 const gd: libGDevelop = global.gd;
 
@@ -157,7 +158,6 @@ export const CompactInstancePropertiesEditor = ({
    * obviously plus instance-wise variables with same name).
    */
   const shouldDisplayVariablesList = instances.length === 1;
-  const shouldDisplayBehaviorsList = instances.length === 1;
   const variablesContainer = shouldDisplayVariablesList
     ? exceptionallyGuardAgainstDeadObject(instance.getVariables())
     : null;
@@ -200,41 +200,44 @@ export const CompactInstancePropertiesEditor = ({
   const { object, instanceSchema, allVisibleBehaviors } = React.useMemo<{|
     object?: gdObject,
     instanceSchema?: Schema,
-    allVisibleBehaviors: Array<string>,
+    allVisibleBehaviors: Array<string> | null,
   |}>(
     () => {
       if (!instance)
         return {
           object: undefined,
           instanceSchema: undefined,
-          allVisibleBehaviors: [],
+          allVisibleBehaviors: null,
         };
 
-      const associatedObjectName = instance.getObjectName();
-      const object = getObjectByName(
-        globalObjectsContainer,
-        objectsContainer,
-        associatedObjectName
-      );
+      const objects = new Map<string, gdObject>();
+      for (const instance of instances) {
+        const associatedObjectName = instance.getObjectName();
+        if (objects.has(associatedObjectName)) {
+          continue;
+        }
+        const object = getObjectByName(
+          globalObjectsContainer,
+          objectsContainer,
+          associatedObjectName
+        );
+        if (object) {
+          objects.set(associatedObjectName, object);
+        }
+      }
+      const [object] = [...objects.values()];
+      if (!object) {
+        return {
+          object: undefined,
+          instanceSchema: undefined,
+          allVisibleBehaviors: null,
+        };
+      }
+
       const properties = instance.getCustomProperties(
         globalObjectsContainer || objectsContainer,
         objectsContainer
       );
-      if (!object)
-        return {
-          object: undefined,
-          instanceSchema: undefined,
-          allVisibleBehaviors: [],
-        };
-
-      const allVisibleBehaviors = object
-        .getAllBehaviorNames()
-        .toJSArray()
-        .map(behaviorName => object.getBehavior(behaviorName))
-        .filter(behavior => !behavior.isDefaultBehavior())
-        // We don't keep the behaviors directly because they may be destroyed
-        // if the object is rebuilt from a serialization.
-        .map(behavior => behavior.getName());
 
       const objectMetadata = gd.MetadataProvider.getObjectMetadata(
         project.getCurrentPlatform(),
@@ -291,7 +294,8 @@ export const CompactInstancePropertiesEditor = ({
       return {
         object,
         instanceSchema,
-        allVisibleBehaviors,
+        allVisibleBehaviors:
+          objects.size === 1 ? getAllVisibleBehaviorNames([object]) : null,
       };
     },
     [
@@ -299,11 +303,12 @@ export const CompactInstancePropertiesEditor = ({
       globalObjectsContainer,
       objectsContainer,
       project,
-      i18n,
-      forceUpdate,
       layersContainer,
+      i18n,
       onGetInstanceSize,
       editObjectInPropertiesPanel,
+      forceUpdate,
+      instances,
     ]
   );
 
@@ -384,7 +389,7 @@ export const CompactInstancePropertiesEditor = ({
               </Column>
             </>
           )}
-          {object && shouldDisplayBehaviorsList ? (
+          {allVisibleBehaviors ? (
             <TopLevelCollapsibleSection
               title={<Trans>Behaviors</Trans>}
               isFolded={isBehaviorsFolded}
@@ -423,7 +428,7 @@ export const CompactInstancePropertiesEditor = ({
                       ? instance.getBehaviorOverriding(behaviorName)
                       : null;
                     const iconUrl = behaviorMetadata.getIconFilename();
-                    const CompactBehaviorComponent = CompactBehaviorsEditorService.getEditor(
+                    const CompactInstanceBehaviorComponent = CompactInstanceBehaviorsEditorService.getEditor(
                       behaviorTypeName
                     );
                     return (
@@ -443,29 +448,31 @@ export const CompactInstancePropertiesEditor = ({
                                 </Column>
                               )
                             : () => (
-                                <CompactBehaviorComponent
+                                <CompactInstanceBehaviorComponent
                                   project={project}
                                   behaviorMetadata={behaviorMetadata}
-                                  behaviors={[behavior]}
+                                  behavior={behavior}
                                   behaviorOverriding={behaviorOverriding}
                                   object={object}
                                   layersContainer={layersContainer}
-                                  initialInstance={instance}
+                                  initialInstances={instances}
                                   onBehaviorUpdated={() => {
-                                    if (
-                                      instance.hasBehaviorOverridingNamed(
-                                        behaviorName
-                                      ) &&
-                                      !instance.hasAnyOverriddenPropertyForBehavior(
-                                        behavior
-                                      )
-                                    ) {
-                                      instance.removeBehaviorOverriding(
-                                        behaviorName
-                                      );
-                                      // Update the view to stop using
-                                      // the removed behavior overriding.
-                                      forceUpdate();
+                                    for (const instance of instances) {
+                                      if (
+                                        instance.hasBehaviorOverridingNamed(
+                                          behaviorName
+                                        ) &&
+                                        !instance.hasAnyOverriddenPropertyForBehavior(
+                                          behavior
+                                        )
+                                      ) {
+                                        instance.removeBehaviorOverriding(
+                                          behaviorName
+                                        );
+                                        // Update the view to stop using
+                                        // the removed behavior overriding.
+                                        forceUpdate();
+                                      }
                                     }
                                   }}
                                   resourceManagementProps={

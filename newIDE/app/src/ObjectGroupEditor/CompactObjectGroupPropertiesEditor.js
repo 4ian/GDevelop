@@ -370,8 +370,6 @@ export const CompactObjectGroupPropertiesEditor = ({
                               project={project}
                               behaviorMetadata={behaviorMetadata}
                               behaviors={behaviors}
-                              behaviorOverriding={null}
-                              initialInstance={null}
                               object={null}
                               layersContainer={layersContainer}
                               onBehaviorUpdated={() => {}}

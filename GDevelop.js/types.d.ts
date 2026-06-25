@@ -1372,6 +1372,7 @@ export class SerializerElement extends EmscriptenObject {
   consideredAsArray(): boolean;
   addChild(str: string): SerializerElement;
   getChild(str: string): SerializerElement;
+  getOrCreateChild(str: string): SerializerElement;
   setChild(str: string, element: SerializerElement): void;
   hasChild(str: string): boolean;
   getAllChildren(): VectorPairStringSharedPtrSerializerElement;

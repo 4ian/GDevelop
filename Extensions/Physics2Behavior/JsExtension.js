@@ -54,24 +54,24 @@ module.exports = {
         else if (normalizedValue === 'kinematic') bodyTypeValue = 'Kinematic';
         else return false;
 
-        behaviorContent.getChild('bodyType').setStringValue(bodyTypeValue);
+        behaviorContent.getOrCreateChild('bodyType').setStringValue(bodyTypeValue);
         return true;
       }
 
       if (propertyName === 'bullet') {
-        behaviorContent.getChild('bullet').setBoolValue(newValue === '1');
+        behaviorContent.getOrCreateChild('bullet').setBoolValue(newValue === '1');
         return true;
       }
 
       if (propertyName === 'fixedRotation') {
         behaviorContent
-          .getChild('fixedRotation')
+          .getOrCreateChild('fixedRotation')
           .setBoolValue(newValue === '1');
         return true;
       }
 
       if (propertyName === 'canSleep') {
-        behaviorContent.getChild('canSleep').setBoolValue(newValue === '1');
+        behaviorContent.getOrCreateChild('canSleep').setBoolValue(newValue === '1');
         return true;
       }
 
@@ -84,7 +84,7 @@ module.exports = {
         else if (normalizedValue === 'polygon') shapeValue = 'Polygon';
         else return false;
 
-        behaviorContent.getChild('shape').setStringValue(shapeValue);
+        behaviorContent.getOrCreateChild('shape').setStringValue(shapeValue);
         return true;
       }
 
@@ -92,7 +92,7 @@ module.exports = {
         const newValueAsNumber = parseFloat(newValue);
         if (newValueAsNumber !== newValueAsNumber) return false;
         behaviorContent
-          .getChild('shapeDimensionA')
+          .getOrCreateChild('shapeDimensionA')
           .setDoubleValue(newValueAsNumber);
         return true;
       }
@@ -101,7 +101,7 @@ module.exports = {
         const newValueAsNumber = parseFloat(newValue);
         if (newValueAsNumber !== newValueAsNumber) return false;
         behaviorContent
-          .getChild('shapeDimensionB')
+          .getOrCreateChild('shapeDimensionB')
           .setDoubleValue(newValueAsNumber);
         return true;
       }
@@ -110,7 +110,7 @@ module.exports = {
         const newValueAsNumber = parseFloat(newValue);
         if (newValueAsNumber !== newValueAsNumber) return false;
         behaviorContent
-          .getChild('shapeOffsetX')
+          .getOrCreateChild('shapeOffsetX')
           .setDoubleValue(newValueAsNumber);
         return true;
       }
@@ -119,7 +119,7 @@ module.exports = {
         const newValueAsNumber = parseFloat(newValue);
         if (newValueAsNumber !== newValueAsNumber) return false;
         behaviorContent
-          .getChild('shapeOffsetY')
+          .getOrCreateChild('shapeOffsetY')
           .setDoubleValue(newValueAsNumber);
         return true;
       }
@@ -144,7 +144,7 @@ module.exports = {
 
       if (propertyName === 'density') {
         behaviorContent
-          .getChild('density')
+          .getOrCreateChild('density')
           .setDoubleValue(parseFloat(newValue));
         return true;
       }
@@ -152,7 +152,7 @@ module.exports = {
       if (propertyName === 'friction') {
         const newValueAsNumber = parseFloat(newValue);
         if (newValueAsNumber !== newValueAsNumber) return false;
-        behaviorContent.getChild('friction').setDoubleValue(newValueAsNumber);
+        behaviorContent.getOrCreateChild('friction').setDoubleValue(newValueAsNumber);
         return true;
       }
 
@@ -160,7 +160,7 @@ module.exports = {
         const newValueAsNumber = parseFloat(newValue);
         if (newValueAsNumber !== newValueAsNumber) return false;
         behaviorContent
-          .getChild('restitution')
+          .getOrCreateChild('restitution')
           .setDoubleValue(newValueAsNumber);
         return true;
       }
@@ -169,7 +169,7 @@ module.exports = {
         const newValueAsNumber = Math.max(0, parseFloat(newValue));
         if (newValueAsNumber !== newValueAsNumber) return false;
         behaviorContent
-          .getChild('linearDamping')
+          .getOrCreateChild('linearDamping')
           .setDoubleValue(newValueAsNumber);
         return true;
       }
@@ -178,7 +178,7 @@ module.exports = {
         const newValueAsNumber = Math.max(0, parseFloat(newValue));
         if (newValueAsNumber !== newValueAsNumber) return false;
         behaviorContent
-          .getChild('angularDamping')
+          .getOrCreateChild('angularDamping')
           .setDoubleValue(newValueAsNumber);
         return true;
       }
@@ -187,18 +187,18 @@ module.exports = {
         const newValueAsNumber = parseFloat(newValue);
         if (newValueAsNumber !== newValueAsNumber) return false;
         behaviorContent
-          .getChild('gravityScale')
+          .getOrCreateChild('gravityScale')
           .setDoubleValue(newValueAsNumber);
         return true;
       }
 
       if (propertyName === 'layers') {
-        behaviorContent.getChild('layers').setIntValue(parseInt(newValue, 10));
+        behaviorContent.getOrCreateChild('layers').setIntValue(parseInt(newValue, 10));
         return true;
       }
 
       if (propertyName === 'masks') {
-        behaviorContent.getChild('masks').setIntValue(parseInt(newValue, 10));
+        behaviorContent.getOrCreateChild('masks').setIntValue(parseInt(newValue, 10));
         return true;
       }
 

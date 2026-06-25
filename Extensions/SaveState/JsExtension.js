@@ -678,13 +678,13 @@ module.exports = {
         const normalizedValue = newValue.toLowerCase();
         if (normalizedValue === 'persisted') {
           behaviorContent
-            .getChild('defaultProfilePersistence')
+            .getOrCreateChild('defaultProfilePersistence')
             .setStringValue('Persisted');
           return true;
         }
         if (normalizedValue === 'donotsave') {
           behaviorContent
-            .getChild('defaultProfilePersistence')
+            .getOrCreateChild('defaultProfilePersistence')
             .setStringValue('DoNotSave');
           return true;
         }
@@ -692,7 +692,7 @@ module.exports = {
       }
       if (propertyName === 'persistedInProfiles') {
         behaviorContent
-          .getChild('persistedInProfiles')
+          .getOrCreateChild('persistedInProfiles')
           .setStringValue(newValue);
         return true;
       }

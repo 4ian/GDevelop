@@ -47,7 +47,7 @@ module.exports = {
         newValue
       ) {
         if (propertyName === 'object3D') {
-          behaviorContent.getChild('object3D').setStringValue(newValue);
+          behaviorContent.getOrCreateChild('object3D').setStringValue(newValue);
           return true;
         }
 
@@ -59,25 +59,25 @@ module.exports = {
           else if (normalizedValue === 'kinematic') bodyTypeValue = 'Kinematic';
           else return false;
 
-          behaviorContent.getChild('bodyType').setStringValue(bodyTypeValue);
+          behaviorContent.getOrCreateChild('bodyType').setStringValue(bodyTypeValue);
           if (
             bodyTypeValue !== 'Static' &&
             behaviorContent.getChild('shape').getStringValue().toLowerCase() ===
               'mesh'
           ) {
-            behaviorContent.getChild('shape').setStringValue('Box');
+            behaviorContent.getOrCreateChild('shape').setStringValue('Box');
           }
           return true;
         }
 
         if (propertyName === 'bullet') {
-          behaviorContent.getChild('bullet').setBoolValue(newValue === '1');
+          behaviorContent.getOrCreateChild('bullet').setBoolValue(newValue === '1');
           return true;
         }
 
         if (propertyName === 'fixedRotation') {
           behaviorContent
-            .getChild('fixedRotation')
+            .getOrCreateChild('fixedRotation')
             .setBoolValue(newValue === '1');
           return true;
         }
@@ -92,16 +92,16 @@ module.exports = {
           else if (normalizedValue === 'mesh') shapeValue = 'Mesh';
           else return false;
 
-          behaviorContent.getChild('shape').setStringValue(shapeValue);
+          behaviorContent.getOrCreateChild('shape').setStringValue(shapeValue);
           if (shapeValue === 'Mesh') {
-            behaviorContent.getChild('bodyType').setStringValue('Static');
+            behaviorContent.getOrCreateChild('bodyType').setStringValue('Static');
           }
           return true;
         }
 
         if (propertyName === 'meshShapeResourceName') {
           behaviorContent
-            .getChild('meshShapeResourceName')
+            .getOrCreateChild('meshShapeResourceName')
             .setStringValue(newValue);
           return true;
         }
@@ -115,7 +115,7 @@ module.exports = {
           else return false;
 
           behaviorContent
-            .getChild('shapeOrientation')
+            .getOrCreateChild('shapeOrientation')
             .setStringValue(orientationValue);
           return true;
         }
@@ -124,7 +124,7 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('shapeDimensionA')
+            .getOrCreateChild('shapeDimensionA')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -133,7 +133,7 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('shapeDimensionB')
+            .getOrCreateChild('shapeDimensionB')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -142,7 +142,7 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('shapeDimensionC')
+            .getOrCreateChild('shapeDimensionC')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -151,7 +151,7 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('shapeOffsetX')
+            .getOrCreateChild('shapeOffsetX')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -160,7 +160,7 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('shapeOffsetY')
+            .getOrCreateChild('shapeOffsetY')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -169,7 +169,7 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('shapeOffsetZ')
+            .getOrCreateChild('shapeOffsetZ')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -178,7 +178,7 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('massCenterOffsetX')
+            .getOrCreateChild('massCenterOffsetX')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -187,7 +187,7 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('massCenterOffsetY')
+            .getOrCreateChild('massCenterOffsetY')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -196,21 +196,21 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('massCenterOffsetZ')
+            .getOrCreateChild('massCenterOffsetZ')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
 
         if (propertyName === 'density') {
           behaviorContent
-            .getChild('density')
+            .getOrCreateChild('density')
             .setDoubleValue(parseFloat(newValue));
           return true;
         }
 
         if (propertyName === 'massOverride') {
           behaviorContent
-            .getChild('massOverride')
+            .getOrCreateChild('massOverride')
             .setDoubleValue(parseFloat(newValue));
           return true;
         }
@@ -218,7 +218,7 @@ module.exports = {
         if (propertyName === 'friction') {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
-          behaviorContent.getChild('friction').setDoubleValue(newValueAsNumber);
+          behaviorContent.getOrCreateChild('friction').setDoubleValue(newValueAsNumber);
           return true;
         }
 
@@ -226,7 +226,7 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('restitution')
+            .getOrCreateChild('restitution')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -235,7 +235,7 @@ module.exports = {
           const newValueAsNumber = Math.max(0, parseFloat(newValue));
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('linearDamping')
+            .getOrCreateChild('linearDamping')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -244,7 +244,7 @@ module.exports = {
           const newValueAsNumber = Math.max(0, parseFloat(newValue));
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('angularDamping')
+            .getOrCreateChild('angularDamping')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -253,20 +253,20 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('gravityScale')
+            .getOrCreateChild('gravityScale')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
 
         if (propertyName === 'layers') {
           behaviorContent
-            .getChild('layers')
+            .getOrCreateChild('layers')
             .setIntValue(parseInt(newValue, 10));
           return true;
         }
 
         if (propertyName === 'masks') {
-          behaviorContent.getChild('masks').setIntValue(parseInt(newValue, 10));
+          behaviorContent.getOrCreateChild('masks').setIntValue(parseInt(newValue, 10));
           return true;
         }
 
@@ -1766,7 +1766,7 @@ module.exports = {
         newValue
       ) {
         if (propertyName === 'physics3D') {
-          behaviorContent.getChild('physics3D').setStringValue(newValue);
+          behaviorContent.getOrCreateChild('physics3D').setStringValue(newValue);
           return true;
         }
 
@@ -1774,7 +1774,7 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('jumpHeight')
+            .getOrCreateChild('jumpHeight')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -1783,7 +1783,7 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('jumpSustainTime')
+            .getOrCreateChild('jumpSustainTime')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -1791,7 +1791,7 @@ module.exports = {
         if (propertyName === 'gravity') {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
-          behaviorContent.getChild('gravity').setDoubleValue(newValueAsNumber);
+          behaviorContent.getOrCreateChild('gravity').setDoubleValue(newValueAsNumber);
           return true;
         }
 
@@ -1799,7 +1799,7 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('fallingSpeedMax')
+            .getOrCreateChild('fallingSpeedMax')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -1808,7 +1808,7 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('forwardAcceleration')
+            .getOrCreateChild('forwardAcceleration')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -1817,7 +1817,7 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('forwardDeceleration')
+            .getOrCreateChild('forwardDeceleration')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -1826,7 +1826,7 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('forwardSpeedMax')
+            .getOrCreateChild('forwardSpeedMax')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -1835,7 +1835,7 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('sidewaysAcceleration')
+            .getOrCreateChild('sidewaysAcceleration')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -1844,7 +1844,7 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('sidewaysDeceleration')
+            .getOrCreateChild('sidewaysDeceleration')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -1853,7 +1853,7 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('sidewaysSpeedMax')
+            .getOrCreateChild('sidewaysSpeedMax')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -1862,7 +1862,7 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('slopeMaxAngle')
+            .getOrCreateChild('slopeMaxAngle')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -1871,21 +1871,21 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('stairHeightMax')
+            .getOrCreateChild('stairHeightMax')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
 
         if (propertyName === 'shouldBindObjectAndForwardAngle') {
           behaviorContent
-            .getChild('shouldBindObjectAndForwardAngle')
+            .getOrCreateChild('shouldBindObjectAndForwardAngle')
             .setBoolValue(newValue === '1');
           return true;
         }
 
         if (propertyName === 'canBePushed') {
           behaviorContent
-            .getChild('canBePushed')
+            .getOrCreateChild('canBePushed')
             .setBoolValue(newValue === '1');
           return true;
         }
@@ -2807,7 +2807,7 @@ module.exports = {
         newValue
       ) {
         if (propertyName === 'physics3D') {
-          behaviorContent.getChild('physics3D').setStringValue(newValue);
+          behaviorContent.getOrCreateChild('physics3D').setStringValue(newValue);
           return true;
         }
 
@@ -2815,7 +2815,7 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('steerAngleMax')
+            .getOrCreateChild('steerAngleMax')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -2824,7 +2824,7 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('beginningSteerSpeed')
+            .getOrCreateChild('beginningSteerSpeed')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -2833,7 +2833,7 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('endSteerSpeed')
+            .getOrCreateChild('endSteerSpeed')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -2842,7 +2842,7 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('engineTorqueMax')
+            .getOrCreateChild('engineTorqueMax')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -2851,7 +2851,7 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('engineSpeedMax')
+            .getOrCreateChild('engineSpeedMax')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -2860,7 +2860,7 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('engineInertia')
+            .getOrCreateChild('engineInertia')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -2869,7 +2869,7 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('reverseGearRatio1')
+            .getOrCreateChild('reverseGearRatio1')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -2878,7 +2878,7 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('gearRatio1')
+            .getOrCreateChild('gearRatio1')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -2887,7 +2887,7 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('gearRatio2')
+            .getOrCreateChild('gearRatio2')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -2896,7 +2896,7 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('gearRatio2')
+            .getOrCreateChild('gearRatio2')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -2905,7 +2905,7 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('gearRatio3')
+            .getOrCreateChild('gearRatio3')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -2914,7 +2914,7 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('gearRatio4')
+            .getOrCreateChild('gearRatio4')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -2923,7 +2923,7 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('gearRatio5')
+            .getOrCreateChild('gearRatio5')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -2932,7 +2932,7 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('gearRatio6')
+            .getOrCreateChild('gearRatio6')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -2941,7 +2941,7 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('wheelRadius')
+            .getOrCreateChild('wheelRadius')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -2950,7 +2950,7 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('wheelWidth')
+            .getOrCreateChild('wheelWidth')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -2959,7 +2959,7 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('backWheelOffsetX')
+            .getOrCreateChild('backWheelOffsetX')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -2968,7 +2968,7 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('frontWheelOffsetX')
+            .getOrCreateChild('frontWheelOffsetX')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -2977,7 +2977,7 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('wheelOffsetY')
+            .getOrCreateChild('wheelOffsetY')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -2986,7 +2986,7 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('wheelOffsetZ')
+            .getOrCreateChild('wheelOffsetZ')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -2995,7 +2995,7 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('brakeTorqueMax')
+            .getOrCreateChild('brakeTorqueMax')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -3004,21 +3004,21 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('handBrakeTorqueMax')
+            .getOrCreateChild('handBrakeTorqueMax')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
 
         if (propertyName === 'hasBackWheelDrive') {
           behaviorContent
-            .getChild('hasBackWheelDrive')
+            .getOrCreateChild('hasBackWheelDrive')
             .setBoolValue(newValue === '1');
           return true;
         }
 
         if (propertyName === 'hasFrontWheelDrive') {
           behaviorContent
-            .getChild('hasFrontWheelDrive')
+            .getOrCreateChild('hasFrontWheelDrive')
             .setBoolValue(newValue === '1');
           return true;
         }
@@ -3027,7 +3027,7 @@ module.exports = {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('pitchRollAngleMax')
+            .getOrCreateChild('pitchRollAngleMax')
             .setDoubleValue(newValueAsNumber);
           return true;
         }

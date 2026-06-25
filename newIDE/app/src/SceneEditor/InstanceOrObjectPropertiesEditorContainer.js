@@ -213,7 +213,6 @@ export const InstanceOrObjectPropertiesEditorContainer: React.ComponentType<{
             resourceManagementProps={resourceManagementProps}
             unsavedChanges={unsavedChanges}
             i18n={i18n}
-            canOverrideBehaviorProperties={!!eventsFunctionsExtension}
           />
         ) : !!objects.length && lastSelectionType === 'object' ? (
           <CompactObjectPropertiesEditor

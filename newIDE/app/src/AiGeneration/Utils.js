@@ -6,7 +6,8 @@ import {
   type InstancesOutsideEditorChanges,
   type ObjectsOutsideEditorChanges,
   type ObjectGroupsOutsideEditorChanges,
-} from '../MainFrame/EditorContainers/BaseEditor';
+  type SceneRenamedOutsideEditorChanges,
+} from '../EditorFunctions/OutsideEditorChanges';
 import {
   getAiRequest,
   getAiRequestSuggestions,
@@ -222,6 +223,7 @@ export const useProcessFunctionCalls = ({
   onInstancesModifiedOutsideEditor,
   onObjectsModifiedOutsideEditor,
   onObjectGroupsModifiedOutsideEditor,
+  onSceneRenamedOutsideEditor,
   onWillInstallExtension,
   onExtensionInstalled,
   isReadyToProcessFunctionCalls,
@@ -258,6 +260,9 @@ export const useProcessFunctionCalls = ({
   ) => void,
   onObjectGroupsModifiedOutsideEditor: (
     changes: ObjectGroupsOutsideEditorChanges
+  ) => void,
+  onSceneRenamedOutsideEditor: (
+    changes: SceneRenamedOutsideEditorChanges
   ) => void,
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
@@ -483,6 +488,7 @@ export const useProcessFunctionCalls = ({
       const accumulatedInstancesScenes: Set<gdLayout> = new Set();
       const accumulatedObjectsChanges: Map<gdLayout, boolean> = new Map();
       const accumulatedObjectGroupsScenes: Set<gdLayout> = new Set();
+      const accumulatedSceneRenames: Array<SceneRenamedOutsideEditorChanges> = [];
       const flushAccumulatedOutsideEditorChanges = () => {
         accumulatedSceneEventsChanges.forEach((eventIds, scene) =>
           onSceneEventsModifiedOutsideEditor({
@@ -498,6 +504,9 @@ export const useProcessFunctionCalls = ({
         );
         accumulatedObjectGroupsScenes.forEach(scene =>
           onObjectGroupsModifiedOutsideEditor({ scene })
+        );
+        accumulatedSceneRenames.forEach(changes =>
+          onSceneRenamedOutsideEditor(changes)
         );
       };
 
@@ -550,6 +559,9 @@ export const useProcessFunctionCalls = ({
           onObjectGroupsModifiedOutsideEditor: changes => {
             accumulatedObjectGroupsScenes.add(changes.scene);
           },
+          onSceneRenamedOutsideEditor: changes => {
+            accumulatedSceneRenames.push(changes);
+          },
           ensureExtensionInstalled,
           onWillInstallExtension,
           onExtensionInstalled,
@@ -600,6 +612,7 @@ export const useProcessFunctionCalls = ({
       onInstancesModifiedOutsideEditor,
       onObjectsModifiedOutsideEditor,
       onObjectGroupsModifiedOutsideEditor,
+      onSceneRenamedOutsideEditor,
       ensureExtensionInstalled,
       onWillInstallExtension,
       onExtensionInstalled,

@@ -1,6 +1,9 @@
 // @flow
 import * as React from 'react';
-import { getInstancesInLayoutForLayer } from '../Utils/Layout';
+import {
+  getInstancesInLayoutForLayer,
+  renameLayoutInProject,
+} from '../Utils/Layout';
 import { mapFor, mapVector } from '../Utils/MapFor';
 import { SafeExtractor } from '../Utils/SafeExtractor';
 import {
@@ -37,6 +40,13 @@ import { retryIfFailed } from '../Utils/RetryIfFailed';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import getObjectByName from '../Utils/GetObjectByName';
 import { getAllVisibleBehaviorNames } from '../Utils/Behavior';
+import type {
+  SceneEventsOutsideEditorChanges,
+  InstancesOutsideEditorChanges,
+  ObjectsOutsideEditorChanges,
+  ObjectGroupsOutsideEditorChanges,
+  SceneRenamedOutsideEditorChanges,
+} from './OutsideEditorChanges';
 import { type AssetShortHeader } from '../Utils/GDevelopServices/Asset';
 import { type ExampleShortHeader } from '../Utils/GDevelopServices/Example';
 import { swapAsset } from '../AssetStore/AssetSwapper';
@@ -226,24 +236,6 @@ export type EditorCallbacks = {|
   |}>,
 |};
 
-export type SceneEventsOutsideEditorChanges = {|
-  scene: gdLayout,
-  newOrChangedAiGeneratedEventIds: Set<string>,
-|};
-
-export type InstancesOutsideEditorChanges = {|
-  scene: gdLayout,
-|};
-
-export type ObjectsOutsideEditorChanges = {|
-  scene: gdLayout,
-  isNewObjectTypeUsed: boolean,
-|};
-
-export type ObjectGroupsOutsideEditorChanges = {|
-  scene: gdLayout,
-|};
-
 export type ToolOptions = {
   includeEventsJson?: boolean,
   ...
@@ -287,6 +279,9 @@ type LaunchFunctionOptionsWithoutProject = {|
   ) => void,
   onObjectGroupsModifiedOutsideEditor: (
     changes: ObjectGroupsOutsideEditorChanges
+  ) => void,
+  onSceneRenamedOutsideEditor: (
+    changes: SceneRenamedOutsideEditorChanges
   ) => void,
   ensureExtensionInstalled: (
     options: EnsureExtensionInstalledOptions
@@ -4879,6 +4874,7 @@ const inspectScenePropertiesLayersEffects: EditorFunction = {
       success: true,
       propertiesLayersEffectsForSceneNamed: scene.getName(),
       properties: {
+        name: scene.getName(),
         backgroundColor: rgbColorToHex(
           scene.getBackgroundColorRed(),
           scene.getBackgroundColorGreen(),
@@ -5034,6 +5030,7 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
     args,
     onInstancesModifiedOutsideEditor,
     onObjectGroupsModifiedOutsideEditor,
+    onSceneRenamedOutsideEditor,
   }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
 
@@ -5081,7 +5078,25 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
           return;
         }
 
-        if (isFuzzyMatch(propertyName, 'backgroundColor')) {
+        if (isFuzzyMatch(propertyName, 'name')) {
+          const oldName = scene.getName();
+          if (newValue === oldName) {
+            changes.push(`Scene already named "${newValue}".`);
+            return;
+          }
+
+          const newSceneName = newNameGenerator(
+            gd.Project.getSafeName(newValue),
+            tentativeNewName => project.hasLayoutNamed(tentativeNewName)
+          );
+
+          renameLayoutInProject(project, oldName, newSceneName);
+          onSceneRenamedOutsideEditor({ oldName, newName: newSceneName });
+
+          changes.push(
+            `Renamed scene "${oldName}" to "${newSceneName}" (events and references updated).`
+          );
+        } else if (isFuzzyMatch(propertyName, 'backgroundColor')) {
           const colorAsRgb = hexNumberToRGBArray(rgbOrHexToHexNumber(newValue));
           scene.setBackgroundColor(colorAsRgb[0], colorAsRgb[1], colorAsRgb[2]);
           changes.push(

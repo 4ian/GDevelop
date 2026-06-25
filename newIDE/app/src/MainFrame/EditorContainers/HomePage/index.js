@@ -1,13 +1,13 @@
 // @flow
 import * as React from 'react';
 import { I18n } from '@lingui/react';
+import { type RenderEditorContainerPropsWithRef } from '../BaseEditor';
 import {
-  type RenderEditorContainerPropsWithRef,
   type SceneEventsOutsideEditorChanges,
   type InstancesOutsideEditorChanges,
   type ObjectsOutsideEditorChanges,
   type ObjectGroupsOutsideEditorChanges,
-} from '../BaseEditor';
+} from '../../../EditorFunctions/OutsideEditorChanges';
 import {
   type FileMetadataAndStorageProviderName,
   type FileMetadata,

@@ -81,13 +81,14 @@ import {
 import { renderAskAiEditorContainer } from '../AiGeneration/AskAiEditorContainer';
 import { renderResourcesEditorContainer } from './EditorContainers/ResourcesEditorContainer';
 import { renderGlobalEventsSearchEditorContainer } from './EditorContainers/GlobalEventsSearchEditorContainer';
+import { type RenderEditorContainerPropsWithRef } from './EditorContainers/BaseEditor';
 import {
-  type RenderEditorContainerPropsWithRef,
   type SceneEventsOutsideEditorChanges,
   type InstancesOutsideEditorChanges,
   type ObjectsOutsideEditorChanges,
   type ObjectGroupsOutsideEditorChanges,
-} from './EditorContainers/BaseEditor';
+  type SceneRenamedOutsideEditorChanges,
+} from '../EditorFunctions/OutsideEditorChanges';
 import { type Exporter } from '../ExportAndShare/ShareDialog';
 import ResourcesLoader from '../ResourcesLoader/index';
 import {
@@ -207,6 +208,7 @@ import useCreateProject, {
   type UseCreateProjectReturnType,
 } from '../Utils/UseCreateProject';
 import newNameGenerator from '../Utils/NewNameGenerator';
+import { renameLayoutInProject } from '../Utils/Layout';
 import { addDefaultLightToAllLayers } from '../ProjectCreation/CreateProject';
 import { type NewProjectSetup } from '../ProjectCreation/NewProjectSetupDialog';
 import useEditorTabsStateSaving from './EditorTabs/UseEditorTabsStateSaving';
@@ -2099,22 +2101,9 @@ const MainFrame = (props: Props): React.MixedElement => {
       }
     );
 
-    const layout = currentProject.getLayout(oldName);
-    const shouldChangeProjectFirstLayout =
-      oldName === currentProject.getFirstLayout();
-
-    // Rename first: the gdLayout pointer (and its instances/objects) is kept.
-    layout.setName(uniqueNewName);
-    gd.WholeProjectRefactorer.renameLayout(
-      currentProject,
-      oldName,
-      uniqueNewName
-    );
+    renameLayoutInProject(currentProject, oldName, uniqueNewName);
     if (inAppTutorialOrchestratorRef.current) {
       inAppTutorialOrchestratorRef.current.changeData(oldName, uniqueNewName);
-    }
-    if (shouldChangeProjectFirstLayout) {
-      currentProject.setFirstLayout(uniqueNewName);
     }
 
     // External layout/events tabs are left untouched: they resolve the renamed
@@ -3674,6 +3663,27 @@ const MainFrame = (props: Props): React.MixedElement => {
     },
     [state.editorTabs]
   );
+
+  // The project model is already updated; just keep open tabs alive by renaming
+  // their project item.
+  const onSceneRenamedOutsideEditor = (
+    changes: SceneRenamedOutsideEditorChanges
+  ) => {
+    const { oldName, newName } = changes;
+    setState(state => {
+      const { currentProject } = state;
+      if (!currentProject) return state;
+      return {
+        ...state,
+        editorTabs: getEditorTabsWithRenamedProjectItem(
+          state.editorTabs,
+          currentProject,
+          editorTab =>
+            getRenamedLayoutTabProjectItemName(editorTab, oldName, newName)
+        ),
+      };
+    });
+  };
 
   const selectAllInActiveEditors = React.useCallback(
     () => {
@@ -5408,6 +5418,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     onInstancesModifiedOutsideEditor: onInstancesModifiedOutsideEditor,
     onObjectsModifiedOutsideEditor: onObjectsModifiedOutsideEditor,
     onObjectGroupsModifiedOutsideEditor: onObjectGroupsModifiedOutsideEditor,
+    onSceneRenamedOutsideEditor: onSceneRenamedOutsideEditor,
     onWillInstallExtension: onWillInstallExtension,
     onExtensionInstalled: onExtensionInstalled,
     onEffectAdded: onEffectAdded,

@@ -4,11 +4,13 @@ import EventsFunctionsExtensionEditor from '../../EventsFunctionsExtensionEditor
 import {
   type RenderEditorContainerProps,
   type RenderEditorContainerPropsWithRef,
+} from './BaseEditor';
+import {
   type SceneEventsOutsideEditorChanges,
   type InstancesOutsideEditorChanges,
   type ObjectsOutsideEditorChanges,
   type ObjectGroupsOutsideEditorChanges,
-} from './BaseEditor';
+} from '../../EditorFunctions/OutsideEditorChanges';
 import { type ObjectWithContext } from '../../ObjectsList/EnumerateObjects';
 import {
   setEditorHotReloadNeeded,

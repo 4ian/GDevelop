@@ -25,7 +25,7 @@ export const Default = (): React.Node => {
     <SerializedObjectDisplay object={spriteObjectWithBehaviors}>
       <AnchorBehaviorEditor
         project={testProject.project}
-        behavior={anchorBehavior}
+        behaviors={[anchorBehavior]}
         object={spriteObjectWithBehaviors}
         onBehaviorUpdated={action('onBehaviorUpdated')}
         resourceManagementProps={fakeResourceManagementProps}

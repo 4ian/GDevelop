@@ -6,10 +6,10 @@ import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/E
  * The props given to any behavior editor
  */
 export type BehaviorEditorProps = {|
-  behavior: gdBehavior,
+  behaviors: Array<gdBehavior>,
   project: gdProject,
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
-  object: gdObject,
+  object: gdObject | null,
   layersContainer: gdLayersContainer,
   resourceManagementProps: ResourceManagementProps,
   onBehaviorUpdated: () => void,

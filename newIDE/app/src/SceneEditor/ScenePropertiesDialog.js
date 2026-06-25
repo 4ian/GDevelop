@@ -175,6 +175,7 @@ const ScenePropertiesDialog = ({
           behaviorSharedData.updateProperty(name, value);
         },
         layersContainer: layout.getLayers(),
+        shouldDisabledFieldsWithMixedValues: false,
       });
       const tutorialIds = getBehaviorTutorialIds(behaviorTypeName);
       // TODO Make this a functional component to use PreferencesContext

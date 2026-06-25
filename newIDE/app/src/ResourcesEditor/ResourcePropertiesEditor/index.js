@@ -129,7 +129,7 @@ const ResourcePropertiesEditor: React.ComponentType<{
         {
           name: i18n._(t`Resource name`),
           valueType: 'string',
-          disabled: () => true,
+          disabled: () => 'always',
           getValue: (resource: gdResource) => resource.getName(),
           setValue: (resource: gdResource, newValue: string) =>
             resource.setName(newValue),
@@ -178,6 +178,7 @@ const ResourcePropertiesEditor: React.ComponentType<{
             forceUpdate();
           },
           layersContainer: null,
+          shouldDisabledFieldsWithMixedValues: false,
         });
 
         return (

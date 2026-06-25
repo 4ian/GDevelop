@@ -17,7 +17,7 @@ import {
 
 const CompactAnchorBehaviorEditor = ({
   project,
-  behavior,
+  behaviors,
   object,
   layersContainer,
   behaviorMetadata,
@@ -28,10 +28,23 @@ const CompactAnchorBehaviorEditor = ({
   resourceManagementProps,
 }: CompactBehaviorPropertiesEditorProps): React.Node => {
   const forceUpdate = useForceUpdate();
-  const _getPropertyValue = (propertyName: string) =>
-    getPropertyValue(behavior, propertyName, initialInstance);
+  const _getPropertyValue = (propertyName: string) => {
+    let commonValue = null;
+    for (const behavior of behaviors) {
+      const value = getPropertyValue(behavior, propertyName, initialInstance);
+      if (commonValue === null) {
+        commonValue = value;
+      }
+      if (value !== commonValue) {
+        return null;
+      }
+    }
+    return commonValue;
+  };
   const _updateProperty = (propertyName: string, value: string) => {
-    updateProperty(project, behavior, propertyName, value, initialInstance);
+    for (const behavior of behaviors) {
+      updateProperty(project, behavior, propertyName, value, initialInstance);
+    }
     forceUpdate();
     onBehaviorUpdated();
   };
@@ -62,7 +75,7 @@ const CompactAnchorBehaviorEditor = ({
         project={project}
         object={object}
         layersContainer={layersContainer}
-        behavior={behavior}
+        behaviors={behaviors}
         behaviorMetadata={behaviorMetadata}
         behaviorOverriding={behaviorOverriding}
         initialInstance={initialInstance}

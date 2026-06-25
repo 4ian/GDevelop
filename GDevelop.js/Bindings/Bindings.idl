@@ -366,7 +366,7 @@ interface ObjectGroup {
     void UnserializeFrom([Const, Ref] SerializerElement element);
 };
 
-interface ObjectVariableHelper {
+interface ObjectRefactorer {
     [Value] VariablesContainer STATIC_MergeVariableContainers(
         [Const, Ref] ObjectsContainersList objectsContainersList,
         [Const, Ref] ObjectGroup objectGroup);
@@ -378,6 +378,15 @@ interface ObjectVariableHelper {
         [Ref] EventsBasedObject eventsBasedObject,
         [Const] DOMString objectName,
         [Const, Ref] VariablesChangeset changeset);
+    void STATIC_FillMissingGroupVariablesToObject(
+        [Ref] gdObject obj,
+        [ Const, Ref ] VariablesContainer groupVariablesContainer);
+    void STATIC_FillMissingGroupBehaviorToObject(
+        [Ref] ObjectsContainer globalObjectsContainer,
+        [Ref] ObjectsContainer objectsContainer,
+        [Ref] gdObject obj,
+        [ Const, Ref ] ObjectGroup objectGroup,
+        [Const] DOMString behaviorName);
 };
 
 interface EventsBasedObjectVariantHelper {

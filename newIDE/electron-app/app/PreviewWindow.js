@@ -9,19 +9,11 @@ const { load } = require('./Utils/UrlLoader');
 const { serializeFunctionForCdp } = require('./PreviewCdpSnippets/cdpEval');
 const {
   bootstrapPreviewCdp,
-} = require('./PreviewCdpSnippets/bootstrapPreviewCdp');
-const {
   readBreakpointPauseState,
-} = require('./PreviewCdpSnippets/readBreakpointPauseState');
-const {
   setBreakpointsInPreview,
-} = require('./PreviewCdpSnippets/setBreakpointsInPreview');
-const {
   programSteppingInPreview,
-} = require('./PreviewCdpSnippets/programSteppingInPreview');
-const {
   schedulePauseAtNextEventInPreview,
-} = require('./PreviewCdpSnippets/schedulePauseAtNextEventInPreview');
+} = require('./PreviewCdpSnippets/previewCdpSnippets');
 
 /**
  * @typedef {import('electron').BrowserWindow} BrowserWindow

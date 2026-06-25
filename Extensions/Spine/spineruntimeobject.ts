@@ -114,7 +114,7 @@ namespace gdjs {
       this.invalidateHitboxes();
     }
 
-    getRendererObject(): pixi_spine.Spine | PIXI.Container {
+    getRendererObject(): spine.Spine | PIXI.Container {
       return this._renderer.getRendererObject();
     }
 

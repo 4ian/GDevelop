@@ -557,6 +557,9 @@ export const CompactObjectPropertiesEditor = ({
     objectName: object.getName(),
     eventsBasedObject,
     enabled: objects.length === 1,
+    objectGroup: null,
+    objectsContainer: null,
+    globalObjectsContainer: null,
   });
 
   const propertiesSchema = React.useMemo(

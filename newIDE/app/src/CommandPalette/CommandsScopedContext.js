@@ -14,8 +14,7 @@ class ScopedCommandManager implements CommandManagerInterface {
   _centralManager: CommandManagerInterface;
   _isActive: boolean;
 
-  // $FlowFixMe[missing-local-annot]
-  constructor(centralCommandManager) {
+  constructor(centralCommandManager: CommandManagerInterface) {
     this._commands = {};
     this._isActive = false;
     this._centralManager = centralCommandManager;
@@ -51,18 +50,15 @@ class ScopedCommandManager implements CommandManagerInterface {
     });
   };
 
-  // $FlowFixMe[missing-local-annot]
-  getAllNamedCommands = () => {
+  getAllNamedCommands = (): Array<NamedCommand> => {
     // $FlowFixMe[missing-type-arg]
     return Object.keys(this._commands).map<NamedCommand>(commandName => {
       const cmd = this._commands[commandName];
-      // $FlowFixMe[incompatible-type]
       return { ...cmd, name: commandName };
     });
   };
 
-  // $FlowFixMe[missing-local-annot]
-  getNamedCommand = (commandName: CommandName) => {
+  getNamedCommand = (commandName: CommandName): ?NamedCommand => {
     const command = this._commands[commandName];
     if (command) return { name: commandName, ...(command: Command) };
     return this._centralManager.getNamedCommand(commandName);

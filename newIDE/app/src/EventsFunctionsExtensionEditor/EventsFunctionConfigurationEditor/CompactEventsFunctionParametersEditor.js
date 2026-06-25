@@ -14,11 +14,7 @@ import CompactSemiControlledTextField from '../../UI/CompactSemiControlledTextFi
 import { type CompactTextFieldInterface } from '../../UI/CompactTextField';
 import { ParametersIndexOffsets } from '../../EventsFunctionsExtensionsLoader';
 import DismissableAlertMessage from '../../UI/DismissableAlertMessage';
-import {
-  ResponsiveLineStackLayout,
-  ColumnStackLayout,
-  LineStackLayout,
-} from '../../UI/Layout';
+import { ColumnStackLayout, LineStackLayout } from '../../UI/Layout';
 import { getLastObjectParameterObjectType } from '../../EventsSheet/ParameterFields/ParameterMetadataTools';
 import newNameGenerator from '../../Utils/NewNameGenerator';
 import CompactValueTypeEditor from './CompactValueTypeEditor';
@@ -774,46 +770,39 @@ const CompactEventsFunctionParametersEditor: React.ComponentType<{
                                         </Column>
                                       </span>
                                     )}
-                                    <ResponsiveLineStackLayout
-                                      expand
-                                      noOverflowParent
+                                    <LineStackLayout
                                       noMargin
+                                      expand
+                                      alignItems="center"
                                     >
-                                      <LineStackLayout
-                                        noMargin
-                                        expand
-                                        alignItems="center"
+                                      <Text
+                                        color="secondary"
+                                        style={{
+                                          whiteSpace: 'nowrap',
+                                        }}
                                       >
-                                        <Text
-                                          color="secondary"
-                                          style={{
-                                            whiteSpace: 'nowrap',
-                                          }}
-                                        >
-                                          <Trans>
-                                            Parameter #
-                                            {i + parametersIndexOffset}
-                                          </Trans>
-                                        </Text>
-                                        <CompactSemiControlledTextField
-                                          ref={ref => {
-                                            parameterNameFieldRefs.current.set(
-                                              parameter.getName(),
-                                              ref
-                                            );
-                                          }}
-                                          commitOnBlur
-                                          placeholder={i18n._(
-                                            t`Enter the parameter name (mandatory)`
-                                          )}
-                                          value={parameter.getName()}
-                                          onChange={newName =>
-                                            renameParameter(parameter, newName)
-                                          }
-                                          disabled={isParameterDisabled(i)}
-                                        />
-                                      </LineStackLayout>
-                                    </ResponsiveLineStackLayout>
+                                        <Trans>
+                                          Parameter #{i + parametersIndexOffset}
+                                        </Trans>
+                                      </Text>
+                                      <CompactSemiControlledTextField
+                                        ref={ref => {
+                                          parameterNameFieldRefs.current.set(
+                                            parameter.getName(),
+                                            ref
+                                          );
+                                        }}
+                                        commitOnBlur
+                                        placeholder={i18n._(
+                                          t`Enter the parameter name (mandatory)`
+                                        )}
+                                        value={parameter.getName()}
+                                        onChange={newName =>
+                                          renameParameter(parameter, newName)
+                                        }
+                                        disabled={isParameterDisabled(i)}
+                                      />
+                                    </LineStackLayout>
                                     <ElementWithMenu
                                       element={
                                         <IconButton size="small">

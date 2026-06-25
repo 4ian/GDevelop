@@ -234,11 +234,15 @@ export default function CompactValueTypeEditor({
                     value="identifier"
                     label={t`Identifier (text)`}
                   />
-                  <SelectOption value="variable" label={t`Variable`} />
-                  <SelectOption
-                    value="scenevar"
-                    label={t`Scene variable (deprecated)`}
-                  />
+                  {!isExpressionType && (
+                    <SelectOption value="variable" label={t`Variable`} />
+                  )}
+                  {!isExpressionType && (
+                    <SelectOption
+                      value="scenevar"
+                      label={t`Scene variable (deprecated)`}
+                    />
+                  )}
                   {!isExpressionType && (
                     <SelectOption
                       value="objectListOrEmptyIfJustDeclared"

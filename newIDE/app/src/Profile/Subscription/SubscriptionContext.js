@@ -15,10 +15,14 @@ import {
   type SubscriptionPlanWithPricingSystems,
   type SubscriptionPlan,
   type SubscriptionPlanPricingSystem,
+  type SubscriptionDialogDisplayConfig,
+  type SubscriptionDialogVariantConfig,
 } from '../../Utils/GDevelopServices/Usage';
 import AuthenticatedUserContext from '../AuthenticatedUserContext';
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
 import SubscriptionDialog from './SubscriptionDialog';
+import SimplifiedSubscriptionDialog from './SubscriptionDialog/SimplifiedSubscriptionDialog';
+import { planIdSortingFunction } from './PlanSmallCard';
 import SubscriptionPendingDialog from './SubscriptionPendingDialog';
 import LoaderModal from '../../UI/LoaderModal';
 import { useAsyncLazyMemo } from '../../Utils/UseLazyMemo';
@@ -31,7 +35,103 @@ export type SubscriptionAnalyticsMetadata = {|
   recommendedPlanId?: string,
   placementId: SubscriptionPlacementId,
   preStep?: 'subscriptionChecker',
+  // Which version of the subscription dialog was shown. Computed when the dialog
+  // is opened (see `resolveSubscriptionDialogDisplay`) and sent with analytics
+  // events.
+  dialogVariant?: string,
+  // Plan featured by the simplified dialog, when shown.
+  featuredPlanId?: string,
 |};
+
+export type SubscriptionDialogDisplay = {|
+  dialogVariant: string,
+  featuredPlanId?: string,
+|};
+
+const standardDialogDisplay: SubscriptionDialogDisplay = {
+  dialogVariant: 'standard',
+};
+
+/**
+ * Picks a variant among the given ones, proportionally to their weights.
+ */
+const pickWeightedVariant = (
+  variants: Array<SubscriptionDialogVariantConfig>
+): ?SubscriptionDialogVariantConfig => {
+  const positiveWeightVariants = variants.filter(variant => variant.weight > 0);
+  if (positiveWeightVariants.length === 0) return variants[0] || null;
+
+  const totalWeight = positiveWeightVariants.reduce(
+    (sum, variant) => sum + variant.weight,
+    0
+  );
+  let remaining = Math.random() * totalWeight;
+  for (const variant of positiveWeightVariants) {
+    remaining -= variant.weight;
+    if (remaining < 0) return variant;
+  }
+  return positiveWeightVariants[positiveWeightVariants.length - 1];
+};
+
+/**
+ * Decides, from the backend-provided A/B test configuration, which subscription
+ * dialog variant (and featured plan) to show for a given placement.
+ *
+ * Degrades gracefully: unconfigured placements, unknown variant types or a
+ * missing config all fall back to the standard dialog. The simplified dialog is
+ * also skipped when the user already has the featured plan (or a higher one),
+ * as it would not make sense to upsell it.
+ */
+export const resolveSubscriptionDialogDisplay = ({
+  placementId,
+  displayConfig,
+  userSubscriptionPlanId,
+  hasMobileAppStoreSubscription = false,
+  pickVariant = pickWeightedVariant,
+}: {|
+  placementId: SubscriptionPlacementId,
+  displayConfig: ?SubscriptionDialogDisplayConfig,
+  userSubscriptionPlanId: ?string,
+  hasMobileAppStoreSubscription?: boolean,
+  pickVariant?: (
+    variants: Array<SubscriptionDialogVariantConfig>
+  ) => ?SubscriptionDialogVariantConfig,
+|}): SubscriptionDialogDisplay => {
+  if (!displayConfig || !displayConfig.placements) return standardDialogDisplay;
+
+  const placementConfig = displayConfig.placements[placementId];
+  if (
+    !placementConfig ||
+    !placementConfig.variants ||
+    placementConfig.variants.length === 0
+  ) {
+    return standardDialogDisplay;
+  }
+
+  const variant = pickVariant(placementConfig.variants);
+  if (!variant) return standardDialogDisplay;
+
+  if (variant.type === 'simplified') {
+    const { featuredPlanId } = variant;
+    // Don't show the simplified (upsell) dialog if we don't know which plan to
+    // feature, or if the user already has that plan or a higher one.
+    if (!featuredPlanId) return standardDialogDisplay;
+    if (
+      userSubscriptionPlanId &&
+      planIdSortingFunction(userSubscriptionPlanId, featuredPlanId) >= 0
+    ) {
+      return standardDialogDisplay;
+    }
+    // Apple/Google Play subscriptions can't be managed from the web checkout.
+    // The standard dialog blocks these users with a dedicated message, so fall
+    // back to it rather than sending them into the cancel/change flow.
+    if (hasMobileAppStoreSubscription) return standardDialogDisplay;
+    return { dialogVariant: 'simplified', featuredPlanId };
+  }
+
+  // 'standard' or any unknown/future variant type: degrade gracefully.
+  return standardDialogDisplay;
+};
 
 const mergeSubscriptionPlansWithPrices = (
   subscriptionPlans: SubscriptionPlan[],
@@ -250,11 +350,40 @@ export const SubscriptionProvider = ({
 
         // Would present App Store screen.
       } else {
-        setAnalyticsMetadata(metadata);
+        const userSubscriptionPlanId = authenticatedUser.subscription
+          ? authenticatedUser.subscription.planId
+          : null;
+        // The A/B test config is served with the user limits (fetched once at
+        // startup for authenticated users). Absent for anonymous users or older
+        // backends, in which case we fall back to the standard dialog.
+        const displayConfig = authenticatedUser.limits
+          ? authenticatedUser.limits.subscriptionDialogDisplayConfig
+          : null;
+        // A caller can force a variant (and featured plan); otherwise resolve
+        // it from the backend A/B test configuration.
+        const { dialogVariant, featuredPlanId } = metadata.dialogVariant
+          ? {
+              dialogVariant: metadata.dialogVariant,
+              featuredPlanId: metadata.featuredPlanId,
+            }
+          : resolveSubscriptionDialogDisplay({
+              placementId: metadata.placementId,
+              displayConfig,
+              userSubscriptionPlanId,
+              hasMobileAppStoreSubscription: hasMobileAppStoreSubscriptionPlan(
+                authenticatedUser.subscription
+              ),
+            });
+        setAnalyticsMetadata({ ...metadata, dialogVariant, featuredPlanId });
         setCouponCode(coupon || null);
       }
     },
-    [authenticatedUser.subscription, showAlert, simulateMobileApp]
+    [
+      authenticatedUser.subscription,
+      authenticatedUser.limits,
+      showAlert,
+      simulateMobileApp,
+    ]
   );
 
   const getUserSubscriptionPlanEvenIfLegacy = React.useCallback(
@@ -355,6 +484,14 @@ export const SubscriptionProvider = ({
       {analyticsMetadata ? (
         authenticatedUser.loginState === 'loggingIn' ? (
           <LoaderModal showImmediately />
+        ) : analyticsMetadata.dialogVariant === 'simplified' ? (
+          <SimplifiedSubscriptionDialog
+            availableSubscriptionPlansWithPrices={getSubscriptionPlansWithPricingSystems()}
+            featuredPlanId={analyticsMetadata.featuredPlanId}
+            onClose={closeSubscriptionDialog}
+            onOpenPendingDialog={openSubscriptionPendingDialog}
+            couponCode={couponCode}
+          />
         ) : (
           <SubscriptionDialog
             availableSubscriptionPlansWithPrices={getSubscriptionPlansWithPricingSystems()}

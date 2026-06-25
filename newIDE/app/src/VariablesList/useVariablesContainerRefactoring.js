@@ -6,14 +6,23 @@ const gd: libGDevelop = global.gd;
 
 const REFACTORING_DEBOUNCE_MS = 200;
 
-type Props = {|
+type Context = {
   project: gdProject,
+  initialInstances: gdInitialInstancesContainer | null,
+  objectName: string | null,
+  eventsBasedObject: gdEventsBasedObject | null,
+
+  // Only for object groups
+  objectGroup: gdObjectGroup | null,
+  objectsContainer: gdObjectsContainer | null,
+  globalObjectsContainer: gdObjectsContainer | null,
+};
+
+type Props = {
+  ...Context,
   variablesContainer: gdVariablesContainer,
-  initialInstances: ?gdInitialInstancesContainer,
-  objectName: ?string,
-  eventsBasedObject: ?gdEventsBasedObject,
   enabled: boolean,
-|};
+};
 
 /**
  * Hook that manages the lifecycle of variable refactoring for a properties
@@ -35,6 +44,9 @@ const useVariablesContainerRefactoring = ({
   objectName,
   eventsBasedObject,
   enabled,
+  objectGroup,
+  objectsContainer,
+  globalObjectsContainer,
 }: Props): {|
   onVariablesUpdated: () => void,
 |} => {
@@ -43,21 +55,22 @@ const useVariablesContainerRefactoring = ({
 
   // Use refs for values that should not trigger the effect to re-run,
   // but need to be accessible in the refactoring callback.
-  const projectRef = React.useRef<gdProject>(project);
-  projectRef.current = project;
-
-  const initialInstancesRef = React.useRef<?gdInitialInstancesContainer>(
-    initialInstances
-  );
-  initialInstancesRef.current = initialInstances;
-
-  const objectNameRef = React.useRef<?string>(objectName);
-  objectNameRef.current = objectName;
-
-  const eventsBasedObjectRef = React.useRef<?gdEventsBasedObject>(
-    eventsBasedObject
-  );
-  eventsBasedObjectRef.current = eventsBasedObject;
+  const context = React.useRef<Context>({
+    project,
+    initialInstances,
+    objectName,
+    eventsBasedObject,
+    objectGroup,
+    objectsContainer,
+    globalObjectsContainer,
+  });
+  context.current.project = project;
+  context.current.initialInstances = initialInstances;
+  context.current.objectName = objectName;
+  context.current.eventsBasedObject = eventsBasedObject;
+  context.current.objectGroup = objectGroup;
+  context.current.objectsContainer = objectsContainer;
+  context.current.globalObjectsContainer = globalObjectsContainer;
 
   // Keep a ref to variablesContainer so the debounced callback always
   // accesses the current one without needing it in its dependency array.
@@ -68,42 +81,69 @@ const useVariablesContainerRefactoring = ({
 
   const applyPendingRefactoring = React.useCallback(() => {
     const snapshot = snapshotRef.current;
-    const container = exceptionallyGuardAgainstDeadObject(
+    const variablesContainer = exceptionallyGuardAgainstDeadObject(
       variablesContainerRef.current
     );
-    if (!snapshot || !container) return;
+    if (!snapshot || !variablesContainer) return;
 
     try {
       const changeset = gd.WholeProjectRefactorer.computeChangesetForVariablesContainer(
         snapshot,
-        container
+        variablesContainer
       );
 
-      const currentObjectName = objectNameRef.current;
-      const currentInitialInstances = initialInstancesRef.current;
-      const currentProject = projectRef.current;
+      const {
+        project,
+        initialInstances,
+        objectName,
+        objectGroup,
+        eventsBasedObject,
+        objectsContainer,
+        globalObjectsContainer,
+      } = context.current;
 
-      if (currentObjectName && currentInitialInstances) {
-        gd.WholeProjectRefactorer.applyRefactoringForObjectVariablesContainer(
-          currentProject,
-          container,
-          currentInitialInstances,
-          currentObjectName,
+      if (objectGroup && initialInstances && objectsContainer) {
+        gd.WholeProjectRefactorer.applyRefactoringForGroupVariablesContainer(
+          project,
+          globalObjectsContainer || objectsContainer,
+          objectsContainer,
+          initialInstances,
+          variablesContainer,
+          objectGroup,
           changeset,
           snapshot
         );
-        const currentEventsBasedObject = eventsBasedObjectRef.current;
-        if (currentEventsBasedObject) {
+        if (eventsBasedObject) {
+          for (const objectName of objectGroup
+            .getAllObjectsNames()
+            .toJSArray()) {
+            gd.ObjectVariableHelper.applyChangesToVariants(
+              eventsBasedObject,
+              objectName,
+              changeset
+            );
+          }
+        }
+      } else if (objectName && initialInstances) {
+        gd.WholeProjectRefactorer.applyRefactoringForObjectVariablesContainer(
+          project,
+          variablesContainer,
+          initialInstances,
+          objectName,
+          changeset,
+          snapshot
+        );
+        if (eventsBasedObject) {
           gd.ObjectVariableHelper.applyChangesToVariants(
-            currentEventsBasedObject,
-            currentObjectName,
+            eventsBasedObject,
+            objectName,
             changeset
           );
         }
       } else {
         gd.WholeProjectRefactorer.applyRefactoringForVariablesContainer(
-          currentProject,
-          container,
+          project,
+          variablesContainer,
           changeset,
           snapshot
         );
@@ -114,10 +154,10 @@ const useVariablesContainerRefactoring = ({
 
     // Take a fresh snapshot for the next cycle.
     snapshot.delete();
-    container.clearPersistentUuid();
-    container.resetPersistentUuid();
+    variablesContainer.clearPersistentUuid();
+    variablesContainer.resetPersistentUuid();
     const newSnapshot = new gd.SerializerElement();
-    container.serializeTo(newSnapshot);
+    variablesContainer.serializeTo(newSnapshot);
     snapshotRef.current = newSnapshot;
   }, []);
 

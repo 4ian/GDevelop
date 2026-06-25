@@ -590,14 +590,10 @@ export const AssetStoreStateProvider = ({
       assetPackFiltersState,
       clearAllFilters,
       useSearchItem: (
-        // $FlowFixMe[missing-local-annot]
-        searchText,
-        // $FlowFixMe[missing-local-annot]
-        chosenCategory,
-        // $FlowFixMe[missing-local-annot]
-        chosenFilters,
-        // $FlowFixMe[missing-local-annot]
-        searchFilters
+        searchText: string,
+        chosenCategory: ?ChosenCategory,
+        chosenFilters: ?Set<string>,
+        searchFilters: Array<SearchFilter<AssetShortHeader>>
       ) =>
         useSearchItem(
           assetShortHeadersById,

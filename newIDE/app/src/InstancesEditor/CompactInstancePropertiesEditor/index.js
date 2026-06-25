@@ -125,7 +125,6 @@ type Props = {|
   historyHandler?: HistoryHandler,
   tileMapTileSelection: ?TileMapTileSelection,
   onSelectTileMapTile: (?TileMapTileSelection) => void,
-  canOverrideBehaviorProperties: boolean,
 |};
 
 export const CompactInstancePropertiesEditor = ({
@@ -146,7 +145,6 @@ export const CompactInstancePropertiesEditor = ({
   projectScopedContainersAccessor,
   tileMapTileSelection,
   onSelectTileMapTile,
-  canOverrideBehaviorProperties,
 }: Props): null | React.Node => {
   const forceUpdate = useForceUpdate();
   const instance = instances[0];
@@ -159,12 +157,12 @@ export const CompactInstancePropertiesEditor = ({
    * obviously plus instance-wise variables with same name).
    */
   const shouldDisplayVariablesList = instances.length === 1;
+  const shouldDisplayBehaviorsList = instances.length === 1;
   const variablesContainer = shouldDisplayVariablesList
     ? exceptionallyGuardAgainstDeadObject(instance.getVariables())
     : null;
 
-  // $FlowFixMe[missing-local-annot]
-  const onScrollY = React.useCallback(deltaY => {
+  const onScrollY = React.useCallback((deltaY: number) => {
     if (scrollViewRef.current) {
       scrollViewRef.current.scrollBy(deltaY);
     }
@@ -385,7 +383,7 @@ export const CompactInstancePropertiesEditor = ({
               </Column>
             </>
           )}
-          {object && canOverrideBehaviorProperties ? (
+          {object && shouldDisplayBehaviorsList ? (
             <TopLevelCollapsibleSection
               title={<Trans>Behaviors</Trans>}
               isFolded={isBehaviorsFolded}

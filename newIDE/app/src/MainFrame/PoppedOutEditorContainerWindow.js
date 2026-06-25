@@ -109,7 +109,7 @@ const PoppedOutEditorContainerWindow = (props: Props): React.Node => {
 
   return (
     <WindowPortal
-      key={`popout-${editorTab.key}`}
+      key={`popout-${editorTab.id}`}
       title={editorTab.label || 'GDevelop'}
       onClose={() => {
         props.onEditorTabClosing(editorTab);
@@ -186,7 +186,7 @@ const PoppedOutEditorContainerWindow = (props: Props): React.Node => {
                       scope={errorBoundaryProps.scope}
                     >
                       {editorTab.renderEditorContainer({
-                        editorId: editorTab.key,
+                        editorId: editorTab.id,
                         gameEditorMode: props.gameEditorMode,
                         setGameEditorMode: props.setGameEditorMode,
                         isActive: true,

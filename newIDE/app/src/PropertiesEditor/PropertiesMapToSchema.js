@@ -39,7 +39,8 @@ const createField = (
   defaultValue: string | null,
   layers: gdLayersContainer | null,
   object: ?gdObject,
-  showcaseNonDefaultValues: boolean
+  showcaseNonDefaultValues: boolean,
+  hideResourceProperties: boolean
 ): ?Field => {
   const propertyName = property.getLabel();
   const getLabel = (instance: Instance) => {
@@ -272,6 +273,9 @@ const createField = (
       isHighlighted: isHighlightedForString,
     };
   } else if (valueType === 'resource') {
+    if (hideResourceProperties) {
+      return null;
+    }
     // Resource is a "string" (with a selector in the UI)
     const extraInfos = property.getExtraInfo().toJSArray();
     // $FlowFixMe[incompatible-type] - assume the passed resource kind is always valid.
@@ -522,6 +526,7 @@ type CommonProps = {|
   visibility?: 'All' | 'Basic' | 'Advanced' | 'Deprecated' | 'Basic-Quick',
   quickCustomizationVisibilities?: gdQuickCustomizationVisibilitiesContainer,
   showcaseNonDefaultValues?: boolean,
+  hideResourceProperties?: boolean,
 |};
 
 export const effectPropertiesMapToSchema = ({
@@ -529,7 +534,7 @@ export const effectPropertiesMapToSchema = ({
   object,
   visibility = 'All',
   quickCustomizationVisibilities,
-  showcaseNonDefaultValues,
+  hideResourceProperties,
 }: {
   ...CommonProps,
   defaultValueProperties: gdMapStringPropertyDescriptor,
@@ -541,7 +546,7 @@ export const effectPropertiesMapToSchema = ({
     layersContainer: null,
     visibility,
     quickCustomizationVisibilities,
-    showcaseNonDefaultValues,
+    hideResourceProperties,
     getNumberValue: (instance: Instance, propertyName: string): number =>
       instance.hasDoubleParameter(propertyName)
         ? instance.getDoubleParameter(propertyName)
@@ -593,6 +598,7 @@ const propertiesMapToSchema = ({
   visibility = 'All',
   quickCustomizationVisibilities,
   showcaseNonDefaultValues,
+  hideResourceProperties,
 }: {
   ...CommonProps,
   getPropertyValue: (instance: Instance, propertyName: string) => string,
@@ -612,6 +618,7 @@ const propertiesMapToSchema = ({
     visibility,
     quickCustomizationVisibilities,
     showcaseNonDefaultValues,
+    hideResourceProperties,
     getNumberValue: (instance: Instance, propertyName: string): number => {
       // Consider a missing value as 0 to avoid propagating NaN.
       return parseFloat(getPropertyValue(instance, propertyName)) || 0;
@@ -642,6 +649,7 @@ const adaptablePropertiesMapToSchema = ({
   visibility = 'All',
   quickCustomizationVisibilities,
   showcaseNonDefaultValues,
+  hideResourceProperties,
   getNumberValue,
   getStringValue,
   getBooleanValue,
@@ -776,7 +784,8 @@ const adaptablePropertiesMapToSchema = ({
               rowPropertyDefaultValue,
               layersContainer,
               object,
-              !!showcaseNonDefaultValues
+              !!showcaseNonDefaultValues,
+              !!hideResourceProperties
             );
 
             if (field) {
@@ -815,7 +824,8 @@ const adaptablePropertiesMapToSchema = ({
           : null,
         layersContainer,
         object,
-        !!showcaseNonDefaultValues
+        !!showcaseNonDefaultValues,
+        !!hideResourceProperties
       );
     }
     if (field) {

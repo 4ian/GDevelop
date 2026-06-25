@@ -3,6 +3,7 @@ import * as React from 'react';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import { retryIfFailed } from '../Utils/RetryIfFailed';
 import { delay } from '../Utils/Delay';
+import { getBackedOffIntervalInMs } from '../Utils/UseAdaptivePollingInterval';
 import {
   getAiGeneratedEvent,
   createAiGeneratedEvent,
@@ -118,11 +119,15 @@ export const useGenerateEvents = ({
           };
         }
 
-        let remainingAttempts = 50;
+        // Poll with exponential backoff (fast initially, capped), bounded by a
+        // total time budget rather than a fixed attempt count.
+        const maxTotalWaitMs = 60000;
+        const maxPollIntervalMs = 5000;
+        const startTime = Date.now();
+        let pollIntervalMs = 1000;
         let aiGeneratedEvent = createResult.aiGeneratedEvent;
         while (aiGeneratedEvent.status === 'working') {
-          remainingAttempts--;
-          await delay(1000);
+          await delay(pollIntervalMs);
 
           try {
             aiGeneratedEvent = await getAiGeneratedEvent(
@@ -138,7 +143,11 @@ export const useGenerateEvents = ({
               error
             );
           }
-          if (remainingAttempts <= 0) {
+          pollIntervalMs = getBackedOffIntervalInMs(
+            pollIntervalMs,
+            maxPollIntervalMs
+          );
+          if (Date.now() - startTime >= maxTotalWaitMs) {
             return {
               generationCompleted: false,
               errorMessage:

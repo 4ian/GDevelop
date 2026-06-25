@@ -48,6 +48,10 @@ const ObjectGroupsListWithObjectGroupEditor = ({
   const [editedGroup, setEditedGroup] = React.useState<gdObjectGroup | null>(
     null
   );
+  const [
+    selectedObjectGroup,
+    setSelectedObjectGroup,
+  ] = React.useState<gdObjectGroup | null>(null);
   const [isCreatingNewGroup, setCreatingNewGroup] = React.useState<boolean>(
     false
   );
@@ -72,6 +76,8 @@ const ObjectGroupsListWithObjectGroupEditor = ({
         canSetAsGlobalGroup={canSetAsGlobalGroup}
         unsavedChanges={unsavedChanges}
         isListLocked={false}
+        selectedObjectGroup={selectedObjectGroup}
+        onSelectObjectGroup={setSelectedObjectGroup}
       />
       {(editedGroup || isCreatingNewGroup) && (
         <ObjectGroupEditorDialog

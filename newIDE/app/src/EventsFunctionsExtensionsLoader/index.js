@@ -99,14 +99,25 @@ const loadProjectEventsFunctionsExtension = (
   eventsFunctionsExtension: gdEventsFunctionsExtension,
   options: OptionsForGeneration
 ): Promise<void> => {
+  const extensionName = eventsFunctionsExtension.getName();
+  const phase = options.skipCodeGeneration ? 'metadata' : 'codegen';
   return generateEventsFunctionExtension(
     project,
     eventsFunctionsExtension,
     options
-  ).then(extension => {
-    gd.JsPlatform.get().addNewExtension(extension);
-    extension.delete();
-  });
+  ).then(
+    extension => {
+      gd.JsPlatform.get().addNewExtension(extension);
+      extension.delete();
+    },
+    error => {
+      console.error(
+        `[EventsFunctionsExtensionsLoader] Failed to load extension "${extensionName}" (phase=${phase}):`,
+        error
+      );
+      throw error;
+    }
+  );
 };
 
 /**
@@ -316,16 +327,26 @@ const generateFreeFunction = (
   codeGenerationContext: CodeGenerationContext
 ): Promise<void> => {
   const metadataDeclarationHelper = new gd.MetadataDeclarationHelper();
-  const { functionMetadata } = generateFreeFunctionMetadata(
-    project,
-    extension,
-    eventsFunctionsExtension,
-    eventsFunction,
-    // $FlowFixMe[incompatible-type]
-    options,
-    codeGenerationContext,
-    metadataDeclarationHelper
-  );
+  let functionMetadata;
+  try {
+    ({ functionMetadata } = generateFreeFunctionMetadata(
+      project,
+      extension,
+      eventsFunctionsExtension,
+      eventsFunction,
+      // $FlowFixMe[incompatible-type]
+      options,
+      codeGenerationContext,
+      metadataDeclarationHelper
+    ));
+  } catch (error) {
+    console.error(
+      `[EventsFunctionsExtensionsLoader] Failed to generate metadata for free function "${eventsFunctionsExtension.getName()}::${eventsFunction.getName()}":`,
+      error
+    );
+    metadataDeclarationHelper.delete();
+    throw error;
+  }
 
   if (!options.skipCodeGeneration) {
     const includeFiles = new gd.SetString();
@@ -336,13 +357,25 @@ const generateFreeFunction = (
       eventsFunction,
       codeGenerationContext.codeNamespacePrefix
     );
-    const code = eventsFunctionsExtensionCodeGenerator.generateFreeEventsFunctionCompleteCode(
-      eventsFunctionsExtension,
-      eventsFunction,
-      codeNamespace,
-      includeFiles,
-      !options.generateForPreview // compilationForRuntime: true strips instrumentation (export), false keeps it (preview)
-    );
+    let code;
+    try {
+      code = eventsFunctionsExtensionCodeGenerator.generateFreeEventsFunctionCompleteCode(
+        eventsFunctionsExtension,
+        eventsFunction,
+        codeNamespace,
+        includeFiles,
+        !options.generateForPreview // compilationForRuntime: true strips instrumentation (export), false keeps it (preview)
+      );
+    } catch (error) {
+      console.error(
+        `[EventsFunctionsExtensionsLoader] Failed to generate code for free function "${eventsFunctionsExtension.getName()}::${eventsFunction.getName()}":`,
+        error
+      );
+      includeFiles.delete();
+      eventsFunctionsExtensionCodeGenerator.delete();
+      metadataDeclarationHelper.delete();
+      throw error;
+    }
 
     // Add any include file required by the function to the list
     // of include files for this function (so that when used, the "dependencies"

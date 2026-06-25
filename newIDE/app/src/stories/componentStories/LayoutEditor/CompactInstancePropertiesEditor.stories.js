@@ -42,7 +42,6 @@ export const InstanceSprite2d = (): React.Node => (
             )}
             tileMapTileSelection={null}
             onSelectTileMapTile={() => {}}
-            canOverrideBehaviorProperties={true}
             resourceManagementProps={fakeResourceManagementProps}
           />
         </SerializedObjectDisplay>
@@ -74,7 +73,6 @@ export const InstanceCube3d = (): React.Node => (
             )}
             tileMapTileSelection={null}
             onSelectTileMapTile={() => {}}
-            canOverrideBehaviorProperties={true}
             resourceManagementProps={fakeResourceManagementProps}
           />
         </SerializedObjectDisplay>
@@ -106,7 +104,6 @@ export const InstanceTextInput = (): React.Node => (
             )}
             tileMapTileSelection={null}
             onSelectTileMapTile={() => {}}
-            canOverrideBehaviorProperties={true}
             resourceManagementProps={fakeResourceManagementProps}
           />
         </SerializedObjectDisplay>

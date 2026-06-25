@@ -17,6 +17,7 @@ import { type FileMetadata, type StorageProvider } from '../ProjectsStorage';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import RouterContext from './RouterContext';
 import { type CreateProjectResult } from '../Utils/UseCreateProject';
+import { type OpenAskAiOptions } from '../AiGeneration/Utils';
 
 type Props = {|
   project: ?gdProject,
@@ -34,6 +35,8 @@ type Props = {|
     newProjectSetup: NewProjectSetup
   ) => Promise<CreateProjectResult>,
   closeAskAi: () => void,
+  openAskAi: (?OpenAskAiOptions) => void,
+  closeProject: () => Promise<void>,
   storageProviders: Array<StorageProvider>,
   storageProvider: ?StorageProvider,
   onOpenLayout: (
@@ -81,6 +84,8 @@ const useNewProjectDialog = ({
   createProjectFromExample,
   createProjectFromPrivateGameTemplate,
   closeAskAi,
+  openAskAi,
+  closeProject,
   storageProviders,
   storageProvider,
   onOpenLayout,
@@ -236,6 +241,8 @@ const useNewProjectDialog = ({
               createProjectFromPrivateGameTemplate
             }
             onCloseAskAi={closeAskAi}
+            onOpenAskAi={openAskAi}
+            closeProject={closeProject}
             storageProviders={storageProviders}
             storageProvider={storageProvider}
             selectedExampleShortHeader={selectedExampleShortHeader}

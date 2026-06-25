@@ -335,20 +335,6 @@ export default (React.forwardRef<Props, VariableFieldInterface>(
       [updateAutocompletions]
     );
 
-    const isSwitchableInstruction =
-      instruction &&
-      gd.VariableInstructionSwitcher.isSwitchableVariableInstruction(
-        instruction.getType()
-      );
-    const variableType =
-      project && instruction && isSwitchableInstruction
-        ? gd.VariableInstructionSwitcher.getVariableTypeFromParameters(
-            project.getCurrentPlatform(),
-            projectScopedContainersAccessor.get(),
-            instruction
-          )
-        : null;
-
     const openVariableEditor = React.useCallback(
       () => {
         if (!onOpenDialog) {
@@ -366,10 +352,16 @@ export default (React.forwardRef<Props, VariableFieldInterface>(
           shouldCreate:
             !!fieldCurrentValue &&
             !isRootVariableDeclared(fieldCurrentValue, variablesContainers),
-          variableType: getVariableTypeName(variableType),
+          variableType: instruction
+            ? getVariableTypeName(
+                gd.VariableInstructionSwitcher.getSwitchableInstructionVariableType(
+                  instruction.getType()
+                )
+              )
+            : 'number',
         });
       },
-      [onChange, onOpenDialog, value, variableType, variablesContainers]
+      [instruction, onChange, onOpenDialog, value, variablesContainers]
     );
 
     const openParameterEditor = React.useCallback(
@@ -390,7 +382,13 @@ export default (React.forwardRef<Props, VariableFieldInterface>(
             fieldCurrentValue,
             variablesContainers
           ),
-          variableType: getVariableTypeName(variableType),
+          variableType: instruction
+            ? getVariableTypeName(
+                gd.VariableInstructionSwitcher.getSwitchableInstructionVariableType(
+                  instruction.getType()
+                )
+              )
+            : 'number',
         });
       },
       [
@@ -398,7 +396,7 @@ export default (React.forwardRef<Props, VariableFieldInterface>(
         value,
         onChange,
         variablesContainers,
-        variableType,
+        instruction,
       ]
     );
 
@@ -467,6 +465,20 @@ export default (React.forwardRef<Props, VariableFieldInterface>(
           quicklyAnalysisResult ===
             VariableNameQuickAnalyzeResults.NAME_COLLISION_WITH_OBJECT
         ? t`This variable has the same name as an object. Consider renaming one or the other.`
+        : null;
+
+    const isSwitchableInstruction =
+      instruction &&
+      gd.VariableInstructionSwitcher.isSwitchableVariableInstruction(
+        instruction.getType()
+      );
+    const variableType =
+      project && instruction && isSwitchableInstruction
+        ? gd.VariableInstructionSwitcher.getVariableTypeFromParameters(
+            project.getCurrentPlatform(),
+            projectScopedContainersAccessor.get(),
+            instruction
+          )
         : null;
 
     const needManualTypeSwitcher =

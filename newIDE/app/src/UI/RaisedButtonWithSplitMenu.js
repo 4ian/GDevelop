@@ -5,7 +5,7 @@ import { type MenuItemTemplate } from './Menu/Menu.flow';
 import { type I18n as I18nType } from '@lingui/core';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
 import Button from '@material-ui/core/Button';
-import { Spacer } from './Grid';
+import { ButtonSpacer } from './Grid';
 import ChevronArrowBottom from './CustomSvgIcons/ChevronArrowBottom';
 
 type Props = {|
@@ -84,7 +84,7 @@ const RaisedButtonWithSplitMenu = (props: Props): React.Node => {
         style={styles.mainButton}
       >
         {icon}
-        {!!icon && !!label && <Spacer />}
+        {!!icon && !!label && <ButtonSpacer />}
         {label}
       </Button>
       <ElementWithMenu

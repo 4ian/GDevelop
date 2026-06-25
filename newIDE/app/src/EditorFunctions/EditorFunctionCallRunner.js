@@ -104,6 +104,18 @@ export const processEditorFunctionCalls = async ({
       });
       continue;
     }
+    if (project && name === 'initialize_project') {
+      results.push({
+        status: 'finished',
+        call_id,
+        success: false,
+        output: {
+          message:
+            'A project is already open — initialize_project cannot be called. If starting from a new project is the right approach, suggest the user close the current project and start a new AI request.',
+        },
+      });
+      continue;
+    }
     let args;
     try {
       try {

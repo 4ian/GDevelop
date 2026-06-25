@@ -18,6 +18,10 @@ namespace gdjs {
 
     fromStorageName?: string;
     fromVariable?: gdjs.Variable;
+
+    // Called once the (deferred) restore has finished, so an awaitable load
+    // action can resolve its task. No-op for the fire-and-forget usage.
+    resolveTask?: () => void;
   };
 
   /** @category Behaviors > Save State */
@@ -31,6 +35,69 @@ namespace gdjs {
     };
     export const getIndexedDbStorageKey = (key: string) => {
       return `save-${key}`;
+    };
+
+    /**
+     * The format version a save is written with. Bump this (and add a migration
+     * step below) whenever the stored format changes in a non-backward-compatible
+     * way - this includes the shape of the inner `gameSaveState` (the network sync
+     * data), not just the envelope, as that's what most often evolves over time.
+     */
+    export const CURRENT_SAVE_FORMAT_VERSION = 1;
+
+    /**
+     * Migration steps from one format version to the next. `migrations[v]` migrates
+     * a save from version `v` to version `v + 1`. Saves written before the
+     * `StoredSave` envelope existed (raw `GameSaveState`, no `formatVersion`) are
+     * treated as version 0.
+     */
+    const migrations: Array<(save: any, name: string) => any> = [
+      // 0 -> 1: wrap a legacy raw GameSaveState in the metadata envelope.
+      // Timestamps are unknown for these old saves, so they default to 0.
+      (raw, name) => ({
+        formatVersion: 1,
+        metadata: { name, savedAt: 0, updatedAt: 0 },
+        gameSaveState: raw,
+      }),
+    ];
+
+    /**
+     * Normalize a record read from storage into an up-to-date `GameSaveState` and
+     * its metadata, applying any needed format migrations. Handles both the current
+     * `StoredSave` envelope and legacy raw `GameSaveState` records.
+     */
+    const migrateStoredSave = (
+      raw: any,
+      name: string
+    ): {
+      gameSaveState: GameSaveState;
+      metadata: SaveStateMetadata;
+    } | null => {
+      if (!raw) return null;
+
+      // No `formatVersion` means a legacy raw GameSaveState, i.e. version 0.
+      let version =
+        typeof raw.formatVersion === 'number' ? raw.formatVersion : 0;
+
+      if (version > CURRENT_SAVE_FORMAT_VERSION) {
+        // The save was written by a newer version of the game than this one.
+        // We can't know how to read it for sure, but the inner data is often
+        // forward-compatible, so we still try as a best effort.
+        logger.warn(
+          `Save "${name}" has format version ${version}, but this game supports up to ${CURRENT_SAVE_FORMAT_VERSION}. It may not load correctly.`
+        );
+      }
+
+      let migrated = raw;
+      while (version < CURRENT_SAVE_FORMAT_VERSION) {
+        migrated = migrations[version](migrated, name);
+        version++;
+      }
+
+      return {
+        gameSaveState: migrated.gameSaveState,
+        metadata: migrated.metadata || { name, savedAt: 0, updatedAt: 0 },
+      };
     };
 
     const variablesSaveConfiguration: WeakMap<
@@ -138,6 +205,14 @@ namespace gdjs {
     let saveJustFailed: boolean = false;
     let loadJustSucceeded: boolean = false;
     let loadJustFailed: boolean = false;
+    let deleteJustSucceeded: boolean = false;
+    let deleteJustFailed: boolean = false;
+    let duplicateJustSucceeded: boolean = false;
+    let duplicateJustFailed: boolean = false;
+    let checkJustCompleted: boolean = false;
+    let listJustCompleted: boolean = false;
+    let lastCheckedSaveExists: boolean = false;
+    let lastCheckedSaveName: string = '';
 
     let restoreRequestOptions: RestoreRequestOptions | null = null;
 
@@ -175,6 +250,30 @@ namespace gdjs {
     export const markLoadJustFailed = (_: RuntimeScene) => {
       loadJustFailed = true;
     };
+    export const hasDeleteJustSucceeded = (_: RuntimeScene) => {
+      return deleteJustSucceeded;
+    };
+    export const hasDeleteJustFailed = (_: RuntimeScene) => {
+      return deleteJustFailed;
+    };
+    export const hasDuplicateJustSucceeded = (_: RuntimeScene) => {
+      return duplicateJustSucceeded;
+    };
+    export const hasDuplicateJustFailed = (_: RuntimeScene) => {
+      return duplicateJustFailed;
+    };
+    export const hasCheckJustCompleted = (_: RuntimeScene) => {
+      return checkJustCompleted;
+    };
+    export const doesCheckedSaveExist = (_: RuntimeScene) => {
+      return lastCheckedSaveExists;
+    };
+    export const getLastCheckedSaveName = (_: RuntimeScene) => {
+      return lastCheckedSaveName;
+    };
+    export const hasListJustCompleted = (_: RuntimeScene) => {
+      return listJustCompleted;
+    };
 
     // Ensure that the condition "save/load just succeeded/failed" are valid only for one frame.
     gdjs.registerRuntimeScenePostEventsCallback(() => {
@@ -182,6 +281,12 @@ namespace gdjs {
       saveJustFailed = false;
       loadJustSucceeded = false;
       loadJustFailed = false;
+      deleteJustSucceeded = false;
+      deleteJustFailed = false;
+      duplicateJustSucceeded = false;
+      duplicateJustFailed = false;
+      checkJustCompleted = false;
+      listJustCompleted = false;
     });
 
     gdjs.registerRuntimeScenePostEventsCallback(
@@ -304,11 +409,13 @@ namespace gdjs {
       return gameSaveState;
     };
 
-    export const createGameSaveStateInVariable = async function (
+    // Returns a gdjs.AsyncTask so the action can be awaited in the events sheet.
+    // When not awaited, the returned task is simply ignored (fire-and-forget).
+    export const createGameSaveStateInVariable = function (
       runtimeScene: RuntimeScene,
       variable: gdjs.Variable,
       commaSeparatedProfileNames: string
-    ) {
+    ): gdjs.AsyncTask {
       try {
         const gameSaveState = createGameSaveState(runtimeScene.getGame(), {
           profileNames: parseCommaSeparatedProfileNamesOrDefault(
@@ -321,30 +428,41 @@ namespace gdjs {
         logger.error('Error saving to variable:', error);
         markSaveJustFailed(runtimeScene);
       }
+      // The work is synchronous, so the task is already resolved.
+      return new gdjs.ResolveTask();
     };
 
-    export const createGameSaveStateInStorage = async function (
+    export const createGameSaveStateInStorage = function (
       runtimeScene: RuntimeScene,
       storageKey: string,
       commaSeparatedProfileNames: string
-    ) {
-      try {
-        const gameSaveState = createGameSaveState(runtimeScene.getGame(), {
-          profileNames: parseCommaSeparatedProfileNamesOrDefault(
-            commaSeparatedProfileNames
-          ),
-        });
-        await gdjs.indexedDb.saveToIndexedDB(
-          getIndexedDbDatabaseName(),
-          getIndexedDbObjectStore(),
-          getIndexedDbStorageKey(storageKey),
-          gameSaveState
-        );
-        markSaveJustSucceeded(runtimeScene);
-      } catch (error) {
-        logger.error('Error saving to IndexedDB:', error);
-        markSaveJustFailed(runtimeScene);
-      }
+    ): gdjs.PromiseTask {
+      const promise = (async () => {
+        try {
+          const gameSaveState = createGameSaveState(runtimeScene.getGame(), {
+            profileNames: parseCommaSeparatedProfileNamesOrDefault(
+              commaSeparatedProfileNames
+            ),
+          });
+          const now = Date.now();
+          const storedSave: StoredSave = {
+            formatVersion: CURRENT_SAVE_FORMAT_VERSION,
+            metadata: { name: storageKey, savedAt: now, updatedAt: now },
+            gameSaveState,
+          };
+          await gdjs.indexedDb.saveToIndexedDB(
+            getIndexedDbDatabaseName(),
+            getIndexedDbObjectStore(),
+            getIndexedDbStorageKey(storageKey),
+            storedSave
+          );
+          markSaveJustSucceeded(runtimeScene);
+        } catch (error) {
+          logger.error('Error saving to IndexedDB:', error);
+          markSaveJustFailed(runtimeScene);
+        }
+      })();
+      return new gdjs.PromiseTask(promise);
     };
 
     const checkAndRestoreGameSaveStateAtEndOfFrame = function (
@@ -353,8 +471,13 @@ namespace gdjs {
       const runtimeGame = runtimeScene.getGame();
 
       if (!restoreRequestOptions) return;
-      const { fromVariable, fromStorageName, profileNames, clearSceneStack } =
-        restoreRequestOptions;
+      const {
+        fromVariable,
+        fromStorageName,
+        profileNames,
+        clearSceneStack,
+        resolveTask,
+      } = restoreRequestOptions;
 
       // Reset it so we don't load it twice.
       restoreRequestOptions = null;
@@ -372,6 +495,8 @@ namespace gdjs {
           logger.error('Error loading from variable:', error);
           markLoadJustFailed(runtimeScene);
         }
+        // Resolve the awaitable task (no-op if the action was not awaited).
+        if (resolveTask) resolveTask();
       } else if (fromStorageName) {
         gdjs.indexedDb
           .loadFromIndexedDB(
@@ -380,8 +505,13 @@ namespace gdjs {
             getIndexedDbStorageKey(fromStorageName)
           )
           .then((jsonData) => {
-            const saveState = jsonData as GameSaveState;
-            restoreGameSaveState(runtimeGame, saveState, {
+            const migrated = migrateStoredSave(jsonData, fromStorageName);
+            if (!migrated) {
+              throw new Error(
+                `No save state found in storage named "${fromStorageName}".`
+              );
+            }
+            restoreGameSaveState(runtimeGame, migrated.gameSaveState, {
               profileNames,
               clearSceneStack,
             });
@@ -390,7 +520,15 @@ namespace gdjs {
           .catch((error) => {
             logger.error('Error loading from IndexedDB:', error);
             markLoadJustFailed(runtimeScene);
+          })
+          .then(() => {
+            // Resolve the awaitable task once the restore finished, whether it
+            // succeeded or failed (no-op if the action was not awaited).
+            if (resolveTask) resolveTask();
           });
+      } else if (resolveTask) {
+        // Nothing to restore, but still resolve the task if any.
+        resolveTask();
       }
     };
 
@@ -608,40 +746,178 @@ namespace gdjs {
       );
     };
 
-    export const restoreGameSaveStateFromVariable = async function (
+    export const restoreGameSaveStateFromVariable = function (
       _: gdjs.RuntimeScene,
       variable: gdjs.Variable,
       commaSeparatedProfileNames: string,
       clearSceneStack: boolean
-    ) {
+    ): gdjs.AsyncTask {
       // The information is saved, so that the restore can be done
-      // at the end of the frame,
-      // and avoid possible conflicts with running events.
+      // at the end of the frame, and avoid possible conflicts with running
+      // events. The task is resolved once that deferred restore has run.
+      const task = new gdjs.ManuallyResolvableTask();
       restoreRequestOptions = {
         fromVariable: variable,
         profileNames: parseCommaSeparatedProfileNamesOrDefault(
           commaSeparatedProfileNames
         ),
         clearSceneStack,
+        resolveTask: () => task.resolve(),
       };
+      return task;
     };
 
-    export const restoreGameSaveStateFromStorage = async function (
+    export const restoreGameSaveStateFromStorage = function (
       _: gdjs.RuntimeScene,
       storageName: string,
       commaSeparatedProfileNames: string,
       clearSceneStack: boolean
-    ) {
+    ): gdjs.AsyncTask {
       // The information is saved, so that the restore can be done
-      // at the end of the frame,
-      // and avoid possible conflicts with running events.
+      // at the end of the frame, and avoid possible conflicts with running
+      // events. The task is resolved once that deferred restore has run.
+      const task = new gdjs.ManuallyResolvableTask();
       restoreRequestOptions = {
         fromStorageName: storageName,
         profileNames: parseCommaSeparatedProfileNamesOrDefault(
           commaSeparatedProfileNames
         ),
         clearSceneStack,
+        resolveTask: () => task.resolve(),
       };
+      return task;
+    };
+
+    export const deleteSaveFromStorage = function (
+      runtimeScene: RuntimeScene,
+      storageKey: string
+    ): gdjs.PromiseTask {
+      const promise = (async () => {
+        try {
+          await gdjs.indexedDb.deleteFromIndexedDB(
+            getIndexedDbDatabaseName(),
+            getIndexedDbObjectStore(),
+            getIndexedDbStorageKey(storageKey)
+          );
+          deleteJustSucceeded = true;
+        } catch (error) {
+          logger.error('Error deleting save from IndexedDB:', error);
+          deleteJustFailed = true;
+        }
+      })();
+      return new gdjs.PromiseTask(promise);
+    };
+
+    export const duplicateSaveInStorage = function (
+      runtimeScene: RuntimeScene,
+      sourceStorageKey: string,
+      destinationStorageKey: string
+    ): gdjs.PromiseTask {
+      const promise = (async () => {
+        try {
+          const raw = await gdjs.indexedDb.loadFromIndexedDB(
+            getIndexedDbDatabaseName(),
+            getIndexedDbObjectStore(),
+            getIndexedDbStorageKey(sourceStorageKey)
+          );
+          const migrated = migrateStoredSave(raw, sourceStorageKey);
+          if (!migrated) {
+            logger.error(
+              `Cannot duplicate save: no save found named "${sourceStorageKey}".`
+            );
+            duplicateJustFailed = true;
+            return;
+          }
+          const now = Date.now();
+          const storedSave: StoredSave = {
+            formatVersion: CURRENT_SAVE_FORMAT_VERSION,
+            metadata: {
+              name: destinationStorageKey,
+              savedAt: migrated.metadata.savedAt || now,
+              updatedAt: now,
+            },
+            gameSaveState: migrated.gameSaveState,
+          };
+          await gdjs.indexedDb.saveToIndexedDB(
+            getIndexedDbDatabaseName(),
+            getIndexedDbObjectStore(),
+            getIndexedDbStorageKey(destinationStorageKey),
+            storedSave
+          );
+          duplicateJustSucceeded = true;
+        } catch (error) {
+          logger.error('Error duplicating save in IndexedDB:', error);
+          duplicateJustFailed = true;
+        }
+      })();
+      return new gdjs.PromiseTask(promise);
+    };
+
+    export const checkSaveExistsInStorage = function (
+      _: RuntimeScene,
+      storageKey: string,
+      resultVariable: gdjs.Variable
+    ): gdjs.PromiseTask {
+      const promise = (async () => {
+        try {
+          const exists = await gdjs.indexedDb.keyExistsInIndexedDB(
+            getIndexedDbDatabaseName(),
+            getIndexedDbObjectStore(),
+            getIndexedDbStorageKey(storageKey)
+          );
+          lastCheckedSaveExists = exists;
+          lastCheckedSaveName = storageKey;
+          checkJustCompleted = true;
+          if (resultVariable) resultVariable.setBoolean(exists);
+        } catch (error) {
+          logger.error('Error checking save existence in IndexedDB:', error);
+          lastCheckedSaveExists = false;
+          lastCheckedSaveName = storageKey;
+          checkJustCompleted = true;
+          if (resultVariable) resultVariable.setBoolean(false);
+        }
+      })();
+      return new gdjs.PromiseTask(promise);
+    };
+
+    export const listSavesInVariable = function (
+      _: RuntimeScene,
+      resultVariable: gdjs.Variable
+    ): gdjs.PromiseTask {
+      const promise = (async () => {
+        try {
+          const all = await gdjs.indexedDb.getAllFromIndexedDB(
+            getIndexedDbDatabaseName(),
+            getIndexedDbObjectStore()
+          );
+          const prefix = getIndexedDbStorageKey('');
+          const list = all
+            .filter(
+              ({ key }) =>
+                typeof key === 'string' && (key as string).indexOf(prefix) === 0
+            )
+            .map(({ key, value }) => {
+              const name = (key as string).substring(prefix.length);
+              // Skip corrupt/unreadable records so one bad save doesn't hide all
+              // the others.
+              const migrated = migrateStoredSave(value, name);
+              if (!migrated) return null;
+              return {
+                name,
+                savedAt: migrated.metadata.savedAt || 0,
+                updatedAt: migrated.metadata.updatedAt || 0,
+              };
+            })
+            .filter(Boolean)
+            .sort((a, b) => b!.updatedAt - a!.updatedAt);
+          resultVariable.fromJSObject(list);
+          listJustCompleted = true;
+        } catch (error) {
+          logger.error('Error listing saves from IndexedDB:', error);
+          listJustCompleted = true;
+        }
+      })();
+      return new gdjs.PromiseTask(promise);
     };
 
     /**

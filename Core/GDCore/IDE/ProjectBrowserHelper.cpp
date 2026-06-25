@@ -182,52 +182,55 @@ void ProjectBrowserHelper::ExposeProjectEventsWithoutExtensions(
 }
 
 void ProjectBrowserHelper::ExposeProjectEventsWithoutExtensions(
-    gd::Project& project, gd::ArbitraryEventsWorkerWithContext& worker) {
+    gd::Project &project, gd::ArbitraryEventsWorkerWithContext &worker) {
   // Add layouts events
   for (std::size_t s = 0; s < project.GetLayoutsCount(); s++) {
     auto &layout = project.GetLayout(s);
-    auto projectScopedContainers =
-      gd::ProjectScopedContainers::MakeNewProjectScopedContainersForProjectAndLayout(project, layout);
+    auto projectScopedContainers = gd::ProjectScopedContainers::
+        MakeNewProjectScopedContainersForProjectAndLayout(project, layout);
     worker.Launch(layout.GetEvents(), projectScopedContainers);
   }
   // Add external events events
   for (std::size_t s = 0; s < project.GetExternalEventsCount(); s++) {
-    const auto &externalEvents = project.GetExternalEvents(s);
+    auto &externalEvents = project.GetExternalEvents(s);
     const gd::String &associatedLayout = externalEvents.GetAssociatedLayout();
-    if (project.HasLayoutNamed(associatedLayout)) {
-      auto &layout = project.GetLayout(associatedLayout);
-      auto projectScopedContainers =
-        gd::ProjectScopedContainers::MakeNewProjectScopedContainersForProjectAndLayout(project, layout);
-      worker.Launch(project.GetExternalEvents(s).GetEvents(), projectScopedContainers);
-    }
+    auto projectScopedContainers =
+        project.HasLayoutNamed(associatedLayout)
+            ? gd::ProjectScopedContainers::
+                  MakeNewProjectScopedContainersForProjectAndLayout(
+                      project, project.GetLayout(associatedLayout))
+            : gd::ProjectScopedContainers::
+                  MakeNewProjectScopedContainersForProject(project);
+    projectScopedContainers.SetScopeExternalEventsName(
+        externalEvents.GetName());
+    worker.Launch(externalEvents.GetEvents(), projectScopedContainers);
   }
 }
 
 void ProjectBrowserHelper::ExposeProjectEventsWithoutExtensions(
-    gd::Project& project, gd::ReadOnlyArbitraryEventsWorkerWithContext& worker) {
+    gd::Project &project,
+    gd::ReadOnlyArbitraryEventsWorkerWithContext &worker) {
   // Add layouts events
   for (std::size_t s = 0; s < project.GetLayoutsCount(); s++) {
     auto &layout = project.GetLayout(s);
-    auto projectScopedContainers =
-      gd::ProjectScopedContainers::MakeNewProjectScopedContainersForProjectAndLayout(project, layout);
+    auto projectScopedContainers = gd::ProjectScopedContainers::
+        MakeNewProjectScopedContainersForProjectAndLayout(project, layout);
     worker.Launch(layout.GetEvents(), projectScopedContainers);
   }
   // Add external events events
   for (std::size_t s = 0; s < project.GetExternalEventsCount(); s++) {
     const auto &externalEvents = project.GetExternalEvents(s);
     const gd::String &associatedLayout = externalEvents.GetAssociatedLayout();
-    if (project.HasLayoutNamed(associatedLayout)) {
-      auto &layout = project.GetLayout(associatedLayout);
-      auto projectScopedContainers =
-        gd::ProjectScopedContainers::MakeNewProjectScopedContainersForProjectAndLayout(project, layout);
-      projectScopedContainers.SetScopeExternalEventsName(externalEvents.GetName());
-      worker.Launch(externalEvents.GetEvents(), projectScopedContainers);
-    } else {
-      auto projectScopedContainers =
-        gd::ProjectScopedContainers::MakeNewProjectScopedContainersForProject(project);
-      projectScopedContainers.SetScopeExternalEventsName(externalEvents.GetName());
-      worker.Launch(externalEvents.GetEvents(), projectScopedContainers);
-    }
+    auto projectScopedContainers =
+        project.HasLayoutNamed(associatedLayout)
+            ? gd::ProjectScopedContainers::
+                  MakeNewProjectScopedContainersForProjectAndLayout(
+                      project, project.GetLayout(associatedLayout))
+            : gd::ProjectScopedContainers::
+                  MakeNewProjectScopedContainersForProject(project);
+    projectScopedContainers.SetScopeExternalEventsName(
+        externalEvents.GetName());
+    worker.Launch(externalEvents.GetEvents(), projectScopedContainers);
   }
 }
 
@@ -288,6 +291,35 @@ void ProjectBrowserHelper::ExposeLayoutEventsAndDependencies(
     gd::Layout& dependencyLayout = project.GetLayout(sceneName);
 
     worker.Launch(dependencyLayout.GetEvents());
+  }
+}
+
+void ProjectBrowserHelper::ExposeLayoutEventsAndDependencies(
+    gd::Project &project, gd::Layout &layout,
+    gd::ArbitraryEventsWorkerWithContext &worker) {
+  auto projectScopedContainers =
+    gd::ProjectScopedContainers::MakeNewProjectScopedContainersForProjectAndLayout(project, layout);
+
+  // Add layouts events
+  worker.Launch(layout.GetEvents(), projectScopedContainers);
+
+  DependenciesAnalyzer dependenciesAnalyzer(project, layout);
+  bool hasCircularDependencies = !dependenciesAnalyzer.Analyze();
+  if (hasCircularDependencies) {
+    // The analyzer stops when it finds circular dependencies so the dependencies are not complete.
+    // TODO Should the analyzer still continue to avoid side effect on thing that would not be code generation related?
+    // Maybe a boolean parameter should be added?
+    return;
+  }
+  for (const gd::String& externalEventName : dependenciesAnalyzer.GetExternalEventsDependencies()) {
+    gd::ExternalEvents& externalEvents = project.GetExternalEvents(externalEventName);
+
+    worker.Launch(externalEvents.GetEvents(), projectScopedContainers);
+  }
+  for (const gd::String& sceneName : dependenciesAnalyzer.GetScenesDependencies()) {
+    gd::Layout& dependencyLayout = project.GetLayout(sceneName);
+
+    worker.Launch(dependencyLayout.GetEvents(), projectScopedContainers);
   }
 }
 

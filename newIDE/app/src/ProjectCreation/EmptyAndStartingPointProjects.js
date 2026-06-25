@@ -118,6 +118,7 @@ type Props = {|
   onSelectExampleShortHeader: (exampleShortHeader: ExampleShortHeader) => void,
   disabled?: boolean,
   onSeeAll?: () => void,
+  title: React.Node,
 |};
 
 const EmptyAndStartingPointProjects = ({
@@ -125,6 +126,7 @@ const EmptyAndStartingPointProjects = ({
   onSelectEmptyProject,
   disabled,
   onSeeAll,
+  title,
 }: Props): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const styles = getStyles(gdevelopTheme);
@@ -155,9 +157,7 @@ const EmptyAndStartingPointProjects = ({
         <Column noMargin>
           {onSeeAll ? (
             <Line justifyContent="space-between" alignItems="center">
-              <Text size="block-title">
-                <Trans>Continue with Human Intelligence</Trans>
-              </Text>
+              <Text size="block-title">{title}</Text>
               <FlatButton
                 label={<Trans>See all</Trans>}
                 rightIcon={<ArrowRight fontSize="small" />}

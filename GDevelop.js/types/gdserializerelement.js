@@ -23,6 +23,7 @@ declare class gdSerializerElement {
   consideredAsArray(): boolean;
   addChild(str: string): gdSerializerElement;
   getChild(str: string): gdSerializerElement;
+  getOrCreateChild(str: string): gdSerializerElement;
   setChild(str: string, element: gdSerializerElement): void;
   hasChild(str: string): boolean;
   getAllChildren(): gdVectorPairStringSharedPtrSerializerElement;

@@ -20,6 +20,8 @@ import { processEditorFunctionCalls } from '../EditorFunctions/EditorFunctionCal
 import {
   type EditorCallbacks,
   type EditorFunctionCallResult,
+  editorFunctions,
+  editorFunctionsWithoutProject,
 } from '../EditorFunctions';
 import {
   getAllSubAgentFunctionCalls,
@@ -91,29 +93,120 @@ export const useRefreshLimits = (
   return { isRefreshingLimits, refreshLimits };
 };
 
-export const AI_AGENT_TOOLS_VERSION = 'v8';
-export const AI_CHAT_TOOLS_VERSION = 'v8';
-export const AI_ORCHESTRATOR_TOOLS_VERSION = 'v3';
-export const AI_AGENT_EXPLORER_TOOLS_VERSION = 'v3'; // TODO: useless?
-export const AI_AGENT_EDIT_TOOLS_VERSION = 'v3';
+// All requests are made in orchestrator mode, and sub-agents (explorer, edit)
+// are created server-side with the same tools version as the orchestrator.
+export const AI_ORCHESTRATOR_TOOLS_VERSION = 'v5';
 
-export const getToolsVersionForAiRequestMode = (mode: string): string => {
-  switch (mode) {
-    case 'agent':
-      return AI_AGENT_TOOLS_VERSION;
-    case 'chat':
-      return AI_CHAT_TOOLS_VERSION;
-    case 'orchestrator':
-      return AI_ORCHESTRATOR_TOOLS_VERSION;
-    case 'agent-explorer':
-      return AI_AGENT_EXPLORER_TOOLS_VERSION;
-    case 'agent-edit':
-      return AI_AGENT_EDIT_TOOLS_VERSION;
-    default:
-      throw new Error(
-        `Unknown AI request mode: ${mode} - unable to get tools version.`
-      );
+/**
+ * A pending request for the user to approve (or refuse) a project-modifying
+ * edit, surfaced inline in the chat when auto-edit is off.
+ */
+export type EditApprovalRequest = {|
+  // The AI request whose calls are gated (the orchestrator itself, or one of
+  // its edit sub-agents).
+  aiRequestId: string,
+  // The project-modifying call ids waiting for approval.
+  callIds: Array<string>,
+  // A short label pointing at what is about to run: the name of the edit agent
+  // (when the call is inside a sub-agent) or the tool itself (for a direct
+  // modifying call). Rendered the same way it appears in the chat.
+  label: React.Node,
+|};
+
+/**
+ * Whether a function call, if run, would modify the project. This is the
+ * signal used to gate edits behind a user confirmation when auto-edit is off.
+ */
+const doesFunctionCallModifyProject = (
+  functionCall: AiRequestMessageAssistantFunctionCall
+): boolean => {
+  const editorFunctionDef =
+    editorFunctions[functionCall.name] ||
+    editorFunctionsWithoutProject[functionCall.name] ||
+    null;
+  return !!(editorFunctionDef && editorFunctionDef.modifiesProject);
+};
+
+/**
+ * Render a single function call to the same short label shown for it in the
+ * chat (via the editor function's renderForEditor). Falls back to the raw
+ * function name when the call can't be rendered.
+ */
+const renderFunctionCallLabel = ({
+  functionCall,
+  project,
+  editorCallbacks,
+}: {|
+  functionCall: AiRequestMessageAssistantFunctionCall,
+  project: ?gdProject,
+  editorCallbacks: EditorCallbacks,
+|}): React.Node => {
+  const editorFunction =
+    editorFunctions[functionCall.name] ||
+    editorFunctionsWithoutProject[functionCall.name] ||
+    null;
+  if (!editorFunction || !editorFunction.renderForEditor) {
+    return functionCall.name;
   }
+  try {
+    const result = editorFunction.renderForEditor({
+      project,
+      args: JSON.parse(functionCall.arguments),
+      editorCallbacks,
+      shouldShowDetails: false,
+      editorFunctionCallResultOutput: null,
+    });
+    return result.text || functionCall.name;
+  } catch (error) {
+    return functionCall.name;
+  }
+};
+
+/**
+ * Build the short label shown in the confirmation prompt when auto-edit is off,
+ * pointing at what is about to run rather than describing the whole change.
+ *
+ * For an edit agent (a sub-agent, identified by its parentAiRequestId), we show
+ * the agent's name — the label of the call that launched it in the parent
+ * request (its short_title), the same name shown for the agent in the chat.
+ * For a direct modifying call (e.g. generate_events on the orchestrator), we
+ * show the tool's own label(s).
+ */
+const getEditApprovalLabel = ({
+  aiRequest,
+  modifyingFunctionCalls,
+  aiRequests,
+  project,
+  editorCallbacks,
+}: {|
+  aiRequest: AiRequest,
+  modifyingFunctionCalls: Array<AiRequestMessageAssistantFunctionCall>,
+  aiRequests: { [string]: AiRequest },
+  project: ?gdProject,
+  editorCallbacks: EditorCallbacks,
+|}): React.Node => {
+  if (aiRequest.parentAiRequestId) {
+    const parentRequest = aiRequests[aiRequest.parentAiRequestId] || null;
+    const launchingCall = parentRequest
+      ? getAllSubAgentFunctionCalls({ aiRequest: parentRequest }).find(
+          functionCall => functionCall.subAgentAiRequestId === aiRequest.id
+        )
+      : null;
+    if (launchingCall) {
+      return renderFunctionCallLabel({
+        functionCall: launchingCall,
+        project,
+        editorCallbacks,
+      });
+    }
+  }
+
+  return modifyingFunctionCalls.map((functionCall, index) => (
+    <React.Fragment key={functionCall.call_id}>
+      {index > 0 ? ', ' : null}
+      {renderFunctionCallLabel({ functionCall, project, editorCallbacks })}
+    </React.Fragment>
+  ));
 };
 
 export const useProcessFunctionCalls = ({
@@ -132,6 +225,9 @@ export const useProcessFunctionCalls = ({
   onWillInstallExtension,
   onExtensionInstalled,
   isReadyToProcessFunctionCalls,
+  getIsAutoEditEnabled,
+  suspendAiRequest,
+  requestEditApproval,
 }: {|
   i18n: I18nType,
   project: ?gdProject,
@@ -166,11 +262,15 @@ export const useProcessFunctionCalls = ({
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
   isReadyToProcessFunctionCalls: boolean,
+  getIsAutoEditEnabled: () => boolean,
+  suspendAiRequest: (aiRequestId: string) => Promise<void>,
+  requestEditApproval: (request: EditApprovalRequest) => Promise<boolean>,
 |}): {
   onProcessFunctionCalls: (
     aiRequest: AiRequest,
     functionCalls: Array<AiRequestMessageAssistantFunctionCall>
   ) => Promise<void>,
+  clearApprovedEditBatches: () => void,
 } => {
   const { ensureExtensionInstalled } = useEnsureExtensionInstalled({
     project,
@@ -191,6 +291,13 @@ export const useProcessFunctionCalls = ({
   const { translatedObjectShortHeadersByType, fetchObjects } = React.useContext(
     ObjectStoreContext
   );
+
+  // Latest map of all AI requests, kept in a ref so the (heavily-memoized)
+  // onProcessFunctionCalls callback can look up a sub-agent's parent at edit
+  // approval time without taking a dependency on the frequently-changing map.
+  const { aiRequestStorage } = React.useContext(AiRequestContext);
+  const aiRequestsRef = React.useRef(aiRequestStorage.aiRequests);
+  aiRequestsRef.current = aiRequestStorage.aiRequests;
 
   React.useEffect(
     () => {
@@ -231,6 +338,21 @@ export const useProcessFunctionCalls = ({
   // never started a second time.
   const inFlightFunctionCallIdsRef = React.useRef<Set<string>>(new Set());
 
+  // When auto-edit is off, the user approves edits one batch at a time. Once a
+  // batch is approved we remember it here so the rest of that edit agent's
+  // tools (and any later modifying rounds) run without asking again.
+  // Keys are `req:<aiRequestId>` (for a whole edit agent) or
+  // `call:<callId>` (for a single direct modifying call like generate_events).
+  const approvedEditBatchKeysRef = React.useRef<Set<string>>(new Set());
+
+  // Forget all previously-granted edit approvals so the next modifying call
+  // asks again. Called when the user toggles auto-edit: turning it on then off
+  // again means they want to review the upcoming edits, even within a sub-agent
+  // whose batch was already approved.
+  const clearApprovedEditBatches = React.useCallback(() => {
+    approvedEditBatchKeysRef.current.clear();
+  }, []);
+
   const onProcessFunctionCalls = React.useCallback(
     async (
       aiRequest: AiRequest,
@@ -259,6 +381,87 @@ export const useProcessFunctionCalls = ({
         );
       });
 
+      // Gate project-modifying calls behind a user confirmation when auto-edit
+      // is off. Read-only calls (exploration, inspection) always run. The first
+      // time an edit agent (or a direct modifying call) is about to change the
+      // project, ask the user; once approved, the rest of that batch runs
+      // without asking again. On refusal, suspend the request so the user can
+      // explain what to do differently.
+      //
+      // This must happen after the in-flight lock above and before the calls
+      // are marked "working": on refusal we intentionally keep the lock held
+      // (we never reach the `finally` that releases it) so the now-suspended
+      // calls are not re-processed before the suspension propagates.
+      if (!getIsAutoEditEnabled()) {
+        const batchKey = aiRequest.parentAiRequestId
+          ? `req:${aiRequest.id}`
+          : null;
+        const isCallApproved = (
+          functionCall: AiRequestMessageAssistantFunctionCall
+        ) =>
+          (!!batchKey && approvedEditBatchKeysRef.current.has(batchKey)) ||
+          approvedEditBatchKeysRef.current.has(`call:${functionCall.call_id}`);
+
+        const modifyingFunctionCalls = functionCallsToProcess.filter(
+          functionCall =>
+            doesFunctionCallModifyProject(functionCall) &&
+            !isCallApproved(functionCall)
+        );
+
+        if (modifyingFunctionCalls.length > 0) {
+          const label = getEditApprovalLabel({
+            aiRequest,
+            modifyingFunctionCalls,
+            aiRequests: aiRequestsRef.current,
+            project,
+            editorCallbacks,
+          });
+          // Ask the user inline, in the chat (see EditApprovalRow). The promise
+          // resolves when they click Apply/Cancel. The in-flight lock stays held
+          // while we wait, so the same calls are not re-processed meanwhile.
+          const accepted = await requestEditApproval({
+            aiRequestId: aiRequest.id,
+            callIds: modifyingFunctionCalls.map(
+              functionCall => functionCall.call_id
+            ),
+            label,
+          });
+
+          if (!accepted) {
+            // Refused: suspend the request (the parent orchestrator if this is
+            // an edit agent) so the whole flow pauses and the user can redirect.
+            // Keep the in-flight lock held so these calls are not re-processed.
+            const requestToSuspendId =
+              aiRequest.parentAiRequestId || aiRequest.id;
+            try {
+              await suspendAiRequest(requestToSuspendId);
+            } catch (error) {
+              console.error(
+                'Error while suspending AI request after a refused edit:',
+                error
+              );
+            }
+            return;
+          }
+
+          // Approved: remember the approval for the whole batch so subsequent
+          // modifying calls from the same edit agent run without asking again.
+          // Avoid unbounded growth across a long session.
+          if (approvedEditBatchKeysRef.current.size > 500) {
+            approvedEditBatchKeysRef.current.clear();
+          }
+          if (batchKey) {
+            approvedEditBatchKeysRef.current.add(batchKey);
+          } else {
+            modifyingFunctionCalls.forEach(functionCall =>
+              approvedEditBatchKeysRef.current.add(
+                `call:${functionCall.call_id}`
+              )
+            );
+          }
+        }
+      }
+
       addEditorFunctionCallResults(
         aiRequest.id,
         functionCallsToProcess.map(functionCall => ({
@@ -266,6 +469,37 @@ export const useProcessFunctionCalls = ({
           call_id: functionCall.call_id,
         }))
       );
+
+      // The "modified outside editor" callbacks each refresh the editor and can
+      // trigger an in-game editor hot reload. Firing them once per function
+      // call would, for a batch of modifying calls (e.g. a sub-agent adding 20
+      // objects), hot reload the editor 20 times. Instead, accumulate the
+      // changes per scene while the batch is processed, then flush a single
+      // coalesced notification per change type once it is done.
+      const accumulatedSceneEventsChanges: Map<
+        gdLayout,
+        Set<string>
+      > = new Map();
+      const accumulatedInstancesScenes: Set<gdLayout> = new Set();
+      const accumulatedObjectsChanges: Map<gdLayout, boolean> = new Map();
+      const accumulatedObjectGroupsScenes: Set<gdLayout> = new Set();
+      const flushAccumulatedOutsideEditorChanges = () => {
+        accumulatedSceneEventsChanges.forEach((eventIds, scene) =>
+          onSceneEventsModifiedOutsideEditor({
+            scene,
+            newOrChangedAiGeneratedEventIds: eventIds,
+          })
+        );
+        accumulatedInstancesScenes.forEach(scene =>
+          onInstancesModifiedOutsideEditor({ scene })
+        );
+        accumulatedObjectsChanges.forEach((isNewObjectTypeUsed, scene) =>
+          onObjectsModifiedOutsideEditor({ scene, isNewObjectTypeUsed })
+        );
+        accumulatedObjectGroupsScenes.forEach(scene =>
+          onObjectGroupsModifiedOutsideEditor({ scene })
+        );
+      };
 
       try {
         const {
@@ -287,10 +521,35 @@ export const useProcessFunctionCalls = ({
           getRelatedAiRequestLastMessages: () =>
             getLastMessagesFromAiRequestOutput(aiRequest.output || []),
           generateEvents,
-          onSceneEventsModifiedOutsideEditor,
-          onInstancesModifiedOutsideEditor,
-          onObjectsModifiedOutsideEditor,
-          onObjectGroupsModifiedOutsideEditor,
+          onSceneEventsModifiedOutsideEditor: changes => {
+            const existingEventIds = accumulatedSceneEventsChanges.get(
+              changes.scene
+            );
+            if (existingEventIds) {
+              changes.newOrChangedAiGeneratedEventIds.forEach(eventId =>
+                existingEventIds.add(eventId)
+              );
+            } else {
+              accumulatedSceneEventsChanges.set(
+                changes.scene,
+                new Set(changes.newOrChangedAiGeneratedEventIds)
+              );
+            }
+          },
+          onInstancesModifiedOutsideEditor: changes => {
+            accumulatedInstancesScenes.add(changes.scene);
+          },
+          onObjectsModifiedOutsideEditor: changes => {
+            accumulatedObjectsChanges.set(
+              changes.scene,
+              accumulatedObjectsChanges.get(changes.scene) ||
+                false ||
+                changes.isNewObjectTypeUsed
+            );
+          },
+          onObjectGroupsModifiedOutsideEditor: changes => {
+            accumulatedObjectGroupsScenes.add(changes.scene);
+          },
           ensureExtensionInstalled,
           onWillInstallExtension,
           onExtensionInstalled,
@@ -316,6 +575,12 @@ export const useProcessFunctionCalls = ({
           createdProject,
         });
       } finally {
+        // Flush the coalesced editor notifications for everything modified in
+        // this batch (one hot reload instead of one per call). In `finally` so
+        // the editor is still refreshed for whatever was modified even if the
+        // batch was aborted or threw, matching the previous inline behavior.
+        flushAccumulatedOutsideEditorChanges();
+
         // Release the lock so these calls can be retried if needed
         // (e.g. after an error or a suspension).
         functionCallsToProcess.forEach(functionCall => {
@@ -343,6 +608,9 @@ export const useProcessFunctionCalls = ({
       getAssetStoreTagForNewObject,
       generateEvents,
       onSendEditorFunctionCallResults,
+      getIsAutoEditEnabled,
+      suspendAiRequest,
+      requestEditApproval,
     ]
   );
 
@@ -388,6 +656,7 @@ export const useProcessFunctionCalls = ({
 
   return {
     onProcessFunctionCalls,
+    clearApprovedEditBatches,
   };
 };
 
@@ -504,6 +773,11 @@ export const useAiRequestState = ({
     setSavingProjectForMessageId,
   ] = React.useState<?string>(null);
 
+  // Best-effort suggestions are attempted at most once per message; this tracks
+  // which messages were already attempted (key: aiRequestId + last message id),
+  // so that a transient failure cannot loop now that the input stays enabled.
+  const attemptedSuggestionMessageIdsRef = React.useRef<Set<string>>(new Set());
+
   const prevProjectRef = React.useRef(project);
   React.useEffect(
     () => {
@@ -557,6 +831,10 @@ export const useAiRequestState = ({
         )
           return;
 
+        // No suggestions until there is an actual project: before that, the AI
+        // is still discussing the game idea or making a plan with the user.
+        if (!project) return;
+
         // Check if there are tools being run. If so, no suggestions at this time.
         const hasFunctionsCallsToProcess =
           getFunctionCallsToProcess({
@@ -594,6 +872,18 @@ export const useAiRequestState = ({
           ) &&
             lastMessage.type !== 'function_call_output') ||
           lastMessage.suggestions
+        ) {
+          return;
+        }
+
+        const lastMessageKey = lastMessage.messageId
+          ? lastMessage.messageId
+          : `index-${outputForSuggestions.length}`;
+        const suggestionAttemptKey = `${
+          selectedAiRequest.id
+        }:${lastMessageKey}`;
+        if (
+          attemptedSuggestionMessageIdsRef.current.has(suggestionAttemptKey)
         ) {
           return;
         }
@@ -643,6 +933,7 @@ export const useAiRequestState = ({
           // The request will switch from "ready" to "working" while suggestions are generated.
           // It will be watched and eventually return to "ready" with suggestions.
           setIsFetchingSuggestions(true);
+          attemptedSuggestionMessageIdsRef.current.add(suggestionAttemptKey);
           const aiRequestWorkingForSuggestions = await getAiRequestSuggestions(
             getAuthorizationHeader,
             {
@@ -661,11 +952,19 @@ export const useAiRequestState = ({
             }
           );
 
-          // Merge with the latest state to preserve any concurrent updates (e.g., projectVersionId)
-          updateAiRequest(selectedAiRequest.id, prevRequest => ({
-            ...(prevRequest || {}),
-            ...aiRequestWorkingForSuggestions,
-          }));
+          // While we were fetching, the user may have sent a new message. If the
+          // conversation advanced, drop the stale snapshot: the newer message wins.
+          const snapshotOutput = aiRequestWorkingForSuggestions.output || [];
+          updateAiRequest(selectedAiRequest.id, prevRequest => {
+            if (!prevRequest) return aiRequestWorkingForSuggestions;
+            if (isSendingAiRequest(selectedAiRequest.id)) return prevRequest;
+            const prevOutput = prevRequest.output || [];
+            if (prevOutput.length !== snapshotOutput.length) return prevRequest;
+            return {
+              ...prevRequest,
+              ...aiRequestWorkingForSuggestions,
+            };
+          });
 
           // If the request is already ready with suggestions, clear the flag immediately
           // Otherwise, it will be watched and cleared when it becomes ready

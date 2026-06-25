@@ -36,6 +36,7 @@ import {
 import { retryIfFailed } from '../Utils/RetryIfFailed';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import { type AssetShortHeader } from '../Utils/GDevelopServices/Asset';
+import { type ExampleShortHeader } from '../Utils/GDevelopServices/Example';
 import { swapAsset } from '../AssetStore/AssetSwapper';
 import { type EnsureExtensionInstalledOptions } from '../AiGeneration/UseEnsureExtensionInstalled';
 import { getObjectFolderOrObjectWithContextFromObjectName } from '../SceneEditor/ObjectFolderOrObjectsSelection';
@@ -135,6 +136,9 @@ export type EditorFunctionGenericOutput = {|
 
   // Default size, origin and center of the object(s) being operated on, keyed by object name:
   objectSizeInfo?: { [string]: ObjectSizeInfo | null },
+
+  // Explanation of the coordinate semantics of `instances` positions:
+  positionSemantics?: string,
 
   hints?: Array<HintEntry>,
 
@@ -249,6 +253,9 @@ type RenderForEditorOptions = {|
   editorCallbacks: EditorCallbacks,
   shouldShowDetails: boolean,
   editorFunctionCallResultOutput: any,
+  // Loaded examples from the example store, when available, so a function can
+  // resolve a template slug to its display name. May be null while still loading.
+  exampleShortHeaders?: ?Array<ExampleShortHeader>,
 |};
 
 export type RelatedAiRequestLastMessages = {|
@@ -309,7 +316,10 @@ export type LaunchFunctionOptionsWithProject = {|
  * A function that does something in the editor on the given project.
  */
 export type EditorFunction = {|
-  renderForEditor: (
+  // Optional: a function with no renderForEditor renders nothing in the chat
+  // (e.g. backend-only tools, or the plan shown separately). Such calls are
+  // skipped in ChatMessages so they don't create an empty bubble.
+  renderForEditor?: (
     options: RenderForEditorOptions
   ) => {|
     text: React.Node,
@@ -327,7 +337,10 @@ export type EditorFunction = {|
  * A function that does something in the editor.
  */
 export type EditorFunctionWithoutProject = {|
-  renderForEditor: (
+  // Optional: a function with no renderForEditor renders nothing in the chat
+  // (e.g. backend-only tools, or the plan shown separately). Such calls are
+  // skipped in ChatMessages so they don't create an empty bubble.
+  renderForEditor?: (
     options: RenderForEditorOptions
   ) => {|
     text: React.Node,
@@ -369,6 +382,45 @@ const injectObjectSizeInfo = (
     output.hints = output.hints ? [...output.hints, ...hints] : hints;
   }
   return output;
+};
+
+const INSTANCE_POSITION_SEMANTICS_MESSAGE =
+  'Each instance x;y;z is its origin, NOT its center. Unless `objectSizeInfo` indicates a custom origin, the origin is the minimum corner: an instance occupies x to x+width, y to y+height and (in 3D) z to z+depth, so its center is at position + size/2. To center an instance A on top of an instance B: A.x = B.x + (B.width - A.width)/2, A.y = B.y + (B.height - A.height)/2, A.z = B.z + B.depth.';
+
+const getOccupiedSpaceDescription = (
+  position: $ReadOnlyArray<number>,
+  size: $ReadOnlyArray<number>,
+  objectSizeInfo: ObjectSizeInfo | null
+): string => {
+  const round = (value: number) => Math.round(value * 100) / 100;
+  const axes = ['X', 'Y', 'Z'];
+  const originOffsets = [0, 0, 0];
+  if (objectSizeInfo) {
+    const defaultSizes = [
+      objectSizeInfo.width,
+      objectSizeInfo.height,
+      objectSizeInfo.depth,
+    ];
+    const origins = [
+      objectSizeInfo.originX,
+      objectSizeInfo.originY,
+      objectSizeInfo.originZ,
+    ];
+    for (let i = 0; i < size.length; i++) {
+      const defaultSize = defaultSizes[i];
+      const origin = origins[i];
+      // Origin offsets are given for the default size - scale them to the actual size.
+      if (origin && defaultSize) {
+        originOffsets[i] = origin * (size[i] / defaultSize);
+      }
+    }
+  }
+  return size
+    .map((sizeOnAxis, i) => {
+      const min = position[i] - originOffsets[i];
+      return `${axes[i]} ${round(min)} to ${round(min + sizeOnAxis)}`;
+    })
+    .join(', ');
 };
 
 const makeGenericSuccess = (message: string): EditorFunctionGenericOutput => ({
@@ -449,8 +501,8 @@ const findPropertyByName = ({
       foundPropertyName: null,
     };
 
-  // $FlowFixMe[missing-local-annot]
-  const normalizeName = name => name.toLowerCase().replace(/\s|_|-/g, '');
+  const normalizeName = (name: string) =>
+    name.toLowerCase().replace(/\s|_|-/g, '');
   const normalizedName = normalizeName(name);
 
   const propertyNames = properties.keys().toJSArray();
@@ -910,6 +962,7 @@ const createOrReplaceObject: EditorFunction = {
       // the asset store, e.g. premade UI objects), use the tag as default
       // search terms.
       let effectiveSearchTerms = search_terms;
+      let assetSearchMissed = false;
       let assetStoreTag: string | null = null;
       if (candidateType && !effectiveSearchTerms && !asset_id) {
         assetStoreTag = getAssetStoreTagForNewObject(candidateType);
@@ -970,10 +1023,14 @@ const createOrReplaceObject: EditorFunction = {
 
             if (createdObjects.length === 1) {
               const object = createdObjects[0];
+              const renamedNotice =
+                object.getName() !== targetObjectName
+                  ? ` (requested name "${targetObjectName}" was taken; use "${object.getName()}" from now on)`
+                  : '';
               const result: EditorFunctionGenericOutput = {
                 success: true,
                 message: [
-                  `Created object "${object.getName()}" (type "${object.getType()}", ${targetScopeText}) from asset store.`,
+                  `Created object "${object.getName()}" (type "${object.getType()}", ${targetScopeText}) from asset store.${renamedNotice}`,
                   getPropertiesText(object),
                 ].join(' '),
               };
@@ -1009,6 +1066,7 @@ const createOrReplaceObject: EditorFunction = {
             }
 
             // No asset found - we'll create an object from scratch.
+            assetSearchMissed = true;
           }
         } catch (error) {
           return makeGenericFailure(
@@ -1073,10 +1131,14 @@ const createOrReplaceObject: EditorFunction = {
         isNewObjectTypeUsed: isTheFirstOfItsTypeInProject,
       });
 
+      const scratchNotice = assetSearchMissed
+        ? ` No asset matched "${effectiveSearchTerms ||
+            ''}", so this object was created with no resource (no texture/3D model/font/etc...).`
+        : '';
       const scratchResult: EditorFunctionGenericOutput = {
         success: true,
         message: [
-          `Created object "${targetObjectName}" (type "${candidateType}", ${targetScopeText}) from scratch.`,
+          `Created object "${targetObjectName}" (type "${candidateType}", ${targetScopeText}) from scratch.${scratchNotice}`,
           getPropertiesText(object),
         ].join(' '),
       };
@@ -1690,6 +1752,33 @@ const changeObjectProperty: EditorFunction = {
       });
 
       if (!foundPropertyName || !foundProperty) {
+        // Position, rotation, opacity, z-order and layer are per-instance
+        // placement attributes, not object properties. A frequent mistake is to
+        // try to set them here; redirect to the right tool instead of a generic
+        // "not found".
+        const normalizedPropertyName = propertyName
+          .toLowerCase()
+          .replace(/\s|_|-/g, '');
+        const instanceOnlyAttributes = [
+          'x',
+          'y',
+          'z',
+          'position',
+          'rotation',
+          'rotationx',
+          'rotationy',
+          'rotationz',
+          'angle',
+          'opacity',
+          'zorder',
+          'layer',
+        ];
+        if (instanceOnlyAttributes.includes(normalizedPropertyName)) {
+          warnings.push(
+            `"${propertyName}" is a per-instance attribute, not a property of object "${object_name}". Use \`put_2d_instances\`/\`put_3d_instances\` to change it.`
+          );
+          return;
+        }
         warnings.push(
           `Property "${propertyName}" not found on object "${object_name}".`
         );
@@ -2478,6 +2567,7 @@ const describeInstances: EditorFunction = {
     const initialInstances = layout.getInitialInstances();
 
     const instances = [];
+    const objectSizeInfoByName: { [string]: ObjectSizeInfo | null } = {};
 
     // For each layer
     mapFor(0, layout.getLayersCount(), i => {
@@ -2501,8 +2591,15 @@ const describeInstances: EditorFunction = {
             object = globalObjects.getObject(objectName);
           }
 
-          const defaultSize = object
+          const sizeInfo = object
             ? getObjectSizeInfo(object, project, PixiResourcesLoader)
+            : null;
+          if (object && !(objectName in objectSizeInfoByName)) {
+            objectSizeInfoByName[objectName] = sizeInfo;
+          }
+
+          const defaultSize = object
+            ? sizeInfo
             : { width: 0, height: 0, depth: 0 };
 
           const width = instance.hasCustomSize()
@@ -2527,6 +2624,8 @@ const describeInstances: EditorFunction = {
             // Replace persistentUuid by id:
             persistentUuid: undefined,
             id: instance.getPersistentUuid().slice(0, 10),
+            // The serializer omits z when it's 0 - always expose it for 3D objects:
+            z: depth !== null ? instance.getZ() : undefined,
             // Actual computed dimensions (accounting for default size when no custom size is set):
             width,
             height,
@@ -2540,20 +2639,16 @@ const describeInstances: EditorFunction = {
       );
     });
 
+    const result: EditorFunctionGenericOutput = {
+      success: true,
+      instances: instances,
+      instancesForSceneNamed: scene_name,
+      positionSemantics: INSTANCE_POSITION_SEMANTICS_MESSAGE,
+    };
     if (objectNames.size > 0) {
-      return {
-        success: true,
-        instances: instances,
-        instancesForSceneNamed: scene_name,
-        instancesOnlyForObjectsNamed: [...objectNames].sort().join(','),
-      };
-    } else {
-      return {
-        success: true,
-        instances: instances,
-        instancesForSceneNamed: scene_name,
-      };
+      result.instancesOnlyForObjectsNamed = [...objectNames].sort().join(',');
     }
+    return injectObjectSizeInfo(result, objectSizeInfoByName);
   },
   modifiesProject: false,
 };
@@ -2791,6 +2886,23 @@ const put2dInstances: EditorFunction = {
         }
       });
 
+      // If specific instance ids were requested but none matched (and the brush
+      // did not select anything either), the call erased nothing. Return a
+      // failure so the agent gets a real error signal instead of a misleading
+      // success that could make it retry the same call in a loop.
+      if (
+        instancesToDelete.size === 0 &&
+        notFoundExistingInstanceIds.size > 0
+      ) {
+        return makeGenericFailure(
+          `None of the specified instance ids were found: ${Array.from(
+            notFoundExistingInstanceIds
+          ).join(
+            ', '
+          )}. Nothing was changed. Call \`describe_instances\` to get valid ids (the \`id\` field of each instance), and check the scene and layer names.`
+        );
+      }
+
       instancesToDelete.forEach(instance => {
         initialInstances.removeInstance(instance);
       });
@@ -2829,6 +2941,18 @@ const put2dInstances: EditorFunction = {
       const brushEndPosition = SafeExtractor.parseCommaSeparatedTwoFiniteNumbers(
         brush_end_position
       );
+
+      // The `line` and `grid` brushes need an end position to spread instances.
+      // Fail early (before creating any instance) so the caller retries with a
+      // valid request, instead of silently leaving every instance at the origin.
+      if (
+        (brush_kind === 'line' || brush_kind === 'grid') &&
+        !brushEndPosition
+      ) {
+        return makeGenericFailure(
+          `The "${brush_kind}" brush requires brush_end_position (the end of the ${brush_kind}). Provide it, or use the "point" brush to place instances at a single position.`
+        );
+      }
 
       // Compute the number of instances to create.
       const rowCount = SafeExtractor.extractNumberProperty(args, 'row_count');
@@ -2932,15 +3056,43 @@ const put2dInstances: EditorFunction = {
         const instancesCount = modifiedAndCreatedInstances.length;
 
         if (brushPosition && brushEndPosition) {
-          // Naively auto-compute the grid column and row count if not specified.
-          const gridRowCount =
-            rowCount || Math.floor(Math.sqrt(instancesCount));
-          const gridRowSize =
-            (brushEndPosition[0] - brushPosition[0]) / gridRowCount;
-          const gridColumnCount =
-            columnCount || Math.ceil(instancesCount / gridRowCount);
+          const brushWidth = brushEndPosition[0] - brushPosition[0];
+          const brushHeight = brushEndPosition[1] - brushPosition[1];
+
+          // Auto-compute the column and row count from the aspect ratio of the
+          // brush rectangle so a wide area gets more columns and a flat line
+          // (zero width or height) gets a single row/column. A naive sqrt split
+          // would stack instances on top of each other for a thin rectangle.
+          const absWidth = Math.abs(brushWidth);
+          const absHeight = Math.abs(brushHeight);
+          let gridColumnCount: number;
+          let gridRowCount: number;
+          if (columnCount && rowCount) {
+            gridColumnCount = columnCount;
+            gridRowCount = rowCount;
+          } else if (absHeight === 0) {
+            gridColumnCount = columnCount || instancesCount;
+            gridRowCount = rowCount || 1;
+          } else if (absWidth === 0) {
+            gridRowCount = rowCount || instancesCount;
+            gridColumnCount = columnCount || 1;
+          } else {
+            gridColumnCount =
+              columnCount ||
+              Math.max(
+                1,
+                Math.round(Math.sqrt((instancesCount * absWidth) / absHeight))
+              );
+            gridRowCount =
+              rowCount || Math.ceil(instancesCount / gridColumnCount);
+          }
+
+          // Spread columns along X and rows along Y. Divide by (count - 1) so
+          // the last column/row reaches brush_end_position, like the line brush.
           const gridColumnSize =
-            (brushEndPosition[1] - brushPosition[1]) / gridColumnCount;
+            gridColumnCount > 1 ? brushWidth / (gridColumnCount - 1) : 0;
+          const gridRowSize =
+            gridRowCount > 1 ? brushHeight / (gridRowCount - 1) : 0;
 
           modifiedAndCreatedInstances.forEach((instance, i) => {
             const row = Math.floor(i / gridColumnCount);
@@ -3018,6 +3170,22 @@ const put2dInstances: EditorFunction = {
           attrs.push(`opacity ${instancesOpacity}/255`);
         if (instances_z_order !== null)
           attrs.push(`z-order ${instances_z_order}`);
+        const effectiveSize = instancesSize
+          ? instancesSize
+          : objectSizeInfo &&
+            objectSizeInfo.width !== null &&
+            objectSizeInfo.height !== null
+          ? [objectSizeInfo.width, objectSizeInfo.height]
+          : null;
+        if (brush_kind === 'point' && effectiveSize) {
+          attrs.push(
+            `origin at this position, each occupies ${getOccupiedSpaceDescription(
+              brushPosition,
+              effectiveSize,
+              objectSizeInfo
+            )}`
+          );
+        }
         changes.push(
           `Created ${newInstancesCount} new instance${
             newInstancesCount > 1 ? 's' : ''
@@ -3124,6 +3292,20 @@ const put2dInstances: EditorFunction = {
       }
 
       if (notFoundExistingInstanceIds.size > 0) {
+        // If NONE of the requested instances were found and nothing new was
+        // created, the call did nothing. Return a failure so the agent gets a
+        // real error signal instead of a misleading success — a success here
+        // can make the agent retry the same (often malformed) call in a loop.
+        if (existingInstanceStates.size === 0 && newInstancesCount === 0) {
+          return makeGenericFailure(
+            `None of the specified instance ids were found: ${Array.from(
+              notFoundExistingInstanceIds
+            ).join(
+              ', '
+            )}. Nothing was changed. Call \`describe_instances\` to get valid ids (the \`id\` field of each instance), and check the scene and layer names.`
+          );
+        }
+
         changes.push(
           `Instance ids not found: ${Array.from(
             notFoundExistingInstanceIds
@@ -3132,8 +3314,36 @@ const put2dInstances: EditorFunction = {
       }
 
       if (changes.length === 0) {
-        return makeGenericSuccess(
-          'No instance changes. Specify brush kind/position/count, or exact instance ids to manipulate.'
+        const matchedCount = existingInstanceStates.size;
+        const hasMutationParams =
+          !!instancesSize ||
+          instancesRotation !== null ||
+          instancesOpacity !== null ||
+          instances_z_order !== null;
+        const hasPositionBrush =
+          brush_kind === 'point' ||
+          brush_kind === 'line' ||
+          brush_kind === 'grid' ||
+          brush_kind === 'random_in_circle';
+
+        if (existingInstanceIds.length === 0) {
+          return makeGenericFailure(
+            'No instance changes. To edit existing instances, pass `existing_instance_ids` (from `describe_instances`); to create, pass `object_name` and `new_instances_count`. See the tool parameters for how to move/resize/rotate.'
+          );
+        }
+
+        if (!hasMutationParams && !hasPositionBrush) {
+          return makeGenericFailure(
+            `Matched ${matchedCount} existing instance${
+              matchedCount > 1 ? 's' : ''
+            } but no change was requested — provide a value to modify (see the tool parameters for what can be edited).`
+          );
+        }
+
+        return makeGenericFailure(
+          `Matched ${matchedCount} existing instance${
+            matchedCount > 1 ? 's' : ''
+          } but the requested values are identical to their current ones, so nothing changed.`
         );
       }
 
@@ -3371,6 +3581,23 @@ const put3dInstances: EditorFunction = {
         }
       });
 
+      // If specific instance ids were requested but none matched (and the brush
+      // did not select anything either), the call erased nothing. Return a
+      // failure so the agent gets a real error signal instead of a misleading
+      // success that could make it retry the same call in a loop.
+      if (
+        instancesToDelete.size === 0 &&
+        notFoundExistingInstanceIds.size > 0
+      ) {
+        return makeGenericFailure(
+          `None of the specified instance ids were found: ${Array.from(
+            notFoundExistingInstanceIds
+          ).join(
+            ', '
+          )}. Nothing was changed. Call \`describe_instances\` to get valid ids (the \`id\` field of each instance), and check the scene and layer names.`
+        );
+      }
+
       instancesToDelete.forEach(instance => {
         initialInstances.removeInstance(instance);
       });
@@ -3585,6 +3812,23 @@ const put3dInstances: EditorFunction = {
               instancesRotationArray[1]
             }°, ${instancesRotationArray[2]}°)`
           );
+        const effectiveSize = instancesSizeArray
+          ? instancesSizeArray
+          : objectSizeInfo &&
+            objectSizeInfo.width !== null &&
+            objectSizeInfo.height !== null &&
+            objectSizeInfo.depth !== null
+          ? [objectSizeInfo.width, objectSizeInfo.height, objectSizeInfo.depth]
+          : null;
+        if (brush_kind === 'point' && effectiveSize) {
+          attrs.push(
+            `origin at this position, each occupies ${getOccupiedSpaceDescription(
+              brushPosition,
+              effectiveSize,
+              objectSizeInfo
+            )}`
+          );
+        }
         changes.push(
           `Created ${newInstancesCount} new instance${
             newInstancesCount > 1 ? 's' : ''
@@ -3666,6 +3910,20 @@ const put3dInstances: EditorFunction = {
       }
 
       if (notFoundExistingInstanceIds.size > 0) {
+        // If NONE of the requested instances were found and nothing new was
+        // created, the call did nothing. Return a failure so the agent gets a
+        // real error signal instead of a misleading success — a success here
+        // can make the agent retry the same (often malformed) call in a loop.
+        if (existingInstanceStates.size === 0 && newInstancesCount === 0) {
+          return makeGenericFailure(
+            `None of the specified instance ids were found: ${Array.from(
+              notFoundExistingInstanceIds
+            ).join(
+              ', '
+            )}. Nothing was changed. Call \`describe_instances\` to get valid ids (the \`id\` field of each instance), and check the scene and layer names.`
+          );
+        }
+
         changes.push(
           `Instance ids not found: ${Array.from(
             notFoundExistingInstanceIds
@@ -3674,7 +3932,35 @@ const put3dInstances: EditorFunction = {
       }
 
       if (changes.length === 0) {
-        return makeGenericSuccess('No instance changes.');
+        const matchedCount = existingInstanceStates.size;
+        const hasMutationParams =
+          !!instancesSizeArray ||
+          (!!instancesRotationArray && instancesRotationArray.length >= 3);
+        const hasPositionBrush =
+          brush_kind === 'point' ||
+          brush_kind === 'line' ||
+          brush_kind === 'grid' ||
+          brush_kind === 'random_in_sphere';
+
+        if (existingInstanceIds.length === 0) {
+          return makeGenericFailure(
+            'No instance changes. To edit existing instances, pass `existing_instance_ids` (from `describe_instances`); to create, pass `object_name` and `new_instances_count`. Instance position and rotation can only be changed here, not with change_object_property. See the tool parameters for how to move/resize/rotate.'
+          );
+        }
+
+        if (!hasMutationParams && !hasPositionBrush) {
+          return makeGenericFailure(
+            `Matched ${matchedCount} existing instance${
+              matchedCount > 1 ? 's' : ''
+            } but no change was requested — provide a value to modify (see the tool parameters for what can be edited).`
+          );
+        }
+
+        return makeGenericFailure(
+          `Matched ${matchedCount} existing instance${
+            matchedCount > 1 ? 's' : ''
+          } but the requested values are identical to their current ones, so nothing changed.`
+        );
       }
 
       // /!\ Tell the editor that some instances have potentially been modified (and even removed).
@@ -4342,18 +4628,31 @@ const createScene: EditorFunction = {
       args,
       'background_color'
     );
+    const is_first_scene = SafeExtractor.extractBooleanProperty(
+      args,
+      'is_first_scene'
+    );
+
+    const firstSceneSuffix = is_first_scene
+      ? ' Also set as the first (startup) scene.'
+      : '';
 
     if (project.hasLayoutNamed(scene_name)) {
       const scene = project.getLayout(scene_name);
+      if (is_first_scene) {
+        project.setFirstLayout(scene_name);
+      }
       if (include_ui_layer && !scene.hasLayerNamed('UI')) {
         scene.insertNewLayer('UI', scene.getLayersCount());
         addDefaultLightToLayer(scene.getLayer('UI'));
         return makeGenericSuccess(
-          `Scene "${scene_name}" already exists; added "UI" layer.`
+          `Scene "${scene_name}" already exists; added "UI" layer.${firstSceneSuffix}`
         );
       }
 
-      return makeGenericSuccess(`Scene "${scene_name}" already exists.`);
+      return makeGenericSuccess(
+        `Scene "${scene_name}" already exists.${firstSceneSuffix}`
+      );
     }
 
     const scenesCount = project.getLayoutsCount();
@@ -4368,12 +4667,16 @@ const createScene: EditorFunction = {
       scene.setBackgroundColor(colorAsRgb[0], colorAsRgb[1], colorAsRgb[2]);
     }
     addDefaultLightToAllLayers(scene);
+    if (is_first_scene) {
+      project.setFirstLayout(scene_name);
+    }
 
     return {
       success: true,
-      message: include_ui_layer
-        ? `Created scene "${scene_name}" with base layer + "UI" layer.`
-        : `Created scene "${scene_name}".`,
+      message:
+        (include_ui_layer
+          ? `Created scene "${scene_name}" with base layer + "UI" layer.`
+          : `Created scene "${scene_name}".`) + firstSceneSuffix,
       meta: {
         newSceneNames: [scene_name],
       },
@@ -4478,6 +4781,7 @@ const inspectScenePropertiesLayersEffects: EditorFunction = {
           scene.getBackgroundColorBlue()
         ),
         stopSoundsOnStartup: scene.stopSoundsOnStartup(),
+        isFirstScene: project.getFirstLayout() === scene.getName(),
 
         // Also include some project related properties:
         gameResolutionWidth: project.getGameResolutionWidth(),
@@ -4712,6 +5016,11 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
         } else if (isFuzzyMatch(propertyName, 'gameName')) {
           project.setName(newValue);
           changes.push(`Set game name to "${newValue}".`);
+        } else if (isFuzzyMatch(propertyName, 'isFirstScene')) {
+          if (newValue.toLowerCase() === 'true') {
+            project.setFirstLayout(scene_name);
+            changes.push(`Set "${scene_name}" as the first (startup) scene.`);
+          }
         } else {
           warnings.push(`Unknown scene property: "${propertyName}". Skipped.`);
         }
@@ -5281,14 +5590,21 @@ const addOrEditVariable: EditorFunction = {
 };
 
 const createOrUpdatePlan: EditorFunction = {
-  renderForEditor: ({ args }) => {
-    return {
-      text: <Trans>Update the plan.</Trans>,
-    };
-  },
+  // No renderForEditor: handled server-side and shown separately via the
+  // OrchestratorPlan component, so nothing to render as a function call.
   launchFunction: async ({ args }) => {
     return makeGenericFailure(
       `Unable to create or update plan - this is handled server-side.`
+    );
+  },
+  modifiesProject: false,
+};
+
+const reportFulfilmentProblem: EditorFunction = {
+  // No renderForEditor: backend-only telemetry, nothing to show to the user.
+  launchFunction: async ({ args }) => {
+    return makeGenericFailure(
+      `Unable to report a fulfilment problem - this is handled server-side.`
     );
   },
   modifiesProject: false,
@@ -5322,6 +5638,49 @@ const searchDocs: EditorFunction = {
   launchFunction: async ({ args }) => {
     return makeGenericFailure(
       `Unable to read full documentation - continue with your existing GDevelop knowledge.`
+    );
+  },
+  modifiesProject: false,
+};
+
+const getGameStarterSummary: EditorFunctionWithoutProject = {
+  // Handled entirely on the backend to inform planning, but still shown in the
+  // chat so the user can see the AI is studying a starter template.
+  renderForEditor: ({ args, exampleShortHeaders }) => {
+    const templateSlug = SafeExtractor.extractStringProperty(
+      args,
+      'template_slug'
+    );
+
+    // Prefer the real example name from the store (when loaded). Otherwise fall
+    // back to humanizing the slug (e.g. "starting-first-person-shooter" ->
+    // "First Person Shooter"), then to a generic label.
+    const matchingExample =
+      templateSlug && exampleShortHeaders
+        ? exampleShortHeaders.find(
+            exampleShortHeader => exampleShortHeader.slug === templateSlug
+          )
+        : null;
+    const templateName =
+      (matchingExample && matchingExample.name) ||
+      (templateSlug
+        ? templateSlug
+            .replace(/^starting-/, '')
+            .replace(/-/g, ' ')
+            .replace(/\b\w/g, letter => letter.toUpperCase())
+        : null);
+
+    return {
+      text: templateName ? (
+        <Trans>Reviewing the {templateName} starter template.</Trans>
+      ) : (
+        <Trans>Reviewing a starter game template.</Trans>
+      ),
+    };
+  },
+  launchFunction: async () => {
+    return makeGenericFailure(
+      'get_game_starter_summary is handled on the backend.'
     );
   },
   modifiesProject: false,
@@ -5522,10 +5881,13 @@ export const editorFunctions: { [string]: EditorFunction } = {
   search_object_asset_store: searchObjectAssetStore,
 
   generate_events: addSceneEvents,
+
+  report_fulfilment_problem: reportFulfilmentProblem,
 };
 
 export const editorFunctionsWithoutProject: {
   [string]: EditorFunctionWithoutProject,
 } = {
   initialize_project: initializeProject,
+  get_game_starter_summary: getGameStarterSummary,
 };

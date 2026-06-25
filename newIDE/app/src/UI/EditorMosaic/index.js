@@ -474,6 +474,7 @@ const EditorMosaic: React.ComponentType<{
                 <MosaicWindow
                   path={path}
                   title={i18n._(editor.title)}
+                  className={`mosaic-editor-${editorName}`}
                   onDragStart={onDragOrResizedStarted}
                   onDragEnd={onDragOrResizedEnded}
                   toolbarControls={

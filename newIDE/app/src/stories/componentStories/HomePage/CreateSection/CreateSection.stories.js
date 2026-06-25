@@ -96,6 +96,7 @@ const WrappedCreateSection = ({
                     )}
                     onExtensionInstalled={action('onExtensionInstalled')}
                     onCloseAskAi={() => action('onCloseAskAi')()}
+                    onOpenAskAi={() => action('onOpenAskAi')()}
                     closeProject={async () => {}}
                     canOpen={true}
                     onOpenProfile={() => action('open profile')()}

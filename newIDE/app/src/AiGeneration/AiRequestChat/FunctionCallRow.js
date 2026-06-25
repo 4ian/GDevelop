@@ -26,6 +26,7 @@ import ChevronArrowBottom from '../../UI/CustomSvgIcons/ChevronArrowBottom';
 import { SafeExtractor } from '../../Utils/SafeExtractor';
 import CircledAdd from '../../UI/CustomSvgIcons/CircledAdd';
 import { AiRequestContext } from '../AiRequestContext';
+import { ExampleStoreContext } from '../../AssetStore/ExampleStore/ExampleStoreContext';
 import {
   getFunctionCallToFunctionCallOutputMap,
   aiRequestHasWorkInProgress,
@@ -47,6 +48,7 @@ type Props = {|
   editorFunctionCallResult: ?EditorFunctionCallResult,
   existingFunctionCallOutput: ?AiRequestFunctionCallOutput,
   editorCallbacks: EditorCallbacks,
+  isRequestStopped?: boolean,
 |};
 
 export const FunctionCallRow: React.ComponentType<Props> = React.memo<Props>(
@@ -65,9 +67,16 @@ const EditorFunctionCallRow = ({
   editorFunctionCallResult,
   existingFunctionCallOutput,
   editorCallbacks,
+  isRequestStopped,
 }: Props) => {
   const [showDetails, setShowDetails] = React.useState(false);
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
+  const { exampleShortHeaders } = React.useContext(ExampleStoreContext);
+  const { pendingEditApproval } = React.useContext(AiRequestContext);
+
+  const isAwaitingApproval =
+    !!pendingEditApproval &&
+    pendingEditApproval.callIds.includes(functionCall.call_id);
 
   let existingParsedOutput;
   try {
@@ -80,14 +89,17 @@ const EditorFunctionCallRow = ({
     existingParsedOutput = null;
   }
 
-  const isAborted =
-    (!!editorFunctionCallResult &&
-      editorFunctionCallResult.status === 'aborted') ||
-    (existingParsedOutput && !!existingParsedOutput.stopped);
   const isFinished =
     !!existingFunctionCallOutput ||
     (!!editorFunctionCallResult &&
       editorFunctionCallResult.status === 'finished');
+  const isAborted =
+    (!!editorFunctionCallResult &&
+      editorFunctionCallResult.status === 'aborted') ||
+    (existingParsedOutput && !!existingParsedOutput.stopped) ||
+    // The request was suspended before this call ran (no output): treat it as
+    // aborted rather than leaving a pending spinner.
+    (!!isRequestStopped && !isFinished);
   const functionCallResultIsErrored =
     editorFunctionCallResult &&
     editorFunctionCallResult.status === 'finished' &&
@@ -96,6 +108,7 @@ const EditorFunctionCallRow = ({
     functionCallResultIsErrored ||
     (existingParsedOutput && existingParsedOutput.success === false);
   const isWorking =
+    !isAwaitingApproval &&
     !isFinished &&
     !!editorFunctionCallResult &&
     editorFunctionCallResult.status === 'working';
@@ -128,11 +141,15 @@ const EditorFunctionCallRow = ({
   let details;
   let hasDetailsToShow = false;
   if (!editorFunction) {
-    text = (
-      <Trans>
-        The AI tried to use a function of the editor that is unknown.
-      </Trans>
-    );
+    // Unknown to this version of the editor: this is a function handled on the
+    // backend (e.g. a newly shipped server-side tool that this frontend doesn't
+    // know about yet). Render nothing rather than an "unknown function" message,
+    // so backend tools can be added without requiring a frontend release.
+    return null;
+  } else if (!editorFunction.renderForEditor) {
+    // Functions with no renderForEditor (e.g. handled on the backend) render
+    // nothing.
+    return null;
   } else {
     try {
       const result = editorFunction.renderForEditor({
@@ -141,6 +158,7 @@ const EditorFunctionCallRow = ({
         editorCallbacks,
         shouldShowDetails: showDetails,
         editorFunctionCallResultOutput,
+        exampleShortHeaders,
       });
 
       text = result.text;
@@ -163,9 +181,13 @@ const EditorFunctionCallRow = ({
     <div className={classes.functionCallContainer}>
       <div className={classes.functionCallRow}>
         <Tooltip
-          title={JSON.stringify(
+          title={
             existingFunctionCallOutput || editorFunctionCallResult
-          )}
+              ? JSON.stringify(
+                  existingFunctionCallOutput || editorFunctionCallResult
+                )
+              : ''
+          }
         >
           <span className={classes.statusIconContainer}>
             {hasErrored ? (
@@ -272,12 +294,14 @@ const SubAgentFunctionCallRow = ({
   functionCall,
   existingFunctionCallOutput,
   editorCallbacks,
+  isRequestStopped,
 }: Props) => {
   const [showDetails, setShowDetails] = React.useState(false);
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const {
     aiRequestStorage,
     editorFunctionCallResultsStorage,
+    pendingEditApproval,
   } = React.useContext(AiRequestContext);
   const { aiRequests } = aiRequestStorage;
   const { getEditorFunctionCallResults } = editorFunctionCallResultsStorage;
@@ -293,6 +317,10 @@ const SubAgentFunctionCallRow = ({
   } catch (error) {
     existingParsedOutput = null;
   }
+
+  const isAwaitingApproval =
+    !!pendingEditApproval &&
+    pendingEditApproval.aiRequestId === subAgentAiRequestId;
 
   const isStopped = existingParsedOutput && !!existingParsedOutput.stopped;
   const hasErrored =
@@ -320,6 +348,7 @@ const SubAgentFunctionCallRow = ({
       (subAgentRequest.status === 'ready' ||
         subAgentRequest.status === 'error'));
   const isWorking =
+    !isAwaitingApproval &&
     !isFinished &&
     ((subAgentRequest && subAgentRequest.status === 'working') ||
       hasWorkInProgress);
@@ -329,7 +358,7 @@ const SubAgentFunctionCallRow = ({
     editorFunctionsWithoutProject[functionCall.name] ||
     null;
   let text;
-  if (!editorFunction) {
+  if (!editorFunction || !editorFunction.renderForEditor) {
     text = functionCall.name;
   } else {
     try {
@@ -495,6 +524,9 @@ const SubAgentFunctionCallRow = ({
                 editorFunctionCallResult={item.editorFunctionCallResult}
                 existingFunctionCallOutput={item.existingFunctionCallOutput}
                 editorCallbacks={editorCallbacks}
+                isRequestStopped={
+                  isRequestStopped || !!isStopped || !!hasErrored
+                }
               />
             ) : (
               <SubAgentTextRow

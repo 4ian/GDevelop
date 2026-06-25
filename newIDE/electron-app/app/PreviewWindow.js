@@ -30,24 +30,18 @@ const {
  * Per-window CDP state. `isPaused` mirrors `Debugger.paused`/`Debugger.resumed`
  * events and may lag reality on races, so resume/step paths do not rely on it
  * as a gate.
- * @typedef {Object} CdpSession
- * @property {boolean} isAttached
- * @property {boolean} isPaused
- * @property {number | null} parentWindowId
+ * @typedef {{isAttached: boolean, isPaused: boolean, parentWindowId: number | null}} CdpSession
  */
 
 /**
- * @typedef {Object} BreakpointEntry
- * @property {string} functionId
- * @property {Array<number>} eventIndices
+ * @typedef {{functionId: string, eventIndices: Array<number>}} BreakpointEntry
  */
 
 /**
- * @typedef {Object} StepPayload
- * @property {number} [currentEventIndex] Zero-based index of the event the
- *   debugger is paused on; omit for a raw pause.
- * @property {string} [currentFunctionId] Events-function identifier; omit for
- *   top-level scene code / raw pause.
+ * `currentEventIndex`: zero-based index of the event the debugger is paused on;
+ * omit for a raw pause. `currentFunctionId`: events-function identifier; omit
+ * for top-level scene code / raw pause.
+ * @typedef {{currentEventIndex?: number, currentFunctionId?: string}} StepPayload
  */
 
 /**
@@ -64,16 +58,6 @@ let openDevToolsByDefault = false;
  * @type {Map<number, CdpSession>}
  */
 const cdpSessions = new Map();
-
-/**
- * @param {Array<BreakpointEntry>} initialBreakpoints
- * @returns {string} CDP-ready expression wrapping {@link bootstrapPreviewCdp}.
- */
-const buildBootstrapSource = initialBreakpoints =>
-  serializeFunctionForCdp(
-    bootstrapPreviewCdp,
-    Array.isArray(initialBreakpoints) ? initialBreakpoints : []
-  );
 
 /**
  * Fire-and-forget: attaches CDP and wires event handlers. Must NOT be
@@ -106,7 +90,10 @@ const attachCdpToPreview = (
     parentWindowId,
   });
 
-  const bootstrapSource = buildBootstrapSource(initialBreakpoints);
+  const bootstrapSource = serializeFunctionForCdp(
+    bootstrapPreviewCdp,
+    Array.isArray(initialBreakpoints) ? initialBreakpoints : []
+  );
 
   wc.debugger.on('detach', () => {
     const entry = cdpSessions.get(windowId);
@@ -227,10 +214,9 @@ const sendCdpCommand = async (windowId, method, commandParams) => {
 };
 
 /**
- * Resolves the target window for a resume/step command. Falls back to any
- * attached session: `isPaused` can be missed on races, so trying
- * `Debugger.resume` on a running session is safer (Chromium returns an error
- * we log and swallow).
+ * Resolves a preview window id, preferring `explicitWindowId` when it has an
+ * attached session, otherwise falling back to any attached one. Useful for
+ * issuing CDP debugger commands.
  *
  * @param {number | null | undefined} explicitWindowId
  * @returns {number | null}
@@ -371,16 +357,7 @@ const detachCdpFromPreview = previewWindow => {
 /**
  * Open 1 or multiple windows running a preview of an exported game.
  *
- * @param {Object} opts
- * @param {BrowserWindow | null} opts.parentWindow
- * @param {Object} opts.previewBrowserWindowOptions
- * @param {string} opts.previewGameIndexHtmlPath
- * @param {boolean} opts.alwaysOnTop
- * @param {boolean} opts.hideMenuBar
- * @param {number} opts.numberOfWindows
- * @param {Object} [opts.captureOptions]
- * @param {IpcMainEvent} opts.openEvent
- * @param {Array<BreakpointEntry>} opts.initialBreakpoints
+ * @param {{parentWindow: BrowserWindow | null, previewBrowserWindowOptions: Object, previewGameIndexHtmlPath: string, alwaysOnTop: boolean, hideMenuBar: boolean, numberOfWindows: number, captureOptions?: Object, openEvent: IpcMainEvent, initialBreakpoints: Array<BreakpointEntry>}} opts
  * @returns {void}
  */
 const openPreviewWindow = ({

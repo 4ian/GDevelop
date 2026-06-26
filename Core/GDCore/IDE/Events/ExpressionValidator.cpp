@@ -67,15 +67,19 @@ size_t GetMaximumParametersNumber(
 }  // namespace
 
 bool ExpressionValidator::ValidateObjectVariableOrVariableOrProperty(
-    const gd::IdentifierNode& identifier) {
-  return ValidateObjectVariableOrVariableOrProperty(identifier.identifierName, identifier.identifierNameLocation, identifier.childIdentifierName, identifier.childIdentifierNameLocation);
+    const gd::IdentifierNode &identifier) {
+  return ValidateObjectVariableOrVariableOrProperty(
+      identifier.identifierName, identifier.identifierNameLocation,
+      identifier.childIdentifierName, identifier.childIdentifierNameLocation,
+      true);
 }
 
 bool ExpressionValidator::ValidateObjectVariableOrVariableOrProperty(
     const gd::String &identifierName,
     const gd::ExpressionParserLocation identifierNameLocation,
     const gd::String &childIdentifierName,
-    const gd::ExpressionParserLocation childIdentifierNameLocation) {
+    const gd::ExpressionParserLocation childIdentifierNameLocation,
+    const bool isUndeclaredVariableFatal) {
   auto validateVariableTypeForExpression =
       [this, &identifierNameLocation](gd::Variable::Type type) {
         // Collections type can't be used directly in expressions, a child
@@ -160,7 +164,7 @@ bool ExpressionValidator::ValidateObjectVariableOrVariableOrProperty(
         // A child variable is accessed, check it can be used in an expression.
         if (!variable.HasChild(childIdentifierName)) {
           RaiseTypeError(_("No child variable with this name found."),
-                        childIdentifierNameLocation);
+                        childIdentifierNameLocation, isUndeclaredVariableFatal);
 
           return true; // We should have found a variable.
         }

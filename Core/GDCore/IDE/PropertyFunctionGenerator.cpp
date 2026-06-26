@@ -80,6 +80,17 @@ void PropertyFunctionGenerator::GenerateGetterAndSetter(
            : "");
 
   gd::String getterName = capitalizedName;
+  auto addObjectParameter = [&extension, &eventsBasedEntity](
+                                gd::EventsFunction &eventsFunction) {
+    gd::ParameterMetadata objectParameter;
+    gd::String objectFullType = gd::PlatformExtension::GetObjectFullType(
+        extension.GetName(), eventsBasedEntity.GetName());
+    objectParameter.SetType("object")
+        .SetName("Object")
+        .SetDescription("Object")
+        .SetExtraInfo(objectFullType);
+    eventsFunction.GetParameters().AddParameter(objectParameter);
+  };
 
   if (!functionsContainer.HasEventsFunctionNamed(getterName)) {
     auto &getter = functionsContainer.InsertNewEventsFunctionInFolder(
@@ -99,19 +110,15 @@ void PropertyFunctionGenerator::GenerateGetterAndSetter(
       getter.SetFunctionType(gd::EventsFunction::Condition)
           .SetDescription("Check " + descriptionSubject)
           .SetSentence("_PARAM0_ " + UnCapitalizeFirstLetter(propertyLabel));
+      if (!isBehavior) {
+        addObjectParameter(getter);
+      }
     } else {
       getter.SetFunctionType(gd::EventsFunction::ExpressionAndCondition)
           .SetDescription(descriptionSubject)
           .SetSentence("the " + UnCapitalizeFirstLetter(propertyLabel));
       if (!isBehavior) {
-        gd::ParameterMetadata objectParameter;
-        gd::String objectFullType = gd::PlatformExtension::GetObjectFullType(
-            extension.GetName(), eventsBasedEntity.GetName());
-        objectParameter.SetType("object")
-            .SetName("Object")
-            .SetDescription("Object")
-            .SetExtraInfo(objectFullType);
-        getter.GetParameters().AddParameter(objectParameter);
+        addObjectParameter(getter);
       }
     }
 

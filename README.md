@@ -294,6 +294,111 @@ read files under `thirdParties/`. Treat those folders as external submodules and
 use the docs, scripts, and integration code outside `thirdParties/` first. This
 saves context and token budget.
 
+### Object picking strategy
+
+This section describes event object picking at the code generation/runtime
+boundary. It is about the objects affected by events, not editor selection.
+The main source anchors are
+`Core/GDCore/Events/CodeGeneration/EventsCodeGenerationContext.*`,
+`Core/GDCore/Events/CodeGeneration/EventsCodeGenerator.cpp`,
+`GDJS/GDJS/Events/CodeGeneration/EventsCodeGenerator.cpp`,
+`GDJS/GDJS/Extensions/Builtin/CommonInstructionsExtension.cpp`,
+`GDJS/GDJS/Extensions/Builtin/BaseObjectExtension.cpp`,
+`GDJS/GDJS/Extensions/Builtin/AsyncExtension.cpp`, and
+`GDJS/Runtime/events-tools/objecttools.ts`.
+
+```mermaid
+flowchart TD
+  A["Event scope starts"] --> B["Codegen builds one picked array per concrete object name"]
+  B --> C{"Object list already exists in parent scope?"}
+  C -->|No| D["Initialize from all instances\nruntimeScene.getObjects(name)\nor eventsFunctionContext.getObjects(name)"]
+  C -->|Yes| E["Copy or reuse the parent picked array"]
+  D --> F["Conditions filter arrays in place"]
+  E --> F
+  F --> G{"Condition composition"}
+  G -->|Sequential / AND| H["Intersection by repeated narrowing"]
+  G -->|OR| I["Evaluate branches in child scopes\nunion successful branch picks"]
+  G -->|NOT group| J["Negate boolean only\ndo not restore nested list side effects"]
+  H --> K["Actions and expressions use current picked arrays"]
+  I --> K
+  J --> K
+  K --> L{"Subevent / function / async / loop"}
+  L -->|Subevent| M["Child scope inherits current picked arrays"]
+  L -->|Events function| N["Object parameter maps pass picked arrays by reference"]
+  L -->|Async| O["LongLivedObjectsList backs up required picked arrays"]
+  L -->|ForEach / Repeat / While| P["Loop scopes forbid reuse and rebuild per iteration"]
+```
+
+The core rule is: a picked object list is a generated JavaScript array keyed by
+the real object name. Object groups are expanded during code generation to their
+concrete object names, so a group parameter becomes a map of several real
+object lists. Generated event-list functions can be split for JavaScript engine
+performance, but picking still works because these lists are stored as static
+variables shared by the generated code namespace.
+
+The first instruction in a scope that needs an object, whether it is a condition,
+an action, or an expression, asks the `EventsCodeGenerationContext` for that
+object list. If no parent scope already declared it, the list is initialized with
+all current instances from the scene or from `eventsFunctionContext`. If a parent
+scope already has a filtered list, the child scope copies or reuses that parent
+list. Special parameter types such as `objectListOrEmptyIfJustDeclared` and
+`objectListOrEmptyWithoutPicking` intentionally create empty lists when the code
+must pass a list without implicitly picking every instance.
+
+Most object and behavior conditions narrow the current list in place. Generated
+object/behavior conditions loop over the current list, compact matching objects
+to the front, then truncate the array. Runtime pair tests such as collision and
+distance mark object pairs with the temporary `pick` flag and then trim one or
+both lists. Consecutive conditions therefore behave like an intersection:
+condition 2 only sees what condition 1 left picked. Inverted object conditions
+invert the per-object predicate and keep the nonmatching objects; this is
+different from a grouped `NOT`, which only flips the final boolean after its
+nested conditions have already run.
+
+Actions do not normally widen picking. Object and behavior actions run on the
+objects that are currently in the picked arrays. Object expressions use the
+current object inside an object loop when one exists; otherwise they use the
+first picked instance and fall back to a bad object/default result when the list
+is empty. The explicit picking instructions are the widening or replacement
+operations: "Pick all" copies all instances back into the current lists, "Pick
+random" and "Pick nearest" reduce the lists to one instance, and creation
+instructions append the newly created instance to the active list. In GDJS,
+creation also calls `onPlacedInScene()` after position, layer, and z-order are
+set, so following actions/conditions in the same scope see the new object as
+picked.
+
+Subevents inherit the parent event's current picked lists, so they operate on
+the subset left by the parent conditions. `AND` is just sequential condition
+generation. `OR` is special: every branch runs in its own child context, and
+successful branch results are merged into final arrays with duplicate removal.
+Loop events deliberately avoid reusing parent arrays. `Repeat`, `While`, and
+child-variable loops rebuild their local declarations each iteration. `ForEach`
+starts from the parent picked list, then pushes exactly one object into an empty
+child list for each iteration; ordered/limited `ForEach` first builds and sorts
+a working list, then still runs the body with one picked object per iteration.
+
+Events functions, custom behaviors, and events-based objects/prefabs use the
+same mechanism with an indirection layer. Object parameters are passed as
+`Hashtable` maps of real object names to picked arrays, and
+`eventsFunctionContext` also stores flattened arrays for `getObjects(name)`.
+Behavior parameters are name mappings, not a separate picking system. Creating
+an object inside an events function goes through the context so the correct
+parent or scoped instance container creates it, and the created object is pushed
+back into both the mapped list and the flattened array. Async events preserve
+the same semantics by backing up required already-declared picked lists in a
+`LongLivedObjectsList`; destroyed objects are removed from these backed-up
+lists before callbacks resume.
+
+Practical mental model:
+
+- If an event references an object with no previous filtering, it starts from
+  all current instances of that object.
+- Conditions narrow lists; actions consume the current narrowed lists.
+- Subevents inherit the narrowed result from their parent.
+- Use explicit pick actions to reset or replace the picked set.
+- Creating an object immediately makes that new instance picked for the
+  following instructions in the same scope.
+
 Status of the tests and builds: [![macOS and Linux build status](https://circleci.com/gh/4ian/GDevelop.svg?style=shield)](https://app.circleci.com/pipelines/github/4ian/GDevelop) [![Fast tests status](https://gdevelop.semaphoreci.com/badges/GDevelop/branches/master.svg?style=shields)](https://gdevelop.semaphoreci.com/projects/GDevelop) [![Windows Build status](https://ci.appveyor.com/api/projects/status/84uhtdox47xp422x/branch/master?svg=true)](https://ci.appveyor.com/project/4ian/gdevelop/branch/master) [![https://good-labs.github.io/greater-good-affirmation/assets/images/badge.svg](https://good-labs.github.io/greater-good-affirmation/assets/images/badge.svg)](https://good-labs.github.io/greater-good-affirmation)
 
 ## Links

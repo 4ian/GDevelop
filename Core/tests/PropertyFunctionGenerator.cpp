@@ -456,8 +456,13 @@ TEST_CASE("PropertyFunctionGenerator", "[common]") {
               "Check if rotate object. The rotation follows movements done by "
               "this object.");
       REQUIRE(getter.GetSentence() == "_PARAM0_ rotate object");
-      // The Object parameter is added automatically.
-      REQUIRE(getter.GetParameters().GetParametersCount() == 0);
+      REQUIRE(getter.GetParameters().GetParametersCount() == 1);
+      const auto &getterObjectParameter =
+          getter.GetParameters().GetParameter(0);
+      REQUIRE(getterObjectParameter.GetName() == "Object");
+      REQUIRE(getterObjectParameter.GetType() == "object");
+      REQUIRE(getterObjectParameter.GetExtraInfo() ==
+              "MyEventsExtension::MyEventsBasedObject");
 
       REQUIRE(getter.GetEvents().GetEventsCount() == 1);
       REQUIRE(getter.GetEvents().GetEvent(0).GetType() ==

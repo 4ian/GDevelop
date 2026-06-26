@@ -466,17 +466,23 @@ gd::String EventsCodeGenerator::GenerateConditionCode(
 gd::String EventsCodeGenerator::GenerateConditionsListCode(
     gd::InstructionsList& conditions, EventsCodeGenerationContext& context) {
   gd::String outputCode;
+  std::vector<std::size_t> enabledConditionIndexes;
 
-  for (std::size_t i = 0; i < conditions.size(); ++i)
+  for (std::size_t i = 0; i < conditions.size(); ++i) {
+    if (!conditions[i].IsDisabled()) enabledConditionIndexes.push_back(i);
+  }
+
+  for (std::size_t i = 0; i < enabledConditionIndexes.size(); ++i)
     outputCode += GenerateBooleanInitializationToFalse(
         "condition" + gd::String::From(i) + "IsTrue", context);
 
-  for (std::size_t cId = 0; cId < conditions.size(); ++cId) {
+  for (std::size_t cId = 0; cId < enabledConditionIndexes.size(); ++cId) {
+    gd::Instruction& condition = conditions[enabledConditionIndexes[cId]];
     gd::String conditionCode =
-        GenerateConditionCode(conditions[cId],
+        GenerateConditionCode(condition,
                               "condition" + gd::String::From(cId) + "IsTrue",
                               context);
-    if (!conditions[cId].GetType().empty()) {
+    if (!condition.GetType().empty()) {
       for (std::size_t i = 0; i < cId;
            ++i)  // Skip conditions if one condition is false. //TODO : Can be
                  // optimized
@@ -500,7 +506,8 @@ gd::String EventsCodeGenerator::GenerateConditionsListCode(
     }
   }
 
-  maxConditionsListsSize = std::max(maxConditionsListsSize, conditions.size());
+  maxConditionsListsSize =
+      std::max(maxConditionsListsSize, enabledConditionIndexes.size());
 
   return outputCode;
 }
@@ -851,6 +858,11 @@ gd::String EventsCodeGenerator::GenerateActionsListCode(
     gd::InstructionsList& actions, EventsCodeGenerationContext& context) {
   gd::String outputCode;
   for (std::size_t aId = 0; aId < actions.size(); ++aId) {
+    if (actions[aId].IsDisabled()) {
+      outputCode += "{/* Disabled action - skipped. */}\n";
+      continue;
+    }
+
     gd::String actionCode = GenerateActionCode(actions[aId], context);
 
     outputCode += "{";

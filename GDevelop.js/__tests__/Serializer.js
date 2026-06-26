@@ -220,6 +220,37 @@ describe('libGD.js object serialization', function () {
       expect(event.variables).toBeUndefined();
     });
 
+    const serializeLayoutEventInstruction = (canonicalMode, disabled) => {
+      gd.Serializer.setCanonicalMode(canonicalMode);
+
+      const project = new gd.ProjectHelper.createNewGDJSProject();
+      const layout = project.insertNewLayout('Scene', 0);
+      const event = layout
+        .getEvents()
+        .insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 0);
+
+      const action = new gd.Instruction();
+      action.setType('ModVarScene');
+      action.setDisabled(disabled);
+      gd.asStandardEvent(event).getActions().insert(action, 0);
+
+      const element = new gd.SerializerElement();
+      layout.getEvents().serializeTo(element);
+      const json = gd.Serializer.toJSON(element);
+      element.delete();
+      project.delete();
+
+      return JSON.parse(json)[0].actions[0];
+    };
+
+    it('serializes instruction disabled state', function () {
+      expect(
+        serializeLayoutEventInstruction(false, false).disabled
+      ).toBeUndefined();
+      expect(serializeLayoutEventInstruction(false, true).disabled).toBe(true);
+      expect(serializeLayoutEventInstruction(true, false).disabled).toBe(false);
+    });
+
     it('produces stable, byte-identical output across two serializations', function () {
       gd.Serializer.setCanonicalMode(true);
       const project = new gd.ProjectHelper.createNewGDJSProject();

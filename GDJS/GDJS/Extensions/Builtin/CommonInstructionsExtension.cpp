@@ -38,6 +38,16 @@ using namespace gd;
 
 namespace gdjs {
 
+namespace {
+bool HasEnabledInstructions(const gd::InstructionsList& instructions) {
+  for (std::size_t i = 0; i < instructions.size(); ++i) {
+    if (!instructions[i].IsDisabled()) return true;
+  }
+
+  return false;
+}
+}  // namespace
+
 CommonInstructionsExtension::CommonInstructionsExtension() {
   gd::BuiltinExtensionsImplementer::ImplementsCommonInstructionsExtension(
       *this);
@@ -141,10 +151,11 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
 
         gd::String conditionsCode = codeGenerator.GenerateConditionsListCode(
             event.GetConditions(), context);
-        gd::String ifPredicate = event.GetConditions().empty()
-                                     ? ""
-                                     : codeGenerator.GenerateBooleanFullName(
-                                           "isConditionTrue", context);
+        gd::String ifPredicate =
+            !HasEnabledInstructions(event.GetConditions())
+                ? ""
+                : codeGenerator.GenerateBooleanFullName("isConditionTrue",
+                                                        context);
 
         gd::EventsCodeGenerationContext actionsContext;
         actionsContext.Reuse(context);
@@ -198,7 +209,7 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
         gd::String conditionsCode = codeGenerator.GenerateConditionsListCode(
             event.GetConditions(), context);
         gd::String ifPredicate =
-            event.GetConditions().empty()
+            !HasEnabledInstructions(event.GetConditions())
                 ? "!" + chainSatisfiedVariable
                 : "!" + chainSatisfiedVariable + " && " +
                       codeGenerator.GenerateBooleanFullName("isConditionTrue",
@@ -263,6 +274,8 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
         // parent event.
         set<gd::String> emptyListsNeeded;
         for (unsigned int cId = 0; cId < conditions.size(); ++cId) {
+          if (conditions[cId].IsDisabled()) continue;
+
           // Each condition inherits the context from the "Or" condition:
           // For example, two sub conditions using an object called
           // "MyObject" will both have to declare a "MyObject" object list.
@@ -426,8 +439,9 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
 
         // Prevent code generation if the event is empty, as this would
         // get the game stuck in a never ending loop.
-        if (event.GetWhileConditions().empty() &&
-            event.GetConditions().empty() && event.GetActions().empty())
+        if (!HasEnabledInstructions(event.GetWhileConditions()) &&
+            !HasEnabledInstructions(event.GetConditions()) &&
+            !HasEnabledInstructions(event.GetActions()))
           return gd::String(
               "\n// While event not generated to prevent an infinite loop.\n");
 
@@ -460,7 +474,7 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
             codeGenerator.GenerateConditionsListCode(event.GetWhileConditions(),
                                                      context);
         gd::String whileIfPredicate = "true";
-        if (!event.GetWhileConditions().empty())
+        if (HasEnabledInstructions(event.GetWhileConditions()))
           whileIfPredicate =
               codeGenerator.GenerateBooleanFullName("isConditionTrue", context);
 
@@ -469,7 +483,7 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
         gd::String actionsCode =
             codeGenerator.GenerateActionsListCode(event.GetActions(), context);
         gd::String ifPredicate = "true";
-        if (!event.GetConditions().empty())
+        if (HasEnabledInstructions(event.GetConditions()))
           ifPredicate =
               codeGenerator.GenerateBooleanFullName("isConditionTrue", context);
 
@@ -538,10 +552,11 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
             event.GetConditions(), context);
         gd::String actionsCode =
             codeGenerator.GenerateActionsListCode(event.GetActions(), context);
-        gd::String ifPredicate = event.GetConditions().empty()
-                                     ? "true"
-                                     : codeGenerator.GenerateBooleanFullName(
-                                           "isConditionTrue", context);
+        gd::String ifPredicate =
+            !HasEnabledInstructions(event.GetConditions())
+                ? "true"
+                : codeGenerator.GenerateBooleanFullName("isConditionTrue",
+                                                        context);
 
         // Prepare object declaration and sub events
         gd::String subevents =
@@ -725,7 +740,7 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
         gd::String actionsCode =
             codeGenerator.GenerateActionsListCode(event.GetActions(), context);
         gd::String ifPredicate = "true";
-        if (!event.GetConditions().empty())
+        if (HasEnabledInstructions(event.GetConditions()))
           ifPredicate =
               codeGenerator.GenerateBooleanFullName("isConditionTrue", context);
 
@@ -836,7 +851,7 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
         gd::String actionsCode =
             codeGenerator.GenerateActionsListCode(event.GetActions(), context);
         gd::String ifPredicate = "true";
-        if (!event.GetConditions().empty())
+        if (HasEnabledInstructions(event.GetConditions()))
           ifPredicate =
               codeGenerator.GenerateBooleanFullName("isConditionTrue", context);
 

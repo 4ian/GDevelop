@@ -81,6 +81,10 @@ describe('libGD.js - GDJS Transparent Events Code Generation integration tests',
   const chainBreaker = () => repeat(1, []);
 
   const disabled = (event) => ({ ...event, disabled: true });
+  const disabledInstruction = (instruction) => ({
+    ...instruction,
+    disabled: true,
+  });
 
   const comment = () => ({ type: 'BuiltinCommonInstructions::Comment' });
 
@@ -101,6 +105,47 @@ describe('libGD.js - GDJS Transparent Events Code Generation integration tests',
   }
 
   // ── Modes: both disabled events and comment events must be transparent ─
+
+  describe('disabled instructions', () => {
+    it('skips disabled actions', () => {
+      const v = runEvents([
+        {
+          type: 'BuiltinCommonInstructions::Standard',
+          conditions: [],
+          actions: [
+            disabledInstruction(addVar('Counter', 100)),
+            addVar('Counter', 1),
+          ],
+          events: [],
+        },
+      ]);
+
+      expect(v('Counter')).toBe(1);
+    });
+
+    it('treats disabled conditions as removed from the condition list', () => {
+      const v = runEvents([
+        {
+          type: 'BuiltinCommonInstructions::Standard',
+          conditions: [disabledInstruction(falseCondition[0])],
+          actions: [setVar('OnlyDisabledFalseCondition', 1)],
+          events: [],
+        },
+        {
+          type: 'BuiltinCommonInstructions::Standard',
+          conditions: [
+            disabledInstruction(falseCondition[0]),
+            falseCondition[0],
+          ],
+          actions: [setVar('ActiveFalseCondition', 1)],
+          events: [],
+        },
+      ]);
+
+      expect(v('OnlyDisabledFalseCondition')).toBe(1);
+      expect(v('ActiveFalseCondition')).toBe(0);
+    });
+  });
 
   const transparentEventModes = [
     {

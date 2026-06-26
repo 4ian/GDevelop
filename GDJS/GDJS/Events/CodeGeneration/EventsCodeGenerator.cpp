@@ -1227,30 +1227,37 @@ gd::String EventsCodeGenerator::GenerateConditionsListCode(
     gd::InstructionsList& conditions,
     gd::EventsCodeGenerationContext& context) {
   gd::String outputCode;
+  std::vector<std::size_t> enabledConditionIndexes;
+
+  for (std::size_t i = 0; i < conditions.size(); ++i) {
+    if (!conditions[i].IsDisabled()) enabledConditionIndexes.push_back(i);
+  }
 
   outputCode +=
       GenerateBooleanInitializationToFalse("isConditionTrue", context);
 
-  for (std::size_t cId = 0; cId < conditions.size(); ++cId) {
+  for (std::size_t cId = 0; cId < enabledConditionIndexes.size(); ++cId) {
     if (cId != 0) {
       outputCode += "if (" +
                     GenerateBooleanFullName("isConditionTrue", context) +
                     ") {\n";
     }
+    gd::Instruction& condition = conditions[enabledConditionIndexes[cId]];
     gd::String conditionCode =
-        GenerateConditionCode(conditions[cId], "isConditionTrue", context);
-    if (!conditions[cId].GetType().empty()) {
+        GenerateConditionCode(condition, "isConditionTrue", context);
+    if (!condition.GetType().empty()) {
       outputCode +=
           GenerateBooleanFullName("isConditionTrue", context) + " = false;\n";
       outputCode += conditionCode;
     }
   }
   // Close nested "if".
-  for (std::size_t cId = 0; cId < conditions.size(); ++cId) {
+  for (std::size_t cId = 0; cId < enabledConditionIndexes.size(); ++cId) {
     if (cId != 0) outputCode += "}\n";
   }
 
-  maxConditionsListsSize = std::max(maxConditionsListsSize, conditions.size());
+  maxConditionsListsSize =
+      std::max(maxConditionsListsSize, enabledConditionIndexes.size());
 
   return outputCode;
 }

@@ -1074,6 +1074,10 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
         accelerator: 'CmdOrCtrl+Shift+A',
         visible: hasSomethingSelected(this.state.selection),
       },
+      {
+        label: i18n._(t`Toggle Disabled`),
+        click: () => this._toggleDisabledInstructions(),
+      },
       hasSelectedAtLeastOneCondition(this.state.selection)
         ? {
             label: i18n._(t`Invert Condition`),
@@ -2139,6 +2143,31 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
             !instructionContext.instruction.isInverted()
           );
         }
+      }
+    );
+
+    const locatingEvent = getSelectedInstructionsLocatingEvents(
+      this.state.selection
+    );
+    const positions = this._getChangedEventRows(locatingEvent);
+    this._saveChangesToHistory(
+      'EDIT',
+      {
+        positionsBeforeAction: positions,
+        positionAfterAction: positions,
+      },
+      () => {
+        if (this._eventsTree) this._eventsTree.forceEventsUpdate();
+      }
+    );
+  };
+
+  _toggleDisabledInstructions = () => {
+    getSelectedInstructionsContexts(this.state.selection).forEach(
+      instructionContext => {
+        instructionContext.instruction.setDisabled(
+          !instructionContext.instruction.isDisabled()
+        );
       }
     );
 

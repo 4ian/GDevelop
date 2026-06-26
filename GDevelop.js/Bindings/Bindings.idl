@@ -1712,6 +1712,8 @@ interface Instruction {
     boolean IsInverted();
     void SetAwaited(boolean awaited);
     boolean IsAwaited();
+    void SetDisabled(boolean disable);
+    boolean IsDisabled();
     void SetParameter(unsigned long id, [Const] DOMString value);
     [Const, Ref] Expression GetParameter(unsigned long id);
     void SetParametersCount(unsigned long count);

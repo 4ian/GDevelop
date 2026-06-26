@@ -175,7 +175,7 @@ export default function InstructionsList({
         onSubInstructionContextMenu={onInstructionContextMenu}
         onAddSubInstructionContextMenu={onAddInstructionContextMenu}
         onSubParameterClick={onParameterClick}
-        disabled={disabled}
+        disabled={disabled || instruction.isDisabled()}
         renderObjectThumbnail={renderObjectThumbnail}
         screenType={screenType}
         windowSize={windowSize}

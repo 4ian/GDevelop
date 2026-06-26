@@ -1439,6 +1439,8 @@ export class Instruction extends EmscriptenObject {
   isInverted(): boolean;
   setAwaited(awaited: boolean): void;
   isAwaited(): boolean;
+  setDisabled(disable: boolean): void;
+  isDisabled(): boolean;
   setParameter(id: number, value: string): void;
   getParameter(id: number): Expression;
   setParametersCount(count: number): void;

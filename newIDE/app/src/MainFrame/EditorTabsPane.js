@@ -444,7 +444,11 @@ const EditorTabsPane: React.ComponentType<{
 
   const onSetGamesPlatformFrameShown = React.useCallback(
     ({ shown, isMobile }: {| shown: boolean, isMobile: boolean |}) => {
-      onSetPointerEventsNone(shown);
+      // The games platform iframe only needs clicks to pass through the start
+      // page content. Disabling the entire pane is too broad: if the iframe
+      // visibility state gets out of sync, every editor in the pane stops
+      // receiving input.
+      onSetPointerEventsNone(false);
       setTabsTitleBarAndEditorToolbarHidden(shown && isMobile);
     },
     [onSetPointerEventsNone]
@@ -893,7 +897,8 @@ const EditorTabsPane: React.ComponentType<{
                 removePointerEvents={
                   // Deactivate pointer events when the play tab is active, so the iframe
                   // can be interacted with.
-                  gamesPlatformFrameTools.iframeVisible ||
+                  (editorTab.kind === 'start page' &&
+                    gamesPlatformFrameTools.iframeVisible) ||
                   shouldRemovePointerEvents(
                     editorTab.kind,
                     gameEditorMode,

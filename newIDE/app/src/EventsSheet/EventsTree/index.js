@@ -205,6 +205,18 @@ const EventContainer = (props: EventsContainerProps) => {
 
   const _onEventContextMenu = React.useCallback(
     (domEvent: MouseEvent) => {
+      // When right-clicking inside an editable text field (for example when
+      // editing a Comment, a Group name or some JavaScript code), let the
+      // native text editing context menu (cut/copy/paste) be shown instead of
+      // the event context menu. Otherwise both would open at the same time,
+      // which makes the menu flicker and disappear on Windows.
+      const { target } = domEvent;
+      if (
+        target instanceof Element &&
+        target.closest('textarea, input, [contenteditable="true"]')
+      ) {
+        return;
+      }
       domEvent.preventDefault();
       onEventContextMenu(domEvent.clientX, domEvent.clientY);
     },

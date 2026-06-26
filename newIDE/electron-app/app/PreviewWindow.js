@@ -63,11 +63,52 @@ const showWithoutStealingFocus = window => {
   else window.show();
 };
 
+// Detach every still-living child window (preview + debugger) from a parent
+// editor window. On macOS a window kept as a native `parent` child is always
+// stacked above its parent and can keep swallowing input even while occluded or
+// mid-teardown; if such a child dies while still attached (or survives as a
+// zombie), the editor is left unable to receive clicks/keys. Detaching
+// synchronously here — not only from each window's own 'close' listener, which
+// can be skipped on abrupt/ raced destruction — guarantees nothing stays
+// stacked over the editor.
+const detachChildWindowsFromParent = parentWindowId => {
+  if (parentWindowId === null) return;
+
+  const detach = win => {
+    try {
+      if (
+        win &&
+        !win.isDestroyed() &&
+        typeof win.setParentWindow === 'function'
+      ) {
+        win.setParentWindow(null);
+        // A preview can be left always-on-top if a previous focus pass threw
+        // between setAlwaysOnTop(true) and setAlwaysOnTop(false). Clear it so an
+        // invisible/occluded preview can never sit above the editor.
+        if (typeof win.setAlwaysOnTop === 'function') win.setAlwaysOnTop(false);
+      }
+    } catch (error) {
+      console.warn('Ignoring exception when detaching child window:', error);
+    }
+  };
+
+  previewWindows.forEach(entry => {
+    if (entry.parentWindowId === parentWindowId) detach(entry.previewWindow);
+  });
+  detach(debuggerPopOutWindows.get(parentWindowId));
+};
+
 const keepParentWindowVisibleAfterChildClose = (
   parentWindowId,
   parentWasMinimizedBeforeChildClose
 ) => {
-  if (parentWindowId === null || parentWasMinimizedBeforeChildClose) return;
+  if (parentWindowId === null) return;
+
+  // Even if the parent was minimized, make sure no closed child is left
+  // attached/always-on-top over it.
+  detachChildWindowsFromParent(parentWindowId);
+
+  if (parentWasMinimizedBeforeChildClose) return;
 
   const restoreParentWindow = () => {
     const parentWindow = BrowserWindow.fromId(parentWindowId);
@@ -75,7 +116,30 @@ const keepParentWindowVisibleAfterChildClose = (
 
     try {
       if (parentWindow.isMinimized()) parentWindow.restore();
-      showWithoutStealingFocus(parentWindow);
+
+      // Only the editor window remains, so it is safe (and necessary on macOS)
+      // to actually give it key/input focus — showInactive() alone reveals the
+      // window but leaves it non-key, so clicks/keys keep going to a now-dead or
+      // occluded child and the editor feels frozen.
+      const noOtherChildWindowsRemain =
+        !previewWindows.some(
+          entry =>
+            entry.parentWindowId === parentWindowId &&
+            entry.previewWindow &&
+            !entry.previewWindow.isDestroyed()
+        ) &&
+        (() => {
+          const debuggerWindow = debuggerPopOutWindows.get(parentWindowId);
+          return !debuggerWindow || debuggerWindow.isDestroyed();
+        })();
+
+      if (noOtherChildWindowsRemain) {
+        parentWindow.show();
+        if (typeof parentWindow.moveTop === 'function') parentWindow.moveTop();
+        parentWindow.focus();
+      } else {
+        showWithoutStealingFocus(parentWindow);
+      }
     } catch (error) {
       console.warn(
         'Ignoring exception when restoring parent editor window:',
@@ -400,9 +464,17 @@ const focusAllPreviewWindows = () => {
         if (win.isMinimized()) win.restore();
         win.show();
         if (typeof win.moveTop === 'function') win.moveTop();
-        win.setAlwaysOnTop(true);
-        win.focus();
-        win.setAlwaysOnTop(false);
+        // The alwaysOnTop toggle must be balanced even if focus() throws:
+        // otherwise the preview is left permanently always-on-top and, once its
+        // renderer is OS-suspended while occluded, becomes an invisible window
+        // sitting above the editor that swallows all clicks. Reset it in a
+        // finally so true is always paired with false.
+        try {
+          win.setAlwaysOnTop(true);
+          win.focus();
+        } finally {
+          win.setAlwaysOnTop(false);
+        }
       }
     } catch (error) {
       console.warn('Ignoring exception when focusing preview window:', error);

@@ -565,6 +565,12 @@ export default class PrefabDetailEditor extends React.Component<Props, State> {
     );
   };
 
+  _notifyObjectPropertiesUpdated = () => {
+    if (this.props.onObjectEdited) {
+      this.props.onObjectEdited();
+    }
+  };
+
   _onObjectPropertyRenamed = (
     eventsBasedObject: gdEventsBasedObject,
     oldName: string,
@@ -577,6 +583,7 @@ export default class PrefabDetailEditor extends React.Component<Props, State> {
       oldName,
       newName
     );
+    this._notifyObjectPropertiesUpdated();
     const { selectedPrefabProperty } = this.state;
     if (
       selectedPrefabProperty &&
@@ -1171,6 +1178,7 @@ export default class PrefabDetailEditor extends React.Component<Props, State> {
                       );
                     }}
                     onPropertiesUpdated={() => {
+                      this._notifyObjectPropertiesUpdated();
                       if (this.eventsBasedObjectEditor) {
                         this.eventsBasedObjectEditor.forceUpdateProperties();
                       }
@@ -1536,6 +1544,7 @@ export default class PrefabDetailEditor extends React.Component<Props, State> {
                           );
                         }}
                         onPropertiesUpdated={() => {
+                          this._notifyObjectPropertiesUpdated();
                           if (this.eventsBasedObjectEditor) {
                             this.eventsBasedObjectEditor.forceUpdateProperties();
                           }
@@ -1576,6 +1585,7 @@ export default class PrefabDetailEditor extends React.Component<Props, State> {
                             );
                           }}
                           onPropertiesUpdated={() => {
+                            this._notifyObjectPropertiesUpdated();
                             if (this.eventsBasedObjectEditor) {
                               this.eventsBasedObjectEditor.forceUpdateProperties();
                             }
@@ -1594,6 +1604,7 @@ export default class PrefabDetailEditor extends React.Component<Props, State> {
                               eventsBasedObject,
                               propertyName
                             );
+                            this._notifyObjectPropertiesUpdated();
                           }}
                           onEventsFunctionsAdded={() => {
                             if (this.eventsFunctionList) {

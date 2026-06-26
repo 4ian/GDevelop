@@ -1353,6 +1353,18 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     );
   };
 
+  _notifyBehaviorPropertiesUpdated = () => {
+    if (this.props.onBehaviorEdited) {
+      this.props.onBehaviorEdited();
+    }
+  };
+
+  _notifyObjectPropertiesUpdated = () => {
+    if (this.props.onObjectEdited) {
+      this.props.onObjectEdited();
+    }
+  };
+
   _onBehaviorPropertyRenamed = (
     eventsBasedBehavior: gdEventsBasedBehavior,
     oldName: string,
@@ -1366,6 +1378,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       oldName,
       newName
     );
+    this._notifyBehaviorPropertiesUpdated();
   };
 
   _onBehaviorSharedPropertyRenamed = (
@@ -1381,6 +1394,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       oldName,
       newName
     );
+    this._notifyBehaviorPropertiesUpdated();
   };
 
   _onObjectPropertyRenamed = (
@@ -1396,6 +1410,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       oldName,
       newName
     );
+    this._notifyObjectPropertiesUpdated();
   };
 
   _onFunctionParameterWillBeRenamed = (
@@ -1890,6 +1905,11 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                       }
                     }}
                     onPropertiesUpdated={() => {
+                      if (selectedEventsBasedBehavior) {
+                        this._notifyBehaviorPropertiesUpdated();
+                      } else if (selectedEventsBasedObject) {
+                        this._notifyObjectPropertiesUpdated();
+                      }
                       const eventsBasedEntityEditor =
                         this.eventsBasedBehaviorEditor ||
                         this.eventsBasedObjectEditor;
@@ -2050,8 +2070,10 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                   selectedEventsBasedBehavior,
                   propertyName
                 );
+                this._notifyBehaviorPropertiesUpdated();
               }}
               onPropertiesUpdated={() => {
+                this._notifyBehaviorPropertiesUpdated();
                 if (this.propertyListEditor) {
                   this.propertyListEditor.forceUpdateList();
                 }
@@ -2101,8 +2123,10 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                   selectedEventsBasedObject,
                   propertyName
                 );
+                this._notifyObjectPropertiesUpdated();
               }}
               onPropertiesUpdated={() => {
+                this._notifyObjectPropertiesUpdated();
                 if (this.propertyListEditor) {
                   this.propertyListEditor.forceUpdateList();
                 }
@@ -2464,6 +2488,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                           );
                         }}
                         onPropertiesUpdated={() => {
+                          this._notifyBehaviorPropertiesUpdated();
                           if (this.eventsBasedBehaviorEditor) {
                             this.eventsBasedBehaviorEditor.forceUpdateProperties();
                           }
@@ -2519,6 +2544,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                             }
                           }}
                           onPropertiesUpdated={() => {
+                            this._notifyBehaviorPropertiesUpdated();
                             if (this.eventsBasedBehaviorEditor) {
                               this.eventsBasedBehaviorEditor.forceUpdateProperties();
                             }
@@ -2540,6 +2566,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                               focusedEventsBasedBehavior,
                               propertyName
                             );
+                            this._notifyBehaviorPropertiesUpdated();
                           }}
                           onEventsFunctionsAdded={() => {
                             if (this.eventsFunctionList) {

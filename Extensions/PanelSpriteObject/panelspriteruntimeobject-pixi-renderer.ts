@@ -16,7 +16,6 @@ namespace gdjs {
     _wasRendered: boolean = false;
     _textureWidth = 0;
     _textureHeight = 0;
-    _cachedWorldAlpha = 255;
 
     constructor(
       runtimeObject: gdjs.PanelSpriteRuntimeObject,
@@ -83,19 +82,19 @@ namespace gdjs {
           this._centerSprite.texture.baseTexture.scaleMode !==
           PIXI.SCALE_MODES.NEAREST
         ) {
-          // This allows to detect opacity changes of a parent custom object.
-          if (this._cachedWorldAlpha !== this._spritesContainer.worldAlpha) {
-            // When the opacity is updated, the cache must be invalidated, otherwise
-            // there is a risk of the panel sprite has been cached previously with a
-            // different opacity (and cannot be updated anymore).
-            this._spritesContainer.cacheAsBitmap = false;
-          }
           // Cache the rendered sprites as a bitmap to speed up rendering when
-          // lots of panel sprites are on the scene.
-          // Sadly, because of this, we need a wrapper container to workaround
-          // a PixiJS issue with alpha (see updateOpacity).
-          this._spritesContainer.cacheAsBitmap = true;
-          this._cachedWorldAlpha = this._spritesContainer.worldAlpha;
+          // lots of panel sprites are on the scene, but only when the object is
+          // fully opaque.
+          // Because of a PixiJS v7 bug, `cacheAsBitmap` bakes the inherited
+          // `worldAlpha` into the cached texture, which is then multiplied again
+          // by the wrapper's alpha (see updateOpacity). A semi-transparent panel
+          // sprite would then render about twice as transparent as it should
+          // (and inconsistently with Sprite and Tiled Sprite). When there is any
+          // transparency, render the sprites directly so the opacity is applied
+          // exactly once, on the wrapper.
+          // See https://github.com/pixijs/pixijs/issues/10757
+          const isFullyOpaque = this._spritesContainer.worldAlpha >= 1;
+          this._spritesContainer.cacheAsBitmap = isFullyOpaque;
         }
       }
       this._wasRendered = true;

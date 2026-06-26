@@ -6,7 +6,8 @@ import {
   type InstancesOutsideEditorChanges,
   type ObjectsOutsideEditorChanges,
   type ObjectGroupsOutsideEditorChanges,
-} from '../MainFrame/EditorContainers/BaseEditor';
+  type ProjectItemRenamedOutsideEditorChanges,
+} from '../EditorFunctions/OutsideEditorChanges';
 import {
   getAiRequest,
   getAiRequestSuggestions,
@@ -222,6 +223,7 @@ export const useProcessFunctionCalls = ({
   onInstancesModifiedOutsideEditor,
   onObjectsModifiedOutsideEditor,
   onObjectGroupsModifiedOutsideEditor,
+  onProjectItemRenamedOutsideEditor,
   onWillInstallExtension,
   onExtensionInstalled,
   isReadyToProcessFunctionCalls,
@@ -258,6 +260,9 @@ export const useProcessFunctionCalls = ({
   ) => void,
   onObjectGroupsModifiedOutsideEditor: (
     changes: ObjectGroupsOutsideEditorChanges
+  ) => void,
+  onProjectItemRenamedOutsideEditor: (
+    changes: ProjectItemRenamedOutsideEditorChanges
   ) => void,
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
@@ -550,6 +555,9 @@ export const useProcessFunctionCalls = ({
           onObjectGroupsModifiedOutsideEditor: changes => {
             accumulatedObjectGroupsScenes.add(changes.scene);
           },
+          // Not coalesced: the tab rename must track the model rename, else the
+          // open scene editor briefly looks up a now-missing layout name.
+          onProjectItemRenamedOutsideEditor,
           ensureExtensionInstalled,
           onWillInstallExtension,
           onExtensionInstalled,
@@ -600,6 +608,7 @@ export const useProcessFunctionCalls = ({
       onInstancesModifiedOutsideEditor,
       onObjectsModifiedOutsideEditor,
       onObjectGroupsModifiedOutsideEditor,
+      onProjectItemRenamedOutsideEditor,
       ensureExtensionInstalled,
       onWillInstallExtension,
       onExtensionInstalled,

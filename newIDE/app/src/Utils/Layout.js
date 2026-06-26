@@ -86,3 +86,17 @@ export const getInstanceCountInLayoutForObject = (
   return getInstancesInLayoutForObject(initialInstancesContainer, objectName)
     .length;
 };
+
+// `newName` is used as-is: ensure it is unique (e.g. via `newNameGenerator`).
+export const renameLayoutInProject = (
+  project: gdProject,
+  oldName: string,
+  newName: string
+): void => {
+  const wasFirstScene = project.getFirstLayout() === oldName;
+  project.getLayout(oldName).setName(newName);
+  gd.WholeProjectRefactorer.renameLayout(project, oldName, newName);
+  if (wasFirstScene) {
+    project.setFirstLayout(newName);
+  }
+};

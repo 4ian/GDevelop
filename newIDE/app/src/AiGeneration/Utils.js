@@ -488,7 +488,6 @@ export const useProcessFunctionCalls = ({
       const accumulatedInstancesScenes: Set<gdLayout> = new Set();
       const accumulatedObjectsChanges: Map<gdLayout, boolean> = new Map();
       const accumulatedObjectGroupsScenes: Set<gdLayout> = new Set();
-      const accumulatedProjectItemRenames: Array<ProjectItemRenamedOutsideEditorChanges> = [];
       const flushAccumulatedOutsideEditorChanges = () => {
         accumulatedSceneEventsChanges.forEach((eventIds, scene) =>
           onSceneEventsModifiedOutsideEditor({
@@ -504,9 +503,6 @@ export const useProcessFunctionCalls = ({
         );
         accumulatedObjectGroupsScenes.forEach(scene =>
           onObjectGroupsModifiedOutsideEditor({ scene })
-        );
-        accumulatedProjectItemRenames.forEach(changes =>
-          onProjectItemRenamedOutsideEditor(changes)
         );
       };
 
@@ -559,9 +555,9 @@ export const useProcessFunctionCalls = ({
           onObjectGroupsModifiedOutsideEditor: changes => {
             accumulatedObjectGroupsScenes.add(changes.scene);
           },
-          onProjectItemRenamedOutsideEditor: changes => {
-            accumulatedProjectItemRenames.push(changes);
-          },
+          // Not coalesced: the tab rename must track the model rename, else the
+          // open scene editor briefly looks up a now-missing layout name.
+          onProjectItemRenamedOutsideEditor,
           ensureExtensionInstalled,
           onWillInstallExtension,
           onExtensionInstalled,

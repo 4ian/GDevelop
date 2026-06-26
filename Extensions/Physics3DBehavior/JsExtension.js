@@ -3698,6 +3698,12 @@ module.exports = {
         'gravityY',
         '456'
       ),
+      // Revert back
+      gd.ProjectHelper.sanityCheckBehaviorsSharedDataProperty(
+        sharedData,
+        'gravityY',
+        '0'
+      ),
     ];
   },
 };

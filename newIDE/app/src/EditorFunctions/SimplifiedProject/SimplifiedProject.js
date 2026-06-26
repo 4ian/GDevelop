@@ -242,7 +242,7 @@ export const makeSimplifiedProjectBuilder = (
         .getBehaviorsOfObject(objectGroup.getName(), true)
         .toJSArray();
 
-      const variablesContainer = gd.ObjectVariableHelper.mergeVariableContainers(
+      const variablesContainer = gd.ObjectRefactorer.mergeVariableContainers(
         objectsContainersList,
         objectGroup
       );

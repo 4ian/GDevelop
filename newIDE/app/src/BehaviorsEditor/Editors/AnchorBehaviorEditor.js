@@ -44,9 +44,9 @@ type AdvancedAnchor =
   | 'None';
 
 const getAnchorProperty = (
-  getPropertyValue: (propertyName: string) => string,
+  getPropertyValue: (propertyName: string) => string | null,
   name: string
-): AdvancedAnchor => {
+): AdvancedAnchor | null => {
   const anchor = getPropertyValue(name);
   if (anchor === 'WindowLeft' || anchor === 'WindowTop') {
     return 'MinEdge';
@@ -62,8 +62,8 @@ const getAnchorProperty = (
 };
 
 const getBasicAnchor = (
-  minEdgeAnchor: AdvancedAnchor,
-  maxEdgeAnchor: AdvancedAnchor
+  minEdgeAnchor: AdvancedAnchor | null,
+  maxEdgeAnchor: AdvancedAnchor | null
 ): BasicAnchor => {
   if (minEdgeAnchor === 'Proportional' && maxEdgeAnchor === 'Proportional') {
     return 'ProportionalFill';
@@ -95,7 +95,7 @@ const getBasicAnchor = (
 };
 
 export const getBasicHorizontalAnchor = (
-  getPropertyValue: (propertyName: string) => string
+  getPropertyValue: (propertyName: string) => string | null
 ): BasicAnchor =>
   getBasicAnchor(
     getAnchorProperty(getPropertyValue, 'leftEdgeAnchor'),
@@ -103,7 +103,7 @@ export const getBasicHorizontalAnchor = (
   );
 
 export const getBasicVerticalAnchor = (
-  getPropertyValue: (propertyName: string) => string
+  getPropertyValue: (propertyName: string) => string | null
 ): BasicAnchor =>
   getBasicAnchor(
     getAnchorProperty(getPropertyValue, 'topEdgeAnchor'),
@@ -297,13 +297,14 @@ type Props = BehaviorEditorProps;
 
 const AnchorBehaviorEditor = ({
   project,
-  behavior,
+  behaviors,
   object,
   layersContainer,
   onBehaviorUpdated,
   resourceManagementProps,
   projectScopedContainersAccessor,
 }: Props): React.Node => {
+  const behavior = behaviors[0];
   const forceUpdate = useForceUpdate();
   const _getPropertyValue = React.useCallback(
     (propertyName: string) => getPropertyValue(behavior, propertyName, null),
@@ -351,7 +352,7 @@ const AnchorBehaviorEditor = ({
       <BehaviorPropertiesEditor
         project={project}
         object={object}
-        behavior={behavior}
+        behaviors={behaviors}
         layersContainer={layersContainer}
         onBehaviorUpdated={_onBehaviorUpdated}
         resourceManagementProps={resourceManagementProps}

@@ -34,8 +34,11 @@ import { useForceRecompute } from '../../Utils/UseForceUpdate';
 import { makeSchema } from './CompactScenePropertiesSchema';
 import EmptyMessage from '../../UI/EmptyMessage';
 import useVariablesContainerRefactoring from '../../VariablesList/useVariablesContainerRefactoring';
+import propertiesMapToSchema from '../../PropertiesEditor/PropertiesMapToSchema';
 
 const gd: libGDevelop = global.gd;
+
+const noop = () => {};
 
 export const styles = {
   icon: {
@@ -217,35 +220,49 @@ export const CompactScenePropertiesEditor = ({
                       behaviorTypeName
                     );
                     const iconUrl = behaviorMetadata.getIconFilename();
+
+                    const isEmpty =
+                      propertiesMapToSchema({
+                        properties: behaviorSharedData.getProperties(),
+                        defaultValueProperties: behaviorMetadata
+                          ? behaviorMetadata.getSharedProperties()
+                          : null,
+                        getPropertyValue: () => '',
+                        onUpdateProperty: noop,
+                        layersContainer: null,
+                        shouldDisabledFieldsWithMixedValues: false,
+                      }).length === 0;
                     return (
-                      <CollapsibleSubPanel
-                        key={behaviorSharedData.ptr}
-                        renderContent={() => (
-                          <CompactBehaviorSharedDataPropertiesEditor
-                            project={project}
-                            behaviorMetadata={behaviorMetadata}
-                            behaviorSharedData={behaviorSharedData}
-                            resourceManagementProps={resourceManagementProps}
-                          />
-                        )}
-                        isFolded={behaviorSharedData.isFolded()}
-                        toggleFolded={() => {
-                          behaviorSharedData.setFolded(
-                            !behaviorSharedData.isFolded()
-                          );
-                          forceUpdate();
-                        }}
-                        titleIcon={
-                          iconUrl ? (
-                            <IconContainer
-                              src={iconUrl}
-                              alt={behaviorMetadata.getFullName()}
-                              size={16}
+                      !isEmpty && (
+                        <CollapsibleSubPanel
+                          key={behaviorSharedData.ptr}
+                          renderContent={() => (
+                            <CompactBehaviorSharedDataPropertiesEditor
+                              project={project}
+                              behaviorMetadata={behaviorMetadata}
+                              behaviorSharedData={behaviorSharedData}
+                              resourceManagementProps={resourceManagementProps}
                             />
-                          ) : null
-                        }
-                        title={behaviorSharedData.getName()}
-                      />
+                          )}
+                          isFolded={behaviorSharedData.isFolded()}
+                          toggleFolded={() => {
+                            behaviorSharedData.setFolded(
+                              !behaviorSharedData.isFolded()
+                            );
+                            forceUpdate();
+                          }}
+                          titleIcon={
+                            iconUrl ? (
+                              <IconContainer
+                                src={iconUrl}
+                                alt={behaviorMetadata.getFullName()}
+                                size={16}
+                              />
+                            ) : null
+                          }
+                          title={behaviorSharedData.getName()}
+                        />
+                      )
                     );
                   })}
                 </ColumnStackLayout>

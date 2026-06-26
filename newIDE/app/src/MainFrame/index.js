@@ -227,7 +227,10 @@ import { QuickCustomizationDialog } from '../QuickCustomization/QuickCustomizati
 import { type ObjectWithContext } from '../ObjectsList/EnumerateObjects';
 import useGamesList from '../GameDashboard/UseGamesList';
 import useCapturesManager from './UseCapturesManager';
-import { readProjectSettings } from '../Utils/ProjectSettingsReader';
+import {
+  readProjectSettings,
+  type ResourceCustomPropertyConfig,
+} from '../Utils/ProjectSettingsReader';
 import useNpmScriptRunner from './NpmScriptRunner/useNpmScriptRunner';
 import { applyProjectPreferences } from '../Utils/ApplyProjectPreferences';
 import {
@@ -421,6 +424,10 @@ const MainFrame = (props: Props): React.MixedElement => {
       toolbarButtons: [],
     }: State)
   );
+  const [
+    resourceCustomPropertyConfigs,
+    setResourceCustomPropertyConfigs,
+  ] = React.useState<Array<ResourceCustomPropertyConfig>>([]);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const [
     cloudProjectFileMetadataToRecover,
@@ -1143,6 +1150,7 @@ const MainFrame = (props: Props): React.MixedElement => {
         editorTabs: closeProjectTabs(state.editorTabs, currentProject),
         toolbarButtons: [],
       }));
+      setResourceCustomPropertyConfigs([]);
 
       // Delete the project from memory. All references to it have been dropped previously
       // by the setState.
@@ -1265,6 +1273,9 @@ const MainFrame = (props: Props): React.MixedElement => {
               ...currentState,
               toolbarButtons: parsedProjectSettings.toolbarButtons || [],
             }));
+            setResourceCustomPropertyConfigs(
+              parsedProjectSettings.resourceCustomProperties || []
+            );
           }
         } catch (error) {
           console.warn(
@@ -5185,6 +5196,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       canInstallPrivateAsset,
       onNewResourcesAdded,
       onResourceUsageChanged,
+      resourceCustomPropertyConfigs,
     }),
     [
       resourceSources,
@@ -5196,6 +5208,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       canInstallPrivateAsset,
       onNewResourcesAdded,
       onResourceUsageChanged,
+      resourceCustomPropertyConfigs,
     ]
   );
 

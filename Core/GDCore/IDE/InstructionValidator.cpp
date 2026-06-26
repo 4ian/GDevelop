@@ -69,7 +69,8 @@ ParameterValidationResult InstructionValidator::ValidateParameter(
         *instruction.GetParameter(parameterIndex).GetRootNode();
     ExpressionValidator expressionValidator(platform, projectScopedContainers,
                                             parameterType,
-                                            parameterMetadata.GetExtraInfo());
+                                            parameterMetadata.GetExtraInfo(),
+                                            parameterMetadata.GetDescription());
     expressionNode.Visit(expressionValidator);
 
     if (!expressionValidator.GetAllErrors().empty()) {

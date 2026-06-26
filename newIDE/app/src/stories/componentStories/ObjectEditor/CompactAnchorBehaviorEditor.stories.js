@@ -34,8 +34,6 @@ export const Default = (): React.Node => {
         behaviors={[anchorBehavior]}
         object={spriteObjectWithBehaviors}
         behaviorMetadata={behaviorMetadata}
-        behaviorOverriding={null}
-        initialInstance={null}
         onOpenFullEditor={action('onOpenFullEditor')}
         onBehaviorUpdated={action('onBehaviorUpdated')}
         resourceManagementProps={fakeResourceManagementProps}

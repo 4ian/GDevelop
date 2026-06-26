@@ -1,7 +1,11 @@
 // @flow
 import * as React from 'react';
-import { type CompactBehaviorPropertiesEditorProps } from './CompactBehaviorPropertiesEditorProps.flow';
-import { CompactBehaviorPropertiesEditor } from './CompactBehaviorPropertiesEditor';
+import { type CompactInstanceBehaviorPropertiesEditorProps } from './CompactInstanceBehaviorPropertiesEditorProps.flow';
+import {
+  CompactInstanceBehaviorPropertiesEditor,
+  getPropertyValue,
+  updateProperty,
+} from './CompactInstanceBehaviorPropertiesEditor';
 import useForceUpdate from '../../Utils/UseForceUpdate';
 import { ColumnStackLayout } from '../../UI/Layout';
 import {
@@ -11,24 +15,20 @@ import {
   getBasicVerticalAnchor,
 } from '../../BehaviorsEditor/Editors/AnchorBehaviorEditor';
 
-const CompactAnchorBehaviorEditor = ({
+const CompactInstanceAnchorBehaviorEditor = ({
   project,
-  behaviors,
   object,
   layersContainer,
   behaviorMetadata,
-  onOpenFullEditor,
+  instancesAndBehaviors,
   onBehaviorUpdated,
   resourceManagementProps,
-}: CompactBehaviorPropertiesEditorProps): React.Node => {
+}: CompactInstanceBehaviorPropertiesEditorProps): React.Node => {
   const forceUpdate = useForceUpdate();
   const _getPropertyValue = (propertyName: string) => {
     let commonValue = null;
-    for (const behavior of behaviors) {
-      const value = behavior
-        .getProperties()
-        .get(propertyName)
-        .getValue();
+    for (const { initialInstance, behavior } of instancesAndBehaviors) {
+      const value = getPropertyValue(behavior, propertyName, initialInstance);
       if (commonValue === null) {
         commonValue = value;
       }
@@ -39,8 +39,8 @@ const CompactAnchorBehaviorEditor = ({
     return commonValue;
   };
   const _updateProperty = (propertyName: string, value: string) => {
-    for (const behavior of behaviors) {
-      behavior.updateProperty(propertyName, value);
+    for (const { initialInstance, behavior } of instancesAndBehaviors) {
+      updateProperty(project, behavior, propertyName, value, initialInstance);
     }
     forceUpdate();
     onBehaviorUpdated();
@@ -68,13 +68,12 @@ const CompactAnchorBehaviorEditor = ({
         expand
         onUpdateProperty={_updateProperty}
       />
-      <CompactBehaviorPropertiesEditor
+      <CompactInstanceBehaviorPropertiesEditor
         project={project}
         object={object}
         layersContainer={layersContainer}
-        behaviors={behaviors}
         behaviorMetadata={behaviorMetadata}
-        onOpenFullEditor={onOpenFullEditor}
+        instancesAndBehaviors={instancesAndBehaviors}
         onBehaviorUpdated={_onBehaviorUpdated}
         resourceManagementProps={resourceManagementProps}
         isAdvancedSectionInitiallyUncollapsed={
@@ -87,4 +86,4 @@ const CompactAnchorBehaviorEditor = ({
   );
 };
 
-export default CompactAnchorBehaviorEditor;
+export default CompactInstanceAnchorBehaviorEditor;

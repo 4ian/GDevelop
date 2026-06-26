@@ -4,13 +4,15 @@ import { type ResourceManagementProps } from '../../ResourcesList/ResourceSource
 /**
  * The props given to any behavior editor
  */
-export type CompactBehaviorPropertiesEditorProps = {|
+export type CompactInstanceBehaviorPropertiesEditorProps = {|
   project: gdProject,
   behaviorMetadata: gdBehaviorMetadata,
-  behaviors: Array<gdBehavior>,
   object: gdObject | null,
   layersContainer: gdLayersContainer,
-  onOpenFullEditor?: () => void,
+  instancesAndBehaviors: Array<{
+    initialInstance: gdInitialInstance,
+    behavior: gdBehavior,
+  }>,
   onBehaviorUpdated: () => void,
   resourceManagementProps: ResourceManagementProps,
   isAdvancedSectionInitiallyUncollapsed?: boolean,

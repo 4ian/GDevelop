@@ -19,10 +19,6 @@ import useForceUpdate from '../../Utils/UseForceUpdate';
 import { ColumnStackLayout } from '../../UI/Layout';
 import { Line } from '../../UI/Grid';
 import Text from '../../UI/Text';
-import {
-  getPropertyValue,
-  updateProperty,
-} from '../../ObjectEditor/CompactObjectPropertiesEditor/CompactBehaviorPropertiesEditor';
 import CompactToggleButtons, {
   type CompactToggleButton,
 } from '../../UI/CompactToggleButtons';
@@ -307,16 +303,20 @@ const AnchorBehaviorEditor = ({
   const behavior = behaviors[0];
   const forceUpdate = useForceUpdate();
   const _getPropertyValue = React.useCallback(
-    (propertyName: string) => getPropertyValue(behavior, propertyName, null),
+    (propertyName: string) =>
+      behavior
+        .getProperties()
+        .get(propertyName)
+        .getValue(),
     [behavior]
   );
   const _updateProperty = React.useCallback(
     (propertyName: string, value: string) => {
-      updateProperty(project, behavior, propertyName, value, null);
+      behavior.updateProperty(propertyName, value);
       forceUpdate();
       onBehaviorUpdated();
     },
-    [behavior, forceUpdate, onBehaviorUpdated, project]
+    [behavior, forceUpdate, onBehaviorUpdated]
   );
   const _onBehaviorUpdated = React.useCallback(
     () => {

@@ -42,7 +42,7 @@ import Window from '../../Utils/Window';
 import { type ResourceManagementProps } from '../../ResourcesList/ResourceSource';
 import { usePersistedScrollPosition } from '../../Utils/UsePersistedScrollPosition';
 import EmptyMessage from '../../UI/EmptyMessage';
-import CompactInstanceBehaviorsEditorService from '../../ObjectEditor/CompactObjectPropertiesEditor/CompactInstanceBehaviorsEditorService';
+import CompactInstanceBehaviorsEditorService from './CompactInstanceBehaviorsEditorService';
 import { exceptionallyGuardAgainstDeadObject } from '../../Utils/IsNullPtr';
 import { getAllVisibleBehaviorNames } from '../../Utils/Behavior';
 

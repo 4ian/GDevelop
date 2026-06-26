@@ -29,7 +29,7 @@ import {
   type InstancesOutsideEditorChanges,
   type ObjectsOutsideEditorChanges,
   type ObjectGroupsOutsideEditorChanges,
-  type SceneRenamedOutsideEditorChanges,
+  type ProjectItemRenamedOutsideEditorChanges,
 } from '../EditorFunctions/OutsideEditorChanges';
 import { type NavigateToEventFromGlobalSearchParams } from '../Utils/Search';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
@@ -285,8 +285,8 @@ export type EditorTabsPaneCommonProps = {|
   onObjectGroupsModifiedOutsideEditor: (
     changes: ObjectGroupsOutsideEditorChanges
   ) => void,
-  onSceneRenamedOutsideEditor: (
-    changes: SceneRenamedOutsideEditorChanges
+  onProjectItemRenamedOutsideEditor: (
+    changes: ProjectItemRenamedOutsideEditorChanges
   ) => void,
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
@@ -404,7 +404,7 @@ const EditorTabsPane: React.ComponentType<{
     onInstancesModifiedOutsideEditor,
     onObjectsModifiedOutsideEditor,
     onObjectGroupsModifiedOutsideEditor,
-    onSceneRenamedOutsideEditor,
+    onProjectItemRenamedOutsideEditor,
     onWillInstallExtension,
     onExtensionInstalled,
     onEffectAdded,
@@ -870,7 +870,7 @@ const EditorTabsPane: React.ComponentType<{
                     onInstancesModifiedOutsideEditor: onInstancesModifiedOutsideEditor,
                     onObjectsModifiedOutsideEditor: onObjectsModifiedOutsideEditor,
                     onObjectGroupsModifiedOutsideEditor: onObjectGroupsModifiedOutsideEditor,
-                    onSceneRenamedOutsideEditor: onSceneRenamedOutsideEditor,
+                    onProjectItemRenamedOutsideEditor: onProjectItemRenamedOutsideEditor,
                     onWillInstallExtension: onWillInstallExtension,
                     onExtensionInstalled: onExtensionInstalled,
                     onEffectAdded: onEffectAdded,

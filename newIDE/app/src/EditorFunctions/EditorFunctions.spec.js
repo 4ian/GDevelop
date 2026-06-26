@@ -37,7 +37,7 @@ describe('editorFunctions', () => {
     onInstancesModifiedOutsideEditor: jest.fn(),
     onObjectGroupsModifiedOutsideEditor: jest.fn(),
     onSceneEventsModifiedOutsideEditor: jest.fn(),
-    onSceneRenamedOutsideEditor: jest.fn(),
+    onProjectItemRenamedOutsideEditor: jest.fn(),
     toolOptions: {
       includeEventsJson: true,
     },
@@ -2524,13 +2524,13 @@ describe('editorFunctions', () => {
     });
 
     it('renames the scene when setting the "name" property', async () => {
-      const onSceneRenamedOutsideEditor: JestMockFn<any, any> = jest.fn();
+      const onProjectItemRenamedOutsideEditor: JestMockFn<any, any> = jest.fn();
       const wasFirstScene = project.getFirstLayout() === 'TestScene';
 
       const result = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
         {
           ...makeFakeLaunchFunctionOptionsWithProject(project),
-          onSceneRenamedOutsideEditor,
+          onProjectItemRenamedOutsideEditor,
           args: {
             scene_name: 'TestScene',
             changed_properties: [
@@ -2555,19 +2555,20 @@ describe('editorFunctions', () => {
       }
 
       // The editor is notified so open tabs can be kept and updated.
-      expect(onSceneRenamedOutsideEditor).toHaveBeenCalledWith({
+      expect(onProjectItemRenamedOutsideEditor).toHaveBeenCalledWith({
+        kind: 'scene',
         oldName: 'TestScene',
         newName: 'GameScene',
       });
     });
 
     it('does nothing when renaming a scene to its current name', async () => {
-      const onSceneRenamedOutsideEditor: JestMockFn<any, any> = jest.fn();
+      const onProjectItemRenamedOutsideEditor: JestMockFn<any, any> = jest.fn();
 
       const result = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
         {
           ...makeFakeLaunchFunctionOptionsWithProject(project),
-          onSceneRenamedOutsideEditor,
+          onProjectItemRenamedOutsideEditor,
           args: {
             scene_name: 'TestScene',
             changed_properties: [
@@ -2580,7 +2581,7 @@ describe('editorFunctions', () => {
       expect(result.success).toBe(true);
       expect(result.message).toContain('Scene already named "TestScene".');
       expect(project.hasLayoutNamed('TestScene')).toBe(true);
-      expect(onSceneRenamedOutsideEditor).not.toHaveBeenCalled();
+      expect(onProjectItemRenamedOutsideEditor).not.toHaveBeenCalled();
     });
   });
 

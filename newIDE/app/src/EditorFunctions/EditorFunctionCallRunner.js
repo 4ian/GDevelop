@@ -23,7 +23,7 @@ import {
   type InstancesOutsideEditorChanges,
   type ObjectsOutsideEditorChanges,
   type ObjectGroupsOutsideEditorChanges,
-  type SceneRenamedOutsideEditorChanges,
+  type ProjectItemRenamedOutsideEditorChanges,
 } from './OutsideEditorChanges';
 import PixiResourcesLoader from '../ObjectsRendering/PixiResourcesLoader';
 import { type EnsureExtensionInstalledOptions } from '../AiGeneration/UseEnsureExtensionInstalled';
@@ -51,8 +51,8 @@ type ProcessEditorFunctionCallsOptions = {|
   onObjectGroupsModifiedOutsideEditor: (
     changes: ObjectGroupsOutsideEditorChanges
   ) => void,
-  onSceneRenamedOutsideEditor: (
-    changes: SceneRenamedOutsideEditorChanges
+  onProjectItemRenamedOutsideEditor: (
+    changes: ProjectItemRenamedOutsideEditorChanges
   ) => void,
   ensureExtensionInstalled: (
     options: EnsureExtensionInstalledOptions
@@ -79,7 +79,7 @@ export const processEditorFunctionCalls = async ({
   onInstancesModifiedOutsideEditor,
   onObjectsModifiedOutsideEditor,
   onObjectGroupsModifiedOutsideEditor,
-  onSceneRenamedOutsideEditor,
+  onProjectItemRenamedOutsideEditor,
   relatedAiRequestId,
   getRelatedAiRequestLastMessages,
   ensureExtensionInstalled,
@@ -194,7 +194,7 @@ export const processEditorFunctionCalls = async ({
         onInstancesModifiedOutsideEditor,
         onObjectsModifiedOutsideEditor,
         onObjectGroupsModifiedOutsideEditor,
-        onSceneRenamedOutsideEditor,
+        onProjectItemRenamedOutsideEditor,
         ensureExtensionInstalled,
         onWillInstallExtension,
         onExtensionInstalled,

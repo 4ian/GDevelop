@@ -10,7 +10,7 @@ import {
   type InstancesOutsideEditorChanges,
   type ObjectsOutsideEditorChanges,
   type ObjectGroupsOutsideEditorChanges,
-  type SceneRenamedOutsideEditorChanges,
+  type ProjectItemRenamedOutsideEditorChanges,
 } from '../EditorFunctions/OutsideEditorChanges';
 import { type ObjectWithContext } from '../ObjectsList/EnumerateObjects';
 import Paper from '../UI/Paper';
@@ -153,8 +153,8 @@ type Props = {|
   onObjectGroupsModifiedOutsideEditor: (
     changes: ObjectGroupsOutsideEditorChanges
   ) => void,
-  onSceneRenamedOutsideEditor: (
-    changes: SceneRenamedOutsideEditorChanges
+  onProjectItemRenamedOutsideEditor: (
+    changes: ProjectItemRenamedOutsideEditorChanges
   ) => void,
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
@@ -254,7 +254,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
         onInstancesModifiedOutsideEditor,
         onObjectsModifiedOutsideEditor,
         onObjectGroupsModifiedOutsideEditor,
-        onSceneRenamedOutsideEditor,
+        onProjectItemRenamedOutsideEditor,
         onWillInstallExtension,
         onExtensionInstalled,
         onOpenAskAi,
@@ -921,7 +921,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
         onInstancesModifiedOutsideEditor,
         onObjectsModifiedOutsideEditor,
         onObjectGroupsModifiedOutsideEditor,
-        onSceneRenamedOutsideEditor,
+        onProjectItemRenamedOutsideEditor,
         i18n,
         onWillInstallExtension,
         onExtensionInstalled,
@@ -1633,7 +1633,9 @@ export const renderAskAiEditorContainer = (
         onObjectGroupsModifiedOutsideEditor={
           props.onObjectGroupsModifiedOutsideEditor
         }
-        onSceneRenamedOutsideEditor={props.onSceneRenamedOutsideEditor}
+        onProjectItemRenamedOutsideEditor={
+          props.onProjectItemRenamedOutsideEditor
+        }
         onWillInstallExtension={props.onWillInstallExtension}
         onExtensionInstalled={props.onExtensionInstalled}
         onOpenAskAi={props.onOpenAskAi}

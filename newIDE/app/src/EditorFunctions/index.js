@@ -45,7 +45,7 @@ import type {
   InstancesOutsideEditorChanges,
   ObjectsOutsideEditorChanges,
   ObjectGroupsOutsideEditorChanges,
-  SceneRenamedOutsideEditorChanges,
+  ProjectItemRenamedOutsideEditorChanges,
 } from './OutsideEditorChanges';
 import { type AssetShortHeader } from '../Utils/GDevelopServices/Asset';
 import { type ExampleShortHeader } from '../Utils/GDevelopServices/Example';
@@ -280,8 +280,8 @@ type LaunchFunctionOptionsWithoutProject = {|
   onObjectGroupsModifiedOutsideEditor: (
     changes: ObjectGroupsOutsideEditorChanges
   ) => void,
-  onSceneRenamedOutsideEditor: (
-    changes: SceneRenamedOutsideEditorChanges
+  onProjectItemRenamedOutsideEditor: (
+    changes: ProjectItemRenamedOutsideEditorChanges
   ) => void,
   ensureExtensionInstalled: (
     options: EnsureExtensionInstalledOptions
@@ -5030,7 +5030,7 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
     args,
     onInstancesModifiedOutsideEditor,
     onObjectGroupsModifiedOutsideEditor,
-    onSceneRenamedOutsideEditor,
+    onProjectItemRenamedOutsideEditor,
   }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
 
@@ -5091,7 +5091,11 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
           );
 
           renameLayoutInProject(project, oldName, newSceneName);
-          onSceneRenamedOutsideEditor({ oldName, newName: newSceneName });
+          onProjectItemRenamedOutsideEditor({
+            kind: 'scene',
+            oldName,
+            newName: newSceneName,
+          });
 
           changes.push(
             `Renamed scene "${oldName}" to "${newSceneName}" (events and references updated).`

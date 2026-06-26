@@ -87,7 +87,7 @@ import {
   type InstancesOutsideEditorChanges,
   type ObjectsOutsideEditorChanges,
   type ObjectGroupsOutsideEditorChanges,
-  type SceneRenamedOutsideEditorChanges,
+  type ProjectItemRenamedOutsideEditorChanges,
 } from '../EditorFunctions/OutsideEditorChanges';
 import { type Exporter } from '../ExportAndShare/ShareDialog';
 import ResourcesLoader from '../ResourcesLoader/index';
@@ -3666,22 +3666,25 @@ const MainFrame = (props: Props): React.MixedElement => {
 
   // The project model is already updated; just keep open tabs alive by renaming
   // their project item.
-  const onSceneRenamedOutsideEditor = (
-    changes: SceneRenamedOutsideEditorChanges
+  const onProjectItemRenamedOutsideEditor = (
+    changes: ProjectItemRenamedOutsideEditorChanges
   ) => {
-    const { oldName, newName } = changes;
+    const { kind, oldName, newName } = changes;
     setState(state => {
       const { currentProject } = state;
       if (!currentProject) return state;
-      return {
-        ...state,
-        editorTabs: getEditorTabsWithRenamedProjectItem(
-          state.editorTabs,
-          currentProject,
-          editorTab =>
-            getRenamedLayoutTabProjectItemName(editorTab, oldName, newName)
-        ),
-      };
+      if (kind === 'scene') {
+        return {
+          ...state,
+          editorTabs: getEditorTabsWithRenamedProjectItem(
+            state.editorTabs,
+            currentProject,
+            editorTab =>
+              getRenamedLayoutTabProjectItemName(editorTab, oldName, newName)
+          ),
+        };
+      }
+      return state;
     });
   };
 
@@ -5418,7 +5421,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     onInstancesModifiedOutsideEditor: onInstancesModifiedOutsideEditor,
     onObjectsModifiedOutsideEditor: onObjectsModifiedOutsideEditor,
     onObjectGroupsModifiedOutsideEditor: onObjectGroupsModifiedOutsideEditor,
-    onSceneRenamedOutsideEditor: onSceneRenamedOutsideEditor,
+    onProjectItemRenamedOutsideEditor: onProjectItemRenamedOutsideEditor,
     onWillInstallExtension: onWillInstallExtension,
     onExtensionInstalled: onExtensionInstalled,
     onEffectAdded: onEffectAdded,

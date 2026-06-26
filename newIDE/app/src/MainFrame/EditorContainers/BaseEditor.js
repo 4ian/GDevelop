@@ -29,7 +29,7 @@ import type {
   InstancesOutsideEditorChanges,
   ObjectsOutsideEditorChanges,
   ObjectGroupsOutsideEditorChanges,
-  SceneRenamedOutsideEditorChanges,
+  ProjectItemRenamedOutsideEditorChanges,
 } from '../../EditorFunctions/OutsideEditorChanges';
 
 export type EditorContainerExtraProps = {|
@@ -231,8 +231,8 @@ export type RenderEditorContainerProps = {|
   onObjectGroupsModifiedOutsideEditor: (
     changes: ObjectGroupsOutsideEditorChanges
   ) => void,
-  onSceneRenamedOutsideEditor: (
-    changes: SceneRenamedOutsideEditorChanges
+  onProjectItemRenamedOutsideEditor: (
+    changes: ProjectItemRenamedOutsideEditorChanges
   ) => void,
 
   // Events editing

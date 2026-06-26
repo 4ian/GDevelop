@@ -18,7 +18,11 @@ export type ObjectGroupsOutsideEditorChanges = {|
   scene: gdLayout,
 |};
 
-export type SceneRenamedOutsideEditorChanges = {|
+// Only scenes are renamed outside the editor for now; extend as needed.
+export type RenamableProjectItemKind = 'scene';
+
+export type ProjectItemRenamedOutsideEditorChanges = {|
+  kind: RenamableProjectItemKind,
   oldName: string,
   newName: string,
 |};

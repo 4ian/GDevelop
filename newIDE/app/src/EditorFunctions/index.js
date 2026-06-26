@@ -1847,19 +1847,18 @@ const changeObjectProperty: EditorFunction = {
 /**
  * Resolve a name to the object(s) it refers to.
  *
- * Object groups are handled "almost like an object": a tool that accepts an
- * object name also accepts a group name, in which case the operation is applied
- * to every object of the group. This mirrors how the editor lets the user edit
- * the behaviors and variables shared in common by all the objects of a group.
- *
  * Returns `null` when no object nor group with this name exists. For a group,
  * `objects` contains all its (resolvable) member objects and `group` is set.
  */
-const getObjectsConcernedByName = (
+const resolveObjectsFromContextAndName = ({
+  project,
+  layout,
+  objectOrGroupName,
+}: {|
   project: gdProject,
   layout: gdLayout,
-  objectOrGroupName: string
-): {|
+  objectOrGroupName: string,
+|}): {|
   objects: Array<gdObject>,
   group: gdObjectGroup | null,
 |} | null => {
@@ -1978,7 +1977,11 @@ const addBehavior: EditorFunction = {
 
     // `object_name` can designate an object or a group (in which case the
     // behavior is added to every object of the group).
-    const concerned = getObjectsConcernedByName(project, layout, object_name);
+    const concerned = resolveObjectsFromContextAndName({
+      project,
+      layout,
+      objectOrGroupName: object_name,
+    });
     if (!concerned) {
       return makeGenericFailure(
         `Object or group not found: "${object_name}" in scene "${scene_name}" nor globally.`
@@ -2134,7 +2137,11 @@ const removeBehavior: EditorFunction = {
 
     // `object_name` can designate an object or a group (in which case the
     // behavior is removed from every object of the group that has it).
-    const concerned = getObjectsConcernedByName(project, layout, object_name);
+    const concerned = resolveObjectsFromContextAndName({
+      project,
+      layout,
+      objectOrGroupName: object_name,
+    });
     if (!concerned) {
       return makeGenericFailure(
         `Object or group not found: "${object_name}" in scene "${scene_name}" nor globally.`
@@ -2211,7 +2218,11 @@ const inspectBehaviorProperties: EditorFunction = {
     // `object_name` can designate an object or a group. For a group, the
     // behavior is shared in common by all its objects, so any of them can be
     // inspected: use the first object that has the behavior.
-    const concerned = getObjectsConcernedByName(project, layout, object_name);
+    const concerned = resolveObjectsFromContextAndName({
+      project,
+      layout,
+      objectOrGroupName: object_name,
+    });
     if (!concerned) {
       return makeGenericFailure(
         `Object or group not found: "${object_name}" in scene "${scene_name}" nor globally.`
@@ -2343,7 +2354,11 @@ const changeBehaviorProperty: EditorFunction = {
 
     // `object_name` can designate an object or a group (which shares the
     // behavior in common): use any object having the behavior to read labels.
-    const concerned = getObjectsConcernedByName(project, layout, object_name);
+    const concerned = resolveObjectsFromContextAndName({
+      project,
+      layout,
+      objectOrGroupName: object_name,
+    });
     const object = concerned
       ? concerned.objects.find(object => object.hasBehaviorNamed(behavior_name))
       : null;
@@ -2429,7 +2444,11 @@ const changeBehaviorProperty: EditorFunction = {
 
     // `object_name` can designate an object or a group (in which case the
     // property is changed on the behavior of every object of the group).
-    const concerned = getObjectsConcernedByName(project, layout, object_name);
+    const concerned = resolveObjectsFromContextAndName({
+      project,
+      layout,
+      objectOrGroupName: object_name,
+    });
     if (!concerned) {
       return makeGenericFailure(
         `Object or group not found: "${object_name}" in scene "${scene_name}" nor globally.`
@@ -5665,11 +5684,11 @@ const addOrEditVariable: EditorFunction = {
         if (!project.hasLayoutNamed(scene_name)) {
           return makeGenericFailure(`Scene not found: "${scene_name}".`);
         }
-        const concerned = getObjectsConcernedByName(
+        const concerned = resolveObjectsFromContextAndName({
           project,
-          project.getLayout(scene_name),
-          object_name
-        );
+          layout: project.getLayout(scene_name),
+          objectOrGroupName: object_name,
+        });
         if (!concerned) {
           return makeGenericFailure(
             `Object or group "${object_name}" not in scene "${scene_name}". For a global object, omit scene_name.`

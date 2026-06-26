@@ -2892,6 +2892,16 @@ const MainFrame = (props: Props): React.MixedElement => {
         }
       } finally {
         previewLaunchInProgressRef.current = false;
+        // Always clear the preview loader here, even if an exception was thrown
+        // (or an early return happened) after `setPreviewLoading('preview')` but
+        // outside the inner try/catch. Otherwise the LoaderModal's full-window
+        // backdrop stays mounted forever, blocking every click/input in the
+        // editor, and the guard at the top of this function would also block all
+        // future previews. This is the "can't click anything after running and
+        // closing a debug preview a few times" bug.
+        if (previewLoadingRef.current) {
+          setPreviewLoading(null);
+        }
       }
     },
     [

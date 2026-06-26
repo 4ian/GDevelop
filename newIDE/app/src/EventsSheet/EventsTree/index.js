@@ -210,9 +210,14 @@ const EventContainer = (props: EventsContainerProps) => {
       // native text editing context menu (cut/copy/paste) be shown instead of
       // the event context menu. Otherwise both would open at the same time,
       // which makes the menu flicker and disappear on Windows.
-      const { target } = domEvent;
+      // `closest` is duck-typed rather than gated on `instanceof Element`: when
+      // the events sheet is rendered in a popped-out window, the target comes
+      // from that window's realm and would fail an `instanceof` check against
+      // the main window's `Element`.
+      const target: any = domEvent.target;
       if (
-        target instanceof Element &&
+        target &&
+        typeof target.closest === 'function' &&
         target.closest('textarea, input, [contenteditable="true"]')
       ) {
         return;

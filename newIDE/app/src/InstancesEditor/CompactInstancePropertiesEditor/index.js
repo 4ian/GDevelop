@@ -424,11 +424,6 @@ export const CompactInstancePropertiesEditor = ({
                       gd.JsPlatform.get(),
                       behaviorTypeName
                     );
-                    const behaviorOverriding = instance.hasBehaviorOverridingNamed(
-                      behaviorName
-                    )
-                      ? instance.getBehaviorOverriding(behaviorName)
-                      : null;
                     const iconUrl = behaviorMetadata.getIconFilename();
                     const CompactInstanceBehaviorComponent = CompactInstanceBehaviorsEditorService.getEditor(
                       behaviorTypeName
@@ -454,7 +449,6 @@ export const CompactInstancePropertiesEditor = ({
                                   project={project}
                                   behaviorMetadata={behaviorMetadata}
                                   behavior={behavior}
-                                  behaviorOverriding={behaviorOverriding}
                                   object={object}
                                   layersContainer={layersContainer}
                                   initialInstances={instances}

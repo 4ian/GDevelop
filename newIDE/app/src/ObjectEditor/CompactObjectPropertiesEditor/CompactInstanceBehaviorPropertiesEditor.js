@@ -114,7 +114,6 @@ export const CompactInstanceBehaviorPropertiesEditor = ({
   behavior,
   object,
   layersContainer,
-  behaviorOverriding,
   initialInstances,
   onOpenFullEditor,
   onBehaviorUpdated,

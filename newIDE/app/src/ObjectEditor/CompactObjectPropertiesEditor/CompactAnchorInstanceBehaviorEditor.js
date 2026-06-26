@@ -21,7 +21,6 @@ const CompactInstanceAnchorBehaviorEditor = ({
   object,
   layersContainer,
   behaviorMetadata,
-  behaviorOverriding,
   initialInstances,
   onOpenFullEditor,
   onBehaviorUpdated,
@@ -77,7 +76,6 @@ const CompactInstanceAnchorBehaviorEditor = ({
         layersContainer={layersContainer}
         behavior={behavior}
         behaviorMetadata={behaviorMetadata}
-        behaviorOverriding={behaviorOverriding}
         initialInstances={initialInstances}
         onOpenFullEditor={onOpenFullEditor}
         onBehaviorUpdated={_onBehaviorUpdated}

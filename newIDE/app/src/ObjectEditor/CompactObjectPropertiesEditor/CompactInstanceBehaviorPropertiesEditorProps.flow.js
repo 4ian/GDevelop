@@ -10,7 +10,6 @@ export type CompactInstanceBehaviorPropertiesEditorProps = {|
   behavior: gdBehavior,
   object: gdObject | null,
   layersContainer: gdLayersContainer,
-  behaviorOverriding: gdBehavior | null,
   initialInstances: Array<gdInitialInstance>,
   onOpenFullEditor?: () => void,
   onBehaviorUpdated: () => void,

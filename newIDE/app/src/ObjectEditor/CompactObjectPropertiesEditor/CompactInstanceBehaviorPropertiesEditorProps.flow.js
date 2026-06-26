@@ -7,11 +7,12 @@ import { type ResourceManagementProps } from '../../ResourcesList/ResourceSource
 export type CompactInstanceBehaviorPropertiesEditorProps = {|
   project: gdProject,
   behaviorMetadata: gdBehaviorMetadata,
-  behavior: gdBehavior,
   object: gdObject | null,
   layersContainer: gdLayersContainer,
-  initialInstances: Array<gdInitialInstance>,
-  onOpenFullEditor?: () => void,
+  instancesAndBehaviors: Array<{
+    initialInstance: gdInitialInstance,
+    behavior: gdBehavior,
+  }>,
   onBehaviorUpdated: () => void,
   resourceManagementProps: ResourceManagementProps,
   isAdvancedSectionInitiallyUncollapsed?: boolean,

@@ -210,10 +210,10 @@ export const CompactInstancePropertiesEditor = ({
           allVisibleBehaviors: null,
         };
 
-      const objects = new Map<string, gdObject>();
+      const objectsMap = new Map<string, gdObject>();
       for (const instance of instances) {
         const associatedObjectName = instance.getObjectName();
-        if (objects.has(associatedObjectName)) {
+        if (objectsMap.has(associatedObjectName)) {
           continue;
         }
         const object = getObjectByName(
@@ -222,10 +222,11 @@ export const CompactInstancePropertiesEditor = ({
           associatedObjectName
         );
         if (object) {
-          objects.set(associatedObjectName, object);
+          objectsMap.set(associatedObjectName, object);
         }
       }
-      const [object] = [...objects.values()];
+      const objects = [...objectsMap.values()];
+      const object = objects[0];
       if (!object) {
         return {
           object: undefined,
@@ -294,8 +295,7 @@ export const CompactInstancePropertiesEditor = ({
       return {
         object,
         instanceSchema,
-        allVisibleBehaviors:
-          objects.size === 1 ? getAllVisibleBehaviorNames([object]) : null,
+        allVisibleBehaviors: getAllVisibleBehaviorNames(objects),
       };
     },
     [
@@ -418,8 +418,9 @@ export const CompactInstancePropertiesEditor = ({
                     if (!object.hasBehaviorNamed(behaviorName)) {
                       return null;
                     }
-                    const behavior = object.getBehavior(behaviorName);
-                    const behaviorTypeName = behavior.getTypeName();
+                    const behaviorTypeName = object
+                      .getBehavior(behaviorName)
+                      .getTypeName();
                     const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
                       gd.JsPlatform.get(),
                       behaviorTypeName
@@ -428,13 +429,30 @@ export const CompactInstancePropertiesEditor = ({
                     const CompactInstanceBehaviorComponent = CompactInstanceBehaviorsEditorService.getEditor(
                       behaviorTypeName
                     );
+                    const instancesAndBehaviors = instances
+                      .map(initialInstance => {
+                        const object = getObjectByName(
+                          globalObjectsContainer,
+                          objectsContainer,
+                          initialInstance.getObjectName()
+                        );
+                        if (!object || !object.hasBehaviorNamed(behaviorName)) {
+                          return null;
+                        }
+                        return {
+                          initialInstance,
+                          behavior: object.getBehavior(behaviorName),
+                        };
+                      })
+                      .filter(Boolean);
+                    if (instancesAndBehaviors.length === 0) {
+                      return null;
+                    }
                     return (
                       <StatefulCollapsibleSubPanel
-                        key={behavior.ptr}
+                        key={instancesAndBehaviors[0].behavior.ptr}
                         renderContent={
-                          notOverridableBehaviorTypes.includes(
-                            behavior.getTypeName()
-                          )
+                          notOverridableBehaviorTypes.includes(behaviorTypeName)
                             ? () => (
                                 <Column expand>
                                   <EmptyMessage>
@@ -448,21 +466,23 @@ export const CompactInstancePropertiesEditor = ({
                                 <CompactInstanceBehaviorComponent
                                   project={project}
                                   behaviorMetadata={behaviorMetadata}
-                                  behavior={behavior}
                                   object={object}
                                   layersContainer={layersContainer}
-                                  initialInstances={instances}
+                                  instancesAndBehaviors={instancesAndBehaviors}
                                   onBehaviorUpdated={() => {
-                                    for (const instance of instances) {
+                                    for (const {
+                                      initialInstance,
+                                      behavior,
+                                    } of instancesAndBehaviors) {
                                       if (
-                                        instance.hasBehaviorOverridingNamed(
+                                        initialInstance.hasBehaviorOverridingNamed(
                                           behaviorName
                                         ) &&
-                                        !instance.hasAnyOverriddenPropertyForBehavior(
+                                        !initialInstance.hasAnyOverriddenPropertyForBehavior(
                                           behavior
                                         )
                                       ) {
-                                        instance.removeBehaviorOverriding(
+                                        initialInstance.removeBehaviorOverriding(
                                           behaviorName
                                         );
                                         // Update the view to stop using
@@ -477,9 +497,9 @@ export const CompactInstancePropertiesEditor = ({
                                 />
                               )
                         }
-                        isInitiallyFolded={instances.every(
-                          instance =>
-                            !instance.hasAnyOverriddenPropertyForBehavior(
+                        isInitiallyFolded={instancesAndBehaviors.every(
+                          ({ initialInstance, behavior }) =>
+                            !initialInstance.hasAnyOverriddenPropertyForBehavior(
                               behavior
                             )
                         )}
@@ -492,7 +512,7 @@ export const CompactInstancePropertiesEditor = ({
                             />
                           ) : null
                         }
-                        title={behavior.getName()}
+                        title={behaviorName}
                       />
                     );
                   })}

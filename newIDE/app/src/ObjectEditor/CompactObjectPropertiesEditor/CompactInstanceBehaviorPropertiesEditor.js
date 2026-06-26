@@ -111,27 +111,23 @@ export const updateProperty = (
 export const CompactInstanceBehaviorPropertiesEditor = ({
   project,
   behaviorMetadata,
-  behavior,
   object,
   layersContainer,
-  initialInstances,
-  onOpenFullEditor,
+  instancesAndBehaviors,
   onBehaviorUpdated,
   resourceManagementProps,
 }: CompactInstanceBehaviorPropertiesEditorProps): React.Node => {
   const [schemaRecomputeTrigger, forceRecomputeSchema] = useForceRecompute();
 
-  const instancesAndBehaviors = initialInstances.map(initialInstance => ({
-    initialInstance,
-    behavior,
-  }));
-
-  const propertiesSchema = React.useMemo(
+  const propertiesSchema: Schema = React.useMemo(
     () => {
       if (schemaRecomputeTrigger) {
         // schemaRecomputeTrigger allows to invalidate the schema when required.
       }
-      const behaviorProperties = behavior.getProperties();
+      if (instancesAndBehaviors.length === 0) {
+        return [];
+      }
+      const behaviorProperties = instancesAndBehaviors[0].behavior.getProperties();
       return propertiesMapToSchema({
         properties: behaviorProperties,
         defaultValueProperties: behaviorProperties,
@@ -165,7 +161,13 @@ export const CompactInstanceBehaviorPropertiesEditor = ({
         shouldDisabledFieldsWithMixedValues: false,
       });
     },
-    [schemaRecomputeTrigger, object, layersContainer, behavior, project]
+    [
+      schemaRecomputeTrigger,
+      instancesAndBehaviors,
+      object,
+      layersContainer,
+      project,
+    ]
   );
 
   return (
@@ -178,17 +180,7 @@ export const CompactInstanceBehaviorPropertiesEditor = ({
         onInstancesModified={onBehaviorUpdated}
         resourceManagementProps={resourceManagementProps}
         placeholder={<Trans>Nothing to configure for this behavior.</Trans>}
-        customizeBasicSchema={
-          onOpenFullEditor
-            ? schema =>
-                getSchemaWithOpenFullEditorButton({
-                  schema,
-                  fullEditorLabel: behaviorMetadata.getOpenFullEditorLabel(),
-                  behavior: behavior,
-                  onOpenFullEditor,
-                })
-            : null
-        }
+        customizeBasicSchema={null}
         onRefreshAllFields={forceRecomputeSchema}
       />
     </ColumnStackLayout>

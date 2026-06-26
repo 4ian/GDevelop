@@ -17,19 +17,17 @@ import {
 
 const CompactInstanceAnchorBehaviorEditor = ({
   project,
-  behavior,
   object,
   layersContainer,
   behaviorMetadata,
-  initialInstances,
-  onOpenFullEditor,
+  instancesAndBehaviors,
   onBehaviorUpdated,
   resourceManagementProps,
 }: CompactInstanceBehaviorPropertiesEditorProps): React.Node => {
   const forceUpdate = useForceUpdate();
   const _getPropertyValue = (propertyName: string) => {
     let commonValue = null;
-    for (const initialInstance of initialInstances) {
+    for (const { initialInstance, behavior } of instancesAndBehaviors) {
       const value = getPropertyValue(behavior, propertyName, initialInstance);
       if (commonValue === null) {
         commonValue = value;
@@ -41,7 +39,7 @@ const CompactInstanceAnchorBehaviorEditor = ({
     return commonValue;
   };
   const _updateProperty = (propertyName: string, value: string) => {
-    for (const initialInstance of initialInstances) {
+    for (const { initialInstance, behavior } of instancesAndBehaviors) {
       updateProperty(project, behavior, propertyName, value, initialInstance);
     }
     forceUpdate();
@@ -74,10 +72,8 @@ const CompactInstanceAnchorBehaviorEditor = ({
         project={project}
         object={object}
         layersContainer={layersContainer}
-        behavior={behavior}
         behaviorMetadata={behaviorMetadata}
-        initialInstances={initialInstances}
-        onOpenFullEditor={onOpenFullEditor}
+        instancesAndBehaviors={instancesAndBehaviors}
         onBehaviorUpdated={_onBehaviorUpdated}
         resourceManagementProps={resourceManagementProps}
         isAdvancedSectionInitiallyUncollapsed={

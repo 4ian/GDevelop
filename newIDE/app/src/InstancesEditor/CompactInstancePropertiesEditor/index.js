@@ -313,7 +313,9 @@ export const CompactInstancePropertiesEditor = ({
   );
 
   const [isBehaviorsFolded, setIsBehaviorsFolded] = React.useState(
-    object ? !instance.hasAnyOverriddenProperty(object) : true
+    object
+      ? instances.every(instance => !instance.hasAnyOverriddenProperty(object))
+      : true
   );
 
   const shouldDisplayTileSetVisualizer =
@@ -481,11 +483,12 @@ export const CompactInstancePropertiesEditor = ({
                                 />
                               )
                         }
-                        isInitiallyFolded={
-                          !instance.hasAnyOverriddenPropertyForBehavior(
-                            behavior
-                          )
-                        }
+                        isInitiallyFolded={instances.every(
+                          instance =>
+                            !instance.hasAnyOverriddenPropertyForBehavior(
+                              behavior
+                            )
+                        )}
                         titleIcon={
                           iconUrl ? (
                             <IconContainer

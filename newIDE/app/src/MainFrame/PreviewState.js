@@ -70,18 +70,30 @@ export const usePreviewDebuggerServerWatcher = (
           // Nothing to do.
         },
         onConnectionClosed: ({ id, debuggerIds }) => {
-          // Remove the debugger status.
+          // Remove the debugger status and synchronize with the server-side
+          // list so a missed or out-of-order close event cannot leave stale
+          // preview/debugger state in the editor.
           setDebuggerStatus(debuggerStatus => {
             const {
               [id]: closedDebuggerStatus,
               ...otherDebuggerStatus
             } = debuggerStatus;
+            const liveDebuggerIds = new Set(debuggerIds);
+            const synchronizedDebuggerStatus: {
+              [DebuggerId]: DebuggerStatus,
+            } = {};
+            for (const debuggerId in otherDebuggerStatus) {
+              if (liveDebuggerIds.has(debuggerId)) {
+                synchronizedDebuggerStatus[debuggerId] =
+                  otherDebuggerStatus[debuggerId];
+              }
+            }
             console.info(
               `Connection closed with preview with id "${id}". Last status was:`,
               closedDebuggerStatus
             );
 
-            return otherDebuggerStatus;
+            return synchronizedDebuggerStatus;
           });
         },
         onConnectionOpened: ({ id, debuggerIds }) => {

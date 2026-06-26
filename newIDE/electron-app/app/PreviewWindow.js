@@ -164,11 +164,30 @@ const setDebuggerPopOutWindow = (parentWindowId, debuggerWindow) => {
   debuggerPopOutWindows.set(parentWindowId, debuggerWindow);
   arrangeDebuggerPopOutWithLatestPreview(parentWindowId);
 
+  let parentWasMinimizedBeforeDebuggerClose = false;
+  debuggerWindow.on('close', () => {
+    const parentWindow =
+      parentWindowId !== null ? BrowserWindow.fromId(parentWindowId) : null;
+    parentWasMinimizedBeforeDebuggerClose =
+      !!parentWindow &&
+      !parentWindow.isDestroyed() &&
+      parentWindow.isMinimized();
+
+    if (typeof debuggerWindow.setParentWindow === 'function') {
+      debuggerWindow.setParentWindow(null);
+    }
+  });
+
   debuggerWindow.on('closed', () => {
     if (debuggerPopOutWindows.get(parentWindowId) === debuggerWindow) {
       debuggerPopOutWindows.delete(parentWindowId);
     }
+    sendDebuggerPopOutCloseRequested(parentWindowId);
     closePreviewWindowsForParent(parentWindowId);
+    keepParentWindowVisibleAfterChildClose(
+      parentWindowId,
+      parentWasMinimizedBeforeDebuggerClose
+    );
   });
 };
 

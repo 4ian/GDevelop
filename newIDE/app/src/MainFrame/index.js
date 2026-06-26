@@ -3722,18 +3722,7 @@ const MainFrame = (props: Props): React.MixedElement => {
         eventsBasedObject
       );
       if (foundTab) {
-        foundTab.editor.selectEventsBasedObjectByName(
-          eventsBasedObject.getName()
-        );
         foundTab.editor.openPrefabSettingsDialog();
-        setState(state => ({
-          ...state,
-          editorTabs: changeCurrentTab(
-            editorTabs,
-            foundTab.paneIdentifier,
-            foundTab.tabIndex
-          ),
-        }));
       } else {
         setState(state => ({
           ...state,
@@ -3750,6 +3739,7 @@ const MainFrame = (props: Props): React.MixedElement => {
             extraEditorProps: {
               initiallyOpenSettingsDialog: true,
             },
+            dontFocusTab: true,
           }),
         }));
       }
@@ -3771,18 +3761,7 @@ const MainFrame = (props: Props): React.MixedElement => {
         eventsBasedBehavior
       );
       if (foundTab) {
-        foundTab.editor.selectEventsBasedBehaviorByName(
-          eventsBasedBehavior.getName()
-        );
         foundTab.editor.openBehaviorSettingsDialog();
-        setState(state => ({
-          ...state,
-          editorTabs: changeCurrentTab(
-            editorTabs,
-            foundTab.paneIdentifier,
-            foundTab.tabIndex
-          ),
-        }));
       } else {
         setState(state => ({
           ...state,
@@ -3802,6 +3781,7 @@ const MainFrame = (props: Props): React.MixedElement => {
               initiallyFocusedObjectName: null,
               initiallyOpenSettingsDialog: true,
             },
+            dontFocusTab: true,
           }),
         }));
       }

@@ -2484,6 +2484,16 @@ const changeBehaviorProperty: EditorFunction = {
     // $FlowFixMe[missing-empty-array-annot]
     const changes = [];
 
+    // Warn about group members that do not have the behavior (they are skipped),
+    // mirroring remove_behavior's per-object reporting.
+    for (const object of concerned.objects) {
+      if (!object.hasBehaviorNamed(behavior_name)) {
+        warnings.push(
+          `Behavior "${behavior_name}" not on "${object.getName()}". Not changed.`
+        );
+      }
+    }
+
     changedProperties.forEach(changed_property => {
       const propertyName = SafeExtractor.extractStringProperty(
         changed_property,

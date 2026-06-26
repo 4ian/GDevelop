@@ -2838,6 +2838,10 @@ describe('editorFunctions', () => {
       expect(
         sceneObjects.getObject('Enemy2').hasBehaviorNamed('PlatformerObject')
       ).toBe(false);
+      // Enemy2 lacks the behavior, so it is reported as skipped.
+      expect(result.message).toContain(
+        'Behavior "PlatformerObject" not on "Enemy2". Not changed.'
+      );
     });
 
     it('removes a behavior from the group members that have it, warning about the others', async () => {

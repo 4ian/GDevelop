@@ -92,6 +92,9 @@ export const NoProjectOpen = (): React.Node => {
                   onEventBasedObjectTypeChanged={action(
                     'onEventBasedObjectTypeChanged'
                   )}
+                  onObjectGroupsModifiedOutsideEditor={action(
+                    'onObjectGroupsModifiedOutsideEditor'
+                  )}
                   onObjectListsModified={action('onObjectListsModified')}
                   onSceneAdded={action('onSceneAdded')}
                   onExternalLayoutAdded={action('onExternalLayoutAdded')}
@@ -202,6 +205,9 @@ export const ProjectOpen = (): React.Node => {
                   )}
                   onEventBasedObjectTypeChanged={action(
                     'onEventBasedObjectTypeChanged'
+                  )}
+                  onObjectGroupsModifiedOutsideEditor={action(
+                    'onObjectGroupsModifiedOutsideEditor'
                   )}
                   onObjectListsModified={action('onObjectListsModified')}
                   onSceneAdded={action('onSceneAdded')}

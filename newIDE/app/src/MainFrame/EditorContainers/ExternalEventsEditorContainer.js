@@ -132,7 +132,9 @@ export class ExternalEventsEditorContainer extends React.Component<
   }
 
   forceUpdateEditor() {
-    // No updates to be done.
+    if (this.editor) {
+      this.editor.forceUpdateEditor();
+    }
   }
 
   onEventsBasedObjectChildrenEdited() {
@@ -168,7 +170,13 @@ export class ExternalEventsEditorContainer extends React.Component<
   onObjectGroupsModifiedOutsideEditor(
     changes: ObjectGroupsOutsideEditorChanges
   ) {
-    // No thing to be done.
+    if (changes.scene !== this.getLayout()) {
+      return;
+    }
+
+    if (this.editor) {
+      this.editor.forceUpdateEditor();
+    }
   }
 
   getExternalEvents(): ?gdExternalEvents {

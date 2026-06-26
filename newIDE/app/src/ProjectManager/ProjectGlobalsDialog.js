@@ -26,6 +26,7 @@ import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewB
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 import EventsRootVariablesFinder from '../Utils/EventsRootVariablesFinder';
+import { type ObjectGroupsOutsideEditorChanges } from '../MainFrame/EditorContainers/BaseEditor';
 import {
   serializeToJSObject,
   unserializeFromJSObject,
@@ -80,6 +81,9 @@ type Props = {|
   ) => void,
   onGlobalObjectEdited: (object: gdObject) => void,
   onEffectAdded: () => void,
+  onObjectGroupsModifiedOutsideEditor: (
+    changes: ObjectGroupsOutsideEditorChanges
+  ) => void,
   onObjectListsModified: ({ isNewObjectTypeUsed: boolean }) => void,
   triggerHotReloadInGameEditorIfNeeded: () => void,
 |};
@@ -714,6 +718,7 @@ const ProjectGlobalsDialog = ({
   onDeleteEventsBasedObjectVariant,
   onGlobalObjectEdited,
   onEffectAdded,
+  onObjectGroupsModifiedOutsideEditor,
   onObjectListsModified,
   triggerHotReloadInGameEditorIfNeeded,
 }: Props): React.Node => {
@@ -754,15 +759,27 @@ const ProjectGlobalsDialog = ({
     ? temporaryLayoutForLayers.getLayers()
     : null;
 
+  const notifyGlobalObjectGroupsModified = React.useCallback(
+    () => {
+      for (let index = 0; index < project.getLayoutsCount(); index++) {
+        onObjectGroupsModifiedOutsideEditor({
+          scene: project.getLayoutAt(index),
+        });
+      }
+    },
+    [onObjectGroupsModifiedOutsideEditor, project]
+  );
+
   const onAddObjectToGroup = React.useCallback(
     (objectName: string, group: GlobalGroupRow) => {
       if (group.objectNames.includes(objectName)) return;
 
       group.group.addObject(objectName);
+      notifyGlobalObjectGroupsModified();
       onChange();
       forceRefresh(key => key + 1);
     },
-    [onChange]
+    [notifyGlobalObjectGroupsModified, onChange]
   );
 
   const onRemoveObjectFromGroup = React.useCallback(
@@ -770,10 +787,11 @@ const ProjectGlobalsDialog = ({
       if (!group.objectNames.includes(objectName)) return;
 
       group.group.removeObject(objectName);
+      notifyGlobalObjectGroupsModified();
       onChange();
       forceRefresh(key => key + 1);
     },
-    [onChange]
+    [notifyGlobalObjectGroupsModified, onChange]
   );
 
   const onCreateGroup = React.useCallback(
@@ -785,10 +803,11 @@ const ProjectGlobalsDialog = ({
       );
 
       globalGroups.insertNew(newGroupName, globalGroups.count());
+      notifyGlobalObjectGroupsModified();
       onChange();
       forceRefresh(key => key + 1);
     },
-    [project, onChange]
+    [notifyGlobalObjectGroupsModified, project, onChange]
   );
 
   const onRenameGroup = React.useCallback((group: GlobalGroupRow) => {
@@ -917,13 +936,14 @@ const ProjectGlobalsDialog = ({
           /* isObjectGroup= */ true
         );
         groupBeingRenamed.group.setName(validatedName);
+        notifyGlobalObjectGroupsModified();
         onChange();
         forceRefresh(key => key + 1);
       }
 
       setGroupBeingRenamed(null);
     },
-    [groupBeingRenamed, onChange, project]
+    [groupBeingRenamed, notifyGlobalObjectGroupsModified, onChange, project]
   );
 
   const onDeleteGroup = React.useCallback(
@@ -944,10 +964,17 @@ const ProjectGlobalsDialog = ({
       ) {
         setGroupBeingRenamed(null);
       }
+      notifyGlobalObjectGroupsModified();
       onChange();
       forceRefresh(key => key + 1);
     },
-    [groupBeingRenamed, onChange, project, showDeleteConfirmation]
+    [
+      groupBeingRenamed,
+      notifyGlobalObjectGroupsModified,
+      onChange,
+      project,
+      showDeleteConfirmation,
+    ]
   );
 
   const actions: Array<?React.Node> = [

@@ -2595,20 +2595,12 @@ const MainFrame = (props: Props): React.MixedElement => {
   };
 
   const autosaveProjectIfNeeded = React.useCallback(
-    async () => {
-      if (!currentProject) return;
-      if (
-        !hasUnsavedChanges ||
-        !preferences.values.autosaveOnPreview ||
-        !currentFileMetadata
-      ) {
-        return;
-      }
+    async (): Promise<?FileMetadata> => {
+      if (!currentProject || !currentFileMetadata) return null;
 
       if (saveProjectRef.current) {
         // Use the normal save path so preview persists the project file.
-        await saveProjectRef.current();
-        return;
+        return (await saveProjectRef.current()) || null;
       }
 
       const storageProviderOperations = getStorageProviderOperations();
@@ -2618,6 +2610,7 @@ const MainFrame = (props: Props): React.MixedElement => {
             currentProject,
             currentFileMetadata
           );
+          return currentFileMetadata;
         } catch (err) {
           console.error('Error while auto-saving the project: ', err);
           _showSnackMessage(
@@ -2627,6 +2620,8 @@ const MainFrame = (props: Props): React.MixedElement => {
           );
         }
       }
+
+      return null;
     },
     [
       i18n,
@@ -2634,9 +2629,49 @@ const MainFrame = (props: Props): React.MixedElement => {
       currentProject,
       currentFileMetadata,
       getStorageProviderOperations,
-      preferences.values.autosaveOnPreview,
-      hasUnsavedChanges,
     ]
+  );
+
+  const loadProjectFromSavedFileForPreview = React.useCallback(
+    async (fileMetadata: FileMetadata): Promise<?gdProject> => {
+      const { onOpen } = getStorageProviderOperations();
+
+      if (!onOpen) {
+        console.warn(
+          'Unable to load the saved project for preview: the storage provider does not support opening files.'
+        );
+        return null;
+      }
+
+      let serializedProject: ?gdSerializerElement = null;
+      let previewProject: ?gdProject = null;
+      try {
+        const { content } = await onOpen(fileMetadata);
+        if (!verifyProjectContent(i18n, content)) {
+          return null;
+        }
+
+        serializedProject = gd.Serializer.fromJSObject(content);
+        previewProject = gd.ProjectHelper.createNewGDJSProject();
+        previewProject.unserializeFrom(serializedProject);
+        previewProject.setProjectFile(fileMetadata.fileIdentifier);
+        return previewProject;
+      } catch (error) {
+        console.warn(
+          'Unable to load the saved project for preview. Falling back to the in-memory project.',
+          error
+        );
+        if (previewProject) {
+          previewProject.delete();
+        }
+        return null;
+      } finally {
+        if (serializedProject) {
+          serializedProject.delete();
+        }
+      }
+    },
+    [getStorageProviderOperations, i18n]
   );
 
   const inGameEditorSettings = useInGameEditorSettings();
@@ -2667,6 +2702,7 @@ const MainFrame = (props: Props): React.MixedElement => {
         return;
       }
 
+      let previewProjectLoadedFromFile: ?gdProject = null;
       previewLaunchInProgressRef.current = true;
       try {
         if (
@@ -2725,9 +2761,12 @@ const MainFrame = (props: Props): React.MixedElement => {
             })
           : null;
 
+        notifyPreviewOrExportWillStart(state.editorTabs);
+
+        let savedFileMetadataForPreview: ?FileMetadata = null;
         if (!isForInGameEdition) {
           try {
-            await autosaveProjectIfNeeded();
+            savedFileMetadataForPreview = await autosaveProjectIfNeeded();
           } catch (err) {
             console.error(
               'Error while auto-saving the project. Ignoring.',
@@ -2745,7 +2784,23 @@ const MainFrame = (props: Props): React.MixedElement => {
             : 'preview'
         );
 
-        notifyPreviewOrExportWillStart(state.editorTabs);
+        let projectForPreview = currentProject;
+        if (!isForInGameEdition && savedFileMetadataForPreview) {
+          const loadedProject = await loadProjectFromSavedFileForPreview(
+            savedFileMetadataForPreview
+          );
+          if (loadedProject) {
+            if (loadedProject.getLayoutsCount() === 0) {
+              console.warn(
+                'Saved project loaded for preview has no scene. Falling back to the in-memory project.'
+              );
+              loadedProject.delete();
+            } else {
+              previewProjectLoadedFromFile = loadedProject;
+              projectForPreview = loadedProject;
+            }
+          }
+        }
 
         // A forced layout name (e.g. from MCP) takes precedence over the
         // editor's active/previewed tab, so a preview can be launched on a
@@ -2754,7 +2809,7 @@ const MainFrame = (props: Props): React.MixedElement => {
         const hasForcedPreviewLayout =
           !isForInGameEdition &&
           !!forcedPreviewLayoutName &&
-          currentProject.hasLayoutNamed(forcedPreviewLayoutName);
+          projectForPreview.hasLayoutNamed(forcedPreviewLayoutName);
         const sceneName = isForInGameEdition
           ? isForInGameEdition.forcedSceneName
           : hasForcedPreviewLayout
@@ -2769,11 +2824,6 @@ const MainFrame = (props: Props): React.MixedElement => {
           : previewState.isPreviewOverriden
           ? previewState.overridenPreviewExternalLayoutName
           : previewState.previewExternalLayoutName;
-
-        // Note that in the future, this kind of checks could be done
-        // and stored in a "diagnostic report", rather than hiding errors
-        // from the user.
-        findAndLogProjectPreviewErrors(currentProject);
 
         const fallbackAuthor = authenticatedUser.profile
           ? {
@@ -2791,6 +2841,16 @@ const MainFrame = (props: Props): React.MixedElement => {
 
         try {
           await eventsFunctionsExtensionsState.ensureLoadFinished();
+          if (projectForPreview !== currentProject) {
+            await eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(
+              projectForPreview
+            );
+          }
+
+          // Note that in the future, this kind of checks could be done
+          // and stored in a "diagnostic report", rather than hiding errors
+          // from the user.
+          findAndLogProjectPreviewErrors(projectForPreview);
 
           const startTime = Date.now();
           let inAppTutorialMessageInPreview = { message: '', position: '' };
@@ -2800,8 +2860,8 @@ const MainFrame = (props: Props): React.MixedElement => {
               inAppTutorialMessageInPreview;
           }
           await previewLauncher.launchPreview({
-            project: currentProject,
-            sceneName: sceneName || currentProject.getLayoutAt(0).getName(),
+            project: projectForPreview,
+            sceneName: sceneName || projectForPreview.getLayoutAt(0).getName(),
             externalLayoutName: externalLayoutName || null,
             eventsBasedObjectType: isForInGameEdition
               ? isForInGameEdition.eventsBasedObjectType
@@ -2891,6 +2951,9 @@ const MainFrame = (props: Props): React.MixedElement => {
           );
         }
       } finally {
+        if (previewProjectLoadedFromFile) {
+          previewProjectLoadedFromFile.delete();
+        }
         previewLaunchInProgressRef.current = false;
         // Always clear the preview loader here, even if an exception was thrown
         // (or an early return happened) after `setPreviewLoading('preview')` but
@@ -2913,6 +2976,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       previewState.overridenPreviewExternalLayoutName,
       previewState.previewExternalLayoutName,
       autosaveProjectIfNeeded,
+      loadProjectFromSavedFileForPreview,
       authenticatedUser.profile,
       eventsFunctionsExtensionsState,
       preferences.getIsMenuBarHiddenInPreview,
@@ -6332,6 +6396,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       onDeletedEventsBasedObjectVariant={deleteEventsBasedObjectVariant}
       onEventsBasedObjectChildrenEdited={onEventsBasedObjectChildrenEdited}
       onEventBasedObjectTypeChanged={onEventBasedObjectTypeChanged}
+      onObjectGroupsModifiedOutsideEditor={onObjectGroupsModifiedOutsideEditor}
       onObjectListsModified={onObjectListsModified}
       onDeleteLayout={deleteLayout}
       onDeleteExternalLayout={deleteExternalLayout}

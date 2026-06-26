@@ -16,6 +16,7 @@ import {
   type EditorTab,
   type EditorKind,
   getEditorTabOpenedWithKey,
+  getAllEditorTabs,
   changeCurrentTab,
   closeEditorTab,
   closeOtherEditorTabs,
@@ -843,6 +844,12 @@ const EditorTabsPane: React.ComponentType<{
                         currentProject,
                         extension
                       );
+                      for (const editorTab of getAllEditorTabs(editorTabs)) {
+                        const { editorRef } = editorTab;
+                        if (editorRef) {
+                          editorRef.forceUpdateEditor();
+                        }
+                      }
                     },
                     onDeleteResource: (
                       resource: gdResource,

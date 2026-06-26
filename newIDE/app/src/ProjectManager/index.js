@@ -30,6 +30,7 @@ import { isExtensionNameTaken } from './EventFunctionExtensionNameVerifier';
 import UnsavedChangesContext, {
   type UnsavedChanges,
 } from '../MainFrame/UnsavedChangesContext';
+import { type ObjectGroupsOutsideEditorChanges } from '../MainFrame/EditorContainers/BaseEditor';
 import ProjectManagerCommands from './ProjectManagerCommands';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 import { type GamesList } from '../GameDashboard/UseGamesList';
@@ -698,6 +699,9 @@ type Props = {|
   onExtensionInstalled: (extensionNames: Array<string>) => void,
   onSceneAdded: () => void,
   onExternalLayoutAdded: () => void,
+  onObjectGroupsModifiedOutsideEditor: (
+    changes: ObjectGroupsOutsideEditorChanges
+  ) => void,
   onObjectListsModified: ({ isNewObjectTypeUsed: boolean }) => void,
 
   // Main menu
@@ -761,6 +765,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       onExtensionInstalled,
       onSceneAdded,
       onExternalLayoutAdded,
+      onObjectGroupsModifiedOutsideEditor,
       onObjectListsModified,
     },
     ref
@@ -2266,6 +2271,9 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                         }
                         onGlobalObjectEdited={onGlobalObjectEdited}
                         onEffectAdded={onEffectAdded}
+                        onObjectGroupsModifiedOutsideEditor={
+                          onObjectGroupsModifiedOutsideEditor
+                        }
                         onObjectListsModified={onObjectListsModified}
                         triggerHotReloadInGameEditorIfNeeded={
                           triggerHotReloadInGameEditorIfNeeded

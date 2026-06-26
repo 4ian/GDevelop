@@ -273,6 +273,7 @@ type State = {|
   analyzedEventsContextResult: ?EventsContextResult,
 
   serializedEventsToExtract: ?Object,
+  projectScopedContainersAccessorForEventsToExtract: ?ProjectScopedContainersAccessor,
 
   textEditedEvent: ?gdBaseEvent,
 
@@ -449,6 +450,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     analyzedEventsContextResult: null,
 
     serializedEventsToExtract: null,
+    projectScopedContainersAccessorForEventsToExtract: null,
 
     showSearchPanel: false,
     showEventsGraphPreview: true,
@@ -2544,6 +2546,11 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   };
 
   extractEventsToFunction = () => {
+    const selectedEventContext = getLastSelectedTopMostOnlyEventContext(
+      this.state.selection
+    );
+    if (!selectedEventContext) return;
+
     const eventsList = new gd.EventsList();
 
     // Only extract the top-most events, as the other will be contained inside.
@@ -2554,6 +2561,8 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     this.props.onBeginCreateEventsFunction();
     this.setState({
       serializedEventsToExtract: serializeToJSObject(eventsList),
+      projectScopedContainersAccessorForEventsToExtract:
+        selectedEventContext.projectScopedContainersAccessor,
     });
 
     eventsList.delete();
@@ -3284,10 +3293,14 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
             scope={scope}
             globalObjectsContainer={globalObjectsContainer}
             objectsContainer={objectsContainer}
-            projectScopedContainersAccessor={projectScopedContainersAccessor}
+            projectScopedContainersAccessor={
+              this.state.projectScopedContainersAccessorForEventsToExtract ||
+              projectScopedContainersAccessor
+            }
             onClose={() =>
               this.setState({
                 serializedEventsToExtract: null,
+                projectScopedContainersAccessorForEventsToExtract: null,
               })
             }
             serializedEvents={this.state.serializedEventsToExtract}
@@ -3299,6 +3312,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
               );
               this.setState({
                 serializedEventsToExtract: null,
+                projectScopedContainersAccessorForEventsToExtract: null,
               });
             }}
           />
@@ -3398,6 +3412,7 @@ type OutOfEditorChanges = {|
 
 export type EventsSheetInterface = {|
   updateToolbar: () => void,
+  forceUpdateEditor: () => void,
   onResourceExternallyChanged: ({| identifier: string |}) => void,
   onEventsModifiedOutsideEditor: (changes: OutOfEditorChanges) => void,
   scrollToEventPath: (eventPath: EventPath) => void,
@@ -3418,6 +3433,7 @@ export type EventsSheetInterface = {|
 const EventsSheet = (props, ref) => {
   React.useImperativeHandle(ref, () => ({
     updateToolbar,
+    forceUpdateEditor,
     onResourceExternallyChanged,
     onEventsModifiedOutsideEditor,
     scrollToEventPath,
@@ -3435,6 +3451,9 @@ const EventsSheet = (props, ref) => {
   const component = React.useRef<?EventsSheetComponentWithoutHandle>(null);
   const updateToolbar = () => {
     if (component.current) component.current.updateToolbar();
+  };
+  const forceUpdateEditor = () => {
+    if (component.current) component.current.forceUpdate();
   };
   const onResourceExternallyChanged = (resourceInfo: any) => {
     if (component.current)

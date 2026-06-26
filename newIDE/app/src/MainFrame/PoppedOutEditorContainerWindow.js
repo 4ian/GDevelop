@@ -6,7 +6,10 @@ import CommandsContextScopedProvider from '../CommandPalette/CommandsScopedConte
 import ErrorBoundary, {
   getEditorErrorBoundaryProps,
 } from '../UI/ErrorBoundary';
-import { type EditorTab } from './EditorTabs/EditorTabsHandler';
+import {
+  getAllEditorTabs,
+  type EditorTab,
+} from './EditorTabs/EditorTabsHandler';
 import UnsavedChangesContext from './UnsavedChangesContext';
 import { SpecificDimensionsWindowSizeProvider } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import WindowPortal from '../UI/WindowPortal';
@@ -310,6 +313,14 @@ const PoppedOutEditorContainerWindow = (props: Props): React.Node => {
                             props.currentProject,
                             extension
                           );
+                          for (const tab of getAllEditorTabs(
+                            props.editorTabs
+                          )) {
+                            const { editorRef } = tab;
+                            if (editorRef) {
+                              editorRef.forceUpdateEditor();
+                            }
+                          }
                         },
                         onDeleteResource: (
                           resource: gdResource,

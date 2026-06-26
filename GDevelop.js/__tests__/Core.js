@@ -3984,7 +3984,7 @@ describe('libGD.js', function () {
       testExpression(
         'string',
         '="Mynewscene"',
-        'You must enter a text (between quotes) or a valid expression call. Please check your event parameters.',
+        'You must enter a text (between quotes) or a valid expression call.',
         0
       );
     });

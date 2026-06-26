@@ -87,7 +87,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 1);
       REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
-              "You must enter a text (between quotes) or a valid expression call. Please check your event parameters.");
+              "You must enter a text (between quotes) or a valid expression call.");
     }
     SECTION("of type number") {
       auto node = parser.ParseExpression("");
@@ -306,7 +306,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(validator.GetFatalErrors().size() == 1);
       REQUIRE(
           validator.GetFatalErrors()[0]->GetMessage() ==
-          "You must enter a text (between quotes) or a valid expression call. Please check your event parameters.");
+          "You must enter a text (between quotes) or a valid expression call.");
     }
     {
       auto node = parser.ParseExpression("abcd");
@@ -473,7 +473,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
               "You must add the operator + between texts or expressions. For "
               "example: \"Your name: \" + VariableString(PlayerName).");
       REQUIRE(validator.GetFatalErrors()[2]->GetMessage() ==
-              "You must enter a text (between quotes) or a valid expression call. Please check your event parameters.");
+              "You must enter a text (between quotes) or a valid expression call.");
 
       REQUIRE(validator.GetFatalErrors()[1]->GetMessage() ==
               "The expression has extra character at the end that should be "
@@ -492,7 +492,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
               "You must add the operator + between texts or expressions. For "
               "example: \"Your name: \" + VariableString(PlayerName).");
       REQUIRE(validator.GetFatalErrors()[2]->GetMessage() ==
-              "You must enter a text (between quotes) or a valid expression call. Please check your event parameters.");
+              "You must enter a text (between quotes) or a valid expression call.");
 
       REQUIRE(validator.GetFatalErrors()[1]->GetMessage() ==
               "The expression has extra character at the end that should be "
@@ -535,7 +535,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(validator.GetFatalErrors().size() == 1);
       REQUIRE(
           validator.GetFatalErrors()[0]->GetMessage() ==
-          "You must enter a text (between quotes) or a valid expression call. Please check your event parameters.");
+          "You must enter a text (between quotes) or a valid expression call.");
     }
   }
 
@@ -570,7 +570,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
               "The expression has extra character at the end that should be "
               "removed (or completed if your expression is not finished).");
       REQUIRE(validator.GetFatalErrors()[3]->GetMessage() ==
-              "You must enter a text (between quotes) or a valid expression call. Please check your event parameters.");
+              "You must enter a text (between quotes) or a valid expression call.");
     }
   }
 

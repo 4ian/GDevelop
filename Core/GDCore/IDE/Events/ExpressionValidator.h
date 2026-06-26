@@ -375,7 +375,7 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
       message = _("You must enter a number or a valid expression call.");
     } else if (parentType == Type::String) {
       message = _(
-          "You must enter a text (between quotes) or a valid expression call. Please check your event parameters.");
+          "You must enter a text (between quotes) or a valid expression call.");
     } else if (parentType == Type::Variable || parentType == Type::LegacyVariable) {
       message = _("You must enter a variable name.");
     } else if (parentType == Type::Object) {

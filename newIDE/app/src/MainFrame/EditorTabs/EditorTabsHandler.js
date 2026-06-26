@@ -114,6 +114,54 @@ export type EditorOpeningOptions = {|
   closable?: boolean,
 |};
 
+export const MAX_OPEN_EDITOR_TABS_PER_PANE = 5;
+
+const isEditorTabIncludedInLimit = (editorTab: EditorTab): boolean =>
+  editorTab.closable &&
+  editorTab.kind !== 'debugger' &&
+  editorTab.kind !== 'resources';
+
+const limitOpenEditorTabsForPane = ({
+  editors,
+  editorTabToKeep,
+  currentEditorTabToKeep,
+}: {|
+  editors: Array<EditorTab>,
+  editorTabToKeep: EditorTab,
+  currentEditorTabToKeep: ?EditorTab,
+|}): Array<EditorTab> => {
+  let nextEditors = editors;
+
+  while (
+    nextEditors.filter(isEditorTabIncludedInLimit).length >
+    MAX_OPEN_EDITOR_TABS_PER_PANE
+  ) {
+    let editorIndexToClose = findIndex(
+      nextEditors,
+      editorTab =>
+        isEditorTabIncludedInLimit(editorTab) &&
+        editorTab !== editorTabToKeep &&
+        editorTab !== currentEditorTabToKeep
+    );
+
+    if (editorIndexToClose === -1) {
+      editorIndexToClose = findIndex(
+        nextEditors,
+        editorTab =>
+          isEditorTabIncludedInLimit(editorTab) && editorTab !== editorTabToKeep
+      );
+    }
+
+    if (editorIndexToClose === -1) break;
+
+    nextEditors = nextEditors.filter(
+      (editorTab, index) => index !== editorIndexToClose
+    );
+  }
+
+  return nextEditors;
+};
+
 export const getEditorTabsInitialState = (): EditorTabsState => {
   return {
     panes: {
@@ -212,24 +260,34 @@ export const openEditorTab = (
     throw new Error(`Pane with identifier "${paneIdentifier}" is not valid.`);
   }
 
+  const currentEditorTab = pane.editors[pane.currentTab] || null;
+  const editorsWithNewTab =
+    // Make sure the home page is always the first tab.
+    key === 'start page'
+      ? [editorTab, ...pane.editors]
+      : [...pane.editors, editorTab];
+  const nextEditors = limitOpenEditorTabsForPane({
+    editors: editorsWithNewTab,
+    editorTabToKeep: editorTab,
+    // Keep the active tab when a tab is opened in the background.
+    currentEditorTabToKeep: dontFocusTab ? currentEditorTab : null,
+  });
+  const nextCurrentEditorTab = dontFocusTab ? currentEditorTab : editorTab;
+  const nextCurrentTab = nextCurrentEditorTab
+    ? nextEditors.indexOf(nextCurrentEditorTab)
+    : -1;
+
   let newState = {
     ...state,
     panes: {
       ...state.panes,
       [paneIdentifier]: {
         ...pane,
-        editors:
-          // Make sure the home page is always the first tab.
-          key === 'start page'
-            ? [editorTab, ...pane.editors]
-            : [...pane.editors, editorTab],
-        currentTab: pane.currentTab,
+        editors: nextEditors,
+        currentTab: nextCurrentTab === -1 ? 0 : nextCurrentTab,
       },
     },
   };
-  if (!dontFocusTab) {
-    newState = changeCurrentTab(newState, paneIdentifier, pane.editors.length);
-  }
   return newState;
 };
 

@@ -31,6 +31,25 @@ import {
 
 let popOutCounter = 0;
 
+const isWindowClosed = (externalWindow: any): boolean => {
+  try {
+    return !externalWindow || externalWindow.closed;
+  } catch (error) {
+    return true;
+  }
+};
+
+const closeWindow = (externalWindow: any) => {
+  try {
+    if (!isWindowClosed(externalWindow)) {
+      externalWindow.close();
+    }
+  } catch (error) {
+    // Accessing a BrowserWindow-backed window during teardown can throw
+    // "illegal access" in Electron. Treat it as already closed.
+  }
+};
+
 type Props = {|
   /** Optional role used by the desktop app to apply native window behavior. */
   role?: 'debugger',
@@ -73,6 +92,7 @@ const WindowPortal = ({
 }: Props): React.Node => {
   const [container, setContainer] = React.useState<HTMLDivElement | null>(null);
   const externalWindowRef = React.useRef<any>(null);
+  const externalWindowDocumentRef = React.useRef<?Document>(null);
   const onCloseRef = React.useRef(onClose);
   onCloseRef.current = onClose;
   const onWindowReadyRef = React.useRef(onWindowReady);
@@ -115,42 +135,44 @@ const WindowPortal = ({
     }
 
     externalWindowRef.current = externalWindow;
+    const externalWindowDocument = externalWindow.document;
+    externalWindowDocumentRef.current = externalWindowDocument;
 
     // Apply the theme background color as early as possible to avoid a white flash.
-    externalWindow.document.body.style.backgroundColor = themeBackgroundColor;
+    externalWindowDocument.body.style.backgroundColor = themeBackgroundColor;
 
     // Register the targetId for this document so we can retrieve it later.
-    registerDocumentTargetId(externalWindow.document, targetId);
+    registerDocumentTargetId(externalWindowDocument, targetId);
 
     // Set up the new window's document.
-    externalWindow.document.title = title;
+    externalWindowDocument.title = title;
 
     // Set a <base> tag so that relative URLs (e.g. script src for Monaco
     // AMD loader) resolve against the main window's origin, since the
     // popped-out window starts as about:blank.
-    const baseTag = externalWindow.document.createElement('base');
+    const baseTag = externalWindowDocument.createElement('base');
     baseTag.href = window.location.href;
-    if (externalWindow.document.head)
-      externalWindow.document.head.appendChild(baseTag);
+    if (externalWindowDocument.head)
+      externalWindowDocument.head.appendChild(baseTag);
 
     // Add a <meta name="theme-color"> tag so that
     // Window.setWindowBackgroundColor can update it for this window.
-    const metaThemeColor = externalWindow.document.createElement('meta');
+    const metaThemeColor = externalWindowDocument.createElement('meta');
     metaThemeColor.name = 'theme-color';
     metaThemeColor.content = '#000000';
-    if (externalWindow.document.head)
-      externalWindow.document.head.appendChild(metaThemeColor);
+    if (externalWindowDocument.head)
+      externalWindowDocument.head.appendChild(metaThemeColor);
 
     // Create a container div in the new window.
-    const containerDiv = externalWindow.document.createElement('div');
+    const containerDiv = externalWindowDocument.createElement('div');
     containerDiv.id = 'window-portal-root';
     containerDiv.className = 'popped-out-frame';
-    externalWindow.document.body.appendChild(containerDiv);
+    externalWindowDocument.body.appendChild(containerDiv);
 
     // Style the body of the new window to match the parent.
-    externalWindow.document.body.style.margin = '0';
-    externalWindow.document.body.style.padding = '0';
-    externalWindow.document.body.style.overflow = 'hidden';
+    externalWindowDocument.body.style.margin = '0';
+    externalWindowDocument.body.style.padding = '0';
+    externalWindowDocument.body.style.overflow = 'hidden';
 
     // Make the container fill the window.
     containerDiv.style.width = '100vw';
@@ -160,7 +182,7 @@ const WindowPortal = ({
 
     // Copy the body class from the parent (used for GDevelop theme).
     if (document.body) {
-      externalWindow.document.body.className = document.body.className;
+      externalWindowDocument.body.className = document.body.className;
     }
 
     // Copy all stylesheets from parent window to the new window.
@@ -168,7 +190,7 @@ const WindowPortal = ({
     // separately by a dedicated JSS instance in FullThemeProvider (via
     // portalContainer context), so this mainly copies static CSS files
     // and pre-existing global styles.
-    const styleObserver = copyDocumentStyles(document, externalWindow.document);
+    const styleObserver = copyDocumentStyles(document, externalWindowDocument);
 
     // Suppress the benign "ResizeObserver loop" error in the external window
     // so that it doesn't propagate to the main window's error handler.
@@ -179,7 +201,7 @@ const WindowPortal = ({
 
     // Listen for the external window being closed.
     const checkClosed: IntervalID = setInterval(() => {
-      if (externalWindow.closed) {
+      if (isWindowClosed(externalWindow)) {
         clearInterval(checkClosed);
 
         // The window is now considered as fully closed, so we can notify it's the case
@@ -201,9 +223,7 @@ const WindowPortal = ({
     // by CloseConfirmDialog). "unload" only fires after the user confirms,
     // so we don't close popped-out windows when the user cancels.
     const handleMainWindowUnload = () => {
-      if (!externalWindow.closed) {
-        externalWindow.close();
-      }
+      closeWindow(externalWindow);
     };
     window.addEventListener('unload', handleMainWindowUnload);
 
@@ -228,7 +248,7 @@ const WindowPortal = ({
           console.info(
             `Triggering close of window "${targetId}" (after previously prevented unload)...`
           );
-          externalWindow.close(); // It's now safe to close the window.
+          closeWindow(externalWindow); // It's now safe to close the window.
         })();
 
         // Prevent the window from closing immediately in the meantime.
@@ -263,19 +283,20 @@ const WindowPortal = ({
       if (styleObserver) styleObserver.disconnect();
       if (observer) observer.disconnect();
       window.removeEventListener('unload', handleMainWindowUnload);
-      unregisterDocumentTargetId(externalWindow.document);
+      unregisterDocumentTargetId(externalWindowDocument);
 
       // ...and close the window if it's not already.
-      if (!externalWindow.closed) {
+      if (!isWindowClosed(externalWindow)) {
         (async () => {
           await waitToSafelyStartWindowClosing(targetId);
           console.info(
             `Triggering close of window "${targetId}" (WindowPortal unmounted)...`
           );
-          externalWindow.close(); // It's now safe to close the window.
+          closeWindow(externalWindow); // It's now safe to close the window.
         })();
       }
       externalWindowRef.current = null;
+      externalWindowDocumentRef.current = null;
     };
     // We intentionally only run this effect once on mount.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -284,8 +305,14 @@ const WindowPortal = ({
   // Update the title if it changes.
   React.useEffect(
     () => {
-      if (externalWindowRef.current && !externalWindowRef.current.closed) {
-        externalWindowRef.current.document.title = title;
+      const externalWindow = externalWindowRef.current;
+      const externalWindowDocument = externalWindowDocumentRef.current;
+      if (
+        externalWindow &&
+        externalWindowDocument &&
+        !isWindowClosed(externalWindow)
+      ) {
+        externalWindowDocument.title = title;
       }
     },
     [title]

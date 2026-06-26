@@ -69,6 +69,31 @@ const isMainWindow = (windowTitle: string): boolean => {
   );
 };
 
+export const getBrowserWindowFocusInfo = (
+  browserWindow: any
+): ?{| id: number, isMainWindow: boolean |} => {
+  if (!browserWindow) return null;
+
+  try {
+    if (
+      typeof browserWindow.isDestroyed === 'function' &&
+      browserWindow.isDestroyed()
+    ) {
+      return null;
+    }
+
+    return {
+      id: browserWindow.id,
+      isMainWindow: isMainWindow(browserWindow.title),
+    };
+  } catch (error) {
+    // Electron can emit focus/blur events while a popped-out window is being
+    // destroyed. BrowserWindow properties are accessed through @electron/remote,
+    // and reading them at this point throws "Object has been destroyed".
+    return null;
+  }
+};
+
 /**
  * Create and update the editor main menu using Electron APIs.
  */
@@ -95,9 +120,12 @@ const ElectronMainMenu = ({
     isFocusedOnMainWindow,
     setIsFocusedOnMainWindow,
   ] = React.useState<boolean>(true);
-  const [focusedWindowId, setFocusedWindowId] = React.useState<number>(
-    remote.getCurrentWindow().id
-  );
+  const [focusedWindowId, setFocusedWindowId] = React.useState<number>(() => {
+    const windowFocusInfo = remote
+      ? getBrowserWindowFocusInfo(remote.getCurrentWindow())
+      : null;
+    return windowFocusInfo ? windowFocusInfo.id : 0;
+  });
   const closePreviewWindow =
     !isFocusedOnMainWindow && onClosePreview
       ? () => onClosePreview(focusedWindowId)
@@ -114,15 +142,21 @@ const ElectronMainMenu = ({
 
   useAppEventListener({
     event: 'browser-window-focus',
-    callback: window => {
-      setFocusedWindowId(window.id);
-      setIsFocusedOnMainWindow(isMainWindow(window.title));
+    callback: browserWindow => {
+      const windowFocusInfo = getBrowserWindowFocusInfo(browserWindow);
+      if (!windowFocusInfo) return;
+
+      setFocusedWindowId(windowFocusInfo.id);
+      setIsFocusedOnMainWindow(windowFocusInfo.isMainWindow);
     },
   });
   useAppEventListener({
     event: 'browser-window-blur',
-    callback: window => {
-      setIsFocusedOnMainWindow(!isMainWindow(window.title));
+    callback: browserWindow => {
+      const windowFocusInfo = getBrowserWindowFocusInfo(browserWindow);
+      if (!windowFocusInfo) return;
+
+      setIsFocusedOnMainWindow(!windowFocusInfo.isMainWindow);
     },
   });
 

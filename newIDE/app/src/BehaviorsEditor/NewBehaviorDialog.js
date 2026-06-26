@@ -79,26 +79,44 @@ export default function NewBehaviorDialog({
   // $FlowFixMe[recursive-definition]
   const getAllRequiredBehaviorTypes = React.useCallback(
     (
-      behaviorMetadata: gdBehaviorMetadata,
-      allRequiredBehaviorTypes: Array<string> = []
+      behaviorType: string,
+      allRequiredBehaviorTypes: Array<string> = [],
+      visitedBehaviorTypes: Set<string> = new Set()
     ): Array<string> => {
-      mapVector(
-        behaviorMetadata.getRequiredBehaviorTypes(),
-        requiredBehaviorType => {
-          if (allRequiredBehaviorTypes.includes(requiredBehaviorType)) {
-            return;
-          }
-          allRequiredBehaviorTypes.push(requiredBehaviorType);
-          const requiredBehaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
-            project.getCurrentPlatform(),
-            requiredBehaviorType
-          );
-          getAllRequiredBehaviorTypes(
-            requiredBehaviorMetadata,
-            allRequiredBehaviorTypes
-          );
-        }
+      if (visitedBehaviorTypes.has(behaviorType)) {
+        return allRequiredBehaviorTypes;
+      }
+      visitedBehaviorTypes.add(behaviorType);
+
+      const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
+        project.getCurrentPlatform(),
+        behaviorType
       );
+      if (gd.MetadataProvider.isBadBehaviorMetadata(behaviorMetadata)) {
+        return allRequiredBehaviorTypes;
+      }
+
+      try {
+        mapVector(
+          behaviorMetadata.getRequiredBehaviorTypes(),
+          requiredBehaviorType => {
+            if (allRequiredBehaviorTypes.includes(requiredBehaviorType)) {
+              return;
+            }
+            allRequiredBehaviorTypes.push(requiredBehaviorType);
+            getAllRequiredBehaviorTypes(
+              requiredBehaviorType,
+              allRequiredBehaviorTypes,
+              visitedBehaviorTypes
+            );
+          }
+        );
+      } catch (error) {
+        console.warn(
+          `Unable to read required behavior types for "${behaviorType}".`,
+          error
+        );
+      }
       return allRequiredBehaviorTypes;
     },
     [project]
@@ -129,9 +147,7 @@ export default function NewBehaviorDialog({
         previewIconUrl: behavior.previewIconUrl,
         objectType: behavior.objectType,
         category: behavior.category,
-        allRequiredBehaviorTypes: getAllRequiredBehaviorTypes(
-          behavior.behaviorMetadata
-        ),
+        allRequiredBehaviorTypes: getAllRequiredBehaviorTypes(behavior.type),
         tags: behavior.tags,
         name: gd.PlatformExtension.getBehaviorNameFromFullBehaviorType(
           behavior.type

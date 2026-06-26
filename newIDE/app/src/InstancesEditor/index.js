@@ -70,6 +70,7 @@ import {
   getTileSet,
   isTileSetBadlyConfigured,
 } from '../Utils/TileMap';
+import { clearPixiCachedShader } from '../Utils/PixiRendererState';
 
 const gd: libGDevelop = global.gd;
 
@@ -745,6 +746,7 @@ export default class InstancesEditor extends Component<Props, State> {
       try {
         if (this.threeRenderer) {
           this.threeRenderer.resetState();
+          clearPixiCachedShader(this.pixiRenderer);
 
           // Actually do not reset PixiJS renderer as we get crashes when doing it
           // ("Cannot read properties of null (reading '_batchEnabled')").

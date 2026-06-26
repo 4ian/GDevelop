@@ -192,6 +192,18 @@ const WindowPortal = ({
     // and pre-existing global styles.
     const styleObserver = copyDocumentStyles(document, externalWindowDocument);
 
+    let hasStoppedRenderingIntoExternalWindow = false;
+    const stopRenderingIntoExternalWindow = () => {
+      if (hasStoppedRenderingIntoExternalWindow) return;
+      hasStoppedRenderingIntoExternalWindow = true;
+
+      if (styleObserver) styleObserver.disconnect();
+      if (observer) observer.disconnect();
+      onWindowReadyRef.current(null);
+      setWindowSize(null);
+      setContainer(null);
+    };
+
     // Suppress the benign "ResizeObserver loop" error in the external window
     // so that it doesn't propagate to the main window's error handler.
     silenceBenignResizeObserverError(externalWindow);
@@ -229,10 +241,6 @@ const WindowPortal = ({
 
     // Listen to "beforeunload" to know when a window is being closed.
     externalWindow.addEventListener('beforeunload', event => {
-      // Disconnect as soon as possible to avoid any further interactions with the window.
-      if (styleObserver) styleObserver.disconnect();
-      if (observer) observer.disconnect();
-
       // Notify the window wants to be closed.
       const isSafeToClose = startWindowClosingIfSafe(targetId);
 
@@ -257,6 +265,10 @@ const WindowPortal = ({
         return;
       }
 
+      // Disconnect as soon as possible to avoid React, observers or callbacks
+      // interacting with a BrowserWindow-backed document during teardown.
+      stopRenderingIntoExternalWindow();
+
       // Let the window closing be done normally (nothing prevents it).
       console.info(`Window "${targetId}" is unloaded.`);
     });
@@ -277,11 +289,8 @@ const WindowPortal = ({
     onWindowReadyRef.current(externalWindow);
 
     return () => {
-      onWindowReadyRef.current(null);
-
       // Component is unmounted: deconnect listeners and clear things...
-      if (styleObserver) styleObserver.disconnect();
-      if (observer) observer.disconnect();
+      stopRenderingIntoExternalWindow();
       window.removeEventListener('unload', handleMainWindowUnload);
       unregisterDocumentTargetId(externalWindowDocument);
 

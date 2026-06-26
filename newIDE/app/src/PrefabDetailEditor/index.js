@@ -79,8 +79,10 @@ type Props = {|
     behaviorName: string
   ) => void | Promise<void>,
   initiallyOpenSettingsDialog?: boolean,
-  onObjectEdited?: () => void,
-  onFunctionEdited?: () => void,
+  dialogOnly?: boolean,
+  onPrefabSettingsDialogClose?: () => void,
+  onObjectEdited?: () => void | Promise<void>,
+  onFunctionEdited?: () => void | Promise<void>,
   initiallyFocusedFunctionName: ?string,
   unsavedChanges?: ?UnsavedChanges,
   onOpenCustomObjectEditor: gdEventsBasedObject => void,
@@ -232,10 +234,14 @@ export default class PrefabDetailEditor extends React.Component<Props, State> {
   _projectScopedContainersAccessor: ProjectScopedContainersAccessor | null = null;
 
   componentDidMount() {
-    if (this.props.initiallyFocusedFunctionName) {
-      this.selectEventsFunctionByName(this.props.initiallyFocusedFunctionName);
-    } else {
-      this._selectFirstEventsFunctionOrPrefabConfiguration();
+    if (!this.props.dialogOnly) {
+      if (this.props.initiallyFocusedFunctionName) {
+        this.selectEventsFunctionByName(
+          this.props.initiallyFocusedFunctionName
+        );
+      } else {
+        this._selectFirstEventsFunctionOrPrefabConfiguration();
+      }
     }
     if (this.props.initiallyOpenSettingsDialog) {
       this._openPrefabDetailsDialog();
@@ -566,6 +572,9 @@ export default class PrefabDetailEditor extends React.Component<Props, State> {
   };
 
   _notifyObjectPropertiesUpdated = () => {
+    if (this.props.unsavedChanges) {
+      this.props.unsavedChanges.triggerUnsavedChanges();
+    }
     if (this.props.onObjectEdited) {
       this.props.onObjectEdited();
     }
@@ -1037,7 +1046,11 @@ export default class PrefabDetailEditor extends React.Component<Props, State> {
   };
 
   _closePrefabDetailsDialog = () => {
-    this.setState({ prefabDetailsDialogOpen: false });
+    this.setState({ prefabDetailsDialogOpen: false }, () => {
+      if (this.props.onPrefabSettingsDialogClose) {
+        this.props.onPrefabSettingsDialogClose();
+      }
+    });
   };
 
   _makePrefabDetailsProjectScopedContainersAccessor = (): ProjectScopedContainersAccessor =>
@@ -1200,6 +1213,7 @@ export default class PrefabDetailEditor extends React.Component<Props, State> {
                       if (this.eventsFunctionList) {
                         this.eventsFunctionList.forceUpdateList();
                       }
+                      this._notifyObjectPropertiesUpdated();
                     }}
                   />
                 ) : (
@@ -1344,59 +1358,61 @@ export default class PrefabDetailEditor extends React.Component<Props, State> {
 
     return (
       <React.Fragment>
-        <ResponsiveWindowMeasurer>
-          {({ isMobile }) =>
-            isMobile ? (
-              <EditorNavigator
-                ref={editorNavigator =>
-                  (this._editorNavigator = editorNavigator)
-                }
-                // $FlowFixMe[incompatible-type]
-                editors={editors}
-                initialEditorName={'functions-list'}
-                transitions={{
-                  'events-sheet': {
-                    previousEditor: () => {
-                      if (selectedEventsFunction) {
-                        this._selectPrefabConfiguration();
-                      }
-                      return 'functions-list';
+        {!this.props.dialogOnly && (
+          <ResponsiveWindowMeasurer>
+            {({ isMobile }) =>
+              isMobile ? (
+                <EditorNavigator
+                  ref={editorNavigator =>
+                    (this._editorNavigator = editorNavigator)
+                  }
+                  // $FlowFixMe[incompatible-type]
+                  editors={editors}
+                  initialEditorName={'functions-list'}
+                  transitions={{
+                    'events-sheet': {
+                      previousEditor: () => {
+                        if (selectedEventsFunction) {
+                          this._selectPrefabConfiguration();
+                        }
+                        return 'functions-list';
+                      },
                     },
-                  },
-                }}
-                onEditorChanged={this._onEditorNavigatorEditorChanged}
-              />
-            ) : (
-              <PreferencesContext.Consumer>
-                {({
-                  getDefaultEditorMosaicNode,
-                  setDefaultEditorMosaicNode,
-                }) => (
-                  <EditorMosaic
-                    ref={editorMosaic => (this._editorMosaic = editorMosaic)}
-                    // $FlowFixMe[incompatible-type]
-                    editors={editors}
-                    centralNodeId="events-sheet"
-                    onPersistNodes={node =>
-                      setDefaultEditorMosaicNode('prefab-detail-editor', node)
-                    }
-                    initialNodes={(() => {
-                      const defaultNode = getInitialMosaicEditorNodes();
-                      const savedNode = getDefaultEditorMosaicNode(
-                        'prefab-detail-editor'
-                      );
-                      return savedNode &&
-                        mosaicContainsNode(savedNode, 'functions-list') &&
-                        !mosaicContainsNode(savedNode, 'parameters')
-                        ? savedNode
-                        : defaultNode;
-                    })()}
-                  />
-                )}
-              </PreferencesContext.Consumer>
-            )
-          }
-        </ResponsiveWindowMeasurer>
+                  }}
+                  onEditorChanged={this._onEditorNavigatorEditorChanged}
+                />
+              ) : (
+                <PreferencesContext.Consumer>
+                  {({
+                    getDefaultEditorMosaicNode,
+                    setDefaultEditorMosaicNode,
+                  }) => (
+                    <EditorMosaic
+                      ref={editorMosaic => (this._editorMosaic = editorMosaic)}
+                      // $FlowFixMe[incompatible-type]
+                      editors={editors}
+                      centralNodeId="events-sheet"
+                      onPersistNodes={node =>
+                        setDefaultEditorMosaicNode('prefab-detail-editor', node)
+                      }
+                      initialNodes={(() => {
+                        const defaultNode = getInitialMosaicEditorNodes();
+                        const savedNode = getDefaultEditorMosaicNode(
+                          'prefab-detail-editor'
+                        );
+                        return savedNode &&
+                          mosaicContainsNode(savedNode, 'functions-list') &&
+                          !mosaicContainsNode(savedNode, 'parameters')
+                          ? savedNode
+                          : defaultNode;
+                      })()}
+                    />
+                  )}
+                </PreferencesContext.Consumer>
+              )
+            }
+          </ResponsiveWindowMeasurer>
+        )}
         {objectMethodSelectorDialogOpen && (
           <ObjectMethodSelectorDialog
             eventsBasedObject={eventsBasedObject}
@@ -1481,6 +1497,9 @@ export default class PrefabDetailEditor extends React.Component<Props, State> {
                         onEventsBasedObjectChildrenEdited={
                           this.props.onEventsBasedObjectChildrenEdited
                         }
+                        onConfigurationUpdated={
+                          this._notifyObjectPropertiesUpdated
+                        }
                         hideOpenVisualEditorButton
                       />
                     </div>
@@ -1559,6 +1578,7 @@ export default class PrefabDetailEditor extends React.Component<Props, State> {
                           if (this.eventsFunctionList) {
                             this.eventsFunctionList.forceUpdateList();
                           }
+                          this._notifyObjectPropertiesUpdated();
                         }}
                       />
                     </div>
@@ -1610,6 +1630,7 @@ export default class PrefabDetailEditor extends React.Component<Props, State> {
                             if (this.eventsFunctionList) {
                               this.eventsFunctionList.forceUpdateList();
                             }
+                            this._notifyObjectPropertiesUpdated();
                           }}
                           onWillInstallExtension={
                             this.props.onWillInstallExtension

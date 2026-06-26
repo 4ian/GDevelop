@@ -71,6 +71,8 @@ import {
   renderFunctionDetailEditorContainer,
 } from './EditorContainers/ExtensionItemDetailEditorContainer';
 import { renderPrefabDetailEditorContainer } from './EditorContainers/PrefabDetailEditorContainer';
+import PrefabDetailEditor from '../PrefabDetailEditor';
+import EventsFunctionsExtensionEditor from '../EventsFunctionsExtensionEditor';
 import { renderCustomObjectEditorContainer } from './EditorContainers/CustomObjectEditorContainer';
 import { renderHomePageContainer } from './EditorContainers/HomePage';
 import { type OpenAskAiOptions } from '../AiGeneration/Utils';
@@ -330,6 +332,7 @@ const movePrefabDetailTabAfterCustomObjectTab = (
 };
 
 const defaultSnackbarAutoHideDuration = 3000;
+const ignoreToolbarUpdate = (_toolbar: ?React.Node) => {};
 
 const findStorageProviderFor = (
   i18n: I18n,
@@ -502,6 +505,20 @@ const MainFrame = (props: Props): React.MixedElement => {
     isProjectManagerPinned,
     setProjectManagerPinned,
   ] = React.useState<boolean>(preferences.values.isProjectManagerPinned);
+  const [
+    standalonePrefabSettingsDialog,
+    setStandalonePrefabSettingsDialog,
+  ] = React.useState<?{|
+    eventsFunctionsExtension: gdEventsFunctionsExtension,
+    eventsBasedObject: gdEventsBasedObject,
+  |}>(null);
+  const [
+    standaloneBehaviorSettingsDialog,
+    setStandaloneBehaviorSettingsDialog,
+  ] = React.useState<?{|
+    eventsFunctionsExtension: gdEventsFunctionsExtension,
+    eventsBasedBehavior: gdEventsBasedBehavior,
+  |}>(null);
   const [languageDialogOpen, openLanguageDialog] = React.useState<boolean>(
     false
   );
@@ -3787,38 +3804,12 @@ const MainFrame = (props: Props): React.MixedElement => {
       eventsFunctionsExtension: gdEventsFunctionsExtension,
       eventsBasedObject: gdEventsBasedObject
     ) => {
-      const { currentProject, editorTabs } = state;
-      if (!currentProject) return;
-
-      const foundTab = getPrefabDetailEditor(
-        editorTabs,
+      setStandalonePrefabSettingsDialog({
         eventsFunctionsExtension,
-        eventsBasedObject
-      );
-      if (foundTab) {
-        foundTab.editor.openPrefabSettingsDialog();
-      } else {
-        setState(state => ({
-          ...state,
-          // $FlowFixMe[incompatible-type]
-          editorTabs: openEditorTab(state.editorTabs, {
-            ...getEditorOpeningOptions({
-              kind: 'prefab detail',
-              name:
-                eventsFunctionsExtension.getName() +
-                '::' +
-                eventsBasedObject.getName(),
-              project: currentProject,
-            }),
-            extraEditorProps: {
-              initiallyOpenSettingsDialog: true,
-            },
-            dontFocusTab: true,
-          }),
-        }));
-      }
+        eventsBasedObject,
+      });
     },
-    [getEditorOpeningOptions, setState, state]
+    [setStandalonePrefabSettingsDialog]
   );
 
   const openBehaviorSettings = React.useCallback(
@@ -3826,41 +3817,12 @@ const MainFrame = (props: Props): React.MixedElement => {
       eventsFunctionsExtension: gdEventsFunctionsExtension,
       eventsBasedBehavior: gdEventsBasedBehavior
     ) => {
-      const { currentProject, editorTabs } = state;
-      if (!currentProject) return;
-
-      const foundTab = getEventsBasedBehaviorDetailEditor(
-        editorTabs,
+      setStandaloneBehaviorSettingsDialog({
         eventsFunctionsExtension,
-        eventsBasedBehavior
-      );
-      if (foundTab) {
-        foundTab.editor.openBehaviorSettingsDialog();
-      } else {
-        setState(state => ({
-          ...state,
-          // $FlowFixMe[incompatible-type]
-          editorTabs: openEditorTab(state.editorTabs, {
-            ...getEditorOpeningOptions({
-              kind: 'behavior detail',
-              name:
-                eventsFunctionsExtension.getName() +
-                '::' +
-                eventsBasedBehavior.getName(),
-              project: currentProject,
-            }),
-            extraEditorProps: {
-              initiallyFocusedFunctionName: null,
-              initiallyFocusedBehaviorName: eventsBasedBehavior.getName(),
-              initiallyFocusedObjectName: null,
-              initiallyOpenSettingsDialog: true,
-            },
-            dontFocusTab: true,
-          }),
-        }));
-      }
+        eventsBasedBehavior,
+      });
     },
-    [getEditorOpeningOptions, setState, state]
+    [setStandaloneBehaviorSettingsDialog]
   );
 
   const openCustomObjectAndExtensionEditors = React.useCallback(
@@ -4213,6 +4175,39 @@ const MainFrame = (props: Props): React.MixedElement => {
       }
     },
     [state.editorTabs, state.currentProject]
+  );
+
+  const forceUpdateOpenedEditors = React.useCallback(
+    () => {
+      for (const editor of getAllEditorTabs(state.editorTabs)) {
+        const editorRefAny: any = editor.editorRef;
+        if (
+          editorRefAny &&
+          typeof editorRefAny.forceUpdateEditor === 'function'
+        ) {
+          editorRefAny.forceUpdateEditor();
+        }
+      }
+      forceUpdate();
+    },
+    [forceUpdate, state.editorTabs]
+  );
+
+  const onStandaloneSettingsEdited = React.useCallback(
+    async () => {
+      try {
+        await onLoadEventsFunctionsExtensions({
+          shouldHotReloadEditor: true,
+        });
+      } catch (error) {
+        console.warn(
+          'Error while loading events functions extensions after editing prefab or behavior settings.',
+          error
+        );
+      }
+      forceUpdateOpenedEditors();
+    },
+    [forceUpdateOpenedEditors, onLoadEventsFunctionsExtensions]
   );
 
   const onSceneObjectEdited = React.useCallback(
@@ -6555,6 +6550,89 @@ const MainFrame = (props: Props): React.MixedElement => {
         onClose={onExternalWindowClose}
         onPopIn={onPopInTab}
       />
+      {currentProject && standalonePrefabSettingsDialog && (
+        <PrefabDetailEditor
+          key={`prefab-settings-dialog-${
+            standalonePrefabSettingsDialog.eventsBasedObject.ptr
+          }`}
+          dialogOnly
+          project={currentProject}
+          eventsFunctionsExtension={
+            standalonePrefabSettingsDialog.eventsFunctionsExtension
+          }
+          eventsBasedObject={standalonePrefabSettingsDialog.eventsBasedObject}
+          setToolbar={ignoreToolbarUpdate}
+          resourceManagementProps={resourceManagementProps}
+          openInstructionOrExpression={openInstructionOrExpression}
+          openBehaviorEvents={openBehaviorEvents}
+          onCreateEventsFunction={onCreateEventsFunction}
+          initiallyFocusedFunctionName={null}
+          initiallyOpenSettingsDialog
+          onPrefabSettingsDialogClose={() =>
+            setStandalonePrefabSettingsDialog(null)
+          }
+          onObjectEdited={onStandaloneSettingsEdited}
+          onFunctionEdited={onStandaloneSettingsEdited}
+          unsavedChanges={unsavedChanges}
+          onOpenCustomObjectEditor={eventsBasedObject => {
+            openCustomObjectEditor(
+              standalonePrefabSettingsDialog.eventsFunctionsExtension,
+              eventsBasedObject,
+              ''
+            );
+          }}
+          hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
+          onEventsBasedObjectChildrenEdited={onEventsBasedObjectChildrenEdited}
+          onWillInstallExtension={onWillInstallExtension}
+          onExtensionInstalled={onExtensionInstalled}
+          onEventBasedObjectTypeChanged={onEventBasedObjectTypeChanged}
+        />
+      )}
+      {currentProject && standaloneBehaviorSettingsDialog && (
+        <EventsFunctionsExtensionEditor
+          key={`behavior-settings-dialog-${
+            standaloneBehaviorSettingsDialog.eventsBasedBehavior.ptr
+          }`}
+          dialogOnly
+          project={currentProject}
+          eventsFunctionsExtension={
+            standaloneBehaviorSettingsDialog.eventsFunctionsExtension
+          }
+          setToolbar={ignoreToolbarUpdate}
+          resourceManagementProps={resourceManagementProps}
+          openInstructionOrExpression={openInstructionOrExpression}
+          onCreateEventsFunction={onCreateEventsFunction}
+          onBehaviorEdited={onStandaloneSettingsEdited}
+          onObjectEdited={onStandaloneSettingsEdited}
+          onFunctionEdited={onStandaloneSettingsEdited}
+          initiallyFocusedFunctionName={null}
+          initiallyFocusedBehaviorName={standaloneBehaviorSettingsDialog.eventsBasedBehavior.getName()}
+          initiallyFocusedObjectName={null}
+          focusedEventsBasedBehavior={
+            standaloneBehaviorSettingsDialog.eventsBasedBehavior
+          }
+          focusedEventsFunction={null}
+          initiallyOpenSettingsDialog
+          onBehaviorSettingsDialogClose={() =>
+            setStandaloneBehaviorSettingsDialog(null)
+          }
+          unsavedChanges={unsavedChanges}
+          onOpenCustomObjectEditor={eventsBasedObject => {
+            openCustomObjectEditor(
+              standaloneBehaviorSettingsDialog.eventsFunctionsExtension,
+              eventsBasedObject,
+              ''
+            );
+          }}
+          hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
+          onEventsBasedObjectChildrenEdited={onEventsBasedObjectChildrenEdited}
+          onRenamedEventsBasedObject={onRenamedEventsBasedObject}
+          onDeletedEventsBasedObject={onDeletedEventsBasedObject}
+          onEventBasedObjectTypeChanged={onEventBasedObjectTypeChanged}
+          onWillInstallExtension={onWillInstallExtension}
+          onExtensionInstalled={onExtensionInstalled}
+        />
+      )}
       <CommandPalette ref={commandPaletteRef} />
       <LoaderModal
         showImmediately={showLoaderImmediately}

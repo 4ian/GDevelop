@@ -15,6 +15,7 @@ let previewWindows = [];
 let debuggerPopOutWindows = new Map();
 
 let openDevToolsByDefault = false;
+const DEBUGGER_POP_OUT_FORCE_CLOSE_DELAY_MS = 17000;
 
 // While ANY preview is open we hold a power-save blocker. macOS suspends the
 // entire renderer process of an OCCLUDED window (not just its requestAnimationFrame
@@ -265,14 +266,13 @@ const sendDebuggerPopOutCloseRequested = parentWindowId => {
     !parentWindow.webContents.isDestroyed()
   ) {
     parentWindow.webContents.send('debugger-popout-close-requested');
+    return true;
   }
+  return false;
 };
 
-const closeDebuggerPopOutWindow = (
-  parentWindowId,
-  parentWasMinimizedBeforePreviewClose
-) => {
-  sendDebuggerPopOutCloseRequested(parentWindowId);
+const closeDebuggerPopOutWindow = parentWindowId => {
+  const parentWasNotified = sendDebuggerPopOutCloseRequested(parentWindowId);
 
   const debuggerWindow = debuggerPopOutWindows.get(parentWindowId);
   if (!debuggerWindow || debuggerWindow.isDestroyed()) return;
@@ -282,18 +282,29 @@ const closeDebuggerPopOutWindow = (
       debuggerWindow.setParentWindow(null);
     }
 
-    setImmediate(() => {
+    const closeDebuggerWindow = () => {
       try {
-        if (!debuggerWindow.isDestroyed()) debuggerWindow.close();
+        if (
+          debuggerPopOutWindows.get(parentWindowId) === debuggerWindow &&
+          !debuggerWindow.isDestroyed()
+        ) {
+          debuggerWindow.close();
+        }
       } catch (error) {
         console.warn('Ignoring exception when closing debugger window:', error);
       }
+    };
 
-      keepParentWindowVisibleAfterChildClose(
-        parentWindowId,
-        parentWasMinimizedBeforePreviewClose
-      );
-    });
+    if (parentWasNotified) {
+      // The debugger pop-out is owned by WindowPortal in the renderer process.
+      // Let it close itself so its Electron window-closing mutex can avoid
+      // "Uncaught illegal access" while filesystem work or React portal cleanup
+      // is still touching the BrowserWindow-backed document. Keep a delayed
+      // fallback in case the renderer cannot process the close request.
+      setTimeout(closeDebuggerWindow, DEBUGGER_POP_OUT_FORCE_CLOSE_DELAY_MS);
+    } else {
+      setImmediate(closeDebuggerWindow);
+    }
   } catch (error) {
     console.warn('Ignoring exception when closing debugger window:', error);
   }
@@ -395,10 +406,7 @@ const openPreviewWindow = ({
       ) {
         arrangeDebuggerPopOutWithLatestPreview(parentWindowId);
       } else {
-        closeDebuggerPopOutWindow(
-          parentWindowId,
-          parentWasMinimizedBeforePreviewClose
-        );
+        closeDebuggerPopOutWindow(parentWindowId);
       }
       keepParentWindowVisibleAfterChildClose(
         parentWindowId,

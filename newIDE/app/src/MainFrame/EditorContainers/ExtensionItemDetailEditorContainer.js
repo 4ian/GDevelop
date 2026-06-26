@@ -91,7 +91,9 @@ export class ExtensionItemDetailEditorContainer extends React.Component<Props> {
   }
 
   forceUpdateEditor() {
-    // No updates to be done.
+    if (this.editor) {
+      this.editor.forceUpdate();
+    }
   }
 
   onEventsBasedObjectChildrenEdited() {

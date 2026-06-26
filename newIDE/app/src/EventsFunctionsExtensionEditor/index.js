@@ -98,15 +98,17 @@ type Props = {|
       | 'extension-events-editor'
       | 'external-events-editor'
   ) => Promise<void>,
-  onBehaviorEdited?: () => void,
-  onObjectEdited?: () => void,
-  onFunctionEdited?: () => void,
+  onBehaviorEdited?: () => void | Promise<void>,
+  onObjectEdited?: () => void | Promise<void>,
+  onFunctionEdited?: () => void | Promise<void>,
   initiallyFocusedFunctionName: ?string,
   initiallyFocusedBehaviorName: ?string,
   initiallyFocusedObjectName: ?string,
   focusedEventsBasedBehavior?: ?gdEventsBasedBehavior,
   focusedEventsFunction?: ?gdEventsFunction,
   initiallyOpenSettingsDialog?: boolean,
+  dialogOnly?: boolean,
+  onBehaviorSettingsDialogClose?: () => void,
   unsavedChanges?: ?UnsavedChanges,
   onOpenCustomObjectEditor: gdEventsBasedObject => void,
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
@@ -342,32 +344,40 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
   _projectScopedContainersAccessor: ProjectScopedContainersAccessor | null = null;
 
   componentDidMount() {
-    if (this.props.focusedEventsBasedBehavior) {
-      if (this.props.initiallyFocusedFunctionName) {
-        this.selectEventsFunctionByName(
-          this.props.initiallyFocusedFunctionName,
-          this.props.focusedEventsBasedBehavior.getName(),
+    if (!this.props.dialogOnly) {
+      if (this.props.focusedEventsBasedBehavior) {
+        if (this.props.initiallyFocusedFunctionName) {
+          this.selectEventsFunctionByName(
+            this.props.initiallyFocusedFunctionName,
+            this.props.focusedEventsBasedBehavior.getName(),
+            null
+          );
+        } else {
+          this._selectFirstEventsFunctionOrBehaviorConfiguration(
+            this.props.focusedEventsBasedBehavior
+          );
+        }
+      } else if (this.props.focusedEventsFunction) {
+        this._selectEventsFunction(
+          this.props.focusedEventsFunction,
+          null,
           null
         );
-      } else {
-        this._selectFirstEventsFunctionOrBehaviorConfiguration(
-          this.props.focusedEventsBasedBehavior
+      } else if (this.props.initiallyFocusedFunctionName) {
+        this.selectEventsFunctionByName(
+          this.props.initiallyFocusedFunctionName,
+          this.props.initiallyFocusedBehaviorName,
+          this.props.initiallyFocusedObjectName
+        );
+      } else if (this.props.initiallyFocusedBehaviorName) {
+        this.selectEventsBasedBehaviorByName(
+          this.props.initiallyFocusedBehaviorName
+        );
+      } else if (this.props.initiallyFocusedObjectName) {
+        this.selectEventsBasedObjectByName(
+          this.props.initiallyFocusedObjectName
         );
       }
-    } else if (this.props.focusedEventsFunction) {
-      this._selectEventsFunction(this.props.focusedEventsFunction, null, null);
-    } else if (this.props.initiallyFocusedFunctionName) {
-      this.selectEventsFunctionByName(
-        this.props.initiallyFocusedFunctionName,
-        this.props.initiallyFocusedBehaviorName,
-        this.props.initiallyFocusedObjectName
-      );
-    } else if (this.props.initiallyFocusedBehaviorName) {
-      this.selectEventsBasedBehaviorByName(
-        this.props.initiallyFocusedBehaviorName
-      );
-    } else if (this.props.initiallyFocusedObjectName) {
-      this.selectEventsBasedObjectByName(this.props.initiallyFocusedObjectName);
     }
     if (this.props.initiallyOpenSettingsDialog) {
       this.openBehaviorSettingsDialog();
@@ -1354,12 +1364,18 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
   };
 
   _notifyBehaviorPropertiesUpdated = () => {
+    if (this.props.unsavedChanges) {
+      this.props.unsavedChanges.triggerUnsavedChanges();
+    }
     if (this.props.onBehaviorEdited) {
       this.props.onBehaviorEdited();
     }
   };
 
   _notifyObjectPropertiesUpdated = () => {
+    if (this.props.unsavedChanges) {
+      this.props.unsavedChanges.triggerUnsavedChanges();
+    }
     if (this.props.onObjectEdited) {
       this.props.onObjectEdited();
     }
@@ -1467,7 +1483,10 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     });
   };
 
-  _editBehavior = (editedEventsBasedBehavior: ?gdEventsBasedBehavior) => {
+  _editBehavior = (
+    editedEventsBasedBehavior: ?gdEventsBasedBehavior,
+    onDone?: () => void
+  ) => {
     this.setState(
       state => {
         // If we're closing the properties of a behavior, ensure parameters
@@ -1511,6 +1530,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
             this._updateProjectScopedContainer();
           }
         }
+        if (onDone) onDone();
       }
     );
   };
@@ -1744,7 +1764,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
 
   _closeDetailSettingsDialog = () => {
     this.setState({ detailSettingsDialogOpen: false }, () => {
-      this._editBehavior(null);
+      this._editBehavior(null, this.props.onBehaviorSettingsDialogClose);
     });
   };
 
@@ -1940,6 +1960,11 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                       if (this.eventsFunctionList) {
                         this.eventsFunctionList.forceUpdateList();
                       }
+                      if (selectedEventsBasedBehavior) {
+                        this._notifyBehaviorPropertiesUpdated();
+                      } else if (selectedEventsBasedObject) {
+                        this._notifyObjectPropertiesUpdated();
+                      }
                     }}
                   />
                 ) : (
@@ -2090,8 +2115,12 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                 if (this.eventsFunctionList) {
                   this.eventsFunctionList.forceUpdateList();
                 }
+                this._notifyBehaviorPropertiesUpdated();
               }}
-              onConfigurationUpdated={this._onConfigurationUpdated}
+              onConfigurationUpdated={attribute => {
+                this._onConfigurationUpdated(attribute);
+                this._notifyBehaviorPropertiesUpdated();
+              }}
               onOpenCustomObjectEditor={() => {}}
               onEventsBasedObjectChildrenEdited={() => {}}
               onWillInstallExtension={this.props.onWillInstallExtension}
@@ -2143,6 +2172,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                 if (this.eventsFunctionList) {
                   this.eventsFunctionList.forceUpdateList();
                 }
+                this._notifyObjectPropertiesUpdated();
               }}
               onOpenCustomObjectEditor={() =>
                 this.props.onOpenCustomObjectEditor(selectedEventsBasedObject)
@@ -2150,6 +2180,10 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
               onEventsBasedObjectChildrenEdited={
                 this.props.onEventsBasedObjectChildrenEdited
               }
+              onConfigurationUpdated={attribute => {
+                this._onConfigurationUpdated(attribute);
+                this._notifyObjectPropertiesUpdated();
+              }}
               onWillInstallExtension={this.props.onWillInstallExtension}
               onExtensionInstalled={this.props.onExtensionInstalled}
             />
@@ -2238,130 +2272,134 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
 
     return (
       <React.Fragment>
-        <ResponsiveWindowMeasurer>
-          {({ isMobile }) =>
-            isMobile ? (
-              <EditorNavigator
-                ref={editorNavigator =>
-                  (this._editorNavigator = editorNavigator)
-                }
-                // $FlowFixMe[incompatible-type]
-                editors={editors}
-                initialEditorName={'functions-list'}
-                transitions={{
-                  'events-sheet': {
-                    nextIcon: <Tune />,
-                    nextLabel: selectedEventsFunction ? (
-                      <Trans>Parameters</Trans>
-                    ) : (
-                      <Trans>Property list</Trans>
-                    ),
-                    nextEditor: 'parameters',
-                    previousEditor: () => {
-                      this._selectEventsFunction(null, null, null);
-                      return 'functions-list';
+        {!this.props.dialogOnly && (
+          <ResponsiveWindowMeasurer>
+            {({ isMobile }) =>
+              isMobile ? (
+                <EditorNavigator
+                  ref={editorNavigator =>
+                    (this._editorNavigator = editorNavigator)
+                  }
+                  // $FlowFixMe[incompatible-type]
+                  editors={editors}
+                  initialEditorName={'functions-list'}
+                  transitions={{
+                    'events-sheet': {
+                      nextIcon: <Tune />,
+                      nextLabel: selectedEventsFunction ? (
+                        <Trans>Parameters</Trans>
+                      ) : (
+                        <Trans>Property list</Trans>
+                      ),
+                      nextEditor: 'parameters',
+                      previousEditor: () => {
+                        this._selectEventsFunction(null, null, null);
+                        return 'functions-list';
+                      },
                     },
-                  },
-                  parameters: {
-                    nextIcon: <Mark />,
-                    nextLabel: selectedEventsFunction ? (
-                      <Trans>Validate these parameters</Trans>
-                    ) : null,
-                    nextEditor: selectedEventsFunction ? 'events-sheet' : null,
-                    previousEditor: selectedEventsFunction
-                      ? null
-                      : () => {
-                          if (this.propertyListEditor) {
-                            const selection = this.propertyListEditor.getSelectedProperty();
-                            if (selection) {
-                              const {
-                                propertyName,
-                                isSharedProperties,
-                              } = selection;
-                              // Scroll to the selected property.
-                              // Ideally, we'd wait for the list to be updated to scroll, but
-                              // to simplify the code, we just wait a few ms for a new render
-                              // to be done.
-                              setTimeout(() => {
-                                const eventsBasedEntityEditor =
-                                  this.eventsBasedBehaviorEditor ||
-                                  this.eventsBasedObjectEditor;
-                                if (eventsBasedEntityEditor) {
-                                  eventsBasedEntityEditor.scrollToProperty(
-                                    propertyName,
-                                    isSharedProperties
-                                  );
-                                }
-                              }, 100); // A few ms is enough for a new render to be done.
+                    parameters: {
+                      nextIcon: <Mark />,
+                      nextLabel: selectedEventsFunction ? (
+                        <Trans>Validate these parameters</Trans>
+                      ) : null,
+                      nextEditor: selectedEventsFunction
+                        ? 'events-sheet'
+                        : null,
+                      previousEditor: selectedEventsFunction
+                        ? null
+                        : () => {
+                            if (this.propertyListEditor) {
+                              const selection = this.propertyListEditor.getSelectedProperty();
+                              if (selection) {
+                                const {
+                                  propertyName,
+                                  isSharedProperties,
+                                } = selection;
+                                // Scroll to the selected property.
+                                // Ideally, we'd wait for the list to be updated to scroll, but
+                                // to simplify the code, we just wait a few ms for a new render
+                                // to be done.
+                                setTimeout(() => {
+                                  const eventsBasedEntityEditor =
+                                    this.eventsBasedBehaviorEditor ||
+                                    this.eventsBasedObjectEditor;
+                                  if (eventsBasedEntityEditor) {
+                                    eventsBasedEntityEditor.scrollToProperty(
+                                      propertyName,
+                                      isSharedProperties
+                                    );
+                                  }
+                                }, 100); // A few ms is enough for a new render to be done.
+                              }
                             }
-                          }
-                          return 'events-sheet';
-                        },
-                  },
-                }}
-                onEditorChanged={
-                  // It's important that this callback is the same across renders,
-                  // to avoid confusing EditorNavigator into thinking it's changed
-                  // and immediately calling it, which would trigger an infinite loop.
-                  // Search for "callback-prevent-infinite-rerendering" in the codebase.
-                  this._onEditorNavigatorEditorChanged
-                }
-              />
-            ) : (
-              <PreferencesContext.Consumer>
-                {({
-                  getDefaultEditorMosaicNode,
-                  setDefaultEditorMosaicNode,
-                }) => (
-                  <EditorMosaic
-                    ref={editorMosaic => (this._editorMosaic = editorMosaic)}
-                    // $FlowFixMe[incompatible-type]
-                    editors={editors}
-                    centralNodeId="events-sheet"
-                    onPersistNodes={node =>
-                      setDefaultEditorMosaicNode(
-                        isDetailMode
-                          ? 'events-functions-extension-detail-editor'
-                          : 'events-functions-extension-editor',
-                        node
-                      )
-                    }
-                    initialNodes={(() => {
-                      if (isDetailMode) {
-                        const defaultNode = getDetailMosaicEditorNodes();
-                        const savedNode = getDefaultEditorMosaicNode(
-                          'events-functions-extension-detail-editor'
-                        );
-                        return savedNode &&
-                          mosaicContainsNode(savedNode, 'functions-list') &&
-                          !mosaicContainsNode(savedNode, 'parameters')
-                          ? savedNode
-                          : defaultNode;
+                            return 'events-sheet';
+                          },
+                    },
+                  }}
+                  onEditorChanged={
+                    // It's important that this callback is the same across renders,
+                    // to avoid confusing EditorNavigator into thinking it's changed
+                    // and immediately calling it, which would trigger an infinite loop.
+                    // Search for "callback-prevent-infinite-rerendering" in the codebase.
+                    this._onEditorNavigatorEditorChanged
+                  }
+                />
+              ) : (
+                <PreferencesContext.Consumer>
+                  {({
+                    getDefaultEditorMosaicNode,
+                    setDefaultEditorMosaicNode,
+                  }) => (
+                    <EditorMosaic
+                      ref={editorMosaic => (this._editorMosaic = editorMosaic)}
+                      // $FlowFixMe[incompatible-type]
+                      editors={editors}
+                      centralNodeId="events-sheet"
+                      onPersistNodes={node =>
+                        setDefaultEditorMosaicNode(
+                          isDetailMode
+                            ? 'events-functions-extension-detail-editor'
+                            : 'events-functions-extension-editor',
+                          node
+                        )
                       }
+                      initialNodes={(() => {
+                        if (isDetailMode) {
+                          const defaultNode = getDetailMosaicEditorNodes();
+                          const savedNode = getDefaultEditorMosaicNode(
+                            'events-functions-extension-detail-editor'
+                          );
+                          return savedNode &&
+                            mosaicContainsNode(savedNode, 'functions-list') &&
+                            !mosaicContainsNode(savedNode, 'parameters')
+                            ? savedNode
+                            : defaultNode;
+                        }
 
-                      // Settings from older release may not have the unified
-                      // function list.
-                      return mosaicContainsNode(
-                        getDefaultEditorMosaicNode(
-                          'events-functions-extension-editor'
-                          // $FlowFixMe[incompatible-type]
-                        ) || getInitialMosaicEditorNodes(),
-                        'functions-list'
-                      )
-                        ? getDefaultEditorMosaicNode(
+                        // Settings from older release may not have the unified
+                        // function list.
+                        return mosaicContainsNode(
+                          getDefaultEditorMosaicNode(
                             'events-functions-extension-editor'
                             // $FlowFixMe[incompatible-type]
-                          ) || getInitialMosaicEditorNodes()
-                        : // Force the mosaic to reset to default.
-                          // $FlowFixMe[incompatible-type]
-                          getInitialMosaicEditorNodes();
-                    })()}
-                  />
-                )}
-              </PreferencesContext.Consumer>
-            )
-          }
-        </ResponsiveWindowMeasurer>
+                          ) || getInitialMosaicEditorNodes(),
+                          'functions-list'
+                        )
+                          ? getDefaultEditorMosaicNode(
+                              'events-functions-extension-editor'
+                              // $FlowFixMe[incompatible-type]
+                            ) || getInitialMosaicEditorNodes()
+                          : // Force the mosaic to reset to default.
+                            // $FlowFixMe[incompatible-type]
+                            getInitialMosaicEditorNodes();
+                      })()}
+                    />
+                  )}
+                </PreferencesContext.Consumer>
+              )
+            }
+          </ResponsiveWindowMeasurer>
+        )}
         {editOptionsDialogOpen && (
           <OptionsEditorDialog
             project={project}
@@ -2457,7 +2495,10 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                         eventsFunctionsExtension={eventsFunctionsExtension}
                         eventsBasedBehavior={focusedEventsBasedBehavior}
                         unsavedChanges={this.props.unsavedChanges}
-                        onConfigurationUpdated={this._onConfigurationUpdated}
+                        onConfigurationUpdated={attribute => {
+                          this._onConfigurationUpdated(attribute);
+                          this._notifyBehaviorPropertiesUpdated();
+                        }}
                       />
                     </div>
                   </div>
@@ -2503,6 +2544,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                           if (this.eventsFunctionList) {
                             this.eventsFunctionList.forceUpdateList();
                           }
+                          this._notifyBehaviorPropertiesUpdated();
                         }}
                       />
                     </div>
@@ -2572,6 +2614,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                             if (this.eventsFunctionList) {
                               this.eventsFunctionList.forceUpdateList();
                             }
+                            this._notifyBehaviorPropertiesUpdated();
                           }}
                           onWillInstallExtension={
                             this.props.onWillInstallExtension

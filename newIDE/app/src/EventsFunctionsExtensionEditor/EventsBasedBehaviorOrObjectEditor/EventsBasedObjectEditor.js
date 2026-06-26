@@ -31,6 +31,7 @@ type Props = {|
   onEventsBasedObjectChildrenEdited: (
     eventsBasedObject: gdEventsBasedObject
   ) => void,
+  onConfigurationUpdated?: () => void,
   hideOpenVisualEditorButton?: boolean,
 |};
 
@@ -40,6 +41,7 @@ export default function EventsBasedObjectEditor({
   onOpenCustomObjectEditor,
   unsavedChanges,
   onEventsBasedObjectChildrenEdited,
+  onConfigurationUpdated,
   hideOpenVisualEditorButton,
 }: Props): React.Node {
   const forceUpdate = useForceUpdate();
@@ -50,9 +52,12 @@ export default function EventsBasedObjectEditor({
       if (unsavedChanges) {
         unsavedChanges.triggerUnsavedChanges();
       }
+      if (onConfigurationUpdated) {
+        onConfigurationUpdated();
+      }
       forceUpdate();
     },
-    [forceUpdate, unsavedChanges]
+    [forceUpdate, onConfigurationUpdated, unsavedChanges]
   );
 
   return (
@@ -111,6 +116,7 @@ export default function EventsBasedObjectEditor({
             }}
             setIconUrl={value => {
               eventsBasedObject.setIconUrl(value);
+              onChange();
             }}
             disabled={!eventsFunctionsExtension.getIconUrl()}
             placeholder={

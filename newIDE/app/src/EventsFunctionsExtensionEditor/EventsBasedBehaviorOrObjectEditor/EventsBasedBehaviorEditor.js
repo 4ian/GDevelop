@@ -45,13 +45,16 @@ export default function EventsBasedBehaviorEditor({
   const [isLoading, setIsLoading] = React.useState(false);
 
   const onChange = React.useCallback(
-    () => {
+    (attribute?: ?ExtensionItemConfigurationAttribute) => {
       if (unsavedChanges) {
         unsavedChanges.triggerUnsavedChanges();
       }
+      if (onConfigurationUpdated) {
+        onConfigurationUpdated(attribute);
+      }
       forceUpdate();
     },
-    [forceUpdate, unsavedChanges]
+    [forceUpdate, onConfigurationUpdated, unsavedChanges]
   );
 
   // An array containing all the object types that are using the behavior
@@ -124,6 +127,7 @@ export default function EventsBasedBehaviorEditor({
             }}
             setIconUrl={value => {
               eventsBasedBehavior.setIconUrl(value);
+              onChange();
             }}
             disabled={!eventsFunctionsExtension.getIconUrl()}
             placeholder={
@@ -139,7 +143,7 @@ export default function EventsBasedBehaviorEditor({
             value={eventsBasedBehavior.getObjectType()}
             onChange={(objectType: string) => {
               eventsBasedBehavior.setObjectType(objectType);
-              onChange();
+              onChange('type');
             }}
             allowedObjectTypes={
               allObjectTypes.length === 0
@@ -200,8 +204,7 @@ export default function EventsBasedBehaviorEditor({
             checked={eventsBasedBehavior.isPrivate()}
             onCheck={checked => {
               eventsBasedBehavior.setPrivate(checked);
-              if (onConfigurationUpdated) onConfigurationUpdated('isPrivate');
-              onChange();
+              onChange('isPrivate');
             }}
             markdownDescription={
               eventsBasedBehavior.isPrivate()

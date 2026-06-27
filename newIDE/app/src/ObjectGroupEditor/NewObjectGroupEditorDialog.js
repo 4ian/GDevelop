@@ -11,7 +11,10 @@ import { ColumnStackLayout } from '../UI/Layout';
 import Checkbox from '../UI/Checkbox';
 import HelpButton from '../UI/HelpButton';
 
-export type ObjectGroupEditorTab = 'objects' | 'variables';
+export type ObjectGroupEditorTab =
+  | 'objects'
+  | 'variables'
+  | 'requiredBehaviors';
 
 type Props = {|
   project: gdProject,

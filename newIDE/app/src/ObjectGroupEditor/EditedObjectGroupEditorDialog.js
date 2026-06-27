@@ -3,6 +3,7 @@ import { Trans, t } from '@lingui/macro';
 import React from 'react';
 import FlatButton from '../UI/FlatButton';
 import ObjectGroupEditor from '.';
+import ObjectGroupRequiredBehaviorsEditor from './ObjectGroupRequiredBehaviorsEditor';
 import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import { useSerializableObjectCancelableEditor } from '../Utils/SerializableObjectCancelableEditor';
 import useForceUpdate from '../Utils/UseForceUpdate';
@@ -20,7 +21,10 @@ import { type GroupWithContext } from '../ObjectsList/EnumerateObjects';
 
 const gd: libGDevelop = global.gd;
 
-export type ObjectGroupEditorTab = 'objects' | 'variables';
+export type ObjectGroupEditorTab =
+  | 'objects'
+  | 'variables'
+  | 'requiredBehaviors';
 
 type Props = {|
   project: gdProject,
@@ -76,6 +80,7 @@ const EditedObjectGroupEditorDialog = ({
   const [objectGroupName, setObjectGroupName] = React.useState<string>(
     group.getName()
   );
+  const requiredBehaviorTypes = group.getAllRequiredBehaviorTypes().toJSArray();
 
   const groupVariablesContainer = useValueWithInit(
     // The VariablesContainer is returned by value.
@@ -189,6 +194,26 @@ const EditedObjectGroupEditorDialog = ({
     [forceUpdate, globalObjectsContainer, group, isGroupGlobal, notifyOfChange]
   );
 
+  const addRequiredBehavior = React.useCallback(
+    (behaviorType: string) => {
+      group.addRequiredBehavior(behaviorType);
+      // Force update to ensure dialog is properly positioned.
+      forceUpdate();
+      notifyOfChange();
+    },
+    [forceUpdate, group, notifyOfChange]
+  );
+
+  const removeRequiredBehavior = React.useCallback(
+    (behaviorType: string) => {
+      group.removeRequiredBehavior(behaviorType);
+      // Force update to ensure dialog is properly positioned.
+      forceUpdate();
+      notifyOfChange();
+    },
+    [forceUpdate, group, notifyOfChange]
+  );
+
   React.useEffect(
     () => {
       if (!isGroupGlobal || !globalObjectsContainer) return;
@@ -216,7 +241,11 @@ const EditedObjectGroupEditorDialog = ({
 
   return (
     <Dialog
-      title={<Trans>Edit {objectGroupName}</Trans>}
+      title={
+        <>
+          <Trans>Edit</Trans> {objectGroupName}
+        </>
+      }
       key={group.ptr}
       actions={[
         <FlatButton
@@ -272,6 +301,10 @@ const EditedObjectGroupEditorDialog = ({
                 label: <Trans>Variables</Trans>,
                 value: 'variables',
               },
+              {
+                label: <Trans>Required behaviors</Trans>,
+                value: 'requiredBehaviors',
+              },
             ]}
           />
         </ColumnStackLayout>
@@ -298,8 +331,17 @@ const EditedObjectGroupEditorDialog = ({
             onObjectRemoved={removeObject}
             isObjectListLocked={isObjectListLocked}
             isGlobalGroup={isGroupGlobal}
+            requiredBehaviorTypes={requiredBehaviorTypes}
           />
         ))}
+      {currentTab === 'requiredBehaviors' && (
+        <ObjectGroupRequiredBehaviorsEditor
+          project={project}
+          requiredBehaviorTypes={requiredBehaviorTypes}
+          onRequiredBehaviorAdded={addRequiredBehavior}
+          onRequiredBehaviorRemoved={removeRequiredBehavior}
+        />
+      )}
       {currentTab === 'variables' && (
         <Column expand noMargin>
           {groupVariablesContainer.count() > 0 && DismissableTutorialMessage && (

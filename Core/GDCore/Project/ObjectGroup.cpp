@@ -38,6 +38,23 @@ void ObjectGroup::RenameObject(const gd::String& oldName,
   }
 }
 
+bool ObjectGroup::HasRequiredBehavior(const gd::String& behaviorType) const {
+  return std::find(requiredBehaviorTypes.begin(), requiredBehaviorTypes.end(),
+                   behaviorType) != requiredBehaviorTypes.end();
+}
+
+void ObjectGroup::AddRequiredBehavior(const gd::String& behaviorType) {
+  if (!behaviorType.empty() && !HasRequiredBehavior(behaviorType))
+    requiredBehaviorTypes.push_back(behaviorType);
+}
+
+void ObjectGroup::RemoveRequiredBehavior(const gd::String& behaviorType) {
+  requiredBehaviorTypes.erase(
+      std::remove(requiredBehaviorTypes.begin(), requiredBehaviorTypes.end(),
+                  behaviorType),
+      requiredBehaviorTypes.end());
+}
+
 void ObjectGroup::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("name", GetName());
 
@@ -46,11 +63,22 @@ void ObjectGroup::SerializeTo(SerializerElement& element) const {
   for (auto& name : GetAllObjectsNames()) {
     objectsElement.AddChild("object").SetAttribute("name", name);
   }
+
+  if (!requiredBehaviorTypes.empty()) {
+    SerializerElement& requiredBehaviorsElement =
+        element.AddChild("requiredBehaviors");
+    requiredBehaviorsElement.ConsiderAsArrayOf("behavior");
+    for (auto& behaviorType : GetAllRequiredBehaviorTypes()) {
+      requiredBehaviorsElement.AddChild("behavior").SetAttribute(
+          "type", behaviorType);
+    }
+  }
 }
 
 void ObjectGroup::UnserializeFrom(const SerializerElement& element) {
   SetName(element.GetStringAttribute("name", "", "nom"));
   memberObjects.clear();
+  requiredBehaviorTypes.clear();
 
   // Compatibility with GD <= 3.3
   if (element.HasChild("Objet")) {
@@ -63,6 +91,17 @@ void ObjectGroup::UnserializeFrom(const SerializerElement& element) {
     objectsElement.ConsiderAsArrayOf("object");
     for (std::size_t j = 0; j < objectsElement.GetChildrenCount(); ++j)
       AddObject(objectsElement.GetChild(j).GetStringAttribute("name"));
+  }
+
+  if (element.HasChild("requiredBehaviors")) {
+    SerializerElement& requiredBehaviorsElement =
+        element.GetChild("requiredBehaviors");
+    requiredBehaviorsElement.ConsiderAsArrayOf("behavior");
+    for (std::size_t j = 0; j < requiredBehaviorsElement.GetChildrenCount();
+         ++j) {
+      AddRequiredBehavior(
+          requiredBehaviorsElement.GetChild(j).GetStringAttribute("type"));
+    }
   }
 }
 

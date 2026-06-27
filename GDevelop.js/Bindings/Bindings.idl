@@ -369,6 +369,12 @@ interface ObjectGroup {
 
     [Const, Ref] VectorString GetAllObjectsNames();
 
+    void AddRequiredBehavior([Const] DOMString behaviorType);
+    void RemoveRequiredBehavior([Const] DOMString behaviorType);
+    boolean HasRequiredBehavior([Const] DOMString behaviorType);
+
+    [Const, Ref] VectorString GetAllRequiredBehaviorTypes();
+
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Const, Ref] SerializerElement element);
 };

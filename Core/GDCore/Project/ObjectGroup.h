@@ -66,6 +66,28 @@ class GD_CORE_API ObjectGroup {
   }
 
   /**
+   * \brief Return true if the ObjectGroup requires this behavior type.
+   */
+  bool HasRequiredBehavior(const gd::String& behaviorType) const;
+
+  /**
+   * \brief Add a behavior type required by the group editor.
+   */
+  void AddRequiredBehavior(const gd::String& behaviorType);
+
+  /**
+   * \brief Remove a behavior type required by the group editor.
+   */
+  void RemoveRequiredBehavior(const gd::String& behaviorType);
+
+  /**
+   * \brief Get the behavior types required by the group editor.
+   */
+  inline const std::vector<gd::String>& GetAllRequiredBehaviorTypes() const {
+    return requiredBehaviorTypes;
+  }
+
+  /**
    * \brief Serialize the group.
    */
   void SerializeTo(SerializerElement& element) const;
@@ -77,6 +99,7 @@ class GD_CORE_API ObjectGroup {
 
  private:
   std::vector<gd::String> memberObjects;
+  std::vector<gd::String> requiredBehaviorTypes;
   gd::String name;  ///< Group name
 };
 

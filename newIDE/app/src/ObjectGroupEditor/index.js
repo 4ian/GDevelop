@@ -3,7 +3,9 @@ import * as React from 'react';
 import { t, Trans } from '@lingui/macro';
 
 import { List, ListItem } from '../UI/List';
-import ObjectSelector from '../ObjectsList/ObjectSelector';
+import ObjectSelector, {
+  checkHasRequiredBehaviors,
+} from '../ObjectsList/ObjectSelector';
 import { Column } from '../UI/Grid';
 import ListIcon from '../UI/ListIcon';
 import ObjectsRenderingService from '../ObjectsRendering/ObjectsRenderingService';
@@ -29,6 +31,7 @@ type Props = {|
   onObjectRemoved: (objectName: string) => void,
   isObjectListLocked: boolean,
   isGlobalGroup?: boolean,
+  requiredBehaviorTypes?: Array<string>,
 |};
 
 const ObjectGroupEditor = ({
@@ -41,6 +44,7 @@ const ObjectGroupEditor = ({
   onObjectRemoved,
   isObjectListLocked,
   isGlobalGroup,
+  requiredBehaviorTypes,
 }: Props): React.Node => {
   const [objectName, setObjectName] = React.useState<string>('');
   const isGlobalObject = React.useCallback(
@@ -53,10 +57,27 @@ const ObjectGroupEditor = ({
   const addObject = React.useCallback(
     (objectName: string) => {
       if (isGlobalGroup && !isGlobalObject(objectName)) return;
+      if (
+        !checkHasRequiredBehaviors({
+          objectsContainersList: projectScopedContainersAccessor
+            .get()
+            .getObjectsContainersList(),
+          objectName,
+          requiredBehaviorTypes,
+        })
+      ) {
+        return;
+      }
       onObjectAdded(objectName);
       setObjectName('');
     },
-    [isGlobalGroup, isGlobalObject, onObjectAdded]
+    [
+      isGlobalGroup,
+      isGlobalObject,
+      onObjectAdded,
+      projectScopedContainersAccessor,
+      requiredBehaviorTypes,
+    ]
   );
 
   const renderExplanation = () => {
@@ -155,12 +176,17 @@ const ObjectGroupEditor = ({
             noGroups
             hintText={
               isGlobalGroup
-                ? t`Choose a global object to add to the group`
+                ? requiredBehaviorTypes && requiredBehaviorTypes.length > 0
+                  ? t`Choose a matching global object to add to the group`
+                  : t`Choose a global object to add to the group`
+                : requiredBehaviorTypes && requiredBehaviorTypes.length > 0
+                ? t`Choose a matching object to add to the group`
                 : t`Choose an object to add to the group`
             }
             fullWidth
             disabled={isObjectListLocked}
             objectNameFilter={isGlobalGroup ? isGlobalObject : undefined}
+            requiredCapabilitiesBehaviorTypes={requiredBehaviorTypes}
           />
         </Column>
       </Paper>

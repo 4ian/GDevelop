@@ -421,6 +421,10 @@ export class ObjectGroup extends EmscriptenObject {
   removeObject(objectName: string): void;
   find(objectName: string): boolean;
   getAllObjectsNames(): VectorString;
+  addRequiredBehavior(behaviorType: string): void;
+  removeRequiredBehavior(behaviorType: string): void;
+  hasRequiredBehavior(behaviorType: string): boolean;
+  getAllRequiredBehaviorTypes(): VectorString;
   serializeTo(element: SerializerElement): void;
   unserializeFrom(element: SerializerElement): void;
 }

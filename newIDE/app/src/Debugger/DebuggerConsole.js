@@ -56,14 +56,14 @@ export class LogsManager {
   _pendingCommit: boolean = false;
 
   _commitLogs() {
-    this.logs.unshift(...this._pendingLogs);
+    this.logs.push(...this._pendingLogs);
     this._pendingLogs.length = 0;
     this._pendingCommit = false;
     this._onNewLog.forEach(f => f());
   }
 
   addLog(log: Log) {
-    this._pendingLogs.unshift(log);
+    this._pendingLogs.push(log);
     if (!this.groups.has(log.group)) {
       this.groups.add(log.group);
       this._onNewGroup.forEach(f => f());
@@ -169,12 +169,8 @@ export const DebuggerConsole = ({
         defaultHeight: 45,
         minHeight: 25,
         fixedWidth: true,
-        // Inverse index so that each log always
-        // get assigned the same ID despite all indices
-        // shifting when a log is added.
-        keyMapper: index => logs.length - index,
       }),
-    [logs]
+    []
   );
 
   const [hideInternal, setHideInternal] = React.useState(false);
@@ -242,6 +238,8 @@ export const DebuggerConsole = ({
                 style={styles.list}
                 rowCount={filteredLogs.length}
                 rowHeight={cellMeasurerCache.rowHeight}
+                scrollToAlignment="end"
+                scrollToIndex={filteredLogs.length - 1}
                 rowRenderer={({ index, key, parent, style }) => {
                   const log = filteredLogs[index];
                   return (

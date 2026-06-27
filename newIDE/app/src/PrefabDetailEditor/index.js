@@ -690,6 +690,26 @@ export default class PrefabDetailEditor extends React.Component<Props, State> {
     }
   };
 
+  _getBehaviorDefaultProperties = (
+    behaviorTypeName: string
+  ): ?gdMapStringPropertyDescriptor => {
+    try {
+      const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
+        gd.JsPlatform.get(),
+        behaviorTypeName
+      );
+      return gd.MetadataProvider.isBadBehaviorMetadata(behaviorMetadata)
+        ? null
+        : behaviorMetadata.getProperties();
+    } catch (error) {
+      console.error(
+        'Unable to read behavior metadata properties while syncing prefab behavior properties.',
+        error
+      );
+      return null;
+    }
+  };
+
   _syncObjectInheritedBehaviorProperties = (
     object: gdObject,
     previousSnapshot: PrefabBehaviorSnapshot,
@@ -741,15 +761,9 @@ export default class PrefabDetailEditor extends React.Component<Props, State> {
       }
 
       const behaviorProperties = behavior.getProperties();
-      const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
-        gd.JsPlatform.get(),
+      const behaviorDefaultProperties = this._getBehaviorDefaultProperties(
         behavior.getTypeName()
       );
-      const behaviorDefaultProperties = gd.MetadataProvider.isBadBehaviorMetadata(
-        behaviorMetadata
-      )
-        ? null
-        : behaviorMetadata.getProperties();
       Object.keys(nextBehaviorSnapshot.properties).forEach(propertyName => {
         if (!behaviorProperties.has(propertyName)) return;
 

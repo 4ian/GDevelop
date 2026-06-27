@@ -7,8 +7,6 @@ import { type BehaviorEditorProps } from './BehaviorEditorProps.flow';
 import { Column } from '../../UI/Grid';
 import propertiesMapToSchema from '../../PropertiesEditor/PropertiesMapToSchema';
 
-const gd: libGDevelop = global.gd;
-
 type Props = BehaviorEditorProps;
 
 const BehaviorPropertiesEditor = ({
@@ -21,16 +19,12 @@ const BehaviorPropertiesEditor = ({
   projectScopedContainersAccessor,
   isAdvancedSectionInitiallyUncollapsed,
 }: Props): React.Node => {
-  const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
-    gd.JsPlatform.get(),
-    behavior.getTypeName()
-  );
-
   const schema = React.useMemo(
-    () =>
-      propertiesMapToSchema({
-        properties: behavior.getProperties(),
-        defaultValueProperties: behaviorMetadata.getProperties(),
+    () => {
+      const behaviorProperties = behavior.getProperties();
+      return propertiesMapToSchema({
+        properties: behaviorProperties,
+        defaultValueProperties: null,
         getPropertyValue: (instance, name) =>
           instance
             .getProperties()
@@ -42,8 +36,9 @@ const BehaviorPropertiesEditor = ({
         object,
         layersContainer,
         visibility: 'All',
-      }),
-    [behavior, behaviorMetadata, layersContainer, object]
+      });
+    },
+    [behavior, layersContainer, object]
   );
 
   return (

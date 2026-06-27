@@ -21,6 +21,7 @@
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/IDE/PlatformManager.h"
+#include "GDCore/Project/CustomBehavior.h"
 #include "GDCore/Project/CustomObjectConfiguration.h"
 #include "GDCore/Project/EventsBasedObject.h"
 #include "GDCore/Project/EventsFunctionsExtension.h"
@@ -98,8 +99,41 @@ void Project::EnsureObjectInheritedBehaviors(gd::Object& object) const {
   for (const auto& behaviorName : eventsBasedObject.GetAllBehaviorNames()) {
     const auto& inheritedBehavior = eventsBasedObject.GetBehavior(behaviorName);
     const auto& inheritedBehaviorType = inheritedBehavior.GetTypeName();
-    auto copyInheritedBehaviorConfiguration = [&inheritedBehavior](
-                                                  gd::Behavior& behavior) {
+    auto getDefaultProperties = [this](const gd::String& behaviorType) {
+      if (HasEventsBasedBehavior(behaviorType)) {
+        gd::CustomBehavior defaultBehavior("", *this, behaviorType);
+        defaultBehavior.InitializeContent();
+        return defaultBehavior.GetProperties();
+      }
+
+      const gd::BehaviorMetadata& behaviorMetadata =
+          gd::MetadataProvider::GetBehaviorMetadata(GetCurrentPlatform(),
+                                                    behaviorType);
+      if (gd::MetadataProvider::IsBadBehaviorMetadata(behaviorMetadata)) {
+        return std::map<gd::String, gd::PropertyDescriptor>();
+      }
+
+      return behaviorMetadata.GetProperties();
+    };
+    auto copyInheritedBehaviorConfiguration =
+        [&inheritedBehavior, &getDefaultProperties](
+            gd::Behavior& behavior, bool preserveNonDefaultValues = false) {
+      std::map<gd::String, gd::String> propertyValuesToRestore;
+      if (preserveNonDefaultValues) {
+        const auto existingProperties = behavior.GetProperties();
+        const auto defaultProperties =
+            getDefaultProperties(behavior.GetTypeName());
+        for (const auto& property : existingProperties) {
+          const auto defaultProperty = defaultProperties.find(property.first);
+          if (defaultProperty == defaultProperties.end() ||
+              property.second.GetValue() !=
+                  defaultProperty->second.GetValue()) {
+            propertyValuesToRestore[property.first] =
+                property.second.GetValue();
+          }
+        }
+      }
+
       behavior.UnserializeFrom(inheritedBehavior.GetContent());
       behavior.SetFolded(inheritedBehavior.IsFolded());
       behavior.SetQuickCustomizationVisibility(
@@ -108,13 +142,24 @@ void Project::EnsureObjectInheritedBehaviors(gd::Object& object) const {
           inheritedBehavior.GetPropertiesQuickCustomizationVisibilities();
       behavior.SetDefaultBehavior(false);
       behavior.SetInheritedFromObjectType(true);
+
+      if (preserveNonDefaultValues && !propertyValuesToRestore.empty()) {
+        const auto inheritedProperties = behavior.GetProperties();
+        for (const auto& propertyValue : propertyValuesToRestore) {
+          if (inheritedProperties.find(propertyValue.first) ==
+              inheritedProperties.end()) {
+            continue;
+          }
+          behavior.UpdateProperty(propertyValue.first, propertyValue.second);
+        }
+      }
     };
 
     if (object.HasBehaviorNamed(behaviorName)) {
       auto& behavior = object.GetBehavior(behaviorName);
       if (behavior.GetTypeName() == inheritedBehaviorType) {
         if (!behavior.IsInheritedFromObjectType()) {
-          copyInheritedBehaviorConfiguration(behavior);
+          copyInheritedBehaviorConfiguration(behavior, true);
         } else {
           behavior.SetInheritedFromObjectType(true);
         }

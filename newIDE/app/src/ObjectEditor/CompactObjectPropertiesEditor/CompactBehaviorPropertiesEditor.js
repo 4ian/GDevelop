@@ -155,10 +155,10 @@ export const CompactBehaviorPropertiesEditor = ({
           showcaseNonDefaultValues: true,
         });
       }
-      const behaviorMetadataProperties = behaviorMetadata.getProperties();
+      const behaviorProperties = behavior.getProperties();
       return propertiesMapToSchema({
-        properties: behaviorMetadataProperties,
-        defaultValueProperties: behaviorMetadataProperties,
+        properties: behaviorProperties,
+        defaultValueProperties: null,
         getPropertyValue: (instance, name) =>
           instance
             .getProperties()

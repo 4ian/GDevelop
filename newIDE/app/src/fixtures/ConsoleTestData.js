@@ -4,23 +4,11 @@ import { type Log, LogsManager } from '../Debugger/DebuggerConsole';
 class MockLogsManager extends LogsManager {
   logs: Array<Log> = [
     {
-      message: 'Only a message',
-      group: '',
+      message: 'A regular message',
+      group: 'Regular group',
       type: 'info',
-      timestamp: 120000.1234,
-    },
-    {
-      message:
-        'This is a veeeeeryy veeeeeryy veeeeeryy veeeeeryy veeeeeryy veeeeeryy veeeeeryy veeeeeryy veeeeeryy veeeeeryy veeeeeryy veeeeeryy veeeeeryy veeeeeryy veeeeeryy veeeeeryy veeeeeryy veeeeeryy veeeeeryy veeeeeryy veeeeeryy veeeeeryy veeeeeryy veeeeeryy veeeeeryy veeeeeryy long message',
-      group: '',
-      type: 'info',
-      timestamp: 120000.1,
-    },
-    {
-      message: 'A warning!',
-      group: '',
-      type: 'warning',
-      timestamp: 120000,
+      timestamp: 20000,
+      internal: false,
     },
     {
       message: 'An internal error message',
@@ -30,11 +18,23 @@ class MockLogsManager extends LogsManager {
       internal: true,
     },
     {
-      message: 'A regular message',
-      group: 'Regular group',
+      message: 'A warning!',
+      group: '',
+      type: 'warning',
+      timestamp: 120000,
+    },
+    {
+      message:
+        'This is a veeeeeryy veeeeeryy veeeeeryy veeeeeryy veeeeeryy veeeeeryy veeeeeryy veeeeeryy veeeeeryy veeeeeryy veeeeeryy veeeeeryy veeeeeryy veeeeeryy veeeeeryy veeeeeryy veeeeeryy veeeeeryy veeeeeryy veeeeeryy veeeeeryy veeeeeryy veeeeeryy veeeeeryy veeeeeryy veeeeeryy long message',
+      group: '',
       type: 'info',
-      timestamp: 20000,
-      internal: false,
+      timestamp: 120000.1,
+    },
+    {
+      message: 'Only a message',
+      group: '',
+      type: 'info',
+      timestamp: 120000.1234,
     },
   ];
   // $FlowFixMe[missing-local-annot]

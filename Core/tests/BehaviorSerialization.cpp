@@ -304,6 +304,49 @@ TEST_CASE("BehaviorSerialization", "[common]") {
                 .at("MyProperty")
                 .GetValue() == "123456");
 
+    auto &objectWithCustomizedExistingBehavior =
+        layout.GetObjects().InsertNewObject(
+            readProject, "MyOtherEventsExtension::MyEventsBasedObject",
+            "PrefabInstanceWithCustomizedExistingBehavior", 2);
+    objectWithCustomizedExistingBehavior.RemoveBehavior("MyPrefabBehavior");
+    auto *customizedExistingBehavior =
+        objectWithCustomizedExistingBehavior.AddNewBehavior(
+            readProject, "MyEventsExtension::MyEventsBasedBehavior",
+            "MyPrefabBehavior");
+    customizedExistingBehavior->UpdateProperty("MyProperty", "654321");
+
+    readProject.EnsureObjectInheritedBehaviors(
+        objectWithCustomizedExistingBehavior);
+    REQUIRE(objectWithCustomizedExistingBehavior.GetBehavior("MyPrefabBehavior")
+                .IsInheritedFromObjectType());
+    REQUIRE(objectWithCustomizedExistingBehavior.GetBehavior("MyPrefabBehavior")
+                .GetProperties()
+                .at("MyProperty")
+                .GetValue() == "654321");
+
+    auto &globalObjectWithCustomizedExistingBehavior =
+        readProject.GetObjects().InsertNewObject(
+            readProject, "MyOtherEventsExtension::MyEventsBasedObject",
+            "GlobalPrefabInstanceWithCustomizedExistingBehavior", 0);
+    globalObjectWithCustomizedExistingBehavior.RemoveBehavior(
+        "MyPrefabBehavior");
+    auto *customizedExistingGlobalBehavior =
+        globalObjectWithCustomizedExistingBehavior.AddNewBehavior(
+            readProject, "MyEventsExtension::MyEventsBasedBehavior",
+            "MyPrefabBehavior");
+    customizedExistingGlobalBehavior->UpdateProperty("MyProperty", "654321");
+
+    readProject.EnsureObjectInheritedBehaviors(
+        globalObjectWithCustomizedExistingBehavior);
+    REQUIRE(globalObjectWithCustomizedExistingBehavior
+                .GetBehavior("MyPrefabBehavior")
+                .IsInheritedFromObjectType());
+    REQUIRE(globalObjectWithCustomizedExistingBehavior
+                .GetBehavior("MyPrefabBehavior")
+                .GetProperties()
+                .at("MyProperty")
+                .GetValue() == "654321");
+
     readEventsBasedObject.RemoveBehavior("MyPrefabBehavior");
     readProject.EnsureObjectInheritedBehaviors(object);
     REQUIRE(!object.HasBehaviorNamed("MyPrefabBehavior"));

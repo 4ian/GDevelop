@@ -17,6 +17,16 @@
 
 using namespace gd;
 
+namespace {
+double GetNumberPropertyValue(const gd::String &value) {
+  return value.empty() ? 0.0 : value.To<double>();
+}
+
+bool GetBooleanPropertyValue(const gd::String &value) {
+  return value == "true" || value == "1";
+}
+} // namespace
+
 void CustomConfigurationHelper::InitializeContent(
     const gd::PropertiesContainer &properties,
     gd::SerializerElement &configurationContent) {
@@ -31,9 +41,9 @@ void CustomConfigurationHelper::InitializeContent(
     if (primitiveType == "string" || valueType == "behavior") {
       element.SetStringValue(property->GetValue());
     } else if (primitiveType == "number") {
-      element.SetDoubleValue(property->GetValue().To<double>());
+      element.SetDoubleValue(GetNumberPropertyValue(property->GetValue()));
     } else if (primitiveType == "boolean") {
-      element.SetBoolValue(property->GetValue() == "true");
+      element.SetBoolValue(GetBooleanPropertyValue(property->GetValue()));
     }
   }
 }
@@ -97,9 +107,9 @@ bool CustomConfigurationHelper::UpdateProperty(
   if (primitiveType == "string" || valueType == "behavior") {
     element.SetStringValue(newValue);
   } else if (primitiveType == "number") {
-    element.SetDoubleValue(newValue.To<double>());
+    element.SetDoubleValue(GetNumberPropertyValue(newValue));
   } else if (primitiveType == "boolean") {
-    element.SetBoolValue(newValue == "1");
+    element.SetBoolValue(GetBooleanPropertyValue(newValue));
   }
 
   return true;

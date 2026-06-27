@@ -60,6 +60,7 @@ type Props = {|
   unsavedChanges?: UnsavedChanges,
   onUpdateBehaviorsSharedData: () => void,
   initialTab: ?ObjectEditorTab,
+  titleSubtitle?: React.Node,
 
   // Preview:
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
@@ -108,6 +109,7 @@ const InnerDialog = (props: InnerDialogProps) => {
     onCancel,
     onRename,
     initialTab,
+    titleSubtitle,
     projectScopedContainersAccessor,
     onUpdateBehaviorsSharedData,
     onComputeAllVariableNames,
@@ -256,6 +258,7 @@ const InnerDialog = (props: InnerDialogProps) => {
   return (
     <Dialog
       title={<Trans>Edit {objectName}</Trans>}
+      subtitle={titleSubtitle}
       key={object && object.ptr}
       actions={[
         <FlatButton

@@ -2091,6 +2091,8 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
     React.useEffect(
       () => {
         if (!isOpen) {
+          setSearchText('');
+          setSelectedItems([]);
           setSelectedMainMenuItemIndices([]);
         }
       },
@@ -2440,7 +2442,7 @@ const arePropsEqual = (prevProps: Props, nextProps: Props): boolean =>
   // from the component.
   // If a change is made, the component won't notice it: you have to manually
   // call forceUpdate.
-  !nextProps.isOpen;
+  prevProps.isOpen === nextProps.isOpen && !nextProps.isOpen;
 
 // $FlowFixMe[incompatible-type]
 const MemoizedProjectManager = React.memo<Props, ProjectManagerInterface>(

@@ -705,6 +705,19 @@ const ProjectGlobalsDialog = ({
     : temporaryLayoutForLayers
     ? temporaryLayoutForLayers.getLayers()
     : null;
+  const editorLayoutName = editorLayout ? editorLayout.getName() : '';
+  const objectEditorTitleSubtitle = editorLayout ? (
+    <React.Fragment>
+      <Trans>Global objects are edited with the first scene,</Trans>{' '}
+      {editorLayoutName}
+      <Trans>, as context. Layer dropdowns use this scene's layers.</Trans>
+    </React.Fragment>
+  ) : (
+    <Trans>
+      Global objects are edited without a scene context. Layer dropdowns use a
+      temporary base layer.
+    </Trans>
+  );
 
   const notifyGlobalObjectGroupsModified = React.useCallback(
     () => {
@@ -1110,6 +1123,7 @@ const ProjectGlobalsDialog = ({
           eventsFunctionsExtension={null}
           eventsBasedObject={null}
           layersContainer={editorLayersContainer}
+          titleSubtitle={objectEditorTitleSubtitle}
           projectScopedContainersAccessor={projectScopedContainersAccessor}
           resourceManagementProps={resourceManagementProps}
           onComputeAllVariableNames={() => {

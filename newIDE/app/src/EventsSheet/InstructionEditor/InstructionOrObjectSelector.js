@@ -313,10 +313,9 @@ const InstructionOrObjectSelector: React.ComponentType<{
     // The objects must never be kept in a state as they may be temporary copies.
     // Search for "ProjectScopedContainers wrongly containing temporary objects containers or objects"
     // in the codebase.
-    const objectsContainersList = React.useMemo(
-      () => projectScopedContainersAccessor.get().getObjectsContainersList(),
-      [projectScopedContainersAccessor]
-    );
+    const objectsContainersList = projectScopedContainersAccessor
+      .get()
+      .getObjectsContainersList();
 
     if (objectsContainersList.getObjectsContainersCount() === 0) {
       throw new Error(
@@ -746,6 +745,7 @@ const InstructionOrObjectSelector: React.ComponentType<{
         <SearchBar
           id="search-bar"
           value={searchText}
+          onChangeImmediately
           onChange={newSearchText => {
             const oldSearchText = searchText;
             if (!!newSearchText) search(newSearchText);

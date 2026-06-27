@@ -399,6 +399,146 @@ Practical mental model:
 - Creating an object immediately makes that new instance picked for the
   following instructions in the same scope.
 
+### Object group architecture
+
+Object groups are a compile-time/editor abstraction used to address several
+object types through one name. They are not runtime instances, do not own
+objects, and cannot contain other groups. The main source anchors are
+`Core/GDCore/Project/ObjectGroup.*`,
+`Core/GDCore/Project/ObjectGroupsContainer.*`,
+`Core/GDCore/Project/ObjectsContainer.*`,
+`Core/GDCore/Project/ObjectsContainersList.*`,
+`Core/GDCore/Project/Layout.*`,
+`Core/GDCore/Project/ProjectScopedContainers.*`,
+`Core/GDCore/IDE/ObjectVariableHelper.*`,
+`Core/GDCore/IDE/WholeProjectRefactorer.cpp`,
+`Core/GDCore/IDE/EventsFunctionTools.cpp`,
+`Core/GDCore/Events/CodeGeneration/EventsCodeGenerator.cpp`,
+`GDJS/GDJS/Events/CodeGeneration/EventsCodeGenerator.cpp`, and the editor
+views under `newIDE/app/src/ObjectGroupEditor`,
+`newIDE/app/src/ObjectGroupsList`, and `newIDE/app/src/ObjectsList`.
+
+```mermaid
+flowchart TD
+  A["ObjectGroup\nname + ordered member object names"] --> B["ObjectGroupsContainer\ninsert / remove / rename / serialize"]
+  B --> C["ObjectsContainer owners"]
+  C --> C1["Project global objects/groups"]
+  C --> C2["Scene objects/groups"]
+  C --> C3["Events-based object child objects/groups"]
+  C --> C4["Variant child objects/groups"]
+  B --> D["EventsFunction objectGroups\nlegacy function-local groups"]
+  C1 --> E["ProjectScopedContainers"]
+  C2 --> E
+  C3 --> E
+  D --> E
+  E --> F["ObjectsContainersList scoped lookup\ninner container shadows outer container"]
+  F --> G["Editor selectors and validation"]
+  F --> H["Type / behavior / variable / animation compatibility"]
+  F --> I["Event code generation"]
+  I --> J["ExpandObjectName(group)\nreal object names only"]
+  J --> K["Generated per-object actions, conditions, object-list maps"]
+  C --> L["Serialized game data objectsGroups"]
+  L --> M["RuntimeGame asset loading by object or group name"]
+```
+
+At the data-model level, `ObjectGroup` stores only the group name and a vector of
+member object names. `AddObject` prevents duplicates, `RemoveObject` and
+`RenameObject` rewrite names in that vector, and serialization writes a `group`
+with an `objects` array of `{ name }` entries. `ObjectGroupsContainer` owns
+groups with `unique_ptr`, preserves list order, and exposes the same vector-like
+API used by the editor and bindings. `ObjectsContainer` embeds an
+`ObjectGroupsContainer`, so any object scope can own groups alongside objects.
+The important consequence is that removing an object from an `ObjectsContainer`
+does not by itself clean every group reference; that cleanup is handled by
+refactoring helpers.
+
+Group scope follows object scope. For normal scene events,
+`ProjectScopedContainers` builds an `ObjectsContainersList` with project/global
+objects first and scene objects second; lookups iterate from the end, so scene
+groups/objects shadow global groups/objects. Events-based object event scopes
+combine child-object containers with generated parameter containers. Free
+events functions build a temporary objects container from object parameters and
+copy `EventsFunction::objectGroups` into it; the source comments note that
+function-local groups are legacy and being phased out in the UI. Within a single
+container, object names are checked before group names, and the editor normally
+keeps objects and groups in the same name namespace to avoid ambiguity.
+
+Membership is symbolic and deliberately shallow. A group member is an object
+name, not an object pointer. If a group stores a stale name, it can remain in the
+serialized group, but `ObjectsContainersList::ExpandObjectName` filters out
+names that no longer resolve to real objects before code generation uses them.
+Because groups cannot be nested, a group name accidentally stored as a member is
+not recursively expanded; it is ignored unless there is also an object with that
+name. The editor enforces this by using `ObjectSelector` with `noGroups` when
+adding members. Global groups are further restricted: the editor only allows
+global objects in them, and "set as global group" refuses a scene group that
+contains scene-local objects.
+
+The compatibility contract is intersection-based: a group exposes only the
+capabilities that all resolvable member objects can safely support.
+`GetTypeOfObject` returns a concrete object type only when all members have the
+same type; otherwise it returns an empty type, so only generic object
+instructions are valid. Behavior lookup follows the same rule:
+`HasBehaviorInObjectOrGroup` requires every member to have the behavior,
+`GetTypeOfBehaviorInObjectOrGroup` requires the behavior type to match across
+members, and `GetBehaviorNamesInObjectOrGroup` returns common behavior names.
+Animation-name lookup also intersects member animation names.
+
+Variables are similar but have extra editor support. A group is considered to
+have a declared variable only when every member object has it; empty groups are
+reported distinctly, and partially shared variables are tracked as "exists only
+on some objects". For editing group variables, `ObjectVariableHelper` builds a
+merged variables container from all members: variables missing from any member
+are removed from the merged view, different types become `MixedTypes`, and
+different values become mixed values. Applying group-variable edits propagates
+the changes back to all member objects and their initial instances, then
+`WholeProjectRefactorer` renames/switches affected event expressions for both
+the individual objects and the group name.
+
+Event code generation erases the group abstraction. Whenever an object parameter
+can reference a group, codegen calls `ExpandObjectName` and emits code for the
+real object names. Object and behavior instructions generate one branch per
+member object, set that member as the current object, validate required
+behaviors, and operate on that object's picked list. For function calls and
+object-list parameters, GDJS builds a `Hashtable` from each real object name to
+its picked array; inside an events function, `eventsFunctionContext` also keeps
+a flattened array for `getObjects(name)`. The "current object" shortcut matters
+when a group instruction is nested inside per-object generation: if the current
+object is one of the group members, `ExpandObjectName` can reduce the group to
+that single object.
+
+Runtime support is intentionally limited. GDJS gameplay code does not create a
+`RuntimeObjectGroup`; event groups have already been expanded to object names
+and picked arrays. The exported scene data still contains `objectsGroups`
+entries (`ObjectGroupData` with `name` and `objects`) for features that need a
+group name at runtime without event codegen, notably object-or-group asset
+loading. `RuntimeGame::loadObjectOrGroupAssets`,
+`areObjectOrGroupAssetsLoaded`, and `unloadObjectOrGroupAssets` look up the
+serialized group in the scene data and then process each member object's
+resources.
+
+Refactoring keeps group references coherent across scopes. When an object is
+removed, `WholeProjectRefactorer` removes that object name from scene, global,
+events-based object, and function groups in the relevant scope. When an object
+is renamed, member names are rewritten and initial instances are renamed. When a
+group itself is renamed, event references are renamed, but there are no member
+references or instances to update because groups cannot be inside groups and
+cannot have instances. Events-based object variants copy groups from the default
+variant, and variant group names/member names are updated when the default
+object or group is renamed.
+
+Practical mental model:
+
+- A group is a named alias for several object names, not a shared base class and
+  not an ECS archetype.
+- Scope resolution is the same as objects: local/inner groups shadow global
+  groups.
+- At authoring time, a group exposes the intersection of member capabilities.
+- At codegen time, the group disappears and becomes one or more concrete object
+  lists.
+- At runtime, group data remains only where name-based systems need it, such as
+  asset loading.
+
 Status of the tests and builds: [![macOS and Linux build status](https://circleci.com/gh/4ian/GDevelop.svg?style=shield)](https://app.circleci.com/pipelines/github/4ian/GDevelop) [![Fast tests status](https://gdevelop.semaphoreci.com/badges/GDevelop/branches/master.svg?style=shields)](https://gdevelop.semaphoreci.com/projects/GDevelop) [![Windows Build status](https://ci.appveyor.com/api/projects/status/84uhtdox47xp422x/branch/master?svg=true)](https://ci.appveyor.com/project/4ian/gdevelop/branch/master) [![https://good-labs.github.io/greater-good-affirmation/assets/images/badge.svg](https://good-labs.github.io/greater-good-affirmation/assets/images/badge.svg)](https://good-labs.github.io/greater-good-affirmation)
 
 ## Links

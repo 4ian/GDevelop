@@ -43,6 +43,7 @@ export type SceneTreeViewItemProps = {|
   project: gdProject,
   onOpenLayoutProperties: (layout: ?gdLayout) => void,
   onOpenLayoutVariables: (layout: ?gdLayout) => void,
+  onOpenSceneObjects: (layout: gdLayout) => void,
 |};
 
 export const getSceneTreeViewItemId = (scene: gdLayout): string => {
@@ -53,6 +54,10 @@ export const getSceneTreeViewItemId = (scene: gdLayout): string => {
 
 export const getSceneEventsTreeViewItemId = (scene: gdLayout): string => {
   return `scene-events-${scene.ptr}`;
+};
+
+export const getSceneObjectsTreeViewItemId = (scene: gdLayout): string => {
+  return `scene-objects-${scene.ptr}`;
 };
 
 export class SceneTreeViewItemContent implements TreeViewItemContent {
@@ -316,6 +321,92 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
     this.props.project.setFirstLayout(sceneName);
     this.props.forceUpdate();
   }
+}
+
+export class SceneObjectsTreeViewItemContent implements TreeViewItemContent {
+  scene: gdLayout;
+  props: SceneTreeViewItemProps;
+  label: string;
+
+  constructor(scene: gdLayout, props: SceneTreeViewItemProps, label: string) {
+    this.scene = scene;
+    this.props = props;
+    this.label = label;
+  }
+
+  isDescendantOf(itemContent: TreeViewItemContent): boolean {
+    const itemId = itemContent.getId();
+    return (
+      itemId === scenesRootFolderId ||
+      itemId === getSceneTreeViewItemId(this.scene)
+    );
+  }
+
+  getRootId(): string {
+    return '';
+  }
+
+  getName(): string | React.Node {
+    return this.label;
+  }
+
+  getId(): string {
+    return getSceneObjectsTreeViewItemId(this.scene);
+  }
+
+  getHtmlId(index: number): ?string {
+    return `scene-objects-item-${index}`;
+  }
+
+  getDataSet(): ?HTMLDataset {
+    return {
+      scene: this.scene.getName(),
+      sceneObjects: this.scene.getName(),
+    };
+  }
+
+  getThumbnail(): ?string {
+    return 'res/functions/object_black.svg';
+  }
+
+  onClick(): void {
+    this.props.onOpenSceneObjects(this.scene);
+  }
+
+  buildMenuTemplate(i18n: I18nType, index: number): any {
+    return [
+      {
+        label: i18n._(t`Open objects and groups`),
+        click: () => this.onClick(),
+      },
+    ];
+  }
+
+  renderRightComponent(i18n: I18nType): ?React.Node {
+    return null;
+  }
+
+  getRightButton(i18n: I18nType): any {
+    return null;
+  }
+
+  rename(newName: string): void {}
+
+  edit(): void {}
+
+  delete(): void {}
+
+  copy(): void {}
+
+  paste(): void {}
+
+  cut(): void {}
+
+  getIndex(): number {
+    return 0;
+  }
+
+  moveAt(destinationIndex: number): void {}
 }
 
 export class SceneEventsTreeViewItemContent implements TreeViewItemContent {

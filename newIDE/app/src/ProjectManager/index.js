@@ -22,6 +22,7 @@ import CreateExternalDialog, {
 import ProjectItemUsageDialog from './ProjectItemUsageDialog';
 import { type ProjectItemUsageTarget } from './ProjectItemUsageFinder';
 import ProjectGlobalsDialog from './ProjectGlobalsDialog';
+import ProjectSceneObjectsDialog from './ProjectSceneObjectsDialog';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import ExtensionsSearchDialog from '../AssetStore/ExtensionStore/ExtensionsSearchDialog';
 import ScenePropertiesDialog from '../SceneEditor/ScenePropertiesDialog';
@@ -31,6 +32,7 @@ import UnsavedChangesContext, {
   type UnsavedChanges,
 } from '../MainFrame/UnsavedChangesContext';
 import { type ObjectGroupsOutsideEditorChanges } from '../MainFrame/EditorContainers/BaseEditor';
+import { type ObjectWithContext } from '../ObjectsList/EnumerateObjects';
 import ProjectManagerCommands from './ProjectManagerCommands';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 import { type GamesList } from '../GameDashboard/UseGamesList';
@@ -57,6 +59,7 @@ import KeyboardShortcuts from '../UI/KeyboardShortcuts';
 import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import {
   SceneTreeViewItemContent,
+  SceneObjectsTreeViewItemContent,
   SceneEventsTreeViewItemContent,
   getSceneTreeViewItemId,
   getSceneEventsTreeViewItemId,
@@ -687,6 +690,10 @@ type Props = {|
     variantName: string
   ) => void,
   onGlobalObjectEdited: (object: gdObject) => void,
+  onSceneObjectEdited: (
+    scene: gdLayout,
+    objectWithContext: ObjectWithContext
+  ) => void,
   onReloadEventsFunctionsExtensions: () => void,
   isOpen: boolean,
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
@@ -743,6 +750,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       onOpenEventBasedObjectEditor,
       onOpenEventBasedObjectVariantEditor,
       onGlobalObjectEdited,
+      onSceneObjectEdited,
       onRenamedEventsBasedObject,
       onDeletedEventsBasedObject,
       onRenamedEventsBasedObjectVariant,
@@ -865,6 +873,13 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
     ] = React.useState(false);
     const openProjectGlobalsDialog = React.useCallback(() => {
       setProjectGlobalsDialogOpen(true);
+    }, []);
+    const [
+      editedSceneObjectsLayout,
+      setEditedSceneObjectsLayout,
+    ] = React.useState<?gdLayout>(null);
+    const openSceneObjectsDialog = React.useCallback((layout: gdLayout) => {
+      setEditedSceneObjectsLayout(layout);
     }, []);
 
     const [
@@ -1362,6 +1377,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
               onDeleteLayout,
               onRenameLayout,
               onOpenLayout,
+              onOpenSceneObjects: openSceneObjectsDialog,
               onOpenLayoutProperties,
               onOpenLayoutVariables,
             }
@@ -1381,6 +1397,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         onDeleteLayout,
         onRenameLayout,
         onOpenLayout,
+        openSceneObjectsDialog,
         onOpenLayoutProperties,
         onOpenLayoutVariables,
       ]
@@ -1700,6 +1717,13 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                         sceneTreeViewItemProps
                       ),
                       [
+                        new LeafTreeViewItem(
+                          new SceneObjectsTreeViewItemContent(
+                            scene,
+                            sceneTreeViewItemProps,
+                            i18n._(t`Objects`)
+                          )
+                        ),
                         new LeafTreeViewItem(
                           new SceneEventsTreeViewItemContent(
                             scene,
@@ -2272,6 +2296,39 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                           onDeletedEventsBasedObjectVariant
                         }
                         onGlobalObjectEdited={onGlobalObjectEdited}
+                        onEffectAdded={onEffectAdded}
+                        onObjectGroupsModifiedOutsideEditor={
+                          onObjectGroupsModifiedOutsideEditor
+                        }
+                        onObjectListsModified={onObjectListsModified}
+                        triggerHotReloadInGameEditorIfNeeded={
+                          triggerHotReloadInGameEditorIfNeeded
+                        }
+                      />
+                    )}
+                    {!!editedSceneObjectsLayout && project && (
+                      <ProjectSceneObjectsDialog
+                        project={project}
+                        layout={editedSceneObjectsLayout}
+                        onChange={triggerUnsavedChanges}
+                        onClose={() => setEditedSceneObjectsLayout(null)}
+                        resourceManagementProps={resourceManagementProps}
+                        hotReloadPreviewButtonProps={
+                          hotReloadPreviewButtonProps
+                        }
+                        openBehaviorEvents={openBehaviorEvents}
+                        onWillInstallExtension={onWillInstallExtension}
+                        onExtensionInstalled={onExtensionInstalled}
+                        onOpenEventBasedObjectEditor={
+                          onOpenEventBasedObjectEditor
+                        }
+                        onOpenEventBasedObjectVariantEditor={
+                          onOpenEventBasedObjectVariantEditor
+                        }
+                        onDeleteEventsBasedObjectVariant={
+                          onDeletedEventsBasedObjectVariant
+                        }
+                        onSceneObjectEdited={onSceneObjectEdited}
                         onEffectAdded={onEffectAdded}
                         onObjectGroupsModifiedOutsideEditor={
                           onObjectGroupsModifiedOutsideEditor

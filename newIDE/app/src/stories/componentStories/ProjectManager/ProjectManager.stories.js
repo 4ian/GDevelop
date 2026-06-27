@@ -74,6 +74,7 @@ export const NoProjectOpen = (): React.Node => {
                     'onOpenEventBasedObjectVariantEditor'
                   )}
                   onGlobalObjectEdited={action('onGlobalObjectEdited')}
+                  onSceneObjectEdited={action('onSceneObjectEdited')}
                   onRenamedEventsBasedObject={action(
                     'onRenamedEventsBasedObject'
                   )}
@@ -188,6 +189,7 @@ export const ProjectOpen = (): React.Node => {
                     'onOpenEventBasedObjectVariantEditor'
                   )}
                   onGlobalObjectEdited={action('onGlobalObjectEdited')}
+                  onSceneObjectEdited={action('onSceneObjectEdited')}
                   onRenamedEventsBasedObject={action(
                     'onRenamedEventsBasedObject'
                   )}

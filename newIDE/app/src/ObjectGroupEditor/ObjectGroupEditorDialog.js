@@ -5,6 +5,7 @@ import NewObjectGroupEditorDialog from './NewObjectGroupEditorDialog';
 import EditedObjectGroupEditorDialog, {
   type ObjectGroupEditorTab,
 } from './EditedObjectGroupEditorDialog';
+import { type GroupWithContext } from '../ObjectsList/EnumerateObjects';
 
 const gd: libGDevelop = global.gd;
 
@@ -31,6 +32,12 @@ type Props = {|
   onComputeAllVariableNames?: () => Array<string>,
   isVariableListLocked: boolean,
   isObjectListLocked: boolean,
+  isGroupGlobal?: boolean,
+  onRenameGroup?: (
+    groupWithContext: GroupWithContext,
+    newName: string,
+    done: (boolean) => void
+  ) => void,
   getValidatedObjectOrGroupName: (newName: string, global: boolean) => string,
 |};
 
@@ -49,6 +56,8 @@ const ObjectGroupEditorDialog = ({
   onComputeAllVariableNames,
   isVariableListLocked,
   isObjectListLocked,
+  isGroupGlobal = false,
+  onRenameGroup,
   getValidatedObjectOrGroupName,
 }: Props): React.Node => {
   const [
@@ -65,13 +74,21 @@ const ObjectGroupEditorDialog = ({
       shouldSpreadAnyVariables: boolean,
       groupObjectNames: Array<string>
     ) => {
+      const allowedGroupObjectNames = isGroupGlobal
+        ? globalObjectsContainer
+          ? groupObjectNames.filter(objectName =>
+              globalObjectsContainer.hasObjectNamed(objectName)
+            )
+          : []
+        : groupObjectNames;
+
       let objectGroup;
       if (editedObjectGroup) {
         objectGroup = editedObjectGroup;
       } else {
         const name = getValidatedObjectOrGroupName(
           objectGroupName || 'Group',
-          false
+          isGroupGlobal
         );
         const objectGroupContainer =
           bypassedObjectGroupsContainer || objectsContainer.getObjectGroups();
@@ -81,12 +98,12 @@ const ObjectGroupEditorDialog = ({
         );
         onObjectGroupAdded(objectGroup);
       }
-      if (groupObjectNames.length === 0) {
+      if (allowedGroupObjectNames.length === 0) {
         // An empty group would have shown the same dialog.
         onApply();
         return;
       }
-      for (const objectName of groupObjectNames) {
+      for (const objectName of allowedGroupObjectNames) {
         objectGroup.addObject(objectName);
       }
       if (shouldSpreadAnyVariables) {
@@ -104,15 +121,14 @@ const ObjectGroupEditorDialog = ({
       editedObjectGroup,
       getValidatedObjectOrGroupName,
       globalObjectsContainer,
+      isGroupGlobal,
       objectsContainer,
       onApply,
       onObjectGroupAdded,
     ]
   );
 
-  return !editedObjectGroup ||
-    (editedObjectGroup.getAllObjectsNames().size() === 0 &&
-      !isObjectListLocked) ? (
+  return !editedObjectGroup ? (
     <NewObjectGroupEditorDialog
       project={project}
       projectScopedContainersAccessor={projectScopedContainersAccessor}
@@ -121,6 +137,7 @@ const ObjectGroupEditorDialog = ({
       globalObjectsContainer={globalObjectsContainer}
       objectsContainer={objectsContainer}
       isGroupAlreadyAdded={!!editedObjectGroup}
+      isGlobalGroup={isGroupGlobal}
     />
   ) : (
     <EditedObjectGroupEditorDialog
@@ -136,6 +153,9 @@ const ObjectGroupEditorDialog = ({
       onComputeAllVariableNames={onComputeAllVariableNames}
       isVariableListLocked={isVariableListLocked}
       isObjectListLocked={isObjectListLocked}
+      isGroupGlobal={isGroupGlobal}
+      onRenameGroup={onRenameGroup}
+      getValidatedObjectOrGroupName={getValidatedObjectOrGroupName}
     />
   );
 };

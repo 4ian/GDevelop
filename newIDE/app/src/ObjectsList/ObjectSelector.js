@@ -38,6 +38,7 @@ type Props = {|
 
   /** A list of object names to exclude from the autocomplete list (for example if they have already been selected). */
   excludedObjectOrGroupNames?: Array<string>,
+  objectNameFilter?: string => boolean,
 
   onChoose?: string => void,
   onChange: string => void,
@@ -66,6 +67,7 @@ const getObjectsAndGroupsDataSource = ({
   allowedObjectType,
   requiredCapabilitiesBehaviorTypes,
   excludedObjectOrGroupNames,
+  objectNameFilter,
 }: {|
   project: ?gdProject,
   objectsContainersList: gdObjectsContainersList,
@@ -73,29 +75,34 @@ const getObjectsAndGroupsDataSource = ({
   allowedObjectType: ?string,
   requiredCapabilitiesBehaviorTypes?: Array<string>,
   excludedObjectOrGroupNames: ?Array<string>,
+  objectNameFilter?: string => boolean,
 |}): DataSource => {
   const { allObjectsList, allGroupsList } = enumerateObjectsAndGroups(
     objectsContainersList,
     allowedObjectType || undefined,
     requiredCapabilitiesBehaviorTypes || []
   );
-  const objects = allObjectsList.map(({ object }) => {
-    return {
-      text: object.getName(),
-      value: object.getName(),
-      renderIcon: project
-        ? () => (
-            <ListIcon
-              iconSize={iconSize}
-              src={ObjectsRenderingService.getThumbnail(
-                project,
-                object.getConfiguration()
-              )}
-            />
-          )
-        : undefined,
-    };
-  });
+  const objects = allObjectsList
+    .filter(
+      ({ object }) => !objectNameFilter || objectNameFilter(object.getName())
+    )
+    .map(({ object }) => {
+      return {
+        text: object.getName(),
+        value: object.getName(),
+        renderIcon: project
+          ? () => (
+              <ListIcon
+                iconSize={iconSize}
+                src={ObjectsRenderingService.getThumbnail(
+                  project,
+                  object.getConfiguration()
+                )}
+              />
+            )
+          : undefined,
+      };
+    });
   const groups = noGroups
     ? []
     : allGroupsList.map(({ group }) => {
@@ -194,6 +201,7 @@ const ObjectSelector: React.ComponentType<{
     id,
     excludedObjectOrGroupNames,
     hintText,
+    objectNameFilter,
     requiredCapabilitiesBehaviorTypes,
     requiredVisibleBehaviorTypes,
     disabled,
@@ -211,6 +219,7 @@ const ObjectSelector: React.ComponentType<{
     allowedObjectType,
     requiredCapabilitiesBehaviorTypes,
     excludedObjectOrGroupNames,
+    objectNameFilter,
   });
 
   const hasValidChoice =

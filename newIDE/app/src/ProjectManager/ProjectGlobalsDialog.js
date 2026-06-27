@@ -1,10 +1,9 @@
 // @flow
 import * as React from 'react';
 import { Trans, t } from '@lingui/macro';
-import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
+import Dialog from '../UI/Dialog';
 import FlatButton from '../UI/FlatButton';
 import IconButton from '../UI/IconButton';
-import TextField from '../UI/TextField';
 import Text from '../UI/Text';
 import { ColumnStackLayout } from '../UI/Layout';
 import { mapFor } from '../Utils/MapFor';
@@ -22,11 +21,13 @@ import Edit from '../UI/CustomSvgIcons/Edit';
 import Trash from '../UI/CustomSvgIcons/Trash';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
 import ObjectEditorDialog from '../ObjectEditor/ObjectEditorDialog';
+import ObjectGroupEditorDialog from '../ObjectGroupEditor/ObjectGroupEditorDialog';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 import EventsRootVariablesFinder from '../Utils/EventsRootVariablesFinder';
 import { type ObjectGroupsOutsideEditorChanges } from '../MainFrame/EditorContainers/BaseEditor';
+import { type GroupWithContext } from '../ObjectsList/EnumerateObjects';
 import {
   serializeToJSObject,
   unserializeFromJSObject,
@@ -267,23 +268,24 @@ const enumerateGlobalGroups = (project: gdProject): Array<GlobalGroupRow> => {
   const globalGroups = globalObjects.getObjectGroups();
   return mapFor(0, globalGroups.count(), index => {
     const group = globalGroups.getAt(index);
-    const objectNames = group.getAllObjectsNames().toJSArray();
+    const objectNames = group
+      .getAllObjectsNames()
+      .toJSArray()
+      .filter(objectName => globalObjects.hasObjectNamed(objectName));
     return {
       name: group.getName(),
       group,
       objectNames,
-      objectPreviews: objectNames
-        .filter(objectName => globalObjects.hasObjectNamed(objectName))
-        .map(objectName => {
-          const object = globalObjects.getObject(objectName);
-          return {
-            name: objectName,
-            thumbnail: ObjectsRenderingService.getThumbnail(
-              project,
-              object.getConfiguration()
-            ),
-          };
-        }),
+      objectPreviews: objectNames.map(objectName => {
+        const object = globalObjects.getObject(objectName);
+        return {
+          name: objectName,
+          thumbnail: ObjectsRenderingService.getThumbnail(
+            project,
+            object.getConfiguration()
+          ),
+        };
+      }),
     };
   });
 };
@@ -542,13 +544,13 @@ const GroupCard = ({
   group,
   onAddObjectToGroup,
   onRemoveObjectFromGroup,
-  onRenameGroup,
+  onEditGroup,
   onDeleteGroup,
 }: {|
   group: GlobalGroupRow,
   onAddObjectToGroup: (objectName: string, group: GlobalGroupRow) => void,
   onRemoveObjectFromGroup: (objectName: string, group: GlobalGroupRow) => void,
-  onRenameGroup: (group: GlobalGroupRow) => void,
+  onEditGroup: (group: GlobalGroupRow) => void,
   onDeleteGroup: (group: GlobalGroupRow) => Promise<void> | void,
 |}) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
@@ -592,11 +594,11 @@ const GroupCard = ({
                 <div style={styles.cardActions}>
                   <IconButton
                     size="small"
-                    tooltip={t`Rename group`}
-                    aria-label="Rename group"
+                    tooltip={t`Edit group`}
+                    aria-label="Edit group"
                     onClick={event => {
                       event.stopPropagation();
-                      onRenameGroup(group);
+                      onEditGroup(group);
                     }}
                   >
                     <Edit />
@@ -652,58 +654,6 @@ const GroupCard = ({
   );
 };
 
-const RenameGlobalGroupDialog = ({
-  group,
-  onCancel,
-  onApply,
-}: {|
-  group: GlobalGroupRow,
-  onCancel: () => void,
-  onApply: string => void,
-|}) => {
-  const [newName, setNewName] = React.useState<string>(group.name);
-
-  const apply = React.useCallback(
-    () => {
-      onApply(newName);
-    },
-    [newName, onApply]
-  );
-
-  return (
-    <Dialog
-      open
-      title={<Trans>Rename group</Trans>}
-      actions={[
-        <FlatButton
-          key="cancel"
-          label={<Trans>Cancel</Trans>}
-          onClick={onCancel}
-        />,
-        <DialogPrimaryButton
-          key="apply"
-          label={<Trans>Rename</Trans>}
-          primary
-          onClick={apply}
-        />,
-      ]}
-      onRequestClose={onCancel}
-      onApply={apply}
-      maxWidth="sm"
-    >
-      <TextField
-        fullWidth
-        value={newName}
-        floatingLabelText={<Trans>Group name</Trans>}
-        floatingLabelFixed
-        translatableHintText={t`Group name`}
-        onChange={(event, value) => setNewName(value)}
-        autoFocus="desktop"
-      />
-    </Dialog>
-  );
-};
-
 const ProjectGlobalsDialog = ({
   project,
   onChange,
@@ -725,10 +675,7 @@ const ProjectGlobalsDialog = ({
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const { showDeleteConfirmation } = useAlertDialog();
   const [, forceRefresh] = React.useState(0);
-  const [
-    groupBeingRenamed,
-    setGroupBeingRenamed,
-  ] = React.useState<?GlobalGroupRow>(null);
+  const [editedGroup, setEditedGroup] = React.useState<?GlobalGroupRow>(null);
   const [editedObject, setEditedObject] = React.useState<?gdObject>(null);
   const globalObjects = enumerateGlobalObjects(project);
   const globalGroups = enumerateGlobalGroups(project);
@@ -770,8 +717,34 @@ const ProjectGlobalsDialog = ({
     [onObjectGroupsModifiedOutsideEditor, project]
   );
 
+  React.useEffect(
+    () => {
+      const globalObjectsContainer = project.getObjects();
+      const globalGroups = globalObjectsContainer.getObjectGroups();
+      let didUpdate = false;
+
+      for (let index = 0; index < globalGroups.count(); index++) {
+        const group = globalGroups.getAt(index);
+        for (const objectName of group.getAllObjectsNames().toJSArray()) {
+          if (!globalObjectsContainer.hasObjectNamed(objectName)) {
+            group.removeObject(objectName);
+            didUpdate = true;
+          }
+        }
+      }
+
+      if (!didUpdate) return;
+
+      notifyGlobalObjectGroupsModified();
+      onChange();
+      forceRefresh(key => key + 1);
+    },
+    [notifyGlobalObjectGroupsModified, onChange, project]
+  );
+
   const onAddObjectToGroup = React.useCallback(
     (objectName: string, group: GlobalGroupRow) => {
+      if (!project.getObjects().hasObjectNamed(objectName)) return;
       if (group.objectNames.includes(objectName)) return;
 
       group.group.addObject(objectName);
@@ -779,7 +752,7 @@ const ProjectGlobalsDialog = ({
       onChange();
       forceRefresh(key => key + 1);
     },
-    [notifyGlobalObjectGroupsModified, onChange]
+    [notifyGlobalObjectGroupsModified, onChange, project]
   );
 
   const onRemoveObjectFromGroup = React.useCallback(
@@ -810,8 +783,8 @@ const ProjectGlobalsDialog = ({
     [notifyGlobalObjectGroupsModified, project, onChange]
   );
 
-  const onRenameGroup = React.useCallback((group: GlobalGroupRow) => {
-    setGroupBeingRenamed(group);
+  const onEditGroup = React.useCallback((group: GlobalGroupRow) => {
+    setEditedGroup(group);
   }, []);
 
   const onEditObject = React.useCallback((object: gdObject) => {
@@ -912,38 +885,36 @@ const ProjectGlobalsDialog = ({
     ]
   );
 
-  const onApplyRenameGroup = React.useCallback(
-    (newName: string) => {
-      if (!groupBeingRenamed) return;
-
-      const currentName = groupBeingRenamed.group.getName();
-      if (newName === currentName) {
-        setGroupBeingRenamed(null);
-        return;
-      }
-
-      const validatedName = getValidatedGlobalGroupName(
-        project,
-        newName,
-        currentName
-      );
-
-      if (currentName !== validatedName) {
+  const onRenameEditedGroup = React.useCallback(
+    (
+      groupWithContext: GroupWithContext,
+      newName: string,
+      done: boolean => void
+    ) => {
+      const currentName = groupWithContext.group.getName();
+      if (newName !== currentName) {
         gd.WholeProjectRefactorer.globalObjectOrGroupRenamed(
           project,
           currentName,
-          validatedName,
+          newName,
           /* isObjectGroup= */ true
         );
-        groupBeingRenamed.group.setName(validatedName);
+      }
+
+      done(true);
+    },
+    [project]
+  );
+
+  const finishEditingGroup = React.useCallback(
+    () => {
+      Promise.resolve().then(() => {
         notifyGlobalObjectGroupsModified();
         onChange();
         forceRefresh(key => key + 1);
-      }
-
-      setGroupBeingRenamed(null);
+      });
     },
-    [groupBeingRenamed, notifyGlobalObjectGroupsModified, onChange, project]
+    [notifyGlobalObjectGroupsModified, onChange]
   );
 
   const onDeleteGroup = React.useCallback(
@@ -958,18 +929,15 @@ const ProjectGlobalsDialog = ({
         .getObjects()
         .getObjectGroups()
         .remove(group.group.getName());
-      if (
-        groupBeingRenamed &&
-        groupBeingRenamed.group.ptr === group.group.ptr
-      ) {
-        setGroupBeingRenamed(null);
+      if (editedGroup && editedGroup.group.ptr === group.group.ptr) {
+        setEditedGroup(null);
       }
       notifyGlobalObjectGroupsModified();
       onChange();
       forceRefresh(key => key + 1);
     },
     [
-      groupBeingRenamed,
+      editedGroup,
       notifyGlobalObjectGroupsModified,
       onChange,
       project,
@@ -1072,7 +1040,7 @@ const ProjectGlobalsDialog = ({
                     group={group}
                     onAddObjectToGroup={onAddObjectToGroup}
                     onRemoveObjectFromGroup={onRemoveObjectFromGroup}
-                    onRenameGroup={onRenameGroup}
+                    onEditGroup={onEditGroup}
                     onDeleteGroup={onDeleteGroup}
                   />
                 ))}
@@ -1092,11 +1060,44 @@ const ProjectGlobalsDialog = ({
           </div>
         </ColumnStackLayout>
       </div>
-      {groupBeingRenamed && (
-        <RenameGlobalGroupDialog
-          group={groupBeingRenamed}
-          onCancel={() => setGroupBeingRenamed(null)}
-          onApply={onApplyRenameGroup}
+      {editedGroup && (
+        <ObjectGroupEditorDialog
+          project={project}
+          projectScopedContainersAccessor={projectScopedContainersAccessor}
+          group={editedGroup.group}
+          onApply={() => {
+            setEditedGroup(null);
+            finishEditingGroup();
+          }}
+          onCancel={() => setEditedGroup(null)}
+          onObjectGroupAdded={() => {}}
+          globalObjectsContainer={project.getObjects()}
+          objectsContainer={project.getObjects()}
+          initialInstances={
+            editorLayout ? editorLayout.getInitialInstances() : null
+          }
+          initialTab={'objects'}
+          onComputeAllVariableNames={() => {
+            if (!editorLayout || !editedGroup) return [];
+
+            return EventsRootVariablesFinder.findAllObjectVariables(
+              project.getCurrentPlatform(),
+              project,
+              editorLayout,
+              editedGroup.group.getName()
+            );
+          }}
+          isVariableListLocked={false}
+          isObjectListLocked={false}
+          isGroupGlobal
+          onRenameGroup={onRenameEditedGroup}
+          getValidatedObjectOrGroupName={newName =>
+            getValidatedGlobalGroupName(
+              project,
+              newName,
+              editedGroup.group.getName()
+            )
+          }
         />
       )}
       {editedObject && editorLayersContainer && (

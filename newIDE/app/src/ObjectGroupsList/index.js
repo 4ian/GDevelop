@@ -317,6 +317,31 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
         const { group } = groupWithContext;
 
         const groupName = group.getName();
+        const objectsContainersList = projectScopedContainersAccessor
+          .get()
+          .getObjectsContainersList();
+        const globalObjectsContainer =
+          objectsContainersList.getObjectsContainersCount() > 1
+            ? objectsContainersList.getObjectsContainer(0)
+            : null;
+        const nonGlobalObjectNames = globalObjectsContainer
+          ? group
+              .getAllObjectsNames()
+              .toJSArray()
+              .filter(
+                objectName => !globalObjectsContainer.hasObjectNamed(objectName)
+              )
+          : [];
+
+        if (nonGlobalObjectNames.length > 0) {
+          await showAlert({
+            title: t`Set as global group`,
+            message: t`This group contains scene objects that are not global objects: ${nonGlobalObjectNames.join(
+              ', '
+            )}. A global group can only contain global objects. Make these objects global or remove them from the group first.`,
+          });
+          return;
+        }
 
         if (globalObjectGroups.has(groupName)) {
           await showAlert({
@@ -360,6 +385,7 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
         objectGroups,
         onObjectGroupModified,
         beforeSetAsGlobalGroup,
+        projectScopedContainersAccessor,
         scrollToItem,
         showConfirmation,
         showAlert,

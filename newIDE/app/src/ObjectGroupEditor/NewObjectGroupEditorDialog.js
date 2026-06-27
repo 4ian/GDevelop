@@ -25,6 +25,7 @@ type Props = {|
   globalObjectsContainer: gdObjectsContainer | null,
   objectsContainer: gdObjectsContainer,
   isGroupAlreadyAdded: boolean,
+  isGlobalGroup?: boolean,
 |};
 
 const NewObjectGroupEditorDialog = ({
@@ -35,6 +36,7 @@ const NewObjectGroupEditorDialog = ({
   globalObjectsContainer,
   objectsContainer,
   isGroupAlreadyAdded,
+  isGlobalGroup,
 }: Props): React.Node => {
   const forceUpdate = useForceUpdate();
 
@@ -61,6 +63,13 @@ const NewObjectGroupEditorDialog = ({
 
   const addObject = React.useCallback(
     (objectName: string) => {
+      if (
+        isGlobalGroup &&
+        (!globalObjectsContainer ||
+          !globalObjectsContainer.hasObjectNamed(objectName))
+      ) {
+        return;
+      }
       setGroupObjectNames(groupObjectNames => [
         ...groupObjectNames,
         objectName,
@@ -69,7 +78,7 @@ const NewObjectGroupEditorDialog = ({
       // Force update to ensure dialog is properly positioned
       forceUpdate();
     },
-    [forceUpdate]
+    [forceUpdate, globalObjectsContainer, isGlobalGroup]
   );
 
   const apply = React.useCallback(
@@ -135,6 +144,7 @@ const NewObjectGroupEditorDialog = ({
         onObjectAdded={addObject}
         onObjectRemoved={removeObject}
         isObjectListLocked={false}
+        isGlobalGroup={isGlobalGroup}
       />
     </Dialog>
   );

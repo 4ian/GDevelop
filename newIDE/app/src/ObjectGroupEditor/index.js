@@ -28,6 +28,7 @@ type Props = {|
   onObjectAdded: (objectName: string) => void,
   onObjectRemoved: (objectName: string) => void,
   isObjectListLocked: boolean,
+  isGlobalGroup?: boolean,
 |};
 
 const ObjectGroupEditor = ({
@@ -39,15 +40,23 @@ const ObjectGroupEditor = ({
   onObjectAdded,
   onObjectRemoved,
   isObjectListLocked,
+  isGlobalGroup,
 }: Props): React.Node => {
   const [objectName, setObjectName] = React.useState<string>('');
+  const isGlobalObject = React.useCallback(
+    (objectName: string) =>
+      !!globalObjectsContainer &&
+      globalObjectsContainer.hasObjectNamed(objectName),
+    [globalObjectsContainer]
+  );
 
   const addObject = React.useCallback(
     (objectName: string) => {
+      if (isGlobalGroup && !isGlobalObject(objectName)) return;
       onObjectAdded(objectName);
       setObjectName('');
     },
-    [onObjectAdded]
+    [isGlobalGroup, isGlobalObject, onObjectAdded]
   );
 
   const renderExplanation = () => {
@@ -144,9 +153,14 @@ const ObjectGroupEditor = ({
             onChoose={addObject}
             openOnFocus
             noGroups
-            hintText={t`Choose an object to add to the group`}
+            hintText={
+              isGlobalGroup
+                ? t`Choose a global object to add to the group`
+                : t`Choose an object to add to the group`
+            }
             fullWidth
             disabled={isObjectListLocked}
+            objectNameFilter={isGlobalGroup ? isGlobalObject : undefined}
           />
         </Column>
       </Paper>

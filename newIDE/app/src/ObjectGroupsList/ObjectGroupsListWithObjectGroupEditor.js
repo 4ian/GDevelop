@@ -54,6 +54,10 @@ const ObjectGroupsListWithObjectGroupEditor = ({
   const objectGroupsListInterface = React.useRef<ObjectGroupsListInterface | null>(
     null
   );
+  const isEditedGroupGlobal =
+    !!editedGroup &&
+    !!globalObjectGroups &&
+    globalObjectGroups.has(editedGroup.getName());
 
   return (
     <React.Fragment>
@@ -93,7 +97,11 @@ const ObjectGroupsListWithObjectGroupEditor = ({
           }}
           onApply={() => {
             if (onGroupsUpdated) onGroupsUpdated();
+            if (objectGroupsListInterface.current) {
+              objectGroupsListInterface.current.forceUpdate();
+            }
             setEditedGroup(null);
+            setCreatingNewGroup(false);
           }}
           onObjectGroupAdded={(objectGroup: gdObjectGroup) => {
             if (objectGroupsListInterface.current) {
@@ -105,6 +113,8 @@ const ObjectGroupsListWithObjectGroupEditor = ({
           initialTab={'objects'}
           isVariableListLocked={false}
           isObjectListLocked={false}
+          isGroupGlobal={isEditedGroupGlobal}
+          onRenameGroup={onRenameGroup}
           getValidatedObjectOrGroupName={getValidatedObjectOrGroupName}
         />
       )}

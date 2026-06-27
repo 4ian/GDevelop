@@ -1,5 +1,5 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import { Trans, t } from '@lingui/macro';
 import React from 'react';
 import FlatButton from '../UI/FlatButton';
 import ObjectGroupEditor from '.';
@@ -14,6 +14,9 @@ import VariablesList from '../VariablesList/VariablesList';
 import HelpButton from '../UI/HelpButton';
 import useValueWithInit from '../Utils/UseRefInitHook';
 import Text from '../UI/Text';
+import SemiControlledTextField from '../UI/SemiControlledTextField';
+import { ColumnStackLayout } from '../UI/Layout';
+import { type GroupWithContext } from '../ObjectsList/EnumerateObjects';
 
 const gd: libGDevelop = global.gd;
 
@@ -32,6 +35,13 @@ type Props = {|
   onComputeAllVariableNames?: () => Array<string>,
   isVariableListLocked: boolean,
   isObjectListLocked: boolean,
+  isGroupGlobal: boolean,
+  onRenameGroup?: (
+    groupWithContext: GroupWithContext,
+    newName: string,
+    done: (boolean) => void
+  ) => void,
+  getValidatedObjectOrGroupName: (newName: string, global: boolean) => string,
 |};
 
 const EditedObjectGroupEditorDialog = ({
@@ -47,6 +57,9 @@ const EditedObjectGroupEditorDialog = ({
   onComputeAllVariableNames,
   isVariableListLocked,
   isObjectListLocked,
+  isGroupGlobal,
+  onRenameGroup,
+  getValidatedObjectOrGroupName,
 }: Props): React.Node => {
   const forceUpdate = useForceUpdate();
   const {
@@ -59,6 +72,9 @@ const EditedObjectGroupEditorDialog = ({
 
   const [currentTab, setCurrentTab] = React.useState<ObjectGroupEditorTab>(
     initialTab || 'objects'
+  );
+  const [objectGroupName, setObjectGroupName] = React.useState<string>(
+    group.getName()
   );
 
   const groupVariablesContainer = useValueWithInit(
@@ -80,7 +96,36 @@ const EditedObjectGroupEditorDialog = ({
     resetThenClearPersistentUuid: true,
   });
 
+  const applyNameChange = React.useCallback(
+    (): Promise<boolean> =>
+      new Promise(resolve => {
+        if (objectGroupName === group.getName()) {
+          resolve(true);
+          return;
+        }
+
+        if (onRenameGroup) {
+          const groupWithContext: GroupWithContext = {
+            group,
+            global: isGroupGlobal,
+          };
+          onRenameGroup(groupWithContext, objectGroupName, doRename => {
+            if (doRename) group.setName(objectGroupName);
+            resolve(doRename);
+          });
+          return;
+        }
+
+        group.setName(objectGroupName);
+        resolve(true);
+      }),
+    [group, isGroupGlobal, objectGroupName, onRenameGroup]
+  );
+
   const apply = async () => {
+    const wasNameChangeApplied = await applyNameChange();
+    if (!wasNameChangeApplied) return;
+
     onApply();
     if (!initialInstances) {
       // This can only happens for legacy function object groups.
@@ -129,12 +174,40 @@ const EditedObjectGroupEditorDialog = ({
 
   const addObject = React.useCallback(
     (objectName: string) => {
+      if (
+        isGroupGlobal &&
+        (!globalObjectsContainer ||
+          !globalObjectsContainer.hasObjectNamed(objectName))
+      ) {
+        return;
+      }
       group.addObject(objectName);
       // Force update to ensure dialog is properly positioned
       forceUpdate();
       notifyOfChange();
     },
-    [forceUpdate, group, notifyOfChange]
+    [forceUpdate, globalObjectsContainer, group, isGroupGlobal, notifyOfChange]
+  );
+
+  React.useEffect(
+    () => {
+      if (!isGroupGlobal || !globalObjectsContainer) return;
+
+      const nonGlobalObjectNames = group
+        .getAllObjectsNames()
+        .toJSArray()
+        .filter(
+          objectName => !globalObjectsContainer.hasObjectNamed(objectName)
+        );
+      if (nonGlobalObjectNames.length === 0) return;
+
+      nonGlobalObjectNames.forEach(objectName =>
+        group.removeObject(objectName)
+      );
+      forceUpdate();
+      notifyOfChange();
+    },
+    [forceUpdate, globalObjectsContainer, group, isGroupGlobal, notifyOfChange]
   );
 
   const { DismissableTutorialMessage } = useDismissableTutorialMessage(
@@ -143,7 +216,7 @@ const EditedObjectGroupEditorDialog = ({
 
   return (
     <Dialog
-      title={<Trans>Edit {group.getName()}</Trans>}
+      title={<Trans>Edit {objectGroupName}</Trans>}
       key={group.ptr}
       actions={[
         <FlatButton
@@ -168,20 +241,40 @@ const EditedObjectGroupEditorDialog = ({
       fullHeight
       flexBody
       fixedContent={
-        <Tabs
-          value={currentTab}
-          onChange={setCurrentTab}
-          options={[
-            {
-              label: <Trans>Objects</Trans>,
-              value: 'objects',
-            },
-            {
-              label: <Trans>Variables</Trans>,
-              value: 'variables',
-            },
-          ]}
-        />
+        <ColumnStackLayout noMargin>
+          <SemiControlledTextField
+            fullWidth
+            id="object-group-name"
+            commitOnBlur
+            floatingLabelText={<Trans>Group name</Trans>}
+            floatingLabelFixed
+            value={objectGroupName}
+            translatableHintText={t`Group name`}
+            onChange={newObjectGroupName => {
+              if (newObjectGroupName === objectGroupName) return;
+
+              setObjectGroupName(
+                getValidatedObjectOrGroupName(newObjectGroupName, isGroupGlobal)
+              );
+              notifyOfChange();
+            }}
+            autoFocus="desktop"
+          />
+          <Tabs
+            value={currentTab}
+            onChange={setCurrentTab}
+            options={[
+              {
+                label: <Trans>Objects</Trans>,
+                value: 'objects',
+              },
+              {
+                label: <Trans>Variables</Trans>,
+                value: 'variables',
+              },
+            ]}
+          />
+        </ColumnStackLayout>
       }
     >
       {currentTab === 'objects' &&
@@ -204,6 +297,7 @@ const EditedObjectGroupEditorDialog = ({
             onObjectAdded={addObject}
             onObjectRemoved={removeObject}
             isObjectListLocked={isObjectListLocked}
+            isGlobalGroup={isGroupGlobal}
           />
         ))}
       {currentTab === 'variables' && (

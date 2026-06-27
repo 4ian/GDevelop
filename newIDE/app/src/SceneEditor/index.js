@@ -1321,16 +1321,23 @@ export default class SceneEditor extends React.Component<Props, State> {
     this.setState({ editedGroup: group, isCreatingNewGroup: false });
   };
 
+  _isObjectGroupGlobal = (group: gdObjectGroup): boolean => {
+    const { globalObjectsContainer } = this.props;
+    return (
+      !!globalObjectsContainer &&
+      globalObjectsContainer.getObjectGroups().has(group.getName())
+    );
+  };
+
   _createObjectGroup = () => {
     this.setState({ editedGroup: null, isCreatingNewGroup: true });
   };
 
   _closeObjectGroupEditorDialog = () => {
     if (this.state.editedGroup) {
-      // TODO Set the `global` attribute correctly.
       this.props.onObjectGroupEdited({
         group: this.state.editedGroup,
-        global: false,
+        global: this._isObjectGroupGlobal(this.state.editedGroup),
       });
     }
     this.setState({ editedGroup: null, isCreatingNewGroup: false });
@@ -4096,6 +4103,11 @@ export default class SceneEditor extends React.Component<Props, State> {
                       }}
                       isVariableListLocked={isCustomVariant}
                       isObjectListLocked={isCustomVariant}
+                      isGroupGlobal={
+                        !!this.state.editedGroup &&
+                        this._isObjectGroupGlobal(this.state.editedGroup)
+                      }
+                      onRenameGroup={this._onRenameObjectGroup}
                       getValidatedObjectOrGroupName={(newName, global) =>
                         this._getValidatedObjectOrGroupName(
                           newName,

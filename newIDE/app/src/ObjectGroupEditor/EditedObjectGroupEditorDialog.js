@@ -40,6 +40,7 @@ type Props = {|
   isVariableListLocked: boolean,
   isObjectListLocked: boolean,
   isGroupGlobal: boolean,
+  objectNameFilter?: string => boolean,
   onRenameGroup?: (
     groupWithContext: GroupWithContext,
     newName: string,
@@ -62,6 +63,7 @@ const EditedObjectGroupEditorDialog = ({
   isVariableListLocked,
   isObjectListLocked,
   isGroupGlobal,
+  objectNameFilter,
   onRenameGroup,
   getValidatedObjectOrGroupName,
 }: Props): React.Node => {
@@ -331,6 +333,7 @@ const EditedObjectGroupEditorDialog = ({
             onObjectRemoved={removeObject}
             isObjectListLocked={isObjectListLocked}
             isGlobalGroup={isGroupGlobal}
+            objectNameFilter={objectNameFilter}
             requiredBehaviorTypes={requiredBehaviorTypes}
           />
         ))}

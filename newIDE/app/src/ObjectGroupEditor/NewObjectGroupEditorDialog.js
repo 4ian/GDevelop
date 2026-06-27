@@ -29,6 +29,7 @@ type Props = {|
   objectsContainer: gdObjectsContainer,
   isGroupAlreadyAdded: boolean,
   isGlobalGroup?: boolean,
+  objectNameFilter?: string => boolean,
 |};
 
 const NewObjectGroupEditorDialog = ({
@@ -40,6 +41,7 @@ const NewObjectGroupEditorDialog = ({
   objectsContainer,
   isGroupAlreadyAdded,
   isGlobalGroup,
+  objectNameFilter,
 }: Props): React.Node => {
   const forceUpdate = useForceUpdate();
 
@@ -148,6 +150,7 @@ const NewObjectGroupEditorDialog = ({
         onObjectRemoved={removeObject}
         isObjectListLocked={false}
         isGlobalGroup={isGlobalGroup}
+        objectNameFilter={objectNameFilter}
       />
     </Dialog>
   );

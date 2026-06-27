@@ -33,6 +33,7 @@ type Props = {|
   isVariableListLocked: boolean,
   isObjectListLocked: boolean,
   isGroupGlobal?: boolean,
+  objectNameFilter?: string => boolean,
   onRenameGroup?: (
     groupWithContext: GroupWithContext,
     newName: string,
@@ -57,6 +58,7 @@ const ObjectGroupEditorDialog = ({
   isVariableListLocked,
   isObjectListLocked,
   isGroupGlobal = false,
+  objectNameFilter,
   onRenameGroup,
   getValidatedObjectOrGroupName,
 }: Props): React.Node => {
@@ -138,6 +140,7 @@ const ObjectGroupEditorDialog = ({
       objectsContainer={objectsContainer}
       isGroupAlreadyAdded={!!editedObjectGroup}
       isGlobalGroup={isGroupGlobal}
+      objectNameFilter={objectNameFilter}
     />
   ) : (
     <EditedObjectGroupEditorDialog
@@ -154,6 +157,7 @@ const ObjectGroupEditorDialog = ({
       isVariableListLocked={isVariableListLocked}
       isObjectListLocked={isObjectListLocked}
       isGroupGlobal={isGroupGlobal}
+      objectNameFilter={objectNameFilter}
       onRenameGroup={onRenameGroup}
       getValidatedObjectOrGroupName={getValidatedObjectOrGroupName}
     />

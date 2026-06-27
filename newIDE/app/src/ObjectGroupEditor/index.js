@@ -31,6 +31,7 @@ type Props = {|
   onObjectRemoved: (objectName: string) => void,
   isObjectListLocked: boolean,
   isGlobalGroup?: boolean,
+  objectNameFilter?: string => boolean,
   requiredBehaviorTypes?: Array<string>,
 |};
 
@@ -44,6 +45,7 @@ const ObjectGroupEditor = ({
   onObjectRemoved,
   isObjectListLocked,
   isGlobalGroup,
+  objectNameFilter,
   requiredBehaviorTypes,
 }: Props): React.Node => {
   const [objectName, setObjectName] = React.useState<string>('');
@@ -53,10 +55,18 @@ const ObjectGroupEditor = ({
       globalObjectsContainer.hasObjectNamed(objectName),
     [globalObjectsContainer]
   );
+  const canUseObject = React.useCallback(
+    (objectName: string) => {
+      if (isGlobalGroup && !isGlobalObject(objectName)) return false;
+      if (objectNameFilter && !objectNameFilter(objectName)) return false;
+      return true;
+    },
+    [isGlobalGroup, isGlobalObject, objectNameFilter]
+  );
 
   const addObject = React.useCallback(
     (objectName: string) => {
-      if (isGlobalGroup && !isGlobalObject(objectName)) return;
+      if (!canUseObject(objectName)) return;
       if (
         !checkHasRequiredBehaviors({
           objectsContainersList: projectScopedContainersAccessor
@@ -72,8 +82,7 @@ const ObjectGroupEditor = ({
       setObjectName('');
     },
     [
-      isGlobalGroup,
-      isGlobalObject,
+      canUseObject,
       onObjectAdded,
       projectScopedContainersAccessor,
       requiredBehaviorTypes,
@@ -185,7 +194,7 @@ const ObjectGroupEditor = ({
             }
             fullWidth
             disabled={isObjectListLocked}
-            objectNameFilter={isGlobalGroup ? isGlobalObject : undefined}
+            objectNameFilter={canUseObject}
             requiredCapabilitiesBehaviorTypes={requiredBehaviorTypes}
           />
         </Column>

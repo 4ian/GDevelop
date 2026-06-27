@@ -1073,6 +1073,9 @@ const ProjectSceneObjectsDialog = ({
           objectsContainer={sceneObjectsContainer}
           initialInstances={layout.getInitialInstances()}
           initialTab={'objects'}
+          objectNameFilter={objectName =>
+            sceneObjectsContainer.hasObjectNamed(objectName)
+          }
           onComputeAllVariableNames={() =>
             EventsRootVariablesFinder.findAllObjectVariables(
               project.getCurrentPlatform(),

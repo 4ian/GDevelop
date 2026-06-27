@@ -176,7 +176,21 @@ void EventsFunctionTools::AddPropertiesToVariablesContainer(
     auto &propertyType = gd::ValueTypeMetadata::GetPrimitiveValueType(
         gd::ValueTypeMetadata::ConvertPropertyTypeToValueType(
             property.GetType()));
-    if (propertyType == "number") {
+    if (property.GetType() == "Choice") {
+      auto &variable = outputVariablesContainer.InsertNew(
+          property.GetName(), outputVariablesContainer.Count());
+      variable.SetString(property.GetValue());
+      variable.CastTo(gd::Variable::Type::Enum);
+      std::vector<gd::String> enumValues;
+      for (const auto &choice : property.GetChoices()) {
+        enumValues.push_back(choice.GetValue());
+      }
+      // Some older extensions stored choice values in extra info.
+      for (const auto &extraInfo : property.GetExtraInfo()) {
+        enumValues.push_back(extraInfo);
+      }
+      variable.SetEnumValues(enumValues);
+    } else if (propertyType == "number") {
       auto &variable = outputVariablesContainer.InsertNew(
           property.GetName(), outputVariablesContainer.Count());
       variable.SetValue(0);

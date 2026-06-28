@@ -13,6 +13,7 @@
 #include "GDCore/Tools/Localization.h"
 #include "GDCore/Extensions/Metadata/ExpressionMetadata.h"
 #include "GDCore/Project/ProjectScopedContainers.h"
+#include "GDCore/Project/JsonObjectPropertyTools.h"
 #include "GDCore/Project/VariablesContainersList.h"
 #include "GDCore/Project/VariablesContainer.h"
 
@@ -218,6 +219,10 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
 
       CheckVariableExistence(node.location, node.name, node.child != nullptr);
       if (node.child) {
+        ValidateJsonObjectPropertyPathIfNeeded(node.name,
+                                               node.child.get());
+      }
+      if (node.child) {
         node.child->Visit(*this);
       }
     } else if (parentType == Type::LegacyVariable) {
@@ -249,8 +254,16 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
         }, [&]() {
           // This is a property.
           // Being in this node implies that there is at least a child - which is not supported for properties.
-          RaiseTypeError(_("Accessing a child variable of a property is not possible - just write the property name."),
-              node.location);
+          const gd::NamedPropertyDescriptor &property =
+              propertiesContainerList.Get(node.name).second;
+          if (property.GetType() != "JsonObject") {
+            RaiseTypeError(_("Accessing a child variable of a property is not possible - just write the property name."),
+                node.location);
+          } else {
+            ValidateJsonObjectPropertyPath(property,
+                                           node.name,
+                                           node.child.get());
+          }
         }, [&]() {
           // This is a parameter.
           // Being in this node implies that there is at least a child - which is not supported for parameters.
@@ -434,8 +447,14 @@ private:
                     "renaming one or the other."),
                   location, name);
             } else if (hasChild) {
-              RaiseMalformedVariableParameter(
-                  _("Properties can't have children."), location, name);
+              const gd::NamedPropertyDescriptor &property =
+                  projectScopedContainers.GetPropertiesContainersList()
+                      .Get(name)
+                      .second;
+              if (property.GetType() != "JsonObject") {
+                RaiseMalformedVariableParameter(
+                    _("Properties can't have children."), location, name);
+              }
             }
           },
           [&]() {
@@ -457,6 +476,92 @@ private:
                 name);
           });
     }
+  }
+
+  bool ValidateJsonObjectPropertyPathIfNeeded(
+      const gd::String& propertyName,
+      const gd::VariableAccessorOrVariableBracketAccessorNode* child) {
+    const auto& propertiesContainersList =
+        projectScopedContainers.GetPropertiesContainersList();
+    if (!propertiesContainersList.Has(propertyName)) {
+      return true;
+    }
+
+    const gd::NamedPropertyDescriptor& property =
+        propertiesContainersList.Get(propertyName).second;
+    if (property.GetType() != "JsonObject") {
+      return true;
+    }
+
+    return ValidateJsonObjectPropertyPath(
+        property, propertyName, child);
+  }
+
+  bool ValidateJsonObjectPropertyChildName(
+      const gd::NamedPropertyDescriptor& property,
+      const gd::String& propertyName,
+      const gd::String& childName,
+      const gd::ExpressionParserLocation& childNameLocation) {
+    if (childName.empty()) {
+      return true;
+    }
+
+    gd::Variable jsonExample =
+        gd::JsonObjectPropertyTools::ParseJsonExampleAsVariable(property);
+    const gd::Variable* childVariable =
+        gd::JsonObjectPropertyTools::GetChildIfDefined(jsonExample,
+                                                       childName);
+    if (!childVariable) {
+      RaiseTypeError(
+          _("The JSON example for property") + " \"" + propertyName +
+              _("\" does not define the child:") + " " + childName,
+          childNameLocation);
+      return false;
+    }
+
+    ReadChildTypeFromVariable(childVariable->GetType());
+    return true;
+  }
+
+  bool ValidateJsonObjectPropertyPath(
+      const gd::NamedPropertyDescriptor& property,
+      const gd::String& propertyName,
+      const gd::VariableAccessorOrVariableBracketAccessorNode* child) {
+    gd::Variable jsonExample =
+        gd::JsonObjectPropertyTools::ParseJsonExampleAsVariable(property);
+    const gd::Variable* currentVariable = &jsonExample;
+    const gd::VariableAccessorOrVariableBracketAccessorNode* currentChild =
+        child;
+
+    while (currentChild) {
+      const gd::VariableAccessorNode* directAccessor =
+          dynamic_cast<const gd::VariableAccessorNode*>(currentChild);
+      if (!directAccessor) {
+        return true;
+      }
+
+      if (directAccessor->name.empty()) {
+        return true;
+      }
+
+      const gd::Variable* childVariable =
+          gd::JsonObjectPropertyTools::GetChildIfDefined(*currentVariable,
+                                                         directAccessor->name);
+      if (!childVariable) {
+        RaiseTypeError(
+            _("The JSON example for property") + " \"" + propertyName +
+                _("\" does not define the child:") + " " +
+                directAccessor->name,
+            directAccessor->nameLocation);
+        return false;
+      }
+
+      currentVariable = childVariable;
+      currentChild = directAccessor->child.get();
+    }
+
+    ReadChildTypeFromVariable(currentVariable->GetType());
+    return true;
   }
 
   void ReportAnyError(const ExpressionNode& node, bool isFatal = true) {

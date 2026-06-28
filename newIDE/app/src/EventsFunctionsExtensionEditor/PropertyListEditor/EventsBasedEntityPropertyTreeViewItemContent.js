@@ -249,6 +249,8 @@ export class EventsBasedEntityPropertyTreeViewItemContent
         return 'res/functions/behavior_black.svg';
       case 'Resource':
         return 'res/functions/resource_black.svg';
+      case 'JsonObject':
+        return 'res/actions/var.png';
       default:
         return 'res/functions/string_black.svg';
     }

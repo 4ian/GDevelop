@@ -176,7 +176,11 @@ void EventsFunctionTools::AddPropertiesToVariablesContainer(
     auto &propertyType = gd::ValueTypeMetadata::GetPrimitiveValueType(
         gd::ValueTypeMetadata::ConvertPropertyTypeToValueType(
             property.GetType()));
-    if (property.GetType() == "Choice") {
+    if (property.GetType() == "JsonObject") {
+      auto &variable = outputVariablesContainer.InsertNew(
+          property.GetName(), outputVariablesContainer.Count());
+      variable.CastTo(gd::Variable::Type::Structure);
+    } else if (property.GetType() == "Choice") {
       auto &variable = outputVariablesContainer.InsertNew(
           property.GetName(), outputVariablesContainer.Count());
       variable.SetString(property.GetValue());

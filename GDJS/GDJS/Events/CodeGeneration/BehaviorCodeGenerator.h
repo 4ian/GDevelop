@@ -151,11 +151,11 @@ class BehaviorCodeGenerator {
       const gd::NamedPropertyDescriptor& property);
 
   gd::String GeneratePropertyValueCode(
-      const gd::PropertyDescriptor& property,
+      const gd::NamedPropertyDescriptor& property,
       const gd::String& runtimeGameExpression);
 
   gd::String GeneratePropertyValueResolutionCode(
-      const gd::PropertyDescriptor& property,
+      const gd::NamedPropertyDescriptor& property,
       const gd::String& runtimeGameExpression,
       const gd::String& valueCode);
 

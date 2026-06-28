@@ -1123,6 +1123,10 @@ void MetadataDeclarationHelper::DeclarePropertyInstructionAndExpression(
   auto group = (eventsBasedEntity.GetFullName() || eventsBasedEntity.GetName())
         + " " + property.GetGroup() + " properties";
 
+  if (propertyType == "JsonObject") {
+    return;
+  }
+
   if (propertyType == "Boolean") {
     auto &conditionMetadata = entityMetadata.AddScopedCondition(
         conditionName, propertyLabel,

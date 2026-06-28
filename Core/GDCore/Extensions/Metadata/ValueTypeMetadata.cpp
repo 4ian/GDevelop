@@ -141,6 +141,8 @@ const gd::String &ValueTypeMetadata::ConvertPropertyTypeToValueType(
     return numberWithChoicesValueType;
   } else if (propertyType == "Behavior") {
     return behaviorValueType;
+  } else if (propertyType == "JsonObject") {
+    return variableType;
   } else if (propertyType == "LeaderboardId") {
     return leaderboardIdValueType;
   } else if (propertyType == "ObjectAnimationName") {

@@ -48,7 +48,9 @@ void CustomConfigurationHelper::InitializeContent(
             property->GetType());
     const auto &primitiveType =
         gd::ValueTypeMetadata::GetPrimitiveValueType(valueType);
-    if (primitiveType == "string" || valueType == "behavior") {
+    if (property->GetType() == "JsonObject") {
+      element.SetStringValue(property->GetValue());
+    } else if (primitiveType == "string" || valueType == "behavior") {
       element.SetStringValue(property->GetValue());
     } else if (primitiveType == "number") {
       if (IsExactGlobalConfigPlaceholderValue(property->GetValue())) {
@@ -86,7 +88,9 @@ std::map<gd::String, gd::PropertyDescriptor> CustomConfigurationHelper::GetPrope
         gd::ValueTypeMetadata::GetPrimitiveValueType(valueType);
     if (configurationContent.HasChild(propertyName)) {
       auto &child = configurationContent.GetChild(propertyName);
-      if (primitiveType == "string" || valueType == "behavior") {
+      if (property->GetType() == "JsonObject") {
+        newProperty.SetValue(child.GetStringValue());
+      } else if (primitiveType == "string" || valueType == "behavior") {
         newProperty.SetValue(child.GetStringValue());
       } else if (primitiveType == "number") {
         newProperty.SetValue(child.GetValue().IsString()
@@ -122,7 +126,9 @@ bool CustomConfigurationHelper::UpdateProperty(
       gd::ValueTypeMetadata::ConvertPropertyTypeToValueType(property.GetType());
   const auto &primitiveType =
       gd::ValueTypeMetadata::GetPrimitiveValueType(valueType);
-  if (primitiveType == "string" || valueType == "behavior") {
+  if (property.GetType() == "JsonObject") {
+    element.SetStringValue(newValue);
+  } else if (primitiveType == "string" || valueType == "behavior") {
     element.SetStringValue(newValue);
   } else if (primitiveType == "number") {
     if (IsExactGlobalConfigPlaceholderValue(newValue)) {

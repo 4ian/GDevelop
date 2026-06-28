@@ -28,6 +28,14 @@ bool HasGlobalConfigPlaceholder(const gd::String& value) {
   return value.find("{{") != std::string::npos &&
          value.find("}}") != std::string::npos;
 }
+
+gd::String GenerateJsonObjectPropertySchemaArguments(
+    const gd::NamedPropertyDescriptor& property) {
+  return ", " + gdjs::EventsCodeGenerator::ConvertToStringExplicit(
+                    property.GetValue()) +
+         ", " + gdjs::EventsCodeGenerator::ConvertToStringExplicit(
+                    property.GetName());
+}
 }  // namespace
 
 gd::String BehaviorCodeGenerator::doStepPreEventsFunctionName =
@@ -455,6 +463,12 @@ gd::String BehaviorCodeGenerator::GenerateUpdatePropertyFromBehaviorDataCode(
 gd::String BehaviorCodeGenerator::GenerateGetPropertyNetworkSyncDataCode(
     const gd::EventsBasedBehavior& eventsBasedBehavior,
     const gd::NamedPropertyDescriptor& property) {
+  if (property.GetType() == "JsonObject") {
+    return gd::String(R"jscode_template(
+    PROPERTY_NAME: this._behaviorData.PROPERTY_NAME.toJSObject(),)jscode_template")
+        .FindAndReplace("PROPERTY_NAME", property.GetName());
+  }
+
   return gd::String(R"jscode_template(
     PROPERTY_NAME: this._behaviorData.PROPERTY_NAME,)jscode_template")
       .FindAndReplace("PROPERTY_NAME", property.GetName());
@@ -463,6 +477,21 @@ gd::String BehaviorCodeGenerator::GenerateGetPropertyNetworkSyncDataCode(
 gd::String BehaviorCodeGenerator::GenerateUpdatePropertyFromNetworkSyncDataCode(
     const gd::EventsBasedBehavior& eventsBasedBehavior,
     const gd::NamedPropertyDescriptor& property) {
+  if (property.GetType() == "JsonObject") {
+    return gd::String(R"jscode_template(
+    if (networkSyncData.props.PROPERTY_NAME !== undefined)
+      this._behaviorData.PROPERTY_NAME = gdjs.evtTools.globalConfig.resolveVariable(this._runtimeScene.getGame(), networkSyncData.props.PROPERTY_NAME, PROPERTY_SCHEMA, PROPERTY_LABEL);)jscode_template")
+        .FindAndReplace("PROPERTY_NAME", property.GetName())
+        .FindAndReplace(
+            "PROPERTY_SCHEMA",
+            gdjs::EventsCodeGenerator::ConvertToStringExplicit(
+                property.GetValue()))
+        .FindAndReplace(
+            "PROPERTY_LABEL",
+            gdjs::EventsCodeGenerator::ConvertToStringExplicit(
+                property.GetName()));
+  }
+
   return gd::String(R"jscode_template(
     if (networkSyncData.props.PROPERTY_NAME !== undefined)
       this._behaviorData.PROPERTY_NAME = networkSyncData.props.PROPERTY_NAME;)jscode_template")
@@ -470,13 +499,14 @@ gd::String BehaviorCodeGenerator::GenerateUpdatePropertyFromNetworkSyncDataCode(
 }
 
 gd::String BehaviorCodeGenerator::GeneratePropertyValueCode(
-    const gd::PropertyDescriptor& property,
+    const gd::NamedPropertyDescriptor& property,
     const gd::String& runtimeGameExpression) {
 
   const auto &valueType =
       gd::ValueTypeMetadata::ConvertPropertyTypeToValueType(property.GetType());
   const auto &primitiveType =
       gd::ValueTypeMetadata::GetPrimitiveValueType(valueType);
+  const bool isJsonObjectProperty = property.GetType() == "JsonObject";
   gd::String placeholderPath;
   const bool hasRuntimeGame = !runtimeGameExpression.empty();
   if (hasRuntimeGame &&
@@ -484,7 +514,11 @@ gd::String BehaviorCodeGenerator::GeneratePropertyValueCode(
                                           placeholderPath)) {
     const gd::String placeholderPathCode =
         EventsCodeGenerator::ConvertToStringExplicit(placeholderPath);
-    if (primitiveType == "string" || valueType == "behavior") {
+    if (isJsonObjectProperty) {
+      return "gdjs.evtTools.globalConfig.getVariable(" +
+             runtimeGameExpression + ", " + placeholderPathCode +
+             GenerateJsonObjectPropertySchemaArguments(property) + ")";
+    } else if (primitiveType == "string" || valueType == "behavior") {
       return "gdjs.evtTools.globalConfig.getString(" + runtimeGameExpression +
              ", " + placeholderPathCode + ")";
     } else if (primitiveType == "number") {
@@ -494,6 +528,17 @@ gd::String BehaviorCodeGenerator::GeneratePropertyValueCode(
       return "gdjs.evtTools.globalConfig.getBoolean(" + runtimeGameExpression +
              ", " + placeholderPathCode + ")";
     }
+  }
+
+  if (isJsonObjectProperty) {
+    if (hasRuntimeGame) {
+      return "gdjs.evtTools.globalConfig.resolveVariable(" +
+             runtimeGameExpression + ", " +
+             EventsCodeGenerator::ConvertToStringExplicit(
+                 property.GetValue()) +
+             GenerateJsonObjectPropertySchemaArguments(property) + ")";
+    }
+    return "new gdjs.Variable({type: \"structure\", children: []})";
   }
 
   if (primitiveType == "string" || valueType == "behavior") {
@@ -517,7 +562,7 @@ gd::String BehaviorCodeGenerator::GeneratePropertyValueCode(
 }
 
 gd::String BehaviorCodeGenerator::GeneratePropertyValueResolutionCode(
-    const gd::PropertyDescriptor& property,
+    const gd::NamedPropertyDescriptor& property,
     const gd::String& runtimeGameExpression,
     const gd::String& valueCode) {
   const auto &valueType =
@@ -525,7 +570,11 @@ gd::String BehaviorCodeGenerator::GeneratePropertyValueResolutionCode(
   const auto &primitiveType =
       gd::ValueTypeMetadata::GetPrimitiveValueType(valueType);
 
-  if (primitiveType == "string" || valueType == "behavior") {
+  if (property.GetType() == "JsonObject") {
+    return "gdjs.evtTools.globalConfig.resolveVariable(" +
+           runtimeGameExpression + ", " + valueCode +
+           GenerateJsonObjectPropertySchemaArguments(property) + ")";
+  } else if (primitiveType == "string" || valueType == "behavior") {
     return "gdjs.evtTools.globalConfig.resolveString(" +
            runtimeGameExpression + ", " + valueCode + ")";
   } else if (primitiveType == "number") {

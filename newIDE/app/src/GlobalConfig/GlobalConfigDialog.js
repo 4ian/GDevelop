@@ -19,7 +19,7 @@ type ConfigRoot = { [string]: any };
 type SelectedCell = {|
   sheetName: string,
   rowKey: string,
-  columnKey: string,
+  columnKey?: string,
 |};
 
 type Props = {|
@@ -473,10 +473,12 @@ const getSelectedPath = (selectedCell: ?SelectedCell, config: ConfigRoot) => {
     : isPlainObject(sheet)
     ? sheet[selectedCell.rowKey]
     : undefined;
-  const columnPath =
-    selectedCell.columnKey === 'value' && !isPlainObject(rowValue)
+  const columnKey = selectedCell.columnKey;
+  const columnPath = columnKey
+    ? columnKey === 'value' && !isPlainObject(rowValue)
       ? ''
-      : formatPathSegment(selectedCell.columnKey, false);
+      : formatPathSegment(columnKey, false)
+    : '';
 
   return (
     formatPathSegment(selectedCell.sheetName, true) +
@@ -1091,9 +1093,26 @@ const GlobalConfigDialog = ({
                       const rowValue = Array.isArray(sheet)
                         ? sheet[Number(rowKey)]
                         : sheet[rowKey];
+                      const isSelectedRow =
+                        !!selectedCell &&
+                        selectedCell.sheetName === selectedSheet &&
+                        selectedCell.rowKey === rowKey &&
+                        !selectedCell.columnKey;
+
                       return (
                         <tr key={rowKey}>
-                          <th style={styles.rowHeader}>
+                          <th
+                            style={{
+                              ...styles.rowHeader,
+                              ...(isSelectedRow ? styles.selectedCell : {}),
+                            }}
+                            onClick={() =>
+                              setSelectedCell({
+                                sheetName: selectedSheet,
+                                rowKey,
+                              })
+                            }
+                          >
                             {Array.isArray(sheet) ? (
                               rowKey
                             ) : (
@@ -1102,6 +1121,12 @@ const GlobalConfigDialog = ({
                                 aria-label={t`Row key`}
                                 defaultValue={rowKey}
                                 title={rowKey}
+                                onFocus={() =>
+                                  setSelectedCell({
+                                    sheetName: selectedSheet,
+                                    rowKey,
+                                  })
+                                }
                                 onBlur={event =>
                                   renameRow(
                                     selectedSheet,

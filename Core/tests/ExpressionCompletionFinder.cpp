@@ -30,6 +30,13 @@ TEST_CASE("ExpressionCompletionFinder", "[common][events]") {
   gd::ProjectScopedContainers projectScopedContainers =
       gd::ProjectScopedContainers::
           MakeNewProjectScopedContainersForProjectAndLayout(project, layout1);
+  gd::PropertiesContainer propertiesContainer(
+      gd::EventsFunctionsContainer::Extension);
+  propertiesContainer.InsertNew("CardConfig")
+      .SetType("JsonObject")
+      .SetValue(
+          "{\"price\":100,\"stats\":{\"damage\":20},\"label\":\"PeaShooter\"}");
+  projectScopedContainers.AddPropertiesContainer(propertiesContainer);
 
   gd::ExpressionParser2 parser;
 
@@ -170,6 +177,42 @@ TEST_CASE("ExpressionCompletionFinder", "[common][events]") {
             expectedEmptyCompletions);
     REQUIRE(getCompletionsFor("string", "\"a\" + ", 5) ==
             expectedEmptyCompletions);
+  }
+
+  SECTION("JsonObject property children") {
+    gd::ExpressionCompletionDescription labelCompletion(
+        gd::ExpressionCompletionDescription::Variable, 11, 11);
+    labelCompletion.SetCompletion("label");
+    labelCompletion.SetVariableType(gd::Variable::String);
+    gd::ExpressionCompletionDescription priceCompletion(
+        gd::ExpressionCompletionDescription::Variable, 11, 11);
+    priceCompletion.SetCompletion("price");
+    priceCompletion.SetVariableType(gd::Variable::Number);
+    gd::ExpressionCompletionDescription statsCompletion(
+        gd::ExpressionCompletionDescription::Variable, 11, 11);
+    statsCompletion.SetCompletion("stats");
+    statsCompletion.SetVariableType(gd::Variable::Structure);
+
+    std::vector<gd::String> expectedCompletions{
+        labelCompletion.ToString(),
+        priceCompletion.ToString(),
+        statsCompletion.ToString(),
+    };
+    REQUIRE(getCompletionsFor("number|string", "CardConfig.", 10) ==
+            expectedCompletions);
+  }
+
+  SECTION("JsonObject property nested children") {
+    gd::ExpressionCompletionDescription damageCompletion(
+        gd::ExpressionCompletionDescription::Variable, 17, 17);
+    damageCompletion.SetCompletion("damage");
+    damageCompletion.SetVariableType(gd::Variable::Number);
+
+    std::vector<gd::String> expectedCompletions{
+        damageCompletion.ToString(),
+    };
+    REQUIRE(getCompletionsFor("number|string", "CardConfig.stats.", 16) ==
+            expectedCompletions);
   }
 
   SECTION("Free function") {

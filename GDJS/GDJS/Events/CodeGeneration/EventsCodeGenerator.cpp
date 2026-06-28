@@ -1447,14 +1447,15 @@ gd::String EventsCodeGenerator::GenerateGetVariable(
       variables = &variablesContainer;
       output = "eventsFunctionContext.sceneVariablesForExtension";
     } else if (sourceType == gd::VariablesContainer::SourceType::Properties) {
-      if (hasChild) {
-        // Properties with children are not supported.
-        return "gdjs.VariablesContainer.badVariablesContainer";
-      }
       const auto& propertiesContainersList =
           GetProjectScopedContainers().GetPropertiesContainersList();
       const auto& propertiesContainerAndProperty =
           propertiesContainersList.Get(variableName);
+      if (hasChild &&
+          propertiesContainerAndProperty.second.get().GetType() !=
+              "JsonObject") {
+        return "gdjs.VariablesContainer.badVariablesContainer";
+      }
       return GeneratePropertyGetterWithoutCasting(
           propertiesContainerAndProperty.first,
           propertiesContainerAndProperty.second);
@@ -1642,6 +1643,13 @@ gd::String EventsCodeGenerator::GeneratePropertyGetter(
     gd::EventsCodeGenerationContext& context) {
   gd::String propertyGetterCode =
       GeneratePropertyGetterWithoutCasting(propertiesContainer, property);
+  if (property.GetType() == "JsonObject") {
+    if (type == "string" || type == "number|string") {
+      return "JSON.stringify(" + propertyGetterCode + ".toJSObject())";
+    } else if (type == "number") {
+      return "(Number(" + propertyGetterCode + ".getAsNumber()) || 0)";
+    }
+  }
 
   if (type == "number|string") {
     if (property.GetType() == "Number") {

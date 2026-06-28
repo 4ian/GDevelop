@@ -40,6 +40,7 @@ import LayerIcon from '../../UI/CustomSvgIcons/Layers';
 import VariableStringIcon from '../../VariablesList/Icons/VariableStringIcon';
 import VariableNumberIcon from '../../VariablesList/Icons/VariableNumberIcon';
 import VariableBooleanIcon from '../../VariablesList/Icons/VariableBooleanIcon';
+import VariableStructureIcon from '../../VariablesList/Icons/VariableStructureIcon';
 import NewBehaviorDialog from '../../BehaviorsEditor/NewBehaviorDialog';
 
 const gd: libGDevelop = global.gd;
@@ -74,6 +75,9 @@ const renderValueTypeIcon = (type: string, className: string): React.Node => {
     case 'Boolean':
       return <VariableBooleanIcon className={className} />;
 
+    case 'JsonObject':
+      return <VariableStructureIcon className={className} />;
+
     case 'ObjectAnimationName':
       return <SceneIcon className={className} />;
 
@@ -89,6 +93,31 @@ const renderValueTypeIcon = (type: string, className: string): React.Node => {
     default:
       return null;
   }
+};
+
+const getJsonObjectExampleErrorText = (
+  value: string,
+  i18n: any
+): ?string => {
+  const trimmedValue = value.trim();
+  if (!trimmedValue) {
+    return i18n._(t`JSON example is required.`);
+  }
+
+  try {
+    const parsedValue = JSON.parse(trimmedValue);
+    if (
+      !parsedValue ||
+      typeof parsedValue !== 'object' ||
+      Array.isArray(parsedValue)
+    ) {
+      return i18n._(t`Enter a JSON object, for example {"price": 100}.`);
+    }
+  } catch (error) {
+    return i18n._(t`Enter a valid JSON object.`);
+  }
+
+  return null;
 };
 
 export const fillBehaviorProperty = (
@@ -560,6 +589,11 @@ export const EventsBasedBehaviorOrObjectPropertiesEditor: React.ComponentType<{
                                       label={t`Multiline text`}
                                     />
                                     <SelectOption
+                                      key="property-type-json-object"
+                                      value="JsonObject"
+                                      label={t`JSON object`}
+                                    />
+                                    <SelectOption
                                       key="property-type-resource"
                                       value="Resource"
                                       label={t`Resource`}
@@ -639,18 +673,40 @@ export const EventsBasedBehaviorOrObjectPropertiesEditor: React.ComponentType<{
                                 property.getType() === 'ObjectAnimationName' ||
                                 property.getType() === 'KeyboardKey' ||
                                 property.getType() === 'MultilineString' ||
+                              property.getType() === 'JsonObject' ||
                                 property.getType() === 'Layer') && (
                                 <CompactPropertiesEditorRowField
-                                  label={i18n._(t`Default value`)}
+                                  label={
+                                    property.getType() === 'JsonObject'
+                                      ? i18n._(t`JSON example`)
+                                      : i18n._(t`Default value`)
+                                  }
                                   field={
                                     <CompactSemiControlledTextField
                                       commitOnBlur
                                       placeholder={
                                         property.getType() === 'Number'
                                           ? '123'
+                                          : property.getType() === 'JsonObject'
+                                          ? '{"price": 100}'
                                           : 'ABC'
                                       }
                                       value={property.getValue()}
+                                      errored={
+                                        property.getType() === 'JsonObject' &&
+                                        !!getJsonObjectExampleErrorText(
+                                          property.getValue(),
+                                          i18n
+                                        )
+                                      }
+                                      errorText={
+                                        property.getType() === 'JsonObject'
+                                          ? getJsonObjectExampleErrorText(
+                                              property.getValue(),
+                                              i18n
+                                            )
+                                          : null
+                                      }
                                       onChange={newValue => {
                                         property.setValue(newValue);
                                         forceUpdate();

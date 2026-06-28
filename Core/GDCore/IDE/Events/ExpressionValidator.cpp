@@ -18,6 +18,7 @@
 #include "GDCore/Extensions/Metadata/ObjectMetadata.h"
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/Project/Layout.h"
+#include "GDCore/Project/JsonObjectPropertyTools.h"
 #include "GDCore/Project/ObjectsContainersList.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/Project/ProjectScopedContainers.h"
@@ -172,15 +173,24 @@ bool ExpressionValidator::ValidateObjectVariableOrVariableOrProperty(
       }
     }, [&]() {
       // This is a property.
+      const gd::NamedPropertyDescriptor &property =
+          propertiesContainersList.Get(identifierName).second;
+
       if (!childIdentifierName.empty()) {
+        if (property.GetType() == "JsonObject") {
+          ValidateJsonObjectPropertyChildName(
+              property,
+              identifierName,
+              childIdentifierName,
+              childIdentifierNameLocation);
+          return true;
+        }
+
         RaiseTypeError(_("Accessing a child variable of a property is not possible - just write the property name."),
             childIdentifierNameLocation);
 
         return true; // We found a property, even if the child is not allowed.
       }
-
-      const gd::NamedPropertyDescriptor &property =
-          propertiesContainersList.Get(identifierName).second;
 
       if (property.GetType() == "Number") {
         childType = Type::Number;

@@ -192,6 +192,23 @@ const createField = (
       allowGlobalConfigPlaceholder: allowGlobalConfigPlaceholders,
       forbidGlobalConfigPlaceholder: !allowGlobalConfigPlaceholders,
     };
+  } else if (valueType === 'jsonobject') {
+    return {
+      name,
+      valueType: 'string',
+      getValue: getValueForString,
+      setValue: (instance: Instance, newValue: string) => {
+        setStringValue(instance, name, newValue);
+      },
+      defaultValue,
+      getLabel,
+      getDescription,
+      hasImpactOnAllOtherFields: property.hasImpactOnOtherProperties(),
+      visibility,
+      isHighlighted: isHighlightedForString,
+      allowGlobalConfigPlaceholder: allowGlobalConfigPlaceholders,
+      forbidGlobalConfigPlaceholder: !allowGlobalConfigPlaceholders,
+    };
   } else if (valueType === 'boolean') {
     const defaultValueBoolean = defaultValue ? defaultValue === 'true' : null;
     const getValue = (instance: Instance): boolean =>

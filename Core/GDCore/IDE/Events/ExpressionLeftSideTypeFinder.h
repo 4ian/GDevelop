@@ -166,7 +166,10 @@ class GD_CORE_API ExpressionLeftSideTypeFinder : public ExpressionParser2NodeWor
         const gd::NamedPropertyDescriptor& property = projectScopedContainers
             .GetPropertiesContainersList().Get(node.identifierName).second;
 
-        if (property.GetType() == "Number") {
+        if (property.GetType() == "JsonObject") {
+          // Keep the type unknown for JSON object children. They can be read as
+          // numbers or strings at runtime, like regular variable children.
+        } else if (property.GetType() == "Number") {
           type = "number";
         } else if (property.GetType() == "Boolean") {
           // Nothing - we don't know the precise type (this could be used a string or as a number)

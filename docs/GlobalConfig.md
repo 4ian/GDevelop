@@ -1,6 +1,6 @@
 # Global Config
 
-Status: first implementation is in place. Global Config now has project storage, folder-project save support, runtime helpers, event instructions, a dockable editor window, and scoped object-editor placeholder support.
+Status: first implementation is in place. Global Config now has project storage, folder-project save support, runtime helpers, event instructions, a dockable editor window, scoped object-editor placeholder support, and schema-aware JSON-object property support for event-based objects/behaviors.
 
 This document describes the current implementation, not only the original design intent.
 
@@ -12,6 +12,8 @@ Global Config is project-wide JSON configuration data for game tuning and conten
 - Global variables remain runtime/game-state variables.
 - Events use dedicated config conditions, actions, and expressions.
 - Object editor properties can use placeholder references such as `{{cards.sunflower.price}}` where this is explicitly enabled.
+- JSON-object properties can reference a config subtree such as `{{cards.sunflower}}` and expose it in object/behavior events with variable-style child access such as `CardConfig.price`.
+- JSON-object properties define a required JSON example. Event autocompletion and validation use this example for `CardConfig.xxx` paths.
 
 Example:
 
@@ -49,14 +51,14 @@ An eligible object editor property can reference:
 | JS bindings              | The project exposes `getGlobalConfigJson` and `setGlobalConfigJson`.                                                                                                      | `GDevelop.js/Bindings/Bindings.idl`, `GDevelop.js/types.d.ts`, `GDevelop.js/types/gdproject.js`                                                                                                                                                                                    |
 | Folder projects          | Folder projects split `globalConfig` to `globalConfig.json`; the local resource watcher tracks this file.                                                                 | `newIDE/app/src/ProjectsStorage/LocalFileStorageProvider/LocalProjectWriter.js`, `newIDE/app/src/ProjectsStorage/LocalFileStorageProvider/LocalFileResourcesWatcher.js`                                                                                                            |
 | Runtime data             | `ProjectData` has optional `globalConfig`; `RuntimeGame` owns `_globalConfig` with `getGlobalConfig` and `setGlobalConfig`.                                               | `GDJS/Runtime/types/project-data.d.ts`, `GDJS/Runtime/runtimegame.ts`                                                                                                                                                                                                              |
-| Runtime helpers          | `gdjs.evtTools.globalConfig` normalizes placeholder paths, reads values, mutates runtime config, and resolves placeholders.                                               | `GDJS/Runtime/events-tools/globalconfigtools.ts`                                                                                                                                                                                                                                   |
+| Runtime helpers          | `gdjs.evtTools.globalConfig` normalizes placeholder paths, reads values, mutates runtime config, resolves placeholders, and validates JSON-object values against examples. | `GDJS/Runtime/events-tools/globalconfigtools.ts`                                                                                                                                                                                                                                   |
 | Event metadata           | Builtin Variables extension adds a `Global configuration` group with config conditions, actions, and expressions.                                                         | `Core/GDCore/Extensions/Builtin/VariablesExtension.cpp`                                                                                                                                                                                                                            |
 | Event codegen            | Global Config instructions generate calls to `gdjs.evtTools.globalConfig`.                                                                                                | `GDJS/GDJS/Extensions/Builtin/VariablesExtension.cpp`                                                                                                                                                                                                                              |
 | Event parameters         | `globalConfigPath` is rendered as a default field and labeled "Global config placeholder".                                                                                | `newIDE/app/src/EventsSheet/ParameterRenderingService.js`                                                                                                                                                                                                                          |
 | Editor UI                | `Global config` is a `global-config` editor kind. It opens floated by default like Resources and can be popped back into the main editor tabs.                            | `newIDE/app/src/MainFrame/index.js`, `newIDE/app/src/MainFrame/EditorTabs/EditorTabsHandler.js`, `newIDE/app/src/MainFrame/EditorContainers/GlobalConfigEditorContainer.js`, `newIDE/app/src/ProjectManager/index.js`                                                              |
 | Grid editor              | The editor has sheet tabs, row/column editing, raw JSON import/export, and copy placeholder.                                                                              | `newIDE/app/src/GlobalConfig/GlobalConfigDialog.js`                                                                                                                                                                                                                                |
 | Placeholder editor scope | Placeholder editing is enabled in the full object editor window for event-based object/behavior properties. Other property editors show an error if `{{...}}` is entered. | `newIDE/app/src/ObjectEditor/ObjectEditorDialog.js`, `newIDE/app/src/ObjectEditor/Editors/ObjectPropertiesEditor.js`, `newIDE/app/src/BehaviorsEditor/Editors/BehaviorPropertiesEditor.js`, `newIDE/app/src/PropertiesEditor/*`, `newIDE/app/src/CompactPropertiesEditor/index.js` |
-| Object/behavior codegen  | Object and behavior properties resolve config placeholders when runtime data is generated.                                                                                | `GDJS/GDJS/Events/CodeGeneration/ObjectCodeGenerator.cpp`, `GDJS/GDJS/Events/CodeGeneration/BehaviorCodeGenerator.cpp`, `Core/GDCore/Project/CustomConfigurationHelper.cpp`                                                                                                        |
+| Object/behavior codegen  | Object and behavior properties resolve config placeholders when runtime data is generated. JSON-object properties pass their JSON example to runtime validation.           | `GDJS/GDJS/Events/CodeGeneration/ObjectCodeGenerator.cpp`, `GDJS/GDJS/Events/CodeGeneration/BehaviorCodeGenerator.cpp`, `Core/GDCore/Project/CustomConfigurationHelper.cpp`, `Core/GDCore/Project/JsonObjectPropertyTools.h`                                                       |
 
 ## Storage Format
 
@@ -222,6 +224,7 @@ gdjs.evtTools.globalConfig.getString(runtimeGame, path);
 gdjs.evtTools.globalConfig.getBoolean(runtimeGame, path);
 gdjs.evtTools.globalConfig.getChildCount(runtimeGame, path);
 gdjs.evtTools.globalConfig.toJSON(runtimeGame, path);
+gdjs.evtTools.globalConfig.getVariable(runtimeGame, path, schemaExample?, propertyName?);
 gdjs.evtTools.globalConfig.setValue(runtimeGame, path, value);
 gdjs.evtTools.globalConfig.setNumber(runtimeGame, path, value);
 gdjs.evtTools.globalConfig.setString(runtimeGame, path, value);
@@ -229,6 +232,7 @@ gdjs.evtTools.globalConfig.setBoolean(runtimeGame, path, value);
 gdjs.evtTools.globalConfig.remove(runtimeGame, path);
 gdjs.evtTools.globalConfig.getExactPlaceholderPath(text);
 gdjs.evtTools.globalConfig.resolvePlaceholders(runtimeGame, text);
+gdjs.evtTools.globalConfig.resolveVariable(runtimeGame, value, schemaExample?, propertyName?);
 gdjs.evtTools.globalConfig.resolveNumber(runtimeGame, value);
 gdjs.evtTools.globalConfig.resolveString(runtimeGame, value);
 gdjs.evtTools.globalConfig.resolveBoolean(runtimeGame, value);
@@ -249,6 +253,15 @@ once for that placeholder path, for example:
 
 ```text
 [Global configuration] Global config path "{{cards.sunflower.price}}" does not exist.
+```
+
+For JSON-object properties, generated code passes the property's JSON example
+and property name to `getVariable`/`resolveVariable`. If the resolved placeholder
+value does not match the example shape, the runtime logger prints an error, for
+example:
+
+```text
+[Global configuration] Global config value "{{cards.sunflower}}" does not match the JSON example for property "CardConfig": CardConfig.price should be a number, got string.
 ```
 
 Coercion rules:
@@ -336,6 +349,7 @@ Current field behavior:
 | String/text     | Yes                     | Interpolation is allowed anywhere in the string.                                                  |
 | Number          | Yes, whole-value only   | `{{cards.sunflower.price}}` is valid. `10 + {{cards.sunflower.price}}` is rejected in the editor. |
 | Boolean         | Runtime resolver exists | UI placeholder editing for boolean fields is not broadly exposed yet.                             |
+| JSON object     | Yes, whole-value or JSON text | `{{cards.sunflower}}` resolves to a `gdjs.Variable` structure, and inline JSON text is parsed at runtime. |
 | Choice/select   | No                      | Future work.                                                                                      |
 | Resource picker | No                      | Kept out of scope to avoid export dependency ambiguity.                                           |
 | Color           | No                      | Future work.                                                                                      |
@@ -346,8 +360,14 @@ Code generation behavior:
   - string: `getString(...)`
   - number: `getNumber(...)`
   - boolean: `getBoolean(...)`
+  - JSON object: `getVariable(...)`
 - String properties containing placeholders are compiled to `resolvePlaceholders(...)`.
-- Generated object/behavior initialization wraps string, number, and boolean property values with `resolveString`, `resolveNumber`, or `resolveBoolean` where needed.
+- Generated object/behavior initialization wraps string, number, boolean, and JSON-object property values with `resolveString`, `resolveNumber`, `resolveBoolean`, or `resolveVariable` where needed.
+- JSON-object properties use the property editor field label `JSON example`, not `Default value`. This field is required and must contain a JSON object.
+- JSON-object properties are exposed in object/behavior events as variable-like structures. For example, a property named `CardConfig` with value `{{cards.Sunflower}}` can be read with `CardConfig.price`.
+- Event autocompletion for `CardConfig.` and nested paths such as `CardConfig.stats.` is derived from the JSON example fields.
+- Event validation reports an error when `CardConfig.xxx` references a field that is not present in the JSON example.
+- Generated primitive getter/setter events are not created for JSON-object properties; use direct variable-style access in object/behavior events instead.
 
 Resolution timing:
 
@@ -372,12 +392,14 @@ Implemented now:
 - Number property editors allow exact placeholders but reject mixed placeholder arithmetic/text.
 - Unsupported placeholder scopes show editor errors.
 - Runtime helpers return deterministic defaults instead of crashing on missing paths.
+- Missing config-path reads print one runtime warning per path.
+- JSON-object property examples are required in the property settings UI.
+- JSON-object event child paths are validated against the JSON example.
+- JSON-object placeholder values print runtime errors when they do not match the JSON example shape.
 
 Not implemented yet:
 
 - Static validation of `globalConfigPath` parameters.
-- Missing-path warnings for placeholders.
-- Type mismatch warnings for placeholders.
 - Export/build diagnostics for unresolved config paths.
 - Dedicated path picker/autocomplete from the Global Config editor.
 
@@ -388,7 +410,7 @@ Not implemented yet:
 3. Add row/column rename in the Global Config grid.
 4. Add spreadsheet paste support for tab-separated data.
 5. Add grid keyboard navigation and multi-cell selection.
-6. Add diagnostics for missing paths and type mismatches.
+6. Add export/build diagnostics for missing paths.
 7. Add focused tests for serialization, runtime helpers, event codegen, editor opening, and placeholder codegen.
 
 ## Test Plan

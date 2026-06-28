@@ -17,6 +17,7 @@ namespace gdjs {
       const hasOwn = Object.prototype.hasOwnProperty;
       const exactPlaceholderRegex = /^\s*\{\{\s*([^{}]+?)\s*\}\}\s*$/;
       const warnedMissingPaths = new Set<string>();
+      const warnedSchemaMismatches = new Set<string>();
 
       const isObjectLike = (
         value: GlobalConfigValue | undefined
@@ -40,6 +41,157 @@ namespace gdjs {
         warnedMissingPaths.add(normalizedPath);
         logger.warn(
           'Global config path "{{' + normalizedPath + '}}" does not exist.'
+        );
+      };
+
+      const getTypeName = function(value: any): string {
+        if (value === null) return 'null';
+        if (Array.isArray(value)) return 'array';
+        return typeof value;
+      };
+
+      const validateValueAgainstExample = function(
+        value: any,
+        example: any,
+        path: string
+      ): string | null {
+        if (example === null) {
+          return value === null
+            ? null
+            : path + ' should be null, got ' + getTypeName(value) + '.';
+        }
+
+        if (Array.isArray(example)) {
+          if (!Array.isArray(value)) {
+            return path + ' should be an array, got ' + getTypeName(value) + '.';
+          }
+          if (example.length === 0) return null;
+
+          for (let index = 0; index < value.length; index++) {
+            const error = validateValueAgainstExample(
+              value[index],
+              example[0],
+              path + '[' + index + ']'
+            );
+            if (error) return error;
+          }
+          return null;
+        }
+
+        if (typeof example === 'object') {
+          if (!isObjectLike(value)) {
+            return path + ' should be an object, got ' + getTypeName(value) + '.';
+          }
+
+          for (const key in example) {
+            if (!hasOwn.call(example, key)) continue;
+
+            if (!hasOwn.call(value, key)) {
+              return path + '.' + key + ' is missing.';
+            }
+
+            const error = validateValueAgainstExample(
+              value[key],
+              example[key],
+              path + '.' + key
+            );
+            if (error) return error;
+          }
+          return null;
+        }
+
+        if (typeof value !== typeof example) {
+          return (
+            path +
+            ' should be a ' +
+            typeof example +
+            ', got ' +
+            getTypeName(value) +
+            '.'
+          );
+        }
+
+        return null;
+      };
+
+      const getParsedJsonExample = function(
+        schemaExample: any,
+        propertyName: string
+      ): any | null {
+        if (schemaExample === undefined || schemaExample === null) {
+          return null;
+        }
+
+        if (typeof schemaExample !== 'string') {
+          return schemaExample;
+        }
+
+        const trimmedSchemaExample = schemaExample.trim();
+        if (!trimmedSchemaExample) {
+          logger.error(
+            'JSON example for property "' + propertyName + '" is required.'
+          );
+          return null;
+        }
+
+        try {
+          const parsedSchemaExample = JSON.parse(trimmedSchemaExample);
+          if (
+            !isObjectLike(parsedSchemaExample) ||
+            Array.isArray(parsedSchemaExample)
+          ) {
+            logger.error(
+              'JSON example for property "' +
+                propertyName +
+                '" must be a JSON object.'
+            );
+            return null;
+          }
+          return parsedSchemaExample;
+        } catch (error) {
+          logger.error(
+            'JSON example for property "' +
+              propertyName +
+              '" is not valid JSON: ' +
+              error
+          );
+          return null;
+        }
+      };
+
+      const validateResolvedVariableValue = function(
+        value: any,
+        schemaExample?: any,
+        propertyName?: string,
+        source?: string
+      ): void {
+        if (schemaExample === undefined || !propertyName) return;
+
+        const parsedSchemaExample = getParsedJsonExample(
+          schemaExample,
+          propertyName
+        );
+        if (!parsedSchemaExample) return;
+
+        const error = validateValueAgainstExample(
+          value,
+          parsedSchemaExample,
+          propertyName
+        );
+        if (!error) return;
+
+        const sourceDescription = source || propertyName;
+        const warningKey = propertyName + '|' + sourceDescription + '|' + error;
+        if (warnedSchemaMismatches.has(warningKey)) return;
+        warnedSchemaMismatches.add(warningKey);
+
+        logger.error(
+          'Global config value "' +
+            sourceDescription +
+            '" does not match the JSON example for property "' +
+            propertyName +
+            '": ' +
+            error
         );
       };
 
@@ -224,6 +376,81 @@ namespace gdjs {
         } catch (error) {
           return 'null';
         }
+      };
+
+      const emptyStructureVariable = function(): gdjs.Variable {
+        const variable = new gdjs.Variable();
+        variable.castTo('structure');
+        return variable;
+      };
+
+      const toVariable = function(value: any): gdjs.Variable {
+        if (value instanceof gdjs.Variable) {
+          validateResolvedVariableValue(
+            value.toJSObject(),
+            schemaExample,
+            propertyName
+          );
+          return value.clone();
+        }
+        if (value === undefined) return emptyStructureVariable();
+
+        const variable = new gdjs.Variable();
+        variable.fromJSObject(value);
+        return variable;
+      };
+
+      export const getVariable = function(
+        runtimeGame: gdjs.RuntimeGame,
+        path: string,
+        schemaExample?: any,
+        propertyName?: string
+      ): gdjs.Variable {
+        const value = getValue(runtimeGame, path);
+        validateResolvedVariableValue(
+          value,
+          schemaExample,
+          propertyName,
+          '{{' + normalizePath(path) + '}}'
+        );
+        return toVariable(value);
+      };
+
+      export const resolveVariable = function(
+        runtimeGame: gdjs.RuntimeGame,
+        value: any,
+        schemaExample?: any,
+        propertyName?: string
+      ): gdjs.Variable {
+        if (value instanceof gdjs.Variable) return value.clone();
+        if (typeof value === 'string') {
+          const placeholderPath = getExactPlaceholderPath(value);
+          if (placeholderPath) {
+            return getVariable(
+              runtimeGame,
+              placeholderPath,
+              schemaExample,
+              propertyName
+            );
+          }
+
+          const trimmedValue = value.trim();
+          if (!trimmedValue) return emptyStructureVariable();
+
+          try {
+            const parsedValue = JSON.parse(trimmedValue);
+            validateResolvedVariableValue(
+              parsedValue,
+              schemaExample,
+              propertyName
+            );
+            return toVariable(parsedValue);
+          } catch (error) {
+            return emptyStructureVariable();
+          }
+        }
+        validateResolvedVariableValue(value, schemaExample, propertyName);
+        return toVariable(value);
       };
 
       const getWritableParent = function(

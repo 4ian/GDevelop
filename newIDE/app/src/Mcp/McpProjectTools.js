@@ -180,10 +180,7 @@ const applySinglePatchOperation = (document: any, operation: Object) => {
     }
   } else if (container && typeof container === 'object') {
     if (op === 'add' || op === 'replace') {
-      if (
-        op === 'replace' &&
-        !hasOwn(container, key)
-      ) {
+      if (op === 'replace' && !hasOwn(container, key)) {
         throw new Error(`Patch replace path does not exist: "${pointer}".`);
       }
       container[key] = operation.value;
@@ -227,7 +224,10 @@ const readJsonFile = (project: gdProject, file: string): any => {
   return JSON.parse(fs.readFileSync(resolvedFile, 'utf8'));
 };
 
-const getPatchOperations = (project: gdProject, args: Object): Array<Object> => {
+const getPatchOperations = (
+  project: gdProject,
+  args: Object
+): Array<Object> => {
   if (Array.isArray(args.patch)) return args.patch;
   if (typeof args.patch === 'string') {
     const parsedPatch = JSON.parse(args.patch);
@@ -354,7 +354,8 @@ const getScopedPatchTarget = (
         'parent_name',
         'parentName',
       ]);
-      if (!parentName) throw new Error('parent_kind "object" requires parent_name.');
+      if (!parentName)
+        throw new Error('parent_kind "object" requires parent_name.');
       const objectIndex = getNamedArrayIndex(
         extension.eventsBasedObjects,
         parentName,
@@ -397,7 +398,9 @@ const getScopedPatchTarget = (
 const getProjectSceneNames = (serializedProject: Object): Array<string> =>
   Array.isArray(serializedProject.layouts)
     ? serializedProject.layouts
-        .map(layout => (layout && typeof layout.name === 'string' ? layout.name : null))
+        .map(layout =>
+          layout && typeof layout.name === 'string' ? layout.name : null
+        )
         .filter(Boolean)
     : [];
 
@@ -408,7 +411,9 @@ const summarizeProjectSemanticDiff = (
 ): Object => {
   const beforeSceneNames = getProjectSceneNames(beforeProject);
   const afterSceneNames = getProjectSceneNames(afterProject);
-  const beforeExtensions = Array.isArray(beforeProject.eventsFunctionsExtensions)
+  const beforeExtensions = Array.isArray(
+    beforeProject.eventsFunctionsExtensions
+  )
     ? beforeProject.eventsFunctionsExtensions.map(extension => extension.name)
     : [];
   const afterExtensions = Array.isArray(afterProject.eventsFunctionsExtensions)
@@ -419,8 +424,12 @@ const summarizeProjectSemanticDiff = (
     changedPaths,
     sceneCountBefore: beforeSceneNames.length,
     sceneCountAfter: afterSceneNames.length,
-    addedScenes: afterSceneNames.filter(name => !beforeSceneNames.includes(name)),
-    removedScenes: beforeSceneNames.filter(name => !afterSceneNames.includes(name)),
+    addedScenes: afterSceneNames.filter(
+      name => !beforeSceneNames.includes(name)
+    ),
+    removedScenes: beforeSceneNames.filter(
+      name => !afterSceneNames.includes(name)
+    ),
     extensionCountBefore: beforeExtensions.length,
     extensionCountAfter: afterExtensions.length,
     addedExtensions: afterExtensions.filter(
@@ -583,8 +592,9 @@ export const validateCurrentProjectJson = (
   return {
     ...validation,
     validationMode: 'current-editor-project',
-    projectFile:
-      project.getProjectFile() ? project.getProjectFile() : undefined,
+    projectFile: project.getProjectFile()
+      ? project.getProjectFile()
+      : undefined,
     note:
       'Validated the currently open in-memory project by serializing it and unserializing it through GDevelop. No project data was modified.',
   };
@@ -600,7 +610,9 @@ export const applyValidatedProjectJsonPatch = (
     JSON.stringify(beforeSerializedProject)
   );
   const scopedTarget = getScopedPatchTarget(patchedSerializedProject, args);
-  patch.forEach(operation => applySinglePatchOperation(scopedTarget.target, operation));
+  patch.forEach(operation =>
+    applySinglePatchOperation(scopedTarget.target, operation)
+  );
 
   const validation = validateSerializedProject(patchedSerializedProject, args);
   if (!validation.valid) {
@@ -645,8 +657,11 @@ export const applyValidatedProjectJsonPatch = (
 
   const snapshot = snapshotProject(project, {
     label:
-      getStringWithAliases(args, ['snapshot_label', 'snapshotLabel', 'label']) ||
-      'before-validated-project-json-patch',
+      getStringWithAliases(args, [
+        'snapshot_label',
+        'snapshotLabel',
+        'label',
+      ]) || 'before-validated-project-json-patch',
   });
   try {
     unserializeFromJSObject(project, patchedSerializedProject);
@@ -676,13 +691,16 @@ export const syncEditorFromValidatedProjectJson = (
   project: gdProject,
   args: Object = {}
 ): Object => {
-  const projectFile =
-    project.getProjectFile() ? project.getProjectFile() : null;
+  const projectFile = project.getProjectFile()
+    ? project.getProjectFile()
+    : null;
   if (!projectFile) {
     throw new Error('The current project has no project file path.');
   }
   if (!fs) throw new Error('Filesystem access is not available.');
-  const diskSerializedProject = JSON.parse(fs.readFileSync(projectFile, 'utf8'));
+  const diskSerializedProject = JSON.parse(
+    fs.readFileSync(projectFile, 'utf8')
+  );
   const validation = validateSerializedProject(diskSerializedProject, args);
   const beforeSerializedProject = serializeToJSObject(project);
   const semanticDiff = summarizeProjectSemanticDiff(
@@ -778,6 +796,428 @@ const getNumberWithAliases = (
     if (typeof value === 'number' && Number.isFinite(value)) return value;
   }
   return null;
+};
+
+const globalConfigPlaceholderRegex = /^\s*\{\{\s*([^{}]+?)\s*\}\}\s*$/;
+
+const isPlainObject = (value: any): boolean =>
+  !!value && typeof value === 'object' && !Array.isArray(value);
+
+const parseGlobalConfigRoot = (value: any, label: string): Object => {
+  const parsedValue =
+    typeof value === 'string' ? JSON.parse(value || '{}') : value;
+  if (!isPlainObject(parsedValue)) {
+    throw new Error(`${label} must be a JSON object.`);
+  }
+  return parsedValue;
+};
+
+const readProjectGlobalConfig = (project: gdProject): Object => {
+  const projectWithGlobalConfig: any = project;
+  const json =
+    typeof projectWithGlobalConfig.getGlobalConfigJson === 'function'
+      ? projectWithGlobalConfig.getGlobalConfigJson()
+      : '{}';
+  return parseGlobalConfigRoot(json || '{}', 'Project global config');
+};
+
+const writeProjectGlobalConfig = (project: gdProject, config: Object) => {
+  const projectWithGlobalConfig: any = project;
+  if (typeof projectWithGlobalConfig.setGlobalConfigJson !== 'function') {
+    throw new Error(
+      'This GDevelop build does not expose global config writes.'
+    );
+  }
+  projectWithGlobalConfig.setGlobalConfigJson(JSON.stringify(config));
+};
+
+const normalizeGlobalConfigPlaceholderPath = (
+  placeholderPath: string
+): string => {
+  const match = globalConfigPlaceholderRegex.exec(placeholderPath || '');
+  if (!match) {
+    throw new Error(
+      'Global config paths must use placeholder syntax such as {{cards.sunflower.price}}.'
+    );
+  }
+  const normalizedPath = match[1].trim();
+  if (!normalizedPath) {
+    throw new Error('Global config placeholder path cannot be empty.');
+  }
+  return normalizedPath;
+};
+
+const parseGlobalConfigPlaceholderPath = (
+  placeholderPath: string
+): Array<string | number> => {
+  const path = normalizeGlobalConfigPlaceholderPath(placeholderPath);
+  const segments: Array<string | number> = [];
+  let current = '';
+  let index = 0;
+
+  const pushCurrent = () => {
+    if (current !== '') {
+      segments.push(current);
+      current = '';
+    }
+  };
+
+  while (index < path.length) {
+    const character = path[index];
+
+    if (character === '.') {
+      pushCurrent();
+      index++;
+      continue;
+    }
+
+    if (character === '[') {
+      pushCurrent();
+      index++;
+      while (index < path.length && /\s/.test(path[index])) index++;
+
+      if (path[index] === '"' || path[index] === "'") {
+        const quote = path[index];
+        index++;
+        let quotedSegment = '';
+        while (index < path.length && path[index] !== quote) {
+          if (path[index] === '\\' && index + 1 < path.length) {
+            index++;
+          }
+          quotedSegment += path[index];
+          index++;
+        }
+        if (path[index] === quote) index++;
+        while (index < path.length && /\s/.test(path[index])) index++;
+        if (path[index] === ']') index++;
+        segments.push(quotedSegment);
+        continue;
+      }
+
+      let bracketSegment = '';
+      while (index < path.length && path[index] !== ']') {
+        bracketSegment += path[index];
+        index++;
+      }
+      if (path[index] === ']') index++;
+      bracketSegment = bracketSegment.trim();
+      if (/^\d+$/.test(bracketSegment)) {
+        segments.push(parseInt(bracketSegment, 10));
+      } else if (bracketSegment !== '') {
+        segments.push(bracketSegment);
+      }
+      continue;
+    }
+
+    current += character;
+    index++;
+  }
+
+  pushCurrent();
+
+  if (!segments.length) {
+    throw new Error('Global config placeholder path cannot be empty.');
+  }
+  return segments;
+};
+
+const getGlobalConfigPathArg = (args: Object): string => {
+  const placeholderPath = getStringWithAliases(args || {}, [
+    'placeholder_path',
+    'placeholderPath',
+    'path',
+  ]);
+  if (!placeholderPath) {
+    throw new Error('Missing placeholder_path.');
+  }
+  return placeholderPath;
+};
+
+const getGlobalConfigValueAtPath = (
+  config: Object,
+  segments: Array<string | number>
+): {| exists: boolean, value?: any |} => {
+  let current: any = config;
+  for (const segment of segments) {
+    if (Array.isArray(current)) {
+      if (
+        typeof segment !== 'number' ||
+        segment < 0 ||
+        segment >= current.length
+      ) {
+        return { exists: false };
+      }
+      current = current[segment];
+      continue;
+    }
+    if (current && typeof current === 'object') {
+      const key = String(segment);
+      if (!hasOwn(current, key)) return { exists: false };
+      current = current[key];
+      continue;
+    }
+    return { exists: false };
+  }
+  return { exists: true, value: current };
+};
+
+const setGlobalConfigValueAtPath = (
+  config: Object,
+  segments: Array<string | number>,
+  value: any
+) => {
+  let current: any = config;
+  for (let index = 0; index < segments.length - 1; index++) {
+    const segment = segments[index];
+    const nextSegment = segments[index + 1];
+
+    if (Array.isArray(current)) {
+      if (typeof segment !== 'number' || segment < 0) {
+        throw new Error(
+          'Array global config paths must use non-negative indexes.'
+        );
+      }
+      if (!hasOwn(current, String(segment)) || current[segment] === null) {
+        current[segment] = typeof nextSegment === 'number' ? [] : {};
+      }
+      if (typeof current[segment] !== 'object') {
+        throw new Error(
+          `Global config path segment "${String(
+            segment
+          )}" is not an object or array.`
+        );
+      }
+      current = current[segment];
+      continue;
+    } else if (!current || typeof current !== 'object') {
+      throw new Error(
+        `Global config path cannot create a child under non-object segment "${String(
+          segment
+        )}".`
+      );
+    }
+
+    const key = String(segment);
+    if (!hasOwn(current, key) || current[key] === null) {
+      current[key] = typeof nextSegment === 'number' ? [] : {};
+    }
+    if (typeof current[key] !== 'object') {
+      throw new Error(
+        `Global config path segment "${String(
+          segment
+        )}" is not an object or array.`
+      );
+    }
+    current = current[key];
+  }
+
+  const lastSegment = segments[segments.length - 1];
+  if (Array.isArray(current)) {
+    if (typeof lastSegment !== 'number' || lastSegment < 0) {
+      throw new Error(
+        'Array global config paths must use non-negative indexes.'
+      );
+    }
+    current[lastSegment] = value;
+    return;
+  }
+  if (!current || typeof current !== 'object') {
+    throw new Error('Global config path parent is not an object.');
+  }
+  current[String(lastSegment)] = value;
+};
+
+const deleteGlobalConfigValueAtPath = (
+  config: Object,
+  segments: Array<string | number>
+): {| deleted: boolean, previousValue?: any |} => {
+  const parentSegments = segments.slice(0, -1);
+  const lastSegment = segments[segments.length - 1];
+  const parentResult = parentSegments.length
+    ? getGlobalConfigValueAtPath(config, parentSegments)
+    : { exists: true, value: config };
+  if (!parentResult.exists) return { deleted: false };
+
+  const parent: any = parentResult.value;
+  if (Array.isArray(parent)) {
+    if (
+      typeof lastSegment !== 'number' ||
+      lastSegment < 0 ||
+      lastSegment >= parent.length
+    ) {
+      return { deleted: false };
+    }
+    const previousValue = parent[lastSegment];
+    parent.splice(lastSegment, 1);
+    return { deleted: true, previousValue };
+  }
+
+  if (!parent || typeof parent !== 'object') return { deleted: false };
+  const key = String(lastSegment);
+  if (!hasOwn(parent, key)) return { deleted: false };
+  const previousValue = parent[key];
+  delete parent[key];
+  return { deleted: true, previousValue };
+};
+
+const getGlobalConfigInputValue = (args: Object): any => {
+  if (hasOwn(args || {}, 'value_json')) {
+    return JSON.parse(String(args.value_json));
+  }
+  if (hasOwn(args || {}, 'valueJson')) {
+    return JSON.parse(String(args.valueJson));
+  }
+  if (hasOwn(args || {}, 'value')) return args.value;
+  throw new Error('Missing value or value_json.');
+};
+
+const getGlobalConfigRootFromArgs = (args: Object): Object => {
+  if (hasOwn(args || {}, 'global_config')) {
+    return parseGlobalConfigRoot(args.global_config, 'global_config');
+  }
+  if (hasOwn(args || {}, 'globalConfig')) {
+    return parseGlobalConfigRoot(args.globalConfig, 'globalConfig');
+  }
+  if (hasOwn(args || {}, 'config')) {
+    return parseGlobalConfigRoot(args.config, 'config');
+  }
+  if (hasOwn(args || {}, 'global_config_json')) {
+    return parseGlobalConfigRoot(args.global_config_json, 'global_config_json');
+  }
+  if (hasOwn(args || {}, 'globalConfigJson')) {
+    return parseGlobalConfigRoot(args.globalConfigJson, 'globalConfigJson');
+  }
+  throw new Error('Missing global_config or global_config_json.');
+};
+
+export const summarizeGlobalConfig = (project: gdProject): Object => {
+  const config = readProjectGlobalConfig(project);
+  const topLevelKeys = Object.keys(config);
+  const placeholderExamples: Array<string> = [];
+  const collectPlaceholders = (value: any, path: string) => {
+    if (placeholderExamples.length >= 12) return;
+    if (isPlainObject(value)) {
+      const keys = Object.keys(value);
+      if (!keys.length && path) placeholderExamples.push(`{{${path}}}`);
+      keys.forEach(key =>
+        collectPlaceholders(value[key], path ? `${path}.${key}` : key)
+      );
+      return;
+    }
+    if (Array.isArray(value)) {
+      if (!value.length && path) placeholderExamples.push(`{{${path}}}`);
+      value.forEach((item, index) =>
+        collectPlaceholders(item, `${path}[${index}]`)
+      );
+      return;
+    }
+    if (path) placeholderExamples.push(`{{${path}}}`);
+  };
+  topLevelKeys.forEach(key => collectPlaceholders(config[key], key));
+  return {
+    topLevelKeyCount: topLevelKeys.length,
+    topLevelKeys,
+    placeholderExamples,
+  };
+};
+
+export const getGlobalConfig = (
+  project: gdProject,
+  args: Object = {}
+): Object => {
+  const config = readProjectGlobalConfig(project);
+  const placeholderPath = getStringWithAliases(args || {}, [
+    'placeholder_path',
+    'placeholderPath',
+    'path',
+  ]);
+  if (placeholderPath) {
+    const normalizedPath = normalizeGlobalConfigPlaceholderPath(
+      placeholderPath
+    );
+    const segments = parseGlobalConfigPlaceholderPath(placeholderPath);
+    const result = getGlobalConfigValueAtPath(config, segments);
+    return {
+      success: true,
+      placeholderPath: `{{${normalizedPath}}}`,
+      path: normalizedPath,
+      exists: result.exists,
+      value: result.value,
+    };
+  }
+
+  return {
+    success: true,
+    summary: summarizeGlobalConfig(project),
+    globalConfig: config,
+    globalConfigJson: JSON.stringify(config, null, 2),
+  };
+};
+
+export const setGlobalConfig = (
+  project: gdProject,
+  args: Object = {}
+): Object => {
+  const config = getGlobalConfigRootFromArgs(args);
+  const previousSummary = summarizeGlobalConfig(project);
+  writeProjectGlobalConfig(project, config);
+  return {
+    success: true,
+    didModifyProject: true,
+    previousSummary,
+    summary: summarizeGlobalConfig(project),
+    globalConfig: args.include_config === true ? config : undefined,
+    note:
+      'Global config was replaced in the editor project model. Persist it with gdevelop_save_project_and_wait.',
+  };
+};
+
+export const setGlobalConfigValue = (
+  project: gdProject,
+  args: Object = {}
+): Object => {
+  const placeholderPath = getGlobalConfigPathArg(args);
+  const normalizedPath = normalizeGlobalConfigPlaceholderPath(placeholderPath);
+  const segments = parseGlobalConfigPlaceholderPath(placeholderPath);
+  const config = readProjectGlobalConfig(project);
+  const previous = getGlobalConfigValueAtPath(config, segments);
+  const value = getGlobalConfigInputValue(args);
+  setGlobalConfigValueAtPath(config, segments, value);
+  writeProjectGlobalConfig(project, config);
+  return {
+    success: true,
+    didModifyProject: true,
+    placeholderPath: `{{${normalizedPath}}}`,
+    path: normalizedPath,
+    previousExists: previous.exists,
+    previousValue: previous.value,
+    value,
+    note:
+      'Global config value was updated in the editor project model. Persist it with gdevelop_save_project_and_wait.',
+  };
+};
+
+export const deleteGlobalConfigValue = (
+  project: gdProject,
+  args: Object = {}
+): Object => {
+  const placeholderPath = getGlobalConfigPathArg(args);
+  const normalizedPath = normalizeGlobalConfigPlaceholderPath(placeholderPath);
+  const segments = parseGlobalConfigPlaceholderPath(placeholderPath);
+  const config = readProjectGlobalConfig(project);
+  const deletion = deleteGlobalConfigValueAtPath(config, segments);
+  if (deletion.deleted) writeProjectGlobalConfig(project, config);
+  return {
+    success: true,
+    didModifyProject: deletion.deleted,
+    placeholderPath: `{{${normalizedPath}}}`,
+    path: normalizedPath,
+    deleted: deletion.deleted,
+    previousValue: deletion.previousValue,
+    note: deletion.deleted
+      ? 'Global config value was deleted in the editor project model. Persist it with gdevelop_save_project_and_wait.'
+      : 'Global config value did not exist; the project was not modified.',
+  };
 };
 
 const summarizeProjectProperties = (project: gdProject): Object => ({

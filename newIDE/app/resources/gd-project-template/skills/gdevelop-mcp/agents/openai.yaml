@@ -1,4 +1,4 @@
 interface:
   display_name: "GDevelop MCP"
   short_description: "Use GDevelop MCP tools to inspect and edit projects safely."
-  default_prompt: "Use the GDevelop MCP workflow to inspect the project, edit events or editor state, and verify the result."
+  default_prompt: "Use the GDevelop MCP workflow to inspect the project, edit events, Global Config, or editor state, and verify the result."

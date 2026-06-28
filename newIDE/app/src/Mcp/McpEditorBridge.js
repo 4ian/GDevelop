@@ -113,6 +113,11 @@ import {
 import {
   setFirstLayout,
   setProjectProperties,
+  getGlobalConfig,
+  setGlobalConfig,
+  setGlobalConfigValue,
+  deleteGlobalConfigValue,
+  summarizeGlobalConfig,
   snapshotProject,
   restoreProjectSnapshot,
   applyValidatedProjectJsonPatch,
@@ -346,6 +351,7 @@ const getProjectSummary = (project: gdProject, sceneName?: ?string): Object => {
       defaultCapabilityInferred:
         'Behavior is a default GDevelop object capability surfaced by the object API; read_serialized_scene may still show behaviors: [] because only explicit serialized behaviors are stored there.',
     },
+    globalConfigSummary: summarizeGlobalConfig(project),
     ...simplifiedProject,
   };
 };
@@ -3291,6 +3297,14 @@ const getResourceContent = async (
     };
   }
 
+  if (uri === 'gdevelop://project/global-config.json') {
+    return {
+      uri,
+      mimeType: 'application/json',
+      text: JSON.stringify(getGlobalConfig(project, {}).globalConfig, null, 2),
+    };
+  }
+
   if (uri === 'gdevelop://project/extensions-summary') {
     return {
       uri,
@@ -3522,6 +3536,15 @@ const callMcpTool = async ({
     return textResult(
       truncateText(serializeToJSON(project), args.maxLength || undefined)
     );
+  }
+
+  if (toolName === 'gdevelop_get_global_config') {
+    if (!project) return errorResult('No project opened.');
+    try {
+      return textResult(getGlobalConfig(project, args || {}));
+    } catch (error) {
+      return errorResult(error.message);
+    }
   }
 
   if (toolName === 'read_game_project_json') {
@@ -4623,6 +4646,36 @@ const callMcpTool = async ({
       }
       return textResult(
         result.success && !result.dryRun
+          ? withStaleStateAdvisory(
+              result,
+              context,
+              getStaleStateTargetForTool(toolName, args, result)
+            )
+          : result
+      );
+    } catch (error) {
+      return errorResult(error.message);
+    }
+  }
+
+  let globalConfigWriteToolHandler = null;
+  if (toolName === 'gdevelop_set_global_config') {
+    globalConfigWriteToolHandler = setGlobalConfig;
+  } else if (toolName === 'gdevelop_set_global_config_value') {
+    globalConfigWriteToolHandler = setGlobalConfigValue;
+  } else if (toolName === 'gdevelop_delete_global_config_value') {
+    globalConfigWriteToolHandler = deleteGlobalConfigValue;
+  }
+
+  if (globalConfigWriteToolHandler) {
+    if (!project) return errorResult('No project opened.');
+    try {
+      const result = globalConfigWriteToolHandler(project, args || {});
+      if (result.didModifyProject !== false) {
+        context.triggerUnsavedChanges();
+      }
+      return textResult(
+        result.didModifyProject !== false
           ? withStaleStateAdvisory(
               result,
               context,

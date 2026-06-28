@@ -21,6 +21,7 @@ describe('McpToolCatalog', () => {
     expect(toolNames).toContain('gdevelop_get_editor_state');
     expect(toolNames).toContain('read_scene_events');
     expect(toolNames).toContain('gdevelop_editor_call');
+    expect(toolNames).toContain('gdevelop_get_global_config');
     expect(toolNames).toContain('gdevelop_get_events_json_examples');
     expect(toolNames).toContain('gdevelop_get_event_operation_reference');
     expect(toolNames).toContain('gdevelop_validate_events_json');
@@ -87,6 +88,9 @@ describe('McpToolCatalog', () => {
     expect(toolNames).toContain('change_object_property');
     expect(toolNames).toContain('set_project_properties');
     expect(toolNames).toContain('set_first_layout');
+    expect(toolNames).toContain('gdevelop_set_global_config');
+    expect(toolNames).toContain('gdevelop_set_global_config_value');
+    expect(toolNames).toContain('gdevelop_delete_global_config_value');
     expect(toolNames).toContain('add_or_update_resource');
     expect(toolNames).toContain('set_sprite_animations');
     expect(toolNames).toContain('bulk_edit_scene_assets');
@@ -140,6 +144,10 @@ describe('McpToolCatalog', () => {
     expect(isWriteTool('create_scene')).toBe(true);
     expect(isWriteTool('set_project_properties')).toBe(true);
     expect(isWriteTool('set_first_layout')).toBe(true);
+    expect(isWriteTool('gdevelop_get_global_config')).toBe(false);
+    expect(isWriteTool('gdevelop_set_global_config')).toBe(true);
+    expect(isWriteTool('gdevelop_set_global_config_value')).toBe(true);
+    expect(isWriteTool('gdevelop_delete_global_config_value')).toBe(true);
     expect(isWriteTool('bulk_edit_scene_assets')).toBe(true);
     expect(isWriteTool('set_text_object_properties')).toBe(true);
     expect(isWriteTool('create_sprite_object_from_resource')).toBe(true);
@@ -232,6 +240,9 @@ describe('McpToolCatalog', () => {
       'gdevelop://project/summary'
     );
     expect(getMcpResources().map(resource => resource.uri)).toContain(
+      'gdevelop://project/global-config.json'
+    );
+    expect(getMcpResources().map(resource => resource.uri)).toContain(
       'gdevelop://scene/{sceneName}/scene.json'
     );
     expect(getMcpPrompts().map(prompt => prompt.name)).toContain(
@@ -275,8 +286,8 @@ describe('McpToolCatalog', () => {
     ).toBeGreaterThan(0);
     expect(
       getMcpToolUsageExamples('gdevelop_create_or_update_extension_function')
-        .gdevelop_create_or_update_extension_function[0].arguments.events_json[0]
-        .variables[0].name
+        .gdevelop_create_or_update_extension_function[0].arguments
+        .events_json[0].variables[0].name
     ).toBe('LocalSunCount');
     expect(
       getMcpToolUsageExamples('gdevelop_validate_extension_events_json')
@@ -284,13 +295,16 @@ describe('McpToolCatalog', () => {
     ).toBeGreaterThan(0);
     expect(
       getMcpToolUsageExamples('gdevelop_create_or_update_extension_property')
-        .gdevelop_create_or_update_extension_property[0].arguments
-        .property_type
+        .gdevelop_create_or_update_extension_property[0].arguments.property_type
     ).toBe('Number');
     expect(
       getMcpToolUsageExamples('apply_validated_project_json_patch')
         .apply_validated_project_json_patch.length
     ).toBeGreaterThan(0);
+    expect(
+      getMcpToolUsageExamples('gdevelop_set_global_config_value')
+        .gdevelop_set_global_config_value[0].arguments.placeholder_path
+    ).toBe('{{cards.Sunflower.price}}');
     expect(
       getMcpToolUsageExamples('replace_extension_function_events_from_file')
         .replace_extension_function_events_from_file.length

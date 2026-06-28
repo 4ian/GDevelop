@@ -44,10 +44,11 @@ When a user asks for any GDevelop edit:
 7. If the user's request refers to "selected", "current object", "this instance", "this event", "the thing I clicked", or similar UI context, call `gdevelop_get_editor_selection` before inferring targets from project data.
 8. For layout work, call `describe_instances` before placing, moving, or deleting instances.
 9. For object/behavior work, call `inspect_object_properties` and, when relevant, `inspect_behavior_properties`.
-10. For extension work, call `gdevelop_list_extensions` and then `gdevelop_inspect_extension` for the target extension before editing functions, events-based objects, events-based behaviors, or extension properties.
-11. Make the smallest write that satisfies the user request.
-12. Read back with the relevant read tool.
-13. Summarize what changed and mention any remaining uncertainty.
+10. For Global Config work, call `gdevelop_get_global_config` before editing; use placeholder paths like `{{cards.Sunflower.price}}` for focused reads/writes.
+11. For extension work, call `gdevelop_list_extensions` and then `gdevelop_inspect_extension` for the target extension before editing functions, events-based objects, events-based behaviors, or extension properties.
+12. Make the smallest write that satisfies the user request.
+13. Read back with the relevant read tool.
+14. Summarize what changed and mention any remaining uncertainty.
 
 Do not start by reading the full project JSON unless a focused tool cannot answer the question. Never rewrite or patch the opened project JSON file on disk.
 
@@ -59,8 +60,9 @@ Read-only context:
 
 - `gdevelop_get_editor_state`: project presence, scene names, permissions, and the absolute `projectFile` / `projectFolder` of the open project. Relative resource paths (`add_or_update_resource`, `bulk_edit_scene_assets`) resolve against `projectFolder`, which may differ from your cwd — read it first to avoid missing-file errors.
 - `gdevelop_get_editor_selection`: current editor UI selection state, including active scene-like editor panes, selected objects, selected layers, selected scene instances, selected events/instructions when an events sheet is active, and the selected project-file asset/resource when the Resources editor is active.
-- `gdevelop_get_project_summary`: compact project structure (also returns absolute `projectFile` / `projectFolder`), optionally scoped by `sceneName`.
+- `gdevelop_get_project_summary`: compact project structure (also returns absolute `projectFile` / `projectFolder` and `globalConfigSummary`), optionally scoped by `sceneName`.
 - `gdevelop_read_project_json`: full project JSON; use sparingly and with `maxLength` for large projects.
+- `gdevelop_get_global_config`: read the Global Config map. Omit `placeholder_path` for the full object, or pass an exact placeholder path like `{{cards.Sunflower.price}}` to read one value. Use this instead of patching top-level project JSON for config inspection.
 - `gdevelop_list_scenes`: all scenes/layouts.
 - `gdevelop_list_objects`: global objects and scene objects.
 - `gdevelop_list_extensions`: project-specific events-functions extensions with metadata and counts.
@@ -127,6 +129,9 @@ Write tools:
 - `rename_scene`: safely rename a scene/layout (`scene_name` → `new_scene_name`), updating references (change-scene actions) across the project and closing its open tabs. Use this instead of leaving placeholder names like "Untitled scene".
 - `set_first_layout`: set the project startup scene/layout in the editor model. Use this instead of patching saved JSON.
 - `set_project_properties`: set project name, startup scene, resolution, runtime resolution adaptation, FPS limits, orientation, and scale mode.
+- `gdevelop_set_global_config`: replace the entire Global Config map with a JSON object. Use sparingly; prefer `gdevelop_set_global_config_value` for small changes.
+- `gdevelop_set_global_config_value`: set one Global Config value by exact placeholder path such as `{{cards.Sunflower.price}}`. It creates missing parents as needed.
+- `gdevelop_delete_global_config_value`: delete one Global Config value by exact placeholder path such as `{{cards.Sunflower.previewObjectName}}`.
 - `create_or_replace_object`: create, duplicate, replace, or move object definitions.
 - `replace_object_definition`: replace/create a scene object from complete serialized object JSON; type changes are allowed after validation.
 - `delete_scene_object`: delete a scene object and clean up references/instances through GDevelop refactoring.
@@ -342,6 +347,8 @@ Validation responses include `issueSummary`. Use it before inspecting every repe
 
 Variable expression syntax (see `gdevelop_get_events_json_examples` -> `variableExpressionSyntax`): a scene variable is referenced by bare name (`Variable(Score)` in an expression, or just `Score` in a variable parameter) - not `SceneVariable(Score)`. A local event variable is declared in an event's `variables` array and uses the same bare-name syntax inside that event/sub-events. A global variable is `GlobalVariable(Name)`. An object variable is `Object.VariableName` in expressions (e.g. `Player.Life`) - not `VarObjet(...)`.
 
+Global Config syntax: config paths are not variables. In scene events, use the `Global configuration` instructions and expressions with exact placeholder paths, for example `ConfigNumber("{{cards.Sunflower.price}}")`, `ConfigString("{{cards.Sunflower.name}}")`, `ConfigBool("{{cards.Sunflower.canUse}}")`, and the matching Global Config conditions/actions. Do not write `GlobalVariable(cards.Sunflower.price)` for config data. Read/edit the config map with `gdevelop_get_global_config`, `gdevelop_set_global_config_value`, and `gdevelop_delete_global_config_value`; the path argument must include the outer `{{...}}`.
+
 The field `isRelevantForSceneEvents` (from `gdevelop_get_instruction_metadata`) maps to GDevelop's `isRelevantForLayoutEvents()`. A value of false does NOT mean the instruction is unusable in scene events; some object-variable instructions report false yet work in scene events.
 
 For extension function event bodies, use the same event JSON shape and metadata workflow. Use `gdevelop_validate_extension_events_json` when you only need validation/linting, and `gdevelop_create_or_update_extension_function` when you are ready to write. The write tool validates `events_json` before replacing the function's event list and validates non-empty action/condition sentences against the final parameter list. Invalid function event JSON or sentence placeholders must be fixed before retrying; failed writes are rolled back.
@@ -538,6 +545,14 @@ Change variables:
 2. `add_or_edit_variable`. For an object variable (`variable_scope: "object"`), pass `scene_name` too unless the object is a global object — scene objects are not found without it. If you omit it for a scene object, the error names the owning scene.
 3. Read summary or relevant object properties again.
 
+Change Global Config:
+
+1. `gdevelop_get_global_config` to read the current config and available placeholder examples.
+2. For one value, call `gdevelop_set_global_config_value` with `placeholder_path`, for example `{{cards.Sunflower.price}}`, and `value` or `value_json`.
+3. For one removal, call `gdevelop_delete_global_config_value` with the exact placeholder path.
+4. Use `gdevelop_set_global_config` only when deliberately replacing the whole config object.
+5. Read back with `gdevelop_get_global_config`, then save with `gdevelop_save_project_and_wait` if persistence is required.
+
 Add gameplay logic:
 
 1. Read current scene events and objects.
@@ -684,6 +699,7 @@ Save the project:
 - Pass resource-name parameters (sound/music/image/font) as BARE names, never quoted.
 - To find a capability behavior's name on an object (for instruction behavior parameters), call `list_available_behaviors` with `object_name` and read `objectBehaviors` (Text, Animation, Effect, Opacity, Resizable, Scale, Flippable).
 - Declare scene/global variables up front with `bulk_edit_scene_assets` `variables`, or auto-declare via the `event_changes` `undeclared_variables` field; an undeclared variable fails event validation even with a correct bare name.
+- Use Global Config for data tables shared by object properties and events; use `gdevelop_get_global_config` and focused `gdevelop_set_global_config_value` / `gdevelop_delete_global_config_value` instead of raw project patches. Paths must be exact placeholders like `{{cards.Sunflower.price}}`.
 - Prefer `bulk_edit_scene_assets` (now incl. behaviors + variables) for initial setup to cut round-trips.
 - Prefer `capture_preview_screenshot` to visually verify a running preview rather than inferring appearance from instance coordinates. It defaults to the latest preview; pass `debugger_id` to target a specific one.
 - When multiple previews accumulate, `control_preview { action: "close", close_all: true }` before relaunching so screenshots/sound checks don't hit a stale window.
@@ -699,6 +715,7 @@ Save the project:
 - Prefer `inspect_project_cleanup` before removing old empty scenes, unused objects, or unused resources.
 - Prefer `lint_scene_events` after any event write.
 - Use `set_first_layout` or `set_project_properties` for project-level changes. Do not edit project JSON on disk.
+- Use `gdevelop_set_global_config_value` for Global Config changes. Do not patch `/globalConfig` through the full project JSON unless no focused tool is available and the user accepts that fallback.
 - Use validated JSON patch tools only for controlled in-memory editor-model edits. They are not permission to hand-edit the opened `.json` file on disk.
 - For custom object hitboxes and mouse targeting, inspect prefab geometry first; do not widen the parent area just to cover a visible child without understanding the `IsCursorOnObject` side effect.
 - For prefab image resources, a Resource property is not enough by itself. Inspect binding evidence, then bind/read back/preview.
@@ -724,6 +741,7 @@ Before claiming completion:
 - Referenced resources have non-empty files and valid paths, or remaining invalid resource paths were explicitly reported.
 - If cleanup was requested, `inspect_project_cleanup` was read first and any heuristic candidates were confirmed before deletion.
 - The startup scene is set with `set_first_layout` or verified from `read_game_project_json`; do not rely on a disk-only patch.
+- Global Config changes, if any, were read back with `gdevelop_get_global_config`; event references use exact `{{...}}` placeholder paths.
 - No opened project `.json` file was directly edited. All project changes went through MCP tools and were saved with `gdevelop_save_project_and_wait` when persistence was required.
 - Any direct JSON patch/sync used `dry_run:true` or validation first, reported no validation/code-generation errors, and was read back after mutation.
 - Custom object geometry changes were checked with `inspect_custom_object_runtime_geometry` when parent area, child bounds, or cursor hit behavior mattered.
@@ -743,12 +761,14 @@ Before claiming completion:
 - Inlining a huge event JSON string just to validate. Fix: write a local file and call `validate_events_json_file`.
 - Reading repeated validation errors one by one. Fix: use `issueSummary.rootCauses`.
 - Forgetting to declare variables before event validation. Fix: call `add_or_edit_variable` first with `variable_scope`, `variable_name_or_path`, and `value`.
+- Treating Global Config paths as variables. Fix: use Global Config expressions/conditions/actions with exact `{{cards.Sunflower.price}}` placeholder paths, and edit the data through `gdevelop_set_global_config_value`.
 - Writing events after validation returned issues. Fix: correct the events first; `add_scene_events` rejects invalid direct event writes.
 - Leaving newly created gameplay events at the root event sheet. Fix: create/find the semantic Group first, or immediately wrap/move the events into it.
 - Leaving Groups with no color, or giving two different Groups the same color. Fix: set a distinct `color: { r, g, b }` on every Group (via `create_group`/`wrap_events_in_group`, or `rename_group` afterwards) so each Group's color is unique within the scene.
 - Using JavaScript events to implement normal gameplay logic. Fix: use standard GDevelop events/instructions; only use JavaScript when the user explicitly asks for it.
 - Editing instances without `describe_instances`. Fix: read existing IDs and positions first.
 - Rewriting or patching the opened project JSON file for any change. Fix: use focused MCP tools, then `gdevelop_save_project_and_wait`.
+- Patching `/globalConfig` for a one-cell config change. Fix: call `gdevelop_set_global_config_value` or `gdevelop_delete_global_config_value` with `placeholder_path`.
 - Treating validated JSON patch tools as disk-edit permission. Fix: use them only through MCP against the in-memory editor model; never modify the opened `.json` file directly.
 - Replacing all scene events just to group them. Fix: use `wrap_events_in_group`, `move_events_to_group`, and `rename_group`.
 - Continuing to use an old `event-N` path after moving/grouping events. Fix: assign/read `aiGeneratedEventId` and target by ID.

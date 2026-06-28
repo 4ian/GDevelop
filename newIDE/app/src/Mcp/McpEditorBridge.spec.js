@@ -407,6 +407,148 @@ describe('McpEditorBridge', () => {
     }
   });
 
+  it('reads and edits global config through focused MCP tools', async () => {
+    // $FlowFixMe[invalid-constructor]
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    const triggerUnsavedChanges = jest.fn();
+
+    try {
+      const projectWithGlobalConfig: any = project;
+      projectWithGlobalConfig.setGlobalConfigJson(
+        JSON.stringify({
+          cards: {
+            PeaShooter: { name: 'PeaShooter', price: 100 },
+          },
+        })
+      );
+
+      const bridge = makeBridge({
+        getProject: () => project,
+        getPermissions: () => ({
+          allowWriteTools: true,
+          allowCommandTools: false,
+        }),
+        triggerUnsavedChanges,
+      });
+
+      const summaryResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'gdevelop_get_project_summary',
+          arguments: {},
+        },
+      });
+      const summary = JSON.parse(summaryResponse.content[0].text);
+      expect(summary.globalConfigSummary.topLevelKeys).toContain('cards');
+      expect(summary.globalConfigSummary.placeholderExamples).toContain(
+        '{{cards.PeaShooter.price}}'
+      );
+
+      const readValueResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'gdevelop_get_global_config',
+          arguments: {
+            placeholder_path: '{{cards.PeaShooter.price}}',
+          },
+        },
+      });
+      const readValue = JSON.parse(readValueResponse.content[0].text);
+      expect(readValue.exists).toBe(true);
+      expect(readValue.value).toBe(100);
+
+      const resourceResponse = await bridge.handleRendererMcpRequest({
+        method: 'resources/read',
+        params: {
+          uri: 'gdevelop://project/global-config.json',
+        },
+      });
+      expect(
+        JSON.parse(resourceResponse.contents[0].text).cards.PeaShooter.price
+      ).toBe(100);
+
+      const replaceResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'gdevelop_set_global_config',
+          arguments: {
+            global_config: {
+              cards: {
+                Sunflower: { name: 'Sunflower', price: 50 },
+              },
+            },
+          },
+        },
+      });
+      const replaceResult = JSON.parse(replaceResponse.content[0].text);
+      expect(replaceResult.success).toBe(true);
+
+      const setValueResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'gdevelop_set_global_config_value',
+          arguments: {
+            placeholder_path: '{{cards.Sunflower.canUse}}',
+            value: true,
+          },
+        },
+      });
+      const setValueResult = JSON.parse(setValueResponse.content[0].text);
+      expect(setValueResult.previousExists).toBe(false);
+      expect(setValueResult.value).toBe(true);
+
+      const setObjectResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'gdevelop_set_global_config_value',
+          arguments: {
+            placeholder_path: '{{cards.WallNut}}',
+            value_json: '{"name":"WallNut","price":50}',
+          },
+        },
+      });
+      const setObjectResult = JSON.parse(setObjectResponse.content[0].text);
+      expect(setObjectResult.value.name).toBe('WallNut');
+
+      const deleteResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'gdevelop_delete_global_config_value',
+          arguments: {
+            placeholder_path: '{{cards.Sunflower.canUse}}',
+          },
+        },
+      });
+      const deleteResult = JSON.parse(deleteResponse.content[0].text);
+      expect(deleteResult.deleted).toBe(true);
+
+      const finalConfig = JSON.parse(
+        projectWithGlobalConfig.getGlobalConfigJson()
+      );
+      expect(finalConfig.cards.Sunflower.price).toBe(50);
+      expect(finalConfig.cards.Sunflower.canUse).toBeUndefined();
+      expect(finalConfig.cards.WallNut.name).toBe('WallNut');
+      expect(triggerUnsavedChanges).toHaveBeenCalledTimes(4);
+
+      const invalidPathResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'gdevelop_set_global_config_value',
+          arguments: {
+            placeholder_path: 'cards.Sunflower.price',
+            value: 75,
+          },
+        },
+      });
+      expect(invalidPathResponse.isError).toBe(true);
+      expect(invalidPathResponse.content[0].text).toContain(
+        'placeholder syntax'
+      );
+    } finally {
+      project.delete();
+    }
+  });
+
   it('returns event JSON examples and operation reference for MCP clients', async () => {
     // $FlowFixMe[invalid-constructor]
     const project = new gd.ProjectHelper.createNewGDJSProject();

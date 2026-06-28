@@ -997,6 +997,72 @@ const firstLayoutSchema = {
   additionalProperties: true,
 };
 
+const globalConfigReadSchema = {
+  type: 'object',
+  properties: {
+    placeholder_path: {
+      type: 'string',
+      description:
+        'Optional exact global config placeholder path to read, for example {{cards.Sunflower.price}}. Omit to read the full config object.',
+    },
+  },
+  additionalProperties: false,
+};
+
+const globalConfigReplaceSchema = {
+  type: 'object',
+  properties: {
+    global_config: {
+      type: 'object',
+      description:
+        'Complete replacement global config object. The root must be a JSON object.',
+      additionalProperties: true,
+    },
+    global_config_json: {
+      type: 'string',
+      description:
+        'Alternative complete replacement config as a JSON string. The root must be an object.',
+    },
+    include_config: {
+      type: 'boolean',
+      description:
+        'When true, include the written config object in the response.',
+    },
+  },
+  additionalProperties: true,
+};
+
+const globalConfigValueSchema = {
+  type: 'object',
+  properties: {
+    placeholder_path: {
+      type: 'string',
+      description:
+        'Exact global config placeholder path, for example {{cards.Sunflower.price}}. Placeholder syntax is required.',
+    },
+    value: {
+      description:
+        'JSON value to write at placeholder_path. Use a number/boolean/object/array for typed config values, or a string for text values.',
+    },
+    value_json: {
+      type: 'string',
+      description:
+        'Alternative value as a JSON string, useful for explicitly writing objects, arrays, null, numbers, or booleans.',
+    },
+  },
+  required: ['placeholder_path'],
+  additionalProperties: true,
+};
+
+const globalConfigDeleteSchema = {
+  type: 'object',
+  properties: {
+    placeholder_path: globalConfigValueSchema.properties.placeholder_path,
+  },
+  required: ['placeholder_path'],
+  additionalProperties: false,
+};
+
 const put2dInstancesSchema = {
   type: 'object',
   properties: {
@@ -3416,6 +3482,12 @@ const readTools: Array<McpTool> = [
     },
   },
   {
+    name: 'gdevelop_get_global_config',
+    description:
+      'Read the project Global Config map. Omit placeholder_path for the full object, or pass an exact placeholder path such as {{cards.Sunflower.price}} to read one value.',
+    inputSchema: globalConfigReadSchema,
+  },
+  {
     name: 'gdevelop_list_scenes',
     description: 'List all scenes/layouts in the current GDevelop project.',
     inputSchema: emptyObjectSchema,
@@ -4090,6 +4162,24 @@ const writeTools: Array<McpTool> = [
     inputSchema: firstLayoutSchema,
   },
   {
+    name: 'gdevelop_set_global_config',
+    description:
+      'Replace the project Global Config map with a complete JSON object in the open editor model. Prefer gdevelop_set_global_config_value for small focused edits.',
+    inputSchema: globalConfigReplaceSchema,
+  },
+  {
+    name: 'gdevelop_set_global_config_value',
+    description:
+      'Set one Global Config value by exact placeholder path such as {{cards.Sunflower.price}}. Creates missing parent objects/arrays as needed.',
+    inputSchema: globalConfigValueSchema,
+  },
+  {
+    name: 'gdevelop_delete_global_config_value',
+    description:
+      'Delete one Global Config value by exact placeholder path such as {{cards.Sunflower.price}}.',
+    inputSchema: globalConfigDeleteSchema,
+  },
+  {
     name: 'snapshot_project',
     description:
       'Take an in-memory snapshot of the WHOLE project (a coarse checkpoint for transaction-style safety). Call before a risky multi-step build; if a later step fails, restore_project_snapshot rolls back. Session-scoped (lost on reload) and NOT a disk save. Returns a snapshot_id.',
@@ -4546,6 +4636,59 @@ const toolUsageExamples: { [string]: Array<Object> } = {
         max_fps: 120,
         orientation: 'landscape',
         scale_mode: 'linear',
+      },
+    },
+  ],
+  gdevelop_get_global_config: [
+    {
+      description: 'Read the full Global Config object.',
+      arguments: {},
+    },
+    {
+      description: 'Read one Global Config value by placeholder path.',
+      arguments: {
+        placeholder_path: '{{cards.Sunflower.price}}',
+      },
+    },
+  ],
+  gdevelop_set_global_config: [
+    {
+      description: 'Replace the full Global Config object.',
+      arguments: {
+        global_config: {
+          cards: {
+            Sunflower: {
+              name: 'Sunflower',
+              price: 50,
+              canUse: true,
+            },
+          },
+        },
+      },
+    },
+  ],
+  gdevelop_set_global_config_value: [
+    {
+      description: 'Set one numeric Global Config value.',
+      arguments: {
+        placeholder_path: '{{cards.Sunflower.price}}',
+        value: 50,
+      },
+    },
+    {
+      description:
+        'Set one object Global Config value from JSON text when the MCP client cannot pass a nested value directly.',
+      arguments: {
+        placeholder_path: '{{cards.Sunflower}}',
+        value_json: '{"name":"Sunflower","price":50,"canUse":true}',
+      },
+    },
+  ],
+  gdevelop_delete_global_config_value: [
+    {
+      description: 'Delete one Global Config value.',
+      arguments: {
+        placeholder_path: '{{cards.Sunflower.previewObjectName}}',
       },
     },
   ],
@@ -6125,6 +6268,7 @@ export const getCapabilitiesSummary = (
     'Project & editor state': [
       'gdevelop_get_editor_state',
       'gdevelop_get_project_summary',
+      'gdevelop_get_global_config',
       'gdevelop_list_scenes',
       'gdevelop_list_objects',
       'gdevelop_get_editor_selection',
@@ -6200,6 +6344,9 @@ export const getCapabilitiesSummary = (
     ],
     'Variables & scenes': [
       'add_or_edit_variable',
+      'gdevelop_set_global_config',
+      'gdevelop_set_global_config_value',
+      'gdevelop_delete_global_config_value',
       'delete_scene_variable',
       'batch_delete_scene_variables',
       'delete_object_variable',
@@ -6267,6 +6414,12 @@ export const getMcpResources = (): Array<McpResource> => [
     uri: 'gdevelop://project/json',
     name: 'Project JSON',
     description: 'Full serialized GDevelop project JSON.',
+    mimeType: 'application/json',
+  },
+  {
+    uri: 'gdevelop://project/global-config.json',
+    name: 'Project Global Config',
+    description: 'Project Global Config map as JSON.',
     mimeType: 'application/json',
   },
   {

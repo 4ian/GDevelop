@@ -66,6 +66,7 @@ Project::Project()
                        gd::String::From(gd::VersionWrapper::Minor()) + "." +
                        gd::String::From(gd::VersionWrapper::Build())),
       variables(gd::VariablesContainer::SourceType::Global),
+      globalConfigJson("{}"),
       objectsContainer(gd::ObjectsContainer::SourceType::Global),
       resourcesContainer(gd::ResourcesContainer::SourceType::Global),
       sceneResourcesPreloading("at-startup"), sceneResourcesUnloading("never") {
@@ -1005,6 +1006,12 @@ void Project::UnserializeFrom(const SerializerElement& element) {
   objectsContainer.AddMissingObjectsInRootFolder();
 
   GetVariables().UnserializeFrom(element.GetChild("variables", 0, "Variables"));
+  if (element.HasChild("globalConfig")) {
+    SetGlobalConfigJson(
+        gd::Serializer::ToJSON(element.GetChild("globalConfig")));
+  } else {
+    SetGlobalConfigJson("{}");
+  }
 
   scenes.clear();
   const SerializerElement& layoutsElement =
@@ -1326,6 +1333,10 @@ void Project::SerializeTo(SerializerElement& element) const {
   objectsContainer.SerializeFoldersTo(element.AddChild("objectsFolderStructure"));
   objectsContainer.GetObjectGroups().SerializeTo(element.AddChild("objectsGroups"));
   GetVariables().SerializeTo(element.AddChild("variables"));
+  if (GetGlobalConfigJson() != "{}") {
+    element.AddChild("globalConfig") =
+        gd::Serializer::FromJSON(GetGlobalConfigJson());
+  }
 
   element.SetAttribute("firstLayout", firstLayout);
   if (!previewLayout.empty()) {
@@ -1469,6 +1480,7 @@ void Project::Init(const gd::Project& game) {
   eventsFunctionsExtensions = gd::Clone(game.eventsFunctionsExtensions);
 
   variables = game.GetVariables();
+  globalConfigJson = game.GetGlobalConfigJson();
 
   projectFile = game.GetProjectFile();
 

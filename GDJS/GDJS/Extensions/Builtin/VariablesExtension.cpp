@@ -23,6 +23,211 @@ namespace gdjs {
 VariablesExtension::VariablesExtension() {
   gd::BuiltinExtensionsImplementer::ImplementsVariablesExtension(*this);
 
+  GetAllConditions()["GlobalConfigExists"].SetCustomCodeGenerator(
+      [](gd::Instruction& instruction,
+         gd::EventsCodeGenerator& codeGenerator,
+         gd::EventsCodeGenerationContext& context) {
+        const gd::String pathCode = EventsCodeGenerator::ConvertToStringExplicit(
+            instruction.GetParameters()[0].GetPlainString());
+        const gd::String resultingBoolean =
+            codeGenerator.GenerateUpperScopeBooleanFullName("isConditionTrue",
+                                                            context);
+
+        return resultingBoolean + " = " +
+               gd::String(instruction.IsInverted() ? "!" : "") +
+               "gdjs.evtTools.globalConfig.has(runtimeScene.getGame(), " +
+               pathCode + ");\n";
+      });
+
+  GetAllConditions()["GlobalConfigNumber"].SetCustomCodeGenerator(
+      [](gd::Instruction& instruction,
+         gd::EventsCodeGenerator& codeGenerator,
+         gd::EventsCodeGenerationContext& context) {
+        const gd::String pathCode = EventsCodeGenerator::ConvertToStringExplicit(
+            instruction.GetParameters()[0].GetPlainString());
+        const gd::String getterCode =
+            "gdjs.evtTools.globalConfig.getNumber(runtimeScene.getGame(), " +
+            pathCode + ")";
+        const gd::String op = instruction.GetParameters()[1].GetPlainString();
+        const gd::String expressionCode =
+            gd::ExpressionCodeGenerator::GenerateExpressionCode(
+                codeGenerator, context, "number",
+                instruction.GetParameters()[2].GetPlainString());
+        const gd::String resultingBoolean =
+            codeGenerator.GenerateUpperScopeBooleanFullName("isConditionTrue",
+                                                            context);
+
+        return resultingBoolean + " = " +
+               gd::String(instruction.IsInverted() ? "!" : "") + "(" +
+               codeGenerator.GenerateRelationalOperation(op, getterCode,
+                                                         expressionCode) +
+               ");\n";
+      });
+
+  GetAllConditions()["GlobalConfigString"].SetCustomCodeGenerator(
+      [](gd::Instruction& instruction,
+         gd::EventsCodeGenerator& codeGenerator,
+         gd::EventsCodeGenerationContext& context) {
+        const gd::String pathCode = EventsCodeGenerator::ConvertToStringExplicit(
+            instruction.GetParameters()[0].GetPlainString());
+        const gd::String getterCode =
+            "gdjs.evtTools.globalConfig.getString(runtimeScene.getGame(), " +
+            pathCode + ")";
+        const gd::String op = instruction.GetParameters()[1].GetPlainString();
+        const gd::String expressionCode =
+            gd::ExpressionCodeGenerator::GenerateExpressionCode(
+                codeGenerator, context, "string",
+                instruction.GetParameters()[2].GetPlainString());
+        const gd::String resultingBoolean =
+            codeGenerator.GenerateUpperScopeBooleanFullName("isConditionTrue",
+                                                            context);
+
+        return resultingBoolean + " = " +
+               gd::String(instruction.IsInverted() ? "!" : "") + "(" +
+               codeGenerator.GenerateRelationalOperation(op, getterCode,
+                                                         expressionCode) +
+               ");\n";
+      });
+
+  GetAllConditions()["GlobalConfigBoolean"].SetCustomCodeGenerator(
+      [](gd::Instruction& instruction,
+         gd::EventsCodeGenerator& codeGenerator,
+         gd::EventsCodeGenerationContext& context) {
+        const gd::String pathCode = EventsCodeGenerator::ConvertToStringExplicit(
+            instruction.GetParameters()[0].GetPlainString());
+        const gd::String operand =
+            instruction.GetParameters()[1].GetPlainString();
+        const bool isOperandTrue = operand == "True" || operand == "true";
+        const gd::String resultingBoolean =
+            codeGenerator.GenerateUpperScopeBooleanFullName("isConditionTrue",
+                                                            context);
+
+        return resultingBoolean + " = " +
+               gd::String(instruction.IsInverted() == isOperandTrue ? "!"
+                                                                    : "") +
+               "gdjs.evtTools.globalConfig.getBoolean(runtimeScene.getGame(), " +
+               pathCode + ");\n";
+      });
+
+  GetAllActions()["SetGlobalConfigNumber"].SetCustomCodeGenerator(
+      [](gd::Instruction& instruction,
+         gd::EventsCodeGenerator& codeGenerator,
+         gd::EventsCodeGenerationContext& context) {
+        const gd::String pathCode = EventsCodeGenerator::ConvertToStringExplicit(
+            instruction.GetParameters()[0].GetPlainString());
+        const gd::String op = instruction.GetParameters()[1].GetPlainString();
+        const gd::String expressionCode =
+            gd::ExpressionCodeGenerator::GenerateExpressionCode(
+                codeGenerator, context, "number",
+                instruction.GetParameters()[2].GetPlainString());
+        const gd::String getterCode =
+            "gdjs.evtTools.globalConfig.getNumber(runtimeScene.getGame(), " +
+            pathCode + ")";
+        const gd::String valueCode =
+            op == "=" ? expressionCode : getterCode + op + expressionCode;
+
+        return "gdjs.evtTools.globalConfig.setNumber(runtimeScene.getGame(), " +
+               pathCode + ", " + valueCode + ");\n";
+      });
+
+  GetAllActions()["SetGlobalConfigString"].SetCustomCodeGenerator(
+      [](gd::Instruction& instruction,
+         gd::EventsCodeGenerator& codeGenerator,
+         gd::EventsCodeGenerationContext& context) {
+        const gd::String pathCode = EventsCodeGenerator::ConvertToStringExplicit(
+            instruction.GetParameters()[0].GetPlainString());
+        const gd::String op = instruction.GetParameters()[1].GetPlainString();
+        const gd::String expressionCode =
+            gd::ExpressionCodeGenerator::GenerateExpressionCode(
+                codeGenerator, context, "string",
+                instruction.GetParameters()[2].GetPlainString());
+        const gd::String valueCode =
+            op == "+"
+                ? "gdjs.evtTools.globalConfig.getString(runtimeScene.getGame(), " +
+                      pathCode + ") + " + expressionCode
+                : expressionCode;
+
+        return "gdjs.evtTools.globalConfig.setString(runtimeScene.getGame(), " +
+               pathCode + ", " + valueCode + ");\n";
+      });
+
+  GetAllActions()["SetGlobalConfigBoolean"].SetCustomCodeGenerator(
+      [](gd::Instruction& instruction,
+         gd::EventsCodeGenerator& codeGenerator,
+         gd::EventsCodeGenerationContext& context) {
+        const gd::String pathCode = EventsCodeGenerator::ConvertToStringExplicit(
+            instruction.GetParameters()[0].GetPlainString());
+        const gd::String operand =
+            instruction.GetParameters()[1].GetPlainString();
+        const bool isOperandTrue = operand == "True" || operand == "true";
+
+        return "gdjs.evtTools.globalConfig.setBoolean(runtimeScene.getGame(), " +
+               pathCode + ", " + gd::String(isOperandTrue ? "true" : "false") +
+               ");\n";
+      });
+
+  GetAllActions()["RemoveGlobalConfigValue"].SetCustomCodeGenerator(
+      [](gd::Instruction& instruction,
+         gd::EventsCodeGenerator& codeGenerator,
+         gd::EventsCodeGenerationContext& context) {
+        const gd::String pathCode = EventsCodeGenerator::ConvertToStringExplicit(
+            instruction.GetParameters()[0].GetPlainString());
+
+        return "gdjs.evtTools.globalConfig.remove(runtimeScene.getGame(), " +
+               pathCode + ");\n";
+      });
+
+  GetAllExpressions()["ConfigNumber"].SetCustomCodeGenerator(
+      [](const std::vector<gd::Expression>& parameters,
+         gd::EventsCodeGenerator& codeGenerator,
+         gd::EventsCodeGenerationContext& context) {
+        const gd::String pathCode =
+            gd::ExpressionCodeGenerator::GenerateExpressionCode(
+                codeGenerator, context, "string", parameters[0]);
+        return "gdjs.evtTools.globalConfig.getNumber(runtimeScene.getGame(), " +
+               pathCode + ")";
+      });
+  GetAllStrExpressions()["ConfigString"].SetCustomCodeGenerator(
+      [](const std::vector<gd::Expression>& parameters,
+         gd::EventsCodeGenerator& codeGenerator,
+         gd::EventsCodeGenerationContext& context) {
+        const gd::String pathCode =
+            gd::ExpressionCodeGenerator::GenerateExpressionCode(
+                codeGenerator, context, "string", parameters[0]);
+        return "gdjs.evtTools.globalConfig.getString(runtimeScene.getGame(), " +
+               pathCode + ")";
+      });
+  GetAllExpressions()["ConfigBool"].SetCustomCodeGenerator(
+      [](const std::vector<gd::Expression>& parameters,
+         gd::EventsCodeGenerator& codeGenerator,
+         gd::EventsCodeGenerationContext& context) {
+        const gd::String pathCode =
+            gd::ExpressionCodeGenerator::GenerateExpressionCode(
+                codeGenerator, context, "string", parameters[0]);
+        return "(gdjs.evtTools.globalConfig.getBoolean(runtimeScene.getGame(), " +
+               pathCode + ") ? 1 : 0)";
+      });
+  GetAllExpressions()["ConfigChildCount"].SetCustomCodeGenerator(
+      [](const std::vector<gd::Expression>& parameters,
+         gd::EventsCodeGenerator& codeGenerator,
+         gd::EventsCodeGenerationContext& context) {
+        const gd::String pathCode =
+            gd::ExpressionCodeGenerator::GenerateExpressionCode(
+                codeGenerator, context, "string", parameters[0]);
+        return "gdjs.evtTools.globalConfig.getChildCount(runtimeScene.getGame(), " +
+               pathCode + ")";
+      });
+  GetAllStrExpressions()["ConfigToJSON"].SetCustomCodeGenerator(
+      [](const std::vector<gd::Expression>& parameters,
+         gd::EventsCodeGenerator& codeGenerator,
+         gd::EventsCodeGenerationContext& context) {
+        const gd::String pathCode =
+            gd::ExpressionCodeGenerator::GenerateExpressionCode(
+                codeGenerator, context, "string", parameters[0]);
+        return "gdjs.evtTools.globalConfig.toJSON(runtimeScene.getGame(), " +
+               pathCode + ")";
+      });
+
   GetAllConditions()["NumberVariable"].SetCustomCodeGenerator(
       [](gd::Instruction &instruction, gd::EventsCodeGenerator &codeGenerator,
          gd::EventsCodeGenerationContext &context) {

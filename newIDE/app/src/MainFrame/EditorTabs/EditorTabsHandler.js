@@ -9,6 +9,7 @@ import { ExtensionItemDetailEditorContainer } from '../EditorContainers/Extensio
 import { ExternalEventsEditorContainer } from '../EditorContainers/ExternalEventsEditorContainer';
 import { ExternalLayoutEditorContainer } from '../EditorContainers/ExternalLayoutEditorContainer';
 import { ResourcesEditorContainer } from '../EditorContainers/ResourcesEditorContainer';
+import { GlobalConfigEditorContainer } from '../EditorContainers/GlobalConfigEditorContainer';
 import { SceneEditorContainer } from '../EditorContainers/SceneEditorContainer';
 import { type HomePageEditorInterface } from '../EditorContainers/HomePage';
 import {
@@ -29,6 +30,7 @@ type EditorRef =
   | ExternalEventsEditorContainer
   | ExternalLayoutEditorContainer
   | ResourcesEditorContainer
+  | GlobalConfigEditorContainer
   | SceneEditorContainer
   | HomePageEditorInterface
   | AskAiEditorInterface;
@@ -47,6 +49,7 @@ export type EditorKind =
   | 'custom object'
   | 'debugger'
   | 'resources'
+  | 'global-config'
   | 'global-search'
   | 'ask-ai'
   | 'start page';
@@ -119,7 +122,8 @@ export const MAX_OPEN_EDITOR_TABS_PER_PANE = 5;
 const isEditorTabIncludedInLimit = (editorTab: EditorTab): boolean =>
   editorTab.closable &&
   editorTab.kind !== 'debugger' &&
-  editorTab.kind !== 'resources';
+  editorTab.kind !== 'resources' &&
+  editorTab.kind !== 'global-config';
 
 const limitOpenEditorTabsForPane = ({
   editors,

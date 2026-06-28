@@ -1072,6 +1072,27 @@ class GD_CORE_API Project {
 
   ///@}
 
+  /** \name Global configuration
+   * Members functions related to project-wide JSON configuration data.
+   */
+  ///@{
+
+  /**
+   * Get the project-wide JSON configuration data.
+   */
+  inline const gd::String& GetGlobalConfigJson() const {
+    return globalConfigJson;
+  }
+
+  /**
+   * Set the project-wide JSON configuration data.
+   */
+  inline void SetGlobalConfigJson(const gd::String& globalConfigJson_) {
+    globalConfigJson = globalConfigJson_.empty() ? "{}" : globalConfigJson_;
+  }
+
+  ///@}
+
   /** \name Global objects
    */
   ///@{
@@ -1172,6 +1193,7 @@ class GD_CORE_API Project {
               ///< 5.6.267).
   std::vector<std::unique_ptr<gd::Layout> > scenes;  ///< List of all scenes
   gd::VariablesContainer variables;  ///< Initial global variables
+  gd::String globalConfigJson;       ///< Project-wide JSON configuration data
   gd::ObjectsContainer objectsContainer;
   std::vector<std::unique_ptr<gd::ExternalLayout> >
       externalLayouts;  ///< List of all externals layouts

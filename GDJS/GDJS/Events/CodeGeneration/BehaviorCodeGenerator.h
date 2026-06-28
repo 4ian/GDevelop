@@ -150,7 +150,14 @@ class BehaviorCodeGenerator {
   gd::String GenerateInitializeSharedPropertyFromDefaultValueCode(
       const gd::NamedPropertyDescriptor& property);
 
-  gd::String GeneratePropertyValueCode(const gd::PropertyDescriptor& property);
+  gd::String GeneratePropertyValueCode(
+      const gd::PropertyDescriptor& property,
+      const gd::String& runtimeGameExpression);
+
+  gd::String GeneratePropertyValueResolutionCode(
+      const gd::PropertyDescriptor& property,
+      const gd::String& runtimeGameExpression,
+      const gd::String& valueCode);
 
   gd::String GenerateUpdatePropertyFromBehaviorDataCode(
       const gd::EventsBasedBehavior& eventsBasedBehavior,

@@ -39,6 +39,8 @@ export const splittedProjectFolderNames = [
   'eventsFunctionsExtensions',
 ];
 
+export const splittedProjectSingleFileNames = ['globalConfig'];
+
 const deleteExistingFilesFromDirs = (
   project: gdProject,
   projectPath: string
@@ -62,6 +64,20 @@ const deleteExistingFilesFromDirs = (
         throw new Error(`Unable to remove file ${file}: ${e.message}`);
       }
     });
+  });
+
+  splittedProjectSingleFileNames.forEach(fileName => {
+    const fileToRemovePath = path.join(projectPath, fileName + '.json');
+    if (!fs.existsSync(fileToRemovePath)) return;
+    if (!fs.statSync(fileToRemovePath).isFile()) return;
+
+    try {
+      fs.unlinkSync(fileToRemovePath);
+    } catch (e) {
+      throw new Error(
+        `Unable to remove file ${fileToRemovePath}: ${e.message}`
+      );
+    }
   });
 };
 
@@ -146,9 +162,10 @@ const writeProjectFiles = async ({
       pathSeparator: '/',
       getArrayItemReferenceName: getSlugifiedUniqueNameFromProperty('name'),
       shouldSplit: splitPaths(
-        new Set(
-          splittedProjectFolderNames.map(folderName => `/${folderName}/*`)
-        )
+        new Set([
+          ...splittedProjectFolderNames.map(folderName => `/${folderName}/*`),
+          ...splittedProjectSingleFileNames.map(fileName => `/${fileName}`),
+        ])
       ),
       isReferenceMagicPropertyName: '__REFERENCE_TO_SPLIT_OBJECT',
     });

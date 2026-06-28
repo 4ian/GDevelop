@@ -113,6 +113,8 @@ declare class gdProject {
   getEventsBasedObject(type: string): gdEventsBasedObject;
   ensureObjectInheritedBehaviors(objectToUpdate: gdObject): void;
   getVariables(): gdVariablesContainer;
+  setGlobalConfigJson(globalConfigJson: string): void;
+  getGlobalConfigJson(): string;
   getObjects(): gdObjectsContainer;
   getResourcesManager(): gdResourcesContainer;
   setSceneResourcesPreloading(resourcesPreloading: string): void;

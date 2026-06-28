@@ -7,6 +7,16 @@
 /**
  * Contains the data of a serialized exported project.
  */
+declare type GlobalConfigValue =
+  | null
+  | boolean
+  | number
+  | string
+  | { [key: string]: GlobalConfigValue }
+  | GlobalConfigValue[];
+
+declare type GlobalConfigData = { [key: string]: GlobalConfigValue };
+
 declare interface ProjectData {
   firstLayout: string;
   gdVersion: GdVersionData;
@@ -15,6 +25,7 @@ declare interface ProjectData {
   usedResources: ResourceReference[];
   objects: ObjectData[];
   variables: RootVariableData[];
+  globalConfig?: GlobalConfigData;
   layouts: LayoutData[];
   externalLayouts: ExternalLayoutData[];
   eventsFunctionsExtensions: EventsFunctionsExtensionData[];

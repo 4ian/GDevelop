@@ -11,6 +11,25 @@
 
 namespace gdjs {
 
+namespace {
+bool GetExactGlobalConfigPlaceholderPath(const gd::String& value,
+                                         gd::String& path) {
+  gd::String trimmedValue = value;
+  trimmedValue = trimmedValue.Trim();
+  if (trimmedValue.length() < 5) return false;
+  if (trimmedValue.substr(0, 2) != "{{") return false;
+  if (trimmedValue.substr(trimmedValue.length() - 2) != "}}") return false;
+
+  path = trimmedValue.substr(2, trimmedValue.length() - 4).Trim();
+  return !path.empty();
+}
+
+bool HasGlobalConfigPlaceholder(const gd::String& value) {
+  return value.find("{{") != std::string::npos &&
+         value.find("}}") != std::string::npos;
+}
+}  // namespace
+
 gd::String BehaviorCodeGenerator::doStepPreEventsFunctionName =
     "doStepPreEvents";
 
@@ -235,7 +254,8 @@ CODE_NAMESPACE.RUNTIME_BEHAVIOR_CLASSNAME = class RUNTIME_BEHAVIOR_CLASSNAME ext
  * Shared data generated from BEHAVIOR_FULL_NAME
  */
 CODE_NAMESPACE.RUNTIME_BEHAVIOR_CLASSNAME.SharedData = class RUNTIME_BEHAVIOR_CLASSNAMESharedData {
-  constructor(sharedData) {
+  constructor(instanceContainer, sharedData) {
+    this._runtimeGame = instanceContainer.getGame();
     INITIALIZE_SHARED_PROPERTIES_CODE
   }
   
@@ -249,6 +269,7 @@ CODE_NAMESPACE.RUNTIME_BEHAVIOR_CLASSNAME.getSharedData = function(instanceConta
       behaviorName
     );
     instanceContainer._EXTENSION_NAME_RUNTIME_BEHAVIOR_CLASSNAMESharedData = new CODE_NAMESPACE.RUNTIME_BEHAVIOR_CLASSNAME.SharedData(
+      instanceContainer,
       initialData
     );
   }
@@ -285,18 +306,36 @@ gdjs.registerBehavior("EXTENSION_NAME::BEHAVIOR_NAME", CODE_NAMESPACE.RUNTIME_BE
 
 gd::String BehaviorCodeGenerator::GenerateInitializePropertyFromDataCode(
     const gd::NamedPropertyDescriptor& property) {
+  const gd::String defaultValueCode =
+      GeneratePropertyValueCode(property, "instanceContainer.getGame()");
+  const gd::String dataValueCode =
+      "behaviorData." + property.GetName() +
+      " !== undefined ? behaviorData." + property.GetName() + " : " +
+      defaultValueCode;
   return gd::String(R"jscode_template(
-    this._behaviorData.PROPERTY_NAME = behaviorData.PROPERTY_NAME !== undefined ? behaviorData.PROPERTY_NAME : DEFAULT_VALUE;)jscode_template")
+    this._behaviorData.PROPERTY_NAME = RESOLVED_VALUE;)jscode_template")
       .FindAndReplace("PROPERTY_NAME", property.GetName())
-      .FindAndReplace("DEFAULT_VALUE", GeneratePropertyValueCode(property));
+      .FindAndReplace(
+          "RESOLVED_VALUE",
+          GeneratePropertyValueResolutionCode(
+              property, "instanceContainer.getGame()", dataValueCode));
 }
 
 gd::String BehaviorCodeGenerator::GenerateInitializeSharedPropertyFromDataCode(
     const gd::NamedPropertyDescriptor& property) {
+  const gd::String defaultValueCode =
+      GeneratePropertyValueCode(property, "instanceContainer.getGame()");
+  const gd::String dataValueCode =
+      "sharedData." + property.GetName() +
+      " !== undefined ? sharedData." + property.GetName() + " : " +
+      defaultValueCode;
   return gd::String(R"jscode_template(
-    this.PROPERTY_NAME = sharedData.PROPERTY_NAME !== undefined ? sharedData.PROPERTY_NAME : DEFAULT_VALUE;)jscode_template")
+    this.PROPERTY_NAME = RESOLVED_VALUE;)jscode_template")
       .FindAndReplace("PROPERTY_NAME", property.GetName())
-      .FindAndReplace("DEFAULT_VALUE", GeneratePropertyValueCode(property));
+      .FindAndReplace(
+          "RESOLVED_VALUE",
+          GeneratePropertyValueResolutionCode(
+              property, "instanceContainer.getGame()", dataValueCode));
 }
 
 gd::String
@@ -305,7 +344,9 @@ BehaviorCodeGenerator::GenerateInitializePropertyFromDefaultValueCode(
   return gd::String(R"jscode_template(
     this._behaviorData.PROPERTY_NAME = DEFAULT_VALUE;)jscode_template")
       .FindAndReplace("PROPERTY_NAME", property.GetName())
-      .FindAndReplace("DEFAULT_VALUE", GeneratePropertyValueCode(property));
+      .FindAndReplace("DEFAULT_VALUE",
+                      GeneratePropertyValueCode(property,
+                                                "instanceContainer.getGame()"));
 }
 
 gd::String
@@ -314,7 +355,9 @@ BehaviorCodeGenerator::GenerateInitializeSharedPropertyFromDefaultValueCode(
   return gd::String(R"jscode_template(
     this.PROPERTY_NAME = DEFAULT_VALUE;)jscode_template")
       .FindAndReplace("PROPERTY_NAME", property.GetName())
-      .FindAndReplace("DEFAULT_VALUE", GeneratePropertyValueCode(property));
+      .FindAndReplace("DEFAULT_VALUE",
+                      GeneratePropertyValueCode(property,
+                                                "instanceContainer.getGame()"));
 }
 
 gd::String BehaviorCodeGenerator::GenerateRuntimeBehaviorPropertyTemplateCode(
@@ -332,7 +375,9 @@ gd::String BehaviorCodeGenerator::GenerateRuntimeBehaviorPropertyTemplateCode(
                       GetBehaviorPropertyGetterName(property.GetName()))
       .FindAndReplace("SETTER_NAME",
                       GetBehaviorPropertySetterName(property.GetName()))
-      .FindAndReplace("DEFAULT_VALUE", GeneratePropertyValueCode(property))
+      .FindAndReplace("DEFAULT_VALUE",
+                      GeneratePropertyValueCode(property,
+                                                "this._runtimeScene.getGame()"))
       .FindAndReplace("RUNTIME_BEHAVIOR_CLASSNAME",
                       eventsBasedBehavior.GetName())
       .FindAndReplace(
@@ -376,7 +421,8 @@ BehaviorCodeGenerator::GenerateRuntimeBehaviorSharedPropertyTemplateCode(
       .FindAndReplace(
           "SETTER_NAME",
           GetBehaviorSharedPropertySetterInternalName(property.GetName()))
-      .FindAndReplace("DEFAULT_VALUE", GeneratePropertyValueCode(property))
+      .FindAndReplace("DEFAULT_VALUE",
+                      GeneratePropertyValueCode(property, "this._runtimeGame"))
       .FindAndReplace("RUNTIME_BEHAVIOR_CLASSNAME",
                       eventsBasedBehavior.GetName())
       .FindAndReplace(
@@ -395,10 +441,15 @@ BehaviorCodeGenerator::GenerateRuntimeBehaviorSharedPropertyTemplateCode(
 gd::String BehaviorCodeGenerator::GenerateUpdatePropertyFromBehaviorDataCode(
     const gd::EventsBasedBehavior& eventsBasedBehavior,
     const gd::NamedPropertyDescriptor& property) {
+  const gd::String newValueCode = GeneratePropertyValueResolutionCode(
+      property,
+      "this._runtimeScene.getGame()",
+      "behaviorOverriding." + property.GetName());
   return gd::String(R"jscode_template(
     if (behaviorOverriding.PROPERTY_NAME !== undefined)
-      this._behaviorData.PROPERTY_NAME = behaviorOverriding.PROPERTY_NAME;)jscode_template")
-      .FindAndReplace("PROPERTY_NAME", property.GetName());
+      this._behaviorData.PROPERTY_NAME = RESOLVED_NEW_VALUE;)jscode_template")
+      .FindAndReplace("PROPERTY_NAME", property.GetName())
+      .FindAndReplace("RESOLVED_NEW_VALUE", newValueCode);
 }
 
 gd::String BehaviorCodeGenerator::GenerateGetPropertyNetworkSyncDataCode(
@@ -419,13 +470,40 @@ gd::String BehaviorCodeGenerator::GenerateUpdatePropertyFromNetworkSyncDataCode(
 }
 
 gd::String BehaviorCodeGenerator::GeneratePropertyValueCode(
-    const gd::PropertyDescriptor& property) {
+    const gd::PropertyDescriptor& property,
+    const gd::String& runtimeGameExpression) {
 
   const auto &valueType =
       gd::ValueTypeMetadata::ConvertPropertyTypeToValueType(property.GetType());
   const auto &primitiveType =
       gd::ValueTypeMetadata::GetPrimitiveValueType(valueType);
+  gd::String placeholderPath;
+  const bool hasRuntimeGame = !runtimeGameExpression.empty();
+  if (hasRuntimeGame &&
+      GetExactGlobalConfigPlaceholderPath(property.GetValue(),
+                                          placeholderPath)) {
+    const gd::String placeholderPathCode =
+        EventsCodeGenerator::ConvertToStringExplicit(placeholderPath);
+    if (primitiveType == "string" || valueType == "behavior") {
+      return "gdjs.evtTools.globalConfig.getString(" + runtimeGameExpression +
+             ", " + placeholderPathCode + ")";
+    } else if (primitiveType == "number") {
+      return "gdjs.evtTools.globalConfig.getNumber(" + runtimeGameExpression +
+             ", " + placeholderPathCode + ")";
+    } else if (primitiveType == "boolean") {
+      return "gdjs.evtTools.globalConfig.getBoolean(" + runtimeGameExpression +
+             ", " + placeholderPathCode + ")";
+    }
+  }
+
   if (primitiveType == "string" || valueType == "behavior") {
+    if (hasRuntimeGame && HasGlobalConfigPlaceholder(property.GetValue())) {
+      return "gdjs.evtTools.globalConfig.resolvePlaceholders(" +
+             runtimeGameExpression + ", " +
+             EventsCodeGenerator::ConvertToStringExplicit(
+                 property.GetValue()) +
+             ")";
+    }
     return EventsCodeGenerator::ConvertToStringExplicit(property.GetValue());
   } else if (primitiveType == "number") {
     return "Number(" +
@@ -436,6 +514,29 @@ gd::String BehaviorCodeGenerator::GeneratePropertyValueCode(
   }
 
   return "0 /* Error: property was of an unrecognized type */";
+}
+
+gd::String BehaviorCodeGenerator::GeneratePropertyValueResolutionCode(
+    const gd::PropertyDescriptor& property,
+    const gd::String& runtimeGameExpression,
+    const gd::String& valueCode) {
+  const auto &valueType =
+      gd::ValueTypeMetadata::ConvertPropertyTypeToValueType(property.GetType());
+  const auto &primitiveType =
+      gd::ValueTypeMetadata::GetPrimitiveValueType(valueType);
+
+  if (primitiveType == "string" || valueType == "behavior") {
+    return "gdjs.evtTools.globalConfig.resolveString(" +
+           runtimeGameExpression + ", " + valueCode + ")";
+  } else if (primitiveType == "number") {
+    return "gdjs.evtTools.globalConfig.resolveNumber(" +
+           runtimeGameExpression + ", " + valueCode + ")";
+  } else if (primitiveType == "boolean") {
+    return "gdjs.evtTools.globalConfig.resolveBoolean(" +
+           runtimeGameExpression + ", " + valueCode + ")";
+  }
+
+  return valueCode;
 }
 
 gd::String BehaviorCodeGenerator::

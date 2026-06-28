@@ -199,6 +199,7 @@ type DialogProps = {|
   open?: boolean,
   title: React.Node,
   subtitle?: React.Node,
+  titleActions?: React.Node,
   fixedContent?: React.Node,
   actions?: Array<?React.Node>,
   secondaryActions?: Array<?React.Node>,
@@ -271,6 +272,7 @@ const DialogWithoutWindowSizeProvider = ({
   minHeight,
   title,
   subtitle,
+  titleActions,
   fixedContent,
   children,
   flexColumnBody,
@@ -496,6 +498,9 @@ const DialogWithoutWindowSizeProvider = ({
             </Line>
             <Column noMargin>
               <Line noMargin alignItems="center">
+                {titleActions && (
+                  <div style={styles.closeDialogContainer}>{titleActions}</div>
+                )}
                 {onRequestClose && !cannotBeDismissed && (
                   <div style={styles.closeDialogContainer}>
                     <IconButton

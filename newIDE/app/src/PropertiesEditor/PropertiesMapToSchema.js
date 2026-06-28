@@ -39,7 +39,8 @@ const createField = (
   defaultValue: string | null,
   layers: gdLayersContainer | null,
   object: ?gdObject,
-  showcaseNonDefaultValues: boolean
+  showcaseNonDefaultValues: boolean,
+  allowGlobalConfigPlaceholders: boolean
 ): ?Field => {
   const propertyName = property.getLabel();
   const getLabel = (instance: Instance) => {
@@ -108,6 +109,36 @@ const createField = (
 
   const valueType = property.getType().toLowerCase();
   if (valueType === 'number') {
+    if (allowGlobalConfigPlaceholders) {
+      const getRawValue = (instance: Instance): string =>
+        getStringValue(instance, name);
+      const setValue = (instance: Instance, newValue: number) => {
+        setNumberValue(instance, name, newValue);
+      };
+      const setRawValue = (instance: Instance, newValue: string) => {
+        setStringValue(instance, name, newValue);
+      };
+      return {
+        name,
+        valueType,
+        getValue: getValueForNumber,
+        setValue,
+        getRawValue,
+        setRawValue,
+        defaultValue,
+        getLabel,
+        getDescription,
+        hasImpactOnAllOtherFields: property.hasImpactOnOtherProperties(),
+        canBeUnlimitedUsingMinus1: property
+          .getExtraInfo()
+          .toJSArray()
+          .includes('canBeUnlimitedUsingMinus1'),
+        getEndAdornment,
+        visibility,
+        isHighlighted: isHighlightedForString,
+        allowGlobalConfigPlaceholder: true,
+      };
+    }
     const getEndAdornmentIcon =
       defaultValueNumber !== null
         ? (instance: gdInitialInstance) => {
@@ -158,6 +189,8 @@ const createField = (
       hasImpactOnAllOtherFields: property.hasImpactOnOtherProperties(),
       visibility,
       isHighlighted: isHighlightedForString,
+      allowGlobalConfigPlaceholder: allowGlobalConfigPlaceholders,
+      forbidGlobalConfigPlaceholder: !allowGlobalConfigPlaceholders,
     };
   } else if (valueType === 'boolean') {
     const defaultValueBoolean = defaultValue ? defaultValue === 'true' : null;
@@ -522,6 +555,7 @@ type CommonProps = {|
   visibility?: 'All' | 'Basic' | 'Advanced' | 'Deprecated' | 'Basic-Quick',
   quickCustomizationVisibilities?: gdQuickCustomizationVisibilitiesContainer,
   showcaseNonDefaultValues?: boolean,
+  allowGlobalConfigPlaceholders?: boolean,
 |};
 
 export const effectPropertiesMapToSchema = ({
@@ -530,6 +564,7 @@ export const effectPropertiesMapToSchema = ({
   visibility = 'All',
   quickCustomizationVisibilities,
   showcaseNonDefaultValues,
+  allowGlobalConfigPlaceholders,
 }: {
   ...CommonProps,
   defaultValueProperties: gdMapStringPropertyDescriptor,
@@ -542,6 +577,7 @@ export const effectPropertiesMapToSchema = ({
     visibility,
     quickCustomizationVisibilities,
     showcaseNonDefaultValues,
+    allowGlobalConfigPlaceholders,
     getNumberValue: (instance: Instance, propertyName: string): number =>
       instance.hasDoubleParameter(propertyName)
         ? instance.getDoubleParameter(propertyName)
@@ -593,6 +629,7 @@ const propertiesMapToSchema = ({
   visibility = 'All',
   quickCustomizationVisibilities,
   showcaseNonDefaultValues,
+  allowGlobalConfigPlaceholders,
 }: {
   ...CommonProps,
   getPropertyValue: (instance: Instance, propertyName: string) => string,
@@ -612,6 +649,7 @@ const propertiesMapToSchema = ({
     visibility,
     quickCustomizationVisibilities,
     showcaseNonDefaultValues,
+    allowGlobalConfigPlaceholders,
     getNumberValue: (instance: Instance, propertyName: string): number => {
       // Consider a missing value as 0 to avoid propagating NaN.
       return parseFloat(getPropertyValue(instance, propertyName)) || 0;
@@ -642,6 +680,7 @@ const adaptablePropertiesMapToSchema = ({
   visibility = 'All',
   quickCustomizationVisibilities,
   showcaseNonDefaultValues,
+  allowGlobalConfigPlaceholders = false,
   getNumberValue,
   getStringValue,
   getBooleanValue,
@@ -776,7 +815,8 @@ const adaptablePropertiesMapToSchema = ({
               rowPropertyDefaultValue,
               layersContainer,
               object,
-              !!showcaseNonDefaultValues
+              !!showcaseNonDefaultValues,
+              allowGlobalConfigPlaceholders
             );
 
             if (field) {
@@ -815,7 +855,8 @@ const adaptablePropertiesMapToSchema = ({
           : null,
         layersContainer,
         object,
-        !!showcaseNonDefaultValues
+        !!showcaseNonDefaultValues,
+        allowGlobalConfigPlaceholders
       );
     }
     if (field) {

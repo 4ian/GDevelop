@@ -7,6 +7,7 @@ import Snackbar from '@material-ui/core/Snackbar';
 import HomeIcon from '../UI/CustomSvgIcons/Home';
 import DebuggerIcon from '../UI/CustomSvgIcons/Debug';
 import ProjectResourcesIcon from '../UI/CustomSvgIcons/ProjectResources';
+import GlobalConfigIcon from '../UI/CustomSvgIcons/GlobalConfig';
 import SceneIcon from '../UI/CustomSvgIcons/Scene';
 import EventsIcon from '../UI/CustomSvgIcons/Events';
 import ExternalEventsIcon from '../UI/CustomSvgIcons/ExternalEvents';
@@ -81,6 +82,7 @@ import { renderAskAiEditorContainer } from '../AiGeneration/AskAiEditorContainer
 import { createMcpEditorBridge } from '../Mcp/McpEditorBridge';
 import { type EditorCallbacks } from '../EditorFunctions';
 import { renderResourcesEditorContainer } from './EditorContainers/ResourcesEditorContainer';
+import { renderGlobalConfigEditorContainer } from './EditorContainers/GlobalConfigEditorContainer';
 import { renderGlobalEventsSearchEditorContainer } from './EditorContainers/GlobalEventsSearchEditorContainer';
 import {
   type RenderEditorContainerPropsWithRef,
@@ -291,6 +293,7 @@ const editorKindToRenderer: {
   'custom object': renderCustomObjectEditorContainer,
   'start page': renderHomePageContainer,
   resources: renderResourcesEditorContainer,
+  'global-config': renderGlobalConfigEditorContainer,
   'global-search': renderGlobalEventsSearchEditorContainer,
   'ask-ai': renderAskAiEditorContainer,
 };
@@ -821,6 +824,8 @@ const MainFrame = (props: Props): React.MixedElement => {
       const label =
         kind === 'resources'
           ? i18n._(t`Resources`)
+          : kind === 'global-config'
+          ? i18n._(t`Global config`)
           : kind === 'global-search'
           ? i18n._(t`Global search`)
           : kind === 'ask-ai'
@@ -886,6 +891,8 @@ const MainFrame = (props: Props): React.MixedElement => {
           <DebuggerIcon />
         ) : kind === 'resources' ? (
           <ProjectResourcesIcon />
+        ) : kind === 'global-config' ? (
+          <GlobalConfigIcon />
         ) : kind === 'global-search' ? (
           <SearchIcon />
         ) : kind === 'layout' ? (
@@ -3460,6 +3467,23 @@ const MainFrame = (props: Props): React.MixedElement => {
             getEditorOpeningOptions({ kind: 'resources', name: '' })
           ),
           'resources'
+        ),
+      }));
+    },
+    [getEditorOpeningOptions, setState]
+  );
+
+  const openGlobalConfig = React.useCallback(
+    () => {
+      setState(state => ({
+        ...state,
+        editorTabs: popOutTab(
+          openEditorTab(
+            state.editorTabs,
+            // $FlowFixMe[incompatible-type]
+            getEditorOpeningOptions({ kind: 'global-config', name: '' })
+          ),
+          'global-config'
         ),
       }));
     },
@@ -6403,6 +6427,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       onRenameEventsFunctionsExtension={renameEventsFunctionsExtension}
       onRenameExternalEvents={renameExternalEvents}
       onOpenResources={openResources}
+      onOpenGlobalConfig={openGlobalConfig}
       onReloadEventsFunctionsExtensions={onReloadEventsFunctionsExtensions}
       onWillInstallExtension={onWillInstallExtension}
       onExtensionInstalled={onExtensionInstalled}

@@ -191,6 +191,7 @@ namespace gdjs {
   export class RuntimeGame {
     _resourcesLoader: gdjs.ResourceLoader;
     _variables: VariablesContainer;
+    _globalConfig: GlobalConfigData;
     _variablesByExtensionName: Map<string, gdjs.VariablesContainer>;
     _data: ProjectData;
     _sceneAndExtensionsData: Array<SceneAndExtensionsData> = [];
@@ -291,6 +292,9 @@ namespace gdjs {
         this._options.initialRuntimeGameStatus?.isInGameEdition || false;
 
       this._variables = new gdjs.VariablesContainer(data.variables);
+      this._globalConfig = data.globalConfig || {};
+      this._data = data;
+      this._data.globalConfig = this._globalConfig;
       this._variablesByExtensionName = new Map<
         string,
         gdjs.VariablesContainer
@@ -304,7 +308,6 @@ namespace gdjs {
         }
       }
       this._eventsBasedObjectDatas = new Map<String, EventsBasedObjectData>();
-      this._data = data;
       this._updateSceneAndExtensionsData();
       gdjs.Variable.useDeprecatedZeroAsDefaultStringVariable =
         !!data.properties.useDeprecatedZeroAsDefaultStringVariable;
@@ -381,6 +384,8 @@ namespace gdjs {
         this._inGameEditor.onProjectDataChange(projectData);
       }
       this._data = projectData;
+      this._globalConfig = projectData.globalConfig || {};
+      this._data.globalConfig = this._globalConfig;
       this._updateEmbeddedResourcesMappings();
       this._updateSceneAndExtensionsData();
       this._resourcesLoader.setResources(
@@ -563,6 +568,21 @@ namespace gdjs {
      */
     getGameData(): ProjectData {
       return this._data;
+    }
+
+    /**
+     * Get the project-wide global configuration.
+     */
+    getGlobalConfig(): GlobalConfigData {
+      return this._globalConfig;
+    }
+
+    /**
+     * Replace the project-wide global configuration.
+     */
+    setGlobalConfig(globalConfig: GlobalConfigData): void {
+      this._globalConfig = globalConfig || {};
+      this._data.globalConfig = this._globalConfig;
     }
 
     getEventsBasedObjectData(type: string): EventsBasedObjectData | null {

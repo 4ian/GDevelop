@@ -25,6 +25,8 @@ export type ValueFieldCommonProperties = {|
   onEditButtonClick?: () => void,
   getValueFromDisplayedValue?: string => string,
   getDisplayedValueFromValue?: string => string,
+  allowGlobalConfigPlaceholder?: boolean,
+  forbidGlobalConfigPlaceholder?: boolean,
   visibility?: FieldVisibility | null,
   defaultValue?: string | number | boolean | null,
 |};
@@ -41,6 +43,8 @@ export type PrimitiveValueField =
       valueType: 'number',
       getValue: Instance => number | null,
       setValue: (instance: Instance, newValue: number) => void,
+      getRawValue?: Instance => string,
+      setRawValue?: (instance: Instance, newValue: string) => void,
       getChoices?: ?() => Array<FieldChoices>,
       /** Only supported on non compact property editors. */
       getEndAdornment?: Instance => {|

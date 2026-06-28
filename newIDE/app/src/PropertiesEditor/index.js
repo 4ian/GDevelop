@@ -79,6 +79,54 @@ const styles = {
   },
 };
 
+const globalConfigPlaceholderExample = '{{cards.sunflower.price}}';
+
+const hasGlobalConfigPlaceholderSyntax = (value: any): boolean =>
+  typeof value === 'string' &&
+  (value.indexOf('{{') !== -1 || value.indexOf('}}') !== -1);
+
+const isExactGlobalConfigPlaceholder = (value: string): boolean =>
+  /^\s*\{\{\s*[^{}]+\s*\}\}\s*$/.test(value);
+
+const isValidNumberOrGlobalConfigPlaceholder = (value: string): boolean => {
+  if (isExactGlobalConfigPlaceholder(value)) return true;
+  if (hasGlobalConfigPlaceholderSyntax(value)) return false;
+
+  const numberValue = parseFloat(value);
+  return !isNaN(numberValue);
+};
+
+const getGlobalConfigPlaceholderErrorText = (
+  field: ValueField,
+  value: any
+): React.Node => {
+  const valueAsString = value == null ? '' : '' + value;
+  if (!hasGlobalConfigPlaceholderSyntax(valueAsString)) return null;
+
+  if (field.forbidGlobalConfigPlaceholder) {
+    return (
+      <Trans>
+        Global config placeholders can only be edited from the object editor
+        window.
+      </Trans>
+    );
+  }
+
+  if (
+    field.valueType === 'number' &&
+    !isExactGlobalConfigPlaceholder(valueAsString)
+  ) {
+    return (
+      <Trans>
+        Use a whole placeholder for number properties, for example{' '}
+        {globalConfigPlaceholderExample}.
+      </Trans>
+    );
+  }
+
+  return null;
+};
+
 const getDisabled = ({
   instances,
   field,
@@ -257,17 +305,38 @@ const PropertiesEditor = ({
           />
         );
       } else if (field.valueType === 'number') {
-        const { setValue, getEndAdornment } = field;
+        const { setValue, getEndAdornment, getRawValue, setRawValue } = field;
         const endAdornment = getEndAdornment && getEndAdornment(instances[0]);
+        const allowGlobalConfigPlaceholder = !!field.allowGlobalConfigPlaceholder;
+        const value =
+          allowGlobalConfigPlaceholder && getRawValue
+            ? getRawValue(instances[0])
+            : getFieldValue({ instances, field });
         return (
           <SemiControlledTextField
-            value={getFieldValue({ instances, field })}
+            value={'' + value}
             key={field.name}
             id={field.name}
             floatingLabelText={getFieldLabel({ instances, field })}
             floatingLabelFixed
             helperMarkdownText={getFieldDescription(field)}
+            hintText={
+              allowGlobalConfigPlaceholder
+                ? globalConfigPlaceholderExample
+                : undefined
+            }
+            errorText={getGlobalConfigPlaceholderErrorText(field, value)}
             onChange={newValue => {
+              if (allowGlobalConfigPlaceholder) {
+                if (!setRawValue) return;
+                if (!isValidNumberOrGlobalConfigPlaceholder(newValue)) return;
+
+                instances.forEach(i => setRawValue(i, newValue));
+                _onInstancesModified(instances);
+                return;
+              }
+              if (hasGlobalConfigPlaceholderSyntax(newValue)) return;
+
               const newNumberValue = parseFloat(newValue);
               // If the value is not a number, the user is probably still typing, adding a dot or a comma.
               // So don't update the value, it will be reverted if they leave the field.
@@ -275,7 +344,7 @@ const PropertiesEditor = ({
               instances.forEach(i => setValue(i, newNumberValue));
               _onInstancesModified(instances);
             }}
-            type="number"
+            type={allowGlobalConfigPlaceholder ? 'text' : 'number'}
             style={styles.field}
             disabled={getDisabled({ instances, field })}
             endAdornment={
@@ -347,7 +416,26 @@ const PropertiesEditor = ({
                 floatingLabelText={getFieldLabel({ instances, field })}
                 floatingLabelFixed
                 helperMarkdownText={getFieldDescription(field)}
+                hintText={
+                  field.allowGlobalConfigPlaceholder
+                    ? globalConfigPlaceholderExample
+                    : undefined
+                }
+                errorText={getGlobalConfigPlaceholderErrorText(
+                  field,
+                  getFieldValue({
+                    instances,
+                    field,
+                    mixedValueFallback: '(Multiple values)',
+                  })
+                )}
                 onChange={newValue => {
+                  if (
+                    field.forbidGlobalConfigPlaceholder &&
+                    hasGlobalConfigPlaceholderSyntax(newValue)
+                  ) {
+                    return;
+                  }
                   instances.forEach(i => setValue(i, newValue || ''));
                   _onInstancesModified(instances);
                 }}

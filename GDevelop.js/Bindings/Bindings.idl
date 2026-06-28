@@ -690,6 +690,8 @@ interface Project {
     void EnsureObjectInheritedBehaviors([Ref] gdObject objectToUpdate);
 
     [Ref] VariablesContainer GetVariables();
+    void SetGlobalConfigJson([Const] DOMString globalConfigJson);
+    [Const, Ref] DOMString GetGlobalConfigJson();
     [Ref] ObjectsContainer GetObjects();
     [Ref] ResourcesContainer GetResourcesManager();
 

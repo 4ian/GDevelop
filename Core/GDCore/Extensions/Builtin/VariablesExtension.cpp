@@ -25,6 +25,141 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
       .SetExtensionHelpPath("/all-features/variables");
   extension.AddInstructionOrExpressionGroupMetadata(_("Variables"))
       .SetIcon("res/conditions/var24.png");
+  extension.AddInstructionOrExpressionGroupMetadata(_("Global configuration"))
+      .SetIcon("res/conditions/var24.png");
+
+  extension
+      .AddCondition("GlobalConfigExists",
+                    _("Config value exists"),
+                    _("Check if a global config value exists."),
+                    _("Global config value _PARAM0_ exists"),
+                    _("Global configuration"),
+                    "res/conditions/var24.png",
+                    "res/conditions/var.png")
+      .AddParameter("globalConfigPath", _("Config path"));
+
+  extension
+      .AddCondition("GlobalConfigNumber",
+                    _("Config number"),
+                    _("Compare the number value of a global config entry."),
+                    _("Global config number _PARAM0_"),
+                    _("Global configuration"),
+                    "res/conditions/var24.png",
+                    "res/conditions/var.png")
+      .AddParameter("globalConfigPath", _("Config path"))
+      .UseStandardRelationalOperatorParameters(
+          "number", ParameterOptions::MakeNewOptions());
+
+  extension
+      .AddCondition("GlobalConfigString",
+                    _("Config text"),
+                    _("Compare the text value of a global config entry."),
+                    _("Global config text _PARAM0_"),
+                    _("Global configuration"),
+                    "res/conditions/var24.png",
+                    "res/conditions/var.png")
+      .AddParameter("globalConfigPath", _("Config path"))
+      .UseStandardRelationalOperatorParameters(
+          "string", ParameterOptions::MakeNewOptions());
+
+  extension
+      .AddCondition("GlobalConfigBoolean",
+                    _("Config boolean"),
+                    _("Compare the boolean value of a global config entry."),
+                    _("Global config boolean _PARAM0_ is _PARAM1_"),
+                    _("Global configuration"),
+                    "res/conditions/var24.png",
+                    "res/conditions/var.png")
+      .AddParameter("globalConfigPath", _("Config path"))
+      .AddParameter("trueorfalse", _("Check if the value is"))
+      .SetDefaultValue("true");
+
+  extension
+      .AddAction("SetGlobalConfigNumber",
+                 _("Change config number"),
+                 _("Modify the number value of a global config entry."),
+                 _("Change global config number _PARAM0_"),
+                 _("Global configuration"),
+                 "res/actions/var24.png",
+                 "res/actions/var.png")
+      .AddParameter("globalConfigPath", _("Config path"))
+      .UseStandardOperatorParameters("number",
+                                     ParameterOptions::MakeNewOptions());
+
+  extension
+      .AddAction("SetGlobalConfigString",
+                 _("Change config text"),
+                 _("Modify the text value of a global config entry."),
+                 _("Change global config text _PARAM0_"),
+                 _("Global configuration"),
+                 "res/actions/var24.png",
+                 "res/actions/var.png")
+      .AddParameter("globalConfigPath", _("Config path"))
+      .UseStandardOperatorParameters("string",
+                                     ParameterOptions::MakeNewOptions());
+
+  extension
+      .AddAction("SetGlobalConfigBoolean",
+                 _("Change config boolean"),
+                 _("Modify the boolean value of a global config entry."),
+                 _("Set global config boolean _PARAM0_ to _PARAM1_"),
+                 _("Global configuration"),
+                 "res/actions/var24.png",
+                 "res/actions/var.png")
+      .AddParameter("globalConfigPath", _("Config path"))
+      .AddParameter("trueorfalse", _("New value"))
+      .SetDefaultValue("true");
+
+  extension
+      .AddAction("RemoveGlobalConfigValue",
+                 _("Remove config value"),
+                 _("Remove a global config value."),
+                 _("Remove global config value _PARAM0_"),
+                 _("Global configuration"),
+                 "res/actions/var24.png",
+                 "res/actions/var.png")
+      .AddParameter("globalConfigPath", _("Config path"));
+
+  extension
+      .AddExpression("ConfigNumber",
+                     _("Config number"),
+                     _("Get a global config value as a number."),
+                     _("Global configuration"),
+                     "res/actions/var.png")
+      .AddParameter("string", _("Config path"));
+
+  extension
+      .AddStrExpression("ConfigString",
+                        _("Config text"),
+                        _("Get a global config value as text."),
+                        _("Global configuration"),
+                        "res/actions/var.png")
+      .AddParameter("string", _("Config path"));
+
+  extension
+      .AddExpression("ConfigBool",
+                     _("Config boolean"),
+                     _("Get a global config value as a boolean, returning 1 "
+                       "for true and 0 for false."),
+                     _("Global configuration"),
+                     "res/actions/var.png")
+      .AddParameter("string", _("Config path"));
+
+  extension
+      .AddExpression("ConfigChildCount",
+                     _("Config child count"),
+                     _("Get the number of children in a global config value."),
+                     _("Global configuration"),
+                     "res/actions/var.png")
+      .AddParameter("string", _("Config path"));
+
+  extension
+      .AddStrExpression("ConfigToJSON",
+                        _("Config JSON"),
+                        _("Get a global config value as JSON text."),
+                        _("Global configuration"),
+                        "res/actions/var.png")
+      .AddParameter("string", _("Config path"));
 
   extension
       .AddCondition("NumberVariable",

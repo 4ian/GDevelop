@@ -38,7 +38,15 @@ const projectHasItem = ({
   kind: EditorKind,
   name: string,
 |}) => {
-  if (['debugger', 'start page', 'resources', 'global-search'].includes(kind))
+  if (
+    [
+      'debugger',
+      'start page',
+      'resources',
+      'global-config',
+      'global-search',
+    ].includes(kind)
+  )
     return true;
   switch (kind) {
     case 'events functions extension':
@@ -127,7 +135,10 @@ const useEditorTabsStateSaving = ({
         currentTab: editorTabs.panes.center.currentTab,
         editors: editorTabs.panes.center.editors
           .filter(
-            editor => editor.key !== 'start page' && editor.kind !== 'resources'
+            editor =>
+              editor.key !== 'start page' &&
+              editor.kind !== 'resources' &&
+              editor.kind !== 'global-config'
           )
           .map(editor => ({
             projectItemName: editor.projectItemName,
@@ -184,6 +195,7 @@ const useEditorTabsStateSaving = ({
 
       const editorsOpeningOptions = editorState.editorTabs.editors
         .filter(editorMetadata => editorMetadata.editorKind !== 'resources')
+        .filter(editorMetadata => editorMetadata.editorKind !== 'global-config')
         .map(editorMetadata => {
           if (
             projectHasItem({

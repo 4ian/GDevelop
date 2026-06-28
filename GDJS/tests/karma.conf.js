@@ -1,4 +1,4 @@
-module.exports = function (config) {
+module.exports = function(config) {
   const testFiles = [
     './Extensions/**/tests/**.spec.js',
     './GDJS/tests/tests/**/*.js',
@@ -96,6 +96,7 @@ module.exports = function (config) {
       './newIDE/app/resources/GDJS/Runtime/CustomRuntimeObject2D.js',
       './newIDE/app/resources/GDJS/Runtime/CustomRuntimeObjectInstanceContainer.js',
       './newIDE/app/resources/GDJS/Runtime/events-tools/commontools.js',
+      './newIDE/app/resources/GDJS/Runtime/events-tools/globalconfigtools.js',
       './newIDE/app/resources/GDJS/Runtime/events-tools/runtimescenetools.js',
       './newIDE/app/resources/GDJS/Runtime/events-tools/inputtools.js',
       './newIDE/app/resources/GDJS/Runtime/events-tools/networktools.js',

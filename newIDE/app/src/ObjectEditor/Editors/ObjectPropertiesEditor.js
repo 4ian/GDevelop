@@ -51,6 +51,9 @@ const ObjectPropertiesEditor = (props: Props): React.Node => {
     onUpdateProperty: (object, name, value) =>
       object.updateProperty(name, value),
     layersContainer: null,
+    allowGlobalConfigPlaceholders: project.hasEventsBasedObject(
+      objectConfigurationAsGd.getType()
+    ),
   });
 
   const extraInformation = getExtraObjectsInformation()[

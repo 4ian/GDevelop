@@ -137,6 +137,7 @@ const gameExtensionsItemId = getProjectManagerItemId('game-extensions');
 const gameShareItemId = getProjectManagerItemId('game-share');
 const globalsRootFolderId = getProjectManagerItemId('globals');
 const globalVariablesItemId = getProjectManagerItemId('global-variables');
+const globalConfigItemId = getProjectManagerItemId('global-config');
 const globalObjectsItemId = getProjectManagerItemId('global-objects');
 export const scenesRootFolderId: string = getProjectManagerItemId('scenes');
 export const customObjectsRootFolderId: string = getProjectManagerItemId(
@@ -188,6 +189,8 @@ export const getProjectManagerTreeViewItemIdForEditorTab = (
   switch (editorKind) {
     case 'resources':
       return gameResourcesItemId;
+    case 'global-config':
+      return globalConfigItemId;
     case 'layout':
       return projectItemName && project.hasLayoutNamed(projectItemName)
         ? getSceneTreeViewItemId(project.getLayout(projectItemName))
@@ -679,6 +682,7 @@ type Props = {|
   ...BehaviorShortcutTreeViewItemCallbacks,
   ...FunctionShortcutTreeViewItemCallbacks,
   onOpenResources: () => void,
+  onOpenGlobalConfig: () => void,
   openBehaviorEvents: (extensionName: string, behaviorName: string) => void,
   onOpenEventBasedObjectEditor: (
     extensionName: string,
@@ -758,6 +762,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       onEventsBasedObjectChildrenEdited,
       onEventBasedObjectTypeChanged,
       onOpenResources,
+      onOpenGlobalConfig,
       onReloadEventsFunctionsExtensions,
       isOpen,
       hotReloadPreviewButtonProps,
@@ -1667,6 +1672,14 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                   return [
                     new LeafTreeViewItem(
                       new ActionTreeViewItemContent(
+                        globalConfigItemId,
+                        i18n._(t`Global config`),
+                        onOpenGlobalConfig,
+                        'res/icons_default/global_config24_black.svg'
+                      )
+                    ),
+                    new LeafTreeViewItem(
+                      new ActionTreeViewItemContent(
                         globalVariablesItemId,
                         i18n._(t`Global variables`),
                         openProjectVariables,
@@ -1989,6 +2002,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         externalEventsTreeViewItemProps,
         externalLayoutTreeViewItemProps,
         functionShortcutTreeViewItemProps,
+        onOpenGlobalConfig,
         onOpenResources,
         onShareProject,
         openCreateExternalDialog,

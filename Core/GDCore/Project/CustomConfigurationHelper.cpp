@@ -18,6 +18,16 @@
 using namespace gd;
 
 namespace {
+bool IsExactGlobalConfigPlaceholderValue(const gd::String &value) {
+  gd::String trimmedValue = value;
+  trimmedValue = trimmedValue.Trim();
+  if (trimmedValue.length() < 5) return false;
+  if (trimmedValue.substr(0, 2) != "{{") return false;
+  if (trimmedValue.substr(trimmedValue.length() - 2) != "}}") return false;
+
+  return !trimmedValue.substr(2, trimmedValue.length() - 4).Trim().empty();
+}
+
 double GetNumberPropertyValue(const gd::String &value) {
   return value.empty() ? 0.0 : value.To<double>();
 }
@@ -41,9 +51,17 @@ void CustomConfigurationHelper::InitializeContent(
     if (primitiveType == "string" || valueType == "behavior") {
       element.SetStringValue(property->GetValue());
     } else if (primitiveType == "number") {
-      element.SetDoubleValue(GetNumberPropertyValue(property->GetValue()));
+      if (IsExactGlobalConfigPlaceholderValue(property->GetValue())) {
+        element.SetStringValue(property->GetValue());
+      } else {
+        element.SetDoubleValue(GetNumberPropertyValue(property->GetValue()));
+      }
     } else if (primitiveType == "boolean") {
-      element.SetBoolValue(GetBooleanPropertyValue(property->GetValue()));
+      if (IsExactGlobalConfigPlaceholderValue(property->GetValue())) {
+        element.SetStringValue(property->GetValue());
+      } else {
+        element.SetBoolValue(GetBooleanPropertyValue(property->GetValue()));
+      }
     }
   }
 }
@@ -67,17 +85,17 @@ std::map<gd::String, gd::PropertyDescriptor> CustomConfigurationHelper::GetPrope
     const auto &primitiveType =
         gd::ValueTypeMetadata::GetPrimitiveValueType(valueType);
     if (configurationContent.HasChild(propertyName)) {
+      auto &child = configurationContent.GetChild(propertyName);
       if (primitiveType == "string" || valueType == "behavior") {
-        newProperty.SetValue(
-            configurationContent.GetChild(propertyName).GetStringValue());
+        newProperty.SetValue(child.GetStringValue());
       } else if (primitiveType == "number") {
-        newProperty.SetValue(gd::String::From(
-            configurationContent.GetChild(propertyName).GetDoubleValue()));
+        newProperty.SetValue(child.GetValue().IsString()
+                                 ? child.GetStringValue()
+                                 : gd::String::From(child.GetDoubleValue()));
       } else if (primitiveType == "boolean") {
-        newProperty.SetValue(
-            configurationContent.GetChild(propertyName).GetBoolValue()
-                ? "true"
-                : "false");
+        newProperty.SetValue(child.GetValue().IsString()
+                                 ? child.GetStringValue()
+                                 : child.GetBoolValue() ? "true" : "false");
       }
     } else {
       // No value was serialized for this property. `newProperty`
@@ -107,9 +125,17 @@ bool CustomConfigurationHelper::UpdateProperty(
   if (primitiveType == "string" || valueType == "behavior") {
     element.SetStringValue(newValue);
   } else if (primitiveType == "number") {
-    element.SetDoubleValue(GetNumberPropertyValue(newValue));
+    if (IsExactGlobalConfigPlaceholderValue(newValue)) {
+      element.SetStringValue(newValue);
+    } else {
+      element.SetDoubleValue(GetNumberPropertyValue(newValue));
+    }
   } else if (primitiveType == "boolean") {
-    element.SetBoolValue(GetBooleanPropertyValue(newValue));
+    if (IsExactGlobalConfigPlaceholderValue(newValue)) {
+      element.SetStringValue(newValue);
+    } else {
+      element.SetBoolValue(GetBooleanPropertyValue(newValue));
+    }
   }
 
   return true;

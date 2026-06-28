@@ -25,6 +25,7 @@ import useDismissableTutorialMessage from '../Hints/useDismissableTutorialMessag
 import useAlertDialog from '../UI/Alert/useAlertDialog';
 import ErrorBoundary from '../UI/ErrorBoundary';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
+import AlertMessage from '../UI/AlertMessage';
 
 const gd: libGDevelop = global.gd;
 
@@ -179,6 +180,17 @@ const InnerDialog = (props: InnerDialogProps) => {
     project.getCurrentPlatform(),
     object.getType()
   );
+  const hasEventBasedObjectProperties = project.hasEventsBasedObject(
+    object.getType()
+  );
+  const hasEventBasedBehaviorProperties = object
+    .getAllBehaviorNames()
+    .toJSArray()
+    .some(behaviorName =>
+      project.hasEventsBasedBehavior(
+        object.getBehavior(behaviorName).getTypeName()
+      )
+    );
 
   const EditorComponent: ?React.ComponentType<EditorProps> =
     props.editorComponent;
@@ -226,6 +238,20 @@ const InnerDialog = (props: InnerDialogProps) => {
 
   const { DismissableTutorialMessage } = useDismissableTutorialMessage(
     'intro-variables'
+  );
+
+  const renderGlobalConfigPlaceholderHint = () => (
+    <Line>
+      <Column noMargin expand>
+        <AlertMessage kind="info">
+          <Trans>
+            Global config placeholders are only supported in this object editor
+            window. Use {'{{cards.sunflower.price}}'} in text or number property
+            values. In events, use the Config expressions instead.
+          </Trans>
+        </AlertMessage>
+      </Column>
+    </Line>
   );
 
   React.useEffect(
@@ -330,6 +356,9 @@ const InnerDialog = (props: InnerDialogProps) => {
             true /* Ensure editors with large/scrolling children won't grow outside of the dialog. */
           }
         >
+          {hasEventBasedObjectProperties
+            ? renderGlobalConfigPlaceholderHint()
+            : null}
           <EditorComponent
             objectConfiguration={object.getConfiguration()}
             project={project}
@@ -371,24 +400,29 @@ const InnerDialog = (props: InnerDialogProps) => {
         </Column>
       ) : null}
       {currentTab === 'behaviors' && (
-        <BehaviorsEditor
-          object={object}
-          isChildObject={!!eventsBasedObject}
-          project={project}
-          eventsFunctionsExtension={eventsFunctionsExtension}
-          layersContainer={layersContainer}
-          resourceManagementProps={_resourceManagementProps}
-          projectScopedContainersAccessor={projectScopedContainersAccessor}
-          onSizeUpdated={
-            forceUpdate /*Force update to ensure dialog is properly positioned*/
-          }
-          onUpdateBehaviorsSharedData={onUpdateBehaviorsSharedData}
-          onBehaviorsUpdated={notifyOfChange}
-          openBehaviorEvents={askConfirmationAndOpenBehaviorEvents}
-          onWillInstallExtension={onWillInstallExtension}
-          onExtensionInstalled={onExtensionInstalled}
-          isListLocked={isBehaviorListLocked}
-        />
+        <Column noMargin expand useFullHeight noOverflowParent>
+          {hasEventBasedBehaviorProperties
+            ? renderGlobalConfigPlaceholderHint()
+            : null}
+          <BehaviorsEditor
+            object={object}
+            isChildObject={!!eventsBasedObject}
+            project={project}
+            eventsFunctionsExtension={eventsFunctionsExtension}
+            layersContainer={layersContainer}
+            resourceManagementProps={_resourceManagementProps}
+            projectScopedContainersAccessor={projectScopedContainersAccessor}
+            onSizeUpdated={
+              forceUpdate /*Force update to ensure dialog is properly positioned*/
+            }
+            onUpdateBehaviorsSharedData={onUpdateBehaviorsSharedData}
+            onBehaviorsUpdated={notifyOfChange}
+            openBehaviorEvents={askConfirmationAndOpenBehaviorEvents}
+            onWillInstallExtension={onWillInstallExtension}
+            onExtensionInstalled={onExtensionInstalled}
+            isListLocked={isBehaviorListLocked}
+          />
+        </Column>
       )}
       {currentTab === 'variables' && (
         <Column expand noMargin>

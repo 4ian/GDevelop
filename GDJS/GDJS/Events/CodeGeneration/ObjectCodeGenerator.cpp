@@ -11,6 +11,25 @@
 
 namespace gdjs {
 
+namespace {
+bool GetExactGlobalConfigPlaceholderPath(const gd::String& value,
+                                         gd::String& path) {
+  gd::String trimmedValue = value;
+  trimmedValue = trimmedValue.Trim();
+  if (trimmedValue.length() < 5) return false;
+  if (trimmedValue.substr(0, 2) != "{{") return false;
+  if (trimmedValue.substr(trimmedValue.length() - 2) != "}}") return false;
+
+  path = trimmedValue.substr(2, trimmedValue.length() - 4).Trim();
+  return !path.empty();
+}
+
+bool HasGlobalConfigPlaceholder(const gd::String& value) {
+  return value.find("{{") != std::string::npos &&
+         value.find("}}") != std::string::npos;
+}
+}  // namespace
+
 gd::String ObjectCodeGenerator::onCreatedFunctionName =
     "onCreated";
 
@@ -266,10 +285,19 @@ gdjs.registerObject("EXTENSION_NAME::OBJECT_NAME", CODE_NAMESPACE.RUNTIME_OBJECT
 // TODO these 2 methods are probably not needed if the properties are merged by GDJS.
 gd::String ObjectCodeGenerator::GenerateInitializePropertyFromDataCode(
     const gd::NamedPropertyDescriptor& property) {
+  const gd::String defaultValueCode =
+      GeneratePropertyValueCode(property, "parentInstanceContainer.getGame()");
+  const gd::String dataValueCode =
+      "objectData.content." + property.GetName() +
+      " !== undefined ? objectData.content." + property.GetName() + " : " +
+      defaultValueCode;
   return gd::String(R"jscode_template(
-    this._objectData.PROPERTY_NAME = objectData.content.PROPERTY_NAME !== undefined ? objectData.content.PROPERTY_NAME : DEFAULT_VALUE;)jscode_template")
+    this._objectData.PROPERTY_NAME = RESOLVED_VALUE;)jscode_template")
       .FindAndReplace("PROPERTY_NAME", property.GetName())
-      .FindAndReplace("DEFAULT_VALUE", GeneratePropertyValueCode(property));
+      .FindAndReplace(
+          "RESOLVED_VALUE",
+          GeneratePropertyValueResolutionCode(
+              property, "parentInstanceContainer.getGame()", dataValueCode));
 }
 gd::String
 ObjectCodeGenerator::GenerateInitializePropertyFromDefaultValueCode(
@@ -277,7 +305,9 @@ ObjectCodeGenerator::GenerateInitializePropertyFromDefaultValueCode(
   return gd::String(R"jscode_template(
     this._objectData.PROPERTY_NAME = DEFAULT_VALUE;)jscode_template")
       .FindAndReplace("PROPERTY_NAME", property.GetName())
-      .FindAndReplace("DEFAULT_VALUE", GeneratePropertyValueCode(property));
+      .FindAndReplace(
+          "DEFAULT_VALUE",
+          GeneratePropertyValueCode(property, "parentInstanceContainer.getGame()"));
 }
 
 gd::String ObjectCodeGenerator::GenerateRuntimeObjectPropertyTemplateCode(
@@ -295,7 +325,9 @@ gd::String ObjectCodeGenerator::GenerateRuntimeObjectPropertyTemplateCode(
                       GetObjectPropertyGetterName(property.GetName()))
       .FindAndReplace("SETTER_NAME",
                       GetObjectPropertySetterName(property.GetName()))
-      .FindAndReplace("DEFAULT_VALUE", GeneratePropertyValueCode(property))
+      .FindAndReplace(
+          "DEFAULT_VALUE",
+          GeneratePropertyValueCode(property, "this._parentInstanceContainer.getGame()"))
       .FindAndReplace("RUNTIME_OBJECT_CLASSNAME",
                       eventsBasedObject.GetName())
       .FindAndReplace(
@@ -323,18 +355,50 @@ gd::String ObjectCodeGenerator::GenerateToggleBooleanPropertyTemplateCode(
 gd::String ObjectCodeGenerator::GenerateUpdatePropertyFromObjectDataCode(
     const gd::EventsBasedObject& eventsBasedObject,
     const gd::NamedPropertyDescriptor& property) {
+  const gd::String newValueCode = GeneratePropertyValueResolutionCode(
+      property,
+      "this._parentInstanceContainer.getGame()",
+      "newObjectData.content." + property.GetName());
   return gd::String(R"jscode_template(
     if (oldObjectData.content.PROPERTY_NAME !== newObjectData.content.PROPERTY_NAME)
-      this._objectData.PROPERTY_NAME = newObjectData.content.PROPERTY_NAME;)jscode_template")
-      .FindAndReplace("PROPERTY_NAME", property.GetName());
+      this._objectData.PROPERTY_NAME = RESOLVED_NEW_VALUE;)jscode_template")
+      .FindAndReplace("PROPERTY_NAME", property.GetName())
+      .FindAndReplace("RESOLVED_NEW_VALUE", newValueCode);
 }
 
 gd::String ObjectCodeGenerator::GeneratePropertyValueCode(
-    const gd::PropertyDescriptor& property) {
+    const gd::PropertyDescriptor& property,
+    const gd::String& runtimeGameExpression) {
   const auto &primitiveType = gd::ValueTypeMetadata::GetPrimitiveValueType(
       gd::ValueTypeMetadata::ConvertPropertyTypeToValueType(
           property.GetType()));
+  gd::String placeholderPath;
+  const bool hasRuntimeGame = !runtimeGameExpression.empty();
+  if (hasRuntimeGame &&
+      GetExactGlobalConfigPlaceholderPath(property.GetValue(),
+                                          placeholderPath)) {
+    const gd::String placeholderPathCode =
+        EventsCodeGenerator::ConvertToStringExplicit(placeholderPath);
+    if (primitiveType == "string") {
+      return "gdjs.evtTools.globalConfig.getString(" + runtimeGameExpression +
+             ", " + placeholderPathCode + ")";
+    } else if (primitiveType == "number") {
+      return "gdjs.evtTools.globalConfig.getNumber(" + runtimeGameExpression +
+             ", " + placeholderPathCode + ")";
+    } else if (primitiveType == "boolean") {
+      return "gdjs.evtTools.globalConfig.getBoolean(" + runtimeGameExpression +
+             ", " + placeholderPathCode + ")";
+    }
+  }
+
   if (primitiveType == "string") {
+    if (hasRuntimeGame && HasGlobalConfigPlaceholder(property.GetValue())) {
+      return "gdjs.evtTools.globalConfig.resolvePlaceholders(" +
+             runtimeGameExpression + ", " +
+             EventsCodeGenerator::ConvertToStringExplicit(
+                 property.GetValue()) +
+             ")";
+    }
     return EventsCodeGenerator::ConvertToStringExplicit(property.GetValue());
   } else if (primitiveType == "number") {
     return "Number(" +
@@ -345,6 +409,29 @@ gd::String ObjectCodeGenerator::GeneratePropertyValueCode(
   }
 
   return "0 /* Error: property was of an unrecognized type */";
+}
+
+gd::String ObjectCodeGenerator::GeneratePropertyValueResolutionCode(
+    const gd::PropertyDescriptor& property,
+    const gd::String& runtimeGameExpression,
+    const gd::String& valueCode) {
+  const auto &valueType =
+      gd::ValueTypeMetadata::ConvertPropertyTypeToValueType(property.GetType());
+  const auto &primitiveType =
+      gd::ValueTypeMetadata::GetPrimitiveValueType(valueType);
+
+  if (primitiveType == "string" || valueType == "behavior") {
+    return "gdjs.evtTools.globalConfig.resolveString(" +
+           runtimeGameExpression + ", " + valueCode + ")";
+  } else if (primitiveType == "number") {
+    return "gdjs.evtTools.globalConfig.resolveNumber(" +
+           runtimeGameExpression + ", " + valueCode + ")";
+  } else if (primitiveType == "boolean") {
+    return "gdjs.evtTools.globalConfig.resolveBoolean(" +
+           runtimeGameExpression + ", " + valueCode + ")";
+  }
+
+  return valueCode;
 }
 
 gd::String ObjectCodeGenerator::GenerateDefaultDoStepPreEventsFunctionCode(

@@ -3,7 +3,10 @@ import optionalRequire from '../../Utils/OptionalRequire';
 import debounce from 'lodash/debounce';
 import wrap from 'lodash/wrap';
 import memoize from 'lodash/memoize';
-import { splittedProjectFolderNames } from './LocalProjectWriter';
+import {
+  splittedProjectFolderNames,
+  splittedProjectSingleFileNames,
+} from './LocalProjectWriter';
 
 const path = optionalRequire('path');
 const electron = optionalRequire('electron');
@@ -68,6 +71,9 @@ export const setupResourcesWatcher:
           ignore.push(
             ...splittedProjectFolderNames.map(folderName =>
               path.join(folderPath, folderName)
+            ),
+            ...splittedProjectSingleFileNames.map(fileName =>
+              path.join(folderPath, fileName + '.json')
             )
           );
         }

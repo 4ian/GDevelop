@@ -36,9 +36,12 @@ const BehaviorPropertiesEditor = ({
         object,
         layersContainer,
         visibility: 'All',
+        allowGlobalConfigPlaceholders: project.hasEventsBasedBehavior(
+          behavior.getTypeName()
+        ),
       });
     },
-    [behavior, layersContainer, object]
+    [behavior, layersContainer, object, project]
   );
 
   return (

@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react';
+import { Trans } from '@lingui/macro';
 import SelectOption from '../UI/SelectOption';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import {
@@ -90,6 +91,29 @@ const styles = {
     flex: 1,
     borderTop: '1px solid black', // Border color is changed in the component.
   },
+};
+
+const hasGlobalConfigPlaceholderSyntax = (value: any): boolean =>
+  typeof value === 'string' &&
+  (value.indexOf('{{') !== -1 || value.indexOf('}}') !== -1);
+
+const getGlobalConfigPlaceholderErrorText = (
+  field: ValueField,
+  value: any
+): React.Node => {
+  if (
+    !field.forbidGlobalConfigPlaceholder ||
+    !hasGlobalConfigPlaceholderSyntax(value)
+  ) {
+    return null;
+  }
+
+  return (
+    <Trans>
+      Global config placeholders can only be edited from the object editor
+      window.
+    </Trans>
+  );
 };
 
 export const Separator = (): React.MixedElement => {
@@ -415,16 +439,23 @@ const CompactPropertiesEditor = ({
           setValue,
           onClickEndAdornment,
         } = field;
+        const value = getFieldValue({
+          instances,
+          field,
+          mixedValueFallback: '(Multiple values)',
+        });
         const commonProps = {
           key: field.name,
           id: field.name,
-          value: getFieldValue({
-            instances,
-            field,
-            mixedValueFallback: '(Multiple values)',
-          }),
+          value,
           // $FlowFixMe[missing-local-annot]
           onChange: newValue => {
+            if (
+              field.forbidGlobalConfigPlaceholder &&
+              hasGlobalConfigPlaceholderSyntax(newValue)
+            ) {
+              return;
+            }
             instances.forEach(i => setValue(i, newValue || ''));
             onFieldChanged({
               instances,
@@ -434,6 +465,7 @@ const CompactPropertiesEditor = ({
           disabled: getDisabled({ instances, field }),
           renderEndAdornmentOnHover:
             getFieldEndAdornmentIcon({ instances, field }) || undefined,
+          errorText: getGlobalConfigPlaceholderErrorText(field, value),
           onClickEndAdornment: () => {
             if (!onClickEndAdornment) return;
             instances.forEach(i => onClickEndAdornment(i));

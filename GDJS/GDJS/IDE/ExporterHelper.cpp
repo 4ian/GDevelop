@@ -1204,6 +1204,7 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
   InsertUnique(includesFiles, "events-tools/stringtools.js");
   InsertUnique(includesFiles, "events-tools/windowtools.js");
   InsertUnique(includesFiles, "events-tools/networktools.js");
+  InsertUnique(includesFiles, "events-tools/globalconfigtools.js");
 
   if (gdevelopLogoStyle == "dark") {
     InsertUnique(includesFiles, "splash/gd-logo-dark.js");

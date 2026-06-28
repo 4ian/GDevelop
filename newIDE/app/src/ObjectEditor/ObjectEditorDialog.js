@@ -245,9 +245,10 @@ const InnerDialog = (props: InnerDialogProps) => {
       <Column noMargin expand>
         <AlertMessage kind="info">
           <Trans>
-            Global config placeholders are only supported in this object editor
-            window. Use {'{{cards.sunflower.price}}'} in text or number property
-            values. In events, use the Config expressions instead.
+            Global config placeholders can be used here in text or number
+            property values, and in scene events with Global configuration
+            conditions, actions, and expressions. Use{' '}
+            {'{{cards.sunflower.price}}'} as a placeholder path.
           </Trans>
         </AlertMessage>
       </Column>

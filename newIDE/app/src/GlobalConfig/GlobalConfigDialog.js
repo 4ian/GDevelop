@@ -13,6 +13,7 @@ import SearchIcon from '../UI/CustomSvgIcons/Search';
 import SettingsIcon from '../UI/CustomSvgIcons/Settings';
 import TrashIcon from '../UI/CustomSvgIcons/Trash';
 import UploadIcon from '../UI/CustomSvgIcons/Upload';
+import { copyTextToClipboard } from '../Utils/Clipboard';
 
 type ConfigRoot = { [string]: any };
 type SelectedCell = {|
@@ -918,8 +919,12 @@ const GlobalConfigDialog = ({
   const selectedPlaceholder = selectedPath ? '{{' + selectedPath + '}}' : '';
 
   const copyText = React.useCallback((text: string) => {
-    if (!text || !navigator.clipboard) return;
-    navigator.clipboard.writeText(text).catch(() => {});
+    if (!text) return;
+    try {
+      copyTextToClipboard(text).catch(() => {});
+    } catch (error) {
+      // Ignore clipboard failures: the placeholder text remains selectable.
+    }
   }, []);
 
   const applyChanges = React.useCallback(
@@ -1170,19 +1175,6 @@ const GlobalConfigDialog = ({
               )}
             </div>
             <div style={styles.pathBar}>
-              <span style={styles.pathLabel}>
-                <Trans>Path</Trans>
-              </span>
-              <span style={styles.code}>{selectedPath || '-'}</span>
-              <IconButton
-                size="small"
-                color="default"
-                tooltip={t`Copy path`}
-                onClick={() => copyText(selectedPath)}
-                disabled={!selectedPath}
-              >
-                <CopyIcon />
-              </IconButton>
               <span style={styles.pathLabel}>
                 <Trans>Placeholder</Trans>
               </span>

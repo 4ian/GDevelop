@@ -13,8 +13,10 @@ namespace gdjs {
     export namespace globalConfig {
       type GlobalConfigPathSegment = string | number;
 
+      const logger = new gdjs.Logger('Global configuration');
       const hasOwn = Object.prototype.hasOwnProperty;
       const exactPlaceholderRegex = /^\s*\{\{\s*([^{}]+?)\s*\}\}\s*$/;
+      const warnedMissingPaths = new Set<string>();
 
       const isObjectLike = (
         value: GlobalConfigValue | undefined
@@ -26,12 +28,28 @@ namespace gdjs {
       ): value is { [key: string]: GlobalConfigValue } | GlobalConfigValue[] =>
         !!value && typeof value === 'object';
 
-      export const parsePath = function (
+      export const normalizePath = function(path: string): string {
+        const match = exactPlaceholderRegex.exec(path);
+        return match ? match[1].trim() : path.trim();
+      };
+
+      const warnMissingPath = function(path: string): void {
+        const normalizedPath = normalizePath(path);
+        if (!normalizedPath || warnedMissingPaths.has(normalizedPath)) return;
+
+        warnedMissingPaths.add(normalizedPath);
+        logger.warn(
+          'Global config path "{{' + normalizedPath + '}}" does not exist.'
+        );
+      };
+
+      export const parsePath = function(
         path: string
       ): GlobalConfigPathSegment[] {
         const segments: GlobalConfigPathSegment[] = [];
         let current = '';
         let index = 0;
+        path = normalizePath(path);
 
         const pushCurrent = () => {
           if (current !== '') {
@@ -95,34 +113,45 @@ namespace gdjs {
         return segments;
       };
 
-      export const getValue = function (
+      export const getValue = function(
         runtimeGame: gdjs.RuntimeGame,
-        path: string
+        path: string,
+        warnIfMissing: boolean = true
       ): GlobalConfigValue | undefined {
-        let value: GlobalConfigValue | undefined =
-          runtimeGame.getGlobalConfig();
+        let value:
+          | GlobalConfigValue
+          | undefined = runtimeGame.getGlobalConfig();
         const segments = parsePath(path);
         for (const segment of segments) {
           if (typeof segment === 'number') {
-            if (!Array.isArray(value)) return undefined;
+            if (
+              !Array.isArray(value) ||
+              segment < 0 ||
+              segment >= value.length
+            ) {
+              if (warnIfMissing) warnMissingPath(path);
+              return undefined;
+            }
             value = value[segment];
           } else {
-            if (!isObjectLike(value)) return undefined;
-            if (!hasOwn.call(value, segment)) return undefined;
+            if (!isObjectLike(value) || !hasOwn.call(value, segment)) {
+              if (warnIfMissing) warnMissingPath(path);
+              return undefined;
+            }
             value = value[segment];
           }
         }
         return value;
       };
 
-      export const has = function (
+      export const has = function(
         runtimeGame: gdjs.RuntimeGame,
         path: string
       ): boolean {
-        return getValue(runtimeGame, path) !== undefined;
+        return getValue(runtimeGame, path, false) !== undefined;
       };
 
-      export const getNumber = function (
+      export const getNumber = function(
         runtimeGame: gdjs.RuntimeGame,
         path: string
       ): number {
@@ -136,7 +165,7 @@ namespace gdjs {
         return 0;
       };
 
-      export const getString = function (
+      export const getString = function(
         runtimeGame: gdjs.RuntimeGame,
         path: string
       ): string {
@@ -154,7 +183,7 @@ namespace gdjs {
         }
       };
 
-      export const getBoolean = function (
+      export const getBoolean = function(
         runtimeGame: gdjs.RuntimeGame,
         path: string
       ): boolean {
@@ -175,7 +204,7 @@ namespace gdjs {
         return false;
       };
 
-      export const getChildCount = function (
+      export const getChildCount = function(
         runtimeGame: gdjs.RuntimeGame,
         path: string
       ): number {
@@ -185,7 +214,7 @@ namespace gdjs {
         return 0;
       };
 
-      export const toJSON = function (
+      export const toJSON = function(
         runtimeGame: gdjs.RuntimeGame,
         path: string
       ): string {
@@ -197,7 +226,7 @@ namespace gdjs {
         }
       };
 
-      const getWritableParent = function (
+      const getWritableParent = function(
         runtimeGame: gdjs.RuntimeGame,
         path: string
       ): {
@@ -215,11 +244,17 @@ namespace gdjs {
             typeof nextSegment === 'number' ? [] : {};
 
           if (typeof segment === 'number') {
-            if (!Array.isArray(value)) return null;
+            if (!Array.isArray(value)) {
+              warnMissingPath(path);
+              return null;
+            }
             if (!isContainer(value[segment])) value[segment] = nextContainer;
             value = value[segment];
           } else {
-            if (!isObjectLike(value)) return null;
+            if (!isObjectLike(value)) {
+              warnMissingPath(path);
+              return null;
+            }
             if (!isContainer(value[segment])) value[segment] = nextContainer;
             value = value[segment];
           }
@@ -228,7 +263,7 @@ namespace gdjs {
         return { parent: value, segment: segments[segments.length - 1] };
       };
 
-      export const setValue = function (
+      export const setValue = function(
         runtimeGame: gdjs.RuntimeGame,
         path: string,
         value: GlobalConfigValue
@@ -244,7 +279,7 @@ namespace gdjs {
         }
       };
 
-      export const setNumber = function (
+      export const setNumber = function(
         runtimeGame: gdjs.RuntimeGame,
         path: string,
         value: number
@@ -252,7 +287,7 @@ namespace gdjs {
         setValue(runtimeGame, path, isFinite(value) ? value : 0);
       };
 
-      export const setString = function (
+      export const setString = function(
         runtimeGame: gdjs.RuntimeGame,
         path: string,
         value: string
@@ -260,7 +295,7 @@ namespace gdjs {
         setValue(runtimeGame, path, value);
       };
 
-      export const setBoolean = function (
+      export const setBoolean = function(
         runtimeGame: gdjs.RuntimeGame,
         path: string,
         value: boolean
@@ -268,7 +303,7 @@ namespace gdjs {
         setValue(runtimeGame, path, value);
       };
 
-      export const remove = function (
+      export const remove = function(
         runtimeGame: gdjs.RuntimeGame,
         path: string
       ): void {
@@ -277,20 +312,30 @@ namespace gdjs {
 
         const { parent, segment } = writableParent;
         if (typeof segment === 'number') {
-          if (Array.isArray(parent)) parent.splice(segment, 1);
+          if (Array.isArray(parent)) {
+            if (segment < 0 || segment >= parent.length) {
+              warnMissingPath(path);
+              return;
+            }
+            parent.splice(segment, 1);
+          }
         } else if (isObjectLike(parent)) {
+          if (!hasOwn.call(parent, segment)) {
+            warnMissingPath(path);
+            return;
+          }
           delete parent[segment];
         }
       };
 
-      export const getExactPlaceholderPath = function (
+      export const getExactPlaceholderPath = function(
         text: string
       ): string | null {
         const match = exactPlaceholderRegex.exec(text);
-        return match ? match[1] : null;
+        return match ? match[1].trim() : null;
       };
 
-      export const resolvePlaceholders = function (
+      export const resolvePlaceholders = function(
         runtimeGame: gdjs.RuntimeGame,
         text: string
       ): string {
@@ -309,7 +354,7 @@ namespace gdjs {
         });
       };
 
-      export const resolveNumber = function (
+      export const resolveNumber = function(
         runtimeGame: gdjs.RuntimeGame,
         value: any
       ): number {
@@ -325,7 +370,7 @@ namespace gdjs {
         return 0;
       };
 
-      export const resolveString = function (
+      export const resolveString = function(
         runtimeGame: gdjs.RuntimeGame,
         value: any
       ): string {
@@ -343,7 +388,7 @@ namespace gdjs {
         }
       };
 
-      export const resolveBoolean = function (
+      export const resolveBoolean = function(
         runtimeGame: gdjs.RuntimeGame,
         value: any
       ): boolean {

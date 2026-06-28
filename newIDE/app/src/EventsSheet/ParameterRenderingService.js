@@ -190,7 +190,7 @@ const userFriendlyTypeName: { [string]: MessageDescriptor } = {
   numberWithChoices: t`Number`,
   behavior: t`Behavior`,
   anyvar: t`Variable`,
-  globalConfigPath: t`Global config path`,
+  globalConfigPath: t`Global config placeholder`,
   scenevar: t`Scene variable`,
   globalvar: t`Global variable`,
   objectvar: t`Object variable`,

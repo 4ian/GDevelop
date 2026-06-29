@@ -449,6 +449,18 @@ namespace gdjs {
       this.setWrappingWidth(width);
     }
 
+    override getCenterX(): float {
+      return 0;
+    }
+
+    override getCenterY(): float {
+      return this._verticalTextAlignment === 'bottom'
+        ? this.getHeight()
+        : this._verticalTextAlignment === 'center'
+          ? this.getHeight() / 2
+          : 0;
+    }
+
     override getDrawableY(): float {
       return (
         this.getY() -

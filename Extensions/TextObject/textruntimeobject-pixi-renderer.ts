@@ -99,7 +99,10 @@ namespace gdjs {
     }
 
     updatePosition(): void {
-      if (this._object.isWrapping() && this._text.width !== 0) {
+      const renderedWidth = this._text.width;
+      const centerX = this._object.getCenterX();
+
+      if (this._object.isWrapping() && renderedWidth !== 0) {
         const alignmentX =
           this._object._textAlign === 'right'
             ? 1
@@ -108,26 +111,22 @@ namespace gdjs {
               : 0;
 
         const width = this._object.getWrappingWidth();
+        const leftOffset = (width - renderedWidth) * alignmentX;
 
-        // A vector from the custom size center to the renderer center.
-        const centerToCenterX = (width - this._text.width) * (alignmentX - 0.5);
-
-        this._text.position.x = this._object.x + width / 2;
-        this._text.anchor.x = 0.5 - centerToCenterX / this._text.width;
+        this._text.position.x = this._object.getDrawableX() + centerX;
+        this._text.anchor.x = (centerX - leftOffset) / renderedWidth;
+      } else if (renderedWidth !== 0) {
+        this._text.position.x = this._object.getDrawableX() + centerX;
+        this._text.anchor.x = centerX / renderedWidth;
       } else {
-        this._text.position.x = this._object.x + this._text.width / 2;
-        this._text.anchor.x = 0.5;
+        this._text.position.x = this._object.getDrawableX() + centerX;
+        this._text.anchor.x = 0;
       }
 
-      const alignmentY =
-        this._object._verticalTextAlignment === 'bottom'
-          ? 1
-          : this._object._verticalTextAlignment === 'center'
-            ? 0.5
-            : 0;
-      this._text.position.y =
-        this._object.y + this._text.height * (0.5 - alignmentY);
-      this._text.anchor.y = 0.5;
+      const renderedHeight = this._text.height;
+      const centerY = this._object.getCenterY();
+      this._text.position.y = this._object.getDrawableY() + centerY;
+      this._text.anchor.y = renderedHeight !== 0 ? centerY / renderedHeight : 0;
     }
 
     updateAngle(): void {

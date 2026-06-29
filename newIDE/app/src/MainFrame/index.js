@@ -802,6 +802,19 @@ const MainFrame = (props: Props): React.MixedElement => {
   const editorTabsRef = useStableUpToDateRef(state.editorTabs);
   const projectManagerRef = React.useRef<?ProjectManagerInterface>(null);
   const lastSelectedProjectManagerItemIdRef = React.useRef<?string>(null);
+  const forceRefreshProjectManagerList = React.useCallback(() => {
+    const refresh = () => {
+      if (projectManagerRef.current) {
+        projectManagerRef.current.forceUpdateList();
+      }
+    };
+
+    // The debugger pop-out is closed by Electron while React is also removing
+    // its external tab. Refresh immediately and once more after the browser has
+    // processed the focus/resize work caused by the child window closing.
+    setTimeout(refresh, 0);
+    setTimeout(refresh, 150);
+  }, []);
 
   const getEditorOpeningOptions = React.useCallback(
     ({
@@ -1014,6 +1027,7 @@ const MainFrame = (props: Props): React.MixedElement => {
             ),
           };
         });
+        forceRefreshProjectManagerList();
       };
 
       ipcRenderer.on(
@@ -1026,7 +1040,7 @@ const MainFrame = (props: Props): React.MixedElement => {
           onDebuggerPopOutCloseRequested
         );
     },
-    [setState]
+    [setState, forceRefreshProjectManagerList]
   );
 
   const {

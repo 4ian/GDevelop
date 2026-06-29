@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react';
 import Popper from '@material-ui/core/Popper';
+import muiZIndex from '@material-ui/core/styles/zIndex';
 import Background from '../UI/Background';
 import ClickAwayListener from '@material-ui/core/ClickAwayListener';
 import { Column, Line } from '../UI/Grid';
@@ -27,10 +28,9 @@ const styles = {
     minHeight: 30,
     maxHeight: 400,
 
-    // When displayed in an events sheet that has Mosaic windows (see `EditorMosaic`) next to it,
-    // it could be displayed behind them, because they have a z-index of 1, and 4 for the window titles :/
-    // use a z-index of 5 then. Only one InlinePopover should be shown at a time anyway.
-    zIndex: 5,
+    // Keep inline parameter editors above editor panes, modal dialogs and
+    // popped-out editor chrome. Only one InlinePopover is shown at a time.
+    zIndex: muiZIndex.tooltip + 100,
   },
 };
 

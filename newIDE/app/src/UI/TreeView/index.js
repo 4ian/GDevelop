@@ -540,7 +540,16 @@ const InnerTreeView = <Item: ItemBaseAttributes>(
     // $FlowFixMe[incompatible-type]
     ref,
     () => ({
-      forceUpdateList: forceUpdate,
+      forceUpdateList: () => {
+        forceUpdate();
+        if (listRef.current) {
+          // The parent TreeView can re-render with the same shallow props while
+          // react-window keeps its previous rendered range. Force the list
+          // instance too so visible rows are repainted.
+          // $FlowFixMe[prop-missing] - FixedSizeList is a React component.
+          listRef.current.forceUpdate();
+        }
+      },
       scrollToItem,
       scrollToItemFromId,
       renameItem,

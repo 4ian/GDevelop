@@ -31,6 +31,47 @@ type Props = {|
   onChange?: () => void,
 |};
 
+const gridMinColumnWidth = 80;
+const gridMaxColumnWidth = 300;
+const gridCellHorizontalPadding = 22;
+const gridHeaderActionWidth = 42;
+const rowHeaderActionWidth = 44;
+
+let textMeasurementCanvas: ?HTMLCanvasElement = null;
+
+const measureGridTextWidth = (text: any): number => {
+  if (text === undefined || text === null) return 0;
+
+  const textValue = String(text);
+  if (!textValue) return 0;
+  if (typeof document === 'undefined') return textValue.length * 8;
+
+  if (!textMeasurementCanvas) {
+    textMeasurementCanvas = document.createElement('canvas');
+  }
+
+  const context = textMeasurementCanvas.getContext('2d');
+  if (!context) return textValue.length * 8;
+
+  context.font = '600 16px sans-serif';
+  return textValue
+    .split(/\r?\n/)
+    .reduce(
+      (widestLineWidth, line) =>
+        Math.max(widestLineWidth, context.measureText(line).width),
+      0
+    );
+};
+
+const clampGridColumnWidth = (width: number): number =>
+  Math.max(gridMinColumnWidth, Math.min(gridMaxColumnWidth, Math.ceil(width)));
+
+const makeColumnWidthStyle = (width: number): Object => ({
+  width,
+  minWidth: width,
+  maxWidth: width,
+});
+
 const styles: { [string]: Object } = {
   root: {
     display: 'flex',
@@ -150,7 +191,7 @@ const styles: { [string]: Object } = {
   },
   table: {
     borderCollapse: 'collapse',
-    minWidth: '100%',
+    width: 'max-content',
     tableLayout: 'fixed',
   },
   cornerCell: {
@@ -158,8 +199,6 @@ const styles: { [string]: Object } = {
     left: 0,
     top: 0,
     zIndex: 3,
-    width: 168,
-    minWidth: 168,
     height: 38,
     backgroundColor: '#303846',
     borderRight: '1px solid #465064',
@@ -185,8 +224,6 @@ const styles: { [string]: Object } = {
     position: 'sticky',
     top: 0,
     zIndex: 2,
-    minWidth: 176,
-    width: 176,
     height: 38,
     backgroundColor: '#303846',
     borderRight: '1px solid #465064',
@@ -234,8 +271,6 @@ const styles: { [string]: Object } = {
     position: 'sticky',
     left: 0,
     zIndex: 1,
-    minWidth: 168,
-    width: 168,
     height: 36,
     backgroundColor: '#272e3a',
     borderRight: '1px solid #465064',
@@ -244,6 +279,15 @@ const styles: { [string]: Object } = {
     padding: '0 10px',
     fontWeight: 600,
     textAlign: 'left',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+  },
+  rowNameLabel: {
+    display: 'block',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
   },
   rowNameInput: {
     width: '100%',
@@ -262,8 +306,6 @@ const styles: { [string]: Object } = {
   cell: {
     borderRight: '1px solid #394252',
     borderBottom: '1px solid #394252',
-    minWidth: 176,
-    width: 176,
     height: 36,
     padding: 0,
     backgroundColor: '#222832',
@@ -296,6 +338,9 @@ const styles: { [string]: Object } = {
     backgroundColor: 'transparent',
     padding: '0 10px',
     font: 'inherit',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
   },
   pathBar: {
     display: 'flex',
@@ -575,6 +620,60 @@ const GlobalConfigDialog = ({
       });
     },
     [columnKeys, normalizedSearchText, rowKeys, selectedSheet, sheet]
+  );
+  const rowKeyColumnWidth = React.useMemo(
+    () => {
+      const headerWidth =
+        measureGridTextWidth(t`Row key`) +
+        gridCellHorizontalPadding +
+        rowHeaderActionWidth;
+      const widestRowKeyWidth = visibleRowKeys.reduce(
+        (widestWidth, rowKey) =>
+          Math.max(
+            widestWidth,
+            measureGridTextWidth(rowKey) + gridCellHorizontalPadding
+          ),
+        headerWidth
+      );
+
+      return clampGridColumnWidth(widestRowKeyWidth);
+    },
+    [visibleRowKeys]
+  );
+  const columnWidths: { [string]: number } = React.useMemo(
+    () => {
+      const widths: { [string]: number } = {};
+
+      columnKeys.forEach(columnKey => {
+        let widestWidth =
+          measureGridTextWidth(columnKey) +
+          gridCellHorizontalPadding +
+          gridHeaderActionWidth;
+
+        visibleRowKeys.forEach(rowKey => {
+          const rowValue = Array.isArray(sheet)
+            ? sheet[Number(rowKey)]
+            : sheet[rowKey];
+          const value =
+            columnKey === 'value' && !isPlainObject(rowValue)
+              ? rowValue
+              : isPlainObject(rowValue)
+              ? rowValue[columnKey]
+              : undefined;
+
+          widestWidth = Math.max(
+            widestWidth,
+            measureGridTextWidth(formatCellValue(value)) +
+              gridCellHorizontalPadding
+          );
+        });
+
+        widths[columnKey] = clampGridColumnWidth(widestWidth);
+      });
+
+      return widths;
+    },
+    [columnKeys, sheet, visibleRowKeys]
   );
 
   React.useEffect(
@@ -1036,9 +1135,26 @@ const GlobalConfigDialog = ({
                 </div>
               ) : (
                 <table style={styles.table}>
+                  <colgroup>
+                    <col style={makeColumnWidthStyle(rowKeyColumnWidth)} />
+                    {columnKeys.map(columnKey => (
+                      <col
+                        key={columnKey}
+                        style={makeColumnWidthStyle(
+                          columnWidths[columnKey] || gridMinColumnWidth
+                        )}
+                      />
+                    ))}
+                    <col style={makeColumnWidthStyle(44)} />
+                  </colgroup>
                   <thead>
                     <tr>
-                      <th style={styles.cornerCell}>
+                      <th
+                        style={{
+                          ...styles.cornerCell,
+                          ...makeColumnWidthStyle(rowKeyColumnWidth),
+                        }}
+                      >
                         <div style={styles.cornerCellContent}>
                           <span style={styles.cornerCellLabel}>
                             <Trans>Row key</Trans>
@@ -1055,7 +1171,15 @@ const GlobalConfigDialog = ({
                         </div>
                       </th>
                       {columnKeys.map(columnKey => (
-                        <th key={columnKey} style={styles.columnHeader}>
+                        <th
+                          key={columnKey}
+                          style={{
+                            ...styles.columnHeader,
+                            ...makeColumnWidthStyle(
+                              columnWidths[columnKey] || gridMinColumnWidth
+                            ),
+                          }}
+                        >
                           <div style={styles.columnHeaderContent}>
                             <input
                               style={styles.columnName}
@@ -1115,6 +1239,7 @@ const GlobalConfigDialog = ({
                           <th
                             style={{
                               ...styles.rowHeader,
+                              ...makeColumnWidthStyle(rowKeyColumnWidth),
                               ...(isSelectedRow ? styles.selectedCell : {}),
                             }}
                             onClick={() =>
@@ -1125,7 +1250,9 @@ const GlobalConfigDialog = ({
                             }
                           >
                             {Array.isArray(sheet) ? (
-                              rowKey
+                              <span style={styles.rowNameLabel} title={rowKey}>
+                                {rowKey}
+                              </span>
                             ) : (
                               <input
                                 style={styles.rowNameInput}
@@ -1169,12 +1296,17 @@ const GlobalConfigDialog = ({
                                 key={columnKey}
                                 style={{
                                   ...styles.cell,
+                                  ...makeColumnWidthStyle(
+                                    columnWidths[columnKey] ||
+                                      gridMinColumnWidth
+                                  ),
                                   ...(isSelected ? styles.selectedCell : {}),
                                 }}
                               >
                                 <input
                                   style={styles.input}
                                   value={formatCellValue(value)}
+                                  title={formatCellValue(value)}
                                   onFocus={() =>
                                     setSelectedCell({
                                       sheetName: selectedSheet,

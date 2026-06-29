@@ -3784,6 +3784,16 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
               "one or the other.");
     }
 
+    SECTION("Declared scene variable with missing gran-children in expression") {
+      // Children of child-variables don't need to be declared.
+      auto node = parser.ParseExpression("MySceneStructureVariable.MyChildStructure.MyNonExistingChild");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
+    }
+
     SECTION("Declared scene variable with missing gran-children in variable parameter") {
       // Children of child-variables don't need to be declared.
       auto node = parser.ParseExpression("MySceneStructureVariable.MyChildStructure.MyNonExistingChild");
@@ -3794,12 +3804,12 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(validator.GetFatalErrors().size() == 0);
     }
 
-    SECTION("Declared scene variable with missing gran-children in expression") {
+    SECTION("Declared legacy scene variable with missing gran-children in variable parameter") {
       // Children of child-variables don't need to be declared.
       auto node = parser.ParseExpression("MySceneStructureVariable.MyChildStructure.MyNonExistingChild");
       REQUIRE(node != nullptr);
 
-      gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "scenevar");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 0);
     }

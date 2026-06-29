@@ -31,7 +31,10 @@ import {
 import { type SimplifiedBehavior } from './SimplifiedProject/SimplifiedProject';
 import { ColumnStackLayout } from '../UI/Layout';
 import Text from '../UI/Text';
-import { applyVariableChange } from './ApplyVariableChange';
+import {
+  applyVariableChange,
+  applyVariableDeletion,
+} from './ApplyVariableChange';
 import {
   addDefaultLightToAllLayers,
   addDefaultLightToLayer,
@@ -5599,37 +5602,133 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
   modifiesProject: true,
 };
 
+// Read the variables to change from a tool call. Supports the batch shape (a
+// `variables` array) and the legacy single-variable shape (fields at the top
+// level), so older tool versions keep working.
+const extractVariableOperations = (
+  args: any
+): Array<{|
+  variable_name_or_path: string | null,
+  value: string | null,
+  variable_type: string | null,
+  delete_this_variable: boolean,
+|}> => {
+  const variablesArray = SafeExtractor.extractArrayProperty(args, 'variables');
+  if (variablesArray) {
+    return variablesArray.map(variableArgs => ({
+      variable_name_or_path: SafeExtractor.extractStringProperty(
+        variableArgs,
+        'variable_name_or_path'
+      ),
+      value: SafeExtractor.extractStringProperty(variableArgs, 'value'),
+      variable_type: SafeExtractor.extractStringProperty(
+        variableArgs,
+        'variable_type'
+      ),
+      delete_this_variable:
+        SafeExtractor.extractBooleanProperty(
+          variableArgs,
+          'delete_this_variable'
+        ) || false,
+    }));
+  }
+
+  return [
+    {
+      variable_name_or_path: SafeExtractor.extractStringProperty(
+        args,
+        'variable_name_or_path'
+      ),
+      value: SafeExtractor.extractStringProperty(args, 'value'),
+      variable_type: SafeExtractor.extractStringProperty(args, 'variable_type'),
+      delete_this_variable: false,
+    },
+  ];
+};
+
 const addOrEditVariable: EditorFunction = {
   renderForEditor: ({ args, shouldShowDetails }) => {
-    const variable_name_or_path = extractRequiredString(
-      args,
-      'variable_name_or_path'
-    );
     const variable_scope = extractRequiredString(args, 'variable_scope');
-    const value = extractRequiredString(args, 'value');
     const object_name = SafeExtractor.extractStringProperty(
       args,
       'object_name'
     );
     const scene_name = SafeExtractor.extractStringProperty(args, 'scene_name');
+    const operations = extractVariableOperations(args);
 
     const details = shouldShowDetails ? (
       <ColumnStackLayout noMargin>
-        <Text noMargin allowSelection color="secondary" size="body-small">
-          <b>
-            <Trans>Value</Trans>
-          </b>
-          : {value}
-        </Text>
+        {operations.map((operation, index) => (
+          <Text
+            key={index}
+            noMargin
+            allowSelection
+            color="secondary"
+            size="body-small"
+          >
+            <b>{operation.variable_name_or_path}</b>
+            {operation.delete_this_variable
+              ? ' — deleted'
+              : `: ${operation.value || ''}`}
+          </Text>
+        ))}
       </ColumnStackLayout>
     ) : null;
 
+    if (operations.length === 1 && !operations[0].delete_this_variable) {
+      const variable_name_or_path = operations[0].variable_name_or_path;
+      if (variable_scope === 'scene') {
+        return {
+          text: (
+            <Trans>
+              Set scene variable <b>{variable_name_or_path}</b> in scene{' '}
+              {scene_name}.
+            </Trans>
+          ),
+          details,
+          hasDetailsToShow: true,
+        };
+      } else if (variable_scope === 'object' || variable_scope === 'group') {
+        return {
+          text: (
+            <Trans>
+              Set <b>{object_name}</b>'s variable <b>{variable_name_or_path}</b>
+              .
+            </Trans>
+          ),
+          details,
+          hasDetailsToShow: true,
+        };
+      } else if (variable_scope === 'global') {
+        return {
+          text: (
+            <Trans>
+              Set global variable <b>{variable_name_or_path}</b>.
+            </Trans>
+          ),
+          details,
+          hasDetailsToShow: true,
+        };
+      }
+
+      return {
+        text: (
+          <Trans>
+            Set variable <b>{variable_name_or_path}</b>.
+          </Trans>
+        ),
+      };
+    }
+
+    const variableNames = operations
+      .map(operation => operation.variable_name_or_path)
+      .filter(Boolean)
+      .join(', ');
     if (variable_scope === 'scene') {
       return {
         text: (
           <Trans>
-            Set scene variable <b>{variable_name_or_path}</b> in scene{' '}
-            {scene_name}.
+            Update variables <b>{variableNames}</b> in scene {scene_name}.
           </Trans>
         ),
         details,
@@ -5639,7 +5738,7 @@ const addOrEditVariable: EditorFunction = {
       return {
         text: (
           <Trans>
-            Set <b>{object_name}</b>'s variable <b>{variable_name_or_path}</b>.
+            Update <b>{object_name}</b>'s variables <b>{variableNames}</b>.
           </Trans>
         ),
         details,
@@ -5649,7 +5748,7 @@ const addOrEditVariable: EditorFunction = {
       return {
         text: (
           <Trans>
-            Set global variable <b>{variable_name_or_path}</b>.
+            Update global variables <b>{variableNames}</b>.
           </Trans>
         ),
         details,
@@ -5660,27 +5759,26 @@ const addOrEditVariable: EditorFunction = {
     return {
       text: (
         <Trans>
-          Set variable <b>{variable_name_or_path}</b>.
+          Update variables <b>{variableNames}</b>.
         </Trans>
       ),
+      details,
+      hasDetailsToShow: true,
     };
   },
   launchFunction: async ({ project, args }) => {
-    const variable_name_or_path = extractRequiredString(
-      args,
-      'variable_name_or_path'
-    );
-    const value = extractRequiredString(args, 'value');
-    const variable_type = SafeExtractor.extractStringProperty(
-      args,
-      'variable_type'
-    );
     const variable_scope = extractRequiredString(args, 'variable_scope');
     const object_name = SafeExtractor.extractStringProperty(
       args,
       'object_name'
     );
     const scene_name = SafeExtractor.extractStringProperty(args, 'scene_name');
+    const operations = extractVariableOperations(args);
+    if (operations.length === 0) {
+      return makeGenericFailure(
+        `No variable to change (the "variables" list is empty).`
+      );
+    }
 
     // A variable change is applied to one or more variables containers.
     // A group is handled "almost like an object": a group variable is a variable
@@ -5769,26 +5867,80 @@ const addOrEditVariable: EditorFunction = {
       );
     }
 
-    let addedNewVariable = false;
-    // The containers list is always non-empty here, so this is overwritten.
-    let variableType = '';
-    for (const variablesContainer of variablesContainers) {
-      const result = applyVariableChange({
-        variablePath: variable_name_or_path,
-        forcedVariableType: variable_type,
-        variablesContainer,
+    const changes = [];
+    const warnings = [];
+    for (const operation of operations) {
+      const {
+        variable_name_or_path,
         value,
-      });
-      addedNewVariable = addedNewVariable || result.addedNewVariable;
-      variableType = result.variableType;
+        variable_type,
+        delete_this_variable,
+      } = operation;
+
+      if (!variable_name_or_path) {
+        warnings.push(
+          `A variable was skipped because "variable_name_or_path" is missing.`
+        );
+        continue;
+      }
+
+      if (delete_this_variable) {
+        let removed = false;
+        for (const variablesContainer of variablesContainers) {
+          const result = applyVariableDeletion({
+            variablePath: variable_name_or_path,
+            variablesContainer,
+          });
+          removed = removed || result.removed;
+        }
+        if (removed) {
+          changes.push(
+            `Deleted ${scopeDescription} variable "${variable_name_or_path}".`
+          );
+        } else {
+          warnings.push(
+            `Could not delete ${scopeDescription} variable "${variable_name_or_path}": not found.`
+          );
+        }
+        continue;
+      }
+
+      if (value === null || value === undefined) {
+        warnings.push(
+          `Variable "${variable_name_or_path}" was skipped: no "value" provided and it was not marked for deletion.`
+        );
+        continue;
+      }
+
+      let addedNewVariable = false;
+      // The containers list is always non-empty here, so this is overwritten.
+      let variableType = '';
+      for (const variablesContainer of variablesContainers) {
+        const result = applyVariableChange({
+          variablePath: variable_name_or_path,
+          forcedVariableType: variable_type,
+          variablesContainer,
+          value,
+        });
+        addedNewVariable = addedNewVariable || result.addedNewVariable;
+        variableType = result.variableType;
+      }
+
+      const truncatedValue = truncateValue(value);
+      changes.push(
+        addedNewVariable
+          ? `Added ${scopeDescription} variable "${variable_name_or_path}" (${variableType}) = ${truncatedValue}`
+          : `Edited ${scopeDescription} variable "${variable_name_or_path}" = ${truncatedValue}`
+      );
     }
 
-    const truncatedValue = truncateValue(value);
-    return makeGenericSuccess(
-      addedNewVariable
-        ? `Added ${scopeDescription} variable "${variable_name_or_path}" (${variableType}) = ${truncatedValue}`
-        : `Edited ${scopeDescription} variable "${variable_name_or_path}" = ${truncatedValue}`
-    );
+    // One line per change (so a single variable keeps its original message),
+    // with any warnings appended below.
+    const message = [...changes, ...warnings].join('\n');
+    if (changes.length === 0) {
+      return makeGenericFailure(message || `No variable was changed.`);
+    }
+    return makeGenericSuccess(message);
   },
   modifiesProject: true,
 };

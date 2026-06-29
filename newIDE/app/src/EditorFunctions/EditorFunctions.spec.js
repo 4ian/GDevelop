@@ -1562,6 +1562,93 @@ describe('editorFunctions', () => {
       expect(player0.getType()).toBe(gd.Variable.Structure);
       expect(player0.getChild('name').getString()).toBe('Alice');
     });
+
+    it('creates several variables at once from a `variables` array', async () => {
+      const result = await editorFunctions.add_or_edit_variable.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          variable_scope: 'scene',
+          scene_name: 'TestScene',
+          variables: [
+            { variable_name_or_path: 'lives', value: '3' },
+            { variable_name_or_path: 'score', value: '0' },
+            { variable_name_or_path: 'playerName', value: 'Hero' },
+          ],
+        },
+      });
+
+      expect(result.success).toBe(true);
+      const variables = testScene.getVariables();
+      expect(variables.get('lives').getValue()).toBe(3);
+      expect(variables.get('score').getValue()).toBe(0);
+      expect(variables.get('playerName').getString()).toBe('Hero');
+    });
+
+    it('deletes a variable when `delete_this_variable` is true', async () => {
+      const variables = testScene.getVariables();
+      variables.insertNew('toRemove', 0).setString('bye');
+      variables.insertNew('toKeep', 1).setString('stay');
+
+      const result = await editorFunctions.add_or_edit_variable.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          variable_scope: 'scene',
+          scene_name: 'TestScene',
+          variables: [
+            { variable_name_or_path: 'toRemove', delete_this_variable: true },
+          ],
+        },
+      });
+
+      expect(result.success).toBe(true);
+      expect(variables.has('toRemove')).toBe(false);
+      expect(variables.has('toKeep')).toBe(true);
+    });
+
+    it('edits and deletes variables in a single call', async () => {
+      const variables = testScene.getVariables();
+      variables.insertNew('old', 0).setString('remove me');
+
+      const result = await editorFunctions.add_or_edit_variable.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          variable_scope: 'scene',
+          scene_name: 'TestScene',
+          variables: [
+            { variable_name_or_path: 'newScore', value: '99' },
+            { variable_name_or_path: 'old', delete_this_variable: true },
+          ],
+        },
+      });
+
+      expect(result.success).toBe(true);
+      expect(variables.get('newScore').getValue()).toBe(99);
+      expect(variables.has('old')).toBe(false);
+    });
+
+    it('warns (but still succeeds) when deleting a variable that does not exist', async () => {
+      const result = await editorFunctions.add_or_edit_variable.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          variable_scope: 'scene',
+          scene_name: 'TestScene',
+          variables: [
+            { variable_name_or_path: 'newOne', value: '1' },
+            { variable_name_or_path: 'ghost', delete_this_variable: true },
+          ],
+        },
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.message).toContain('Could not delete');
+      expect(result.message).toContain('ghost');
+      expect(
+        testScene
+          .getVariables()
+          .get('newOne')
+          .getValue()
+      ).toBe(1);
+    });
   });
 
   describe('inspect_object_properties (property listing format)', () => {

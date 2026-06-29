@@ -253,3 +253,81 @@ export const applyVariableChange = ({
     };
   }
 };
+
+export const applyVariableDeletion = ({
+  variablePath,
+  variablesContainer,
+}: {|
+  variablePath: string,
+  variablesContainer: gd.VariablesContainer,
+|}): {| removed: boolean |} => {
+  const pathSegments = parseVariablePath(variablePath);
+
+  if (pathSegments.length === 0) {
+    throw new Error('Invalid variable path');
+  }
+
+  const firstSegment = pathSegments[0];
+  if (firstSegment.type !== 'property') {
+    throw new Error('Variable path must start with a property name');
+  }
+
+  // Top-level variable: remove it from the container.
+  if (pathSegments.length === 1) {
+    if (!variablesContainer.has(firstSegment.value)) {
+      return { removed: false };
+    }
+    variablesContainer.remove(firstSegment.value);
+    return { removed: true };
+  }
+
+  // Nested variable: navigate to its direct parent, then remove the last segment.
+  if (!variablesContainer.has(firstSegment.value)) {
+    return { removed: false };
+  }
+  let parentVariable = variablesContainer.get(firstSegment.value);
+
+  for (let i = 1; i < pathSegments.length - 1; i++) {
+    const segment = pathSegments[i];
+    if (segment.type === 'property') {
+      if (
+        parentVariable.getType() !== gd.Variable.Structure ||
+        !parentVariable.hasChild(segment.value)
+      ) {
+        return { removed: false };
+      }
+      parentVariable = parentVariable.getChild(segment.value);
+    } else {
+      const index = parseInt(segment.value, 10);
+      if (
+        parentVariable.getType() !== gd.Variable.Array ||
+        index >= parentVariable.getChildrenCount()
+      ) {
+        return { removed: false };
+      }
+      parentVariable = parentVariable.getAtIndex(index);
+    }
+  }
+
+  const lastSegment = pathSegments[pathSegments.length - 1];
+  if (lastSegment.type === 'index') {
+    const index = parseInt(lastSegment.value, 10);
+    if (
+      parentVariable.getType() !== gd.Variable.Array ||
+      index >= parentVariable.getChildrenCount()
+    ) {
+      return { removed: false };
+    }
+    parentVariable.removeAtIndex(index);
+    return { removed: true };
+  }
+
+  if (
+    parentVariable.getType() !== gd.Variable.Structure ||
+    !parentVariable.hasChild(lastSegment.value)
+  ) {
+    return { removed: false };
+  }
+  parentVariable.removeChild(lastSegment.value);
+  return { removed: true };
+};

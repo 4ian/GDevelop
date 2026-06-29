@@ -35,7 +35,6 @@ const gridMinColumnWidth = 80;
 const gridMaxColumnWidth = 300;
 const gridCellHorizontalPadding = 22;
 const gridHeaderActionWidth = 42;
-const rowHeaderActionWidth = 44;
 
 let textMeasurementCanvas: ?HTMLCanvasElement = null;
 
@@ -65,6 +64,9 @@ const measureGridTextWidth = (text: any): number => {
 
 const clampGridColumnWidth = (width: number): number =>
   Math.max(gridMinColumnWidth, Math.min(gridMaxColumnWidth, Math.ceil(width)));
+
+const clampRowKeyColumnWidth = (width: number): number =>
+  Math.max(gridMinColumnWidth, Math.ceil(width));
 
 const makeColumnWidthStyle = (width: number): Object => ({
   width,
@@ -199,6 +201,7 @@ const styles: { [string]: Object } = {
     left: 0,
     top: 0,
     zIndex: 3,
+    boxSizing: 'border-box',
     height: 38,
     backgroundColor: '#303846',
     borderRight: '1px solid #465064',
@@ -211,14 +214,19 @@ const styles: { [string]: Object } = {
   cornerCellContent: {
     display: 'flex',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: 8,
+    justifyContent: 'flex-start',
     minWidth: 0,
+    height: '100%',
+    position: 'relative',
   },
   cornerCellLabel: {
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
+    paddingRight: 28,
+  },
+  addRowButton: {
+    position: 'absolute',
+    top: 0,
+    right: -4,
   },
   columnHeader: {
     position: 'sticky',
@@ -271,6 +279,7 @@ const styles: { [string]: Object } = {
     position: 'sticky',
     left: 0,
     zIndex: 1,
+    boxSizing: 'border-box',
     height: 36,
     backgroundColor: '#272e3a',
     borderRight: '1px solid #465064',
@@ -279,14 +288,10 @@ const styles: { [string]: Object } = {
     padding: '0 10px',
     fontWeight: 600,
     textAlign: 'left',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
   },
   rowNameLabel: {
     display: 'block',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
   },
   rowNameInput: {
@@ -299,8 +304,6 @@ const styles: { [string]: Object } = {
     padding: 0,
     font: 'inherit',
     fontWeight: 'inherit',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
   },
   cell: {
@@ -624,10 +627,8 @@ const GlobalConfigDialog = ({
   const rowKeyColumnWidth = React.useMemo(
     () => {
       const headerWidth =
-        measureGridTextWidth(t`Row key`) +
-        gridCellHorizontalPadding +
-        rowHeaderActionWidth;
-      const widestRowKeyWidth = visibleRowKeys.reduce(
+        measureGridTextWidth(t`Row key`) + gridCellHorizontalPadding;
+      const widestRowKeyWidth = rowKeys.reduce(
         (widestWidth, rowKey) =>
           Math.max(
             widestWidth,
@@ -636,9 +637,9 @@ const GlobalConfigDialog = ({
         headerWidth
       );
 
-      return clampGridColumnWidth(widestRowKeyWidth);
+      return clampRowKeyColumnWidth(widestRowKeyWidth);
     },
-    [visibleRowKeys]
+    [rowKeys]
   );
   const columnWidths: { [string]: number } = React.useMemo(
     () => {
@@ -1160,6 +1161,7 @@ const GlobalConfigDialog = ({
                             <Trans>Row key</Trans>
                           </span>
                           <IconButton
+                            style={styles.addRowButton}
                             size="small"
                             color="default"
                             tooltip={t`Add row`}

@@ -548,6 +548,27 @@ const getSelectedPath = (selectedCell: ?SelectedCell, config: ConfigRoot) => {
   );
 };
 
+const getSelectedRowJson = (
+  selectedCell: ?SelectedCell,
+  config: ConfigRoot
+): string => {
+  if (!selectedCell || selectedCell.columnKey) return '';
+
+  const sheet = config[selectedCell.sheetName];
+  const rowValue = Array.isArray(sheet)
+    ? sheet[Number(selectedCell.rowKey)]
+    : isPlainObject(sheet)
+    ? sheet[selectedCell.rowKey]
+    : undefined;
+  if (rowValue === undefined) return '';
+
+  try {
+    return JSON.stringify(rowValue).trim();
+  } catch (error) {
+    return '';
+  }
+};
+
 const GlobalConfigDialog = ({
   project,
   open = true,
@@ -1030,6 +1051,7 @@ const GlobalConfigDialog = ({
 
   const selectedPath = getSelectedPath(selectedCell, config);
   const selectedPlaceholder = selectedPath ? '{{' + selectedPath + '}}' : '';
+  const selectedRowJson = getSelectedRowJson(selectedCell, config);
 
   const copyText = React.useCallback((text: string) => {
     if (!text) return;
@@ -1358,6 +1380,13 @@ const GlobalConfigDialog = ({
               >
                 <CopyIcon />
               </IconButton>
+              {selectedRowJson ? (
+                <FlatButton
+                  label={<Trans>Copy JSON</Trans>}
+                  leftIcon={<CopyIcon />}
+                  onClick={() => copyText(selectedRowJson)}
+                />
+              ) : null}
               <span style={styles.rawToggleSpacer} />
               <FlatButton
                 label={<Trans>Raw JSON</Trans>}

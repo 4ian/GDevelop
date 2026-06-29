@@ -223,6 +223,7 @@ const InnerTreeView = <Item: ItemBaseAttributes>(
   const [renamedItemId, setRenamedItemId] = React.useState<?string>(null);
   const contextMenuRef = React.useRef<?ContextMenuInterface>(null);
   const containerRef = React.useRef<?HTMLDivElement>(null);
+  const listOuterRef = React.useRef<?HTMLDivElement>(null);
   // $FlowFixMe[value-as-type]
   const listRef = React.useRef<?FixedSizeList>(null);
   const [
@@ -536,20 +537,41 @@ const InnerTreeView = <Item: ItemBaseAttributes>(
     [animatedItemId]
   );
 
+  const forceUpdateList = React.useCallback(
+    () => {
+      forceUpdate();
+      if (listRef.current) {
+        // When Electron closes a popped-out window, Chromium can restore the
+        // real DOM scroll position before react-window receives a scroll
+        // event. Sync react-window with the DOM first so rows are not painted
+        // at stale offsets, leaving a blank gap at the top of the tree.
+        if (listOuterRef.current) {
+          listRef.current.scrollTo(listOuterRef.current.scrollTop);
+        }
+        // $FlowFixMe[prop-missing] - FixedSizeList is a React component.
+        listRef.current.forceUpdate();
+      }
+    },
+    [forceUpdate]
+  );
+
+  React.useEffect(
+    () => {
+      window.addEventListener('focus', forceUpdateList);
+      window.addEventListener('resize', forceUpdateList);
+      return () => {
+        window.removeEventListener('focus', forceUpdateList);
+        window.removeEventListener('resize', forceUpdateList);
+      };
+    },
+    [forceUpdateList]
+  );
+
   React.useImperativeHandle(
     // $FlowFixMe[incompatible-type]
     ref,
     () => ({
-      forceUpdateList: () => {
-        forceUpdate();
-        if (listRef.current) {
-          // The parent TreeView can re-render with the same shallow props while
-          // react-window keeps its previous rendered range. Force the list
-          // instance too so visible rows are repainted.
-          // $FlowFixMe[prop-missing] - FixedSizeList is a React component.
-          listRef.current.forceUpdate();
-        }
-      },
+      forceUpdateList,
       scrollToItem,
       scrollToItemFromId,
       renameItem,
@@ -752,6 +774,7 @@ const InnerTreeView = <Item: ItemBaseAttributes>(
           itemSize={TREE_VIEW_ROW_HEIGHT}
           width={typeof width === 'number' ? width : '100%'}
           itemKey={index => flattenedData[index].id}
+          outerRef={listOuterRef}
           // Flow does not seem to accept the generic used in FixedSizeList
           // can itself use a generic.
           // $FlowFixMe[incompatible-type]

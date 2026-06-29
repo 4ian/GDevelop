@@ -813,7 +813,9 @@ const MainFrame = (props: Props): React.MixedElement => {
     // its external tab. Refresh immediately and once more after the browser has
     // processed the focus/resize work caused by the child window closing.
     setTimeout(refresh, 0);
+    setTimeout(refresh, 50);
     setTimeout(refresh, 150);
+    setTimeout(refresh, 500);
   }, []);
 
   const getEditorOpeningOptions = React.useCallback(

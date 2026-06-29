@@ -16,7 +16,9 @@ namespace gdjs {
       const logger = new gdjs.Logger('Global configuration');
       const hasOwn = Object.prototype.hasOwnProperty;
       const exactPlaceholderRegex = /^\s*\{\{\s*([^{}]+?)\s*\}\}\s*$/;
+      const dynamicVariableSegmentRegex = /^\$([A-Za-z_][A-Za-z0-9_]*)$/;
       const warnedMissingPaths = new Set<string>();
+      const warnedDynamicPathVariables = new Set<string>();
       const warnedSchemaMismatches = new Set<string>();
 
       const isObjectLike = (
@@ -41,6 +43,27 @@ namespace gdjs {
         warnedMissingPaths.add(normalizedPath);
         logger.warn(
           'Global config path "{{' + normalizedPath + '}}" does not exist.'
+        );
+      };
+
+      const warnDynamicPathVariable = function(
+        path: string,
+        variableName: string,
+        reason: string
+      ): void {
+        const normalizedPath = normalizePath(path);
+        const warningKey = normalizedPath + '|' + variableName + '|' + reason;
+        if (warnedDynamicPathVariables.has(warningKey)) return;
+
+        warnedDynamicPathVariables.add(warningKey);
+        logger.warn(
+          'Global config path "{{' +
+            normalizedPath +
+            '}}" uses global variable "$' +
+            variableName +
+            '" but ' +
+            reason +
+            '.'
         );
       };
 
@@ -265,6 +288,57 @@ namespace gdjs {
         return segments;
       };
 
+      const resolveDynamicPathSegment = function(
+        runtimeGame: gdjs.RuntimeGame,
+        path: string,
+        segment: GlobalConfigPathSegment
+      ): GlobalConfigPathSegment | null {
+        if (typeof segment !== 'string') return segment;
+
+        const match = dynamicVariableSegmentRegex.exec(segment);
+        if (!match) return segment;
+
+        const variableName = match[1];
+        const variables = runtimeGame.getVariables();
+        if (!variables.has(variableName)) {
+          warnDynamicPathVariable(path, variableName, 'it does not exist');
+          return null;
+        }
+
+        const variable = variables.get(variableName);
+        if (!variable.isPrimitive()) {
+          warnDynamicPathVariable(
+            path,
+            variableName,
+            'it is not a primitive value'
+          );
+          return null;
+        }
+
+        return variable.getAsString();
+      };
+
+      const resolveDynamicPathSegments = function(
+        runtimeGame: gdjs.RuntimeGame,
+        path: string
+      ): GlobalConfigPathSegment[] | null {
+        const segments = parsePath(path);
+        const resolvedSegments: GlobalConfigPathSegment[] = [];
+
+        for (const segment of segments) {
+          const resolvedSegment = resolveDynamicPathSegment(
+            runtimeGame,
+            path,
+            segment
+          );
+          if (resolvedSegment === null) return null;
+
+          resolvedSegments.push(resolvedSegment);
+        }
+
+        return resolvedSegments;
+      };
+
       export const getValue = function(
         runtimeGame: gdjs.RuntimeGame,
         path: string,
@@ -273,7 +347,12 @@ namespace gdjs {
         let value:
           | GlobalConfigValue
           | undefined = runtimeGame.getGlobalConfig();
-        const segments = parsePath(path);
+        const segments = resolveDynamicPathSegments(runtimeGame, path);
+        if (!segments) {
+          if (warnIfMissing) warnMissingPath(path);
+          return undefined;
+        }
+
         for (const segment of segments) {
           if (typeof segment === 'number') {
             if (
@@ -460,7 +539,7 @@ namespace gdjs {
         parent: { [key: string]: GlobalConfigValue } | GlobalConfigValue[];
         segment: GlobalConfigPathSegment;
       } | null {
-        const segments = parsePath(path);
+        const segments = resolveDynamicPathSegments(runtimeGame, path);
         if (segments.length === 0) return null;
 
         let value: any = runtimeGame.getGlobalConfig();

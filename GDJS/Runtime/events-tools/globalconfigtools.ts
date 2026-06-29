@@ -16,7 +16,7 @@ namespace gdjs {
       const logger = new gdjs.Logger('Global configuration');
       const hasOwn = Object.prototype.hasOwnProperty;
       const exactPlaceholderRegex = /^\s*\{\{\s*([^{}]+?)\s*\}\}\s*$/;
-      const dynamicVariableSegmentRegex = /^\$([A-Za-z_][A-Za-z0-9_]*)$/;
+      const dynamicVariableTokenRegex = /\$([A-Za-z_][A-Za-z0-9_]*)/g;
       const warnedMissingPaths = new Set<string>();
       const warnedDynamicPathVariables = new Set<string>();
       const warnedSchemaMismatches = new Set<string>();
@@ -294,27 +294,33 @@ namespace gdjs {
       ): GlobalConfigPathSegment | null {
         if (typeof segment !== 'string') return segment;
 
-        const match = dynamicVariableSegmentRegex.exec(segment);
-        if (!match) return segment;
-
-        const variableName = match[1];
         const variables = runtimeGame.getVariables();
-        if (!variables.has(variableName)) {
-          warnDynamicPathVariable(path, variableName, 'it does not exist');
-          return null;
-        }
+        let hasUnresolvedVariable = false;
+        const resolvedSegment = segment.replace(
+          dynamicVariableTokenRegex,
+          (_match, variableName) => {
+            if (!variables.has(variableName)) {
+              warnDynamicPathVariable(path, variableName, 'it does not exist');
+              hasUnresolvedVariable = true;
+              return '';
+            }
 
-        const variable = variables.get(variableName);
-        if (!variable.isPrimitive()) {
-          warnDynamicPathVariable(
-            path,
-            variableName,
-            'it is not a primitive value'
-          );
-          return null;
-        }
+            const variable = variables.get(variableName);
+            if (!variable.isPrimitive()) {
+              warnDynamicPathVariable(
+                path,
+                variableName,
+                'it is not a primitive value'
+              );
+              hasUnresolvedVariable = true;
+              return '';
+            }
 
-        return variable.getAsString();
+            return variable.getAsString();
+          }
+        );
+
+        return hasUnresolvedVariable ? null : resolvedSegment;
       };
 
       const resolveDynamicPathSegments = function(

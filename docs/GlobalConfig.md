@@ -136,6 +136,7 @@ Public config references use exact placeholder paths:
 {{cards["sun.flower"].price}}
 {{localization['main menu'].title}}
 {{texts.card_sunflower_name.$locale}}
+{{i18n.button1.label_$locale}}
 ```
 
 Inside `{{...}}`, the path parser supports:
@@ -146,6 +147,7 @@ waves[0].enemies[2].type
 cards["sun.flower"].price
 localization['main menu'].title
 texts.card_sunflower_name.$locale
+i18n.button1.label_$locale
 ```
 
 Path behavior:
@@ -153,10 +155,12 @@ Path behavior:
 - Dot segments address object properties.
 - Bracket numbers address array indexes.
 - Bracket strings address object keys that contain dots, spaces, or other non-identifier characters.
-- A whole path segment starting with `$`, such as `$locale`, is resolved from a
-  global variable with the same name without `$`. For example,
+- A `$name` token inside a string path segment is resolved from a global
+  variable with the same name without `$`. For example,
   `{{texts.card_sunflower_name.$locale}}` reads global variable `locale`, then
-  uses its string value as the final path segment.
+  uses its string value as the final path segment. Embedded tokens are also
+  supported: if `locale` is `en`, `{{i18n.button1.label_$locale}}` reads
+  `i18n.button1.label_en`.
 - Whitespace is trimmed inside brackets and placeholder delimiters.
 - Missing reads print one runtime warning per path, return `undefined`
   internally, and keep deterministic defaults through typed helpers.

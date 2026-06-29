@@ -3532,6 +3532,7 @@ interface EventsBasedObject {
     [Ref] InitialInstancesContainer GetInitialInstances();
     [Ref] LayersContainer GetLayers();
     [Ref] ObjectsContainer GetObjects();
+    [Ref] VariablesContainer GetVariables();
     [Value] VectorString GetAllBehaviorNames();
     boolean HasBehaviorNamed([Const] DOMString name);
     Behavior AddNewBehavior([Ref] Project project, [Const] DOMString type, [Const] DOMString name);

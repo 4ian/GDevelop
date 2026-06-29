@@ -8,6 +8,7 @@ import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewB
 import EventsRootVariablesFinder from '../Utils/EventsRootVariablesFinder';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 import { enumerateObjectVariableTabs } from './UnifiedVariablesDialogTabs';
+import { getRootVariableName } from '../EventsSheet/ParameterFields/VariableField';
 
 type Props = {|
   open: boolean,
@@ -51,6 +52,9 @@ const UnifiedVariablesDialog = ({
     globalVariables = eventsFunctionsExtension.getGlobalVariables();
     sceneVariables = eventsFunctionsExtension.getSceneVariables();
   }
+  const prefabVariables = eventsBasedObject
+    ? eventsBasedObject.getVariables()
+    : null;
 
   const objectVariableTabs = React.useMemo(
     () =>
@@ -84,9 +88,24 @@ const UnifiedVariablesDialog = ({
     [layout, project]
   );
 
+  const onComputeAllPrefabVariableNames = React.useCallback(
+    (): Array<string> => [],
+    []
+  );
+
   const tabs = React.useMemo(
     () =>
       [
+        prefabVariables && {
+          id: 'prefab-variables',
+          label: <Trans>Prefab variables</Trans>,
+          variablesContainer: prefabVariables,
+          emptyPlaceholderTitle: <Trans>Add your first prefab variable</Trans>,
+          emptyPlaceholderDescription: (
+            <Trans>These variables hold internal state for the prefab.</Trans>
+          ),
+          onComputeAllVariableNames: onComputeAllPrefabVariableNames,
+        },
         sceneVariables && {
           id: 'scene-variables',
           label: <Trans>Scene variables</Trans>,
@@ -139,6 +158,8 @@ const UnifiedVariablesDialog = ({
         ),
       ].filter(Boolean),
     [
+      prefabVariables,
+      onComputeAllPrefabVariableNames,
       sceneVariables,
       onComputeAllSceneVariableNames,
       globalVariables,
@@ -146,6 +167,50 @@ const UnifiedVariablesDialog = ({
       objectVariableTabs,
       layout,
       project,
+    ]
+  );
+
+  const initiallyOpenTabId = React.useMemo(
+    () => {
+      const selectedVariableRootName = initiallySelectedVariable
+        ? getRootVariableName(initiallySelectedVariable.variableName)
+        : '';
+
+      if (isGlobalTabInitiallyOpen && globalVariables) {
+        return 'global-variables';
+      }
+      if (selectedVariableRootName) {
+        if (globalVariables && globalVariables.has(selectedVariableRootName)) {
+          return 'global-variables';
+        }
+        if (sceneVariables && sceneVariables.has(selectedVariableRootName)) {
+          return 'scene-variables';
+        }
+        if (prefabVariables && prefabVariables.has(selectedVariableRootName)) {
+          return 'prefab-variables';
+        }
+        const objectVariableTab = objectVariableTabs.find(
+          ({ variablesContainer }) =>
+            variablesContainer.has(selectedVariableRootName)
+        );
+        if (objectVariableTab) {
+          return objectVariableTab.id;
+        }
+      }
+
+      if (prefabVariables) return 'prefab-variables';
+      if (sceneVariables) return 'scene-variables';
+      if (globalVariables) return 'global-variables';
+      return tabs.length > 0 ? tabs[0].id : undefined;
+    },
+    [
+      initiallySelectedVariable,
+      isGlobalTabInitiallyOpen,
+      globalVariables,
+      sceneVariables,
+      prefabVariables,
+      objectVariableTabs,
+      tabs,
     ]
   );
 
@@ -159,9 +224,7 @@ const UnifiedVariablesDialog = ({
       title={<Trans>Variables</Trans>}
       // $FlowFixMe[incompatible-type]
       tabs={tabs}
-      initiallyOpenTabId={
-        isGlobalTabInitiallyOpen ? 'global-variables' : 'scene-variables'
-      }
+      initiallyOpenTabId={initiallyOpenTabId}
       initiallySelectedVariable={initiallySelectedVariable}
       helpPagePath={'/all-features/variables'}
       hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}

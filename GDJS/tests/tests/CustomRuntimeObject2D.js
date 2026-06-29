@@ -5,8 +5,9 @@ describe('gdjs.CustomRuntimeObject', function () {
    * Create a CustomRuntimeObject with a SpriteRuntimeObject using a 64x64
    * image with a custom collision mask.
    * @param {gdjs.RuntimeInstanceContainer} instanceContainer
+   * @param {Array<RootVariableData>=} variables
    */
-  const createCustomObject = (instanceContainer) => {
+  const createCustomObject = (instanceContainer, variables = []) => {
     // The corresponding event-based object declaration is done by
     // getPixiRuntimeGameWithAssets.
     const customObject = new gdjs.CustomRuntimeObject2D(instanceContainer, {
@@ -14,7 +15,7 @@ describe('gdjs.CustomRuntimeObject', function () {
       type: 'MyExtension::MyEventsBasedObject',
       variant: '',
       isInnerAreaFollowingParentSize: false,
-      variables: [],
+      variables,
       behaviors: [],
       effects: [],
       content: {},
@@ -49,6 +50,62 @@ describe('gdjs.CustomRuntimeObject', function () {
     }
     return sprite;
   };
+
+  it('initializes variables from the events-based object definition', async () => {
+    const runtimeGame = await gdjs.getPixiRuntimeGameWithAssets({
+      customObjectVariables: [
+        {
+          name: 'Health',
+          type: 'number',
+          value: 100,
+        },
+        {
+          name: 'State',
+          type: 'string',
+          value: 'Idle',
+        },
+      ],
+    });
+    const runtimeScene = createSceneWithLayer(runtimeGame);
+
+    const customObject = createCustomObject(runtimeScene);
+
+    expect(customObject.getVariables().get('Health').getAsNumber()).to.be(100);
+    expect(customObject.getVariables().get('State').getAsString()).to.be(
+      'Idle'
+    );
+  });
+
+  it('keeps scene object variables when they override prefab variables', async () => {
+    const runtimeGame = await gdjs.getPixiRuntimeGameWithAssets({
+      customObjectVariables: [
+        {
+          name: 'Health',
+          type: 'number',
+          value: 100,
+        },
+        {
+          name: 'State',
+          type: 'string',
+          value: 'Idle',
+        },
+      ],
+    });
+    const runtimeScene = createSceneWithLayer(runtimeGame);
+
+    const customObject = createCustomObject(runtimeScene, [
+      {
+        name: 'Health',
+        type: 'number',
+        value: 25,
+      },
+    ]);
+
+    expect(customObject.getVariables().get('Health').getAsNumber()).to.be(25);
+    expect(customObject.getVariables().get('State').getAsString()).to.be(
+      'Idle'
+    );
+  });
 
   describe('with 2 sprites', function () {
     const instancesSideBySide = [

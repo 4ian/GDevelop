@@ -18,7 +18,8 @@ EventsBasedObject::EventsBasedObject()
     isAnimatable(false),
     isTextContainer(false),
     isInnerAreaFollowingParentSize(false),
-    isUsingLegacyInstancesRenderer(false) {
+    isUsingLegacyInstancesRenderer(false),
+    variables(gd::VariablesContainer::SourceType::Object) {
 }
 
 EventsBasedObject::~EventsBasedObject() {}
@@ -78,6 +79,7 @@ void EventsBasedObject::SerializeToExternal(SerializerElement& element) const {
   // AbstractEventsBasedEntity::SerializeTo must be done after.
   defaultVariant.SerializeTo(element);
   behaviors.SerializeTo(element.AddChild("behaviors"));
+  variables.SerializeTo(element.AddChild("variables"));
   AbstractEventsBasedEntity::SerializeTo(element);
 }
 
@@ -100,6 +102,10 @@ void EventsBasedObject::UnserializeFrom(gd::Project& project,
   defaultVariant.SetName("");
   behaviors.UnserializeFrom(
       project, element.GetChild("behaviors", 0, "automatisms"));
+  variables.Clear();
+  if (element.HasChild("variables")) {
+    variables.UnserializeFrom(element.GetChild("variables"));
+  }
   AbstractEventsBasedEntity::UnserializeFrom(project, element);
 
   if (element.HasChild("variants")) {

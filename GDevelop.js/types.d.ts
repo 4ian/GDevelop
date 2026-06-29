@@ -2578,6 +2578,7 @@ export class EventsBasedObject extends AbstractEventsBasedEntity {
   getInitialInstances(): InitialInstancesContainer;
   getLayers(): LayersContainer;
   getObjects(): ObjectsContainer;
+  getVariables(): VariablesContainer;
   getAllBehaviorNames(): VectorString;
   hasBehaviorNamed(name: string): boolean;
   addNewBehavior(project: Project, type: string, name: string): Behavior;

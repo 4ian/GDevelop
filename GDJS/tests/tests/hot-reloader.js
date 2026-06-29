@@ -213,6 +213,7 @@ describe('gdjs.HotReloader._hotReloadRuntimeGame', () => {
     return {
       name,
       variables: [],
+      behaviors: [],
       instances: instances
         ? instances.map((instance) => ({
             ...defaultChildInstance,

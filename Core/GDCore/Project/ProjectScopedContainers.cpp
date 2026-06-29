@@ -5,6 +5,7 @@
 #include "GDCore/Project/EventsBasedBehavior.h"
 #include "GDCore/Project/EventsBasedObject.h"
 #include "GDCore/Project/Layout.h"
+#include "GDCore/Project/Object.h"
 #include "GDCore/Project/ObjectsContainer.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/Events/Event.h"
@@ -211,18 +212,19 @@ ProjectScopedContainers::MakeNewProjectScopedContainersForEventsBasedObject(
   // "globalObjectsContainer".
   // Search for "ProjectScopedContainers wrongly containing temporary objects containers or objects"
   // in the codebase.
-  outputObjectsContainer.InsertNewObject(
+  gd::Object& thisObject = outputObjectsContainer.InsertNewObject(
       project,
       gd::PlatformExtension::GetObjectFullType(
           eventsFunctionsExtension.GetName(), eventsBasedObject.GetName()),
       "Object", outputObjectsContainer.GetObjectsCount());
+  thisObject.GetVariables() = eventsBasedObject.GetVariables();
 
   ProjectScopedContainers projectScopedContainers(
       ObjectsContainersList::MakeNewObjectsContainersListForContainers(
           eventsBasedObject.GetObjects(), outputObjectsContainer),
       VariablesContainersList::
-          MakeNewVariablesContainersListForEventsFunctionsExtension(
-              eventsFunctionsExtension),
+          MakeNewVariablesContainersListForEventsBasedObject(
+              eventsFunctionsExtension, eventsBasedObject),
       &eventsFunctionsExtension.GetGlobalVariables(),
       &eventsFunctionsExtension.GetSceneVariables(),
       PropertiesContainersList::MakeNewEmptyPropertiesContainersList(),

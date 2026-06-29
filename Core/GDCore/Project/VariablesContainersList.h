@@ -42,6 +42,11 @@ public:
       const gd::EventsFunctionsExtension &extension);
 
   static VariablesContainersList
+  MakeNewVariablesContainersListForEventsBasedObject(
+      const gd::EventsFunctionsExtension &extension,
+      const gd::EventsBasedObject &eventsBasedObject);
+
+  static VariablesContainersList
   MakeNewVariablesContainersListForFreeEventsFunction(
       const gd::EventsFunctionsExtension &extension,
       const gd::EventsFunction &eventsFunction,

@@ -13,6 +13,7 @@
 #include "GDCore/Project/ObjectsContainer.h"
 #include "GDCore/Project/InitialInstancesContainer.h"
 #include "GDCore/Project/LayersContainer.h"
+#include "GDCore/Project/VariablesContainer.h"
 #include "GDCore/String.h"
 namespace gd {
 class SerializerElement;
@@ -253,6 +254,23 @@ class GD_CORE_API EventsBasedObject: public AbstractEventsBasedEntity {
   }
   ///@}
 
+  /** \name Variables
+   */
+  ///@{
+  /**
+   * \brief Get the variables of the custom object.
+   *
+   * These variables store state owned by the custom object itself and are
+   * available as variables of the "Object" parameter in its events.
+   */
+  const gd::VariablesContainer& GetVariables() const { return variables; }
+
+  /**
+   * \brief Get the variables of the custom object.
+   */
+  gd::VariablesContainer& GetVariables() { return variables; }
+  ///@}
+
   /** \name Behaviors management
    * Members functions related to behaviors management.
    */
@@ -452,6 +470,7 @@ class GD_CORE_API EventsBasedObject: public AbstractEventsBasedEntity {
   gd::EventsBasedObjectVariant defaultVariant;
   gd::EventsBasedObjectVariantsContainer variants;
   gd::BehaviorsContainer behaviors;
+  gd::VariablesContainer variables;
 };
 
 }  // namespace gd

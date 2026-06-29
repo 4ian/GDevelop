@@ -21,7 +21,7 @@ const defaultInstance = {
  * Create and return a game with a few assets loaded, to be used in tests
  * needing real images.
  * @internal
- * @param props {?{customObjectInstances?: Array<InstanceData>}}
+ * @param props {?{customObjectInstances?: Array<InstanceData>, customObjectVariables?: Array<RootVariableData>}}
  * @returns {Promise<gdjs.RuntimeGame>} A promise resolving with the game with loaded assets.
  */
 gdjs.getPixiRuntimeGameWithAssets = (props = null) => {
@@ -144,6 +144,7 @@ gdjs.getPixiRuntimeGameWithAssets = (props = null) => {
         eventsBasedObjects: [
           {
             name: 'MyEventsBasedObject',
+            variables: (props && props.customObjectVariables) || [],
             objects: [
               {
                 name: 'MySprite',

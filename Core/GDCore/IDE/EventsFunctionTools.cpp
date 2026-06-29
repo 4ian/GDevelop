@@ -102,6 +102,9 @@ void EventsFunctionTools::ObjectEventsFunctionToObjectsContainer(
                   "for the parent. ");
     return;
   }
+
+  gd::Object& thisObject = outputObjectsContainer.GetObject("Object");
+  thisObject.GetVariables() = eventsBasedObject.GetVariables();
 }
 
 void EventsFunctionTools::ParametersToVariablesContainer(

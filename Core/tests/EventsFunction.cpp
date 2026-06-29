@@ -17,7 +17,9 @@
 #include "GDCore/Project/Object.h"
 #include "GDCore/Project/ObjectsContainer.h"
 #include "GDCore/Project/Project.h"
+#include "GDCore/Project/ProjectScopedContainers.h"
 #include "GDCore/Project/PropertiesContainer.h"
+#include "GDCore/Project/ResourcesContainer.h"
 #include "GDCore/Project/Variable.h"
 #include "GDCore/Project/VariablesContainer.h"
 #include "GDCore/Serialization/SerializerElement.h"
@@ -127,6 +129,68 @@ TEST_CASE("EventsFunction", "[common]") {
             "MyExtension::MyBehavior");
     REQUIRE(
         object.GetBehavior("MyPrefabBehavior").IsInheritedFromObjectType());
+  }
+
+  SECTION("Prefab variables are exposed in prefab event scopes") {
+    gd::Platform platform;
+    gd::Project project;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    auto &eventsExtension =
+        project.InsertNewEventsFunctionsExtension("MyEventsExtension", 0);
+    auto &eventsBasedObject = eventsExtension.GetEventsBasedObjects().InsertNew(
+        "MyEventsBasedObject", 0);
+    eventsBasedObject.GetVariables()
+        .InsertNew("PrefabState", eventsBasedObject.GetVariables().Count())
+        .SetString("Idle");
+
+    gd::ObjectsContainer prefabConfigurationObjectsContainer(
+        gd::ObjectsContainer::SourceType::Unknown);
+    auto prefabConfigurationScopedContainers =
+        gd::ProjectScopedContainers::
+            MakeNewProjectScopedContainersForEventsBasedObject(
+                project, eventsExtension, eventsBasedObject,
+                prefabConfigurationObjectsContainer);
+    const auto &prefabConfigurationVariablesContainersList =
+        prefabConfigurationScopedContainers.GetVariablesContainersList();
+
+    REQUIRE(prefabConfigurationVariablesContainersList.Has("PrefabState"));
+    REQUIRE(&prefabConfigurationVariablesContainersList
+                 .GetVariablesContainerFromVariableNameOnly("PrefabState") ==
+            &eventsBasedObject.GetVariables());
+
+    auto &eventsFunction =
+        eventsBasedObject.GetEventsFunctions().InsertNewEventsFunction(
+            "MyObjectEventsFunction", 0);
+    gd::WholeProjectRefactorer::EnsureObjectEventsFunctionsProperParameters(
+        eventsExtension, eventsBasedObject);
+
+    gd::ObjectsContainer parameterObjectsContainer(
+        gd::ObjectsContainer::SourceType::Function);
+    gd::VariablesContainer parameterVariablesContainer(
+        gd::VariablesContainer::SourceType::Parameters);
+    gd::VariablesContainer propertyVariablesContainer(
+        gd::VariablesContainer::SourceType::Properties);
+    gd::ResourcesContainer parameterResourcesContainer(
+        gd::ResourcesContainer::SourceType::Parameters);
+    gd::ResourcesContainer propertyResourcesContainer(
+        gd::ResourcesContainer::SourceType::Properties);
+    auto objectFunctionScopedContainers =
+        gd::ProjectScopedContainers::
+            MakeNewProjectScopedContainersForObjectEventsFunction(
+                project, eventsExtension, eventsBasedObject, eventsFunction,
+                parameterObjectsContainer, parameterVariablesContainer,
+                propertyVariablesContainer, parameterResourcesContainer,
+                propertyResourcesContainer);
+    const auto &objectFunctionVariablesContainersList =
+        objectFunctionScopedContainers.GetVariablesContainersList();
+
+    REQUIRE(objectFunctionVariablesContainersList.Has("PrefabState"));
+    REQUIRE(&objectFunctionVariablesContainersList
+                 .GetVariablesContainerFromVariableNameOnly("PrefabState") ==
+            &eventsBasedObject.GetVariables());
+    REQUIRE(objectFunctionVariablesContainersList.Get("PrefabState")
+                .GetString() == "Idle");
   }
 
   SECTION("Choice properties are exposed as enum variables") {

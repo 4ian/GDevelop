@@ -106,7 +106,12 @@ namespace gdjs {
       objectData: ObjectData & CustomObjectConfiguration,
       instanceData: InstanceData | undefined
     ) {
-      super(parent, objectData, instanceData);
+      const objectDataWithPrefabVariables =
+        gdjs.CustomRuntimeObject.mergeObjectDataWithPrefabVariables(
+          parent,
+          objectData
+        );
+      super(parent, objectDataWithPrefabVariables, instanceData);
       this._type = objectData.type;
       this._instanceContainer = new gdjs.CustomRuntimeObjectInstanceContainer(
         parent,
@@ -114,10 +119,55 @@ namespace gdjs {
       );
       this._renderer = this._createRender();
 
-      this._initializeFromObjectData(objectData);
+      this._initializeFromObjectData(objectDataWithPrefabVariables);
 
       // The generated code calls onCreated at the constructor end
       // and onCreated calls its super implementation at its end.
+    }
+
+    static mergeVariablesWithPrefabVariables(
+      objectVariablesData: Array<RootVariableData>,
+      prefabVariablesData: Array<RootVariableData>
+    ): Array<RootVariableData> {
+      if (prefabVariablesData.length === 0) {
+        return objectVariablesData;
+      }
+
+      const variablesData = [...objectVariablesData];
+      const objectVariableNames = new Set(
+        objectVariablesData.map((variableData) => variableData.name)
+      );
+      for (const prefabVariableData of prefabVariablesData) {
+        if (objectVariableNames.has(prefabVariableData.name)) {
+          continue;
+        }
+        variablesData.push(prefabVariableData);
+      }
+
+      return variablesData;
+    }
+
+    static mergeObjectDataWithPrefabVariables(
+      parent: gdjs.RuntimeInstanceContainer,
+      objectData: ObjectData & CustomObjectConfiguration
+    ): ObjectData & CustomObjectConfiguration {
+      const eventsBasedObjectData = parent
+        .getGame()
+        .getEventsBasedObjectData(objectData.type);
+      const prefabVariablesData = eventsBasedObjectData
+        ? eventsBasedObjectData.variables || []
+        : [];
+      if (!eventsBasedObjectData || prefabVariablesData.length === 0) {
+        return objectData;
+      }
+
+      return {
+        ...objectData,
+        variables: gdjs.CustomRuntimeObject.mergeVariablesWithPrefabVariables(
+          objectData.variables || [],
+          prefabVariablesData
+        ),
+      };
     }
 
     private _initializeFromObjectData(
@@ -172,9 +222,14 @@ namespace gdjs {
     protected abstract _reinitializeRenderer(): void;
 
     override reinitialize(objectData: ObjectData & CustomObjectConfiguration) {
-      super.reinitialize(objectData);
+      const objectDataWithPrefabVariables =
+        gdjs.CustomRuntimeObject.mergeObjectDataWithPrefabVariables(
+          this._runtimeScene,
+          objectData
+        );
+      super.reinitialize(objectDataWithPrefabVariables);
 
-      this._reinitializeContentFromObjectData(objectData);
+      this._reinitializeContentFromObjectData(objectDataWithPrefabVariables);
 
       // When changing the variant, the instance is like a new instance.
       // We call again `onCreated` at the end, like done by the constructor

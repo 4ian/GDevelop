@@ -933,6 +933,10 @@ namespace gdjs {
           objects: mergedChildObjectDataList,
           // It must be the last one to ensure the object name won't be overridden.
           ...objectData,
+          variables: gdjs.CustomRuntimeObject.mergeVariablesWithPrefabVariables(
+            objectData.variables || [],
+            eventsBasedObjectData.variables || []
+          ),
         };
         return mergedObjectConfiguration;
       });

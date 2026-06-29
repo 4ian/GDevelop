@@ -1649,6 +1649,128 @@ describe('editorFunctions', () => {
           .getValue()
       ).toBe(1);
     });
+
+    it('deletes an element of an object array variable by index', async () => {
+      // Reproduce the reported case: object "Player" with an array variable
+      // "Variable" holding three numbers, delete index 2.
+      const playerVariables = testScene
+        .getObjects()
+        .getObject('Player')
+        .getVariables();
+      const arrayVariable = playerVariables.insertNew('Variable', 0);
+      arrayVariable.castTo('Array');
+      arrayVariable.pushNew().setValue(10);
+      arrayVariable.pushNew().setValue(11);
+      arrayVariable.pushNew().setValue(12);
+
+      const result = await editorFunctions.add_or_edit_variable.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          variable_scope: 'object',
+          scene_name: 'TestScene',
+          object_name: 'Player',
+          variables: [
+            {
+              variable_name_or_path: 'Variable[2]',
+              delete_this_variable: true,
+            },
+          ],
+        },
+      });
+
+      expect(result.success).toBe(true);
+      const updated = testScene
+        .getObjects()
+        .getObject('Player')
+        .getVariables()
+        .get('Variable');
+      expect(updated.getType()).toBe(gd.Variable.Array);
+      expect(updated.getChildrenCount()).toBe(2);
+      expect(updated.getAtIndex(0).getValue()).toBe(10);
+      expect(updated.getAtIndex(1).getValue()).toBe(11);
+    });
+  });
+
+  describe('inspect_variables', () => {
+    let project: gdProject;
+    let testScene: gdLayout;
+
+    beforeEach(() => {
+      // $FlowFixMe[invalid-constructor]
+      project = new gd.ProjectHelper.createNewGDJSProject();
+      testScene = project.insertNewLayout('TestScene', 0);
+      testScene.getObjects().insertNewObject(project, 'Sprite', 'Player', 0);
+    });
+
+    afterEach(() => {
+      project.delete();
+    });
+
+    it('returns all scene variables when no paths are requested', async () => {
+      const variables = testScene.getVariables();
+      variables.insertNew('Score', 0).setValue(7);
+      variables.insertNew('Name', 1).setString('Hero');
+
+      const result = await editorFunctions.inspect_variables.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: { variable_scope: 'scene', scene_name: 'TestScene' },
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.variables).toEqual([
+        { variableName: 'Score', type: 'Number', value: '7' },
+        { variableName: 'Name', type: 'String', value: 'Hero' },
+      ]);
+    });
+
+    it('returns a requested nested array path on an object variable', async () => {
+      const objectVariables = testScene
+        .getObjects()
+        .getObject('Player')
+        .getVariables();
+      const arrayVariable = objectVariables.insertNew('Variable', 0);
+      arrayVariable.castTo('Array');
+      arrayVariable.pushNew().setValue(10);
+      arrayVariable.pushNew().setValue(11);
+      arrayVariable.pushNew().setValue(12);
+
+      const result = await editorFunctions.inspect_variables.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          variable_scope: 'object',
+          scene_name: 'TestScene',
+          object_name: 'Player',
+          variable_names_or_paths: ['Variable[2]'],
+        },
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.variables).toEqual([
+        { variableName: 'Variable[2]', type: 'Number', value: '12' },
+      ]);
+    });
+
+    it('reports requested paths that do not exist', async () => {
+      testScene
+        .getVariables()
+        .insertNew('Score', 0)
+        .setValue(1);
+
+      const result = await editorFunctions.inspect_variables.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          variable_scope: 'scene',
+          scene_name: 'TestScene',
+          variable_names_or_paths: ['Score', 'Missing'],
+        },
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.variables).toEqual([
+        { variableName: 'Score', type: 'Number', value: '1' },
+      ]);
+      expect(result.message).toContain('Missing');
+    });
   });
 
   describe('inspect_object_properties (property listing format)', () => {
@@ -1671,6 +1793,25 @@ describe('editorFunctions', () => {
 
     afterEach(() => {
       project.delete();
+    });
+
+    it('reminds to inspect variables/behaviors with the dedicated tools', async () => {
+      testScene
+        .getObjects()
+        .getObject('MyText')
+        .getVariables()
+        .insertNew('Score', 0)
+        .setValue(0);
+
+      const result = await editorFunctions.inspect_object_properties.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: { scene_name: 'TestScene', object_name: 'MyText' },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.reminder).toContain('inspect_variables');
     });
 
     it('formats new object properties: short units, no boolean type tag, empty grouped at end', async () => {

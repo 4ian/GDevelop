@@ -331,3 +331,51 @@ export const applyVariableDeletion = ({
   parentVariable.removeChild(lastSegment.value);
   return { removed: true };
 };
+
+export const getVariableAtPath = ({
+  variablePath,
+  variablesContainer,
+}: {|
+  variablePath: string,
+  variablesContainer: gd.VariablesContainer,
+|}): gdVariable | null => {
+  const pathSegments = parseVariablePath(variablePath);
+
+  if (pathSegments.length === 0) {
+    throw new Error('Invalid variable path');
+  }
+
+  const firstSegment = pathSegments[0];
+  if (firstSegment.type !== 'property') {
+    throw new Error('Variable path must start with a property name');
+  }
+
+  if (!variablesContainer.has(firstSegment.value)) {
+    return null;
+  }
+  let variable = variablesContainer.get(firstSegment.value);
+
+  for (let i = 1; i < pathSegments.length; i++) {
+    const segment = pathSegments[i];
+    if (segment.type === 'property') {
+      if (
+        variable.getType() !== gd.Variable.Structure ||
+        !variable.hasChild(segment.value)
+      ) {
+        return null;
+      }
+      variable = variable.getChild(segment.value);
+    } else {
+      const index = parseInt(segment.value, 10);
+      if (
+        variable.getType() !== gd.Variable.Array ||
+        index >= variable.getChildrenCount()
+      ) {
+        return null;
+      }
+      variable = variable.getAtIndex(index);
+    }
+  }
+
+  return variable;
+};

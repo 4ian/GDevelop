@@ -28,12 +28,18 @@ import {
   rgbColorToHex,
   rgbOrHexToHexNumber,
 } from '../Utils/ColorTransformer';
-import { type SimplifiedBehavior } from './SimplifiedProject/SimplifiedProject';
+import {
+  type SimplifiedBehavior,
+  type SimplifiedVariable,
+  getSimplifiedVariable,
+  getSimplifiedVariablesContainer,
+} from './SimplifiedProject/SimplifiedProject';
 import { ColumnStackLayout } from '../UI/Layout';
 import Text from '../UI/Text';
 import {
   applyVariableChange,
   applyVariableDeletion,
+  getVariableAtPath,
 } from './ApplyVariableChange';
 import {
   addDefaultLightToAllLayers,
@@ -129,6 +135,8 @@ export type EditorFunctionGenericOutput = {|
   instances?: any,
   layers?: any,
   behaviors?: Array<SimplifiedBehavior>,
+  variables?: Array<SimplifiedVariable>,
+  reminder?: string,
   animationNames?: string,
   generatedEventsErrorDiagnostics?: string,
   aiGeneratedEventId?: string,
@@ -1490,6 +1498,20 @@ const inspectObjectProperties: EditorFunction = {
       }
     );
 
+    const variableCount = object.getVariables().count();
+    const behaviorCount = behaviors.length;
+    const inspectParts = [];
+    if (variableCount > 0) {
+      inspectParts.push(
+        `${variableCount} variable(s) (inspect with \`inspect_variables\`)`
+      );
+    }
+    if (behaviorCount > 0) {
+      inspectParts.push(
+        `${behaviorCount} behavior(s) (inspect with \`inspect_behavior_properties\`)`
+      );
+    }
+
     const output: EditorFunctionGenericOutput = {
       success: true,
       objectName: object_name,
@@ -1499,6 +1521,9 @@ const inspectObjectProperties: EditorFunction = {
         .filter(Boolean)
         .join('-'),
     };
+    if (inspectParts.length > 0) {
+      output.reminder = `This object also has ${inspectParts.join(' and ')}.`;
+    }
     injectObjectSizeInfo(output, {
       [object_name]: getObjectSizeInfo(object, project, PixiResourcesLoader),
     });
@@ -5646,6 +5671,119 @@ const extractVariableOperations = (
   ];
 };
 
+type VariablesContainersResolution = {|
+  failure: EditorFunctionGenericOutput | null,
+  variablesContainers: Array<gdVariablesContainer>,
+  scopeDescription: string,
+|};
+
+// Resolve a variable scope to the variables container(s) to act on. A group
+// resolves to the container of every object in it (a group variable is shared
+// by all of them); `object` and `group` are equivalent (resolved to whichever
+// exists). Returns a `failure` output to forward when the scope is invalid.
+const resolveVariablesContainers = ({
+  project,
+  variable_scope,
+  scene_name,
+  object_name,
+}: {|
+  project: gdProject,
+  variable_scope: string,
+  scene_name: ?string,
+  object_name: ?string,
+|}): VariablesContainersResolution => {
+  const fail = (message: string): VariablesContainersResolution => ({
+    failure: makeGenericFailure(message),
+    variablesContainers: [],
+    scopeDescription: '',
+  });
+
+  if (variable_scope === 'scene') {
+    if (!scene_name) {
+      return fail(`Missing "scene_name" (required for scene variable).`);
+    }
+    if (!project.hasLayoutNamed(scene_name)) {
+      return fail(`Scene not found: "${scene_name}".`);
+    }
+    return {
+      failure: null,
+      variablesContainers: [project.getLayout(scene_name).getVariables()],
+      scopeDescription: `scene "${scene_name}"`,
+    };
+  } else if (variable_scope === 'object' || variable_scope === 'group') {
+    if (!object_name) {
+      return fail(
+        `Missing "object_name" (required for an object or group variable).`
+      );
+    }
+
+    let concernedObjects: Array<gdObject> = [];
+    let isGroup = false;
+    if (scene_name) {
+      if (!project.hasLayoutNamed(scene_name)) {
+        return fail(`Scene not found: "${scene_name}".`);
+      }
+      const concerned = resolveObjectsFromContextAndName({
+        project,
+        layout: project.getLayout(scene_name),
+        objectOrGroupName: object_name,
+      });
+      if (!concerned) {
+        return fail(
+          `Object or group "${object_name}" not in scene "${scene_name}". For a global object, omit scene_name.`
+        );
+      }
+      concernedObjects = concerned.objects;
+      isGroup = !!concerned.group;
+    } else {
+      const globalObjects = project.getObjects();
+      if (globalObjects.hasObjectNamed(object_name)) {
+        concernedObjects = [globalObjects.getObject(object_name)];
+      } else if (globalObjects.getObjectGroups().has(object_name)) {
+        isGroup = true;
+        concernedObjects = globalObjects
+          .getObjectGroups()
+          .get(object_name)
+          .getAllObjectsNames()
+          .toJSArray()
+          .map(name => getObjectByName(globalObjects, null, name))
+          .filter(Boolean);
+      } else {
+        return fail(
+          `Object or group "${object_name}" not found globally. Did you forget to specify scene_name?`
+        );
+      }
+    }
+
+    if (concernedObjects.length === 0) {
+      return fail(`Group "${object_name}" has no object.`);
+    }
+
+    const objectOrGroupLabel = isGroup
+      ? `group "${object_name}"`
+      : `object "${object_name}"`;
+    return {
+      failure: null,
+      variablesContainers: concernedObjects.map(object =>
+        object.getVariables()
+      ),
+      scopeDescription: scene_name
+        ? `scene "${scene_name}" ${objectOrGroupLabel}`
+        : `global ${objectOrGroupLabel}`,
+    };
+  } else if (variable_scope === 'global') {
+    return {
+      failure: null,
+      variablesContainers: [project.getVariables()],
+      scopeDescription: 'global',
+    };
+  }
+
+  return fail(
+    `Invalid "variable_scope": "${variable_scope}". Use \`scene\`, \`object\`, \`group\` or \`global\`.`
+  );
+};
+
 const addOrEditVariable: EditorFunction = {
   renderForEditor: ({ args, shouldShowDetails }) => {
     const variable_scope = extractRequiredString(args, 'variable_scope');
@@ -5780,92 +5918,14 @@ const addOrEditVariable: EditorFunction = {
       );
     }
 
-    // A variable change is applied to one or more variables containers.
-    // A group is handled "almost like an object": a group variable is a variable
-    // shared in common by all the objects of the group, so the change is applied
-    // to each object of the group. `object` and `group` scopes are equivalent
-    // (the name is resolved to whichever exists).
-    let variablesContainers: Array<gdVariablesContainer> = [];
-    let scopeDescription;
-    if (variable_scope === 'scene') {
-      if (!scene_name) {
-        return makeGenericFailure(
-          `Missing "scene_name" (required for scene variable).`
-        );
-      }
-      if (!project.hasLayoutNamed(scene_name)) {
-        return makeGenericFailure(`Scene not found: "${scene_name}".`);
-      }
-      variablesContainers = [project.getLayout(scene_name).getVariables()];
-      scopeDescription = `scene "${scene_name}"`;
-    } else if (variable_scope === 'object' || variable_scope === 'group') {
-      if (!object_name) {
-        return makeGenericFailure(
-          `Missing "object_name" (required for an object or group variable).`
-        );
-      }
-
-      let concernedObjects: Array<gdObject> = [];
-      let isGroup = false;
-      if (scene_name) {
-        if (!project.hasLayoutNamed(scene_name)) {
-          return makeGenericFailure(`Scene not found: "${scene_name}".`);
-        }
-        const concerned = resolveObjectsFromContextAndName({
-          project,
-          layout: project.getLayout(scene_name),
-          objectOrGroupName: object_name,
-        });
-        if (!concerned) {
-          return makeGenericFailure(
-            `Object or group "${object_name}" not in scene "${scene_name}". For a global object, omit scene_name.`
-          );
-        }
-        concernedObjects = concerned.objects;
-        isGroup = !!concerned.group;
-      } else {
-        const globalObjects = project.getObjects();
-        if (globalObjects.hasObjectNamed(object_name)) {
-          concernedObjects = [globalObjects.getObject(object_name)];
-        } else if (globalObjects.getObjectGroups().has(object_name)) {
-          isGroup = true;
-          concernedObjects = globalObjects
-            .getObjectGroups()
-            .get(object_name)
-            .getAllObjectsNames()
-            .toJSArray()
-            .map(name => getObjectByName(globalObjects, null, name))
-            .filter(Boolean);
-        } else {
-          return makeGenericFailure(
-            `Object or group "${object_name}" not found globally. Did you forget to specify scene_name?`
-          );
-        }
-      }
-
-      if (concernedObjects.length === 0) {
-        return makeGenericFailure(
-          `Group "${object_name}" has no object, so the variable was not changed.`
-        );
-      }
-
-      variablesContainers = concernedObjects.map(object =>
-        object.getVariables()
-      );
-      const objectOrGroupLabel = isGroup
-        ? `group "${object_name}"`
-        : `object "${object_name}"`;
-      scopeDescription = scene_name
-        ? `scene "${scene_name}" ${objectOrGroupLabel}`
-        : `global ${objectOrGroupLabel}`;
-    } else if (variable_scope === 'global') {
-      variablesContainers = [project.getVariables()];
-      scopeDescription = 'global';
-    } else {
-      return makeGenericFailure(
-        `Invalid "variable_scope": "${variable_scope}". Use \`scene\`, \`object\`, \`group\` or \`global\`.`
-      );
-    }
+    const resolved = resolveVariablesContainers({
+      project,
+      variable_scope,
+      scene_name,
+      object_name,
+    });
+    if (resolved.failure) return resolved.failure;
+    const { variablesContainers, scopeDescription } = resolved;
 
     const changes = [];
     const warnings = [];
@@ -5943,6 +6003,98 @@ const addOrEditVariable: EditorFunction = {
     return makeGenericSuccess(message);
   },
   modifiesProject: true,
+};
+
+const inspectVariables: EditorFunction = {
+  renderForEditor: ({ args }) => {
+    const variable_scope =
+      SafeExtractor.extractStringProperty(args, 'variable_scope') || '';
+    const object_name = SafeExtractor.extractStringProperty(
+      args,
+      'object_name'
+    );
+    const scene_name = SafeExtractor.extractStringProperty(args, 'scene_name');
+
+    if (variable_scope === 'object' || variable_scope === 'group') {
+      return {
+        text: (
+          <Trans>
+            Inspect <b>{object_name}</b>'s variables.
+          </Trans>
+        ),
+      };
+    } else if (variable_scope === 'scene') {
+      return {
+        text: <Trans>Inspect scene {scene_name}'s variables.</Trans>,
+      };
+    } else if (variable_scope === 'global') {
+      return { text: <Trans>Inspect global variables.</Trans> };
+    }
+    return { text: <Trans>Inspect variables.</Trans> };
+  },
+  launchFunction: async ({ project, args }) => {
+    const variable_scope = extractRequiredString(args, 'variable_scope');
+    const object_name = SafeExtractor.extractStringProperty(
+      args,
+      'object_name'
+    );
+    const scene_name = SafeExtractor.extractStringProperty(args, 'scene_name');
+    const requestedPaths = (
+      SafeExtractor.extractArrayProperty(args, 'variable_names_or_paths') || []
+    )
+      .map(entry => (typeof entry === 'string' ? entry : null))
+      .filter(Boolean);
+
+    const resolved = resolveVariablesContainers({
+      project,
+      variable_scope,
+      scene_name,
+      object_name,
+    });
+    if (resolved.failure) return resolved.failure;
+    const { variablesContainers, scopeDescription } = resolved;
+    const variablesContainer = variablesContainers[0];
+
+    if (requestedPaths.length === 0) {
+      return {
+        success: true,
+        message: `Variables of ${scopeDescription}.`,
+        variables: getSimplifiedVariablesContainer(gd, variablesContainer),
+      };
+    }
+
+    const variables = [];
+    const notFound = [];
+    for (const path of requestedPaths) {
+      let variable = null;
+      try {
+        variable = getVariableAtPath({
+          variablePath: path,
+          variablesContainer,
+        });
+      } catch (error) {
+        notFound.push(path);
+        continue;
+      }
+      if (variable) {
+        variables.push(getSimplifiedVariable(gd, path, variable));
+      } else {
+        notFound.push(path);
+      }
+    }
+
+    return {
+      success: true,
+      message:
+        notFound.length > 0
+          ? `Variables of ${scopeDescription}. Not found: ${notFound.join(
+              ', '
+            )}.`
+          : `Variables of ${scopeDescription}.`,
+      variables,
+    };
+  },
+  modifiesProject: false,
 };
 
 const createOrUpdatePlan: EditorFunction = {
@@ -6226,6 +6378,7 @@ export const editorFunctions: { [string]: EditorFunction } = {
   inspect_scene_properties_layers_effects: inspectScenePropertiesLayersEffects,
   change_scene_properties_layers_effects_groups: changeScenePropertiesLayersEffectsGroups,
   add_or_edit_variable: addOrEditVariable,
+  inspect_variables: inspectVariables,
   read_full_docs: readFullDocs,
   search_docs: searchDocs,
 

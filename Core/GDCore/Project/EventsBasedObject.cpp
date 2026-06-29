@@ -19,7 +19,7 @@ EventsBasedObject::EventsBasedObject()
     isTextContainer(false),
     isInnerAreaFollowingParentSize(false),
     isUsingLegacyInstancesRenderer(false),
-    variables(gd::VariablesContainer::SourceType::Object) {
+    variables(gd::VariablesContainer::SourceType::Prefab) {
 }
 
 EventsBasedObject::~EventsBasedObject() {}

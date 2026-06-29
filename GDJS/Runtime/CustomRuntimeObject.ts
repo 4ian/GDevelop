@@ -63,6 +63,8 @@ namespace gdjs {
       | gdjs.CustomRuntimeObject3DRenderer;
     /** It contains the children of this object. */
     _instanceContainer: gdjs.CustomRuntimeObjectInstanceContainer;
+    /** Internal variables of the prefab instance. */
+    _prefabVariables: gdjs.VariablesContainer;
     _isUntransformedHitBoxesDirty: boolean = true;
     /** It contains shallow copies of the children hitboxes */
     private _untransformedHitBoxes: gdjs.Polygon[] = [];
@@ -106,68 +108,26 @@ namespace gdjs {
       objectData: ObjectData & CustomObjectConfiguration,
       instanceData: InstanceData | undefined
     ) {
-      const objectDataWithPrefabVariables =
-        gdjs.CustomRuntimeObject.mergeObjectDataWithPrefabVariables(
-          parent,
-          objectData
-        );
-      super(parent, objectDataWithPrefabVariables, instanceData);
+      const eventsBasedObjectData = parent
+        .getGame()
+        .getEventsBasedObjectData(objectData.type);
+      super(parent, objectData, instanceData);
       this._type = objectData.type;
       this._instanceContainer = new gdjs.CustomRuntimeObjectInstanceContainer(
         parent,
         this
       );
+      this._prefabVariables = new gdjs.VariablesContainer(
+        eventsBasedObjectData
+          ? eventsBasedObjectData.variables || []
+          : undefined
+      );
       this._renderer = this._createRender();
 
-      this._initializeFromObjectData(objectDataWithPrefabVariables);
+      this._initializeFromObjectData(objectData);
 
       // The generated code calls onCreated at the constructor end
       // and onCreated calls its super implementation at its end.
-    }
-
-    static mergeVariablesWithPrefabVariables(
-      objectVariablesData: Array<RootVariableData>,
-      prefabVariablesData: Array<RootVariableData>
-    ): Array<RootVariableData> {
-      if (prefabVariablesData.length === 0) {
-        return objectVariablesData;
-      }
-
-      const variablesData = [...objectVariablesData];
-      const objectVariableNames = new Set(
-        objectVariablesData.map((variableData) => variableData.name)
-      );
-      for (const prefabVariableData of prefabVariablesData) {
-        if (objectVariableNames.has(prefabVariableData.name)) {
-          continue;
-        }
-        variablesData.push(prefabVariableData);
-      }
-
-      return variablesData;
-    }
-
-    static mergeObjectDataWithPrefabVariables(
-      parent: gdjs.RuntimeInstanceContainer,
-      objectData: ObjectData & CustomObjectConfiguration
-    ): ObjectData & CustomObjectConfiguration {
-      const eventsBasedObjectData = parent
-        .getGame()
-        .getEventsBasedObjectData(objectData.type);
-      const prefabVariablesData = eventsBasedObjectData
-        ? eventsBasedObjectData.variables || []
-        : [];
-      if (!eventsBasedObjectData || prefabVariablesData.length === 0) {
-        return objectData;
-      }
-
-      return {
-        ...objectData,
-        variables: gdjs.CustomRuntimeObject.mergeVariablesWithPrefabVariables(
-          objectData.variables || [],
-          prefabVariablesData
-        ),
-      };
     }
 
     private _initializeFromObjectData(
@@ -222,14 +182,17 @@ namespace gdjs {
     protected abstract _reinitializeRenderer(): void;
 
     override reinitialize(objectData: ObjectData & CustomObjectConfiguration) {
-      const objectDataWithPrefabVariables =
-        gdjs.CustomRuntimeObject.mergeObjectDataWithPrefabVariables(
-          this._runtimeScene,
-          objectData
-        );
-      super.reinitialize(objectDataWithPrefabVariables);
+      const eventsBasedObjectData = this._runtimeScene
+        .getGame()
+        .getEventsBasedObjectData(objectData.type);
+      super.reinitialize(objectData);
+      this._prefabVariables = new gdjs.VariablesContainer(
+        eventsBasedObjectData
+          ? eventsBasedObjectData.variables || []
+          : undefined
+      );
 
-      this._reinitializeContentFromObjectData(objectDataWithPrefabVariables);
+      this._reinitializeContentFromObjectData(objectData);
 
       // When changing the variant, the instance is like a new instance.
       // We call again `onCreated` at the end, like done by the constructor
@@ -464,6 +427,10 @@ namespace gdjs {
 
     getChildrenContainer(): gdjs.RuntimeInstanceContainer {
       return this._instanceContainer;
+    }
+
+    getPrefabVariables(): gdjs.VariablesContainer {
+      return this._prefabVariables;
     }
 
     onChildrenLocationChanged() {

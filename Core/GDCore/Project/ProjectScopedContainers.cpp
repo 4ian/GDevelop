@@ -212,12 +212,11 @@ ProjectScopedContainers::MakeNewProjectScopedContainersForEventsBasedObject(
   // "globalObjectsContainer".
   // Search for "ProjectScopedContainers wrongly containing temporary objects containers or objects"
   // in the codebase.
-  gd::Object& thisObject = outputObjectsContainer.InsertNewObject(
+  outputObjectsContainer.InsertNewObject(
       project,
       gd::PlatformExtension::GetObjectFullType(
           eventsFunctionsExtension.GetName(), eventsBasedObject.GetName()),
       "Object", outputObjectsContainer.GetObjectsCount());
-  thisObject.GetVariables() = eventsBasedObject.GetVariables();
 
   ProjectScopedContainers projectScopedContainers(
       ObjectsContainersList::MakeNewObjectsContainersListForContainers(

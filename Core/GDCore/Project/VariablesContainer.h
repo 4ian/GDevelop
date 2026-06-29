@@ -38,6 +38,7 @@ class GD_CORE_API VariablesContainer {
       ExtensionScene,
       Parameters,
       Properties,
+      Prefab,
   };
 
   VariablesContainer();

@@ -40,6 +40,7 @@ export enum VariablesContainer_SourceType {
   ExtensionScene = 6,
   Parameters = 7,
   Properties = 8,
+  Prefab = 9,
 }
 
 export enum ObjectsContainer_SourceType {

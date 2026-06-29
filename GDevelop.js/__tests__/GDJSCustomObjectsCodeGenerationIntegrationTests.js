@@ -539,6 +539,70 @@ describe('libGD.js - GDJS Custom Object Code Generation integration tests', func
     ).toBe(456);
   });
 
+  it('keeps prefab variables isolated from object variables', () => {
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    const eventsFunctionsExtension = project.insertNewEventsFunctionsExtension(
+      'MyExtension',
+      0
+    );
+    const eventsBasedObject = eventsFunctionsExtension
+      .getEventsBasedObjects()
+      .insertNew('MyCustomObject', 0);
+
+    eventsBasedObject
+      .getVariables()
+      .insertNew('InternalCounter', 0)
+      .setValue(5);
+
+    const eventsSerializerElement = gd.Serializer.fromJSObject([
+      {
+        type: 'BuiltinCommonInstructions::Standard',
+        conditions: [],
+        actions: [
+          {
+            type: { value: 'SetNumberVariable' },
+            parameters: ['InternalCounter', '+', '1'],
+          },
+          {
+            type: { value: 'ModVarObjet' },
+            parameters: ['Object', 'InternalCounter', '+', '1'],
+          },
+        ],
+      },
+    ]);
+    eventsBasedObject
+      .getEventsFunctions()
+      .insertNewEventsFunction('MyFunction', 0)
+      .getEvents()
+      .unserializeFrom(project, eventsSerializerElement);
+    eventsSerializerElement.delete();
+    gd.WholeProjectRefactorer.ensureObjectEventsFunctionsProperParameters(
+      eventsFunctionsExtension,
+      eventsBasedObject
+    );
+
+    const { runtimeScene, object } = generatedCustomObject(
+      gd,
+      project,
+      eventsFunctionsExtension,
+      eventsBasedObject,
+      { logCode: false }
+    );
+
+    expect(object.getPrefabVariables().has('InternalCounter')).toBe(true);
+    expect(
+      object.getPrefabVariables().get('InternalCounter').getAsNumber()
+    ).toBe(5);
+    expect(object.getVariables().has('InternalCounter')).toBe(false);
+
+    object.MyFunction();
+
+    expect(
+      object.getPrefabVariables().get('InternalCounter').getAsNumber()
+    ).toBe(6);
+    expect(object.getVariables().get('InternalCounter').getAsNumber()).toBe(1);
+  });
+
   describe('Child object instance creation', () => {
     // Builds an events-based object with a child object and an events function
     // running the provided list of events.

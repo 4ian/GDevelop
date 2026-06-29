@@ -3,13 +3,18 @@ import { enumerateObjectVariableTabs } from './UnifiedVariablesDialogTabs';
 
 const gd: libGDevelop = global.gd;
 
-const makeObject = (name: string, variablesCount: number = 0): any => {
+const makeObject = (
+  name: string,
+  variablesCount: number = 0,
+  type: string = 'Sprite'
+): any => {
   const variables = {
     id: `${name}-variables`,
     count: () => variablesCount,
   };
   return {
     getName: () => name,
+    getType: () => type,
     getVariables: () => variables,
   };
 };
@@ -96,6 +101,32 @@ describe('VariablesList/UnifiedVariablesDialogTabs', () => {
         id: 'object-variables-1-Player',
         objectName: 'Player',
         variablesContainer: sceneObject.getVariables(),
+        initialInstances: null,
+      },
+    ]);
+  });
+
+  it('can ignore the synthetic prefab parent object', () => {
+    const prefabParentObject = makeObject('Object', 3, 'pvz::Zombie');
+    const prefabChildObject = makeObject('NewSprite', 1);
+    const objectsContainersList = makeObjectsContainersList([
+      makeObjectsContainer([prefabChildObject, prefabParentObject]),
+    ]);
+
+    const tabs = enumerateObjectVariableTabs({
+      projectScopedContainersAccessor: makeProjectScopedContainersAccessor(
+        objectsContainersList
+      ),
+      initialInstances: null,
+      shouldIncludeObject: (object: gdObject) =>
+        object.getName() !== 'Object' || object.getType() !== 'pvz::Zombie',
+    });
+
+    expect(tabs).toEqual([
+      {
+        id: 'object-variables-0-NewSprite',
+        objectName: 'NewSprite',
+        variablesContainer: prefabChildObject.getVariables(),
         initialInstances: null,
       },
     ]);

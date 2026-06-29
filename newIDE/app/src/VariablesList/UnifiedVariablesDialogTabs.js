@@ -10,12 +10,16 @@ export type ObjectVariableTab = {|
   initialInstances: gdInitialInstancesContainer | null,
 |};
 
+type ShouldIncludeObjectVariableTab = (object: gdObject) => boolean;
+
 export const enumerateObjectVariableTabs = ({
   projectScopedContainersAccessor,
   initialInstances,
+  shouldIncludeObject,
 }: {|
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   initialInstances: gdInitialInstancesContainer | null,
+  shouldIncludeObject?: ShouldIncludeObjectVariableTab,
 |}): Array<ObjectVariableTab> => {
   const objectsContainersList = projectScopedContainersAccessor
     .get()
@@ -40,6 +44,10 @@ export const enumerateObjectVariableTabs = ({
       objectIndex++
     ) {
       const object = objectsContainer.getObjectAt(objectIndex);
+      if (shouldIncludeObject && !shouldIncludeObject(object)) {
+        continue;
+      }
+
       const objectName = object.getName();
       objectVariableTabs.push({
         id: `object-variables-${containerIndex}-${objectName}`,

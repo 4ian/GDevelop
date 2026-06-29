@@ -36,6 +36,7 @@ const UnifiedVariablesDialog = ({
     layout,
     eventsFunctionsExtension,
     eventsBasedObject,
+    eventsFunction,
   } = projectScopedContainersAccessor.getScope();
 
   const initialInstances =
@@ -56,13 +57,30 @@ const UnifiedVariablesDialog = ({
     ? eventsBasedObject.getVariables()
     : null;
 
+  const prefabObjectType =
+    eventsFunctionsExtension && eventsBasedObject && !eventsFunction
+      ? `${eventsFunctionsExtension.getName()}::${eventsBasedObject.getName()}`
+      : null;
+  const shouldIncludeObjectVariableTab = React.useCallback(
+    (object: gdObject) =>
+      !prefabObjectType ||
+      object.getName() !== 'Object' ||
+      object.getType() !== prefabObjectType,
+    [prefabObjectType]
+  );
+
   const objectVariableTabs = React.useMemo(
     () =>
       enumerateObjectVariableTabs({
         projectScopedContainersAccessor,
         initialInstances,
+        shouldIncludeObject: shouldIncludeObjectVariableTab,
       }),
-    [projectScopedContainersAccessor, initialInstances]
+    [
+      projectScopedContainersAccessor,
+      initialInstances,
+      shouldIncludeObjectVariableTab,
+    ]
   );
 
   const onComputeAllSceneVariableNames = React.useCallback(

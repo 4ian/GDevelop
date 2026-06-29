@@ -143,6 +143,8 @@ TEST_CASE("EventsFunction", "[common]") {
     eventsBasedObject.GetVariables()
         .InsertNew("PrefabState", eventsBasedObject.GetVariables().Count())
         .SetString("Idle");
+    REQUIRE(eventsBasedObject.GetVariables().GetSourceType() ==
+            gd::VariablesContainer::SourceType::Prefab);
 
     gd::ObjectsContainer prefabConfigurationObjectsContainer(
         gd::ObjectsContainer::SourceType::Unknown);
@@ -158,6 +160,10 @@ TEST_CASE("EventsFunction", "[common]") {
     REQUIRE(&prefabConfigurationVariablesContainersList
                  .GetVariablesContainerFromVariableNameOnly("PrefabState") ==
             &eventsBasedObject.GetVariables());
+    REQUIRE(prefabConfigurationObjectsContainer.HasObjectNamed("Object"));
+    REQUIRE(!prefabConfigurationObjectsContainer.GetObject("Object")
+                 .GetVariables()
+                 .Has("PrefabState"));
 
     auto &eventsFunction =
         eventsBasedObject.GetEventsFunctions().InsertNewEventsFunction(
@@ -191,6 +197,10 @@ TEST_CASE("EventsFunction", "[common]") {
             &eventsBasedObject.GetVariables());
     REQUIRE(objectFunctionVariablesContainersList.Get("PrefabState")
                 .GetString() == "Idle");
+    REQUIRE(parameterObjectsContainer.HasObjectNamed("Object"));
+    REQUIRE(!parameterObjectsContainer.GetObject("Object")
+                 .GetVariables()
+                 .Has("PrefabState"));
   }
 
   SECTION("Choice properties are exposed as enum variables") {

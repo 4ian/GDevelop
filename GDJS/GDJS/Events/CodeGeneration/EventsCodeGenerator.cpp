@@ -1446,6 +1446,10 @@ gd::String EventsCodeGenerator::GenerateGetVariable(
                gd::VariablesContainer::SourceType::ExtensionScene) {
       variables = &variablesContainer;
       output = "eventsFunctionContext.sceneVariablesForExtension";
+    } else if (sourceType == gd::VariablesContainer::SourceType::Prefab) {
+      variables = &variablesContainer;
+      output =
+          "eventsFunctionContext.getObjects(\"Object\")[0].getPrefabVariables()";
     } else if (sourceType == gd::VariablesContainer::SourceType::Properties) {
       const auto& propertiesContainersList =
           GetProjectScopedContainers().GetPropertiesContainersList();

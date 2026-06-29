@@ -319,6 +319,7 @@ enum VariablesContainer_SourceType {
   "VariablesContainer::ExtensionScene",
   "VariablesContainer::Parameters",
   "VariablesContainer::Properties",
+  "VariablesContainer::Prefab",
 };
 
 interface VariablesContainer {

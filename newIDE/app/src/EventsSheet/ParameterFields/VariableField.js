@@ -44,6 +44,7 @@ import GlobalVariableIcon from '../../UI/CustomSvgIcons/GlobalVariable';
 import SceneVariableIcon from '../../UI/CustomSvgIcons/SceneVariable';
 import ObjectVariableIcon from '../../UI/CustomSvgIcons/ObjectVariable';
 import LocalVariableIcon from '../../UI/CustomSvgIcons/LocalVariable';
+import VariableTreeIcon from '../../UI/CustomSvgIcons/VariableTree';
 import PropertyIcon from '../../UI/CustomSvgIcons/Settings';
 import ParameterIcon from '../../UI/CustomSvgIcons/Parameter';
 import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
@@ -225,6 +226,8 @@ export const getVariableSourceIcon = (
       return SceneVariableIcon;
     case gd.VariablesContainer.Object:
       return ObjectVariableIcon;
+    case gd.VariablesContainer.Prefab:
+      return VariableTreeIcon;
     case gd.VariablesContainer.Local:
       return LocalVariableIcon;
     case gd.VariablesContainer.Parameters:

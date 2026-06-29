@@ -6,7 +6,7 @@
 namespace gdjs {
   export namespace evtTools {
     /**
-     * Helpers to read and update project-wide global configuration data.
+     * Helpers to read project-wide global configuration data.
      * @private
      * @namespace
      */
@@ -25,11 +25,6 @@ namespace gdjs {
         value: GlobalConfigValue | undefined
       ): value is { [key: string]: GlobalConfigValue } =>
         !!value && typeof value === 'object' && !Array.isArray(value);
-
-      const isContainer = (
-        value: GlobalConfigValue | undefined
-      ): value is { [key: string]: GlobalConfigValue } | GlobalConfigValue[] =>
-        !!value && typeof value === 'object';
 
       export const normalizePath = function(path: string): string {
         const match = exactPlaceholderRegex.exec(path);
@@ -86,7 +81,9 @@ namespace gdjs {
 
         if (Array.isArray(example)) {
           if (!Array.isArray(value)) {
-            return path + ' should be an array, got ' + getTypeName(value) + '.';
+            return (
+              path + ' should be an array, got ' + getTypeName(value) + '.'
+            );
           }
           if (example.length === 0) return null;
 
@@ -103,7 +100,9 @@ namespace gdjs {
 
         if (typeof example === 'object') {
           if (!isObjectLike(value)) {
-            return path + ' should be an object, got ' + getTypeName(value) + '.';
+            return (
+              path + ' should be an object, got ' + getTypeName(value) + '.'
+            );
           }
 
           for (const key in example) {
@@ -349,7 +348,6 @@ namespace gdjs {
           | undefined = runtimeGame.getGlobalConfig();
         const segments = resolveDynamicPathSegments(runtimeGame, path);
         if (!segments) {
-          if (warnIfMissing) warnMissingPath(path);
           return undefined;
         }
 
@@ -530,108 +528,6 @@ namespace gdjs {
         }
         validateResolvedVariableValue(value, schemaExample, propertyName);
         return toVariable(value);
-      };
-
-      const getWritableParent = function(
-        runtimeGame: gdjs.RuntimeGame,
-        path: string
-      ): {
-        parent: { [key: string]: GlobalConfigValue } | GlobalConfigValue[];
-        segment: GlobalConfigPathSegment;
-      } | null {
-        const segments = resolveDynamicPathSegments(runtimeGame, path);
-        if (segments.length === 0) return null;
-
-        let value: any = runtimeGame.getGlobalConfig();
-        for (let index = 0; index < segments.length - 1; index++) {
-          const segment = segments[index];
-          const nextSegment = segments[index + 1];
-          const nextContainer: GlobalConfigValue =
-            typeof nextSegment === 'number' ? [] : {};
-
-          if (typeof segment === 'number') {
-            if (!Array.isArray(value)) {
-              warnMissingPath(path);
-              return null;
-            }
-            if (!isContainer(value[segment])) value[segment] = nextContainer;
-            value = value[segment];
-          } else {
-            if (!isObjectLike(value)) {
-              warnMissingPath(path);
-              return null;
-            }
-            if (!isContainer(value[segment])) value[segment] = nextContainer;
-            value = value[segment];
-          }
-        }
-
-        return { parent: value, segment: segments[segments.length - 1] };
-      };
-
-      export const setValue = function(
-        runtimeGame: gdjs.RuntimeGame,
-        path: string,
-        value: GlobalConfigValue
-      ): void {
-        const writableParent = getWritableParent(runtimeGame, path);
-        if (!writableParent) return;
-
-        const { parent, segment } = writableParent;
-        if (typeof segment === 'number') {
-          if (Array.isArray(parent)) parent[segment] = value;
-        } else if (isObjectLike(parent)) {
-          parent[segment] = value;
-        }
-      };
-
-      export const setNumber = function(
-        runtimeGame: gdjs.RuntimeGame,
-        path: string,
-        value: number
-      ): void {
-        setValue(runtimeGame, path, isFinite(value) ? value : 0);
-      };
-
-      export const setString = function(
-        runtimeGame: gdjs.RuntimeGame,
-        path: string,
-        value: string
-      ): void {
-        setValue(runtimeGame, path, value);
-      };
-
-      export const setBoolean = function(
-        runtimeGame: gdjs.RuntimeGame,
-        path: string,
-        value: boolean
-      ): void {
-        setValue(runtimeGame, path, value);
-      };
-
-      export const remove = function(
-        runtimeGame: gdjs.RuntimeGame,
-        path: string
-      ): void {
-        const writableParent = getWritableParent(runtimeGame, path);
-        if (!writableParent) return;
-
-        const { parent, segment } = writableParent;
-        if (typeof segment === 'number') {
-          if (Array.isArray(parent)) {
-            if (segment < 0 || segment >= parent.length) {
-              warnMissingPath(path);
-              return;
-            }
-            parent.splice(segment, 1);
-          }
-        } else if (isObjectLike(parent)) {
-          if (!hasOwn.call(parent, segment)) {
-            warnMissingPath(path);
-            return;
-          }
-          delete parent[segment];
-        }
       };
 
       export const getExactPlaceholderPath = function(

@@ -75,52 +75,6 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
       .SetDefaultValue("true");
 
   extension
-      .AddAction("SetGlobalConfigNumber",
-                 _("Change config number"),
-                 _("Modify the number value of a global config placeholder."),
-                 _("Change global config number _PARAM0_"),
-                 _("Global configuration"),
-                 "res/actions/var24.png",
-                 "res/actions/var.png")
-      .AddParameter("globalConfigPath", _("Config placeholder"))
-      .UseStandardOperatorParameters("number",
-                                     ParameterOptions::MakeNewOptions());
-
-  extension
-      .AddAction("SetGlobalConfigString",
-                 _("Change config text"),
-                 _("Modify the text value of a global config placeholder."),
-                 _("Change global config text _PARAM0_"),
-                 _("Global configuration"),
-                 "res/actions/var24.png",
-                 "res/actions/var.png")
-      .AddParameter("globalConfigPath", _("Config placeholder"))
-      .UseStandardOperatorParameters("string",
-                                     ParameterOptions::MakeNewOptions());
-
-  extension
-      .AddAction("SetGlobalConfigBoolean",
-                 _("Change config boolean"),
-                 _("Modify the boolean value of a global config placeholder."),
-                 _("Set global config boolean _PARAM0_ to _PARAM1_"),
-                 _("Global configuration"),
-                 "res/actions/var24.png",
-                 "res/actions/var.png")
-      .AddParameter("globalConfigPath", _("Config placeholder"))
-      .AddParameter("trueorfalse", _("New value"))
-      .SetDefaultValue("true");
-
-  extension
-      .AddAction("RemoveGlobalConfigValue",
-                 _("Remove config value"),
-                 _("Remove a global config placeholder value."),
-                 _("Remove global config value _PARAM0_"),
-                 _("Global configuration"),
-                 "res/actions/var24.png",
-                 "res/actions/var.png")
-      .AddParameter("globalConfigPath", _("Config placeholder"));
-
-  extension
       .AddExpression("ConfigNumber",
                      _("Config number"),
                      _("Get a global config placeholder value as a number."),

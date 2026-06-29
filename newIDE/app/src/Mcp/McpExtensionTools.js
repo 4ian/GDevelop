@@ -1791,6 +1791,96 @@ const DIRECT_VARIABLE_PARAMETER_INSTRUCTION_TYPES = new Set([
 const FUNCTION_VARIABLE_PARAMETER_SUGGESTION =
   'Inside extension functions, variable parameters are function arguments, not scene/local variables. Use CopyArgumentToVariable2 to copy the argument into an event-local variable, read/write that local variable with NumberVariable/SetNumberVariable, then use CopyVariableToArgument2 to write the local value back when needed.';
 
+const GLOBAL_CONFIG_EXPRESSION_CALL_REGEX = /\b(?:ConfigNumber|ConfigString|ConfigBool|ConfigChildCount|ConfigToJSON)\s*\(/;
+
+const getEventLevelExpressionReferences = (eventReference: {|
+  event: gdBaseEvent,
+  path: Array<number>,
+|}): Array<{| label: string, value: string, eventPath: Array<number> |}> => {
+  const event = eventReference.event;
+  const eventType = event.getType();
+  if (eventType === 'BuiltinCommonInstructions::Repeat') {
+    return [
+      {
+        label: 'repeatExpression',
+        value: gd
+          .asRepeatEvent(event)
+          .getRepeatExpression()
+          .getPlainString(),
+        eventPath: eventReference.path,
+      },
+    ];
+  }
+  if (eventType === 'BuiltinCommonInstructions::ForEach') {
+    const forEachEvent = gd.asForEachEvent(event);
+    return [
+      {
+        label: 'orderBy',
+        value: forEachEvent.getOrderBy(),
+        eventPath: eventReference.path,
+      },
+      {
+        label: 'limit',
+        value: forEachEvent.getLimit(),
+        eventPath: eventReference.path,
+      },
+    ];
+  }
+
+  return [];
+};
+
+const collectGlobalConfigExpressionMisuseIssues = (
+  eventsFunction: gdEventsFunction
+): Array<Object> => {
+  const issues: Array<Object> = [];
+  collectEventReferences(eventsFunction.getEvents()).forEach(eventReference => {
+    getEventLevelExpressionReferences(eventReference).forEach(reference => {
+      if (!GLOBAL_CONFIG_EXPRESSION_CALL_REGEX.test(reference.value)) return;
+
+      issues.push({
+        severity: 'error',
+        type: 'global-config-expression-in-extension-function',
+        eventPath: reference.eventPath,
+        eventExpression: reference.label,
+        expressionValue: reference.value,
+        suggestion:
+          'Do not use direct Global Config expressions inside extension events. Inject config through parameters/properties instead, preferably a JSON-object property like CardConfig with an object-editor placeholder value such as {{cards.Sunflower}}, then read CardConfig.price in the extension events.',
+      });
+    });
+
+    collectEventInstructionReferences(eventReference.event).forEach(
+      instructionReference => {
+        const instruction = instructionReference.instruction;
+        for (
+          let parameterIndex = 0;
+          parameterIndex < instruction.getParametersCount();
+          parameterIndex++
+        ) {
+          const value = instruction
+            .getParameter(parameterIndex)
+            .getPlainString();
+          if (!GLOBAL_CONFIG_EXPRESSION_CALL_REGEX.test(value)) continue;
+
+          issues.push({
+            severity: 'error',
+            type: 'global-config-expression-in-extension-function',
+            instructionType: instruction.getType(),
+            instructionKind: instructionReference.instructionKind,
+            eventPath: eventReference.path,
+            instructionPath: instructionReference.instructionPath,
+            parameterIndex,
+            parameterValue: value,
+            suggestion:
+              'Do not use direct Global Config expressions inside extension events. Inject config through parameters/properties instead, preferably a JSON-object property like CardConfig with an object-editor placeholder value such as {{cards.Sunflower}}, then read CardConfig.price in the extension events.',
+          });
+        }
+      }
+    );
+  });
+  return issues;
+};
+
 const getFunctionVariableParameterNames = (
   eventsFunction: gdEventsFunction
 ): Set<string> => {
@@ -2064,6 +2154,9 @@ const lintExtensionFunctionTarget = (
   );
   issues.push(
     ...collectFunctionVariableParameterMisuseIssues(target.eventsFunction)
+  );
+  issues.push(
+    ...collectGlobalConfigExpressionMisuseIssues(target.eventsFunction)
   );
   issues.push(
     ...collectObjectFunctionCreateExternalObjectIssues(

@@ -36,7 +36,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                     _("Global configuration"),
                     "res/conditions/var24.png",
                     "res/conditions/var.png")
-      .AddParameter("globalConfigPath", _("Config placeholder"));
+      .AddParameter("globalConfigPath", _("Config placeholder"))
+      .SetRelevantForLayoutEventsOnly();
 
   extension
       .AddCondition("GlobalConfigNumber",
@@ -48,7 +49,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                     "res/conditions/var.png")
       .AddParameter("globalConfigPath", _("Config placeholder"))
       .UseStandardRelationalOperatorParameters(
-          "number", ParameterOptions::MakeNewOptions());
+          "number", ParameterOptions::MakeNewOptions())
+      .SetRelevantForLayoutEventsOnly();
 
   extension
       .AddCondition("GlobalConfigString",
@@ -60,7 +62,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                     "res/conditions/var.png")
       .AddParameter("globalConfigPath", _("Config placeholder"))
       .UseStandardRelationalOperatorParameters(
-          "string", ParameterOptions::MakeNewOptions());
+          "string", ParameterOptions::MakeNewOptions())
+      .SetRelevantForLayoutEventsOnly();
 
   extension
       .AddCondition("GlobalConfigBoolean",
@@ -72,7 +75,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                     "res/conditions/var.png")
       .AddParameter("globalConfigPath", _("Config placeholder"))
       .AddParameter("trueorfalse", _("Check if the value is"))
-      .SetDefaultValue("true");
+      .SetDefaultValue("true")
+      .SetRelevantForLayoutEventsOnly();
 
   extension
       .AddExpression("ConfigNumber",
@@ -80,7 +84,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                      _("Get a global config placeholder value as a number."),
                      _("Global configuration"),
                      "res/actions/var.png")
-      .AddParameter("string", _("Config placeholder"));
+      .AddParameter("string", _("Config placeholder"))
+      .SetRelevantForLayoutEventsOnly();
 
   extension
       .AddStrExpression("ConfigString",
@@ -88,7 +93,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                         _("Get a global config placeholder value as text."),
                         _("Global configuration"),
                         "res/actions/var.png")
-      .AddParameter("string", _("Config placeholder"));
+      .AddParameter("string", _("Config placeholder"))
+      .SetRelevantForLayoutEventsOnly();
 
   extension
       .AddExpression("ConfigBool",
@@ -98,7 +104,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                        "for true and 0 for false."),
                      _("Global configuration"),
                      "res/actions/var.png")
-      .AddParameter("string", _("Config placeholder"));
+      .AddParameter("string", _("Config placeholder"))
+      .SetRelevantForLayoutEventsOnly();
 
   extension
       .AddExpression("ConfigChildCount",
@@ -107,7 +114,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                        "placeholder value."),
                      _("Global configuration"),
                      "res/actions/var.png")
-      .AddParameter("string", _("Config placeholder"));
+      .AddParameter("string", _("Config placeholder"))
+      .SetRelevantForLayoutEventsOnly();
 
   extension
       .AddStrExpression("ConfigToJSON",
@@ -115,7 +123,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                         _("Get a global config placeholder value as JSON text."),
                         _("Global configuration"),
                         "res/actions/var.png")
-      .AddParameter("string", _("Config placeholder"));
+      .AddParameter("string", _("Config placeholder"))
+      .SetRelevantForLayoutEventsOnly();
 
   extension
       .AddCondition("NumberVariable",

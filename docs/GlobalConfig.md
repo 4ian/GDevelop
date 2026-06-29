@@ -10,8 +10,9 @@ Global Config is project-wide JSON configuration data for game tuning and conten
 
 - Global Config is saved as a JSON map.
 - Global variables remain runtime/game-state variables.
-- Events use dedicated config conditions and expressions. Global Config is
-  read-only at runtime.
+- Scene/external events use dedicated config conditions and expressions. Global
+  Config is read-only at runtime and these direct event instructions are not
+  available inside extension events.
 - Object editor properties can use placeholder references such as `{{cards.sunflower.price}}` where this is explicitly enabled.
 - JSON-object properties can reference a config subtree such as `{{cards.sunflower}}` and expose it in object/behavior events with variable-style child access such as `CardConfig.price`.
 - JSON-object properties define a required JSON example. Event autocompletion and validation use this example for `CardConfig.xxx` paths.
@@ -53,7 +54,7 @@ An eligible object editor property can reference:
 | Folder projects          | Folder projects split `globalConfig` to `globalConfig.json`; the local resource watcher tracks this file.                                                                 | `newIDE/app/src/ProjectsStorage/LocalFileStorageProvider/LocalProjectWriter.js`, `newIDE/app/src/ProjectsStorage/LocalFileStorageProvider/LocalFileResourcesWatcher.js`                                                                                                            |
 | Runtime data             | `ProjectData` has optional `globalConfig`; `RuntimeGame` owns `_globalConfig` with `getGlobalConfig` and `setGlobalConfig`.                                               | `GDJS/Runtime/types/project-data.d.ts`, `GDJS/Runtime/runtimegame.ts`                                                                                                                                                                                                              |
 | Runtime helpers          | `gdjs.evtTools.globalConfig` normalizes placeholder paths, reads values, resolves placeholders, and validates JSON-object values against examples.                        | `GDJS/Runtime/events-tools/globalconfigtools.ts`                                                                                                                                                                                                                                   |
-| Event metadata           | Builtin Variables extension adds a `Global configuration` group with config conditions and expressions.                                                                   | `Core/GDCore/Extensions/Builtin/VariablesExtension.cpp`                                                                                                                                                                                                                            |
+| Event metadata           | Builtin Variables extension adds a `Global configuration` group with scene/external-event-only config conditions and expressions.                                          | `Core/GDCore/Extensions/Builtin/VariablesExtension.cpp`                                                                                                                                                                                                                            |
 | Event codegen            | Global Config instructions generate calls to `gdjs.evtTools.globalConfig`.                                                                                                | `GDJS/GDJS/Extensions/Builtin/VariablesExtension.cpp`                                                                                                                                                                                                                              |
 | Event parameters         | `globalConfigPath` is rendered as a default field and labeled "Global config placeholder".                                                                                | `newIDE/app/src/EventsSheet/ParameterRenderingService.js`                                                                                                                                                                                                                          |
 | Editor UI                | `Global config` is a `global-config` editor kind. It opens floated by default like Resources and can be popped back into the main editor tabs.                            | `newIDE/app/src/MainFrame/index.js`, `newIDE/app/src/MainFrame/EditorTabs/EditorTabsHandler.js`, `newIDE/app/src/MainFrame/EditorContainers/GlobalConfigEditorContainer.js`, `newIDE/app/src/ProjectManager/index.js`                                                              |
@@ -298,6 +299,9 @@ Runtime read-only semantics:
 ## Event Instructions
 
 Global Config instructions are added under the builtin `Global configuration` group.
+They are marked as layout-event-only, so they are intended for scene events and
+external events included by scenes. They are not available in extension function,
+event-based object, or event-based behavior event sheets.
 
 Parameter type:
 
@@ -334,6 +338,9 @@ gdjs.evtTools.globalConfig.getNumber(
 Current limitation:
 
 - `globalConfigPath` currently uses the default text field renderer. Placeholder autocomplete and static path validation are not implemented yet.
+- Extension events cannot use the direct Global Config conditions/expressions.
+  For prefab/behavior logic, pass config through a JSON-object property such as
+  `CardConfig` and read fields with `CardConfig.price`.
 
 ## Placeholder Support
 
@@ -350,8 +357,12 @@ Current scope:
 - Object editor property placeholders are supported in the full object editor
   window.
 - The object editor shows an info hint when editing event-based object or behavior properties that support placeholders.
-- Scene events can use exact placeholder paths in Global configuration
+- Scene/external events can use exact placeholder paths in Global configuration
   conditions and expressions.
+- Extension events cannot use direct Global configuration conditions and
+  expressions. Use injected properties/parameters instead; for config subtrees,
+  prefer a `JSON object` property whose object-editor value is a placeholder
+  such as `{{cards.sunflower}}`.
 - Compact/property editors outside that scope reject placeholder syntax with: "Global config placeholders can only be edited from the object editor window."
 - Config events and expressions use exact placeholder paths such as `{{cards.sunflower.price}}`.
 
@@ -396,7 +407,7 @@ Expected behavior with the current runtime model:
 
 - Edited project config is included in `ProjectData.globalConfig`.
 - Preview/runtime code reads the latest config data after project data is regenerated.
-- Event expressions read Global Config whenever events run.
+- Scene/external event expressions read Global Config whenever events run.
 - Object/behavior constructor values use the resolved value from initialization time.
 
 ## Validation And Diagnostics

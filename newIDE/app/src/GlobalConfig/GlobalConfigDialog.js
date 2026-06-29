@@ -46,6 +46,7 @@ const styles: { [string]: Object } = {
     alignItems: 'center',
     justifyContent: 'space-between',
     gap: 12,
+    flexShrink: 0,
     padding: '10px 14px',
     borderBottom: '1px solid #3b4452',
     backgroundColor: '#252b35',
@@ -98,6 +99,7 @@ const styles: { [string]: Object } = {
     alignItems: 'center',
     gap: 4,
     minWidth: 0,
+    flexShrink: 0,
     overflowX: 'auto',
     padding: '3px 10px 0 10px',
     borderBottom: '1px solid #3d4654',
@@ -143,7 +145,7 @@ const styles: { [string]: Object } = {
   gridScroller: {
     overflow: 'auto',
     flex: 1,
-    minHeight: 260,
+    minHeight: 0,
     backgroundColor: '#1d222b',
   },
   table: {
@@ -300,6 +302,7 @@ const styles: { [string]: Object } = {
     alignItems: 'center',
     flexWrap: 'wrap',
     gap: 8,
+    flexShrink: 0,
     padding: '9px 12px',
     borderTop: '1px solid #3d4654',
     backgroundColor: '#242a35',
@@ -326,22 +329,29 @@ const styles: { [string]: Object } = {
     minWidth: 12,
   },
   rawPanel: {
+    display: 'flex',
+    flexDirection: 'column',
+    flex: '0 1 42%',
+    minHeight: 128,
     borderTop: '1px solid #3d4654',
     padding: '10px 12px 12px 12px',
     backgroundColor: '#202631',
+    overflow: 'hidden',
   },
   rawHeader: {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
+    flexShrink: 0,
     gap: 8,
     marginBottom: 8,
   },
   rawTextArea: {
     width: '100%',
-    height: 150,
+    flex: 1,
+    minHeight: 80,
     boxSizing: 'border-box',
-    resize: 'vertical',
+    resize: 'none',
     border: '1px solid #4d5868',
     borderRadius: 4,
     color: '#ffffff',
@@ -354,6 +364,7 @@ const styles: { [string]: Object } = {
   rawFooter: {
     display: 'flex',
     alignItems: 'center',
+    flexShrink: 0,
     gap: 8,
     marginTop: 8,
   },
@@ -1220,32 +1231,32 @@ const GlobalConfigDialog = ({
                 onClick={() => setRawJsonExpanded(!rawJsonExpanded)}
               />
             </div>
-          </div>
-          {rawJsonExpanded && (
-            <div style={styles.rawPanel}>
-              <div style={styles.rawHeader}>
-                <Text noMargin color="secondary">
-                  <Trans>Raw JSON</Trans>
-                </Text>
-                <FlatButton
-                  label={<Trans>Apply JSON</Trans>}
-                  onClick={applyRawJson}
-                />
-              </div>
-              <textarea
-                style={styles.rawTextArea}
-                value={rawJson}
-                onChange={event => setRawJson(event.currentTarget.value)}
-              />
-              <div style={styles.rawFooter}>
-                {rawJsonError ? (
-                  <Text noMargin style={styles.error}>
-                    {rawJsonError}
+            {rawJsonExpanded && (
+              <div style={styles.rawPanel}>
+                <div style={styles.rawHeader}>
+                  <Text noMargin color="secondary">
+                    <Trans>Raw JSON</Trans>
                   </Text>
-                ) : null}
+                  <FlatButton
+                    label={<Trans>Apply JSON</Trans>}
+                    onClick={applyRawJson}
+                  />
+                </div>
+                <textarea
+                  style={styles.rawTextArea}
+                  value={rawJson}
+                  onChange={event => setRawJson(event.currentTarget.value)}
+                />
+                <div style={styles.rawFooter}>
+                  {rawJsonError ? (
+                    <Text noMargin style={styles.error}>
+                      {rawJsonError}
+                    </Text>
+                  ) : null}
+                </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       )}
     </>

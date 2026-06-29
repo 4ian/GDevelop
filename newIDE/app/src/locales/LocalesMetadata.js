@@ -71,7 +71,7 @@ module.exports = [
     "languageCode": "en",
     "languageName": "English",
     "languageNativeName": "English",
-    "translationRatio": 0.09654320987654319
+    "translationRatio": 0.09783144406111388
   },
   {
     "languageCode": "eo_UY",
@@ -227,7 +227,7 @@ module.exports = [
     "languageCode": "pseudo_LOCALE",
     "languageName": "for development only",
     "languageNativeName": "Pseudolocalization",
-    "translationRatio": 0.9965432098765432
+    "translationRatio": 0.9965500246426812
   },
   {
     "languageCode": "pt_BR",

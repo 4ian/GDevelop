@@ -35,6 +35,7 @@ import EditorNavigator, {
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import { sendEventsExtractedAsFunction } from '../Utils/Analytics/EventSender';
+import EditSceneIcon from '../UI/CustomSvgIcons/EditScene';
 import SettingsIcon from '../UI/CustomSvgIcons/Settings';
 import Tune from '../UI/CustomSvgIcons/Tune';
 import newNameGenerator from '../Utils/NewNameGenerator';
@@ -115,6 +116,12 @@ const styles = {
     justifyContent: 'center',
     width: '100%',
     height: '100%',
+  },
+  functionsListHeaderControls: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 8,
+    width: '100%',
   },
   prefabSettingsContainer: {
     display: 'flex',
@@ -1355,13 +1362,24 @@ export default class PrefabDetailEditor extends React.Component<Props, State> {
                   this.props.onEventBasedObjectTypeChanged
                 }
                 headerControls={
-                  <FlatButton
-                    fullWidth
-                    label={<Trans>Prefab settings</Trans>}
-                    leftIcon={<SettingsIcon />}
-                    onClick={this._openPrefabDetailsDialog}
-                    id="prefab-settings-button"
-                  />
+                  <div style={styles.functionsListHeaderControls}>
+                    <FlatButton
+                      fullWidth
+                      label={<Trans>Open visual editor</Trans>}
+                      leftIcon={<EditSceneIcon />}
+                      onClick={() =>
+                        this.props.onOpenCustomObjectEditor(eventsBasedObject)
+                      }
+                      id="open-visual-editor-button"
+                    />
+                    <FlatButton
+                      fullWidth
+                      label={<Trans>Prefab settings</Trans>}
+                      leftIcon={<SettingsIcon />}
+                      onClick={this._openPrefabDetailsDialog}
+                      id="prefab-settings-button"
+                    />
+                  </div>
                 }
               />
             )}

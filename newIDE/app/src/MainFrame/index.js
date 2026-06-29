@@ -22,6 +22,10 @@ import ProjectManager, {
   getProjectManagerTreeViewItemIdForEditorTab,
 } from '../ProjectManager';
 import LoaderModal from '../UI/LoaderModal';
+import {
+  cleanupLeakedOverlaysAfterPopOutClose,
+  reportPotentialInputBlockers,
+} from '../UI/MaterialUISpecificUtil';
 import CloseConfirmDialog from '../UI/CloseConfirmDialog';
 import ProfileDialog from '../Profile/ProfileDialog';
 import PurchaseClaimDialog from '../Profile/PurchaseClaimDialog';
@@ -818,6 +822,44 @@ const MainFrame = (props: Props): React.MixedElement => {
     setTimeout(refresh, 500);
   }, []);
 
+  // When a popped-out window (e.g. the debugger) is destroyed, Material-UI's
+  // GLOBAL ModalManager — shared with that window — can fail to clean up,
+  // leaving an orphaned full-screen overlay root in the MAIN window's
+  // `document.body` that swallows every click (the "UI not responding after
+  // closing the debug window" bug), and/or `aria-hidden`/scroll-lock leftovers.
+  // Heal the main window across the same teardown window as the tree refresh.
+  const healMainWindowAfterPopOutClose = React.useCallback(() => {
+    const heal = () => {
+      cleanupLeakedOverlaysAfterPopOutClose();
+      // Diagnostic: if anything is still covering the editor after cleanup,
+      // log exactly what it is so the remaining cause can be pinned down.
+      reportPotentialInputBlockers();
+    };
+    heal();
+    setTimeout(heal, 0);
+    setTimeout(heal, 60);
+    setTimeout(heal, 200);
+    setTimeout(heal, 550);
+  }, []);
+
+  // Expose the input-blocker diagnostic so it can be run from the devtools
+  // console at the exact moment the UI becomes unresponsive:
+  //   window.gdReportInputBlockers()
+  // and a manual heal:
+  //   window.gdHealMainWindow()
+  React.useEffect(() => {
+    // $FlowFixMe[prop-missing] - debug handles.
+    window.gdReportInputBlockers = reportPotentialInputBlockers;
+    // $FlowFixMe[prop-missing]
+    window.gdHealMainWindow = cleanupLeakedOverlaysAfterPopOutClose;
+    return () => {
+      // $FlowFixMe[prop-missing]
+      delete window.gdReportInputBlockers;
+      // $FlowFixMe[prop-missing]
+      delete window.gdHealMainWindow;
+    };
+  }, []);
+
   const getEditorOpeningOptions = React.useCallback(
     ({
       kind,
@@ -1005,8 +1047,12 @@ const MainFrame = (props: Props): React.MixedElement => {
         ...prevState,
         editorTabs: closeEditorTab(prevState.editorTabs, editorTab),
       }));
+      // A popped-out editor window just closed: clear any Material-UI overlay
+      // state it may have leaked into the main window (see
+      // healMainWindowAfterPopOutClose).
+      healMainWindowAfterPopOutClose();
     },
-    [setState]
+    [setState, healMainWindowAfterPopOutClose]
   );
 
   React.useEffect(
@@ -1030,6 +1076,7 @@ const MainFrame = (props: Props): React.MixedElement => {
           };
         });
         forceRefreshProjectManagerList();
+        healMainWindowAfterPopOutClose();
       };
 
       ipcRenderer.on(
@@ -1042,7 +1089,7 @@ const MainFrame = (props: Props): React.MixedElement => {
           onDebuggerPopOutCloseRequested
         );
     },
-    [setState, forceRefreshProjectManagerList]
+    [setState, forceRefreshProjectManagerList, healMainWindowAfterPopOutClose]
   );
 
   const {

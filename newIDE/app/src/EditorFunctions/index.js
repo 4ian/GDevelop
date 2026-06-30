@@ -5532,17 +5532,29 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
             );
           }
 
+          // `objects_to_add`/`objects_to_remove` are plain arrays of object
+          // names (strings). The legacy `objects` shape is an array of
+          // `{ object_name }` objects.
+          const dedupeNames = (names: Array<string>): Array<string> =>
+            Array.from(new Set(names));
+          const extractStringNames = (
+            namesArray: Array<mixed>
+          ): Array<string> => {
+            const names: Array<string> = [];
+            for (const name of namesArray) {
+              if (typeof name === 'string' && name) names.push(name);
+            }
+            return dedupeNames(names);
+          };
           const extractObjectNames = (
             objectsArray: Array<mixed>
           ): Array<string> =>
-            Array.from(
-              new Set(
-                objectsArray
-                  .map(object =>
-                    SafeExtractor.extractStringProperty(object, 'object_name')
-                  )
-                  .filter(Boolean)
-              )
+            dedupeNames(
+              objectsArray
+                .map(object =>
+                  SafeExtractor.extractStringProperty(object, 'object_name')
+                )
+                .filter(Boolean)
             );
 
           const usesIncremental =
@@ -5566,10 +5578,10 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
             let namesToAdd: Array<string>;
             if (usesIncremental) {
               const removeNames = objectsToRemove
-                ? extractObjectNames(objectsToRemove)
+                ? extractStringNames(objectsToRemove)
                 : [];
               const addNames = objectsToAdd
-                ? extractObjectNames(objectsToAdd)
+                ? extractStringNames(objectsToAdd)
                 : [];
               namesToRemove = currentObjectNames.filter(name =>
                 removeNames.includes(name)

@@ -3548,7 +3548,7 @@ describe('editorFunctions', () => {
             changed_groups: [
               {
                 group_name: 'Enemies',
-                objects_to_add: [{ object_name: 'Enemy3' }],
+                objects_to_add: ['Enemy3'],
               },
             ],
           },
@@ -3576,7 +3576,7 @@ describe('editorFunctions', () => {
             changed_groups: [
               {
                 group_name: 'Enemies',
-                objects_to_remove: [{ object_name: 'Enemy2' }],
+                objects_to_remove: ['Enemy2'],
               },
             ],
           },
@@ -3606,15 +3606,8 @@ describe('editorFunctions', () => {
                 group_name: 'Enemies',
                 // Enemy3 listed twice (duplicate), Enemy1 already in the group
                 // (no-op), Enemy2 removed, GhostNotHere removed (no-op).
-                objects_to_add: [
-                  { object_name: 'Enemy3' },
-                  { object_name: 'Enemy3' },
-                  { object_name: 'Enemy1' },
-                ],
-                objects_to_remove: [
-                  { object_name: 'Enemy2' },
-                  { object_name: 'GhostNotHere' },
-                ],
+                objects_to_add: ['Enemy3', 'Enemy3', 'Enemy1'],
+                objects_to_remove: ['Enemy2', 'GhostNotHere'],
               },
             ],
           },
@@ -3644,7 +3637,7 @@ describe('editorFunctions', () => {
                 // "objects" would empty the group, but it must be ignored in
                 // favor of the incremental fields.
                 objects: [],
-                objects_to_remove: [{ object_name: 'Enemy1' }],
+                objects_to_remove: ['Enemy1'],
               },
             ],
           },
@@ -3689,7 +3682,7 @@ describe('editorFunctions', () => {
             changed_groups: [
               {
                 group_name: 'Enemies',
-                objects_to_add: [{ object_name: 'Enemy3' }],
+                objects_to_add: ['Enemy3'],
               },
             ],
           },
@@ -3711,7 +3704,7 @@ describe('editorFunctions', () => {
             changed_groups: [
               {
                 group_name: 'Enemies',
-                objects_to_add: [{ object_name: 'Ghost' }],
+                objects_to_add: ['Ghost'],
               },
             ],
           },

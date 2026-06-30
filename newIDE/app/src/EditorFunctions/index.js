@@ -12,7 +12,12 @@ import {
   unserializeFromJSObject,
 } from '../Utils/Serializer';
 import { type AiGeneratedEvent } from '../Utils/GDevelopServices/Generation';
-import { renderNonTranslatedEventsAsText } from '../EventsSheet/EventsTree/TextRenderer';
+import {
+  renderNonTranslatedEventsAsText,
+  renderNonTranslatedEventsAsTextWithErrors,
+  eventsTextRenderingErrorText,
+  type EventsTextRenderingError,
+} from '../EventsSheet/EventsTree/TextRenderer';
 import {
   addMissingObjectBehaviors,
   addObjectUndeclaredVariables,
@@ -128,6 +133,8 @@ export type EditorFunctionGenericOutput = {|
   },
   message?: string,
   eventsAsText?: string,
+  // Per-event/instruction rendering failures (the rest still rendered).
+  eventsRenderingErrors?: Array<EventsTextRenderingError>,
   objectName?: string,
   behaviorName?: string,
   properties?: any,
@@ -4146,14 +4153,31 @@ const readSceneEvents: EditorFunction = {
     const scene = project.getLayout(scene_name);
     const events = scene.getEvents();
 
-    const eventsAsText = renderNonTranslatedEventsAsText({
+    const {
+      text: eventsAsText,
+      renderingErrors,
+    } = renderNonTranslatedEventsAsTextWithErrors({
       eventsList: events,
     });
+
+    // Total render failure must be a hard failure, not a success carrying an error string.
+    if (eventsAsText === eventsTextRenderingErrorText) {
+      const details = renderingErrors.length
+        ? ` (${renderingErrors[0].message})`
+        : '';
+      return makeGenericFailure(
+        `Could not read the events of scene "${scene_name}": rendering the events as text failed${details}.`
+      );
+    }
 
     return {
       success: true,
       eventsForSceneNamed: scene_name,
       eventsAsText,
+      // Surface partial failures so the cause is reported, not dropped.
+      ...(renderingErrors.length
+        ? { eventsRenderingErrors: renderingErrors }
+        : {}),
     };
   },
   modifiesProject: false,

@@ -8,6 +8,7 @@ import {
   createImageAttachmentFromProjectFileDragData,
   getImageAttachmentErrorMessage,
   getImageAttachmentPreviewUrl,
+  getAdvancedTweenAnimationsFolderPath,
   getGeneratedImagesFolderPath,
   getResourcesToolsSettingsWithDefaults,
   getAiGameWorkbenchAssetRelativePath,
@@ -136,6 +137,12 @@ describe('ToolsPanel', () => {
   it('saves Nano Banana output in the project generated folder', () => {
     expect(getGeneratedImagesFolderPath('D:\\Project')).toBe(
       'D:\\Project\\generated'
+    );
+  });
+
+  it('saves AdvancedTween files in the project animations assets folder', () => {
+    expect(getAdvancedTweenAnimationsFolderPath('D:\\Project')).toBe(
+      'D:\\Project\\assets\\animations'
     );
   });
 
@@ -429,5 +436,13 @@ describe('ToolsPanel', () => {
       elevenLabsMode: 'sound-effect',
       elevenLabsVoiceId: 'JBFqnCBsd6RMkjVDRZzb',
     });
+  });
+
+  it('normalizes the persisted Animation tools category', () => {
+    expect(
+      getResourcesToolsSettingsWithDefaults({
+        activeToolCategory: 'animation',
+      }).activeToolCategory
+    ).toBe('animation');
   });
 });

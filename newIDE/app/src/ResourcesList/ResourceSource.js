@@ -133,6 +133,7 @@ export type ChooseResourceOptions = {|
   resourceKind: ResourceKind,
   importedResourcesFolder?: string,
   includeProjectAssetsFolder?: boolean,
+  defaultLocalFileDialogFolder?: string,
 |};
 
 export type ResourceImportationBehavior = 'import' | 'relative' | 'ask';

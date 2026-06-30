@@ -14,6 +14,18 @@ const normalizeSlashes = (filePath: string): string =>
 const normalizeProjectResourcePath = (filePath: string): string =>
   normalizeSlashes(filePath).toLowerCase();
 
+const isPathInsideFolder = (filePath: string, folderPath: string): boolean => {
+  if (!path) return false;
+
+  const relativePath = path.relative(folderPath, filePath);
+  return (
+    relativePath === '' ||
+    (!!relativePath &&
+      !relativePath.startsWith('..') &&
+      !path.isAbsolute(relativePath))
+  );
+};
+
 export const getFileExtensionsForResourceKind = (
   resourceKind: ResourceKind
 ): Array<string> => {
@@ -67,6 +79,52 @@ export const createProjectAssetResourceFromFile = ({
   resource.setName(relativePath);
   resource.setFile(relativePath);
   return resource;
+};
+
+export const createProjectAssetResourceFromResourceName = ({
+  project,
+  resourceKind,
+  resourceName,
+}: {|
+  project: gdProject,
+  resourceKind: ResourceKind,
+  resourceName: string,
+|}): ?gdResource => {
+  if (!fs || !path || !resourceName) return null;
+
+  const normalizedResourceName = normalizeSlashes(resourceName);
+  if (
+    path.isAbsolute(normalizedResourceName) ||
+    normalizedResourceName === 'assets' ||
+    !normalizedResourceName.startsWith('assets/')
+  ) {
+    return null;
+  }
+
+  const projectFile = project.getProjectFile();
+  if (!projectFile) return null;
+
+  const projectRootPath = path.dirname(projectFile);
+  const assetFilePath = path.resolve(projectRootPath, normalizedResourceName);
+  const assetsFolderPath = path.resolve(projectRootPath, 'assets');
+  if (!isPathInsideFolder(assetFilePath, assetsFolderPath)) return null;
+
+  if (
+    !isSupportedProjectAssetResourceFile({
+      filePath: assetFilePath,
+      resourceKind,
+    })
+  ) {
+    return null;
+  }
+
+  if (!fs.existsSync(assetFilePath)) return null;
+
+  return createProjectAssetResourceFromFile({
+    projectRootPath,
+    resourceKind,
+    filePath: assetFilePath,
+  });
 };
 
 const readProjectAssetFiles = async ({

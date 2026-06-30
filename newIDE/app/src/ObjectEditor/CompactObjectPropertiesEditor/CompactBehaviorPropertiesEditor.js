@@ -11,6 +11,10 @@ import { CompactPropertiesEditorByVisibility } from '../../CompactPropertiesEdit
 import propertiesMapToSchema from '../../PropertiesEditor/PropertiesMapToSchema';
 import { useForceRecompute } from '../../Utils/UseForceUpdate';
 import { type CompactBehaviorPropertiesEditorProps } from './CompactBehaviorPropertiesEditorProps.flow';
+import {
+  advancedTweenBehaviorType,
+  customizeAdvancedTweenBehaviorPropertiesSchema,
+} from '../../BehaviorsEditor/Editors/AdvancedTweenBehaviorEditorOptions';
 
 export const styles = {
   icon: {
@@ -136,7 +140,7 @@ export const CompactBehaviorPropertiesEditor = ({
       }
       if (initialInstance) {
         const behaviorProperties = behavior.getProperties();
-        return propertiesMapToSchema({
+        const schema = propertiesMapToSchema({
           properties: behaviorProperties,
           defaultValueProperties: behaviorProperties,
           getPropertyValue: (instance, propertyName) =>
@@ -154,9 +158,13 @@ export const CompactBehaviorPropertiesEditor = ({
           visibility: 'All',
           showcaseNonDefaultValues: true,
         });
+        if (behavior.getTypeName() === advancedTweenBehaviorType) {
+          return customizeAdvancedTweenBehaviorPropertiesSchema(schema);
+        }
+        return schema;
       }
       const behaviorProperties = behavior.getProperties();
-      return propertiesMapToSchema({
+      const schema = propertiesMapToSchema({
         properties: behaviorProperties,
         defaultValueProperties: null,
         getPropertyValue: (instance, name) =>
@@ -171,11 +179,14 @@ export const CompactBehaviorPropertiesEditor = ({
         layersContainer,
         visibility: 'All',
       });
+      if (behavior.getTypeName() === advancedTweenBehaviorType) {
+        return customizeAdvancedTweenBehaviorPropertiesSchema(schema);
+      }
+      return schema;
     },
     [
       schemaRecomputeTrigger,
       initialInstance,
-      behaviorMetadata,
       object,
       layersContainer,
       behavior,

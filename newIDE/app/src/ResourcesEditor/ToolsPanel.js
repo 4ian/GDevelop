@@ -20,6 +20,7 @@ import PreferencesContext, {
 import SparkleIcon from '../UI/CustomSvgIcons/Sparkle';
 import MusicIcon from '../UI/CustomSvgIcons/Music';
 import PictureIcon from '../UI/CustomSvgIcons/Picture';
+import PlayIcon from '../UI/CustomSvgIcons/Play';
 import CrossIcon from '../UI/CustomSvgIcons/Cross';
 import RectangleIcon from '../UI/CustomSvgIcons/Rectangle';
 import HorizontalSizeIcon from '../UI/CustomSvgIcons/HorizontalSize';
@@ -58,6 +59,8 @@ const aiGameWorkbenchGitHubUrl =
   'https://github.com/zhouzhipeng/ai_game_workbench';
 const gorestSpritesheetGitHubUrl =
   'https://github.com/zhouzhipeng/gorest-2d-animation-spritesheet-generator';
+const advancedTweenEditorGitHubUrl =
+  'https://github.com/zhouzhipeng/AdvancedTweenEditor';
 
 type Props = {|
   project: gdProject,
@@ -66,7 +69,7 @@ type Props = {|
   onProjectFilesChanged: () => Promise<void> | void,
 |};
 
-type ToolCategory = 'image' | 'sound';
+type ToolCategory = 'image' | 'sound' | 'animation';
 type ImageTool =
   | 'nano-banana'
   | 'local-tools'
@@ -126,6 +129,7 @@ const styles = {
   },
   tabs: {
     flex: '0 0 auto',
+    minWidth: 0,
   },
   body: {
     display: 'flex',
@@ -141,6 +145,11 @@ const styles = {
     gap: 8,
     overflow: 'auto',
     minHeight: 0,
+    minWidth: 0,
+  },
+  wrappingText: {
+    overflowWrap: 'anywhere',
+    wordBreak: 'break-word',
   },
   segmentedRow: {
     display: 'flex',
@@ -482,6 +491,13 @@ export const getGeneratedImagesFolderPath = (projectRootPath: string): string =>
     ? path.join(projectRootPath, 'generated')
     : `${projectRootPath}/generated`;
 
+export const getAdvancedTweenAnimationsFolderPath = (
+  projectRootPath: string
+): string =>
+  path
+    ? path.join(projectRootPath, 'assets', 'animations')
+    : `${projectRootPath}/assets/animations`;
+
 const isAbsolutePathInside = (
   parentPath: string,
   childPath: string
@@ -629,8 +645,10 @@ export const getResourcesToolsSettingsWithDefaults = (
   settings: any
 ): ResourcesToolsSettings => ({
   activeToolCategory:
-    settings && settings.activeToolCategory === 'sound'
-      ? 'sound'
+    settings &&
+    (settings.activeToolCategory === 'sound' ||
+      settings.activeToolCategory === 'animation')
+      ? settings.activeToolCategory
       : defaultResourcesToolsSettings.activeToolCategory,
   selectedImageTool:
     settings &&
@@ -820,6 +838,14 @@ const ToolsPanel = ({
   const [
     gorestSpritesheetError,
     setGorestSpritesheetError,
+  ] = React.useState<?string>(null);
+  const [
+    advancedTweenEditorStatus,
+    setAdvancedTweenEditorStatus,
+  ] = React.useState<?string>(null);
+  const [
+    advancedTweenEditorError,
+    setAdvancedTweenEditorError,
   ] = React.useState<?string>(null);
   const [
     localImageOperation,
@@ -1802,6 +1828,66 @@ const ToolsPanel = ({
     }
   }, []);
 
+  const openAdvancedTweenEditor = React.useCallback(async () => {
+    if (!ipcRenderer) {
+      setAdvancedTweenEditorError(
+        'AdvancedTween Editor is only available in the desktop app.'
+      );
+      return;
+    }
+
+    const projectRootPath = getProjectRootPath(project);
+    if (!projectRootPath) {
+      setAdvancedTweenEditorError(
+        'Save the project before opening AdvancedTween Editor.'
+      );
+      return;
+    }
+
+    setAdvancedTweenEditorError(null);
+    setAdvancedTweenEditorStatus('Opening AdvancedTween Editor...');
+    try {
+      await ipcRenderer.invoke('advanced-tween-editor-load', {
+        projectRootPath,
+        gameResolutionWidth: project.getGameResolutionWidth(),
+        gameResolutionHeight: project.getGameResolutionHeight(),
+      });
+      await onProjectFilesChanged();
+      setAdvancedTweenEditorStatus(
+        `AdvancedTween Editor opened. Animations are saved in ${normalizeSlashes(
+          getAdvancedTweenAnimationsFolderPath(projectRootPath)
+        )}.`
+      );
+    } catch (error) {
+      setAdvancedTweenEditorError(
+        error && error.message ? error.message : String(error)
+      );
+      setAdvancedTweenEditorStatus(null);
+    }
+  }, [onProjectFilesChanged, project]);
+
+  React.useEffect(
+    () => {
+      if (!ipcRenderer) return;
+
+      const handleProjectFilesChanged = () => {
+        onProjectFilesChanged();
+      };
+
+      ipcRenderer.on(
+        'advanced-tween-editor-project-files-changed',
+        handleProjectFilesChanged
+      );
+      return () => {
+        ipcRenderer.removeListener(
+          'advanced-tween-editor-project-files-changed',
+          handleProjectFilesChanged
+        );
+      };
+    },
+    [onProjectFilesChanged]
+  );
+
   const importAiGameWorkbenchGDevelopExtension = React.useCallback(
     async (
       payload: AiGameWorkbenchExtensionImportPayload
@@ -2154,6 +2240,52 @@ const ToolsPanel = ({
       </Text>
     </div>
   );
+
+  const renderAdvancedTweenEditor = () => {
+    const projectRootPath = getProjectRootPath(project);
+    const animationsFolderPath = projectRootPath
+      ? normalizeSlashes(getAdvancedTweenAnimationsFolderPath(projectRootPath))
+      : 'assets/animations';
+
+    return (
+      <div style={styles.section}>
+        <MiniToolbar noPadding>
+          <PlayIcon />
+          <MiniToolbarText>
+            <Trans>AdvancedTween Editor</Trans>
+          </MiniToolbarText>
+        </MiniToolbar>
+        <MiniToolbar noPadding>
+          <RaisedButton
+            label={<Trans>Open AdvancedTween Editor</Trans>}
+            icon={<PlayIcon />}
+            color="ai"
+            onClick={openAdvancedTweenEditor}
+          />
+        </MiniToolbar>
+        {!!advancedTweenEditorError && (
+          <Text color="error">{advancedTweenEditorError}</Text>
+        )}
+        {!!advancedTweenEditorStatus ? (
+          <Text style={styles.wrappingText}>{advancedTweenEditorStatus}</Text>
+        ) : (
+          <Text
+            style={styles.wrappingText}
+          >{`Animation files are saved in ${animationsFolderPath}.`}</Text>
+        )}
+        <Text style={styles.wrappingText}>
+          <Link
+            href={advancedTweenEditorGitHubUrl}
+            onClick={() =>
+              Window.openExternalURL(advancedTweenEditorGitHubUrl)
+            }
+          >
+            {advancedTweenEditorGitHubUrl}
+          </Link>
+        </Text>
+      </div>
+    );
+  };
 
   const renderLocalImageTools = () => (
     <div style={styles.section}>
@@ -2508,8 +2640,11 @@ const ToolsPanel = ({
                 label: <Trans>Sound</Trans>,
                 value: 'sound',
               },
+              {
+                label: <Trans>Animation</Trans>,
+                value: 'animation',
+              },
             ]}
-            variant="scrollable"
           />
         </div>
         <div style={styles.body}>
@@ -2525,6 +2660,8 @@ const ToolsPanel = ({
               : selectedImageTool === 'local-tools'
               ? renderLocalImageTools()
               : null
+            : activeToolCategory === 'animation'
+            ? renderAdvancedTweenEditor()
             : selectedSoundTool === 'elevenlabs'
             ? renderElevenLabs()
             : null}

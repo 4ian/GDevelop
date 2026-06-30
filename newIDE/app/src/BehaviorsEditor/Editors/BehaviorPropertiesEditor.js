@@ -6,6 +6,10 @@ import PropertiesEditorByVisibility from '../../PropertiesEditor/PropertiesEdito
 import { type BehaviorEditorProps } from './BehaviorEditorProps.flow';
 import { Column } from '../../UI/Grid';
 import propertiesMapToSchema from '../../PropertiesEditor/PropertiesMapToSchema';
+import {
+  advancedTweenBehaviorType,
+  customizeAdvancedTweenBehaviorPropertiesSchema,
+} from './AdvancedTweenBehaviorEditorOptions';
 
 type Props = BehaviorEditorProps;
 
@@ -22,7 +26,7 @@ const BehaviorPropertiesEditor = ({
   const schema = React.useMemo(
     () => {
       const behaviorProperties = behavior.getProperties();
-      return propertiesMapToSchema({
+      const schema = propertiesMapToSchema({
         properties: behaviorProperties,
         defaultValueProperties: null,
         getPropertyValue: (instance, name) =>
@@ -40,6 +44,10 @@ const BehaviorPropertiesEditor = ({
           behavior.getTypeName()
         ),
       });
+      if (behavior.getTypeName() === advancedTweenBehaviorType) {
+        return customizeAdvancedTweenBehaviorPropertiesSchema(schema);
+      }
+      return schema;
     },
     [behavior, layersContainer, object, project]
   );

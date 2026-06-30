@@ -208,27 +208,17 @@ const getProjectExtensionCounts = (
 
 const getSystemExtensionCounts = (
   platformExtension: gdPlatformExtension
-): ExtensionCount => ({
-  primary: platformExtension.getExtensionObjectsTypes().size(),
-  secondary: platformExtension.getBehaviorsTypes().size(),
-  tertiary:
-    platformExtension
-      .getAllActions()
-      .keys()
-      .size() +
-    platformExtension
-      .getAllConditions()
-      .keys()
-      .size() +
-    platformExtension
-      .getAllExpressions()
-      .keys()
-      .size() +
-    platformExtension
-      .getAllStrExpressions()
-      .keys()
-      .size(),
-});
+): ExtensionCount => {
+  const functionNames = getSystemExtensionFunctionNames(platformExtension);
+  return {
+    primary: platformExtension.getExtensionObjectsTypes().size(),
+    secondary: platformExtension.getBehaviorsTypes().size(),
+    tertiary:
+      functionNames.actions.length +
+      functionNames.conditions.length +
+      functionNames.expressions.length,
+  };
+};
 
 const getEntryCounts = (entry: ExtensionEntry): ExtensionCount => {
   if (entry.projectExtension)
@@ -296,6 +286,7 @@ const getPlatformInstructionNames = (
   instructionMetadataMap
     .keys()
     .toJSArray()
+    .filter(name => !instructionMetadataMap.get(name).isHidden())
     .sort();
 
 const getPlatformExpressionNames = (
@@ -304,7 +295,130 @@ const getPlatformExpressionNames = (
   expressionMetadataMap
     .keys()
     .toJSArray()
+    .filter(name => expressionMetadataMap.get(name).isShown())
     .sort();
+
+const getBehaviorScopedMetadataName = (
+  behaviorType: string,
+  metadataName: string
+): string =>
+  metadataName.includes('::')
+    ? metadataName
+    : `${behaviorType}::${metadataName}`;
+
+const addBehaviorScopedInstructionNames = (
+  names: Set<string>,
+  platformExtension: gdPlatformExtension,
+  getInstructionMetadataMap: (
+    gdPlatformExtension,
+    string
+  ) => gdMapStringInstructionMetadata
+) => {
+  platformExtension
+    .getBehaviorsTypes()
+    .toJSArray()
+    .forEach(behaviorType => {
+      getPlatformInstructionNames(
+        getInstructionMetadataMap(platformExtension, behaviorType)
+      ).forEach(metadataName =>
+        names.add(getBehaviorScopedMetadataName(behaviorType, metadataName))
+      );
+    });
+};
+
+const addBehaviorScopedExpressionNames = (
+  names: Set<string>,
+  platformExtension: gdPlatformExtension,
+  getExpressionMetadataMap: (
+    gdPlatformExtension,
+    string
+  ) => gdMapStringExpressionMetadata
+) => {
+  platformExtension
+    .getBehaviorsTypes()
+    .toJSArray()
+    .forEach(behaviorType => {
+      getPlatformExpressionNames(
+        getExpressionMetadataMap(platformExtension, behaviorType)
+      ).forEach(metadataName =>
+        names.add(getBehaviorScopedMetadataName(behaviorType, metadataName))
+      );
+    });
+};
+
+const getSystemExtensionFunctionNames = (
+  platformExtension: gdPlatformExtension
+): {|
+  actions: Array<string>,
+  conditions: Array<string>,
+  expressions: Array<string>,
+|} => {
+  const actions = new Set(
+    getPlatformInstructionNames(platformExtension.getAllActions())
+  );
+  const conditions = new Set(
+    getPlatformInstructionNames(platformExtension.getAllConditions())
+  );
+  const expressions = new Set([
+    ...getPlatformExpressionNames(platformExtension.getAllExpressions()),
+    ...getPlatformExpressionNames(platformExtension.getAllStrExpressions()),
+  ]);
+
+  addBehaviorScopedInstructionNames(
+    actions,
+    platformExtension,
+    (extension, behaviorType) =>
+      extension.getAllActionsForBehavior(behaviorType)
+  );
+  addBehaviorScopedInstructionNames(
+    conditions,
+    platformExtension,
+    (extension, behaviorType) =>
+      extension.getAllConditionsForBehavior(behaviorType)
+  );
+  addBehaviorScopedExpressionNames(
+    expressions,
+    platformExtension,
+    (extension, behaviorType) =>
+      extension.getAllExpressionsForBehavior(behaviorType)
+  );
+  addBehaviorScopedExpressionNames(
+    expressions,
+    platformExtension,
+    (extension, behaviorType) =>
+      extension.getAllStrExpressionsForBehavior(behaviorType)
+  );
+
+  // Expression-and-condition metadata exists in both maps. List it once here
+  // so the Extensions window matches the public function list.
+  const expressionNames = Array.from(expressions).sort();
+  const conditionNames = Array.from(conditions)
+    .filter(name => !expressions.has(name))
+    .sort();
+
+  return {
+    actions: Array.from(actions).sort(),
+    conditions: conditionNames,
+    expressions: expressionNames,
+  };
+};
+
+const getSystemExtensionFunctionGroups = (
+  platformExtension: gdPlatformExtension
+): FunctionGroups => {
+  const functionNames = getSystemExtensionFunctionNames(platformExtension);
+  return {
+    actions: functionNames.actions.map(name => ({ name, description: '' })),
+    conditions: functionNames.conditions.map(name => ({
+      name,
+      description: '',
+    })),
+    expressions: functionNames.expressions.map(name => ({
+      name,
+      description: '',
+    })),
+  };
+};
 
 const getEntryKindLabel = (kind: ExtensionEntryKind): React.Node => {
   if (kind === 'system') return <Trans>System</Trans>;
@@ -861,23 +975,7 @@ const SystemExtensionDetails = ({
     .toJSArray()
     .sort()
     .map(name => ({ name, description: '' }));
-  const actions: Array<ListedEntity> = getPlatformInstructionNames(
-    platformExtension.getAllActions()
-  ).map(name => ({ name, description: '' }));
-  const conditions: Array<ListedEntity> = getPlatformInstructionNames(
-    platformExtension.getAllConditions()
-  ).map(name => ({ name, description: '' }));
-  const expressions: Array<ListedEntity> = [
-    ...getPlatformExpressionNames(platformExtension.getAllExpressions()),
-    ...getPlatformExpressionNames(platformExtension.getAllStrExpressions()),
-  ]
-    .sort()
-    .map(name => ({ name, description: '' }));
-  const functionGroups: FunctionGroups = {
-    actions,
-    conditions,
-    expressions,
-  };
+  const functionGroups = getSystemExtensionFunctionGroups(platformExtension);
 
   return (
     <React.Fragment>

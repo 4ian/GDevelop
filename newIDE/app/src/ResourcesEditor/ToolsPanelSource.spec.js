@@ -90,6 +90,16 @@ describe('ToolsPanel source policies', () => {
     expect(source).toContain('gorest-spritesheet-load');
   });
 
+  it('offers AdvancedTween Editor in the animation tab', () => {
+    const source = getSource();
+
+    expect(source).toContain("value: 'animation'");
+    expect(source).toContain('AdvancedTween Editor');
+    expect(source).toContain('advanced-tween-editor-load');
+    expect(source).toContain('getAdvancedTweenAnimationsFolderPath');
+    expect(source).not.toContain('variant="wrapped"');
+  });
+
   it('saves Local tools output as a new generated file', () => {
     const source = getSource();
     const runLocalImageToolStart = source.indexOf('const runLocalImageTool');

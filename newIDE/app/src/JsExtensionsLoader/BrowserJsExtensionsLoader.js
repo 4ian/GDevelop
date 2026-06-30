@@ -78,6 +78,12 @@ const jsExtensions = [
     objectsRenderingServiceModules: {},
   },
   {
+    name: 'AdvancedTween',
+    // $FlowFixMe[cannot-resolve-module]
+    extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/AdvancedTween/JsExtension.js'),
+    objectsRenderingServiceModules: {},
+  },
+  {
     name: 'Video',
     // $FlowFixMe[cannot-resolve-module]
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/Video/JsExtension.js'),

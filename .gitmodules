@@ -7,3 +7,6 @@
 [submodule "thirdParties/gorest-2d-animation-spritesheet-generator"]
 	path = thirdParties/gorest-2d-animation-spritesheet-generator
 	url = https://github.com/zhouzhipeng/gorest-2d-animation-spritesheet-generator.git
+[submodule "thirdParties/AdvancedTweenEditor"]
+	path = thirdParties/AdvancedTweenEditor
+	url = https://github.com/zhouzhipeng/AdvancedTweenEditor.git

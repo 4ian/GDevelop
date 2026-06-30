@@ -33,6 +33,7 @@ import ProjectResourcesChooser from './ProjectResources/ProjectResourcesChooser'
 const remote = optionalRequire('@electron/remote');
 const dialog = remote ? remote.dialog : null;
 const path = optionalRequire('path');
+const fs = optionalRequire('fs');
 
 const ResourceStoreChooser = ({
   options,
@@ -76,8 +77,19 @@ const localResourceSources: Array<ResourceSource> = [
         if (options.multiSelection) properties.push('multiSelections');
 
         const projectPath = path.dirname(project.getProjectFile());
+        const defaultLocalFileDialogPath = options.defaultLocalFileDialogFolder
+          ? path.join(projectPath, options.defaultLocalFileDialogFolder)
+          : null;
+        if (defaultLocalFileDialogPath && fs) {
+          await fs.promises.mkdir(defaultLocalFileDialogPath, {
+            recursive: true,
+          });
+        }
         // $FlowFixMe[incompatible-type]
-        const latestPath = getLastUsedPath(project, kind) || projectPath;
+        const latestPath =
+          defaultLocalFileDialogPath ||
+          getLastUsedPath(project, kind) ||
+          projectPath;
 
         const browserWindow = remote.getCurrentWindow();
         let { filePaths } = await dialog.showOpenDialog(browserWindow, {

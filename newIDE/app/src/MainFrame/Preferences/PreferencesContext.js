@@ -186,7 +186,7 @@ export type EditorStateForProject = {|
 export type EditorStateForProjectUpdate = $Shape<EditorStateForProject>;
 
 export type ResourcesToolsSettings = {|
-  activeToolCategory: 'image' | 'sound',
+  activeToolCategory: 'image' | 'sound' | 'animation',
   selectedImageTool:
     | 'nano-banana'
     | 'local-tools'

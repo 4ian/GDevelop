@@ -25,6 +25,7 @@ import useForceUpdate from '../../Utils/UseForceUpdate';
 import classes from './CompactResourceSelectorWithThumbnail.module.css';
 import classNames from 'classnames';
 import { makeTimestampedId } from '../../Utils/TimestampedId';
+import { createProjectAssetResourceFromResourceName } from '../ProjectResources/ProjectAssetsFolderResources';
 
 const styles = {
   icon: {
@@ -38,6 +39,10 @@ type Props = {|
   resourceKind: ResourceKind,
   resourceName: string,
   defaultNewResourceName?: string,
+  importedResourcesFolder?: string,
+  includeProjectAssetsFolder?: boolean,
+  defaultLocalFileDialogFolder?: string,
+  resourceNameFilter?: (resourceName: string, resource: gdResource) => boolean,
   onChange: string => void,
   id?: string,
 |};
@@ -48,6 +53,10 @@ export const CompactResourceSelectorWithThumbnail = ({
   resourceKind,
   resourceName,
   defaultNewResourceName,
+  importedResourcesFolder,
+  includeProjectAssetsFolder,
+  defaultLocalFileDialogFolder,
+  resourceNameFilter,
   onChange,
   id,
 }: Props): React.Node => {
@@ -79,17 +88,96 @@ export const CompactResourceSelectorWithThumbnail = ({
     callback: () => {},
   });
 
+  const hasMatchingResource = React.useCallback(
+    (resourceNameToCheck: string): boolean => {
+      const resourcesManager = project.getResourcesManager();
+      if (!resourcesManager.hasResource(resourceNameToCheck)) return false;
+
+      const resource = resourcesManager.getResource(resourceNameToCheck);
+      return (
+        resource.getKind() === resourceKind &&
+        (!resourceNameFilter ||
+          resourceNameFilter(resourceNameToCheck, resource))
+      );
+    },
+    [project, resourceKind, resourceNameFilter]
+  );
+
+  const registerProjectAssetResourceName = React.useCallback(
+    (resourceNameToRegister: string): boolean => {
+      if (!includeProjectAssetsFolder || !resourceNameToRegister) {
+        return false;
+      }
+
+      const resourcesManager = project.getResourcesManager();
+      if (hasMatchingResource(resourceNameToRegister)) {
+        return true;
+      }
+
+      const projectAssetResource = createProjectAssetResourceFromResourceName({
+        project,
+        resourceKind,
+        resourceName: resourceNameToRegister,
+      });
+      if (!projectAssetResource) return false;
+      if (
+        resourceNameFilter &&
+        !resourceNameFilter(resourceNameToRegister, projectAssetResource)
+      ) {
+        projectAssetResource.delete();
+        return false;
+      }
+
+      applyResourceDefaults(project, projectAssetResource);
+      const hasCreatedAnyResource = resourcesManager.addResource(
+        projectAssetResource
+      );
+      projectAssetResource.delete();
+
+      if (hasCreatedAnyResource) {
+        resourceManagementProps.onNewResourcesAdded();
+        triggerResourcesHaveChanged();
+        forceUpdate();
+      }
+
+      return hasMatchingResource(resourceNameToRegister);
+    },
+    [
+      hasMatchingResource,
+      includeProjectAssetsFolder,
+      project,
+      resourceKind,
+      resourceNameFilter,
+      resourceManagementProps,
+      triggerResourcesHaveChanged,
+      forceUpdate,
+    ]
+  );
+
+  React.useEffect(
+    () => {
+      if (resourceName) registerProjectAssetResourceName(resourceName);
+    },
+    [resourceName, registerProjectAssetResourceName]
+  );
+
   const _onChange = React.useCallback(
     (value: string) => {
       if (value === resourceName) {
         return;
       }
+      registerProjectAssetResourceName(value);
       onChange(value);
       if (resourceManagementProps.onResourceUsageChanged) {
         resourceManagementProps.onResourceUsageChanged();
       }
     },
-    [resourceName, onChange, resourceManagementProps]
+    [
+      resourceName,
+      registerProjectAssetResourceName,
+      onChange,
+      resourceManagementProps,
+    ]
   );
 
   // TODO: move in a hook?
@@ -105,6 +193,9 @@ export const CompactResourceSelectorWithThumbnail = ({
           initialSourceName: initialResourceSource.name,
           multiSelection: false,
           resourceKind: resourceKind,
+          importedResourcesFolder,
+          includeProjectAssetsFolder,
+          defaultLocalFileDialogFolder,
         });
 
         if (!selectedResources.length) return;
@@ -116,6 +207,17 @@ export const CompactResourceSelectorWithThumbnail = ({
         const resource = selectedResources[0];
 
         const resourceName: string = resource.getName();
+        if (
+          resourceNameFilter &&
+          !resourceNameFilter(resourceName, resource)
+        ) {
+          showErrorBox({
+            message:
+              'This resource cannot be used here. Choose a resource from the expected project folder.',
+            errorId: 'resource-folder-mismatch',
+          });
+          return;
+        }
 
         if (selectedResourceSource.shouldCreateResource) {
           applyResourceDefaults(project, resource);
@@ -147,6 +249,10 @@ export const CompactResourceSelectorWithThumbnail = ({
       project,
       resourceManagementProps,
       resourceKind,
+      importedResourcesFolder,
+      includeProjectAssetsFolder,
+      defaultLocalFileDialogFolder,
+      resourceNameFilter,
       _onChange,
       triggerResourcesHaveChanged,
       resourceSources,
@@ -159,7 +265,10 @@ export const CompactResourceSelectorWithThumbnail = ({
       abortControllerRef.current = new AbortController();
       const { signal } = abortControllerRef.current;
       const resourcesManager = project.getResourcesManager();
-      const initialResource = resourcesManager.getResource(resourceName);
+      const initialResource =
+        resourceName && resourcesManager.hasResource(resourceName)
+          ? resourcesManager.getResource(resourceName)
+          : null;
 
       try {
         setExternalEditorOpened(true);
@@ -170,7 +279,9 @@ export const CompactResourceSelectorWithThumbnail = ({
           resourceManagementProps,
           resourceNames: [resourceName],
           extraOptions: {
-            existingMetadata: initialResource.getMetadata(),
+            existingMetadata: initialResource
+              ? initialResource.getMetadata()
+              : '',
 
             // Only useful for images:
             singleFrame: true,
@@ -252,7 +363,7 @@ export const CompactResourceSelectorWithThumbnail = ({
   );
 
   const isResourceSetButInvalid =
-    resourceName && !project.getResourcesManager().hasResource(resourceName);
+    resourceName && !hasMatchingResource(resourceName);
 
   return (
     <LineStackLayout noMargin expand id={idToUse.current}>

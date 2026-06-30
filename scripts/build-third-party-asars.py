@@ -7,6 +7,7 @@ Desk from the git submodules under thirdParties:
 - newIDE/electron-app/app/external/image-extender.asar
 - newIDE/electron-app/app/external/ai-game-workbench.storage-open.asar
 - newIDE/electron-app/app/external/gorest-spritesheet.asar
+- newIDE/electron-app/app/external/advanced-tween-editor.asar
 
 It stages compiled runtime files in the system temp directory. It does not start
 a localhost server or copy expanded upstream source into the Electron app.
@@ -536,6 +537,23 @@ console.log('gorest-spritesheet.asar smoke:', indexPath);
     run([electron_path, "-e", script], cwd=REPO_ROOT, env=env)
 
 
+def smoke_test_advanced_tween_editor(electron_path: Path) -> None:
+    log("Smoke testing advanced-tween-editor.asar")
+    script = r"""
+const fs = require('fs');
+const path = require('path');
+const bundle = path.resolve('newIDE/electron-app/app/external/advanced-tween-editor.asar');
+const indexPath = path.join(bundle, 'web', 'index.html');
+if (!fs.existsSync(indexPath)) {
+  throw new Error('advanced-tween-editor.asar web/index.html was not found.');
+}
+console.log('advanced-tween-editor.asar smoke:', indexPath);
+"""
+    env = os.environ.copy()
+    env["ELECTRON_RUN_AS_NODE"] = "1"
+    run([electron_path, "-e", script], cwd=REPO_ROOT, env=env)
+
+
 def build_image_extender(args: argparse.Namespace) -> None:
     upstream = ensure_submodule("thirdParties/image-extender", args.pull)
     ensure_next_standalone_output(upstream)
@@ -700,6 +718,33 @@ def build_gorest_spritesheet(args: argparse.Namespace) -> None:
         smoke_test_gorest_spritesheet(electron_bin("electron"))
 
 
+def build_advanced_tween_editor(args: argparse.Namespace) -> None:
+    upstream = ensure_submodule("thirdParties/AdvancedTweenEditor", args.pull)
+    assert_exists(upstream / "index.html", "file")
+
+    staging = Path(tempfile.gettempdir()) / "gdevelop-advanced-tween-editor-electron"
+    log(f"Staging AdvancedTween Editor runtime in {staging}")
+    remove_safe(staging, Path(tempfile.gettempdir()))
+    (staging / "web").mkdir(parents=True, exist_ok=True)
+
+    copy_file(upstream / "index.html", staging / "web" / "index.html")
+    copy_directory_contents(upstream / "css", staging / "web" / "css")
+    copy_directory_contents(upstream / "js", staging / "web" / "js")
+    copy_directory_contents(upstream / "vendor", staging / "web" / "vendor")
+    copy_file(upstream / "README.md", staging / "README.md")
+
+    ensure_electron_packaging_dependencies(args.skip_install)
+    EXTERNAL_DIR.mkdir(parents=True, exist_ok=True)
+    asar_path = EXTERNAL_DIR / "advanced-tween-editor.asar"
+
+    log(f"Packing {asar_path}")
+    remove_safe_with_lock_kill(asar_path, EXTERNAL_DIR)
+    run([electron_bin("asar"), "pack", staging, asar_path], cwd=REPO_ROOT)
+
+    if not args.skip_smoke_test:
+        smoke_test_advanced_tween_editor(electron_bin("electron"))
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Build third-party Electron ASAR artifacts."
@@ -711,6 +756,7 @@ def parse_args() -> argparse.Namespace:
             "ai-game-workbench",
             "image-extender",
             "gorest-spritesheet",
+            "advanced-tween-editor",
         ),
         default="all",
         help="Build all ASARs, or only one target.",
@@ -749,6 +795,8 @@ def main() -> int:
             build_ai_game_workbench(args)
         if args.target in ("all", "gorest-spritesheet"):
             build_gorest_spritesheet(args)
+        if args.target in ("all", "advanced-tween-editor"):
+            build_advanced_tween_editor(args)
     except subprocess.CalledProcessError as error:
         print(f"Command failed with exit code {error.returncode}.", file=sys.stderr)
         return error.returncode

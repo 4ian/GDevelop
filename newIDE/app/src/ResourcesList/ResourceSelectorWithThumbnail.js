@@ -27,6 +27,10 @@ type Props = {|
   hintText?: MessageDescriptor,
   helperMarkdownText?: ?string,
   fallbackResourceKind?: ResourceKind,
+  importedResourcesFolder?: string,
+  includeProjectAssetsFolder?: boolean,
+  defaultLocalFileDialogFolder?: string,
+  resourceNameFilter?: (resourceName: string, resource: gdResource) => boolean,
   id?: string,
   disabled?: boolean,
 |};
@@ -43,6 +47,10 @@ const ResourceSelectorWithThumbnail = ({
   hintText,
   helperMarkdownText,
   fallbackResourceKind,
+  importedResourcesFolder,
+  includeProjectAssetsFolder,
+  defaultLocalFileDialogFolder,
+  resourceNameFilter,
   id,
   disabled,
 }: Props): React.Node => {
@@ -65,6 +73,10 @@ const ResourceSelectorWithThumbnail = ({
       hintText={hintText}
       helperMarkdownText={helperMarkdownText}
       fallbackResourceKind={fallbackResourceKind}
+      importedResourcesFolder={importedResourcesFolder}
+      includeProjectAssetsFolder={includeProjectAssetsFolder}
+      defaultLocalFileDialogFolder={defaultLocalFileDialogFolder}
+      resourceNameFilter={resourceNameFilter}
       id={id}
       disabled={disabled}
     />

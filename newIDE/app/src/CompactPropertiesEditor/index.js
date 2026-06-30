@@ -670,6 +670,12 @@ const CompactPropertiesEditor = ({
     }
 
     const { setValue } = field;
+    const resourceManagementPropsToUse = field.resourceExternalEditors
+      ? {
+          ...resourceManagementProps,
+          resourceExternalEditors: field.resourceExternalEditors,
+        }
+      : resourceManagementProps;
     return (
       <CompactPropertiesEditorRowField
         key={field.name}
@@ -678,8 +684,12 @@ const CompactPropertiesEditor = ({
         field={
           <CompactResourceSelectorWithThumbnail
             project={project}
-            resourceManagementProps={resourceManagementProps}
+            resourceManagementProps={resourceManagementPropsToUse}
             resourceKind={field.resourceKind}
+            importedResourcesFolder={field.importedResourcesFolder}
+            includeProjectAssetsFolder={field.includeProjectAssetsFolder}
+            defaultLocalFileDialogFolder={field.defaultLocalFileDialogFolder}
+            resourceNameFilter={field.resourceNameFilter}
             resourceName={getFieldValue({
               instances,
               field,

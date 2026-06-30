@@ -626,13 +626,23 @@ const PropertiesEditor = ({
     }
 
     const { setValue } = field;
+    const resourceManagementPropsToUse = field.resourceExternalEditors
+      ? {
+          ...resourceManagementProps,
+          resourceExternalEditors: field.resourceExternalEditors,
+        }
+      : resourceManagementProps;
     return (
       <ResourceSelectorWithThumbnail
         key={field.name}
         project={project}
         projectScopedContainersAccessor={projectScopedContainersAccessor}
-        resourceManagementProps={resourceManagementProps}
+        resourceManagementProps={resourceManagementPropsToUse}
         resourceKind={field.resourceKind}
+        importedResourcesFolder={field.importedResourcesFolder}
+        includeProjectAssetsFolder={field.includeProjectAssetsFolder}
+        defaultLocalFileDialogFolder={field.defaultLocalFileDialogFolder}
+        resourceNameFilter={field.resourceNameFilter}
         resourceName={getFieldValue({
           instances,
           field,

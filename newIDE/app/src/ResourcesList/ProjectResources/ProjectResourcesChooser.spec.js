@@ -1,6 +1,7 @@
 // @flow
 import {
   createProjectAssetResourceFromFile,
+  createProjectAssetResourceFromResourceName,
   getProjectAssetsFolderResources,
   isSupportedProjectAssetResourceFile,
 } from './ProjectAssetsFolderResources';
@@ -43,6 +44,51 @@ describe('ProjectResourcesChooser', () => {
     expect(resource.getFile()).toBe('assets/hero.png');
     expect(resource.getKind()).toBe('image');
     resource.delete();
+  });
+
+  it('creates project-relative resources from existing asset resource names', () => {
+    if (!fs || !os || !path) return;
+
+    const tempDir = fs.mkdtempSync(
+      path.join(os.tmpdir(), 'gd-project-assets-')
+    );
+    const projectFolder = path.join(tempDir, 'project');
+    fs.mkdirSync(path.join(projectFolder, 'assets', 'animations'), {
+      recursive: true,
+    });
+    fs.writeFileSync(
+      path.join(projectFolder, 'assets', 'animations', 'walk.json'),
+      '{}'
+    );
+
+    const project = gd.ProjectHelper.createNewGDJSProject();
+    project.setProjectFile(path.join(projectFolder, 'game.json'));
+
+    try {
+      const resource = createProjectAssetResourceFromResourceName({
+        project,
+        resourceKind: 'json',
+        resourceName: 'assets/animations/walk.json',
+      });
+
+      expect(resource).not.toBe(null);
+      if (!resource) return;
+      expect(resource.getName()).toBe('assets/animations/walk.json');
+      expect(resource.getFile()).toBe('assets/animations/walk.json');
+      expect(resource.getKind()).toBe('json');
+      resource.delete();
+
+      expect(
+        createProjectAssetResourceFromResourceName({
+          project,
+          resourceKind: 'json',
+          resourceName: '../outside.json',
+        })
+      ).toBe(null);
+    } finally {
+      project.delete();
+      fs.rmSync(tempDir, { recursive: true, force: true });
+    }
   });
 
   it('lists unregistered resources from the project assets folder', async () => {

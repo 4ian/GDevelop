@@ -3,6 +3,7 @@ import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
 import { type ResourceKind } from '../ResourcesList/ResourceSource';
+import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor';
 
 // An "instance" here is the objects for which properties are shown
 export type Instance = Object; // This could be improved using generics.
@@ -106,6 +107,11 @@ export type PrimitiveValueField =
 export type ResourceField = {|
   valueType: 'resource',
   resourceKind: ResourceKind,
+  importedResourcesFolder?: string,
+  includeProjectAssetsFolder?: boolean,
+  defaultLocalFileDialogFolder?: string,
+  resourceNameFilter?: (resourceName: string, resource: gdResource) => boolean,
+  resourceExternalEditors?: Array<ResourceExternalEditor>,
   getValue: Instance => string,
   setValue: (instance: Instance, newValue: string) => void,
   renderLeftIcon?: (className?: string) => React.Node,

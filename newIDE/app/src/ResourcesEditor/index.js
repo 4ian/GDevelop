@@ -118,6 +118,8 @@ const styles = {
     backgroundColor: 'rgba(128, 128, 128, 0.12)',
     borderTop: '1px solid rgba(128, 128, 128, 0.2)',
     borderBottom: '1px solid rgba(128, 128, 128, 0.2)',
+    position: 'relative',
+    zIndex: 2,
   },
   projectFilesPane: {
     display: 'flex',
@@ -131,10 +133,13 @@ const styles = {
     backgroundColor: 'rgba(128, 128, 128, 0.12)',
     borderLeft: '1px solid rgba(128, 128, 128, 0.2)',
     borderRight: '1px solid rgba(128, 128, 128, 0.2)',
+    position: 'relative',
+    zIndex: 2,
   },
   toolsPane: {
     display: 'flex',
     minWidth: minToolsWidth,
+    overflow: 'hidden',
   },
 };
 

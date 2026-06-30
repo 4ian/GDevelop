@@ -62,6 +62,10 @@ const {
   openGorestSpritesheetWindow,
 } = require('./GorestSpritesheetWindow');
 const {
+  advancedTweenEditorScheme,
+  openAdvancedTweenEditorWindow,
+} = require('./AdvancedTweenEditorWindow');
+const {
   setupLocalGDJSDevelopmentWatcher,
   closeLocalGDJSDevelopmentWatcher,
   onLocalGDJSDevelopmentWatcherRuntimeUpdated,
@@ -205,6 +209,15 @@ protocol.registerSchemesAsPrivileged([
   },
   {
     scheme: gorestSpritesheetScheme,
+    privileges: {
+      standard: true,
+      secure: true,
+      supportFetchAPI: true,
+      corsEnabled: true,
+    },
+  },
+  {
+    scheme: advancedTweenEditorScheme,
     privileges: {
       standard: true,
       secure: true,
@@ -781,6 +794,20 @@ app.on('ready', function() {
     return openGorestSpritesheetWindow({
       parentWindow,
       devTools,
+    });
+  });
+
+  // AdvancedTween Editor executable app
+  ipcMain.handle('advanced-tween-editor-load', (event, options = {}) => {
+    const parentWindow = BrowserWindow.fromWebContents(event.sender);
+    return openAdvancedTweenEditorWindow({
+      parentWindow,
+      devTools,
+      projectRootPath: options.projectRootPath,
+      waitForResult: !!options.waitForResult,
+      initialJsonFile: options.initialJsonFile,
+      gameResolutionWidth: options.gameResolutionWidth,
+      gameResolutionHeight: options.gameResolutionHeight,
     });
   });
 

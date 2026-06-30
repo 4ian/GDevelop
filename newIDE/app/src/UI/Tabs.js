@@ -68,7 +68,7 @@ type TabsProps<TabName> = {|
   value?: TabName,
   onChange: TabName => void,
   options: TabOptions<TabName>,
-  variant?: 'scrollable', // Allow overriding the scrollable variant for specific cases.
+  variant?: 'scrollable', // Allow overriding the tab layout for specific cases.
 |};
 
 /**

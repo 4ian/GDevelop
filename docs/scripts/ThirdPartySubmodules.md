@@ -11,6 +11,8 @@ Current submodules:
   `https://github.com/zhouzhipeng/image-extender.git`
 - `thirdParties/gorest-2d-animation-spritesheet-generator`:
   `https://github.com/zhouzhipeng/gorest-2d-animation-spritesheet-generator.git`
+- `thirdParties/AdvancedTweenEditor`:
+  `https://github.com/zhouzhipeng/AdvancedTweenEditor.git`
 
 ## Initialize
 
@@ -28,6 +30,7 @@ To pull the latest upstream commits into the local submodule checkouts:
 git -C thirdParties/ai_game_workbench pull --ff-only
 git -C thirdParties/image-extender pull --ff-only
 git -C thirdParties/gorest-2d-animation-spritesheet-generator pull --ff-only
+git -C thirdParties/AdvancedTweenEditor pull --ff-only
 git status --short
 ```
 
@@ -49,8 +52,9 @@ git add thirdParties/ai_game_workbench
 git status --short
 ```
 
-Use the same flow for `thirdParties/image-extender` and
-`thirdParties/gorest-2d-animation-spritesheet-generator`.
+Use the same flow for `thirdParties/image-extender`,
+`thirdParties/gorest-2d-animation-spritesheet-generator`, and
+`thirdParties/AdvancedTweenEditor`.
 
 ## Packaging
 

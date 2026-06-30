@@ -267,7 +267,7 @@ GDevelop is composed of an **editor**, a **game engine**, an **ecosystem** of ex
 | `Extensions`  | Built-in extensions for the game engine, providing objects, behaviors and new features. For example, this includes the physics engines running in WebAssembly (Box2D or Jolt Physics for 3D). All the [official and experimental extensions are on this repository](https://github.com/GDevelopApp/GDevelop-extensions). [Community extensions are available here](https://github.com/GDevelopApp/GDevelop-community-list). |
 | `docs`        | Repository documentation and implementation notes. Script and third-party integration documentation lives in `docs/scripts`.                                                                                                                                                                              |
 | `scripts`     | Executable helper scripts for build, release, development, and packaging tasks. Non-executable documentation should live in `docs`.                                                                                                                                                                       |
-| `thirdParties` | Git submodules for external upstream tools integrated into the editor, including `ai_game_workbench`, `image-extender`, and `gorest-2d-animation-spritesheet-generator`. These are source checkouts for maintenance; Electron uses compiled ASAR artifacts from `newIDE/electron-app/app/external`.                                                   |
+| `thirdParties` | Git submodules for external upstream tools integrated into the editor, including `ai_game_workbench`, `image-extender`, `gorest-2d-animation-spritesheet-generator`, and `AdvancedTweenEditor`. These are source checkouts for maintenance; Electron uses compiled ASAR artifacts from `newIDE/electron-app/app/external`.                                                   |
 
 To learn more about GDevelop Architecture, read the [architecture overview here](Core/GDevelop-Architecture-Overview.md).
 
@@ -278,9 +278,10 @@ Pre-generated documentation of the game engine is [available here](https://docs.
 The Resource Working Desk integrates selected third-party tools through
 Electron-packaged ASAR files:
 
-- `thirdParties/ai_game_workbench`, `thirdParties/image-extender`, and
-  `thirdParties/gorest-2d-animation-spritesheet-generator` are git submodules
-  that track upstream source.
+- `thirdParties/ai_game_workbench`, `thirdParties/image-extender`,
+  `thirdParties/gorest-2d-animation-spritesheet-generator`, and
+  `thirdParties/AdvancedTweenEditor` are git submodules that track upstream
+  source.
 - `scripts/build-third-party-asars.py` builds the runtime ASAR files from those
   submodules.
 - `newIDE/electron-app/app/external` contains the packaged artifacts loaded by

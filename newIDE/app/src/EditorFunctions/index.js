@@ -5477,8 +5477,6 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
           changed_group,
           'delete_this_group'
         );
-        // Group membership is edited incrementally: `objects_to_add` /
-        // `objects_to_remove` only list the objects that change.
         const objectsToAdd = SafeExtractor.extractArrayProperty(
           changed_group,
           'objects_to_add'
@@ -5619,8 +5617,6 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
               }
             });
 
-            // Echo the resulting content of the group, so the caller (and the
-            // orchestrator) can see and verify the new state.
             const finalObjectNames = foundGroup
               .getAllObjectsNames()
               .toJSArray();

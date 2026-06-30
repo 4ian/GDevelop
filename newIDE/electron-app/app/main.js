@@ -45,6 +45,7 @@ const {
   onLocalGDJSDevelopmentWatcherRuntimeUpdated,
 } = require('./LocalGDJSDevelopmentWatcher');
 const { setupWatcher, disableWatcher } = require('./LocalFilesystemWatcher');
+const { installCliInPath } = require('./InstallCliInPath');
 
 // Initialize `@electron/remote` module
 require('@electron/remote/main').initialize();
@@ -419,6 +420,10 @@ app.on('ready', function() {
 
   ipcMain.on('app-exit', (_event, exitCode) => {
     app.exit(typeof exitCode === 'number' ? exitCode : 0);
+  });
+
+  ipcMain.handle('install-cli-in-path', async () => {
+    return installCliInPath(process.execPath);
   });
 
   ipcMain.on('set-main-menu', (event, mainMenuTemplate) => {

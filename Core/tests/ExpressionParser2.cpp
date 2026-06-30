@@ -28,6 +28,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
   layout1.GetVariables().InsertNew("MySceneVariable");
   layout1.GetVariables().InsertNew("MySceneVariable2");
   layout1.GetVariables().InsertNew("MySceneStructureVariable").GetChild("MyChild");
+  layout1.GetVariables().InsertNew("MySceneStructureVariable").GetChild("MyChildStructure").GetChild("MyChild");
   layout1.GetVariables().InsertNew("MySceneStructureVariable2").GetChild("MyChild");
   layout1.GetVariables().InsertNew("MySceneNumberVariable").SetValue(123);
   layout1.GetVariables().InsertNew("MySceneStringVariable").SetString("Test");
@@ -1676,7 +1677,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
               "You entered a number, but a text was expected (in quotes).");
     }
     {
-      auto node = parser.ParseExpression("MySceneStructureVariable.MyChild.UnknownSubChild + 123 + \"hello world\"");
+      auto node = parser.ParseExpression("MySceneStructureVariable.MyChildStructure.UnknownSubChild + 123 + \"hello world\"");
       REQUIRE(node != nullptr);
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
@@ -1686,7 +1687,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
               "You entered a text, but a number was expected.");
     }
     {
-      auto node = parser.ParseExpression("MySceneStructureVariable.MyChild.UnknownSubChild + \"hello world\" + 123");
+      auto node = parser.ParseExpression("MySceneStructureVariable.MyChildStructure.UnknownSubChild + \"hello world\" + 123");
       REQUIRE(node != nullptr);
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
@@ -1974,38 +1975,101 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
   }
 
   SECTION("Valid scene variables (1 level)") {
-    {
+    SECTION("in expression") {
+      {
+        auto node =
+            parser.ParseExpression("MySceneVariable");
+
+        gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
+        node->Visit(validator);
+        REQUIRE(validator.GetFatalErrors().size() == 0);
+      }
+      {
+        auto node =
+            parser.ParseExpression("MySceneVariable + MySceneVariable2");
+
+        gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
+        node->Visit(validator);
+        REQUIRE(validator.GetFatalErrors().size() == 0);
+      }
+    }
+    SECTION("in variable parameter") {
       auto node =
           parser.ParseExpression("MySceneVariable");
 
-      gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "variable");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 0);
     }
-    {
+    SECTION("in legacy variable parameter") {
       auto node =
-          parser.ParseExpression("MySceneVariable + MySceneVariable2");
+          parser.ParseExpression("MySceneVariable");
 
-      gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "scenevar");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 0);
     }
   }
 
   SECTION("Valid scene variables (2 levels)") {
-    {
+    SECTION("in expression") {
+      {
+        auto node =
+            parser.ParseExpression("MySceneStructureVariable.MyChild");
+
+        gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
+        node->Visit(validator);
+        REQUIRE(validator.GetFatalErrors().size() == 0);
+      }
+      {
+        auto node =
+            parser.ParseExpression("MySceneStructureVariable.MyChild + MySceneStructureVariable2.MyChild");
+
+        gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
+        node->Visit(validator);
+        REQUIRE(validator.GetFatalErrors().size() == 0);
+      }
+    }
+    SECTION("in variable parameter") {
       auto node =
           parser.ParseExpression("MySceneStructureVariable.MyChild");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "variable");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
+    }
+    SECTION("in legacy variable parameter") {
+      auto node =
+          parser.ParseExpression("MySceneStructureVariable.MyChild");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "scenevar");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
+    }
+  }
+
+  SECTION("Valid scene variables (3 levels)") {
+    SECTION("in expression") {
+      auto node =
+          parser.ParseExpression("MySceneStructureVariable.MyChildStructure.MyChild");
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 0);
     }
-    {
+    SECTION("in variable parameter") {
       auto node =
-          parser.ParseExpression("MySceneStructureVariable.MyChild + MySceneStructureVariable2.MyChild");
+          parser.ParseExpression("MySceneStructureVariable.MyChildStructure.MyChild");
 
-      gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "variable");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
+    }
+    SECTION("in legacy variable parameter") {
+      auto node =
+          parser.ParseExpression("MySceneStructureVariable.MyChildStructure.MyChild");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "scenevar");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 0);
     }
@@ -2097,16 +2161,78 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
     }
   }
 
-  SECTION("Invalid scene variables (2 levels, child does not exist)") {
+  SECTION("Invalid scene variables in expression (2 levels, child does not exist)") {
     {
       auto node =
-          parser.ParseExpression("MySceneVariable.MyNonExistingChild");
+          parser.ParseExpression("MySceneStructureVariable.MyNonExistingChild");
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 1);
       REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
               "No child variable with this name found.");
+    }
+  }
+
+  SECTION("Invalid scene variables in expression (3 levels, child does not exist)") {
+    {
+      // Declaration is not enforced on variables with more than 1 level of children.
+      auto node =
+          parser.ParseExpression("MySceneStructureVariable.MyNonExistingChild.MyNonExistingChild");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
+      REQUIRE(validator.GetAllErrors().size() == 0);
+    }
+  }
+
+  SECTION("Invalid scene variables (2 levels, child does not exist)") {
+    {
+      auto node =
+          parser.ParseExpression("MySceneStructureVariable.MyNonExistingChild");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "variable");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
+      REQUIRE(validator.GetAllErrors().size() == 0);
+    }
+  }
+
+  SECTION("Invalid scene variables (3 levels, child does not exist)") {
+    {
+      // Declaration is not enforced on variables with more than 1 level of children.
+      auto node =
+          parser.ParseExpression("MySceneStructureVariable.MyNonExistingChild.MyNonExistingChild");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "variable");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
+      REQUIRE(validator.GetAllErrors().size() == 0);
+    }
+  }
+
+  SECTION("Undeclared legacy scene variables (2 levels, child does not exist)") {
+    {
+      auto node =
+          parser.ParseExpression("MySceneStructureVariable.MyNonExistingChild");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "scenevar");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
+      REQUIRE(validator.GetAllErrors().size() == 0);
+    }
+  }
+
+  SECTION("Undeclared legacy scene variables (3 levels, child does not exist)") {
+    {
+      auto node =
+          parser.ParseExpression("MySceneStructureVariable.MyNonExistingChild.MyNonExistingChild");
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "scenevar");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
+      REQUIRE(validator.GetAllErrors().size() == 0);
     }
   }
 
@@ -3658,8 +3784,19 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
               "one or the other.");
     }
 
-    SECTION("Declared scene variable") {
-      auto node = parser.ParseExpression("MySceneVariable");
+    SECTION("Declared scene variable with missing gran-children in expression") {
+      // Children of child-variables don't need to be declared.
+      auto node = parser.ParseExpression("MySceneStructureVariable.MyChildStructure.MyNonExistingChild");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
+    }
+
+    SECTION("Declared scene variable with missing gran-children in variable parameter") {
+      // Children of child-variables don't need to be declared.
+      auto node = parser.ParseExpression("MySceneStructureVariable.MyChildStructure.MyNonExistingChild");
       REQUIRE(node != nullptr);
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "variable");
@@ -3667,12 +3804,12 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(validator.GetFatalErrors().size() == 0);
     }
 
-    SECTION("Declared scene variable with children") {
-      // Children themselves don't need to be declared.
-      auto node = parser.ParseExpression("MySceneVariable.MyChild.MyChild");
+    SECTION("Declared legacy scene variable with missing gran-children in variable parameter") {
+      // Children of child-variables don't need to be declared.
+      auto node = parser.ParseExpression("MySceneStructureVariable.MyChildStructure.MyNonExistingChild");
       REQUIRE(node != nullptr);
 
-      gd::ExpressionValidator validator(platform, projectScopedContainers, "variable");
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "scenevar");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 0);
     }
@@ -3869,14 +4006,14 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(type == "string");
     }
     {
-      auto node = parser.ParseExpression("MySceneStructureVariable.MyChild.UnknownSubChild + 123");
+      auto node = parser.ParseExpression("MySceneStructureVariable.MyChildStructure.UnknownSubChild + 123");
       REQUIRE(node != nullptr);
       auto type = gd::ExpressionTypeFinder::GetType(
           platform, projectScopedContainers, "number|string", *node.get());
       REQUIRE(type == "number");
     }
     {
-      auto node = parser.ParseExpression("MySceneStructureVariable.MyChild.UnknownSubChild + \"hello world\"");
+      auto node = parser.ParseExpression("MySceneStructureVariable.MyChildStructure.UnknownSubChild + \"hello world\"");
       REQUIRE(node != nullptr);
       auto type = gd::ExpressionTypeFinder::GetType(
           platform, projectScopedContainers, "number|string", *node.get());
@@ -3994,7 +4131,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       // A string concatenated with an unknown variable (will have to be casted to a string in code generation)
       // and then with a string again.
       {
-        auto node = parser.ParseExpression("\"You have \" + MySceneStructureVariable.MyChild.CantKnownTheTypeSoStayGeneric + \" points\"");
+        auto node = parser.ParseExpression("\"You have \" + MySceneStructureVariable.MyChildStructure.CantKnownTheTypeSoStayGeneric + \" points\"");
         REQUIRE(node != nullptr);
 
         gd::ExpressionValidator validator(platform, projectScopedContainers, "string");
@@ -4037,7 +4174,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       // A number concatenated with an unknown variable (will have to be casted to a number in code generation)
       // and then with a number again.
       {
-        auto node = parser.ParseExpression("123 + MySceneStructureVariable.MyChild.CantKnownTheTypeSoStayGeneric + 456");
+        auto node = parser.ParseExpression("123 + MySceneStructureVariable.MyChildStructure.CantKnownTheTypeSoStayGeneric + 456");
         REQUIRE(node != nullptr);
 
         gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
@@ -4081,7 +4218,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
         // A string concatenated with an unknown variable (will have to be casted to a string in code generation)
         // and then with a string again.
         {
-          auto node = parser.ParseExpression("\"You have \" + MySceneStructureVariable.MyChild.CantKnownTheTypeSoStayGeneric + \" points\"");
+          auto node = parser.ParseExpression("\"You have \" + MySceneStructureVariable.MyChildStucture.CantKnownTheTypeSoStayGeneric + \" points\"");
           REQUIRE(node != nullptr);
 
           gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
@@ -4124,7 +4261,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
         // A number concatenated with an unknown variable (will have to be casted to a number in code generation)
         // and then with a number again.
         {
-          auto node = parser.ParseExpression("123 + MySceneStructureVariable.MyChild.CantKnownTheTypeSoStayGeneric + 456");
+          auto node = parser.ParseExpression("123 + MySceneStructureVariable.MyChildStructure.CantKnownTheTypeSoStayGeneric + 456");
           REQUIRE(node != nullptr);
 
           gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");

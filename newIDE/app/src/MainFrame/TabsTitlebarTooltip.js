@@ -12,6 +12,7 @@ import {
 } from './EditorTabs/EditorTabsHandler';
 import { ColumnStackLayout } from '../UI/Layout';
 import Text from '../UI/Text';
+import { parseCustomObjectEditorTabName } from '../Utils/CustomObjectEditorTabName';
 
 const editorKindToLabel: { [kind: EditorKind]: React.Node } = {
   layout: <Trans>Scene</Trans>,
@@ -95,8 +96,9 @@ const TabsTitlebarTooltip = ({
     title = editorTab.projectItemName;
     subtitle = editorKindToLabel[editorTab.kind];
   } else if (editorTab.kind === 'custom object' && editorTab.projectItemName) {
-    const nameParts = editorTab.projectItemName.split('::');
-    const customObjectName = nameParts[1];
+    const { objectName: customObjectName } = parseCustomObjectEditorTabName(
+      editorTab.projectItemName
+    );
     if (customObjectName) {
       title = customObjectName;
       subtitle = editorKindToLabel[editorTab.kind];

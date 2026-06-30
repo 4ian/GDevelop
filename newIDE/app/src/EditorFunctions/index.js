@@ -1,6 +1,9 @@
 // @flow
 import * as React from 'react';
-import { getInstancesInLayoutForLayer } from '../Utils/Layout';
+import {
+  getInstancesInLayoutForLayer,
+  renameLayoutInProject,
+} from '../Utils/Layout';
 import { mapFor, mapVector } from '../Utils/MapFor';
 import { SafeExtractor } from '../Utils/SafeExtractor';
 import {
@@ -25,16 +28,34 @@ import {
   rgbColorToHex,
   rgbOrHexToHexNumber,
 } from '../Utils/ColorTransformer';
-import { type SimplifiedBehavior } from './SimplifiedProject/SimplifiedProject';
+import {
+  type SimplifiedBehavior,
+  type SimplifiedVariable,
+  getSimplifiedVariable,
+  getSimplifiedVariablesContainer,
+} from './SimplifiedProject/SimplifiedProject';
 import { ColumnStackLayout } from '../UI/Layout';
 import Text from '../UI/Text';
-import { applyVariableChange } from './ApplyVariableChange';
+import {
+  applyVariableChange,
+  applyVariableDeletion,
+  getVariableAtPath,
+} from './ApplyVariableChange';
 import {
   addDefaultLightToAllLayers,
   addDefaultLightToLayer,
 } from '../ProjectCreation/CreateProject';
 import { retryIfFailed } from '../Utils/RetryIfFailed';
 import newNameGenerator from '../Utils/NewNameGenerator';
+import getObjectByName from '../Utils/GetObjectByName';
+import { getAllVisibleBehaviorNames } from '../Utils/Behavior';
+import type {
+  SceneEventsOutsideEditorChanges,
+  InstancesOutsideEditorChanges,
+  ObjectsOutsideEditorChanges,
+  ObjectGroupsOutsideEditorChanges,
+  ProjectItemRenamedOutsideEditorChanges,
+} from './OutsideEditorChanges';
 import { type AssetShortHeader } from '../Utils/GDevelopServices/Asset';
 import { type ExampleShortHeader } from '../Utils/GDevelopServices/Example';
 import { swapAsset } from '../AssetStore/AssetSwapper';
@@ -114,6 +135,8 @@ export type EditorFunctionGenericOutput = {|
   instances?: any,
   layers?: any,
   behaviors?: Array<SimplifiedBehavior>,
+  variables?: Array<SimplifiedVariable>,
+  reminder?: string,
   animationNames?: string,
   generatedEventsErrorDiagnostics?: string,
   aiGeneratedEventId?: string,
@@ -224,24 +247,6 @@ export type EditorCallbacks = {|
   |}>,
 |};
 
-export type SceneEventsOutsideEditorChanges = {|
-  scene: gdLayout,
-  newOrChangedAiGeneratedEventIds: Set<string>,
-|};
-
-export type InstancesOutsideEditorChanges = {|
-  scene: gdLayout,
-|};
-
-export type ObjectsOutsideEditorChanges = {|
-  scene: gdLayout,
-  isNewObjectTypeUsed: boolean,
-|};
-
-export type ObjectGroupsOutsideEditorChanges = {|
-  scene: gdLayout,
-|};
-
 export type ToolOptions = {
   includeEventsJson?: boolean,
   ...
@@ -285,6 +290,9 @@ type LaunchFunctionOptionsWithoutProject = {|
   ) => void,
   onObjectGroupsModifiedOutsideEditor: (
     changes: ObjectGroupsOutsideEditorChanges
+  ) => void,
+  onProjectItemRenamedOutsideEditor: (
+    changes: ProjectItemRenamedOutsideEditorChanges
   ) => void,
   ensureExtensionInstalled: (
     options: EnsureExtensionInstalledOptions
@@ -501,8 +509,8 @@ const findPropertyByName = ({
       foundPropertyName: null,
     };
 
-  // $FlowFixMe[missing-local-annot]
-  const normalizeName = name => name.toLowerCase().replace(/\s|_|-/g, '');
+  const normalizeName = (name: string) =>
+    name.toLowerCase().replace(/\s|_|-/g, '');
   const normalizedName = normalizeName(name);
 
   const propertyNames = properties.keys().toJSArray();
@@ -962,6 +970,7 @@ const createOrReplaceObject: EditorFunction = {
       // the asset store, e.g. premade UI objects), use the tag as default
       // search terms.
       let effectiveSearchTerms = search_terms;
+      let assetSearchMissed = false;
       let assetStoreTag: string | null = null;
       if (candidateType && !effectiveSearchTerms && !asset_id) {
         assetStoreTag = getAssetStoreTagForNewObject(candidateType);
@@ -1022,10 +1031,14 @@ const createOrReplaceObject: EditorFunction = {
 
             if (createdObjects.length === 1) {
               const object = createdObjects[0];
+              const renamedNotice =
+                object.getName() !== targetObjectName
+                  ? ` (requested name "${targetObjectName}" was taken; use "${object.getName()}" from now on)`
+                  : '';
               const result: EditorFunctionGenericOutput = {
                 success: true,
                 message: [
-                  `Created object "${object.getName()}" (type "${object.getType()}", ${targetScopeText}) from asset store.`,
+                  `Created object "${object.getName()}" (type "${object.getType()}", ${targetScopeText}) from asset store.${renamedNotice}`,
                   getPropertiesText(object),
                 ].join(' '),
               };
@@ -1061,6 +1074,7 @@ const createOrReplaceObject: EditorFunction = {
             }
 
             // No asset found - we'll create an object from scratch.
+            assetSearchMissed = true;
           }
         } catch (error) {
           return makeGenericFailure(
@@ -1125,10 +1139,14 @@ const createOrReplaceObject: EditorFunction = {
         isNewObjectTypeUsed: isTheFirstOfItsTypeInProject,
       });
 
+      const scratchNotice = assetSearchMissed
+        ? ` No asset matched "${effectiveSearchTerms ||
+            ''}", so this object was created with no resource (no texture/3D model/font/etc...).`
+        : '';
       const scratchResult: EditorFunctionGenericOutput = {
         success: true,
         message: [
-          `Created object "${targetObjectName}" (type "${candidateType}", ${targetScopeText}) from scratch.`,
+          `Created object "${targetObjectName}" (type "${candidateType}", ${targetScopeText}) from scratch.${scratchNotice}`,
           getPropertiesText(object),
         ].join(' '),
       };
@@ -1480,6 +1498,20 @@ const inspectObjectProperties: EditorFunction = {
       }
     );
 
+    const variableCount = object.getVariables().count();
+    const behaviorCount = behaviors.length;
+    const inspectParts = [];
+    if (variableCount > 0) {
+      inspectParts.push(
+        `${variableCount} variable(s) (inspect with \`inspect_variables\`)`
+      );
+    }
+    if (behaviorCount > 0) {
+      inspectParts.push(
+        `${behaviorCount} behavior(s) (inspect with \`inspect_behavior_properties\`)`
+      );
+    }
+
     const output: EditorFunctionGenericOutput = {
       success: true,
       objectName: object_name,
@@ -1489,6 +1521,9 @@ const inspectObjectProperties: EditorFunction = {
         .filter(Boolean)
         .join('-'),
     };
+    if (inspectParts.length > 0) {
+      output.reminder = `This object also has ${inspectParts.join(' and ')}.`;
+    }
     injectObjectSizeInfo(output, {
       [object_name]: getObjectSizeInfo(object, project, PixiResourcesLoader),
     });
@@ -1742,6 +1777,33 @@ const changeObjectProperty: EditorFunction = {
       });
 
       if (!foundPropertyName || !foundProperty) {
+        // Position, rotation, opacity, z-order and layer are per-instance
+        // placement attributes, not object properties. A frequent mistake is to
+        // try to set them here; redirect to the right tool instead of a generic
+        // "not found".
+        const normalizedPropertyName = propertyName
+          .toLowerCase()
+          .replace(/\s|_|-/g, '');
+        const instanceOnlyAttributes = [
+          'x',
+          'y',
+          'z',
+          'position',
+          'rotation',
+          'rotationx',
+          'rotationy',
+          'rotationz',
+          'angle',
+          'opacity',
+          'zorder',
+          'layer',
+        ];
+        if (instanceOnlyAttributes.includes(normalizedPropertyName)) {
+          warnings.push(
+            `"${propertyName}" is a per-instance attribute, not a property of object "${object_name}". Use \`put_2d_instances\`/\`put_3d_instances\` to change it.`
+          );
+          return;
+        }
         warnings.push(
           `Property "${propertyName}" not found on object "${object_name}".`
         );
@@ -1806,7 +1868,58 @@ const changeObjectProperty: EditorFunction = {
 };
 
 /**
- * Adds a behavior to an object in a scene
+ * Resolve a name to the object(s) it refers to.
+ *
+ * Returns `null` when no object nor group with this name exists. For a group,
+ * `objects` contains all its (resolvable) member objects and `group` is set.
+ */
+const resolveObjectsFromContextAndName = ({
+  project,
+  layout,
+  objectOrGroupName,
+}: {|
+  project: gdProject,
+  layout: gdLayout,
+  objectOrGroupName: string,
+|}): {|
+  objects: Array<gdObject>,
+  group: gdObjectGroup | null,
+|} | null => {
+  const layoutObjects = layout.getObjects();
+  const globalObjects = project.getObjects();
+
+  const object = getObjectByName(
+    globalObjects,
+    layoutObjects,
+    objectOrGroupName
+  );
+  if (object) {
+    return { objects: [object], group: null };
+  }
+
+  const sceneGroups = layoutObjects.getObjectGroups();
+  const globalGroups = globalObjects.getObjectGroups();
+  const group = sceneGroups.has(objectOrGroupName)
+    ? sceneGroups.get(objectOrGroupName)
+    : globalGroups.has(objectOrGroupName)
+    ? globalGroups.get(objectOrGroupName)
+    : null;
+  if (group) {
+    const objects = group
+      .getAllObjectsNames()
+      .toJSArray()
+      .map(objectName =>
+        getObjectByName(globalObjects, layoutObjects, objectName)
+      )
+      .filter(Boolean);
+    return { objects, group };
+  }
+
+  return null;
+};
+
+/**
+ * Adds a behavior to an object (or to all objects of a group) in a scene.
  */
 const addBehavior: EditorFunction = {
   renderForEditor: ({ project, args, editorCallbacks }) => {
@@ -1884,20 +1997,22 @@ const addBehavior: EditorFunction = {
     }
 
     const layout = project.getLayout(scene_name);
-    const layoutObjects = layout.getObjects();
-    const globalObjects = project.getObjects();
 
-    let object: gdObject | null = null;
-
-    if (layoutObjects.hasObjectNamed(object_name)) {
-      object = layoutObjects.getObject(object_name);
-    } else if (globalObjects.hasObjectNamed(object_name)) {
-      object = globalObjects.getObject(object_name);
-    }
-
-    if (!object) {
+    // `object_name` can designate an object or a group (in which case the
+    // behavior is added to every object of the group).
+    const concerned = resolveObjectsFromContextAndName({
+      project,
+      layout,
+      objectOrGroupName: object_name,
+    });
+    if (!concerned) {
       return makeGenericFailure(
-        `Object not found: "${object_name}" in scene "${scene_name}" nor globally.`
+        `Object or group not found: "${object_name}" in scene "${scene_name}" nor globally.`
+      );
+    }
+    if (concerned.objects.length === 0) {
+      return makeGenericFailure(
+        `Group "${object_name}" has no object, so the behavior was not added.`
       );
     }
 
@@ -1935,81 +2050,87 @@ const addBehavior: EditorFunction = {
     // allows to share the same behavior shared data between objects).
     const behaviorName =
       optionalBehaviorName || behaviorMetadata.getDefaultName();
+    const isDefaultCapability = isBehaviorDefaultCapability(behaviorMetadata);
 
-    // Check if behavior with this name already exists
-    if (object.hasBehaviorNamed(behaviorName)) {
+    const changes = [];
+    const warnings = [];
+    for (const object of concerned.objects) {
+      const objectName = object.getName();
+
+      // Check if behavior with this name already exists
+      if (object.hasBehaviorNamed(behaviorName)) {
+        const behavior = object.getBehavior(behaviorName);
+        if (behavior.getTypeName() !== behavior_type) {
+          warnings.push(
+            `Behavior "${behaviorName}" already on "${objectName}" with different type ("${behavior_type}").`
+          );
+        } else {
+          changes.push(
+            `Behavior "${behaviorName}" already on "${objectName}".`
+          );
+        }
+        continue;
+      }
+
+      if (isDefaultCapability) {
+        const alreadyHasDefaultCapability = object
+          .getAllBehaviorNames()
+          .toJSArray()
+          .some(
+            name => object.getBehavior(name).getTypeName() === behavior_type
+          );
+        if (alreadyHasDefaultCapability) {
+          changes.push(
+            `Behavior "${behaviorName}" (type "${behavior_type}") is a default capability already on "${objectName}".`
+          );
+        } else {
+          warnings.push(
+            `Behavior "${behaviorName}" (type "${behavior_type}") is a default capability; cannot be added to "${objectName}".`
+          );
+        }
+        continue;
+      }
+
+      if (
+        behaviorMetadata.getObjectType() &&
+        behaviorMetadata.getObjectType() !== object.getType()
+      ) {
+        warnings.push(
+          `Behavior "${behaviorName}" (type "${behavior_type}") requires object type "${behaviorMetadata.getObjectType()}"; "${objectName}" is not.`
+        );
+        continue;
+      }
+
+      // Add the behavior
+      gd.WholeProjectRefactorer.addBehaviorAndRequiredBehaviors(
+        project,
+        object,
+        behavior_type,
+        behaviorName
+      );
+      if (!object.hasBehaviorNamed(behaviorName)) {
+        warnings.push(
+          `Unexpected error: behavior "${behaviorName}" not added to "${objectName}".`
+        );
+        continue;
+      }
+
       const behavior = object.getBehavior(behaviorName);
-      if (behavior.getTypeName() !== behavior_type) {
-        return makeGenericFailure(
-          `Behavior "${behaviorName}" already on "${object_name}" with different type ("${behavior_type}").`
-        );
-      }
-
-      return makeGenericSuccess(
-        `Behavior "${behaviorName}" already on "${object_name}".`
-      );
-    }
-
-    if (isBehaviorDefaultCapability(behaviorMetadata)) {
-      const alreadyHasDefaultCapability = object
-        .getAllBehaviorNames()
-        .toJSArray()
-        .some(behaviorName => {
-          if (!object) return false;
-          const behavior = object.getBehavior(behaviorName);
-          return behavior.getTypeName() === behavior_type;
-        });
-      if (alreadyHasDefaultCapability) {
-        return makeGenericSuccess(
-          `Behavior "${behaviorName}" (type "${behavior_type}") is a default capability already on "${object_name}".`
-        );
-      }
-
-      return makeGenericFailure(
-        `Behavior "${behaviorName}" (type "${behavior_type}") is a default capability; cannot be added to "${object_name}".`
-      );
-    }
-
-    if (
-      behaviorMetadata.getObjectType() &&
-      behaviorMetadata.getObjectType() !== object.getType()
-    ) {
-      return makeGenericFailure(
-        `Behavior "${behaviorName}" (type "${behavior_type}") requires object type "${behaviorMetadata.getObjectType()}"; "${object_name}" is not.`
-      );
-    }
-
-    // Add the behavior
-    gd.WholeProjectRefactorer.addBehaviorAndRequiredBehaviors(
-      project,
-      object,
-      behavior_type,
-      behaviorName
-    );
-    if (!object.hasBehaviorNamed(behaviorName)) {
-      return makeGenericFailure(
-        `Unexpected error: behavior "${behaviorName}" not added to "${object_name}".`
+      changes.push(
+        `Added behavior "${behaviorName}" (type "${behavior_type}") to "${objectName}". Properties: ${formatPropertiesList(
+          behavior.getProperties()
+        )}.`
       );
     }
     layout.updateBehaviorsSharedData(project);
 
-    const behavior = object.getBehavior(behaviorName);
-    const propertiesText = `Properties: ${formatPropertiesList(
-      behavior.getProperties()
-    )}.`;
-
-    return makeGenericSuccess(
-      [
-        `Added behavior "${behaviorName}" (type "${behavior_type}") to "${object_name}".`,
-        propertiesText,
-      ].join(' ')
-    );
+    return makeMultipleChangesOutput(changes, warnings);
   },
   modifiesProject: true,
 };
 
 /**
- * Removes a behavior from an object in a scene
+ * Removes a behavior from an object (or from all objects of a group) in a scene.
  */
 const removeBehavior: EditorFunction = {
   renderForEditor: ({ args }) => {
@@ -2036,55 +2157,60 @@ const removeBehavior: EditorFunction = {
     }
 
     const layout = project.getLayout(scene_name);
-    const layoutObjects = layout.getObjects();
-    const globalObjects = project.getObjects();
 
-    let object: gdObject | null = null;
-
-    if (layoutObjects.hasObjectNamed(object_name)) {
-      object = layoutObjects.getObject(object_name);
-    } else if (globalObjects.hasObjectNamed(object_name)) {
-      object = globalObjects.getObject(object_name);
-    }
-
-    if (!object) {
-      return makeGenericFailure(
-        `Object not found: "${object_name}" in scene "${scene_name}" nor globally.`
-      );
-    }
-
-    if (!object.hasBehaviorNamed(behavior_name)) {
-      return makeGenericFailure(
-        `Behavior "${behavior_name}" not on "${object_name}". Not removed.`
-      );
-    }
-
-    const dependentBehaviors = gd.WholeProjectRefactorer.findDependentBehaviorNames(
+    // `object_name` can designate an object or a group (in which case the
+    // behavior is removed from every object of the group that has it).
+    const concerned = resolveObjectsFromContextAndName({
       project,
-      object,
-      behavior_name
-    ).toJSArray();
-
-    // Remove the behavior
-    object.removeBehavior(behavior_name);
-    dependentBehaviors.forEach(name => {
-      if (!object) return;
-      object.removeBehavior(name);
+      layout,
+      objectOrGroupName: object_name,
     });
+    if (!concerned) {
+      return makeGenericFailure(
+        `Object or group not found: "${object_name}" in scene "${scene_name}" nor globally.`
+      );
+    }
 
-    return makeGenericSuccess(
-      dependentBehaviors.length > 0
-        ? `Removed behavior "${behavior_name}" from "${object_name}" (also removed dependents: ${dependentBehaviors.join(
-            ', '
-          )}).`
-        : `Removed behavior "${behavior_name}" from "${object_name}".`
-    );
+    const changes = [];
+    const warnings = [];
+    for (const object of concerned.objects) {
+      const objectName = object.getName();
+      if (!object.hasBehaviorNamed(behavior_name)) {
+        warnings.push(
+          `Behavior "${behavior_name}" not on "${objectName}". Not removed.`
+        );
+        continue;
+      }
+
+      const dependentBehaviors = gd.WholeProjectRefactorer.findDependentBehaviorNames(
+        project,
+        object,
+        behavior_name
+      ).toJSArray();
+
+      // Remove the behavior
+      object.removeBehavior(behavior_name);
+      dependentBehaviors.forEach(name => {
+        object.removeBehavior(name);
+      });
+
+      changes.push(
+        dependentBehaviors.length > 0
+          ? `Removed behavior "${behavior_name}" from "${objectName}" (also removed dependents: ${dependentBehaviors.join(
+              ', '
+            )}).`
+          : `Removed behavior "${behavior_name}" from "${objectName}".`
+      );
+    }
+
+    return makeMultipleChangesOutput(changes, warnings);
   },
   modifiesProject: true,
 };
 
 /**
- * Retrieves the properties of a specific behavior attached to an object
+ * Retrieves the properties of a specific behavior attached to an object (or to
+ * the objects of a group).
  */
 const inspectBehaviorProperties: EditorFunction = {
   renderForEditor: ({ args }) => {
@@ -2111,24 +2237,25 @@ const inspectBehaviorProperties: EditorFunction = {
     }
 
     const layout = project.getLayout(scene_name);
-    const layoutObjects = layout.getObjects();
-    const globalObjects = project.getObjects();
 
-    let object: gdObject | null = null;
-
-    if (layoutObjects.hasObjectNamed(object_name)) {
-      object = layoutObjects.getObject(object_name);
-    } else if (globalObjects.hasObjectNamed(object_name)) {
-      object = globalObjects.getObject(object_name);
-    }
-
-    if (!object) {
+    // `object_name` can designate an object or a group. For a group, the
+    // behavior is shared in common by all its objects, so any of them can be
+    // inspected: use the first object that has the behavior.
+    const concerned = resolveObjectsFromContextAndName({
+      project,
+      layout,
+      objectOrGroupName: object_name,
+    });
+    if (!concerned) {
       return makeGenericFailure(
-        `Object not found: "${object_name}" in scene "${scene_name}" nor globally.`
+        `Object or group not found: "${object_name}" in scene "${scene_name}" nor globally.`
       );
     }
 
-    if (!object.hasBehaviorNamed(behavior_name)) {
+    const object = concerned.objects.find(object =>
+      object.hasBehaviorNamed(behavior_name)
+    );
+    if (!object) {
       return makeGenericFailure(
         `Behavior "${behavior_name}" not on "${object_name}".`
       );
@@ -2247,25 +2374,19 @@ const changeBehaviorProperty: EditorFunction = {
     }
 
     const layout = project.getLayout(scene_name);
-    const layoutObjects = layout.getObjects();
-    const globalObjects = project.getObjects();
 
-    let object: gdObject | null = null;
-
-    if (layoutObjects.hasObjectNamed(object_name)) {
-      object = layoutObjects.getObject(object_name);
-    } else if (globalObjects.hasObjectNamed(object_name)) {
-      object = globalObjects.getObject(object_name);
-    }
+    // `object_name` can designate an object or a group (which shares the
+    // behavior in common): use any object having the behavior to read labels.
+    const concerned = resolveObjectsFromContextAndName({
+      project,
+      layout,
+      objectOrGroupName: object_name,
+    });
+    const object = concerned
+      ? concerned.objects.find(object => object.hasBehaviorNamed(behavior_name))
+      : null;
 
     if (!object) {
-      // $FlowFixMe[incompatible-type]
-      return renderChanges(
-        listLabelAndValuesFromChangedProperties(changed_properties)
-      );
-    }
-
-    if (!object.hasBehaviorNamed(behavior_name)) {
       // $FlowFixMe[incompatible-type]
       return renderChanges(
         listLabelAndValuesFromChangedProperties(changed_properties)
@@ -2343,30 +2464,32 @@ const changeBehaviorProperty: EditorFunction = {
     }
 
     const layout = project.getLayout(scene_name);
-    const layoutObjects = layout.getObjects();
-    const globalObjects = project.getObjects();
 
-    let object: gdObject | null = null;
-
-    if (layoutObjects.hasObjectNamed(object_name)) {
-      object = layoutObjects.getObject(object_name);
-    } else if (globalObjects.hasObjectNamed(object_name)) {
-      object = globalObjects.getObject(object_name);
-    }
-
-    if (!object) {
+    // `object_name` can designate an object or a group (in which case the
+    // property is changed on the behavior of every object of the group).
+    const concerned = resolveObjectsFromContextAndName({
+      project,
+      layout,
+      objectOrGroupName: object_name,
+    });
+    if (!concerned) {
       return makeGenericFailure(
-        `Object not found: "${object_name}" in scene "${scene_name}" nor globally.`
+        `Object or group not found: "${object_name}" in scene "${scene_name}" nor globally.`
       );
     }
 
-    if (!object.hasBehaviorNamed(behavior_name)) {
+    const objectsWithBehavior = concerned.objects.filter(object =>
+      object.hasBehaviorNamed(behavior_name)
+    );
+    if (objectsWithBehavior.length === 0) {
       return makeGenericFailure(
         `Behavior "${behavior_name}" not on "${object_name}".`
       );
     }
 
-    const behavior = object.getBehavior(behavior_name);
+    // The behavior is shared in common, so any object's behavior can be used
+    // to look up properties; changes are then applied to all of them.
+    const behavior = objectsWithBehavior[0].getBehavior(behavior_name);
     const behaviorProperties = behavior.getProperties();
 
     const allBehaviorSharedDataNames = layout
@@ -2383,6 +2506,16 @@ const changeBehaviorProperty: EditorFunction = {
     const warnings = [];
     // $FlowFixMe[missing-empty-array-annot]
     const changes = [];
+
+    // Warn about group members that do not have the behavior (they are skipped),
+    // mirroring remove_behavior's per-object reporting.
+    for (const object of concerned.objects) {
+      if (!object.hasBehaviorNamed(behavior_name)) {
+        warnings.push(
+          `Behavior "${behavior_name}" not on "${object.getName()}". Not changed.`
+        );
+      }
+    }
 
     changedProperties.forEach(changed_property => {
       const propertyName = SafeExtractor.extractStringProperty(
@@ -2418,7 +2551,17 @@ const changeBehaviorProperty: EditorFunction = {
           foundProperty,
           newValue
         );
-        if (!behavior.updateProperty(foundPropertyName, sanitizedNewValue)) {
+        let couldUpdate = true;
+        for (const object of objectsWithBehavior) {
+          if (
+            !object
+              .getBehavior(behavior_name)
+              .updateProperty(foundPropertyName, sanitizedNewValue)
+          ) {
+            couldUpdate = false;
+          }
+        }
+        if (!couldUpdate) {
           warnings.push(
             `Could not set "${foundPropertyName}" on behavior "${behavior_name}": invalid value or type.`
           );
@@ -2849,6 +2992,23 @@ const put2dInstances: EditorFunction = {
         }
       });
 
+      // If specific instance ids were requested but none matched (and the brush
+      // did not select anything either), the call erased nothing. Return a
+      // failure so the agent gets a real error signal instead of a misleading
+      // success that could make it retry the same call in a loop.
+      if (
+        instancesToDelete.size === 0 &&
+        notFoundExistingInstanceIds.size > 0
+      ) {
+        return makeGenericFailure(
+          `None of the specified instance ids were found: ${Array.from(
+            notFoundExistingInstanceIds
+          ).join(
+            ', '
+          )}. Nothing was changed. Call \`describe_instances\` to get valid ids (the \`id\` field of each instance), and check the scene and layer names.`
+        );
+      }
+
       instancesToDelete.forEach(instance => {
         initialInstances.removeInstance(instance);
       });
@@ -3074,6 +3234,13 @@ const put2dInstances: EditorFunction = {
             'The brush kind is unknown and was considered to be "none" instead.'
           );
         }
+        // "none" keeps existing instances in place; new ones still need a position.
+        modifiedAndCreatedInstances.forEach(instance => {
+          if (!existingInstanceStates.has(instance)) {
+            instance.setX(brushPosition[0]);
+            instance.setY(brushPosition[1]);
+          }
+        });
       }
 
       const instancesSize = SafeExtractor.parseCommaSeparatedTwoFiniteNumbers(
@@ -3123,7 +3290,10 @@ const put2dInstances: EditorFunction = {
             objectSizeInfo.height !== null
           ? [objectSizeInfo.width, objectSizeInfo.height]
           : null;
-        if (brush_kind === 'point' && effectiveSize) {
+        if (
+          (brush_kind === 'point' || brush_kind === 'none') &&
+          effectiveSize
+        ) {
           attrs.push(
             `origin at this position, each occupies ${getOccupiedSpaceDescription(
               brushPosition,
@@ -3238,6 +3408,20 @@ const put2dInstances: EditorFunction = {
       }
 
       if (notFoundExistingInstanceIds.size > 0) {
+        // If NONE of the requested instances were found and nothing new was
+        // created, the call did nothing. Return a failure so the agent gets a
+        // real error signal instead of a misleading success — a success here
+        // can make the agent retry the same (often malformed) call in a loop.
+        if (existingInstanceStates.size === 0 && newInstancesCount === 0) {
+          return makeGenericFailure(
+            `None of the specified instance ids were found: ${Array.from(
+              notFoundExistingInstanceIds
+            ).join(
+              ', '
+            )}. Nothing was changed. Call \`describe_instances\` to get valid ids (the \`id\` field of each instance), and check the scene and layer names.`
+          );
+        }
+
         changes.push(
           `Instance ids not found: ${Array.from(
             notFoundExistingInstanceIds
@@ -3246,8 +3430,36 @@ const put2dInstances: EditorFunction = {
       }
 
       if (changes.length === 0) {
-        return makeGenericSuccess(
-          'No instance changes. Specify brush kind/position/count, or exact instance ids to manipulate.'
+        const matchedCount = existingInstanceStates.size;
+        const hasMutationParams =
+          !!instancesSize ||
+          instancesRotation !== null ||
+          instancesOpacity !== null ||
+          instances_z_order !== null;
+        const hasPositionBrush =
+          brush_kind === 'point' ||
+          brush_kind === 'line' ||
+          brush_kind === 'grid' ||
+          brush_kind === 'random_in_circle';
+
+        if (existingInstanceIds.length === 0) {
+          return makeGenericFailure(
+            'No instance changes. To edit existing instances, pass `existing_instance_ids` (from `describe_instances`); to create, pass `object_name` and `new_instances_count`. See the tool parameters for how to move/resize/rotate.'
+          );
+        }
+
+        if (!hasMutationParams && !hasPositionBrush) {
+          return makeGenericFailure(
+            `Matched ${matchedCount} existing instance${
+              matchedCount > 1 ? 's' : ''
+            } but no change was requested — provide a value to modify (see the tool parameters for what can be edited).`
+          );
+        }
+
+        return makeGenericFailure(
+          `Matched ${matchedCount} existing instance${
+            matchedCount > 1 ? 's' : ''
+          } but the requested values are identical to their current ones, so nothing changed.`
         );
       }
 
@@ -3485,6 +3697,23 @@ const put3dInstances: EditorFunction = {
         }
       });
 
+      // If specific instance ids were requested but none matched (and the brush
+      // did not select anything either), the call erased nothing. Return a
+      // failure so the agent gets a real error signal instead of a misleading
+      // success that could make it retry the same call in a loop.
+      if (
+        instancesToDelete.size === 0 &&
+        notFoundExistingInstanceIds.size > 0
+      ) {
+        return makeGenericFailure(
+          `None of the specified instance ids were found: ${Array.from(
+            notFoundExistingInstanceIds
+          ).join(
+            ', '
+          )}. Nothing was changed. Call \`describe_instances\` to get valid ids (the \`id\` field of each instance), and check the scene and layer names.`
+        );
+      }
+
       instancesToDelete.forEach(instance => {
         initialInstances.removeInstance(instance);
       });
@@ -3660,6 +3889,14 @@ const put3dInstances: EditorFunction = {
             'The brush kind is unknown and was considered to be "none" instead.'
           );
         }
+        // "none" keeps existing instances in place; new ones still need a position.
+        modifiedAndCreatedInstances.forEach(instance => {
+          if (!existingInstanceStates.has(instance)) {
+            instance.setX(brushPosition[0]);
+            instance.setY(brushPosition[1]);
+            instance.setZ(brushPosition[2]);
+          }
+        });
       }
 
       const instancesSizeArray = SafeExtractor.parseCommaSeparatedThreeFiniteNumbers(
@@ -3707,7 +3944,10 @@ const put3dInstances: EditorFunction = {
             objectSizeInfo.depth !== null
           ? [objectSizeInfo.width, objectSizeInfo.height, objectSizeInfo.depth]
           : null;
-        if (brush_kind === 'point' && effectiveSize) {
+        if (
+          (brush_kind === 'point' || brush_kind === 'none') &&
+          effectiveSize
+        ) {
           attrs.push(
             `origin at this position, each occupies ${getOccupiedSpaceDescription(
               brushPosition,
@@ -3797,6 +4037,20 @@ const put3dInstances: EditorFunction = {
       }
 
       if (notFoundExistingInstanceIds.size > 0) {
+        // If NONE of the requested instances were found and nothing new was
+        // created, the call did nothing. Return a failure so the agent gets a
+        // real error signal instead of a misleading success — a success here
+        // can make the agent retry the same (often malformed) call in a loop.
+        if (existingInstanceStates.size === 0 && newInstancesCount === 0) {
+          return makeGenericFailure(
+            `None of the specified instance ids were found: ${Array.from(
+              notFoundExistingInstanceIds
+            ).join(
+              ', '
+            )}. Nothing was changed. Call \`describe_instances\` to get valid ids (the \`id\` field of each instance), and check the scene and layer names.`
+          );
+        }
+
         changes.push(
           `Instance ids not found: ${Array.from(
             notFoundExistingInstanceIds
@@ -3805,7 +4059,35 @@ const put3dInstances: EditorFunction = {
       }
 
       if (changes.length === 0) {
-        return makeGenericSuccess('No instance changes.');
+        const matchedCount = existingInstanceStates.size;
+        const hasMutationParams =
+          !!instancesSizeArray ||
+          (!!instancesRotationArray && instancesRotationArray.length >= 3);
+        const hasPositionBrush =
+          brush_kind === 'point' ||
+          brush_kind === 'line' ||
+          brush_kind === 'grid' ||
+          brush_kind === 'random_in_sphere';
+
+        if (existingInstanceIds.length === 0) {
+          return makeGenericFailure(
+            'No instance changes. To edit existing instances, pass `existing_instance_ids` (from `describe_instances`); to create, pass `object_name` and `new_instances_count`. Instance position and rotation can only be changed here, not with change_object_property. See the tool parameters for how to move/resize/rotate.'
+          );
+        }
+
+        if (!hasMutationParams && !hasPositionBrush) {
+          return makeGenericFailure(
+            `Matched ${matchedCount} existing instance${
+              matchedCount > 1 ? 's' : ''
+            } but no change was requested — provide a value to modify (see the tool parameters for what can be edited).`
+          );
+        }
+
+        return makeGenericFailure(
+          `Matched ${matchedCount} existing instance${
+            matchedCount > 1 ? 's' : ''
+          } but the requested values are identical to their current ones, so nothing changed.`
+        );
       }
 
       // /!\ Tell the editor that some instances have potentially been modified (and even removed).
@@ -4473,18 +4755,31 @@ const createScene: EditorFunction = {
       args,
       'background_color'
     );
+    const is_first_scene = SafeExtractor.extractBooleanProperty(
+      args,
+      'is_first_scene'
+    );
+
+    const firstSceneSuffix = is_first_scene
+      ? ' Also set as the first (startup) scene.'
+      : '';
 
     if (project.hasLayoutNamed(scene_name)) {
       const scene = project.getLayout(scene_name);
+      if (is_first_scene) {
+        project.setFirstLayout(scene_name);
+      }
       if (include_ui_layer && !scene.hasLayerNamed('UI')) {
         scene.insertNewLayer('UI', scene.getLayersCount());
         addDefaultLightToLayer(scene.getLayer('UI'));
         return makeGenericSuccess(
-          `Scene "${scene_name}" already exists; added "UI" layer.`
+          `Scene "${scene_name}" already exists; added "UI" layer.${firstSceneSuffix}`
         );
       }
 
-      return makeGenericSuccess(`Scene "${scene_name}" already exists.`);
+      return makeGenericSuccess(
+        `Scene "${scene_name}" already exists.${firstSceneSuffix}`
+      );
     }
 
     const scenesCount = project.getLayoutsCount();
@@ -4499,12 +4794,16 @@ const createScene: EditorFunction = {
       scene.setBackgroundColor(colorAsRgb[0], colorAsRgb[1], colorAsRgb[2]);
     }
     addDefaultLightToAllLayers(scene);
+    if (is_first_scene) {
+      project.setFirstLayout(scene_name);
+    }
 
     return {
       success: true,
-      message: include_ui_layer
-        ? `Created scene "${scene_name}" with base layer + "UI" layer.`
-        : `Created scene "${scene_name}".`,
+      message:
+        (include_ui_layer
+          ? `Created scene "${scene_name}" with base layer + "UI" layer.`
+          : `Created scene "${scene_name}".`) + firstSceneSuffix,
       meta: {
         newSceneNames: [scene_name],
       },
@@ -4603,12 +4902,14 @@ const inspectScenePropertiesLayersEffects: EditorFunction = {
       success: true,
       propertiesLayersEffectsForSceneNamed: scene.getName(),
       properties: {
+        name: scene.getName(),
         backgroundColor: rgbColorToHex(
           scene.getBackgroundColorRed(),
           scene.getBackgroundColorGreen(),
           scene.getBackgroundColorBlue()
         ),
         stopSoundsOnStartup: scene.stopSoundsOnStartup(),
+        isFirstScene: project.getFirstLayout() === scene.getName(),
 
         // Also include some project related properties:
         gameResolutionWidth: project.getGameResolutionWidth(),
@@ -4757,6 +5058,7 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
     args,
     onInstancesModifiedOutsideEditor,
     onObjectGroupsModifiedOutsideEditor,
+    onProjectItemRenamedOutsideEditor,
   }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
 
@@ -4804,7 +5106,29 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
           return;
         }
 
-        if (isFuzzyMatch(propertyName, 'backgroundColor')) {
+        if (isFuzzyMatch(propertyName, 'name')) {
+          const oldName = scene.getName();
+          if (newValue === oldName) {
+            changes.push(`Scene already named "${newValue}".`);
+            return;
+          }
+
+          const newSceneName = newNameGenerator(
+            gd.Project.getSafeName(newValue),
+            tentativeNewName => project.hasLayoutNamed(tentativeNewName)
+          );
+
+          renameLayoutInProject(project, oldName, newSceneName);
+          onProjectItemRenamedOutsideEditor({
+            kind: 'scene',
+            oldName,
+            newName: newSceneName,
+          });
+
+          changes.push(
+            `Renamed scene "${oldName}" to "${newSceneName}" (events and references updated).`
+          );
+        } else if (isFuzzyMatch(propertyName, 'backgroundColor')) {
           const colorAsRgb = hexNumberToRGBArray(rgbOrHexToHexNumber(newValue));
           scene.setBackgroundColor(colorAsRgb[0], colorAsRgb[1], colorAsRgb[2]);
           changes.push(
@@ -4843,6 +5167,11 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
         } else if (isFuzzyMatch(propertyName, 'gameName')) {
           project.setName(newValue);
           changes.push(`Set game name to "${newValue}".`);
+        } else if (isFuzzyMatch(propertyName, 'isFirstScene')) {
+          if (newValue.toLowerCase() === 'true') {
+            project.setFirstLayout(scene_name);
+            changes.push(`Set "${scene_name}" as the first (startup) scene.`);
+          }
         } else {
           warnings.push(`Unknown scene property: "${propertyName}". Skipped.`);
         }
@@ -5203,13 +5532,54 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
             });
             const globalObjects = project.getObjects();
             const sceneObjects = scene.getObjects();
+
+            // Capture the variables and behaviors shared in common by the group
+            // (from its objects after removals, before additions), so that any
+            // newly added object can be filled with them - exactly like the
+            // object group editor does. This keeps an object added to a group
+            // consistent with the rest of the group (which is the "intersection"
+            // of its objects: it shows the variables and behaviors in common).
+            const objectsContainersList = gd.ProjectScopedContainers.makeNewProjectScopedContainersForProjectAndLayout(
+              project,
+              scene
+            ).getObjectsContainersList();
+            const groupVariablesContainer = gd.ObjectRefactorer.mergeVariableContainers(
+              objectsContainersList,
+              foundGroup
+            );
+            const existingGroupObjects = foundGroup
+              .getAllObjectsNames()
+              .toJSArray()
+              .map(name => getObjectByName(globalObjects, sceneObjects, name))
+              .filter(Boolean);
+            const groupVisibleBehaviorNames = getAllVisibleBehaviorNames(
+              existingGroupObjects
+            );
+
             newObjectNames.forEach(objectName => {
               if (!currentObjectNames.includes(objectName)) {
-                if (
-                  sceneObjects.hasObjectNamed(objectName) ||
-                  globalObjects.hasObjectNamed(objectName)
-                ) {
+                const object = getObjectByName(
+                  globalObjects,
+                  sceneObjects,
+                  objectName
+                );
+                if (object) {
                   foundGroup.addObject(objectName);
+                  // Give the newly added object the variables and behaviors
+                  // shared in common by the group, if it does not have them yet.
+                  gd.ObjectRefactorer.fillMissingGroupVariablesToObject(
+                    object,
+                    groupVariablesContainer
+                  );
+                  for (const behaviorName of groupVisibleBehaviorNames) {
+                    gd.ObjectRefactorer.fillMissingGroupBehaviorToObject(
+                      globalObjects,
+                      sceneObjects,
+                      object,
+                      foundGroup,
+                      behaviorName
+                    );
+                  }
                 } else {
                   warnings.push(
                     `Object "${objectName}" not found in scene "${scene_name}", so it was not added to group "${groupName}".`
@@ -5257,47 +5627,256 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
   modifiesProject: true,
 };
 
+// Read the variables to change from a tool call. Supports the batch shape (a
+// `variables` array) and the legacy single-variable shape (fields at the top
+// level), so older tool versions keep working.
+const extractVariableOperations = (
+  args: any
+): Array<{|
+  variable_name_or_path: string | null,
+  value: string | null,
+  variable_type: string | null,
+  delete_this_variable: boolean,
+|}> => {
+  const variablesArray = SafeExtractor.extractArrayProperty(args, 'variables');
+  if (variablesArray) {
+    return variablesArray.map(variableArgs => ({
+      variable_name_or_path: SafeExtractor.extractStringProperty(
+        variableArgs,
+        'variable_name_or_path'
+      ),
+      value: SafeExtractor.extractStringProperty(variableArgs, 'value'),
+      variable_type: SafeExtractor.extractStringProperty(
+        variableArgs,
+        'variable_type'
+      ),
+      delete_this_variable:
+        SafeExtractor.extractBooleanProperty(
+          variableArgs,
+          'delete_this_variable'
+        ) || false,
+    }));
+  }
+
+  return [
+    {
+      variable_name_or_path: SafeExtractor.extractStringProperty(
+        args,
+        'variable_name_or_path'
+      ),
+      value: SafeExtractor.extractStringProperty(args, 'value'),
+      variable_type: SafeExtractor.extractStringProperty(args, 'variable_type'),
+      delete_this_variable: false,
+    },
+  ];
+};
+
+type VariablesContainersResolution = {|
+  failure: EditorFunctionGenericOutput | null,
+  variablesContainers: Array<gdVariablesContainer>,
+  scopeDescription: string,
+|};
+
+// Resolve a variable scope to the variables container(s) to act on. A group
+// resolves to the container of every object in it (a group variable is shared
+// by all of them); `object` and `group` are equivalent (resolved to whichever
+// exists). Returns a `failure` output to forward when the scope is invalid.
+const resolveVariablesContainers = ({
+  project,
+  variable_scope,
+  scene_name,
+  object_name,
+}: {|
+  project: gdProject,
+  variable_scope: string,
+  scene_name: ?string,
+  object_name: ?string,
+|}): VariablesContainersResolution => {
+  const fail = (message: string): VariablesContainersResolution => ({
+    failure: makeGenericFailure(message),
+    variablesContainers: [],
+    scopeDescription: '',
+  });
+
+  if (variable_scope === 'scene') {
+    if (!scene_name) {
+      return fail(`Missing "scene_name" (required for scene variable).`);
+    }
+    if (!project.hasLayoutNamed(scene_name)) {
+      return fail(`Scene not found: "${scene_name}".`);
+    }
+    return {
+      failure: null,
+      variablesContainers: [project.getLayout(scene_name).getVariables()],
+      scopeDescription: `scene "${scene_name}"`,
+    };
+  } else if (variable_scope === 'object' || variable_scope === 'group') {
+    if (!object_name) {
+      return fail(
+        `Missing "object_name" (required for an object or group variable).`
+      );
+    }
+
+    let concernedObjects: Array<gdObject> = [];
+    let isGroup = false;
+    if (scene_name) {
+      if (!project.hasLayoutNamed(scene_name)) {
+        return fail(`Scene not found: "${scene_name}".`);
+      }
+      const concerned = resolveObjectsFromContextAndName({
+        project,
+        layout: project.getLayout(scene_name),
+        objectOrGroupName: object_name,
+      });
+      if (!concerned) {
+        return fail(
+          `Object or group "${object_name}" not in scene "${scene_name}". For a global object, omit scene_name.`
+        );
+      }
+      concernedObjects = concerned.objects;
+      isGroup = !!concerned.group;
+    } else {
+      const globalObjects = project.getObjects();
+      if (globalObjects.hasObjectNamed(object_name)) {
+        concernedObjects = [globalObjects.getObject(object_name)];
+      } else if (globalObjects.getObjectGroups().has(object_name)) {
+        isGroup = true;
+        concernedObjects = globalObjects
+          .getObjectGroups()
+          .get(object_name)
+          .getAllObjectsNames()
+          .toJSArray()
+          .map(name => getObjectByName(globalObjects, null, name))
+          .filter(Boolean);
+      } else {
+        return fail(
+          `Object or group "${object_name}" not found globally. Did you forget to specify scene_name?`
+        );
+      }
+    }
+
+    if (concernedObjects.length === 0) {
+      return fail(`Group "${object_name}" has no object.`);
+    }
+
+    const objectOrGroupLabel = isGroup
+      ? `group "${object_name}"`
+      : `object "${object_name}"`;
+    return {
+      failure: null,
+      variablesContainers: concernedObjects.map(object =>
+        object.getVariables()
+      ),
+      scopeDescription: scene_name
+        ? `scene "${scene_name}" ${objectOrGroupLabel}`
+        : `global ${objectOrGroupLabel}`,
+    };
+  } else if (variable_scope === 'global') {
+    return {
+      failure: null,
+      variablesContainers: [project.getVariables()],
+      scopeDescription: 'global',
+    };
+  }
+
+  return fail(
+    `Invalid "variable_scope": "${variable_scope}". Use \`scene\`, \`object\`, \`group\` or \`global\`.`
+  );
+};
+
 const addOrEditVariable: EditorFunction = {
   renderForEditor: ({ args, shouldShowDetails }) => {
-    const variable_name_or_path = extractRequiredString(
-      args,
-      'variable_name_or_path'
-    );
     const variable_scope = extractRequiredString(args, 'variable_scope');
-    const value = extractRequiredString(args, 'value');
     const object_name = SafeExtractor.extractStringProperty(
       args,
       'object_name'
     );
     const scene_name = SafeExtractor.extractStringProperty(args, 'scene_name');
+    const operations = extractVariableOperations(args);
 
     const details = shouldShowDetails ? (
       <ColumnStackLayout noMargin>
-        <Text noMargin allowSelection color="secondary" size="body-small">
-          <b>
-            <Trans>Value</Trans>
-          </b>
-          : {value}
-        </Text>
+        {operations.map((operation, index) => (
+          <Text
+            key={index}
+            noMargin
+            allowSelection
+            color="secondary"
+            size="body-small"
+          >
+            <b>{operation.variable_name_or_path}</b>
+            {operation.delete_this_variable
+              ? ' — deleted'
+              : `: ${operation.value || ''}`}
+          </Text>
+        ))}
       </ColumnStackLayout>
     ) : null;
 
+    if (operations.length === 1 && !operations[0].delete_this_variable) {
+      const variable_name_or_path = operations[0].variable_name_or_path;
+      if (variable_scope === 'scene') {
+        return {
+          text: (
+            <Trans>
+              Set scene variable <b>{variable_name_or_path}</b> in scene{' '}
+              {scene_name}.
+            </Trans>
+          ),
+          details,
+          hasDetailsToShow: true,
+        };
+      } else if (variable_scope === 'object' || variable_scope === 'group') {
+        return {
+          text: (
+            <Trans>
+              Set <b>{object_name}</b>'s variable <b>{variable_name_or_path}</b>
+              .
+            </Trans>
+          ),
+          details,
+          hasDetailsToShow: true,
+        };
+      } else if (variable_scope === 'global') {
+        return {
+          text: (
+            <Trans>
+              Set global variable <b>{variable_name_or_path}</b>.
+            </Trans>
+          ),
+          details,
+          hasDetailsToShow: true,
+        };
+      }
+
+      return {
+        text: (
+          <Trans>
+            Set variable <b>{variable_name_or_path}</b>.
+          </Trans>
+        ),
+      };
+    }
+
+    const variableNames = operations
+      .map(operation => operation.variable_name_or_path)
+      .filter(Boolean)
+      .join(', ');
     if (variable_scope === 'scene') {
       return {
         text: (
           <Trans>
-            Set scene variable <b>{variable_name_or_path}</b> in scene{' '}
-            {scene_name}.
+            Update variables <b>{variableNames}</b> in scene {scene_name}.
           </Trans>
         ),
         details,
         hasDetailsToShow: true,
       };
-    } else if (variable_scope === 'object') {
+    } else if (variable_scope === 'object' || variable_scope === 'group') {
       return {
         text: (
           <Trans>
-            Set <b>{object_name}</b>'s variable <b>{variable_name_or_path}</b>.
+            Update <b>{object_name}</b>'s variables <b>{variableNames}</b>.
           </Trans>
         ),
         details,
@@ -5307,7 +5886,7 @@ const addOrEditVariable: EditorFunction = {
       return {
         text: (
           <Trans>
-            Set global variable <b>{variable_name_or_path}</b>.
+            Update global variables <b>{variableNames}</b>.
           </Trans>
         ),
         details,
@@ -5318,97 +5897,204 @@ const addOrEditVariable: EditorFunction = {
     return {
       text: (
         <Trans>
-          Set variable <b>{variable_name_or_path}</b>.
+          Update variables <b>{variableNames}</b>.
         </Trans>
       ),
+      details,
+      hasDetailsToShow: true,
     };
   },
   launchFunction: async ({ project, args }) => {
-    const variable_name_or_path = extractRequiredString(
-      args,
-      'variable_name_or_path'
-    );
-    const value = extractRequiredString(args, 'value');
-    const variable_type = SafeExtractor.extractStringProperty(
-      args,
-      'variable_type'
-    );
     const variable_scope = extractRequiredString(args, 'variable_scope');
     const object_name = SafeExtractor.extractStringProperty(
       args,
       'object_name'
     );
     const scene_name = SafeExtractor.extractStringProperty(args, 'scene_name');
-
-    let variablesContainer;
-    let scopeDescription;
-    if (variable_scope === 'scene') {
-      if (!scene_name) {
-        return makeGenericFailure(
-          `Missing "scene_name" (required for scene variable).`
-        );
-      }
-      if (!project.hasLayoutNamed(scene_name)) {
-        return makeGenericFailure(`Scene not found: "${scene_name}".`);
-      }
-      variablesContainer = project.getLayout(scene_name).getVariables();
-      scopeDescription = `scene "${scene_name}"`;
-    } else if (variable_scope === 'object') {
-      if (!object_name) {
-        return makeGenericFailure(
-          `Missing "object_name" (required for object variable).`
-        );
-      }
-
-      let objectsContainer;
-      if (scene_name) {
-        if (!project.hasLayoutNamed(scene_name)) {
-          return makeGenericFailure(`Scene not found: "${scene_name}".`);
-        }
-        objectsContainer = project.getLayout(scene_name).getObjects();
-        if (!objectsContainer.hasObjectNamed(object_name)) {
-          return makeGenericFailure(
-            `Object "${object_name}" not in scene "${scene_name}". For a global object, omit scene_name.`
-          );
-        }
-        scopeDescription = `scene "${scene_name}" object "${object_name}"`;
-      } else {
-        objectsContainer = project.getObjects();
-        if (!objectsContainer.hasObjectNamed(object_name)) {
-          return makeGenericFailure(
-            `Object "${object_name}" not found globally. Did you forget to specify scene_name?`
-          );
-        }
-        scopeDescription = `global object "${object_name}"`;
-      }
-
-      variablesContainer = objectsContainer
-        .getObject(object_name)
-        .getVariables();
-    } else if (variable_scope === 'global') {
-      variablesContainer = project.getVariables();
-      scopeDescription = 'global';
-    } else {
+    const operations = extractVariableOperations(args);
+    if (operations.length === 0) {
       return makeGenericFailure(
-        `Invalid "variable_scope": "${variable_scope}". Use \`scene\`, \`object\` or \`global\`.`
+        `No variable to change (the "variables" list is empty).`
       );
     }
 
-    const { addedNewVariable, variableType } = applyVariableChange({
-      variablePath: variable_name_or_path,
-      forcedVariableType: variable_type,
-      variablesContainer,
-      value,
+    const resolved = resolveVariablesContainers({
+      project,
+      variable_scope,
+      scene_name,
+      object_name,
     });
+    if (resolved.failure) return resolved.failure;
+    const { variablesContainers, scopeDescription } = resolved;
 
-    const truncatedValue = truncateValue(value);
-    return makeGenericSuccess(
-      addedNewVariable
-        ? `Added ${scopeDescription} variable "${variable_name_or_path}" (${variableType}) = ${truncatedValue}`
-        : `Edited ${scopeDescription} variable "${variable_name_or_path}" = ${truncatedValue}`
-    );
+    const changes = [];
+    const warnings = [];
+    for (const operation of operations) {
+      const {
+        variable_name_or_path,
+        value,
+        variable_type,
+        delete_this_variable,
+      } = operation;
+
+      if (!variable_name_or_path) {
+        warnings.push(
+          `A variable was skipped because "variable_name_or_path" is missing.`
+        );
+        continue;
+      }
+
+      if (delete_this_variable) {
+        let removed = false;
+        for (const variablesContainer of variablesContainers) {
+          const result = applyVariableDeletion({
+            variablePath: variable_name_or_path,
+            variablesContainer,
+          });
+          removed = removed || result.removed;
+        }
+        if (removed) {
+          changes.push(
+            `Deleted ${scopeDescription} variable "${variable_name_or_path}".`
+          );
+        } else {
+          warnings.push(
+            `Could not delete ${scopeDescription} variable "${variable_name_or_path}": not found.`
+          );
+        }
+        continue;
+      }
+
+      if (value === null || value === undefined) {
+        warnings.push(
+          `Variable "${variable_name_or_path}" was skipped: no "value" provided and it was not marked for deletion.`
+        );
+        continue;
+      }
+
+      let addedNewVariable = false;
+      // The containers list is always non-empty here, so this is overwritten.
+      let variableType = '';
+      for (const variablesContainer of variablesContainers) {
+        const result = applyVariableChange({
+          variablePath: variable_name_or_path,
+          forcedVariableType: variable_type,
+          variablesContainer,
+          value,
+        });
+        addedNewVariable = addedNewVariable || result.addedNewVariable;
+        variableType = result.variableType;
+      }
+
+      const truncatedValue = truncateValue(value);
+      changes.push(
+        addedNewVariable
+          ? `Added ${scopeDescription} variable "${variable_name_or_path}" (${variableType}) = ${truncatedValue}`
+          : `Edited ${scopeDescription} variable "${variable_name_or_path}" = ${truncatedValue}`
+      );
+    }
+
+    // One line per change (so a single variable keeps its original message),
+    // with any warnings appended below.
+    const message = [...changes, ...warnings].join('\n');
+    if (changes.length === 0) {
+      return makeGenericFailure(message || `No variable was changed.`);
+    }
+    return makeGenericSuccess(message);
   },
   modifiesProject: true,
+};
+
+const inspectVariables: EditorFunction = {
+  renderForEditor: ({ args }) => {
+    const variable_scope =
+      SafeExtractor.extractStringProperty(args, 'variable_scope') || '';
+    const object_name = SafeExtractor.extractStringProperty(
+      args,
+      'object_name'
+    );
+    const scene_name = SafeExtractor.extractStringProperty(args, 'scene_name');
+
+    if (variable_scope === 'object' || variable_scope === 'group') {
+      return {
+        text: (
+          <Trans>
+            Inspect <b>{object_name}</b>'s variables.
+          </Trans>
+        ),
+      };
+    } else if (variable_scope === 'scene') {
+      return {
+        text: <Trans>Inspect scene {scene_name}'s variables.</Trans>,
+      };
+    } else if (variable_scope === 'global') {
+      return { text: <Trans>Inspect global variables.</Trans> };
+    }
+    return { text: <Trans>Inspect variables.</Trans> };
+  },
+  launchFunction: async ({ project, args }) => {
+    const variable_scope = extractRequiredString(args, 'variable_scope');
+    const object_name = SafeExtractor.extractStringProperty(
+      args,
+      'object_name'
+    );
+    const scene_name = SafeExtractor.extractStringProperty(args, 'scene_name');
+    const requestedPaths = (
+      SafeExtractor.extractArrayProperty(args, 'variable_names_or_paths') || []
+    )
+      .map(entry => (typeof entry === 'string' ? entry : null))
+      .filter(Boolean);
+
+    const resolved = resolveVariablesContainers({
+      project,
+      variable_scope,
+      scene_name,
+      object_name,
+    });
+    if (resolved.failure) return resolved.failure;
+    const { variablesContainers, scopeDescription } = resolved;
+    const variablesContainer = variablesContainers[0];
+
+    if (requestedPaths.length === 0) {
+      return {
+        success: true,
+        message: `Variables of ${scopeDescription}.`,
+        variables: getSimplifiedVariablesContainer(gd, variablesContainer),
+      };
+    }
+
+    const variables = [];
+    const notFound = [];
+    for (const path of requestedPaths) {
+      let variable = null;
+      try {
+        variable = getVariableAtPath({
+          variablePath: path,
+          variablesContainer,
+        });
+      } catch (error) {
+        notFound.push(path);
+        continue;
+      }
+      if (variable) {
+        variables.push(getSimplifiedVariable(gd, path, variable));
+      } else {
+        notFound.push(path);
+      }
+    }
+
+    return {
+      success: true,
+      message:
+        notFound.length > 0
+          ? `Variables of ${scopeDescription}. Not found: ${notFound.join(
+              ', '
+            )}.`
+          : `Variables of ${scopeDescription}.`,
+      variables,
+    };
+  },
+  modifiesProject: false,
 };
 
 const createOrUpdatePlan: EditorFunction = {
@@ -5692,6 +6378,7 @@ export const editorFunctions: { [string]: EditorFunction } = {
   inspect_scene_properties_layers_effects: inspectScenePropertiesLayersEffects,
   change_scene_properties_layers_effects_groups: changeScenePropertiesLayersEffectsGroups,
   add_or_edit_variable: addOrEditVariable,
+  inspect_variables: inspectVariables,
   read_full_docs: readFullDocs,
   search_docs: searchDocs,
 

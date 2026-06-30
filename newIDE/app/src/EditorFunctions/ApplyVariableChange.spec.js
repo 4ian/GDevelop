@@ -1,6 +1,9 @@
 // @flow
 import { serializeToJSObject } from '../Utils/Serializer';
-import { applyVariableChange } from './ApplyVariableChange';
+import {
+  applyVariableChange,
+  applyVariableDeletion,
+} from './ApplyVariableChange';
 
 const gd: libGDevelop = global.gd;
 
@@ -639,5 +642,120 @@ describe('applyVariableChange', () => {
       expect(replacedRow.getChildrenCount()).toBe(1);
       expect(replacedRow.getAtIndex(0).getValue()).toBe(42);
     });
+  });
+});
+
+describe('applyVariableDeletion', () => {
+  let variablesContainer: gdVariablesContainer;
+
+  beforeEach(() => {
+    variablesContainer = new gd.VariablesContainer(
+      gd.VariablesContainer.Unknown
+    );
+  });
+
+  afterEach(() => {
+    variablesContainer.delete();
+  });
+
+  it('should remove a top-level variable', () => {
+    applyVariableChange({
+      variablePath: 'myVariable',
+      forcedVariableType: null,
+      variablesContainer,
+      value: 'hello',
+    });
+    expect(variablesContainer.has('myVariable')).toBe(true);
+
+    const result = applyVariableDeletion({
+      variablePath: 'myVariable',
+      variablesContainer,
+    });
+
+    expect(result.removed).toBe(true);
+    expect(variablesContainer.has('myVariable')).toBe(false);
+  });
+
+  it('should report not removed when the variable does not exist', () => {
+    const result = applyVariableDeletion({
+      variablePath: 'missing',
+      variablesContainer,
+    });
+
+    expect(result.removed).toBe(false);
+  });
+
+  it('should remove a nested structure child without touching siblings', () => {
+    applyVariableChange({
+      variablePath: 'player',
+      forcedVariableType: null,
+      variablesContainer,
+      value: '{"name":"Hero","score":10}',
+    });
+
+    const result = applyVariableDeletion({
+      variablePath: 'player.score',
+      variablesContainer,
+    });
+
+    expect(result.removed).toBe(true);
+    const player = variablesContainer.get('player');
+    expect(player.hasChild('score')).toBe(false);
+    expect(player.hasChild('name')).toBe(true);
+    expect(player.getChild('name').getString()).toBe('Hero');
+  });
+
+  it('should remove an array element by index', () => {
+    applyVariableChange({
+      variablePath: 'inventory',
+      forcedVariableType: null,
+      variablesContainer,
+      value: '["Sword","Shield","Potion"]',
+    });
+
+    const result = applyVariableDeletion({
+      variablePath: 'inventory[1]',
+      variablesContainer,
+    });
+
+    expect(result.removed).toBe(true);
+    const inventory = variablesContainer.get('inventory');
+    expect(inventory.getChildrenCount()).toBe(2);
+    expect(inventory.getAtIndex(0).getString()).toBe('Sword');
+    expect(inventory.getAtIndex(1).getString()).toBe('Potion');
+  });
+
+  it('should report not removed for a missing nested child', () => {
+    applyVariableChange({
+      variablePath: 'player',
+      forcedVariableType: null,
+      variablesContainer,
+      value: '{"name":"Hero"}',
+    });
+
+    const result = applyVariableDeletion({
+      variablePath: 'player.missing',
+      variablesContainer,
+    });
+
+    expect(result.removed).toBe(false);
+    expect(variablesContainer.has('player')).toBe(true);
+  });
+
+  it('should report not removed for an out-of-range array index', () => {
+    applyVariableChange({
+      variablePath: 'inventory',
+      forcedVariableType: null,
+      variablesContainer,
+      value: '["Sword"]',
+    });
+
+    const result = applyVariableDeletion({
+      variablePath: 'inventory[5]',
+      variablesContainer,
+    });
+
+    expect(result.removed).toBe(false);
+    expect(variablesContainer.get('inventory').getChildrenCount()).toBe(1);
   });
 });

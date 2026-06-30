@@ -251,7 +251,9 @@ const generateExtensionHeaderText = (
       '\n' +
       `${extensionShortHeader.shortDescription}\n` +
       '\n' +
-      `**Authors and contributors** to this experimental extension: ${authorNamesWithLinks}.\n` +
+      `**Authors and contributors** to this ${
+        isExperimental ? 'experimental ' : ''
+      }extension: ${authorNamesWithLinks}.\n` +
       '\n' +
       (isExperimental
         ? `!!! warning

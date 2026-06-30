@@ -9,11 +9,13 @@ import {
 import {
   type RenderEditorContainerProps,
   type RenderEditorContainerPropsWithRef,
+} from './BaseEditor';
+import {
   type SceneEventsOutsideEditorChanges,
   type InstancesOutsideEditorChanges,
   type ObjectsOutsideEditorChanges,
   type ObjectGroupsOutsideEditorChanges,
-} from './BaseEditor';
+} from '../../EditorFunctions/OutsideEditorChanges';
 import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
 import { type ObjectWithContext } from '../../ObjectsList/EnumerateObjects';
 import {

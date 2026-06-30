@@ -6,11 +6,13 @@ import Debugger from '../../Debugger';
 import {
   type RenderEditorContainerProps,
   type RenderEditorContainerPropsWithRef,
+} from './BaseEditor';
+import {
   type SceneEventsOutsideEditorChanges,
   type InstancesOutsideEditorChanges,
   type ObjectsOutsideEditorChanges,
   type ObjectGroupsOutsideEditorChanges,
-} from './BaseEditor';
+} from '../../EditorFunctions/OutsideEditorChanges';
 import SubscriptionChecker, {
   type SubscriptionCheckerInterface,
 } from '../../Profile/Subscription/SubscriptionChecker';

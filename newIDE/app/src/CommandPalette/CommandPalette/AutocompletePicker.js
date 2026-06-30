@@ -58,8 +58,7 @@ const AutocompletePicker = (
   const classes = useStyles();
   const portalContainer = React.useContext(PortalContainerContext);
 
-  // $FlowFixMe[missing-local-annot]
-  const handleClose = (_, reason) => {
+  const handleClose = (_: any, reason: string) => {
     if (reason === 'select-option' || reason === 'toggleInput') return;
     props.onClose();
   };

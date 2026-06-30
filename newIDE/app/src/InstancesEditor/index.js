@@ -154,8 +154,7 @@ export default class InstancesEditor extends Component<Props, State> {
   lastContextMenuY = 0;
   lastCursorX: number | null = null;
   lastCursorY: number | null = null;
-  // $FlowFixMe[missing-local-annot]
-  fpsLimiter = (new FpsLimiter({ maxFps: 60, idleFps: 10 }): FpsLimiter);
+  fpsLimiter: FpsLimiter = new FpsLimiter({ maxFps: 60, idleFps: 10 });
   canvasArea: ?HTMLDivElement;
   // $FlowFixMe[value-as-type]
   pixiRenderer: PIXI.Renderer;
@@ -196,8 +195,7 @@ export default class InstancesEditor extends Component<Props, State> {
   _showObjectInstancesIn3D: boolean = false;
   _previousToolBeforePicker: ?TileMapTileSelection = null;
 
-  // $FlowFixMe[missing-local-annot]
-  state = {
+  state: State = {
     renderingError: null,
   };
 

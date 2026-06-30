@@ -164,12 +164,12 @@ const enableBit = (bitsValue: number, pos: number, enable: boolean) => {
 const Physics2Editor = (props: Props): React.Node => {
   const { current: resourcesLoader } = React.useRef(ResourcesLoader);
   const [image, setImage] = React.useState('');
-  const { behavior, onBehaviorUpdated } = props;
+  const { behaviors, onBehaviorUpdated } = props;
+  const behavior = behaviors[0];
   const forceUpdate = useForceUpdate();
 
   const updateBehaviorProperty = React.useCallback(
-    // $FlowFixMe[missing-local-annot]
-    (property, value) => {
+    (property: string, value: string) => {
       behavior.updateProperty(property, value);
       forceUpdate();
       onBehaviorUpdated();

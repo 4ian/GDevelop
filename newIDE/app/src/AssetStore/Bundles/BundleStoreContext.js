@@ -118,8 +118,10 @@ export const BundleStoreStateProvider = ({
 
           setBundleListingDatas(fetchedBundleListingDatas);
           const defaultTags = fetchedBundleListingDatas.reduce(
-            // $FlowFixMe[missing-local-annot]
-            (allCategories, bundleListingData) => {
+            (
+              allCategories: Array<string>,
+              bundleListingData: BundleListingData
+            ) => {
               return allCategories.concat(
                 bundleListingData.categories.map(category =>
                   capitalize(category)

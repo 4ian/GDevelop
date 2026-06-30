@@ -102,8 +102,7 @@ export default class LayerRenderer {
 
   _showObjectInstancesIn3D: boolean;
 
-  // $FlowFixMe[missing-local-annot]
-  _basicProfilingCounters = (makeBasicProfilingCounters(): BasicProfilingCounters);
+  _basicProfilingCounters: BasicProfilingCounters = makeBasicProfilingCounters();
 
   constructor({
     project,

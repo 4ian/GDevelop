@@ -200,6 +200,18 @@ class GD_CORE_API Object {
   GetAllBehaviorContents() const {
     return behaviors.GetAllBehaviorContents();
   };
+
+  /**
+   * \brief Provide access to the gd::BehaviorsContainer member containing the
+   * object behaviors
+   */
+  const gd::BehaviorsContainer& GetBehaviors() const { return behaviors; }
+
+  /**
+   * \brief Provide access to the gd::BehaviorsContainer member containing the
+   * object behaviors
+   */
+  gd::BehaviorsContainer& GetBehaviors() { return behaviors; }
   ///@}
 
   /** \name Variable management

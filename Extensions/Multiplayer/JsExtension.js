@@ -1249,13 +1249,15 @@ module.exports = {
     ) {
       if (propertyName === 'actionOnPlayerDisconnect') {
         behaviorContent
-          .getChild('actionOnPlayerDisconnect')
+          .getOrCreateChild('actionOnPlayerDisconnect')
           .setStringValue(newValue);
         return true;
       }
       if (propertyName === 'playerNumber') {
         const numberValue = newValue === 'Host' ? 0 : parseInt(newValue, 10);
-        behaviorContent.getChild('playerNumber').setIntValue(numberValue);
+        behaviorContent
+          .getOrCreateChild('playerNumber')
+          .setIntValue(numberValue);
         return true;
       }
 

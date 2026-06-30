@@ -69,6 +69,7 @@ export const ChildObjectPropertiesEditor = ({
           objectConfiguration.updateProperty(name, value),
         visibility: 'All',
         layersContainer: null,
+        shouldDisabledFieldsWithMixedValues: false,
       });
     },
     [schemaRecomputeTrigger, childObjectConfigurationAsGd]

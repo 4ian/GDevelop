@@ -6,6 +6,7 @@
 #include "GDCore/Project/Project.h"
 #include "GDCore/Project/Variable.h"
 #include "GDCore/Project/EventsFunctionsExtension.h"
+#include "GDCore/Project/EventsBasedObject.h"
 #include "GDCore/IDE/EventsFunctionTools.h"
 
 namespace gd {
@@ -39,6 +40,18 @@ VariablesContainersList::MakeNewVariablesContainersListForEventsFunctionsExtensi
   variablesContainersList.Push(extension.GetGlobalVariables());
   variablesContainersList.Push(extension.GetSceneVariables());
   variablesContainersList.firstLocalVariableContainerIndex = 2;
+  return variablesContainersList;
+}
+
+VariablesContainersList
+VariablesContainersList::MakeNewVariablesContainersListForEventsBasedObject(
+    const gd::EventsFunctionsExtension &extension,
+    const gd::EventsBasedObject &eventsBasedObject) {
+  VariablesContainersList variablesContainersList;
+  variablesContainersList.Push(extension.GetGlobalVariables());
+  variablesContainersList.Push(extension.GetSceneVariables());
+  variablesContainersList.Push(eventsBasedObject.GetVariables());
+  variablesContainersList.firstLocalVariableContainerIndex = 3;
   return variablesContainersList;
 }
 
@@ -97,6 +110,7 @@ VariablesContainersList::MakeNewVariablesContainersListForObjectEventsFunction(
   VariablesContainersList variablesContainersList;
   variablesContainersList.Push(extension.GetGlobalVariables());
   variablesContainersList.Push(extension.GetSceneVariables());
+  variablesContainersList.Push(eventsBasedObject.GetVariables());
 
   gd::EventsFunctionTools::PropertiesToVariablesContainer(
       eventsBasedObject.GetPropertyDescriptors(), propertyVariablesContainer);
@@ -108,7 +122,7 @@ VariablesContainersList::MakeNewVariablesContainersListForObjectEventsFunction(
       parameterVariablesContainer);
   variablesContainersList.Push(parameterVariablesContainer);
 
-  variablesContainersList.firstLocalVariableContainerIndex = 4;
+  variablesContainersList.firstLocalVariableContainerIndex = 5;
   return variablesContainersList;
 }
 

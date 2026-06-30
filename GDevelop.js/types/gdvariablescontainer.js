@@ -9,6 +9,7 @@ declare class gdVariablesContainer {
   static ExtensionScene: 6;
   static Parameters: 7;
   static Properties: 8;
+  static Prefab: 9;
   constructor(sourceType: VariablesContainer_SourceType): void;
   getSourceType(): VariablesContainer_SourceType;
   has(name: string): boolean;

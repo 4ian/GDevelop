@@ -63,6 +63,8 @@ namespace gdjs {
       | gdjs.CustomRuntimeObject3DRenderer;
     /** It contains the children of this object. */
     _instanceContainer: gdjs.CustomRuntimeObjectInstanceContainer;
+    /** Internal variables of the prefab instance. */
+    _prefabVariables: gdjs.VariablesContainer;
     _isUntransformedHitBoxesDirty: boolean = true;
     /** It contains shallow copies of the children hitboxes */
     private _untransformedHitBoxes: gdjs.Polygon[] = [];
@@ -106,11 +108,19 @@ namespace gdjs {
       objectData: ObjectData & CustomObjectConfiguration,
       instanceData: InstanceData | undefined
     ) {
+      const eventsBasedObjectData = parent
+        .getGame()
+        .getEventsBasedObjectData(objectData.type);
       super(parent, objectData, instanceData);
       this._type = objectData.type;
       this._instanceContainer = new gdjs.CustomRuntimeObjectInstanceContainer(
         parent,
         this
+      );
+      this._prefabVariables = new gdjs.VariablesContainer(
+        eventsBasedObjectData
+          ? eventsBasedObjectData.variables || []
+          : undefined
       );
       this._renderer = this._createRender();
 
@@ -172,7 +182,15 @@ namespace gdjs {
     protected abstract _reinitializeRenderer(): void;
 
     override reinitialize(objectData: ObjectData & CustomObjectConfiguration) {
+      const eventsBasedObjectData = this._runtimeScene
+        .getGame()
+        .getEventsBasedObjectData(objectData.type);
       super.reinitialize(objectData);
+      this._prefabVariables = new gdjs.VariablesContainer(
+        eventsBasedObjectData
+          ? eventsBasedObjectData.variables || []
+          : undefined
+      );
 
       this._reinitializeContentFromObjectData(objectData);
 
@@ -409,6 +427,10 @@ namespace gdjs {
 
     getChildrenContainer(): gdjs.RuntimeInstanceContainer {
       return this._instanceContainer;
+    }
+
+    getPrefabVariables(): gdjs.VariablesContainer {
+      return this._prefabVariables;
     }
 
     onChildrenLocationChanged() {

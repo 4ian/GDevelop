@@ -40,6 +40,7 @@ export enum VariablesContainer_SourceType {
   ExtensionScene = 6,
   Parameters = 7,
   Properties = 8,
+  Prefab = 9,
 }
 
 export enum ObjectsContainer_SourceType {
@@ -2578,6 +2579,7 @@ export class EventsBasedObject extends AbstractEventsBasedEntity {
   getInitialInstances(): InitialInstancesContainer;
   getLayers(): LayersContainer;
   getObjects(): ObjectsContainer;
+  getVariables(): VariablesContainer;
   getAllBehaviorNames(): VectorString;
   hasBehaviorNamed(name: string): boolean;
   addNewBehavior(project: Project, type: string, name: string): Behavior;

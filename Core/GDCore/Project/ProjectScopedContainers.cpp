@@ -5,6 +5,7 @@
 #include "GDCore/Project/EventsBasedBehavior.h"
 #include "GDCore/Project/EventsBasedObject.h"
 #include "GDCore/Project/Layout.h"
+#include "GDCore/Project/Object.h"
 #include "GDCore/Project/ObjectsContainer.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/Events/Event.h"
@@ -221,8 +222,8 @@ ProjectScopedContainers::MakeNewProjectScopedContainersForEventsBasedObject(
       ObjectsContainersList::MakeNewObjectsContainersListForContainers(
           eventsBasedObject.GetObjects(), outputObjectsContainer),
       VariablesContainersList::
-          MakeNewVariablesContainersListForEventsFunctionsExtension(
-              eventsFunctionsExtension),
+          MakeNewVariablesContainersListForEventsBasedObject(
+              eventsFunctionsExtension, eventsBasedObject),
       &eventsFunctionsExtension.GetGlobalVariables(),
       &eventsFunctionsExtension.GetSceneVariables(),
       PropertiesContainersList::MakeNewEmptyPropertiesContainersList(),

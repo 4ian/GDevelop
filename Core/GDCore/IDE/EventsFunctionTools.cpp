@@ -102,6 +102,10 @@ void EventsFunctionTools::ObjectEventsFunctionToObjectsContainer(
                   "for the parent. ");
     return;
   }
+
+  // Prefab variables are exposed through the variables scope only. They must
+  // not be copied to the synthetic parent object, otherwise `Object.Variable`
+  // would alias the prefab's internal state.
 }
 
 void EventsFunctionTools::ParametersToVariablesContainer(

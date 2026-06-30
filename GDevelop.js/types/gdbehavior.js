@@ -13,6 +13,8 @@ declare class gdBehavior {
   unserializeFrom(element: gdSerializerElement): void;
   isFolded(): boolean;
   setFolded(folded: boolean): void;
+  isMuted(): boolean;
+  setMuted(muted: boolean): void;
   isDefaultBehavior(): boolean;
   isInheritedFromObjectType(): boolean;
   setInheritedFromObjectType(isInheritedFromObjectType: boolean): void;

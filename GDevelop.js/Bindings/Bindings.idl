@@ -853,6 +853,9 @@ interface Behavior {
     boolean IsFolded();
     void SetFolded(boolean folded);
 
+    boolean IsMuted();
+    void SetMuted(boolean muted);
+
     boolean IsDefaultBehavior();
     boolean IsInheritedFromObjectType();
     void SetInheritedFromObjectType(boolean isInheritedFromObjectType);

@@ -144,6 +144,7 @@ void BehaviorsContainer::UnserializeFrom(gd::Project &project,
 
     bool isFolded = behaviorElement.GetBoolAttribute("isFolded", false);
     behavior->SetFolded(isFolded);
+    behavior->SetMuted(behaviorElement.GetBoolAttribute("isMuted", false));
     behavior->SetInheritedFromObjectType(
         behaviorElement.GetBoolAttribute("isInheritedFromObjectType", false));
 
@@ -180,11 +181,15 @@ void BehaviorsContainer::SerializeTo(SerializerElement &element) const {
                                          // name properties, remove them.
     behaviorElement.RemoveChild("name");
     behaviorElement.RemoveChild("isFolded");
+    behaviorElement.RemoveChild("isMuted");
     behaviorElement.RemoveChild("isInheritedFromObjectType");
+    behaviorElement.RemoveAttribute("isMuted");
     behaviorElement.SetAttribute("type", behavior.GetTypeName());
     behaviorElement.SetAttribute("name", behavior.GetName());
     if (behavior.IsFolded())
       behaviorElement.SetAttribute("isFolded", true);
+    if (behavior.IsMuted())
+      behaviorElement.SetAttribute("isMuted", true);
     if (behavior.IsInheritedFromObjectType()) {
       behaviorElement.SetAttribute("isInheritedFromObjectType", true);
     }

@@ -216,6 +216,8 @@ declare type BehaviorData = {
   name: string;
   /** The behavior type. Used by GDJS to find the proper behavior to construct. */
   type: string;
+  /** When true, the behavior is initially deactivated. */
+  isMuted?: boolean;
 };
 
 declare type BehaviorNetworkSyncData = {

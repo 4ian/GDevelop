@@ -41,6 +41,7 @@ namespace gdjs {
     type: string;
     _nameId: integer;
     _activated: boolean;
+    _activatedByDefault: boolean;
 
     // When synchronised over the network, a behavior is always owned by the player owning the object,
     // and always synced. If set to false, the behavior properties will not be synced to others.
@@ -60,9 +61,10 @@ namespace gdjs {
       this.type = behaviorData.type || '';
       this._nameId = gdjs.RuntimeObject.getNameIdentifier(this.name);
       const game = instanceContainer.getGame();
-      this._activated =
+      this._activatedByDefault =
         !game.isInGameEdition() ||
         !!game.isBehaviorActivatedByDefaultInEditor(this.type);
+      this._activated = this._activatedByDefault && !behaviorData.isMuted;
     }
 
     /**
@@ -90,8 +92,19 @@ namespace gdjs {
           diffBehaviorData[key] = newData[key];
         }
       }
+      const wasMuted = !!oldBehaviorData.isMuted;
+      const isMuted = !!newBehaviorData.isMuted;
+      const didUpdateActivation = wasMuted !== isMuted;
+      if (didUpdateActivation) {
+        this.activate(!isMuted && this._activatedByDefault);
+      }
+      const onlyMuteChanged =
+        didUpdateActivation &&
+        Object.keys(diffBehaviorData).every(
+          (key) => key === 'name' || key === 'type' || key === 'isMuted'
+        );
       // If not redefined, mark by default the hot-reload as failed.
-      return this.applyBehaviorOverriding(diffBehaviorData);
+      return onlyMuteChanged || this.applyBehaviorOverriding(diffBehaviorData);
     }
 
     applyBehaviorOverriding(behaviorOverriding: BehaviorData): boolean {

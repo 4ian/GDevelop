@@ -758,6 +758,8 @@ export class Behavior extends EmscriptenObject {
   unserializeFrom(element: SerializerElement): void;
   isFolded(): boolean;
   setFolded(folded: boolean): void;
+  isMuted(): boolean;
+  setMuted(muted: boolean): void;
   isDefaultBehavior(): boolean;
   isInheritedFromObjectType(): boolean;
   setInheritedFromObjectType(isInheritedFromObjectType: boolean): void;

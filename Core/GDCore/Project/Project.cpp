@@ -137,6 +137,7 @@ void Project::EnsureObjectInheritedBehaviors(gd::Object& object) const {
 
       behavior.UnserializeFrom(inheritedBehavior.GetContent());
       behavior.SetFolded(inheritedBehavior.IsFolded());
+      behavior.SetMuted(inheritedBehavior.IsMuted());
       behavior.SetQuickCustomizationVisibility(
           inheritedBehavior.GetQuickCustomizationVisibility());
       behavior.GetPropertiesQuickCustomizationVisibilities() =

@@ -145,11 +145,61 @@ TEST_CASE("BehaviorSerialization", "[common]") {
     gd::Platform platform;
     gd::Project originalProject;
     SetupProject(originalProject, platform);
+    auto &originalBehavior = originalProject.GetLayout("Scene")
+                                 .GetObjects()
+                                 .GetObject("MyObject")
+                                 .GetBehavior("MyEventsBasedBehavior");
+    originalBehavior.SetMuted(true);
     CheckBehaviorProperty(originalProject.GetLayout("Scene").GetObjects());
 
     auto clonedProject = originalProject;
 
     CheckBehaviorProperty(clonedProject.GetLayout("Scene").GetObjects());
+    REQUIRE(clonedProject.GetLayout("Scene")
+                .GetObjects()
+                .GetObject("MyObject")
+                .GetBehavior("MyEventsBasedBehavior")
+                .IsMuted());
+  }
+
+  SECTION("Save and load a project with a muted behavior") {
+    gd::Platform platform;
+    gd::Project writtenProject;
+    SetupProject(writtenProject, platform);
+    auto &behavior = writtenProject.GetLayout("Scene")
+                         .GetObjects()
+                         .GetObject("MyObject")
+                         .GetBehavior("MyEventsBasedBehavior");
+    behavior.SetMuted(true);
+
+    SerializerElement projectElement;
+    writtenProject.SerializeTo(projectElement);
+    auto &layoutElement = projectElement.GetChild("layouts").GetChild(0);
+    auto &behaviorElement = layoutElement.GetChild("objects")
+                                .GetChild(0)
+                                .GetChild("behaviors")
+                                .GetChild(0);
+    REQUIRE(behaviorElement.GetBoolAttribute("isMuted", false));
+
+    gd::Project readProject;
+    readProject.AddPlatform(platform);
+    readProject.UnserializeFrom(projectElement);
+    auto &readBehavior = readProject.GetLayout("Scene")
+                             .GetObjects()
+                             .GetObject("MyObject")
+                             .GetBehavior("MyEventsBasedBehavior");
+    REQUIRE(readBehavior.IsMuted());
+
+    readBehavior.SetMuted(false);
+    SerializerElement unmutedProjectElement;
+    readProject.SerializeTo(unmutedProjectElement);
+    auto &unmutedBehaviorElement = unmutedProjectElement.GetChild("layouts")
+                                      .GetChild(0)
+                                      .GetChild("objects")
+                                      .GetChild(0)
+                                      .GetChild("behaviors")
+                                      .GetChild(0);
+    REQUIRE(!unmutedBehaviorElement.HasAttribute("isMuted"));
   }
 
   SECTION("Load a project with a property value on a custom behavior that no longer exists") {
@@ -234,6 +284,7 @@ TEST_CASE("BehaviorSerialization", "[common]") {
         writtenProject, "MyEventsExtension::MyEventsBasedBehavior",
         "MyPrefabBehavior");
     prefabBehavior->UpdateProperty("MyProperty", "123456");
+    prefabBehavior->SetMuted(true);
 
     SerializerElement projectElement;
     writtenProject.SerializeTo(projectElement);
@@ -253,6 +304,7 @@ TEST_CASE("BehaviorSerialization", "[common]") {
     REQUIRE(behaviorElement.GetStringAttribute("type") ==
             "MyEventsExtension::MyEventsBasedBehavior");
     REQUIRE(behaviorElement.GetStringAttribute("MyProperty") == "123456");
+    REQUIRE(behaviorElement.GetBoolAttribute("isMuted", false));
 
     gd::Project readProject;
     readProject.AddPlatform(platform);
@@ -265,6 +317,7 @@ TEST_CASE("BehaviorSerialization", "[common]") {
                 .GetProperties()
                 .at("MyProperty")
                 .GetValue() == "123456");
+    REQUIRE(readEventsBasedObject.GetBehavior("MyPrefabBehavior").IsMuted());
 
     gd::Layout &layout = readProject.InsertNewLayout("PrefabInstances", 0);
     auto &object = layout.GetObjects().InsertNewObject(
@@ -273,6 +326,7 @@ TEST_CASE("BehaviorSerialization", "[common]") {
     REQUIRE(object.HasBehaviorNamed("MyPrefabBehavior"));
     auto &objectBehavior = object.GetBehavior("MyPrefabBehavior");
     REQUIRE(objectBehavior.IsInheritedFromObjectType());
+    REQUIRE(objectBehavior.IsMuted());
     REQUIRE(objectBehavior.GetProperties().at("MyProperty").GetValue() ==
             "123456");
 
@@ -300,6 +354,8 @@ TEST_CASE("BehaviorSerialization", "[common]") {
     REQUIRE(objectWithExistingBehavior.GetBehavior("MyPrefabBehavior")
                 .IsInheritedFromObjectType());
     REQUIRE(objectWithExistingBehavior.GetBehavior("MyPrefabBehavior")
+                .IsMuted());
+    REQUIRE(objectWithExistingBehavior.GetBehavior("MyPrefabBehavior")
                 .GetProperties()
                 .at("MyProperty")
                 .GetValue() == "123456");
@@ -319,6 +375,8 @@ TEST_CASE("BehaviorSerialization", "[common]") {
         objectWithCustomizedExistingBehavior);
     REQUIRE(objectWithCustomizedExistingBehavior.GetBehavior("MyPrefabBehavior")
                 .IsInheritedFromObjectType());
+    REQUIRE(objectWithCustomizedExistingBehavior.GetBehavior("MyPrefabBehavior")
+                .IsMuted());
     REQUIRE(objectWithCustomizedExistingBehavior.GetBehavior("MyPrefabBehavior")
                 .GetProperties()
                 .at("MyProperty")
@@ -341,6 +399,9 @@ TEST_CASE("BehaviorSerialization", "[common]") {
     REQUIRE(globalObjectWithCustomizedExistingBehavior
                 .GetBehavior("MyPrefabBehavior")
                 .IsInheritedFromObjectType());
+    REQUIRE(globalObjectWithCustomizedExistingBehavior
+                .GetBehavior("MyPrefabBehavior")
+                .IsMuted());
     REQUIRE(globalObjectWithCustomizedExistingBehavior
                 .GetBehavior("MyPrefabBehavior")
                 .GetProperties()

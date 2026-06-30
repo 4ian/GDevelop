@@ -422,6 +422,7 @@ const InnerDialog = (props: InnerDialogProps) => {
             onWillInstallExtension={onWillInstallExtension}
             onExtensionInstalled={onExtensionInstalled}
             isListLocked={isBehaviorListLocked}
+            canToggleBehaviorMute
           />
         </Column>
       )}

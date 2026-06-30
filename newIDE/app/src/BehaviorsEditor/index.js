@@ -49,11 +49,38 @@ import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasur
 import QuickCustomizationPropertiesVisibilityDialog from '../QuickCustomization/QuickCustomizationPropertiesVisibilityDialog';
 import Text from '../UI/Text';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
+import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
+import Chip from '../UI/Chip';
 
 const gd: libGDevelop = global.gd;
 
 const BEHAVIORS_CLIPBOARD_KIND = 'Behaviors';
 type BehaviorHolder = any;
+
+const isBehaviorMuted = (behavior: gdBehavior): boolean => {
+  const behaviorWithMaybeMuteMethods: any = behavior;
+  if (typeof behaviorWithMaybeMuteMethods.isMuted === 'function') {
+    return behaviorWithMaybeMuteMethods.isMuted();
+  }
+
+  return !!serializeToJSObject(behavior).isMuted;
+};
+
+const setBehaviorMuted = (behavior: gdBehavior, isMuted: boolean) => {
+  const behaviorWithMaybeMuteMethods: any = behavior;
+  if (typeof behaviorWithMaybeMuteMethods.setMuted === 'function') {
+    behaviorWithMaybeMuteMethods.setMuted(isMuted);
+    return;
+  }
+
+  const serializedBehavior = serializeToJSObject(behavior);
+  if (isMuted) {
+    serializedBehavior.isMuted = true;
+  } else {
+    delete serializedBehavior.isMuted;
+  }
+  unserializeFromJSObject(behavior, serializedBehavior);
+};
 
 const isBehaviorInheritedFromObjectType = (behavior: gdBehavior): boolean => {
   try {
@@ -119,6 +146,7 @@ type BehaviorConfigurationEditorProps = {|
     behaviorName: string
   ) => void,
   isListLocked: boolean,
+  canToggleBehaviorMute: boolean,
   layersContainer: gdLayersContainer,
 |};
 
@@ -144,11 +172,13 @@ const BehaviorConfigurationEditor = React.forwardRef<
       openExtension,
       openBehaviorPropertiesQuickCustomizationDialog,
       isListLocked,
+      canToggleBehaviorMute,
       layersContainer,
     },
     ref
   ) => {
     const { values } = React.useContext(PreferencesContext);
+    const gdevelopTheme = React.useContext(GDevelopThemeContext);
     const forceUpdate = useForceUpdate();
     const behaviorName = behavior.getName();
     const behaviorTypeName = behavior.getTypeName();
@@ -253,6 +283,8 @@ const BehaviorConfigurationEditor = React.forwardRef<
       tutorialId => !values.hiddenTutorialHints[tutorialId]
     );
     const iconUrl = behaviorMetadata.getIconFilename();
+    const isMuted = isBehaviorMuted(behavior);
+    const shouldShowMutedBadge = canToggleBehaviorMute && isMuted;
 
     return (
       <Accordion
@@ -294,6 +326,21 @@ const BehaviorConfigurationEditor = React.forwardRef<
                   // TODO Allow to paste behaviors that are already in the list.
                   enabled: canPasteBehaviors && !isListLocked,
                 },
+                ...(canToggleBehaviorMute
+                  ? [
+                      {
+                        type: 'checkbox',
+                        label: i18n._(t`Mute`),
+                        checked: isMuted,
+                        enabled: !isListLocked,
+                        click: () => {
+                          setBehaviorMuted(behavior, !isMuted);
+                          onBehaviorsUpdated();
+                          forceUpdate();
+                        },
+                      },
+                    ]
+                  : []),
                 ...(canResetInheritedBehaviorValue
                   ? [
                       { type: 'separator' },
@@ -335,17 +382,28 @@ const BehaviorConfigurationEditor = React.forwardRef<
               size={20}
             />
           ) : null}
-          <Column expand>
+          <Column noMargin noOverflowParent>
             <TextField
               value={behaviorName}
               translatableHintText={t`Behavior name`}
               margin="none"
-              fullWidth
               disabled
               onChange={(e, text) => onChangeBehaviorName(behavior, text)}
               id={`behavior-${behaviorName}-name-text-field`}
             />
           </Column>
+          {shouldShowMutedBadge ? (
+            <Chip
+              size="small"
+              label={<Trans>muted</Trans>}
+              style={{
+                marginLeft: 8,
+                backgroundColor: gdevelopTheme.statusIndicator.error,
+                color: '#ffffff',
+                height: 22,
+              }}
+            />
+          ) : null}
         </AccordionHeader>
         <AccordionBody>
           <Column
@@ -768,6 +826,7 @@ type Props = {|
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
   isListLocked: boolean,
+  canToggleBehaviorMute?: boolean,
   canUseWholeProjectRefactorer?: boolean,
 |};
 
@@ -793,6 +852,7 @@ const BehaviorsEditor = (props: Props): React.Node => {
     onWillInstallExtension,
     onExtensionInstalled,
     isListLocked,
+    canToggleBehaviorMute,
     canUseWholeProjectRefactorer,
   } = props;
   const forceUpdate = useForceUpdate();
@@ -958,6 +1018,7 @@ const BehaviorsEditor = (props: Props): React.Node => {
                     props.projectScopedContainersAccessor
                   }
                   isListLocked={isListLocked}
+                  canToggleBehaviorMute={!!canToggleBehaviorMute}
                 />
               );
             })}

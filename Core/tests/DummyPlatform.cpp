@@ -5,7 +5,6 @@
  */
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/Extensions/PlatformExtension.h"
-#include "GDCore/IDE/Events/ExpressionValidator.h"
 #include "GDCore/Project/Behavior.h"
 #include "GDCore/Project/ObjectConfiguration.h"
 #include "GDCore/Extensions/Builtin/SpriteExtension/SpriteObject.h"

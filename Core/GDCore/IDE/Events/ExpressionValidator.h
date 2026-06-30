@@ -40,10 +40,12 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
   ExpressionValidator(const gd::Platform &platform_,
                       const gd::ProjectScopedContainers & projectScopedContainers_,
                       const gd::String &rootType_,
+                      const gd::String &rootObjectName_ = emptyParameterExtraInfo,
                       const gd::String &extraInfo_ = emptyParameterExtraInfo)
       : platform(platform_),
         projectScopedContainers(projectScopedContainers_),
         parentType(StringToType(gd::ValueTypeMetadata::GetExpressionPrimitiveValueType(rootType_))),
+        rootObjectName(rootObjectName_),
         childType(Type::Unknown),
         forbidsUsageOfBracketsBecauseParentIsObject(false),
         currentParameterExtraInfo(&extraInfo_),
@@ -593,6 +595,8 @@ private:
   std::vector<std::unique_ptr<ExpressionParserError>> supplementalErrors;
   Type childType; ///< The type "discovered" down the tree and passed up.
   Type parentType; ///< The type "required" by the top of the tree.
+  /** The root object name of the expression or a function call. */
+  gd::String rootObjectName;
   bool forbidsUsageOfBracketsBecauseParentIsObject;
   gd::String variableObjectName;
   gd::ExpressionParserLocation variableObjectNameLocation;

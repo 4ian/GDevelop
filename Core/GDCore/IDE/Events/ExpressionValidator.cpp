@@ -392,6 +392,12 @@ ExpressionValidator::Type ExpressionValidator::ValidateFunction(
     return returnType;
   }
 
+  const gd::String parentRootObjectName = rootObjectName;
+  // We don't check objectvar parameters since they are only used by the legacy
+  // functions like: `Object.Variable(MyVariable)` which allow undeclared
+  // variables.
+  rootObjectName = emptyParameterExtraInfo;
+
   // TODO: reverse the order of diagnostic?
   size_t writtenParametersFirstIndex =
       ExpressionParser2::WrittenParametersFirstIndex(function.objectName,
@@ -452,6 +458,7 @@ ExpressionValidator::Type ExpressionValidator::ValidateFunction(
     }
     metadataIndex++;
   }
+  rootObjectName = parentRootObjectName;
   return returnType;
 }
 

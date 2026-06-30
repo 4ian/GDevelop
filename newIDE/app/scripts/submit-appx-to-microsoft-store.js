@@ -279,8 +279,26 @@ const sleep = timeInMs => new Promise(resolve => setTimeout(resolve, timeInMs));
     shell.exit(2);
   }
 
-  // Poll the status until the commit is confirmed by the Store.
+  // Print any errors/warnings reported for the submission. Warnings (for example,
+  // about pricing and availability) can prevent the new Partner Center submission
+  // experience from accepting the commit, leaving the submission stuck in draft.
+  const printStatusDetails = statusDetails => {
+    if (!statusDetails) return;
+    (statusDetails.errors || []).forEach(error => {
+      shell.echo(`   ❌ Error: [${error.code}] ${error.details}`);
+    });
+    (statusDetails.warnings || []).forEach(warning => {
+      shell.echo(`   ⚠️ Warning: [${warning.code}] ${warning.details}`);
+    });
+  };
+
+  // Poll the status until the commit is confirmed by the Store. The commit is
+  // expected to move from CommitStarted to PreProcessing (accepted) within a few
+  // minutes, so if it stays at CommitStarted for too long we stop and dump the
+  // submission details to help understand why (rather than polling forever).
   shell.echo(`ℹ️ Waiting for the Store to confirm the submission...`);
+  const commitTimeoutMs = 20 * 60 * 1000;
+  const startTime = Date.now();
   while (true) {
     await sleep(30 * 1000);
 
@@ -298,9 +316,7 @@ const sleep = timeInMs => new Promise(resolve => setTimeout(resolve, timeInMs));
     }
 
     shell.echo(`ℹ️ Submission status: ${status.status}.`);
-    if (status.status === 'CommitStarted') {
-      continue; // Still being processed, keep polling.
-    }
+    printStatusDetails(status.statusDetails);
 
     if (status.status === 'CommitFailed') {
       shell.echo(
@@ -309,6 +325,35 @@ const sleep = timeInMs => new Promise(resolve => setTimeout(resolve, timeInMs));
           null,
           2
         )}`
+      );
+      shell.exit(4);
+    }
+
+    if (status.status === 'CommitStarted') {
+      if (Date.now() - startTime < commitTimeoutMs) {
+        continue; // Still being processed, keep polling.
+      }
+
+      // The commit is taking too long. This usually means the submission has a
+      // blocking warning (often "Pricing and availability") that the new Partner
+      // Center submission experience won't auto-resolve. Dump the full submission
+      // so we can see what is incomplete.
+      shell.echo(
+        `❌ The commit is still not confirmed after ${Math.round(
+          commitTimeoutMs / 60000
+        )} minutes. The submission is likely stuck in draft because of a blocking warning. Full submission details:`
+      );
+      try {
+        const response = await api.get(`/submissions/${submissionId}`);
+        printStatusDetails(response.data.statusDetails);
+        shell.echo(JSON.stringify(response.data, null, 2));
+      } catch (error) {
+        shell.echo(
+          `⚠️ Could not fetch the submission details: ${formatApiError(error)}`
+        );
+      }
+      shell.echo(
+        `ℹ️ Open https://partner.microsoft.com/en-us/dashboard/products/${applicationId}/overview to see which section is flagged, or delete this submission with --deletePendingSubmission and retry.`
       );
       shell.exit(4);
     }

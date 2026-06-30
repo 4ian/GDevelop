@@ -5477,18 +5477,8 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
           changed_group,
           'delete_this_group'
         );
-        // Two ways to change a group's membership:
-        // - Incrementally (preferred): `objects_to_add` / `objects_to_remove`
-        //   only list the objects that change. This is far less error prone for
-        //   an AI agent, which no longer has to restate the whole group.
-        // - Legacy (for older tool versions): `objects` is the full, exhaustive
-        //   list the group must end up matching.
-        // Only one of the two shapes is used: if the incremental fields are
-        // provided, `objects` is ignored.
-        const objects = SafeExtractor.extractArrayProperty(
-          changed_group,
-          'objects'
-        );
+        // Group membership is edited incrementally: `objects_to_add` /
+        // `objects_to_remove` only list the objects that change.
         const objectsToAdd = SafeExtractor.extractArrayProperty(
           changed_group,
           'objects_to_add'
@@ -5533,75 +5523,39 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
           }
 
           // `objects_to_add`/`objects_to_remove` are plain arrays of object
-          // names (strings). The legacy `objects` shape is an array of
-          // `{ object_name }` objects.
-          const dedupeNames = (names: Array<string>): Array<string> =>
-            Array.from(new Set(names));
-          const extractStringNames = (
+          // names (strings).
+          const extractObjectNames = (
             namesArray: Array<mixed>
           ): Array<string> => {
             const names: Array<string> = [];
             for (const name of namesArray) {
               if (typeof name === 'string' && name) names.push(name);
             }
-            return dedupeNames(names);
+            return Array.from(new Set(names));
           };
-          const extractObjectNames = (
-            objectsArray: Array<mixed>
-          ): Array<string> =>
-            dedupeNames(
-              objectsArray
-                .map(object =>
-                  SafeExtractor.extractStringProperty(object, 'object_name')
-                )
-                .filter(Boolean)
-            );
 
-          const usesIncremental =
-            objectsToAdd !== null || objectsToRemove !== null;
-          const usesLegacy = objects !== null;
-
-          if (usesIncremental || usesLegacy) {
-            if (usesIncremental && usesLegacy) {
-              warnings.push(
-                `Group "${groupName}": "objects" was ignored because "objects_to_add"/"objects_to_remove" were also provided.`
-              );
-            }
-
+          if (objectsToAdd !== null || objectsToRemove !== null) {
             const currentObjectNames = foundGroup
               .getAllObjectsNames()
               .toJSArray();
 
             // Resolve the names to remove first, then the names to add (relative
-            // to what remains), whichever shape was used.
-            let namesToRemove: Array<string>;
-            let namesToAdd: Array<string>;
-            if (usesIncremental) {
-              const removeNames = objectsToRemove
-                ? extractStringNames(objectsToRemove)
-                : [];
-              const addNames = objectsToAdd
-                ? extractStringNames(objectsToAdd)
-                : [];
-              namesToRemove = currentObjectNames.filter(name =>
-                removeNames.includes(name)
-              );
-              const remainingNames = currentObjectNames.filter(
-                name => !removeNames.includes(name)
-              );
-              namesToAdd = addNames.filter(
-                name => !remainingNames.includes(name)
-              );
-            } else {
-              // Legacy: the group must end up matching `objects` exactly.
-              const newObjectNames = extractObjectNames(objects || []);
-              namesToRemove = currentObjectNames.filter(
-                name => !newObjectNames.includes(name)
-              );
-              namesToAdd = newObjectNames.filter(
-                name => !currentObjectNames.includes(name)
-              );
-            }
+            // to what remains).
+            const removeNames = objectsToRemove
+              ? extractObjectNames(objectsToRemove)
+              : [];
+            const addNames = objectsToAdd
+              ? extractObjectNames(objectsToAdd)
+              : [];
+            const namesToRemove = currentObjectNames.filter(name =>
+              removeNames.includes(name)
+            );
+            const remainingNames = currentObjectNames.filter(
+              name => !removeNames.includes(name)
+            );
+            const namesToAdd = addNames.filter(
+              name => !remainingNames.includes(name)
+            );
 
             // Remove first, so the shared variables/behaviors captured below
             // reflect the group after removals (and before additions).
@@ -5666,8 +5620,7 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
             });
 
             // Echo the resulting content of the group, so the caller (and the
-            // orchestrator) can see and verify the new state instead of a blind
-            // "Modified objects" confirmation.
+            // orchestrator) can see and verify the new state.
             const finalObjectNames = foundGroup
               .getAllObjectsNames()
               .toJSArray();

@@ -3010,11 +3010,7 @@ describe('editorFunctions', () => {
             changed_groups: [
               {
                 group_name: 'Enemies',
-                objects: [
-                  { object_name: 'Enemy1' },
-                  { object_name: 'Enemy2' },
-                  { object_name: 'Enemy3' },
-                ],
+                objects_to_add: ['Enemy3'],
               },
             ],
           },
@@ -3440,31 +3436,6 @@ describe('editorFunctions', () => {
       project.delete();
     });
 
-    it('removes an object from a group when it is left out of the objects list', async () => {
-      const result: EditorFunctionGenericOutput = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
-        {
-          ...makeFakeLaunchFunctionOptionsWithProject(project),
-          args: {
-            scene_name: 'TestScene',
-            changed_groups: [
-              {
-                group_name: 'Enemies',
-                objects: [{ object_name: 'Enemy1' }],
-              },
-            ],
-          },
-        }
-      );
-
-      expect(result.success).toBe(true);
-      const group = testScene
-        .getObjects()
-        .getObjectGroups()
-        .get('Enemies');
-      expect(group.find('Enemy1')).toBe(true);
-      expect(group.find('Enemy2')).toBe(false);
-    });
-
     it('renames a group', async () => {
       const result: EditorFunctionGenericOutput = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
         {
@@ -3482,37 +3453,6 @@ describe('editorFunctions', () => {
       expect(groups.has('Enemies')).toBe(false);
     });
 
-    it('warns when an object added to a group does not exist', async () => {
-      const result: EditorFunctionGenericOutput = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
-        {
-          ...makeFakeLaunchFunctionOptionsWithProject(project),
-          args: {
-            scene_name: 'TestScene',
-            changed_groups: [
-              {
-                group_name: 'Enemies',
-                objects: [
-                  { object_name: 'Enemy1' },
-                  { object_name: 'Enemy2' },
-                  { object_name: 'Ghost' },
-                ],
-              },
-            ],
-          },
-        }
-      );
-
-      expect(result.success).toBe(true);
-      expect(result.warnings).toContain('Ghost');
-      expect(
-        testScene
-          .getObjects()
-          .getObjectGroups()
-          .get('Enemies')
-          .find('Ghost')
-      ).toBe(false);
-    });
-
     it('echoes the resulting content of the group in the message', async () => {
       const result: EditorFunctionGenericOutput = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
         {
@@ -3522,7 +3462,7 @@ describe('editorFunctions', () => {
             changed_groups: [
               {
                 group_name: 'Enemies',
-                objects: [{ object_name: 'Enemy1' }],
+                objects_to_remove: ['Enemy2'],
               },
             ],
           },
@@ -3623,36 +3563,6 @@ describe('editorFunctions', () => {
         'Enemy1',
         'Enemy3',
       ]);
-    });
-
-    it('ignores legacy "objects" when incremental fields are also provided', async () => {
-      const result: EditorFunctionGenericOutput = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
-        {
-          ...makeFakeLaunchFunctionOptionsWithProject(project),
-          args: {
-            scene_name: 'TestScene',
-            changed_groups: [
-              {
-                group_name: 'Enemies',
-                // "objects" would empty the group, but it must be ignored in
-                // favor of the incremental fields.
-                objects: [],
-                objects_to_remove: ['Enemy1'],
-              },
-            ],
-          },
-        }
-      );
-
-      expect(result.success).toBe(true);
-      expect(result.warnings).toContain('"objects" was ignored');
-      const group = testScene
-        .getObjects()
-        .getObjectGroups()
-        .get('Enemies');
-      // Only Enemy1 removed; Enemy2 stays (it would be gone if "objects":[] won).
-      expect(group.find('Enemy1')).toBe(false);
-      expect(group.find('Enemy2')).toBe(true);
     });
 
     it('fills shared variables and behaviors when adding via objects_to_add', async () => {

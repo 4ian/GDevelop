@@ -3,11 +3,13 @@ import * as React from 'react';
 import type {
   RenderEditorContainerProps,
   RenderEditorContainerPropsWithRef,
+} from './BaseEditor';
+import type {
   SceneEventsOutsideEditorChanges,
   InstancesOutsideEditorChanges,
   ObjectsOutsideEditorChanges,
   ObjectGroupsOutsideEditorChanges,
-} from './BaseEditor';
+} from '../../EditorFunctions/OutsideEditorChanges';
 import { type ObjectWithContext } from '../../ObjectsList/EnumerateObjects';
 import { type HotReloadSteps } from '../../EmbeddedGame/EmbeddedGameFrame';
 import TimelineEditor from '../../TimelineEditor';

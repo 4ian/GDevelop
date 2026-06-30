@@ -56,6 +56,7 @@ export type PreviewOptions = {|
   shouldGenerateScenesEventsCode: boolean,
   shouldReloadResources: boolean,
   shouldHardReload: boolean,
+  displayCollisionMask: boolean,
   fullLoadingScreen: boolean,
   fallbackAuthor: ?{ id: string, username: string },
   authenticatedPlayer: ?{

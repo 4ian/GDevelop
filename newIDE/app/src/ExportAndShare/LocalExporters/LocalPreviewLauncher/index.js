@@ -77,6 +77,7 @@ export default class LocalPreviewLauncher extends React.Component<
   State
 > {
   canDoNetworkPreview = (): any => true;
+  _onPreviewWindowClosed: ?(event: any) => Promise<void>;
 
   // $FlowFixMe[missing-local-annot]
   state = {
@@ -113,12 +114,19 @@ export default class LocalPreviewLauncher extends React.Component<
       captureOptions,
     });
 
-    ipcRenderer.removeAllListeners('preview-window-closed');
-    ipcRenderer.on('preview-window-closed', async event => {
+    if (this._onPreviewWindowClosed) {
+      ipcRenderer.removeListener(
+        'preview-window-closed',
+        this._onPreviewWindowClosed
+      );
+    }
+
+    this._onPreviewWindowClosed = async event => {
       if (captureOptions) {
         await this.props.onCaptureFinished(captureOptions);
       }
-    });
+    };
+    ipcRenderer.on('preview-window-closed', this._onPreviewWindowClosed);
   };
 
   closePreview = (windowId: number) => {
@@ -328,6 +336,9 @@ export default class LocalPreviewLauncher extends React.Component<
       );
     }
 
+    previewExportOptions.setDisplayCollisionMask(
+      previewOptions.displayCollisionMask
+    );
     previewExportOptions.setFullLoadingScreen(previewOptions.fullLoadingScreen);
     previewExportOptions.setGDevelopVersionWithHash(getIDEVersionWithHash());
     previewExportOptions.setCrashReportUploadLevel(

@@ -215,6 +215,9 @@ export default class BrowserSWPreviewLauncher extends React.Component<
       previewExportOptions.setFullLoadingScreen(
         previewOptions.fullLoadingScreen
       );
+      previewExportOptions.setDisplayCollisionMask(
+        previewOptions.displayCollisionMask
+      );
 
       previewExportOptions.setNativeMobileApp(isNativeMobileApp());
       previewExportOptions.setGDevelopVersionWithHash(getIDEVersionWithHash());

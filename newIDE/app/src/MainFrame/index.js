@@ -403,6 +403,8 @@ const initialPreviewState: PreviewState = {
   overridenPreviewExternalLayoutName: null,
 };
 
+type PreviewLaunchPhase = 'idle' | 'preparing' | 'launching';
+
 const usePreviewLoadingState = () => {
   const forceUpdate = useForceUpdate();
   const previewLoadingRef = React.useRef<
@@ -563,6 +565,10 @@ const MainFrame = (props: Props): React.MixedElement => {
   } = useAlertDialog();
   const { previewLoadingRef, setPreviewLoading } = usePreviewLoadingState();
   const previewLaunchInProgressRef = React.useRef<boolean>(false);
+  const previewLaunchIdRef = React.useRef<number>(0);
+  const activePreviewLaunchIdRef = React.useRef<?number>(null);
+  const cancelledPreviewLaunchIdsRef = React.useRef<Set<number>>(new Set());
+  const previewLaunchPhaseRef = React.useRef<PreviewLaunchPhase>('idle');
   const saveProjectRef = React.useRef<?(options?: {|
     skipNewVersionWarning: boolean,
   |}) => Promise<?FileMetadata>>(null);
@@ -622,6 +628,10 @@ const MainFrame = (props: Props): React.MixedElement => {
     [preferences, showConfirmation, setDiagnosticReportDialogOpen]
   );
   const [previewState, setPreviewState] = React.useState(initialPreviewState);
+  const [
+    displayCollisionMaskInPreview,
+    setDisplayCollisionMaskInPreview,
+  ] = React.useState<boolean>(false);
   const commandPaletteRef = React.useRef((null: ?CommandPaletteInterface));
   const inAppTutorialOrchestratorRef = React.useRef<?InAppTutorialOrchestratorInterface>(
     null
@@ -860,6 +870,77 @@ const MainFrame = (props: Props): React.MixedElement => {
     };
   }, []);
 
+  const isPreviewLaunchCancelled = React.useCallback(
+    (previewLaunchId: number) =>
+      activePreviewLaunchIdRef.current !== previewLaunchId ||
+      cancelledPreviewLaunchIdsRef.current.has(previewLaunchId),
+    []
+  );
+
+  const clearPreviewLoadingForLaunch = React.useCallback(
+    (previewLaunchId: number) => {
+      if (activePreviewLaunchIdRef.current !== previewLaunchId) return;
+      if (previewLoadingRef.current) {
+        setPreviewLoading(null);
+      }
+    },
+    [previewLoadingRef, setPreviewLoading]
+  );
+
+  const cancelPendingPreviewLaunchAfterWindowClosed = React.useCallback(
+    (reason: string) => {
+      const previewLaunchId = activePreviewLaunchIdRef.current;
+
+      if (previewLaunchId == null) {
+        if (previewLaunchInProgressRef.current) {
+          previewLaunchInProgressRef.current = false;
+          previewLaunchPhaseRef.current = 'idle';
+        }
+        if (previewLoadingRef.current) {
+          setPreviewLoading(null);
+        }
+        return;
+      }
+
+      cancelledPreviewLaunchIdsRef.current.add(previewLaunchId);
+      if (previewLoadingRef.current) {
+        setPreviewLoading(null);
+      }
+
+      if (previewLaunchPhaseRef.current === 'preparing') {
+        console.info(
+          `Cancelling preview launch #${previewLaunchId} because ${reason}.`
+        );
+        activePreviewLaunchIdRef.current = null;
+        previewLaunchInProgressRef.current = false;
+        previewLaunchPhaseRef.current = 'idle';
+      }
+    },
+    [previewLoadingRef, setPreviewLoading]
+  );
+
+  React.useEffect(
+    () => {
+      if (!ipcRenderer) return;
+
+      const onPreviewWindowClosed = () => {
+        if (!hasNonEditionPreviewsRunning) {
+          cancelPendingPreviewLaunchAfterWindowClosed(
+            'a preview window was closed'
+          );
+        }
+      };
+
+      ipcRenderer.on('preview-window-closed', onPreviewWindowClosed);
+      return () =>
+        ipcRenderer.removeListener(
+          'preview-window-closed',
+          onPreviewWindowClosed
+        );
+    },
+    [cancelPendingPreviewLaunchAfterWindowClosed, hasNonEditionPreviewsRunning]
+  );
+
   const getEditorOpeningOptions = React.useCallback(
     ({
       kind,
@@ -1060,6 +1141,9 @@ const MainFrame = (props: Props): React.MixedElement => {
       if (!ipcRenderer) return;
 
       const onDebuggerPopOutCloseRequested = () => {
+        cancelPendingPreviewLaunchAfterWindowClosed(
+          'the debugger window was closed'
+        );
         setState(prevState => {
           const debuggerTab = getEditorTabOpenedWithKey(
             prevState.editorTabs,
@@ -1089,7 +1173,12 @@ const MainFrame = (props: Props): React.MixedElement => {
           onDebuggerPopOutCloseRequested
         );
     },
-    [setState, forceRefreshProjectManagerList, healMainWindowAfterPopOutClose]
+    [
+      setState,
+      forceRefreshProjectManagerList,
+      healMainWindowAfterPopOutClose,
+      cancelPendingPreviewLaunchAfterWindowClosed,
+    ]
   );
 
   const {
@@ -2790,11 +2879,21 @@ const MainFrame = (props: Props): React.MixedElement => {
       }
 
       let previewProjectLoadedFromFile: ?gdProject = null;
+      const previewLaunchId = previewLaunchIdRef.current + 1;
+      previewLaunchIdRef.current = previewLaunchId;
+      activePreviewLaunchIdRef.current = previewLaunchId;
+      cancelledPreviewLaunchIdsRef.current.delete(previewLaunchId);
       previewLaunchInProgressRef.current = true;
+      previewLaunchPhaseRef.current = 'preparing';
       try {
-        if (
-          await checkDiagnosticErrorsAndIfShouldBlock(currentProject, 'preview')
-        ) {
+        const shouldBlockPreview = await checkDiagnosticErrorsAndIfShouldBlock(
+          currentProject,
+          'preview'
+        );
+        if (isPreviewLaunchCancelled(previewLaunchId)) {
+          return;
+        }
+        if (shouldBlockPreview) {
           return;
         }
 
@@ -2811,6 +2910,7 @@ const MainFrame = (props: Props): React.MixedElement => {
             shouldGenerateScenesEventsCode,
             shouldReloadResources,
             shouldHardReload,
+            displayCollisionMaskInPreview,
             fullLoadingScreen,
             forceDiagnosticReport,
             launchCaptureOptions,
@@ -2861,6 +2961,9 @@ const MainFrame = (props: Props): React.MixedElement => {
             );
           }
         }
+        if (isPreviewLaunchCancelled(previewLaunchId)) {
+          return;
+        }
 
         // Mark the preview as loading after the optional save. The
         // `previewLaunchInProgressRef` above prevents duplicate launches while
@@ -2876,6 +2979,12 @@ const MainFrame = (props: Props): React.MixedElement => {
           const loadedProject = await loadProjectFromSavedFileForPreview(
             savedFileMetadataForPreview
           );
+          if (isPreviewLaunchCancelled(previewLaunchId)) {
+            if (loadedProject) {
+              loadedProject.delete();
+            }
+            return;
+          }
           if (loadedProject) {
             if (loadedProject.getLayoutsCount() === 0) {
               console.warn(
@@ -2925,13 +3034,22 @@ const MainFrame = (props: Props): React.MixedElement => {
             ? null
             : createCaptureOptionsForPreview(launchCaptureOptions),
         ]);
+        if (isPreviewLaunchCancelled(previewLaunchId)) {
+          return;
+        }
 
         try {
           await eventsFunctionsExtensionsState.ensureLoadFinished();
+          if (isPreviewLaunchCancelled(previewLaunchId)) {
+            return;
+          }
           if (projectForPreview !== currentProject) {
             await eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(
               projectForPreview
             );
+            if (isPreviewLaunchCancelled(previewLaunchId)) {
+              return;
+            }
           }
 
           // Note that in the future, this kind of checks could be done
@@ -2946,6 +3064,7 @@ const MainFrame = (props: Props): React.MixedElement => {
               inAppTutorialOrchestratorRef.current.getPreviewMessage() ||
               inAppTutorialMessageInPreview;
           }
+          previewLaunchPhaseRef.current = 'launching';
           await previewLauncher.launchPreview({
             project: projectForPreview,
             sceneName: sceneName || projectForPreview.getLayoutAt(0).getName(),
@@ -2972,6 +3091,7 @@ const MainFrame = (props: Props): React.MixedElement => {
                 : shouldGenerateScenesEventsCode,
             shouldReloadResources: !!shouldReloadResources,
             shouldHardReload: !!shouldHardReload,
+            displayCollisionMask: displayCollisionMaskInPreview,
             fullLoadingScreen: !!fullLoadingScreen,
             fallbackAuthor,
             authenticatedPlayer,
@@ -2997,8 +3117,11 @@ const MainFrame = (props: Props): React.MixedElement => {
 
             previewWindows,
           });
+          if (isPreviewLaunchCancelled(previewLaunchId)) {
+            return;
+          }
 
-          setPreviewLoading(null);
+          clearPreviewLoadingForLaunch(previewLaunchId);
 
           if (!isForInGameEdition)
             sendPreviewStarted({
@@ -3031,7 +3154,7 @@ const MainFrame = (props: Props): React.MixedElement => {
             }
           }
         } catch (error) {
-          setPreviewLoading(null);
+          clearPreviewLoadingForLaunch(previewLaunchId);
           console.error(
             'Error caught while launching preview, this should never happen.',
             error
@@ -3041,16 +3164,17 @@ const MainFrame = (props: Props): React.MixedElement => {
         if (previewProjectLoadedFromFile) {
           previewProjectLoadedFromFile.delete();
         }
-        previewLaunchInProgressRef.current = false;
-        // Always clear the preview loader here, even if an exception was thrown
-        // (or an early return happened) after `setPreviewLoading('preview')` but
-        // outside the inner try/catch. Otherwise the LoaderModal's full-window
-        // backdrop stays mounted forever, blocking every click/input in the
-        // editor, and the guard at the top of this function would also block all
-        // future previews. This is the "can't click anything after running and
-        // closing a debug preview a few times" bug.
-        if (previewLoadingRef.current) {
-          setPreviewLoading(null);
+        cancelledPreviewLaunchIdsRef.current.delete(previewLaunchId);
+        if (activePreviewLaunchIdRef.current === previewLaunchId) {
+          activePreviewLaunchIdRef.current = null;
+          previewLaunchInProgressRef.current = false;
+          previewLaunchPhaseRef.current = 'idle';
+          // Always clear the preview loader here, even if an exception was
+          // thrown (or an early return happened) after `setPreviewLoading`.
+          // When a newer launch is active, this old launch must not touch it.
+          if (previewLoadingRef.current) {
+            setPreviewLoading(null);
+          }
         }
       }
     },
@@ -3062,6 +3186,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       previewState.previewLayoutName,
       previewState.overridenPreviewExternalLayoutName,
       previewState.previewExternalLayoutName,
+      displayCollisionMaskInPreview,
       autosaveProjectIfNeeded,
       loadProjectFromSavedFileForPreview,
       authenticatedUser.profile,
@@ -3078,6 +3203,8 @@ const MainFrame = (props: Props): React.MixedElement => {
       previewLoadingRef,
       setPreviewLoading,
       checkDiagnosticErrorsAndIfShouldBlock,
+      isPreviewLaunchCancelled,
+      clearPreviewLoadingForLaunch,
     ]
   );
 
@@ -6375,6 +6502,8 @@ const MainFrame = (props: Props): React.MixedElement => {
     launchHotReloadPreview: launchHotReloadPreview,
     launchPreviewWithDiagnosticReport: launchPreviewWithDiagnosticReport,
     setPreviewOverride: setPreviewOverride,
+    displayCollisionMaskInPreview,
+    setDisplayCollisionMaskInPreview,
     openVersionHistoryPanel: openVersionHistoryPanel,
     onQuitVersionHistory: onQuitVersionHistory,
     onOpenAskAi: openAskAi,

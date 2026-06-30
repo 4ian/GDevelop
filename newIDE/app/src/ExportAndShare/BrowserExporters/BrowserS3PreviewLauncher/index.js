@@ -165,6 +165,9 @@ export default class BrowserS3PreviewLauncher extends React.Component<
       previewExportOptions.setFullLoadingScreen(
         previewOptions.fullLoadingScreen
       );
+      previewExportOptions.setDisplayCollisionMask(
+        previewOptions.displayCollisionMask
+      );
 
       previewExportOptions.setNativeMobileApp(isNativeMobileApp());
       previewExportOptions.setGDevelopVersionWithHash(getIDEVersionWithHash());

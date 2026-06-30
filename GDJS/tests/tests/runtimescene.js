@@ -4,6 +4,24 @@
  */
 
 describe('gdjs.RuntimeScene integration tests', function () {
+  describe('Debug draw', function () {
+    it('should follow the project collision mask display setting', function () {
+      const runtimeGame = gdjs.getPixiRuntimeGame({
+        propertiesOverrides: { displayCollisionMask: true },
+      });
+      const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
+
+      expect(runtimeScene._debugDrawEnabled).to.be(true);
+    });
+
+    it('should not display collision masks by default', function () {
+      const runtimeGame = gdjs.getPixiRuntimeGame();
+      const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
+
+      expect(runtimeScene._debugDrawEnabled).to.be(false);
+    });
+  });
+
   describe('Object and behavior lifecycles (using TestObject and TestBehavior)', function () {
     it('should properly create and destroy object, including the behaviors', function () {
       const runtimeGame = gdjs.getPixiRuntimeGame();

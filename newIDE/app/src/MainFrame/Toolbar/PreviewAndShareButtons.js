@@ -20,6 +20,8 @@ export type PreviewAndShareButtonsProps = {|
   onNetworkPreview: () => Promise<void>,
   onHotReloadPreview: () => Promise<void>,
   onLaunchPreviewWithDiagnosticReport: () => Promise<void>,
+  displayCollisionMaskInPreview: boolean,
+  setDisplayCollisionMaskInPreview: boolean => void,
   setPreviewOverride: ({|
     isPreviewOverriden: boolean,
     overridenPreviewLayoutName: ?string,
@@ -40,6 +42,8 @@ const PreviewAndShareButtons: React.ComponentType<PreviewAndShareButtonsProps> =
     onOpenDebugger,
     onHotReloadPreview,
     onLaunchPreviewWithDiagnosticReport,
+    displayCollisionMaskInPreview,
+    setDisplayCollisionMaskInPreview,
     canDoNetworkPreview,
     isPreviewEnabled,
     hasPreviewsRunning,
@@ -99,6 +103,15 @@ const PreviewAndShareButtons: React.ComponentType<PreviewAndShareButtonsProps> =
               },
             ],
           },
+          {
+            type: 'checkbox',
+            label: i18n._(t`Display collision masks in previews`),
+            checked: displayCollisionMaskInPreview,
+            click: () =>
+              setDisplayCollisionMaskInPreview(
+                !displayCollisionMaskInPreview
+              ),
+          },
           { type: 'separator' },
           ...(previewState.overridenPreviewLayoutName
             ? [
@@ -156,6 +169,8 @@ const PreviewAndShareButtons: React.ComponentType<PreviewAndShareButtonsProps> =
         hasPreviewsRunning,
         preferences.values.openDiagnosticReportAutomatically,
         onLaunchPreviewWithDiagnosticReport,
+        displayCollisionMaskInPreview,
+        setDisplayCollisionMaskInPreview,
         previewState.overridenPreviewLayoutName,
         previewState.overridenPreviewExternalLayoutName,
         previewState.isPreviewOverriden,

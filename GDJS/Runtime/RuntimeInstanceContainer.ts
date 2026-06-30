@@ -69,6 +69,8 @@ namespace gdjs {
       this._objectsCtor = new Hashtable();
       this._layers = new Hashtable();
       this._orderedLayers = [];
+      const { displayCollisionMask } = runtimeGame.getGameData().properties;
+      this._debugDrawEnabled = !!displayCollisionMask;
       if (runtimeGame.isInGameEdition()) {
         // Register an UnknownRuntimeObject to use when the object doesn't exist.
         this.registerObject(unknownObjectData);

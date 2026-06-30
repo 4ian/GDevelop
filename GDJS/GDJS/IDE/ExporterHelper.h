@@ -43,6 +43,7 @@ struct PreviewExportOptions {
         useWindowMessageDebuggerClient(false),
         useMinimalDebuggerClient(false),
         nativeMobileApp(false),
+        displayCollisionMask(false),
         fullLoadingScreen(false),
         isDevelopmentEnvironment(false),
         isInGameEdition(false),
@@ -125,6 +126,14 @@ struct PreviewExportOptions {
    */
   PreviewExportOptions &SetNativeMobileApp(bool enable) {
     nativeMobileApp = enable;
+    return *this;
+  }
+
+  /**
+   * \brief Set if collision masks should be displayed in the preview.
+   */
+  PreviewExportOptions &SetDisplayCollisionMask(bool enable) {
+    displayCollisionMask = enable;
     return *this;
   }
 
@@ -390,6 +399,7 @@ struct PreviewExportOptions {
   gd::String inAppTutorialMessageInPreview;
   gd::String inAppTutorialMessagePositionInPreview;
   bool nativeMobileApp;
+  bool displayCollisionMask;
   std::map<gd::String, int> includeFileHashes;
   bool shouldClearExportFolder = true;
   bool shouldReloadProjectData = true;
@@ -494,7 +504,8 @@ class ExporterHelper {
   static gd::String ExportProjectData(
       gd::AbstractFileSystem &fs, gd::Project &project, gd::String filename,
       const gd::SerializerElement &runtimeGameOptions, bool isInGameEdition,
-      const std::vector<gd::InGameEditorResourceMetadata> &inGameEditorResources);
+      const std::vector<gd::InGameEditorResourceMetadata> &inGameEditorResources,
+      bool displayCollisionMask = false);
 
   /**
    * \brief Serialize a project without its events to JSON

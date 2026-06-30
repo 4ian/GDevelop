@@ -3762,6 +3762,110 @@ describe('libGD.js', function () {
       project.delete();
       fs.delete();
     });
+
+    it('should serialize collision mask display for preview', function () {
+      const fs = new gd.AbstractFileSystemJS();
+      const project = gd.ProjectHelper.createNewGDJSProject();
+      const projectDataElement = new gd.SerializerElement();
+      fs.getTempDir = function () {
+        return '/tmp/';
+      };
+      fs.dirNameFrom = function (fullpath) {
+        return path.dirname(fullpath);
+      };
+      fs.fileNameFrom = function (fullpath) {
+        return path.basename(fullpath);
+      };
+      fs.readDir = function () {
+        return new gd.VectorString();
+      };
+      const exporter = new gd.Exporter(fs, 'fake-gdjs-root');
+      const previewExportOptions = new gd.PreviewExportOptions(
+        project,
+        '/path/for/export/'
+      );
+      previewExportOptions.setDisplayCollisionMask(true);
+
+      exporter.serializeProjectData(
+        project,
+        previewExportOptions,
+        projectDataElement
+      );
+      const projectData = JSON.parse(gd.Serializer.toJSON(projectDataElement));
+      expect(projectData.properties.displayCollisionMask).toBe(true);
+
+      previewExportOptions.delete();
+      exporter.delete();
+      projectDataElement.delete();
+      project.delete();
+      fs.delete();
+    });
+
+    it('should export collision mask display in preview project data', function () {
+      const fs = new gd.AbstractFileSystemJS();
+      const project = gd.ProjectHelper.createNewGDJSProject();
+      project.insertNewLayout('Scene', 0);
+      let exportedProjectData = null;
+
+      fs.mkDir = fs.clearDir = function () {};
+      fs.dirExists = fs.fileExists = function () {
+        return false;
+      };
+      fs.getTempDir = function () {
+        return '/tmp/';
+      };
+      fs.dirNameFrom = function (fullpath) {
+        return path.dirname(fullpath);
+      };
+      fs.fileNameFrom = function (fullpath) {
+        return path.basename(fullpath);
+      };
+      fs.makeAbsolute = function (filePath, baseDirectory) {
+        return path.isAbsolute(filePath)
+          ? filePath
+          : path.join(baseDirectory, filePath);
+      };
+      fs.makeRelative = function (filePath, baseDirectory) {
+        return path.relative(baseDirectory, filePath);
+      };
+      fs.isAbsolute = function (filePath) {
+        return path.isAbsolute(filePath);
+      };
+      fs.copyFile = function () {
+        return true;
+      };
+      fs.readFile = function () {
+        return '';
+      };
+      fs.readDir = function () {
+        return new gd.VectorString();
+      };
+      fs.writeToFile = function (filePath, content) {
+        if (filePath.endsWith('data.js')) {
+          const projectDataPrefix = 'gdjs.projectData = ';
+          const runtimeOptionsPrefix = ';\ngdjs.runtimeGameOptions = ';
+          const projectDataEnd = content.indexOf(runtimeOptionsPrefix);
+          exportedProjectData = JSON.parse(
+            content.substring(projectDataPrefix.length, projectDataEnd)
+          );
+        }
+        return true;
+      };
+      const exporter = new gd.Exporter(fs, 'fake-gdjs-root');
+      const previewExportOptions = new gd.PreviewExportOptions(
+        project,
+        '/path/for/export/'
+      );
+      previewExportOptions.setDisplayCollisionMask(true);
+
+      exporter.exportProjectForPixiPreview(previewExportOptions);
+      expect(exportedProjectData.properties.displayCollisionMask).toBe(true);
+
+      previewExportOptions.delete();
+      exporter.delete();
+      project.delete();
+      fs.delete();
+    });
   });
 
   describe('gd.EventsRemover', function () {

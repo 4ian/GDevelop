@@ -311,7 +311,7 @@ bool ExporterHelper::ExportProjectForPixiPreview(
                                                     includesFiles, runtimeGameOptions);
     ExportProjectData(fs, exportedProject, codeOutputDir + "/data.js",
                       runtimeGameOptions, options.isInGameEdition,
-                      inGameEditorResources);
+                      inGameEditorResources, options.displayCollisionMask);
 
     previousTime = LogTimeSpent("Project data export", previousTime);
   }
@@ -347,13 +347,18 @@ bool ExporterHelper::ExportProjectForPixiPreview(
 gd::String ExporterHelper::ExportProjectData(
     gd::AbstractFileSystem &fs, gd::Project &project, gd::String filename,
     const gd::SerializerElement &runtimeGameOptions, bool isInGameEdition,
-    const std::vector<gd::InGameEditorResourceMetadata> &inGameEditorResources) {
+    const std::vector<gd::InGameEditorResourceMetadata> &inGameEditorResources,
+    bool displayCollisionMask) {
   fs.MkDir(fs.DirNameFrom(filename));
 
   gd::SerializerElement projectDataElement;
   ExporterHelper::StripAndSerializeProjectData(project, projectDataElement,
                                                 isInGameEdition,
                                                 inGameEditorResources);
+  if (displayCollisionMask) {
+    projectDataElement.GetChild("properties")
+        .SetAttribute("displayCollisionMask", true);
+  }
 
   // Save the project to JSON
   gd::String output =
@@ -558,6 +563,10 @@ void ExporterHelper::SerializeProjectData(gd::AbstractFileSystem &fs,
   ExporterHelper::StripAndSerializeProjectData(clonedProject, rootElement,
                                                 options.isInGameEdition,
                                                 inGameEditorResources);
+  if (options.displayCollisionMask) {
+    rootElement.GetChild("properties")
+        .SetAttribute("displayCollisionMask", true);
+  }
 }
 
 void ExporterHelper::StripAndSerializeProjectData(

@@ -524,6 +524,20 @@ namespace gdjs {
         currentScene.getName(),
         () => {}
       );
+      const wasDisplayCollisionMaskEnabled =
+        !!oldProjectData.properties.displayCollisionMask;
+      const isDisplayCollisionMaskEnabled =
+        !!newProjectData.properties.displayCollisionMask;
+      if (wasDisplayCollisionMaskEnabled !== isDisplayCollisionMaskEnabled) {
+        sceneStack._stack.forEach((runtimeScene) => {
+          runtimeScene.enableDebugDraw(
+            isDisplayCollisionMaskEnabled,
+            false,
+            false,
+            false
+          );
+        });
+      }
       this._hotReloadVariablesContainer(
         oldProjectData.variables,
         newProjectData.variables,

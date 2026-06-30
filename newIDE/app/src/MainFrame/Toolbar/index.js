@@ -167,6 +167,12 @@ export default (React.forwardRef<MainFrameToolbarProps, ToolbarInterface>(
                 onLaunchPreviewWithDiagnosticReport={
                   props.onLaunchPreviewWithDiagnosticReport
                 }
+                displayCollisionMaskInPreview={
+                  props.displayCollisionMaskInPreview
+                }
+                setDisplayCollisionMaskInPreview={
+                  props.setDisplayCollisionMaskInPreview
+                }
                 setPreviewOverride={props.setPreviewOverride}
                 canDoNetworkPreview={props.canDoNetworkPreview}
                 isPreviewEnabled={props.isPreviewEnabled}

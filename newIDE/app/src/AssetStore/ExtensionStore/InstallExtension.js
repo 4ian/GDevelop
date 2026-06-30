@@ -4,6 +4,7 @@ import * as React from 'react';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
 import {
   getExtension,
+  getExtensionsRegistry,
   type ExtensionShortHeader,
   type BehaviorShortHeader,
   type SerializedExtension,
@@ -42,6 +43,35 @@ export type RequiredExtensionInstallation = {|
   safeToUpdateExtensions: Array<ExtensionShortHeader>,
   isGDevelopUpdateNeeded: boolean,
 |};
+
+// Returns the given registry if already loaded, otherwise fetches it directly
+// (with retry) so callers can tell a network issue apart from a missing extension.
+export const ensureExtensionsRegistryLoaded = async (extensionShortHeadersByName: {
+  [name: string]: ExtensionShortHeader,
+}): Promise<{ [name: string]: ExtensionShortHeader }> => {
+  if (Object.keys(extensionShortHeadersByName).length > 0) {
+    return extensionShortHeadersByName;
+  }
+
+  let extensionsRegistry;
+  try {
+    extensionsRegistry = await retryIfFailed({ times: 3 }, () =>
+      getExtensionsRegistry()
+    );
+  } catch (error) {
+    throw new Error(
+      `The extension registry could not be loaded (${
+        error.message
+      }). This is likely a temporary network issue - try again.`
+    );
+  }
+
+  const freshHeadersByName: { [name: string]: ExtensionShortHeader } = {};
+  extensionsRegistry.headers.forEach(header => {
+    freshHeadersByName[header.name] = header;
+  });
+  return freshHeadersByName;
+};
 
 export const getExtensionHeader = (
   extensionShortHeadersByName: {

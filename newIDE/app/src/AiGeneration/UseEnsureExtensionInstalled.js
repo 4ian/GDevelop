@@ -7,12 +7,9 @@ import {
   checkRequiredExtensionsUpdate,
   getRequiredExtensions,
   getExtensionHeader,
+  ensureExtensionsRegistryLoaded,
 } from '../AssetStore/ExtensionStore/InstallExtension';
-import {
-  getExtensionsRegistry,
-  type ExtensionShortHeader,
-} from '../Utils/GDevelopServices/Extension';
-import { retryIfFailed } from '../Utils/RetryIfFailed';
+import { type ExtensionShortHeader } from '../Utils/GDevelopServices/Extension';
 
 export type EnsureExtensionInstalledOptions = {|
   extensionName: string,
@@ -47,34 +44,12 @@ export const useEnsureExtensionInstalled = ({
         if (project.getCurrentPlatform().isExtensionLoaded(extensionName))
           return;
 
-        // If the registry was never loaded in this session, fetch it directly
-        // so we can tell a network issue apart from a missing extension.
-        let extensionShortHeadersByNameToUse = extensionShortHeadersByName;
-        const isRegistryLoaded =
-          Object.keys(extensionShortHeadersByNameToUse).length > 0;
-        if (!isRegistryLoaded) {
-          fetchExtensionsAndFilters();
-
-          let extensionsRegistry;
-          try {
-            extensionsRegistry = await retryIfFailed({ times: 3 }, () =>
-              getExtensionsRegistry()
-            );
-          } catch (error) {
-            throw new Error(
-              `The extension registry could not be loaded (${
-                error.message
-              }). This is likely a temporary network issue - try again.`
-            );
-          }
-          const freshHeadersByName: {
-            [name: string]: ExtensionShortHeader,
-          } = {};
-          extensionsRegistry.headers.forEach(header => {
-            freshHeadersByName[header.name] = header;
-          });
-          extensionShortHeadersByNameToUse = freshHeadersByName;
-        }
+        // Warm the context for following installs, and get a loaded registry
+        // (fetched directly if it was never loaded in this session).
+        fetchExtensionsAndFilters();
+        const extensionShortHeadersByNameToUse = await ensureExtensionsRegistryLoaded(
+          extensionShortHeadersByName
+        );
 
         if (!extensionShortHeadersByNameToUse[extensionName]) {
           throw new Error(

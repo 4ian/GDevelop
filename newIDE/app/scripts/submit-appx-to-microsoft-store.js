@@ -174,7 +174,13 @@ const sleep = timeInMs => new Promise(resolve => setTimeout(resolve, timeInMs));
 
   const api = axios.create({
     baseURL: `${submissionApiBaseUrl}/applications/${applicationId}`,
-    headers: { Authorization: `Bearer ${accessToken}` },
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      // The Ingestion API only accepts JSON, including for requests with an
+      // empty body (POST to create or commit a submission), for which axios
+      // would otherwise not set any Content-Type.
+      'Content-Type': 'application/json',
+    },
   });
 
   // Check if there is already a pending (in progress) submission, as the API

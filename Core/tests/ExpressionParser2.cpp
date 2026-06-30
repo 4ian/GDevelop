@@ -2212,7 +2212,9 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       gd::ExpressionValidator validator(platform, projectScopedContainers, "variable");
       node->Visit(validator);
       REQUIRE(validator.GetFatalErrors().size() == 0);
-      REQUIRE(validator.GetAllErrors().size() == 0);
+      REQUIRE(validator.GetAllErrors().size() == 1);
+      REQUIRE(validator.GetAllErrors()[0]->GetMessage() ==
+              "No child variable with this name found.");
     }
   }
 

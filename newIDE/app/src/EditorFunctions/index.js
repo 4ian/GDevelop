@@ -5477,9 +5477,25 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
           changed_group,
           'delete_this_group'
         );
+        // Two ways to change a group's membership:
+        // - Incrementally (preferred): `objects_to_add` / `objects_to_remove`
+        //   only list the objects that change. This is far less error prone for
+        //   an AI agent, which no longer has to restate the whole group.
+        // - Legacy (for older tool versions): `objects` is the full, exhaustive
+        //   list the group must end up matching.
+        // Only one of the two shapes is used: if the incremental fields are
+        // provided, `objects` is ignored.
         const objects = SafeExtractor.extractArrayProperty(
           changed_group,
           'objects'
+        );
+        const objectsToAdd = SafeExtractor.extractArrayProperty(
+          changed_group,
+          'objects_to_add'
+        );
+        const objectsToRemove = SafeExtractor.extractArrayProperty(
+          changed_group,
+          'objects_to_remove'
         );
         if (groupName === null) {
           warnings.push(
@@ -5515,21 +5531,72 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
               `Renamed group "${groupName}" to "${newGroupName}" in scene "${scene_name}".`
             );
           }
-          if (objects) {
-            const newObjectNames = objects
-              .map(object =>
-                SafeExtractor.extractStringProperty(object, 'object_name')
+
+          const extractObjectNames = (
+            objectsArray: Array<mixed>
+          ): Array<string> =>
+            Array.from(
+              new Set(
+                objectsArray
+                  .map(object =>
+                    SafeExtractor.extractStringProperty(object, 'object_name')
+                  )
+                  .filter(Boolean)
               )
-              .filter(Boolean);
-            // Remove objects that are not in the list, and add new objects.
+            );
+
+          const usesIncremental =
+            objectsToAdd !== null || objectsToRemove !== null;
+          const usesLegacy = objects !== null;
+
+          if (usesIncremental || usesLegacy) {
+            if (usesIncremental && usesLegacy) {
+              warnings.push(
+                `Group "${groupName}": "objects" was ignored because "objects_to_add"/"objects_to_remove" were also provided.`
+              );
+            }
+
             const currentObjectNames = foundGroup
               .getAllObjectsNames()
               .toJSArray();
-            currentObjectNames.forEach(objectName => {
-              if (!newObjectNames.includes(objectName)) {
-                foundGroup.removeObject(objectName);
-              }
+
+            // Resolve the names to remove first, then the names to add (relative
+            // to what remains), whichever shape was used.
+            let namesToRemove: Array<string>;
+            let namesToAdd: Array<string>;
+            if (usesIncremental) {
+              const removeNames = objectsToRemove
+                ? extractObjectNames(objectsToRemove)
+                : [];
+              const addNames = objectsToAdd
+                ? extractObjectNames(objectsToAdd)
+                : [];
+              namesToRemove = currentObjectNames.filter(name =>
+                removeNames.includes(name)
+              );
+              const remainingNames = currentObjectNames.filter(
+                name => !removeNames.includes(name)
+              );
+              namesToAdd = addNames.filter(
+                name => !remainingNames.includes(name)
+              );
+            } else {
+              // Legacy: the group must end up matching `objects` exactly.
+              const newObjectNames = extractObjectNames(objects || []);
+              namesToRemove = currentObjectNames.filter(
+                name => !newObjectNames.includes(name)
+              );
+              namesToAdd = newObjectNames.filter(
+                name => !currentObjectNames.includes(name)
+              );
+            }
+
+            // Remove first, so the shared variables/behaviors captured below
+            // reflect the group after removals (and before additions).
+            namesToRemove.forEach(objectName => {
+              foundGroup.removeObject(objectName);
             });
+
             const globalObjects = project.getObjects();
             const sceneObjects = scene.getObjects();
 
@@ -5556,39 +5623,50 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
               existingGroupObjects
             );
 
-            newObjectNames.forEach(objectName => {
-              if (!currentObjectNames.includes(objectName)) {
-                const object = getObjectByName(
-                  globalObjects,
-                  sceneObjects,
-                  objectName
+            namesToAdd.forEach(objectName => {
+              const object = getObjectByName(
+                globalObjects,
+                sceneObjects,
+                objectName
+              );
+              if (object) {
+                foundGroup.addObject(objectName);
+                // Give the newly added object the variables and behaviors
+                // shared in common by the group, if it does not have them yet.
+                gd.ObjectRefactorer.fillMissingGroupVariablesToObject(
+                  object,
+                  groupVariablesContainer
                 );
-                if (object) {
-                  foundGroup.addObject(objectName);
-                  // Give the newly added object the variables and behaviors
-                  // shared in common by the group, if it does not have them yet.
-                  gd.ObjectRefactorer.fillMissingGroupVariablesToObject(
+                for (const behaviorName of groupVisibleBehaviorNames) {
+                  gd.ObjectRefactorer.fillMissingGroupBehaviorToObject(
+                    globalObjects,
+                    sceneObjects,
                     object,
-                    groupVariablesContainer
-                  );
-                  for (const behaviorName of groupVisibleBehaviorNames) {
-                    gd.ObjectRefactorer.fillMissingGroupBehaviorToObject(
-                      globalObjects,
-                      sceneObjects,
-                      object,
-                      foundGroup,
-                      behaviorName
-                    );
-                  }
-                } else {
-                  warnings.push(
-                    `Object "${objectName}" not found in scene "${scene_name}", so it was not added to group "${groupName}".`
+                    foundGroup,
+                    behaviorName
                   );
                 }
+              } else {
+                warnings.push(
+                  `Object "${objectName}" not found in scene "${scene_name}", so it was not added to group "${groupName}".`
+                );
               }
             });
+
+            // Echo the resulting content of the group, so the caller (and the
+            // orchestrator) can see and verify the new state instead of a blind
+            // "Modified objects" confirmation.
+            const finalObjectNames = foundGroup
+              .getAllObjectsNames()
+              .toJSArray();
             changes.push(
-              `Modified objects of group "${groupName}" in scene "${scene_name}".`
+              `Group "${groupName}" in scene "${scene_name}" now contains ${
+                finalObjectNames.length
+              } object(s): ${
+                finalObjectNames.length > 0
+                  ? finalObjectNames.join(', ')
+                  : '(none)'
+              }.`
             );
           }
         }

@@ -23,6 +23,10 @@ import {
   SetupExportHeader,
   ExportFlow,
 } from '../GenericExporters/OnlineElectronExport';
+import {
+  applyElectronWindowOptionsToExportOptions,
+  getElectronWindowOptionsFromProjectEvents,
+} from '../GenericExporters/ElectronExport';
 import { downloadUrlsToLocalFiles } from '../../Utils/LocalFileDownloader';
 
 const path = optionalRequire('path');
@@ -120,6 +124,10 @@ export const localOnlineElectronExportPipeline: ExportPipeline<
       temporaryOutputDir
     );
     exportOptions.setTarget('electron');
+    applyElectronWindowOptionsToExportOptions(
+      exportOptions,
+      getElectronWindowOptionsFromProjectEvents(context.project)
+    );
     if (fallbackAuthor) {
       exportOptions.setFallbackAuthor(
         fallbackAuthor.id,

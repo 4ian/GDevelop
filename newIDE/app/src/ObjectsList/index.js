@@ -432,6 +432,7 @@ const objectTypeToDefaultName = {
   'Scene3D::Model3DObject': 'New3DModel',
   'Scene3D::Cube3DObject': 'New3DBox',
   'SpineObject::SpineObject': 'NewSpine',
+  'Spine43Object::Spine43Object': 'NewSpine',
   'Video::VideoObject': 'NewVideo',
 };
 

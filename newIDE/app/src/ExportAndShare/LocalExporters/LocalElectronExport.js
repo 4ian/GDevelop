@@ -15,9 +15,15 @@ import {
   type ExportPipelineContext,
 } from '../ExportPipeline.flow';
 import {
+  type ElectronWindowOptions,
   ExplanationHeader,
   DoneFooter,
   ExportFlow,
+  getDefaultElectronWindowOptions,
+  ElectronWindowOptionsEditor,
+  applyElectronWindowOptionsToExportOptions,
+  getElectronWindowOptionsFromProjectEvents,
+  mergeElectronWindowOptions,
 } from '../GenericExporters/ElectronExport';
 import { downloadUrlsToLocalFiles } from '../../Utils/LocalFileDownloader';
 // It's important to use remote and not electron for folder actions,
@@ -28,9 +34,10 @@ const shell = remote ? remote.shell : null;
 
 const gd: libGDevelop = global.gd;
 
-type ExportState = {
+type ExportState = {|
   outputDir: string,
-};
+  electronWindowOptions: ElectronWindowOptions,
+|};
 
 type PreparedExporter = {|
   exporter: gdjsExporter,
@@ -59,13 +66,20 @@ export const localElectronExportPipeline: ExportPipeline<
 
   getInitialExportState: (project: gdProject) => ({
     outputDir: project.getLastCompilationDirectory(),
+    electronWindowOptions: getDefaultElectronWindowOptions(),
   }),
 
   canLaunchBuild: exportState => !!exportState.outputDir,
 
   isNavigationDisabled: () => false,
 
-  renderHeader: ({ project, exportState, updateExportState, exportStep }) =>
+  renderHeader: ({
+    project,
+    exportState,
+    updateExportState,
+    exportStep,
+    isExporting,
+  }) =>
     exportStep !== 'done' ? (
       <Column noMargin expand>
         <Line>
@@ -79,10 +93,25 @@ export const localElectronExportPipeline: ExportPipeline<
             value={exportState.outputDir}
             defaultPath={project.getLastCompilationDirectory()}
             onChange={outputDir => {
-              updateExportState(() => ({ outputDir }));
+              updateExportState(prevExportState => ({
+                ...prevExportState,
+                outputDir,
+              }));
               project.setLastCompilationDirectory(outputDir);
             }}
             fullWidth
+          />
+        </Line>
+        <Line>
+          <ElectronWindowOptionsEditor
+            electronWindowOptions={exportState.electronWindowOptions}
+            onChange={electronWindowOptions => {
+              updateExportState(prevExportState => ({
+                ...prevExportState,
+                electronWindowOptions,
+              }));
+            }}
+            disabled={isExporting}
           />
         </Line>
       </Column>
@@ -125,6 +154,14 @@ export const localElectronExportPipeline: ExportPipeline<
       context.exportState.outputDir
     );
     exportOptions.setTarget('electron');
+    const electronWindowOptions = mergeElectronWindowOptions(
+      context.exportState.electronWindowOptions,
+      getElectronWindowOptionsFromProjectEvents(context.project)
+    );
+    applyElectronWindowOptionsToExportOptions(
+      exportOptions,
+      electronWindowOptions
+    );
     if (fallbackAuthor) {
       exportOptions.setFallbackAuthor(
         fallbackAuthor.id,

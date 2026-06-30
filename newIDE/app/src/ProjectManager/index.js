@@ -67,6 +67,18 @@ import {
   type ExternalLayoutTreeViewItemProps,
   type ExternalLayoutTreeViewItemCallbacks,
 } from './ExternalLayoutTreeViewItemContent';
+import {
+  TimelineTreeViewItemContent,
+  getTimelineTreeViewItemId,
+  type TimelineTreeViewItemProps,
+  type TimelineTreeViewItemCallbacks,
+} from './TimelineTreeViewItemContent';
+import {
+  createDefaultTimeline,
+  getTimelines,
+  makeTimelineName,
+  saveTimelines,
+} from '../TimelineEditor/TimelineProjectStorage';
 import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
 import { type ShowConfirmDeleteDialogOptions } from '../UI/Alert/AlertContext';
@@ -98,6 +110,9 @@ const gameDashboardItemId = 'manage';
 const globalVariablesItemId = getProjectManagerItemId('global-variables');
 const gameResourcesItemId = getProjectManagerItemId('game-resources');
 export const scenesRootFolderId: string = getProjectManagerItemId('scenes');
+export const timelinesRootFolderId: string = getProjectManagerItemId(
+  'timelines'
+);
 export const extensionsRootFolderId: string = getProjectManagerItemId(
   'extensions'
 );
@@ -109,6 +124,7 @@ export const externalLayoutsRootFolderId: string = getProjectManagerItemId(
 );
 
 const scenesEmptyPlaceholderId = 'scenes-placeholder';
+const timelinesEmptyPlaceholderId = 'timelines-placeholder';
 const extensionsEmptyPlaceholderId = 'extensions-placeholder';
 const externalEventsEmptyPlaceholderId = 'external-events-placeholder';
 const externalLayoutEmptyPlaceholderId = 'external-layout-placeholder';
@@ -421,6 +437,7 @@ type Props = {|
   ...ExtensionTreeViewItemCallbacks,
   ...ExternalEventsTreeViewItemCallbacks,
   ...ExternalLayoutTreeViewItemCallbacks,
+  ...TimelineTreeViewItemCallbacks,
   onOpenResources: () => void,
   onReloadEventsFunctionsExtensions: () => void,
   isOpen: boolean,
@@ -464,6 +481,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       onOpenExternalEvents,
       onOpenExternalLayout,
       onOpenEventsFunctionsExtension,
+      onOpenTimeline,
       onOpenResources,
       onReloadEventsFunctionsExtensions,
       isOpen,
@@ -682,6 +700,37 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         editName(sceneItemId);
       },
       [project, onProjectItemModified, editName, scrollToItem, onSceneAdded]
+    );
+
+    const addTimeline = React.useCallback(
+      (index: number, i18n: I18nType) => {
+        if (!project) return;
+
+        const timeline = createDefaultTimeline(
+          makeTimelineName(project, i18n._(t`Untitled timeline`))
+        );
+        const timelines = getTimelines(project);
+        const nextTimelines = timelines.slice();
+        nextTimelines.splice(index + 1, 0, timeline);
+        saveTimelines(project, nextTimelines);
+
+        onProjectItemModified();
+
+        const timelineItemId = getTimelineTreeViewItemId(timeline);
+        if (treeViewRef.current) {
+          treeViewRef.current.openItems([
+            timelineItemId,
+            timelinesRootFolderId,
+          ]);
+        }
+        setTimeout(() => {
+          scrollToItem(timelineItemId);
+        }, 100);
+
+        editName(timelineItemId);
+        onOpenTimeline(timeline.id);
+      },
+      [project, onProjectItemModified, editName, scrollToItem, onOpenTimeline]
     );
 
     const onCreateNewExtension = React.useCallback(
@@ -926,6 +975,36 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       ]
     );
 
+    const timelineTreeViewItemProps = React.useMemo<?TimelineTreeViewItemProps>(
+      () =>
+        project
+          ? {
+              project,
+              unsavedChanges,
+              preferences,
+              gdevelopTheme,
+              forceUpdate,
+              forceUpdateList,
+              showDeleteConfirmation,
+              editName,
+              scrollToItem,
+              onOpenTimeline,
+            }
+          : null,
+      [
+        project,
+        unsavedChanges,
+        preferences,
+        gdevelopTheme,
+        forceUpdate,
+        forceUpdateList,
+        showDeleteConfirmation,
+        editName,
+        scrollToItem,
+        onOpenTimeline,
+      ]
+    );
+
     const extensionTreeViewItemProps = React.useMemo<?ExtensionTreeViewItemProps>(
       () =>
         project
@@ -1038,6 +1117,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       (i18n: I18nType): Array<TreeViewItem> => {
         return !project ||
           !sceneTreeViewItemProps ||
+          !timelineTreeViewItemProps ||
           !extensionTreeViewItemProps ||
           !externalEventsTreeViewItemProps ||
           !externalLayoutTreeViewItemProps
@@ -1119,6 +1199,42 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                         new SceneTreeViewItemContent(
                           project.getLayoutAt(i),
                           sceneTreeViewItemProps
+                        )
+                      )
+                  );
+                },
+              },
+              {
+                isRoot: true,
+                content: new LabelTreeViewItemContent(
+                  timelinesRootFolderId,
+                  i18n._(t`Timelines`),
+                  {
+                    icon: <Add />,
+                    label: i18n._(t`Add a timeline`),
+                    click: () => {
+                      const timelines = getTimelines(project);
+                      addTimeline(timelines.length - 1, i18n);
+                    },
+                    id: 'add-new-timeline-button',
+                  }
+                ),
+                getChildren(i18n: I18nType): ?Array<TreeViewItem> {
+                  const timelines = getTimelines(project);
+                  if (timelines.length === 0) {
+                    return [
+                      new PlaceHolderTreeViewItem(
+                        timelinesEmptyPlaceholderId,
+                        i18n._(t`Start by adding a new timeline.`)
+                      ),
+                    ];
+                  }
+                  return timelines.map(
+                    timeline =>
+                      new LeafTreeViewItem(
+                        new TimelineTreeViewItemContent(
+                          timeline,
+                          timelineTreeViewItemProps
                         )
                       )
                   );
@@ -1237,6 +1353,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
             ];
       },
       [
+        addTimeline,
         addExternalEvents,
         addExternalLayout,
         addNewScene,
@@ -1250,6 +1367,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         openSearchExtensionDialog,
         project,
         sceneTreeViewItemProps,
+        timelineTreeViewItemProps,
       ]
     );
 
@@ -1306,6 +1424,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
     const initiallyOpenedNodeIds = [
       gameSettingsRootFolderId,
       scenesRootFolderId,
+      timelinesRootFolderId,
       extensionsRootFolderId,
       externalEventsRootFolderId,
       externalLayoutsRootFolderId,

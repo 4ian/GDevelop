@@ -40,6 +40,7 @@ import { useSearchAndInstallResource } from './UseSearchAndInstallResource';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import { AiRequestContext } from './AiRequestContext';
 import { ObjectStoreContext } from '../AssetStore/ObjectStoreContext';
+import { ExtensionStoreContext } from '../AssetStore/ExtensionStore/ExtensionStoreContext';
 import { enumerateObjectTypes } from '../ObjectsList/EnumerateObjects';
 
 import { delay } from '../Utils/Delay';
@@ -296,6 +297,7 @@ export const useProcessFunctionCalls = ({
   const { translatedObjectShortHeadersByType, fetchObjects } = React.useContext(
     ObjectStoreContext
   );
+  const { fetchExtensionsAndFilters } = React.useContext(ExtensionStoreContext);
 
   // Latest map of all AI requests, kept in a ref so the (heavily-memoized)
   // onProcessFunctionCalls callback can look up a sub-agent's parent at edit
@@ -307,8 +309,10 @@ export const useProcessFunctionCalls = ({
   React.useEffect(
     () => {
       fetchObjects();
+      // Warm the extension registry so AI-triggered installs don't fail.
+      fetchExtensionsAndFilters();
     },
-    [fetchObjects]
+    [fetchObjects, fetchExtensionsAndFilters]
   );
   const getAssetStoreTagForNewObject = React.useCallback(
     (objectType: string): string | null => {

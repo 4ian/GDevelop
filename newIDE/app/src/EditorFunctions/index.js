@@ -1106,7 +1106,7 @@ const createOrReplaceObject: EditorFunction = {
             error
           );
           return makeGenericFailure(
-            `Could not install extension "${extensionName}" - try a different object type?`
+            `Could not install extension "${extensionName}": ${error.message}`
           );
         }
       }
@@ -2031,7 +2031,7 @@ const addBehavior: EditorFunction = {
           error
         );
         return makeGenericFailure(
-          `Could not install extension "${extensionName}" - try a different behavior type?`
+          `Could not install extension "${extensionName}": ${error.message}`
         );
       }
     }

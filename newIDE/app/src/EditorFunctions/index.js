@@ -38,6 +38,7 @@ import {
   type SimplifiedVariable,
   getSimplifiedVariable,
   getSimplifiedVariablesContainer,
+  getVariableTypeAsString,
 } from './SimplifiedProject/SimplifiedProject';
 import { ColumnStackLayout } from '../UI/Layout';
 import Text from '../UI/Text';
@@ -5602,6 +5603,7 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
               existingGroupObjects
             );
 
+            const addedObjectNames = [];
             namesToAdd.forEach(objectName => {
               const object = getObjectByName(
                 globalObjects,
@@ -5610,6 +5612,7 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
               );
               if (object) {
                 foundGroup.addObject(objectName);
+                addedObjectNames.push(objectName);
                 // Give the newly added object the variables and behaviors
                 // shared in common by the group, if it does not have them yet.
                 gd.ObjectRefactorer.fillMissingGroupVariablesToObject(
@@ -5644,6 +5647,62 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
                   : '(none)'
               }.`
             );
+
+            // Explain the variables and behaviors that were given to the newly
+            // added objects, so it is clear they now share the ones the group
+            // has in common (a group is the "intersection" of its objects).
+            if (addedObjectNames.length > 0) {
+              const sharedVariableDescriptions = mapFor(
+                0,
+                groupVariablesContainer.count(),
+                index =>
+                  `"${groupVariablesContainer.getNameAt(
+                    index
+                  )}" (${getVariableTypeAsString(
+                    gd,
+                    groupVariablesContainer.getAt(index)
+                  )})`
+              );
+              const sharedBehaviorDescriptions = groupVisibleBehaviorNames.map(
+                behaviorName => {
+                  const behaviorType =
+                    existingGroupObjects.length > 0
+                      ? existingGroupObjects[0]
+                          .getBehavior(behaviorName)
+                          .getTypeName()
+                      : null;
+                  return behaviorType
+                    ? `"${behaviorName}" (${behaviorType})`
+                    : `"${behaviorName}"`;
+                }
+              );
+
+              if (
+                sharedVariableDescriptions.length > 0 ||
+                sharedBehaviorDescriptions.length > 0
+              ) {
+                const sharedParts = [];
+                if (sharedBehaviorDescriptions.length > 0) {
+                  sharedParts.push(
+                    `behavior(s) ${sharedBehaviorDescriptions.join(', ')}`
+                  );
+                }
+                if (sharedVariableDescriptions.length > 0) {
+                  sharedParts.push(
+                    `variable(s) ${sharedVariableDescriptions.join(', ')}`
+                  );
+                }
+                changes.push(
+                  `Object(s) ${addedObjectNames
+                    .map(name => `"${name}"`)
+                    .join(
+                      ', '
+                    )} newly added to group "${groupName}" now have the ${sharedParts.join(
+                    ' and '
+                  )} that the rest of the group has in common (a group is the "intersection" of its objects), added to them if they did not already have them.`
+                );
+              }
+            }
           }
         }
       });

@@ -210,15 +210,22 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
   }
   void OnVisitVariableNode(VariableNode& node) override {
     ReportAnyError(node);
+    rootVariableName = "";
 
     if (parentType == Type::Variable ||
         parentType == Type::VariableOrProperty ||
         parentType == Type::VariableOrPropertyOrParameter) {
       childType = parentType;
 
-      CheckVariableExistence(node.location, node.name, node.child != nullptr);
+      bool isRootVariableDeclared = CheckVariableExistence(
+          node.location, node.name, node.child != nullptr);
       if (node.child) {
+        if (isRootVariableDeclared) {
+          rootVariableName = node.name;
+          rootVariableLocation = node.nameLocation;
+        }
         node.child->Visit(*this);
+        rootVariableName = "";
       }
     } else if (parentType == Type::LegacyVariable) {
       childType = parentType;
@@ -246,6 +253,8 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
           forbidsUsageOfBracketsBecauseParentIsObject = true;
         }, [&]() {
           // This is a variable.
+          rootVariableName = node.name;
+          rootVariableLocation = node.nameLocation;
         }, [&]() {
           // This is a property.
           // Being in this node implies that there is at least a child - which is not supported for properties.
@@ -281,11 +290,16 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
     ReportAnyError(node);
     // TODO Also check child-variables existence on a path with only VariableAccessor to raise non-fatal errors.
     if (!variableObjectName.empty()) {
-      ValidateObjectVariableOrVariableOrProperty(variableObjectName,
-                                                 variableObjectNameLocation,
-                                                 node.name, node.nameLocation);
+      ValidateObjectVariableOrVariableOrProperty(
+          variableObjectName, variableObjectNameLocation, node.name,
+          node.nameLocation, !node.child);
       variableObjectName = "";
+    } else if (!rootVariableName.empty()) {
+      ValidateObjectVariableOrVariableOrProperty(
+          rootVariableName, rootVariableLocation, node.name, node.nameLocation,
+          !node.child);
     }
+    rootVariableName = "";
     // In the case we accessed an object variable (`MyObject.MyVariable`),
     // brackets can now be used (`MyObject.MyVariable["MyChildVariable"]` is now valid).
     forbidsUsageOfBracketsBecauseParentIsObject = false;
@@ -298,6 +312,7 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
       VariableBracketAccessorNode& node) override {
     ReportAnyError(node);
 
+    rootVariableName = "";
     variableObjectName = "";
     if (forbidsUsageOfBracketsBecauseParentIsObject) {
       RaiseError(gd::ExpressionParserError::ErrorType::BracketsNotAllowedForObjects,
@@ -350,7 +365,14 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
     } else if (parentType == Type::Variable ||
                parentType == Type::VariableOrProperty ||
                parentType == Type::VariableOrPropertyOrParameter) {
-      CheckVariableExistence(node.location, node.identifierName, !node.childIdentifierName.empty());
+      bool isRootVariableDeclared =
+          CheckVariableExistence(node.location, node.identifierName,
+                                 !node.childIdentifierName.empty());
+      if (isRootVariableDeclared && !node.childIdentifierName.empty()) {
+        ValidateObjectVariableOrVariableOrProperty(
+            node.identifierName, node.identifierNameLocation,
+            node.childIdentifierName, node.childIdentifierNameLocation, false);
+      }
     } else if (parentType != Type::Object &&
                parentType != Type::LegacyVariable) {
       // It can't happen.
@@ -407,12 +429,14 @@ private:
       const gd::String &identifierName,
       const gd::ExpressionParserLocation identifierNameLocation,
       const gd::String &childIdentifierName,
-      const gd::ExpressionParserLocation childIdentifierNameLocation);
+      const gd::ExpressionParserLocation childIdentifierNameLocation,
+      const bool hasChild);
 
-  void CheckVariableExistence(const ExpressionParserLocation &location,
+  bool CheckVariableExistence(const ExpressionParserLocation &location,
                               const gd::String &name, bool hasChild) {
     if (!currentParameterExtraInfo ||
         *currentParameterExtraInfo != "AllowUndeclaredVariable") {
+      bool isRootVariableDeclared = false;
       projectScopedContainers.MatchIdentifierWithName<void>(
           name,
           [&]() {
@@ -424,6 +448,7 @@ private:
           },
           [&]() {
             // This is a variable.
+            isRootVariableDeclared = true;
           },
           [&]() {
             // This is a property.
@@ -456,7 +481,9 @@ private:
                 _("No variable with this name found."), location,
                 name);
           });
+    return isRootVariableDeclared;
     }
+    return false;
   }
 
   void ReportAnyError(const ExpressionNode& node, bool isFatal = true) {
@@ -569,6 +596,8 @@ private:
   bool forbidsUsageOfBracketsBecauseParentIsObject;
   gd::String variableObjectName;
   gd::ExpressionParserLocation variableObjectNameLocation;
+  gd::String rootVariableName;
+  gd::ExpressionParserLocation rootVariableLocation;
   const gd::String *currentParameterExtraInfo;
   const gd::Platform &platform;
   const gd::ProjectScopedContainers &projectScopedContainers;

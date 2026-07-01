@@ -1023,6 +1023,193 @@ describe('editorFunctions', () => {
     });
   });
 
+  describe('change_object_properties_effects (object effects)', () => {
+    let project: gdProject;
+    let testScene: gdLayout;
+
+    beforeEach(() => {
+      makeTestExtensions(gd);
+      // $FlowFixMe[invalid-constructor]
+      project = new gd.ProjectHelper.createNewGDJSProject();
+      testScene = project.insertNewLayout('TestScene', 0);
+      const testSceneObjects = testScene.getObjects();
+      testSceneObjects.insertNewObject(
+        project,
+        'Sprite',
+        'MySprite',
+        testSceneObjects.getObjectsCount()
+      );
+    });
+
+    afterEach(() => {
+      project.delete();
+    });
+
+    it('creates a new effect on the object (not on any layer) and reports it with a single message', async () => {
+      const result = await editorFunctions.change_object_properties_effects.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'MySprite',
+            changed_effects: [
+              {
+                effect_name: 'MySepia',
+                effect_type: 'FakeSepia',
+                changed_properties: [
+                  { property_name: 'opacity', new_value: '0.5' },
+                ],
+              },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).toContain('Created new "MySepia" effect');
+      expect(result.message).not.toContain('Modified "opacity"');
+
+      const object = testScene.getObjects().getObject('MySprite');
+      const effectsContainer = object.getEffects();
+      expect(effectsContainer.getEffectsCount()).toBe(1);
+      expect(
+        effectsContainer.getEffect('MySepia').getDoubleParameter('opacity')
+      ).toBe(0.5);
+
+      // The base layer must not have received the effect.
+      expect(
+        testScene
+          .getLayers()
+          .getLayer('')
+          .getEffects()
+          .getEffectsCount()
+      ).toBe(0);
+    });
+
+    it('updates and deletes existing object effects', async () => {
+      await editorFunctions.change_object_properties_effects.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          object_name: 'MySprite',
+          changed_effects: [
+            { effect_name: 'ToRemove', effect_type: 'FakeSepia' },
+            { effect_name: 'ToKeep', effect_type: 'FakeNight' },
+          ],
+        },
+      });
+
+      const result = await editorFunctions.change_object_properties_effects.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'MySprite',
+            changed_effects: [
+              { effect_name: 'ToRemove', delete_this_effect: true },
+              {
+                effect_name: 'ToKeep',
+                changed_properties: [
+                  { property_name: 'intensity', new_value: '0.3' },
+                ],
+              },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).toContain(
+        'Removed "ToRemove" effect on object "MySprite".'
+      );
+      expect(result.message).toContain(
+        'Modified "intensity" property of the "ToKeep" effect to "0.3".'
+      );
+
+      const effectsContainer = testScene
+        .getObjects()
+        .getObject('MySprite')
+        .getEffects();
+      expect(effectsContainer.hasEffectNamed('ToRemove')).toBe(false);
+      expect(effectsContainer.hasEffectNamed('ToKeep')).toBe(true);
+    });
+
+    it('changes properties and effects together in a single call', async () => {
+      const result = await editorFunctions.change_object_properties_effects.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'MySprite',
+            changed_properties: [
+              { property_name: 'name', new_value: 'MySprite' },
+            ],
+            changed_effects: [
+              { effect_name: 'MyNight', effect_type: 'FakeNight' },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).toContain('already named "MySprite"');
+      expect(result.message).toContain('Created new "MyNight" effect');
+
+      const effectsContainer = testScene
+        .getObjects()
+        .getObject('MySprite')
+        .getEffects();
+      expect(effectsContainer.hasEffectNamed('MyNight')).toBe(true);
+    });
+  });
+
+  describe('inspect_object_properties_effects (object effects)', () => {
+    let project: gdProject;
+    let testScene: gdLayout;
+
+    beforeEach(() => {
+      makeTestExtensions(gd);
+      // $FlowFixMe[invalid-constructor]
+      project = new gd.ProjectHelper.createNewGDJSProject();
+      testScene = project.insertNewLayout('TestScene', 0);
+      const testSceneObjects = testScene.getObjects();
+      const object = testSceneObjects.insertNewObject(
+        project,
+        'Sprite',
+        'MySprite',
+        testSceneObjects.getObjectsCount()
+      );
+      const effect = object.getEffects().insertNewEffect('MySepia', 0);
+      effect.setEffectType('FakeSepia');
+      effect.setDoubleParameter('opacity', 0.7);
+    });
+
+    afterEach(() => {
+      project.delete();
+    });
+
+    it('returns the object properties as well as its own effects', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.inspect_object_properties_effects.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'MySprite',
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.properties).toBeTruthy();
+      expect(result.effects).toEqual([
+        expect.objectContaining({
+          effectName: 'MySepia',
+          effectType: 'FakeSepia',
+        }),
+      ]);
+    });
+  });
+
   describe('change_behavior_property', () => {
     let project: gdProject;
     let testScene: gdLayout;

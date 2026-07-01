@@ -3,6 +3,7 @@ import { fakeAssetShortHeader1 } from '../fixtures/GDevelopServicesTestData';
 import { PixiResourcesLoaderMock } from '../fixtures/TestPixiResourcesLoader';
 import {
   editorFunctions,
+  noEventsInSceneText,
   type EditorFunctionGenericOutput,
   type LaunchFunctionOptionsWithProject,
 } from './index';
@@ -1121,6 +1122,30 @@ describe('editorFunctions', () => {
       expect(behaviorProperties.get('IgnoreDefaultControls').getValue()).toBe(
         'false'
       );
+    });
+  });
+
+  describe('read_scene_events', () => {
+    let project: gdProject;
+
+    beforeEach(() => {
+      // $FlowFixMe[invalid-constructor]
+      project = new gd.ProjectHelper.createNewGDJSProject();
+      project.insertNewLayout('TestScene', 0);
+    });
+
+    afterEach(() => {
+      project.delete();
+    });
+
+    it('returns a placeholder when the scene has no events', async () => {
+      const result = await editorFunctions.read_scene_events.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: { scene_name: 'TestScene' },
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.eventsAsText).toBe(noEventsInSceneText);
     });
   });
 

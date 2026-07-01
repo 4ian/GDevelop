@@ -4115,6 +4115,8 @@ const put3dInstances: EditorFunction = {
   modifiesProject: true,
 };
 
+export const noEventsInSceneText = 'This scene has no events.';
+
 /**
  * Retrieves the event sheet structure for a scene
  */
@@ -4173,7 +4175,8 @@ const readSceneEvents: EditorFunction = {
     return {
       success: true,
       eventsForSceneNamed: scene_name,
-      eventsAsText,
+      // Disambiguate a genuinely empty scene from a failed/empty read.
+      eventsAsText: eventsAsText || noEventsInSceneText,
       // Surface partial failures so the cause is reported, not dropped.
       ...(renderingErrors.length
         ? { eventsRenderingErrors: renderingErrors }

@@ -28,6 +28,7 @@ import FlatButton from '../../UI/FlatButton';
 import ShareExternal from '../../UI/CustomSvgIcons/ShareExternal';
 import { Accordion, AccordionHeader, AccordionBody } from '../../UI/Accordion';
 import { buildDetectedErrorsConfig } from './BuildDetectedErrors';
+import AlertMessage from '../../UI/AlertMessage';
 
 const buildTypesConfig = {
   'cordova-build': {
@@ -205,8 +206,14 @@ const BuildProgressAndActions = ({
     <I18n>
       {({ i18n }) =>
         build.status === 'error' ? (
-          knownDetectedErrors.length > 0 ? (
-            <ColumnStackLayout expand noMargin>
+          <ColumnStackLayout expand noMargin>
+            <AlertMessage kind="error">
+              <Trans>
+                Something wrong happened :( Check the logs to see if there is an
+                explanation about what went wrong, or try again later.
+              </Trans>
+            </AlertMessage>
+            {knownDetectedErrors.length > 0 && (
               <Accordion defaultExpanded noMargin>
                 <AccordionHeader>
                   <Text noMargin>
@@ -218,8 +225,12 @@ const BuildProgressAndActions = ({
                     {knownDetectedErrors.map((detectedError, index) => {
                       const { code, helpUrl } = detectedError;
                       return (
-                        <Column key={`${code}-${index}`} noMargin expand>
-                          <Text noMargin>
+                        <ColumnStackLayout
+                          key={`${code}-${index}`}
+                          noMargin
+                          expand
+                        >
+                          <Text noMargin allowSelection>
                             {buildDetectedErrorsConfig[code].message}
                           </Text>
                           {helpUrl && (
@@ -230,46 +241,21 @@ const BuildProgressAndActions = ({
                               />
                             </Line>
                           )}
-                        </Column>
+                        </ColumnStackLayout>
                       );
                     })}
                   </ColumnStackLayout>
                 </AccordionBody>
               </Accordion>
-              <Line noMargin justifyContent="flex-end">
-                <RaisedButton
-                  primary
-                  label={<Trans>Download log files</Trans>}
-                  onClick={() => onDownload('logsKey')}
-                />
-              </Line>
-            </ColumnStackLayout>
-          ) : (
-            <ResponsiveLineStackLayout
-              alignItems="center"
-              justifyContent="space-between"
-              expand
-            >
-              <Column noMargin>
-                <Text noMargin>
-                  <Trans>Something wrong happened :(</Trans>
-                </Text>
-                <EmptyMessage
-                  style={{ justifyContent: 'flex-start', padding: 0 }}
-                >
-                  <Trans>
-                    Check the logs to see if there is an explanation about what
-                    went wrong, or try again later.
-                  </Trans>
-                </EmptyMessage>
-              </Column>
+            )}
+            <Line noMargin justifyContent="flex-end">
               <RaisedButton
                 primary
                 label={<Trans>Download log files</Trans>}
                 onClick={() => onDownload('logsKey')}
               />
-            </ResponsiveLineStackLayout>
-          )
+            </Line>
+          </ColumnStackLayout>
         ) : build.status === 'pending' ? (
           <>
             <Line alignItems="center" expand justifyContent="center">

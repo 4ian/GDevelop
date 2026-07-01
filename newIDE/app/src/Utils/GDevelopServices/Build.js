@@ -26,6 +26,14 @@ export type BuildType =
   | 'electron-build'
   | 'web-build';
 
+export type BuildDetectedError = {|
+  // A machine-readable code identifying the error. The human-readable message
+  // is resolved on the frontend from this code (see BuildDetectedErrors.js).
+  code: string,
+  // An optional page url giving more information about the error.
+  helpUrl?: string,
+|};
+
 export type Build = {
   id: string,
   gameId?: string, // not defined for old builds.
@@ -52,14 +60,6 @@ export type Build = {
   // size). Empty or undefined when nothing known was detected.
   detectedErrors?: Array<BuildDetectedError>,
 };
-
-export type BuildDetectedError = {|
-  // A machine-readable code identifying the error. The human-readable message
-  // is resolved on the frontend from this code (see BuildDetectedErrors.js).
-  code: string,
-  // An optional page url giving more information about the error.
-  helpUrl?: string,
-|};
 
 export type BuildArtifactKeyName =
   | 'apkKey'

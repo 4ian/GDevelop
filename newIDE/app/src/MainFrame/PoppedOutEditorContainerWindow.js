@@ -32,6 +32,7 @@ type Props = {|
   editorTab: EditorTab,
   onClose: (editorTab: EditorTab) => void,
   onPopIn: (editorTab: EditorTab) => void,
+  focusRequestId: number,
 |};
 
 const getPopOutDimensions = (
@@ -122,6 +123,7 @@ const PoppedOutEditorContainerWindow = (props: Props): React.Node => {
       initialWidth={popOutWidth}
       initialHeight={popOutHeight}
       onWindowReady={onWindowReady}
+      focusRequestId={props.focusRequestId}
       renderContent={({ windowSize }) => (
         <SpecificDimensionsWindowSizeProvider
           innerWidth={windowSize.width}

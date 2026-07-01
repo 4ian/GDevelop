@@ -494,7 +494,8 @@ gd::String EventsCodeGenerator::GenerateBehaviorEventsFunctionContext(
                                        objectArraysMap,
                                        behaviorNamesMap,
                                        thisObjectName,
-                                       thisBehaviorName);
+                                       thisBehaviorName,
+                                       "this.getBehaviorVariables()");
 }
 
 gd::String EventsCodeGenerator::GenerateObjectEventsFunctionContext(
@@ -551,7 +552,8 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionContext(
     gd::String& objectArraysMap,
     gd::String& behaviorNamesMap,
     const gd::String& thisObjectName,
-    const gd::String& thisBehaviorName) {
+    const gd::String& thisBehaviorName,
+    const gd::String& behaviorVariablesAccessor) {
   const auto& extensionName = eventsFunctionsExtension.GetName();
   const auto& parameters =
       eventsFunction.GetParametersForEvents(eventsFunctionsContainer);
@@ -633,6 +635,9 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionContext(
          "  sceneVariablesForExtension: "
          "runtimeScene.getScene().getVariablesForExtension(" +
          ConvertToStringExplicit(extensionName) + "),\n" +
+         (behaviorVariablesAccessor.empty()
+              ? ""
+              : "  behaviorVariables: " + behaviorVariablesAccessor + ",\n") +
          // The local variables stack:
          "  localVariables: [],\n"
          // Function that will be used to query objects, when a new object list
@@ -1450,6 +1455,9 @@ gd::String EventsCodeGenerator::GenerateGetVariable(
       variables = &variablesContainer;
       output =
           "eventsFunctionContext.getObjects(\"Object\")[0].getPrefabVariables()";
+    } else if (sourceType == gd::VariablesContainer::SourceType::Behavior) {
+      variables = &variablesContainer;
+      output = "eventsFunctionContext.behaviorVariables";
     } else if (sourceType == gd::VariablesContainer::SourceType::Properties) {
       const auto& propertiesContainersList =
           GetProjectScopedContainers().GetPropertiesContainersList();

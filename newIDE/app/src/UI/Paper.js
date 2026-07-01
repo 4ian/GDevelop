@@ -15,6 +15,10 @@ type Props = {|
   background: 'light' | 'medium' | 'dark',
   style?: Object,
   square?: boolean,
+  tabIndex?: number,
+  role?: string,
+  'aria-label'?: string,
+  onMouseDown?: (event: SyntheticMouseEvent<HTMLDivElement>) => void,
 |};
 
 export const getBackgroundColor = (
@@ -31,7 +35,22 @@ const Paper: React.ComponentType<{
   ...Props,
   +ref?: React.RefSetter<HTMLDivElement>,
 }> = React.forwardRef<Props, HTMLDivElement>(
-  ({ id, children, background, elevation, variant, style, square }, ref) => {
+  (
+    {
+      id,
+      children,
+      background,
+      elevation,
+      variant,
+      style,
+      square,
+      tabIndex,
+      role,
+      'aria-label': ariaLabel,
+      onMouseDown,
+    },
+    ref
+  ) => {
     const gdevelopTheme = React.useContext(GDevelopThemeContext);
     const backgroundColor = getBackgroundColor(gdevelopTheme, background);
     return (
@@ -45,6 +64,10 @@ const Paper: React.ComponentType<{
           ...style,
         }}
         square={!!square}
+        tabIndex={tabIndex}
+        role={role}
+        aria-label={ariaLabel}
+        onMouseDown={onMouseDown}
       >
         {children}
       </MuiPaper>

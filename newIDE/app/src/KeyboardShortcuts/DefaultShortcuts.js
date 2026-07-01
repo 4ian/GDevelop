@@ -21,6 +21,7 @@ const defaultShortcuts: ShortcutMap = {
   EXPORT_GAME: 'CmdOrCtrl+Shift+KeyE',
   INVITE_COLLABORATORS: 'CmdOrCtrl+Shift+KeyI',
   OPEN_RECENT_PROJECT: '',
+  OPEN_RECENT_EDITOR: 'CmdOrCtrl+KeyE',
   OPEN_COMMAND_PALETTE: 'CmdOrCtrl+KeyP',
 
   OPEN_PROJECT_PROPERTIES: '',

@@ -138,7 +138,9 @@ const gameShareItemId = getProjectManagerItemId('game-share');
 const globalsRootFolderId = getProjectManagerItemId('globals');
 const globalVariablesItemId = getProjectManagerItemId('global-variables');
 const globalConfigItemId = getProjectManagerItemId('global-config');
-const globalObjectsItemId = getProjectManagerItemId('global-objects');
+export const globalObjectsItemId: string = getProjectManagerItemId(
+  'global-objects'
+);
 export const scenesRootFolderId: string = getProjectManagerItemId('scenes');
 export const customObjectsRootFolderId: string = getProjectManagerItemId(
   'custom-objects'
@@ -668,6 +670,7 @@ export type ProjectManagerInterface = {|
   forceUpdateList: () => void,
   focusSearchBar: () => void,
   selectAndScrollToItemFromId: (itemId: string) => void,
+  activateItemFromId: (itemId: string) => void,
 |};
 
 type Props = {|
@@ -959,22 +962,15 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
 
     const searchBarRef = React.useRef<?CompactSearchBarInterface>(null);
 
-    React.useImperativeHandle(ref, () => ({
-      forceUpdateList: () => {
-        forceUpdate();
-        if (treeViewRef.current) treeViewRef.current.forceUpdateList();
-      },
-      focusSearchBar: () => {
-        if (searchBarRef.current) searchBarRef.current.focus();
-      },
-      selectAndScrollToItemFromId: (itemId: string) => {
+    const selectAndScrollToItemFromId = React.useCallback(
+      (itemId: string): ?TreeViewItem => {
         const i18n = i18nRef.current;
         const getTreeViewData = getTreeViewDataRef.current;
         const treeView = treeViewRef.current;
-        if (!i18n || !getTreeViewData || !treeView) return;
+        if (!i18n || !getTreeViewData || !treeView) return null;
 
         const found = findTreeViewItemById(getTreeViewData(i18n), itemId, i18n);
-        if (!found) return;
+        if (!found) return null;
 
         // Open ancestor folders so the item is visible, then select and scroll
         // to it. Selecting the actual item (not just the id) keeps keyboard
@@ -989,6 +985,24 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
             treeViewRef.current.scrollToItemFromId(itemId, 'smart');
           }
         }, 100);
+
+        return found.item;
+      },
+      []
+    );
+
+    React.useImperativeHandle(ref, () => ({
+      forceUpdateList: () => {
+        forceUpdate();
+        if (treeViewRef.current) treeViewRef.current.forceUpdateList();
+      },
+      focusSearchBar: () => {
+        if (searchBarRef.current) searchBarRef.current.focus();
+      },
+      selectAndScrollToItemFromId,
+      activateItemFromId: (itemId: string) => {
+        const item = selectAndScrollToItemFromId(itemId);
+        if (item) item.content.onClick();
       },
     }));
 

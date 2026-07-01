@@ -67,6 +67,8 @@ type Props = {|
   initialHeight: number,
   /** Called when the external window is ready (or null when closing). */
   onWindowReady: (externalWindow: any) => void,
+  /** Incremented by a parent that wants to bring this window to the front. */
+  focusRequestId?: number,
 |};
 
 /**
@@ -89,6 +91,7 @@ const WindowPortal = ({
   initialWidth,
   initialHeight,
   onWindowReady,
+  focusRequestId,
 }: Props): React.Node => {
   const [container, setContainer] = React.useState<HTMLDivElement | null>(null);
   const externalWindowRef = React.useRef<any>(null);
@@ -325,6 +328,22 @@ const WindowPortal = ({
       }
     },
     [title]
+  );
+
+  React.useEffect(
+    () => {
+      if (!focusRequestId) return;
+
+      const externalWindow = externalWindowRef.current;
+      if (!externalWindow || isWindowClosed(externalWindow)) return;
+
+      try {
+        externalWindow.focus();
+      } catch (error) {
+        // Ignore focus failures from browser popup policies or closing windows.
+      }
+    },
+    [focusRequestId]
   );
 
   if (!container) return null;

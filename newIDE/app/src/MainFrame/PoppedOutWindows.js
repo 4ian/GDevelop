@@ -11,10 +11,11 @@ type Props = {|
   ...EditorTabsPaneCommonProps,
   onClose: (editorTab: EditorTab) => void,
   onPopIn: (editorTab: EditorTab) => void,
+  focusRequest: {| editorKey: ?string, requestId: number |},
 |};
 
 const PoppedOutWindows = (props: Props): React.Node => {
-  const { onClose, onPopIn, ...sharedProps } = props;
+  const { onClose, onPopIn, focusRequest, ...sharedProps } = props;
   const externalEditors = getExternalEditors(props.editorTabs);
 
   if (externalEditors.length === 0) return null;
@@ -27,6 +28,11 @@ const PoppedOutWindows = (props: Props): React.Node => {
           editorTab={editorTab}
           onClose={onClose}
           onPopIn={onPopIn}
+          focusRequestId={
+            focusRequest.editorKey === editorTab.key
+              ? focusRequest.requestId
+              : 0
+          }
           {...sharedProps}
         />
       ))}

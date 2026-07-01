@@ -67,6 +67,7 @@ type CommandHandlers = {|
   onOpenExternalLayout: string => void,
   onOpenEventsFunctionsExtension: string => void,
   onOpenCommandPalette: () => void,
+  onOpenRecentEditorSwitcher: () => void,
   onOpenProfile: () => void,
   onRestartInGameEditor: (reason: string) => void,
   onOpenGlobalSearch: () => void,
@@ -170,6 +171,10 @@ const useMainFrameCommands = (handlers: CommandHandlers) => {
 
   useCommand('OPEN_COMMAND_PALETTE', true, {
     handler: handlers.onOpenCommandPalette,
+  });
+
+  useCommand('OPEN_RECENT_EDITOR', true, {
+    handler: handlers.onOpenRecentEditorSwitcher,
   });
 
   useCommand('OPEN_GLOBAL_SEARCH', !!handlers.project, {

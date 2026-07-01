@@ -22,6 +22,7 @@ export type CommandName =
   | 'EXPORT_HTML5_EXTERNAL'
   | 'INVITE_COLLABORATORS'
   | 'OPEN_RECENT_PROJECT'
+  | 'OPEN_RECENT_EDITOR'
   | 'OPEN_COMMAND_PALETTE'
   | 'RESTART_IN_GAME_EDITOR'
   | 'OPEN_PROJECT_PROPERTIES'
@@ -177,6 +178,11 @@ const commandsList: { [CommandName]: CommandMetadata } = {
   OPEN_RECENT_PROJECT: {
     area: 'GENERAL',
     displayText: t`Open recent project...`,
+  },
+  OPEN_RECENT_EDITOR: {
+    area: 'IDE',
+    displayText: t`Open recent editors`,
+    ghost: true,
   },
   OPEN_COMMAND_PALETTE: {
     area: 'IDE',

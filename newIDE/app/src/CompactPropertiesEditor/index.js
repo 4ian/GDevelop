@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react';
-import { Trans } from '@lingui/macro';
 import SelectOption from '../UI/SelectOption';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import {
@@ -96,25 +95,6 @@ const styles = {
 const hasGlobalConfigPlaceholderSyntax = (value: any): boolean =>
   typeof value === 'string' &&
   (value.indexOf('{{') !== -1 || value.indexOf('}}') !== -1);
-
-const getGlobalConfigPlaceholderErrorText = (
-  field: ValueField,
-  value: any
-): React.Node => {
-  if (
-    !field.forbidGlobalConfigPlaceholder ||
-    !hasGlobalConfigPlaceholderSyntax(value)
-  ) {
-    return null;
-  }
-
-  return (
-    <Trans>
-      Global config placeholders can only be edited from the object editor
-      window.
-    </Trans>
-  );
-};
 
 export const Separator = (): React.MixedElement => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
@@ -465,7 +445,6 @@ const CompactPropertiesEditor = ({
           disabled: getDisabled({ instances, field }),
           renderEndAdornmentOnHover:
             getFieldEndAdornmentIcon({ instances, field }) || undefined,
-          errorText: getGlobalConfigPlaceholderErrorText(field, value),
           onClickEndAdornment: () => {
             if (!onClickEndAdornment) return;
             instances.forEach(i => onClickEndAdornment(i));

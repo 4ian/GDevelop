@@ -41,6 +41,7 @@ export enum VariablesContainer_SourceType {
   Parameters = 7,
   Properties = 8,
   Prefab = 9,
+  Behavior = 10,
 }
 
 export enum ObjectsContainer_SourceType {
@@ -2529,6 +2530,7 @@ export class EventsBasedBehavior extends AbstractEventsBasedEntity {
   setQuickCustomizationVisibility(visibility: QuickCustomization_Visibility): EventsBasedBehavior;
   getQuickCustomizationVisibility(): QuickCustomization_Visibility;
   getSharedPropertyDescriptors(): PropertiesContainer;
+  getVariables(): VariablesContainer;
   static getPropertyActionName(propertyName: string): string;
   static getPropertyConditionName(propertyName: string): string;
   static getPropertyExpressionName(propertyName: string): string;

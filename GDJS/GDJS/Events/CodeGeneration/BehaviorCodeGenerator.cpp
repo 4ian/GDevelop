@@ -8,6 +8,8 @@
 #include "EventsCodeGenerator.h"
 #include "GDCore/Project/EventsBasedBehavior.h"
 #include "GDCore/Project/EventsFunctionsExtension.h"
+#include "GDCore/Serialization/Serializer.h"
+#include "GDCore/Serialization/SerializerElement.h"
 
 namespace gdjs {
 
@@ -191,6 +193,7 @@ gd::String BehaviorCodeGenerator::GenerateRuntimeBehaviorCompleteCode(
       eventsFunctionsExtension.GetName(),
       eventsBasedBehavior,
       codeNamespace,
+      [&]() { return GenerateInitializeVariablesCode(eventsBasedBehavior); },
       generateInitializePropertiesCode,
       generatePropertiesCode,
       generateInitializeSharedPropertiesCode,
@@ -205,6 +208,7 @@ gd::String BehaviorCodeGenerator::GenerateRuntimeBehaviorTemplateCode(
     const gd::String& extensionName,
     const gd::EventsBasedBehavior& eventsBasedBehavior,
     const gd::String& codeNamespace,
+    std::function<gd::String()> generateInitializeVariablesCode,
     std::function<gd::String()> generateInitializePropertiesCode,
     std::function<gd::String()> generatePropertiesCode,
     std::function<gd::String()> generateInitializeSharedPropertiesCode,
@@ -226,6 +230,7 @@ CODE_NAMESPACE.RUNTIME_BEHAVIOR_CLASSNAME = class RUNTIME_BEHAVIOR_CLASSNAME ext
 
     this._onceTriggers = new gdjs.OnceTriggers();
     this._behaviorData = {};
+    this._behaviorVariables = new gdjs.VariablesContainer(BEHAVIOR_VARIABLES_DATA);
     this._sharedData = CODE_NAMESPACE.RUNTIME_BEHAVIOR_CLASSNAME.getSharedData(
       instanceContainer,
       behaviorData.name
@@ -256,6 +261,10 @@ CODE_NAMESPACE.RUNTIME_BEHAVIOR_CLASSNAME = class RUNTIME_BEHAVIOR_CLASSNAME ext
 
   // Properties:
   PROPERTIES_CODE
+
+  getBehaviorVariables() {
+    return this._behaviorVariables;
+  }
 }
 
 /**
@@ -295,6 +304,8 @@ gdjs.registerBehavior("EXTENSION_NAME::BEHAVIOR_NAME", CODE_NAMESPACE.RUNTIME_BE
       .FindAndReplace("RUNTIME_BEHAVIOR_CLASSNAME",
                       eventsBasedBehavior.GetName())
       .FindAndReplace("CODE_NAMESPACE", codeNamespace)
+      .FindAndReplace("BEHAVIOR_VARIABLES_DATA",
+                      generateInitializeVariablesCode())
       .FindAndReplace("INITIALIZE_SHARED_PROPERTIES_CODE",
                       generateInitializeSharedPropertiesCode())
       .FindAndReplace("INITIALIZE_PROPERTIES_CODE",
@@ -310,6 +321,13 @@ gdjs.registerBehavior("EXTENSION_NAME::BEHAVIOR_NAME", CODE_NAMESPACE.RUNTIME_BE
       .FindAndReplace("PROPERTIES_CODE", generatePropertiesCode())
       .FindAndReplace("METHODS_CODE", generateMethodsCode());
   ;
+}
+
+gd::String BehaviorCodeGenerator::GenerateInitializeVariablesCode(
+    const gd::EventsBasedBehavior& eventsBasedBehavior) {
+  gd::SerializerElement variablesElement;
+  eventsBasedBehavior.GetVariables().SerializeTo(variablesElement);
+  return gd::Serializer::ToJSON(variablesElement);
 }
 
 gd::String BehaviorCodeGenerator::GenerateInitializePropertyFromDataCode(

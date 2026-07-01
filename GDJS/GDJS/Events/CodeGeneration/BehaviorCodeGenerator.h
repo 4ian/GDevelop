@@ -116,6 +116,7 @@ class BehaviorCodeGenerator {
       const gd::String& extensionName,
       const gd::EventsBasedBehavior& eventsBasedBehavior,
       const gd::String& codeNamespace,
+      std::function<gd::String()> generateInitializeVariablesCode,
       std::function<gd::String()> generateInitializePropertiesCode,
       std::function<gd::String()> generatePropertiesCode,
       std::function<gd::String()> generateInitializeSharedPropertiesCode,
@@ -128,6 +129,9 @@ class BehaviorCodeGenerator {
   gd::String GenerateRuntimeBehaviorPropertyTemplateCode(
       const gd::EventsBasedBehavior& eventsBasedBehavior,
       const gd::NamedPropertyDescriptor& property);
+
+  gd::String GenerateInitializeVariablesCode(
+      const gd::EventsBasedBehavior& eventsBasedBehavior);
 
   gd::String GenerateToggleBooleanPropertyTemplateCode(
       const gd::String& toggleName,

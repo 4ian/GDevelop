@@ -35,6 +35,7 @@ const UnifiedVariablesDialog = ({
     project,
     layout,
     eventsFunctionsExtension,
+    eventsBasedBehavior,
     eventsBasedObject,
     eventsFunction,
   } = projectScopedContainersAccessor.getScope();
@@ -55,6 +56,9 @@ const UnifiedVariablesDialog = ({
   }
   const prefabVariables = eventsBasedObject
     ? eventsBasedObject.getVariables()
+    : null;
+  const behaviorVariables = eventsBasedBehavior
+    ? eventsBasedBehavior.getVariables()
     : null;
 
   const prefabObjectType =
@@ -110,10 +114,26 @@ const UnifiedVariablesDialog = ({
     (): Array<string> => [],
     []
   );
+  const onComputeAllBehaviorVariableNames = React.useCallback(
+    (): Array<string> => [],
+    []
+  );
 
   const tabs = React.useMemo(
     () =>
       [
+        behaviorVariables && {
+          id: 'behavior-variables',
+          label: <Trans>Behavior variables</Trans>,
+          variablesContainer: behaviorVariables,
+          emptyPlaceholderTitle: (
+            <Trans>Add your first behavior variable</Trans>
+          ),
+          emptyPlaceholderDescription: (
+            <Trans>These variables hold internal state for the behavior.</Trans>
+          ),
+          onComputeAllVariableNames: onComputeAllBehaviorVariableNames,
+        },
         prefabVariables && {
           id: 'prefab-variables',
           label: <Trans>Prefab variables</Trans>,
@@ -176,6 +196,8 @@ const UnifiedVariablesDialog = ({
         ),
       ].filter(Boolean),
     [
+      behaviorVariables,
+      onComputeAllBehaviorVariableNames,
       prefabVariables,
       onComputeAllPrefabVariableNames,
       sceneVariables,
@@ -204,6 +226,12 @@ const UnifiedVariablesDialog = ({
         if (sceneVariables && sceneVariables.has(selectedVariableRootName)) {
           return 'scene-variables';
         }
+        if (
+          behaviorVariables &&
+          behaviorVariables.has(selectedVariableRootName)
+        ) {
+          return 'behavior-variables';
+        }
         if (prefabVariables && prefabVariables.has(selectedVariableRootName)) {
           return 'prefab-variables';
         }
@@ -216,6 +244,7 @@ const UnifiedVariablesDialog = ({
         }
       }
 
+      if (behaviorVariables) return 'behavior-variables';
       if (prefabVariables) return 'prefab-variables';
       if (sceneVariables) return 'scene-variables';
       if (globalVariables) return 'global-variables';
@@ -226,6 +255,7 @@ const UnifiedVariablesDialog = ({
       isGlobalTabInitiallyOpen,
       globalVariables,
       sceneVariables,
+      behaviorVariables,
       prefabVariables,
       objectVariableTabs,
       tabs,

@@ -8,6 +8,11 @@ import HomeIcon from '../UI/CustomSvgIcons/Home';
 import DebuggerIcon from '../UI/CustomSvgIcons/Debug';
 import ProjectResourcesIcon from '../UI/CustomSvgIcons/ProjectResources';
 import GlobalConfigIcon from '../UI/CustomSvgIcons/GlobalConfig';
+import MenuIcon from '../UI/CustomSvgIcons/Menu';
+import ObjectIcon from '../UI/CustomSvgIcons/Object';
+import BehaviorIcon from '../UI/CustomSvgIcons/Behavior';
+import SettingsIcon from '../UI/CustomSvgIcons/Settings';
+import ShareIcon from '../UI/CustomSvgIcons/Share';
 import SceneIcon from '../UI/CustomSvgIcons/Scene';
 import EventsIcon from '../UI/CustomSvgIcons/Events';
 import ExternalEventsIcon from '../UI/CustomSvgIcons/ExternalEvents';
@@ -20,6 +25,7 @@ import AboutDialog from './AboutDialog';
 import ProjectManager, {
   type ProjectManagerInterface,
   getProjectManagerTreeViewItemIdForEditorTab,
+  globalObjectsItemId,
 } from '../ProjectManager';
 import LoaderModal from '../UI/LoaderModal';
 import {
@@ -35,6 +41,10 @@ import EditorTabsPane, {
   type EditorTabsPaneCommonProps,
 } from './EditorTabsPane';
 import PoppedOutWindows from './PoppedOutWindows';
+import RecentEditorSwitcher, {
+  type RecentEditorSwitcherEntry,
+  type RecentEditorSwitcherSideMenuItem,
+} from './RecentEditorSwitcher';
 import {
   getEditorTabsInitialState,
   openEditorTab,
@@ -272,6 +282,7 @@ import StandaloneDialog from './StandAloneDialog';
 import { useInGameEditorSettings } from '../EmbeddedGame/InGameEditorSettings';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 import { useAutomatedRegularInGameEditorRestart } from '../EmbeddedGame/UseAutomatedRegularInGameEditorRestart';
+import { enumerateFunctionsInFolder } from '../EventsFunctionsList/EnumerateFunctionFolderOrFunction';
 const electron = optionalRequire('electron');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
 const remote = optionalRequire('@electron/remote');
@@ -633,6 +644,25 @@ const MainFrame = (props: Props): React.MixedElement => {
     setDisplayCollisionMaskInPreview,
   ] = React.useState<boolean>(false);
   const commandPaletteRef = React.useRef((null: ?CommandPaletteInterface));
+  const [
+    recentEditorSwitcherOpen,
+    setRecentEditorSwitcherOpen,
+  ] = React.useState<boolean>(false);
+  const [
+    recentNavigationEntryIds,
+    setRecentNavigationEntryIds,
+  ] = React.useState<Array<string>>([]);
+  const [
+    recentNavigationEntryUseCounts,
+    setRecentNavigationEntryUseCounts,
+  ] = React.useState<{ [string]: number }>({});
+  const [
+    poppedOutEditorFocusRequest,
+    setPoppedOutEditorFocusRequest,
+  ] = React.useState<{| editorKey: ?string, requestId: number |}>({
+    editorKey: null,
+    requestId: 0,
+  });
   const inAppTutorialOrchestratorRef = React.useRef<?InAppTutorialOrchestratorInterface>(
     null
   );
@@ -814,6 +844,48 @@ const MainFrame = (props: Props): React.MixedElement => {
    */
   const currentProjectRef = useStableUpToDateRef(currentProject);
   const editorTabsRef = useStableUpToDateRef(state.editorTabs);
+
+  React.useEffect(
+    () => {
+      const editorTabs = state.editorTabs;
+      const allEditorKeys = getAllEditorTabs(editorTabs).map(
+        editorTab => editorTab.key
+      );
+      const focusedEditorKeys: Array<string> = [];
+      ['center', 'left', 'right', 'external'].forEach(paneIdentifier => {
+        if (!editorTabs.panes[paneIdentifier]) return;
+        const currentTab = getCurrentTabForPane(editorTabs, paneIdentifier);
+        if (currentTab && !focusedEditorKeys.includes(currentTab.key)) {
+          focusedEditorKeys.push(currentTab.key);
+        }
+      });
+
+      setRecentNavigationEntryIds(previousIds => {
+        const newlyOpenedKeys = allEditorKeys.filter(
+          key => !previousIds.includes(key) && !focusedEditorKeys.includes(key)
+        );
+        const nextIds = [
+          ...focusedEditorKeys,
+          ...newlyOpenedKeys,
+          ...previousIds.filter(
+            id =>
+              !focusedEditorKeys.includes(id) && !newlyOpenedKeys.includes(id)
+          ),
+        ].slice(0, 80);
+
+        if (
+          previousIds.length === nextIds.length &&
+          previousIds.every((id, index) => id === nextIds[index])
+        ) {
+          return previousIds;
+        }
+
+        return nextIds;
+      });
+    },
+    [state.editorTabs]
+  );
+
   const projectManagerRef = React.useRef<?ProjectManagerInterface>(null);
   const lastSelectedProjectManagerItemIdRef = React.useRef<?string>(null);
   const forceRefreshProjectManagerList = React.useCallback(() => {
@@ -1935,6 +2007,22 @@ const MainFrame = (props: Props): React.MixedElement => {
     [isProjectManagerPinnedForCurrentProject, openProjectManager]
   );
 
+  const activateProjectManagerItemFromSwitcher = React.useCallback(
+    (itemId: string) => {
+      if (!isProjectManagerPinnedForCurrentProject) {
+        openProjectManager(true);
+      }
+
+      // Let the drawer render before activating a Project Manager item from
+      // the global switcher.
+      setTimeout(() => {
+        const projectManager = projectManagerRef.current;
+        if (projectManager) projectManager.activateItemFromId(itemId);
+      }, 200);
+    },
+    [isProjectManagerPinnedForCurrentProject, openProjectManager]
+  );
+
   const isProjectManagerVisible =
     projectManagerOpen || isProjectManagerPinnedForCurrentProject;
 
@@ -1971,6 +2059,80 @@ const MainFrame = (props: Props): React.MixedElement => {
       selectProjectManagerItemFromId(itemId, options);
     },
     [currentProjectRef, selectProjectManagerItemFromId]
+  );
+
+  const recordRecentNavigationEntry = React.useCallback((id: string) => {
+    setRecentNavigationEntryIds(previousIds =>
+      [id, ...previousIds.filter(previousId => previousId !== id)].slice(0, 80)
+    );
+    setRecentNavigationEntryUseCounts(previousUseCounts => ({
+      ...previousUseCounts,
+      [id]: (previousUseCounts[id] || 0) + 1,
+    }));
+  }, []);
+
+  const activateRecentEditorSwitcherEntry = React.useCallback(
+    (entry: RecentEditorSwitcherEntry) => {
+      if (!entry.editorTab) return;
+
+      const openedEditor = getEditorTabOpenedWithKey(
+        state.editorTabs,
+        entry.id
+      );
+      if (!openedEditor) return;
+
+      setRecentEditorSwitcherOpen(false);
+      recordRecentNavigationEntry(openedEditor.editorTab.key);
+
+      if (openedEditor.paneIdentifier === 'external') {
+        setPoppedOutEditorFocusRequest({
+          editorKey: openedEditor.editorTab.key,
+          requestId: Date.now(),
+        });
+        return;
+      }
+
+      setState(prevState => {
+        const currentOpenedEditor = getEditorTabOpenedWithKey(
+          prevState.editorTabs,
+          openedEditor.editorTab.key
+        );
+        if (!currentOpenedEditor) return prevState;
+
+        return {
+          ...prevState,
+          editorTabs: changeCurrentTab(
+            prevState.editorTabs,
+            currentOpenedEditor.paneIdentifier,
+            currentOpenedEditor.tabIndex
+          ),
+        };
+      });
+
+      selectProjectManagerItemForEditorTab(openedEditor.editorTab, {
+        force: true,
+      });
+
+      if (openedEditor.editorTab.editorRef) {
+        openedEditor.editorTab.editorRef.forceUpdateEditor();
+      }
+    },
+    [
+      selectProjectManagerItemForEditorTab,
+      setState,
+      state.editorTabs,
+      setPoppedOutEditorFocusRequest,
+      recordRecentNavigationEntry,
+    ]
+  );
+
+  const activateRecentEditorSwitcherSideMenuItem = React.useCallback(
+    (item: RecentEditorSwitcherSideMenuItem) => {
+      setRecentEditorSwitcherOpen(false);
+      recordRecentNavigationEntry(item.id);
+      item.activate();
+    },
+    [recordRecentNavigationEntry]
   );
 
   // When the project manager is shown, highlight and scroll to the item
@@ -3654,7 +3816,11 @@ const MainFrame = (props: Props): React.MixedElement => {
           openEditorTab(
             state.editorTabs,
             // $FlowFixMe[incompatible-type]
-            getEditorOpeningOptions({ kind: 'resources', name: '' })
+            getEditorOpeningOptions({
+              kind: 'resources',
+              name: '',
+              dontFocusTab: true,
+            })
           ),
           'resources'
         ),
@@ -3671,7 +3837,11 @@ const MainFrame = (props: Props): React.MixedElement => {
           openEditorTab(
             state.editorTabs,
             // $FlowFixMe[incompatible-type]
-            getEditorOpeningOptions({ kind: 'global-config', name: '' })
+            getEditorOpeningOptions({
+              kind: 'global-config',
+              name: '',
+              dontFocusTab: true,
+            })
           ),
           'global-config'
         ),
@@ -5903,6 +6073,265 @@ const MainFrame = (props: Props): React.MixedElement => {
     }
   }, []);
 
+  const openRecentEditorSwitcher = React.useCallback(() => {
+    setRecentEditorSwitcherOpen(true);
+  }, []);
+
+  const recentEditorSwitcherSideMenuItems: Array<RecentEditorSwitcherSideMenuItem> = [];
+  const addRecentEditorSwitcherSideMenuItem = (
+    id: string,
+    title: string,
+    subtitle: string,
+    icon: ?React.Node,
+    activate: () => void
+  ) => {
+    recentEditorSwitcherSideMenuItems.push({
+      id,
+      title,
+      subtitle,
+      icon,
+      activate,
+    });
+  };
+
+  addRecentEditorSwitcherSideMenuItem(
+    'project-manager',
+    i18n._(t`Project menu`),
+    i18n._(t`Side menu`),
+    <MenuIcon />,
+    showProjectManager
+  );
+  addRecentEditorSwitcherSideMenuItem(
+    'start page',
+    i18n._(t`Home`),
+    i18n._(t`Main editor`),
+    <HomeIcon titleAccess="Home" />,
+    openHomePage
+  );
+  addRecentEditorSwitcherSideMenuItem(
+    'ask-ai',
+    i18n._(t`Ask AI`),
+    i18n._(t`Assistant`),
+    <RobotIcon size={16} />,
+    () => openAskAi(null)
+  );
+
+  if (currentProject) {
+    addRecentEditorSwitcherSideMenuItem(
+      'resources',
+      i18n._(t`Resources`),
+      i18n._(t`Project window`),
+      <ProjectResourcesIcon />,
+      openResources
+    );
+    addRecentEditorSwitcherSideMenuItem(
+      'global-config',
+      i18n._(t`Global config`),
+      i18n._(t`Game settings`),
+      <GlobalConfigIcon />,
+      openGlobalConfig
+    );
+    addRecentEditorSwitcherSideMenuItem(
+      globalObjectsItemId,
+      i18n._(t`Global objects`),
+      i18n._(t`Globals`),
+      <ObjectIcon />,
+      () => activateProjectManagerItemFromSwitcher(globalObjectsItemId)
+    );
+    addRecentEditorSwitcherSideMenuItem(
+      'global-search',
+      i18n._(t`Global search`),
+      i18n._(t`Search in project`),
+      <SearchIcon />,
+      openGlobalSearch
+    );
+    addRecentEditorSwitcherSideMenuItem(
+      'export-share',
+      i18n._(t`Export & Share`),
+      i18n._(t`Project window`),
+      <ShareIcon />,
+      () => {
+        openShareDialog('publish');
+      }
+    );
+
+    for (
+      let sceneIndex = 0;
+      sceneIndex < currentProject.getLayoutsCount();
+      sceneIndex++
+    ) {
+      const layout = currentProject.getLayoutAt(sceneIndex);
+      const layoutName = layout.getName();
+      addRecentEditorSwitcherSideMenuItem(
+        `layout ${layoutName}`,
+        layoutName,
+        i18n._(t`Scene editor`),
+        <SceneIcon />,
+        () =>
+          openLayout(layoutName, {
+            openEventsEditor: false,
+            openSceneEditor: true,
+            focusWhenOpened: 'scene',
+          })
+      );
+      addRecentEditorSwitcherSideMenuItem(
+        `layout events ${layoutName}`,
+        `${layoutName} ${i18n._(t`(Events)`)}`,
+        i18n._(t`Events sheet`),
+        <EventsIcon />,
+        () =>
+          openLayout(layoutName, {
+            openEventsEditor: true,
+            openSceneEditor: false,
+            focusWhenOpened: 'events',
+          })
+      );
+    }
+
+    for (
+      let externalLayoutIndex = 0;
+      externalLayoutIndex < currentProject.getExternalLayoutsCount();
+      externalLayoutIndex++
+    ) {
+      const externalLayout = currentProject.getExternalLayoutAt(
+        externalLayoutIndex
+      );
+      const externalLayoutName = externalLayout.getName();
+      addRecentEditorSwitcherSideMenuItem(
+        `external layout ${externalLayoutName}`,
+        externalLayoutName,
+        i18n._(t`External layout`),
+        <ExternalLayoutIcon />,
+        () => openExternalLayout(externalLayoutName)
+      );
+    }
+
+    for (
+      let externalEventsIndex = 0;
+      externalEventsIndex < currentProject.getExternalEventsCount();
+      externalEventsIndex++
+    ) {
+      const externalEvents = currentProject.getExternalEventsAt(
+        externalEventsIndex
+      );
+      const externalEventsName = externalEvents.getName();
+      addRecentEditorSwitcherSideMenuItem(
+        `external events ${externalEventsName}`,
+        externalEventsName,
+        i18n._(t`External events`),
+        <ExternalEventsIcon />,
+        () => openExternalEvents(externalEventsName)
+      );
+    }
+
+    for (
+      let extensionIndex = 0;
+      extensionIndex < currentProject.getEventsFunctionsExtensionsCount();
+      extensionIndex++
+    ) {
+      const eventsFunctionsExtension = currentProject.getEventsFunctionsExtensionAt(
+        extensionIndex
+      );
+      const extensionName = eventsFunctionsExtension.getName();
+      addRecentEditorSwitcherSideMenuItem(
+        `events functions extension ${extensionName}`,
+        extensionName,
+        i18n._(t`Extension`),
+        <ExtensionIcon />,
+        () => openEventsFunctionsExtension(extensionName)
+      );
+
+      const eventsBasedObjects = eventsFunctionsExtension.getEventsBasedObjects();
+      for (
+        let objectIndex = 0;
+        objectIndex < eventsBasedObjects.size();
+        objectIndex++
+      ) {
+        const eventsBasedObject = eventsBasedObjects.at(objectIndex);
+        const objectName = eventsBasedObject.getName();
+        addRecentEditorSwitcherSideMenuItem(
+          `custom object ${extensionName}::${objectName}`,
+          objectName,
+          `${extensionName} - ${i18n._(t`Visual editor`)}`,
+          <ObjectIcon />,
+          () =>
+            openCustomObjectEditor(
+              eventsFunctionsExtension,
+              eventsBasedObject,
+              ''
+            )
+        );
+        addRecentEditorSwitcherSideMenuItem(
+          `prefab detail ${extensionName}::${objectName}`,
+          `${objectName} ${i18n._(t`(Prefab)`)}`,
+          `${extensionName} - ${i18n._(t`Prefab detail`)}`,
+          <ObjectIcon />,
+          () =>
+            openPrefabDetailEditor(eventsFunctionsExtension, eventsBasedObject)
+        );
+
+        const variants = eventsBasedObject.getVariants();
+        for (
+          let variantIndex = 0;
+          variantIndex < variants.getVariantsCount();
+          variantIndex++
+        ) {
+          const variant = variants.getVariantAt(variantIndex);
+          const variantName = variant.getName();
+          if (!variantName) continue;
+          addRecentEditorSwitcherSideMenuItem(
+            `custom object ${extensionName}::${objectName}::${variantName}`,
+            variantName,
+            `${objectName} - ${i18n._(t`Variant`)}`,
+            <ObjectIcon />,
+            () =>
+              openCustomObjectEditor(
+                eventsFunctionsExtension,
+                eventsBasedObject,
+                variantName
+              )
+          );
+        }
+      }
+
+      const eventsBasedBehaviors = eventsFunctionsExtension.getEventsBasedBehaviors();
+      for (
+        let behaviorIndex = 0;
+        behaviorIndex < eventsBasedBehaviors.size();
+        behaviorIndex++
+      ) {
+        const eventsBasedBehavior = eventsBasedBehaviors.at(behaviorIndex);
+        const behaviorName = eventsBasedBehavior.getName();
+        addRecentEditorSwitcherSideMenuItem(
+          `behavior detail ${extensionName}::${behaviorName}`,
+          behaviorName,
+          `${extensionName} - ${i18n._(t`Behavior`)}`,
+          <BehaviorIcon />,
+          () => openBehaviorEvents(extensionName, behaviorName)
+        );
+      }
+
+      const eventsFunctions = enumerateFunctionsInFolder(
+        eventsFunctionsExtension.getEventsFunctions().getRootFolder()
+      );
+      for (
+        let functionIndex = 0;
+        functionIndex < eventsFunctions.length;
+        functionIndex++
+      ) {
+        const eventsFunction = eventsFunctions[functionIndex];
+        const functionName = eventsFunction.getName();
+        addRecentEditorSwitcherSideMenuItem(
+          `function detail ${extensionName}::${functionName}`,
+          functionName,
+          `${extensionName} - ${i18n._(t`Function`)}`,
+          <SettingsIcon />,
+          () => openEventsFunctionsExtension(extensionName, functionName)
+        );
+      }
+    }
+  }
+
   const {
     configureNewProjectActions: configureNewProjectActionsForProfile,
   } = React.useContext(PublicProfileContext);
@@ -6038,6 +6467,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     onOpenExternalLayout: openExternalLayout,
     onOpenEventsFunctionsExtension: openEventsFunctionsExtension,
     onOpenCommandPalette: openCommandPalette,
+    onOpenRecentEditorSwitcher: openRecentEditorSwitcher,
     onOpenProfile: onOpenProfileDialog,
     onRestartInGameEditor,
     onOpenGlobalSearch: openGlobalSearch,
@@ -6767,6 +7197,7 @@ const MainFrame = (props: Props): React.MixedElement => {
         {...editorTabsPaneProps}
         onClose={onExternalWindowClose}
         onPopIn={onPopInTab}
+        focusRequest={poppedOutEditorFocusRequest}
       />
       {currentProject && standalonePrefabSettingsDialog && (
         <PrefabDetailEditor
@@ -6852,6 +7283,17 @@ const MainFrame = (props: Props): React.MixedElement => {
         />
       )}
       <CommandPalette ref={commandPaletteRef} />
+      <RecentEditorSwitcher
+        open={recentEditorSwitcherOpen}
+        editorTabs={state.editorTabs}
+        sideMenuItems={recentEditorSwitcherSideMenuItems}
+        recentNavigationEntryIds={recentNavigationEntryIds}
+        recentNavigationEntryUseCounts={recentNavigationEntryUseCounts}
+        shortcut={shortcutMap['OPEN_RECENT_EDITOR']}
+        onClose={() => setRecentEditorSwitcherOpen(false)}
+        onActivate={activateRecentEditorSwitcherEntry}
+        onActivateSideMenuItem={activateRecentEditorSwitcherSideMenuItem}
+      />
       <LoaderModal
         showImmediately={showLoaderImmediately}
         showAfterDelay={showLoaderAfterDelay}

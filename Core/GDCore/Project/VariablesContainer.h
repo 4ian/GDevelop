@@ -39,6 +39,7 @@ class GD_CORE_API VariablesContainer {
       Parameters,
       Properties,
       Prefab,
+      Behavior,
   };
 
   VariablesContainer();

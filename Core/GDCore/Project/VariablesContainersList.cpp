@@ -6,6 +6,7 @@
 #include "GDCore/Project/Project.h"
 #include "GDCore/Project/Variable.h"
 #include "GDCore/Project/EventsFunctionsExtension.h"
+#include "GDCore/Project/EventsBasedBehavior.h"
 #include "GDCore/Project/EventsBasedObject.h"
 #include "GDCore/IDE/EventsFunctionTools.h"
 
@@ -83,6 +84,7 @@ VariablesContainersList VariablesContainersList::
   VariablesContainersList variablesContainersList;
   variablesContainersList.Push(extension.GetGlobalVariables());
   variablesContainersList.Push(extension.GetSceneVariables());
+  variablesContainersList.Push(eventsBasedBehavior.GetVariables());
 
   gd::EventsFunctionTools::PropertiesToVariablesContainer(
       eventsBasedBehavior.GetPropertyDescriptors(),
@@ -96,7 +98,7 @@ VariablesContainersList VariablesContainersList::
       parameterVariablesContainer);
   variablesContainersList.Push(parameterVariablesContainer);
 
-  variablesContainersList.firstLocalVariableContainerIndex = 4;
+  variablesContainersList.firstLocalVariableContainerIndex = 5;
   return variablesContainersList;
 }
 

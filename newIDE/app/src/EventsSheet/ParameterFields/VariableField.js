@@ -227,6 +227,7 @@ export const getVariableSourceIcon = (
     case gd.VariablesContainer.Object:
       return ObjectVariableIcon;
     case gd.VariablesContainer.Prefab:
+    case gd.VariablesContainer.Behavior:
       return VariableTreeIcon;
     case gd.VariablesContainer.Local:
       return LocalVariableIcon;

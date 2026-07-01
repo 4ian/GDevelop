@@ -11,6 +11,7 @@
 #include "GDCore/IDE/EventsFunctionTools.h"
 #include "GDCore/IDE/WholeProjectRefactorer.h"
 #include "GDCore/Project/Behavior.h"
+#include "GDCore/Project/EventsBasedBehavior.h"
 #include "GDCore/Project/EventsBasedObject.h"
 #include "GDCore/Project/EventsFunction.h"
 #include "GDCore/Project/EventsFunctionsExtension.h"
@@ -201,6 +202,67 @@ TEST_CASE("EventsFunction", "[common]") {
     REQUIRE(!parameterObjectsContainer.GetObject("Object")
                  .GetVariables()
                  .Has("PrefabState"));
+  }
+
+  SECTION("Behavior variables are exposed in behavior event scopes") {
+    gd::Platform platform;
+    gd::Project project;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    auto &eventsExtension =
+        project.InsertNewEventsFunctionsExtension("MyEventsExtension", 0);
+    auto &eventsBasedBehavior =
+        eventsExtension.GetEventsBasedBehaviors().InsertNew("MyBehavior", 0);
+    eventsBasedBehavior.GetVariables()
+        .InsertNew("BehaviorState", eventsBasedBehavior.GetVariables().Count())
+        .SetString("Idle");
+    REQUIRE(eventsBasedBehavior.GetVariables().GetSourceType() ==
+            gd::VariablesContainer::SourceType::Behavior);
+
+    gd::SerializerElement serializedBehavior;
+    eventsBasedBehavior.SerializeTo(serializedBehavior);
+    gd::EventsBasedBehavior unserializedBehavior;
+    unserializedBehavior.UnserializeFrom(project, serializedBehavior);
+    REQUIRE(unserializedBehavior.GetVariables().Has("BehaviorState"));
+    REQUIRE(unserializedBehavior.GetVariables().Get("BehaviorState")
+                .GetString() == "Idle");
+
+    auto &eventsFunction =
+        eventsBasedBehavior.GetEventsFunctions().InsertNewEventsFunction(
+            "MyBehaviorEventsFunction", 0);
+    gd::WholeProjectRefactorer::EnsureBehaviorEventsFunctionsProperParameters(
+        eventsExtension, eventsBasedBehavior);
+
+    gd::ObjectsContainer parameterObjectsContainer(
+        gd::ObjectsContainer::SourceType::Function);
+    gd::VariablesContainer parameterVariablesContainer(
+        gd::VariablesContainer::SourceType::Parameters);
+    gd::VariablesContainer propertyVariablesContainer(
+        gd::VariablesContainer::SourceType::Properties);
+    gd::ResourcesContainer parameterResourcesContainer(
+        gd::ResourcesContainer::SourceType::Parameters);
+    gd::ResourcesContainer propertyResourcesContainer(
+        gd::ResourcesContainer::SourceType::Properties);
+    auto behaviorFunctionScopedContainers =
+        gd::ProjectScopedContainers::
+            MakeNewProjectScopedContainersForBehaviorEventsFunction(
+                project, eventsExtension, eventsBasedBehavior, eventsFunction,
+                parameterObjectsContainer, parameterVariablesContainer,
+                propertyVariablesContainer, parameterResourcesContainer,
+                propertyResourcesContainer);
+    const auto &behaviorFunctionVariablesContainersList =
+        behaviorFunctionScopedContainers.GetVariablesContainersList();
+
+    REQUIRE(behaviorFunctionVariablesContainersList.Has("BehaviorState"));
+    REQUIRE(&behaviorFunctionVariablesContainersList
+                 .GetVariablesContainerFromVariableNameOnly("BehaviorState") ==
+            &eventsBasedBehavior.GetVariables());
+    REQUIRE(behaviorFunctionVariablesContainersList.Get("BehaviorState")
+                .GetString() == "Idle");
+    REQUIRE(parameterObjectsContainer.HasObjectNamed("Object"));
+    REQUIRE(!parameterObjectsContainer.GetObject("Object")
+                 .GetVariables()
+                 .Has("BehaviorState"));
   }
 
   SECTION("Choice properties are exposed as enum variables") {

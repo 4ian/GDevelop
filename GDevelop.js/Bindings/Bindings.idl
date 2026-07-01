@@ -320,6 +320,7 @@ enum VariablesContainer_SourceType {
   "VariablesContainer::Parameters",
   "VariablesContainer::Properties",
   "VariablesContainer::Prefab",
+  "VariablesContainer::Behavior",
 };
 
 interface VariablesContainer {
@@ -3476,6 +3477,7 @@ interface EventsBasedBehavior {
     QuickCustomization_Visibility GetQuickCustomizationVisibility();
 
     [Ref] PropertiesContainer GetSharedPropertyDescriptors();
+    [Ref] VariablesContainer GetVariables();
 
     [Const, Value] DOMString STATIC_GetPropertyActionName([Const] DOMString propertyName);
     [Const, Value] DOMString STATIC_GetPropertyConditionName([Const] DOMString propertyName);

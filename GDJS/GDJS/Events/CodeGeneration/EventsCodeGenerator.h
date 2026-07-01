@@ -489,7 +489,8 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
       gd::String& objectArraysMap,
       gd::String& behaviorNamesMap,
       const gd::String& thisObjectName = "",
-      const gd::String& thisBehaviorName = "");
+      const gd::String& thisBehaviorName = "",
+      const gd::String& behaviorVariablesAccessor = "");
 };
 
 }  // namespace gdjs

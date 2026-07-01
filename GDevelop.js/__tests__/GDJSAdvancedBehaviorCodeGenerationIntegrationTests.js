@@ -352,4 +352,80 @@ describe('libGD.js - GDJS Advanced Behavior Code Generation integration tests', 
       }
     });
   });
+
+  describe('Behavior variables', () => {
+    it('keeps behavior variables isolated from owner object variables', () => {
+      const project = new gd.ProjectHelper.createNewGDJSProject();
+      const eventsFunctionsExtension =
+        project.insertNewEventsFunctionsExtension('MyExtension', 0);
+      const eventsBasedBehavior = eventsFunctionsExtension
+        .getEventsBasedBehaviors()
+        .insertNew('MyBehavior', 0);
+
+      eventsBasedBehavior
+        .getVariables()
+        .insertNew('InternalCounter', 0)
+        .setValue(5);
+
+      const eventsSerializerElement = gd.Serializer.fromJSObject([
+        {
+          type: 'BuiltinCommonInstructions::Standard',
+          conditions: [],
+          actions: [
+            {
+              type: { value: 'SetNumberVariable' },
+              parameters: ['InternalCounter', '+', '1'],
+            },
+            {
+              type: { value: 'ModVarObjet' },
+              parameters: ['Object', 'InternalCounter', '+', '1'],
+            },
+          ],
+        },
+      ]);
+      eventsBasedBehavior
+        .getEventsFunctions()
+        .insertNewEventsFunction('doStepPreEvents', 0)
+        .getEvents()
+        .unserializeFrom(project, eventsSerializerElement);
+      eventsSerializerElement.delete();
+      gd.WholeProjectRefactorer.ensureBehaviorEventsFunctionsProperParameters(
+        eventsFunctionsExtension,
+        eventsBasedBehavior
+      );
+
+      const { gdjs, runtimeScene } = makeMinimalGDJSMock();
+      const CompiledRuntimeBehavior =
+        generateCompiledEventsForEventsBasedBehavior(
+          gd,
+          project,
+          eventsFunctionsExtension,
+          eventsBasedBehavior,
+          gdjs,
+          { logCode: false }
+        );
+      project.delete();
+
+      const owner = runtimeScene.createObject('Owner');
+      const behavior = new CompiledRuntimeBehavior(
+        runtimeScene,
+        { name: 'MyBehavior', type: 'MyExtension::MyBehavior' },
+        owner
+      );
+      owner.addBehavior(behavior);
+
+      expect(behavior.getBehaviorVariables().has('InternalCounter')).toBe(true);
+      expect(
+        behavior.getBehaviorVariables().get('InternalCounter').getAsNumber()
+      ).toBe(5);
+      expect(owner.getVariables().has('InternalCounter')).toBe(false);
+
+      behavior.doStepPreEvents();
+
+      expect(
+        behavior.getBehaviorVariables().get('InternalCounter').getAsNumber()
+      ).toBe(6);
+      expect(owner.getVariables().get('InternalCounter').getAsNumber()).toBe(1);
+    });
+  });
 });

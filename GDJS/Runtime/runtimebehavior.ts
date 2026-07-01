@@ -224,6 +224,16 @@ namespace gdjs {
     onPlacedInScene(): void {}
 
     /**
+     * Reimplement this to react to a signal sent to the behavior owner.
+     */
+    onSignal(
+      signalName: string,
+      payload: gdjs.Variable,
+      emitterObjectName: string,
+      emitterInstanceId: integer
+    ): void {}
+
+    /**
      * Return true if the behavior is activated
      */
     activated(): boolean {

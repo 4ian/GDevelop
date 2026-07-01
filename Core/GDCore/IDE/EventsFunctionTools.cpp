@@ -7,8 +7,10 @@
 
 #include "GDCore/Events/Expression.h"
 #include "GDCore/Extensions/Metadata/ParameterMetadataTools.h"
+#include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/Project/EventsBasedBehavior.h"
 #include "GDCore/Project/EventsBasedObject.h"
+#include "GDCore/Project/EventsFunctionsExtension.h"
 #include "GDCore/Project/ObjectsContainer.h"
 #include "GDCore/Project/ParameterMetadataContainer.h"
 #include "GDCore/Project/PropertiesContainer.h"
@@ -54,11 +56,18 @@ void EventsFunctionTools::BehaviorEventsFunctionToObjectsContainer(
 
   // ...and has an "Object" by convention...
   if (!outputObjectsContainer.HasObjectNamed("Object")) {
-    gd::LogWarning("No \"Object\" in a function of an events based behavior: " +
-                   eventsFunction.GetName() +
-                   ". This means this function is likely misconfigured (check "
-                   "its parameters).");
-    return;
+    if (eventsFunction.GetName() == "onSignal") {
+      outputObjectsContainer.InsertNewObject(
+          project, eventsBasedBehavior.GetObjectType(), "Object",
+          outputObjectsContainer.GetObjectsCount());
+    } else {
+      gd::LogWarning(
+          "No \"Object\" in a function of an events based behavior: " +
+          eventsFunction.GetName() +
+          ". This means this function is likely misconfigured (check "
+          "its parameters).");
+      return;
+    }
   }
 
   // ...with behaviors from properties.
@@ -79,6 +88,7 @@ void EventsFunctionTools::BehaviorEventsFunctionToObjectsContainer(
 
 void EventsFunctionTools::ObjectEventsFunctionToObjectsContainer(
     const gd::Project& project,
+    const gd::EventsFunctionsExtension& eventsFunctionsExtension,
     const gd::EventsBasedObject& eventsBasedObject,
     const gd::EventsFunction& eventsFunction,
     gd::ObjectsContainer& outputObjectsContainer) {
@@ -91,11 +101,20 @@ void EventsFunctionTools::ObjectEventsFunctionToObjectsContainer(
   // TODO EBO Use a constant instead a hard coded value "Object".
   // ...and has an "Object" by convention...
   if (!outputObjectsContainer.HasObjectNamed("Object")) {
-    gd::LogWarning("No \"Object\" in a function of an events based object: " +
-                   eventsFunction.GetName() +
-                   ". This means this function is likely misconfigured (check "
-                   "its parameters).");
-    return;
+    if (eventsFunction.GetName() == "onSignal") {
+      outputObjectsContainer.InsertNewObject(
+          project,
+          gd::PlatformExtension::GetObjectFullType(
+              eventsFunctionsExtension.GetName(), eventsBasedObject.GetName()),
+          "Object", outputObjectsContainer.GetObjectsCount());
+    } else {
+      gd::LogWarning(
+          "No \"Object\" in a function of an events based object: " +
+          eventsFunction.GetName() +
+          ". This means this function is likely misconfigured (check "
+          "its parameters).");
+      return;
+    }
   }
   if (eventsBasedObject.GetObjects().HasObjectNamed("Object")) {
     gd::LogWarning("Child-objects can't be named Object because it's reserved"

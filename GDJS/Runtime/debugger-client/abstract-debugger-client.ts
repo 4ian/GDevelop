@@ -715,6 +715,17 @@ namespace gdjs {
       } catch (e) {
         // Ignore — sound reporting is best-effort.
       }
+      let signalDiagnostics: gdjs.SignalDebugInfo | null = null;
+      try {
+        if (
+          currentScene &&
+          typeof (currentScene as any).getSignalBus === 'function'
+        ) {
+          signalDiagnostics = currentScene.getSignalBus().getDebugInfo();
+        }
+      } catch (e) {
+        // Ignore - signal reporting is best-effort.
+      }
       this._sendMessage(
         circularSafeStringify({
           command: 'status',
@@ -724,6 +735,7 @@ namespace gdjs {
             isInGameEdition: this._runtimegame.isInGameEdition(),
             sceneName: currentScene ? currentScene.getName() : null,
             recentlyPlayedSounds,
+            signalDiagnostics,
           },
         })
       );
@@ -745,6 +757,7 @@ namespace gdjs {
         '_debuggerClient',
         // Exclude some RuntimeScene fields:
         '_allInstancesList',
+        '_signalBus',
         // Exclude circular references to parent runtimeGame or runtimeScene:
         '_runtimeGame',
         '_runtimeScene',
@@ -1333,6 +1346,7 @@ namespace gdjs {
       const excludedKeys = [
         '_debuggerClient',
         '_allInstancesList',
+        '_signalBus',
         '_runtimeGame',
         '_runtimeScene',
         '_behaviorsTable',

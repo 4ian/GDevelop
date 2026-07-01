@@ -32,6 +32,7 @@ namespace gdjs {
     _requestedScene: string = '';
     _resourcesUnloading: 'at-scene-exit' | 'never' | 'inherit' = 'inherit';
     private _asyncTasksManager = new gdjs.AsyncTasksManager();
+    private _objectGroups = new Map<string, string[]>();
 
     /** True if loadFromScene was called and the scene is being played. */
     _isLoaded: boolean = false;
@@ -148,6 +149,14 @@ namespace gdjs {
 
       if (this._isLoaded) {
         this.unloadScene();
+      }
+
+      this._objectGroups.clear();
+      for (const objectGroupData of sceneData.objectsGroups || []) {
+        this._objectGroups.set(
+          objectGroupData.name,
+          objectGroupData.objects.map(({ name }) => name)
+        );
       }
 
       //Setup main properties
@@ -343,6 +352,14 @@ namespace gdjs {
       this._eventsFunction = null;
       this._lastId = 0;
       this.networkId = null;
+      this._objectGroups.clear();
+    }
+
+    /**
+     * Return the object names declared in an object group.
+     */
+    getObjectNamesInGroup(objectGroupName: string): string[] {
+      return this._objectGroups.get(objectGroupName) || [];
     }
 
     /**

@@ -86,12 +86,15 @@ export const CompactEventsFunctionPropertiesEditor = ({
   const forceUpdate = useForceUpdate();
 
   const type = eventsFunction.getFunctionType();
+  const functionName = eventsFunction.getName();
+  const isOnSignalLifecycleEventsFunction = functionName === 'onSignal';
   const isABehaviorLifecycleEventsFunction =
     !!eventsBasedBehavior &&
     !eventsBasedObject &&
-    gd.MetadataDeclarationHelper.isBehaviorLifecycleEventsFunction(
-      eventsFunction.getName()
-    );
+    (gd.MetadataDeclarationHelper.isBehaviorLifecycleEventsFunction(
+      functionName
+    ) ||
+      isOnSignalLifecycleEventsFunction);
   if (isABehaviorLifecycleEventsFunction) {
     return (
       <EmptyMessage>
@@ -104,11 +107,12 @@ export const CompactEventsFunctionPropertiesEditor = ({
   }
 
   const isAnObjectLifecycleEventsFunction =
-    !!eventsBasedObject &&
-    !eventsBasedBehavior &&
-    gd.MetadataDeclarationHelper.isObjectLifecycleEventsFunction(
-      eventsFunction.getName()
-    );
+    isOnSignalLifecycleEventsFunction ||
+    (!!eventsBasedObject &&
+      !eventsBasedBehavior &&
+      gd.MetadataDeclarationHelper.isObjectLifecycleEventsFunction(
+        functionName
+      ));
   if (isAnObjectLifecycleEventsFunction) {
     return (
       <EmptyMessage>

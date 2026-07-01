@@ -163,25 +163,22 @@ type SignalName = string;
 
 type SignalTarget =
   | { kind: 'scene' }
-  | { kind: 'object'; objectName: string; instanceId?: number }
-  | { kind: 'objectGroup'; groupName: string }
-  | { kind: 'customObject'; instanceId: number }
+  | { kind: 'object'; objectName: string }
+  | { kind: 'objectGroup'; objectGroupName: string }
+  | { kind: 'pickedObjects'; pickedObjects: gdjs.LongLivedObjectsList }
   | { kind: 'behavior'; objectName: string; behaviorName: string };
-
-// Serialized variables, the same shape gdjs.VariablesContainer.initFrom consumes.
-type SignalPayloadData = Array<VariableData>;
 
 type RuntimeSignal = {
   id: number;
   name: SignalName;
   target: SignalTarget;
-  sender?: {
+  sender: {
     objectName?: string;
-    instanceId?: number;
-    behaviorName?: string;
-  };
-  payload?: gdjs.VariablesContainer; // deep-cloned at emit time (§6)
-  frameId: number;
+    objectId?: number;
+  } | null;
+  payload: gdjs.Variable | null; // deep-cloned at emit time (section 6)
+  emittedFrameId: number;
+  deliveredFrameId: number | null;
 };
 ```
 
@@ -342,8 +339,8 @@ A custom object receives signals through its `onSignal` handler:
 
 ```text
 CardSlot prefab, onSignal:
-  if SignalName() = "Card.DragStarted"
-    if SignalPayload("cardId") = AcceptedCardId
+  if SignalName = "Card.DragStarted"
+    if Payload.cardId = AcceptedCardId
       highlight slot
 ```
 
@@ -356,8 +353,8 @@ A behavior receives signals for its owner through its `onSignal` handler:
 
 ```text
 Health behavior, onSignal:
-  if SignalName() = "Damage.Apply"
-    subtract SignalPayload("amount") from Object health
+  if SignalName = "Damage.Apply"
+    subtract Payload.amount from Object health
     emit "Health.Damaged"
     if health <= 0 emit "Health.Depleted"
 ```
@@ -373,11 +370,12 @@ dispatch.
 
 Payload shape:
 
-- at runtime: a `gdjs.VariablesContainer`,
-- in project data: serialized variables typed as `VariableData[]` (the type
-  `gdjs.VariablesContainer.initFrom` consumes,
-  `GDJS/Runtime/variablescontainer.ts:37`),
-- in the editor: the existing variables editor, scoped to the emit action (§9.1).
+- at runtime: a root `gdjs.Variable` or `null`,
+- in event actions: an optional `variable` parameter named "Payload variable"
+  and an optional sender object parameter named "Emitter object",
+- in generated/runtime code: either a `gdjs.Variable` or
+  `gdjs.VariablesContainer` can be passed to the runtime helper; containers are
+  copied into a root structure variable.
 
 Example payload:
 
@@ -400,12 +398,18 @@ SignalSenderObjectName()           -> "Zombie"
 SignalSenderInstanceId()           -> 17
 ```
 
+Inside `onSignal`, the same payload is also available as the visible `Payload`
+function parameter. The dispatcher passes a clone to each receiver. When no
+payload was emitted, the direct `Payload` parameter is an empty structure
+variable and the `SignalPayload...` expressions return neutral values.
+
 ### Copy semantics
 
 The payload is deep-copied at emit time with `gdjs.Variable.prototype.clone()`
 (`GDJS/Runtime/variable.ts:433`), which recursively clones structure children and
-array items (`variable.ts:127`). The bus stores the clone, so a receiver never
-shares mutable state with the emitter:
+array items (`variable.ts:127`). The bus stores the clone, and direct
+`onSignal` payload parameters are cloned again per receiver, so a receiver never
+shares mutable state with the emitter or with another receiver:
 
 ```text
 Emitter changes payload variable after emitting
@@ -539,26 +543,42 @@ onDestroy            Runs when the instance is removed.
 `onSignal` is event-driven, not per-frame. It is invoked only during signal
 dispatch, once per delivered signal that targets the receiver.
 
-### 8.1 Reads context, takes no parameters
+### 8.1 Fixed signal parameters plus context expressions
 
-Existing lifecycle functions take no custom parameters — the runtime base
-signatures are fixed, e.g. `doStepPostEvents(instanceContainer)`
-(`GDJS/Runtime/runtimebehavior.ts`) and `customruntimeobject.ts:388`. There is
-also no `VariablesContainer` parameter type for events functions. So `onSignal`
-is **parameterless**: the dispatcher sets the current-signal context on the scene
-before calling the handler, and the handler reads it through expressions. This is
-how other transient per-dispatch state is exposed in the runtime, and it lets
-`onSignal` slot into the reserved-lifecycle mechanism without a new
-parameter-passing path.
+`onSignal` has a fixed lifecycle signature. The owner `Object` parameter for
+custom objects, and the owner `Object` plus `Behavior` parameters for behaviors,
+remain internal lifecycle parameters. The editor shows the signal data
+parameters:
+
+```text
+SignalName          signalName  The delivered signal name.
+Payload             variable    A per-receiver clone of the delivered payload.
+EmitterObjectName   string      The sender object name, or "" when none is set.
+EmitterInstanceId   expression  The sender unique id, or -1 when none is set.
+```
+
+The runtime also sets the current-signal context while the handler runs, so the
+existing `SignalName()`, `SignalPayload(...)`, `SignalPayloadString(...)` and
+sender expressions remain valid. The direct parameters are the primary
+lifecycle API; the expressions are useful when the same events are shared with a
+scene "Signal received" condition or when an instruction expects an expression
+instead of a function parameter.
 
 ### 8.2 Custom object handler
 
 ```text
 Function name: onSignal
 Function kind: lifecycle / signal handler
-Parameters:    none
+Internal parameters:
+  Object
 
-Reads via expressions while the handler runs:
+Visible signal parameters:
+  SignalName
+  Payload
+  EmitterObjectName
+  EmitterInstanceId
+
+Also readable via expressions while the handler runs:
   SignalName()              -> string
   SignalPayload(key)        -> number
   SignalPayloadString(key)  -> string
@@ -570,7 +590,15 @@ Reads via expressions while the handler runs:
 
 ```text
 Function name: onSignal
-Parameters:    the implicit owner Object only (as all behavior functions have)
+Internal parameters:
+  Object
+  Behavior
+
+Visible signal parameters:
+  SignalName
+  Payload
+  EmitterObjectName
+  EmitterInstanceId
 
 Reads the same current-signal expressions listed above.
 ```
@@ -593,8 +621,13 @@ Emit signal to object group
 Emit signal to behavior
 ```
 
-Each action edits its payload with the standard variables editor, scoped to the
-action. Vague names (`Trigger event`, `Call event`, `Send message`) are avoided.
+Each action takes an optional "Payload variable" parameter. Authors can pass a
+scene, object, behavior or function-parameter variable; the runtime deep-clones
+it when the signal is queued. Each action also takes an optional "Emitter
+object" parameter. When it is set, the first object in the picked emitter list
+becomes the sender exposed by `EmitterObjectName`, `EmitterInstanceId`,
+`SignalSenderObjectName()` and `SignalSenderInstanceId()`. Vague names
+(`Trigger event`, `Call event`, `Send message`) are avoided.
 
 ### 9.2 Condition
 
@@ -606,8 +639,6 @@ Parameters:
 
 ```text
 Signal name
-Sender filter (optional)
-Target filter (optional)
 ```
 
 ### 9.3 Expressions
@@ -685,12 +716,13 @@ lazily, stepped from a pre-events callback (§4.1), cleared on unload (§14.9).
 
 ```ts
 class SignalBus {
-  emit(signal: RuntimeSignal): void;
+  emitSignal(name: string, target: SignalTarget, payload?: ..., sender?: ...): void;
   dispatchQueuedSignals(runtimeScene: gdjs.RuntimeScene): void;
   getCurrentSignal(): RuntimeSignal | null;
   getDeliveredSignalsThisFrame(): RuntimeSignal[];
+  getDeliveredSignals(signalName: string): RuntimeSignal[];
+  getDebugInfo(): SignalDebugInfo;
   clear(): void;
-  getPendingSignalsCount(): number;
 }
 ```
 
@@ -725,8 +757,9 @@ lists.
 **Scene broadcasts.** At scene load, build a receiver index once:
 
 ```text
-signalReceiverObjectNames:   Set<string>   // object names whose class defines onSignal
-signalReceiverBehaviorTypes: Set<string>   // behavior types whose class defines onSignal
+receiverObjectNames: string[]                 // object names whose class defines onSignal
+receiverBehaviorNamesByObjectName: Map<string, string[]>
+                                             // behavior instance names whose class defines onSignal
 ```
 
 populated by testing `class.prototype.onSignal` for each loaded object/behavior
@@ -740,21 +773,31 @@ as `doStepPostEvents` receives the frame and branches.
 
 ### 10.4 Generated method calls
 
-The dispatcher sets the current-signal context, then calls the parameterless
-handler (§8):
+The dispatcher sets the current-signal context, then calls the generated
+handler with the fixed signal arguments (section 8):
 
 ```ts
 runtimeScene._currentSignal = signal;   // set once per delivered signal
 
 // Custom object receiver:
 if (runtimeObject.onSignal) {
-  runtimeObject.onSignal();
+  runtimeObject.onSignal(
+    signal.name,
+    clonedPayloadForThisReceiver,
+    senderObjectName,
+    senderInstanceId
+  );
 }
 
-// Behavior receiver (carries only the implicit owner):
-if (behavior.onSignal) {
-  behavior.onSignal();
-}
+// Behavior receivers are called through the owner so behavior ordering and
+// optional behavior-name targeting stay centralized:
+runtimeObject.signalBehaviorsOnSignal(
+  signal.name,
+  clonedPayloadForThisReceiver,
+  senderObjectName,
+  senderInstanceId,
+  optionalBehaviorName
+);
 
 runtimeScene._currentSignal = null;     // cleared after the delivery pass
 ```
@@ -787,17 +830,23 @@ non-renamable and hides it from the action/condition list automatically.
 
 ```ts
 gdjs.evtTools.signal.emitSceneSignal(runtimeScene, name, payload)
-gdjs.evtTools.signal.emitSignalToObjects(runtimeScene, objectsLists, name, payload)
-gdjs.evtTools.signal.emitSignalToObjectGroup(runtimeScene, groupObjectsLists, name, payload)
-gdjs.evtTools.signal.emitSignalToBehavior(runtimeScene, objectsLists, behaviorName, name, payload)
+gdjs.evtTools.signal.emitSignalToObject(runtimeScene, objectNameOrObjectsLists, name, payload)
+gdjs.evtTools.signal.emitSignalToPickedObjects(runtimeScene, objectsLists, name, payload)
+gdjs.evtTools.signal.emitSignalToObjectGroup(runtimeScene, objectGroupName, name, payload)
+gdjs.evtTools.signal.emitSignalToBehavior(runtimeScene, objectName, behaviorName, name, payload)
 
 gdjs.evtTools.signal.isSignalReceived(runtimeScene, name)  // "Signal received" condition
-gdjs.evtTools.signal.getCurrentSignalName(runtimeScene)
-gdjs.evtTools.signal.getCurrentSignalPayloadNumber(runtimeScene, key)
-gdjs.evtTools.signal.getCurrentSignalPayloadString(runtimeScene, key)
-gdjs.evtTools.signal.getCurrentSignalSenderObjectName(runtimeScene)
-gdjs.evtTools.signal.getCurrentSignalSenderInstanceId(runtimeScene)
+gdjs.evtTools.signal.getSignalName(runtimeScene)
+gdjs.evtTools.signal.getSignalPayloadNumber(runtimeScene, key)
+gdjs.evtTools.signal.getSignalPayloadString(runtimeScene, key)
+gdjs.evtTools.signal.getSignalSenderObjectName(runtimeScene)
+gdjs.evtTools.signal.getSignalSenderInstanceId(runtimeScene)
 ```
+
+All emit helpers also accept an optional sender argument at runtime. It can be a
+`gdjs.RuntimeObject`, a sender record, or an object-list map generated from the
+event action's optional "Emitter object" parameter. Object-list senders use the
+first picked object in the list.
 
 ### 11.3 Codegen for "Signal received"
 
@@ -827,19 +876,25 @@ runtimeScene._currentSignal = null;
 
 ### 11.4 Codegen for object/behavior onSignal
 
-`onSignal` is generated as a parameterless prototype method, exactly like other
-lifecycle methods (§8, §10.4). Signal name, payload and sender are read inside the
-body through the current-signal expressions:
+`onSignal` is generated as a runtime prototype method with the four signal data
+arguments. The events-function metadata still carries hidden owner parameters
+for editor/codegen context (section 8), but the runtime method does not receive
+them because the owner object or behavior is already available from `this`.
+Signal name, payload and sender can be read either from the direct parameters or
+through the current-signal expressions:
 
 ```ts
-MyCustomObject.prototype.onSignal = function() {
-  // generated events; SignalName()/SignalPayload(...)/sender read _currentSignal
+MyCustomObject.prototype.onSignal = function(
+  SignalName,
+  Payload,
+  EmitterObjectName,
+  EmitterInstanceId
+) {
+  // generated events
 };
 ```
 
-Behavior code generation does the same for behavior classes (the method carries
-only the implicit owner, as all behavior functions do), keeping `onSignal` inside
-the existing reserved-lifecycle mechanism with no new parameter-passing path.
+Behavior code generation uses the same four-argument runtime signature.
 
 ---
 
@@ -885,7 +940,7 @@ Editor search finds:
 
 Scene-wide broadcasts never walk every instance in the scene. They use the
 load-time receiver index (§10.3) and iterate only instances of object names /
-behavior types whose generated class defines `onSignal`:
+behavior-bearing object names whose generated class defines `onSignal`:
 
 ```text
 signalReceiverObjectNames:   Set<string>
@@ -962,15 +1017,17 @@ Emit in frame N, deliver at the start of frame N+1.
 Within one delivered signal, receivers run in a fixed order:
 
 ```text
-1. Custom object onSignal handlers   (containers before contained, then instance creation order)
-2. Behavior onSignal handlers        (in the owner's behavior declaration order)
-3. Scene "Signal received" conditions (in scene event-sheet order)
+1. For each targeted object name, in resolved target order:
+   a. each live instance in instance-list order,
+   b. that instance's custom object onSignal handler, if any,
+   c. that instance's behavior onSignal handlers, in behavior declaration order.
+2. Scene "Signal received" conditions (in scene event-sheet order)
 ```
 
-Object handlers run before behavior handlers because a prefab is the owner
-context for its behaviors. Behavior order follows the object's declared behavior
-order. Scene conditions run last, in sheet order. Determinism is a hard
-requirement (§2.5).
+Object handlers run before their own behavior handlers because a prefab is the
+owner context for its behaviors. Behavior order follows the object's declared
+behavior order. Scene conditions run last, in sheet order. Determinism is a hard
+requirement (section 2.5).
 
 ### 14.3 Signal names — free strings through one parameter type
 
@@ -978,12 +1035,14 @@ Signal names are free strings, entered through the single `signalName` parameter
 type (§9.6). This gives consistent autocomplete and a single attachment point for
 project-wide name discovery, without constraining authors to a fixed list.
 
-### 14.4 Payload editing — the existing variables editor
+### 14.4 Payload input - an optional variable parameter
 
-Payloads are edited with the standard variables editor, scoped to the emit
-action. The payload serializes as `VariableData[]`, instantiates into a
-`gdjs.VariablesContainer`, and is deep-cloned at emit (§6). Nested structures and
-arrays are authorable with no new UI.
+Emit actions take an optional payload variable. This avoids a new payload editor
+and uses the existing variable picker/editor model: authors prepare a variable
+with the fields they need, pass it to the emit action, and the bus deep-clones
+it at emit (section 6). They also take an optional emitter object list so signal
+receivers can identify the sender. Nested structures and arrays are authorable
+with no new UI.
 
 ### 14.5 Nested payloads — supported
 
@@ -1049,7 +1108,8 @@ lifecycle handlers, and the scene "Signal received" condition.
 ### 15.2 Event tools, actions, condition, expressions
 
 - `gdjs.evtTools.signal.*` runtime helpers (§11.2).
-- Emit actions: scene, object, picked objects, object group, behavior (§9.1).
+- Emit actions: scene, object, picked objects, object group, behavior, with
+  optional payload and emitter object parameters (§9.1).
 - "Signal received" condition (§9.2, §11.3).
 - `SignalName` / `SignalPayload` / `SignalPayloadString` / `SignalSenderObjectName`
   / `SignalSenderInstanceId` expressions (§9.3).
@@ -1059,11 +1119,15 @@ lifecycle handlers, and the scene "Signal received" condition.
 
 - `onSignal` recognized as a reserved lifecycle name for events-based objects and
   behaviors in the `MetadataDeclarationHelper.cpp` predicates.
-- Behavior and object code generators emit the parameterless prototype method
-  (`BehaviorCodeGenerator`, `ObjectCodeGenerator`, and their headers).
+- The core refactorer creates the fixed signature: hidden owner parameters plus
+  visible `SignalName`, `Payload`, `EmitterObjectName` and
+  `EmitterInstanceId`.
+- Behavior and object code generators emit runtime prototype methods with the
+  four signal data parameters.
 - Runtime base-method declarations for `onSignal` on `runtimebehavior.ts` and
   `customruntimeobject.ts`.
-- The dispatcher's per-instance invocation site (§10.4).
+- The dispatcher's per-instance invocation site passes the fixed signal
+  arguments and a per-receiver payload clone (section 10.4).
 - newIDE: lifecycle icon and method-selector entries for `onSignal`.
 
 ### 15.4 Debugger
@@ -1085,8 +1149,9 @@ SignalBus.dispatchQueuedSignals:
   publish this frame's delivered-signal list
   for each queued signal (FIFO, until the per-cycle limit):
     set current-signal context
-    call matching custom object onSignal handlers   (§14.2 order)
-    call matching behavior onSignal handlers
+    call matching custom object onSignal(SignalName, Payload, EmitterObjectName, EmitterInstanceId)
+    call matching behavior onSignal(SignalName, Payload, EmitterObjectName, EmitterInstanceId)
+      // Payload is cloned per receiver.
     clear current-signal context
 
 _eventsFunction(this):
@@ -1118,7 +1183,8 @@ Receivers react on the next frame in a deterministic, isolated phase.
 ```
 
 Signals are queued, scene-local notifications with copied payloads, delivered at
-the pre-events seam to three receiver kinds — custom object `onSignal`, behavior
-`onSignal`, and the scene "Signal received" condition — in a fixed, inspectable
-order. This preserves GDevelop's event-system design while giving prefabs, custom
-objects and behaviors a strong communication primitive.
+the pre-events seam to three receiver kinds: custom object `onSignal`, behavior
+`onSignal`, and the scene "Signal received" condition. `onSignal` receives fixed
+signal data parameters while the scene condition reads the same delivered signal
+through expressions. This preserves GDevelop's event-system design while giving
+prefabs, custom objects and behaviors a strong communication primitive.

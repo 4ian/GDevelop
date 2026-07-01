@@ -1207,6 +1207,7 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
   InsertUnique(includesFiles, "events-tools/runtimescenetools.js");
   InsertUnique(includesFiles, "events-tools/inputtools.js");
   InsertUnique(includesFiles, "events-tools/objecttools.js");
+  InsertUnique(includesFiles, "events-tools/signaltools.js");
   InsertUnique(includesFiles, "events-tools/cameratools.js");
   InsertUnique(includesFiles, "events-tools/soundtools.js");
   InsertUnique(includesFiles, "events-tools/storagetools.js");

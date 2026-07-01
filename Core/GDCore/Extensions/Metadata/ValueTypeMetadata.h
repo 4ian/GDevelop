@@ -224,6 +224,7 @@ class GD_CORE_API ValueTypeMetadata {
              parameterType == "color" || parameterType == "file" ||
              parameterType == "stringWithSelector" ||
              parameterType == "sceneName" ||
+             parameterType == "signalName" ||
              parameterType == "layerEffectName" ||
              parameterType == "layerEffectParameterName" ||
              parameterType == "objectEffectName" ||

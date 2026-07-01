@@ -680,6 +680,16 @@ namespace gdjs {
       return this.objectsLists.get(objectName) || [];
     }
 
+    getObjectNames(): string[] {
+      const objectNames = Array.from(this.objectsLists.keys());
+      if (this.parent) {
+        for (const objectName of this.parent.getObjectNames()) {
+          if (!this.objectsLists.has(objectName)) objectNames.push(objectName);
+        }
+      }
+      return objectNames;
+    }
+
     addObject(objectName: string, runtimeObject: gdjs.RuntimeObject): void {
       const list = this.getOrCreateList(objectName);
       if (list.includes(runtimeObject)) return;
@@ -702,6 +712,16 @@ namespace gdjs {
         this.callbacks.get(runtimeObject)!
       );
       this.callbacks.delete(runtimeObject);
+    }
+
+    clear(): void {
+      for (const [runtimeObject, callback] of this.callbacks.entries()) {
+        runtimeObject.unregisterDestroyCallback(callback);
+      }
+      this.callbacks.clear();
+      this.objectsLists.clear();
+      this.localVariablesContainers.length = 0;
+      this.parent = null;
     }
 
     restoreLocalVariablesContainers(

@@ -2115,6 +2115,43 @@ namespace gdjs {
     }
 
     /**
+     * Call onSignal on behaviors that implement it.
+     *
+     * @param signalName The delivered signal name.
+     * @param payload The delivered signal payload.
+     * @param emitterObjectName The name of the object that emitted the signal, if any.
+     * @param emitterInstanceId The unique id of the object that emitted the signal, if any.
+     * @param behaviorName If set, only this behavior instance can receive the signal.
+     * @returns The number of behavior callbacks called.
+     */
+    signalBehaviorsOnSignal(
+      signalName: string,
+      payload: gdjs.Variable,
+      emitterObjectName: string,
+      emitterInstanceId: integer,
+      behaviorName?: string
+    ): integer {
+      let calledBehaviorCount = 0;
+      for (let i = 0, len = this._behaviors.length; i < len; ++i) {
+        const behavior = this._behaviors[i];
+        if (behaviorName && behavior.getName() !== behaviorName) {
+          continue;
+        }
+        if (behavior.onSignal === gdjs.RuntimeBehavior.prototype.onSignal) {
+          continue;
+        }
+        behavior.onSignal(
+          signalName,
+          payload.clone(),
+          emitterObjectName,
+          emitterInstanceId
+        );
+        calledBehaviorCount++;
+      }
+      return calledBehaviorCount;
+    }
+
+    /**
      * Called when the object was hot reloaded, to notify behaviors
      * that the object was modified. Useful for behaviors that
      */

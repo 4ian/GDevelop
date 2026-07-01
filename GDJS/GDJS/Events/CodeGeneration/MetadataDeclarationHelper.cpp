@@ -402,7 +402,8 @@ bool MetadataDeclarationHelper::IsBehaviorLifecycleEventsFunction(
   return functionName == "onCreated" || functionName == "onPlacedInScene" ||
          functionName == "onActivate" ||
          functionName == "onDeActivate" || functionName == "doStepPreEvents" ||
-         functionName == "doStepPostEvents" || functionName == "onDestroy" ||
+         functionName == "doStepPostEvents" || functionName == "onSignal" ||
+         functionName == "onDestroy" ||
          // Compatibility with GD <= 5.0 beta 75
          functionName == "onOwnerRemovedFromScene";
   // end of compatibility code
@@ -415,8 +416,8 @@ bool MetadataDeclarationHelper::IsBehaviorLifecycleEventsFunction(
 bool MetadataDeclarationHelper::IsObjectLifecycleEventsFunction(
     const gd::String &functionName) {
   return functionName == "onCreated" || functionName == "onPlacedInScene" ||
-         functionName == "doStepPostEvents" || functionName == "onDestroy" ||
-         functionName == "onHotReloading";
+         functionName == "doStepPostEvents" || functionName == "onSignal" ||
+         functionName == "onDestroy" || functionName == "onHotReloading";
 }
 
 /**

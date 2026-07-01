@@ -345,11 +345,15 @@ gd::String EventsCodeGenerator::GenerateConditionCode(
        ++pNb) {
     if (ParameterMetadata::IsObject(
             instrInfos.parameters.GetParameter(pNb).GetType())) {
+      const gd::ParameterMetadata& parameterMetadata =
+          instrInfos.parameters.GetParameter(pNb);
       gd::String objectInParameter =
           condition.GetParameter(pNb).GetPlainString();
+      if (parameterMetadata.IsOptional() && objectInParameter.empty()) {
+        continue;
+      }
 
-      const auto& expectedObjectType =
-          instrInfos.parameters.GetParameter(pNb).GetExtraInfo();
+      const auto& expectedObjectType = parameterMetadata.GetExtraInfo();
       const auto& actualObjectType =
           GetObjectsContainersList().GetTypeOfObject(objectInParameter);
       if (!GetObjectsContainersList().HasObjectOrGroupNamed(
@@ -640,10 +644,14 @@ gd::String EventsCodeGenerator::GenerateActionCode(
        ++pNb) {
     if (ParameterMetadata::IsObject(
             instrInfos.parameters.GetParameter(pNb).GetType())) {
+      const gd::ParameterMetadata& parameterMetadata =
+          instrInfos.parameters.GetParameter(pNb);
       gd::String objectInParameter = action.GetParameter(pNb).GetPlainString();
+      if (parameterMetadata.IsOptional() && objectInParameter.empty()) {
+        continue;
+      }
 
-      const auto& expectedObjectType =
-          instrInfos.parameters.GetParameter(pNb).GetExtraInfo();
+      const auto& expectedObjectType = parameterMetadata.GetExtraInfo();
       const auto& actualObjectType =
           GetObjectsContainersList().GetTypeOfObject(objectInParameter);
       if (!GetObjectsContainersList().HasObjectOrGroupNamed(

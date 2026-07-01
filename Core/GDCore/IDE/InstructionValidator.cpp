@@ -90,6 +90,10 @@ ParameterValidationResult InstructionValidator::ValidateParameter(
   } else if (gd::ParameterMetadata::IsObject(parameterType)) {
     const auto &objectOrGroupName =
         instruction.GetParameter(parameterIndex).GetPlainString();
+    if (parameterMetadata.IsOptional() && objectOrGroupName.empty()) {
+      result.isValid = true;
+      return result;
+    }
     const auto &objectsContainersList =
         projectScopedContainers.GetObjectsContainersList();
     result.isValid =

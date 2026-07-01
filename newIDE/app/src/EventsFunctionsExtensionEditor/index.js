@@ -36,6 +36,10 @@ import BehaviorMethodSelectorDialog from './BehaviorMethodSelectorDialog';
 import ObjectMethodSelectorDialog from './ObjectMethodSelectorDialog';
 import ExtensionFunctionSelectorDialog from './ExtensionFunctionSelectorDialog';
 import EventsBasedObjectSelectorDialog from './EventsBasedObjectSelectorDialog';
+import {
+  ensureOnSignalBehaviorEventsFunctionProperParameters,
+  ensureOnSignalObjectEventsFunctionProperParameters,
+} from './OnSignalEventsFunctionParameters';
 import { ResponsiveWindowMeasurer } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import EditorNavigator, {
   type EditorNavigatorInterface,
@@ -343,7 +347,39 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
   );
   _projectScopedContainersAccessor: ProjectScopedContainersAccessor | null = null;
 
+  _normalizeOnSignalEventsFunctionParameters = (): boolean => {
+    const { eventsFunctionsExtension } = this.props;
+    let hasChanged = false;
+
+    const eventsBasedBehaviors = eventsFunctionsExtension.getEventsBasedBehaviors();
+    for (let i = 0; i < eventsBasedBehaviors.getCount(); ++i) {
+      hasChanged =
+        ensureOnSignalBehaviorEventsFunctionProperParameters(
+          eventsFunctionsExtension,
+          eventsBasedBehaviors.getAt(i)
+        ) || hasChanged;
+    }
+
+    const eventsBasedObjects = eventsFunctionsExtension.getEventsBasedObjects();
+    for (let i = 0; i < eventsBasedObjects.getCount(); ++i) {
+      hasChanged =
+        ensureOnSignalObjectEventsFunctionProperParameters(
+          eventsFunctionsExtension,
+          eventsBasedObjects.getAt(i)
+        ) || hasChanged;
+    }
+
+    return hasChanged;
+  };
+
   componentDidMount() {
+    if (
+      this._normalizeOnSignalEventsFunctionParameters() &&
+      this.props.unsavedChanges
+    ) {
+      this.props.unsavedChanges.triggerUnsavedChanges();
+    }
+
     if (!this.props.dialogOnly) {
       if (this.props.focusedEventsBasedBehavior) {
         if (this.props.initiallyFocusedFunctionName) {
@@ -764,6 +800,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
           gd.MetadataDeclarationHelper.isBehaviorLifecycleEventsFunction(
             tentativeNewName
           ) ||
+          tentativeNewName === 'onSignal' ||
           eventsBasedBehavior
             .getEventsFunctions()
             .hasEventsFunctionNamed(tentativeNewName)
@@ -805,6 +842,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
           gd.MetadataDeclarationHelper.isObjectLifecycleEventsFunction(
             tentativeNewName
           ) ||
+          tentativeNewName === 'onSignal' ||
           eventsBasedObject
             .getEventsFunctions()
             .hasEventsFunctionNamed(tentativeNewName)
@@ -1353,11 +1391,19 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       this.props.eventsFunctionsExtension,
       eventsBasedBehavior
     );
+    ensureOnSignalBehaviorEventsFunctionProperParameters(
+      this.props.eventsFunctionsExtension,
+      eventsBasedBehavior
+    );
   };
 
   _onObjectEventsFunctionAdded = (eventsBasedObject: gdEventsBasedObject) => {
     // This will create the mandatory parameters for the newly added function.
     gd.WholeProjectRefactorer.ensureObjectEventsFunctionsProperParameters(
+      this.props.eventsFunctionsExtension,
+      eventsBasedObject
+    );
+    ensureOnSignalObjectEventsFunctionProperParameters(
       this.props.eventsFunctionsExtension,
       eventsBasedObject
     );

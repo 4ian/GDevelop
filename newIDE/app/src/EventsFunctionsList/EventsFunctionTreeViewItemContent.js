@@ -100,6 +100,9 @@ export const getFunctionIconUrl = (
         case 'doStepPostEvents':
           return 'res/functions/step_black.svg';
 
+        case 'onSignal':
+          return 'res/functions/signal_black.svg';
+
         case 'onSceneLoaded':
         case 'onFirstSceneLoaded':
         case 'onCreated':
@@ -188,13 +191,18 @@ export const canFunctionBeRenamed = (
   containerType: 'extension' | 'behavior' | 'object'
 ): boolean => {
   const name = eventsFunction.getName();
+  const isOnSignalLifecycleEventsFunction = name === 'onSignal';
   if (containerType === 'behavior') {
-    return !gd.MetadataDeclarationHelper.isBehaviorLifecycleEventsFunction(
-      name
+    return !(
+      gd.MetadataDeclarationHelper.isBehaviorLifecycleEventsFunction(name) ||
+      isOnSignalLifecycleEventsFunction
     );
   }
   if (containerType === 'object') {
-    return !gd.MetadataDeclarationHelper.isObjectLifecycleEventsFunction(name);
+    return !(
+      gd.MetadataDeclarationHelper.isObjectLifecycleEventsFunction(name) ||
+      isOnSignalLifecycleEventsFunction
+    );
   }
   return !gd.MetadataDeclarationHelper.isExtensionLifecycleEventsFunction(name);
 };

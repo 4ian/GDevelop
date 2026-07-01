@@ -28,6 +28,7 @@ import EventsBasedObjectEditor from '../EventsFunctionsExtensionEditor/EventsBas
 import { EventsBasedBehaviorOrObjectPropertiesEditor } from '../EventsFunctionsExtensionEditor/EventsBasedBehaviorOrObjectEditor/EventsBasedBehaviorOrObjectPropertiesEditor';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import ObjectMethodSelectorDialog from '../EventsFunctionsExtensionEditor/ObjectMethodSelectorDialog';
+import { ensureOnSignalObjectEventsFunctionProperParameters } from '../EventsFunctionsExtensionEditor/OnSignalEventsFunctionParameters';
 import { ResponsiveWindowMeasurer } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import EditorNavigator, {
   type EditorNavigatorInterface,
@@ -240,7 +241,21 @@ export default class PrefabDetailEditor extends React.Component<Props, State> {
   );
   _projectScopedContainersAccessor: ProjectScopedContainersAccessor | null = null;
 
+  _normalizeOnSignalEventsFunctionParameters = (): boolean => {
+    return ensureOnSignalObjectEventsFunctionProperParameters(
+      this.props.eventsFunctionsExtension,
+      this.props.eventsBasedObject
+    );
+  };
+
   componentDidMount() {
+    if (
+      this._normalizeOnSignalEventsFunctionParameters() &&
+      this.props.unsavedChanges
+    ) {
+      this.props.unsavedChanges.triggerUnsavedChanges();
+    }
+
     if (!this.props.dialogOnly) {
       if (this.props.initiallyFocusedFunctionName) {
         this.selectEventsFunctionByName(
@@ -480,6 +495,7 @@ export default class PrefabDetailEditor extends React.Component<Props, State> {
           gd.MetadataDeclarationHelper.isObjectLifecycleEventsFunction(
             tentativeNewName
           ) ||
+          tentativeNewName === 'onSignal' ||
           object.getEventsFunctions().hasEventsFunctionNamed(tentativeNewName)
         ) {
           return true;
@@ -573,6 +589,10 @@ export default class PrefabDetailEditor extends React.Component<Props, State> {
 
   _onObjectEventsFunctionAdded = (eventsBasedObject: gdEventsBasedObject) => {
     gd.WholeProjectRefactorer.ensureObjectEventsFunctionsProperParameters(
+      this.props.eventsFunctionsExtension,
+      eventsBasedObject
+    );
+    ensureOnSignalObjectEventsFunctionProperParameters(
       this.props.eventsFunctionsExtension,
       eventsBasedObject
     );

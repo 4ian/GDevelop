@@ -46,6 +46,19 @@ bool HasEnabledInstructions(const gd::InstructionsList& instructions) {
 
   return false;
 }
+
+const gd::Instruction* FindTopLevelSignalReceivedCondition(
+    const gd::InstructionsList& instructions) {
+  for (std::size_t i = 0; i < instructions.size(); ++i) {
+    const gd::Instruction& instruction = instructions[i];
+    if (!instruction.IsDisabled() && !instruction.IsInverted() &&
+        instruction.GetType() == "SignalReceived") {
+      return &instruction;
+    }
+  }
+
+  return nullptr;
+}
 }  // namespace
 
 CommonInstructionsExtension::CommonInstructionsExtension() {
@@ -171,22 +184,84 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
         gd::String actionsDeclarationsCode =
             codeGenerator.GenerateObjectsDeclarationCode(actionsContext);
 
-        gd::String outputCode;
-        outputCode += localVariablesInitializationCode;
-        outputCode += conditionsCode;
-        if (!ifPredicate.empty())
-          outputCode += "if (" + ifPredicate + ") ";
-        outputCode += "{\n";
-        outputCode += actionsDeclarationsCode;
-        outputCode += actionsCode;
-        if (context.IsFollowedByElseEvent()) {
-          outputCode += chainSatisfiedVariable + " = true;\n";
-        }
-        outputCode += "}\n";
+        const gd::Instruction* signalReceivedCondition =
+            codeGenerator.HasProjectAndLayout()
+                ? FindTopLevelSignalReceivedCondition(event.GetConditions())
+                : nullptr;
 
-        if (event_.HasVariables()) {
-          outputCode += codeGenerator.GenerateLocalVariablesStackAccessor() +
-                        ".pop();\n";
+        gd::String outputCode;
+        if (signalReceivedCondition) {
+          const gd::String signalIteratorId = gd::String::From(
+              codeGenerator.GenerateSingleUsageUniqueIdFor(
+                  signalReceivedCondition));
+          const gd::String signalsListName =
+              "signalsForEvent" + signalIteratorId;
+          const gd::String signalIndexName =
+              "signalIndex" + signalIteratorId;
+          const gd::String signalNameCode =
+              gd::ExpressionCodeGenerator::GenerateExpressionCode(
+                  codeGenerator,
+                  context,
+                  "string",
+                  signalReceivedCondition->GetParameters().empty()
+                      ? ""
+                      : signalReceivedCondition->GetParameter(0)
+                            .GetPlainString());
+
+          outputCode += "const " + signalsListName +
+                        " = gdjs.evtTools.signal.getDeliveredSignals("
+                        "runtimeScene, " +
+                        signalNameCode + ");\n";
+          outputCode += "for (let " + signalIndexName + " = 0, " +
+                        signalIndexName + "Len = " + signalsListName +
+                        ".length; " + signalIndexName + " < " +
+                        signalIndexName + "Len; ++" + signalIndexName +
+                        ") {\n";
+          outputCode +=
+              "gdjs.evtTools.signal.setCurrentSignalForSceneCondition("
+              "runtimeScene, " +
+              signalsListName + "[" + signalIndexName + "]);\n";
+          outputCode += localVariablesInitializationCode;
+          outputCode += conditionsCode;
+          if (!ifPredicate.empty())
+            outputCode += "if (" + ifPredicate + ") ";
+          outputCode += "{\n";
+          outputCode +=
+              "gdjs.evtTools.signal.recordSceneSignalReceived(runtimeScene, " +
+              signalsListName + "[" + signalIndexName + "]);\n";
+          outputCode += actionsDeclarationsCode;
+          outputCode += actionsCode;
+          if (context.IsFollowedByElseEvent()) {
+            outputCode += chainSatisfiedVariable + " = true;\n";
+          }
+          outputCode += "}\n";
+
+          if (event_.HasVariables()) {
+            outputCode += codeGenerator.GenerateLocalVariablesStackAccessor() +
+                          ".pop();\n";
+          }
+
+          outputCode += "}\n";
+          outputCode +=
+              "gdjs.evtTools.signal.clearCurrentSignalForSceneCondition("
+              "runtimeScene);\n";
+        } else {
+          outputCode += localVariablesInitializationCode;
+          outputCode += conditionsCode;
+          if (!ifPredicate.empty())
+            outputCode += "if (" + ifPredicate + ") ";
+          outputCode += "{\n";
+          outputCode += actionsDeclarationsCode;
+          outputCode += actionsCode;
+          if (context.IsFollowedByElseEvent()) {
+            outputCode += chainSatisfiedVariable + " = true;\n";
+          }
+          outputCode += "}\n";
+
+          if (event_.HasVariables()) {
+            outputCode += codeGenerator.GenerateLocalVariablesStackAccessor() +
+                          ".pop();\n";
+          }
         }
 
         return outputCode;

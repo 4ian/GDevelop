@@ -116,6 +116,17 @@ export default function ObjectMethodSelectorDialog({
         />
         <FunctionListItem
           functionType={gd.EventsFunction.Action}
+          functionName="onSignal"
+          disabled={eventsFunctions.hasEventsFunctionNamed('onSignal')}
+          onChoose={onChoose}
+          description={
+            <Trans>
+              Events that will be run when a signal is delivered to the object.
+            </Trans>
+          }
+        />
+        <FunctionListItem
+          functionType={gd.EventsFunction.Action}
           functionName="doStepPostEvents"
           disabled={eventsFunctions.hasEventsFunctionNamed('doStepPostEvents')}
           onChoose={onChoose}

@@ -120,7 +120,8 @@ TEST_CASE("EventsFunction", "[common]") {
 
     gd::ObjectsContainer objectsContainer(gd::ObjectsContainer::Function);
     gd::EventsFunctionTools::ObjectEventsFunctionToObjectsContainer(
-        project, eventsBasedObject, eventsFunction, objectsContainer);
+        project, eventsExtension, eventsBasedObject, eventsFunction,
+        objectsContainer);
 
     REQUIRE(objectsContainer.HasObjectNamed("Object"));
     auto &object = objectsContainer.GetObject("Object");
@@ -130,6 +131,47 @@ TEST_CASE("EventsFunction", "[common]") {
             "MyExtension::MyBehavior");
     REQUIRE(
         object.GetBehavior("MyPrefabBehavior").IsInheritedFromObjectType());
+  }
+
+  SECTION("Object onSignal has signal parameters and keeps Object scope") {
+    gd::Platform platform;
+    gd::Project project;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    auto &eventsExtension =
+        project.InsertNewEventsFunctionsExtension("MyEventsExtension", 0);
+    auto &eventsBasedObject = eventsExtension.GetEventsBasedObjects().InsertNew(
+        "MyEventsBasedObject", 0);
+
+    auto &eventsFunction =
+        eventsBasedObject.GetEventsFunctions().InsertNewEventsFunction(
+            "onSignal", 0);
+    gd::WholeProjectRefactorer::EnsureObjectEventsFunctionsProperParameters(
+        eventsExtension, eventsBasedObject);
+
+    auto &parameters = eventsFunction.GetParameters();
+    REQUIRE(parameters.GetParametersCount() == 5);
+    REQUIRE(parameters.GetParameter(0).GetName() == "Object");
+    REQUIRE(parameters.GetParameter(0).GetType() == "object");
+    REQUIRE(parameters.GetParameter(0).GetExtraInfo() ==
+            "MyEventsExtension::MyEventsBasedObject");
+    REQUIRE(parameters.GetParameter(1).GetName() == "SignalName");
+    REQUIRE(parameters.GetParameter(1).GetType() == "signalName");
+    REQUIRE(parameters.GetParameter(2).GetName() == "Payload");
+    REQUIRE(parameters.GetParameter(2).GetType() == "variable");
+    REQUIRE(parameters.GetParameter(3).GetName() == "EmitterObjectName");
+    REQUIRE(parameters.GetParameter(3).GetType() == "string");
+    REQUIRE(parameters.GetParameter(4).GetName() == "EmitterInstanceId");
+    REQUIRE(parameters.GetParameter(4).GetType() == "expression");
+
+    gd::ObjectsContainer objectsContainer(gd::ObjectsContainer::Function);
+    gd::EventsFunctionTools::ObjectEventsFunctionToObjectsContainer(
+        project, eventsExtension, eventsBasedObject, eventsFunction,
+        objectsContainer);
+
+    REQUIRE(objectsContainer.HasObjectNamed("Object"));
+    REQUIRE(objectsContainer.GetObject("Object").GetType() ==
+            "MyEventsExtension::MyEventsBasedObject");
   }
 
   SECTION("Prefab variables are exposed in prefab event scopes") {
@@ -263,6 +305,50 @@ TEST_CASE("EventsFunction", "[common]") {
     REQUIRE(!parameterObjectsContainer.GetObject("Object")
                  .GetVariables()
                  .Has("BehaviorState"));
+  }
+
+  SECTION("Behavior onSignal has signal parameters and keeps Object scope") {
+    gd::Platform platform;
+    gd::Project project;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    auto &eventsExtension =
+        project.InsertNewEventsFunctionsExtension("MyEventsExtension", 0);
+    auto &eventsBasedBehavior =
+        eventsExtension.GetEventsBasedBehaviors().InsertNew("MyBehavior", 0);
+    eventsBasedBehavior.SetObjectType("MyExtension::Sprite");
+
+    auto &eventsFunction =
+        eventsBasedBehavior.GetEventsFunctions().InsertNewEventsFunction(
+            "onSignal", 0);
+    gd::WholeProjectRefactorer::EnsureBehaviorEventsFunctionsProperParameters(
+        eventsExtension, eventsBasedBehavior);
+
+    auto &parameters = eventsFunction.GetParameters();
+    REQUIRE(parameters.GetParametersCount() == 6);
+    REQUIRE(parameters.GetParameter(0).GetName() == "Object");
+    REQUIRE(parameters.GetParameter(0).GetType() == "object");
+    REQUIRE(parameters.GetParameter(0).GetExtraInfo() == "MyExtension::Sprite");
+    REQUIRE(parameters.GetParameter(1).GetName() == "Behavior");
+    REQUIRE(parameters.GetParameter(1).GetType() == "behavior");
+    REQUIRE(parameters.GetParameter(1).GetExtraInfo() ==
+            "MyEventsExtension::MyBehavior");
+    REQUIRE(parameters.GetParameter(2).GetName() == "SignalName");
+    REQUIRE(parameters.GetParameter(2).GetType() == "signalName");
+    REQUIRE(parameters.GetParameter(3).GetName() == "Payload");
+    REQUIRE(parameters.GetParameter(3).GetType() == "variable");
+    REQUIRE(parameters.GetParameter(4).GetName() == "EmitterObjectName");
+    REQUIRE(parameters.GetParameter(4).GetType() == "string");
+    REQUIRE(parameters.GetParameter(5).GetName() == "EmitterInstanceId");
+    REQUIRE(parameters.GetParameter(5).GetType() == "expression");
+
+    gd::ObjectsContainer objectsContainer(gd::ObjectsContainer::Function);
+    gd::EventsFunctionTools::BehaviorEventsFunctionToObjectsContainer(
+        project, eventsBasedBehavior, eventsFunction, objectsContainer);
+
+    REQUIRE(objectsContainer.HasObjectNamed("Object"));
+    REQUIRE(objectsContainer.GetObject("Object").GetType() ==
+            "MyExtension::Sprite");
   }
 
   SECTION("Choice properties are exposed as enum variables") {

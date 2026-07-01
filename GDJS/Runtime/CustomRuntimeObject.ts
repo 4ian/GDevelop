@@ -388,6 +388,18 @@ namespace gdjs {
     doStepPreEvents(parent: gdjs.RuntimeInstanceContainer) {}
 
     /**
+     * This method is called when a signal is delivered to the object.
+     *
+     * Custom objects implement this method with code generated from events.
+     */
+    onSignal(
+      signalName: string,
+      payload: gdjs.Variable,
+      emitterObjectName: string,
+      emitterInstanceId: integer
+    ) {}
+
+    /**
      * Called after the custom object has received its final position, layer and
      * z order in the parent container.
      *

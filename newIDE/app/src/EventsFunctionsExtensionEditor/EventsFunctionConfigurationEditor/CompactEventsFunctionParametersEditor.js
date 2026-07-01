@@ -379,21 +379,26 @@ const CompactEventsFunctionParametersEditor: React.ComponentType<{
 
     const forceUpdate = useForceUpdate();
 
+    const functionName = eventsFunction.getName();
+    const isOnSignalLifecycleEventsFunction = functionName === 'onSignal';
     const isABehaviorLifecycleEventsFunction =
       !!eventsBasedBehavior &&
-      gd.MetadataDeclarationHelper.isBehaviorLifecycleEventsFunction(
-        eventsFunction.getName()
-      );
+      (gd.MetadataDeclarationHelper.isBehaviorLifecycleEventsFunction(
+        functionName
+      ) ||
+        isOnSignalLifecycleEventsFunction);
     const isAnObjectLifecycleEventsFunction =
       !!eventsBasedObject &&
       !eventsBasedBehavior &&
-      gd.MetadataDeclarationHelper.isObjectLifecycleEventsFunction(
-        eventsFunction.getName()
-      );
-    freezeParameters =
-      freezeParameters ||
+      (gd.MetadataDeclarationHelper.isObjectLifecycleEventsFunction(
+        functionName
+      ) ||
+        isOnSignalLifecycleEventsFunction);
+    const isLifecycleEventsFunction =
+      isOnSignalLifecycleEventsFunction ||
       isABehaviorLifecycleEventsFunction ||
       isAnObjectLifecycleEventsFunction;
+    freezeParameters = freezeParameters || isLifecycleEventsFunction;
 
     const [
       longDescriptionShownIndexes,
@@ -857,9 +862,21 @@ const CompactEventsFunctionParametersEditor: React.ComponentType<{
       );
     };
 
-    const parametersCount = parameters.getParametersCount();
+    const visibleParameterIndexes: Array<number> =
+      isLifecycleEventsFunction && !isOnSignalLifecycleEventsFunction
+        ? []
+        : isOnSignalLifecycleEventsFunction
+        ? mapFor(
+            firstParameterIndex,
+            parameters.getParametersCount(),
+            index => index
+          )
+        : mapFor(0, parameters.getParametersCount(), index => index);
+    const parametersCount = visibleParameterIndexes.length;
     const firstParameterName =
-      parametersCount > 0 ? parameters.getParameterAt(0).getName() : null;
+      parametersCount > 0
+        ? parameters.getParameterAt(visibleParameterIndexes[0]).getName()
+        : null;
 
     React.useEffect(
       () => {
@@ -882,12 +899,17 @@ const CompactEventsFunctionParametersEditor: React.ComponentType<{
 
     const selectedParameterIndex =
       selectedParameterName &&
-      parameters.hasParameterNamed(selectedParameterName)
+      parameters.hasParameterNamed(selectedParameterName) &&
+      visibleParameterIndexes.includes(
+        parameters.getParameterPosition(
+          parameters.getParameter(selectedParameterName)
+        )
+      )
         ? parameters.getParameterPosition(
             parameters.getParameter(selectedParameterName)
           )
         : parametersCount > 0
-        ? 0
+        ? visibleParameterIndexes[0]
         : -1;
 
     const isAnExtensionLifecycleEventsFunction =
@@ -1374,7 +1396,13 @@ const CompactEventsFunctionParametersEditor: React.ComponentType<{
             {renderConfigurationFields()}
             <Line>
               <Column noMargin expand noOverflowParent>
-                {mapFor(0, parametersCount, i => renderParameterRow(i18n, i))}
+                {visibleParameterIndexes.length > 0 ? (
+                  visibleParameterIndexes.map(i => renderParameterRow(i18n, i))
+                ) : isLifecycleEventsFunction ? (
+                  <EmptyMessage>
+                    <Trans>This function has no parameters.</Trans>
+                  </EmptyMessage>
+                ) : null}
               </Column>
             </Line>
           </ScrollView>
@@ -1389,11 +1417,7 @@ const CompactEventsFunctionParametersEditor: React.ComponentType<{
         selectedParameterIndex >= 0
           ? parameters.getParameterAt(selectedParameterIndex)
           : null;
-      const matchingParameterIndexes = mapFor(
-        0,
-        parametersCount,
-        index => index
-      ).filter(index =>
+      const matchingParameterIndexes = visibleParameterIndexes.filter(index =>
         getIsParameterMatchingSearch(parameters.getParameterAt(index), index)
       );
 
@@ -1495,7 +1519,13 @@ const CompactEventsFunctionParametersEditor: React.ComponentType<{
                           <Line>
                             <Column noMargin expand>
                               <Text color="secondary">
-                                <Trans>No parameters yet.</Trans>
+                                {isLifecycleEventsFunction ? (
+                                  <Trans>
+                                    This function has no parameters.
+                                  </Trans>
+                                ) : (
+                                  <Trans>No parameters yet.</Trans>
+                                )}
                               </Text>
                             </Column>
                           </Line>

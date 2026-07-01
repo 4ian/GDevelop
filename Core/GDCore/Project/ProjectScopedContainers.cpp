@@ -160,7 +160,8 @@ ProjectScopedContainers::MakeNewProjectScopedContainersForObjectEventsFunction(
     gd::ResourcesContainer &propertyResourcesContainer) {
 
   gd::EventsFunctionTools::ObjectEventsFunctionToObjectsContainer(
-      project, eventsBasedObject, eventsFunction, parameterObjectsContainer);
+      project, eventsFunctionsExtension, eventsBasedObject, eventsFunction,
+      parameterObjectsContainer);
 
   ProjectScopedContainers projectScopedContainers(
       ObjectsContainersList::MakeNewObjectsContainersListForContainers(

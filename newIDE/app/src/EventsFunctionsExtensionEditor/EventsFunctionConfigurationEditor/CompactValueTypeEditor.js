@@ -35,6 +35,7 @@ const renderOptionIcon = (type: string, className: string): React.Node => {
     case 'identifier':
     case 'keyboardKey':
     case 'mouseButton':
+    case 'signalName':
     case 'objectPointName':
     case 'color':
     case 'leaderboardId':
@@ -189,6 +190,10 @@ export default function CompactValueTypeEditor({
                   <SelectOption
                     value="sceneName"
                     label={t`Scene name (text)`}
+                  />
+                  <SelectOption
+                    value="signalName"
+                    label={t`Signal name (text)`}
                   />
                   {!isExpressionType && (
                     <SelectOption

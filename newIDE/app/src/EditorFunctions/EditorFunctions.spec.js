@@ -3049,6 +3049,14 @@ describe('editorFunctions', () => {
       const enemy3 = sceneObjects.getObject('Enemy3');
       expect(enemy3.hasBehaviorNamed('PlatformerObject')).toBe(true);
       expect(enemy3.getVariables().has('groupHealth')).toBe(true);
+
+      // The change message explains which behaviors and variables the newly
+      // added object inherited from the group, with their names and types.
+      expect(result.message).toMatchInlineSnapshot(`
+        "Done.
+        Group \\"Enemies\\" in scene \\"TestScene\\" now contains 3 object(s): Enemy1, Enemy2, Enemy3.
+        Object(s) \\"Enemy3\\" newly added to group \\"Enemies\\" now have the behavior(s) \\"PlatformerObject\\" (PlatformBehavior::PlatformerObjectBehavior) and variable(s) \\"groupHealth\\" (Number) that the rest of the group has in common (a group is the \\"intersection\\" of its objects), added to them if they did not already have them."
+      `);
     });
 
     it('sets a variable on every object of a global group (no scene_name)', async () => {

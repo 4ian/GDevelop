@@ -22,6 +22,7 @@ const BehaviorPropertiesEditor = ({
   resourceManagementProps,
   projectScopedContainersAccessor,
   isAdvancedSectionInitiallyUncollapsed,
+  hideGlobalConfigPlaceholderHints,
 }: Props): React.Node => {
   const schema = React.useMemo(
     () => {
@@ -71,6 +72,7 @@ const BehaviorPropertiesEditor = ({
         isAdvancedSectionInitiallyUncollapsed={
           isAdvancedSectionInitiallyUncollapsed
         }
+        hideGlobalConfigPlaceholderHints={hideGlobalConfigPlaceholderHints}
       />
     </Column>
   );

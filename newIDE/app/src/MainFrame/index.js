@@ -2009,18 +2009,18 @@ const MainFrame = (props: Props): React.MixedElement => {
 
   const activateProjectManagerItemFromSwitcher = React.useCallback(
     (itemId: string) => {
-      if (!isProjectManagerPinnedForCurrentProject) {
-        openProjectManager(true);
+      const projectManager = projectManagerRef.current;
+      if (projectManager) {
+        projectManager.activateItemFromId(itemId);
+        return;
       }
 
-      // Let the drawer render before activating a Project Manager item from
-      // the global switcher.
       setTimeout(() => {
         const projectManager = projectManagerRef.current;
         if (projectManager) projectManager.activateItemFromId(itemId);
-      }, 200);
+      }, 0);
     },
-    [isProjectManagerPinnedForCurrentProject, openProjectManager]
+    []
   );
 
   const isProjectManagerVisible =

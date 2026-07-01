@@ -57,6 +57,7 @@ type Props = {|
   project?: ?gdProject,
   projectScopedContainersAccessor?: ProjectScopedContainersAccessor,
   resourceManagementProps?: ?ResourceManagementProps,
+  hideGlobalConfigPlaceholderHints?: boolean,
 |};
 
 const styles = {
@@ -235,6 +236,7 @@ const PropertiesEditor = ({
   project,
   projectScopedContainersAccessor,
   resourceManagementProps,
+  hideGlobalConfigPlaceholderHints,
 }: Props): React.Node => {
   const forceUpdate = useForceUpdate();
 
@@ -321,7 +323,7 @@ const PropertiesEditor = ({
             floatingLabelFixed
             helperMarkdownText={getFieldDescription(field)}
             hintText={
-              allowGlobalConfigPlaceholder
+              allowGlobalConfigPlaceholder && !hideGlobalConfigPlaceholderHints
                 ? globalConfigPlaceholderExample
                 : undefined
             }
@@ -417,7 +419,8 @@ const PropertiesEditor = ({
                 floatingLabelFixed
                 helperMarkdownText={getFieldDescription(field)}
                 hintText={
-                  field.allowGlobalConfigPlaceholder
+                  field.allowGlobalConfigPlaceholder &&
+                  !hideGlobalConfigPlaceholderHints
                     ? globalConfigPlaceholderExample
                     : undefined
                 }
@@ -469,7 +472,12 @@ const PropertiesEditor = ({
         );
       }
     },
-    [instances, getFieldDescription, _onInstancesModified]
+    [
+      instances,
+      getFieldDescription,
+      _onInstancesModified,
+      hideGlobalConfigPlaceholderHints,
+    ]
   );
 
   const renderSelectField = React.useCallback(
@@ -731,6 +739,9 @@ const PropertiesEditor = ({
                   mode="row"
                   unsavedChanges={unsavedChanges}
                   onInstancesModified={onInstancesModified}
+                  hideGlobalConfigPlaceholderHints={
+                    hideGlobalConfigPlaceholderHints
+                  }
                 />
               )}
             </UnsavedChangesContext.Consumer>
@@ -762,6 +773,9 @@ const PropertiesEditor = ({
                   mode="column"
                   unsavedChanges={unsavedChanges}
                   onInstancesModified={onInstancesModified}
+                  hideGlobalConfigPlaceholderHints={
+                    hideGlobalConfigPlaceholderHints
+                  }
                 />
               )}
             </UnsavedChangesContext.Consumer>

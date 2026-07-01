@@ -46,6 +46,7 @@ type Props = {|
   projectScopedContainersAccessor?: ProjectScopedContainersAccessor,
   resourceManagementProps?: ?ResourceManagementProps,
   isAdvancedSectionInitiallyUncollapsed?: boolean,
+  hideGlobalConfigPlaceholderHints?: boolean,
 |};
 
 const PropertiesEditorByVisibility = ({
@@ -60,6 +61,7 @@ const PropertiesEditorByVisibility = ({
   resourceManagementProps,
   placeholder,
   isAdvancedSectionInitiallyUncollapsed,
+  hideGlobalConfigPlaceholderHints,
 }: Props): ?(false | 0 | '' | React$Portal | React.Node) => {
   const [
     shouldShowDeprecatedProperties,
@@ -112,6 +114,7 @@ const PropertiesEditorByVisibility = ({
         projectScopedContainersAccessor={projectScopedContainersAccessor}
         renderExtraDescriptionText={renderExtraDescriptionText}
         unsavedChanges={unsavedChanges}
+        hideGlobalConfigPlaceholderHints={hideGlobalConfigPlaceholderHints}
       />
       {(advancedPropertiesSchema.length > 0 ||
         deprecatedPropertiesSchema.length > 0) && (
@@ -137,6 +140,9 @@ const PropertiesEditorByVisibility = ({
                 }
                 renderExtraDescriptionText={renderExtraDescriptionText}
                 unsavedChanges={unsavedChanges}
+                hideGlobalConfigPlaceholderHints={
+                  hideGlobalConfigPlaceholderHints
+                }
               />
               {deprecatedPropertiesSchema.length > 0 &&
                 (shouldShowDeprecatedProperties ? (
@@ -151,6 +157,9 @@ const PropertiesEditorByVisibility = ({
                     }
                     renderExtraDescriptionText={renderExtraDescriptionText}
                     unsavedChanges={unsavedChanges}
+                    hideGlobalConfigPlaceholderHints={
+                      hideGlobalConfigPlaceholderHints
+                    }
                   />
                 ) : (
                   <Line justifyContent="center">

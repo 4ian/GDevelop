@@ -1564,6 +1564,7 @@ export default class PrefabDetailEditor extends React.Component<Props, State> {
                       onExtensionInstalled={this.props.onExtensionInstalled}
                       isListLocked={false}
                       canUseWholeProjectRefactorer={false}
+                      hideGlobalConfigPlaceholderHints
                     />
                   </div>
                 )}

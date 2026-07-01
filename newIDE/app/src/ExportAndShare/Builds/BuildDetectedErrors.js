@@ -5,10 +5,6 @@ import { Trans } from '@lingui/macro';
 /**
  * Maps a build error `code` (detected by the backend when analyzing the build
  * log) to a human-readable, translatable message shown to the user.
- *
- * To handle a new common error, add a detector on the backend (build-api
- * `build-log-analysis/analyzer.js`) and a matching entry here keyed by the same
- * `code`. Codes without an entry here are simply ignored by the UI.
  */
 export const buildDetectedErrorsConfig: {
   [code: string]: {| message: React.Node |},

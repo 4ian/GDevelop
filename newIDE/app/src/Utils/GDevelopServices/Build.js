@@ -48,7 +48,18 @@ export type Build = {
   targets?: Array<TargetName>,
   createdAt?: number, // Not defined for old builds.
   updatedAt: number,
+  // Common errors detected by analyzing the build log (e.g. a wrong app icon
+  // size). Empty or undefined when nothing known was detected.
+  detectedErrors?: Array<BuildDetectedError>,
 };
+
+export type BuildDetectedError = {|
+  // A machine-readable code identifying the error. The human-readable message
+  // is resolved on the frontend from this code (see BuildDetectedErrors.js).
+  code: string,
+  // An optional page url giving more information about the error.
+  helpUrl?: string,
+|};
 
 export type BuildArtifactKeyName =
   | 'apkKey'

@@ -24,6 +24,31 @@ export const Errored = (): React.Node => (
   <BuildProgressAndActions build={erroredCordovaBuild} game={game1} />
 );
 
+export const ErroredWithDetectedIssue = (): React.Node => (
+  <BuildProgressAndActions
+    build={{
+      ...erroredCordovaBuild,
+      detectedErrors: [{ code: 'ios-app-icon-wrong-size' }],
+    }}
+    game={game1}
+  />
+);
+
+export const ErroredWithDetectedIssueAndHelpLink = (): React.Node => (
+  <BuildProgressAndActions
+    build={{
+      ...erroredCordovaBuild,
+      detectedErrors: [
+        {
+          code: 'ios-app-icon-wrong-size',
+          helpUrl: 'https://wiki.gdevelop.io/gdevelop5/publishing/',
+        },
+      ],
+    }}
+    game={game1}
+  />
+);
+
 export const PendingElectronBuild = (): React.Node => (
   <BuildProgressAndActions
     build={{ ...pendingElectronBuild, updatedAt: Date.now() }}

@@ -26,6 +26,8 @@ import { shortenUuidForDisplay } from '../../Utils/GDevelopServices/Play';
 import LinearProgress from '../../UI/LinearProgress';
 import FlatButton from '../../UI/FlatButton';
 import ShareExternal from '../../UI/CustomSvgIcons/ShareExternal';
+import { Accordion, AccordionHeader, AccordionBody } from '../../UI/Accordion';
+import { buildDetectedErrorsConfig } from './BuildDetectedErrors';
 
 const buildTypesConfig = {
   'cordova-build': {
@@ -142,6 +144,12 @@ const BuildProgressAndActions = ({
     onCopyToClipboard && onCopyToClipboard();
   };
 
+  // Errors detected by analyzing the build log, restricted to the ones we have
+  // a user-facing message for (a newer backend may report unknown codes).
+  const knownDetectedErrors = (build.detectedErrors || []).filter(
+    detectedError => !!buildDetectedErrorsConfig[detectedError.code]
+  );
+
   const onUpdatePublicBuild = React.useCallback(
     async (buildId: ?string, i18n: I18nType) => {
       if (!profile || !game || !onGameUpdated || !setGameUpdating) return;
@@ -197,30 +205,71 @@ const BuildProgressAndActions = ({
     <I18n>
       {({ i18n }) =>
         build.status === 'error' ? (
-          <ResponsiveLineStackLayout
-            alignItems="center"
-            justifyContent="space-between"
-            expand
-          >
-            <Column noMargin>
-              <Text noMargin>
-                <Trans>Something wrong happened :(</Trans>
-              </Text>
-              <EmptyMessage
-                style={{ justifyContent: 'flex-start', padding: 0 }}
-              >
-                <Trans>
-                  Check the logs to see if there is an explanation about what
-                  went wrong, or try again later.
-                </Trans>
-              </EmptyMessage>
-            </Column>
-            <RaisedButton
-              primary
-              label={<Trans>Download log files</Trans>}
-              onClick={() => onDownload('logsKey')}
-            />
-          </ResponsiveLineStackLayout>
+          knownDetectedErrors.length > 0 ? (
+            <ColumnStackLayout expand noMargin>
+              <Accordion defaultExpanded noMargin>
+                <AccordionHeader>
+                  <Text noMargin>
+                    <Trans>Details</Trans>
+                  </Text>
+                </AccordionHeader>
+                <AccordionBody>
+                  <ColumnStackLayout expand noMargin>
+                    {knownDetectedErrors.map((detectedError, index) => {
+                      const { code, helpUrl } = detectedError;
+                      return (
+                        <Column key={`${code}-${index}`} noMargin expand>
+                          <Text noMargin>
+                            {buildDetectedErrorsConfig[code].message}
+                          </Text>
+                          {helpUrl && (
+                            <Line noMargin>
+                              <FlatButton
+                                label={<Trans>Learn more</Trans>}
+                                onClick={() => Window.openExternalURL(helpUrl)}
+                              />
+                            </Line>
+                          )}
+                        </Column>
+                      );
+                    })}
+                  </ColumnStackLayout>
+                </AccordionBody>
+              </Accordion>
+              <Line noMargin justifyContent="flex-end">
+                <RaisedButton
+                  primary
+                  label={<Trans>Download log files</Trans>}
+                  onClick={() => onDownload('logsKey')}
+                />
+              </Line>
+            </ColumnStackLayout>
+          ) : (
+            <ResponsiveLineStackLayout
+              alignItems="center"
+              justifyContent="space-between"
+              expand
+            >
+              <Column noMargin>
+                <Text noMargin>
+                  <Trans>Something wrong happened :(</Trans>
+                </Text>
+                <EmptyMessage
+                  style={{ justifyContent: 'flex-start', padding: 0 }}
+                >
+                  <Trans>
+                    Check the logs to see if there is an explanation about what
+                    went wrong, or try again later.
+                  </Trans>
+                </EmptyMessage>
+              </Column>
+              <RaisedButton
+                primary
+                label={<Trans>Download log files</Trans>}
+                onClick={() => onDownload('logsKey')}
+              />
+            </ResponsiveLineStackLayout>
+          )
         ) : build.status === 'pending' ? (
           <>
             <Line alignItems="center" expand justifyContent="center">

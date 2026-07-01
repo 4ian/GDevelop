@@ -235,6 +235,15 @@ struct PreviewExportOptions {
   }
 
   /**
+   * \brief Set whether a CDP debugger (local Electron preview) is attached,
+   * so the runtime knows the generated `debugger;` statements are live.
+   */
+  PreviewExportOptions &SetCdpDebuggerEnabled(bool enable) {
+    cdpDebuggerEnabled = enable;
+    return *this;
+  }
+
+  /**
    * \brief Set the JSON string representation of the in-game editor settings.
    */
   PreviewExportOptions &SetInGameEditorSettingsJson(const gd::String &inGameEditorSettingsJson_) {
@@ -398,6 +407,7 @@ struct PreviewExportOptions {
   bool fullLoadingScreen;
   bool isDevelopmentEnvironment;
   bool isInGameEdition;
+  bool cdpDebuggerEnabled = false;
   gd::String editorId;
   gd::String editorCamera3DCameraMode;
   gd::String inGameEditorSettingsJson;

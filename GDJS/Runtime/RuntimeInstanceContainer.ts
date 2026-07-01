@@ -104,6 +104,21 @@ namespace gdjs {
 
     abstract getAsyncTasksManager(): gdjs.AsyncTasksManager;
 
+    // Stub so generated profiler code works on any instance container.
+    // RuntimeScene overrides this with a real implementation.
+    getProfiler(): null {
+      return null;
+    }
+
+    /**
+     * The preview breakpoint manager (owned by the game). Generated event code
+     * calls this on whichever container runs the events (scene or custom-object
+     * sub-container), so the manager records the right calling container.
+     */
+    getBreakpointManager(): gdjs.DebuggerBreakpointManager {
+      return this.getGame().getBreakpointManager();
+    }
+
     /**
      * Convert a point from the canvas coordinates (for example,
      * the mouse position) to the container coordinates.

@@ -14,7 +14,8 @@ export type EventsFunctionsExtensionsState = {|
     extensionName: string
   ) => void,
   reloadProjectEventsFunctionsExtensions: (
-    project: ?gdProject
+    project: ?gdProject,
+    generateForPreview?: boolean
   ) => Promise<void>,
   reloadProjectEventsFunctionsExtensionMetadata: (
     project: ?gdProject,

@@ -34,6 +34,16 @@ export const ErroredWithDetectedIssue = (): React.Node => (
   />
 );
 
+export const ErroredWithUnknownDetectedIssue = (): React.Node => (
+  <BuildProgressAndActions
+    build={{
+      ...erroredCordovaBuild,
+      detectedErrors: [{ code: 'some-future-error-code' }],
+    }}
+    game={game1}
+  />
+);
+
 export const ErroredWithDetectedIssueAndHelpLink = (): React.Node => (
   <BuildProgressAndActions
     build={{

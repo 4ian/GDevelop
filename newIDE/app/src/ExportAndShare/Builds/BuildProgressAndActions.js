@@ -145,11 +145,10 @@ const BuildProgressAndActions = ({
     onCopyToClipboard && onCopyToClipboard();
   };
 
-  // Errors detected by analyzing the build log, restricted to the ones we have
-  // a user-facing message for (a newer backend may report unknown codes).
-  const knownDetectedErrors = (build.detectedErrors || []).filter(
-    detectedError => !!buildDetectedErrorsConfig[detectedError.code]
-  );
+  // Errors detected by analyzing the build log. Codes without a known
+  // user-facing message (e.g. reported by a newer backend) are still shown,
+  // inviting the user to upgrade GDevelop to learn more.
+  const detectedErrors = build.detectedErrors || [];
 
   const onUpdatePublicBuild = React.useCallback(
     async (buildId: ?string, i18n: I18nType) => {
@@ -213,7 +212,7 @@ const BuildProgressAndActions = ({
                 explanation about what went wrong, or try again later.
               </Trans>
             </AlertMessage>
-            {knownDetectedErrors.length > 0 && (
+            {detectedErrors.length > 0 && (
               <Accordion defaultExpanded noMargin>
                 <AccordionHeader>
                   <Text noMargin>
@@ -222,17 +221,27 @@ const BuildProgressAndActions = ({
                 </AccordionHeader>
                 <AccordionBody>
                   <ColumnStackLayout expand noMargin>
-                    {knownDetectedErrors.map((detectedError, index) => {
+                    {detectedErrors.map((detectedError, index) => {
                       const { code, helpUrl } = detectedError;
+                      const config = buildDetectedErrorsConfig[code];
                       return (
                         <ColumnStackLayout
                           key={`${code}-${index}`}
                           noMargin
                           expand
                         >
-                          <Text noMargin allowSelection>
-                            {buildDetectedErrorsConfig[code].message}
-                          </Text>
+                          {config ? (
+                            <Text noMargin allowSelection>
+                              {config.message}
+                            </Text>
+                          ) : (
+                            <Text noMargin allowSelection>
+                              <Trans>
+                                Upgrade GDevelop to learn more about this error.
+                              </Trans>{' '}
+                              ({code})
+                            </Text>
+                          )}
                           {helpUrl && (
                             <Line noMargin>
                               <FlatButton

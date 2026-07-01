@@ -150,6 +150,10 @@ import useForceUpdate from '../Utils/UseForceUpdate';
 import useStateWithCallback from '../Utils/UseSetStateWithCallback';
 import { useKeyboardShortcuts, useShortcutMap } from '../KeyboardShortcuts';
 import useMainFrameCommands from './MainFrameCommands';
+import {
+  installCliInPath,
+  isCliInPathInstallSupported,
+} from '../Utils/InstallCliInPath';
 import CommandPalette, {
   type CommandPaletteInterface,
 } from '../CommandPalette/CommandPalette';
@@ -5190,6 +5194,15 @@ const MainFrame = (props: Props): React.MixedElement => {
     onRestartInGameEditor,
     onOpenGlobalSearch: openGlobalSearch,
     onOpenMemoryTrackerRegistry: () => setMemoryTrackedRegistryDialogOpen(true),
+    canInstallCliInPath: isCliInPathInstallSupported(),
+    onInstallCliInPath: async () => {
+      const result = await installCliInPath();
+      _showSnackMessage(
+        result.status === 'success'
+          ? i18n._(t`GDevelop CLI is now available from your terminal.`)
+          : i18n._(t`Couldn't set up the GDevelop CLI: ${result.message}`)
+      );
+    },
   });
 
   useCliCommandRunner({

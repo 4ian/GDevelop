@@ -70,7 +70,8 @@ export type CommandName =
   | 'SEARCH_EVENTS'
   | 'OPEN_EXTENSION_SETTINGS'
   | 'OPEN_PROFILE'
-  | 'OPEN_MEMORY_TRACKER_REGISTRY';
+  | 'OPEN_MEMORY_TRACKER_REGISTRY'
+  | 'INSTALL_CLI_IN_PATH';
 
 export const commandAreas = {
   GENERAL: (t`General`: any),
@@ -184,6 +185,11 @@ const commandsList: { [CommandName]: CommandMetadata } = {
   RESTART_IN_GAME_EDITOR: {
     area: 'IDE',
     displayText: t`Restart 3D editor`,
+  },
+  INSTALL_CLI_IN_PATH: {
+    area: 'IDE',
+    displayText: t`Install GDevelop CLI in PATH`,
+    noShortcut: true,
   },
 
   // Project manager commands

@@ -128,6 +128,17 @@ GDevelop.exe --disable-update-check --run-command EXPORT_HTML5_EXTERNAL path\to\
 
 Extra flags: `--keep-open` (don't quit after command), `--dev-tools` (open DevTools).
 
+### Making the CLI available on PATH
+
+When GDevelop is installed with the Windows NSIS installer, the install
+directory is added to the current user's `PATH` automatically. Open a new
+terminal after installing, then run `GDevelop --run-command ...`.
+
+For other builds (macOS `.dmg`, Linux AppImage/`.deb`), run the command
+palette command **"Install GDevelop CLI in PATH"** from the running app:
+on Windows it appends the install directory to the user `PATH`; on
+macOS/Linux it creates a `gdevelop` symlink in `/usr/local/bin`.
+
 ## (Optional) Building and deploying the standalone app 📦
 
 > 🖐 This section is only for maintainers that want to deploy the "official app" on the GDevelop website. If you're working on contributions for GDevelop, you won't need it. You can download ["Nightly Builds" of GDevelop here too](./docs/Nightly-Builds-and-continuous-deployment.md).

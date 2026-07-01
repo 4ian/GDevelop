@@ -14,7 +14,7 @@
  * Handles both delivery paths: early (`addScriptToEvaluateOnNewDocument`, gdjs
  * not yet defined) stashes them on `window` for `installBreakpointDebugSupport`
  * to consume; late (`Runtime.evaluate`, game already running) hands them
- * straight to `gdjs.Debugger.setBreakpoints`.
+ * straight to `gdjs.BreakpointDebugger.setBreakpoints`.
  *
  * @param {Array<BreakpointEntry>} bps
  * @returns {void}
@@ -26,40 +26,40 @@ function bootstrapPreviewCdp(bps) {
     window.__gdjsInitialBreakpoints = bps;
   }
 
-  if (typeof gdjs !== 'undefined' && gdjs.Debugger) {
-    gdjs.Debugger.setBreakpoints(bps);
+  if (typeof gdjs !== 'undefined' && gdjs.BreakpointDebugger) {
+    gdjs.BreakpointDebugger.setBreakpoints(bps);
   }
 }
 
 /**
  * Reads breakpoint-hit info and builds a compact runtime dump while V8 is
- * paused. Thin wrapper over `gdjs.Debugger.readPauseState`.
+ * paused. Thin wrapper over `gdjs.BreakpointDebugger.readPauseState`.
  *
  * @returns {string} A JSON string `{"bp": BreakpointInfo | null, "dump": string}`,
  *   or `""` if `gdjs` / the runtime debugger isn't available.
  */
 function readBreakpointPauseState() {
-  if (typeof gdjs === 'undefined' || !gdjs.Debugger) return '';
-  return gdjs.Debugger.readPauseState();
+  if (typeof gdjs === 'undefined' || !gdjs.BreakpointDebugger) return '';
+  return gdjs.BreakpointDebugger.readPauseState();
 }
 
 /**
  * Pushes the full breakpoint payload into the preview runtime. Thin wrapper
- * over `gdjs.Debugger.setBreakpoints`. Applied via `Runtime.evaluate`, which
- * works even while V8 is paused on a `debugger;` statement.
+ * over `gdjs.BreakpointDebugger.setBreakpoints`. Applied via `Runtime.evaluate`,
+ * which works even while V8 is paused on a `debugger;` statement.
  *
  * @param {Array<BreakpointEntry>} entries
  * @returns {boolean} `true` if applied, `false` if the runtime debugger isn't ready yet.
  */
 function setBreakpointsInPreview(entries) {
-  if (typeof gdjs === 'undefined' || !gdjs.Debugger) return false;
-  return gdjs.Debugger.setBreakpoints(entries);
+  if (typeof gdjs === 'undefined' || !gdjs.BreakpointDebugger) return false;
+  return gdjs.BreakpointDebugger.setBreakpoints(entries);
 }
 
 /**
  * Arms the stepping FSM in the preview so the next `checkBreakpoint` trips on
  * the target event, then the caller issues `Debugger.resume`. Thin wrapper
- * over `gdjs.Debugger.programStepping` (the logic lives in the runtime).
+ * over `gdjs.BreakpointDebugger.programStepping` (the logic lives in the runtime).
  *
  * @param {number} eventIndex Zero-based index of the paused event, or `-1` for a raw pause.
  * @param {string} functionId Events-function identifier, or `""` for scene code / raw pause.
@@ -67,20 +67,25 @@ function setBreakpointsInPreview(entries) {
  * @returns {boolean} `true` if applied, `false` if the runtime debugger isn't ready yet.
  */
 function programSteppingInPreview(eventIndex, functionId, preFlipPassed) {
-  if (typeof gdjs === 'undefined' || !gdjs.Debugger) return false;
-  return gdjs.Debugger.programStepping(eventIndex, functionId, preFlipPassed);
+  if (typeof gdjs === 'undefined' || !gdjs.BreakpointDebugger) return false;
+  return gdjs.BreakpointDebugger.programStepping(
+    eventIndex,
+    functionId,
+    preFlipPassed
+  );
 }
 
 /**
  * Schedules a pause in the running preview so the next `checkBreakpoint` emits
- * a `debugger;`. Thin wrapper over `gdjs.Debugger.schedulePauseAtNextEvent`
- * (clears a held Debugger-panel Pause so the render loop keeps running).
+ * a `debugger;`. Thin wrapper over
+ * `gdjs.BreakpointDebugger.schedulePauseAtNextEvent` (clears a held
+ * Debugger-panel Pause so the render loop keeps running).
  *
  * @returns {boolean} `true` if applied, `false` if the runtime debugger isn't ready yet.
  */
 function schedulePauseAtNextEventInPreview() {
-  if (typeof gdjs === 'undefined' || !gdjs.Debugger) return false;
-  return gdjs.Debugger.schedulePauseAtNextEvent();
+  if (typeof gdjs === 'undefined' || !gdjs.BreakpointDebugger) return false;
+  return gdjs.BreakpointDebugger.schedulePauseAtNextEvent();
 }
 
 module.exports = {

@@ -387,6 +387,28 @@ namespace gdjs {
   };
 
   /**
+   * Collect the non-empty registered "Declare local variable" stacks, keyed by
+   * code namespace. Used by the debugger dumps to inspect scene-level locals.
+   *
+   * @category Core Engine > Debugger
+   */
+  export const collectActiveLocalVariables = function (): {
+    [codeNamespace: string]: Array<gdjs.VariablesContainer>;
+  } {
+    const activeLocalVariables: {
+      [codeNamespace: string]: Array<gdjs.VariablesContainer>;
+    } = {};
+    const registeredContainers = gdjs.registeredLocalVariablesContainers;
+    for (const codeNamespace in registeredContainers) {
+      const container = registeredContainers[codeNamespace];
+      if (container.length > 0) {
+        activeLocalVariables[codeNamespace] = container;
+      }
+    }
+    return activeLocalVariables;
+  };
+
+  /**
    * Register a function to be called when the first {@link gdjs.RuntimeScene} is loaded, after
    * resources loading is done. This can be considered as the "start of the game".
    *

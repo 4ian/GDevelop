@@ -687,19 +687,7 @@ namespace gdjs {
     sendRuntimeGameDump(): void {
       const that = this;
 
-      // Scene code namespaces register their `localVariables` stack for
-      // "Declare local" scopes. Extension function locals aren't registered
-      // and are omitted.
-      const activeLocalVariables: {
-        [codeNamespace: string]: Array<gdjs.VariablesContainer>;
-      } = {};
-      const registeredContainers = gdjs.registeredLocalVariablesContainers;
-      for (const codeNamespace in registeredContainers) {
-        const container = registeredContainers[codeNamespace];
-        if (container.length > 0) {
-          activeLocalVariables[codeNamespace] = container;
-        }
-      }
+      const activeLocalVariables = gdjs.collectActiveLocalVariables();
       const message: any = { command: 'dump', payload: this._runtimegame };
       if (Object.keys(activeLocalVariables).length > 0) {
         message.activeLocalVariables = activeLocalVariables;

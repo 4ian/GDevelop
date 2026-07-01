@@ -13,7 +13,7 @@ import {
   buildAllBreakpointsPayload,
   walkEventsInGeneratorOrder,
 } from './BreakpointsSessionStore';
-import { extractVariablesFromDump } from './RuntimeVariablesContext';
+import { extractVariablesFromDump } from '../Debugger/RuntimeVariablesContext';
 import { findEventByPath } from '../Utils/EventsValidationScanner';
 import { type EventsScope } from '../InstructionOrExpression/EventsScope';
 
@@ -64,9 +64,7 @@ const getFunctionIdFromScope = (scope: EventsScope): string => {
 };
 
 // Maps flat DFS index (matching the C++ code generator's traversal) back to
-// its serialized EventPath (e.g. "0/2/1"). Synthetic AsyncEvent wrappers are
-// absent from the user-authored tree and don't call checkBreakpoint, so
-// no extra accounting is needed here.
+// its serialized EventPath (e.g. "0/2/1").
 const buildFlatIndexToPathMap = (events: gdEventsList): Map<number, string> => {
   const map = new Map<number, string>();
   walkEventsInGeneratorOrder(events, (_event, idx, path) => {

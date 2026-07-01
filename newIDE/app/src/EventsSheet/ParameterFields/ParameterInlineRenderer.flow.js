@@ -2,7 +2,7 @@
 import * as React from 'react';
 import { type EventsScope } from '../../InstructionOrExpression/EventsScope';
 import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
-import { type RuntimeVariablesMap } from '../RuntimeVariablesContext';
+import { type RuntimeVariablesMap } from '../../Debugger/RuntimeVariablesContext';
 
 export type InvalidParameterValueProps = {|
   children: React.Node,

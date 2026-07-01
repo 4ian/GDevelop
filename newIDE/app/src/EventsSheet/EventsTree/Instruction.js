@@ -25,7 +25,7 @@ import InvalidParameterValue from './InvalidParameterValue';
 import DeprecatedParameterValue from './DeprecatedParameterValue';
 import MissingParameterValue from './MissingParameterValue';
 import { makeDragSourceAndDropTarget } from '../../UI/DragAndDrop/DragSourceAndDropTarget';
-import RuntimeVariablesContext from '../RuntimeVariablesContext';
+import RuntimeVariablesContext from '../../Debugger/RuntimeVariablesContext';
 import {
   type ScreenType,
   useScreenType,

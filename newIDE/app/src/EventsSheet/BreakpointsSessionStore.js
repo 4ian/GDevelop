@@ -23,6 +23,10 @@ type Entry = {|
 
 const entries: Map<number, Entry> = new Map();
 
+export const clearBreakpointsSession = (): void => {
+  entries.clear();
+};
+
 export const getBreakpoints = (eventsListPtr: number): Set<number> => {
   const entry = entries.get(eventsListPtr);
   return entry ? new Set(entry.breakpoints) : new Set();

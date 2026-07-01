@@ -164,6 +164,7 @@ import { useDiscordRichPresence } from '../Utils/UpdateDiscordRichPresence';
 import { delay } from '../Utils/Delay';
 import useNewProjectDialog from './UseNewProjectDialog';
 import useBreakpointDebugger from './UseBreakpointDebugger';
+import { clearBreakpointsSession } from '../EventsSheet/BreakpointsSessionStore';
 import { findAndLogProjectPreviewErrors } from '../Utils/ProjectErrorsChecker';
 import { renameResourcesInProject } from '../ResourcesList/ResourceUtils';
 import useNewResourceDialog from '../ResourcesList/useNewResourceDialog';
@@ -1164,6 +1165,9 @@ const MainFrame = (props: Props): React.MixedElement => {
       eventsFunctionsExtensionsState.unloadProjectEventsFunctionsExtensions(
         currentProject
       );
+      // The session breakpoints reference this project's events lists, which
+      // become dangling once it is deleted from memory.
+      clearBreakpointsSession();
       currentProject.delete();
       sealUnsavedChanges();
       console.info('Project closed.');

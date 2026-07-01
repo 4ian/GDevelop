@@ -143,7 +143,7 @@ import { useHighlightedAiGeneratedEvent } from './UseHighlightedAiGeneratedEvent
 import { findEventByPath } from '../Utils/EventsValidationScanner';
 import type { SearchFilterParams } from '../Utils/Search';
 import type { InitialSearchFilterParams } from './SearchPanel';
-import RuntimeVariablesContext from './RuntimeVariablesContext';
+import RuntimeVariablesContext from '../Debugger/RuntimeVariablesContext';
 import { isNullPtr } from '../Utils/IsNullPtr';
 import { type VariableDialogOpeningProps } from '../VariablesList/VariablesEditorDialog';
 

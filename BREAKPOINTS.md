@@ -172,7 +172,7 @@ Manager state (all private fields):
 }
 ```
 
-The preview-facing API surfaces under the `gdjs.Debugger` namespace
+The preview-facing API surfaces under the `gdjs.BreakpointDebugger` namespace
 (also in `breakpointDebugSupport.ts`): `game`, `buildDumpJson`,
 `setBreakpoints`, `programStepping`, `schedulePauseAtNextEvent`,
 `readPauseState`. The Electron CDP snippets are thin wrappers that call
@@ -199,8 +199,8 @@ A free function, not a method — to keep the install logic off the
 `RuntimeGame` interface. Called once from the `RuntimeGame` constructor,
 gated on `_isPreview`. Does two things:
 
-1. Publishes `gdjs.Debugger.game = this` and installs
-   `gdjs.Debugger.buildDumpJson` — a compact dump builder used by
+1. Publishes `gdjs.BreakpointDebugger.game = this` and installs
+   `gdjs.BreakpointDebugger.buildDumpJson` — a compact dump builder used by
    Electron main on `Debugger.paused`.
 2. Calls `getBreakpointManager().consumeInitialBreakpoints()`, which
    applies `window.__gdjsInitialBreakpoints` (if the CDP bootstrap
@@ -329,7 +329,7 @@ Renders the red breakpoint dot and the paused-on-event frame. Styles
 are consolidated in the module-level `styles` object under a shared
 `BREAKPOINT_ACCENT_COLOR` constant.
 
-### `RuntimeVariablesContext.js` + `ParameterFields/VariableField.js`
+### `Debugger/RuntimeVariablesContext.js` + `EventsSheet/ParameterFields/VariableField.js`
 
 On each `preview-debugger-paused` IPC, `EventsSheet` parses the inline
 `dumpJson` and extracts a structured runtime variables map:
@@ -365,7 +365,7 @@ On each `preview-debugger-paused` IPC, `EventsSheet` parses the inline
   `gd.ParameterMetadata.isObject` — and passes it to
   `ParameterRenderingService.renderInlineParameter` as `lastObjectName`.
   `VariableField.renderVariableWithIcon` forwards that to
-  `lookupVariable(scope='object', …, objectName)`, which resolves the
+  `lookupRuntimeVariable(scope='object', …, objectName)`, which resolves the
   root against `map.object[objectName]` and walks any trailing
   `.<child>` segments as structure access.
 
@@ -399,7 +399,7 @@ Thin renderer-side wrapper over `ipcRenderer.invoke`/`on`:
   callback `(isPaused, payload?)`. `payload` carries
   `{ breakpoint, dumpJson }` where `breakpoint` is the manager's
   `_lastBreakpoint` and `dumpJson` is the dump string — both produced by
-  `gdjs.Debugger.readPauseState()` in one `Runtime.evaluate` on
+  `gdjs.BreakpointDebugger.readPauseState()` in one `Runtime.evaluate` on
   `Debugger.paused`.
 
   A module-level cache of the latest `{ isPaused, payload }` replays
@@ -439,18 +439,18 @@ Each chunk of code shipped into the preview V8 is a plain `.js` file —
 lintable, testable, and free of template-string escape hell:
 
 Except for `cdpEval.js`, each snippet is now a **thin wrapper** over a
-`gdjs.Debugger.*` runtime method — the logic lives in
+`gdjs.BreakpointDebugger.*` runtime method — the logic lives in
 `breakpointDebugSupport.ts` and the snippet just guards on `gdjs` /
-`gdjs.Debugger` and forwards the call:
+`gdjs.BreakpointDebugger` and forwards the call:
 
 | File                                   | Purpose                                                                                                                                         |
 | -------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
 | `cdpEval.js`                           | `serializeFunctionForCdp(fn, args)` — turns a function + JSON args into a `Runtime.evaluate` expression.                                         |
-| `bootstrapPreviewCdp.js`               | Runs before the game script: seeds `window.__gdjsInitialBreakpoints` (early path) and calls `gdjs.Debugger.setBreakpoints` if the game is already running (late path). |
-| `readBreakpointPauseState.js`          | Evaluated on `Debugger.paused`; calls `gdjs.Debugger.readPauseState()` → `{ bp, dump }` JSON.                                                    |
-| `setBreakpointsInPreview.js`           | Calls `gdjs.Debugger.setBreakpoints(entries)` for every session-breakpoints push.                                                               |
-| `programSteppingInPreview.js`          | Calls `gdjs.Debugger.programStepping(...)` before `Debugger.resume`.                                                                             |
-| `schedulePauseAtNextEventInPreview.js` | Calls `gdjs.Debugger.schedulePauseAtNextEvent()` on a *running* preview.                                                                         |
+| `bootstrapPreviewCdp.js`               | Runs before the game script: seeds `window.__gdjsInitialBreakpoints` (early path) and calls `gdjs.BreakpointDebugger.setBreakpoints` if the game is already running (late path). |
+| `readBreakpointPauseState.js`          | Evaluated on `Debugger.paused`; calls `gdjs.BreakpointDebugger.readPauseState()` → `{ bp, dump }` JSON.                                                    |
+| `setBreakpointsInPreview.js`           | Calls `gdjs.BreakpointDebugger.setBreakpoints(entries)` for every session-breakpoints push.                                                               |
+| `programSteppingInPreview.js`          | Calls `gdjs.BreakpointDebugger.programStepping(...)` before `Debugger.resume`.                                                                             |
+| `schedulePauseAtNextEventInPreview.js` | Calls `gdjs.BreakpointDebugger.schedulePauseAtNextEvent()` on a *running* preview.                                                                         |
 
 `PreviewWindow.js` imports these and uses `serializeFunctionForCdp` to
 inject them; the file itself carries no inline JS source.
@@ -485,11 +485,11 @@ On preview window creation:
 
 ```js
 // readBreakpointPauseState.js, evaluated on Debugger.paused
-if (typeof gdjs === 'undefined' || !gdjs.Debugger) return '';
-return gdjs.Debugger.readPauseState();
-// gdjs.Debugger.readPauseState (runtime):
+if (typeof gdjs === 'undefined' || !gdjs.BreakpointDebugger) return '';
+return gdjs.BreakpointDebugger.readPauseState();
+// gdjs.BreakpointDebugger.readPauseState (runtime):
 //   bp   = manager.getLastBreakpoint()
-//   dump = gdjs.Debugger.buildDumpJson()  (guarded; '' on throw)
+//   dump = gdjs.BreakpointDebugger.buildDumpJson()  (guarded; '' on throw)
 //   → JSON.stringify({ bp, dump })
 ```
 
@@ -506,7 +506,7 @@ V8 pauses on `debugger;` which sits **after** `checkBreakpoint(N)` —
 event `N` has been "passed" by the FSM but its body has not run yet.
 For a step originating from a known `currentEventIndex`, the bridge
 pre-flips `_stepPassedCurrentEvent = true` via `Runtime.evaluate`
-(executing `programSteppingInPreview` → `gdjs.Debugger.programStepping`)
+(executing `programSteppingInPreview` → `gdjs.BreakpointDebugger.programStepping`)
 before issuing `Debugger.resume`, so the next `checkBreakpoint` trips at
 depth `N+1` (a sub-event of `N`) or at sibling `N+1`.
 
@@ -524,7 +524,7 @@ frame if nothing trips them.
 ### Schedule pause at next event
 
 Invoked by F10 while the preview is not paused. Calls
-`gdjs.Debugger.schedulePauseAtNextEvent()` (→ manager) in the *running*
+`gdjs.BreakpointDebugger.schedulePauseAtNextEvent()` (→ manager) in the *running*
 V8 via `Runtime.evaluate` — no `Debugger.resume` is issued because V8 is
 not paused. It arms the step-FSM (`_stepNextEvent = true`, raw-pause
 payload) and calls `game.pause(false)` so a Debugger-panel-Pause held

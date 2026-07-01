@@ -1,5 +1,8 @@
 // @flow
 import * as React from 'react';
+import { type EventsScope } from '../InstructionOrExpression/EventsScope';
+
+const gd: libGDevelop = global.gd;
 
 // Mirrors the internals of gdjs.Variable (same shape as in VariablesContainerInspector).
 export type RuntimeVariable = {
@@ -27,7 +30,7 @@ const RuntimeVariablesContext: React.Context<RuntimeVariablesMap | null> = React
   null
 );
 
-const extractExtensionVarsFromMap = (
+const extractExtensionVariablesFromMap = (
   extMap: any
 ): { [string]: { [string]: RuntimeVariable } } => {
   if (!extMap || typeof extMap !== 'object') return {};
@@ -39,7 +42,7 @@ const extractExtensionVarsFromMap = (
   return result;
 };
 
-const extractLocalsFromMessage = (
+const extractLocalVariablesFromMessage = (
   rawLocal: any
 ): { [string]: Array<{ [string]: RuntimeVariable }> } => {
   const result: { [string]: Array<{ [string]: RuntimeVariable }> } = {};
@@ -74,13 +77,13 @@ export const extractVariablesFromDump = (
       : null;
   const sceneVars = currentScene?._variables?._variables?.items || {};
 
-  const extensionGlobal = extractExtensionVarsFromMap(
+  const extensionGlobal = extractExtensionVariablesFromMap(
     payload._variablesByExtensionName
   );
-  const extensionScene = extractExtensionVarsFromMap(
+  const extensionScene = extractExtensionVariablesFromMap(
     currentScene?._variablesByExtensionName
   );
-  const localByCodeNamespace = extractLocalsFromMessage(
+  const localByCodeNamespace = extractLocalVariablesFromMessage(
     message.activeLocalVariables
   );
 
@@ -103,7 +106,7 @@ export const extractVariablesFromDump = (
   };
 };
 
-export const lookupVariable = (
+export const lookupRuntimeVariable = (
   map: RuntimeVariablesMap,
   scope: 'global' | 'scene' | 'local' | 'object' | 'any',
   varPath: string,
@@ -210,6 +213,83 @@ const formatVariableInternal = (
 
 export const formatVariableValue = (variable: RuntimeVariable): string => {
   return formatVariableInternal(variable, '');
+};
+
+// When paused with a runtime dump, resolves the variable's live value;
+// otherwise returns the default `tooltip`.
+export const buildRuntimeVariableTooltip = ({
+  runtimeVariables,
+  value,
+  sourceType,
+  tooltip,
+  scope,
+  lastObjectName,
+}: {|
+  runtimeVariables: ?RuntimeVariablesMap,
+  value: string,
+  sourceType: VariablesContainer_SourceType,
+  tooltip: string,
+  scope: EventsScope,
+  lastObjectName: ?string,
+|}): string => {
+  if (!runtimeVariables || !value) return tooltip;
+
+  // Use `sourceType` (resolved container kind) for scope selection;
+  // fall back to the tooltip string for callers that don't set sourceType.
+  let varScope: 'global' | 'scene' | 'local' | 'object' | 'any';
+  if (
+    sourceType === gd.VariablesContainer.Global ||
+    sourceType === gd.VariablesContainer.ExtensionGlobal
+  ) {
+    varScope = 'global';
+  } else if (
+    sourceType === gd.VariablesContainer.Scene ||
+    sourceType === gd.VariablesContainer.ExtensionScene
+  ) {
+    varScope = 'scene';
+  } else if (sourceType === gd.VariablesContainer.Local) {
+    varScope = 'local';
+  } else if (sourceType === gd.VariablesContainer.Object) {
+    varScope = 'object';
+  } else if (tooltip === 'global variable') {
+    varScope = 'global';
+  } else if (tooltip === 'scene variable') {
+    varScope = 'scene';
+  } else if (tooltip === 'object variable') {
+    varScope = 'object';
+  } else {
+    varScope = 'any';
+  }
+
+  const extName = scope.eventsFunctionsExtension
+    ? scope.eventsFunctionsExtension.getName()
+    : undefined;
+  // Scene-scoped locals only; extension function locals are omitted from the dump.
+  const codeNamespace =
+    varScope === 'local' && scope.layout && !scope.eventsFunctionsExtension
+      ? gd.MetadataDeclarationHelper.getSceneCodeNamespace(
+          scope.layout.getName()
+        )
+      : undefined;
+  // Object scope requires lastObjectName; value only carries the variable path.
+  const runtimeVar =
+    varScope === 'object' && !lastObjectName
+      ? null
+      : lookupRuntimeVariable(
+          runtimeVariables,
+          varScope,
+          value,
+          extName,
+          codeNamespace,
+          lastObjectName
+        );
+  if (!runtimeVar) return tooltip;
+
+  const displayName =
+    varScope === 'object' && lastObjectName
+      ? `${lastObjectName}.${value}`
+      : value;
+  return `${displayName} = ${formatVariableValue(runtimeVar)}`;
 };
 
 export default RuntimeVariablesContext;

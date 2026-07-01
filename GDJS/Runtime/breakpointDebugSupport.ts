@@ -4,7 +4,11 @@
  * This project is released under the MIT License.
  */
 namespace gdjs {
-  /** Dump shape consumed by `extractVariablesFromDump` on the IDE side. */
+  /**
+   * Dump shape consumed by `extractVariablesFromDump`. Field names keep the
+   * runtime's underscore-prefixed members so the same extractor also parses the
+   * full `sendRuntimeGameDump` output.
+   */
   type BreakpointDumpPayload = {
     _variables: gdjs.VariablesContainer;
     _variablesByExtensionName: Map<string, gdjs.VariablesContainer>;
@@ -191,7 +195,7 @@ namespace gdjs {
       }
     }
 
-    // --- Commands issued by the IDE over CDP, through gdjs.Debugger.* ---
+    // --- Commands issued by the IDE over CDP, through gdjs.BreakpointDebugger.* ---
 
     setBreakpoints(entries: gdjs.BreakpointEntry[]): void {
       const map = new Map<string, Set<number>>();
@@ -266,11 +270,11 @@ namespace gdjs {
   }
 
   /**
-   * Preview-only debugger API, callable from the Chrome debugger (CDP) and
-   * the generated event code. The Electron CDP snippets are thin wrappers
-   * over these methods.
+   * Preview-only breakpoint debugger API, callable from the Chrome debugger
+   * (CDP) and the generated event code. The Electron CDP snippets are thin
+   * wrappers over these methods.
    */
-  export namespace Debugger {
+  export namespace BreakpointDebugger {
     /** The current preview RuntimeGame. */
     export let game: gdjs.RuntimeGame | undefined;
 
@@ -334,19 +338,10 @@ namespace gdjs {
   export const installBreakpointDebugSupport = (
     game: gdjs.RuntimeGame
   ): void => {
-    gdjs.Debugger.game = game;
+    gdjs.BreakpointDebugger.game = game;
 
-    gdjs.Debugger.buildDumpJson = (): string => {
-      const activeLocalVariables: {
-        [namespaceKey: string]: gdjs.VariablesContainer[];
-      } = {};
-      const registeredContainers = gdjs.registeredLocalVariablesContainers;
-      for (const codeNamespace in registeredContainers) {
-        const container = registeredContainers[codeNamespace];
-        if (container.length > 0) {
-          activeLocalVariables[codeNamespace] = container;
-        }
-      }
+    gdjs.BreakpointDebugger.buildDumpJson = (): string => {
+      const activeLocalVariables = gdjs.collectActiveLocalVariables();
 
       const sceneArray: gdjs.RuntimeScene[] = game._sceneStack
         ? game._sceneStack._stack

@@ -5477,11 +5477,11 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
           changed_group,
           'delete_this_group'
         );
-        const objectsToAdd = SafeExtractor.extractArrayProperty(
+        const objectsToAdd = SafeExtractor.extractStringArrayProperty(
           changed_group,
           'objects_to_add'
         );
-        const objectsToRemove = SafeExtractor.extractArrayProperty(
+        const objectsToRemove = SafeExtractor.extractStringArrayProperty(
           changed_group,
           'objects_to_remove'
         );
@@ -5520,18 +5520,6 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
             );
           }
 
-          // `objects_to_add`/`objects_to_remove` are plain arrays of object
-          // names (strings).
-          const extractObjectNames = (
-            namesArray: Array<mixed>
-          ): Array<string> => {
-            const names: Array<string> = [];
-            for (const name of namesArray) {
-              if (typeof name === 'string' && name) names.push(name);
-            }
-            return Array.from(new Set(names));
-          };
-
           if (objectsToAdd !== null || objectsToRemove !== null) {
             const currentObjectNames = foundGroup
               .getAllObjectsNames()
@@ -5540,10 +5528,10 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
             // Resolve the names to remove first, then the names to add (relative
             // to what remains).
             const removeNames = objectsToRemove
-              ? extractObjectNames(objectsToRemove)
+              ? Array.from(new Set(objectsToRemove))
               : [];
             const addNames = objectsToAdd
-              ? extractObjectNames(objectsToAdd)
+              ? Array.from(new Set(objectsToAdd))
               : [];
             const namesToRemove = currentObjectNames.filter(name =>
               removeNames.includes(name)

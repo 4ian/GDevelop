@@ -70,13 +70,31 @@ gd::String EventsCodeGenerator::GenerateEventsListCompleteFunctionCode(
 
   gd::String localVariablesInitializationCode;
   if (codeGenerator.HasProjectAndLayout()) {
-    localVariablesInitializationCode +=
-        codeGenerator.GetCodeNamespace() + ".localVariables = [];\n";
+    gd::String ns = codeGenerator.GetCodeNamespace();
+    localVariablesInitializationCode += ns + ".localVariables = [];\n";
+    // In previews, expose the stack to the debugger so it can inspect
+    // "Declare local variable" scopes.
+    if (!codeGenerator.GenerateCodeForRuntime()) {
+      localVariablesInitializationCode +=
+          "gdjs.registerLocalVariablesContainer(" +
+          codeGenerator.ConvertToStringExplicit(ns) + ", " + ns +
+          ".localVariables);\n";
+    }
   }
 
   gd::String idToCallbackMapCode;
   idToCallbackMapCode +=
       codeGenerator.GetCodeNamespace() + ".idToCallbackMap = new Map();\n";
+
+  gd::String bpPushCode;
+  gd::String bpTryCode;
+  gd::String bpFinallyCode;
+  if (!codeGenerator.GenerateCodeForRuntime()) {
+    gd::String ns = codeGenerator.ConvertToStringExplicit(codeGenerator.GetCodeNamespace());
+    bpPushCode = "if (runtimeScene) runtimeScene.getBreakpointManager().pushBreakpointFunction(" + ns + ");\n";
+    bpTryCode = "try {\n";
+    bpFinallyCode = "} finally { if (runtimeScene) runtimeScene.getBreakpointManager().popBreakpointFunction(); }\n";
+  }
 
   gd::String output =
       // clang-format off
@@ -89,12 +107,18 @@ gd::String EventsCodeGenerator::GenerateEventsListCompleteFunctionCode(
       fullyQualifiedFunctionName + " = function(" +
         functionArgumentsCode +
       ") {\n" +
+        // Prelude must run before pushBreakpointFunction: object methods declare
+        // `var runtimeScene = this._instanceContainer;` there, so pushing
+        // earlier would hit a var-hoisted undefined and silently no-op.
         functionPreEventsCode + "\n" +
+        bpPushCode +
+        bpTryCode +
         globalObjectListsReset + "\n" +
         wholeEventsCode + "\n" +
         globalObjectListsReset + "\n" +
         functionPostEventsCode + "\n" +
         functionReturnCode + "\n" +
+        bpFinallyCode +
       "}\n";
   // clang-format on
 
@@ -1561,7 +1585,7 @@ gd::String EventsCodeGenerator::GenerateProfilerSectionBegin(
     const gd::String& section) {
   if (GenerateCodeForRuntime()) return "";
 
-  return "if (runtimeScene.getProfiler()) { runtimeScene.getProfiler().begin(" +
+  return "if (runtimeScene && runtimeScene.getProfiler()) { runtimeScene.getProfiler().begin(" +
          ConvertToStringExplicit(section) + "); }";
 }
 
@@ -1569,8 +1593,21 @@ gd::String EventsCodeGenerator::GenerateProfilerSectionEnd(
     const gd::String& section) {
   if (GenerateCodeForRuntime()) return "";
 
-  return "if (runtimeScene.getProfiler()) { runtimeScene.getProfiler().end(" +
+  return "if (runtimeScene && runtimeScene.getProfiler()) { runtimeScene.getProfiler().end(" +
          ConvertToStringExplicit(section) + "); }";
+}
+
+gd::String EventsCodeGenerator::GenerateBreakpointCode(size_t eventIndex) {
+  if (GenerateCodeForRuntime()) return "";
+
+  // The `runtimeScene &&` guard matches the push/pop and profiler code: the
+  // local can be undefined during custom-object construction.
+  // checkBreakpoint returns false unless CDP is attached (Electron local
+  // preview only), so the `debugger;` is dead code in web/remote previews.
+  return "if (runtimeScene && runtimeScene.getBreakpointManager().checkBreakpoint(" +
+         ConvertToStringExplicit(GetCodeNamespace()) + ", " +
+         gd::String::From(eventIndex) +
+         ", runtimeScene)) debugger;\n";
 }
 
 gd::String EventsCodeGenerator::GeneratePropertySetterWithoutCasting(

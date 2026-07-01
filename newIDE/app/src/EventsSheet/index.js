@@ -5,6 +5,10 @@ import { type I18n as I18nType } from '@lingui/core';
 
 import * as React from 'react';
 import EventsTree, { type EventsTreeInterface } from './EventsTree';
+import BreakpointSessionController, {
+  isBreakpointableEvent,
+  type BreakpointHit,
+} from './BreakpointSessionController';
 import { getInstructionMetadata } from './InstructionEditor/InstructionEditor';
 import InstructionEditorDialog from './InstructionEditor/InstructionEditorDialog';
 import InstructionEditorMenu from './InstructionEditor/InstructionEditorMenu';
@@ -120,6 +124,12 @@ import { TutorialContext } from '../Tutorial/TutorialContext';
 import { type Tutorial } from '../Utils/GDevelopServices/Tutorial';
 import AlertMessage from '../UI/AlertMessage';
 import { Column, Line } from '../UI/Grid';
+import DraggableSnackBar, {
+  type DraggableSnackBarInterface,
+} from './DraggableSnackBar';
+import Button from '@material-ui/core/Button';
+import PlayIcon from '../UI/CustomSvgIcons/Preview';
+import SkipNextIcon from '@material-ui/icons/SkipNext';
 import ErrorBoundary from '../UI/ErrorBoundary';
 import {
   registerOnResourceExternallyChangedCallback,
@@ -133,6 +143,7 @@ import { useHighlightedAiGeneratedEvent } from './UseHighlightedAiGeneratedEvent
 import { findEventByPath } from '../Utils/EventsValidationScanner';
 import type { SearchFilterParams } from '../Utils/Search';
 import type { InitialSearchFilterParams } from './SearchPanel';
+import RuntimeVariablesContext from '../Debugger/RuntimeVariablesContext';
 import { isNullPtr } from '../Utils/IsNullPtr';
 import { type VariableDialogOpeningProps } from '../VariablesList/VariablesEditorDialog';
 
@@ -267,6 +278,13 @@ type State = {|
   allEventsMetadata: Array<EventMetadata>,
 
   fontSize: number,
+
+  breakpoints: Set<number>,
+
+  pausedOnEventPath: string | null,
+  pausedOnEventIndex: number,
+  isPausedInDebugger: boolean,
+  runtimeVariables: any,
 |};
 
 type EventInsertionContext = {|
@@ -320,6 +338,27 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
 
   eventContextMenu: ?ContextMenuInterface;
   resourceExternallyChangedCallbackId: ?string;
+  _breakpointSession: BreakpointSessionController = new BreakpointSessionController(
+    {
+      getEvents: () => this.props.events,
+      getScope: () => this.props.scope,
+      onBreakpointHit: hit => this._onBreakpointHit(hit),
+      onResumed: () => {
+        this._clearPausedState();
+        if (this._eventsTree) this._eventsTree.forceEventsUpdate();
+      },
+      onRuntimeVariables: runtimeVariables =>
+        this.setState({ runtimeVariables }),
+      onPreviewClosed: () => {
+        if (this._draggableSnackBarRef.current) {
+          this._draggableSnackBarRef.current.resetPosition();
+        }
+      },
+    }
+  );
+  _draggableSnackBarRef: {|
+    current: ?DraggableSnackBarInterface,
+  |} = React.createRef();
   instructionContextMenu: ?ContextMenuInterface;
   addNewEvent: (
     type: string,
@@ -372,6 +411,13 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     textEditedEvent: null,
 
     fontSize: 14,
+
+    breakpoints: (new Set(): Set<number>),
+
+    pausedOnEventPath: null,
+    pausedOnEventIndex: -1,
+    isPausedInDebugger: false,
+    runtimeVariables: null,
   };
 
   constructor(props: ComponentProps) {
@@ -381,6 +427,12 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       TRIVIAL_FIRST_EVENT,
       this._addNewEvent
     );
+    this.state = {
+      ...this.state,
+      breakpoints: BreakpointSessionController.getInitialBreakpoints(
+        this.props.events
+      ),
+    };
   }
 
   componentDidMount() {
@@ -388,11 +440,13 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     this.resourceExternallyChangedCallbackId = registerOnResourceExternallyChangedCallback(
       this.onResourceExternallyChanged.bind(this)
     );
+    this._breakpointSession.start();
   }
   componentWillUnmount() {
     unregisterOnResourceExternallyChangedCallback(
       this.resourceExternallyChangedCallbackId
     );
+    this._breakpointSession.dispose();
   }
 
   componentDidUpdate(prevProps: ComponentProps, prevState: State) {
@@ -558,6 +612,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
         onAddEvent={this.addNewEvent}
         onToggleInvertedCondition={this._invertSelectedConditions}
         onToggleDisabledEvent={this.toggleDisabled}
+        onToggleBreakpoint={this._toggleBreakpoint}
         canRemove={hasSomethingSelected(this.state.selection)}
         onRemove={this.deleteSelection}
         canUndo={canUndo(this.state.eventsHistory)}
@@ -691,6 +746,10 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     return getSelectedEvents(this.state.selection).some(event => {
       return event.isExecutable();
     });
+  };
+
+  _selectionCanToggleBreakpoint = (): boolean => {
+    return getSelectedEvents(this.state.selection).some(isBreakpointableEvent);
   };
 
   _addNewEvent = (
@@ -1128,6 +1187,14 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       enabled: this._selectionCanToggleDisabled(),
       accelerator: getShortcutDisplayName(
         this.props.shortcutMap['TOGGLE_EVENT_DISABLED'] || 'KeyD'
+      ),
+    },
+    {
+      label: i18n._(t`Toggle Breakpoint`),
+      click: () => this._toggleBreakpoint(),
+      enabled: this._selectionCanToggleBreakpoint(),
+      accelerator: getShortcutDisplayName(
+        this.props.shortcutMap['TOGGLE_BREAKPOINT'] || 'F9'
       ),
     },
     {
@@ -1636,6 +1703,71 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
           // gone and we can change the focus without worries.
           inlineEditingAnchorEl.focus();
         }
+      }
+    );
+  };
+
+  _toggleBreakpoint = () => {
+    const selectedEvents = getSelectedEvents(this.state.selection);
+    if (selectedEvents.length === 0) return;
+
+    this.setState(
+      prevState => ({
+        breakpoints: this._breakpointSession.toggleBreakpointsForEvents(
+          prevState.breakpoints,
+          selectedEvents
+        ),
+      }),
+      () => {
+        this._breakpointSession.persistBreakpoints(this.state.breakpoints);
+        if (this._eventsTree) this._eventsTree.forceEventsUpdate();
+      }
+    );
+  };
+
+  _resumeExecution = () => {
+    this._breakpointSession.resume();
+  };
+
+  _stepNextEvent = () => {
+    if (!this.state.isPausedInDebugger) return;
+    this._breakpointSession.step(this.state.pausedOnEventIndex);
+  };
+
+  _scrollToPausedEvent = (path: string) => {
+    const eventsTree = this._eventsTree;
+    if (!eventsTree) return;
+    const eventPath: EventPath = path.split('/').map(Number);
+    const event = findEventByPath(this.props.events, eventPath);
+    if (!event) return;
+    eventsTree.unfoldForEvent(event);
+    setTimeout(() => {
+      const row = eventsTree.getEventRow(event);
+      if (row !== -1) eventsTree.scrollToRow(row);
+    }, 100 /* Give some time for the events sheet to render before scrolling */);
+  };
+
+  _clearPausedState = () => {
+    this.setState({
+      pausedOnEventPath: null,
+      pausedOnEventIndex: -1,
+      isPausedInDebugger: false,
+      runtimeVariables: null,
+    });
+  };
+
+  // Mark the paused event row and scroll it into view.
+  _onBreakpointHit = ({ path, eventIndex }: BreakpointHit) => {
+    this.setState(
+      {
+        pausedOnEventPath: path,
+        pausedOnEventIndex: eventIndex,
+        isPausedInDebugger: true,
+        // Toast position is preserved across pauses once the user has dragged it.
+      },
+      () => {
+        if (this._eventsTree) this._eventsTree.forceEventsUpdate();
+        if (path) this._scrollToPausedEvent(path);
       }
     );
   };
@@ -2753,89 +2885,98 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                     </Column>
                   </Line>
                 )}
+
                 {this._containerDivLastKnownSize && (
-                  <EventsTree
-                    ref={eventsTree => (this._eventsTree = eventsTree)}
-                    key={events.ptr}
-                    indentScale={preferences.values.eventsSheetIndentScale}
-                    onScroll={this._ensureFocused}
-                    events={events}
-                    project={project}
-                    scope={scope}
-                    globalObjectsContainer={globalObjectsContainer}
-                    objectsContainer={objectsContainer}
-                    projectScopedContainersAccessor={
-                      projectScopedContainersAccessor
-                    }
-                    selection={this.state.selection}
-                    onInstructionClick={this.selectInstruction}
-                    onInstructionDoubleClick={this.openInstructionEditor}
-                    onInstructionContextMenu={this.openInstructionContextMenu}
-                    onAddInstructionContextMenu={
-                      this.openAddInstructionContextMenu
-                    }
-                    onAddNewInstruction={this.openInstructionEditor}
-                    onPasteInstructions={
-                      this.pasteInstructionsInInstructionsList
-                    }
-                    onMoveToInstruction={this.moveSelectionToInstruction}
-                    onMoveToInstructionsList={
-                      this.moveSelectionToInstructionsList
-                    }
-                    onParameterClick={this.openParameterEditor}
-                    onVariableDeclarationClick={() => {
-                      // Nothing to do.
-                    }}
-                    onVariableDeclarationDoubleClick={this.openVariablesEditor}
-                    onEventClick={this.selectEvent}
-                    onEventContextMenu={this.openEventContextMenu}
-                    onAddNewEvent={(
-                      eventType: string,
-                      eventsList: gdEventsList
-                    ) => {
-                      this.addNewEvent(eventType, {
-                        eventsList,
-                        indexInList: eventsList.getEventsCount(),
-                      });
-                    }}
-                    onOpenExternalEvents={onOpenExternalEvents}
-                    onOpenLayout={onOpenLayout}
-                    searchResults={
-                      effectiveSearchHighlight
-                        ? effectiveSearchHighlight.results
-                        : null
-                    }
-                    searchFocusOffset={
-                      effectiveSearchHighlight
-                        ? effectiveSearchHighlight.focusOffset
-                        : null
-                    }
-                    onEventMoved={this._onEventMoved}
-                    onEndEditingEvent={this._onEndEditingStringEvent}
-                    showObjectThumbnails={
-                      preferences.values.eventsSheetShowObjectThumbnails
-                    }
-                    screenType={screenType}
-                    windowSize={windowSize}
-                    eventsSheetWidth={this._containerDivLastKnownSize.width}
-                    eventsSheetHeight={this._containerDivLastKnownSize.height}
-                    fontSize={preferences.values.eventsSheetZoomLevel}
-                    preferences={preferences}
-                    tutorials={tutorials}
-                    highlightedSearchText={
-                      effectiveSearchHighlight
-                        ? effectiveSearchHighlight.text || null
-                        : null
-                    }
-                    highlightedSearchMatchCase={
-                      effectiveSearchHighlight
-                        ? effectiveSearchHighlight.matchCase
-                        : false
-                    }
-                    highlightedAiGeneratedEventIds={
-                      highlightedAiGeneratedEventIds
-                    }
-                  />
+                  <RuntimeVariablesContext.Provider
+                    value={this.state.runtimeVariables}
+                  >
+                    <EventsTree
+                      ref={eventsTree => (this._eventsTree = eventsTree)}
+                      key={events.ptr}
+                      indentScale={preferences.values.eventsSheetIndentScale}
+                      onScroll={this._ensureFocused}
+                      events={events}
+                      project={project}
+                      scope={scope}
+                      globalObjectsContainer={globalObjectsContainer}
+                      objectsContainer={objectsContainer}
+                      projectScopedContainersAccessor={
+                        projectScopedContainersAccessor
+                      }
+                      selection={this.state.selection}
+                      onInstructionClick={this.selectInstruction}
+                      onInstructionDoubleClick={this.openInstructionEditor}
+                      onInstructionContextMenu={this.openInstructionContextMenu}
+                      onAddInstructionContextMenu={
+                        this.openAddInstructionContextMenu
+                      }
+                      onAddNewInstruction={this.openInstructionEditor}
+                      onPasteInstructions={
+                        this.pasteInstructionsInInstructionsList
+                      }
+                      onMoveToInstruction={this.moveSelectionToInstruction}
+                      onMoveToInstructionsList={
+                        this.moveSelectionToInstructionsList
+                      }
+                      onParameterClick={this.openParameterEditor}
+                      onVariableDeclarationClick={() => {
+                        // Nothing to do.
+                      }}
+                      onVariableDeclarationDoubleClick={
+                        this.openVariablesEditor
+                      }
+                      onEventClick={this.selectEvent}
+                      onEventContextMenu={this.openEventContextMenu}
+                      onAddNewEvent={(
+                        eventType: string,
+                        eventsList: gdEventsList
+                      ) => {
+                        this.addNewEvent(eventType, {
+                          eventsList,
+                          indexInList: eventsList.getEventsCount(),
+                        });
+                      }}
+                      onOpenExternalEvents={onOpenExternalEvents}
+                      onOpenLayout={onOpenLayout}
+                      searchResults={
+                        effectiveSearchHighlight
+                          ? effectiveSearchHighlight.results
+                          : null
+                      }
+                      searchFocusOffset={
+                        effectiveSearchHighlight
+                          ? effectiveSearchHighlight.focusOffset
+                          : null
+                      }
+                      onEventMoved={this._onEventMoved}
+                      onEndEditingEvent={this._onEndEditingStringEvent}
+                      showObjectThumbnails={
+                        preferences.values.eventsSheetShowObjectThumbnails
+                      }
+                      screenType={screenType}
+                      windowSize={windowSize}
+                      eventsSheetWidth={this._containerDivLastKnownSize.width}
+                      eventsSheetHeight={this._containerDivLastKnownSize.height}
+                      fontSize={preferences.values.eventsSheetZoomLevel}
+                      preferences={preferences}
+                      tutorials={tutorials}
+                      highlightedSearchText={
+                        effectiveSearchHighlight
+                          ? effectiveSearchHighlight.text || null
+                          : null
+                      }
+                      highlightedSearchMatchCase={
+                        effectiveSearchHighlight
+                          ? effectiveSearchHighlight.matchCase
+                          : false
+                      }
+                      highlightedAiGeneratedEventIds={
+                        highlightedAiGeneratedEventIds
+                      }
+                      breakpoints={this.state.breakpoints}
+                      pausedOnEventPath={this.state.pausedOnEventPath}
+                    />
+                  </RuntimeVariablesContext.Provider>
                 )}
                 {this.state.showSearchPanel && (
                   <ErrorBoundary
@@ -3068,6 +3209,31 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
             onClose={this.closeEventTextDialog}
           />
         )}
+        <DraggableSnackBar
+          ref={this._draggableSnackBarRef}
+          open={this.state.isPausedInDebugger}
+          message={<Trans>Paused in debugger</Trans>}
+          action={
+            <>
+              <Button
+                color="secondary"
+                size="small"
+                onClick={this._resumeExecution}
+                startIcon={<PlayIcon />}
+              >
+                <Trans>Resume</Trans>
+              </Button>
+              <Button
+                color="secondary"
+                size="small"
+                onClick={this._stepNextEvent}
+                startIcon={<SkipNextIcon />}
+              >
+                <Trans>Next event</Trans>
+              </Button>
+            </>
+          }
+        />
       </>
     );
   }

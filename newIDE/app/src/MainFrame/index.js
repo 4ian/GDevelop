@@ -163,6 +163,8 @@ import HotReloadLogsDialog from '../HotReload/HotReloadLogsDialog';
 import { useDiscordRichPresence } from '../Utils/UpdateDiscordRichPresence';
 import { delay } from '../Utils/Delay';
 import useNewProjectDialog from './UseNewProjectDialog';
+import useBreakpointDebugger from './UseBreakpointDebugger';
+import { clearBreakpointsSession } from '../EventsSheet/BreakpointsSessionStore';
 import { findAndLogProjectPreviewErrors } from '../Utils/ProjectErrorsChecker';
 import { renameResourcesInProject } from '../ResourcesList/ResourceUtils';
 import useNewResourceDialog from '../ResourcesList/useNewResourceDialog';
@@ -1163,6 +1165,9 @@ const MainFrame = (props: Props): React.MixedElement => {
       eventsFunctionsExtensionsState.unloadProjectEventsFunctionsExtensions(
         currentProject
       );
+      // The session breakpoints reference this project's events lists, which
+      // become dangling once it is deleted from memory.
+      clearBreakpointsSession();
       currentProject.delete();
       sealUnsavedChanges();
       console.info('Project closed.');
@@ -3029,6 +3034,70 @@ const MainFrame = (props: Props): React.MixedElement => {
     openLayout,
     openExternalEvents,
     openEventsFunctionsExtension,
+  });
+
+  // Ref so focusOnExtensionFunction sees the current tabs without needing
+  // to re-subscribe every time tabs change.
+  const editorTabsRef = React.useRef(state.editorTabs);
+  React.useEffect(
+    () => {
+      editorTabsRef.current = state.editorTabs;
+    },
+    [state.editorTabs]
+  );
+
+  // Open / focus an extension function editor. When the tab is already open,
+  // drives it via the live ref since `initiallyFocused*` props are mount-only.
+  const focusOnExtensionFunction = React.useCallback(
+    (
+      extensionName: string,
+      functionName: string,
+      behaviorName: ?string,
+      objectName: ?string
+    ) => {
+      if (!currentProject) return;
+      if (!currentProject.hasEventsFunctionsExtensionNamed(extensionName))
+        return;
+      const eventsFunctionsExtension = currentProject.getEventsFunctionsExtension(
+        extensionName
+      );
+      const foundTab = getEventsFunctionsExtensionEditor(
+        editorTabsRef.current,
+        eventsFunctionsExtension
+      );
+      if (foundTab) {
+        foundTab.editor.selectEventsFunctionByName(
+          functionName,
+          behaviorName,
+          objectName
+        );
+        setState(state => ({
+          ...state,
+          editorTabs: changeCurrentTab(
+            state.editorTabs,
+            foundTab.paneIdentifier,
+            foundTab.tabIndex
+          ),
+        }));
+      } else {
+        openEventsFunctionsExtension(
+          extensionName,
+          functionName,
+          behaviorName,
+          objectName
+        );
+      }
+    },
+    [currentProject, setState, openEventsFunctionsExtension]
+  );
+
+  const { togglePauseExecution, stepNextEvent } = useBreakpointDebugger({
+    previewDebuggerServer,
+    currentProject,
+    previewLayoutName: previewState.previewLayoutName,
+    openLayout,
+    focusOnExtensionFunction,
+    showAlert,
   });
 
   const onEditorTabClosing = React.useCallback(
@@ -5190,6 +5259,8 @@ const MainFrame = (props: Props): React.MixedElement => {
     onRestartInGameEditor,
     onOpenGlobalSearch: openGlobalSearch,
     onOpenMemoryTrackerRegistry: () => setMemoryTrackedRegistryDialogOpen(true),
+    onTogglePauseExecution: togglePauseExecution,
+    onStepNextEvent: stepNextEvent,
   });
 
   useCliCommandRunner({

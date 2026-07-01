@@ -249,8 +249,10 @@ namespace gdjs {
       try {
         if (data.command === 'play') {
           runtimeGame.pause(false);
+          that.sendRuntimeGameStatus();
         } else if (data.command === 'pause') {
           runtimeGame.pause(true);
+          that.sendRuntimeGameStatus();
           that.sendRuntimeGameDump();
         } else if (data.command === 'refresh') {
           that.sendRuntimeGameDump();
@@ -684,7 +686,12 @@ namespace gdjs {
      */
     sendRuntimeGameDump(): void {
       const that = this;
-      const message = { command: 'dump', payload: this._runtimegame };
+
+      const activeLocalVariables = gdjs.collectActiveLocalVariables();
+      const message: any = { command: 'dump', payload: this._runtimegame };
+      if (Object.keys(activeLocalVariables).length > 0) {
+        message.activeLocalVariables = activeLocalVariables;
+      }
       const serializationStartTime = Date.now();
 
       // Stringify the message, excluding some known data that are big and/or not
@@ -733,6 +740,14 @@ namespace gdjs {
             excludedKeys.indexOf(key) !== -1
           ) {
             return '[Removed from the debugger]';
+          }
+          // Map instances don't serialize to JSON natively.
+          if (value instanceof Map) {
+            const obj: Record<string, any> = {};
+            value.forEach((v, k) => {
+              obj[k] = v;
+            });
+            return obj;
           }
           return value;
         },

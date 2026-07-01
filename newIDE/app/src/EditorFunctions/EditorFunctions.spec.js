@@ -3035,11 +3035,7 @@ describe('editorFunctions', () => {
             changed_groups: [
               {
                 group_name: 'Enemies',
-                objects: [
-                  { object_name: 'Enemy1' },
-                  { object_name: 'Enemy2' },
-                  { object_name: 'Enemy3' },
-                ],
+                objects_to_add: ['Enemy3'],
               },
             ],
           },
@@ -3465,31 +3461,6 @@ describe('editorFunctions', () => {
       project.delete();
     });
 
-    it('removes an object from a group when it is left out of the objects list', async () => {
-      const result: EditorFunctionGenericOutput = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
-        {
-          ...makeFakeLaunchFunctionOptionsWithProject(project),
-          args: {
-            scene_name: 'TestScene',
-            changed_groups: [
-              {
-                group_name: 'Enemies',
-                objects: [{ object_name: 'Enemy1' }],
-              },
-            ],
-          },
-        }
-      );
-
-      expect(result.success).toBe(true);
-      const group = testScene
-        .getObjects()
-        .getObjectGroups()
-        .get('Enemies');
-      expect(group.find('Enemy1')).toBe(true);
-      expect(group.find('Enemy2')).toBe(false);
-    });
-
     it('renames a group', async () => {
       const result: EditorFunctionGenericOutput = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
         {
@@ -3507,7 +3478,7 @@ describe('editorFunctions', () => {
       expect(groups.has('Enemies')).toBe(false);
     });
 
-    it('warns when an object added to a group does not exist', async () => {
+    it('echoes the resulting content of the group in the message', async () => {
       const result: EditorFunctionGenericOutput = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
         {
           ...makeFakeLaunchFunctionOptionsWithProject(project),
@@ -3516,11 +3487,159 @@ describe('editorFunctions', () => {
             changed_groups: [
               {
                 group_name: 'Enemies',
-                objects: [
-                  { object_name: 'Enemy1' },
-                  { object_name: 'Enemy2' },
-                  { object_name: 'Ghost' },
-                ],
+                objects_to_remove: ['Enemy2'],
+              },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      // The message reports the new state instead of a blind confirmation.
+      expect(result.message).toContain(
+        'Group "Enemies" in scene "TestScene" now contains 1 object(s): Enemy1.'
+      );
+    });
+
+    it('adds objects incrementally with objects_to_add (keeping existing ones)', async () => {
+      const sceneObjects = testScene.getObjects();
+      sceneObjects.insertNewObject(project, 'Sprite', 'Enemy3', 2);
+
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            changed_groups: [
+              {
+                group_name: 'Enemies',
+                objects_to_add: ['Enemy3'],
+              },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      const group = testScene
+        .getObjects()
+        .getObjectGroups()
+        .get('Enemies');
+      // The objects already in the group are untouched, the new one is added.
+      expect(group.find('Enemy1')).toBe(true);
+      expect(group.find('Enemy2')).toBe(true);
+      expect(group.find('Enemy3')).toBe(true);
+      expect(result.message).toContain('Enemy1, Enemy2, Enemy3');
+    });
+
+    it('removes objects incrementally with objects_to_remove (keeping the others)', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            changed_groups: [
+              {
+                group_name: 'Enemies',
+                objects_to_remove: ['Enemy2'],
+              },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      const group = testScene
+        .getObjects()
+        .getObjectGroups()
+        .get('Enemies');
+      expect(group.find('Enemy1')).toBe(true);
+      expect(group.find('Enemy2')).toBe(false);
+    });
+
+    it('adds and removes in a single call, ignoring duplicates and no-ops', async () => {
+      const sceneObjects = testScene.getObjects();
+      sceneObjects.insertNewObject(project, 'Sprite', 'Enemy3', 2);
+
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            changed_groups: [
+              {
+                group_name: 'Enemies',
+                // Enemy3 listed twice (duplicate), Enemy1 already in the group
+                // (no-op), Enemy2 removed, GhostNotHere removed (no-op).
+                objects_to_add: ['Enemy3', 'Enemy3', 'Enemy1'],
+                objects_to_remove: ['Enemy2', 'GhostNotHere'],
+              },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      const group = testScene
+        .getObjects()
+        .getObjectGroups()
+        .get('Enemies');
+      expect(group.getAllObjectsNames().toJSArray()).toEqual([
+        'Enemy1',
+        'Enemy3',
+      ]);
+    });
+
+    it('fills shared variables and behaviors when adding via objects_to_add', async () => {
+      const sceneObjects = testScene.getObjects();
+
+      // Enemy1 and Enemy2 share a behavior and a variable, so the group exposes
+      // them. A freshly added Enemy3 should receive them too.
+      for (const objectName of ['Enemy1', 'Enemy2']) {
+        const object = sceneObjects.getObject(objectName);
+        object.addNewBehavior(
+          project,
+          'PlatformBehavior::PlatformerObjectBehavior',
+          'PlatformerObject'
+        );
+        object
+          .getVariables()
+          .insertNew('groupHealth', 0)
+          .setValue(100);
+      }
+      sceneObjects.insertNewObject(project, 'Sprite', 'Enemy3', 2);
+
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            changed_groups: [
+              {
+                group_name: 'Enemies',
+                objects_to_add: ['Enemy3'],
+              },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      const enemy3 = sceneObjects.getObject('Enemy3');
+      expect(enemy3.hasBehaviorNamed('PlatformerObject')).toBe(true);
+      expect(enemy3.getVariables().has('groupHealth')).toBe(true);
+    });
+
+    it('warns when an object added via objects_to_add does not exist', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            changed_groups: [
+              {
+                group_name: 'Enemies',
+                objects_to_add: ['Ghost'],
               },
             ],
           },

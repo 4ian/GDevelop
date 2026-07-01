@@ -5461,9 +5461,12 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
               effect.setStringParameter(propertyName, newValue);
             }
 
-            changes.push(
-              `Modified "${propertyName}" property of the "${effectName}" effect to "${newValue}".`
-            );
+            // Newly created effects get one summary message below instead, so this isn't repeated.
+            if (!newlyCreatedEffect) {
+              changes.push(
+                `Modified "${propertyName}" property of the "${effectName}" effect to "${newValue}".`
+              );
+            }
           });
         }
 

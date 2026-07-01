@@ -1,6 +1,7 @@
 // @flow
 import { fakeAssetShortHeader1 } from '../fixtures/GDevelopServicesTestData';
 import { PixiResourcesLoaderMock } from '../fixtures/TestPixiResourcesLoader';
+import { makeTestExtensions } from '../fixtures/TestExtensions';
 import {
   editorFunctions,
   noEventsInSceneText,
@@ -2835,6 +2836,117 @@ describe('editorFunctions', () => {
       expect(result.message).toContain('Scene already named "TestScene".');
       expect(project.hasLayoutNamed('TestScene')).toBe(true);
       expect(onProjectItemRenamedOutsideEditor).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('change_scene_properties_layers_effects_groups (layer effects)', () => {
+    let project: gdProject;
+    let testScene: gdLayout;
+
+    beforeEach(() => {
+      makeTestExtensions(gd);
+      // $FlowFixMe[invalid-constructor]
+      project = new gd.ProjectHelper.createNewGDJSProject();
+      testScene = project.insertNewLayout('TestScene', 0);
+    });
+
+    afterEach(() => {
+      project.delete();
+    });
+
+    it('creates a new effect and reports it with a single message (no separate "Modified" lines)', async () => {
+      const result = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            changed_layer_effects: [
+              {
+                layer_name: '',
+                effect_name: 'MySepia',
+                effect_type: 'FakeSepia',
+                changed_properties: [
+                  { property_name: 'opacity', new_value: '0.5' },
+                ],
+              },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).toContain('Created new "MySepia" effect');
+      expect(result.message).not.toContain('Modified "opacity"');
+
+      const effectsContainer = testScene
+        .getLayers()
+        .getLayer('')
+        .getEffects();
+      expect(effectsContainer.getEffectsCount()).toBe(1);
+      expect(
+        effectsContainer.getEffect('MySepia').getDoubleParameter('opacity')
+      ).toBe(0.5);
+    });
+
+    it('reports a deletion and a modification together in the same message', async () => {
+      await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            changed_layer_effects: [
+              {
+                layer_name: '',
+                effect_name: 'ToRemove',
+                effect_type: 'FakeSepia',
+              },
+              {
+                layer_name: '',
+                effect_name: 'ToKeep',
+                effect_type: 'FakeNight',
+              },
+            ],
+          },
+        }
+      );
+
+      const result = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            changed_layer_effects: [
+              {
+                layer_name: '',
+                effect_name: 'ToRemove',
+                delete_this_effect: true,
+              },
+              {
+                layer_name: '',
+                effect_name: 'ToKeep',
+                changed_properties: [
+                  { property_name: 'intensity', new_value: '0.3' },
+                ],
+              },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).toContain(
+        'Removed "ToRemove" effect on layer "".'
+      );
+      expect(result.message).toContain(
+        'Modified "intensity" property of the "ToKeep" effect to "0.3".'
+      );
+
+      const effectsContainer = testScene
+        .getLayers()
+        .getLayer('')
+        .getEffects();
+      expect(effectsContainer.hasEffectNamed('ToRemove')).toBe(false);
+      expect(effectsContainer.hasEffectNamed('ToKeep')).toBe(true);
     });
   });
 

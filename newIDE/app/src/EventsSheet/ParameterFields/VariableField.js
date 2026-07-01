@@ -81,8 +81,11 @@ type Props = {
   ) => VariablesContainer_SourceType,
   enumerateVariables: () => Array<EnumeratedVariable>,
   forceDeclaration?: boolean,
-  onOpenDialog: (VariableDialogOpeningProps => void) | null,
+  openVariableEditorDialog: (VariableDialogOpeningProps => void) | null,
   editEventsFunctionParameter: (VariableDialogOpeningProps => void) | null,
+  openEventsBasedEntityPropertyEditorDialog:
+    | (VariableDialogOpeningProps => void)
+    | null,
 };
 
 type VariableNameQuickAnalyzeResult = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7;
@@ -92,7 +95,9 @@ export type VariableFieldInterface = {|
   updateAutocompletions: () => void,
 |};
 
-export const VariableNameQuickAnalyzeResults = {
+export const VariableNameQuickAnalyzeResults: {
+  [string]: VariableNameQuickAnalyzeResult,
+} = {
   OK: 0,
   WRONG_QUOTE: 1,
   WRONG_SPACE: 2,
@@ -143,7 +148,6 @@ export const quicklyAnalyzeVariableName = (
   projectScopedContainersAccessor?: ProjectScopedContainersAccessor,
   isObjectVariable: boolean = false
 ): VariableNameQuickAnalyzeResult => {
-  // $FlowFixMe[incompatible-type]
   if (!name) return VariableNameQuickAnalyzeResults.OK;
 
   for (let i = 0; i < name.length; ++i) {
@@ -153,10 +157,8 @@ export const quicklyAnalyzeVariableName = (
       // This probably starts an expression, so stop the analysis.
       break;
     } else if (character === ' ') {
-      // $FlowFixMe[incompatible-type]
       return VariableNameQuickAnalyzeResults.WRONG_SPACE;
     } else if (character === '"') {
-      // $FlowFixMe[incompatible-type]
       return VariableNameQuickAnalyzeResults.WRONG_QUOTE;
     } else if (
       character === '(' ||
@@ -165,7 +167,6 @@ export const quicklyAnalyzeVariableName = (
       character === '/' ||
       character === '*'
     ) {
-      // $FlowFixMe[incompatible-type]
       return VariableNameQuickAnalyzeResults.WRONG_EXPRESSION;
     }
   }
@@ -173,12 +174,10 @@ export const quicklyAnalyzeVariableName = (
   const rootVariableName = getRootVariableName(name);
   // Check at least the name of the root variable, it's the best we can do.
   if (!isRootVariableDeclared(rootVariableName, variablesContainers)) {
-    // $FlowFixMe[incompatible-type]
     return VariableNameQuickAnalyzeResults.UNDECLARED_VARIABLE;
   }
 
   if (!projectScopedContainersAccessor) {
-    // $FlowFixMe[incompatible-type]
     return VariableNameQuickAnalyzeResults.OK;
   }
   const projectScopedContainers = projectScopedContainersAccessor.get();
@@ -189,7 +188,6 @@ export const quicklyAnalyzeVariableName = (
       .getObjectsContainersList()
       .hasObjectOrGroupNamed(rootVariableName)
   ) {
-    // $FlowFixMe[incompatible-type]
     return VariableNameQuickAnalyzeResults.NAME_COLLISION_WITH_OBJECT;
   }
 
@@ -203,16 +201,13 @@ export const quicklyAnalyzeVariableName = (
     );
 
     if (variableSource === gd.VariablesContainer.Parameters) {
-      // $FlowFixMe[incompatible-type]
       return VariableNameQuickAnalyzeResults.PARAMETER_WITH_CHILD;
     }
     if (variableSource === gd.VariablesContainer.Properties) {
-      // $FlowFixMe[incompatible-type]
       return VariableNameQuickAnalyzeResults.PROPERTY_WITH_CHILD;
     }
   }
 
-  // $FlowFixMe[incompatible-type]
   return VariableNameQuickAnalyzeResults.OK;
 };
 
@@ -275,8 +270,9 @@ export default (React.forwardRef<Props, VariableFieldInterface>(
       onInstructionTypeChanged,
       isObjectVariable,
       getVariableSourceFromIdentifier,
-      onOpenDialog,
+      openVariableEditorDialog,
       editEventsFunctionParameter,
+      openEventsBasedEntityPropertyEditorDialog,
     } = props;
 
     const field = React.useRef<?SemiControlledAutoCompleteInterface>(null);
@@ -337,7 +333,7 @@ export default (React.forwardRef<Props, VariableFieldInterface>(
 
     const openVariableEditor = React.useCallback(
       () => {
-        if (!onOpenDialog) {
+        if (!openVariableEditorDialog) {
           return;
         }
         // Access to the input directly because the value
@@ -347,7 +343,7 @@ export default (React.forwardRef<Props, VariableFieldInterface>(
           : value;
 
         onChange(fieldCurrentValue);
-        onOpenDialog({
+        openVariableEditorDialog({
           variableName: fieldCurrentValue,
           shouldCreate:
             !!fieldCurrentValue &&
@@ -361,7 +357,13 @@ export default (React.forwardRef<Props, VariableFieldInterface>(
             : 'number',
         });
       },
-      [instruction, onChange, onOpenDialog, value, variablesContainers]
+      [
+        instruction,
+        onChange,
+        openVariableEditorDialog,
+        value,
+        variablesContainers,
+      ]
     );
 
     const openParameterEditor = React.useCallback(
@@ -378,10 +380,9 @@ export default (React.forwardRef<Props, VariableFieldInterface>(
         onChange(fieldCurrentValue);
         editEventsFunctionParameter({
           variableName: fieldCurrentValue,
-          shouldCreate: !isRootVariableDeclared(
-            fieldCurrentValue,
-            variablesContainers
-          ),
+          shouldCreate:
+            !!fieldCurrentValue &&
+            !isRootVariableDeclared(fieldCurrentValue, variablesContainers),
           variableType: instruction
             ? getVariableTypeName(
                 gd.VariableInstructionSwitcher.getSwitchableInstructionVariableType(
@@ -397,6 +398,41 @@ export default (React.forwardRef<Props, VariableFieldInterface>(
         onChange,
         variablesContainers,
         instruction,
+      ]
+    );
+
+    const openPropertyEditor = React.useCallback(
+      () => {
+        if (!openEventsBasedEntityPropertyEditorDialog) {
+          return;
+        }
+        // Access to the input directly because the value
+        // may not have been sent to onChange yet.
+        const fieldCurrentValue = field.current
+          ? field.current.getInputValue()
+          : value;
+
+        onChange(fieldCurrentValue);
+        openEventsBasedEntityPropertyEditorDialog({
+          variableName: fieldCurrentValue,
+          shouldCreate:
+            !!fieldCurrentValue &&
+            !isRootVariableDeclared(fieldCurrentValue, variablesContainers),
+          variableType: instruction
+            ? getVariableTypeName(
+                gd.VariableInstructionSwitcher.getSwitchableInstructionVariableType(
+                  instruction.getType()
+                )
+              )
+            : 'number',
+        });
+      },
+      [
+        openEventsBasedEntityPropertyEditorDialog,
+        value,
+        onChange,
+        instruction,
+        variablesContainers,
       ]
     );
 
@@ -508,12 +544,11 @@ export default (React.forwardRef<Props, VariableFieldInterface>(
           ? variableSourceType === gd.VariablesContainer.Parameters
             ? ['edit-parameters']
             : variableSourceType === gd.VariablesContainer.Properties
-            ? // TODO Allow to edit properties from the event sheet.
-              []
+            ? ['edit-properties']
             : ['edit-variables']
           : fieldCurrentValue
-          ? ['add-variable', 'add-parameter']
-          : ['edit-or-add-variables'];
+          ? ['add-parameter', 'add-property', 'add-variable']
+          : ['edit-or-add-properties', 'edit-or-add-variables'];
 
         return optionIds.includes(id);
       },
@@ -543,10 +578,57 @@ export default (React.forwardRef<Props, VariableFieldInterface>(
                   onRequestClose={onRequestClose}
                   onApply={onApply}
                   filterOptionById={filterOptionById}
-                  // $FlowFixMe[incompatible-type]
                   dataSource={[
                     ...autocompletionVariableNames,
-                    ...(onOpenDialog
+                    ...(editEventsFunctionParameter
+                      ? [
+                          {
+                            id: 'edit-parameters',
+                            translatableValue: t`Edit parameters...`,
+                            text: '',
+                            value: '',
+                            renderIcon: () => <Add />,
+                            onClick: openParameterEditor,
+                          },
+                          {
+                            id: 'add-parameter',
+                            translatableValue: t`Add parameter...`,
+                            text: '',
+                            value: '',
+                            renderIcon: () => <Add />,
+                            onClick: openParameterEditor,
+                          },
+                        ]
+                      : []),
+                    ...(openEventsBasedEntityPropertyEditorDialog
+                      ? [
+                          {
+                            id: 'edit-properties',
+                            translatableValue: t`Edit properties...`,
+                            text: '',
+                            value: '',
+                            renderIcon: () => <Add />,
+                            onClick: openPropertyEditor,
+                          },
+                          {
+                            id: 'add-property',
+                            translatableValue: t`Add property...`,
+                            text: '',
+                            value: '',
+                            renderIcon: () => <Add />,
+                            onClick: openPropertyEditor,
+                          },
+                          {
+                            id: 'edit-or-add-properties',
+                            translatableValue: t`Edit or add properties...`,
+                            text: '',
+                            value: '',
+                            renderIcon: () => <Add />,
+                            onClick: openPropertyEditor,
+                          },
+                        ]
+                      : []),
+                    ...(openVariableEditorDialog
                       ? [
                           {
                             id: 'edit-variables',
@@ -574,26 +656,6 @@ export default (React.forwardRef<Props, VariableFieldInterface>(
                           },
                         ]
                       : []),
-                    ...(editEventsFunctionParameter
-                      ? [
-                          {
-                            id: 'edit-parameters',
-                            translatableValue: t`Edit parameters...`,
-                            text: '',
-                            value: '',
-                            renderIcon: () => <Add />,
-                            onClick: openParameterEditor,
-                          },
-                          {
-                            id: 'add-parameter',
-                            translatableValue: t`Add parameter...`,
-                            text: '',
-                            value: '',
-                            renderIcon: () => <Add />,
-                            onClick: openParameterEditor,
-                          },
-                        ]
-                      : []),
                   ]}
                   openOnFocus={!isInline}
                   ref={field}
@@ -604,12 +666,12 @@ export default (React.forwardRef<Props, VariableFieldInterface>(
                 !isInline ? (
                   <RaisedButton
                     icon={<ShareExternal />}
-                    disabled={!onOpenDialog}
+                    disabled={!openVariableEditorDialog}
                     primary
                     style={style}
                     onClick={() => {
-                      if (onOpenDialog) {
-                        onOpenDialog({
+                      if (openVariableEditorDialog) {
+                        openVariableEditorDialog({
                           variableName: value,
                           shouldCreate: false,
                           variableType: getVariableTypeName(variableType),

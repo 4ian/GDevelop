@@ -589,6 +589,7 @@ export const AskAiStandAloneForm = ({
     onInstancesModifiedOutsideEditor: () => {},
     onObjectsModifiedOutsideEditor: () => {},
     onObjectGroupsModifiedOutsideEditor: () => {},
+    onProjectItemRenamedOutsideEditor: () => {},
     onWillInstallExtension,
     onExtensionInstalled,
     isReadyToProcessFunctionCalls: true,

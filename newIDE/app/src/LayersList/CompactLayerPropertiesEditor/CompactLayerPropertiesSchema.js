@@ -105,7 +105,9 @@ const getCamera3DFieldOfViewField = ({
   setValue: (layer: gdLayer, newValue: number) =>
     layer.setCamera3DFieldOfView(newValue),
   disabled: (layers: Array<gdLayer>) =>
-    layers[0] && layers[0].getCameraType() !== 'perspective',
+    layers[0] && layers[0].getCameraType() === 'perspective'
+      ? 'never'
+      : 'always',
 });
 
 const getNearPlaneDistanceField = ({ i18n }: {| i18n: I18nType |}): Field => ({

@@ -3,7 +3,7 @@
  * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#include "ObjectVariableHelper.h"
+#include "ObjectRefactorer.h"
 
 #include "GDCore/IDE/WholeProjectRefactorer.h"
 #include "GDCore/Project/EventsBasedObject.h"
@@ -18,7 +18,7 @@
 
 namespace gd {
 
-void ObjectVariableHelper::FillAnyVariableBetweenObjects(
+void ObjectRefactorer::FillAnyVariableBetweenObjects(
     gd::ObjectsContainer &globalObjectsContainer,
     gd::ObjectsContainer &objectsContainer,
     const gd::ObjectGroup &objectGroup) {
@@ -67,7 +67,7 @@ void ObjectVariableHelper::FillAnyVariableBetweenObjects(
   }
 }
 
-gd::VariablesContainer ObjectVariableHelper::MergeVariableContainers(
+gd::VariablesContainer ObjectRefactorer::MergeVariableContainers(
     const gd::ObjectsContainersList &objectsContainersList,
     const gd::ObjectGroup &objectGroup) {
   gd::VariablesContainer mergedVariablesContainer;
@@ -115,12 +115,13 @@ gd::VariablesContainer ObjectVariableHelper::MergeVariableContainers(
   return mergedVariablesContainer;
 }
 
-void ObjectVariableHelper::FillMissingGroupVariablesToObjects(
+void ObjectRefactorer::FillMissingGroupVariablesToObjects(
     gd::ObjectsContainer &globalObjectsContainer,
     gd::ObjectsContainer &objectsContainer, const gd::ObjectGroup &objectGroup,
     const gd::SerializerElement &originalSerializedVariables) {
   gd::VariablesContainer groupVariablesContainer;
   groupVariablesContainer.UnserializeFrom(originalSerializedVariables);
+
   // Add missing variables to objects added in the group.
   for (const gd::String &objectName : objectGroup.GetAllObjectsNames()) {
     const bool hasObject = objectsContainer.HasObjectNamed(objectName);
@@ -129,25 +130,55 @@ void ObjectVariableHelper::FillMissingGroupVariablesToObjects(
     }
     auto &object = hasObject ? objectsContainer.GetObject(objectName)
                              : globalObjectsContainer.GetObject(objectName);
-    auto &variablesContainer = object.GetVariables();
-    for (std::size_t variableIndex = 0;
-         variableIndex < groupVariablesContainer.Count(); ++variableIndex) {
-      auto &groupVariable = groupVariablesContainer.Get(variableIndex);
-      const auto &variableName =
-          groupVariablesContainer.GetNameAt(variableIndex);
 
-      if (!variablesContainer.Has(variableName)) {
-        variablesContainer.Insert(variableName, groupVariable,
-                                  variablesContainer.Count());
-      }
+    gd::ObjectRefactorer::FillMissingGroupVariablesToObject(
+        object, groupVariablesContainer);
+  }
+}
+
+void ObjectRefactorer::FillMissingGroupVariablesToObject(
+    gd::Object &object, const gd::VariablesContainer &groupVariablesContainer) {
+  auto &variablesContainer = object.GetVariables();
+  for (std::size_t variableIndex = 0;
+       variableIndex < groupVariablesContainer.Count(); ++variableIndex) {
+    auto &groupVariable = groupVariablesContainer.Get(variableIndex);
+    const auto &variableName = groupVariablesContainer.GetNameAt(variableIndex);
+
+    if (!variablesContainer.Has(variableName)) {
+      variablesContainer.Insert(variableName, groupVariable,
+                                variablesContainer.Count());
     }
   }
-};
+}
+
+void ObjectRefactorer::FillMissingGroupBehaviorToObject(
+    gd::ObjectsContainer &globalObjectsContainer,
+    gd::ObjectsContainer &objectsContainer, gd::Object &object,
+    const gd::ObjectGroup &objectGroup, const gd::String &behaviorName) {
+  if (object.HasBehaviorNamed(behaviorName) ||
+      objectGroup.GetAllObjectsNames().size() == 0) {
+    return;
+  }
+  const gd::String &firstObjectName = objectGroup.GetAllObjectsNames()[0];
+  const bool hasObject = objectsContainer.HasObjectNamed(firstObjectName);
+  if (!hasObject && !globalObjectsContainer.HasObjectNamed(firstObjectName)) {
+    return;
+  }
+  auto &firstObject = hasObject
+                          ? objectsContainer.GetObject(firstObjectName)
+                          : globalObjectsContainer.GetObject(firstObjectName);
+
+  if (!firstObject.HasBehaviorNamed(behaviorName)) {
+    return;
+  }
+  object.GetBehaviors().AddBehavior(firstObject.GetBehavior(behaviorName),
+                                    behaviorName);
+}
 
 // TODO Handle position changes for group variables.
 // We could try to change the order of object variables in a way that the next
 // call to MergeVariableContainers rebuild them in the same order.
-void ObjectVariableHelper::ApplyChangesToObjects(
+void ObjectRefactorer::ApplyChangesToObjects(
     gd::ObjectsContainer &globalObjectsContainer,
     gd::ObjectsContainer &objectsContainer,
     const gd::VariablesContainer &groupVariablesContainer,
@@ -196,7 +227,7 @@ void ObjectVariableHelper::ApplyChangesToObjects(
   }
 }
 
-void ObjectVariableHelper::ApplyChangesToObjectInstances(
+void ObjectRefactorer::ApplyChangesToObjectInstances(
     gd::VariablesContainer &objectVariablesContainer,
     gd::InitialInstancesContainer &initialInstancesContainer,
     const gd::String &objectName, const gd::VariablesChangeset &changeset) {
@@ -243,7 +274,7 @@ void ObjectVariableHelper::ApplyChangesToObjectInstances(
       });
 }
 
-void ObjectVariableHelper::ApplyChangesToVariants(
+void ObjectRefactorer::ApplyChangesToVariants(
     gd::EventsBasedObject &eventsBasedObject, const gd::String &objectName,
     const gd::VariablesChangeset &changeset) {
   auto &defaultVariablesContainer = eventsBasedObject.GetDefaultVariant()
@@ -295,7 +326,7 @@ void ObjectVariableHelper::ApplyChangesToVariants(
       }
     }
 
-    gd::ObjectVariableHelper::ApplyChangesToObjectInstances(
+    gd::ObjectRefactorer::ApplyChangesToObjectInstances(
         variablesContainer, variant->GetInitialInstances(), objectName,
         changeset);
   }

@@ -3722,7 +3722,7 @@ module.exports = {
       gd.ProjectHelper.sanityCheckBehaviorsSharedDataProperty(
         sharedData,
         'gravityY',
-        '9.8'
+        '0'
       ),
     ];
   },

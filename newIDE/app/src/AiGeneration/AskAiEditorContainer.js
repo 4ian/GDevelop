@@ -4,13 +4,14 @@ import { type I18n as I18nType } from '@lingui/core';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import { exceptionallyGuardAgainstDeadObject } from '../Utils/IsNullPtr';
 import { I18n } from '@lingui/react';
+import { type RenderEditorContainerPropsWithRef } from '../MainFrame/EditorContainers/BaseEditor';
 import {
-  type RenderEditorContainerPropsWithRef,
   type SceneEventsOutsideEditorChanges,
   type InstancesOutsideEditorChanges,
   type ObjectsOutsideEditorChanges,
   type ObjectGroupsOutsideEditorChanges,
-} from '../MainFrame/EditorContainers/BaseEditor';
+  type ProjectItemRenamedOutsideEditorChanges,
+} from '../EditorFunctions/OutsideEditorChanges';
 import { type ObjectWithContext } from '../ObjectsList/EnumerateObjects';
 import Paper from '../UI/Paper';
 import { AiRequestChat, type AiRequestChatInterface } from './AiRequestChat';
@@ -152,6 +153,9 @@ type Props = {|
   onObjectGroupsModifiedOutsideEditor: (
     changes: ObjectGroupsOutsideEditorChanges
   ) => void,
+  onProjectItemRenamedOutsideEditor: (
+    changes: ProjectItemRenamedOutsideEditorChanges
+  ) => void,
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
   onOpenAskAi: ({|
@@ -250,6 +254,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
         onInstancesModifiedOutsideEditor,
         onObjectsModifiedOutsideEditor,
         onObjectGroupsModifiedOutsideEditor,
+        onProjectItemRenamedOutsideEditor,
         onWillInstallExtension,
         onExtensionInstalled,
         onOpenAskAi,
@@ -916,6 +921,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
         onInstancesModifiedOutsideEditor,
         onObjectsModifiedOutsideEditor,
         onObjectGroupsModifiedOutsideEditor,
+        onProjectItemRenamedOutsideEditor,
         i18n,
         onWillInstallExtension,
         onExtensionInstalled,
@@ -1626,6 +1632,9 @@ export const renderAskAiEditorContainer = (
         onObjectsModifiedOutsideEditor={props.onObjectsModifiedOutsideEditor}
         onObjectGroupsModifiedOutsideEditor={
           props.onObjectGroupsModifiedOutsideEditor
+        }
+        onProjectItemRenamedOutsideEditor={
+          props.onProjectItemRenamedOutsideEditor
         }
         onWillInstallExtension={props.onWillInstallExtension}
         onExtensionInstalled={props.onExtensionInstalled}

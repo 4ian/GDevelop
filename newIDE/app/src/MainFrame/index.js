@@ -81,13 +81,14 @@ import {
 import { renderAskAiEditorContainer } from '../AiGeneration/AskAiEditorContainer';
 import { renderResourcesEditorContainer } from './EditorContainers/ResourcesEditorContainer';
 import { renderGlobalEventsSearchEditorContainer } from './EditorContainers/GlobalEventsSearchEditorContainer';
+import { type RenderEditorContainerPropsWithRef } from './EditorContainers/BaseEditor';
 import {
-  type RenderEditorContainerPropsWithRef,
   type SceneEventsOutsideEditorChanges,
   type InstancesOutsideEditorChanges,
   type ObjectsOutsideEditorChanges,
   type ObjectGroupsOutsideEditorChanges,
-} from './EditorContainers/BaseEditor';
+  type ProjectItemRenamedOutsideEditorChanges,
+} from '../EditorFunctions/OutsideEditorChanges';
 import { type Exporter } from '../ExportAndShare/ShareDialog';
 import ResourcesLoader from '../ResourcesLoader/index';
 import {
@@ -208,6 +209,7 @@ import useCreateProject, {
   type UseCreateProjectReturnType,
 } from '../Utils/UseCreateProject';
 import newNameGenerator from '../Utils/NewNameGenerator';
+import { renameLayoutInProject } from '../Utils/Layout';
 import { addDefaultLightToAllLayers } from '../ProjectCreation/CreateProject';
 import { type NewProjectSetup } from '../ProjectCreation/NewProjectSetupDialog';
 import useEditorTabsStateSaving from './EditorTabs/UseEditorTabsStateSaving';
@@ -228,7 +230,10 @@ import { QuickCustomizationDialog } from '../QuickCustomization/QuickCustomizati
 import { type ObjectWithContext } from '../ObjectsList/EnumerateObjects';
 import useGamesList from '../GameDashboard/UseGamesList';
 import useCapturesManager from './UseCapturesManager';
-import { readProjectSettings } from '../Utils/ProjectSettingsReader';
+import {
+  readProjectSettings,
+  type ResourceCustomPropertyConfig,
+} from '../Utils/ProjectSettingsReader';
 import useNpmScriptRunner from './NpmScriptRunner/useNpmScriptRunner';
 import { applyProjectPreferences } from '../Utils/ApplyProjectPreferences';
 import {
@@ -422,6 +427,10 @@ const MainFrame = (props: Props): React.MixedElement => {
       toolbarButtons: [],
     }: State)
   );
+  const [
+    resourceCustomPropertyConfigs,
+    setResourceCustomPropertyConfigs,
+  ] = React.useState<Array<ResourceCustomPropertyConfig>>([]);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const [
     cloudProjectFileMetadataToRecover,
@@ -1144,6 +1153,7 @@ const MainFrame = (props: Props): React.MixedElement => {
         editorTabs: closeProjectTabs(state.editorTabs, currentProject),
         toolbarButtons: [],
       }));
+      setResourceCustomPropertyConfigs([]);
 
       // Delete the project from memory. All references to it have been dropped previously
       // by the setState.
@@ -1266,6 +1276,9 @@ const MainFrame = (props: Props): React.MixedElement => {
               ...currentState,
               toolbarButtons: parsedProjectSettings.toolbarButtons || [],
             }));
+            setResourceCustomPropertyConfigs(
+              parsedProjectSettings.resourceCustomProperties || []
+            );
           }
         } catch (error) {
           console.warn(
@@ -2089,22 +2102,9 @@ const MainFrame = (props: Props): React.MixedElement => {
       }
     );
 
-    const layout = currentProject.getLayout(oldName);
-    const shouldChangeProjectFirstLayout =
-      oldName === currentProject.getFirstLayout();
-
-    // Rename first: the gdLayout pointer (and its instances/objects) is kept.
-    layout.setName(uniqueNewName);
-    gd.WholeProjectRefactorer.renameLayout(
-      currentProject,
-      oldName,
-      uniqueNewName
-    );
+    renameLayoutInProject(currentProject, oldName, uniqueNewName);
     if (inAppTutorialOrchestratorRef.current) {
       inAppTutorialOrchestratorRef.current.changeData(oldName, uniqueNewName);
-    }
-    if (shouldChangeProjectFirstLayout) {
-      currentProject.setFirstLayout(uniqueNewName);
     }
 
     // External layout/events tabs are left untouched: they resolve the renamed
@@ -3729,6 +3729,30 @@ const MainFrame = (props: Props): React.MixedElement => {
     [state.editorTabs]
   );
 
+  // The project model is already updated; just keep open tabs alive by renaming
+  // their project item.
+  const onProjectItemRenamedOutsideEditor = (
+    changes: ProjectItemRenamedOutsideEditorChanges
+  ) => {
+    const { kind, oldName, newName } = changes;
+    setState(state => {
+      const { currentProject } = state;
+      if (!currentProject) return state;
+      if (kind === 'scene') {
+        return {
+          ...state,
+          editorTabs: getEditorTabsWithRenamedProjectItem(
+            state.editorTabs,
+            currentProject,
+            editorTab =>
+              getRenamedLayoutTabProjectItemName(editorTab, oldName, newName)
+          ),
+        };
+      }
+      return state;
+    });
+  };
+
   const selectAllInActiveEditors = React.useCallback(
     () => {
       if (isUserTyping()) {
@@ -5252,6 +5276,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       canInstallPrivateAsset,
       onNewResourcesAdded,
       onResourceUsageChanged,
+      resourceCustomPropertyConfigs,
     }),
     [
       resourceSources,
@@ -5263,6 +5288,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       canInstallPrivateAsset,
       onNewResourcesAdded,
       onResourceUsageChanged,
+      resourceCustomPropertyConfigs,
     ]
   );
 
@@ -5462,6 +5488,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     onInstancesModifiedOutsideEditor: onInstancesModifiedOutsideEditor,
     onObjectsModifiedOutsideEditor: onObjectsModifiedOutsideEditor,
     onObjectGroupsModifiedOutsideEditor: onObjectGroupsModifiedOutsideEditor,
+    onProjectItemRenamedOutsideEditor: onProjectItemRenamedOutsideEditor,
     onWillInstallExtension: onWillInstallExtension,
     onExtensionInstalled: onExtensionInstalled,
     onEffectAdded: onEffectAdded,

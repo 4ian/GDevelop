@@ -81,6 +81,7 @@ type Props = {|
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
   editEventsFunctionParameter: VariableDialogOpeningProps => void,
+  openEventsBasedEntityPropertyEditorDialog: VariableDialogOpeningProps => void,
 |};
 
 const getInitialStepName = (isNewInstruction: boolean): StepName => {
@@ -118,6 +119,7 @@ const InstructionEditorDialog = ({
   onExtensionInstalled,
   i18n,
   editEventsFunctionParameter,
+  openEventsBasedEntityPropertyEditorDialog,
 }: Props) => {
   const forceUpdate = useForceUpdate();
   const [
@@ -217,7 +219,8 @@ const InstructionEditorDialog = ({
           project,
           chosenObject,
           type,
-          defaultName
+          defaultName,
+          /* shouldSkipExistingBehaviorSilently= */ false
         );
 
         if (wasBehaviorAdded) {
@@ -243,7 +246,8 @@ const InstructionEditorDialog = ({
             project,
             chosenObject,
             type,
-            defaultName
+            defaultName,
+            /* shouldSkipExistingBehaviorSilently= */ false
           );
 
           if (wasBehaviorAdded) {
@@ -393,6 +397,9 @@ const InstructionEditorDialog = ({
       focusOnMount={shouldAutofocusInput && !!instructionType}
       noHelpButton
       id="object-instruction-parameters"
+      openEventsBasedEntityPropertyEditorDialog={
+        openEventsBasedEntityPropertyEditorDialog
+      }
     />
   );
 

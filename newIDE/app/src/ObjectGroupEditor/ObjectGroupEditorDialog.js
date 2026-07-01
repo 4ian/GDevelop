@@ -90,7 +90,7 @@ const ObjectGroupEditorDialog = ({
         objectGroup.addObject(objectName);
       }
       if (shouldSpreadAnyVariables) {
-        gd.ObjectVariableHelper.fillAnyVariableBetweenObjects(
+        gd.ObjectRefactorer.fillAnyVariableBetweenObjects(
           globalObjectsContainer || objectsContainer,
           objectsContainer,
           objectGroup

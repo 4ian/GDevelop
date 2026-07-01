@@ -43,6 +43,7 @@ export const CompactBehaviorSharedDataPropertiesEditor = ({
         object: null,
         layersContainer: null,
         visibility: 'All',
+        shouldDisabledFieldsWithMixedValues: false,
       });
     },
     [schemaRecomputeTrigger, behaviorMetadata]

@@ -3,6 +3,7 @@ import { fakeAssetShortHeader1 } from '../fixtures/GDevelopServicesTestData';
 import { PixiResourcesLoaderMock } from '../fixtures/TestPixiResourcesLoader';
 import {
   editorFunctions,
+  noEventsInSceneText,
   type EditorFunctionGenericOutput,
   type LaunchFunctionOptionsWithProject,
 } from './index';
@@ -37,6 +38,7 @@ describe('editorFunctions', () => {
     onInstancesModifiedOutsideEditor: jest.fn(),
     onObjectGroupsModifiedOutsideEditor: jest.fn(),
     onSceneEventsModifiedOutsideEditor: jest.fn(),
+    onProjectItemRenamedOutsideEditor: jest.fn(),
     toolOptions: {
       includeEventsJson: true,
     },
@@ -1123,6 +1125,30 @@ describe('editorFunctions', () => {
     });
   });
 
+  describe('read_scene_events', () => {
+    let project: gdProject;
+
+    beforeEach(() => {
+      // $FlowFixMe[invalid-constructor]
+      project = new gd.ProjectHelper.createNewGDJSProject();
+      project.insertNewLayout('TestScene', 0);
+    });
+
+    afterEach(() => {
+      project.delete();
+    });
+
+    it('returns a placeholder when the scene has no events', async () => {
+      const result = await editorFunctions.read_scene_events.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: { scene_name: 'TestScene' },
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.eventsAsText).toBe(noEventsInSceneText);
+    });
+  });
+
   describe('add_scene_events', () => {
     let project: gdProject;
     let testScene: gdLayout;
@@ -1561,6 +1587,215 @@ describe('editorFunctions', () => {
       expect(player0.getType()).toBe(gd.Variable.Structure);
       expect(player0.getChild('name').getString()).toBe('Alice');
     });
+
+    it('creates several variables at once from a `variables` array', async () => {
+      const result = await editorFunctions.add_or_edit_variable.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          variable_scope: 'scene',
+          scene_name: 'TestScene',
+          variables: [
+            { variable_name_or_path: 'lives', value: '3' },
+            { variable_name_or_path: 'score', value: '0' },
+            { variable_name_or_path: 'playerName', value: 'Hero' },
+          ],
+        },
+      });
+
+      expect(result.success).toBe(true);
+      const variables = testScene.getVariables();
+      expect(variables.get('lives').getValue()).toBe(3);
+      expect(variables.get('score').getValue()).toBe(0);
+      expect(variables.get('playerName').getString()).toBe('Hero');
+    });
+
+    it('deletes a variable when `delete_this_variable` is true', async () => {
+      const variables = testScene.getVariables();
+      variables.insertNew('toRemove', 0).setString('bye');
+      variables.insertNew('toKeep', 1).setString('stay');
+
+      const result = await editorFunctions.add_or_edit_variable.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          variable_scope: 'scene',
+          scene_name: 'TestScene',
+          variables: [
+            { variable_name_or_path: 'toRemove', delete_this_variable: true },
+          ],
+        },
+      });
+
+      expect(result.success).toBe(true);
+      expect(variables.has('toRemove')).toBe(false);
+      expect(variables.has('toKeep')).toBe(true);
+    });
+
+    it('edits and deletes variables in a single call', async () => {
+      const variables = testScene.getVariables();
+      variables.insertNew('old', 0).setString('remove me');
+
+      const result = await editorFunctions.add_or_edit_variable.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          variable_scope: 'scene',
+          scene_name: 'TestScene',
+          variables: [
+            { variable_name_or_path: 'newScore', value: '99' },
+            { variable_name_or_path: 'old', delete_this_variable: true },
+          ],
+        },
+      });
+
+      expect(result.success).toBe(true);
+      expect(variables.get('newScore').getValue()).toBe(99);
+      expect(variables.has('old')).toBe(false);
+    });
+
+    it('warns (but still succeeds) when deleting a variable that does not exist', async () => {
+      const result = await editorFunctions.add_or_edit_variable.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          variable_scope: 'scene',
+          scene_name: 'TestScene',
+          variables: [
+            { variable_name_or_path: 'newOne', value: '1' },
+            { variable_name_or_path: 'ghost', delete_this_variable: true },
+          ],
+        },
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.message).toContain('Could not delete');
+      expect(result.message).toContain('ghost');
+      expect(
+        testScene
+          .getVariables()
+          .get('newOne')
+          .getValue()
+      ).toBe(1);
+    });
+
+    it('deletes an element of an object array variable by index', async () => {
+      // Reproduce the reported case: object "Player" with an array variable
+      // "Variable" holding three numbers, delete index 2.
+      const playerVariables = testScene
+        .getObjects()
+        .getObject('Player')
+        .getVariables();
+      const arrayVariable = playerVariables.insertNew('Variable', 0);
+      arrayVariable.castTo('Array');
+      arrayVariable.pushNew().setValue(10);
+      arrayVariable.pushNew().setValue(11);
+      arrayVariable.pushNew().setValue(12);
+
+      const result = await editorFunctions.add_or_edit_variable.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          variable_scope: 'object',
+          scene_name: 'TestScene',
+          object_name: 'Player',
+          variables: [
+            {
+              variable_name_or_path: 'Variable[2]',
+              delete_this_variable: true,
+            },
+          ],
+        },
+      });
+
+      expect(result.success).toBe(true);
+      const updated = testScene
+        .getObjects()
+        .getObject('Player')
+        .getVariables()
+        .get('Variable');
+      expect(updated.getType()).toBe(gd.Variable.Array);
+      expect(updated.getChildrenCount()).toBe(2);
+      expect(updated.getAtIndex(0).getValue()).toBe(10);
+      expect(updated.getAtIndex(1).getValue()).toBe(11);
+    });
+  });
+
+  describe('inspect_variables', () => {
+    let project: gdProject;
+    let testScene: gdLayout;
+
+    beforeEach(() => {
+      // $FlowFixMe[invalid-constructor]
+      project = new gd.ProjectHelper.createNewGDJSProject();
+      testScene = project.insertNewLayout('TestScene', 0);
+      testScene.getObjects().insertNewObject(project, 'Sprite', 'Player', 0);
+    });
+
+    afterEach(() => {
+      project.delete();
+    });
+
+    it('returns all scene variables when no paths are requested', async () => {
+      const variables = testScene.getVariables();
+      variables.insertNew('Score', 0).setValue(7);
+      variables.insertNew('Name', 1).setString('Hero');
+
+      const result = await editorFunctions.inspect_variables.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: { variable_scope: 'scene', scene_name: 'TestScene' },
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.variables).toEqual([
+        { variableName: 'Score', type: 'Number', value: '7' },
+        { variableName: 'Name', type: 'String', value: 'Hero' },
+      ]);
+    });
+
+    it('returns a requested nested array path on an object variable', async () => {
+      const objectVariables = testScene
+        .getObjects()
+        .getObject('Player')
+        .getVariables();
+      const arrayVariable = objectVariables.insertNew('Variable', 0);
+      arrayVariable.castTo('Array');
+      arrayVariable.pushNew().setValue(10);
+      arrayVariable.pushNew().setValue(11);
+      arrayVariable.pushNew().setValue(12);
+
+      const result = await editorFunctions.inspect_variables.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          variable_scope: 'object',
+          scene_name: 'TestScene',
+          object_name: 'Player',
+          variable_names_or_paths: ['Variable[2]'],
+        },
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.variables).toEqual([
+        { variableName: 'Variable[2]', type: 'Number', value: '12' },
+      ]);
+    });
+
+    it('reports requested paths that do not exist', async () => {
+      testScene
+        .getVariables()
+        .insertNew('Score', 0)
+        .setValue(1);
+
+      const result = await editorFunctions.inspect_variables.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          variable_scope: 'scene',
+          scene_name: 'TestScene',
+          variable_names_or_paths: ['Score', 'Missing'],
+        },
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.variables).toEqual([
+        { variableName: 'Score', type: 'Number', value: '1' },
+      ]);
+      expect(result.message).toContain('Missing');
+    });
   });
 
   describe('inspect_object_properties (property listing format)', () => {
@@ -1583,6 +1818,25 @@ describe('editorFunctions', () => {
 
     afterEach(() => {
       project.delete();
+    });
+
+    it('reminds to inspect variables/behaviors with the dedicated tools', async () => {
+      testScene
+        .getObjects()
+        .getObject('MyText')
+        .getVariables()
+        .insertNew('Score', 0)
+        .setValue(0);
+
+      const result = await editorFunctions.inspect_object_properties.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: { scene_name: 'TestScene', object_name: 'MyText' },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.reminder).toContain('inspect_variables');
     });
 
     it('formats new object properties: short units, no boolean type tag, empty grouped at end', async () => {
@@ -1890,6 +2144,59 @@ describe('editorFunctions', () => {
         const distance = Math.sqrt((x - center.x) ** 2 + (y - center.y) ** 2);
         expect(distance).toBeLessThanOrEqual(radius);
       });
+    });
+
+    // Regression test: creating instances with the "none" brush used to leave
+    // every new instance at the origin (0,0) instead of at brush_position.
+    it('creates new instances at brush_position with the none brush', async () => {
+      await putInstances({
+        brush_kind: 'none',
+        brush_position: '200,300',
+        new_instances_count: 2,
+      });
+
+      expect(getInstancePositions(testScene)).toEqual([
+        { x: 200, y: 300 },
+        { x: 200, y: 300 },
+      ]);
+    });
+
+    // The none brush must still leave existing instances where they are.
+    it('does not move an existing instance edited with the none brush', async () => {
+      await putInstances({
+        brush_kind: 'point',
+        brush_position: '100,200',
+        new_instances_count: 1,
+      });
+      const [created] = getInstances(testScene);
+
+      await putInstances({
+        brush_kind: 'none',
+        brush_position: '640,360',
+        existing_instance_ids: created.uuid,
+        instances_size: '48,48',
+      });
+
+      expect(getInstancePositions(testScene)).toEqual([{ x: 100, y: 200 }]);
+    });
+
+    // Editing an existing instance with the none brush and no brush_position
+    // must not snap it to the scene-center fallback.
+    it('does not move an existing instance edited with the none brush and no brush_position', async () => {
+      await putInstances({
+        brush_kind: 'point',
+        brush_position: '100,200',
+        new_instances_count: 1,
+      });
+      const [created] = getInstances(testScene);
+
+      await putInstances({
+        brush_kind: 'none',
+        existing_instance_ids: created.uuid,
+        instances_opacity: 128,
+      });
+
+      expect(getInstancePositions(testScene)).toEqual([{ x: 100, y: 200 }]);
     });
 
     // line/grid need an end position to spread instances. Omitting it must fail
@@ -2467,6 +2774,895 @@ describe('editorFunctions', () => {
       expect(project.getOrientation()).toBe('landscape');
       expect(project.getScaleMode()).toBe('nearest');
       expect(project.getName()).toBe('My Game');
+    });
+
+    it('renames the scene when setting the "name" property', async () => {
+      const onProjectItemRenamedOutsideEditor: JestMockFn<any, any> = jest.fn();
+      const wasFirstScene = project.getFirstLayout() === 'TestScene';
+
+      const result = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          onProjectItemRenamedOutsideEditor,
+          args: {
+            scene_name: 'TestScene',
+            changed_properties: [
+              { property_name: 'name', new_value: 'GameScene' },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).toContain(
+        'Renamed scene "TestScene" to "GameScene"'
+      );
+
+      // The scene is actually renamed in the project.
+      expect(project.hasLayoutNamed('TestScene')).toBe(false);
+      expect(project.hasLayoutNamed('GameScene')).toBe(true);
+      // The kept layout pointer is the same one.
+      expect(testScene.getName()).toBe('GameScene');
+      if (wasFirstScene) {
+        expect(project.getFirstLayout()).toBe('GameScene');
+      }
+
+      // The editor is notified so open tabs can be kept and updated.
+      expect(onProjectItemRenamedOutsideEditor).toHaveBeenCalledWith({
+        kind: 'scene',
+        oldName: 'TestScene',
+        newName: 'GameScene',
+      });
+    });
+
+    it('does nothing when renaming a scene to its current name', async () => {
+      const onProjectItemRenamedOutsideEditor: JestMockFn<any, any> = jest.fn();
+
+      const result = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          onProjectItemRenamedOutsideEditor,
+          args: {
+            scene_name: 'TestScene',
+            changed_properties: [
+              { property_name: 'name', new_value: 'TestScene' },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).toContain('Scene already named "TestScene".');
+      expect(project.hasLayoutNamed('TestScene')).toBe(true);
+      expect(onProjectItemRenamedOutsideEditor).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('object groups behave like objects', () => {
+    let project: gdProject;
+    let testScene: gdLayout;
+
+    beforeEach(() => {
+      // $FlowFixMe[invalid-constructor]
+      project = new gd.ProjectHelper.createNewGDJSProject();
+      testScene = project.insertNewLayout('TestScene', 0);
+
+      const sceneObjects = testScene.getObjects();
+      sceneObjects.insertNewObject(project, 'Sprite', 'Enemy1', 0);
+      sceneObjects.insertNewObject(project, 'Sprite', 'Enemy2', 1);
+
+      // A group of the two enemies.
+      const group = sceneObjects.getObjectGroups().insertNew('Enemies', 0);
+      group.addObject('Enemy1');
+      group.addObject('Enemy2');
+    });
+
+    afterEach(() => {
+      project.delete();
+    });
+
+    it('adds a behavior to every object of a group when the group name is given', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.add_behavior.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'Enemies',
+            behavior_type: 'PlatformBehavior::PlatformerObjectBehavior',
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      const sceneObjects = testScene.getObjects();
+      expect(
+        sceneObjects.getObject('Enemy1').hasBehaviorNamed('PlatformerObject')
+      ).toBe(true);
+      expect(
+        sceneObjects.getObject('Enemy2').hasBehaviorNamed('PlatformerObject')
+      ).toBe(true);
+    });
+
+    it('removes a behavior from every object of a group when the group name is given', async () => {
+      const sceneObjects = testScene.getObjects();
+      sceneObjects
+        .getObject('Enemy1')
+        .addNewBehavior(
+          project,
+          'PlatformBehavior::PlatformerObjectBehavior',
+          'PlatformerObject'
+        );
+      sceneObjects
+        .getObject('Enemy2')
+        .addNewBehavior(
+          project,
+          'PlatformBehavior::PlatformerObjectBehavior',
+          'PlatformerObject'
+        );
+
+      const result: EditorFunctionGenericOutput = await editorFunctions.remove_behavior.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'Enemies',
+            behavior_name: 'PlatformerObject',
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(
+        sceneObjects.getObject('Enemy1').hasBehaviorNamed('PlatformerObject')
+      ).toBe(false);
+      expect(
+        sceneObjects.getObject('Enemy2').hasBehaviorNamed('PlatformerObject')
+      ).toBe(false);
+    });
+
+    it('changes a behavior property on every object of a group', async () => {
+      const sceneObjects = testScene.getObjects();
+      for (const objectName of ['Enemy1', 'Enemy2']) {
+        sceneObjects
+          .getObject(objectName)
+          .addNewBehavior(
+            project,
+            'PlatformBehavior::PlatformerObjectBehavior',
+            'PlatformerObject'
+          );
+      }
+
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_behavior_property.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'Enemies',
+            behavior_name: 'PlatformerObject',
+            changed_properties: [
+              { property_name: 'GRAVITY', new_value: '1500' },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      for (const objectName of ['Enemy1', 'Enemy2']) {
+        const behavior = sceneObjects
+          .getObject(objectName)
+          .getBehavior('PlatformerObject');
+        expect(
+          behavior
+            .getProperties()
+            .get('Gravity')
+            .getValue()
+        ).toBe('1500');
+      }
+    });
+
+    it('sets a variable on every object of a group (object scope with a group name)', async () => {
+      const result = await editorFunctions.add_or_edit_variable.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          variable_name_or_path: 'health',
+          variable_scope: 'object',
+          scene_name: 'TestScene',
+          object_name: 'Enemies',
+          value: '100',
+        },
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.message).toMatchInlineSnapshot(
+        `"Added scene \\"TestScene\\" group \\"Enemies\\" variable \\"health\\" (Number) = 100"`
+      );
+      const sceneObjects = testScene.getObjects();
+      for (const objectName of ['Enemy1', 'Enemy2']) {
+        const variables = sceneObjects.getObject(objectName).getVariables();
+        expect(variables.has('health')).toBe(true);
+        expect(variables.get('health').getValue()).toBe(100);
+      }
+    });
+
+    it('accepts the `group` variable scope (equivalent to `object`)', async () => {
+      const result = await editorFunctions.add_or_edit_variable.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          variable_name_or_path: 'shield',
+          variable_scope: 'group',
+          scene_name: 'TestScene',
+          object_name: 'Enemies',
+          value: '5',
+        },
+      });
+
+      expect(result.success).toBe(true);
+      const sceneObjects = testScene.getObjects();
+      for (const objectName of ['Enemy1', 'Enemy2']) {
+        expect(
+          sceneObjects
+            .getObject(objectName)
+            .getVariables()
+            .has('shield')
+        ).toBe(true);
+      }
+    });
+
+    it('fills the variables and behaviors in common when an object is added to a group', async () => {
+      const sceneObjects = testScene.getObjects();
+
+      // Make Enemy1 and Enemy2 share a behavior and a variable in common, so
+      // the group exposes them. Then add a fresh Enemy3 with neither.
+      for (const objectName of ['Enemy1', 'Enemy2']) {
+        const object = sceneObjects.getObject(objectName);
+        object.addNewBehavior(
+          project,
+          'PlatformBehavior::PlatformerObjectBehavior',
+          'PlatformerObject'
+        );
+        object
+          .getVariables()
+          .insertNew('groupHealth', 0)
+          .setValue(100);
+      }
+      sceneObjects.insertNewObject(project, 'Sprite', 'Enemy3', 2);
+
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            changed_groups: [
+              {
+                group_name: 'Enemies',
+                objects_to_add: ['Enemy3'],
+              },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+
+      // Enemy3 was added to the group, so it received the variable and behavior
+      // shared in common by the group.
+      const enemy3 = sceneObjects.getObject('Enemy3');
+      expect(enemy3.hasBehaviorNamed('PlatformerObject')).toBe(true);
+      expect(enemy3.getVariables().has('groupHealth')).toBe(true);
+
+      // The change message explains which behaviors and variables the newly
+      // added object inherited from the group, with their names and types.
+      expect(result.message).toMatchInlineSnapshot(`
+        "Done.
+        Group \\"Enemies\\" in scene \\"TestScene\\" now contains 3 object(s): Enemy1, Enemy2, Enemy3.
+        Object(s) \\"Enemy3\\" newly added to group \\"Enemies\\" now have the behavior(s) \\"PlatformerObject\\" (PlatformBehavior::PlatformerObjectBehavior) and variable(s) \\"groupHealth\\" (Number) that the rest of the group has in common (a group is the \\"intersection\\" of its objects), added to them if they did not already have them."
+      `);
+    });
+
+    it('sets a variable on every object of a global group (no scene_name)', async () => {
+      // A global group, resolved without a scene_name.
+      const globalObjects = project.getObjects();
+      globalObjects.insertNewObject(project, 'Sprite', 'GlobalA', 0);
+      globalObjects.insertNewObject(project, 'Sprite', 'GlobalB', 1);
+      const globalGroup = globalObjects
+        .getObjectGroups()
+        .insertNew('Globals', 0);
+      globalGroup.addObject('GlobalA');
+      globalGroup.addObject('GlobalB');
+
+      const result = await editorFunctions.add_or_edit_variable.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          variable_name_or_path: 'ammo',
+          variable_scope: 'object',
+          object_name: 'Globals',
+          value: '7',
+        },
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.message).toMatchInlineSnapshot(
+        `"Added global group \\"Globals\\" variable \\"ammo\\" (Number) = 7"`
+      );
+      for (const objectName of ['GlobalA', 'GlobalB']) {
+        expect(
+          globalObjects
+            .getObject(objectName)
+            .getVariables()
+            .has('ammo')
+        ).toBe(true);
+      }
+    });
+
+    it('inspects a behavior via a group (reads from a member that has it)', async () => {
+      const sceneObjects = testScene.getObjects();
+      // Only Enemy2 has the behavior; inspecting the group still finds it.
+      sceneObjects
+        .getObject('Enemy2')
+        .addNewBehavior(
+          project,
+          'PlatformBehavior::PlatformerObjectBehavior',
+          'PlatformerObject'
+        );
+
+      const result: EditorFunctionGenericOutput = await editorFunctions.inspect_behavior_properties.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'Enemies',
+            behavior_name: 'PlatformerObject',
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.properties).toBeDefined();
+    });
+
+    it('applies a behavior property change only to the group members that have the behavior', async () => {
+      const sceneObjects = testScene.getObjects();
+      // Only Enemy1 has the behavior.
+      sceneObjects
+        .getObject('Enemy1')
+        .addNewBehavior(
+          project,
+          'PlatformBehavior::PlatformerObjectBehavior',
+          'PlatformerObject'
+        );
+
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_behavior_property.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'Enemies',
+            behavior_name: 'PlatformerObject',
+            changed_properties: [
+              { property_name: 'GRAVITY', new_value: '1500' },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(
+        sceneObjects
+          .getObject('Enemy1')
+          .getBehavior('PlatformerObject')
+          .getProperties()
+          .get('Gravity')
+          .getValue()
+      ).toBe('1500');
+      expect(
+        sceneObjects.getObject('Enemy2').hasBehaviorNamed('PlatformerObject')
+      ).toBe(false);
+      // Enemy2 lacks the behavior, so it is reported as skipped.
+      expect(result.message).toContain(
+        'Behavior "PlatformerObject" not on "Enemy2". Not changed.'
+      );
+    });
+
+    it('removes a behavior from the group members that have it, warning about the others', async () => {
+      const sceneObjects = testScene.getObjects();
+      // Only Enemy1 has the behavior; Enemy2 will be reported as a warning.
+      sceneObjects
+        .getObject('Enemy1')
+        .addNewBehavior(
+          project,
+          'PlatformBehavior::PlatformerObjectBehavior',
+          'PlatformerObject'
+        );
+
+      const result: EditorFunctionGenericOutput = await editorFunctions.remove_behavior.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'Enemies',
+            behavior_name: 'PlatformerObject',
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).toContain('Removed behavior');
+      expect(result.message).toContain('Enemy2');
+      expect(
+        sceneObjects.getObject('Enemy1').hasBehaviorNamed('PlatformerObject')
+      ).toBe(false);
+    });
+
+    it('fails when the object/group name does not exist', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.add_behavior.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'DoesNotExist',
+            behavior_type: 'PlatformBehavior::PlatformerObjectBehavior',
+          },
+        }
+      );
+
+      expect(result.success).toBe(false);
+      expect(result.message).toContain('Object or group not found');
+    });
+
+    it('fails when adding a behavior to an empty group', async () => {
+      testScene
+        .getObjects()
+        .getObjectGroups()
+        .insertNew('EmptyGroup', 0);
+
+      const result: EditorFunctionGenericOutput = await editorFunctions.add_behavior.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'EmptyGroup',
+            behavior_type: 'PlatformBehavior::PlatformerObjectBehavior',
+          },
+        }
+      );
+
+      expect(result.success).toBe(false);
+      expect(result.message).toContain('has no object');
+    });
+  });
+
+  describe('add_behavior (single object)', () => {
+    let project: gdProject;
+    let testScene: gdLayout;
+
+    beforeEach(() => {
+      // $FlowFixMe[invalid-constructor]
+      project = new gd.ProjectHelper.createNewGDJSProject();
+      testScene = project.insertNewLayout('TestScene', 0);
+      testScene.getObjects().insertNewObject(project, 'Sprite', 'MySprite', 0);
+    });
+
+    afterEach(() => {
+      project.delete();
+    });
+
+    it('adds a behavior to an object', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.add_behavior.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'MySprite',
+            behavior_type: 'PlatformBehavior::PlatformerObjectBehavior',
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).toContain('Added behavior');
+      expect(
+        testScene
+          .getObjects()
+          .getObject('MySprite')
+          .hasBehaviorNamed('PlatformerObject')
+      ).toBe(true);
+    });
+
+    it('is a no-op success when the behavior is already on the object', async () => {
+      const object = testScene.getObjects().getObject('MySprite');
+      object.addNewBehavior(
+        project,
+        'PlatformBehavior::PlatformerObjectBehavior',
+        'PlatformerObject'
+      );
+
+      const result: EditorFunctionGenericOutput = await editorFunctions.add_behavior.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'MySprite',
+            behavior_type: 'PlatformBehavior::PlatformerObjectBehavior',
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).toContain('already on');
+    });
+
+    it('fails when a behavior with the same name but a different type exists', async () => {
+      const object = testScene.getObjects().getObject('MySprite');
+      object.addNewBehavior(
+        project,
+        'PlatformBehavior::PlatformerObjectBehavior',
+        'SharedName'
+      );
+
+      const result: EditorFunctionGenericOutput = await editorFunctions.add_behavior.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'MySprite',
+            behavior_type: 'TopDownMovementBehavior::TopDownMovementBehavior',
+            behavior_name: 'SharedName',
+          },
+        }
+      );
+
+      expect(result.success).toBe(false);
+      expect(result.message).toContain('different type');
+    });
+
+    it('fails when the object does not exist', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.add_behavior.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'Unknown',
+            behavior_type: 'PlatformBehavior::PlatformerObjectBehavior',
+          },
+        }
+      );
+
+      expect(result.success).toBe(false);
+      expect(result.message).toContain('Object or group not found');
+    });
+  });
+
+  describe('remove_behavior (single object)', () => {
+    let project: gdProject;
+    let testScene: gdLayout;
+
+    beforeEach(() => {
+      // $FlowFixMe[invalid-constructor]
+      project = new gd.ProjectHelper.createNewGDJSProject();
+      testScene = project.insertNewLayout('TestScene', 0);
+      const object = testScene
+        .getObjects()
+        .insertNewObject(project, 'Sprite', 'MySprite', 0);
+      object.addNewBehavior(
+        project,
+        'PlatformBehavior::PlatformerObjectBehavior',
+        'PlatformerObject'
+      );
+    });
+
+    afterEach(() => {
+      project.delete();
+    });
+
+    it('removes a behavior from an object', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.remove_behavior.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'MySprite',
+            behavior_name: 'PlatformerObject',
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).toContain('Removed behavior');
+      expect(
+        testScene
+          .getObjects()
+          .getObject('MySprite')
+          .hasBehaviorNamed('PlatformerObject')
+      ).toBe(false);
+    });
+
+    it('fails when the behavior is not on the object', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.remove_behavior.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'MySprite',
+            behavior_name: 'NotThere',
+          },
+        }
+      );
+
+      expect(result.success).toBe(false);
+      expect(result.message).toContain('Not removed');
+    });
+  });
+
+  describe('inspect_behavior_properties (single object)', () => {
+    let project: gdProject;
+    let testScene: gdLayout;
+
+    beforeEach(() => {
+      // $FlowFixMe[invalid-constructor]
+      project = new gd.ProjectHelper.createNewGDJSProject();
+      testScene = project.insertNewLayout('TestScene', 0);
+      const object = testScene
+        .getObjects()
+        .insertNewObject(project, 'Sprite', 'MySprite', 0);
+      object.addNewBehavior(
+        project,
+        'PlatformBehavior::PlatformerObjectBehavior',
+        'PlatformerObject'
+      );
+    });
+
+    afterEach(() => {
+      project.delete();
+    });
+
+    it("returns an object's behavior properties", async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.inspect_behavior_properties.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'MySprite',
+            behavior_name: 'PlatformerObject',
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.behaviorName).toBe('PlatformerObject');
+      expect(result.properties).toBeDefined();
+    });
+
+    it('fails when the behavior is not on the object', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.inspect_behavior_properties.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'MySprite',
+            behavior_name: 'NotThere',
+          },
+        }
+      );
+
+      expect(result.success).toBe(false);
+      expect(result.message).toContain('not on');
+    });
+  });
+
+  describe('change_scene_properties_layers_effects_groups (group object membership)', () => {
+    let project: gdProject;
+    let testScene: gdLayout;
+
+    beforeEach(() => {
+      // $FlowFixMe[invalid-constructor]
+      project = new gd.ProjectHelper.createNewGDJSProject();
+      testScene = project.insertNewLayout('TestScene', 0);
+      const sceneObjects = testScene.getObjects();
+      sceneObjects.insertNewObject(project, 'Sprite', 'Enemy1', 0);
+      sceneObjects.insertNewObject(project, 'Sprite', 'Enemy2', 1);
+      const group = sceneObjects.getObjectGroups().insertNew('Enemies', 0);
+      group.addObject('Enemy1');
+      group.addObject('Enemy2');
+    });
+
+    afterEach(() => {
+      project.delete();
+    });
+
+    it('renames a group', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            changed_groups: [{ group_name: 'Enemies', new_group_name: 'Foes' }],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      const groups = testScene.getObjects().getObjectGroups();
+      expect(groups.has('Foes')).toBe(true);
+      expect(groups.has('Enemies')).toBe(false);
+    });
+
+    it('echoes the resulting content of the group in the message', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            changed_groups: [
+              {
+                group_name: 'Enemies',
+                objects_to_remove: ['Enemy2'],
+              },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      // The message reports the new state instead of a blind confirmation.
+      expect(result.message).toContain(
+        'Group "Enemies" in scene "TestScene" now contains 1 object(s): Enemy1.'
+      );
+    });
+
+    it('adds objects incrementally with objects_to_add (keeping existing ones)', async () => {
+      const sceneObjects = testScene.getObjects();
+      sceneObjects.insertNewObject(project, 'Sprite', 'Enemy3', 2);
+
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            changed_groups: [
+              {
+                group_name: 'Enemies',
+                objects_to_add: ['Enemy3'],
+              },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      const group = testScene
+        .getObjects()
+        .getObjectGroups()
+        .get('Enemies');
+      // The objects already in the group are untouched, the new one is added.
+      expect(group.find('Enemy1')).toBe(true);
+      expect(group.find('Enemy2')).toBe(true);
+      expect(group.find('Enemy3')).toBe(true);
+      expect(result.message).toContain('Enemy1, Enemy2, Enemy3');
+    });
+
+    it('removes objects incrementally with objects_to_remove (keeping the others)', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            changed_groups: [
+              {
+                group_name: 'Enemies',
+                objects_to_remove: ['Enemy2'],
+              },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      const group = testScene
+        .getObjects()
+        .getObjectGroups()
+        .get('Enemies');
+      expect(group.find('Enemy1')).toBe(true);
+      expect(group.find('Enemy2')).toBe(false);
+    });
+
+    it('adds and removes in a single call, ignoring duplicates and no-ops', async () => {
+      const sceneObjects = testScene.getObjects();
+      sceneObjects.insertNewObject(project, 'Sprite', 'Enemy3', 2);
+
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            changed_groups: [
+              {
+                group_name: 'Enemies',
+                // Enemy3 listed twice (duplicate), Enemy1 already in the group
+                // (no-op), Enemy2 removed, GhostNotHere removed (no-op).
+                objects_to_add: ['Enemy3', 'Enemy3', 'Enemy1'],
+                objects_to_remove: ['Enemy2', 'GhostNotHere'],
+              },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      const group = testScene
+        .getObjects()
+        .getObjectGroups()
+        .get('Enemies');
+      expect(group.getAllObjectsNames().toJSArray()).toEqual([
+        'Enemy1',
+        'Enemy3',
+      ]);
+    });
+
+    it('fills shared variables and behaviors when adding via objects_to_add', async () => {
+      const sceneObjects = testScene.getObjects();
+
+      // Enemy1 and Enemy2 share a behavior and a variable, so the group exposes
+      // them. A freshly added Enemy3 should receive them too.
+      for (const objectName of ['Enemy1', 'Enemy2']) {
+        const object = sceneObjects.getObject(objectName);
+        object.addNewBehavior(
+          project,
+          'PlatformBehavior::PlatformerObjectBehavior',
+          'PlatformerObject'
+        );
+        object
+          .getVariables()
+          .insertNew('groupHealth', 0)
+          .setValue(100);
+      }
+      sceneObjects.insertNewObject(project, 'Sprite', 'Enemy3', 2);
+
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            changed_groups: [
+              {
+                group_name: 'Enemies',
+                objects_to_add: ['Enemy3'],
+              },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      const enemy3 = sceneObjects.getObject('Enemy3');
+      expect(enemy3.hasBehaviorNamed('PlatformerObject')).toBe(true);
+      expect(enemy3.getVariables().has('groupHealth')).toBe(true);
+    });
+
+    it('warns when an object added via objects_to_add does not exist', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            changed_groups: [
+              {
+                group_name: 'Enemies',
+                objects_to_add: ['Ghost'],
+              },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.warnings).toContain('Ghost');
+      expect(
+        testScene
+          .getObjects()
+          .getObjectGroups()
+          .get('Enemies')
+          .find('Ghost')
+      ).toBe(false);
     });
   });
 });

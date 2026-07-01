@@ -1,11 +1,7 @@
 // @flow
 import * as React from 'react';
 import { type CompactBehaviorPropertiesEditorProps } from './CompactBehaviorPropertiesEditorProps.flow';
-import {
-  CompactBehaviorPropertiesEditor,
-  getPropertyValue,
-  updateProperty,
-} from './CompactBehaviorPropertiesEditor';
+import { CompactBehaviorPropertiesEditor } from './CompactBehaviorPropertiesEditor';
 import useForceUpdate from '../../Utils/UseForceUpdate';
 import { ColumnStackLayout } from '../../UI/Layout';
 import {
@@ -17,21 +13,35 @@ import {
 
 const CompactAnchorBehaviorEditor = ({
   project,
-  behavior,
+  behaviors,
   object,
   layersContainer,
   behaviorMetadata,
-  behaviorOverriding,
-  initialInstance,
   onOpenFullEditor,
   onBehaviorUpdated,
   resourceManagementProps,
 }: CompactBehaviorPropertiesEditorProps): React.Node => {
   const forceUpdate = useForceUpdate();
-  const _getPropertyValue = (propertyName: string) =>
-    getPropertyValue(behavior, propertyName, initialInstance);
+  const _getPropertyValue = (propertyName: string) => {
+    let commonValue = null;
+    for (const behavior of behaviors) {
+      const value = behavior
+        .getProperties()
+        .get(propertyName)
+        .getValue();
+      if (commonValue === null) {
+        commonValue = value;
+      }
+      if (value !== commonValue) {
+        return null;
+      }
+    }
+    return commonValue;
+  };
   const _updateProperty = (propertyName: string, value: string) => {
-    updateProperty(project, behavior, propertyName, value, initialInstance);
+    for (const behavior of behaviors) {
+      behavior.updateProperty(propertyName, value);
+    }
     forceUpdate();
     onBehaviorUpdated();
   };
@@ -62,10 +72,8 @@ const CompactAnchorBehaviorEditor = ({
         project={project}
         object={object}
         layersContainer={layersContainer}
-        behavior={behavior}
+        behaviors={behaviors}
         behaviorMetadata={behaviorMetadata}
-        behaviorOverriding={behaviorOverriding}
-        initialInstance={initialInstance}
         onOpenFullEditor={onOpenFullEditor}
         onBehaviorUpdated={_onBehaviorUpdated}
         resourceManagementProps={resourceManagementProps}

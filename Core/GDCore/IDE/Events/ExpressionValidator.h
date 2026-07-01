@@ -129,11 +129,12 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
           _("Operators (+, -, /, *) can't be used with an object name. Remove "
             "the operator."),
             node.rightHandSide->location);
-    } else if (leftType == Type::Variable || leftType == Type::LegacyVariable) {
+    } else if (leftType == Type::Variable || leftType == Type::ObjectVariable ||
+               leftType == Type::LegacyVariable) {
       RaiseOperatorError(
           _("Operators (+, -, /, *) can't be used in variable names. Remove "
             "the operator from the variable name."),
-            node.rightHandSide->location);
+          node.rightHandSide->location);
     }
 
     // The "required" type ("parentType") of the second operator is decided by:
@@ -176,7 +177,9 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
           _("Operators (+, -) can't be used with an object name. Remove the "
             "operator."),
           node.location);
-    } else if (rightType == Type::Variable || rightType == Type::LegacyVariable) {
+    } else if (rightType == Type::Variable ||
+               rightType == Type::ObjectVariable ||
+               rightType == Type::LegacyVariable) {
       RaiseTypeError(
           _("Operators (+, -) can't be used in variable names. Remove "
             "the operator from the variable name."),
@@ -228,6 +231,17 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
         }
         node.child->Visit(*this);
         rootVariableName = "";
+      }
+    } else if (parentType == Type::ObjectVariable) {
+      childType = parentType;
+
+      if (!rootObjectName.empty()) {
+        ValidateObjectVariableOrVariableOrProperty(rootObjectName,
+                                                   node.nameLocation, node.name,
+                                                   node.nameLocation, false);
+      }
+      if (node.child) {
+        node.child->Visit(*this);
       }
     } else if (parentType == Type::LegacyVariable) {
       childType = parentType;
@@ -294,7 +308,7 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
     if (!variableObjectName.empty()) {
       ValidateObjectVariableOrVariableOrProperty(
           variableObjectName, variableObjectNameLocation, node.name,
-          node.nameLocation, !node.child);
+          node.nameLocation, true);
       variableObjectName = "";
     } else if (!rootVariableName.empty()) {
       ValidateObjectVariableOrVariableOrProperty(
@@ -375,6 +389,13 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
             node.identifierName, node.identifierNameLocation,
             node.childIdentifierName, node.childIdentifierNameLocation, false);
       }
+    } else if (parentType == Type::ObjectVariable) {
+      childType = parentType;
+      if (!rootObjectName.empty()) {
+        ValidateObjectVariableOrVariableOrProperty(
+            rootObjectName, node.identifierNameLocation,
+            node.identifierName, node.identifierNameLocation, false);
+      }
     } else if (parentType != Type::Object &&
                parentType != Type::LegacyVariable) {
       // It can't happen.
@@ -400,7 +421,9 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
     } else if (parentType == Type::String) {
       message = _(
           "You must enter a text (between quotes) or a valid expression call.");
-    } else if (parentType == Type::Variable || parentType == Type::LegacyVariable) {
+    } else if (parentType == Type::Variable ||
+               parentType == Type::ObjectVariable ||
+               parentType == Type::LegacyVariable) {
       message = _("You must enter a variable name.");
     } else if (parentType == Type::Object) {
       message = _("You must enter a valid object name.");
@@ -419,6 +442,7 @@ private:
     String,
     NumberOrString,
     Variable,
+    ObjectVariable,
     LegacyVariable,
     Object,
     Empty,
@@ -526,9 +550,10 @@ private:
   void RaiseUndeclaredVariableError(const gd::String &message,
                                     const ExpressionParserLocation &location,
                                     const gd::String &variableName,
-                                    const gd::String &objectName = "") {
+                                    const gd::String &objectName = "",
+                                    const bool isUndeclaredVariableFatal = true) {
     RaiseError(gd::ExpressionParserError::ErrorType::UndeclaredVariable,
-               message, location, true, variableName, objectName);
+               message, location, isUndeclaredVariableFatal, variableName, objectName);
   }
 
   void RaiseVariableNameCollisionError(const gd::String &message,

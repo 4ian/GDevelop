@@ -122,18 +122,21 @@ bool ExpressionValidator::ValidateObjectVariableOrVariableOrProperty(
               identifierName, childIdentifierName);
 
       if (variableExistence == gd::ObjectsContainersList::DoesNotExist) {
-        RaiseUndeclaredVariableError(_("This variable does not exist on this object or group."),
-                        childIdentifierNameLocation, childIdentifierName, identifierName);
+        RaiseUndeclaredVariableError(
+            _("This variable does not exist on this object or group."),
+            childIdentifierNameLocation, childIdentifierName, identifierName,
+            isUndeclaredVariableFatal);
 
         return true; // We should have found a variable.
-      }
-      else if (variableExistence == gd::ObjectsContainersList::ExistsOnlyOnSomeObjectsOfTheGroup) {
-        RaiseUndeclaredVariableError(_("This variable only exists on some objects of the group. It must be declared for all objects."),
-                        childIdentifierNameLocation, childIdentifierName, identifierName);
+      } else if (variableExistence ==
+                 gd::ObjectsContainersList::ExistsOnlyOnSomeObjectsOfTheGroup) {
+        RaiseUndeclaredVariableError(
+            _("This variable only exists on some objects of the group. It must be declared for all objects."),
+            childIdentifierNameLocation, childIdentifierName, identifierName,
+            isUndeclaredVariableFatal);
 
         return true; // We should have found a variable.
-      }
-      else if (variableExistence == gd::ObjectsContainersList::GroupIsEmpty) {
+      } else if (variableExistence == gd::ObjectsContainersList::GroupIsEmpty) {
         RaiseUndeclaredVariableError(_("This group is empty. Add an object to this group first."),
                         identifierNameLocation, childIdentifierName, identifierName);
 
@@ -489,6 +492,7 @@ const gd::String& ExpressionValidator::TypeToString(Type type) {
       // if it allows properties and parameters.
     case Type::VariableOrProperty:
     case Type::VariableOrPropertyOrParameter:
+    case Type::ObjectVariable:
     case Type::LegacyVariable:
       return variableTypeString;
     case Type::Object:
@@ -517,7 +521,9 @@ ExpressionValidator::Type ExpressionValidator::StringToType(
   if (type == ExpressionValidator::variableTypeString ||
       gd::ParameterMetadata::IsExpression(
           ExpressionValidator::variableTypeString, type)) {
-    if (gd::ValueTypeMetadata::IsTypeLegacyPreScopedVariable(type)) {
+    if (gd::ValueTypeMetadata::IsTypeObjectVariable(type)) {
+      return Type::ObjectVariable;
+    } else if (gd::ValueTypeMetadata::IsTypeLegacyPreScopedVariable(type)) {
       return Type::LegacyVariable;
     } else if (type == "variableOrProperty") {
       return Type::VariableOrProperty;

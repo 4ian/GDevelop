@@ -40,14 +40,10 @@ SceneExtension::SceneExtension() {
       "gdjs.evtTools.signal.emitSignalToPickedObjects");
   GetAllActions()["EmitSignalToObjectGroup"].SetFunctionName(
       "gdjs.evtTools.signal.emitSignalToObjectGroup");
-  GetAllActions()["EmitSignalToBehavior"].SetFunctionName(
-      "gdjs.evtTools.signal.emitSignalToBehavior");
   GetAllStrExpressions()["SignalName"].SetFunctionName(
       "gdjs.evtTools.signal.getSignalName");
-  GetAllExpressions()["SignalPayload"].SetFunctionName(
-      "gdjs.evtTools.signal.getSignalPayloadNumber");
-  GetAllStrExpressions()["SignalPayloadString"].SetFunctionName(
-      "gdjs.evtTools.signal.getSignalPayloadString");
+  GetAllStrExpressions()["SignalPayload"].SetFunctionName(
+      "gdjs.evtTools.signal.getSignalPayload");
   GetAllStrExpressions()["SignalSenderObjectName"].SetFunctionName(
       "gdjs.evtTools.signal.getSignalSenderObjectName");
   GetAllExpressions()["SignalSenderInstanceId"].SetFunctionName(

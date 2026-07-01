@@ -87,7 +87,8 @@ export const CompactEventsFunctionPropertiesEditor = ({
 
   const type = eventsFunction.getFunctionType();
   const functionName = eventsFunction.getName();
-  const isOnSignalLifecycleEventsFunction = functionName === 'onSignal';
+  const isOnSignalLifecycleEventsFunction =
+    functionName === 'onSignal' && !!eventsBasedObject && !eventsBasedBehavior;
   const isABehaviorLifecycleEventsFunction =
     !!eventsBasedBehavior &&
     !eventsBasedObject &&

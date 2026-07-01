@@ -209,7 +209,7 @@ BaseObjectExtension::BaseObjectExtension() {
   objectExpressions["ObjectTimerElapsedTime"].SetFunctionName(
       "getTimerElapsedTimeInSeconds");
   objectStrExpressions["ObjectName"].SetFunctionName("getName");
-  objectExpressions["UniqueId"].SetFunctionName("getUniqueId");
+  objectExpressions["InstanceId"].SetFunctionName("getUniqueId");
   objectStrExpressions["Layer"].SetFunctionName("getLayer");
   objectExpressions["XFromAngleAndDistance"].SetFunctionName(
       "getXFromAngleAndDistance");

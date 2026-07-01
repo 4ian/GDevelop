@@ -11,7 +11,7 @@ const signalParameters = [
   },
   {
     name: 'Payload',
-    type: 'variable',
+    type: 'string',
     description: 'Payload',
   },
   {
@@ -121,51 +121,6 @@ export const ensureOnSignalObjectEventsFunctionProperParameters = (
 
   parameters.clearParameters();
   addParameter(parameters, 'Object', 'object', 'Object', objectType);
-  addSignalParameters(parameters);
-  return true;
-};
-
-export const ensureOnSignalBehaviorEventsFunctionProperParameters = (
-  eventsFunctionsExtension: gdEventsFunctionsExtension,
-  eventsBasedBehavior: gdEventsBasedBehavior
-): boolean => {
-  const eventsFunctions = eventsBasedBehavior.getEventsFunctions();
-  if (!eventsFunctions.hasEventsFunctionNamed(onSignalFunctionName)) {
-    return false;
-  }
-
-  const eventsFunction = eventsFunctions.getEventsFunction(
-    onSignalFunctionName
-  );
-  const parameters = eventsFunction.getParameters();
-  const behaviorType = gd.PlatformExtension.getBehaviorFullType(
-    eventsFunctionsExtension.getName(),
-    eventsBasedBehavior.getName()
-  );
-  if (
-    parameters.getParametersCount() === 6 &&
-    isParameterMatching(
-      parameters,
-      0,
-      'Object',
-      'object',
-      eventsBasedBehavior.getObjectType()
-    ) &&
-    isParameterMatching(parameters, 1, 'Behavior', 'behavior', behaviorType) &&
-    hasExpectedSignalParameters(parameters, 2)
-  ) {
-    return false;
-  }
-
-  parameters.clearParameters();
-  addParameter(
-    parameters,
-    'Object',
-    'object',
-    'Object',
-    eventsBasedBehavior.getObjectType()
-  );
-  addParameter(parameters, 'Behavior', 'behavior', 'Behavior', behaviorType);
   addSignalParameters(parameters);
   return true;
 };

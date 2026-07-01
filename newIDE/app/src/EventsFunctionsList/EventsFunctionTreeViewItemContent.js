@@ -71,7 +71,8 @@ export const pasteEventsFunction = (
 
 export const getFunctionIconUrl = (
   functionType: EventsFunction_FunctionType,
-  functionName?: string | null
+  functionName?: string | null,
+  containerType?: 'extension' | 'behavior' | 'object'
 ): string => {
   switch (functionType) {
     default:
@@ -101,7 +102,9 @@ export const getFunctionIconUrl = (
           return 'res/functions/step_black.svg';
 
         case 'onSignal':
-          return 'res/functions/signal_black.svg';
+          return containerType === 'behavior'
+            ? 'res/functions/action_black.svg'
+            : 'res/functions/signal_black.svg';
 
         case 'onSceneLoaded':
         case 'onFirstSceneLoaded':
@@ -193,10 +196,7 @@ export const canFunctionBeRenamed = (
   const name = eventsFunction.getName();
   const isOnSignalLifecycleEventsFunction = name === 'onSignal';
   if (containerType === 'behavior') {
-    return !(
-      gd.MetadataDeclarationHelper.isBehaviorLifecycleEventsFunction(name) ||
-      isOnSignalLifecycleEventsFunction
-    );
+    return !gd.MetadataDeclarationHelper.isBehaviorLifecycleEventsFunction(name);
   }
   if (containerType === 'object') {
     return !(
@@ -273,7 +273,12 @@ export class EventsFunctionTreeViewItemContent implements TreeViewItemContent {
     const eventsFunction = this.functionFolderOrFunction.getFunction();
     return getFunctionIconUrl(
       eventsFunction.getFunctionType(),
-      eventsFunction.getName()
+      eventsFunction.getName(),
+      this.getEventsBasedBehavior()
+        ? 'behavior'
+        : this.getEventsBasedObject()
+        ? 'object'
+        : 'extension'
     );
   }
 

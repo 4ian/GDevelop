@@ -36,10 +36,7 @@ import BehaviorMethodSelectorDialog from './BehaviorMethodSelectorDialog';
 import ObjectMethodSelectorDialog from './ObjectMethodSelectorDialog';
 import ExtensionFunctionSelectorDialog from './ExtensionFunctionSelectorDialog';
 import EventsBasedObjectSelectorDialog from './EventsBasedObjectSelectorDialog';
-import {
-  ensureOnSignalBehaviorEventsFunctionProperParameters,
-  ensureOnSignalObjectEventsFunctionProperParameters,
-} from './OnSignalEventsFunctionParameters';
+import { ensureOnSignalObjectEventsFunctionProperParameters } from './OnSignalEventsFunctionParameters';
 import { ResponsiveWindowMeasurer } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import EditorNavigator, {
   type EditorNavigatorInterface,
@@ -350,15 +347,6 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
   _normalizeOnSignalEventsFunctionParameters = (): boolean => {
     const { eventsFunctionsExtension } = this.props;
     let hasChanged = false;
-
-    const eventsBasedBehaviors = eventsFunctionsExtension.getEventsBasedBehaviors();
-    for (let i = 0; i < eventsBasedBehaviors.getCount(); ++i) {
-      hasChanged =
-        ensureOnSignalBehaviorEventsFunctionProperParameters(
-          eventsFunctionsExtension,
-          eventsBasedBehaviors.getAt(i)
-        ) || hasChanged;
-    }
 
     const eventsBasedObjects = eventsFunctionsExtension.getEventsBasedObjects();
     for (let i = 0; i < eventsBasedObjects.getCount(); ++i) {
@@ -800,7 +788,6 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
           gd.MetadataDeclarationHelper.isBehaviorLifecycleEventsFunction(
             tentativeNewName
           ) ||
-          tentativeNewName === 'onSignal' ||
           eventsBasedBehavior
             .getEventsFunctions()
             .hasEventsFunctionNamed(tentativeNewName)
@@ -1388,10 +1375,6 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
   ) => {
     // This will create the mandatory parameters for the newly added function.
     gd.WholeProjectRefactorer.ensureBehaviorEventsFunctionsProperParameters(
-      this.props.eventsFunctionsExtension,
-      eventsBasedBehavior
-    );
-    ensureOnSignalBehaviorEventsFunctionProperParameters(
       this.props.eventsFunctionsExtension,
       eventsBasedBehavior
     );

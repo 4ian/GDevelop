@@ -5457,7 +5457,6 @@ describe('McpEditorBridge', () => {
           name: 'create_signal_emit_action',
           arguments: {
             target_kind: 'object_instance',
-            object_name: 'Enemy',
             instance_id: 'SignalSenderInstanceId()',
             signal_name: 'Attack.Reply',
             payload: 'Blocked',
@@ -5469,7 +5468,6 @@ describe('McpEditorBridge', () => {
       expect(emitInstance.actionType).toBe('EmitSignalToObjectInstance');
       expect(emitInstance.instruction.parameters).toEqual([
         '',
-        'Enemy',
         'SignalSenderInstanceId()',
         '"Attack.Reply"',
         '"Blocked"',

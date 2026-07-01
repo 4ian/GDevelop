@@ -402,8 +402,7 @@ bool MetadataDeclarationHelper::IsBehaviorLifecycleEventsFunction(
   return functionName == "onCreated" || functionName == "onPlacedInScene" ||
          functionName == "onActivate" ||
          functionName == "onDeActivate" || functionName == "doStepPreEvents" ||
-         functionName == "doStepPostEvents" || functionName == "onSignal" ||
-         functionName == "onDestroy" ||
+         functionName == "doStepPostEvents" || functionName == "onDestroy" ||
          // Compatibility with GD <= 5.0 beta 75
          functionName == "onOwnerRemovedFromScene";
   // end of compatibility code

@@ -380,13 +380,13 @@ const CompactEventsFunctionParametersEditor: React.ComponentType<{
     const forceUpdate = useForceUpdate();
 
     const functionName = eventsFunction.getName();
-    const isOnSignalLifecycleEventsFunction = functionName === 'onSignal';
+    const isOnSignalLifecycleEventsFunction =
+      functionName === 'onSignal' && !!eventsBasedObject && !eventsBasedBehavior;
     const isABehaviorLifecycleEventsFunction =
       !!eventsBasedBehavior &&
       (gd.MetadataDeclarationHelper.isBehaviorLifecycleEventsFunction(
         functionName
-      ) ||
-        isOnSignalLifecycleEventsFunction);
+      ));
     const isAnObjectLifecycleEventsFunction =
       !!eventsBasedObject &&
       !eventsBasedBehavior &&

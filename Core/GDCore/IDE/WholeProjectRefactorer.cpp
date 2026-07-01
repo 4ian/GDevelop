@@ -99,21 +99,6 @@ void AddOnSignalDataParameters(gd::ParameterMetadataContainer &parameters) {
                        "expression", "Emitter instance id");
 }
 
-void EnsureOnSignalBehaviorEventsFunctionProperParameters(
-    const gd::EventsFunctionsExtension &eventsFunctionsExtension,
-    const gd::EventsBasedBehavior &eventsBasedBehavior,
-    gd::ParameterMetadataContainer &parameters) {
-  parameters.ClearParameters();
-
-  AddFunctionParameter(parameters, onSignalObjectParameterName, "object",
-                       "Object", eventsBasedBehavior.GetObjectType());
-  AddFunctionParameter(
-      parameters, "Behavior", "behavior", "Behavior",
-      gd::PlatformExtension::GetBehaviorFullType(
-          eventsFunctionsExtension.GetName(), eventsBasedBehavior.GetName()));
-  AddOnSignalDataParameters(parameters);
-}
-
 void EnsureOnSignalObjectEventsFunctionProperParameters(
     const gd::EventsFunctionsExtension &eventsFunctionsExtension,
     const gd::EventsBasedObject &eventsBasedObject,
@@ -163,12 +148,6 @@ void WholeProjectRefactorer::EnsureBehaviorEventsFunctionsProperParameters(
   for (auto &eventsFunction :
        eventsBasedBehavior.GetEventsFunctions().GetInternalVector()) {
     auto &parameters = eventsFunction->GetParameters();
-    if (eventsFunction->GetName() == onSignalFunctionName) {
-      EnsureOnSignalBehaviorEventsFunctionProperParameters(
-          eventsFunctionsExtension, eventsBasedBehavior, parameters);
-      continue;
-    }
-
     while (parameters.GetParametersCount() < 2) {
       gd::ParameterMetadata newParameter;
       parameters.AddParameter(newParameter);

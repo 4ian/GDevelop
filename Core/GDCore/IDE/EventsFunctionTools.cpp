@@ -56,18 +56,12 @@ void EventsFunctionTools::BehaviorEventsFunctionToObjectsContainer(
 
   // ...and has an "Object" by convention...
   if (!outputObjectsContainer.HasObjectNamed("Object")) {
-    if (eventsFunction.GetName() == "onSignal") {
-      outputObjectsContainer.InsertNewObject(
-          project, eventsBasedBehavior.GetObjectType(), "Object",
-          outputObjectsContainer.GetObjectsCount());
-    } else {
-      gd::LogWarning(
-          "No \"Object\" in a function of an events based behavior: " +
-          eventsFunction.GetName() +
-          ". This means this function is likely misconfigured (check "
-          "its parameters).");
-      return;
-    }
+    gd::LogWarning(
+        "No \"Object\" in a function of an events based behavior: " +
+        eventsFunction.GetName() +
+        ". This means this function is likely misconfigured (check "
+        "its parameters).");
+    return;
   }
 
   // ...with behaviors from properties.

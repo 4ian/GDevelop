@@ -3443,7 +3443,7 @@ const signalEmitActionSchema = {
     target_kind: {
       type: 'string',
       description:
-        'Signal target: scene, object, object_instance, picked_objects, object_group, or behavior.',
+        'Signal target: scene, object, object_instance, picked_objects, or object_group.',
     },
     signal_name: {
       type: 'string',
@@ -3463,24 +3463,20 @@ const signalEmitActionSchema = {
     object_name: {
       type: 'string',
       description:
-        'Target object name for object, object_instance, picked_objects, or behavior targets.',
+        'Target object name for object or picked_objects targets.',
     },
     objects: {
       type: 'string',
       description:
-        'Object list parameter for picked_objects or object_instance targets; alias for object_name.',
+        'Object list parameter for picked_objects targets; alias for object_name.',
     },
     instance_id: {
       description:
-        'Object instance id expression for object_instance targets, for example Enemy.UniqueId() or SignalSenderInstanceId().',
+        'Object instance id expression for object_instance targets, for example Enemy.InstanceId() or SignalSenderInstanceId().',
     },
     object_group_name: {
       type: 'string',
       description: 'Object group name for object_group targets.',
-    },
-    behavior_name: {
-      type: 'string',
-      description: 'Behavior instance name on object_name for behavior targets.',
     },
   },
   required: ['target_kind', 'signal_name'],
@@ -3538,7 +3534,7 @@ const onSignalFunctionSchema = {
     parent_kind: {
       type: 'string',
       description:
-        'Receiver kind: object or behavior. onSignal is not a free extension function.',
+        'Receiver kind: object. onSignal is not a free extension function.',
     },
     parent_name: extensionFunctionSchema.properties.parent_name,
     events_json: extensionFunctionSchema.properties.events_json,
@@ -3658,7 +3654,7 @@ const readTools: Array<McpTool> = [
   {
     name: 'gdevelop_inspect_signal_usage',
     description:
-      'Inspect signal emit actions, scene Signal received conditions, and object/behavior onSignal handlers across the project, optionally filtered by signal name or extension scope.',
+      'Inspect signal emit actions, scene Signal received conditions, and object onSignal handlers across the project, optionally filtered by signal name or extension scope.',
     inputSchema: inspectSignalUsageSchema,
   },
   {
@@ -3881,7 +3877,7 @@ const readTools: Array<McpTool> = [
   {
     name: 'create_signal_emit_action',
     description:
-      'Build a correctly-formed signal emit ACTION instruction JSON for scene, object, object_instance, picked_objects, object_group, or behavior targets. Handles hidden currentScene, signalName quoting, string payload, and optional emitter object parameter ordering.',
+      'Build a correctly-formed signal emit ACTION instruction JSON for scene, object, object_instance, picked_objects, or object_group targets. Handles hidden currentScene, signalName quoting, string payload, and optional emitter object parameter ordering.',
     inputSchema: signalEmitActionSchema,
   },
   {
@@ -4649,7 +4645,7 @@ const writeTools: Array<McpTool> = [
   {
     name: 'gdevelop_create_or_update_on_signal',
     description:
-      'Create or update the reserved object/behavior onSignal lifecycle function in an extension. GDevelop maintains the fixed signal parameters: SignalName, Payload, EmitterObjectName, and EmitterInstanceId, plus Object/Behavior receiver parameters.',
+      'Create or update the reserved object onSignal lifecycle function in an extension. GDevelop maintains the fixed signal parameters: SignalName, Payload, EmitterObjectName, and EmitterInstanceId, plus the Object receiver parameter.',
     inputSchema: onSignalFunctionSchema,
   },
   {
@@ -4773,7 +4769,6 @@ const toolUsageExamples: { [string]: Array<Object> } = {
         'Emit a reply to one object instance by id, using a signal expression as the target id.',
       arguments: {
         target_kind: 'object_instance',
-        object_name: 'Enemy',
         instance_id: 'SignalSenderInstanceId()',
         signal_name: 'Attack.Reply',
         payload: 'Blocked',

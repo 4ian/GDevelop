@@ -307,7 +307,7 @@ TEST_CASE("EventsFunction", "[common]") {
                  .Has("BehaviorState"));
   }
 
-  SECTION("Behavior onSignal has signal parameters and keeps Object scope") {
+  SECTION("Behavior onSignal is not a signal lifecycle function") {
     gd::Platform platform;
     gd::Project project;
     SetupProjectWithDummyPlatform(project, platform);
@@ -325,7 +325,7 @@ TEST_CASE("EventsFunction", "[common]") {
         eventsExtension, eventsBasedBehavior);
 
     auto &parameters = eventsFunction.GetParameters();
-    REQUIRE(parameters.GetParametersCount() == 6);
+    REQUIRE(parameters.GetParametersCount() == 2);
     REQUIRE(parameters.GetParameter(0).GetName() == "Object");
     REQUIRE(parameters.GetParameter(0).GetType() == "object");
     REQUIRE(parameters.GetParameter(0).GetExtraInfo() == "MyExtension::Sprite");
@@ -333,14 +333,6 @@ TEST_CASE("EventsFunction", "[common]") {
     REQUIRE(parameters.GetParameter(1).GetType() == "behavior");
     REQUIRE(parameters.GetParameter(1).GetExtraInfo() ==
             "MyEventsExtension::MyBehavior");
-    REQUIRE(parameters.GetParameter(2).GetName() == "SignalName");
-    REQUIRE(parameters.GetParameter(2).GetType() == "signalName");
-    REQUIRE(parameters.GetParameter(3).GetName() == "Payload");
-    REQUIRE(parameters.GetParameter(3).GetType() == "string");
-    REQUIRE(parameters.GetParameter(4).GetName() == "EmitterObjectName");
-    REQUIRE(parameters.GetParameter(4).GetType() == "string");
-    REQUIRE(parameters.GetParameter(5).GetName() == "EmitterInstanceId");
-    REQUIRE(parameters.GetParameter(5).GetType() == "expression");
 
     gd::ObjectsContainer objectsContainer(gd::ObjectsContainer::Function);
     gd::EventsFunctionTools::BehaviorEventsFunctionToObjectsContainer(

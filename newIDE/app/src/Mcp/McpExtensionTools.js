@@ -1558,7 +1558,6 @@ const signalEmitActionTypes = [
   'EmitSignalToObjectInstance',
   'EmitSignalToPickedObjects',
   'EmitSignalToObjectGroup',
-  'EmitSignalToBehavior',
 ];
 
 const getSignalNameFilter = (args: Object): ?string => {
@@ -1637,9 +1636,9 @@ export const inspectSignalUsage = (
     args && typeof args.parent_kind === 'string' && args.parent_kind
       ? normalizeParentKind(args.parent_kind)
       : null;
-  if (requestedParentKind && requestedParentKind === 'extension') {
+  if (requestedParentKind && requestedParentKind !== 'object') {
     throw new Error(
-      'onSignal handlers are only available on events-based objects and behaviors.'
+      'onSignal handlers are only available on events-based objects.'
     );
   }
   const requestedParentName =
@@ -1651,7 +1650,7 @@ export const inspectSignalUsage = (
   const onSignalHandlers = [];
   const addOnSignalHandler = (
     extensionName: string,
-    parentKind: 'behavior' | 'object',
+    parentKind: 'object',
     parentName: string,
     container: gdEventsFunctionsContainer
   ) => {
@@ -1682,16 +1681,6 @@ export const inspectSignalUsage = (
   ) {
     const extension = project.getEventsFunctionsExtensionAt(extensionIndex);
     const extensionName = extension.getName();
-    const behaviors = extension.getEventsBasedBehaviors();
-    for (let index = 0; index < behaviors.getCount(); index++) {
-      const behavior = behaviors.getAt(index);
-      addOnSignalHandler(
-        extensionName,
-        'behavior',
-        behavior.getName(),
-        behavior.getEventsFunctions()
-      );
-    }
     const objects = extension.getEventsBasedObjects();
     for (let index = 0; index < objects.getCount(); index++) {
       const object = objects.getAt(index);

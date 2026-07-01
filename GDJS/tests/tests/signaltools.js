@@ -12,7 +12,7 @@ describe('gdjs.evtTools.signal', () => {
         const signalNameFromContext =
           gdjs.evtTools.signal.getSignalName(runtimeScene);
         const payloadFromContext =
-          gdjs.evtTools.signal.getSignalPayloadString(runtimeScene);
+          gdjs.evtTools.signal.getSignalPayload(runtimeScene);
         signalParameterCalls.push({
           receiver: this.getName(),
           signalName,
@@ -41,33 +41,6 @@ describe('gdjs.evtTools.signal', () => {
       }
     };
     gdjs.registerObject('SignalTest::Object', SignalTestRuntimeObject);
-
-    const SignalTestRuntimeBehavior = class SignalTestRuntimeBehavior extends gdjs.RuntimeBehavior {
-      onSignal(signalName, payload, emitterObjectName, emitterInstanceId) {
-        signalParameterCalls.push({
-          receiver: this.owner.getName() + '.' + this.getName(),
-          signalName,
-          payload,
-          emitterObjectName,
-          emitterInstanceId,
-        });
-        signalReceiverIds.push({
-          receiver: this.owner.getName() + '.' + this.getName(),
-          receiverId: this.owner.getUniqueId(),
-          signalName,
-        });
-        signalCalls.push({
-          receiver: this.owner.getName() + '.' + this.getName(),
-          signalName: gdjs.evtTools.signal.getSignalName(
-            this.owner.getRuntimeScene()
-          ),
-          payload: gdjs.evtTools.signal.getSignalPayloadString(
-            this.owner.getRuntimeScene()
-          ),
-        });
-      }
-    };
-    gdjs.registerBehavior('SignalTest::Behavior', SignalTestRuntimeBehavior);
   });
 
   beforeEach(() => {
@@ -83,12 +56,7 @@ describe('gdjs.evtTools.signal', () => {
       name: 'Receiver',
       type: 'SignalTest::Object',
       variables: [],
-      behaviors: [
-        {
-          name: 'Listener',
-          type: 'SignalTest::Behavior',
-        },
-      ],
+      behaviors: [],
       effects: [],
     });
     runtimeScene.createObject('Receiver');
@@ -112,31 +80,23 @@ describe('gdjs.evtTools.signal', () => {
       expect(gdjs.evtTools.signal.isSignalReceived(runtimeScene, 'Ping')).to.be(
         true
       );
-      expect(gdjs.evtTools.signal.getSignalPayloadNumber(runtimeScene)).to.be(
-        7
+      expect(gdjs.evtTools.signal.getSignalPayload(runtimeScene)).to.be(
+        '7'
       );
       signalCalls.push({
         receiver: 'scene',
         signalName: gdjs.evtTools.signal.getSignalName(runtimeScene),
-        payload: gdjs.evtTools.signal.getSignalPayloadString(runtimeScene),
+        payload: gdjs.evtTools.signal.getSignalPayload(runtimeScene),
       });
     });
 
     expect(signalCalls).to.eql([
       { receiver: 'Receiver', signalName: 'Ping', payload: '7' },
-      { receiver: 'Receiver.Listener', signalName: 'Ping', payload: '7' },
       { receiver: 'scene', signalName: 'Ping', payload: '7' },
     ]);
     expect(signalParameterCalls).to.eql([
       {
         receiver: 'Receiver',
-        signalName: 'Ping',
-        payload: '7',
-        emitterObjectName: '',
-        emitterInstanceId: -1,
-      },
-      {
-        receiver: 'Receiver.Listener',
         signalName: 'Ping',
         payload: '7',
         emitterObjectName: '',
@@ -173,10 +133,7 @@ describe('gdjs.evtTools.signal', () => {
 
     runtimeScene.renderAndStepWithEventsFunction(16, () => {});
 
-    expect(signalCalls.map(({ receiver }) => receiver)).to.eql([
-      'Receiver',
-      'Receiver.Listener',
-    ]);
+    expect(signalCalls.map(({ receiver }) => receiver)).to.eql(['Receiver']);
   });
 
   it('treats an omitted payload placeholder as no payload', () => {
@@ -195,18 +152,10 @@ describe('gdjs.evtTools.signal', () => {
 
     expect(signalCalls).to.eql([
       { receiver: 'Receiver', signalName: 'NoPayload', payload: '' },
-      { receiver: 'Receiver.Listener', signalName: 'NoPayload', payload: '' },
     ]);
     expect(signalParameterCalls).to.eql([
       {
         receiver: 'Receiver',
-        signalName: 'NoPayload',
-        payload: '',
-        emitterObjectName: '',
-        emitterInstanceId: -1,
-      },
-      {
-        receiver: 'Receiver.Listener',
         signalName: 'NoPayload',
         payload: '',
         emitterObjectName: '',
@@ -254,13 +203,6 @@ describe('gdjs.evtTools.signal', () => {
         emitterObjectName: 'Emitter',
         emitterInstanceId: emitter.getUniqueId(),
       },
-      {
-        receiver: 'Receiver.Listener',
-        signalName: 'WithSender',
-        payload: '',
-        emitterObjectName: 'Emitter',
-        emitterInstanceId: emitter.getUniqueId(),
-      },
     ]);
   });
 
@@ -278,7 +220,7 @@ describe('gdjs.evtTools.signal', () => {
       signalCalls.push({
         receiver: 'scene',
         signalName: gdjs.evtTools.signal.getSignalName(runtimeScene),
-        payload: gdjs.evtTools.signal.getSignalPayloadString(runtimeScene),
+        payload: gdjs.evtTools.signal.getSignalPayload(runtimeScene),
       });
 
       expect(
@@ -287,15 +229,13 @@ describe('gdjs.evtTools.signal', () => {
       signalCalls.push({
         receiver: 'scene',
         signalName: gdjs.evtTools.signal.getSignalName(runtimeScene),
-        payload: gdjs.evtTools.signal.getSignalPayloadString(runtimeScene),
+        payload: gdjs.evtTools.signal.getSignalPayload(runtimeScene),
       });
     });
 
     expect(signalCalls).to.eql([
       { receiver: 'Receiver', signalName: 'First', payload: '1' },
-      { receiver: 'Receiver.Listener', signalName: 'First', payload: '1' },
       { receiver: 'Receiver', signalName: 'Second', payload: '2' },
-      { receiver: 'Receiver.Listener', signalName: 'Second', payload: '2' },
       { receiver: 'scene', signalName: 'First', payload: '1' },
       { receiver: 'scene', signalName: 'Second', payload: '2' },
     ]);
@@ -315,12 +255,6 @@ describe('gdjs.evtTools.signal', () => {
         payload: '2',
         emitterObjectName: 'Receiver',
       },
-      {
-        receiver: 'Receiver.Listener',
-        signalName: 'Second',
-        payload: '2',
-        emitterObjectName: 'Receiver',
-      },
     ]);
     signalParameterCalls
       .filter(({ signalName }) => signalName === 'Second')
@@ -329,7 +263,7 @@ describe('gdjs.evtTools.signal', () => {
       });
   });
 
-  it('targets objects, object groups and behaviors without broadcasting', () => {
+  it('targets objects and object groups without broadcasting', () => {
     const runtimeScene = createSignalRuntimeScene();
     runtimeScene.registerObject({
       name: 'OtherReceiver',
@@ -357,26 +291,12 @@ describe('gdjs.evtTools.signal', () => {
       '4'
     );
 
-    gdjs.evtTools.signal.emitSignalToBehavior(
-      runtimeScene,
-      'Receiver',
-      'Listener',
-      'BehaviorOnly',
-      '5'
-    );
-
     runtimeScene.renderAndStepWithEventsFunction(16, () => {});
 
     expect(signalCalls).to.eql([
       { receiver: 'OtherReceiver', signalName: 'ObjectOnly', payload: '3' },
       { receiver: 'Receiver', signalName: 'Group', payload: '4' },
-      { receiver: 'Receiver.Listener', signalName: 'Group', payload: '4' },
       { receiver: 'OtherReceiver', signalName: 'Group', payload: '4' },
-      {
-        receiver: 'Receiver.Listener',
-        signalName: 'BehaviorOnly',
-        payload: '5',
-      },
     ]);
   });
 
@@ -384,12 +304,9 @@ describe('gdjs.evtTools.signal', () => {
     const runtimeScene = createSignalRuntimeScene();
     const firstReceiver = runtimeScene.getObjects('Receiver')[0];
     const secondReceiver = runtimeScene.createObject('Receiver');
-    const objectsLists = new Hashtable();
-    objectsLists.put('Receiver', []);
 
     gdjs.evtTools.signal.emitSignalToObjectInstance(
       runtimeScene,
-      objectsLists,
       secondReceiver.getUniqueId(),
       'InstanceOnly'
     );
@@ -398,16 +315,10 @@ describe('gdjs.evtTools.signal', () => {
 
     expect(signalCalls).to.eql([
       { receiver: 'Receiver', signalName: 'InstanceOnly', payload: '' },
-      { receiver: 'Receiver.Listener', signalName: 'InstanceOnly', payload: '' },
     ]);
     expect(signalReceiverIds).to.eql([
       {
         receiver: 'Receiver',
-        receiverId: secondReceiver.getUniqueId(),
-        signalName: 'InstanceOnly',
-      },
-      {
-        receiver: 'Receiver.Listener',
         receiverId: secondReceiver.getUniqueId(),
         signalName: 'InstanceOnly',
       },
@@ -480,7 +391,7 @@ describe('gdjs.evtTools.signal', () => {
     expect(records[0].source.objectName).to.be('Sender');
     expect(records[0].source.objectId).to.be(sender.getUniqueId());
     expect(records[0].receivers.map(({ receiverName }) => receiverName)).to.eql(
-      ['Receiver', 'Receiver.*(1)']
+      ['Receiver']
     );
     records[0].receivers.forEach(receiverRecord => {
       expect(receiverRecord.objectName).to.be('Receiver');

@@ -2017,13 +2017,12 @@ const normalizeSignalTargetKind = (targetKind: any): string => {
     normalized === 'object' ||
     normalized === 'object_instance' ||
     normalized === 'picked_objects' ||
-    normalized === 'object_group' ||
-    normalized === 'behavior'
+    normalized === 'object_group'
   ) {
     return normalized;
   }
   throw new Error(
-    'target_kind must be scene, object, object_instance, picked_objects, object_group, or behavior.'
+    'target_kind must be scene, object, object_instance, picked_objects, or object_group.'
   );
 };
 
@@ -2081,19 +2080,12 @@ const buildSignalEmitAction = ({
     parameters['1'] = String(
       getRequiredSignalArg(
         args,
-        ['object_name', 'objects', 'target_object_name'],
-        'object_name'
-      )
-    );
-    parameters['2'] = String(
-      getRequiredSignalArg(
-        args,
         ['instance_id', 'instanceId', 'object_id', 'objectId'],
         'instance_id'
       )
     );
-    parameters['3'] = signalName;
-    setPayloadAndEmitter(4, 5);
+    parameters['2'] = signalName;
+    setPayloadAndEmitter(3, 4);
   } else if (targetKind === 'picked_objects') {
     type = 'EmitSignalToPickedObjects';
     parameters['1'] = String(
@@ -2116,24 +2108,6 @@ const buildSignalEmitAction = ({
     );
     parameters['2'] = signalName;
     setPayloadAndEmitter(3, 4);
-  } else if (targetKind === 'behavior') {
-    type = 'EmitSignalToBehavior';
-    parameters['1'] = String(
-      getRequiredSignalArg(
-        args,
-        ['object_name', 'target_object_name'],
-        'object_name'
-      )
-    );
-    parameters['2'] = String(
-      getRequiredSignalArg(
-        args,
-        ['behavior_name', 'target_behavior_name'],
-        'behavior_name'
-      )
-    );
-    parameters['3'] = signalName;
-    setPayloadAndEmitter(4, 5);
   }
 
   const built = buildInstruction({
@@ -2176,7 +2150,7 @@ const buildSignalReceivedCondition = ({
     ...built,
     conditionType: 'SignalReceived',
     signalNote:
-      'Drop instruction into an event conditions array. Use SignalPayloadString(), SignalPayload(), SignalSenderObjectName(), or SignalSenderInstanceId() in this event/sub-events to read signal data.',
+      'Drop instruction into an event conditions array. Use SignalPayload(), SignalSenderObjectName(), or SignalSenderInstanceId() in this event/sub-events to read signal data.',
   };
 };
 
@@ -2187,8 +2161,8 @@ const createOrUpdateOnSignalFunction = (
   const parentKind = String((args && args.parent_kind) || '')
     .trim()
     .toLowerCase();
-  if (parentKind !== 'object' && parentKind !== 'behavior') {
-    throw new Error('parent_kind must be object or behavior for onSignal.');
+  if (parentKind !== 'object') {
+    throw new Error('parent_kind must be object for onSignal.');
   }
   const signalArgs = {
     ...(args || {}),
@@ -2208,23 +2182,13 @@ const createOrUpdateOnSignalFunction = (
     parentKind,
     parentName: args && args.parent_name,
     functionName: 'onSignal',
-    signalSignature:
-      parentKind === 'behavior'
-        ? [
-            'Object',
-            'Behavior',
-            'SignalName',
-            'Payload',
-            'EmitterObjectName',
-            'EmitterInstanceId',
-          ]
-        : [
-            'Object',
-            'SignalName',
-            'Payload',
-            'EmitterObjectName',
-            'EmitterInstanceId',
-          ],
+    signalSignature: [
+      'Object',
+      'SignalName',
+      'Payload',
+      'EmitterObjectName',
+      'EmitterInstanceId',
+    ],
   };
 };
 

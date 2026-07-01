@@ -98,12 +98,11 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
                  _("Emit a signal to an object instance"),
                  _("Queue a signal for one object instance matching an "
                    "instance id."),
-                 _("Emit signal _PARAM3_ to instance _PARAM2_ of _PARAM1_"),
+                 _("Emit signal _PARAM2_ to instance _PARAM1_"),
                  _("Signals"),
                  "res/actions/texte.png",
                  "res/actions/texte.png")
       .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("objectListOrEmptyWithoutPicking", _("Object"))
       .AddParameter("expression", _("Instance id"))
       .AddParameter("signalName", _("Signal name"))
       .AddParameter("string", _("Payload"), "", true)
@@ -143,23 +142,6 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
       .MarkAsAdvanced();
 
   extension
-      .AddAction("EmitSignalToBehavior",
-                 _("Emit a signal to a behavior"),
-                 _("Queue a signal for a behavior on all instances of an "
-                   "object."),
-                 _("Emit signal _PARAM3_ to behavior _PARAM2_ on _PARAM1_"),
-                 _("Signals"),
-                 "res/actions/texte.png",
-                 "res/actions/texte.png")
-      .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("string", _("Object name"))
-      .AddParameter("string", _("Behavior name"))
-      .AddParameter("signalName", _("Signal name"))
-      .AddParameter("string", _("Payload"), "", true)
-      .AddParameter("objectList", _("Emitter object"), "", true)
-      .MarkAsAdvanced();
-
-  extension
       .AddStrExpression("SignalName",
                         _("Current signal name"),
                         _("Name of the signal currently being handled."),
@@ -168,16 +150,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
       .AddCodeOnlyParameter("currentScene", "");
 
   extension
-      .AddExpression("SignalPayload",
-                     _("Signal payload number"),
-                     _("Read a number from the current signal payload."),
-                     _("Signals"),
-                     "res/actions/texte.png")
-      .AddCodeOnlyParameter("currentScene", "");
-
-  extension
-      .AddStrExpression("SignalPayloadString",
-                        _("Signal payload text"),
+      .AddStrExpression("SignalPayload",
+                        _("Signal payload"),
                         _("Read text from the current signal payload."),
                         _("Signals"),
                         "res/actions/texte.png")

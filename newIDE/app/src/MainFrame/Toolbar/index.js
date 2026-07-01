@@ -173,6 +173,12 @@ export default (React.forwardRef<MainFrameToolbarProps, ToolbarInterface>(
                 setDisplayCollisionMaskInPreview={
                   props.setDisplayCollisionMaskInPreview
                 }
+                displaySignalAnimationsInPreview={
+                  props.displaySignalAnimationsInPreview
+                }
+                setDisplaySignalAnimationsInPreview={
+                  props.setDisplaySignalAnimationsInPreview
+                }
                 setPreviewOverride={props.setPreviewOverride}
                 canDoNetworkPreview={props.canDoNetworkPreview}
                 isPreviewEnabled={props.isPreviewEnabled}

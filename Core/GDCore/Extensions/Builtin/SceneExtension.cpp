@@ -74,9 +74,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
                  "res/actions/texte.png")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("signalName", _("Signal name"))
-      .AddParameter("variable", _("Payload variable"), "", true)
-      .AddParameter("objectListOrEmptyWithoutPicking", _("Emitter object"), "",
-                    true)
+      .AddParameter("string", _("Payload"), "", true)
+      .AddParameter("objectList", _("Emitter object"), "", true)
       .MarkAsSimple();
 
   extension
@@ -90,9 +89,25 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("string", _("Object name"))
       .AddParameter("signalName", _("Signal name"))
-      .AddParameter("variable", _("Payload variable"), "", true)
-      .AddParameter("objectListOrEmptyWithoutPicking", _("Emitter object"), "",
-                    true)
+      .AddParameter("string", _("Payload"), "", true)
+      .AddParameter("objectList", _("Emitter object"), "", true)
+      .MarkAsAdvanced();
+
+  extension
+      .AddAction("EmitSignalToObjectInstance",
+                 _("Emit a signal to an object instance"),
+                 _("Queue a signal for one object instance matching an "
+                   "instance id."),
+                 _("Emit signal _PARAM3_ to instance _PARAM2_ of _PARAM1_"),
+                 _("Signals"),
+                 "res/actions/texte.png",
+                 "res/actions/texte.png")
+      .AddCodeOnlyParameter("currentScene", "")
+      .AddParameter("objectListOrEmptyWithoutPicking", _("Object"))
+      .AddParameter("expression", _("Instance id"))
+      .AddParameter("signalName", _("Signal name"))
+      .AddParameter("string", _("Payload"), "", true)
+      .AddParameter("objectList", _("Emitter object"), "", true)
       .MarkAsAdvanced();
 
   extension
@@ -107,9 +122,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("objectList", _("Objects"))
       .AddParameter("signalName", _("Signal name"))
-      .AddParameter("variable", _("Payload variable"), "", true)
-      .AddParameter("objectListOrEmptyWithoutPicking", _("Emitter object"), "",
-                    true)
+      .AddParameter("string", _("Payload"), "", true)
+      .AddParameter("objectList", _("Emitter object"), "", true)
       .MarkAsSimple();
 
   extension
@@ -124,9 +138,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("string", _("Object group name"))
       .AddParameter("signalName", _("Signal name"))
-      .AddParameter("variable", _("Payload variable"), "", true)
-      .AddParameter("objectListOrEmptyWithoutPicking", _("Emitter object"), "",
-                    true)
+      .AddParameter("string", _("Payload"), "", true)
+      .AddParameter("objectList", _("Emitter object"), "", true)
       .MarkAsAdvanced();
 
   extension
@@ -142,9 +155,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
       .AddParameter("string", _("Object name"))
       .AddParameter("string", _("Behavior name"))
       .AddParameter("signalName", _("Signal name"))
-      .AddParameter("variable", _("Payload variable"), "", true)
-      .AddParameter("objectListOrEmptyWithoutPicking", _("Emitter object"), "",
-                    true)
+      .AddParameter("string", _("Payload"), "", true)
+      .AddParameter("objectList", _("Emitter object"), "", true)
       .MarkAsAdvanced();
 
   extension
@@ -161,8 +173,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
                      _("Read a number from the current signal payload."),
                      _("Signals"),
                      "res/actions/texte.png")
-      .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("string", _("Child name"), "", true);
+      .AddCodeOnlyParameter("currentScene", "");
 
   extension
       .AddStrExpression("SignalPayloadString",
@@ -170,8 +181,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
                         _("Read text from the current signal payload."),
                         _("Signals"),
                         "res/actions/texte.png")
-      .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("string", _("Child name"), "", true);
+      .AddCodeOnlyParameter("currentScene", "");
 
   extension
       .AddStrExpression("SignalSenderObjectName",

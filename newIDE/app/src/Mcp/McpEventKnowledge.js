@@ -352,6 +352,7 @@ const QUOTED_STRING_PARAMETER_TYPES = new Set([
   'externalLayoutName',
   'leaderboardId',
   'identifier',
+  'signalName',
   'keyboardKey',
   'mouseButton',
 ]);

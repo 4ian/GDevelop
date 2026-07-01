@@ -44,6 +44,7 @@ struct PreviewExportOptions {
         useMinimalDebuggerClient(false),
         nativeMobileApp(false),
         displayCollisionMask(false),
+        displaySignalAnimations(false),
         fullLoadingScreen(false),
         isDevelopmentEnvironment(false),
         isInGameEdition(false),
@@ -134,6 +135,14 @@ struct PreviewExportOptions {
    */
   PreviewExportOptions &SetDisplayCollisionMask(bool enable) {
     displayCollisionMask = enable;
+    return *this;
+  }
+
+  /**
+   * \brief Set if signal animations should be displayed in the preview.
+   */
+  PreviewExportOptions &SetDisplaySignalAnimations(bool enable) {
+    displaySignalAnimations = enable;
     return *this;
   }
 
@@ -400,6 +409,7 @@ struct PreviewExportOptions {
   gd::String inAppTutorialMessagePositionInPreview;
   bool nativeMobileApp;
   bool displayCollisionMask;
+  bool displaySignalAnimations;
   std::map<gd::String, int> includeFileHashes;
   bool shouldClearExportFolder = true;
   bool shouldReloadProjectData = true;
@@ -505,7 +515,8 @@ class ExporterHelper {
       gd::AbstractFileSystem &fs, gd::Project &project, gd::String filename,
       const gd::SerializerElement &runtimeGameOptions, bool isInGameEdition,
       const std::vector<gd::InGameEditorResourceMetadata> &inGameEditorResources,
-      bool displayCollisionMask = false);
+      bool displayCollisionMask = false,
+      bool displaySignalAnimations = false);
 
   /**
    * \brief Serialize a project without its events to JSON

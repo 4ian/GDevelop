@@ -4414,6 +4414,7 @@ interface PreviewExportOptions {
     [Ref] PreviewExportOptions SetShouldGenerateScenesEventsCode(boolean enable);
     [Ref] PreviewExportOptions SetNativeMobileApp(boolean enable);
     [Ref] PreviewExportOptions SetDisplayCollisionMask(boolean enable);
+    [Ref] PreviewExportOptions SetDisplaySignalAnimations(boolean enable);
     [Ref] PreviewExportOptions SetFullLoadingScreen(boolean enable);
     [Ref] PreviewExportOptions SetIsDevelopmentEnvironment(boolean enable);
     [Ref] PreviewExportOptions SetIsInGameEdition(boolean enable);

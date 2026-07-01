@@ -557,6 +557,7 @@ declare interface ProjectPropertiesData {
   scaleMode: 'linear' | 'nearest';
   pixelsRounding: boolean;
   displayCollisionMask?: boolean;
+  displaySignalAnimations?: boolean;
   antialiasingMode: 'none' | 'MSAA';
   antialisingEnabledOnMobile: boolean;
   sizeOnStartupMode: '' | 'scaleOuter' | 'adaptWidth' | 'adaptHeight';

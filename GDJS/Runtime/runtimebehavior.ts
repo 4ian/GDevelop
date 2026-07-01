@@ -228,7 +228,7 @@ namespace gdjs {
      */
     onSignal(
       signalName: string,
-      payload: gdjs.Variable,
+      payload: string,
       emitterObjectName: string,
       emitterInstanceId: integer
     ): void {}

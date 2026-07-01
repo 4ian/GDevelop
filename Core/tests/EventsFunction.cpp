@@ -158,7 +158,7 @@ TEST_CASE("EventsFunction", "[common]") {
     REQUIRE(parameters.GetParameter(1).GetName() == "SignalName");
     REQUIRE(parameters.GetParameter(1).GetType() == "signalName");
     REQUIRE(parameters.GetParameter(2).GetName() == "Payload");
-    REQUIRE(parameters.GetParameter(2).GetType() == "variable");
+    REQUIRE(parameters.GetParameter(2).GetType() == "string");
     REQUIRE(parameters.GetParameter(3).GetName() == "EmitterObjectName");
     REQUIRE(parameters.GetParameter(3).GetType() == "string");
     REQUIRE(parameters.GetParameter(4).GetName() == "EmitterInstanceId");
@@ -336,7 +336,7 @@ TEST_CASE("EventsFunction", "[common]") {
     REQUIRE(parameters.GetParameter(2).GetName() == "SignalName");
     REQUIRE(parameters.GetParameter(2).GetType() == "signalName");
     REQUIRE(parameters.GetParameter(3).GetName() == "Payload");
-    REQUIRE(parameters.GetParameter(3).GetType() == "variable");
+    REQUIRE(parameters.GetParameter(3).GetType() == "string");
     REQUIRE(parameters.GetParameter(4).GetName() == "EmitterObjectName");
     REQUIRE(parameters.GetParameter(4).GetType() == "string");
     REQUIRE(parameters.GetParameter(5).GetName() == "EmitterInstanceId");

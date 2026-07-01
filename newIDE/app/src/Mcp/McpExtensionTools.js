@@ -1552,6 +1552,186 @@ export const findProjectEvents = (project: gdProject, args: Object): Object => {
   };
 };
 
+const signalEmitActionTypes = [
+  'EmitSceneSignal',
+  'EmitSignalToObject',
+  'EmitSignalToObjectInstance',
+  'EmitSignalToPickedObjects',
+  'EmitSignalToObjectGroup',
+  'EmitSignalToBehavior',
+];
+
+const getSignalNameFilter = (args: Object): ?string => {
+  if (args && typeof args.signal_name === 'string' && args.signal_name) {
+    return args.signal_name;
+  }
+  if (args && typeof args.signalName === 'string' && args.signalName) {
+    return args.signalName;
+  }
+  return null;
+};
+
+const buildSignalEventSearchArgs = (
+  args: Object,
+  instructionType: string,
+  instructionKind: 'action' | 'condition',
+  signalName: ?string,
+  limit: number
+): Object => {
+  const searchArgs: Object = { limit };
+  [
+    'scene_name',
+    'extension_name',
+    'parent_kind',
+    'parent_name',
+    'function_name',
+    'include_serialized',
+    'summary_only',
+  ].forEach(name => {
+    if (args && args[name] !== undefined) searchArgs[name] = args[name];
+  });
+  if (signalName) searchArgs.parameter_contains = signalName;
+  if (instructionKind === 'condition') {
+    searchArgs.condition_type = instructionType;
+  } else {
+    searchArgs.action_type = instructionType;
+  }
+  return searchArgs;
+};
+
+export const inspectSignalUsage = (
+  project: gdProject,
+  args: Object = {}
+): Object => {
+  const signalName = getSignalNameFilter(args);
+  const limit = getSearchLimit(args);
+  const emitMatches = [];
+  let totalEmitMatches = 0;
+  signalEmitActionTypes.forEach(actionType => {
+    const result = findProjectEvents(
+      project,
+      buildSignalEventSearchArgs(args, actionType, 'action', signalName, limit)
+    );
+    totalEmitMatches += result.totalMatches || 0;
+    (result.matches || []).forEach(match =>
+      emitMatches.push({ signalActionType: actionType, ...match })
+    );
+  });
+
+  const receivedResult = findProjectEvents(
+    project,
+    buildSignalEventSearchArgs(
+      args,
+      'SignalReceived',
+      'condition',
+      signalName,
+      limit
+    )
+  );
+
+  const requestedExtensionName =
+    args && typeof args.extension_name === 'string' && args.extension_name
+      ? normalizeRequiredName(args.extension_name, 'extension_name')
+      : null;
+  const requestedParentKind =
+    args && typeof args.parent_kind === 'string' && args.parent_kind
+      ? normalizeParentKind(args.parent_kind)
+      : null;
+  if (requestedParentKind && requestedParentKind === 'extension') {
+    throw new Error(
+      'onSignal handlers are only available on events-based objects and behaviors.'
+    );
+  }
+  const requestedParentName =
+    args && typeof args.parent_name === 'string' && args.parent_name
+      ? normalizeRequiredName(args.parent_name, 'parent_name')
+      : null;
+  const includeEvents = !!(args && args.include_events);
+  const includeSerialized = !!(args && args.include_serialized);
+  const onSignalHandlers = [];
+  const addOnSignalHandler = (
+    extensionName: string,
+    parentKind: 'behavior' | 'object',
+    parentName: string,
+    container: gdEventsFunctionsContainer
+  ) => {
+    if (requestedExtensionName && extensionName !== requestedExtensionName) {
+      return;
+    }
+    if (requestedParentKind && parentKind !== requestedParentKind) return;
+    if (requestedParentName && parentName !== requestedParentName) return;
+    if (!container.hasEventsFunctionNamed('onSignal')) return;
+    const eventsFunction = container.getEventsFunction('onSignal');
+    onSignalHandlers.push({
+      extensionName,
+      parentKind,
+      parentName,
+      functionName: 'onSignal',
+      function: summarizeEventsFunction(
+        eventsFunction,
+        includeEvents,
+        includeSerialized
+      ),
+    });
+  };
+
+  for (
+    let extensionIndex = 0;
+    extensionIndex < project.getEventsFunctionsExtensionsCount();
+    extensionIndex++
+  ) {
+    const extension = project.getEventsFunctionsExtensionAt(extensionIndex);
+    const extensionName = extension.getName();
+    const behaviors = extension.getEventsBasedBehaviors();
+    for (let index = 0; index < behaviors.getCount(); index++) {
+      const behavior = behaviors.getAt(index);
+      addOnSignalHandler(
+        extensionName,
+        'behavior',
+        behavior.getName(),
+        behavior.getEventsFunctions()
+      );
+    }
+    const objects = extension.getEventsBasedObjects();
+    for (let index = 0; index < objects.getCount(); index++) {
+      const object = objects.getAt(index);
+      addOnSignalHandler(
+        extensionName,
+        'object',
+        object.getName(),
+        object.getEventsFunctions()
+      );
+    }
+  }
+
+  const limitedEmitMatches = emitMatches.slice(0, limit);
+  const limitedOnSignalHandlers = onSignalHandlers.slice(0, limit);
+  return {
+    success: true,
+    signalName: signalName || null,
+    emitActions: {
+      count: limitedEmitMatches.length,
+      totalMatches: totalEmitMatches,
+      truncated: totalEmitMatches > limitedEmitMatches.length,
+      matches: limitedEmitMatches,
+    },
+    receivedConditions: {
+      count: receivedResult.count || 0,
+      totalMatches: receivedResult.totalMatches || 0,
+      truncated: !!receivedResult.truncated,
+      matches: receivedResult.matches || [],
+    },
+    onSignalHandlers: {
+      count: limitedOnSignalHandlers.length,
+      totalMatches: onSignalHandlers.length,
+      truncated: onSignalHandlers.length > limitedOnSignalHandlers.length,
+      handlers: limitedOnSignalHandlers,
+    },
+    note:
+      'onSignal handlers are listed by receiver, not signal name; they can branch on SignalName/SignalName() at runtime.',
+  };
+};
+
 const getFunctionParentName = (target: ExtensionFunctionTarget): ?string =>
   target.parentKind === 'extension'
     ? null

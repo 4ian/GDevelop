@@ -643,6 +643,10 @@ const MainFrame = (props: Props): React.MixedElement => {
     displayCollisionMaskInPreview,
     setDisplayCollisionMaskInPreview,
   ] = React.useState<boolean>(false);
+  const [
+    displaySignalAnimationsInPreview,
+    setDisplaySignalAnimationsInPreview,
+  ] = React.useState<boolean>(false);
   const commandPaletteRef = React.useRef((null: ?CommandPaletteInterface));
   const [
     recentEditorSwitcherOpen,
@@ -3073,6 +3077,7 @@ const MainFrame = (props: Props): React.MixedElement => {
             shouldReloadResources,
             shouldHardReload,
             displayCollisionMaskInPreview,
+            displaySignalAnimationsInPreview,
             fullLoadingScreen,
             forceDiagnosticReport,
             launchCaptureOptions,
@@ -3254,6 +3259,7 @@ const MainFrame = (props: Props): React.MixedElement => {
             shouldReloadResources: !!shouldReloadResources,
             shouldHardReload: !!shouldHardReload,
             displayCollisionMask: displayCollisionMaskInPreview,
+            displaySignalAnimations: displaySignalAnimationsInPreview,
             fullLoadingScreen: !!fullLoadingScreen,
             fallbackAuthor,
             authenticatedPlayer,
@@ -3349,6 +3355,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       previewState.overridenPreviewExternalLayoutName,
       previewState.previewExternalLayoutName,
       displayCollisionMaskInPreview,
+      displaySignalAnimationsInPreview,
       autosaveProjectIfNeeded,
       loadProjectFromSavedFileForPreview,
       authenticatedUser.profile,
@@ -6934,6 +6941,8 @@ const MainFrame = (props: Props): React.MixedElement => {
     setPreviewOverride: setPreviewOverride,
     displayCollisionMaskInPreview,
     setDisplayCollisionMaskInPreview,
+    displaySignalAnimationsInPreview,
+    setDisplaySignalAnimationsInPreview,
     openVersionHistoryPanel: openVersionHistoryPanel,
     onQuitVersionHistory: onQuitVersionHistory,
     onOpenAskAi: openAskAi,

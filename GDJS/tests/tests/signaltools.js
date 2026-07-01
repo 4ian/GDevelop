@@ -3,6 +3,7 @@
 describe('gdjs.evtTools.signal', () => {
   const signalCalls = [];
   const signalParameterCalls = [];
+  const signalReceiverIds = [];
 
   before(() => {
     const SignalTestRuntimeObject = class SignalTestRuntimeObject extends gdjs.TestRuntimeObject {
@@ -10,19 +11,19 @@ describe('gdjs.evtTools.signal', () => {
         const runtimeScene = this.getRuntimeScene();
         const signalNameFromContext =
           gdjs.evtTools.signal.getSignalName(runtimeScene);
-        const payloadFromContext = gdjs.evtTools.signal.getSignalPayloadNumber(
-          runtimeScene,
-          'value'
-        );
+        const payloadFromContext =
+          gdjs.evtTools.signal.getSignalPayloadString(runtimeScene);
         signalParameterCalls.push({
           receiver: this.getName(),
           signalName,
-          payload:
-            payload && payload.getType() === 'structure'
-              ? payload.getChild('value').getAsNumber()
-              : 0,
+          payload,
           emitterObjectName,
           emitterInstanceId,
+        });
+        signalReceiverIds.push({
+          receiver: this.getName(),
+          receiverId: this.getUniqueId(),
+          signalName,
         });
         signalCalls.push({
           receiver: this.getName(),
@@ -30,12 +31,10 @@ describe('gdjs.evtTools.signal', () => {
           payload: payloadFromContext,
         });
         if (signalNameFromContext === 'First') {
-          const nextPayload = new gdjs.Variable({ type: 'structure' });
-          nextPayload.getChild('value').setNumber(2);
           gdjs.evtTools.signal.emitSceneSignal(
             runtimeScene,
             'Second',
-            nextPayload,
+            '2',
             this
           );
         }
@@ -48,21 +47,22 @@ describe('gdjs.evtTools.signal', () => {
         signalParameterCalls.push({
           receiver: this.owner.getName() + '.' + this.getName(),
           signalName,
-          payload:
-            payload && payload.getType() === 'structure'
-              ? payload.getChild('value').getAsNumber()
-              : 0,
+          payload,
           emitterObjectName,
           emitterInstanceId,
+        });
+        signalReceiverIds.push({
+          receiver: this.owner.getName() + '.' + this.getName(),
+          receiverId: this.owner.getUniqueId(),
+          signalName,
         });
         signalCalls.push({
           receiver: this.owner.getName() + '.' + this.getName(),
           signalName: gdjs.evtTools.signal.getSignalName(
             this.owner.getRuntimeScene()
           ),
-          payload: gdjs.evtTools.signal.getSignalPayloadNumber(
-            this.owner.getRuntimeScene(),
-            'value'
+          payload: gdjs.evtTools.signal.getSignalPayloadString(
+            this.owner.getRuntimeScene()
           ),
         });
       }
@@ -73,6 +73,7 @@ describe('gdjs.evtTools.signal', () => {
   beforeEach(() => {
     signalCalls.length = 0;
     signalParameterCalls.length = 0;
+    signalReceiverIds.length = 0;
   });
 
   const createSignalRuntimeScene = () => {
@@ -99,10 +100,7 @@ describe('gdjs.evtTools.signal', () => {
     const runtimeScene = createSignalRuntimeScene();
 
     runtimeScene.renderAndStepWithEventsFunction(16, () => {
-      const payload = new gdjs.Variable({ type: 'structure' });
-      payload.getChild('value').setNumber(7);
-      gdjs.evtTools.signal.emitSceneSignal(runtimeScene, 'Ping', payload);
-      payload.getChild('value').setNumber(99);
+      gdjs.evtTools.signal.emitSceneSignal(runtimeScene, 'Ping', '7');
 
       expect(gdjs.evtTools.signal.isSignalReceived(runtimeScene, 'Ping')).to.be(
         false
@@ -114,33 +112,33 @@ describe('gdjs.evtTools.signal', () => {
       expect(gdjs.evtTools.signal.isSignalReceived(runtimeScene, 'Ping')).to.be(
         true
       );
+      expect(gdjs.evtTools.signal.getSignalPayloadNumber(runtimeScene)).to.be(
+        7
+      );
       signalCalls.push({
         receiver: 'scene',
         signalName: gdjs.evtTools.signal.getSignalName(runtimeScene),
-        payload: gdjs.evtTools.signal.getSignalPayloadNumber(
-          runtimeScene,
-          'value'
-        ),
+        payload: gdjs.evtTools.signal.getSignalPayloadString(runtimeScene),
       });
     });
 
     expect(signalCalls).to.eql([
-      { receiver: 'Receiver', signalName: 'Ping', payload: 7 },
-      { receiver: 'Receiver.Listener', signalName: 'Ping', payload: 7 },
-      { receiver: 'scene', signalName: 'Ping', payload: 7 },
+      { receiver: 'Receiver', signalName: 'Ping', payload: '7' },
+      { receiver: 'Receiver.Listener', signalName: 'Ping', payload: '7' },
+      { receiver: 'scene', signalName: 'Ping', payload: '7' },
     ]);
     expect(signalParameterCalls).to.eql([
       {
         receiver: 'Receiver',
         signalName: 'Ping',
-        payload: 7,
+        payload: '7',
         emitterObjectName: '',
         emitterInstanceId: -1,
       },
       {
         receiver: 'Receiver.Listener',
         signalName: 'Ping',
-        payload: 7,
+        payload: '7',
         emitterObjectName: '',
         emitterInstanceId: -1,
       },
@@ -196,21 +194,21 @@ describe('gdjs.evtTools.signal', () => {
     runtimeScene.renderAndStepWithEventsFunction(16, () => {});
 
     expect(signalCalls).to.eql([
-      { receiver: 'Receiver', signalName: 'NoPayload', payload: 0 },
-      { receiver: 'Receiver.Listener', signalName: 'NoPayload', payload: 0 },
+      { receiver: 'Receiver', signalName: 'NoPayload', payload: '' },
+      { receiver: 'Receiver.Listener', signalName: 'NoPayload', payload: '' },
     ]);
     expect(signalParameterCalls).to.eql([
       {
         receiver: 'Receiver',
         signalName: 'NoPayload',
-        payload: 0,
+        payload: '',
         emitterObjectName: '',
         emitterInstanceId: -1,
       },
       {
         receiver: 'Receiver.Listener',
         signalName: 'NoPayload',
-        payload: 0,
+        payload: '',
         emitterObjectName: '',
         emitterInstanceId: -1,
       },
@@ -252,14 +250,14 @@ describe('gdjs.evtTools.signal', () => {
       {
         receiver: 'Receiver',
         signalName: 'WithSender',
-        payload: 0,
+        payload: '',
         emitterObjectName: 'Emitter',
         emitterInstanceId: emitter.getUniqueId(),
       },
       {
         receiver: 'Receiver.Listener',
         signalName: 'WithSender',
-        payload: 0,
+        payload: '',
         emitterObjectName: 'Emitter',
         emitterInstanceId: emitter.getUniqueId(),
       },
@@ -270,9 +268,7 @@ describe('gdjs.evtTools.signal', () => {
     const runtimeScene = createSignalRuntimeScene();
 
     runtimeScene.renderAndStepWithEventsFunction(16, () => {
-      const payload = new gdjs.Variable({ type: 'structure' });
-      payload.getChild('value').setNumber(1);
-      gdjs.evtTools.signal.emitSceneSignal(runtimeScene, 'First', payload);
+      gdjs.evtTools.signal.emitSceneSignal(runtimeScene, 'First', '1');
     });
 
     runtimeScene.renderAndStepWithEventsFunction(16, () => {
@@ -282,10 +278,7 @@ describe('gdjs.evtTools.signal', () => {
       signalCalls.push({
         receiver: 'scene',
         signalName: gdjs.evtTools.signal.getSignalName(runtimeScene),
-        payload: gdjs.evtTools.signal.getSignalPayloadNumber(
-          runtimeScene,
-          'value'
-        ),
+        payload: gdjs.evtTools.signal.getSignalPayloadString(runtimeScene),
       });
 
       expect(
@@ -294,20 +287,17 @@ describe('gdjs.evtTools.signal', () => {
       signalCalls.push({
         receiver: 'scene',
         signalName: gdjs.evtTools.signal.getSignalName(runtimeScene),
-        payload: gdjs.evtTools.signal.getSignalPayloadNumber(
-          runtimeScene,
-          'value'
-        ),
+        payload: gdjs.evtTools.signal.getSignalPayloadString(runtimeScene),
       });
     });
 
     expect(signalCalls).to.eql([
-      { receiver: 'Receiver', signalName: 'First', payload: 1 },
-      { receiver: 'Receiver.Listener', signalName: 'First', payload: 1 },
-      { receiver: 'Receiver', signalName: 'Second', payload: 2 },
-      { receiver: 'Receiver.Listener', signalName: 'Second', payload: 2 },
-      { receiver: 'scene', signalName: 'First', payload: 1 },
-      { receiver: 'scene', signalName: 'Second', payload: 2 },
+      { receiver: 'Receiver', signalName: 'First', payload: '1' },
+      { receiver: 'Receiver.Listener', signalName: 'First', payload: '1' },
+      { receiver: 'Receiver', signalName: 'Second', payload: '2' },
+      { receiver: 'Receiver.Listener', signalName: 'Second', payload: '2' },
+      { receiver: 'scene', signalName: 'First', payload: '1' },
+      { receiver: 'scene', signalName: 'Second', payload: '2' },
     ]);
     expect(
       signalParameterCalls
@@ -322,13 +312,13 @@ describe('gdjs.evtTools.signal', () => {
       {
         receiver: 'Receiver',
         signalName: 'Second',
-        payload: 2,
+        payload: '2',
         emitterObjectName: 'Receiver',
       },
       {
         receiver: 'Receiver.Listener',
         signalName: 'Second',
-        payload: 2,
+        payload: '2',
         emitterObjectName: 'Receiver',
       },
     ]);
@@ -353,47 +343,80 @@ describe('gdjs.evtTools.signal', () => {
     runtimeScene._objectGroups.set('Receivers', ['Receiver', 'OtherReceiver']);
     runtimeScene.getSignalBus().refreshReceiverIndex(runtimeScene);
 
-    const objectPayload = new gdjs.Variable({ type: 'structure' });
-    objectPayload.getChild('value').setNumber(3);
     gdjs.evtTools.signal.emitSignalToObject(
       runtimeScene,
       'OtherReceiver',
       'ObjectOnly',
-      objectPayload
+      '3'
     );
 
-    const groupPayload = new gdjs.Variable({ type: 'structure' });
-    groupPayload.getChild('value').setNumber(4);
     gdjs.evtTools.signal.emitSignalToObjectGroup(
       runtimeScene,
       'Receivers',
       'Group',
-      groupPayload
+      '4'
     );
 
-    const behaviorPayload = new gdjs.Variable({ type: 'structure' });
-    behaviorPayload.getChild('value').setNumber(5);
     gdjs.evtTools.signal.emitSignalToBehavior(
       runtimeScene,
       'Receiver',
       'Listener',
       'BehaviorOnly',
-      behaviorPayload
+      '5'
     );
 
     runtimeScene.renderAndStepWithEventsFunction(16, () => {});
 
     expect(signalCalls).to.eql([
-      { receiver: 'OtherReceiver', signalName: 'ObjectOnly', payload: 3 },
-      { receiver: 'Receiver', signalName: 'Group', payload: 4 },
-      { receiver: 'Receiver.Listener', signalName: 'Group', payload: 4 },
-      { receiver: 'OtherReceiver', signalName: 'Group', payload: 4 },
+      { receiver: 'OtherReceiver', signalName: 'ObjectOnly', payload: '3' },
+      { receiver: 'Receiver', signalName: 'Group', payload: '4' },
+      { receiver: 'Receiver.Listener', signalName: 'Group', payload: '4' },
+      { receiver: 'OtherReceiver', signalName: 'Group', payload: '4' },
       {
         receiver: 'Receiver.Listener',
         signalName: 'BehaviorOnly',
-        payload: 5,
+        payload: '5',
       },
     ]);
+  });
+
+  it('targets one object instance by unique id', () => {
+    const runtimeScene = createSignalRuntimeScene();
+    const firstReceiver = runtimeScene.getObjects('Receiver')[0];
+    const secondReceiver = runtimeScene.createObject('Receiver');
+    const objectsLists = new Hashtable();
+    objectsLists.put('Receiver', []);
+
+    gdjs.evtTools.signal.emitSignalToObjectInstance(
+      runtimeScene,
+      objectsLists,
+      secondReceiver.getUniqueId(),
+      'InstanceOnly'
+    );
+
+    runtimeScene.renderAndStepWithEventsFunction(16, () => {});
+
+    expect(signalCalls).to.eql([
+      { receiver: 'Receiver', signalName: 'InstanceOnly', payload: '' },
+      { receiver: 'Receiver.Listener', signalName: 'InstanceOnly', payload: '' },
+    ]);
+    expect(signalReceiverIds).to.eql([
+      {
+        receiver: 'Receiver',
+        receiverId: secondReceiver.getUniqueId(),
+        signalName: 'InstanceOnly',
+      },
+      {
+        receiver: 'Receiver.Listener',
+        receiverId: secondReceiver.getUniqueId(),
+        signalName: 'InstanceOnly',
+      },
+    ]);
+    expect(
+      signalReceiverIds.some(
+        ({ receiverId }) => receiverId === firstReceiver.getUniqueId()
+      )
+    ).to.be(false);
   });
 
   it('drops deleted picked objects before dispatch', () => {
@@ -412,5 +435,95 @@ describe('gdjs.evtTools.signal', () => {
     runtimeScene.renderAndStepWithEventsFunction(16, () => {});
 
     expect(signalCalls.length).to.be(0);
+  });
+
+  it('records signal animation debug points only when enabled', () => {
+    const runtimeScene = createSignalRuntimeScene();
+    runtimeScene.registerObject({
+      name: 'Sender',
+      type: 'SignalTest::Object',
+      variables: [],
+      behaviors: [],
+      effects: [],
+    });
+    const sender = runtimeScene.createObject('Sender');
+    const receiver = runtimeScene.getObjects('Receiver')[0];
+    sender.setPosition(10, 20);
+    receiver.setPosition(90, 40);
+
+    gdjs.evtTools.signal.emitSignalToObject(
+      runtimeScene,
+      'Receiver',
+      'Pulse',
+      'payload',
+      sender
+    );
+    runtimeScene.renderAndStepWithEventsFunction(16, () => {});
+
+    expect(runtimeScene.getSignalBus().getSignalAnimationDebugRecords()).to.eql(
+      []
+    );
+
+    runtimeScene.enableSignalAnimationDebugDraw(true);
+    gdjs.evtTools.signal.emitSignalToObject(
+      runtimeScene,
+      'Receiver',
+      'Pulse',
+      'payload',
+      sender
+    );
+    runtimeScene.renderAndStepWithEventsFunction(16, () => {});
+
+    const records = runtimeScene.getSignalBus().getSignalAnimationDebugRecords();
+    expect(records.length).to.be(1);
+    expect(records[0].name).to.be('Pulse');
+    expect(records[0].source.objectName).to.be('Sender');
+    expect(records[0].source.objectId).to.be(sender.getUniqueId());
+    expect(records[0].receivers.map(({ receiverName }) => receiverName)).to.eql(
+      ['Receiver', 'Receiver.*(1)']
+    );
+    records[0].receivers.forEach(receiverRecord => {
+      expect(receiverRecord.objectName).to.be('Receiver');
+      expect(receiverRecord.objectId).to.be(receiver.getUniqueId());
+      expect(receiverRecord.x).to.be(receiver.getCenterXInScene());
+      expect(receiverRecord.y).to.be(receiver.getCenterYInScene());
+    });
+  });
+
+  it('records scene signal animations as scene receivers', () => {
+    const runtimeScene = createSignalRuntimeScene();
+    runtimeScene.registerObject({
+      name: 'Sender',
+      type: 'SignalTest::Object',
+      variables: [],
+      behaviors: [],
+      effects: [],
+    });
+    const sender = runtimeScene.createObject('Sender');
+    sender.setPosition(10, 20);
+    runtimeScene.getSignalBus().refreshReceiverIndex(runtimeScene);
+    runtimeScene.enableSignalAnimationDebugDraw(true);
+
+    gdjs.evtTools.signal.emitSceneSignal(
+      runtimeScene,
+      'ScenePulse',
+      'payload',
+      sender
+    );
+    runtimeScene.renderAndStepWithEventsFunction(16, () => {
+      const signal = gdjs.evtTools.signal.getDeliveredSignals(
+        runtimeScene,
+        'ScenePulse'
+      )[0];
+      gdjs.evtTools.signal.recordSceneSignalReceived(runtimeScene, signal);
+    });
+
+    const records = runtimeScene.getSignalBus().getSignalAnimationDebugRecords();
+    expect(records.length).to.be(1);
+    expect(records[0].name).to.be('ScenePulse');
+    expect(records[0].source.objectName).to.be('Sender');
+    expect(records[0].receivers.map(({ receiverName }) => receiverName)).to.eql(
+      ['scene']
+    );
   });
 });

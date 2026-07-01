@@ -22,6 +22,7 @@ namespace gdjs {
     > = null;
     _renderer: RuntimeSceneRenderer;
     _debuggerRenderer: gdjs.DebuggerRenderer;
+    _signalBus?: gdjs.SignalBus;
     _variables: gdjs.VariablesContainer;
     _variablesByExtensionName: Map<string, gdjs.VariablesContainer>;
     _runtimeGame: gdjs.RuntimeGame;
@@ -33,6 +34,7 @@ namespace gdjs {
     _resourcesUnloading: 'at-scene-exit' | 'never' | 'inherit' = 'inherit';
     private _asyncTasksManager = new gdjs.AsyncTasksManager();
     private _objectGroups = new Map<string, string[]>();
+    private _signalAnimationDebugDrawEnabled: boolean = false;
 
     /** True if loadFromScene was called and the scene is being played. */
     _isLoaded: boolean = false;
@@ -88,6 +90,10 @@ namespace gdjs {
         runtimeGame ? runtimeGame.getRenderer() : null
       );
       this._debuggerRenderer = new gdjs.DebuggerRenderer(this);
+      const displaySignalAnimations = runtimeGame
+        ? runtimeGame.getGameData().properties.displaySignalAnimations
+        : false;
+      this._signalAnimationDebugDrawEnabled = !!displaySignalAnimations;
 
       // What to do after the frame is rendered.
 
@@ -500,8 +506,36 @@ namespace gdjs {
           this._debugDrawShowCustomPoints
         );
       }
+      if (this._signalAnimationDebugDrawEnabled) {
+        const signalAnimationDebugRecords = this._signalBus
+          ? this._signalBus.getSignalAnimationDebugRecords()
+          : [];
+        this._debuggerRenderer.renderSignalDebugDraw(
+          signalAnimationDebugRecords
+        );
+      } else {
+        this._debuggerRenderer.clearSignalDebugDraw();
+      }
 
       this._renderer.render();
+    }
+
+    /**
+     * Activate or deactivate the debug visualization for signal delivery.
+     */
+    enableSignalAnimationDebugDraw(enableSignalAnimationDebugDraw: boolean) {
+      if (
+        this._signalAnimationDebugDrawEnabled &&
+        !enableSignalAnimationDebugDraw
+      ) {
+        this._debuggerRenderer.clearSignalDebugDraw();
+      }
+
+      this._signalAnimationDebugDrawEnabled = enableSignalAnimationDebugDraw;
+    }
+
+    isSignalAnimationDebugDrawEnabled(): boolean {
+      return this._signalAnimationDebugDrawEnabled;
     }
 
     /**

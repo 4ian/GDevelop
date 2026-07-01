@@ -49,6 +49,7 @@ import {
   inspectExtensionObject,
   inspectExtensionProperty,
   inspectPrefabPropertyBindings,
+  inspectSignalUsage,
   inspectProjectExtension,
   listProjectExtensions,
   lintExtensionFunctionEvents,
@@ -1958,6 +1959,275 @@ const getStringArg = (args: ?Object, names: Array<string>): ?string => {
   return null;
 };
 
+const getNonEmptyArg = (args: ?Object, names: Array<string>): ?any => {
+  if (!args) return null;
+  for (const name of names) {
+    const value = args[name];
+    if (typeof value === 'string' && value.trim()) return value;
+    if (typeof value === 'number' && Number.isFinite(value)) return value;
+  }
+  return null;
+};
+
+const getRequiredSignalArg = (
+  args: ?Object,
+  names: Array<string>,
+  label: string
+): any => {
+  const value = getNonEmptyArg(args, names);
+  if (value === null || value === undefined) {
+    throw new Error(`Missing ${label}.`);
+  }
+  return value;
+};
+
+const signalStringExpression = (value: any, label: string): string => {
+  if (value === null || value === undefined) {
+    throw new Error(`Missing ${label}.`);
+  }
+  const serialized = String(value).trim();
+  if (!serialized) throw new Error(`Missing ${label}.`);
+  if (/^".*"$/.test(serialized) || /[+()]/.test(serialized)) {
+    return serialized;
+  }
+  return JSON.stringify(serialized);
+};
+
+const optionalSignalStringExpression = (
+  args: ?Object,
+  names: Array<string>
+): ?string => {
+  const value = getNonEmptyArg(args, names);
+  if (value === null || value === undefined) return null;
+  return signalStringExpression(value, names[0]);
+};
+
+const normalizeSignalTargetKind = (targetKind: any): string => {
+  const normalized = String(targetKind || '')
+    .trim()
+    .toLowerCase()
+    .replace(/[-\s]+/g, '_');
+  if (normalized === 'picked' || normalized === 'picked_object') {
+    return 'picked_objects';
+  }
+  if (normalized === 'group') return 'object_group';
+  if (normalized === 'instance') return 'object_instance';
+  if (
+    normalized === 'scene' ||
+    normalized === 'object' ||
+    normalized === 'object_instance' ||
+    normalized === 'picked_objects' ||
+    normalized === 'object_group' ||
+    normalized === 'behavior'
+  ) {
+    return normalized;
+  }
+  throw new Error(
+    'target_kind must be scene, object, object_instance, picked_objects, object_group, or behavior.'
+  );
+};
+
+const buildSignalEmitAction = ({
+  project,
+  i18n,
+  args,
+}: {|
+  project: gdProject,
+  i18n?: any,
+  args: Object,
+|}): Object => {
+  const targetKind = normalizeSignalTargetKind(args && args.target_kind);
+  const signalName = signalStringExpression(
+    getRequiredSignalArg(args, ['signal_name', 'signalName'], 'signal_name'),
+    'signal_name'
+  );
+  const payload = optionalSignalStringExpression(args, [
+    'payload',
+    'payload_string',
+    'payloadString',
+  ]);
+  const emitterObject = getStringArg(args, [
+    'emitter_object',
+    'emitter_object_name',
+    'emitter',
+    'sender_object',
+    'sender_object_name',
+  ]);
+  let type = 'EmitSceneSignal';
+  const parameters: Object = {};
+  const setPayloadAndEmitter = (payloadIndex, emitterIndex) => {
+    if (payload !== null && payload !== undefined) {
+      parameters[String(payloadIndex)] = payload;
+    }
+    if (emitterObject) parameters[String(emitterIndex)] = emitterObject;
+  };
+
+  if (targetKind === 'scene') {
+    parameters['1'] = signalName;
+    setPayloadAndEmitter(2, 3);
+  } else if (targetKind === 'object') {
+    type = 'EmitSignalToObject';
+    parameters['1'] = String(
+      getRequiredSignalArg(
+        args,
+        ['object_name', 'target_object_name'],
+        'object_name'
+      )
+    );
+    parameters['2'] = signalName;
+    setPayloadAndEmitter(3, 4);
+  } else if (targetKind === 'object_instance') {
+    type = 'EmitSignalToObjectInstance';
+    parameters['1'] = String(
+      getRequiredSignalArg(
+        args,
+        ['object_name', 'objects', 'target_object_name'],
+        'object_name'
+      )
+    );
+    parameters['2'] = String(
+      getRequiredSignalArg(
+        args,
+        ['instance_id', 'instanceId', 'object_id', 'objectId'],
+        'instance_id'
+      )
+    );
+    parameters['3'] = signalName;
+    setPayloadAndEmitter(4, 5);
+  } else if (targetKind === 'picked_objects') {
+    type = 'EmitSignalToPickedObjects';
+    parameters['1'] = String(
+      getRequiredSignalArg(
+        args,
+        ['objects', 'object_name', 'target_object_name'],
+        'objects'
+      )
+    );
+    parameters['2'] = signalName;
+    setPayloadAndEmitter(3, 4);
+  } else if (targetKind === 'object_group') {
+    type = 'EmitSignalToObjectGroup';
+    parameters['1'] = String(
+      getRequiredSignalArg(
+        args,
+        ['object_group_name', 'group_name', 'target_group_name'],
+        'object_group_name'
+      )
+    );
+    parameters['2'] = signalName;
+    setPayloadAndEmitter(3, 4);
+  } else if (targetKind === 'behavior') {
+    type = 'EmitSignalToBehavior';
+    parameters['1'] = String(
+      getRequiredSignalArg(
+        args,
+        ['object_name', 'target_object_name'],
+        'object_name'
+      )
+    );
+    parameters['2'] = String(
+      getRequiredSignalArg(
+        args,
+        ['behavior_name', 'target_behavior_name'],
+        'behavior_name'
+      )
+    );
+    parameters['3'] = signalName;
+    setPayloadAndEmitter(4, 5);
+  }
+
+  const built = buildInstruction({
+    project,
+    i18n,
+    type,
+    kind: 'action',
+    parameters,
+  });
+  return {
+    ...built,
+    actionType: type,
+    targetKind,
+    signalNote:
+      'Drop instruction into an event actions array. Signal payload is a string expression; use ToString(...) for numeric values if needed.',
+  };
+};
+
+const buildSignalReceivedCondition = ({
+  project,
+  i18n,
+  args,
+}: {|
+  project: gdProject,
+  i18n?: any,
+  args: Object,
+|}): Object => {
+  const signalName = signalStringExpression(
+    getRequiredSignalArg(args, ['signal_name', 'signalName'], 'signal_name'),
+    'signal_name'
+  );
+  const built = buildInstruction({
+    project,
+    i18n,
+    type: 'SignalReceived',
+    kind: 'condition',
+    parameters: { '1': signalName },
+  });
+  return {
+    ...built,
+    conditionType: 'SignalReceived',
+    signalNote:
+      'Drop instruction into an event conditions array. Use SignalPayloadString(), SignalPayload(), SignalSenderObjectName(), or SignalSenderInstanceId() in this event/sub-events to read signal data.',
+  };
+};
+
+const createOrUpdateOnSignalFunction = (
+  project: gdProject,
+  args: Object
+): Object => {
+  const parentKind = String((args && args.parent_kind) || '')
+    .trim()
+    .toLowerCase();
+  if (parentKind !== 'object' && parentKind !== 'behavior') {
+    throw new Error('parent_kind must be object or behavior for onSignal.');
+  }
+  const signalArgs = {
+    ...(args || {}),
+    parent_kind: parentKind,
+    function_name: 'onSignal',
+    function_type: 'action',
+    sentence: '',
+  };
+  delete signalArgs.new_function_name;
+  delete signalArgs.parameters;
+  delete signalArgs.parameters_mode;
+  delete signalArgs.serialized_function;
+  const result = createOrUpdateExtensionFunction(project, signalArgs);
+  return {
+    ...result,
+    extensionName: args && args.extension_name,
+    parentKind,
+    parentName: args && args.parent_name,
+    functionName: 'onSignal',
+    signalSignature:
+      parentKind === 'behavior'
+        ? [
+            'Object',
+            'Behavior',
+            'SignalName',
+            'Payload',
+            'EmitterObjectName',
+            'EmitterInstanceId',
+          ]
+        : [
+            'Object',
+            'SignalName',
+            'Payload',
+            'EmitterObjectName',
+            'EmitterInstanceId',
+          ],
+  };
+};
+
 const getStaleStateTargetForTool = (
   toolName: string,
   args: ?Object,
@@ -1987,6 +2257,7 @@ const getStaleStateTargetForTool = (
 
   if (
     toolName === 'gdevelop_create_or_update_extension_function' ||
+    toolName === 'gdevelop_create_or_update_on_signal' ||
     toolName === 'patch_extension_event_instruction' ||
     toolName === 'replace_extension_function_events_from_file' ||
     (toolName === 'apply_validated_extension_patch' &&
@@ -3835,6 +4106,36 @@ const callMcpTool = async ({
     }
   }
 
+  if (toolName === 'create_signal_emit_action') {
+    if (!project) return errorResult('No project opened.');
+    try {
+      return textResult(
+        buildSignalEmitAction({
+          project,
+          i18n: context.i18n,
+          args: args || {},
+        })
+      );
+    } catch (error) {
+      return errorResult(error.message);
+    }
+  }
+
+  if (toolName === 'create_signal_received_condition') {
+    if (!project) return errorResult('No project opened.');
+    try {
+      return textResult(
+        buildSignalReceivedCondition({
+          project,
+          i18n: context.i18n,
+          args: args || {},
+        })
+      );
+    } catch (error) {
+      return errorResult(error.message);
+    }
+  }
+
   if (toolName === 'read_serialized_scene') {
     if (!project) return errorResult('No project opened.');
     try {
@@ -4237,6 +4538,15 @@ const callMcpTool = async ({
     }
   }
 
+  if (toolName === 'gdevelop_inspect_signal_usage') {
+    if (!project) return errorResult('No project opened.');
+    try {
+      return textResult(inspectSignalUsage(project, args || {}));
+    } catch (error) {
+      return errorResult(error.message);
+    }
+  }
+
   if (toolName === 'lint_scene_events') {
     if (!project) return errorResult('No project opened.');
     try {
@@ -4487,6 +4797,8 @@ const callMcpTool = async ({
     extensionWriteToolHandler = deleteExtension;
   } else if (toolName === 'gdevelop_create_or_update_extension_function') {
     extensionWriteToolHandler = createOrUpdateExtensionFunction;
+  } else if (toolName === 'gdevelop_create_or_update_on_signal') {
+    extensionWriteToolHandler = createOrUpdateOnSignalFunction;
   } else if (toolName === 'replace_extension_function_events_from_file') {
     extensionWriteToolHandler = replaceExtensionFunctionEventsFromFile;
   } else if (toolName === 'patch_extension_event_instruction') {
@@ -4538,7 +4850,10 @@ const callMcpTool = async ({
           args &&
           (getEventsJsonArgument(args) ||
             (args.serialized_function &&
-              typeof args.serialized_function === 'object')));
+              typeof args.serialized_function === 'object'))) ||
+        (toolName === 'gdevelop_create_or_update_on_signal' &&
+          args &&
+          getEventsJsonArgument(args));
       if (
         extensionFunctionEventsChanged &&
         !result.dryRun &&

@@ -55,6 +55,8 @@ const defaultProps: MainFrameToolbarProps = {
   onLaunchPreviewWithDiagnosticReport: async () => {},
   displayCollisionMaskInPreview: false,
   setDisplayCollisionMaskInPreview: () => {},
+  displaySignalAnimationsInPreview: false,
+  setDisplaySignalAnimationsInPreview: () => {},
   setPreviewOverride: () => {},
   canDoNetworkPreview: true,
   isPreviewEnabled: false,

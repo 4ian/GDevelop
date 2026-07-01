@@ -3437,6 +3437,118 @@ const bindChildSpriteResourcePropertySchema = {
   additionalProperties: true,
 };
 
+const signalEmitActionSchema = {
+  type: 'object',
+  properties: {
+    target_kind: {
+      type: 'string',
+      description:
+        'Signal target: scene, object, object_instance, picked_objects, object_group, or behavior.',
+    },
+    signal_name: {
+      type: 'string',
+      description:
+        'Signal name string expression. Bare names such as Attack are quoted automatically.',
+    },
+    payload: {
+      type: 'string',
+      description:
+        'Optional string payload expression. Bare text is quoted automatically; use ToString(...) for numeric data.',
+    },
+    emitter_object: {
+      type: 'string',
+      description:
+        'Optional picked object name to expose as EmitterObjectName / SignalSenderObjectName.',
+    },
+    object_name: {
+      type: 'string',
+      description:
+        'Target object name for object, object_instance, picked_objects, or behavior targets.',
+    },
+    objects: {
+      type: 'string',
+      description:
+        'Object list parameter for picked_objects or object_instance targets; alias for object_name.',
+    },
+    instance_id: {
+      description:
+        'Object instance id expression for object_instance targets, for example Enemy.UniqueId() or SignalSenderInstanceId().',
+    },
+    object_group_name: {
+      type: 'string',
+      description: 'Object group name for object_group targets.',
+    },
+    behavior_name: {
+      type: 'string',
+      description: 'Behavior instance name on object_name for behavior targets.',
+    },
+  },
+  required: ['target_kind', 'signal_name'],
+  additionalProperties: true,
+};
+
+const signalReceivedConditionSchema = {
+  type: 'object',
+  properties: {
+    signal_name: {
+      type: 'string',
+      description:
+        'Signal name string expression. Bare names such as Attack are quoted automatically.',
+    },
+  },
+  required: ['signal_name'],
+  additionalProperties: true,
+};
+
+const inspectSignalUsageSchema = {
+  type: 'object',
+  properties: {
+    signal_name: {
+      type: 'string',
+      description:
+        'Optional signal name filter for emit actions and Signal received conditions.',
+    },
+    scene_name: sceneNameSchema.properties.scene_name,
+    extension_name: extensionNameSchema.properties.extension_name,
+    parent_kind: extensionFunctionSchema.properties.parent_kind,
+    parent_name: extensionFunctionSchema.properties.parent_name,
+    function_name: extensionFunctionSchema.properties.function_name,
+    include_events: {
+      type: 'boolean',
+      description:
+        'When true, include onSignal handler events as text/json. Default false.',
+    },
+    include_serialized: {
+      type: 'boolean',
+      description:
+        'When true, include serialized matching events/functions. Default false.',
+    },
+    limit: {
+      type: 'number',
+      description: 'Maximum matches per section. Defaults to 100.',
+    },
+  },
+  additionalProperties: true,
+};
+
+const onSignalFunctionSchema = {
+  type: 'object',
+  properties: {
+    extension_name: extensionNameSchema.properties.extension_name,
+    parent_kind: {
+      type: 'string',
+      description:
+        'Receiver kind: object or behavior. onSignal is not a free extension function.',
+    },
+    parent_name: extensionFunctionSchema.properties.parent_name,
+    events_json: extensionFunctionSchema.properties.events_json,
+    dry_run: extensionFunctionSchema.properties.dry_run,
+    summary_only: extensionFunctionSchema.properties.summary_only,
+  },
+  required: ['extension_name', 'parent_kind', 'parent_name'],
+  additionalProperties: true,
+};
+
 const readTools: Array<McpTool> = [
   {
     name: 'gdevelop_get_editor_state',
@@ -3542,6 +3654,12 @@ const readTools: Array<McpTool> = [
     description:
       'Inspect an events-based behavior/object property inside a project-specific extension.',
     inputSchema: extensionPropertySchema,
+  },
+  {
+    name: 'gdevelop_inspect_signal_usage',
+    description:
+      'Inspect signal emit actions, scene Signal received conditions, and object/behavior onSignal handlers across the project, optionally filtered by signal name or extension scope.',
+    inputSchema: inspectSignalUsageSchema,
   },
   {
     name: 'validate_current_project_json',
@@ -3759,6 +3877,18 @@ const readTools: Array<McpTool> = [
       required: ['type'],
       additionalProperties: false,
     },
+  },
+  {
+    name: 'create_signal_emit_action',
+    description:
+      'Build a correctly-formed signal emit ACTION instruction JSON for scene, object, object_instance, picked_objects, object_group, or behavior targets. Handles hidden currentScene, signalName quoting, string payload, and optional emitter object parameter ordering.',
+    inputSchema: signalEmitActionSchema,
+  },
+  {
+    name: 'create_signal_received_condition',
+    description:
+      'Build a correctly-formed Signal received CONDITION instruction JSON. Handles hidden currentScene and signalName quoting.',
+    inputSchema: signalReceivedConditionSchema,
   },
   {
     name: 'inspect_tool_schema',
@@ -4517,6 +4647,12 @@ const writeTools: Array<McpTool> = [
     inputSchema: extensionFunctionSchema,
   },
   {
+    name: 'gdevelop_create_or_update_on_signal',
+    description:
+      'Create or update the reserved object/behavior onSignal lifecycle function in an extension. GDevelop maintains the fixed signal parameters: SignalName, Payload, EmitterObjectName, and EmitterInstanceId, plus Object/Behavior receiver parameters.',
+    inputSchema: onSignalFunctionSchema,
+  },
+  {
     name: 'apply_validated_extension_patch',
     description:
       'Apply a focused JSON patch inside one project extension, events-based object/behavior, function, or property descriptor. Uses a temporary extension copy for GDevelop unserialization and generated-code validation before touching the live extension.',
@@ -4620,6 +4756,45 @@ const toolUsageExamples: { [string]: Array<Object> } = {
       description:
         'List the curated tool categories before choosing a GDevelop MCP workflow.',
       arguments: {},
+    },
+  ],
+  create_signal_emit_action: [
+    {
+      description: 'Emit a scene signal with a string payload and sender.',
+      arguments: {
+        target_kind: 'scene',
+        signal_name: 'Attack',
+        payload: 'heavy',
+        emitter_object: 'Player',
+      },
+    },
+    {
+      description:
+        'Emit a reply to one object instance by id, using a signal expression as the target id.',
+      arguments: {
+        target_kind: 'object_instance',
+        object_name: 'Enemy',
+        instance_id: 'SignalSenderInstanceId()',
+        signal_name: 'Attack.Reply',
+        payload: 'Blocked',
+      },
+    },
+  ],
+  create_signal_received_condition: [
+    {
+      description: 'Create a scene-level signal received condition.',
+      arguments: {
+        signal_name: 'Attack',
+      },
+    },
+  ],
+  gdevelop_inspect_signal_usage: [
+    {
+      description:
+        'Find all emitters, scene receivers, and onSignal handlers for a signal name.',
+      arguments: {
+        signal_name: 'Attack',
+      },
     },
   ],
   set_project_properties: [
@@ -5548,6 +5723,25 @@ const toolUsageExamples: { [string]: Array<Object> } = {
       },
     },
   ],
+  gdevelop_create_or_update_on_signal: [
+    {
+      description:
+        'Create or update an events-based object onSignal lifecycle function while preserving the fixed signal parameters.',
+      arguments: {
+        extension_name: 'Cards',
+        parent_kind: 'object',
+        parent_name: 'CardSlot',
+        events_json: [
+          {
+            type: 'BuiltinCommonInstructions::Standard',
+            conditions: [],
+            actions: [],
+          },
+        ],
+        summary_only: true,
+      },
+    },
+  ],
   gdevelop_validate_extension_events_json: [
     {
       description:
@@ -6289,6 +6483,7 @@ export const getCapabilitiesSummary = (
       'find_scene_events',
       'find_extension_events',
       'find_project_events',
+      'gdevelop_inspect_signal_usage',
       'gdevelop_validate_extension_events_json',
       'lint_extension_function_events',
       'inspect_object_properties',
@@ -6328,6 +6523,8 @@ export const getCapabilitiesSummary = (
     'Author events': [
       'create_action',
       'create_condition',
+      'create_signal_emit_action',
+      'create_signal_received_condition',
       'add_scene_events',
       'patch_scene_event_instruction',
       'patch_extension_event_instruction',
@@ -6341,6 +6538,7 @@ export const getCapabilitiesSummary = (
       'lint_extension_function_events',
       'inspect_gameplay_rules',
       'create_group',
+      'gdevelop_create_or_update_on_signal',
     ],
     'Variables & scenes': [
       'add_or_edit_variable',

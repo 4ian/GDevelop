@@ -5422,6 +5422,162 @@ describe('McpEditorBridge', () => {
     }
   });
 
+  it('builds signal instructions with dedicated helpers', async () => {
+    // $FlowFixMe[invalid-constructor]
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    project.insertNewLayout('Level1', 0);
+    try {
+      const bridge = makeBridge({ getProject: () => project });
+
+      const emitSceneResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'create_signal_emit_action',
+          arguments: {
+            target_kind: 'scene',
+            signal_name: 'Attack',
+            payload: 'heavy',
+            emitter_object: 'Player',
+          },
+        },
+      });
+      const emitScene = JSON.parse(emitSceneResponse.content[0].text);
+      expect(emitSceneResponse.isError).not.toBe(true);
+      expect(emitScene.actionType).toBe('EmitSceneSignal');
+      expect(emitScene.instruction.parameters).toEqual([
+        '',
+        '"Attack"',
+        '"heavy"',
+        'Player',
+      ]);
+
+      const emitInstanceResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'create_signal_emit_action',
+          arguments: {
+            target_kind: 'object_instance',
+            object_name: 'Enemy',
+            instance_id: 'SignalSenderInstanceId()',
+            signal_name: 'Attack.Reply',
+            payload: 'Blocked',
+          },
+        },
+      });
+      const emitInstance = JSON.parse(emitInstanceResponse.content[0].text);
+      expect(emitInstanceResponse.isError).not.toBe(true);
+      expect(emitInstance.actionType).toBe('EmitSignalToObjectInstance');
+      expect(emitInstance.instruction.parameters).toEqual([
+        '',
+        'Enemy',
+        'SignalSenderInstanceId()',
+        '"Attack.Reply"',
+        '"Blocked"',
+        '',
+      ]);
+
+      const receiveResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'create_signal_received_condition',
+          arguments: {
+            signal_name: 'Attack',
+          },
+        },
+      });
+      const receive = JSON.parse(receiveResponse.content[0].text);
+      expect(receiveResponse.isError).not.toBe(true);
+      expect(receive.instruction.type.value).toBe('SignalReceived');
+      expect(receive.instruction.parameters).toEqual(['', '"Attack"']);
+
+      const genericSignalResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'create_action',
+          arguments: {
+            type: 'EmitSceneSignal',
+            parameters: { '1': 'Attack' },
+          },
+        },
+      });
+      const genericSignal = JSON.parse(genericSignalResponse.content[0].text);
+      expect(genericSignalResponse.isError).not.toBe(true);
+      expect(genericSignal.instruction.parameters[1]).toBe('"Attack"');
+    } finally {
+      project.delete();
+    }
+  });
+
+  it('creates object onSignal lifecycle functions through the dedicated tool', async () => {
+    // $FlowFixMe[invalid-constructor]
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    const extension = project.insertNewEventsFunctionsExtension(
+      'SignalExt',
+      0
+    );
+    extension.getEventsBasedObjects().insertNew('SignalReceiver', 0);
+
+    try {
+      const bridge = makeBridge({
+        getProject: () => project,
+        getPermissions: () => ({
+          allowWriteTools: true,
+          allowCommandTools: false,
+        }),
+      });
+
+      const response = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'gdevelop_create_or_update_on_signal',
+          arguments: {
+            extension_name: 'SignalExt',
+            parent_kind: 'object',
+            parent_name: 'SignalReceiver',
+            summary_only: true,
+          },
+        },
+      });
+      const result = JSON.parse(response.content[0].text);
+      expect(response.isError).not.toBe(true);
+      expect(result.functionName).toBe('onSignal');
+      expect(result.signalSignature).toEqual([
+        'Object',
+        'SignalName',
+        'Payload',
+        'EmitterObjectName',
+        'EmitterInstanceId',
+      ]);
+      expect(
+        result.function.parameters.map(parameter => parameter.name)
+      ).toEqual([
+        'Object',
+        'SignalName',
+        'Payload',
+        'EmitterObjectName',
+        'EmitterInstanceId',
+      ]);
+
+      const inspectResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'gdevelop_inspect_signal_usage',
+          arguments: {
+            extension_name: 'SignalExt',
+          },
+        },
+      });
+      const usage = JSON.parse(inspectResponse.content[0].text);
+      expect(inspectResponse.isError).not.toBe(true);
+      expect(usage.onSignalHandlers.totalMatches).toBe(1);
+      expect(usage.onSignalHandlers.handlers[0].parentName).toBe(
+        'SignalReceiver'
+      );
+    } finally {
+      project.delete();
+    }
+  });
+
   it('paints and reads a tilemap instance grid (set/get round-trip)', async () => {
     // $FlowFixMe[invalid-constructor]
     const project = new gd.ProjectHelper.createNewGDJSProject();

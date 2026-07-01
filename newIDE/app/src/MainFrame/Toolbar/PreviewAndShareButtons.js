@@ -22,6 +22,8 @@ export type PreviewAndShareButtonsProps = {|
   onLaunchPreviewWithDiagnosticReport: () => Promise<void>,
   displayCollisionMaskInPreview: boolean,
   setDisplayCollisionMaskInPreview: boolean => void,
+  displaySignalAnimationsInPreview: boolean,
+  setDisplaySignalAnimationsInPreview: boolean => void,
   setPreviewOverride: ({|
     isPreviewOverriden: boolean,
     overridenPreviewLayoutName: ?string,
@@ -44,6 +46,8 @@ const PreviewAndShareButtons: React.ComponentType<PreviewAndShareButtonsProps> =
     onLaunchPreviewWithDiagnosticReport,
     displayCollisionMaskInPreview,
     setDisplayCollisionMaskInPreview,
+    displaySignalAnimationsInPreview,
+    setDisplaySignalAnimationsInPreview,
     canDoNetworkPreview,
     isPreviewEnabled,
     hasPreviewsRunning,
@@ -112,6 +116,15 @@ const PreviewAndShareButtons: React.ComponentType<PreviewAndShareButtonsProps> =
                 !displayCollisionMaskInPreview
               ),
           },
+          {
+            type: 'checkbox',
+            label: i18n._(t`Display Signal Animations`),
+            checked: displaySignalAnimationsInPreview,
+            click: () =>
+              setDisplaySignalAnimationsInPreview(
+                !displaySignalAnimationsInPreview
+              ),
+          },
           { type: 'separator' },
           ...(previewState.overridenPreviewLayoutName
             ? [
@@ -171,6 +184,8 @@ const PreviewAndShareButtons: React.ComponentType<PreviewAndShareButtonsProps> =
         onLaunchPreviewWithDiagnosticReport,
         displayCollisionMaskInPreview,
         setDisplayCollisionMaskInPreview,
+        displaySignalAnimationsInPreview,
+        setDisplaySignalAnimationsInPreview,
         previewState.overridenPreviewLayoutName,
         previewState.overridenPreviewExternalLayoutName,
         previewState.isPreviewOverriden,

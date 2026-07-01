@@ -34,6 +34,8 @@ SceneExtension::SceneExtension() {
       "gdjs.evtTools.signal.emitSceneSignal");
   GetAllActions()["EmitSignalToObject"].SetFunctionName(
       "gdjs.evtTools.signal.emitSignalToObject");
+  GetAllActions()["EmitSignalToObjectInstance"].SetFunctionName(
+      "gdjs.evtTools.signal.emitSignalToObjectInstance");
   GetAllActions()["EmitSignalToPickedObjects"].SetFunctionName(
       "gdjs.evtTools.signal.emitSignalToPickedObjects");
   GetAllActions()["EmitSignalToObjectGroup"].SetFunctionName(

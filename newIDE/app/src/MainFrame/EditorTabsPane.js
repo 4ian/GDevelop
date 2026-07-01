@@ -139,6 +139,8 @@ export type EditorTabsPaneCommonProps = {|
   launchPreviewWithDiagnosticReport: () => Promise<void>,
   displayCollisionMaskInPreview: boolean,
   setDisplayCollisionMaskInPreview: boolean => void,
+  displaySignalAnimationsInPreview: boolean,
+  setDisplaySignalAnimationsInPreview: boolean => void,
   setPreviewOverride: (override: {|
     isPreviewOverriden: boolean,
     overridenPreviewLayoutName: ?string,
@@ -349,6 +351,8 @@ const EditorTabsPane: React.ComponentType<{
     launchPreviewWithDiagnosticReport,
     displayCollisionMaskInPreview,
     setDisplayCollisionMaskInPreview,
+    displaySignalAnimationsInPreview,
+    setDisplaySignalAnimationsInPreview,
     setPreviewOverride,
     openVersionHistoryPanel,
     onQuitVersionHistory,
@@ -727,6 +731,10 @@ const EditorTabsPane: React.ComponentType<{
         onLaunchPreviewWithDiagnosticReport={launchPreviewWithDiagnosticReport}
         displayCollisionMaskInPreview={displayCollisionMaskInPreview}
         setDisplayCollisionMaskInPreview={setDisplayCollisionMaskInPreview}
+        displaySignalAnimationsInPreview={displaySignalAnimationsInPreview}
+        setDisplaySignalAnimationsInPreview={
+          setDisplaySignalAnimationsInPreview
+        }
         canDoNetworkPreview={canDoNetworkPreview}
         setPreviewOverride={setPreviewOverride}
         isPreviewEnabled={

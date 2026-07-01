@@ -158,6 +158,12 @@ const PoppedOutEditorContainerWindow = (props: Props): React.Node => {
                     setDisplayCollisionMaskInPreview={
                       props.setDisplayCollisionMaskInPreview
                     }
+                    displaySignalAnimationsInPreview={
+                      props.displaySignalAnimationsInPreview
+                    }
+                    setDisplaySignalAnimationsInPreview={
+                      props.setDisplaySignalAnimationsInPreview
+                    }
                     canDoNetworkPreview={props.canDoNetworkPreview}
                     setPreviewOverride={props.setPreviewOverride}
                     isPreviewEnabled={

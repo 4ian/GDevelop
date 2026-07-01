@@ -39,6 +39,7 @@ describe('McpToolCatalog', () => {
     expect(toolNames).toContain('find_scene_events');
     expect(toolNames).toContain('find_extension_events');
     expect(toolNames).toContain('find_project_events');
+    expect(toolNames).toContain('gdevelop_inspect_signal_usage');
     expect(toolNames).toContain('validate_events_json_file');
     expect(toolNames).toContain('gdevelop_validate_extension_events_json');
     expect(toolNames).toContain('lint_scene_events');
@@ -63,6 +64,8 @@ describe('McpToolCatalog', () => {
     expect(toolNames).toContain('gdevelop_capabilities');
     expect(toolNames).toContain('create_action');
     expect(toolNames).toContain('create_condition');
+    expect(toolNames).toContain('create_signal_emit_action');
+    expect(toolNames).toContain('create_signal_received_condition');
     expect(toolNames).not.toContain('create_scene');
     expect(toolNames).not.toContain('gdevelop_create_or_update_extension');
     expect(toolNames).not.toContain('gdevelop_run_command');
@@ -128,6 +131,7 @@ describe('McpToolCatalog', () => {
     expect(toolNames).toContain('sync_editor_from_validated_project_json');
     expect(toolNames).toContain('gdevelop_create_or_update_extension');
     expect(toolNames).toContain('gdevelop_create_or_update_extension_function');
+    expect(toolNames).toContain('gdevelop_create_or_update_on_signal');
     expect(toolNames).toContain('replace_extension_function_events_from_file');
     expect(toolNames).toContain('apply_validated_extension_patch');
     expect(toolNames).toContain('gdevelop_create_or_update_extension_behavior');
@@ -183,6 +187,9 @@ describe('McpToolCatalog', () => {
     expect(isWriteTool('gdevelop_validate_extension_events_json')).toBe(false);
     expect(isWriteTool('lint_scene_events')).toBe(false);
     expect(isWriteTool('lint_extension_function_events')).toBe(false);
+    expect(isWriteTool('gdevelop_inspect_signal_usage')).toBe(false);
+    expect(isWriteTool('create_signal_emit_action')).toBe(false);
+    expect(isWriteTool('create_signal_received_condition')).toBe(false);
     expect(isWriteTool('validate_current_project_json')).toBe(false);
     expect(isWriteTool('inspect_custom_object_runtime_geometry')).toBe(false);
     expect(isWriteTool('inspect_prefab_property_bindings')).toBe(false);
@@ -195,6 +202,7 @@ describe('McpToolCatalog', () => {
     expect(isWriteTool('apply_validated_extension_patch')).toBe(true);
     expect(isWriteTool('bind_child_sprite_resource_property')).toBe(true);
     expect(isWriteTool('gdevelop_extract_prefab_from_object')).toBe(true);
+    expect(isWriteTool('gdevelop_create_or_update_on_signal')).toBe(true);
     expect(isWriteTool('read_scene_events')).toBe(false);
     expect(isWriteTool('gdevelop_list_extensions')).toBe(false);
     expect(isCommandTool('gdevelop_run_command')).toBe(true);
@@ -209,6 +217,9 @@ describe('McpToolCatalog', () => {
     expect(isKnownMcpTool('save_and_relaunch_preview_paused')).toBe(true);
     expect(isKnownMcpTool('find_extension_events')).toBe(true);
     expect(isKnownMcpTool('find_project_events')).toBe(true);
+    expect(isKnownMcpTool('gdevelop_inspect_signal_usage')).toBe(true);
+    expect(isKnownMcpTool('create_signal_emit_action')).toBe(true);
+    expect(isKnownMcpTool('create_signal_received_condition')).toBe(true);
     expect(isCommandTool('gdevelop_save_project_and_wait')).toBe(true);
     expect(isKnownMcpTool('totally_unknown_tool')).toBe(false);
   });
@@ -293,6 +304,18 @@ describe('McpToolCatalog', () => {
       getMcpToolUsageExamples('gdevelop_validate_extension_events_json')
         .gdevelop_validate_extension_events_json.length
     ).toBeGreaterThan(0);
+    expect(
+      getMcpToolUsageExamples('create_signal_emit_action')
+        .create_signal_emit_action[0].arguments.target_kind
+    ).toBe('scene');
+    expect(
+      getMcpToolUsageExamples('create_signal_received_condition')
+        .create_signal_received_condition[0].arguments.signal_name
+    ).toBe('Attack');
+    expect(
+      getMcpToolUsageExamples('gdevelop_create_or_update_on_signal')
+        .gdevelop_create_or_update_on_signal[0].arguments.parent_kind
+    ).toBe('object');
     expect(
       getMcpToolUsageExamples('gdevelop_create_or_update_extension_property')
         .gdevelop_create_or_update_extension_property[0].arguments.property_type

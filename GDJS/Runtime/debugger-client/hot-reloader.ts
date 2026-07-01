@@ -538,6 +538,20 @@ namespace gdjs {
           );
         });
       }
+      const wasDisplaySignalAnimationsEnabled =
+        !!oldProjectData.properties.displaySignalAnimations;
+      const isDisplaySignalAnimationsEnabled =
+        !!newProjectData.properties.displaySignalAnimations;
+      if (
+        wasDisplaySignalAnimationsEnabled !==
+        isDisplaySignalAnimationsEnabled
+      ) {
+        sceneStack._stack.forEach((runtimeScene) => {
+          runtimeScene.enableSignalAnimationDebugDraw(
+            isDisplaySignalAnimationsEnabled
+          );
+        });
+      }
       this._hotReloadVariablesContainer(
         oldProjectData.variables,
         newProjectData.variables,

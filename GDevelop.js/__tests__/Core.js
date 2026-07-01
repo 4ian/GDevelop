@@ -3763,7 +3763,7 @@ describe('libGD.js', function () {
       fs.delete();
     });
 
-    it('should serialize collision mask display for preview', function () {
+    it('should serialize preview debug display options', function () {
       const fs = new gd.AbstractFileSystemJS();
       const project = gd.ProjectHelper.createNewGDJSProject();
       const projectDataElement = new gd.SerializerElement();
@@ -3785,6 +3785,7 @@ describe('libGD.js', function () {
         '/path/for/export/'
       );
       previewExportOptions.setDisplayCollisionMask(true);
+      previewExportOptions.setDisplaySignalAnimations(true);
 
       exporter.serializeProjectData(
         project,
@@ -3793,6 +3794,7 @@ describe('libGD.js', function () {
       );
       const projectData = JSON.parse(gd.Serializer.toJSON(projectDataElement));
       expect(projectData.properties.displayCollisionMask).toBe(true);
+      expect(projectData.properties.displaySignalAnimations).toBe(true);
 
       previewExportOptions.delete();
       exporter.delete();
@@ -3801,7 +3803,7 @@ describe('libGD.js', function () {
       fs.delete();
     });
 
-    it('should export collision mask display in preview project data', function () {
+    it('should export preview debug display options in preview project data', function () {
       const fs = new gd.AbstractFileSystemJS();
       const project = gd.ProjectHelper.createNewGDJSProject();
       project.insertNewLayout('Scene', 0);
@@ -3857,9 +3859,11 @@ describe('libGD.js', function () {
         '/path/for/export/'
       );
       previewExportOptions.setDisplayCollisionMask(true);
+      previewExportOptions.setDisplaySignalAnimations(true);
 
       exporter.exportProjectForPixiPreview(previewExportOptions);
       expect(exportedProjectData.properties.displayCollisionMask).toBe(true);
+      expect(exportedProjectData.properties.displaySignalAnimations).toBe(true);
 
       previewExportOptions.delete();
       exporter.delete();

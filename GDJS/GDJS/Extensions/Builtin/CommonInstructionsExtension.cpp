@@ -198,6 +198,8 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
               "signalsForEvent" + signalIteratorId;
           const gd::String signalIndexName =
               "signalIndex" + signalIteratorId;
+          const std::size_t signalNameParameterIndex =
+              signalReceivedCondition->GetParameters().size() > 1 ? 1 : 0;
           const gd::String signalNameCode =
               gd::ExpressionCodeGenerator::GenerateExpressionCode(
                   codeGenerator,
@@ -205,7 +207,8 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
                   "string",
                   signalReceivedCondition->GetParameters().empty()
                       ? ""
-                      : signalReceivedCondition->GetParameter(0)
+                      : signalReceivedCondition
+                            ->GetParameter(signalNameParameterIndex)
                             .GetPlainString());
 
           outputCode += "const " + signalsListName +

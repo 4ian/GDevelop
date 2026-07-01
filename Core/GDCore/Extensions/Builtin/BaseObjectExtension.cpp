@@ -2092,6 +2092,13 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                        "res/conditions/text_black.png")
       .AddParameter("object", _("Object"));
 
+  obj.AddExpression("UniqueId",
+                    _("Object unique id"),
+                    _("Return the unique id of the object instance"),
+                    "",
+                    "res/actions/texte.png")
+      .AddParameter("object", _("Object"));
+
   obj.AddStrExpression("Layer",
                        _("Object layer"),
                        _("Return the name of the layer the object is on"),

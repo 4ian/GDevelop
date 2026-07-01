@@ -2126,7 +2126,7 @@ namespace gdjs {
      */
     signalBehaviorsOnSignal(
       signalName: string,
-      payload: gdjs.Variable,
+      payload: string,
       emitterObjectName: string,
       emitterInstanceId: integer,
       behaviorName?: string
@@ -2142,7 +2142,7 @@ namespace gdjs {
         }
         behavior.onSignal(
           signalName,
-          payload.clone(),
+          payload,
           emitterObjectName,
           emitterInstanceId
         );

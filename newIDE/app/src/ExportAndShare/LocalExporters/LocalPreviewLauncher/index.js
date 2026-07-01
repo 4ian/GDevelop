@@ -339,6 +339,9 @@ export default class LocalPreviewLauncher extends React.Component<
     previewExportOptions.setDisplayCollisionMask(
       previewOptions.displayCollisionMask
     );
+    previewExportOptions.setDisplaySignalAnimations(
+      previewOptions.displaySignalAnimations
+    );
     previewExportOptions.setFullLoadingScreen(previewOptions.fullLoadingScreen);
     previewExportOptions.setGDevelopVersionWithHash(getIDEVersionWithHash());
     previewExportOptions.setCrashReportUploadLevel(

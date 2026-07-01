@@ -65,7 +65,7 @@ These work, but they have drawbacks:
 The signal system provides explicit message passing:
 
 ```text
-Emit signal "Health.Damaged" with payload { amount: 10 }
+Emit signal "Health.Damaged" with payload "10"
 Receive signal "Health.Damaged" in interested scene / custom-object / behavior logic
 ```
 
@@ -164,6 +164,7 @@ type SignalName = string;
 type SignalTarget =
   | { kind: 'scene' }
   | { kind: 'object'; objectName: string }
+  | { kind: 'objectInstance'; objectNames: string[]; objectId: number }
   | { kind: 'objectGroup'; objectGroupName: string }
   | { kind: 'pickedObjects'; pickedObjects: gdjs.LongLivedObjectsList }
   | { kind: 'behavior'; objectName: string; behaviorName: string };
@@ -176,7 +177,7 @@ type RuntimeSignal = {
     objectName?: string;
     objectId?: number;
   } | null;
-  payload: gdjs.Variable | null; // deep-cloned at emit time (section 6)
+  payload: string; // empty when omitted
   emittedFrameId: number;
   deliveredFrameId: number | null;
 };
@@ -320,7 +321,16 @@ Emit signal "Health.Damaged" to picked Enemy instances
 
 This is the only place current picking matters: when the instruction explicitly
 says "picked instances". The captured instances are held safely across the
-one-frame dispatch gap (§13.4).
+one-frame dispatch gap.
+
+An object instance signal targets one concrete instance by its unique instance
+id. The target object parameter resolves to one or more object names, but the
+runtime dispatches only to the live instance whose `getUniqueId()` matches:
+
+```text
+Emit signal "Health.Damaged" to instance Enemy.UniqueId() of Enemy
+```
+
 
 ### 5.3 Object group signal
 
@@ -340,7 +350,7 @@ A custom object receives signals through its `onSignal` handler:
 ```text
 CardSlot prefab, onSignal:
   if SignalName = "Card.DragStarted"
-    if Payload.cardId = AcceptedCardId
+    if Payload = AcceptedCardId
       highlight slot
 ```
 
@@ -354,7 +364,7 @@ A behavior receives signals for its owner through its `onSignal` handler:
 ```text
 Health behavior, onSignal:
   if SignalName = "Damage.Apply"
-    subtract Payload.amount from Object health
+    subtract SignalPayload() from Object health
     emit "Health.Damaged"
     if health <= 0 emit "Health.Depleted"
 ```
@@ -370,61 +380,45 @@ dispatch.
 
 Payload shape:
 
-- at runtime: a root `gdjs.Variable` or `null`,
-- in event actions: an optional `variable` parameter named "Payload variable"
-  and an optional sender object parameter named "Emitter object",
-- in generated/runtime code: either a `gdjs.Variable` or
-  `gdjs.VariablesContainer` can be passed to the runtime helper; containers are
-  copied into a root structure variable.
+- at runtime: a string,
+- in event actions: an optional `string` parameter named "Payload" and an
+  optional sender object parameter named "Emitter object",
+- in generated/runtime code: a string is passed to the runtime helper. Legacy
+  variable inputs are converted to their string value for compatibility.
 
 Example payload:
 
-```json
-{
-  "amount": 10,
-  "damageType": "Fire",
-  "sourceObjectId": 123
-}
+```text
+"10"
+"Fire"
+"cardId=7"
 ```
 
 The payload is read through expressions, resolved against the current-signal
 context during any handler or matching scene condition:
 
 ```text
-SignalName()                       -> "Health.Damaged"
-SignalPayload("amount")            -> 10
-SignalPayloadString("damageType")  -> "Fire"
-SignalSenderObjectName()           -> "Zombie"
-SignalSenderInstanceId()           -> 17
+SignalName()             -> "Health.Damaged"
+SignalPayload()          -> 10
+SignalPayloadString()    -> "Fire"
+SignalSenderObjectName() -> "Zombie"
+SignalSenderInstanceId() -> 17
 ```
 
-Inside `onSignal`, the same payload is also available as the visible `Payload`
-function parameter. The dispatcher passes a clone to each receiver. When no
-payload was emitted, the direct `Payload` parameter is an empty structure
-variable and the `SignalPayload...` expressions return neutral values.
+Inside `onSignal`, the same payload is also available as the visible string
+`Payload` function parameter. When no payload was emitted, `Payload` is `""` and
+the `SignalPayload...` expressions return neutral values.
 
 ### Copy semantics
 
-The payload is deep-copied at emit time with `gdjs.Variable.prototype.clone()`
-(`GDJS/Runtime/variable.ts:433`), which recursively clones structure children and
-array items (`variable.ts:127`). The bus stores the clone, and direct
-`onSignal` payload parameters are cloned again per receiver, so a receiver never
-shares mutable state with the emitter or with another receiver:
+Payloads are immutable strings. The bus stores the emitted string value, so
+receivers do not share mutable payload state with the emitter or with each other.
 
-```text
-Emitter changes payload variable after emitting
-Receiver still sees the emitted value, not the later mutation
-```
+### Structured data
 
-Shallow copies and shared references are forbidden: structural sharing across the
-deferred dispatch gap reintroduces exactly the hidden-mutation bug this design
-exists to prevent. Clone cost is bounded by the "keep payloads small" rule below.
-
-### Nested structures
-
-Nested payloads are supported. `clone()` handles structures and arrays and
-`gdjs.VariablesContainer` stores them natively, so `payload.source.objectName` is
-valid. The guardrail is size and frequency, not depth.
+Nested payloads are not modeled by the signal system. Authors who need
+structured payloads can encode them as text, for example with a compact
+delimiter format or JSON text handled by project-specific JavaScript.
 
 ### Payload size
 
@@ -433,7 +427,9 @@ Payloads are notifications, not data stores.
 Good:
 
 ```text
-{ amount: 10, damageType: "Fire" }
+"10"
+"Fire"
+"cardId=7"
 ```
 
 Bad:
@@ -492,7 +488,7 @@ signal dispatch context:
 
 ```text
 Signal received "Health.Damaged"
-  Do something with SignalPayload("amount")
+  Do something with SignalPayload()
 ```
 
 This means "the dispatcher is currently delivering this signal" — not "the last
@@ -552,7 +548,7 @@ parameters:
 
 ```text
 SignalName          signalName  The delivered signal name.
-Payload             variable    A per-receiver clone of the delivered payload.
+Payload             string      The delivered payload text.
 EmitterObjectName   string      The sender object name, or "" when none is set.
 EmitterInstanceId   expression  The sender unique id, or -1 when none is set.
 ```
@@ -580,8 +576,8 @@ Visible signal parameters:
 
 Also readable via expressions while the handler runs:
   SignalName()              -> string
-  SignalPayload(key)        -> number
-  SignalPayloadString(key)  -> string
+  SignalPayload()           -> number
+  SignalPayloadString()     -> string
   SignalSenderObjectName()  -> string
   SignalSenderInstanceId()  -> number
 ```
@@ -616,18 +612,20 @@ Action names are explicit and always use the word "signal":
 ```text
 Emit scene signal
 Emit signal to object
+Emit signal to object instance
 Emit signal to picked objects
 Emit signal to object group
 Emit signal to behavior
 ```
 
-Each action takes an optional "Payload variable" parameter. Authors can pass a
-scene, object, behavior or function-parameter variable; the runtime deep-clones
-it when the signal is queued. Each action also takes an optional "Emitter
-object" parameter. When it is set, the first object in the picked emitter list
-becomes the sender exposed by `EmitterObjectName`, `EmitterInstanceId`,
-`SignalSenderObjectName()` and `SignalSenderInstanceId()`. Vague names
-(`Trigger event`, `Call event`, `Send message`) are avoided.
+Each action takes an optional string "Payload" parameter. Each action also takes
+an optional "Emitter object" parameter. When it is set, the first object in the
+picked emitter list becomes the sender exposed by `EmitterObjectName`,
+`EmitterInstanceId`, `SignalSenderObjectName()` and `SignalSenderInstanceId()`.
+Vague names (`Trigger event`, `Call event`, `Send message`) are avoided.
+
+The object-instance action's instance id can come from an object's `UniqueId()`
+expression or from `SignalSenderInstanceId()` when replying to a sender.
 
 ### 9.2 Condition
 
@@ -645,8 +643,8 @@ Signal name
 
 ```text
 SignalName()
-SignalPayload(key)
-SignalPayloadString(key)
+SignalPayload()
+SignalPayloadString()
 SignalSenderObjectName()
 SignalSenderInstanceId()
 ```
@@ -729,7 +727,7 @@ class SignalBus {
 Responsibilities:
 
 - store pending signals and assign signal IDs,
-- deep-copy payloads at emit,
+- store payload text,
 - resolve target instances,
 - set the current-signal context, invoke `onSignal` receivers, publish the
   frame's delivered list for scene conditions, clear the context,
@@ -748,11 +746,12 @@ runtime fact:
 
 Two targeted paths:
 
-**Targeted signals (object, group, picked, behavior).** Resolve through the
+**Targeted signals (object, object instance, group, picked, behavior).** Resolve through the
 scene's existing per-name instance lists (the lists `getObjects(name)` / picking
 already use). Only addressed instances are iterated. A group expands to its
 member object names via the group definition (§5.3), then the same per-name
-lists.
+lists. An object-instance target additionally checks the requested unique
+instance id before dispatching.
 
 **Scene broadcasts.** At scene load, build a receiver index once:
 
@@ -783,7 +782,7 @@ runtimeScene._currentSignal = signal;   // set once per delivered signal
 if (runtimeObject.onSignal) {
   runtimeObject.onSignal(
     signal.name,
-    clonedPayloadForThisReceiver,
+    signal.payload,
     senderObjectName,
     senderInstanceId
   );
@@ -793,7 +792,7 @@ if (runtimeObject.onSignal) {
 // optional behavior-name targeting stay centralized:
 runtimeObject.signalBehaviorsOnSignal(
   signal.name,
-  clonedPayloadForThisReceiver,
+  signal.payload,
   senderObjectName,
   senderInstanceId,
   optionalBehaviorName
@@ -831,14 +830,15 @@ non-renamable and hides it from the action/condition list automatically.
 ```ts
 gdjs.evtTools.signal.emitSceneSignal(runtimeScene, name, payload)
 gdjs.evtTools.signal.emitSignalToObject(runtimeScene, objectNameOrObjectsLists, name, payload)
+gdjs.evtTools.signal.emitSignalToObjectInstance(runtimeScene, objectsLists, instanceId, name, payload)
 gdjs.evtTools.signal.emitSignalToPickedObjects(runtimeScene, objectsLists, name, payload)
 gdjs.evtTools.signal.emitSignalToObjectGroup(runtimeScene, objectGroupName, name, payload)
 gdjs.evtTools.signal.emitSignalToBehavior(runtimeScene, objectName, behaviorName, name, payload)
 
 gdjs.evtTools.signal.isSignalReceived(runtimeScene, name)  // "Signal received" condition
 gdjs.evtTools.signal.getSignalName(runtimeScene)
-gdjs.evtTools.signal.getSignalPayloadNumber(runtimeScene, key)
-gdjs.evtTools.signal.getSignalPayloadString(runtimeScene, key)
+gdjs.evtTools.signal.getSignalPayloadNumber(runtimeScene)
+gdjs.evtTools.signal.getSignalPayloadString(runtimeScene)
 gdjs.evtTools.signal.getSignalSenderObjectName(runtimeScene)
 gdjs.evtTools.signal.getSignalSenderInstanceId(runtimeScene)
 ```
@@ -910,7 +910,7 @@ Signals this frame
   #102 Health.Damaged
     sender: Zombie#17
     target: PeaShooter#4
-    payload: { amount: 10 }
+    payload: "10"
     receivers:
       PeaShooter.Health.onSignal
       PeaShooter prefab onSignal
@@ -947,8 +947,9 @@ signalReceiverObjectNames:   Set<string>
 signalReceiverBehaviorTypes: Set<string>
 ```
 
-This is O(relevant instances). Targeted signals (object/group/picked/behavior)
-never scan at all; they use the scene's existing per-name instance lists.
+This is O(relevant instances). Targeted signals
+(object/object-instance/group/picked/behavior) never scan the whole scene; they
+use the scene's existing per-name instance lists.
 
 ### 13.2 No per-frame signal spam
 
@@ -967,10 +968,10 @@ Store position in object state.
 Emit a signal only for meaningful transitions.
 ```
 
-### 13.3 Payload copy cost
+### 13.3 Payload size
 
-Deep-copying payloads is required for safety (§6) and costs memory and time. Keep
-payloads small so the clone is cheap.
+Payload strings are cheap, but they should still stay small. Signals are
+notifications, not a transport for large serialized state.
 
 ### 13.4 Deletion safety
 
@@ -1035,20 +1036,18 @@ Signal names are free strings, entered through the single `signalName` parameter
 type (§9.6). This gives consistent autocomplete and a single attachment point for
 project-wide name discovery, without constraining authors to a fixed list.
 
-### 14.4 Payload input - an optional variable parameter
+### 14.4 Payload input - an optional string parameter
 
-Emit actions take an optional payload variable. This avoids a new payload editor
-and uses the existing variable picker/editor model: authors prepare a variable
-with the fields they need, pass it to the emit action, and the bus deep-clones
-it at emit (section 6). They also take an optional emitter object list so signal
-receivers can identify the sender. Nested structures and arrays are authorable
-with no new UI.
+Emit actions take an optional payload string. This keeps the action lightweight:
+authors can pass a literal, a string expression or encoded text. They also take
+an optional emitter object list so signal receivers can identify the sender.
 
-### 14.5 Nested payloads — supported
+### 14.5 Structured payloads
 
-`gdjs.Variable.prototype.clone()` deep-copies structures and arrays (§6), so
-nesting is supported. The guardrail is size and frequency (§13.2, §13.3), not
-depth.
+Structured payloads are encoded by the project, not modeled by the signal
+system. Authors can pass compact text, JSON text or identifiers that receivers
+resolve from their own state. The guardrail is size and frequency (section 13.2,
+section 13.3), not parser choice.
 
 ### 14.6 Immediate dispatch — not in the model
 
@@ -1103,13 +1102,13 @@ lifecycle handlers, and the scene "Signal received" condition.
 - Load-time receiver index for broadcasts; per-name lists for targeted signals
   (§10.3).
 - `longLivedObjectsList`-based capture for picked-instance targets (§13.4).
-- Payload deep-copied at emit (§6).
+- Payload stored as string text (section 6).
 
 ### 15.2 Event tools, actions, condition, expressions
 
 - `gdjs.evtTools.signal.*` runtime helpers (§11.2).
-- Emit actions: scene, object, picked objects, object group, behavior, with
-  optional payload and emitter object parameters (§9.1).
+- Emit actions: scene, object, object instance, picked objects, object group,
+  behavior, with optional payload and emitter object parameters (section 9.1).
 - "Signal received" condition (§9.2, §11.3).
 - `SignalName` / `SignalPayload` / `SignalPayloadString` / `SignalSenderObjectName`
   / `SignalSenderInstanceId` expressions (§9.3).
@@ -1127,7 +1126,7 @@ lifecycle handlers, and the scene "Signal received" condition.
 - Runtime base-method declarations for `onSignal` on `runtimebehavior.ts` and
   `customruntimeobject.ts`.
 - The dispatcher's per-instance invocation site passes the fixed signal
-  arguments and a per-receiver payload clone (section 10.4).
+  arguments, including the payload string (section 10.4).
 - newIDE: lifecycle icon and method-selector entries for `onSignal`.
 
 ### 15.4 Debugger
@@ -1139,8 +1138,8 @@ lifecycle handlers, and the scene "Signal received" condition.
 
 ```text
 Scene event action (frame N):
-  gdjs.evtTools.signal.emitSceneSignal(runtimeScene, "Game.Paused", payload)
-    -> bus.emit(signal)   // deep-copies payload, assigns id, enqueues
+  gdjs.evtTools.signal.emitSceneSignal(runtimeScene, "Game.Paused", payloadText)
+    -> bus.emit(signal)   // stores payload text, assigns id, enqueues
 
 Pre-events callback (frame N+1), before _eventsFunction:
   runtimeScene.getSignalBus().dispatchQueuedSignals(runtimeScene)
@@ -1151,7 +1150,6 @@ SignalBus.dispatchQueuedSignals:
     set current-signal context
     call matching custom object onSignal(SignalName, Payload, EmitterObjectName, EmitterInstanceId)
     call matching behavior onSignal(SignalName, Payload, EmitterObjectName, EmitterInstanceId)
-      // Payload is cloned per receiver.
     clear current-signal context
 
 _eventsFunction(this):
@@ -1182,7 +1180,7 @@ Signals announce what happened.
 Receivers react on the next frame in a deterministic, isolated phase.
 ```
 
-Signals are queued, scene-local notifications with copied payloads, delivered at
+Signals are queued, scene-local notifications with string payloads, delivered at
 the pre-events seam to three receiver kinds: custom object `onSignal`, behavior
 `onSignal`, and the scene "Signal received" condition. `onSignal` receives fixed
 signal data parameters while the scene condition reads the same delivered signal

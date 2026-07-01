@@ -415,6 +415,14 @@ export default (React.forwardRef<Props, VariableFieldInterface>(
       projectScopedContainersAccessor,
       isObjectVariable
     );
+    const isWritingToProperty =
+      !!value &&
+      !!parameterMetadata &&
+      parameterMetadata.getType() === 'variableOrProperty' &&
+      getVariableSourceFromIdentifier(
+        value,
+        projectScopedContainersAccessor.get()
+      ) === gd.VariablesContainer.Properties;
 
     const errorText =
       quicklyAnalysisResult === VariableNameQuickAnalyzeResults.WRONG_QUOTE ? (
@@ -461,9 +469,11 @@ export default (React.forwardRef<Props, VariableFieldInterface>(
         <Trans>Properties can't have children.</Trans>
       ) : null;
     const warningTranslatableText =
-      !forceDeclaration &&
-      quicklyAnalysisResult ===
-        VariableNameQuickAnalyzeResults.UNDECLARED_VARIABLE
+      isWritingToProperty
+        ? t`Writing to properties from events is deprecated. Use object variables or behavior variables to store values that change at runtime.`
+        : !forceDeclaration &&
+          quicklyAnalysisResult ===
+            VariableNameQuickAnalyzeResults.UNDECLARED_VARIABLE
         ? t`This variable is not declared. It's recommended to use the *variables editor* to add it.`
         : !forceDeclaration &&
           quicklyAnalysisResult ===

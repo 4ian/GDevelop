@@ -2508,10 +2508,11 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
                                         "variableOrPropertyOrParameter");
       node->Visit(validator);
       REQUIRE(validator.GetAllErrors().size() == 0);
+      REQUIRE(validator.GetDeprecationWarnings().size() == 0);
     }
   }
 
-  SECTION("Valid property (in variableOrProperty parameter)") {
+  SECTION("Deprecated property write (in variableOrProperty parameter)") {
     {
       gd::PropertiesContainer propertiesContainer(
           gd::EventsFunctionsContainer::Extension);
@@ -2530,6 +2531,11 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
                                         "variableOrProperty");
       node->Visit(validator);
       REQUIRE(validator.GetAllErrors().size() == 0);
+      REQUIRE(validator.GetDeprecationWarnings().size() == 1);
+      REQUIRE(validator.GetDeprecationWarnings()[0]->GetMessage() ==
+              "Writing to properties from events is deprecated. Use object "
+              "variables or behavior variables to store values that change at "
+              "runtime.");
     }
   }
 

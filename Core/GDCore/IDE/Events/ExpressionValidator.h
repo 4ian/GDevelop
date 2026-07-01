@@ -446,14 +446,23 @@ private:
                   _("This variable has the same name as a property. Consider "
                     "renaming one or the other."),
                   location, name);
-            } else if (hasChild) {
-              const gd::NamedPropertyDescriptor &property =
-                  projectScopedContainers.GetPropertiesContainersList()
-                      .Get(name)
-                      .second;
-              if (property.GetType() != "JsonObject") {
-                RaiseMalformedVariableParameter(
-                    _("Properties can't have children."), location, name);
+            } else {
+              if (parentType == Type::VariableOrProperty) {
+                RaiseDeprecationWarning(
+                    _("Writing to properties from events is deprecated. Use "
+                      "object variables or behavior variables to store values "
+                      "that change at runtime."),
+                    location);
+              }
+              if (hasChild) {
+                const gd::NamedPropertyDescriptor &property =
+                    projectScopedContainers.GetPropertiesContainersList()
+                        .Get(name)
+                        .second;
+                if (property.GetType() != "JsonObject") {
+                  RaiseMalformedVariableParameter(
+                      _("Properties can't have children."), location, name);
+                }
               }
             }
           },
@@ -633,6 +642,15 @@ private:
                           const ExpressionParserLocation &location) {
     RaiseError(gd::ExpressionParserError::ErrorType::InvalidOperator, message,
                location);
+  }
+
+  void RaiseDeprecationWarning(const gd::String &message,
+                               const ExpressionParserLocation &location) {
+    auto diagnostic = gd::make_unique<ExpressionParserError>(
+        gd::ExpressionParserError::ErrorType::DeprecatedExpression, message,
+        location);
+    deprecationWarnings.push_back(diagnostic.get());
+    supplementalErrors.push_back(std::move(diagnostic));
   }
 
   void ReadChildTypeFromVariable(gd::Variable::Type variableType) {

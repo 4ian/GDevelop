@@ -16,6 +16,7 @@ import {
 import { type AskAiEditorInterface } from '../../AiGeneration/AskAiEditorContainer';
 import { type HTMLDataset } from '../../Utils/HTMLDataset';
 import { CustomObjectEditorContainer } from '../EditorContainers/CustomObjectEditorContainer';
+import { TimelineEditorContainer } from '../EditorContainers/TimelineEditorContainer';
 
 // Supported editors
 type EditorRef =
@@ -26,6 +27,7 @@ type EditorRef =
   | ExternalLayoutEditorContainer
   | ResourcesEditorContainer
   | SceneEditorContainer
+  | TimelineEditorContainer
   | HomePageEditorInterface
   | AskAiEditorInterface;
 
@@ -38,6 +40,7 @@ export type EditorKind =
   | 'external events'
   | 'events functions extension'
   | 'custom object'
+  | 'timeline'
   | 'debugger'
   | 'resources'
   | 'global-search'

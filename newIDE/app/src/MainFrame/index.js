@@ -63,6 +63,7 @@ import { renderSceneEditorContainer } from './EditorContainers/SceneEditorContai
 import { renderExternalLayoutEditorContainer } from './EditorContainers/ExternalLayoutEditorContainer';
 import { renderEventsFunctionsExtensionEditorContainer } from './EditorContainers/EventsFunctionsExtensionEditorContainer';
 import { renderCustomObjectEditorContainer } from './EditorContainers/CustomObjectEditorContainer';
+import { renderTimelineEditorContainer } from './EditorContainers/TimelineEditorContainer';
 import { renderHomePageContainer } from './EditorContainers/HomePage';
 import { type OpenAskAiOptions } from '../AiGeneration/Utils';
 import { exceptionallyGuardAgainstDeadObject } from '../Utils/IsNullPtr';
@@ -233,8 +234,10 @@ import {
   readProjectSettings,
   type ResourceCustomPropertyConfig,
 } from '../Utils/ProjectSettingsReader';
+import { getTimelineByIdOrName } from '../TimelineEditor/TimelineProjectStorage';
 import useNpmScriptRunner from './NpmScriptRunner/useNpmScriptRunner';
 import { applyProjectPreferences } from '../Utils/ApplyProjectPreferences';
+import AIEditorBridge from '../AIEditorBridge';
 import {
   EmbeddedGameFrame,
   setEditorHotReloadNeeded,
@@ -244,6 +247,7 @@ import useHomePageSwitch from './useHomePageSwitch';
 import { useNavigationToEvent } from './UseNavigationToEvent';
 import useNavigateFromGlobalSearch from './UseNavigateFromGlobalSearch';
 import RobotIcon from '../ProjectCreation/RobotIcon';
+import TimelineIcon from '@material-ui/icons/Timeline';
 import PublicProfileContext from '../Profile/PublicProfileContext';
 import { useGamesPlatformFrame } from './EditorContainers/HomePage/PlaySection/UseGamesPlatformFrame';
 import { useExtensionLoadErrorDialog } from '../Utils/UseExtensionLoadErrorDialog';
@@ -279,6 +283,7 @@ const editorKindToRenderer: {
   'external layout': renderExternalLayoutEditorContainer,
   'events functions extension': renderEventsFunctionsExtensionEditorContainer,
   'custom object': renderCustomObjectEditorContainer,
+  timeline: renderTimelineEditorContainer,
   'start page': renderHomePageContainer,
   resources: renderResourcesEditorContainer,
   'global-search': renderGlobalEventsSearchEditorContainer,
@@ -747,6 +752,10 @@ const MainFrame = (props: Props): React.MixedElement => {
       paneIdentifier?: 'left' | 'center' | 'right',
       continueProcessingFunctionCallsOnMount?: boolean,
     }) => {
+      const timeline =
+        kind === 'timeline' && project
+          ? getTimelineByIdOrName(project, name)
+          : null;
       const label =
         kind === 'resources'
           ? i18n._(t`Resources`)
@@ -758,6 +767,10 @@ const MainFrame = (props: Props): React.MixedElement => {
           ? undefined
           : kind === 'debugger'
           ? i18n._(t`Debugger`)
+          : kind === 'timeline'
+          ? timeline
+            ? timeline.name
+            : name
           : kind === 'layout events'
           ? name + ` ${i18n._(t`(Events)`)}`
           : kind === 'custom object'
@@ -778,6 +791,7 @@ const MainFrame = (props: Props): React.MixedElement => {
         'external layout',
         'events functions extension',
         'custom object',
+        'timeline',
       ].includes(kind)
         ? `${kind} ${name}`
         : kind;
@@ -816,6 +830,8 @@ const MainFrame = (props: Props): React.MixedElement => {
         ) : kind === 'events functions extension' ||
           kind === 'custom object' ? (
           <ExtensionIcon />
+        ) : kind === 'timeline' ? (
+          <TimelineIcon style={{ fontSize: 18 }} />
         ) : kind === 'ask-ai' ? (
           <RobotIcon size={16} />
         ) : null;
@@ -2986,6 +3002,24 @@ const MainFrame = (props: Props): React.MixedElement => {
           state.editorTabs,
           // $FlowFixMe[incompatible-type]
           getEditorOpeningOptions({ kind: 'resources', name: '' })
+        ),
+      }));
+    },
+    [getEditorOpeningOptions, setState]
+  );
+
+  const openTimeline = React.useCallback(
+    (name: string) => {
+      setState(state => ({
+        ...state,
+        editorTabs: openEditorTab(
+          state.editorTabs,
+          // $FlowFixMe[incompatible-type]
+          getEditorOpeningOptions({
+            kind: 'timeline',
+            name,
+            project: state.currentProject,
+          })
         ),
       }));
     },
@@ -5514,6 +5548,7 @@ const MainFrame = (props: Props): React.MixedElement => {
           onRenameExternalLayout={renameExternalLayout}
           onRenameEventsFunctionsExtension={renameEventsFunctionsExtension}
           onRenameExternalEvents={renameExternalEvents}
+          onOpenTimeline={openTimeline}
           onOpenResources={openResources}
           onReloadEventsFunctionsExtensions={onReloadEventsFunctionsExtensions}
           onWillInstallExtension={onWillInstallExtension}
@@ -5949,6 +5984,26 @@ const MainFrame = (props: Props): React.MixedElement => {
           onClose={() => setMemoryTrackedRegistryDialogOpen(false)}
         />
       )}
+      <AIEditorBridge
+        project={currentProject}
+        currentFileMetadata={currentFileMetadata}
+        editorTabs={state.editorTabs}
+        hasUnsavedChanges={hasUnsavedChanges}
+        unsavedChanges={unsavedChanges}
+        previewState={{
+          hasNonEditionPreviewsRunning,
+          nonEditionPreviewsCount,
+          gameHotReloadLogs,
+          editorHotReloadLogs,
+          editorUncaughtError,
+        }}
+        onSceneEventsModifiedOutsideEditor={onSceneEventsModifiedOutsideEditor}
+        onInstancesModifiedOutsideEditor={onInstancesModifiedOutsideEditor}
+        onObjectsModifiedOutsideEditor={onObjectsModifiedOutsideEditor}
+        onNewResourcesAdded={onNewResourcesAdded}
+        onSave={saveProject}
+        onLaunchPreview={launchPreview}
+      />
       <CustomDragLayer />
     </div>
   );

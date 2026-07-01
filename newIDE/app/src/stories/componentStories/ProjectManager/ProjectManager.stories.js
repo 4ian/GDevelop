@@ -62,6 +62,7 @@ export const NoProjectOpen = (): React.Node => {
                   onOpenEventsFunctionsExtension={action(
                     'onOpenEventsFunctionsExtension'
                   )}
+                  onOpenTimeline={action('onOpenTimeline')}
                   onSceneAdded={action('onSceneAdded')}
                   onExternalLayoutAdded={action('onExternalLayoutAdded')}
                   onDeleteLayout={action('onDeleteLayout')}
@@ -138,6 +139,7 @@ export const ProjectOpen = (): React.Node => {
                   onOpenEventsFunctionsExtension={action(
                     'onOpenEventsFunctionsExtension'
                   )}
+                  onOpenTimeline={action('onOpenTimeline')}
                   onSceneAdded={action('onSceneAdded')}
                   onExternalLayoutAdded={action('onExternalLayoutAdded')}
                   onDeleteLayout={action('onDeleteLayout')}

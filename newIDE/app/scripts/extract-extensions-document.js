@@ -3,6 +3,7 @@
  * Launch this script to generate a list (in markdown format) of all custom extensions.
  */
 
+// @ts-ignore - libGD.js is an Emscripten-generated file downloaded at install time.
 const initializeGDevelopJs = require('../public/libGD.js');
 const fs = require('fs').promises;
 const { default: axios } = require('axios');

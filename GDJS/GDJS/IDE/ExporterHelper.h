@@ -46,6 +46,7 @@ struct PreviewExportOptions {
         fullLoadingScreen(false),
         isDevelopmentEnvironment(false),
         isInGameEdition(false),
+        transparentRuntimeBackground(false),
         nonRuntimeScriptsCacheBurst(0),
         inAppTutorialMessageInPreview(""),
         inAppTutorialMessagePositionInPreview(""),
@@ -235,6 +236,16 @@ struct PreviewExportOptions {
   }
 
   /**
+   * \brief Set if the preview should render the game with a transparent
+   * background. This is useful when the Electron preview window is itself
+   * created with native transparency.
+   */
+  PreviewExportOptions &SetTransparentRuntimeBackground(bool enable) {
+    transparentRuntimeBackground = enable;
+    return *this;
+  }
+
+  /**
    * \brief Set the JSON string representation of the in-game editor settings.
    */
   PreviewExportOptions &SetInGameEditorSettingsJson(const gd::String &inGameEditorSettingsJson_) {
@@ -398,6 +409,7 @@ struct PreviewExportOptions {
   bool fullLoadingScreen;
   bool isDevelopmentEnvironment;
   bool isInGameEdition;
+  bool transparentRuntimeBackground;
   gd::String editorId;
   gd::String editorCamera3DCameraMode;
   gd::String inGameEditorSettingsJson;
@@ -432,7 +444,12 @@ struct ExportOptions {
         exportPath(exportPath_),
         target(""),
         fallbackAuthorId(""),
-        fallbackAuthorUsername("") {};
+        fallbackAuthorUsername(""),
+        electronTransparentWindow(false),
+        electronFramelessWindow(false),
+        electronDisableWindowShadow(false),
+        electronTransparentRuntimeBackground(false),
+        electronDisableHardwareAcceleration(false) {};
 
   /**
    * \brief Set the fallback author info (if info not present in project
@@ -456,11 +473,61 @@ struct ExportOptions {
     return *this;
   }
 
+  /**
+   * \brief Set whether Electron exports should create a transparent native
+   * window.
+   */
+  ExportOptions &SetElectronTransparentWindow(bool enable) {
+    electronTransparentWindow = enable;
+    return *this;
+  }
+
+  /**
+   * \brief Set whether Electron exports should create a frameless native
+   * window.
+   */
+  ExportOptions &SetElectronFramelessWindow(bool enable) {
+    electronFramelessWindow = enable;
+    return *this;
+  }
+
+  /**
+   * \brief Set whether Electron exports should disable the native window
+   * shadow.
+   */
+  ExportOptions &SetElectronDisableWindowShadow(bool enable) {
+    electronDisableWindowShadow = enable;
+    return *this;
+  }
+
+  /**
+   * \brief Set whether Electron exports should render the GDJS background with
+   * transparency.
+   */
+  ExportOptions &SetElectronTransparentRuntimeBackground(bool enable) {
+    electronTransparentRuntimeBackground = enable;
+    return *this;
+  }
+
+  /**
+   * \brief Set whether Electron exports should disable hardware acceleration at
+   * application startup.
+   */
+  ExportOptions &SetElectronDisableHardwareAcceleration(bool enable) {
+    electronDisableHardwareAcceleration = enable;
+    return *this;
+  }
+
   gd::Project &project;
   gd::String exportPath;
   gd::String target;
   gd::String fallbackAuthorUsername;
   gd::String fallbackAuthorId;
+  bool electronTransparentWindow;
+  bool electronFramelessWindow;
+  bool electronDisableWindowShadow;
+  bool electronTransparentRuntimeBackground;
+  bool electronDisableHardwareAcceleration;
 };
 
 /**
@@ -622,7 +689,8 @@ class ExporterHelper {
                        const std::vector<gd::String> &includesFiles,
                        const std::vector<gd::SourceFileMetadata> &sourceFiles,
                        unsigned int nonRuntimeScriptsCacheBurst,
-                       gd::String additionalSpec = "");
+                       gd::String additionalSpec = "",
+                       bool transparentBackground = false);
 
   /**
    * \brief Replace the annotations in a index.html file by the specified
@@ -644,7 +712,8 @@ class ExporterHelper {
                          gd::String exportDir,
                          const std::vector<gd::String> &includesFiles,
                          unsigned int nonRuntimeScriptsCacheBurst,
-                         gd::String additionalSpec);
+                         gd::String additionalSpec,
+                         bool transparentBackground = false);
 
   /**
    * \brief Generates a WebManifest, a metadata file that allow to make the
@@ -675,7 +744,8 @@ class ExporterHelper {
    */
   bool ExportElectronFiles(const gd::Project &project,
                            gd::String exportDir,
-                           std::set<gd::String> usedExtensions);
+                           std::set<gd::String> usedExtensions,
+                           const ExportOptions &options);
 
   /**
    * \brief Generate the Build Resources files for Electron (mainly for the

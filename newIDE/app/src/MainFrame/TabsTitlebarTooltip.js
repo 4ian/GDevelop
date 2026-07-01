@@ -21,6 +21,7 @@ const editorKindToLabel: { [kind: EditorKind]: React.Node } = {
   'external events': <Trans>External events</Trans>,
   'events functions extension': <Trans>Extension</Trans>,
   'custom object': <Trans>Object</Trans>,
+  timeline: <Trans>Timeline</Trans>,
   debugger: <Trans>Debugger</Trans>,
   resources: <Trans>Resources</Trans>,
   'global-search': <Trans>Global search</Trans>,
@@ -89,6 +90,7 @@ const TabsTitlebarTooltip = ({
       'external layout',
       'external events',
       'events functions extension',
+      'timeline',
     ].includes(editorTab.kind)
   ) {
     title = editorTab.projectItemName;

@@ -962,7 +962,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
 
     const searchBarRef = React.useRef<?CompactSearchBarInterface>(null);
 
-    const selectAndScrollToItemFromId = React.useCallback(
+    const selectAndScrollToTreeViewItemFromId = React.useCallback(
       (itemId: string): ?TreeViewItem => {
         const i18n = i18nRef.current;
         const getTreeViewData = getTreeViewDataRef.current;
@@ -999,9 +999,11 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       focusSearchBar: () => {
         if (searchBarRef.current) searchBarRef.current.focus();
       },
-      selectAndScrollToItemFromId,
+      selectAndScrollToItemFromId: (itemId: string) => {
+        selectAndScrollToTreeViewItemFromId(itemId);
+      },
       activateItemFromId: (itemId: string) => {
-        const item = selectAndScrollToItemFromId(itemId);
+        const item = selectAndScrollToTreeViewItemFromId(itemId);
         if (item) item.content.onClick();
       },
     }));

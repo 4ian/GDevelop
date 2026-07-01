@@ -519,7 +519,6 @@ const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
       onRenameProperty,
       onOpenConfiguration,
       onOpenProperty,
-      onEventsFunctionsAdded,
       hideConfigurationItem,
     },
     ref
@@ -868,7 +867,6 @@ const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
               onOpenProperty,
               onPropertiesUpdated,
               onRenameProperty,
-              onEventsFunctionsAdded,
             }
           : null,
       [
@@ -891,7 +889,6 @@ const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
         onOpenProperty,
         onPropertiesUpdated,
         onRenameProperty,
-        onEventsFunctionsAdded,
       ]
     );
 

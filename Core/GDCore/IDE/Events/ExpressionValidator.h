@@ -215,7 +215,8 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
   }
   void OnVisitVariableNode(VariableNode& node) override {
     ReportAnyError(node);
-    rootVariableName = "";
+    parentVariable = nullptr;
+    variableChildDepth = 0;
 
     if (parentType == Type::Variable ||
         parentType == Type::VariableOrProperty ||
@@ -226,11 +227,16 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
           node.location, node.name, node.child != nullptr);
       if (node.child) {
         if (isRootVariableDeclared) {
-          rootVariableName = node.name;
-          rootVariableLocation = node.nameLocation;
+          const auto &variable =
+              projectScopedContainers.GetVariablesContainersList().Get(
+                  node.name);
+          if (node.child) {
+            parentVariable = &variable;
+          } else {
+            ValidateLastChildVariable(variable, node.location);
+          }
         }
         node.child->Visit(*this);
-        rootVariableName = "";
       }
     } else if (parentType == Type::ObjectVariable) {
       childType = parentType;
@@ -269,8 +275,14 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
           forbidsUsageOfBracketsBecauseParentIsObject = true;
         }, [&]() {
           // This is a variable.
-          rootVariableName = node.name;
-          rootVariableLocation = node.nameLocation;
+          const auto &variable =
+              projectScopedContainers.GetVariablesContainersList().Get(
+                  node.name);
+          if (node.child) {
+            parentVariable = &variable;
+          } else {
+            ValidateLastChildVariable(variable, node.location);
+          }
         }, [&]() {
           // This is a property.
           // Being in this node implies that there is at least a child - which is not supported for properties.
@@ -309,13 +321,48 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
       ValidateObjectVariableOrVariableOrProperty(
           variableObjectName, variableObjectNameLocation, node.name,
           node.nameLocation, true);
+
+      const auto &objectsContainersList =
+          projectScopedContainers.GetObjectsContainersList();
+      auto variableExistence =
+          objectsContainersList.HasObjectOrGroupWithVariableNamed(
+              variableObjectName, node.name);
+      if (variableExistence == gd::ObjectsContainersList::Exists) {
+        const auto &childVariable =
+            objectsContainersList
+                .GetObjectOrGroupVariablesContainer(variableObjectName)
+                ->Get(node.name);
+        if (node.child) {
+          parentVariable = &childVariable;
+        } else {
+          ValidateLastChildVariable(childVariable, node.nameLocation);
+          parentVariable = nullptr;
+          variableChildDepth = 0;
+        }
+      } else {
+        parentVariable = nullptr;
+        variableChildDepth = 0;
+      }
       variableObjectName = "";
-    } else if (!rootVariableName.empty()) {
-      ValidateObjectVariableOrVariableOrProperty(
-          rootVariableName, rootVariableLocation, node.name, node.nameLocation,
-          !node.child);
+    } else if (parentVariable) {
+      const bool isChildVariableDeclared = ValidateChildVariable(
+          *parentVariable, node.name, node.nameLocation, false);
+      if (isChildVariableDeclared) {
+        const auto &childVariable = parentVariable->GetChild(node.name);
+        if (node.child) {
+          parentVariable = &childVariable;
+          variableChildDepth++;
+        } else {
+          ValidateLastChildVariable(childVariable, node.nameLocation);
+          parentVariable = nullptr;
+          variableChildDepth = 0;
+        }
+      }
+      else {
+        parentVariable = nullptr;
+        variableChildDepth = 0;
+      }
     }
-    rootVariableName = "";
     // In the case we accessed an object variable (`MyObject.MyVariable`),
     // brackets can now be used (`MyObject.MyVariable["MyChildVariable"]` is now valid).
     forbidsUsageOfBracketsBecauseParentIsObject = false;
@@ -328,8 +375,9 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
       VariableBracketAccessorNode& node) override {
     ReportAnyError(node);
 
-    rootVariableName = "";
     variableObjectName = "";
+    parentVariable = nullptr;
+    variableChildDepth = 0;
     if (forbidsUsageOfBracketsBecauseParentIsObject) {
       RaiseError(gd::ExpressionParserError::ErrorType::BracketsNotAllowedForObjects,
                  _("You can't use the brackets to access an object variable. "
@@ -457,6 +505,13 @@ private:
       const gd::String &childIdentifierName,
       const gd::ExpressionParserLocation childIdentifierNameLocation,
       const bool hasChild);
+  bool ValidateChildVariable(
+      const gd::Variable &parentVariable, const gd::String &childVariableName,
+      const gd::ExpressionParserLocation childNameLocation,
+      const bool isUndeclaredVariableFatal);
+  void ValidateLastChildVariable(
+    const gd::Variable &lastChildVariable,
+    const gd::ExpressionParserLocation childNameLocation);
 
   bool CheckVariableExistence(const ExpressionParserLocation &location,
                               const gd::String &name, bool hasChild) {
@@ -625,8 +680,8 @@ private:
   bool forbidsUsageOfBracketsBecauseParentIsObject;
   gd::String variableObjectName;
   gd::ExpressionParserLocation variableObjectNameLocation;
-  gd::String rootVariableName;
-  gd::ExpressionParserLocation rootVariableLocation;
+  const gd::Variable *parentVariable = nullptr;
+  size_t variableChildDepth = 0;
   const gd::String *currentParameterExtraInfo;
   const gd::Platform &platform;
   const gd::ProjectScopedContainers &projectScopedContainers;

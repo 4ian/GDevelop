@@ -1416,135 +1416,6 @@ const createOrReplaceObject: EditorFunction = {
 /**
  * Retrieves the properties of a specific object (global or in a scene)
  */
-const inspectObjectProperties: EditorFunction = {
-  renderForEditor: ({ args, editorCallbacks }) => {
-    const scene_name = extractRequiredString(args, 'scene_name');
-    const object_name = extractRequiredString(args, 'object_name');
-
-    return {
-      text: (
-        <Trans>
-          Read <b>{object_name}</b>'s properties in scene{' '}
-          <Link
-            href="#"
-            onClick={() =>
-              editorCallbacks.onOpenLayout(scene_name, {
-                openEventsEditor: true,
-                openSceneEditor: true,
-                focusWhenOpened: 'scene',
-              })
-            }
-          >
-            {scene_name}
-          </Link>
-          .
-        </Trans>
-      ),
-    };
-  },
-  launchFunction: async ({ project, args, PixiResourcesLoader }) => {
-    const scene_name = extractRequiredString(args, 'scene_name');
-    const object_name = extractRequiredString(args, 'object_name');
-
-    if (!project.hasLayoutNamed(scene_name)) {
-      return makeGenericFailure(`Scene not found: "${scene_name}".`);
-    }
-
-    const layout = project.getLayout(scene_name);
-    const layoutObjects = layout.getObjects();
-    const globalObjects = project.getObjects();
-
-    let object: gdObject | null = null;
-
-    if (layoutObjects.hasObjectNamed(object_name)) {
-      object = layoutObjects.getObject(object_name);
-    } else if (globalObjects.hasObjectNamed(object_name)) {
-      object = globalObjects.getObject(object_name);
-    }
-
-    if (!object) {
-      return makeGenericFailure(
-        `Object not found: "${object_name}" in scene "${scene_name}" nor globally.`
-      );
-    }
-
-    const objectConfiguration = object.getConfiguration();
-    const objectProperties = objectConfiguration.getProperties();
-
-    const propertyNames = objectProperties.keys().toJSArray();
-    const properties = propertyNames
-      .map(name => {
-        const propertyDescriptor = objectProperties.get(name);
-        if (shouldHideProperty(propertyDescriptor)) return null;
-
-        return serializeNamedProperty(name, propertyDescriptor);
-      })
-      .filter(Boolean);
-
-    // Also include information about behaviors:
-    const behaviors = object
-      .getAllBehaviorNames()
-      .toJSArray()
-      .map(behaviorName => {
-        if (!object) return null;
-        const behavior = object.getBehavior(behaviorName);
-        return {
-          behaviorName: behaviorName,
-          behaviorType: behavior.getTypeName(),
-        };
-      })
-      .filter(Boolean);
-
-    // Also include information about animations:
-    const animationNames = mapFor(
-      0,
-      objectConfiguration.getAnimationsCount(),
-      i => {
-        return (
-          objectConfiguration.getAnimationName(i) ||
-          `(animation without name, animation index is: ${i})`
-        );
-      }
-    );
-
-    const variableCount = object.getVariables().count();
-    const behaviorCount = behaviors.length;
-    const inspectParts = [];
-    if (variableCount > 0) {
-      inspectParts.push(
-        `${variableCount} variable(s) (inspect with \`inspect_variables\`)`
-      );
-    }
-    if (behaviorCount > 0) {
-      inspectParts.push(
-        `${behaviorCount} behavior(s) (inspect with \`inspect_behavior_properties\`)`
-      );
-    }
-
-    const output: EditorFunctionGenericOutput = {
-      success: true,
-      objectName: object_name,
-      properties,
-      behaviors,
-      objectPropertiesDeduplicationKey: [scene_name, object_name]
-        .filter(Boolean)
-        .join('-'),
-    };
-    if (inspectParts.length > 0) {
-      output.reminder = `This object also has ${inspectParts.join(' and ')}.`;
-    }
-    injectObjectSizeInfo(output, {
-      [object_name]: getObjectSizeInfo(object, project, PixiResourcesLoader),
-    });
-    if (animationNames.length > 0) {
-      output.animationNames = animationNames.join(', ');
-    }
-
-    return output;
-  },
-  modifiesProject: false,
-};
-
 const isPropertyForChangingObjectName = (propertyName: string): boolean => {
   return (
     propertyName.toLowerCase() === 'name' ||
@@ -1552,9 +1423,21 @@ const isPropertyForChangingObjectName = (propertyName: string): boolean => {
   );
 };
 
+const objectSupportsEffects = (object: gdObject): boolean =>
+  object
+    .getAllBehaviorNames()
+    .toJSArray()
+    .some(behaviorName => {
+      if (!object) return false;
+      return (
+        object.getBehavior(behaviorName).getTypeName() ===
+        'EffectCapability::EffectBehavior'
+      );
+    });
+
 /**
  * Applies a single property change (or the special "name" rename) to an
- * object. Shared between `change_object_property` and
+ * object. Shared between the property and effects loops of
  * `change_object_properties_effects`.
  */
 const applyObjectPropertyChange = ({
@@ -1730,14 +1613,188 @@ const applyObjectPropertyChange = ({
 };
 
 /**
- * Changes a property of a specific object (global or in a scene)
+ * Retrieves the properties, behaviors and effects of a specific object
+ * (global or in a scene). An object has its own effects container, just
+ * like a layer does — effects are only listed if the object type supports
+ * them (see `objectSupportsEffects`).
  */
-const changeObjectProperty: EditorFunction = {
+const inspectObjectPropertiesEffects: EditorFunction = {
+  renderForEditor: ({ args, editorCallbacks }) => {
+    const scene_name = extractRequiredString(args, 'scene_name');
+    const object_name = extractRequiredString(args, 'object_name');
+
+    return {
+      text: (
+        <Trans>
+          Read <b>{object_name}</b>'s properties in scene{' '}
+          <Link
+            href="#"
+            onClick={() =>
+              editorCallbacks.onOpenLayout(scene_name, {
+                openEventsEditor: true,
+                openSceneEditor: true,
+                focusWhenOpened: 'scene',
+              })
+            }
+          >
+            {scene_name}
+          </Link>
+          .
+        </Trans>
+      ),
+    };
+  },
+  launchFunction: async ({ project, args, PixiResourcesLoader }) => {
+    const scene_name = extractRequiredString(args, 'scene_name');
+    const object_name = extractRequiredString(args, 'object_name');
+
+    if (!project.hasLayoutNamed(scene_name)) {
+      return makeGenericFailure(`Scene not found: "${scene_name}".`);
+    }
+
+    const layout = project.getLayout(scene_name);
+    const layoutObjects = layout.getObjects();
+    const globalObjects = project.getObjects();
+
+    let object: gdObject | null = null;
+
+    if (layoutObjects.hasObjectNamed(object_name)) {
+      object = layoutObjects.getObject(object_name);
+    } else if (globalObjects.hasObjectNamed(object_name)) {
+      object = globalObjects.getObject(object_name);
+    }
+
+    if (!object) {
+      return makeGenericFailure(
+        `Object not found: "${object_name}" in scene "${scene_name}" nor globally.`
+      );
+    }
+
+    const objectConfiguration = object.getConfiguration();
+    const objectProperties = objectConfiguration.getProperties();
+
+    const propertyNames = objectProperties.keys().toJSArray();
+    const properties = propertyNames
+      .map(name => {
+        const propertyDescriptor = objectProperties.get(name);
+        if (shouldHideProperty(propertyDescriptor)) return null;
+
+        return serializeNamedProperty(name, propertyDescriptor);
+      })
+      .filter(Boolean);
+
+    // Also include information about behaviors:
+    const behaviors = object
+      .getAllBehaviorNames()
+      .toJSArray()
+      .map(behaviorName => {
+        if (!object) return null;
+        const behavior = object.getBehavior(behaviorName);
+        return {
+          behaviorName: behaviorName,
+          behaviorType: behavior.getTypeName(),
+        };
+      })
+      .filter(Boolean);
+
+    // Also include information about animations:
+    const animationNames = mapFor(
+      0,
+      objectConfiguration.getAnimationsCount(),
+      i => {
+        return (
+          objectConfiguration.getAnimationName(i) ||
+          `(animation without name, animation index is: ${i})`
+        );
+      }
+    );
+
+    const variableCount = object.getVariables().count();
+    const behaviorCount = behaviors.length;
+    const inspectParts = [];
+    if (variableCount > 0) {
+      inspectParts.push(
+        `${variableCount} variable(s) (inspect with \`inspect_variables\`)`
+      );
+    }
+    if (behaviorCount > 0) {
+      inspectParts.push(
+        `${behaviorCount} behavior(s) (inspect with \`inspect_behavior_properties\`)`
+      );
+    }
+
+    const output: EditorFunctionGenericOutput = {
+      success: true,
+      objectName: object_name,
+      properties,
+      behaviors,
+      objectPropertiesDeduplicationKey: [scene_name, object_name]
+        .filter(Boolean)
+        .join('-'),
+    };
+    if (inspectParts.length > 0) {
+      output.reminder = `This object also has ${inspectParts.join(' and ')}.`;
+    }
+    injectObjectSizeInfo(output, {
+      [object_name]: getObjectSizeInfo(object, project, PixiResourcesLoader),
+    });
+    if (animationNames.length > 0) {
+      output.animationNames = animationNames.join(', ');
+    }
+
+    if (objectSupportsEffects(object)) {
+      const effectsContainer = object.getEffects();
+      output.effects = mapFor(0, effectsContainer.getEffectsCount(), i => {
+        const effect = effectsContainer.getEffectAt(i);
+        const effectMetadata = gd.MetadataProvider.getEffectMetadata(
+          project.getCurrentPlatform(),
+          effect.getEffectType()
+        );
+        if (gd.MetadataProvider.isBadEffectMetadata(effectMetadata))
+          return null;
+
+        return {
+          effectName: effect.getName(),
+          effectType: effect.getEffectType(),
+          effectProperties: serializeEffectProperties(effect, effectMetadata),
+        };
+      }).filter(Boolean);
+    }
+
+    return output;
+  },
+  modifiesProject: false,
+};
+
+/**
+ * Changes properties and/or effects of a specific object (global or in a
+ * scene). Effects are only applied if the object type supports them (see
+ * `objectSupportsEffects`).
+ */
+const changeObjectPropertiesEffects: EditorFunction = {
   renderForEditor: ({ project, shouldShowDetails, args, editorCallbacks }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
     const object_name = extractRequiredString(args, 'object_name');
     const changed_properties =
       SafeExtractor.extractArrayProperty(args, 'changed_properties') || [];
+    const changed_effects =
+      SafeExtractor.extractArrayProperty(args, 'changed_effects') || [];
+
+    if (changed_effects.length > 0) {
+      return {
+        text:
+          changed_properties.length > 0 ? (
+            <Trans>
+              Update properties and effects of <b>{object_name}</b> (in scene{' '}
+              {scene_name}).
+            </Trans>
+          ) : (
+            <Trans>
+              Update effects of <b>{object_name}</b> (in scene {scene_name}).
+            </Trans>
+          ),
+      };
+    }
 
     const renderChanges = (
       changes: Array<{ label: string, newValue: string }>
@@ -1858,133 +1915,6 @@ const changeObjectProperty: EditorFunction = {
     const object_name = extractRequiredString(args, 'object_name');
     const changed_properties =
       SafeExtractor.extractArrayProperty(args, 'changed_properties') || [];
-
-    if (!project.hasLayoutNamed(scene_name)) {
-      return makeGenericFailure(`Scene not found: "${scene_name}".`);
-    }
-
-    const layout = project.getLayout(scene_name);
-    const layoutObjects = layout.getObjects();
-    const globalObjects = project.getObjects();
-
-    let object: gdObject | null = null;
-    let isGlobalObject = false;
-
-    if (layoutObjects.hasObjectNamed(object_name)) {
-      object = layoutObjects.getObject(object_name);
-    } else if (globalObjects.hasObjectNamed(object_name)) {
-      object = globalObjects.getObject(object_name);
-      isGlobalObject = true;
-    }
-
-    if (!object) {
-      return makeGenericFailure(
-        `Object not found: "${object_name}" in scene "${scene_name}" nor globally.`
-      );
-    }
-
-    const warnings: Array<string> = [];
-    const changes: Array<string> = [];
-
-    changed_properties.forEach(changed_property => {
-      if (!object) return;
-      applyObjectPropertyChange({
-        project,
-        layout,
-        object,
-        isGlobalObject,
-        object_name,
-        changedProperty: changed_property,
-        changes,
-        warnings,
-      });
-    });
-
-    return makeMultipleChangesOutput(changes, warnings);
-  },
-  modifiesProject: true,
-};
-
-/**
- * Retrieves the properties and effects of a specific object (global or in a scene).
- * Same as `inspectObjectProperties`, with the object's own effects included
- * (an object has its own effects container, just like a layer does).
- */
-const inspectObjectPropertiesEffects: EditorFunction = {
-  renderForEditor: inspectObjectProperties.renderForEditor,
-  launchFunction: async options => {
-    const { project, args } = options;
-    const output = await inspectObjectProperties.launchFunction(options);
-    if (!output.success) return output;
-
-    const scene_name = extractRequiredString(args, 'scene_name');
-    const object_name = extractRequiredString(args, 'object_name');
-
-    const layoutObjects = project.hasLayoutNamed(scene_name)
-      ? project.getLayout(scene_name).getObjects()
-      : null;
-    const globalObjects = project.getObjects();
-
-    let object: gdObject | null = null;
-    if (layoutObjects && layoutObjects.hasObjectNamed(object_name)) {
-      object = layoutObjects.getObject(object_name);
-    } else if (globalObjects.hasObjectNamed(object_name)) {
-      object = globalObjects.getObject(object_name);
-    }
-    if (!object) return output;
-
-    const effectsContainer = object.getEffects();
-    output.effects = mapFor(0, effectsContainer.getEffectsCount(), i => {
-      const effect = effectsContainer.getEffectAt(i);
-      const effectMetadata = gd.MetadataProvider.getEffectMetadata(
-        project.getCurrentPlatform(),
-        effect.getEffectType()
-      );
-      if (gd.MetadataProvider.isBadEffectMetadata(effectMetadata)) return null;
-
-      return {
-        effectName: effect.getName(),
-        effectType: effect.getEffectType(),
-        effectProperties: serializeEffectProperties(effect, effectMetadata),
-      };
-    }).filter(Boolean);
-
-    return output;
-  },
-  modifiesProject: false,
-};
-
-/**
- * Changes properties and/or effects of a specific object (global or in a scene).
- * Same as `change_object_property`, plus the ability to add/remove/update
- * effects directly on the object (rather than on a layer).
- */
-const changeObjectPropertiesEffects: EditorFunction = {
-  renderForEditor: options => {
-    const { args } = options;
-    const changed_effects =
-      SafeExtractor.extractArrayProperty(args, 'changed_effects') || [];
-
-    if (changed_effects.length === 0 && changeObjectProperty.renderForEditor) {
-      return changeObjectProperty.renderForEditor(options);
-    }
-
-    const object_name = extractRequiredString(args, 'object_name');
-    const scene_name = extractRequiredString(args, 'scene_name');
-    return {
-      text: (
-        <Trans>
-          Update effects of <b>{object_name}</b> (in scene {scene_name}).
-        </Trans>
-      ),
-    };
-  },
-  launchFunction: async options => {
-    const { project, args } = options;
-    const scene_name = extractRequiredString(args, 'scene_name');
-    const object_name = extractRequiredString(args, 'object_name');
-    const changed_properties =
-      SafeExtractor.extractArrayProperty(args, 'changed_properties') || [];
     const changed_effects =
       SafeExtractor.extractArrayProperty(args, 'changed_effects') || [];
 
@@ -2030,18 +1960,7 @@ const changeObjectPropertiesEffects: EditorFunction = {
     });
 
     if (changed_effects.length > 0) {
-      const supportsEffects = object
-        .getAllBehaviorNames()
-        .toJSArray()
-        .some(behaviorName => {
-          if (!object) return false;
-          return (
-            object.getBehavior(behaviorName).getTypeName() ===
-            'EffectCapability::EffectBehavior'
-          );
-        });
-
-      if (!supportsEffects) {
+      if (!objectSupportsEffects(object)) {
         warnings.push(
           `Object "${object_name}" does not support effects (its type has no effect capability). Effects were NOT changed.`
         );
@@ -6689,8 +6608,10 @@ const searchObjectAssetStore: EditorFunction = {
 export const editorFunctions: { [string]: EditorFunction } = {
   create_object: createOrReplaceObject,
   create_or_replace_object: createOrReplaceObject,
-  inspect_object_properties: inspectObjectProperties,
-  change_object_property: changeObjectProperty,
+  // Old tool names, kept for AI requests still using an older toolsVersion:
+  // redirected to the same (backward-compatible) implementation as the new names.
+  inspect_object_properties: inspectObjectPropertiesEffects,
+  change_object_property: changeObjectPropertiesEffects,
   inspect_object_properties_effects: inspectObjectPropertiesEffects,
   change_object_properties_effects: changeObjectPropertiesEffects,
   add_behavior: addBehavior,

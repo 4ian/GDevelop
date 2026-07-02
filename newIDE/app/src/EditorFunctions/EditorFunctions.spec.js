@@ -1045,6 +1045,12 @@ describe('editorFunctions', () => {
       project.delete();
     });
 
+    it('redirects the old "change_object_property" name to the same implementation', () => {
+      expect(editorFunctions.change_object_property).toBe(
+        editorFunctions.change_object_properties_effects
+      );
+    });
+
     it('creates a new effect on the object (not on any layer) and reports it with a single message', async () => {
       const result = await editorFunctions.change_object_properties_effects.launchFunction(
         {
@@ -1161,6 +1167,41 @@ describe('editorFunctions', () => {
         .getEffects();
       expect(effectsContainer.hasEffectNamed('MyNight')).toBe(true);
     });
+
+    it('warns and does not add an effect on an object type with no effect capability', async () => {
+      const testSceneObjects = testScene.getObjects();
+      testSceneObjects.insertNewObject(
+        project,
+        'FakeScene3D::Cube3DObject',
+        'MyCube',
+        testSceneObjects.getObjectsCount()
+      );
+
+      const result = await editorFunctions.change_object_properties_effects.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'MyCube',
+            changed_effects: [
+              { effect_name: 'MySepia', effect_type: 'FakeSepia' },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(false);
+      expect(result.message).toContain(
+        'Object "MyCube" does not support effects'
+      );
+      expect(
+        testScene
+          .getObjects()
+          .getObject('MyCube')
+          .getEffects()
+          .getEffectsCount()
+      ).toBe(0);
+    });
   });
 
   describe('inspect_object_properties_effects (object effects)', () => {
@@ -1188,6 +1229,12 @@ describe('editorFunctions', () => {
       project.delete();
     });
 
+    it('redirects the old "inspect_object_properties" name to the same implementation', () => {
+      expect(editorFunctions.inspect_object_properties).toBe(
+        editorFunctions.inspect_object_properties_effects
+      );
+    });
+
     it('returns the object properties as well as its own effects', async () => {
       const result: EditorFunctionGenericOutput = await editorFunctions.inspect_object_properties_effects.launchFunction(
         {
@@ -1207,6 +1254,29 @@ describe('editorFunctions', () => {
           effectType: 'FakeSepia',
         }),
       ]);
+    });
+
+    it('does not include an effects field for an object type with no effect capability', async () => {
+      const testSceneObjects = testScene.getObjects();
+      testSceneObjects.insertNewObject(
+        project,
+        'FakeScene3D::Cube3DObject',
+        'MyCube',
+        testSceneObjects.getObjectsCount()
+      );
+
+      const result: EditorFunctionGenericOutput = await editorFunctions.inspect_object_properties_effects.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'MyCube',
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.effects).toBeUndefined();
     });
   });
 

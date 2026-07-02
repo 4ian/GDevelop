@@ -362,7 +362,7 @@ Payload shape:
 
 - at runtime: a string,
 - in event actions: an optional `string` parameter named "Payload" and an
-  optional sender object parameter named "Emitter object",
+  required sender object parameter named "Emitter object",
 - in generated/runtime code: a string is passed to the runtime helper. Legacy
   variable inputs are converted to their string value for compatibility.
 
@@ -578,8 +578,8 @@ Emit signal to object group
 ```
 
 Each action takes an optional string "Payload" parameter. Each action also takes
-an optional "Emitter object" parameter. When it is set, the first object in the
-picked emitter list becomes the sender exposed by `EmitterObjectName`,
+a required "Emitter object" parameter. The first object in the picked emitter
+list becomes the sender exposed by `EmitterObjectName`,
 `EmitterInstanceId`, `SignalSenderObjectName()` and `SignalSenderInstanceId()`.
 Vague names (`Trigger event`, `Call event`, `Send message`) are avoided.
 
@@ -808,7 +808,7 @@ gdjs.evtTools.signal.getSignalSenderInstanceId(runtimeScene);
 
 All emit helpers also accept an optional sender argument at runtime. It can be a
 `gdjs.RuntimeObject`, a sender record, or an object-list map generated from the
-event action's optional "Emitter object" parameter. Object-list senders use the
+event action's required "Emitter object" parameter. Object-list senders use the
 first picked object in the list.
 
 ### 11.3 Codegen for "Signal received"
@@ -1005,7 +1005,7 @@ project-wide name discovery, without constraining authors to a fixed list.
 
 Emit actions take an optional payload string. This keeps the action lightweight:
 authors can pass a literal, a string expression or encoded text. They also take
-an optional emitter object list so signal receivers can identify the sender.
+a required emitter object list so signal receivers can identify the sender.
 
 ### 14.5 Structured payloads
 
@@ -1074,7 +1074,7 @@ lifecycle handlers, and the scene "Signal received" condition.
 
 - `gdjs.evtTools.signal.*` runtime helpers (§11.2).
 - Emit actions: scene, object, object instance, picked objects and object group,
-  with optional payload and emitter object parameters (section 9.1).
+  with optional payload and required emitter object parameters (section 9.1).
 - "Signal received" condition (§9.2, §11.3).
 - `SignalName` / `SignalPayload` / `SignalSenderObjectName`
   / `SignalSenderInstanceId` expressions (§9.3).

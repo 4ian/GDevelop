@@ -6,7 +6,9 @@ describe('gdjs.evtTools.signal', () => {
   const signalReceiverIds = [];
 
   before(() => {
-    const SignalTestRuntimeObject = class SignalTestRuntimeObject extends gdjs.TestRuntimeObject {
+    const SignalTestRuntimeObject = class SignalTestRuntimeObject
+      extends gdjs.TestRuntimeObject
+    {
       onSignal(signalName, payload, emitterObjectName, emitterInstanceId) {
         const runtimeScene = this.getRuntimeScene();
         const signalNameFromContext =
@@ -298,6 +300,37 @@ describe('gdjs.evtTools.signal', () => {
     ]);
   });
 
+  it('ignores non-existing object signal targets without registering empty instance lists', () => {
+    const runtimeScene = createSignalRuntimeScene();
+    const missingObjectName = 'MissingReceiver';
+
+    // @ts-ignore - Inspect the runtime instance table directly for this regression.
+    expect(runtimeScene._instances.containsKey(missingObjectName)).to.be(false);
+
+    gdjs.evtTools.signal.emitSignalToObject(
+      runtimeScene,
+      missingObjectName,
+      'MissingTarget',
+      'payload'
+    );
+    expect(runtimeScene.getSignalBus().getDebugInfo().queuedSignalsCount).to.be(
+      1
+    );
+
+    runtimeScene.renderAndStepWithEventsFunction(16, () => {});
+
+    expect(signalCalls.length).to.be(0);
+    expect(runtimeScene.getSignalBus().getDebugInfo().queuedSignalsCount).to.be(
+      0
+    );
+    expect(
+      gdjs.evtTools.signal.getDeliveredSignals(runtimeScene, 'MissingTarget')
+        .length
+    ).to.be(1);
+    // @ts-ignore - Inspect the runtime instance table directly for this regression.
+    expect(runtimeScene._instances.containsKey(missingObjectName)).to.be(false);
+  });
+
   it('targets one object instance by unique id', () => {
     const runtimeScene = createSignalRuntimeScene();
     const firstReceiver = runtimeScene.getObjects('Receiver')[0];
@@ -390,6 +423,7 @@ describe('gdjs.evtTools.signal', () => {
     expect(records[0].name).to.be('Pulse');
     expect(records[0].payload).to.be('payload');
     expect(records[0].target).to.be('object:Receiver');
+    expect(records[0].status).to.be('delivered');
     expect(records[0].source.objectName).to.be('Sender');
     expect(records[0].source.objectId).to.be(sender.getUniqueId());
     expect(records[0].receivers.map(({ receiverName }) => receiverName)).to.eql(
@@ -401,6 +435,86 @@ describe('gdjs.evtTools.signal', () => {
       expect(receiverRecord.x).to.be(receiver.getCenterXInScene());
       expect(receiverRecord.y).to.be(receiver.getCenterYInScene());
     });
+  });
+
+  it('records unhandled object signal animation targets', () => {
+    const runtimeGame = gdjs.getPixiRuntimeGame();
+    const runtimeScene = new gdjs.TestRuntimeScene(runtimeGame);
+    runtimeScene.registerObject({
+      name: 'Sender',
+      type: 'TestObject::TestObject',
+      variables: [],
+      behaviors: [],
+      effects: [],
+    });
+    runtimeScene.registerObject({
+      name: 'PlainTarget',
+      type: 'TestObject::TestObject',
+      variables: [],
+      behaviors: [],
+      effects: [],
+    });
+    const sender = runtimeScene.createObject('Sender');
+    const plainTarget = runtimeScene.createObject('PlainTarget');
+    runtimeScene.getSignalBus().refreshReceiverIndex(runtimeScene);
+    runtimeScene.enableSignalAnimationDebugDraw(true);
+
+    gdjs.evtTools.signal.emitSignalToObject(
+      runtimeScene,
+      'PlainTarget',
+      'MissingHandler',
+      'payload',
+      sender
+    );
+    runtimeScene.renderAndStepWithEventsFunction(16, () => {});
+
+    expect(signalCalls.length).to.be(0);
+    const records = runtimeScene
+      .getSignalBus()
+      .getSignalAnimationDebugRecords();
+    expect(records.length).to.be(1);
+    expect(records[0].status).to.be('unhandled');
+    expect(records[0].receivers.map(({ receiverName }) => receiverName)).to.eql(
+      ['PlainTarget']
+    );
+    expect(records[0].receivers[0].isUnhandled).to.be(true);
+    expect(records[0].receivers[0].objectName).to.be('PlainTarget');
+    expect(records[0].receivers[0].objectId).to.be(plainTarget.getUniqueId());
+  });
+
+  it('records unhandled scene signal animations as scene targets', () => {
+    const runtimeGame = gdjs.getPixiRuntimeGame();
+    const runtimeScene = new gdjs.TestRuntimeScene(runtimeGame);
+    runtimeScene.registerObject({
+      name: 'Sender',
+      type: 'TestObject::TestObject',
+      variables: [],
+      behaviors: [],
+      effects: [],
+    });
+    const sender = runtimeScene.createObject('Sender');
+    runtimeScene.getSignalBus().refreshReceiverIndex(runtimeScene);
+    runtimeScene.enableSignalAnimationDebugDraw(true);
+
+    gdjs.evtTools.signal.emitSceneSignal(
+      runtimeScene,
+      'SceneWithoutReceiver',
+      'payload',
+      sender
+    );
+    runtimeScene.renderAndStepWithEventsFunction(16, () => {});
+
+    const records = runtimeScene
+      .getSignalBus()
+      .getSignalAnimationDebugRecords();
+    expect(records.length).to.be(1);
+    expect(records[0].target).to.be('scene');
+    expect(records[0].status).to.be('unhandled');
+    expect(records[0].source.objectName).to.be('Sender');
+    expect(records[0].receivers.map(({ receiverName }) => receiverName)).to.eql(
+      ['scene']
+    );
+    expect(records[0].receivers[0].isUnhandled).to.be(true);
   });
 
   it('records scene signal animations as scene receivers', () => {
@@ -438,9 +552,16 @@ describe('gdjs.evtTools.signal', () => {
     expect(records[0].name).to.be('ScenePulse');
     expect(records[0].payload).to.be('payload');
     expect(records[0].target).to.be('scene');
+    expect(records[0].status).to.be('delivered');
     expect(records[0].source.objectName).to.be('Sender');
     expect(records[0].receivers.map(({ receiverName }) => receiverName)).to.eql(
       ['scene']
+    );
+    expect(records[0].receivers[0].x).to.be(
+      runtimeScene.getLayer('').getCameraX()
+    );
+    expect(records[0].receivers[0].y).to.be(
+      runtimeScene.getLayer('').getCameraY()
     );
   });
 });

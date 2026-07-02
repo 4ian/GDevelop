@@ -510,8 +510,12 @@ namespace gdjs {
         const signalAnimationDebugRecords = this._signalBus
           ? this._signalBus.getSignalAnimationDebugRecords()
           : [];
+        const signalDebugInfo = this._signalBus
+          ? this._signalBus.getDebugInfo()
+          : null;
         this._debuggerRenderer.renderSignalDebugDraw(
-          signalAnimationDebugRecords
+          signalAnimationDebugRecords,
+          signalDebugInfo
         );
       } else {
         this._debuggerRenderer.clearSignalDebugDraw();

@@ -6076,9 +6076,10 @@ const MainFrame = (props: Props): React.MixedElement => {
 
   useKeyboardShortcuts({
     previewDebuggerServer,
-    onRunCommand: commandPaletteRef.current
-      ? commandPaletteRef.current.launchCommand
-      : () => {},
+    onRunCommand: React.useCallback(commandName => {
+      if (!commandPaletteRef.current) return;
+      commandPaletteRef.current.launchCommand(commandName);
+    }, []),
   });
 
   const openCommandPalette = React.useCallback(() => {

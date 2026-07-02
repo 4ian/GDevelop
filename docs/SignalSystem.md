@@ -856,6 +856,14 @@ Signals this frame
       scene "Signal received" x2
 ```
 
+Editor-preview signal animations are diagnostic only and are not part of
+exported games. When "Display Signal Animations" is enabled, the preview shows a
+signal monitor with the current queue count and recent signal deliveries.
+Signals that have no receiver are still animated to their intended target and
+shown with a `NO RECEIVER` warning badge. Signals dropped because the per-cycle
+dispatch limit was reached are animated when possible and shown with a
+`DROPPED` warning badge, so missed consumption is visible while developing.
+
 Diagnostics:
 
 - pending signal count,

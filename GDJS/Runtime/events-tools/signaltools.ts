@@ -6,6 +6,9 @@
 namespace gdjs {
   const logger = new gdjs.Logger('SignalSystem');
   const maxSignalsDispatchedPerFrame = 10000;
+  const maxDroppedSignalDebugRecordsPerFrame = 100;
+
+  export type SignalDebugStatus = 'delivered' | 'unhandled' | 'dropped';
 
   export type RuntimeSignalSender = {
     objectName?: string;
@@ -61,6 +64,8 @@ namespace gdjs {
 
   export type SignalAnimationDebugReceiver = SignalDebugPoint & {
     receiverName: string;
+    isUnhandled?: boolean;
+    isDropped?: boolean;
   };
 
   export type SignalAnimationDebugRecord = {
@@ -68,6 +73,7 @@ namespace gdjs {
     name: string;
     payload: string;
     target: string;
+    status: SignalDebugStatus;
     source: SignalDebugPoint;
     receivers: SignalAnimationDebugReceiver[];
   };
@@ -78,10 +84,12 @@ namespace gdjs {
     payload: string;
     target: string;
     emittedFrameId: integer;
-    deliveredFrameId: integer;
+    deliveredFrameId: integer | null;
+    status: SignalDebugStatus;
     receivers: string[];
     source: SignalDebugPoint | null;
     receiverPositions: SignalAnimationDebugReceiver[];
+    targetPositions: SignalAnimationDebugReceiver[];
   };
 
   export type SignalDebugInfo = {
@@ -244,8 +252,20 @@ namespace gdjs {
       objectName: 'scene',
       objectId: -1,
       x: baseLayer.getCameraX(),
-      y: baseLayer.getCameraY() - baseLayer.getCameraHeight() / 2 + 32,
+      y: baseLayer.getCameraY(),
       layer: '',
+    };
+  };
+
+  const getVirtualSignalDebugPoint = (
+    runtimeScene: gdjs.RuntimeScene,
+    objectName: string
+  ): SignalDebugPoint => {
+    const scenePoint = getSceneSignalDebugPoint(runtimeScene);
+    return {
+      ...scenePoint,
+      objectName,
+      objectId: -1,
     };
   };
 
@@ -257,7 +277,13 @@ namespace gdjs {
       return null;
     }
 
-    const runtimeObjects = runtimeScene.getObjects(sender.objectName);
+    const runtimeObjects = getRuntimeObjectsWithoutCreating(
+      runtimeScene,
+      sender.objectName
+    );
+    if (!runtimeObjects) {
+      return null;
+    }
     for (let i = 0, len = runtimeObjects.length; i < len; ++i) {
       const runtimeObject = runtimeObjects[i];
       if (!isRuntimeObjectLiving(runtimeObject)) {
@@ -271,6 +297,19 @@ namespace gdjs {
       }
     }
 
+    return null;
+  };
+
+  const getRuntimeObjectsWithoutCreating = (
+    runtimeScene: gdjs.RuntimeScene,
+    objectName: string
+  ): gdjs.RuntimeObject[] | null => {
+    if (runtimeScene._instances.containsKey(objectName)) {
+      return runtimeScene._instances.get(objectName);
+    }
+    if (runtimeScene._objects.containsKey(objectName)) {
+      return [];
+    }
     return null;
   };
 
@@ -381,6 +420,9 @@ namespace gdjs {
         );
         for (let i = signalIndex; i < this._queuedSignals.length; ++i) {
           const signal = this._queuedSignals[i];
+          if (i - signalIndex < maxDroppedSignalDebugRecordsPerFrame) {
+            this._recordDroppedSignal(runtimeScene, signal);
+          }
           if (signal.target.kind === 'pickedObjects') {
             signal.target.pickedObjects.clear();
           }
@@ -484,8 +526,22 @@ namespace gdjs {
         droppedSignalsCount: this._droppedSignalsCount,
         deliveredSignalsThisFrameCount: this._deliveredSignalsThisFrame.length,
         receiversThisFrameCount: this._receiversThisFrameCount,
-        signalsThisFrame: this._signalsThisFrameDebugRecords.slice(),
+        signalsThisFrame: this._signalsThisFrameDebugRecords.map(
+          (debugRecord) => ({
+            ...debugRecord,
+            status: this._getSignalDebugRecordStatus(debugRecord),
+          })
+        ),
       };
+    }
+
+    private _getSignalDebugRecordStatus(
+      debugRecord: SignalDebugRecord
+    ): SignalDebugStatus {
+      if (debugRecord.status === 'dropped') {
+        return 'dropped';
+      }
+      return debugRecord.receivers.length === 0 ? 'unhandled' : 'delivered';
     }
 
     getSignalAnimationDebugRecords(): SignalAnimationDebugRecord[] {
@@ -496,7 +552,12 @@ namespace gdjs {
         ++i
       ) {
         const debugRecord = this._signalsThisFrameDebugRecords[i];
-        if (!debugRecord.source || debugRecord.receiverPositions.length === 0) {
+        const status = this._getSignalDebugRecordStatus(debugRecord);
+        const receiverPositions =
+          debugRecord.receiverPositions.length > 0
+            ? debugRecord.receiverPositions
+            : debugRecord.targetPositions;
+        if (!debugRecord.source || receiverPositions.length === 0) {
           continue;
         }
 
@@ -505,11 +566,297 @@ namespace gdjs {
           name: debugRecord.name,
           payload: debugRecord.payload,
           target: debugRecord.target,
+          status,
           source: debugRecord.source,
-          receivers: debugRecord.receiverPositions.slice(),
+          receivers: receiverPositions.map((receiverPosition) => ({
+            ...receiverPosition,
+            isUnhandled: status === 'unhandled',
+            isDropped: status === 'dropped',
+          })),
         });
       }
       return signalAnimationDebugRecords;
+    }
+
+    private _getSignalDebugSource(
+      runtimeScene: gdjs.RuntimeScene,
+      signal: RuntimeSignal
+    ): SignalDebugPoint | null {
+      if (!isSignalAnimationDebugDrawEnabled(runtimeScene)) {
+        return null;
+      }
+
+      const sourceRuntimeObject = findRuntimeObjectBySignalSender(
+        runtimeScene,
+        signal.sender
+      );
+      if (sourceRuntimeObject) {
+        return getRuntimeObjectSignalDebugPoint(sourceRuntimeObject);
+      }
+
+      if (signal.sender?.objectName) {
+        const virtualSource = getVirtualSignalDebugPoint(
+          runtimeScene,
+          signal.sender.objectName
+        );
+        virtualSource.objectId = signal.sender.objectId ?? -1;
+        return virtualSource;
+      }
+
+      return getSceneSignalDebugPoint(runtimeScene);
+    }
+
+    private _recordSignalAnimationTarget(
+      debugRecord: SignalDebugRecord,
+      runtimeObject: gdjs.RuntimeObject,
+      receiverName: string
+    ): void {
+      if (!debugRecord.source || debugRecord.target === 'scene') {
+        return;
+      }
+
+      debugRecord.targetPositions.push({
+        ...getRuntimeObjectSignalDebugPoint(runtimeObject),
+        receiverName,
+      });
+    }
+
+    private _recordVirtualSignalAnimationTarget(
+      runtimeScene: gdjs.RuntimeScene,
+      debugRecord: SignalDebugRecord,
+      receiverName: string,
+      objectName?: string
+    ): void {
+      if (!debugRecord.source || debugRecord.target === 'scene') {
+        return;
+      }
+
+      const virtualObjectName = objectName || receiverName;
+      if (
+        debugRecord.targetPositions.some(
+          (targetPosition) =>
+            targetPosition.objectName === virtualObjectName &&
+            targetPosition.receiverName === receiverName &&
+            targetPosition.objectId < 0
+        )
+      ) {
+        return;
+      }
+
+      debugRecord.targetPositions.push({
+        ...getVirtualSignalDebugPoint(runtimeScene, virtualObjectName),
+        receiverName,
+      });
+    }
+
+    private _recordSceneSignalAnimationTarget(
+      runtimeScene: gdjs.RuntimeScene,
+      debugRecord: SignalDebugRecord
+    ): void {
+      if (!debugRecord.source) {
+        return;
+      }
+
+      if (
+        debugRecord.targetPositions.some(
+          (targetPosition) => targetPosition.receiverName === 'scene'
+        )
+      ) {
+        return;
+      }
+
+      debugRecord.targetPositions.push({
+        ...getSceneSignalDebugPoint(runtimeScene),
+        receiverName: 'scene',
+      });
+    }
+
+    private _recordSignalAnimationTargetsForObjects(
+      runtimeScene: gdjs.RuntimeScene,
+      objectName: string,
+      debugRecord: SignalDebugRecord
+    ): gdjs.RuntimeObject[] | null {
+      const runtimeObjects = getRuntimeObjectsWithoutCreating(
+        runtimeScene,
+        objectName
+      );
+      if (!runtimeObjects) {
+        this._recordVirtualSignalAnimationTarget(
+          runtimeScene,
+          debugRecord,
+          objectName
+        );
+        return null;
+      }
+
+      const runtimeObjectsSnapshot = runtimeObjects.slice();
+      let hasLivingTarget = false;
+      for (let i = 0, len = runtimeObjectsSnapshot.length; i < len; ++i) {
+        const runtimeObject = runtimeObjectsSnapshot[i];
+        if (!isRuntimeObjectLiving(runtimeObject)) {
+          continue;
+        }
+        hasLivingTarget = true;
+        this._recordSignalAnimationTarget(
+          debugRecord,
+          runtimeObject,
+          objectName
+        );
+      }
+      if (!hasLivingTarget) {
+        this._recordVirtualSignalAnimationTarget(
+          runtimeScene,
+          debugRecord,
+          objectName
+        );
+      }
+
+      return runtimeObjectsSnapshot;
+    }
+
+    private _recordSignalAnimationTargetForObjectInstance(
+      runtimeScene: gdjs.RuntimeScene,
+      objectId: integer,
+      debugRecord: SignalDebugRecord
+    ): gdjs.RuntimeObject | null {
+      const runtimeObjects = runtimeScene.getAdhocListOfAllInstances();
+      for (let i = 0, len = runtimeObjects.length; i < len; ++i) {
+        const runtimeObject = runtimeObjects[i];
+        if (!isRuntimeObjectLiving(runtimeObject)) {
+          continue;
+        }
+        if (runtimeObject.getUniqueId() === objectId) {
+          this._recordSignalAnimationTarget(
+            debugRecord,
+            runtimeObject,
+            runtimeObject.getName()
+          );
+          return runtimeObject;
+        }
+      }
+
+      this._recordVirtualSignalAnimationTarget(
+        runtimeScene,
+        debugRecord,
+        'instance #' + objectId
+      );
+      return null;
+    }
+
+    private _recordSignalAnimationTargetsForPickedObjects(
+      runtimeScene: gdjs.RuntimeScene,
+      pickedObjects: gdjs.LongLivedObjectsList,
+      debugRecord: SignalDebugRecord
+    ): {
+      objectNames: string[];
+      runtimeObjects: { [objectName: string]: gdjs.RuntimeObject[] };
+    } {
+      const pickedObjectSnapshots: {
+        [objectName: string]: gdjs.RuntimeObject[];
+      } = {};
+      const objectNames = pickedObjects.getObjectNames();
+      let hasLivingTarget = false;
+      for (let i = 0, len = objectNames.length; i < len; ++i) {
+        const objectName = objectNames[i];
+        const runtimeObjects = pickedObjects.getObjects(objectName).slice();
+        pickedObjectSnapshots[objectName] = runtimeObjects;
+        for (let j = 0, lenj = runtimeObjects.length; j < lenj; ++j) {
+          const runtimeObject = runtimeObjects[j];
+          if (!isRuntimeObjectLiving(runtimeObject)) {
+            continue;
+          }
+          hasLivingTarget = true;
+          this._recordSignalAnimationTarget(
+            debugRecord,
+            runtimeObject,
+            objectName
+          );
+        }
+      }
+
+      if (!hasLivingTarget) {
+        this._recordVirtualSignalAnimationTarget(
+          runtimeScene,
+          debugRecord,
+          'picked objects',
+          'pickedObjects'
+        );
+      }
+
+      return {
+        objectNames,
+        runtimeObjects: pickedObjectSnapshots,
+      };
+    }
+
+    private _recordDroppedSignalTarget(
+      runtimeScene: gdjs.RuntimeScene,
+      signal: RuntimeSignal,
+      debugRecord: SignalDebugRecord
+    ): void {
+      if (signal.target.kind === 'scene') {
+        this._recordSceneSignalAnimationTarget(runtimeScene, debugRecord);
+      } else if (signal.target.kind === 'object') {
+        this._recordSignalAnimationTargetsForObjects(
+          runtimeScene,
+          signal.target.objectName,
+          debugRecord
+        );
+      } else if (signal.target.kind === 'objectInstance') {
+        this._recordSignalAnimationTargetForObjectInstance(
+          runtimeScene,
+          signal.target.objectId,
+          debugRecord
+        );
+      } else if (signal.target.kind === 'objectGroup') {
+        const objectNames = runtimeScene.getObjectNamesInGroup(
+          signal.target.objectGroupName
+        );
+        if (objectNames.length === 0) {
+          this._recordVirtualSignalAnimationTarget(
+            runtimeScene,
+            debugRecord,
+            'object group ' + signal.target.objectGroupName,
+            'objectGroup:' + signal.target.objectGroupName
+          );
+        }
+        for (let i = 0, len = objectNames.length; i < len; ++i) {
+          this._recordSignalAnimationTargetsForObjects(
+            runtimeScene,
+            objectNames[i],
+            debugRecord
+          );
+        }
+      } else if (signal.target.kind === 'pickedObjects') {
+        this._recordSignalAnimationTargetsForPickedObjects(
+          runtimeScene,
+          signal.target.pickedObjects,
+          debugRecord
+        );
+      }
+    }
+
+    private _recordDroppedSignal(
+      runtimeScene: gdjs.RuntimeScene,
+      signal: RuntimeSignal
+    ): void {
+      const debugRecord: SignalDebugRecord = {
+        id: signal.id,
+        name: signal.name,
+        payload: signal.payload,
+        target: describeSignalTarget(signal.target),
+        emittedFrameId: signal.emittedFrameId,
+        deliveredFrameId: null,
+        status: 'dropped',
+        receivers: [],
+        source: this._getSignalDebugSource(runtimeScene, signal),
+        receiverPositions: [],
+        targetPositions: [],
+      };
+
+      this._recordDroppedSignalTarget(runtimeScene, signal, debugRecord);
+      this._signalsThisFrameDebugRecords.push(debugRecord);
+      this._signalDebugRecordsById.set(signal.id, debugRecord);
     }
 
     private _dispatchSignal(
@@ -520,11 +867,6 @@ namespace gdjs {
       this._deliveredSignalsThisFrame.push(signal);
       this._currentSignal = signal;
 
-      const sourceRuntimeObject = isSignalAnimationDebugDrawEnabled(
-        runtimeScene
-      )
-        ? findRuntimeObjectBySignalSender(runtimeScene, signal.sender)
-        : null;
       const debugRecord: SignalDebugRecord = {
         id: signal.id,
         name: signal.name,
@@ -532,16 +874,17 @@ namespace gdjs {
         target: describeSignalTarget(signal.target),
         emittedFrameId: signal.emittedFrameId,
         deliveredFrameId: signal.deliveredFrameId,
+        status: 'delivered',
         receivers: [],
-        source: sourceRuntimeObject
-          ? getRuntimeObjectSignalDebugPoint(sourceRuntimeObject)
-          : null,
+        source: this._getSignalDebugSource(runtimeScene, signal),
         receiverPositions: [],
+        targetPositions: [],
       };
 
       this._isDispatchingSignalReceivers = true;
       try {
         if (signal.target.kind === 'scene') {
+          this._recordSceneSignalAnimationTarget(runtimeScene, debugRecord);
           this._dispatchToSceneReceivers(runtimeScene, signal, debugRecord);
         } else if (signal.target.kind === 'object') {
           this._dispatchToObjects(
@@ -561,6 +904,14 @@ namespace gdjs {
           const objectNames = runtimeScene.getObjectNamesInGroup(
             signal.target.objectGroupName
           );
+          if (objectNames.length === 0) {
+            this._recordVirtualSignalAnimationTarget(
+              runtimeScene,
+              debugRecord,
+              'object group ' + signal.target.objectGroupName,
+              'objectGroup:' + signal.target.objectGroupName
+            );
+          }
           for (let i = 0, len = objectNames.length; i < len; ++i) {
             this._dispatchToObjects(
               runtimeScene,
@@ -571,6 +922,7 @@ namespace gdjs {
           }
         } else if (signal.target.kind === 'pickedObjects') {
           this._dispatchToPickedObjects(
+            runtimeScene,
             signal.target.pickedObjects,
             signal,
             debugRecord
@@ -651,10 +1003,26 @@ namespace gdjs {
         onlyIndexedObjectReceivers?: boolean;
       }
     ): void {
-      const runtimeObjects = runtimeScene.getObjects(objectName).slice();
-      for (let i = 0, len = runtimeObjects.length; i < len; ++i) {
+      const runtimeObjectsSnapshot =
+        this._recordSignalAnimationTargetsForObjects(
+          runtimeScene,
+          objectName,
+          debugRecord
+        );
+      if (!runtimeObjectsSnapshot) {
+        logger.warn(
+          'Signal "' +
+            signal.name +
+            '" targeted a non-existing object "' +
+            objectName +
+            '". The target was ignored.'
+        );
+        return;
+      }
+
+      for (let i = 0, len = runtimeObjectsSnapshot.length; i < len; ++i) {
         this._dispatchToRuntimeObject(
-          runtimeObjects[i],
+          runtimeObjectsSnapshot[i],
           signal,
           debugRecord,
           options
@@ -668,28 +1036,32 @@ namespace gdjs {
       signal: RuntimeSignal,
       debugRecord: SignalDebugRecord
     ): void {
-      const runtimeObjects = runtimeScene.getAdhocListOfAllInstances();
-      for (let i = 0, len = runtimeObjects.length; i < len; ++i) {
-        const runtimeObject = runtimeObjects[i];
-        if (!isRuntimeObjectLiving(runtimeObject)) {
-          continue;
-        }
-        if (runtimeObject.getUniqueId() === objectId) {
-          this._dispatchToRuntimeObject(runtimeObject, signal, debugRecord);
-          return;
-        }
+      const runtimeObject = this._recordSignalAnimationTargetForObjectInstance(
+        runtimeScene,
+        objectId,
+        debugRecord
+      );
+      if (runtimeObject) {
+        this._dispatchToRuntimeObject(runtimeObject, signal, debugRecord);
       }
     }
 
     private _dispatchToPickedObjects(
+      runtimeScene: gdjs.RuntimeScene,
       pickedObjects: gdjs.LongLivedObjectsList,
       signal: RuntimeSignal,
       debugRecord: SignalDebugRecord
     ): void {
-      const objectNames = pickedObjects.getObjectNames();
+      const pickedObjectTargets =
+        this._recordSignalAnimationTargetsForPickedObjects(
+          runtimeScene,
+          pickedObjects,
+          debugRecord
+        );
+      const objectNames = pickedObjectTargets.objectNames;
       for (let i = 0, len = objectNames.length; i < len; ++i) {
         const objectName = objectNames[i];
-        const runtimeObjects = pickedObjects.getObjects(objectName).slice();
+        const runtimeObjects = pickedObjectTargets.runtimeObjects[objectName];
         for (let j = 0, lenj = runtimeObjects.length; j < lenj; ++j) {
           this._dispatchToRuntimeObject(runtimeObjects[j], signal, debugRecord);
         }
@@ -770,10 +1142,7 @@ namespace gdjs {
       export const emitSignalToObject = function (
         instanceContainer: gdjs.RuntimeInstanceContainer,
         objectNameOrObjectsLists:
-          | string
-          | Hashtable<gdjs.RuntimeObject[]>
-          | null
-          | undefined,
+          string | Hashtable<gdjs.RuntimeObject[]> | null | undefined,
         signalName: string,
         payload?: RuntimeSignalPayloadInput,
         sender?: RuntimeSignalSenderInput

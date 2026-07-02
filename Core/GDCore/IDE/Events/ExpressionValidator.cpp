@@ -66,6 +66,39 @@ size_t GetMaximumParametersNumber(
 
 }  // namespace
 
+bool ExpressionValidator::ValidateChildVariable(
+    const gd::Variable &parentVariable, const gd::String &childVariableName,
+    const gd::ExpressionParserLocation childNameLocation,
+    const bool isUndeclaredVariableFatal) {
+  // A child variable is accessed, check it can be used in an expression.
+  if (!parentVariable.HasChild(childVariableName)) {
+    RaiseTypeError(_("No child variable with this name found."),
+                   childNameLocation, isUndeclaredVariableFatal);
+    return false;
+  }
+  return true;
+}
+
+void ExpressionValidator::ValidateLastChildVariable(
+    const gd::Variable &lastChildVariable,
+    const gd::ExpressionParserLocation childNameLocation) {
+    const auto type = lastChildVariable.GetType();
+    // Collections type can't be used directly in expressions, a child
+    // must be accessed.
+    if (type == Variable::Structure) {
+      RaiseTypeError(_("You need to specify the name of the child variable "
+                        "to access. For example: `MyVariable.child`."),
+                      childNameLocation);
+    } else if (type == Variable::Array) {
+      RaiseTypeError(_("You need to specify the name of the child variable "
+                        "to access. For example: `MyVariable[0]`."),
+                      childNameLocation);
+    } else {
+      // Number, string or boolean variables can be used in expressions.
+      ReadChildTypeFromVariable(type);
+    }
+}
+
 bool ExpressionValidator::ValidateObjectVariableOrVariableOrProperty(
     const gd::IdentifierNode &identifier) {
   return ValidateObjectVariableOrVariableOrProperty(
@@ -80,24 +113,6 @@ bool ExpressionValidator::ValidateObjectVariableOrVariableOrProperty(
     const gd::String &childIdentifierName,
     const gd::ExpressionParserLocation childIdentifierNameLocation,
     const bool isUndeclaredVariableFatal) {
-  auto validateVariableTypeForExpression =
-      [this, &identifierNameLocation](gd::Variable::Type type) {
-        // Collections type can't be used directly in expressions, a child
-        // must be accessed.
-        if (type == Variable::Structure) {
-          RaiseTypeError(_("You need to specify the name of the child variable "
-                           "to access. For example: `MyVariable.child`."),
-                         identifierNameLocation);
-        } else if (type == Variable::Array) {
-          RaiseTypeError(_("You need to specify the name of the child variable "
-                           "to access. For example: `MyVariable[0]`."),
-                         identifierNameLocation);
-        } else {
-          // Number, string or boolean variables can be used in expressions.
-          return;
-        }
-      };
-
   const auto& variablesContainersList = projectScopedContainers.GetVariablesContainersList();
   const auto& objectsContainersList = projectScopedContainers.GetObjectsContainersList();
   const auto& propertiesContainersList = projectScopedContainers.GetPropertiesContainersList();
@@ -159,22 +174,16 @@ bool ExpressionValidator::ValidateObjectVariableOrVariableOrProperty(
       if (childIdentifierName.empty()) {
         // Just the root variable is accessed, check it can be used in an
         // expression.
-        validateVariableTypeForExpression(variable.GetType());
-        ReadChildTypeFromVariable(variable.GetType());
-
+        ValidateLastChildVariable(variable, identifierNameLocation);
         return true; // We found a variable.
       } else {
-        // A child variable is accessed, check it can be used in an expression.
-        if (!variable.HasChild(childIdentifierName)) {
-          RaiseTypeError(_("No child variable with this name found."),
-                        childIdentifierNameLocation, isUndeclaredVariableFatal);
-
-          return true; // We should have found a variable.
+        ValidateChildVariable(variable, childIdentifierName,
+                              childIdentifierNameLocation,
+                              isUndeclaredVariableFatal);
+        if (variable.HasChild(childIdentifierName)) {
+          ValidateLastChildVariable(variable.GetChild(childIdentifierName),
+                                    identifierNameLocation);
         }
-
-        const gd::Variable& childVariable =
-            variable.GetChild(childIdentifierName);
-        ReadChildTypeFromVariable(childVariable.GetType());
         return true; // We found a variable.
       }
     }, [&]() {

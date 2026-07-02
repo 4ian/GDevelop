@@ -242,9 +242,9 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
       childType = parentType;
 
       if (!rootObjectName.empty()) {
-        ValidateObjectVariableOrVariableOrProperty(rootObjectName,
-                                                   node.nameLocation, node.name,
-                                                   node.nameLocation, false);
+        ValidateObjectVariableOrVariableOrProperty(
+            rootObjectName, node.nameLocation, node.name, node.nameLocation,
+            false, !!node.child);
 
         const auto &objectsContainersList =
             projectScopedContainers.GetObjectsContainersList();
@@ -338,7 +338,7 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
     if (!variableObjectName.empty()) {
       ValidateObjectVariableOrVariableOrProperty(
           variableObjectName, variableObjectNameLocation, node.name,
-          node.nameLocation, true);
+          node.nameLocation, true, !!node.child);
 
       const auto &objectsContainersList =
           projectScopedContainers.GetObjectsContainersList();
@@ -353,7 +353,6 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
         if (node.child) {
           parentVariable = &objectVariable;
         } else {
-          ValidateLastChildVariable(objectVariable, node.nameLocation);
           parentVariable = nullptr;
         }
       } else {
@@ -458,8 +457,9 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
       childType = parentType;
       if (!rootObjectName.empty()) {
         ValidateObjectVariableOrVariableOrProperty(
-            rootObjectName, node.identifierNameLocation,
-            node.identifierName, node.identifierNameLocation, false);
+            rootObjectName, node.identifierNameLocation, node.identifierName,
+            node.identifierNameLocation, false,
+            !node.childIdentifierName.empty());
 
         const auto &objectsContainersList =
             projectScopedContainers.GetObjectsContainersList();
@@ -545,7 +545,8 @@ private:
       const gd::ExpressionParserLocation identifierNameLocation,
       const gd::String &childIdentifierName,
       const gd::ExpressionParserLocation childIdentifierNameLocation,
-      const bool hasChild);
+      const bool isUndeclaredVariableFatal,
+      const bool hasMoreChildren = false);
   bool ValidateChildVariable(
       const gd::Variable &parentVariable, const gd::String &childVariableName,
       const gd::ExpressionParserLocation childNameLocation,

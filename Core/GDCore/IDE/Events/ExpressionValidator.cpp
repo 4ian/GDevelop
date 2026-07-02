@@ -112,7 +112,8 @@ bool ExpressionValidator::ValidateObjectVariableOrVariableOrProperty(
     const gd::ExpressionParserLocation identifierNameLocation,
     const gd::String &childIdentifierName,
     const gd::ExpressionParserLocation childIdentifierNameLocation,
-    const bool isUndeclaredVariableFatal) {
+    const bool isUndeclaredVariableFatal,
+    const bool hasMoreChildren) {
   const auto& variablesContainersList = projectScopedContainers.GetVariablesContainersList();
   const auto& objectsContainersList = projectScopedContainers.GetObjectsContainersList();
   const auto& propertiesContainersList = projectScopedContainers.GetPropertiesContainersList();
@@ -158,9 +159,13 @@ bool ExpressionValidator::ValidateObjectVariableOrVariableOrProperty(
         return true; // We should have found a variable.
       }
 
-      auto variableType = objectsContainersList.GetTypeOfObjectOrGroupVariable(
-          identifierName, childIdentifierName);
-      ReadChildTypeFromVariable(variableType);
+      if (!hasMoreChildren) {
+        const auto &objectVariable =
+            objectsContainersList
+                .GetObjectOrGroupVariablesContainer(identifierName)
+                ->Get(childIdentifierName);
+        ValidateLastChildVariable(objectVariable, childIdentifierNameLocation);
+      }
 
       return true; // We found a variable.
     }, [&]() {

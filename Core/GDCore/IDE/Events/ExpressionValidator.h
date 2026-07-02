@@ -245,6 +245,24 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
         ValidateObjectVariableOrVariableOrProperty(rootObjectName,
                                                    node.nameLocation, node.name,
                                                    node.nameLocation, false);
+
+        const auto &objectsContainersList =
+            projectScopedContainers.GetObjectsContainersList();
+        auto variableExistence =
+            objectsContainersList.HasObjectOrGroupWithVariableNamed(
+                rootObjectName, node.name);
+        if (variableExistence == gd::ObjectsContainersList::Exists) {
+          const auto &objectVariable =
+              objectsContainersList
+                  .GetObjectOrGroupVariablesContainer(rootObjectName)
+                  ->Get(node.name);
+          if (node.child) {
+            parentVariable = &objectVariable;
+          } else {
+            ValidateLastChildVariable(objectVariable, node.nameLocation);
+          }
+        }
+        rootObjectName = "";
       }
       if (node.child) {
         node.child->Visit(*this);
@@ -328,21 +346,20 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
           objectsContainersList.HasObjectOrGroupWithVariableNamed(
               variableObjectName, node.name);
       if (variableExistence == gd::ObjectsContainersList::Exists) {
-        const auto &childVariable =
+        const auto &objectVariable =
             objectsContainersList
                 .GetObjectOrGroupVariablesContainer(variableObjectName)
                 ->Get(node.name);
         if (node.child) {
-          parentVariable = &childVariable;
+          parentVariable = &objectVariable;
         } else {
-          ValidateLastChildVariable(childVariable, node.nameLocation);
+          ValidateLastChildVariable(objectVariable, node.nameLocation);
           parentVariable = nullptr;
-          variableChildDepth = 0;
         }
       } else {
         parentVariable = nullptr;
-        variableChildDepth = 0;
       }
+      variableChildDepth = 0;
       variableObjectName = "";
     } else if (parentVariable) {
       const bool isChildVariableDeclared = ValidateChildVariable(
@@ -443,6 +460,30 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
         ValidateObjectVariableOrVariableOrProperty(
             rootObjectName, node.identifierNameLocation,
             node.identifierName, node.identifierNameLocation, false);
+
+        const auto &objectsContainersList =
+            projectScopedContainers.GetObjectsContainersList();
+        auto variableExistence =
+            objectsContainersList.HasObjectOrGroupWithVariableNamed(
+                rootObjectName, node.identifierName);
+        if (variableExistence == gd::ObjectsContainersList::Exists) {
+          const auto &objectVariable =
+              objectsContainersList
+                  .GetObjectOrGroupVariablesContainer(rootObjectName)
+                  ->Get(node.identifierName);
+          if (!node.childIdentifierName.empty()) {
+            const bool isChildVariableDeclared =
+                ValidateChildVariable(objectVariable, node.childIdentifierName,
+                                      node.childIdentifierNameLocation, false);
+            if (isChildVariableDeclared) {
+              const auto &childVariable =
+                  parentVariable->GetChild(node.childIdentifierName);
+              ValidateLastChildVariable(childVariable,
+                                        node.childIdentifierNameLocation);
+            }
+          }
+        }
+        rootObjectName = "";
       }
     } else if (parentType != Type::Object &&
                parentType != Type::LegacyVariable) {

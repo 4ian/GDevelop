@@ -365,9 +365,14 @@ namespace gdjs {
       payload?: RuntimeSignalPayloadInput,
       sender?: RuntimeSignalSenderInput
     ): void {
+      if (!name) {
+        logger.warn('Ignored a signal with an empty name.');
+        return;
+      }
+
       this._queuedSignals.push({
         id: this._nextSignalId++,
-        name: name || '',
+        name,
         payload: normalizePayload(payload),
         target,
         sender: normalizeSender(sender),
@@ -1178,6 +1183,16 @@ namespace gdjs {
         sender?: RuntimeSignalSenderInput
       ) {
         const runtimeScene = getSignalRuntimeScene(instanceContainer);
+        if (!isFinite(objectId) || objectId <= 0) {
+          logger.warn(
+            'Ignored object instance signal "' +
+              signalName +
+              '" because instance id "' +
+              objectId +
+              '" is invalid.'
+          );
+          return;
+        }
         runtimeScene.getSignalBus().emitSignal(
           signalName,
           {

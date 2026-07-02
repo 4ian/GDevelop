@@ -159,11 +159,11 @@ Runtime data model:
 type SignalName = string;
 
 type SignalTarget =
-  | { kind: 'scene' }
-  | { kind: 'object'; objectName: string }
-  | { kind: 'objectInstance'; objectId: number }
-  | { kind: 'objectGroup'; objectGroupName: string }
-  | { kind: 'pickedObjects'; pickedObjects: gdjs.LongLivedObjectsList };
+  | { kind: "scene" }
+  | { kind: "object"; objectName: string }
+  | { kind: "objectInstance"; objectId: number }
+  | { kind: "objectGroup"; objectGroupName: string }
+  | { kind: "pickedObjects"; pickedObjects: gdjs.LongLivedObjectsList };
 
 type RuntimeSignal = {
   id: number;
@@ -206,7 +206,7 @@ Two runtime facts fix where dispatch must go:
 - The generated scene sheet `_eventsFunction` is a single function invoked
   exactly once per frame (`runtimescene.ts:423`). It cannot be re-entered during
   a later phase, so a scene-level "Signal received" condition can only observe a
-  context that was set *before* the sheet ran.
+  context that was set _before_ the sheet ran.
 - The only per-frame seams an extension can register into are
   `gdjs.registerRuntimeScenePreEventsCallback` (step 4) and
   `registerRuntimeScenePostEventsCallback` (step 7), declared in
@@ -218,7 +218,7 @@ Two runtime facts fix where dispatch must go:
 
 - A signal emitted in frame N is dispatched at the start of frame N+1, before
   that frame's scene events (step 5).
-- Because the sheet runs *after* the dispatcher, the scene-level "Signal
+- Because the sheet runs _after_ the dispatcher, the scene-level "Signal
   received" condition (§7.3) reads a context the dispatcher already set — no
   re-entrancy.
 - Object `onSignal` handlers are plain method calls invoked in the
@@ -325,7 +325,6 @@ needed:
 ```text
 Emit signal "Health.Damaged" to instance Enemy.InstanceId()
 ```
-
 
 ### 5.3 Object group signal
 
@@ -475,7 +474,7 @@ This means "the dispatcher is currently delivering this signal" — not "the las
 event somewhere emitted this signal".
 
 The mechanism follows from the pre-events dispatch phase (§4.1). The dispatcher
-publishes the frame's delivered signals to a scene-level context *before*
+publishes the frame's delivered signals to a scene-level context _before_
 `_eventsFunction` runs. The condition then reads that context top-to-bottom in
 the normal way, with no re-entrancy.
 
@@ -586,6 +585,9 @@ Vague names (`Trigger event`, `Call event`, `Send message`) are avoided.
 
 The object-instance action's instance id can come from an object's `InstanceId()`
 expression or from `SignalSenderInstanceId()` when replying to a sender.
+Runtime instance ids start at 1. Empty signal names and invalid instance ids
+such as 0 are ignored at runtime instead of being queued, because they usually
+come from incomplete editor actions.
 
 ### 9.2 Condition
 
@@ -730,7 +732,7 @@ The dispatcher sets the current-signal context, then calls the generated
 handler with the fixed signal arguments (section 8):
 
 ```ts
-runtimeScene._currentSignal = signal;   // set once per delivered signal
+runtimeScene._currentSignal = signal; // set once per delivered signal
 
 // Custom object receiver:
 if (runtimeObject.onSignal) {
@@ -738,11 +740,11 @@ if (runtimeObject.onSignal) {
     signal.name,
     signal.payload,
     senderObjectName,
-    senderInstanceId
+    senderInstanceId,
   );
 }
 
-runtimeScene._currentSignal = null;     // cleared after the delivery pass
+runtimeScene._currentSignal = null; // cleared after the delivery pass
 ```
 
 Because presence is a prototype-level fact (§10.3), the `if (obj.onSignal)` guard
@@ -771,17 +773,37 @@ non-renamable and hides it from the action/condition list automatically.
 ### 11.2 Runtime event tools
 
 ```ts
-gdjs.evtTools.signal.emitSceneSignal(runtimeScene, name, payload)
-gdjs.evtTools.signal.emitSignalToObject(runtimeScene, objectNameOrObjectsLists, name, payload)
-gdjs.evtTools.signal.emitSignalToObjectInstance(runtimeScene, instanceId, name, payload)
-gdjs.evtTools.signal.emitSignalToPickedObjects(runtimeScene, objectsLists, name, payload)
-gdjs.evtTools.signal.emitSignalToObjectGroup(runtimeScene, objectGroupName, name, payload)
+gdjs.evtTools.signal.emitSceneSignal(runtimeScene, name, payload);
+gdjs.evtTools.signal.emitSignalToObject(
+  runtimeScene,
+  objectNameOrObjectsLists,
+  name,
+  payload,
+);
+gdjs.evtTools.signal.emitSignalToObjectInstance(
+  runtimeScene,
+  instanceId,
+  name,
+  payload,
+);
+gdjs.evtTools.signal.emitSignalToPickedObjects(
+  runtimeScene,
+  objectsLists,
+  name,
+  payload,
+);
+gdjs.evtTools.signal.emitSignalToObjectGroup(
+  runtimeScene,
+  objectGroupName,
+  name,
+  payload,
+);
 
-gdjs.evtTools.signal.isSignalReceived(runtimeScene, name)  // "Signal received" condition
-gdjs.evtTools.signal.getSignalName(runtimeScene)
-gdjs.evtTools.signal.getSignalPayload(runtimeScene)
-gdjs.evtTools.signal.getSignalSenderObjectName(runtimeScene)
-gdjs.evtTools.signal.getSignalSenderInstanceId(runtimeScene)
+gdjs.evtTools.signal.isSignalReceived(runtimeScene, name); // "Signal received" condition
+gdjs.evtTools.signal.getSignalName(runtimeScene);
+gdjs.evtTools.signal.getSignalPayload(runtimeScene);
+gdjs.evtTools.signal.getSignalSenderObjectName(runtimeScene);
+gdjs.evtTools.signal.getSignalSenderInstanceId(runtimeScene);
 ```
 
 All emit helpers also accept an optional sender argument at runtime. It can be a
@@ -802,7 +824,7 @@ runtimeScene._currentSignal = signal;
 The generated condition matches against it:
 
 ```ts
-gdjs.evtTools.signal.isSignalReceived(runtimeScene, "Health.Damaged")
+gdjs.evtTools.signal.isSignalReceived(runtimeScene, "Health.Damaged");
 ```
 
 While a matched condition's sub-events run, `SignalName()` / `SignalPayload()`
@@ -825,11 +847,11 @@ Signal name, payload and sender can be read either from the direct parameters or
 through the current-signal expressions:
 
 ```ts
-MyCustomObject.prototype.onSignal = function(
+MyCustomObject.prototype.onSignal = function (
   SignalName,
   Payload,
   EmitterObjectName,
-  EmitterInstanceId
+  EmitterInstanceId,
 ) {
   // generated events
 };

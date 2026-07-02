@@ -361,6 +361,44 @@ describe('gdjs.evtTools.signal', () => {
     ).to.be(false);
   });
 
+  it('ignores empty signal names without queueing debug noise', () => {
+    const runtimeScene = createSignalRuntimeScene();
+    runtimeScene.enableSignalAnimationDebugDraw(true);
+
+    gdjs.evtTools.signal.emitSceneSignal(runtimeScene, '', 'payload');
+
+    expect(runtimeScene.getSignalBus().getDebugInfo().queuedSignalsCount).to.be(
+      0
+    );
+    runtimeScene.renderAndStepWithEventsFunction(16, () => {});
+
+    expect(signalCalls.length).to.be(0);
+    expect(runtimeScene.getSignalBus().getSignalAnimationDebugRecords()).to.eql(
+      []
+    );
+  });
+
+  it('ignores invalid object instance ids without queueing debug noise', () => {
+    const runtimeScene = createSignalRuntimeScene();
+    runtimeScene.enableSignalAnimationDebugDraw(true);
+
+    gdjs.evtTools.signal.emitSignalToObjectInstance(
+      runtimeScene,
+      0,
+      'InstanceOnly'
+    );
+
+    expect(runtimeScene.getSignalBus().getDebugInfo().queuedSignalsCount).to.be(
+      0
+    );
+    runtimeScene.renderAndStepWithEventsFunction(16, () => {});
+
+    expect(signalCalls.length).to.be(0);
+    expect(runtimeScene.getSignalBus().getSignalAnimationDebugRecords()).to.eql(
+      []
+    );
+  });
+
   it('drops deleted picked objects before dispatch', () => {
     const runtimeScene = createSignalRuntimeScene();
     const receiver = runtimeScene.getObjects('Receiver')[0];

@@ -83,6 +83,41 @@ namespace gdjs {
     return text.substr(0, maxLength - 3) + '...';
   };
 
+  const fitSignalDebugTextToWidth = (
+    textObject: PIXI.Text,
+    text: string,
+    maxWidth: float
+  ): void => {
+    if (maxWidth <= 0) {
+      textObject.text = '';
+      return;
+    }
+
+    textObject.text = text;
+    if (textObject.width <= maxWidth) {
+      return;
+    }
+
+    const ellipsis = '...';
+    let lowerLength = 0;
+    let upperLength = Math.max(0, text.length - ellipsis.length);
+    while (lowerLength < upperLength) {
+      const middleLength = Math.ceil((lowerLength + upperLength) / 2);
+      textObject.text = text.substr(0, middleLength) + ellipsis;
+      if (textObject.width <= maxWidth) {
+        lowerLength = middleLength;
+      } else {
+        upperLength = middleLength - 1;
+      }
+    }
+
+    textObject.text = text.substr(0, lowerLength) + ellipsis;
+    while (lowerLength > 0 && textObject.width > maxWidth) {
+      lowerLength--;
+      textObject.text = text.substr(0, lowerLength) + ellipsis;
+    }
+  };
+
   const formatSignalDebugPoint = (point: gdjs.SignalDebugPoint): string => {
     if (point.objectName === 'scene') {
       return 'scene';
@@ -133,6 +168,8 @@ namespace gdjs {
     _signalDebugPanelScrollIndex: integer = 0;
     _signalDebugQueuedSignalsCount: integer = 0;
     _signalDebugHoveredPayloadLogId: integer | null = null;
+    _signalDebugPanelPointerX: float = NaN;
+    _signalDebugPanelPointerY: float = NaN;
     _hasUserPositionedSignalDebugPanel: boolean = false;
     _isDraggingSignalDebugPanel: boolean = false;
     _isSignalDebugPanelFolded: boolean = false;
@@ -533,6 +570,13 @@ namespace gdjs {
       };
     }
 
+    _updateSignalDebugPanelPointerPosition(event: any): { x: float; y: float } {
+      const position = this._getSignalDebugPanelPointerPosition(event);
+      this._signalDebugPanelPointerX = position.x;
+      this._signalDebugPanelPointerY = position.y;
+      return position;
+    }
+
     _isSignalDebugPanelPointInside(x: float, y: float): boolean {
       if (!this._signalDebugPanel) {
         return false;
@@ -545,6 +589,22 @@ namespace gdjs {
         x <= this._signalDebugPanelX + panelWidth &&
         y >= this._signalDebugPanelY &&
         y <= this._signalDebugPanelY + panelHeight
+      );
+    }
+
+    _isSignalDebugPointerInsideRect(
+      x: float,
+      y: float,
+      width: float,
+      height: float
+    ): boolean {
+      return (
+        isFinite(this._signalDebugPanelPointerX) &&
+        isFinite(this._signalDebugPanelPointerY) &&
+        this._signalDebugPanelPointerX >= x &&
+        this._signalDebugPanelPointerX <= x + width &&
+        this._signalDebugPanelPointerY >= y &&
+        this._signalDebugPanelPointerY <= y + height
       );
     }
 
@@ -639,7 +699,7 @@ namespace gdjs {
         this._registerSignalDebugPanelInputInterceptor();
 
         this._signalDebugPanel.on('pointerdown', (event: any) => {
-          const position = this._getSignalDebugPanelPointerPosition(event);
+          const position = this._updateSignalDebugPanelPointerPosition(event);
           this._hasUserPositionedSignalDebugPanel = true;
           this._isDraggingSignalDebugPanel = true;
           this._signalDebugPanelDragOffsetX =
@@ -651,17 +711,20 @@ namespace gdjs {
           }
         });
         const movePanel = (event: any) => {
+          const position = this._updateSignalDebugPanelPointerPosition(event);
           if (!this._isDraggingSignalDebugPanel) {
             return;
           }
-          const position = this._getSignalDebugPanelPointerPosition(event);
           this._signalDebugPanelX =
             position.x - this._signalDebugPanelDragOffsetX;
           this._signalDebugPanelY =
             position.y - this._signalDebugPanelDragOffsetY;
           this._clampSignalDebugPanelPosition();
         };
-        const stopDragging = () => {
+        const stopDragging = (event: any) => {
+          if (event) {
+            this._updateSignalDebugPanelPointerPosition(event);
+          }
           this._isDraggingSignalDebugPanel = false;
         };
         this._signalDebugPanel.on('pointermove', movePanel);
@@ -1044,51 +1107,62 @@ namespace gdjs {
         row.addChild(fromToText);
 
         const payload = log.payload || '';
+        const payloadX = 12;
+        const payloadY = 52;
+        const payloadWidth = rowWidth - 24;
+        const payloadHeight = 18;
         const payloadBackground = new PIXI.Graphics();
         payloadBackground.lineStyle(1, payload ? 0xffdd78 : 0x536174, 0.5);
         payloadBackground.beginFill(payload ? 0x2a2230 : 0x151d29, 0.7);
-        payloadBackground.drawRoundedRect(12, 52, rowWidth - 24, 18, 4);
+        payloadBackground.drawRoundedRect(
+          payloadX,
+          payloadY,
+          payloadWidth,
+          payloadHeight,
+          4
+        );
         payloadBackground.endFill();
         row.addChild(payloadBackground);
 
-        const payloadText = new PIXI.Text(
-          shortenSignalDebugText(
-            'data: "' + payload + '"',
-            panelWidth < 380 ? 38 : 68
-          ),
-          {
-            fill: payload ? 0xffdd78 : 0x9aa7b8,
-            fontSize: 10,
-          }
+        const payloadText = new PIXI.Text('', {
+          fill: payload ? 0xffdd78 : 0x9aa7b8,
+          fontSize: 10,
+        });
+        fitSignalDebugTextToWidth(
+          payloadText,
+          'data: "' + payload + '"',
+          payloadWidth - 12
         );
-        payloadText.position.set(18, 54);
+        payloadText.position.set(payloadX + 6, payloadY + 2);
         row.addChild(payloadText);
 
         if (payload) {
           const payloadHitArea = new PIXI.Container();
           payloadHitArea.hitArea = new PIXI.Rectangle(
-            12,
-            52,
-            rowWidth - 24,
-            18
+            payloadX,
+            payloadY,
+            payloadWidth,
+            payloadHeight
           );
           (payloadHitArea as any).eventMode = 'static';
           (payloadHitArea as any).interactive = true;
           (payloadHitArea as any).cursor = 'help';
           payloadHitArea.on('pointerover', (event: any) => {
-            if (this._signalDebugHoveredPayloadLogId !== log.id) {
-              this._signalDebugHoveredPayloadLogId = log.id;
-              this._renderSignalDebugPanel();
+            this._updateSignalDebugPanelPointerPosition(event);
+            this._renderSignalDebugPanel();
+            if (event && event.stopPropagation) {
+              event.stopPropagation();
             }
+          });
+          payloadHitArea.on('pointermove', (event: any) => {
+            this._updateSignalDebugPanelPointerPosition(event);
             if (event && event.stopPropagation) {
               event.stopPropagation();
             }
           });
           payloadHitArea.on('pointerout', (event: any) => {
-            if (this._signalDebugHoveredPayloadLogId === log.id) {
-              this._signalDebugHoveredPayloadLogId = null;
-              this._renderSignalDebugPanel();
-            }
+            this._updateSignalDebugPanelPointerPosition(event);
+            this._renderSignalDebugPanel();
             if (event && event.stopPropagation) {
               event.stopPropagation();
             }
@@ -1096,7 +1170,20 @@ namespace gdjs {
           row.addChild(payloadHitArea);
         }
 
-        if (this._signalDebugHoveredPayloadLogId === log.id && payload) {
+        const payloadAbsoluteX =
+          this._signalDebugPanelX +
+          signalDebugPanelHorizontalPadding +
+          payloadX;
+        const payloadAbsoluteY = this._signalDebugPanelY + rowY + payloadY;
+        if (
+          payload &&
+          this._isSignalDebugPointerInsideRect(
+            payloadAbsoluteX,
+            payloadAbsoluteY,
+            payloadWidth,
+            payloadHeight
+          )
+        ) {
           hoveredPayloadLog = log;
           hoveredPayloadRowY = rowY;
         }
@@ -1177,6 +1264,7 @@ namespace gdjs {
       }
 
       if (hoveredPayloadLog) {
+        this._signalDebugHoveredPayloadLogId = hoveredPayloadLog.id;
         this._renderSignalDebugPayloadTooltip(
           rows,
           hoveredPayloadLog.payload,
@@ -1430,6 +1518,8 @@ namespace gdjs {
       this._signalDebugPanelRows = null;
       this._signalDebugPanelScrollIndex = 0;
       this._signalDebugHoveredPayloadLogId = null;
+      this._signalDebugPanelPointerX = NaN;
+      this._signalDebugPanelPointerY = NaN;
       this._hasUserPositionedSignalDebugPanel = false;
       this._isDraggingSignalDebugPanel = false;
       this._isSignalDebugPanelFolded = false;

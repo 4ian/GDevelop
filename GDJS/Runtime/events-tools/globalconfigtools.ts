@@ -26,12 +26,12 @@ namespace gdjs {
       ): value is { [key: string]: GlobalConfigValue } =>
         !!value && typeof value === 'object' && !Array.isArray(value);
 
-      export const normalizePath = function(path: string): string {
+      export const normalizePath = function (path: string): string {
         const match = exactPlaceholderRegex.exec(path);
         return match ? match[1].trim() : path.trim();
       };
 
-      const warnMissingPath = function(path: string): void {
+      const warnMissingPath = function (path: string): void {
         const normalizedPath = normalizePath(path);
         if (!normalizedPath || warnedMissingPaths.has(normalizedPath)) return;
 
@@ -41,7 +41,7 @@ namespace gdjs {
         );
       };
 
-      const warnDynamicPathVariable = function(
+      const warnDynamicPathVariable = function (
         path: string,
         variableName: string,
         reason: string
@@ -62,13 +62,13 @@ namespace gdjs {
         );
       };
 
-      const getTypeName = function(value: any): string {
+      const getTypeName = function (value: any): string {
         if (value === null) return 'null';
         if (Array.isArray(value)) return 'array';
         return typeof value;
       };
 
-      const validateValueAgainstExample = function(
+      const validateValueAgainstExample = function (
         value: any,
         example: any,
         path: string
@@ -136,7 +136,7 @@ namespace gdjs {
         return null;
       };
 
-      const getParsedJsonExample = function(
+      const getParsedJsonExample = function (
         schemaExample: any,
         propertyName: string
       ): any | null {
@@ -181,7 +181,7 @@ namespace gdjs {
         }
       };
 
-      const validateResolvedVariableValue = function(
+      const validateResolvedVariableValue = function (
         value: any,
         schemaExample?: any,
         propertyName?: string,
@@ -217,7 +217,7 @@ namespace gdjs {
         );
       };
 
-      export const parsePath = function(
+      export const parsePath = function (
         path: string
       ): GlobalConfigPathSegment[] {
         const segments: GlobalConfigPathSegment[] = [];
@@ -287,7 +287,7 @@ namespace gdjs {
         return segments;
       };
 
-      const resolveDynamicPathSegment = function(
+      const resolveDynamicPathSegment = function (
         runtimeGame: gdjs.RuntimeGame,
         path: string,
         segment: GlobalConfigPathSegment
@@ -323,7 +323,7 @@ namespace gdjs {
         return hasUnresolvedVariable ? null : resolvedSegment;
       };
 
-      const resolveDynamicPathSegments = function(
+      const resolveDynamicPathSegments = function (
         runtimeGame: gdjs.RuntimeGame,
         path: string
       ): GlobalConfigPathSegment[] | null {
@@ -344,14 +344,13 @@ namespace gdjs {
         return resolvedSegments;
       };
 
-      export const getValue = function(
+      export const getValue = function (
         runtimeGame: gdjs.RuntimeGame,
         path: string,
         warnIfMissing: boolean = true
       ): GlobalConfigValue | undefined {
-        let value:
-          | GlobalConfigValue
-          | undefined = runtimeGame.getGlobalConfig();
+        let value: GlobalConfigValue | undefined =
+          runtimeGame.getGlobalConfig();
         const segments = resolveDynamicPathSegments(runtimeGame, path);
         if (!segments) {
           return undefined;
@@ -379,14 +378,14 @@ namespace gdjs {
         return value;
       };
 
-      export const has = function(
+      export const has = function (
         runtimeGame: gdjs.RuntimeGame,
         path: string
       ): boolean {
         return getValue(runtimeGame, path, false) !== undefined;
       };
 
-      export const getNumber = function(
+      export const getNumber = function (
         runtimeGame: gdjs.RuntimeGame,
         path: string
       ): number {
@@ -400,7 +399,7 @@ namespace gdjs {
         return 0;
       };
 
-      export const getString = function(
+      export const getString = function (
         runtimeGame: gdjs.RuntimeGame,
         path: string
       ): string {
@@ -418,7 +417,7 @@ namespace gdjs {
         }
       };
 
-      export const getBoolean = function(
+      export const getBoolean = function (
         runtimeGame: gdjs.RuntimeGame,
         path: string
       ): boolean {
@@ -439,7 +438,7 @@ namespace gdjs {
         return false;
       };
 
-      export const getChildCount = function(
+      export const getChildCount = function (
         runtimeGame: gdjs.RuntimeGame,
         path: string
       ): number {
@@ -449,7 +448,7 @@ namespace gdjs {
         return 0;
       };
 
-      export const toJSON = function(
+      export const toJSON = function (
         runtimeGame: gdjs.RuntimeGame,
         path: string
       ): string {
@@ -461,19 +460,14 @@ namespace gdjs {
         }
       };
 
-      const emptyStructureVariable = function(): gdjs.Variable {
+      const emptyStructureVariable = function (): gdjs.Variable {
         const variable = new gdjs.Variable();
         variable.castTo('structure');
         return variable;
       };
 
-      const toVariable = function(value: any): gdjs.Variable {
+      const toVariable = function (value: any): gdjs.Variable {
         if (value instanceof gdjs.Variable) {
-          validateResolvedVariableValue(
-            value.toJSObject(),
-            schemaExample,
-            propertyName
-          );
           return value.clone();
         }
         if (value === undefined) return emptyStructureVariable();
@@ -483,7 +477,7 @@ namespace gdjs {
         return variable;
       };
 
-      export const getVariable = function(
+      export const getVariable = function (
         runtimeGame: gdjs.RuntimeGame,
         path: string,
         schemaExample?: any,
@@ -499,13 +493,20 @@ namespace gdjs {
         return toVariable(value);
       };
 
-      export const resolveVariable = function(
+      export const resolveVariable = function (
         runtimeGame: gdjs.RuntimeGame,
         value: any,
         schemaExample?: any,
         propertyName?: string
       ): gdjs.Variable {
-        if (value instanceof gdjs.Variable) return value.clone();
+        if (value instanceof gdjs.Variable) {
+          validateResolvedVariableValue(
+            value.toJSObject(),
+            schemaExample,
+            propertyName
+          );
+          return value.clone();
+        }
         if (typeof value === 'string') {
           const placeholderPath = getExactPlaceholderPath(value);
           if (placeholderPath) {
@@ -536,14 +537,14 @@ namespace gdjs {
         return toVariable(value);
       };
 
-      export const getExactPlaceholderPath = function(
+      export const getExactPlaceholderPath = function (
         text: string
       ): string | null {
         const match = exactPlaceholderRegex.exec(text);
         return match ? match[1].trim() : null;
       };
 
-      export const resolvePlaceholders = function(
+      export const resolvePlaceholders = function (
         runtimeGame: gdjs.RuntimeGame,
         text: string
       ): string {
@@ -562,7 +563,7 @@ namespace gdjs {
         });
       };
 
-      export const resolveNumber = function(
+      export const resolveNumber = function (
         runtimeGame: gdjs.RuntimeGame,
         value: any
       ): number {
@@ -578,7 +579,7 @@ namespace gdjs {
         return 0;
       };
 
-      export const resolveString = function(
+      export const resolveString = function (
         runtimeGame: gdjs.RuntimeGame,
         value: any
       ): string {
@@ -596,7 +597,7 @@ namespace gdjs {
         }
       };
 
-      export const resolveBoolean = function(
+      export const resolveBoolean = function (
         runtimeGame: gdjs.RuntimeGame,
         value: any
       ): boolean {

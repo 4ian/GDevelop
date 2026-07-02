@@ -4,7 +4,7 @@
 Dedicated packaging counterpart to ``start-windows-app.py`` (which only launches
 the app for development). This builds the React app, syncs it into the Electron
 ``app/www`` folder, and packages a Windows NSIS installer
-(``GDevelop 5 Setup <version>.exe``) with electron-builder.
+(``GDevelop 6 Setup <version>.exe``) with electron-builder.
 
 Windows Authenticode signing is disabled by default (``GD_PORTABLE_BUILD=true``)
 so the build works without a code-signing certificate. The resulting installer

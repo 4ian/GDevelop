@@ -190,7 +190,9 @@ export default class LocalPreviewLauncher extends React.Component<
         },
         previewGamePath: gamePath,
         hideMenuBar: !options.getIsMenuBarHiddenInPreview(),
-        alwaysOnTop: options.getIsAlwaysOnTopInPreview(),
+        alwaysOnTop:
+          options.forceAlwaysOnTopInPreview ||
+          options.getIsAlwaysOnTopInPreview(),
         numberOfWindows: options.numberOfWindows,
         captureOptions: options.captureOptions,
       },

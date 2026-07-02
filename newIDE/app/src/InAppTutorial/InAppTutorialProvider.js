@@ -105,7 +105,7 @@ const InAppTutorialProvider = (props: Props): React.Node => {
         title: 'Open a guided lesson',
         properties: ['openFile'],
         message: 'Choose a guided lesson (.json file)',
-        filters: [{ name: 'GDevelop 5 in-app tutorial', extensions: ['json'] }],
+        filters: [{ name: 'GDevelop 6 in-app tutorial', extensions: ['json'] }],
       });
       if (!filePath) return;
       // $FlowFixMe[incompatible-type]

@@ -25,6 +25,7 @@ export type LaunchPreviewOptions = {
   fullLoadingScreen?: boolean,
   forceDiagnosticReport?: boolean,
   numberOfWindows?: number,
+  forceAlwaysOnTopInPreview?: boolean,
   isForInGameEdition?: {|
     editorId: string,
     forcedSceneName: string | null,
@@ -59,6 +60,7 @@ export type PreviewOptions = {|
   displayCollisionMask: boolean,
   displaySignalAnimations: boolean,
   fullLoadingScreen: boolean,
+  forceAlwaysOnTopInPreview: boolean,
   fallbackAuthor: ?{ id: string, username: string },
   authenticatedPlayer: ?{
     playerId: string,

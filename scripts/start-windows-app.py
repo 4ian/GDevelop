@@ -308,13 +308,13 @@ def verify_electron_started(repo_root: Path, electron_exe: Path, dry_run: bool) 
     script = f"""
 $electronPath = {quote_powershell_string(electron_exe)}
 $windows = Get-Process electron -ErrorAction SilentlyContinue |
-  Where-Object {{ $_.Path -eq $electronPath -and $_.MainWindowTitle -like 'GDevelop 5*' }}
+  Where-Object {{ $_.Path -eq $electronPath -and $_.MainWindowTitle -like 'GDevelop 6*' }}
 if (!$windows) {{
   Get-Process electron -ErrorAction SilentlyContinue |
     Where-Object {{ $_.Path -eq $electronPath }} |
     Select-Object Id,MainWindowTitle,StartTime |
     Format-Table -AutoSize
-  Write-Error 'Could not find a GDevelop 5 Electron window.'
+  Write-Error 'Could not find a GDevelop 6 Electron window.'
   exit 1
 }}
 $windows | Select-Object Id,MainWindowTitle,StartTime | Format-Table -AutoSize

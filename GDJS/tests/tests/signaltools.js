@@ -80,9 +80,7 @@ describe('gdjs.evtTools.signal', () => {
       expect(gdjs.evtTools.signal.isSignalReceived(runtimeScene, 'Ping')).to.be(
         true
       );
-      expect(gdjs.evtTools.signal.getSignalPayload(runtimeScene)).to.be(
-        '7'
-      );
+      expect(gdjs.evtTools.signal.getSignalPayload(runtimeScene)).to.be('7');
       signalCalls.push({
         receiver: 'scene',
         signalName: gdjs.evtTools.signal.getSignalName(runtimeScene),
@@ -385,15 +383,19 @@ describe('gdjs.evtTools.signal', () => {
     );
     runtimeScene.renderAndStepWithEventsFunction(16, () => {});
 
-    const records = runtimeScene.getSignalBus().getSignalAnimationDebugRecords();
+    const records = runtimeScene
+      .getSignalBus()
+      .getSignalAnimationDebugRecords();
     expect(records.length).to.be(1);
     expect(records[0].name).to.be('Pulse');
+    expect(records[0].payload).to.be('payload');
+    expect(records[0].target).to.be('object:Receiver');
     expect(records[0].source.objectName).to.be('Sender');
     expect(records[0].source.objectId).to.be(sender.getUniqueId());
     expect(records[0].receivers.map(({ receiverName }) => receiverName)).to.eql(
       ['Receiver']
     );
-    records[0].receivers.forEach(receiverRecord => {
+    records[0].receivers.forEach((receiverRecord) => {
       expect(receiverRecord.objectName).to.be('Receiver');
       expect(receiverRecord.objectId).to.be(receiver.getUniqueId());
       expect(receiverRecord.x).to.be(receiver.getCenterXInScene());
@@ -429,9 +431,13 @@ describe('gdjs.evtTools.signal', () => {
       gdjs.evtTools.signal.recordSceneSignalReceived(runtimeScene, signal);
     });
 
-    const records = runtimeScene.getSignalBus().getSignalAnimationDebugRecords();
+    const records = runtimeScene
+      .getSignalBus()
+      .getSignalAnimationDebugRecords();
     expect(records.length).to.be(1);
     expect(records[0].name).to.be('ScenePulse');
+    expect(records[0].payload).to.be('payload');
+    expect(records[0].target).to.be('scene');
     expect(records[0].source.objectName).to.be('Sender');
     expect(records[0].receivers.map(({ receiverName }) => receiverName)).to.eql(
       ['scene']

@@ -9,7 +9,7 @@ macOS code signing and notarization are disabled (``GD_PORTABLE_BUILD=true``) so
 the build works without Apple Developer certificates. The resulting ``.dmg`` is
 therefore unsigned: on first launch other machines may need to right-click the
 app and choose "Open", or run
-``xattr -dr com.apple.quarantine "/Applications/GDevelop 5.app"``.
+``xattr -dr com.apple.quarantine "/Applications/GDevelop 6.app"``.
 
 The absolute path to the produced ``.dmg`` is printed at the end so it can be
 copied and distributed elsewhere.

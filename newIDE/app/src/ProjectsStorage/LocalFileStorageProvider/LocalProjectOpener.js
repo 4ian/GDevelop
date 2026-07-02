@@ -12,7 +12,7 @@ export const onOpenWithPicker = (): Promise<?FileMetadata> => {
     properties: ['openFile'],
     message:
       'If you want to open your GDevelop 4 project, be sure to save it as a .json file',
-    filters: [{ name: 'GDevelop 5 project', extensions: ['json'] }],
+    filters: [{ name: 'GDevelop 6 project', extensions: ['json'] }],
     // $FlowFixMe[incompatible-type]
   }).then(filePath => (filePath ? { fileIdentifier: filePath } : null));
 };

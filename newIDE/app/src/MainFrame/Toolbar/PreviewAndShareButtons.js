@@ -13,7 +13,12 @@ import ResponsiveRaisedButton from '../../UI/ResponsiveRaisedButton';
 import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
 
 export type PreviewAndShareButtonsProps = {|
-  onPreviewWithoutHotReload: (?{ numberOfWindows: number }) => Promise<void>,
+  onPreviewWithoutHotReload: (
+    ?{|
+      numberOfWindows?: number,
+      forceAlwaysOnTopInPreview?: boolean,
+    |}
+  ) => Promise<void>,
   onOpenDebugger: () => void,
   onNetworkPreview: () => void,
   onHotReloadPreview: () => void,
@@ -112,9 +117,7 @@ const PreviewAndShareButtons: React.ComponentType<PreviewAndShareButtonsProps> =
             label: i18n._(t`Display collision masks in previews`),
             checked: displayCollisionMaskInPreview,
             click: () =>
-              setDisplayCollisionMaskInPreview(
-                !displayCollisionMaskInPreview
-              ),
+              setDisplayCollisionMaskInPreview(!displayCollisionMaskInPreview),
           },
           {
             type: 'checkbox',

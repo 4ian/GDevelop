@@ -1,14 +1,18 @@
 namespace gdjs {
   const signalDebugAnimationDuration = 850;
   const maxSignalDebugSegments = 240;
+  const maxSignalDebugPanelLogs = 80;
+  const signalDebugPanelMargin = 12;
+  const signalDebugPanelHeaderHeight = 34;
+  const signalDebugPanelRowHeight = 78;
+  const signalDebugPanelHorizontalPadding = 12;
+  const signalDebugPanelFoldButtonSize = 20;
+  const signalDebugPanelScrollbarWidth = 7;
+  const signalDebugPanelScrollbarGap = 8;
+  const signalDebugPanelMinWidth = 260;
+  const signalDebugPanelMaxWidth = 360;
   const signalDebugColors = [
-    0x00d1ff,
-    0xffc857,
-    0xff5c8a,
-    0x7cff6b,
-    0xb388ff,
-    0xff9f1c,
-    0x40f99b,
+    0x00d1ff, 0xffc857, 0xff5c8a, 0x7cff6b, 0xb388ff, 0xff9f1c, 0x40f99b,
     0xff4d4d,
   ];
 
@@ -21,12 +25,50 @@ namespace gdjs {
     startTime: integer;
   };
 
+  type SignalDebugPanelLog = {
+    id: integer;
+    signalName: string;
+    payload: string;
+    target: string;
+    source: gdjs.SignalDebugPoint;
+    receiver: gdjs.SignalAnimationDebugReceiver;
+    color: integer;
+    startTime: integer;
+  };
+
   const getSignalDebugColor = (signalName: string): integer => {
     let hash = 0;
     for (let i = 0, len = signalName.length; i < len; ++i) {
       hash = (hash * 31 + signalName.charCodeAt(i)) | 0;
     }
     return signalDebugColors[Math.abs(hash) % signalDebugColors.length];
+  };
+
+  const shortenSignalDebugText = (text: string, maxLength: integer): string => {
+    if (text.length <= maxLength) {
+      return text;
+    }
+    if (maxLength <= 3) {
+      return text.substr(0, maxLength);
+    }
+    return text.substr(0, maxLength - 3) + '...';
+  };
+
+  const formatSignalDebugPoint = (point: gdjs.SignalDebugPoint): string => {
+    if (point.objectName === 'scene' || point.objectId < 0) {
+      return 'scene';
+    }
+    return point.objectName + '#' + point.objectId;
+  };
+
+  const getPointerGlobalPosition = (event: any): { x: float; y: float } => {
+    if (event && event.global) {
+      return event.global;
+    }
+    if (event && event.data && event.data.global) {
+      return event.data.global;
+    }
+    return { x: 0, y: 0 };
   };
 
   /**
@@ -50,6 +92,18 @@ namespace gdjs {
     _signalDebugDrawContainer: PIXI.Container | null = null;
     _signalDebugDrawLabels: PIXI.Text[] = [];
     _signalDebugSegments: SignalDebugSegment[] = [];
+    _signalDebugPanel: PIXI.Container | null = null;
+    _signalDebugPanelBackground: PIXI.Graphics | null = null;
+    _signalDebugPanelRows: PIXI.Container | null = null;
+    _signalDebugPanelLogs: SignalDebugPanelLog[] = [];
+    _signalDebugPanelX: float = signalDebugPanelMargin;
+    _signalDebugPanelY: float = signalDebugPanelMargin;
+    _signalDebugPanelScrollIndex: integer = 0;
+    _hasUserPositionedSignalDebugPanel: boolean = false;
+    _isDraggingSignalDebugPanel: boolean = false;
+    _isSignalDebugPanelFolded: boolean = false;
+    _signalDebugPanelDragOffsetX: float = 0;
+    _signalDebugPanelDragOffsetY: float = 0;
 
     constructor(instanceContainer: gdjs.RuntimeInstanceContainer) {
       this._instanceContainer = instanceContainer;
@@ -357,7 +411,9 @@ namespace gdjs {
         .getRendererObject();
       if (!this._signalDebugDraw || !this._signalDebugDrawContainer) {
         this._signalDebugDrawContainer = new PIXI.Container();
+        this._signalDebugDrawContainer.sortableChildren = true;
         this._signalDebugDraw = new PIXI.Graphics();
+        this._signalDebugDraw.zIndex = 0;
 
         this._signalDebugDrawContainer.addChild(this._signalDebugDraw);
         if (pixiContainer) {
@@ -366,6 +422,229 @@ namespace gdjs {
       }
 
       return this._signalDebugDraw;
+    }
+
+    _getSignalDebugPanelWidth(): float {
+      const gameWidth = this._instanceContainer
+        .getGame()
+        .getGameResolutionWidth();
+      const availableWidth = gameWidth - signalDebugPanelMargin * 2;
+      if (availableWidth < signalDebugPanelMinWidth) {
+        return Math.max(180, availableWidth);
+      }
+      return Math.min(signalDebugPanelMaxWidth, availableWidth);
+    }
+
+    _getSignalDebugPanelHeight(): float {
+      if (this._isSignalDebugPanelFolded) {
+        return signalDebugPanelHeaderHeight;
+      }
+
+      return (
+        signalDebugPanelHeaderHeight +
+        signalDebugPanelHorizontalPadding +
+        Math.max(1, this._getVisibleSignalDebugPanelLogCount()) *
+          signalDebugPanelRowHeight
+      );
+    }
+
+    _getVisibleSignalDebugPanelLogCount(): integer {
+      if (this._signalDebugPanelLogs.length === 0) {
+        return 0;
+      }
+
+      const availableHeight =
+        this._instanceContainer.getGame().getGameResolutionHeight() -
+        signalDebugPanelMargin * 2 -
+        signalDebugPanelHeaderHeight -
+        signalDebugPanelHorizontalPadding;
+      const maxVisibleRows = Math.max(
+        1,
+        Math.floor(availableHeight / signalDebugPanelRowHeight)
+      );
+      return Math.min(this._signalDebugPanelLogs.length, maxVisibleRows);
+    }
+
+    _getMaxSignalDebugPanelScrollIndex(): integer {
+      return Math.max(
+        0,
+        this._signalDebugPanelLogs.length -
+          this._getVisibleSignalDebugPanelLogCount()
+      );
+    }
+
+    _clampSignalDebugPanelScrollIndex(): void {
+      this._signalDebugPanelScrollIndex = Math.min(
+        Math.max(0, this._signalDebugPanelScrollIndex),
+        this._getMaxSignalDebugPanelScrollIndex()
+      );
+    }
+
+    _scrollSignalDebugPanel(deltaRows: integer): void {
+      this._signalDebugPanelScrollIndex += deltaRows;
+      this._clampSignalDebugPanelScrollIndex();
+    }
+
+    _getSignalDebugPanelPointerPosition(event: any): { x: float; y: float } {
+      const globalPosition = getPointerGlobalPosition(event);
+      if (!this._signalDebugDrawContainer) {
+        return globalPosition;
+      }
+
+      const localPosition =
+        this._signalDebugDrawContainer.toLocal(globalPosition);
+      return {
+        x: localPosition.x,
+        y: localPosition.y,
+      };
+    }
+
+    _isSignalDebugPanelPointInside(x: float, y: float): boolean {
+      if (!this._signalDebugPanel) {
+        return false;
+      }
+
+      const panelWidth = this._getSignalDebugPanelWidth();
+      const panelHeight = this._getSignalDebugPanelHeight();
+      return (
+        x >= this._signalDebugPanelX &&
+        x <= this._signalDebugPanelX + panelWidth &&
+        y >= this._signalDebugPanelY &&
+        y <= this._signalDebugPanelY + panelHeight
+      );
+    }
+
+    _handleSignalDebugPanelWheel(x: float, y: float, deltaY: float): boolean {
+      if (!this._isSignalDebugPanelPointInside(x, y)) {
+        return false;
+      }
+
+      if (!this._isSignalDebugPanelFolded) {
+        this._scrollSignalDebugPanel(deltaY > 0 ? 1 : -1);
+        this._renderSignalDebugPanel();
+      }
+      return true;
+    }
+
+    _registerSignalDebugPanelInputInterceptor(): void {
+      const gameRenderer = this._instanceContainer.getGame().getRenderer();
+      const setInputInterceptor =
+        // $FlowIgnore - RuntimeGamePixiRenderer exposes this in preview runtimes.
+        gameRenderer.setPreviewOverlayInputInterceptor;
+      if (!setInputInterceptor) {
+        return;
+      }
+
+      setInputInterceptor.call(gameRenderer, {
+        isBlockingPointer: (x: float, y: float): boolean =>
+          this._isSignalDebugPanelPointInside(x, y),
+        handleWheel: (x: float, y: float, deltaY: float): boolean =>
+          this._handleSignalDebugPanelWheel(x, y, deltaY),
+      });
+    }
+
+    _unregisterSignalDebugPanelInputInterceptor(): void {
+      const gameRenderer = this._instanceContainer.getGame().getRenderer();
+      const setInputInterceptor =
+        // $FlowIgnore - RuntimeGamePixiRenderer exposes this in preview runtimes.
+        gameRenderer.setPreviewOverlayInputInterceptor;
+      if (!setInputInterceptor) {
+        return;
+      }
+
+      setInputInterceptor.call(gameRenderer, null);
+    }
+
+    _placeSignalDebugPanelAtDefaultPosition(): void {
+      const game = this._instanceContainer.getGame();
+      this._signalDebugPanelX = signalDebugPanelMargin;
+      this._signalDebugPanelY =
+        game.getGameResolutionHeight() -
+        this._getSignalDebugPanelHeight() -
+        signalDebugPanelMargin;
+    }
+
+    _clampSignalDebugPanelPosition(): void {
+      const game = this._instanceContainer.getGame();
+      const panelWidth = this._getSignalDebugPanelWidth();
+      const panelHeight = this._getSignalDebugPanelHeight();
+      const maxX = Math.max(
+        signalDebugPanelMargin,
+        game.getGameResolutionWidth() - panelWidth - signalDebugPanelMargin
+      );
+      const maxY = Math.max(
+        signalDebugPanelMargin,
+        game.getGameResolutionHeight() - panelHeight - signalDebugPanelMargin
+      );
+      this._signalDebugPanelX = Math.min(
+        Math.max(signalDebugPanelMargin, this._signalDebugPanelX),
+        maxX
+      );
+      this._signalDebugPanelY = Math.min(
+        Math.max(signalDebugPanelMargin, this._signalDebugPanelY),
+        maxY
+      );
+    }
+
+    _ensureSignalDebugPanel(): PIXI.Container | null {
+      if (!this._signalDebugDrawContainer) {
+        return null;
+      }
+
+      if (!this._signalDebugPanel) {
+        this._signalDebugPanel = new PIXI.Container();
+        this._signalDebugPanel.zIndex = 1000;
+        (this._signalDebugPanel as any).eventMode = 'static';
+        (this._signalDebugPanel as any).interactive = true;
+        (this._signalDebugPanel as any).cursor = 'move';
+
+        this._signalDebugPanelBackground = new PIXI.Graphics();
+        this._signalDebugPanelRows = new PIXI.Container();
+        this._signalDebugPanel.addChild(this._signalDebugPanelBackground);
+        this._signalDebugPanel.addChild(this._signalDebugPanelRows);
+        this._registerSignalDebugPanelInputInterceptor();
+
+        this._signalDebugPanel.on('pointerdown', (event: any) => {
+          const position = this._getSignalDebugPanelPointerPosition(event);
+          this._hasUserPositionedSignalDebugPanel = true;
+          this._isDraggingSignalDebugPanel = true;
+          this._signalDebugPanelDragOffsetX =
+            position.x - this._signalDebugPanelX;
+          this._signalDebugPanelDragOffsetY =
+            position.y - this._signalDebugPanelY;
+          if (event && event.stopPropagation) {
+            event.stopPropagation();
+          }
+        });
+        const movePanel = (event: any) => {
+          if (!this._isDraggingSignalDebugPanel) {
+            return;
+          }
+          const position = this._getSignalDebugPanelPointerPosition(event);
+          this._signalDebugPanelX =
+            position.x - this._signalDebugPanelDragOffsetX;
+          this._signalDebugPanelY =
+            position.y - this._signalDebugPanelDragOffsetY;
+          this._clampSignalDebugPanelPosition();
+        };
+        const stopDragging = () => {
+          this._isDraggingSignalDebugPanel = false;
+        };
+        this._signalDebugPanel.on('pointermove', movePanel);
+        this._signalDebugPanel.on('globalpointermove', movePanel);
+        this._signalDebugPanel.on('pointerup', stopDragging);
+        this._signalDebugPanel.on('pointerupoutside', stopDragging);
+        this._signalDebugPanel.on('pointercancel', stopDragging);
+      }
+
+      if (
+        this._signalDebugDrawContainer.children.indexOf(
+          this._signalDebugPanel
+        ) === -1
+      ) {
+        this._signalDebugDrawContainer.addChild(this._signalDebugPanel);
+      }
+      return this._signalDebugPanel;
     }
 
     _clearSignalDebugLabels(): void {
@@ -380,6 +659,371 @@ namespace gdjs {
         label.destroy();
       }
       this._signalDebugDrawLabels.length = 0;
+    }
+
+    _clearSignalDebugPanelRows(): void {
+      if (!this._signalDebugPanelRows) {
+        return;
+      }
+
+      while (this._signalDebugPanelRows.children.length > 0) {
+        const child = this._signalDebugPanelRows.removeChildAt(0);
+        child.destroy({
+          children: true,
+        });
+      }
+    }
+
+    _appendSignalDebugPanelLogs(
+      signalDebugRecords: gdjs.SignalAnimationDebugRecord[],
+      now: integer
+    ): void {
+      let addedLogCount = 0;
+      for (let i = 0, len = signalDebugRecords.length; i < len; ++i) {
+        const signalDebugRecord = signalDebugRecords[i];
+        const color = getSignalDebugColor(signalDebugRecord.name);
+        for (
+          let j = 0, lenj = signalDebugRecord.receivers.length;
+          j < lenj;
+          ++j
+        ) {
+          this._signalDebugPanelLogs.unshift({
+            id: signalDebugRecord.id,
+            signalName: signalDebugRecord.name,
+            payload: signalDebugRecord.payload,
+            target: signalDebugRecord.target,
+            source: signalDebugRecord.source,
+            receiver: signalDebugRecord.receivers[j],
+            color,
+            startTime: now,
+          });
+          addedLogCount++;
+        }
+      }
+
+      if (this._signalDebugPanelScrollIndex > 0) {
+        this._signalDebugPanelScrollIndex += addedLogCount;
+      }
+      if (this._signalDebugPanelLogs.length > maxSignalDebugPanelLogs) {
+        this._signalDebugPanelLogs.length = maxSignalDebugPanelLogs;
+      }
+      this._clampSignalDebugPanelScrollIndex();
+    }
+
+    _renderSignalDebugPanel(): void {
+      const panel = this._ensureSignalDebugPanel();
+      if (
+        !panel ||
+        !this._signalDebugPanelBackground ||
+        !this._signalDebugPanelRows
+      ) {
+        return;
+      }
+
+      if (!this._hasUserPositionedSignalDebugPanel) {
+        this._placeSignalDebugPanelAtDefaultPosition();
+      }
+      this._clampSignalDebugPanelScrollIndex();
+      this._clampSignalDebugPanelPosition();
+      const panelWidth = this._getSignalDebugPanelWidth();
+      const panelHeight = this._getSignalDebugPanelHeight();
+      panel.position.set(this._signalDebugPanelX, this._signalDebugPanelY);
+      panel.hitArea = new PIXI.Rectangle(0, 0, panelWidth, panelHeight);
+
+      const background = this._signalDebugPanelBackground;
+      background.clear();
+      background.lineStyle(2, 0xffffff, 0.24);
+      background.beginFill(0x080c14, 0.9);
+      background.drawRoundedRect(0, 0, panelWidth, panelHeight, 6);
+      background.endFill();
+      background.lineStyle(0, 0, 0);
+      background.beginFill(0x121926, 0.98);
+      background.drawRoundedRect(
+        0,
+        0,
+        panelWidth,
+        signalDebugPanelHeaderHeight,
+        6
+      );
+      background.endFill();
+      background.beginFill(0x00d1ff, 0.95);
+      background.drawRect(0, signalDebugPanelHeaderHeight - 3, panelWidth, 3);
+      background.endFill();
+
+      this._clearSignalDebugPanelRows();
+      const rows = this._signalDebugPanelRows;
+      const title = new PIXI.Text('Signal monitor', {
+        fill: 0xffffff,
+        fontSize: 14,
+        fontWeight: 'bold',
+      });
+      title.position.set(signalDebugPanelHorizontalPadding, 8);
+      rows.addChild(title);
+
+      const subtitle = new PIXI.Text('drag', {
+        fill: 0x9aa7b8,
+        fontSize: 11,
+      });
+      subtitle.anchor.set(1, 0);
+      subtitle.position.set(
+        panelWidth -
+          signalDebugPanelHorizontalPadding -
+          signalDebugPanelFoldButtonSize -
+          8,
+        10
+      );
+      rows.addChild(subtitle);
+
+      const foldButton = new PIXI.Container();
+      const foldButtonX =
+        panelWidth -
+        signalDebugPanelHorizontalPadding -
+        signalDebugPanelFoldButtonSize;
+      const foldButtonY =
+        (signalDebugPanelHeaderHeight - signalDebugPanelFoldButtonSize) / 2;
+      foldButton.position.set(foldButtonX, foldButtonY);
+      foldButton.hitArea = new PIXI.Rectangle(
+        0,
+        0,
+        signalDebugPanelFoldButtonSize,
+        signalDebugPanelFoldButtonSize
+      );
+      (foldButton as any).eventMode = 'static';
+      (foldButton as any).interactive = true;
+      (foldButton as any).cursor = 'pointer';
+      foldButton.on('pointerdown', (event: any) => {
+        this._isSignalDebugPanelFolded = !this._isSignalDebugPanelFolded;
+        this._isDraggingSignalDebugPanel = false;
+        this._clampSignalDebugPanelPosition();
+        if (event && event.stopPropagation) {
+          event.stopPropagation();
+        }
+      });
+
+      const foldButtonBackground = new PIXI.Graphics();
+      foldButtonBackground.lineStyle(1, 0x9aa7b8, 0.8);
+      foldButtonBackground.beginFill(0x1f2938, 0.92);
+      foldButtonBackground.drawRoundedRect(
+        0,
+        0,
+        signalDebugPanelFoldButtonSize,
+        signalDebugPanelFoldButtonSize,
+        4
+      );
+      foldButtonBackground.endFill();
+      foldButtonBackground.lineStyle(2, 0xf3f7ff, 0.95);
+      foldButtonBackground.moveTo(5, signalDebugPanelFoldButtonSize / 2);
+      foldButtonBackground.lineTo(
+        signalDebugPanelFoldButtonSize - 5,
+        signalDebugPanelFoldButtonSize / 2
+      );
+      if (this._isSignalDebugPanelFolded) {
+        foldButtonBackground.moveTo(signalDebugPanelFoldButtonSize / 2, 5);
+        foldButtonBackground.lineTo(
+          signalDebugPanelFoldButtonSize / 2,
+          signalDebugPanelFoldButtonSize - 5
+        );
+      }
+      foldButton.addChild(foldButtonBackground);
+      rows.addChild(foldButton);
+
+      if (this._isSignalDebugPanelFolded) {
+        return;
+      }
+
+      if (this._signalDebugPanelLogs.length === 0) {
+        const emptyText = new PIXI.Text('Waiting for signal deliveries...', {
+          fill: 0xb9c3d4,
+          fontSize: 13,
+        });
+        emptyText.position.set(
+          signalDebugPanelHorizontalPadding,
+          signalDebugPanelHeaderHeight + signalDebugPanelHorizontalPadding
+        );
+        rows.addChild(emptyText);
+        return;
+      }
+
+      const visibleLogCount = this._getVisibleSignalDebugPanelLogCount();
+      const hasScrollbar = this._getMaxSignalDebugPanelScrollIndex() > 0;
+      const rowWidth =
+        panelWidth -
+        signalDebugPanelHorizontalPadding * 2 -
+        (hasScrollbar
+          ? signalDebugPanelScrollbarWidth + signalDebugPanelScrollbarGap
+          : 0);
+      for (let i = 0, len = visibleLogCount; i < len; ++i) {
+        const log =
+          this._signalDebugPanelLogs[this._signalDebugPanelScrollIndex + i];
+        if (!log) {
+          continue;
+        }
+
+        const rowY =
+          signalDebugPanelHeaderHeight +
+          signalDebugPanelHorizontalPadding +
+          i * signalDebugPanelRowHeight;
+        const row = new PIXI.Container();
+        row.position.set(signalDebugPanelHorizontalPadding, rowY);
+
+        const rowBackground = new PIXI.Graphics();
+        rowBackground.lineStyle(1, log.color, i === 0 ? 0.75 : 0.35);
+        rowBackground.beginFill(i === 0 ? 0x1a2331 : 0x101722, 0.96);
+        rowBackground.drawRoundedRect(
+          0,
+          0,
+          rowWidth,
+          signalDebugPanelRowHeight - 6,
+          5
+        );
+        rowBackground.endFill();
+        rowBackground.beginFill(log.color, 0.95);
+        rowBackground.drawRoundedRect(
+          0,
+          0,
+          5,
+          signalDebugPanelRowHeight - 6,
+          4
+        );
+        rowBackground.endFill();
+        row.addChild(rowBackground);
+
+        const signalText = new PIXI.Text(
+          shortenSignalDebugText(log.signalName, 28),
+          {
+            fill: 0x0b0f16,
+            fontSize: 12,
+            fontWeight: 'bold',
+          }
+        );
+        const chipWidth = Math.min(160, Math.max(54, signalText.width + 14));
+        const chip = new PIXI.Graphics();
+        chip.beginFill(log.color, 1);
+        chip.drawRoundedRect(12, 8, chipWidth, 20, 4);
+        chip.endFill();
+        signalText.position.set(19, 10);
+        row.addChild(chip);
+        row.addChild(signalText);
+
+        const idText = new PIXI.Text('#' + log.id, {
+          fill: 0x7e8da3,
+          fontSize: 11,
+        });
+        idText.anchor.set(1, 0);
+        idText.position.set(rowWidth - 12, 10);
+        row.addChild(idText);
+
+        const fromToText = new PIXI.Text(
+          shortenSignalDebugText(
+            'from ' +
+              formatSignalDebugPoint(log.source) +
+              ' -> ' +
+              formatSignalDebugPoint(log.receiver),
+            panelWidth < 380 ? 42 : 62
+          ),
+          {
+            fill: 0xf3f7ff,
+            fontSize: 12,
+          }
+        );
+        fromToText.position.set(12, 33);
+        row.addChild(fromToText);
+
+        const payload = log.payload || '';
+        const payloadBackground = new PIXI.Graphics();
+        payloadBackground.lineStyle(1, payload ? 0xffdd78 : 0x536174, 0.5);
+        payloadBackground.beginFill(payload ? 0x2a2230 : 0x151d29, 0.94);
+        payloadBackground.drawRoundedRect(12, 52, rowWidth - 24, 18, 4);
+        payloadBackground.endFill();
+        row.addChild(payloadBackground);
+
+        const payloadText = new PIXI.Text(
+          shortenSignalDebugText(
+            'data: "' + payload + '"',
+            panelWidth < 380 ? 38 : 68
+          ),
+          {
+            fill: payload ? 0xffdd78 : 0x9aa7b8,
+            fontSize: 10,
+          }
+        );
+        payloadText.position.set(18, 54);
+        row.addChild(payloadText);
+
+        rows.addChild(row);
+      }
+
+      if (hasScrollbar) {
+        const maxScrollIndex = this._getMaxSignalDebugPanelScrollIndex();
+        const trackX =
+          panelWidth -
+          signalDebugPanelHorizontalPadding -
+          signalDebugPanelScrollbarWidth;
+        const trackY =
+          signalDebugPanelHeaderHeight + signalDebugPanelHorizontalPadding;
+        const trackHeight = Math.max(
+          1,
+          visibleLogCount * signalDebugPanelRowHeight - 8
+        );
+        const thumbHeight = Math.max(
+          24,
+          (trackHeight * visibleLogCount) / this._signalDebugPanelLogs.length
+        );
+        const thumbTravel = Math.max(1, trackHeight - thumbHeight);
+        const thumbY =
+          trackY +
+          (thumbTravel * this._signalDebugPanelScrollIndex) / maxScrollIndex;
+
+        const scrollbar = new PIXI.Container();
+        scrollbar.position.set(trackX, trackY);
+        scrollbar.hitArea = new PIXI.Rectangle(
+          -signalDebugPanelScrollbarGap,
+          0,
+          signalDebugPanelScrollbarWidth + signalDebugPanelScrollbarGap,
+          trackHeight
+        );
+        (scrollbar as any).eventMode = 'static';
+        (scrollbar as any).interactive = true;
+        (scrollbar as any).cursor = 'pointer';
+        scrollbar.on('pointerdown', (event: any) => {
+          const position = this._getSignalDebugPanelPointerPosition(event);
+          const localY = position.y - this._signalDebugPanelY - trackY;
+          const normalizedPosition = Math.min(
+            1,
+            Math.max(0, localY / trackHeight)
+          );
+          this._signalDebugPanelScrollIndex = Math.round(
+            normalizedPosition * maxScrollIndex
+          );
+          this._clampSignalDebugPanelScrollIndex();
+          this._renderSignalDebugPanel();
+          if (event && event.stopPropagation) {
+            event.stopPropagation();
+          }
+        });
+
+        const scrollbarGraphics = new PIXI.Graphics();
+        scrollbarGraphics.beginFill(0xffffff, 0.14);
+        scrollbarGraphics.drawRoundedRect(
+          0,
+          0,
+          signalDebugPanelScrollbarWidth,
+          trackHeight,
+          4
+        );
+        scrollbarGraphics.endFill();
+        scrollbarGraphics.beginFill(0x00d1ff, 0.8);
+        scrollbarGraphics.drawRoundedRect(
+          0,
+          thumbY - trackY,
+          signalDebugPanelScrollbarWidth,
+          thumbHeight,
+          4
+        );
+        scrollbarGraphics.endFill();
+        scrollbar.addChild(scrollbarGraphics);
+        rows.addChild(scrollbar);
+      }
     }
 
     _getSignalDebugPointPosition(
@@ -406,14 +1050,8 @@ namespace gdjs {
     renderSignalDebugDraw(
       signalDebugRecords: gdjs.SignalAnimationDebugRecord[]
     ): void {
-      if (
-        signalDebugRecords.length === 0 &&
-        this._signalDebugSegments.length === 0
-      ) {
-        return;
-      }
-
       const now = Date.now();
+      this._appendSignalDebugPanelLogs(signalDebugRecords, now);
       for (let i = 0, len = signalDebugRecords.length; i < len; ++i) {
         const signalDebugRecord = signalDebugRecords[i];
         const color = getSignalDebugColor(signalDebugRecord.name);
@@ -460,10 +1098,7 @@ namespace gdjs {
         }
 
         activeSegments.push(segment);
-        const alpha = Math.max(
-          0,
-          1 - age / signalDebugAnimationDuration
-        );
+        const alpha = Math.max(0, 1 - age / signalDebugAnimationDuration);
         const sourcePosition = this._getSignalDebugPointPosition(
           segment.source,
           workingPoint
@@ -540,11 +1175,16 @@ namespace gdjs {
       }
 
       this._signalDebugSegments = activeSegments;
+      this._renderSignalDebugPanel();
     }
 
     clearSignalDebugDraw(): void {
       this._signalDebugSegments.length = 0;
+      this._signalDebugPanelLogs.length = 0;
+      this._signalDebugPanelScrollIndex = 0;
       this._clearSignalDebugLabels();
+      this._clearSignalDebugPanelRows();
+      this._unregisterSignalDebugPanelInputInterceptor();
 
       if (this._signalDebugDraw) {
         this._signalDebugDraw.clear();
@@ -564,6 +1204,13 @@ namespace gdjs {
       this._signalDebugDraw = null;
       this._signalDebugDrawContainer = null;
       this._signalDebugDrawLabels.length = 0;
+      this._signalDebugPanel = null;
+      this._signalDebugPanelBackground = null;
+      this._signalDebugPanelRows = null;
+      this._signalDebugPanelScrollIndex = 0;
+      this._hasUserPositionedSignalDebugPanel = false;
+      this._isDraggingSignalDebugPanel = false;
+      this._isSignalDebugPanelFolded = false;
     }
 
     clearDebugDraw(): void {

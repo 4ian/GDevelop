@@ -31,6 +31,17 @@ namespace gdjs {
       ? 1
       : Math.max(1, window.devicePixelRatio || 1);
 
+  type PreviewOverlayInputInterceptor = {
+    isBlockingPointer: (x: float, y: float) => boolean;
+    handleWheel?: (
+      x: float,
+      y: float,
+      deltaY: float,
+      deltaX: float,
+      deltaZ: float
+    ) => boolean;
+  };
+
   /**
    * The renderer for a gdjs.RuntimeGame using Pixi.js.
    * @category Renderers > Game
@@ -51,6 +62,10 @@ namespace gdjs {
     private _threeRenderer: THREE.WebGLRenderer | null = null;
     private _gameCanvas: HTMLCanvasElement | null = null;
     private _domElementsContainer: HTMLDivElement | null = null;
+    private _previewOverlayInputInterceptor: PreviewOverlayInputInterceptor | null =
+      null;
+    private _mouseInputBlockedByPreviewOverlay: boolean = false;
+    private _touchesBlockedByPreviewOverlay: Set<number> = new Set();
 
     // Current width of the canvas (might be scaled down/up compared to renderer)
     _canvasWidth: float = 0;
@@ -647,6 +662,58 @@ namespace gdjs {
       return pos;
     }
 
+    setPreviewOverlayInputInterceptor(
+      interceptor: PreviewOverlayInputInterceptor | null
+    ): void {
+      this._previewOverlayInputInterceptor = interceptor;
+      if (!interceptor) {
+        this._mouseInputBlockedByPreviewOverlay = false;
+        this._touchesBlockedByPreviewOverlay.clear();
+      }
+    }
+
+    _isPreviewOverlayBlockingPagePosition(pageX: float, pageY: float): boolean {
+      if (!this._game.isPreview() || !this._previewOverlayInputInterceptor) {
+        return false;
+      }
+
+      const pos = this.convertPageToGameCoords(pageX, pageY);
+      return this._previewOverlayInputInterceptor.isBlockingPointer(
+        pos[0],
+        pos[1]
+      );
+    }
+
+    _handlePreviewOverlayWheel(
+      pageX: float,
+      pageY: float,
+      deltaY: float,
+      deltaX: float,
+      deltaZ: float
+    ): boolean {
+      if (!this._game.isPreview() || !this._previewOverlayInputInterceptor) {
+        return false;
+      }
+
+      const pos = this.convertPageToGameCoords(pageX, pageY);
+      if (
+        !this._previewOverlayInputInterceptor.isBlockingPointer(pos[0], pos[1])
+      ) {
+        return false;
+      }
+
+      if (this._previewOverlayInputInterceptor.handleWheel) {
+        return this._previewOverlayInputInterceptor.handleWheel(
+          pos[0],
+          pos[1],
+          deltaY,
+          deltaX,
+          deltaZ
+        );
+      }
+      return true;
+    }
+
     /**
      * Add the standard events handler.
      *
@@ -829,13 +896,30 @@ namespace gdjs {
         return button;
       }
       canvas.onmousemove = (e) => {
+        if (
+          this._mouseInputBlockedByPreviewOverlay ||
+          this._isPreviewOverlayBlockingPagePosition(e.pageX, e.pageY)
+        ) {
+          e.preventDefault();
+          e.stopPropagation();
+          return false;
+        }
+
         const pos = this.convertPageToGameCoords(e.pageX, e.pageY);
         manager.onMouseMove(pos[0], pos[1], {
           movementX: e.movementX,
           movementY: e.movementY,
         });
+        return false;
       };
       canvas.onmousedown = (e) => {
+        if (this._isPreviewOverlayBlockingPagePosition(e.pageX, e.pageY)) {
+          this._mouseInputBlockedByPreviewOverlay = true;
+          e.preventDefault();
+          e.stopPropagation();
+          return false;
+        }
+
         const pos = this.convertPageToGameCoords(e.pageX, e.pageY);
         manager.onMouseMove(pos[0], pos[1]);
         manager.onMouseButtonPressed(
@@ -846,7 +930,14 @@ namespace gdjs {
         }
         return false;
       };
-      canvas.onmouseup = function (e) {
+      canvas.onmouseup = (e) => {
+        if (this._mouseInputBlockedByPreviewOverlay) {
+          this._mouseInputBlockedByPreviewOverlay = false;
+          e.preventDefault();
+          e.stopPropagation();
+          return false;
+        }
+
         manager.onMouseButtonReleased(
           convertHtmlMouseButtonToInputManagerMouseButton(e.button)
         );
@@ -893,8 +984,23 @@ namespace gdjs {
         return false;
       };
       // @ts-ignore
-      canvas.onwheel = function (event) {
+      canvas.onwheel = (event) => {
+        if (
+          this._handlePreviewOverlayWheel(
+            event.pageX,
+            event.pageY,
+            event.deltaY,
+            event.deltaX,
+            event.deltaZ
+          )
+        ) {
+          event.preventDefault();
+          event.stopPropagation();
+          return false;
+        }
+
         manager.onMouseWheel(-event.deltaY, event.deltaX, event.deltaZ);
+        return false;
       };
 
       // Touches:
@@ -910,8 +1016,14 @@ namespace gdjs {
 
           e.preventDefault();
           if (e.changedTouches) {
+            let hasBlockedTouch = false;
             for (let i = 0; i < e.changedTouches.length; ++i) {
               const touch = e.changedTouches[i];
+              if (this._touchesBlockedByPreviewOverlay.has(touch.identifier)) {
+                hasBlockedTouch = true;
+                continue;
+              }
+
               const pos = this.convertPageToGameCoords(
                 touch.pageX,
                 touch.pageY
@@ -927,6 +1039,9 @@ namespace gdjs {
                   manager.onMouseLeave();
                 }
               }
+            }
+            if (hasBlockedTouch) {
+              e.stopPropagation();
             }
           }
         },
@@ -945,8 +1060,20 @@ namespace gdjs {
 
           e.preventDefault();
           if (e.changedTouches) {
+            let hasBlockedTouch = false;
             for (let i = 0; i < e.changedTouches.length; ++i) {
               const touch = e.changedTouches[i];
+              if (
+                this._isPreviewOverlayBlockingPagePosition(
+                  touch.pageX,
+                  touch.pageY
+                )
+              ) {
+                this._touchesBlockedByPreviewOverlay.add(touch.identifier);
+                hasBlockedTouch = true;
+                continue;
+              }
+
               const pos = this.convertPageToGameCoords(
                 touch.pageX,
                 touch.pageY
@@ -957,6 +1084,9 @@ namespace gdjs {
                 pos[1]
               );
             }
+            if (hasBlockedTouch) {
+              e.stopPropagation();
+            }
           }
           return false;
         },
@@ -965,7 +1095,7 @@ namespace gdjs {
       );
       window.addEventListener(
         'touchend',
-        function (e) {
+        (e) => {
           if (isTargetDomElement(e)) {
             // Bail out if the game canvas is not focused. For example,
             // an `<input>` element can be focused, and needs to receive
@@ -975,8 +1105,21 @@ namespace gdjs {
 
           e.preventDefault();
           if (e.changedTouches) {
+            let hasBlockedTouch = false;
             for (let i = 0; i < e.changedTouches.length; ++i) {
+              if (
+                this._touchesBlockedByPreviewOverlay.delete(
+                  e.changedTouches[i].identifier
+                )
+              ) {
+                hasBlockedTouch = true;
+                continue;
+              }
+
               manager.onTouchEnd(e.changedTouches[i].identifier);
+            }
+            if (hasBlockedTouch) {
+              e.stopPropagation();
             }
           }
           return false;
@@ -986,7 +1129,7 @@ namespace gdjs {
       );
       window.addEventListener(
         'touchcancel',
-        function (e) {
+        (e) => {
           if (isTargetDomElement(e)) {
             // Bail out if the game canvas is not focused. For example,
             // an `<input>` element can be focused, and needs to receive
@@ -996,8 +1139,21 @@ namespace gdjs {
 
           e.preventDefault();
           if (e.changedTouches) {
+            let hasBlockedTouch = false;
             for (let i = 0; i < e.changedTouches.length; ++i) {
+              if (
+                this._touchesBlockedByPreviewOverlay.delete(
+                  e.changedTouches[i].identifier
+                )
+              ) {
+                hasBlockedTouch = true;
+                continue;
+              }
+
               manager.onTouchCancel(e.changedTouches[i].identifier);
+            }
+            if (hasBlockedTouch) {
+              e.stopPropagation();
             }
           }
           return false;

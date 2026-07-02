@@ -386,7 +386,7 @@ export const buildMainMenuDeclarativeTemplate = ({
   // macOS has a menu with the name of the app.
   if (isMacLike() && isApplicationTopLevelMenu) {
     template.unshift({
-      label: i18n._(t`GDevelop 5`),
+      label: i18n._(t`GDevelop 6`),
       submenu: [
         {
           label: i18n._(t`About GDevelop`),

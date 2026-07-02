@@ -319,7 +319,7 @@ export const generateOnChooseSaveProjectAsLocation = ({
   const browserWindow = remote.getCurrentWindow();
   const saveDialogOptions = {
     defaultPath,
-    filters: [{ name: 'GDevelop 5 project', extensions: ['json'] }],
+    filters: [{ name: 'GDevelop 6 project', extensions: ['json'] }],
   };
 
   if (!dialog) {

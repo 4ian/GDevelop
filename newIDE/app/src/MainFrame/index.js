@@ -3031,6 +3031,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       shouldHardReload,
       fullLoadingScreen,
       forceDiagnosticReport,
+      forceAlwaysOnTopInPreview,
       launchCaptureOptions,
       isForInGameEdition,
     }: LaunchPreviewOptions) => {
@@ -3080,6 +3081,7 @@ const MainFrame = (props: Props): React.MixedElement => {
             displaySignalAnimationsInPreview,
             fullLoadingScreen,
             forceDiagnosticReport,
+            forceAlwaysOnTopInPreview,
             launchCaptureOptions,
             isForInGameEdition,
           }
@@ -3261,6 +3263,7 @@ const MainFrame = (props: Props): React.MixedElement => {
             displayCollisionMask: displayCollisionMaskInPreview,
             displaySignalAnimations: displaySignalAnimationsInPreview,
             fullLoadingScreen: !!fullLoadingScreen,
+            forceAlwaysOnTopInPreview: !!forceAlwaysOnTopInPreview,
             fallbackAuthor,
             authenticatedPlayer,
             getIsMenuBarHiddenInPreview:
@@ -3398,6 +3401,9 @@ const MainFrame = (props: Props): React.MixedElement => {
       await launchPreview({
         networkPreview: false,
         numberOfWindows,
+        forceAlwaysOnTopInPreview: !!(
+          options && options.forceAlwaysOnTopInPreview
+        ),
         launchCaptureOptions,
       });
     },
@@ -3966,7 +3972,7 @@ const MainFrame = (props: Props): React.MixedElement => {
   const launchDebuggerAndPreview = React.useCallback(
     () => {
       openDebugger();
-      launchNewPreview();
+      launchNewPreview({ forceAlwaysOnTopInPreview: true });
     },
     [openDebugger, launchNewPreview]
   );
@@ -3988,6 +3994,7 @@ const MainFrame = (props: Props): React.MixedElement => {
         networkPreview: false,
         forcedPreviewLayoutName: sceneName || null,
         numberOfWindows: 1,
+        forceAlwaysOnTopInPreview: true,
         launchCaptureOptions,
       });
     },

@@ -66,6 +66,8 @@ namespace gdjs {
   export type SignalAnimationDebugRecord = {
     id: integer;
     name: string;
+    payload: string;
+    target: string;
     source: SignalDebugPoint;
     receivers: SignalAnimationDebugReceiver[];
   };
@@ -73,6 +75,7 @@ namespace gdjs {
   export type SignalDebugRecord = {
     id: integer;
     name: string;
+    payload: string;
     target: string;
     emittedFrameId: integer;
     deliveredFrameId: integer;
@@ -500,6 +503,8 @@ namespace gdjs {
         signalAnimationDebugRecords.push({
           id: debugRecord.id,
           name: debugRecord.name,
+          payload: debugRecord.payload,
+          target: debugRecord.target,
           source: debugRecord.source,
           receivers: debugRecord.receiverPositions.slice(),
         });
@@ -515,12 +520,15 @@ namespace gdjs {
       this._deliveredSignalsThisFrame.push(signal);
       this._currentSignal = signal;
 
-      const sourceRuntimeObject = isSignalAnimationDebugDrawEnabled(runtimeScene)
+      const sourceRuntimeObject = isSignalAnimationDebugDrawEnabled(
+        runtimeScene
+      )
         ? findRuntimeObjectBySignalSender(runtimeScene, signal.sender)
         : null;
       const debugRecord: SignalDebugRecord = {
         id: signal.id,
         name: signal.name,
+        payload: signal.payload,
         target: describeSignalTarget(signal.target),
         emittedFrameId: signal.emittedFrameId,
         deliveredFrameId: signal.deliveredFrameId,
@@ -606,7 +614,7 @@ namespace gdjs {
         debugRecord.source &&
         debugRecord.target === 'scene' &&
         !debugRecord.receiverPositions.some(
-          receiverPosition => receiverPosition.receiverName === 'scene'
+          (receiverPosition) => receiverPosition.receiverName === 'scene'
         )
       ) {
         debugRecord.receiverPositions.push({

@@ -198,6 +198,7 @@ namespace gdjs {
     _signalDebugPanelBackground: PIXI.Graphics | null = null;
     _signalDebugPanelRows: PIXI.Container | null = null;
     _signalDebugPanelLogs: SignalDebugPanelLog[] = [];
+    _lastAppendedSignalDebugRecordsSignature: string = '';
     _signalDebugPanelX: float = signalDebugPanelMargin;
     _signalDebugPanelY: float = signalDebugPanelMargin;
     _signalDebugPanelScrollIndex: integer = 0;
@@ -846,6 +847,32 @@ namespace gdjs {
       this._clampSignalDebugPanelScrollIndex();
     }
 
+    _getSignalDebugRecordsSignature(
+      signalDebugRecords: gdjs.SignalAnimationDebugRecord[]
+    ): string {
+      let signature = '';
+      for (let i = 0, len = signalDebugRecords.length; i < len; ++i) {
+        const signalDebugRecord = signalDebugRecords[i];
+        signature +=
+          signalDebugRecord.id +
+          ':' +
+          signalDebugRecord.status +
+          ':' +
+          signalDebugRecord.receivers.length +
+          '[';
+        for (
+          let j = 0, lenj = signalDebugRecord.receivers.length;
+          j < lenj;
+          ++j
+        ) {
+          const receiver = signalDebugRecord.receivers[j];
+          signature += receiver.receiverName + '#' + receiver.objectId + ';';
+        }
+        signature += ']|';
+      }
+      return signature;
+    }
+
     _renderSignalDebugPayloadTooltip(
       rows: PIXI.Container,
       payload: string,
@@ -1378,28 +1405,38 @@ namespace gdjs {
       const now = Date.now();
       this._signalDebugQueuedSignalsCount =
         signalDebugInfo?.queuedSignalsCount || 0;
-      this._appendSignalDebugPanelLogs(signalDebugRecords, now);
-      for (let i = 0, len = signalDebugRecords.length; i < len; ++i) {
-        const signalDebugRecord = signalDebugRecords[i];
-        const color = getSignalDebugStatusColor(
-          signalDebugRecord.status,
-          signalDebugRecord.name
-        );
-        for (
-          let j = 0, lenj = signalDebugRecord.receivers.length;
-          j < lenj;
-          ++j
-        ) {
-          const receiver = signalDebugRecord.receivers[j];
-          this._signalDebugSegments.push({
-            signalName: signalDebugRecord.name,
-            receiverName: receiver.receiverName,
-            source: signalDebugRecord.source,
-            receiver,
-            status: signalDebugRecord.status,
-            color,
-            startTime: now,
-          });
+      const signalDebugRecordsSignature =
+        this._getSignalDebugRecordsSignature(signalDebugRecords);
+      if (
+        signalDebugRecordsSignature &&
+        signalDebugRecordsSignature !==
+          this._lastAppendedSignalDebugRecordsSignature
+      ) {
+        this._lastAppendedSignalDebugRecordsSignature =
+          signalDebugRecordsSignature;
+        this._appendSignalDebugPanelLogs(signalDebugRecords, now);
+        for (let i = 0, len = signalDebugRecords.length; i < len; ++i) {
+          const signalDebugRecord = signalDebugRecords[i];
+          const color = getSignalDebugStatusColor(
+            signalDebugRecord.status,
+            signalDebugRecord.name
+          );
+          for (
+            let j = 0, lenj = signalDebugRecord.receivers.length;
+            j < lenj;
+            ++j
+          ) {
+            const receiver = signalDebugRecord.receivers[j];
+            this._signalDebugSegments.push({
+              signalName: signalDebugRecord.name,
+              receiverName: receiver.receiverName,
+              source: signalDebugRecord.source,
+              receiver,
+              status: signalDebugRecord.status,
+              color,
+              startTime: now,
+            });
+          }
         }
       }
 
@@ -1525,6 +1562,7 @@ namespace gdjs {
     clearSignalDebugDraw(): void {
       this._signalDebugSegments.length = 0;
       this._signalDebugPanelLogs.length = 0;
+      this._lastAppendedSignalDebugRecordsSignature = '';
       this._signalDebugPanelScrollIndex = 0;
       this._clearSignalDebugLabels();
       this._clearSignalDebugPanelRows();

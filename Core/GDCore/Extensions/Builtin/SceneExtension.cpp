@@ -69,15 +69,14 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
                  _("Emit a scene signal"),
                  _("Queue a signal for scene receivers. It will be delivered "
                    "before events on the next frame."),
-                 _("Emit scene signal _PARAM1_ with payload : _PARAM2_ from "
-                   "Emitter : _PARAM3_"),
+                 _("Emit scene signal _PARAM1_ with payload : _PARAM2_"),
                  _("Signals"),
                  "res/actions/texte.png",
                  "res/actions/texte.png")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("signalName", _("Signal name"))
       .AddParameter("string", _("Payload"), "", true)
-      .AddParameter("objectList", _("Emitter object"))
+      .AddCodeOnlyParameter("signalSenderObjectsContext", "")
       .MarkAsSimple();
 
   extension
@@ -85,7 +84,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
                  _("Emit a signal to an object"),
                  _("Queue a signal for all instances of an object."),
                  _("Emit signal _PARAM2_ to object _PARAM1_ with payload : "
-                   "_PARAM3_ from Emitter : _PARAM4_"),
+                   "_PARAM3_"),
                  _("Signals"),
                  "res/actions/texte.png",
                  "res/actions/texte.png")
@@ -93,7 +92,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
       .AddParameter("string", _("Object name"))
       .AddParameter("signalName", _("Signal name"))
       .AddParameter("string", _("Payload"), "", true)
-      .AddParameter("objectList", _("Emitter object"))
+      .AddCodeOnlyParameter("signalSenderObjectsContext", "")
       .MarkAsAdvanced();
 
   extension
@@ -102,7 +101,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
                  _("Queue a signal for one object instance matching an "
                    "instance id."),
                  _("Emit signal _PARAM2_ to instance _PARAM1_ with payload : "
-                   "_PARAM3_ from Emitter : _PARAM4_"),
+                   "_PARAM3_"),
                  _("Signals"),
                  "res/actions/texte.png",
                  "res/actions/texte.png")
@@ -110,7 +109,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
       .AddParameter("expression", _("Instance id"))
       .AddParameter("signalName", _("Signal name"))
       .AddParameter("string", _("Payload"), "", true)
-      .AddParameter("objectList", _("Emitter object"))
+      .AddCodeOnlyParameter("signalSenderObjectsContext", "")
       .MarkAsAdvanced();
 
   extension
@@ -119,7 +118,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
                  _("Queue a signal for the currently picked object "
                    "instances."),
                  _("Emit signal _PARAM2_ to picked _PARAM1_ with payload : "
-                   "_PARAM3_ from Emitter : _PARAM4_"),
+                   "_PARAM3_"),
                  _("Signals"),
                  "res/actions/texte.png",
                  "res/actions/texte.png")
@@ -127,7 +126,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
       .AddParameter("objectList", _("Objects"))
       .AddParameter("signalName", _("Signal name"))
       .AddParameter("string", _("Payload"), "", true)
-      .AddParameter("objectList", _("Emitter object"))
+      .AddCodeOnlyParameter("signalSenderObjectsContext", "")
       .MarkAsSimple();
 
   extension
@@ -136,7 +135,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
                  _("Queue a signal for all instances of objects in an object "
                    "group."),
                  _("Emit signal _PARAM2_ to object group _PARAM1_ with "
-                   "payload : _PARAM3_ from Emitter : _PARAM4_"),
+                   "payload : _PARAM3_"),
                  _("Signals"),
                  "res/actions/texte.png",
                  "res/actions/texte.png")
@@ -144,7 +143,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
       .AddParameter("string", _("Object group name"))
       .AddParameter("signalName", _("Signal name"))
       .AddParameter("string", _("Payload"), "", true)
-      .AddParameter("objectList", _("Emitter object"))
+      .AddCodeOnlyParameter("signalSenderObjectsContext", "")
       .MarkAsAdvanced();
 
   extension

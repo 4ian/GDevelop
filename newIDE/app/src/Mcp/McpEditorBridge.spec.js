@@ -5437,7 +5437,6 @@ describe('McpEditorBridge', () => {
             target_kind: 'scene',
             signal_name: 'Attack',
             payload: 'heavy',
-            emitter_object: 'Player',
           },
         },
       });
@@ -5448,7 +5447,6 @@ describe('McpEditorBridge', () => {
         '',
         '"Attack"',
         '"heavy"',
-        'Player',
       ]);
 
       const emitInstanceResponse = await bridge.handleRendererMcpRequest({
@@ -5460,7 +5458,6 @@ describe('McpEditorBridge', () => {
             instance_id: 'SignalSenderInstanceId()',
             signal_name: 'Attack.Reply',
             payload: 'Blocked',
-            emitter_object: 'Player',
           },
         },
       });
@@ -5472,22 +5469,25 @@ describe('McpEditorBridge', () => {
         'SignalSenderInstanceId()',
         '"Attack.Reply"',
         '"Blocked"',
-        'Player',
       ]);
 
-      const missingEmitterResponse = await bridge.handleRendererMcpRequest({
-        method: 'tools/call',
-        params: {
-          name: 'create_signal_emit_action',
-          arguments: {
-            target_kind: 'scene',
-            signal_name: 'MissingEmitter',
+      const invalidExtensionTargetResponse = await bridge.handleRendererMcpRequest(
+        {
+          method: 'tools/call',
+          params: {
+            name: 'create_signal_emit_action',
+            arguments: {
+              target_kind: 'object_group',
+              target_scope: 'object_function',
+              object_group_name: 'Enemies',
+              signal_name: 'Attack',
+            },
           },
-        },
-      });
-      expect(missingEmitterResponse.isError).toBe(true);
-      expect(missingEmitterResponse.content[0].text).toContain(
-        'Missing emitter_object.'
+        }
+      );
+      expect(invalidExtensionTargetResponse.isError).toBe(true);
+      expect(invalidExtensionTargetResponse.content[0].text).toContain(
+        'extension event sheets'
       );
 
       const receiveResponse = await bridge.handleRendererMcpRequest({
@@ -5525,10 +5525,7 @@ describe('McpEditorBridge', () => {
   it('creates object onSignal lifecycle functions through the dedicated tool', async () => {
     // $FlowFixMe[invalid-constructor]
     const project = new gd.ProjectHelper.createNewGDJSProject();
-    const extension = project.insertNewEventsFunctionsExtension(
-      'SignalExt',
-      0
-    );
+    const extension = project.insertNewEventsFunctionsExtension('SignalExt', 0);
     extension.getEventsBasedObjects().insertNew('SignalReceiver', 0);
 
     try {

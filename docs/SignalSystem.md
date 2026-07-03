@@ -362,7 +362,7 @@ Payload shape:
 
 - at runtime: a string,
 - in event actions: an optional `string` parameter named "Payload" and an
-  required sender object parameter named "Emitter object",
+  automatically supplied sender context,
 - in generated/runtime code: a string is passed to the runtime helper. Legacy
   variable inputs are converted to their string value for compatibility.
 
@@ -464,7 +464,7 @@ Dispatch order is deterministic and documented.
 ### 7.3 The "Signal received" scene condition
 
 Scene events receive signals through a dedicated condition evaluated against the
-signal dispatch context:
+scene-targeted signal dispatch context:
 
 ```text
 Signal received "Health.Damaged"
@@ -473,6 +473,12 @@ Signal received "Health.Damaged"
 
 This means "the dispatcher is currently delivering this signal" — not "the last
 event somewhere emitted this signal".
+
+The condition only observes signals whose target is `scene`. Signals emitted to
+objects, picked objects, object instances, or object groups are delivered through
+matching object `onSignal` handlers and are not visible to scene conditions. This
+keeps scene dispatchers from accidentally re-consuming a forwarded signal with
+the same name.
 
 The mechanism follows from the pre-events dispatch phase (§4.1). The dispatcher
 publishes the frame's delivered signals to a scene-level context _before_
@@ -572,11 +578,14 @@ Emit signal to picked objects
 Emit signal to object group
 ```
 
-Each action takes an optional string "Payload" parameter. Each action also takes
-a required "Emitter object" parameter. The first object in the picked emitter
-list becomes the sender exposed by the `onSignal` parameters
-`EmitterObjectName` / `EmitterInstanceId` and, in scene/external scene receivers,
-by `SignalSenderObjectName()` / `SignalSenderInstanceId()`.
+Each action takes an optional string "Payload" parameter and no explicit emitter
+parameter. When an action emits from a prefab/object function event, the sender
+is the owner object (`Object`). When an action emits from scene or external
+scene events, the sender is the scene. JavaScript/runtime helper calls without
+an explicit sender also use the scene as their debug source.
+The sender is exposed by the `onSignal` parameters `EmitterObjectName` /
+`EmitterInstanceId` and, in scene/external scene receivers, by
+`SignalSenderObjectName()` / `SignalSenderInstanceId()`.
 Vague names (`Trigger event`, `Call event`, `Send message`) are avoided.
 
 The object-instance action's instance id can come from an object's `InstanceId()`
@@ -585,6 +594,17 @@ from `SignalSenderInstanceId()`. When replying inside `onSignal`, use the fixed
 `EmitterInstanceId` parameter. Runtime instance ids start at 1. Empty signal
 names and invalid instance ids such as 0 are ignored at runtime instead of being
 queued, because they usually come from incomplete editor actions.
+
+In extension event sheets, only these emit actions are offered:
+
+```text
+Emit scene signal
+Emit signal to object instance
+```
+
+Object-name, picked-object, and object-group signal targets are hidden there.
+Extensions should not depend on scene-specific object or group names; they can
+announce to the scene, or target an explicit instance id supplied by the caller.
 
 ### 9.2 Condition
 
@@ -807,10 +827,11 @@ gdjs.evtTools.signal.getSignalSenderObjectName(runtimeScene);
 gdjs.evtTools.signal.getSignalSenderInstanceId(runtimeScene);
 ```
 
-All emit helpers also accept an optional sender argument at runtime. It can be a
-`gdjs.RuntimeObject`, a sender record, or an object-list map generated from the
-event action's required "Emitter object" parameter. Object-list senders use the
-first picked object in the list.
+Event-generated emit helper calls pass a hidden sender context. In
+prefab/object function events, this is the owner object (`Object`); in scene
+events it is empty, so the signal monitor and animations treat the scene as the
+emitter. Low-level `SignalBus.emitSignal` can still accept an explicit sender for
+internal runtime use and tests.
 
 ### 11.3 Codegen for "Signal received"
 
@@ -1119,7 +1140,7 @@ lifecycle handlers, and the scene "Signal received" condition.
 
 - `gdjs.evtTools.signal.*` runtime helpers (§11.2).
 - Emit actions: scene, object, object instance, picked objects and object group,
-  with optional payload and required emitter object parameters (section 9.1).
+  with optional payload and context-inherited sender information (section 9.1).
 - "Signal received" condition (§9.2, §11.3).
 - `SignalName` / `SignalPayload` / `SignalSenderObjectName`
   / `SignalSenderInstanceId` expressions (§9.3).

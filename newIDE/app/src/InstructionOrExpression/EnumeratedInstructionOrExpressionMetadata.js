@@ -62,6 +62,19 @@ export type EnumeratedInstructionOrExpressionMetadata =
   | EnumeratedInstructionMetadata
   | EnumeratedExpressionMetadata;
 
+const signalEmitActionTypes = new Set([
+  'EmitSceneSignal',
+  'EmitSignalToObject',
+  'EmitSignalToObjectInstance',
+  'EmitSignalToPickedObjects',
+  'EmitSignalToObjectGroup',
+]);
+
+const signalEmitActionTypesAllowedInExtensionEvents = new Set([
+  'EmitSceneSignal',
+  'EmitSignalToObjectInstance',
+]);
+
 /**
  * Given a list of expression or instructions that were previously enumerated,
  * filter the ones that are not usable from the current "scope".
@@ -95,6 +108,18 @@ const isFunctionVisibleInGivenScope = (
     eventsBasedObject,
     eventsFunctionsExtension,
   } = scope;
+
+  if (
+    eventsFunctionsExtension &&
+    scope.eventsFunction &&
+    extension.name === 'BuiltinScene' &&
+    signalEmitActionTypes.has(enumeratedInstructionOrExpressionMetadata.type) &&
+    !signalEmitActionTypesAllowedInExtensionEvents.has(
+      enumeratedInstructionOrExpressionMetadata.type
+    )
+  ) {
+    return false;
+  }
 
   return !!(
     ((enumeratedInstructionOrExpressionMetadata.isRelevantForLayoutEvents &&

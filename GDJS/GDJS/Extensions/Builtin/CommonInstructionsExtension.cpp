@@ -212,7 +212,7 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
                             .GetPlainString());
 
           outputCode += "const " + signalsListName +
-                        " = gdjs.evtTools.signal.getDeliveredSignals("
+                        " = gdjs.evtTools.signal.getDeliveredSceneSignals("
                         "runtimeScene, " +
                         signalNameCode + ");\n";
           outputCode += "for (let " + signalIndexName + " = 0, " +

@@ -1288,6 +1288,11 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(
   // Code only parameter type
   else if (metadata.GetType() == "eventsFunctionContext") {
     argOutput = HasProjectAndLayout() ? "null" : "eventsFunctionContext";
+  } else if (metadata.GetType() == "signalSenderObjectsContext") {
+    argOutput = HasProjectAndLayout()
+                    ? "undefined"
+                    : "gdjs.evtTools.signal.getSenderFromContext("
+                      "eventsFunctionContext)";
   } else
     return gd::EventsCodeGenerator::GenerateParameterCodes(
         parameter,

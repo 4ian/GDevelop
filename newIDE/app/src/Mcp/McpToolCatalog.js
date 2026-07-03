@@ -3443,7 +3443,7 @@ const signalEmitActionSchema = {
     target_kind: {
       type: 'string',
       description:
-        'Signal target: scene, object, object_instance, picked_objects, or object_group.',
+        'Signal target: scene, object, object_instance, picked_objects, or object_group. In extension event sheets, use only scene or object_instance.',
     },
     signal_name: {
       type: 'string',
@@ -3455,15 +3455,9 @@ const signalEmitActionSchema = {
       description:
         'Optional string payload expression. Bare text is quoted automatically; use ToString(...) for numeric data.',
     },
-    emitter_object: {
-      type: 'string',
-      description:
-        'Required picked object name to expose as EmitterObjectName / SignalSenderObjectName.',
-    },
     object_name: {
       type: 'string',
-      description:
-        'Target object name for object or picked_objects targets.',
+      description: 'Target object name for object or picked_objects targets.',
     },
     objects: {
       type: 'string',
@@ -3478,8 +3472,13 @@ const signalEmitActionSchema = {
       type: 'string',
       description: 'Object group name for object_group targets.',
     },
+    target_scope: {
+      type: 'string',
+      description:
+        'Optional scope guard: scene, extension_function, behavior_function, object_function, or async_function. Extension scopes reject object, picked_objects, and object_group targets.',
+    },
   },
-  required: ['target_kind', 'signal_name', 'emitter_object'],
+  required: ['target_kind', 'signal_name'],
   additionalProperties: true,
 };
 
@@ -4761,12 +4760,11 @@ const toolUsageExamples: { [string]: Array<Object> } = {
   ],
   create_signal_emit_action: [
     {
-      description: 'Emit a scene signal with a string payload and sender.',
+      description: 'Emit a scene signal with a string payload.',
       arguments: {
         target_kind: 'scene',
         signal_name: 'Attack',
         payload: 'heavy',
-        emitter_object: 'Player',
       },
     },
     {
@@ -4777,7 +4775,6 @@ const toolUsageExamples: { [string]: Array<Object> } = {
         instance_id: 'SignalSenderInstanceId()',
         signal_name: 'Attack.Reply',
         payload: 'Blocked',
-        emitter_object: 'Player',
       },
     },
   ],

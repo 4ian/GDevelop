@@ -68,4 +68,35 @@ describe('EnumeratedInstructionOrExpressionMetadata', () => {
     eventsFunction.delete();
     project.delete();
   });
+
+  it('only shows decoupled signal emit actions in extension events', () => {
+    const project = gd.ProjectHelper.createNewGDJSProject();
+    const eventsFunctionsExtension = new gd.EventsFunctionsExtension();
+    const eventsFunction = new gd.EventsFunction();
+
+    const instructions = filterEnumeratedInstructionOrExpressionMetadataByScope(
+      enumerateAllInstructions(false, project, makeFakeI18n()),
+      {
+        project,
+        eventsFunctionsExtension,
+        eventsFunction,
+      }
+    );
+    const instructionTypes = instructions.map(instruction => instruction.type);
+
+    expect(instructionTypes).toEqual(
+      expect.arrayContaining(['EmitSceneSignal', 'EmitSignalToObjectInstance'])
+    );
+    expect(instructionTypes).toEqual(
+      expect.not.arrayContaining([
+        'EmitSignalToObject',
+        'EmitSignalToPickedObjects',
+        'EmitSignalToObjectGroup',
+      ])
+    );
+
+    eventsFunctionsExtension.delete();
+    eventsFunction.delete();
+    project.delete();
+  });
 });

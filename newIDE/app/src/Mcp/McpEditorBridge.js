@@ -2026,6 +2026,19 @@ const normalizeSignalTargetKind = (targetKind: any): string => {
   );
 };
 
+const signalTargetKindsAllowedInExtensionEvents = new Set([
+  'scene',
+  'object_instance',
+]);
+
+const signalExtensionEventTargetScopes = new Set([
+  'extension_function',
+  'object_function',
+  'prefab_function',
+  'behavior_function',
+  'async_function',
+]);
+
 const buildSignalEmitAction = ({
   project,
   i18n,
@@ -2036,6 +2049,17 @@ const buildSignalEmitAction = ({
   args: Object,
 |}): Object => {
   const targetKind = normalizeSignalTargetKind(args && args.target_kind);
+  const targetScope = String((args && args.target_scope) || '')
+    .trim()
+    .toLowerCase();
+  if (
+    signalExtensionEventTargetScopes.has(targetScope) &&
+    !signalTargetKindsAllowedInExtensionEvents.has(targetKind)
+  ) {
+    throw new Error(
+      'In extension event sheets, signal emit actions can only target scene or object_instance.'
+    );
+  }
   const signalName = signalStringExpression(
     getRequiredSignalArg(args, ['signal_name', 'signalName'], 'signal_name'),
     'signal_name'
@@ -2045,33 +2069,25 @@ const buildSignalEmitAction = ({
     'payload_string',
     'payloadString',
   ]);
-  const emitterObject = String(
-    getRequiredSignalArg(
-      args,
-      [
-        'emitter_object',
-        'emitter_object_name',
-        'emitter',
-        'sender_object',
-        'sender_object_name',
-      ],
-      'emitter_object'
-    )
-  ).trim();
   let type = 'EmitSceneSignal';
   const parameters: Object = {};
-  const setPayloadAndEmitter = (payloadIndex: number, emitterIndex: number) => {
+  let outputLastParameterIndex =
+    payload !== null && payload !== undefined ? 2 : 1;
+  let obsoleteEmitterParameterIndex = 3;
+  const setPayload = (payloadIndex: number) => {
     if (payload !== null && payload !== undefined) {
       parameters[String(payloadIndex)] = payload;
+      outputLastParameterIndex = payloadIndex;
     }
-    parameters[String(emitterIndex)] = emitterObject;
   };
 
   if (targetKind === 'scene') {
     parameters['1'] = signalName;
-    setPayloadAndEmitter(2, 3);
+    setPayload(2);
   } else if (targetKind === 'object') {
     type = 'EmitSignalToObject';
+    outputLastParameterIndex = 2;
+    obsoleteEmitterParameterIndex = 4;
     parameters['1'] = String(
       getRequiredSignalArg(
         args,
@@ -2080,9 +2096,11 @@ const buildSignalEmitAction = ({
       )
     );
     parameters['2'] = signalName;
-    setPayloadAndEmitter(3, 4);
+    setPayload(3);
   } else if (targetKind === 'object_instance') {
     type = 'EmitSignalToObjectInstance';
+    outputLastParameterIndex = 2;
+    obsoleteEmitterParameterIndex = 4;
     parameters['1'] = String(
       getRequiredSignalArg(
         args,
@@ -2091,9 +2109,11 @@ const buildSignalEmitAction = ({
       )
     );
     parameters['2'] = signalName;
-    setPayloadAndEmitter(3, 4);
+    setPayload(3);
   } else if (targetKind === 'picked_objects') {
     type = 'EmitSignalToPickedObjects';
+    outputLastParameterIndex = 2;
+    obsoleteEmitterParameterIndex = 4;
     parameters['1'] = String(
       getRequiredSignalArg(
         args,
@@ -2102,9 +2122,11 @@ const buildSignalEmitAction = ({
       )
     );
     parameters['2'] = signalName;
-    setPayloadAndEmitter(3, 4);
+    setPayload(3);
   } else if (targetKind === 'object_group') {
     type = 'EmitSignalToObjectGroup';
+    outputLastParameterIndex = 2;
+    obsoleteEmitterParameterIndex = 4;
     parameters['1'] = String(
       getRequiredSignalArg(
         args,
@@ -2113,8 +2135,12 @@ const buildSignalEmitAction = ({
       )
     );
     parameters['2'] = signalName;
-    setPayloadAndEmitter(3, 4);
+    setPayload(3);
   }
+
+  // Old libGD builds still expose a required emitter object slot. Fill it to
+  // avoid a stale warning, then trim it from the JSON returned by this helper.
+  parameters[String(obsoleteEmitterParameterIndex)] = '';
 
   const built = buildInstruction({
     project,
@@ -2123,12 +2149,26 @@ const buildSignalEmitAction = ({
     kind: 'action',
     parameters,
   });
+  const parametersLength = outputLastParameterIndex + 1;
+  if (
+    built.instruction &&
+    Array.isArray(built.instruction.parameters) &&
+    built.instruction.parameters.length > parametersLength
+  ) {
+    built.instruction.parameters.length = parametersLength;
+  }
+  if (
+    Array.isArray(built.parameters) &&
+    built.parameters.length > parametersLength
+  ) {
+    built.parameters.length = parametersLength;
+  }
   return {
     ...built,
     actionType: type,
     targetKind,
     signalNote:
-      'Drop instruction into an event actions array. Signal payload is a string expression; use ToString(...) for numeric values if needed. emitter_object is required so receivers can identify the sender.',
+      'Drop instruction into an event actions array. Signal payload is a string expression; use ToString(...) for numeric values if needed. Signal actions automatically use the owner object as sender in object/prefab functions. Scene and external scene events emit from the scene.',
   };
 };
 

@@ -459,6 +459,24 @@ namespace gdjs {
       return matchingSignals;
     }
 
+    getDeliveredSceneSignals(signalName: string): RuntimeSignal[] {
+      const matchingSignals: RuntimeSignal[] = [];
+      for (
+        let i = 0, len = this._deliveredSignalsThisFrame.length;
+        i < len;
+        ++i
+      ) {
+        const signal = this._deliveredSignalsThisFrame[i];
+        if (
+          signal.target.kind === 'scene' &&
+          (!signalName || signal.name === signalName)
+        ) {
+          matchingSignals.push(signal);
+        }
+      }
+      return matchingSignals;
+    }
+
     getCurrentSignal(): RuntimeSignal | null {
       return this._currentSignal;
     }
@@ -497,7 +515,10 @@ namespace gdjs {
         ++i
       ) {
         const signal = this._deliveredSignalsThisFrame[i];
-        if (!signalName || signal.name === signalName) {
+        if (
+          signal.target.kind === 'scene' &&
+          (!signalName || signal.name === signalName)
+        ) {
           this._currentSignal = signal;
           return true;
         }
@@ -1147,7 +1168,10 @@ namespace gdjs {
       export const emitSignalToObject = function (
         instanceContainer: gdjs.RuntimeInstanceContainer,
         objectNameOrObjectsLists:
-          string | Hashtable<gdjs.RuntimeObject[]> | null | undefined,
+          | string
+          | Hashtable<gdjs.RuntimeObject[]>
+          | null
+          | undefined,
         signalName: string,
         payload?: RuntimeSignalPayloadInput,
         sender?: RuntimeSignalSenderInput
@@ -1241,6 +1265,16 @@ namespace gdjs {
           );
       };
 
+      export const getSenderFromContext = function (
+        eventsFunctionContext?: EventsFunctionContext | null
+      ): RuntimeSignalSenderInput {
+        if (!eventsFunctionContext) {
+          return undefined;
+        }
+        const ownerObjects = eventsFunctionContext.getObjects('Object');
+        return ownerObjects.length > 0 ? ownerObjects[0] : undefined;
+      };
+
       export const isSignalReceived = function (
         instanceContainer: gdjs.RuntimeInstanceContainer,
         signalName: string
@@ -1255,6 +1289,14 @@ namespace gdjs {
       ): RuntimeSignal[] {
         const runtimeScene = getSignalRuntimeScene(instanceContainer);
         return runtimeScene.getSignalBus().getDeliveredSignals(signalName);
+      };
+
+      export const getDeliveredSceneSignals = function (
+        instanceContainer: gdjs.RuntimeInstanceContainer,
+        signalName: string
+      ): RuntimeSignal[] {
+        const runtimeScene = getSignalRuntimeScene(instanceContainer);
+        return runtimeScene.getSignalBus().getDeliveredSceneSignals(signalName);
       };
 
       export const setCurrentSignalForSceneCondition = function (

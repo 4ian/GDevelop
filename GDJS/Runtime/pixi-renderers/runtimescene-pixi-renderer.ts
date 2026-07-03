@@ -70,6 +70,8 @@ namespace gdjs {
       if (!pixiRenderer) return;
 
       const threeRenderer = this._threeRenderer;
+      const transparentBackground =
+        runtimeGameRenderer.isTransparentBackgroundEnabled();
 
       // If we are in VR, we cannot render like this: we must use the special VR
       // rendering method to not display a black screen.
@@ -134,9 +136,14 @@ namespace gdjs {
 
             if (isFirstRender) {
               // Render the background color.
-              pixiRenderer.background.color =
-                this._runtimeScene.getBackgroundColor();
-              pixiRenderer.background.alpha = 1;
+              if (transparentBackground) {
+                pixiRenderer.background.color = 0;
+                pixiRenderer.background.alpha = 0;
+              } else {
+                pixiRenderer.background.color =
+                  this._runtimeScene.getBackgroundColor();
+                pixiRenderer.background.alpha = 1;
+              }
               if (this._runtimeScene.getClearCanvas()) pixiRenderer.clear();
 
               isFirstRender = false;
@@ -210,18 +217,25 @@ namespace gdjs {
               if (isFirstRender) {
                 // Render the background color.
                 threeRenderer.setClearColor(
-                  this._runtimeScene.getBackgroundColor()
+                  this._runtimeScene.getBackgroundColor(),
+                  transparentBackground ? 0 : 1
                 );
                 threeRenderer.resetState();
                 if (this._runtimeScene.getClearCanvas()) threeRenderer.clear();
-                if (!this._backgroundColor) {
-                  this._backgroundColor = new THREE.Color();
-                }
-                this._backgroundColor.set(
-                  this._runtimeScene.getBackgroundColor()
-                );
-                if (!threeScene.background) {
-                  threeScene.background = this._backgroundColor;
+                if (transparentBackground) {
+                  if (threeScene.background === this._backgroundColor) {
+                    threeScene.background = null;
+                  }
+                } else {
+                  if (!this._backgroundColor) {
+                    this._backgroundColor = new THREE.Color();
+                  }
+                  this._backgroundColor.set(
+                    this._runtimeScene.getBackgroundColor()
+                  );
+                  if (!threeScene.background) {
+                    threeScene.background = this._backgroundColor;
+                  }
                 }
 
                 isFirstRender = false;
@@ -284,7 +298,14 @@ namespace gdjs {
 
         // Render all the layers then.
         // TODO: replace by a loop like in 3D?
-        pixiRenderer.background.color = this._runtimeScene.getBackgroundColor();
+        if (transparentBackground) {
+          pixiRenderer.background.color = 0;
+          pixiRenderer.background.alpha = 0;
+        } else {
+          pixiRenderer.background.color =
+            this._runtimeScene.getBackgroundColor();
+          pixiRenderer.background.alpha = 1;
+        }
         pixiRenderer.render(this._pixiContainer, {
           clear: this._runtimeScene.getClearCanvas(),
         });
@@ -332,6 +353,8 @@ namespace gdjs {
       // VR rendering relies on ThreeJS
       if (!threeRenderer)
         throw new Error('Cannot render a scene with no 3D elements in VR!');
+      const transparentBackground =
+        runtimeGameRenderer.isTransparentBackgroundEnabled();
 
       // Render each layer one by one.
       let isFirstRender = true;
@@ -354,11 +377,14 @@ namespace gdjs {
 
         if (isFirstRender) {
           // Render the background color.
-          threeRenderer.setClearColor(this._runtimeScene.getBackgroundColor());
-          if (this._runtimeScene.getClearCanvas()) threeRenderer.clear();
-          threeScene.background = new THREE.Color(
-            this._runtimeScene.getBackgroundColor()
+          threeRenderer.setClearColor(
+            this._runtimeScene.getBackgroundColor(),
+            transparentBackground ? 0 : 1
           );
+          if (this._runtimeScene.getClearCanvas()) threeRenderer.clear();
+          threeScene.background = transparentBackground
+            ? null
+            : new THREE.Color(this._runtimeScene.getBackgroundColor());
 
           isFirstRender = false;
         } else {

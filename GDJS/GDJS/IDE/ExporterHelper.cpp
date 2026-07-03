@@ -334,7 +334,8 @@ bool ExporterHelper::ExportProjectForPixiPreview(
       if (!ExportIndexFile(exportedProject, gdjsRoot + "/Runtime/index.html",
                            options.exportPath, includesFiles, usedSourceFiles,
                            options.nonRuntimeScriptsCacheBurst,
-                           "gdjs.runtimeGameOptions")) {
+                           "gdjs.runtimeGameOptions",
+                           options.transparentRuntimeBackground)) {
         return false;
       }
     }
@@ -430,6 +431,9 @@ void ExporterHelper::SerializeRuntimeGameOptions(
 
   runtimeGameOptions.AddChild("nativeMobileApp")
       .SetBoolValue(options.nativeMobileApp);
+  if (options.transparentRuntimeBackground) {
+    runtimeGameOptions.AddChild("transparentBackground").SetBoolValue(true);
+  }
   runtimeGameOptions.AddChild("websocketDebuggerServerAddress")
       .SetStringValue(options.websocketDebuggerServerAddress);
   runtimeGameOptions.AddChild("websocketDebuggerServerPort")
@@ -740,7 +744,8 @@ bool ExporterHelper::ExportIndexFile(
     const std::vector<gd::String> &includesFiles,
     const std::vector<gd::SourceFileMetadata> &sourceFiles,
     unsigned int nonRuntimeScriptsCacheBurst,
-    gd::String additionalSpec) {
+    gd::String additionalSpec,
+    bool transparentBackground) {
   gd::String str = fs.ReadFile(source);
 
   // Add a reference to all files to include, as weel as the source files
@@ -768,7 +773,8 @@ bool ExporterHelper::ExportIndexFile(
                          exportDir,
                          finalIncludesFiles,
                          nonRuntimeScriptsCacheBurst,
-                         additionalSpec))
+                         additionalSpec,
+                         transparentBackground))
     return false;
 
   // Write the index.html file
@@ -1002,7 +1008,8 @@ bool ExporterHelper::ExportHtml5Files(const gd::Project &project,
 
 bool ExporterHelper::ExportElectronFiles(const gd::Project &project,
                                          gd::String exportDir,
-                                         std::set<gd::String> usedExtensions) {
+                                         std::set<gd::String> usedExtensions,
+                                         const ExportOptions &options) {
   gd::String jsonName =
       gd::Serializer::ToJSON(gd::SerializerElement(project.GetName()));
   gd::String jsonPackageName =
@@ -1062,15 +1069,54 @@ bool ExporterHelper::ExportElectronFiles(const gd::Project &project,
   }
 
   {
+    gd::String electronAppOptions = "";
+    if (options.electronDisableHardwareAcceleration) {
+      electronAppOptions = "app.disableHardwareAcceleration();\n";
+    }
+
+    gd::String electronBrowserWindowOptions = "";
+    const auto appendElectronBrowserWindowOption =
+        [&electronBrowserWindowOptions](const gd::String &option) {
+          if (!electronBrowserWindowOptions.empty()) {
+            electronBrowserWindowOptions += "\n    ";
+          }
+          electronBrowserWindowOptions += option;
+        };
+    if (options.electronFramelessWindow) {
+      appendElectronBrowserWindowOption("frame: false,");
+    }
+    if (options.electronTransparentWindow) {
+      appendElectronBrowserWindowOption("transparent: true,");
+    }
+    if (options.electronDisableWindowShadow) {
+      appendElectronBrowserWindowOption("hasShadow: false,");
+    }
+
+    const gd::String electronWindowBackgroundColor =
+        options.electronTransparentWindow ? "'#00000000'" : "'#000000'";
+    const gd::String electronAfterWindowCreation =
+        options.electronTransparentWindow
+            ? "mainWindow.setBackgroundColor('#00000000');"
+            : "";
+
     gd::String str =
         fs.ReadFile(gdjsRoot + "/Runtime/Electron/main.js")
+            .FindAndReplace("/* GDJS_ELECTRON_APP_OPTIONS */",
+                            electronAppOptions)
             .FindAndReplace(
                 "800 /*GDJS_WINDOW_WIDTH*/",
                 gd::String::From<int>(project.GetGameResolutionWidth()))
             .FindAndReplace(
                 "600 /*GDJS_WINDOW_HEIGHT*/",
                 gd::String::From<int>(project.GetGameResolutionHeight()))
-            .FindAndReplace("'GDJS_GAME_NAME'", jsonName);
+            .FindAndReplace("'GDJS_GAME_NAME'", jsonName)
+            .FindAndReplace("'#000000' /* GDJS_ELECTRON_BACKGROUND_COLOR */",
+                            electronWindowBackgroundColor)
+            .FindAndReplace(
+                "/* GDJS_ELECTRON_BROWSER_WINDOW_OPTIONS */",
+                electronBrowserWindowOptions)
+            .FindAndReplace("/* GDJS_ELECTRON_AFTER_WINDOW_CREATION */",
+                            electronAfterWindowCreation);
 
     if (!fs.WriteToFile(exportDir + "/main.js", str)) {
       lastError = "Unable to write Electron main.js file.";
@@ -1115,7 +1161,8 @@ bool ExporterHelper::CompleteIndexFile(
     gd::String exportDir,
     const std::vector<gd::String> &includesFiles,
     unsigned int nonRuntimeScriptsCacheBurst,
-    gd::String additionalSpec) {
+    gd::String additionalSpec,
+    bool transparentBackground) {
   if (additionalSpec.empty()) additionalSpec = "{}";
 
   gd::String codeFilesIncludes;
@@ -1137,7 +1184,21 @@ bool ExporterHelper::CompleteIndexFile(
                          "\" crossorigin=\"anonymous\"></script>\n";
   }
 
+  const gd::String transparentBackgroundStyle =
+      transparentBackground
+          ? "html, body {\n"
+            "\t\t\tbackground: transparent;\n"
+            "\t\t\tbackground-color: transparent;\n"
+            "\t\t}\n"
+            "\t\tcanvas {\n"
+            "\t\t\tbackground: transparent;\n"
+            "\t\t\tbackground-color: transparent;\n"
+            "\t\t}\n"
+          : "";
+
   str = str.FindAndReplace("/* GDJS_CUSTOM_STYLE */", "")
+            .FindAndReplace("/* GDJS_TRANSPARENT_BACKGROUND_STYLE */",
+                            transparentBackgroundStyle)
             .FindAndReplace("<!-- GDJS_CUSTOM_HTML -->", "")
             .FindAndReplace("<!-- GDJS_CODE_FILES -->", codeFilesIncludes)
             .FindAndReplace("{}/*GDJS_ADDITIONAL_SPEC*/", additionalSpec);

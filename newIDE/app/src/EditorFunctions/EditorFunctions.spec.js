@@ -3205,6 +3205,93 @@ describe('editorFunctions', () => {
       expect(effectsContainer.hasEffectNamed('ToRemove')).toBe(false);
       expect(effectsContainer.hasEffectNamed('ToKeep')).toBe(true);
     });
+
+    it('warns (but still adds it) when adding a 3D-only effect to a 2D-restricted layer', async () => {
+      testScene
+        .getLayers()
+        .getLayer('')
+        .setRenderingType('2d');
+
+      const result = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            changed_layer_effects: [
+              {
+                layer_name: '',
+                effect_name: 'MyLight',
+                effect_type: 'FakeDirectionalLight',
+              },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).toContain('Created new "MyLight" effect');
+      expect(result.warnings).toContain(
+        '"MyLight" only works in 3D, but layer "" is restricted to 2D'
+      );
+      expect(
+        testScene
+          .getLayers()
+          .getLayer('')
+          .getEffects()
+          .hasEffectNamed('MyLight')
+      ).toBe(true);
+    });
+
+    it('warns (but still adds it) when adding a 2D-only effect to a 3D-restricted layer', async () => {
+      testScene
+        .getLayers()
+        .getLayer('')
+        .setRenderingType('3d');
+
+      const result = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            changed_layer_effects: [
+              {
+                layer_name: '',
+                effect_name: 'MySepia',
+                effect_type: 'FakeSepia',
+              },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).toContain('Created new "MySepia" effect');
+      expect(result.warnings).toContain(
+        '"MySepia" only works in 2D, but layer "" is restricted to 3D'
+      );
+    });
+
+    it('does not warn when the layer allows both 2D and 3D (default)', async () => {
+      const result = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            changed_layer_effects: [
+              {
+                layer_name: '',
+                effect_name: 'MyLight',
+                effect_type: 'FakeDirectionalLight',
+              },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).toContain('Done.');
+      expect(result.warnings).toBeUndefined();
+    });
   });
 
   describe('object groups behave like objects', () => {

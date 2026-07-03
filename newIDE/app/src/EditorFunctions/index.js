@@ -5025,6 +5025,7 @@ const applyEffectChange = ({
   targetLabel,
   changes,
   warnings,
+  targetRenderingType,
 }: {
   project: gdProject,
   effectsContainer: gdEffectsContainer,
@@ -5032,6 +5033,7 @@ const applyEffectChange = ({
   targetLabel: string,
   changes: Array<string>,
   warnings: Array<string>,
+  targetRenderingType?: string,
 }) => {
   const effectName = SafeExtractor.extractStringProperty(
     changedEffect,
@@ -5189,6 +5191,22 @@ const applyEffectChange = ({
           .map(serializedProperty => JSON.stringify(serializedProperty))
           .join(', ')}.`
       );
+
+      if (
+        targetRenderingType === '2d' &&
+        effectMetadata.isMarkedAsOnlyWorkingFor3D()
+      ) {
+        warnings.push(
+          `"${newlyCreatedEffect.getName()}" only works in 3D, but ${targetLabel} is restricted to 2D — it may have no visible effect.`
+        );
+      } else if (
+        targetRenderingType === '3d' &&
+        effectMetadata.isMarkedAsOnlyWorkingFor2D()
+      ) {
+        warnings.push(
+          `"${newlyCreatedEffect.getName()}" only works in 2D, but ${targetLabel} is restricted to 3D — it may have no visible effect.`
+        );
+      }
     }
   }
 };
@@ -5619,6 +5637,7 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
           targetLabel: `layer "${layerName}"`,
           changes,
           warnings,
+          targetRenderingType: layer.getRenderingType(),
         });
       });
     }

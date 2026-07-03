@@ -818,11 +818,11 @@ namespace gdjs {
           signalDebugRecord.status,
           signalDebugRecord.name
         );
-        for (
-          let j = 0, lenj = signalDebugRecord.receivers.length;
-          j < lenj;
-          ++j
-        ) {
+        const logReceiverCount =
+          signalDebugRecord.status === 'delivered'
+            ? signalDebugRecord.receivers.length
+            : Math.min(1, signalDebugRecord.receivers.length);
+        for (let j = 0; j < logReceiverCount; ++j) {
           this._signalDebugPanelLogs.unshift({
             id: signalDebugRecord.id,
             signalName: signalDebugRecord.name,

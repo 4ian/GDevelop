@@ -145,7 +145,7 @@ const PreferencesDialog = ({
   const mcpServerPreferences = (
     <ColumnStackLayout noMargin>
       <Text size="block-title">
-        <Trans>MCP server</Trans>
+        <Trans>Gdevelop MCP</Trans>
       </Text>
       <CompactToggleField
         labelColor="primary"
@@ -189,7 +189,6 @@ const PreferencesDialog = ({
         fullWidth
       />
       <TextField
-        type="password"
         value={values.mcpServerAuthorizationToken}
         floatingLabelText={<Trans>Authorization token</Trans>}
         onChange={(event, value) => setMcpServerAuthorizationToken(value)}

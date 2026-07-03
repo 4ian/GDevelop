@@ -160,19 +160,48 @@ export const getInitialPreferences = (): {
   return { ...initialPreferences.values, language: languageOrLocale };
 };
 
-const generateMcpServerAuthorizationToken = (): string => {
-  const prefix = 'gdevelop-mcp';
-  if (typeof window !== 'undefined' && window.crypto) {
-    const bytes = new Uint8Array(24);
-    window.crypto.getRandomValues(bytes);
-    return `${prefix}-${Array.from(bytes)
-      .map(byte => byte.toString(16).padStart(2, '0'))
-      .join('')}`;
+const mcpServerAuthorizationTokenPrefix = 'mcp';
+const mcpServerAuthorizationTokenRandomByteCount = 16;
+const base64UrlAlphabet =
+  'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
+
+const encodeBytesAsBase64Url = (bytes: Uint8Array): string => {
+  let encoded = '';
+
+  for (let index = 0; index < bytes.length; index += 3) {
+    const byte1 = bytes[index];
+    const byte2 = index + 1 < bytes.length ? bytes[index + 1] : 0;
+    const byte3 = index + 2 < bytes.length ? bytes[index + 2] : 0;
+    const triplet = (byte1 << 16) | (byte2 << 8) | byte3;
+
+    encoded += base64UrlAlphabet[(triplet >> 18) & 63];
+    encoded += base64UrlAlphabet[(triplet >> 12) & 63];
+    if (index + 1 < bytes.length)
+      encoded += base64UrlAlphabet[(triplet >> 6) & 63];
+    if (index + 2 < bytes.length) encoded += base64UrlAlphabet[triplet & 63];
   }
 
-  return `${prefix}-${Date.now().toString(36)}-${Math.random()
-    .toString(36)
-    .slice(2)}`;
+  return encoded;
+};
+
+export const generateMcpServerAuthorizationToken = (): string => {
+  const bytes = new Uint8Array(mcpServerAuthorizationTokenRandomByteCount);
+
+  if (
+    typeof window !== 'undefined' &&
+    window.crypto &&
+    typeof window.crypto.getRandomValues === 'function'
+  ) {
+    window.crypto.getRandomValues(bytes);
+  } else {
+    for (let index = 0; index < bytes.length; index++) {
+      bytes[index] = Math.floor(Math.random() * 256);
+    }
+  }
+
+  return `${mcpServerAuthorizationTokenPrefix}-${encodeBytesAsBase64Url(
+    bytes
+  )}`;
 };
 
 const hasMcpServerConfigurationChanged = (

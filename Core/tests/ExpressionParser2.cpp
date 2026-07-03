@@ -278,7 +278,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "string");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
     }
     SECTION("Identifiers can contain multi-byte characters") {
       // "Ünïçá" is 5 codepoints (each accented letter is 2 bytes in UTF-8).
@@ -308,7 +308,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
     }
     SECTION("Escaped quotes around multi-byte text") {
       auto node = parser.ParseExpression("\"süper \\\"café\\\" ☕\"");
@@ -689,7 +689,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
     }
     {
       auto node = parser.ParseExpression("\"abc\" + \"def\"");
@@ -708,7 +708,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "string");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
     }
   }
 
@@ -730,7 +730,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
     }
     {
       auto node = parser.ParseExpression("-123-456");
@@ -749,7 +749,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
     }
     {
       auto node = parser.ParseExpression("\"abc\" + \"def\"");
@@ -768,7 +768,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
     }
   }
 
@@ -784,7 +784,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
     }
     {
       auto node = parser.ParseExpression("- 123");
@@ -800,7 +800,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
     }
     {
       auto node = parser.ParseExpression("+123");
@@ -816,7 +816,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
     }
     {
       auto node = parser.ParseExpression("-123.2");
@@ -829,7 +829,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
     }
     {
       auto node = parser.ParseExpression("- 123.2");
@@ -845,7 +845,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
     }
   }
   SECTION("valid unary operators ('number|string' type)") {
@@ -860,7 +860,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
     }
     {
       auto node = parser.ParseExpression("+123");
@@ -876,7 +876,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
     }
     {
       auto node = parser.ParseExpression("-123.2");
@@ -889,7 +889,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
     }
   }
 
@@ -905,7 +905,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
     }
     // A negative number with a trailing dot is allowed.
     {
@@ -918,7 +918,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
     }
     // Leading zeros are stripped but the minus sign is kept.
     {
@@ -931,7 +931,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
     }
     // Negative zero is preserved.
     {
@@ -942,7 +942,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
     }
     // Leading whitespace before a negative number does not break it.
     {
@@ -956,7 +956,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
     }
     // A `+` is never treated as a number sign: `+123` stays a unary operator
     // applied to NumberNode("123").
@@ -991,7 +991,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
     }
     // `2/-3`
     {
@@ -1005,7 +1005,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
     }
     // `1+-2` parses cleanly into NumberNode("1") + NumberNode("-2").
     {
@@ -1021,7 +1021,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
     }
     // `1--2` (subtract a negative literal) parses to a binary `-` whose right
     // hand side is the literal -2 (not a unary minus on 2).
@@ -1039,7 +1039,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
     }
     // `-1 + 2`: the negative literal is the left hand side of `+`.
     {
@@ -1056,7 +1056,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
     }
     // Multiplicative precedence: `-2*3 + 1` → ((-2) * 3) + 1.
     {
@@ -1075,7 +1075,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
     }
     // Whitespace around `-` keeps it a binary subtract. Ensure `2 - 3` is
     // not collapsed into `2` followed by NumberNode("-3").
@@ -1094,7 +1094,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
     }
   }
 
@@ -1110,7 +1110,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
     }
     // `-(3)` is *not* a negative literal: the `(` is not a digit so the parser
     // takes the unary-operator path and wraps a SubExpression.
@@ -1127,7 +1127,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
     }
     // `-(-3)` is a unary minus around a sub-expression containing a negative
     // literal.
@@ -1144,7 +1144,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
     }
   }
 
@@ -1161,7 +1161,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
     }
     // `+-3` is unary `+` around NumberNode("-3").
     {
@@ -1175,7 +1175,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
     }
     // `-+3` is unary `-` around a unary `+` around NumberNode("3") (the `+` is
     // never folded into the literal).
@@ -1192,7 +1192,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
     }
   }
 
@@ -1210,7 +1210,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
     }
     // `-(123)`: `-` followed by an opening parenthesis is also a unary
     // operator (the `(` is not a number first char).
@@ -1242,7 +1242,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
     gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
     node->Visit(validator);
-    RequireNoFatalError(validator);
+    RequireNoError(validator);
   }
 
   SECTION("Negative number in a string-only context is rejected") {
@@ -1777,7 +1777,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "object");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
     }
     {
       auto node = parser.ParseExpression("😅");
@@ -1787,7 +1787,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "object");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
     }
     {
       auto node = parser.ParseExpression("中文");
@@ -1797,7 +1797,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "object");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
     }
 
     {
@@ -1808,7 +1808,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "object");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
     }
     {
       auto node = parser.ParseExpression("Hello World 1 ");
@@ -1818,7 +1818,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "object");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
     }
     {
       auto node = parser.ParseExpression("Hello World 1  ");
@@ -1828,7 +1828,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "object");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
     }
   }
 
@@ -1867,7 +1867,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
     }
     SECTION("number and string parameters") {
       auto node = parser.ParseExpression(
@@ -1880,7 +1880,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
     }
     SECTION("3rd optional parameter not set") {
       auto node = parser.ParseExpression(
@@ -1890,7 +1890,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
     }
     SECTION("3rd optional parameter set") {
       auto node = parser.ParseExpression(
@@ -1900,7 +1900,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
     }
     SECTION("object function call") {
       auto node =
@@ -1913,7 +1913,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
     }
     SECTION("object function call on group") {
       auto node =
@@ -1926,7 +1926,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
     }
     SECTION("behavior function call") {
       auto node = parser.ParseExpression(
@@ -1939,7 +1939,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
     }
     SECTION("behavior function call on group") {
       auto node = parser.ParseExpression(
@@ -1952,7 +1952,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
     }
     SECTION("identifier parameter") {
       auto node = parser.ParseExpression(
@@ -2024,7 +2024,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
         gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
         node->Visit(validator);
-        RequireNoFatalError(validator);
+        RequireNoError(validator);
       }
       {
         auto node =
@@ -2032,7 +2032,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
         gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
         node->Visit(validator);
-        RequireNoFatalError(validator);
+        RequireNoError(validator);
       }
     }
     SECTION("in variable parameter") {
@@ -2041,7 +2041,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "variable");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
     }
     SECTION("in legacy scene variable parameter") {
       auto node =
@@ -2049,7 +2049,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "scenevar");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
     }
     SECTION("in object variable parameter") {
       auto node =
@@ -2058,7 +2058,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       gd::ExpressionValidator validator(platform, projectScopedContainers,
                                         "objectvar", "MyObject");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
     }
   }
 
@@ -2070,7 +2070,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
         gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
         node->Visit(validator);
-        RequireNoFatalError(validator);
+        RequireNoError(validator);
       }
       {
         auto node =
@@ -2078,7 +2078,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
         gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
         node->Visit(validator);
-        RequireNoFatalError(validator);
+        RequireNoError(validator);
       }
     }
     SECTION("in variable parameter") {
@@ -2087,7 +2087,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "variable");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
     }
     SECTION("in legacy variable parameter") {
       auto node =
@@ -2095,7 +2095,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "scenevar");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
     }
     SECTION("in object variable parameter") {
       auto node =
@@ -2104,7 +2104,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       gd::ExpressionValidator validator(platform, projectScopedContainers,
                                         "objectvar", "MyObject");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
     }
   }
 
@@ -2115,7 +2115,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
     }
     SECTION("in variable parameter") {
       auto node =
@@ -2123,7 +2123,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "variable");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
     }
     SECTION("in legacy variable parameter") {
       auto node =
@@ -2131,7 +2131,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "scenevar");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
     }
   }
 
@@ -2142,7 +2142,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
     }
     {
       auto node =
@@ -2150,7 +2150,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
     }
   }
 
@@ -2161,7 +2161,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
     }
     {
       auto node =
@@ -2169,7 +2169,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
     }
     {
       auto node =
@@ -2177,7 +2177,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
     }
     {
       auto node = parser.ParseExpression(
@@ -2187,7 +2187,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       gd::ExpressionValidator validator(platform, projectScopedContainers,
                                         "number");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
     }
     {
       // TODO `ToString` should not be required here.
@@ -2198,7 +2198,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       gd::ExpressionValidator validator(platform, projectScopedContainers,
                                         "number");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
     }
   }
 
@@ -2425,7 +2425,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
     }
     {
       auto node =
@@ -2433,7 +2433,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
     }
   }
 
@@ -2444,7 +2444,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
     }
     {
       auto node =
@@ -2452,7 +2452,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
     }
   }
 
@@ -2463,7 +2463,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
     }
     {
       auto node =
@@ -2471,7 +2471,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
     }
     {
       auto node =
@@ -2479,7 +2479,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
     }
   }
 
@@ -2499,7 +2499,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
     gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
     node->Visit(validator);
-    RequireNoFatalError(validator);
+    RequireNoError(validator);
 	  // TODO Add a non-fatal error
   }
 
@@ -2702,7 +2702,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainersWithProperties, "number|string");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
 
       auto type = gd::ExpressionTypeFinder::GetType(
           platform, projectScopedContainersWithProperties, "number|string", *node.get());
@@ -2715,7 +2715,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainersWithProperties, "number|string");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
 
       auto type = gd::ExpressionTypeFinder::GetType(
           platform, projectScopedContainersWithProperties, "number|string", *node.get());
@@ -2728,7 +2728,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainersWithProperties, "number|string");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
 
       auto type = gd::ExpressionTypeFinder::GetType(
           platform, projectScopedContainersWithProperties, "number|string", *node.get());
@@ -2741,7 +2741,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainersWithProperties, "number|string");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
 
       auto type = gd::ExpressionTypeFinder::GetType(
           platform, projectScopedContainersWithProperties, "number|string", *node.get());
@@ -2754,7 +2754,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainersWithProperties, "number|string");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
 
       auto type = gd::ExpressionTypeFinder::GetType(
           platform, projectScopedContainersWithProperties, "number|string", *node.get());
@@ -3168,7 +3168,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainersWithParameters, "number|string");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
 
       auto type = gd::ExpressionTypeFinder::GetType(
           platform, projectScopedContainersWithParameters, "number|string", *node.get());
@@ -3180,7 +3180,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainersWithParameters, "number|string");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
 
       auto type = gd::ExpressionTypeFinder::GetType(
           platform, projectScopedContainersWithParameters, "number|string", *node.get());
@@ -3192,7 +3192,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainersWithParameters, "number|string");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
 
       auto type = gd::ExpressionTypeFinder::GetType(
           platform, projectScopedContainersWithParameters, "number|string", *node.get());
@@ -3204,7 +3204,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainersWithParameters, "number|string");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
 
       auto type = gd::ExpressionTypeFinder::GetType(
           platform, projectScopedContainersWithParameters, "number|string", *node.get());
@@ -3216,7 +3216,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainersWithParameters, "number|string");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
 
       auto type = gd::ExpressionTypeFinder::GetType(
           platform, projectScopedContainersWithParameters, "number|string", *node.get());
@@ -3314,7 +3314,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
     }
     {
       auto node =
@@ -3330,7 +3330,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
     }
   }
 
@@ -3346,7 +3346,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
     }
     {
       auto node = parser.ParseExpression(
@@ -3359,7 +3359,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
     }
     {
       auto node = parser.ParseExpression("WhateverObject  .  WhateverBehavior  "
@@ -3393,7 +3393,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
     }
   }
 
@@ -3405,7 +3405,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
     }
     {
       auto node = parser.ParseExpression("MyExtension::MouseX(,0)");
@@ -3414,7 +3414,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
     }
   }
 
@@ -4030,7 +4030,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "variable");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
     }
 
     SECTION("Declared project variable with children") {
@@ -4315,7 +4315,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
         gd::ExpressionValidator validator(platform, projectScopedContainers, "string");
         node->Visit(validator);
-        RequireNoFatalError(validator);
+        RequireNoError(validator);
       }
       // A string concatenated with a number variable (will have to be casted to a string in code generation)
       {
@@ -4325,7 +4325,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
         gd::ExpressionValidator validator(platform, projectScopedContainers, "string");
         node->Visit(validator);
 
-        RequireNoFatalError(validator);
+        RequireNoError(validator);
       }
       // A string concatenated with a number variable (will have to be casted to a string in code generation)
       // and then with a string again.
@@ -4336,7 +4336,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
         gd::ExpressionValidator validator(platform, projectScopedContainers, "string");
         node->Visit(validator);
 
-        RequireNoFatalError(validator);
+        RequireNoError(validator);
       }
       // A string concatenated with an unknown variable (will have to be casted to a string in code generation)
       // and then with a string again.
@@ -4347,7 +4347,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
         gd::ExpressionValidator validator(platform, projectScopedContainers, "string");
         node->Visit(validator);
 
-        RequireNoFatalError(validator);
+        RequireNoError(validator);
       }
     }
     SECTION("Expression/parent type is 'number'") {
@@ -4358,7 +4358,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
         gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
         node->Visit(validator);
-        RequireNoFatalError(validator);
+        RequireNoError(validator);
       }
       // A number concatenated with a string variable (will have to be casted to a number in code generation)
       {
@@ -4368,7 +4368,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
         gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
         node->Visit(validator);
 
-        RequireNoFatalError(validator);
+        RequireNoError(validator);
       }
       // A number concatenated with a string variable (will have to be casted to a number in code generation)
       // and then with a number again.
@@ -4379,7 +4379,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
         gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
         node->Visit(validator);
 
-        RequireNoFatalError(validator);
+        RequireNoError(validator);
       }
       // A number concatenated with an unknown variable (will have to be casted to a number in code generation)
       // and then with a number again.
@@ -4390,7 +4390,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
         gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
         node->Visit(validator);
 
-        RequireNoFatalError(validator);
+        RequireNoError(validator);
       }
     }
     SECTION("Expression/parent type is 'number|string'") {
@@ -4402,7 +4402,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
           gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
           node->Visit(validator);
-          RequireNoFatalError(validator);
+          RequireNoError(validator);
         }
         // A string concatenated with a number variable (will have to be casted to a string in code generation)
         {
@@ -4412,7 +4412,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
           gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
           node->Visit(validator);
 
-          RequireNoFatalError(validator);
+          RequireNoError(validator);
         }
         // A string concatenated with a number variable (will have to be casted to a string in code generation)
         // and then with a string again.
@@ -4423,7 +4423,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
           gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
           node->Visit(validator);
 
-          RequireNoFatalError(validator);
+          RequireNoError(validator);
         }
         // A string concatenated with an unknown variable (will have to be casted to a string in code generation)
         // and then with a string again.
@@ -4434,7 +4434,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
           gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
           node->Visit(validator);
 
-          RequireNoFatalError(validator);
+          RequireNoError(validator);
         }
       }
       SECTION("Expression/parent inferred type is 'number'") {
@@ -4445,7 +4445,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
           gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
           node->Visit(validator);
-          RequireNoFatalError(validator);
+          RequireNoError(validator);
         }
         // A number concatenated with a string variable (will have to be casted to a number in code generation)
         {
@@ -4455,7 +4455,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
           gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
           node->Visit(validator);
 
-          RequireNoFatalError(validator);
+          RequireNoError(validator);
         }
         // A number concatenated with a string variable (will have to be casted to a number in code generation)
         // and then with a number again.
@@ -4466,7 +4466,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
           gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
           node->Visit(validator);
 
-          RequireNoFatalError(validator);
+          RequireNoError(validator);
         }
         // A number concatenated with an unknown variable (will have to be casted to a number in code generation)
         // and then with a number again.
@@ -4477,7 +4477,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
           gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
           node->Visit(validator);
 
-          RequireNoFatalError(validator);
+          RequireNoError(validator);
         }
       }
     }
@@ -4579,7 +4579,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "string");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
     }
   }
 
@@ -4618,7 +4618,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "string");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
     }
   }
 
@@ -4644,7 +4644,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
     }
   }
 
@@ -4671,7 +4671,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
       node->Visit(validator);
-      RequireNoFatalError(validator);
+      RequireNoError(validator);
     }
   }
 

@@ -477,7 +477,7 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
                                       node.childIdentifierNameLocation, false);
             if (isChildVariableDeclared) {
               const auto &childVariable =
-                  parentVariable->GetChild(node.childIdentifierName);
+                  objectVariable.GetChild(node.childIdentifierName);
               ValidateLastChildVariable(childVariable,
                                         node.childIdentifierNameLocation);
             }

@@ -142,6 +142,7 @@ export type EditorFunctionGenericOutput = {|
   sharedProperties?: any,
   instances?: any,
   layers?: any,
+  effects?: any,
   behaviors?: Array<SimplifiedBehavior>,
   variables?: Array<SimplifiedVariable>,
   reminder?: string,
@@ -1415,7 +1416,209 @@ const createOrReplaceObject: EditorFunction = {
 /**
  * Retrieves the properties of a specific object (global or in a scene)
  */
-const inspectObjectProperties: EditorFunction = {
+const isPropertyForChangingObjectName = (propertyName: string): boolean => {
+  return (
+    propertyName.toLowerCase() === 'name' ||
+    propertyName.toLowerCase().replace(/-|_| /, '') === 'objectname'
+  );
+};
+
+const objectSupportsEffects = (object: gdObject): boolean =>
+  object
+    .getAllBehaviorNames()
+    .toJSArray()
+    .some(behaviorName => {
+      if (!object) return false;
+      return (
+        object.getBehavior(behaviorName).getTypeName() ===
+        'EffectCapability::EffectBehavior'
+      );
+    });
+
+/**
+ * Applies a single property change (or the special "name" rename) to an
+ * object. Shared between the property and effects loops of
+ * `change_object_properties_effects`.
+ */
+const applyObjectPropertyChange = ({
+  project,
+  layout,
+  object,
+  isGlobalObject,
+  object_name,
+  changedProperty,
+  changes,
+  warnings,
+}: {
+  project: gdProject,
+  layout: gdLayout,
+  object: gdObject,
+  isGlobalObject: boolean,
+  object_name: string,
+  changedProperty: Object,
+  changes: Array<string>,
+  warnings: Array<string>,
+}) => {
+  const propertyName = SafeExtractor.extractStringProperty(
+    changedProperty,
+    'property_name'
+  );
+  const newValue = SafeExtractor.extractStringProperty(
+    changedProperty,
+    'new_value'
+  );
+  if (propertyName === null || newValue === null) {
+    warnings.push(
+      `Missing "property_name" or "new_value" in changed_properties item: ${JSON.stringify(
+        changedProperty
+      )}. Skipped.`
+    );
+    return;
+  }
+
+  // Renaming an object is a special case by using a property called "name".
+  if (isPropertyForChangingObjectName(propertyName)) {
+    if (object.getName() === newValue) {
+      changes.push(`Object "${object_name}" already named "${newValue}".`);
+      return;
+    }
+
+    const objectsContainersList = gd.ObjectsContainersList.makeNewObjectsContainersListForProjectAndLayout(
+      project,
+      layout
+    );
+
+    const newName = newNameGenerator(
+      gd.Project.getSafeName(newValue),
+      tentativeNewName =>
+        objectsContainersList.hasObjectOrGroupNamed(tentativeNewName)
+    );
+
+    if (layout) {
+      if (isGlobalObject) {
+        gd.WholeProjectRefactorer.globalObjectOrGroupRenamed(
+          project,
+          object.getName(),
+          newName,
+          /* isObjectGroup=*/ false
+        );
+      } else {
+        gd.WholeProjectRefactorer.objectOrGroupRenamedInScene(
+          project,
+          layout,
+          object.getName(),
+          newName,
+          /* isObjectGroup=*/ false
+        );
+      }
+    }
+    // Note: gd.WholeProjectRefactorer.objectOrGroupRenamedInEventsBasedObject to be added here
+    // if events-based objects can be handled by AI one day.
+
+    object.setName(newName);
+
+    changes.push(
+      `Renamed object "${object_name}" to "${newName}" (events and references updated).`
+    );
+    return;
+  }
+
+  // Changing a "usual" property of an object:
+  const objectConfiguration = object.getConfiguration();
+  const objectProperties = objectConfiguration.getProperties();
+
+  const { foundPropertyName, foundProperty } = findPropertyByName({
+    properties: objectProperties,
+    name: propertyName,
+  });
+
+  if (!foundPropertyName || !foundProperty) {
+    // Position, rotation, opacity, z-order and layer are per-instance
+    // placement attributes, not object properties. A frequent mistake is to
+    // try to set them here; redirect to the right tool instead of a generic
+    // "not found".
+    const normalizedPropertyName = propertyName
+      .toLowerCase()
+      .replace(/\s|_|-/g, '');
+    const instanceOnlyAttributes = [
+      'x',
+      'y',
+      'z',
+      'position',
+      'rotation',
+      'rotationx',
+      'rotationy',
+      'rotationz',
+      'angle',
+      'opacity',
+      'zorder',
+      'layer',
+    ];
+    if (instanceOnlyAttributes.includes(normalizedPropertyName)) {
+      warnings.push(
+        `"${propertyName}" is a per-instance attribute, not a property of object "${object_name}". Use \`put_2d_instances\`/\`put_3d_instances\` to change it.`
+      );
+      return;
+    }
+    warnings.push(
+      `Property "${propertyName}" not found on object "${object_name}".`
+    );
+    return;
+  }
+
+  const sanitizedNewValue = sanitizePropertyNewValue(foundProperty, newValue);
+
+  if (foundProperty.getType() === 'resource') {
+    if (!project.getResourcesManager().hasResource(sanitizedNewValue)) {
+      warnings.push(
+        `"${foundPropertyName}" on "${object_name}" -> "${newValue}": resource "${sanitizedNewValue}" does not exist. New resources cannot be added just by name; use \`create_or_replace_object\` to import assets from the asset store (preserving properties/behaviors/events).`
+      );
+      return;
+    }
+    const resource = project
+      .getResourcesManager()
+      .getResource(sanitizedNewValue);
+
+    // Check the new resource is of the expected kind.
+    const extraInfos = foundProperty.getExtraInfo().toJSArray();
+    const expectedResourceKind = (extraInfos[0] || '').toLowerCase();
+    if (
+      expectedResourceKind &&
+      resource.getKind().toLowerCase() !== expectedResourceKind
+    ) {
+      warnings.push(
+        `"${foundPropertyName}" on "${object_name}" -> "${newValue}": resource "${sanitizedNewValue}" has kind "${resource.getKind()}" but expected "${expectedResourceKind}".`
+      );
+      return;
+    }
+  }
+
+  if (
+    !objectConfiguration.updateProperty(foundPropertyName, sanitizedNewValue)
+  ) {
+    warnings.push(
+      `Could not set "${foundPropertyName}" on "${object_name}": invalid value or type.`
+    );
+    return;
+  }
+
+  const { propertyWarnings, propertyChanges } = verifyPropertyChange({
+    propertyNameWithLocation: `"${foundPropertyName}" on "${object_name}"`,
+    newProperties: objectConfiguration.getProperties(),
+    propertyName: foundPropertyName,
+    requestedNewValue: sanitizedNewValue,
+  });
+  warnings.push(...propertyWarnings);
+  changes.push(...propertyChanges);
+};
+
+/**
+ * Retrieves the properties, behaviors and effects of a specific object
+ * (global or in a scene). An object has its own effects container, just
+ * like a layer does — effects are only listed if the object type supports
+ * them (see `objectSupportsEffects`).
+ */
+const inspectObjectPropertiesEffects: EditorFunction = {
   renderForEditor: ({ args, editorCallbacks }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
     const object_name = extractRequiredString(args, 'object_name');
@@ -1539,27 +1742,59 @@ const inspectObjectProperties: EditorFunction = {
       output.animationNames = animationNames.join(', ');
     }
 
+    if (objectSupportsEffects(object)) {
+      const effectsContainer = object.getEffects();
+      output.effects = mapFor(0, effectsContainer.getEffectsCount(), i => {
+        const effect = effectsContainer.getEffectAt(i);
+        const effectMetadata = gd.MetadataProvider.getEffectMetadata(
+          project.getCurrentPlatform(),
+          effect.getEffectType()
+        );
+        if (gd.MetadataProvider.isBadEffectMetadata(effectMetadata))
+          return null;
+
+        return {
+          effectName: effect.getName(),
+          effectType: effect.getEffectType(),
+          effectProperties: serializeEffectProperties(effect, effectMetadata),
+        };
+      }).filter(Boolean);
+    }
+
     return output;
   },
   modifiesProject: false,
 };
 
-const isPropertyForChangingObjectName = (propertyName: string): boolean => {
-  return (
-    propertyName.toLowerCase() === 'name' ||
-    propertyName.toLowerCase().replace(/-|_| /, '') === 'objectname'
-  );
-};
-
 /**
- * Changes a property of a specific object (global or in a scene)
+ * Changes properties and/or effects of a specific object (global or in a
+ * scene). Effects are only applied if the object type supports them (see
+ * `objectSupportsEffects`).
  */
-const changeObjectProperty: EditorFunction = {
+const changeObjectPropertiesEffects: EditorFunction = {
   renderForEditor: ({ project, shouldShowDetails, args, editorCallbacks }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
     const object_name = extractRequiredString(args, 'object_name');
     const changed_properties =
       SafeExtractor.extractArrayProperty(args, 'changed_properties') || [];
+    const changed_effects =
+      SafeExtractor.extractArrayProperty(args, 'changed_effects') || [];
+
+    if (changed_effects.length > 0) {
+      return {
+        text:
+          changed_properties.length > 0 ? (
+            <Trans>
+              Update properties and effects of <b>{object_name}</b> (in scene{' '}
+              {scene_name}).
+            </Trans>
+          ) : (
+            <Trans>
+              Update effects of <b>{object_name}</b> (in scene {scene_name}).
+            </Trans>
+          ),
+      };
+    }
 
     const renderChanges = (
       changes: Array<{ label: string, newValue: string }>
@@ -1680,6 +1915,8 @@ const changeObjectProperty: EditorFunction = {
     const object_name = extractRequiredString(args, 'object_name');
     const changed_properties =
       SafeExtractor.extractArrayProperty(args, 'changed_properties') || [];
+    const changed_effects =
+      SafeExtractor.extractArrayProperty(args, 'changed_effects') || [];
 
     if (!project.hasLayoutNamed(scene_name)) {
       return makeGenericFailure(`Scene not found: "${scene_name}".`);
@@ -1705,170 +1942,42 @@ const changeObjectProperty: EditorFunction = {
       );
     }
 
-    const warnings = [];
-    const changes = [];
+    const warnings: Array<string> = [];
+    const changes: Array<string> = [];
 
     changed_properties.forEach(changed_property => {
       if (!object) return;
-
-      const propertyName = SafeExtractor.extractStringProperty(
-        changed_property,
-        'property_name'
-      );
-      const newValue = SafeExtractor.extractStringProperty(
-        changed_property,
-        'new_value'
-      );
-      if (propertyName === null || newValue === null) {
-        warnings.push(
-          `Missing "property_name" or "new_value" in changed_properties item: ${JSON.stringify(
-            changed_property
-          )}. Skipped.`
-        );
-        return;
-      }
-
-      // Renaming an object is a special case by using a property called "name".
-      if (isPropertyForChangingObjectName(propertyName)) {
-        if (object.getName() === newValue) {
-          changes.push(`Object "${object_name}" already named "${newValue}".`);
-          return;
-        }
-
-        const objectsContainersList = gd.ObjectsContainersList.makeNewObjectsContainersListForProjectAndLayout(
-          project,
-          layout
-        );
-
-        const newName = newNameGenerator(
-          gd.Project.getSafeName(newValue),
-          tentativeNewName =>
-            objectsContainersList.hasObjectOrGroupNamed(tentativeNewName)
-        );
-
-        if (layout) {
-          if (isGlobalObject) {
-            gd.WholeProjectRefactorer.globalObjectOrGroupRenamed(
-              project,
-              object.getName(),
-              newName,
-              /* isObjectGroup=*/ false
-            );
-          } else {
-            gd.WholeProjectRefactorer.objectOrGroupRenamedInScene(
-              project,
-              layout,
-              object.getName(),
-              newName,
-              /* isObjectGroup=*/ false
-            );
-          }
-        }
-        // Note: gd.WholeProjectRefactorer.objectOrGroupRenamedInEventsBasedObject to be added here
-        // if events-based objects can be handled by AI one day.
-
-        object.setName(newName);
-
-        changes.push(
-          `Renamed object "${object_name}" to "${newName}" (events and references updated).`
-        );
-        return;
-      }
-
-      // Changing a "usual" property of an object:
-      const objectConfiguration = object.getConfiguration();
-      const objectProperties = objectConfiguration.getProperties();
-
-      const { foundPropertyName, foundProperty } = findPropertyByName({
-        properties: objectProperties,
-        name: propertyName,
+      applyObjectPropertyChange({
+        project,
+        layout,
+        object,
+        isGlobalObject,
+        object_name,
+        changedProperty: changed_property,
+        changes,
+        warnings,
       });
-
-      if (!foundPropertyName || !foundProperty) {
-        // Position, rotation, opacity, z-order and layer are per-instance
-        // placement attributes, not object properties. A frequent mistake is to
-        // try to set them here; redirect to the right tool instead of a generic
-        // "not found".
-        const normalizedPropertyName = propertyName
-          .toLowerCase()
-          .replace(/\s|_|-/g, '');
-        const instanceOnlyAttributes = [
-          'x',
-          'y',
-          'z',
-          'position',
-          'rotation',
-          'rotationx',
-          'rotationy',
-          'rotationz',
-          'angle',
-          'opacity',
-          'zorder',
-          'layer',
-        ];
-        if (instanceOnlyAttributes.includes(normalizedPropertyName)) {
-          warnings.push(
-            `"${propertyName}" is a per-instance attribute, not a property of object "${object_name}". Use \`put_2d_instances\`/\`put_3d_instances\` to change it.`
-          );
-          return;
-        }
-        warnings.push(
-          `Property "${propertyName}" not found on object "${object_name}".`
-        );
-        return;
-      }
-
-      const sanitizedNewValue = sanitizePropertyNewValue(
-        foundProperty,
-        newValue
-      );
-
-      if (foundProperty.getType() === 'resource') {
-        if (!project.getResourcesManager().hasResource(sanitizedNewValue)) {
-          warnings.push(
-            `"${foundPropertyName}" on "${object_name}" -> "${newValue}": resource "${sanitizedNewValue}" does not exist. New resources cannot be added just by name; use \`create_or_replace_object\` to import assets from the asset store (preserving properties/behaviors/events).`
-          );
-          return;
-        }
-        const resource = project
-          .getResourcesManager()
-          .getResource(sanitizedNewValue);
-
-        // Check the new resource is of the expected kind.
-        const extraInfos = foundProperty.getExtraInfo().toJSArray();
-        const expectedResourceKind = (extraInfos[0] || '').toLowerCase();
-        if (
-          expectedResourceKind &&
-          resource.getKind().toLowerCase() !== expectedResourceKind
-        ) {
-          warnings.push(
-            `"${foundPropertyName}" on "${object_name}" -> "${newValue}": resource "${sanitizedNewValue}" has kind "${resource.getKind()}" but expected "${expectedResourceKind}".`
-          );
-          return;
-        }
-      }
-
-      if (
-        !objectConfiguration.updateProperty(
-          foundPropertyName,
-          sanitizedNewValue
-        )
-      ) {
-        warnings.push(
-          `Could not set "${foundPropertyName}" on "${object_name}": invalid value or type.`
-        );
-        return;
-      }
-
-      const { propertyWarnings, propertyChanges } = verifyPropertyChange({
-        propertyNameWithLocation: `"${foundPropertyName}" on "${object_name}"`,
-        newProperties: objectConfiguration.getProperties(),
-        propertyName: foundPropertyName,
-        requestedNewValue: sanitizedNewValue,
-      });
-      warnings.push(...propertyWarnings);
-      changes.push(...propertyChanges);
     });
+
+    if (changed_effects.length > 0) {
+      if (!objectSupportsEffects(object)) {
+        warnings.push(
+          `Object "${object_name}" does not support effects (its type has no effect capability). Effects were NOT changed.`
+        );
+      } else {
+        const effectsContainer = object.getEffects();
+        changed_effects.forEach(changed_effect => {
+          applyEffectChange({
+            project,
+            effectsContainer,
+            changedEffect: changed_effect,
+            targetLabel: `object "${object_name}"`,
+            changes,
+            warnings,
+          });
+        });
+      }
+    }
 
     return makeMultipleChangesOutput(changes, warnings);
   },
@@ -4904,6 +5013,204 @@ const serializeEffectProperties = (
     .filter(Boolean);
 };
 
+/**
+ * Applies a single effect change (add, rename, move, delete or update
+ * properties) to an effects container. Shared between layers and objects,
+ * which both expose the same `gd.EffectsContainer` API.
+ */
+const applyEffectChange = ({
+  project,
+  effectsContainer,
+  changedEffect,
+  targetLabel,
+  changes,
+  warnings,
+  targetRenderingType,
+}: {
+  project: gdProject,
+  effectsContainer: gdEffectsContainer,
+  changedEffect: Object,
+  targetLabel: string,
+  changes: Array<string>,
+  warnings: Array<string>,
+  targetRenderingType?: string,
+}) => {
+  const effectName = SafeExtractor.extractStringProperty(
+    changedEffect,
+    'effect_name'
+  );
+  if (effectName === null) {
+    warnings.push(`Missing "effect_name" in changed_effects item. Skipped.`);
+    return;
+  }
+  const effect_type = SafeExtractor.extractStringProperty(
+    changedEffect,
+    'effect_type'
+  );
+  const new_effect_name = SafeExtractor.extractStringProperty(
+    changedEffect,
+    'new_effect_name'
+  );
+  const new_effect_position = SafeExtractor.extractNumberProperty(
+    changedEffect,
+    'new_effect_position'
+  );
+  const delete_this_effect = SafeExtractor.extractBooleanProperty(
+    changedEffect,
+    'delete_this_effect'
+  );
+  let newlyCreatedEffect: gdEffect | null = null;
+
+  if (effectsContainer.hasEffectNamed(effectName)) {
+    const effect = effectsContainer.getEffect(effectName);
+    if (delete_this_effect) {
+      effectsContainer.removeEffect(effectName);
+      changes.push(`Removed "${effectName}" effect on ${targetLabel}.`);
+    } else {
+      if (new_effect_name) {
+        effect.setName(new_effect_name);
+        changes.push(
+          `Renamed the "${effectName}" effect on ${targetLabel} to "${new_effect_name}".`
+        );
+      }
+      if (new_effect_position !== null) {
+        effectsContainer.moveEffect(
+          effectsContainer.getEffectPosition(effectName),
+          new_effect_position
+        );
+        changes.push(
+          `Moved the "${effectName}" effect on ${targetLabel} to position ${new_effect_position}.`
+        );
+      }
+    }
+  } else {
+    if (effect_type) {
+      const newEffectName = new_effect_name || effectName;
+      const effectMetadata = gd.MetadataProvider.getEffectMetadata(
+        project.getCurrentPlatform(),
+        effect_type
+      );
+      if (gd.MetadataProvider.isBadEffectMetadata(effectMetadata)) {
+        warnings.push(
+          `Effect type "${effect_type}" is not a valid effect type. Effect "${newEffectName}" was NOT added.`
+        );
+      } else {
+        newlyCreatedEffect = effectsContainer.insertNewEffect(
+          newEffectName,
+          new_effect_position || 0
+        );
+        newlyCreatedEffect.setEffectType(effect_type);
+      }
+    }
+  }
+
+  const changed_properties = SafeExtractor.extractArrayProperty(
+    changedEffect,
+    'changed_properties'
+  );
+  if (changed_properties) {
+    if (!effectsContainer.hasEffectNamed(effectName)) {
+      warnings.push(`Effect "${effectName}" not found. Skipped.`);
+      return;
+    }
+    const effect = effectsContainer.getEffect(effectName);
+    const effectMetadata = gd.MetadataProvider.getEffectMetadata(
+      project.getCurrentPlatform(),
+      effect.getEffectType()
+    );
+
+    if (gd.MetadataProvider.isBadEffectMetadata(effectMetadata)) {
+      warnings.push(`Effect "${effectName}" invalid. Skipped.`);
+      return;
+    }
+
+    const effectProperties = effectMetadata.getProperties();
+
+    changed_properties.forEach(changed_property => {
+      const propertyName = SafeExtractor.extractStringProperty(
+        changed_property,
+        'property_name'
+      );
+      const newValue = SafeExtractor.extractStringProperty(
+        changed_property,
+        'new_value'
+      );
+      if (propertyName === null || newValue === null) {
+        warnings.push(
+          `Missing "property_name" or "new_value" in changed_properties item. Skipped.`
+        );
+        return;
+      }
+
+      const { foundProperty } = findPropertyByName({
+        properties: effectProperties,
+        name: propertyName,
+      });
+      if (!foundProperty) {
+        warnings.push(
+          `Property "${propertyName}" not on effect "${effectName}". Skipped.`
+        );
+        return;
+      }
+
+      const lowercasedType = foundProperty.getType().toLowerCase();
+      if (lowercasedType === 'number') {
+        effect.setDoubleParameter(propertyName, parseFloat(newValue) || 0);
+      } else if (lowercasedType === 'boolean') {
+        effect.setBooleanParameter(
+          propertyName,
+          newValue.toLowerCase() === 'true'
+        );
+      } else {
+        effect.setStringParameter(propertyName, newValue);
+      }
+
+      // Newly created effects get one summary message below instead, so this isn't repeated.
+      if (!newlyCreatedEffect) {
+        changes.push(
+          `Modified "${propertyName}" property of the "${effectName}" effect to "${newValue}".`
+        );
+      }
+    });
+  }
+
+  if (newlyCreatedEffect) {
+    const effectMetadata = gd.MetadataProvider.getEffectMetadata(
+      project.getCurrentPlatform(),
+      newlyCreatedEffect.getEffectType()
+    );
+    if (gd.MetadataProvider.isBadEffectMetadata(effectMetadata)) {
+      // Should not happen.
+    } else {
+      changes.push(
+        `Created new "${newlyCreatedEffect.getName()}" effect on ${targetLabel} at position ${new_effect_position ||
+          0}. It properties are: ${serializeEffectProperties(
+          newlyCreatedEffect,
+          effectMetadata
+        )
+          .map(serializedProperty => JSON.stringify(serializedProperty))
+          .join(', ')}.`
+      );
+
+      if (
+        targetRenderingType === '2d' &&
+        effectMetadata.isMarkedAsOnlyWorkingFor3D()
+      ) {
+        warnings.push(
+          `"${newlyCreatedEffect.getName()}" only works in 3D, but ${targetLabel} is restricted to 2D — it may have no visible effect.`
+        );
+      } else if (
+        targetRenderingType === '3d' &&
+        effectMetadata.isMarkedAsOnlyWorkingFor2D()
+      ) {
+        warnings.push(
+          `"${newlyCreatedEffect.getName()}" only works in 2D, but ${targetLabel} is restricted to 3D — it may have no visible effect.`
+        );
+      }
+    }
+  }
+};
+
 const inspectScenePropertiesLayersEffects: EditorFunction = {
   renderForEditor: ({ args }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
@@ -5322,174 +5629,16 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
           return;
         }
         const layer = scene.getLayers().getLayer(layerName);
-        const effectsContainer = layer.getEffects();
 
-        const effectName = SafeExtractor.extractStringProperty(
-          changed_layer_effect,
-          'effect_name'
-        );
-        if (effectName === null) {
-          warnings.push(
-            `Missing "effect_name" in changed_layer_effects item. Skipped.`
-          );
-          return;
-        }
-        const effect_type = SafeExtractor.extractStringProperty(
-          changed_layer_effect,
-          'effect_type'
-        );
-        const new_effect_name = SafeExtractor.extractStringProperty(
-          changed_layer_effect,
-          'new_effect_name'
-        );
-        const new_effect_position = SafeExtractor.extractNumberProperty(
-          changed_layer_effect,
-          'new_effect_position'
-        );
-        const delete_this_effect = SafeExtractor.extractBooleanProperty(
-          changed_layer_effect,
-          'delete_this_effect'
-        );
-        let newlyCreatedEffect: gdEffect | null = null;
-
-        if (effectsContainer.hasEffectNamed(effectName)) {
-          const effect = effectsContainer.getEffect(effectName);
-          if (delete_this_effect) {
-            effectsContainer.removeEffect(effectName);
-            changes.push(
-              `Removed "${effectName}" effect on layer "${layerName}".`
-            );
-          } else {
-            if (new_effect_name) {
-              effect.setName(new_effect_name);
-              changes.push(
-                `Renamed the "${effectName}" effect on layer "${layerName}" to "${new_effect_name}".`
-              );
-            }
-            if (new_effect_position !== null) {
-              effectsContainer.moveEffect(
-                effectsContainer.getEffectPosition(effectName),
-                new_effect_position
-              );
-              changes.push(
-                `Moved the "${effectName}" effect on layer "${layerName}" to position ${new_effect_position}.`
-              );
-            }
-          }
-        } else {
-          if (effect_type) {
-            const newEffectName = new_effect_name || effectName;
-            const effectMetadata = gd.MetadataProvider.getEffectMetadata(
-              project.getCurrentPlatform(),
-              effect_type
-            );
-            if (gd.MetadataProvider.isBadEffectMetadata(effectMetadata)) {
-              warnings.push(
-                `Effect type "${effect_type}" is not a valid effect type. Effect "${newEffectName}" was NOT added.`
-              );
-            } else {
-              newlyCreatedEffect = effectsContainer.insertNewEffect(
-                newEffectName,
-                new_effect_position || 0
-              );
-              newlyCreatedEffect.setEffectType(effect_type);
-            }
-          }
-        }
-
-        const changed_properties = SafeExtractor.extractArrayProperty(
-          changed_layer_effect,
-          'changed_properties'
-        );
-        if (changed_properties) {
-          if (!effectsContainer.hasEffectNamed(effectName)) {
-            warnings.push(`Effect "${effectName}" not found. Skipped.`);
-            return;
-          }
-          const effect = effectsContainer.getEffect(effectName);
-          const effectMetadata = gd.MetadataProvider.getEffectMetadata(
-            project.getCurrentPlatform(),
-            effect.getEffectType()
-          );
-
-          if (gd.MetadataProvider.isBadEffectMetadata(effectMetadata)) {
-            warnings.push(`Effect "${effectName}" invalid. Skipped.`);
-            return;
-          }
-
-          const effectProperties = effectMetadata.getProperties();
-
-          changed_properties.forEach(changed_property => {
-            const propertyName = SafeExtractor.extractStringProperty(
-              changed_property,
-              'property_name'
-            );
-            const newValue = SafeExtractor.extractStringProperty(
-              changed_property,
-              'new_value'
-            );
-            if (propertyName === null || newValue === null) {
-              warnings.push(
-                `Missing "property_name" or "new_value" in changed_properties item. Skipped.`
-              );
-              return;
-            }
-
-            const { foundProperty } = findPropertyByName({
-              properties: effectProperties,
-              name: propertyName,
-            });
-            if (!foundProperty) {
-              warnings.push(
-                `Property "${propertyName}" not on effect "${effectName}". Skipped.`
-              );
-              return;
-            }
-
-            const lowercasedType = foundProperty.getType().toLowerCase();
-            if (lowercasedType === 'number') {
-              effect.setDoubleParameter(
-                propertyName,
-                parseFloat(newValue) || 0
-              );
-            } else if (lowercasedType === 'boolean') {
-              effect.setBooleanParameter(
-                propertyName,
-                newValue.toLowerCase() === 'true'
-              );
-            } else {
-              effect.setStringParameter(propertyName, newValue);
-            }
-
-            // Newly created effects get one summary message below instead, so this isn't repeated.
-            if (!newlyCreatedEffect) {
-              changes.push(
-                `Modified "${propertyName}" property of the "${effectName}" effect to "${newValue}".`
-              );
-            }
-          });
-        }
-
-        if (newlyCreatedEffect) {
-          const effectMetadata = gd.MetadataProvider.getEffectMetadata(
-            project.getCurrentPlatform(),
-            newlyCreatedEffect.getEffectType()
-          );
-          if (gd.MetadataProvider.isBadEffectMetadata(effectMetadata)) {
-            // Should not happen.
-          } else {
-            changes.push(
-              `Created new "${newlyCreatedEffect.getName()}" effect on layer "${layerName}" at position ${new_effect_position ||
-                0}. It properties are: ${serializeEffectProperties(
-                newlyCreatedEffect,
-                effectMetadata
-              )
-                // This stringify might not give the prettiest output, this could be improved.
-                .map(serializedProperty => JSON.stringify(serializedProperty))
-                .join(', ')}.`
-            );
-          }
-        }
+        applyEffectChange({
+          project,
+          effectsContainer: layer.getEffects(),
+          changedEffect: changed_layer_effect,
+          targetLabel: `layer "${layerName}"`,
+          changes,
+          warnings,
+          targetRenderingType: layer.getRenderingType(),
+        });
       });
     }
 
@@ -6478,8 +6627,12 @@ const searchObjectAssetStore: EditorFunction = {
 export const editorFunctions: { [string]: EditorFunction } = {
   create_object: createOrReplaceObject,
   create_or_replace_object: createOrReplaceObject,
-  inspect_object_properties: inspectObjectProperties,
-  change_object_property: changeObjectProperty,
+  // Old tool names, kept for AI requests still using an older toolsVersion:
+  // redirected to the same (backward-compatible) implementation as the new names.
+  inspect_object_properties: inspectObjectPropertiesEffects,
+  change_object_property: changeObjectPropertiesEffects,
+  inspect_object_properties_effects: inspectObjectPropertiesEffects,
+  change_object_properties_effects: changeObjectPropertiesEffects,
   add_behavior: addBehavior,
   remove_behavior: removeBehavior,
   inspect_behavior_properties: inspectBehaviorProperties,

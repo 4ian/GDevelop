@@ -1023,6 +1023,263 @@ describe('editorFunctions', () => {
     });
   });
 
+  describe('change_object_properties_effects (object effects)', () => {
+    let project: gdProject;
+    let testScene: gdLayout;
+
+    beforeEach(() => {
+      makeTestExtensions(gd);
+      // $FlowFixMe[invalid-constructor]
+      project = new gd.ProjectHelper.createNewGDJSProject();
+      testScene = project.insertNewLayout('TestScene', 0);
+      const testSceneObjects = testScene.getObjects();
+      testSceneObjects.insertNewObject(
+        project,
+        'Sprite',
+        'MySprite',
+        testSceneObjects.getObjectsCount()
+      );
+    });
+
+    afterEach(() => {
+      project.delete();
+    });
+
+    it('redirects the old "change_object_property" name to the same implementation', () => {
+      expect(editorFunctions.change_object_property).toBe(
+        editorFunctions.change_object_properties_effects
+      );
+    });
+
+    it('creates a new effect on the object (not on any layer) and reports it with a single message', async () => {
+      const result = await editorFunctions.change_object_properties_effects.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'MySprite',
+            changed_effects: [
+              {
+                effect_name: 'MySepia',
+                effect_type: 'FakeSepia',
+                changed_properties: [
+                  { property_name: 'opacity', new_value: '0.5' },
+                ],
+              },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).toContain('Created new "MySepia" effect');
+      expect(result.message).not.toContain('Modified "opacity"');
+
+      const object = testScene.getObjects().getObject('MySprite');
+      const effectsContainer = object.getEffects();
+      expect(effectsContainer.getEffectsCount()).toBe(1);
+      expect(
+        effectsContainer.getEffect('MySepia').getDoubleParameter('opacity')
+      ).toBe(0.5);
+
+      // The base layer must not have received the effect.
+      expect(
+        testScene
+          .getLayers()
+          .getLayer('')
+          .getEffects()
+          .getEffectsCount()
+      ).toBe(0);
+    });
+
+    it('updates and deletes existing object effects', async () => {
+      await editorFunctions.change_object_properties_effects.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          object_name: 'MySprite',
+          changed_effects: [
+            { effect_name: 'ToRemove', effect_type: 'FakeSepia' },
+            { effect_name: 'ToKeep', effect_type: 'FakeNight' },
+          ],
+        },
+      });
+
+      const result = await editorFunctions.change_object_properties_effects.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'MySprite',
+            changed_effects: [
+              { effect_name: 'ToRemove', delete_this_effect: true },
+              {
+                effect_name: 'ToKeep',
+                changed_properties: [
+                  { property_name: 'intensity', new_value: '0.3' },
+                ],
+              },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).toContain(
+        'Removed "ToRemove" effect on object "MySprite".'
+      );
+      expect(result.message).toContain(
+        'Modified "intensity" property of the "ToKeep" effect to "0.3".'
+      );
+
+      const effectsContainer = testScene
+        .getObjects()
+        .getObject('MySprite')
+        .getEffects();
+      expect(effectsContainer.hasEffectNamed('ToRemove')).toBe(false);
+      expect(effectsContainer.hasEffectNamed('ToKeep')).toBe(true);
+    });
+
+    it('changes properties and effects together in a single call', async () => {
+      const result = await editorFunctions.change_object_properties_effects.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'MySprite',
+            changed_properties: [
+              { property_name: 'name', new_value: 'MySprite' },
+            ],
+            changed_effects: [
+              { effect_name: 'MyNight', effect_type: 'FakeNight' },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).toContain('already named "MySprite"');
+      expect(result.message).toContain('Created new "MyNight" effect');
+
+      const effectsContainer = testScene
+        .getObjects()
+        .getObject('MySprite')
+        .getEffects();
+      expect(effectsContainer.hasEffectNamed('MyNight')).toBe(true);
+    });
+
+    it('warns and does not add an effect on an object type with no effect capability', async () => {
+      const testSceneObjects = testScene.getObjects();
+      testSceneObjects.insertNewObject(
+        project,
+        'FakeScene3D::Cube3DObject',
+        'MyCube',
+        testSceneObjects.getObjectsCount()
+      );
+
+      const result = await editorFunctions.change_object_properties_effects.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'MyCube',
+            changed_effects: [
+              { effect_name: 'MySepia', effect_type: 'FakeSepia' },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(false);
+      expect(result.message).toContain(
+        'Object "MyCube" does not support effects'
+      );
+      expect(
+        testScene
+          .getObjects()
+          .getObject('MyCube')
+          .getEffects()
+          .getEffectsCount()
+      ).toBe(0);
+    });
+  });
+
+  describe('inspect_object_properties_effects (object effects)', () => {
+    let project: gdProject;
+    let testScene: gdLayout;
+
+    beforeEach(() => {
+      makeTestExtensions(gd);
+      // $FlowFixMe[invalid-constructor]
+      project = new gd.ProjectHelper.createNewGDJSProject();
+      testScene = project.insertNewLayout('TestScene', 0);
+      const testSceneObjects = testScene.getObjects();
+      const object = testSceneObjects.insertNewObject(
+        project,
+        'Sprite',
+        'MySprite',
+        testSceneObjects.getObjectsCount()
+      );
+      const effect = object.getEffects().insertNewEffect('MySepia', 0);
+      effect.setEffectType('FakeSepia');
+      effect.setDoubleParameter('opacity', 0.7);
+    });
+
+    afterEach(() => {
+      project.delete();
+    });
+
+    it('redirects the old "inspect_object_properties" name to the same implementation', () => {
+      expect(editorFunctions.inspect_object_properties).toBe(
+        editorFunctions.inspect_object_properties_effects
+      );
+    });
+
+    it('returns the object properties as well as its own effects', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.inspect_object_properties_effects.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'MySprite',
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.properties).toBeTruthy();
+      expect(result.effects).toEqual([
+        expect.objectContaining({
+          effectName: 'MySepia',
+          effectType: 'FakeSepia',
+        }),
+      ]);
+    });
+
+    it('does not include an effects field for an object type with no effect capability', async () => {
+      const testSceneObjects = testScene.getObjects();
+      testSceneObjects.insertNewObject(
+        project,
+        'FakeScene3D::Cube3DObject',
+        'MyCube',
+        testSceneObjects.getObjectsCount()
+      );
+
+      const result: EditorFunctionGenericOutput = await editorFunctions.inspect_object_properties_effects.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'MyCube',
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.effects).toBeUndefined();
+    });
+  });
+
   describe('change_behavior_property', () => {
     let project: gdProject;
     let testScene: gdLayout;
@@ -2947,6 +3204,93 @@ describe('editorFunctions', () => {
         .getEffects();
       expect(effectsContainer.hasEffectNamed('ToRemove')).toBe(false);
       expect(effectsContainer.hasEffectNamed('ToKeep')).toBe(true);
+    });
+
+    it('warns (but still adds it) when adding a 3D-only effect to a 2D-restricted layer', async () => {
+      testScene
+        .getLayers()
+        .getLayer('')
+        .setRenderingType('2d');
+
+      const result = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            changed_layer_effects: [
+              {
+                layer_name: '',
+                effect_name: 'MyLight',
+                effect_type: 'FakeDirectionalLight',
+              },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).toContain('Created new "MyLight" effect');
+      expect(result.warnings).toContain(
+        '"MyLight" only works in 3D, but layer "" is restricted to 2D'
+      );
+      expect(
+        testScene
+          .getLayers()
+          .getLayer('')
+          .getEffects()
+          .hasEffectNamed('MyLight')
+      ).toBe(true);
+    });
+
+    it('warns (but still adds it) when adding a 2D-only effect to a 3D-restricted layer', async () => {
+      testScene
+        .getLayers()
+        .getLayer('')
+        .setRenderingType('3d');
+
+      const result = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            changed_layer_effects: [
+              {
+                layer_name: '',
+                effect_name: 'MySepia',
+                effect_type: 'FakeSepia',
+              },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).toContain('Created new "MySepia" effect');
+      expect(result.warnings).toContain(
+        '"MySepia" only works in 2D, but layer "" is restricted to 3D'
+      );
+    });
+
+    it('does not warn when the layer allows both 2D and 3D (default)', async () => {
+      const result = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            changed_layer_effects: [
+              {
+                layer_name: '',
+                effect_name: 'MyLight',
+                effect_type: 'FakeDirectionalLight',
+              },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).toContain('Done.');
+      expect(result.warnings).toBeUndefined();
     });
   });
 

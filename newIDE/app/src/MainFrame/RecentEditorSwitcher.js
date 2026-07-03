@@ -483,13 +483,15 @@ const RecentEditorSwitcher = ({
 
   const filteredSideMenuItems = React.useMemo(
     () =>
-      sideMenuItems.filter(item =>
-        doesTextMatchFilter(
-          normalizedFilterText,
-          item.title,
-          item.subtitle,
-          item.id
-        )
+      sideMenuItems.filter(
+        item =>
+          item.id !== 'start page' &&
+          doesTextMatchFilter(
+            normalizedFilterText,
+            item.title,
+            item.subtitle,
+            item.id
+          )
       ),
     [normalizedFilterText, sideMenuItems]
   );

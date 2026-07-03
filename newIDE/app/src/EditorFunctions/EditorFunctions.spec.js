@@ -1204,6 +1204,86 @@ describe('editorFunctions', () => {
     });
   });
 
+  describe('change_object_properties_effects (delete_this_object)', () => {
+    let project: gdProject;
+    let testScene: gdLayout;
+
+    beforeEach(() => {
+      // $FlowFixMe[invalid-constructor]
+      project = new gd.ProjectHelper.createNewGDJSProject();
+      testScene = project.insertNewLayout('TestScene', 0);
+    });
+
+    afterEach(() => {
+      project.delete();
+    });
+
+    it('deletes a scene object and its instances when delete_this_object is true', async () => {
+      const sceneObjects = testScene.getObjects();
+      sceneObjects.insertNewObject(project, 'Sprite', 'MySprite', 0);
+      const instance = testScene
+        .getInitialInstances()
+        .insertNewInitialInstance();
+      instance.setObjectName('MySprite');
+
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_object_properties_effects.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'MySprite',
+            delete_this_object: true,
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).toContain('Deleted object "MySprite"');
+      expect(sceneObjects.hasObjectNamed('MySprite')).toBe(false);
+      expect(
+        testScene.getInitialInstances().hasInstancesOfObject('MySprite')
+      ).toBe(false);
+    });
+
+    it('deletes a global object and removes it from groups', async () => {
+      const globalObjects = project.getObjects();
+      globalObjects.insertNewObject(project, 'Sprite', 'GlobalSprite', 0);
+      const group = globalObjects.getObjectGroups().insertNew('AllSprites', 0);
+      group.addObject('GlobalSprite');
+
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_object_properties_effects.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'GlobalSprite',
+            delete_this_object: true,
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(globalObjects.hasObjectNamed('GlobalSprite')).toBe(false);
+      expect(group.find('GlobalSprite')).toBe(false);
+    });
+
+    it('fails when the object is not found', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_object_properties_effects.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'Ghost',
+            delete_this_object: true,
+          },
+        }
+      );
+
+      expect(result.success).toBe(false);
+      expect(result.message).toContain('Object not found');
+    });
+  });
+
   describe('inspect_object_properties_effects (object effects)', () => {
     let project: gdProject;
     let testScene: gdLayout;
@@ -3849,6 +3929,69 @@ describe('editorFunctions', () => {
     });
   });
 
+  describe('change_behavior_property (delete_this_behavior)', () => {
+    let project: gdProject;
+    let testScene: gdLayout;
+
+    beforeEach(() => {
+      // $FlowFixMe[invalid-constructor]
+      project = new gd.ProjectHelper.createNewGDJSProject();
+      testScene = project.insertNewLayout('TestScene', 0);
+      const object = testScene
+        .getObjects()
+        .insertNewObject(project, 'Sprite', 'MySprite', 0);
+      object.addNewBehavior(
+        project,
+        'PlatformBehavior::PlatformerObjectBehavior',
+        'PlatformerObject'
+      );
+    });
+
+    afterEach(() => {
+      project.delete();
+    });
+
+    it('deletes a behavior from an object when delete_this_behavior is true', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_behavior_property.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'MySprite',
+            behavior_name: 'PlatformerObject',
+            delete_this_behavior: true,
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).toContain('Removed behavior');
+      expect(
+        testScene
+          .getObjects()
+          .getObject('MySprite')
+          .hasBehaviorNamed('PlatformerObject')
+      ).toBe(false);
+    });
+
+    it('fails when the behavior is not on the object', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_behavior_property.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'MySprite',
+            behavior_name: 'NotThere',
+            delete_this_behavior: true,
+          },
+        }
+      );
+
+      expect(result.success).toBe(false);
+      expect(result.message).toContain('Not removed');
+    });
+  });
+
   describe('inspect_behavior_properties (single object)', () => {
     let project: gdProject;
     let testScene: gdLayout;
@@ -3902,6 +4045,52 @@ describe('editorFunctions', () => {
 
       expect(result.success).toBe(false);
       expect(result.message).toContain('not on');
+    });
+  });
+
+  describe('change_scene_properties_layers_effects_groups (delete_this_scene)', () => {
+    let project: gdProject;
+
+    beforeEach(() => {
+      // $FlowFixMe[invalid-constructor]
+      project = new gd.ProjectHelper.createNewGDJSProject();
+      project.insertNewLayout('TestScene', 0);
+    });
+
+    afterEach(() => {
+      project.delete();
+    });
+
+    it('deletes a scene when delete_this_scene is true', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            delete_this_scene: true,
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).toContain('Deleted scene "TestScene"');
+      expect(project.hasLayoutNamed('TestScene')).toBe(false);
+    });
+
+    it('clears the first layout if the deleted scene was the first layout', async () => {
+      project.setFirstLayout('TestScene');
+
+      await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            delete_this_scene: true,
+          },
+        }
+      );
+
+      expect(project.getFirstLayout()).toBe('');
     });
   });
 

@@ -374,8 +374,8 @@ Example payload:
 "cardId=7"
 ```
 
-The payload is read through expressions, resolved against the current-signal
-context during any handler or matching scene condition:
+In scene and external scene event sheets, the payload is read through
+expressions while the sub-events of a matching "Signal received" condition run:
 
 ```text
 SignalName()             -> "Health.Damaged"
@@ -384,9 +384,10 @@ SignalSenderObjectName() -> "Zombie"
 SignalSenderInstanceId() -> 17
 ```
 
-Inside `onSignal`, the same payload is also available as the visible string
-`Payload` function parameter. When no payload was emitted, `Payload` is `""` and
-the `SignalPayload()` expression returns a neutral empty value.
+Inside `onSignal`, the same payload is available as the visible string `Payload`
+function parameter. `onSignal` handlers use their fixed signal parameters
+directly; the `Signal...()` expressions are not exposed in prefab/object or
+behavior event sheets. When no payload was emitted, `Payload` is `""`.
 
 ### Copy semantics
 
@@ -518,7 +519,7 @@ onDestroy            Runs when the instance is removed.
 `onSignal` is event-driven, not per-frame. It is invoked only during signal
 dispatch, once per delivered signal that targets the receiver.
 
-### 8.1 Fixed signal parameters plus context expressions
+### 8.1 Fixed signal parameters
 
 `onSignal` has a fixed lifecycle signature. The owner `Object` parameter for
 custom objects remains an internal lifecycle parameter. The editor shows the
@@ -531,12 +532,9 @@ EmitterObjectName   string      The sender object name, or "" when none is set.
 EmitterInstanceId   expression  The sender unique id, or -1 when none is set.
 ```
 
-The runtime also sets the current-signal context while the handler runs, so the
-existing `SignalName()`, `SignalPayload()` and sender expressions remain valid.
-The direct parameters are the primary
-lifecycle API; the expressions are useful when the same events are shared with a
-scene "Signal received" condition or when an instruction expects an expression
-instead of a function parameter.
+The direct parameters are the lifecycle API for prefab/object signal receivers.
+The scene-only `SignalName()`, `SignalPayload()` and sender expressions are not
+available in object or behavior function event sheets.
 
 ### 8.2 Custom object handler
 
@@ -551,13 +549,10 @@ Visible signal parameters:
   Payload
   EmitterObjectName
   EmitterInstanceId
-
-Also readable via expressions while the handler runs:
-  SignalName()              -> string
-  SignalPayload()           -> string
-  SignalSenderObjectName()  -> string
-  SignalSenderInstanceId()  -> number
 ```
+
+Signal context expressions are not part of the `onSignal` editor surface. Use
+the fixed parameters above.
 
 ---
 
@@ -579,15 +574,17 @@ Emit signal to object group
 
 Each action takes an optional string "Payload" parameter. Each action also takes
 a required "Emitter object" parameter. The first object in the picked emitter
-list becomes the sender exposed by `EmitterObjectName`,
-`EmitterInstanceId`, `SignalSenderObjectName()` and `SignalSenderInstanceId()`.
+list becomes the sender exposed by the `onSignal` parameters
+`EmitterObjectName` / `EmitterInstanceId` and, in scene/external scene receivers,
+by `SignalSenderObjectName()` / `SignalSenderInstanceId()`.
 Vague names (`Trigger event`, `Call event`, `Send message`) are avoided.
 
 The object-instance action's instance id can come from an object's `InstanceId()`
-expression or from `SignalSenderInstanceId()` when replying to a sender.
-Runtime instance ids start at 1. Empty signal names and invalid instance ids
-such as 0 are ignored at runtime instead of being queued, because they usually
-come from incomplete editor actions.
+expression. When replying from scene/external scene events, it can also come
+from `SignalSenderInstanceId()`. When replying inside `onSignal`, use the fixed
+`EmitterInstanceId` parameter. Runtime instance ids start at 1. Empty signal
+names and invalid instance ids such as 0 are ignored at runtime instead of being
+queued, because they usually come from incomplete editor actions.
 
 ### 9.2 Condition
 
@@ -601,6 +598,9 @@ Parameters:
 Signal name
 ```
 
+This condition is available only in scene and external scene event sheets. It is
+not available in prefab/object or behavior function event sheets.
+
 ### 9.3 Expressions
 
 ```text
@@ -610,8 +610,9 @@ SignalSenderObjectName()
 SignalSenderInstanceId()
 ```
 
-These resolve during an `onSignal` handler or the sub-events of a matching
-"Signal received" condition, and return neutral empty values outside a dispatch.
+These expressions are available only in scene and external scene event sheets.
+They resolve during the sub-events of a matching "Signal received" condition and
+return neutral empty values outside a signal context.
 
 ### 9.4 Custom object editor
 
@@ -629,7 +630,7 @@ Lifecycle
 ### 9.5 Signal name input
 
 Signal names are entered through a single dedicated `signalName` parameter type,
-shared by every emit action, the "Signal received" condition, and the
+shared by every emit action, the "Signal received" condition, and the scene-only
 `SignalName()` expression. Routing all names through one type gives consistent
 autocomplete across the project and a single point that a discovery UI attaches
 to.
@@ -837,14 +838,56 @@ After the sheet consumes the context, it is cleared:
 runtimeScene._currentSignal = null;
 ```
 
-### 11.4 Codegen for object onSignal
+### 11.4 JavaScript code events
+
+In a scene or external scene JavaScript code event, `SignalPayload()` is not
+valid JavaScript syntax. Use the runtime helper while running under a matching
+"Signal received" condition:
+
+```text
+Signal received "Health.Damaged"
+  JavaScript code
+```
+
+```js
+const signalName = gdjs.evtTools.signal.getSignalName(runtimeScene);
+const payload = gdjs.evtTools.signal.getSignalPayload(runtimeScene);
+const emitterObjectName =
+  gdjs.evtTools.signal.getSignalSenderObjectName(runtimeScene);
+const emitterInstanceId =
+  gdjs.evtTools.signal.getSignalSenderInstanceId(runtimeScene);
+```
+
+If the payload is encoded JSON text, parse it explicitly:
+
+```js
+const payload = gdjs.evtTools.signal.getSignalPayload(runtimeScene);
+const data = payload ? JSON.parse(payload) : {};
+```
+
+The helpers return neutral empty values outside the scene/external-scene signal
+context. A JavaScript code event must therefore be inside the sub-events of a
+matching "Signal received" condition when it needs the current signal payload.
+
+Inside an object `onSignal` JavaScript code event, read the fixed lifecycle
+parameters instead of using the scene-only signal helpers:
+
+```js
+const signalName = eventsFunctionContext.getArgument("SignalName");
+const payload = eventsFunctionContext.getArgument("Payload");
+const emitterObjectName =
+  eventsFunctionContext.getArgument("EmitterObjectName");
+const emitterInstanceId =
+  eventsFunctionContext.getArgument("EmitterInstanceId");
+```
+
+### 11.5 Codegen for object onSignal
 
 `onSignal` is generated as a runtime prototype method with the four signal data
 arguments. The events-function metadata still carries hidden owner parameters
 for editor/codegen context (section 8), but the runtime method does not receive
 it because the owner object is already available from `this`.
-Signal name, payload and sender can be read either from the direct parameters or
-through the current-signal expressions:
+Signal name, payload and sender are read from the direct parameters:
 
 ```ts
 MyCustomObject.prototype.onSignal = function (
@@ -1044,11 +1087,13 @@ delivering to objects that are about to be torn down is pointless and unsafe.
 
 ### 14.10 Async events and the signal context — read eagerly
 
-`_currentSignal` is valid only for the synchronous duration of a handler's
-delivery pass. An async event started inside `onSignal` must read the signal
-expressions before its first `await` and capture the values it needs. Reading the
-current-signal expressions after an `await`, when the context is already cleared,
-returns the neutral empty result — never a stale one.
+`_currentSignal` is valid only for the synchronous duration of a scene condition
+delivery pass. An async event started under a scene "Signal received" condition
+must read `SignalName()`, `SignalPayload()` and sender expressions before its
+first `await` and capture the values it needs. Reading the current-signal
+expressions after an `await`, when the context is already cleared, returns the
+neutral empty result — never a stale one. Inside `onSignal`, capture the fixed
+signal parameters instead.
 
 ---
 

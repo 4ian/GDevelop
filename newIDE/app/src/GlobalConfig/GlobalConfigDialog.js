@@ -225,8 +225,9 @@ const styles: { [string]: Object } = {
   },
   addRowButton: {
     position: 'absolute',
-    top: 0,
+    top: '50%',
     right: -4,
+    transform: 'translateY(-50%)',
   },
   columnHeader: {
     position: 'sticky',

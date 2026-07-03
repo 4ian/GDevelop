@@ -2045,20 +2045,26 @@ const buildSignalEmitAction = ({
     'payload_string',
     'payloadString',
   ]);
-  const emitterObject = getStringArg(args, [
-    'emitter_object',
-    'emitter_object_name',
-    'emitter',
-    'sender_object',
-    'sender_object_name',
-  ]);
+  const emitterObject = String(
+    getRequiredSignalArg(
+      args,
+      [
+        'emitter_object',
+        'emitter_object_name',
+        'emitter',
+        'sender_object',
+        'sender_object_name',
+      ],
+      'emitter_object'
+    )
+  ).trim();
   let type = 'EmitSceneSignal';
   const parameters: Object = {};
-  const setPayloadAndEmitter = (payloadIndex, emitterIndex) => {
+  const setPayloadAndEmitter = (payloadIndex: number, emitterIndex: number) => {
     if (payload !== null && payload !== undefined) {
       parameters[String(payloadIndex)] = payload;
     }
-    if (emitterObject) parameters[String(emitterIndex)] = emitterObject;
+    parameters[String(emitterIndex)] = emitterObject;
   };
 
   if (targetKind === 'scene') {
@@ -2122,7 +2128,7 @@ const buildSignalEmitAction = ({
     actionType: type,
     targetKind,
     signalNote:
-      'Drop instruction into an event actions array. Signal payload is a string expression; use ToString(...) for numeric values if needed.',
+      'Drop instruction into an event actions array. Signal payload is a string expression; use ToString(...) for numeric values if needed. emitter_object is required so receivers can identify the sender.',
   };
 };
 
@@ -2150,7 +2156,7 @@ const buildSignalReceivedCondition = ({
     ...built,
     conditionType: 'SignalReceived',
     signalNote:
-      'Drop instruction into an event conditions array. Use SignalPayload(), SignalSenderObjectName(), or SignalSenderInstanceId() in this event/sub-events to read signal data.',
+      'Drop instruction into a scene or external scene event conditions array only. Use SignalPayload(), SignalSenderObjectName(), or SignalSenderInstanceId() in this event/sub-events to read signal data.',
   };
 };
 

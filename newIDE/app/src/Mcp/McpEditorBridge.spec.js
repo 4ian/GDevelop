@@ -5460,6 +5460,7 @@ describe('McpEditorBridge', () => {
             instance_id: 'SignalSenderInstanceId()',
             signal_name: 'Attack.Reply',
             payload: 'Blocked',
+            emitter_object: 'Player',
           },
         },
       });
@@ -5471,8 +5472,23 @@ describe('McpEditorBridge', () => {
         'SignalSenderInstanceId()',
         '"Attack.Reply"',
         '"Blocked"',
-        '',
+        'Player',
       ]);
+
+      const missingEmitterResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'create_signal_emit_action',
+          arguments: {
+            target_kind: 'scene',
+            signal_name: 'MissingEmitter',
+          },
+        },
+      });
+      expect(missingEmitterResponse.isError).toBe(true);
+      expect(missingEmitterResponse.content[0].text).toContain(
+        'Missing emitter_object.'
+      );
 
       const receiveResponse = await bridge.handleRendererMcpRequest({
         method: 'tools/call',

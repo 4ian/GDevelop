@@ -61,6 +61,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
                     "res/conditions/depart.png")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("signalName", _("Signal name"))
+      .SetRelevantForLayoutEventsOnly()
       .MarkAsSimple();
 
   extension
@@ -152,7 +153,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
                         _("Name of the signal currently being handled."),
                         _("Signals"),
                         "res/actions/texte.png")
-      .AddCodeOnlyParameter("currentScene", "");
+      .AddCodeOnlyParameter("currentScene", "")
+      .SetRelevantForLayoutEventsOnly();
 
   extension
       .AddStrExpression("SignalPayload",
@@ -160,7 +162,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
                         _("Read text from the current signal payload."),
                         _("Signals"),
                         "res/actions/texte.png")
-      .AddCodeOnlyParameter("currentScene", "");
+      .AddCodeOnlyParameter("currentScene", "")
+      .SetRelevantForLayoutEventsOnly();
 
   extension
       .AddStrExpression("SignalSenderObjectName",
@@ -168,7 +171,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
                         _("Object name of the signal sender, if any."),
                         _("Signals"),
                         "res/actions/texte.png")
-      .AddCodeOnlyParameter("currentScene", "");
+      .AddCodeOnlyParameter("currentScene", "")
+      .SetRelevantForLayoutEventsOnly();
 
   extension
       .AddExpression("SignalSenderInstanceId",
@@ -176,7 +180,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
                      _("Instance id of the signal sender, if any."),
                      _("Signals"),
                      "res/actions/texte.png")
-      .AddCodeOnlyParameter("currentScene", "");
+      .AddCodeOnlyParameter("currentScene", "")
+      .SetRelevantForLayoutEventsOnly();
 
   // Compatibility with GD <= 5.6.251
   extension.AddDuplicatedCondition("DepartScene", "SceneJustBegins").SetHidden();

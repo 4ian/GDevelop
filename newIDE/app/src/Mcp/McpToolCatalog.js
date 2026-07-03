@@ -3458,7 +3458,7 @@ const signalEmitActionSchema = {
     emitter_object: {
       type: 'string',
       description:
-        'Optional picked object name to expose as EmitterObjectName / SignalSenderObjectName.',
+        'Required picked object name to expose as EmitterObjectName / SignalSenderObjectName.',
     },
     object_name: {
       type: 'string',
@@ -3479,7 +3479,7 @@ const signalEmitActionSchema = {
       description: 'Object group name for object_group targets.',
     },
   },
-  required: ['target_kind', 'signal_name'],
+  required: ['target_kind', 'signal_name', 'emitter_object'],
   additionalProperties: true,
 };
 
@@ -3490,6 +3490,11 @@ const signalReceivedConditionSchema = {
       type: 'string',
       description:
         'Signal name string expression. Bare names such as Attack are quoted automatically.',
+    },
+    target_scope: {
+      type: 'string',
+      description:
+        'Optional documentation-only scope hint. Signal received is valid only in scene and external scene event sheets.',
     },
   },
   required: ['signal_name'],
@@ -3654,7 +3659,7 @@ const readTools: Array<McpTool> = [
   {
     name: 'gdevelop_inspect_signal_usage',
     description:
-      'Inspect signal emit actions, scene Signal received conditions, and object onSignal handlers across the project, optionally filtered by signal name or extension scope.',
+      'Inspect signal emit actions, scene/external-scene Signal received conditions, and object onSignal handlers across the project, optionally filtered by signal name or extension scope.',
     inputSchema: inspectSignalUsageSchema,
   },
   {
@@ -3877,13 +3882,13 @@ const readTools: Array<McpTool> = [
   {
     name: 'create_signal_emit_action',
     description:
-      'Build a correctly-formed signal emit ACTION instruction JSON for scene, object, object_instance, picked_objects, or object_group targets. Handles hidden currentScene, signalName quoting, string payload, and optional emitter object parameter ordering.',
+      'Build a correctly-formed signal emit ACTION instruction JSON for scene, object, object_instance, picked_objects, or object_group targets. Handles hidden currentScene, signalName quoting, string payload, and required emitter object parameter ordering.',
     inputSchema: signalEmitActionSchema,
   },
   {
     name: 'create_signal_received_condition',
     description:
-      'Build a correctly-formed Signal received CONDITION instruction JSON. Handles hidden currentScene and signalName quoting.',
+      'Build a correctly-formed Signal received CONDITION instruction JSON for scene or external scene event sheets only. Handles hidden currentScene and signalName quoting.',
     inputSchema: signalReceivedConditionSchema,
   },
   {
@@ -4772,6 +4777,7 @@ const toolUsageExamples: { [string]: Array<Object> } = {
         instance_id: 'SignalSenderInstanceId()',
         signal_name: 'Attack.Reply',
         payload: 'Blocked',
+        emitter_object: 'Player',
       },
     },
   ],

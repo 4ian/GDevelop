@@ -1,6 +1,9 @@
 // @flow
 import * as React from 'react';
+import { I18n } from '@lingui/react';
+import { type I18n as I18nType } from '@lingui/core';
 import { t, Trans } from '@lingui/macro';
+import Tooltip from '@material-ui/core/Tooltip';
 
 import { List, ListItem } from '../UI/List';
 import ObjectSelector, {
@@ -14,9 +17,21 @@ import Paper from '../UI/Paper';
 import { ColumnStackLayout } from '../UI/Layout';
 import AlertMessage from '../UI/AlertMessage';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
+import WarningIcon from '../UI/CustomSvgIcons/Warning';
+import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
+import { enumerateCommonFunctionsForObjectOrGroup } from './ObjectGroupCommonFunctions';
 
 const styles = {
   objectSelector: { position: 'sticky', bottom: 0 },
+  objectNameWithWarning: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: 6,
+  },
+  warningIcon: {
+    display: 'inline-flex',
+    alignItems: 'center',
+  },
 };
 
 type Props = {|
@@ -33,6 +48,12 @@ type Props = {|
   isGlobalGroup?: boolean,
   objectNameFilter?: string => boolean,
   requiredBehaviorTypes?: Array<string>,
+  groupName?: string,
+|};
+
+type InnerProps = {|
+  ...Props,
+  i18n: I18nType,
 |};
 
 const ObjectGroupEditor = ({
@@ -47,8 +68,11 @@ const ObjectGroupEditor = ({
   isGlobalGroup,
   objectNameFilter,
   requiredBehaviorTypes,
-}: Props): React.Node => {
+  groupName,
+  i18n,
+}: InnerProps): React.Node => {
   const [objectName, setObjectName] = React.useState<string>('');
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const isGlobalObject = React.useCallback(
     (objectName: string) =>
       !!globalObjectsContainer &&
@@ -89,6 +113,83 @@ const ObjectGroupEditor = ({
     ]
   );
 
+  const objectNamesWithoutCommonFunctions: Set<string> = React.useMemo(
+    () => {
+      if (!project || !groupName || !groupObjectNames.length)
+        return new Set<string>();
+
+      const commonFunctionKeys = new Set<string>(
+        enumerateCommonFunctionsForObjectOrGroup({
+          project,
+          projectScopedContainersAccessor,
+          globalObjectsContainer,
+          objectsContainer,
+          objectOrGroupName: groupName,
+          i18n,
+        }).map(commonFunction => commonFunction.key)
+      );
+
+      if (commonFunctionKeys.size === 0) {
+        return new Set<string>(groupObjectNames);
+      }
+
+      return new Set<string>(
+        groupObjectNames.filter(objectName => {
+          const objectFunctionKeys = new Set<string>(
+            enumerateCommonFunctionsForObjectOrGroup({
+              project,
+              projectScopedContainersAccessor,
+              globalObjectsContainer,
+              objectsContainer,
+              objectOrGroupName: objectName,
+              i18n,
+            }).map(commonFunction => commonFunction.key)
+          );
+
+          for (const commonFunctionKey of commonFunctionKeys) {
+            if (objectFunctionKeys.has(commonFunctionKey)) return false;
+          }
+
+          return true;
+        })
+      );
+    },
+    [
+      groupName,
+      groupObjectNames,
+      project,
+      projectScopedContainersAccessor,
+      globalObjectsContainer,
+      objectsContainer,
+      i18n,
+    ]
+  );
+
+  const renderObjectName = (objectName: string) => {
+    if (!objectNamesWithoutCommonFunctions.has(objectName)) return objectName;
+
+    return (
+      <span style={styles.objectNameWithWarning}>
+        <span>{objectName}</span>
+        <Tooltip
+          title={
+            <Trans>
+              This object has no functions listed in Common functions for this
+              group.
+            </Trans>
+          }
+        >
+          <span style={styles.warningIcon}>
+            <WarningIcon
+              fontSize="small"
+              style={{ color: gdevelopTheme.listItem.warningTextColor }}
+            />
+          </span>
+        </Tooltip>
+      </span>
+    );
+  };
+
   const renderExplanation = () => {
     let type = undefined;
     if (groupObjectNames.length === 0) {
@@ -111,23 +212,16 @@ const ObjectGroupEditor = ({
         <>
           <Trans>
             This group contains objects of different kinds. You'll only be able
-            to use actions and conditions common to all objects with this group.
-          </Trans>{' '}
-          <Trans>
-            Variables declared in all objects of the group will be visible in
-            event expressions.
+            to use actions, conditions and expressions common to all objects
+            with this group.
           </Trans>
         </>
       ) : (
         <>
           <Trans>
             This group contains objects of the same kind ({type}). You can use
-            actions and conditions related to this kind of objects in events
-            with this group.
-          </Trans>{' '}
-          <Trans>
-            Variables declared in all objects of the group will be visible in
-            event expressions.
+            actions, conditions and expressions related to this kind of objects
+            in events with this group.
           </Trans>
         </>
       );
@@ -158,13 +252,13 @@ const ObjectGroupEditor = ({
           return isObjectListLocked ? (
             <ListItem
               key={objectName}
-              primaryText={objectName}
+              primaryText={renderObjectName(objectName)}
               leftIcon={icon}
             />
           ) : (
             <ListItem
               key={objectName}
-              primaryText={objectName}
+              primaryText={renderObjectName(objectName)}
               displayRemoveButton
               onRemove={() => onObjectRemoved(objectName)}
               leftIcon={icon}
@@ -203,4 +297,8 @@ const ObjectGroupEditor = ({
   );
 };
 
-export default ObjectGroupEditor;
+const ObjectGroupEditorWithI18n = (props: Props): React.Node => (
+  <I18n>{({ i18n }) => <ObjectGroupEditor {...props} i18n={i18n} />}</I18n>
+);
+
+export default ObjectGroupEditorWithI18n;

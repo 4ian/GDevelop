@@ -4,26 +4,22 @@ import React from 'react';
 import FlatButton from '../UI/FlatButton';
 import ObjectGroupEditor from '.';
 import ObjectGroupRequiredBehaviorsEditor from './ObjectGroupRequiredBehaviorsEditor';
+import ObjectGroupCommonFunctions from './ObjectGroupCommonFunctions';
 import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import { useSerializableObjectCancelableEditor } from '../Utils/SerializableObjectCancelableEditor';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import { Tabs } from '../UI/Tabs';
-import { Column, Line } from '../UI/Grid';
+import { Column } from '../UI/Grid';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
-import useDismissableTutorialMessage from '../Hints/useDismissableTutorialMessage';
-import VariablesList from '../VariablesList/VariablesList';
 import HelpButton from '../UI/HelpButton';
-import useValueWithInit from '../Utils/UseRefInitHook';
 import Text from '../UI/Text';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
 import { ColumnStackLayout } from '../UI/Layout';
 import { type GroupWithContext } from '../ObjectsList/EnumerateObjects';
 
-const gd: libGDevelop = global.gd;
-
 export type ObjectGroupEditorTab =
   | 'objects'
-  | 'variables'
+  | 'commonFunctions'
   | 'requiredBehaviors';
 
 type Props = {|
@@ -34,10 +30,7 @@ type Props = {|
   onCancel: () => void,
   globalObjectsContainer: gdObjectsContainer | null,
   objectsContainer: gdObjectsContainer,
-  initialInstances: gdInitialInstancesContainer | null,
   initialTab: ?ObjectGroupEditorTab,
-  onComputeAllVariableNames?: () => Array<string>,
-  isVariableListLocked: boolean,
   isObjectListLocked: boolean,
   isGroupGlobal: boolean,
   objectNameFilter?: string => boolean,
@@ -57,10 +50,7 @@ const EditedObjectGroupEditorDialog = ({
   onCancel,
   globalObjectsContainer,
   objectsContainer,
-  initialInstances,
   initialTab,
-  onComputeAllVariableNames,
-  isVariableListLocked,
   isObjectListLocked,
   isGroupGlobal,
   objectNameFilter,
@@ -83,25 +73,6 @@ const EditedObjectGroupEditorDialog = ({
     group.getName()
   );
   const requiredBehaviorTypes = group.getAllRequiredBehaviorTypes().toJSArray();
-
-  const groupVariablesContainer = useValueWithInit(
-    // The VariablesContainer is returned by value.
-    // Thus, the same instance is reused every time.
-    () =>
-      gd.ObjectVariableHelper.mergeVariableContainers(
-        projectScopedContainersAccessor.get().getObjectsContainersList(),
-        group
-      )
-  );
-
-  const {
-    notifyOfChange: notifyOfVariableChange,
-    getOriginalContentSerializedElement: getOriginalVariablesSerializedElement,
-  } = useSerializableObjectCancelableEditor({
-    serializableObject: groupVariablesContainer,
-    onCancel: () => {},
-    resetThenClearPersistentUuid: true,
-  });
 
   const applyNameChange = React.useCallback(
     (): Promise<boolean> =>
@@ -134,39 +105,6 @@ const EditedObjectGroupEditorDialog = ({
     if (!wasNameChangeApplied) return;
 
     onApply();
-    if (!initialInstances) {
-      // This can only happens for legacy function object groups.
-      // In this case, we don't do any refactoring.
-      return;
-    }
-
-    const originalSerializedVariables = getOriginalVariablesSerializedElement();
-    const changeset = gd.WholeProjectRefactorer.computeChangesetForVariablesContainer(
-      originalSerializedVariables,
-      groupVariablesContainer
-    );
-
-    gd.WholeProjectRefactorer.applyRefactoringForGroupVariablesContainer(
-      project,
-      globalObjectsContainer || objectsContainer,
-      objectsContainer,
-      initialInstances,
-      groupVariablesContainer,
-      group,
-      changeset,
-      originalSerializedVariables
-    );
-    const { eventsBasedObject } = projectScopedContainersAccessor._scope;
-    if (eventsBasedObject) {
-      for (const objectName of group.getAllObjectsNames().toJSArray()) {
-        gd.ObjectVariableHelper.applyChangesToVariants(
-          eventsBasedObject,
-          objectName,
-          changeset
-        );
-      }
-    }
-    groupVariablesContainer.clearPersistentUuid();
   };
 
   const removeObject = React.useCallback(
@@ -237,10 +175,6 @@ const EditedObjectGroupEditorDialog = ({
     [forceUpdate, globalObjectsContainer, group, isGroupGlobal, notifyOfChange]
   );
 
-  const { DismissableTutorialMessage } = useDismissableTutorialMessage(
-    'intro-variables'
-  );
-
   return (
     <Dialog
       title={
@@ -300,8 +234,8 @@ const EditedObjectGroupEditorDialog = ({
                 value: 'objects',
               },
               {
-                label: <Trans>Variables</Trans>,
-                value: 'variables',
+                label: <Trans>Common functions</Trans>,
+                value: 'commonFunctions',
               },
               {
                 label: <Trans>Required behaviors</Trans>,
@@ -335,8 +269,18 @@ const EditedObjectGroupEditorDialog = ({
             isGlobalGroup={isGroupGlobal}
             objectNameFilter={objectNameFilter}
             requiredBehaviorTypes={requiredBehaviorTypes}
+            groupName={group.getName()}
           />
         ))}
+      {currentTab === 'commonFunctions' && (
+        <ObjectGroupCommonFunctions
+          project={project}
+          projectScopedContainersAccessor={projectScopedContainersAccessor}
+          globalObjectsContainer={globalObjectsContainer}
+          objectsContainer={objectsContainer}
+          groupName={group.getName()}
+        />
+      )}
       {currentTab === 'requiredBehaviors' && (
         <ObjectGroupRequiredBehaviorsEditor
           project={project}
@@ -344,35 +288,6 @@ const EditedObjectGroupEditorDialog = ({
           onRequiredBehaviorAdded={addRequiredBehavior}
           onRequiredBehaviorRemoved={removeRequiredBehavior}
         />
-      )}
-      {currentTab === 'variables' && (
-        <Column expand noMargin>
-          {groupVariablesContainer.count() > 0 && DismissableTutorialMessage && (
-            <Line>
-              <Column noMargin expand>
-                {DismissableTutorialMessage}
-              </Column>
-            </Line>
-          )}
-          <VariablesList
-            projectScopedContainersAccessor={projectScopedContainersAccessor}
-            variablesContainer={groupVariablesContainer}
-            areObjectVariables
-            emptyPlaceholderTitle={
-              <Trans>Add your first object group variable</Trans>
-            }
-            emptyPlaceholderDescription={
-              <Trans>
-                These variables hold additional information and are available on
-                all objects of the group.
-              </Trans>
-            }
-            helpPagePath={'/all-features/variables/object-variables'}
-            onComputeAllVariableNames={onComputeAllVariableNames}
-            onVariablesUpdated={notifyOfVariableChange}
-            isListLocked={isVariableListLocked}
-          />
-        </Column>
       )}
     </Dialog>
   );

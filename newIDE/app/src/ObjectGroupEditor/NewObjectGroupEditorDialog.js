@@ -13,7 +13,7 @@ import HelpButton from '../UI/HelpButton';
 
 export type ObjectGroupEditorTab =
   | 'objects'
-  | 'variables'
+  | 'commonFunctions'
   | 'requiredBehaviors';
 
 type Props = {|

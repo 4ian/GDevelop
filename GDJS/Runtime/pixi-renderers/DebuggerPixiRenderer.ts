@@ -128,6 +128,41 @@ namespace gdjs {
     return point.objectName + '#' + point.objectId;
   };
 
+  const formatSignalDebugTarget = (target: string): string => {
+    const separatorIndex = target.indexOf(':');
+    if (separatorIndex < 0) {
+      return target || '<missing target>';
+    }
+
+    const targetKind = target.substr(0, separatorIndex);
+    const targetValue = target.substr(separatorIndex + 1);
+    if (targetKind === 'objectGroup') {
+      return 'object group ' + (targetValue || '<missing>');
+    }
+    if (targetKind === 'object') {
+      return targetValue || 'object <missing>';
+    }
+    if (targetKind === 'objectInstance') {
+      return targetValue ? 'instance ' + targetValue : 'instance <missing>';
+    }
+    return targetValue ? targetKind + ' ' + targetValue : targetKind;
+  };
+
+  const formatSignalDebugPanelDestination = (
+    log: SignalDebugPanelLog
+  ): string => {
+    const receiverLabel = formatSignalDebugPoint(log.receiver);
+    if (
+      log.target.indexOf('objectGroup:') === 0 &&
+      (log.status !== 'delivered' ||
+        receiverLabel === 'objectGroup' ||
+        receiverLabel.indexOf('objectGroup:') === 0)
+    ) {
+      return formatSignalDebugTarget(log.target);
+    }
+    return receiverLabel;
+  };
+
   const getPointerGlobalPosition = (event: any): { x: float; y: float } => {
     if (event && event.global) {
       return event.global;
@@ -1095,7 +1130,7 @@ namespace gdjs {
             'from ' +
               formatSignalDebugPoint(log.source) +
               ' -> ' +
-              formatSignalDebugPoint(log.receiver),
+              formatSignalDebugPanelDestination(log),
             panelWidth < 380 ? 42 : 62
           ),
           {

@@ -106,6 +106,9 @@ class GD_CORE_API BehaviorConfigurationContainer {
   void RemoveProperty(const gd::String &name) {
     content.RemoveChild(name);
     content.RemoveAttribute(name);
+    auto uncapitalizedName = name.UncapitalizeFirstLetter();
+    content.RemoveChild(uncapitalizedName);
+    content.RemoveAttribute(uncapitalizedName);
   };
 
   /**
@@ -114,7 +117,12 @@ class GD_CORE_API BehaviorConfigurationContainer {
    * \see gd::InitialInstance
    */
   bool HasPropertyValue(const gd::String name) const {
-    return content.HasChild(name) || content.HasAttribute(name);
+    if (content.HasChild(name) || content.HasAttribute(name)) {
+      return true;
+    }
+    auto uncapitalizedName = name.UncapitalizeFirstLetter();
+    return content.HasChild(uncapitalizedName) ||
+           content.HasAttribute(uncapitalizedName);
   }
 
   /**

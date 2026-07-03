@@ -11,6 +11,7 @@ import { type ExampleShortHeader } from '../../Utils/GDevelopServices/Example';
 import shuffle from 'lodash/shuffle';
 import Fuse from 'fuse.js';
 import { type ObjectCategory } from '../../AssetStore/ObjectStoreContext';
+import { normalizeString } from '../../Utils/Search';
 
 type SearchableItem =
   | ExtensionShortHeader
@@ -50,6 +51,44 @@ type SearchOptions = {|
   shuffleResults?: boolean,
 |};
 
+/**
+ * Normalize a value (string or array of strings) the same way the search query
+ * is normalized, so accents/diacritics are ignored when matching.
+ */
+const normalizeSearchableValue = (value: any): any => {
+  if (Array.isArray(value)) {
+    return value.map(normalizeSearchableValue);
+  }
+  if (typeof value === 'string') {
+    return normalizeString(value);
+  }
+  return value;
+};
+
+/**
+ * Custom Fuse.js getter that normalizes the indexed field values so that the
+ * search ignores accents/diacritics (e.g. searching "camera" matches "caméra",
+ * "scene" matches "scène"). The search query is normalized the same way (see
+ * the query builders below), so both sides of the comparison are accent- and
+ * case-insensitive.
+ * Note: removing diacritics this way preserves character positions for the
+ * accented characters commonly used in translations (é, è, à, ç…), so the match
+ * indices returned by Fuse.js still align with the original (accented) text used
+ * for highlighting.
+ */
+export const getNormalizedSearchValue = (
+  obj: any,
+  path: string | Array<string>
+): any => {
+  const keys = Array.isArray(path) ? path : path.split('.');
+  let value = obj;
+  for (const key of keys) {
+    if (value == null) return undefined;
+    value = value[key];
+  }
+  return normalizeSearchableValue(value);
+};
+
 export const sharedFuseConfiguration = {
   minMatchCharLength: 1,
   threshold: 0.35,
@@ -57,6 +96,7 @@ export const sharedFuseConfiguration = {
   ignoreLocation: true,
   useExtendedSearch: true,
   findAllMatches: true,
+  getFn: getNormalizedSearchValue,
 };
 
 /**
@@ -65,7 +105,11 @@ export const sharedFuseConfiguration = {
 export const getFuseSearchQueryForSimpleArray = (
   searchText: string
 ): string => {
-  const tokenisedSearchQuery = searchText.trim().split(' ');
+  // Normalize the query (lowercase + remove accents) so the search is
+  // accent-insensitive, matching the normalization applied to indexed values.
+  const tokenisedSearchQuery = normalizeString(searchText)
+    .trim()
+    .split(' ');
   return `'${tokenisedSearchQuery.join(" '")}`;
 };
 
@@ -79,7 +123,11 @@ export const getFuseSearchQueryForMultipleKeys = (
   searchText: string,
   keys: Array<string>
 ): { $or: Array<{ $or: Array<any> }> } => {
-  const tokenisedSearchQuery = searchText.trim().split(' ');
+  // Normalize the query (lowercase + remove accents) so the search is
+  // accent-insensitive, matching the normalization applied to indexed values.
+  const tokenisedSearchQuery = normalizeString(searchText)
+    .trim()
+    .split(' ');
   const searchQuery: {
     // $FlowFixMe[value-as-type]
     $or: Fuse.Expression[],
@@ -111,16 +159,18 @@ export const getFuseSearchQueryForMultipleKeys = (
  * It gets rid of the indices that do not match the search text exactly.
  */
 const tuneMatchIndices = (match: SearchMatch, searchText: string) => {
-  const lowerCaseSearchText = searchText.toLowerCase();
+  // Normalize both sides (lowercase + remove accents) so the comparison is
+  // accent-insensitive, consistent with the normalized search query/index.
+  const normalizedSearchText = normalizeString(searchText);
   return match.indices
     .map(index => {
-      const lowerCaseMatchedText = match.value
-        .slice(index[0], index[1] + 1)
-        .toLowerCase();
+      const normalizedMatchedText = normalizeString(
+        match.value.slice(index[0], index[1] + 1)
+      );
       // if exact match, return indices untouched
-      if (lowerCaseMatchedText === lowerCaseSearchText) return index;
-      const indexOfSearchTextInMatchedText = lowerCaseMatchedText.indexOf(
-        lowerCaseSearchText
+      if (normalizedMatchedText === normalizedSearchText) return index;
+      const indexOfSearchTextInMatchedText = normalizedMatchedText.indexOf(
+        normalizedSearchText
       );
 
       // if searched text is not in match returned by the fuzzy search
@@ -132,7 +182,10 @@ const tuneMatchIndices = (match: SearchMatch, searchText: string) => {
       // to highlight only the part that matches exactly
       return [
         index[0] + indexOfSearchTextInMatchedText,
-        index[0] + indexOfSearchTextInMatchedText + searchText.length - 1,
+        index[0] +
+          indexOfSearchTextInMatchedText +
+          normalizedSearchText.length -
+          1,
       ];
     })
     .filter(Boolean);
@@ -142,17 +195,20 @@ const getFirstExactMatchPosition = (
   match: SearchMatch,
   lowerCaseSearchText: string
 ) => {
+  // Normalize (lowercase + remove accents) so the comparison is
+  // accent-insensitive, consistent with the normalized search query/index.
+  const normalizedSearchText = normalizeString(lowerCaseSearchText);
   let closestExactMatchIndex = null;
   let closestExactMatchAtStartOfWordIndex = null;
   for (const index of match.indices) {
-    const lowerCaseMatchedText = match.value
-      .slice(index[0], index[1] + 1)
-      .toLowerCase();
+    const normalizedMatchedText = normalizeString(
+      match.value.slice(index[0], index[1] + 1)
+    );
     // Using startsWith here instead of `===` because of this behavior of Fuse.js:
     // Searching `trig` will return the instruction `Trigger once` but the match first index
     // will be on the `Trigg` part of `Trigger once`, and not only on the part `Trig`,
     // because the `g` is repeated.
-    const doesMatch = lowerCaseMatchedText.startsWith(lowerCaseSearchText);
+    const doesMatch = normalizedMatchedText.startsWith(normalizedSearchText);
     if (!doesMatch) continue;
     if (closestExactMatchIndex === null) {
       closestExactMatchIndex = index[0];
@@ -226,8 +282,7 @@ export const sortResultsUsingExactMatches = (
   return <T>(
     resultA: AugmentedSearchResult<T>,
     resultB: AugmentedSearchResult<T>
-    // $FlowFixMe[missing-local-annot]
-  ) => {
+  ): number => {
     // First give priority to result that have an exact match at start of word and not the other.
     const resultAExactMatchesAtStartOfWordCount = resultA.matches.filter(
       match => match.closestExactMatchAtStartOfWordIndex !== null
@@ -491,6 +546,7 @@ export const useSearchStructuredItem = <SearchItem: SearchableItem>(
           ignoreLocation: true,
           useExtendedSearch: true,
           findAllMatches: true,
+          getFn: getNormalizedSearchValue,
         });
 
         const totalTime = performance.now() - startTime;
@@ -555,9 +611,8 @@ export const useSearchStructuredItem = <SearchItem: SearchableItem>(
         // items matching more tokens above those matching fewer.
         // score = (unmatched token count) + fuseScore, so a full match
         // always beats a partial match regardless of raw Fuse.js score.
-        const tokens = searchText
+        const tokens = normalizeString(searchText)
           .trim()
-          .toLowerCase()
           .split(' ')
           .filter(t => t.length >= 2);
         const isMultiWordSearch = tokens.length > 1;
@@ -571,7 +626,7 @@ export const useSearchStructuredItem = <SearchItem: SearchableItem>(
                 result.matches &&
                 result.matches.some(
                   match =>
-                    match.value && match.value.toLowerCase().includes(token)
+                    match.value && normalizeString(match.value).includes(token)
                 )
             ).length;
             compositeScore = tokens.length - matchedTokenCount + fuseScore;

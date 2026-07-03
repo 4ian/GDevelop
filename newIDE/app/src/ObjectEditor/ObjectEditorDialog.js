@@ -209,7 +209,7 @@ const InnerDialog = (props: InnerDialogProps) => {
       originalSerializedVariables
     );
     if (eventsBasedObject) {
-      gd.ObjectVariableHelper.applyChangesToVariants(
+      gd.ObjectRefactorer.applyChangesToVariants(
         eventsBasedObject,
         object.getName(),
         changeset
@@ -372,7 +372,7 @@ const InnerDialog = (props: InnerDialogProps) => {
       ) : null}
       {currentTab === 'behaviors' && (
         <BehaviorsEditor
-          object={object}
+          objects={[object]}
           isChildObject={!!eventsBasedObject}
           project={project}
           eventsFunctionsExtension={eventsFunctionsExtension}

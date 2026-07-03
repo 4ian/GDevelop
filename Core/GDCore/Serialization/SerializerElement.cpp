@@ -234,6 +234,15 @@ SerializerElement& SerializerElement::GetChild(
   return nullElement;
 }
 
+SerializerElement &
+SerializerElement::GetOrCreateChild(gd::String name,
+                                    gd::String deprecatedName) {
+  if (!HasChild(name)) {
+    AddChild(name);
+  }
+  return GetChild(name, 0, deprecatedName);
+}
+
 std::size_t SerializerElement::GetChildrenCount(
     gd::String name, gd::String deprecatedName) const {
   if (name.empty()) {

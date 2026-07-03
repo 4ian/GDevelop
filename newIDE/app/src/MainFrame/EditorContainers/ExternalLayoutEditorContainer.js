@@ -12,11 +12,13 @@ import PlaceholderMessage from '../../UI/PlaceholderMessage';
 import {
   type RenderEditorContainerProps,
   type RenderEditorContainerPropsWithRef,
+} from './BaseEditor';
+import {
   type SceneEventsOutsideEditorChanges,
   type InstancesOutsideEditorChanges,
   type ObjectsOutsideEditorChanges,
   type ObjectGroupsOutsideEditorChanges,
-} from './BaseEditor';
+} from '../../EditorFunctions/OutsideEditorChanges';
 import ExternalPropertiesDialog, {
   type ExternalProperties,
 } from './ExternalPropertiesDialog';
@@ -174,16 +176,25 @@ export class ExternalLayoutEditorContainer extends React.Component<
     }
   }
 
-  onEventsBasedObjectChildrenEdited() {
+  onEventsBasedObjectChildrenEdited(
+    eventsBasedObject: gdEventsBasedObject,
+    options?: {| editedObject?: ?gdObject, hasResourceChanged?: boolean |}
+  ) {
     const { editor } = this;
     if (editor) {
-      // Update every custom object because some custom objects may include
-      // the one actually edited.
-      editor.forceUpdateCustomObjectRenderedInstances();
+      // Update the edited object and every custom object that includes it.
+      editor.forceUpdateCustomObjectRenderedInstances(
+        eventsBasedObject,
+        options
+      );
     }
   }
 
-  onSceneObjectEdited(scene: gdLayout, objectWithContext: ObjectWithContext) {
+  onSceneObjectEdited(
+    scene: gdLayout,
+    objectWithContext: ObjectWithContext,
+    hasResourceChanged?: boolean
+  ) {
     const { editor } = this;
     const externalLayout = this.getExternalLayout();
     if (!externalLayout) {
@@ -197,7 +208,10 @@ export class ExternalLayoutEditorContainer extends React.Component<
     }
     if (editor) {
       // Update instances of the object as it was modified in an editor.
-      editor.forceUpdateRenderedInstancesOfObject(objectWithContext.object);
+      editor.forceUpdateRenderedInstancesOfObject(
+        objectWithContext.object,
+        hasResourceChanged
+      );
     }
   }
 
@@ -390,8 +404,12 @@ export class ExternalLayoutEditorContainer extends React.Component<
             onOpenEventBasedObjectVariantEditor={
               this.props.onOpenEventBasedObjectVariantEditor
             }
-            onObjectEdited={objectWithContext =>
-              this.props.onSceneObjectEdited(layout, objectWithContext)
+            onObjectEdited={(objectWithContext, hasResourceChanged) =>
+              this.props.onSceneObjectEdited(
+                layout,
+                objectWithContext,
+                hasResourceChanged
+              )
             }
             onObjectsDeleted={() => this.props.onSceneObjectsDeleted(layout)}
             // It's only used to refresh events-based object variants.

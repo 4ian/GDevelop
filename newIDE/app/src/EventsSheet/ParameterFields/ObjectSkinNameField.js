@@ -85,14 +85,18 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
 
         let cancelled = false;
         (async () => {
-          const spineData = await PixiResourcesLoader.getSpineData(
+          const spine = await PixiResourcesLoader.createSpine(
             project,
             spineResourceName
           );
-          if (cancelled) return;
+          if (cancelled) {
+            if (spine) spine.destroy();
+            return;
+          }
 
-          if (spineData.skeleton && spineData.skeleton.skins) {
-            setSkinNames(spineData.skeleton.skins.map(skin => skin.name));
+          if (spine && spine.skeleton.data.skins) {
+            setSkinNames(spine.skeleton.data.skins.map(skin => skin.name));
+            spine.destroy();
           } else {
             setSkinNames([]);
           }

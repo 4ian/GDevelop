@@ -32,6 +32,7 @@ import {
   openEditorTab,
   closeProjectTabs,
   closeLayoutTabs,
+  renameEditorTabs,
   closeExternalLayoutTabs,
   closeExternalEventsTabs,
   closeEventsFunctionsExtensionTabs,
@@ -39,6 +40,7 @@ import {
   closeEventsBasedObjectVariantTab,
   saveUiSettings,
   type EditorTab,
+  type EditorOpeningOptions,
   type EditorTabsState,
   type EditorKind,
   getEventsFunctionsExtensionEditor,
@@ -64,16 +66,29 @@ import { renderCustomObjectEditorContainer } from './EditorContainers/CustomObje
 import { renderHomePageContainer } from './EditorContainers/HomePage';
 import { type OpenAskAiOptions } from '../AiGeneration/Utils';
 import { exceptionallyGuardAgainstDeadObject } from '../Utils/IsNullPtr';
+import {
+  makeCustomObjectEditorTabName,
+  parseCustomObjectEditorTabName,
+} from '../Utils/CustomObjectEditorTabName';
+import {
+  getRenamedLayoutTabProjectItemName,
+  getRenamedExternalLayoutTabProjectItemName,
+  getRenamedExternalEventsTabProjectItemName,
+  getRenamedExtensionTabProjectItemName,
+  getRenamedEventsBasedObjectTabProjectItemName,
+  type RenamableTab,
+} from './EditorTabs/EditorTabsRenaming';
 import { renderAskAiEditorContainer } from '../AiGeneration/AskAiEditorContainer';
 import { renderResourcesEditorContainer } from './EditorContainers/ResourcesEditorContainer';
 import { renderGlobalEventsSearchEditorContainer } from './EditorContainers/GlobalEventsSearchEditorContainer';
+import { type RenderEditorContainerPropsWithRef } from './EditorContainers/BaseEditor';
 import {
-  type RenderEditorContainerPropsWithRef,
   type SceneEventsOutsideEditorChanges,
   type InstancesOutsideEditorChanges,
   type ObjectsOutsideEditorChanges,
   type ObjectGroupsOutsideEditorChanges,
-} from './EditorContainers/BaseEditor';
+  type ProjectItemRenamedOutsideEditorChanges,
+} from '../EditorFunctions/OutsideEditorChanges';
 import { type Exporter } from '../ExportAndShare/ShareDialog';
 import ResourcesLoader from '../ResourcesLoader/index';
 import {
@@ -125,6 +140,7 @@ import SaveToStorageProviderDialog from '../ProjectsStorage/SaveToStorageProvide
 import { useOpenConfirmDialog } from '../ProjectsStorage/OpenConfirmDialog';
 import verifyProjectContent from '../ProjectsStorage/ProjectContentChecker';
 import UnsavedChangesContext from './UnsavedChangesContext';
+import { AiRequestContext } from '../AiGeneration/AiRequestContext';
 import {
   type BuildMainMenuProps,
   type MainMenuCallbacks,
@@ -163,6 +179,7 @@ import {
   sendInAppTutorialStarted,
   sendEventsExtractedAsFunction,
   sendPreviewStarted,
+  sendProjectOpened,
 } from '../Utils/Analytics/EventSender';
 import { useLeaderboardReplacer } from '../Leaderboard/UseLeaderboardReplacer';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
@@ -192,6 +209,7 @@ import useCreateProject, {
   type UseCreateProjectReturnType,
 } from '../Utils/UseCreateProject';
 import newNameGenerator from '../Utils/NewNameGenerator';
+import { renameLayoutInProject } from '../Utils/Layout';
 import { addDefaultLightToAllLayers } from '../ProjectCreation/CreateProject';
 import { type NewProjectSetup } from '../ProjectCreation/NewProjectSetupDialog';
 import useEditorTabsStateSaving from './EditorTabs/UseEditorTabsStateSaving';
@@ -212,7 +230,10 @@ import { QuickCustomizationDialog } from '../QuickCustomization/QuickCustomizati
 import { type ObjectWithContext } from '../ObjectsList/EnumerateObjects';
 import useGamesList from '../GameDashboard/UseGamesList';
 import useCapturesManager from './UseCapturesManager';
-import { readProjectSettings } from '../Utils/ProjectSettingsReader';
+import {
+  readProjectSettings,
+  type ResourceCustomPropertyConfig,
+} from '../Utils/ProjectSettingsReader';
 import useNpmScriptRunner from './NpmScriptRunner/useNpmScriptRunner';
 import { applyProjectPreferences } from '../Utils/ApplyProjectPreferences';
 import {
@@ -241,6 +262,7 @@ import StandaloneDialog from './StandAloneDialog';
 import { useInGameEditorSettings } from '../EmbeddedGame/InGameEditorSettings';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 import { useAutomatedRegularInGameEditorRestart } from '../EmbeddedGame/UseAutomatedRegularInGameEditorRestart';
+import isUserTyping from '../KeyboardShortcuts/IsUserTyping';
 const electron = optionalRequire('electron');
 const ipcRendererForUpdates = electron ? electron.ipcRenderer : null;
 
@@ -405,6 +427,10 @@ const MainFrame = (props: Props): React.MixedElement => {
       toolbarButtons: [],
     }: State)
   );
+  const [
+    resourceCustomPropertyConfigs,
+    setResourceCustomPropertyConfigs,
+  ] = React.useState<Array<ResourceCustomPropertyConfig>>([]);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const [
     cloudProjectFileMetadataToRecover,
@@ -563,6 +589,10 @@ const MainFrame = (props: Props): React.MixedElement => {
     EventsFunctionsExtensionsContext
   );
   const unsavedChanges = React.useContext(UnsavedChangesContext);
+  const {
+    getWorkingAiRequest,
+    suspendAiRequest: suspendWorkingAiRequest,
+  } = React.useContext(AiRequestContext);
   const {
     hasUnsavedChanges,
     sealUnsavedChanges,
@@ -732,8 +762,9 @@ const MainFrame = (props: Props): React.MixedElement => {
           : kind === 'layout events'
           ? name + ` ${i18n._(t`(Events)`)}`
           : kind === 'custom object'
-          ? name.split('::')[2] ||
-            name.split('::')[1] + ` ${i18n._(t`(Object)`)}`
+          ? parseCustomObjectEditorTabName(name).variantName ||
+            parseCustomObjectEditorTabName(name).objectName +
+              ` ${i18n._(t`(Object)`)}`
           : name;
       const tabOptions =
         kind === 'layout'
@@ -754,7 +785,8 @@ const MainFrame = (props: Props): React.MixedElement => {
 
       let customIconUrl = '';
       if (kind === 'events functions extension' || kind === 'custom object') {
-        const extensionName = name.split('::')[0];
+        const extensionName = parseCustomObjectEditorTabName(name)
+          .extensionName;
         if (
           project &&
           project.hasEventsFunctionsExtensionNamed(extensionName)
@@ -1017,12 +1049,9 @@ const MainFrame = (props: Props): React.MixedElement => {
         if (openedEditor) {
           if (openedEditor.paneIdentifier !== newPaneIdentifier) {
             // The editor is opened, but not at the right position, close it.
-            // It will re-open in the right pane.
-            // Tell the editor not to suspend the AI request on close, since
-            // we're just repositioning it, not intentionally closing it.
-            if (openedEditor.askAiEditor) {
-              openedEditor.askAiEditor.prepareToReposition();
-            }
+            // It will re-open in the right pane. Repositioning unmounts then
+            // remounts the editor, but that never suspends the AI request:
+            // suspending is only triggered by explicit close/stop actions.
             newEditorTabs = closeEditorTab(
               newEditorTabs,
               openedEditor.editorTab
@@ -1124,6 +1153,7 @@ const MainFrame = (props: Props): React.MixedElement => {
         editorTabs: closeProjectTabs(state.editorTabs, currentProject),
         toolbarButtons: [],
       }));
+      setResourceCustomPropertyConfigs([]);
 
       // Delete the project from memory. All references to it have been dropped previously
       // by the setState.
@@ -1246,6 +1276,9 @@ const MainFrame = (props: Props): React.MixedElement => {
               ...currentState,
               toolbarButtons: parsedProjectSettings.toolbarButtons || [],
             }));
+            setResourceCustomPropertyConfigs(
+              parsedProjectSettings.resourceCustomProperties || []
+            );
           }
         } catch (error) {
           console.warn(
@@ -1313,6 +1346,10 @@ const MainFrame = (props: Props): React.MixedElement => {
       options?: {|
         openingMessage?: ?MessageDescriptor,
         ignoreAutoSave?: boolean,
+        // Set when this "open" is really the first step of creating a new project
+        // (loading a template/example that will be re-stamped with a new UUID).
+        // In that case we must not report it as the user re-opening a project.
+        doNotTrackAsProjectOpened?: boolean,
       |}
     ): Promise<?State> => {
       const storageProviderOperations = getStorageProviderOperations();
@@ -1433,13 +1470,31 @@ const MainFrame = (props: Props): React.MixedElement => {
         const serializedProject = gd.Serializer.fromJSObject(content);
 
         try {
-          const state = loadFromSerializedProject(
+          const state = await loadFromSerializedProject(
             serializedProject,
             // Note that fileMetadata is the original, unchanged one, even if we're loading
             // an autosave. If we're for some reason loading an autosave, we still consider
             // that we're opening the file that was originally requested by the user.
             fileMetadata
           );
+
+          // Report that the user opened an existing project, so we can tell apart
+          // people coming back to the same project from people creating new ones.
+          // Skipped when this "open" is just loading a template to create a new project.
+          if (
+            state.currentProject &&
+            !(options && options.doNotTrackAsProjectOpened)
+          ) {
+            const lastModifiedDate = fileMetadata.lastModifiedDate;
+            sendProjectOpened({
+              projectUuid: state.currentProject.getProjectUuid(),
+              storageProviderName: getStorageProvider().internalName,
+              timeSinceLastModified: lastModifiedDate
+                ? Date.now() - lastModifiedDate
+                : null,
+            });
+          }
+
           return state;
         } finally {
           sealUnsavedChanges();
@@ -1465,6 +1520,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     [
       i18n,
       getStorageProviderOperations,
+      getStorageProvider,
       loadFromSerializedProject,
       showConfirmation,
       showAlert,
@@ -2054,6 +2110,36 @@ const MainFrame = (props: Props): React.MixedElement => {
     [notifyChangesToInGameEditor]
   );
 
+  // Rename matching tabs in place instead of closing them: the stable `id` keeps
+  // the editor mounted (selection/zoom preserved); only name-derived fields are
+  // recomputed.
+  const getEditorTabsWithRenamedProjectItem = (
+    editorTabs: EditorTabsState,
+    project: gdProject,
+    getNewProjectItemName: (tab: RenamableTab) => ?string
+  ): EditorTabsState =>
+    renameEditorTabs(editorTabs, editorTab => {
+      const newProjectItemName = getNewProjectItemName({
+        kind: editorTab.kind,
+        projectItemName: editorTab.projectItemName,
+      });
+      if (!newProjectItemName) return null;
+      // $FlowFixMe[incompatible-type] - same Flow invariance as the openEditorTab calls.
+      const newOptions: EditorOpeningOptions = getEditorOpeningOptions({
+        kind: editorTab.kind,
+        name: newProjectItemName,
+        project,
+      });
+      return {
+        key: newOptions.key,
+        label: newOptions.label,
+        projectItemName: newOptions.projectItemName,
+        tabOptions: newOptions.tabOptions,
+        icon: newOptions.icon,
+        renderCustomIcon: newOptions.renderCustomIcon,
+      };
+    });
+
   const renameLayout = (oldName: string, newName: string) => {
     const { currentProject } = state;
     const { i18n } = props;
@@ -2068,25 +2154,22 @@ const MainFrame = (props: Props): React.MixedElement => {
       }
     );
 
-    const layout = currentProject.getLayout(oldName);
-    const shouldChangeProjectFirstLayout =
-      oldName === currentProject.getFirstLayout();
+    renameLayoutInProject(currentProject, oldName, uniqueNewName);
+    if (inAppTutorialOrchestratorRef.current) {
+      inAppTutorialOrchestratorRef.current.changeData(oldName, uniqueNewName);
+    }
+
+    // External layout/events tabs are left untouched: they resolve the renamed
+    // scene fresh on render.
     setState(state => ({
       ...state,
-      editorTabs: closeLayoutTabs(state.editorTabs, layout),
-    })).then(state => {
-      layout.setName(uniqueNewName);
-      gd.WholeProjectRefactorer.renameLayout(
+      editorTabs: getEditorTabsWithRenamedProjectItem(
+        state.editorTabs,
         currentProject,
-        oldName,
-        uniqueNewName
-      );
-      if (inAppTutorialOrchestratorRef.current) {
-        inAppTutorialOrchestratorRef.current.changeData(oldName, uniqueNewName);
-      }
-      if (shouldChangeProjectFirstLayout) {
-        currentProject.setFirstLayout(uniqueNewName);
-      }
+        editorTab =>
+          getRenamedLayoutTabProjectItemName(editorTab, oldName, uniqueNewName)
+      ),
+    })).then(() => {
       notifyChangesToInGameEditor({
         shouldReloadProjectData: true,
         shouldReloadLibraries: false,
@@ -2114,16 +2197,25 @@ const MainFrame = (props: Props): React.MixedElement => {
     );
 
     const externalLayout = currentProject.getExternalLayout(oldName);
+    externalLayout.setName(uniqueNewName);
+    gd.WholeProjectRefactorer.renameExternalLayout(
+      currentProject,
+      oldName,
+      uniqueNewName
+    );
     setState(state => ({
       ...state,
-      editorTabs: closeExternalLayoutTabs(state.editorTabs, externalLayout),
-    })).then(state => {
-      externalLayout.setName(uniqueNewName);
-      gd.WholeProjectRefactorer.renameExternalLayout(
+      editorTabs: getEditorTabsWithRenamedProjectItem(
+        state.editorTabs,
         currentProject,
-        oldName,
-        uniqueNewName
-      );
+        editorTab =>
+          getRenamedExternalLayoutTabProjectItemName(
+            editorTab,
+            oldName,
+            uniqueNewName
+          )
+      ),
+    })).then(() => {
       notifyChangesToInGameEditor({
         shouldReloadProjectData: true,
         shouldReloadLibraries: false,
@@ -2151,16 +2243,25 @@ const MainFrame = (props: Props): React.MixedElement => {
     );
 
     const externalEvents = currentProject.getExternalEvents(oldName);
+    externalEvents.setName(uniqueNewName);
+    gd.WholeProjectRefactorer.renameExternalEvents(
+      currentProject,
+      oldName,
+      uniqueNewName
+    );
     setState(state => ({
       ...state,
-      editorTabs: closeExternalEventsTabs(state.editorTabs, externalEvents),
-    })).then(state => {
-      externalEvents.setName(uniqueNewName);
-      gd.WholeProjectRefactorer.renameExternalEvents(
+      editorTabs: getEditorTabsWithRenamedProjectItem(
+        state.editorTabs,
         currentProject,
-        oldName,
-        uniqueNewName
-      );
+        editorTab =>
+          getRenamedExternalEventsTabProjectItemName(
+            editorTab,
+            oldName,
+            uniqueNewName
+          )
+      ),
+    })).then(() => {
       _onProjectItemModified();
     });
   };
@@ -2200,11 +2301,21 @@ const MainFrame = (props: Props): React.MixedElement => {
       oldName
     );
 
-    // TODO Replace the tabs instead on closing them.
+    // Update the extension tab and its custom-object tabs (whose name embeds the
+    // extension) in place.
     setState(state => ({
       ...state,
-      editorTabs: closeEventsFunctionsExtensionTabs(state.editorTabs, oldName),
-    })).then(async state => {
+      editorTabs: getEditorTabsWithRenamedProjectItem(
+        state.editorTabs,
+        currentProject,
+        editorTab =>
+          getRenamedExtensionTabProjectItemName(
+            editorTab,
+            oldName,
+            safeAndUniqueNewName
+          )
+      ),
+    })).then(async () => {
       await eventsFunctionsExtensionsState.reloadProjectEventsFunctionsExtensions(
         currentProject
       );
@@ -2224,15 +2335,25 @@ const MainFrame = (props: Props): React.MixedElement => {
     oldName: string,
     newName: string
   ) => {
-    // TODO Replace the tabs instead on closing them.
+    const { currentProject } = state;
+    if (!currentProject) return;
+
+    const extensionName = eventsFunctionsExtension.getName();
+    // The object is already renamed; update its custom-object tabs in place.
     setState(state => ({
       ...state,
-      editorTabs: closeCustomObjectTab(
+      editorTabs: getEditorTabsWithRenamedProjectItem(
         state.editorTabs,
-        eventsFunctionsExtension.getName(),
-        oldName
+        currentProject,
+        editorTab =>
+          getRenamedEventsBasedObjectTabProjectItemName(
+            editorTab,
+            extensionName,
+            oldName,
+            newName
+          )
       ),
-    })).then(state => {
+    })).then(() => {
       notifyChangesToInGameEditor({
         shouldReloadProjectData: true,
         shouldReloadLibraries: true,
@@ -2562,6 +2683,7 @@ const MainFrame = (props: Props): React.MixedElement => {
 
         if (!isForInGameEdition)
           sendPreviewStarted({
+            projectUuid: currentProject.getProjectUuid(),
             quickCustomizationGameId:
               quickCustomizationDialogOpenedFromGameId || null,
             networkPreview: !!networkPreview,
@@ -3131,13 +3253,15 @@ const MainFrame = (props: Props): React.MixedElement => {
           editorTabs: openEditorTab(state.editorTabs, {
             ...getEditorOpeningOptions({
               kind: 'custom object',
-              name:
-                eventsFunctionsExtension.getName() +
-                '::' +
-                eventsBasedObject.getName() +
-                (eventsBasedObject.getVariants().hasVariantNamed(variantName)
-                  ? '::' + variantName
-                  : ''),
+              name: makeCustomObjectEditorTabName({
+                extensionName: eventsFunctionsExtension.getName(),
+                objectName: eventsBasedObject.getName(),
+                variantName: eventsBasedObject
+                  .getVariants()
+                  .hasVariantNamed(variantName)
+                  ? variantName
+                  : undefined,
+              }),
               project: currentProject,
             }),
           }),
@@ -3178,13 +3302,15 @@ const MainFrame = (props: Props): React.MixedElement => {
           {
             ...getEditorOpeningOptions({
               kind: 'custom object',
-              name:
-                eventsFunctionsExtension.getName() +
-                '::' +
-                eventsBasedObject.getName() +
-                (eventsBasedObject.getVariants().hasVariantNamed(variantName)
-                  ? '::' + variantName
-                  : ''),
+              name: makeCustomObjectEditorTabName({
+                extensionName: eventsFunctionsExtension.getName(),
+                objectName: eventsBasedObject.getName(),
+                variantName: eventsBasedObject
+                  .getVariants()
+                  .hasVariantNamed(variantName)
+                  ? variantName
+                  : undefined,
+              }),
               project: currentProject,
             }),
           }
@@ -3482,7 +3608,10 @@ const MainFrame = (props: Props): React.MixedElement => {
   );
 
   const onEventsBasedObjectChildrenEdited = React.useCallback(
-    (eventsBasedObject: gdEventsBasedObject) => {
+    (
+      eventsBasedObject: gdEventsBasedObject,
+      options?: {| editedObject?: ?gdObject, hasResourceChanged?: boolean |}
+    ) => {
       const project = state.currentProject;
       if (!project) {
         return;
@@ -3495,7 +3624,10 @@ const MainFrame = (props: Props): React.MixedElement => {
       for (const editor of getAllEditorTabs(state.editorTabs)) {
         const { editorRef } = editor;
         if (editorRef) {
-          editorRef.onEventsBasedObjectChildrenEdited();
+          editorRef.onEventsBasedObjectChildrenEdited(
+            eventsBasedObject,
+            options
+          );
         }
       }
     },
@@ -3503,11 +3635,19 @@ const MainFrame = (props: Props): React.MixedElement => {
   );
 
   const onSceneObjectEdited = React.useCallback(
-    (scene: gdLayout, objectWithContext: ObjectWithContext) => {
+    (
+      scene: gdLayout,
+      objectWithContext: ObjectWithContext,
+      hasResourceChanged?: boolean
+    ) => {
       for (const editor of getAllEditorTabs(state.editorTabs)) {
         const { editorRef } = editor;
         if (editorRef) {
-          editorRef.onSceneObjectEdited(scene, objectWithContext);
+          editorRef.onSceneObjectEdited(
+            scene,
+            objectWithContext,
+            hasResourceChanged
+          );
         }
       }
     },
@@ -3577,8 +3717,37 @@ const MainFrame = (props: Props): React.MixedElement => {
     [state.editorTabs]
   );
 
+  // The project model is already updated; just keep open tabs alive by renaming
+  // their project item.
+  const onProjectItemRenamedOutsideEditor = (
+    changes: ProjectItemRenamedOutsideEditorChanges
+  ) => {
+    const { kind, oldName, newName } = changes;
+    setState(state => {
+      const { currentProject } = state;
+      if (!currentProject) return state;
+      if (kind === 'scene') {
+        return {
+          ...state,
+          editorTabs: getEditorTabsWithRenamedProjectItem(
+            state.editorTabs,
+            currentProject,
+            editorTab =>
+              getRenamedLayoutTabProjectItemName(editorTab, oldName, newName)
+          ),
+        };
+      }
+      return state;
+    });
+  };
+
   const selectAllInActiveEditors = React.useCallback(
     () => {
+      if (isUserTyping()) {
+        document.execCommand('selectAll');
+        return;
+      }
+
       for (const paneIdentifier in state.editorTabs.panes) {
         const currentTab = getCurrentTabForPane(
           state.editorTabs,
@@ -3598,7 +3767,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     forceUpdate();
   };
 
-  const onCreateEventsFunction = (
+  const onCreateEventsFunction = async (
     extensionName: string,
     eventsFunction: gdEventsFunction,
     editorIdentifier:
@@ -3630,7 +3799,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     }
 
     extension.getEventsFunctions().insertEventsFunction(eventsFunction, 0);
-    eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(
+    await eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(
       currentProject
     );
     setEditorHotReloadNeeded({
@@ -4461,10 +4630,56 @@ const MainFrame = (props: Props): React.MixedElement => {
         );
         if (!answer) return false;
       }
+
+      // If the AI is working on this project, ask the user to stop it (or cancel
+      // the close) first. Done here — on the explicit user close — rather than in
+      // closeProject(), which is also called programmatically while *opening* a
+      // project (and would wrongly prompt during e.g. AI-driven project opening).
+      const workingAiRequest = getWorkingAiRequest();
+      if (workingAiRequest) {
+        const shouldStopAndClose = await showConfirmation({
+          title: t`Close the project?`,
+          message: t`The AI is currently working on your project. Closing the project will stop it. Do you want to continue?`,
+          confirmButtonLabel: t`Stop working`,
+          dismissButtonLabel: t`Cancel`,
+          level: 'warning',
+        });
+        if (!shouldStopAndClose) return false;
+        await suspendWorkingAiRequest(workingAiRequest.id);
+      }
+
       await closeProject();
       return true;
     },
-    [currentProject, hasUnsavedChanges, i18n, closeProject]
+    [
+      currentProject,
+      hasUnsavedChanges,
+      i18n,
+      closeProject,
+      getWorkingAiRequest,
+      suspendWorkingAiRequest,
+      showConfirmation,
+    ]
+  );
+
+  // Asked before a side drawer is hidden by a swipe: if the Ask AI editor is in
+  // that pane and a request is working, let it confirm/suspend first. Returns
+  // whether the drawer should actually be hidden. Hiding the drawer does not
+  // unmount the editor, so the AI keeps running if the user keeps it.
+  const requestCloseAskAiDrawerInPane = React.useCallback(
+    (paneIdentifier: string): Promise<boolean> => {
+      const openedAskAiEditor = getOpenedAskAiEditor(state.editorTabs);
+      if (
+        openedAskAiEditor &&
+        openedAskAiEditor.paneIdentifier === paneIdentifier &&
+        openedAskAiEditor.askAiEditor &&
+        openedAskAiEditor.askAiEditor.requestClose
+      ) {
+        return openedAskAiEditor.askAiEditor.requestClose();
+      }
+      return Promise.resolve(true);
+    },
+    [state.editorTabs]
   );
 
   const reloadProject = React.useCallback(
@@ -5049,6 +5264,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       canInstallPrivateAsset,
       onNewResourcesAdded,
       onResourceUsageChanged,
+      resourceCustomPropertyConfigs,
     }),
     [
       resourceSources,
@@ -5060,6 +5276,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       canInstallPrivateAsset,
       onNewResourcesAdded,
       onResourceUsageChanged,
+      resourceCustomPropertyConfigs,
     ]
   );
 
@@ -5088,6 +5305,8 @@ const MainFrame = (props: Props): React.MixedElement => {
     createProjectFromExample,
     createProjectFromPrivateGameTemplate,
     closeAskAi,
+    openAskAi,
+    closeProject,
     storageProviders: props.storageProviders,
     storageProvider: getStorageProvider(),
     resourceManagementProps,
@@ -5257,6 +5476,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     onInstancesModifiedOutsideEditor: onInstancesModifiedOutsideEditor,
     onObjectsModifiedOutsideEditor: onObjectsModifiedOutsideEditor,
     onObjectGroupsModifiedOutsideEditor: onObjectGroupsModifiedOutsideEditor,
+    onProjectItemRenamedOutsideEditor: onProjectItemRenamedOutsideEditor,
     onWillInstallExtension: onWillInstallExtension,
     onExtensionInstalled: onExtensionInstalled,
     onEffectAdded: onEffectAdded,
@@ -5380,6 +5600,7 @@ const MainFrame = (props: Props): React.MixedElement => {
         <PanesContainer
           hasEditorsInLeftPane={hasEditorsInLeftPane}
           hasEditorsInRightPane={hasEditorsInRightPane}
+          onRequestDrawerClose={requestCloseAskAiDrawerInPane}
           renderPane={({
             paneIdentifier,
             isLeftMostPane,

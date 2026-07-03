@@ -40,6 +40,9 @@ export const DefaultNoScope = (): React.Node => (
         onWillInstallExtension={action('extension will be installed')}
         onExtensionInstalled={action('extension installed')}
         editEventsFunctionParameter={action('edit function parameter')}
+        openEventsBasedEntityPropertyEditorDialog={action(
+          'openEventsBasedEntityPropertyEditorDialog'
+        )}
       />
     </FixedHeightFlexContainer>
   </DragAndDropContextProvider>
@@ -73,6 +76,9 @@ export const EmptyNoScope = (): React.Node => (
         onWillInstallExtension={action('extension will be installed')}
         onExtensionInstalled={action('extension installed')}
         editEventsFunctionParameter={action('edit function parameter')}
+        openEventsBasedEntityPropertyEditorDialog={action(
+          'openEventsBasedEntityPropertyEditorDialog'
+        )}
       />
     </FixedHeightFlexContainer>
   </DragAndDropContextProvider>

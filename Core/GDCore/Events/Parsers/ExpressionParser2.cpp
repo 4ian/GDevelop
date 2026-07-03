@@ -29,8 +29,7 @@ namespace gd {
 gd::String ExpressionParser2::NAMESPACE_SEPARATOR = "::";
 
 ExpressionParser2::ExpressionParser2()
-    : expression(""),
-      currentPosition(0) {}
+    : currentPosition(0) {}
 
 std::unique_ptr<TextNode> ExpressionParser2::ReadText() {
   size_t textStartPosition = GetCurrentPosition();

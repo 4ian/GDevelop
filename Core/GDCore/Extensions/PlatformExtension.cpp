@@ -854,7 +854,7 @@ gd::String PlatformExtension::GetInstructionNameFromFullType(
 }
 
 PlatformExtension::PlatformExtension()
-    : deprecated(false), category("General") {}
+    : category("General") {}
 
 PlatformExtension::~PlatformExtension() {}
 

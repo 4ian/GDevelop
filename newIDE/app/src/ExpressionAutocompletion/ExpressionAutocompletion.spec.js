@@ -89,6 +89,7 @@ describe('ExpressionAutocompletion', () => {
           scope,
         },
         completionDescriptions,
+        project,
         makeFakeI18n()
       );
       expect(autocompletions).toHaveLength(2);
@@ -124,6 +125,7 @@ describe('ExpressionAutocompletion', () => {
           scope,
         },
         completionDescriptions2,
+        project,
         makeFakeI18n()
       );
       expect(autocompletions2).toHaveLength(1);
@@ -163,6 +165,7 @@ describe('ExpressionAutocompletion', () => {
           scope,
         },
         completionDescriptions,
+        project,
         makeFakeI18n()
       );
       expect(autocompletions).toEqual(
@@ -220,6 +223,7 @@ describe('ExpressionAutocompletion', () => {
           scope,
         },
         completionDescriptions,
+        project,
         makeFakeI18n()
       );
       expect(autocompletions).toEqual(
@@ -257,6 +261,7 @@ describe('ExpressionAutocompletion', () => {
           scope,
         },
         completionDescriptions,
+        project,
         makeFakeI18n()
       );
       expect(autocompletions).toEqual(
@@ -298,6 +303,7 @@ describe('ExpressionAutocompletion', () => {
           scope,
         },
         completionDescriptions,
+        project,
         makeFakeI18n()
       );
       expect(autocompletions).toEqual(
@@ -349,6 +355,7 @@ describe('ExpressionAutocompletion', () => {
           scope,
         },
         completionDescriptions,
+        project,
         makeFakeI18n()
       );
       expect(autocompletions).toEqual(
@@ -388,6 +395,7 @@ describe('ExpressionAutocompletion', () => {
           scope,
         },
         completionDescriptions,
+        project,
         makeFakeI18n()
       );
       expect(autocompletions).toEqual(
@@ -428,6 +436,7 @@ describe('ExpressionAutocompletion', () => {
           scope,
         },
         completionDescriptions,
+        project,
         makeFakeI18n()
       );
       expect(autocompletions).toEqual(
@@ -468,6 +477,7 @@ describe('ExpressionAutocompletion', () => {
           scope,
         },
         completionDescriptions,
+        project,
         makeFakeI18n()
       );
       expect(autocompletions).toEqual(
@@ -513,6 +523,7 @@ describe('ExpressionAutocompletion', () => {
           scope,
         },
         completionDescriptions,
+        project,
         makeFakeI18n()
       );
       expect(autocompletions).toEqual(

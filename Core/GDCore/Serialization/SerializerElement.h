@@ -402,11 +402,19 @@ class GD_CORE_API SerializerElement {
    * \brief Get a child of the element using its name.
    *
    * \param name The name of the child.
-   * \param name The index of the child, in case of an array.
+   * \param index The index of the child, in case of an array.
    */
   SerializerElement &GetChild(gd::String name,
                               std::size_t index = 0,
                               gd::String deprecatedName = "") const;
+
+  /**
+   * \brief Get or create a child of the element.
+   *
+   * \param name The name of the child.
+   */
+  SerializerElement &GetOrCreateChild(gd::String name,
+                                      gd::String deprecatedName = "");
 
   /**
    * \brief Get a child of the element using its index (when the element is

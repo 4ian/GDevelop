@@ -59,8 +59,10 @@ export type EditorTab = {|
   tabOptions?: TabOptions,
   /** The name of the layout/external layout/external events/extension. */
   projectItemName: ?string,
-  /** A unique key for the tab. */
+  /** A unique key for the tab, derived from its kind and project item name. */
   key: string,
+  /** A stable id (React key and editorId) that survives a rename, unlike `key`. */
+  id: string,
   /** Extra props to pass to editors. */
   extraEditorProps: ?EditorContainerExtraProps,
   /** If set to false, the tab can't be closed. */
@@ -106,6 +108,10 @@ export type EditorOpeningOptions = {|
   dontFocusTab?: boolean,
   closable?: boolean,
 |};
+
+// Source of stable EditorTab.id. `openEditorTab` is the only tab creator; other
+// transforms spread an existing tab and so preserve the id.
+let nextEditorTabId = 0;
 
 export const getEditorTabsInitialState = (): EditorTabsState => {
   return {
@@ -172,6 +178,7 @@ export const openEditorTab = (
     tabOptions,
     renderEditorContainer,
     key,
+    id: 'editor-tab-' + nextEditorTabId++,
     extraEditorProps,
     editorRef: null,
     closable: typeof closable === 'undefined' ? true : !!closable,
@@ -521,6 +528,44 @@ export const closeLayoutTabs = (
 
     return true;
   });
+};
+
+// The name-derived subset of EditorTab a rename may replace; id/editorRef and the
+// rest are preserved. Kept explicit (not $Shape<EditorTab>) so callers can't touch
+// id/editorRef.
+type RenamedEditorTabFields = {|
+  key: string,
+  label?: string,
+  projectItemName: ?string,
+  tabOptions?: TabOptions,
+  icon?: React.Node,
+  renderCustomIcon: ?(brightness: number) => React.Node,
+|};
+
+/**
+ * Rename tabs in place: each renamed tab keeps its stable `id` and `editorRef`
+ * (so its editor stays mounted), only its name-derived fields are replaced.
+ * `getRenamedFields` returns null to leave a tab unchanged.
+ */
+export const renameEditorTabs = (
+  state: EditorTabsState,
+  getRenamedFields: (editorTab: EditorTab) => ?RenamedEditorTabFields
+): EditorTabsState => {
+  const newPanes = { ...state.panes };
+  for (const paneIdentifier in state.panes) {
+    const pane = state.panes[paneIdentifier];
+    newPanes[paneIdentifier] = {
+      ...pane,
+      editors: pane.editors.map(editorTab => {
+        const renamedFields = getRenamedFields(editorTab);
+        return renamedFields ? { ...editorTab, ...renamedFields } : editorTab;
+      }),
+    };
+  }
+  return {
+    ...state,
+    panes: newPanes,
+  };
 };
 
 export const closeExternalLayoutTabs = (

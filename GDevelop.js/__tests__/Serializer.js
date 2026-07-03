@@ -93,6 +93,23 @@ describe('libGD.js object serialization', function () {
       checkJsonParseAndStringify('[{"a":1},2]');
       checkJsonParseAndStringify('{"a":[1,2,{"b":3},{"c":[4,5]},6],"7":[]}');
     });
+
+    it('should parse a large JSON without overflowing the stack', function () {
+      // Reproduces #8740: FromJSON copied the whole input into a stack VLA,
+      // which overflows the (small, fixed) WASM stack on large projects.
+      // ~5 MB of JSON, far larger than the WASM stack.
+      const childrenCount = 200000;
+      const json =
+        '[' +
+        new Array(childrenCount).fill('{"name":"obj","value":12345}').join(',') +
+        ']';
+
+      const element = gd.Serializer.fromJSON(json);
+      // Round-trips back to the same JSON (also proves the large input was
+      // parsed correctly, not just that it didn't crash).
+      expect(gd.Serializer.toJSON(element)).toBe(json);
+      element.delete();
+    });
   });
 
   // TODO: test failures

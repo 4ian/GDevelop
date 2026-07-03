@@ -418,10 +418,12 @@ export class ObjectGroup extends EmscriptenObject {
   unserializeFrom(element: SerializerElement): void;
 }
 
-export class ObjectVariableHelper extends EmscriptenObject {
+export class ObjectRefactorer extends EmscriptenObject {
   static mergeVariableContainers(objectsContainersList: ObjectsContainersList, objectGroup: ObjectGroup): VariablesContainer;
   static fillAnyVariableBetweenObjects(globalObjectsContainer: ObjectsContainer, objectsContainer: ObjectsContainer, objectGroup: ObjectGroup): void;
   static applyChangesToVariants(eventsBasedObject: EventsBasedObject, objectName: string, changeset: VariablesChangeset): void;
+  static fillMissingGroupVariablesToObject(obj: gdObject, groupVariablesContainer: VariablesContainer): void;
+  static fillMissingGroupBehaviorToObject(globalObjectsContainer: ObjectsContainer, objectsContainer: ObjectsContainer, obj: gdObject, objectGroup: ObjectGroup, behaviorName: string): void;
 }
 
 export class EventsBasedObjectVariantHelper extends EmscriptenObject {
@@ -607,6 +609,7 @@ export class Project extends EmscriptenObject {
   getUseDeprecatedZeroAsDefaultStringVariable(): boolean;
   areEffectsHiddenInEditor(): boolean;
   setEffectsHiddenInEditor(enable: boolean): void;
+  getInitialGDVersion(): string;
   setLastCompilationDirectory(path: string): void;
   getLastCompilationDirectory(): string;
   getExtensionProperties(): ExtensionProperties;
@@ -761,6 +764,8 @@ export class BehaviorsSharedData extends EmscriptenObject {
   getProperties(): MapStringPropertyDescriptor;
   updateProperty(name: string, value: string): boolean;
   initializeContent(): void;
+  isFolded(): boolean;
+  setFolded(folded: boolean): void;
   getPropertiesQuickCustomizationVisibilities(): QuickCustomizationVisibilitiesContainer;
 }
 
@@ -1369,6 +1374,7 @@ export class SerializerElement extends EmscriptenObject {
   consideredAsArray(): boolean;
   addChild(str: string): SerializerElement;
   getChild(str: string): SerializerElement;
+  getOrCreateChild(str: string): SerializerElement;
   setChild(str: string, element: SerializerElement): void;
   hasChild(str: string): boolean;
   getAllChildren(): VectorPairStringSharedPtrSerializerElement;
@@ -1699,6 +1705,7 @@ export class ObjectMetadata extends EmscriptenObject {
   getHelpPath(): string;
   getCategory(): string;
   getAssetStoreTag(): string;
+  setHelpPath(helpPath: string): ObjectMetadata;
   setCategory(categoryFullName: string): ObjectMetadata;
   setAssetStoreTag(assetStoreTag: string): ObjectMetadata;
   addInGameEditorResource(): InGameEditorResourceMetadata;
@@ -1769,6 +1776,7 @@ export class BehaviorMetadata extends EmscriptenObject {
   getGroup(): string;
   getIconFilename(): string;
   getHelpPath(): string;
+  setHelpPath(helpPath: string): BehaviorMetadata;
   addScopedCondition(name: string, fullname: string, description: string, sentence: string, group: string, icon: string, smallicon: string): InstructionMetadata;
   addScopedAction(name: string, fullname: string, description: string, sentence: string, group: string, icon: string, smallicon: string): InstructionMetadata;
   addCondition(name: string, fullname: string, description: string, sentence: string, group: string, icon: string, smallicon: string): InstructionMetadata;
@@ -1847,7 +1855,9 @@ export class PlatformExtension extends EmscriptenObject {
   setDimension(dimension: string): PlatformExtension;
   getDimension(): string;
   addInstructionOrExpressionGroupMetadata(name: string): InstructionOrExpressionGroupMetadata;
-  markAsDeprecated(): void;
+  markAsDeprecatedSince(version: string): PlatformExtension;
+  isDeprecated(): boolean;
+  getDeprecationGDVersion(): string;
   getTags(): VectorString;
   setTags(csvTags: string): PlatformExtension;
   addExpressionAndCondition(type: string, name: string, fullname: string, description: string, sentenceName: string, group: string, icon: string): MultipleInstructionMetadata;
@@ -2194,9 +2204,8 @@ export class ParameterValidationResult extends EmscriptenObject {
 }
 
 export class InstructionValidator extends EmscriptenObject {
-  static validateParameter(platform: Platform, projectScopedContainers: ProjectScopedContainers, instruction: Instruction, metadata: InstructionMetadata, parameterIndex: number, value: string): ParameterValidationResult;
-  static isParameterValid(platform: Platform, projectScopedContainers: ProjectScopedContainers, instruction: Instruction, metadata: InstructionMetadata, parameterIndex: number, value: string): boolean;
-  static hasDeprecationWarnings(platform: Platform, projectScopedContainers: ProjectScopedContainers, instruction: Instruction, metadata: InstructionMetadata, parameterIndex: number, value: string): boolean;
+  static validateParameter(platform: Platform, projectScopedContainers: ProjectScopedContainers, instruction: Instruction, metadata: InstructionMetadata, parameterIndex: number): ParameterValidationResult;
+  static isParameterValid(platform: Platform, projectScopedContainers: ProjectScopedContainers, instruction: Instruction, metadata: InstructionMetadata, parameterIndex: number): boolean;
 }
 
 export class ObjectTools extends EmscriptenObject {
@@ -2211,7 +2220,9 @@ export class PropertyFunctionGenerator extends EmscriptenObject {
   static generateBehaviorGetterAndSetter(project: Project, extension: EventsFunctionsExtension, eventsBasedBehavior: EventsBasedBehavior, property: NamedPropertyDescriptor, isSharedProperties: boolean): void;
   static generateObjectGetterAndSetter(project: Project, extension: EventsFunctionsExtension, eventsBasedObject: EventsBasedObject, property: NamedPropertyDescriptor): void;
   static canGenerateGetterAndSetter(eventsBasedBehavior: AbstractEventsBasedEntity, property: NamedPropertyDescriptor): boolean;
-  static generateConditionSkeleton(project: Project, eventFunction: EventsFunction): void;
+  static generateConditionSkeleton(project: Project, eventsFunction: EventsFunction): void;
+  static generateExpressionSkeleton(project: Project, eventsFunction: EventsFunction): void;
+  static updateReturnActionType(project: Project, eventsFunction: EventsFunction): void;
 }
 
 export class UsedExtensionsResult extends EmscriptenObject {

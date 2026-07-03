@@ -231,6 +231,7 @@ TEST_CASE("ArbitraryResourceWorker", "[common][resources]") {
           "res4", "path/to/file4.png", "audio");
       ArbitraryResourceWorkerTest worker(project.GetResourcesManager());
 
+      // External events that is not associated with any layout
       auto& externalEvents = project.InsertNewExternalEvents("MyExternalEvents", 0);
 
       gd::StandardEvent standardEvent;

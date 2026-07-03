@@ -20,8 +20,8 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function GlobalVariableField(props: ParameterFieldProps, ref) {
     const field = React.useRef<?VariableFieldInterface>(null);
     const [
-      editorOpen,
-      setEditorOpen,
+      variableEditorOpen,
+      setVariableEditorOpen,
     ] = React.useState<VariableDialogOpeningProps | null>(null);
     const focus: FieldFocusFunction = options => {
       if (field.current) field.current.focus(options);
@@ -59,19 +59,20 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           onRequestClose={props.onRequestClose}
           onApply={props.onApply}
           ref={field}
-          onOpenDialog={setEditorOpen}
+          openVariableEditorDialog={setVariableEditorOpen}
           globalObjectsContainer={props.globalObjectsContainer}
           objectsContainer={props.objectsContainer}
           projectScopedContainersAccessor={projectScopedContainersAccessor}
           scope={scope}
           getVariableSourceFromIdentifier={getVariableSourceFromIdentifier}
           editEventsFunctionParameter={null}
+          openEventsBasedEntityPropertyEditorDialog={null}
         />
-        {editorOpen && project && (
+        {variableEditorOpen && project && (
           <GlobalVariablesDialog
             project={project}
             open
-            onCancel={() => setEditorOpen(null)}
+            onCancel={() => setVariableEditorOpen(null)}
             onApply={(selectedVariableName: string | null) => {
               if (
                 selectedVariableName &&
@@ -79,10 +80,10 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
               ) {
                 props.onChange(selectedVariableName);
               }
-              setEditorOpen(null);
+              setVariableEditorOpen(null);
               if (field.current) field.current.updateAutocompletions();
             }}
-            initiallySelectedVariable={editorOpen}
+            initiallySelectedVariable={variableEditorOpen}
             hotReloadPreviewButtonProps={null}
             isListLocked={false}
           />

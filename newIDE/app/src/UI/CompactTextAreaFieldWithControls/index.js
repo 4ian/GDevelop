@@ -31,6 +31,7 @@ export type CompactTextAreaFieldWithControlsProps = {|
 
 export type CompactTextAreaFieldWithControlsInterface = {|
   setCursorPosition: (position: number) => void,
+  focus: () => void,
 |};
 
 export const CompactTextAreaFieldWithControls: React.ComponentType<{
@@ -68,8 +69,15 @@ export const CompactTextAreaFieldWithControls: React.ComponentType<{
       }
     }, []);
 
+    const focus = React.useCallback(() => {
+      if (textareaRef.current) {
+        textareaRef.current.focus();
+      }
+    }, []);
+
     React.useImperativeHandle(ref, () => ({
       setCursorPosition,
+      focus,
     }));
 
     // Auto-resize textarea based on content when maxRows is provided

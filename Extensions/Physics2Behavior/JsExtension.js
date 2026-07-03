@@ -54,24 +54,30 @@ module.exports = {
         else if (normalizedValue === 'kinematic') bodyTypeValue = 'Kinematic';
         else return false;
 
-        behaviorContent.getChild('bodyType').setStringValue(bodyTypeValue);
+        behaviorContent
+          .getOrCreateChild('bodyType')
+          .setStringValue(bodyTypeValue);
         return true;
       }
 
       if (propertyName === 'bullet') {
-        behaviorContent.getChild('bullet').setBoolValue(newValue === '1');
+        behaviorContent
+          .getOrCreateChild('bullet')
+          .setBoolValue(newValue === '1');
         return true;
       }
 
       if (propertyName === 'fixedRotation') {
         behaviorContent
-          .getChild('fixedRotation')
+          .getOrCreateChild('fixedRotation')
           .setBoolValue(newValue === '1');
         return true;
       }
 
       if (propertyName === 'canSleep') {
-        behaviorContent.getChild('canSleep').setBoolValue(newValue === '1');
+        behaviorContent
+          .getOrCreateChild('canSleep')
+          .setBoolValue(newValue === '1');
         return true;
       }
 
@@ -84,7 +90,7 @@ module.exports = {
         else if (normalizedValue === 'polygon') shapeValue = 'Polygon';
         else return false;
 
-        behaviorContent.getChild('shape').setStringValue(shapeValue);
+        behaviorContent.getOrCreateChild('shape').setStringValue(shapeValue);
         return true;
       }
 
@@ -92,7 +98,7 @@ module.exports = {
         const newValueAsNumber = parseFloat(newValue);
         if (newValueAsNumber !== newValueAsNumber) return false;
         behaviorContent
-          .getChild('shapeDimensionA')
+          .getOrCreateChild('shapeDimensionA')
           .setDoubleValue(newValueAsNumber);
         return true;
       }
@@ -101,7 +107,7 @@ module.exports = {
         const newValueAsNumber = parseFloat(newValue);
         if (newValueAsNumber !== newValueAsNumber) return false;
         behaviorContent
-          .getChild('shapeDimensionB')
+          .getOrCreateChild('shapeDimensionB')
           .setDoubleValue(newValueAsNumber);
         return true;
       }
@@ -110,7 +116,7 @@ module.exports = {
         const newValueAsNumber = parseFloat(newValue);
         if (newValueAsNumber !== newValueAsNumber) return false;
         behaviorContent
-          .getChild('shapeOffsetX')
+          .getOrCreateChild('shapeOffsetX')
           .setDoubleValue(newValueAsNumber);
         return true;
       }
@@ -119,7 +125,7 @@ module.exports = {
         const newValueAsNumber = parseFloat(newValue);
         if (newValueAsNumber !== newValueAsNumber) return false;
         behaviorContent
-          .getChild('shapeOffsetY')
+          .getOrCreateChild('shapeOffsetY')
           .setDoubleValue(newValueAsNumber);
         return true;
       }
@@ -144,7 +150,7 @@ module.exports = {
 
       if (propertyName === 'density') {
         behaviorContent
-          .getChild('density')
+          .getOrCreateChild('density')
           .setDoubleValue(parseFloat(newValue));
         return true;
       }
@@ -152,7 +158,9 @@ module.exports = {
       if (propertyName === 'friction') {
         const newValueAsNumber = parseFloat(newValue);
         if (newValueAsNumber !== newValueAsNumber) return false;
-        behaviorContent.getChild('friction').setDoubleValue(newValueAsNumber);
+        behaviorContent
+          .getOrCreateChild('friction')
+          .setDoubleValue(newValueAsNumber);
         return true;
       }
 
@@ -160,7 +168,7 @@ module.exports = {
         const newValueAsNumber = parseFloat(newValue);
         if (newValueAsNumber !== newValueAsNumber) return false;
         behaviorContent
-          .getChild('restitution')
+          .getOrCreateChild('restitution')
           .setDoubleValue(newValueAsNumber);
         return true;
       }
@@ -169,7 +177,7 @@ module.exports = {
         const newValueAsNumber = Math.max(0, parseFloat(newValue));
         if (newValueAsNumber !== newValueAsNumber) return false;
         behaviorContent
-          .getChild('linearDamping')
+          .getOrCreateChild('linearDamping')
           .setDoubleValue(newValueAsNumber);
         return true;
       }
@@ -178,7 +186,7 @@ module.exports = {
         const newValueAsNumber = Math.max(0, parseFloat(newValue));
         if (newValueAsNumber !== newValueAsNumber) return false;
         behaviorContent
-          .getChild('angularDamping')
+          .getOrCreateChild('angularDamping')
           .setDoubleValue(newValueAsNumber);
         return true;
       }
@@ -187,18 +195,22 @@ module.exports = {
         const newValueAsNumber = parseFloat(newValue);
         if (newValueAsNumber !== newValueAsNumber) return false;
         behaviorContent
-          .getChild('gravityScale')
+          .getOrCreateChild('gravityScale')
           .setDoubleValue(newValueAsNumber);
         return true;
       }
 
       if (propertyName === 'layers') {
-        behaviorContent.getChild('layers').setIntValue(parseInt(newValue, 10));
+        behaviorContent
+          .getOrCreateChild('layers')
+          .setIntValue(parseInt(newValue, 10));
         return true;
       }
 
       if (propertyName === 'masks') {
-        behaviorContent.getChild('masks').setIntValue(parseInt(newValue, 10));
+        behaviorContent
+          .getOrCreateChild('masks')
+          .setIntValue(parseInt(newValue, 10));
         return true;
       }
 
@@ -503,14 +515,16 @@ module.exports = {
           sharedContent.getChild('gravityX').getDoubleValue().toString(10)
         )
         .setType('Number')
-        .setMeasurementUnit(gd.MeasurementUnit.getNewton());
+        .setMeasurementUnit(gd.MeasurementUnit.getNewton())
+        .setAdvanced(true);
       sharedProperties
         .getOrCreate('gravityY')
         .setValue(
           sharedContent.getChild('gravityY').getDoubleValue().toString(10)
         )
         .setType('Number')
-        .setMeasurementUnit(gd.MeasurementUnit.getNewton());
+        .setMeasurementUnit(gd.MeasurementUnit.getNewton())
+        .setAdvanced(true);
 
       if (!sharedContent.hasChild('worldScale')) {
         sharedContent.addChild('worldScale');
@@ -528,7 +542,8 @@ module.exports = {
         .setValue(
           sharedContent.getChild('worldScale').getDoubleValue().toString(10)
         )
-        .setType('Number');
+        .setType('Number')
+        .setAdvanced(true);
 
       return sharedProperties;
     };
@@ -948,7 +963,7 @@ module.exports = {
         'ShapeScale',
         _('Shape scale'),
         _(
-          'Modify an object shape scale. It affects custom shape dimensions and shape offset, if custom dimensions are not set the body will be scaled automatically to the object size.'
+          'Modify an object shape scale. It affects custom shape dimensions and shape offset. If custom dimensions are not set, the body will be scaled automatically to the object size.'
         ),
         _('the shape scale'),
         _('Body settings'),
@@ -4296,6 +4311,12 @@ module.exports = {
         sharedData,
         'gravityY',
         '456'
+      ),
+      // Revert back
+      gd.ProjectHelper.sanityCheckBehaviorsSharedDataProperty(
+        sharedData,
+        'gravityY',
+        '9.8'
       ),
     ];
   },

@@ -2,8 +2,7 @@
 const gd: libGDevelop = global.gd;
 
 /** Naive way to check if a variable expression is not using a structure/array. */
-// $FlowFixMe[missing-local-annot]
-const isRootVariableName = fullName =>
+const isRootVariableName = (fullName: string) =>
   !fullName.includes('.') && !fullName.includes('[') && fullName.length > 0;
 
 /**

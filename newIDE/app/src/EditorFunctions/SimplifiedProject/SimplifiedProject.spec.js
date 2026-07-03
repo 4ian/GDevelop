@@ -2,11 +2,11 @@
 import { makeSimplifiedProjectBuilder } from './SimplifiedProject';
 import { makeTestProject } from '../../fixtures/TestProject';
 import { makeTestExtensions } from '../../fixtures/TestExtensions';
-const initializeGDevelopJs = require('libGD.js-for-tests-only');
+
+const gd: libGDevelop = global.gd;
 
 describe('SimplifiedProject', () => {
-  it('should create a simplified project JSON with global objects and scenes', async () => {
-    const gd = await initializeGDevelopJs();
+  it('should create a simplified project JSON with global objects and scenes', () => {
     const { project } = makeTestProject(gd);
     const simplifiedJson = makeSimplifiedProjectBuilder(
       gd
@@ -59,6 +59,7 @@ describe('SimplifiedProject', () => {
         ],
         "globalVariables": Array [],
         "properties": Object {
+          "firstLayout": "",
           "gameResolutionHeight": 600,
           "gameResolutionWidth": 800,
         },
@@ -349,6 +350,13 @@ describe('SimplifiedProject', () => {
                   "MySpriteObject_With_A_Veeeerrryyyyyyyyy_Looooooooooooong_Name",
                   "MySpriteObjectWithoutBehaviors",
                 ],
+                "variables": undefined,
+              },
+              Object {
+                "behaviors": undefined,
+                "objectGroupName": "EmptyGroup",
+                "objectGroupType": "",
+                "objectNames": Array [],
                 "variables": undefined,
               },
             ],
@@ -1023,8 +1031,7 @@ describe('SimplifiedProject', () => {
     `);
   });
 
-  it('should include summaries of project specific extensions', async () => {
-    const gd = await initializeGDevelopJs();
+  it('should include summaries of project specific extensions', () => {
     makeTestExtensions(gd);
 
     const project = gd.ProjectHelper.createNewGDJSProject();
@@ -1102,8 +1109,7 @@ describe('SimplifiedProject', () => {
     project.delete();
   });
 
-  it('should include summaries of project specific extensions with events based objects', async () => {
-    const gd = await initializeGDevelopJs();
+  it('should include summaries of project specific extensions with events based objects', () => {
     makeTestExtensions(gd);
 
     const { project } = makeTestProject(gd);

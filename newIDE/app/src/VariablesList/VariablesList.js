@@ -85,6 +85,7 @@ import { MarkdownText } from '../UI/MarkdownText';
 import Paper from '../UI/Paper';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 import ContextMenu, { type ContextMenuInterface } from '../UI/Menu/ContextMenu';
+import { exceptionallyGuardAgainstDeadObject } from '../Utils/IsNullPtr';
 
 const gd: libGDevelop = global.gd;
 
@@ -911,6 +912,12 @@ const VariablesList: React.ComponentType<{
   const pasteClipboardContent = React.useCallback(
     () => {
       if (!Clipboard.has(CLIPBOARD_KIND)) return;
+      const variablesContainer = exceptionallyGuardAgainstDeadObject(
+        props.variablesContainer
+      );
+      if (!variablesContainer) {
+        return;
+      }
       const newSelectedNodes = [];
 
       const clipboardContent = Clipboard.get(CLIPBOARD_KIND);
@@ -944,10 +951,10 @@ const VariablesList: React.ComponentType<{
           if (props.isListLocked) return;
           if (!name) return;
           const { name: newName } = insertInVariablesContainer(
-            props.variablesContainer,
+            variablesContainer,
             gd.Project.getSafeName(name),
             serializedVariable,
-            props.variablesContainer.count(),
+            variablesContainer.count(),
             props.inheritedVariablesContainer
           );
           newSelectedNodes.push(newName);
@@ -958,10 +965,7 @@ const VariablesList: React.ComponentType<{
           const {
             name: targetVariableName,
             lineage: targetVariableLineage,
-          } = getVariableContextFromNodeId(
-            targetNode,
-            props.variablesContainer
-          );
+          } = getVariableContextFromNodeId(targetNode, variablesContainer);
           if (!targetVariableName) return;
 
           const targetParentVariable = getDirectParentVariable(
@@ -971,10 +975,10 @@ const VariablesList: React.ComponentType<{
             if (props.isListLocked) return;
             if (!name) return;
             const { name: newName } = insertInVariablesContainer(
-              props.variablesContainer,
+              variablesContainer,
               name,
               serializedVariable,
-              props.variablesContainer.getPosition(targetVariableName) + 1,
+              variablesContainer.getPosition(targetVariableName) + 1,
               props.inheritedVariablesContainer
             );
             newSelectedNodes.push(newName);
@@ -1526,16 +1530,22 @@ const VariablesList: React.ComponentType<{
 
   const addVariable = React.useCallback(
     () => {
+      const variablesContainer = exceptionallyGuardAgainstDeadObject(
+        props.variablesContainer
+      );
+      if (!variablesContainer) {
+        return;
+      }
       const addAtTopLevel =
         selectedNodes.length === 0 ||
         selectedNodes.some(node => node.startsWith(inheritedPrefix));
 
       if (addAtTopLevel) {
         const { name: newName, variable } = insertInVariablesContainer(
-          props.variablesContainer,
+          variablesContainer,
           'Variable',
           null,
-          props.variablesContainer.count(),
+          variablesContainer.count(),
           props.inheritedVariablesContainer
         );
         _onChange();
@@ -1553,10 +1563,9 @@ const VariablesList: React.ComponentType<{
       const oldestAncestry = getOldestAncestryVariable(targetLineage);
       let position;
       if (!oldestAncestry) {
-        position = props.variablesContainer.getPosition(targetVariableName) + 1;
+        position = variablesContainer.getPosition(targetVariableName) + 1;
       } else {
-        position =
-          props.variablesContainer.getPosition(oldestAncestry.name) + 1;
+        position = variablesContainer.getPosition(oldestAncestry.name) + 1;
       }
       const { name: newName, variable } = insertInVariablesContainer(
         props.variablesContainer,
@@ -1954,7 +1963,13 @@ const VariablesList: React.ComponentType<{
           newVariable,
           serializeToJSObject(changedInheritedVariable)
         );
-        variable = props.variablesContainer.insert(name, newVariable, 0);
+        const variablesContainer = exceptionallyGuardAgainstDeadObject(
+          props.variablesContainer
+        );
+        if (!variablesContainer) {
+          return;
+        }
+        variable = variablesContainer.insert(name, newVariable, 0);
 
         setSelectedNodes(selectedNodes => {
           const newSelectedNodes = [...selectedNodes];

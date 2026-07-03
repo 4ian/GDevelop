@@ -61,7 +61,8 @@ const untransformedPaths = [
   'Extensions/TileMap/pako/dist/pako.min.js',
   'Extensions/TileMap/pixi-tilemap/dist/pixi-tilemap.umd.js',
   'Extensions/TileMap/helper/TileMapHelper.js',
-  'Extensions/Spine/pixi-spine/pixi-spine.js',
+  'Extensions/Spine/spine-pixi-v7/spine-pixi-v7-pre.js',
+  'Extensions/Spine/spine-pixi-v7/spine-pixi-v7.js',
 ].map((untransformedPath) => path.resolve(gdevelopRootPath, untransformedPath));
 
 /**

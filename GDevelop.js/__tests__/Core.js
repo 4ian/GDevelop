@@ -2582,6 +2582,77 @@ describe('libGD.js', function () {
 
       action.delete();
     });
+
+    it('should use the default value of optional yes/no parameters when left empty', function () {
+      // `SetFullScreen` has a required yes/no parameter (PARAM1) and an
+      // optional yes/no parameter defaulting to "yes" (PARAM2).
+      let action = new gd.Instruction();
+      action.setType('SetFullScreen');
+      action.setParametersCount(3);
+
+      let formattedTexts = gd.InstructionSentenceFormatter.get().getAsFormattedText(
+        action,
+        gd.MetadataProvider.getActionMetadata(gd.JsPlatform.get(), 'SetFullScreen')
+      );
+
+      // An empty required parameter is rendered as "no"...
+      expect(formattedTexts.getString(1)).toBe('no');
+      // ...while an empty optional parameter falls back to its default value.
+      expect(formattedTexts.getString(3)).toBe('yes');
+
+      action.delete();
+    });
+  });
+
+  describe('InstructionValidator', function () {
+    let project = null;
+    let layout = null;
+    let projectScopedContainers = null;
+    beforeAll(() => {
+      project = new gd.ProjectHelper.createNewGDJSProject();
+      layout = project.insertNewLayout('Scene', 0);
+      projectScopedContainers = gd.ProjectScopedContainers.makeNewProjectScopedContainersForProjectAndLayout(
+        project,
+        layout
+      );
+    });
+    afterAll(() => {
+      project.delete();
+    });
+
+    const validateVolumeParameter = value => {
+      // `PlaySoundOnChannel` has an optional "expression" parameter (Volume,
+      // PARAM4) defaulting to "100".
+      const action = new gd.Instruction();
+      action.setType('PlaySoundOnChannel');
+      action.setParametersCount(6);
+      action.setParameter(4, value);
+      const result = gd.InstructionValidator.validateParameter(
+        gd.JsPlatform.get(),
+        projectScopedContainers,
+        action,
+        gd.MetadataProvider.getActionMetadata(
+          gd.JsPlatform.get(),
+          'PlaySoundOnChannel'
+        ),
+        4
+      );
+      const isValid = result.isValid();
+      action.delete();
+      return isValid;
+    };
+
+    it('considers an optional parameter left empty as valid', function () {
+      // The default value is used when generating the code, so it must not be
+      // shown as an error in the events sheet.
+      expect(validateVolumeParameter('')).toBe(true);
+    });
+
+    it('still validates the value of a filled optional parameter', function () {
+      expect(validateVolumeParameter('50')).toBe(true);
+      expect(validateVolumeParameter('1 +')).toBe(false);
+      expect(validateVolumeParameter('"Not a number"')).toBe(false);
+    });
   });
 
   describe('EventsRefactorer', function () {

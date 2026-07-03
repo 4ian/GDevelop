@@ -7,6 +7,7 @@ declare class gdBehaviorMetadata {
   getGroup(): string;
   getIconFilename(): string;
   getHelpPath(): string;
+  setHelpPath(helpPath: string): gdBehaviorMetadata;
   addScopedCondition(name: string, fullname: string, description: string, sentence: string, group: string, icon: string, smallicon: string): gdInstructionMetadata;
   addScopedAction(name: string, fullname: string, description: string, sentence: string, group: string, icon: string, smallicon: string): gdInstructionMetadata;
   addCondition(name: string, fullname: string, description: string, sentence: string, group: string, icon: string, smallicon: string): gdInstructionMetadata;

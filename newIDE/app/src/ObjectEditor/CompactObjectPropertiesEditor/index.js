@@ -1,5 +1,6 @@
 // @flow
 import { type I18n as I18nType } from '@lingui/core';
+import { Trans, t } from '@lingui/macro';
 import * as React from 'react';
 import { type UnsavedChanges } from '../../MainFrame/UnsavedChangesContext';
 import VariablesList, {
@@ -12,7 +13,6 @@ import ScrollView, { type ScrollViewInterface } from '../../UI/ScrollView';
 import { Column, Line, Spacer, marginsSize } from '../../UI/Grid';
 import { Separator } from '../../CompactPropertiesEditor';
 import Text from '../../UI/Text';
-import { Trans, t } from '@lingui/macro';
 import IconButton from '../../UI/IconButton';
 import ShareExternal from '../../UI/CustomSvgIcons/ShareExternal';
 import EventsRootVariablesFinder from '../../Utils/EventsRootVariablesFinder';
@@ -32,6 +32,7 @@ import Add from '../../UI/CustomSvgIcons/Add';
 import Trash from '../../UI/CustomSvgIcons/Trash';
 import Edit from '../../UI/CustomSvgIcons/ShareExternal';
 import { useManageObjectBehaviors } from '../../BehaviorsEditor';
+import { getAllVisibleBehaviorNames } from '../../Utils/Behavior';
 import Object3d from '../../UI/CustomSvgIcons/Object3d';
 import Object2d from '../../UI/CustomSvgIcons/Object2d';
 import { mapFor } from '../../Utils/MapFor';
@@ -65,6 +66,7 @@ import {
   type Field,
   type FieldChoices,
 } from '../../PropertiesEditor/PropertiesEditorSchema';
+import useVariablesContainerRefactoring from '../../VariablesList/useVariablesContainerRefactoring';
 
 const gd: libGDevelop = global.gd;
 
@@ -261,9 +263,12 @@ type Props = {|
   resourceManagementProps: ResourceManagementProps,
   layout?: ?gdLayout,
   eventsFunctionsExtension: gdEventsFunctionsExtension | null,
+  /** Only set when a default variant is edited */
+  eventsBasedObject: gdEventsBasedObject | null,
   onUpdateBehaviorsSharedData: () => void,
   objectsContainer: gdObjectsContainer,
   globalObjectsContainer: gdObjectsContainer | null,
+  initialInstances: gdInitialInstancesContainer,
   layersContainer: gdLayersContainer,
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   unsavedChanges?: ?UnsavedChanges,
@@ -295,9 +300,11 @@ export const CompactObjectPropertiesEditor = ({
   resourceManagementProps,
   layout,
   eventsFunctionsExtension,
+  eventsBasedObject,
   onUpdateBehaviorsSharedData,
   objectsContainer,
   globalObjectsContainer,
+  initialInstances,
   layersContainer,
   projectScopedContainersAccessor,
   unsavedChanges,
@@ -355,13 +362,18 @@ export const CompactObjectPropertiesEditor = ({
   );
 
   // Behaviors:
+  const allVisibleBehaviorNames = getAllVisibleBehaviorNames([object]);
+  const allVisibleBehaviors = allVisibleBehaviorNames.map(behaviorName =>
+    object.getBehavior(behaviorName)
+  );
   const {
     openNewBehaviorDialog,
     newBehaviorDialog,
     removeBehavior,
   } = useManageObjectBehaviors({
     project,
-    object,
+    projectScopedContainersAccessor,
+    objects: [object],
     isChildObject: !layout,
     eventsFunctionsExtension,
     onUpdate: forceUpdate,
@@ -369,15 +381,15 @@ export const CompactObjectPropertiesEditor = ({
     onUpdateBehaviorsSharedData,
     onWillInstallExtension,
     onExtensionInstalled,
+    allVisibleBehaviorNames,
   });
 
-  const allVisibleBehaviors = object
-    .getAllBehaviorNames()
-    .toJSArray()
-    .map(behaviorName => object.getBehavior(behaviorName))
-    .filter(behavior => !behavior.isDefaultBehavior());
-
   // Events based object children:
+  /** The events-based object according to the selected object type.
+   *
+   * This is not the same as `eventsBasedObject` which is the events-based
+   * object of the edited variant.
+   */
   const customObjectEventsBasedObject = project.hasEventsBasedObject(
     objectConfiguration.getType()
   )
@@ -538,6 +550,19 @@ export const CompactObjectPropertiesEditor = ({
     persistedScrollType: 'object',
   });
 
+  // Variable refactoring: snapshot on object selection, apply on deselection/unmount.
+  const { onVariablesUpdated } = useVariablesContainerRefactoring({
+    project,
+    variablesContainer: object.getVariables(),
+    initialInstances,
+    objectName: object.getName(),
+    eventsBasedObject,
+    enabled: objects.length === 1,
+    objectGroup: null,
+    objectsContainer: null,
+    globalObjectsContainer: null,
+  });
+
   const propertiesSchema = React.useMemo(
     () => {
       if (schemaRecomputeTrigger) {
@@ -562,6 +587,7 @@ export const CompactObjectPropertiesEditor = ({
         object,
         layersContainer,
         visibility: 'All',
+        shouldDisabledFieldsWithMixedValues: false,
       });
 
       if (layout && layout.getObjects().hasObjectNamed(object.getName())) {
@@ -654,7 +680,6 @@ export const CompactObjectPropertiesEditor = ({
                       onEditObject,
                     })
                   }
-                  // $FlowFixMe[incompatible-type]
                   onRefreshAllFields={forceRecomputeSchema}
                 />
                 {shouldDisplayVariant && (
@@ -822,9 +847,7 @@ export const CompactObjectPropertiesEditor = ({
                         <CompactBehaviorComponent
                           project={project}
                           behaviorMetadata={behaviorMetadata}
-                          behavior={behavior}
-                          behaviorOverriding={null}
-                          initialInstance={null}
+                          behaviors={[behavior]}
                           object={object}
                           layersContainer={layersContainer}
                           onBehaviorUpdated={() => {}}
@@ -892,7 +915,7 @@ export const CompactObjectPropertiesEditor = ({
                     projectScopedContainersAccessor
                   }
                   directlyStoreValueChangesWhileEditing
-                  variablesContainer={variablesContainer}
+                  variablesContainer={object.getVariables()}
                   areObjectVariables
                   size="compact"
                   onComputeAllVariableNames={() =>
@@ -906,6 +929,7 @@ export const CompactObjectPropertiesEditor = ({
                       : []
                   }
                   historyHandler={historyHandler}
+                  onVariablesUpdated={onVariablesUpdated}
                   toolbarIconStyle={styles.icon}
                   compactEmptyPlaceholderText={
                     <Trans>

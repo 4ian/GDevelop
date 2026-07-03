@@ -1,13 +1,13 @@
 // @flow
 import * as React from 'react';
 import { I18n } from '@lingui/react';
+import { type RenderEditorContainerPropsWithRef } from '../BaseEditor';
 import {
-  type RenderEditorContainerPropsWithRef,
   type SceneEventsOutsideEditorChanges,
   type InstancesOutsideEditorChanges,
   type ObjectsOutsideEditorChanges,
   type ObjectGroupsOutsideEditorChanges,
-} from '../BaseEditor';
+} from '../../../EditorFunctions/OutsideEditorChanges';
 import {
   type FileMetadataAndStorageProviderName,
   type FileMetadata,
@@ -197,10 +197,14 @@ export type HomePageEditorInterface = {|
   getProject: () => void,
   updateToolbar: () => void,
   forceUpdateEditor: () => void,
-  onEventsBasedObjectChildrenEdited: () => void,
+  onEventsBasedObjectChildrenEdited: (
+    eventsBasedObject: gdEventsBasedObject,
+    options?: {| editedObject?: ?gdObject, hasResourceChanged?: boolean |}
+  ) => void,
   onSceneObjectEdited: (
     scene: gdLayout,
-    objectWithContext: ObjectWithContext
+    objectWithContext: ObjectWithContext,
+    hasResourceChanged?: boolean
   ) => void,
   onSceneObjectsDeleted: (scene: gdLayout) => void,
   onSceneEventsModifiedOutsideEditor: (
@@ -616,6 +620,7 @@ export const HomePage: React.ComponentType<Props> = React.memo<Props>(
                       onWillInstallExtension={onWillInstallExtension}
                       onExtensionInstalled={onExtensionInstalled}
                       onCloseAskAi={onCloseAskAi}
+                      onOpenAskAi={onOpenAskAi}
                       closeProject={closeProject}
                       games={games}
                       onRefreshGames={fetchGames}

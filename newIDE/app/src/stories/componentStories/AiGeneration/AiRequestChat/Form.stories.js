@@ -28,41 +28,45 @@ export default {
 };
 
 const commonProps = {
+  // Chat and Agent modes were merged into a single "orchestrator" mode, with
+  // the preset now choosing a reasoning level (see ReasoningLevelSelector).
   aiConfigurationPresetsWithAvailability: [
     {
+      mode: 'orchestrator',
       id: 'default',
       nameByLocale: { en: 'Default' },
-      mode: 'chat',
+      reasoningLevelByLocale: { en: 'Medium' },
+      reasoningLevel: 1,
+      isDefault: true,
       disabled: false,
       enableWith: null,
+      enabledWithPlans: [],
     },
     {
-      id: 'expert-mode',
-      nameByLocale: { en: 'Expert Mode' },
-      mode: 'chat',
+      mode: 'orchestrator',
+      id: 'high-reasoning',
+      nameByLocale: { en: 'High reasoning' },
+      reasoningLevelByLocale: { en: 'High' },
+      reasoningLevel: 2,
+      isDefault: false,
       disabled: false,
       enableWith: null,
+      enabledWithPlans: [],
     },
     {
-      id: 'default',
-      nameByLocale: { en: 'Default' },
-      mode: 'agent',
-      disabled: false,
-      enableWith: null,
-    },
-    {
-      id: 'extended-thinking',
-      nameByLocale: { en: 'Extended Thinking' },
-      mode: 'agent',
-      disabled: false,
-      enableWith: null,
-    },
-    {
+      mode: 'orchestrator',
       id: 'max-mode',
       nameByLocale: { en: 'MAX mode' },
-      mode: 'agent',
+      reasoningLevelByLocale: { en: 'Maximum' },
+      reasoningLevel: 3,
+      isDefault: false,
       disabled: true,
       enableWith: 'higher-tier-plan',
+      enabledWithPlans: [
+        'gdevelop_gold',
+        'gdevelop_startup',
+        'gdevelop_education',
+      ],
     },
   ],
   editorCallbacks: {
@@ -83,7 +87,7 @@ const commonProps = {
   price: {
     priceInCredits: 5,
     variablePrice: {
-      agent: {
+      orchestrator: {
         default: {
           minimumPriceInCredits: 4,
           maximumPriceInCredits: 20,
@@ -94,13 +98,14 @@ const commonProps = {
   lastSendError: null,
   availableCredits: 400,
   onSendFeedback: async () => {},
-  hasOpenedProject: false,
+  // The in-editor form appears with a project open, so the orchestrator controls
+  // (reasoning selector and "Auto edit" button) are shown.
+  hasOpenedProject: true,
   editorFunctionCallResults: [],
   increaseQuotaOffering: 'subscribe',
   onProcessFunctionCalls: async () => {},
   onStop: async () => {},
   onStartOrOpenChat: () => {},
-  aiRequestMode: 'agent',
   saveProject: async () => {},
   onRestore: async () => {},
 };

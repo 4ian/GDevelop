@@ -39,14 +39,23 @@ const resourceKindToInputAcceptedMimes = {
   json: ['application/json'],
   tilemap: ['application/json'],
   tileset: ['application/json'],
-  bitmapFont: [],
+  bitmapFont: [
+    'file',
+    // iOS Safari/WKWebView does not filter file inputs by extension and .fnt/.xml
+    // have no recognized mime type, so they get greyed out in the picker. Using the
+    // 'file' pseudo-mime makes them selectable; validation happens post-picking.
+  ],
   model3D: [
     'file',
     // The following mime type is not handled by Safari. The verification will be handled
     // after the files have been picked.
     // 'model/gltf-binary'
   ],
-  atlas: [],
+  atlas: [
+    'file',
+    // Same as above: .atlas files have no recognized mime type on iOS Safari, so the
+    // 'file' pseudo-mime is used and validation happens post-picking.
+  ],
   spine: ['application/json'],
   javascript: ['text/javascript'],
 };

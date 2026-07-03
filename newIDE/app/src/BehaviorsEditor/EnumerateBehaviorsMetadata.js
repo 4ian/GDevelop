@@ -1,6 +1,7 @@
 // @flow
 import { mapFor } from '../Utils/MapFor';
 import flatten from 'lodash/flatten';
+import { shouldHideExtension } from '../Version';
 
 export type EnumeratedBehaviorMetadata = {|
   extension: gdPlatformExtension,
@@ -25,6 +26,9 @@ export const enumerateBehaviorsMetadata = (
   return flatten(
     mapFor(0, extensionsList.size(), i => {
       const extension = extensionsList.at(i);
+      if (shouldHideExtension(project, extension)) {
+        return [];
+      }
 
       return extension
         .getBehaviorsTypes()

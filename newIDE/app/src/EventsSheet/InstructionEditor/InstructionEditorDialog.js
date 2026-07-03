@@ -39,6 +39,7 @@ import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/E
 import { fillBehaviorParameter } from '../../EventsFunctionsExtensionEditor/EventsFunctionConfigurationEditor/CompactEventsFunctionParametersEditor.js';
 import { fillBehaviorProperty } from '../../EventsFunctionsExtensionEditor/EventsBasedBehaviorOrObjectEditor/EventsBasedBehaviorOrObjectPropertiesEditor';
 import { type VariableDialogOpeningProps } from '../../VariablesList/VariablesEditorDialog';
+import { ExtensionStoreContext } from '../../AssetStore/ExtensionStore/ExtensionStoreContext';
 
 const gd: libGDevelop = global.gd;
 
@@ -80,6 +81,7 @@ type Props = {|
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
   editEventsFunctionParameter: VariableDialogOpeningProps => void,
+  openEventsBasedEntityPropertyEditorDialog: VariableDialogOpeningProps => void,
 |};
 
 const getInitialStepName = (isNewInstruction: boolean): StepName => {
@@ -117,6 +119,7 @@ const InstructionEditorDialog = ({
   onExtensionInstalled,
   i18n,
   editEventsFunctionParameter,
+  openEventsBasedEntityPropertyEditorDialog,
 }: Props) => {
   const forceUpdate = useForceUpdate();
   const [
@@ -173,6 +176,7 @@ const InstructionEditorDialog = ({
     setNewExtensionDialogOpen,
   ] = React.useState<boolean>(false);
   const shouldAutofocusInput = useShouldAutofocusInput();
+  const { setSearchText } = React.useContext(ExtensionStoreContext);
 
   // Handle the back button
   const stepBackFrom = (origin: StepName) => {
@@ -215,7 +219,8 @@ const InstructionEditorDialog = ({
           project,
           chosenObject,
           type,
-          defaultName
+          defaultName,
+          /* shouldSkipExistingBehaviorSilently= */ false
         );
 
         if (wasBehaviorAdded) {
@@ -241,7 +246,8 @@ const InstructionEditorDialog = ({
             project,
             chosenObject,
             type,
-            defaultName
+            defaultName,
+            /* shouldSkipExistingBehaviorSilently= */ false
           );
 
           if (wasBehaviorAdded) {
@@ -364,7 +370,10 @@ const InstructionEditorDialog = ({
           }}
           focusOnMount={shouldAutofocusInput && !instructionType}
           onSearchStartOrReset={forceUpdate}
-          onClickMore={() => setNewExtensionDialogOpen(true)}
+          onOpenExtensionStore={props => {
+            setSearchText(props.searchText);
+            setNewExtensionDialogOpen(true);
+          }}
           i18n={i18n}
         />
       )}
@@ -388,6 +397,9 @@ const InstructionEditorDialog = ({
       focusOnMount={shouldAutofocusInput && !!instructionType}
       noHelpButton
       id="object-instruction-parameters"
+      openEventsBasedEntityPropertyEditorDialog={
+        openEventsBasedEntityPropertyEditorDialog
+      }
     />
   );
 
@@ -556,9 +568,9 @@ const InstructionEditorDialog = ({
           onChoose={addBehavior}
           onWillInstallExtension={onWillInstallExtension}
           onExtensionInstalled={extensionName => {
+            onExtensionInstalled(extensionName);
             freeInstructionComponentRef.current &&
               freeInstructionComponentRef.current.reEnumerateInstructions(i18n);
-            onExtensionInstalled(extensionName);
           }}
           shouldShowCapabilityBehaviors={
             chosenObject && !isSceneObject(chosenObject)
@@ -574,11 +586,11 @@ const InstructionEditorDialog = ({
               onWillInstallExtension={onWillInstallExtension}
               onExtensionInstalled={extensionName => {
                 setNewExtensionDialogOpen(false);
+                onExtensionInstalled(extensionName);
                 freeInstructionComponentRef.current &&
                   freeInstructionComponentRef.current.reEnumerateInstructions(
                     i18n
                   );
-                onExtensionInstalled(extensionName);
               }}
             />
           )}

@@ -148,10 +148,14 @@ class GD_CORE_API PlatformExtension {
   }
 
   /**
-   * \brief Mark this extension as deprecated: the IDE will hide it from the
-   * user.
+   * \brief Mark this extension as deprecated: the IDE will hide it from users
+   * in new projects.
    */
-  void MarkAsDeprecated() { deprecated = true; }
+  PlatformExtension& MarkAsDeprecatedSince(const gd::String& version) {
+    deprecated = true;
+    deprecationGDVersion = version;
+    return *this;
+  }
 
   ///@}
 
@@ -477,6 +481,13 @@ class GD_CORE_API PlatformExtension {
   bool IsDeprecated() const { return deprecated; }
 
   /**
+   * Get the version of GDevelop when this extension got deprecated.
+   */
+  const gd::String& GetDeprecationGDVersion() {
+    return deprecationGDVersion;
+  };
+
+  /**
    * \brief Get the namespace of the extension.
    * \note The namespace is simply the name of the extension concatenated with
    * "::" at the end.
@@ -739,8 +750,9 @@ static gd::String GetVariantFullType(const gd::String& extensionName,
   gd::String category;
   gd::String author;   ///< Author displayed to users in the editor.
   gd::String license;  ///< License name displayed to users in the editor.
-  bool deprecated;     ///< true if the extension is deprecated and shouldn't be
-                       ///< shown in IDE.
+  bool deprecated = false; ///< true if the extension is deprecated and
+                           ///< shouldn't be shown in IDE.
+  gd::String deprecationGDVersion;
   gd::String helpPath;  ///< The relative path to the help for this extension in
                         ///< the documentation.
   gd::String iconUrl;   ///< The URL to the icon to be shown for this extension.

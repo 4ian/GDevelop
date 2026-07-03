@@ -16,12 +16,15 @@ import {
   type RelatedAiRequestLastMessages,
   type ResourceSearchAndInstallOptions,
   type ResourceSearchAndInstallResult,
+  type ToolOptions,
+} from '.';
+import {
   type SceneEventsOutsideEditorChanges,
   type InstancesOutsideEditorChanges,
   type ObjectsOutsideEditorChanges,
   type ObjectGroupsOutsideEditorChanges,
-  type ToolOptions,
-} from '.';
+  type ProjectItemRenamedOutsideEditorChanges,
+} from './OutsideEditorChanges';
 import PixiResourcesLoader from '../ObjectsRendering/PixiResourcesLoader';
 import { type EnsureExtensionInstalledOptions } from '../AiGeneration/UseEnsureExtensionInstalled';
 
@@ -48,6 +51,9 @@ type ProcessEditorFunctionCallsOptions = {|
   onObjectGroupsModifiedOutsideEditor: (
     changes: ObjectGroupsOutsideEditorChanges
   ) => void,
+  onProjectItemRenamedOutsideEditor: (
+    changes: ProjectItemRenamedOutsideEditorChanges
+  ) => void,
   ensureExtensionInstalled: (
     options: EnsureExtensionInstalledOptions
   ) => Promise<void>,
@@ -73,6 +79,7 @@ export const processEditorFunctionCalls = async ({
   onInstancesModifiedOutsideEditor,
   onObjectsModifiedOutsideEditor,
   onObjectGroupsModifiedOutsideEditor,
+  onProjectItemRenamedOutsideEditor,
   relatedAiRequestId,
   getRelatedAiRequestLastMessages,
   ensureExtensionInstalled,
@@ -100,6 +107,18 @@ export const processEditorFunctionCalls = async ({
         success: false,
         output: {
           message: 'No project opened.',
+        },
+      });
+      continue;
+    }
+    if (project && name === 'initialize_project') {
+      results.push({
+        status: 'finished',
+        call_id,
+        success: false,
+        output: {
+          message:
+            'A project is already open — initialize_project cannot be called. If starting from a new project is the right approach, suggest the user close the current project and start a new AI request.',
         },
       });
       continue;
@@ -175,6 +194,7 @@ export const processEditorFunctionCalls = async ({
         onInstancesModifiedOutsideEditor,
         onObjectsModifiedOutsideEditor,
         onObjectGroupsModifiedOutsideEditor,
+        onProjectItemRenamedOutsideEditor,
         ensureExtensionInstalled,
         onWillInstallExtension,
         onExtensionInstalled,

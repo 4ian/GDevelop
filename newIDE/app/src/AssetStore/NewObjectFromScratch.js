@@ -12,14 +12,18 @@ import { type AssetShortHeader } from '../Utils/GDevelopServices/Asset';
 import TextButton from '../UI/TextButton';
 import { t, Trans } from '@lingui/macro';
 import ChevronArrowLeft from '../UI/CustomSvgIcons/ChevronArrowLeft';
-import AssetsList from './AssetsList';
+import AssetsList, { type AssetsListInterface } from './AssetsList';
 import SearchBar from '../UI/SearchBar';
+import {
+  assetStoreHomePageState,
+  type AssetStorePageState,
+} from './AssetStoreNavigator';
 import { type ObjectShortHeader } from '../Utils/GDevelopServices/Extension';
 import { ObjectStoreContext, type ObjectCategory } from './ObjectStoreContext';
 import { ListSearchResults } from '../UI/Search/ListSearchResults';
 import { ObjectListItem } from './ObjectListItem';
 import { type SearchMatch } from '../UI/Search/UseSearchStructuredItem';
-import { ColumnStackLayout } from '../UI/Layout';
+import { ColumnStackLayout, LineStackLayout } from '../UI/Layout';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import { ResponsiveLineStackLayout } from '../UI/Layout';
 import SearchBarSelectField from '../UI/SearchBarSelectField';
@@ -45,6 +49,8 @@ export const CustomObjectPackResults = ({
   isAssetBeingInstalled,
 }: CustomObjectPackResultsProps): React.Node => {
   const { useSearchItem, error } = React.useContext(AssetStoreContext);
+  const [searchText, setSearchText] = React.useState<string>('');
+  const assetsList = React.useRef<?AssetsListInterface>(null);
   // Memoizing the parameters of the search as it seems to trigger infinite rendering if not.
   const chosenCategory: ChosenCategory = React.useMemo(
     () => ({
@@ -60,33 +66,57 @@ export const CustomObjectPackResults = ({
   // $FlowFixMe[missing-empty-array-annot]
   const filters = React.useMemo(() => [], []);
   const selectedAssetPackSearchResults = useSearchItem(
-    '',
+    searchText,
     chosenCategory,
     null,
     filters
   );
 
+  // A page state is used so the AssetsList can handle pagination (the asset
+  // store navigator is not used in this dialog).
+  const currentPage = React.useRef<AssetStorePageState>({
+    ...assetStoreHomePageState,
+    displayAssets: true,
+  }).current;
+
   return (
-    <>
-      <Column noMargin expand>
-        <Line>
-          <TextButton
-            icon={<ChevronArrowLeft />}
-            label={<Trans>Back</Trans>}
-            onClick={onBack}
-            disabled={isAssetBeingInstalled}
-          />
-        </Line>
-        <AssetsList
-          assetShortHeaders={selectedAssetPackSearchResults}
-          error={error}
-          onOpenDetails={assetShortHeader => {
-            if (isAssetBeingInstalled) return;
-            onAssetSelect(assetShortHeader);
-          }}
+    <Column noMargin expand>
+      <LineStackLayout alignItems="center">
+        <TextButton
+          icon={<ChevronArrowLeft />}
+          label={<Trans>Back</Trans>}
+          onClick={onBack}
+          disabled={isAssetBeingInstalled}
         />
-      </Column>
-    </>
+        <Column expand noMargin>
+          <SearchBar
+            value={searchText}
+            onChange={newSearchText => {
+              setSearchText(newSearchText);
+              // Reset the pagination and scroll when the search changes.
+              currentPage.pageBreakIndex = 0;
+              const assetsListInterface = assetsList.current;
+              if (assetsListInterface) {
+                assetsListInterface.scrollToPosition(0);
+                assetsListInterface.setPageBreakIndex(0);
+              }
+            }}
+            onRequestSearch={() => {}}
+            placeholder={t`Search assets`}
+          />
+        </Column>
+      </LineStackLayout>
+      <AssetsList
+        ref={assetsList}
+        assetShortHeaders={selectedAssetPackSearchResults}
+        currentPage={currentPage}
+        error={error}
+        onOpenDetails={assetShortHeader => {
+          if (isAssetBeingInstalled) return;
+          onAssetSelect(assetShortHeader);
+        }}
+      />
+    </Column>
   );
 };
 
@@ -171,7 +201,6 @@ export default function NewObjectFromScratch({
               eventsBasedObject
             );
           }
-          // $FlowFixMe[incompatible-type]
           return {
             type: object.type,
             fullName: object.fullName,

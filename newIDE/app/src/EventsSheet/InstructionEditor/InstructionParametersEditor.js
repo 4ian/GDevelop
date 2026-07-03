@@ -40,6 +40,7 @@ import {
 } from '../ParameterFields/ParameterFieldCommons';
 import Edit from '../../UI/CustomSvgIcons/Edit';
 import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
+import { type VariableDialogOpeningProps } from '../../VariablesList/VariablesEditorDialog';
 
 const gd: libGDevelop = global.gd;
 
@@ -90,6 +91,7 @@ type Props = {|
   ) => void,
   noHelpButton?: boolean,
   id?: string,
+  openEventsBasedEntityPropertyEditorDialog: VariableDialogOpeningProps => void,
 |};
 
 const isParameterVisible = (
@@ -136,6 +138,7 @@ const InstructionParametersEditor: React.ComponentType<{
       openInstructionOrExpression,
       resourceManagementProps,
       id,
+      openEventsBasedEntityPropertyEditorDialog,
     },
     ref
   ) => {
@@ -434,6 +437,9 @@ const InstructionParametersEditor: React.ComponentType<{
                             firstVisibleField.current = field;
                           }
                         }}
+                        openEventsBasedEntityPropertyEditorDialog={
+                          openEventsBasedEntityPropertyEditorDialog
+                        }
                       />
                     );
                   })}

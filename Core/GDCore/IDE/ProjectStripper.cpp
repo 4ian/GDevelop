@@ -17,7 +17,6 @@
 namespace gd {
 
 void GD_CORE_API ProjectStripper::StripProjectForExport(gd::Project &project) {
-  project.GetObjects().GetObjectGroups().Clear();
   while (project.GetExternalEventsCount() > 0)
     project.RemoveExternalEvents(project.GetExternalEvents(0).GetName());
 

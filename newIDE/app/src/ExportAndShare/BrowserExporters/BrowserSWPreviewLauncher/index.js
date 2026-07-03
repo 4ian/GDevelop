@@ -24,6 +24,10 @@ import {
 } from './BrowserSWPreviewIndexedDB';
 import { setEmbeddedGameFramePreviewLocation } from '../../../EmbeddedGame/EmbeddedGameFrame';
 import { immediatelyOpenNewPreviewWindow } from '../BrowserPreview/BrowserPreviewWindow';
+import {
+  addGlobalObjectGroupsToDataJs,
+  addGlobalObjectGroupsToProjectData,
+} from '../../PreviewGlobalObjectGroupsPatch';
 const gd: libGDevelop = global.gd;
 
 let nextPreviewId = 1;
@@ -289,6 +293,9 @@ export default class BrowserSWPreviewLauncher extends React.Component<
         `[BrowserSWPreviewLauncher] Exporting project for preview #${previewId}...`
       );
       exporter.exportProjectForPixiPreview(previewExportOptions);
+      browserSWFileSystem.patchPendingTextFile('data.js', contents =>
+        addGlobalObjectGroupsToDataJs(project, contents)
+      );
 
       console.log(
         `[BrowserSWPreviewLauncher] Storing preview files in IndexedDB for preview #${previewId}...`
@@ -308,8 +315,9 @@ export default class BrowserSWPreviewLauncher extends React.Component<
           previewExportOptions,
           projectDataElement
         );
-        const projectData = JSON.parse(
-          gd.Serializer.toJSON(projectDataElement)
+        const projectData = addGlobalObjectGroupsToProjectData(
+          project,
+          JSON.parse(gd.Serializer.toJSON(projectDataElement))
         );
         projectDataElement.delete();
 

@@ -218,10 +218,10 @@ const ObjectGroupEditor = ({
         </>
       ) : (
         <>
+          <Trans>This group contains objects of the same kind</Trans> ({type}).{' '}
           <Trans>
-            This group contains objects of the same kind ({type}). You can use
-            actions, conditions and expressions related to this kind of objects
-            in events with this group.
+            You can use actions, conditions and expressions related to this kind
+            of objects in events with this group.
           </Trans>
         </>
       );

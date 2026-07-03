@@ -158,11 +158,17 @@ namespace gdjs {
       }
 
       this._objectGroups.clear();
-      for (const objectGroupData of sceneData.objectsGroups || []) {
+      const setObjectGroup = (objectGroupData: ObjectGroupData) => {
         this._objectGroups.set(
           objectGroupData.name,
           objectGroupData.objects.map(({ name }) => name)
         );
+      };
+      for (const objectGroupData of this.getGame().getInitialObjectGroupsData()) {
+        setObjectGroup(objectGroupData);
+      }
+      for (const objectGroupData of sceneData.objectsGroups || []) {
+        setObjectGroup(objectGroupData);
       }
 
       //Setup main properties

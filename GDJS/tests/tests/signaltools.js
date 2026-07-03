@@ -6,9 +6,7 @@ describe('gdjs.evtTools.signal', () => {
   const signalReceiverIds = [];
 
   before(() => {
-    const SignalTestRuntimeObject = class SignalTestRuntimeObject
-      extends gdjs.TestRuntimeObject
-    {
+    const SignalTestRuntimeObject = class SignalTestRuntimeObject extends gdjs.TestRuntimeObject {
       onSignal(signalName, payload, emitterObjectName, emitterInstanceId) {
         const runtimeScene = this.getRuntimeScene();
         const signalNameFromContext =
@@ -65,6 +63,52 @@ describe('gdjs.evtTools.signal', () => {
     runtimeScene.getSignalBus().refreshReceiverIndex(runtimeScene);
     return runtimeScene;
   };
+
+  /**
+   * @param {{objects?: ObjectData[], objectsGroups?: ObjectGroupData[]}} props
+   * @returns {LayoutData}
+   */
+  const createSignalTestSceneData = ({ objects = [], objectsGroups = [] }) => ({
+    layers: [
+      {
+        name: '',
+        visibility: true,
+        cameras: [],
+        effects: [],
+        ambientLightColorR: 127,
+        ambientLightColorB: 127,
+        ambientLightColorG: 127,
+        isLightingLayer: false,
+        followBaseLayerCamera: false,
+      },
+    ],
+    variables: [],
+    r: 0,
+    v: 0,
+    b: 0,
+    mangledName: 'Scene1',
+    name: 'Scene1',
+    stopSoundsOnStartup: false,
+    title: '',
+    behaviorsSharedData: [],
+    objects,
+    objectsGroups,
+    instances: [],
+    usedResources: [],
+    uiSettings: {
+      grid: false,
+      gridType: 'rectangular',
+      gridWidth: 10,
+      gridHeight: 10,
+      gridDepth: 10,
+      gridOffsetX: 0,
+      gridOffsetY: 0,
+      gridOffsetZ: 0,
+      gridColor: 0,
+      gridAlpha: 1,
+      snap: false,
+    },
+  });
 
   it('queues signals until the next pre-events step and exposes their payload', () => {
     const runtimeScene = createSignalRuntimeScene();
@@ -297,6 +341,43 @@ describe('gdjs.evtTools.signal', () => {
       { receiver: 'OtherReceiver', signalName: 'ObjectOnly', payload: '3' },
       { receiver: 'Receiver', signalName: 'Group', payload: '4' },
       { receiver: 'OtherReceiver', signalName: 'Group', payload: '4' },
+    ]);
+  });
+
+  it('targets global object groups loaded by the scene', () => {
+    const receiverObjectData = {
+      name: 'Receiver',
+      type: 'SignalTest::Object',
+      variables: [],
+      behaviors: [],
+      effects: [],
+    };
+    const runtimeGame = gdjs.getPixiRuntimeGame({
+      objects: [receiverObjectData],
+      objectsGroups: [
+        {
+          name: 'GlobalReceivers',
+          objects: [{ name: 'Receiver' }],
+        },
+      ],
+      layouts: [createSignalTestSceneData({})],
+    });
+    const runtimeScene = new gdjs.TestRuntimeScene(runtimeGame);
+    runtimeScene.loadFromScene(runtimeGame.getSceneAndExtensionsData('Scene1'));
+    runtimeScene.createObject('Receiver');
+    runtimeScene.getSignalBus().refreshReceiverIndex(runtimeScene);
+
+    gdjs.evtTools.signal.emitSignalToObjectGroup(
+      runtimeScene,
+      'GlobalReceivers',
+      'GlobalGroup',
+      'payload'
+    );
+
+    runtimeScene.renderAndStepWithEventsFunction(16, () => {});
+
+    expect(signalCalls).to.eql([
+      { receiver: 'Receiver', signalName: 'GlobalGroup', payload: 'payload' },
     ]);
   });
 

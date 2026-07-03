@@ -3,7 +3,7 @@
 /**
  * Create and return a minimum working game.
  * @internal
- * @param {{layouts?: LayoutData[], resources?: ResourcesData, propertiesOverrides?: Partial<ProjectPropertiesData>}=} settings
+ * @param {{layouts?: LayoutData[], resources?: ResourcesData, objects?: ObjectData[], objectsGroups?: ObjectGroupData[], propertiesOverrides?: Partial<ProjectPropertiesData>}=} settings
  * @returns {ProjectData}
  */
 gdjs.createProjectData = (settings) => {
@@ -59,7 +59,8 @@ gdjs.createProjectData = (settings) => {
       build: 0,
       revision: 0,
     },
-    objects: [],
+    objects: (settings && settings.objects) || [],
+    objectsGroups: (settings && settings.objectsGroups) || [],
     layouts: (settings && settings.layouts) || [],
     externalLayouts: [],
     resources: (settings && settings.resources) || { resources: [] },
@@ -71,7 +72,7 @@ gdjs.createProjectData = (settings) => {
 /**
  * Create and return a minimum working game.
  * @internal
- * @param {{layouts?: LayoutData[], resources?: ResourcesData, propertiesOverrides?: Partial<ProjectPropertiesData>}=} settings
+ * @param {{layouts?: LayoutData[], resources?: ResourcesData, objects?: ObjectData[], objectsGroups?: ObjectGroupData[], propertiesOverrides?: Partial<ProjectPropertiesData>}=} settings
  * @returns {gdjs.RuntimeGame}
  */
 gdjs.getPixiRuntimeGame = (settings) =>

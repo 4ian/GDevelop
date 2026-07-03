@@ -17,6 +17,10 @@ import {
 import Window from '../../../Utils/Window';
 import { getIDEVersionWithHash } from '../../../Version';
 import { setEmbeddedGameFramePreviewLocation } from '../../../EmbeddedGame/EmbeddedGameFrame';
+import {
+  addGlobalObjectGroupsToDataJs,
+  addGlobalObjectGroupsToProjectData,
+} from '../../PreviewGlobalObjectGroupsPatch';
 const electron = optionalRequire('electron');
 const path = optionalRequire('path');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
@@ -51,6 +55,7 @@ const prepareExporter = async ({
   outputDir: string,
   exporter: gdjsExporter,
   gdjsRoot: string,
+  fileSystem: any,
 |}> => {
   const { gdjsRoot } = await findGDJS();
   console.info('GDJS found in ', gdjsRoot);
@@ -69,6 +74,7 @@ const prepareExporter = async ({
     outputDir,
     exporter,
     gdjsRoot,
+    fileSystem,
   };
 };
 
@@ -260,9 +266,11 @@ export default class LocalPreviewLauncher extends React.Component<
       );
     }
 
-    const { outputDir, exporter, gdjsRoot } = await prepareExporter({
-      isForInGameEdition: previewOptions.isForInGameEdition,
-    });
+    const { outputDir, exporter, gdjsRoot, fileSystem } = await prepareExporter(
+      {
+        isForInGameEdition: previewOptions.isForInGameEdition,
+      }
+    );
 
     var previewStartTime = performance.now();
 
@@ -402,6 +410,11 @@ export default class LocalPreviewLauncher extends React.Component<
     }
 
     exporter.exportProjectForPixiPreview(previewExportOptions);
+    const dataJsPath = path.join(outputDir, 'data.js');
+    fileSystem.writeToFile(
+      dataJsPath,
+      addGlobalObjectGroupsToDataJs(project, fileSystem.readFile(dataJsPath))
+    );
 
     if (shouldHotReload) {
       const projectDataElement = new gd.SerializerElement();
@@ -410,7 +423,10 @@ export default class LocalPreviewLauncher extends React.Component<
         previewExportOptions,
         projectDataElement
       );
-      const projectData = JSON.parse(gd.Serializer.toJSON(projectDataElement));
+      const projectData = addGlobalObjectGroupsToProjectData(
+        project,
+        JSON.parse(gd.Serializer.toJSON(projectDataElement))
+      );
       projectDataElement.delete();
 
       const runtimeGameOptionsElement = new gd.SerializerElement();

@@ -726,6 +726,14 @@ namespace gdjs {
     }
 
     /**
+     * Get the data representing all the global object groups of the game.
+     * @return The data associated to the global object groups.
+     */
+    getInitialObjectGroupsData(): ObjectGroupData[] {
+      return this._data.objectsGroups || [];
+    }
+
+    /**
      * Get the original width of the game, as set on the startup of the game.
      *
      * This is guaranteed to never change, even if the size of the game is changed afterwards.

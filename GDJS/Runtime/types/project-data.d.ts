@@ -24,6 +24,7 @@ declare interface ProjectData {
   resources: ResourcesData;
   usedResources: ResourceReference[];
   objects: ObjectData[];
+  objectsGroups: ObjectGroupData[];
   variables: RootVariableData[];
   globalConfig?: GlobalConfigData;
   layouts: LayoutData[];

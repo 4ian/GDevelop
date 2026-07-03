@@ -21,6 +21,7 @@ import { isNativeMobileApp } from '../../../Utils/Platform';
 import { getIDEVersionWithHash } from '../../../Version';
 import { setEmbeddedGameFramePreviewLocation } from '../../../EmbeddedGame/EmbeddedGameFrame';
 import { immediatelyOpenNewPreviewWindow } from '../BrowserPreview/BrowserPreviewWindow';
+import { addGlobalObjectGroupsToDataJs } from '../../PreviewGlobalObjectGroupsPatch';
 const gd: libGDevelop = global.gd;
 
 type State = {|
@@ -236,6 +237,9 @@ export default class BrowserS3PreviewLauncher extends React.Component<
         previewExportOptions.setGDevelopResourceToken(gdevelopResourceToken);
 
       exporter.exportProjectForPixiPreview(previewExportOptions);
+      browserS3FileSystem.patchPendingTextFile('data.js', contents =>
+        addGlobalObjectGroupsToDataJs(project, contents)
+      );
       previewExportOptions.delete();
       exporter.delete();
 

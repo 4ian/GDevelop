@@ -10,7 +10,8 @@ const gd: libGDevelop = global.gd;
 export type ValidationErrorType =
   | 'missing-instruction'
   | 'invalid-parameter'
-  | 'missing-parameter';
+  | 'missing-parameter'
+  | 'unsafe-external-layout-creation';
 
 export type ValidationError = {|
   type: ValidationErrorType,
@@ -82,23 +83,42 @@ const getValidationErrorLocationInformationFromProjectScopedContainers = (
  * Build a map from event pointer to its path in the events list.
  * This allows us to track event paths when using the C++ worker.
  */
-const buildEventPtrToPathMap = (
+const hasEnabledInstructions = (instructionsList: gdInstructionsList) => {
+  for (let index = 0; index < instructionsList.size(); index++) {
+    if (!instructionsList.get(index).isDisabled()) return true;
+  }
+  return false;
+};
+
+type EventValidationContext = {|
+  eventPath: EventPath,
+  standardEventHasEnabledConditions: ?boolean,
+|};
+
+const buildEventPtrToValidationContextMap = (
   eventsList: gdEventsList,
   parentPath: EventPath = []
-): Map<number, EventPath> => {
-  const map = new Map<number, EventPath>();
+): Map<number, EventValidationContext> => {
+  const map = new Map<number, EventValidationContext>();
   mapFor(0, eventsList.getEventsCount(), index => {
     const event = eventsList.getEventAt(index);
     const currentPath = [...parentPath, index];
+    const standardEventHasEnabledConditions =
+      event.getType() === 'BuiltinCommonInstructions::Standard'
+        ? hasEnabledInstructions(gd.asStandardEvent(event).getConditions())
+        : null;
     // $FlowFixMe[incompatible-type] - ptr is a number identifying the C++ object
-    map.set(event.ptr, currentPath);
+    map.set(event.ptr, {
+      eventPath: currentPath,
+      standardEventHasEnabledConditions,
+    });
 
     if (event.canHaveSubEvents()) {
-      const subEventsMap = buildEventPtrToPathMap(
+      const subEventsMap = buildEventPtrToValidationContextMap(
         event.getSubEvents(),
         currentPath
       );
-      subEventsMap.forEach((path, ptr) => map.set(ptr, path));
+      subEventsMap.forEach((context, ptr) => map.set(ptr, context));
     }
   });
   return map;
@@ -117,22 +137,30 @@ const createValidationWorker = (
   worker.setSkipDisabledEvents(true);
 
   let currentEventPath: EventPath = [];
-  let eventPtrToPathMap: Map<number, EventPath> = new Map();
+  let currentStandardEventHasEnabledConditions: ?boolean = null;
+  let eventPtrToValidationContextMap: Map<
+    number,
+    EventValidationContext
+  > = new Map();
 
   // $FlowFixMe[incompatible-type] - overriding C++ method:
   // $FlowFixMe[cannot-write]
   worker.doOnLaunch = (events: gdEventsList) => {
     // Rebuild the event path map for each new events list (each scene,
     // external layout, or extension function).
-    eventPtrToPathMap = buildEventPtrToPathMap(events);
+    eventPtrToValidationContextMap = buildEventPtrToValidationContextMap(
+      events
+    );
   };
 
   // $FlowFixMe[incompatible-type] - overriding C++ method:
   // $FlowFixMe[cannot-write]
   worker.doVisitEvent = (event: gdBaseEvent) => {
-    const path = eventPtrToPathMap.get(event.ptr);
-    if (path) {
-      currentEventPath = path;
+    const validationContext = eventPtrToValidationContextMap.get(event.ptr);
+    if (validationContext) {
+      currentEventPath = validationContext.eventPath;
+      currentStandardEventHasEnabledConditions =
+        validationContext.standardEventHasEnabledConditions;
     }
   };
 
@@ -170,6 +198,31 @@ const createValidationWorker = (
         ),
       });
       return;
+    }
+
+    if (
+      !isCondition &&
+      currentStandardEventHasEnabledConditions === false &&
+      type === 'BuiltinExternalLayouts::CreateObjectsFromExternalLayout' &&
+      !projectScopedContainers.getScopeExtensionName()
+    ) {
+      errors.push({
+        type: 'unsafe-external-layout-creation',
+        isCondition,
+        instructionType: type,
+        instructionSentence: renderInstructionSentenceAsPlainText(
+          instruction,
+          metadata
+        ),
+        parameterValue:
+          instruction.getParametersCount() > 1
+            ? instruction.getParameter(1).getPlainString()
+            : '',
+        eventPath: [...currentEventPath],
+        ...getValidationErrorLocationInformationFromProjectScopedContainers(
+          projectScopedContainers
+        ),
+      });
     }
 
     // Validate parameters

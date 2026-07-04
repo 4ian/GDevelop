@@ -322,6 +322,7 @@ export default function DiagnosticReportDialog({
       const missingSceneVariables = new Set<string>();
       const unknownObjects = new Set<string>();
       const mismatchedTypeObjects = new Set<string>();
+      const unsafeExternalLayouts = new Set<string>();
       const missingObjectVariablesByObject = new Map<string, Set<string>>();
       const missingBehaviorsByObjects = new Map<string, Set<string>>();
       mapFor(0, diagnosticReport.count(), index => {
@@ -361,6 +362,10 @@ export default function DiagnosticReportDialog({
 
           case gd.ProjectDiagnostic.MismatchedObjectType:
             mismatchedTypeObjects.add(objectName);
+            break;
+
+          case gd.ProjectDiagnostic.UnsafeExternalLayoutCreation:
+            unsafeExternalLayouts.add(projectDiagnostic.getActualValue());
             break;
 
           default:
@@ -461,6 +466,29 @@ export default function DiagnosticReportDialog({
                     </TableRowColumn>
                   </TableRow>
                 )
+              )}
+              {unsafeExternalLayouts.size > 0 && (
+                <TableRow
+                  key={`unsafe-external-layout-creation`}
+                  style={{
+                    backgroundColor: gdevelopTheme.list.itemsBackgroundColor,
+                  }}
+                >
+                  <TableRowColumn>
+                    <Text size="body">
+                      <Trans>External layout creation without conditions</Trans>
+                    </Text>
+                  </TableRowColumn>
+                  <TableRowColumn>
+                    <Text size="body" allowSelection>
+                      <Trans>
+                        Add a condition, for example "At the beginning of the
+                        scene", before creating objects from an external layout.
+                      </Trans>{' '}
+                      {[...unsafeExternalLayouts].filter(Boolean).join(', ')}
+                    </Text>
+                  </TableRowColumn>
+                </TableRow>
               )}
               {[...missingBehaviorsByObjects.entries()].map(
                 ([objectName, missingBehaviors]) => (

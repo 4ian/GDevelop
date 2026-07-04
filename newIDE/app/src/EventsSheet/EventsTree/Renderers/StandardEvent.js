@@ -19,6 +19,13 @@ const styles = {
   },
 };
 
+const hasEnabledInstructions = (instructionsList: gdInstructionsList) => {
+  for (let index = 0; index < instructionsList.size(); index++) {
+    if (!instructionsList.get(index).isDisabled()) return true;
+  }
+  return false;
+};
+
 export default class StandardEvent extends React.Component<
   EventRendererProps,
   // $FlowFixMe[unsupported-syntax]
@@ -26,6 +33,9 @@ export default class StandardEvent extends React.Component<
 > {
   render(): any {
     var standardEvent = gd.asStandardEvent(this.props.event);
+    const hasEnabledConditions = hasEnabledInstructions(
+      standardEvent.getConditions()
+    );
 
     return (
       <div
@@ -84,6 +94,12 @@ export default class StandardEvent extends React.Component<
                 this.props.projectScopedContainersAccessor
               }
               idPrefix={this.props.idPrefix}
+              isInstructionMarkedAsInvalid={instruction =>
+                !hasEnabledConditions &&
+                !instruction.isDisabled() &&
+                instruction.getType() ===
+                  'BuiltinExternalLayouts::CreateObjectsFromExternalLayout'
+              }
               highlightedSearchText={this.props.highlightedSearchText}
               highlightedSearchMatchCase={this.props.highlightedSearchMatchCase}
             />

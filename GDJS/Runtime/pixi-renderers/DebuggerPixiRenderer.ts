@@ -1,7 +1,13 @@
 namespace gdjs {
   const signalDebugAnimationDuration = 850;
-  const maxSignalDebugSegments = 240;
-  const maxSignalDebugPanelLogs = 80;
+  const signalDebugDrawRefreshInterval = 1000 / 30;
+  const maxSignalDebugSegments = 16;
+  const maxSignalDebugLabels = 6;
+  const debugDrawRefreshInterval = 1000 / 4;
+  const maxDebugDrawObjectsPerRefresh = 60;
+  const maxDebugDrawHitBoxesPerRefresh = 120;
+  const maxDebugDrawPointObjectsPerRefresh = 20;
+  const maxSignalDebugPanelLogs = 40;
   const signalDebugPanelMargin = 12;
   const signalDebugPanelHeaderHeight = 34;
   const signalDebugPanelRowHeight = 78;
@@ -16,6 +22,12 @@ namespace gdjs {
   const signalDebugColors = [
     0x00d1ff, 0xffc857, 0xff5c8a, 0x7cff6b, 0xb388ff, 0xff9f1c, 0x40f99b,
     0xff4d4d,
+  ];
+  const textDebugDrawRuntimeObjectConstructorNames = [
+    'TextRuntimeObject',
+    'BBTextRuntimeObject',
+    'BitmapTextRuntimeObject',
+    'TextEntryRuntimeObject',
   ];
 
   type SignalDebugSegment = {
@@ -38,6 +50,44 @@ namespace gdjs {
     status: gdjs.SignalDebugStatus;
     color: integer;
     startTime: integer;
+  };
+
+  type DebugDrawCameraBounds = {
+    minX: float;
+    minY: float;
+    maxX: float;
+    maxY: float;
+  };
+
+  const isDebugDrawAABBVisible = (
+    aabb: AABB,
+    cameraBounds: DebugDrawCameraBounds
+  ): boolean => {
+    return (
+      aabb.max[0] >= cameraBounds.minX &&
+      aabb.min[0] <= cameraBounds.maxX &&
+      aabb.max[1] >= cameraBounds.minY &&
+      aabb.min[1] <= cameraBounds.maxY
+    );
+  };
+
+  const isTextDebugDrawObject = (object: gdjs.RuntimeObject): boolean => {
+    for (
+      let i = 0, len = textDebugDrawRuntimeObjectConstructorNames.length;
+      i < len;
+      ++i
+    ) {
+      const RuntimeObjectConstructor = (gdjs as any)[
+        textDebugDrawRuntimeObjectConstructorNames[i]
+      ];
+      if (
+        typeof RuntimeObjectConstructor === 'function' &&
+        object instanceof RuntimeObjectConstructor
+      ) {
+        return true;
+      }
+    }
+    return false;
   };
 
   const getSignalDebugColor = (signalName: string): integer => {
@@ -183,6 +233,9 @@ namespace gdjs {
     _instanceContainer: gdjs.RuntimeInstanceContainer;
     _debugDraw: PIXI.Graphics | null = null;
     _debugDrawContainer: PIXI.Container | null = null;
+    _debugDrawLastRenderTime: integer = 0;
+    _debugDrawLastRenderSignature: string = '';
+    _debugDrawStartIndex: integer = 0;
     _debugDrawRenderedObjectsPoints: Record<
       number,
       {
@@ -192,7 +245,10 @@ namespace gdjs {
     >;
     _signalDebugDraw: PIXI.Graphics | null = null;
     _signalDebugDrawContainer: PIXI.Container | null = null;
-    _signalDebugDrawLabels: PIXI.Text[] = [];
+    _signalDebugLastRenderTime: integer = 0;
+    _signalDebugDrawHasContent: boolean = false;
+    _signalDebugDrawLabelPool: PIXI.Text[] = [];
+    _signalDebugDrawActiveLabelCount: integer = 0;
     _signalDebugSegments: SignalDebugSegment[] = [];
     _signalDebugPanel: PIXI.Container | null = null;
     _signalDebugPanelBackground: PIXI.Graphics | null = null;
@@ -206,6 +262,7 @@ namespace gdjs {
     _signalDebugHoveredPayloadLogId: integer | null = null;
     _signalDebugPanelPointerX: float = NaN;
     _signalDebugPanelPointerY: float = NaN;
+    _lastRenderedSignalDebugPanelSignature: string = '';
     _hasUserPositionedSignalDebugPanel: boolean = false;
     _isDraggingSignalDebugPanel: boolean = false;
     _isSignalDebugPanelFolded: boolean = false;
@@ -222,6 +279,36 @@ namespace gdjs {
       return this._debugDrawContainer;
     }
 
+    _getDebugDrawRenderSignature(
+      showHiddenInstances: boolean,
+      showPointsNames: boolean,
+      showCustomPoints: boolean
+    ): string {
+      return (
+        (showHiddenInstances ? '1' : '0') +
+        ':' +
+        (showPointsNames ? '1' : '0') +
+        ':' +
+        (showCustomPoints ? '1' : '0')
+      );
+    }
+
+    isDebugDrawRefreshNeeded(
+      showHiddenInstances: boolean,
+      showPointsNames: boolean,
+      showCustomPoints: boolean
+    ): boolean {
+      const renderSignature = this._getDebugDrawRenderSignature(
+        showHiddenInstances,
+        showPointsNames,
+        showCustomPoints
+      );
+      return (
+        renderSignature !== this._debugDrawLastRenderSignature ||
+        Date.now() - this._debugDrawLastRenderTime >= debugDrawRefreshInterval
+      );
+    }
+
     /**
      * Render graphics for debugging purpose. Activate this in `gdjs.RuntimeScene`,
      * in the `renderAndStep` method.
@@ -233,6 +320,21 @@ namespace gdjs {
       showPointsNames: boolean,
       showCustomPoints: boolean
     ) {
+      const now = Date.now();
+      const renderSignature = this._getDebugDrawRenderSignature(
+        showHiddenInstances,
+        showPointsNames,
+        showCustomPoints
+      );
+      if (
+        renderSignature === this._debugDrawLastRenderSignature &&
+        now - this._debugDrawLastRenderTime < debugDrawRefreshInterval
+      ) {
+        return;
+      }
+      this._debugDrawLastRenderSignature = renderSignature;
+      this._debugDrawLastRenderTime = now;
+
       const pixiContainer = this._instanceContainer
         .getRenderer()
         .getRendererObject();
@@ -250,7 +352,11 @@ namespace gdjs {
 
       // Reset the boolean "wasRendered" of all points of objects to false:
       for (let id in this._debugDrawRenderedObjectsPoints) {
-        this._debugDrawRenderedObjectsPoints[id].wasRendered = false;
+        const renderedObjectPoints = this._debugDrawRenderedObjectsPoints[id];
+        renderedObjectPoints.wasRendered = false;
+        for (const pointName in renderedObjectPoints.points) {
+          renderedObjectPoints.points[pointName].visible = false;
+        }
       }
 
       const renderObjectPoint = (
@@ -270,10 +376,13 @@ namespace gdjs {
               fill: fillColor,
               fontSize: 12,
             });
+          }
 
+          if (points[name].parent !== this._debugDrawContainer) {
             this._debugDrawContainer!.addChild(points[name]);
           }
 
+          points[name].visible = true;
           points[name].position.set(x, y);
         }
       };
@@ -281,12 +390,62 @@ namespace gdjs {
       debugDraw.clear();
       debugDraw.beginFill();
       debugDraw.alpha = 0.8;
-      debugDraw.lineStyle(2, 0x0000ff, 1);
+      debugDraw.lineStyle(2, 0xff0000, 1);
 
-      // Draw AABB
+      const shouldDrawObjectPoints = showPointsNames || showCustomPoints;
       const workingPoint: FloatPoint = [0, 0];
-      for (let i = 0; i < instances.length; i++) {
+      const layerCameraBounds: Record<string, DebugDrawCameraBounds> = {};
+      const getLayerCameraBounds = (
+        layer: gdjs.RuntimeLayer
+      ): DebugDrawCameraBounds => {
+        const layerName = layer.getName();
+        if (layerCameraBounds[layerName]) {
+          return layerCameraBounds[layerName];
+        }
+
+        const cameraX = layer.getCameraX();
+        const cameraY = layer.getCameraY();
+        let cameraHalfWidth = layer.getCameraWidth() / 2;
+        let cameraHalfHeight = layer.getCameraHeight() / 2;
+        if (layer.getCameraRotation() !== 0) {
+          const hypot = cameraHalfWidth + cameraHalfHeight;
+          cameraHalfWidth = hypot;
+          cameraHalfHeight = hypot;
+        }
+
+        return (layerCameraBounds[layerName] = {
+          minX: cameraX - cameraHalfWidth,
+          minY: cameraY - cameraHalfHeight,
+          maxX: cameraX + cameraHalfWidth,
+          maxY: cameraY + cameraHalfHeight,
+        });
+      };
+
+      const instancesCount = instances.length;
+      if (instancesCount === 0) {
+        this._debugDrawStartIndex = 0;
+        debugDraw.endFill();
+        return;
+      }
+
+      let renderedObjectsCount = 0;
+      let drawnHitBoxesCount = 0;
+      let drawnPointObjectsCount = 0;
+      let nextDebugDrawStartIndex = this._debugDrawStartIndex % instancesCount;
+      for (
+        let scannedObjectsCount = 0;
+        scannedObjectsCount < instancesCount &&
+        renderedObjectsCount < maxDebugDrawObjectsPerRefresh &&
+        drawnHitBoxesCount < maxDebugDrawHitBoxesPerRefresh;
+        ++scannedObjectsCount
+      ) {
+        const i =
+          (this._debugDrawStartIndex + scannedObjectsCount) % instancesCount;
+        nextDebugDrawStartIndex = (i + 1) % instancesCount;
         const object = instances[i];
+        if (isTextDebugDrawObject(object)) {
+          continue;
+        }
         const layer = this._instanceContainer.getLayer(object.getLayer());
 
         if (
@@ -301,119 +460,71 @@ namespace gdjs {
           continue;
         }
         const aabb = object.getAABB();
-        debugDraw.fill.alpha = 0.2;
-        debugDraw.line.color = 0x778ee8;
-        debugDraw.fill.color = 0x778ee8;
-
-        const polygon: float[] = [];
-        polygon.push.apply(
-          polygon,
-          layer.applyLayerTransformation(
-            aabb.min[0],
-            aabb.min[1],
-            0,
-            workingPoint
-          )
-        );
-        polygon.push.apply(
-          polygon,
-          layer.applyLayerTransformation(
-            aabb.max[0],
-            aabb.min[1],
-            0,
-            workingPoint
-          )
-        );
-        polygon.push.apply(
-          polygon,
-          layer.applyLayerTransformation(
-            aabb.max[0],
-            aabb.max[1],
-            0,
-            workingPoint
-          )
-        );
-        polygon.push.apply(
-          polygon,
-          layer.applyLayerTransformation(
-            aabb.min[0],
-            aabb.max[1],
-            0,
-            workingPoint
-          )
-        );
-
-        debugDraw.drawPolygon(polygon);
-      }
-
-      // Draw hitboxes and points
-      for (let i = 0; i < instances.length; i++) {
-        const object = instances[i];
-        const layer = this._instanceContainer.getLayer(object.getLayer());
-
-        if (
-          (!object.isVisible() || !layer.isVisible()) &&
-          !showHiddenInstances
-        ) {
+        const cameraBounds = getLayerCameraBounds(layer);
+        if (!isDebugDrawAABBVisible(aabb, cameraBounds)) {
           continue;
         }
-
-        const rendererObject = object.getRendererObject();
-        if (!rendererObject) {
-          continue;
-        }
+        renderedObjectsCount++;
 
         // Create the structure to store the points in memory
-        const id = object.id;
-        if (!this._debugDrawRenderedObjectsPoints[id]) {
-          this._debugDrawRenderedObjectsPoints[id] = {
-            wasRendered: true,
-            points: {},
-          };
+        let renderedObjectPoints: {
+          wasRendered: boolean;
+          points: Record<string, PIXI.Text>;
+        } | null = null;
+        if (
+          shouldDrawObjectPoints &&
+          drawnPointObjectsCount < maxDebugDrawPointObjectsPerRefresh
+        ) {
+          drawnPointObjectsCount++;
+          const id = object.id;
+          if (!this._debugDrawRenderedObjectsPoints[id]) {
+            this._debugDrawRenderedObjectsPoints[id] = {
+              wasRendered: true,
+              points: {},
+            };
+          }
+          renderedObjectPoints = this._debugDrawRenderedObjectsPoints[id];
+          renderedObjectPoints.wasRendered = true;
         }
-        const renderedObjectPoints = this._debugDrawRenderedObjectsPoints[id];
-        renderedObjectPoints.wasRendered = true;
 
-        const cameraX = layer.getCameraX();
-        const cameraY = layer.getCameraY();
-        let cameraHalfWidth = layer.getCameraWidth() / 2;
-        let cameraHalfHeight = layer.getCameraHeight() / 2;
-        if (layer.getCameraRotation() !== 0) {
-          const hypot = cameraHalfWidth + cameraHalfHeight;
-          cameraHalfWidth = hypot;
-          cameraHalfHeight = hypot;
-        }
         // Draw hitboxes (sub-optimal performance)
-        for (const hitBox of object.getHitBoxesAround(
-          cameraX - cameraHalfWidth,
-          cameraY - cameraHalfHeight,
-          cameraX + cameraHalfWidth,
-          cameraY + cameraHalfHeight
-        )) {
+        const hitBoxes = object.getHitBoxesAround(
+          cameraBounds.minX,
+          cameraBounds.minY,
+          cameraBounds.maxX,
+          cameraBounds.maxY
+        );
+        for (const hitBox of hitBoxes) {
+          if (drawnHitBoxesCount >= maxDebugDrawHitBoxesPerRefresh) {
+            break;
+          }
           // Note that this conversion is sub-optimal, but we don't care
           // as this is for debug draw.
           const polygon: float[] = [];
-          hitBox.vertices.forEach((point) => {
-            point = layer.applyLayerTransformation(
-              point[0],
-              point[1],
+          for (let j = 0, lenj = hitBox.vertices.length; j < lenj; ++j) {
+            const hitBoxPoint = hitBox.vertices[j];
+            const transformedPoint = layer.applyLayerTransformation(
+              hitBoxPoint[0],
+              hitBoxPoint[1],
               0,
               workingPoint
             );
 
-            polygon.push(point[0]);
-            polygon.push(point[1]);
-          });
+            polygon.push(transformedPoint[0], transformedPoint[1]);
+          }
           debugDraw.fill.alpha = 0;
           debugDraw.line.alpha = 0.5;
           debugDraw.line.color = 0xff0000;
           debugDraw.drawPolygon(polygon);
+          drawnHitBoxesCount++;
         }
 
-        // Draw points
-        debugDraw.fill.alpha = 0.3;
+        if (!renderedObjectPoints) {
+          continue;
+        }
 
         // Draw Center point
+        debugDraw.fill.alpha = 0.3;
         const centerPoint = layer.applyLayerTransformation(
           object.getCenterXInScene(),
           object.getCenterYInScene(),
@@ -496,6 +607,7 @@ namespace gdjs {
           }
         }
       }
+      this._debugDrawStartIndex = nextDebugDrawStartIndex;
 
       // Clean any point text from an object that is not rendered.
       for (const objectID in this._debugDrawRenderedObjectsPoints) {
@@ -505,7 +617,9 @@ namespace gdjs {
 
         const points = renderedObjectPoints.points;
         for (const name in points) {
-          this._debugDrawContainer.removeChild(points[name]);
+          if (points[name].parent === this._debugDrawContainer) {
+            this._debugDrawContainer.removeChild(points[name]);
+          }
         }
       }
 
@@ -756,6 +870,7 @@ namespace gdjs {
           this._signalDebugPanelY =
             position.y - this._signalDebugPanelDragOffsetY;
           this._clampSignalDebugPanelPosition();
+          this._renderSignalDebugPanel();
         };
         const stopDragging = (event: any) => {
           if (event) {
@@ -780,18 +895,64 @@ namespace gdjs {
       return this._signalDebugPanel;
     }
 
+    _resetSignalDebugLabels(): void {
+      this._signalDebugDrawActiveLabelCount = 0;
+      for (
+        let i = 0, len = this._signalDebugDrawLabelPool.length;
+        i < len;
+        ++i
+      ) {
+        this._signalDebugDrawLabelPool[i].visible = false;
+      }
+    }
+
+    _getSignalDebugLabel(): PIXI.Text | null {
+      if (!this._signalDebugDrawContainer) {
+        return null;
+      }
+      if (this._signalDebugDrawActiveLabelCount >= maxSignalDebugLabels) {
+        return null;
+      }
+
+      let label =
+        this._signalDebugDrawLabelPool[this._signalDebugDrawActiveLabelCount];
+      if (!label) {
+        label = new PIXI.Text('', {
+          fill: 0xffffff,
+          fontSize: 12,
+        });
+        label.anchor.set(0.5, 0.5);
+        this._signalDebugDrawLabelPool.push(label);
+      }
+
+      if (label.parent !== this._signalDebugDrawContainer) {
+        this._signalDebugDrawContainer.addChild(label);
+      }
+      label.visible = true;
+      this._signalDebugDrawActiveLabelCount++;
+      return label;
+    }
+
     _clearSignalDebugLabels(): void {
       if (!this._signalDebugDrawContainer) {
-        this._signalDebugDrawLabels.length = 0;
+        this._signalDebugDrawLabelPool.length = 0;
+        this._signalDebugDrawActiveLabelCount = 0;
         return;
       }
 
-      for (let i = 0, len = this._signalDebugDrawLabels.length; i < len; ++i) {
-        const label = this._signalDebugDrawLabels[i];
-        this._signalDebugDrawContainer.removeChild(label);
+      for (
+        let i = 0, len = this._signalDebugDrawLabelPool.length;
+        i < len;
+        ++i
+      ) {
+        const label = this._signalDebugDrawLabelPool[i];
+        if (label.parent === this._signalDebugDrawContainer) {
+          this._signalDebugDrawContainer.removeChild(label);
+        }
         label.destroy();
       }
-      this._signalDebugDrawLabels.length = 0;
+      this._signalDebugDrawLabelPool.length = 0;
+      this._signalDebugDrawActiveLabelCount = 0;
     }
 
     _clearSignalDebugPanelRows(): void {
@@ -915,6 +1076,73 @@ namespace gdjs {
       rows.addChild(tooltip);
     }
 
+    _getSignalDebugPanelRenderSignature(
+      panelWidth: float,
+      panelHeight: float
+    ): string {
+      const pointerX = isFinite(this._signalDebugPanelPointerX)
+        ? Math.round(this._signalDebugPanelPointerX)
+        : '';
+      const pointerY = isFinite(this._signalDebugPanelPointerY)
+        ? Math.round(this._signalDebugPanelPointerY)
+        : '';
+      let signature =
+        Math.round(panelWidth) +
+        ':' +
+        Math.round(panelHeight) +
+        ':' +
+        Math.round(this._signalDebugPanelX) +
+        ':' +
+        Math.round(this._signalDebugPanelY) +
+        ':' +
+        this._signalDebugQueuedSignalsCount +
+        ':' +
+        this._signalDebugPanelLogs.length +
+        ':' +
+        this._signalDebugPanelScrollIndex +
+        ':' +
+        (this._isSignalDebugPanelFolded ? '1' : '0') +
+        ':' +
+        pointerX +
+        ':' +
+        pointerY;
+
+      if (this._isSignalDebugPanelFolded) {
+        return signature;
+      }
+
+      const visibleLogCount = this._getVisibleSignalDebugPanelLogCount();
+      for (let i = 0, len = visibleLogCount; i < len; ++i) {
+        const log =
+          this._signalDebugPanelLogs[this._signalDebugPanelScrollIndex + i];
+        if (!log) {
+          continue;
+        }
+
+        signature +=
+          '|' +
+          log.id +
+          ':' +
+          log.status +
+          ':' +
+          log.signalName +
+          ':' +
+          log.payload +
+          ':' +
+          log.target +
+          ':' +
+          log.source.objectName +
+          '#' +
+          log.source.objectId +
+          ':' +
+          log.receiver.receiverName +
+          '#' +
+          log.receiver.objectId;
+      }
+
+      return signature;
+    }
+
     _renderSignalDebugPanel(): void {
       const panel = this._ensureSignalDebugPanel();
       if (
@@ -934,6 +1162,15 @@ namespace gdjs {
       const panelHeight = this._getSignalDebugPanelHeight();
       panel.position.set(this._signalDebugPanelX, this._signalDebugPanelY);
       panel.hitArea = new PIXI.Rectangle(0, 0, panelWidth, panelHeight);
+
+      const renderSignature = this._getSignalDebugPanelRenderSignature(
+        panelWidth,
+        panelHeight
+      );
+      if (renderSignature === this._lastRenderedSignalDebugPanelSignature) {
+        return;
+      }
+      this._lastRenderedSignalDebugPanelSignature = renderSignature;
 
       const background = this._signalDebugPanelBackground;
       background.clear();
@@ -1400,11 +1637,13 @@ namespace gdjs {
      */
     renderSignalDebugDraw(
       signalDebugRecords: gdjs.SignalAnimationDebugRecord[],
-      signalDebugInfo?: gdjs.SignalDebugInfo | null
+      queuedSignalsCount: integer = 0
     ): void {
       const now = Date.now();
-      this._signalDebugQueuedSignalsCount =
-        signalDebugInfo?.queuedSignalsCount || 0;
+      let shouldRenderSignalDebugPanel =
+        queuedSignalsCount !== this._signalDebugQueuedSignalsCount ||
+        !this._signalDebugPanel;
+      this._signalDebugQueuedSignalsCount = queuedSignalsCount;
       const signalDebugRecordsSignature =
         this._getSignalDebugRecordsSignature(signalDebugRecords);
       if (
@@ -1414,6 +1653,7 @@ namespace gdjs {
       ) {
         this._lastAppendedSignalDebugRecordsSignature =
           signalDebugRecordsSignature;
+        shouldRenderSignalDebugPanel = true;
         this._appendSignalDebugPanelLogs(signalDebugRecords, now);
         for (let i = 0, len = signalDebugRecords.length; i < len; ++i) {
           const signalDebugRecord = signalDebugRecords[i];
@@ -1447,13 +1687,36 @@ namespace gdjs {
         );
       }
 
+      if (this._signalDebugSegments.length === 0) {
+        if (this._signalDebugDrawHasContent && this._signalDebugDraw) {
+          this._signalDebugDraw.clear();
+          this._resetSignalDebugLabels();
+          this._signalDebugDrawHasContent = false;
+        }
+        if (shouldRenderSignalDebugPanel && this._ensureSignalDebugDraw()) {
+          this._renderSignalDebugPanel();
+        }
+        return;
+      }
+
+      if (
+        now - this._signalDebugLastRenderTime <
+        signalDebugDrawRefreshInterval
+      ) {
+        if (shouldRenderSignalDebugPanel && this._ensureSignalDebugDraw()) {
+          this._renderSignalDebugPanel();
+        }
+        return;
+      }
+      this._signalDebugLastRenderTime = now;
+
       const signalDraw = this._ensureSignalDebugDraw();
       if (!signalDraw || !this._signalDebugDrawContainer) {
         return;
       }
 
       signalDraw.clear();
-      this._clearSignalDebugLabels();
+      this._resetSignalDebugLabels();
 
       const activeSegments: SignalDebugSegment[] = [];
       const workingPoint: FloatPoint = [0, 0];
@@ -1548,25 +1811,28 @@ namespace gdjs {
 
         const labelOffset =
           12 + (Math.abs(getSignalDebugColor(segment.receiverName)) % 3) * 8;
-        const label = new PIXI.Text(
-          segment.signalName + ' -> ' + segment.receiverName,
-          {
-            fill: color,
-            fontSize: 12,
+        const label = this._getSignalDebugLabel();
+        if (label) {
+          const labelText = segment.signalName + ' -> ' + segment.receiverName;
+          if (label.text !== labelText) {
+            label.text = labelText;
           }
-        );
-        label.alpha = Math.max(0.35, alpha);
-        label.anchor.set(0.5, 0.5);
-        label.position.set(
-          (sourceX + receiverX) / 2 + normalX * labelOffset,
-          (sourceY + receiverY) / 2 + normalY * labelOffset
-        );
-        this._signalDebugDrawContainer.addChild(label);
-        this._signalDebugDrawLabels.push(label);
+          if (label.tint !== color) {
+            label.tint = color;
+          }
+          label.alpha = Math.max(0.35, alpha);
+          label.position.set(
+            (sourceX + receiverX) / 2 + normalX * labelOffset,
+            (sourceY + receiverY) / 2 + normalY * labelOffset
+          );
+        }
       }
 
       this._signalDebugSegments = activeSegments;
-      this._renderSignalDebugPanel();
+      this._signalDebugDrawHasContent = activeSegments.length > 0;
+      if (shouldRenderSignalDebugPanel) {
+        this._renderSignalDebugPanel();
+      }
     }
 
     clearSignalDebugDraw(): void {
@@ -1595,7 +1861,10 @@ namespace gdjs {
       }
       this._signalDebugDraw = null;
       this._signalDebugDrawContainer = null;
-      this._signalDebugDrawLabels.length = 0;
+      this._signalDebugLastRenderTime = 0;
+      this._signalDebugDrawHasContent = false;
+      this._signalDebugDrawLabelPool.length = 0;
+      this._signalDebugDrawActiveLabelCount = 0;
       this._signalDebugPanel = null;
       this._signalDebugPanelBackground = null;
       this._signalDebugPanelRows = null;
@@ -1603,6 +1872,7 @@ namespace gdjs {
       this._signalDebugHoveredPayloadLogId = null;
       this._signalDebugPanelPointerX = NaN;
       this._signalDebugPanelPointerY = NaN;
+      this._lastRenderedSignalDebugPanelSignature = '';
       this._hasUserPositionedSignalDebugPanel = false;
       this._isDraggingSignalDebugPanel = false;
       this._isSignalDebugPanelFolded = false;
@@ -1626,6 +1896,9 @@ namespace gdjs {
       }
       this._debugDraw = null;
       this._debugDrawContainer = null;
+      this._debugDrawLastRenderTime = 0;
+      this._debugDrawLastRenderSignature = '';
+      this._debugDrawStartIndex = 0;
       this._debugDrawRenderedObjectsPoints = {};
     }
   }

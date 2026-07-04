@@ -266,7 +266,14 @@ namespace gdjs {
       const shouldRenderDebugDraw =
         this._debugDrawEnabled &&
         this._customObject.isIncludedInParentCollisionMask();
-      const debugDrawInstancesList = shouldRenderDebugDraw
+      const shouldRefreshDebugDraw =
+        shouldRenderDebugDraw &&
+        this._debuggerRenderer.isDebugDrawRefreshNeeded(
+          this._debugDrawShowHiddenInstances,
+          this._debugDrawShowPointsNames,
+          this._debugDrawShowCustomPoints
+        );
+      const debugDrawInstancesList = shouldRefreshDebugDraw
         ? allInstancesList.filter((object) =>
             object.isIncludedInParentCollisionMask()
           )
@@ -289,19 +296,18 @@ namespace gdjs {
           }
         }
 
-        // Set to true to enable debug rendering (look for the implementation in the renderer
-        // to see what is rendered).
-        if (shouldRenderDebugDraw) {
-          this._debuggerRenderer.renderDebugDraw(
-            debugDrawInstancesList!,
-            this._debugDrawShowHiddenInstances,
-            this._debugDrawShowPointsNames,
-            this._debugDrawShowCustomPoints
-          );
-        }
-
         // Perform pre-render update.
         object.updatePreRender(this);
+      }
+      // Set to true to enable debug rendering (look for the implementation in
+      // the renderer to see what is rendered).
+      if (shouldRefreshDebugDraw) {
+        this._debuggerRenderer.renderDebugDraw(
+          debugDrawInstancesList!,
+          this._debugDrawShowHiddenInstances,
+          this._debugDrawShowPointsNames,
+          this._debugDrawShowCustomPoints
+        );
       }
       return;
     }

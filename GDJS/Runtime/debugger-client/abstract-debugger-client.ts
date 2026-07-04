@@ -757,6 +757,7 @@ namespace gdjs {
       const excludedKeys = [
         // Exclude reference to the debugger
         '_debuggerClient',
+        '_debuggerRenderer',
         // Exclude some RuntimeScene fields:
         '_allInstancesList',
         '_signalBus',
@@ -1347,6 +1348,7 @@ namespace gdjs {
       const excludedValues = [that._runtimegame.getGameData()];
       const excludedKeys = [
         '_debuggerClient',
+        '_debuggerRenderer',
         '_allInstancesList',
         '_signalBus',
         '_runtimeGame',

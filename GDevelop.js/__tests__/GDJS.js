@@ -292,6 +292,41 @@ describe('libGD.js - GDJS related tests', function () {
 
       expect(code).toMatch('elseEventsChainSatisfied');
     });
+    it('reports external layout creation without conditions as unsafe', function () {
+      const project = gd.ProjectHelper.createNewGDJSProject();
+      const layout = project.insertNewLayout('Scene', 0);
+      const evt = layout
+        .getEvents()
+        .insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 0);
+
+      const action = new gd.Instruction();
+      action.setType('BuiltinExternalLayouts::CreateObjectsFromExternalLayout');
+      action.setParametersCount(5);
+      action.setParameter(1, '"Main_HUD"');
+      action.setParameter(2, '0');
+      action.setParameter(3, '0');
+      action.setParameter(4, '0');
+      gd.asStandardEvent(evt).getActions().insert(action, 0);
+      action.delete();
+
+      const layoutCodeGenerator = new gd.LayoutCodeGenerator(project);
+      const diagnosticReport = new gd.DiagnosticReport();
+      layoutCodeGenerator.generateLayoutCompleteCode(
+        layout,
+        new gd.SetString(),
+        diagnosticReport,
+        true
+      );
+
+      expect(diagnosticReport.count()).toBe(1);
+      expect(diagnosticReport.get(0).getType()).toBe(
+        gd.ProjectDiagnostic.UnsafeExternalLayoutCreation
+      );
+
+      diagnosticReport.delete();
+      layoutCodeGenerator.delete();
+      project.delete();
+    });
     it('does not generate code for improperly set up actions/conditions', function () {
       const project = gd.ProjectHelper.createNewGDJSProject();
       const layout = project.insertNewLayout('Scene', 0);

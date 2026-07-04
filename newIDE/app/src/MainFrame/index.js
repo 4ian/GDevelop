@@ -601,26 +601,37 @@ const MainFrame = (props: Props): React.MixedElement => {
       project: ?gdProject,
       actionType: 'preview' | 'export'
     ): Promise<boolean> => {
-      if (
-        !project ||
-        !preferences.getBlockPreviewAndExportOnDiagnosticErrors()
-      ) {
+      if (!project) {
         return false;
       }
 
       try {
+        const shouldBlockAllDiagnosticErrors = preferences.getBlockPreviewAndExportOnDiagnosticErrors();
         const validationErrors = scanProjectForValidationErrors(project);
-        if (validationErrors.length > 0) {
+        const unsafeExternalLayoutCreationErrors = validationErrors.filter(
+          error => error.type === 'unsafe-external-layout-creation'
+        );
+        const mustBlockForUnsafeExternalLayoutCreation =
+          actionType === 'preview' &&
+          unsafeExternalLayoutCreationErrors.length > 0;
+
+        if (
+          mustBlockForUnsafeExternalLayoutCreation ||
+          (shouldBlockAllDiagnosticErrors && validationErrors.length > 0)
+        ) {
           const openReport = await showConfirmation({
-            title: t`Diagnostic errors found`,
-            message:
-              actionType === 'preview'
-                ? t`Your project has ${
-                    validationErrors.length
-                  } diagnostic error(s). Please fix them before launching a preview.`
-                : t`Your project has ${
-                    validationErrors.length
-                  } diagnostic error(s). Please fix them before exporting.`,
+            title: mustBlockForUnsafeExternalLayoutCreation
+              ? t`External layout action needs a condition`
+              : t`Diagnostic errors found`,
+            message: mustBlockForUnsafeExternalLayoutCreation
+              ? t`This preview cannot run because an event creates objects from an external layout without any condition. Add a condition, for example "At the beginning of the scene", before launching a preview.`
+              : actionType === 'preview'
+              ? t`Your project has ${
+                  validationErrors.length
+                } diagnostic error(s). Please fix them before launching a preview.`
+              : t`Your project has ${
+                  validationErrors.length
+                } diagnostic error(s). Please fix them before exporting.`,
             dismissButtonLabel: t`Close`,
             confirmButtonLabel: t`Open report`,
           });

@@ -67,6 +67,7 @@ type Props = {|
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
 
   idPrefix: string,
+  isInstructionMarkedAsInvalid?: gdInstruction => boolean,
   highlightedSearchText?: ?string,
   highlightedSearchMatchCase?: boolean,
 |};
@@ -106,6 +107,7 @@ export default function InstructionsList({
   objectsContainer,
   projectScopedContainersAccessor,
   idPrefix,
+  isInstructionMarkedAsInvalid,
   highlightedSearchText,
   highlightedSearchMatchCase,
 }: Props): React.Node {
@@ -154,6 +156,11 @@ export default function InstructionsList({
         onDoubleClick={() => onInstructionDoubleClick(instructionContext)}
         onContextMenu={(x, y) =>
           onInstructionContextMenu(x, y, instructionContext)
+        }
+        isMarkedAsInvalid={
+          isInstructionMarkedAsInvalid
+            ? isInstructionMarkedAsInvalid(instruction)
+            : false
         }
         onParameterClick={(domEvent, parameterIndex) =>
           onParameterClick({

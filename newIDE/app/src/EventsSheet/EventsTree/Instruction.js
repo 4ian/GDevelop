@@ -10,6 +10,7 @@ import {
   selectableArea,
   subInstructionsContainer,
   instructionParameter,
+  instructionInvalidParameter,
   disabledText,
   icon,
   warningInstruction,
@@ -76,6 +77,7 @@ type Props = {|
   onDoubleClick: () => void,
   onContextMenu: (x: number, y: number) => void,
   onMoveToInstruction: () => void,
+  isMarkedAsInvalid?: boolean,
 
   // For potential sub-instructions list:
   selection: Object,
@@ -498,6 +500,7 @@ const Instruction = (props: Props): React.Node => {
                 className={classNames({
                   [selectableArea]: true,
                   [selectedArea]: props.selected,
+                  [instructionInvalidParameter]: props.isMarkedAsInvalid,
                   [warningInstruction]:
                     showDeprecatedInstructionWarning !== 'no' &&
                     (!isInstructionVisible(scope, metadata) ||

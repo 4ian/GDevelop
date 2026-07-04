@@ -47,6 +47,42 @@ bool HasEnabledInstructions(const gd::InstructionsList& instructions) {
   return false;
 }
 
+void ReportUnsafeExternalLayoutCreationIfNeeded(
+    const gd::StandardEvent& event,
+    gd::EventsCodeGenerator& codeGenerator) {
+  if (!codeGenerator.HasProjectAndLayout() ||
+      HasEnabledInstructions(event.GetConditions())) {
+    return;
+  }
+
+  gd::DiagnosticReport* diagnosticReport = codeGenerator.GetDiagnosticReport();
+  if (!diagnosticReport) {
+    return;
+  }
+
+  const gd::InstructionsList& actions = event.GetActions();
+  for (std::size_t i = 0; i < actions.size(); ++i) {
+    const gd::Instruction& action = actions[i];
+    if (action.IsDisabled() ||
+        action.GetType() !=
+            "BuiltinExternalLayouts::CreateObjectsFromExternalLayout") {
+      continue;
+    }
+
+    const gd::String externalLayoutName =
+        action.GetParametersCount() > 1
+            ? action.GetParameter(1).GetPlainString()
+            : "";
+    gd::ProjectDiagnostic projectDiagnostic(
+        gd::ProjectDiagnostic::ErrorType::UnsafeExternalLayoutCreation,
+        "Create objects from an external layout must not be used in an event "
+        "without conditions.",
+        externalLayoutName,
+        "Add a condition, for example At the beginning of the scene.");
+    diagnosticReport->Add(projectDiagnostic);
+  }
+}
+
 const gd::Instruction* FindTopLevelSignalReceivedCondition(
     const gd::InstructionsList& instructions) {
   for (std::size_t i = 0; i < instructions.size(); ++i) {
@@ -169,6 +205,8 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
                 ? ""
                 : codeGenerator.GenerateBooleanFullName("isConditionTrue",
                                                         context);
+
+        ReportUnsafeExternalLayoutCreationIfNeeded(event, codeGenerator);
 
         gd::EventsCodeGenerationContext actionsContext;
         actionsContext.Reuse(context);

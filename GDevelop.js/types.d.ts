@@ -85,6 +85,7 @@ export enum ProjectDiagnostic_ErrorType {
   MissingBehavior = 1,
   UnknownObject = 2,
   MismatchedObjectType = 3,
+  UnsafeExternalLayoutCreation = 4,
 }
 
 export enum ExpressionParserError_ErrorType {

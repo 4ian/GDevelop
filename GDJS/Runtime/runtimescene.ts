@@ -504,7 +504,14 @@ namespace gdjs {
 
       // Set to true to enable debug rendering (look for the implementation in the renderer
       // to see what is rendered).
-      if (this._debugDrawEnabled) {
+      if (
+        this._debugDrawEnabled &&
+        this._debuggerRenderer.isDebugDrawRefreshNeeded(
+          this._debugDrawShowHiddenInstances,
+          this._debugDrawShowPointsNames,
+          this._debugDrawShowCustomPoints
+        )
+      ) {
         this._debuggerRenderer.renderDebugDraw(
           this.getAdhocListOfAllInstances(),
           this._debugDrawShowHiddenInstances,
@@ -516,12 +523,12 @@ namespace gdjs {
         const signalAnimationDebugRecords = this._signalBus
           ? this._signalBus.getSignalAnimationDebugRecords()
           : [];
-        const signalDebugInfo = this._signalBus
-          ? this._signalBus.getDebugInfo()
-          : null;
+        const queuedSignalsCount = this._signalBus
+          ? this._signalBus.getQueuedSignalsCount()
+          : 0;
         this._debuggerRenderer.renderSignalDebugDraw(
           signalAnimationDebugRecords,
-          signalDebugInfo
+          queuedSignalsCount
         );
       } else {
         this._debuggerRenderer.clearSignalDebugDraw();

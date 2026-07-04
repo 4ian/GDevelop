@@ -3179,6 +3179,7 @@ enum ProjectDiagnostic_ErrorType {
     "ProjectDiagnostic::MissingBehavior",
     "ProjectDiagnostic::UnknownObject",
     "ProjectDiagnostic::MismatchedObjectType",
+    "ProjectDiagnostic::UnsafeExternalLayoutCreation",
 };
 
 interface ProjectDiagnostic {

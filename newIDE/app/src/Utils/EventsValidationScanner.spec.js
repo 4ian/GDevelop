@@ -509,6 +509,78 @@ describe('EventsValidationScanner', () => {
           expect(targetError.isCondition).toBe(false);
         }
       });
+
+      it('detects external layout creation in a standard event without conditions', () => {
+        const { project, testLayout } = makeTestProject(gd);
+        const events = testLayout.getEvents();
+
+        const event = events.insertNewEvent(
+          project,
+          'BuiltinCommonInstructions::Standard',
+          0
+        );
+        const standardEvent = gd.asStandardEvent(event);
+        const action = new gd.Instruction();
+        action.setType(
+          'BuiltinExternalLayouts::CreateObjectsFromExternalLayout'
+        );
+        action.setParameter(1, '"Main_HUD"');
+        action.setParameter(2, '0');
+        action.setParameter(3, '0');
+        action.setParameter(4, '0');
+        standardEvent.getActions().insert(action, 0);
+        action.delete();
+
+        const errors = scanProjectForValidationErrors(project);
+
+        const targetError = errors.find(
+          e => e.type === 'unsafe-external-layout-creation'
+        );
+        expect(targetError).toBeDefined();
+        if (targetError) {
+          expect(targetError.instructionType).toBe(
+            'BuiltinExternalLayouts::CreateObjectsFromExternalLayout'
+          );
+          expect(targetError.isCondition).toBe(false);
+          expect(targetError.locationType).toBe('scene');
+          expect(targetError.locationName).toBe(testLayout.getName());
+        }
+      });
+
+      it('allows external layout creation when the event has an enabled condition', () => {
+        const { project, testLayout } = makeTestProject(gd);
+        const events = testLayout.getEvents();
+
+        const event = events.insertNewEvent(
+          project,
+          'BuiltinCommonInstructions::Standard',
+          0
+        );
+        const standardEvent = gd.asStandardEvent(event);
+        const condition = new gd.Instruction();
+        condition.setType('SceneJustBegins');
+        condition.setParameter(0, '');
+        standardEvent.getConditions().insert(condition, 0);
+        condition.delete();
+
+        const action = new gd.Instruction();
+        action.setType(
+          'BuiltinExternalLayouts::CreateObjectsFromExternalLayout'
+        );
+        action.setParameter(1, '"Main_HUD"');
+        action.setParameter(2, '0');
+        action.setParameter(3, '0');
+        action.setParameter(4, '0');
+        standardEvent.getActions().insert(action, 0);
+        action.delete();
+
+        const errors = scanProjectForValidationErrors(project);
+
+        const targetError = errors.find(
+          e => e.type === 'unsafe-external-layout-creation'
+        );
+        expect(targetError).toBeUndefined();
+      });
     });
   });
 

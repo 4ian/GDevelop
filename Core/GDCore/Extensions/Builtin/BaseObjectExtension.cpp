@@ -1698,8 +1698,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 _("Include or exclude a child from its parent collision mask."),
                 _("Include _PARAM0_ in parent object collision mask: _PARAM1_"),
                 _("Collision"),
-                "res/functions/extension.svg",
-                "res/functions/extension.svg")
+                "res/functions/extension_black.svg",
+                "res/functions/extension_black.svg")
       .AddParameter("object", _("Object"))
       .AddParameter("yesorno", "Include in parent collision mask")
       .SetRelevantForCustomObjectEventsOnly();

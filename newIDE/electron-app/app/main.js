@@ -1021,7 +1021,10 @@ app.on('ready', function() {
     const windowId = window ? window.id : 'unknown';
     sendMessage(windowId, message, err => {
       if (!event.sender.isDestroyed()) {
-        event.sender.send('debugger-send-message-done', err);
+        event.sender.send('debugger-send-message-done', {
+          id: message && message.id,
+          errorMessage: err ? err.message || String(err) : null,
+        });
       }
     });
   });

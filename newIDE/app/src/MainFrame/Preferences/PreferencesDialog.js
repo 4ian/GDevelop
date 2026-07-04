@@ -81,7 +81,6 @@ const PreferencesDialog = ({
     setNewProjectsDefaultFolder,
     setUseShortcutToClosePreviewWindow,
     setWatchProjectFolderFilesForLocalProjects,
-    setDisplaySaveReminder,
     setFetchPlayerTokenForPreviewAutomatically,
     setPreviewCrashReportUploadLevel,
     setTakeScreenshotOnPreview,
@@ -704,15 +703,6 @@ const PreferencesDialog = ({
                 checked={values.automaticallyUseCreditsForAiRequests}
                 label={i18n._(
                   t`Automatically use GDevelop credits for AI requests when run out of AI credits`
-                )}
-              />
-              <CompactToggleField
-                labelColor="primary"
-                hideTooltip
-                onCheck={check => setDisplaySaveReminder({ activated: check })}
-                checked={values.displaySaveReminder.activated}
-                label={i18n._(
-                  t`Display save reminder after significant changes in project`
                 )}
               />
               <CompactToggleField

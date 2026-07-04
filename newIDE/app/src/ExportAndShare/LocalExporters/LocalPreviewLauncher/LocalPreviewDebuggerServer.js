@@ -79,6 +79,14 @@ const notifyConnectionClosed = (id: DebuggerId) => {
   );
 };
 
+const removeDebuggerId = (id: DebuggerId): boolean => {
+  const debuggerIdIndex = debuggerIds.indexOf(id);
+  if (debuggerIdIndex === -1) return false;
+  debuggerIds.splice(debuggerIdIndex, 1);
+  delete recentLogsByDebuggerId[id];
+  return true;
+};
+
 const removeServerListeners = () => {
   if (!ipcRenderer) return;
 
@@ -136,11 +144,33 @@ class LocalPreviewDebuggerServer {
         callbacksList.forEach(({ onErrorReceived }) => onErrorReceived(err));
       });
 
-      ipcRenderer.on('debugger-connection-closed', (event, { id }) => {
-        const debuggerIdIndex = debuggerIds.indexOf(id);
-        if (debuggerIdIndex !== -1) debuggerIds.splice(debuggerIdIndex, 1);
-        delete recentLogsByDebuggerId[id];
+      ipcRenderer.on('debugger-send-message-done', (event, result) => {
+        const id =
+          result && typeof result === 'object' && typeof result.id === 'string'
+            ? result.id
+            : '';
+        const errorMessage =
+          result &&
+          typeof result === 'object' &&
+          typeof result.errorMessage === 'string'
+            ? result.errorMessage
+            : typeof result === 'string'
+            ? result
+            : null;
+        if (!errorMessage) return;
 
+        const wasConnected = id ? removeDebuggerId(id) : false;
+        callbacksList.forEach(({ onConnectionErrored }) =>
+          onConnectionErrored({
+            id,
+            errorMessage,
+          })
+        );
+        if (id && wasConnected) notifyConnectionClosed(id);
+      });
+
+      ipcRenderer.on('debugger-connection-closed', (event, { id }) => {
+        removeDebuggerId(id);
         notifyConnectionClosed(id);
       });
 

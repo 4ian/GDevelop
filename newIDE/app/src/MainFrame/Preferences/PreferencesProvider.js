@@ -95,7 +95,6 @@ export const getInitialPreferences = (): {
   codeEditorThemeName: string,
   defaultEditorMosaicNodes: {},
   disableNpmScriptConfirmation: boolean,
-  displaySaveReminder: { activated: boolean },
   editorStateByProject: {},
   eventsSheetCancelInlineParameter: string,
   eventsSheetIndentScale: number,
@@ -435,8 +434,6 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     setNewFeaturesAcknowledgements: (this._setNewFeaturesAcknowledgements.bind(
       this
     ): any),
-    // $FlowFixMe[method-unbinding]
-    setDisplaySaveReminder: (this._setDisplaySaveReminder.bind(this): any),
     // $FlowFixMe[method-unbinding]
     getEditorStateForProject: (this._getEditorStateForProject.bind(this): any),
     // $FlowFixMe[method-unbinding]
@@ -1362,18 +1359,6 @@ export default class PreferencesProvider extends React.Component<Props, State> {
         values: {
           ...state.values,
           newFeaturesAcknowledgements,
-        },
-      }),
-      () => this._persistValuesToLocalStorage(this.state)
-    );
-  }
-
-  _setDisplaySaveReminder(newValue: {| activated: boolean |}) {
-    this.setState(
-      state => ({
-        values: {
-          ...state.values,
-          displaySaveReminder: newValue,
         },
       }),
       () => this._persistValuesToLocalStorage(this.state)

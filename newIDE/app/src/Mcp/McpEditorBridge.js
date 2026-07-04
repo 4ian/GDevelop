@@ -1834,6 +1834,7 @@ const previewHealthCheck = async (
 
   let matched = false;
   let status = null;
+  let pingFailure = null;
   if (running && targetId) {
     const ping = await sendTargetedRequest(
       previewDebuggerServer,
@@ -1843,16 +1844,33 @@ const previewHealthCheck = async (
     );
     matched = ping.matched;
     status = matched ? ping.payload : null;
+    pingFailure = !matched ? ping.payload : null;
   }
 
-  const responsive = running && matched;
+  const currentPreviewIds =
+    serverState === 'started'
+      ? getPreviewDebuggerIds(previewDebuggerServer)
+      : [];
+  const currentRunning =
+    serverState === 'started' && currentPreviewIds.length > 0;
+  const currentLatestDebuggerId = currentPreviewIds.length
+    ? currentPreviewIds[currentPreviewIds.length - 1]
+    : null;
+  const responsive = currentRunning && matched;
+  const targetDisconnected =
+    !!targetId &&
+    running &&
+    !matched &&
+    (currentPreviewIds.indexOf(targetId) === -1 ||
+      (pingFailure &&
+        (pingFailure.connectionClosed || pingFailure.connectionErrored)));
   const recommendedActions = responsive
     ? [
         'gdevelop_inspect_running_preview',
         'run_frames',
         'capture_preview_screenshot',
       ]
-    : running
+    : currentRunning
     ? [
         'control_preview { action: "focus" }',
         'control_preview { action: "close", close_all: true }',
@@ -1861,29 +1879,32 @@ const previewHealthCheck = async (
     : ['launch_preview'];
   return {
     success: true,
-    running,
+    running: currentRunning,
     serverState,
     responsive,
-    previewHealth: running
+    previewHealth: currentRunning
       ? responsive
         ? 'responsive'
+        : targetDisconnected
+        ? 'target-disconnected'
         : 'connected-unresponsive'
       : 'not-running',
-    availableDebuggerIds: previewIds,
-    latestDebuggerId,
+    availableDebuggerIds: currentPreviewIds,
+    latestDebuggerId: currentLatestDebuggerId,
     targetDebuggerId: targetId,
     status: status || undefined,
+    error: pingFailure && pingFailure.error ? pingFailure.error : undefined,
     diagnostics: buildPreviewDiagnostics({
-      running: serverState === 'started',
-      previewIds,
+      running: currentRunning,
+      previewIds: currentPreviewIds,
       targetId,
       status,
-      timedOut: running && !responsive,
+      timedOut: currentRunning && !responsive && !targetDisconnected,
       operation: 'health_check',
     }),
     recommendedActions,
     recovery:
-      running && previewIds.length > 1
+      currentRunning && currentPreviewIds.length > 1
         ? [
             'control_preview { action: "close", close_all: true }',
             'launch_preview { start_paused: true }',
@@ -2454,9 +2475,30 @@ const sendTargetedRequest = (
       unregister = previewDebuggerServer.registerCallbacks({
         onErrorReceived: () => {},
         onServerStateChanged: () => {},
-        onConnectionClosed: () => {},
+        onConnectionClosed: connection => {
+          const closedId = getConnectionDebuggerId(connection);
+          if (closedId !== targetId) return;
+          finish({
+            matched: false,
+            payload: {
+              error: `Debugger connection "${targetId}" closed before replying.`,
+              connectionClosed: true,
+            },
+          });
+        },
         onConnectionOpened: () => {},
-        onConnectionErrored: () => {},
+        onConnectionErrored: ({ id, errorMessage }) => {
+          if (id !== targetId) return;
+          finish({
+            matched: false,
+            payload: {
+              error:
+                errorMessage ||
+                `Debugger connection "${targetId}" errored before replying.`,
+              connectionErrored: true,
+            },
+          });
+        },
         onHandleParsedMessage: ({ id, parsedMessage }) => {
           if (
             id === targetId &&
@@ -2526,6 +2568,7 @@ const makePreviewRuntimeNotReadyResult = ({
   status,
   operation,
   failurePhase,
+  failurePayload,
 }: {|
   previewDebuggerServer: Object,
   targetId: string,
@@ -2534,22 +2577,31 @@ const makePreviewRuntimeNotReadyResult = ({
   status: any,
   operation: string,
   failurePhase: string,
+  failurePayload?: any,
 |}): Object => {
   const previewIds = getPreviewDebuggerIds(previewDebuggerServer);
+  const targetStillConnected = previewIds.indexOf(targetId) !== -1;
   return {
     ready: false,
+    running: targetStillConnected,
     responsive: false,
-    previewHealth: status ? 'connected-status-only' : 'connected-unresponsive',
+    previewHealth: status
+      ? 'connected-status-only'
+      : targetStillConnected
+      ? 'connected-unresponsive'
+      : 'not-running',
     failurePhase,
     attempts,
     timeoutMs,
     status: status || undefined,
+    error:
+      failurePayload && failurePayload.error ? failurePayload.error : undefined,
     diagnostics: buildPreviewDiagnostics({
-      running: true,
+      running: targetStillConnected,
       previewIds,
       targetId,
       status,
-      timedOut: true,
+      timedOut: targetStillConnected,
       operation,
     }),
   };
@@ -2625,6 +2677,21 @@ const waitForPreviewRuntimeReady = async (
           elapsedMs: Date.now() - startedAt,
         };
       }
+    }
+    if (
+      payload &&
+      (payload.connectionClosed === true || payload.connectionErrored === true)
+    ) {
+      return makePreviewRuntimeNotReadyResult({
+        previewDebuggerServer,
+        targetId,
+        timeoutMs,
+        attempts,
+        status: lastStatus,
+        operation,
+        failurePhase: requirePaused ? 'pause-confirmation' : 'runtime-ready',
+        failurePayload: payload,
+      });
     }
 
     const remainingAfterProbeMs = timeoutMs - (Date.now() - startedAt);
@@ -2741,7 +2808,7 @@ const pausePreviewAndConfirm = async (
   const { matched, payload } = await sendTargetedRequest(
     previewDebuggerServer,
     targetId,
-    { command: 'pause' },
+    { command: 'pause', skipDump: true },
     { timeoutMs: pauseTimeoutMs }
   );
   if (matched && payload && payload.isPaused === true) {
@@ -3225,7 +3292,7 @@ const controlPreview = async (
     const { matched, payload } = await sendTargetedRequest(
       (previewDebuggerServer: any),
       targetId,
-      { command },
+      command === 'pause' ? { command, skipDump: true } : { command },
       { timeoutMs: 1500 }
     );
     if (!matched) {

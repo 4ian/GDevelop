@@ -257,10 +257,12 @@ namespace gdjs {
           if (data.messageId) {
             that.sendRuntimeGameStatus(data.messageId);
           }
-          // Let the pause status flush before the heavier runtime dump.
-          setTimeout(() => {
-            that.sendRuntimeGameDump();
-          }, 0);
+          if (!data.skipDump) {
+            // Let the pause status flush before the heavier runtime dump.
+            setTimeout(() => {
+              that.sendRuntimeGameDump();
+            }, 0);
+          }
         } else if (data.command === 'refresh') {
           that.sendRuntimeGameDump();
         } else if (data.command === 'getStatus') {

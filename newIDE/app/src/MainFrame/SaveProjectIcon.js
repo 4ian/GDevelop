@@ -6,9 +6,6 @@ import DotBadge from '../UI/DotBadge';
 import FloppyIcon from '../UI/CustomSvgIcons/Floppy';
 import { t } from '@lingui/macro';
 import UnsavedChangesContext from './UnsavedChangesContext';
-import { getUnsavedChangesAmount } from './UseSaveReminder';
-import { useInterval } from '../Utils/UseInterval';
-import useForceUpdate from '../Utils/UseForceUpdate';
 import type { FileMetadata } from '../ProjectsStorage';
 
 type Props = {|
@@ -18,15 +15,10 @@ type Props = {|
   canSave: boolean,
   id: string,
 |};
-const CHECK_FREQUENCY = 5000;
 
 const SaveProjectIcon = (props: Props): React.Node => {
   const unsavedChanges = React.useContext(UnsavedChangesContext);
-  const unsavedChangesAmount = getUnsavedChangesAmount(unsavedChanges);
-  const displayDotBadge = unsavedChangesAmount !== 'none';
-  const dotBadgeColor = unsavedChangesAmount === 'small' ? 'neutral' : 'error';
-
-  useInterval(useForceUpdate(), props.canSave ? CHECK_FREQUENCY : null);
+  const displayDotBadge = unsavedChanges.hasUnsavedChanges;
 
   return (
     <IconButton
@@ -39,11 +31,7 @@ const SaveProjectIcon = (props: Props): React.Node => {
       color="default"
       disabled={!props.canSave}
     >
-      <DotBadge
-        overlap="circle"
-        color={dotBadgeColor}
-        invisible={!displayDotBadge}
-      >
+      <DotBadge overlap="circle" color="error" invisible={!displayDotBadge}>
         <FloppyIcon />
       </DotBadge>
     </IconButton>

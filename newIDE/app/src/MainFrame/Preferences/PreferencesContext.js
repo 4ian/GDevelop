@@ -277,7 +277,6 @@ export type PreferencesValues = {|
   newFeaturesAcknowledgements: {
     [featureId: string]: {| dates: [number] |},
   },
-  displaySaveReminder: {| activated: boolean |}, // Store as object in case we need to add options.
   editorStateByProject: { [string]: EditorStateForProject },
   fetchPlayerTokenForPreviewAutomatically: boolean,
   previewCrashReportUploadLevel: string,
@@ -403,7 +402,6 @@ export type Preferences = {|
   setNewFeaturesAcknowledgements: ({
     [featureId: string]: {| dates: [number] |},
   }) => void,
-  setDisplaySaveReminder: ({| activated: boolean |}) => void,
   getEditorStateForProject: (projectId: string) => ?EditorStateForProject,
   setEditorStateForProject: (
     projectId: string,
@@ -481,7 +479,6 @@ export const initialPreferences = {
     useShortcutToClosePreviewWindow: true,
     watchProjectFolderFilesForLocalProjects: true,
     newFeaturesAcknowledgements: {},
-    displaySaveReminder: { activated: true },
     editorStateByProject: {},
     fetchPlayerTokenForPreviewAutomatically: true,
     previewCrashReportUploadLevel: 'exclude-javascript-code-events',
@@ -573,7 +570,6 @@ export const initialPreferences = {
   setUseShortcutToClosePreviewWindow: () => {},
   setWatchProjectFolderFilesForLocalProjects: () => {},
   setNewFeaturesAcknowledgements: () => {},
-  setDisplaySaveReminder: () => {},
   getEditorStateForProject: (projectId: any): any => {},
   setEditorStateForProject: (projectId: any, editorState: any) => {},
   setFetchPlayerTokenForPreviewAutomatically: (enabled: boolean) => {},

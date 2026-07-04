@@ -239,7 +239,6 @@ import { ProjectManagerDrawer } from '../ProjectManager/ProjectManagerDrawer';
 import DiagnosticReportDialog from '../ExportAndShare/DiagnosticReportDialog';
 import MemoryTrackedRegistryDialog from './MemoryTrackedRegistryDialog';
 import { scanProjectForValidationErrors } from '../Utils/EventsValidationScanner';
-import useSaveReminder from './UseSaveReminder';
 import { useMultiplayerLobbyConfigurator } from './UseMultiplayerLobbyConfigurator';
 import { useAuthenticatedPlayer } from './UseAuthenticatedPlayer';
 import ListIcon from '../UI/ListIcon';
@@ -5649,12 +5648,6 @@ const MainFrame = (props: Props): React.MixedElement => {
     [saveProject]
   );
 
-  const renderSaveReminder = useSaveReminder({
-    onSave: saveProject,
-    project: currentProject,
-    isInQuickCustomization: !!quickCustomizationDialogOpenedFromGameId,
-  });
-
   /**
    * Returns true if the project has been closed and false if the user refused to close it.
    */
@@ -7444,7 +7437,6 @@ const MainFrame = (props: Props): React.MixedElement => {
       {renderResourceMoverDialog()}
       {renderResourceFetcherDialog()}
       {renderVersionHistoryPanel()}
-      {renderSaveReminder()}
       {renderExtensionLoadErrorDialog()}
       <CloseConfirmDialog
         shouldPrompt={!!state.currentProject}

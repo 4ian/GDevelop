@@ -71,6 +71,8 @@ describe('McpEditorBridge', () => {
   const makeTargetedPreviewServer = ({
     debuggerIds = ['preview-ws-0'],
     responders = {},
+    closeOnSendCommands = [],
+    errorOnSendCommands = {},
   }: Object = {}) => {
     let callbacks: any = null;
     let currentDebuggerIds: Array<string> = debuggerIds;
@@ -85,6 +87,34 @@ describe('McpEditorBridge', () => {
         };
       },
       sendMessage: (id: string, message: any) => {
+        if (closeOnSendCommands.indexOf(message.command) !== -1) {
+          currentDebuggerIds = currentDebuggerIds.filter(
+            debuggerId => debuggerId !== id
+          );
+          setTimeout(() => {
+            if (!callbacks) return;
+            callbacks.onConnectionClosed({
+              id,
+              debuggerIds: currentDebuggerIds,
+            });
+          }, 2);
+          return;
+        }
+        const errorMessage = errorOnSendCommands[message.command];
+        if (errorMessage) {
+          currentDebuggerIds = currentDebuggerIds.filter(
+            debuggerId => debuggerId !== id
+          );
+          setTimeout(() => {
+            if (!callbacks) return;
+            callbacks.onConnectionErrored({ id, errorMessage });
+            callbacks.onConnectionClosed({
+              id,
+              debuggerIds: currentDebuggerIds,
+            });
+          }, 2);
+          return;
+        }
         const responder = responders[message.command];
         if (responder === undefined || !callbacks) return;
         const payload =
@@ -237,6 +267,33 @@ describe('McpEditorBridge', () => {
     expect(result.recommendedActions).toContain(
       'control_preview { action: "close", close_all: true }'
     );
+  });
+
+  it('does not keep a stale preview id alive when health-check target disconnects', async () => {
+    const previewDebuggerServer = makeTargetedPreviewServer({
+      debuggerIds: ['preview-ws-0'],
+      closeOnSendCommands: ['getStatus'],
+    });
+    const bridge = makeBridge({
+      getPreviewDebuggerServer: () => previewDebuggerServer,
+    });
+
+    const response = await bridge.handleRendererMcpRequest({
+      method: 'tools/call',
+      params: {
+        name: 'preview_health_check',
+        arguments: { timeout_ms: 1000 },
+      },
+    });
+    const result = JSON.parse(response.content[0].text);
+
+    expect(response.isError).not.toBe(true);
+    expect(result.running).toBe(false);
+    expect(result.responsive).toBe(false);
+    expect(result.previewHealth).toBe('not-running');
+    expect(result.availableDebuggerIds).toEqual([]);
+    expect(result.latestDebuggerId).toBe(null);
+    expect(result.error).toContain('closed before replying');
   });
 
   it('waits until a selected preview answers getStatus', async () => {
@@ -6242,6 +6299,14 @@ describe('McpEditorBridge', () => {
     expect(
       sent.some(s => s.id === 'preview-ws-0' && s.message.command === 'pause')
     ).toBe(true);
+    expect(
+      sent.some(
+        s =>
+          s.id === 'preview-ws-0' &&
+          s.message.command === 'pause' &&
+          s.message.skipDump === true
+      )
+    ).toBe(true);
   });
 
   it('launch_preview attaches to an already-running preview instead of opening a new window', async () => {
@@ -7172,6 +7237,37 @@ describe('McpEditorBridge', () => {
     );
   });
 
+  it('run_frames stops readiness polling when the targeted preview disconnects', async () => {
+    const previewDebuggerServer = makeTargetedPreviewServer({
+      debuggerIds: ['preview-ws-23'],
+      closeOnSendCommands: ['getStatus'],
+    });
+    const bridge = makeBridge({
+      getPreviewDebuggerServer: () => previewDebuggerServer,
+    });
+
+    const response = await bridge.handleRendererMcpRequest({
+      method: 'tools/call',
+      params: {
+        name: 'run_frames',
+        arguments: {
+          debugger_id: 'preview-ws-23',
+          frames: 1,
+          timeout_ms: 1000,
+        },
+      },
+    });
+    const result = JSON.parse(response.content[0].text);
+
+    expect(response.isError).not.toBe(true);
+    expect(result.success).toBe(false);
+    expect(result.ready).toBe(false);
+    expect(result.running).toBe(false);
+    expect(result.previewHealth).toBe('not-running');
+    expect(result.error).toContain('closed before replying');
+    expect(result.diagnostics.classification).toBe('no-running-preview');
+  });
+
   it('lists behavior names already on an object', async () => {
     // $FlowFixMe[invalid-constructor]
     const project = new gd.ProjectHelper.createNewGDJSProject();
@@ -7516,7 +7612,8 @@ describe('McpEditorBridge', () => {
     expect(pauseResult.success).toBe(true);
     expect(pauseResult.confirmed).toBe(true);
     expect(pauseResult.isPaused).toBe(true);
-    expect(sent.find(m => m.command === 'pause')).toBeDefined();
+    const pauseMessage: any = sent.find(m => m.command === 'pause');
+    expect(pauseMessage.skipDump).toBe(true);
 
     const stateResponse = await bridge.handleRendererMcpRequest({
       method: 'tools/call',

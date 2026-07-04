@@ -96,6 +96,151 @@ describe('gdjs.evtTools.object', function () {
   const getInstancesIds = (instances) =>
     instances.map((instance) => instance && instance.id);
 
+  const makeCollisionObjects = (runtimeScene) => {
+    const objectA = new gdjs.TestRuntimeObject(runtimeScene, {
+      name: 'ObjectA',
+      type: '',
+      variables: [],
+      behaviors: [],
+      effects: [],
+    });
+    objectA.setCustomWidthAndHeight(10, 10);
+    objectA.setCustomCenter(0, 0);
+
+    const objectB = new gdjs.TestRuntimeObject(runtimeScene, {
+      name: 'ObjectB',
+      type: '',
+      variables: [],
+      behaviors: [],
+      effects: [],
+    });
+    objectB.setCustomWidthAndHeight(10, 10);
+    objectB.setCustomCenter(0, 0);
+
+    return { objectA, objectB };
+  };
+
+  const makeCollisionObjectLists = (objectA, objectB) => ({
+    objectsListsA: Hashtable.newFrom({
+      ObjectA: [objectA],
+    }),
+    objectsListsB: Hashtable.newFrom({
+      ObjectB: [objectB],
+    }),
+  });
+
+  const runCollisionEnterCondition = (runtimeScene, objectA, objectB) => {
+    /** @type {boolean} */
+    let result = false;
+    /** @type {gdjs.RuntimeObject[]} */
+    let pickedObjectsA = [];
+    /** @type {gdjs.RuntimeObject[]} */
+    let pickedObjectsB = [];
+    runtimeScene.renderAndStepWithEventsFunction(1000 / 60, () => {
+      const { objectsListsA, objectsListsB } = makeCollisionObjectLists(
+        objectA,
+        objectB
+      );
+      result = gdjs.evtTools.object.hitBoxesCollisionEnterTest(
+        objectsListsA,
+        objectsListsB,
+        false,
+        runtimeScene,
+        1,
+        false
+      );
+      pickedObjectsA = objectsListsA.get('ObjectA').slice();
+      pickedObjectsB = objectsListsB.get('ObjectB').slice();
+    });
+
+    return { result, pickedObjectsA, pickedObjectsB };
+  };
+
+  const runCollisionExitCondition = (runtimeScene, objectA, objectB) => {
+    /** @type {boolean} */
+    let result = false;
+    /** @type {gdjs.RuntimeObject[]} */
+    let pickedObjectsA = [];
+    /** @type {gdjs.RuntimeObject[]} */
+    let pickedObjectsB = [];
+    runtimeScene.renderAndStepWithEventsFunction(1000 / 60, () => {
+      const { objectsListsA, objectsListsB } = makeCollisionObjectLists(
+        objectA,
+        objectB
+      );
+      result = gdjs.evtTools.object.hitBoxesCollisionExitTest(
+        objectsListsA,
+        objectsListsB,
+        false,
+        runtimeScene,
+        2,
+        false
+      );
+      pickedObjectsA = objectsListsA.get('ObjectA').slice();
+      pickedObjectsB = objectsListsB.get('ObjectB').slice();
+    });
+
+    return { result, pickedObjectsA, pickedObjectsB };
+  };
+
+  it('can detect collision enter', function () {
+    const runtimeGame = gdjs.getPixiRuntimeGame();
+    const runtimeScene = new gdjs.TestRuntimeScene(runtimeGame);
+    const { objectA, objectB } = makeCollisionObjects(runtimeScene);
+
+    objectB.setPosition(20, 0);
+    expect(
+      runCollisionEnterCondition(runtimeScene, objectA, objectB).result
+    ).to.be(false);
+
+    objectB.setPosition(0, 0);
+    const enteringCollision = runCollisionEnterCondition(
+      runtimeScene,
+      objectA,
+      objectB
+    );
+    expect(enteringCollision.result).to.be(true);
+    expect(getInstancesIds(enteringCollision.pickedObjectsA)).to.eql(
+      getInstancesIds([objectA])
+    );
+    expect(getInstancesIds(enteringCollision.pickedObjectsB)).to.eql(
+      getInstancesIds([objectB])
+    );
+
+    expect(
+      runCollisionEnterCondition(runtimeScene, objectA, objectB).result
+    ).to.be(false);
+  });
+
+  it('can detect collision exit', function () {
+    const runtimeGame = gdjs.getPixiRuntimeGame();
+    const runtimeScene = new gdjs.TestRuntimeScene(runtimeGame);
+    const { objectA, objectB } = makeCollisionObjects(runtimeScene);
+
+    objectB.setPosition(0, 0);
+    expect(
+      runCollisionExitCondition(runtimeScene, objectA, objectB).result
+    ).to.be(false);
+
+    objectB.setPosition(20, 0);
+    const exitingCollision = runCollisionExitCondition(
+      runtimeScene,
+      objectA,
+      objectB
+    );
+    expect(exitingCollision.result).to.be(true);
+    expect(getInstancesIds(exitingCollision.pickedObjectsA)).to.eql(
+      getInstancesIds([objectA])
+    );
+    expect(getInstancesIds(exitingCollision.pickedObjectsB)).to.eql(
+      getInstancesIds([objectB])
+    );
+
+    expect(
+      runCollisionExitCondition(runtimeScene, objectA, objectB).result
+    ).to.be(false);
+  });
+
   it('can create and pick an instance when some instances were not picked', function () {
     const runtimeGame = gdjs.getPixiRuntimeGame();
     const runtimeScene = new gdjs.TestRuntimeScene(runtimeGame);

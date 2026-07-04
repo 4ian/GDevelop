@@ -1981,6 +1981,54 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .MarkAsSimple();
 
   extension
+      .AddCondition(
+          "CollisionEnter",
+          _("Collision enter"),
+          _("Check if two objects have started colliding during this frame."),
+          _("_PARAM0_ started colliding with _PARAM1_"),
+          _("Collision"),
+          "res/conditions/collision24.png",
+          "res/conditions/collision.png")
+      .AddParameter("objectList", _("Object"))
+      .AddParameter("objectList", _("Object"))
+      .AddCodeOnlyParameter("conditionInverted", "")
+      .AddCodeOnlyParameter("currentScene", "")
+      .AddCodeOnlyParameter("conditionUniqueId", "")
+      .AddParameter("yesorno",
+                    _("Ignore objects that are touching each other on their "
+                      "edges, but are not overlapping (default: no)"),
+                    "",
+                    true)
+      .SetDefaultValue("no")
+      .SetHelpPath("/all-features/collisions/")
+      .SetRelevantForLayoutEventsOnly()
+      .MarkAsSimple();
+
+  extension
+      .AddCondition(
+          "CollisionExit",
+          _("Collision exit"),
+          _("Check if two objects have stopped colliding during this frame."),
+          _("_PARAM0_ stopped colliding with _PARAM1_"),
+          _("Collision"),
+          "res/conditions/collision24.png",
+          "res/conditions/collision.png")
+      .AddParameter("objectList", _("Object"))
+      .AddParameter("objectList", _("Object"))
+      .AddCodeOnlyParameter("conditionInverted", "")
+      .AddCodeOnlyParameter("currentScene", "")
+      .AddCodeOnlyParameter("conditionUniqueId", "")
+      .AddParameter("yesorno",
+                    _("Ignore objects that are touching each other on their "
+                      "edges, but are not overlapping (default: no)"),
+                    "",
+                    true)
+      .SetDefaultValue("no")
+      .SetHelpPath("/all-features/collisions/")
+      .SetRelevantForLayoutEventsOnly()
+      .MarkAsSimple();
+
+  extension
       .AddCondition("EstTourne",
                     _("An object is turned toward another"),
                     _("Check if an object is turned toward another"),

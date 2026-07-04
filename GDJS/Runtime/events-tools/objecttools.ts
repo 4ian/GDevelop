@@ -234,6 +234,283 @@ namespace gdjs {
         );
       };
 
+      type CollisionLifecycleKind = 'enter' | 'exit';
+
+      type CollisionLifecycleState = {
+        previousPairs: Set<string>;
+        consideredPairs: Set<string>;
+        collidingPairs: Set<string>;
+      };
+
+      const collisionLifecycleStatesByScene = new WeakMap<
+        gdjs.RuntimeScene,
+        Map<number | string, CollisionLifecycleState>
+      >();
+
+      let areCollisionLifecycleCallbacksRegistered = false;
+
+      const getCollisionLifecyclePairKey = function (
+        object1: gdjs.RuntimeObject,
+        object2: gdjs.RuntimeObject
+      ): string {
+        return object1.id < object2.id
+          ? object1.id + ':' + object2.id
+          : object2.id + ':' + object1.id;
+      };
+
+      const collisionLifecyclePairKeyHasObjectId = function (
+        pairKey: string,
+        objectId: integer
+      ): boolean {
+        const objectIdString = objectId.toString();
+        return (
+          pairKey.startsWith(objectIdString + ':') ||
+          pairKey.endsWith(':' + objectIdString)
+        );
+      };
+
+      const deleteCollisionLifecyclePairsWithObjectId = function (
+        pairs: Set<string>,
+        objectId: integer
+      ) {
+        pairs.forEach((pairKey) => {
+          if (collisionLifecyclePairKeyHasObjectId(pairKey, objectId)) {
+            pairs.delete(pairKey);
+          }
+        });
+      };
+
+      const ensureCollisionLifecycleCallbacksRegistered = function () {
+        if (areCollisionLifecycleCallbacksRegistered) {
+          return;
+        }
+
+        gdjs.registerRuntimeScenePostEventsCallback((runtimeScene) => {
+          const sceneStates = collisionLifecycleStatesByScene.get(runtimeScene);
+          if (!sceneStates) {
+            return;
+          }
+
+          sceneStates.forEach((state) => {
+            state.consideredPairs.forEach((pairKey) => {
+              if (state.collidingPairs.has(pairKey)) {
+                state.previousPairs.add(pairKey);
+              } else {
+                state.previousPairs.delete(pairKey);
+              }
+            });
+
+            state.consideredPairs.clear();
+            state.collidingPairs.clear();
+          });
+        });
+
+        gdjs.registerObjectDeletedFromSceneCallback(
+          (instanceContainer, object) => {
+            const runtimeScene = instanceContainer.getScene();
+            const sceneStates =
+              collisionLifecycleStatesByScene.get(runtimeScene);
+            if (!sceneStates) {
+              return;
+            }
+
+            sceneStates.forEach((state) => {
+              deleteCollisionLifecyclePairsWithObjectId(
+                state.previousPairs,
+                object.id
+              );
+              deleteCollisionLifecyclePairsWithObjectId(
+                state.consideredPairs,
+                object.id
+              );
+              deleteCollisionLifecyclePairsWithObjectId(
+                state.collidingPairs,
+                object.id
+              );
+            });
+          }
+        );
+
+        gdjs.registerRuntimeSceneUnloadedCallback((runtimeScene) => {
+          collisionLifecycleStatesByScene.delete(runtimeScene);
+        });
+
+        areCollisionLifecycleCallbacksRegistered = true;
+      };
+
+      const getCollisionLifecycleState = function (
+        instanceContainer: gdjs.RuntimeInstanceContainer,
+        conditionUniqueId: number | string
+      ): CollisionLifecycleState {
+        ensureCollisionLifecycleCallbacksRegistered();
+
+        const runtimeScene = instanceContainer.getScene();
+        let sceneStates = collisionLifecycleStatesByScene.get(runtimeScene);
+        if (!sceneStates) {
+          sceneStates = new Map();
+          collisionLifecycleStatesByScene.set(runtimeScene, sceneStates);
+        }
+
+        let state = sceneStates.get(conditionUniqueId);
+        if (!state) {
+          state = {
+            previousPairs: new Set(),
+            consideredPairs: new Set(),
+            collidingPairs: new Set(),
+          };
+          sceneStates.set(conditionUniqueId, state);
+        }
+
+        return state;
+      };
+
+      const hitBoxesCollisionLifecycleTest = function (
+        kind: CollisionLifecycleKind,
+        objectsLists1: ObjectsLists,
+        objectsLists2: ObjectsLists,
+        inverted: boolean,
+        instanceContainer: gdjs.RuntimeInstanceContainer,
+        conditionUniqueId: number | string,
+        ignoreTouchingEdges: boolean
+      ): boolean {
+        const state = getCollisionLifecycleState(
+          instanceContainer,
+          conditionUniqueId
+        );
+        const currentCollidingPairs = new Set<string>();
+        let isTrue = false;
+        const objects1Lists = gdjs.staticArray(hitBoxesCollisionLifecycleTest);
+        objectsLists1.values(objects1Lists);
+        const objects2Lists = gdjs.staticArray2(hitBoxesCollisionLifecycleTest);
+        objectsLists2.values(objects2Lists);
+
+        for (let i = 0, leni = objects1Lists.length; i < leni; ++i) {
+          const arr = objects1Lists[i];
+          for (let k = 0, lenk = arr.length; k < lenk; ++k) {
+            arr[k].pick = false;
+          }
+        }
+        for (let i = 0, leni = objects2Lists.length; i < leni; ++i) {
+          const arr = objects2Lists[i];
+          for (let k = 0, lenk = arr.length; k < lenk; ++k) {
+            arr[k].pick = false;
+          }
+        }
+
+        for (let i = 0, leni = objects1Lists.length; i < leni; ++i) {
+          const arr1 = objects1Lists[i];
+          for (let k = 0, lenk = arr1.length; k < lenk; ++k) {
+            for (let j = 0, lenj = objects2Lists.length; j < lenj; ++j) {
+              const arr2 = objects2Lists[j];
+              for (let l = 0, lenl = arr2.length; l < lenl; ++l) {
+                if (arr1[k].id === arr2[l].id) {
+                  continue;
+                }
+
+                const pairKey = getCollisionLifecyclePairKey(arr1[k], arr2[l]);
+                state.consideredPairs.add(pairKey);
+
+                if (
+                  gdjs.RuntimeObject.collisionTest(
+                    arr1[k],
+                    arr2[l],
+                    ignoreTouchingEdges
+                  )
+                ) {
+                  currentCollidingPairs.add(pairKey);
+                  state.collidingPairs.add(pairKey);
+                }
+              }
+            }
+          }
+        }
+
+        for (let i = 0, leni = objects1Lists.length; i < leni; ++i) {
+          const arr1 = objects1Lists[i];
+          for (let k = 0, lenk = arr1.length; k < lenk; ++k) {
+            let atLeastOneObject = false;
+            for (let j = 0, lenj = objects2Lists.length; j < lenj; ++j) {
+              const arr2 = objects2Lists[j];
+              for (let l = 0, lenl = arr2.length; l < lenl; ++l) {
+                if (arr1[k].id === arr2[l].id) {
+                  continue;
+                }
+
+                const pairKey = getCollisionLifecyclePairKey(arr1[k], arr2[l]);
+                const pairHasChanged =
+                  kind === 'enter'
+                    ? currentCollidingPairs.has(pairKey) &&
+                      !state.previousPairs.has(pairKey)
+                    : state.previousPairs.has(pairKey) &&
+                      !currentCollidingPairs.has(pairKey);
+
+                if (pairHasChanged) {
+                  if (!inverted) {
+                    isTrue = true;
+                    arr1[k].pick = true;
+                    arr2[l].pick = true;
+                  }
+                  atLeastOneObject = true;
+                }
+              }
+            }
+            if (!atLeastOneObject && inverted) {
+              isTrue = true;
+              arr1[k].pick = true;
+            }
+          }
+        }
+
+        for (let i = 0, leni = objects1Lists.length; i < leni; ++i) {
+          gdjs.evtTools.object.filterPickedObjectsList(objects1Lists[i]);
+        }
+        if (!inverted) {
+          for (let i = 0, leni = objects2Lists.length; i < leni; ++i) {
+            gdjs.evtTools.object.filterPickedObjectsList(objects2Lists[i]);
+          }
+        }
+
+        return isTrue;
+      };
+
+      export const hitBoxesCollisionEnterTest = function (
+        objectsLists1: ObjectsLists,
+        objectsLists2: ObjectsLists,
+        inverted: boolean,
+        instanceContainer: gdjs.RuntimeInstanceContainer,
+        conditionUniqueId: number | string,
+        ignoreTouchingEdges: boolean
+      ) {
+        return hitBoxesCollisionLifecycleTest(
+          'enter',
+          objectsLists1,
+          objectsLists2,
+          inverted,
+          instanceContainer,
+          conditionUniqueId,
+          ignoreTouchingEdges
+        );
+      };
+
+      export const hitBoxesCollisionExitTest = function (
+        objectsLists1: ObjectsLists,
+        objectsLists2: ObjectsLists,
+        inverted: boolean,
+        instanceContainer: gdjs.RuntimeInstanceContainer,
+        conditionUniqueId: number | string,
+        ignoreTouchingEdges: boolean
+      ) {
+        return hitBoxesCollisionLifecycleTest(
+          'exit',
+          objectsLists1,
+          objectsLists2,
+          inverted,
+          instanceContainer,
+          conditionUniqueId,
+          ignoreTouchingEdges
+        );
+      };
+
       export const _distanceBetweenObjects = function (obj1, obj2, distance) {
         return obj1.getSqDistanceToObject(obj2) <= distance;
       };

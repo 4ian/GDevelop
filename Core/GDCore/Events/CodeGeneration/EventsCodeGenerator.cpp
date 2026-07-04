@@ -450,6 +450,9 @@ gd::String EventsCodeGenerator::GenerateConditionCode(
         supplementaryParametersTypes;
     supplementaryParametersTypes.push_back(std::make_pair(
         "conditionInverted", condition.IsInverted() ? "true" : "false"));
+    supplementaryParametersTypes.push_back(std::make_pair(
+        "conditionUniqueId",
+        gd::String::From(GenerateSingleUsageUniqueIdFor(&condition))));
     vector<gd::String> arguments =
         GenerateParametersCodes(condition.GetParameters(),
                                 instrInfos.parameters,

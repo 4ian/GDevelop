@@ -238,6 +238,10 @@ BaseObjectExtension::BaseObjectExtension() {
 
   GetAllConditions()["CollisionNP"].SetFunctionName(
       "gdjs.evtTools.object.hitBoxesCollisionTest");
+  GetAllConditions()["CollisionEnter"].SetFunctionName(
+      "gdjs.evtTools.object.hitBoxesCollisionEnterTest");
+  GetAllConditions()["CollisionExit"].SetFunctionName(
+      "gdjs.evtTools.object.hitBoxesCollisionExitTest");
   GetAllConditions()["Raycast"].SetFunctionName(
       "gdjs.evtTools.object.raycastObject");
   GetAllConditions()["RaycastToPosition"].SetFunctionName(

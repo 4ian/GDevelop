@@ -392,12 +392,7 @@ namespace gdjs {
      *
      * Custom objects implement this method with code generated from events.
      */
-    onSignal(
-      signalName: string,
-      payload: string,
-      emitterObjectName: string,
-      emitterInstanceId: integer
-    ) {}
+    onSignal(signalName: string, payload: string) {}
 
     /**
      * Called after the custom object has received its final position, layer and

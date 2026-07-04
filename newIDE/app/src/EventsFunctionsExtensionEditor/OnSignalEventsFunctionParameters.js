@@ -14,16 +14,6 @@ const signalParameters = [
     type: 'string',
     description: 'Payload',
   },
-  {
-    name: 'EmitterObjectName',
-    type: 'string',
-    description: 'Emitter object name',
-  },
-  {
-    name: 'EmitterInstanceId',
-    type: 'expression',
-    description: 'Emitter instance id',
-  },
 ];
 
 const addParameter = (
@@ -112,7 +102,7 @@ export const ensureOnSignalObjectEventsFunctionProperParameters = (
     eventsBasedObject.getName()
   );
   if (
-    parameters.getParametersCount() === 5 &&
+    parameters.getParametersCount() === 3 &&
     isParameterMatching(parameters, 0, 'Object', 'object', objectType) &&
     hasExpectedSignalParameters(parameters, 1)
   ) {

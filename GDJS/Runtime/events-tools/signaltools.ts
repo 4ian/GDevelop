@@ -150,14 +150,6 @@ namespace gdjs {
     return signal ? signal.payload : '';
   };
 
-  const getSenderObjectName = (signal: RuntimeSignal): string => {
-    return signal.sender?.objectName || '';
-  };
-
-  const getSenderInstanceId = (signal: RuntimeSignal): integer => {
-    return signal.sender?.objectId ?? -1;
-  };
-
   const normalizeSender = (
     sender?: RuntimeSignalSenderInput
   ): RuntimeSignalSender | null => {
@@ -1111,12 +1103,7 @@ namespace gdjs {
           runtimeObjectCanReceiveObjectSignal(runtimeObject)) &&
         runtimeObjectHasOnSignal(runtimeObject)
       ) {
-        (runtimeObject as any).onSignal(
-          signal.name,
-          signal.payload,
-          getSenderObjectName(signal),
-          getSenderInstanceId(signal)
-        );
+        (runtimeObject as any).onSignal(signal.name, signal.payload);
         debugRecord.receivers.push(runtimeObject.getName());
         this._recordSignalAnimationReceiver(
           debugRecord,

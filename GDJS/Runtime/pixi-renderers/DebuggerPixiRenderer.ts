@@ -1357,7 +1357,7 @@ namespace gdjs {
       return [transformedPoint[0], transformedPoint[1]];
     }
 
-    _drawSignalDebugSceneReceiver(
+    _drawSignalDebugScenePoint(
       signalDraw: PIXI.Graphics,
       x: float,
       y: float,
@@ -1523,11 +1523,21 @@ namespace gdjs {
           signalDraw.endFill();
         }
 
+        if (segment.source.objectName === 'scene') {
+          this._drawSignalDebugScenePoint(
+            signalDraw,
+            sourceX,
+            sourceY,
+            color,
+            alpha
+          );
+        }
+
         if (
           segment.receiver.objectName === 'scene' ||
           segment.receiver.receiverName === 'scene'
         ) {
-          this._drawSignalDebugSceneReceiver(
+          this._drawSignalDebugScenePoint(
             signalDraw,
             receiverX,
             receiverY,

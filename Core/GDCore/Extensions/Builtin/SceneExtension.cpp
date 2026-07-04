@@ -93,6 +93,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
       .AddParameter("signalName", _("Signal name"))
       .AddParameter("string", _("Payload"), "", true)
       .AddCodeOnlyParameter("signalSenderObjectsContext", "")
+      .SetHidden()
       .MarkAsAdvanced();
 
   extension
@@ -144,6 +145,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
       .AddParameter("signalName", _("Signal name"))
       .AddParameter("string", _("Payload"), "", true)
       .AddCodeOnlyParameter("signalSenderObjectsContext", "")
+      .SetHidden()
       .MarkAsAdvanced();
 
   extension

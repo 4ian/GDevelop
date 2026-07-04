@@ -1717,7 +1717,7 @@ export const inspectSignalUsage = (
       handlers: limitedOnSignalHandlers,
     },
     note:
-      'Signal received conditions and SignalName()/SignalPayload()/sender expressions are scene/external-scene only. onSignal handlers are listed by receiver, not signal name; branch on their fixed SignalName, Payload, EmitterObjectName, and EmitterInstanceId parameters.',
+      'Signal received conditions and SignalName()/SignalPayload()/sender expressions are scene/external-scene only. onSignal handlers are listed by receiver, not signal name; branch on their fixed SignalName and Payload parameters.',
   };
 };
 

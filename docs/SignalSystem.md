@@ -534,8 +534,6 @@ signal data parameters:
 ```text
 SignalName          signalName  The delivered signal name.
 Payload             string      The delivered payload text.
-EmitterObjectName   string      The sender object name, or "" when none is set.
-EmitterInstanceId   expression  The sender unique id, or -1 when none is set.
 ```
 
 The direct parameters are the lifecycle API for prefab/object signal receivers.
@@ -553,12 +551,11 @@ Internal parameters:
 Visible signal parameters:
   SignalName
   Payload
-  EmitterObjectName
-  EmitterInstanceId
 ```
 
 Signal context expressions are not part of the `onSignal` editor surface. Use
-the fixed parameters above.
+the fixed parameters above. If a prefab receiver needs sender details, include
+them in the payload contract for that signal.
 
 ---
 
@@ -583,15 +580,13 @@ parameter. When an action emits from a prefab/object function event, the sender
 is the owner object (`Object`). When an action emits from scene or external
 scene events, the sender is the scene. JavaScript/runtime helper calls without
 an explicit sender also use the scene as their debug source.
-The sender is exposed by the `onSignal` parameters `EmitterObjectName` /
-`EmitterInstanceId` and, in scene/external scene receivers, by
+In scene/external scene receivers, the sender is exposed by
 `SignalSenderObjectName()` / `SignalSenderInstanceId()`.
 Vague names (`Trigger event`, `Call event`, `Send message`) are avoided.
 
 The object-instance action's instance id can come from an object's `InstanceId()`
 expression. When replying from scene/external scene events, it can also come
-from `SignalSenderInstanceId()`. When replying inside `onSignal`, use the fixed
-`EmitterInstanceId` parameter. Runtime instance ids start at 1. Empty signal
+from `SignalSenderInstanceId()`. Runtime instance ids start at 1. Empty signal
 names and invalid instance ids such as 0 are ignored at runtime instead of being
 queued, because they usually come from incomplete editor actions.
 
@@ -896,26 +891,20 @@ parameters instead of using the scene-only signal helpers:
 ```js
 const signalName = eventsFunctionContext.getArgument("SignalName");
 const payload = eventsFunctionContext.getArgument("Payload");
-const emitterObjectName =
-  eventsFunctionContext.getArgument("EmitterObjectName");
-const emitterInstanceId =
-  eventsFunctionContext.getArgument("EmitterInstanceId");
 ```
 
 ### 11.5 Codegen for object onSignal
 
-`onSignal` is generated as a runtime prototype method with the four signal data
+`onSignal` is generated as a runtime prototype method with the two signal data
 arguments. The events-function metadata still carries hidden owner parameters
 for editor/codegen context (section 8), but the runtime method does not receive
 it because the owner object is already available from `this`.
-Signal name, payload and sender are read from the direct parameters:
+Signal name and payload are read from the direct parameters:
 
 ```ts
 MyCustomObject.prototype.onSignal = function (
   SignalName,
   Payload,
-  EmitterObjectName,
-  EmitterInstanceId,
 ) {
   // generated events
 };
@@ -1151,9 +1140,8 @@ lifecycle handlers, and the scene "Signal received" condition.
 - `onSignal` recognized as a reserved lifecycle name for events-based objects in
   the `MetadataDeclarationHelper.cpp` predicates.
 - The core refactorer creates the fixed signature: hidden owner parameters plus
-  visible `SignalName`, `Payload`, `EmitterObjectName` and
-  `EmitterInstanceId`.
-- Object code generators emit runtime prototype methods with the four signal
+  visible `SignalName` and `Payload`.
+- Object code generators emit runtime prototype methods with the two signal
   data parameters.
 - Runtime base-method declarations for `onSignal` on `customruntimeobject.ts`.
 - The dispatcher's per-instance invocation site passes the fixed signal
@@ -1179,7 +1167,7 @@ SignalBus.dispatchQueuedSignals:
   publish this frame's delivered-signal list
   for each queued signal (FIFO, until the per-cycle limit):
     set current-signal context
-    call matching custom object onSignal(SignalName, Payload, EmitterObjectName, EmitterInstanceId)
+    call matching custom object onSignal(SignalName, Payload)
     clear current-signal context
 
 _eventsFunction(this):

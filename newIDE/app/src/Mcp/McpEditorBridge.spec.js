@@ -5534,9 +5534,9 @@ describe('McpEditorBridge', () => {
           params: {
             name: 'create_signal_emit_action',
             arguments: {
-              target_kind: 'object_group',
+              target_kind: 'picked_objects',
               target_scope: 'object_function',
-              object_group_name: 'Enemies',
+              objects: 'Enemies',
               signal_name: 'Attack',
             },
           },
@@ -5609,22 +5609,10 @@ describe('McpEditorBridge', () => {
       const result = JSON.parse(response.content[0].text);
       expect(response.isError).not.toBe(true);
       expect(result.functionName).toBe('onSignal');
-      expect(result.signalSignature).toEqual([
-        'Object',
-        'SignalName',
-        'Payload',
-        'EmitterObjectName',
-        'EmitterInstanceId',
-      ]);
+      expect(result.signalSignature).toEqual(['Object', 'SignalName', 'Payload']);
       expect(
         result.function.parameters.map(parameter => parameter.name)
-      ).toEqual([
-        'Object',
-        'SignalName',
-        'Payload',
-        'EmitterObjectName',
-        'EmitterInstanceId',
-      ]);
+      ).toEqual(['Object', 'SignalName', 'Payload']);
 
       const inspectResponse = await bridge.handleRendererMcpRequest({
         method: 'tools/call',

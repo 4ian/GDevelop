@@ -3443,7 +3443,7 @@ const signalEmitActionSchema = {
     target_kind: {
       type: 'string',
       description:
-        'Signal target: scene, object, object_instance, picked_objects, or object_group. In extension event sheets, use only scene or object_instance.',
+        'Signal target: scene, object_instance, or picked_objects. In extension event sheets, use only scene or object_instance.',
     },
     signal_name: {
       type: 'string',
@@ -3457,7 +3457,7 @@ const signalEmitActionSchema = {
     },
     object_name: {
       type: 'string',
-      description: 'Target object name for object or picked_objects targets.',
+      description: 'Target object list name for picked_objects targets.',
     },
     objects: {
       type: 'string',
@@ -3470,12 +3470,12 @@ const signalEmitActionSchema = {
     },
     object_group_name: {
       type: 'string',
-      description: 'Object group name for object_group targets.',
+      description: 'Legacy field; object_group signal emit actions are no longer generated.',
     },
     target_scope: {
       type: 'string',
       description:
-        'Optional scope guard: scene, extension_function, behavior_function, object_function, or async_function. Extension scopes reject object, picked_objects, and object_group targets.',
+        'Optional scope guard: scene, extension_function, behavior_function, object_function, or async_function. Extension scopes reject picked_objects targets.',
     },
   },
   required: ['target_kind', 'signal_name'],
@@ -3881,7 +3881,7 @@ const readTools: Array<McpTool> = [
   {
     name: 'create_signal_emit_action',
     description:
-      'Build a correctly-formed signal emit ACTION instruction JSON for scene, object, object_instance, picked_objects, or object_group targets. Handles hidden currentScene, signalName quoting, string payload, and required emitter object parameter ordering.',
+      'Build a correctly-formed signal emit ACTION instruction JSON for scene, object_instance, or picked_objects targets. Handles hidden currentScene, signalName quoting, string payload, and required emitter object parameter ordering.',
     inputSchema: signalEmitActionSchema,
   },
   {
@@ -4649,7 +4649,7 @@ const writeTools: Array<McpTool> = [
   {
     name: 'gdevelop_create_or_update_on_signal',
     description:
-      'Create or update the reserved object onSignal lifecycle function in an extension. GDevelop maintains the fixed signal parameters: SignalName, Payload, EmitterObjectName, and EmitterInstanceId, plus the Object receiver parameter.',
+      'Create or update the reserved object onSignal lifecycle function in an extension. GDevelop maintains the fixed signal parameters: SignalName and Payload, plus the Object receiver parameter.',
     inputSchema: onSignalFunctionSchema,
   },
   {
@@ -4775,6 +4775,15 @@ const toolUsageExamples: { [string]: Array<Object> } = {
         instance_id: 'SignalSenderInstanceId()',
         signal_name: 'Attack.Reply',
         payload: 'Blocked',
+      },
+    },
+    {
+      description: 'Emit a signal to currently picked object instances.',
+      arguments: {
+        target_kind: 'picked_objects',
+        objects: 'Enemy',
+        signal_name: 'EnemyHit',
+        payload: 'SignalPayload()',
       },
     },
   ],

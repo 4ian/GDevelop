@@ -125,6 +125,7 @@ import {
   syncEditorFromValidatedProjectJson,
   validateCurrentProjectJson,
 } from './McpProjectTools';
+import { ensureOnSignalObjectEventsFunctionProperParameters } from '../EventsFunctionsExtensionEditor/OnSignalEventsFunctionParameters';
 import { getBehaviorsRegistry } from '../Utils/GDevelopServices/Extension';
 import optionalRequire from '../Utils/OptionalRequire';
 
@@ -2035,15 +2036,13 @@ const normalizeSignalTargetKind = (targetKind: any): string => {
   if (normalized === 'instance') return 'object_instance';
   if (
     normalized === 'scene' ||
-    normalized === 'object' ||
     normalized === 'object_instance' ||
-    normalized === 'picked_objects' ||
-    normalized === 'object_group'
+    normalized === 'picked_objects'
   ) {
     return normalized;
   }
   throw new Error(
-    'target_kind must be scene, object, object_instance, picked_objects, or object_group.'
+    'target_kind must be scene, object_instance, or picked_objects.'
   );
 };
 
@@ -2105,19 +2104,6 @@ const buildSignalEmitAction = ({
   if (targetKind === 'scene') {
     parameters['1'] = signalName;
     setPayload(2);
-  } else if (targetKind === 'object') {
-    type = 'EmitSignalToObject';
-    outputLastParameterIndex = 2;
-    obsoleteEmitterParameterIndex = 4;
-    parameters['1'] = String(
-      getRequiredSignalArg(
-        args,
-        ['object_name', 'target_object_name'],
-        'object_name'
-      )
-    );
-    parameters['2'] = signalName;
-    setPayload(3);
   } else if (targetKind === 'object_instance') {
     type = 'EmitSignalToObjectInstance';
     outputLastParameterIndex = 2;
@@ -2140,19 +2126,6 @@ const buildSignalEmitAction = ({
         args,
         ['objects', 'object_name', 'target_object_name'],
         'objects'
-      )
-    );
-    parameters['2'] = signalName;
-    setPayload(3);
-  } else if (targetKind === 'object_group') {
-    type = 'EmitSignalToObjectGroup';
-    outputLastParameterIndex = 2;
-    obsoleteEmitterParameterIndex = 4;
-    parameters['1'] = String(
-      getRequiredSignalArg(
-        args,
-        ['object_group_name', 'group_name', 'target_group_name'],
-        'object_group_name'
       )
     );
     parameters['2'] = signalName;
@@ -2243,19 +2216,66 @@ const createOrUpdateOnSignalFunction = (
   delete signalArgs.parameters_mode;
   delete signalArgs.serialized_function;
   const result = createOrUpdateExtensionFunction(project, signalArgs);
+  const signalSignature = ['Object', 'SignalName', 'Payload'];
+  let fixedParameters: Array<Object> = signalSignature.map((name, index) => ({
+    index,
+    name,
+    type: index === 0 ? 'object' : index === 1 ? 'signalName' : 'string',
+    description:
+      index === 0 ? 'Object' : index === 1 ? 'Signal name' : 'Payload',
+  }));
+  let repairedEventsFunction = null;
+  const extensionName = args && args.extension_name;
+  const parentName = args && args.parent_name;
+  if (
+    !result.dryRun &&
+    typeof extensionName === 'string' &&
+    typeof parentName === 'string' &&
+    project.hasEventsFunctionsExtensionNamed(extensionName)
+  ) {
+    const extension = project.getEventsFunctionsExtension(extensionName);
+    const objects = extension.getEventsBasedObjects();
+    if (objects.has(parentName)) {
+      const eventsBasedObject = objects.get(parentName);
+      ensureOnSignalObjectEventsFunctionProperParameters(
+        extension,
+        eventsBasedObject
+      );
+      const eventsFunctions = eventsBasedObject.getEventsFunctions();
+      if (eventsFunctions.hasEventsFunctionNamed('onSignal')) {
+        repairedEventsFunction = eventsFunctions.getEventsFunction('onSignal');
+        const parameters = repairedEventsFunction.getParameters();
+        fixedParameters = fixedParameters.map((parameter, index) => {
+          const repairedParameter = parameters.getParameterAt(index);
+          return {
+            ...parameter,
+            name: repairedParameter.getName(),
+            type: repairedParameter.getType(),
+            description: repairedParameter.getDescription(),
+            longDescription: repairedParameter.getLongDescription(),
+            extraInfo: repairedParameter.getExtraInfo() || undefined,
+          };
+        });
+      }
+    }
+  }
+  const fixedFunction = result.function
+    ? {
+        ...result.function,
+        parameters: fixedParameters,
+        ...(repairedEventsFunction && result.function.serializedFunction
+          ? { serializedFunction: serializeToJSObject(repairedEventsFunction) }
+          : {}),
+      }
+    : result.function;
   return {
     ...result,
+    function: fixedFunction,
     extensionName: args && args.extension_name,
     parentKind,
     parentName: args && args.parent_name,
     functionName: 'onSignal',
-    signalSignature: [
-      'Object',
-      'SignalName',
-      'Payload',
-      'EmitterObjectName',
-      'EmitterInstanceId',
-    ],
+    signalSignature,
   };
 };
 

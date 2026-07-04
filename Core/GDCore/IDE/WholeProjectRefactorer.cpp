@@ -71,8 +71,6 @@ namespace {
 const gd::String onSignalFunctionName = "onSignal";
 const gd::String onSignalSignalNameParameterName = "SignalName";
 const gd::String onSignalPayloadParameterName = "Payload";
-const gd::String onSignalEmitterObjectNameParameterName = "EmitterObjectName";
-const gd::String onSignalEmitterInstanceIdParameterName = "EmitterInstanceId";
 const gd::String onSignalObjectParameterName = "Object";
 
 void AddFunctionParameter(gd::ParameterMetadataContainer &parameters,
@@ -93,10 +91,6 @@ void AddOnSignalDataParameters(gd::ParameterMetadataContainer &parameters) {
                        "Signal name");
   AddFunctionParameter(parameters, onSignalPayloadParameterName, "string",
                        "Payload");
-  AddFunctionParameter(parameters, onSignalEmitterObjectNameParameterName,
-                       "string", "Emitter object name");
-  AddFunctionParameter(parameters, onSignalEmitterInstanceIdParameterName,
-                       "expression", "Emitter instance id");
 }
 
 void EnsureOnSignalObjectEventsFunctionProperParameters(

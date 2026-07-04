@@ -77,13 +77,9 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       layout1.GetObjects().InsertNewObject(project, "", "MyObject", 0);
   myObject.AddNewBehavior(project, "MyExtension::MyBehavior", "MyBehavior");
   myObject.GetVariables().InsertNew("MyObjectVariable");
-  myObject.GetVariables()
-      .InsertNew("MyObjectStructureVariable")
-      .GetChild("MyChildStructure")
-      .GetChild("MyChild");
-  myObject.GetVariables()
-      .Get("MyObjectStructureVariable")
-      .GetChild("MyChild");
+  myObject.GetVariables().InsertNew("MyObjectStructureVariable").GetChild("MyChild");
+  myObject.GetVariables().Get("MyObjectStructureVariable").GetChild("MyChildStructure").GetChild("MyChild");
+  myObject.GetVariables().Get("MyObjectStructureVariable").GetChild("MyChildStructure").GetChild("MyChildStructure2").GetChild("MyChild");
 
   auto &myGroup =
       layout1.GetObjects().GetObjectGroups().InsertNew("MyGroup");
@@ -2379,9 +2375,8 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
             "You must enter a number or a text, wrapped inside double quotes (example: \"Hello world\"), or a variable name.");
   }
 
-  SECTION("Invalid scene variables type in expression (1 level)") {
-    auto node =
-        parser.ParseExpression("MySceneStructureVariable");
+  SECTION("Invalid scene variables structure in expression (1 level)") {
+    auto node = parser.ParseExpression("MySceneStructureVariable");
 
     gd::ExpressionValidator validator(platform, projectScopedContainers,
                                       "number|string");
@@ -2391,7 +2386,16 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
             "You need to specify the name of the child variable to access. For example: `MyVariable.child`.");
   }
 
-  SECTION("Invalid scene variables type in expression (2 levels)") {
+  SECTION("Valid scene variable structure in variable parameter (1 level)") {
+    auto node = parser.ParseExpression("MySceneStructureVariable");
+
+    gd::ExpressionValidator validator(platform, projectScopedContainers,
+                                      "variable");
+    node->Visit(validator);
+    RequireNoError(validator);
+  }
+
+  SECTION("Invalid scene variables structure in expression (2 levels)") {
     auto node =
         parser.ParseExpression("MySceneStructureVariable.MyChildStructure");
 
@@ -2403,7 +2407,17 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
             "You need to specify the name of the child variable to access. For example: `MyVariable.child`.");
   }
 
-  SECTION("Invalid scene variables type in expression (3 levels)") {
+  SECTION("Valid scene variables structure in variable parameter (2 levels)") {
+    auto node =
+        parser.ParseExpression("MySceneStructureVariable.MyChildStructure");
+
+    gd::ExpressionValidator validator(platform, projectScopedContainers,
+                                      "variable");
+    node->Visit(validator);
+    RequireNoError(validator);
+  }
+
+  SECTION("Invalid scene variables structure in expression (3 levels)") {
     auto node =
         parser.ParseExpression("MySceneStructureVariable.MyChildStructure.MyChildStructure2");
 
@@ -2415,7 +2429,17 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
             "You need to specify the name of the child variable to access. For example: `MyVariable.child`.");
   }
 
-  SECTION("Invalid object variables type in expression (1 level)") {
+  SECTION("Valid scene variables structure in variable parameter (3 levels)") {
+    auto node =
+        parser.ParseExpression("MySceneStructureVariable.MyChildStructure.MyChildStructure2");
+
+    gd::ExpressionValidator validator(platform, projectScopedContainers,
+                                      "variable");
+    node->Visit(validator);
+    RequireNoError(validator);
+  }
+
+  SECTION("Invalid object variables structure in expression (1 level)") {
     auto node =
         parser.ParseExpression("MyObject.MyObjectStructureVariable");
 
@@ -2427,7 +2451,16 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
             "You need to specify the name of the child variable to access. For example: `MyVariable.child`.");
   }
 
-  SECTION("Invalid object variables type in expression (2 levels)") {
+  SECTION("Valid object variables structure in variable parameter (1 level)") {
+    auto node = parser.ParseExpression("MyObjectStructureVariable");
+
+    gd::ExpressionValidator validator(platform, projectScopedContainers,
+                                      "objectvar");
+    node->Visit(validator);
+    RequireNoError(validator);
+  }
+
+  SECTION("Invalid object variables structure in expression (2 levels)") {
     auto node =
         parser.ParseExpression("MyObject.MyObjectStructureVariable.MyChildStructure");
 
@@ -2437,6 +2470,38 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
     RequireFatalErrorsCount(validator, 1);
     REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
             "You need to specify the name of the child variable to access. For example: `MyVariable.child`.");
+  }
+
+  SECTION("Valid object variables structure in variable parameter (2 levels)") {
+    auto node =
+        parser.ParseExpression("MyObjectStructureVariable.MyChildStructure");
+
+    gd::ExpressionValidator validator(platform, projectScopedContainers,
+                                      "objectvar");
+    node->Visit(validator);
+    RequireNoError(validator);
+  }
+
+  SECTION("Invalid object variables structure in expression (3 levels)") {
+    auto node =
+        parser.ParseExpression("MyObject.MyObjectStructureVariable.MyChildStructure.MyChildStructure2");
+
+    gd::ExpressionValidator validator(platform, projectScopedContainers,
+                                      "number|string");
+    node->Visit(validator);
+    RequireFatalErrorsCount(validator, 1);
+    REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+            "You need to specify the name of the child variable to access. For example: `MyVariable.child`.");
+  }
+
+  SECTION("Valid object variables structure in variable parameter (3 levels)") {
+    auto node =
+        parser.ParseExpression("MyObjectStructureVariable.MyChildStructure.MyChildStructure2");
+
+    gd::ExpressionValidator validator(platform, projectScopedContainers,
+                                      "objectvar");
+    node->Visit(validator);
+    RequireNoError(validator);
   }
 
   SECTION("Valid object variables (1 level)") {

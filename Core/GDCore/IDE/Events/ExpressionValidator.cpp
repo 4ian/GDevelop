@@ -82,21 +82,24 @@ bool ExpressionValidator::ValidateChildVariable(
 void ExpressionValidator::ValidateLastChildVariable(
     const gd::Variable &lastChildVariable,
     const gd::ExpressionParserLocation childNameLocation) {
-    const auto type = lastChildVariable.GetType();
+  const auto type = lastChildVariable.GetType();
+
+  if (parentType == Type::String || parentType == Type::Number ||
+      parentType == Type::NumberOrString) {
     // Collections type can't be used directly in expressions, a child
     // must be accessed.
     if (type == Variable::Structure) {
       RaiseTypeError(_("You need to specify the name of the child variable "
-                        "to access. For example: `MyVariable.child`."),
-                      childNameLocation);
+                       "to access. For example: `MyVariable.child`."),
+                     childNameLocation);
     } else if (type == Variable::Array) {
       RaiseTypeError(_("You need to specify the name of the child variable "
-                        "to access. For example: `MyVariable[0]`."),
-                      childNameLocation);
-    } else {
-      // Number, string or boolean variables can be used in expressions.
-      ReadChildTypeFromVariable(type);
+                       "to access. For example: `MyVariable[0]`."),
+                     childNameLocation);
     }
+  }
+  // Number, string or boolean variables can be used in expressions.
+  ReadChildTypeFromVariable(type);
 }
 
 bool ExpressionValidator::ValidateObjectVariableOrVariableOrProperty(

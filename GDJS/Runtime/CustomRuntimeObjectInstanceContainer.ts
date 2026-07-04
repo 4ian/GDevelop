@@ -263,6 +263,17 @@ namespace gdjs {
      */
     _updateObjectsPreRender() {
       const allInstancesList = this.getAdhocListOfAllInstances();
+      const shouldRenderDebugDraw =
+        this._debugDrawEnabled &&
+        this._customObject.isIncludedInParentCollisionMask();
+      const debugDrawInstancesList = shouldRenderDebugDraw
+        ? allInstancesList.filter((object) =>
+            object.isIncludedInParentCollisionMask()
+          )
+        : null;
+      if (this._debugDrawEnabled && !shouldRenderDebugDraw) {
+        this._debuggerRenderer.clearDebugDraw();
+      }
       // TODO (3D) culling - add support for 3D object culling?
       for (let i = 0, len = allInstancesList.length; i < len; ++i) {
         const object = allInstancesList[i];
@@ -280,9 +291,9 @@ namespace gdjs {
 
         // Set to true to enable debug rendering (look for the implementation in the renderer
         // to see what is rendered).
-        if (this._debugDrawEnabled) {
+        if (shouldRenderDebugDraw) {
           this._debuggerRenderer.renderDebugDraw(
-            allInstancesList,
+            debugDrawInstancesList!,
             this._debugDrawShowHiddenInstances,
             this._debugDrawShowPointsNames,
             this._debugDrawShowCustomPoints

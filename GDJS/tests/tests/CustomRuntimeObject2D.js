@@ -193,6 +193,45 @@ describe('gdjs.CustomRuntimeObject', function () {
       ]);
     });
 
+    it('does not debug-draw children excluded from the parent collision mask', async () => {
+      const { customObject, leftSprite, rightSprite } =
+        await makeCustomObjectWith2Children();
+      const childrenContainer = customObject.getChildrenContainer();
+      /** @type {gdjs.RuntimeObject[] | null} */
+      let debugDrawInstances = null;
+
+      rightSprite.setIncludedInParentCollisionMask(false);
+      childrenContainer.getDebuggerRenderer().renderDebugDraw = (instances) => {
+        debugDrawInstances = instances;
+      };
+
+      childrenContainer.enableDebugDraw(true, true, false, false);
+      childrenContainer._updateObjectsPreRender();
+
+      expect(debugDrawInstances).to.eql([leftSprite]);
+    });
+
+    it("does not debug-draw an excluded custom object's children", async () => {
+      const { customObject } = await makeCustomObjectWith2Children();
+      const childrenContainer = customObject.getChildrenContainer();
+      let didRenderDebugDraw = false;
+      let didClearDebugDraw = false;
+
+      customObject.setIncludedInParentCollisionMask(false);
+      childrenContainer.getDebuggerRenderer().renderDebugDraw = () => {
+        didRenderDebugDraw = true;
+      };
+      childrenContainer.getDebuggerRenderer().clearDebugDraw = () => {
+        didClearDebugDraw = true;
+      };
+
+      childrenContainer.enableDebugDraw(true, true, false, false);
+      childrenContainer._updateObjectsPreRender();
+
+      expect(didRenderDebugDraw).to.be(false);
+      expect(didClearDebugDraw).to.be(true);
+    });
+
     it('can translate its hit-boxes', async () => {
       const { customObject } = await makeCustomObjectWith2Children();
 

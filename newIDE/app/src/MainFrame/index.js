@@ -8,6 +8,7 @@ import HomeIcon from '../UI/CustomSvgIcons/Home';
 import DebuggerIcon from '../UI/CustomSvgIcons/Debug';
 import ProjectResourcesIcon from '../UI/CustomSvgIcons/ProjectResources';
 import GlobalConfigIcon from '../UI/CustomSvgIcons/GlobalConfig';
+import GlobalVariableIcon from '../UI/CustomSvgIcons/GlobalVariable';
 import MenuIcon from '../UI/CustomSvgIcons/Menu';
 import ObjectIcon from '../UI/CustomSvgIcons/Object';
 import BehaviorIcon from '../UI/CustomSvgIcons/Behavior';
@@ -25,6 +26,7 @@ import AboutDialog from './AboutDialog';
 import ProjectManager, {
   type ProjectManagerInterface,
   getProjectManagerTreeViewItemIdForEditorTab,
+  globalVariablesItemId,
   globalObjectsItemId,
 } from '../ProjectManager';
 import LoaderModal from '../UI/LoaderModal';
@@ -6149,6 +6151,13 @@ const MainFrame = (props: Props): React.MixedElement => {
       i18n._(t`Game settings`),
       <GlobalConfigIcon />,
       openGlobalConfig
+    );
+    addRecentEditorSwitcherSideMenuItem(
+      globalVariablesItemId,
+      i18n._(t`Global variables`),
+      i18n._(t`Globals`),
+      <GlobalVariableIcon />,
+      () => activateProjectManagerItemFromSwitcher(globalVariablesItemId)
     );
     addRecentEditorSwitcherSideMenuItem(
       globalObjectsItemId,

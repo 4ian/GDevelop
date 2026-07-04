@@ -145,7 +145,7 @@ namespace gdjs {
       this._italic = content.italic;
       this._underlined = content.underlined;
       this._color = gdjs.rgbOrHexToRGBColor(content.color);
-      this._str = content.text;
+      this._str = this._resolveGlobalConfigPlaceholders(content.text);
       this._textAlign = content.textAlignment || 'left';
       this._verticalTextAlignment = content.verticalTextAlignment || 'top';
 
@@ -192,7 +192,7 @@ namespace gdjs {
         this.setColor(newContent.color);
       }
       if (oldContent.text !== newContent.text) {
-        this.setText(newContent.text);
+        this.setText(this._resolveGlobalConfigPlaceholders(newContent.text));
       }
       if (oldContent.textAlignment !== newContent.textAlignment) {
         this.setTextAlignment(newContent.textAlignment);
@@ -237,6 +237,13 @@ namespace gdjs {
       }
 
       return true;
+    }
+
+    private _resolveGlobalConfigPlaceholders(text: string): string {
+      return gdjs.evtTools.globalConfig.resolveString(
+        this.getInstanceContainer().getGame(),
+        text
+      );
     }
 
     override getNetworkSyncData(

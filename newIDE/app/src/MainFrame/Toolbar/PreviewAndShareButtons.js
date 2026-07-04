@@ -114,7 +114,7 @@ const PreviewAndShareButtons: React.ComponentType<PreviewAndShareButtonsProps> =
           },
           {
             type: 'checkbox',
-            label: i18n._(t`Display collision masks in previews`),
+            label: i18n._(t`Display collision masks`),
             checked: displayCollisionMaskInPreview,
             click: () =>
               setDisplayCollisionMaskInPreview(!displayCollisionMaskInPreview),

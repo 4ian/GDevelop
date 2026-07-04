@@ -136,7 +136,9 @@ const gameResourcesItemId = getProjectManagerItemId('game-resources');
 const gameExtensionsItemId = getProjectManagerItemId('game-extensions');
 const gameShareItemId = getProjectManagerItemId('game-share');
 const globalsRootFolderId = getProjectManagerItemId('globals');
-const globalVariablesItemId = getProjectManagerItemId('global-variables');
+export const globalVariablesItemId: string = getProjectManagerItemId(
+  'global-variables'
+);
 const globalConfigItemId = getProjectManagerItemId('global-config');
 export const globalObjectsItemId: string = getProjectManagerItemId(
   'global-objects'

@@ -16,7 +16,10 @@ import { useAsyncLazyMemo } from '../Utils/UseLazyMemo';
 import { retryIfFailed } from '../Utils/RetryIfFailed';
 import { useInterval } from '../Utils/UseInterval';
 import useForceUpdate from '../Utils/UseForceUpdate';
-import { aiRequestShouldBeWatched } from './AiRequestUtils';
+import {
+  aiRequestHasWorkInProgress,
+  aiRequestShouldBeWatched,
+} from './AiRequestUtils';
 
 type EditorFunctionCallResultsStorage = {|
   getEditorFunctionCallResults: (
@@ -462,6 +465,7 @@ export type AiRequestContextState = {|
   selectedAiRequestId: string | null,
   setSelectedAiRequestId: (aiRequestId: string | null) => void,
   selectedAiRequest: AiRequest | null,
+  getWorkingAiRequest: () => AiRequest | null,
   activeSubAgents: { [subAgentAiRequestId: string]: ActiveSubAgent },
   activateSubAgent: (
     subAgentAiRequestId: string,
@@ -502,6 +506,7 @@ export const initialAiRequestContextState: AiRequestContextState = {
   selectedAiRequestId: null,
   setSelectedAiRequestId: () => {},
   selectedAiRequest: null,
+  getWorkingAiRequest: () => null,
   activeSubAgents: {},
   activateSubAgent: () => {},
 };
@@ -873,6 +878,21 @@ export const AiRequestProvider = ({
   );
 
   const activeSubAgents = activeSubAgentsRef.current;
+  const { getEditorFunctionCallResults } = editorFunctionCallResultsStorage;
+
+  const getWorkingAiRequest = React.useCallback(
+    (): AiRequest | null => {
+      if (!selectedAiRequest) return null;
+
+      return aiRequestHasWorkInProgress(
+        selectedAiRequest,
+        getEditorFunctionCallResults(selectedAiRequest.id)
+      )
+        ? selectedAiRequest
+        : null;
+    },
+    [selectedAiRequest, getEditorFunctionCallResults]
+  );
 
   const state = React.useMemo(
     (): AiRequestContextState => ({
@@ -885,6 +905,7 @@ export const AiRequestProvider = ({
       selectedAiRequestId,
       setSelectedAiRequestId,
       selectedAiRequest,
+      getWorkingAiRequest,
       activeSubAgents,
       activateSubAgent,
     }),
@@ -898,6 +919,7 @@ export const AiRequestProvider = ({
       selectedAiRequestId,
       setSelectedAiRequestId,
       selectedAiRequest,
+      getWorkingAiRequest,
       activeSubAgents,
       activateSubAgent,
     ]

@@ -1,13 +1,13 @@
 # AdvancedTween Editor Electron Bundle Steps
 
-This documents how to refresh `thirdParties/AdvancedTweenEditor` and rebuild the
+This documents how to refresh `ThirdParties/AdvancedTweenEditor` and rebuild the
 Electron ASAR artifact used by the Resources editor Animation tools tab.
 
 ## Refresh Upstream
 
 ```powershell
-git submodule update --init --recursive thirdParties/AdvancedTweenEditor
-git -C thirdParties/AdvancedTweenEditor pull --ff-only
+git submodule update --init --recursive ThirdParties/AdvancedTweenEditor
+git -C ThirdParties/AdvancedTweenEditor pull --ff-only
 ```
 
 ## Rebuild ASAR

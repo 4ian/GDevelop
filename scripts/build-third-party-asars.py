@@ -2,7 +2,7 @@
 """Build Electron ASAR artifacts for bundled third-party tools.
 
 The script builds the ASAR files used by the GDevelop Electron Resource Working
-Desk from the git submodules under thirdParties:
+Desk from the git submodules under ThirdParties:
 
 - newIDE/electron-app/app/external/image-extender.asar
 - newIDE/electron-app/app/external/ai-game-workbench.storage-open.asar
@@ -555,7 +555,7 @@ console.log('advanced-tween-editor.asar smoke:', indexPath);
 
 
 def build_image_extender(args: argparse.Namespace) -> None:
-    upstream = ensure_submodule("thirdParties/image-extender", args.pull)
+    upstream = ensure_submodule("ThirdParties/image-extender", args.pull)
     ensure_next_standalone_output(upstream)
     ensure_npm_install(upstream, args.skip_install)
 
@@ -592,7 +592,7 @@ def build_image_extender(args: argparse.Namespace) -> None:
 
 
 def build_ai_game_workbench(args: argparse.Namespace) -> None:
-    upstream = ensure_submodule("thirdParties/ai_game_workbench", args.pull)
+    upstream = ensure_submodule("ThirdParties/ai_game_workbench", args.pull)
     ensure_ai_game_workbench_electron_compatibility(upstream)
     ensure_npm_install(upstream, args.skip_install)
 
@@ -684,7 +684,7 @@ def build_ai_game_workbench(args: argparse.Namespace) -> None:
 
 def build_gorest_spritesheet(args: argparse.Namespace) -> None:
     upstream = ensure_submodule(
-        "thirdParties/gorest-2d-animation-spritesheet-generator",
+        "ThirdParties/gorest-2d-animation-spritesheet-generator",
         args.pull,
     )
     ensure_npm_install(upstream, args.skip_install)
@@ -719,7 +719,7 @@ def build_gorest_spritesheet(args: argparse.Namespace) -> None:
 
 
 def build_advanced_tween_editor(args: argparse.Namespace) -> None:
-    upstream = ensure_submodule("thirdParties/AdvancedTweenEditor", args.pull)
+    upstream = ensure_submodule("ThirdParties/AdvancedTweenEditor", args.pull)
     assert_exists(upstream / "index.html", "file")
 
     staging = Path(tempfile.gettempdir()) / "gdevelop-advanced-tween-editor-electron"

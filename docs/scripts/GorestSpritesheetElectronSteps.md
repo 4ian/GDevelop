@@ -1,7 +1,7 @@
 # Gorest Spritesheet Electron steps
 
 The Gorest 2D Animation Spritesheet Generator source is tracked as a git
-submodule at `thirdParties/gorest-2d-animation-spritesheet-generator`.
+submodule at `ThirdParties/gorest-2d-animation-spritesheet-generator`.
 Electron loads the compiled runtime artifact from
 `newIDE/electron-app/app/external/gorest-spritesheet.asar`.
 
@@ -10,8 +10,8 @@ Electron loads the compiled runtime artifact from
 Run from the GDevelop repository root:
 
 ```powershell
-git submodule update --init --recursive thirdParties/gorest-2d-animation-spritesheet-generator
-git -C thirdParties/gorest-2d-animation-spritesheet-generator pull --ff-only
+git submodule update --init --recursive ThirdParties/gorest-2d-animation-spritesheet-generator
+git -C ThirdParties/gorest-2d-animation-spritesheet-generator pull --ff-only
 git status --short
 ```
 

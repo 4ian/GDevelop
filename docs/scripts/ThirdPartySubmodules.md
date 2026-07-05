@@ -1,17 +1,17 @@
 # Third-party Submodules
 
 This repository tracks external tool source checkouts as git submodules under
-`thirdParties/`.
+`ThirdParties/`.
 
 Current submodules:
 
-- `thirdParties/ai_game_workbench`:
+- `ThirdParties/ai_game_workbench`:
   `https://github.com/zhouzhipeng/ai_game_workbench.git`
-- `thirdParties/image-extender`:
+- `ThirdParties/image-extender`:
   `https://github.com/zhouzhipeng/image-extender.git`
-- `thirdParties/gorest-2d-animation-spritesheet-generator`:
+- `ThirdParties/gorest-2d-animation-spritesheet-generator`:
   `https://github.com/zhouzhipeng/gorest-2d-animation-spritesheet-generator.git`
-- `thirdParties/AdvancedTweenEditor`:
+- `ThirdParties/AdvancedTweenEditor`:
   `https://github.com/zhouzhipeng/AdvancedTweenEditor.git`
 
 ## Initialize
@@ -27,10 +27,10 @@ git submodule update --init --recursive
 To pull the latest upstream commits into the local submodule checkouts:
 
 ```powershell
-git -C thirdParties/ai_game_workbench pull --ff-only
-git -C thirdParties/image-extender pull --ff-only
-git -C thirdParties/gorest-2d-animation-spritesheet-generator pull --ff-only
-git -C thirdParties/AdvancedTweenEditor pull --ff-only
+git -C ThirdParties/ai_game_workbench pull --ff-only
+git -C ThirdParties/image-extender pull --ff-only
+git -C ThirdParties/gorest-2d-animation-spritesheet-generator pull --ff-only
+git -C ThirdParties/AdvancedTweenEditor pull --ff-only
 git status --short
 ```
 
@@ -43,18 +43,18 @@ Make source changes inside the submodule repository, commit and push them there,
 then stage the updated submodule pointer in GDevelop:
 
 ```powershell
-git -C thirdParties/ai_game_workbench status --short
-git -C thirdParties/ai_game_workbench add .
-git -C thirdParties/ai_game_workbench commit -m "Update workbench integration"
-git -C thirdParties/ai_game_workbench push
+git -C ThirdParties/ai_game_workbench status --short
+git -C ThirdParties/ai_game_workbench add .
+git -C ThirdParties/ai_game_workbench commit -m "Update workbench integration"
+git -C ThirdParties/ai_game_workbench push
 
-git add thirdParties/ai_game_workbench
+git add ThirdParties/ai_game_workbench
 git status --short
 ```
 
-Use the same flow for `thirdParties/image-extender`,
-`thirdParties/gorest-2d-animation-spritesheet-generator`, and
-`thirdParties/AdvancedTweenEditor`.
+Use the same flow for `ThirdParties/image-extender`,
+`ThirdParties/gorest-2d-animation-spritesheet-generator`, and
+`ThirdParties/AdvancedTweenEditor`.
 
 ## Packaging
 

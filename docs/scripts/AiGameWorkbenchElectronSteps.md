@@ -1,11 +1,11 @@
 # AI Game Workbench Electron Bundle Steps
 
-This documents how to refresh `thirdParties/ai_game_workbench` and rebuild the
+This documents how to refresh `ThirdParties/ai_game_workbench` and rebuild the
 Electron-bundled executable artifact used by the Resource Working Desk.
 
 The integration must keep runtime source out of GDevelop's Electron app:
 
-- Keep the upstream source checkout only in the `thirdParties/ai_game_workbench`
+- Keep the upstream source checkout only in the `ThirdParties/ai_game_workbench`
   git submodule.
 - Do not start a localhost server or reserve any TCP port.
 - Ship the compiled ASAR artifact and native runtime sidecar:
@@ -42,8 +42,8 @@ build process.
 Run from the GDevelop repository root in PowerShell:
 
 ```powershell
-git submodule update --init --recursive thirdParties/ai_game_workbench
-$upstream = (Resolve-Path "thirdParties\ai_game_workbench").Path
+git submodule update --init --recursive ThirdParties/ai_game_workbench
+$upstream = (Resolve-Path "ThirdParties\ai_game_workbench").Path
 git -C $upstream pull --ff-only
 git -C $upstream log -1 --oneline
 ```
@@ -263,7 +263,7 @@ if (Test-Path -LiteralPath $unpackedPath) {
 
 Do not commit `$staging` or an expanded
 `newIDE/electron-app/app/external/ai-game-workbench/` folder. Commit the
-`thirdParties/ai_game_workbench` submodule pointer only after the upstream
+`ThirdParties/ai_game_workbench` submodule pointer only after the upstream
 changes are committed in that submodule.
 
 ## 7. Verify

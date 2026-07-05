@@ -173,6 +173,22 @@ def build_react_app(app_dir: Path, skip_build: bool, dry_run: bool) -> None:
     run_command([resolve_tool("npm"), "run", "build"], cwd=app_dir, dry_run=dry_run)
 
 
+def sync_electron_www(electron_app_dir: Path, dry_run: bool) -> None:
+    step("Sync Electron app/www")
+    run_command(
+        [
+            resolve_tool("npm"),
+            "run",
+            "app-build",
+            "--",
+            "--skip-app-build",
+            "--allow-development-libgd",
+        ],
+        cwd=electron_app_dir,
+        dry_run=dry_run,
+    )
+
+
 # Env vars electron-builder reads to discover a Windows code-signing
 # certificate. If any of them resolves, electron-builder runs its signing step,
 # which downloads the "winCodeSign" tools (a 7z full of macOS .dylib symlinks
@@ -211,11 +227,11 @@ def package_app(electron_app_dir: Path, sign: bool, dry_run: bool) -> None:
             flush=True,
         )
 
-    # `npm run build` runs `app-build` (sync app/www) then electron-builder
-    # with electron-builder-config.js, whose win target "nsis" emits an
-    # installer .exe.
+    # app/www is synced explicitly before this step. Passing --skip-app-build
+    # avoids running Electron's app-build a second time, which would repeat the
+    # libGD.js size guard against locally built binaries.
     run_command(
-        [resolve_tool("npm"), "run", "build", "--", "--win"],
+        [resolve_tool("npm"), "run", "build", "--", "--skip-app-build", "--win"],
         cwd=electron_app_dir,
         dry_run=dry_run,
         env_updates=env_updates,
@@ -288,6 +304,7 @@ def main() -> int:
             dry_run=args.dry_run,
         )
         build_react_app(app_dir, args.skip_build, args.dry_run)
+        sync_electron_www(electron_app_dir, args.dry_run)
         package_app(electron_app_dir, args.sign, args.dry_run)
         report_artifact(dist_dir, args.dry_run)
     except (RuntimeError, subprocess.CalledProcessError) as error:

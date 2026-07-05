@@ -1,11 +1,11 @@
 # Image Extender Electron Bundle Steps
 
-This documents how to refresh `thirdParties/image-extender` and rebuild the
+This documents how to refresh `ThirdParties/image-extender` and rebuild the
 Electron-bundled executable artifact used by the Resource Working Desk.
 
 The integration must keep runtime source out of GDevelop's Electron app:
 
-- Keep the upstream source checkout only in the `thirdParties/image-extender`
+- Keep the upstream source checkout only in the `ThirdParties/image-extender`
   git submodule.
 - Do not start a localhost server or reserve any TCP port.
 - Ship only the compiled ASAR artifact:
@@ -30,8 +30,8 @@ as implementation notes for debugging the build process.
 Run from the GDevelop repository root in PowerShell:
 
 ```powershell
-git submodule update --init --recursive thirdParties/image-extender
-$upstream = (Resolve-Path "thirdParties\image-extender").Path
+git submodule update --init --recursive ThirdParties/image-extender
+$upstream = (Resolve-Path "ThirdParties\image-extender").Path
 git -C $upstream pull --ff-only
 git -C $upstream log -1 --oneline
 ```
@@ -101,7 +101,7 @@ the custom protocol is serving files.
 
 Do not commit `$staging` or an expanded
 `newIDE/electron-app/app/external/image-extender/` folder. Commit the
-`thirdParties/image-extender` submodule pointer only after the upstream changes
+`ThirdParties/image-extender` submodule pointer only after the upstream changes
 are committed in that submodule.
 
 ## 5. Verify

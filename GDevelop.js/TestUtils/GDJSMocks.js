@@ -850,6 +850,63 @@ const objectsListsToArray = function (objectsLists) {
   return result;
 };
 
+const throwAmbiguousObjectPickingError = function (
+  usage,
+  pickedInstancesCount
+) {
+  const error = new Error(
+    'Ambiguous object picking for ' +
+      usage +
+      ': expected at most one picked instance, but ' +
+      pickedInstancesCount +
+      ' are picked. Add conditions to pick a single instance, or use a "For each object" event.'
+  );
+  if (typeof console !== 'undefined' && console.error) {
+    console.error(error);
+  }
+  throw error;
+};
+
+const assertObjectListHasNoMoreThanOnePickedInstance = function (
+  objectsList,
+  usage
+) {
+  if (objectsList.length > 1) {
+    throwAmbiguousObjectPickingError(usage, objectsList.length);
+  }
+  return objectsList;
+};
+
+const assertObjectListsHaveNoMoreThanOnePickedInstance = function (
+  objectsLists,
+  usage
+) {
+  let pickedInstancesCount = 0;
+  for (let i = 0; i < objectsLists.length; ++i) {
+    pickedInstancesCount += objectsLists[i].length;
+  }
+  if (pickedInstancesCount > 1) {
+    throwAmbiguousObjectPickingError(usage, pickedInstancesCount);
+  }
+  return objectsLists;
+};
+
+const assertObjectMapHasNoMoreThanOnePickedInstance = function (
+  objectsMap,
+  usage
+) {
+  let pickedInstancesCount = 0;
+  const objectLists = [];
+  objectsMap.values(objectLists);
+  for (let i = 0; i < objectLists.length; ++i) {
+    pickedInstancesCount += objectLists[i].length;
+  }
+  if (pickedInstancesCount > 1) {
+    throwAmbiguousObjectPickingError(usage, pickedInstancesCount);
+  }
+  return objectsMap;
+};
+
 /**
  * @template T
  * @param {Array<T>} src
@@ -921,6 +978,37 @@ const pickAllObjects = (objectsContext, objectsLists) => {
   return true;
 };
 
+/**
+ * @param {any} instanceContainer
+ * @param {Hashtable<RuntimeObject[]>} objectsLists
+ */
+const pickRandomObject = (instanceContainer, objectsLists) => {
+  let pickedObject = null;
+  for (const name in objectsLists.items) {
+    if (objectsLists.items.hasOwnProperty(name)) {
+      const objectsList = objectsLists.items[name];
+      if (objectsList.length > 0) {
+        pickedObject = objectsList[0];
+        break;
+      }
+    }
+  }
+  if (!pickedObject) {
+    return false;
+  }
+
+  for (const name in objectsLists.items) {
+    if (objectsLists.items.hasOwnProperty(name)) {
+      const objectsList = objectsLists.items[name];
+      objectsList.length = 0;
+      if (pickedObject.getName() === name) {
+        objectsList.push(pickedObject);
+      }
+    }
+  }
+  return true;
+};
+
 class RuntimeGame {
   constructor(gameData) {
     this._variablesContainer = new VariablesContainer(
@@ -953,7 +1041,7 @@ class RuntimeGame {
   getVariables() {
     return this._variablesContainer;
   }
-  
+
   getVariablesForExtension(extensionName) {
     return this._variablesByExtensionName.get(extensionName) || null;
   }
@@ -1244,6 +1332,7 @@ function makeMinimalGDJSMock(options) {
           getSceneInstancesCount,
           getPickedInstancesCount,
           pickAllObjects,
+          pickRandomObject,
         },
         runtimeScene: {
           wait: () => new FakeAsyncTask(),
@@ -1279,6 +1368,9 @@ function makeMinimalGDJSMock(options) {
       },
       copyArray,
       objectsListsToArray,
+      assertObjectListHasNoMoreThanOnePickedInstance,
+      assertObjectListsHaveNoMoreThanOnePickedInstance,
+      assertObjectMapHasNoMoreThanOnePickedInstance,
       RuntimeBehavior,
       RuntimeObject,
       OnceTriggers,

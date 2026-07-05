@@ -702,6 +702,33 @@ class GD_CORE_API EventsCodeGenerator {
       gd::EventsCodeGenerationContext& context);
 
   /**
+   * \brief Generate a statement asserting that object-consuming code is not
+   * receiving more than one picked instance.
+   *
+   * Platforms that don't enforce this invariant can return an empty string.
+   */
+  virtual gd::String GenerateObjectListsPickedInstancesAssertCode(
+      const std::vector<gd::String>& objectNames,
+      gd::EventsCodeGenerationContext& context,
+      const gd::String& usage) {
+    return "";
+  };
+
+  /**
+   * \brief Wrap an expression with an assertion that object-consuming code is
+   * not receiving more than one picked instance.
+   *
+   * Platforms that don't enforce this invariant can return expressionCode.
+   */
+  virtual gd::String GenerateObjectListsPickedInstancesAssertExpression(
+      const std::vector<gd::String>& objectNames,
+      gd::EventsCodeGenerationContext& context,
+      const gd::String& usage,
+      const gd::String& expressionCode) {
+    return expressionCode;
+  };
+
+  /**
    * \brief Called when a new scope must be entered.
    * \param context The context : Internal events of the scope have been
    * generated, but GenerateObjectsDeclarationCode was not called. \param

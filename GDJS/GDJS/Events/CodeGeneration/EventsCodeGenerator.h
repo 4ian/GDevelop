@@ -260,6 +260,17 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
       gd::String defaultOutput,
       gd::EventsCodeGenerationContext& context) override;
 
+  virtual gd::String GenerateObjectListsPickedInstancesAssertCode(
+      const std::vector<gd::String>& objectNames,
+      gd::EventsCodeGenerationContext& context,
+      const gd::String& usage) override;
+
+  virtual gd::String GenerateObjectListsPickedInstancesAssertExpression(
+      const std::vector<gd::String>& objectNames,
+      gd::EventsCodeGenerationContext& context,
+      const gd::String& usage,
+      const gd::String& expressionCode) override;
+
   virtual gd::String GenerateFreeCondition(
       const std::vector<gd::String>& arguments,
       const gd::InstructionMetadata& instrInfos,

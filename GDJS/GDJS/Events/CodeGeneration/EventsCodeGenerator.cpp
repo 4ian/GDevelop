@@ -36,6 +36,32 @@ using namespace std;
 
 namespace gdjs {
 
+namespace {
+
+gd::String GenerateObjectListAssertExpression(
+    const gd::String& objectListCode,
+    const gd::String& usage) {
+  return "gdjs.assertObjectListHasNoMoreThanOnePickedInstance(" +
+         objectListCode + ", " +
+         gdjs::EventsCodeGenerator::ConvertToStringExplicit(usage) + ")";
+}
+
+gd::String GenerateObjectListsArrayCode(
+    gdjs::EventsCodeGenerator& codeGenerator,
+    const std::vector<gd::String>& objectNames,
+    gd::EventsCodeGenerationContext& context) {
+  gd::String objectListsArrayCode = "[";
+  for (std::size_t i = 0; i < objectNames.size(); ++i) {
+    if (i != 0) objectListsArrayCode += ", ";
+    objectListsArrayCode +=
+        codeGenerator.GetObjectListName(objectNames[i], context);
+  }
+  objectListsArrayCode += "]";
+  return objectListsArrayCode;
+}
+
+}  // namespace
+
 gd::String EventsCodeGenerator::GenerateEventsListCompleteFunctionCode(
     gdjs::EventsCodeGenerator& codeGenerator,
     gd::String fullyQualifiedFunctionName,
@@ -785,14 +811,18 @@ gd::String EventsCodeGenerator::GenerateObjectFunctionCall(
     gd::EventsCodeGenerationContext& context) {
   if (codeInfo.staticFunction)
     return "(" + codeInfo.functionCallName + "(" + parametersStr + "))";
+  gd::String objectListCode = GetObjectListName(objectListName, context);
   if (context.GetCurrentObject() == objectListName &&
       !context.GetCurrentObject().empty())
-    return "(" + GetObjectListName(objectListName, context) + "[i]." +
+    return "(" + objectListCode + "[i]." +
            codeInfo.functionCallName + "(" + parametersStr + "))";
   else
-    return "(( " + GetObjectListName(objectListName, context) +
-           ".length === 0 ) ? " + defaultOutput + " :" +
-           GetObjectListName(objectListName, context) + "[0]." +
+    return "(( " + objectListCode + ".length === 0 ) ? " + defaultOutput +
+           " : " +
+           GenerateObjectListAssertExpression(objectListCode,
+                                              "object expression \"" +
+                                                  objectListName + "\"") +
+           "[0]." +
            codeInfo.functionCallName + "(" + parametersStr + "))";
 }
 
@@ -806,17 +836,43 @@ gd::String EventsCodeGenerator::GenerateObjectBehaviorFunctionCall(
     gd::EventsCodeGenerationContext& context) {
   if (codeInfo.staticFunction)
     return "(" + codeInfo.functionCallName + "(" + parametersStr + "))";
+  gd::String objectListCode = GetObjectListName(objectListName, context);
   if (context.GetCurrentObject() == objectListName &&
       !context.GetCurrentObject().empty())
-    return "(" + GetObjectListName(objectListName, context) +
-           "[i].getBehavior(" + GenerateGetBehaviorNameCode(behaviorName) +
+    return "(" + objectListCode + "[i].getBehavior(" +
+           GenerateGetBehaviorNameCode(behaviorName) +
            ")." + codeInfo.functionCallName + "(" + parametersStr + "))";
   else
-    return "(( " + GetObjectListName(objectListName, context) +
-           ".length === 0 ) ? " + defaultOutput + " :" +
-           GetObjectListName(objectListName, context) + "[0].getBehavior(" +
+    return "(( " + objectListCode + ".length === 0 ) ? " + defaultOutput +
+           " : " +
+           GenerateObjectListAssertExpression(objectListCode,
+                                              "behavior expression \"" +
+                                                  objectListName + "\"") +
+           "[0].getBehavior(" +
            GenerateGetBehaviorNameCode(behaviorName) + ")." +
            codeInfo.functionCallName + "(" + parametersStr + "))";
+}
+
+gd::String EventsCodeGenerator::GenerateObjectListsPickedInstancesAssertCode(
+    const std::vector<gd::String>& objectNames,
+    gd::EventsCodeGenerationContext& context,
+    const gd::String& usage) {
+  if (objectNames.empty()) return "";
+  return "gdjs.assertObjectListsHaveNoMoreThanOnePickedInstance(" +
+         GenerateObjectListsArrayCode(*this, objectNames, context) + ", " +
+         ConvertToStringExplicit(usage) + ");\n";
+}
+
+gd::String
+EventsCodeGenerator::GenerateObjectListsPickedInstancesAssertExpression(
+    const std::vector<gd::String>& objectNames,
+    gd::EventsCodeGenerationContext& context,
+    const gd::String& usage,
+    const gd::String& expressionCode) {
+  if (objectNames.empty()) return expressionCode;
+  return "(gdjs.assertObjectListsHaveNoMoreThanOnePickedInstance(" +
+         GenerateObjectListsArrayCode(*this, objectNames, context) + ", " +
+         ConvertToStringExplicit(usage) + "), " + expressionCode + ")";
 }
 
 gd::String EventsCodeGenerator::GenerateFreeCondition(
@@ -1014,6 +1070,9 @@ gd::String EventsCodeGenerator::GenerateObjectAction(
     call = "asyncTaskGroup.addTask(" + call + ")";
   }
 
+  actionCode += GenerateObjectListsPickedInstancesAssertCode(
+      std::vector<gd::String>{objectName}, context,
+      "object action \"" + objectName + "\"");
   actionCode +=
       "for(var i = 0, len = " + GetObjectListName(objectName, context) +
       ".length ;i < len;++i) {\n";
@@ -1084,6 +1143,9 @@ gd::String EventsCodeGenerator::GenerateBehaviorAction(
     call = "asyncTaskGroup.addTask(" + call + ")";
   }
 
+  actionCode += GenerateObjectListsPickedInstancesAssertCode(
+      std::vector<gd::String>{objectName}, context,
+      "behavior action \"" + objectName + "\"");
   actionCode +=
       "for(var i = 0, len = " + GetObjectListName(objectName, context) +
       ".length ;i < len;++i) {\n";
@@ -1346,16 +1408,51 @@ gd::String EventsCodeGenerator::GenerateObject(
                                  mapDeclaration + "});\n");
         return objectsMapName;
       };
+  auto useObjectParameterMapWhenAvailable =
+      [this, &context](const gd::String& objectName,
+                       const gd::String& objectsMapName) {
+        if (HasProjectAndLayout() ||
+            context.IsObjectListParameterPickingAllowed()) {
+          return objectsMapName;
+        }
+
+        const auto& parametersVectorsList =
+            GetProjectScopedContainers().GetParametersVectorsList();
+        if (!gd::ParameterMetadataTools::Has(parametersVectorsList,
+                                            objectName)) {
+          return objectsMapName;
+        }
+
+        const auto& parameter =
+            gd::ParameterMetadataTools::Get(parametersVectorsList, objectName);
+        if (!gd::ParameterMetadata::IsObject(parameter.GetType())) {
+          return objectsMapName;
+        }
+
+        return "(eventsFunctionContext.getObjectsLists(" +
+               ConvertToStringExplicit(objectName) + ") || " +
+               objectsMapName + ")";
+      };
 
   gd::String output;
+  const bool shouldAssertObjectListParameterPicking =
+      !context.IsObjectListParameterPickingAllowed();
   if (type == "object" || type == "objectList") {
     std::vector<gd::String> realObjects =
         GetObjectsContainersList().ExpandObjectName(objectName,
                                                     context.GetCurrentObject());
     for (auto& objectName : realObjects) context.ObjectsListNeeded(objectName);
 
-    gd::String objectsMapName = declareMapOfObjects(realObjects, context);
-    output = objectsMapName;
+    gd::String objectsMapName = useObjectParameterMapWhenAvailable(
+        objectName, declareMapOfObjects(realObjects, context));
+    output =
+        shouldAssertObjectListParameterPicking
+            ? "gdjs.assertObjectMapHasNoMoreThanOnePickedInstance(" +
+                  objectsMapName + ", " +
+                  ConvertToStringExplicit("object parameter \"" + objectName +
+                                          "\"") +
+                  ")"
+            : objectsMapName;
   } else if (type == "objectListOrEmptyIfJustDeclared") {
     std::vector<gd::String> realObjects =
         GetObjectsContainersList().ExpandObjectName(objectName,
@@ -1363,8 +1460,16 @@ gd::String EventsCodeGenerator::GenerateObject(
     for (auto& objectName : realObjects)
       context.ObjectsListNeededOrEmptyIfJustDeclared(objectName);
 
-    gd::String objectsMapName = declareMapOfObjects(realObjects, context);
-    output = objectsMapName;
+    gd::String objectsMapName = useObjectParameterMapWhenAvailable(
+        objectName, declareMapOfObjects(realObjects, context));
+    output =
+        shouldAssertObjectListParameterPicking
+            ? "gdjs.assertObjectMapHasNoMoreThanOnePickedInstance(" +
+                  objectsMapName + ", " +
+                  ConvertToStringExplicit("object parameter \"" + objectName +
+                                          "\"") +
+                  ")"
+            : objectsMapName;
   } else if (type == "objectListOrEmptyWithoutPicking") {
     std::vector<gd::String> realObjects =
         GetObjectsContainersList().ExpandObjectName(objectName,
@@ -1383,9 +1488,18 @@ gd::String EventsCodeGenerator::GenerateObject(
       }
     }
 
-    gd::String objectsMapName = declareMapOfObjects(
-        objectToBeDeclaredNames, context, objectNotYetDeclaredNames);
-    output = objectsMapName;
+    gd::String objectsMapName = useObjectParameterMapWhenAvailable(
+        objectName,
+        declareMapOfObjects(
+            objectToBeDeclaredNames, context, objectNotYetDeclaredNames));
+    output =
+        shouldAssertObjectListParameterPicking
+            ? "gdjs.assertObjectMapHasNoMoreThanOnePickedInstance(" +
+                  objectsMapName + ", " +
+                  ConvertToStringExplicit("object parameter \"" + objectName +
+                                          "\"") +
+                  ")"
+            : objectsMapName;
   } else if (type == "objectPtr") {
     std::vector<gd::String> realObjects =
         GetObjectsContainersList().ExpandObjectName(objectName,
@@ -1400,12 +1514,18 @@ gd::String EventsCodeGenerator::GenerateObject(
     } else {
       for (std::size_t i = 0; i < realObjects.size(); ++i) {
         context.ObjectsListNeeded(realObjects[i]);
-        output += "(" + GetObjectListName(realObjects[i], context) +
-                  ".length !== 0 ? " +
-                  GetObjectListName(realObjects[i], context) + "[0] : ";
+        gd::String objectListCode = GetObjectListName(realObjects[i], context);
+        output += "(" + objectListCode + ".length !== 0 ? " +
+                  GenerateObjectListAssertExpression(
+                      objectListCode,
+                      "object pointer \"" + realObjects[i] + "\"") +
+                  "[0] : ";
       }
       output += GenerateBadObject();
       for (std::size_t i = 0; i < realObjects.size(); ++i) output += ")";
+      output = GenerateObjectListsPickedInstancesAssertExpression(
+          realObjects, context, "object pointer \"" + objectName + "\"",
+          output);
     }
   }
 
@@ -1519,17 +1639,26 @@ gd::String EventsCodeGenerator::GenerateGetVariable(
     output = "gdjs.VariablesContainer.badVariablesContainer";
     for (std::size_t i = 0; i < realObjects.size(); ++i) {
       context.ObjectsListNeeded(realObjects[i]);
+      gd::String objectListCode = GetObjectListName(realObjects[i], context);
 
       // Generate the call to GetVariables() method.
       if (context.GetCurrentObject() == realObjects[i] &&
           !context.GetCurrentObject().empty())
-        output =
-            GetObjectListName(realObjects[i], context) + "[i].getVariables()";
+        output = objectListCode + "[i].getVariables()";
       else
-        output = "((" + GetObjectListName(realObjects[i], context) +
-                 ".length === 0 ) ? " + output + " : " +
-                 GetObjectListName(realObjects[i], context) +
+        output = "((" + objectListCode + ".length === 0 ) ? " + output +
+                 " : " +
+                 GenerateObjectListAssertExpression(
+                     objectListCode,
+                     "object variable \"" + realObjects[i] + "\"") +
                  "[0].getVariables())";
+    }
+
+    if (context.GetCurrentObject().empty() || realObjects.size() != 1 ||
+        context.GetCurrentObject() != realObjects[0]) {
+      output = GenerateObjectListsPickedInstancesAssertExpression(
+          realObjects, context, "object variable \"" + objectName + "\"",
+          output);
     }
 
     if (HasProjectAndLayout()) {

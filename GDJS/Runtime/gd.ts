@@ -678,6 +678,73 @@ namespace gdjs {
     return result;
   };
 
+  const throwAmbiguousObjectPickingError = function (
+    usage: string,
+    pickedInstancesCount: number
+  ): never {
+    const error = new Error(
+      'Ambiguous object picking for ' +
+        usage +
+        ': expected at most one picked instance, but ' +
+        pickedInstancesCount +
+        ' are picked. Add conditions to pick a single instance, or use a "For each object" event.'
+    );
+    throw error;
+  };
+
+  /**
+   * Assert that a generated object-consuming instruction is deterministic.
+   *
+   * @internal
+   */
+  export const assertObjectListHasNoMoreThanOnePickedInstance = function <
+    T extends RuntimeObject,
+  >(objectsList: Array<T>, usage: string): Array<T> {
+    if (objectsList.length > 1) {
+      throwAmbiguousObjectPickingError(usage, objectsList.length);
+    }
+    return objectsList;
+  };
+
+  /**
+   * Assert that a generated object-consuming instruction is deterministic
+   * across all concrete object lists of an object group.
+   *
+   * @internal
+   */
+  export const assertObjectListsHaveNoMoreThanOnePickedInstance = function <
+    T extends RuntimeObject,
+  >(objectsLists: Array<Array<T>>, usage: string): Array<Array<T>> {
+    let pickedInstancesCount = 0;
+    for (let i = 0; i < objectsLists.length; ++i) {
+      pickedInstancesCount += objectsLists[i].length;
+    }
+    if (pickedInstancesCount > 1) {
+      throwAmbiguousObjectPickingError(usage, pickedInstancesCount);
+    }
+    return objectsLists;
+  };
+
+  /**
+   * Assert that a generated object-list parameter is deterministic.
+   *
+   * @internal
+   */
+  export const assertObjectMapHasNoMoreThanOnePickedInstance = function <
+    T extends RuntimeObject,
+  >(objectsMap: Hashtable<Array<T>>, usage: string): Hashtable<Array<T>> {
+    let pickedInstancesCount = 0;
+    const objectLists: Array<Array<T>> = [];
+    objectsMap.values(objectLists);
+    for (let i = 0; i < objectLists.length; ++i) {
+      pickedInstancesCount += objectLists[i].length;
+    }
+    if (pickedInstancesCount > 1) {
+      throwAmbiguousObjectPickingError(usage, pickedInstancesCount);
+    }
+    return objectsMap;
+  };
+
   /**
    * Copy the element for the first array into the second array, so that
    * both array contains the same elements.

@@ -383,6 +383,25 @@ gd::String EventsCodeGenerator::GenerateConditionCode(
     return "/* Missing behavior - skipped. */";
   }
 
+  auto generateConditionParametersCodes =
+      [this, &context](
+          const std::vector<gd::Expression>& parameters,
+          const gd::ParameterMetadataContainer& parametersInfo,
+          std::vector<std::pair<gd::String, gd::String> >*
+              supplementaryParametersTypes = nullptr) {
+        const bool wasObjectListParameterPickingAllowed =
+            context.IsObjectListParameterPickingAllowed();
+        context.SetObjectListParameterPickingAllowed(true);
+        std::vector<gd::String> arguments =
+            GenerateParametersCodes(parameters,
+                                    parametersInfo,
+                                    context,
+                                    supplementaryParametersTypes);
+        context.SetObjectListParameterPickingAllowed(
+            wasObjectListParameterPickingAllowed);
+        return arguments;
+      };
+
   if (instrInfos.IsObjectInstruction()) {
     gd::String objectName = condition.GetParameter(0).GetPlainString();
     if (!objectName.empty() && instrInfos.parameters.GetParametersCount() > 0) {
@@ -403,8 +422,8 @@ gd::String EventsCodeGenerator::GenerateConditionCode(
         if (gd::EventsCodeGenerator::AreBehaviorParametersOfFirstObjectValid(
                 realObjects[i], condition, instrInfos, realObjects.size() != 1)) {
           // Prepare arguments and generate the condition whole code
-          vector<gd::String> arguments = GenerateParametersCodes(
-              condition.GetParameters(), instrInfos.parameters, context);
+          vector<gd::String> arguments = generateConditionParametersCodes(
+              condition.GetParameters(), instrInfos.parameters);
           conditionCode += GenerateObjectCondition(
               realObjects[i], objInfo, arguments, instrInfos, returnBoolean,
               condition.IsInverted(), context);
@@ -436,8 +455,8 @@ gd::String EventsCodeGenerator::GenerateConditionCode(
         if (gd::EventsCodeGenerator::AreBehaviorParametersOfFirstObjectValid(
                 realObjects[i], condition, instrInfos, realObjects.size() != 1)) {
           // Prepare arguments and generate the whole condition code
-          vector<gd::String> arguments = GenerateParametersCodes(
-              condition.GetParameters(), instrInfos.parameters, context);
+          vector<gd::String> arguments = generateConditionParametersCodes(
+              condition.GetParameters(), instrInfos.parameters);
           conditionCode += GenerateBehaviorCondition(
               realObjects[i], behaviorName, autoInfo, arguments, instrInfos,
               returnBoolean, condition.IsInverted(), context);
@@ -454,10 +473,9 @@ gd::String EventsCodeGenerator::GenerateConditionCode(
         "conditionUniqueId",
         gd::String::From(GenerateSingleUsageUniqueIdFor(&condition))));
     vector<gd::String> arguments =
-        GenerateParametersCodes(condition.GetParameters(),
-                                instrInfos.parameters,
-                                context,
-                                &supplementaryParametersTypes);
+        generateConditionParametersCodes(condition.GetParameters(),
+                                         instrInfos.parameters,
+                                         &supplementaryParametersTypes);
 
     conditionCode += GenerateFreeCondition(
         arguments, instrInfos, returnBoolean, condition.IsInverted(), context);
@@ -693,6 +711,11 @@ gd::String EventsCodeGenerator::GenerateActionCode(
           GetObjectsContainersList().ExpandObjectName(
               objectName, context.GetCurrentObject());
       for (std::size_t i = 0; i < realObjects.size(); ++i) {
+        context.ObjectsListNeeded(realObjects[i]);
+      }
+      actionCode += GenerateObjectListsPickedInstancesAssertCode(
+          realObjects, context, "object action \"" + objectName + "\"");
+      for (std::size_t i = 0; i < realObjects.size(); ++i) {
         // Setup context
         gd::String objectType =
             GetObjectsContainersList().GetTypeOfObject(realObjects[i]);
@@ -730,6 +753,11 @@ gd::String EventsCodeGenerator::GenerateActionCode(
           MetadataProvider::GetBehaviorMetadata(platform, actualBehaviorType);
 
       AddIncludeFiles(autoInfo.includeFiles);
+      for (std::size_t i = 0; i < realObjects.size(); ++i) {
+        context.ObjectsListNeeded(realObjects[i]);
+      }
+      actionCode += GenerateObjectListsPickedInstancesAssertCode(
+          realObjects, context, "behavior action \"" + objectName + "\"");
       for (std::size_t i = 0; i < realObjects.size(); ++i) {
         // Setup context
         context.SetCurrentObject(realObjects[i]);

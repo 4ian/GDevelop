@@ -404,7 +404,14 @@ gd::String ExpressionCodeGenerator::GenerateObjectFunctionCode(
           context);
   }
 
-  return functionOutput;
+  if (!context.GetCurrentObject().empty() && realObjects.size() == 1 &&
+      context.GetCurrentObject() == realObjects[0]) {
+    return functionOutput;
+  }
+
+  return codeGenerator.GenerateObjectListsPickedInstancesAssertExpression(
+      realObjects, context, "object expression \"" + objectName + "\"",
+      functionOutput);
 }
 gd::String ExpressionCodeGenerator::GenerateBehaviorFunctionCode(
     const gd::String& type,
@@ -452,7 +459,14 @@ gd::String ExpressionCodeGenerator::GenerateBehaviorFunctionCode(
         context);
   }
 
-  return functionOutput;
+  if (!context.GetCurrentObject().empty() && realObjects.size() == 1 &&
+      context.GetCurrentObject() == realObjects[0]) {
+    return functionOutput;
+  }
+
+  return codeGenerator.GenerateObjectListsPickedInstancesAssertExpression(
+      realObjects, context, "behavior expression \"" + objectName + "\"",
+      functionOutput);
 }
 
 gd::String ExpressionCodeGenerator::GenerateParametersCodes(

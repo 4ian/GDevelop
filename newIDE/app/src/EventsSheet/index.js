@@ -706,7 +706,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
               this.state.selection
             )}
             moveEventsIntoNewGroup={this.moveEventsIntoNewGroup}
-            onOpenSceneVariables={this.editLayoutVariables}
+            onOpenSceneVariables={this.openSceneVariables}
             onShowGeneratedCode={
               // Available for scenes AND extension events-functions (free, behavior
               // and object functions); not for external events.

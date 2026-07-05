@@ -16,7 +16,7 @@ export const useCommand = (
   const { handler } = command;
   React.useEffect(
     () => {
-      if (!enabled) return;
+      if (!enabled || typeof handler !== 'function') return;
       commandManager.registerCommand(commandName, { handler });
       return () => commandManager.deregisterCommand(commandName);
     },
@@ -36,7 +36,7 @@ export const useCommandWithOptions = (
   const { generateOptions } = command;
   React.useEffect(
     () => {
-      if (!enabled) return;
+      if (!enabled || typeof generateOptions !== 'function') return;
       commandManager.registerCommand(commandName, { generateOptions });
       return () => commandManager.deregisterCommand(commandName);
     },

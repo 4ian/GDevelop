@@ -6,10 +6,8 @@ import { LineStackLayout } from '../../UI/Layout';
 import { type PreviewState } from '../PreviewState';
 import PreviewIcon from '../../UI/CustomSvgIcons/Preview';
 import UpdateIcon from '../../UI/CustomSvgIcons/Update';
-import DebuggerIcon from '../../UI/CustomSvgIcons/Debug';
 import FlatButtonWithSplitMenu from '../../UI/FlatButtonWithSplitMenu';
 import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
-import ResponsiveRaisedButton from '../../UI/ResponsiveRaisedButton';
 import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
 import optionalRequire from '../../Utils/OptionalRequire';
 
@@ -214,13 +212,23 @@ const PreviewAndShareButtons: React.ComponentType<PreviewAndShareButtonsProps> =
       ]
     );
 
+    const onPreviewButtonClick = React.useCallback(
+      async () => {
+        if (hasPreviewsRunning) {
+          await onHotReloadPreview();
+          return;
+        }
+
+        await onOpenDebugger();
+      },
+      [hasPreviewsRunning, onHotReloadPreview, onOpenDebugger]
+    );
+
     return (
       <LineStackLayout noMargin>
         <FlatButtonWithSplitMenu
           primary
-          onClick={
-            hasPreviewsRunning ? onHotReloadPreview : onPreviewWithoutHotReload
-          }
+          onClick={onPreviewButtonClick}
           disabled={!isPreviewEnabled}
           icon={hasPreviewsRunning ? <UpdateIcon /> : <PreviewIcon />}
           label={
@@ -236,13 +244,6 @@ const PreviewAndShareButtons: React.ComponentType<PreviewAndShareButtonsProps> =
           splitMenuButtonId="toolbar-preview-split-menu-button"
           // $FlowFixMe[incompatible-type]
           buildMenuTemplate={previewBuildMenuTemplate}
-        />
-        <ResponsiveRaisedButton
-          onClick={onOpenDebugger}
-          disabled={!isPreviewEnabled}
-          icon={<DebuggerIcon />}
-          label={<Trans>Debug</Trans>}
-          id="toolbar-debug-button"
         />
       </LineStackLayout>
     );

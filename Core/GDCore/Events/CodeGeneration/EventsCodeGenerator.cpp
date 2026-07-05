@@ -929,6 +929,9 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(
   gd::String argOutput;
 
   if (ParameterMetadata::IsExpression("number", metadata.GetType())) {
+    if (metadata.IsOptional() && parameter.GetPlainString().empty()) {
+      return "0";
+    }
     argOutput = gd::ExpressionCodeGenerator::GenerateExpressionCode(
         *this,
         context,
@@ -937,6 +940,9 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(
         lastObjectName,
         metadata.GetExtraInfo());
   } else if (ParameterMetadata::IsExpression("string", metadata.GetType())) {
+    if (metadata.IsOptional() && parameter.GetPlainString().empty()) {
+      return ConvertToStringExplicit("");
+    }
     argOutput = gd::ExpressionCodeGenerator::GenerateExpressionCode(
         *this,
         context,

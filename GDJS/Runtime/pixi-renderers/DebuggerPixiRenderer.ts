@@ -1640,9 +1640,6 @@ namespace gdjs {
       queuedSignalsCount: integer = 0
     ): void {
       const now = Date.now();
-      let shouldRenderSignalDebugPanel =
-        queuedSignalsCount !== this._signalDebugQueuedSignalsCount ||
-        !this._signalDebugPanel;
       this._signalDebugQueuedSignalsCount = queuedSignalsCount;
       const signalDebugRecordsSignature =
         this._getSignalDebugRecordsSignature(signalDebugRecords);
@@ -1653,8 +1650,6 @@ namespace gdjs {
       ) {
         this._lastAppendedSignalDebugRecordsSignature =
           signalDebugRecordsSignature;
-        shouldRenderSignalDebugPanel = true;
-        this._appendSignalDebugPanelLogs(signalDebugRecords, now);
         for (let i = 0, len = signalDebugRecords.length; i < len; ++i) {
           const signalDebugRecord = signalDebugRecords[i];
           const color = getSignalDebugStatusColor(
@@ -1693,9 +1688,6 @@ namespace gdjs {
           this._resetSignalDebugLabels();
           this._signalDebugDrawHasContent = false;
         }
-        if (shouldRenderSignalDebugPanel && this._ensureSignalDebugDraw()) {
-          this._renderSignalDebugPanel();
-        }
         return;
       }
 
@@ -1703,9 +1695,6 @@ namespace gdjs {
         now - this._signalDebugLastRenderTime <
         signalDebugDrawRefreshInterval
       ) {
-        if (shouldRenderSignalDebugPanel && this._ensureSignalDebugDraw()) {
-          this._renderSignalDebugPanel();
-        }
         return;
       }
       this._signalDebugLastRenderTime = now;
@@ -1830,9 +1819,6 @@ namespace gdjs {
 
       this._signalDebugSegments = activeSegments;
       this._signalDebugDrawHasContent = activeSegments.length > 0;
-      if (shouldRenderSignalDebugPanel) {
-        this._renderSignalDebugPanel();
-      }
     }
 
     clearSignalDebugDraw(): void {

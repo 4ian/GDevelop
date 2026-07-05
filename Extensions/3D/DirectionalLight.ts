@@ -1,4 +1,5 @@
 namespace gdjs {
+  const lightIntensityMigrationFactor = Math.PI;
   interface DirectionalLightFilterNetworkSyncData {
     i: number;
     c: number;
@@ -189,7 +190,7 @@ namespace gdjs {
           }
           updateDoubleParameter(parameterName: string, value: number): void {
             if (parameterName === 'intensity') {
-              this._light.intensity = value;
+              this._light.intensity = value * lightIntensityMigrationFactor;
             } else if (parameterName === 'elevation') {
               this._elevation = value;
             } else if (parameterName === 'rotation') {
@@ -204,7 +205,7 @@ namespace gdjs {
           }
           getDoubleParameter(parameterName: string): number {
             if (parameterName === 'intensity') {
-              return this._light.intensity;
+              return this._light.intensity / lightIntensityMigrationFactor;
             } else if (parameterName === 'elevation') {
               return this._elevation;
             } else if (parameterName === 'rotation') {
@@ -260,7 +261,7 @@ namespace gdjs {
           }
           getNetworkSyncData(): DirectionalLightFilterNetworkSyncData {
             return {
-              i: this._light.intensity,
+              i: this.getDoubleParameter('intensity'),
               c: this._light.color.getHex(),
               e: this._elevation,
               r: this._rotation,
@@ -268,7 +269,7 @@ namespace gdjs {
             };
           }
           updateFromNetworkSyncData(syncData: any): void {
-            this._light.intensity = syncData.i;
+            this.updateDoubleParameter('intensity', syncData.i);
             this._light.color.setHex(syncData.c);
             this._elevation = syncData.e;
             this._rotation = syncData.r;

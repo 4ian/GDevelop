@@ -54,6 +54,7 @@ type State = {|
   debuggerGameData: { [DebuggerId]: any },
   profilerOutputs: { [DebuggerId]: ProfilerOutput },
   profilingInProgress: { [DebuggerId]: boolean },
+  signalDiagnostics: { [DebuggerId]: any },
   debuggerStatus: { [DebuggerId]: DebuggerStatus },
   selectedId: DebuggerId,
   logs: { [DebuggerId]: Array<Log> },
@@ -74,6 +75,7 @@ export default class Debugger extends React.Component<Props, State> {
     debuggerGameData: {},
     profilerOutputs: {},
     profilingInProgress: {},
+    signalDiagnostics: {},
     debuggerStatus: {},
     selectedId: '0',
     logs: {},
@@ -116,6 +118,15 @@ export default class Debugger extends React.Component<Props, State> {
         onToggleConsole={() => {
           if (this._debuggerContents[this.state.selectedId])
             this._debuggerContents[this.state.selectedId].toggleConsole();
+        }}
+        canOpenSignalMonitor={this._hasSelectedDebugger()}
+        isSignalMonitorShown={
+          !!selectedDebuggerContents &&
+          selectedDebuggerContents.isSignalMonitorShown()
+        }
+        onToggleSignalMonitor={() => {
+          if (this._debuggerContents[this.state.selectedId])
+            this._debuggerContents[this.state.selectedId].toggleSignalMonitor();
         }}
       />
     );
@@ -169,6 +180,7 @@ export default class Debugger extends React.Component<Props, State> {
             debuggerGameData,
             profilerOutputs,
             profilingInProgress,
+            signalDiagnostics,
             debuggerStatus,
           }) => {
             // Remove any data bound to the instance that might have been stored.
@@ -176,6 +188,9 @@ export default class Debugger extends React.Component<Props, State> {
             if (debuggerGameData[id]) delete debuggerGameData[id];
             if (profilerOutputs[id]) delete profilerOutputs[id];
             if (profilingInProgress[id]) delete profilingInProgress[id];
+            if (signalDiagnostics.hasOwnProperty(id)) {
+              delete signalDiagnostics[id];
+            }
             if (debuggerStatus[id]) delete debuggerStatus[id];
 
             return {
@@ -189,6 +204,7 @@ export default class Debugger extends React.Component<Props, State> {
               debuggerGameData,
               profilerOutputs,
               profilingInProgress,
+              signalDiagnostics,
               debuggerStatus,
             };
           },
@@ -249,9 +265,23 @@ export default class Debugger extends React.Component<Props, State> {
             ...state.debuggerStatus,
             [id]: data.payload,
           },
+          signalDiagnostics:
+            data.payload && data.payload.hasOwnProperty('signalDiagnostics')
+              ? {
+                  ...state.signalDiagnostics,
+                  [id]: data.payload.signalDiagnostics,
+                }
+              : state.signalDiagnostics,
         }),
         () => this.updateToolbar()
       );
+    } else if (data.command === 'signalDiagnostics') {
+      this.setState(state => ({
+        signalDiagnostics: {
+          ...state.signalDiagnostics,
+          [id]: data.payload,
+        },
+      }));
     } else if (data.command === 'profiler.output') {
       this.setState({
         profilerOutputs: {
@@ -355,6 +385,7 @@ export default class Debugger extends React.Component<Props, State> {
       debuggerGameData,
       profilerOutputs,
       profilingInProgress,
+      signalDiagnostics,
     } = this.state;
 
     return (
@@ -407,6 +438,7 @@ export default class Debugger extends React.Component<Props, State> {
                 profilerOutput={profilerOutputs[selectedId]}
                 profilingInProgress={profilingInProgress[selectedId]}
                 logsManager={this._getLogsManager(selectedId)}
+                signalDiagnostics={signalDiagnostics[selectedId]}
                 onOpenedEditorsChanged={this.updateToolbar}
               />
             )}

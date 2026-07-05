@@ -744,6 +744,20 @@ namespace gdjs {
     }
 
     /**
+     * Send the latest signal diagnostics to the debugger server.
+     */
+    sendSignalDiagnostics(
+      signalDiagnostics: gdjs.SignalDebugInfo | null
+    ): void {
+      this._sendMessage(
+        circularSafeStringify({
+          command: 'signalDiagnostics',
+          payload: signalDiagnostics,
+        })
+      );
+    }
+
+    /**
      * Dump all the relevant data from the {@link RuntimeGame} instance and send it to the server.
      */
     sendRuntimeGameDump(): void {

@@ -35,6 +35,7 @@ namespace gdjs {
     private _asyncTasksManager = new gdjs.AsyncTasksManager();
     private _objectGroups = new Map<string, string[]>();
     private _signalAnimationDebugDrawEnabled: boolean = false;
+    private _lastSentSignalDiagnosticsSignature: string = '';
 
     /** True if loadFromScene was called and the scene is being played. */
     _isLoaded: boolean = false;
@@ -530,8 +531,12 @@ namespace gdjs {
           signalAnimationDebugRecords,
           queuedSignalsCount
         );
+        this._sendSignalDiagnostics(
+          this._signalBus ? this._signalBus.getDebugInfo() : null
+        );
       } else {
         this._debuggerRenderer.clearSignalDebugDraw();
+        this._sendSignalDiagnostics(null);
       }
 
       this._renderer.render();
@@ -548,11 +553,87 @@ namespace gdjs {
         this._debuggerRenderer.clearSignalDebugDraw();
       }
 
+      this._lastSentSignalDiagnosticsSignature = '';
       this._signalAnimationDebugDrawEnabled = enableSignalAnimationDebugDraw;
     }
 
     isSignalAnimationDebugDrawEnabled(): boolean {
       return this._signalAnimationDebugDrawEnabled;
+    }
+
+    private _getSignalDiagnosticsSignature(
+      signalDiagnostics: gdjs.SignalDebugInfo | null
+    ): string {
+      if (!signalDiagnostics) {
+        return 'disabled';
+      }
+
+      let signature =
+        signalDiagnostics.queuedSignalsCount +
+        ':' +
+        signalDiagnostics.emittedSignalsCount +
+        ':' +
+        signalDiagnostics.droppedSignalsCount +
+        ':' +
+        signalDiagnostics.deliveredSignalsThisFrameCount +
+        ':' +
+        signalDiagnostics.receiversThisFrameCount +
+        ':' +
+        signalDiagnostics.signalsThisFrame.length;
+
+      for (
+        let i = 0, len = signalDiagnostics.signalsThisFrame.length;
+        i < len;
+        ++i
+      ) {
+        const signal = signalDiagnostics.signalsThisFrame[i];
+        signature +=
+          '|' +
+          signal.id +
+          ':' +
+          signal.status +
+          ':' +
+          signal.name +
+          ':' +
+          signal.payload +
+          ':' +
+          signal.target +
+          ':' +
+          signal.receivers.length +
+          ':' +
+          signal.receiverPositions.length +
+          ':' +
+          signal.targetPositions.length;
+
+        if (signal.source) {
+          signature +=
+            ':' + signal.source.objectName + '#' + signal.source.objectId;
+        }
+
+        for (let j = 0, lenj = signal.receivers.length; j < lenj; ++j) {
+          signature += ':' + signal.receivers[j];
+        }
+      }
+
+      return signature;
+    }
+
+    private _sendSignalDiagnostics(
+      signalDiagnostics: gdjs.SignalDebugInfo | null
+    ): void {
+      const debuggerClient =
+        this._runtimeGame && this._runtimeGame._debuggerClient;
+      if (!debuggerClient) {
+        return;
+      }
+
+      const signature = this._getSignalDiagnosticsSignature(signalDiagnostics);
+      if (signature === this._lastSentSignalDiagnosticsSignature) {
+        return;
+      }
+
+      this._lastSentSignalDiagnosticsSignature = signature;
+      debuggerClient.sendSignalDiagnostics(signalDiagnostics);
     }
 
     /**

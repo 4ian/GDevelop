@@ -9,6 +9,7 @@ import ConsoleIcon from '../UI/CustomSvgIcons/Console';
 import PlayIcon from '../UI/CustomSvgIcons/Preview';
 import PauseIcon from '../UI/CustomSvgIcons/Pause';
 import IconButton from '../UI/IconButton';
+import TimelineIcon from '@material-ui/icons/Timeline';
 
 type Props = {|
   onPlay: () => void,
@@ -21,6 +22,9 @@ type Props = {|
   isConsoleShown: boolean,
   onToggleConsole: () => void,
   canOpenConsole: boolean,
+  isSignalMonitorShown: boolean,
+  onToggleSignalMonitor: () => void,
+  canOpenSignalMonitor: boolean,
 |};
 
 export class Toolbar extends React.PureComponent<Props> {
@@ -34,8 +38,11 @@ export class Toolbar extends React.PureComponent<Props> {
       canOpenProfiler,
       onToggleConsole,
       canOpenConsole,
+      onToggleSignalMonitor,
+      canOpenSignalMonitor,
       isProfilerShown,
       isConsoleShown,
+      isSignalMonitorShown,
     } = this.props;
 
     return (
@@ -59,6 +66,16 @@ export class Toolbar extends React.PureComponent<Props> {
           tooltip={t`Open the console`}
         >
           <ConsoleIcon />
+        </IconButton>
+        <IconButton
+          size="small"
+          color="default"
+          onClick={onToggleSignalMonitor}
+          disabled={!canOpenSignalMonitor}
+          selected={isSignalMonitorShown}
+          tooltip={t`Open the signal monitor`}
+        >
+          <TimelineIcon />
         </IconButton>
 
         {canPause ? (

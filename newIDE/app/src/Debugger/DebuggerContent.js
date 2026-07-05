@@ -24,6 +24,7 @@ import HelpButton from '../UI/HelpButton';
 import Profiler from './Profiler';
 import { DebuggerConsole, type LogsManager } from './DebuggerConsole';
 import { type ProfilerOutput } from '.';
+import SignalMonitor, { type SignalDiagnostics } from './SignalMonitor';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import MiniToolbar from '../UI/MiniToolbar';
 import ScrollView from '../UI/ScrollView';
@@ -40,6 +41,7 @@ type Props = {|
   profilerOutput: ?ProfilerOutput,
   profilingInProgress: boolean,
   logsManager: LogsManager,
+  signalDiagnostics: ?SignalDiagnostics,
   onOpenedEditorsChanged: () => void,
 |};
 
@@ -60,7 +62,12 @@ const initialMosaicEditorNodes = {
   second: {
     direction: 'row',
     first: 'profiler',
-    second: 'console',
+    second: {
+      direction: 'row',
+      first: 'signal-monitor',
+      second: 'console',
+      splitPercentage: 40,
+    },
     splitPercentage: 25,
   },
   splitPercentage: 65,
@@ -93,12 +100,23 @@ export default class DebuggerContent extends React.Component<Props, State> {
     );
   };
 
+  isSignalMonitorShown = (): any => {
+    return (
+      !!this._editors &&
+      this._editors.getOpenedEditorNames().includes('signal-monitor')
+    );
+  };
+
   toggleProfiler = () => {
     if (this._editors) this._editors.toggleEditor('profiler', 'bottom');
   };
 
   toggleConsole = () => {
     if (this._editors) this._editors.toggleEditor('console', 'bottom');
+  };
+
+  toggleSignalMonitor = () => {
+    if (this._editors) this._editors.toggleEditor('signal-monitor', 'bottom');
   };
 
   render(): any {
@@ -112,6 +130,7 @@ export default class DebuggerContent extends React.Component<Props, State> {
       profilerOutput,
       profilingInProgress,
       logsManager,
+      signalDiagnostics,
       onOpenedEditorsChanged,
     } = this.props;
     const {
@@ -232,6 +251,15 @@ export default class DebuggerContent extends React.Component<Props, State> {
             profilerOutput={profilerOutput}
             profilingInProgress={profilingInProgress}
           />
+        ),
+      },
+      'signal-monitor': {
+        type: 'secondary',
+        title: t`Signal monitor`,
+        renderEditor: () => (
+          <Background>
+            <SignalMonitor signalDiagnostics={signalDiagnostics} />
+          </Background>
         ),
       },
       console: {

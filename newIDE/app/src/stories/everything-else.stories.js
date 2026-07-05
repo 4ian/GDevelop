@@ -1743,6 +1743,7 @@ storiesOf('DebuggerContent', module)
           profilerOutput={profilerOutputsTestData}
           profilingInProgress={false}
           logsManager={consoleTestData}
+          signalDiagnostics={null}
           onOpenedEditorsChanged={() => {}}
         />
       </FixedHeightFlexContainer>
@@ -1763,6 +1764,7 @@ storiesOf('DebuggerContent', module)
           profilerOutput={profilerOutputsTestData}
           profilingInProgress={true}
           logsManager={consoleTestData}
+          signalDiagnostics={null}
           onOpenedEditorsChanged={() => {}}
         />
       </FixedHeightFlexContainer>

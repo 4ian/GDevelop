@@ -139,7 +139,6 @@ namespace gdjs {
         });
         this._threeRenderer.shadowMap.enabled = true;
         this._threeRenderer.shadowMap.type = THREE.PCFSoftShadowMap;
-        this._threeRenderer.useLegacyLights = true;
         this._threeRenderer.autoClear = false;
         this._threeRenderer.setPixelRatio(canvasResolution);
         this._threeRenderer.setSize(

@@ -452,6 +452,220 @@ describe('EventsValidationScanner', () => {
         );
         expect(targetError).toBeUndefined();
       });
+
+      it('detects actions without conditions in project behavior per-frame lifecycle functions', () => {
+        const { project } = makeTestProject(gd);
+        const extension = project.insertNewEventsFunctionsExtension(
+          'TestLifecycleExt',
+          0
+        );
+        extension.setName('TestLifecycleExt');
+        const behavior = extension
+          .getEventsBasedBehaviors()
+          .insertNew('TestBehavior', 0);
+        ['doStepPreEvents', 'doStepPostEvents'].forEach(
+          (functionName, functionIndex) => {
+            const fn = behavior
+              .getEventsFunctions()
+              .insertNewEventsFunction(functionName, functionIndex);
+            const event = fn
+              .getEvents()
+              .insertNewEvent(
+                project,
+                'BuiltinCommonInstructions::Standard',
+                0
+              );
+            const standardEvent = gd.asStandardEvent(event);
+            const action = new gd.Instruction();
+            action.setType('SetNumberVariable');
+            action.setParametersCount(3);
+            action.setParameter(0, 'Variable1');
+            action.setParameter(1, '=');
+            action.setParameter(2, '1');
+            standardEvent.getActions().insert(action, 0);
+            action.delete();
+          }
+        );
+
+        const errors = scanProjectForValidationErrors(project);
+
+        ['doStepPreEvents', 'doStepPostEvents'].forEach(functionName => {
+          const targetError = errors.find(
+            e =>
+              e.type === 'unconditioned-action' &&
+              e.instructionType === 'SetNumberVariable' &&
+              e.extensionName === 'TestLifecycleExt' &&
+              e.functionName === functionName
+          );
+          expect(targetError).toBeDefined();
+          if (targetError) {
+            expect(targetError.locationType).toBe('extension');
+            expect(targetError.behaviorName).toBe('TestBehavior');
+            expect(targetError.objectName).toBeNull();
+          }
+        });
+      });
+
+      it('detects actions without conditions in project object per-frame lifecycle functions', () => {
+        const { project } = makeTestProject(gd);
+        const extension = project.insertNewEventsFunctionsExtension(
+          'TestObjectLifecycleExt',
+          0
+        );
+        extension.setName('TestObjectLifecycleExt');
+        const object = extension
+          .getEventsBasedObjects()
+          .insertNew('TestObject', 0);
+        ['doStepPreEvents', 'doStepPostEvents'].forEach(
+          (functionName, functionIndex) => {
+            const fn = object
+              .getEventsFunctions()
+              .insertNewEventsFunction(functionName, functionIndex);
+            const event = fn
+              .getEvents()
+              .insertNewEvent(
+                project,
+                'BuiltinCommonInstructions::Standard',
+                0
+              );
+            const standardEvent = gd.asStandardEvent(event);
+            const action = new gd.Instruction();
+            action.setType('SetNumberVariable');
+            action.setParametersCount(3);
+            action.setParameter(0, 'Variable1');
+            action.setParameter(1, '=');
+            action.setParameter(2, '1');
+            standardEvent.getActions().insert(action, 0);
+            action.delete();
+          }
+        );
+
+        const errors = scanProjectForValidationErrors(project);
+
+        ['doStepPreEvents', 'doStepPostEvents'].forEach(functionName => {
+          const targetError = errors.find(
+            e =>
+              e.type === 'unconditioned-action' &&
+              e.instructionType === 'SetNumberVariable' &&
+              e.extensionName === 'TestObjectLifecycleExt' &&
+              e.functionName === functionName
+          );
+          expect(targetError).toBeDefined();
+          if (targetError) {
+            expect(targetError.locationType).toBe('extension');
+            expect(targetError.behaviorName).toBeNull();
+            expect(targetError.objectName).toBe('TestObject');
+          }
+        });
+      });
+
+      it('allows actions without conditions in ordinary project extension functions', () => {
+        const { project } = makeTestProject(gd);
+        const extension = project.insertNewEventsFunctionsExtension(
+          'TestOrdinaryExt',
+          0
+        );
+        extension.setName('TestOrdinaryExt');
+        const behavior = extension
+          .getEventsBasedBehaviors()
+          .insertNew('TestBehavior', 0);
+        const fn = behavior
+          .getEventsFunctions()
+          .insertNewEventsFunction('BhvFunc', 0);
+        const event = fn
+          .getEvents()
+          .insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 0);
+        const standardEvent = gd.asStandardEvent(event);
+        const action = new gd.Instruction();
+        action.setType('SetNumberVariable');
+        action.setParametersCount(3);
+        action.setParameter(0, 'Variable1');
+        action.setParameter(1, '=');
+        action.setParameter(2, '1');
+        standardEvent.getActions().insert(action, 0);
+        action.delete();
+
+        const errors = scanProjectForValidationErrors(project);
+
+        const targetError = errors.find(
+          e =>
+            e.type === 'unconditioned-action' &&
+            e.extensionName === 'TestOrdinaryExt' &&
+            e.functionName === 'BhvFunc'
+        );
+        expect(targetError).toBeUndefined();
+      });
+
+      it('ignores actions without conditions in free extension per-frame lifecycle functions', () => {
+        const { project } = makeTestProject(gd);
+        const extension = project.insertNewEventsFunctionsExtension(
+          'TestFreeLifecycleExt',
+          0
+        );
+        extension.setName('TestFreeLifecycleExt');
+        const fn = extension
+          .getEventsFunctions()
+          .insertNewEventsFunction('onScenePostEvents', 0);
+        const event = fn
+          .getEvents()
+          .insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 0);
+        const standardEvent = gd.asStandardEvent(event);
+        const action = new gd.Instruction();
+        action.setType('SetNumberVariable');
+        action.setParametersCount(3);
+        action.setParameter(0, 'Variable1');
+        action.setParameter(1, '=');
+        action.setParameter(2, '1');
+        standardEvent.getActions().insert(action, 0);
+        action.delete();
+
+        const errors = scanProjectForValidationErrors(project);
+
+        const targetError = errors.find(
+          e =>
+            e.type === 'unconditioned-action' &&
+            e.extensionName === 'TestFreeLifecycleExt' &&
+            e.functionName === 'onScenePostEvents'
+        );
+        expect(targetError).toBeUndefined();
+      });
+
+      it('ignores actions without conditions in store extension lifecycle functions', () => {
+        const { project } = makeTestProject(gd);
+        const extension = project.insertNewEventsFunctionsExtension(
+          'StoreLifecycleExt',
+          0
+        );
+        extension.setName('StoreLifecycleExt');
+        extension.setOrigin('gdevelop-extension-store', 'StoreLifecycleExt');
+        const behavior = extension
+          .getEventsBasedBehaviors()
+          .insertNew('TestBehavior', 0);
+        const fn = behavior
+          .getEventsFunctions()
+          .insertNewEventsFunction('doStepPreEvents', 0);
+        const event = fn
+          .getEvents()
+          .insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 0);
+        const standardEvent = gd.asStandardEvent(event);
+        const action = new gd.Instruction();
+        action.setType('SetNumberVariable');
+        action.setParametersCount(3);
+        action.setParameter(0, 'Variable1');
+        action.setParameter(1, '=');
+        action.setParameter(2, '1');
+        standardEvent.getActions().insert(action, 0);
+        action.delete();
+
+        const errors = scanProjectForValidationErrors(project);
+
+        const targetError = errors.find(
+          e =>
+            e.type === 'unconditioned-action' &&
+            e.extensionName === 'StoreLifecycleExt'
+        );
+        expect(targetError).toBeUndefined();
+      });
     });
 
     describe('ForEachEvent scanning', () => {

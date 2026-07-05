@@ -130,9 +130,60 @@ const multipleInstancePickingInstructionTypes = new Set([
   'AjoutObjConcern',
 ]);
 
+const perFrameBehaviorLifecycleFunctionNames = new Set([
+  'doStepPreEvents',
+  'doStepPostEvents',
+]);
+
+const perFrameObjectLifecycleFunctionNames = new Set([
+  'doStepPreEvents',
+  'doStepPostEvents',
+]);
+
 const isObjectParameterTypeThatConsumesPickedInstances = (
   parameterType: string
 ): boolean => objectParameterTypesThatConsumePickedInstances.has(parameterType);
+
+const isPerFrameLifecycleFunctionInProjectExtension = (
+  project: gdProject,
+  projectScopedContainers: gdProjectScopedContainers
+): boolean => {
+  const extensionName = projectScopedContainers.getScopeExtensionName();
+  if (
+    !extensionName ||
+    !project.hasEventsFunctionsExtensionNamed(extensionName)
+  ) {
+    return false;
+  }
+
+  const extension = project.getEventsFunctionsExtension(extensionName);
+  if (extension.getOriginName()) {
+    return false;
+  }
+
+  const functionName = projectScopedContainers.getScopeFunctionName();
+  if (!functionName) {
+    return false;
+  }
+
+  if (projectScopedContainers.getScopeBehaviorName()) {
+    return perFrameBehaviorLifecycleFunctionNames.has(functionName);
+  }
+  if (projectScopedContainers.getScopeObjectName()) {
+    return perFrameObjectLifecycleFunctionNames.has(functionName);
+  }
+  return false;
+};
+
+const shouldValidateUnconditionedActionForScope = (
+  project: gdProject,
+  projectScopedContainers: gdProjectScopedContainers
+): boolean =>
+  !projectScopedContainers.getScopeExtensionName() ||
+  isPerFrameLifecycleFunctionInProjectExtension(
+    project,
+    projectScopedContainers
+  );
 
 const getObjectNamesForObjectOrGroup = (
   project: gdProject,
@@ -424,7 +475,10 @@ const createValidationWorker = (
     if (
       !isCondition &&
       currentStandardEventHasEnabledConditions === false &&
-      !projectScopedContainers.getScopeExtensionName() &&
+      shouldValidateUnconditionedActionForScope(
+        project,
+        projectScopedContainers
+      ) &&
       // $FlowFixMe[prop-missing] - ptr is a number identifying the C++ object.
       instruction.ptr === currentStandardEventFirstEnabledActionPtr
     ) {

@@ -2201,8 +2201,7 @@ export const allGameCategoriesMocked = [
 class NumberGenerator {
   x: number;
 
-  // $FlowFixMe[missing-local-annot]
-  constructor(x = 1) {
+  constructor(x: number = 1) {
     this.x = x % 2 ** 15;
   }
 

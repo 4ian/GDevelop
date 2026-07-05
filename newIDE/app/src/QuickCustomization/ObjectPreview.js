@@ -84,7 +84,7 @@ export const ObjectPreview = ({
         )}
       </div>
       <div style={styles.titleContainer}>
-        <Text noMargin style={styles.title} color="inherit">
+        <Text noMargin style={styles.title} color="inherit" size="body-small">
           {object.getName()}
         </Text>
       </div>

@@ -282,8 +282,7 @@ export const sortResultsUsingExactMatches = (
   return <T>(
     resultA: AugmentedSearchResult<T>,
     resultB: AugmentedSearchResult<T>
-    // $FlowFixMe[missing-local-annot]
-  ) => {
+  ): number => {
     // First give priority to result that have an exact match at start of word and not the other.
     const resultAExactMatchesAtStartOfWordCount = resultA.matches.filter(
       match => match.closestExactMatchAtStartOfWordIndex !== null

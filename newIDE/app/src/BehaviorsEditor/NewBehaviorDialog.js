@@ -301,6 +301,7 @@ export default function NewBehaviorDialog({
             onChoose={behaviorType => chooseBehavior(i18n, behaviorType)}
             installedBehaviorMetadataList={installedBehaviorMetadataList}
             deprecatedBehaviorMetadataList={deprecatedBehaviorMetadataList}
+            shouldCheckCapabilityBehaviors={!shouldShowCapabilityBehaviors}
           />
         </Dialog>
       )}

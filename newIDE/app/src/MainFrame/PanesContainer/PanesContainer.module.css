@@ -118,6 +118,12 @@
   width: 0;
 }
 
+/* A drawer has a fixed width: make the content lay out at exactly this width,
+   instead of the default 300px minimum which overflows on small screens. */
+.pane.drawer .paneContent {
+  min-width: min(calc(100vw - 82px), 320px);
+}
+
 /* Pane as drawer */
 .pane.drawer {
   width: min(calc(100vw - 82px), 320px);

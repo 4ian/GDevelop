@@ -413,6 +413,11 @@ String String::CapitalizeFirstLetter() const
   return size() < 1 ? *this : substr(0, 1).UpperCase() + substr(1);
 }
 
+String String::UncapitalizeFirstLetter() const
+{
+  return size() < 1 ? *this : substr(0, 1).LowerCase() + substr(1);
+}
+
 String String::FindAndReplace(String search, String replacement, bool all) const
 {
     gd::String result(*this);

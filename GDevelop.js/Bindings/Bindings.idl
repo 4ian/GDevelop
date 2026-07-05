@@ -381,7 +381,7 @@ interface ObjectGroup {
     void UnserializeFrom([Const, Ref] SerializerElement element);
 };
 
-interface ObjectVariableHelper {
+interface ObjectRefactorer {
     [Value] VariablesContainer STATIC_MergeVariableContainers(
         [Const, Ref] ObjectsContainersList objectsContainersList,
         [Const, Ref] ObjectGroup objectGroup);
@@ -393,6 +393,15 @@ interface ObjectVariableHelper {
         [Ref] EventsBasedObject eventsBasedObject,
         [Const] DOMString objectName,
         [Const, Ref] VariablesChangeset changeset);
+    void STATIC_FillMissingGroupVariablesToObject(
+        [Ref] gdObject obj,
+        [ Const, Ref ] VariablesContainer groupVariablesContainer);
+    void STATIC_FillMissingGroupBehaviorToObject(
+        [Ref] ObjectsContainer globalObjectsContainer,
+        [Ref] ObjectsContainer objectsContainer,
+        [Ref] gdObject obj,
+        [ Const, Ref ] ObjectGroup objectGroup,
+        [Const] DOMString behaviorName);
 };
 
 interface EventsBasedObjectVariantHelper {
@@ -883,6 +892,9 @@ interface BehaviorsSharedData {
     [Value] MapStringPropertyDescriptor GetProperties();
     boolean UpdateProperty([Const] DOMString name, [Const] DOMString value);
     void InitializeContent();
+
+    boolean IsFolded();
+    void SetFolded(boolean folded);
 
     [Ref] QuickCustomizationVisibilitiesContainer GetPropertiesQuickCustomizationVisibilities();
 };
@@ -1654,6 +1666,7 @@ interface SerializerElement {
     // Use the element as an object ("associative array", "dictionary") or array:
     [Ref] SerializerElement AddChild([Const] DOMString str);
     [Ref] SerializerElement GetChild([Const] DOMString str);
+    [Ref] SerializerElement GetOrCreateChild([Const] DOMString str);
     void WRAPPED_SetChild([Const] DOMString str, [Const, Ref] SerializerElement element);
     boolean HasChild([Const] DOMString str);
 
@@ -2061,6 +2074,8 @@ interface ObjectMetadata {
     [Const, Ref] DOMString GetCategory();
     [Const, Ref] DOMString GetAssetStoreTag();
 
+
+    [Ref] ObjectMetadata SetHelpPath([Const] DOMString helpPath);
     [Ref] ObjectMetadata SetCategory([Const] DOMString categoryFullName);
     [Ref] ObjectMetadata SetAssetStoreTag([Const] DOMString assetStoreTag);
     [Ref] InGameEditorResourceMetadata AddInGameEditorResource();
@@ -2198,6 +2213,8 @@ interface BehaviorMetadata {
     [Const, Ref] DOMString GetGroup();
     [Const, Ref] DOMString GetIconFilename();
     [Const, Ref] DOMString GetHelpPath();
+
+    [Ref] BehaviorMetadata SetHelpPath([Const] DOMString helpPath);
 
     [Const, Ref] InstructionMetadata AddScopedCondition([Const] DOMString name,
                                         [Const] DOMString fullname,
@@ -3051,22 +3068,13 @@ interface InstructionValidator {
     [Const, Ref] ProjectScopedContainers projectScopedContainers,
     [Const, Ref] Instruction instruction,
     [Const, Ref] InstructionMetadata metadata,
-    long parameterIndex,
-    [Const] DOMString value);
+    long parameterIndex);
   boolean STATIC_IsParameterValid(
     [Const, Ref] Platform platform,
     [Const, Ref] ProjectScopedContainers projectScopedContainers,
     [Const, Ref] Instruction instruction,
     [Const, Ref] InstructionMetadata metadata,
-    long parameterIndex,
-    [Const] DOMString value);
-  boolean STATIC_HasDeprecationWarnings(
-    [Const, Ref] Platform platform,
-    [Const, Ref] ProjectScopedContainers projectScopedContainers,
-    [Const, Ref] Instruction instruction,
-    [Const, Ref] InstructionMetadata metadata,
-    long parameterIndex,
-    [Const] DOMString value);
+    long parameterIndex);
 };
 
 interface ObjectTools {
@@ -3088,7 +3096,10 @@ interface PropertyFunctionGenerator {
     void STATIC_GenerateObjectGetterAndSetter([Ref] Project project, [Ref] EventsFunctionsExtension extension, [Ref] EventsBasedObject eventsBasedObject, [Const, Ref] NamedPropertyDescriptor property);
     boolean STATIC_CanGenerateGetterAndSetter([Const, Ref] AbstractEventsBasedEntity eventsBasedBehavior, [Const, Ref] NamedPropertyDescriptor property);
 
-    void STATIC_GenerateConditionSkeleton([Ref] Project project, [Ref] EventsFunction eventFunction);
+    void STATIC_GenerateConditionSkeleton([Ref] Project project, [Ref] EventsFunction eventsFunction);
+    void STATIC_GenerateExpressionSkeleton([Ref] Project project, [Ref] EventsFunction eventsFunction);
+    void STATIC_UpdateReturnActionType([Ref] Project project, [Ref] EventsFunction eventsFunction);
+
 };
 
 interface UsedExtensionsResult {

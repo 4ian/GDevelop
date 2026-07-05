@@ -34,7 +34,7 @@ export type SceneEditorsDisplayProps = {|
   objectsContainer: gdObjectsContainer,
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   initialInstances: gdInitialInstancesContainer,
-  lastSelectionType: 'instance' | 'object' | 'layer',
+  lastSelectionType: LastSelectionType,
   instancesSelection: InstancesSelection,
   onSelectInstances: (
     instances: Array<gdInitialInstance>,
@@ -81,6 +81,9 @@ export type SceneEditorsDisplayProps = {|
   onLayersModified: () => void,
   onLayersVisibilityInEditorChanged: () => void,
   onBackgroundColorChanged: () => void,
+  selectedObjectGroup: gdObjectGroup | null,
+  onSelectObjectGroup: (objectGroup: gdObjectGroup | null) => void,
+  openSceneVariables: () => void,
   onObjectCreated: (
     objects: Array<gdObject>,
     isTheFirstOfItsTypeInProject: boolean,
@@ -115,7 +118,10 @@ export type SceneEditorsDisplayProps = {|
     done: (boolean) => void
   ) => void,
   onCreateObjectGroup: () => void,
-  onEditObjectGroup: (?gdObjectGroup) => void,
+  onEditObjectGroup: (
+    objectGroup: gdObjectGroup,
+    initialTab: ?ObjectGroupEditorTab
+  ) => void,
   onDeleteObjectGroup: (
     groupWithContext: GroupWithContext,
     done: (boolean) => void
@@ -178,7 +184,10 @@ export type SceneEditorsDisplayProps = {|
   onOpenedEditorsChanged: () => void,
   onRestartInGameEditor: (reason: string) => void,
   showRestartInGameEditorAfterErrorButton: boolean,
-  onEventsBasedObjectChildrenEdited: gdEventsBasedObject => void,
+  onEventsBasedObjectChildrenEdited: (
+    eventsBasedObject: gdEventsBasedObject,
+    options?: {| editedObject?: ?gdObject, hasResourceChanged?: boolean |}
+  ) => void,
 |};
 
 export type SceneEditorsDisplayInterface = {|

@@ -57,17 +57,18 @@ import { LARGE_WIDGET_SIZE } from '../MainFrame/EditorContainers/HomePage/CardWi
 
 const ASSETS_DISPLAY_LIMIT = 60;
 
-const getAssetSize = (windowSize: WindowSizeType) => {
+const getAssetColumns = (windowSize: WindowSizeType, isLandscape: boolean) => {
   switch (windowSize) {
     case 'small':
-      return 80;
+      return isLandscape ? 4 : 3;
     case 'medium':
-      return 120;
+      return 5;
     case 'large':
+      return 8;
     case 'xlarge':
-      return 130;
+      return 10;
     default:
-      return 120;
+      return 3;
   }
 };
 
@@ -526,7 +527,6 @@ const AssetsList: React.ComponentType<{
         // Don't show assets if filtering on asset packs.)
         // $FlowFixMe[missing-empty-array-annot]
         if (hasAssetPackFiltersApplied && !openedAssetPack) return [];
-        const assetSize = getAssetSize(windowSize);
 
         return getAssetShortHeadersToDisplay(
           assetShortHeaders,
@@ -536,9 +536,7 @@ const AssetsList: React.ComponentType<{
           <AssetCardTile
             assetShortHeader={assetShortHeader}
             onOpenDetails={() => onOpenDetails(assetShortHeader)}
-            size={assetSize}
             key={assetShortHeader.id}
-            margin={cellSpacing / 2}
             hideShortDescription={!!hideDetails}
           />
         ));
@@ -549,7 +547,6 @@ const AssetsList: React.ComponentType<{
         openedAssetPack,
         selectedFolders,
         pageBreakIndex,
-        windowSize,
         onOpenDetails,
         hideDetails,
       ]
@@ -977,7 +974,12 @@ const AssetsList: React.ComponentType<{
         {isNavigatingInsideFolder ? (
           <PlaceholderLoader />
         ) : assetTiles && assetTiles.length ? (
-          <GridList style={styles.grid} cellHeight="auto">
+          <GridList
+            style={styles.grid}
+            cellHeight="auto"
+            cols={getAssetColumns(windowSize, isLandscape)}
+            spacing={cellSpacing}
+          >
             {assetTiles}
           </GridList>
         ) : openedAssetPack &&

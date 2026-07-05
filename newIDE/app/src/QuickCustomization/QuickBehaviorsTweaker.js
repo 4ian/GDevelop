@@ -49,6 +49,7 @@ const QuickBehaviorPropertiesEditor = ({
         visibility: 'Basic-Quick',
         quickCustomizationVisibilities: behavior.getPropertiesQuickCustomizationVisibilities(),
         layersContainer: null,
+        shouldDisabledFieldsWithMixedValues: false,
       });
     },
     [behavior, object, schemaRecomputeTrigger]
@@ -62,7 +63,6 @@ const QuickBehaviorPropertiesEditor = ({
         instances={[behavior]}
         onInstancesModified={onBehaviorUpdated}
         resourceManagementProps={resourceManagementProps}
-        // $FlowFixMe[incompatible-type]
         onRefreshAllFields={forceRecomputeSchema}
       />
     </Column>

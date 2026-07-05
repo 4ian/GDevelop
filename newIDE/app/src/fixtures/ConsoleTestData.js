@@ -37,8 +37,7 @@ class MockLogsManager extends LogsManager {
       timestamp: 120000.1234,
     },
   ];
-  // $FlowFixMe[missing-local-annot]
-  groups = (new Set<string>(['Grouped error', 'Regular group']): Set<string>);
+  groups: Set<string> = new Set<string>(['Grouped error', 'Regular group']);
   on() {}
   off() {}
   addLog() {}

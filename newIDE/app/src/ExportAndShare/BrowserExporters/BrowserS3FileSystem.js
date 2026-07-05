@@ -46,8 +46,7 @@ export default class BrowserS3FileSystem {
 
   // Store a set of all external URLs copied so that we can simulate
   // readDir result.
-  // $FlowFixMe[missing-local-annot]
-  _allCopiedExternalUrls = (new Set<string>(): Set<string>);
+  _allCopiedExternalUrls: Set<string> = new Set<string>();
 
   constructor({ filesContent, prefix, bucketBaseUrl }: ConstructorArgs) {
     this.prefix = prefix;
@@ -61,8 +60,7 @@ export default class BrowserS3FileSystem {
     });
   }
 
-  // $FlowFixMe[missing-local-annot]
-  uploadPendingObjects = async () => {
+  uploadPendingObjects = async (): Promise<void> => {
     try {
       console.log(
         `Uploading ${this._pendingUploadObjects.length} files for preview...`

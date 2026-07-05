@@ -1,15 +1,12 @@
 // @flow
-import { t, Trans } from '@lingui/macro';
+import { Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import Dialog from '../../../UI/Dialog';
 import AuthenticatedUserContext from '../../AuthenticatedUserContext';
 import {
-  getRedirectToCheckoutUrl,
   type SubscriptionPlanWithPricingSystems,
-  type SubscriptionPlanPricingSystem,
-  changeUserSubscription,
   hasValidSubscriptionPlan,
   hasSubscriptionBeenManuallyAdded,
   isSubscriptionComingFromTeam,
@@ -18,11 +15,6 @@ import {
   validateCoupon,
   type PricingSystemDiscount,
 } from '../../../Utils/GDevelopServices/Usage';
-import {
-  sendCancelSubscriptionToChange,
-  sendChoosePlanClicked,
-} from '../../../Utils/Analytics/EventSender';
-import Window from '../../../Utils/Window';
 import Text from '../../../UI/Text';
 import { ColumnStackLayout, LineStackLayout } from '../../../UI/Layout';
 import PlaceholderLoader from '../../../UI/PlaceholderLoader';
@@ -31,49 +23,18 @@ import { SubscriptionContext } from '../SubscriptionContext';
 import SubscriptionOptions from './SubscriptionOptions';
 import SubscriptionPlan from './SubscriptionPlan';
 import AlertMessage from '../../../UI/AlertMessage';
-import useAlertDialog from '../../../UI/Alert/useAlertDialog';
 import Paper from '../../../UI/Paper';
 import { formatPriceWithCurrency, getPlanIcon } from '../PlanSmallCard';
 import { selectMessageByLocale } from '../../../Utils/i18n/MessageByLocale';
 import FlatButton from '../../../UI/FlatButton';
 import CancelReasonDialog from '../CancelReasonDialog';
+import { useBuyUpdateOrCancelPlan } from './useBuyUpdateOrCancelPlan';
 import { uniq } from 'lodash';
 
 const styles = {
   currentPlanPaper: {
     padding: '8px 12px',
     marginBottom: 8,
-  },
-};
-
-const cancelConfirmationTexts = {
-  level: 'normal',
-  dialogTexts: {
-    title: t`Cancel your subscription?`,
-    message: t`By canceling your subscription, you will lose all your premium features at the end of the period you already paid for. Continue?`,
-    confirmButtonLabel: t`Continue`,
-    dismissButtonLabel: t`Keep subscription`,
-    maxWidth: 'sm',
-  },
-};
-const cancelAndChangeConfirmationTexts = {
-  level: 'normal',
-  dialogTexts: {
-    title: t`Update your subscription`,
-    message: t`To get this new subscription, we need to stop your existing one before you can pay for the new one. This is immediate but your payment will NOT be pro-rated (you will pay the full price for the new subscription). You won't lose any project, game or other data.`,
-    confirmButtonLabel: t`Cancel and change my subscription`,
-    dismissButtonLabel: t`Go back`,
-    maxWidth: 'sm',
-  },
-};
-const cancelAndChangeWithValidRedeemedCodeConfirmationTexts = {
-  level: 'danger',
-  dialogTexts: {
-    title: t`Update your subscription`,
-    message: t`To buy this new subscription, we need to stop your existing one before you can pay for the new one. This means the redemption code you're currently used won't be usable anymore.`,
-    confirmButtonLabel: t`Forfeit my redeemed subscription and continue`,
-    dismissButtonLabel: t`Go back`,
-    maxWidth: 'sm',
   },
 };
 
@@ -116,20 +77,12 @@ export default function SubscriptionDialog({
   onOpenPendingDialog,
   couponCode,
 }: Props): React.Node {
-  const [isChangingSubscription, setIsChangingSubscription] = React.useState(
-    false
-  );
   const [
     educationPlanSeatsCount,
     setEducationPlanSeatsCount,
   ] = React.useState<number>(20);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
-  const {
-    getAuthorizationHeader,
-    subscription,
-    profile,
-    subscriptionPricingSystem,
-  } = authenticatedUser;
+  const { subscriptionPricingSystem } = authenticatedUser;
 
   const { clearCouponCode, openRedeemCodeDialog } = React.useContext(
     SubscriptionContext
@@ -141,14 +94,6 @@ export default function SubscriptionDialog({
   ] = React.useState(null);
   const [selectedPlanId, setSelectedPlanId] = React.useState(null);
 
-  const {
-    showAlert,
-    showConfirmation,
-    showDeleteConfirmation,
-  } = useAlertDialog();
-  const [cancelReasonDialogOpen, setCancelReasonDialogOpen] = React.useState(
-    false
-  );
   const [pricingSystemDiscounts, setPricingSystemDiscounts] = React.useState<{
     [pricingSystemId: string]: PricingSystemDiscount,
   }>({});
@@ -166,124 +111,17 @@ export default function SubscriptionDialog({
     [clearCouponCode]
   );
 
-  const buyUpdateOrCancelPlan = async (
-    i18n: I18nType,
-    subscriptionPlanPricingSystem: SubscriptionPlanPricingSystem | null
-  ) => {
-    if (!profile || !subscription) return;
-    sendChoosePlanClicked({
-      planId: subscriptionPlanPricingSystem
-        ? subscriptionPlanPricingSystem.planId
-        : null,
-      pricingSystemId: subscriptionPlanPricingSystem
-        ? subscriptionPlanPricingSystem.id
-        : null,
-    });
-
-    // Subscribing from an account without a subscription
-    if (!subscription.planId && subscriptionPlanPricingSystem) {
-      onOpenPendingDialog(true);
-      const isEducationPlan =
-        subscriptionPlanPricingSystem &&
-        subscriptionPlanPricingSystem.planId === 'gdevelop_education';
-      const quantity = isEducationPlan ? educationPlanSeatsCount : undefined;
-      Window.openExternalURL(
-        getRedirectToCheckoutUrl({
-          pricingSystemId: subscriptionPlanPricingSystem.id,
-          userId: profile.id,
-          userEmail: profile.email,
-          quantity,
-          couponCode: couponCode || undefined,
-        })
-      );
-      return;
-    }
-
-    if (!subscriptionPlanPricingSystem) {
-      // Cancelling the existing subscription.
-      const answer = await showConfirmation(
-        // $FlowFixMe[incompatible-type]
-        cancelConfirmationTexts.dialogTexts
-      );
-      if (!answer) return;
-
-      setCancelReasonDialogOpen(true);
-      return;
-    }
-
-    const hasValidRedeemedSubscription =
-      !!subscription.redemptionCodeValidUntil &&
-      subscription.redemptionCodeValidUntil > Date.now();
-    const hasExpiredRedeemedSubscription =
-      !!subscription.redemptionCodeValidUntil &&
-      subscription.redemptionCodeValidUntil < Date.now();
-
-    // Changing the existing subscription.
-    const confirmDialogTexts = hasExpiredRedeemedSubscription
-      ? null // We don't show an alert if the redeemed code is expired.
-      : hasValidRedeemedSubscription
-      ? cancelAndChangeWithValidRedeemedCodeConfirmationTexts
-      : cancelAndChangeConfirmationTexts;
-
-    if (confirmDialogTexts) {
-      const { level, dialogTexts } = confirmDialogTexts;
-
-      const answer =
-        level === 'danger'
-          ? await showDeleteConfirmation({
-              title: dialogTexts.title,
-              message: dialogTexts.message,
-              confirmButtonLabel: dialogTexts.confirmButtonLabel,
-              dismissButtonLabel: dialogTexts.dismissButtonLabel,
-            })
-          : // $FlowFixMe[incompatible-type]
-            await showConfirmation(dialogTexts);
-      if (!answer) return;
-    }
-
-    // Changing the existing subscription by cancelling first.
-    setIsChangingSubscription(true);
-    await sendCancelSubscriptionToChange({
-      planId: subscriptionPlanPricingSystem.planId,
-      pricingSystemId: subscriptionPlanPricingSystem.id,
-    });
-    try {
-      await changeUserSubscription(
-        getAuthorizationHeader,
-        profile.id,
-        {
-          planId: null,
-        },
-        {
-          cancelImmediately: true,
-          cancelReasons: {
-            'changing-subscription': true,
-          },
-        }
-      );
-      await authenticatedUser.onRefreshSubscription();
-    } catch (rawError) {
-      showAlert({
-        title: t`Could not change subscription`,
-        message: t`Something went wrong while changing your subscription. Please try again.`,
-      });
-      console.error('Error while changing subscription:', rawError);
-      return;
-    } finally {
-      setIsChangingSubscription(false);
-    }
-
-    // Then redirect as if a new subscription is being chosen.
-    onOpenPendingDialog(true);
-    Window.openExternalURL(
-      getRedirectToCheckoutUrl({
-        pricingSystemId: subscriptionPlanPricingSystem.id,
-        userId: profile.id,
-        userEmail: profile.email,
-        couponCode: couponCode || undefined,
-      })
-    );
-  };
+  const {
+    buyUpdateOrCancelPlan,
+    isChangingSubscription,
+    cancelReasonDialogOpen,
+    setCancelReasonDialogOpen,
+  } = useBuyUpdateOrCancelPlan({
+    onOpenPendingDialog,
+    couponCode,
+    getEducationPlanSeatsCount: () => educationPlanSeatsCount,
+    dialogVariant: 'standard',
+  });
 
   const isLoading =
     authenticatedUser.loginState === 'loggingIn' || isChangingSubscription;

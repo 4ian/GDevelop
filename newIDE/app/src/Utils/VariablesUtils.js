@@ -3,6 +3,7 @@ import { mapFor } from './MapFor';
 import newNameGenerator from './NewNameGenerator';
 import { normalizeString } from './Search';
 import { unserializeFromJSObject } from './Serializer';
+
 const gd: libGDevelop = global.gd;
 
 export const hasChildThatContainsStringInNameOrValue = (
@@ -18,9 +19,7 @@ export const hasChildThatContainsStringInNameOrValue = (
           variable
             .getEnumValues()
             .toJSArray()
-            .some(enumValue =>
-              normalizeString(enumValue).includes(searchText)
-            ))
+            .some(enumValue => normalizeString(enumValue).includes(searchText)))
       );
     case gd.Variable.Number:
       return variable

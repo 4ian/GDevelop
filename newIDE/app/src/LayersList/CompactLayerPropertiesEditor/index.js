@@ -5,30 +5,24 @@ import { type UnsavedChanges } from '../../MainFrame/UnsavedChangesContext';
 import { type ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
 import ErrorBoundary from '../../UI/ErrorBoundary';
 import ScrollView from '../../UI/ScrollView';
-import { Column, Line, marginsSize } from '../../UI/Grid';
-import CompactPropertiesEditor, {
-  Separator,
-} from '../../CompactPropertiesEditor';
+import { Column, marginsSize } from '../../UI/Grid';
+import CompactPropertiesEditor from '../../CompactPropertiesEditor';
 import Text from '../../UI/Text';
 import { Trans, t } from '@lingui/macro';
 import IconButton from '../../UI/IconButton';
-import ShareExternal from '../../UI/CustomSvgIcons/ShareExternal';
 import { type ResourceManagementProps } from '../../ResourcesList/ResourceSource';
 import { ColumnStackLayout, LineStackLayout } from '../../UI/Layout';
 import useForceUpdate from '../../Utils/UseForceUpdate';
-import ChevronArrowDownWithRoundedBorder from '../../UI/CustomSvgIcons/ChevronArrowDownWithRoundedBorder';
-import ChevronArrowRightWithRoundedBorder from '../../UI/CustomSvgIcons/ChevronArrowRightWithRoundedBorder';
-import Add from '../../UI/CustomSvgIcons/Add';
 import LayersIcon from '../../UI/CustomSvgIcons/Layers';
 import Help from '../../UI/CustomSvgIcons/Help';
 import { getHelpLink } from '../../Utils/HelpLink';
 import Window from '../../Utils/Window';
 import CompactTextField from '../../UI/CompactTextField';
-import { textEllipsisStyle } from '../../UI/TextEllipsis';
 import { makeSchema } from './CompactLayerPropertiesSchema';
 import { type Schema } from '../../PropertiesEditor/PropertiesEditorSchema';
 import { CompactEffectsListEditor } from './CompactEffectsListEditor';
 import { useForceRecompute } from '../../Utils/UseForceUpdate';
+import { TopLevelCollapsibleSection } from '../../ObjectEditor/CompactObjectPropertiesEditor';
 
 export const styles = {
   icon: {
@@ -54,65 +48,6 @@ export const styles = {
 
 const effectsHelpLink = getHelpLink(
   '/interface/scene-editor/layers-and-cameras'
-);
-
-const TopLevelCollapsibleSection = ({
-  title,
-  isFolded,
-  toggleFolded,
-  renderContent,
-  renderContentAsHiddenWhenFolded,
-  noContentMargin,
-  onOpenFullEditor,
-  onAdd,
-}: {|
-  title: React.Node,
-  isFolded: boolean,
-  toggleFolded: () => void,
-  renderContent: () => React.Node,
-  renderContentAsHiddenWhenFolded?: boolean,
-  noContentMargin?: boolean,
-  onOpenFullEditor: () => void,
-  onAdd?: (() => void) | null,
-|}) => (
-  <>
-    <Separator />
-    <Column noOverflowParent>
-      <LineStackLayout alignItems="center" justifyContent="space-between">
-        <LineStackLayout noMargin alignItems="center">
-          <IconButton size="small" onClick={toggleFolded}>
-            {isFolded ? (
-              <ChevronArrowRightWithRoundedBorder style={styles.icon} />
-            ) : (
-              <ChevronArrowDownWithRoundedBorder style={styles.icon} />
-            )}
-          </IconButton>
-          <Text size="sub-title" noMargin style={textEllipsisStyle}>
-            {title}
-          </Text>
-        </LineStackLayout>
-        <Line alignItems="center" noMargin>
-          <IconButton size="small" onClick={onOpenFullEditor}>
-            <ShareExternal style={styles.icon} />
-          </IconButton>
-          {onAdd && (
-            <IconButton size="small" onClick={onAdd}>
-              <Add style={styles.icon} />
-            </IconButton>
-          )}
-        </Line>
-      </LineStackLayout>
-    </Column>
-    <Column noMargin={noContentMargin}>
-      {isFolded ? (
-        renderContentAsHiddenWhenFolded ? (
-          <div style={styles.hiddenContent}>{renderContent()}</div>
-        ) : null
-      ) : (
-        renderContent()
-      )}
-    </Column>
-  </>
 );
 
 type Props = {|
@@ -221,7 +156,6 @@ export const CompactLayerPropertiesEditor = ({
                     schema={layerPropertiesSchema}
                     instances={[layer]}
                     onInstancesModified={onLayersModified}
-                    // $FlowFixMe[incompatible-type]
                     onRefreshAllFields={forceRecomputeSchema}
                   />
                 </ColumnStackLayout>

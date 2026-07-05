@@ -31,13 +31,11 @@ const chartMargins = {
 // in a flexbox component. check https://github.com/recharts/recharts/issues/172
 const chartWidth = '99%';
 
-// $FlowFixMe[missing-local-annot]
-const minutesFormatter = value => {
+const minutesFormatter = (value: number) => {
   return value.toFixed(2);
 };
 
-// $FlowFixMe[missing-local-annot]
-const percentFormatter = value => {
+const percentFormatter = (value: number) => {
   return value.toFixed(2);
 };
 

@@ -35,6 +35,8 @@ type Props = {|
     newProjectSetup: NewProjectSetup
   ) => Promise<CreateProjectResult>,
   closeAskAi: () => void,
+  openAskAi: (?OpenAskAiOptions) => void,
+  closeProject: () => Promise<void>,
   storageProviders: Array<StorageProvider>,
   storageProvider: ?StorageProvider,
   onOpenLayout: OpenLayoutHandler,
@@ -71,6 +73,8 @@ const useNewProjectDialog = ({
   createProjectFromExample,
   createProjectFromPrivateGameTemplate,
   closeAskAi,
+  openAskAi,
+  closeProject,
   storageProviders,
   storageProvider,
   onOpenLayout,
@@ -226,6 +230,8 @@ const useNewProjectDialog = ({
               createProjectFromPrivateGameTemplate
             }
             onCloseAskAi={closeAskAi}
+            onOpenAskAi={openAskAi}
+            closeProject={closeProject}
             storageProviders={storageProviders}
             storageProvider={storageProvider}
             selectedExampleShortHeader={selectedExampleShortHeader}

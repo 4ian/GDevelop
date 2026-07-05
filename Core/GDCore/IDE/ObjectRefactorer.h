@@ -10,6 +10,7 @@
 namespace gd {
 class EventsBasedObject;
 class InitialInstancesContainer;
+class Object;
 class ObjectsContainersList;
 class ObjectsContainer;
 class ObjectGroup;
@@ -24,7 +25,7 @@ namespace gd {
  *
  * This is used by the object group variable editor.
  */
-class GD_CORE_API ObjectVariableHelper {
+class GD_CORE_API ObjectRefactorer {
 public:
   /**
    * Copy every variable from every object of the group to the other objects
@@ -54,13 +55,30 @@ public:
    * Objects can be added during the group edition and may not necessarily have
    * all the variables initially shared by the group.
    *
-   * \see gd::ObjectVariableHelper::MergeVariableContainers
+   * \see gd::ObjectRefactorer::MergeVariableContainers
    */
   static void FillMissingGroupVariablesToObjects(
       gd::ObjectsContainer &globalObjectsContainer,
       gd::ObjectsContainer &objectsContainer,
       const gd::ObjectGroup &objectGroup,
       const gd::SerializerElement &originalSerializedVariables);
+
+  /**
+   * @brief Copy the variables of the group to the object newly added to the
+   * group.
+   */
+  static void FillMissingGroupVariablesToObject(
+      gd::Object &object,
+      const gd::VariablesContainer &groupVariablesContainer);
+
+  /**
+   * @brief Copy the behavior of the group to the object newly added to the
+   * group.
+   */
+  static void FillMissingGroupBehaviorToObject(
+      gd::ObjectsContainer &globalObjectsContainer,
+      gd::ObjectsContainer &objectsContainer, gd::Object &object,
+      const gd::ObjectGroup &objectGroup, const gd::String &behaviorName);
 
   /**
    * @brief Apply the changes done with the variables editor to the objects of

@@ -291,8 +291,8 @@
       },
       "secondary": {
         "color": {
-          "value": "#494952",
-          "comment": "Palette/Grey/70 - Text/ Secondary"
+          "value": "#7F7F85",
+          "comment": "Palette/Grey/50 - Text/ Secondary"
         }
       },
       "disabled": {
@@ -644,6 +644,28 @@
           "comment": "Palette/Grey/30 and alpha"
         }
       }
+    },
+    "auto-edit": {
+      "off": {
+        "background-color": {
+          "value": "#C5C5C9",
+          "comment": "Palette/Grey/30"
+        },
+        "text-color": {
+          "value": "#A6A6AB",
+          "comment": "Palette/Grey/40"
+        }
+      },
+      "on": {
+        "background-color": {
+          "value": "#45D9A1",
+          "comment": "Palette/Green/40"
+        },
+        "text-color": {
+          "value": "#1D1D26",
+          "comment": "Palette/Grey/100"
+        }
+      }
     }
   },
   "input": {
@@ -908,8 +930,8 @@
         "value": "#bbbbbb"
       },
       "background-color": {
-        "value": "#FAFAFA",
-        "comment": "Palette/Grey/00"
+        "value": "#F5F5F7",
+        "comment": "Palette/Grey/10 - Background Primary"
       }
     },
     "toolbar": {
@@ -936,10 +958,15 @@
         "value": "rgb(158, 158, 158)"
       }
     },
+    "header": {
+      "background-color": {
+        "value": "#F5F5F7"
+      }
+    },
     "row": {
       "odd": {
         "background-color": {
-          "value": "#fafafa"
+          "value": "#FAFAFA"
         }
       },
       "even": {
@@ -949,10 +976,12 @@
       },
       "selected": {
         "background-color": {
-          "value": "#4c92ff"
+          "value": "#ECE5FF",
+          "comment": "Palette/Purple/10"
         },
         "color": {
-          "value": "#FFFFFF"
+          "value": "#1D1D26",
+          "comment": "Text/Primary"
         }
       }
     }

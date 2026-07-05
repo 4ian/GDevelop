@@ -113,6 +113,8 @@ public:
   gd::Behavior *AddNewBehavior(const gd::Project &project,
                                const gd::String &type, const gd::String &name);
 
+  gd::Behavior *AddBehavior(const gd::Behavior &behavior, const gd::String &name);
+
   /**
    * \brief Get a read-only access to the map containing the behaviors with
    * their properties.

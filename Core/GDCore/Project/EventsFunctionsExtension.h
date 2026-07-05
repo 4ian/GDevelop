@@ -318,6 +318,12 @@ class GD_CORE_API EventsFunctionsExtension {
       const gd::SerializerElement& element);
 
   /**
+   * \brief Load default variants of all the events-based objects.
+   */
+  void UnserializeExtensionDefaultVariantsFrom(gd::Project &project,
+                                            const SerializerElement &element);
+
+  /**
    * \brief Load free functions, behaviors and objects implementation
    * (in opposition to load just their "declaration" by reading their name).
    */
@@ -393,9 +399,6 @@ class GD_CORE_API EventsFunctionsExtension {
     dependency.SetVersion(serializer.GetStringAttribute("version"));
     return dependency;
   }
-
-  std::vector<gd::String> GetUnserializingOrderEventsBasedObjectNames(
-    const gd::SerializerElement &eventsBasedObjectsElement);
 
   gd::String version;
   gd::String extensionNamespace;

@@ -228,8 +228,7 @@ export default class ResourcesEditor extends React.Component<Props, State> {
   _mainColumn: ?HTMLDivElement = null;
   // $FlowFixMe[missing-local-annot]
   resourcesLoader = ResourcesLoader;
-  // $FlowFixMe[missing-local-annot]
-  state = {
+  state: State = {
     selectedResource: null,
     selectedProjectFile: null,
     propertiesDialogSelection: null,

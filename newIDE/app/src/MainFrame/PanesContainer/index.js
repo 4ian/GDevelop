@@ -36,6 +36,11 @@ type Props = {|
   }) => React.Node,
   hasEditorsInLeftPane: boolean,
   hasEditorsInRightPane: boolean,
+  // Asked before a drawer is hidden by an explicit user gesture (swipe). Lets
+  // the Ask AI editor in that pane confirm/suspend a running request first.
+  // Returns whether the drawer should actually be hidden. Switching layouts
+  // does not go through this, so it never prompts.
+  onRequestDrawerClose?: (paneIdentifier: string) => Promise<boolean>,
 |};
 
 type DraggingState = {|
@@ -105,25 +110,21 @@ const useSwipeableDrawer = ({
             ? deltaX > minDistanceForAction
             : deltaX < -minDistanceForAction;
 
-        // Animate the drawer either to close or fully open position,
         const animationTimeInMs = 200;
-        drawer.style.transition = `transform 0.${animationTimeInMs}s ease-out`;
 
         if (shouldClose) {
-          // Animate to close position.
-          const closeTransform = direction === 'left' ? '100vw' : '-100vw';
-          drawer.style.transform = `translateX(${closeTransform})`;
-
-          // Delay to match animation time.
-          setTimeout(() => {
-            onClose(); // This is responsible for ensuring the drawer will stay closed.
-            drawer.style.transform = ''; // Reset for future swipes
-          }, 250);
+          // Do NOT fling the drawer off-screen here. Closing is driven by
+          // onClose() -> drawer state, which may first show a confirmation (when
+          // the AI is working). We hand the drawer's position back to its state
+          // (still open) so the confirmation appears with the drawer visible,
+          // instead of the drawer flashing closed and then reopening.
+          drawer.style.transition = '';
+          drawer.style.transform = '';
+          onClose();
         } else {
-          // Snap back to open.
+          // Swipe didn't reach the threshold: snap back to the open position.
+          drawer.style.transition = `transform 0.${animationTimeInMs}s ease-out`;
           drawer.style.transform = 'translateX(0)';
-
-          // Delay to match animation time.
           setTimeout(() => {
             drawer.style.transform = ''; // Reset for future swipes
           }, 250);
@@ -256,6 +257,7 @@ export const PanesContainer = ({
   renderPane,
   hasEditorsInLeftPane,
   hasEditorsInRightPane,
+  onRequestDrawerClose,
 }: Props): React.MixedElement => {
   const { isMobile } = useResponsiveWindowSize();
   const forceUpdate = useForceUpdate();
@@ -307,13 +309,27 @@ export const PanesContainer = ({
     []
   );
 
+  // Latest "has editors" values, read inside the layout-switch effect below
+  // without making it depend on them (it must only run when the layout
+  // actually switches, not whenever an editor is opened/closed in a pane).
+  const hasEditorsInLeftPaneRef = React.useRef(hasEditorsInLeftPane);
+  hasEditorsInLeftPaneRef.current = hasEditorsInLeftPane;
+  const hasEditorsInRightPaneRef = React.useRef(hasEditorsInRightPane);
+  hasEditorsInRightPaneRef.current = hasEditorsInRightPane;
+
   React.useEffect(
     () => {
       if (areSidePanesDrawers) {
-        // Just switched to mobile view: any drawer is closed.
+        // Just switched to mobile view. Keep a side pane that was visible on
+        // desktop (i.e. has editors, e.g. the Ask AI panel) open as a drawer so
+        // the switch is seamless. Two drawers can't be shown at once on mobile,
+        // so if both side panes have editors we prefer the right one (where the
+        // Ask AI panel lives by default) and keep the left closed.
+        const openRight = hasEditorsInRightPaneRef.current;
+        const openLeft = !openRight && hasEditorsInLeftPaneRef.current;
         setPanesDrawerState({
-          left: 'closed',
-          right: 'closed',
+          left: openLeft ? 'open' : 'closed',
+          right: openRight ? 'open' : 'closed',
         });
       } else {
         // Just switched to non-mobile view: always consider the pane drawers as open.
@@ -352,10 +368,25 @@ export const PanesContainer = ({
     [setPaneDrawerState, hasEditorsInLeftPane]
   );
 
-  const onCloseLeftPane = React.useCallback(
-    () => setPaneDrawerState('left', 'closed'),
-    [setPaneDrawerState]
+  // Hiding a drawer via a swipe is an explicit user gesture: let the pane's Ask
+  // AI editor (if any) confirm/suspend a running request first, and only hide
+  // the drawer if confirmed (otherwise keep it open). Layout switches reset the
+  // drawer state directly (not through here), so they never prompt.
+  const requestHideDrawer = React.useCallback(
+    (paneIdentifier: 'left' | 'right') => {
+      const proceed = onRequestDrawerClose
+        ? onRequestDrawerClose(paneIdentifier)
+        : Promise.resolve(true);
+      proceed.then(shouldClose => {
+        setPaneDrawerState(paneIdentifier, shouldClose ? 'closed' : 'open');
+      });
+    },
+    [onRequestDrawerClose, setPaneDrawerState]
   );
+
+  const onCloseLeftPane = React.useCallback(() => requestHideDrawer('left'), [
+    requestHideDrawer,
+  ]);
   useSwipeableDrawer({
     enabled: areSidePanesDrawers,
     paneRef: leftPaneRef,
@@ -363,10 +394,9 @@ export const PanesContainer = ({
     onClose: onCloseLeftPane,
   });
 
-  const onCloseRightPane = React.useCallback(
-    () => setPaneDrawerState('right', 'closed'),
-    [setPaneDrawerState]
-  );
+  const onCloseRightPane = React.useCallback(() => requestHideDrawer('right'), [
+    requestHideDrawer,
+  ]);
   useSwipeableDrawer({
     enabled: areSidePanesDrawers,
     paneRef: rightPaneRef,

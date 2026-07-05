@@ -293,8 +293,7 @@ class LabelTreeViewItemContent implements TreeViewItemContent {
 
   onClick(): void {}
 
-  // $FlowFixMe[missing-local-annot]
-  buildMenuTemplate(i18n: I18nType, index: number) {
+  buildMenuTemplate(i18n: I18nType, index: number): Array<MenuItemTemplate> {
     return this.buildMenuTemplateFunction(i18n, index);
   }
 
@@ -390,8 +389,7 @@ class ActionTreeViewItemContent implements TreeViewItemContent {
     this.onClickCallback();
   }
 
-  // $FlowFixMe[missing-local-annot]
-  buildMenuTemplate(i18n: I18nType, index: number) {
+  buildMenuTemplate(i18n: I18nType, index: number): Array<MenuItemTemplate> {
     return this.buildMenuTemplateFunction(i18n, index);
   }
 

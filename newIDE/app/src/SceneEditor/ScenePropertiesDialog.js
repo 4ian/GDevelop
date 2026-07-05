@@ -16,6 +16,7 @@ import { ColumnStackLayout } from '../UI/Layout';
 import {
   rgbColorToRGBString,
   rgbStringAndAlphaToRGBColor,
+  clampRgbComponent,
   type RGBColor,
 } from '../Utils/ColorTransformer';
 import HelpIcon from '../UI/HelpIcon';
@@ -32,6 +33,8 @@ import Text from '../UI/Text';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 
 const gd: libGDevelop = global.gd;
+
+const noop = () => {};
 
 type Props = {|
   open: boolean,
@@ -109,9 +112,9 @@ const ScenePropertiesDialog = ({
       layout.getBackgroundColorGreen() !== backgroundColor.g &&
       layout.getBackgroundColorBlue() !== backgroundColor.b;
     layout.setBackgroundColor(
-      backgroundColor ? backgroundColor.r : 0,
-      backgroundColor ? backgroundColor.g : 0,
-      backgroundColor ? backgroundColor.b : 0
+      backgroundColor ? clampRgbComponent(backgroundColor.r) : 0,
+      backgroundColor ? clampRgbComponent(backgroundColor.g) : 0,
+      backgroundColor ? clampRgbComponent(backgroundColor.b) : 0
     );
     onApply();
     if (hasBackgroundColorChanged) {
@@ -159,29 +162,24 @@ const ScenePropertiesDialog = ({
         behaviorTypeName
       );
 
-      const properties = behaviorSharedData.getProperties();
-      const propertiesSchema = propertiesMapToSchema({
-        properties,
-        defaultValueProperties: behaviorMetadata
-          ? behaviorMetadata.getSharedProperties()
-          : null,
-        getPropertyValue: (sharedDataContent, name) =>
-          behaviorSharedData
-            .getProperties()
-            .get(name)
-            .getValue(),
-        onUpdateProperty: (sharedDataContent, name, value) => {
-          behaviorSharedData.updateProperty(name, value);
-        },
-        layersContainer: layout.getLayers(),
-      });
+      const isEmpty =
+        propertiesMapToSchema({
+          properties: behaviorSharedData.getProperties(),
+          defaultValueProperties: behaviorMetadata
+            ? behaviorMetadata.getSharedProperties()
+            : null,
+          getPropertyValue: () => '',
+          onUpdateProperty: noop,
+          layersContainer: null,
+          shouldDisabledFieldsWithMixedValues: false,
+        }).length === 0;
       const tutorialIds = getBehaviorTutorialIds(behaviorTypeName);
       // TODO Make this a functional component to use PreferencesContext
       const enabledTutorialIds: Array<string> = [];
       const iconUrl = behaviorMetadata.getIconFilename();
 
       return (
-        !!propertiesSchema.length && (
+        !isEmpty && (
           <Accordion
             key={behaviorName}
             defaultExpanded
@@ -289,9 +287,7 @@ const ScenePropertiesDialog = ({
         />
         <Checkbox
           checked={shouldStopSoundsOnStartup}
-          label={
-            <Trans>Stop music and sounds at the beginning of this scene</Trans>
-          }
+          label={<Trans>Stop music and sounds at scene startup</Trans>}
           onCheck={(e, check) => setShouldStopSoundsOnStartup(check)}
         />
         {!some(propertiesEditors) && (

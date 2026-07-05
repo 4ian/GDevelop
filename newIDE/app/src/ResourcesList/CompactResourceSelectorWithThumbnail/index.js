@@ -45,6 +45,8 @@ type Props = {|
   resourceNameFilter?: (resourceName: string, resource: gdResource) => boolean,
   onChange: string => void,
   id?: string,
+  placeholder?: string,
+  disabled?: boolean,
 |};
 
 export const CompactResourceSelectorWithThumbnail = ({
@@ -59,6 +61,8 @@ export const CompactResourceSelectorWithThumbnail = ({
   resourceNameFilter,
   onChange,
   id,
+  placeholder,
+  disabled,
 }: Props): React.Node => {
   const resourcesLoader = ResourcesLoader;
   const forceUpdate = useForceUpdate();
@@ -207,10 +211,7 @@ export const CompactResourceSelectorWithThumbnail = ({
         const resource = selectedResources[0];
 
         const resourceName: string = resource.getName();
-        if (
-          resourceNameFilter &&
-          !resourceNameFilter(resourceName, resource)
-        ) {
+        if (resourceNameFilter && !resourceNameFilter(resourceName, resource)) {
           showErrorBox({
             message:
               'This resource cannot be used here. Choose a resource from the expected project folder.',
@@ -393,12 +394,14 @@ export const CompactResourceSelectorWithThumbnail = ({
             spellCheck={false}
             value={resourceName}
             onChange={e => _onChange(e.currentTarget.value)}
+            placeholder={placeholder}
+            disabled={disabled}
           />
         </div>
       </div>
       <ElementWithMenu
         element={
-          <IconButton size="small">
+          <IconButton size="small" disabled={disabled}>
             <Edit style={styles.icon} />
           </IconButton>
         }

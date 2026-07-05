@@ -12,7 +12,7 @@ import PreferencesContext, {
   initialPreferences,
 } from '../../../../MainFrame/Preferences/PreferencesContext';
 import { CreditsPackageStoreStateProvider } from '../../../../AssetStore/CreditsPackages/CreditsPackageStoreContext';
-import { commonProps } from './Agent.stories';
+import { commonProps } from './Orchestrator.stories';
 import {
   AiRequestContext,
   initialAiRequestContextState,
@@ -107,7 +107,7 @@ export const addSceneEventsWithNewlyAddedResources = (): React.Node => (
       createdAt: '',
       updatedAt: '',
       id: 'fake-working-new-ai-request',
-      mode: 'agent',
+      mode: 'orchestrator',
       status: 'ready',
       userId: 'fake-user-id',
       gameProjectJson: 'FAKE DATA',
@@ -132,7 +132,7 @@ export const addSceneEventsWithNewlyAddedResourcesWithEditorFunctionCallResult =
       createdAt: '',
       updatedAt: '',
       id: 'fake-working-new-ai-request',
-      mode: 'agent',
+      mode: 'orchestrator',
       status: 'ready',
       userId: 'fake-user-id',
       gameProjectJson: 'FAKE DATA',
@@ -168,7 +168,7 @@ const fakeSubAgentAiRequest = {
   createdAt: '',
   updatedAt: '',
   userId: 'fake-user-id',
-  mode: 'agent',
+  mode: 'orchestrator',
   status: 'ready',
   gameProjectJson: null,
   error: null,
@@ -214,7 +214,7 @@ const fakeSubAgentAiRequestWithText = {
   createdAt: '',
   updatedAt: '',
   userId: 'fake-user-id',
-  mode: 'agent',
+  mode: 'orchestrator',
   status: 'ready',
   gameProjectJson: null,
   error: null,

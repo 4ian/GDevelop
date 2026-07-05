@@ -46,7 +46,7 @@ const updateAndReturnValueAsFloatIfValid = (
 
 type Props = {|
   id?: string,
-  value: number,
+  value: number | '',
   onChange: number => void,
   commitOnBlur?: boolean,
   disabled?: boolean,

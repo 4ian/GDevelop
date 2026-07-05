@@ -3,7 +3,10 @@ import {
   filterAllowedPreferences,
   applyProjectPreferences,
 } from './ApplyProjectPreferences';
-import { parseToolbarButtons } from './ProjectSettingsReader';
+import {
+  parseToolbarButtons,
+  parseResourceCustomProperties,
+} from './ProjectSettingsReader';
 import YAML from 'yaml';
 import { type Preferences } from '../MainFrame/Preferences/PreferencesContext';
 
@@ -270,6 +273,117 @@ preferences:
       const raw = ([{ name: 'Lint', icon: '🔍', npmScript: 'lint' }]: any);
       const result = parseToolbarButtons(raw, {});
       expect(result).toHaveLength(0);
+    });
+  });
+
+  describe('parseResourceCustomProperties', () => {
+    test('parses string, number and boolean properties', () => {
+      // $FlowFixMe[incompatible-call]
+      const raw = ([
+        { name: 'packTag', label: 'Packing tag', type: 'string' },
+        { name: 'customScale', type: 'number', resourceKinds: ['image'] },
+        { name: 'noResize', label: 'Do not resize', type: 'boolean' },
+      ]: any);
+      const result = parseResourceCustomProperties(raw);
+      expect(result).toEqual([
+        { name: 'packTag', label: 'Packing tag', type: 'string' },
+        {
+          name: 'customScale',
+          label: 'customScale',
+          type: 'number',
+          resourceKinds: ['image'],
+        },
+        { name: 'noResize', label: 'Do not resize', type: 'boolean' },
+      ]);
+    });
+
+    test('parses no-atlas, no-resize and scale-multiplier properties', () => {
+      // $FlowFixMe[incompatible-call]
+      const raw = ([
+        { name: 'no-atlas', label: 'No atlas', type: 'boolean' },
+        { name: 'no-resize', label: 'No resize', type: 'boolean' },
+        {
+          name: 'scale-multiplier',
+          label: 'Scale multiplier',
+          type: 'number',
+          resourceKinds: ['image'],
+        },
+      ]: any);
+      const result = parseResourceCustomProperties(raw);
+      expect(result).toEqual([
+        { name: 'no-atlas', label: 'No atlas', type: 'boolean' },
+        { name: 'no-resize', label: 'No resize', type: 'boolean' },
+        {
+          name: 'scale-multiplier',
+          label: 'Scale multiplier',
+          type: 'number',
+          resourceKinds: ['image'],
+        },
+      ]);
+    });
+
+    test('parses a property with a default value', () => {
+      // $FlowFixMe[incompatible-call]
+      const raw = ([
+        {
+          name: 'scale-multiplier',
+          label: 'Scale multiplier',
+          type: 'number',
+          resourceKinds: ['image'],
+          default: 0.5,
+        },
+      ]: any);
+      const result = parseResourceCustomProperties(raw);
+      expect(result).toEqual([
+        {
+          name: 'scale-multiplier',
+          label: 'Scale multiplier',
+          type: 'number',
+          resourceKinds: ['image'],
+          default: 0.5,
+        },
+      ]);
+    });
+
+    test('skips a property without a name', () => {
+      const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+      // $FlowFixMe[incompatible-call]
+      const raw = ([{ label: 'No name', type: 'string' }]: any);
+      expect(parseResourceCustomProperties(raw)).toHaveLength(0);
+      warnSpy.mockRestore();
+    });
+
+    test('skips a property with an invalid type', () => {
+      const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+      // $FlowFixMe[incompatible-call]
+      const raw = ([{ name: 'weird', type: 'object' }]: any);
+      expect(parseResourceCustomProperties(raw)).toHaveLength(0);
+      expect(warnSpy).toHaveBeenCalledWith(
+        expect.stringContaining('invalid type "object"')
+      );
+      warnSpy.mockRestore();
+    });
+
+    test('skips a property with an unsafe name', () => {
+      const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+      // $FlowFixMe[incompatible-call]
+      const raw = ([{ name: 'bad name!', type: 'string' }]: any);
+      expect(parseResourceCustomProperties(raw)).toHaveLength(0);
+      warnSpy.mockRestore();
+    });
+
+    test('deduplicates by name, last definition wins', () => {
+      const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+      // $FlowFixMe[incompatible-call]
+      const raw = ([
+        { name: 'tag', label: 'First', type: 'string' },
+        { name: 'tag', label: 'Second', type: 'number' },
+      ]: any);
+      const result = parseResourceCustomProperties(raw);
+      expect(result).toEqual([
+        { name: 'tag', label: 'Second', type: 'number' },
+      ]);
+      warnSpy.mockRestore();
     });
   });
 });

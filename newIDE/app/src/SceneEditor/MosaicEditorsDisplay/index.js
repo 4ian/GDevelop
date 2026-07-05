@@ -90,6 +90,7 @@ const MosaicEditorsDisplay: React.ComponentType<{
       initialInstances,
       chosenLayer,
       selectedLayer,
+      selectedObjectGroup,
       onSelectInstances,
       onInstancesModified,
       onWillInstallExtension,
@@ -330,6 +331,7 @@ const MosaicEditorsDisplay: React.ComponentType<{
                 onUpdateBehaviorsSharedData={updateBehaviorsSharedData}
                 objectsContainer={objectsContainer}
                 globalObjectsContainer={globalObjectsContainer}
+                initialInstances={initialInstances}
                 layersContainer={layersContainer}
                 projectScopedContainersAccessor={
                   projectScopedContainersAccessor
@@ -337,9 +339,11 @@ const MosaicEditorsDisplay: React.ComponentType<{
                 instances={selectedInstances}
                 objects={selectedObjects}
                 layer={selectedLayer}
+                objectGroup={selectedObjectGroup}
                 editInstanceVariables={props.editInstanceVariables}
                 editObjectInPropertiesPanel={props.editObjectInPropertiesPanel}
                 onEditObject={props.onEditObject}
+                onEditObjectGroup={props.onEditObjectGroup}
                 onObjectsModified={props.onObjectsModified}
                 onEffectAdded={props.onEffectAdded}
                 onInstancesModified={_onInstancesModified}
@@ -361,6 +365,7 @@ const MosaicEditorsDisplay: React.ComponentType<{
                 }
                 isVariableListLocked={isCustomVariant}
                 isBehaviorListLocked={isCustomVariant}
+                isObjectGroupObjectListLocked={isCustomVariant}
                 onEditLayerEffects={props.editLayerEffects}
                 onEditLayer={props.editLayer}
                 onLayersModified={props.onLayersModified}
@@ -374,6 +379,8 @@ const MosaicEditorsDisplay: React.ComponentType<{
                 onEventsBasedObjectChildrenEdited={
                   props.onEventsBasedObjectChildrenEdited
                 }
+                onBackgroundColorChanged={props.onBackgroundColorChanged}
+                openSceneVariables={props.openSceneVariables}
               />
             )}
           </I18n>
@@ -567,6 +574,8 @@ const MosaicEditorsDisplay: React.ComponentType<{
                 }
                 objectGroups={objectsContainer.getObjectGroups()}
                 onCreateGroup={props.onCreateObjectGroup}
+                selectedObjectGroup={selectedObjectGroup}
+                onSelectObjectGroup={props.onSelectObjectGroup}
                 onEditGroup={props.onEditObjectGroup}
                 onDeleteGroup={props.onDeleteObjectGroup}
                 onRenameGroup={props.onRenameObjectGroup}

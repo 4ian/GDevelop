@@ -7,7 +7,7 @@ import { Column, Line } from '../../UI/Grid';
 import SelectOption from '../../UI/SelectOption';
 import { mapFor, mapVector } from '../../Utils/MapFor';
 import newNameGenerator from '../../Utils/NewNameGenerator';
-import { ResponsiveLineStackLayout, ColumnStackLayout } from '../../UI/Layout';
+import { LineStackLayout, ColumnStackLayout } from '../../UI/Layout';
 import ChoicesEditor, { type Choice } from '../../ChoicesEditor';
 import { CompactColorField } from '../../UI/CompactColorField';
 import CompactBehaviorTypeSelector from '../../BehaviorTypeSelector/CompactBehaviorTypeSelector';
@@ -42,6 +42,7 @@ import VariableNumberIcon from '../../VariablesList/Icons/VariableNumberIcon';
 import VariableBooleanIcon from '../../VariablesList/Icons/VariableBooleanIcon';
 import VariableStructureIcon from '../../VariablesList/Icons/VariableStructureIcon';
 import NewBehaviorDialog from '../../BehaviorsEditor/NewBehaviorDialog';
+import { type CompactTextFieldInterface } from '../../UI/CompactTextField';
 
 const gd: libGDevelop = global.gd;
 
@@ -95,10 +96,7 @@ const renderValueTypeIcon = (type: string, className: string): React.Node => {
   }
 };
 
-const getJsonObjectExampleErrorText = (
-  value: string,
-  i18n: any
-): ?string => {
+const getJsonObjectExampleErrorText = (value: string, i18n: any): ?string => {
   const trimmedValue = value.trim();
   if (!trimmedValue) {
     return i18n._(t`JSON example is required.`);
@@ -209,6 +207,7 @@ const getChoicesArray = (
 export type EventsBasedBehaviorOrObjectPropertiesEditorInterface = {|
   forceUpdate: () => void,
   getPropertyEditorRef: (propertyName: string) => React.ElementRef<any>,
+  focusOnProperty: (propertyName: string) => void,
 |};
 
 export const EventsBasedBehaviorOrObjectPropertiesEditor: React.ComponentType<{
@@ -241,10 +240,22 @@ export const EventsBasedBehaviorOrObjectPropertiesEditor: React.ComponentType<{
   ) => {
     const forceUpdate = useForceUpdate();
     const propertyRefs = React.useRef(new Map<string, React.ElementRef<any>>());
+    const propertyNameFieldRefs = React.useRef(
+      new Map<string, CompactTextFieldInterface | null>()
+    );
     React.useImperativeHandle(ref, () => ({
       forceUpdate,
       getPropertyEditorRef: (propertyName: string) =>
         propertyRefs ? propertyRefs.current.get(propertyName) : null,
+      focusOnProperty: (propertyName: string) => {
+        const propertyNameField = propertyNameFieldRefs.current.get(
+          propertyName
+        );
+        if (propertyNameField) {
+          propertyNameField.focus();
+          propertyNameField.select();
+        }
+      },
     }));
 
     const [newBehaviorDialogOpen, setNewBehaviorDialogOpen] = React.useState<{
@@ -264,7 +275,6 @@ export const EventsBasedBehaviorOrObjectPropertiesEditor: React.ComponentType<{
         property.setType('Number');
         forceUpdate();
         onPropertiesUpdated();
-        //setJustAddedPropertyName(newName);
       },
       [forceUpdate, onPropertiesUpdated, properties]
     );
@@ -340,6 +350,7 @@ export const EventsBasedBehaviorOrObjectPropertiesEditor: React.ComponentType<{
     );
 
     propertyRefs.current.clear();
+    propertyNameFieldRefs.current.clear();
 
     const propertyFolderOrProperties = mapVector(
       properties.getAllPropertyFolderOrProperty(),
@@ -388,13 +399,15 @@ export const EventsBasedBehaviorOrObjectPropertiesEditor: React.ComponentType<{
                             }}
                           >
                             <Column expand noOverflowParent>
-                              <ResponsiveLineStackLayout
-                                expand
-                                noOverflowParent
-                                noMargin
-                              >
+                              <LineStackLayout expand noMargin>
                                 <Line noMargin expand alignItems="center">
                                   <CompactSemiControlledTextField
+                                    ref={ref => {
+                                      propertyNameFieldRefs.current.set(
+                                        property.getName(),
+                                        ref
+                                      );
+                                    }}
                                     commitOnBlur
                                     placeholder={i18n._(
                                       t`Enter the property name`
@@ -499,7 +512,7 @@ export const EventsBasedBehaviorOrObjectPropertiesEditor: React.ComponentType<{
                                     />
                                   </CompactSelectField>
                                 </Line>
-                              </ResponsiveLineStackLayout>
+                              </LineStackLayout>
                             </Column>
                           </div>
                           <Line expand>
@@ -673,7 +686,7 @@ export const EventsBasedBehaviorOrObjectPropertiesEditor: React.ComponentType<{
                                 property.getType() === 'ObjectAnimationName' ||
                                 property.getType() === 'KeyboardKey' ||
                                 property.getType() === 'MultilineString' ||
-                              property.getType() === 'JsonObject' ||
+                                property.getType() === 'JsonObject' ||
                                 property.getType() === 'Layer') && (
                                 <CompactPropertiesEditorRowField
                                   label={

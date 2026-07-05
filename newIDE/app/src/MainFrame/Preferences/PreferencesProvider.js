@@ -88,6 +88,7 @@ export const getInitialPreferences = (): {
   autoDisplayChangelog: boolean,
   autoDownloadUpdates: boolean,
   autoOpenMostRecentProject: boolean,
+  automaticallyApplyAiRequestEditsByProjectId: { [string]: boolean },
   automaticallyUseCreditsForAiRequests: boolean,
   autosaveOnPreview: boolean,
   backdropClickBehavior: string,

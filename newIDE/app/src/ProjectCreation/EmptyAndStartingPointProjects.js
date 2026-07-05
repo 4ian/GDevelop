@@ -143,6 +143,7 @@ type Props = {|
   onSelectExampleShortHeader: (exampleShortHeader: ExampleShortHeader) => void,
   disabled?: boolean,
   onSeeAll?: () => void,
+  title: React.Node,
 |};
 
 const EmptyAndStartingPointProjects = ({
@@ -150,6 +151,7 @@ const EmptyAndStartingPointProjects = ({
   onSelectEmptyProject,
   disabled,
   onSeeAll,
+  title,
 }: Props): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const styles = getStyles(gdevelopTheme);

@@ -9,8 +9,7 @@ export class DurationResourceStoreSearchFilter
   implements SearchFilter<AudioResourceV2> {
   durationMin: number;
   durationMax: number;
-  // $FlowFixMe[missing-local-annot]
-  static durationMarks = [0, 2, 5, 20, 60, 300, 1800];
+  static durationMarks: Array<number> = [0, 2, 5, 20, 60, 300, 1800];
 
   constructor(
     durationMin: number = DurationResourceStoreSearchFilter.durationMarks[0],

@@ -123,4 +123,10 @@ void EventsBasedObject::UnserializeFrom(gd::Project& project,
   }
 }
 
+void EventsBasedObject::UnserializeDefaultVariantFrom(
+    gd::Project &project, const SerializerElement &element) {
+  defaultVariant.UnserializeFrom(project, element);
+  defaultVariant.SetName("");
+}
+
 }  // namespace gd

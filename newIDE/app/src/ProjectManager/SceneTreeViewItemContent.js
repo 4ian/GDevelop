@@ -152,7 +152,7 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
       {
         label: i18n._(t`Edit scene variables`),
         enabled: true,
-        click: () => this.props.onOpenLayoutVariables(this.scene),
+        click: () => this.props.openSceneVariables(this.scene),
       },
       {
         label: i18n._(t`Set as start scene`),

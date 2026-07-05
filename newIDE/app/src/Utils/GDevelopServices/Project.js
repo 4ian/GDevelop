@@ -665,9 +665,8 @@ export const getProjectFileAsZipBlob = async (
   return response.data;
 };
 
-// $FlowFixMe[missing-local-annot]
-const escapeStringForRegExp = string => {
-  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
+const escapeStringForRegExp = (value: string) => {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
 };
 const resourceFilenameRegex = new RegExp(
   `${escapeStringForRegExp(

@@ -42,6 +42,8 @@ const {
 
 /** @typedef {import("./lib/ExtensionReferenceGenerator.js").RawText} RawText */
 /** @typedef {import("./lib/ExtensionReferenceGenerator.js").ExtensionReference} ExtensionReference */
+/** @typedef {import("./lib/WikiExtensionTable.js").ExtensionItem} ExtensionItem */
+/** @typedef {import('../../../GDevelop.js/types').PlatformExtension} PlatformExtension */
 
 /** @returns {RawText} */
 const generateFileHeaderText = () => {
@@ -93,6 +95,19 @@ const generateAllExtensionReferences = gd => {
 };
 
 /**
+ * @param {PlatformExtension} extension
+ * @return {ExtensionItem}
+ */
+const getPlatformExtensionItem = extension => ({
+  extensionName: extension.getName(),
+  fullName: extension.getFullName(),
+  description: extension.getShortDescription() || extension.getDescription(),
+  iconUrl: extension.getIconUrl(),
+  helpPath: extension.getHelpPath(),
+  category: extension.getCategory(),
+});
+
+/**
  * @param {Array<ExtensionReference>} extensionReferences
  * @returns {Array<RawText>}
  */
@@ -129,7 +144,9 @@ You can also [search for new features in list of extensions](/gdevelop5/extensio
     .map(extensionReference => extensionReference.extension);
 
   const groupedContent = generateAllExtensionsSections({
-    extensions: filteredExtensions,
+    extensionItems: filteredExtensions.map(extension =>
+      getPlatformExtensionItem(extension)
+    ),
     baseFolder: 'all-features',
   });
 

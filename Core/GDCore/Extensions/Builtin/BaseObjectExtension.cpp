@@ -1867,7 +1867,12 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
           "res/conditions/add.png")
       .AddCodeOnlyParameter("objectsContext", "")
       .AddParameter("objectList", _("Object"))
-      .MarkAsAdvanced();
+      .MarkAsAdvanced()
+      .SetHidden()
+      .SetDeprecationMessage(_(
+          "This condition is deprecated because it selects several instances "
+          "at once. Use picking conditions to select a single instance, or use "
+          "a \"For each object\" event to handle every instance explicitly."));
 
   // Compatibility with GD <= 5.6.251
   extension.AddDuplicatedCondition("AjoutObjConcern", "PickAllInstances")

@@ -717,17 +717,6 @@ namespace gdjs {
       } catch (e) {
         // Ignore — sound reporting is best-effort.
       }
-      let signalDiagnostics: gdjs.SignalDebugInfo | null = null;
-      try {
-        if (
-          currentScene &&
-          typeof (currentScene as any).getSignalBus === 'function'
-        ) {
-          signalDiagnostics = currentScene.getSignalBus().getDebugInfo();
-        }
-      } catch (e) {
-        // Ignore - signal reporting is best-effort.
-      }
       this._sendMessage(
         circularSafeStringify({
           command: 'status',
@@ -737,7 +726,6 @@ namespace gdjs {
             isInGameEdition: this._runtimegame.isInGameEdition(),
             sceneName: currentScene ? currentScene.getName() : null,
             recentlyPlayedSounds,
-            signalDiagnostics,
           },
         })
       );

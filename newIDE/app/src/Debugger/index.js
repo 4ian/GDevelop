@@ -265,13 +265,6 @@ export default class Debugger extends React.Component<Props, State> {
             ...state.debuggerStatus,
             [id]: data.payload,
           },
-          signalDiagnostics:
-            data.payload && data.payload.hasOwnProperty('signalDiagnostics')
-              ? {
-                  ...state.signalDiagnostics,
-                  [id]: data.payload.signalDiagnostics,
-                }
-              : state.signalDiagnostics,
         }),
         () => this.updateToolbar()
       );

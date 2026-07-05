@@ -138,6 +138,9 @@ export default class DebuggerContent extends React.Component<Props, State> {
       selectedInspectorFullPath,
       rawMode,
     } = this.state;
+    const queuedSignalsCount = signalDiagnostics
+      ? signalDiagnostics.queuedSignalsCount
+      : 0;
 
     const editors = {
       inspectors: {
@@ -255,7 +258,7 @@ export default class DebuggerContent extends React.Component<Props, State> {
       },
       'signal-monitor': {
         type: 'secondary',
-        title: t`Signal monitor`,
+        title: 'Signal monitor (queue: ' + queuedSignalsCount + ')',
         renderEditor: () => (
           <Background>
             <SignalMonitor signalDiagnostics={signalDiagnostics} />

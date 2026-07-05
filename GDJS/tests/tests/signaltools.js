@@ -44,8 +44,9 @@ describe('gdjs.evtTools.signal', () => {
     signalReceiverIds.length = 0;
   });
 
-  const createSignalRuntimeScene = () => {
-    const runtimeGame = gdjs.getPixiRuntimeGame();
+  const createSignalRuntimeScene = (
+    runtimeGame = gdjs.getPixiRuntimeGame()
+  ) => {
     const runtimeScene = new gdjs.TestRuntimeScene(runtimeGame);
     runtimeScene.registerObject({
       name: 'Receiver',
@@ -602,6 +603,78 @@ describe('gdjs.evtTools.signal', () => {
     runtimeScene.renderAndStepWithEventsFunction(16, () => {});
 
     expect(signalCalls.length).to.be(0);
+  });
+
+  it('records preview signal monitor diagnostics when animations are disabled', () => {
+    const runtimeGame = new gdjs.RuntimeGame(gdjs.createProjectData(), {
+      isPreview: true,
+    });
+    const runtimeScene = createSignalRuntimeScene(runtimeGame);
+    runtimeScene.registerObject({
+      name: 'Sender',
+      type: 'SignalTest::Object',
+      variables: [],
+      behaviors: [],
+      effects: [],
+    });
+    const sender = runtimeScene.createObject('Sender');
+
+    gdjs.evtTools.signal.emitSignalToObject(
+      runtimeScene,
+      'Receiver',
+      'PreviewMonitor',
+      'payload',
+      sender
+    );
+    runtimeScene.renderAndStepWithEventsFunction(16, () => {});
+
+    const diagnostics = runtimeScene.getSignalBus().getDebugInfo();
+    expect(diagnostics.signalsThisFrame.length).to.be(1);
+    const signalDebugRecord = diagnostics.signalsThisFrame[0];
+    const signalDebugSource = signalDebugRecord.source;
+    if (!signalDebugSource) {
+      throw new Error('Expected a signal debug source.');
+    }
+    expect(signalDebugRecord.name).to.be('PreviewMonitor');
+    expect(signalDebugSource.objectName).to.be('Sender');
+    expect(signalDebugSource.objectId).to.be(sender.getUniqueId());
+    expect(signalDebugRecord.receiverPositions.length).to.be(1);
+    expect(signalDebugRecord.receiverPositions[0].objectName).to.be('Receiver');
+    expect(runtimeScene.getSignalBus().getSignalAnimationDebugRecords()).to.eql(
+      []
+    );
+  });
+
+  it('records preview scene signal diagnostics as scene target when animations are disabled', () => {
+    const runtimeGame = new gdjs.RuntimeGame(gdjs.createProjectData(), {
+      isPreview: true,
+    });
+    const runtimeScene = new gdjs.TestRuntimeScene(runtimeGame);
+    runtimeScene.getSignalBus().refreshReceiverIndex(runtimeScene);
+
+    gdjs.evtTools.signal.emitSceneSignal(
+      runtimeScene,
+      'PreviewSceneMonitor',
+      'payload'
+    );
+    runtimeScene.renderAndStepWithEventsFunction(16, () => {});
+
+    const diagnostics = runtimeScene.getSignalBus().getDebugInfo();
+    expect(diagnostics.signalsThisFrame.length).to.be(1);
+    const signalDebugRecord = diagnostics.signalsThisFrame[0];
+    const signalDebugSource = signalDebugRecord.source;
+    if (!signalDebugSource) {
+      throw new Error('Expected a signal debug source.');
+    }
+    expect(signalDebugRecord.name).to.be('PreviewSceneMonitor');
+    expect(signalDebugRecord.target).to.be('scene');
+    expect(signalDebugRecord.status).to.be('unhandled');
+    expect(signalDebugSource.objectName).to.be('scene');
+    expect(signalDebugRecord.targetPositions.length).to.be(1);
+    expect(signalDebugRecord.targetPositions[0].objectName).to.be('scene');
+    expect(runtimeScene.getSignalBus().getSignalAnimationDebugRecords()).to.eql(
+      []
+    );
   });
 
   it('records signal animation debug points only when enabled', () => {

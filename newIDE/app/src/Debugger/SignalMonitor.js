@@ -21,6 +21,8 @@ type SignalDebugRecord = {
   name: string,
   payload: string,
   target: string,
+  emittedFrameId: number,
+  deliveredFrameId: ?number,
   status: SignalDebugStatus,
   source: ?SignalDebugPoint,
   receivers: Array<string>,
@@ -30,6 +32,7 @@ type SignalDebugRecord = {
 };
 
 export type SignalDiagnostics = {
+  frameId: number,
   queuedSignalsCount: number,
   emittedSignalsCount: number,
   droppedSignalsCount: number,
@@ -45,18 +48,21 @@ type SignalMonitorLog = {|
   payload: string,
   target: string,
   source: SignalDebugPoint,
-  receiver: {
-    objectName: string,
-    objectId: number,
-    receiverName: string,
-    ...
-  },
+  destination: string,
+  emittedFrameId: number,
+  deliveredFrameId: ?number,
   status: SignalDebugStatus,
   color: number,
 |};
 
 type Props = {|
   signalDiagnostics: ?SignalDiagnostics,
+|};
+
+type SignalDiagnosticsCounters = {|
+  frameId: number,
+  emittedSignalsCount: number,
+  droppedSignalsCount: number,
 |};
 
 const maxSignalDebugPanelLogs = 40;
@@ -156,43 +162,59 @@ const formatSignalDebugTarget = (target: string): string => {
   return targetValue ? targetKind + ' ' + targetValue : targetKind;
 };
 
-const formatSignalDebugPanelDestination = (log: SignalMonitorLog): string => {
-  const receiverLabel = formatSignalDebugPoint(log.receiver);
-  if (
-    log.target.indexOf('objectGroup:') === 0 &&
-    (log.status !== 'delivered' ||
-      receiverLabel === 'objectGroup' ||
-      receiverLabel.indexOf('objectGroup:') === 0)
-  ) {
-    return formatSignalDebugTarget(log.target);
-  }
-  return receiverLabel;
-};
-
-const makeVirtualReceiver = (receiverName: string): SignalDebugReceiver => ({
-  objectName: receiverName || '<missing receiver>',
-  objectId: -1,
-  receiverName: receiverName || '<missing receiver>',
-});
-
-const getSignalDebugRecordReceivers = (
+const formatSignalDebugRecordDestination = (
   signalDebugRecord: SignalDebugRecord
-): Array<SignalDebugReceiver> => {
-  if (signalDebugRecord.status === 'delivered') {
-    if (signalDebugRecord.receiverPositions.length > 0) {
-      return signalDebugRecord.receiverPositions;
-    }
-    return signalDebugRecord.receivers.map(makeVirtualReceiver);
+): string => {
+  if (signalDebugRecord.target === 'scene') {
+    return 'scene';
+  }
+
+  if (
+    signalDebugRecord.status === 'delivered' &&
+    signalDebugRecord.receiverPositions.length > 0
+  ) {
+    return formatSignalDebugPoint(signalDebugRecord.receiverPositions[0]);
   }
 
   if (signalDebugRecord.targetPositions.length > 0) {
-    return [signalDebugRecord.targetPositions[0]];
+    return formatSignalDebugPoint(signalDebugRecord.targetPositions[0]);
   }
 
-  return [
-    makeVirtualReceiver(formatSignalDebugTarget(signalDebugRecord.target)),
-  ];
+  return formatSignalDebugTarget(signalDebugRecord.target);
 };
+
+const hasSignalDiagnosticsReset = (
+  previousCounters: ?SignalDiagnosticsCounters,
+  signalDiagnostics: SignalDiagnostics
+): boolean => {
+  if (!previousCounters) {
+    return false;
+  }
+
+  return (
+    signalDiagnostics.frameId < previousCounters.frameId ||
+    signalDiagnostics.emittedSignalsCount <
+      previousCounters.emittedSignalsCount ||
+    signalDiagnostics.droppedSignalsCount < previousCounters.droppedSignalsCount
+  );
+};
+
+const getSignalDiagnosticsCounters = (
+  signalDiagnostics: SignalDiagnostics
+): SignalDiagnosticsCounters => ({
+  frameId: signalDiagnostics.frameId,
+  emittedSignalsCount: signalDiagnostics.emittedSignalsCount,
+  droppedSignalsCount: signalDiagnostics.droppedSignalsCount,
+});
+
+const getSignalDiagnosticsFrameKey = (
+  signalDiagnostics: SignalDiagnostics
+): string =>
+  signalDiagnostics.frameId +
+  ':' +
+  signalDiagnostics.emittedSignalsCount +
+  ':' +
+  signalDiagnostics.droppedSignalsCount;
 
 const getSignalDiagnosticsSignature = (
   signalDiagnostics: ?SignalDiagnostics
@@ -202,6 +224,8 @@ const getSignalDiagnosticsSignature = (
   }
 
   let signature =
+    getSignalDiagnosticsFrameKey(signalDiagnostics) +
+    ':' +
     signalDiagnostics.queuedSignalsCount +
     ':' +
     signalDiagnostics.emittedSignalsCount +
@@ -256,24 +280,18 @@ const getSignalMonitorLogs = (
       signalDebugRecord.status,
       signalDebugRecord.name
     );
-    const receivers = getSignalDebugRecordReceivers(signalDebugRecord);
-    for (let j = 0, lenj = receivers.length; j < lenj; ++j) {
-      const receiver = receivers[j];
-      logs.unshift({
-        id: signalDebugRecord.id,
-        signalName: signalDebugRecord.name,
-        payload: signalDebugRecord.payload,
-        target: signalDebugRecord.target,
-        source: signalDebugRecord.source || sceneSignalDebugPoint,
-        receiver: {
-          ...receiver,
-          receiverName:
-            receiver.receiverName || formatSignalDebugPoint(receiver),
-        },
-        status: signalDebugRecord.status,
-        color,
-      });
-    }
+    logs.push({
+      id: signalDebugRecord.id,
+      signalName: signalDebugRecord.name,
+      payload: signalDebugRecord.payload,
+      target: signalDebugRecord.target,
+      source: signalDebugRecord.source || sceneSignalDebugPoint,
+      destination: formatSignalDebugRecordDestination(signalDebugRecord),
+      emittedFrameId: signalDebugRecord.emittedFrameId,
+      deliveredFrameId: signalDebugRecord.deliveredFrameId,
+      status: signalDebugRecord.status,
+      color,
+    });
   }
   return logs;
 };
@@ -285,11 +303,32 @@ const getSignalMonitorLogKey = (log: SignalMonitorLog): string =>
   ':' +
   log.signalName +
   ':' +
-  log.receiver.receiverName +
+  log.target +
   ':' +
-  log.receiver.objectName +
+  log.payload +
   ':' +
-  log.receiver.objectId;
+  log.emittedFrameId +
+  ':' +
+  (log.deliveredFrameId || -1) +
+  ':' +
+  log.source.objectName +
+  ':' +
+  log.source.objectId;
+
+const getSignalMonitorLogContentKey = (log: SignalMonitorLog): string =>
+  log.status +
+  ':' +
+  log.signalName +
+  ':' +
+  log.target +
+  ':' +
+  log.payload +
+  ':' +
+  log.destination +
+  ':' +
+  log.source.objectName +
+  ':' +
+  log.source.objectId;
 
 const styles = {
   frame: {
@@ -298,79 +337,11 @@ const styles = {
     padding: 12,
     boxSizing: 'border-box',
   },
-  monitor: {
+  rows: {
     height: '100%',
     minHeight: 0,
-    display: 'flex',
-    flexDirection: 'column',
-    overflow: 'hidden',
-    backgroundColor: 'rgba(8, 12, 20, 0.5)',
-    border: '2px solid rgba(255, 255, 255, 0.18)',
-    borderRadius: 6,
-    boxSizing: 'border-box',
-  },
-  header: {
-    height: 34,
-    minHeight: 34,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: '0 12px',
-    boxSizing: 'border-box',
-    backgroundColor: 'rgba(18, 25, 38, 0.68)',
-    borderBottom: '3px solid rgba(0, 209, 255, 0.95)',
-  },
-  title: {
-    color: '#ffffff',
-    fontSize: 14,
-    fontWeight: 'bold',
-    lineHeight: '34px',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    whiteSpace: 'nowrap',
-  },
-  headerControls: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: 8,
-    marginLeft: 8,
-  },
-  dragLabel: {
-    color: '#9aa7b8',
-    fontSize: 11,
-  },
-  foldButton: {
-    position: 'relative',
-    width: 20,
-    height: 20,
-    minWidth: 20,
-    borderRadius: 4,
-    border: '1px solid rgba(154, 167, 184, 0.8)',
-    backgroundColor: 'rgba(31, 41, 56, 0.92)',
-    cursor: 'pointer',
-    padding: 0,
-  },
-  foldButtonLine: {
-    position: 'absolute',
-    left: 5,
-    right: 5,
-    top: 9,
-    height: 2,
-    backgroundColor: 'rgba(243, 247, 255, 0.95)',
-  },
-  foldButtonVerticalLine: {
-    position: 'absolute',
-    top: 5,
-    bottom: 5,
-    left: 9,
-    width: 2,
-    backgroundColor: 'rgba(243, 247, 255, 0.95)',
-  },
-  rows: {
-    flex: 1,
-    minHeight: 0,
     overflowY: 'auto',
-    padding: 12,
+    padding: 0,
     boxSizing: 'border-box',
   },
   empty: {
@@ -493,7 +464,7 @@ const SignalMonitorRow = ({
           'from ' +
             formatSignalDebugPoint(log.source) +
             ' -> ' +
-            formatSignalDebugPanelDestination(log),
+            log.destination,
           62
         )}
       </div>
@@ -517,9 +488,12 @@ const SignalMonitorRow = ({
 };
 
 export const SignalMonitor = ({ signalDiagnostics }: Props): React.Node => {
-  const [isFolded, setIsFolded] = React.useState(false);
   const [logs, setLogs] = React.useState<Array<SignalMonitorLog>>([]);
   const lastDiagnosticsSignature = React.useRef('');
+  const lastDiagnosticsCounters = React.useRef<?SignalDiagnosticsCounters>(
+    null
+  );
+  const rowsElement = React.useRef<?HTMLDivElement>(null);
 
   React.useEffect(
     () => {
@@ -530,68 +504,85 @@ export const SignalMonitor = ({ signalDiagnostics }: Props): React.Node => {
       lastDiagnosticsSignature.current = signature;
 
       if (!signalDiagnostics) {
+        lastDiagnosticsCounters.current = null;
         setLogs([]);
         return;
       }
 
+      const hasRuntimeReset = hasSignalDiagnosticsReset(
+        lastDiagnosticsCounters.current,
+        signalDiagnostics
+      );
+      lastDiagnosticsCounters.current = getSignalDiagnosticsCounters(
+        signalDiagnostics
+      );
+
       const incomingLogs = getSignalMonitorLogs(signalDiagnostics);
-      if (incomingLogs.length === 0) {
+      if (incomingLogs.length === 0 && !hasRuntimeReset) {
         return;
       }
 
       setLogs(previousLogs => {
-        const knownLogKeys = new Set(previousLogs.map(getSignalMonitorLogKey));
-        const freshLogs = incomingLogs.filter(
-          log => !knownLogKeys.has(getSignalMonitorLogKey(log))
-        );
-        if (freshLogs.length === 0) {
+        const logsToKeep = hasRuntimeReset ? [] : previousLogs;
+        const knownLogKeys = new Set(logsToKeep.map(getSignalMonitorLogKey));
+        const nextLogs = logsToKeep.slice();
+        let hasChanged = false;
+
+        for (let i = 0, len = incomingLogs.length; i < len; ++i) {
+          const log = incomingLogs[i];
+          const logKey = getSignalMonitorLogKey(log);
+          if (knownLogKeys.has(logKey)) {
+            continue;
+          }
+
+          const lastLog = nextLogs[nextLogs.length - 1];
+          if (
+            lastLog &&
+            getSignalMonitorLogContentKey(lastLog) ===
+              getSignalMonitorLogContentKey(log)
+          ) {
+            nextLogs[nextLogs.length - 1] = log;
+          } else {
+            nextLogs.push(log);
+          }
+          knownLogKeys.add(logKey);
+          hasChanged = true;
+        }
+
+        if (!hasChanged && !hasRuntimeReset) {
           return previousLogs;
         }
 
-        return freshLogs.concat(previousLogs).slice(0, maxSignalDebugPanelLogs);
+        return nextLogs.slice(-maxSignalDebugPanelLogs);
       });
     },
     [signalDiagnostics]
   );
 
-  const queuedSignalsCount = signalDiagnostics
-    ? signalDiagnostics.queuedSignalsCount
-    : 0;
+  React.useEffect(
+    () => {
+      const rows = rowsElement.current;
+      if (!rows) {
+        return;
+      }
+      rows.scrollTop = rows.scrollHeight;
+    },
+    [logs]
+  );
 
   return (
     <div style={styles.frame}>
-      <div style={styles.monitor}>
-        <div style={styles.header}>
-          <div style={styles.title}>
-            Signal monitor (queue: {queuedSignalsCount})
-          </div>
-          <div style={styles.headerControls}>
-            <div style={styles.dragLabel}>drag</div>
-            <button
-              type="button"
-              title={isFolded ? 'Show signal monitor' : 'Hide signal monitor'}
-              style={styles.foldButton}
-              onClick={() => setIsFolded(!isFolded)}
-            >
-              <span style={styles.foldButtonLine} />
-              {isFolded ? <span style={styles.foldButtonVerticalLine} /> : null}
-            </button>
-          </div>
-        </div>
-        {!isFolded && (
-          <div style={styles.rows}>
-            {logs.length === 0 ? (
-              <div style={styles.empty}>Waiting for signal deliveries...</div>
-            ) : (
-              logs.map((log, index) => (
-                <SignalMonitorRow
-                  key={getSignalMonitorLogKey(log)}
-                  log={log}
-                  isNewest={index === 0}
-                />
-              ))
-            )}
-          </div>
+      <div ref={rowsElement} style={styles.rows}>
+        {logs.length === 0 ? (
+          <div style={styles.empty}>Waiting for signal deliveries...</div>
+        ) : (
+          logs.map((log, index) => (
+            <SignalMonitorRow
+              key={getSignalMonitorLogKey(log)}
+              log={log}
+              isNewest={index === logs.length - 1}
+            />
+          ))
         )}
       </div>
     </div>

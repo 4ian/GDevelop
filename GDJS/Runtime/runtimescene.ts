@@ -531,13 +531,12 @@ namespace gdjs {
           signalAnimationDebugRecords,
           queuedSignalsCount
         );
-        this._sendSignalDiagnostics(
-          this._signalBus ? this._signalBus.getDebugInfo() : null
-        );
       } else {
         this._debuggerRenderer.clearSignalDebugDraw();
-        this._sendSignalDiagnostics(null);
       }
+      this._sendSignalDiagnostics(
+        this._signalBus ? this._signalBus.getDebugInfo() : null
+      );
 
       this._renderer.render();
     }
@@ -559,6 +558,14 @@ namespace gdjs {
 
     isSignalAnimationDebugDrawEnabled(): boolean {
       return this._signalAnimationDebugDrawEnabled;
+    }
+
+    isSignalMonitorDebugEnabled(): boolean {
+      return (
+        !!this._runtimeGame &&
+        typeof this._runtimeGame.isPreview === 'function' &&
+        this._runtimeGame.isPreview()
+      );
     }
 
     private _getSignalDiagnosticsSignature(
@@ -623,7 +630,7 @@ namespace gdjs {
     ): void {
       const debuggerClient =
         this._runtimeGame && this._runtimeGame._debuggerClient;
-      if (!debuggerClient) {
+      if (!debuggerClient || !this.isSignalMonitorDebugEnabled()) {
         return;
       }
 

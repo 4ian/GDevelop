@@ -96,6 +96,10 @@ namespace gdjs {
     targetPositions: SignalAnimationDebugReceiver[];
   };
 
+  type InternalSignalDebugRecord = SignalDebugRecord & {
+    enableAnimationDebugPoints: boolean;
+  };
+
   export type SignalDebugInfo = {
     frameId: integer;
     queuedSignalsCount: integer;
@@ -111,6 +115,7 @@ namespace gdjs {
     getSignalBus(): gdjs.SignalBus;
     getObjectNamesInGroup(objectGroupName: string): string[];
     isSignalAnimationDebugDrawEnabled(): boolean;
+    isSignalMonitorDebugEnabled(): boolean;
   }
 
   const getRuntimeObjectListsItems = (
@@ -228,6 +233,19 @@ namespace gdjs {
     return typeof isEnabled === 'function' && isEnabled.call(runtimeScene);
   };
 
+  const isSignalMonitorDebugEnabled = (
+    runtimeScene: gdjs.RuntimeScene
+  ): boolean => {
+    const isEnabled = runtimeScene.isSignalMonitorDebugEnabled;
+    return typeof isEnabled === 'function' && isEnabled.call(runtimeScene);
+  };
+
+  const shouldResolveSignalDebugSource = (
+    runtimeScene: gdjs.RuntimeScene
+  ): boolean =>
+    isSignalAnimationDebugDrawEnabled(runtimeScene) ||
+    isSignalMonitorDebugEnabled(runtimeScene);
+
   const getRuntimeObjectSignalDebugPoint = (
     runtimeObject: gdjs.RuntimeObject
   ): SignalDebugPoint => {
@@ -326,8 +344,11 @@ namespace gdjs {
   export class SignalBus {
     private _queuedSignals: RuntimeSignal[] = [];
     private _deliveredSignalsThisFrame: RuntimeSignal[] = [];
-    private _signalsThisFrameDebugRecords: SignalDebugRecord[] = [];
-    private _signalDebugRecordsById = new Map<integer, SignalDebugRecord>();
+    private _signalsThisFrameDebugRecords: InternalSignalDebugRecord[] = [];
+    private _signalDebugRecordsById = new Map<
+      integer,
+      InternalSignalDebugRecord
+    >();
     private _signalDebugSourcesBySenderKey = new Map<
       string,
       SignalDebugPoint | null
@@ -560,8 +581,17 @@ namespace gdjs {
         receiversThisFrameCount: this._receiversThisFrameCount,
         signalsThisFrame: this._signalsThisFrameDebugRecords.map(
           (debugRecord) => ({
-            ...debugRecord,
+            id: debugRecord.id,
+            name: debugRecord.name,
+            payload: debugRecord.payload,
+            target: debugRecord.target,
+            emittedFrameId: debugRecord.emittedFrameId,
+            deliveredFrameId: debugRecord.deliveredFrameId,
             status: this._getSignalDebugRecordStatus(debugRecord),
+            receivers: debugRecord.receivers,
+            source: debugRecord.source,
+            receiverPositions: debugRecord.receiverPositions,
+            targetPositions: debugRecord.targetPositions,
           })
         ),
       };
@@ -589,6 +619,9 @@ namespace gdjs {
         ++i
       ) {
         const debugRecord = this._signalsThisFrameDebugRecords[i];
+        if (!debugRecord.enableAnimationDebugPoints) {
+          continue;
+        }
         const status = this._getSignalDebugRecordStatus(debugRecord);
         const receiverPositions =
           debugRecord.receiverPositions.length > 0
@@ -619,7 +652,7 @@ namespace gdjs {
       runtimeScene: gdjs.RuntimeScene,
       signal: RuntimeSignal
     ): SignalDebugPoint | null {
-      if (!isSignalAnimationDebugDrawEnabled(runtimeScene)) {
+      if (!shouldResolveSignalDebugSource(runtimeScene)) {
         return null;
       }
 
@@ -658,7 +691,7 @@ namespace gdjs {
 
     private _trackSignalDebugRecord(
       signal: RuntimeSignal,
-      debugRecord: SignalDebugRecord
+      debugRecord: InternalSignalDebugRecord
     ): boolean {
       if (
         this._signalsThisFrameDebugRecords.length >=
@@ -673,13 +706,13 @@ namespace gdjs {
     }
 
     private _isSignalDebugRecordTracked(
-      debugRecord: SignalDebugRecord
+      debugRecord: InternalSignalDebugRecord
     ): boolean {
       return this._signalDebugRecordsById.get(debugRecord.id) === debugRecord;
     }
 
     private _recordSignalAnimationTarget(
-      debugRecord: SignalDebugRecord,
+      debugRecord: InternalSignalDebugRecord,
       runtimeObject: gdjs.RuntimeObject,
       receiverName: string
     ): void {
@@ -701,7 +734,7 @@ namespace gdjs {
 
     private _recordVirtualSignalAnimationTarget(
       runtimeScene: gdjs.RuntimeScene,
-      debugRecord: SignalDebugRecord,
+      debugRecord: InternalSignalDebugRecord,
       receiverName: string,
       objectName?: string
     ): void {
@@ -735,7 +768,7 @@ namespace gdjs {
 
     private _recordSceneSignalAnimationTarget(
       runtimeScene: gdjs.RuntimeScene,
-      debugRecord: SignalDebugRecord
+      debugRecord: InternalSignalDebugRecord
     ): void {
       if (
         !this._isSignalDebugRecordTracked(debugRecord) ||
@@ -763,7 +796,7 @@ namespace gdjs {
     private _recordSignalAnimationTargetsForObjects(
       runtimeScene: gdjs.RuntimeScene,
       objectName: string,
-      debugRecord: SignalDebugRecord
+      debugRecord: InternalSignalDebugRecord
     ): gdjs.RuntimeObject[] | null {
       const runtimeObjects = getRuntimeObjectsWithoutCreating(
         runtimeScene,
@@ -810,7 +843,7 @@ namespace gdjs {
     private _recordSignalAnimationTargetForObjectInstance(
       runtimeScene: gdjs.RuntimeScene,
       objectId: integer,
-      debugRecord: SignalDebugRecord
+      debugRecord: InternalSignalDebugRecord
     ): gdjs.RuntimeObject | null {
       const runtimeObjects = runtimeScene.getAdhocListOfAllInstances();
       for (let i = 0, len = runtimeObjects.length; i < len; ++i) {
@@ -839,7 +872,7 @@ namespace gdjs {
     private _recordSignalAnimationTargetsForPickedObjects(
       runtimeScene: gdjs.RuntimeScene,
       pickedObjects: gdjs.LongLivedObjectsList,
-      debugRecord: SignalDebugRecord
+      debugRecord: InternalSignalDebugRecord
     ): {
       objectNames: string[];
       runtimeObjects: { [objectName: string]: gdjs.RuntimeObject[] };
@@ -891,7 +924,7 @@ namespace gdjs {
     private _recordDroppedSignalTarget(
       runtimeScene: gdjs.RuntimeScene,
       signal: RuntimeSignal,
-      debugRecord: SignalDebugRecord
+      debugRecord: InternalSignalDebugRecord
     ): void {
       if (signal.target.kind === 'scene') {
         this._recordSceneSignalAnimationTarget(runtimeScene, debugRecord);
@@ -939,7 +972,7 @@ namespace gdjs {
       runtimeScene: gdjs.RuntimeScene,
       signal: RuntimeSignal
     ): void {
-      const debugRecord: SignalDebugRecord = {
+      const debugRecord: InternalSignalDebugRecord = {
         id: signal.id,
         name: signal.name,
         payload: signal.payload,
@@ -951,6 +984,8 @@ namespace gdjs {
         source: null,
         receiverPositions: [],
         targetPositions: [],
+        enableAnimationDebugPoints:
+          isSignalAnimationDebugDrawEnabled(runtimeScene),
       };
 
       if (this._trackSignalDebugRecord(signal, debugRecord)) {
@@ -967,7 +1002,7 @@ namespace gdjs {
       this._deliveredSignalsThisFrame.push(signal);
       this._currentSignal = signal;
 
-      const debugRecord: SignalDebugRecord = {
+      const debugRecord: InternalSignalDebugRecord = {
         id: signal.id,
         name: signal.name,
         payload: signal.payload,
@@ -979,6 +1014,8 @@ namespace gdjs {
         source: null,
         receiverPositions: [],
         targetPositions: [],
+        enableAnimationDebugPoints:
+          isSignalAnimationDebugDrawEnabled(runtimeScene),
       };
       if (this._trackSignalDebugRecord(signal, debugRecord)) {
         debugRecord.source = this._getSignalDebugSource(runtimeScene, signal);
@@ -1043,7 +1080,7 @@ namespace gdjs {
     }
 
     private _recordSignalAnimationReceiver(
-      debugRecord: SignalDebugRecord,
+      debugRecord: InternalSignalDebugRecord,
       runtimeObject: gdjs.RuntimeObject,
       receiverName: string
     ): void {
@@ -1095,7 +1132,7 @@ namespace gdjs {
     private _dispatchToSceneReceivers(
       runtimeScene: gdjs.RuntimeScene,
       signal: RuntimeSignal,
-      debugRecord: SignalDebugRecord
+      debugRecord: InternalSignalDebugRecord
     ): void {
       const objectNames = new Set<string>();
       for (let i = 0, len = this._receiverObjectNames.length; i < len; ++i) {
@@ -1113,7 +1150,7 @@ namespace gdjs {
       runtimeScene: gdjs.RuntimeScene,
       objectName: string,
       signal: RuntimeSignal,
-      debugRecord: SignalDebugRecord,
+      debugRecord: InternalSignalDebugRecord,
       options?: {
         onlyIndexedObjectReceivers?: boolean;
       }
@@ -1149,7 +1186,7 @@ namespace gdjs {
       runtimeScene: gdjs.RuntimeScene,
       objectId: integer,
       signal: RuntimeSignal,
-      debugRecord: SignalDebugRecord
+      debugRecord: InternalSignalDebugRecord
     ): void {
       const runtimeObject = this._recordSignalAnimationTargetForObjectInstance(
         runtimeScene,
@@ -1165,7 +1202,7 @@ namespace gdjs {
       runtimeScene: gdjs.RuntimeScene,
       pickedObjects: gdjs.LongLivedObjectsList,
       signal: RuntimeSignal,
-      debugRecord: SignalDebugRecord
+      debugRecord: InternalSignalDebugRecord
     ): void {
       const pickedObjectTargets =
         this._recordSignalAnimationTargetsForPickedObjects(
@@ -1186,7 +1223,7 @@ namespace gdjs {
     private _dispatchToRuntimeObject(
       runtimeObject: gdjs.RuntimeObject,
       signal: RuntimeSignal,
-      debugRecord: SignalDebugRecord,
+      debugRecord: InternalSignalDebugRecord,
       options?: {
         onlyIndexedObjectReceivers?: boolean;
       }

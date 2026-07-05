@@ -47,17 +47,13 @@ bool HasEnabledInstructions(const gd::InstructionsList& instructions) {
   return false;
 }
 
-void ReportUnsafeExternalLayoutCreationIfNeeded(
+gd::String GenerateUnsafeExternalLayoutCreationValidationCodeIfNeeded(
     const gd::StandardEvent& event,
     gd::EventsCodeGenerator& codeGenerator) {
+  gd::String runtimeValidationCode;
   if (!codeGenerator.HasProjectAndLayout() ||
       HasEnabledInstructions(event.GetConditions())) {
-    return;
-  }
-
-  gd::DiagnosticReport* diagnosticReport = codeGenerator.GetDiagnosticReport();
-  if (!diagnosticReport) {
-    return;
+    return runtimeValidationCode;
   }
 
   const gd::InstructionsList& actions = event.GetActions();
@@ -73,14 +69,27 @@ void ReportUnsafeExternalLayoutCreationIfNeeded(
         action.GetParametersCount() > 1
             ? action.GetParameter(1).GetPlainString()
             : "";
-    gd::ProjectDiagnostic projectDiagnostic(
-        gd::ProjectDiagnostic::ErrorType::UnsafeExternalLayoutCreation,
-        "Create objects from an external layout must not be used in an event "
-        "without conditions.",
-        externalLayoutName,
-        "Add a condition, for example At the beginning of the scene.");
-    diagnosticReport->Add(projectDiagnostic);
+    gd::DiagnosticReport* diagnosticReport = codeGenerator.GetDiagnosticReport();
+    if (diagnosticReport) {
+      gd::ProjectDiagnostic projectDiagnostic(
+          gd::ProjectDiagnostic::ErrorType::UnsafeExternalLayoutCreation,
+          "Create objects from an external layout must not be used in an event "
+          "without conditions.",
+          externalLayoutName,
+          "Add a condition, for example At the beginning of the scene.");
+      diagnosticReport->Add(projectDiagnostic);
+    }
+
+    if (codeGenerator.GenerateCodeForRuntime()) {
+      runtimeValidationCode +=
+          "gdjs.assertExternalLayoutCreationHasCondition(" +
+          gd::EventsCodeGenerator::ConvertToStringExplicit(
+              externalLayoutName) +
+          ");\n";
+    }
   }
+
+  return runtimeValidationCode;
 }
 
 const gd::Instruction* FindTopLevelSignalReceivedCondition(
@@ -206,12 +215,16 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
                 : codeGenerator.GenerateBooleanFullName("isConditionTrue",
                                                         context);
 
-        ReportUnsafeExternalLayoutCreationIfNeeded(event, codeGenerator);
+        gd::String runtimeValidationCode =
+            GenerateUnsafeExternalLayoutCreationValidationCodeIfNeeded(
+                event, codeGenerator);
 
         gd::EventsCodeGenerationContext actionsContext;
         actionsContext.Reuse(context);
-        gd::String actionsCode = codeGenerator.GenerateActionsListCode(
-            event.GetActions(), actionsContext);
+        gd::String actionsCode =
+            runtimeValidationCode +
+            codeGenerator.GenerateActionsListCode(event.GetActions(),
+                                                  actionsContext);
         if (event.HasSubEvents()) // Sub events
         {
           actionsCode += "\n{ //Subevents\n";

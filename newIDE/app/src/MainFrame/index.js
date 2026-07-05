@@ -613,27 +613,56 @@ const MainFrame = (props: Props): React.MixedElement => {
         const unsafeExternalLayoutCreationErrors = validationErrors.filter(
           error => error.type === 'unsafe-external-layout-creation'
         );
+        const ambiguousObjectPickingErrors = validationErrors.filter(
+          error => error.type === 'ambiguous-object-picking'
+        );
+        const unconditionedActionErrors = validationErrors.filter(
+          error => error.type === 'unconditioned-action'
+        );
         const mustBlockForUnsafeExternalLayoutCreation =
-          actionType === 'preview' &&
           unsafeExternalLayoutCreationErrors.length > 0;
+        const mustBlockForAmbiguousObjectPicking =
+          ambiguousObjectPickingErrors.length > 0;
+        const mustBlockForUnconditionedActions =
+          unconditionedActionErrors.length > 0;
+        const mustBlockForSpecificValidationErrors =
+          mustBlockForUnsafeExternalLayoutCreation ||
+          mustBlockForAmbiguousObjectPicking ||
+          mustBlockForUnconditionedActions;
 
         if (
-          mustBlockForUnsafeExternalLayoutCreation ||
+          mustBlockForSpecificValidationErrors ||
           (shouldBlockAllDiagnosticErrors && validationErrors.length > 0)
         ) {
-          const openReport = await showConfirmation({
-            title: mustBlockForUnsafeExternalLayoutCreation
-              ? t`External layout action needs a condition`
-              : t`Diagnostic errors found`,
-            message: mustBlockForUnsafeExternalLayoutCreation
+          const title = mustBlockForUnsafeExternalLayoutCreation
+            ? t`External layout action needs a condition`
+            : mustBlockForAmbiguousObjectPicking
+            ? t`Object action needs a single picked instance`
+            : mustBlockForUnconditionedActions
+            ? t`Action needs a condition`
+            : t`Diagnostic errors found`;
+          const message = mustBlockForUnsafeExternalLayoutCreation
+            ? actionType === 'preview'
               ? t`This preview cannot run because an event creates objects from an external layout without any condition. Add a condition, for example "At the beginning of the scene", before launching a preview.`
-              : actionType === 'preview'
-              ? t`Your project has ${
-                  validationErrors.length
-                } diagnostic error(s). Please fix them before launching a preview.`
-              : t`Your project has ${
-                  validationErrors.length
-                } diagnostic error(s). Please fix them before exporting.`,
+              : t`This export cannot run because an event creates objects from an external layout without any condition. Add a condition, for example "At the beginning of the scene", before exporting.`
+            : mustBlockForAmbiguousObjectPicking
+            ? actionType === 'preview'
+              ? t`This preview cannot run because one or more events pass object parameters without first picking a single instance. Add conditions such as "Pick a random object" or "Pick nearest object", or use a "For each object" event before launching a preview.`
+              : t`This export cannot run because one or more events pass object parameters without first picking a single instance. Add conditions such as "Pick a random object" or "Pick nearest object", or use a "For each object" event before exporting.`
+            : mustBlockForUnconditionedActions
+            ? actionType === 'preview'
+              ? t`This preview cannot run because one or more events have actions without any enabled condition, so they would run every frame. Add a condition, for example "At the beginning of the scene", before launching a preview.`
+              : t`This export cannot run because one or more events have actions without any enabled condition, so they would run every frame. Add a condition, for example "At the beginning of the scene", before exporting.`
+            : actionType === 'preview'
+            ? t`Your project has ${
+                validationErrors.length
+              } diagnostic error(s). Please fix them before launching a preview.`
+            : t`Your project has ${
+                validationErrors.length
+              } diagnostic error(s). Please fix them before exporting.`;
+          const openReport = await showConfirmation({
+            title,
+            message,
             dismissButtonLabel: t`Close`,
             confirmButtonLabel: t`Open report`,
           });
@@ -3043,6 +3072,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       shouldHardReload,
       fullLoadingScreen,
       forceDiagnosticReport,
+      skipDiagnosticErrorBlocking,
       forceAlwaysOnTopInPreview,
       launchCaptureOptions,
       isForInGameEdition,
@@ -3065,15 +3095,17 @@ const MainFrame = (props: Props): React.MixedElement => {
       previewLaunchInProgressRef.current = true;
       previewLaunchPhaseRef.current = 'preparing';
       try {
-        const shouldBlockPreview = await checkDiagnosticErrorsAndIfShouldBlock(
-          currentProject,
-          'preview'
-        );
-        if (isPreviewLaunchCancelled(previewLaunchId)) {
-          return;
-        }
-        if (shouldBlockPreview) {
-          return;
+        if (!skipDiagnosticErrorBlocking) {
+          const shouldBlockPreview = await checkDiagnosticErrorsAndIfShouldBlock(
+            currentProject,
+            'preview'
+          );
+          if (isPreviewLaunchCancelled(previewLaunchId)) {
+            return;
+          }
+          if (shouldBlockPreview) {
+            return;
+          }
         }
 
         console.info(
@@ -3093,6 +3125,7 @@ const MainFrame = (props: Props): React.MixedElement => {
             displaySignalAnimationsInPreview,
             fullLoadingScreen,
             forceDiagnosticReport,
+            skipDiagnosticErrorBlocking,
             forceAlwaysOnTopInPreview,
             launchCaptureOptions,
             isForInGameEdition,
@@ -3415,6 +3448,9 @@ const MainFrame = (props: Props): React.MixedElement => {
         numberOfWindows,
         forceAlwaysOnTopInPreview: !!(
           options && options.forceAlwaysOnTopInPreview
+        ),
+        skipDiagnosticErrorBlocking: !!(
+          options && options.skipDiagnosticErrorBlocking
         ),
         launchCaptureOptions,
       });
@@ -3954,7 +3990,13 @@ const MainFrame = (props: Props): React.MixedElement => {
   });
 
   const _openDebugger = React.useCallback(
-    () => {
+    async (): Promise<boolean> => {
+      if (
+        await checkDiagnosticErrorsAndIfShouldBlock(currentProject, 'preview')
+      ) {
+        return false;
+      }
+
       setState(state => {
         const editorTabsWithDebugger = openEditorTab(
           state.editorTabs,
@@ -3971,8 +4013,15 @@ const MainFrame = (props: Props): React.MixedElement => {
           editorTabs: popOutTab(editorTabsWithDebugger, 'debugger'),
         };
       });
+
+      return true;
     },
-    [getEditorOpeningOptions, setState]
+    [
+      checkDiagnosticErrorsAndIfShouldBlock,
+      currentProject,
+      getEditorOpeningOptions,
+      setState,
+    ]
   );
 
   const openDebugger = addCreateBadgePreHookIfNotClaimed(
@@ -3982,9 +4031,16 @@ const MainFrame = (props: Props): React.MixedElement => {
   );
 
   const launchDebuggerAndPreview = React.useCallback(
-    () => {
-      openDebugger();
-      launchNewPreview({ forceAlwaysOnTopInPreview: true });
+    async () => {
+      const didOpenDebugger = await openDebugger();
+      if (!didOpenDebugger) {
+        return;
+      }
+
+      launchNewPreview({
+        forceAlwaysOnTopInPreview: true,
+        skipDiagnosticErrorBlocking: true,
+      });
     },
     [openDebugger, launchNewPreview]
   );
@@ -3994,19 +4050,24 @@ const MainFrame = (props: Props): React.MixedElement => {
   // tab is currently focused. When sceneName is empty/unknown, falls back to
   // the editor's normal scene selection.
   const launchPreviewForScene = React.useCallback(
-    (sceneName: ?string) => {
+    async (sceneName: ?string) => {
       const launchCaptureOptions =
         currentProject && !hasNonEditionPreviewsRunning
           ? getHotReloadPreviewLaunchCaptureOptions(
               currentProject.getProjectUuid()
             )
           : undefined;
-      openDebugger();
+      const didOpenDebugger = await openDebugger();
+      if (!didOpenDebugger) {
+        return;
+      }
+
       launchPreview({
         networkPreview: false,
         forcedPreviewLayoutName: sceneName || null,
         numberOfWindows: 1,
         forceAlwaysOnTopInPreview: true,
+        skipDiagnosticErrorBlocking: true,
         launchCaptureOptions,
       });
     },

@@ -693,6 +693,22 @@ namespace gdjs {
   };
 
   /**
+   * Throw when objects from an external layout are created from an event that
+   * runs without conditions.
+   *
+   * @internal
+   */
+  export const assertExternalLayoutCreationHasCondition = function (
+    externalLayoutName: string
+  ): never {
+    throw new Error(
+      'External layout action needs a condition: an event creates objects from external layout "' +
+        externalLayoutName +
+        '" without any condition. Add a condition, for example "At the beginning of the scene", before creating objects from an external layout.'
+    );
+  };
+
+  /**
    * Assert that a generated object-consuming instruction is deterministic.
    *
    * @internal

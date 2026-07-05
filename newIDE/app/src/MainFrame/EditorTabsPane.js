@@ -133,7 +133,7 @@ export type EditorTabsPaneCommonProps = {|
     versionId: string
   ) => Promise<?ExpandedCloudProjectVersion>,
   openShareDialog: (tab?: ShareTab) => void,
-  launchDebuggerAndPreview: () => void,
+  launchDebuggerAndPreview: () => void | Promise<void>,
   launchNewPreview: (
     ?{|
       numberOfWindows?: number,

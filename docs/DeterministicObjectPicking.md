@@ -90,6 +90,32 @@ style of error report on top of the game screen. The first uncaught error is
 logged to the browser or platform console once, then the game loop stops so the
 same crash is not printed again every frame.
 
+## Preview And Export Validation
+
+The editor also scans events before launching a preview, launching a debug
+preview, or exporting the game. When it can prove that an object-consuming
+action or function can receive more than one initial instance from the scene,
+the launch is blocked before any window or export starts.
+
+Objects that have zero or one initial instance in the scene are allowed by the
+editor scanner even when they are not explicitly picked first. The runtime
+assertion still checks the actual picked list when the event executes, so
+instances created later are validated by the game itself.
+
+The editor first shows a warning dialog with a short explanation. Choosing
+`Open report` opens the diagnostic report with the exact event locations so the
+author can navigate to the failing instructions. This is the same validation
+flow used for external layout creation actions that need a condition.
+
+## Conditionless Actions
+
+The editor also blocks standard events that have enabled actions but no enabled
+conditions. Such actions run every frame, which is usually accidental and can
+hide non-deterministic event logic.
+
+To run actions only once, add a condition such as `At the beginning of the scene`. To run actions repeatedly on purpose, add an explicit condition that
+describes the intended frame-by-frame trigger.
+
 ## Compatibility Notes
 
 This is intentionally stricter than classic GDevelop object picking.

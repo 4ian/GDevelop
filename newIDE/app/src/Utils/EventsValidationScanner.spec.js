@@ -581,6 +581,335 @@ describe('EventsValidationScanner', () => {
         );
         expect(targetError).toBeUndefined();
       });
+
+      it('allows external layout creation in a sub-event when the parent event has an enabled condition', () => {
+        const { project, testLayout } = makeTestProject(gd);
+        const events = testLayout.getEvents();
+
+        const parentEvent = events.insertNewEvent(
+          project,
+          'BuiltinCommonInstructions::Standard',
+          0
+        );
+        const parentStandardEvent = gd.asStandardEvent(parentEvent);
+        const condition = new gd.Instruction();
+        condition.setType('SceneJustBegins');
+        condition.setParametersCount(1);
+        condition.setParameter(0, '');
+        parentStandardEvent.getConditions().insert(condition, 0);
+        condition.delete();
+
+        const childEvent = parentEvent
+          .getSubEvents()
+          .insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 0);
+        const childStandardEvent = gd.asStandardEvent(childEvent);
+        const action = new gd.Instruction();
+        action.setType(
+          'BuiltinExternalLayouts::CreateObjectsFromExternalLayout'
+        );
+        action.setParameter(1, '"Main_HUD"');
+        action.setParameter(2, '0');
+        action.setParameter(3, '0');
+        action.setParameter(4, '0');
+        childStandardEvent.getActions().insert(action, 0);
+        action.delete();
+
+        const errors = scanProjectForValidationErrors(project);
+
+        expect(
+          errors.find(e => e.type === 'unsafe-external-layout-creation')
+        ).toBeUndefined();
+        expect(
+          errors.find(
+            e =>
+              e.type === 'unconditioned-action' &&
+              e.instructionType ===
+                'BuiltinExternalLayouts::CreateObjectsFromExternalLayout'
+          )
+        ).toBeUndefined();
+      });
+
+      it('detects actions in a standard event without enabled conditions', () => {
+        const { project, testLayout } = makeTestProject(gd);
+        const events = testLayout.getEvents();
+
+        const event = events.insertNewEvent(
+          project,
+          'BuiltinCommonInstructions::Standard',
+          0
+        );
+        const standardEvent = gd.asStandardEvent(event);
+        const action = new gd.Instruction();
+        action.setType('SetNumberVariable');
+        action.setParametersCount(3);
+        action.setParameter(0, 'Variable1');
+        action.setParameter(1, '=');
+        action.setParameter(2, '1');
+        standardEvent.getActions().insert(action, 0);
+        action.delete();
+
+        const errors = scanProjectForValidationErrors(project);
+
+        const targetError = errors.find(
+          e =>
+            e.type === 'unconditioned-action' &&
+            e.instructionType === 'SetNumberVariable'
+        );
+        expect(targetError).toBeDefined();
+        if (targetError) {
+          expect(targetError.isCondition).toBe(false);
+          expect(targetError.locationType).toBe('scene');
+          expect(targetError.locationName).toBe(testLayout.getName());
+        }
+      });
+
+      it('detects actions when all standard event conditions are disabled', () => {
+        const { project } = makeTestProject(gd);
+        const events = project.getLayout('TestLayout').getEvents();
+
+        const event = events.insertNewEvent(
+          project,
+          'BuiltinCommonInstructions::Standard',
+          0
+        );
+        const standardEvent = gd.asStandardEvent(event);
+        const condition = new gd.Instruction();
+        condition.setType('SceneJustBegins');
+        condition.setParametersCount(1);
+        condition.setParameter(0, '');
+        condition.setDisabled(true);
+        standardEvent.getConditions().insert(condition, 0);
+        condition.delete();
+
+        const action = new gd.Instruction();
+        action.setType('SetNumberVariable');
+        action.setParametersCount(3);
+        action.setParameter(0, 'Variable1');
+        action.setParameter(1, '=');
+        action.setParameter(2, '1');
+        standardEvent.getActions().insert(action, 0);
+        action.delete();
+
+        const errors = scanProjectForValidationErrors(project);
+
+        const targetError = errors.find(
+          e =>
+            e.type === 'unconditioned-action' &&
+            e.instructionType === 'SetNumberVariable'
+        );
+        expect(targetError).toBeDefined();
+      });
+
+      it('allows actions in a standard event with an enabled condition', () => {
+        const { project } = makeTestProject(gd);
+        const events = project.getLayout('TestLayout').getEvents();
+
+        const event = events.insertNewEvent(
+          project,
+          'BuiltinCommonInstructions::Standard',
+          0
+        );
+        const standardEvent = gd.asStandardEvent(event);
+        const condition = new gd.Instruction();
+        condition.setType('SceneJustBegins');
+        condition.setParametersCount(1);
+        condition.setParameter(0, '');
+        standardEvent.getConditions().insert(condition, 0);
+        condition.delete();
+
+        const action = new gd.Instruction();
+        action.setType('SetNumberVariable');
+        action.setParametersCount(3);
+        action.setParameter(0, 'Variable1');
+        action.setParameter(1, '=');
+        action.setParameter(2, '1');
+        standardEvent.getActions().insert(action, 0);
+        action.delete();
+
+        const errors = scanProjectForValidationErrors(project);
+
+        const targetError = errors.find(
+          e =>
+            e.type === 'unconditioned-action' &&
+            e.instructionType === 'SetNumberVariable'
+        );
+        expect(targetError).toBeUndefined();
+      });
+
+      it('allows actions in a sub-event when the parent event has an enabled condition', () => {
+        const { project } = makeTestProject(gd);
+        const events = project.getLayout('TestLayout').getEvents();
+
+        const parentEvent = events.insertNewEvent(
+          project,
+          'BuiltinCommonInstructions::Standard',
+          0
+        );
+        const parentStandardEvent = gd.asStandardEvent(parentEvent);
+        const condition = new gd.Instruction();
+        condition.setType('SceneJustBegins');
+        condition.setParametersCount(1);
+        condition.setParameter(0, '');
+        parentStandardEvent.getConditions().insert(condition, 0);
+        condition.delete();
+
+        const childEvent = parentEvent
+          .getSubEvents()
+          .insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 0);
+        const childStandardEvent = gd.asStandardEvent(childEvent);
+        const action = new gd.Instruction();
+        action.setType('SetNumberVariable');
+        action.setParametersCount(3);
+        action.setParameter(0, 'Variable1');
+        action.setParameter(1, '=');
+        action.setParameter(2, '1');
+        childStandardEvent.getActions().insert(action, 0);
+        action.delete();
+
+        const errors = scanProjectForValidationErrors(project);
+
+        const targetError = errors.find(
+          e =>
+            e.type === 'unconditioned-action' &&
+            e.instructionType === 'SetNumberVariable'
+        );
+        expect(targetError).toBeUndefined();
+      });
+
+      it('detects actions in a sub-event when the parent event has no enabled condition', () => {
+        const { project } = makeTestProject(gd);
+        const events = project.getLayout('TestLayout').getEvents();
+
+        const parentEvent = events.insertNewEvent(
+          project,
+          'BuiltinCommonInstructions::Standard',
+          0
+        );
+
+        const childEvent = parentEvent
+          .getSubEvents()
+          .insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 0);
+        const childStandardEvent = gd.asStandardEvent(childEvent);
+        const action = new gd.Instruction();
+        action.setType('SetNumberVariable');
+        action.setParametersCount(3);
+        action.setParameter(0, 'Variable1');
+        action.setParameter(1, '=');
+        action.setParameter(2, '1');
+        childStandardEvent.getActions().insert(action, 0);
+        action.delete();
+
+        const errors = scanProjectForValidationErrors(project);
+
+        const targetError = errors.find(
+          e =>
+            e.type === 'unconditioned-action' &&
+            e.instructionType === 'SetNumberVariable'
+        );
+        expect(targetError).toBeDefined();
+      });
+
+      it('detects object action parameters without a single picked instance', () => {
+        const { project, testLayout } = makeTestProject(gd);
+        const events = testLayout.getEvents();
+        const secondSpriteObjectInstance = testLayout
+          .getInitialInstances()
+          .insertNewInitialInstance();
+        secondSpriteObjectInstance.setObjectName('MySpriteObject');
+
+        const event = events.insertNewEvent(
+          project,
+          'BuiltinCommonInstructions::Standard',
+          0
+        );
+        const standardEvent = gd.asStandardEvent(event);
+        const action = new gd.Instruction();
+        action.setType('Delete');
+        action.setParametersCount(1);
+        action.setParameter(0, 'MySpriteObject');
+        standardEvent.getActions().insert(action, 0);
+        action.delete();
+
+        const errors = scanProjectForValidationErrors(project);
+
+        const targetError = errors.find(
+          e =>
+            e.type === 'ambiguous-object-picking' &&
+            e.instructionType === 'Delete' &&
+            e.parameterValue === 'MySpriteObject'
+        );
+        expect(targetError).toBeDefined();
+        if (targetError) {
+          expect(targetError.isCondition).toBe(false);
+          expect(targetError.parameterIndex).toBe(0);
+          expect(targetError.locationType).toBe('scene');
+          expect(targetError.locationName).toBe(testLayout.getName());
+        }
+      });
+
+      it('allows object action parameters when the scene has at most one initial instance', () => {
+        const { project, testLayout } = makeTestProject(gd);
+        const events = testLayout.getEvents();
+
+        const event = events.insertNewEvent(
+          project,
+          'BuiltinCommonInstructions::Standard',
+          0
+        );
+        const standardEvent = gd.asStandardEvent(event);
+        const action = new gd.Instruction();
+        action.setType('Delete');
+        action.setParametersCount(1);
+        action.setParameter(0, 'MySpriteObject');
+        standardEvent.getActions().insert(action, 0);
+        action.delete();
+
+        const errors = scanProjectForValidationErrors(project);
+
+        const targetError = errors.find(
+          e =>
+            e.type === 'ambiguous-object-picking' &&
+            e.instructionType === 'Delete' &&
+            e.parameterValue === 'MySpriteObject'
+        );
+        expect(targetError).toBeUndefined();
+      });
+
+      it('allows object action parameters after a single-instance picking condition', () => {
+        const { project, testLayout } = makeTestProject(gd);
+        const events = testLayout.getEvents();
+
+        const event = events.insertNewEvent(
+          project,
+          'BuiltinCommonInstructions::Standard',
+          0
+        );
+        const standardEvent = gd.asStandardEvent(event);
+        const condition = new gd.Instruction();
+        condition.setType('PickRandomInstance');
+        condition.setParametersCount(2);
+        condition.setParameter(1, 'MySpriteObject');
+        standardEvent.getConditions().insert(condition, 0);
+        condition.delete();
+
+        const action = new gd.Instruction();
+        action.setType('Delete');
+        action.setParametersCount(1);
+        action.setParameter(0, 'MySpriteObject');
+        standardEvent.getActions().insert(action, 0);
+        action.delete();
+
+        const errors = scanProjectForValidationErrors(project);
+
+        const targetError = errors.find(
+          e =>
+            e.type === 'ambiguous-object-picking' &&
+            e.instructionType === 'Delete' &&
+            e.parameterValue === 'MySpriteObject' &&
+            e.eventPath[0] === 0
+        );
+        expect(targetError).toBeUndefined();
+      });
     });
   });
 

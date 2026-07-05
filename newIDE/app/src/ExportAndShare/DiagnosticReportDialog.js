@@ -171,12 +171,12 @@ const InvalidParametersSection = ({
   return (
     <ColumnStackLayout noMargin>
       <Text size="block-title">
-        <Trans>Invalid parameters in events ({invalidParametersCount})</Trans>
+        <Trans>Invalid events ({invalidParametersCount})</Trans>
       </Text>
       <AlertMessage kind="error">
         <Trans>
-          The following events have invalid parameters (shown with red underline
-          in the events sheet). Click a location to navigate there.
+          The following events have validation errors. Click a location to
+          navigate there.
         </Trans>
       </AlertMessage>
       {/* $FlowFixMe[incompatible-type] */}

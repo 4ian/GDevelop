@@ -11,6 +11,12 @@ import FlatButtonWithSplitMenu from '../../UI/FlatButtonWithSplitMenu';
 import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 import ResponsiveRaisedButton from '../../UI/ResponsiveRaisedButton';
 import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
+import optionalRequire from '../../Utils/OptionalRequire';
+
+const electron = optionalRequire('electron');
+
+const escapeMenuLabelForElectron = (label: string): string =>
+  electron ? label.replace(/&/g, '&&') : label;
 
 export type PreviewAndShareButtonsProps = {|
   onPreviewWithoutHotReload: (
@@ -19,7 +25,7 @@ export type PreviewAndShareButtonsProps = {|
       forceAlwaysOnTopInPreview?: boolean,
     |}
   ) => Promise<void>,
-  onOpenDebugger: () => void,
+  onOpenDebugger: () => void | Promise<boolean>,
   onNetworkPreview: () => void,
   onHotReloadPreview: () => void,
   onNetworkPreview: () => Promise<void>,
@@ -58,6 +64,8 @@ const PreviewAndShareButtons: React.ComponentType<PreviewAndShareButtonsProps> =
     hasPreviewsRunning,
     previewState,
     setPreviewOverride,
+    openShareDialog,
+    isSharingEnabled,
   }: PreviewAndShareButtonsProps) {
     const preferences = React.useContext(PreferencesContext);
     const { isMobile } = useResponsiveWindowSize();
@@ -176,6 +184,12 @@ const PreviewAndShareButtons: React.ComponentType<PreviewAndShareButtonsProps> =
               previewState.previewExternalLayoutName !==
                 previewState.overridenPreviewExternalLayoutName,
           },
+          { type: 'separator' },
+          {
+            label: escapeMenuLabelForElectron(i18n._(t`Export & Share`)),
+            click: openShareDialog,
+            enabled: isSharingEnabled,
+          },
         ].filter(Boolean),
       [
         onNetworkPreview,
@@ -195,6 +209,8 @@ const PreviewAndShareButtons: React.ComponentType<PreviewAndShareButtonsProps> =
         previewState.previewExternalLayoutName,
         previewState.previewLayoutName,
         setPreviewOverride,
+        openShareDialog,
+        isSharingEnabled,
       ]
     );
 

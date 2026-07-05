@@ -24,6 +24,7 @@ export type LaunchPreviewOptions = {
   shouldHardReload?: boolean,
   fullLoadingScreen?: boolean,
   forceDiagnosticReport?: boolean,
+  skipDiagnosticErrorBlocking?: boolean,
   numberOfWindows?: number,
   forceAlwaysOnTopInPreview?: boolean,
   isForInGameEdition?: {|

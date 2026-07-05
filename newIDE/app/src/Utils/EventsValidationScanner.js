@@ -11,7 +11,9 @@ export type ValidationErrorType =
   | 'missing-instruction'
   | 'invalid-parameter'
   | 'missing-parameter'
-  | 'unsafe-external-layout-creation';
+  | 'unsafe-external-layout-creation'
+  | 'ambiguous-object-picking'
+  | 'unconditioned-action';
 
 export type ValidationError = {|
   type: ValidationErrorType,
@@ -90,33 +92,244 @@ const hasEnabledInstructions = (instructionsList: gdInstructionsList) => {
   return false;
 };
 
+const getFirstEnabledInstructionPtr = (
+  instructionsList: gdInstructionsList
+): ?number => {
+  for (let index = 0; index < instructionsList.size(); index++) {
+    const instruction = instructionsList.get(index);
+    if (!instruction.isDisabled()) {
+      // $FlowFixMe[prop-missing] - ptr is a number identifying the C++ object.
+      return instruction.ptr;
+    }
+  }
+
+  return null;
+};
+
 type EventValidationContext = {|
   eventPath: EventPath,
   standardEventHasEnabledConditions: ?boolean,
+  standardEventFirstEnabledActionPtr: ?number,
+  singlePickedObjectNames: Set<string>,
 |};
+
+const objectParameterTypesThatConsumePickedInstances = new Set([
+  'object',
+  'objectList',
+  'objectPtr',
+]);
+
+const singleInstancePickingInstructionTypes = new Set([
+  'PickRandomInstance',
+  'AjoutHasard',
+  'PickNearest',
+]);
+
+const multipleInstancePickingInstructionTypes = new Set([
+  'PickAllInstances',
+  'AjoutObjConcern',
+]);
+
+const isObjectParameterTypeThatConsumesPickedInstances = (
+  parameterType: string
+): boolean => objectParameterTypesThatConsumePickedInstances.has(parameterType);
+
+const getObjectNamesForObjectOrGroup = (
+  project: gdProject,
+  layout: gdLayout,
+  objectOrGroupName: string
+): Array<string> => {
+  const sceneObjectGroups = layout.getObjects().getObjectGroups();
+  if (sceneObjectGroups.has(objectOrGroupName)) {
+    return sceneObjectGroups
+      .get(objectOrGroupName)
+      .getAllObjectsNames()
+      .toJSArray();
+  }
+
+  const projectObjectGroups = project.getObjects().getObjectGroups();
+  if (projectObjectGroups.has(objectOrGroupName)) {
+    return projectObjectGroups
+      .get(objectOrGroupName)
+      .getAllObjectsNames()
+      .toJSArray();
+  }
+
+  return [objectOrGroupName];
+};
+
+const initialInstancesContainMoreThanOneObjectOrGroupInstance = (
+  project: gdProject,
+  sceneName: string,
+  objectOrGroupName: string
+): boolean => {
+  if (!sceneName || !project.hasLayoutNamed(sceneName)) {
+    return false;
+  }
+
+  const layout = project.getLayout(sceneName);
+  const initialInstances = layout.getInitialInstances();
+  const objectNames = getObjectNamesForObjectOrGroup(
+    project,
+    layout,
+    objectOrGroupName
+  );
+
+  let initialInstanceCount = 0;
+  for (const objectName of objectNames) {
+    if (initialInstances.isInstancesCountOfObjectGreaterThan(objectName, 1)) {
+      return true;
+    }
+
+    if (initialInstances.hasInstancesOfObject(objectName)) {
+      initialInstanceCount++;
+      if (initialInstanceCount > 1) {
+        return true;
+      }
+    }
+  }
+
+  return false;
+};
+
+const getFirstObjectParameterValue = (
+  instruction: gdInstruction,
+  metadata: gdInstructionMetadata
+): ?string => {
+  const parametersCount = metadata.getParametersCount();
+  for (
+    let parameterIndex = 0;
+    parameterIndex < parametersCount;
+    parameterIndex++
+  ) {
+    const parameterMetadata = metadata.getParameter(parameterIndex);
+    if (parameterMetadata.isCodeOnly()) {
+      continue;
+    }
+
+    const parameterType = parameterMetadata.getType();
+    if (!isObjectParameterTypeThatConsumesPickedInstances(parameterType)) {
+      continue;
+    }
+
+    return instruction.getParameter(parameterIndex).getPlainString();
+  }
+
+  return null;
+};
+
+const updateSinglePickedObjectNamesFromInstruction = (
+  instruction: gdInstruction,
+  metadata: gdInstructionMetadata,
+  singlePickedObjectNames: Set<string>
+) => {
+  const type = instruction.getType();
+  const objectName = getFirstObjectParameterValue(instruction, metadata);
+  if (!objectName) {
+    return;
+  }
+
+  if (singleInstancePickingInstructionTypes.has(type)) {
+    singlePickedObjectNames.add(objectName);
+  } else if (multipleInstancePickingInstructionTypes.has(type)) {
+    singlePickedObjectNames.delete(objectName);
+  }
+};
+
+const updateSinglePickedObjectNamesFromInstructions = (
+  instructionsList: gdInstructionsList,
+  isCondition: boolean,
+  singlePickedObjectNames: Set<string>
+) => {
+  for (let index = 0; index < instructionsList.size(); index++) {
+    const instruction = instructionsList.get(index);
+    if (instruction.isDisabled()) {
+      continue;
+    }
+
+    const type = instruction.getType();
+    if (
+      !singleInstancePickingInstructionTypes.has(type) &&
+      !multipleInstancePickingInstructionTypes.has(type)
+    ) {
+      continue;
+    }
+
+    const metadata = isCondition
+      ? gd.MetadataProvider.getConditionMetadata(gd.JsPlatform.get(), type)
+      : gd.MetadataProvider.getActionMetadata(gd.JsPlatform.get(), type);
+    if (gd.MetadataProvider.isBadInstructionMetadata(metadata)) {
+      continue;
+    }
+
+    updateSinglePickedObjectNamesFromInstruction(
+      instruction,
+      metadata,
+      singlePickedObjectNames
+    );
+  }
+};
 
 const buildEventPtrToValidationContextMap = (
   eventsList: gdEventsList,
-  parentPath: EventPath = []
+  parentPath: EventPath = [],
+  parentSinglePickedObjectNames: Set<string> = new Set(),
+  parentHasEnabledConditions: boolean = false
 ): Map<number, EventValidationContext> => {
   const map = new Map<number, EventValidationContext>();
   mapFor(0, eventsList.getEventsCount(), index => {
     const event = eventsList.getEventAt(index);
     const currentPath = [...parentPath, index];
-    const standardEventHasEnabledConditions =
+    const singlePickedObjectNames = new Set(parentSinglePickedObjectNames);
+    if (event.getType() === 'BuiltinCommonInstructions::ForEach') {
+      const objectName = gd.asForEachEvent(event).getObjectToPick();
+      if (objectName) {
+        singlePickedObjectNames.add(objectName);
+      }
+    }
+    const standardEventOwnHasEnabledConditions =
       event.getType() === 'BuiltinCommonInstructions::Standard'
         ? hasEnabledInstructions(gd.asStandardEvent(event).getConditions())
+        : false;
+    const standardEventHasEnabledConditions =
+      event.getType() === 'BuiltinCommonInstructions::Standard'
+        ? parentHasEnabledConditions || standardEventOwnHasEnabledConditions
         : null;
+    const standardEventFirstEnabledActionPtr =
+      event.getType() === 'BuiltinCommonInstructions::Standard'
+        ? getFirstEnabledInstructionPtr(gd.asStandardEvent(event).getActions())
+        : null;
+    if (event.getType() === 'BuiltinCommonInstructions::Standard') {
+      const standardEvent = gd.asStandardEvent(event);
+      updateSinglePickedObjectNamesFromInstructions(
+        standardEvent.getConditions(),
+        true,
+        singlePickedObjectNames
+      );
+    }
     // $FlowFixMe[incompatible-type] - ptr is a number identifying the C++ object
     map.set(event.ptr, {
       eventPath: currentPath,
       standardEventHasEnabledConditions,
+      standardEventFirstEnabledActionPtr,
+      singlePickedObjectNames,
     });
+
+    const subEventSinglePickedObjectNames = new Set(singlePickedObjectNames);
+    if (event.getType() === 'BuiltinCommonInstructions::Standard') {
+      updateSinglePickedObjectNamesFromInstructions(
+        gd.asStandardEvent(event).getActions(),
+        false,
+        subEventSinglePickedObjectNames
+      );
+    }
 
     if (event.canHaveSubEvents()) {
       const subEventsMap = buildEventPtrToValidationContextMap(
         event.getSubEvents(),
-        currentPath
+        currentPath,
+        subEventSinglePickedObjectNames,
+        parentHasEnabledConditions || standardEventOwnHasEnabledConditions
       );
       subEventsMap.forEach((context, ptr) => map.set(ptr, context));
     }
@@ -130,6 +343,7 @@ const buildEventPtrToValidationContextMap = (
  * handles local variable scoping as it traverses the event tree.
  */
 const createValidationWorker = (
+  project: gdProject,
   platform: gdPlatform,
   errors: Array<ValidationError>
 ): gdReadOnlyArbitraryEventsWorkerWithContextJS => {
@@ -138,6 +352,8 @@ const createValidationWorker = (
 
   let currentEventPath: EventPath = [];
   let currentStandardEventHasEnabledConditions: ?boolean = null;
+  let currentStandardEventFirstEnabledActionPtr: ?number = null;
+  let currentSinglePickedObjectNames: Set<string> = new Set();
   let eventPtrToValidationContextMap: Map<
     number,
     EventValidationContext
@@ -161,6 +377,11 @@ const createValidationWorker = (
       currentEventPath = validationContext.eventPath;
       currentStandardEventHasEnabledConditions =
         validationContext.standardEventHasEnabledConditions;
+      currentStandardEventFirstEnabledActionPtr =
+        validationContext.standardEventFirstEnabledActionPtr;
+      currentSinglePickedObjectNames = new Set(
+        validationContext.singlePickedObjectNames
+      );
     }
   };
 
@@ -203,6 +424,28 @@ const createValidationWorker = (
     if (
       !isCondition &&
       currentStandardEventHasEnabledConditions === false &&
+      !projectScopedContainers.getScopeExtensionName() &&
+      // $FlowFixMe[prop-missing] - ptr is a number identifying the C++ object.
+      instruction.ptr === currentStandardEventFirstEnabledActionPtr
+    ) {
+      errors.push({
+        type: 'unconditioned-action',
+        isCondition,
+        instructionType: type,
+        instructionSentence: renderInstructionSentenceAsPlainText(
+          instruction,
+          metadata
+        ),
+        eventPath: [...currentEventPath],
+        ...getValidationErrorLocationInformationFromProjectScopedContainers(
+          projectScopedContainers
+        ),
+      });
+    }
+
+    if (
+      !isCondition &&
+      currentStandardEventHasEnabledConditions === false &&
       type === 'BuiltinExternalLayouts::CreateObjectsFromExternalLayout' &&
       !projectScopedContainers.getScopeExtensionName()
     ) {
@@ -231,6 +474,9 @@ const createValidationWorker = (
       const parameterMetadata = metadata.getParameter(parameterIndex);
       const parameterType = parameterMetadata.getType();
       const value = instruction.getParameter(parameterIndex).getPlainString();
+      const isObjectParameterThatConsumesPickedInstances = isObjectParameterTypeThatConsumesPickedInstances(
+        parameterType
+      );
 
       // Skip codeOnly parameters
       if (parameterMetadata.isCodeOnly()) {
@@ -341,8 +587,44 @@ const createValidationWorker = (
             projectScopedContainers
           ),
         });
+      } else if (
+        !isCondition &&
+        isObjectParameterThatConsumesPickedInstances &&
+        value !== '' &&
+        !singleInstancePickingInstructionTypes.has(type) &&
+        !currentSinglePickedObjectNames.has(value) &&
+        initialInstancesContainMoreThanOneObjectOrGroupInstance(
+          project,
+          projectScopedContainers.getScopeSceneName(),
+          value
+        )
+      ) {
+        errors.push({
+          type: 'ambiguous-object-picking',
+          isCondition,
+          instructionType: type,
+          instructionSentence: renderInstructionSentenceAsPlainText(
+            instruction,
+            metadata
+          ),
+          parameterIndex,
+          parameterValue: value,
+          parameterType,
+          eventPath: [...currentEventPath],
+          ...getValidationErrorLocationInformationFromProjectScopedContainers(
+            projectScopedContainers
+          ),
+        });
       }
     });
+
+    if (!isCondition) {
+      updateSinglePickedObjectNamesFromInstruction(
+        instruction,
+        metadata,
+        currentSinglePickedObjectNames
+      );
+    }
   };
 
   return worker;
@@ -359,7 +641,7 @@ export const scanEventsListForValidationErrors = ({
 |}): Array<ValidationError> => {
   const errors: Array<ValidationError> = [];
   const platform = gd.JsPlatform.get();
-  const worker = createValidationWorker(platform, errors);
+  const worker = createValidationWorker(project, platform, errors);
   const projectScopedContainers = layout
     ? gd.ProjectScopedContainers.makeNewProjectScopedContainersForProjectAndLayout(
         project,
@@ -391,7 +673,7 @@ export const scanProjectForValidationErrors = (
 
   // Create a single worker for the entire scan. The worker derives
   // location info from ProjectScopedContainers set by the C++ traversal.
-  const worker = createValidationWorker(platform, errors);
+  const worker = createValidationWorker(project, platform, errors);
 
   // Scan all layouts (scenes) and external events via C++ traversal.
   gd.ProjectBrowserHelper.exposeProjectEventsWithoutExtensions(project, worker);

@@ -43,7 +43,7 @@ type CommandHandlers = {|
   hasPreviewsRunning: boolean,
   onOpenProjectManager: () => void,
   onLaunchPreview: () => void | Promise<void>,
-  onLaunchDebugPreview: () => void,
+  onLaunchDebugPreview: () => void | Promise<void>,
   onLaunchNetworkPreview: () => void,
   onHotReloadPreview: () => void,
   onLaunchNetworkPreview: () => Promise<void>,

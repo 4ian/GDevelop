@@ -273,6 +273,11 @@ To learn more about GDevelop Architecture, read the [architecture overview here]
 
 Pre-generated documentation of the game engine is [available here](https://docs.gdevelop.io).
 
+### Implementation notes
+
+- [Global Config](docs/GlobalConfig.md): project-wide JSON configuration storage, editor support, runtime helpers and event instructions.
+- [Signal System](docs/SignalSystem.md): queued signal notification design for scene events, custom objects and prefabs.
+
 ### Local third-party tools
 
 The Resource Working Desk integrates selected third-party tools through

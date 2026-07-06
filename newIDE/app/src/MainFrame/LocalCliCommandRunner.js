@@ -41,7 +41,8 @@ const getCommandArgs = (): Array<string> => {
   const appArguments = Window.getArguments();
   const arg = appArguments['cmd-args'];
   if (!arg) return [];
-  return Array.isArray(arg) ? arg : [arg];
+  const values = Array.isArray(arg) ? arg : [arg];
+  return values.map(value => value.trim()).filter(Boolean);
 };
 
 const runners: { [commandName: string]: CliCommandRunner } = {

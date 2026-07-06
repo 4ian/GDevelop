@@ -3443,17 +3443,17 @@ const signalEmitActionSchema = {
     target_kind: {
       type: 'string',
       description:
-        'Signal target: scene, object_instance, or picked_objects. In extension event sheets, use only scene or object_instance.',
+        'Signal target: scene, object_instance, or picked_objects. Use scene for prefab-to-scene notifications, object_instance for scene-to-one-prefab commands, and picked_objects for scene-to-picked-prefabs commands. In extension event sheets, use only scene or object_instance.',
     },
     signal_name: {
       type: 'string',
       description:
-        'Signal name string expression. Bare names such as Attack are quoted automatically.',
+        'Signal name string expression. Bare names such as Attack or CardSlot.Select are quoted automatically.',
     },
     payload: {
       type: 'string',
       description:
-        'Optional string payload expression. Bare text is quoted automatically; use ToString(...) for numeric data.',
+        'Optional string payload expression. Keep payloads small. Bare text is quoted automatically; use ToString(...) for numeric data. Inside onSignal, use GetArgumentAsString("Payload") or the fixed Payload parameter, not scene-only SignalPayload().',
     },
     object_name: {
       type: 'string',
@@ -3470,7 +3470,8 @@ const signalEmitActionSchema = {
     },
     object_group_name: {
       type: 'string',
-      description: 'Legacy field; object_group signal emit actions are no longer generated.',
+      description:
+        'Legacy field; object_group signal emit actions are no longer generated.',
     },
     target_scope: {
       type: 'string',
@@ -3488,12 +3489,12 @@ const signalReceivedConditionSchema = {
     signal_name: {
       type: 'string',
       description:
-        'Signal name string expression. Bare names such as Attack are quoted automatically.',
+        'Signal name string expression. Bare names such as Attack or CardSlot.Selected are quoted automatically.',
     },
     target_scope: {
       type: 'string',
       description:
-        'Optional documentation-only scope hint. Signal received is valid only in scene and external scene event sheets.',
+        'Optional documentation-only scope hint. Signal received is valid only in scene and external scene event sheets. Prefabs receive signals with onSignal instead.',
     },
   },
   required: ['signal_name'],
@@ -3541,7 +3542,11 @@ const onSignalFunctionSchema = {
         'Receiver kind: object. onSignal is not a free extension function.',
     },
     parent_name: extensionFunctionSchema.properties.parent_name,
-    events_json: extensionFunctionSchema.properties.events_json,
+    events_json: {
+      ...extensionFunctionSchema.properties.events_json,
+      description:
+        'Serialized events for the onSignal lifecycle handler. Branch on the fixed SignalName parameter, read Payload through GetArgumentAsString("Payload") or the fixed Payload parameter, and do not use scene-only SignalPayload()/SignalSender* expressions here.',
+    },
     dry_run: extensionFunctionSchema.properties.dry_run,
     summary_only: extensionFunctionSchema.properties.summary_only,
   },
@@ -3881,13 +3886,13 @@ const readTools: Array<McpTool> = [
   {
     name: 'create_signal_emit_action',
     description:
-      'Build a correctly-formed signal emit ACTION instruction JSON for scene, object_instance, or picked_objects targets. Handles hidden currentScene, signalName quoting, string payload, and required emitter object parameter ordering.',
+      'Build a correctly-formed signal emit ACTION instruction JSON for scene, object_instance, or picked_objects targets. Use it for scene-to-prefab commands and prefab-to-scene notifications. Handles hidden currentScene, signalName quoting, string payload, and required emitter object parameter ordering.',
     inputSchema: signalEmitActionSchema,
   },
   {
     name: 'create_signal_received_condition',
     description:
-      'Build a correctly-formed Signal received CONDITION instruction JSON for scene or external scene event sheets only. Handles hidden currentScene and signalName quoting.',
+      'Build a correctly-formed Signal received CONDITION instruction JSON for scene or external scene event sheets only. Use it for scene-level signal dispatchers; prefabs receive with onSignal. Handles hidden currentScene and signalName quoting.',
     inputSchema: signalReceivedConditionSchema,
   },
   {
@@ -4649,7 +4654,7 @@ const writeTools: Array<McpTool> = [
   {
     name: 'gdevelop_create_or_update_on_signal',
     description:
-      'Create or update the reserved object onSignal lifecycle function in an extension. GDevelop maintains the fixed signal parameters: SignalName and Payload, plus the Object receiver parameter.',
+      'Create or update the reserved object onSignal lifecycle function in an extension. Use it for prefab signal receivers. GDevelop maintains the fixed Object, SignalName, and Payload parameters; inside onSignal, branch on SignalName and read Payload directly.',
     inputSchema: onSignalFunctionSchema,
   },
   {
@@ -4769,6 +4774,26 @@ const toolUsageExamples: { [string]: Array<Object> } = {
     },
     {
       description:
+        'Scene event sends a command to the currently picked CardSlot prefab instance. Put the returned instruction in the event actions array.',
+      arguments: {
+        target_kind: 'object_instance',
+        instance_id: 'CardSlot.InstanceId()',
+        signal_name: 'CardSlot.Select',
+        payload: 'VariableString(SelectedCardId)',
+      },
+    },
+    {
+      description:
+        'Prefab onSignal/object function emits a reply back to the scene. In object_function scope, scene and object_instance targets keep the prefab decoupled from scene object names.',
+      arguments: {
+        target_kind: 'scene',
+        target_scope: 'object_function',
+        signal_name: 'CardSlot.Selected',
+        payload: 'GetArgumentAsString("Payload")',
+      },
+    },
+    {
+      description:
         'Emit a reply to one object instance by id, using a signal expression as the target id.',
       arguments: {
         target_kind: 'object_instance',
@@ -4794,6 +4819,14 @@ const toolUsageExamples: { [string]: Array<Object> } = {
         signal_name: 'Attack',
       },
     },
+    {
+      description:
+        'Scene receives a prefab reply. Put the returned condition in a scene/external-scene event, then use SignalPayload(), SignalSenderObjectName(), and SignalSenderInstanceId() in its sub-events/actions.',
+      arguments: {
+        signal_name: 'CardSlot.Selected',
+        target_scope: 'scene',
+      },
+    },
   ],
   gdevelop_inspect_signal_usage: [
     {
@@ -4801,6 +4834,15 @@ const toolUsageExamples: { [string]: Array<Object> } = {
         'Find all emitters, scene receivers, and onSignal handlers for a signal name.',
       arguments: {
         signal_name: 'Attack',
+      },
+    },
+    {
+      description:
+        'Audit a prefab signal contract and include onSignal handler event bodies when checking how prefabs react.',
+      arguments: {
+        signal_name: 'CardSlot.Select',
+        extension_name: 'Cards',
+        include_events: true,
       },
     },
   ],
@@ -5355,6 +5397,50 @@ const toolUsageExamples: { [string]: Array<Object> } = {
         ],
       },
     },
+    {
+      description:
+        'Add a grouped scene signal receiver. This is the scene side of a prefab signal contract: receive CardSlot.Selected, read SignalPayload(), and store it in a scene variable.',
+      arguments: {
+        scene_name: 'Level1',
+        event_changes: [
+          {
+            operation_name: 'insert_at_end',
+            undeclared_variables: [
+              { name: 'SelectedCardId', type: 'string', value: '' },
+            ],
+            generated_events: [
+              {
+                type: 'BuiltinCommonInstructions::Group',
+                aiGeneratedEventId: 'signal-dispatchers',
+                name: 'Signal dispatchers',
+                folded: false,
+                colorR: 90,
+                colorG: 140,
+                colorB: 230,
+                events: [
+                  {
+                    type: 'BuiltinCommonInstructions::Standard',
+                    aiGeneratedEventId: 'receive-card-slot-selected',
+                    conditions: [
+                      {
+                        type: { value: 'SignalReceived' },
+                        parameters: ['', '"CardSlot.Selected"'],
+                      },
+                    ],
+                    actions: [
+                      {
+                        type: { value: 'SetStringVariable' },
+                        parameters: ['SelectedCardId', '=', 'SignalPayload()'],
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+    },
   ],
   apply_validated_scene_patch: [
     {
@@ -5733,7 +5819,7 @@ const toolUsageExamples: { [string]: Array<Object> } = {
   gdevelop_create_or_update_on_signal: [
     {
       description:
-        'Create or update an events-based object onSignal lifecycle function while preserving the fixed signal parameters.',
+        'Create or update an events-based object onSignal lifecycle function. Branch on the fixed SignalName parameter and read Payload through GetArgumentAsString("Payload") or the fixed Payload parameter; scene-only SignalPayload() is not available inside onSignal.',
       arguments: {
         extension_name: 'Cards',
         parent_kind: 'object',
@@ -5741,10 +5827,63 @@ const toolUsageExamples: { [string]: Array<Object> } = {
         events_json: [
           {
             type: 'BuiltinCommonInstructions::Standard',
-            conditions: [],
-            actions: [],
+            aiGeneratedEventId: 'card-slot-select-signal',
+            conditions: [
+              {
+                type: { value: 'CompareArgumentAsString' },
+                parameters: ['"SignalName"', '=', '"CardSlot.Select"'],
+              },
+            ],
+            actions: [
+              {
+                type: { value: 'SetStringObjectVariable' },
+                parameters: [
+                  'Object',
+                  'SelectedCardId',
+                  '=',
+                  'GetArgumentAsString("Payload")',
+                ],
+              },
+              {
+                type: { value: 'EmitSceneSignal' },
+                parameters: [
+                  '',
+                  '"CardSlot.Selected"',
+                  'GetArgumentAsString("Payload")',
+                ],
+              },
+            ],
           },
         ],
+        summary_only: true,
+      },
+    },
+    {
+      description:
+        'Create a prefab reset handler. The scene can emit CardSlot.Reset to one instance or picked CardSlot instances without knowing the prefab children.',
+      arguments: {
+        extension_name: 'Cards',
+        parent_kind: 'object',
+        parent_name: 'CardSlot',
+        events_json: [
+          {
+            type: 'BuiltinCommonInstructions::Standard',
+            aiGeneratedEventId: 'card-slot-reset-signal',
+            conditions: [
+              {
+                type: { value: 'CompareArgumentAsString' },
+                parameters: ['"SignalName"', '=', '"CardSlot.Reset"'],
+              },
+            ],
+            actions: [
+              {
+                type: { value: 'SetStringObjectVariable' },
+                parameters: ['Object', 'SelectedCardId', '=', '""'],
+              },
+            ],
+          },
+        ],
+        dry_run: true,
         summary_only: true,
       },
     },

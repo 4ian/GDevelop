@@ -1,6 +1,6 @@
 ---
 name: gdevelop-mcp
-description: Use when an AI agent is connected to GDevelop through MCP and needs to inspect, create, modify, debug, or verify a GDevelop project, scene, object, instance, behavior, variable, event sheet, or editor command.
+description: Use when an AI agent is connected to GDevelop through MCP and needs to inspect, create, modify, debug, or verify a GDevelop project, scene, object, instance, behavior, prefab, signal, variable, event sheet, or editor command.
 ---
 
 # GDevelop MCP
@@ -10,6 +10,13 @@ description: Use when an AI agent is connected to GDevelop through MCP and needs
 Use this skill to operate the GDevelop editor through MCP safely and predictably. Always inspect current editor/project state before writing, use MCP tools for every project mutation, validate generated event JSON before inserting it, and read back the result after every meaningful change.
 
 GDevelop logic is event-based. A standard event contains `conditions` and `actions`; when all conditions are true, actions run. If an event has no conditions, its actions run every frame. Event order matters.
+
+When creating game logic, prefer reusable architecture over scene-only event sheets:
+
+- Use events-based object prefabs for reusable actors, UI widgets, projectiles, pickups, enemies, cards, and other repeated gameplay units.
+- Use built-in, community, or events-based behaviors for object capabilities whenever possible before hand-writing equivalent per-scene events.
+- Keep scene events focused on orchestration such as spawning, level setup, camera/UI routing, and global flow; put object-local mechanics inside prefab object functions or behavior functions.
+- Communicate between scenes/external scene events and prefabs with signals whenever practical. Emit named signals with payloads for commands or state changes, handle prefab reactions in `onSignal`, and avoid direct scene references to prefab child objects or implementation variables unless there is a clear reason.
 
 ## Tool Discovery
 
@@ -560,11 +567,13 @@ Add gameplay logic:
 
 1. Read current scene events and objects.
 2. If the user refers to the currently selected event, call `gdevelop_get_editor_selection` and use `primarySelection.selectedEvents[0].eventPath` or `selectedEventPaths[0]` as the target path for `event_changes`.
-3. Find or create the semantic Group for the gameplay feature. Do not add root-level gameplay events.
-4. Search exact instruction metadata for needed standard conditions/actions. Do not use JavaScript events unless the user explicitly requested JavaScript.
-5. Validate event JSON.
-6. Write with `add_scene_events` targeting that Group, or write then immediately move/wrap into the Group.
-7. Read events back and verify the new/changed events are grouped and not JavaScript events.
+3. Decide whether the feature belongs in an events-based object prefab, an events-based behavior, an existing built-in/community behavior, or thin scene orchestration. Prefer prefab/behavior implementation for reusable or object-local logic.
+4. If scene logic must command or observe a prefab, use signals for the scene-to-prefab or prefab-to-scene boundary whenever practical. Emit with `create_signal_emit_action`; receive in prefabs with `gdevelop_create_or_update_on_signal`.
+5. Find or create the semantic Group for any scene-level gameplay feature. Do not add root-level gameplay events.
+6. Search exact instruction metadata for needed standard conditions/actions. Do not use JavaScript events unless the user explicitly requested JavaScript.
+7. Validate event JSON.
+8. Write with `add_scene_events` targeting that Group, or write then immediately move/wrap into the Group.
+9. Read events back and verify the new/changed events are grouped and not JavaScript events.
 
 Create or edit an extension:
 
@@ -656,8 +665,10 @@ Save the project:
 - After writing events, confirm `subInstructionsPreserved` is true (or read back and verify nested conditions survived) — a "valid" write can still differ from intent if a wrong key dropped data. `compare_scene_events_semantics` can diff intended vs written.
 - Read `projectFolder` from `gdevelop_get_editor_state` before registering resources by relative path; the open project folder may not be your cwd.
 - Prefer `issueSummary.rootCauses` over reading every repeated validation issue; or pass `dedupe_errors: true` to validation to get grouped causes directly.
+- Prefer prefabs and behaviors over scene-only events for reusable gameplay logic; keep scene events thin and put repeated/object-local mechanics in events-based objects or events-based behaviors.
 - Prefer `list_available_behaviors` over guessing a `behavior_type` string for `add_behavior`.
 - Before hand-writing events to implement a common mechanic (jump/platformer, flash on hit, health/lives, draggable, screen wrap, follow/anchor, top-down/physics movement, tween, timer/destroy-outside), check for a ready-made behavior first: `list_available_behaviors` (installed) then `search_behavior_store` (community). Add it with `add_behavior` and configure it with `change_behavior_property` instead of reinventing it in events. Behaviors auto-add their required behaviors and refresh scene shared data.
+- Prefer signals for communication between scene-level orchestration and prefab internals. Use `create_signal_emit_action` in scene/external-scene events and `gdevelop_create_or_update_on_signal` for prefab receivers instead of reaching into child objects or duplicating prefab logic in the scene.
 - Prefer the per-error `parameterType`/`suggestion` and `literalSyntax` hints over guessing whether a parameter value needs quotes. For a `behavior`-type parameter, the metadata's `behaviorNameHint` tells you which behavior NAME to fill (the parameter's extraInfo is the required behavior TYPE, not the value to write).
 - Prefer `compact: true` on `gdevelop_search_instruction_metadata` and `gdevelop_get_instruction_metadata` when you only need types and parameter shapes, to keep responses small. Add `target_scope` when authoring scene or extension-function event bodies so compatibility is explicit.
 - Prefer `simulate_preview_input` to verify input-driven gameplay (movement, fire, restart) instead of editing variables as a hack; then inspect/screenshot to confirm. For the one-call, throttle-proof version use `run_frames`; use `clickAndHold` for mouse press/release timing and `include_cursor_world_coordinates` when layer/camera transforms affect hit testing.

@@ -87,6 +87,13 @@ const persistLayout = ({
   }
 };
 
+const getResizeEventDocument = (
+  event: SyntheticMouseEvent<HTMLDivElement>
+): Document =>
+  event.currentTarget.ownerDocument
+    ? event.currentTarget.ownerDocument
+    : document;
+
 const initialLayout: {|
   workingDeskHeight: number,
   toolsWidth: number,
@@ -501,11 +508,12 @@ export default class ResourcesEditor extends React.Component<Props, State> {
     });
   };
 
-  _startWorkingDeskResize = (event: MouseEvent) => {
+  _startWorkingDeskResize = (event: SyntheticMouseEvent<HTMLDivElement>) => {
     event.preventDefault();
     const mainColumn = this._mainColumn;
     if (!mainColumn) return;
     const bounds = mainColumn.getBoundingClientRect();
+    const eventDocument = getResizeEventDocument(event);
 
     const onMouseMove = (event: MouseEvent) => {
       const maxWorkingDeskHeight = Math.max(
@@ -521,18 +529,19 @@ export default class ResourcesEditor extends React.Component<Props, State> {
       });
     };
     const onMouseUp = () => {
-      document.removeEventListener('mousemove', onMouseMove);
-      document.removeEventListener('mouseup', onMouseUp);
+      eventDocument.removeEventListener('mousemove', onMouseMove);
+      eventDocument.removeEventListener('mouseup', onMouseUp);
     };
-    document.addEventListener('mousemove', onMouseMove);
-    document.addEventListener('mouseup', onMouseUp);
+    eventDocument.addEventListener('mousemove', onMouseMove);
+    eventDocument.addEventListener('mouseup', onMouseUp);
   };
 
-  _startToolsResize = (event: MouseEvent) => {
+  _startToolsResize = (event: SyntheticMouseEvent<HTMLDivElement>) => {
     event.preventDefault();
     const container = this._container;
     if (!container) return;
     const bounds = container.getBoundingClientRect();
+    const eventDocument = getResizeEventDocument(event);
 
     const onMouseMove = (event: MouseEvent) => {
       const maxToolsWidth = Math.max(minToolsWidth, bounds.width - 420);
@@ -545,11 +554,11 @@ export default class ResourcesEditor extends React.Component<Props, State> {
       });
     };
     const onMouseUp = () => {
-      document.removeEventListener('mousemove', onMouseMove);
-      document.removeEventListener('mouseup', onMouseUp);
+      eventDocument.removeEventListener('mousemove', onMouseMove);
+      eventDocument.removeEventListener('mouseup', onMouseUp);
     };
-    document.addEventListener('mousemove', onMouseMove);
-    document.addEventListener('mouseup', onMouseUp);
+    eventDocument.addEventListener('mousemove', onMouseMove);
+    eventDocument.addEventListener('mouseup', onMouseUp);
   };
 
   _onProjectFileSelected = (selectedProjectFile: ?ProjectFileSelection) => {

@@ -2231,9 +2231,9 @@ const MainFrame = (props: Props): React.MixedElement => {
   );
 
   const deleteLayout = (layout: gdLayout) => {
-    const { currentProject } = state;
+    const project = currentProject;
     const { i18n } = props;
-    if (!currentProject) return;
+    if (!project) return;
 
     const answer = Window.showConfirmDialog(
       i18n._(
@@ -2245,18 +2245,19 @@ const MainFrame = (props: Props): React.MixedElement => {
     setState(state => ({
       ...state,
       editorTabs: closeLayoutTabs(state.editorTabs, layout),
-    })).then(state => {
-      if (currentProject.getFirstLayout() === layout.getName())
-        currentProject.setFirstLayout('');
-      currentProject.removeLayout(layout.getName());
+    })).then(() => {
+      if (!isCurrentProjectFresh(currentProjectRef, project)) return;
+      if (project.getFirstLayout() === layout.getName())
+        project.setFirstLayout('');
+      project.removeLayout(layout.getName());
       _onProjectItemModified();
     });
   };
 
   const deleteExternalLayout = (externalLayout: gdExternalLayout) => {
-    const { currentProject } = state;
+    const project = currentProject;
     const { i18n } = props;
-    if (!currentProject) return;
+    if (!project) return;
 
     const answer = Window.showConfirmDialog(
       i18n._(
@@ -2268,16 +2269,17 @@ const MainFrame = (props: Props): React.MixedElement => {
     setState(state => ({
       ...state,
       editorTabs: closeExternalLayoutTabs(state.editorTabs, externalLayout),
-    })).then(state => {
-      if (state.currentProject)
-        state.currentProject.removeExternalLayout(externalLayout.getName());
+    })).then(() => {
+      if (!isCurrentProjectFresh(currentProjectRef, project)) return;
+      project.removeExternalLayout(externalLayout.getName());
       _onProjectItemModified();
     });
   };
 
   const deleteExternalEvents = (externalEvents: gdExternalEvents) => {
     const { i18n } = props;
-    if (!state.currentProject) return;
+    const project = currentProject;
+    if (!project) return;
 
     const answer = Window.showConfirmDialog(
       i18n._(
@@ -2289,9 +2291,9 @@ const MainFrame = (props: Props): React.MixedElement => {
     setState(state => ({
       ...state,
       editorTabs: closeExternalEventsTabs(state.editorTabs, externalEvents),
-    })).then(state => {
-      if (state.currentProject)
-        state.currentProject.removeExternalEvents(externalEvents.getName());
+    })).then(() => {
+      if (!isCurrentProjectFresh(currentProjectRef, project)) return;
+      project.removeExternalEvents(externalEvents.getName());
       _onProjectItemModified();
     });
   };
@@ -4629,7 +4631,7 @@ const MainFrame = (props: Props): React.MixedElement => {
 
   const onEventsBasedObjectChildrenEdited = React.useCallback(
     (eventsBasedObject: gdEventsBasedObject) => {
-      const project = state.currentProject;
+      const project = currentProject;
       if (!project) {
         return;
       }
@@ -4645,7 +4647,7 @@ const MainFrame = (props: Props): React.MixedElement => {
         }
       }
     },
-    [state.editorTabs, state.currentProject]
+    [currentProject, state.editorTabs]
   );
 
   const forceUpdateOpenedEditors = React.useCallback(
@@ -4695,7 +4697,7 @@ const MainFrame = (props: Props): React.MixedElement => {
 
   const onGlobalObjectEdited = React.useCallback(
     (object: gdObject) => {
-      const project = state.currentProject;
+      const project = currentProject;
       if (!project || project.getLayoutsCount() === 0) return;
 
       onSceneObjectEdited(project.getLayoutAt(0), {
@@ -4713,7 +4715,7 @@ const MainFrame = (props: Props): React.MixedElement => {
         }
       }
     },
-    [onSceneObjectEdited, state.currentProject, state.editorTabs]
+    [onSceneObjectEdited, currentProject, state.editorTabs]
   );
 
   const onSceneObjectsDeleted = React.useCallback(
@@ -6510,9 +6512,8 @@ const MainFrame = (props: Props): React.MixedElement => {
 
   useMainFrameCommands({
     i18n,
-    project: state.currentProject,
-    previewEnabled:
-      !!state.currentProject && state.currentProject.getLayoutsCount() > 0,
+    project: currentProject,
+    previewEnabled: !!currentProject && currentProject.getLayoutsCount() > 0,
     onOpenProjectManager: toggleProjectManager,
     hasPreviewsRunning: hasNonEditionPreviewsRunning,
     allowNetworkPreview:
@@ -6538,7 +6539,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       openShareDialog('publish');
     },
     onExportHtml5External: async () => {
-      const project = state.currentProject;
+      const project = currentProject;
       if (!project || !onExportHtml5External) return;
       try {
         await onExportHtml5External(project, i18n);
@@ -6564,7 +6565,7 @@ const MainFrame = (props: Props): React.MixedElement => {
   });
 
   useCliCommandRunner({
-    project: state.currentProject,
+    project: currentProject,
     i18n,
     commandPaletteRef,
   });
@@ -6899,7 +6900,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     openNewProjectDialog,
     closeNewProjectDialog,
   } = useNewProjectDialog({
-    project: state.currentProject,
+    project: currentProject,
     fileMetadata: currentFileMetadata,
     isProjectOpening,
     newProjectSetupDialogOpen,
@@ -6945,7 +6946,7 @@ const MainFrame = (props: Props): React.MixedElement => {
 
   const buildMainMenuProps = {
     i18n: i18n,
-    project: state.currentProject,
+    project: currentProject,
     canSaveProjectAs,
     recentProjectFiles: preferences.getRecentProjectFiles({ limit: 20 }),
     shortcutMap,
@@ -6983,7 +6984,7 @@ const MainFrame = (props: Props): React.MixedElement => {
   const isProjectOwnedBySomeoneElse =
     !!currentFileMetadata && !!currentFileMetadata.ownerId;
   const canSave =
-    !!state.currentProject &&
+    !!currentProject &&
     !isSavingProject &&
     (!currentFileMetadata || !isProjectOwnedBySomeoneElse);
 
@@ -7101,8 +7102,8 @@ const MainFrame = (props: Props): React.MixedElement => {
 
   const hasEditorsInLeftPane = hasEditorsInPane(state.editorTabs, 'left');
   const hasEditorsInRightPane = hasEditorsInPane(state.editorTabs, 'right');
-  const projectManagerTitle = state.currentProject
-    ? state.currentProject.getName()
+  const projectManagerTitle = currentProject
+    ? currentProject.getName()
     : i18n._(t`Menu`);
   const projectManagerNode = (
     <ProjectManager
@@ -7408,7 +7409,7 @@ const MainFrame = (props: Props): React.MixedElement => {
         renderShareDialog({
           onClose: closeShareDialog,
           onChangeSubscription: closeShareDialog,
-          project: state.currentProject,
+          project: currentProject,
           onSaveProject: saveProject,
           isSavingProject: isSavingProject,
           fileMetadata: currentFileMetadata,
@@ -7520,7 +7521,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       {renderVersionHistoryPanel()}
       {renderExtensionLoadErrorDialog()}
       <CloseConfirmDialog
-        shouldPrompt={!!state.currentProject}
+        shouldPrompt={!!currentProject}
         i18n={props.i18n}
         language={props.i18n.language}
         hasUnsavedChanges={hasUnsavedChanges}

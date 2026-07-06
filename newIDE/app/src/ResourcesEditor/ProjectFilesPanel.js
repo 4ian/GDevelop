@@ -133,6 +133,13 @@ const persistTreeWidth = (treeWidth: number) => {
   }
 };
 
+const getResizeEventDocument = (
+  event: SyntheticMouseEvent<HTMLDivElement>
+): Document =>
+  event.currentTarget.ownerDocument
+    ? event.currentTarget.ownerDocument
+    : document;
+
 const styles = {
   header: {
     display: 'flex',
@@ -2243,6 +2250,7 @@ const ProjectFilesPanel: React.ComponentType<{
         const content = contentRef.current;
         if (!content) return;
         const bounds = content.getBoundingClientRect();
+        const eventDocument = getResizeEventDocument(event);
 
         const onMouseMove = (event: MouseEvent) => {
           updateTreeWidth(
@@ -2254,11 +2262,11 @@ const ProjectFilesPanel: React.ComponentType<{
           );
         };
         const onMouseUp = () => {
-          document.removeEventListener('mousemove', onMouseMove);
-          document.removeEventListener('mouseup', onMouseUp);
+          eventDocument.removeEventListener('mousemove', onMouseMove);
+          eventDocument.removeEventListener('mouseup', onMouseUp);
         };
-        document.addEventListener('mousemove', onMouseMove);
-        document.addEventListener('mouseup', onMouseUp);
+        eventDocument.addEventListener('mousemove', onMouseMove);
+        eventDocument.addEventListener('mouseup', onMouseUp);
       },
       [updateTreeWidth]
     );

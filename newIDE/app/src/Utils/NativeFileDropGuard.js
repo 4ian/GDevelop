@@ -95,7 +95,32 @@ const dragEventHasNativeFiles = (event: any): boolean => {
 export const installNativeFileDropGuard = (
   targetDocument: any
 ): (() => void) => {
+  // TEMPORARY DIAGNOSTIC LOGGING (remove once the Windows drop is confirmed).
+  // Proves whether this guard is actually loaded and whether its handlers run.
+  // eslint-disable-next-line no-console
+  console.info('[NativeFileDropGuard] installed on', targetDocument);
+  let loggedOnce = false;
+
   const onDragOverOrEnter = (event: any) => {
+    if (!loggedOnce) {
+      loggedOnce = true;
+      let types: Array<string> = [];
+      try {
+        types = Array.from(
+          (event.dataTransfer && event.dataTransfer.types) || []
+        );
+      } catch (error) {
+        /* ignore */
+      }
+      // eslint-disable-next-line no-console
+      console.info('[NativeFileDropGuard] first drag event', {
+        type: event.type,
+        types,
+        internal: isInternalDrag(event),
+        onUninterceptable: isEventOnUninterceptableTarget(event),
+      });
+    }
+
     // Leave internal GDevelop drags and browser-native targets alone.
     if (isInternalDrag(event)) return;
     if (isEventOnUninterceptableTarget(event)) return;

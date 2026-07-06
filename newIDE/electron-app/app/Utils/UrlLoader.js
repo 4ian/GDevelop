@@ -8,15 +8,31 @@ const appPublicFolderBaseUrl = path.join(__dirname + '/../www');
 /**
  * Load the given path, relative to the app public folder.
  */
+const openDevTools = window => {
+  // In recent Electron versions (30+), `openDevTools` lives on `webContents`,
+  // not on `BrowserWindow`. Calling `window.openDevTools()` throws (silently, as
+  // it is not awaited/caught), which is why DevTools would not open. Prefer the
+  // `webContents` method and fall back to the legacy one for older versions.
+  try {
+    if (window.webContents && window.webContents.openDevTools) {
+      window.webContents.openDevTools();
+    } else if (typeof window.openDevTools === 'function') {
+      window.openDevTools();
+    }
+  } catch (error) {
+    console.error('Unable to open developer tools:', error);
+  }
+};
+
 const load = ({ isDev, devTools, path, window }) => {
   if (isDev) {
     // Development (server hosted by npm run start)
     window.loadURL(developmentServerBaseUrl + path);
-    window.openDevTools();
+    openDevTools(window);
   } else {
     // Production (with npm run build)
     window.loadURL('file://' + appPublicFolderBaseUrl + path);
-    if (devTools) window.openDevTools();
+    if (devTools) openDevTools(window);
   }
 };
 

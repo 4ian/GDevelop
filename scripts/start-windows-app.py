@@ -147,6 +147,58 @@ def quote_powershell_string(path: Path | str) -> str:
     return "'" + str(path).replace("'", "''") + "'"
 
 
+def is_running_as_administrator() -> bool:
+    """Return True if the current process has an elevated (Administrator) token.
+
+    Only meaningful on Windows; returns False on other platforms.
+    """
+    if os.name != "nt":
+        return False
+
+    try:
+        import ctypes
+
+        # IsUserAnAdmin() returns non-zero when the process runs elevated.
+        return bool(ctypes.windll.shell32.IsUserAnAdmin())
+    except Exception:
+        # If we cannot determine the elevation state, do not block the user.
+        return False
+
+
+def ensure_not_running_as_administrator() -> None:
+    """Refuse to run elevated: Administrator breaks drag-and-drop on Windows.
+
+    When GDevelop runs as Administrator (High integrity level), Windows' User
+    Interface Privilege Isolation (UIPI) silently blocks drag-and-drop coming
+    from normal-integrity processes such as Explorer. The result is that
+    dragging an image onto the scene canvas shows the "blocked" cursor and does
+    nothing. Running GDevelop as a normal user keeps it at the same integrity
+    level as Explorer, so drag-and-drop works. GDevelop does not need
+    Administrator rights for normal use.
+    """
+    if not is_running_as_administrator():
+        return
+
+    print(
+        "\n".join(
+            [
+                "ERROR: GDevelop must not be started as Administrator on Windows.",
+                "",
+                "Running elevated breaks drag-and-drop (e.g. dragging an image onto",
+                "the scene canvas): Windows blocks drops from normal programs like",
+                "Explorer into an Administrator process (UIPI), so you only get the",
+                '"blocked" cursor.',
+                "",
+                "How to fix: close this window and run the script again from a NORMAL",
+                "(non-elevated) terminal. Do NOT use 'Run as administrator'. GDevelop",
+                "does not need Administrator rights.",
+            ]
+        ),
+        file=sys.stderr,
+        flush=True,
+    )
+
+
 def stop_existing_processes(repo_root: Path, electron_exe: Path, dry_run: bool) -> None:
     step("Stop existing GDevelop Electron processes")
     script = f"""
@@ -324,6 +376,13 @@ $windows | Select-Object Id,MainWindowTitle,StartTime | Format-Table -AutoSize
 
 def main() -> int:
     args = parse_args()
+
+    # Refuse to run elevated: Administrator breaks drag-and-drop on Windows
+    # (see ensure_not_running_as_administrator). Checked before doing any work.
+    if is_running_as_administrator():
+        ensure_not_running_as_administrator()
+        return 1
+
     repo_root = args.repo_root.resolve()
     app_dir = repo_root / "newIDE" / "app"
     electron_app_dir = repo_root / "newIDE" / "electron-app"

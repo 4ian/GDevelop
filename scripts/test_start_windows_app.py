@@ -71,6 +71,49 @@ class StartWindowsAppScriptTest(unittest.TestCase):
         self.assertEqual(run.call_args.kwargs["encoding"], "utf-8")
         self.assertEqual(run.call_args.kwargs["errors"], "replace")
 
+    def test_refuses_to_run_as_administrator(self):
+        module = load_script_module()
+
+        with mock.patch.object(sys, "argv", [str(SCRIPT), "--dry-run", "--no-launch"]):
+            with mock.patch.object(
+                module, "is_running_as_administrator", return_value=True
+            ):
+                with mock.patch.object(module, "stop_existing_processes") as stop:
+                    exit_code = module.main()
+
+        # Must exit with an error and must NOT start doing any work.
+        self.assertEqual(exit_code, 1)
+        stop.assert_not_called()
+
+    def test_admin_error_message_is_actionable(self):
+        module = load_script_module()
+
+        with mock.patch.object(
+            module, "is_running_as_administrator", return_value=True
+        ):
+            with mock.patch("builtins.print") as printed:
+                module.ensure_not_running_as_administrator()
+
+        printed_text = "\n".join(
+            str(call.args[0]) for call in printed.call_args_list if call.args
+        )
+        self.assertIn("must not be started as Administrator", printed_text)
+        self.assertIn("drag-and-drop", printed_text)
+        self.assertIn("non-elevated", printed_text)
+
+    def test_normal_user_is_not_blocked(self):
+        module = load_script_module()
+
+        # A non-elevated run should pass the guard (returns None, no output).
+        with mock.patch.object(
+            module, "is_running_as_administrator", return_value=False
+        ):
+            with mock.patch("builtins.print") as printed:
+                result = module.ensure_not_running_as_administrator()
+
+        self.assertIsNone(result)
+        printed.assert_not_called()
+
     def test_stop_process_scripts_are_best_effort(self):
         module = load_script_module()
         electron_exe = (

@@ -23,11 +23,7 @@ import { type EditorMosaicNode } from '../../UI/EditorMosaic';
 import { type FileMetadataAndStorageProviderName } from '../../ProjectsStorage';
 import defaultShortcuts from '../../KeyboardShortcuts/DefaultShortcuts';
 import { type CommandName } from '../../CommandPalette/CommandsList';
-import {
-  getBrowserLanguageOrLocale,
-  setLanguageInDOM,
-  selectLanguageOrLocale,
-} from '../../Utils/Language';
+import { setLanguageInDOM } from '../../Utils/Language';
 import { type GamesDashboardOrderBy } from '../../GameDashboard/GamesList';
 import {
   CHECK_APP_UPDATES_TIMEOUT,
@@ -149,15 +145,7 @@ export const getInitialPreferences = (): {
   userShortcutMap: {},
   watchProjectFolderFilesForLocalProjects: boolean,
 } => {
-  let languageOrLocale = 'en';
-  const browserLanguageOrLocale = getBrowserLanguageOrLocale();
-  if (browserLanguageOrLocale)
-    languageOrLocale = selectLanguageOrLocale(
-      browserLanguageOrLocale,
-      languageOrLocale
-    );
-
-  return { ...initialPreferences.values, language: languageOrLocale };
+  return { ...initialPreferences.values };
 };
 
 const mcpServerAuthorizationTokenPrefix = 'mcp';

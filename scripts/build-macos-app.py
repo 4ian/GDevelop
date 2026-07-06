@@ -14,8 +14,11 @@ app and choose "Open", or run
 The absolute path to the produced ``.dmg`` is printed at the end so it can be
 copied and distributed elsewhere. By default the ``.dmg`` is then uploaded to a
 GitHub release (``zhouzhipeng/GDevelop`` tag ``latest`` by default) using the
-``gh`` CLI; pass ``--no-upload`` to skip this, or ``--release-repo`` /
-``--release-tag`` to target a different release.
+``gh`` CLI. If ``gh`` is missing it is installed automatically with Homebrew
+(pass ``--no-auto-install-gh`` to disable). Pass ``--no-upload`` to skip the
+upload, ``--upload-only`` to upload an already-built ``.dmg`` without
+rebuilding, or ``--release-repo`` / ``--release-tag`` to target a different
+release.
 """
 
 from __future__ import annotations
@@ -82,11 +85,30 @@ def parse_args() -> argparse.Namespace:
         help="Tag of the GitHub release to upload the .dmg to.",
     )
     parser.add_argument(
+        "--upload-only",
+        action="store_true",
+        help=(
+            "Skip building/packaging entirely and only upload the .dmg already "
+            "present in newIDE/electron-app/dist to the GitHub release. Useful to "
+            "retry the upload after a successful build (e.g. once gh is installed)."
+        ),
+    )
+    parser.add_argument(
+        "--no-auto-install-gh",
+        dest="auto_install_gh",
+        action="store_false",
+        help=(
+            "Do not attempt to auto-install the GitHub CLI (gh) when it is "
+            "missing. By default gh is installed via Homebrew if the upload step "
+            "cannot find it."
+        ),
+    )
+    parser.add_argument(
         "--dry-run",
         action="store_true",
         help="Print the planned commands without running them.",
     )
-    parser.set_defaults(upload=True)
+    parser.set_defaults(upload=True, auto_install_gh=True)
     return parser.parse_args()
 
 
@@ -99,6 +121,87 @@ def resolve_tool(name: str) -> str:
     if resolved:
         return resolved
     raise RuntimeError(f"Could not find required tool on PATH: {name}")
+
+
+def _find_gh_in_known_locations() -> str | None:
+    """Return a path to ``gh`` from PATH or its usual install dirs, else None.
+
+    Homebrew installs ``gh`` to ``/opt/homebrew/bin`` (Apple Silicon) or
+    ``/usr/local/bin`` (Intel), which are not always on the PATH of a
+    non-interactive/non-login shell. Check those locations too.
+    """
+    try:
+        return resolve_tool("gh")
+    except RuntimeError:
+        pass
+
+    for candidate in (
+        Path("/opt/homebrew/bin/gh"),
+        Path("/usr/local/bin/gh"),
+        Path("/usr/bin/gh"),
+    ):
+        if candidate.exists():
+            return str(candidate)
+    return None
+
+
+def _auto_install_gh(dry_run: bool) -> bool:
+    """Try to install the GitHub CLI with Homebrew.
+
+    Returns True if an installer command ran (or would run in dry-run), False if
+    Homebrew is not available. Never raises: a failed installer just returns True
+    and the caller re-probes for gh.
+    """
+    step("Install GitHub CLI (gh)")
+
+    if not shutil.which("brew"):
+        print(
+            "Homebrew (brew) not found; cannot auto-install gh. Install it from "
+            "https://brew.sh/ or https://cli.github.com/.",
+            flush=True,
+        )
+        return False
+
+    command = [resolve_tool("brew"), "install", "gh"]
+    print("Found package manager 'brew'; installing gh...", flush=True)
+    print(f"[run] {command_line(command)}", flush=True)
+    if dry_run:
+        return True
+    try:
+        subprocess.run(command, check=True)
+    except (subprocess.CalledProcessError, OSError) as error:
+        print(f"WARNING: 'brew' failed to install gh: {error}", flush=True)
+    return True
+
+
+def resolve_gh(*, auto_install: bool = True, dry_run: bool = False) -> str:
+    """Locate the GitHub CLI (``gh``), installing it automatically if missing.
+
+    Looks on PATH and in gh's usual install locations first. If still missing and
+    ``auto_install`` is set, installs it with Homebrew and probes again.
+    """
+    found = _find_gh_in_known_locations()
+    if found:
+        return found
+
+    if auto_install and _auto_install_gh(dry_run):
+        if dry_run:
+            return "gh"
+        found = _find_gh_in_known_locations()
+        if found:
+            print(f"✅ gh installed: {found}", flush=True)
+            return found
+        print(
+            "WARNING: gh was installed but is not yet visible on PATH. You may "
+            "need to open a new terminal.",
+            flush=True,
+        )
+
+    raise RuntimeError(
+        "Could not find or install the GitHub CLI (gh). Install it from "
+        "https://cli.github.com/ (on macOS: `brew install gh`) and make sure "
+        "`gh auth login` has been run, then retry the upload."
+    )
 
 
 def command_line(command: list[str]) -> str:
@@ -238,6 +341,7 @@ def upload_artifact(
     release_repo: str,
     release_tag: str,
     dry_run: bool,
+    auto_install_gh: bool = True,
 ) -> None:
     step(f"Upload distributable to GitHub release {release_repo}@{release_tag}")
 
@@ -268,11 +372,9 @@ def upload_artifact(
             f"No .dmg found to upload in {dist_dir}. Nothing was uploaded."
         )
 
-    gh = resolve_tool("gh")
     # `--clobber` replaces an existing asset of the same name so re-runs update
     # the release in place instead of failing on a duplicate asset.
-    command = [
-        gh,
+    upload_arguments = [
         "release",
         "upload",
         release_tag,
@@ -281,6 +383,24 @@ def upload_artifact(
         release_repo,
         "--clobber",
     ]
+
+    try:
+        gh = resolve_gh(auto_install=auto_install_gh, dry_run=dry_run)
+    except RuntimeError as error:
+        # The .dmg already exists on disk; don't lose it just because gh is
+        # missing. Explain how to upload it manually and re-raise so the run
+        # still reports failure.
+        print(f"❌ {error}", flush=True)
+        print(
+            "\nThe .dmg was built successfully and is still available at:\n"
+            f"\n  {dmg.resolve()}\n"
+            "\nOnce gh is installed and authenticated, upload it with:\n"
+            f'\n  gh {command_line(upload_arguments)}\n',
+            flush=True,
+        )
+        raise
+
+    command = [gh, *upload_arguments]
     print(f"[run] {dist_dir}> {command_line(command)}", flush=True)
     subprocess.run(command, cwd=dist_dir, check=True)
 
@@ -306,6 +426,25 @@ def main() -> int:
         print("DRY RUN: no commands will be executed.", flush=True)
 
     try:
+        if args.upload_only:
+            # Reuse the already-built .dmg from a previous run; skip every
+            # build/package step and go straight to uploading.
+            print(
+                "Upload-only mode: skipping build/package and uploading the "
+                "existing .dmg.",
+                flush=True,
+            )
+            dmg = report_artifact(dist_dir, args.dry_run)
+            upload_artifact(
+                dmg,
+                dist_dir,
+                release_repo=args.release_repo,
+                release_tag=args.release_tag,
+                dry_run=args.dry_run,
+                auto_install_gh=args.auto_install_gh,
+            )
+            return 0
+
         ensure_electron_dependencies(electron_app_dir, electron_builder, args.dry_run)
         ensure_react_app_dependencies(app_dir, args.dry_run)
         build_libgd(
@@ -324,6 +463,7 @@ def main() -> int:
                 release_repo=args.release_repo,
                 release_tag=args.release_tag,
                 dry_run=args.dry_run,
+                auto_install_gh=args.auto_install_gh,
             )
         else:
             print(

@@ -13,6 +13,7 @@ import {
 import { registerServiceWorker } from './ServiceWorkerSetup';
 import './UI/icomoon-font.css'; // Styles for Icomoon font.
 import optionalRequire from './Utils/OptionalRequire';
+import { installNativeFileDropGuard } from './Utils/NativeFileDropGuard';
 import { loadScript } from './Utils/LoadScript';
 import { showErrorBox } from './UI/Messages/MessageBox';
 import VersionMetadata from './Version/VersionMetadata';
@@ -66,6 +67,11 @@ class Bootstrapper extends Component<{}, State> {
 
   componentDidMount() {
     installAnalyticsEvents();
+    // Keep the whole window a valid drop target for native OS file drags.
+    // Without this, dropping an image onto the scene canvas fails on Windows
+    // (Chromium rejects the drop and/or navigates to the file) even though it
+    // works on macOS. See Utils/NativeFileDropGuard for details.
+    installNativeFileDropGuard(document);
     GD_STARTUP_TIMES.push(['bootstrapperComponentDidMount', performance.now()]);
 
     // Load GDevelop.js, ensuring a new version is fetched when the version changes.

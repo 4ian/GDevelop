@@ -24,8 +24,11 @@ environment intact and produce a signed installer.)
 The absolute path to the produced installer ``.exe`` is printed at the end so it
 can be copied and distributed elsewhere. By default the installer is then
 uploaded to a GitHub release (``zhouzhipeng/GDevelop`` tag ``latest`` by
-default) using the ``gh`` CLI; pass ``--no-upload`` to skip this, or
-``--release-repo`` / ``--release-tag`` to target a different release.
+default) using the ``gh`` CLI. If ``gh`` is missing it is installed
+automatically with winget/scoop/choco (pass ``--no-auto-install-gh`` to
+disable). Pass ``--no-upload`` to skip the upload, ``--upload-only`` to upload
+an already-built installer without rebuilding, or ``--release-repo`` /
+``--release-tag`` to target a different release.
 """
 
 from __future__ import annotations
@@ -99,11 +102,31 @@ def parse_args() -> argparse.Namespace:
         help="Tag of the GitHub release to upload the installer to.",
     )
     parser.add_argument(
+        "--upload-only",
+        action="store_true",
+        help=(
+            "Skip building/packaging entirely and only upload the installer .exe "
+            "already present in newIDE/electron-app/dist to the GitHub release. "
+            "Useful to retry the upload after a successful build (e.g. once gh is "
+            "installed)."
+        ),
+    )
+    parser.add_argument(
+        "--no-auto-install-gh",
+        dest="auto_install_gh",
+        action="store_false",
+        help=(
+            "Do not attempt to auto-install the GitHub CLI (gh) when it is "
+            "missing. By default gh is installed via winget/scoop/choco if the "
+            "upload step cannot find it."
+        ),
+    )
+    parser.add_argument(
         "--dry-run",
         action="store_true",
         help="Print the planned commands without running them.",
     )
-    parser.set_defaults(upload=True)
+    parser.set_defaults(upload=True, auto_install_gh=True)
     return parser.parse_args()
 
 
@@ -118,6 +141,140 @@ def resolve_tool(name: str) -> str:
         if resolved:
             return resolved
     raise RuntimeError(f"Could not find required tool on PATH: {name}")
+
+
+def _find_gh_in_known_locations() -> str | None:
+    """Return a path to ``gh`` from PATH or its usual install dirs, else None.
+
+    On Windows the GitHub CLI installs to a fixed ``Program Files`` location that
+    is only added to PATH for new shells, so a build run in the same terminal
+    that installed it (or a non-login shell) often can't see ``gh`` yet even
+    though it is installed. Check the well-known install locations too.
+    """
+    try:
+        return resolve_tool("gh")
+    except RuntimeError:
+        pass
+
+    fallback_candidates: list[Path] = []
+    if os.name == "nt":
+        program_files_dirs = [
+            os.environ.get("ProgramFiles", r"C:\Program Files"),
+            os.environ.get("ProgramFiles(x86)", r"C:\Program Files (x86)"),
+            os.environ.get("LOCALAPPDATA", ""),
+        ]
+        for base in program_files_dirs:
+            if not base:
+                continue
+            fallback_candidates.append(Path(base) / "GitHub CLI" / "gh.exe")
+        # winget/scoop style user install locations.
+        local_app_data = os.environ.get("LOCALAPPDATA", "")
+        if local_app_data:
+            fallback_candidates.append(
+                Path(local_app_data) / "Microsoft" / "WinGet" / "Links" / "gh.exe"
+            )
+            fallback_candidates.append(
+                Path(local_app_data) / "Programs" / "GitHub CLI" / "gh.exe"
+            )
+        user_profile = os.environ.get("USERPROFILE", "")
+        if user_profile:
+            fallback_candidates.append(
+                Path(user_profile) / "scoop" / "shims" / "gh.exe"
+            )
+    else:
+        fallback_candidates.extend(
+            [
+                Path("/opt/homebrew/bin/gh"),
+                Path("/usr/local/bin/gh"),
+                Path("/usr/bin/gh"),
+            ]
+        )
+
+    for candidate in fallback_candidates:
+        if candidate.exists():
+            return str(candidate)
+    return None
+
+
+def _auto_install_gh(dry_run: bool) -> bool:
+    """Try to install the GitHub CLI with an available package manager.
+
+    Returns True if an installer command ran (or would run in dry-run), False if
+    no supported package manager was found. Never raises: a failed installer just
+    returns True and the caller re-probes for gh.
+    """
+    step("Install GitHub CLI (gh)")
+
+    # (package manager executable, install command). The first manager found on
+    # PATH is used.
+    if os.name == "nt":
+        managers = [
+            ("winget", ["winget", "install", "--id", "GitHub.cli", "--silent",
+                        "--accept-package-agreements", "--accept-source-agreements"]),
+            ("scoop", ["scoop", "install", "gh"]),
+            ("choco", ["choco", "install", "gh", "-y"]),
+        ]
+    else:
+        managers = [
+            ("brew", ["brew", "install", "gh"]),
+        ]
+
+    for manager, command in managers:
+        if not shutil.which(manager):
+            continue
+        print(f"Found package manager '{manager}'; installing gh...", flush=True)
+        print(f"[run] {command_line(command)}", flush=True)
+        if dry_run:
+            return True
+        try:
+            subprocess.run(command, check=True)
+        except (subprocess.CalledProcessError, OSError) as error:
+            print(
+                f"WARNING: '{manager}' failed to install gh: {error}",
+                flush=True,
+            )
+        return True
+
+    manager_names = ", ".join(name for name, _ in managers)
+    print(
+        f"No supported package manager found (looked for: {manager_names}). "
+        "Cannot auto-install gh.",
+        flush=True,
+    )
+    return False
+
+
+def resolve_gh(*, auto_install: bool = True, dry_run: bool = False) -> str:
+    """Locate the GitHub CLI (``gh``), installing it automatically if missing.
+
+    Looks on PATH and in gh's usual install locations first. If still missing and
+    ``auto_install`` is set, installs it with the platform package manager
+    (winget/scoop/choco on Windows, Homebrew on macOS) and probes again.
+    """
+    found = _find_gh_in_known_locations()
+    if found:
+        return found
+
+    if auto_install and _auto_install_gh(dry_run):
+        if dry_run:
+            # Nothing was actually installed; report the command gh would be.
+            return "gh"
+        found = _find_gh_in_known_locations()
+        if found:
+            print(f"✅ gh installed: {found}", flush=True)
+            return found
+        print(
+            "WARNING: gh was installed but is not yet visible on PATH. You may "
+            "need to open a new terminal.",
+            flush=True,
+        )
+
+    raise RuntimeError(
+        "Could not find or install the GitHub CLI (gh). Install it from "
+        "https://cli.github.com/ (on Windows: `winget install --id GitHub.cli`; "
+        "on macOS: `brew install gh`) and make sure `gh auth login` has been "
+        "run, then retry the upload."
+    )
 
 
 def command_line(command: list[str]) -> str:
@@ -310,6 +467,7 @@ def upload_artifact(
     release_repo: str,
     release_tag: str,
     dry_run: bool,
+    auto_install_gh: bool = True,
 ) -> None:
     step(f"Upload distributable to GitHub release {release_repo}@{release_tag}")
 
@@ -342,11 +500,9 @@ def upload_artifact(
             f"No installer .exe found to upload in {dist_dir}. Nothing was uploaded."
         )
 
-    gh = resolve_tool("gh")
     # `--clobber` replaces an existing asset of the same name so re-runs update
     # the release in place instead of failing on a duplicate asset.
-    command = [
-        gh,
+    upload_arguments = [
         "release",
         "upload",
         release_tag,
@@ -355,6 +511,24 @@ def upload_artifact(
         release_repo,
         "--clobber",
     ]
+
+    try:
+        gh = resolve_gh(auto_install=auto_install_gh, dry_run=dry_run)
+    except RuntimeError as error:
+        # The installer already exists on disk; don't lose it just because gh is
+        # missing. Explain how to upload it manually and re-raise so the run
+        # still reports failure.
+        print(f"❌ {error}", flush=True)
+        print(
+            "\nThe installer was built successfully and is still available at:\n"
+            f"\n  {installer.resolve()}\n"
+            "\nOnce gh is installed and authenticated, upload it with:\n"
+            f'\n  gh {command_line(upload_arguments)}\n',
+            flush=True,
+        )
+        raise
+
+    command = [gh, *upload_arguments]
     print(f"[run] {dist_dir}> {command_line(command)}", flush=True)
     subprocess.run(command, cwd=dist_dir, check=True)
 
@@ -384,6 +558,25 @@ def main() -> int:
         print("DRY RUN: no commands will be executed.", flush=True)
 
     try:
+        if args.upload_only:
+            # Reuse the already-built installer from a previous run; skip every
+            # build/package step and go straight to uploading.
+            print(
+                "Upload-only mode: skipping build/package and uploading the "
+                "existing installer.",
+                flush=True,
+            )
+            installer = report_artifact(dist_dir, args.dry_run)
+            upload_artifact(
+                installer,
+                dist_dir,
+                release_repo=args.release_repo,
+                release_tag=args.release_tag,
+                dry_run=args.dry_run,
+                auto_install_gh=args.auto_install_gh,
+            )
+            return 0
+
         ensure_electron_dependencies(electron_app_dir, electron_builder, args.dry_run)
         ensure_react_app_dependencies(app_dir, args.dry_run)
         build_libgd(
@@ -404,6 +597,7 @@ def main() -> int:
                 release_repo=args.release_repo,
                 release_tag=args.release_tag,
                 dry_run=args.dry_run,
+                auto_install_gh=args.auto_install_gh,
             )
         else:
             print(

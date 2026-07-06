@@ -982,6 +982,28 @@ describe('editorFunctions', () => {
       expect(properties.get('shadowAngle').getValue()).toBe('20');
     });
 
+    it('lists the available properties only once when several properties are not found', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_object_property.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'MyTextObject',
+            changed_properties: [
+              { property_name: 'fontSize', new_value: '56' },
+              { property_name: 'scaleX', new_value: '2' },
+              { property_name: 'wrongProperty', new_value: '3' },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(false);
+      expect(
+        (result.message || '').split('Available properties:').length - 1
+      ).toBe(1);
+    });
+
     it('reports the FINAL renamed name when a collision forces a suffix', async () => {
       // The scene already has another object named "Foo": renaming
       // MyTextObject -> Foo must collide and end up as "Foo2".
@@ -2986,9 +3008,6 @@ describe('editorFunctions', () => {
       });
     });
 
-    // The 3D line brush used to silently skip positioning when
-    // brush_end_position was missing, leaving every instance at (0,0,0)
-    // (the 2D variant already had this guard).
     it('fails without creating instances when the line brush lacks brush_end_position', async () => {
       const result = await editorFunctions.put_3d_instances.launchFunction({
         ...makeFakeLaunchFunctionOptionsWithProject(project),

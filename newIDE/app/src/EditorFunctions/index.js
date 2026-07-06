@@ -509,9 +509,16 @@ const serializeNamedProperty = (
 
 // List the (visible) property names so a "property not found" warning lets
 // the caller immediately pick the right name instead of guessing again.
+// Emitted at most once per call: if a previous warning already lists the
+// properties (e.g. several unknown properties in the same call), returns "".
 const getAvailablePropertyNamesText = (
-  properties: gdMapStringPropertyDescriptor | null
+  properties: gdMapStringPropertyDescriptor | null,
+  existingWarnings: Array<string>
 ): string => {
+  if (
+    existingWarnings.some(warning => warning.includes('Available properties:'))
+  )
+    return '';
   if (!properties) return '';
   const names = properties
     .keys()
@@ -1584,7 +1591,8 @@ const applyObjectPropertyChange = ({
     }
     warnings.push(
       `Property "${propertyName}" not found on object "${object_name}".${getAvailablePropertyNamesText(
-        objectProperties
+        objectProperties,
+        warnings
       )}`
     );
     return;
@@ -2898,7 +2906,8 @@ const changeBehaviorProperty: EditorFunction = {
       } else {
         warnings.push(
           `Property "${propertyName}" not on behavior "${behavior_name}" of "${object_name}".${getAvailablePropertyNamesText(
-            behaviorProperties
+            behaviorProperties,
+            warnings
           )}`
         );
       }

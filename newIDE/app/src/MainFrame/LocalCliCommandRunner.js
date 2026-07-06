@@ -12,6 +12,7 @@ import PreferencesContext, {
 import { scanProjectForValidationErrors } from '../Utils/EventsValidationScanner';
 import Window from '../Utils/Window';
 import optionalRequire from '../Utils/OptionalRequire';
+import { type FileMetadata } from '../ProjectsStorage';
 
 const electron = optionalRequire('electron');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
@@ -30,6 +31,9 @@ export type CliCommandRunner = (
       project: gdProject,
       filePaths: Array<string>
     ) => Promise<void>,
+    saveProject: (options?: {|
+      skipNewVersionWarning: boolean,
+    |}) => Promise<?FileMetadata>,
   |}
 ) => Promise<void>;
 
@@ -58,7 +62,7 @@ const runners: { [commandName: string]: CliCommandRunner } = {
   IMPORT_EXTENSION: async (
     project,
     i18n,
-    { commandArgs, importExtensionFromFilePaths }
+    { commandArgs, importExtensionFromFilePaths, saveProject }
   ) => {
     if (commandArgs.length === 0) {
       throw new Error(
@@ -71,6 +75,11 @@ const runners: { [commandName: string]: CliCommandRunner } = {
       );
     }
     await importExtensionFromFilePaths(project, commandArgs);
+
+    const fileMetadata = await saveProject({ skipNewVersionWarning: true });
+    if (!fileMetadata) {
+      throw new Error('[CLI] Extension imported but project save failed.');
+    }
   },
 };
 
@@ -121,6 +130,9 @@ type Props = {|
     project: gdProject,
     filePaths: Array<string>
   ) => Promise<void>,
+  saveProject: (options?: {|
+    skipNewVersionWarning: boolean,
+  |}) => Promise<?FileMetadata>,
 |};
 
 export const useCliCommandRunner = ({
@@ -128,6 +140,7 @@ export const useCliCommandRunner = ({
   i18n,
   commandPaletteRef,
   importExtensionFromFilePaths,
+  saveProject,
 }: Props) => {
   const eventsFunctionsExtensionsState = React.useContext(
     EventsFunctionsExtensionsContext
@@ -166,6 +179,7 @@ export const useCliCommandRunner = ({
               preferences,
               commandArgs: getCommandArgs(),
               importExtensionFromFilePaths,
+              saveProject,
             });
             console.info(
               `[CLI] Command "${commandName}" finished successfully.`
@@ -206,6 +220,7 @@ export const useCliCommandRunner = ({
       eventsFunctionsExtensionsState,
       preferences,
       importExtensionFromFilePaths,
+      saveProject,
     ]
   );
 

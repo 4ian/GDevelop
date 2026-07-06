@@ -5251,6 +5251,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     i18n,
     commandPaletteRef,
     importExtensionFromFilePaths,
+    saveProject,
   });
 
   const resourceManagementProps: ResourceManagementProps = React.useMemo(

@@ -393,6 +393,29 @@ const makeGenericFailure = (message: string): EditorFunctionGenericOutput => ({
   message,
 });
 
+const getSceneNotFoundMessage = (
+  project: gdProject,
+  sceneName: string
+): string => {
+  const sceneNames = mapFor(
+    0,
+    project.getLayoutsCount(),
+    i => `"${project.getLayoutAt(i).getName()}"`
+  );
+  return (
+    `Scene not found: "${sceneName}". ` +
+    (sceneNames.length > 0
+      ? `Scenes in this project: ${sceneNames.join(', ')}.`
+      : 'The project has no scenes.')
+  );
+};
+
+const makeSceneNotFoundFailure = (
+  project: gdProject,
+  sceneName: string
+): EditorFunctionGenericOutput =>
+  makeGenericFailure(getSceneNotFoundMessage(project, sceneName));
+
 const injectObjectSizeInfo = (
   output: EditorFunctionGenericOutput,
   objectSizeInfoByName: { [string]: ObjectSizeInfo | null }
@@ -907,7 +930,7 @@ const createOrReplaceObject: EditorFunction = {
     );
 
     if (!project.hasLayoutNamed(scene_name)) {
-      return makeGenericFailure(`Scene not found: "${scene_name}".`);
+      return makeSceneNotFoundFailure(project, scene_name);
     }
 
     const layout = project.getLayout(scene_name);
@@ -1281,7 +1304,10 @@ const createOrReplaceObject: EditorFunction = {
         !project.hasLayoutNamed(duplicatedObjectSceneName)
       ) {
         return makeGenericFailure(
-          `Scene not found: "${duplicatedObjectSceneName}". Not duplicated.`
+          `${getSceneNotFoundMessage(
+            project,
+            duplicatedObjectSceneName
+          )} Not duplicated.`
         );
       }
 
@@ -1653,7 +1679,7 @@ const inspectObjectPropertiesEffects: EditorFunction = {
     const object_name = extractRequiredString(args, 'object_name');
 
     if (!project.hasLayoutNamed(scene_name)) {
-      return makeGenericFailure(`Scene not found: "${scene_name}".`);
+      return makeSceneNotFoundFailure(project, scene_name);
     }
 
     const layout = project.getLayout(scene_name);
@@ -1944,7 +1970,7 @@ const changeObjectPropertiesEffects: EditorFunction = {
       SafeExtractor.extractArrayProperty(args, 'changed_effects') || [];
 
     if (!project.hasLayoutNamed(scene_name)) {
-      return makeGenericFailure(`Scene not found: "${scene_name}".`);
+      return makeSceneNotFoundFailure(project, scene_name);
     }
 
     const layout = project.getLayout(scene_name);
@@ -2168,7 +2194,7 @@ const addBehavior: EditorFunction = {
     );
 
     if (!project.hasLayoutNamed(scene_name)) {
-      return makeGenericFailure(`Scene not found: "${scene_name}".`);
+      return makeSceneNotFoundFailure(project, scene_name);
     }
 
     const layout = project.getLayout(scene_name);
@@ -2330,7 +2356,7 @@ const removeBehavior: EditorFunction = {
     const behavior_name = extractRequiredString(args, 'behavior_name');
 
     if (!project.hasLayoutNamed(scene_name)) {
-      return makeGenericFailure(`Scene not found: "${scene_name}".`);
+      return makeSceneNotFoundFailure(project, scene_name);
     }
 
     const layout = project.getLayout(scene_name);
@@ -2410,7 +2436,7 @@ const inspectBehaviorProperties: EditorFunction = {
     const behavior_name = extractRequiredString(args, 'behavior_name');
 
     if (!project.hasLayoutNamed(scene_name)) {
-      return makeGenericFailure(`Scene not found: "${scene_name}".`);
+      return makeSceneNotFoundFailure(project, scene_name);
     }
 
     const layout = project.getLayout(scene_name);
@@ -2653,7 +2679,7 @@ const changeBehaviorProperty: EditorFunction = {
       SafeExtractor.extractArrayProperty(args, 'changed_properties') || [];
 
     if (!project.hasLayoutNamed(scene_name)) {
-      return makeGenericFailure(`Scene not found: "${scene_name}".`);
+      return makeSceneNotFoundFailure(project, scene_name);
     }
 
     const layout = project.getLayout(scene_name);
@@ -2896,7 +2922,7 @@ const describeInstances: EditorFunction = {
     );
 
     if (!project.hasLayoutNamed(scene_name)) {
-      return makeGenericFailure(`Scene not found: "${scene_name}".`);
+      return makeSceneNotFoundFailure(project, scene_name);
     }
 
     const layout = project.getLayout(scene_name);
@@ -3147,7 +3173,7 @@ const put2dInstances: EditorFunction = {
     );
 
     if (!project.hasLayoutNamed(scene_name)) {
-      return makeGenericFailure(`Scene not found: "${scene_name}".`);
+      return makeSceneNotFoundFailure(project, scene_name);
     }
 
     const layout = project.getLayout(scene_name);
@@ -3850,7 +3876,7 @@ const put3dInstances: EditorFunction = {
     );
 
     if (!project.hasLayoutNamed(scene_name)) {
-      return makeGenericFailure(`Scene not found: "${scene_name}".`);
+      return makeSceneNotFoundFailure(project, scene_name);
     }
 
     const layout = project.getLayout(scene_name);
@@ -4374,7 +4400,7 @@ const readSceneEvents: EditorFunction = {
     const scene_name = extractRequiredString(args, 'scene_name');
 
     if (!project.hasLayoutNamed(scene_name)) {
-      return makeGenericFailure(`Scene not found: "${scene_name}".`);
+      return makeSceneNotFoundFailure(project, scene_name);
     }
 
     const scene = project.getLayout(scene_name);
@@ -4690,7 +4716,7 @@ const addSceneEvents: EditorFunction = {
       SafeExtractor.extractStringProperty(args, 'placement_hint') || '';
 
     if (!project.hasLayoutNamed(sceneName)) {
-      return makeGenericFailure(`Scene not found: "${sceneName}".`);
+      return makeSceneNotFoundFailure(project, sceneName);
     }
     if (!relatedAiRequestId) {
       return makeGenericFailure(
@@ -5313,7 +5339,7 @@ const inspectScenePropertiesLayersEffects: EditorFunction = {
     const scene_name = extractRequiredString(args, 'scene_name');
 
     if (!project.hasLayoutNamed(scene_name)) {
-      return makeGenericFailure(`Scene not found: "${scene_name}".`);
+      return makeSceneNotFoundFailure(project, scene_name);
     }
 
     const scene = project.getLayout(scene_name);
@@ -5499,7 +5525,7 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
     const scene_name = extractRequiredString(args, 'scene_name');
 
     if (!project.hasLayoutNamed(scene_name)) {
-      return makeGenericFailure(`Scene not found: "${scene_name}".`);
+      return makeSceneNotFoundFailure(project, scene_name);
     }
     const scene = project.getLayout(scene_name);
 
@@ -5574,9 +5600,10 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
             return;
           }
 
-          const newSceneName = newNameGenerator(
-            gd.Project.getSafeName(newValue),
-            tentativeNewName => project.hasLayoutNamed(tentativeNewName)
+          // Unlike objects, scene names are not identifiers and can contain
+          // spaces or any character - only ensure unicity.
+          const newSceneName = newNameGenerator(newValue, tentativeNewName =>
+            project.hasLayoutNamed(tentativeNewName)
           );
 
           renameLayoutInProject(project, oldName, newSceneName);
@@ -5630,8 +5657,13 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
           changes.push(`Set game name to "${newValue}".`);
         } else if (isFuzzyMatch(propertyName, 'isFirstScene')) {
           if (newValue.toLowerCase() === 'true') {
-            project.setFirstLayout(scene_name);
-            changes.push(`Set "${scene_name}" as the first (startup) scene.`);
+            // Use the scene's current name: a rename can have been applied
+            // by a previous item of the same call.
+            const currentSceneName = scene.getName();
+            project.setFirstLayout(currentSceneName);
+            changes.push(
+              `Set "${currentSceneName}" as the first (startup) scene.`
+            );
           }
         } else {
           warnings.push(`Unknown scene property: "${propertyName}". Skipped.`);
@@ -5809,7 +5841,7 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
         if (deleteThisGroup) {
           groups.remove(groupName);
           changes.push(
-            `Deleted group "${groupName}" from scene "${scene_name}".`
+            `Deleted group "${groupName}" from scene "${scene.getName()}".`
           );
         } else {
           if (newGroupName) {
@@ -5822,7 +5854,7 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
             );
             foundGroup.setName(newGroupName);
             changes.push(
-              `Renamed group "${groupName}" to "${newGroupName}" in scene "${scene_name}".`
+              `Renamed group "${groupName}" to "${newGroupName}" in scene "${scene.getName()}".`
             );
           }
 
@@ -5908,7 +5940,7 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
                 }
               } else {
                 warnings.push(
-                  `Object "${objectName}" not found in scene "${scene_name}", so it was not added to group "${groupName}".`
+                  `Object "${objectName}" not found in scene "${scene.getName()}", so it was not added to group "${groupName}".`
                 );
               }
             });
@@ -5917,7 +5949,7 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
               .getAllObjectsNames()
               .toJSArray();
             changes.push(
-              `Group "${groupName}" in scene "${scene_name}" now contains ${
+              `Group "${groupName}" in scene "${scene.getName()}" now contains ${
                 finalObjectNames.length
               } object(s): ${
                 finalObjectNames.length > 0
@@ -6094,7 +6126,7 @@ const resolveVariablesContainers = ({
       return fail(`Missing "scene_name" (required for scene variable).`);
     }
     if (!project.hasLayoutNamed(scene_name)) {
-      return fail(`Scene not found: "${scene_name}".`);
+      return fail(getSceneNotFoundMessage(project, scene_name));
     }
     return {
       failure: null,
@@ -6112,7 +6144,7 @@ const resolveVariablesContainers = ({
     let isGroup = false;
     if (scene_name) {
       if (!project.hasLayoutNamed(scene_name)) {
-        return fail(`Scene not found: "${scene_name}".`);
+        return fail(getSceneNotFoundMessage(project, scene_name));
       }
       const concerned = resolveObjectsFromContextAndName({
         project,

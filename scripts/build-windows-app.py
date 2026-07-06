@@ -22,7 +22,10 @@ never downloads winCodeSign at all. (Pass ``--sign`` to keep your signing
 environment intact and produce a signed installer.)
 
 The absolute path to the produced installer ``.exe`` is printed at the end so it
-can be copied and distributed elsewhere.
+can be copied and distributed elsewhere. By default the installer is then
+uploaded to a GitHub release (``zhouzhipeng/GDevelop`` tag ``latest`` by
+default) using the ``gh`` CLI; pass ``--no-upload`` to skip this, or
+``--release-repo`` / ``--release-tag`` to target a different release.
 """
 
 from __future__ import annotations
@@ -76,10 +79,31 @@ def parse_args() -> argparse.Namespace:
         ),
     )
     parser.add_argument(
+        "--no-upload",
+        dest="upload",
+        action="store_false",
+        help=(
+            "Do not upload the built installer .exe to a GitHub release. By "
+            "default the installer is uploaded to the release given by "
+            "--release-repo/--release-tag."
+        ),
+    )
+    parser.add_argument(
+        "--release-repo",
+        default="zhouzhipeng/GDevelop",
+        help="GitHub repository (owner/name) whose release receives the installer.",
+    )
+    parser.add_argument(
+        "--release-tag",
+        default="latest",
+        help="Tag of the GitHub release to upload the installer to.",
+    )
+    parser.add_argument(
         "--dry-run",
         action="store_true",
         help="Print the planned commands without running them.",
     )
+    parser.set_defaults(upload=True)
     return parser.parse_args()
 
 
@@ -256,11 +280,11 @@ def find_latest_installer(dist_dir: Path) -> Path | None:
     return (setups or exes)[0]
 
 
-def report_artifact(dist_dir: Path, dry_run: bool) -> None:
+def report_artifact(dist_dir: Path, dry_run: bool) -> Path | None:
     step("Locate distributable")
     if dry_run:
         print(f"[dry-run] would search for *.exe in {dist_dir}", flush=True)
-        return
+        return None
 
     installer = find_latest_installer(dist_dir)
     if installer is None:
@@ -275,6 +299,72 @@ def report_artifact(dist_dir: Path, dry_run: bool) -> None:
     print(f"   Size: {size_mb:.1f} MB", flush=True)
     print("\nExecutable file path (copy this to distribute):", flush=True)
     print(f"\n  {installer.resolve()}\n", flush=True)
+    print("=" * 70, flush=True)
+    return installer
+
+
+def upload_artifact(
+    installer: Path | None,
+    dist_dir: Path,
+    *,
+    release_repo: str,
+    release_tag: str,
+    dry_run: bool,
+) -> None:
+    step(f"Upload distributable to GitHub release {release_repo}@{release_tag}")
+
+    if dry_run:
+        installer_display = (
+            installer if installer is not None else f"<latest *.exe in {dist_dir}>"
+        )
+        print(
+            "[dry-run] would upload with: "
+            + command_line(
+                [
+                    "gh",
+                    "release",
+                    "upload",
+                    release_tag,
+                    str(installer_display),
+                    "--repo",
+                    release_repo,
+                    "--clobber",
+                ]
+            ),
+            flush=True,
+        )
+        return
+
+    if installer is None:
+        installer = find_latest_installer(dist_dir)
+    if installer is None:
+        raise RuntimeError(
+            f"No installer .exe found to upload in {dist_dir}. Nothing was uploaded."
+        )
+
+    gh = resolve_tool("gh")
+    # `--clobber` replaces an existing asset of the same name so re-runs update
+    # the release in place instead of failing on a duplicate asset.
+    command = [
+        gh,
+        "release",
+        "upload",
+        release_tag,
+        str(installer.resolve()),
+        "--repo",
+        release_repo,
+        "--clobber",
+    ]
+    print(f"[run] {dist_dir}> {command_line(command)}", flush=True)
+    subprocess.run(command, cwd=dist_dir, check=True)
+
+    print("\n" + "=" * 70, flush=True)
+    print("Uploaded distributable to GitHub release.", flush=True)
+    print(f"   Asset:   {installer.name}", flush=True)
+    print(
+        f"   Release: https://github.com/{release_repo}/releases/tag/{release_tag}",
+        flush=True,
+    )
     print("=" * 70, flush=True)
 
 
@@ -306,7 +396,20 @@ def main() -> int:
         build_react_app(app_dir, args.skip_build, args.dry_run)
         sync_electron_www(electron_app_dir, args.dry_run)
         package_app(electron_app_dir, args.sign, args.dry_run)
-        report_artifact(dist_dir, args.dry_run)
+        installer = report_artifact(dist_dir, args.dry_run)
+        if args.upload:
+            upload_artifact(
+                installer,
+                dist_dir,
+                release_repo=args.release_repo,
+                release_tag=args.release_tag,
+                dry_run=args.dry_run,
+            )
+        else:
+            print(
+                "\nSkipping GitHub release upload (--no-upload).",
+                flush=True,
+            )
     except (RuntimeError, subprocess.CalledProcessError) as error:
         print(f"ERROR: {error}", file=sys.stderr, flush=True)
         return 1

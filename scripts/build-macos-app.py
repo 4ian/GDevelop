@@ -12,7 +12,10 @@ app and choose "Open", or run
 ``xattr -dr com.apple.quarantine "/Applications/GDevelop 6.app"``.
 
 The absolute path to the produced ``.dmg`` is printed at the end so it can be
-copied and distributed elsewhere.
+copied and distributed elsewhere. By default the ``.dmg`` is then uploaded to a
+GitHub release (``zhouzhipeng/GDevelop`` tag ``latest`` by default) using the
+``gh`` CLI; pass ``--no-upload`` to skip this, or ``--release-repo`` /
+``--release-tag`` to target a different release.
 """
 
 from __future__ import annotations
@@ -60,10 +63,30 @@ def parse_args() -> argparse.Namespace:
         ),
     )
     parser.add_argument(
+        "--no-upload",
+        dest="upload",
+        action="store_false",
+        help=(
+            "Do not upload the built .dmg to a GitHub release. By default the "
+            ".dmg is uploaded to the release given by --release-repo/--release-tag."
+        ),
+    )
+    parser.add_argument(
+        "--release-repo",
+        default="zhouzhipeng/GDevelop",
+        help="GitHub repository (owner/name) whose release receives the .dmg.",
+    )
+    parser.add_argument(
+        "--release-tag",
+        default="latest",
+        help="Tag of the GitHub release to upload the .dmg to.",
+    )
+    parser.add_argument(
         "--dry-run",
         action="store_true",
         help="Print the planned commands without running them.",
     )
+    parser.set_defaults(upload=True)
     return parser.parse_args()
 
 
@@ -185,11 +208,11 @@ def find_latest_dmg(dist_dir: Path) -> Path | None:
     return dmgs[0] if dmgs else None
 
 
-def report_artifact(dist_dir: Path, dry_run: bool) -> None:
+def report_artifact(dist_dir: Path, dry_run: bool) -> Path | None:
     step("Locate distributable")
     if dry_run:
         print(f"[dry-run] would search for *.dmg in {dist_dir}", flush=True)
-        return
+        return None
 
     dmg = find_latest_dmg(dist_dir)
     if dmg is None:
@@ -204,6 +227,70 @@ def report_artifact(dist_dir: Path, dry_run: bool) -> None:
     print(f"   Size: {size_mb:.1f} MB", flush=True)
     print("\nExecutable file path (copy this to distribute):", flush=True)
     print(f"\n  {dmg.resolve()}\n", flush=True)
+    print("=" * 70, flush=True)
+    return dmg
+
+
+def upload_artifact(
+    dmg: Path | None,
+    dist_dir: Path,
+    *,
+    release_repo: str,
+    release_tag: str,
+    dry_run: bool,
+) -> None:
+    step(f"Upload distributable to GitHub release {release_repo}@{release_tag}")
+
+    if dry_run:
+        dmg_display = dmg if dmg is not None else f"<latest *.dmg in {dist_dir}>"
+        print(
+            "[dry-run] would upload with: "
+            + command_line(
+                [
+                    "gh",
+                    "release",
+                    "upload",
+                    release_tag,
+                    str(dmg_display),
+                    "--repo",
+                    release_repo,
+                    "--clobber",
+                ]
+            ),
+            flush=True,
+        )
+        return
+
+    if dmg is None:
+        dmg = find_latest_dmg(dist_dir)
+    if dmg is None:
+        raise RuntimeError(
+            f"No .dmg found to upload in {dist_dir}. Nothing was uploaded."
+        )
+
+    gh = resolve_tool("gh")
+    # `--clobber` replaces an existing asset of the same name so re-runs update
+    # the release in place instead of failing on a duplicate asset.
+    command = [
+        gh,
+        "release",
+        "upload",
+        release_tag,
+        str(dmg.resolve()),
+        "--repo",
+        release_repo,
+        "--clobber",
+    ]
+    print(f"[run] {dist_dir}> {command_line(command)}", flush=True)
+    subprocess.run(command, cwd=dist_dir, check=True)
+
+    print("\n" + "=" * 70, flush=True)
+    print("Uploaded distributable to GitHub release.", flush=True)
+    print(f"   Asset:   {dmg.name}", flush=True)
+    print(
+        f"   Release: https://github.com/{release_repo}/releases/tag/{release_tag}",
+        flush=True,
+    )
     print("=" * 70, flush=True)
 
 
@@ -229,7 +316,20 @@ def main() -> int:
         )
         build_react_app(app_dir, args.skip_build, args.dry_run)
         package_app(electron_app_dir, args.sign, args.dry_run)
-        report_artifact(dist_dir, args.dry_run)
+        dmg = report_artifact(dist_dir, args.dry_run)
+        if args.upload:
+            upload_artifact(
+                dmg,
+                dist_dir,
+                release_repo=args.release_repo,
+                release_tag=args.release_tag,
+                dry_run=args.dry_run,
+            )
+        else:
+            print(
+                "\nSkipping GitHub release upload (--no-upload).",
+                flush=True,
+            )
     except (RuntimeError, subprocess.CalledProcessError) as error:
         print(f"ERROR: {error}", file=sys.stderr, flush=True)
         return 1

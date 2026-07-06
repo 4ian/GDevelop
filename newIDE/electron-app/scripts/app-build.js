@@ -4,6 +4,13 @@ const path = require('path');
 const args = require('minimist')(process.argv.slice(2));
 const allowDevelopmentLibGD = !!args['allow-development-libgd'];
 
+// Maximum size (in MiB) allowed for a production (release) libGD.js. This guard
+// only exists to catch a development/debug build (which ships debugging symbols
+// and unoptimized/unminified glue and is many megabytes larger) being packaged
+// by mistake. The optimized release build grows slowly over time, so keep some
+// headroom above its current size; a real dev/debug build is far larger still.
+const MAX_LIBGDJS_SIZE_IN_MIB = 4;
+
 // Sanity check electron-builder installation
 if (!shell.test('-f', './node_modules/.bin/electron-builder')) {
   shell.echo('⚠️ Please run npm install in electron-app folder');
@@ -23,11 +30,11 @@ const checkLibGDjsSize = () => {
       }
 
       const sizeInMiB = stats.size / 1024 / 1024;
-      if (sizeInMiB > 2 && !allowDevelopmentLibGD) {
+      if (sizeInMiB > MAX_LIBGDJS_SIZE_IN_MIB && !allowDevelopmentLibGD) {
         shell.echo(
           `❌ libGD.js size is too big (${sizeInMiB.toFixed(
             2
-          )}MiB) - are you sure you're not trying to deploy the development version?`
+          )}MiB, limit ${MAX_LIBGDJS_SIZE_IN_MIB}MiB) - are you sure you're not trying to deploy the development version?`
         );
         shell.exit(1);
       }

@@ -22,7 +22,7 @@ import ExternalLayoutIcon from '../UI/CustomSvgIcons/ExternalLayout';
 import ExtensionIcon from '../UI/CustomSvgIcons/Extension';
 import SearchIcon from '../UI/CustomSvgIcons/Search';
 import ProjectTitlebar from './ProjectTitlebar';
-import StickyNotes from './StickyNotes';
+import StickyNotes, { type StickyNotesInterface } from './StickyNotes';
 import PreferencesDialog from './Preferences/PreferencesDialog';
 import AboutDialog from './AboutDialog';
 import ProjectManager, {
@@ -695,6 +695,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     setStickyNotesManagerShown,
   ] = React.useState<boolean>(false);
   const commandPaletteRef = React.useRef((null: ?CommandPaletteInterface));
+  const stickyNotesRef = React.useRef((null: ?StickyNotesInterface));
   const [
     recentEditorSwitcherOpen,
     setRecentEditorSwitcherOpen,
@@ -3911,11 +3912,14 @@ const MainFrame = (props: Props): React.MixedElement => {
     [setStickyNotesManagerShown]
   );
 
-  const toggleStickyNotesManager = React.useCallback(
+  const createStickyNoteFromTitlebar = React.useCallback(
     () => {
-      setStickyNotesManagerShown(isShown => !isShown);
+      const stickyNotes = stickyNotesRef.current;
+      if (!stickyNotes) return;
+
+      stickyNotes.createNote({ showManager: false });
     },
-    [setStickyNotesManagerShown]
+    []
   );
 
   const openGlobalConfig = React.useCallback(
@@ -7063,7 +7067,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     onQuitVersionHistory: onQuitVersionHistory,
     onOpenAskAi: openAskAi,
     onCloseAskAi: closeAskAi,
-    onToggleStickyNotesManager: toggleStickyNotesManager,
+    onCreateStickyNote: createStickyNoteFromTitlebar,
     isStickyNotesManagerShown,
     getStorageProvider: getStorageProvider,
     // $FlowFixMe[incompatible-type]
@@ -7320,6 +7324,7 @@ const MainFrame = (props: Props): React.MixedElement => {
           </LeaderboardProvider>
           {currentProject && (
             <StickyNotes
+              ref={stickyNotesRef}
               project={currentProject}
               isManagerShown={isStickyNotesManagerShown}
               onManagerShownChange={setStickyNotesManagerShown}

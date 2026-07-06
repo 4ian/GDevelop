@@ -111,6 +111,31 @@ describe('StickyNotes', () => {
     });
   });
 
+  it('creates notes on the right side and vertically centered by default', () => {
+    expect(
+      createStickyNote([], {
+        now: 100,
+        bounds: { width: 1000, height: 800 },
+      })
+    ).toEqual({
+      id: 'sticky-note-100-0',
+      title: '',
+      body: '',
+      color: 'yellow',
+      fontSize: 'normal',
+      textStyle: 'normal',
+      x: 712,
+      y: 290,
+      width: 280,
+      height: 220,
+      isOpen: true,
+      isArchived: false,
+      createdAt: 100,
+      updatedAt: 100,
+      zIndex: 1,
+    });
+  });
+
   it('separates open, active and archived notes', () => {
     const openNote = makeStickyNote({ id: 'open', updatedAt: 4, zIndex: 2 });
     const closedNote = makeStickyNote({

@@ -40,6 +40,7 @@ export type StickyNoteColor =
 export type StickyNoteFontSize = 'small' | 'normal' | 'large';
 export type StickyNoteTextStyle = 'normal' | 'bold' | 'italic';
 export type StickyNotesManagerTab = 'active' | 'archived';
+type CreateStickyNoteOptions = {| showManager?: boolean |};
 
 export type StickyNote = {|
   id: string,
@@ -60,7 +61,7 @@ export type StickyNote = {|
 |};
 
 export type StickyNotesInterface = {|
-  createNote: () => void,
+  createNote: (options?: CreateStickyNoteOptions) => void,
   showManager: () => void,
 |};
 
@@ -284,6 +285,28 @@ const getNextStickyNoteColor = (
 ): StickyNoteColor =>
   stickyNoteColors[stickyNotes.length % stickyNoteColors.length];
 
+const getDefaultStickyNotePosition = (
+  stickyNotes: Array<StickyNote>,
+  bounds: ?StickyNotesBounds
+): {| x: number, y: number |} => {
+  const offset =
+    stickyNotes.filter(stickyNote => !stickyNote.isArchived).length % 8;
+  const offsetX = offset * 28;
+  const offsetY = offset * 22;
+
+  if (!bounds) {
+    return {
+      x: 24 + offsetX,
+      y: 24 + offsetY,
+    };
+  }
+
+  return {
+    x: bounds.width - defaultNoteWidth - noteBoundsMargin + offsetX,
+    y: (bounds.height - defaultNoteHeight) / 2 + offsetY,
+  };
+};
+
 export const clampStickyNotePosition = (
   stickyNote: StickyNote,
   bounds: ?StickyNotesBounds
@@ -311,8 +334,8 @@ export const createStickyNote = (
 ): StickyNote => {
   const now =
     options && typeof options.now === 'number' ? options.now : Date.now();
-  const offset =
-    stickyNotes.filter(stickyNote => !stickyNote.isArchived).length % 8;
+  const bounds = options ? options.bounds : null;
+  const position = getDefaultStickyNotePosition(stickyNotes, bounds);
   return clampStickyNotePosition(
     {
       id: `sticky-note-${now}-${stickyNotes.length}`,
@@ -321,8 +344,8 @@ export const createStickyNote = (
       color: getNextStickyNoteColor(stickyNotes),
       fontSize: 'normal',
       textStyle: 'normal',
-      x: 24 + offset * 28,
-      y: 24 + offset * 22,
+      x: position.x,
+      y: position.y,
       width: defaultNoteWidth,
       height: defaultNoteHeight,
       isOpen: true,
@@ -331,7 +354,7 @@ export const createStickyNote = (
       updatedAt: now,
       zIndex: getNextStickyNoteZIndex(stickyNotes),
     },
-    options ? options.bounds : null
+    bounds
   );
 };
 
@@ -639,14 +662,16 @@ const StickyNotes: React.ComponentType<{
     );
 
     const createNote = React.useCallback(
-      () => {
+      (options?: CreateStickyNoteOptions) => {
         setManagerTab('active');
         setAndPersistStickyNotes(currentStickyNotes => {
           const stickyNote = createStickyNote(currentStickyNotes, {
             bounds: getContainerBounds(),
           });
           setEditingNoteId(stickyNote.id);
-          onManagerShownChange(true);
+          if (!options || options.showManager !== false) {
+            onManagerShownChange(true);
+          }
           return [...currentStickyNotes, stickyNote];
         });
       },
@@ -870,7 +895,7 @@ const StickyNotes: React.ComponentType<{
                 <TextButton
                   icon={<AddIcon />}
                   label={<Trans>Add note</Trans>}
-                  onClick={createNote}
+                  onClick={() => createNote()}
                   style={{ marginLeft: 16 }}
                 />
               </span>

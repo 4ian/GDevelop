@@ -158,7 +158,7 @@ export type EditorTabsPaneCommonProps = {|
   onQuitVersionHistory: () => Promise<void>,
   onOpenAskAi: (?OpenAskAiOptions) => void,
   onCloseAskAi: () => void,
-  onToggleStickyNotesManager: () => void,
+  onCreateStickyNote: () => void,
   isStickyNotesManagerShown: boolean,
   getStorageProvider: () => StorageProvider,
   setPreviewedLayout: ({|
@@ -371,7 +371,7 @@ const EditorTabsPane: React.ComponentType<{
     onQuitVersionHistory,
     onOpenAskAi,
     onCloseAskAi,
-    onToggleStickyNotesManager,
+    onCreateStickyNote,
     isStickyNotesManagerShown,
     getStorageProvider,
     setPreviewedLayout,
@@ -735,7 +735,7 @@ const EditorTabsPane: React.ComponentType<{
           }
           onAskAiClicked={onOpenAskAiFromTitlebar}
           displayStickyNotes={!!currentProject && isRightMostPane}
-          onStickyNotesClicked={onToggleStickyNotesManager}
+          onStickyNotesClicked={onCreateStickyNote}
           isStickyNotesManagerShown={isStickyNotesManagerShown}
         />
       )}

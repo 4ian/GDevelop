@@ -296,7 +296,7 @@ export default function TabsTitlebar({
           >
             <TextButton
               icon={<AddCommentIcon />}
-              label={'Notes'}
+              label={'Add Note'}
               onClick={onStickyNotesClicked}
             />
           </div>

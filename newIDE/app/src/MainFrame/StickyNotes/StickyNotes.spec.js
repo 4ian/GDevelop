@@ -6,6 +6,7 @@ import {
   archiveStickyNote,
   closeStickyNote,
   createStickyNote,
+  deleteArchivedStickyNotes,
   getActiveStickyNotes,
   getArchivedStickyNotes,
   getNextStickyNoteFontSize,
@@ -18,6 +19,7 @@ import {
   openStickyNote,
   saveStickyNotesToProject,
   setStickyNotePinned,
+  unpinAllStickyNotes,
   type StickyNote,
 } from './index';
 
@@ -220,6 +222,60 @@ describe('StickyNotes', () => {
       'newer',
       'older',
     ]);
+  });
+
+  it('un-pins all open notes without archiving them', () => {
+    const openNote = makeStickyNote({
+      id: 'open',
+      isOpen: true,
+      isArchived: false,
+    });
+    const closedNote = makeStickyNote({
+      id: 'closed',
+      isOpen: false,
+      isArchived: false,
+    });
+    const archivedOpenNote = makeStickyNote({
+      id: 'archived-open',
+      isOpen: true,
+      isArchived: true,
+    });
+
+    expect(
+      unpinAllStickyNotes([openNote, closedNote, archivedOpenNote])
+    ).toEqual([
+      {
+        ...openNote,
+        isOpen: false,
+      },
+      closedNote,
+      {
+        ...archivedOpenNote,
+        isOpen: false,
+      },
+    ]);
+  });
+
+  it('deletes all archived notes while keeping active notes', () => {
+    const openNote = makeStickyNote({
+      id: 'open',
+      isOpen: true,
+      isArchived: false,
+    });
+    const closedNote = makeStickyNote({
+      id: 'closed',
+      isOpen: false,
+      isArchived: false,
+    });
+    const archivedNote = makeStickyNote({
+      id: 'archived',
+      isOpen: false,
+      isArchived: true,
+    });
+
+    expect(
+      deleteArchivedStickyNotes([openNote, closedNote, archivedNote])
+    ).toEqual([openNote, closedNote]);
   });
 
   it('keeps floating previews readable and copies only the note body', () => {

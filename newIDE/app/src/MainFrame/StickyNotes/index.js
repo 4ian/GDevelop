@@ -428,6 +428,13 @@ export const setStickyNotePinned = (
       : updatedStickyNote;
   });
 
+export const unpinAllStickyNotes = (
+  stickyNotes: Array<StickyNote>
+): Array<StickyNote> =>
+  stickyNotes.map(stickyNote =>
+    stickyNote.isOpen ? { ...stickyNote, isOpen: false } : stickyNote
+  );
+
 export const archiveStickyNote = (
   stickyNotes: Array<StickyNote>,
   stickyNoteId: string,
@@ -451,6 +458,10 @@ export const deleteStickyNote = (
   stickyNoteId: string
 ): Array<StickyNote> =>
   stickyNotes.filter(stickyNote => stickyNote.id !== stickyNoteId);
+
+export const deleteArchivedStickyNotes = (
+  stickyNotes: Array<StickyNote>
+): Array<StickyNote> => stickyNotes.filter(stickyNote => !stickyNote.isArchived);
 
 const getNoteColorClassName = (color: StickyNoteColor): string => {
   switch (color) {
@@ -742,6 +753,24 @@ const StickyNotes: React.ComponentType<{
       [getContainerBounds, setAndPersistStickyNotes]
     );
 
+    const handleUnpinAllNotes = React.useCallback(
+      () => {
+        setAndPersistStickyNotes(currentStickyNotes =>
+          unpinAllStickyNotes(currentStickyNotes)
+        );
+      },
+      [setAndPersistStickyNotes]
+    );
+
+    const handleDeleteAllArchivedNotes = React.useCallback(
+      () => {
+        setAndPersistStickyNotes(currentStickyNotes =>
+          deleteArchivedStickyNotes(currentStickyNotes)
+        );
+      },
+      [setAndPersistStickyNotes]
+    );
+
     const handleSelectNote = React.useCallback((stickyNoteId: string) => {
       setEditingNoteId(stickyNoteId);
     }, []);
@@ -898,14 +927,25 @@ const StickyNotes: React.ComponentType<{
                   onClick={() => createNote()}
                   style={{ marginLeft: 16 }}
                 />
+                <TextButton
+                  icon={<PinIcon />}
+                  label={<Trans>Un-pin all</Trans>}
+                  onClick={handleUnpinAllNotes}
+                  disabled={!openStickyNotes.length}
+                />
+                <TextButton
+                  icon={<TrashIcon />}
+                  label={<Trans>Delete all archived</Trans>}
+                  onClick={handleDeleteAllArchivedNotes}
+                  disabled={!archivedStickyNotes.length}
+                />
               </span>
             }
             open={isManagerShown}
             onRequestClose={closeManager}
             flexBody
-            fullHeight
             disableContentScroll
-            maxWidth="lg"
+            maxWidth="md"
             id="sticky-notes-dialog"
           >
             <div className={classes.managerBody}>

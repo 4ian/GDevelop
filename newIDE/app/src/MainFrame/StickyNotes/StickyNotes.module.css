@@ -14,8 +14,10 @@
 
 .managerBody {
   display: grid;
-  grid-template-columns: minmax(280px, 34%) minmax(0, 1fr);
-  flex: 1;
+  grid-template-columns: minmax(260px, 32%) minmax(0, 1fr);
+  flex: 1 1 auto;
+  height: min(62vh, 560px);
+  max-height: calc(100vh - 180px);
   min-height: 0;
   width: 100%;
   border-top: 1px solid var(--theme-toolbar-separator-color);
@@ -120,7 +122,7 @@
   flex-direction: column;
   min-width: 0;
   min-height: 0;
-  padding: 12px;
+  padding: 12px 12px 0;
   gap: 10px;
 }
 

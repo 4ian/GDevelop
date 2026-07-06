@@ -1014,7 +1014,6 @@ export const addObjectUndeclaredVariables = ({
       originalSerializedVariables,
       groupVariablesContainer
     );
-    originalSerializedVariables.delete();
 
     gd.WholeProjectRefactorer.applyRefactoringForGroupVariablesContainer(
       project,
@@ -1026,6 +1025,7 @@ export const addObjectUndeclaredVariables = ({
       changeset,
       originalSerializedVariables
     );
+    originalSerializedVariables.delete();
   };
 
   undeclaredVariables.forEach(undeclaredVariable => {

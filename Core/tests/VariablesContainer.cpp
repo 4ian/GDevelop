@@ -49,4 +49,33 @@ TEST_CASE("VariablesContainer", "[common][variables]") {
             "Hello second copied World");
     REQUIRE(container3.Get("Variable2").GetValue() == 44);
   }
+  SECTION("Insert clears the editor-only mixed values marker") {
+    gd::Variable mixedValuesVariable;
+    mixedValuesVariable.SetValue(123);
+    mixedValuesVariable.MarkAsMixedValues();
+
+    gd::Variable mixedTypesVariable;
+    mixedTypesVariable.SetValue(456);
+    mixedTypesVariable.CastTo(gd::Variable::Type::MixedTypes);
+
+    gd::VariablesContainer container;
+    auto& insertedMixedValuesVariable =
+        container.Insert("MyMixedValuesVariable", mixedValuesVariable, 0);
+    auto& insertedMixedTypesVariable =
+        container.Insert("MyMixedTypesVariable", mixedTypesVariable, 1);
+
+    // The inserted copies have an actual value: the marker used to display
+    // "Mixed values" in the editor is not kept.
+    REQUIRE(insertedMixedValuesVariable.HasMixedValues() == false);
+    REQUIRE(insertedMixedValuesVariable.GetType() ==
+            gd::Variable::Type::Number);
+    REQUIRE(insertedMixedValuesVariable.GetValue() == 123);
+    REQUIRE(insertedMixedTypesVariable.HasMixedValues() == false);
+    REQUIRE(insertedMixedTypesVariable.GetType() ==
+            gd::Variable::Type::Number);
+
+    // The original variables are left untouched.
+    REQUIRE(mixedValuesVariable.HasMixedValues() == true);
+    REQUIRE(mixedTypesVariable.GetType() == gd::Variable::Type::MixedTypes);
+  }
 }

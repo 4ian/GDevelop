@@ -144,7 +144,16 @@ void ObjectRefactorer::FillMissingGroupVariablesToObject(
     auto &groupVariable = groupVariablesContainer.Get(variableIndex);
     const auto &variableName = groupVariablesContainer.GetNameAt(variableIndex);
 
+    if (groupVariable.GetType() == gd::Variable::Type::MixedTypes) {
+      // Objects of the group have entirely different types for this variable:
+      // there is no meaningful type or value to give to the object.
+      continue;
+    }
     if (!variablesContainer.Has(variableName)) {
+      // Note: if the group objects have different values for this variable
+      // ("mixed values"), the value of the first object of the group is used
+      // (`Insert` takes care of clearing the editor-only "mixed values"
+      // marker so it's not persisted in the project).
       variablesContainer.Insert(variableName, groupVariable,
                                 variablesContainer.Count());
     }

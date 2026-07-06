@@ -571,7 +571,7 @@ describe('editorFunctions', () => {
 
       expect(result.success).toBe(false);
       expect(result.message).toMatchInlineSnapshot(
-        `"Scene not found: \\"NonExistentScene\\"."`
+        `"Scene not found: \\"NonExistentScene\\". Scenes in this project: \\"TestScene\\"."`
       );
     });
 
@@ -3179,6 +3179,67 @@ describe('editorFunctions', () => {
         oldName: 'TestScene',
         newName: 'GameScene',
       });
+    });
+
+    it('keeps spaces and special characters when renaming a scene', async () => {
+      const result = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            changed_properties: [
+              { property_name: 'name', new_value: 'Templo das Estações' },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).toContain(
+        'Renamed scene "TestScene" to "Templo das Estações"'
+      );
+      expect(project.hasLayoutNamed('Templo das Estações')).toBe(true);
+      expect(project.hasLayoutNamed('Templo_das_Estações')).toBe(false);
+    });
+
+    it('uses the new scene name when renaming and setting as first scene in the same call', async () => {
+      const result = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            changed_properties: [
+              { property_name: 'name', new_value: 'New Scene Name' },
+              { property_name: 'isFirstScene', new_value: 'true' },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).toContain(
+        'Set "New Scene Name" as the first (startup) scene.'
+      );
+      expect(project.getFirstLayout()).toBe('New Scene Name');
+    });
+
+    it('lists the project scenes when the scene is not found', async () => {
+      const result = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'NonExistentScene',
+            changed_properties: [
+              { property_name: 'name', new_value: 'Whatever' },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(false);
+      expect(result.message).toMatchInlineSnapshot(
+        `"Scene not found: \\"NonExistentScene\\". Scenes in this project: \\"TestScene\\"."`
+      );
     });
 
     it('does nothing when renaming a scene to its current name', async () => {

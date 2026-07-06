@@ -1775,6 +1775,21 @@ const changeObjectPropertiesEffects: EditorFunction = {
   renderForEditor: ({ project, shouldShowDetails, args, editorCallbacks }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
     const object_name = extractRequiredString(args, 'object_name');
+
+    const deleteThisObject = SafeExtractor.extractBooleanProperty(
+      args,
+      'delete_this_object'
+    );
+    if (deleteThisObject) {
+      return {
+        text: (
+          <Trans>
+            Remove object <b>{object_name}</b> (in scene {scene_name}).
+          </Trans>
+        ),
+      };
+    }
+
     const changed_properties =
       SafeExtractor.extractArrayProperty(args, 'changed_properties') || [];
     const changed_effects =
@@ -1910,7 +1925,7 @@ const changeObjectPropertiesEffects: EditorFunction = {
     // $FlowFixMe[incompatible-type]
     return renderChanges(changes);
   },
-  launchFunction: async ({ project, args }) => {
+  launchFunction: async ({ project, args, onObjectsModifiedOutsideEditor }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
     const object_name = extractRequiredString(args, 'object_name');
     const changed_properties =
@@ -1940,6 +1955,31 @@ const changeObjectPropertiesEffects: EditorFunction = {
       return makeGenericFailure(
         `Object not found: "${object_name}" in scene "${scene_name}" nor globally.`
       );
+    }
+
+    const deleteThisObject = SafeExtractor.extractBooleanProperty(
+      args,
+      'delete_this_object'
+    );
+    if (deleteThisObject) {
+      if (isGlobalObject) {
+        gd.WholeProjectRefactorer.globalObjectRemoved(project, object_name);
+        globalObjects.removeObject(object_name);
+      } else {
+        gd.WholeProjectRefactorer.objectRemovedInScene(
+          project,
+          layout,
+          object_name
+        );
+        layoutObjects.removeObject(object_name);
+      }
+
+      onObjectsModifiedOutsideEditor({
+        scene: layout,
+        isNewObjectTypeUsed: false,
+      });
+
+      return makeGenericSuccess(`Deleted object "${object_name}".`);
     }
 
     const warnings: Array<string> = [];
@@ -2248,6 +2288,8 @@ const addBehavior: EditorFunction = {
 
 /**
  * Removes a behavior from an object (or from all objects of a group) in a scene.
+ * Not offered to the AI anymore since toolsVersion v6 (see `delete_this_behavior`
+ * in `changeBehaviorProperty`), kept only for older toolsVersions.
  */
 const removeBehavior: EditorFunction = {
   renderForEditor: ({ args }) => {
@@ -2430,6 +2472,22 @@ const changeBehaviorProperty: EditorFunction = {
     const scene_name = extractRequiredString(args, 'scene_name');
     const object_name = extractRequiredString(args, 'object_name');
     const behavior_name = extractRequiredString(args, 'behavior_name');
+
+    const deleteThisBehavior = SafeExtractor.extractBooleanProperty(
+      args,
+      'delete_this_behavior'
+    );
+    if (deleteThisBehavior) {
+      return {
+        text: (
+          <Trans>
+            Remove <b>{behavior_name}</b> behavior from <b>{object_name}</b> in
+            scene {scene_name}.
+          </Trans>
+        ),
+      };
+    }
+
     const changed_properties =
       SafeExtractor.extractArrayProperty(args, 'changed_properties') || [];
 
@@ -2593,6 +2651,45 @@ const changeBehaviorProperty: EditorFunction = {
       return makeGenericFailure(
         `Object or group not found: "${object_name}" in scene "${scene_name}" nor globally.`
       );
+    }
+
+    const deleteThisBehavior = SafeExtractor.extractBooleanProperty(
+      args,
+      'delete_this_behavior'
+    );
+    if (deleteThisBehavior) {
+      const changes = [];
+      const warnings = [];
+      for (const object of concerned.objects) {
+        const objectName = object.getName();
+        if (!object.hasBehaviorNamed(behavior_name)) {
+          warnings.push(
+            `Behavior "${behavior_name}" not on "${objectName}". Not removed.`
+          );
+          continue;
+        }
+
+        const dependentBehaviors = gd.WholeProjectRefactorer.findDependentBehaviorNames(
+          project,
+          object,
+          behavior_name
+        ).toJSArray();
+
+        object.removeBehavior(behavior_name);
+        dependentBehaviors.forEach(name => {
+          object.removeBehavior(name);
+        });
+
+        changes.push(
+          dependentBehaviors.length > 0
+            ? `Removed behavior "${behavior_name}" from "${objectName}" (also removed dependents: ${dependentBehaviors.join(
+                ', '
+              )}).`
+            : `Removed behavior "${behavior_name}" from "${objectName}".`
+        );
+      }
+
+      return makeMultipleChangesOutput(changes, warnings);
     }
 
     const objectsWithBehavior = concerned.objects.filter(object =>
@@ -4949,35 +5046,6 @@ const createScene: EditorFunction = {
   modifiesProject: true,
 };
 
-/**
- * Deletes an existing scene
- */
-const deleteScene: EditorFunction = {
-  renderForEditor: ({ args }) => {
-    const scene_name = extractRequiredString(args, 'scene_name');
-
-    return {
-      text: (
-        <Trans>
-          Remove scene <b>{scene_name}</b>.
-        </Trans>
-      ),
-    };
-  },
-  launchFunction: async ({ project, args }) => {
-    const scene_name = extractRequiredString(args, 'scene_name');
-
-    if (!project.hasLayoutNamed(scene_name)) {
-      return makeGenericSuccess(`Scene "${scene_name}" already absent.`);
-    }
-
-    project.removeLayout(scene_name);
-
-    return makeGenericSuccess(`Deleted scene "${scene_name}".`);
-  },
-  modifiesProject: true,
-};
-
 const serializeEffectProperties = (
   effect: gdEffect,
   effectMetadata: gdEffectMetadata
@@ -5297,6 +5365,20 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
   renderForEditor: ({ args, shouldShowDetails }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
 
+    const deleteThisScene = SafeExtractor.extractBooleanProperty(
+      args,
+      'delete_this_scene'
+    );
+    if (deleteThisScene) {
+      return {
+        text: (
+          <Trans>
+            Remove scene <b>{scene_name}</b>.
+          </Trans>
+        ),
+      };
+    }
+
     const changed_properties = SafeExtractor.extractArrayProperty(
       args,
       'changed_properties'
@@ -5401,6 +5483,18 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
       return makeGenericFailure(`Scene not found: "${scene_name}".`);
     }
     const scene = project.getLayout(scene_name);
+
+    const deleteThisScene = SafeExtractor.extractBooleanProperty(
+      args,
+      'delete_this_scene'
+    );
+    if (deleteThisScene) {
+      if (project.getFirstLayout() === scene_name) {
+        project.setFirstLayout('');
+      }
+      project.removeLayout(scene_name);
+      return makeGenericSuccess(`Deleted scene "${scene_name}".`);
+    }
 
     const changes = [];
     const warnings = [];
@@ -6634,6 +6728,9 @@ export const editorFunctions: { [string]: EditorFunction } = {
   inspect_object_properties_effects: inspectObjectPropertiesEffects,
   change_object_properties_effects: changeObjectPropertiesEffects,
   add_behavior: addBehavior,
+  // Not offered to the AI anymore since toolsVersion v6 (behavior deletion is
+  // now done via `change_behavior_property`'s `delete_this_behavior`), but kept
+  // here for AI requests still using an older toolsVersion.
   remove_behavior: removeBehavior,
   inspect_behavior_properties: inspectBehaviorProperties,
   change_behavior_property: changeBehaviorProperty,
@@ -6643,7 +6740,6 @@ export const editorFunctions: { [string]: EditorFunction } = {
   read_scene_events: readSceneEvents,
   add_scene_events: addSceneEvents,
   create_scene: createScene,
-  delete_scene: deleteScene,
   inspect_scene_properties_layers_effects: inspectScenePropertiesLayersEffects,
   change_scene_properties_layers_effects_groups: changeScenePropertiesLayersEffectsGroups,
   add_or_edit_variable: addOrEditVariable,

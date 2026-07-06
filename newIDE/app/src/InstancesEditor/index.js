@@ -1074,31 +1074,11 @@ export default class InstancesEditor extends Component<Props, State> {
   _hasNativeFiles = (event: DragEvent): boolean => {
     const { dataTransfer } = event;
     if (!dataTransfer) return false;
-    if (Array.from(dataTransfer.types || []).includes('Files')) return true;
-    // On the `drop` event the file list is populated; on some platforms the
-    // `types` list is not reliably filled during `dragover` (protected mode),
-    // so also check `files` and `items` as a fallback.
-    if (dataTransfer.files && dataTransfer.files.length > 0) return true;
-    const items = dataTransfer.items;
-    if (items && items.length) {
-      for (let index = 0; index < items.length; index++) {
-        if (items[index] && items[index].kind === 'file') return true;
-      }
-    }
-    return false;
+    return Array.from(dataTransfer.types || []).includes('Files');
   };
 
   _onNativeDragOver = (event: DragEvent) => {
-    if (!this._hasNativeFiles(event)) {
-      // Even when we cannot positively confirm files are being dragged (the
-      // drag data can be in "protected mode" during dragover on Windows), we
-      // must still prevent the default so the drop is allowed to fire and the
-      // cursor does not show the "blocked" icon. A document-level guard also
-      // does this, but doing it here keeps the canvas a valid drop target
-      // independently.
-      event.preventDefault();
-      return;
-    }
+    if (!this._hasNativeFiles(event)) return;
 
     event.preventDefault();
     event.stopPropagation();

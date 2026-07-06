@@ -24,7 +24,6 @@ import CommandPalette, {
 } from '../CommandPalette/CommandPalette';
 import AlertProvider from '../UI/Alert/AlertProvider';
 import DragAndDropContextProvider from '../UI/DragAndDrop/DragAndDropContextProvider';
-import { installNativeFileDropGuard } from '../Utils/NativeFileDropGuard';
 import { I18n } from '@lingui/react';
 import useNewResourceDialog from '../ResourcesList/useNewResourceDialog';
 
@@ -72,17 +71,6 @@ const PoppedOutEditorContainerWindow = (props: Props): React.Node => {
   const onWindowReady = React.useCallback((externalWindow: any) => {
     setExternalWindow(externalWindow);
   }, []);
-
-  // Keep the popped-out window a valid drop target for native OS file drags,
-  // so dropping an image onto a popped-out scene canvas works on Windows too
-  // (see Utils/NativeFileDropGuard).
-  React.useEffect(
-    () => {
-      if (!externalWindowDocument) return;
-      return installNativeFileDropGuard(externalWindowDocument);
-    },
-    [externalWindowDocument]
-  );
 
   // Compute adaptive window size based on which pane the tab came from.
   const { popOutWidth, popOutHeight } = React.useMemo(

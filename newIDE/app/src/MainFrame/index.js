@@ -5,6 +5,7 @@ import { type State } from './MainFrameState';
 import './MainFrame.css';
 import Snackbar from '@material-ui/core/Snackbar';
 import HomeIcon from '../UI/CustomSvgIcons/Home';
+import AddCommentIcon from '../UI/CustomSvgIcons/AddComment';
 import DebuggerIcon from '../UI/CustomSvgIcons/Debug';
 import ProjectResourcesIcon from '../UI/CustomSvgIcons/ProjectResources';
 import GlobalConfigIcon from '../UI/CustomSvgIcons/GlobalConfig';
@@ -21,6 +22,7 @@ import ExternalLayoutIcon from '../UI/CustomSvgIcons/ExternalLayout';
 import ExtensionIcon from '../UI/CustomSvgIcons/Extension';
 import SearchIcon from '../UI/CustomSvgIcons/Search';
 import ProjectTitlebar from './ProjectTitlebar';
+import StickyNotes from './StickyNotes';
 import PreferencesDialog from './Preferences/PreferencesDialog';
 import AboutDialog from './AboutDialog';
 import ProjectManager, {
@@ -688,6 +690,10 @@ const MainFrame = (props: Props): React.MixedElement => {
     displaySignalAnimationsInPreview,
     setDisplaySignalAnimationsInPreview,
   ] = React.useState<boolean>(false);
+  const [
+    isStickyNotesManagerShown,
+    setStickyNotesManagerShown,
+  ] = React.useState<boolean>(false);
   const commandPaletteRef = React.useRef((null: ?CommandPaletteInterface));
   const [
     recentEditorSwitcherOpen,
@@ -805,6 +811,12 @@ const MainFrame = (props: Props): React.MixedElement => {
   const { currentFileMetadata, updateStatus } = state;
   const currentProject = exceptionallyGuardAgainstDeadObject(
     state.currentProject
+  );
+  React.useEffect(
+    () => {
+      if (!currentProject) setStickyNotesManagerShown(false);
+    },
+    [currentProject]
   );
   const isProjectManagerPinnedForCurrentProject =
     !!currentProject && isProjectManagerPinned;
@@ -3892,6 +3904,20 @@ const MainFrame = (props: Props): React.MixedElement => {
     [getEditorOpeningOptions, setState]
   );
 
+  const openStickyNotesManager = React.useCallback(
+    () => {
+      setStickyNotesManagerShown(true);
+    },
+    [setStickyNotesManagerShown]
+  );
+
+  const toggleStickyNotesManager = React.useCallback(
+    () => {
+      setStickyNotesManagerShown(isShown => !isShown);
+    },
+    [setStickyNotesManagerShown]
+  );
+
   const openGlobalConfig = React.useCallback(
     () => {
       setState(state => ({
@@ -6209,6 +6235,13 @@ const MainFrame = (props: Props): React.MixedElement => {
       openResources
     );
     addRecentEditorSwitcherSideMenuItem(
+      'sticky-notes',
+      i18n._(t`Sticky notes`),
+      i18n._(t`Project tools`),
+      <AddCommentIcon />,
+      openStickyNotesManager
+    );
+    addRecentEditorSwitcherSideMenuItem(
       'global-config',
       i18n._(t`Global config`),
       i18n._(t`Game settings`),
@@ -7030,6 +7063,8 @@ const MainFrame = (props: Props): React.MixedElement => {
     onQuitVersionHistory: onQuitVersionHistory,
     onOpenAskAi: openAskAi,
     onCloseAskAi: closeAskAi,
+    onToggleStickyNotesManager: toggleStickyNotesManager,
+    isStickyNotesManagerShown,
     getStorageProvider: getStorageProvider,
     // $FlowFixMe[incompatible-type]
     setPreviewedLayout: setPreviewedLayout,
@@ -7283,6 +7318,13 @@ const MainFrame = (props: Props): React.MixedElement => {
               )}
             />
           </LeaderboardProvider>
+          {currentProject && (
+            <StickyNotes
+              project={currentProject}
+              isManagerShown={isStickyNotesManagerShown}
+              onManagerShownChange={setStickyNotesManagerShown}
+            />
+          )}
         </div>
       </div>
       <PoppedOutWindows

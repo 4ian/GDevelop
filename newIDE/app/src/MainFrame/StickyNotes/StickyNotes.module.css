@@ -1,0 +1,411 @@
+.notesLayer {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.managerTitle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.managerBody {
+  display: grid;
+  grid-template-columns: minmax(280px, 34%) minmax(0, 1fr);
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  border-top: 1px solid var(--theme-toolbar-separator-color);
+}
+
+.managerSidebar {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  border-right: 1px solid var(--theme-toolbar-separator-color);
+}
+
+.managerList {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 6px;
+  gap: 6px;
+}
+
+.managerEmptyState {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  min-height: 120px;
+  padding: 16px;
+  text-align: center;
+}
+
+.managerListItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  border: 1px solid var(--theme-list-item-separator-color);
+  border-radius: 6px;
+  background-color: var(--theme-surface-canvas-background-color);
+}
+
+.managerListItemSelected {
+  border-color: var(--theme-text-default-color);
+  background-color: var(--theme-list-item-hover-background-color);
+}
+
+.managerListItemSummary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+  min-height: 56px;
+  padding: 8px;
+  border: 0;
+  background: transparent;
+  color: var(--theme-text-default-color);
+  text-align: left;
+  cursor: pointer;
+}
+
+.managerListItemSummary:hover,
+.managerListItemSummary:focus {
+  background-color: var(--theme-list-item-hover-background-color);
+  outline: none;
+}
+
+.managerListItemText {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 2px;
+}
+
+.managerListItemTitle,
+.managerListItemPreview {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.managerListItemTitle {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.managerListItemPreview {
+  font-size: 12px;
+  color: var(--theme-text-secondary-color);
+}
+
+.managerListItemActions {
+  display: flex;
+  flex: 0 0 auto;
+  padding-right: 4px;
+}
+
+.managerEditor {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  padding: 12px;
+  gap: 10px;
+}
+
+.managerEditorEmptyState {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  min-height: 0;
+  text-align: center;
+}
+
+.managerEditorTitleInput {
+  width: 100%;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: var(--theme-text-default-color);
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 26px;
+  box-sizing: border-box;
+}
+
+.managerEditorToolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 34px;
+}
+
+.managerEditorPalette,
+.managerEditorTextActions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.managerEditorBodyInput {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  padding: 10px;
+  border: 1px solid var(--theme-toolbar-separator-color);
+  border-radius: 6px;
+  outline: none;
+  resize: none;
+  box-sizing: border-box;
+  background-color: var(--theme-surface-canvas-background-color);
+  color: var(--theme-text-default-color);
+  font-family: inherit;
+}
+
+.noteColorSwatch {
+  flex: 0 0 auto;
+  width: 14px;
+  height: 32px;
+  border-radius: 4px;
+  border: 1px solid var(--sticky-note-border-color);
+  background-color: var(--sticky-note-background-color);
+}
+
+.note {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  pointer-events: auto;
+  border: 1px solid var(--sticky-note-border-color);
+  border-radius: 6px;
+  background-color: var(--sticky-note-background-color);
+  color: var(--sticky-note-text-color);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.28);
+  overflow: hidden;
+}
+
+.noteYellow {
+  --sticky-note-background-color: #fff3a7;
+  --sticky-note-border-color: #d7a910;
+  --sticky-note-text-color: #322806;
+}
+
+.noteOrange {
+  --sticky-note-background-color: #ffd8a8;
+  --sticky-note-border-color: #df8421;
+  --sticky-note-text-color: #3b1d02;
+}
+
+.noteBlue {
+  --sticky-note-background-color: #cfe6ff;
+  --sticky-note-border-color: #4f95d9;
+  --sticky-note-text-color: #082640;
+}
+
+.noteGreen {
+  --sticky-note-background-color: #d6f3c8;
+  --sticky-note-border-color: #6aa844;
+  --sticky-note-text-color: #18300f;
+}
+
+.noteTeal {
+  --sticky-note-background-color: #c8f0e7;
+  --sticky-note-border-color: #3aa891;
+  --sticky-note-text-color: #07352e;
+}
+
+.notePurple {
+  --sticky-note-background-color: #eadbff;
+  --sticky-note-border-color: #9b70d6;
+  --sticky-note-text-color: #281048;
+}
+
+.notePink {
+  --sticky-note-background-color: #ffd9e8;
+  --sticky-note-border-color: #d96c97;
+  --sticky-note-text-color: #3c1023;
+}
+
+.noteGray {
+  --sticky-note-background-color: #ece8de;
+  --sticky-note-border-color: #a39884;
+  --sticky-note-text-color: #27241d;
+}
+
+.noteHeader {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 0 0 36px;
+  min-width: 0;
+  padding: 4px 4px 4px 10px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.16);
+  background-color: rgba(255, 255, 255, 0.22);
+  cursor: default;
+  user-select: none;
+}
+
+.noteTitleInput {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 24px;
+}
+
+.noteTitleInput::placeholder {
+  color: rgba(0, 0, 0, 0.48);
+}
+
+.managerEditorTitleInput::placeholder,
+.managerEditorBodyInput::placeholder {
+  color: #ffffff;
+  opacity: 1;
+}
+
+.noteHeaderActions {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 1px;
+}
+
+.noteIconButton {
+  color: inherit !important;
+}
+
+.noteDragButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: inherit;
+  cursor: move;
+}
+
+.noteDragButton:hover,
+.noteDragButton:focus {
+  background-color: rgba(0, 0, 0, 0.08);
+  outline: none;
+}
+
+.noteDragIcon {
+  font-size: 20px !important;
+}
+
+.noteWrenchIcon {
+  font-size: 18px !important;
+}
+
+.noteTextTool,
+.noteTextToolBold,
+.noteTextToolItalic {
+  min-width: 18px;
+  color: inherit;
+  font-size: 12px;
+  line-height: 18px;
+  text-align: center;
+}
+
+.noteTextToolBold {
+  font-weight: 700;
+}
+
+.noteTextToolItalic {
+  font-style: italic;
+}
+
+.notePaletteButton {
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: 1px solid rgba(0, 0, 0, 0.3);
+  border-radius: 50%;
+  box-sizing: border-box;
+  background-color: var(--sticky-note-background-color);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.32);
+  cursor: pointer;
+}
+
+.notePaletteButtonSelected {
+  border: 2px solid var(--sticky-note-text-color);
+}
+
+.noteBodyInput {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  padding: 10px 12px 12px;
+  border: 0;
+  outline: none;
+  resize: none;
+  box-sizing: border-box;
+  background: transparent;
+  color: inherit;
+  font-family: inherit;
+  text-align: left;
+  overflow: auto;
+  overflow-wrap: anywhere;
+}
+
+.noteBodyInput::placeholder {
+  color: rgba(0, 0, 0, 0.48);
+  opacity: 1;
+}
+
+.noteBodyInput:hover,
+.noteBodyInput:focus {
+  background-color: rgba(255, 255, 255, 0.18);
+}
+
+.noteBodySmall {
+  font-size: 12px;
+  line-height: 17px;
+}
+
+.noteBodyNormal {
+  font-size: 13px;
+  line-height: 18px;
+}
+
+.noteBodyLarge {
+  font-size: 15px;
+  line-height: 21px;
+}
+
+.noteBodyRegular {
+  font-weight: 400;
+  font-style: normal;
+}
+
+.noteBodyBold {
+  font-weight: 700;
+  font-style: normal;
+}
+
+.noteBodyItalic {
+  font-weight: 400;
+  font-style: italic;
+}

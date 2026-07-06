@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react';
 
+import AddCommentIcon from '../UI/CustomSvgIcons/AddComment';
 import MenuIcon from '../UI/CustomSvgIcons/Menu';
 import IconButton from '../UI/IconButton';
 import {
@@ -46,6 +47,12 @@ const styles = {
     marginRight: 1,
     marginLeft: 2,
   },
+  stickyNotesContainer: {
+    zIndex: 0,
+    marginBottom: 4,
+    marginRight: 1,
+    marginLeft: 2,
+  },
 };
 
 type TabsTitlebarProps = {|
@@ -62,6 +69,9 @@ type TabsTitlebarProps = {|
 
   displayAskAi: boolean,
   onAskAiClicked: () => void,
+  displayStickyNotes: boolean,
+  onStickyNotesClicked: () => void,
+  isStickyNotesManagerShown: boolean,
 |};
 
 const useIsAskAiIconAnimated = (shouldDisplayAskAi: boolean) => {
@@ -117,6 +127,9 @@ export default function TabsTitlebar({
   displayLeftSafeMargins,
   displayAskAi,
   onAskAiClicked,
+  displayStickyNotes,
+  onStickyNotesClicked,
+  isStickyNotesManagerShown,
 }: TabsTitlebarProps): React.MixedElement {
   const isTouchscreen = useScreenType() === 'touch';
   const preferences = React.useContext(PreferencesContext);
@@ -271,6 +284,24 @@ export default function TabsTitlebar({
         </IconButton>
       )}
       {renderTabs(onEditorTabHovered, onEditorTabClosing)}
+      {displayStickyNotes ? (
+        <div
+          style={styles.stickyNotesContainer}
+          className={WINDOW_NON_DRAGGABLE_PART_CLASS_NAME}
+        >
+          <div
+            className={
+              isStickyNotesManagerShown ? classes.stickyNotesActive : undefined
+            }
+          >
+            <TextButton
+              icon={<AddCommentIcon />}
+              label={'Notes'}
+              onClick={onStickyNotesClicked}
+            />
+          </div>
+        </div>
+      ) : null}
       {shouldDisplayAskAi ? (
         <div
           style={styles.askAiContainer}

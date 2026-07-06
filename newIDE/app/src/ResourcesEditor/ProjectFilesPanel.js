@@ -52,6 +52,7 @@ const ignoredDirectoryNames = new Set([
   'node_modules',
   '.cache',
 ]);
+const ignoredFileNames = new Set(['.gdevelop-sticky-notes.json']);
 
 export type ProjectFileNode = {
   id: string,
@@ -540,6 +541,7 @@ const readDirectory = async ({
     }
     const name = dirent.name;
     if (dirent.isDirectory() && ignoredDirectoryNames.has(name)) continue;
+    if (dirent.isFile() && ignoredFileNames.has(name)) continue;
 
     const childAbsolutePath = path.join(absolutePath, name);
     const childRelativePath = relativePath

@@ -7,6 +7,8 @@ import {
   type ObjectsOutsideEditorChanges,
   type ObjectGroupsOutsideEditorChanges,
   type ProjectItemRenamedOutsideEditorChanges,
+  type WillDeleteSceneChanges,
+  type WillDeleteObjectChanges,
 } from '../EditorFunctions/OutsideEditorChanges';
 import {
   getAiRequest,
@@ -225,6 +227,8 @@ export const useProcessFunctionCalls = ({
   onObjectsModifiedOutsideEditor,
   onObjectGroupsModifiedOutsideEditor,
   onProjectItemRenamedOutsideEditor,
+  onWillDeleteScene,
+  onWillDeleteObject,
   onWillInstallExtension,
   onExtensionInstalled,
   isReadyToProcessFunctionCalls,
@@ -265,6 +269,8 @@ export const useProcessFunctionCalls = ({
   onProjectItemRenamedOutsideEditor: (
     changes: ProjectItemRenamedOutsideEditorChanges
   ) => void,
+  onWillDeleteScene: (changes: WillDeleteSceneChanges) => Promise<void>,
+  onWillDeleteObject: (changes: WillDeleteObjectChanges) => void,
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
   isReadyToProcessFunctionCalls: boolean,
@@ -562,6 +568,12 @@ export const useProcessFunctionCalls = ({
           // Not coalesced: the tab rename must track the model rename, else the
           // open scene editor briefly looks up a now-missing layout name.
           onProjectItemRenamedOutsideEditor,
+          // Not coalesced: must run before the scene is actually deleted so
+          // the tab can be closed while the gdLayout is still valid.
+          onWillDeleteScene,
+          // Not coalesced: must run before the object is actually deleted so
+          // editors can safely read it to close a dialog/panel referring to it.
+          onWillDeleteObject,
           ensureExtensionInstalled,
           onWillInstallExtension,
           onExtensionInstalled,
@@ -613,6 +625,8 @@ export const useProcessFunctionCalls = ({
       onObjectsModifiedOutsideEditor,
       onObjectGroupsModifiedOutsideEditor,
       onProjectItemRenamedOutsideEditor,
+      onWillDeleteScene,
+      onWillDeleteObject,
       ensureExtensionInstalled,
       onWillInstallExtension,
       onExtensionInstalled,

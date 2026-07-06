@@ -81,6 +81,8 @@ describe('editorFunctions', () => {
       });
     },
     onObjectsModifiedOutsideEditor: jest.fn(),
+    onWillDeleteScene: jest.fn(),
+    onWillDeleteObject: jest.fn(),
     onWillInstallExtension: jest.fn(),
     onExtensionInstalled: jest.fn(),
     getAssetStoreTagForNewObject: () => null,
@@ -1281,6 +1283,32 @@ describe('editorFunctions', () => {
 
       expect(result.success).toBe(false);
       expect(result.message).toContain('Object not found');
+    });
+
+    it('notifies the editor of the deleted object name, so it can close any related dialog/panel', async () => {
+      testScene.getObjects().insertNewObject(project, 'Sprite', 'MySprite', 0);
+      const fakeOptions = makeFakeLaunchFunctionOptionsWithProject(project);
+
+      await editorFunctions.change_object_properties_effects.launchFunction({
+        ...fakeOptions,
+        args: {
+          scene_name: 'TestScene',
+          object_name: 'MySprite',
+          delete_this_object: true,
+        },
+      });
+
+      expect(fakeOptions.onWillDeleteObject).toHaveBeenCalledWith({
+        scene: testScene,
+        objectName: 'MySprite',
+      });
+      expect(fakeOptions.onInstancesModifiedOutsideEditor).toHaveBeenCalledWith(
+        { scene: testScene }
+      );
+      expect(fakeOptions.onObjectsModifiedOutsideEditor).toHaveBeenCalledWith({
+        scene: testScene,
+        isNewObjectTypeUsed: false,
+      });
     });
   });
 
@@ -4091,6 +4119,23 @@ describe('editorFunctions', () => {
       );
 
       expect(project.getFirstLayout()).toBe('');
+    });
+
+    it('notifies the editor before the scene is deleted, so it can close any open tab', async () => {
+      const scene = project.getLayout('TestScene');
+      const fakeOptions = makeFakeLaunchFunctionOptionsWithProject(project);
+
+      await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...fakeOptions,
+          args: {
+            scene_name: 'TestScene',
+            delete_this_scene: true,
+          },
+        }
+      );
+
+      expect(fakeOptions.onWillDeleteScene).toHaveBeenCalledWith({ scene });
     });
   });
 

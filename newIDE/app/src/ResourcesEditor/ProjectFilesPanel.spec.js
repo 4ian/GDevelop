@@ -145,6 +145,32 @@ describe('ProjectFilesPanel', () => {
     );
   });
 
+  it('copies the project absolute path from the header toolbar', () => {
+    const source = getSource();
+    const toolbarStart = source.indexOf('<MiniToolbar noPadding>');
+    const toolbarEnd = source.indexOf('</MiniToolbar>', toolbarStart);
+    const toolbar = source.slice(toolbarStart, toolbarEnd);
+
+    expect(source).toContain(
+      "import CopyIcon from '../UI/CustomSvgIcons/Copy'"
+    );
+    expect(source).toContain(
+      "import { copyTextToClipboard } from '../Utils/Clipboard'"
+    );
+    expect(source).toContain(
+      'const copyProjectAbsolutePath = React.useCallback'
+    );
+    expect(source).toContain('await copyTextToClipboard(projectRoot);');
+    expect(toolbar).toContain('onClick={copyProjectAbsolutePath}');
+    expect(toolbar).toContain('tooltip={t`Copy project absolute path`}');
+    expect(toolbar.indexOf('onClick={openProjectFolder}')).toBeLessThan(
+      toolbar.indexOf('onClick={copyProjectAbsolutePath}')
+    );
+    expect(toolbar.indexOf('onClick={copyProjectAbsolutePath}')).toBeLessThan(
+      toolbar.indexOf('onClick={onRefreshProjectFiles}')
+    );
+  });
+
   it('refreshes registered file badges when project resources change', () => {
     const source = getSource();
 

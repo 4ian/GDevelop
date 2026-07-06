@@ -226,7 +226,7 @@ describe('CreateProject template files', () => {
       1,
       'git',
       ['init'],
-      expect.objectContaining({ cwd: '/Project' }),
+      expect.objectContaining({ cwd: '/Project', timeout: 10000 }),
       expect.any(Function)
     );
     expect(childProcess.execFile).toHaveBeenNthCalledWith(
@@ -274,7 +274,15 @@ describe('CreateProject template files', () => {
     expect(childProcess.execFile).toHaveBeenNthCalledWith(
       8,
       'git',
-      ['commit', '-m', 'Initial GDevelop project'],
+      [
+        '-c',
+        'commit.gpgsign=false',
+        'commit',
+        '--no-gpg-sign',
+        '--no-verify',
+        '-m',
+        'Initial GDevelop project',
+      ],
       expect.objectContaining({ cwd: '/Project' }),
       expect.any(Function)
     );

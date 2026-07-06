@@ -16,6 +16,7 @@ const gd: libGDevelop = global.gd;
 const fs = optionalRequire('fs-extra');
 const path = optionalRequire('path');
 const childProcess = optionalRequire('child_process');
+const gitCommandTimeoutMs = 10000;
 
 export type ProjectTemplateFilesSource =
   | {|
@@ -208,7 +209,7 @@ const runGitCommand = ({
       args,
       {
         cwd: workingDirectory,
-        timeout: 120000,
+        timeout: gitCommandTimeoutMs,
         maxBuffer: 10 * 1024 * 1024,
         windowsHide: true,
       },
@@ -271,7 +272,15 @@ export const initializeLocalProjectGitRepository = async ({
   const statusResult = await runGit(['status', '--porcelain=v1', '-uall']);
   if (!statusResult.stdout.trim()) return;
 
-  await runGit(['commit', '-m', 'Initial GDevelop project']);
+  await runGit([
+    '-c',
+    'commit.gpgsign=false',
+    'commit',
+    '--no-gpg-sign',
+    '--no-verify',
+    '-m',
+    'Initial GDevelop project',
+  ]);
 };
 
 // Recursively copy a bundled local template folder into the new project folder.

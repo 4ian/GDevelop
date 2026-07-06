@@ -9,6 +9,7 @@ import {
   createNewProjectFromTutorialTemplate,
   createNewProjectFromCourseChapterTemplate,
   initializeLocalProjectGitRepository,
+  type ProjectTemplateFilesSource,
   type NewProjectSource,
 } from '../ProjectCreation/CreateProject';
 import {
@@ -45,6 +46,55 @@ import { TutorialContext } from '../Tutorial/TutorialContext';
 export type CreateProjectResult = {|
   createdProject: gdProject | null,
 |};
+
+const optionalLocalProjectSetupStepTimeoutMs = 10000;
+
+const runOptionalLocalProjectSetupStep = async (
+  description: string,
+  setupStep: () => Promise<void>
+): Promise<void> => {
+  let timeoutId: ?TimeoutID = null;
+  try {
+    await Promise.race([
+      setupStep(),
+      new Promise((resolve, reject) => {
+        timeoutId = setTimeout(() => {
+          reject(new Error(`${description} timed out.`));
+        }, optionalLocalProjectSetupStepTimeoutMs);
+      }),
+    ]);
+  } catch (error) {
+    console.warn(`Unable to ${description}:`, error);
+  } finally {
+    if (timeoutId) clearTimeout(timeoutId);
+  }
+};
+
+const startOptionalLocalProjectSetup = ({
+  projectFilePath,
+  templateFilesSource,
+}: {|
+  projectFilePath: string,
+  templateFilesSource?: ?ProjectTemplateFilesSource,
+|}): void => {
+  (async () => {
+    await runOptionalLocalProjectSetupStep(
+      'copy project template files to the new local project',
+      () =>
+        copyProjectTemplateFilesToLocalProjectFolder({
+          projectFilePath,
+          templateFilesSource,
+        })
+    );
+    await runOptionalLocalProjectSetupStep(
+      'initialize Git for the new local project',
+      () =>
+        initializeLocalProjectGitRepository({
+          projectFilePath,
+        })
+    );
+  })();
+};
 
 type Props = {|
   beforeCreatingProject: () => void,
@@ -295,12 +345,7 @@ const useCreateProject = ({
                 if (
                   newProjectSetup.storageProvider.internalName === 'LocalFile'
                 ) {
-                  console.log(
-                    'Start copying project template files to the new project...'
-                  );
-                  await copyProjectTemplateFilesToLocalProjectFolder({
-                    projectFilePath: newFileMetadata.fileIdentifier,
-                  });
+                  console.log('Project template files will be copied later.');
                 }
               },
             }
@@ -315,16 +360,10 @@ const useCreateProject = ({
           }
 
           if (newProjectSetup.storageProvider.internalName === 'LocalFile') {
-            try {
-              await initializeLocalProjectGitRepository({
-                projectFilePath: fileMetadata.fileIdentifier,
-              });
-            } catch (error) {
-              console.warn(
-                'Unable to initialize Git for the new project:',
-                error
-              );
-            }
+            startOptionalLocalProjectSetup({
+              projectFilePath: fileMetadata.fileIdentifier,
+              templateFilesSource: newProjectSource.templateFilesSource,
+            });
           }
 
           updatedFileMetadata = fileMetadata;
@@ -394,31 +433,63 @@ const useCreateProject = ({
     ]
   );
 
+  const createProjectAfterPreparation = React.useCallback(
+    async ({
+      prepareNewProjectSource,
+      newProjectSetup,
+      options,
+    }: {|
+      prepareNewProjectSource: () => Promise<?NewProjectSource>,
+      newProjectSetup: NewProjectSetup,
+      options?: { openAllScenes: boolean },
+    |}): Promise<CreateProjectResult> => {
+      beforeCreatingProject();
+      let didStartProjectCreation = false;
+      try {
+        const newProjectSource = await prepareNewProjectSource();
+        didStartProjectCreation = true;
+        return await createProject(newProjectSource, newProjectSetup, options);
+      } catch (error) {
+        if (didStartProjectCreation) throw error;
+
+        console.error('Unable to prepare the new project:', error);
+        showAlert({
+          title: t`Unable to create the project`,
+          message: t`An error occurred when creating the project. Try again later.`,
+        });
+        onError();
+        return { createdProject: null };
+      } finally {
+        if (!didStartProjectCreation) onSuccessOrError();
+      }
+    },
+    [beforeCreatingProject, createProject, onError, onSuccessOrError, showAlert]
+  );
+
   const createEmptyProject = React.useCallback(
     async (newProjectSetup: NewProjectSetup): Promise<CreateProjectResult> => {
-      beforeCreatingProject();
-      const newProjectSource = createNewEmptyProject({
-        creationSource: newProjectSetup.creationSource,
+      return await createProjectAfterPreparation({
+        prepareNewProjectSource: async () =>
+          createNewEmptyProject({
+            creationSource: newProjectSetup.creationSource,
+          }),
+        newProjectSetup,
       });
-      return await createProject(newProjectSource, newProjectSetup);
     },
-    [beforeCreatingProject, createProject]
+    [createProjectAfterPreparation]
   );
 
   const createProjectFromExample = React.useCallback(
     async (
       exampleProjectSetup: ExampleProjectSetup
     ): Promise<CreateProjectResult> => {
-      beforeCreatingProject();
-      const newProjectSource = await createNewProjectFromExampleShortHeader(
-        exampleProjectSetup
-      );
-      return await createProject(
-        newProjectSource,
-        exampleProjectSetup.newProjectSetup
-      );
+      return await createProjectAfterPreparation({
+        prepareNewProjectSource: () =>
+          createNewProjectFromExampleShortHeader(exampleProjectSetup),
+        newProjectSetup: exampleProjectSetup.newProjectSetup,
+      });
     },
-    [beforeCreatingProject, createProject]
+    [createProjectAfterPreparation]
   );
 
   const createProjectFromPrivateGameTemplate = React.useCallback(
@@ -426,32 +497,35 @@ const useCreateProject = ({
       privateGameTemplateListingData: PrivateGameTemplateListingData,
       newProjectSetup: NewProjectSetup
     ): Promise<CreateProjectResult> => {
-      beforeCreatingProject();
-      if (!profile) {
-        throw new Error(
-          'Unable to create the project with the game template because no profile was found.'
-        );
-      }
+      return await createProjectAfterPreparation({
+        prepareNewProjectSource: async () => {
+          if (!profile) {
+            throw new Error(
+              'Unable to create the project with the game template because no profile was found.'
+            );
+          }
 
-      const token = await getAuthorizationTokenForPrivateGameTemplates(
-        authenticatedUser.getAuthorizationHeader,
-        {
-          userId: profile.id,
-        }
-      );
+          const token = await getAuthorizationTokenForPrivateGameTemplates(
+            authenticatedUser.getAuthorizationHeader,
+            {
+              userId: profile.id,
+            }
+          );
 
-      const privateGameTemplateUrl = await createPrivateGameTemplateUrl(
-        privateGameTemplateListingData,
-        token
-      );
+          const privateGameTemplateUrl = await createPrivateGameTemplateUrl(
+            privateGameTemplateListingData,
+            token
+          );
 
-      const newProjectSource = await createNewProjectFromPrivateGameTemplate(
-        privateGameTemplateUrl,
-        privateGameTemplateListingData.id
-      );
-      return await createProject(newProjectSource, newProjectSetup);
+          return await createNewProjectFromPrivateGameTemplate(
+            privateGameTemplateUrl,
+            privateGameTemplateListingData.id
+          );
+        },
+        newProjectSetup,
+      });
     },
-    [beforeCreatingProject, createProject, profile, authenticatedUser]
+    [authenticatedUser, createProjectAfterPreparation, profile]
   );
 
   const createProjectFromInAppTutorial = React.useCallback(
@@ -459,28 +533,33 @@ const useCreateProject = ({
       tutorialId: string,
       newProjectSetup: NewProjectSetup
     ): Promise<CreateProjectResult> => {
-      beforeCreatingProject();
-      const selectedInAppTutorialShortHeader = getInAppTutorialShortHeader(
-        tutorialId
-      );
-      if (!selectedInAppTutorialShortHeader) {
-        throw new Error(`No in app tutorial found for id "${tutorialId}"`);
-      }
-      const templateUrl = selectedInAppTutorialShortHeader.initialTemplateUrl;
-      if (!templateUrl) {
-        throw new Error(
-          `No initial template URL for the in-app tutorial "${tutorialId}"`
-        );
-      }
-      const newProjectSource = await createNewProjectFromTutorialTemplate(
-        templateUrl,
-        selectedInAppTutorialShortHeader.id
-      );
-      return await createProject(newProjectSource, newProjectSetup, {
-        openAllScenes: true,
+      return await createProjectAfterPreparation({
+        prepareNewProjectSource: async () => {
+          const selectedInAppTutorialShortHeader = getInAppTutorialShortHeader(
+            tutorialId
+          );
+          if (!selectedInAppTutorialShortHeader) {
+            throw new Error(`No in app tutorial found for id "${tutorialId}"`);
+          }
+          const templateUrl =
+            selectedInAppTutorialShortHeader.initialTemplateUrl;
+          if (!templateUrl) {
+            throw new Error(
+              `No initial template URL for the in-app tutorial "${tutorialId}"`
+            );
+          }
+          return await createNewProjectFromTutorialTemplate(
+            templateUrl,
+            selectedInAppTutorialShortHeader.id
+          );
+        },
+        newProjectSetup,
+        options: {
+          openAllScenes: true,
+        },
       });
     },
-    [beforeCreatingProject, createProject, getInAppTutorialShortHeader]
+    [createProjectAfterPreparation, getInAppTutorialShortHeader]
   );
 
   const createProjectFromTutorial = React.useCallback(
@@ -488,29 +567,33 @@ const useCreateProject = ({
       tutorialId: string,
       newProjectSetup: NewProjectSetup
     ): Promise<CreateProjectResult> => {
-      beforeCreatingProject();
-      if (!tutorials) {
-        throw new Error(`Tutorials could not be loaded`);
-      }
-      const selectedTutorial = tutorials.find(
-        tutorial => tutorial.id === tutorialId
-      );
-      if (!selectedTutorial) {
-        throw new Error(`No tutorial found for id "${tutorialId}"`);
-      }
-      const { templateUrl } = selectedTutorial;
-      if (!templateUrl) {
-        throw new Error(`No template URL for the tutorial "${tutorialId}"`);
-      }
-      const newProjectSource = await createNewProjectFromTutorialTemplate(
-        templateUrl,
-        tutorialId
-      );
-      return await createProject(newProjectSource, newProjectSetup, {
-        openAllScenes: true,
+      return await createProjectAfterPreparation({
+        prepareNewProjectSource: async () => {
+          if (!tutorials) {
+            throw new Error(`Tutorials could not be loaded`);
+          }
+          const selectedTutorial = tutorials.find(
+            tutorial => tutorial.id === tutorialId
+          );
+          if (!selectedTutorial) {
+            throw new Error(`No tutorial found for id "${tutorialId}"`);
+          }
+          const { templateUrl } = selectedTutorial;
+          if (!templateUrl) {
+            throw new Error(`No template URL for the tutorial "${tutorialId}"`);
+          }
+          return await createNewProjectFromTutorialTemplate(
+            templateUrl,
+            tutorialId
+          );
+        },
+        newProjectSetup,
+        options: {
+          openAllScenes: true,
+        },
       });
     },
-    [beforeCreatingProject, createProject, tutorials]
+    [createProjectAfterPreparation, tutorials]
   );
 
   const createProjectFromCourseChapter = React.useCallback(
@@ -524,32 +607,36 @@ const useCreateProject = ({
       newProjectSetup: NewProjectSetup,
     |}): Promise<CreateProjectResult> => {
       if (courseChapter.isLocked) return { createdProject: null };
-      beforeCreatingProject();
-      let templateUrl;
-      if (courseChapter.templateUrl) {
-        templateUrl = courseChapter.templateUrl;
-      } else if (courseChapter.templates) {
-        const matchingTemplate = courseChapter.templates.find(
-          template => template.id === templateId
-        );
-        if (matchingTemplate) templateUrl = matchingTemplate.url;
-      }
-      if (!templateUrl) {
-        throw new Error(
-          `No template URL for the course chapter "${
+      return await createProjectAfterPreparation({
+        prepareNewProjectSource: async () => {
+          let templateUrl;
+          if (courseChapter.templateUrl) {
+            templateUrl = courseChapter.templateUrl;
+          } else if (courseChapter.templates) {
+            const matchingTemplate = courseChapter.templates.find(
+              template => template.id === templateId
+            );
+            if (matchingTemplate) templateUrl = matchingTemplate.url;
+          }
+          if (!templateUrl) {
+            throw new Error(
+              `No template URL for the course chapter "${
+                courseChapter.id
+              }" and template id "${templateId || 'undefined'}"`
+            );
+          }
+          return await createNewProjectFromCourseChapterTemplate(
+            templateUrl,
             courseChapter.id
-          }" and template id "${templateId || 'undefined'}"`
-        );
-      }
-      const newProjectSource = await createNewProjectFromCourseChapterTemplate(
-        templateUrl,
-        courseChapter.id
-      );
-      return await createProject(newProjectSource, newProjectSetup, {
-        openAllScenes: true,
+          );
+        },
+        newProjectSetup,
+        options: {
+          openAllScenes: true,
+        },
       });
     },
-    [beforeCreatingProject, createProject]
+    [createProjectAfterPreparation]
   );
 
   return {

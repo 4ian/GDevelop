@@ -18,6 +18,7 @@ import type { StorageProvider } from '../ProjectsStorage';
 import ChevronArrowBottom from '../UI/CustomSvgIcons/ChevronArrowBottom';
 import ChevronArrowRight from '../UI/CustomSvgIcons/ChevronArrowRight';
 import CheckIcon from '../UI/CustomSvgIcons/Check';
+import CopyIcon from '../UI/CustomSvgIcons/Copy';
 import FileIcon from '../UI/CustomSvgIcons/File';
 import FileWithLines from '../UI/CustomSvgIcons/FileWithLines';
 import FolderIcon from '../UI/CustomSvgIcons/Folder';
@@ -33,6 +34,7 @@ import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
 import useResourcesChangedWatcher from '../ResourcesList/UseResourcesChangedWatcher';
 import { findLocalProjectTemplatePath } from '../ProjectCreation/LocalProjectTemplateFinder';
+import { copyTextToClipboard } from '../Utils/Clipboard';
 
 const gd: libGDevelop = global.gd;
 const fs = optionalRequire('fs');
@@ -2185,6 +2187,23 @@ const ProjectFilesPanel: React.ComponentType<{
       [project]
     );
 
+    const copyProjectAbsolutePath = React.useCallback(
+      async () => {
+        const projectRoot = getProjectRootPath(project);
+        if (!projectRoot) return;
+
+        try {
+          await copyTextToClipboard(projectRoot);
+        } catch (error) {
+          await showAlert({
+            title: t`Unable to copy project path`,
+            message: t`The project path could not be copied to the clipboard.`,
+          });
+        }
+      },
+      [project, showAlert]
+    );
+
     const updateProjectSkillsFolderFromTemplate = React.useCallback(
       async (node: ProjectFileNode) => {
         if (!canUpdateProjectFolderFromTemplate(node)) return;
@@ -2697,6 +2716,13 @@ const ProjectFilesPanel: React.ComponentType<{
               tooltip={t`Open the project folder`}
             >
               <FolderIcon />
+            </IconButton>
+            <IconButton
+              size="small"
+              onClick={copyProjectAbsolutePath}
+              tooltip={t`Copy project absolute path`}
+            >
+              <CopyIcon />
             </IconButton>
             <IconButton
               size="small"

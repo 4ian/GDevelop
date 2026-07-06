@@ -268,7 +268,14 @@ export default class MaterialUIMenuImplementation
                 }
 
                 if (item.click) {
-                  await item.click();
+                  try {
+                    await item.click();
+                  } catch (error) {
+                    console.error(
+                      'Error while executing menu item action:',
+                      error
+                    );
+                  }
                   if (item.type === 'checkbox') {
                     // In case the item click function changes something that React does not detect,
                     // for instance a change in the project/layout C++ object, the menu must be
@@ -314,8 +321,16 @@ export default class MaterialUIMenuImplementation
                 }
 
                 if (item.click) {
-                  item.click();
-                  this._onClose();
+                  try {
+                    item.click();
+                  } catch (error) {
+                    console.error(
+                      'Error while executing menu item action:',
+                      error
+                    );
+                  } finally {
+                    this._onClose();
+                  }
                 }
               }}
               style={styles.menuItem}

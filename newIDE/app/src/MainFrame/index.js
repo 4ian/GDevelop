@@ -1063,6 +1063,9 @@ const MainFrame = (props: Props): React.MixedElement => {
             'a preview window was closed'
           );
         }
+        // A preview window close can leave the main window with leaked MUI
+        // overlay state, just like debugger/editor pop-outs do.
+        healMainWindowAfterPopOutClose();
       };
 
       ipcRenderer.on('preview-window-closed', onPreviewWindowClosed);
@@ -1072,7 +1075,11 @@ const MainFrame = (props: Props): React.MixedElement => {
           onPreviewWindowClosed
         );
     },
-    [cancelPendingPreviewLaunchAfterWindowClosed, hasNonEditionPreviewsRunning]
+    [
+      cancelPendingPreviewLaunchAfterWindowClosed,
+      hasNonEditionPreviewsRunning,
+      healMainWindowAfterPopOutClose,
+    ]
   );
 
   const getEditorOpeningOptions = React.useCallback(

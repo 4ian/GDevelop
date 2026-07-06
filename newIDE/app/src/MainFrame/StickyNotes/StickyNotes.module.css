@@ -195,6 +195,7 @@
   border-radius: 6px;
   background-color: var(--sticky-note-background-color);
   color: var(--sticky-note-text-color);
+  font-family: var(--gdevelop-modern-font-family);
   box-shadow: 0 10px 28px rgba(0, 0, 0, 0.28);
   overflow: hidden;
 }
@@ -267,9 +268,10 @@
   outline: none;
   background: transparent;
   color: inherit;
+  font-family: var(--gdevelop-modern-font-family);
   font-size: 14px;
   font-weight: 600;
-  line-height: 24px;
+  line-height: 20px;
 }
 
 .noteTitleInput::placeholder {
@@ -366,7 +368,7 @@
   box-sizing: border-box;
   background: transparent;
   color: inherit;
-  font-family: inherit;
+  font-family: var(--gdevelop-modern-font-family);
   text-align: left;
   overflow: auto;
   overflow-wrap: anywhere;
@@ -384,17 +386,17 @@
 
 .noteBodySmall {
   font-size: 12px;
-  line-height: 17px;
+  line-height: 16px;
 }
 
 .noteBodyNormal {
-  font-size: 13px;
-  line-height: 18px;
+  font-size: 14px;
+  line-height: 20px;
 }
 
 .noteBodyLarge {
-  font-size: 15px;
-  line-height: 21px;
+  font-size: 16px;
+  line-height: 24px;
 }
 
 .noteBodyRegular {

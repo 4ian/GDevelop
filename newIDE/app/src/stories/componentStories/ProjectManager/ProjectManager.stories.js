@@ -113,6 +113,7 @@ export const NoProjectOpen = (): React.Node => {
                   )}
                   onRenameExternalEvents={action('onRenameExternalEvents')}
                   onOpenResources={action('onOpenResources')}
+                  onOpenStickyNotes={action('onOpenStickyNotes')}
                   onReloadEventsFunctionsExtensions={action(
                     'onReloadEventsFunctionsExtensions'
                   )}
@@ -229,6 +230,7 @@ export const ProjectOpen = (): React.Node => {
                   )}
                   onRenameExternalEvents={action('onRenameExternalEvents')}
                   onOpenResources={action('onOpenResources')}
+                  onOpenStickyNotes={action('onOpenStickyNotes')}
                   onReloadEventsFunctionsExtensions={action(
                     'onReloadEventsFunctionsExtensions'
                   )}

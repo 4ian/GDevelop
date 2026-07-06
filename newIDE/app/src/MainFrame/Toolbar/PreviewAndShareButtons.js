@@ -9,12 +9,6 @@ import UpdateIcon from '../../UI/CustomSvgIcons/Update';
 import FlatButtonWithSplitMenu from '../../UI/FlatButtonWithSplitMenu';
 import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
-import optionalRequire from '../../Utils/OptionalRequire';
-
-const electron = optionalRequire('electron');
-
-const escapeMenuLabelForElectron = (label: string): string =>
-  electron ? label.replace(/&/g, '&&') : label;
 
 export type PreviewAndShareButtonsProps = {|
   onPreviewWithoutHotReload: (
@@ -184,7 +178,7 @@ const PreviewAndShareButtons: React.ComponentType<PreviewAndShareButtonsProps> =
           },
           { type: 'separator' },
           {
-            label: escapeMenuLabelForElectron(i18n._(t`Export & Share`)),
+            label: i18n._(t`Export & Share`),
             click: openShareDialog,
             enabled: isSharingEnabled,
           },

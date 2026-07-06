@@ -135,6 +135,7 @@ const gamePropertiesItemId = getProjectManagerItemId('game-properties');
 const gameResourcesItemId = getProjectManagerItemId('game-resources');
 const gameExtensionsItemId = getProjectManagerItemId('game-extensions');
 const gameShareItemId = getProjectManagerItemId('game-share');
+const gameStickyNotesItemId = getProjectManagerItemId('game-sticky-notes');
 const globalsRootFolderId = getProjectManagerItemId('globals');
 export const globalVariablesItemId: string = getProjectManagerItemId(
   'global-variables'
@@ -687,6 +688,7 @@ type Props = {|
   ...BehaviorShortcutTreeViewItemCallbacks,
   ...FunctionShortcutTreeViewItemCallbacks,
   onOpenResources: () => void,
+  onOpenStickyNotes: () => void,
   onOpenGlobalConfig: () => void,
   openBehaviorEvents: (extensionName: string, behaviorName: string) => void,
   onOpenEventBasedObjectEditor: (
@@ -767,6 +769,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       onEventsBasedObjectChildrenEdited,
       onEventBasedObjectTypeChanged,
       onOpenResources,
+      onOpenStickyNotes,
       onOpenGlobalConfig,
       onReloadEventsFunctionsExtensions,
       isOpen,
@@ -1677,6 +1680,14 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                         'res/icons_default/publish_black.svg'
                       )
                     ),
+                    new LeafTreeViewItem(
+                      new ActionTreeViewItemContent(
+                        gameStickyNotesItemId,
+                        i18n._(t`Sticky notes`),
+                        onOpenStickyNotes,
+                        'res/commentaireadd24.png'
+                      )
+                    ),
                   ];
                 },
               },
@@ -2022,6 +2033,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         functionShortcutTreeViewItemProps,
         onOpenGlobalConfig,
         onOpenResources,
+        onOpenStickyNotes,
         onShareProject,
         openCreateExternalDialog,
         openProjectExtensionsDialog,

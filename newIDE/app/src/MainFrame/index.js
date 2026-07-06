@@ -3916,15 +3916,12 @@ const MainFrame = (props: Props): React.MixedElement => {
     [setStickyNotesManagerShown]
   );
 
-  const createStickyNoteFromTitlebar = React.useCallback(
-    () => {
-      const stickyNotes = stickyNotesRef.current;
-      if (!stickyNotes) return;
+  const createStickyNoteFromTitlebar = React.useCallback(() => {
+    const stickyNotes = stickyNotesRef.current;
+    if (!stickyNotes) return;
 
-      stickyNotes.createNote({ showManager: false });
-    },
-    []
-  );
+    stickyNotes.createNote({ showManager: false });
+  }, []);
 
   const openGlobalConfig = React.useCallback(
     () => {
@@ -7198,6 +7195,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       onRenameEventsFunctionsExtension={renameEventsFunctionsExtension}
       onRenameExternalEvents={renameExternalEvents}
       onOpenResources={openResources}
+      onOpenStickyNotes={openStickyNotesManager}
       onOpenGlobalConfig={openGlobalConfig}
       onReloadEventsFunctionsExtensions={onReloadEventsFunctionsExtensions}
       onWillInstallExtension={onWillInstallExtension}

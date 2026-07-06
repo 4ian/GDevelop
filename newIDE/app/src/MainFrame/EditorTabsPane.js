@@ -30,6 +30,8 @@ import {
   type ObjectsOutsideEditorChanges,
   type ObjectGroupsOutsideEditorChanges,
   type ProjectItemRenamedOutsideEditorChanges,
+  type WillDeleteSceneChanges,
+  type WillDeleteObjectChanges,
 } from '../EditorFunctions/OutsideEditorChanges';
 import { type NavigateToEventFromGlobalSearchParams } from '../Utils/Search';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
@@ -288,6 +290,8 @@ export type EditorTabsPaneCommonProps = {|
   onProjectItemRenamedOutsideEditor: (
     changes: ProjectItemRenamedOutsideEditorChanges
   ) => void,
+  onWillDeleteScene: (changes: WillDeleteSceneChanges) => Promise<void>,
+  onWillDeleteObject: (changes: WillDeleteObjectChanges) => void,
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
   onLoadEventsFunctionsExtensions: ({|
@@ -405,6 +409,8 @@ const EditorTabsPane: React.ComponentType<{
     onObjectsModifiedOutsideEditor,
     onObjectGroupsModifiedOutsideEditor,
     onProjectItemRenamedOutsideEditor,
+    onWillDeleteScene,
+    onWillDeleteObject,
     onWillInstallExtension,
     onExtensionInstalled,
     onEffectAdded,
@@ -871,6 +877,8 @@ const EditorTabsPane: React.ComponentType<{
                     onObjectsModifiedOutsideEditor: onObjectsModifiedOutsideEditor,
                     onObjectGroupsModifiedOutsideEditor: onObjectGroupsModifiedOutsideEditor,
                     onProjectItemRenamedOutsideEditor: onProjectItemRenamedOutsideEditor,
+                    onWillDeleteScene: onWillDeleteScene,
+                    onWillDeleteObject: onWillDeleteObject,
                     onWillInstallExtension: onWillInstallExtension,
                     onExtensionInstalled: onExtensionInstalled,
                     onEffectAdded: onEffectAdded,

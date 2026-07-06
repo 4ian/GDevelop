@@ -61,6 +61,8 @@ import type {
   ObjectsOutsideEditorChanges,
   ObjectGroupsOutsideEditorChanges,
   ProjectItemRenamedOutsideEditorChanges,
+  WillDeleteSceneChanges,
+  WillDeleteObjectChanges,
 } from './OutsideEditorChanges';
 import { type AssetShortHeader } from '../Utils/GDevelopServices/Asset';
 import { type ExampleShortHeader } from '../Utils/GDevelopServices/Example';
@@ -303,6 +305,8 @@ type LaunchFunctionOptionsWithoutProject = {|
   onProjectItemRenamedOutsideEditor: (
     changes: ProjectItemRenamedOutsideEditorChanges
   ) => void,
+  onWillDeleteScene: (changes: WillDeleteSceneChanges) => Promise<void>,
+  onWillDeleteObject: (changes: WillDeleteObjectChanges) => void,
   ensureExtensionInstalled: (
     options: EnsureExtensionInstalledOptions
   ) => Promise<void>,
@@ -1925,7 +1929,13 @@ const changeObjectPropertiesEffects: EditorFunction = {
     // $FlowFixMe[incompatible-type]
     return renderChanges(changes);
   },
-  launchFunction: async ({ project, args, onObjectsModifiedOutsideEditor }) => {
+  launchFunction: async ({
+    project,
+    args,
+    onObjectsModifiedOutsideEditor,
+    onInstancesModifiedOutsideEditor,
+    onWillDeleteObject,
+  }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
     const object_name = extractRequiredString(args, 'object_name');
     const changed_properties =
@@ -1962,6 +1972,10 @@ const changeObjectPropertiesEffects: EditorFunction = {
       'delete_this_object'
     );
     if (deleteThisObject) {
+      // Let editors close any dialog referring to this object BEFORE it's
+      // actually removed, while it's still safe to read it.
+      onWillDeleteObject({ scene: layout, objectName: object_name });
+
       if (isGlobalObject) {
         gd.WholeProjectRefactorer.globalObjectRemoved(project, object_name);
         globalObjects.removeObject(object_name);
@@ -1974,6 +1988,10 @@ const changeObjectPropertiesEffects: EditorFunction = {
         layoutObjects.removeObject(object_name);
       }
 
+      // Refresh instances/objects lists AFTER the removal, so they reflect
+      // the final state (the instances hot-reload payload in particular is
+      // built synchronously from current data when this is called).
+      onInstancesModifiedOutsideEditor({ scene: layout });
       onObjectsModifiedOutsideEditor({
         scene: layout,
         isNewObjectTypeUsed: false,
@@ -5476,6 +5494,7 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
     onInstancesModifiedOutsideEditor,
     onObjectGroupsModifiedOutsideEditor,
     onProjectItemRenamedOutsideEditor,
+    onWillDeleteScene,
   }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
 
@@ -5489,11 +5508,24 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
       'delete_this_scene'
     );
     if (deleteThisScene) {
-      if (project.getFirstLayout() === scene_name) {
+      // Let the editor close any tab bound to this scene BEFORE it's
+      // actually deleted (mirrors the manual delete flow, which closes tabs
+      // before removing the layout). This must be awaited: closing tabs
+      // requires reading the layout via `getLayout()`, which only works
+      // while the scene still exists in the project.
+      await onWillDeleteScene({ scene });
+
+      const wasFirstLayout = project.getFirstLayout() === scene_name;
+      if (wasFirstLayout) {
         project.setFirstLayout('');
       }
       project.removeLayout(scene_name);
-      return makeGenericSuccess(`Deleted scene "${scene_name}".`);
+      return makeGenericSuccess(
+        `Deleted scene "${scene_name}".` +
+          (wasFirstLayout
+            ? " It has been removed as the project's first scene."
+            : '')
+      );
     }
 
     const changes = [];

@@ -30,6 +30,8 @@ import type {
   ObjectsOutsideEditorChanges,
   ObjectGroupsOutsideEditorChanges,
   ProjectItemRenamedOutsideEditorChanges,
+  WillDeleteSceneChanges,
+  WillDeleteObjectChanges,
 } from '../../EditorFunctions/OutsideEditorChanges';
 
 export type EditorContainerExtraProps = {|
@@ -234,6 +236,8 @@ export type RenderEditorContainerProps = {|
   onProjectItemRenamedOutsideEditor: (
     changes: ProjectItemRenamedOutsideEditorChanges
   ) => void,
+  onWillDeleteScene: (changes: WillDeleteSceneChanges) => Promise<void>,
+  onWillDeleteObject: (changes: WillDeleteObjectChanges) => void,
 
   // Events editing
   onSceneEventsModifiedOutsideEditor: (

@@ -381,6 +381,10 @@ export const useAiRequestHistory = (
         .forEach((request: AiRequest) => {
           if (!request.output) return;
 
+          // Exclude sub-agent requests: their "user" messages are sent by
+          // the orchestrator, not by the user.
+          if (request.parentAiRequestId) return;
+
           const userMessages = request.output
             .filter(
               message => message.type === 'message' && message.role === 'user'

@@ -9,6 +9,7 @@ import {
   type InstancesOutsideEditorChanges,
   type ObjectsOutsideEditorChanges,
   type ObjectGroupsOutsideEditorChanges,
+  type WillDeleteObjectChanges,
 } from '../../EditorFunctions/OutsideEditorChanges';
 import { prepareInstancesEditorSettings } from '../../InstancesEditor/InstancesEditorSettings';
 import {
@@ -193,6 +194,14 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
 
   onObjectsModifiedOutsideEditor(changes: ObjectsOutsideEditorChanges) {
     // No thing to be done.
+  }
+
+  onWillDeleteObject(changes: WillDeleteObjectChanges) {
+    // No thing to be done: `changes.scene` is always a real project layout,
+    // and this editor's own object dialog (if any) is scoped to the custom
+    // object variant's private objects container, which can't be targeted by
+    // this notification. Revisit if object deletion is ever extended to
+    // event-based-object children.
   }
 
   onObjectGroupsModifiedOutsideEditor(

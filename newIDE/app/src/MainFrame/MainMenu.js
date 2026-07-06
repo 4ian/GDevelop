@@ -439,6 +439,56 @@ export const buildMainMenuDeclarativeTemplate = ({
   return template;
 };
 
+// Some menu items are declared only with an Electron `role` (e.g. 'toggledevtools',
+// 'togglefullscreen', 'undo'...). Native Electron menus handle these automatically,
+// but the in-app (Material-UI) menu only calls `item.click()` and ignores `role`.
+// This maps the roles we use to an explicit action so they work in the HTML menu too.
+const getClickFromRole = (role: string): ?() => void => {
+  const remote = optionalRequire('@electron/remote');
+  if (!remote) return null;
+
+  const getFocusedWebContents = () => {
+    const browserWindow =
+      remote.BrowserWindow.getFocusedWindow() || remote.getCurrentWindow();
+    return browserWindow ? browserWindow.webContents : null;
+  };
+
+  switch (role) {
+    case 'toggledevtools':
+      return () => {
+        const webContents = getFocusedWebContents();
+        if (webContents) webContents.toggleDevTools();
+      };
+    case 'togglefullscreen':
+      return () => {
+        const browserWindow =
+          remote.BrowserWindow.getFocusedWindow() || remote.getCurrentWindow();
+        if (browserWindow)
+          browserWindow.setFullScreen(!browserWindow.isFullScreen());
+      };
+    case 'undo':
+    case 'redo':
+    case 'cut':
+    case 'copy':
+    case 'paste':
+    case 'pasteandmatchstyle':
+    case 'delete':
+    case 'selectall':
+    case 'minimize': {
+      return () => {
+        const webContents = getFocusedWebContents();
+        // $FlowFixMe[invalid-computed-prop] - these are all valid WebContents methods.
+        if (webContents && typeof webContents[role] === 'function') {
+          // $FlowFixMe[invalid-computed-prop]
+          webContents[role]();
+        }
+      };
+    }
+    default:
+      return null;
+  }
+};
+
 export const adaptFromDeclarativeTemplate = (
   menuDeclarativeTemplate: Array<MenuDeclarativeItemTemplate>,
   callbacks: MainMenuCallbacks
@@ -458,28 +508,36 @@ export const adaptFromDeclarativeTemplate = (
       } = menuItemTemplate;
 
       const hasOnClick = onClickSendEvent || onClickOpenLink;
+      // $FlowFixMe[incompatible-type] - property can be undefined.
+      const roleClick = menuItemTemplate.role
+        ? // $FlowFixMe[incompatible-call] - role is a string here.
+          getClickFromRole(menuItemTemplate.role)
+        : null;
 
       // $FlowFixMe[incompatible-type] - we're putting both a click and a submenu, so not strictly following the schema.
       return {
         ...menuItemTemplateRest,
-        click: hasOnClick
-          ? function() {
-              if (menuItemTemplate.onClickSendEvent) {
-                const mainMenuEvent = menuItemTemplate.onClickSendEvent;
-                const callback = getMainMenuEventCallback(
-                  mainMenuEvent,
-                  callbacks
-                );
+        click:
+          hasOnClick || roleClick
+            ? function() {
+                if (menuItemTemplate.onClickSendEvent) {
+                  const mainMenuEvent = menuItemTemplate.onClickSendEvent;
+                  const callback = getMainMenuEventCallback(
+                    mainMenuEvent,
+                    callbacks
+                  );
 
-                if (eventArgs) callback(eventArgs);
-                else callback();
-              }
+                  if (eventArgs) callback(eventArgs);
+                  else callback();
+                }
 
-              if (menuItemTemplate.onClickOpenLink) {
-                Window.openExternalURL(menuItemTemplate.onClickOpenLink);
+                if (menuItemTemplate.onClickOpenLink) {
+                  Window.openExternalURL(menuItemTemplate.onClickOpenLink);
+                }
+
+                if (roleClick) roleClick();
               }
-            }
-          : undefined,
+            : undefined,
         submenu: menuItemTemplate.submenu
           ? adaptMenuDeclarativeItemTemplate(menuItemTemplate.submenu)
           : undefined,

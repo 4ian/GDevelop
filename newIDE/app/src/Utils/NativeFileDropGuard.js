@@ -92,38 +92,67 @@ const dragEventHasNativeFiles = (event: any): boolean => {
  * editor window's document).
  * @returns A cleanup function removing the installed listeners.
  */
+// TEMPORARY on-screen diagnostic overlay (remove once the Windows drop is
+// confirmed). It reports drag activity directly on the page, so it works even
+// when DevTools cannot be opened. Shows: whether the guard is installed, and for
+// each drag event its type, the dataTransfer.types list, and whether the event
+// was treated as internal / on an uninterceptable target.
+const showDiagnostic = (targetDocument: any, message: string) => {
+  try {
+    const id = '__native_file_drop_diagnostic__';
+    let el = targetDocument.getElementById(id);
+    if (!el) {
+      el = targetDocument.createElement('div');
+      el.id = id;
+      el.style.cssText = [
+        'position:fixed',
+        'left:8px',
+        'bottom:8px',
+        'z-index:2147483647',
+        'max-width:520px',
+        'padding:8px 10px',
+        'background:rgba(0,0,0,0.85)',
+        'color:#0f0',
+        'font:12px/1.4 monospace',
+        'white-space:pre-wrap',
+        'pointer-events:none',
+        'border:1px solid #0f0',
+        'border-radius:4px',
+      ].join(';');
+      if (targetDocument.body) targetDocument.body.appendChild(el);
+    }
+    el.textContent = '[DropGuard] ' + message;
+  } catch (error) {
+    /* ignore */
+  }
+};
+
 export const installNativeFileDropGuard = (
   targetDocument: any
 ): (() => void) => {
-  // TEMPORARY DIAGNOSTIC LOGGING (remove once the Windows drop is confirmed).
-  // Proves whether this guard is actually loaded and whether its handlers run.
-  // eslint-disable-next-line no-console
-  console.info('[NativeFileDropGuard] installed on', targetDocument);
-  let loggedOnce = false;
+  showDiagnostic(targetDocument, 'installed — drag an image onto the window');
 
   const onDragOverOrEnter = (event: any) => {
-    if (!loggedOnce) {
-      loggedOnce = true;
-      let types: Array<string> = [];
-      try {
-        types = Array.from(
-          (event.dataTransfer && event.dataTransfer.types) || []
-        );
-      } catch (error) {
-        /* ignore */
-      }
-      // eslint-disable-next-line no-console
-      console.info('[NativeFileDropGuard] first drag event', {
-        type: event.type,
-        types,
-        internal: isInternalDrag(event),
-        onUninterceptable: isEventOnUninterceptableTarget(event),
-      });
+    let types: Array<string> = [];
+    try {
+      types = Array.from(
+        (event.dataTransfer && event.dataTransfer.types) || []
+      );
+    } catch (error) {
+      /* ignore */
     }
+    const internal = isInternalDrag(event);
+    const onUninterceptable = isEventOnUninterceptableTarget(event);
+    showDiagnostic(
+      targetDocument,
+      `${event.type} types=[${types.join(',')}] internal=${String(
+        internal
+      )} onInput=${String(onUninterceptable)}`
+    );
 
     // Leave internal GDevelop drags and browser-native targets alone.
-    if (isInternalDrag(event)) return;
-    if (isEventOnUninterceptableTarget(event)) return;
+    if (internal) return;
+    if (onUninterceptable) return;
 
     // Required on Windows so the drop event is allowed to fire on the actual
     // drop targets (e.g. the scene canvas), and to stop navigate-to-file.
@@ -138,6 +167,17 @@ export const installNativeFileDropGuard = (
     }
   };
   const onDrop = (event: any) => {
+    let fileCount = 'n/a';
+    try {
+      fileCount =
+        event.dataTransfer && event.dataTransfer.files
+          ? String(event.dataTransfer.files.length)
+          : 'n/a';
+    } catch (error) {
+      /* ignore */
+    }
+    showDiagnostic(targetDocument, `DROP fired — files=${fileCount}`);
+
     if (isInternalDrag(event)) return;
     if (isEventOnUninterceptableTarget(event)) return;
 

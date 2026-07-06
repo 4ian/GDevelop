@@ -966,7 +966,7 @@ describe('editorFunctions', () => {
         Set \\"shadowBlurRadius\\" on \\"MyTextObject\\" = \\"20.41\\".
         Warnings:
         Could not set \\"textAlignment\\" on \\"MyTextObject\\": invalid value or type.
-        Property \\"nonExistingProperty\\" not found on object \\"MyTextObject\\".
+        Property \\"nonExistingProperty\\" not found on object \\"MyTextObject\\". Available properties: bold, characterSize, color, font, isOutlineEnabled, isShadowEnabled, italic, lineHeight, outlineColor, outlineThickness, shadowAngle, shadowBlurRadius, shadowColor, shadowDistance, shadowOpacity, text, textAlignment, verticalTextAlignment.
         \\"shadowAngle\\" on \\"MyTextObject\\" = \\"20\\", but requested \\"20,40 , 50\\" looks multi-dimensional; only a single number is allowed.
         \\"shadowDistance\\" on \\"MyTextObject\\" = \\"0\\", but requested \\"20X   40 X 50\\" looks multi-dimensional; only a single number is allowed.
         \\"shadowBlurRadius\\" on \\"MyTextObject\\" = \\"20.41\\", but requested \\"20.41 × 50\\" looks multi-dimensional; only a single number is allowed."
@@ -1443,7 +1443,7 @@ describe('editorFunctions', () => {
         Set \\"IgnoreDefaultControls\\" on behavior \\"PlatformerObject\\" = \\"false\\".
         Warnings:
         \\"MaxSpeed\\" on behavior \\"PlatformerObject\\" = \\"300\\", but requested \\"300 x 20\\" looks multi-dimensional; only a single number is allowed.
-        Property \\"nonExistingProperty\\" not on behavior \\"PlatformerObject\\" of \\"MySprite\\"."
+        Property \\"nonExistingProperty\\" not on behavior \\"PlatformerObject\\" of \\"MySprite\\". Available properties: Acceleration, CanGoDownFromJumpthru, CanGrabPlatforms, CanGrabWithoutMoving, Deceleration, Gravity, IgnoreDefaultControls, JumpSpeed, JumpSustainTime, LadderClimbingSpeed, MaxFallingSpeed, MaxSpeed, SlopeMaxAngle, XGrabTolerance, YGrabOffset."
       `);
 
       // Verify the behavior properties were actually changed
@@ -2252,7 +2252,7 @@ describe('editorFunctions', () => {
       expect(result.success).toBe(true);
       expect(result.message).toEqual(
         expect.stringContaining(
-          'Created 1 new instance of object "Player" using point brush at 100, 200 on layer "base".'
+          'Created 1 new instance of object "Player" using point brush at 100, 200 on the base layer ("").'
         )
       );
     });
@@ -2277,7 +2277,7 @@ describe('editorFunctions', () => {
       expect(result.success).toBe(true);
       expect(result.message).toEqual(
         expect.stringContaining(
-          'Created 2 new instances of object "Player" using point brush at 50, 60 on layer "base" (size 64x64, rotation 45°, opacity 128/255, z-order 5, origin at this position, each occupies X 50 to 114, Y 60 to 124).'
+          'Created 2 new instances of object "Player" using point brush at 50, 60 on the base layer ("") (size 64x64, rotation 45°, opacity 128/255, z-order 5, origin at this position, each occupies X 50 to 114, Y 60 to 124).'
         )
       );
     });
@@ -2452,18 +2452,65 @@ describe('editorFunctions', () => {
       expect(uniqueKeys.size).toBe(positions.length);
     });
 
-    it('falls back to the scene center when no brush_position is given', async () => {
-      await putInstances({
-        brush_kind: 'point',
-        new_instances_count: 1,
+    // Creating instances without an explicit brush_position used to silently
+    // fall back to the scene center — a major source of instances duplicated
+    // or dropped at a meaningless position by the AI. It must fail instead.
+    it('fails when creating instances without a brush_position', async () => {
+      const result = await editorFunctions.put_2d_instances.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          object_name: 'Player',
+          layer_name: '',
+          brush_kind: 'point',
+          new_instances_count: 1,
+        },
       });
 
-      expect(getInstancePositions(testScene)).toEqual([
-        {
-          x: project.getGameResolutionWidth() / 2,
-          y: project.getGameResolutionHeight() / 2,
+      expect(result.success).toBe(false);
+      expect(result.message).toEqual(
+        expect.stringContaining('`brush_position` is required')
+      );
+      expect(getInstancePositions(testScene)).toEqual([]);
+    });
+
+    // The most frequent malformed call seen in production: a "modification"
+    // call that forgot `existing_instance_ids` (and gave no position). It used
+    // to create a duplicate instance at the scene center; it must fail.
+    it('fails instead of creating a default instance when neither existing_instance_ids nor brush_position are given', async () => {
+      const result = await editorFunctions.put_2d_instances.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          object_name: 'Player',
+          layer_name: '',
+          brush_kind: 'none',
+          instances_opacity: 0,
         },
-      ]);
+      });
+
+      expect(result.success).toBe(false);
+      expect(result.message).toEqual(
+        expect.stringContaining('existing_instance_ids')
+      );
+      expect(getInstancePositions(testScene)).toEqual([]);
+    });
+
+    // The base layer's real name is "": accept the frequent "base" mistake
+    // (when no layer literally named "base" exists) instead of failing.
+    it('accepts "base" as the base layer name when no such layer exists', async () => {
+      const result = await putInstances({
+        brush_kind: 'point',
+        brush_position: '100,200',
+        new_instances_count: 1,
+        layer_name: 'base',
+      });
+
+      const [created] = getInstances(testScene);
+      expect(created.layer).toBe('');
+      expect(result.message).toEqual(
+        expect.stringContaining('the base layer ("")')
+      );
     });
 
     it('scatters instances within the radius for the random_in_circle brush', async () => {
@@ -2668,6 +2715,35 @@ describe('editorFunctions', () => {
       expect(getInstancePositions(testScene)).toEqual([]);
     });
 
+    // An erase that removed nothing used to report "Erased 0 instances." as a
+    // success, which the AI took as a confirmation the instances were gone.
+    it('fails when the erase brush matches nothing', async () => {
+      await putInstances({
+        brush_kind: 'point',
+        brush_position: '100,200',
+        new_instances_count: 1,
+      });
+
+      const result = await editorFunctions.put_2d_instances.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          object_name: 'Player',
+          layer_name: '',
+          brush_kind: 'erase',
+          brush_position: '900,900',
+          brush_size: 10,
+        },
+      });
+
+      expect(result.success).toBe(false);
+      expect(result.message).toEqual(
+        expect.stringContaining('No instance was erased.')
+      );
+      // The existing instance is untouched.
+      expect(getInstancePositions(testScene)).toEqual([{ x: 100, y: 200 }]);
+    });
+
     it('fails when erasing an unknown instance id (none found, nothing changed)', async () => {
       // Bypass the `putInstances` helper, which asserts success — here we
       // expect a failure so the agent gets a real error signal instead of a
@@ -2772,7 +2848,7 @@ describe('editorFunctions', () => {
       expect(result.success).toBe(true);
       expect(result.message).toEqual(
         expect.stringContaining(
-          'Created 1 new instance of object "Player" using point brush at 10, 20, 30 on layer "base" (size 8x16x24, rotation (15°, 30°, 45°), origin at this position, each occupies X 10 to 18, Y 20 to 36, Z 30 to 54).'
+          'Created 1 new instance of object "Player" using point brush at 10, 20, 30 on the base layer ("") (size 8x16x24, rotation (15°, 30°, 45°), origin at this position, each occupies X 10 to 18, Y 20 to 36, Z 30 to 54).'
         )
       );
     });
@@ -2908,6 +2984,50 @@ describe('editorFunctions', () => {
       positions.forEach(({ x, y, z }) => {
         expect(Math.sqrt(x * x + y * y + z * z)).toBeLessThanOrEqual(radius);
       });
+    });
+
+    // The 3D line brush used to silently skip positioning when
+    // brush_end_position was missing, leaving every instance at (0,0,0)
+    // (the 2D variant already had this guard).
+    it('fails without creating instances when the line brush lacks brush_end_position', async () => {
+      const result = await editorFunctions.put_3d_instances.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          object_name: 'Player',
+          layer_name: '',
+          brush_kind: 'line',
+          brush_position: '10,20,30',
+          new_instances_count: 3,
+        },
+      });
+
+      expect(result.success).toBe(false);
+      expect(result.message).toEqual(
+        expect.stringContaining('requires brush_end_position')
+      );
+      expect(getInstancePositions(testScene)).toEqual([]);
+    });
+
+    // Creating instances without an explicit brush_position used to silently
+    // fall back to the scene center: it must fail instead.
+    it('fails when creating instances without a brush_position', async () => {
+      const result = await editorFunctions.put_3d_instances.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          object_name: 'Player',
+          layer_name: '',
+          brush_kind: 'point',
+          new_instances_count: 1,
+        },
+      });
+
+      expect(result.success).toBe(false);
+      expect(result.message).toEqual(
+        expect.stringContaining('`brush_position` is required')
+      );
+      expect(getInstancePositions(testScene)).toEqual([]);
     });
 
     it('fails when no requested instance id is found and nothing is created', async () => {

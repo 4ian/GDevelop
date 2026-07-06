@@ -204,6 +204,79 @@ def resolve_gh(*, auto_install: bool = True, dry_run: bool = False) -> str:
     )
 
 
+def _gh_is_authenticated(gh: str) -> bool:
+    """Whether ``gh`` already has working credentials for github.com."""
+    try:
+        result = subprocess.run(
+            [gh, "auth", "status", "--hostname", "github.com"],
+            capture_output=True,
+            text=True,
+        )
+    except OSError:
+        return False
+    return result.returncode == 0
+
+
+def _token_from_git_credential() -> str | None:
+    """Fetch a github.com token from the git credential helper, if any.
+
+    Because the repo is pushed over HTTPS, a Personal Access Token (or the token
+    minted by the credential helper) for github.com is typically already stored
+    in the OS credential store. ``git credential fill`` returns it without any
+    prompt when it is present, letting us authenticate gh non-interactively.
+    """
+    git = shutil.which("git")
+    if not git:
+        return None
+    try:
+        result = subprocess.run(
+            [git, "credential", "fill"],
+            input="protocol=https\nhost=github.com\n\n",
+            capture_output=True,
+            text=True,
+        )
+    except OSError:
+        return None
+    if result.returncode != 0:
+        return None
+    for line in result.stdout.splitlines():
+        if line.startswith("password="):
+            token = line[len("password=") :].strip()
+            return token or None
+    return None
+
+
+def resolve_gh_token(gh: str) -> str | None:
+    """Return a token to authenticate gh, or None if gh is already logged in.
+
+    Order: an explicit GH_TOKEN/GITHUB_TOKEN in the environment (returned so it
+    is forwarded to the upload subprocess), then — only if gh is not already
+    authenticated — the git credential helper's stored github.com token.
+    """
+    env_token = os.environ.get("GH_TOKEN") or os.environ.get("GITHUB_TOKEN")
+    if env_token:
+        return env_token
+
+    if _gh_is_authenticated(gh):
+        return None
+
+    token = _token_from_git_credential()
+    if token:
+        print(
+            "gh is not logged in; reusing the stored github.com git credential "
+            "for this upload.",
+            flush=True,
+        )
+        return token
+
+    raise RuntimeError(
+        "The GitHub CLI (gh) is installed but not authenticated, and no token "
+        "could be found. Run `gh auth login` once, or set the GH_TOKEN "
+        "environment variable to a GitHub token with 'repo' scope, then retry "
+        "the upload."
+    )
+
+
 def command_line(command: list[str]) -> str:
     return " ".join(command)
 
@@ -386,10 +459,11 @@ def upload_artifact(
 
     try:
         gh = resolve_gh(auto_install=auto_install_gh, dry_run=dry_run)
+        token = resolve_gh_token(gh)
     except RuntimeError as error:
         # The .dmg already exists on disk; don't lose it just because gh is
-        # missing. Explain how to upload it manually and re-raise so the run
-        # still reports failure.
+        # missing or unauthenticated. Explain how to upload it manually and
+        # re-raise so the run still reports failure.
         print(f"❌ {error}", flush=True)
         print(
             "\nThe .dmg was built successfully and is still available at:\n"
@@ -401,8 +475,12 @@ def upload_artifact(
         raise
 
     command = [gh, *upload_arguments]
+    # Forward the token via the environment (never on the command line / logs).
+    upload_env = os.environ.copy()
+    if token:
+        upload_env["GH_TOKEN"] = token
     print(f"[run] {dist_dir}> {command_line(command)}", flush=True)
-    subprocess.run(command, cwd=dist_dir, check=True)
+    subprocess.run(command, cwd=dist_dir, check=True, env=upload_env)
 
     print("\n" + "=" * 70, flush=True)
     print("Uploaded distributable to GitHub release.", flush=True)

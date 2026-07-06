@@ -461,7 +461,8 @@ export const deleteStickyNote = (
 
 export const deleteArchivedStickyNotes = (
   stickyNotes: Array<StickyNote>
-): Array<StickyNote> => stickyNotes.filter(stickyNote => !stickyNote.isArchived);
+): Array<StickyNote> =>
+  stickyNotes.filter(stickyNote => !stickyNote.isArchived);
 
 const getNoteColorClassName = (color: StickyNoteColor): string => {
   switch (color) {
@@ -1169,6 +1170,14 @@ const StickyNotes: React.ComponentType<{
                     className={classes.noteIconButton}
                   >
                     <CopyIcon />
+                  </IconButton>
+                  <IconButton
+                    size="small"
+                    onClick={() => handleTogglePinNote(stickyNote.id)}
+                    tooltip={t`Hide sticky note`}
+                    className={classes.noteIconButton}
+                  >
+                    <PinIcon />
                   </IconButton>
                   <IconButton
                     size="small"

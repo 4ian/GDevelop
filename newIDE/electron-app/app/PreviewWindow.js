@@ -7,6 +7,10 @@ const {
 } = require('electron');
 const isDev = require('electron-is-dev');
 const { load } = require('./Utils/UrlLoader');
+const {
+  getPreviewBrowserWindowOptionsFittingDisplay,
+  getBoundsFittingDisplayHeight,
+} = require('./PreviewWindowBounds');
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -62,6 +66,66 @@ const getLatestPreviewWindow = parentWindowId => {
 const showWithoutStealingFocus = window => {
   if (typeof window.showInactive === 'function') window.showInactive();
   else window.show();
+};
+
+const getPreviewDisplayWorkArea = ({ parentWindow, x, y }) => {
+  if (typeof x === 'number' && typeof y === 'number') {
+    return screen.getDisplayNearestPoint({ x, y }).workArea;
+  }
+
+  if (parentWindow && !parentWindow.isDestroyed()) {
+    return screen.getDisplayMatching(parentWindow.getBounds()).workArea;
+  }
+
+  return screen.getPrimaryDisplay().workArea;
+};
+
+const fitPreviewWindowToDisplayHeight = (previewWindow, displayWorkArea) => {
+  try {
+    if (
+      !previewWindow ||
+      previewWindow.isDestroyed() ||
+      !displayWorkArea ||
+      typeof previewWindow.getBounds !== 'function'
+    ) {
+      return;
+    }
+
+    const bounds = previewWindow.getBounds();
+
+    if (
+      bounds.height > displayWorkArea.height &&
+      typeof previewWindow.getContentBounds === 'function' &&
+      typeof previewWindow.setContentSize === 'function'
+    ) {
+      const contentBounds = previewWindow.getContentBounds();
+      const verticalFrameSize = Math.max(
+        0,
+        bounds.height - contentBounds.height
+      );
+      const maxContentHeight = Math.max(
+        1,
+        Math.floor(displayWorkArea.height - verticalFrameSize)
+      );
+
+      if (contentBounds.height > maxContentHeight) {
+        const scale = maxContentHeight / contentBounds.height;
+        const fittedContentWidth = Math.max(
+          1,
+          Math.floor(contentBounds.width * scale)
+        );
+        previewWindow.setContentSize(fittedContentWidth, maxContentHeight);
+      }
+    }
+
+    const fittedBounds = getBoundsFittingDisplayHeight(
+      previewWindow.getBounds(),
+      displayWorkArea
+    );
+    if (fittedBounds) previewWindow.setBounds(fittedBounds);
+  } catch (error) {
+    console.warn('Ignoring exception when fitting preview window:', error);
+  }
 };
 
 // Detach every still-living child window (preview + debugger) from a parent
@@ -324,29 +388,45 @@ const openPreviewWindow = ({
   openEvent,
 }) => {
   // If opening multiple windows at once, place them across the screen.
-  const screenSize = screen.getPrimaryDisplay().workAreaSize;
-  const screenWidth = screenSize.width;
-  const screenHeight = screenSize.height;
+  const primaryWorkArea = screen.getPrimaryDisplay().workArea;
+  const screenWidth = primaryWorkArea.width;
+  const screenHeight = primaryWorkArea.height;
   const positions = {
     // top-left
-    1: { x: 0, y: 0 },
+    1: { x: primaryWorkArea.x, y: primaryWorkArea.y },
     // top-right
-    2: { x: screenWidth / 2, y: 0 },
+    2: { x: primaryWorkArea.x + screenWidth / 2, y: primaryWorkArea.y },
     // bottom-left
-    3: { x: 0, y: screenHeight / 2 },
+    3: { x: primaryWorkArea.x, y: primaryWorkArea.y + screenHeight / 2 },
     // bottom-right
-    4: { x: screenWidth / 2, y: screenHeight / 2 },
+    4: {
+      x: primaryWorkArea.x + screenWidth / 2,
+      y: primaryWorkArea.y + screenHeight / 2,
+    },
   };
   for (let i = 0; i < numberOfWindows; i++) {
     const parentWindowId = parentWindow ? parentWindow.id : null;
+    const x = numberOfWindows > 1 ? positions[i + 1].x : undefined;
+    const y = numberOfWindows > 1 ? positions[i + 1].y : undefined;
+    const displayWorkArea = getPreviewDisplayWorkArea({
+      parentWindow,
+      x,
+      y,
+    });
+    const fittedPreviewBrowserWindowOptions =
+      getPreviewBrowserWindowOptionsFittingDisplay(
+        previewBrowserWindowOptions,
+        displayWorkArea
+      );
     const browserWindowOptions = {
-      ...previewBrowserWindowOptions,
+      ...fittedPreviewBrowserWindowOptions,
       parent: alwaysOnTop ? parentWindow : null,
-      x: numberOfWindows > 1 ? positions[i + 1].x : undefined,
-      y: numberOfWindows > 1 ? positions[i + 1].y : undefined,
+      x,
+      y,
     };
 
     let previewWindow = new BrowserWindow(browserWindowOptions);
+    fitPreviewWindowToDisplayHeight(previewWindow, displayWorkArea);
     let parentWasMinimizedBeforePreviewClose = parentWindow
       ? parentWindow.isMinimized()
       : false;

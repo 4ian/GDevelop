@@ -27,6 +27,7 @@ import PreferencesDialog from './Preferences/PreferencesDialog';
 import AboutDialog from './AboutDialog';
 import ProjectManager, {
   type ProjectManagerInterface,
+  getProjectManagerItemId,
   getProjectManagerTreeViewItemIdForEditorTab,
   globalVariablesItemId,
   globalObjectsItemId,
@@ -286,6 +287,9 @@ import { useInGameEditorSettings } from '../EmbeddedGame/InGameEditorSettings';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 import { useAutomatedRegularInGameEditorRestart } from '../EmbeddedGame/UseAutomatedRegularInGameEditorRestart';
 import { enumerateFunctionsInFolder } from '../EventsFunctionsList/EnumerateFunctionFolderOrFunction';
+
+const gamePropertiesItemId = getProjectManagerItemId('game-properties');
+const gameExtensionsItemId = getProjectManagerItemId('game-extensions');
 const electron = optionalRequire('electron');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
 const remote = optionalRequire('@electron/remote');
@@ -6232,11 +6236,34 @@ const MainFrame = (props: Props): React.MixedElement => {
 
   if (currentProject) {
     addRecentEditorSwitcherSideMenuItem(
+      gamePropertiesItemId,
+      i18n._(t`Properties & Icons`),
+      i18n._(t`Project window`),
+      <SettingsIcon />,
+      () => activateProjectManagerItemFromSwitcher(gamePropertiesItemId)
+    );
+    addRecentEditorSwitcherSideMenuItem(
       'resources',
       i18n._(t`Resources`),
       i18n._(t`Project window`),
       <ProjectResourcesIcon />,
       openResources
+    );
+    addRecentEditorSwitcherSideMenuItem(
+      gameExtensionsItemId,
+      i18n._(t`Extensions`),
+      i18n._(t`Project window`),
+      <ExtensionIcon />,
+      () => activateProjectManagerItemFromSwitcher(gameExtensionsItemId)
+    );
+    addRecentEditorSwitcherSideMenuItem(
+      'export-share',
+      i18n._(t`Export & Share`),
+      i18n._(t`Project window`),
+      <ShareIcon />,
+      () => {
+        openShareDialog('publish');
+      }
     );
     addRecentEditorSwitcherSideMenuItem(
       'sticky-notes',
@@ -6272,15 +6299,6 @@ const MainFrame = (props: Props): React.MixedElement => {
       i18n._(t`Search in project`),
       <SearchIcon />,
       openGlobalSearch
-    );
-    addRecentEditorSwitcherSideMenuItem(
-      'export-share',
-      i18n._(t`Export & Share`),
-      i18n._(t`Project window`),
-      <ShareIcon />,
-      () => {
-        openShareDialog('publish');
-      }
     );
 
     for (

@@ -11,6 +11,7 @@ import {
   type ObjectsOutsideEditorChanges,
   type ObjectGroupsOutsideEditorChanges,
 } from './BaseEditor';
+import { type WillDeleteObjectChanges } from '../../EditorFunctions/OutsideEditorChanges';
 import { type ObjectWithContext } from '../../ObjectsList/EnumerateObjects';
 import {
   setEditorHotReloadNeeded,
@@ -140,6 +141,10 @@ export class ExtensionItemDetailEditorContainer extends React.Component<Props> {
   onObjectGroupsModifiedOutsideEditor(
     changes: ObjectGroupsOutsideEditorChanges
   ) {
+    // No updates to be done.
+  }
+
+  onWillDeleteObject(changes: WillDeleteObjectChanges) {
     // No updates to be done.
   }
 

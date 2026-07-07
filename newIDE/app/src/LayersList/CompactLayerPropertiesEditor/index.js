@@ -4,7 +4,7 @@ import * as React from 'react';
 import { type UnsavedChanges } from '../../MainFrame/UnsavedChangesContext';
 import { type ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
 import ErrorBoundary from '../../UI/ErrorBoundary';
-import ScrollView from '../../UI/ScrollView';
+import ScrollView, { type ScrollViewInterface } from '../../UI/ScrollView';
 import { Column, marginsSize } from '../../UI/Grid';
 import CompactPropertiesEditor from '../../CompactPropertiesEditor';
 import Text from '../../UI/Text';
@@ -22,6 +22,7 @@ import { makeSchema } from './CompactLayerPropertiesSchema';
 import { type Schema } from '../../PropertiesEditor/PropertiesEditorSchema';
 import { CompactEffectsListEditor } from './CompactEffectsListEditor';
 import { useForceRecompute } from '../../Utils/UseForceUpdate';
+import { usePersistedScrollPosition } from '../../Utils/UsePersistedScrollPosition';
 import { TopLevelCollapsibleSection } from '../../ObjectEditor/CompactObjectPropertiesEditor';
 
 export const styles = {
@@ -89,6 +90,21 @@ export const CompactLayerPropertiesEditor = ({
 
   const [schemaRecomputeTrigger, forceRecomputeSchema] = useForceRecompute();
 
+  const scrollViewRef = React.useRef<?ScrollViewInterface>(null);
+  const scrollKey = 'layer-' + layer.ptr;
+
+  // Layers have no persistent UUID, so the name is used (like for scenes).
+  // The base layer has an empty name, so a placeholder is used instead.
+  const persistedScrollId = layer.getName() || 'base-layer';
+
+  const onScroll = usePersistedScrollPosition({
+    project,
+    scrollViewRef,
+    scrollKey,
+    persistedScrollId,
+    persistedScrollType: 'layer',
+  });
+
   const layerPropertiesSchema = React.useMemo<Schema>(
     () => {
       if (schemaRecomputeTrigger) {
@@ -114,7 +130,13 @@ export const CompactLayerPropertiesEditor = ({
       componentTitle={<Trans>Layer properties</Trans>}
       scope="scene-editor-layer-properties"
     >
-      <ScrollView autoHideScrollbar style={styles.scrollView} key={layer.ptr}>
+      <ScrollView
+        ref={scrollViewRef}
+        autoHideScrollbar
+        style={styles.scrollView}
+        key={scrollKey}
+        onScroll={onScroll}
+      >
         <Column expand noMargin id="layer-properties-editor" noOverflowParent>
           <ColumnStackLayout expand noOverflowParent>
             <LineStackLayout

@@ -100,6 +100,11 @@ void Object::UnserializeFrom(gd::Project& project,
 
   objectVariables.UnserializeFrom(
       element.GetChild("variables", 0, "Variables"));
+  // The "mixed values" marker is an editor-only, display state used when
+  // showing the variables of several objects at once. It must never be kept
+  // on the variables of an object - clean it up in case it was wrongly
+  // persisted in the project by a previous version of the editor.
+  objectVariables.ClearMixedValues();
 
   if (element.HasChild("effects")) {
     const SerializerElement& effectsElement = element.GetChild("effects");

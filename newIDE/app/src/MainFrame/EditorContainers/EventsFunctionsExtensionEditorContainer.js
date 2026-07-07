@@ -5,13 +5,14 @@ import { type EventsSheetSelectionSnapshot } from '../../EventsSheet';
 import {
   type RenderEditorContainerProps,
   type RenderEditorContainerPropsWithRef,
+  type ExtensionFunctionEventsOutsideEditorChanges,
 } from './BaseEditor';
 import {
   type SceneEventsOutsideEditorChanges,
-  type ExtensionFunctionEventsOutsideEditorChanges,
   type InstancesOutsideEditorChanges,
   type ObjectsOutsideEditorChanges,
   type ObjectGroupsOutsideEditorChanges,
+  type WillDeleteObjectChanges,
 } from '../../EditorFunctions/OutsideEditorChanges';
 import { type ObjectWithContext } from '../../ObjectsList/EnumerateObjects';
 import {
@@ -141,6 +142,10 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
   }
 
   onObjectsModifiedOutsideEditor(changes: ObjectsOutsideEditorChanges) {
+    // No thing to be done.
+  }
+
+  onWillDeleteObject(changes: WillDeleteObjectChanges) {
     // No thing to be done.
   }
 

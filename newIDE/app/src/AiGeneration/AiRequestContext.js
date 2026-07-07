@@ -372,6 +372,10 @@ export const useAiRequestHistory = (
         .forEach((request: AiRequest) => {
           if (!request.output) return;
 
+          // Exclude sub-agent requests: their "user" messages are sent by
+          // the orchestrator, not by the user.
+          if (request.parentAiRequestId) return;
+
           const userMessages = request.output
             .filter(
               message => message.type === 'message' && message.role === 'user'
@@ -517,6 +521,35 @@ export const AiRequestContext: React.Context<AiRequestContextState> = React.crea
 type AiRequestProviderProps = {|
   children: React.Node,
 |};
+
+// Merge an incremental fetch (only the messages from `outputFromMessageId` onward)
+// back onto the cached request. When the response isn't an incremental slice
+// of what we have (no cache, unknown id, or the backend returned the full
+// output), we just use the fetched request as-is.
+export const mergeIncrementalAiRequest = (
+  previousAiRequest: ?AiRequest,
+  fetchedAiRequest: AiRequest,
+  outputFromMessageId: ?string
+): AiRequest => {
+  const fetchedOutput = fetchedAiRequest.output || [];
+  const previousOutput = previousAiRequest && previousAiRequest.output;
+  const isIncrementalSlice =
+    !!outputFromMessageId &&
+    !!previousOutput &&
+    fetchedOutput.length > 0 &&
+    fetchedOutput[0].messageId === outputFromMessageId;
+  if (!isIncrementalSlice || !previousOutput) return fetchedAiRequest;
+
+  const spliceIndex = previousOutput.findIndex(
+    message => message.messageId === outputFromMessageId
+  );
+  if (spliceIndex === -1) return fetchedAiRequest;
+
+  return {
+    ...fetchedAiRequest,
+    output: [...previousOutput.slice(0, spliceIndex), ...fetchedOutput],
+  };
+};
 
 export const AiRequestProvider = ({
   children,

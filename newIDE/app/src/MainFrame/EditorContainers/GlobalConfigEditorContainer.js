@@ -8,6 +8,7 @@ import {
   type ObjectsOutsideEditorChanges,
   type ObjectGroupsOutsideEditorChanges,
 } from './BaseEditor';
+import { type WillDeleteObjectChanges } from '../../EditorFunctions/OutsideEditorChanges';
 import { GlobalConfigEditor } from '../../GlobalConfig/GlobalConfigDialog';
 import { type ObjectWithContext } from '../../ObjectsList/EnumerateObjects';
 import {
@@ -73,6 +74,10 @@ export class GlobalConfigEditorContainer extends React.Component<RenderEditorCon
   onObjectGroupsModifiedOutsideEditor(
     changes: ObjectGroupsOutsideEditorChanges
   ) {
+    // No thing to be done.
+  }
+
+  onWillDeleteObject(changes: WillDeleteObjectChanges) {
     // No thing to be done.
   }
 

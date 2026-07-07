@@ -11,7 +11,8 @@ type Props = {|
     | 'instances-of-object'
     | 'object'
     | 'scene'
-    | 'objectGroup',
+    | 'objectGroup'
+    | 'layer',
   persistedScrollId: string | null,
   saveDebounceTimeInMs?: number,
 |};

@@ -20,6 +20,7 @@
 #include "GDCore/Project/Object.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/Project/PropertyDescriptor.h"
+#include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/Tools/VersionWrapper.h"
 
 TEST_CASE("InitialInstance", "[common][instances]") {
@@ -32,6 +33,30 @@ TEST_CASE("InitialInstance", "[common][instances]") {
   SECTION("GetRawStringProperty") {
     gd::InitialInstance instance;
     REQUIRE(instance.GetRawStringProperty("NotExistingProperty") == "");
+  }
+
+  SECTION("Clean up the mixed values marker wrongly saved on instance variables") {
+    gd::Platform platform;
+    gd::Project project;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    gd::InitialInstance instance;
+    instance.SetObjectName("MyObject");
+    instance.GetVariables().InsertNew("MyVariable").SetValue(123);
+    // Simulate a project that was corrupted by an editor version which
+    // wrongly persisted the editor-only "mixed values" marker on an instance
+    // variable.
+    instance.GetVariables().Get("MyVariable").MarkAsMixedValues();
+
+    gd::SerializerElement instanceElement;
+    instance.SerializeTo(instanceElement);
+
+    gd::InitialInstance readInstance;
+    readInstance.UnserializeFrom(project, instanceElement);
+
+    auto &readVariable = readInstance.GetVariables().Get("MyVariable");
+    REQUIRE(readVariable.HasMixedValues() == false);
+    REQUIRE(readVariable.GetValue() == 123);
   }
 
   SECTION("Can create an instance without behavior property overriding") {

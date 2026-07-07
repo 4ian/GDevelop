@@ -79,6 +79,9 @@ describe('editorFunctions', () => {
       });
     },
     onObjectsModifiedOutsideEditor: jest.fn(),
+    onProjectItemRenamedOutsideEditor: jest.fn(),
+    onWillDeleteScene: jest.fn(),
+    onWillDeleteObject: jest.fn(),
     onWillInstallExtension: jest.fn(),
     onExtensionInstalled: jest.fn(),
     getAssetStoreTagForNewObject: () => null,
@@ -567,7 +570,7 @@ describe('editorFunctions', () => {
 
       expect(result.success).toBe(false);
       expect(result.message).toMatchInlineSnapshot(
-        `"Scene not found: \\"NonExistentScene\\"."`
+        `"Scene not found: \\"NonExistentScene\\". Scenes in this project: \\"TestScene\\"."`
       );
     });
 
@@ -1018,6 +1021,112 @@ describe('editorFunctions', () => {
       expect(testScene.getObjects().hasObjectNamed('Foo')).toBe(true);
       expect(testScene.getObjects().hasObjectNamed('Foo2')).toBe(true);
       expect(testScene.getObjects().hasObjectNamed('MyTextObject')).toBe(false);
+    });
+  });
+
+  describe('change_object_property (delete_this_object)', () => {
+    let project: gdProject;
+    let testScene: gdLayout;
+
+    beforeEach(() => {
+      // $FlowFixMe[invalid-constructor]
+      project = new gd.ProjectHelper.createNewGDJSProject();
+      testScene = project.insertNewLayout('TestScene', 0);
+    });
+
+    afterEach(() => {
+      project.delete();
+    });
+
+    it('deletes a scene object and its instances when delete_this_object is true', async () => {
+      const sceneObjects = testScene.getObjects();
+      sceneObjects.insertNewObject(project, 'Sprite', 'MySprite', 0);
+      const instance = testScene
+        .getInitialInstances()
+        .insertNewInitialInstance();
+      instance.setObjectName('MySprite');
+
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_object_property.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'MySprite',
+            delete_this_object: true,
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).toContain('Deleted object "MySprite"');
+      expect(sceneObjects.hasObjectNamed('MySprite')).toBe(false);
+      expect(
+        testScene.getInitialInstances().hasInstancesOfObject('MySprite')
+      ).toBe(false);
+    });
+
+    it('deletes a global object and removes it from groups', async () => {
+      const globalObjects = project.getObjects();
+      globalObjects.insertNewObject(project, 'Sprite', 'GlobalSprite', 0);
+      const group = globalObjects.getObjectGroups().insertNew('AllSprites', 0);
+      group.addObject('GlobalSprite');
+
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_object_property.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'GlobalSprite',
+            delete_this_object: true,
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(globalObjects.hasObjectNamed('GlobalSprite')).toBe(false);
+      expect(group.find('GlobalSprite')).toBe(false);
+    });
+
+    it('fails when the object is not found', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_object_property.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'Ghost',
+            delete_this_object: true,
+          },
+        }
+      );
+
+      expect(result.success).toBe(false);
+      expect(result.message).toContain('Object not found');
+    });
+
+    it('notifies the editor of the deleted object name, so it can close any related dialog/panel', async () => {
+      testScene.getObjects().insertNewObject(project, 'Sprite', 'MySprite', 0);
+      const fakeOptions = makeFakeLaunchFunctionOptionsWithProject(project);
+
+      await editorFunctions.change_object_property.launchFunction({
+        ...fakeOptions,
+        args: {
+          scene_name: 'TestScene',
+          object_name: 'MySprite',
+          delete_this_object: true,
+        },
+      });
+
+      expect(fakeOptions.onWillDeleteObject).toHaveBeenCalledWith({
+        scene: testScene,
+        objectName: 'MySprite',
+      });
+      expect(fakeOptions.onInstancesModifiedOutsideEditor).toHaveBeenCalledWith(
+        { scene: testScene }
+      );
+      expect(fakeOptions.onObjectsModifiedOutsideEditor).toHaveBeenCalledWith({
+        scene: testScene,
+        isNewObjectTypeUsed: false,
+      });
     });
   });
 

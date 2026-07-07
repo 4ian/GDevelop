@@ -25,6 +25,11 @@ import { type CreateProjectResult } from '../../Utils/UseCreateProject';
 import { type OpenAskAiOptions } from '../../AiGeneration/Utils';
 import type { NavigateToEventFromGlobalSearchParams } from '../../Utils/Search';
 import { type EditorId as SceneEditorPanelId } from '../../SceneEditor/utils';
+import type {
+  ProjectItemRenamedOutsideEditorChanges,
+  WillDeleteSceneChanges,
+  WillDeleteObjectChanges,
+} from '../../EditorFunctions/OutsideEditorChanges';
 
 export type EditorContainerExtraProps = {|
   // Events function extension editor
@@ -264,6 +269,8 @@ export type RenderEditorContainerProps = {|
   onProjectItemRenamedOutsideEditor: (
     changes: ProjectItemRenamedOutsideEditorChanges
   ) => void,
+  onWillDeleteScene: (changes: WillDeleteSceneChanges) => Promise<void>,
+  onWillDeleteObject: (changes: WillDeleteObjectChanges) => void,
 
   // Events editing
   onSceneEventsModifiedOutsideEditor: (

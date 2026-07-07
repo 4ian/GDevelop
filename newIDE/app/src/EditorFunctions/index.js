@@ -44,6 +44,15 @@ import {
 } from '../ProjectCreation/CreateProject';
 import { retryIfFailed } from '../Utils/RetryIfFailed';
 import newNameGenerator from '../Utils/NewNameGenerator';
+import type {
+  SceneEventsOutsideEditorChanges,
+  InstancesOutsideEditorChanges,
+  ObjectsOutsideEditorChanges,
+  ObjectGroupsOutsideEditorChanges,
+  ProjectItemRenamedOutsideEditorChanges,
+  WillDeleteSceneChanges,
+  WillDeleteObjectChanges,
+} from './OutsideEditorChanges';
 import { type AssetShortHeader } from '../Utils/GDevelopServices/Asset';
 import { swapAsset } from '../AssetStore/AssetSwapper';
 import { type EnsureExtensionInstalledOptions } from '../AiGeneration/UseEnsureExtensionInstalled';
@@ -226,24 +235,6 @@ export type EditorCallbacks = {|
   |}>,
 |};
 
-export type SceneEventsOutsideEditorChanges = {|
-  scene: gdLayout,
-  newOrChangedAiGeneratedEventIds: Set<string>,
-|};
-
-export type InstancesOutsideEditorChanges = {|
-  scene: gdLayout,
-|};
-
-export type ObjectsOutsideEditorChanges = {|
-  scene: gdLayout,
-  isNewObjectTypeUsed: boolean,
-|};
-
-export type ObjectGroupsOutsideEditorChanges = {|
-  scene: gdLayout,
-|};
-
 export type ToolOptions = {
   includeEventsJson?: boolean,
   ...
@@ -285,6 +276,11 @@ type LaunchFunctionOptionsWithoutProject = {|
   onObjectGroupsModifiedOutsideEditor: (
     changes: ObjectGroupsOutsideEditorChanges
   ) => void,
+  onProjectItemRenamedOutsideEditor: (
+    changes: ProjectItemRenamedOutsideEditorChanges
+  ) => void,
+  onWillDeleteScene: (changes: WillDeleteSceneChanges) => Promise<void>,
+  onWillDeleteObject: (changes: WillDeleteObjectChanges) => void,
   ensureExtensionInstalled: (
     options: EnsureExtensionInstalledOptions
   ) => Promise<void>,
@@ -364,6 +360,29 @@ const makeGenericFailure = (message: string): EditorFunctionGenericOutput => ({
   success: false,
   message,
 });
+
+const getSceneNotFoundMessage = (
+  project: gdProject,
+  sceneName: string
+): string => {
+  const sceneNames = mapFor(
+    0,
+    project.getLayoutsCount(),
+    i => `"${project.getLayoutAt(i).getName()}"`
+  );
+  return (
+    `Scene not found: "${sceneName}". ` +
+    (sceneNames.length > 0
+      ? `Scenes in this project: ${sceneNames.join(', ')}.`
+      : 'The project has no scenes.')
+  );
+};
+
+const makeSceneNotFoundFailure = (
+  project: gdProject,
+  sceneName: string
+): EditorFunctionGenericOutput =>
+  makeGenericFailure(getSceneNotFoundMessage(project, sceneName));
 
 const injectObjectSizeInfo = (
   output: EditorFunctionGenericOutput,
@@ -840,7 +859,7 @@ const createOrReplaceObject: EditorFunction = {
     );
 
     if (!project.hasLayoutNamed(scene_name)) {
-      return makeGenericFailure(`Scene not found: "${scene_name}".`);
+      return makeSceneNotFoundFailure(project, scene_name);
     }
 
     const layout = project.getLayout(scene_name);
@@ -1204,7 +1223,10 @@ const createOrReplaceObject: EditorFunction = {
         !project.hasLayoutNamed(duplicatedObjectSceneName)
       ) {
         return makeGenericFailure(
-          `Scene not found: "${duplicatedObjectSceneName}". Not duplicated.`
+          `${getSceneNotFoundMessage(
+            project,
+            duplicatedObjectSceneName
+          )} Not duplicated.`
         );
       }
 
@@ -1374,7 +1396,7 @@ const inspectObjectProperties: EditorFunction = {
     const object_name = extractRequiredString(args, 'object_name');
 
     if (!project.hasLayoutNamed(scene_name)) {
-      return makeGenericFailure(`Scene not found: "${scene_name}".`);
+      return makeSceneNotFoundFailure(project, scene_name);
     }
 
     const layout = project.getLayout(scene_name);
@@ -1469,6 +1491,21 @@ const changeObjectProperty: EditorFunction = {
   renderForEditor: ({ project, shouldShowDetails, args, editorCallbacks }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
     const object_name = extractRequiredString(args, 'object_name');
+
+    const deleteThisObject = SafeExtractor.extractBooleanProperty(
+      args,
+      'delete_this_object'
+    );
+    if (deleteThisObject) {
+      return {
+        text: (
+          <Trans>
+            Remove object <b>{object_name}</b> (in scene {scene_name}).
+          </Trans>
+        ),
+      };
+    }
+
     const changed_properties =
       SafeExtractor.extractArrayProperty(args, 'changed_properties') || [];
 
@@ -1586,14 +1623,20 @@ const changeObjectProperty: EditorFunction = {
     // $FlowFixMe[incompatible-type]
     return renderChanges(changes);
   },
-  launchFunction: async ({ project, args }) => {
+  launchFunction: async ({
+    project,
+    args,
+    onObjectsModifiedOutsideEditor,
+    onInstancesModifiedOutsideEditor,
+    onWillDeleteObject,
+  }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
     const object_name = extractRequiredString(args, 'object_name');
     const changed_properties =
       SafeExtractor.extractArrayProperty(args, 'changed_properties') || [];
 
     if (!project.hasLayoutNamed(scene_name)) {
-      return makeGenericFailure(`Scene not found: "${scene_name}".`);
+      return makeSceneNotFoundFailure(project, scene_name);
     }
 
     const layout = project.getLayout(scene_name);
@@ -1616,8 +1659,41 @@ const changeObjectProperty: EditorFunction = {
       );
     }
 
-    const warnings = [];
-    const changes = [];
+    const deleteThisObject = SafeExtractor.extractBooleanProperty(
+      args,
+      'delete_this_object'
+    );
+    if (deleteThisObject) {
+      // Let editors close any dialog referring to this object BEFORE it's
+      // actually removed, while it's still safe to read it.
+      onWillDeleteObject({ scene: layout, objectName: object_name });
+
+      if (isGlobalObject) {
+        gd.WholeProjectRefactorer.globalObjectRemoved(project, object_name);
+        globalObjects.removeObject(object_name);
+      } else {
+        gd.WholeProjectRefactorer.objectRemovedInScene(
+          project,
+          layout,
+          object_name
+        );
+        layoutObjects.removeObject(object_name);
+      }
+
+      // Refresh instances/objects lists AFTER the removal, so they reflect
+      // the final state (the instances hot-reload payload in particular is
+      // built synchronously from current data when this is called).
+      onInstancesModifiedOutsideEditor({ scene: layout });
+      onObjectsModifiedOutsideEditor({
+        scene: layout,
+        isNewObjectTypeUsed: false,
+      });
+
+      return makeGenericSuccess(`Deleted object "${object_name}".`);
+    }
+
+    const warnings: Array<string> = [];
+    const changes: Array<string> = [];
 
     changed_properties.forEach(changed_property => {
       if (!object) return;
@@ -1834,7 +1910,7 @@ const addBehavior: EditorFunction = {
     );
 
     if (!project.hasLayoutNamed(scene_name)) {
-      return makeGenericFailure(`Scene not found: "${scene_name}".`);
+      return makeSceneNotFoundFailure(project, scene_name);
     }
 
     const layout = project.getLayout(scene_name);
@@ -1963,7 +2039,9 @@ const addBehavior: EditorFunction = {
 };
 
 /**
- * Removes a behavior from an object in a scene
+ * Removes a behavior from an object (or from all objects of a group) in a scene.
+ * Not offered to the AI anymore since toolsVersion v6 (see `delete_this_behavior`
+ * in `changeBehaviorProperty`), kept only for older toolsVersions.
  */
 const removeBehavior: EditorFunction = {
   renderForEditor: ({ args }) => {
@@ -1986,7 +2064,7 @@ const removeBehavior: EditorFunction = {
     const behavior_name = extractRequiredString(args, 'behavior_name');
 
     if (!project.hasLayoutNamed(scene_name)) {
-      return makeGenericFailure(`Scene not found: "${scene_name}".`);
+      return makeSceneNotFoundFailure(project, scene_name);
     }
 
     const layout = project.getLayout(scene_name);
@@ -2061,7 +2139,7 @@ const inspectBehaviorProperties: EditorFunction = {
     const behavior_name = extractRequiredString(args, 'behavior_name');
 
     if (!project.hasLayoutNamed(scene_name)) {
-      return makeGenericFailure(`Scene not found: "${scene_name}".`);
+      return makeSceneNotFoundFailure(project, scene_name);
     }
 
     const layout = project.getLayout(scene_name);
@@ -2140,6 +2218,22 @@ const changeBehaviorProperty: EditorFunction = {
     const scene_name = extractRequiredString(args, 'scene_name');
     const object_name = extractRequiredString(args, 'object_name');
     const behavior_name = extractRequiredString(args, 'behavior_name');
+
+    const deleteThisBehavior = SafeExtractor.extractBooleanProperty(
+      args,
+      'delete_this_behavior'
+    );
+    if (deleteThisBehavior) {
+      return {
+        text: (
+          <Trans>
+            Remove <b>{behavior_name}</b> behavior from <b>{object_name}</b> in
+            scene {scene_name}.
+          </Trans>
+        ),
+      };
+    }
+
     const changed_properties =
       SafeExtractor.extractArrayProperty(args, 'changed_properties') || [];
 
@@ -2293,7 +2387,7 @@ const changeBehaviorProperty: EditorFunction = {
       SafeExtractor.extractArrayProperty(args, 'changed_properties') || [];
 
     if (!project.hasLayoutNamed(scene_name)) {
-      return makeGenericFailure(`Scene not found: "${scene_name}".`);
+      return makeSceneNotFoundFailure(project, scene_name);
     }
 
     const layout = project.getLayout(scene_name);
@@ -2475,7 +2569,7 @@ const describeInstances: EditorFunction = {
     );
 
     if (!project.hasLayoutNamed(scene_name)) {
-      return makeGenericFailure(`Scene not found: "${scene_name}".`);
+      return makeSceneNotFoundFailure(project, scene_name);
     }
 
     const layout = project.getLayout(scene_name);
@@ -2729,7 +2823,7 @@ const put2dInstances: EditorFunction = {
     );
 
     if (!project.hasLayoutNamed(scene_name)) {
-      return makeGenericFailure(`Scene not found: "${scene_name}".`);
+      return makeSceneNotFoundFailure(project, scene_name);
     }
 
     const layout = project.getLayout(scene_name);
@@ -3307,7 +3401,7 @@ const put3dInstances: EditorFunction = {
     );
 
     if (!project.hasLayoutNamed(scene_name)) {
-      return makeGenericFailure(`Scene not found: "${scene_name}".`);
+      return makeSceneNotFoundFailure(project, scene_name);
     }
 
     const layout = project.getLayout(scene_name);
@@ -3742,7 +3836,7 @@ const readSceneEvents: EditorFunction = {
     const scene_name = extractRequiredString(args, 'scene_name');
 
     if (!project.hasLayoutNamed(scene_name)) {
-      return makeGenericFailure(`Scene not found: "${scene_name}".`);
+      return makeSceneNotFoundFailure(project, scene_name);
     }
 
     const scene = project.getLayout(scene_name);
@@ -4343,7 +4437,7 @@ const addSceneEvents: EditorFunction = {
       SafeExtractor.extractStringProperty(args, 'placement_hint') || '';
 
     if (!project.hasLayoutNamed(sceneName)) {
-      return makeGenericFailure(`Scene not found: "${sceneName}".`);
+      return makeSceneNotFoundFailure(project, sceneName);
     }
     const scene = project.getLayout(sceneName);
     const currentSceneEvents = scene.getEvents();
@@ -5018,7 +5112,7 @@ const inspectScenePropertiesLayersEffects: EditorFunction = {
     const scene_name = extractRequiredString(args, 'scene_name');
 
     if (!project.hasLayoutNamed(scene_name)) {
-      return makeGenericFailure(`Scene not found: "${scene_name}".`);
+      return makeSceneNotFoundFailure(project, scene_name);
     }
 
     const scene = project.getLayout(scene_name);
@@ -5085,6 +5179,20 @@ const isFuzzyMatch = (string1: string, string2: string) => {
 const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
   renderForEditor: ({ args, shouldShowDetails }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
+
+    const deleteThisScene = SafeExtractor.extractBooleanProperty(
+      args,
+      'delete_this_scene'
+    );
+    if (deleteThisScene) {
+      return {
+        text: (
+          <Trans>
+            Remove scene <b>{scene_name}</b>.
+          </Trans>
+        ),
+      };
+    }
 
     const changed_properties = SafeExtractor.extractArrayProperty(
       args,
@@ -5186,7 +5294,7 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
     const scene_name = extractRequiredString(args, 'scene_name');
 
     if (!project.hasLayoutNamed(scene_name)) {
-      return makeGenericFailure(`Scene not found: "${scene_name}".`);
+      return makeSceneNotFoundFailure(project, scene_name);
     }
     const scene = project.getLayout(scene_name);
 
@@ -5602,7 +5710,7 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
         if (deleteThisGroup) {
           groups.remove(groupName);
           changes.push(
-            `Deleted group "${groupName}" from scene "${scene_name}".`
+            `Deleted group "${groupName}" from scene "${scene.getName()}".`
           );
         } else {
           if (newGroupName) {
@@ -5615,7 +5723,7 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
             );
             foundGroup.setName(newGroupName);
             changes.push(
-              `Renamed group "${groupName}" to "${newGroupName}" in scene "${scene_name}".`
+              `Renamed group "${groupName}" to "${newGroupName}" in scene "${scene.getName()}".`
             );
           }
           if (objects) {
@@ -6086,6 +6194,9 @@ export const editorFunctions: { [string]: EditorFunction } = {
   inspect_object_properties: inspectObjectProperties,
   change_object_property: changeObjectProperty,
   add_behavior: addBehavior,
+  // Not offered to the AI anymore since toolsVersion v6 (behavior deletion is
+  // now done via `change_behavior_property`'s `delete_this_behavior`), but kept
+  // here for AI requests still using an older toolsVersion.
   remove_behavior: removeBehavior,
   inspect_behavior_properties: inspectBehaviorProperties,
   change_behavior_property: changeBehaviorProperty,

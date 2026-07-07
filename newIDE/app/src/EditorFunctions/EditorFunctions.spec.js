@@ -11,6 +11,28 @@ import {
 
 const gd: libGDevelop = global.gd;
 
+const fake9PatchAssetShortHeader = {
+  ...fakeAssetShortHeader1,
+  name: 'Yellow Button',
+  objectType: '9patch',
+  animationsCount: 1,
+};
+
+const fake3DModelAssetShortHeader = {
+  ...fakeAssetShortHeader1,
+  name: 'Knight Character',
+  objectType: 'Scene3D::Model3DObject',
+  animationsCount: 8,
+};
+
+// Particle emitter assets have no animations count in the assets database.
+const fakeParticleEmitterAssetShortHeader = {
+  ...fakeAssetShortHeader1,
+  name: 'Fire Sparkles',
+  objectType: 'ParticleSystem::ParticleEmitter',
+  animationsCount: undefined,
+};
+
 // $FlowFixMe[incompatible-type]
 // $FlowFixMe[missing-local-annot]
 // $FlowFixMe[cannot-resolve-name]
@@ -163,7 +185,7 @@ describe('editorFunctions', () => {
       );
 
       expect(result.message).toMatchInlineSnapshot(
-        `"Created object \\"MyNewTextObject\\" (type \\"TextObject::Text\\", scene \\"TestScene\\") from asset store. Properties: bold: false, characterSize: 20 (px), color: 0;0;0 (color), isOutlineEnabled: false, isShadowEnabled: false, italic: false, lineHeight: 0 (px), outlineColor: 255;255;255 (color), outlineThickness: 2 (px), shadowAngle: 90 (deg), shadowBlurRadius: 2 (px), shadowColor: 0;0;0 (color), shadowDistance: 4 (px), shadowOpacity: 127 (px), text: Text (multilinestring), textAlignment: left (choice, one of: [\\"left\\", \\"center\\", \\"right\\"]), verticalTextAlignment: top (choice, one of: [\\"top\\", \\"center\\", \\"bottom\\"]). Empty: font (resource)."`
+        `"Created object \\"MyNewTextObject\\" (type \\"TextObject::Text\\", scene \\"TestScene\\") from asset store. Used asset \\"Dino Doux\\" (6 animation(s)). Properties: bold: false, characterSize: 20 (px), color: 0;0;0 (color), isOutlineEnabled: false, isShadowEnabled: false, italic: false, lineHeight: 0 (px), outlineColor: 255;255;255 (color), outlineThickness: 2 (px), shadowAngle: 90 (deg), shadowBlurRadius: 2 (px), shadowColor: 0;0;0 (color), shadowDistance: 4 (px), shadowOpacity: 127 (px), text: Text (multilinestring), textAlignment: left (choice, one of: [\\"left\\", \\"center\\", \\"right\\"]), verticalTextAlignment: top (choice, one of: [\\"top\\", \\"center\\", \\"bottom\\"]). Empty: font (resource)."`
       );
       expect(result.success).toBe(true);
       expect(onObjectsModifiedOutsideEditor).toHaveBeenCalledWith({
@@ -189,13 +211,99 @@ describe('editorFunctions', () => {
       );
 
       expect(result.message).toMatchInlineSnapshot(
-        `"Created object \\"SomeNewObject\\" (type \\"Sprite\\", scene \\"TestScene\\") from asset store. Properties: ."`
+        `"Created object \\"SomeNewObject\\" (type \\"Sprite\\", scene \\"TestScene\\") from asset store. Used asset \\"Dino Doux\\" (6 animation(s)). This object type has no editable object properties."`
       );
       expect(result.success).toBe(true);
       expect(onObjectsModifiedOutsideEditor).toHaveBeenCalledWith({
         scene: testScene,
         isNewObjectTypeUsed: false,
       });
+    });
+
+    it('creates a new object from a 9patch asset, without showing its constant animations count', async () => {
+      // $FlowFixMe[underconstrained-implicit-instantiation]
+      const onObjectsModifiedOutsideEditor = jest.fn();
+
+      const result: EditorFunctionGenericOutput = await editorFunctions.create_or_replace_object.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          searchAndInstallAsset: async ({
+            objectsContainer,
+            objectName,
+            objectType,
+          }) => {
+            const object = objectsContainer.insertNewObject(
+              project,
+              'TextObject::Text',
+              objectName,
+              objectsContainer.getObjectsCount()
+            );
+            return Promise.resolve({
+              status: 'asset-installed',
+              message: 'Object installed',
+              createdObjects: [object],
+              assetShortHeader: fake9PatchAssetShortHeader,
+              isTheFirstOfItsTypeInProject: false,
+            });
+          },
+          args: {
+            scene_name: 'TestScene',
+            object_type: 'TextObject::Text',
+            object_name: 'MenuButton',
+            search_terms: 'yellow button',
+          },
+          onObjectsModifiedOutsideEditor,
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).toEqual(
+        expect.stringContaining('Used asset "Yellow Button".')
+      );
+      expect(result.message).not.toEqual(expect.stringContaining('animation'));
+    });
+
+    it('creates a new object from an animated 3D model asset, showing its animations count', async () => {
+      // $FlowFixMe[underconstrained-implicit-instantiation]
+      const onObjectsModifiedOutsideEditor = jest.fn();
+
+      const result: EditorFunctionGenericOutput = await editorFunctions.create_or_replace_object.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          searchAndInstallAsset: async ({
+            objectsContainer,
+            objectName,
+            objectType,
+          }) => {
+            const object = objectsContainer.insertNewObject(
+              project,
+              'Sprite',
+              objectName,
+              objectsContainer.getObjectsCount()
+            );
+            return Promise.resolve({
+              status: 'asset-installed',
+              message: 'Object installed',
+              createdObjects: [object],
+              assetShortHeader: fake3DModelAssetShortHeader,
+              isTheFirstOfItsTypeInProject: false,
+            });
+          },
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'Knight',
+            search_terms: 'knight character',
+          },
+          onObjectsModifiedOutsideEditor,
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).toEqual(
+        expect.stringContaining(
+          'Used asset "Knight Character" (8 animation(s)).'
+        )
+      );
     });
 
     it('creates a new object (from scratch, fallback if not found in the asset store)', async () => {
@@ -255,7 +363,7 @@ describe('editorFunctions', () => {
 
       expect(result.success).toBe(true);
       expect(result.message).toMatchInlineSnapshot(
-        `"Object \\"Player\\" already exists."`
+        `"Object \\"Player\\" already exists - nothing was changed. Set replace_existing_object to true to replace its assets from the asset store."`
       );
       expect(onObjectsModifiedOutsideEditor).toHaveBeenCalledWith({
         scene: testScene,
@@ -444,7 +552,7 @@ describe('editorFunctions', () => {
       );
       expect(testScene.getObjects().hasObjectNamed('Player')).toBe(true);
       expect(result.message).toMatchInlineSnapshot(
-        `"Replaced scene \\"TestScene\\" object \\"Player\\" with asset store object (same type \\"Sprite\\")."`
+        `"Replaced scene \\"TestScene\\" object \\"Player\\" with asset store object (same type \\"Sprite\\"). Used asset \\"Dino Doux\\" (6 animation(s))."`
       );
       expect(result.success).toBe(true);
       expect(onObjectsModifiedOutsideEditor).toHaveBeenCalledWith({
@@ -651,8 +759,53 @@ describe('editorFunctions', () => {
 
       expect(result.success).toBe(true);
       expect(result.message).toMatchInlineSnapshot(
-        `"Replaced scene \\"TestScene\\" object \\"Player\\" with asset store object (same type \\"Sprite\\")."`
+        `"Replaced scene \\"TestScene\\" object \\"Player\\" with asset store object (same type \\"Sprite\\"). Used asset \\"Dino Doux\\" (6 animation(s))."`
       );
+    });
+
+    it('replaces an existing object with a particle emitter asset, which has no animations count', async () => {
+      // $FlowFixMe[underconstrained-implicit-instantiation]
+      const onObjectsModifiedOutsideEditor = jest.fn();
+
+      const result: EditorFunctionGenericOutput = await editorFunctions.create_or_replace_object.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          searchAndInstallAsset: async ({
+            objectsContainer,
+            objectName,
+            objectType,
+          }) => {
+            const object = objectsContainer.insertNewObject(
+              project,
+              objectType || 'Sprite',
+              objectName,
+              objectsContainer.getObjectsCount()
+            );
+            return Promise.resolve({
+              status: 'asset-installed',
+              message: 'Object installed',
+              createdObjects: [object],
+              // $FlowFixMe[incompatible-type] - the AssetShortHeader type declares animationsCount as required, but particle emitter assets have none in the assets database.
+              assetShortHeader: fakeParticleEmitterAssetShortHeader,
+              isTheFirstOfItsTypeInProject: false,
+            });
+          },
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'Player',
+            replace_existing_object: true,
+            search_terms: 'fire sparkles',
+          },
+          onObjectsModifiedOutsideEditor,
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).toEqual(
+        expect.stringContaining('Used asset "Fire Sparkles".')
+      );
+      expect(result.message).not.toEqual(expect.stringContaining('animation'));
+      expect(result.message).not.toEqual(expect.stringContaining('undefined'));
     });
 
     it('fails when object_type conflicts with an existing object type', async () => {
@@ -2301,8 +2454,8 @@ describe('editorFunctions', () => {
 
       expect(result.success).toBe(true);
       expect(result.message).toEqual(
-        expect.stringContaining(
-          'Created 1 new instance of object "Player" using point brush at 100, 200 on the base layer ("").'
+        expect.stringMatching(
+          /Created 1 new instance of object "Player" \(id: [0-9a-f-]{10}\) using point brush at 100, 200 on the base layer \(""\)\./
         )
       );
     });
@@ -2326,8 +2479,8 @@ describe('editorFunctions', () => {
 
       expect(result.success).toBe(true);
       expect(result.message).toEqual(
-        expect.stringContaining(
-          'Created 2 new instances of object "Player" using point brush at 50, 60 on the base layer ("") (size 64x64, rotation 45°, opacity 128/255, z-order 5, origin at this position, each occupies X 50 to 114, Y 60 to 124).'
+        expect.stringMatching(
+          /Created 2 new instances of object "Player" \(ids: [0-9a-f-]{10}, [0-9a-f-]{10}\) using point brush at 50, 60 on the base layer \(""\) \(size 64x64, rotation 45°, opacity 128\/255, z-order 5, origin at this position, each occupies X 50 to 114, Y 60 to 124\)\./
         )
       );
     });
@@ -2581,19 +2734,94 @@ describe('editorFunctions', () => {
       });
     });
 
-    // Regression test: creating instances with the "none" brush used to leave
-    // every new instance at the origin (0,0) instead of at brush_position.
-    it('creates new instances at brush_position with the none brush', async () => {
-      await putInstances({
-        brush_kind: 'none',
-        brush_position: '200,300',
-        new_instances_count: 2,
+    // The "none" brush is for modifying existing instances only: creating with
+    // it used to silently pile up instances at a default position, leaving
+    // unwanted duplicates.
+    it('fails instead of creating instances with the none brush', async () => {
+      const result = await editorFunctions.put_2d_instances.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          object_name: 'Player',
+          layer_name: '',
+          brush_kind: 'none',
+          brush_position: '200,300',
+          new_instances_count: 2,
+        },
       });
 
-      expect(getInstancePositions(testScene)).toEqual([
-        { x: 200, y: 300 },
-        { x: 200, y: 300 },
-      ]);
+      expect(result.success).toBe(false);
+      expect(result.message).toEqual(
+        expect.stringContaining('cannot create new ones')
+      );
+      expect(getInstancePositions(testScene)).toEqual([]);
+    });
+
+    // A call asking to create nothing and modify nothing used to silently
+    // create one instance at the default scene-center position.
+    it('fails when new_instances_count is 0 and no existing_instance_ids are given', async () => {
+      for (const brush_kind of ['point', 'none']) {
+        const result = await editorFunctions.put_2d_instances.launchFunction({
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'Player',
+            layer_name: '',
+            brush_kind,
+            new_instances_count: 0,
+          },
+        });
+
+        expect(result.success).toBe(false);
+        expect(result.message).toEqual(
+          expect.stringContaining('Nothing to do')
+        );
+        expect(getInstancePositions(testScene)).toEqual([]);
+      }
+    });
+
+    // The none brush with neither ids nor an explicit count used to create one
+    // instance at the default scene-center position.
+    it('fails with the none brush when no existing_instance_ids are given', async () => {
+      const result = await editorFunctions.put_2d_instances.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          object_name: 'Player',
+          layer_name: '',
+          brush_kind: 'none',
+        },
+      });
+
+      expect(result.success).toBe(false);
+      expect(result.message).toEqual(
+        expect.stringContaining('cannot create new ones')
+      );
+      expect(getInstancePositions(testScene)).toEqual([]);
+    });
+
+    // The created id in the message closes the loop "create then adjust":
+    // it must be directly usable as `existing_instance_ids`.
+    it('reports the created instance id, usable to modify it in a follow-up call', async () => {
+      const result = await putInstances({
+        brush_kind: 'point',
+        brush_position: '100,200',
+        new_instances_count: 1,
+      });
+
+      const idMatch = (result.message || '').match(/\(id: ([^)]+)\)/);
+      if (!idMatch) throw new Error('Expected the created id in the message.');
+
+      const moveResult = await putInstances({
+        brush_kind: 'point',
+        brush_position: '300,400',
+        existing_instance_ids: idMatch[1],
+      });
+
+      expect(moveResult.message).toEqual(
+        expect.stringContaining('Repositioned 1 instance')
+      );
+      expect(getInstancePositions(testScene)).toEqual([{ x: 300, y: 400 }]);
     });
 
     // The none brush must still leave existing instances where they are.
@@ -2897,8 +3125,8 @@ describe('editorFunctions', () => {
 
       expect(result.success).toBe(true);
       expect(result.message).toEqual(
-        expect.stringContaining(
-          'Created 1 new instance of object "Player" using point brush at 10, 20, 30 on the base layer ("") (size 8x16x24, rotation (15°, 30°, 45°), origin at this position, each occupies X 10 to 18, Y 20 to 36, Z 30 to 54).'
+        expect.stringMatching(
+          /Created 1 new instance of object "Player" \(id: [0-9a-f-]{10}\) using point brush at 10, 20, 30 on the base layer \(""\) \(size 8x16x24, rotation \(15°, 30°, 45°\), origin at this position, each occupies X 10 to 18, Y 20 to 36, Z 30 to 54\)\./
         )
       );
     });
@@ -3098,6 +3326,74 @@ describe('editorFunctions', () => {
           'None of the specified instance ids were found: does-not-exist'
         )
       );
+    });
+
+    // A call asking to create nothing and modify nothing used to silently
+    // create one instance at the default scene-center position.
+    it('fails when new_instances_count is 0 and no existing_instance_ids are given', async () => {
+      const result = await editorFunctions.put_3d_instances.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          object_name: 'Player',
+          layer_name: '',
+          brush_kind: 'none',
+          new_instances_count: 0,
+        },
+      });
+
+      expect(result.success).toBe(false);
+      expect(result.message).toEqual(expect.stringContaining('Nothing to do'));
+      expect(getInstancePositions(testScene)).toEqual([]);
+    });
+
+    // The "none" brush is for modifying existing instances only: creating with
+    // it used to silently pile up instances at a default position, leaving
+    // unwanted duplicates.
+    it('fails instead of creating instances with the none brush', async () => {
+      const result = await editorFunctions.put_3d_instances.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          object_name: 'Player',
+          layer_name: '',
+          brush_kind: 'none',
+          brush_position: '10,20,30',
+          new_instances_count: 6,
+        },
+      });
+
+      expect(result.success).toBe(false);
+      expect(result.message).toEqual(
+        expect.stringContaining('cannot create new ones')
+      );
+      expect(getInstancePositions(testScene)).toEqual([]);
+    });
+
+    // The created id in the message closes the loop "create then adjust":
+    // it must be directly usable as `existing_instance_ids`.
+    it('reports the created instance id, usable to modify it in a follow-up call', async () => {
+      const result = await putInstances({
+        brush_kind: 'point',
+        brush_position: '10,20,30',
+        new_instances_count: 1,
+      });
+
+      const idMatch = (result.message || '').match(/\(id: ([^)]+)\)/);
+      if (!idMatch) throw new Error('Expected the created id in the message.');
+
+      const moveResult = await putInstances({
+        brush_kind: 'point',
+        brush_position: '40,50,60',
+        existing_instance_ids: idMatch[1],
+      });
+
+      expect(moveResult.message).toEqual(
+        expect.stringContaining('Repositioned 1 instance')
+      );
+      expect(getInstancePositions(testScene)).toEqual([
+        { x: 40, y: 50, z: 60 },
+      ]);
     });
 
     it('erases an existing instance by id', async () => {

@@ -643,6 +643,68 @@ describe('applyVariableChange', () => {
       expect(replacedRow.getAtIndex(0).getValue()).toBe(42);
     });
   });
+
+  describe('Empty arrays and structures', () => {
+    it('creates an empty array from "[]"', () => {
+      const result = applyVariableChange({
+        variablePath: 'emptyArray',
+        forcedVariableType: 'Array',
+        variablesContainer,
+        value: '[]',
+      });
+
+      expect(result.variableType).toBe('Array');
+      const variable = variablesContainer.get('emptyArray');
+      expect(variable.getType()).toBe(gd.Variable.Array);
+      expect(variable.getChildrenCount()).toBe(0);
+    });
+
+    it('creates an empty structure from "{}"', () => {
+      const result = applyVariableChange({
+        variablePath: 'emptyStructure',
+        forcedVariableType: null,
+        variablesContainer,
+        value: '{}',
+      });
+
+      expect(result.variableType).toBe('Structure');
+      const variable = variablesContainer.get('emptyStructure');
+      expect(variable.getType()).toBe(gd.Variable.Structure);
+      expect(variable.getChildrenCount()).toBe(0);
+    });
+
+    it('creates empty array and structure children inside a structure', () => {
+      applyVariableChange({
+        variablePath: 'inventory',
+        forcedVariableType: null,
+        variablesContainer,
+        value: '{"weapons": [], "stats": {}}',
+      });
+
+      const variable = variablesContainer.get('inventory');
+      expect(variable.getType()).toBe(gd.Variable.Structure);
+      expect(variable.getChild('weapons').getType()).toBe(gd.Variable.Array);
+      expect(variable.getChild('weapons').getChildrenCount()).toBe(0);
+      expect(variable.getChild('stats').getType()).toBe(gd.Variable.Structure);
+      expect(variable.getChild('stats').getChildrenCount()).toBe(0);
+    });
+
+    it('replaces an existing number child with an empty array via a path', () => {
+      const root = variablesContainer.insertNew('storage', 0);
+      root.getChild('herbs').setValue(0);
+
+      applyVariableChange({
+        variablePath: 'storage.herbs',
+        forcedVariableType: 'Array',
+        variablesContainer,
+        value: '[]',
+      });
+
+      const herbs = variablesContainer.get('storage').getChild('herbs');
+      expect(herbs.getType()).toBe(gd.Variable.Array);
+      expect(herbs.getChildrenCount()).toBe(0);
+    });
+  });
 });
 
 describe('applyVariableDeletion', () => {

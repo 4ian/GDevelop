@@ -337,7 +337,7 @@ describe('StickyNotes', () => {
   });
 
   it('keeps the internal notes json out of the resources file tree', () => {
-    const source = fs.readFileSync(
+    const projectFilesPanelSource = fs.readFileSync(
       path.join(
         __dirname,
         '..',
@@ -347,10 +347,27 @@ describe('StickyNotes', () => {
       ),
       'utf8'
     );
+    const localFileResourcesWatcherSource = fs.readFileSync(
+      path.join(
+        __dirname,
+        '..',
+        '..',
+        'ProjectsStorage',
+        'LocalFileStorageProvider',
+        'LocalFileResourcesWatcher.js'
+      ),
+      'utf8'
+    );
 
-    expect(source).toContain(
+    expect(projectFilesPanelSource).toContain(
       "const ignoredFileNames = new Set(['.gdevelop-sticky-notes.json']);"
     );
-    expect(source).toContain('ignoredFileNames.has(name)');
+    expect(projectFilesPanelSource).toContain('ignoredFileNames.has(name)');
+    expect(localFileResourcesWatcherSource).toContain(
+      "const stickyNotesFileName = '.gdevelop-sticky-notes.json';"
+    );
+    expect(localFileResourcesWatcherSource).toContain(
+      'path.join(folderPath, stickyNotesFileName)'
+    );
   });
 });

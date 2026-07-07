@@ -289,6 +289,17 @@
   flex: 0 0 auto;
   align-items: center;
   gap: 1px;
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+  transition: opacity 120ms ease-in-out, visibility 120ms ease-in-out;
+}
+
+.noteHeader:hover .noteHeaderActions,
+.noteHeader:focus-within .noteHeaderActions {
+  opacity: 1;
+  pointer-events: auto;
+  visibility: visible;
 }
 
 .noteIconButton {

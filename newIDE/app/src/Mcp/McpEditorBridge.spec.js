@@ -265,8 +265,36 @@ describe('McpEditorBridge', () => {
     expect(result.responsive).toBe(false);
     expect(result.previewHealth).toBe('connected-unresponsive');
     expect(result.recommendedActions).toContain(
-      'control_preview { action: "close", close_all: true }'
+      'save_and_relaunch_preview_paused { timeout_ms: 10000 }'
     );
+  });
+
+  it('rejects CLOSE_PREVIEW as a command and points to preview relaunch cleanup', async () => {
+    const runCommand = jest.fn();
+    const bridge = makeBridge({
+      getPermissions: () => ({
+        allowWriteTools: false,
+        allowCommandTools: true,
+      }),
+      runCommand,
+    });
+
+    const response = await bridge.handleRendererMcpRequest({
+      method: 'tools/call',
+      params: {
+        name: 'gdevelop_run_command',
+        arguments: { commandName: 'CLOSE_PREVIEW' },
+      },
+    });
+
+    expect(response.isError).toBe(true);
+    expect(response.content[0].text).toContain(
+      'CLOSE_PREVIEW is not a GDevelop command'
+    );
+    expect(response.content[0].text).toContain(
+      'save_and_relaunch_preview_paused'
+    );
+    expect(runCommand).not.toHaveBeenCalled();
   });
 
   it('does not keep a stale preview id alive when health-check target disconnects', async () => {
@@ -739,9 +767,15 @@ describe('McpEditorBridge', () => {
       );
 
       expect(invalidColorValidation.valid).toBe(false);
-      expect(invalidColorValidation.issues[0].type).toBe('invalid-parameter');
-      expect(invalidColorValidation.issues[0].parameterValue).toBe('220;30;55');
-      expect(invalidColorValidation.issues[0].suggestion).toContain(
+      const invalidColorIssue = invalidColorValidation.issues.find(
+        issue =>
+          issue.type === 'invalid-parameter' &&
+          issue.parameterValue === '220;30;55'
+      );
+      if (!invalidColorIssue) {
+        throw new Error('Expected an invalid color parameter issue.');
+      }
+      expect(invalidColorIssue.suggestion).toContain(
         '"220;30;55"'
       );
       expect(invalidColorValidation.issueSummary.byType).toEqual(
@@ -749,9 +783,13 @@ describe('McpEditorBridge', () => {
           'invalid-parameter': expect.any(Number),
         })
       );
-      expect(
-        invalidColorValidation.issueSummary.rootCauses[0].suggestion
-      ).toContain('"220;30;55"');
+      const invalidColorRootCause =
+        invalidColorValidation.issueSummary.rootCauses.find(
+          rootCause =>
+            rootCause.suggestion &&
+            rootCause.suggestion.includes('"220;30;55"')
+        );
+      expect(invalidColorRootCause).toBeTruthy();
       expect(layout.getEvents().getEventsCount()).toBe(0);
 
       const invalidTextResponse = await bridge.handleRendererMcpRequest({
@@ -779,7 +817,10 @@ describe('McpEditorBridge', () => {
         invalidTextResponse.content[0].text
       );
       expect(invalidTextValidation.valid).toBe(false);
-      expect(invalidTextValidation.issues[0].suggestion).toContain('NewLine()');
+      const invalidTextIssue = invalidTextValidation.issues.find(
+        issue => issue.suggestion && issue.suggestion.includes('NewLine()')
+      );
+      expect(invalidTextIssue).toBeTruthy();
 
       layout.getObjects().insertNewObject(project, 'Sprite', 'GroundSlot', 2);
       layout
@@ -3114,7 +3155,7 @@ describe('McpEditorBridge', () => {
         'preview-ws-0',
       ]);
       expect(result.staleStateAdvisory.recommendedActions).toContain(
-        'control_preview { action: "close", close_all: true }'
+        'save_and_relaunch_preview_paused { timeout_ms: 10000 }'
       );
       expect(result.staleStateAdvisory.editorPanelsMayBeStale).toEqual(
         expect.arrayContaining([

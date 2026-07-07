@@ -123,7 +123,7 @@ Event write paths:
 
 Call `gdevelop_get_event_operation_reference` when unsure about `event_changes` operation names or target paths. For organization-only changes, prefer group tools and use `compare_scene_events_semantics` when you need to prove behavior stayed equivalent.
 
-After any write, inspect `staleStateAdvisory`. If previews may be stale, close all previews and relaunch before runtime verification. If editor panels may be stale, trust MCP readback over open tabs until they refresh.
+After any write, inspect `staleStateAdvisory`. If previews may be stale, use `save_and_relaunch_preview_paused` before runtime verification so cleanup happens through the preview relaunch workflow. If editor panels may be stale, trust MCP readback over open tabs until they refresh.
 
 ## Event JSON Essentials
 
@@ -219,7 +219,7 @@ Runtime verification:
 - Use `set_runtime_state` to reach hard-to-trigger states instead of hacking editor variables.
 - Verify with `gdevelop_inspect_running_preview`: errors/logs, live counts, variables, positions via `instance_positions_for`, `sceneElapsedTimeSeconds`, `recentSounds`, and `activeSounds`.
 - Use `capture_preview_screenshot` for visual evidence. Screenshots reflect rendered frames; state tools read runtime memory.
-- If several previews exist or evidence looks stale, `control_preview { action:"close", close_all:true }` and relaunch one fresh preview.
+- If several previews exist or evidence looks stale, use `save_and_relaunch_preview_paused` to save, clean up stale previews, and relaunch one fresh paused preview.
 - A launched preview alone is not a passed smoke test. Report concrete runtime evidence.
 
 Saving:

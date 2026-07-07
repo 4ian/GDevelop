@@ -1664,7 +1664,7 @@ const controlPreviewSchema = {
     action: {
       type: 'string',
       description:
-        'pause (freeze the game loop), play (resume), step (advance exactly N frames while paused for deterministic testing), close (stop previews; close_all:true closes every preview), or focus (bring all preview windows to front — fixes timed-out inspect/screenshot when a backgrounded preview is throttled). Defaults to step.',
+        'pause (freeze the game loop), play (resume), step (advance exactly N frames while paused for deterministic testing), close (stop previews directly), or focus (bring all preview windows to front - fixes timed-out inspect/screenshot when a backgrounded preview is throttled). Defaults to step. For stale-preview cleanup before verification, prefer save_and_relaunch_preview_paused so cleanup and relaunch happen as one supported workflow.',
     },
     frames: {
       type: 'number',
@@ -1678,7 +1678,7 @@ const controlPreviewSchema = {
     close_all: {
       type: 'boolean',
       description:
-        'For action=close: close ALL running previews instead of just the targeted one. Useful before relaunching to avoid stale windows.',
+        'For action=close: close ALL running previews instead of just the targeted one. For stale-preview cleanup before runtime verification, prefer save_and_relaunch_preview_paused.',
     },
     debugger_id: {
       type: 'string',
@@ -4721,7 +4721,7 @@ const commandTools: Array<McpTool> = [
   {
     name: 'gdevelop_run_command',
     description:
-      'Run a GDevelop command palette command by name. This can open dialogs, launch previews, save projects, or navigate the editor.',
+      'Run a GDevelop command palette command by name. This can open dialogs, launch previews, save projects, or navigate the editor. CLOSE_PREVIEW is not a command; use save_and_relaunch_preview_paused for stale preview cleanup.',
     inputSchema: {
       type: 'object',
       properties: {

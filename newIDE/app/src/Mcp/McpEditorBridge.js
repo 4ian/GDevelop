@@ -1656,7 +1656,7 @@ const runPreviewFrames = async (
       failurePhase: 'renderer-response',
       debuggerId: targetId,
       error:
-        'run_frames timed out: the targeted preview did not reply. The window may still be loading; retry, or close all previews and relaunch.',
+        'run_frames timed out: the targeted preview did not reply. The window may still be loading; retry, or use save_and_relaunch_preview_paused to clean up stale previews and relaunch.',
       diagnostics: buildPreviewDiagnostics({
         running: true,
         previewIds: guard.previewIds,

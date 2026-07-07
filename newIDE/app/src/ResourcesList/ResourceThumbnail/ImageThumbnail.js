@@ -6,17 +6,6 @@ import { CorsAwareImage } from '../../UI/CorsAwareImage';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import { useLongTouch } from '../../Utils/UseLongTouch';
 import CheckeredBackground from '../CheckeredBackground';
-import {
-  getRenderedGifFrameDataUrl,
-  isGifResource,
-} from '../../Utils/GifFrameRenderer';
-
-type SourceRect = {|
-  x: number,
-  y: number,
-  width: number,
-  height: number,
-|};
 
 const styles = {
   spriteThumbnail: {
@@ -31,10 +20,6 @@ const styles = {
   spriteThumbnailImage: {
     position: 'relative',
     pointerEvents: 'none',
-  },
-  sourceRectContainer: {
-    overflow: 'hidden',
-    position: 'relative',
   },
   checkboxContainer: {
     textAlign: 'initial',
@@ -56,70 +41,12 @@ type Props = {|
   onSelect?: (checked: boolean) => void,
   onContextMenu?: (x: number, y: number) => void,
   size?: number,
-  sourceRect?: ?SourceRect,
-  imageFrameIndex?: number,
 |};
 
 const ImageThumbnail = (props: Props): React.MixedElement => {
   const { onContextMenu, resourcesLoader, resourceName, project } = props;
   const theme = React.useContext(GDevelopThemeContext);
   const [error, setError] = React.useState(false);
-  const [imageSize, setImageSize] = React.useState<?[number, number]>(null);
-  const [
-    staticGifFrameSource,
-    setStaticGifFrameSource,
-  ] = React.useState<?string>(null);
-  const resourceSource = resourcesLoader.getResourceFullUrl(
-    project,
-    resourceName,
-    {}
-  );
-  const shouldRenderStaticGifFrame = isGifResource(project, resourceName);
-
-  React.useEffect(
-    () => {
-      if (!shouldRenderStaticGifFrame) {
-        setStaticGifFrameSource(null);
-        return;
-      }
-
-      let wasCancelled = false;
-      setError(false);
-      setStaticGifFrameSource(null);
-      getRenderedGifFrameDataUrl(
-        {
-          project,
-          resourceName,
-          resourceUrl: resourceSource,
-        },
-        props.imageFrameIndex || 0
-      ).then(
-        dataUrl => {
-          if (wasCancelled) return;
-          setStaticGifFrameSource(dataUrl);
-        },
-        error => {
-          if (wasCancelled) return;
-          console.error(
-            `Unable to render GIF frame for resource "${resourceName}":`,
-            error
-          );
-          setError(true);
-        }
-      );
-
-      return () => {
-        wasCancelled = true;
-      };
-    },
-    [
-      project,
-      props.imageFrameIndex,
-      resourceName,
-      resourceSource,
-      shouldRenderStaticGifFrame,
-    ]
-  );
 
   // Allow a long press to show the context menu
   const { contextMenuProps: longTouchForContextMenuProps } = useLongTouch(
@@ -146,26 +73,6 @@ const ImageThumbnail = (props: Props): React.MixedElement => {
     borderRadius: 4,
     ...props.style,
   };
-  const thumbnailSize = props.size || 100;
-  const sourceRect = props.sourceRect;
-  const imageSource = shouldRenderStaticGifFrame
-    ? staticGifFrameSource
-    : resourceSource;
-  const displaySourceRect = sourceRect && imageSize ? sourceRect : null;
-  const sourceRectScale =
-    sourceRect && imageSize
-      ? Math.min(
-          thumbnailSize / sourceRect.width,
-          thumbnailSize / sourceRect.height
-        )
-      : 1;
-  const sourceRectContainerStyle = displaySourceRect
-    ? {
-        ...styles.sourceRectContainer,
-        width: displaySourceRect.width * sourceRectScale,
-        height: displaySourceRect.height * sourceRectScale,
-      }
-    : null;
 
   return (
     <div
@@ -178,61 +85,23 @@ const ImageThumbnail = (props: Props): React.MixedElement => {
       {...longTouchForContextMenuProps}
     >
       <CheckeredBackground borderRadius={4} />
-      {imageSource && sourceRectContainerStyle && displaySourceRect ? (
-        <div style={sourceRectContainerStyle}>
-          <CorsAwareImage
-            style={{
-              ...styles.spriteThumbnailImage,
-              width: imageSize ? imageSize[0] * sourceRectScale : undefined,
-              height: imageSize ? imageSize[1] * sourceRectScale : undefined,
-              maxWidth: undefined,
-              maxHeight: undefined,
-              display: error ? 'none' : undefined,
-              transform: `translate(${-displaySourceRect.x *
-                sourceRectScale}px, ${-displaySourceRect.y *
-                sourceRectScale}px)`,
-              transformOrigin: 'top left',
-            }}
-            alt={resourceName}
-            src={imageSource}
-            onError={error => {
-              // $FlowFixMe[incompatible-type]
-              setError(error);
-            }}
-            onLoad={event => {
-              const imgElement = event.currentTarget;
-              setImageSize([
-                imgElement.naturalWidth || imgElement.clientWidth,
-                imgElement.naturalHeight || imgElement.clientHeight,
-              ]);
-              setError(false);
-            }}
-          />
-        </div>
-      ) : imageSource ? (
-        <CorsAwareImage
-          style={{
-            ...styles.spriteThumbnailImage,
-            maxWidth: props.size || 100,
-            maxHeight: props.size || 100,
-            display: error ? 'none' : undefined,
-          }}
-          alt={resourceName}
-          src={imageSource}
-          onError={error => {
-            // $FlowFixMe[incompatible-type]
-            setError(error);
-          }}
-          onLoad={event => {
-            const imgElement = event.currentTarget;
-            setImageSize([
-              imgElement.naturalWidth || imgElement.clientWidth,
-              imgElement.naturalHeight || imgElement.clientHeight,
-            ]);
-            setError(false);
-          }}
-        />
-      ) : null}
+      <CorsAwareImage
+        style={{
+          ...styles.spriteThumbnailImage,
+          maxWidth: props.size || 100,
+          maxHeight: props.size || 100,
+          display: error ? 'none' : undefined,
+        }}
+        alt={resourceName}
+        src={resourcesLoader.getResourceFullUrl(project, resourceName, {})}
+        onError={error => {
+          // $FlowFixMe[incompatible-type]
+          setError(error);
+        }}
+        onLoad={() => {
+          setError(false);
+        }}
+      />
       {props.selectable && (
         <div style={styles.checkboxContainer}>
           <Checkbox

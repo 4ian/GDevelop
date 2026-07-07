@@ -23,11 +23,6 @@ import {
   zoomOutFactor,
 } from '../../Utils/ZoomUtils';
 import KeyboardShortcuts from '../../UI/KeyboardShortcuts';
-import {
-  getRenderedGifFrameDataUrl,
-  isGifPath,
-  isGifResource,
-} from '../../Utils/GifFrameRenderer';
 
 const gd: libGDevelop = global.gd;
 
@@ -35,12 +30,6 @@ const imagePreviewMaxZoom = 4;
 const imagePreviewMinZoom = 1 / 4;
 
 type Point = { x: number, y: number };
-type SourceRect = {|
-  x: number,
-  y: number,
-  width: number,
-  height: number,
-|};
 
 const getDistanceBetweenPoints = (point1: Point, point2: Point) => {
   return Math.sqrt((point2.x - point1.x) ** 2 + (point2.y - point1.y) ** 2);
@@ -92,7 +81,6 @@ type Props = {|
   resourceName: string,
   imageResourceSource: string,
   isImageResourceSmooth: boolean,
-  sourceRect?: ?SourceRect,
   displaySpacedView?: boolean,
   fixedHeight?: number,
   fixedWidth?: number,
@@ -111,8 +99,6 @@ type Props = {|
   isImagePrivate?: boolean,
   onImageLoaded?: () => void,
   hideLoader?: boolean,
-  project?: gdProject,
-  imageFrameIndex?: number,
 |};
 
 export const isProjectImageResourceSmooth = (
@@ -139,7 +125,6 @@ const ImagePreview = ({
   resourceName,
   imageResourceSource,
   isImageResourceSmooth,
-  sourceRect,
   fixedHeight,
   fixedWidth,
   renderOverlay,
@@ -150,18 +135,10 @@ const ImagePreview = ({
   isImagePrivate,
   onImageLoaded,
   hideLoader,
-  project,
-  imageFrameIndex,
 }: Props): React.Node => {
   const [errored, setErrored] = React.useState<boolean>(false);
   const [imageWidth, setImageWidth] = React.useState<?number>(null);
   const [imageHeight, setImageHeight] = React.useState<?number>(null);
-  const [fullImageWidth, setFullImageWidth] = React.useState<?number>(null);
-  const [fullImageHeight, setFullImageHeight] = React.useState<?number>(null);
-  const [
-    staticGifFrameSource,
-    setStaticGifFrameSource,
-  ] = React.useState<?string>(null);
   const [containerWidth, setContainerWidth] = React.useState<?number>(null);
   const [containerHeight, setContainerHeight] = React.useState<?number>(null);
   const [zoomState, setZoomState] = React.useState<ZoomState>({
@@ -175,13 +152,10 @@ const ImagePreview = ({
   const previousPointerCoordinates = React.useRef<?[number, number]>(null);
   const hasZoomBeenAdaptedToImageRef = React.useRef<boolean>(false);
   const containerRef = React.useRef<?HTMLDivElement>(null);
-  const previousGifResourceKeyRef = React.useRef<?string>(null);
   const handleImageError = () => {
     setErrored(true);
   };
   const [shouldMoveView, setShouldMoveView] = React.useState<boolean>(false);
-  const sourceRectWidth = sourceRect ? sourceRect.width : null;
-  const sourceRectHeight = sourceRect ? sourceRect.height : null;
   const keyboardShortcuts = React.useRef<KeyboardShortcuts>(
     new KeyboardShortcuts({
       isActive: () => !deactivateControls,
@@ -189,65 +163,6 @@ const ImagePreview = ({
         onToggleGrabbingTool: setShouldMoveView,
       },
     })
-  );
-  const shouldRenderStaticGifFrame =
-    !isImagePrivate &&
-    !sourceRect &&
-    (project
-      ? isGifResource(project, resourceName)
-      : isGifPath(resourceName) || isGifPath(imageResourceSource));
-
-  React.useEffect(
-    () => {
-      if (!shouldRenderStaticGifFrame) {
-        setStaticGifFrameSource(null);
-        return;
-      }
-
-      let wasCancelled = false;
-      const gifResourceKey = `${resourceName}:${imageResourceSource}`;
-      if (previousGifResourceKeyRef.current !== gifResourceKey) {
-        previousGifResourceKeyRef.current = gifResourceKey;
-        setImageWidth(null);
-        setImageHeight(null);
-        setFullImageWidth(null);
-        setFullImageHeight(null);
-        setStaticGifFrameSource(null);
-      }
-      setErrored(false);
-      getRenderedGifFrameDataUrl(
-        {
-          project,
-          resourceName,
-          resourceUrl: imageResourceSource,
-        },
-        imageFrameIndex || 0
-      ).then(
-        dataUrl => {
-          if (wasCancelled) return;
-          setStaticGifFrameSource(dataUrl);
-        },
-        error => {
-          if (wasCancelled) return;
-          console.error(
-            `Unable to render GIF frame for resource "${resourceName}":`,
-            error
-          );
-          setErrored(true);
-        }
-      );
-
-      return () => {
-        wasCancelled = true;
-      };
-    },
-    [
-      imageFrameIndex,
-      imageResourceSource,
-      project,
-      resourceName,
-      shouldRenderStaticGifFrame,
-    ]
   );
 
   const getZoomFactorToFitImage = React.useCallback(
@@ -468,7 +383,7 @@ const ImagePreview = ({
     () => {
       hasZoomBeenAdaptedToImageRef.current = false;
     },
-    [imageResourceSource, sourceRectWidth, sourceRectHeight]
+    [imageResourceSource]
   );
 
   const containerCenter = React.useMemo(
@@ -501,29 +416,12 @@ const ImagePreview = ({
       const newImageHeight = imgElement
         ? imgElement.naturalHeight || imgElement.clientHeight
         : 0;
-      setFullImageWidth(newImageWidth);
-      setFullImageHeight(newImageHeight);
-      const displayedImageWidth =
-        sourceRectWidth != null ? sourceRectWidth : newImageWidth;
-      const displayedImageHeight =
-        sourceRectHeight != null ? sourceRectHeight : newImageHeight;
-      setImageHeight(displayedImageHeight);
-      setImageWidth(displayedImageWidth);
-      if (onImageSize) onImageSize([displayedImageWidth, displayedImageHeight]);
+      setImageHeight(newImageHeight);
+      setImageWidth(newImageWidth);
+      if (onImageSize) onImageSize([newImageWidth, newImageHeight]);
       if (onImageLoaded) onImageLoaded();
     },
-    [onImageLoaded, onImageSize, sourceRectWidth, sourceRectHeight]
-  );
-
-  React.useEffect(
-    () => {
-      if (sourceRectWidth == null || sourceRectHeight == null) return;
-
-      setImageHeight(sourceRectHeight);
-      setImageWidth(sourceRectWidth);
-      if (onImageSize) onImageSize([sourceRectWidth, sourceRectHeight]);
-    },
-    [onImageSize, sourceRectWidth, sourceRectHeight]
+    [onImageLoaded, onImageSize]
   );
 
   const onTouchEnd = React.useCallback((event: TouchEvent) => {
@@ -615,26 +513,13 @@ const ImagePreview = ({
     height: imageHeight,
     transformOrigin: '0 0',
     display: 'flex',
-    overflow: sourceRect ? 'hidden' : undefined,
   };
-
-  const imageSource = shouldRenderStaticGifFrame
-    ? staticGifFrameSource
-    : imageResourceSource;
 
   const imageStyle = {
     ...styles.spriteThumbnailImage,
     visibility,
     ...(!isImageResourceSmooth ? styles.previewImagePixelated : undefined),
     cursor: forcedCursor,
-    flexShrink: 0,
-    maxWidth: sourceRect ? 'none' : undefined,
-    maxHeight: sourceRect ? 'none' : undefined,
-    width: sourceRect && fullImageWidth ? fullImageWidth : undefined,
-    height: sourceRect && fullImageHeight ? fullImageHeight : undefined,
-    transform: sourceRect
-      ? `translate(${-sourceRect.x}px, ${-sourceRect.y}px)`
-      : undefined,
   };
 
   const overlayStyle = {
@@ -745,14 +630,14 @@ const ImagePreview = ({
                     </Text>
                   </PlaceholderMessage>
                 )}
-                {!errored && imageSource && (
+                {!errored && (
                   <div style={imageContainerBorderStyle}>
                     <div style={imageContainerStyle}>
                       {isImagePrivate ? (
                         <AuthorizedAssetImage
                           style={imageStyle}
                           alt={resourceName}
-                          url={imageSource}
+                          url={imageResourceSource}
                           onError={handleImageError}
                           onLoad={handleImageLoaded}
                           hideLoader={hideLoader}
@@ -761,7 +646,7 @@ const ImagePreview = ({
                         <CorsAwareImage
                           style={imageStyle}
                           alt={resourceName}
-                          src={imageSource}
+                          src={imageResourceSource}
                           onError={handleImageError}
                           onLoad={handleImageLoaded}
                         />

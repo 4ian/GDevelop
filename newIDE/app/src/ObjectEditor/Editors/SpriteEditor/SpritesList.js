@@ -39,22 +39,6 @@ import ContextMenu, {
 import useAlertDialog from '../../../UI/Alert/useAlertDialog';
 import { groupResourcesByAnimations } from './AnimationImportHelper';
 import { type ResourceExternalEditor } from '../../../ResourcesList/ResourceExternalEditor';
-import RawSpriteSheetImportDialog, {
-  type RawSpriteSheetImportOptions,
-} from './RawSpriteSheetImportDialog';
-import { importRawGifToProjectResources } from './GifImportHelper';
-import {
-  createSpriteSheetSourceRects,
-  getSourceRectFromSprite,
-  loadImageSize,
-  setSpriteSourceRect,
-  type SpriteSourceRect,
-} from '../../../Utils/SpriteSourceRect';
-import { openFilePicker } from '../../../Utils/FileSystem';
-import {
-  addImageFileToProjectResources,
-  getImageFilePathsFromDataTransfer,
-} from '../../../SceneEditor/CreateSpriteFromImage';
 
 const gd: libGDevelop = global.gd;
 
@@ -71,25 +55,6 @@ const styles = {
   },
 };
 
-const hasNativeFiles = (event: any): boolean => {
-  const { dataTransfer } = event;
-  if (!dataTransfer || !dataTransfer.types) return false;
-
-  if (typeof dataTransfer.types.includes === 'function') {
-    return dataTransfer.types.includes('Files');
-  }
-
-  if (typeof dataTransfer.types.contains === 'function') {
-    return dataTransfer.types.contains('Files');
-  }
-
-  for (let index = 0; index < dataTransfer.types.length; index++) {
-    if (dataTransfer.types[index] === 'Files') return true;
-  }
-
-  return false;
-};
-
 const SortableSpriteThumbnail = SortableElement(
   ({
     sprite,
@@ -99,8 +64,6 @@ const SortableSpriteThumbnail = SortableElement(
     onSelect,
     onContextMenu,
     isFirst,
-    sourceRect,
-    imageFrameIndex,
   }) => (
     <ImageThumbnail
       selectable
@@ -108,8 +71,6 @@ const SortableSpriteThumbnail = SortableElement(
       onSelect={onSelect}
       onContextMenu={onContextMenu}
       resourceName={sprite.getImageName()}
-      sourceRect={sourceRect}
-      imageFrameIndex={imageFrameIndex}
       resourcesLoader={resourcesLoader}
       project={project}
       style={isFirst ? {} : styles.thumbnailExtraStyle}
@@ -127,44 +88,14 @@ const SortableList = SortableContainer(
     selectedSprites,
     onSelectSprite,
     onOpenSpriteContextMenu,
-    onNativeDragOver,
-    onNativeDrop,
   }) => {
     const spritesCount = direction.getSpritesCount();
     const hasMoreThanOneSprite = spritesCount > 1;
-    let previousWholeImageName: ?string = null;
-    let consecutiveWholeImageFrameIndex = 0;
-    const getImageFrameIndex = (
-      sprite: gdSprite,
-      sourceRect: ?SpriteSourceRect
-    ) => {
-      const imageName = sprite.getImageName();
-      if (!sourceRect && imageName) {
-        if (imageName === previousWholeImageName) {
-          consecutiveWholeImageFrameIndex++;
-        } else {
-          previousWholeImageName = imageName;
-          consecutiveWholeImageFrameIndex = 0;
-        }
-        return consecutiveWholeImageFrameIndex;
-      }
-
-      previousWholeImageName = null;
-      consecutiveWholeImageFrameIndex = 0;
-      return 0;
-    };
-
     return (
-      <div
-        style={styles.spritesList}
-        onDragOver={onNativeDragOver}
-        onDrop={onNativeDrop}
-      >
+      <div style={styles.spritesList}>
         {[
           ...mapFor(0, spritesCount, i => {
             const sprite = direction.getSprite(i);
-            const sourceRect = getSourceRectFromSprite(sprite);
-            const imageFrameIndex = getImageFrameIndex(sprite, sourceRect);
             return hasMoreThanOneSprite ? (
               <SortableSpriteThumbnail
                 sprite={sprite}
@@ -174,8 +105,6 @@ const SortableList = SortableContainer(
                 selected={!!selectedSprites[sprite.ptr]}
                 onContextMenu={(x, y) => onOpenSpriteContextMenu(x, y, sprite)}
                 onSelect={selected => onSelectSprite(sprite, selected)}
-                sourceRect={sourceRect}
-                imageFrameIndex={imageFrameIndex}
                 resourcesLoader={resourcesLoader}
                 project={project}
               />
@@ -188,8 +117,6 @@ const SortableList = SortableContainer(
                 onSelect={selected => onSelectSprite(sprite, selected)}
                 onContextMenu={(x, y) => onOpenSpriteContextMenu(x, y, sprite)}
                 resourceName={sprite.getImageName()}
-                sourceRect={sourceRect}
-                imageFrameIndex={imageFrameIndex}
                 resourcesLoader={resourcesLoader}
                 project={project}
                 size={SPRITE_SIZE}
@@ -309,16 +236,14 @@ export const applyPointsAndMasksToSpriteIfNecessary = (
   }
 };
 
-export const addAnimationFrameWithResourceName = (
+export const addAnimationFrame = (
   animations: gdSpriteAnimationList,
   direction: gdDirection,
-  resourceName: string,
-  onSpriteAdded: (sprite: gdSprite) => void,
-  sourceRect?: ?SpriteSourceRect
+  resource: gdResource,
+  onSpriteAdded: (sprite: gdSprite) => void
 ) => {
   const sprite = new gd.Sprite();
-  sprite.setImageName(resourceName);
-  setSpriteSourceRect(sprite, sourceRect);
+  sprite.setImageName(resource.getName());
 
   applyPointsAndMasksToSpriteIfNecessary(animations, direction, sprite);
 
@@ -326,51 +251,6 @@ export const addAnimationFrameWithResourceName = (
   direction.addSprite(sprite);
   sprite.delete();
 };
-
-export const addAnimationFrame = (
-  animations: gdSpriteAnimationList,
-  direction: gdDirection,
-  resource: gdResource,
-  onSpriteAdded: (sprite: gdSprite) => void,
-  sourceRect?: ?SpriteSourceRect
-) => {
-  addAnimationFrameWithResourceName(
-    animations,
-    direction,
-    resource.getName(),
-    onSpriteAdded,
-    sourceRect
-  );
-};
-
-export const addMissingResourcesToProject = (
-  project: gdProject,
-  resources: Array<gdResource>
-): {|
-  hasCreatedAnyResource: boolean,
-  resourcesToDeleteAfterUse: Array<gdResource>,
-|} => {
-  let hasCreatedAnyResource = false;
-  const resourcesToDeleteAfterUse: Array<gdResource> = [];
-  const resourcesManager = project.getResourcesManager();
-
-  resources.forEach(resource => {
-    if (resourcesManager.hasResource(resource.getName())) return;
-
-    applyResourceDefaults(project, resource);
-    const hasCreatedResource = resourcesManager.addResource(resource);
-    hasCreatedAnyResource = hasCreatedAnyResource || hasCreatedResource;
-    resourcesToDeleteAfterUse.push(resource);
-  });
-
-  return { hasCreatedAnyResource, resourcesToDeleteAfterUse };
-};
-
-type RawSpriteSheetImportState = {|
-  resourceName: string,
-  sheetWidth: number,
-  sheetHeight: number,
-|};
 
 type Props = {|
   animations: gdSpriteAnimationList,
@@ -417,15 +297,10 @@ const SpritesList = ({
     [number]: boolean,
   }>({});
   const spriteContextMenu = React.useRef<?ContextMenuInterface>(null);
-  const [
-    rawSpriteSheetImport,
-    setRawSpriteSheetImport,
-  ] = React.useState<?RawSpriteSheetImportState>(null);
   const forceUpdate = useForceUpdate();
-  const { showAlert, showConfirmation } = useAlertDialog();
+  const { showConfirmation } = useAlertDialog();
 
   const storageProvider = resourceManagementProps.getStorageProvider();
-  const canImportGif = storageProvider.internalName === 'LocalFile';
   const resourceSources = resourceManagementProps.resourceSources
     .filter(source => source.kind === 'image')
     .filter(
@@ -528,8 +403,6 @@ const SpritesList = ({
         initialSourceName: initialResourceSource.name,
         multiSelection: true,
         resourceKind: 'image',
-        importedResourcesFolder: 'assets',
-        includeProjectAssetsFolder: true,
       });
 
       if (!selectedResources.length) return;
@@ -539,7 +412,6 @@ const SpritesList = ({
       if (!selectedResourceSource) return;
 
       let hasCreatedAnyResource = false;
-      let resourcesToDeleteAfterUse: Array<gdResource> = [];
       if (selectedResourceSource.shouldCreateResource) {
         selectedResources.forEach(resource => {
           applyResourceDefaults(project, resource);
@@ -548,17 +420,6 @@ const SpritesList = ({
             .addResource(resource);
           hasCreatedAnyResource = hasCreatedAnyResource || hasCreatedResource;
         });
-        resourcesToDeleteAfterUse = selectedResources;
-      } else {
-        const addMissingResourcesResult = addMissingResourcesToProject(
-          project,
-          selectedResources
-        );
-        hasCreatedAnyResource =
-          hasCreatedAnyResource ||
-          addMissingResourcesResult.hasCreatedAnyResource;
-        resourcesToDeleteAfterUse =
-          addMissingResourcesResult.resourcesToDeleteAfterUse;
       }
 
       if (
@@ -585,10 +446,10 @@ const SpritesList = ({
         }
       }
 
-      if (resourcesToDeleteAfterUse.length) {
+      if (selectedResourceSource.shouldCreateResource) {
         // Important, we are responsible for deleting the resources that were given to us.
         // Otherwise we have a memory leak, as calling addResource is making a copy of the resource.
-        resourcesToDeleteAfterUse.forEach(resource => resource.delete());
+        selectedResources.forEach(resource => resource.delete());
       }
 
       forceUpdate();
@@ -615,391 +476,6 @@ const SpritesList = ({
       animations,
       onSpriteAdded,
       resourceSources,
-    ]
-  );
-
-  const onAddImageFilesFromLocalFileSystem = React.useCallback(
-    async (imageFilePaths: Array<string>) => {
-      if (
-        storageProvider.internalName !== 'LocalFile' ||
-        !project.getProjectFile()
-      ) {
-        await showAlert({
-          title: t`Unable to add images`,
-          message: t`Images can only be dropped into saved local projects.`,
-          dismissButtonLabel: t`Close`,
-        });
-        return;
-      }
-
-      const directionSpritesCountBeforeAdding = direction.getSpritesCount();
-      let addedFramesCount = 0;
-      try {
-        for (const imageFilePath of imageFilePaths) {
-          const resourceName = await addImageFileToProjectResources({
-            project,
-            imageFilePath,
-          });
-          addAnimationFrameWithResourceName(
-            animations,
-            direction,
-            resourceName,
-            onSpriteAdded
-          );
-          addedFramesCount++;
-        }
-      } catch (error) {
-        console.error('Unable to add dropped image files to sprite:', error);
-        await showAlert({
-          title: t`Unable to add images`,
-          message: t`The dropped images could not be imported.`,
-          dismissButtonLabel: t`Close`,
-        });
-      }
-
-      if (!addedFramesCount) return;
-
-      forceUpdate();
-      await resourceManagementProps.onFetchNewlyAddedResources();
-      resourceManagementProps.onNewResourcesAdded();
-
-      if (onSpriteUpdated) onSpriteUpdated();
-      if (directionSpritesCountBeforeAdding === 0 && onFirstSpriteUpdated) {
-        onFirstSpriteUpdated();
-      }
-    },
-    [
-      animations,
-      direction,
-      forceUpdate,
-      onFirstSpriteUpdated,
-      onSpriteAdded,
-      onSpriteUpdated,
-      project,
-      resourceManagementProps,
-      showAlert,
-      storageProvider.internalName,
-    ]
-  );
-
-  const onNativeDragOver = React.useCallback((event: any) => {
-    if (!hasNativeFiles(event)) return;
-
-    event.preventDefault();
-    event.stopPropagation();
-    if (event.dataTransfer) {
-      event.dataTransfer.dropEffect = 'copy';
-    }
-  }, []);
-
-  const onNativeDrop = React.useCallback(
-    async (event: any) => {
-      if (!hasNativeFiles(event)) return;
-
-      event.preventDefault();
-      event.stopPropagation();
-
-      const imageFilePaths = getImageFilePathsFromDataTransfer(
-        event.dataTransfer
-      );
-      if (!imageFilePaths.length) return;
-
-      await onAddImageFilesFromLocalFileSystem(imageFilePaths);
-    },
-    [onAddImageFilesFromLocalFileSystem]
-  );
-
-  const onReplaceSprites = React.useCallback(
-    async (initialResourceSource: ResourceSource) => {
-      const {
-        selectedResources,
-        selectedSourceName,
-      } = await resourceManagementProps.onChooseResource({
-        initialSourceName: initialResourceSource.name,
-        multiSelection: false,
-        resourceKind: 'image',
-        importedResourcesFolder: 'assets',
-        includeProjectAssetsFolder: true,
-      });
-
-      if (!selectedResources.length) return;
-      const selectedResource = selectedResources[0];
-      const selectedResourceSource = resourceSources.find(
-        source => source.name === selectedSourceName
-      );
-      if (!selectedResourceSource) return;
-
-      let hasCreatedResource = false;
-      let resourcesToDeleteAfterUse: Array<gdResource> = [];
-      if (selectedResourceSource.shouldCreateResource) {
-        applyResourceDefaults(project, selectedResource);
-        hasCreatedResource = project
-          .getResourcesManager()
-          .addResource(selectedResource);
-        resourcesToDeleteAfterUse = selectedResources;
-      } else {
-        const addMissingResourcesResult = addMissingResourcesToProject(
-          project,
-          selectedResources
-        );
-        hasCreatedResource = addMissingResourcesResult.hasCreatedAnyResource;
-        resourcesToDeleteAfterUse =
-          addMissingResourcesResult.resourcesToDeleteAfterUse;
-      }
-
-      const resourceName = selectedResource.getName();
-      if (resourcesToDeleteAfterUse.length) {
-        // Important, we are responsible for deleting the resources that were given to us.
-        // Otherwise we have a memory leak, as calling addResource is making a copy of the resource.
-        resourcesToDeleteAfterUse.forEach(resource => resource.delete());
-      }
-
-      const sprites = selectedSprites.current;
-      const firstObjectSprite = getCurrentElements(animations, 0, 0, 0).sprite;
-      const isObjectFirstSpriteReplaced =
-        !!firstObjectSprite && !!sprites[firstObjectSprite.ptr];
-
-      mapFor(0, animations.getAnimationsCount(), animationIndex => {
-        const animation = animations.getAnimation(animationIndex);
-        mapFor(0, animation.getDirectionsCount(), directionIndex => {
-          const direction = animation.getDirection(directionIndex);
-          mapFor(0, direction.getSpritesCount(), spriteIndex => {
-            const sprite = direction.getSprite(spriteIndex);
-            if (!sprites[sprite.ptr]) return;
-
-            sprite.setImageName(resourceName);
-            setSpriteSourceRect(sprite, null);
-          });
-        });
-      });
-
-      forceUpdate();
-
-      if (hasCreatedResource) {
-        await resourceManagementProps.onFetchNewlyAddedResources();
-        resourceManagementProps.onNewResourcesAdded();
-      }
-
-      if (onSpriteUpdated) onSpriteUpdated();
-      if (isObjectFirstSpriteReplaced && onFirstSpriteUpdated)
-        onFirstSpriteUpdated();
-    },
-    [
-      animations,
-      forceUpdate,
-      onFirstSpriteUpdated,
-      onSpriteUpdated,
-      project,
-      resourceManagementProps,
-      resourceSources,
-    ]
-  );
-
-  const onImportRawSpriteSheet = React.useCallback(
-    async (initialResourceSource: ResourceSource) => {
-      const {
-        selectedResources,
-        selectedSourceName,
-      } = await resourceManagementProps.onChooseResource({
-        initialSourceName: initialResourceSource.name,
-        multiSelection: false,
-        resourceKind: 'image',
-        importedResourcesFolder: 'assets',
-        includeProjectAssetsFolder: true,
-      });
-
-      if (!selectedResources.length) return;
-      const selectedResource = selectedResources[0];
-      const selectedResourceSource = resourceSources.find(
-        source => source.name === selectedSourceName
-      );
-      if (!selectedResourceSource) {
-        return;
-      }
-
-      let hasCreatedResource = false;
-      let resourcesToDeleteAfterUse: Array<gdResource> = [];
-      if (selectedResourceSource.shouldCreateResource) {
-        applyResourceDefaults(project, selectedResource);
-        hasCreatedResource = project
-          .getResourcesManager()
-          .addResource(selectedResource);
-        resourcesToDeleteAfterUse = selectedResources;
-      } else {
-        const addMissingResourcesResult = addMissingResourcesToProject(
-          project,
-          selectedResources
-        );
-        hasCreatedResource = addMissingResourcesResult.hasCreatedAnyResource;
-        resourcesToDeleteAfterUse =
-          addMissingResourcesResult.resourcesToDeleteAfterUse;
-      }
-
-      const resourceName = selectedResource.getName();
-      if (resourcesToDeleteAfterUse.length) {
-        // Important, we are responsible for deleting the resources that were given to us.
-        // Otherwise we have a memory leak, as calling addResource is making a copy of the resource.
-        resourcesToDeleteAfterUse.forEach(resource => resource.delete());
-      }
-
-      if (hasCreatedResource) {
-        await resourceManagementProps.onFetchNewlyAddedResources();
-        resourceManagementProps.onNewResourcesAdded();
-      }
-
-      try {
-        const [sheetWidth, sheetHeight] = await loadImageSize(
-          resourcesLoader.getResourceFullUrl(project, resourceName, {})
-        );
-        setRawSpriteSheetImport({
-          resourceName,
-          sheetWidth,
-          sheetHeight,
-        });
-      } catch (error) {
-        console.error('Unable to load raw sprite sheet image size:', error);
-        await showAlert({
-          title: t`Unable to import the sprite sheet`,
-          message: t`The image size could not be read.`,
-          dismissButtonLabel: t`Close`,
-        });
-      }
-    },
-    [
-      project,
-      resourceManagementProps,
-      resourceSources,
-      resourcesLoader,
-      showAlert,
-    ]
-  );
-
-  const addRawSpriteSheetFrames = React.useCallback(
-    (options: RawSpriteSheetImportOptions) => {
-      if (!rawSpriteSheetImport) return;
-
-      const directionSpritesCountBeforeAdding = direction.getSpritesCount();
-      const sourceRects = createSpriteSheetSourceRects({
-        columns: options.columns,
-        rows: options.rows,
-        frameCount: options.frameCount,
-        sheetWidth: rawSpriteSheetImport.sheetWidth,
-        sheetHeight: rawSpriteSheetImport.sheetHeight,
-      });
-
-      for (const sourceRect of sourceRects) {
-        addAnimationFrameWithResourceName(
-          animations,
-          direction,
-          rawSpriteSheetImport.resourceName,
-          onSpriteAdded,
-          sourceRect
-        );
-      }
-
-      setRawSpriteSheetImport(null);
-      forceUpdate();
-
-      if (sourceRects.length && onSpriteUpdated) onSpriteUpdated();
-      if (
-        directionSpritesCountBeforeAdding === 0 &&
-        sourceRects.length &&
-        onFirstSpriteUpdated
-      ) {
-        onFirstSpriteUpdated();
-      }
-    },
-    [
-      animations,
-      direction,
-      forceUpdate,
-      onFirstSpriteUpdated,
-      onSpriteAdded,
-      onSpriteUpdated,
-      rawSpriteSheetImport,
-    ]
-  );
-
-  const onImportGif = React.useCallback(
-    async (i18n: I18nType) => {
-      if (!canImportGif || !project.getProjectFile()) {
-        await showAlert({
-          title: t`Unable to import the GIF`,
-          message: t`GIF import is only available for saved local projects.`,
-          dismissButtonLabel: t`Close`,
-        });
-        return;
-      }
-
-      try {
-        const gifFilePath = await openFilePicker({
-          title: i18n._(t`Choose a GIF file`),
-          properties: ['openFile'],
-          message: i18n._(
-            t`Choose the GIF file to import as a raw animated sprite.`
-          ),
-          filters: [{ name: i18n._(t`GIF files`), extensions: ['gif'] }],
-        });
-        if (!gifFilePath || typeof gifFilePath !== 'string') return;
-
-        const directionSpritesCountBeforeAdding = direction.getSpritesCount();
-        const {
-          resourceName,
-          frameCount,
-          timeBetweenFrames,
-        } = await importRawGifToProjectResources({
-          project,
-          gifFilePath,
-        });
-
-        for (let frameIndex = 0; frameIndex < frameCount; frameIndex++) {
-          addAnimationFrameWithResourceName(
-            animations,
-            direction,
-            resourceName,
-            onSpriteAdded
-          );
-        }
-
-        if (frameCount > 1) {
-          direction.setTimeBetweenFrames(timeBetweenFrames);
-          if (directionSpritesCountBeforeAdding === 0) {
-            direction.setLoop(true);
-          }
-        }
-
-        forceUpdate();
-        await resourceManagementProps.onFetchNewlyAddedResources();
-        resourceManagementProps.onNewResourcesAdded();
-
-        if (frameCount && onSpriteUpdated) onSpriteUpdated();
-        if (
-          directionSpritesCountBeforeAdding === 0 &&
-          frameCount &&
-          onFirstSpriteUpdated
-        ) {
-          onFirstSpriteUpdated();
-        }
-      } catch (error) {
-        console.error('Unable to import GIF:', error);
-        await showAlert({
-          title: t`Unable to import the GIF`,
-          message: t`The GIF could not be imported.`,
-          dismissButtonLabel: t`Close`,
-        });
-      }
-    },
-    [
-      animations,
-      canImportGif,
-      direction,
-      forceUpdate,
-      onFirstSpriteUpdated,
-      onSpriteAdded,
-      onSpriteUpdated,
-      project,
-      resourceManagementProps,
-      showAlert,
     ]
   );
 
@@ -1139,8 +615,6 @@ const SpritesList = ({
           selectedSprites={selectedSprites.current}
           onSelectSprite={addSpriteToSelection}
           onOpenSpriteContextMenu={openSpriteContextMenu}
-          onNativeDragOver={onNativeDragOver}
-          onNativeDrop={onNativeDrop}
           onSortEnd={onSortEnd}
           helperClass="sortable-helper"
           lockAxis="x"
@@ -1157,16 +631,6 @@ const SpritesList = ({
               label: i18n._(t`Duplicate selection`),
               click: duplicateSprites,
             },
-            {
-              label: i18n._(t`Replace image`),
-              click: () => {
-                const initialResourceSource = resourceSources[0];
-                if (initialResourceSource) {
-                  onReplaceSprites(initialResourceSource);
-                }
-              },
-              enabled: resourceSources.length > 0,
-            },
           ]}
         />
         <Column noMargin>
@@ -1180,41 +644,22 @@ const SpritesList = ({
             icon={<Add />}
             primary
             buildMenuTemplate={(i18n: I18nType) => {
-              const menuTemplate: Array<any> = resourceSources.map(source => ({
-                label: i18n._(source.displayName),
-                click: () => onAddSprite(source),
-              }));
-              if (resourceSources.length) {
-                menuTemplate.push(
-                  { type: 'separator' },
-                  ...(canImportGif
-                    ? [
-                        {
-                          label: i18n._(t`Import GIF...`),
-                          click: () => onImportGif(i18n),
-                        },
-                      ]
-                    : []),
-                  {
-                    label: i18n._(t`Import raw sprite sheet...`),
-                    click: () => onImportRawSpriteSheet(resourceSources[0]),
-                  }
-                );
-              }
-              return menuTemplate;
+              const storageProvider = resourceManagementProps.getStorageProvider();
+              return resourceManagementProps.resourceSources
+                .filter(source => source.kind === 'image')
+                .filter(
+                  ({ onlyForStorageProvider }) =>
+                    !onlyForStorageProvider ||
+                    onlyForStorageProvider === storageProvider.internalName
+                )
+                .map(source => ({
+                  label: i18n._(source.displayName),
+                  click: () => onAddSprite(source),
+                }));
             }}
           />
         </Column>
       </ResponsiveLineStackLayout>
-      {rawSpriteSheetImport && (
-        <RawSpriteSheetImportDialog
-          resourceName={rawSpriteSheetImport.resourceName}
-          sheetWidth={rawSpriteSheetImport.sheetWidth}
-          sheetHeight={rawSpriteSheetImport.sheetHeight}
-          onApply={addRawSpriteSheetFrames}
-          onRequestClose={() => setRawSpriteSheetImport(null)}
-        />
-      )}
     </ColumnStackLayout>
   );
 };

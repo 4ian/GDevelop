@@ -28,7 +28,6 @@ import Paper from '../../../../UI/Paper';
 import ScrollView from '../../../../UI/ScrollView';
 import useAlertDialog from '../../../../UI/Alert/useAlertDialog';
 import AlertMessage from '../../../../UI/AlertMessage';
-import { getSourceRectFromSprite } from '../../../../Utils/SpriteSourceRect';
 
 const styles = {
   leftContainer: {
@@ -328,7 +327,6 @@ const CollisionMasksEditor = ({
                 resourceName,
                 {}
               )}
-              sourceRect={getSourceRectFromSprite(sprite)}
               isImageResourceSmooth={isProjectImageResourceSmooth(
                 project,
                 resourceName

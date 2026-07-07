@@ -15,7 +15,6 @@ import PlaceholderLoader from '../../../UI/PlaceholderLoader';
 import Play from '../../../UI/CustomSvgIcons/Play';
 import Pause from '../../../UI/CustomSvgIcons/Pause';
 import { toFixedWithoutTrailingZeros } from '../../../Utils/Mathematics';
-import { type SpriteSourceRect } from '../../../Utils/SpriteSourceRect';
 
 const styles = {
   // This container is important to have the loader positioned on top of the image.
@@ -43,7 +42,6 @@ const styles = {
 type Props = {|
   animationName: string,
   resourceNames: string[],
-  sourceRects?: Array<?SpriteSourceRect>,
   getImageResourceSource: (resourceName: string) => string,
   isImageResourceSmooth: (resourceName: string) => boolean,
   timeBetweenFrames: number,
@@ -56,13 +54,11 @@ type Props = {|
   fixedWidth?: number,
   isAssetPrivate?: boolean,
   hideAnimationLoader?: boolean,
-  project?: gdProject,
 |};
 
 const AnimationPreview = ({
   animationName,
   resourceNames,
-  sourceRects,
   getImageResourceSource,
   isImageResourceSmooth,
   timeBetweenFrames,
@@ -75,7 +71,6 @@ const AnimationPreview = ({
   fixedWidth,
   isAssetPrivate,
   hideAnimationLoader,
-  project,
 }: Props): React.Node => {
   const forceUpdate = useForceUpdate();
 
@@ -89,10 +84,12 @@ const AnimationPreview = ({
   const timeBetweenFramesRef = React.useRef(timeBetweenFrames);
   const pausedRef = React.useRef(false);
   const currentFrameIndexRef = React.useRef(0);
+  const currentResourceNameRef = React.useRef(resourceNames[0]);
   const isLoopingRef = React.useRef(isLooping);
   const animationNameRef = React.useRef(animationName);
-  const resourceNamesKeyRef = React.useRef(JSON.stringify(resourceNames));
-  const loadedResourceNamesRef = React.useRef<Set<string>>(new Set());
+  const imagesLoadedArray = React.useRef(
+    new Array<boolean>(resourceNames.length).fill(false)
+  );
   const loaderTimeout = React.useRef<?TimeoutID>(null);
 
   const [isStillLoadingResources, setIsStillLoadingResources] = React.useState(
@@ -107,12 +104,8 @@ const AnimationPreview = ({
       }
       if (animationName !== animationNameRef.current) {
         animationNameRef.current = animationName;
-      }
-      const resourceNamesKey = JSON.stringify(resourceNames);
-      if (resourceNamesKey !== resourceNamesKeyRef.current) {
-        resourceNamesKeyRef.current = resourceNamesKey;
-        loadedResourceNamesRef.current = new Set();
-        setIsStillLoadingResources(!!resourceNames.length);
+        // $FlowFixMe[underconstrained-implicit-instantiation]
+        imagesLoadedArray.current = new Array(resourceNames.length).fill(false);
       }
     },
     [timeBetweenFrames, isLooping, animationName, resourceNames]
@@ -140,11 +133,9 @@ const AnimationPreview = ({
       const paused = pausedRef.current;
       const isLooping = isLoopingRef.current;
       const numberOfFrames = resourceNames.length;
-      const currentResourceName = resourceNames[currentFrameIndex];
 
-      const hasCurrentImageLoaded = loadedResourceNamesRef.current.has(
-        currentResourceName
-      );
+      const hasCurrentImageLoaded =
+        imagesLoadedArray.current[currentFrameIndex];
       // $FlowFixMe[constant-condition]
       if (previousUpdateTimeInMs && hasCurrentImageLoaded) {
         const elapsedTime = (updateTimeInMs - previousUpdateTimeInMs) / 1000;
@@ -178,7 +169,15 @@ const AnimationPreview = ({
         // Ensure we trigger an update if the frame changes,
         // as the refs will not do it.
         if (currentFrameIndex !== newFrameIndex) {
-          if (!loadedResourceNamesRef.current.has(newResourceName)) {
+          if (newResourceName === currentResourceNameRef.current) {
+            // Important: if the resource name is the same on the following frame,
+            // it means the same image is used for multiple frames in the animation.
+            // In this case, we can consider the image as already loaded.
+            // Not doing so will cause the animation to be stuck on this frame,
+            // as the image onLoad will never be triggered.
+            imagesLoadedArray.current[currentFrameIndexRef.current] = true;
+          } else {
+            imagesLoadedArray.current[currentFrameIndexRef.current] = false;
             // When the array of loaders changes, wait a bit to display the loader to avoid flickering.
             loaderTimeout.current = setTimeout(() => {
               console.warn(
@@ -187,6 +186,7 @@ const AnimationPreview = ({
               setIsStillLoadingResources(true);
             }, 500);
           }
+          currentResourceNameRef.current = newResourceName;
           forceUpdate();
         }
       }
@@ -211,13 +211,11 @@ const AnimationPreview = ({
 
   const onImageLoaded = React.useCallback(
     () => {
-      loadedResourceNamesRef.current.add(
-        resourceNames[currentFrameIndexRef.current]
-      );
+      imagesLoadedArray.current[currentFrameIndexRef.current] = true;
       // When the array of loaders changes, decide if we display the loader or not.
       // If all images are loaded, then hide loader for instant display.
-      const hasFinishedLoadingAllResources = resourceNames.every(resourceName =>
-        loadedResourceNamesRef.current.has(resourceName)
+      const hasFinishedLoadingAllResources = !imagesLoadedArray.current.some(
+        hasImageLoaded => !hasImageLoaded
       );
       if (hasFinishedLoadingAllResources) {
         setIsStillLoadingResources(false);
@@ -229,7 +227,7 @@ const AnimationPreview = ({
       }
       forceUpdate();
     },
-    [forceUpdate, resourceNames]
+    [forceUpdate]
   );
 
   // When changing animation, the index can be out of bounds, so reset the animation.
@@ -237,35 +235,7 @@ const AnimationPreview = ({
     currentFrameIndexRef.current = 0;
   }
 
-  const imageFrameIndexes = React.useMemo(
-    () => {
-      let previousWholeImageName: ?string = null;
-      let consecutiveWholeImageFrameIndex = 0;
-      return resourceNames.map((resourceName, index) => {
-        const sourceRect = sourceRects ? sourceRects[index] : null;
-        if (!sourceRect && resourceName) {
-          if (resourceName === previousWholeImageName) {
-            consecutiveWholeImageFrameIndex++;
-          } else {
-            previousWholeImageName = resourceName;
-            consecutiveWholeImageFrameIndex = 0;
-          }
-          return consecutiveWholeImageFrameIndex;
-        }
-
-        previousWholeImageName = null;
-        consecutiveWholeImageFrameIndex = 0;
-        return 0;
-      });
-    },
-    [resourceNames, sourceRects]
-  );
-
   const resourceName = resourceNames[currentFrameIndexRef.current];
-  const sourceRect = sourceRects
-    ? sourceRects[currentFrameIndexRef.current]
-    : null;
-  const imageFrameIndex = imageFrameIndexes[currentFrameIndexRef.current] || 0;
 
   return (
     <Column expand noOverflowParent noMargin>
@@ -273,9 +243,6 @@ const AnimationPreview = ({
         <ImagePreview
           resourceName={resourceName}
           imageResourceSource={getImageResourceSource(resourceName)}
-          sourceRect={sourceRect}
-          project={project}
-          imageFrameIndex={imageFrameIndex}
           isImageResourceSmooth={isImageResourceSmooth(resourceName)}
           displaySpacedView={displaySpacedView}
           hideCheckeredBackground={hideCheckeredBackground}

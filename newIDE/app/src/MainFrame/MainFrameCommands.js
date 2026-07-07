@@ -72,6 +72,8 @@ type CommandHandlers = {|
   onOpenGlobalSearch: () => void,
   onOpenMemoryTrackerRegistry: () => void,
   onImportExtension: () => Promise<void>,
+  canInstallCliInPath: boolean,
+  onInstallCliInPath: () => void | Promise<void>,
 |};
 
 const useMainFrameCommands = (handlers: CommandHandlers) => {
@@ -191,6 +193,10 @@ const useMainFrameCommands = (handlers: CommandHandlers) => {
 
   useCommand('OPEN_MEMORY_TRACKER_REGISTRY', true, {
     handler: handlers.onOpenMemoryTrackerRegistry,
+  });
+
+  useCommand('INSTALL_CLI_IN_PATH', handlers.canInstallCliInPath, {
+    handler: handlers.onInstallCliInPath,
   });
 
   useCommandWithOptions('OPEN_LAYOUT', !!handlers.project, {

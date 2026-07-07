@@ -54,6 +54,7 @@ const ObjectPropertiesEditor = (props: Props): React.Node => {
     allowGlobalConfigPlaceholders: project.hasEventsBasedObject(
       objectConfigurationAsGd.getType()
     ),
+    shouldDisabledFieldsWithMixedValues: false,
   });
 
   const extraInformation = getExtraObjectsInformation()[

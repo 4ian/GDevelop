@@ -61,6 +61,7 @@ type SimplifiedProject = {|
   properties: {|
     gameResolutionWidth: number,
     gameResolutionHeight: number,
+    firstLayout: string,
   |},
   globalObjects: Array<SimplifiedObject>,
   globalObjectGroups: Array<SimplifiedObjectGroup>,
@@ -249,7 +250,7 @@ export const makeSimplifiedProjectBuilder = (
         .getBehaviorsOfObject(objectGroup.getName(), true)
         .toJSArray();
 
-      const variablesContainer = gd.ObjectVariableHelper.mergeVariableContainers(
+      const variablesContainer = gd.ObjectRefactorer.mergeVariableContainers(
         objectsContainersList,
         objectGroup
       );
@@ -409,6 +410,7 @@ export const makeSimplifiedProjectBuilder = (
       properties: {
         gameResolutionWidth: project.getGameResolutionWidth(),
         gameResolutionHeight: project.getGameResolutionHeight(),
+        firstLayout: project.getFirstLayout(),
       },
       resources: getSimplifiedResourcesJson(project.getResourcesManager()),
       globalObjects,

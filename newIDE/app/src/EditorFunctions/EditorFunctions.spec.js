@@ -2130,6 +2130,29 @@ describe('editorFunctions', () => {
       expect(project.getScaleMode()).toBe('nearest');
       expect(project.getName()).toBe('My Game');
     });
+
+    it('sets the scene as the first (startup) scene when isFirstScene is true', async () => {
+      project.insertNewLayout('OtherScene', 1);
+      project.setFirstLayout('OtherScene');
+
+      const result = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            changed_properties: [
+              { property_name: 'isFirstScene', new_value: 'true' },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).toContain(
+        'Set "TestScene" as the first (startup) scene.'
+      );
+      expect(project.getFirstLayout()).toBe('TestScene');
+    });
   });
 
   describe('delete_scene', () => {

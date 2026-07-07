@@ -124,6 +124,7 @@ type Props = {|
     options?: {|
       openingMessage?: ?MessageDescriptor,
       ignoreAutoSave?: boolean,
+      suppressOpenErrorAlert?: boolean,
       doNotTrackAsProjectOpened?: boolean,
     |}
   ) => Promise<?State>,

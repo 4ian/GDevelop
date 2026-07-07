@@ -5128,6 +5128,7 @@ const inspectScenePropertiesLayersEffects: EditorFunction = {
           scene.getBackgroundColorBlue()
         ),
         stopSoundsOnStartup: scene.stopSoundsOnStartup(),
+        isFirstScene: project.getFirstLayout() === scene.getName(),
 
         // Also include some project related properties:
         gameResolutionWidth: project.getGameResolutionWidth(),
@@ -5376,6 +5377,16 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
         } else if (isFuzzyMatch(propertyName, 'gameName')) {
           project.setName(newValue);
           changes.push(`Set game name to "${newValue}".`);
+        } else if (isFuzzyMatch(propertyName, 'isFirstScene')) {
+          if (newValue.toLowerCase() === 'true') {
+            // Use the scene's current name: a rename can have been applied
+            // by a previous item of the same call.
+            const currentSceneName = scene.getName();
+            project.setFirstLayout(currentSceneName);
+            changes.push(
+              `Set "${currentSceneName}" as the first (startup) scene.`
+            );
+          }
         } else {
           warnings.push(`Unknown scene property: "${propertyName}". Skipped.`);
         }

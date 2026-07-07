@@ -30,6 +30,7 @@ import ChevronArrowDownWithRoundedBorder from '../../UI/CustomSvgIcons/ChevronAr
 import ChevronArrowRightWithRoundedBorder from '../../UI/CustomSvgIcons/ChevronArrowRightWithRoundedBorder';
 import Add from '../../UI/CustomSvgIcons/Add';
 import { useManageObjectBehaviors } from '../../BehaviorsEditor';
+import { getAllVisibleBehaviorNames } from '../../Utils/Behavior';
 import Object3d from '../../UI/CustomSvgIcons/Object3d';
 import Object2d from '../../UI/CustomSvgIcons/Object2d';
 import { mapFor } from '../../Utils/MapFor';
@@ -58,6 +59,7 @@ import {
   type Field,
   type FieldChoices,
 } from '../../PropertiesEditor/PropertiesEditorSchema';
+import useVariablesContainerRefactoring from '../../VariablesList/useVariablesContainerRefactoring';
 
 const gd: libGDevelop = global.gd;
 
@@ -254,9 +256,12 @@ type Props = {|
   resourceManagementProps: ResourceManagementProps,
   layout?: ?gdLayout,
   eventsFunctionsExtension: gdEventsFunctionsExtension | null,
+  /** Only set when a default variant is edited */
+  eventsBasedObject: gdEventsBasedObject | null,
   onUpdateBehaviorsSharedData: () => void,
   objectsContainer: gdObjectsContainer,
   globalObjectsContainer: gdObjectsContainer | null,
+  initialInstances: gdInitialInstancesContainer,
   layersContainer: gdLayersContainer,
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   unsavedChanges?: ?UnsavedChanges,
@@ -293,9 +298,11 @@ export const CompactObjectPropertiesEditorContent = ({
   resourceManagementProps,
   layout,
   eventsFunctionsExtension,
+  eventsBasedObject,
   onUpdateBehaviorsSharedData,
   objectsContainer,
   globalObjectsContainer,
+  initialInstances,
   layersContainer,
   projectScopedContainersAccessor,
   unsavedChanges,
@@ -346,6 +353,10 @@ export const CompactObjectPropertiesEditorContent = ({
   );
 
   // Behaviors:
+  const allVisibleBehaviorNames = getAllVisibleBehaviorNames([object]);
+  const allVisibleBehaviors = allVisibleBehaviorNames.map(behaviorName =>
+    object.getBehavior(behaviorName)
+  );
   const {
     openNewBehaviorDialog,
     newBehaviorDialog,
@@ -362,13 +373,12 @@ export const CompactObjectPropertiesEditorContent = ({
     onExtensionInstalled,
   });
 
-  const allVisibleBehaviors = object
-    .getAllBehaviorNames()
-    .toJSArray()
-    .map(behaviorName => object.getBehavior(behaviorName))
-    .filter(behavior => !behavior.isDefaultBehavior());
-
   // Events based object children:
+  /** The events-based object according to the selected object type.
+   *
+   * This is not the same as `eventsBasedObject` which is the events-based
+   * object of the edited variant.
+   */
   const customObjectEventsBasedObject = project.hasEventsBasedObject(
     objectConfiguration.getType()
   )
@@ -401,6 +411,19 @@ export const CompactObjectPropertiesEditorContent = ({
     [object, onEditObject]
   );
 
+  // Variable refactoring: snapshot on object selection, apply on deselection/unmount.
+  const { onVariablesUpdated } = useVariablesContainerRefactoring({
+    project,
+    variablesContainer: object.getVariables(),
+    initialInstances,
+    objectName: object.getName(),
+    eventsBasedObject,
+    enabled: objects.length === 1,
+    objectGroup: null,
+    objectsContainer: null,
+    globalObjectsContainer: null,
+  });
+
   const [schemaRecomputeTrigger, forceRecomputeSchema] = useForceRecompute();
   const propertiesSchema = React.useMemo(
     () => {
@@ -426,6 +449,7 @@ export const CompactObjectPropertiesEditorContent = ({
         object,
         layersContainer,
         visibility: 'All',
+        shouldDisabledFieldsWithMixedValues: false,
       });
 
       if (layout && layout.getObjects().hasObjectNamed(object.getName())) {
@@ -652,9 +676,7 @@ export const CompactObjectPropertiesEditorContent = ({
                       <CompactBehaviorComponent
                         project={project}
                         behaviorMetadata={behaviorMetadata}
-                        behavior={behavior}
-                        behaviorOverriding={null}
-                        initialInstance={null}
+                        behaviors={[behavior]}
                         object={object}
                         layersContainer={layersContainer}
                         onBehaviorUpdated={() => {}}
@@ -722,7 +744,7 @@ export const CompactObjectPropertiesEditorContent = ({
                   projectScopedContainersAccessor
                 }
                 directlyStoreValueChangesWhileEditing
-                variablesContainer={variablesContainer}
+                variablesContainer={object.getVariables()}
                 areObjectVariables
                 size="compact"
                 onComputeAllVariableNames={() =>
@@ -736,6 +758,7 @@ export const CompactObjectPropertiesEditorContent = ({
                     : []
                 }
                 historyHandler={historyHandler}
+                onVariablesUpdated={onVariablesUpdated}
                 toolbarIconStyle={styles.icon}
                 compactEmptyPlaceholderText={
                   <Trans>

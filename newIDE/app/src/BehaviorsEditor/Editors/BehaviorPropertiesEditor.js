@@ -15,7 +15,7 @@ type Props = BehaviorEditorProps;
 
 const BehaviorPropertiesEditor = ({
   project,
-  behavior,
+  behaviors,
   object,
   layersContainer,
   onBehaviorUpdated,
@@ -24,6 +24,8 @@ const BehaviorPropertiesEditor = ({
   isAdvancedSectionInitiallyUncollapsed,
   hideGlobalConfigPlaceholderHints,
 }: Props): React.Node => {
+  const behavior = behaviors[0];
+
   const schema = React.useMemo(
     () => {
       const behaviorProperties = behavior.getProperties();
@@ -41,6 +43,7 @@ const BehaviorPropertiesEditor = ({
         object,
         layersContainer,
         visibility: 'All',
+        shouldDisabledFieldsWithMixedValues: true,
         allowGlobalConfigPlaceholders: project.hasEventsBasedBehavior(
           behavior.getTypeName()
         ),
@@ -59,7 +62,7 @@ const BehaviorPropertiesEditor = ({
         project={project}
         object={object}
         schema={schema}
-        instances={[behavior]}
+        instances={behaviors}
         onInstancesModified={onBehaviorUpdated}
         resourceManagementProps={resourceManagementProps}
         projectScopedContainersAccessor={projectScopedContainersAccessor}

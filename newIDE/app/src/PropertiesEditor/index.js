@@ -128,7 +128,7 @@ const getGlobalConfigPlaceholderErrorText = (
   return null;
 };
 
-const getDisabled = ({
+export const getDisabled = ({
   instances,
   field,
   mixedValues,

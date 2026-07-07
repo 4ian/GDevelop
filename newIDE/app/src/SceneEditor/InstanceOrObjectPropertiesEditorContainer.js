@@ -2,7 +2,6 @@
 import * as React from 'react';
 import { type I18n as I18nType } from '@lingui/core';
 import Paper from '../UI/Paper';
-import EmptyMessage from '../UI/EmptyMessage';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import { CompactInstancePropertiesEditor } from '../InstancesEditor/CompactInstancePropertiesEditor';
 import { Trans } from '@lingui/macro';
@@ -18,7 +17,16 @@ import { type ObjectEditorTab } from '../ObjectEditor/ObjectEditorDialog';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import { CompactLayerPropertiesEditor } from '../LayersList/CompactLayerPropertiesEditor';
 import { CompactEventsBasedObjectVariantPropertiesEditor } from '../SceneEditor/CompactEventsBasedObjectVariantPropertiesEditor';
+import { CompactScenePropertiesEditor } from './CompactScenePropertiesEditor';
+import { CompactObjectGroupPropertiesEditor } from '../ObjectGroupEditor/CompactObjectGroupPropertiesEditor';
+import { type ObjectGroupEditorTab } from '../ObjectGroupEditor/EditedObjectGroupEditorDialog';
 import Rectangle from '../Utils/Rectangle';
+
+// The kind of the current selection whose properties are displayed in the panel.
+// NOTE: Upstream exposes this as `type LastSelectionType` from
+// './EditorsDisplay.flow', but that module (a sibling not owned by this change)
+// does not currently export it, so the union is kept in sync locally here.
+export type LastSelectionType = 'instance' | 'object' | 'layer' | 'objectGroup';
 
 export const styles = {
   paper: {
@@ -32,11 +40,12 @@ export const styles = {
 type Props = {|
   project: gdProject,
   resourceManagementProps: ResourceManagementProps,
+  initialInstances: gdInitialInstancesContainer,
   layersContainer: gdLayersContainer,
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   unsavedChanges?: ?UnsavedChanges,
   i18n: I18nType,
-  lastSelectionType: 'instance' | 'object' | 'layer',
+  lastSelectionType: LastSelectionType,
   historyHandler?: HistoryHandler,
   isVariableListLocked: boolean,
   layout?: ?gdLayout,
@@ -90,6 +99,18 @@ type Props = {|
     gdEventsFunctionsExtension,
     gdEventsBasedObject
   ) => void,
+
+  // For scenes
+  onBackgroundColorChanged: () => void,
+  openSceneVariables: () => void,
+
+  // For object groups
+  objectGroup: gdObjectGroup | null,
+  isObjectGroupObjectListLocked: boolean,
+  onEditObjectGroup: (
+    objectGroup: gdObjectGroup,
+    initialTab: ?ObjectGroupEditorTab
+  ) => void,
 |};
 
 export type InstanceOrObjectPropertiesEditorInterface = {|
@@ -103,20 +124,29 @@ export const InstanceOrObjectPropertiesEditorContainer: React.ComponentType<{
 }> = React.forwardRef<Props, InstanceOrObjectPropertiesEditorInterface>(
   (props, ref) => {
     const forceUpdate = useForceUpdate();
-    // $FlowFixMe[incompatible-type]
-    React.useImperativeHandle(ref, () => ({
-      forceUpdate,
-      getEditorTitle: () =>
-        lastSelectionType === 'instance' ? (
-          <Trans>Instance properties</Trans>
-        ) : (
-          <Trans>Object properties</Trans>
-        ),
-    }));
+    React.useImperativeHandle<InstanceOrObjectPropertiesEditorInterface>(
+      ref,
+      () => ({
+        forceUpdate,
+        getEditorTitle: () =>
+          lastSelectionType === 'instance' ? (
+            <Trans>Instance properties</Trans>
+          ) : lastSelectionType === 'object' ? (
+            <Trans>Object properties</Trans>
+          ) : lastSelectionType === 'layer' ? (
+            <Trans>Layer properties</Trans>
+          ) : lastSelectionType === 'objectGroup' ? (
+            <Trans>Object group properties</Trans>
+          ) : (
+            <Trans>Scene properties</Trans>
+          ),
+      })
+    );
 
     const {
       project,
       layersContainer,
+      initialInstances,
       projectScopedContainersAccessor,
       unsavedChanges,
       i18n,
@@ -164,6 +194,15 @@ export const InstanceOrObjectPropertiesEditorContainer: React.ComponentType<{
       layout,
       objectsContainer,
       globalObjectsContainer,
+
+      // For scenes
+      onBackgroundColorChanged,
+      openSceneVariables,
+
+      // For object groups
+      objectGroup,
+      isObjectGroupObjectListLocked,
+      onEditObjectGroup,
     } = props;
 
     return (
@@ -180,6 +219,16 @@ export const InstanceOrObjectPropertiesEditorContainer: React.ComponentType<{
                 onEffectAdded={onEffectAdded}
                 resourceManagementProps={resourceManagementProps}
                 eventsFunctionsExtension={eventsFunctionsExtension}
+                // This EventsBasedObject is used to refactor variables in all
+                // variants when editing the default variant.
+                eventsBasedObject={
+                  eventsBasedObject &&
+                  eventsBasedObject.getDefaultVariant() ===
+                    eventsBasedObjectVariant
+                    ? eventsBasedObject
+                    : null
+                }
+                initialInstances={initialInstances}
                 onUpdateBehaviorsSharedData={onUpdateBehaviorsSharedData}
                 onWillInstallExtension={onWillInstallExtension}
                 onExtensionInstalled={onExtensionInstalled}
@@ -220,7 +269,6 @@ export const InstanceOrObjectPropertiesEditorContainer: React.ComponentType<{
             resourceManagementProps={resourceManagementProps}
             unsavedChanges={unsavedChanges}
             i18n={i18n}
-            canOverrideBehaviorProperties={!!eventsFunctionsExtension}
           />
         ) : !!objects.length && lastSelectionType === 'object' ? (
           <CompactObjectPropertiesEditor
@@ -230,6 +278,14 @@ export const InstanceOrObjectPropertiesEditorContainer: React.ComponentType<{
             onEffectAdded={onEffectAdded}
             resourceManagementProps={resourceManagementProps}
             eventsFunctionsExtension={eventsFunctionsExtension}
+            // This EventsBasedObject is used to refactor variables in all
+            // variants when editing the default variant.
+            eventsBasedObject={
+              eventsBasedObject &&
+              eventsBasedObject.getDefaultVariant() === eventsBasedObjectVariant
+                ? eventsBasedObject
+                : null
+            }
             onUpdateBehaviorsSharedData={onUpdateBehaviorsSharedData}
             onWillInstallExtension={onWillInstallExtension}
             onExtensionInstalled={onExtensionInstalled}
@@ -243,11 +299,35 @@ export const InstanceOrObjectPropertiesEditorContainer: React.ComponentType<{
             layout={layout}
             objectsContainer={objectsContainer}
             globalObjectsContainer={globalObjectsContainer}
+            initialInstances={initialInstances}
             layersContainer={layersContainer}
             project={project}
             projectScopedContainersAccessor={projectScopedContainersAccessor}
             unsavedChanges={unsavedChanges}
             i18n={i18n}
+          />
+        ) : objectGroup && lastSelectionType === 'objectGroup' ? (
+          <CompactObjectGroupPropertiesEditor
+            project={project}
+            resourceManagementProps={resourceManagementProps}
+            layout={layout}
+            eventsFunctionsExtension={eventsFunctionsExtension}
+            eventsBasedObject={eventsBasedObject}
+            objectsContainer={objectsContainer}
+            globalObjectsContainer={globalObjectsContainer}
+            initialInstances={initialInstances}
+            layersContainer={layersContainer}
+            projectScopedContainersAccessor={projectScopedContainersAccessor}
+            unsavedChanges={unsavedChanges}
+            historyHandler={historyHandler}
+            objectGroup={objectGroup}
+            isObjectListLocked={isObjectGroupObjectListLocked}
+            isBehaviorListLocked={isBehaviorListLocked}
+            isVariableListLocked={isVariableListLocked}
+            onEditObjectGroup={onEditObjectGroup}
+            onUpdateBehaviorsSharedData={onUpdateBehaviorsSharedData}
+            onWillInstallExtension={onWillInstallExtension}
+            onExtensionInstalled={onExtensionInstalled}
           />
         ) : layer && lastSelectionType === 'layer' ? (
           <CompactLayerPropertiesEditor
@@ -283,14 +363,18 @@ export const InstanceOrObjectPropertiesEditorContainer: React.ComponentType<{
             unsavedChanges={unsavedChanges}
             i18n={i18n}
           />
-        ) : (
-          <EmptyMessage>
-            <Trans>
-              Click on an instance on the canvas or an object in the list to
-              display their properties.
-            </Trans>
-          </EmptyMessage>
-        )}
+        ) : layout ? (
+          <CompactScenePropertiesEditor
+            scene={layout}
+            resourceManagementProps={resourceManagementProps}
+            project={project}
+            projectScopedContainersAccessor={projectScopedContainersAccessor}
+            unsavedChanges={unsavedChanges}
+            i18n={i18n}
+            onBackgroundColorChanged={onBackgroundColorChanged}
+            openSceneVariables={openSceneVariables}
+          />
+        ) : null}
       </Paper>
     );
   }

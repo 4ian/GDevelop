@@ -220,7 +220,7 @@ const InstructionEditorDialog = ({
           chosenObject,
           type,
           defaultName,
-          /* shouldSkipExistingBehaviorSilently= */ false
+          { shouldSkipExistingBehaviorSilently: false }
         );
 
         if (wasBehaviorAdded) {
@@ -247,7 +247,7 @@ const InstructionEditorDialog = ({
             chosenObject,
             type,
             defaultName,
-            /* shouldSkipExistingBehaviorSilently= */ false
+            { shouldSkipExistingBehaviorSilently: false }
           );
 
           if (wasBehaviorAdded) {

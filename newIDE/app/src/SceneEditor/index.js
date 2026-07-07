@@ -113,8 +113,20 @@ import {
 import Rectangle from '../Utils/Rectangle';
 import { exceptionallyGuardAgainstDeadObject } from '../Utils/IsNullPtr';
 import { type WillDeleteObjectChanges } from '../EditorFunctions/OutsideEditorChanges';
+import {
+  type EventsBasedObjectChildrenEditedOptions,
+  getImageResourceNamesForEditedObject,
+  shouldResetObjectRendererForCustomObjectChildrenEdit,
+} from './CustomObjectResourceReload';
+import { type ObjectGroupEditorTab } from '../ObjectGroupEditor/EditedObjectGroupEditorDialog';
 
 const gd: libGDevelop = global.gd;
+
+// The kind of the last selection whose properties are shown in the side panel.
+// NOTE: Upstream imports this as `type LastSelectionType` from
+// './EditorsDisplay.flow', but that (sibling) module does not currently export
+// it, so the union is kept in sync locally here.
+type LastSelectionType = 'instance' | 'object' | 'layer' | 'objectGroup';
 
 const BASE_LAYER_NAME = '';
 const INSTANCES_CLIPBOARD_KIND = 'Instances';
@@ -260,10 +272,14 @@ type Props = {|
 
   onOpenMoreSettings?: ?() => void,
   onOpenEvents: (sceneName: string) => void,
-  onObjectEdited: (objectWithContext: ObjectWithContext) => void,
+  onObjectEdited: (
+    objectWithContext: ObjectWithContext,
+    hasResourceChanged?: boolean
+  ) => void,
   onObjectGroupEdited: (objectGroupWithContext: GroupWithContext) => void,
   onEventsBasedObjectChildrenEdited: (
-    eventsBasedObject: gdEventsBasedObject
+    eventsBasedObject: gdEventsBasedObject,
+    options?: EventsBasedObjectChildrenEditedOptions
   ) => void,
 
   onObjectsDeleted: () => void,
@@ -331,6 +347,7 @@ type State = {|
 
   editedGroup: gdObjectGroup | null,
   isCreatingNewGroup: boolean,
+  editedGroupInitialTab: ObjectGroupEditorTab | null,
 
   instancesEditorSettings: InstancesEditorSettings,
   history: HistoryState,
@@ -342,10 +359,11 @@ type State = {|
   selectedObjectFolderOrObjectsWithContext: Array<ObjectFolderOrObjectWithContext>,
   chosenLayer: string,
   selectedLayer: gdLayer | null,
+  selectedObjectGroup: gdObjectGroup | null,
 
   tileMapTileSelection: ?TileMapTileSelection,
 
-  lastSelectionType: 'instance' | 'object' | 'layer',
+  lastSelectionType: LastSelectionType,
 |};
 
 const getSceneEditorHistoryContext = (
@@ -403,7 +421,7 @@ export type SceneEditorSelectionSnapshot = {|
   externalLayoutName: string | null,
   eventsBasedObjectName: string | null,
   eventsBasedObjectVariantName: string | null,
-  lastSelectionType: 'instance' | 'object' | 'layer',
+  lastSelectionType: LastSelectionType,
   selectedLayerName: string | null,
   chosenLayerName: string,
   selectedObjectNames: Array<string>,
@@ -466,6 +484,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       variablesEditedInstance: null,
       editedGroup: null,
       isCreatingNewGroup: false,
+      editedGroupInitialTab: null,
       extractAsExternalLayoutDialogOpen: false,
       extractAsCustomObjectDialogOpen: false,
       newObjectDialogOpen: false,
@@ -492,6 +511,7 @@ export default class SceneEditor extends React.Component<Props, State> {
         initialInstancesEditorSettings.selectedLayer
       ),
       selectedLayer: null,
+      selectedObjectGroup: null,
       invisibleLayerOnWhichInstancesHaveJustBeenAdded: null,
 
       lastSelectionType: 'instance',
@@ -833,18 +853,17 @@ export default class SceneEditor extends React.Component<Props, State> {
     }
   }
 
-  _reloadResources = async (resourceNames: string[], reason: string) => {
+  // A human-readable name of the edited scene / external layout / custom object
+  // variant, used to make resource reload logs easier to audit.
+  _getReloadContextName = (): string => {
     const {
-      project,
       layout,
       externalLayout,
       eventsFunctionsExtension,
       eventsBasedObject,
       eventsBasedObjectVariant,
     } = this.props;
-    const { editorDisplay } = this;
-
-    const name = externalLayout
+    return externalLayout
       ? externalLayout.getName()
       : layout
       ? layout.getName()
@@ -852,6 +871,17 @@ export default class SceneEditor extends React.Component<Props, State> {
           .filter(Boolean)
           .map(item => item.getName())
           .join(' > ');
+  };
+
+  _reloadResources = async (
+    resourceNames: string[],
+    reason: string,
+    { reloadFromDisk = true }: {| reloadFromDisk?: boolean |} = {}
+  ) => {
+    const { project } = this.props;
+    const { editorDisplay } = this;
+
+    const name = this._getReloadContextName();
 
     if (!editorDisplay) return;
 
@@ -860,9 +890,13 @@ export default class SceneEditor extends React.Component<Props, State> {
 
     try {
       console.info(
-        `Reloading resources "${resourceNames.join(
-          ', '
-        )}" for scene "${name}" rendering (reason: ${reason}).`
+        reloadFromDisk && resourceNames.length > 0
+          ? `Reloading ${
+              resourceNames.length
+            } resource(s) from disk for "${name}" (reason: ${reason}): ${resourceNames.join(
+              ', '
+            )}.`
+          : `Refreshing "${name}" renderers without reloading resources from disk (reason: ${reason}).`
       );
 
       // When reloading textures, there can be a short time during which
@@ -870,8 +904,15 @@ export default class SceneEditor extends React.Component<Props, State> {
       // through the RenderedInstance's, triggering crashes. So the scene rendering
       // is paused during this period.
       editorDisplay.startSceneRendering(false, pauseReason);
-      for (const resourceName of resourceNames) {
-        await PixiResourcesLoader.reloadResource(project, resourceName);
+      // Reloading textures from the disk is only necessary when a resource file
+      // actually changed (e.g. an image edited in an external editor). Otherwise
+      // we only need to reset the renderers below so they pick up the new object
+      // configuration - reloading every texture from the disk would be needlessly
+      // slow (especially for custom objects using a lot of resources).
+      if (reloadFromDisk) {
+        for (const resourceName of resourceNames) {
+          await PixiResourcesLoader.reloadResource(project, resourceName);
+        }
       }
 
       editorDisplay.forceUpdateObjectsList();
@@ -898,20 +939,17 @@ export default class SceneEditor extends React.Component<Props, State> {
         clear(project)
       );
 
-      console.info(
-        `Resetting instance renderers for objects using resources "${resourceNames.join(
-          ', '
-        )}": ${[...objectNames].join(', ')} (scene: "${name}").`
-      );
+      if (objectNames.size > 0) {
+        console.info(
+          `Resetting renderers of object(s) directly using these resources in "${name}": ${[
+            ...objectNames,
+          ].join(', ')}.`
+        );
+      }
       objectNames.forEach(objectName => {
         editorDisplay.instancesHandlers.resetInstanceRenderersFor(objectName);
       });
     } finally {
-      console.info(
-        `Starting scene rendering again after reloading resources "${resourceNames.join(
-          ', '
-        )}": (scene: "${name}").`
-      );
       editorDisplay.startSceneRendering(true, pauseReason);
     }
   };
@@ -1049,7 +1087,7 @@ export default class SceneEditor extends React.Component<Props, State> {
               openEventsTooltip={openEventsTooltip}
               onOpenSettings={this.openSceneProperties}
               settingsIcon={editSceneIconReactNode}
-              onOpenSceneVariables={this.editLayoutVariables}
+              onOpenSceneVariables={this.openSceneVariables}
             />
           }
         />
@@ -1086,7 +1124,7 @@ export default class SceneEditor extends React.Component<Props, State> {
           openEventsTooltip={openEventsTooltip}
           onOpenSettings={this.openSceneProperties}
           settingsIcon={editSceneIconReactNode}
-          onOpenSceneVariables={this.editLayoutVariables}
+          onOpenSceneVariables={this.openSceneVariables}
         />
       );
     }
@@ -1241,7 +1279,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     this.setState({ variablesEditedInstance: instance });
   };
 
-  editLayoutVariables = (open: boolean = true) => {
+  openSceneVariables = (open: boolean = true) => {
     this.setState({ layoutVariablesDialogOpen: open });
   };
 
@@ -1336,14 +1374,22 @@ export default class SceneEditor extends React.Component<Props, State> {
         objectFolderOrObjectWithContext,
       ],
       selectedLayer: null,
+      selectedObjectGroup: null,
       lastSelectionType: 'object',
     });
     if (this.editorDisplay)
       this.editorDisplay.ensureEditorVisible('properties');
   };
 
-  _editObjectGroup = (group: ?gdObjectGroup) => {
-    this.setState({ editedGroup: group, isCreatingNewGroup: false });
+  _editObjectGroup = (
+    group: gdObjectGroup,
+    initialTab: ?ObjectGroupEditorTab
+  ) => {
+    this.setState({
+      editedGroup: group,
+      editedGroupInitialTab: initialTab || null,
+      isCreatingNewGroup: false,
+    });
   };
 
   _isObjectGroupGlobal = (group: gdObjectGroup): boolean => {
@@ -1512,6 +1558,7 @@ export default class SceneEditor extends React.Component<Props, State> {
         lastSelectionType: 'object',
         selectedObjectFolderOrObjectsWithContext,
         selectedLayer: null,
+        selectedObjectGroup: null,
       },
       () => {
         this.forceUpdateInstancesList();
@@ -1903,6 +1950,7 @@ export default class SceneEditor extends React.Component<Props, State> {
           lastSelectionType: 'instance',
           selectedObjectFolderOrObjectsWithContext: [],
           selectedLayer: null,
+          selectedObjectGroup: null,
         },
         this.updateToolbar
       );
@@ -1929,6 +1977,7 @@ export default class SceneEditor extends React.Component<Props, State> {
             },
           ],
           selectedLayer: null,
+          selectedObjectGroup: null,
         },
         this.updateToolbar
       );
@@ -1945,6 +1994,7 @@ export default class SceneEditor extends React.Component<Props, State> {
             },
           ],
           selectedLayer: null,
+          selectedObjectGroup: null,
         },
         this.updateToolbar
       );
@@ -2086,8 +2136,9 @@ export default class SceneEditor extends React.Component<Props, State> {
     hasResourceChanged: boolean
   ) => {
     const { project, layout, resourceManagementProps } = this.props;
-    // It triggers forceUpdateRenderedInstancesOfObject on this editor too.
-    this.props.onObjectEdited(objectWithContext);
+    // It triggers forceUpdateRenderedInstancesOfObject (or
+    // forceUpdateCustomObjectRenderedInstances) on this editor too.
+    this.props.onObjectEdited(objectWithContext, hasResourceChanged);
     if (layout) {
       if (objectWithContext.global) {
         gd.WholeProjectRefactorer.behaviorsAddedToGlobalObject(
@@ -2410,6 +2461,8 @@ export default class SceneEditor extends React.Component<Props, State> {
   };
 
   _sendSetBackgroundColor = () => {
+    this.forceUpdatePropertiesEditor();
+    this.forceUpdateLayersList();
     const { previewDebuggerServer, layout } = this.props;
     if (!layout) {
       return;
@@ -2470,6 +2523,15 @@ export default class SceneEditor extends React.Component<Props, State> {
     this.setState({
       selectedLayer: layer,
       lastSelectionType: 'layer',
+      selectedObjectGroup: null,
+    });
+  };
+
+  _onSelectObjectGroup = (objectGroup: gdObjectGroup | null) => {
+    this.setState({
+      selectedObjectGroup: objectGroup,
+      lastSelectionType: 'objectGroup',
+      selectedLayer: null,
     });
   };
 
@@ -3645,7 +3707,13 @@ export default class SceneEditor extends React.Component<Props, State> {
     if (this.editorDisplay) this.editorDisplay.forceUpdatePropertiesEditor();
   };
 
-  forceUpdateCustomObjectRenderedInstances = async () => {
+  forceUpdateCustomObjectRenderedInstances = async (
+    editedEventsBasedObject: gdEventsBasedObject,
+    {
+      editedObject,
+      hasResourceChanged = false,
+    }: EventsBasedObjectChildrenEditedOptions = {}
+  ) => {
     const { project, projectScopedContainersAccessor } = this.props;
 
     // Reset the custom object renderers FIRST, synchronously. When an
@@ -3658,6 +3726,9 @@ export default class SceneEditor extends React.Component<Props, State> {
     // InitialInstancesContainer and crashes with a use-after-free. Resetting
     // before the (async) resource reload drops those stale references so the
     // next frame rebuilds them from the fresh container.
+    // /!\ This reset must stay unconditional (every object) so no stale
+    // reference to a freed container survives, even though the reset below (after
+    // the reload) is scoped to the objects actually affected by the edit.
     const { editorDisplay } = this;
     if (editorDisplay) {
       projectScopedContainersAccessor.forEachObject(object => {
@@ -3667,48 +3738,65 @@ export default class SceneEditor extends React.Component<Props, State> {
       });
     }
 
-    const resourcesInUse = new gd.ResourcesInUseHelper(
-      project.getResourcesManager()
-    );
-    projectScopedContainersAccessor.forEachObject(object => {
-      if (project.hasEventsBasedObject(object.getType())) {
-        object.getConfiguration().exposeResources(resourcesInUse);
-      }
-    });
-    const objectResourceNames = resourcesInUse
-      .getAllImages() // TODO: should probably check all resources.
-      .toNewVectorString()
-      .toJSArray();
-    resourcesInUse.delete();
+    // Only the resources of the object that was actually edited may need to be
+    // reloaded from the disk, and only if a resource really changed.
+    const objectResourceNames =
+      hasResourceChanged && editedObject
+        ? getImageResourceNamesForEditedObject(project, editedObject)
+        : [];
 
-    await this._reloadResources(objectResourceNames, 'custom object edited');
+    // _reloadResources also refreshes the objects list and resets the renderers
+    // of every object *directly* using these resources (custom objects nesting
+    // the edited one are handled below). The textures are only read again from
+    // the disk when a resource really changed.
+    await this._reloadResources(objectResourceNames, 'custom object edited', {
+      reloadFromDisk: hasResourceChanged,
+    });
     // Reset again after resources have been reloaded so renderers that were
     // rebuilt (with possibly outdated textures) during the await are refreshed
-    // with the freshly loaded resources.
+    // with the freshly loaded resources. Only the edited object and the objects
+    // depending on the edited events-based object need to be reset.
     const editorDisplayAfterReload = this.editorDisplay;
     if (editorDisplayAfterReload) {
+      const resetObjectNames = [];
       projectScopedContainersAccessor.forEachObject(object => {
-        editorDisplayAfterReload.instancesHandlers.resetInstanceRenderersFor(
-          object.getName()
-        );
+        if (
+          shouldResetObjectRendererForCustomObjectChildrenEdit({
+            project,
+            object,
+            editedEventsBasedObject,
+            editedObject,
+          })
+        ) {
+          resetObjectNames.push(object.getName());
+          editorDisplayAfterReload.instancesHandlers.resetInstanceRenderersFor(
+            object.getName()
+          );
+        }
       });
+      if (resetObjectNames.length > 0) {
+        console.info(
+          `Resetting renderers in "${this._getReloadContextName()}" of the edited object and objects depending on "${editedEventsBasedObject.getName()}": ${resetObjectNames.join(
+            ', '
+          )}.`
+        );
+      }
     }
   };
 
-  forceUpdateRenderedInstancesOfObject = (object: gdObject) => {
+  forceUpdateRenderedInstancesOfObject = (
+    object: gdObject,
+    hasResourceChanged: boolean = true
+  ) => {
     const { project } = this.props;
-
-    const resourcesInUse = new gd.ResourcesInUseHelper(
-      project.getResourcesManager()
+    const objectResourceNames = getImageResourceNamesForEditedObject(
+      project,
+      object
     );
-    object.getConfiguration().exposeResources(resourcesInUse);
-    const objectResourceNames = resourcesInUse
-      .getAllImages() // TODO: should probably check all resources.
-      .toNewVectorString()
-      .toJSArray();
-    resourcesInUse.delete();
 
-    this._reloadResources(objectResourceNames, 'object edited');
+    this._reloadResources(objectResourceNames, 'object edited', {
+      reloadFromDisk: hasResourceChanged,
+    });
   };
 
   render(): any {
@@ -3822,6 +3910,8 @@ export default class SceneEditor extends React.Component<Props, State> {
                     onSelectLayer={this._onSelectLayer}
                     editLayer={this.editLayer}
                     editLayerEffects={this.editLayerEffects}
+                    selectedObjectGroup={this.state.selectedObjectGroup}
+                    onSelectObjectGroup={this._onSelectObjectGroup}
                     editInstanceVariables={this.editInstanceVariables}
                     editObjectByName={this.editObjectByName}
                     editObjectInPropertiesPanel={
@@ -3942,6 +4032,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                     onEventsBasedObjectChildrenEdited={
                       this.props.onEventsBasedObjectChildrenEdited
                     }
+                    openSceneVariables={this.openSceneVariables}
                   />
                   <React.Fragment>
                     {editedObjectWithContext && (
@@ -3972,9 +4063,10 @@ export default class SceneEditor extends React.Component<Props, State> {
                         }}
                         onCancel={() => {
                           if (editedObjectWithContext) {
-                            // Object changes are reverted but not the
-                            // resources modified with an external editor.
-                            this.props.onObjectEdited(editedObjectWithContext);
+                            this.props.onObjectEdited(
+                              editedObjectWithContext,
+                              false
+                            );
                           }
                           this.editObject(null);
                           // An hot-reload for an edited image may be on hold.
@@ -4091,6 +4183,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                         projectScopedContainersAccessor
                       }
                       group={this.state.editedGroup}
+                      initialTab={this.state.editedGroupInitialTab}
                       objectsContainer={this.props.objectsContainer}
                       globalObjectsContainer={this.props.globalObjectsContainer}
                       initialInstances={this.props.initialInstances}
@@ -4108,7 +4201,6 @@ export default class SceneEditor extends React.Component<Props, State> {
                           global: false,
                         });
                       }}
-                      initialTab={'objects'}
                       onComputeAllVariableNames={() => {
                         const { editedGroup } = this.state;
                         if (!editedGroup) return [];
@@ -4249,7 +4341,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                       layout={layout}
                       onClose={() => this.openSceneProperties(false)}
                       onApply={() => this.openSceneProperties(false)}
-                      onEditVariables={() => this.editLayoutVariables(true)}
+                      onEditVariables={() => this.openSceneVariables(true)}
                       onOpenMoreSettings={this.props.onOpenMoreSettings}
                       resourceManagementProps={
                         this.props.resourceManagementProps
@@ -4306,8 +4398,8 @@ export default class SceneEditor extends React.Component<Props, State> {
                       open
                       project={project}
                       layout={layout}
-                      onApply={() => this.editLayoutVariables(false)}
-                      onCancel={() => this.editLayoutVariables(false)}
+                      onApply={() => this.openSceneVariables(false)}
+                      onCancel={() => this.openSceneVariables(false)}
                       hotReloadPreviewButtonProps={
                         this.props.hotReloadPreviewButtonProps
                       }

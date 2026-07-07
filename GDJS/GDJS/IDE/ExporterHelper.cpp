@@ -1141,6 +1141,15 @@ bool ExporterHelper::CompleteIndexFile(
 
   gd::String codeFilesIncludes;
   for (auto &include : includesFiles) {
+    // WebAssembly binaries (e.g. the Draco decoder) are listed as include
+    // files so they get copied next to the game, but they must NOT be added as
+    // `<script>` tags: the browser would try to parse the binary as JavaScript
+    // and throw "SyntaxError: Invalid or unexpected token". They are loaded at
+    // runtime by their own loader (e.g. DRACOLoader fetches the .wasm itself).
+    if (include.size() >= 5 && include.substr(include.size() - 5) == ".wasm") {
+      continue;
+    }
+
     gd::String scriptSrc =
         GetExportedIncludeFilename(fs, gdjsRoot, include, nonRuntimeScriptsCacheBurst);
 

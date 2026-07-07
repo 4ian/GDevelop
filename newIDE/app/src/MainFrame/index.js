@@ -1880,37 +1880,13 @@ const MainFrame = (props: Props): React.MixedElement => {
     [state.currentProject, notifyChangesToInGameEditor, setState]
   );
 
-  const importExtensionFromFiles = useImportExtension();
-
-  const importExtensionFromFilePaths = React.useCallback(
-    async (project: gdProject, filePaths: Array<string>) => {
-      const importedExtensionNames = await importExtensionFromFiles({
-        i18n,
-        project,
-        filePaths,
-        skipUserPrompts: true,
-        onWillInstallExtension,
-        onExtensionInstalled,
-      });
-      if (importedExtensionNames.length === 0) {
-        throw new Error(
-          '[CLI] Extension import failed or produced no extensions.'
-        );
-      }
-    },
-    [
-      importExtensionFromFiles,
-      i18n,
-      onWillInstallExtension,
-      onExtensionInstalled,
-    ]
-  );
+  const importExtension = useImportExtension();
 
   const onImportExtension = React.useCallback(
     async () => {
       const currentProject = state.currentProject;
       if (!currentProject) return;
-      await importExtensionFromFiles({
+      await importExtension({
         i18n,
         project: currentProject,
         onWillInstallExtension,
@@ -1919,7 +1895,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     },
     [
       state.currentProject,
-      importExtensionFromFiles,
+      importExtension,
       i18n,
       onWillInstallExtension,
       onExtensionInstalled,
@@ -5250,7 +5226,9 @@ const MainFrame = (props: Props): React.MixedElement => {
     project: state.currentProject,
     i18n,
     commandPaletteRef,
-    importExtensionFromFilePaths,
+    importExtension,
+    onWillInstallExtension,
+    onExtensionInstalled,
     saveProject,
   });
 

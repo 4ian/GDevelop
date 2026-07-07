@@ -126,17 +126,17 @@ GDevelop.exe --disable-update-check --run-command EXPORT_HTML5_EXTERNAL path\to\
   --run-command EXPORT_HTML5_EXTERNAL /path/to/game.json
 ```
 
-`IMPORT_EXTENSION` imports one or more extension files into the project and saves it. Pass each
-extension path with a repeated `--cmd-args` flag:
+`IMPORT_EXTENSION_AND_SAVE` imports one or more extension files into the project and saves it. Pass
+each extension path with a repeated `--cmd-args` flag:
 
 ```bash
 # Windows
-GDevelop.exe --disable-update-check --run-command IMPORT_EXTENSION path\to\game.json ^
+GDevelop.exe --disable-update-check --run-command IMPORT_EXTENSION_AND_SAVE path\to\game.json ^
   --cmd-args path\to\FirstExtension.json --cmd-args path\to\SecondExtension.json
 
 # Linux
 ./gdevelop --no-sandbox --disable-update-check \
-  --run-command IMPORT_EXTENSION /path/to/game.json \
+  --run-command IMPORT_EXTENSION_AND_SAVE /path/to/game.json \
   --cmd-args /path/to/FirstExtension.json --cmd-args /path/to/SecondExtension.json
 ```
 

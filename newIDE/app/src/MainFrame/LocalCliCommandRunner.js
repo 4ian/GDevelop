@@ -18,6 +18,19 @@ const electron = optionalRequire('electron');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
 const fs = optionalRequire('fs');
 
+type ImportExtension = (options: {|
+  i18n: I18nType,
+  project: gdProject,
+  onWillInstallExtension: (extensionNames: Array<string>) => void,
+  onExtensionInstalled: (extensionNames: Array<string>) => void,
+  filePaths?: Array<string>,
+  skipUserPrompts?: boolean,
+|}) => Promise<Array<string>>;
+
+type SaveProject = (options?: {|
+  skipNewVersionWarning: boolean,
+|}) => Promise<?FileMetadata>;
+
 // Commands registered here are awaited by the CLI dispatcher so the process
 // exits with a meaningful code. Unregistered commands fall back to
 // fire-and-forget via launchCommand.
@@ -27,13 +40,10 @@ export type CliCommandRunner = (
   context: {|
     preferences: Preferences,
     commandArgs: Array<string>,
-    importExtensionFromFilePaths?: (
-      project: gdProject,
-      filePaths: Array<string>
-    ) => Promise<void>,
-    saveProject: (options?: {|
-      skipNewVersionWarning: boolean,
-    |}) => Promise<?FileMetadata>,
+    importExtension: ImportExtension,
+    onWillInstallExtension: (extensionNames: Array<string>) => void,
+    onExtensionInstalled: (extensionNames: Array<string>) => void,
+    saveProject: SaveProject,
   |}
 ) => Promise<void>;
 
@@ -60,22 +70,35 @@ const runners: { [commandName: string]: CliCommandRunner } = {
     }
     await exportLocalHtml5Headless({ project, i18n });
   },
-  IMPORT_EXTENSION: async (
+  IMPORT_EXTENSION_AND_SAVE: async (
     project,
     i18n,
-    { commandArgs, importExtensionFromFilePaths, saveProject }
+    {
+      commandArgs,
+      importExtension,
+      onWillInstallExtension,
+      onExtensionInstalled,
+      saveProject,
+    }
   ) => {
     if (commandArgs.length === 0) {
       throw new Error(
-        '[CLI] IMPORT_EXTENSION requires at least one path via --cmd-args.'
+        '[CLI] IMPORT_EXTENSION_AND_SAVE requires at least one path via --cmd-args.'
       );
     }
-    if (!importExtensionFromFilePaths) {
+    const importedExtensionNames = await importExtension({
+      i18n,
+      project,
+      filePaths: commandArgs,
+      skipUserPrompts: true,
+      onWillInstallExtension,
+      onExtensionInstalled,
+    });
+    if (importedExtensionNames.length === 0) {
       throw new Error(
-        '[CLI] Import extension is not available in this environment.'
+        '[CLI] Extension import failed or produced no extensions.'
       );
     }
-    await importExtensionFromFilePaths(project, commandArgs);
 
     const fileMetadata = await saveProject({ skipNewVersionWarning: true });
     if (!fileMetadata) {
@@ -127,20 +150,19 @@ type Props = {|
   project: ?gdProject,
   i18n: I18nType,
   commandPaletteRef: {| current: ?CommandPaletteInterface |},
-  importExtensionFromFilePaths?: (
-    project: gdProject,
-    filePaths: Array<string>
-  ) => Promise<void>,
-  saveProject: (options?: {|
-    skipNewVersionWarning: boolean,
-  |}) => Promise<?FileMetadata>,
+  importExtension: ImportExtension,
+  onWillInstallExtension: (extensionNames: Array<string>) => void,
+  onExtensionInstalled: (extensionNames: Array<string>) => void,
+  saveProject: SaveProject,
 |};
 
 export const useCliCommandRunner = ({
   project,
   i18n,
   commandPaletteRef,
-  importExtensionFromFilePaths,
+  importExtension,
+  onWillInstallExtension,
+  onExtensionInstalled,
   saveProject,
 }: Props) => {
   const eventsFunctionsExtensionsState = React.useContext(
@@ -179,7 +201,9 @@ export const useCliCommandRunner = ({
             await awaitableRunner(project, i18n, {
               preferences,
               commandArgs: getCommandArgs(),
-              importExtensionFromFilePaths,
+              importExtension,
+              onWillInstallExtension,
+              onExtensionInstalled,
               saveProject,
             });
             console.info(
@@ -220,7 +244,9 @@ export const useCliCommandRunner = ({
       commandPaletteRef,
       eventsFunctionsExtensionsState,
       preferences,
-      importExtensionFromFilePaths,
+      importExtension,
+      onWillInstallExtension,
+      onExtensionInstalled,
       saveProject,
     ]
   );

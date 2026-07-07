@@ -117,6 +117,12 @@ void InitialInstance::UnserializeFrom(gd::Project &project,
   if (element.HasChild("initialVariables", "InitialVariables")) {
     GetVariables().UnserializeFrom(
         element.GetChild("initialVariables", 0, "InitialVariables"));
+    // The "mixed values" marker is an editor-only, display state used when
+    // showing the variables of several objects or instances at once. It must
+    // never be kept on the variables of an instance - clean it up in case it
+    // was wrongly persisted in the project by a previous version of the
+    // editor.
+    GetVariables().ClearMixedValues();
   }
 
   if (element.HasChild("behaviorOverridings")) {

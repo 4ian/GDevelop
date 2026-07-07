@@ -26,6 +26,9 @@ import { shortenUuidForDisplay } from '../../Utils/GDevelopServices/Play';
 import LinearProgress from '../../UI/LinearProgress';
 import FlatButton from '../../UI/FlatButton';
 import ShareExternal from '../../UI/CustomSvgIcons/ShareExternal';
+import { Accordion, AccordionHeader, AccordionBody } from '../../UI/Accordion';
+import { buildDetectedErrorsConfig } from './BuildDetectedErrors';
+import AlertMessage from '../../UI/AlertMessage';
 
 const buildTypesConfig = {
   'cordova-build': {
@@ -142,6 +145,11 @@ const BuildProgressAndActions = ({
     onCopyToClipboard && onCopyToClipboard();
   };
 
+  // Errors detected by analyzing the build log. Codes without a known
+  // user-facing message (e.g. reported by a newer backend) are still shown,
+  // inviting the user to upgrade GDevelop to learn more.
+  const detectedErrors = build.detectedErrors || [];
+
   const onUpdatePublicBuild = React.useCallback(
     async (buildId: ?string, i18n: I18nType) => {
       if (!profile || !game || !onGameUpdated || !setGameUpdating) return;
@@ -197,30 +205,66 @@ const BuildProgressAndActions = ({
     <I18n>
       {({ i18n }) =>
         build.status === 'error' ? (
-          <ResponsiveLineStackLayout
-            alignItems="center"
-            justifyContent="space-between"
-            expand
-          >
-            <Column noMargin>
-              <Text noMargin>
-                <Trans>Something wrong happened :(</Trans>
-              </Text>
-              <EmptyMessage
-                style={{ justifyContent: 'flex-start', padding: 0 }}
-              >
-                <Trans>
-                  Check the logs to see if there is an explanation about what
-                  went wrong, or try again later.
-                </Trans>
-              </EmptyMessage>
-            </Column>
-            <RaisedButton
-              primary
-              label={<Trans>Download log files</Trans>}
-              onClick={() => onDownload('logsKey')}
-            />
-          </ResponsiveLineStackLayout>
+          <ColumnStackLayout expand noMargin>
+            <AlertMessage kind="error">
+              <Trans>
+                Something wrong happened :( Check the logs to see if there is an
+                explanation about what went wrong, or try again later.
+              </Trans>
+            </AlertMessage>
+            {detectedErrors.length > 0 && (
+              <Accordion defaultExpanded noMargin>
+                <AccordionHeader>
+                  <Text noMargin>
+                    <Trans>Details</Trans>
+                  </Text>
+                </AccordionHeader>
+                <AccordionBody>
+                  <ColumnStackLayout expand noMargin>
+                    {detectedErrors.map((detectedError, index) => {
+                      const { code, helpUrl } = detectedError;
+                      const config = buildDetectedErrorsConfig[code];
+                      return (
+                        <ColumnStackLayout
+                          key={`${code}-${index}`}
+                          noMargin
+                          expand
+                        >
+                          {config ? (
+                            <Text noMargin allowSelection>
+                              {config.message}
+                            </Text>
+                          ) : (
+                            <Text noMargin allowSelection>
+                              <Trans>
+                                Upgrade GDevelop to learn more about this error.
+                              </Trans>{' '}
+                              ({code})
+                            </Text>
+                          )}
+                          {helpUrl && (
+                            <Line noMargin>
+                              <FlatButton
+                                label={<Trans>Learn more</Trans>}
+                                onClick={() => Window.openExternalURL(helpUrl)}
+                              />
+                            </Line>
+                          )}
+                        </ColumnStackLayout>
+                      );
+                    })}
+                  </ColumnStackLayout>
+                </AccordionBody>
+              </Accordion>
+            )}
+            <Line noMargin justifyContent="flex-end">
+              <RaisedButton
+                primary
+                label={<Trans>Download log files</Trans>}
+                onClick={() => onDownload('logsKey')}
+              />
+            </Line>
+          </ColumnStackLayout>
         ) : build.status === 'pending' ? (
           <>
             <Line alignItems="center" expand justifyContent="center">

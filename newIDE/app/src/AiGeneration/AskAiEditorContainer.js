@@ -11,6 +11,8 @@ import {
   type ObjectsOutsideEditorChanges,
   type ObjectGroupsOutsideEditorChanges,
   type ProjectItemRenamedOutsideEditorChanges,
+  type WillDeleteSceneChanges,
+  type WillDeleteObjectChanges,
 } from '../EditorFunctions/OutsideEditorChanges';
 import { type ObjectWithContext } from '../ObjectsList/EnumerateObjects';
 import Paper from '../UI/Paper';
@@ -156,6 +158,8 @@ type Props = {|
   onProjectItemRenamedOutsideEditor: (
     changes: ProjectItemRenamedOutsideEditorChanges
   ) => void,
+  onWillDeleteScene: (changes: WillDeleteSceneChanges) => Promise<void>,
+  onWillDeleteObject: (changes: WillDeleteObjectChanges) => void,
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
   onOpenAskAi: ({|
@@ -210,6 +214,7 @@ export type AskAiEditorInterface = {|
   onObjectGroupsModifiedOutsideEditor: (
     changes: ObjectGroupsOutsideEditorChanges
   ) => void,
+  onWillDeleteObject: (changes: WillDeleteObjectChanges) => void,
   selectAllInsideEditor: () => void,
   startOrOpenChat: (
     ?{|
@@ -255,6 +260,8 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
         onObjectsModifiedOutsideEditor,
         onObjectGroupsModifiedOutsideEditor,
         onProjectItemRenamedOutsideEditor,
+        onWillDeleteScene,
+        onWillDeleteObject,
         onWillInstallExtension,
         onExtensionInstalled,
         onOpenAskAi,
@@ -922,6 +929,8 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
         onObjectsModifiedOutsideEditor,
         onObjectGroupsModifiedOutsideEditor,
         onProjectItemRenamedOutsideEditor,
+        onWillDeleteScene,
+        onWillDeleteObject,
         i18n,
         onWillInstallExtension,
         onExtensionInstalled,
@@ -1026,6 +1035,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
         onInstancesModifiedOutsideEditor: noop,
         onObjectsModifiedOutsideEditor: noop,
         onObjectGroupsModifiedOutsideEditor: noop,
+        onWillDeleteObject: noop,
         selectAllInsideEditor: noop,
         startOrOpenChat: onStartOrOpenChat,
         notifyChangesToInGameEditor: setEditorHotReloadNeeded,
@@ -1636,6 +1646,8 @@ export const renderAskAiEditorContainer = (
         onProjectItemRenamedOutsideEditor={
           props.onProjectItemRenamedOutsideEditor
         }
+        onWillDeleteScene={props.onWillDeleteScene}
+        onWillDeleteObject={props.onWillDeleteObject}
         onWillInstallExtension={props.onWillInstallExtension}
         onExtensionInstalled={props.onExtensionInstalled}
         onOpenAskAi={props.onOpenAskAi}

@@ -77,7 +77,7 @@ export type SimplifiedProjectOptions = {|
   scopeToScene?: string,
 |};
 
-const getVariableTypeAsString = (
+export const getVariableTypeAsString = (
   gd: libGDevelop,
   variable: gdVariable
 ): string => {

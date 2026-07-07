@@ -71,6 +71,7 @@ type CommandHandlers = {|
   onRestartInGameEditor: (reason: string) => void,
   onOpenGlobalSearch: () => void,
   onOpenMemoryTrackerRegistry: () => void,
+  onImportExtension: () => Promise<void>,
   canInstallCliInPath: boolean,
   onInstallCliInPath: () => void | Promise<void>,
 |};
@@ -176,6 +177,10 @@ const useMainFrameCommands = (handlers: CommandHandlers) => {
 
   useCommand('OPEN_GLOBAL_SEARCH', !!handlers.project, {
     handler: handlers.onOpenGlobalSearch,
+  });
+
+  useCommand('IMPORT_EXTENSION', !!handlers.project, {
+    handler: handlers.onImportExtension,
   });
 
   const onRestartInGameEditor = handlers.onRestartInGameEditor;

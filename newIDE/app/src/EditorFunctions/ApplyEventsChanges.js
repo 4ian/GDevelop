@@ -946,14 +946,14 @@ export const addUndeclaredVariables = ({
       const lowerCaseType = type.toLowerCase();
       newVariable.castTo(
         lowerCaseType === 'string'
-          ? 'String'
+          ? 'string'
           : lowerCaseType === 'boolean'
-          ? 'Boolean'
+          ? 'boolean'
           : lowerCaseType === 'array'
-          ? 'Array'
+          ? 'array'
           : lowerCaseType === 'structure'
-          ? 'Structure'
-          : 'Number'
+          ? 'structure'
+          : 'number'
       );
     }
   });
@@ -982,14 +982,14 @@ export const addObjectUndeclaredVariables = ({
     const lowerCaseType = type.toLowerCase();
     variable.castTo(
       lowerCaseType === 'string'
-        ? 'String'
+        ? 'string'
         : lowerCaseType === 'boolean'
-        ? 'Boolean'
+        ? 'boolean'
         : lowerCaseType === 'array'
-        ? 'Array'
+        ? 'array'
         : lowerCaseType === 'structure'
-        ? 'Structure'
-        : 'Number'
+        ? 'structure'
+        : 'number'
     );
   };
 

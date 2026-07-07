@@ -69,7 +69,7 @@ let windowCounter = 0; // Counter for creating unique session partitions
 // so have to ignore one more).
 const argsParserOptions = {
   boolean: ['dev-tools', 'disable-update-check', 'keep-open'],
-  string: ['_', 'run-command'],
+  string: ['_', 'run-command', 'cmd-args'],
 };
 const args = parseArgs(process.argv.slice(isDev ? 2 : 1), argsParserOptions);
 

@@ -1,5 +1,6 @@
 // @flow
 import {
+  getLocalResourceFullPath,
   parseLocalFilePathOrExtensionFromMetadata,
   renameResourcesInProject,
   updateResourceJsonMetadata,
@@ -7,6 +8,13 @@ import {
   getResourceCustomPropertyValue,
   setResourceCustomPropertyValue,
 } from './ResourceUtils';
+jest.mock('../ResourcesLoader', () => ({
+  __esModule: true,
+  default: {
+    getResourceFullUrl: jest.fn(),
+  },
+}));
+const ResourcesLoader = require('../ResourcesLoader').default;
 const gd: libGDevelop = global.gd;
 
 const addNewAnimationWithImageToSpriteObject = (
@@ -25,6 +33,22 @@ const addNewAnimationWithImageToSpriteObject = (
 };
 
 describe('ResourceUtils', () => {
+  beforeEach(() => {
+    ResourcesLoader.getResourceFullUrl.mockReset();
+  });
+
+  it('can decode an encoded local file URL', () => {
+    const project: any = {};
+    ResourcesLoader.getResourceFullUrl.mockReturnValue(
+      'file:///E:/GDevelop/Weekend%20Jam%20%231/Parts/hero%20%231.png?cache=1234'
+    );
+
+    expect([
+      'E:\\GDevelop\\Weekend Jam #1\\Parts\\hero #1.png',
+      '/E:/GDevelop/Weekend Jam #1/Parts/hero #1.png',
+    ]).toContain(getLocalResourceFullPath(project, 'hero'));
+  });
+
   it('can rename a resource in the whole project', () => {
     const project = gd.ProjectHelper.createNewGDJSProject();
 

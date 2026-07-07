@@ -3,6 +3,7 @@ import { addGDevelopResourceTokenIfRequired } from '../Utils/CrossOrigin';
 import optionalRequire from '../Utils/OptionalRequire';
 const electron = optionalRequire('electron');
 const path = optionalRequire('path');
+const url = optionalRequire('url');
 
 class UrlsCache {
   projectCache: { [number]: { [string]: string } } = {};
@@ -131,15 +132,17 @@ export default class ResourcesLoader {
       // Support local filesystem with Electron
       const file = project.getProjectFile();
       const projectPath = path.dirname(file);
-      const resourceAbsolutePath = path
-        .resolve(projectPath, urlOrFilename)
-        .replace(/\\/g, '/');
+      const resourceAbsolutePath = path.resolve(projectPath, urlOrFilename);
+      const resourceFileUrl =
+        url && url.pathToFileURL
+          ? url.pathToFileURL(resourceAbsolutePath).toString()
+          : 'file://' + resourceAbsolutePath.replace(/\\/g, '/');
 
       console.info('Caching resolved local filename:', resourceAbsolutePath);
       return this._cache.cacheLocalFileUrl(
         project,
         urlOrFilename,
-        'file://' + resourceAbsolutePath,
+        resourceFileUrl,
         !!disableCacheBurst
       );
     }

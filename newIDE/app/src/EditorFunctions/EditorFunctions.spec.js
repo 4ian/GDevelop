@@ -163,7 +163,7 @@ describe('editorFunctions', () => {
       );
 
       expect(result.message).toMatchInlineSnapshot(
-        `"Created object \\"MyNewTextObject\\" (type \\"TextObject::Text\\", scene \\"TestScene\\") from asset store. Properties: bold: false, characterSize: 20 (px), color: 0;0;0 (color), isOutlineEnabled: false, isShadowEnabled: false, italic: false, lineHeight: 0 (px), outlineColor: 255;255;255 (color), outlineThickness: 2 (px), shadowAngle: 90 (deg), shadowBlurRadius: 2 (px), shadowColor: 0;0;0 (color), shadowDistance: 4 (px), shadowOpacity: 127 (px), text: Text (multilinestring), textAlignment: left (choice, one of: [\\"left\\", \\"center\\", \\"right\\"]), verticalTextAlignment: top (choice, one of: [\\"top\\", \\"center\\", \\"bottom\\"]). Empty: font (resource)."`
+        `"Created object \\"MyNewTextObject\\" (type \\"TextObject::Text\\", scene \\"TestScene\\") from asset store. Used asset \\"Dino Doux\\" (6 animation(s)). Properties: bold: false, characterSize: 20 (px), color: 0;0;0 (color), isOutlineEnabled: false, isShadowEnabled: false, italic: false, lineHeight: 0 (px), outlineColor: 255;255;255 (color), outlineThickness: 2 (px), shadowAngle: 90 (deg), shadowBlurRadius: 2 (px), shadowColor: 0;0;0 (color), shadowDistance: 4 (px), shadowOpacity: 127 (px), text: Text (multilinestring), textAlignment: left (choice, one of: [\\"left\\", \\"center\\", \\"right\\"]), verticalTextAlignment: top (choice, one of: [\\"top\\", \\"center\\", \\"bottom\\"]). Empty: font (resource)."`
       );
       expect(result.success).toBe(true);
       expect(onObjectsModifiedOutsideEditor).toHaveBeenCalledWith({
@@ -189,7 +189,7 @@ describe('editorFunctions', () => {
       );
 
       expect(result.message).toMatchInlineSnapshot(
-        `"Created object \\"SomeNewObject\\" (type \\"Sprite\\", scene \\"TestScene\\") from asset store. Properties: ."`
+        `"Created object \\"SomeNewObject\\" (type \\"Sprite\\", scene \\"TestScene\\") from asset store. Used asset \\"Dino Doux\\" (6 animation(s)). This object type has no editable object properties."`
       );
       expect(result.success).toBe(true);
       expect(onObjectsModifiedOutsideEditor).toHaveBeenCalledWith({
@@ -255,7 +255,7 @@ describe('editorFunctions', () => {
 
       expect(result.success).toBe(true);
       expect(result.message).toMatchInlineSnapshot(
-        `"Object \\"Player\\" already exists."`
+        `"Object \\"Player\\" already exists - nothing was changed. Set replace_existing_object to true to replace its assets from the asset store."`
       );
       expect(onObjectsModifiedOutsideEditor).toHaveBeenCalledWith({
         scene: testScene,
@@ -444,7 +444,7 @@ describe('editorFunctions', () => {
       );
       expect(testScene.getObjects().hasObjectNamed('Player')).toBe(true);
       expect(result.message).toMatchInlineSnapshot(
-        `"Replaced scene \\"TestScene\\" object \\"Player\\" with asset store object (same type \\"Sprite\\")."`
+        `"Replaced scene \\"TestScene\\" object \\"Player\\" with asset store object (same type \\"Sprite\\"). Used asset \\"Dino Doux\\" (6 animation(s))."`
       );
       expect(result.success).toBe(true);
       expect(onObjectsModifiedOutsideEditor).toHaveBeenCalledWith({
@@ -651,7 +651,7 @@ describe('editorFunctions', () => {
 
       expect(result.success).toBe(true);
       expect(result.message).toMatchInlineSnapshot(
-        `"Replaced scene \\"TestScene\\" object \\"Player\\" with asset store object (same type \\"Sprite\\")."`
+        `"Replaced scene \\"TestScene\\" object \\"Player\\" with asset store object (same type \\"Sprite\\"). Used asset \\"Dino Doux\\" (6 animation(s))."`
       );
     });
 

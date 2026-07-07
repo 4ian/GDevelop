@@ -472,6 +472,15 @@ const makeGenericSuccess = (message: string): EditorFunctionGenericOutput => ({
   message,
 });
 
+// Always tell the AI which asset was chosen, so it can verify the result
+// matches the user's request without extra inspection calls.
+const getUsedAssetText = (assetShortHeader: AssetShortHeader | null): string =>
+  assetShortHeader
+    ? ` Used asset "${assetShortHeader.name}" (${
+        assetShortHeader.animationsCount
+      } animation(s)).`
+    : '';
+
 // The base layer's real name is the empty string: never display it as "base"
 // in tool results, as this teaches the AI a layer name that does not exist.
 const getLayerNameForMessage = (layerName: string): string =>
@@ -968,7 +977,10 @@ const createOrReplaceObject: EditorFunction = {
 
     const getPropertiesText = (object: gdObject): string => {
       const properties = object.getConfiguration().getProperties();
-      return `Properties: ${formatPropertiesList(properties)}.`;
+      const propertiesList = formatPropertiesList(properties);
+      return propertiesList
+        ? `Properties: ${propertiesList}.`
+        : 'This object type has no editable object properties.';
     };
 
     // Check if target object already exists.
@@ -1021,7 +1033,7 @@ const createOrReplaceObject: EditorFunction = {
           isNewObjectTypeUsed: false, // No object was actually added.
         });
         return makeGenericSuccess(
-          `Object "${targetObjectName}" already exists.`
+          `Object "${targetObjectName}" already exists - nothing was changed. Set replace_existing_object to true to replace its assets from the asset store.`
         );
       }
 
@@ -1103,7 +1115,9 @@ const createOrReplaceObject: EditorFunction = {
               const result: EditorFunctionGenericOutput = {
                 success: true,
                 message: [
-                  `Created object "${object.getName()}" (type "${object.getType()}", ${targetScopeText}) from asset store.${renamedNotice}`,
+                  `Created object "${object.getName()}" (type "${object.getType()}", ${targetScopeText}) from asset store.${renamedNotice}${getUsedAssetText(
+                    assetShortHeader
+                  )}`,
                   getPropertiesText(object),
                 ].join(' '),
               };
@@ -1122,7 +1136,7 @@ const createOrReplaceObject: EditorFunction = {
                 .map(
                   object => `"${object.getName()}" (type "${object.getType()}")`
                 )
-                .join(', ')}.`
+                .join(', ')}.${getUsedAssetText(assetShortHeader)}`
             );
           } else {
             if (asset_id) {
@@ -1306,7 +1320,9 @@ const createOrReplaceObject: EditorFunction = {
           return makeGenericSuccess(
             `Replaced ${
               isTargetObjectGlobal ? 'global' : `scene "${scene_name}"`
-            } object "${existingTargetObject.getName()}" with asset store object (same type "${existingTargetObject.getType()}").`
+            } object "${existingTargetObject.getName()}" with asset store object (same type "${existingTargetObject.getType()}").${getUsedAssetText(
+              assetShortHeader
+            )}`
           );
         } else {
           // No asset found.

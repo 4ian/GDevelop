@@ -829,7 +829,7 @@ app.on('ready', function() {
           const escapedPath = projectPath.replace(/'/g, "'\\''");
           const shellCommand = keepOpen
             ? `cd '${escapedPath}' && ${npmCommand}`
-            : `cd '${escapedPath}' && ${npmCommand} && exit || echo "${NPM_SCRIPT_COMMAND_FAILED_MESSAGE}"`;
+            : `cd '${escapedPath}' && ${npmCommand} && exit || echo '${NPM_SCRIPT_COMMAND_FAILED_MESSAGE}'`;
           const script = `tell application "Terminal" to do script "${shellCommand.replace(
             /"/g,
             '\\"'

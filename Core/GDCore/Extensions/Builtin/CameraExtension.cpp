@@ -429,6 +429,11 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
       .SetDefaultValue("\"\"")
       .AddParameter("expression", _("Camera number (default : 0)"), "", true)
       .SetDefaultValue("0")
+      .SetHint(
+          "This only centers the 2D camera on the X/Y axes: it does not set "
+          "the camera Z position nor a 3D viewing angle. For 3D games, use "
+          "the 3D camera actions or a camera behavior (third person camera, "
+          "first person camera...).")
       .MarkAsSimple();
 
   // Compatibility with GD <= 5.6.251

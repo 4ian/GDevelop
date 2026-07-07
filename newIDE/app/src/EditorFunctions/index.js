@@ -472,6 +472,11 @@ const makeGenericSuccess = (message: string): EditorFunctionGenericOutput => ({
   message,
 });
 
+// The base layer's real name is the empty string: never display it as "base"
+// in tool results, as this teaches the AI a layer name that does not exist.
+const getLayerNameForMessage = (layerName: string): string =>
+  layerName === '' ? 'the base layer ("")' : `layer "${layerName}"`;
+
 const makeMultipleChangesOutput = (
   changes: Array<string>,
   warnings: Array<string>
@@ -527,6 +532,30 @@ const serializeNamedProperty = (
     quickCustomizationVisibility: undefined,
     advanced: undefined,
   };
+};
+
+// List the (visible) property names so a "property not found" warning lets
+// the caller immediately pick the right name instead of guessing again.
+// Emitted at most once per call: if a previous warning already lists the
+// properties (e.g. several unknown properties in the same call), returns "".
+const getAvailablePropertyNamesText = (
+  properties: gdMapStringPropertyDescriptor | null,
+  existingWarnings: Array<string>
+): string => {
+  if (
+    existingWarnings.some(warning => warning.includes('Available properties:'))
+  )
+    return '';
+  if (!properties) return '';
+  const names = properties
+    .keys()
+    .toJSArray()
+    .filter(name => !shouldHideProperty(properties.get(name)));
+  if (names.length === 0) return '';
+  const maxCount = 25;
+  return ` Available properties: ${names.slice(0, maxCount).join(', ')}${
+    names.length > maxCount ? `, … (${names.length - maxCount} more)` : ''
+  }.`;
 };
 
 const findPropertyByName = ({
@@ -1591,19 +1620,54 @@ const applyObjectPropertyChange = ({
       return;
     }
     warnings.push(
-      `Property "${propertyName}" not found on object "${object_name}".`
+      `Property "${propertyName}" not found on object "${object_name}".${getAvailablePropertyNamesText(
+        objectProperties,
+        warnings
+      )}`
     );
     return;
   }
 
-  const sanitizedNewValue = sanitizePropertyNewValue(foundProperty, newValue);
+  let sanitizedNewValue = sanitizePropertyNewValue(foundProperty, newValue);
 
   if (foundProperty.getType() === 'resource') {
     if (!project.getResourcesManager().hasResource(sanitizedNewValue)) {
-      warnings.push(
-        `"${foundPropertyName}" on "${object_name}" -> "${newValue}": resource "${sanitizedNewValue}" does not exist. New resources cannot be added just by name; use \`create_or_replace_object\` to import assets from the asset store (preserving properties/behaviors/events).`
+      // Resource names can contain backslashes (e.g. "assets\\Player.glb"):
+      // tolerate a name given with the wrong slashes or casing, and suggest
+      // close candidates otherwise.
+      const normalizeResourceName = (resourceName: string) =>
+        resourceName.replace(/\\/g, '/').toLowerCase();
+      const allResourceNames = project
+        .getResourcesManager()
+        .getAllResourceNames()
+        .toJSArray();
+      const normalizedNewValue = normalizeResourceName(sanitizedNewValue);
+      const matchingResourceNames = allResourceNames.filter(
+        resourceName =>
+          normalizeResourceName(resourceName) === normalizedNewValue
       );
-      return;
+      if (matchingResourceNames.length === 1) {
+        sanitizedNewValue = matchingResourceNames[0];
+      } else {
+        const requestedBaseName = normalizedNewValue.split('/').pop() || '';
+        const closeResourceNames = requestedBaseName
+          ? allResourceNames
+              .filter(resourceName =>
+                normalizeResourceName(resourceName).endsWith(requestedBaseName)
+              )
+              .slice(0, 5)
+          : [];
+        warnings.push(
+          `"${foundPropertyName}" on "${object_name}" -> "${newValue}": resource "${sanitizedNewValue}" does not exist.${
+            closeResourceNames.length > 0
+              ? ` Did you mean: ${closeResourceNames
+                  .map(resourceName => `"${resourceName}"`)
+                  .join(', ')}?`
+              : ''
+          } New resources cannot be added just by name; use \`create_or_replace_object\` to import assets from the asset store (preserving properties/behaviors/events).`
+        );
+        return;
+      }
     }
     const resource = project
       .getResourcesManager()
@@ -1640,6 +1704,21 @@ const applyObjectPropertyChange = ({
   });
   warnings.push(...propertyWarnings);
   changes.push(...propertyChanges);
+
+  // Resizing an object that keeps its aspect ratio can visually do nothing
+  // (the rendered size is clamped to the model aspect ratio) even though the
+  // stored property changed — so `verifyPropertyChange` cannot catch it.
+  if (['width', 'height', 'depth'].includes(foundPropertyName.toLowerCase())) {
+    const keepAspectRatioValue = getPropertyValue({
+      properties: objectConfiguration.getProperties(),
+      propertyName: 'keepAspectRatio',
+    });
+    if (keepAspectRatioValue === 'true') {
+      warnings.push(
+        `"${object_name}" has "keepAspectRatio" enabled: the rendered size keeps the model's aspect ratio, so this change may have no visible effect. Set "keepAspectRatio" to false first to control each dimension exactly.`
+      );
+    }
+  }
 };
 
 /**
@@ -2870,7 +2949,10 @@ const changeBehaviorProperty: EditorFunction = {
         changes.push(...propertyChanges);
       } else {
         warnings.push(
-          `Property "${propertyName}" not on behavior "${behavior_name}" of "${object_name}".`
+          `Property "${propertyName}" not on behavior "${behavior_name}" of "${object_name}".${getAvailablePropertyNamesText(
+            behaviorProperties,
+            warnings
+          )}`
         );
       }
     });
@@ -3192,10 +3274,19 @@ const put2dInstances: EditorFunction = {
       ? getObjectSizeInfo(namedObject, project, PixiResourcesLoader)
       : null;
 
+    // Accept the frequent mistake of calling the base layer "base" (its real
+    // name is the empty string) when no layer with that literal name exists.
+    const layerName =
+      layer_name !== '' &&
+      layer_name.trim().toLowerCase() === 'base' &&
+      !layout.hasLayerNamed(layer_name)
+        ? ''
+        : layer_name;
+
     // Check if layer exists (empty string is allowed for base layer)
-    if (layer_name !== '' && !layout.hasLayerNamed(layer_name)) {
+    if (layerName !== '' && !layout.hasLayerNamed(layerName)) {
       return makeGenericFailure(
-        `Layer not found: ${layer_name} in scene "${scene_name}".`
+        `Layer not found: ${layerName} in scene "${scene_name}".`
       );
     }
 
@@ -3228,7 +3319,7 @@ const put2dInstances: EditorFunction = {
         if (instance.getObjectName() !== object_name) return;
 
         if (!brushPosition) return;
-        if (instance.getLayer() !== layer_name) return; // Layer must be the same as specified when deleting instances with a brush.
+        if (instance.getLayer() !== layerName) return; // Layer must be the same as specified when deleting instances with a brush.
 
         if (brushSize === 0) {
           if (
@@ -3250,20 +3341,21 @@ const put2dInstances: EditorFunction = {
         }
       });
 
-      // If specific instance ids were requested but none matched (and the brush
-      // did not select anything either), the call erased nothing. Return a
-      // failure so the agent gets a real error signal instead of a misleading
-      // success that could make it retry the same call in a loop.
-      if (
-        instancesToDelete.size === 0 &&
-        notFoundExistingInstanceIds.size > 0
-      ) {
+      // An erase call that removed nothing is a failure: return a real error
+      // signal instead of a misleading "Erased 0 instances." success that
+      // could make the agent retry the same call in a loop, or believe the
+      // instances are gone.
+      if (instancesToDelete.size === 0) {
         return makeGenericFailure(
-          `None of the specified instance ids were found: ${Array.from(
-            notFoundExistingInstanceIds
-          ).join(
-            ', '
-          )}. Nothing was changed. Call \`describe_instances\` to get valid ids (the \`id\` field of each instance), and check the scene and layer names.`
+          [
+            'No instance was erased.',
+            notFoundExistingInstanceIds.size > 0
+              ? `None of the specified instance ids were found: ${Array.from(
+                  notFoundExistingInstanceIds
+                ).join(', ')}.`
+              : 'No instance matched the brush (check `object_name`, the layer and the brush position/size).',
+            'Call `describe_instances` to get valid ids (the `id` field of each instance), and check the scene and layer names.',
+          ].join(' ')
         );
       }
 
@@ -3296,11 +3388,9 @@ const put2dInstances: EditorFunction = {
         injectObjectSizeInfo(eraseResult, { [object_name]: objectSizeInfo });
       return eraseResult;
     } else {
-      const brushPosition: [number, number] = (brush_position &&
-        SafeExtractor.parseCommaSeparatedTwoFiniteNumbers(brush_position)) || [
-        project.getGameResolutionWidth() / 2,
-        project.getGameResolutionHeight() / 2,
-      ];
+      const parsedBrushPosition = brush_position
+        ? SafeExtractor.parseCommaSeparatedTwoFiniteNumbers(brush_position)
+        : null;
       const brushSize = brush_size || 0;
       const brushEndPosition = SafeExtractor.parseCommaSeparatedTwoFiniteNumbers(
         brush_end_position
@@ -3331,6 +3421,26 @@ const put2dInstances: EditorFunction = {
         newInstancesCount =
           rowCount && columnCount ? rowCount * columnCount : 1;
       }
+
+      // As stated in the tool description, `brush_position` can only be
+      // omitted when modifying existing instances with the "none" brush. Fail
+      // instead of silently using a default position (like the scene center):
+      // a call without a position is usually a modification that forgot
+      // `existing_instance_ids`, or would drop every new instance at a
+      // meaningless position.
+      if (
+        !parsedBrushPosition &&
+        !(brush_kind === 'none' && newInstancesCount === 0)
+      ) {
+        return makeGenericFailure(
+          newInstancesCount > 0
+            ? `A valid \`brush_position\` is required to create ${newInstancesCount} new instance(s) (or pass \`existing_instance_ids\` from \`describe_instances\` if you meant to modify existing instances).`
+            : `A valid \`brush_position\` is required for the "${brush_kind}" brush (or use the "none" brush to modify existing instances without moving them).`
+        );
+      }
+      // After the guard, a missing position can only happen when nothing is
+      // created nor moved ("none" brush only): the fallback is never used.
+      const brushPosition: [number, number] = parsedBrushPosition || [0, 0];
 
       // Track changes for detailed success message
       const changes = [];
@@ -3384,8 +3494,8 @@ const put2dInstances: EditorFunction = {
 
           modifiedAndCreatedInstances.push(instance);
           // Take the opportunity to move to a new layer if specified.
-          if (instance.getLayer() !== layer_name) {
-            instance.setLayer(layer_name);
+          if (instance.getLayer() !== layerName) {
+            instance.setLayer(layerName);
           }
         }
       });
@@ -3393,7 +3503,7 @@ const put2dInstances: EditorFunction = {
       for (let i = 0; i < newInstancesCount; i++) {
         const instance = initialInstances.insertNewInitialInstance();
         instance.setObjectName(object_name || '');
-        instance.setLayer(layer_name);
+        instance.setLayer(layerName);
         modifiedAndCreatedInstances.push(instance);
       }
 
@@ -3566,7 +3676,7 @@ const put2dInstances: EditorFunction = {
           } of object "${object_name ||
             ''}" using ${brush_kind} brush at ${brushPosition.join(
             ', '
-          )} on layer "${layer_name || 'base'}"${
+          )} on ${getLayerNameForMessage(layerName)}${
             attrs.length > 0 ? ` (${attrs.join(', ')})` : ''
           }.`
         );
@@ -3621,7 +3731,7 @@ const put2dInstances: EditorFunction = {
         changes.push(
           `Moved ${movedToLayerCount} instance${
             movedToLayerCount > 1 ? 's' : ''
-          } to layer "${layer_name || 'base'}".`
+          } to ${getLayerNameForMessage(layerName)}.`
         );
       }
 
@@ -3895,10 +4005,19 @@ const put3dInstances: EditorFunction = {
       ? getObjectSizeInfo(namedObject, project, PixiResourcesLoader)
       : null;
 
+    // Accept the frequent mistake of calling the base layer "base" (its real
+    // name is the empty string) when no layer with that literal name exists.
+    const layerName =
+      layer_name !== '' &&
+      layer_name.trim().toLowerCase() === 'base' &&
+      !layout.hasLayerNamed(layer_name)
+        ? ''
+        : layer_name;
+
     // Check if layer exists (empty string is allowed for base layer)
-    if (layer_name !== '' && !layout.hasLayerNamed(layer_name)) {
+    if (layerName !== '' && !layout.hasLayerNamed(layerName)) {
       return makeGenericFailure(
-        `Layer not found: ${layer_name} in scene "${scene_name}".`
+        `Layer not found: ${layerName} in scene "${scene_name}".`
       );
     }
 
@@ -3931,7 +4050,7 @@ const put3dInstances: EditorFunction = {
         if (instance.getObjectName() !== object_name) return;
 
         if (!brushPosition) return;
-        if (instance.getLayer() !== layer_name) return; // Layer must be the same as specified when deleting instances with a brush.
+        if (instance.getLayer() !== layerName) return; // Layer must be the same as specified when deleting instances with a brush.
 
         if (brushSize <= 0) {
           if (
@@ -3955,20 +4074,21 @@ const put3dInstances: EditorFunction = {
         }
       });
 
-      // If specific instance ids were requested but none matched (and the brush
-      // did not select anything either), the call erased nothing. Return a
-      // failure so the agent gets a real error signal instead of a misleading
-      // success that could make it retry the same call in a loop.
-      if (
-        instancesToDelete.size === 0 &&
-        notFoundExistingInstanceIds.size > 0
-      ) {
+      // An erase call that removed nothing is a failure: return a real error
+      // signal instead of a misleading "Erased 0 instances." success that
+      // could make the agent retry the same call in a loop, or believe the
+      // instances are gone.
+      if (instancesToDelete.size === 0) {
         return makeGenericFailure(
-          `None of the specified instance ids were found: ${Array.from(
-            notFoundExistingInstanceIds
-          ).join(
-            ', '
-          )}. Nothing was changed. Call \`describe_instances\` to get valid ids (the \`id\` field of each instance), and check the scene and layer names.`
+          [
+            'No instance was erased.',
+            notFoundExistingInstanceIds.size > 0
+              ? `None of the specified instance ids were found: ${Array.from(
+                  notFoundExistingInstanceIds
+                ).join(', ')}.`
+              : 'No instance matched the brush (check `object_name`, the layer and the brush position/size).',
+            'Call `describe_instances` to get valid ids (the `id` field of each instance), and check the scene and layer names.',
+          ].join(' ')
         );
       }
 
@@ -4001,24 +4121,52 @@ const put3dInstances: EditorFunction = {
         injectObjectSizeInfo(eraseResult, { [object_name]: objectSizeInfo });
       return eraseResult;
     } else {
-      const brushPosition: [number, number, number] = (brush_position &&
-        SafeExtractor.parseCommaSeparatedThreeFiniteNumbers(
-          brush_position
-        )) || [
-        project.getGameResolutionWidth() / 2,
-        project.getGameResolutionHeight() / 2,
-        0,
-      ];
+      const parsedBrushPosition = brush_position
+        ? SafeExtractor.parseCommaSeparatedThreeFiniteNumbers(brush_position)
+        : null;
       const brushSize = brush_size || 0;
       const brushEndPosition = SafeExtractor.parseCommaSeparatedThreeFiniteNumbers(
         brush_end_position
       );
+
+      // The `line` brush needs an end position to spread instances. Fail early
+      // (before creating any instance) so the caller retries with a valid
+      // request, instead of silently leaving every instance at the origin.
+      if (brush_kind === 'line' && !brushEndPosition) {
+        return makeGenericFailure(
+          `The "line" brush requires brush_end_position (the end of the line). Provide it, or use the "point" brush to place instances at a single position.`
+        );
+      }
 
       let newInstancesCount =
         new_instances_count !== null ? new_instances_count : 0;
       if (newInstancesCount === 0 && existingInstanceIds.length === 0) {
         newInstancesCount = 1;
       }
+
+      // As stated in the tool description, `brush_position` can only be
+      // omitted when modifying existing instances with the "none" brush. Fail
+      // instead of silently using a default position (like the scene center):
+      // a call without a position is usually a modification that forgot
+      // `existing_instance_ids`, or would drop every new instance at a
+      // meaningless position.
+      if (
+        !parsedBrushPosition &&
+        !(brush_kind === 'none' && newInstancesCount === 0)
+      ) {
+        return makeGenericFailure(
+          newInstancesCount > 0
+            ? `A valid \`brush_position\` is required to create ${newInstancesCount} new instance(s) (or pass \`existing_instance_ids\` from \`describe_instances\` if you meant to modify existing instances).`
+            : `A valid \`brush_position\` is required for the "${brush_kind}" brush (or use the "none" brush to modify existing instances without moving them).`
+        );
+      }
+      // After the guard, a missing position can only happen when nothing is
+      // created nor moved ("none" brush only): the fallback is never used.
+      const brushPosition: [number, number, number] = parsedBrushPosition || [
+        0,
+        0,
+        0,
+      ];
 
       // Track changes for detailed success message
       const changes = [];
@@ -4075,8 +4223,8 @@ const put3dInstances: EditorFunction = {
 
           modifiedAndCreatedInstances.push(instance);
           // Take the opportunity to move to a new layer if specified.
-          if (instance.getLayer() !== layer_name) {
-            instance.setLayer(layer_name);
+          if (instance.getLayer() !== layerName) {
+            instance.setLayer(layerName);
           }
         }
       });
@@ -4084,7 +4232,7 @@ const put3dInstances: EditorFunction = {
       for (let i = 0; i < newInstancesCount; i++) {
         const instance = initialInstances.insertNewInitialInstance();
         instance.setObjectName(object_name || '');
-        instance.setLayer(layer_name);
+        instance.setLayer(layerName);
         modifiedAndCreatedInstances.push(instance);
       }
 
@@ -4220,7 +4368,7 @@ const put3dInstances: EditorFunction = {
           } of object "${object_name ||
             ''}" using ${brush_kind} brush at ${brushPosition.join(
             ', '
-          )} on layer "${layer_name || 'base'}"${
+          )} on ${getLayerNameForMessage(layerName)}${
             attrs.length > 0 ? ` (${attrs.join(', ')})` : ''
           }.`
         );
@@ -4266,7 +4414,7 @@ const put3dInstances: EditorFunction = {
         changes.push(
           `Moved ${movedToLayerCount} instance${
             movedToLayerCount > 1 ? 's' : ''
-          } to layer "${layer_name || 'base'}".`
+          } to ${getLayerNameForMessage(layerName)}.`
         );
       }
 
@@ -5753,17 +5901,25 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
             scene,
           });
         } else {
+          const createdLayerName = new_layer_name || layerName;
+          // Never create a layer literally named "base": this is always a
+          // confusion with the default base layer, whose real name is "".
+          if (createdLayerName.trim().toLowerCase() === 'base') {
+            warnings.push(
+              `Layer "${createdLayerName}" was not created: the default base layer already exists and its real name is the empty string. Use "" to target it.`
+            );
+            return;
+          }
           scene
             .getLayers()
             .insertNewLayer(
-              new_layer_name || layerName,
+              createdLayerName,
               new_layer_position === null
                 ? scene.getLayersCount()
                 : new_layer_position
             );
           changes.push(
-            `Created new layer "${new_layer_name ||
-              layerName}" for scene "${scene.getName()}" at position ${new_layer_position ||
+            `Created new layer "${createdLayerName}" for scene "${scene.getName()}" at position ${new_layer_position ||
               0}.`
           );
         }

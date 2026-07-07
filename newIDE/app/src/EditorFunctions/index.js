@@ -5968,26 +5968,55 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
             scene,
           });
         } else {
-          const createdLayerName = new_layer_name || layerName;
-          // Never create a layer literally named "base": this is always a
-          // confusion with the default base layer, whose real name is "".
-          if (createdLayerName.trim().toLowerCase() === 'base') {
+          const existingLayerNames = mapFor(
+            0,
+            scene.getLayers().getLayersCount(),
+            i =>
+              `"${scene
+                .getLayers()
+                .getLayerAt(i)
+                .getName()}"`
+          ).join(', ');
+
+          // A deletion or rename targeting a layer that does not exist is
+          // always a wrong layer name: don't create a layer out of it.
+          if (delete_this_layer) {
             warnings.push(
-              `Layer "${createdLayerName}" was not created: the default base layer already exists and its real name is the empty string. Use "" to target it.`
+              `Layer "${layerName}" not found in scene "${scene.getName()}": nothing was deleted. Existing layers are: ${existingLayerNames}.`
             );
             return;
           }
-          scene
-            .getLayers()
-            .insertNewLayer(
-              createdLayerName,
-              new_layer_position === null
-                ? scene.getLayersCount()
-                : new_layer_position
+          if (new_layer_name) {
+            warnings.push(
+              `Layer "${layerName}" not found in scene "${scene.getName()}": no layer was renamed. Existing layers are: ${existingLayerNames}. To create a new layer, pass its name as "layer_name".`
             );
+            return;
+          }
+
+          // Never create a layer literally named "base": this is always a
+          // confusion with the default base layer, whose real name is "".
+          if (layerName.trim().toLowerCase() === 'base') {
+            warnings.push(
+              `Layer "${layerName}" was not created: the default base layer already exists and its real name is the empty string. Use "" to target it.`
+            );
+            return;
+          }
+          const insertionPosition =
+            new_layer_position === null
+              ? scene.getLayers().getLayersCount()
+              : new_layer_position;
+          scene.getLayers().insertNewLayer(layerName, insertionPosition);
+          const newLayerNames = mapFor(
+            0,
+            scene.getLayers().getLayersCount(),
+            i =>
+              `"${scene
+                .getLayers()
+                .getLayerAt(i)
+                .getName()}"`
+          ).join(', ');
           changes.push(
-            `Created new layer "${createdLayerName}" for scene "${scene.getName()}" at position ${new_layer_position ||
-              0}.`
+            `Layer "${layerName}" did not exist in scene "${scene.getName()}": created it at position ${insertionPosition}. Layers are now: ${newLayerNames}. If you meant to modify an existing layer, check its exact name.`
           );
         }
       });

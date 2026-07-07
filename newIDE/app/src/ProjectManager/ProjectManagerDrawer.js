@@ -28,6 +28,9 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     minHeight: 0,
+    position: 'relative',
+    zIndex: 1,
+    backgroundColor: 'var(--theme-surface-window-background-color)',
     borderRight: '1px solid var(--theme-toolbar-separator-color)',
   },
 };

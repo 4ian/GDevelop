@@ -276,6 +276,7 @@ namespace gdjs {
   const RIGHT_KEY = 39;
   const DOWN_KEY = 40;
   const ALT_KEY = 18;
+  const TAB_KEY = 9;
   const DEL_KEY = 46;
   const BACKSPACE_KEY = 8;
   const LEFT_ALT_KEY = gdjs.InputManager.getLocationAwareKeyCode(ALT_KEY, 1);
@@ -2899,13 +2900,10 @@ namespace gdjs {
         inputManager.isKeyPressed(RIGHT_META_KEY);
       const isShiftKeyPressed = isShiftPressed(inputManager);
       const isAltKeyPressed = isAltPressed(inputManager);
+      const hasModifierKeyPressed =
+        isCtrlPressed || isMetaPressed || isAltKeyPressed || isShiftKeyPressed;
 
-      if (
-        !isCtrlPressed &&
-        !isMetaPressed &&
-        !isAltKeyPressed &&
-        !isShiftKeyPressed
-      ) {
+      if (!hasModifierKeyPressed && !inputManager.wasKeyJustPressed(TAB_KEY)) {
         return;
       }
 
@@ -2914,6 +2912,9 @@ namespace gdjs {
         .exceptionallyGetAllJustPressedKeys()) {
         const keyCode =
           exceptionallyGetKeyCodeFromLocationAwareKeyCode(locationAwareKeyCode);
+        if (!hasModifierKeyPressed && keyCode !== TAB_KEY) {
+          continue;
+        }
 
         const debuggerClient = this._runtimeGame._debuggerClient;
         if (debuggerClient) {

@@ -59,6 +59,7 @@ import {
   getTileMapPaintingSelection,
 } from './TileSetVisualizer';
 import { getImageFilePathsFromDataTransfer } from '../SceneEditor/CreateSpriteFromImage';
+import { get3DModelFilePathsFromDataTransfer } from '../SceneEditor/Create3DModelFromGLB';
 import ClickInterceptor from './ClickInterceptor';
 import getObjectByName from '../Utils/GetObjectByName';
 import { AffineTransformation } from '../Utils/AffineTransformation';
@@ -132,6 +133,10 @@ export type InstancesEditorPropsWithoutSizeAndScroll = {|
   onInstancesRotated: (instances: Array<gdInitialInstance>) => void,
   onImageFilesDropped?: (
     imageFilePaths: Array<string>,
+    position: [number, number]
+  ) => void | Promise<void>,
+  on3DModelFilesDropped?: (
+    modelFilePaths: Array<string>,
     position: [number, number]
   ) => void | Promise<void>,
   onCustomObjectDropped?: (
@@ -1087,19 +1092,22 @@ export default class InstancesEditor extends Component<Props, State> {
     }
   };
 
-  _onNativeDrop = (event: DragEvent) => {
+  _onNativeDrop = async (event: DragEvent) => {
     if (!this._hasNativeFiles(event)) return;
 
     event.preventDefault();
     event.stopPropagation();
 
-    const { onImageFilesDropped } = this.props;
-    if (!onImageFilesDropped) return;
+    const { onImageFilesDropped, on3DModelFilesDropped } = this.props;
+    if (!onImageFilesDropped && !on3DModelFilesDropped) return;
 
-    const imageFilePaths = getImageFilePathsFromDataTransfer(
-      event.dataTransfer
-    );
-    if (!imageFilePaths.length) return;
+    const imageFilePaths = onImageFilesDropped
+      ? getImageFilePathsFromDataTransfer(event.dataTransfer)
+      : [];
+    const modelFilePaths = on3DModelFilesDropped
+      ? get3DModelFilePathsFromDataTransfer(event.dataTransfer)
+      : [];
+    if (!imageFilePaths.length && !modelFilePaths.length) return;
 
     const position = this._getSceneCoordinatesFromClientPosition(
       event.clientX,
@@ -1107,7 +1115,12 @@ export default class InstancesEditor extends Component<Props, State> {
     );
     if (!position) return;
 
-    onImageFilesDropped(imageFilePaths, position);
+    if (onImageFilesDropped && imageFilePaths.length) {
+      await onImageFilesDropped(imageFilePaths, position);
+    }
+    if (on3DModelFilesDropped && modelFilePaths.length) {
+      await on3DModelFilesDropped(modelFilePaths, position);
+    }
   };
 
   _onMouseMove = (x: number, y: number) => {

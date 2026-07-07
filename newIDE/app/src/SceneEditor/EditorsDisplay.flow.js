@@ -154,6 +154,10 @@ export type SceneEditorsDisplayProps = {|
     imageFilePaths: Array<string>,
     position: [number, number]
   ) => void | Promise<void>,
+  on3DModelFilesDropped?: (
+    modelFilePaths: Array<string>,
+    position: [number, number]
+  ) => void | Promise<void>,
   onCustomObjectDropped: (
     customObjectDragItem: CustomObjectDragItem,
     position: [number, number]

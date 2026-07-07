@@ -107,6 +107,10 @@ import {
   writeImageFromClipboardToProjectFolder,
 } from './CreateSpriteFromImage';
 import {
+  create3DModelObjectsFromGLBFiles,
+  getSupported3DModelFilePaths,
+} from './Create3DModelFromGLB';
+import {
   changeViewPosition,
   setCameraState,
 } from '../EmbeddedGame/EmbeddedGameFrame';
@@ -2352,6 +2356,54 @@ export default class SceneEditor extends React.Component<Props, State> {
     }
   };
 
+  _on3DModelFilesDropped = async (
+    modelFilePaths: Array<string>,
+    position: [number, number]
+  ) => {
+    const storageProvider = this.props.resourceManagementProps.getStorageProvider();
+    if (
+      storageProvider.internalName !== 'LocalFile' ||
+      !this.props.project.getProjectFile()
+    ) {
+      Window.showMessageBox(
+        '3D models can only be dropped into saved local projects.',
+        'info'
+      );
+      return;
+    }
+
+    const supported3DModelFilePaths = getSupported3DModelFilePaths(
+      modelFilePaths
+    );
+    if (!supported3DModelFilePaths.length) return;
+
+    const isTheFirst3DModelObjectInProject = !gd.UsedObjectTypeFinder.scanProject(
+      this.props.project,
+      'Scene3D::Model3DObject'
+    );
+    try {
+      const objects = await create3DModelObjectsFromGLBFiles({
+        project: this.props.project,
+        objectsContainer: this.props.objectsContainer,
+        modelFilePaths: supported3DModelFilePaths,
+      });
+      this._onObjectsCreated(objects, isTheFirst3DModelObjectInProject);
+      this._addInstancesForObjectsAtPosition(objects, position);
+      if (this.editorDisplay) this.editorDisplay.forceUpdateObjectsList();
+      await this.props.resourceManagementProps.onFetchNewlyAddedResources();
+      this.props.resourceManagementProps.onNewResourcesAdded();
+    } catch (error) {
+      console.error(
+        'Unable to create 3D model object from dropped GLB:',
+        error
+      );
+      Window.showMessageBox(
+        'Unable to create a 3D model object from the dropped GLB file.',
+        'error'
+      );
+    }
+  };
+
   _onRemoveLayer = (layerName: string, done: boolean => void) => {
     const getNewState = (doRemove: boolean) => {
       const newState: {|
@@ -4009,6 +4061,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                     onInstancesResized={this._onInstancesResized}
                     onInstancesRotated={this._onInstancesRotated}
                     onImageFilesDropped={this._onImageFilesDropped}
+                    on3DModelFilesDropped={this._on3DModelFilesDropped}
                     onCustomObjectDropped={this._onCustomObjectDropped}
                     isInstanceOf3DObject={this.isInstanceOf3DObject}
                     onSelectAllInstancesOfObjectInLayout={

@@ -381,6 +381,7 @@ const SwipeableDrawerEditorsDisplay: React.ComponentType<{
                   onInstancesResized={props.onInstancesResized}
                   onInstancesRotated={props.onInstancesRotated}
                   onImageFilesDropped={props.onImageFilesDropped}
+                  on3DModelFilesDropped={props.on3DModelFilesDropped}
                   onCustomObjectDropped={props.onCustomObjectDropped}
                   selectedObjectNames={selectedObjectNames}
                   onContextMenu={props.onContextMenu}

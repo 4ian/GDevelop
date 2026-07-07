@@ -124,7 +124,7 @@ describe('applyVariableChange', () => {
     it('should add property to existing structure', () => {
       // Setup existing structure
       const existingStruct = variablesContainer.insertNew('existingStruct', 0);
-      existingStruct.castTo('Structure');
+      existingStruct.castTo('structure');
       existingStruct.getChild('existingProp').setString('existing');
 
       const result = applyVariableChange({
@@ -186,7 +186,7 @@ describe('applyVariableChange', () => {
     it('should expand array when accessing higher index', () => {
       // Setup existing array with 2 items
       const existingArray = variablesContainer.insertNew('existingArray', 0);
-      existingArray.castTo('Array');
+      existingArray.castTo('array');
       existingArray.pushNew().setString('item0');
       existingArray.pushNew().setString('item1');
 
@@ -220,7 +220,7 @@ describe('applyVariableChange', () => {
     it('should modify existing array item', () => {
       // Setup existing array
       const existingArray = variablesContainer.insertNew('existingArray', 0);
-      existingArray.castTo('Array');
+      existingArray.castTo('array');
       existingArray.pushNew().setString('original');
 
       applyVariableChange({
@@ -542,11 +542,11 @@ describe('applyVariableChange', () => {
     it('replaces a whole structure (root and nested) with new JSON, dropping old fields', () => {
       // Pre-populate a structure with multiple children, including a nested one.
       const root = variablesContainer.insertNew('player', 0);
-      root.castTo('Structure');
+      root.castTo('structure');
       root.getChild('hp').setValue(10);
       root.getChild('name').setString('Hero');
       const stats = root.getChild('stats');
-      stats.castTo('Structure');
+      stats.castTo('structure');
       stats.getChild('strength').setValue(5);
       stats.getChild('agility').setValue(7);
 
@@ -571,7 +571,7 @@ describe('applyVariableChange', () => {
       // should be replaced, siblings at the parent level must be preserved.
       replacedRoot.getChild('hp').setValue(10);
       const newStats = replacedRoot.getChild('stats');
-      newStats.castTo('Structure');
+      newStats.castTo('structure');
       newStats.getChild('strength').setValue(5);
       newStats.getChild('agility').setValue(7);
 
@@ -599,14 +599,14 @@ describe('applyVariableChange', () => {
     it('replaces a whole array (root and nested) with new JSON, dropping old elements', () => {
       // Pre-populate an array with multiple items, plus a nested array.
       const root = variablesContainer.insertNew('inventory', 0);
-      root.castTo('Array');
+      root.castTo('array');
       root.pushNew().setString('Sword');
       root.pushNew().setString('Shield');
       root.pushNew().setString('Potion');
       const nested = variablesContainer.insertNew('matrix', 0);
-      nested.castTo('Structure');
+      nested.castTo('structure');
       const row = nested.getChild('row');
-      row.castTo('Array');
+      row.castTo('array');
       row.pushNew().setValue(1);
       row.pushNew().setValue(2);
       row.pushNew().setValue(3);

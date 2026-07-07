@@ -1983,7 +1983,7 @@ describe('editorFunctions', () => {
       // Pre-populate a structure with a child field.
       const variables = project.getVariables();
       const struct = variables.insertNew('player', 0);
-      struct.castTo('Structure');
+      struct.castTo('structure');
       struct.getChild('hp').setValue(10);
 
       const result = await editorFunctions.add_or_edit_variable.launchFunction({
@@ -2050,7 +2050,7 @@ describe('editorFunctions', () => {
       // Pre-populate a structure with multiple children to ensure none are lost.
       const variables = project.getVariables();
       const struct = variables.insertNew('player', 0);
-      struct.castTo('Structure');
+      struct.castTo('structure');
       struct.getChild('hp').setValue(10);
       struct.getChild('name').setString('Hero');
       struct.getChild('alive').setBool(true);
@@ -2081,7 +2081,7 @@ describe('editorFunctions', () => {
       // Pre-populate an array with multiple items to ensure none are lost.
       const variables = project.getVariables();
       const array = variables.insertNew('inventory', 0);
-      array.castTo('Array');
+      array.castTo('array');
       array.pushNew().setString('Sword');
       array.pushNew().setString('Shield');
       array.pushNew().setString('Potion');
@@ -2224,7 +2224,7 @@ describe('editorFunctions', () => {
         .getObject('Player')
         .getVariables();
       const arrayVariable = playerVariables.insertNew('Variable', 0);
-      arrayVariable.castTo('Array');
+      arrayVariable.castTo('array');
       arrayVariable.pushNew().setValue(10);
       arrayVariable.pushNew().setValue(11);
       arrayVariable.pushNew().setValue(12);
@@ -2295,7 +2295,7 @@ describe('editorFunctions', () => {
         .getObject('Player')
         .getVariables();
       const arrayVariable = objectVariables.insertNew('Variable', 0);
-      arrayVariable.castTo('Array');
+      arrayVariable.castTo('array');
       arrayVariable.pushNew().setValue(10);
       arrayVariable.pushNew().setValue(11);
       arrayVariable.pushNew().setValue(12);

@@ -143,6 +143,12 @@ const hasOwn = (object: any, propertyName: string): boolean =>
 // Monotonic id used to match targeted preview request/response messages.
 let nextTargetedRequestId = 1;
 
+const PREVIEW_CLEANUP_RELAUNCH_ACTION =
+  'save_and_relaunch_preview_paused { timeout_ms: 10000 }';
+
+const closePreviewCommandError =
+  'CLOSE_PREVIEW is not a GDevelop command. For stale preview cleanup, call save_and_relaunch_preview_paused; it saves the project, closes stale previews through the preview launcher, launches one fresh paused debug preview, and waits for runtime readiness.';
+
 // Score a behavior store header against space-separated query tokens. Returns 0
 // for no match; higher is a better match. Every token must match somewhere.
 const scoreBehaviorHeaderMatch = (header: Object, query: string): number => {
@@ -759,7 +765,7 @@ const buildPreviewDiagnostics = ({
       recommendedActions: [
         'increase timeout_ms',
         'retry gdevelop_inspect_running_preview',
-        'close all previews and relaunch a single paused preview',
+        PREVIEW_CLEANUP_RELAUNCH_ACTION,
       ],
     };
   }
@@ -775,7 +781,7 @@ const buildPreviewDiagnostics = ({
       recommendedActions: [
         'preview_health_check',
         'control_preview { action: "focus" }',
-        'control_preview { action: "close", close_all: true } then launch_preview { start_paused: true }',
+        PREVIEW_CLEANUP_RELAUNCH_ACTION,
       ],
     };
   }
@@ -788,7 +794,7 @@ const buildPreviewDiagnostics = ({
     recommendedActions: [
       'increase timeout_ms',
       'focus the preview',
-      'close all previews and relaunch',
+      PREVIEW_CLEANUP_RELAUNCH_ACTION,
     ],
   };
 };
@@ -993,7 +999,7 @@ const captureRunningPreviewState = (
         }),
         note: dumpPayload
           ? undefined
-          : 'No runtime dump was received before the timeout — the preview connected but did not respond. Remediation: close all previews with control_preview { action: "close", close_all: true }, then launch_preview { start_paused: true } and advance with run_frames; or increase timeout_ms. status/logs may still be useful.',
+          : `No runtime dump was received before the timeout - the preview connected but did not respond. Remediation: use ${PREVIEW_CLEANUP_RELAUNCH_ACTION} to save, close stale previews, and launch one paused preview; then advance with run_frames. You can also increase timeout_ms. status/logs may still be useful.`,
       });
     };
 
@@ -1776,8 +1782,7 @@ const requireRunningPreview = (
           ],
           recommendedActions: [
             'use the latestDebuggerId from launch_preview or preview_health_check',
-            'control_preview { action: "close", close_all: true }',
-            'launch_preview { start_paused: true }',
+            PREVIEW_CLEANUP_RELAUNCH_ACTION,
           ],
         },
       },
@@ -1874,8 +1879,7 @@ const previewHealthCheck = async (
     : currentRunning
     ? [
         'control_preview { action: "focus" }',
-        'control_preview { action: "close", close_all: true }',
-        'launch_preview { start_paused: true }',
+        PREVIEW_CLEANUP_RELAUNCH_ACTION,
       ]
     : ['launch_preview'];
   return {
@@ -1906,17 +1910,14 @@ const previewHealthCheck = async (
     recommendedActions,
     recovery:
       currentRunning && currentPreviewIds.length > 1
-        ? [
-            'control_preview { action: "close", close_all: true }',
-            'launch_preview { start_paused: true }',
-          ]
+        ? [PREVIEW_CLEANUP_RELAUNCH_ACTION]
         : [
             'launch_preview { start_paused: true }',
             'control_preview { action: "focus" }',
           ],
     note: responsive
       ? 'The selected preview replied to a debugger status ping.'
-      : 'Use this before screenshots/runtime tests when the debugger channel looks stale. For a connected-but-unresponsive preview, close all previews and relaunch a single paused preview.',
+      : 'Use this before screenshots/runtime tests when the debugger channel looks stale. For a connected-but-unresponsive preview, run save_and_relaunch_preview_paused so cleanup happens through the preview relaunch path.',
   };
 };
 
@@ -2419,14 +2420,13 @@ const buildStaleStateAdvisory = (
                 'reload/reopen the project if extension instruction metadata or generated preview code still looks stale',
               ]
             : []),
-          'control_preview { action: "close", close_all: true }',
-          'launch_preview { start_paused: true }',
+          PREVIEW_CLEANUP_RELAUNCH_ACTION,
           'run runtime checks/screenshots only after relaunching the preview',
         ]
       : [],
     editorPanelsMayBeStale,
     message: previewMayBeStale
-      ? 'The project changed while one or more previews were running. Existing previews do not automatically reload changed events/resources; close and relaunch before final runtime verification.'
+      ? 'The project changed while one or more previews were running. Existing previews do not automatically reload changed events/resources; use save_and_relaunch_preview_paused before final runtime verification.'
       : 'The project changed through MCP. No running preview was detected, but already-open editor panels can still need a refresh if they show old state.',
   };
 };
@@ -3155,7 +3155,7 @@ const launchPreview = async (
           readiness,
           startPaused,
           note:
-            'Attached to an already-connected preview window, but its runtime debugger did not answer getStatus. Close all previews and relaunch a single paused preview.',
+            'Attached to an already-connected preview window, but its runtime debugger did not answer getStatus. Use save_and_relaunch_preview_paused to clean up stale previews and relaunch one paused preview.',
         });
       }
     }
@@ -3242,7 +3242,7 @@ const launchPreview = async (
       readiness,
       startPaused,
       note:
-        'Preview window/debugger id connected, but the runtime did not answer getStatus before the timeout. Treat this preview as not ready; close all previews and relaunch.',
+        'Preview window/debugger id connected, but the runtime did not answer getStatus before the timeout. Treat this preview as not ready; use save_and_relaunch_preview_paused for cleanup and relaunch.',
     });
   }
 
@@ -4785,6 +4785,9 @@ const callMcpTool = async ({
     const commandName =
       args && typeof args.commandName === 'string' ? args.commandName : '';
     if (!commandName) return errorResult('Missing commandName.');
+    if (commandName.trim().toUpperCase() === 'CLOSE_PREVIEW') {
+      return errorResult(closePreviewCommandError);
+    }
     const commandMetadata = commandsList[((commandName: any): CommandName)];
     if (!commandMetadata) {
       return errorResult(`Unknown command: ${commandName}.`);

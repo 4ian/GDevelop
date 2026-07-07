@@ -1685,7 +1685,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                         gameStickyNotesItemId,
                         i18n._(t`Sticky notes`),
                         onOpenStickyNotes,
-                        'res/commentaireadd24.png'
+                        'res/icons_default/sticky_notes_black.svg'
                       )
                     ),
                   ];

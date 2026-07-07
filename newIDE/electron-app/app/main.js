@@ -423,7 +423,9 @@ app.on('ready', function() {
   });
 
   ipcMain.handle('install-cli-in-path', async () => {
-    return installCliInPath(process.execPath);
+    // Inside an AppImage, process.execPath points into a transient mount that
+    // vanishes on quit; APPIMAGE is the stable file path (still breaks if moved).
+    return installCliInPath(process.env.APPIMAGE || process.execPath);
   });
 
   ipcMain.on('set-main-menu', (event, mainMenuTemplate) => {

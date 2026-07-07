@@ -5197,9 +5197,11 @@ const MainFrame = (props: Props): React.MixedElement => {
     canInstallCliInPath: isCliInPathInstallSupported(),
     onInstallCliInPath: async () => {
       const result = await installCliInPath();
+      // Main-process message isn't localized but carries OS-specific nuance
+      // (e.g. "open a new terminal" on Windows) that a generic string would drop.
       _showSnackMessage(
         result.status === 'success'
-          ? i18n._(t`GDevelop CLI is now available from your terminal.`)
+          ? result.message
           : i18n._(t`Couldn't set up the GDevelop CLI: ${result.message}`)
       );
     },

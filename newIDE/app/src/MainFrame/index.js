@@ -273,6 +273,9 @@ import {
   setEditorHotReloadNeeded,
   isEditorHotReloadNeeded,
 } from '../EmbeddedGame/EmbeddedGameFrame';
+import {
+  useActiveEmbeddedGameFrameHoleCount,
+} from '../EmbeddedGame/EmbeddedGameFrameHole';
 import useHomePageSwitch from './useHomePageSwitch';
 import { useNavigationToEvent } from './UseNavigationToEvent';
 import useNavigateFromGlobalSearch from './UseNavigateFromGlobalSearch';
@@ -820,6 +823,8 @@ const MainFrame = (props: Props): React.MixedElement => {
   const [gameEditorMode, setGameEditorMode] = React.useState<
     'embedded-game' | 'instances-editor'
   >('instances-editor');
+  const activeEmbeddedGameFrameHoleCount =
+    useActiveEmbeddedGameFrameHoleCount();
 
   // This is just for testing, to check if we're getting the right state
   // and gives us an idea about the number of re-renders.
@@ -7438,7 +7443,15 @@ const MainFrame = (props: Props): React.MixedElement => {
             {projectManagerNode}
           </ProjectManagerDrawer>
         )}
-        <div className="main-frame-editors-content">
+        <div
+          className="main-frame-editors-content"
+          style={
+            gameEditorMode === 'embedded-game' &&
+            activeEmbeddedGameFrameHoleCount > 0
+              ? { pointerEvents: 'none' }
+              : undefined
+          }
+        >
           <LeaderboardProvider
             gameId={currentProject ? currentProject.getProjectUuid() : ''}
           >

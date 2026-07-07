@@ -18,7 +18,7 @@ const electron = optionalRequire('electron');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
 const fs = optionalRequire('fs');
 
-type ImportExtension = (options: {|
+export type ImportExtension = (options: {|
   i18n: I18nType,
   project: gdProject,
   onWillInstallExtension: (extensionNames: Array<string>) => void,
@@ -27,7 +27,7 @@ type ImportExtension = (options: {|
   skipUserPrompts?: boolean,
 |}) => Promise<Array<string>>;
 
-type SaveProject = (options?: {|
+export type SaveProject = (options?: {|
   skipNewVersionWarning: boolean,
 |}) => Promise<?FileMetadata>;
 

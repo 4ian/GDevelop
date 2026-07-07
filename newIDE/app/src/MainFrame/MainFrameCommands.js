@@ -71,7 +71,7 @@ type CommandHandlers = {|
   onRestartInGameEditor: (reason: string) => void,
   onOpenGlobalSearch: () => void,
   onOpenMemoryTrackerRegistry: () => void,
-  onImportExtension: () => void,
+  onImportExtension: () => Promise<void>,
 |};
 
 const useMainFrameCommands = (handlers: CommandHandlers) => {

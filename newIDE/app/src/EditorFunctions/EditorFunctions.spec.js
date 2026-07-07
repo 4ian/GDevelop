@@ -3700,6 +3700,80 @@ describe('editorFunctions', () => {
     });
   });
 
+  describe('change_scene_properties_layers_effects_groups (layers)', () => {
+    let project: gdProject;
+    let testScene: gdLayout;
+
+    beforeEach(() => {
+      makeTestExtensions(gd);
+      // $FlowFixMe[invalid-constructor]
+      project = new gd.ProjectHelper.createNewGDJSProject();
+      testScene = project.insertNewLayout('TestScene', 0);
+    });
+
+    afterEach(() => {
+      project.delete();
+    });
+
+    it('creates a layer and clearly reports it did not exist', async () => {
+      const result = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            changed_layers: [{ layer_name: 'UI' }],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).toMatchInlineSnapshot(`
+        "Done.
+        Layer \\"UI\\" did not exist in scene \\"TestScene\\": created it at position 1. Layers are now: \\"\\", \\"UI\\". If you meant to modify an existing layer, check its exact name."
+      `);
+      expect(testScene.hasLayerNamed('UI')).toBe(true);
+    });
+
+    it('does not create a layer when renaming a layer that does not exist', async () => {
+      const result = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            changed_layers: [
+              { layer_name: 'Ground', new_layer_name: 'Background' },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(false);
+      expect(result.warnings).toMatchInlineSnapshot(
+        `"Layer \\"Ground\\" not found in scene \\"TestScene\\": no layer was renamed. Existing layers are: \\"\\". To create a new layer, pass its name as \\"layer_name\\"."`
+      );
+      expect(testScene.hasLayerNamed('Ground')).toBe(false);
+      expect(testScene.hasLayerNamed('Background')).toBe(false);
+    });
+
+    it('does not create a layer when deleting a layer that does not exist', async () => {
+      const result = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            changed_layers: [{ layer_name: 'Ground', delete_this_layer: true }],
+          },
+        }
+      );
+
+      expect(result.success).toBe(false);
+      expect(result.warnings).toMatchInlineSnapshot(
+        `"Layer \\"Ground\\" not found in scene \\"TestScene\\": nothing was deleted. Existing layers are: \\"\\"."`
+      );
+      expect(testScene.hasLayerNamed('Ground')).toBe(false);
+    });
+  });
+
   describe('change_scene_properties_layers_effects_groups (layer effects)', () => {
     let project: gdProject;
     let testScene: gdLayout;

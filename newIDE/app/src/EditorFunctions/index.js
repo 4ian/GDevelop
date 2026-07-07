@@ -473,13 +473,23 @@ const makeGenericSuccess = (message: string): EditorFunctionGenericOutput => ({
 });
 
 // Always tell the AI which asset was chosen, so it can verify the result
-// matches the user's request without extra inspection calls.
-const getUsedAssetText = (assetShortHeader: AssetShortHeader | null): string =>
-  assetShortHeader
-    ? ` Used asset "${assetShortHeader.name}" (${
-        assetShortHeader.animationsCount
-      } animation(s)).`
+// matches the user's request without extra inspection calls. The animations
+// count is only real information for sprites and 3D models: other asset types
+// have a constant count, or none at all for particle emitters.
+const getUsedAssetText = (
+  assetShortHeader: AssetShortHeader | null
+): string => {
+  if (!assetShortHeader) return '';
+
+  const hasMeaningfulAnimationsCount =
+    (assetShortHeader.objectType === 'sprite' ||
+      assetShortHeader.objectType === 'Scene3D::Model3DObject') &&
+    typeof assetShortHeader.animationsCount === 'number';
+  const animationsText = hasMeaningfulAnimationsCount
+    ? ` (${assetShortHeader.animationsCount} animation(s))`
     : '';
+  return ` Used asset "${assetShortHeader.name}"${animationsText}.`;
+};
 
 // The base layer's real name is the empty string: never display it as "base"
 // in tool results, as this teaches the AI a layer name that does not exist.

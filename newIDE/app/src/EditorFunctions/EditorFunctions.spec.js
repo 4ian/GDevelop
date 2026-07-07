@@ -11,6 +11,28 @@ import {
 
 const gd: libGDevelop = global.gd;
 
+const fake9PatchAssetShortHeader = {
+  ...fakeAssetShortHeader1,
+  name: 'Yellow Button',
+  objectType: '9patch',
+  animationsCount: 1,
+};
+
+const fake3DModelAssetShortHeader = {
+  ...fakeAssetShortHeader1,
+  name: 'Knight Character',
+  objectType: 'Scene3D::Model3DObject',
+  animationsCount: 8,
+};
+
+// Particle emitter assets have no animations count in the assets database.
+const fakeParticleEmitterAssetShortHeader = {
+  ...fakeAssetShortHeader1,
+  name: 'Fire Sparkles',
+  objectType: 'ParticleSystem::ParticleEmitter',
+  animationsCount: undefined,
+};
+
 // $FlowFixMe[incompatible-type]
 // $FlowFixMe[missing-local-annot]
 // $FlowFixMe[cannot-resolve-name]
@@ -196,6 +218,92 @@ describe('editorFunctions', () => {
         scene: testScene,
         isNewObjectTypeUsed: false,
       });
+    });
+
+    it('creates a new object from a 9patch asset, without showing its constant animations count', async () => {
+      // $FlowFixMe[underconstrained-implicit-instantiation]
+      const onObjectsModifiedOutsideEditor = jest.fn();
+
+      const result: EditorFunctionGenericOutput = await editorFunctions.create_or_replace_object.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          searchAndInstallAsset: async ({
+            objectsContainer,
+            objectName,
+            objectType,
+          }) => {
+            const object = objectsContainer.insertNewObject(
+              project,
+              'TextObject::Text',
+              objectName,
+              objectsContainer.getObjectsCount()
+            );
+            return Promise.resolve({
+              status: 'asset-installed',
+              message: 'Object installed',
+              createdObjects: [object],
+              assetShortHeader: fake9PatchAssetShortHeader,
+              isTheFirstOfItsTypeInProject: false,
+            });
+          },
+          args: {
+            scene_name: 'TestScene',
+            object_type: 'TextObject::Text',
+            object_name: 'MenuButton',
+            search_terms: 'yellow button',
+          },
+          onObjectsModifiedOutsideEditor,
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).toEqual(
+        expect.stringContaining('Used asset "Yellow Button".')
+      );
+      expect(result.message).not.toEqual(expect.stringContaining('animation'));
+    });
+
+    it('creates a new object from an animated 3D model asset, showing its animations count', async () => {
+      // $FlowFixMe[underconstrained-implicit-instantiation]
+      const onObjectsModifiedOutsideEditor = jest.fn();
+
+      const result: EditorFunctionGenericOutput = await editorFunctions.create_or_replace_object.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          searchAndInstallAsset: async ({
+            objectsContainer,
+            objectName,
+            objectType,
+          }) => {
+            const object = objectsContainer.insertNewObject(
+              project,
+              'Sprite',
+              objectName,
+              objectsContainer.getObjectsCount()
+            );
+            return Promise.resolve({
+              status: 'asset-installed',
+              message: 'Object installed',
+              createdObjects: [object],
+              assetShortHeader: fake3DModelAssetShortHeader,
+              isTheFirstOfItsTypeInProject: false,
+            });
+          },
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'Knight',
+            search_terms: 'knight character',
+          },
+          onObjectsModifiedOutsideEditor,
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).toEqual(
+        expect.stringContaining(
+          'Used asset "Knight Character" (8 animation(s)).'
+        )
+      );
     });
 
     it('creates a new object (from scratch, fallback if not found in the asset store)', async () => {
@@ -653,6 +761,51 @@ describe('editorFunctions', () => {
       expect(result.message).toMatchInlineSnapshot(
         `"Replaced scene \\"TestScene\\" object \\"Player\\" with asset store object (same type \\"Sprite\\"). Used asset \\"Dino Doux\\" (6 animation(s))."`
       );
+    });
+
+    it('replaces an existing object with a particle emitter asset, which has no animations count', async () => {
+      // $FlowFixMe[underconstrained-implicit-instantiation]
+      const onObjectsModifiedOutsideEditor = jest.fn();
+
+      const result: EditorFunctionGenericOutput = await editorFunctions.create_or_replace_object.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          searchAndInstallAsset: async ({
+            objectsContainer,
+            objectName,
+            objectType,
+          }) => {
+            const object = objectsContainer.insertNewObject(
+              project,
+              objectType || 'Sprite',
+              objectName,
+              objectsContainer.getObjectsCount()
+            );
+            return Promise.resolve({
+              status: 'asset-installed',
+              message: 'Object installed',
+              createdObjects: [object],
+              // $FlowFixMe[incompatible-type] - the AssetShortHeader type declares animationsCount as required, but particle emitter assets have none in the assets database.
+              assetShortHeader: fakeParticleEmitterAssetShortHeader,
+              isTheFirstOfItsTypeInProject: false,
+            });
+          },
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'Player',
+            replace_existing_object: true,
+            search_terms: 'fire sparkles',
+          },
+          onObjectsModifiedOutsideEditor,
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).toEqual(
+        expect.stringContaining('Used asset "Fire Sparkles".')
+      );
+      expect(result.message).not.toEqual(expect.stringContaining('animation'));
+      expect(result.message).not.toEqual(expect.stringContaining('undefined'));
     });
 
     it('fails when object_type conflicts with an existing object type', async () => {

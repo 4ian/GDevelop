@@ -2963,9 +2963,6 @@ const changeBehaviorProperty: EditorFunction = {
   modifiesProject: true,
 };
 
-/**
- * Lists all object instances in a scene
- */
 const describeInstances: EditorFunction = {
   renderForEditor: ({ args, editorCallbacks }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
@@ -3149,7 +3146,7 @@ const put2dInstances: EditorFunction = {
       'new_instances_count'
     );
     const newInstancesCount =
-      !new_instances_count && existingInstanceIds.length === 0
+      new_instances_count === null && existingInstanceIds.length === 0
         ? 1
         : new_instances_count;
 
@@ -3388,6 +3385,15 @@ const put2dInstances: EditorFunction = {
         injectObjectSizeInfo(eraseResult, { [object_name]: objectSizeInfo });
       return eraseResult;
     } else {
+      // An explicit `new_instances_count: 0` with no instances to modify means
+      // the call has nothing to do. Fail instead of silently creating one
+      // instance, which would end up as an unwanted duplicate.
+      if (new_instances_count === 0 && existingInstanceIds.length === 0) {
+        return makeGenericFailure(
+          'Nothing to do: `new_instances_count` is 0 and no `existing_instance_ids` were given. Pass `new_instances_count` greater than 0 to create instances, or `existing_instance_ids` (from `describe_instances`) to modify existing ones.'
+        );
+      }
+
       const parsedBrushPosition = brush_position
         ? SafeExtractor.parseCommaSeparatedTwoFiniteNumbers(brush_position)
         : null;
@@ -3420,6 +3426,20 @@ const put2dInstances: EditorFunction = {
       if (newInstancesCount === 0 && existingInstanceIds.length === 0) {
         newInstancesCount =
           rowCount && columnCount ? rowCount * columnCount : 1;
+      }
+
+      // Only brushes that give a position to instances can create new ones:
+      // the "none" brush (or an unknown one) would silently pile up new
+      // instances at a default position.
+      const isPlacementBrush =
+        brush_kind === 'point' ||
+        brush_kind === 'line' ||
+        brush_kind === 'grid' ||
+        brush_kind === 'random_in_circle';
+      if (newInstancesCount > 0 && !isPlacementBrush) {
+        return makeGenericFailure(
+          `The "${brush_kind}" brush only modifies existing instances and cannot create new ones. To create instances, use the "point" brush (or "line"/"grid") with \`brush_position\`. To modify existing instances without moving them, use the "none" brush with \`existing_instance_ids\` (from \`describe_instances\`).`
+        );
       }
 
       // As stated in the tool description, `brush_position` can only be
@@ -3602,13 +3622,7 @@ const put2dInstances: EditorFunction = {
             'The brush kind is unknown and was considered to be "none" instead.'
           );
         }
-        // "none" keeps existing instances in place; new ones still need a position.
-        modifiedAndCreatedInstances.forEach(instance => {
-          if (!existingInstanceStates.has(instance)) {
-            instance.setX(brushPosition[0]);
-            instance.setY(brushPosition[1]);
-          }
-        });
+        // The "none" brush keeps existing instances in place.
       }
 
       const instancesSize = SafeExtractor.parseCommaSeparatedTwoFiniteNumbers(
@@ -3670,11 +3684,17 @@ const put2dInstances: EditorFunction = {
             )}`
           );
         }
+        const createdInstanceIds = modifiedAndCreatedInstances
+          .filter(instance => !existingInstanceStates.has(instance))
+          .map(instance => instance.getPersistentUuid().slice(0, 10));
         changes.push(
           `Created ${newInstancesCount} new instance${
             newInstancesCount > 1 ? 's' : ''
-          } of object "${object_name ||
-            ''}" using ${brush_kind} brush at ${brushPosition.join(
+          } of object "${object_name || ''}" (id${
+            createdInstanceIds.length > 1 ? 's' : ''
+          }: ${createdInstanceIds.join(
+            ', '
+          )}) using ${brush_kind} brush at ${brushPosition.join(
             ', '
           )} on ${getLayerNameForMessage(layerName)}${
             attrs.length > 0 ? ` (${attrs.join(', ')})` : ''
@@ -3880,7 +3900,7 @@ const put3dInstances: EditorFunction = {
       'new_instances_count'
     );
     const newInstancesCount =
-      !new_instances_count && existingInstanceIds.length === 0
+      new_instances_count === null && existingInstanceIds.length === 0
         ? 1
         : new_instances_count;
 
@@ -4121,6 +4141,15 @@ const put3dInstances: EditorFunction = {
         injectObjectSizeInfo(eraseResult, { [object_name]: objectSizeInfo });
       return eraseResult;
     } else {
+      // An explicit `new_instances_count: 0` with no instances to modify means
+      // the call has nothing to do. Fail instead of silently creating one
+      // instance, which would end up as an unwanted duplicate.
+      if (new_instances_count === 0 && existingInstanceIds.length === 0) {
+        return makeGenericFailure(
+          'Nothing to do: `new_instances_count` is 0 and no `existing_instance_ids` were given. Pass `new_instances_count` greater than 0 to create instances, or `existing_instance_ids` (from `describe_instances`) to modify existing ones.'
+        );
+      }
+
       const parsedBrushPosition = brush_position
         ? SafeExtractor.parseCommaSeparatedThreeFiniteNumbers(brush_position)
         : null;
@@ -4142,6 +4171,19 @@ const put3dInstances: EditorFunction = {
         new_instances_count !== null ? new_instances_count : 0;
       if (newInstancesCount === 0 && existingInstanceIds.length === 0) {
         newInstancesCount = 1;
+      }
+
+      // Only brushes that give a position to instances can create new ones:
+      // the "none" brush (or an unknown one) would silently pile up new
+      // instances at a default position.
+      const isPlacementBrush =
+        brush_kind === 'point' ||
+        brush_kind === 'line' ||
+        brush_kind === 'random_in_sphere';
+      if (newInstancesCount > 0 && !isPlacementBrush) {
+        return makeGenericFailure(
+          `The "${brush_kind}" brush only modifies existing instances and cannot create new ones. To create instances, use the "point" brush (or "line"/"random_in_sphere") with \`brush_position\`. To modify existing instances without moving them, use the "none" brush with \`existing_instance_ids\` (from \`describe_instances\`).`
+        );
       }
 
       // As stated in the tool description, `brush_position` can only be
@@ -4295,14 +4337,7 @@ const put3dInstances: EditorFunction = {
             'The brush kind is unknown and was considered to be "none" instead.'
           );
         }
-        // "none" keeps existing instances in place; new ones still need a position.
-        modifiedAndCreatedInstances.forEach(instance => {
-          if (!existingInstanceStates.has(instance)) {
-            instance.setX(brushPosition[0]);
-            instance.setY(brushPosition[1]);
-            instance.setZ(brushPosition[2]);
-          }
-        });
+        // The "none" brush keeps existing instances in place.
       }
 
       const instancesSizeArray = SafeExtractor.parseCommaSeparatedThreeFiniteNumbers(
@@ -4362,11 +4397,17 @@ const put3dInstances: EditorFunction = {
             )}`
           );
         }
+        const createdInstanceIds = modifiedAndCreatedInstances
+          .filter(instance => !existingInstanceStates.has(instance))
+          .map(instance => instance.getPersistentUuid().slice(0, 10));
         changes.push(
           `Created ${newInstancesCount} new instance${
             newInstancesCount > 1 ? 's' : ''
-          } of object "${object_name ||
-            ''}" using ${brush_kind} brush at ${brushPosition.join(
+          } of object "${object_name || ''}" (id${
+            createdInstanceIds.length > 1 ? 's' : ''
+          }: ${createdInstanceIds.join(
+            ', '
+          )}) using ${brush_kind} brush at ${brushPosition.join(
             ', '
           )} on ${getLayerNameForMessage(layerName)}${
             attrs.length > 0 ? ` (${attrs.join(', ')})` : ''

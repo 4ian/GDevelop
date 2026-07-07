@@ -2301,8 +2301,8 @@ describe('editorFunctions', () => {
 
       expect(result.success).toBe(true);
       expect(result.message).toEqual(
-        expect.stringContaining(
-          'Created 1 new instance of object "Player" using point brush at 100, 200 on the base layer ("").'
+        expect.stringMatching(
+          /Created 1 new instance of object "Player" \(id: [0-9a-f-]{10}\) using point brush at 100, 200 on the base layer \(""\)\./
         )
       );
     });
@@ -2326,8 +2326,8 @@ describe('editorFunctions', () => {
 
       expect(result.success).toBe(true);
       expect(result.message).toEqual(
-        expect.stringContaining(
-          'Created 2 new instances of object "Player" using point brush at 50, 60 on the base layer ("") (size 64x64, rotation 45°, opacity 128/255, z-order 5, origin at this position, each occupies X 50 to 114, Y 60 to 124).'
+        expect.stringMatching(
+          /Created 2 new instances of object "Player" \(ids: [0-9a-f-]{10}, [0-9a-f-]{10}\) using point brush at 50, 60 on the base layer \(""\) \(size 64x64, rotation 45°, opacity 128\/255, z-order 5, origin at this position, each occupies X 50 to 114, Y 60 to 124\)\./
         )
       );
     });
@@ -2581,19 +2581,94 @@ describe('editorFunctions', () => {
       });
     });
 
-    // Regression test: creating instances with the "none" brush used to leave
-    // every new instance at the origin (0,0) instead of at brush_position.
-    it('creates new instances at brush_position with the none brush', async () => {
-      await putInstances({
-        brush_kind: 'none',
-        brush_position: '200,300',
-        new_instances_count: 2,
+    // The "none" brush is for modifying existing instances only: creating with
+    // it used to silently pile up instances at a default position, leaving
+    // unwanted duplicates.
+    it('fails instead of creating instances with the none brush', async () => {
+      const result = await editorFunctions.put_2d_instances.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          object_name: 'Player',
+          layer_name: '',
+          brush_kind: 'none',
+          brush_position: '200,300',
+          new_instances_count: 2,
+        },
       });
 
-      expect(getInstancePositions(testScene)).toEqual([
-        { x: 200, y: 300 },
-        { x: 200, y: 300 },
-      ]);
+      expect(result.success).toBe(false);
+      expect(result.message).toEqual(
+        expect.stringContaining('cannot create new ones')
+      );
+      expect(getInstancePositions(testScene)).toEqual([]);
+    });
+
+    // A call asking to create nothing and modify nothing used to silently
+    // create one instance at the default scene-center position.
+    it('fails when new_instances_count is 0 and no existing_instance_ids are given', async () => {
+      for (const brush_kind of ['point', 'none']) {
+        const result = await editorFunctions.put_2d_instances.launchFunction({
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'Player',
+            layer_name: '',
+            brush_kind,
+            new_instances_count: 0,
+          },
+        });
+
+        expect(result.success).toBe(false);
+        expect(result.message).toEqual(
+          expect.stringContaining('Nothing to do')
+        );
+        expect(getInstancePositions(testScene)).toEqual([]);
+      }
+    });
+
+    // The none brush with neither ids nor an explicit count used to create one
+    // instance at the default scene-center position.
+    it('fails with the none brush when no existing_instance_ids are given', async () => {
+      const result = await editorFunctions.put_2d_instances.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          object_name: 'Player',
+          layer_name: '',
+          brush_kind: 'none',
+        },
+      });
+
+      expect(result.success).toBe(false);
+      expect(result.message).toEqual(
+        expect.stringContaining('cannot create new ones')
+      );
+      expect(getInstancePositions(testScene)).toEqual([]);
+    });
+
+    // The created id in the message closes the loop "create then adjust":
+    // it must be directly usable as `existing_instance_ids`.
+    it('reports the created instance id, usable to modify it in a follow-up call', async () => {
+      const result = await putInstances({
+        brush_kind: 'point',
+        brush_position: '100,200',
+        new_instances_count: 1,
+      });
+
+      const idMatch = (result.message || '').match(/\(id: ([^)]+)\)/);
+      if (!idMatch) throw new Error('Expected the created id in the message.');
+
+      const moveResult = await putInstances({
+        brush_kind: 'point',
+        brush_position: '300,400',
+        existing_instance_ids: idMatch[1],
+      });
+
+      expect(moveResult.message).toEqual(
+        expect.stringContaining('Repositioned 1 instance')
+      );
+      expect(getInstancePositions(testScene)).toEqual([{ x: 300, y: 400 }]);
     });
 
     // The none brush must still leave existing instances where they are.
@@ -2897,8 +2972,8 @@ describe('editorFunctions', () => {
 
       expect(result.success).toBe(true);
       expect(result.message).toEqual(
-        expect.stringContaining(
-          'Created 1 new instance of object "Player" using point brush at 10, 20, 30 on the base layer ("") (size 8x16x24, rotation (15°, 30°, 45°), origin at this position, each occupies X 10 to 18, Y 20 to 36, Z 30 to 54).'
+        expect.stringMatching(
+          /Created 1 new instance of object "Player" \(id: [0-9a-f-]{10}\) using point brush at 10, 20, 30 on the base layer \(""\) \(size 8x16x24, rotation \(15°, 30°, 45°\), origin at this position, each occupies X 10 to 18, Y 20 to 36, Z 30 to 54\)\./
         )
       );
     });
@@ -3098,6 +3173,74 @@ describe('editorFunctions', () => {
           'None of the specified instance ids were found: does-not-exist'
         )
       );
+    });
+
+    // A call asking to create nothing and modify nothing used to silently
+    // create one instance at the default scene-center position.
+    it('fails when new_instances_count is 0 and no existing_instance_ids are given', async () => {
+      const result = await editorFunctions.put_3d_instances.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          object_name: 'Player',
+          layer_name: '',
+          brush_kind: 'none',
+          new_instances_count: 0,
+        },
+      });
+
+      expect(result.success).toBe(false);
+      expect(result.message).toEqual(expect.stringContaining('Nothing to do'));
+      expect(getInstancePositions(testScene)).toEqual([]);
+    });
+
+    // The "none" brush is for modifying existing instances only: creating with
+    // it used to silently pile up instances at a default position, leaving
+    // unwanted duplicates.
+    it('fails instead of creating instances with the none brush', async () => {
+      const result = await editorFunctions.put_3d_instances.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          object_name: 'Player',
+          layer_name: '',
+          brush_kind: 'none',
+          brush_position: '10,20,30',
+          new_instances_count: 6,
+        },
+      });
+
+      expect(result.success).toBe(false);
+      expect(result.message).toEqual(
+        expect.stringContaining('cannot create new ones')
+      );
+      expect(getInstancePositions(testScene)).toEqual([]);
+    });
+
+    // The created id in the message closes the loop "create then adjust":
+    // it must be directly usable as `existing_instance_ids`.
+    it('reports the created instance id, usable to modify it in a follow-up call', async () => {
+      const result = await putInstances({
+        brush_kind: 'point',
+        brush_position: '10,20,30',
+        new_instances_count: 1,
+      });
+
+      const idMatch = (result.message || '').match(/\(id: ([^)]+)\)/);
+      if (!idMatch) throw new Error('Expected the created id in the message.');
+
+      const moveResult = await putInstances({
+        brush_kind: 'point',
+        brush_position: '40,50,60',
+        existing_instance_ids: idMatch[1],
+      });
+
+      expect(moveResult.message).toEqual(
+        expect.stringContaining('Repositioned 1 instance')
+      );
+      expect(getInstancePositions(testScene)).toEqual([
+        { x: 40, y: 50, z: 60 },
+      ]);
     });
 
     it('erases an existing instance by id', async () => {

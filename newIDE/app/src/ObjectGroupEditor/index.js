@@ -51,21 +51,21 @@ const ObjectGroupEditor = ({
   );
 
   const renderExplanation = () => {
-    let type = undefined;
+    let type = null;
     if (groupObjectNames.length === 0) {
       return null;
     }
-    groupObjectNames.forEach(objectName => {
-      const objectType = projectScopedContainersAccessor
-        .get()
-        .getObjectsContainersList()
-        .getTypeOfObject(objectName);
-      // $FlowFixMe[invalid-compare]
-      // $FlowFixMe[incompatible-type]
-      if (type === undefined || objectType === type) type = objectType;
-      // $FlowFixMe[incompatible-type]
-      else type = '';
-    });
+    const objectsContainersList = projectScopedContainersAccessor
+      .get()
+      .getObjectsContainersList();
+    for (const objectName of groupObjectNames) {
+      const objectType = objectsContainersList.getTypeOfObject(objectName);
+      if (type === null || objectType === type) {
+        type = objectType;
+      } else {
+        type = '';
+      }
+    }
 
     const message =
       type === '' ? (

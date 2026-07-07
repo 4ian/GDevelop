@@ -237,6 +237,9 @@ bool Variable::InsertAtIndex(const gd::Variable& variable, const size_t index) {
   if (type != Type::Array) return false;
   hasMixedValues = false;
   auto newVariable = std::make_shared<gd::Variable>(variable);
+  // The "mixed values" marker is an editor-only, display state: a variable
+  // stored in a container must always have an actual value.
+  newVariable->ClearMixedValues();
   if (index < childrenArray.size()) {
     childrenArray.insert(childrenArray.begin() + index, newVariable);
   } else {
@@ -252,6 +255,9 @@ bool Variable::InsertChild(const gd::String& name,
   }
   hasMixedValues = false;
   children[name] = std::make_shared<gd::Variable>(variable);
+  // The "mixed values" marker is an editor-only, display state: a variable
+  // stored in a container must always have an actual value.
+  children[name]->ClearMixedValues();
   return true;
 };
 
@@ -492,6 +498,21 @@ bool Variable::operator!=(const gd::Variable &variable) const {
 void Variable::MarkAsMixedValues() {
   hasMixedValues = true;
   ClearChildren();
+}
+
+void Variable::ClearMixedValues() {
+  hasMixedValues = false;
+  if (type == Type::MixedTypes) {
+    // A variable with entirely mixed types has no meaningful value:
+    // default to a number.
+    CastTo(Type::Number);
+  }
+  for (auto& it : children) {
+    it.second->ClearMixedValues();
+  }
+  for (auto& child : childrenArray) {
+    child->ClearMixedValues();
+  }
 }
 
 }  // namespace gd

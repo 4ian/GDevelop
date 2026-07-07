@@ -190,6 +190,32 @@ TEST_CASE("ObjectSerialization", "[common]") {
     CheckSpriteConfiguration(readProject);
   }
 
+  SECTION("Clean up the mixed values marker wrongly saved on object variables") {
+    gd::Platform platform;
+    gd::Project writtenProject;
+    auto &object = SetupProjectWithSprite(writtenProject, platform);
+    object.GetVariables().InsertNew("MyVariable").SetValue(123);
+    // Simulate a project that was corrupted by an editor version which
+    // wrongly persisted the editor-only "mixed values" marker on an object
+    // variable.
+    object.GetVariables().Get("MyVariable").MarkAsMixedValues();
+
+    SerializerElement projectElement;
+    writtenProject.SerializeTo(projectElement);
+
+    gd::Project readProject;
+    readProject.AddPlatform(platform);
+    readProject.UnserializeFrom(projectElement);
+
+    auto &readVariable = readProject.GetLayout("Scene")
+                             .GetObjects()
+                             .GetObject("MyObject")
+                             .GetVariables()
+                             .Get("MyVariable");
+    REQUIRE(readVariable.HasMixedValues() == false);
+    REQUIRE(readVariable.GetValue() == 123);
+  }
+
   SECTION("Clone a sprite object") {
     gd::Platform platform;
     gd::Project project;

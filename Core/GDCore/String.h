@@ -531,6 +531,11 @@ public:
     String CapitalizeFirstLetter() const;
 
     /**
+     * \brief Returns the string with the first letter in lower case.
+     */
+    String UncapitalizeFirstLetter() const;
+
+    /**
      * \brief Searches a string for a specified substring and returns a new string where all occurrences of this substring is replaced.
      * \param search The string that will be replaced by the new string.
      * \param replacement The value to replace the old substring with.

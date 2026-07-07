@@ -1498,7 +1498,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
 
   obj.AddExpression("Distance",
                     _("Distance between two objects"),
-                    _("Distance between two objects"),
+                    _("Distance between two objects, on the X/Y plane only (Z "
+                      "is ignored)"),
                     _("Position"),
                     "res/conditions/distance.png")
       .AddParameter("object", _("Object"))
@@ -1506,7 +1507,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
 
   obj.AddExpression("SqDistance",
                     _("Square distance between two objects"),
-                    _("Square distance between two objects"),
+                    _("Square distance between two objects, on the X/Y plane "
+                      "only (Z is ignored)"),
                     _("Position"),
                     "res/conditions/distance.png")
       .AddParameter("object", _("Object"))
@@ -1851,6 +1853,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("objectList", _("Object 2"))
       .AddParameter("expression", _("Distance"))
       .AddCodeOnlyParameter("conditionInverted", "")
+      .SetHint(
+          "The distance is measured on the X/Y plane only: Z is ignored. For "
+          "3D games, also compare the Z difference between the objects, or "
+          "compute the full 3D distance in an expression.")
       .MarkAsSimple();
 
   extension

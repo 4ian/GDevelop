@@ -20,6 +20,7 @@ const fakeResourceManagementProps: ResourceManagementProps = {
   canInstallPrivateAsset: () => false,
   onNewResourcesAdded: () => {},
   onResourceUsageChanged: () => {},
+  resourceCustomPropertyConfigs: [],
 };
 
 export default fakeResourceManagementProps;

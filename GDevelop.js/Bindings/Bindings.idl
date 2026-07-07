@@ -366,7 +366,7 @@ interface ObjectGroup {
     void UnserializeFrom([Const, Ref] SerializerElement element);
 };
 
-interface ObjectVariableHelper {
+interface ObjectRefactorer {
     [Value] VariablesContainer STATIC_MergeVariableContainers(
         [Const, Ref] ObjectsContainersList objectsContainersList,
         [Const, Ref] ObjectGroup objectGroup);
@@ -378,6 +378,15 @@ interface ObjectVariableHelper {
         [Ref] EventsBasedObject eventsBasedObject,
         [Const] DOMString objectName,
         [Const, Ref] VariablesChangeset changeset);
+    void STATIC_FillMissingGroupVariablesToObject(
+        [Ref] gdObject obj,
+        [ Const, Ref ] VariablesContainer groupVariablesContainer);
+    void STATIC_FillMissingGroupBehaviorToObject(
+        [Ref] ObjectsContainer globalObjectsContainer,
+        [Ref] ObjectsContainer objectsContainer,
+        [Ref] gdObject obj,
+        [ Const, Ref ] ObjectGroup objectGroup,
+        [Const] DOMString behaviorName);
 };
 
 interface EventsBasedObjectVariantHelper {
@@ -1634,6 +1643,7 @@ interface SerializerElement {
     // Use the element as an object ("associative array", "dictionary") or array:
     [Ref] SerializerElement AddChild([Const] DOMString str);
     [Ref] SerializerElement GetChild([Const] DOMString str);
+    [Ref] SerializerElement GetOrCreateChild([Const] DOMString str);
     void WRAPPED_SetChild([Const] DOMString str, [Const, Ref] SerializerElement element);
     boolean HasChild([Const] DOMString str);
 
@@ -3033,22 +3043,13 @@ interface InstructionValidator {
     [Const, Ref] ProjectScopedContainers projectScopedContainers,
     [Const, Ref] Instruction instruction,
     [Const, Ref] InstructionMetadata metadata,
-    long parameterIndex,
-    [Const] DOMString value);
+    long parameterIndex);
   boolean STATIC_IsParameterValid(
     [Const, Ref] Platform platform,
     [Const, Ref] ProjectScopedContainers projectScopedContainers,
     [Const, Ref] Instruction instruction,
     [Const, Ref] InstructionMetadata metadata,
-    long parameterIndex,
-    [Const] DOMString value);
-  boolean STATIC_HasDeprecationWarnings(
-    [Const, Ref] Platform platform,
-    [Const, Ref] ProjectScopedContainers projectScopedContainers,
-    [Const, Ref] Instruction instruction,
-    [Const, Ref] InstructionMetadata metadata,
-    long parameterIndex,
-    [Const] DOMString value);
+    long parameterIndex);
 };
 
 interface ObjectTools {

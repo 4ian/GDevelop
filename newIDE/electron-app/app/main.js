@@ -69,7 +69,7 @@ let windowCounter = 0; // Counter for creating unique session partitions
 // so have to ignore one more).
 const argsParserOptions = {
   boolean: ['dev-tools', 'disable-update-check', 'keep-open'],
-  string: ['_', 'run-command'],
+  string: ['_', 'run-command', 'cmd-args'],
 };
 const args = parseArgs(process.argv.slice(isDev ? 2 : 1), argsParserOptions);
 
@@ -829,7 +829,7 @@ app.on('ready', function() {
           const escapedPath = projectPath.replace(/'/g, "'\\''");
           const shellCommand = keepOpen
             ? `cd '${escapedPath}' && ${npmCommand}`
-            : `cd '${escapedPath}' && ${npmCommand} && exit || echo "${NPM_SCRIPT_COMMAND_FAILED_MESSAGE}"`;
+            : `cd '${escapedPath}' && ${npmCommand} && exit || echo '${NPM_SCRIPT_COMMAND_FAILED_MESSAGE}'`;
           const script = `tell application "Terminal" to do script "${shellCommand.replace(
             /"/g,
             '\\"'

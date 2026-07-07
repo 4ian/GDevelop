@@ -197,7 +197,9 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           onRequestClose={props.onRequestClose}
           onApply={props.onApply}
           ref={field}
-          onOpenDialog={canObjectDeclareVariable ? setEditorOpen : null}
+          openVariableEditorDialog={
+            canObjectDeclareVariable ? setEditorOpen : null
+          }
           globalObjectsContainer={props.globalObjectsContainer}
           objectsContainer={props.objectsContainer}
           projectScopedContainersAccessor={projectScopedContainersAccessor}
@@ -210,6 +212,7 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           onInstructionTypeChanged={onInstructionTypeChanged}
           getVariableSourceFromIdentifier={getVariableSourceFromIdentifier}
           editEventsFunctionParameter={null}
+          openEventsBasedEntityPropertyEditorDialog={null}
         />
         {editorOpen &&
           project &&

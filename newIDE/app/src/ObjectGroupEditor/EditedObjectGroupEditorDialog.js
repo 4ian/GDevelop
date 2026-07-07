@@ -65,7 +65,7 @@ const EditedObjectGroupEditorDialog = ({
     // The VariablesContainer is returned by value.
     // Thus, the same instance is reused every time.
     () =>
-      gd.ObjectVariableHelper.mergeVariableContainers(
+      gd.ObjectRefactorer.mergeVariableContainers(
         projectScopedContainersAccessor.get().getObjectsContainersList(),
         group
       )
@@ -107,7 +107,7 @@ const EditedObjectGroupEditorDialog = ({
     const { eventsBasedObject } = projectScopedContainersAccessor._scope;
     if (eventsBasedObject) {
       for (const objectName of group.getAllObjectsNames().toJSArray()) {
-        gd.ObjectVariableHelper.applyChangesToVariants(
+        gd.ObjectRefactorer.applyChangesToVariants(
           eventsBasedObject,
           objectName,
           changeset

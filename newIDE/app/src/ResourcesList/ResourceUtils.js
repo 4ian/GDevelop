@@ -239,6 +239,74 @@ export const updateResourceJsonMetadata = (
   resource.setMetadata(JSON.stringify(newMetadata));
 };
 
+// Key under which the project-configurable custom resource properties
+// (defined in gdevelop-settings.yaml) are stored inside the resource metadata
+// JSON. Kept separate from other metadata keys (e.g. localFilePath) to avoid
+// collisions.
+export const RESOURCE_CUSTOM_PROPERTIES_METADATA_KEY =
+  'resourceCustomProperties';
+
+export type ResourceCustomPropertyValue = string | number | boolean;
+
+/**
+ * Returns the map of custom property values stored on a resource, or an empty
+ * object if none are set or the metadata is malformed.
+ */
+export const getResourceCustomProperties = (
+  resource: gdResource
+): { [string]: ResourceCustomPropertyValue } => {
+  const metadataAsString = resource.getMetadata();
+  if (!metadataAsString) return {};
+  try {
+    const metadata = JSON.parse(metadataAsString);
+    if (
+      metadata &&
+      typeof metadata === 'object' &&
+      metadata[RESOURCE_CUSTOM_PROPERTIES_METADATA_KEY] &&
+      typeof metadata[RESOURCE_CUSTOM_PROPERTIES_METADATA_KEY] === 'object'
+    ) {
+      return metadata[RESOURCE_CUSTOM_PROPERTIES_METADATA_KEY];
+    }
+  } catch (error) {
+    // Malformed metadata: treat as if no custom properties were set.
+  }
+  return {};
+};
+
+/**
+ * Returns the stored value for a single custom property, falling back to the
+ * provided default value (typically from the YAML schema) if it is not set.
+ */
+export const getResourceCustomPropertyValue = (
+  resource: gdResource,
+  name: string,
+  defaultValue: ?ResourceCustomPropertyValue
+): ?ResourceCustomPropertyValue => {
+  const resourceCustomProperties = getResourceCustomProperties(resource);
+  if (resourceCustomProperties[name] !== undefined) {
+    return resourceCustomProperties[name];
+  }
+  return defaultValue == null ? null : defaultValue;
+};
+
+/**
+ * Sets (or merges) a single custom property value on a resource, storing it in
+ * the resource metadata JSON under RESOURCE_CUSTOM_PROPERTIES_METADATA_KEY.
+ */
+export const setResourceCustomPropertyValue = (
+  resource: gdResource,
+  name: string,
+  value: ResourceCustomPropertyValue
+) => {
+  const resourceCustomProperties = {
+    ...getResourceCustomProperties(resource),
+    [name]: value,
+  };
+  updateResourceJsonMetadata(resource, {
+    [RESOURCE_CUSTOM_PROPERTIES_METADATA_KEY]: resourceCustomProperties,
+  });
+};
+
 export const isFetchableUrl = (url: string): boolean => {
   return (
     url.startsWith('http://') ||

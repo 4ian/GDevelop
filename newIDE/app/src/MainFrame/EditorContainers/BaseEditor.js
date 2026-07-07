@@ -24,6 +24,15 @@ import { type ObjectWithContext } from '../../ObjectsList/EnumerateObjects';
 import { type CreateProjectResult } from '../../Utils/UseCreateProject';
 import { type OpenAskAiOptions } from '../../AiGeneration/Utils';
 import type { NavigateToEventFromGlobalSearchParams } from '../../Utils/Search';
+import type {
+  SceneEventsOutsideEditorChanges,
+  InstancesOutsideEditorChanges,
+  ObjectsOutsideEditorChanges,
+  ObjectGroupsOutsideEditorChanges,
+  ProjectItemRenamedOutsideEditorChanges,
+  WillDeleteSceneChanges,
+  WillDeleteObjectChanges,
+} from '../../EditorFunctions/OutsideEditorChanges';
 
 export type EditorContainerExtraProps = {|
   // Events function extension editor
@@ -36,24 +45,6 @@ export type EditorContainerExtraProps = {|
 
   // Ask AI
   continueProcessingFunctionCallsOnMount?: boolean,
-|};
-
-export type SceneEventsOutsideEditorChanges = {|
-  scene: gdLayout,
-  newOrChangedAiGeneratedEventIds: Set<string>,
-|};
-
-export type InstancesOutsideEditorChanges = {|
-  scene: gdLayout,
-|};
-
-export type ObjectsOutsideEditorChanges = {|
-  scene: gdLayout,
-  isNewObjectTypeUsed: boolean,
-|};
-
-export type ObjectGroupsOutsideEditorChanges = {|
-  scene: gdLayout,
 |};
 
 export type RenderEditorContainerProps = {|
@@ -242,6 +233,11 @@ export type RenderEditorContainerProps = {|
   onObjectGroupsModifiedOutsideEditor: (
     changes: ObjectGroupsOutsideEditorChanges
   ) => void,
+  onProjectItemRenamedOutsideEditor: (
+    changes: ProjectItemRenamedOutsideEditorChanges
+  ) => void,
+  onWillDeleteScene: (changes: WillDeleteSceneChanges) => Promise<void>,
+  onWillDeleteObject: (changes: WillDeleteObjectChanges) => void,
 
   // Events editing
   onSceneEventsModifiedOutsideEditor: (

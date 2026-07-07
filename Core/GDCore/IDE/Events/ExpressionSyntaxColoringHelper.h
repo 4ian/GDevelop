@@ -207,7 +207,7 @@ protected:
     } else if (gd::ValueTypeMetadata::IsTypeLegacyPreScopedVariable(type)) {
       AddColoration(
           gd::ExpressionColorationDescription::ColorationKind::Variable,
-          node.location.GetStartPosition(), node.location.GetStartPosition());
+          node.location.GetStartPosition(), node.location.GetEndPosition());
 
     } else {
       // Might be:

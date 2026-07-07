@@ -7,6 +7,7 @@ import {
   checkRequiredExtensionsUpdate,
   getRequiredExtensions,
   getExtensionHeader,
+  ensureExtensionsRegistryLoaded,
 } from '../AssetStore/ExtensionStore/InstallExtension';
 import { type ExtensionShortHeader } from '../Utils/GDevelopServices/Extension';
 
@@ -28,6 +29,7 @@ export const useEnsureExtensionInstalled = ({
 |}): _UseEnsureExtensionInstalledReturnType => {
   const {
     translatedExtensionShortHeadersByName: extensionShortHeadersByName,
+    fetchExtensionsAndFilters,
   } = React.useContext(ExtensionStoreContext);
   const installExtension = useInstallExtension();
 
@@ -42,8 +44,21 @@ export const useEnsureExtensionInstalled = ({
         if (project.getCurrentPlatform().isExtensionLoaded(extensionName))
           return;
 
+        // Warm the context for following installs, and get a loaded registry
+        // (fetched directly if it was never loaded in this session).
+        fetchExtensionsAndFilters();
+        const extensionShortHeadersByNameToUse = await ensureExtensionsRegistryLoaded(
+          extensionShortHeadersByName
+        );
+
+        if (!extensionShortHeadersByNameToUse[extensionName]) {
+          throw new Error(
+            `Extension "${extensionName}" does not exist in the extension registry. Use a different extension or behavior.`
+          );
+        }
+
         const extensionShortHeader = getExtensionHeader(
-          extensionShortHeadersByName,
+          extensionShortHeadersByNameToUse,
           extensionName
         );
         const extensionShortHeaders: Array<ExtensionShortHeader> = [
@@ -58,7 +73,7 @@ export const useEnsureExtensionInstalled = ({
           {
             requiredExtensions,
             project,
-            extensionShortHeadersByName,
+            extensionShortHeadersByName: extensionShortHeadersByNameToUse,
           }
         );
         await installExtension({
@@ -71,7 +86,12 @@ export const useEnsureExtensionInstalled = ({
           reason: 'extension',
         });
       },
-      [extensionShortHeadersByName, installExtension, project]
+      [
+        extensionShortHeadersByName,
+        fetchExtensionsAndFilters,
+        installExtension,
+        project,
+      ]
     ),
   };
 };

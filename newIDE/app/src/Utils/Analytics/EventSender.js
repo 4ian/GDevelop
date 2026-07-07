@@ -321,11 +321,13 @@ export const sendNewGameCreated = ({
   exampleSlug,
   exampleCompositeSlug,
   creationSource,
+  projectUuid,
 }: {|
   exampleUrl: string,
   exampleSlug: string,
   exampleCompositeSlug: string,
   creationSource: NewProjectCreationSource,
+  projectUuid: string,
 |}) => {
   recordEvent('new_game_creation', {
     platform: 'GDevelop JS Platform', // Hardcoded here for now
@@ -333,7 +335,19 @@ export const sendNewGameCreated = ({
     exampleSlug,
     exampleCompositeSlug,
     creationSource,
+    projectUuid,
   });
+};
+
+export const sendProjectOpened = (metadata: {|
+  projectUuid: string,
+  storageProviderName: string,
+  // Milliseconds since the project file was last modified, if known. Lets analytics
+  // distinguish "came back after a long time" from "reopened right away". Null when
+  // the storage provider does not expose a last-modified date.
+  timeSinceLastModified: number | null,
+|}) => {
+  recordEvent('project-opened', metadata);
 };
 
 export const sendTutorialOpened = (tutorialName: string) => {
@@ -681,6 +695,7 @@ const canSendPreviewStartedForQuickCustomization = makeCanSendEvent({
 });
 
 export const sendPreviewStarted = (metadata: {|
+  projectUuid: string,
   quickCustomizationGameId: string | null,
   networkPreview: boolean,
   numberOfWindows: number,

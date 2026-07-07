@@ -4,6 +4,7 @@ import * as React from 'react';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
 import {
   getExtension,
+  getExtensionsRegistry,
   type ExtensionShortHeader,
   type BehaviorShortHeader,
   type SerializedExtension,
@@ -42,6 +43,35 @@ export type RequiredExtensionInstallation = {|
   safeToUpdateExtensions: Array<ExtensionShortHeader>,
   isGDevelopUpdateNeeded: boolean,
 |};
+
+// Returns the given registry if already loaded, otherwise fetches it directly
+// (with retry) so callers can tell a network issue apart from a missing extension.
+export const ensureExtensionsRegistryLoaded = async (extensionShortHeadersByName: {
+  [name: string]: ExtensionShortHeader,
+}): Promise<{ [name: string]: ExtensionShortHeader }> => {
+  if (Object.keys(extensionShortHeadersByName).length > 0) {
+    return extensionShortHeadersByName;
+  }
+
+  let extensionsRegistry;
+  try {
+    extensionsRegistry = await retryIfFailed({ times: 3 }, () =>
+      getExtensionsRegistry()
+    );
+  } catch (error) {
+    throw new Error(
+      `The extension registry could not be loaded (${
+        error.message
+      }). This is likely a temporary network issue - try again.`
+    );
+  }
+
+  const freshHeadersByName: { [name: string]: ExtensionShortHeader } = {};
+  extensionsRegistry.headers.forEach(header => {
+    freshHeadersByName[header.name] = header;
+  });
+  return freshHeadersByName;
+};
 
 export const getExtensionHeader = (
   extensionShortHeadersByName: {
@@ -504,6 +534,8 @@ export const useImportExtension = (): (({
   onExtensionInstalled: (extensionNames: Array<string>) => void,
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   project: gdProject,
+  filePaths?: Array<string>,
+  skipUserPrompts?: boolean,
 }) => Promise<Array<string>>) => {
   const { showConfirmation, showAlert } = useAlertDialog();
   const eventsFunctionsExtensionsState = React.useContext(
@@ -519,18 +551,25 @@ export const useImportExtension = (): (({
     project,
     onWillInstallExtension,
     onExtensionInstalled,
+    filePaths,
+    skipUserPrompts,
   }: {|
     i18n: I18nType,
     project: gdProject,
     onWillInstallExtension: (extensionNames: Array<string>) => void,
     onExtensionInstalled: (extensionNames: Array<string>) => void,
+    filePaths?: Array<string>,
+    skipUserPrompts?: boolean,
   |}): Promise<Array<string>> => {
     const eventsFunctionsExtensionOpener = eventsFunctionsExtensionsState.getEventsFunctionsExtensionOpener();
     if (!eventsFunctionsExtensionOpener) {
       return [];
     }
     try {
-      const pathOrUrls = await eventsFunctionsExtensionOpener.chooseEventsFunctionExtensionFile();
+      const pathOrUrls =
+        filePaths && filePaths.length > 0
+          ? filePaths
+          : await eventsFunctionsExtensionOpener.chooseEventsFunctionExtensionFile();
       if (pathOrUrls.length === 0) {
         return [];
       }
@@ -555,13 +594,15 @@ export const useImportExtension = (): (({
           project.hasEventsFunctionsExtensionNamed(extensionName)
         )
       ) {
-        const answer = await showConfirmation({
-          title: t`Replace existing extension`,
-          message: t`An extension with this name already exists in the project. Importing this extension will replace it.`,
-          confirmButtonLabel: `Replace`,
-        });
-        if (!answer) {
-          return [];
+        if (!skipUserPrompts) {
+          const answer = await showConfirmation({
+            title: t`Replace existing extension`,
+            message: t`An extension with this name already exists in the project. Importing this extension will replace it.`,
+            confirmButtonLabel: `Replace`,
+          });
+          if (!answer) {
+            return [];
+          }
         }
       } else {
         let hasConflictWithBuiltInExtension = false;
@@ -574,6 +615,11 @@ export const useImportExtension = (): (({
           }
         });
         if (hasConflictWithBuiltInExtension) {
+          if (skipUserPrompts) {
+            throw new Error(
+              'The extension cannot be imported because it has the same name as a built-in extension.'
+            );
+          }
           await showAlert({
             title: t`Invalid name`,
             message: t`The extension can't be imported because it has the same name as a built-in extension.`,
@@ -620,6 +666,24 @@ export const useImportExtension = (): (({
           )
       );
 
+      if (skipUserPrompts) {
+        if (requiredExtensionInstallation.isGDevelopUpdateNeeded) {
+          throw new Error(
+            'Could not install the extension: please upgrade the editor to the latest version.'
+          );
+        }
+        await installRequiredExtensions({
+          requiredExtensionInstallation,
+          shouldUpdateExtension: true,
+          eventsFunctionsExtensionsState,
+          project,
+          onWillInstallExtension,
+          onExtensionInstalled,
+          importedSerializedExtensions,
+        });
+        return importedExtensionNames;
+      }
+
       const wasExtensionInstalled = await installExtension({
         project,
         requiredExtensionInstallation,
@@ -634,6 +698,9 @@ export const useImportExtension = (): (({
       }
       return importedExtensionNames;
     } catch (rawError) {
+      if (skipUserPrompts) {
+        throw rawError;
+      }
       showErrorBox({
         message: i18n._(
           t`An error happened while loading this extension. Please check that it is a proper extension file and compatible with this version of GDevelop`

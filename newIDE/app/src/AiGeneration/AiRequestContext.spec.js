@@ -7,6 +7,7 @@ import {
   fetchAiSettings,
   getAiRequests,
   type AiRequest,
+  type AiRequestUserMessage,
 } from '../Utils/GDevelopServices/Generation';
 import { type AuthenticatedUser } from '../Profile/AuthenticatedUserContext';
 import AuthenticatedUserContext, {
@@ -16,6 +17,7 @@ import {
   AiRequestContext,
   AiRequestProvider,
   mergeIncrementalAiRequest,
+  useAiRequestHistory,
   type AiRequestContextState,
 } from './AiRequestContext';
 import { act } from 'react-dom/test-utils';
@@ -553,5 +555,76 @@ describe('mergeIncrementalAiRequest', () => {
       message('c'),
     ]);
     expect(mergeIncrementalAiRequest(previous, fetched, 'b')).toBe(fetched);
+  });
+});
+
+describe('useAiRequestHistory', () => {
+  const userMessage = (text: string): AiRequestUserMessage => ({
+    type: 'message',
+    status: 'completed',
+    role: 'user',
+    content: [{ type: 'user_request', status: 'completed', text }],
+  });
+
+  const requestWithUserMessages = (
+    id: string,
+    updatedAt: string,
+    texts: Array<string>,
+    parentAiRequestId?: string | null
+  ): AiRequest => ({
+    ...makeAiRequest(id, 'ready', parentAiRequestId),
+    updatedAt,
+    output: texts.map(userMessage),
+  });
+
+  const renderHistoryHook = (aiRequests: { [string]: AiRequest }) => {
+    const hookResultRef: { current: any } = { current: null };
+    const HookCapture = () => {
+      hookResultRef.current = useAiRequestHistory(({ aiRequests }: any));
+      return null;
+    };
+    act(() => {
+      TestRenderer.create(<HookCapture />);
+    });
+    return hookResultRef;
+  };
+
+  const navigateUp = (hookResultRef: { current: any }) => {
+    let latestText = '';
+    act(() => {
+      hookResultRef.current.handleNavigateHistory({
+        direction: 'up',
+        currentText: '',
+        onChangeText: text => {
+          latestText = text;
+        },
+      });
+    });
+    return latestText;
+  };
+
+  it('browses only messages sent by the user, skipping sub-agent requests', () => {
+    const hookResultRef = renderHistoryHook({
+      'orchestrator-1': requestWithUserMessages(
+        'orchestrator-1',
+        '2024-01-01T00:00:00.000Z',
+        ['Make a platformer game']
+      ),
+      // A sub-agent request: its "user" messages come from the orchestrator.
+      'sub-agent-1': requestWithUserMessages(
+        'sub-agent-1',
+        '2024-01-01T00:01:00.000Z',
+        ['Create the player object with animations'],
+        'orchestrator-1'
+      ),
+      'chat-1': requestWithUserMessages('chat-1', '2024-01-01T00:02:00.000Z', [
+        'Add coins to collect',
+      ]),
+    });
+
+    expect(navigateUp(hookResultRef)).toBe('Add coins to collect');
+    expect(navigateUp(hookResultRef)).toBe('Make a platformer game');
+    // No more history: the sub-agent request message must not appear.
+    expect(navigateUp(hookResultRef)).toBe('');
   });
 });

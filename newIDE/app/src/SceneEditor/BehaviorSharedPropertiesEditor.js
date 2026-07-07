@@ -33,6 +33,7 @@ export default class BehaviorSharedPropertiesEditor extends React.Component<Prop
         behavior.updateProperty(name, value);
       },
       layersContainer,
+      shouldDisabledFieldsWithMixedValues: false,
     });
 
     return (

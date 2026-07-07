@@ -555,6 +555,11 @@ namespace gdjs {
     }
 
     resumeAllActiveSounds(): void {
+      // Mobile OSes (notably iOS) suspend the WebAudio context in the background and never resume it on their own, which would leave every sound silent on return.
+      const audioContext = Howler.ctx;
+      if (audioContext) {
+        audioContext.resume().catch(() => {});
+      }
       try {
         for (let i = 0; i < this._pausedSounds.length; i++) {
           const sound = this._pausedSounds[i];

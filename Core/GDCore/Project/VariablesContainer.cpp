@@ -86,6 +86,13 @@ Variable& VariablesContainer::Insert(const gd::String& name,
                                      const gd::Variable& variable,
                                      std::size_t position) {
   auto newVariable = std::make_shared<gd::Variable>(variable);
+  // The "mixed values" marker is an editor-only, display state used by the
+  // temporary containers merging the variables of several objects (see
+  // `gd::ObjectRefactorer::MergeVariableContainers`). A variable inserted in
+  // a container must always have an actual value, otherwise the marker could
+  // end up being persisted in the project - and a variable of a single object
+  // or instance would wrongly show "Mixed values" in the editor.
+  newVariable->ClearMixedValues();
   if (position < variables.size()) {
     variables.insert(variables.begin() + position,
                      std::make_pair(name, newVariable));
@@ -177,6 +184,12 @@ void VariablesContainer::ForEachVariableMatchingSearch(
   }
 }
 
+void VariablesContainer::ClearMixedValues() {
+  for (auto& nameAndVariable : variables) {
+    nameAndVariable.second->ClearMixedValues();
+  }
+}
+
 void VariablesContainer::SerializeTo(SerializerElement& element) const {
   if (!persistentUuid.empty())
     element.SetStringAttribute("persistentUuid", persistentUuid);
@@ -197,10 +210,14 @@ void VariablesContainer::UnserializeFrom(const SerializerElement& element) {
   for (std::size_t j = 0; j < element.GetChildrenCount(); j++) {
     const SerializerElement& variableElement = element.GetChild(j);
 
-    Variable variable;
-    variable.UnserializeFrom(variableElement);
-    Insert(
-        variableElement.GetStringAttribute("name", "", "Name"), variable, -1);
+    // Don't use `Insert` so that the serialized state is restored exactly as
+    // it was - notably, the "mixed values" marker must be kept (it's used by
+    // the editor to snapshot the temporary containers merging the variables
+    // of several objects, and to compute changesets from them).
+    auto variable = std::make_shared<gd::Variable>();
+    variable->UnserializeFrom(variableElement);
+    variables.push_back(std::make_pair(
+        variableElement.GetStringAttribute("name", "", "Name"), variable));
   }
 }
 

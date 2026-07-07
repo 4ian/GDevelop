@@ -29,7 +29,10 @@ import {
   type InstancesOutsideEditorChanges,
   type ObjectsOutsideEditorChanges,
   type ObjectGroupsOutsideEditorChanges,
-} from './EditorContainers/BaseEditor';
+  type ProjectItemRenamedOutsideEditorChanges,
+  type WillDeleteSceneChanges,
+  type WillDeleteObjectChanges,
+} from '../EditorFunctions/OutsideEditorChanges';
 import { type NavigateToEventFromGlobalSearchParams } from '../Utils/Search';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
@@ -284,6 +287,11 @@ export type EditorTabsPaneCommonProps = {|
   onObjectGroupsModifiedOutsideEditor: (
     changes: ObjectGroupsOutsideEditorChanges
   ) => void,
+  onProjectItemRenamedOutsideEditor: (
+    changes: ProjectItemRenamedOutsideEditorChanges
+  ) => void,
+  onWillDeleteScene: (changes: WillDeleteSceneChanges) => Promise<void>,
+  onWillDeleteObject: (changes: WillDeleteObjectChanges) => void,
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
   onLoadEventsFunctionsExtensions: ({|
@@ -400,6 +408,9 @@ const EditorTabsPane: React.ComponentType<{
     onInstancesModifiedOutsideEditor,
     onObjectsModifiedOutsideEditor,
     onObjectGroupsModifiedOutsideEditor,
+    onProjectItemRenamedOutsideEditor,
+    onWillDeleteScene,
+    onWillDeleteObject,
     onWillInstallExtension,
     onExtensionInstalled,
     onEffectAdded,
@@ -742,7 +753,7 @@ const EditorTabsPane: React.ComponentType<{
                   scope={errorBoundaryProps.scope}
                 >
                   {editorTab.renderEditorContainer({
-                    editorId: editorTab.key,
+                    editorId: editorTab.id,
                     gameEditorMode,
                     setGameEditorMode,
                     isActive: isCurrentTab,
@@ -865,6 +876,9 @@ const EditorTabsPane: React.ComponentType<{
                     onInstancesModifiedOutsideEditor: onInstancesModifiedOutsideEditor,
                     onObjectsModifiedOutsideEditor: onObjectsModifiedOutsideEditor,
                     onObjectGroupsModifiedOutsideEditor: onObjectGroupsModifiedOutsideEditor,
+                    onProjectItemRenamedOutsideEditor: onProjectItemRenamedOutsideEditor,
+                    onWillDeleteScene: onWillDeleteScene,
+                    onWillDeleteObject: onWillDeleteObject,
                     onWillInstallExtension: onWillInstallExtension,
                     onExtensionInstalled: onExtensionInstalled,
                     onEffectAdded: onEffectAdded,
@@ -880,7 +894,7 @@ const EditorTabsPane: React.ComponentType<{
 
             return (
               <TabContentContainer
-                key={editorTab.key}
+                key={editorTab.id}
                 active={isCurrentTab}
                 removePointerEvents={
                   // Deactivate pointer events when the play tab is active, so the iframe

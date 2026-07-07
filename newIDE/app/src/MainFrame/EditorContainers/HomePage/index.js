@@ -1,13 +1,14 @@
 // @flow
 import * as React from 'react';
 import { I18n } from '@lingui/react';
+import { type RenderEditorContainerPropsWithRef } from '../BaseEditor';
 import {
-  type RenderEditorContainerPropsWithRef,
   type SceneEventsOutsideEditorChanges,
   type InstancesOutsideEditorChanges,
   type ObjectsOutsideEditorChanges,
   type ObjectGroupsOutsideEditorChanges,
-} from '../BaseEditor';
+  type WillDeleteObjectChanges,
+} from '../../../EditorFunctions/OutsideEditorChanges';
 import {
   type FileMetadataAndStorageProviderName,
   type FileMetadata,
@@ -218,6 +219,7 @@ export type HomePageEditorInterface = {|
   onObjectsModifiedOutsideEditor: (
     changes: ObjectsOutsideEditorChanges
   ) => void,
+  onWillDeleteObject: (changes: WillDeleteObjectChanges) => void,
   onObjectGroupsModifiedOutsideEditor: (
     changes: ObjectGroupsOutsideEditorChanges
   ) => void,
@@ -564,6 +566,7 @@ export const HomePage: React.ComponentType<Props> = React.memo<Props>(
         switchInGameEditorIfNoHotReloadIsNeeded: noop,
         onInstancesModifiedOutsideEditor: noop,
         onObjectsModifiedOutsideEditor: noop,
+        onWillDeleteObject: noop,
         onObjectGroupsModifiedOutsideEditor: noop,
         selectAllInsideEditor: noop,
       }));

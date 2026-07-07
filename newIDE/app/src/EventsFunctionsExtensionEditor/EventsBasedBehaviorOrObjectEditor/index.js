@@ -42,12 +42,14 @@ type Props = {|
   ) => void,
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
+  shouldHideAddPropertyButton?: boolean,
 |};
 
 export type EventsBasedBehaviorOrObjectEditorInterface = {|
   forceUpdateProperties: () => void,
   scrollToConfiguration: () => void,
   scrollToProperty: (propertyName: string, isSharedProperties: boolean) => void,
+  focusOnProperty: (propertyName: string, isSharedProperties: boolean) => void,
 |};
 
 export const EventsBasedBehaviorOrObjectEditor: React.ComponentType<{
@@ -73,6 +75,7 @@ export const EventsBasedBehaviorOrObjectEditor: React.ComponentType<{
       onEventsBasedObjectChildrenEdited,
       onWillInstallExtension,
       onExtensionInstalled,
+      shouldHideAddPropertyButton,
     }: Props,
     ref
   ) => {
@@ -125,6 +128,17 @@ export const EventsBasedBehaviorOrObjectEditor: React.ComponentType<{
         }
         if (scenePropertiesEditor.current) {
           scenePropertiesEditor.current.forceUpdate();
+        }
+      },
+      focusOnProperty: (propertyName: string, isSharedProperties: boolean) => {
+        if (isSharedProperties) {
+          if (scenePropertiesEditor.current) {
+            scenePropertiesEditor.current.focusOnProperty(propertyName);
+          }
+        } else {
+          if (propertiesEditor.current) {
+            propertiesEditor.current.focusOnProperty(propertyName);
+          }
         }
       },
       scrollToConfiguration: () => {
@@ -271,7 +285,7 @@ export const EventsBasedBehaviorOrObjectEditor: React.ComponentType<{
             </Container>
           </Column>
         </ScrollView>
-        {windowSize === 'small' && (
+        {windowSize === 'small' && !shouldHideAddPropertyButton && (
           <Column>
             <Line noMargin justifyContent="flex-end" expand>
               <RaisedButton

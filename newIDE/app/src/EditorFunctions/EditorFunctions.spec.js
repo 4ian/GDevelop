@@ -1,13 +1,37 @@
 // @flow
 import { fakeAssetShortHeader1 } from '../fixtures/GDevelopServicesTestData';
 import { PixiResourcesLoaderMock } from '../fixtures/TestPixiResourcesLoader';
+import { makeTestExtensions } from '../fixtures/TestExtensions';
 import {
   editorFunctions,
+  noEventsInSceneText,
   type EditorFunctionGenericOutput,
   type LaunchFunctionOptionsWithProject,
 } from './index';
 
 const gd: libGDevelop = global.gd;
+
+const fake9PatchAssetShortHeader = {
+  ...fakeAssetShortHeader1,
+  name: 'Yellow Button',
+  objectType: '9patch',
+  animationsCount: 1,
+};
+
+const fake3DModelAssetShortHeader = {
+  ...fakeAssetShortHeader1,
+  name: 'Knight Character',
+  objectType: 'Scene3D::Model3DObject',
+  animationsCount: 8,
+};
+
+// Particle emitter assets have no animations count in the assets database.
+const fakeParticleEmitterAssetShortHeader = {
+  ...fakeAssetShortHeader1,
+  name: 'Fire Sparkles',
+  objectType: 'ParticleSystem::ParticleEmitter',
+  animationsCount: undefined,
+};
 
 // $FlowFixMe[incompatible-type]
 // $FlowFixMe[missing-local-annot]
@@ -37,6 +61,7 @@ describe('editorFunctions', () => {
     onInstancesModifiedOutsideEditor: jest.fn(),
     onObjectGroupsModifiedOutsideEditor: jest.fn(),
     onSceneEventsModifiedOutsideEditor: jest.fn(),
+    onProjectItemRenamedOutsideEditor: jest.fn(),
     toolOptions: {
       includeEventsJson: true,
     },
@@ -78,6 +103,8 @@ describe('editorFunctions', () => {
       });
     },
     onObjectsModifiedOutsideEditor: jest.fn(),
+    onWillDeleteScene: jest.fn(),
+    onWillDeleteObject: jest.fn(),
     onWillInstallExtension: jest.fn(),
     onExtensionInstalled: jest.fn(),
     getAssetStoreTagForNewObject: () => null,
@@ -158,7 +185,7 @@ describe('editorFunctions', () => {
       );
 
       expect(result.message).toMatchInlineSnapshot(
-        `"Created object \\"MyNewTextObject\\" (type \\"TextObject::Text\\", scene \\"TestScene\\") from asset store. Properties: bold: false, characterSize: 20 (px), color: 0;0;0 (color), isOutlineEnabled: false, isShadowEnabled: false, italic: false, lineHeight: 0 (px), outlineColor: 255;255;255 (color), outlineThickness: 2 (px), shadowAngle: 90 (deg), shadowBlurRadius: 2 (px), shadowColor: 0;0;0 (color), shadowDistance: 4 (px), shadowOpacity: 127 (px), text: Text (multilinestring), textAlignment: left (choice, one of: [\\"left\\", \\"center\\", \\"right\\"]), verticalTextAlignment: top (choice, one of: [\\"top\\", \\"center\\", \\"bottom\\"]). Empty: font (resource)."`
+        `"Created object \\"MyNewTextObject\\" (type \\"TextObject::Text\\", scene \\"TestScene\\") from asset store. Used asset \\"Dino Doux\\" (6 animation(s)). Properties: bold: false, characterSize: 20 (px), color: 0;0;0 (color), isOutlineEnabled: false, isShadowEnabled: false, italic: false, lineHeight: 0 (px), outlineColor: 255;255;255 (color), outlineThickness: 2 (px), shadowAngle: 90 (deg), shadowBlurRadius: 2 (px), shadowColor: 0;0;0 (color), shadowDistance: 4 (px), shadowOpacity: 127 (px), text: Text (multilinestring), textAlignment: left (choice, one of: [\\"left\\", \\"center\\", \\"right\\"]), verticalTextAlignment: top (choice, one of: [\\"top\\", \\"center\\", \\"bottom\\"]). Empty: font (resource)."`
       );
       expect(result.success).toBe(true);
       expect(onObjectsModifiedOutsideEditor).toHaveBeenCalledWith({
@@ -184,13 +211,99 @@ describe('editorFunctions', () => {
       );
 
       expect(result.message).toMatchInlineSnapshot(
-        `"Created object \\"SomeNewObject\\" (type \\"Sprite\\", scene \\"TestScene\\") from asset store. Properties: ."`
+        `"Created object \\"SomeNewObject\\" (type \\"Sprite\\", scene \\"TestScene\\") from asset store. Used asset \\"Dino Doux\\" (6 animation(s)). This object type has no editable object properties."`
       );
       expect(result.success).toBe(true);
       expect(onObjectsModifiedOutsideEditor).toHaveBeenCalledWith({
         scene: testScene,
         isNewObjectTypeUsed: false,
       });
+    });
+
+    it('creates a new object from a 9patch asset, without showing its constant animations count', async () => {
+      // $FlowFixMe[underconstrained-implicit-instantiation]
+      const onObjectsModifiedOutsideEditor = jest.fn();
+
+      const result: EditorFunctionGenericOutput = await editorFunctions.create_or_replace_object.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          searchAndInstallAsset: async ({
+            objectsContainer,
+            objectName,
+            objectType,
+          }) => {
+            const object = objectsContainer.insertNewObject(
+              project,
+              'TextObject::Text',
+              objectName,
+              objectsContainer.getObjectsCount()
+            );
+            return Promise.resolve({
+              status: 'asset-installed',
+              message: 'Object installed',
+              createdObjects: [object],
+              assetShortHeader: fake9PatchAssetShortHeader,
+              isTheFirstOfItsTypeInProject: false,
+            });
+          },
+          args: {
+            scene_name: 'TestScene',
+            object_type: 'TextObject::Text',
+            object_name: 'MenuButton',
+            search_terms: 'yellow button',
+          },
+          onObjectsModifiedOutsideEditor,
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).toEqual(
+        expect.stringContaining('Used asset "Yellow Button".')
+      );
+      expect(result.message).not.toEqual(expect.stringContaining('animation'));
+    });
+
+    it('creates a new object from an animated 3D model asset, showing its animations count', async () => {
+      // $FlowFixMe[underconstrained-implicit-instantiation]
+      const onObjectsModifiedOutsideEditor = jest.fn();
+
+      const result: EditorFunctionGenericOutput = await editorFunctions.create_or_replace_object.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          searchAndInstallAsset: async ({
+            objectsContainer,
+            objectName,
+            objectType,
+          }) => {
+            const object = objectsContainer.insertNewObject(
+              project,
+              'Sprite',
+              objectName,
+              objectsContainer.getObjectsCount()
+            );
+            return Promise.resolve({
+              status: 'asset-installed',
+              message: 'Object installed',
+              createdObjects: [object],
+              assetShortHeader: fake3DModelAssetShortHeader,
+              isTheFirstOfItsTypeInProject: false,
+            });
+          },
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'Knight',
+            search_terms: 'knight character',
+          },
+          onObjectsModifiedOutsideEditor,
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).toEqual(
+        expect.stringContaining(
+          'Used asset "Knight Character" (8 animation(s)).'
+        )
+      );
     });
 
     it('creates a new object (from scratch, fallback if not found in the asset store)', async () => {
@@ -250,7 +363,7 @@ describe('editorFunctions', () => {
 
       expect(result.success).toBe(true);
       expect(result.message).toMatchInlineSnapshot(
-        `"Object \\"Player\\" already exists."`
+        `"Object \\"Player\\" already exists - nothing was changed. Set replace_existing_object to true to replace its assets from the asset store."`
       );
       expect(onObjectsModifiedOutsideEditor).toHaveBeenCalledWith({
         scene: testScene,
@@ -439,7 +552,7 @@ describe('editorFunctions', () => {
       );
       expect(testScene.getObjects().hasObjectNamed('Player')).toBe(true);
       expect(result.message).toMatchInlineSnapshot(
-        `"Replaced scene \\"TestScene\\" object \\"Player\\" with asset store object (same type \\"Sprite\\")."`
+        `"Replaced scene \\"TestScene\\" object \\"Player\\" with asset store object (same type \\"Sprite\\"). Used asset \\"Dino Doux\\" (6 animation(s))."`
       );
       expect(result.success).toBe(true);
       expect(onObjectsModifiedOutsideEditor).toHaveBeenCalledWith({
@@ -566,7 +679,7 @@ describe('editorFunctions', () => {
 
       expect(result.success).toBe(false);
       expect(result.message).toMatchInlineSnapshot(
-        `"Scene not found: \\"NonExistentScene\\"."`
+        `"Scene not found: \\"NonExistentScene\\". Scenes in this project: \\"TestScene\\"."`
       );
     });
 
@@ -646,8 +759,53 @@ describe('editorFunctions', () => {
 
       expect(result.success).toBe(true);
       expect(result.message).toMatchInlineSnapshot(
-        `"Replaced scene \\"TestScene\\" object \\"Player\\" with asset store object (same type \\"Sprite\\")."`
+        `"Replaced scene \\"TestScene\\" object \\"Player\\" with asset store object (same type \\"Sprite\\"). Used asset \\"Dino Doux\\" (6 animation(s))."`
       );
+    });
+
+    it('replaces an existing object with a particle emitter asset, which has no animations count', async () => {
+      // $FlowFixMe[underconstrained-implicit-instantiation]
+      const onObjectsModifiedOutsideEditor = jest.fn();
+
+      const result: EditorFunctionGenericOutput = await editorFunctions.create_or_replace_object.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          searchAndInstallAsset: async ({
+            objectsContainer,
+            objectName,
+            objectType,
+          }) => {
+            const object = objectsContainer.insertNewObject(
+              project,
+              objectType || 'Sprite',
+              objectName,
+              objectsContainer.getObjectsCount()
+            );
+            return Promise.resolve({
+              status: 'asset-installed',
+              message: 'Object installed',
+              createdObjects: [object],
+              // $FlowFixMe[incompatible-type] - the AssetShortHeader type declares animationsCount as required, but particle emitter assets have none in the assets database.
+              assetShortHeader: fakeParticleEmitterAssetShortHeader,
+              isTheFirstOfItsTypeInProject: false,
+            });
+          },
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'Player',
+            replace_existing_object: true,
+            search_terms: 'fire sparkles',
+          },
+          onObjectsModifiedOutsideEditor,
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).toEqual(
+        expect.stringContaining('Used asset "Fire Sparkles".')
+      );
+      expect(result.message).not.toEqual(expect.stringContaining('animation'));
+      expect(result.message).not.toEqual(expect.stringContaining('undefined'));
     });
 
     it('fails when object_type conflicts with an existing object type', async () => {
@@ -963,7 +1121,7 @@ describe('editorFunctions', () => {
         Set \\"shadowBlurRadius\\" on \\"MyTextObject\\" = \\"20.41\\".
         Warnings:
         Could not set \\"textAlignment\\" on \\"MyTextObject\\": invalid value or type.
-        Property \\"nonExistingProperty\\" not found on object \\"MyTextObject\\".
+        Property \\"nonExistingProperty\\" not found on object \\"MyTextObject\\". Available properties: bold, characterSize, color, font, isOutlineEnabled, isShadowEnabled, italic, lineHeight, outlineColor, outlineThickness, shadowAngle, shadowBlurRadius, shadowColor, shadowDistance, shadowOpacity, text, textAlignment, verticalTextAlignment.
         \\"shadowAngle\\" on \\"MyTextObject\\" = \\"20\\", but requested \\"20,40 , 50\\" looks multi-dimensional; only a single number is allowed.
         \\"shadowDistance\\" on \\"MyTextObject\\" = \\"0\\", but requested \\"20X   40 X 50\\" looks multi-dimensional; only a single number is allowed.
         \\"shadowBlurRadius\\" on \\"MyTextObject\\" = \\"20.41\\", but requested \\"20.41 × 50\\" looks multi-dimensional; only a single number is allowed."
@@ -977,6 +1135,28 @@ describe('editorFunctions', () => {
       expect(properties.get('bold').getValue()).toBe('true');
       expect(properties.get('italic').getValue()).toBe('false');
       expect(properties.get('shadowAngle').getValue()).toBe('20');
+    });
+
+    it('lists the available properties only once when several properties are not found', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_object_property.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'MyTextObject',
+            changed_properties: [
+              { property_name: 'fontSize', new_value: '56' },
+              { property_name: 'scaleX', new_value: '2' },
+              { property_name: 'wrongProperty', new_value: '3' },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(false);
+      expect(
+        (result.message || '').split('Available properties:').length - 1
+      ).toBe(1);
     });
 
     it('reports the FINAL renamed name when a collision forces a suffix', async () => {
@@ -1017,6 +1197,369 @@ describe('editorFunctions', () => {
       expect(testScene.getObjects().hasObjectNamed('Foo')).toBe(true);
       expect(testScene.getObjects().hasObjectNamed('Foo2')).toBe(true);
       expect(testScene.getObjects().hasObjectNamed('MyTextObject')).toBe(false);
+    });
+  });
+
+  describe('change_object_properties_effects (object effects)', () => {
+    let project: gdProject;
+    let testScene: gdLayout;
+
+    beforeEach(() => {
+      makeTestExtensions(gd);
+      // $FlowFixMe[invalid-constructor]
+      project = new gd.ProjectHelper.createNewGDJSProject();
+      testScene = project.insertNewLayout('TestScene', 0);
+      const testSceneObjects = testScene.getObjects();
+      testSceneObjects.insertNewObject(
+        project,
+        'Sprite',
+        'MySprite',
+        testSceneObjects.getObjectsCount()
+      );
+    });
+
+    afterEach(() => {
+      project.delete();
+    });
+
+    it('redirects the old "change_object_property" name to the same implementation', () => {
+      expect(editorFunctions.change_object_property).toBe(
+        editorFunctions.change_object_properties_effects
+      );
+    });
+
+    it('creates a new effect on the object (not on any layer) and reports it with a single message', async () => {
+      const result = await editorFunctions.change_object_properties_effects.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'MySprite',
+            changed_effects: [
+              {
+                effect_name: 'MySepia',
+                effect_type: 'FakeSepia',
+                changed_properties: [
+                  { property_name: 'opacity', new_value: '0.5' },
+                ],
+              },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).toContain('Created new "MySepia" effect');
+      expect(result.message).not.toContain('Modified "opacity"');
+
+      const object = testScene.getObjects().getObject('MySprite');
+      const effectsContainer = object.getEffects();
+      expect(effectsContainer.getEffectsCount()).toBe(1);
+      expect(
+        effectsContainer.getEffect('MySepia').getDoubleParameter('opacity')
+      ).toBe(0.5);
+
+      // The base layer must not have received the effect.
+      expect(
+        testScene
+          .getLayers()
+          .getLayer('')
+          .getEffects()
+          .getEffectsCount()
+      ).toBe(0);
+    });
+
+    it('updates and deletes existing object effects', async () => {
+      await editorFunctions.change_object_properties_effects.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          object_name: 'MySprite',
+          changed_effects: [
+            { effect_name: 'ToRemove', effect_type: 'FakeSepia' },
+            { effect_name: 'ToKeep', effect_type: 'FakeNight' },
+          ],
+        },
+      });
+
+      const result = await editorFunctions.change_object_properties_effects.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'MySprite',
+            changed_effects: [
+              { effect_name: 'ToRemove', delete_this_effect: true },
+              {
+                effect_name: 'ToKeep',
+                changed_properties: [
+                  { property_name: 'intensity', new_value: '0.3' },
+                ],
+              },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).toContain(
+        'Removed "ToRemove" effect on object "MySprite".'
+      );
+      expect(result.message).toContain(
+        'Modified "intensity" property of the "ToKeep" effect to "0.3".'
+      );
+
+      const effectsContainer = testScene
+        .getObjects()
+        .getObject('MySprite')
+        .getEffects();
+      expect(effectsContainer.hasEffectNamed('ToRemove')).toBe(false);
+      expect(effectsContainer.hasEffectNamed('ToKeep')).toBe(true);
+    });
+
+    it('changes properties and effects together in a single call', async () => {
+      const result = await editorFunctions.change_object_properties_effects.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'MySprite',
+            changed_properties: [
+              { property_name: 'name', new_value: 'MySprite' },
+            ],
+            changed_effects: [
+              { effect_name: 'MyNight', effect_type: 'FakeNight' },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).toContain('already named "MySprite"');
+      expect(result.message).toContain('Created new "MyNight" effect');
+
+      const effectsContainer = testScene
+        .getObjects()
+        .getObject('MySprite')
+        .getEffects();
+      expect(effectsContainer.hasEffectNamed('MyNight')).toBe(true);
+    });
+
+    it('warns and does not add an effect on an object type with no effect capability', async () => {
+      const testSceneObjects = testScene.getObjects();
+      testSceneObjects.insertNewObject(
+        project,
+        'FakeScene3D::Cube3DObject',
+        'MyCube',
+        testSceneObjects.getObjectsCount()
+      );
+
+      const result = await editorFunctions.change_object_properties_effects.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'MyCube',
+            changed_effects: [
+              { effect_name: 'MySepia', effect_type: 'FakeSepia' },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(false);
+      expect(result.message).toContain(
+        'Object "MyCube" does not support effects'
+      );
+      expect(
+        testScene
+          .getObjects()
+          .getObject('MyCube')
+          .getEffects()
+          .getEffectsCount()
+      ).toBe(0);
+    });
+  });
+
+  describe('change_object_properties_effects (delete_this_object)', () => {
+    let project: gdProject;
+    let testScene: gdLayout;
+
+    beforeEach(() => {
+      // $FlowFixMe[invalid-constructor]
+      project = new gd.ProjectHelper.createNewGDJSProject();
+      testScene = project.insertNewLayout('TestScene', 0);
+    });
+
+    afterEach(() => {
+      project.delete();
+    });
+
+    it('deletes a scene object and its instances when delete_this_object is true', async () => {
+      const sceneObjects = testScene.getObjects();
+      sceneObjects.insertNewObject(project, 'Sprite', 'MySprite', 0);
+      const instance = testScene
+        .getInitialInstances()
+        .insertNewInitialInstance();
+      instance.setObjectName('MySprite');
+
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_object_properties_effects.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'MySprite',
+            delete_this_object: true,
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).toContain('Deleted object "MySprite"');
+      expect(sceneObjects.hasObjectNamed('MySprite')).toBe(false);
+      expect(
+        testScene.getInitialInstances().hasInstancesOfObject('MySprite')
+      ).toBe(false);
+    });
+
+    it('deletes a global object and removes it from groups', async () => {
+      const globalObjects = project.getObjects();
+      globalObjects.insertNewObject(project, 'Sprite', 'GlobalSprite', 0);
+      const group = globalObjects.getObjectGroups().insertNew('AllSprites', 0);
+      group.addObject('GlobalSprite');
+
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_object_properties_effects.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'GlobalSprite',
+            delete_this_object: true,
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(globalObjects.hasObjectNamed('GlobalSprite')).toBe(false);
+      expect(group.find('GlobalSprite')).toBe(false);
+    });
+
+    it('fails when the object is not found', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_object_properties_effects.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'Ghost',
+            delete_this_object: true,
+          },
+        }
+      );
+
+      expect(result.success).toBe(false);
+      expect(result.message).toContain('Object not found');
+    });
+
+    it('notifies the editor of the deleted object name, so it can close any related dialog/panel', async () => {
+      testScene.getObjects().insertNewObject(project, 'Sprite', 'MySprite', 0);
+      const fakeOptions = makeFakeLaunchFunctionOptionsWithProject(project);
+
+      await editorFunctions.change_object_properties_effects.launchFunction({
+        ...fakeOptions,
+        args: {
+          scene_name: 'TestScene',
+          object_name: 'MySprite',
+          delete_this_object: true,
+        },
+      });
+
+      expect(fakeOptions.onWillDeleteObject).toHaveBeenCalledWith({
+        scene: testScene,
+        objectName: 'MySprite',
+      });
+      expect(fakeOptions.onInstancesModifiedOutsideEditor).toHaveBeenCalledWith(
+        { scene: testScene }
+      );
+      expect(fakeOptions.onObjectsModifiedOutsideEditor).toHaveBeenCalledWith({
+        scene: testScene,
+        isNewObjectTypeUsed: false,
+      });
+    });
+  });
+
+  describe('inspect_object_properties_effects (object effects)', () => {
+    let project: gdProject;
+    let testScene: gdLayout;
+
+    beforeEach(() => {
+      makeTestExtensions(gd);
+      // $FlowFixMe[invalid-constructor]
+      project = new gd.ProjectHelper.createNewGDJSProject();
+      testScene = project.insertNewLayout('TestScene', 0);
+      const testSceneObjects = testScene.getObjects();
+      const object = testSceneObjects.insertNewObject(
+        project,
+        'Sprite',
+        'MySprite',
+        testSceneObjects.getObjectsCount()
+      );
+      const effect = object.getEffects().insertNewEffect('MySepia', 0);
+      effect.setEffectType('FakeSepia');
+      effect.setDoubleParameter('opacity', 0.7);
+    });
+
+    afterEach(() => {
+      project.delete();
+    });
+
+    it('redirects the old "inspect_object_properties" name to the same implementation', () => {
+      expect(editorFunctions.inspect_object_properties).toBe(
+        editorFunctions.inspect_object_properties_effects
+      );
+    });
+
+    it('returns the object properties as well as its own effects', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.inspect_object_properties_effects.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'MySprite',
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.properties).toBeTruthy();
+      expect(result.effects).toEqual([
+        expect.objectContaining({
+          effectName: 'MySepia',
+          effectType: 'FakeSepia',
+        }),
+      ]);
+    });
+
+    it('does not include an effects field for an object type with no effect capability', async () => {
+      const testSceneObjects = testScene.getObjects();
+      testSceneObjects.insertNewObject(
+        project,
+        'FakeScene3D::Cube3DObject',
+        'MyCube',
+        testSceneObjects.getObjectsCount()
+      );
+
+      const result: EditorFunctionGenericOutput = await editorFunctions.inspect_object_properties_effects.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'MyCube',
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.effects).toBeUndefined();
     });
   });
 
@@ -1103,7 +1646,7 @@ describe('editorFunctions', () => {
         Set \\"IgnoreDefaultControls\\" on behavior \\"PlatformerObject\\" = \\"false\\".
         Warnings:
         \\"MaxSpeed\\" on behavior \\"PlatformerObject\\" = \\"300\\", but requested \\"300 x 20\\" looks multi-dimensional; only a single number is allowed.
-        Property \\"nonExistingProperty\\" not on behavior \\"PlatformerObject\\" of \\"MySprite\\"."
+        Property \\"nonExistingProperty\\" not on behavior \\"PlatformerObject\\" of \\"MySprite\\". Available properties: Acceleration, CanGoDownFromJumpthru, CanGrabPlatforms, CanGrabWithoutMoving, Deceleration, Gravity, IgnoreDefaultControls, JumpSpeed, JumpSustainTime, LadderClimbingSpeed, MaxFallingSpeed, MaxSpeed, SlopeMaxAngle, XGrabTolerance, YGrabOffset."
       `);
 
       // Verify the behavior properties were actually changed
@@ -1120,6 +1663,30 @@ describe('editorFunctions', () => {
       expect(behaviorProperties.get('IgnoreDefaultControls').getValue()).toBe(
         'false'
       );
+    });
+  });
+
+  describe('read_scene_events', () => {
+    let project: gdProject;
+
+    beforeEach(() => {
+      // $FlowFixMe[invalid-constructor]
+      project = new gd.ProjectHelper.createNewGDJSProject();
+      project.insertNewLayout('TestScene', 0);
+    });
+
+    afterEach(() => {
+      project.delete();
+    });
+
+    it('returns a placeholder when the scene has no events', async () => {
+      const result = await editorFunctions.read_scene_events.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: { scene_name: 'TestScene' },
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.eventsAsText).toBe(noEventsInSceneText);
     });
   });
 
@@ -1416,7 +1983,7 @@ describe('editorFunctions', () => {
       // Pre-populate a structure with a child field.
       const variables = project.getVariables();
       const struct = variables.insertNew('player', 0);
-      struct.castTo('Structure');
+      struct.castTo('structure');
       struct.getChild('hp').setValue(10);
 
       const result = await editorFunctions.add_or_edit_variable.launchFunction({
@@ -1483,7 +2050,7 @@ describe('editorFunctions', () => {
       // Pre-populate a structure with multiple children to ensure none are lost.
       const variables = project.getVariables();
       const struct = variables.insertNew('player', 0);
-      struct.castTo('Structure');
+      struct.castTo('structure');
       struct.getChild('hp').setValue(10);
       struct.getChild('name').setString('Hero');
       struct.getChild('alive').setBool(true);
@@ -1514,7 +2081,7 @@ describe('editorFunctions', () => {
       // Pre-populate an array with multiple items to ensure none are lost.
       const variables = project.getVariables();
       const array = variables.insertNew('inventory', 0);
-      array.castTo('Array');
+      array.castTo('array');
       array.pushNew().setString('Sword');
       array.pushNew().setString('Shield');
       array.pushNew().setString('Potion');
@@ -1561,6 +2128,215 @@ describe('editorFunctions', () => {
       expect(player0.getType()).toBe(gd.Variable.Structure);
       expect(player0.getChild('name').getString()).toBe('Alice');
     });
+
+    it('creates several variables at once from a `variables` array', async () => {
+      const result = await editorFunctions.add_or_edit_variable.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          variable_scope: 'scene',
+          scene_name: 'TestScene',
+          variables: [
+            { variable_name_or_path: 'lives', value: '3' },
+            { variable_name_or_path: 'score', value: '0' },
+            { variable_name_or_path: 'playerName', value: 'Hero' },
+          ],
+        },
+      });
+
+      expect(result.success).toBe(true);
+      const variables = testScene.getVariables();
+      expect(variables.get('lives').getValue()).toBe(3);
+      expect(variables.get('score').getValue()).toBe(0);
+      expect(variables.get('playerName').getString()).toBe('Hero');
+    });
+
+    it('deletes a variable when `delete_this_variable` is true', async () => {
+      const variables = testScene.getVariables();
+      variables.insertNew('toRemove', 0).setString('bye');
+      variables.insertNew('toKeep', 1).setString('stay');
+
+      const result = await editorFunctions.add_or_edit_variable.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          variable_scope: 'scene',
+          scene_name: 'TestScene',
+          variables: [
+            { variable_name_or_path: 'toRemove', delete_this_variable: true },
+          ],
+        },
+      });
+
+      expect(result.success).toBe(true);
+      expect(variables.has('toRemove')).toBe(false);
+      expect(variables.has('toKeep')).toBe(true);
+    });
+
+    it('edits and deletes variables in a single call', async () => {
+      const variables = testScene.getVariables();
+      variables.insertNew('old', 0).setString('remove me');
+
+      const result = await editorFunctions.add_or_edit_variable.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          variable_scope: 'scene',
+          scene_name: 'TestScene',
+          variables: [
+            { variable_name_or_path: 'newScore', value: '99' },
+            { variable_name_or_path: 'old', delete_this_variable: true },
+          ],
+        },
+      });
+
+      expect(result.success).toBe(true);
+      expect(variables.get('newScore').getValue()).toBe(99);
+      expect(variables.has('old')).toBe(false);
+    });
+
+    it('warns (but still succeeds) when deleting a variable that does not exist', async () => {
+      const result = await editorFunctions.add_or_edit_variable.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          variable_scope: 'scene',
+          scene_name: 'TestScene',
+          variables: [
+            { variable_name_or_path: 'newOne', value: '1' },
+            { variable_name_or_path: 'ghost', delete_this_variable: true },
+          ],
+        },
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.message).toContain('Could not delete');
+      expect(result.message).toContain('ghost');
+      expect(
+        testScene
+          .getVariables()
+          .get('newOne')
+          .getValue()
+      ).toBe(1);
+    });
+
+    it('deletes an element of an object array variable by index', async () => {
+      // Reproduce the reported case: object "Player" with an array variable
+      // "Variable" holding three numbers, delete index 2.
+      const playerVariables = testScene
+        .getObjects()
+        .getObject('Player')
+        .getVariables();
+      const arrayVariable = playerVariables.insertNew('Variable', 0);
+      arrayVariable.castTo('array');
+      arrayVariable.pushNew().setValue(10);
+      arrayVariable.pushNew().setValue(11);
+      arrayVariable.pushNew().setValue(12);
+
+      const result = await editorFunctions.add_or_edit_variable.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          variable_scope: 'object',
+          scene_name: 'TestScene',
+          object_name: 'Player',
+          variables: [
+            {
+              variable_name_or_path: 'Variable[2]',
+              delete_this_variable: true,
+            },
+          ],
+        },
+      });
+
+      expect(result.success).toBe(true);
+      const updated = testScene
+        .getObjects()
+        .getObject('Player')
+        .getVariables()
+        .get('Variable');
+      expect(updated.getType()).toBe(gd.Variable.Array);
+      expect(updated.getChildrenCount()).toBe(2);
+      expect(updated.getAtIndex(0).getValue()).toBe(10);
+      expect(updated.getAtIndex(1).getValue()).toBe(11);
+    });
+  });
+
+  describe('inspect_variables', () => {
+    let project: gdProject;
+    let testScene: gdLayout;
+
+    beforeEach(() => {
+      // $FlowFixMe[invalid-constructor]
+      project = new gd.ProjectHelper.createNewGDJSProject();
+      testScene = project.insertNewLayout('TestScene', 0);
+      testScene.getObjects().insertNewObject(project, 'Sprite', 'Player', 0);
+    });
+
+    afterEach(() => {
+      project.delete();
+    });
+
+    it('returns all scene variables when no paths are requested', async () => {
+      const variables = testScene.getVariables();
+      variables.insertNew('Score', 0).setValue(7);
+      variables.insertNew('Name', 1).setString('Hero');
+
+      const result = await editorFunctions.inspect_variables.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: { variable_scope: 'scene', scene_name: 'TestScene' },
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.variables).toEqual([
+        { variableName: 'Score', type: 'Number', value: '7' },
+        { variableName: 'Name', type: 'String', value: 'Hero' },
+      ]);
+    });
+
+    it('returns a requested nested array path on an object variable', async () => {
+      const objectVariables = testScene
+        .getObjects()
+        .getObject('Player')
+        .getVariables();
+      const arrayVariable = objectVariables.insertNew('Variable', 0);
+      arrayVariable.castTo('array');
+      arrayVariable.pushNew().setValue(10);
+      arrayVariable.pushNew().setValue(11);
+      arrayVariable.pushNew().setValue(12);
+
+      const result = await editorFunctions.inspect_variables.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          variable_scope: 'object',
+          scene_name: 'TestScene',
+          object_name: 'Player',
+          variable_names_or_paths: ['Variable[2]'],
+        },
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.variables).toEqual([
+        { variableName: 'Variable[2]', type: 'Number', value: '12' },
+      ]);
+    });
+
+    it('reports requested paths that do not exist', async () => {
+      testScene
+        .getVariables()
+        .insertNew('Score', 0)
+        .setValue(1);
+
+      const result = await editorFunctions.inspect_variables.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          variable_scope: 'scene',
+          scene_name: 'TestScene',
+          variable_names_or_paths: ['Score', 'Missing'],
+        },
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.variables).toEqual([
+        { variableName: 'Score', type: 'Number', value: '1' },
+      ]);
+      expect(result.message).toContain('Missing');
+    });
   });
 
   describe('inspect_object_properties (property listing format)', () => {
@@ -1583,6 +2359,25 @@ describe('editorFunctions', () => {
 
     afterEach(() => {
       project.delete();
+    });
+
+    it('reminds to inspect variables/behaviors with the dedicated tools', async () => {
+      testScene
+        .getObjects()
+        .getObject('MyText')
+        .getVariables()
+        .insertNew('Score', 0)
+        .setValue(0);
+
+      const result = await editorFunctions.inspect_object_properties.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: { scene_name: 'TestScene', object_name: 'MyText' },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.reminder).toContain('inspect_variables');
     });
 
     it('formats new object properties: short units, no boolean type tag, empty grouped at end', async () => {
@@ -1659,8 +2454,8 @@ describe('editorFunctions', () => {
 
       expect(result.success).toBe(true);
       expect(result.message).toEqual(
-        expect.stringContaining(
-          'Created 1 new instance of object "Player" using point brush at 100, 200 on layer "base".'
+        expect.stringMatching(
+          /Created 1 new instance of object "Player" \(id: [0-9a-f-]{10}\) using point brush at 100, 200 on the base layer \(""\)\./
         )
       );
     });
@@ -1684,8 +2479,8 @@ describe('editorFunctions', () => {
 
       expect(result.success).toBe(true);
       expect(result.message).toEqual(
-        expect.stringContaining(
-          'Created 2 new instances of object "Player" using point brush at 50, 60 on layer "base" (size 64x64, rotation 45°, opacity 128/255, z-order 5, origin at this position, each occupies X 50 to 114, Y 60 to 124).'
+        expect.stringMatching(
+          /Created 2 new instances of object "Player" \(ids: [0-9a-f-]{10}, [0-9a-f-]{10}\) using point brush at 50, 60 on the base layer \(""\) \(size 64x64, rotation 45°, opacity 128\/255, z-order 5, origin at this position, each occupies X 50 to 114, Y 60 to 124\)\./
         )
       );
     });
@@ -1860,18 +2655,65 @@ describe('editorFunctions', () => {
       expect(uniqueKeys.size).toBe(positions.length);
     });
 
-    it('falls back to the scene center when no brush_position is given', async () => {
-      await putInstances({
-        brush_kind: 'point',
-        new_instances_count: 1,
+    // Creating instances without an explicit brush_position used to silently
+    // fall back to the scene center — a major source of instances duplicated
+    // or dropped at a meaningless position by the AI. It must fail instead.
+    it('fails when creating instances without a brush_position', async () => {
+      const result = await editorFunctions.put_2d_instances.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          object_name: 'Player',
+          layer_name: '',
+          brush_kind: 'point',
+          new_instances_count: 1,
+        },
       });
 
-      expect(getInstancePositions(testScene)).toEqual([
-        {
-          x: project.getGameResolutionWidth() / 2,
-          y: project.getGameResolutionHeight() / 2,
+      expect(result.success).toBe(false);
+      expect(result.message).toEqual(
+        expect.stringContaining('`brush_position` is required')
+      );
+      expect(getInstancePositions(testScene)).toEqual([]);
+    });
+
+    // The most frequent malformed call seen in production: a "modification"
+    // call that forgot `existing_instance_ids` (and gave no position). It used
+    // to create a duplicate instance at the scene center; it must fail.
+    it('fails instead of creating a default instance when neither existing_instance_ids nor brush_position are given', async () => {
+      const result = await editorFunctions.put_2d_instances.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          object_name: 'Player',
+          layer_name: '',
+          brush_kind: 'none',
+          instances_opacity: 0,
         },
-      ]);
+      });
+
+      expect(result.success).toBe(false);
+      expect(result.message).toEqual(
+        expect.stringContaining('existing_instance_ids')
+      );
+      expect(getInstancePositions(testScene)).toEqual([]);
+    });
+
+    // The base layer's real name is "": accept the frequent "base" mistake
+    // (when no layer literally named "base" exists) instead of failing.
+    it('accepts "base" as the base layer name when no such layer exists', async () => {
+      const result = await putInstances({
+        brush_kind: 'point',
+        brush_position: '100,200',
+        new_instances_count: 1,
+        layer_name: 'base',
+      });
+
+      const [created] = getInstances(testScene);
+      expect(created.layer).toBe('');
+      expect(result.message).toEqual(
+        expect.stringContaining('the base layer ("")')
+      );
     });
 
     it('scatters instances within the radius for the random_in_circle brush', async () => {
@@ -1890,6 +2732,134 @@ describe('editorFunctions', () => {
         const distance = Math.sqrt((x - center.x) ** 2 + (y - center.y) ** 2);
         expect(distance).toBeLessThanOrEqual(radius);
       });
+    });
+
+    // The "none" brush is for modifying existing instances only: creating with
+    // it used to silently pile up instances at a default position, leaving
+    // unwanted duplicates.
+    it('fails instead of creating instances with the none brush', async () => {
+      const result = await editorFunctions.put_2d_instances.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          object_name: 'Player',
+          layer_name: '',
+          brush_kind: 'none',
+          brush_position: '200,300',
+          new_instances_count: 2,
+        },
+      });
+
+      expect(result.success).toBe(false);
+      expect(result.message).toEqual(
+        expect.stringContaining('cannot create new ones')
+      );
+      expect(getInstancePositions(testScene)).toEqual([]);
+    });
+
+    // A call asking to create nothing and modify nothing used to silently
+    // create one instance at the default scene-center position.
+    it('fails when new_instances_count is 0 and no existing_instance_ids are given', async () => {
+      for (const brush_kind of ['point', 'none']) {
+        const result = await editorFunctions.put_2d_instances.launchFunction({
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'Player',
+            layer_name: '',
+            brush_kind,
+            new_instances_count: 0,
+          },
+        });
+
+        expect(result.success).toBe(false);
+        expect(result.message).toEqual(
+          expect.stringContaining('Nothing to do')
+        );
+        expect(getInstancePositions(testScene)).toEqual([]);
+      }
+    });
+
+    // The none brush with neither ids nor an explicit count used to create one
+    // instance at the default scene-center position.
+    it('fails with the none brush when no existing_instance_ids are given', async () => {
+      const result = await editorFunctions.put_2d_instances.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          object_name: 'Player',
+          layer_name: '',
+          brush_kind: 'none',
+        },
+      });
+
+      expect(result.success).toBe(false);
+      expect(result.message).toEqual(
+        expect.stringContaining('cannot create new ones')
+      );
+      expect(getInstancePositions(testScene)).toEqual([]);
+    });
+
+    // The created id in the message closes the loop "create then adjust":
+    // it must be directly usable as `existing_instance_ids`.
+    it('reports the created instance id, usable to modify it in a follow-up call', async () => {
+      const result = await putInstances({
+        brush_kind: 'point',
+        brush_position: '100,200',
+        new_instances_count: 1,
+      });
+
+      const idMatch = (result.message || '').match(/\(id: ([^)]+)\)/);
+      if (!idMatch) throw new Error('Expected the created id in the message.');
+
+      const moveResult = await putInstances({
+        brush_kind: 'point',
+        brush_position: '300,400',
+        existing_instance_ids: idMatch[1],
+      });
+
+      expect(moveResult.message).toEqual(
+        expect.stringContaining('Repositioned 1 instance')
+      );
+      expect(getInstancePositions(testScene)).toEqual([{ x: 300, y: 400 }]);
+    });
+
+    // The none brush must still leave existing instances where they are.
+    it('does not move an existing instance edited with the none brush', async () => {
+      await putInstances({
+        brush_kind: 'point',
+        brush_position: '100,200',
+        new_instances_count: 1,
+      });
+      const [created] = getInstances(testScene);
+
+      await putInstances({
+        brush_kind: 'none',
+        brush_position: '640,360',
+        existing_instance_ids: created.uuid,
+        instances_size: '48,48',
+      });
+
+      expect(getInstancePositions(testScene)).toEqual([{ x: 100, y: 200 }]);
+    });
+
+    // Editing an existing instance with the none brush and no brush_position
+    // must not snap it to the scene-center fallback.
+    it('does not move an existing instance edited with the none brush and no brush_position', async () => {
+      await putInstances({
+        brush_kind: 'point',
+        brush_position: '100,200',
+        new_instances_count: 1,
+      });
+      const [created] = getInstances(testScene);
+
+      await putInstances({
+        brush_kind: 'none',
+        existing_instance_ids: created.uuid,
+        instances_opacity: 128,
+      });
+
+      expect(getInstancePositions(testScene)).toEqual([{ x: 100, y: 200 }]);
     });
 
     // line/grid need an end position to spread instances. Omitting it must fail
@@ -2023,14 +2993,102 @@ describe('editorFunctions', () => {
       expect(getInstancePositions(testScene)).toEqual([]);
     });
 
-    it('reports not-found ids when erasing an unknown instance id', async () => {
-      const result = await putInstances({
-        brush_kind: 'erase',
-        existing_instance_ids: 'does-not-exist',
+    // An erase that removed nothing used to report "Erased 0 instances." as a
+    // success, which the AI took as a confirmation the instances were gone.
+    it('fails when the erase brush matches nothing', async () => {
+      await putInstances({
+        brush_kind: 'point',
+        brush_position: '100,200',
+        new_instances_count: 1,
       });
 
+      const result = await editorFunctions.put_2d_instances.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          object_name: 'Player',
+          layer_name: '',
+          brush_kind: 'erase',
+          brush_position: '900,900',
+          brush_size: 10,
+        },
+      });
+
+      expect(result.success).toBe(false);
+      expect(result.message).toEqual(
+        expect.stringContaining('No instance was erased.')
+      );
+      // The existing instance is untouched.
+      expect(getInstancePositions(testScene)).toEqual([{ x: 100, y: 200 }]);
+    });
+
+    it('fails when erasing an unknown instance id (none found, nothing changed)', async () => {
+      // Bypass the `putInstances` helper, which asserts success — here we
+      // expect a failure so the agent gets a real error signal instead of a
+      // misleading success that could make it retry the same call in a loop.
+      const result = await editorFunctions.put_2d_instances.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          object_name: 'Player',
+          layer_name: '',
+          brush_kind: 'erase',
+          existing_instance_ids: 'does-not-exist',
+        },
+      });
+
+      expect(result.success).toBe(false);
+      expect(result.message).toEqual(
+        expect.stringContaining(
+          'None of the specified instance ids were found: does-not-exist'
+        )
+      );
+    });
+
+    it('still succeeds erasing when some ids match and others are unknown', async () => {
+      await putInstances({
+        brush_kind: 'point',
+        brush_position: '100,200',
+        new_instances_count: 1,
+      });
+      const [created] = getInstances(testScene);
+
+      const result = await putInstances({
+        brush_kind: 'erase',
+        existing_instance_ids: `${created.uuid},does-not-exist`,
+      });
+
+      // One id matched (so the call did something and must not fail), the other
+      // is reported as not found.
+      expect(result.message).toEqual(
+        expect.stringContaining('Erased 1 instance')
+      );
       expect(result.message).toEqual(
         expect.stringContaining('Instance ids not found: does-not-exist')
+      );
+      expect(getInstances(testScene)).toHaveLength(0);
+    });
+
+    it('fails when no requested instance id is found and nothing is created', async () => {
+      // Bypass the `putInstances` helper, which asserts success — here we
+      // expect a failure so the agent gets a real error signal instead of a
+      // misleading success that could make it retry the same call in a loop.
+      const result = await editorFunctions.put_2d_instances.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          object_name: 'Player',
+          layer_name: '',
+          brush_kind: 'none',
+          existing_instance_ids: 'does-not-exist',
+        },
+      });
+
+      expect(result.success).toBe(false);
+      expect(result.message).toEqual(
+        expect.stringContaining(
+          'None of the specified instance ids were found: does-not-exist'
+        )
       );
     });
   });
@@ -2067,8 +3125,8 @@ describe('editorFunctions', () => {
 
       expect(result.success).toBe(true);
       expect(result.message).toEqual(
-        expect.stringContaining(
-          'Created 1 new instance of object "Player" using point brush at 10, 20, 30 on layer "base" (size 8x16x24, rotation (15°, 30°, 45°), origin at this position, each occupies X 10 to 18, Y 20 to 36, Z 30 to 54).'
+        expect.stringMatching(
+          /Created 1 new instance of object "Player" \(id: [0-9a-f-]{10}\) using point brush at 10, 20, 30 on the base layer \(""\) \(size 8x16x24, rotation \(15°, 30°, 45°\), origin at this position, each occupies X 10 to 18, Y 20 to 36, Z 30 to 54\)\./
         )
       );
     });
@@ -2112,6 +3170,40 @@ describe('editorFunctions', () => {
       scene.getInitialInstances().iterateOverInstances(functor);
       functor.delete();
       return positions.sort((a, b) => a.x - b.x || a.y - b.y || a.z - b.z);
+    };
+
+    // Collect full instances (with their persistent uuid) so tests can target
+    // existing instances by id for move/erase, like the real tool does.
+    const getInstances = (
+      scene: gdLayout
+    ): Array<{|
+      uuid: string,
+      x: number,
+      y: number,
+      z: number,
+      layer: string,
+    |}> => {
+      const instances = [];
+      const functor = new gd.InitialInstanceJSFunctor();
+      // $FlowFixMe[cannot-write]
+      functor.invoke = instancePtr => {
+        const instance: gdInitialInstance = gd.wrapPointer(
+          // $FlowFixMe[incompatible-type]
+          instancePtr,
+          gd.InitialInstance
+        );
+        instances.push({
+          uuid: instance.getPersistentUuid(),
+          x: instance.getX(),
+          y: instance.getY(),
+          z: instance.getZ(),
+          layer: instance.getLayer(),
+        });
+      };
+      // $FlowFixMe[incompatible-type]
+      scene.getInitialInstances().iterateOverInstances(functor);
+      functor.delete();
+      return instances;
     };
 
     const putInstances = async (args: any) => {
@@ -2170,6 +3262,213 @@ describe('editorFunctions', () => {
       positions.forEach(({ x, y, z }) => {
         expect(Math.sqrt(x * x + y * y + z * z)).toBeLessThanOrEqual(radius);
       });
+    });
+
+    it('fails without creating instances when the line brush lacks brush_end_position', async () => {
+      const result = await editorFunctions.put_3d_instances.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          object_name: 'Player',
+          layer_name: '',
+          brush_kind: 'line',
+          brush_position: '10,20,30',
+          new_instances_count: 3,
+        },
+      });
+
+      expect(result.success).toBe(false);
+      expect(result.message).toEqual(
+        expect.stringContaining('requires brush_end_position')
+      );
+      expect(getInstancePositions(testScene)).toEqual([]);
+    });
+
+    // Creating instances without an explicit brush_position used to silently
+    // fall back to the scene center: it must fail instead.
+    it('fails when creating instances without a brush_position', async () => {
+      const result = await editorFunctions.put_3d_instances.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          object_name: 'Player',
+          layer_name: '',
+          brush_kind: 'point',
+          new_instances_count: 1,
+        },
+      });
+
+      expect(result.success).toBe(false);
+      expect(result.message).toEqual(
+        expect.stringContaining('`brush_position` is required')
+      );
+      expect(getInstancePositions(testScene)).toEqual([]);
+    });
+
+    it('fails when no requested instance id is found and nothing is created', async () => {
+      // Bypass the `putInstances` helper, which asserts success — here we
+      // expect a failure so the agent gets a real error signal instead of a
+      // misleading success that could make it retry the same call in a loop.
+      const result = await editorFunctions.put_3d_instances.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          object_name: 'Player',
+          layer_name: '',
+          brush_kind: 'none',
+          existing_instance_ids: 'does-not-exist',
+        },
+      });
+
+      expect(result.success).toBe(false);
+      expect(result.message).toEqual(
+        expect.stringContaining(
+          'None of the specified instance ids were found: does-not-exist'
+        )
+      );
+    });
+
+    // A call asking to create nothing and modify nothing used to silently
+    // create one instance at the default scene-center position.
+    it('fails when new_instances_count is 0 and no existing_instance_ids are given', async () => {
+      const result = await editorFunctions.put_3d_instances.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          object_name: 'Player',
+          layer_name: '',
+          brush_kind: 'none',
+          new_instances_count: 0,
+        },
+      });
+
+      expect(result.success).toBe(false);
+      expect(result.message).toEqual(expect.stringContaining('Nothing to do'));
+      expect(getInstancePositions(testScene)).toEqual([]);
+    });
+
+    // The "none" brush is for modifying existing instances only: creating with
+    // it used to silently pile up instances at a default position, leaving
+    // unwanted duplicates.
+    it('fails instead of creating instances with the none brush', async () => {
+      const result = await editorFunctions.put_3d_instances.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          object_name: 'Player',
+          layer_name: '',
+          brush_kind: 'none',
+          brush_position: '10,20,30',
+          new_instances_count: 6,
+        },
+      });
+
+      expect(result.success).toBe(false);
+      expect(result.message).toEqual(
+        expect.stringContaining('cannot create new ones')
+      );
+      expect(getInstancePositions(testScene)).toEqual([]);
+    });
+
+    // The created id in the message closes the loop "create then adjust":
+    // it must be directly usable as `existing_instance_ids`.
+    it('reports the created instance id, usable to modify it in a follow-up call', async () => {
+      const result = await putInstances({
+        brush_kind: 'point',
+        brush_position: '10,20,30',
+        new_instances_count: 1,
+      });
+
+      const idMatch = (result.message || '').match(/\(id: ([^)]+)\)/);
+      if (!idMatch) throw new Error('Expected the created id in the message.');
+
+      const moveResult = await putInstances({
+        brush_kind: 'point',
+        brush_position: '40,50,60',
+        existing_instance_ids: idMatch[1],
+      });
+
+      expect(moveResult.message).toEqual(
+        expect.stringContaining('Repositioned 1 instance')
+      );
+      expect(getInstancePositions(testScene)).toEqual([
+        { x: 40, y: 50, z: 60 },
+      ]);
+    });
+
+    it('erases an existing instance by id', async () => {
+      await putInstances({
+        brush_kind: 'point',
+        brush_position: '10,20,30',
+        new_instances_count: 2,
+      });
+      const instances = getInstances(testScene);
+      expect(instances).toHaveLength(2);
+
+      const result = await putInstances({
+        brush_kind: 'erase',
+        existing_instance_ids: instances[0].uuid,
+      });
+
+      expect(result.message).toEqual(
+        expect.stringContaining('Erased 1 instance')
+      );
+      expect(getInstances(testScene)).toHaveLength(1);
+    });
+
+    it('fails when erasing an unknown instance id (none found, nothing changed)', async () => {
+      await putInstances({
+        brush_kind: 'point',
+        brush_position: '10,20,30',
+        new_instances_count: 1,
+      });
+
+      // Bypass the `putInstances` helper, which asserts success — here we
+      // expect a failure so the agent gets a real error signal instead of a
+      // misleading success that could make it retry the same call in a loop.
+      const result = await editorFunctions.put_3d_instances.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          object_name: 'Player',
+          layer_name: '',
+          brush_kind: 'erase',
+          existing_instance_ids: 'does-not-exist',
+        },
+      });
+
+      expect(result.success).toBe(false);
+      expect(result.message).toEqual(
+        expect.stringContaining(
+          'None of the specified instance ids were found: does-not-exist'
+        )
+      );
+      // Nothing was erased: the existing instance is still there.
+      expect(getInstances(testScene)).toHaveLength(1);
+    });
+
+    it('still succeeds erasing when some ids match and others are unknown', async () => {
+      await putInstances({
+        brush_kind: 'point',
+        brush_position: '10,20,30',
+        new_instances_count: 1,
+      });
+      const [created] = getInstances(testScene);
+
+      const result = await putInstances({
+        brush_kind: 'erase',
+        existing_instance_ids: `${created.uuid},does-not-exist`,
+      });
+
+      // One id matched (so the call did something and must not fail), the other
+      // is reported as not found.
+      expect(result.message).toEqual(
+        expect.stringContaining('Erased 1 instance')
+      );
+      expect(result.message).toEqual(
+        expect.stringContaining('Instance ids not found: does-not-exist')
+      );
+      expect(getInstances(testScene)).toHaveLength(0);
     });
 
     // Note: there is intentionally no grid test here. `grid` is not part of
@@ -2276,6 +3575,1354 @@ describe('editorFunctions', () => {
       expect(project.getOrientation()).toBe('landscape');
       expect(project.getScaleMode()).toBe('nearest');
       expect(project.getName()).toBe('My Game');
+    });
+
+    it('renames the scene when setting the "name" property', async () => {
+      const onProjectItemRenamedOutsideEditor: JestMockFn<any, any> = jest.fn();
+      const wasFirstScene = project.getFirstLayout() === 'TestScene';
+
+      const result = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          onProjectItemRenamedOutsideEditor,
+          args: {
+            scene_name: 'TestScene',
+            changed_properties: [
+              { property_name: 'name', new_value: 'GameScene' },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).toContain(
+        'Renamed scene "TestScene" to "GameScene"'
+      );
+
+      // The scene is actually renamed in the project.
+      expect(project.hasLayoutNamed('TestScene')).toBe(false);
+      expect(project.hasLayoutNamed('GameScene')).toBe(true);
+      // The kept layout pointer is the same one.
+      expect(testScene.getName()).toBe('GameScene');
+      if (wasFirstScene) {
+        expect(project.getFirstLayout()).toBe('GameScene');
+      }
+
+      // The editor is notified so open tabs can be kept and updated.
+      expect(onProjectItemRenamedOutsideEditor).toHaveBeenCalledWith({
+        kind: 'scene',
+        oldName: 'TestScene',
+        newName: 'GameScene',
+      });
+    });
+
+    it('keeps spaces and special characters when renaming a scene', async () => {
+      const result = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            changed_properties: [
+              { property_name: 'name', new_value: 'Templo das Estações' },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).toContain(
+        'Renamed scene "TestScene" to "Templo das Estações"'
+      );
+      expect(project.hasLayoutNamed('Templo das Estações')).toBe(true);
+      expect(project.hasLayoutNamed('Templo_das_Estações')).toBe(false);
+    });
+
+    it('uses the new scene name when renaming and setting as first scene in the same call', async () => {
+      const result = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            changed_properties: [
+              { property_name: 'name', new_value: 'New Scene Name' },
+              { property_name: 'isFirstScene', new_value: 'true' },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).toContain(
+        'Set "New Scene Name" as the first (startup) scene.'
+      );
+      expect(project.getFirstLayout()).toBe('New Scene Name');
+    });
+
+    it('lists the project scenes when the scene is not found', async () => {
+      const result = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'NonExistentScene',
+            changed_properties: [
+              { property_name: 'name', new_value: 'Whatever' },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(false);
+      expect(result.message).toMatchInlineSnapshot(
+        `"Scene not found: \\"NonExistentScene\\". Scenes in this project: \\"TestScene\\"."`
+      );
+    });
+
+    it('does nothing when renaming a scene to its current name', async () => {
+      const onProjectItemRenamedOutsideEditor: JestMockFn<any, any> = jest.fn();
+
+      const result = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          onProjectItemRenamedOutsideEditor,
+          args: {
+            scene_name: 'TestScene',
+            changed_properties: [
+              { property_name: 'name', new_value: 'TestScene' },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).toContain('Scene already named "TestScene".');
+      expect(project.hasLayoutNamed('TestScene')).toBe(true);
+      expect(onProjectItemRenamedOutsideEditor).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('change_scene_properties_layers_effects_groups (layers)', () => {
+    let project: gdProject;
+    let testScene: gdLayout;
+
+    beforeEach(() => {
+      makeTestExtensions(gd);
+      // $FlowFixMe[invalid-constructor]
+      project = new gd.ProjectHelper.createNewGDJSProject();
+      testScene = project.insertNewLayout('TestScene', 0);
+    });
+
+    afterEach(() => {
+      project.delete();
+    });
+
+    it('creates a layer and clearly reports it did not exist', async () => {
+      const result = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            changed_layers: [{ layer_name: 'UI' }],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).toMatchInlineSnapshot(`
+        "Done.
+        Layer \\"UI\\" did not exist in scene \\"TestScene\\": created it at position 1. Layers are now: \\"\\", \\"UI\\". If you meant to modify an existing layer, check its exact name."
+      `);
+      expect(testScene.hasLayerNamed('UI')).toBe(true);
+    });
+
+    it('does not create a layer when renaming a layer that does not exist', async () => {
+      const result = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            changed_layers: [
+              { layer_name: 'Ground', new_layer_name: 'Background' },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(false);
+      expect(result.warnings).toMatchInlineSnapshot(
+        `"Layer \\"Ground\\" not found in scene \\"TestScene\\": no layer was renamed. Existing layers are: \\"\\". To create a new layer, pass its name as \\"layer_name\\"."`
+      );
+      expect(testScene.hasLayerNamed('Ground')).toBe(false);
+      expect(testScene.hasLayerNamed('Background')).toBe(false);
+    });
+
+    it('does not create a layer when deleting a layer that does not exist', async () => {
+      const result = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            changed_layers: [{ layer_name: 'Ground', delete_this_layer: true }],
+          },
+        }
+      );
+
+      expect(result.success).toBe(false);
+      expect(result.warnings).toMatchInlineSnapshot(
+        `"Layer \\"Ground\\" not found in scene \\"TestScene\\": nothing was deleted. Existing layers are: \\"\\"."`
+      );
+      expect(testScene.hasLayerNamed('Ground')).toBe(false);
+    });
+  });
+
+  describe('change_scene_properties_layers_effects_groups (layer effects)', () => {
+    let project: gdProject;
+    let testScene: gdLayout;
+
+    beforeEach(() => {
+      makeTestExtensions(gd);
+      // $FlowFixMe[invalid-constructor]
+      project = new gd.ProjectHelper.createNewGDJSProject();
+      testScene = project.insertNewLayout('TestScene', 0);
+    });
+
+    afterEach(() => {
+      project.delete();
+    });
+
+    it('creates a new effect and reports it with a single message (no separate "Modified" lines)', async () => {
+      const result = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            changed_layer_effects: [
+              {
+                layer_name: '',
+                effect_name: 'MySepia',
+                effect_type: 'FakeSepia',
+                changed_properties: [
+                  { property_name: 'opacity', new_value: '0.5' },
+                ],
+              },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).toContain('Created new "MySepia" effect');
+      expect(result.message).not.toContain('Modified "opacity"');
+
+      const effectsContainer = testScene
+        .getLayers()
+        .getLayer('')
+        .getEffects();
+      expect(effectsContainer.getEffectsCount()).toBe(1);
+      expect(
+        effectsContainer.getEffect('MySepia').getDoubleParameter('opacity')
+      ).toBe(0.5);
+    });
+
+    it('reports a deletion and a modification together in the same message', async () => {
+      await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            changed_layer_effects: [
+              {
+                layer_name: '',
+                effect_name: 'ToRemove',
+                effect_type: 'FakeSepia',
+              },
+              {
+                layer_name: '',
+                effect_name: 'ToKeep',
+                effect_type: 'FakeNight',
+              },
+            ],
+          },
+        }
+      );
+
+      const result = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            changed_layer_effects: [
+              {
+                layer_name: '',
+                effect_name: 'ToRemove',
+                delete_this_effect: true,
+              },
+              {
+                layer_name: '',
+                effect_name: 'ToKeep',
+                changed_properties: [
+                  { property_name: 'intensity', new_value: '0.3' },
+                ],
+              },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).toContain(
+        'Removed "ToRemove" effect on layer "".'
+      );
+      expect(result.message).toContain(
+        'Modified "intensity" property of the "ToKeep" effect to "0.3".'
+      );
+
+      const effectsContainer = testScene
+        .getLayers()
+        .getLayer('')
+        .getEffects();
+      expect(effectsContainer.hasEffectNamed('ToRemove')).toBe(false);
+      expect(effectsContainer.hasEffectNamed('ToKeep')).toBe(true);
+    });
+
+    it('warns (but still adds it) when adding a 3D-only effect to a 2D-restricted layer', async () => {
+      testScene
+        .getLayers()
+        .getLayer('')
+        .setRenderingType('2d');
+
+      const result = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            changed_layer_effects: [
+              {
+                layer_name: '',
+                effect_name: 'MyLight',
+                effect_type: 'FakeDirectionalLight',
+              },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).toContain('Created new "MyLight" effect');
+      expect(result.warnings).toContain(
+        '"MyLight" only works in 3D, but layer "" is restricted to 2D'
+      );
+      expect(
+        testScene
+          .getLayers()
+          .getLayer('')
+          .getEffects()
+          .hasEffectNamed('MyLight')
+      ).toBe(true);
+    });
+
+    it('warns (but still adds it) when adding a 2D-only effect to a 3D-restricted layer', async () => {
+      testScene
+        .getLayers()
+        .getLayer('')
+        .setRenderingType('3d');
+
+      const result = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            changed_layer_effects: [
+              {
+                layer_name: '',
+                effect_name: 'MySepia',
+                effect_type: 'FakeSepia',
+              },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).toContain('Created new "MySepia" effect');
+      expect(result.warnings).toContain(
+        '"MySepia" only works in 2D, but layer "" is restricted to 3D'
+      );
+    });
+
+    it('does not warn when the layer allows both 2D and 3D (default)', async () => {
+      const result = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            changed_layer_effects: [
+              {
+                layer_name: '',
+                effect_name: 'MyLight',
+                effect_type: 'FakeDirectionalLight',
+              },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).toContain('Done.');
+      expect(result.warnings).toBeUndefined();
+    });
+  });
+
+  describe('object groups behave like objects', () => {
+    let project: gdProject;
+    let testScene: gdLayout;
+
+    beforeEach(() => {
+      // $FlowFixMe[invalid-constructor]
+      project = new gd.ProjectHelper.createNewGDJSProject();
+      testScene = project.insertNewLayout('TestScene', 0);
+
+      const sceneObjects = testScene.getObjects();
+      sceneObjects.insertNewObject(project, 'Sprite', 'Enemy1', 0);
+      sceneObjects.insertNewObject(project, 'Sprite', 'Enemy2', 1);
+
+      // A group of the two enemies.
+      const group = sceneObjects.getObjectGroups().insertNew('Enemies', 0);
+      group.addObject('Enemy1');
+      group.addObject('Enemy2');
+    });
+
+    afterEach(() => {
+      project.delete();
+    });
+
+    it('adds a behavior to every object of a group when the group name is given', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.add_behavior.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'Enemies',
+            behavior_type: 'PlatformBehavior::PlatformerObjectBehavior',
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      const sceneObjects = testScene.getObjects();
+      expect(
+        sceneObjects.getObject('Enemy1').hasBehaviorNamed('PlatformerObject')
+      ).toBe(true);
+      expect(
+        sceneObjects.getObject('Enemy2').hasBehaviorNamed('PlatformerObject')
+      ).toBe(true);
+    });
+
+    it('removes a behavior from every object of a group when the group name is given', async () => {
+      const sceneObjects = testScene.getObjects();
+      sceneObjects
+        .getObject('Enemy1')
+        .addNewBehavior(
+          project,
+          'PlatformBehavior::PlatformerObjectBehavior',
+          'PlatformerObject'
+        );
+      sceneObjects
+        .getObject('Enemy2')
+        .addNewBehavior(
+          project,
+          'PlatformBehavior::PlatformerObjectBehavior',
+          'PlatformerObject'
+        );
+
+      const result: EditorFunctionGenericOutput = await editorFunctions.remove_behavior.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'Enemies',
+            behavior_name: 'PlatformerObject',
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(
+        sceneObjects.getObject('Enemy1').hasBehaviorNamed('PlatformerObject')
+      ).toBe(false);
+      expect(
+        sceneObjects.getObject('Enemy2').hasBehaviorNamed('PlatformerObject')
+      ).toBe(false);
+    });
+
+    it('changes a behavior property on every object of a group', async () => {
+      const sceneObjects = testScene.getObjects();
+      for (const objectName of ['Enemy1', 'Enemy2']) {
+        sceneObjects
+          .getObject(objectName)
+          .addNewBehavior(
+            project,
+            'PlatformBehavior::PlatformerObjectBehavior',
+            'PlatformerObject'
+          );
+      }
+
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_behavior_property.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'Enemies',
+            behavior_name: 'PlatformerObject',
+            changed_properties: [
+              { property_name: 'GRAVITY', new_value: '1500' },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      for (const objectName of ['Enemy1', 'Enemy2']) {
+        const behavior = sceneObjects
+          .getObject(objectName)
+          .getBehavior('PlatformerObject');
+        expect(
+          behavior
+            .getProperties()
+            .get('Gravity')
+            .getValue()
+        ).toBe('1500');
+      }
+    });
+
+    it('sets a variable on every object of a group (object scope with a group name)', async () => {
+      const result = await editorFunctions.add_or_edit_variable.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          variable_name_or_path: 'health',
+          variable_scope: 'object',
+          scene_name: 'TestScene',
+          object_name: 'Enemies',
+          value: '100',
+        },
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.message).toMatchInlineSnapshot(
+        `"Added scene \\"TestScene\\" group \\"Enemies\\" variable \\"health\\" (Number) = 100"`
+      );
+      const sceneObjects = testScene.getObjects();
+      for (const objectName of ['Enemy1', 'Enemy2']) {
+        const variables = sceneObjects.getObject(objectName).getVariables();
+        expect(variables.has('health')).toBe(true);
+        expect(variables.get('health').getValue()).toBe(100);
+      }
+    });
+
+    it('accepts the `group` variable scope (equivalent to `object`)', async () => {
+      const result = await editorFunctions.add_or_edit_variable.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          variable_name_or_path: 'shield',
+          variable_scope: 'group',
+          scene_name: 'TestScene',
+          object_name: 'Enemies',
+          value: '5',
+        },
+      });
+
+      expect(result.success).toBe(true);
+      const sceneObjects = testScene.getObjects();
+      for (const objectName of ['Enemy1', 'Enemy2']) {
+        expect(
+          sceneObjects
+            .getObject(objectName)
+            .getVariables()
+            .has('shield')
+        ).toBe(true);
+      }
+    });
+
+    it('fills the variables and behaviors in common when an object is added to a group', async () => {
+      const sceneObjects = testScene.getObjects();
+
+      // Make Enemy1 and Enemy2 share a behavior and a variable in common, so
+      // the group exposes them. Then add a fresh Enemy3 with neither.
+      for (const objectName of ['Enemy1', 'Enemy2']) {
+        const object = sceneObjects.getObject(objectName);
+        object.addNewBehavior(
+          project,
+          'PlatformBehavior::PlatformerObjectBehavior',
+          'PlatformerObject'
+        );
+        object
+          .getVariables()
+          .insertNew('groupHealth', 0)
+          .setValue(100);
+      }
+      sceneObjects.insertNewObject(project, 'Sprite', 'Enemy3', 2);
+
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            changed_groups: [
+              {
+                group_name: 'Enemies',
+                objects_to_add: ['Enemy3'],
+              },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+
+      // Enemy3 was added to the group, so it received the variable and behavior
+      // shared in common by the group.
+      const enemy3 = sceneObjects.getObject('Enemy3');
+      expect(enemy3.hasBehaviorNamed('PlatformerObject')).toBe(true);
+      expect(enemy3.getVariables().has('groupHealth')).toBe(true);
+
+      // The change message explains which behaviors and variables the newly
+      // added object inherited from the group, with their names and types.
+      expect(result.message).toMatchInlineSnapshot(`
+        "Done.
+        Group \\"Enemies\\" in scene \\"TestScene\\" now contains 3 object(s): Enemy1, Enemy2, Enemy3.
+        Object(s) \\"Enemy3\\" newly added to group \\"Enemies\\" now have the behavior(s) \\"PlatformerObject\\" (PlatformBehavior::PlatformerObjectBehavior) and variable(s) \\"groupHealth\\" (Number) that the rest of the group has in common (a group is the \\"intersection\\" of its objects), added to them if they did not already have them."
+      `);
+    });
+
+    it('sets a variable on every object of a global group (no scene_name)', async () => {
+      // A global group, resolved without a scene_name.
+      const globalObjects = project.getObjects();
+      globalObjects.insertNewObject(project, 'Sprite', 'GlobalA', 0);
+      globalObjects.insertNewObject(project, 'Sprite', 'GlobalB', 1);
+      const globalGroup = globalObjects
+        .getObjectGroups()
+        .insertNew('Globals', 0);
+      globalGroup.addObject('GlobalA');
+      globalGroup.addObject('GlobalB');
+
+      const result = await editorFunctions.add_or_edit_variable.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          variable_name_or_path: 'ammo',
+          variable_scope: 'object',
+          object_name: 'Globals',
+          value: '7',
+        },
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.message).toMatchInlineSnapshot(
+        `"Added global group \\"Globals\\" variable \\"ammo\\" (Number) = 7"`
+      );
+      for (const objectName of ['GlobalA', 'GlobalB']) {
+        expect(
+          globalObjects
+            .getObject(objectName)
+            .getVariables()
+            .has('ammo')
+        ).toBe(true);
+      }
+    });
+
+    it('inspects a behavior via a group (reads from a member that has it)', async () => {
+      const sceneObjects = testScene.getObjects();
+      // Only Enemy2 has the behavior; inspecting the group still finds it.
+      sceneObjects
+        .getObject('Enemy2')
+        .addNewBehavior(
+          project,
+          'PlatformBehavior::PlatformerObjectBehavior',
+          'PlatformerObject'
+        );
+
+      const result: EditorFunctionGenericOutput = await editorFunctions.inspect_behavior_properties.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'Enemies',
+            behavior_name: 'PlatformerObject',
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.properties).toBeDefined();
+    });
+
+    it('applies a behavior property change only to the group members that have the behavior', async () => {
+      const sceneObjects = testScene.getObjects();
+      // Only Enemy1 has the behavior.
+      sceneObjects
+        .getObject('Enemy1')
+        .addNewBehavior(
+          project,
+          'PlatformBehavior::PlatformerObjectBehavior',
+          'PlatformerObject'
+        );
+
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_behavior_property.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'Enemies',
+            behavior_name: 'PlatformerObject',
+            changed_properties: [
+              { property_name: 'GRAVITY', new_value: '1500' },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(
+        sceneObjects
+          .getObject('Enemy1')
+          .getBehavior('PlatformerObject')
+          .getProperties()
+          .get('Gravity')
+          .getValue()
+      ).toBe('1500');
+      expect(
+        sceneObjects.getObject('Enemy2').hasBehaviorNamed('PlatformerObject')
+      ).toBe(false);
+      // Enemy2 lacks the behavior, so it is reported as skipped.
+      expect(result.message).toContain(
+        'Behavior "PlatformerObject" not on "Enemy2". Not changed.'
+      );
+    });
+
+    it('removes a behavior from the group members that have it, warning about the others', async () => {
+      const sceneObjects = testScene.getObjects();
+      // Only Enemy1 has the behavior; Enemy2 will be reported as a warning.
+      sceneObjects
+        .getObject('Enemy1')
+        .addNewBehavior(
+          project,
+          'PlatformBehavior::PlatformerObjectBehavior',
+          'PlatformerObject'
+        );
+
+      const result: EditorFunctionGenericOutput = await editorFunctions.remove_behavior.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'Enemies',
+            behavior_name: 'PlatformerObject',
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).toContain('Removed behavior');
+      expect(result.message).toContain('Enemy2');
+      expect(
+        sceneObjects.getObject('Enemy1').hasBehaviorNamed('PlatformerObject')
+      ).toBe(false);
+    });
+
+    it('fails when the object/group name does not exist', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.add_behavior.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'DoesNotExist',
+            behavior_type: 'PlatformBehavior::PlatformerObjectBehavior',
+          },
+        }
+      );
+
+      expect(result.success).toBe(false);
+      expect(result.message).toContain('Object or group not found');
+    });
+
+    it('fails when adding a behavior to an empty group', async () => {
+      testScene
+        .getObjects()
+        .getObjectGroups()
+        .insertNew('EmptyGroup', 0);
+
+      const result: EditorFunctionGenericOutput = await editorFunctions.add_behavior.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'EmptyGroup',
+            behavior_type: 'PlatformBehavior::PlatformerObjectBehavior',
+          },
+        }
+      );
+
+      expect(result.success).toBe(false);
+      expect(result.message).toContain('has no object');
+    });
+  });
+
+  describe('add_behavior (single object)', () => {
+    let project: gdProject;
+    let testScene: gdLayout;
+
+    beforeEach(() => {
+      // $FlowFixMe[invalid-constructor]
+      project = new gd.ProjectHelper.createNewGDJSProject();
+      testScene = project.insertNewLayout('TestScene', 0);
+      testScene.getObjects().insertNewObject(project, 'Sprite', 'MySprite', 0);
+    });
+
+    afterEach(() => {
+      project.delete();
+    });
+
+    it('adds a behavior to an object', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.add_behavior.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'MySprite',
+            behavior_type: 'PlatformBehavior::PlatformerObjectBehavior',
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).toContain('Added behavior');
+      expect(
+        testScene
+          .getObjects()
+          .getObject('MySprite')
+          .hasBehaviorNamed('PlatformerObject')
+      ).toBe(true);
+    });
+
+    it('is a no-op success when the behavior is already on the object', async () => {
+      const object = testScene.getObjects().getObject('MySprite');
+      object.addNewBehavior(
+        project,
+        'PlatformBehavior::PlatformerObjectBehavior',
+        'PlatformerObject'
+      );
+
+      const result: EditorFunctionGenericOutput = await editorFunctions.add_behavior.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'MySprite',
+            behavior_type: 'PlatformBehavior::PlatformerObjectBehavior',
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).toContain('already on');
+    });
+
+    it('fails when a behavior with the same name but a different type exists', async () => {
+      const object = testScene.getObjects().getObject('MySprite');
+      object.addNewBehavior(
+        project,
+        'PlatformBehavior::PlatformerObjectBehavior',
+        'SharedName'
+      );
+
+      const result: EditorFunctionGenericOutput = await editorFunctions.add_behavior.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'MySprite',
+            behavior_type: 'TopDownMovementBehavior::TopDownMovementBehavior',
+            behavior_name: 'SharedName',
+          },
+        }
+      );
+
+      expect(result.success).toBe(false);
+      expect(result.message).toContain('different type');
+    });
+
+    it('fails when the object does not exist', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.add_behavior.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'Unknown',
+            behavior_type: 'PlatformBehavior::PlatformerObjectBehavior',
+          },
+        }
+      );
+
+      expect(result.success).toBe(false);
+      expect(result.message).toContain('Object or group not found');
+    });
+  });
+
+  describe('remove_behavior (single object)', () => {
+    let project: gdProject;
+    let testScene: gdLayout;
+
+    beforeEach(() => {
+      // $FlowFixMe[invalid-constructor]
+      project = new gd.ProjectHelper.createNewGDJSProject();
+      testScene = project.insertNewLayout('TestScene', 0);
+      const object = testScene
+        .getObjects()
+        .insertNewObject(project, 'Sprite', 'MySprite', 0);
+      object.addNewBehavior(
+        project,
+        'PlatformBehavior::PlatformerObjectBehavior',
+        'PlatformerObject'
+      );
+    });
+
+    afterEach(() => {
+      project.delete();
+    });
+
+    it('removes a behavior from an object', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.remove_behavior.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'MySprite',
+            behavior_name: 'PlatformerObject',
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).toContain('Removed behavior');
+      expect(
+        testScene
+          .getObjects()
+          .getObject('MySprite')
+          .hasBehaviorNamed('PlatformerObject')
+      ).toBe(false);
+    });
+
+    it('fails when the behavior is not on the object', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.remove_behavior.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'MySprite',
+            behavior_name: 'NotThere',
+          },
+        }
+      );
+
+      expect(result.success).toBe(false);
+      expect(result.message).toContain('Not removed');
+    });
+  });
+
+  describe('change_behavior_property (delete_this_behavior)', () => {
+    let project: gdProject;
+    let testScene: gdLayout;
+
+    beforeEach(() => {
+      // $FlowFixMe[invalid-constructor]
+      project = new gd.ProjectHelper.createNewGDJSProject();
+      testScene = project.insertNewLayout('TestScene', 0);
+      const object = testScene
+        .getObjects()
+        .insertNewObject(project, 'Sprite', 'MySprite', 0);
+      object.addNewBehavior(
+        project,
+        'PlatformBehavior::PlatformerObjectBehavior',
+        'PlatformerObject'
+      );
+    });
+
+    afterEach(() => {
+      project.delete();
+    });
+
+    it('deletes a behavior from an object when delete_this_behavior is true', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_behavior_property.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'MySprite',
+            behavior_name: 'PlatformerObject',
+            delete_this_behavior: true,
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).toContain('Removed behavior');
+      expect(
+        testScene
+          .getObjects()
+          .getObject('MySprite')
+          .hasBehaviorNamed('PlatformerObject')
+      ).toBe(false);
+    });
+
+    it('fails when the behavior is not on the object', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_behavior_property.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'MySprite',
+            behavior_name: 'NotThere',
+            delete_this_behavior: true,
+          },
+        }
+      );
+
+      expect(result.success).toBe(false);
+      expect(result.message).toContain('Not removed');
+    });
+  });
+
+  describe('inspect_behavior_properties (single object)', () => {
+    let project: gdProject;
+    let testScene: gdLayout;
+
+    beforeEach(() => {
+      // $FlowFixMe[invalid-constructor]
+      project = new gd.ProjectHelper.createNewGDJSProject();
+      testScene = project.insertNewLayout('TestScene', 0);
+      const object = testScene
+        .getObjects()
+        .insertNewObject(project, 'Sprite', 'MySprite', 0);
+      object.addNewBehavior(
+        project,
+        'PlatformBehavior::PlatformerObjectBehavior',
+        'PlatformerObject'
+      );
+    });
+
+    afterEach(() => {
+      project.delete();
+    });
+
+    it("returns an object's behavior properties", async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.inspect_behavior_properties.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'MySprite',
+            behavior_name: 'PlatformerObject',
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.behaviorName).toBe('PlatformerObject');
+      expect(result.properties).toBeDefined();
+    });
+
+    it('fails when the behavior is not on the object', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.inspect_behavior_properties.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'MySprite',
+            behavior_name: 'NotThere',
+          },
+        }
+      );
+
+      expect(result.success).toBe(false);
+      expect(result.message).toContain('not on');
+    });
+  });
+
+  describe('change_scene_properties_layers_effects_groups (delete_this_scene)', () => {
+    let project: gdProject;
+
+    beforeEach(() => {
+      // $FlowFixMe[invalid-constructor]
+      project = new gd.ProjectHelper.createNewGDJSProject();
+      project.insertNewLayout('TestScene', 0);
+    });
+
+    afterEach(() => {
+      project.delete();
+    });
+
+    it('deletes a scene when delete_this_scene is true', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            delete_this_scene: true,
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).toContain('Deleted scene "TestScene"');
+      expect(project.hasLayoutNamed('TestScene')).toBe(false);
+    });
+
+    it('clears the first layout if the deleted scene was the first layout', async () => {
+      project.setFirstLayout('TestScene');
+
+      await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            delete_this_scene: true,
+          },
+        }
+      );
+
+      expect(project.getFirstLayout()).toBe('');
+    });
+
+    it('notifies the editor before the scene is deleted, so it can close any open tab', async () => {
+      const scene = project.getLayout('TestScene');
+      const fakeOptions = makeFakeLaunchFunctionOptionsWithProject(project);
+
+      await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...fakeOptions,
+          args: {
+            scene_name: 'TestScene',
+            delete_this_scene: true,
+          },
+        }
+      );
+
+      expect(fakeOptions.onWillDeleteScene).toHaveBeenCalledWith({ scene });
+    });
+  });
+
+  describe('change_scene_properties_layers_effects_groups (group object membership)', () => {
+    let project: gdProject;
+    let testScene: gdLayout;
+
+    beforeEach(() => {
+      // $FlowFixMe[invalid-constructor]
+      project = new gd.ProjectHelper.createNewGDJSProject();
+      testScene = project.insertNewLayout('TestScene', 0);
+      const sceneObjects = testScene.getObjects();
+      sceneObjects.insertNewObject(project, 'Sprite', 'Enemy1', 0);
+      sceneObjects.insertNewObject(project, 'Sprite', 'Enemy2', 1);
+      const group = sceneObjects.getObjectGroups().insertNew('Enemies', 0);
+      group.addObject('Enemy1');
+      group.addObject('Enemy2');
+    });
+
+    afterEach(() => {
+      project.delete();
+    });
+
+    it('renames a group', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            changed_groups: [{ group_name: 'Enemies', new_group_name: 'Foes' }],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      const groups = testScene.getObjects().getObjectGroups();
+      expect(groups.has('Foes')).toBe(true);
+      expect(groups.has('Enemies')).toBe(false);
+    });
+
+    it('echoes the resulting content of the group in the message', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            changed_groups: [
+              {
+                group_name: 'Enemies',
+                objects_to_remove: ['Enemy2'],
+              },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      // The message reports the new state instead of a blind confirmation.
+      expect(result.message).toContain(
+        'Group "Enemies" in scene "TestScene" now contains 1 object(s): Enemy1.'
+      );
+    });
+
+    it('adds objects incrementally with objects_to_add (keeping existing ones)', async () => {
+      const sceneObjects = testScene.getObjects();
+      sceneObjects.insertNewObject(project, 'Sprite', 'Enemy3', 2);
+
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            changed_groups: [
+              {
+                group_name: 'Enemies',
+                objects_to_add: ['Enemy3'],
+              },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      const group = testScene
+        .getObjects()
+        .getObjectGroups()
+        .get('Enemies');
+      // The objects already in the group are untouched, the new one is added.
+      expect(group.find('Enemy1')).toBe(true);
+      expect(group.find('Enemy2')).toBe(true);
+      expect(group.find('Enemy3')).toBe(true);
+      expect(result.message).toContain('Enemy1, Enemy2, Enemy3');
+    });
+
+    it('removes objects incrementally with objects_to_remove (keeping the others)', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            changed_groups: [
+              {
+                group_name: 'Enemies',
+                objects_to_remove: ['Enemy2'],
+              },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      const group = testScene
+        .getObjects()
+        .getObjectGroups()
+        .get('Enemies');
+      expect(group.find('Enemy1')).toBe(true);
+      expect(group.find('Enemy2')).toBe(false);
+    });
+
+    it('adds and removes in a single call, ignoring duplicates and no-ops', async () => {
+      const sceneObjects = testScene.getObjects();
+      sceneObjects.insertNewObject(project, 'Sprite', 'Enemy3', 2);
+
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            changed_groups: [
+              {
+                group_name: 'Enemies',
+                // Enemy3 listed twice (duplicate), Enemy1 already in the group
+                // (no-op), Enemy2 removed, GhostNotHere removed (no-op).
+                objects_to_add: ['Enemy3', 'Enemy3', 'Enemy1'],
+                objects_to_remove: ['Enemy2', 'GhostNotHere'],
+              },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      const group = testScene
+        .getObjects()
+        .getObjectGroups()
+        .get('Enemies');
+      expect(group.getAllObjectsNames().toJSArray()).toEqual([
+        'Enemy1',
+        'Enemy3',
+      ]);
+    });
+
+    it('fills shared variables and behaviors when adding via objects_to_add', async () => {
+      const sceneObjects = testScene.getObjects();
+
+      // Enemy1 and Enemy2 share a behavior and a variable, so the group exposes
+      // them. A freshly added Enemy3 should receive them too.
+      for (const objectName of ['Enemy1', 'Enemy2']) {
+        const object = sceneObjects.getObject(objectName);
+        object.addNewBehavior(
+          project,
+          'PlatformBehavior::PlatformerObjectBehavior',
+          'PlatformerObject'
+        );
+        object
+          .getVariables()
+          .insertNew('groupHealth', 0)
+          .setValue(100);
+      }
+      sceneObjects.insertNewObject(project, 'Sprite', 'Enemy3', 2);
+
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            changed_groups: [
+              {
+                group_name: 'Enemies',
+                objects_to_add: ['Enemy3'],
+              },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      const enemy3 = sceneObjects.getObject('Enemy3');
+      expect(enemy3.hasBehaviorNamed('PlatformerObject')).toBe(true);
+      expect(enemy3.getVariables().has('groupHealth')).toBe(true);
+    });
+
+    it('warns when an object added via objects_to_add does not exist', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            changed_groups: [
+              {
+                group_name: 'Enemies',
+                objects_to_add: ['Ghost'],
+              },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.warnings).toContain('Ghost');
+      expect(
+        testScene
+          .getObjects()
+          .getObjectGroups()
+          .get('Enemies')
+          .find('Ghost')
+      ).toBe(false);
     });
   });
 });

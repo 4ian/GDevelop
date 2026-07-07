@@ -49,6 +49,7 @@ const QuickBehaviorPropertiesEditor = ({
         visibility: 'Basic-Quick',
         quickCustomizationVisibilities: behavior.getPropertiesQuickCustomizationVisibilities(),
         layersContainer: null,
+        shouldDisabledFieldsWithMixedValues: false,
       });
     },
     [behavior, object, schemaRecomputeTrigger]

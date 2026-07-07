@@ -213,7 +213,6 @@ export const InstanceOrObjectPropertiesEditorContainer: React.ComponentType<{
             resourceManagementProps={resourceManagementProps}
             unsavedChanges={unsavedChanges}
             i18n={i18n}
-            canOverrideBehaviorProperties={!!eventsFunctionsExtension}
           />
         ) : !!objects.length && lastSelectionType === 'object' ? (
           <CompactObjectPropertiesEditor
@@ -255,18 +254,24 @@ export const InstanceOrObjectPropertiesEditorContainer: React.ComponentType<{
           <CompactObjectGroupPropertiesEditor
             project={project}
             resourceManagementProps={resourceManagementProps}
+            layout={layout}
             eventsFunctionsExtension={eventsFunctionsExtension}
             eventsBasedObject={eventsBasedObject}
             objectsContainer={objectsContainer}
             globalObjectsContainer={globalObjectsContainer}
             initialInstances={initialInstances}
+            layersContainer={layersContainer}
             projectScopedContainersAccessor={projectScopedContainersAccessor}
             unsavedChanges={unsavedChanges}
             historyHandler={historyHandler}
             objectGroup={objectGroup}
             isObjectListLocked={isObjectGroupObjectListLocked}
+            isBehaviorListLocked={isBehaviorListLocked}
             isVariableListLocked={isVariableListLocked}
             onEditObjectGroup={onEditObjectGroup}
+            onUpdateBehaviorsSharedData={onUpdateBehaviorsSharedData}
+            onWillInstallExtension={onWillInstallExtension}
+            onExtensionInstalled={onExtensionInstalled}
           />
         ) : layer && lastSelectionType === 'layer' ? (
           <CompactLayerPropertiesEditor

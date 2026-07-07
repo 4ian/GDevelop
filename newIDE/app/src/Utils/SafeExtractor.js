@@ -74,6 +74,16 @@ export class SafeExtractor {
     return this.extractArray(property);
   }
 
+  static extractStringArrayProperty(
+    anything: any,
+    propertyName: string
+  ): Array<string> | null {
+    const array = this.extractArrayProperty(anything, propertyName);
+    if (!array) return null;
+
+    return array.filter(item => typeof item === 'string');
+  }
+
   static extractObject(anything: any): Object | null {
     if (
       anything === null ||

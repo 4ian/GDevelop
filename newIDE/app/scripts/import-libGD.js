@@ -49,14 +49,15 @@ if (shell.test('-f', path.join(sourceDirectory, 'libGD.js'))) {
     let branch = (branchShellString.stdout || '').trim();
     if (branch === 'HEAD') {
       // We're in detached HEAD. Try to read the branch from the CI environment variables.
-      if (process.env.APPVEYOR_PULL_REQUEST_HEAD_REPO_BRANCH) {
-        branch = process.env.APPVEYOR_PULL_REQUEST_HEAD_REPO_BRANCH;
-      } else if (process.env.APPVEYOR_REPO_BRANCH) {
-        branch = process.env.APPVEYOR_REPO_BRANCH;
-      }
+      branch =
+        process.env.APPVEYOR_PULL_REQUEST_HEAD_REPO_BRANCH ||
+        process.env.APPVEYOR_REPO_BRANCH ||
+        process.env.SEMAPHORE_GIT_PR_BRANCH ||
+        process.env.SEMAPHORE_GIT_BRANCH ||
+        '';
     }
 
-    if (!branch) {
+    if (!branch || branch === 'HEAD') {
       shell.echo(
         `⚠️ Can't find the branch of the associated commit - if you're in detached HEAD, you need to be on a branch instead.`
       );
@@ -75,7 +76,6 @@ if (shell.test('-f', path.join(sourceDirectory, 'libGD.js'))) {
         silent: true,
       });
       const hash = (hashShellString.stdout || 'unknown-hash').trim();
-      const branch = getBranchFromGitRef(gitRef);
       if (hashShellString.stderr || hashShellString.code || !branch) {
         shell.echo(
           `⚠️ Can't find the hash or branch of the associated commit.`
@@ -102,13 +102,16 @@ if (shell.test('-f', path.join(sourceDirectory, 'libGD.js'))) {
     );
   };
 
+  // Download the two files sequentially (not with `Promise.all`): if one of
+  // them fails while the other is still being written, the fallback URL would
+  // otherwise be tried while a download to the same destination file is still
+  // running in background.
   const downloadLibGdJs = baseUrl =>
-    Promise.all([
-      downloadLocalFile(baseUrl + '/libGD.js', '../public/libGD.js'),
-      downloadLocalFile(baseUrl + '/libGD.wasm', '../public/libGD.wasm'),
-    ]).then(
-      responses => {},
-      error => {
+    downloadLocalFile(baseUrl + '/libGD.wasm', '../public/libGD.wasm')
+      .then(() =>
+        downloadLocalFile(baseUrl + '/libGD.js', '../public/libGD.js')
+      )
+      .catch(error => {
         if (error.statusCode === 403) {
           shell.echo(
             `ℹ️ Maybe libGD.js was not automatically built yet, try again in a few minutes.`
@@ -130,8 +133,7 @@ if (shell.test('-f', path.join(sourceDirectory, 'libGD.js'))) {
           }) (baseUrl=${baseUrl}), try again later.`
         );
         throw error;
-      }
-    );
+      });
 
   const onLibGdJsDownloaded = response => {
     shell.echo('✅ libGD.js downloaded and stored in public/libGD.js');

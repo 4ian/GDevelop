@@ -104,6 +104,7 @@ module.exports = function (config) {
       './newIDE/app/resources/GDJS/Runtime/events-tools/cameratools.js',
       './newIDE/app/resources/GDJS/Runtime/events-tools/soundtools.js',
       './newIDE/app/resources/GDJS/Runtime/events-tools/storagetools.js',
+      './newIDE/app/resources/GDJS/Runtime/indexeddb.js',
       './newIDE/app/resources/GDJS/Runtime/events-tools/stringtools.js',
       './newIDE/app/resources/GDJS/Runtime/events-tools/windowtools.js',
       './newIDE/app/resources/GDJS/Runtime/debugger-client/hot-reloader.js',

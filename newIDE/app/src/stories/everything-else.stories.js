@@ -948,7 +948,7 @@ storiesOf('PropertiesEditor', module)
         {
           name: 'Object name',
           valueType: 'string',
-          disabled: () => true,
+          disabled: () => 'always',
           getValue: instance => 'Disabled field',
           setValue: (instance, newValue) => {},
         },
@@ -1014,7 +1014,7 @@ storiesOf('PropertiesEditor', module)
         {
           name: 'Object name',
           valueType: 'string',
-          disabled: () => true,
+          disabled: () => 'always',
           getValue: instance => 'Disabled field',
           setValue: (instance, newValue) => {},
           getDescription: () =>
@@ -2058,6 +2058,9 @@ storiesOf('InstructionEditorDialog', module)
           onWillInstallExtension={action('extension will be installed')}
           onExtensionInstalled={action('extension installed')}
           editEventsFunctionParameter={action('editEventsFunctionParameter')}
+          openEventsBasedEntityPropertyEditorDialog={action(
+            'openEventsBasedEntityPropertyEditorDialog'
+          )}
         />
       )}
     </I18n>
@@ -2087,6 +2090,9 @@ storiesOf('InstructionEditorDialog', module)
           onWillInstallExtension={action('extension will be installed')}
           onExtensionInstalled={action('extension installed')}
           editEventsFunctionParameter={action('editEventsFunctionParameter')}
+          openEventsBasedEntityPropertyEditorDialog={action(
+            'openEventsBasedEntityPropertyEditorDialog'
+          )}
         />
       )}
     </I18n>
@@ -2125,6 +2131,9 @@ storiesOf('InstructionEditorDialog', module)
             onWillInstallExtension={action('extension will be installed')}
             onExtensionInstalled={action('extension installed')}
             editEventsFunctionParameter={action('editEventsFunctionParameter')}
+            openEventsBasedEntityPropertyEditorDialog={action(
+              'openEventsBasedEntityPropertyEditorDialog'
+            )}
           />
         )}
       </I18n>
@@ -2175,6 +2184,9 @@ storiesOf('InstructionEditorMenu', module)
                 onExtensionInstalled={action('extension installed')}
                 editEventsFunctionParameter={action(
                   'editEventsFunctionParameter'
+                )}
+                openEventsBasedEntityPropertyEditorDialog={action(
+                  'openEventsBasedEntityPropertyEditorDialog'
                 )}
               />
             )}

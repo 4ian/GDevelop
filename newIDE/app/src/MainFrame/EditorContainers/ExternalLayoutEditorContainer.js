@@ -12,11 +12,14 @@ import PlaceholderMessage from '../../UI/PlaceholderMessage';
 import {
   type RenderEditorContainerProps,
   type RenderEditorContainerPropsWithRef,
+} from './BaseEditor';
+import {
   type SceneEventsOutsideEditorChanges,
   type InstancesOutsideEditorChanges,
   type ObjectsOutsideEditorChanges,
   type ObjectGroupsOutsideEditorChanges,
-} from './BaseEditor';
+  type WillDeleteObjectChanges,
+} from '../../EditorFunctions/OutsideEditorChanges';
 import ExternalPropertiesDialog, {
   type ExternalProperties,
 } from './ExternalPropertiesDialog';
@@ -252,6 +255,16 @@ export class ExternalLayoutEditorContainer extends React.Component<
 
     if (this.editor) {
       this.editor.forceUpdateObjectsList();
+    }
+  }
+
+  onWillDeleteObject(changes: WillDeleteObjectChanges) {
+    if (changes.scene !== this.getLayout()) {
+      return;
+    }
+
+    if (this.editor) {
+      this.editor.onWillDeleteObject(changes);
     }
   }
 

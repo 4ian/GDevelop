@@ -83,7 +83,7 @@ class GD_CORE_API ObjectsContainersList {
    * group of objects.
    *
    * \warning In most cases, prefer to use other methods to access variables or use
-   * ObjectVariableHelper::MergeVariableContainers if you know you're dealing with a group.
+   * ObjectRefactorer::MergeVariableContainers if you know you're dealing with a group.
    * This is because the variables container of an object group does not exist and the one from
    * first object of the group will be returned.
    */

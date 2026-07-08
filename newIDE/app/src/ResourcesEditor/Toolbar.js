@@ -1,7 +1,7 @@
 // @flow
 import { t } from '@lingui/macro';
 import React, { PureComponent } from 'react';
-import EditIcon from '../UI/CustomSvgIcons/Edit';
+import WrenchIcon from '../UI/CustomSvgIcons/Wrench';
 import { ToolbarGroup } from '../UI/Toolbar';
 import IconButton from '../UI/IconButton';
 
@@ -25,7 +25,7 @@ export class Toolbar extends PureComponent<Props, State> {
           tooltip={t`Open the tools panel`}
           selected={isPropertiesShown}
         >
-          <EditIcon />
+          <WrenchIcon />
         </IconButton>
       </ToolbarGroup>
     );

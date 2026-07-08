@@ -2,6 +2,10 @@
 import newNameGenerator from '../Utils/NewNameGenerator';
 import optionalRequire from '../Utils/OptionalRequire';
 import { applyResourceDefaults } from '../ResourcesList/ResourceUtils';
+import {
+  getActiveProjectFileDragPath,
+  getProjectFilePathFromDataTransfer,
+} from '../Utils/ProjectFileDragData';
 
 const gd: libGDevelop = global.gd;
 const fs = optionalRequire('fs');
@@ -82,14 +86,25 @@ export const get3DModelFilePathsFromDataTransfer = (
   dataTransfer: ?DataTransfer | any,
   webUtils: any = electronWebUtils
 ): Array<string> => {
-  if (!dataTransfer || !dataTransfer.files) return [];
   const filePaths = [];
-  for (let i = 0; i < dataTransfer.files.length; i++) {
-    const file = dataTransfer.files[i];
-    const filePath = getLocalPathFromNativeFile(file, webUtils);
-    if (filePath) filePaths.push(filePath);
+  const activeProjectFileDragPath = getActiveProjectFileDragPath();
+  if (activeProjectFileDragPath) filePaths.push(activeProjectFileDragPath);
+
+  if (!dataTransfer) {
+    return Array.from(new Set(getSupported3DModelFilePaths(filePaths)));
   }
-  return getSupported3DModelFilePaths(filePaths);
+
+  const projectFilePath = getProjectFilePathFromDataTransfer(dataTransfer);
+  if (projectFilePath) filePaths.push(projectFilePath);
+
+  if (dataTransfer.files) {
+    for (let i = 0; i < dataTransfer.files.length; i++) {
+      const file = dataTransfer.files[i];
+      const filePath = getLocalPathFromNativeFile(file, webUtils);
+      if (filePath) filePaths.push(filePath);
+    }
+  }
+  return Array.from(new Set(getSupported3DModelFilePaths(filePaths)));
 };
 
 const getSafeObjectBaseName = (modelFilePath: string): string => {

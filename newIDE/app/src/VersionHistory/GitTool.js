@@ -13,6 +13,7 @@ import RaisedButton from '../UI/RaisedButton';
 import Chip from '../UI/Chip';
 import { Line } from '../UI/Grid';
 import { LineStackLayout } from '../UI/Layout';
+import Check from '../UI/CustomSvgIcons/Check';
 import Refresh from '../UI/CustomSvgIcons/Refresh';
 import Upload from '../UI/CustomSvgIcons/Upload';
 import Restore from '../UI/CustomSvgIcons/Restore';
@@ -151,6 +152,14 @@ const styles = {
     display: 'flex',
     gap: 6,
     flexWrap: 'wrap',
+  },
+  gitActionButtons: {
+    display: 'flex',
+    gap: 8,
+    flexWrap: 'wrap',
+  },
+  gitActionButton: {
+    flex: '1 1 140px',
   },
 };
 
@@ -570,6 +579,10 @@ const GitTool = ({
   const [isRemoteDialogOpen, setIsRemoteDialogOpen] = React.useState<boolean>(
     false
   );
+  const [
+    hasCommitSuccessHint,
+    setHasCommitSuccessHint,
+  ] = React.useState<boolean>(false);
   const [hasPushSuccessHint, setHasPushSuccessHint] = React.useState<boolean>(
     false
   );
@@ -591,6 +604,7 @@ const GitTool = ({
 
       setIsLoading(true);
       setErrorMessage(null);
+      setHasCommitSuccessHint(false);
       setHasPushSuccessHint(false);
       try {
         const nextStatus = await invokeGitTool(projectFilePath, 'status');
@@ -610,6 +624,7 @@ const GitTool = ({
       setCommitMessage('');
       setRemoteRepositoryUrl('');
       setIsRemoteDialogOpen(false);
+      setHasCommitSuccessHint(false);
       setHasPushSuccessHint(false);
       setErrorMessage(null);
       setDiffFile(null);
@@ -622,19 +637,14 @@ const GitTool = ({
 
   const runAction = React.useCallback(
     async (
-      action:
-        | 'init'
-        | 'commit'
-        | 'commit-and-push'
-        | 'push'
-        | 'revert'
-        | 'reset',
+      action: 'init' | 'commit' | 'push' | 'revert' | 'reset',
       payload?: Object
     ): Promise<boolean> => {
       if (!projectFilePath) return false;
 
       setRunningAction(action);
       setErrorMessage(null);
+      setHasCommitSuccessHint(false);
       setHasPushSuccessHint(false);
       try {
         const nextStatus = await invokeGitTool(
@@ -689,17 +699,17 @@ const GitTool = ({
     [hasUnsavedChanges, showConfirmation]
   );
 
-  const performCommitAndPush = React.useCallback(
-    async (remoteUrl?: string): Promise<boolean> => {
+  const performCommit = React.useCallback(
+    async (): Promise<boolean> => {
       if (!status || !status.isAvailable) return false;
-      if (!status.changedFiles.length && !status.commits.length) {
+      if (!status.changedFiles.length) {
         await showAlert({
-          title: t`Nothing to push`,
-          message: t`There are no commits or changed files to push.`,
+          title: t`Nothing to commit`,
+          message: t`There are no changed files to commit.`,
         });
         return false;
       }
-      if (status.changedFiles.length && !commitMessage.trim()) {
+      if (!commitMessage.trim()) {
         await showAlert({
           title: t`Add a commit message`,
           message: t`Write a short comment describing this version before committing.`,
@@ -707,33 +717,49 @@ const GitTool = ({
         return false;
       }
 
-      if (status.changedFiles.length) {
-        const shouldContinue = await confirmUnsavedChanges();
-        if (!shouldContinue) return false;
-      }
+      const shouldContinue = await confirmUnsavedChanges();
+      if (!shouldContinue) return false;
 
-      const wasSuccessful = await runAction('commit-and-push', {
-        message: status.changedFiles.length ? commitMessage : '',
-        remoteUrl,
+      const wasSuccessful = await runAction('commit', {
+        message: commitMessage,
       });
       if (wasSuccessful) {
         setCommitMessage('');
-        setHasPushSuccessHint(true);
+        setHasCommitSuccessHint(true);
       }
       return wasSuccessful;
     },
     [status, commitMessage, confirmUnsavedChanges, runAction, showAlert]
   );
 
-  const commitAndPush = React.useCallback(
+  const performPush = React.useCallback(
+    async (remoteUrl?: string): Promise<boolean> => {
+      if (!status || !status.isAvailable) return false;
+      if (!status.commits.length) {
+        await showAlert({
+          title: t`Nothing to push`,
+          message: t`There are no commits to push.`,
+        });
+        return false;
+      }
+
+      const wasSuccessful = await runAction('push', {
+        remoteUrl,
+        force: true,
+      });
+      if (wasSuccessful) {
+        setHasPushSuccessHint(true);
+      }
+      return wasSuccessful;
+    },
+    [status, runAction, showAlert]
+  );
+
+  const push = React.useCallback(
     async () => {
       if (!status || !status.isAvailable) return;
-      if (!status.changedFiles.length && !status.commits.length) {
-        await performCommitAndPush();
-        return;
-      }
-      if (status.changedFiles.length && !commitMessage.trim()) {
-        await performCommitAndPush();
+      if (!status.commits.length) {
+        await performPush();
         return;
       }
 
@@ -743,9 +769,9 @@ const GitTool = ({
         return;
       }
 
-      await performCommitAndPush();
+      await performPush();
     },
-    [status, commitMessage, performCommitAndPush]
+    [status, performPush]
   );
 
   const closeRemoteDialog = React.useCallback(
@@ -756,18 +782,18 @@ const GitTool = ({
     [runningAction]
   );
 
-  const commitAndPushWithRemote = React.useCallback(
+  const pushWithRemote = React.useCallback(
     async () => {
       const remoteUrl = remoteRepositoryUrl.trim();
       if (!remoteUrl) return;
 
-      const wasSuccessful = await performCommitAndPush(remoteUrl);
+      const wasSuccessful = await performPush(remoteUrl);
       if (wasSuccessful) {
         setIsRemoteDialogOpen(false);
         setRemoteRepositoryUrl('');
       }
     },
-    [remoteRepositoryUrl, performCommitAndPush]
+    [remoteRepositoryUrl, performPush]
   );
 
   const initializeGit = React.useCallback(
@@ -892,10 +918,8 @@ const GitTool = ({
   const isBusy = isLoading || !!runningAction;
   const changedFiles = status && status.isAvailable ? status.changedFiles : [];
   const commits = status && status.isAvailable ? status.commits : [];
-  const canCommitAndPush =
-    !!status &&
-    status.isAvailable &&
-    (!!changedFiles.length || !!commits.length);
+  const canCommit = !!status && status.isAvailable && !!changedFiles.length;
+  const canPush = !!status && status.isAvailable && !!commits.length;
   const hasStatusError = !!status && !status.isAvailable;
   const currentError = errorMessage || (status && status.error);
   const remoteDialogActions: Array<?React.Node> = [
@@ -906,9 +930,9 @@ const GitTool = ({
       disabled={isBusy}
     />,
     <DialogPrimaryButton
-      key="commit-and-push"
-      label={<Trans>Commit & push</Trans>}
-      onClick={commitAndPushWithRemote}
+      key="push"
+      label={<Trans>Push</Trans>}
+      onClick={pushWithRemote}
       disabled={isBusy || !remoteRepositoryUrl.trim()}
       icon={<Upload />}
       primary
@@ -1047,12 +1071,33 @@ const GitTool = ({
                       fullWidth
                       disabled={isBusy}
                     />
-                    <RaisedButton
-                      label={<Trans>Commit & push</Trans>}
-                      onClick={commitAndPush}
-                      disabled={isBusy || !canCommitAndPush}
-                      icon={<Upload />}
-                    />
+                    <div style={styles.gitActionButtons}>
+                      <div style={styles.gitActionButton}>
+                        <RaisedButton
+                          label={<Trans>Commit</Trans>}
+                          onClick={async () => {
+                            await performCommit();
+                          }}
+                          disabled={isBusy || !canCommit}
+                          icon={<Check />}
+                          fullWidth
+                        />
+                      </div>
+                      <div style={styles.gitActionButton}>
+                        <RaisedButton
+                          label={<Trans>Push</Trans>}
+                          onClick={push}
+                          disabled={isBusy || !canPush}
+                          icon={<Upload />}
+                          fullWidth
+                        />
+                      </div>
+                    </div>
+                    {hasCommitSuccessHint && (
+                      <Text noMargin size="body-small" color="secondary">
+                        <Trans>Changes committed locally.</Trans>
+                      </Text>
+                    )}
                     {hasPushSuccessHint && (
                       <Text noMargin size="body-small" color="secondary">
                         <Trans>Project pushed successfully.</Trans>
@@ -1090,7 +1135,7 @@ const GitTool = ({
             title={<Trans>Connect remote repository</Trans>}
             actions={remoteDialogActions}
             onRequestClose={closeRemoteDialog}
-            onApply={commitAndPushWithRemote}
+            onApply={pushWithRemote}
             cannotBeDismissed={isBusy}
             maxWidth="sm"
           >

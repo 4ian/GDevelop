@@ -10,6 +10,7 @@ import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import optionalRequire from '../Utils/OptionalRequire';
 import {
   isAudioFile,
+  is3DModelFile,
   isImageFile,
   isMarkdownFile,
   isTextLikeFile,
@@ -70,6 +71,7 @@ const getKindLabel = (selectedItem: ProjectFileSelection): React.Node => {
   if (isImageFile(node)) return <Trans>Image</Trans>;
   if (isAudioFile(node)) return <Trans>Audio</Trans>;
   if (isVideoFile(node)) return <Trans>Video</Trans>;
+  if (is3DModelFile(node)) return <Trans>3D model</Trans>;
   if (isMarkdownFile(node)) return <Trans>Markdown</Trans>;
   if (isTextLikeFile(node)) return <Trans>Text</Trans>;
   return <Trans>File</Trans>;

@@ -10,6 +10,7 @@ import {
   hasClipboardImage,
   writeClipboardImageToProjectFolder,
 } from './CreateSpriteFromImage';
+import { projectFileDragDataMimeType } from '../Utils/ProjectFileDragData';
 
 const gd = global.gd;
 
@@ -155,6 +156,23 @@ describe('CreateSpriteFromImage', () => {
 
     expect(getImageFilePathsFromDataTransfer(dataTransfer, webUtils)).toEqual([
       'C:\\project\\Hero.png',
+    ]);
+  });
+
+  test('extracts supported image paths from project file drag data', () => {
+    const dataTransfer = {
+      types: [projectFileDragDataMimeType],
+      getData: mimeType =>
+        mimeType === projectFileDragDataMimeType
+          ? JSON.stringify({
+              type: 'file',
+              absolutePath: 'C:\\project\\Linked\\Hero.png',
+            })
+          : '',
+    };
+
+    expect(getImageFilePathsFromDataTransfer(dataTransfer)).toEqual([
+      'C:\\project\\Linked\\Hero.png',
     ]);
   });
 

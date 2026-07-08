@@ -7,9 +7,12 @@ import {
   buildDuplicateMarkdownCreationErrorMessage,
   buildFolderCreationDiskErrorMessage,
   canDeleteProjectFolder,
+  canRenameLinkedFolderNode,
   canMoveProjectFileToFolder,
   canRenameProjectFileNode,
   canUpdateProjectFolderFromTemplate,
+  findNodeById,
+  getLinkedFoldersFilePath,
   getExternalFileCopyDestinationPath,
   getExternalFileDropPaths,
   getMovedProjectFilePath,
@@ -21,6 +24,8 @@ import {
   getResourceFileAfterProjectFileMove,
   getResourceFileAfterProjectPathMove,
   hasExternalFilesDragData,
+  isProjectFileNode,
+  normalizeLinkedFolders,
   shouldSelectProjectFileNode,
   shouldSelectCreatedProjectFile,
   type ProjectFileNode,
@@ -59,6 +64,26 @@ describe('ProjectFilesPanel', () => {
     type: 'folder',
     extension: '',
     children: [],
+  };
+  const linkedFileNode: ProjectFileNode = {
+    ...fileNode,
+    id: 'linked-folder:d:/library:D:/Library/coin.png',
+    absolutePath: 'D:\\Library\\coin.png',
+    relativePath: 'Library/coin.png',
+    source: 'linked-folder',
+    linkedFolderId: 'linked-folder:d:/library',
+  };
+  const linkedFolderNode: ProjectFileNode = {
+    id: 'linked-folder:d:/library',
+    name: 'Library',
+    absolutePath: 'D:\\Library',
+    relativePath: 'Library',
+    type: 'folder',
+    extension: '',
+    children: [linkedFileNode],
+    source: 'linked-folder',
+    linkedFolderId: 'linked-folder:d:/library',
+    isLinkedFolderRoot: true,
   };
 
   it('formats file deletion blockers without Lingui placeholders', () => {
@@ -177,7 +202,7 @@ describe('ProjectFilesPanel', () => {
     expect(source).toContain(
       "import useResourcesChangedWatcher from '../ResourcesList/UseResourcesChangedWatcher'"
     );
-    expect(source).toContain('onProjectFilesRefreshed(newRootNode)');
+    expect(source).toContain('onProjectFilesRefreshed(projectFilesRootNode)');
     expect(source).toContain(
       'const refreshOnResourceChange = React.useCallback'
     );
@@ -203,10 +228,33 @@ describe('ProjectFilesPanel', () => {
         targetFolderNode,
       })
     ).toBe(false);
+    expect(
+      canMoveProjectFileToFolder({
+        sourceNode: linkedFileNode,
+        targetFolderNode,
+      })
+    ).toBe(false);
+    expect(
+      canMoveProjectFileToFolder({
+        sourceNode: fileNode,
+        targetFolderNode: linkedFolderNode,
+      })
+    ).toBe(false);
   });
 
   it('allows project file drags to be moved or copied', () => {
     expect(getProjectFileDragEffectAllowed()).toBe('copyMove');
+  });
+
+  it('blocks the embedded game frame while dragging GLB project files', () => {
+    const source = getSource();
+
+    expect(source).toContain(
+      "import { preventGameFramePointerEvents } from '../EmbeddedGame/EmbeddedGameFramePointerEvents'"
+    );
+    expect(source).toContain('if (is3DModelFile(node))');
+    expect(source).toContain('preventEmbeddedGameFramePointerEvents(true)');
+    expect(source).toContain('preventEmbeddedGameFramePointerEvents(false)');
   });
 
   it('detects external files dragged from the operating system', () => {
@@ -295,6 +343,7 @@ describe('ProjectFilesPanel', () => {
     expect(canDeleteProjectFolder(sourceFolderNode)).toBe(false);
     expect(canDeleteProjectFolder(rootFolderNode)).toBe(false);
     expect(canDeleteProjectFolder(fileNode)).toBe(false);
+    expect(canDeleteProjectFolder(linkedFolderNode)).toBe(false);
   });
 
   it('selects an empty folder on regular click', () => {
@@ -377,6 +426,10 @@ describe('ProjectFilesPanel', () => {
     expect(canRenameProjectFileNode(fileNode)).toBe(true);
     expect(canRenameProjectFileNode(sourceFolderNode)).toBe(true);
     expect(canRenameProjectFileNode(rootFolderNode)).toBe(false);
+    expect(canRenameProjectFileNode(linkedFileNode)).toBe(false);
+    expect(canRenameProjectFileNode(linkedFolderNode)).toBe(false);
+    expect(canRenameLinkedFolderNode(linkedFolderNode)).toBe(true);
+    expect(canRenameLinkedFolderNode(linkedFileNode)).toBe(false);
   });
 
   it('allows updating from template only on the project root folder', () => {
@@ -393,6 +446,71 @@ describe('ProjectFilesPanel', () => {
     expect(canUpdateProjectFolderFromTemplate(rootFolderNode)).toBe(true);
     expect(canUpdateProjectFolderFromTemplate(sourceFolderNode)).toBe(false);
     expect(canUpdateProjectFolderFromTemplate(fileNode)).toBe(false);
+    expect(canUpdateProjectFolderFromTemplate(linkedFolderNode)).toBe(false);
+  });
+
+  it('normalizes linked folder sidecar entries', () => {
+    expect(
+      normalizeLinkedFolders([
+        { path: 'D:\\Asset Library', name: 'Shared art' },
+        { absolutePath: 'D:\\Asset Library' },
+        { path: 'D:\\Audio' },
+        { path: '' },
+        {},
+      ]).map(linkedFolder => ({
+        name: linkedFolder.name,
+        absolutePath: linkedFolder.absolutePath,
+      }))
+    ).toEqual([
+      {
+        name: 'Shared art',
+        absolutePath: 'D:\\Asset Library',
+      },
+      {
+        name: 'Audio',
+        absolutePath: 'D:\\Audio',
+      },
+    ]);
+  });
+
+  it('keeps linked folder metadata in a dedicated sidecar file', () => {
+    expect(
+      getLinkedFoldersFilePath({
+        getProjectFile: () => 'D:\\Project\\game.json',
+      })
+    ).toBe('D:\\Project\\.gdevelop-folder-links.json');
+    expect(isProjectFileNode(fileNode)).toBe(true);
+    expect(isProjectFileNode(linkedFileNode)).toBe(false);
+  });
+
+  it('finds linked folder nodes by id in a top-level tree', () => {
+    const projectFolderNode: ProjectFileNode = {
+      id: 'project',
+      name: 'Project',
+      absolutePath: 'D:\\Project',
+      relativePath: '',
+      type: 'folder',
+      extension: '',
+      children: [sourceFolderNode],
+      source: 'project',
+    };
+    const projectFilesRootNode: ProjectFileNode = {
+      id: 'project#project-files-root',
+      name: 'Project files',
+      absolutePath: 'D:\\Project',
+      relativePath: '',
+      type: 'folder',
+      extension: '',
+      children: [projectFolderNode, linkedFolderNode],
+      source: 'project-files-root',
+    };
+
+    expect(findNodeById(projectFilesRootNode, linkedFileNode.id)).toBe(
+      linkedFileNode
+    );
+    expect(findNodeById(projectFilesRootNode, projectFolderNode.id)).toBe(
+      projectFolderNode
+    );
   });
 
   it('computes skills folder paths for project template updates', () => {
@@ -415,6 +533,30 @@ describe('ProjectFilesPanel', () => {
     expect(source).toContain('canUpdateProjectFolderFromTemplate(node)');
     expect(source).toContain('label: i18n._(t`Update from template`)');
     expect(source).toContain('updateProjectSkillsFolderFromTemplate(node);');
+  });
+
+  it('shows folder link management actions', () => {
+    const source = getSource();
+
+    expect(source).toContain("'.gdevelop-folder-links.json'");
+    expect(source).not.toContain(
+      'children: [...children, linkedFoldersRootNode]'
+    );
+    expect(source).toContain(
+      'if (linkedFoldersRootNode) nodes.push(linkedFoldersRootNode);'
+    );
+    expect(source).toContain('if (rootNode) nodes.push(rootNode);');
+    expect(source).toContain('topLevelNodes.map(node => renderNode(node, 0))');
+    expect(source).toContain('label: i18n._(t`Add folder link`)');
+    expect(source).toContain('canRenameLinkedFolderNode(node)');
+    expect(source).toContain('name: newName');
+    expect(source).toContain('label: i18n._(t`Remove folder link`)');
+    expect(source).toContain('title: i18n._(t`Add folder link`)');
+    expect(source).toContain(
+      'message: i18n._(t`Choose a folder to show under Project files.`)'
+    );
+    expect(source).toContain('openAddLinkedFolderDialog');
+    expect(source).toContain('removeLinkedFolder(node)');
   });
 
   it('does not auto-select a newly created folder', () => {

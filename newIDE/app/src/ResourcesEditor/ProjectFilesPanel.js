@@ -1,5 +1,6 @@
 // @flow
 import { t, Trans } from '@lingui/macro';
+import { I18n } from '@lingui/react';
 
 import * as React from 'react';
 import { type I18n as I18nType } from '@lingui/core';
@@ -22,10 +23,14 @@ import CopyIcon from '../UI/CustomSvgIcons/Copy';
 import FileIcon from '../UI/CustomSvgIcons/File';
 import FileWithLines from '../UI/CustomSvgIcons/FileWithLines';
 import FolderIcon from '../UI/CustomSvgIcons/Folder';
+import AddFolderIcon from '../UI/CustomSvgIcons/AddFolder';
+import LinkIcon from '../UI/CustomSvgIcons/Link';
 import MusicIcon from '../UI/CustomSvgIcons/Music';
+import Object3dIcon from '../UI/CustomSvgIcons/Object3d';
 import PictureIcon from '../UI/CustomSvgIcons/Picture';
 import RefreshIcon from '../UI/CustomSvgIcons/Refresh';
 import VideoIcon from '../UI/CustomSvgIcons/Video';
+import Model3DPreview from '../ResourcesList/ResourcePreview/Model3DPreview';
 import FolderNameDialog from './FolderNameDialog';
 import MarkdownFileNameDialog from './MarkdownFileNameDialog';
 import ProjectFileRenameDialog from './ProjectFileRenameDialog';
@@ -35,6 +40,12 @@ import useAlertDialog from '../UI/Alert/useAlertDialog';
 import useResourcesChangedWatcher from '../ResourcesList/UseResourcesChangedWatcher';
 import { findLocalProjectTemplatePath } from '../ProjectCreation/LocalProjectTemplateFinder';
 import { copyTextToClipboard } from '../Utils/Clipboard';
+import { preventGameFramePointerEvents } from '../EmbeddedGame/EmbeddedGameFramePointerEvents';
+import {
+  clearActiveProjectFileDragPath,
+  projectFileDragDataMimeType,
+  setActiveProjectFileDragPath,
+} from '../Utils/ProjectFileDragData';
 
 const gd: libGDevelop = global.gd;
 const fs = optionalRequire('fs');
@@ -43,6 +54,7 @@ const url = optionalRequire('url');
 const electron = optionalRequire('electron');
 const remote = optionalRequire('@electron/remote');
 const shell = remote ? remote.shell : null;
+const dialog = remote ? remote.dialog : null;
 const electronWebUtils = electron ? electron.webUtils : null;
 
 const MAX_SCANNED_FILES = 8000;
@@ -52,7 +64,24 @@ const ignoredDirectoryNames = new Set([
   'node_modules',
   '.cache',
 ]);
-const ignoredFileNames = new Set(['.gdevelop-sticky-notes.json']);
+const folderLinksFileName = '.gdevelop-folder-links.json';
+const linkedFoldersRootName = 'Linked folders';
+const ignoredFileNames = new Set([
+  '.gdevelop-sticky-notes.json',
+  folderLinksFileName,
+]);
+
+type ProjectFileNodeSource =
+  | 'project'
+  | 'linked-folder'
+  | 'linked-folders-root'
+  | 'project-files-root';
+
+type LinkedFolder = {|
+  id: string,
+  name: string,
+  absolutePath: string,
+|};
 
 export type ProjectFileNode = {
   id: string,
@@ -65,6 +94,9 @@ export type ProjectFileNode = {
   resourceName?: ?string,
   resourceKind?: ?string,
   error?: ?string,
+  source?: ProjectFileNodeSource,
+  linkedFolderId?: string,
+  isLinkedFolderRoot?: boolean,
 };
 
 export type ProjectFileSelection = {|
@@ -101,6 +133,11 @@ type Props = {|
   onProjectFilesRefreshed: ProjectFileNode => void,
 |};
 
+type PropsWithI18n = {|
+  ...Props,
+  i18n: I18nType,
+|};
+
 const projectFilesLayoutStorageKey =
   'gdevelop.resourcesEditor.projectFiles.layout.v1';
 const defaultTreeWidth = 320;
@@ -133,6 +170,14 @@ const persistTreeWidth = (treeWidth: number) => {
     );
   } catch (error) {
     // Ignore local storage errors.
+  }
+};
+
+const preventEmbeddedGameFramePointerEvents = (enabled: boolean) => {
+  try {
+    preventGameFramePointerEvents(enabled);
+  } catch (error) {
+    // The embedded game frame is not always mounted while browsing project files.
   }
 };
 
@@ -374,6 +419,96 @@ export const getFileUrl = (absolutePath: string): string => {
 const normalizeAbsolutePath = (filePath: string): string =>
   normalizeSlashes(path.resolve(filePath)).toLowerCase();
 
+const getProjectFileNodeSource = (
+  node: ProjectFileNode
+): ProjectFileNodeSource => node.source || 'project';
+
+export const isProjectFileNode = (node: ProjectFileNode): boolean =>
+  getProjectFileNodeSource(node) === 'project';
+
+export const isLinkedFoldersRootNode = (node: ProjectFileNode): boolean =>
+  getProjectFileNodeSource(node) === 'linked-folders-root';
+
+export const isLinkedFolderNode = (node: ProjectFileNode): boolean =>
+  getProjectFileNodeSource(node) === 'linked-folder';
+
+export const isLinkedFolderRootNode = (node: ProjectFileNode): boolean =>
+  isLinkedFolderNode(node) && !!node.isLinkedFolderRoot;
+
+const getLinkedFolderId = (absolutePath: string): string =>
+  `linked-folder:${normalizeAbsolutePath(absolutePath)}`;
+
+const getLinkedFoldersRootNodeId = (projectRoot: string): string =>
+  `${normalizeSlashes(projectRoot)}#linked-folders`;
+
+const getProjectFilesRootNodeId = (projectRoot: string): string =>
+  `${normalizeSlashes(projectRoot)}#project-files-root`;
+
+const getProjectFileNodeId = ({
+  absolutePath,
+  source,
+  linkedFolderId,
+}: {|
+  absolutePath: string,
+  source: ProjectFileNodeSource,
+  linkedFolderId?: ?string,
+|}): string => {
+  if (source === 'linked-folder' && linkedFolderId) {
+    return `${linkedFolderId}:${normalizeSlashes(absolutePath)}`;
+  }
+
+  return normalizeSlashes(absolutePath);
+};
+
+export const getLinkedFoldersFilePath = (project: gdProject): ?string => {
+  if (!path) return null;
+  const projectRoot = getProjectRootPath(project);
+  if (!projectRoot) return null;
+  return path.join(projectRoot, folderLinksFileName);
+};
+
+const getLinkedFolderName = (absolutePath: string): string => {
+  if (!path) return absolutePath;
+  return path.basename(absolutePath) || absolutePath;
+};
+
+export const normalizeLinkedFolders = (
+  serializedLinkedFolders: any
+): Array<LinkedFolder> => {
+  if (!path || !Array.isArray(serializedLinkedFolders)) return [];
+
+  const linkedFolders = [];
+  const seenNormalizedPaths = new Set();
+  serializedLinkedFolders.forEach(serializedLinkedFolder => {
+    const serializedPath =
+      serializedLinkedFolder &&
+      (typeof serializedLinkedFolder.path === 'string'
+        ? serializedLinkedFolder.path
+        : typeof serializedLinkedFolder.absolutePath === 'string'
+        ? serializedLinkedFolder.absolutePath
+        : '');
+    const absolutePath = serializedPath.trim();
+    if (!absolutePath) return;
+
+    const resolvedAbsolutePath = path.resolve(absolutePath);
+    const normalizedAbsolutePath = normalizeAbsolutePath(resolvedAbsolutePath);
+    if (seenNormalizedPaths.has(normalizedAbsolutePath)) return;
+
+    const serializedName =
+      serializedLinkedFolder && typeof serializedLinkedFolder.name === 'string'
+        ? serializedLinkedFolder.name.trim()
+        : '';
+    seenNormalizedPaths.add(normalizedAbsolutePath);
+    linkedFolders.push({
+      id: getLinkedFolderId(resolvedAbsolutePath),
+      name: serializedName || getLinkedFolderName(resolvedAbsolutePath),
+      absolutePath: resolvedAbsolutePath,
+    });
+  });
+
+  return linkedFolders;
+};
+
 const normalizeProjectPath = (filePath: string): string =>
   normalizeSlashes(filePath)
     .replace(/^\.\//, '')
@@ -463,6 +598,9 @@ export const isVideoFile = (node: ProjectFileNode): boolean =>
   node.type === 'file' &&
   ['.mp4', '.webm', '.mov', '.m4v', '.ogv'].includes(node.extension);
 
+export const is3DModelFile = (node: ProjectFileNode): boolean =>
+  node.type === 'file' && ['.glb'].includes(node.extension);
+
 export const isMarkdownFile = (node: ProjectFileNode): boolean =>
   node.type === 'file' && ['.md', '.markdown'].includes(node.extension);
 
@@ -486,10 +624,14 @@ export const isTextLikeFile = (node: ProjectFileNode): boolean =>
   ].includes(node.extension);
 
 const getIconForNode = (node: ProjectFileNode): React.Node => {
+  if (isLinkedFoldersRootNode(node) || isLinkedFolderRootNode(node)) {
+    return <LinkIcon />;
+  }
   if (node.type === 'folder') return <FolderIcon />;
   if (isImageFile(node)) return <PictureIcon />;
   if (isAudioFile(node)) return <MusicIcon />;
   if (isVideoFile(node)) return <VideoIcon />;
+  if (is3DModelFile(node)) return <Object3dIcon />;
   if (isMarkdownFile(node) || isTextLikeFile(node)) return <FileWithLines />;
   return <FileIcon />;
 };
@@ -508,11 +650,15 @@ const readDirectory = async ({
   relativePath,
   resourcesByPath,
   counter,
+  source = 'project',
+  linkedFolderId = null,
 }: {|
   absolutePath: string,
   relativePath: string,
   resourcesByPath: Map<string, ResourceReference>,
   counter: {| count: number, truncated: boolean |},
+  source?: ProjectFileNodeSource,
+  linkedFolderId?: ?string,
 |}): Promise<Array<ProjectFileNode>> => {
   if (!fs || !path || counter.truncated) return [];
 
@@ -522,13 +668,20 @@ const readDirectory = async ({
   } catch (error) {
     return [
       {
-        id: absolutePath + '#error',
+        id:
+          getProjectFileNodeId({
+            absolutePath,
+            source,
+            linkedFolderId,
+          }) + '#error',
         name: 'Unable to read folder',
         absolutePath,
         relativePath,
         type: 'file',
         extension: '',
         error: error.message,
+        source,
+        linkedFolderId,
       },
     ];
   }
@@ -554,7 +707,11 @@ const readDirectory = async ({
     counter.count++;
 
     const node: ProjectFileNode = {
-      id: normalizeSlashes(childAbsolutePath),
+      id: getProjectFileNodeId({
+        absolutePath: childAbsolutePath,
+        source,
+        linkedFolderId,
+      }),
       name,
       absolutePath: childAbsolutePath,
       relativePath: childRelativePath,
@@ -562,6 +719,8 @@ const readDirectory = async ({
       extension: type === 'file' ? getExtension(name) : '',
       resourceName: resourceReference ? resourceReference.resourceName : null,
       resourceKind: resourceReference ? resourceReference.resourceKind : null,
+      source,
+      linkedFolderId,
     };
 
     if (type === 'folder') {
@@ -570,6 +729,8 @@ const readDirectory = async ({
         relativePath: childRelativePath,
         resourcesByPath,
         counter,
+        source,
+        linkedFolderId,
       });
     }
 
@@ -578,6 +739,186 @@ const readDirectory = async ({
 
   return sortNodes(nodes);
 };
+
+const ensureFolderLinksFileIsGitExcluded = async (
+  projectRoot: string
+): Promise<void> => {
+  if (!fs || !path) return;
+
+  let gitRootPath = path.resolve(projectRoot);
+  let gitDirectoryPath = null;
+  while (true) {
+    const candidateGitDirectoryPath = path.join(gitRootPath, '.git');
+    try {
+      const gitDirectoryStat = await fs.promises.stat(
+        candidateGitDirectoryPath
+      );
+      if (gitDirectoryStat.isDirectory()) {
+        gitDirectoryPath = candidateGitDirectoryPath;
+        break;
+      }
+    } catch (error) {
+      // Keep walking up to find an ancestor Git repository.
+    }
+
+    const parentPath = path.dirname(gitRootPath);
+    if (parentPath === gitRootPath) return;
+    gitRootPath = parentPath;
+  }
+
+  if (!gitDirectoryPath) return;
+
+  const gitInfoDirectoryPath = path.join(gitDirectoryPath, 'info');
+  const excludeFilePath = path.join(gitInfoDirectoryPath, 'exclude');
+  const excludeEntry = `/${normalizeSlashes(
+    path.relative(gitRootPath, path.join(projectRoot, folderLinksFileName))
+  )}`;
+
+  try {
+    await fs.promises.mkdir(gitInfoDirectoryPath, { recursive: true });
+    let existingExclude = '';
+    try {
+      existingExclude = await fs.promises.readFile(excludeFilePath, 'utf8');
+    } catch (error) {
+      existingExclude = '';
+    }
+
+    if (
+      existingExclude
+        .split(/\r?\n/)
+        .map(line => line.trim())
+        .includes(excludeEntry)
+    ) {
+      return;
+    }
+
+    const prefix =
+      existingExclude && !existingExclude.endsWith('\n') ? '\n' : '';
+    await fs.promises.appendFile(
+      excludeFilePath,
+      `${prefix}# GDevelop local folder links\n${excludeEntry}\n`,
+      'utf8'
+    );
+  } catch (error) {
+    // Do not block the feature if Git exclusion can't be updated.
+  }
+};
+
+const readLinkedFoldersFile = async (
+  project: gdProject
+): Promise<Array<LinkedFolder>> => {
+  if (!fs) return [];
+  const linkedFoldersFilePath = getLinkedFoldersFilePath(project);
+  if (!linkedFoldersFilePath) return [];
+
+  try {
+    const serializedLinkedFoldersFile = await fs.promises.readFile(
+      linkedFoldersFilePath,
+      'utf8'
+    );
+    const parsedLinkedFoldersFile = JSON.parse(serializedLinkedFoldersFile);
+    return normalizeLinkedFolders(parsedLinkedFoldersFile.linkedFolders);
+  } catch (error) {
+    if (error && error.code === 'ENOENT') return [];
+    throw error;
+  }
+};
+
+const writeLinkedFoldersFile = async ({
+  project,
+  linkedFolders,
+}: {|
+  project: gdProject,
+  linkedFolders: Array<LinkedFolder>,
+|}): Promise<void> => {
+  if (!fs || !path) return;
+  const projectRoot = getProjectRootPath(project);
+  const linkedFoldersFilePath = getLinkedFoldersFilePath(project);
+  if (!projectRoot || !linkedFoldersFilePath) return;
+
+  await ensureFolderLinksFileIsGitExcluded(projectRoot);
+  await fs.promises.writeFile(
+    linkedFoldersFilePath,
+    JSON.stringify(
+      {
+        version: 1,
+        linkedFolders: linkedFolders.map(linkedFolder => ({
+          name: linkedFolder.name,
+          path: linkedFolder.absolutePath,
+        })),
+      },
+      null,
+      2
+    ) + '\n',
+    'utf8'
+  );
+};
+
+const buildLinkedFoldersRootNode = async ({
+  projectRoot,
+  linkedFolders,
+  resourcesByPath,
+  counter,
+}: {|
+  projectRoot: string,
+  linkedFolders: Array<LinkedFolder>,
+  resourcesByPath: Map<string, ResourceReference>,
+  counter: {| count: number, truncated: boolean |},
+|}): Promise<ProjectFileNode> => {
+  const children = [];
+
+  for (const linkedFolder of linkedFolders) {
+    const linkedFolderChildren = await readDirectory({
+      absolutePath: linkedFolder.absolutePath,
+      relativePath: linkedFolder.name,
+      resourcesByPath,
+      counter,
+      source: 'linked-folder',
+      linkedFolderId: linkedFolder.id,
+    });
+
+    children.push({
+      id: linkedFolder.id,
+      name: linkedFolder.name,
+      absolutePath: linkedFolder.absolutePath,
+      relativePath: linkedFolder.name,
+      type: 'folder',
+      extension: '',
+      children: linkedFolderChildren,
+      source: 'linked-folder',
+      linkedFolderId: linkedFolder.id,
+      isLinkedFolderRoot: true,
+    });
+  }
+
+  return {
+    id: getLinkedFoldersRootNodeId(projectRoot),
+    name: linkedFoldersRootName,
+    absolutePath: projectRoot,
+    relativePath: linkedFoldersRootName,
+    type: 'folder',
+    extension: '',
+    children,
+    source: 'linked-folders-root',
+  };
+};
+
+const buildProjectFilesRootNode = ({
+  projectRootNode,
+  linkedFoldersRootNode,
+}: {|
+  projectRootNode: ProjectFileNode,
+  linkedFoldersRootNode: ProjectFileNode,
+|}): ProjectFileNode => ({
+  id: getProjectFilesRootNodeId(projectRootNode.absolutePath),
+  name: 'Project files',
+  absolutePath: projectRootNode.absolutePath,
+  relativePath: '',
+  type: 'folder',
+  extension: '',
+  children: [projectRootNode, linkedFoldersRootNode],
+  source: 'project-files-root',
+});
 
 export const findNodeByAbsolutePath = (
   node: ProjectFileNode,
@@ -592,6 +933,19 @@ export const findNodeByAbsolutePath = (
   if (!node.children) return null;
   for (const child of node.children) {
     const foundNode = findNodeByAbsolutePath(child, absolutePath);
+    if (foundNode) return foundNode;
+  }
+  return null;
+};
+
+export const findNodeById = (
+  node: ProjectFileNode,
+  nodeId: string
+): ?ProjectFileNode => {
+  if (node.id === nodeId) return node;
+  if (!node.children) return null;
+  for (const child of node.children) {
+    const foundNode = findNodeById(child, nodeId);
     if (foundNode) return foundNode;
   }
   return null;
@@ -615,6 +969,20 @@ const findParentNodeByAbsolutePath = (
       absolutePath,
       node
     );
+    if (foundParentNode) return foundParentNode;
+  }
+  return null;
+};
+
+const findParentNodeById = (
+  node: ProjectFileNode,
+  nodeId: string,
+  parentNode: ?ProjectFileNode = null
+): ?ProjectFileNode => {
+  if (node.id === nodeId) return parentNode;
+  if (!node.children) return null;
+  for (const child of node.children) {
+    const foundParentNode = findParentNodeById(child, nodeId, node);
     if (foundParentNode) return foundParentNode;
   }
   return null;
@@ -940,13 +1308,15 @@ export const shouldSelectCreatedProjectFile = (
 ): boolean => node.type !== 'folder';
 
 export const canDeleteProjectFolder = (node: ProjectFileNode): boolean =>
+  isProjectFileNode(node) &&
   node.type === 'folder' &&
   !!node.relativePath &&
   (!node.children || node.children.length === 0);
 
 export const canUpdateProjectFolderFromTemplate = (
   node: ProjectFileNode
-): boolean => node.type === 'folder' && !node.relativePath;
+): boolean =>
+  isProjectFileNode(node) && node.type === 'folder' && !node.relativePath;
 
 export const shouldSelectProjectFileNode = (node: ProjectFileNode): boolean =>
   node.type === 'file' || node.type === 'folder';
@@ -959,6 +1329,9 @@ export const canMoveProjectFileToFolder = ({
   targetFolderNode: ProjectFileNode,
 |}): boolean => {
   if (!path || !sourceNode) return false;
+  if (!isProjectFileNode(sourceNode) || !isProjectFileNode(targetFolderNode)) {
+    return false;
+  }
   if (sourceNode.type !== 'file' || targetFolderNode.type !== 'folder') {
     return false;
   }
@@ -972,7 +1345,11 @@ export const canMoveProjectFileToFolder = ({
 export const getProjectFileDragEffectAllowed = (): string => 'copyMove';
 
 export const canRenameProjectFileNode = (node: ProjectFileNode): boolean =>
-  node.type === 'file' || (node.type === 'folder' && !!node.relativePath);
+  isProjectFileNode(node) &&
+  (node.type === 'file' || (node.type === 'folder' && !!node.relativePath));
+
+export const canRenameLinkedFolderNode = (node: ProjectFileNode): boolean =>
+  isLinkedFolderRootNode(node);
 
 export const hasExternalFilesDragData = (dataTransferTypes: any): boolean => {
   if (!dataTransferTypes) return false;
@@ -1046,7 +1423,10 @@ export const getProjectFolderDropOperation = ({
     return 'move-project-file';
   }
 
-  if (getExternalFileDropPaths(dataTransfer).length) {
+  if (
+    isProjectFileNode(targetFolderNode) &&
+    getExternalFileDropPaths(dataTransfer).length
+  ) {
     return 'copy-external-files';
   }
 
@@ -1176,7 +1556,9 @@ export const getResourceFileAfterProjectPathMove = ({
   );
   return path.isAbsolute(previousResourceFile)
     ? movedResourceAbsolutePath
-    : normalizeSlashes(path.relative(projectRootPath, movedResourceAbsolutePath));
+    : normalizeSlashes(
+        path.relative(projectRootPath, movedResourceAbsolutePath)
+      );
 };
 
 const getFileMoveCheck = (
@@ -1317,13 +1699,14 @@ const updateResourcesAfterProjectPathMove = ({
     });
 };
 
-const ProjectFilesPanel: React.ComponentType<{
-  ...Props,
+const ProjectFilesPanelContent: React.ComponentType<{
+  ...PropsWithI18n,
   +ref?: React.RefSetter<ProjectFilesPanelInterface>,
-}> = React.forwardRef<Props, ProjectFilesPanelInterface>(
+}> = React.forwardRef<PropsWithI18n, ProjectFilesPanelInterface>(
   (
     {
       project,
+      i18n,
       fileMetadata,
       storageProvider,
       selectedItem,
@@ -1335,11 +1718,19 @@ const ProjectFilesPanel: React.ComponentType<{
     ref
   ) => {
     const theme = React.useContext(GDevelopThemeContext);
-    const { showAlert, showDeleteConfirmation } = useAlertDialog();
+    const {
+      showAlert,
+      showConfirmation,
+      showDeleteConfirmation,
+    } = useAlertDialog();
     const contextMenu = React.useRef<?ContextMenuInterface>(null);
     const contentRef = React.useRef<?HTMLDivElement>(null);
     const [searchText, setSearchText] = React.useState('');
     const [rootNode, setRootNode] = React.useState<?ProjectFileNode>(null);
+    const [
+      linkedFoldersRootNode,
+      setLinkedFoldersRootNode,
+    ] = React.useState<?ProjectFileNode>(null);
     const [openedNodeIds, setOpenedNodeIds] = React.useState<Array<string>>([]);
     const [treeWidth, setTreeWidth] = React.useState(getPersistedTreeWidth);
     const [isLoading, setIsLoading] = React.useState(false);
@@ -1366,9 +1757,10 @@ const ProjectFilesPanel: React.ComponentType<{
       setFolderCreationError,
     ] = React.useState<?string>(null);
     const [isRenameDialogOpen, setIsRenameDialogOpen] = React.useState(false);
-    const [renameTargetNode, setRenameTargetNode] = React.useState<?ProjectFileNode>(
-      null
-    );
+    const [
+      renameTargetNode,
+      setRenameTargetNode,
+    ] = React.useState<?ProjectFileNode>(null);
     const [renameError, setRenameError] = React.useState<?string>(null);
     const [
       draggedFileNode,
@@ -1402,6 +1794,14 @@ const ProjectFilesPanel: React.ComponentType<{
             relativePath: '',
             resourcesByPath,
             counter,
+            source: 'project',
+          });
+          const linkedFolders = await readLinkedFoldersFile(project);
+          const linkedFoldersRootNode = await buildLinkedFoldersRootNode({
+            projectRoot,
+            linkedFolders,
+            resourcesByPath,
+            counter,
           });
           const newRootNode: ProjectFileNode = {
             id: normalizeSlashes(projectRoot),
@@ -1411,15 +1811,21 @@ const ProjectFilesPanel: React.ComponentType<{
             type: 'folder',
             extension: '',
             children,
+            source: 'project',
           };
+          const projectFilesRootNode = buildProjectFilesRootNode({
+            projectRootNode: newRootNode,
+            linkedFoldersRootNode,
+          });
           setRootNode(newRootNode);
+          setLinkedFoldersRootNode(linkedFoldersRootNode);
           setOpenedNodeIds(openedNodeIds => {
             if (openedNodeIds.includes(newRootNode.id)) return openedNodeIds;
             return [newRootNode.id, ...openedNodeIds];
           });
           setIsTruncated(counter.truncated);
-          onProjectFilesRefreshed(newRootNode);
-          return newRootNode;
+          onProjectFilesRefreshed(projectFilesRootNode);
+          return projectFilesRootNode;
         } catch (error) {
           setError(error.message);
           return null;
@@ -1619,16 +2025,91 @@ const ProjectFilesPanel: React.ComponentType<{
       [makeSelectionForNode, onViewProjectFileProperties]
     );
 
-    const openRenameDialogForNode = React.useCallback((node: ProjectFileNode) => {
-      if (!canRenameProjectFileNode(node)) return;
-      setRenameTargetNode(node);
-      setRenameError(null);
-      setIsRenameDialogOpen(true);
-    }, []);
+    const openRenameDialogForNode = React.useCallback(
+      (node: ProjectFileNode) => {
+        if (
+          !canRenameProjectFileNode(node) &&
+          !canRenameLinkedFolderNode(node)
+        ) {
+          return;
+        }
+        setRenameTargetNode(node);
+        setRenameError(null);
+        setIsRenameDialogOpen(true);
+      },
+      []
+    );
 
     const renameProjectFileNode = React.useCallback(
       async (newName: string) => {
         if (!fs || !path || !rootNode || !renameTargetNode) return;
+
+        if (canRenameLinkedFolderNode(renameTargetNode)) {
+          const linkedFolderId = renameTargetNode.linkedFolderId;
+          if (!linkedFolderId) return;
+
+          if (newName === renameTargetNode.name) {
+            setRenameError(null);
+            setRenameTargetNode(null);
+            setIsRenameDialogOpen(false);
+            return;
+          }
+
+          const currentLinkedFolders = await readLinkedFoldersFile(project);
+          let hasRenamedLinkedFolder = false;
+          const nextLinkedFolders = currentLinkedFolders.map(linkedFolder => {
+            if (linkedFolder.id !== linkedFolderId) return linkedFolder;
+
+            hasRenamedLinkedFolder = true;
+            return {
+              ...linkedFolder,
+              name: newName,
+            };
+          });
+
+          if (!hasRenamedLinkedFolder) {
+            setRenameError('This folder link could not be found.');
+            return;
+          }
+
+          try {
+            await writeLinkedFoldersFile({
+              project,
+              linkedFolders: nextLinkedFolders,
+            });
+          } catch (error) {
+            setRenameError(
+              `The folder link could not be renamed:\n\n${error.message}`
+            );
+            return;
+          }
+
+          setRenameError(null);
+          setRenameTargetNode(null);
+          setIsRenameDialogOpen(false);
+          const refreshedRoot = (await refresh()) || rootNode;
+          if (
+            selectedItem &&
+            selectedItem.node.linkedFolderId === linkedFolderId
+          ) {
+            const renamedNode =
+              findNodeById(refreshedRoot, selectedItem.node.id) ||
+              findNodeByAbsolutePath(
+                refreshedRoot,
+                selectedItem.node.absolutePath
+              );
+            onSelectProjectFile(
+              renamedNode
+                ? {
+                    node: renamedNode,
+                    resource: getResourceFromNode(project, renamedNode),
+                  }
+                : null
+            );
+          }
+          return;
+        }
+
         if (!canRenameProjectFileNode(renameTargetNode)) return;
 
         const renamedPath = getRenamedProjectFilePath({
@@ -1699,7 +2180,10 @@ const ProjectFilesPanel: React.ComponentType<{
           normalizeAbsolutePath(selectedItem.node.absolutePath) ===
             normalizeAbsolutePath(renameTargetNode.absolutePath)
         ) {
-          const renamedNode = findNodeByAbsolutePath(refreshedRoot, renamedPath);
+          const renamedNode = findNodeByAbsolutePath(
+            refreshedRoot,
+            renamedPath
+          );
           onSelectProjectFile(
             renamedNode
               ? {
@@ -2058,6 +2542,8 @@ const ProjectFilesPanel: React.ComponentType<{
     const finishDraggingProjectFile = React.useCallback(() => {
       setDraggedFileNode(null);
       setDropTargetFolderNodeId(null);
+      clearActiveProjectFileDragPath();
+      preventEmbeddedGameFramePointerEvents(false);
     }, []);
 
     const startDraggingProjectFile = React.useCallback(
@@ -2065,16 +2551,21 @@ const ProjectFilesPanel: React.ComponentType<{
         if (node.type !== 'file') return;
         event.dataTransfer.effectAllowed = getProjectFileDragEffectAllowed();
         event.dataTransfer.setData(
-          'application/x-gdevelop-project-file',
+          projectFileDragDataMimeType,
           JSON.stringify({
             id: node.id,
             type: node.type,
             absolutePath: node.absolutePath,
             name: node.name,
             extension: node.extension,
+            source: getProjectFileNodeSource(node),
           })
         );
         event.dataTransfer.setData('text/plain', node.name);
+        setActiveProjectFileDragPath(node.absolutePath);
+        if (is3DModelFile(node)) {
+          preventEmbeddedGameFramePointerEvents(true);
+        }
         setDraggedFileNode(node);
       },
       []
@@ -2087,6 +2578,7 @@ const ProjectFilesPanel: React.ComponentType<{
           targetFolderNode,
         });
         const canCopyExternalFiles =
+          isProjectFileNode(targetFolderNode) &&
           targetFolderNode.type === 'folder' &&
           hasExternalFilesDragData(event.dataTransfer.types);
         if (!canMoveProjectFile && !canCopyExternalFiles) {
@@ -2181,6 +2673,10 @@ const ProjectFilesPanel: React.ComponentType<{
       [toggleNode]
     );
 
+    const openNodePath = React.useCallback((node: ProjectFileNode) => {
+      if (shell) shell.openPath(node.absolutePath);
+    }, []);
+
     const openProjectFolder = React.useCallback(
       () => {
         const projectRoot = getProjectRootPath(project);
@@ -2204,6 +2700,167 @@ const ProjectFilesPanel: React.ComponentType<{
         }
       },
       [project, showAlert]
+    );
+
+    const copyNodeAbsolutePath = React.useCallback(
+      async (node: ProjectFileNode) => {
+        try {
+          await copyTextToClipboard(node.absolutePath);
+        } catch (error) {
+          await showAlert({
+            title: t`Unable to copy path`,
+            message: t`The path could not be copied to the clipboard.`,
+          });
+        }
+      },
+      [showAlert]
+    );
+
+    const addLinkedFolderPath = React.useCallback(
+      async (folderPath: string) => {
+        if (!fs || !path || !rootNode) return;
+
+        let folderStat;
+        try {
+          folderStat = await fs.promises.stat(folderPath);
+        } catch (error) {
+          await showAlert({
+            title: t`Unable to add folder link`,
+            message: `The folder could not be read from disk:\n\n${
+              error.message
+            }`,
+          });
+          return;
+        }
+
+        if (!folderStat.isDirectory()) {
+          await showAlert({
+            title: t`Unable to add folder link`,
+            message: t`Only folders can be linked.`,
+          });
+          return;
+        }
+
+        const resolvedFolderPath = path.resolve(folderPath);
+        const currentLinkedFolders = await readLinkedFoldersFile(project);
+        const nextLinkedFolder = normalizeLinkedFolders([
+          { path: resolvedFolderPath },
+        ])[0];
+        if (!nextLinkedFolder) return;
+
+        if (
+          currentLinkedFolders.some(
+            linkedFolder =>
+              normalizeAbsolutePath(linkedFolder.absolutePath) ===
+              normalizeAbsolutePath(nextLinkedFolder.absolutePath)
+          )
+        ) {
+          await showAlert({
+            title: t`Folder link already exists`,
+            message: t`This folder is already linked in Project files.`,
+          });
+          return;
+        }
+
+        await writeLinkedFoldersFile({
+          project,
+          linkedFolders: [...currentLinkedFolders, nextLinkedFolder],
+        });
+        setOpenedNodeIds(openedNodeIds =>
+          Array.from(
+            new Set([
+              rootNode.id,
+              getLinkedFoldersRootNodeId(rootNode.absolutePath),
+              nextLinkedFolder.id,
+              ...openedNodeIds,
+            ])
+          )
+        );
+        const refreshedRoot = (await refresh()) || rootNode;
+        const fallbackLinkedFolderNode: ProjectFileNode = {
+          id: nextLinkedFolder.id,
+          name: nextLinkedFolder.name,
+          absolutePath: nextLinkedFolder.absolutePath,
+          relativePath: nextLinkedFolder.name,
+          type: 'folder',
+          extension: '',
+          children: [],
+          source: 'linked-folder',
+          linkedFolderId: nextLinkedFolder.id,
+          isLinkedFolderRoot: true,
+        };
+        const linkedFolderNode =
+          findNodeById(refreshedRoot, nextLinkedFolder.id) ||
+          findNodeByAbsolutePath(
+            refreshedRoot,
+            nextLinkedFolder.absolutePath
+          ) ||
+          fallbackLinkedFolderNode;
+        if (linkedFolderNode) {
+          onSelectProjectFile({
+            node: linkedFolderNode,
+            resource: null,
+          });
+        }
+      },
+      [project, refresh, rootNode, onSelectProjectFile, showAlert]
+    );
+
+    const openAddLinkedFolderDialog = React.useCallback(
+      async () => {
+        if (!dialog || !remote) {
+          await showAlert({
+            title: t`Unable to add folder link`,
+            message: t`Folder links are available only in the desktop app.`,
+          });
+          return;
+        }
+
+        const projectRoot = getProjectRootPath(project);
+        const browserWindow = remote.getCurrentWindow();
+        const { filePaths } = await dialog.showOpenDialog(browserWindow, {
+          title: i18n._(t`Add folder link`),
+          message: i18n._(t`Choose a folder to show under Project files.`),
+          properties: ['openDirectory'],
+          defaultPath: projectRoot || undefined,
+        });
+
+        if (!filePaths || !filePaths.length) return;
+        await addLinkedFolderPath(filePaths[0]);
+      },
+      [addLinkedFolderPath, i18n, project, showAlert]
+    );
+
+    const removeLinkedFolder = React.useCallback(
+      async (node: ProjectFileNode) => {
+        if (!isLinkedFolderRootNode(node) || !node.linkedFolderId) return;
+
+        const shouldRemove = await showConfirmation({
+          title: t`Remove folder link`,
+          message: `This removes the "${
+            node.name
+          }" shortcut from Project files. Files on disk will not be deleted.`,
+          confirmButtonLabel: t`Remove`,
+        });
+        if (!shouldRemove) return;
+
+        const currentLinkedFolders = await readLinkedFoldersFile(project);
+        await writeLinkedFoldersFile({
+          project,
+          linkedFolders: currentLinkedFolders.filter(
+            linkedFolder => linkedFolder.id !== node.linkedFolderId
+          ),
+        });
+
+        if (
+          selectedItem &&
+          selectedItem.node.linkedFolderId === node.linkedFolderId
+        ) {
+          onSelectProjectFile(null);
+        }
+        await refresh();
+      },
+      [project, refresh, selectedItem, onSelectProjectFile, showConfirmation]
     );
 
     const updateProjectSkillsFolderFromTemplate = React.useCallback(
@@ -2312,6 +2969,61 @@ const ProjectFilesPanel: React.ComponentType<{
         const node = options.node;
         if (!node) return [];
 
+        if (isLinkedFoldersRootNode(node)) {
+          return [
+            {
+              label: i18n._(t`Add folder link`),
+              click: openAddLinkedFolderDialog,
+            },
+          ];
+        }
+
+        if (isLinkedFolderRootNode(node)) {
+          return [
+            {
+              label: i18n._(t`View properties`),
+              click: () => viewPropertiesForNode(node),
+            },
+            {
+              label: i18n._(t`Rename`),
+              click: () => openRenameDialogForNode(node),
+            },
+            {
+              label: i18n._(t`Open linked folder`),
+              click: () => openNodePath(node),
+            },
+            {
+              label: i18n._(t`Copy linked folder path`),
+              click: () => copyNodeAbsolutePath(node),
+            },
+            { type: 'separator' },
+            {
+              label: i18n._(t`Remove folder link`),
+              click: () => removeLinkedFolder(node),
+            },
+          ];
+        }
+
+        if (isLinkedFolderNode(node)) {
+          return [
+            {
+              label: i18n._(t`View properties`),
+              click: () => viewPropertiesForNode(node),
+            },
+            {
+              label:
+                node.type === 'folder'
+                  ? i18n._(t`Open folder`)
+                  : i18n._(t`Open file`),
+              click: () => openNodePath(node),
+            },
+            {
+              label: i18n._(t`Copy absolute path`),
+              click: () => copyNodeAbsolutePath(node),
+            },
+          ];
+        }
+
         const menu: Array<MenuItemTemplate> = [
           {
             label: i18n._(t`View properties`),
@@ -2330,6 +3042,10 @@ const ProjectFilesPanel: React.ComponentType<{
           {
             label: i18n._(t`New Markdown`),
             click: () => openMarkdownDialogForNode(node),
+          },
+          {
+            label: i18n._(t`Add folder link`),
+            click: openAddLinkedFolderDialog,
           },
         ];
 
@@ -2371,15 +3087,40 @@ const ProjectFilesPanel: React.ComponentType<{
       [
         deleteProjectFolder,
         deleteProjectFile,
+        copyNodeAbsolutePath,
+        openAddLinkedFolderDialog,
         openFolderDialogForNode,
         openMarkdownDialogForNode,
         openRenameDialogForNode,
+        openNodePath,
+        removeLinkedFolder,
         updateProjectSkillsFolderFromTemplate,
         viewPropertiesForNode,
       ]
     );
 
     const searchTextLowerCase = searchText.trim().toLowerCase();
+
+    const projectFilesRootNode = React.useMemo(
+      (): ?ProjectFileNode =>
+        rootNode && linkedFoldersRootNode
+          ? buildProjectFilesRootNode({
+              projectRootNode: rootNode,
+              linkedFoldersRootNode,
+            })
+          : rootNode,
+      [linkedFoldersRootNode, rootNode]
+    );
+
+    const topLevelNodes = React.useMemo(
+      (): Array<ProjectFileNode> => {
+        const nodes = [];
+        if (linkedFoldersRootNode) nodes.push(linkedFoldersRootNode);
+        if (rootNode) nodes.push(rootNode);
+        return nodes;
+      },
+      [linkedFoldersRootNode, rootNode]
+    );
 
     const nodeMatchesSearch = React.useCallback(
       (node: ProjectFileNode): boolean => {
@@ -2439,9 +3180,7 @@ const ProjectFilesPanel: React.ComponentType<{
                 ...styles.registeredBadge,
                 ...styles.registeredIconBadge,
               }}
-              title={getRegisteredProjectFileBadgeTitle(
-                registeredResourceName
-              )}
+              title={getRegisteredProjectFileBadgeTitle(registeredResourceName)}
               aria-label={getRegisteredProjectFileBadgeTitle(
                 registeredResourceName
               )}
@@ -2530,13 +3269,17 @@ const ProjectFilesPanel: React.ComponentType<{
         if (!selectedItem) return rootNode;
         if (selectedItem.node.type === 'folder') return selectedItem.node;
         return (
-          findParentNodeByAbsolutePath(
-            rootNode,
-            selectedItem.node.absolutePath
-          ) || rootNode
+          (projectFilesRootNode &&
+            findParentNodeById(projectFilesRootNode, selectedItem.node.id)) ||
+          (projectFilesRootNode &&
+            findParentNodeByAbsolutePath(
+              projectFilesRootNode,
+              selectedItem.node.absolutePath
+            )) ||
+          rootNode
         );
       },
-      [rootNode, selectedItem]
+      [projectFilesRootNode, rootNode, selectedItem]
     );
 
     const thumbnailNodes = React.useMemo(
@@ -2562,13 +3305,27 @@ const ProjectFilesPanel: React.ComponentType<{
           );
         }
 
+        if (is3DModelFile(node)) {
+          return (
+            <Model3DPreview
+              modelUrl={getFileUrl(node.absolutePath)}
+              expand
+              fullWidth
+            />
+          );
+        }
+
         const iconStyle = {
           width: 56,
           height: 56,
         };
+        if (isLinkedFoldersRootNode(node) || isLinkedFolderRootNode(node)) {
+          return <LinkIcon style={iconStyle} />;
+        }
         if (node.type === 'folder') return <FolderIcon style={iconStyle} />;
         if (isAudioFile(node)) return <MusicIcon style={iconStyle} />;
         if (isVideoFile(node)) return <VideoIcon style={iconStyle} />;
+        if (is3DModelFile(node)) return <Object3dIcon style={iconStyle} />;
         if (isMarkdownFile(node) || isTextLikeFile(node)) {
           return <FileWithLines style={iconStyle} />;
         }
@@ -2598,9 +3355,7 @@ const ProjectFilesPanel: React.ComponentType<{
                 ...styles.registeredBadge,
                 ...styles.registeredIconBadge,
               }}
-              title={getRegisteredProjectFileBadgeTitle(
-                registeredResourceName
-              )}
+              title={getRegisteredProjectFileBadgeTitle(registeredResourceName)}
               aria-label={getRegisteredProjectFileBadgeTitle(
                 registeredResourceName
               )}
@@ -2728,6 +3483,13 @@ const ProjectFilesPanel: React.ComponentType<{
             </IconButton>
             <IconButton
               size="small"
+              onClick={openAddLinkedFolderDialog}
+              tooltip={t`Add folder link`}
+            >
+              <AddFolderIcon />
+            </IconButton>
+            <IconButton
+              size="small"
               onClick={onRefreshProjectFiles}
               tooltip={t`Refresh project files and remove unused resources`}
             >
@@ -2763,7 +3525,7 @@ const ProjectFilesPanel: React.ComponentType<{
               }}
             >
               <div style={styles.scrollContainer}>
-                {renderNode(rootNode, 0)}
+                {topLevelNodes.map(node => renderNode(node, 0))}
               </div>
             </div>
             <div
@@ -2882,5 +3644,16 @@ const ProjectFilesPanel: React.ComponentType<{
     );
   }
 );
+
+const ProjectFilesPanel: React.ComponentType<{
+  ...Props,
+  +ref?: React.RefSetter<ProjectFilesPanelInterface>,
+}> = React.forwardRef<Props, ProjectFilesPanelInterface>((props, ref) => (
+  <I18n>
+    {({ i18n }) => (
+      <ProjectFilesPanelContent {...props} i18n={i18n} ref={ref} />
+    )}
+  </I18n>
+));
 
 export default ProjectFilesPanel;

@@ -8,6 +8,11 @@ import {
   get3DModelFilePathsFromDataTransfer,
   getSupported3DModelFilePaths,
 } from './Create3DModelFromGLB';
+import {
+  clearActiveProjectFileDragPath,
+  projectFileDragDataMimeType,
+  setActiveProjectFileDragPath,
+} from '../Utils/ProjectFileDragData';
 
 const gd = global.gd;
 const scene3DExtensionModule = require('../../../../Extensions/3D/JsExtension');
@@ -20,6 +25,18 @@ const makeProjectInTempFolder = () => {
 };
 
 describe('Create3DModelFromGLB', () => {
+  const getSceneEditorSource = () =>
+    fs
+      .readFileSync(path.join(__dirname, 'index.js'), 'utf8')
+      .replace(/\r\n/g, '\n');
+  const getEmbeddedGameFrameSource = () =>
+    fs
+      .readFileSync(
+        path.join(__dirname, '..', 'EmbeddedGame', 'EmbeddedGameFrame.js'),
+        'utf8'
+      )
+      .replace(/\r\n/g, '\n');
+
   beforeAll(() => {
     const translate = message => message;
     const extension = scene3DExtensionModule.createExtension(translate, gd);
@@ -138,6 +155,79 @@ describe('Create3DModelFromGLB', () => {
 
     expect(get3DModelFilePathsFromDataTransfer(dataTransfer, webUtils)).toEqual(
       ['C:\\project\\Hero.glb']
+    );
+  });
+
+  test('extracts supported GLB paths from project file drag data', () => {
+    const dataTransfer = {
+      types: [projectFileDragDataMimeType],
+      getData: mimeType =>
+        mimeType === projectFileDragDataMimeType
+          ? JSON.stringify({
+              type: 'file',
+              absolutePath: 'C:\\project\\Linked\\Hero.glb',
+            })
+          : '',
+    };
+
+    expect(get3DModelFilePathsFromDataTransfer(dataTransfer)).toEqual([
+      'C:\\project\\Linked\\Hero.glb',
+    ]);
+  });
+
+  test('extracts a supported GLB path from the active project file drag', () => {
+    try {
+      setActiveProjectFileDragPath('C:\\project\\Linked\\Hero.glb');
+      const dataTransfer = {
+        types: [],
+        getData: () => '',
+      };
+
+      expect(get3DModelFilePathsFromDataTransfer(dataTransfer)).toEqual([
+        'C:\\project\\Linked\\Hero.glb',
+      ]);
+    } finally {
+      clearActiveProjectFileDragPath();
+    }
+  });
+
+  test('updates the embedded 3D editor incrementally after dropping a GLB', () => {
+    const source = getSceneEditorSource();
+    const embeddedDropStart = source.indexOf(
+      '_on3DModelFilesDroppedInEmbeddedGameFrame = async'
+    );
+    const embeddedDropEnd = source.indexOf('_onRemoveLayer', embeddedDropStart);
+    const embeddedDropSource = source.slice(embeddedDropStart, embeddedDropEnd);
+
+    expect(source).toContain("command: 'hotReloadObjectsAndAddInstances'");
+    expect(source).toContain(
+      'const resources = getRuntimeProjectResourceDataArray(project)'
+    );
+    expect(embeddedDropSource).toContain(
+      'this._hotReloadObjectsAndAddInstancesInEditor3D({ objects, instances })'
+    );
+    expect(embeddedDropSource).toContain(
+      'this._ignoreResourceExternalChangesForFiles'
+    );
+    expect(source).toContain('_shouldIgnoreResourceExternalChange');
+    expect(source).toContain('Ignoring resource watcher event');
+    expect(embeddedDropSource).not.toContain(
+      'resourceManagementProps.onResourceUsageChanged()'
+    );
+    expect(embeddedDropSource).not.toContain(
+      'resourceManagementProps.onNewResourcesAdded()'
+    );
+  });
+
+  test('accepts native GLB drops that enter directly over the embedded game iframe', () => {
+    const source = getEmbeddedGameFrameSource();
+
+    expect(source).toContain('const toParentNativeFileDragEvent');
+    expect(source).toContain('iframe.contentWindow');
+    expect(source).toContain('registeredIframeWindow.addEventListener(');
+    expect(source).toContain("'dragover'");
+    expect(source).toContain(
+      'onNativeFileDrop(toParentNativeFileDragEvent(event))'
     );
   });
 });

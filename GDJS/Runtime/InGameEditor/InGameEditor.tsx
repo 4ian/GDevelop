@@ -3097,6 +3097,71 @@ namespace gdjs {
       }
     }
 
+    getNewInstanceDropPosition(): {
+      x: float;
+      y: float;
+      z: float;
+      layerName: string;
+    } | null {
+      const currentScene = this._currentScene;
+      if (!currentScene) return null;
+
+      const selectedLayer = this.getEditorLayer(this._selectedLayerName);
+      if (!selectedLayer) return null;
+
+      const isLayer3D = selectedLayer.getRenderer().getThreeGroup();
+      let cursorX: float;
+      let cursorY: float;
+      let cursorZ: float;
+      if (isLayer3D) {
+        const cameraX = selectedLayer.getCameraX();
+        const cameraY = selectedLayer.getCameraY();
+        const cameraZ = getCameraZ(currentScene, selectedLayer.getName(), 0);
+
+        const closestIntersect = this._getClosestIntersectionUnderCursor();
+        if (closestIntersect) {
+          cursorX = closestIntersect.point.x;
+          cursorY = -closestIntersect.point.y;
+          cursorZ = closestIntersect.point.z;
+        } else {
+          const projectedCursor = this._getProjectedCursor();
+          if (!projectedCursor) {
+            // Avoid to create an object behind the camera when it's dropped over the horizon.
+            return null;
+          }
+          cursorX = projectedCursor[0];
+          cursorY = projectedCursor[1];
+          cursorZ = 0;
+        }
+
+        const cursorDistance = Math.hypot(
+          cursorX - cameraX,
+          cursorY - cameraY,
+          cursorZ - cameraZ
+        );
+        if (
+          cursorDistance > selectedLayer.getInitialCamera3DFarPlaneDistance()
+        ) {
+          // Avoid to create an object outside of the rendered area.
+          return null;
+        }
+      } else {
+        const projectedCursor = this._getProjectedCursor();
+        if (!projectedCursor) return null;
+
+        cursorX = projectedCursor[0];
+        cursorY = projectedCursor[1];
+        cursorZ = 0;
+      }
+
+      return {
+        x: Math.round(cursorX),
+        y: Math.round(cursorY),
+        z: cursorZ,
+        layerName: selectedLayer.getName(),
+      };
+    }
+
     /**
      * @returns The cursor projected on the plane Z = 0 or `null` if the cursor is in the sky.
      */

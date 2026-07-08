@@ -32,7 +32,7 @@ import {
   type InstanceOrObjectPropertiesEditorInterface,
 } from '../../SceneEditor/InstanceOrObjectPropertiesEditorContainer';
 import { useDoNowOrAfterRender } from '../../Utils/UseDoNowOrAfterRender';
-import { preventGameFramePointerEvents } from '../../EmbeddedGame/EmbeddedGameFrame';
+import { preventGameFramePointerEvents } from '../../EmbeddedGame/EmbeddedGameFramePointerEvents';
 import { EmbeddedGameFrameHole } from '../../EmbeddedGame/EmbeddedGameFrameHole';
 import { exceptionallyGuardAgainstDeadObject } from '../../Utils/IsNullPtr';
 

@@ -428,7 +428,7 @@ const BehaviorConfigurationEditor = React.forwardRef<
             ) : null}
             <Line>
               <BehaviorComponent
-                behavior={behavior}
+                behaviors={[behavior]}
                 project={project}
                 object={behaviorEditorObject || object}
                 layersContainer={layersContainer}

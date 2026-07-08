@@ -14,9 +14,18 @@ import {
 } from './EmbeddedGameFrameHole';
 import KeyboardShortcuts from '../UI/KeyboardShortcuts';
 import { useInGameEditorSettings } from './InGameEditorSettings';
+import { get3DModelFilePathsFromDataTransfer } from '../SceneEditor/Create3DModelFromGLB';
+import { hasProjectFileDragData } from '../Utils/ProjectFileDragData';
+import { registerPreventGameFramePointerEventsCallback } from './EmbeddedGameFramePointerEvents';
 
 type AttachToPreviewOptions = {|
   previewIndexHtmlLocation: string,
+|};
+
+type EmbeddedGameFrame3DModelFilesDrop = {|
+  modelFilePaths: Array<string>,
+  x: number,
+  y: number,
 |};
 
 export type PreviewInGameEditorTarget = {|
@@ -103,13 +112,15 @@ let onIsEditorHotReloadNeeded: null | (() => boolean) = null;
 let onSwitchInGameEditorIfNoHotReloadIsNeeded:
   | null
   | (PreviewInGameEditorTarget => void) = null;
-let onPreventGameFramePointerEvents: null | ((enabled: boolean) => void) = null;
 let onSetCameraState:
   | null
   | ((editorId: string, cameraState: EditorCameraState) => void) = null;
 let onChangeViewPosition:
   | null
   | ((command: ChangeViewPositionCommand) => void) = null;
+let on3DModelFilesDroppedInEmbeddedGameFrame:
+  | null
+  | (EmbeddedGameFrame3DModelFilesDrop => void | Promise<void>) = null;
 
 export const setEmbeddedGameFramePreviewLocation = ({
   previewIndexHtmlLocation,
@@ -153,15 +164,21 @@ export const switchInGameEditorIfNoHotReloadIsNeeded = (
   onSwitchInGameEditorIfNoHotReloadIsNeeded(previewInGameEditorTarget);
 };
 
-export const preventGameFramePointerEvents = (enabled: boolean) => {
-  if (!onPreventGameFramePointerEvents)
-    throw new Error('No EmbeddedGameFrame registered.');
-  onPreventGameFramePointerEvents(enabled);
-};
-
 export const changeViewPosition = (command: ChangeViewPositionCommand) => {
   if (!onChangeViewPosition) return;
   onChangeViewPosition(command);
+};
+
+export const register3DModelFilesDroppedInEmbeddedGameFrameCallback = (
+  callback: EmbeddedGameFrame3DModelFilesDrop => void | Promise<void>
+): (() => void) => {
+  on3DModelFilesDroppedInEmbeddedGameFrame = callback;
+
+  return () => {
+    if (on3DModelFilesDroppedInEmbeddedGameFrame === callback) {
+      on3DModelFilesDroppedInEmbeddedGameFrame = null;
+    }
+  };
 };
 
 const logSwitchingInfo = ({
@@ -270,9 +287,11 @@ export const EmbeddedGameFrame = ({
           iframe.contentWindow.focus();
         }
       };
-      onPreventGameFramePointerEvents = (enabled: boolean) => {
-        setIsPointerEventsPrevented(enabled);
-      };
+      const unregisterPreventGameFramePointerEvents = registerPreventGameFramePointerEventsCallback(
+        (enabled: boolean) => {
+          setIsPointerEventsPrevented(enabled);
+        }
+      );
       onSetEditorHotReloadNeeded = (addedHotReloadSteps: HotReloadSteps) => {
         hotReloadSteps.current = mergeNeededHotReloadSteps(
           hotReloadSteps.current,
@@ -492,6 +511,10 @@ export const EmbeddedGameFrame = ({
             });
           });
       };
+
+      return () => {
+        unregisterPreventGameFramePointerEvents();
+      };
     },
     [
       previewDebuggerServer,
@@ -527,7 +550,258 @@ export const EmbeddedGameFrame = ({
   );
 
   const [isDraggedItem3D, setDraggedItem3D] = React.useState(false);
+  const [isNativeFileDraggedOver, setNativeFileDraggedOver] = React.useState(
+    false
+  );
   const dropTargetRef = React.useRef<HTMLDivElement | null>(null);
+  const nativeFileDragOverTimeoutId = React.useRef<?TimeoutID>(null);
+
+  const hasImportableFileDragData = React.useCallback((event: any): boolean => {
+    if (!on3DModelFilesDroppedInEmbeddedGameFrame) return false;
+
+    const { dataTransfer } = event;
+    if (!dataTransfer) return false;
+
+    const dataTransferTypes = dataTransfer.types || [];
+    return (
+      Array.from(dataTransferTypes).includes('Files') ||
+      hasProjectFileDragData(dataTransferTypes) ||
+      get3DModelFilePathsFromDataTransfer(dataTransfer).length > 0
+    );
+  }, []);
+
+  const isOverActiveEmbeddedGameFrameHole = React.useCallback(
+    (event: DragEvent): boolean => {
+      const embeddedGameFrameHoleRect = getActiveEmbeddedGameFrameHoleRect();
+      if (!embeddedGameFrameHoleRect) return false;
+
+      return (
+        event.clientX >= embeddedGameFrameHoleRect.left &&
+        event.clientX <= embeddedGameFrameHoleRect.right &&
+        event.clientY >= embeddedGameFrameHoleRect.top &&
+        event.clientY <= embeddedGameFrameHoleRect.bottom
+      );
+    },
+    []
+  );
+
+  const clearNativeFileDragOverTimeout = React.useCallback(() => {
+    if (nativeFileDragOverTimeoutId.current) {
+      clearTimeout(nativeFileDragOverTimeoutId.current);
+      nativeFileDragOverTimeoutId.current = null;
+    }
+  }, []);
+
+  const showNativeFileDropTarget = React.useCallback(
+    () => {
+      clearNativeFileDragOverTimeout();
+      setNativeFileDraggedOver(true);
+      nativeFileDragOverTimeoutId.current = setTimeout(() => {
+        setNativeFileDraggedOver(false);
+        nativeFileDragOverTimeoutId.current = null;
+      }, 150);
+    },
+    [clearNativeFileDragOverTimeout]
+  );
+
+  const keepNativeFileDropTargetVisible = React.useCallback(
+    (event: any) => {
+      if (!hasImportableFileDragData(event)) return;
+
+      event.preventDefault();
+      event.stopPropagation();
+
+      if (event.dataTransfer) {
+        event.dataTransfer.dropEffect = 'copy';
+      }
+
+      showNativeFileDropTarget();
+    },
+    [hasImportableFileDragData, showNativeFileDropTarget]
+  );
+
+  const hideNativeFileDropTarget = React.useCallback(
+    () => {
+      clearNativeFileDragOverTimeout();
+      setNativeFileDraggedOver(false);
+    },
+    [clearNativeFileDragOverTimeout]
+  );
+
+  const onNativeFileDrop = React.useCallback(
+    (event: any) => {
+      if (!hasImportableFileDragData(event)) return;
+
+      event.preventDefault();
+      event.stopPropagation();
+      hideNativeFileDropTarget();
+
+      if (!isOverActiveEmbeddedGameFrameHole(event)) {
+        return;
+      }
+
+      const dropTarget = dropTargetRef.current;
+      const on3DModelFilesDropped = on3DModelFilesDroppedInEmbeddedGameFrame;
+      if (!dropTarget || !on3DModelFilesDropped) return;
+
+      const modelFilePaths = get3DModelFilePathsFromDataTransfer(
+        event.dataTransfer
+      );
+      if (!modelFilePaths.length) return;
+
+      const dropTargetRect = dropTarget.getBoundingClientRect();
+      Promise.resolve(
+        on3DModelFilesDropped({
+          modelFilePaths,
+          x: event.clientX - dropTargetRect.left,
+          y: event.clientY - dropTargetRect.top,
+        })
+      ).catch(error => {
+        console.error('Unable to drop 3D model files in the 3D editor:', error);
+      });
+    },
+    [
+      hasImportableFileDragData,
+      hideNativeFileDropTarget,
+      isOverActiveEmbeddedGameFrameHole,
+    ]
+  );
+
+  const toParentNativeFileDragEvent = React.useCallback((event: any): any => {
+    const iframe = iframeRef.current;
+    const iframeRect = iframe ? iframe.getBoundingClientRect() : null;
+
+    return {
+      dataTransfer: event.dataTransfer,
+      clientX: event.clientX + (iframeRect ? iframeRect.left : 0),
+      clientY: event.clientY + (iframeRect ? iframeRect.top : 0),
+      preventDefault: () => event.preventDefault(),
+      stopPropagation: () => event.stopPropagation(),
+    };
+  }, []);
+
+  React.useEffect(
+    () => {
+      const onWindowDragEnter = (event: DragEvent) => {
+        if (!getActiveEmbeddedGameFrameHoleRect()) return;
+        if (!hasImportableFileDragData(event)) return;
+        showNativeFileDropTarget();
+      };
+      const onWindowDragOver = (event: DragEvent) => {
+        if (isOverActiveEmbeddedGameFrameHole(event)) {
+          keepNativeFileDropTargetVisible(event);
+          return;
+        }
+        if (!getActiveEmbeddedGameFrameHoleRect()) return;
+        if (!hasImportableFileDragData(event)) return;
+        showNativeFileDropTarget();
+      };
+      const onWindowDrop = (event: DragEvent) => {
+        if (!isOverActiveEmbeddedGameFrameHole(event)) return;
+        onNativeFileDrop(event);
+      };
+
+      window.addEventListener('dragenter', onWindowDragEnter);
+      window.addEventListener('dragover', onWindowDragOver);
+      window.addEventListener('drop', onWindowDrop);
+
+      return () => {
+        window.removeEventListener('dragenter', onWindowDragEnter);
+        window.removeEventListener('dragover', onWindowDragOver);
+        window.removeEventListener('drop', onWindowDrop);
+      };
+    },
+    [
+      hasImportableFileDragData,
+      isOverActiveEmbeddedGameFrameHole,
+      keepNativeFileDropTargetVisible,
+      onNativeFileDrop,
+      showNativeFileDropTarget,
+    ]
+  );
+
+  React.useEffect(
+    () => () => {
+      clearNativeFileDragOverTimeout();
+    },
+    [clearNativeFileDragOverTimeout]
+  );
+
+  React.useEffect(
+    () => {
+      const iframe = iframeRef.current;
+      if (!iframe) return;
+
+      let registeredIframeWindow: any = null;
+      const onIframeDragEnter = (event: any) => {
+        const parentEvent = toParentNativeFileDragEvent(event);
+        if (!hasImportableFileDragData(parentEvent)) return;
+
+        parentEvent.preventDefault();
+        parentEvent.stopPropagation();
+        showNativeFileDropTarget();
+      };
+      const onIframeDragOver = (event: any) => {
+        keepNativeFileDropTargetVisible(toParentNativeFileDragEvent(event));
+      };
+      const onIframeDrop = (event: any) => {
+        onNativeFileDrop(toParentNativeFileDragEvent(event));
+      };
+
+      const unregisterIframeWindow = () => {
+        if (!registeredIframeWindow) return;
+        registeredIframeWindow.removeEventListener(
+          'dragenter',
+          onIframeDragEnter,
+          true
+        );
+        registeredIframeWindow.removeEventListener(
+          'dragover',
+          onIframeDragOver,
+          true
+        );
+        registeredIframeWindow.removeEventListener('drop', onIframeDrop, true);
+        registeredIframeWindow = null;
+      };
+
+      const registerIframeWindow = () => {
+        unregisterIframeWindow();
+
+        try {
+          registeredIframeWindow = iframe.contentWindow;
+          if (!registeredIframeWindow) return;
+          registeredIframeWindow.addEventListener(
+            'dragenter',
+            onIframeDragEnter,
+            true
+          );
+          registeredIframeWindow.addEventListener(
+            'dragover',
+            onIframeDragOver,
+            true
+          );
+          registeredIframeWindow.addEventListener('drop', onIframeDrop, true);
+        } catch (error) {
+          registeredIframeWindow = null;
+        }
+      };
+
+      iframe.addEventListener('load', registerIframeWindow);
+      registerIframeWindow();
+
+      return () => {
+        iframe.removeEventListener('load', registerIframeWindow);
+        unregisterIframeWindow();
+      };
+    },
+    [
+      hasImportableFileDragData,
+      keepNativeFileDropTargetVisible,
+      onNativeFileDrop,
+      showNativeFileDropTarget,
+      toParentNativeFileDragEvent,
+    ]
+  );
 
   const dragNewInstance = React.useCallback(
     ({
@@ -665,7 +939,11 @@ export const EmbeddedGameFrame = ({
                   // Display the div that acts either as a drop target or as a "blocker"
                   // to avoid the iframe stealing drag/resize mouse/touch events.
                   display:
-                    canDrop || isPointerEventsPrevented ? 'flex' : 'none',
+                    canDrop ||
+                    isPointerEventsPrevented ||
+                    isNativeFileDraggedOver
+                      ? 'flex'
+                      : 'none',
                   position: 'absolute',
                   top: 0,
                   left: 0,
@@ -677,10 +955,17 @@ export const EmbeddedGameFrame = ({
                 }}
                 id="embedded-game-frame-drop-target"
                 ref={dropTargetRef}
+                onDragEnter={keepNativeFileDropTargetVisible}
+                onDragOver={keepNativeFileDropTargetVisible}
+                onDrop={onNativeFileDrop}
               >
-                {canDrop && (
+                {(canDrop || isNativeFileDraggedOver) && (
                   <div className={classes.hintText}>
-                    {isDraggedItem3D ? (
+                    {isNativeFileDraggedOver ? (
+                      <Text color="inherit">
+                        <Trans>Drop to add the 3D model to the scene</Trans>
+                      </Text>
+                    ) : isDraggedItem3D ? (
                       <Text color="inherit">
                         <Trans>Drag here to add to the scene</Trans>
                       </Text>

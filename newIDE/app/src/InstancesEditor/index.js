@@ -60,6 +60,7 @@ import {
 } from './TileSetVisualizer';
 import { getImageFilePathsFromDataTransfer } from '../SceneEditor/CreateSpriteFromImage';
 import { get3DModelFilePathsFromDataTransfer } from '../SceneEditor/Create3DModelFromGLB';
+import { hasProjectFileDragData } from '../Utils/ProjectFileDragData';
 import ClickInterceptor from './ClickInterceptor';
 import getObjectByName from '../Utils/GetObjectByName';
 import { AffineTransformation } from '../Utils/AffineTransformation';
@@ -1076,14 +1077,18 @@ export default class InstancesEditor extends Component<Props, State> {
     this._onObjectDrop(monitor);
   };
 
-  _hasNativeFiles = (event: DragEvent): boolean => {
+  _hasImportableFileDragData = (event: DragEvent): boolean => {
     const { dataTransfer } = event;
     if (!dataTransfer) return false;
-    return Array.from(dataTransfer.types || []).includes('Files');
+    const dataTransferTypes = dataTransfer.types || [];
+    return (
+      Array.from(dataTransferTypes).includes('Files') ||
+      hasProjectFileDragData(dataTransferTypes)
+    );
   };
 
   _onNativeDragOver = (event: DragEvent) => {
-    if (!this._hasNativeFiles(event)) return;
+    if (!this._hasImportableFileDragData(event)) return;
 
     event.preventDefault();
     event.stopPropagation();
@@ -1093,7 +1098,7 @@ export default class InstancesEditor extends Component<Props, State> {
   };
 
   _onNativeDrop = async (event: DragEvent) => {
-    if (!this._hasNativeFiles(event)) return;
+    if (!this._hasImportableFileDragData(event)) return;
 
     event.preventDefault();
     event.stopPropagation();

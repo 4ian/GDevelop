@@ -325,29 +325,6 @@ const pushChanges = async ({ projectFilePath, remoteUrl, force = false }) => {
   return getStatus(projectFilePath);
 };
 
-const commitAndPushChanges = async ({
-  projectFilePath,
-  message,
-  remoteUrl,
-}) => {
-  const status = await ensureGitRepository(projectFilePath);
-
-  if (status.changedFiles.length) {
-    await commitChanges({
-      projectFilePath,
-      message,
-    });
-  } else if (!status.commits.length) {
-    throw new Error('There are no commits to push.');
-  }
-
-  return pushChanges({
-    projectFilePath,
-    remoteUrl,
-    force: true,
-  });
-};
-
 const revertCommit = async ({ projectFilePath, commitHash }) => {
   if (!commitHash) throw new Error('A commit hash is required.');
 
@@ -456,12 +433,6 @@ const handleGitToolRequest = async request => {
         projectFilePath,
         remoteUrl: payload.remoteUrl,
         force: !!payload.force,
-      });
-    case 'commit-and-push':
-      return commitAndPushChanges({
-        projectFilePath,
-        message: payload.message,
-        remoteUrl: payload.remoteUrl,
       });
     case 'revert':
       return revertCommit({

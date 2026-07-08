@@ -15,6 +15,10 @@ import {
 
 jest.mock('../UI/SoundPlayer', () => () => null);
 jest.mock('../ResourcesList/ResourcePreview', () => () => null);
+jest.mock(
+  '../ResourcesList/ResourcePreview/InteractiveModel3DPreview',
+  () => () => null
+);
 jest.mock('../UI/IconButton', () => {
   const React = require('react');
   return function MockIconButton(props) {
@@ -318,6 +322,21 @@ describe('WorkingDesk', () => {
     expect(source).toContain("'nano-banana'");
     expect(source).toContain("'elevenlabs-audio'");
     expect(source).toContain("'local-image'");
+  });
+
+  it('opens GLB files in the interactive 3D model preview', () => {
+    const source = fs.readFileSync(
+      path.join(__dirname, 'WorkingDesk.js'),
+      'utf8'
+    );
+
+    expect(source).toContain(
+      "import InteractiveModel3DPreview from '../ResourcesList/ResourcePreview/InteractiveModel3DPreview'"
+    );
+    expect(source).toContain('if (is3DModelFile(selectedNode))');
+    expect(source).toContain(
+      '<InteractiveModel3DPreview modelUrl={fileUrl} />'
+    );
   });
 
   it('uses white text for HTTP request and response details', () => {

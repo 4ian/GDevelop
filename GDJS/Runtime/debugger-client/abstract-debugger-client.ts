@@ -9,6 +9,58 @@ namespace gdjs {
     error: console.error,
   };
 
+  const mergeResourcesByName = (
+    currentResources: ResourceData[],
+    newResources: ResourceData[]
+  ): ResourceData[] => {
+    const resourcesByName = new Map<string, ResourceData>();
+    currentResources.forEach((resource) => {
+      resourcesByName.set(resource.name, resource);
+    });
+    newResources.forEach((resource) => {
+      resourcesByName.set(resource.name, resource);
+    });
+    return Array.from(resourcesByName.values());
+  };
+
+  const getUsedResourcesForObjectData = (
+    objectData: ObjectData
+  ): ResourceReference[] => {
+    if (Array.isArray(objectData.usedResources)) {
+      return objectData.usedResources;
+    }
+
+    const modelResourceName =
+      objectData.type === 'Scene3D::Model3DObject'
+        ? (objectData as any).content &&
+          (objectData as any).content.modelResourceName
+        : null;
+    return typeof modelResourceName === 'string' && modelResourceName
+      ? [{ name: modelResourceName }]
+      : [];
+  };
+
+  const getObjectDataWithUsedResources = (
+    objectData: ObjectData
+  ): ObjectData => {
+    const usedResources = getUsedResourcesForObjectData(objectData);
+    return usedResources.length ? { ...objectData, usedResources } : objectData;
+  };
+
+  const upsertObjectData = (
+    objectDatas: ObjectData[],
+    objectData: ObjectData
+  ): void => {
+    const objectIndex = objectDatas.findIndex(
+      (existingObjectData) => existingObjectData.name === objectData.name
+    );
+    if (objectIndex >= 0) {
+      objectDatas[objectIndex] = objectData;
+    } else {
+      objectDatas.push(objectData);
+    }
+  };
+
   /**
    * A function used to replace circular references with a new value.
    * @param key - The key corresponding to the value.
@@ -312,6 +364,84 @@ namespace gdjs {
               );
             }
           }
+        } else if (data.command === 'hotReloadObjectsAndAddInstances') {
+          if (inGameEditor) {
+            const editor = inGameEditor;
+            const editedInstanceContainer = editor.getEditedInstanceContainer();
+            if (editedInstanceContainer) {
+              const resources = data.payload.resources || [];
+              const updatedObjects = (data.payload.updatedObjects || []).map(
+                getObjectDataWithUsedResources
+              );
+              const instances = data.payload.instances || [];
+              const sceneName =
+                editedInstanceContainer instanceof gdjs.RuntimeScene
+                  ? editedInstanceContainer.getName()
+                  : undefined;
+              const projectData = runtimeGame._data;
+              if (resources.length) {
+                projectData.resources.resources = mergeResourcesByName(
+                  projectData.resources.resources,
+                  resources
+                );
+              }
+              if (sceneName) {
+                const sceneData = runtimeGame.getSceneData(sceneName);
+                if (sceneData) {
+                  updatedObjects.forEach((objectData: ObjectData) => {
+                    upsertObjectData(sceneData.objects, objectData);
+                  });
+                }
+              }
+              runtimeGame.setProjectData(projectData);
+              that._hotReloader.hotReloadRuntimeSceneObjects(
+                updatedObjects,
+                editedInstanceContainer
+              );
+
+              const objectNames = updatedObjects
+                .map((objectData: ObjectData) => objectData.name)
+                .filter(
+                  (objectName: string | null): objectName is string =>
+                    !!objectName
+                );
+              objectNames.forEach((objectName: string) => {
+                runtimeGame.loadObjectOrGroupAssets(objectName, sceneName);
+              });
+
+              const waitForAssets = async () => {
+                const startTime = Date.now();
+                while (
+                  objectNames.some(
+                    (objectName: string) =>
+                      !runtimeGame.areObjectOrGroupAssetsLoaded(
+                        objectName,
+                        sceneName
+                      )
+                  ) &&
+                  Date.now() - startTime < 30000
+                ) {
+                  await new Promise((resolve) => setTimeout(resolve, 50));
+                }
+              };
+
+              waitForAssets()
+                .catch((error) => {
+                  logger.error(
+                    'Unable to load object resources before adding instances: ' +
+                      error
+                  );
+                })
+                .then(() => {
+                  editor.addInstances(instances);
+                  editor.setSelectedObjects(
+                    instances.map(
+                      (instance: InstanceData) => instance.persistentUuid
+                    )
+                  );
+                });
+            }
+          }
         } else if (data.command === 'hotReloadLayers') {
           if (inGameEditor) {
             const editedInstanceContainer =
@@ -416,6 +546,17 @@ namespace gdjs {
             if (data.payload.moveUnderCursor) {
               inGameEditor.moveSelectionUnderCursor();
             }
+          }
+        } else if (data.command === 'getInGameEditorDropPosition') {
+          const gameCoords = runtimeGame
+            .getRenderer()
+            .convertPageToGameCoords(data.x, data.y);
+          runtimeGame
+            .getInputManager()
+            .onMouseMove(gameCoords[0], gameCoords[1]);
+
+          if (data.messageId) {
+            this.sendInGameEditorDropPosition(data.messageId);
           }
         } else if (data.command === 'deleteSelection') {
           if (inGameEditor) {
@@ -1026,6 +1167,22 @@ namespace gdjs {
                 maxY: 0,
                 maxZ: 0,
               },
+        })
+      );
+    }
+
+    sendInGameEditorDropPosition(messageId: number): void {
+      const inGameEditor = this._runtimegame.getInGameEditor();
+      this._sendMessage(
+        circularSafeStringify({
+          command: 'inGameEditorDropPosition',
+          editorId: inGameEditor ? inGameEditor.getEditorId() : null,
+          messageId,
+          payload: {
+            position: inGameEditor
+              ? inGameEditor.getNewInstanceDropPosition()
+              : null,
+          },
         })
       );
     }

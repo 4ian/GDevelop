@@ -112,6 +112,7 @@ import {
 } from './Create3DModelFromGLB';
 import {
   changeViewPosition,
+  register3DModelFilesDroppedInEmbeddedGameFrameCallback,
   setCameraState,
 } from '../EmbeddedGame/EmbeddedGameFrame';
 import Rectangle from '../Utils/Rectangle';
@@ -123,8 +124,11 @@ import {
   shouldResetObjectRendererForCustomObjectChildrenEdit,
 } from './CustomObjectResourceReload';
 import { type ObjectGroupEditorTab } from '../ObjectGroupEditor/EditedObjectGroupEditorDialog';
+import optionalRequire from '../Utils/OptionalRequire';
 
 const gd: libGDevelop = global.gd;
+const path = optionalRequire('path');
+const url = optionalRequire('url');
 
 // The kind of the last selection whose properties are shown in the side panel.
 // NOTE: Upstream imports this as `type LastSelectionType` from
@@ -132,8 +136,86 @@ const gd: libGDevelop = global.gd;
 // it, so the union is kept in sync locally here.
 type LastSelectionType = 'instance' | 'object' | 'layer' | 'objectGroup';
 
+type EmbeddedGameFrame3DModelDropPosition = {|
+  x: number,
+  y: number,
+  z: number,
+  layerName: string,
+|};
+
 const BASE_LAYER_NAME = '';
 const INSTANCES_CLIPBOARD_KIND = 'Instances';
+
+const isExternalResourceFile = (file: string): boolean =>
+  file.indexOf('http://') === 0 ||
+  file.indexOf('https://') === 0 ||
+  file.indexOf('data:') === 0 ||
+  file.indexOf('blob:') === 0 ||
+  file.indexOf('file://') === 0;
+
+const getLocalFileUrl = (absolutePath: string): string => {
+  if (url && url.pathToFileURL)
+    return url.pathToFileURL(absolutePath).toString();
+  return `file:///${absolutePath.replace(/\\/g, '/').replace(/^\/+/, '')}`;
+};
+
+const getRuntimeProjectResourceDataArray = (project: gdProject): Array<any> => {
+  const serializedProject = serializeToJSObject(project);
+  const resourceDataArray =
+    serializedProject.resources &&
+    Array.isArray(serializedProject.resources.resources)
+      ? serializedProject.resources.resources
+      : [];
+
+  if (!path) return resourceDataArray;
+  const projectFile = project.getProjectFile();
+  const projectRootPath = projectFile ? path.dirname(projectFile) : null;
+  if (!projectRootPath) return resourceDataArray;
+
+  return resourceDataArray.map(resourceData => {
+    const file = resourceData.file;
+    if (typeof file !== 'string' || !file || isExternalResourceFile(file)) {
+      return resourceData;
+    }
+
+    const absolutePath = path.isAbsolute(file)
+      ? file
+      : path.join(projectRootPath, file);
+    return {
+      ...resourceData,
+      file: getLocalFileUrl(absolutePath),
+    };
+  });
+};
+
+const normalizeResourceFileIdentifier = (identifier: string): string =>
+  identifier.replace(/\\/g, '/').toLowerCase();
+
+const get3DModelResourceFileIdentifiers = ({
+  project,
+  objects,
+}: {|
+  project: gdProject,
+  objects: Array<gdObject>,
+|}): Array<string> => {
+  const resourceFiles = [];
+  const resourcesManager = project.getResourcesManager();
+
+  objects.forEach(object => {
+    if (object.getType() !== 'Scene3D::Model3DObject') return;
+
+    const model3DConfiguration = gd.asModel3DConfiguration(
+      object.getConfiguration()
+    );
+    const resourceName = model3DConfiguration.getModelResourceName();
+    if (!resourceName || !resourcesManager.hasResource(resourceName)) return;
+
+    const resourceFile = resourcesManager.getResource(resourceName).getFile();
+    if (resourceFile) resourceFiles.push(resourceFile);
+  });
+
+  return resourceFiles;
+};
 
 const getTopLayerName = (
   layersContainer: gdLayersContainer,
@@ -463,8 +545,12 @@ export default class SceneEditor extends React.Component<Props, State> {
   editorDisplay: ?SceneEditorsDisplayInterface;
   resourceExternallyChangedCallbackId: ?string;
   unregisterDebuggerCallback: (() => void) | null = null;
+  unregister3DModelFilesDroppedInEmbeddedGameFrameCallback:
+    | (() => void)
+    | null = null;
   editorViewPosition2D: EditorViewPosition2D = { viewX: null, viewY: null };
   _reloadResourcesCounter: number = 0;
+  _ignoredResourceChangeIdentifiers: { [string]: number } = {};
 
   constructor(props: Props) {
     super(props);
@@ -526,6 +612,8 @@ export default class SceneEditor extends React.Component<Props, State> {
     if (this.state.history !== prevState.history)
       if (this.props.unsavedChanges)
         this.props.unsavedChanges.triggerUnsavedChanges();
+
+    this._sync3DModelFilesDroppedInEmbeddedGameFrameCallback();
   }
 
   componentDidMount() {
@@ -598,6 +686,7 @@ export default class SceneEditor extends React.Component<Props, State> {
         }
       );
     }
+    this._sync3DModelFilesDroppedInEmbeddedGameFrameCallback();
   }
 
   componentWillUnmount() {
@@ -608,7 +697,31 @@ export default class SceneEditor extends React.Component<Props, State> {
       this.unregisterDebuggerCallback();
       this.unregisterDebuggerCallback = null;
     }
+    if (this.unregister3DModelFilesDroppedInEmbeddedGameFrameCallback) {
+      this.unregister3DModelFilesDroppedInEmbeddedGameFrameCallback();
+      this.unregister3DModelFilesDroppedInEmbeddedGameFrameCallback = null;
+    }
   }
+
+  _sync3DModelFilesDroppedInEmbeddedGameFrameCallback = () => {
+    const shouldRegister =
+      this.props.isActive && this.props.gameEditorMode === 'embedded-game';
+
+    if (
+      shouldRegister &&
+      !this.unregister3DModelFilesDroppedInEmbeddedGameFrameCallback
+    ) {
+      this.unregister3DModelFilesDroppedInEmbeddedGameFrameCallback = register3DModelFilesDroppedInEmbeddedGameFrameCallback(
+        this._on3DModelFilesDroppedInEmbeddedGameFrame
+      );
+    } else if (
+      !shouldRegister &&
+      this.unregister3DModelFilesDroppedInEmbeddedGameFrameCallback
+    ) {
+      this.unregister3DModelFilesDroppedInEmbeddedGameFrameCallback();
+      this.unregister3DModelFilesDroppedInEmbeddedGameFrameCallback = null;
+    }
+  };
 
   onEditorReloaded() {
     this._sendSelectedInstances();
@@ -963,6 +1076,15 @@ export default class SceneEditor extends React.Component<Props, State> {
   |}) => {
     const { project } = this.props;
 
+    if (this._shouldIgnoreResourceExternalChange(resourceInfo.identifier)) {
+      console.info(
+        `Ignoring resource watcher event for "${
+          resourceInfo.identifier
+        }" because it was just imported into the 3D editor.`
+      );
+      return;
+    }
+
     const resourceNames = project
       .getResourcesManager()
       .getResourceNamesWithFile(resourceInfo.identifier)
@@ -977,6 +1099,30 @@ export default class SceneEditor extends React.Component<Props, State> {
     }
 
     await this._reloadResources(resourceNames, 'resource file changed');
+  };
+
+  _ignoreResourceExternalChangesForFiles = (resourceFiles: Array<string>) => {
+    const expiresAt = Date.now() + 5000;
+    resourceFiles.forEach(resourceFile => {
+      this._ignoredResourceChangeIdentifiers[
+        normalizeResourceFileIdentifier(resourceFile)
+      ] = expiresAt;
+    });
+  };
+
+  _shouldIgnoreResourceExternalChange = (identifier: string): boolean => {
+    const normalizedIdentifier = normalizeResourceFileIdentifier(identifier);
+    const expiresAt = this._ignoredResourceChangeIdentifiers[
+      normalizedIdentifier
+    ];
+    if (!expiresAt) return false;
+
+    if (Date.now() > expiresAt) {
+      delete this._ignoredResourceChangeIdentifiers[normalizedIdentifier];
+      return false;
+    }
+
+    return true;
   };
 
   onInstancesModifiedOutsideEditor = () => {
@@ -2135,6 +2281,38 @@ export default class SceneEditor extends React.Component<Props, State> {
     }
   };
 
+  _hotReloadObjectsAndAddInstancesInEditor3D = ({
+    objects,
+    instances,
+  }: {|
+    objects: Array<gdObject>,
+    instances: Array<gdInitialInstance>,
+  |}) => {
+    const { previewDebuggerServer, project } = this.props;
+    if (!previewDebuggerServer) return;
+
+    const updatedObjects = objects
+      .filter(object => !!exceptionallyGuardAgainstDeadObject(object))
+      .map(object => serializeObjectWithCleanDefaultBehaviorFlags(object));
+    const serializedInstances = instances.map(instance =>
+      serializeToJSObject(instance)
+    );
+    const resources = getRuntimeProjectResourceDataArray(project);
+
+    previewDebuggerServer
+      .getExistingEmbeddedGameFrameDebuggerIds()
+      .forEach(debuggerId => {
+        previewDebuggerServer.sendMessage(debuggerId, {
+          command: 'hotReloadObjectsAndAddInstances',
+          payload: {
+            resources,
+            updatedObjects,
+            instances: serializedInstances,
+          },
+        });
+      });
+  };
+
   _onObjectEdited = (
     objectWithContext: ObjectWithContext,
     hasResourceChanged: boolean
@@ -2284,7 +2462,8 @@ export default class SceneEditor extends React.Component<Props, State> {
 
   _onObjectsCreated = (
     objects: Array<gdObject>,
-    isTheFirstOfItsTypeInProject: boolean
+    isTheFirstOfItsTypeInProject: boolean,
+    { notifyInGameEditor = true }: {| notifyInGameEditor?: boolean |} = {}
   ) => {
     if (objects.length === 0) return;
 
@@ -2305,9 +2484,11 @@ export default class SceneEditor extends React.Component<Props, State> {
     if (this.props.unsavedChanges)
       this.props.unsavedChanges.triggerUnsavedChanges();
 
-    this.props.onObjectListsModified({
-      isNewObjectTypeUsed: isTheFirstOfItsTypeInProject,
-    });
+    if (notifyInGameEditor) {
+      this.props.onObjectListsModified({
+        isNewObjectTypeUsed: isTheFirstOfItsTypeInProject,
+      });
+    }
   };
 
   _onImageFilesDropped = async (
@@ -2392,6 +2573,170 @@ export default class SceneEditor extends React.Component<Props, State> {
       if (this.editorDisplay) this.editorDisplay.forceUpdateObjectsList();
       await this.props.resourceManagementProps.onFetchNewlyAddedResources();
       this.props.resourceManagementProps.onNewResourcesAdded();
+    } catch (error) {
+      console.error(
+        'Unable to create 3D model object from dropped GLB:',
+        error
+      );
+      Window.showMessageBox(
+        'Unable to create a 3D model object from the dropped GLB file.',
+        'error'
+      );
+    }
+  };
+
+  _get3DModelDropPositionInEmbeddedGameFrame = async ({
+    x,
+    y,
+  }: {|
+    x: number,
+    y: number,
+  |}): Promise<?EmbeddedGameFrame3DModelDropPosition> => {
+    const { previewDebuggerServer } = this.props;
+    if (!previewDebuggerServer) return null;
+
+    try {
+      const answer = await previewDebuggerServer.sendMessageWithResponse({
+        command: 'getInGameEditorDropPosition',
+        x,
+        y,
+      });
+      const position = answer.payload && answer.payload.position;
+      if (!position) return null;
+
+      const dropX = Number(position.x);
+      const dropY = Number(position.y);
+      const dropZ = Number(position.z);
+      if (
+        !Number.isFinite(dropX) ||
+        !Number.isFinite(dropY) ||
+        !Number.isFinite(dropZ)
+      ) {
+        return null;
+      }
+
+      return {
+        x: dropX,
+        y: dropY,
+        z: dropZ,
+        layerName:
+          typeof position.layerName === 'string'
+            ? position.layerName
+            : this.state.chosenLayer,
+      };
+    } catch (error) {
+      console.error('Unable to get the 3D model drop position:', error);
+      return null;
+    }
+  };
+
+  _addInstancesForObjectsAt3DPosition = (
+    objects: Array<gdObject>,
+    dropPosition: EmbeddedGameFrame3DModelDropPosition
+  ): Array<gdInitialInstance> => {
+    if (!objects.length) return [];
+
+    const zOrderFinder = new gd.HighestZOrderFinder();
+    zOrderFinder.reset();
+    this.props.initialInstances.iterateOverInstances(zOrderFinder);
+    const zOrder = zOrderFinder.getHighestZOrder() + 1;
+    zOrderFinder.delete();
+
+    return objects.map((object, index) => {
+      const instance: gdInitialInstance = this.props.initialInstances.insertNewInitialInstance();
+      instance.setObjectName(object.getName());
+      instance.setX(Math.round(dropPosition.x + index * 16));
+      instance.setY(Math.round(dropPosition.y + index * 16));
+      instance.setZ(dropPosition.z);
+      instance.setLayer(dropPosition.layerName);
+      instance.setZOrder(zOrder + index);
+
+      return instance;
+    });
+  };
+
+  _on3DModelFilesDroppedInEmbeddedGameFrame = async ({
+    modelFilePaths,
+    x,
+    y,
+  }: {|
+    modelFilePaths: Array<string>,
+    x: number,
+    y: number,
+  |}) => {
+    const storageProvider = this.props.resourceManagementProps.getStorageProvider();
+    if (
+      storageProvider.internalName !== 'LocalFile' ||
+      !this.props.project.getProjectFile()
+    ) {
+      Window.showMessageBox(
+        '3D models can only be dropped into saved local projects.',
+        'info'
+      );
+      return;
+    }
+
+    const supported3DModelFilePaths = getSupported3DModelFilePaths(
+      modelFilePaths
+    );
+    if (!supported3DModelFilePaths.length) return;
+
+    const dropPosition = await this._get3DModelDropPositionInEmbeddedGameFrame({
+      x,
+      y,
+    });
+    if (!dropPosition) return;
+
+    const isTheFirst3DModelObjectInProject = !gd.UsedObjectTypeFinder.scanProject(
+      this.props.project,
+      'Scene3D::Model3DObject'
+    );
+    try {
+      const objects = await create3DModelObjectsFromGLBFiles({
+        project: this.props.project,
+        objectsContainer: this.props.objectsContainer,
+        modelFilePaths: supported3DModelFilePaths,
+      });
+      this._ignoreResourceExternalChangesForFiles(
+        get3DModelResourceFileIdentifiers({
+          project: this.props.project,
+          objects,
+        })
+      );
+      const instances = this._addInstancesForObjectsAt3DPosition(
+        objects,
+        dropPosition
+      );
+
+      this._onObjectsCreated(objects, isTheFirst3DModelObjectInProject, {
+        notifyInGameEditor: false,
+      });
+      this._onInstancesAdded(instances);
+      if (this.editorDisplay) this.editorDisplay.forceUpdateObjectsList();
+      this.instancesSelection.clearSelection();
+      this.instancesSelection.selectInstances({
+        instances,
+        multiSelect: true,
+        layersLocks: null,
+      });
+      this._onInstancesSelected(instances);
+      this.forceUpdatePropertiesEditor();
+
+      if (isTheFirst3DModelObjectInProject) {
+        this.props.onObjectListsModified({
+          isNewObjectTypeUsed: true,
+        });
+      } else {
+        this._hotReloadObjectsAndAddInstancesInEditor3D({ objects, instances });
+      }
+      this.props.resourceManagementProps
+        .onFetchNewlyAddedResources()
+        .catch(error => {
+          console.error(
+            'Unable to fetch newly added resources after dropped GLB:',
+            error
+          );
+        });
     } catch (error) {
       console.error(
         'Unable to create 3D model object from dropped GLB:',

@@ -45,7 +45,6 @@ type GitToolStatusAction =
   | 'status'
   | 'init'
   | 'commit'
-  | 'commit-and-push'
   | 'push'
   | 'revert'
   | 'reset';

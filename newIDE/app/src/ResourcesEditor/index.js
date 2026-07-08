@@ -9,6 +9,7 @@ import ResourcePropertiesEditor, {
 import FilePropertiesPanel from './FilePropertiesPanel';
 import ProjectFilesPanel, {
   findNodeByAbsolutePath,
+  findNodeById,
   getResourceFromNode,
   type ProjectFilesPanelInterface,
   type ProjectFileNode,
@@ -240,7 +241,7 @@ export default class ResourcesEditor extends React.Component<Props, State> {
     selectedProjectFile: null,
     propertiesDialogSelection: null,
     workingDeskToolTabUpdate: null,
-    isPropertiesShown: true,
+    isPropertiesShown: false,
     workingDeskHeight: initialLayout.workingDeskHeight,
     toolsWidth: initialLayout.toolsWidth,
   };
@@ -296,10 +297,9 @@ export default class ResourcesEditor extends React.Component<Props, State> {
     const { selectedProjectFile } = this.state;
     if (!selectedProjectFile) return;
 
-    const refreshedNode = findNodeByAbsolutePath(
-      rootNode,
-      selectedProjectFile.node.absolutePath
-    );
+    const refreshedNode =
+      findNodeById(rootNode, selectedProjectFile.node.id) ||
+      findNodeByAbsolutePath(rootNode, selectedProjectFile.node.absolutePath);
     if (!refreshedNode) {
       this.setState(
         {

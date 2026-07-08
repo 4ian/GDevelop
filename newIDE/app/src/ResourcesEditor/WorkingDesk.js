@@ -15,6 +15,7 @@ import {
 import { MarkdownText } from '../UI/MarkdownText';
 import ResourcesLoader from '../ResourcesLoader';
 import ResourcePreview from '../ResourcesList/ResourcePreview';
+import InteractiveModel3DPreview from '../ResourcesList/ResourcePreview/InteractiveModel3DPreview';
 import CheckeredBackground from '../ResourcesList/CheckeredBackground';
 import SoundPlayer from '../UI/SoundPlayer';
 import optionalRequire from '../Utils/OptionalRequire';
@@ -27,9 +28,11 @@ import ZoomOut from '../UI/CustomSvgIcons/ZoomOut';
 import SparkleIcon from '../UI/CustomSvgIcons/Sparkle';
 import MusicIcon from '../UI/CustomSvgIcons/Music';
 import PictureIcon from '../UI/CustomSvgIcons/Picture';
+import Object3dIcon from '../UI/CustomSvgIcons/Object3d';
 import {
   getFileUrl,
   isAudioFile,
+  is3DModelFile,
   isImageFile,
   isMarkdownFile,
   isTextLikeFile,
@@ -877,6 +880,7 @@ const WorkingDesk = ({
     const node = tab.selectedItem.node;
     if (isImageFile(node)) return <PictureIcon />;
     if (isAudioFile(node)) return <MusicIcon />;
+    if (is3DModelFile(node)) return <Object3dIcon />;
     return null;
   };
 
@@ -1187,6 +1191,9 @@ const WorkingDesk = ({
           <video controls src={fileUrl} style={styles.audioVideo} />
         </div>
       );
+    }
+    if (is3DModelFile(selectedNode)) {
+      return <InteractiveModel3DPreview modelUrl={fileUrl} />;
     }
     if (isMarkdownFile(selectedNode)) return renderMarkdownEditor();
     if (isTextLikeFile(selectedNode)) return renderTextPreview();

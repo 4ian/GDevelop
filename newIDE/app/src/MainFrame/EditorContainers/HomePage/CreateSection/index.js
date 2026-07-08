@@ -51,7 +51,12 @@ import {
   MaxProjectCountAlertMessage,
 } from './MaxProjectCountAlertMessage';
 import { useProjectsListFor } from './utils';
-import { deleteCloudProject } from '../../../../Utils/GDevelopServices/Project';
+import {
+  deleteCloudProject,
+  restoreCloudProject,
+  type CloudProjectWithUserAccessInfo,
+} from '../../../../Utils/GDevelopServices/Project';
+import InfoBar from '../../../../UI/Messages/InfoBar';
 import { getDefaultRegisterGameProperties } from '../../../../Utils/UseGameAndBuildsManager';
 import { type CreateProjectResult } from '../../../../Utils/UseCreateProject';
 import { AskAiStandAloneForm } from '../../../../AiGeneration/AskAiStandAloneForm';
@@ -228,6 +233,7 @@ const CreateSection = ({
 
   const [currentPage, setCurrentPage] = React.useState(1);
   const [searchText, setSearchText] = React.useState<string>('');
+  const [infoBarMessage, setInfoBarMessage] = React.useState<?React.Node>(null);
 
   const onUnregisterGame = React.useCallback(
     async (
@@ -374,6 +380,7 @@ const CreateSection = ({
       setIsUpdatingGame(true);
       await deleteCloudProject(authenticatedUser, fileMetadata.fileIdentifier);
       authenticatedUser.onCloudProjectsChanged();
+      setInfoBarMessage(<Trans>{projectName} has been deleted.</Trans>);
     } catch (error) {
       const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
         error
@@ -386,6 +393,45 @@ const CreateSection = ({
         title: t`Unable to delete the project`,
         message,
       });
+    } finally {
+      setIsUpdatingGame(false);
+    }
+  };
+
+  const onRestoreCloudProject = async (
+    i18n: I18nType,
+    cloudProject: CloudProjectWithUserAccessInfo
+  ) => {
+    try {
+      setIsUpdatingGame(true);
+      await restoreCloudProject(authenticatedUser, cloudProject.id);
+      await authenticatedUser.onCloudProjectsChanged();
+      setInfoBarMessage(<Trans>{cloudProject.name} has been restored.</Trans>);
+    } catch (error) {
+      const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
+        error
+      );
+      const errorCode = extractedStatusAndCode
+        ? extractedStatusAndCode.code
+        : null;
+      if (errorCode === 'project-restoration/too-many-projects') {
+        showAlert({
+          title: t`Too many projects`,
+          message: t`You've reached the maximum number of projects you can have. Delete or unpublish some projects, or get a subscription with a higher limit, and try again.`,
+        });
+      } else if (
+        errorCode === 'project-restoration/restoration-window-expired'
+      ) {
+        showAlert({
+          title: t`Unable to restore the project`,
+          message: t`This project was deleted too long ago to be restored. Get a subscription to restore older deleted projects.`,
+        });
+      } else {
+        showAlert({
+          title: t`Unable to restore the project`,
+          message: t`An error occurred when restoring the project. Please try again later.`,
+        });
+      }
     } finally {
       setIsUpdatingGame(false);
     }
@@ -476,6 +522,11 @@ const CreateSection = ({
           onUnregisterGame={() => onUnregisterGame(openedGame.id, i18n)}
           onDeleteCloudProject={onDeleteCloudProject}
           initialWidgetToScrollTo={initialWidgetToScrollTo}
+        />
+        <InfoBar
+          message={infoBarMessage || ''}
+          visible={!!infoBarMessage}
+          hide={() => setInfoBarMessage(null)}
         />
       </SectionContainer>
     );
@@ -584,6 +635,7 @@ const CreateSection = ({
                   onSaveProject={onSaveProject}
                   canSaveProject={canSaveProject}
                   onDeleteCloudProject={onDeleteCloudProject}
+                  onRestoreCloudProject={onRestoreCloudProject}
                   onRegisterProject={onRegisterProject}
                   // Controls
                   currentPage={currentPage}
@@ -662,6 +714,11 @@ const CreateSection = ({
               )}
             </ColumnStackLayout>
           </SectionRow>
+          <InfoBar
+            message={infoBarMessage || ''}
+            visible={!!infoBarMessage}
+            hide={() => setInfoBarMessage(null)}
+          />
         </SectionContainer>
       )}
     </I18n>

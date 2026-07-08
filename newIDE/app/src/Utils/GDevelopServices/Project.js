@@ -577,6 +577,32 @@ export const deleteCloudProject = async (
   });
 };
 
+export const restoreCloudProject = async (
+  authenticatedUser: AuthenticatedUser,
+  cloudProjectId: string
+): Promise<?CloudProject> => {
+  const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
+  if (!firebaseUser) return;
+
+  const { uid: userId } = firebaseUser;
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await apiClient.post(
+    `/project/${cloudProjectId}/action/restore`,
+    {},
+    {
+      headers: {
+        Authorization: authorizationHeader,
+      },
+      params: { userId },
+    }
+  );
+  return ensureIsNullOrObjectHasProperty({
+    data: response.data,
+    propertyName: 'id',
+    endpointName: '/project/{id}/action/restore of Project API',
+  });
+};
+
 export const getPresignedUrlForVersionUpload = async (
   authenticatedUser: AuthenticatedUser,
   cloudProjectId: string

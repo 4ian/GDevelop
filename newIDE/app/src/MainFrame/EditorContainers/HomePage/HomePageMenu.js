@@ -11,6 +11,7 @@ import SchoolIcon from '../../../UI/CustomSvgIcons/School';
 import ControllerIcon from '../../../UI/CustomSvgIcons/Controller';
 import BookLeafIcon from '../../../UI/CustomSvgIcons/BookLeaf';
 import StoreIcon from '../../../UI/CustomSvgIcons/Store';
+import PlanetIcon from '../../../UI/CustomSvgIcons/Planet';
 import Preferences from '../../../UI/CustomSvgIcons/Preferences';
 import GDevelopGLogo from '../../../UI/CustomSvgIcons/GDevelopGLogo';
 import GDevelopThemeContext from '../../../UI/Theme/GDevelopThemeContext';
@@ -42,7 +43,13 @@ export const styles = {
   },
 };
 
-export type HomeTab = 'create' | 'learn' | 'play' | 'shop' | 'team-view';
+export type HomeTab =
+  | 'create'
+  | 'learn'
+  | 'play'
+  | 'shop'
+  | 'team-view'
+  | 'browser';
 
 export type GetIconFunction = ({
   color: string,
@@ -97,6 +104,14 @@ const homePageMenuTabs: { [tab: HomeTab]: HomePageMenuTab } = {
       <BookLeafIcon fontSize={fontSize} color={color} />
     ),
   },
+  browser: {
+    label: <Trans>Browser</Trans>,
+    tab: 'browser',
+    id: 'home-browser-tab',
+    getIcon: ({ color, fontSize }) => (
+      <PlanetIcon fontSize={fontSize} color={color} />
+    ),
+  },
 };
 
 export const getTabsToDisplay = ({
@@ -125,6 +140,7 @@ export const getTabsToDisplay = ({
     displayPlayTab ? 'play' : null,
     displayShopTab ? 'shop' : null,
     displayTeachTab ? 'team-view' : null,
+    'browser',
   ].filter(Boolean);
   return tabs.map(tab => homePageMenuTabs[tab]);
 };

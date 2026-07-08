@@ -23,6 +23,7 @@ describe('HomePageMenu', () => {
         'play',
         'shop',
         'team-view',
+        'browser',
       ]);
     });
 
@@ -33,7 +34,11 @@ describe('HomePageMenu', () => {
         limits: limitsForStudentUser,
       });
 
-      expect(tabs.map(tab => tab.tab)).toEqual(['learn', 'create']);
+      expect(tabs.map(tab => tab.tab)).toEqual([
+        'learn',
+        'create',
+        'browser',
+      ]);
     });
 
     test('Default mobile user', () => {
@@ -46,6 +51,7 @@ describe('HomePageMenu', () => {
         'create',
         'play',
         'shop',
+        'browser',
       ]);
     });
 
@@ -54,7 +60,11 @@ describe('HomePageMenu', () => {
 
       const tabs = getTabsToDisplay({ limits: limitsForStudentUser });
 
-      expect(tabs.map(tab => tab.tab)).toEqual(['learn', 'create']);
+      expect(tabs.map(tab => tab.tab)).toEqual([
+        'learn',
+        'create',
+        'browser',
+      ]);
     });
   });
 });

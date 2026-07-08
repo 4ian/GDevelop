@@ -321,6 +321,7 @@ function createNewWindow(windowArgs = args) {
       // as we've not removed dependency on it and on "@electron/remote".
       nodeIntegration: true,
       contextIsolation: false,
+      webviewTag: true,
     },
     enableLargerThanScreen: true,
     backgroundColor: '#000',

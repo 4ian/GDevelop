@@ -761,7 +761,14 @@ export type ProjectManagerInterface = {|
   focusSearchBar: () => void,
   selectAndScrollToItemFromId: (itemId: string) => void,
   activateItemFromId: (itemId: string) => void,
+  createProjectItem: (itemKind: ProjectManagerCreateItemKind) => void,
 |};
+
+export type ProjectManagerCreateItemKind =
+  | 'scene'
+  | 'extension'
+  | 'external'
+  | ExtensionItemKind;
 
 type Props = {|
   project: ?gdProject,
@@ -1082,23 +1089,6 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       },
       []
     );
-
-    React.useImperativeHandle(ref, () => ({
-      forceUpdateList: () => {
-        forceUpdate();
-        if (treeViewRef.current) treeViewRef.current.forceUpdateList();
-      },
-      focusSearchBar: () => {
-        if (searchBarRef.current) searchBarRef.current.focus();
-      },
-      selectAndScrollToItemFromId: (itemId: string) => {
-        selectAndScrollToTreeViewItemFromId(itemId);
-      },
-      activateItemFromId: (itemId: string) => {
-        const item = selectAndScrollToTreeViewItemFromId(itemId);
-        if (item) item.content.onClick();
-      },
-    }));
 
     const onProjectItemModified = React.useCallback(
       () => {
@@ -1437,6 +1427,64 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         );
       },
       [addExternalEvents, addExternalLayout, project]
+    );
+
+    const createProjectItem = React.useCallback(
+      (itemKind: ProjectManagerCreateItemKind) => {
+        if (!project) return;
+
+        if (itemKind === 'scene') {
+          const i18n = i18nRef.current;
+          if (!i18n) return;
+
+          addNewScene(project.getLayoutsCount() - 1, i18n);
+          return;
+        }
+
+        if (itemKind === 'extension') {
+          const i18n = i18nRef.current;
+          if (!i18n) return;
+
+          onCreateNewExtension(project, i18n);
+          return;
+        }
+
+        if (itemKind === 'external') {
+          openCreateExternalDialog();
+          return;
+        }
+
+        openCreateExtensionItemDialog(itemKind);
+      },
+      [
+        addNewScene,
+        onCreateNewExtension,
+        openCreateExternalDialog,
+        openCreateExtensionItemDialog,
+        project,
+      ]
+    );
+
+    React.useImperativeHandle(
+      ref,
+      () => ({
+        forceUpdateList: () => {
+          forceUpdate();
+          if (treeViewRef.current) treeViewRef.current.forceUpdateList();
+        },
+        focusSearchBar: () => {
+          if (searchBarRef.current) searchBarRef.current.focus();
+        },
+        selectAndScrollToItemFromId: (itemId: string) => {
+          selectAndScrollToTreeViewItemFromId(itemId);
+        },
+        activateItemFromId: (itemId: string) => {
+          const item = selectAndScrollToTreeViewItemFromId(itemId);
+          if (item) item.content.onClick();
+        },
+        createProjectItem,
+      }),
+      [createProjectItem, forceUpdate, selectAndScrollToTreeViewItemFromId]
     );
 
     const onTreeModified = React.useCallback(

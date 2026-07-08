@@ -19,6 +19,15 @@ export type RecentEditorSwitcherSideMenuItem = {|
   activate: () => void,
 |};
 
+export type RecentEditorSwitcherActionItem = {|
+  id: string,
+  title: string,
+  subtitle: string,
+  icon: ?React.Node,
+  searchTerms?: string,
+  activate: () => void,
+|};
+
 export type RecentEditorSwitcherEntry = {|
   id: string,
   title: string,
@@ -26,25 +35,29 @@ export type RecentEditorSwitcherEntry = {|
   icon: ?React.Node,
   renderCustomIcon: ?(brightness: number) => React.Node,
   sideMenuItem: ?RecentEditorSwitcherSideMenuItem,
+  actionItem: ?RecentEditorSwitcherActionItem,
   editorTab: ?EditorTab,
   paneIdentifier: ?string,
   tabIndex: number,
   isCurrentTab: boolean,
   openOrder: number,
   usageCount: number,
-  source: 'editor' | 'side-menu',
+  searchTerms: ?string,
+  source: 'editor' | 'side-menu' | 'action',
 |};
 
 type Props = {|
   open: boolean,
   editorTabs: EditorTabsState,
   sideMenuItems: Array<RecentEditorSwitcherSideMenuItem>,
+  actionItems: Array<RecentEditorSwitcherActionItem>,
   recentNavigationEntryIds: Array<string>,
   recentNavigationEntryUseCounts: { [string]: number },
   shortcut: string,
   onClose: () => void,
   onActivate: RecentEditorSwitcherEntry => void,
   onActivateSideMenuItem: RecentEditorSwitcherSideMenuItem => void,
+  onActivateActionItem: RecentEditorSwitcherActionItem => void,
 |};
 
 type EditorAreaRect = {|
@@ -150,6 +163,7 @@ const getEditorAreaRect = (): EditorAreaRect => {
 export const getRecentEditorSwitcherEntries = (
   editorTabs: EditorTabsState,
   sideMenuItems: Array<RecentEditorSwitcherSideMenuItem>,
+  actionItems: Array<RecentEditorSwitcherActionItem>,
   recentNavigationEntryIds: Array<string>,
   recentNavigationEntryUseCounts: { [string]: number }
 ): Array<RecentEditorSwitcherEntry> => {
@@ -183,12 +197,14 @@ export const getRecentEditorSwitcherEntries = (
         icon: sideMenuItem ? sideMenuItem.icon : editorTab.icon,
         renderCustomIcon: editorTab.renderCustomIcon,
         sideMenuItem,
+        actionItem: null,
         editorTab,
         paneIdentifier,
         tabIndex,
         isCurrentTab: tabIndex === pane.currentTab,
         openOrder: openOrder++,
         usageCount: recentNavigationEntryUseCounts[editorTab.key] || 0,
+        searchTerms: null,
         source: 'editor',
       };
     }
@@ -206,13 +222,35 @@ export const getRecentEditorSwitcherEntries = (
       icon: sideMenuItem.icon,
       renderCustomIcon: null,
       sideMenuItem,
+      actionItem: null,
       editorTab: null,
       paneIdentifier: null,
       tabIndex: -1,
       isCurrentTab: false,
       openOrder: -1,
       usageCount: recentNavigationEntryUseCounts[id] || 0,
+      searchTerms: null,
       source: 'side-menu',
+    };
+  });
+
+  actionItems.forEach((actionItem, index) => {
+    entriesById[actionItem.id] = {
+      id: actionItem.id,
+      title: actionItem.title,
+      subtitle: actionItem.subtitle,
+      icon: actionItem.icon,
+      renderCustomIcon: null,
+      sideMenuItem: null,
+      actionItem,
+      editorTab: null,
+      paneIdentifier: null,
+      tabIndex: -1,
+      isCurrentTab: false,
+      openOrder: -2 - index,
+      usageCount: recentNavigationEntryUseCounts[actionItem.id] || 0,
+      searchTerms: actionItem.searchTerms || null,
+      source: 'action',
     };
   });
 
@@ -335,6 +373,7 @@ const styles = {
     alignItems: 'center',
     columnGap: 10,
     textAlign: 'left',
+    boxSizing: 'border-box',
   },
   iconContainer: {
     width: 28,
@@ -343,6 +382,9 @@ const styles = {
     alignItems: 'center',
     justifyContent: 'center',
     flexShrink: 0,
+  },
+  actionIconContainer: {
+    borderRadius: 14,
   },
   rowText: {
     minWidth: 0,
@@ -390,6 +432,19 @@ const styles = {
     fontSize: 11,
     lineHeight: '16px',
     fontWeight: 700,
+  },
+  sourceBadge: {
+    minWidth: 42,
+    height: 20,
+    padding: '0 7px',
+    borderRadius: 10,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontSize: 11,
+    lineHeight: '16px',
+    fontWeight: 700,
+    textTransform: 'uppercase',
   },
   activeDot: {
     width: 8,
@@ -440,12 +495,14 @@ const RecentEditorSwitcher = ({
   open,
   editorTabs,
   sideMenuItems,
+  actionItems,
   recentNavigationEntryIds,
   recentNavigationEntryUseCounts,
   shortcut,
   onClose,
   onActivate,
   onActivateSideMenuItem,
+  onActivateActionItem,
 }: Props): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const panelRef = React.useRef<?HTMLDivElement>(null);
@@ -469,12 +526,14 @@ const RecentEditorSwitcher = ({
       getRecentEditorSwitcherEntries(
         editorTabs,
         sideMenuItems,
+        actionItems,
         recentNavigationEntryIds,
         recentNavigationEntryUseCounts
       ),
     [
       editorTabs,
       sideMenuItems,
+      actionItems,
       recentNavigationEntryIds,
       recentNavigationEntryUseCounts,
     ]
@@ -504,6 +563,7 @@ const RecentEditorSwitcher = ({
           entry.title,
           entry.subtitle,
           entry.id,
+          entry.searchTerms,
           entry.paneIdentifier || null
         )
       ),
@@ -581,9 +641,11 @@ const RecentEditorSwitcher = ({
         onActivate(entry);
       } else if (entry.sideMenuItem) {
         onActivateSideMenuItem(entry.sideMenuItem);
+      } else if (entry.actionItem) {
+        onActivateActionItem(entry.actionItem);
       }
     },
-    [onActivate, onActivateSideMenuItem]
+    [onActivate, onActivateActionItem, onActivateSideMenuItem]
   );
 
   React.useEffect(

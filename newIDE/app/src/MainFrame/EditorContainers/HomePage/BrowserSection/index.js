@@ -15,7 +15,7 @@ import Window from '../../../../Utils/Window';
 import optionalRequire from '../../../../Utils/OptionalRequire';
 
 const electron = optionalRequire('electron');
-const defaultBrowserUrl = 'https://gdevelop.io';
+const defaultBrowserUrl = 'https://wiki.gdevelop.io/gdevelop5/';
 
 const styles = {
   sectionPaper: {
@@ -127,11 +127,11 @@ const BrowserSection = (): React.Node => {
   const [currentUrl, setCurrentUrl] = React.useState(defaultBrowserUrl);
   const [canGoBack, setCanGoBack] = React.useState(false);
   const [canGoForward, setCanGoForward] = React.useState(false);
-  const [isLoading, setIsLoading] = React.useState(false);
   const [loadError, setLoadError] = React.useState<?BrowserLoadError>(null);
   const [iframeReloadKey, setIframeReloadKey] = React.useState(0);
   const webviewRef = React.useRef<any>(null);
   const isWebviewReady = React.useRef(false);
+  const pendingWebviewUrl = React.useRef<?string>(null);
   const isWebviewAvailable = !!electron;
 
   const inputStyle = {
@@ -179,9 +179,12 @@ const BrowserSection = (): React.Node => {
       ) {
         try {
           webview.loadURL(normalizedUrl);
+          pendingWebviewUrl.current = null;
         } catch (error) {
-          // The src attribute is already updated through state.
+          pendingWebviewUrl.current = normalizedUrl;
         }
+      } else if (isWebviewAvailable) {
+        pendingWebviewUrl.current = normalizedUrl;
       }
     },
     [isWebviewAvailable]
@@ -250,14 +253,18 @@ const BrowserSection = (): React.Node => {
 
       const onDomReady = () => {
         isWebviewReady.current = true;
+        if (pendingWebviewUrl.current && webview.loadURL) {
+          try {
+            webview.loadURL(pendingWebviewUrl.current);
+            pendingWebviewUrl.current = null;
+          } catch (error) {}
+        }
         updateNavigationState();
       };
       const onDidStartLoading = () => {
-        setIsLoading(true);
         setLoadError(null);
       };
       const onDidStopLoading = () => {
-        setIsLoading(false);
         updateNavigationState();
       };
       const onDidNavigate = event => {
@@ -269,7 +276,6 @@ const BrowserSection = (): React.Node => {
       const onDidFailLoad = event => {
         if (event.errorCode === -3) return;
         if (event.isMainFrame) {
-          setIsLoading(false);
           setLoadError('load-failed');
         }
       };
@@ -374,7 +380,10 @@ const BrowserSection = (): React.Node => {
           {isWebviewAvailable ? (
             React.createElement('webview', {
               ref: webviewRef,
-              src: currentUrl,
+              // Keep this value stable. The webview can update its own URL
+              // hash while scrolling documentation pages; mirroring that hash
+              // into the src prop makes Electron reload and flicker.
+              src: defaultBrowserUrl,
               partition: 'persist:gdevelop-home-browser',
               style: styles.webview,
               allowpopups: 'true',
@@ -388,7 +397,7 @@ const BrowserSection = (): React.Node => {
               sandbox="allow-forms allow-modals allow-popups allow-presentation allow-scripts allow-same-origin allow-popups-to-escape-sandbox allow-downloads"
             />
           )}
-          {(loadError || isLoading || !isWebviewAvailable) && (
+          {(loadError || !isWebviewAvailable) && (
             <div
               style={{
                 ...styles.statusBar,
@@ -405,8 +414,6 @@ const BrowserSection = (): React.Node => {
                   <Trans>Enter an HTTP or HTTPS URL.</Trans>
                 ) : loadError === 'load-failed' ? (
                   <Trans>Unable to load this page.</Trans>
-                ) : isLoading ? (
-                  <Trans>Loading...</Trans>
                 ) : (
                   <Trans>
                     Some websites may block embedded loading outside the

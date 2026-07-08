@@ -16,6 +16,7 @@ import CreateEventsFunctionExtensionItemDialog, {
   type CreateExtensionItemPayload,
 } from './CreateEventsFunctionExtensionItemDialog';
 import ExtensionFunctionSelectorDialog from '../EventsFunctionsExtensionEditor/ExtensionFunctionSelectorDialog';
+import CreateSceneDialog from './CreateSceneDialog';
 import CreateExternalDialog, {
   type CreateExternalPayload,
 } from './CreateExternalDialog';
@@ -756,6 +757,12 @@ const findTreeViewItemById = (
   return null;
 };
 
+export type ProjectManagerCreateItemKind =
+  | 'scene'
+  | 'extension'
+  | 'external'
+  | ExtensionItemKind;
+
 export type ProjectManagerInterface = {|
   forceUpdateList: () => void,
   focusSearchBar: () => void,
@@ -763,12 +770,6 @@ export type ProjectManagerInterface = {|
   activateItemFromId: (itemId: string) => void,
   createProjectItem: (itemKind: ProjectManagerCreateItemKind) => void,
 |};
-
-export type ProjectManagerCreateItemKind =
-  | 'scene'
-  | 'extension'
-  | 'external'
-  | ExtensionItemKind;
 
 type Props = {|
   project: ?gdProject,
@@ -997,6 +998,10 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       editedVariablesLayout,
       setEditedVariablesLayout,
     ] = React.useState<?gdLayout>(null);
+    const [
+      createSceneDialogIndex,
+      setCreateSceneDialogIndex,
+    ] = React.useState<?number>(null);
     const onOpenLayoutProperties = React.useCallback((layout: ?gdLayout) => {
       setEditedPropertiesLayout(layout);
     }, []);
@@ -1114,14 +1119,11 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
     );
 
     const addNewScene = React.useCallback(
-      (index: number, i18n: I18nType) => {
+      (index: number, sceneName: string) => {
         if (!project) return;
 
-        const newName = newNameGenerator(i18n._(t`Untitled scene`), name =>
-          project.hasLayoutNamed(name)
-        );
-        const newScene = project.insertNewLayout(newName, index + 1);
-        newScene.setName(newName);
+        const newScene = project.insertNewLayout(sceneName, index + 1);
+        newScene.setName(sceneName);
         newScene.updateBehaviorsSharedData(project);
         addDefaultLightToAllLayers(newScene);
 
@@ -1133,7 +1135,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         if (treeViewRef.current) {
           treeViewRef.current.openItems([sceneItemId, scenesRootFolderId]);
         }
-        // Scroll to the new behavior.
+        // Scroll to the new scene.
         // Ideally, we'd wait for the list to be updated to scroll, but
         // to simplify the code, we just wait a few ms for a new render
         // to be done.
@@ -1141,10 +1143,31 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
           scrollToItem(sceneItemId);
         }, 100); // A few ms is enough for a new render to be done.
 
-        // We focus it so the user can edit the name directly.
-        editName(sceneItemId);
+        onOpenLayout(sceneName, {
+          openEventsEditor: true,
+          openSceneEditor: true,
+          focusWhenOpened: 'scene',
+        });
       },
-      [project, onProjectItemModified, editName, scrollToItem, onSceneAdded]
+      [project, onProjectItemModified, scrollToItem, onSceneAdded, onOpenLayout]
+    );
+
+    const openCreateSceneDialog = React.useCallback((index: number) => {
+      setCreateSceneDialogIndex(index);
+    }, []);
+
+    const closeCreateSceneDialog = React.useCallback(() => {
+      setCreateSceneDialogIndex(null);
+    }, []);
+
+    const onCreateScene = React.useCallback(
+      (sceneName: string) => {
+        if (createSceneDialogIndex === null) return;
+
+        addNewScene(createSceneDialogIndex, sceneName);
+        setCreateSceneDialogIndex(null);
+      },
+      [addNewScene, createSceneDialogIndex]
     );
 
     const onCreateNewExtension = React.useCallback(
@@ -1434,10 +1457,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         if (!project) return;
 
         if (itemKind === 'scene') {
-          const i18n = i18nRef.current;
-          if (!i18n) return;
-
-          addNewScene(project.getLayoutsCount() - 1, i18n);
+          openCreateSceneDialog(project.getLayoutsCount() - 1);
           return;
         }
 
@@ -1457,8 +1477,8 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         openCreateExtensionItemDialog(itemKind);
       },
       [
-        addNewScene,
         onCreateNewExtension,
+        openCreateSceneDialog,
         openCreateExternalDialog,
         openCreateExtensionItemDialog,
         project,
@@ -1891,7 +1911,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                     click: () => {
                       // TODO Add after selected scene?
                       const index = project.getLayoutsCount() - 1;
-                      addNewScene(index, i18n);
+                      openCreateSceneDialog(index);
                     },
                     id: 'add-new-scene-button',
                   }
@@ -2218,7 +2238,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
             ];
       },
       [
-        addNewScene,
+        openCreateSceneDialog,
         behaviorShortcutTreeViewItemProps,
         customObjectTreeViewItemProps,
         externalEventsTreeViewItemProps,
@@ -2710,6 +2730,13 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                         }
                         onCancel={closeCreateExtensionItemDialog}
                         onCreate={onCreateExtensionItem}
+                      />
+                    )}
+                    {project && createSceneDialogIndex !== null && (
+                      <CreateSceneDialog
+                        project={project}
+                        onCancel={closeCreateSceneDialog}
+                        onCreate={onCreateScene}
                       />
                     )}
                     {project && createExternalDialogOpen && (

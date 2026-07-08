@@ -383,9 +383,6 @@ const styles = {
     justifyContent: 'center',
     flexShrink: 0,
   },
-  actionIconContainer: {
-    borderRadius: 14,
-  },
   rowText: {
     minWidth: 0,
     display: 'flex',
@@ -736,6 +733,16 @@ const RecentEditorSwitcher = ({
   const hoverBackgroundColor = gdevelopTheme.list.hover.backgroundColor;
   const recentBackgroundColor = gdevelopTheme.paper.backgroundColor.dark;
   const chipBackgroundColor = gdevelopTheme.paper.backgroundColor.medium;
+  const actionAccentColor =
+    gdevelopTheme.palette.type === 'dark' ? '#7BC7FF' : '#006FBA';
+  const actionBackgroundColor =
+    gdevelopTheme.palette.type === 'dark'
+      ? 'rgba(123, 199, 255, 0.12)'
+      : 'rgba(0, 111, 186, 0.08)';
+  const actionBorderColor =
+    gdevelopTheme.palette.type === 'dark'
+      ? 'rgba(123, 199, 255, 0.36)'
+      : 'rgba(0, 111, 186, 0.22)';
   const shortcutDisplayName = getShortcutDisplayName(shortcut);
 
   return (
@@ -879,7 +886,7 @@ const RecentEditorSwitcher = ({
           >
             <div style={styles.columnHeader}>
               <Text noMargin color="secondary">
-                <Trans>Recently opened</Trans>
+                <Trans>Recent editors and actions</Trans>
               </Text>
             </div>
             {filteredEntries.length ? (
@@ -892,6 +899,7 @@ const RecentEditorSwitcher = ({
                   const rowMetaColor = selected
                     ? selectedTextColor
                     : mutedTextColor;
+                  const isAction = entry.source === 'action';
                   const isWindow = entry.paneIdentifier === 'external';
                   const sourceLabel = isWindow
                     ? 'Window'
@@ -931,11 +939,33 @@ const RecentEditorSwitcher = ({
                           style={{ ...styles.rowMeta, color: rowMetaColor }}
                         >
                           {entry.subtitle}
-                          {' - '}
-                          {sourceLabel}
+                          {!isAction && (
+                            <React.Fragment>
+                              {' - '}
+                              {sourceLabel}
+                            </React.Fragment>
+                          )}
                         </span>
                       </span>
                       <span style={styles.recentBadges}>
+                        {isAction && (
+                          <span
+                            style={{
+                              ...styles.sourceBadge,
+                              color: selected
+                                ? selectedTextColor
+                                : actionAccentColor,
+                              backgroundColor: selected
+                                ? 'rgba(255, 255, 255, 0.16)'
+                                : actionBackgroundColor,
+                              border: `1px solid ${
+                                selected ? selectedTextColor : actionBorderColor
+                              }`,
+                            }}
+                          >
+                            <Trans>Action</Trans>
+                          </span>
+                        )}
                         {entry.usageCount > 1 && (
                           <span
                             style={{
@@ -965,10 +995,10 @@ const RecentEditorSwitcher = ({
               <div style={styles.emptyState}>
                 <Text noMargin color="secondary">
                   {normalizedFilterText ? (
-                    <Trans>No recently opened item matches.</Trans>
+                    <Trans>No recent editor or action matches.</Trans>
                   ) : (
                     <Trans>
-                      Select an item from the side menu to start a recent list.
+                      Select an item from the side menu or run an action.
                     </Trans>
                   )}
                 </Text>

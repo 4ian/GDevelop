@@ -27,6 +27,7 @@ import PreferencesDialog from './Preferences/PreferencesDialog';
 import AboutDialog from './AboutDialog';
 import ProjectManager, {
   type ProjectManagerInterface,
+  type ProjectManagerCreateItemKind,
   getProjectManagerItemId,
   getProjectManagerTreeViewItemIdForEditorTab,
   globalVariablesItemId,
@@ -49,6 +50,7 @@ import PoppedOutWindows from './PoppedOutWindows';
 import RecentEditorSwitcher, {
   type RecentEditorSwitcherEntry,
   type RecentEditorSwitcherSideMenuItem,
+  type RecentEditorSwitcherActionItem,
 } from './RecentEditorSwitcher';
 import {
   getEditorTabsInitialState,
@@ -2189,6 +2191,22 @@ const MainFrame = (props: Props): React.MixedElement => {
     []
   );
 
+  const createProjectItemFromSwitcher = React.useCallback(
+    (itemKind: ProjectManagerCreateItemKind) => {
+      const projectManager = projectManagerRef.current;
+      if (projectManager) {
+        projectManager.createProjectItem(itemKind);
+        return;
+      }
+
+      setTimeout(() => {
+        const projectManager = projectManagerRef.current;
+        if (projectManager) projectManager.createProjectItem(itemKind);
+      }, 0);
+    },
+    []
+  );
+
   const isProjectManagerVisible =
     projectManagerOpen || isProjectManagerPinnedForCurrentProject;
 
@@ -2294,6 +2312,15 @@ const MainFrame = (props: Props): React.MixedElement => {
 
   const activateRecentEditorSwitcherSideMenuItem = React.useCallback(
     (item: RecentEditorSwitcherSideMenuItem) => {
+      setRecentEditorSwitcherOpen(false);
+      recordRecentNavigationEntry(item.id);
+      item.activate();
+    },
+    [recordRecentNavigationEntry]
+  );
+
+  const activateRecentEditorSwitcherActionItem = React.useCallback(
+    (item: RecentEditorSwitcherActionItem) => {
       setRecentEditorSwitcherOpen(false);
       recordRecentNavigationEntry(item.id);
       item.activate();
@@ -6431,6 +6458,24 @@ const MainFrame = (props: Props): React.MixedElement => {
       activate,
     });
   };
+  const recentEditorSwitcherActionItems: Array<RecentEditorSwitcherActionItem> = [];
+  const addRecentEditorSwitcherActionItem = (
+    id: string,
+    title: string,
+    subtitle: string,
+    icon: ?React.Node,
+    searchTerms: string,
+    activate: () => void
+  ) => {
+    recentEditorSwitcherActionItems.push({
+      id,
+      title,
+      subtitle,
+      icon,
+      searchTerms,
+      activate,
+    });
+  };
 
   addRecentEditorSwitcherSideMenuItem(
     'project-manager',
@@ -6455,6 +6500,47 @@ const MainFrame = (props: Props): React.MixedElement => {
   );
 
   if (currentProject) {
+    addRecentEditorSwitcherActionItem(
+      'action:create-scene',
+      i18n._(t`Create a scene`),
+      i18n._(t`Project action`),
+      <SceneIcon />,
+      'new scene add scene layout level',
+      () => createProjectItemFromSwitcher('scene')
+    );
+    addRecentEditorSwitcherActionItem(
+      'action:create-prefab',
+      i18n._(t`Create a prefab`),
+      i18n._(t`Project action`),
+      <ObjectIcon />,
+      'new prefab add prefab custom object events based object',
+      () => createProjectItemFromSwitcher('prefab')
+    );
+    addRecentEditorSwitcherActionItem(
+      'action:create-behavior',
+      i18n._(t`Create a behavior`),
+      i18n._(t`Project action`),
+      <BehaviorIcon />,
+      'new behavior add behavior events based behavior',
+      () => createProjectItemFromSwitcher('behavior')
+    );
+    addRecentEditorSwitcherActionItem(
+      'action:create-function',
+      i18n._(t`Create a function`),
+      i18n._(t`Project action`),
+      <SettingsIcon />,
+      'new function add function action condition expression extension function',
+      () => createProjectItemFromSwitcher('function')
+    );
+    addRecentEditorSwitcherActionItem(
+      'action:create-external',
+      i18n._(t`Create external events/layout`),
+      i18n._(t`Project action`),
+      <ExternalEventsIcon />,
+      'new external add external events external layout linked scene',
+      () => createProjectItemFromSwitcher('external')
+    );
+
     addRecentEditorSwitcherSideMenuItem(
       gamePropertiesItemId,
       i18n._(t`Properties & Icons`),
@@ -7676,12 +7762,14 @@ const MainFrame = (props: Props): React.MixedElement => {
         open={recentEditorSwitcherOpen}
         editorTabs={state.editorTabs}
         sideMenuItems={recentEditorSwitcherSideMenuItems}
+        actionItems={recentEditorSwitcherActionItems}
         recentNavigationEntryIds={recentNavigationEntryIds}
         recentNavigationEntryUseCounts={recentNavigationEntryUseCounts}
         shortcut={shortcutMap['OPEN_RECENT_EDITOR']}
         onClose={() => setRecentEditorSwitcherOpen(false)}
         onActivate={activateRecentEditorSwitcherEntry}
         onActivateSideMenuItem={activateRecentEditorSwitcherSideMenuItem}
+        onActivateActionItem={activateRecentEditorSwitcherActionItem}
       />
       <LoaderModal
         showImmediately={showLoaderImmediately}

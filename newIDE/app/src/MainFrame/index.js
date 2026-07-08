@@ -273,9 +273,7 @@ import {
   setEditorHotReloadNeeded,
   isEditorHotReloadNeeded,
 } from '../EmbeddedGame/EmbeddedGameFrame';
-import {
-  useActiveEmbeddedGameFrameHoleCount,
-} from '../EmbeddedGame/EmbeddedGameFrameHole';
+import { useActiveEmbeddedGameFrameHoleCount } from '../EmbeddedGame/EmbeddedGameFrameHole';
 import useHomePageSwitch from './useHomePageSwitch';
 import { useNavigationToEvent } from './UseNavigationToEvent';
 import useNavigateFromGlobalSearch from './UseNavigateFromGlobalSearch';
@@ -498,6 +496,8 @@ export type Props = {|
   onExportHtml5External?: (project: gdProject, i18n: I18n) => Promise<void>,
 |};
 
+const saveProjectStaleTimeoutMs = 5 * 60 * 1000;
+
 const MainFrame = (props: Props): React.MixedElement => {
   const preferences = React.useContext(PreferencesContext);
   const {
@@ -607,6 +607,8 @@ const MainFrame = (props: Props): React.MixedElement => {
   const saveProjectRef = React.useRef<?(options?: {|
     skipNewVersionWarning: boolean,
   |}) => Promise<?FileMetadata>>(null);
+  const isSavingProjectRef = React.useRef<boolean>(false);
+  const saveProjectStartedAtRef = React.useRef<?number>(null);
   const shortcutMap = useShortcutMap();
   const [
     diagnosticReportDialogOpen,
@@ -792,6 +794,46 @@ const MainFrame = (props: Props): React.MixedElement => {
     sealUnsavedChanges,
     triggerUnsavedChanges,
   } = unsavedChanges;
+
+  const setSavingProjectInProgress = React.useCallback((isSaving: boolean) => {
+    isSavingProjectRef.current = isSaving;
+    saveProjectStartedAtRef.current = isSaving ? Date.now() : null;
+    setIsSavingProject(isSaving);
+  }, []);
+
+  const isSaveProjectInProgress = React.useCallback(
+    (): boolean => {
+      if (!isSavingProjectRef.current) return false;
+
+      const saveProjectStartedAt = saveProjectStartedAtRef.current;
+      if (
+        saveProjectStartedAt &&
+        Date.now() - saveProjectStartedAt > saveProjectStaleTimeoutMs
+      ) {
+        console.warn(
+          'Project save state was still active after the stale timeout. Resetting the save guard so saving can be retried.'
+        );
+        setSavingProjectInProgress(false);
+        return false;
+      }
+
+      return true;
+    },
+    [setSavingProjectInProgress]
+  );
+
+  React.useEffect(
+    () => {
+      if (!isSavingProject) return;
+
+      const intervalId = setInterval(() => {
+        isSaveProjectInProgress();
+      }, 10000);
+
+      return () => clearInterval(intervalId);
+    },
+    [isSavingProject, isSaveProjectInProgress]
+  );
   const {
     currentlyRunningInAppTutorial,
     getInAppTutorialShortHeader,
@@ -834,8 +876,7 @@ const MainFrame = (props: Props): React.MixedElement => {
   const [gameEditorMode, setGameEditorMode] = React.useState<
     'embedded-game' | 'instances-editor'
   >('instances-editor');
-  const activeEmbeddedGameFrameHoleCount =
-    useActiveEmbeddedGameFrameHoleCount();
+  const activeEmbeddedGameFrameHoleCount = useActiveEmbeddedGameFrameHoleCount();
 
   // This is just for testing, to check if we're getting the right state
   // and gives us an idea about the number of re-renders.
@@ -907,6 +948,16 @@ const MainFrame = (props: Props): React.MixedElement => {
   });
 
   const gamesList = useGamesList();
+  const markGameAsSavedIfRelevant = React.useCallback(
+    (gameId: string) => {
+      // The project is already saved on disk when this is called. Do not block
+      // the save UI on an optional online status update.
+      gamesList.markGameAsSavedIfRelevant(gameId).catch(error => {
+        console.error('Error while marking game as saved:', error);
+      });
+    },
+    [gamesList]
+  );
 
   const {
     createCaptureOptionsForPreview,
@@ -3114,6 +3165,10 @@ const MainFrame = (props: Props): React.MixedElement => {
     async (): Promise<?FileMetadata> => {
       if (!currentProject || !currentFileMetadata) return null;
 
+      if (!hasUnsavedChanges) {
+        return currentFileMetadata;
+      }
+
       if (saveProjectRef.current) {
         // Use the normal save path so preview persists the project file.
         return (await saveProjectRef.current()) || null;
@@ -3144,6 +3199,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       _showSnackMessage,
       currentProject,
       currentFileMetadata,
+      hasUnsavedChanges,
       getStorageProviderOperations,
     ]
   );
@@ -5471,7 +5527,7 @@ const MainFrame = (props: Props): React.MixedElement => {
 
       // Protect against concurrent saves, which can trigger issues with the
       // file system.
-      if (isSavingProject) {
+      if (isSaveProjectInProgress()) {
         console.info('Project is already being saved, not triggering save.');
         return;
       }
@@ -5501,7 +5557,7 @@ const MainFrame = (props: Props): React.MixedElement => {
         return;
       }
 
-      setIsSavingProject(true);
+      setSavingProjectInProgress(true);
 
       // At the end of the promise below, currentProject and storageProvider
       // may have changed (if the user opened another project). So we read and
@@ -5609,7 +5665,7 @@ const MainFrame = (props: Props): React.MixedElement => {
         }
 
         if (fileMetadata.gameId) {
-          await gamesList.markGameAsSavedIfRelevant(fileMetadata.gameId);
+          markGameAsSavedIfRelevant(fileMetadata.gameId);
         }
 
         // Save was done on a new file/location, so save it in the
@@ -5663,12 +5719,13 @@ const MainFrame = (props: Props): React.MixedElement => {
           errorId: 'project-save-as-error',
         });
       } finally {
-        setIsSavingProject(false);
+        setSavingProjectInProgress(false);
       }
     },
     [
       i18n,
-      isSavingProject,
+      isSaveProjectInProgress,
+      setSavingProjectInProgress,
       currentProject,
       currentProjectRef,
       currentFileMetadata,
@@ -5685,7 +5742,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       currentlyRunningInAppTutorial,
       showAlert,
       showConfirmation,
-      gamesList,
+      markGameAsSavedIfRelevant,
       hasExtensionLoadErrors,
     ]
   );
@@ -5765,7 +5822,7 @@ const MainFrame = (props: Props): React.MixedElement => {
 
       // Protect against concurrent saves, which can trigger issues with the
       // file system.
-      if (isSavingProject) {
+      if (isSaveProjectInProgress()) {
         console.info('Project is already being saved, not triggering save.');
         return;
       }
@@ -5779,7 +5836,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       }
 
       _showSnackMessage(i18n._(t`Saving...`), null);
-      setIsSavingProject(true);
+      setSavingProjectInProgress(true);
 
       try {
         const saveStartTime = performance.now();
@@ -5823,7 +5880,7 @@ const MainFrame = (props: Props): React.MixedElement => {
           // If project was saved, and a game is registered, ensure the game is
           // marked as saved.
           if (fileMetadata.gameId) {
-            await gamesList.markGameAsSavedIfRelevant(fileMetadata.gameId);
+            markGameAsSavedIfRelevant(fileMetadata.gameId);
           }
 
           setCloudProjectSaveChoiceOpen(false);
@@ -5881,12 +5938,13 @@ const MainFrame = (props: Props): React.MixedElement => {
         });
         _closeSnackMessage();
       } finally {
-        setIsSavingProject(false);
+        setSavingProjectInProgress(false);
       }
     },
     [
       saveWithBackgroundSerializer,
-      isSavingProject,
+      isSaveProjectInProgress,
+      setSavingProjectInProgress,
       currentProject,
       currentProjectRef,
       currentFileMetadata,
@@ -5908,7 +5966,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       showAlert,
       showConfirmation,
       checkedOutVersionStatus,
-      gamesList,
+      markGameAsSavedIfRelevant,
       hasExtensionLoadErrors,
     ]
   );

@@ -8,11 +8,11 @@ import {
   serializeToJSObject,
   unserializeFromJSObject,
 } from '../Utils/Serializer';
-import Text from '../UI/Text';
 import {
   type TreeViewItemContent,
   type TreeItemProps,
   customObjectsRootFolderId,
+  getProjectManagerShortcutExtensionGroupId,
 } from './index';
 import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
 import { type MenuButton } from '../UI/TreeView';
@@ -386,22 +386,7 @@ export class CustomObjectTreeViewItemContent implements TreeViewItemContent {
   }
 
   renderRightComponent(i18n: I18nType): ?React.Node {
-    const extensionName = this.eventsFunctionsExtension.getName();
-    return (
-      <Text
-        size="body2"
-        color="secondary"
-        noMargin
-        style={{
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          whiteSpace: 'nowrap',
-        }}
-        tooltip={extensionName}
-      >
-        {extensionName}
-      </Text>
-    );
+    return null;
   }
 
   getRightButton(i18n: I18nType): ?MenuButton {
@@ -577,7 +562,14 @@ export class CustomObjectTreeViewItemContent implements TreeViewItemContent {
   }
 
   isDescendantOf(itemContent: TreeViewItemContent): boolean {
-    return itemContent.getId() === customObjectsRootFolderId;
+    return (
+      itemContent.getId() === customObjectsRootFolderId ||
+      itemContent.getId() ===
+        getProjectManagerShortcutExtensionGroupId(
+          customObjectsRootFolderId,
+          this.eventsFunctionsExtension
+        )
+    );
   }
 }
 
@@ -876,6 +868,11 @@ export class CustomObjectVariantTreeViewItemContent
   isDescendantOf(itemContent: TreeViewItemContent): boolean {
     return (
       itemContent.getId() === customObjectsRootFolderId ||
+      itemContent.getId() ===
+        getProjectManagerShortcutExtensionGroupId(
+          customObjectsRootFolderId,
+          this.eventsFunctionsExtension
+        ) ||
       itemContent.getId() ===
         getCustomObjectTreeViewItemId(
           this.eventsFunctionsExtension,

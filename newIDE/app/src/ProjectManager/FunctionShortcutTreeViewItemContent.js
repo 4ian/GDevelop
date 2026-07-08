@@ -4,11 +4,11 @@ import { t } from '@lingui/macro';
 
 import * as React from 'react';
 import newNameGenerator from '../Utils/NewNameGenerator';
-import Text from '../UI/Text';
 import {
   type TreeViewItemContent,
   type TreeItemProps,
   functionsRootFolderId,
+  getProjectManagerShortcutExtensionGroupId,
 } from './index';
 import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
 import { type MenuButton } from '../UI/TreeView';
@@ -145,22 +145,7 @@ export class FunctionShortcutTreeViewItemContent
   }
 
   renderRightComponent(i18n: I18nType): ?React.Node {
-    const extensionName = this.eventsFunctionsExtension.getName();
-    return (
-      <Text
-        size="body2"
-        color="secondary"
-        noMargin
-        style={{
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          whiteSpace: 'nowrap',
-        }}
-        tooltip={extensionName}
-      >
-        {extensionName}
-      </Text>
-    );
+    return null;
   }
 
   getRightButton(i18n: I18nType): ?MenuButton {
@@ -261,6 +246,13 @@ export class FunctionShortcutTreeViewItemContent
   }
 
   isDescendantOf(itemContent: TreeViewItemContent): boolean {
-    return itemContent.getId() === functionsRootFolderId;
+    return (
+      itemContent.getId() === functionsRootFolderId ||
+      itemContent.getId() ===
+        getProjectManagerShortcutExtensionGroupId(
+          functionsRootFolderId,
+          this.eventsFunctionsExtension
+        )
+    );
   }
 }

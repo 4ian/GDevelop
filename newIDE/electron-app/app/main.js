@@ -463,6 +463,9 @@ function createNewWindow(windowArgs = args) {
       const isDebuggerPopOut = details.frameName.startsWith(
         'GDevelopWindowPortal-debugger-'
       );
+      const isBrowserPopup = details.frameName.startsWith(
+        'GDevelopWindowPortal-browser-'
+      );
       // Extract the theme background color passed via the features string
       // by WindowPortal (e.g. "...,themeBackgroundColor=%23282828").
       let backgroundColor = '#000';
@@ -494,6 +497,7 @@ function createNewWindow(windowArgs = args) {
             // nodeIntegration: true,
             // contextIsolation: false,
             webSecurity: false,
+            webviewTag: isBrowserPopup,
           },
         },
       };

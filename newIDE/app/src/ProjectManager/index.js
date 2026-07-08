@@ -173,6 +173,11 @@ const behaviorsEmptyPlaceholderId = 'behaviors-placeholder';
 const functionsEmptyPlaceholderId = 'functions-placeholder';
 const externalsEmptyPlaceholderId = 'externals-placeholder';
 
+export const getProjectManagerShortcutExtensionGroupId = (
+  rootFolderId: string,
+  eventsFunctionsExtension: gdEventsFunctionsExtension
+): string => `${rootFolderId}-extension-${eventsFunctionsExtension.ptr}`;
+
 /**
  * Given the currently focused editor tab (its kind and the name of the
  * layout/external layout/external events/extension/custom object it edits),
@@ -603,6 +608,88 @@ class ActionTreeViewItemContent implements TreeViewItemContent {
 
   isDescendantOf(itemContent: TreeViewItemContent): boolean {
     return false;
+  }
+
+  getRootId(): string {
+    return '';
+  }
+}
+
+class ShortcutExtensionGroupTreeViewItemContent implements TreeViewItemContent {
+  rootFolderId: string;
+  eventsFunctionsExtension: gdEventsFunctionsExtension;
+
+  constructor(
+    rootFolderId: string,
+    eventsFunctionsExtension: gdEventsFunctionsExtension
+  ) {
+    this.rootFolderId = rootFolderId;
+    this.eventsFunctionsExtension = eventsFunctionsExtension;
+  }
+
+  getName(): string | React.Node {
+    return this.eventsFunctionsExtension.getName();
+  }
+
+  getId(): string {
+    return getProjectManagerShortcutExtensionGroupId(
+      this.rootFolderId,
+      this.eventsFunctionsExtension
+    );
+  }
+
+  getHtmlId(index: number): ?string {
+    return `extension-group-item-${index}`;
+  }
+
+  getDataSet(): ?HTMLDataset {
+    return {
+      extension: this.eventsFunctionsExtension.getName(),
+    };
+  }
+
+  getThumbnail(): ?string {
+    return (
+      this.eventsFunctionsExtension.getIconUrl() ||
+      'res/functions/extension_black.svg'
+    );
+  }
+
+  onClick(): void {}
+
+  // $FlowFixMe[missing-local-annot]
+  buildMenuTemplate(i18n: I18nType, index: number) {
+    return [];
+  }
+
+  getRightButton(i18n: I18nType): ?MenuButton {
+    return null;
+  }
+
+  renderRightComponent(i18n: I18nType): ?React.Node {
+    return null;
+  }
+
+  rename(newName: string): void {}
+
+  edit(): void {}
+
+  delete(): void {}
+
+  copy(): void {}
+
+  paste(): void {}
+
+  cut(): void {}
+
+  getIndex(): number {
+    return 0;
+  }
+
+  moveAt(destinationIndex: number): void {}
+
+  isDescendantOf(itemContent: TreeViewItemContent): boolean {
+    return itemContent.getId() === this.rootFolderId;
   }
 
   getRootId(): string {
@@ -1121,7 +1208,14 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
             eventsFunctionsExtension,
             eventsBasedObject
           );
-          openItems([customObjectsRootFolderId, itemId]);
+          openItems([
+            customObjectsRootFolderId,
+            getProjectManagerShortcutExtensionGroupId(
+              customObjectsRootFolderId,
+              eventsFunctionsExtension
+            ),
+            itemId,
+          ]);
           setTimeout(() => scrollToItem(itemId), 100);
           onOpenCustomObjectEditor(
             eventsFunctionsExtension,
@@ -1145,7 +1239,13 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
             eventsFunctionsExtension,
             eventsBasedBehavior
           );
-          openItems([behaviorsRootFolderId]);
+          openItems([
+            behaviorsRootFolderId,
+            getProjectManagerShortcutExtensionGroupId(
+              behaviorsRootFolderId,
+              eventsFunctionsExtension
+            ),
+          ]);
           setTimeout(() => scrollToItem(itemId), 100);
           onOpenEventsFunctionsExtension(
             eventsFunctionsExtension.getName(),
@@ -1177,7 +1277,13 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
           eventsFunctionsExtension,
           eventsFunction
         );
-        openItems([functionsRootFolderId]);
+        openItems([
+          functionsRootFolderId,
+          getProjectManagerShortcutExtensionGroupId(
+            functionsRootFolderId,
+            eventsFunctionsExtension
+          ),
+        ]);
         setTimeout(() => scrollToItem(itemId), 100);
         onOpenEventsFunctionsExtension(
           eventsFunctionsExtension.getName(),
@@ -1791,7 +1897,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                   }
                 ),
                 getChildren(i18n: I18nType): ?Array<TreeViewItem> {
-                  const customObjectItems: Array<TreeViewItem> = [];
+                  const customObjectExtensionItems: Array<TreeViewItem> = [];
                   const eventsFunctionsExtensionsCount = project.getEventsFunctionsExtensionsCount();
                   for (
                     let extensionIndex = 0;
@@ -1801,6 +1907,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                     const eventsFunctionsExtension = project.getEventsFunctionsExtensionAt(
                       extensionIndex
                     );
+                    const customObjectItems: Array<TreeViewItem> = [];
                     const eventsBasedObjects = eventsFunctionsExtension.getEventsBasedObjects();
                     const eventsBasedObjectsCount = eventsBasedObjects.size();
                     for (
@@ -1847,9 +1954,21 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                           : new LeafTreeViewItem(objectItemContent)
                       );
                     }
+
+                    if (customObjectItems.length > 0) {
+                      customObjectExtensionItems.push(
+                        new TreeViewItemWithChildren(
+                          new ShortcutExtensionGroupTreeViewItemContent(
+                            customObjectsRootFolderId,
+                            eventsFunctionsExtension
+                          ),
+                          customObjectItems
+                        )
+                      );
+                    }
                   }
 
-                  if (customObjectItems.length === 0) {
+                  if (customObjectExtensionItems.length === 0) {
                     return [
                       new PlaceHolderTreeViewItem(
                         customObjectsEmptyPlaceholderId,
@@ -1858,7 +1977,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                     ];
                   }
 
-                  return customObjectItems;
+                  return customObjectExtensionItems;
                 },
               },
               {
@@ -1874,7 +1993,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                   }
                 ),
                 getChildren(i18n: I18nType): ?Array<TreeViewItem> {
-                  const behaviorItems: Array<TreeViewItem> = [];
+                  const behaviorExtensionItems: Array<TreeViewItem> = [];
                   const eventsFunctionsExtensionsCount = project.getEventsFunctionsExtensionsCount();
                   for (
                     let extensionIndex = 0;
@@ -1884,6 +2003,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                     const eventsFunctionsExtension = project.getEventsFunctionsExtensionAt(
                       extensionIndex
                     );
+                    const behaviorItems: Array<TreeViewItem> = [];
                     const eventsBasedBehaviors = eventsFunctionsExtension.getEventsBasedBehaviors();
                     const eventsBasedBehaviorsCount = eventsBasedBehaviors.size();
                     for (
@@ -1901,9 +2021,21 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                         )
                       );
                     }
+
+                    if (behaviorItems.length > 0) {
+                      behaviorExtensionItems.push(
+                        new TreeViewItemWithChildren(
+                          new ShortcutExtensionGroupTreeViewItemContent(
+                            behaviorsRootFolderId,
+                            eventsFunctionsExtension
+                          ),
+                          behaviorItems
+                        )
+                      );
+                    }
                   }
 
-                  if (behaviorItems.length === 0) {
+                  if (behaviorExtensionItems.length === 0) {
                     return [
                       new PlaceHolderTreeViewItem(
                         behaviorsEmptyPlaceholderId,
@@ -1912,7 +2044,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                     ];
                   }
 
-                  return behaviorItems;
+                  return behaviorExtensionItems;
                 },
               },
               {
@@ -1928,7 +2060,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                   }
                 ),
                 getChildren(i18n: I18nType): ?Array<TreeViewItem> {
-                  const functionItems: Array<TreeViewItem> = [];
+                  const functionExtensionItems: Array<TreeViewItem> = [];
                   const eventsFunctionsExtensionsCount = project.getEventsFunctionsExtensionsCount();
                   for (
                     let extensionIndex = 0;
@@ -1938,6 +2070,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                     const eventsFunctionsExtension = project.getEventsFunctionsExtensionAt(
                       extensionIndex
                     );
+                    const functionItems: Array<TreeViewItem> = [];
                     const eventsFunctions = enumerateFunctionsInFolder(
                       eventsFunctionsExtension
                         .getEventsFunctions()
@@ -1958,9 +2091,21 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                         )
                       );
                     }
+
+                    if (functionItems.length > 0) {
+                      functionExtensionItems.push(
+                        new TreeViewItemWithChildren(
+                          new ShortcutExtensionGroupTreeViewItemContent(
+                            functionsRootFolderId,
+                            eventsFunctionsExtension
+                          ),
+                          functionItems
+                        )
+                      );
+                    }
                   }
 
-                  if (functionItems.length === 0) {
+                  if (functionExtensionItems.length === 0) {
                     return [
                       new PlaceHolderTreeViewItem(
                         functionsEmptyPlaceholderId,
@@ -1969,7 +2114,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                     ];
                   }
 
-                  return functionItems;
+                  return functionExtensionItems;
                 },
               },
               {
@@ -2126,6 +2271,14 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
           );
           const eventsBasedObjects = eventsFunctionsExtension.getEventsBasedObjects();
           const eventsBasedObjectsCount = eventsBasedObjects.size();
+          if (eventsBasedObjectsCount > 0) {
+            nodeIds.push(
+              getProjectManagerShortcutExtensionGroupId(
+                customObjectsRootFolderId,
+                eventsFunctionsExtension
+              )
+            );
+          }
           for (
             let objectIndex = 0;
             objectIndex < eventsBasedObjectsCount;
@@ -2140,6 +2293,28 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                 )
               );
             }
+          }
+
+          if (eventsFunctionsExtension.getEventsBasedBehaviors().size() > 0) {
+            nodeIds.push(
+              getProjectManagerShortcutExtensionGroupId(
+                behaviorsRootFolderId,
+                eventsFunctionsExtension
+              )
+            );
+          }
+
+          if (
+            enumerateFunctionsInFolder(
+              eventsFunctionsExtension.getEventsFunctions().getRootFolder()
+            ).length > 0
+          ) {
+            nodeIds.push(
+              getProjectManagerShortcutExtensionGroupId(
+                functionsRootFolderId,
+                eventsFunctionsExtension
+              )
+            );
           }
         }
 

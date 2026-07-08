@@ -171,7 +171,7 @@ const InvalidParametersSection = ({
   return (
     <ColumnStackLayout noMargin>
       <Text size="block-title">
-        <Trans>Invalid events ({invalidParametersCount})</Trans>
+        <Trans>Invalid events</Trans> ({invalidParametersCount})
       </Text>
       <AlertMessage kind="error">
         <Trans>

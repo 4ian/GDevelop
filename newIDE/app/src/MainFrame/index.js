@@ -3202,7 +3202,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       previewLaunchInProgressRef.current = true;
       previewLaunchPhaseRef.current = 'preparing';
       try {
-        if (!skipDiagnosticErrorBlocking) {
+        if (!isForInGameEdition && !skipDiagnosticErrorBlocking) {
           const shouldBlockPreview = await checkDiagnosticErrorsAndIfShouldBlock(
             currentProject,
             'preview'

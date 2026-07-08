@@ -21,6 +21,11 @@ const maxRecentLogsPerDebugger = 200;
 let embeddedGameFrameWindow: WindowProxy | null = null;
 let isWindowMessageListenerRegistered = false;
 
+const hasDebuggerId = (id: DebuggerId): boolean =>
+  id === 'embedded-game-frame'
+    ? !!embeddedGameFrameWindow
+    : debuggerIds.indexOf(id) !== -1;
+
 const getExistingDebuggerIds = (): Array<DebuggerId> => [
   ...getExistingEmbeddedGameFrameDebuggerIds(),
   ...getExistingPreviewDebuggerIds(),
@@ -36,6 +41,12 @@ const handleParsedMessage = (
   parsedMessage: Object | null
 ): void => {
   if (!parsedMessage) return;
+  if (!hasDebuggerId(id)) {
+    console.warn(
+      `Ignoring message from closed or unknown preview debugger id "${id}".`
+    );
+    return;
+  }
 
   if (
     parsedMessage.command === 'console.log' ||
@@ -342,7 +353,7 @@ class LocalPreviewDebuggerServer {
     delete recentLogsByDebuggerId['embedded-game-frame'];
     notifyConnectionClosed('embedded-game-frame');
   }
-  closeAllConnections() {
+  closeAllPreviewConnections() {
     const previousDebuggerIds = [...debuggerIds];
     debuggerIds.length = 0;
 
@@ -359,7 +370,10 @@ class LocalPreviewDebuggerServer {
     if (ipcRenderer) {
       ipcRenderer.send('debugger-close-all-connections');
     }
+  }
 
+  closeAllConnections() {
+    this.closeAllPreviewConnections();
     if (embeddedGameFrameWindow) {
       embeddedGameFrameWindow = null;
       delete recentLogsByDebuggerId['embedded-game-frame'];

@@ -683,16 +683,26 @@ const MainFrame = (props: Props): React.MixedElement => {
             : t`Your project has ${
                 validationErrors.length
               } diagnostic error(s). Please fix them before exporting.`;
+          let shouldIgnoreDiagnosticErrors = false;
           const openReport = await showConfirmation({
             title,
             message,
             dismissButtonLabel: t`Close`,
             confirmButtonLabel: t`Open report`,
+            ...(actionType === 'preview'
+              ? {
+                  secondaryActionButtonLabel: t`Ignore and run`,
+                  secondaryActionButtonColor: 'danger',
+                  onClickSecondaryAction: () => {
+                    shouldIgnoreDiagnosticErrors = true;
+                  },
+                }
+              : {}),
           });
           if (openReport) {
             setDiagnosticReportDialogOpen(true);
           }
-          return true;
+          return !shouldIgnoreDiagnosticErrors;
         }
       } catch (error) {
         console.error('Error scanning project for validation errors:', error);
@@ -760,6 +770,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     clearEditorHotReloadLogs,
     clearEditorUncaughtError,
     hardReloadAllPreviews,
+    clearPreviewDebuggerStatuses,
   } = usePreviewDebuggerServerWatcher(previewDebuggerServer);
   const {
     ensureInteractionHappened,
@@ -1076,8 +1087,21 @@ const MainFrame = (props: Props): React.MixedElement => {
     () => {
       if (!ipcRenderer) return;
 
-      const onPreviewWindowClosed = () => {
-        if (!hasNonEditionPreviewsRunning) {
+      const onPreviewWindowClosed = (
+        event: any,
+        {
+          remainingPreviewWindowsForParent,
+        }: { remainingPreviewWindowsForParent?: number } = {}
+      ) => {
+        const isLastPreviewWindowClosed =
+          remainingPreviewWindowsForParent === 0;
+        if (isLastPreviewWindowClosed) {
+          if (previewDebuggerServer) {
+            previewDebuggerServer.closeAllPreviewConnections();
+          }
+          clearPreviewDebuggerStatuses();
+        }
+        if (isLastPreviewWindowClosed || !hasNonEditionPreviewsRunning) {
           cancelPendingPreviewLaunchAfterWindowClosed(
             'a preview window was closed'
           );
@@ -1096,8 +1120,10 @@ const MainFrame = (props: Props): React.MixedElement => {
     },
     [
       cancelPendingPreviewLaunchAfterWindowClosed,
+      clearPreviewDebuggerStatuses,
       hasNonEditionPreviewsRunning,
       healMainWindowAfterPopOutClose,
+      previewDebuggerServer,
     ]
   );
 

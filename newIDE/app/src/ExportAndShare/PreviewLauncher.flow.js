@@ -152,6 +152,7 @@ export interface PreviewDebuggerServer {
   registerCallbacks(callbacks: PreviewDebuggerServerCallbacks): () => void;
   registerEmbeddedGameFrame(window: WindowProxy): void;
   unregisterEmbeddedGameFrame(window: WindowProxy): void;
+  closeAllPreviewConnections(): void;
   closeAllConnections(): void;
 }
 

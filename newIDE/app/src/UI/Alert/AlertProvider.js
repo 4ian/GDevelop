@@ -128,6 +128,22 @@ function ConfirmProvider({ children }: Props): React.Node {
             confirmDialogConfig.callback(true);
           }}
           confirmButtonLabel={confirmDialogConfig.confirmButtonLabel}
+          onClickSecondaryAction={
+            confirmDialogConfig.onClickSecondaryAction
+              ? () => {
+                  setConfirmDialogOpen(false);
+                  confirmDialogConfig.onClickSecondaryAction &&
+                    confirmDialogConfig.onClickSecondaryAction();
+                  confirmDialogConfig.callback(false);
+                }
+              : undefined
+          }
+          secondaryActionButtonLabel={
+            confirmDialogConfig.secondaryActionButtonLabel
+          }
+          secondaryActionButtonColor={
+            confirmDialogConfig.secondaryActionButtonColor
+          }
           onDismiss={() => {
             setConfirmDialogOpen(false);
             confirmDialogConfig.callback(false);

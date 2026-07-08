@@ -264,6 +264,7 @@ const Model3DEditor = ({
     },
     [properties]
   );
+  const pendingScaleForReplacedModel = React.useRef<?number>(null);
   const scale = React.useMemo<number | null>(
     () => {
       if (!modelSize) {
@@ -278,21 +279,44 @@ const Model3DEditor = ({
     [depth, height, modelSize, width]
   );
 
-  const setScale = React.useCallback(
-    (scale: number) => {
-      if (!modelSize) {
+  const setDimensionsFromModelSizeAndScale = React.useCallback(
+    (newModelSize: { x: number, y: number, z: number }, scale: number) => {
+      if (!Number.isFinite(scale)) {
         return;
       }
-      const width = scale * modelSize.x;
-      const height = scale * modelSize.y;
-      const depth = scale * modelSize.z;
+      const width = scale * newModelSize.x;
+      const height = scale * newModelSize.y;
+      const depth = scale * newModelSize.z;
       objectConfiguration.updateProperty('width', width.toString(10));
       objectConfiguration.updateProperty('height', height.toString(10));
       objectConfiguration.updateProperty('depth', depth.toString(10));
       onDimensionChange();
       forceUpdate();
     },
-    [forceUpdate, modelSize, objectConfiguration, onDimensionChange]
+    [forceUpdate, objectConfiguration, onDimensionChange]
+  );
+
+  const setScale = React.useCallback(
+    (scale: number) => {
+      if (!modelSize) {
+        return;
+      }
+      setDimensionsFromModelSizeAndScale(modelSize, scale);
+    },
+    [modelSize, setDimensionsFromModelSizeAndScale]
+  );
+
+  React.useEffect(
+    () => {
+      if (!modelSize || pendingScaleForReplacedModel.current === null) {
+        return;
+      }
+
+      const scale = pendingScaleForReplacedModel.current;
+      pendingScaleForReplacedModel.current = null;
+      setDimensionsFromModelSizeAndScale(modelSize, scale);
+    },
+    [modelSize, setDimensionsFromModelSizeAndScale]
   );
 
   const scanNewAnimations = React.useCallback(
@@ -497,6 +521,8 @@ const Model3DEditor = ({
             projectScopedContainersAccessor={projectScopedContainersAccessor}
             resourceName={properties.get('modelResourceName').getValue()}
             onChange={newValue => {
+              pendingScaleForReplacedModel.current =
+                scale !== null && Number.isFinite(scale) ? scale : 1;
               onChangeProperty('modelResourceName', newValue);
               loadGltf(newValue);
               forceUpdate();

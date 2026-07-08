@@ -244,9 +244,9 @@ class BrowserPreviewDebuggerServer {
     embbededGameFrameWindow = null;
     notifyConnectionClosed('embedded-game-frame');
   }
-  closeAllConnections() {
+  closeAllPreviewConnections() {
     console.info(
-      'Closing all connections (i.e: windows and the embedded game frame) to the debugger server.'
+      'Closing all preview window connections to the debugger server.'
     );
     Object.keys(existingPreviewWindows).forEach(id => {
       const previewWindow = existingPreviewWindows[id];
@@ -265,7 +265,11 @@ class BrowserPreviewDebuggerServer {
     });
 
     stopWindowClosedPolling();
+    responseCallbacks.clear();
+  }
 
+  closeAllConnections() {
+    this.closeAllPreviewConnections();
     if (embbededGameFrameWindow) {
       embbededGameFrameWindow = null;
       notifyConnectionClosed('embedded-game-frame');

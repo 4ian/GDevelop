@@ -2203,6 +2203,85 @@ export default class SceneEditor extends React.Component<Props, State> {
     this._sendUpdatedInstances(instances);
   };
 
+  _fitCustomSizedModel3DInstancesToObjectRatio = (
+    object: gdObject
+  ): Array<gdInitialInstance> => {
+    if (object.getType() !== 'Scene3D::Model3DObject') return [];
+
+    const model3DConfiguration = gd.asModel3DConfiguration(
+      object.getConfiguration()
+    );
+    const defaultWidth = model3DConfiguration.getWidth();
+    const defaultHeight = model3DConfiguration.getHeight();
+    const defaultDepth = model3DConfiguration.getDepth();
+    if (
+      !Number.isFinite(defaultWidth) ||
+      !Number.isFinite(defaultHeight) ||
+      !Number.isFinite(defaultDepth) ||
+      defaultWidth <= 0 ||
+      defaultHeight <= 0 ||
+      defaultDepth <= 0
+    ) {
+      return [];
+    }
+
+    const resizedInstances: Array<gdInitialInstance> = [];
+    const objectInstances = getInstancesInLayoutForObject(
+      this.props.initialInstances,
+      object.getName()
+    );
+    objectInstances.forEach(instance => {
+      if (!instance.hasCustomSize() && !instance.hasCustomDepth()) return;
+
+      const currentWidth = instance.hasCustomSize()
+        ? instance.getCustomWidth()
+        : defaultWidth;
+      const currentHeight = instance.hasCustomSize()
+        ? instance.getCustomHeight()
+        : defaultHeight;
+      const currentDepth = instance.hasCustomDepth()
+        ? instance.getCustomDepth()
+        : defaultDepth;
+      if (
+        !Number.isFinite(currentWidth) ||
+        !Number.isFinite(currentHeight) ||
+        !Number.isFinite(currentDepth) ||
+        currentWidth <= 0 ||
+        currentHeight <= 0 ||
+        currentDepth <= 0
+      ) {
+        return;
+      }
+
+      const scale = Math.min(
+        currentWidth / defaultWidth,
+        currentHeight / defaultHeight,
+        currentDepth / defaultDepth
+      );
+      if (!Number.isFinite(scale) || scale <= 0) return;
+
+      const nextWidth = scale * defaultWidth;
+      const nextHeight = scale * defaultHeight;
+      const nextDepth = scale * defaultDepth;
+      if (
+        Math.abs(currentWidth - nextWidth) < 0.000001 &&
+        Math.abs(currentHeight - nextHeight) < 0.000001 &&
+        Math.abs(currentDepth - nextDepth) < 0.000001
+      ) {
+        return;
+      }
+
+      instance.setHasCustomSize(true);
+      instance.setCustomWidth(nextWidth);
+      instance.setCustomHeight(nextHeight);
+      instance.setHasCustomDepth(true);
+      instance.setCustomDepth(nextDepth);
+      resizedInstances.push(instance);
+    });
+
+    return resizedInstances;
+  };
+
   _onInstancesRotated = (instances: Array<gdInitialInstance>) => {
     this.setState(
       {
@@ -2348,6 +2427,15 @@ export default class SceneEditor extends React.Component<Props, State> {
       this._hotReloadObjects({
         updatedObjects: [objectWithContext.object],
       });
+    }
+
+    const resizedInstances = hasResourceChanged
+      ? this._fitCustomSizedModel3DInstancesToObjectRatio(
+          objectWithContext.object
+        )
+      : [];
+    if (resizedInstances.length > 0) {
+      this._onInstancesResized(resizedInstances);
     }
   };
 

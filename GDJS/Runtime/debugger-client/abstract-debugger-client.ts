@@ -384,6 +384,7 @@ namespace gdjs {
                   projectData.resources.resources,
                   resources
                 );
+                runtimeGame.getResourceLoader().upsertResources(resources);
               }
               if (sceneName) {
                 const sceneData = runtimeGame.getSceneData(sceneName);
@@ -393,7 +394,6 @@ namespace gdjs {
                   });
                 }
               }
-              runtimeGame.setProjectData(projectData);
               that._hotReloader.hotReloadRuntimeSceneObjects(
                 updatedObjects,
                 editedInstanceContainer

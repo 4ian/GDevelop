@@ -597,9 +597,19 @@ namespace gdjs {
      * @param onProgress Callback called each time a new file is loaded.
      */
     async _loadTexture(resource: ResourceData): Promise<void> {
-      if (this._loadedTextures.get(resource)) {
+      const existingTexture = this._loadedTextures.get(resource);
+      if (
+        existingTexture &&
+        !existingTexture.destroyed &&
+        existingTexture.valid
+      ) {
         return;
       }
+      if (existingTexture) {
+        this._destroyLoadedGifFrameTextures(resource);
+        this._loadedTextures.delete(resource);
+      }
+
       const resourceUrl = this._resourceLoader.getFullUrl(resource.file);
       try {
         if (resource.kind === 'video') {

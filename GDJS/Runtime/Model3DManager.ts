@@ -108,9 +108,14 @@ namespace gdjs {
       if (!loader) {
         return;
       }
-      if (this._loadedThreeModels.get(resource)) {
+      const loadedThreeModel = this._loadedThreeModels.get(resource);
+      if (loadedThreeModel && loadedThreeModel.scene.children.length > 0) {
         return;
       }
+      if (loadedThreeModel) {
+        this._loadedThreeModels.delete(resource);
+      }
+
       const url = this._resourceLoader.getFullUrl(resource.file);
       try {
         const response = await fetch(url, {
@@ -170,7 +175,9 @@ namespace gdjs {
         resourceData.name
       );
       if (loadedThreeModel) {
-        loadedThreeModel.scene.clear();
+        // Don't clear the scene: existing 3D renderers can keep a reference to
+        // this GLTF during editor hot-reload. Deleting the cache entry is enough
+        // to allow collection when no renderer references it anymore.
         this._loadedThreeModels.delete(resourceData);
       }
 

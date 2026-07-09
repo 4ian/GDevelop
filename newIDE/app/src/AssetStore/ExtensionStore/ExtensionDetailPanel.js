@@ -1,6 +1,5 @@
 // @flow
 import { t, Trans } from '@lingui/macro';
-import { I18n } from '@lingui/react';
 import React from 'react';
 import FlatButton from '../../UI/FlatButton';
 import RaisedButton from '../../UI/RaisedButton';
@@ -286,141 +285,133 @@ const ExtensionDetailPanel = ({
     : null;
 
   return (
-    <I18n>
-      {({ i18n }) => (
-        <ColumnStackLayout expand noMargin>
-          <Line alignItems="center" noMargin>
-            <IconContainer
-              alt={extensionShortHeader.fullName}
-              src={extensionShortHeader.previewIconUrl}
-              size={64}
-            />
-            <Column expand>
-              <Text noMargin size="body2">
-                {extensionUpdate &&
-                installedExtension &&
-                extensionShortHeader.version !==
-                  installedExtension.getVersion() ? (
-                  <Trans>{`Version ${installedExtension.getVersion()} (${
-                    extensionShortHeader.version
-                  } available)`}</Trans>
-                ) : (
-                  <Trans>{`Version ${extensionShortHeader.version}`}</Trans>
-                )}
-              </Text>
-              <Line>
-                <div style={{ flexWrap: 'wrap' }}>
-                  {extensionShortHeader.authors &&
-                    extensionShortHeader.authors.map(author => (
-                      <UserPublicProfileChip
-                        user={author}
-                        key={author.id}
-                        isClickable
-                      />
-                    ))}
-                </div>
-              </Line>
-            </Column>
-            {shouldDisplayButtons && onInstall && (
-              <Column noMargin noOverflowParent justifyContent="center">
-                <LeftLoader isLoading={isInstalling} key="install">
-                  <RaisedButton
-                    id="install-extension-button"
-                    label={renderInstallButtonLabel()}
-                    primary
-                    onClick={onInstallExtension}
-                    disabled={!canInstallExtension}
-                  />
-                </LeftLoader>
-              </Column>
+    <ColumnStackLayout expand noMargin>
+      <Line alignItems="center" noMargin>
+        <IconContainer
+          alt={extensionShortHeader.fullName}
+          src={extensionShortHeader.previewIconUrl}
+          size={64}
+        />
+        <Column expand>
+          <Text noMargin size="body2">
+            {extensionUpdate &&
+            installedExtension &&
+            extensionShortHeader.version !== installedExtension.getVersion() ? (
+              <Trans>{`Version ${installedExtension.getVersion()} (${
+                extensionShortHeader.version
+              } available)`}</Trans>
+            ) : (
+              <Trans>{`Version ${extensionShortHeader.version}`}</Trans>
             )}
-          </Line>
-          <Text noMargin>
-            {extensionHeader
-              ? extensionHeader.shortDescription
-              : typeof extensionShortHeader.shortDescription === 'string'
-              ? extensionShortHeader.shortDescription || ''
-              : ''}
           </Text>
-          <Divider />
-          {extensionHeader && (
-            <MarkdownText
-              source={getTransformedDescription(extensionHeader)}
-              isStandaloneText
+          <Line>
+            <div style={{ flexWrap: 'wrap' }}>
+              {extensionShortHeader.authors &&
+                extensionShortHeader.authors.map(author => (
+                  <UserPublicProfileChip
+                    user={author}
+                    key={author.id}
+                    isClickable
+                  />
+                ))}
+            </div>
+          </Line>
+        </Column>
+        {shouldDisplayButtons && onInstall && (
+          <Column noMargin noOverflowParent justifyContent="center">
+            <LeftLoader isLoading={isInstalling} key="install">
+              <RaisedButton
+                id="install-extension-button"
+                label={renderInstallButtonLabel()}
+                primary
+                onClick={onInstallExtension}
+                disabled={!canInstallExtension}
+              />
+            </LeftLoader>
+          </Column>
+        )}
+      </Line>
+      <Text noMargin>
+        {extensionHeader
+          ? extensionHeader.shortDescription
+          : typeof extensionShortHeader.shortDescription === 'string'
+          ? extensionShortHeader.shortDescription || ''
+          : ''}
+      </Text>
+      <Divider />
+      {extensionHeader && (
+        <MarkdownText
+          source={getTransformedDescription(extensionHeader)}
+          isStandaloneText
+        />
+      )}
+      {extensionShortHeader.tier === 'experimental' && (
+        <AlertMessage kind="warning">
+          <Trans>
+            This is an extension made by a community member and it only got
+            through a light review by the GDevelop extension team. As such, we
+            can't guarantee it meets all the quality standards of fully reviewed
+            extensions.
+          </Trans>
+        </AlertMessage>
+      )}
+      {!isCompatible && (
+        <AlertMessage kind="error">
+          <Trans>
+            Unfortunately, this extension requires a newer version of GDevelop
+            to work. Update GDevelop to be able to use this extension in your
+            project.
+          </Trans>
+        </AlertMessage>
+      )}
+      {!extensionHeader && !error && <PlaceholderLoader />}
+      {!extensionHeader && error && (
+        <PlaceholderError onRetry={loadExtensionheader}>
+          <Trans>
+            Can't load the extension registry. Verify your internet connection
+            or try again later.
+          </Trans>
+        </PlaceholderError>
+      )}
+      {newBreakingChangesText && (
+        <>
+          <Text size="sub-title">
+            <Trans>Breaking changes</Trans>
+          </Text>
+          <MarkdownText source={newBreakingChangesText} isStandaloneText />
+        </>
+      )}
+      {oldBreakingChangesText && (
+        <Accordion noMargin>
+          <AccordionHeader noMargin>
+            <Text size="sub-title">
+              <Trans>Previous breaking changes (no longer relevant)</Trans>
+            </Text>
+          </AccordionHeader>
+          <AccordionBody disableGutters>
+            <MarkdownText source={oldBreakingChangesText} isStandaloneText />
+          </AccordionBody>
+        </Accordion>
+      )}
+      <LineStackLayout noMargin>
+        {shouldDisplayButtons &&
+          extensionHeader &&
+          extensionHeader.helpPath && (
+            <HelpButton
+              key="help-button"
+              helpPagePath={extensionHeader.helpPath}
+              scopeName={t`Extension`}
             />
           )}
-          {extensionShortHeader.tier === 'experimental' && (
-            <AlertMessage kind="warning">
-              <Trans>
-                This is an extension made by a community member and it only got
-                through a light review by the GDevelop extension team. As such,
-                we can't guarantee it meets all the quality standards of fully
-                reviewed extensions.
-              </Trans>
-            </AlertMessage>
-          )}
-          {!isCompatible && (
-            <AlertMessage kind="error">
-              <Trans>
-                Unfortunately, this extension requires a newer version of
-                GDevelop to work. Update GDevelop to be able to use this
-                extension in your project.
-              </Trans>
-            </AlertMessage>
-          )}
-          {!extensionHeader && !error && <PlaceholderLoader />}
-          {!extensionHeader && error && (
-            <PlaceholderError onRetry={loadExtensionheader}>
-              <Trans>
-                Can't load the extension registry. Verify your internet
-                connection or try again later.
-              </Trans>
-            </PlaceholderError>
-          )}
-          {newBreakingChangesText && (
-            <>
-              <Text size="sub-title">
-                <Trans>Breaking changes</Trans>
-              </Text>
-              <MarkdownText source={newBreakingChangesText} isStandaloneText />
-            </>
-          )}
-          {oldBreakingChangesText && (
-            <Accordion noMargin>
-              <AccordionHeader noMargin>
-                <Text size="sub-title">
-                  <Trans>Previous breaking changes (no longer relevant)</Trans>
-                </Text>
-              </AccordionHeader>
-              <AccordionBody disableGutters>
-                <MarkdownText
-                  source={oldBreakingChangesText}
-                  isStandaloneText
-                />
-              </AccordionBody>
-            </Accordion>
-          )}
-          <LineStackLayout noMargin>
-            {shouldDisplayButtons &&
-              extensionHeader &&
-              extensionHeader.helpPath && (
-                <HelpButton
-                  key="help-button"
-                  helpPagePath={extensionHeader.helpPath}
-                  scopeName={i18n._(t`Extension`)}
-                />
-              )}
-            {shouldDisplayButtons && isAlreadyInstalled && (
-              <FlatButton
-                key="report-extension"
-                label={<Trans>Report an issue</Trans>}
-                onClick={() => onUserReportIssue()}
-              />
-            )}
-          </LineStackLayout>
-        </ColumnStackLayout>
-      )}
-    </I18n>
+        {shouldDisplayButtons && isAlreadyInstalled && (
+          <FlatButton
+            key="report-extension"
+            label={<Trans>Report an issue</Trans>}
+            onClick={() => onUserReportIssue()}
+          />
+        )}
+      </LineStackLayout>
+    </ColumnStackLayout>
   );
 };
 

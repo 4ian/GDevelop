@@ -4,6 +4,8 @@ import TextButton from '../TextButton';
 import Window from '../../Utils/Window';
 import { getHelpLink } from '../../Utils/HelpLink';
 import { Trans } from '@lingui/macro';
+import { I18n } from '@lingui/react';
+import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
 import { useResponsiveWindowSize } from '../Responsive/ResponsiveWindowMeasurer';
 import HelpIcon from '../HelpIcon';
 import Help from '../CustomSvgIcons/Help';
@@ -12,7 +14,7 @@ type PropsType = {
   helpPagePath: ?string,
   label?: React.Node,
   anchor?: string,
-  scopeName?: string,
+  scopeName?: MessageDescriptor,
 };
 
 /**
@@ -31,19 +33,22 @@ const HelpButton = (props: PropsType): null | React.Node => {
   };
 
   return !isMobile ? (
-    <TextButton
-      onClick={onClick}
-      target="_blank"
-      label={
-        props.label ||
-        (props.scopeName ? (
-          <Trans>See {props.scopeName}</Trans>
-        ) : (
-          <Trans>Help</Trans>
-        ))
-      }
-      icon={<Help />}
-    />
+    <I18n>
+      {({ i18n }) => {
+        const scopeName = props.scopeName ? i18n._(props.scopeName) : null;
+        return (
+          <TextButton
+            onClick={onClick}
+            target="_blank"
+            label={
+              props.label ||
+              (scopeName ? <Trans>See {scopeName}</Trans> : <Trans>Help</Trans>)
+            }
+            icon={<Help />}
+          />
+        );
+      }}
+    </I18n>
   ) : (
     <HelpIcon size="small" helpPagePath={props.helpPagePath} />
   );

@@ -270,7 +270,7 @@ export default function NewBehaviorDialog({
             <HelpButton
               helpPagePath="/behaviors"
               key="help"
-              scopeName={i18n._(t`Behaviors`)}
+              scopeName={t`Behaviors`}
             />,
           ]}
           open

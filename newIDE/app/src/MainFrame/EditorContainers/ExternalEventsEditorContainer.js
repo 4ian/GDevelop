@@ -1,6 +1,5 @@
 // @flow
 import { t, Trans } from '@lingui/macro';
-import { I18n } from '@lingui/react';
 import React from 'react';
 import EventsSheet, { type EventsSheetInterface } from '../../EventsSheet';
 import RaisedButton from '../../UI/RaisedButton';
@@ -261,94 +260,84 @@ export class ExternalEventsEditorContainer extends React.Component<
     };
 
     return (
-      <I18n>
-        {({ i18n }) => (
-          <div style={styles.container}>
-            {layout && (
-              <EventsSheet
-                ref={editor => (this.editor = editor)}
-                setToolbar={this.props.setToolbar}
-                onOpenLayout={this.props.onOpenLayout}
-                resourceManagementProps={this.props.resourceManagementProps}
-                openInstructionOrExpression={
-                  this.props.openInstructionOrExpression
-                }
-                onCreateEventsFunction={this.onCreateEventsFunction}
-                onBeginCreateEventsFunction={this.onBeginCreateEventsFunction}
-                unsavedChanges={this.props.unsavedChanges}
-                project={project}
-                // $FlowFixMe[incompatible-type]
-                scope={scope}
-                globalObjectsContainer={project.getObjects()}
-                objectsContainer={layout.getObjects()}
-                projectScopedContainersAccessor={
-                  // $FlowFixMe[incompatible-type]
-                  new ProjectScopedContainersAccessor(scope)
-                }
-                events={externalEvents.getEvents()}
-                onOpenSettings={this.openExternalPropertiesDialog}
-                settingsIcon={editSceneIconReactNode}
-                onOpenExternalEvents={this.props.onOpenExternalEvents}
-                isActive={this.props.isActive}
-                hotReloadPreviewButtonProps={
-                  this.props.hotReloadPreviewButtonProps
-                }
-                onWillInstallExtension={this.props.onWillInstallExtension}
-                onExtensionInstalled={this.props.onExtensionInstalled}
-                // Scene events don't have parameters
-                editEventsFunctionParameter={() => {}}
-              />
-            )}
-            {!layout && (
-              <Background>
-                <PlaceholderMessage>
-                  <Text>
-                    <Trans>
-                      To edit the external events, choose the scene in which it
-                      will be included
-                    </Trans>
-                  </Text>
-                  <Line justifyContent="center">
-                    <RaisedButton
-                      label={<Trans>Choose the scene</Trans>}
-                      primary
-                      onClick={this.openExternalPropertiesDialog}
-                    />
-                  </Line>
-                  <Line justifyContent="flex-start" noMargin>
-                    <TutorialButton
-                      tutorialId="Intermediate-externals"
-                      label={<Trans>Watch tutorial</Trans>}
-                      renderIfNotFound={
-                        <HelpButton
-                          helpPagePath="/interface/events-editor/external-events"
-                          scopeName={i18n._(t`External events`)}
-                        />
-                      }
-                    />
-                  </Line>
-                </PlaceholderMessage>
-              </Background>
-            )}
-            <ExternalPropertiesDialog
-              title={<Trans>Configure the external events</Trans>}
-              helpTexts={[
-                <Trans>
-                  In order to use these external events, you still need to add a
-                  "Link" event in the events sheet of the corresponding scene
-                </Trans>,
-              ]}
-              open={this.state.externalPropertiesDialogOpen}
-              project={project}
-              onChoose={this.saveExternalProperties}
-              layoutName={this.getAssociatedLayoutName()}
-              onClose={() =>
-                this.setState({ externalPropertiesDialogOpen: false })
-              }
-            />
-          </div>
+      <div style={styles.container}>
+        {layout && (
+          <EventsSheet
+            ref={editor => (this.editor = editor)}
+            setToolbar={this.props.setToolbar}
+            onOpenLayout={this.props.onOpenLayout}
+            resourceManagementProps={this.props.resourceManagementProps}
+            openInstructionOrExpression={this.props.openInstructionOrExpression}
+            onCreateEventsFunction={this.onCreateEventsFunction}
+            onBeginCreateEventsFunction={this.onBeginCreateEventsFunction}
+            unsavedChanges={this.props.unsavedChanges}
+            project={project}
+            // $FlowFixMe[incompatible-type]
+            scope={scope}
+            globalObjectsContainer={project.getObjects()}
+            objectsContainer={layout.getObjects()}
+            projectScopedContainersAccessor={
+              // $FlowFixMe[incompatible-type]
+              new ProjectScopedContainersAccessor(scope)
+            }
+            events={externalEvents.getEvents()}
+            onOpenSettings={this.openExternalPropertiesDialog}
+            settingsIcon={editSceneIconReactNode}
+            onOpenExternalEvents={this.props.onOpenExternalEvents}
+            isActive={this.props.isActive}
+            hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
+            onWillInstallExtension={this.props.onWillInstallExtension}
+            onExtensionInstalled={this.props.onExtensionInstalled}
+            // Scene events don't have parameters
+            editEventsFunctionParameter={() => {}}
+          />
         )}
-      </I18n>
+        {!layout && (
+          <Background>
+            <PlaceholderMessage>
+              <Text>
+                <Trans>
+                  To edit the external events, choose the scene in which it will
+                  be included
+                </Trans>
+              </Text>
+              <Line justifyContent="center">
+                <RaisedButton
+                  label={<Trans>Choose the scene</Trans>}
+                  primary
+                  onClick={this.openExternalPropertiesDialog}
+                />
+              </Line>
+              <Line justifyContent="flex-start" noMargin>
+                <TutorialButton
+                  tutorialId="Intermediate-externals"
+                  label={<Trans>Watch tutorial</Trans>}
+                  renderIfNotFound={
+                    <HelpButton
+                      helpPagePath="/interface/events-editor/external-events"
+                      scopeName={t`External events`}
+                    />
+                  }
+                />
+              </Line>
+            </PlaceholderMessage>
+          </Background>
+        )}
+        <ExternalPropertiesDialog
+          title={<Trans>Configure the external events</Trans>}
+          helpTexts={[
+            <Trans>
+              In order to use these external events, you still need to add a
+              "Link" event in the events sheet of the corresponding scene
+            </Trans>,
+          ]}
+          open={this.state.externalPropertiesDialogOpen}
+          project={project}
+          onChoose={this.saveExternalProperties}
+          layoutName={this.getAssociatedLayoutName()}
+          onClose={() => this.setState({ externalPropertiesDialogOpen: false })}
+        />
+      </div>
     );
   }
 }

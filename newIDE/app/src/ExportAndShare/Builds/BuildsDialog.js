@@ -1,6 +1,5 @@
 // @flow
 import { t, Trans } from '@lingui/macro';
-import { I18n } from '@lingui/react';
 
 import React from 'react';
 import Dialog from '../../UI/Dialog';
@@ -30,38 +29,34 @@ const BuildsDialog = ({
   if (!open) return null;
 
   return (
-    <I18n>
-      {({ i18n }) => (
-        <Dialog
-          title={<Trans>{game.gameName} builds</Trans>}
-          actions={[
-            <FlatButton
-              label={<Trans>Close</Trans>}
-              key="close"
-              primary={false}
-              onClick={onClose}
-            />,
-          ]}
-          secondaryActions={[
-            <HelpButton
-              key="help"
-              helpPagePath={'/publishing'}
-              scopeName={i18n._(t`Publishing`)}
-            />,
-          ]}
-          onRequestClose={onClose}
-          open={open}
-        >
-          <Builds
-            // Force the Dialog repositioning
-            onBuildsUpdated={forceUpdate}
-            authenticatedUser={authenticatedUser}
-            game={game}
-            onGameUpdated={onGameUpdated}
-          />
-        </Dialog>
-      )}
-    </I18n>
+    <Dialog
+      title={<Trans>{game.gameName} builds</Trans>}
+      actions={[
+        <FlatButton
+          label={<Trans>Close</Trans>}
+          key="close"
+          primary={false}
+          onClick={onClose}
+        />,
+      ]}
+      secondaryActions={[
+        <HelpButton
+          key="help"
+          helpPagePath={'/publishing'}
+          scopeName={t`Publishing`}
+        />,
+      ]}
+      onRequestClose={onClose}
+      open={open}
+    >
+      <Builds
+        // Force the Dialog repositioning
+        onBuildsUpdated={forceUpdate}
+        authenticatedUser={authenticatedUser}
+        game={game}
+        onGameUpdated={onGameUpdated}
+      />
+    </Dialog>
   );
 };
 

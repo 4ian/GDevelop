@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react';
 import { t, Trans } from '@lingui/macro';
-import { I18n } from '@lingui/react';
 
 import FlatButton from '../UI/FlatButton';
 import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
@@ -153,89 +152,82 @@ const CreateAccountDialog = ({
   };
 
   return (
-    <I18n>
-      {({ i18n }) => (
-        <Dialog
-          title={null} // This dialog has a custom design to be more welcoming, the title is set in the content.
-          id="create-account-dialog"
-          actions={[
-            <FlatButton
-              label={<Trans>Cancel</Trans>}
-              key="close"
-              primary={false}
-              onClick={onClose}
-            />,
-            <LeftLoader
-              isLoading={createAccountInProgress}
-              key="create-account"
-            >
-              <DialogPrimaryButton
-                label={<Trans>Create account</Trans>}
-                id="create-account-button"
-                primary
-                disabled={!canCreateAccount}
-                onClick={createAccount}
-              />
-            </LeftLoader>,
-          ]}
-          secondaryActions={[
-            <HelpButton
-              key="help"
-              helpPagePath={'/interface/profile'}
-              scopeName={i18n._(t`Account`)}
-            />,
-          ]}
-          cannotBeDismissed={createAccountInProgress}
-          onApply={createAccount}
-          onRequestClose={() => {
-            if (!createAccountInProgress) onClose();
-          }}
-          maxWidth="md"
-          open
-          flexColumnBody
-        >
+    <Dialog
+      title={null} // This dialog has a custom design to be more welcoming, the title is set in the content.
+      id="create-account-dialog"
+      actions={[
+        <FlatButton
+          label={<Trans>Cancel</Trans>}
+          key="close"
+          primary={false}
+          onClick={onClose}
+        />,
+        <LeftLoader isLoading={createAccountInProgress} key="create-account">
+          <DialogPrimaryButton
+            label={<Trans>Create account</Trans>}
+            id="create-account-button"
+            primary
+            disabled={!canCreateAccount}
+            onClick={createAccount}
+          />
+        </LeftLoader>,
+      ]}
+      secondaryActions={[
+        <HelpButton
+          key="help"
+          helpPagePath={'/interface/profile'}
+          scopeName={t`Account`}
+        />,
+      ]}
+      cannotBeDismissed={createAccountInProgress}
+      onApply={createAccount}
+      onRequestClose={() => {
+        if (!createAccountInProgress) onClose();
+      }}
+      maxWidth="md"
+      open
+      flexColumnBody
+    >
+      <ColumnStackLayout
+        noMargin
+        expand
+        justifyContent="center"
+        alignItems="center"
+      >
+        {
           <ColumnStackLayout
             noMargin
-            expand
             justifyContent="center"
             alignItems="center"
           >
-            {
-              <ColumnStackLayout
-                noMargin
-                justifyContent="center"
-                alignItems="center"
-              >
-                <GDevelopGLogo fontSize="large" />
-                <Text size="section-title" align="center" noMargin>
-                  <Trans>Welcome to GDevelop!</Trans>
-                </Text>
-              </ColumnStackLayout>
-            }
-            <div style={styles.formContainer}>
-              <CreateAccountForm
-                onCreateAccount={createAccount}
-                onLoginWithProvider={onLoginWithProvider}
-                email={email}
-                onChangeEmail={setEmail}
-                password={password}
-                onChangePassword={setPassword}
-                username={username}
-                onChangeUsername={setUsername}
-                optInNewsletterEmail={getNewsletterEmail}
-                onChangeOptInNewsletterEmail={setGetNewsletterEmail}
-                createAccountInProgress={createAccountInProgress}
-                error={error}
-                onChangeUsernameAvailability={setUsernameAvailability}
-                isValidatingUsername={isValidatingUsername}
-                onChangeIsValidatingUsername={setIsValidatingUsername}
-                onGoToLogin={onGoToLogin}
-              />
-            </div>
+            <GDevelopGLogo fontSize="large" />
+            <Text size="section-title" align="center" noMargin>
+              <Trans>Welcome to GDevelop!</Trans>
+            </Text>
           </ColumnStackLayout>
-        </Dialog>
-      )}
-    </I18n>
+        }
+        <div style={styles.formContainer}>
+          <CreateAccountForm
+            onCreateAccount={createAccount}
+            onLoginWithProvider={onLoginWithProvider}
+            email={email}
+            onChangeEmail={setEmail}
+            password={password}
+            onChangePassword={setPassword}
+            username={username}
+            onChangeUsername={setUsername}
+            optInNewsletterEmail={getNewsletterEmail}
+            onChangeOptInNewsletterEmail={setGetNewsletterEmail}
+            createAccountInProgress={createAccountInProgress}
+            error={error}
+            onChangeUsernameAvailability={setUsernameAvailability}
+            isValidatingUsername={isValidatingUsername}
+            onChangeIsValidatingUsername={setIsValidatingUsername}
+            onGoToLogin={onGoToLogin}
+          />
+        </div>
+      </ColumnStackLayout>
+    </Dialog>
   );
 };
 

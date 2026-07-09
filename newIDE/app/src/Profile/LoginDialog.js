@@ -86,7 +86,7 @@ const LoginDialog = ({
     <HelpButton
       key="help"
       helpPagePath={'/interface/profile'}
-      scopeName={i18n._(t`Account`)}
+      scopeName={t`Account`}
     />,
   ];
 

@@ -135,7 +135,7 @@ const ExtensionsSearchDialog = ({
             <HelpButton
               key="help"
               helpPagePath="/extensions/search"
-              scopeName={i18n._(t`Extensions`)}
+              scopeName={t`Extensions`}
             />,
             eventsFunctionsExtensionOpener ? (
               <FlatButton

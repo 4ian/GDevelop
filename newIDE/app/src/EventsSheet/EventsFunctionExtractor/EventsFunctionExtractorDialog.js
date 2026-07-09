@@ -126,7 +126,7 @@ const EventsFunctionExtractorDialog = ({
             <HelpButton
               helpPagePath="/events/functions/extract-events"
               key="help"
-              scopeName={i18n._(t`Extract to function`)}
+              scopeName={t`Extract to function`}
             />,
           ]}
           actions={[

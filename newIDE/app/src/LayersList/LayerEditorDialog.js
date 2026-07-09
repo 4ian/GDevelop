@@ -1,6 +1,5 @@
 // @flow
 import { t, Trans } from '@lingui/macro';
-import { I18n } from '@lingui/react';
 import * as React from 'react';
 import FlatButton from '../UI/FlatButton';
 import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
@@ -205,348 +204,340 @@ const LayerEditorDialog = ({
   );
 
   return (
-    <I18n>
-      {({ i18n }) => (
-        <Dialog
-          title={
-            layer.getName() ? (
-              <Trans>{layer.getName()} properties</Trans>
-            ) : (
-              <Trans>Base layer properties</Trans>
-            )
-          }
-          open
-          secondaryActions={[
-            <HelpButton
-              key="help"
-              helpPagePath={'/interface/scene-editor/layer-effects'}
-              scopeName={i18n._(t`Layer effects`)}
-            />,
-            <HotReloadPreviewButton
-              key="hot-reload-preview-button"
-              {...hotReloadPreviewButtonProps}
-            />,
+    <Dialog
+      title={
+        layer.getName() ? (
+          <Trans>{layer.getName()} properties</Trans>
+        ) : (
+          <Trans>Base layer properties</Trans>
+        )
+      }
+      open
+      secondaryActions={[
+        <HelpButton
+          key="help"
+          helpPagePath={'/interface/scene-editor/layer-effects'}
+          scopeName={t`Layer effects`}
+        />,
+        <HotReloadPreviewButton
+          key="hot-reload-preview-button"
+          {...hotReloadPreviewButtonProps}
+        />,
+      ]}
+      actions={[
+        <FlatButton
+          label={<Trans>Cancel</Trans>}
+          onClick={onCancelChanges}
+          key={'Cancel'}
+        />,
+        <DialogPrimaryButton
+          label={<Trans>Apply</Trans>}
+          primary
+          onClick={() => onApply(hasAnyEffectBeenAdded)}
+          key={'Apply'}
+        />,
+      ]}
+      onRequestClose={onCancelChanges}
+      onApply={() => onApply(hasAnyEffectBeenAdded)}
+      fullHeight
+      maxWidth="md"
+      flexColumnBody
+      fixedContent={
+        <Tabs
+          value={currentTab}
+          onChange={setCurrentTab}
+          options={[
+            {
+              value: 'properties',
+              label: <Trans>Properties</Trans>,
+            },
+            {
+              value: 'effects',
+              label: <Trans>Effects</Trans>,
+            },
           ]}
-          actions={[
-            <FlatButton
-              label={<Trans>Cancel</Trans>}
-              onClick={onCancelChanges}
-              key={'Cancel'}
-            />,
-            <DialogPrimaryButton
-              label={<Trans>Apply</Trans>}
-              primary
-              onClick={() => onApply(hasAnyEffectBeenAdded)}
-              key={'Apply'}
-            />,
-          ]}
-          onRequestClose={onCancelChanges}
-          onApply={() => onApply(hasAnyEffectBeenAdded)}
-          fullHeight
-          maxWidth="md"
-          flexColumnBody
-          fixedContent={
-            <Tabs
-              value={currentTab}
-              onChange={setCurrentTab}
-              options={[
-                {
-                  value: 'properties',
-                  label: <Trans>Properties</Trans>,
-                },
-                {
-                  value: 'effects',
-                  label: <Trans>Effects</Trans>,
-                },
-              ]}
+        />
+      }
+    >
+      {currentTab === 'properties' && (
+        <ColumnStackLayout noMargin>
+          {layer.isLightingLayer() ? (
+            <DismissableAlertMessage
+              kind="info"
+              identifier="lighting-layer-usage"
+            >
+              <Trans>
+                The lighting layer renders an ambient light on the scene. All
+                lights should be placed on this layer so that shadows are
+                properly rendered. By default, the layer follows the base layer
+                camera. Uncheck this if you want to manually move the camera
+                using events.
+              </Trans>
+            </DismissableAlertMessage>
+          ) : null}
+          <Text size="block-title">
+            <Trans>Camera positioning</Trans>
+          </Text>
+          <SelectField
+            fullWidth
+            floatingLabelText={<Trans>Default camera behavior</Trans>}
+            value={layer.getDefaultCameraBehavior()}
+            onChange={(e, i, value: string) => {
+              layer.setDefaultCameraBehavior(value);
+              forceUpdate();
+            }}
+          >
+            <SelectOption
+              value={'do-nothing'}
+              label={t`Keep centered (best for game content)`}
             />
-          }
-        >
-          {currentTab === 'properties' && (
+            <SelectOption
+              value={'top-left-anchored-if-never-moved'}
+              label={t`Keep top-left corner fixed (best for content that can extend)`}
+            />
+          </SelectField>
+          <Text size="block-title">
+            <Trans>Visibility and instances ordering</Trans>
+          </Text>
+          <Text>
+            <Trans>
+              There are {instancesCount} instances of objects on this layer.
+            </Trans>
+          </Text>
+          {!project.getUseDeprecatedZeroAsDefaultZOrder() && (
+            <Paper background="light" variant="outlined">
+              <Line>
+                <Column>
+                  <Text noMargin>
+                    <Trans>
+                      Objects created using events on this layer will be given a
+                      "Z order" of {highestZOrder + 1}, so that they appear in
+                      front of all objects of this layer. You can change this
+                      using the action to change an object Z order, after using
+                      an action to create it.
+                    </Trans>
+                  </Text>
+                </Column>
+              </Line>
+            </Paper>
+          )}
+          <InlineCheckbox
+            label={<Trans>Hide the layer</Trans>}
+            checked={!layer.getVisibility()}
+            onCheck={(e, checked) => {
+              layer.setVisibility(!checked);
+              forceUpdate();
+              notifyOfChange();
+            }}
+            tooltipOrHelperText={
+              <Trans>
+                This setting changes the visibility of the entire layer. Objects
+                on the layer will not be treated as "hidden" for event
+                conditions or actions.
+              </Trans>
+            }
+          />
+          {!layer.isLightingLayer() && (
             <ColumnStackLayout noMargin>
-              {layer.isLightingLayer() ? (
-                <DismissableAlertMessage
-                  kind="info"
-                  identifier="lighting-layer-usage"
-                >
-                  <Trans>
-                    The lighting layer renders an ambient light on the scene.
-                    All lights should be placed on this layer so that shadows
-                    are properly rendered. By default, the layer follows the
-                    base layer camera. Uncheck this if you want to manually move
-                    the camera using events.
-                  </Trans>
-                </DismissableAlertMessage>
-              ) : null}
               <Text size="block-title">
-                <Trans>Camera positioning</Trans>
+                <Trans>3D settings</Trans>
               </Text>
               <SelectField
                 fullWidth
-                floatingLabelText={<Trans>Default camera behavior</Trans>}
-                value={layer.getDefaultCameraBehavior()}
-                onChange={(e, i, value: string) => {
-                  layer.setDefaultCameraBehavior(value);
+                floatingLabelText={<Trans>Rendering type</Trans>}
+                value={layer.getRenderingType()}
+                onChange={(e, i, newValue: string) => {
+                  layer.setRenderingType(newValue);
                   forceUpdate();
                 }}
               >
                 <SelectOption
-                  value={'do-nothing'}
-                  label={t`Keep centered (best for game content)`}
+                  value={''}
+                  label={t`Display both 2D and 3D objects (default)`}
                 />
                 <SelectOption
-                  value={'top-left-anchored-if-never-moved'}
-                  label={t`Keep top-left corner fixed (best for content that can extend)`}
+                  value={'2d'}
+                  label={t`Force display only 2D objects`}
+                />
+                <SelectOption
+                  value={'3d'}
+                  label={t`Force display only 3D objects`}
+                  disabled={layer.isLightingLayer()}
+                />
+                <SelectOption
+                  value={'2d+3d'}
+                  label={t`Force display both 2D and 3D objects`}
+                  disabled={layer.isLightingLayer()}
                 />
               </SelectField>
-              <Text size="block-title">
-                <Trans>Visibility and instances ordering</Trans>
-              </Text>
-              <Text>
-                <Trans>
-                  There are {instancesCount} instances of objects on this layer.
-                </Trans>
-              </Text>
-              {!project.getUseDeprecatedZeroAsDefaultZOrder() && (
-                <Paper background="light" variant="outlined">
-                  <Line>
-                    <Column>
-                      <Text noMargin>
-                        <Trans>
-                          Objects created using events on this layer will be
-                          given a "Z order" of {highestZOrder + 1}, so that they
-                          appear in front of all objects of this layer. You can
-                          change this using the action to change an object Z
-                          order, after using an action to create it.
-                        </Trans>
-                      </Text>
-                    </Column>
-                  </Line>
-                </Paper>
-              )}
-              <InlineCheckbox
-                label={<Trans>Hide the layer</Trans>}
-                checked={!layer.getVisibility()}
-                onCheck={(e, checked) => {
-                  layer.setVisibility(!checked);
-                  forceUpdate();
-                  notifyOfChange();
-                }}
-                tooltipOrHelperText={
-                  <Trans>
-                    This setting changes the visibility of the entire layer.
-                    Objects on the layer will not be treated as "hidden" for
-                    event conditions or actions.
-                  </Trans>
-                }
-              />
-              {!layer.isLightingLayer() && (
+              {layer.getRenderingType() !== '2d' && (
                 <ColumnStackLayout noMargin>
-                  <Text size="block-title">
-                    <Trans>3D settings</Trans>
-                  </Text>
-                  <SelectField
-                    fullWidth
-                    floatingLabelText={<Trans>Rendering type</Trans>}
-                    value={layer.getRenderingType()}
-                    onChange={(e, i, newValue: string) => {
-                      layer.setRenderingType(newValue);
-                      forceUpdate();
-                    }}
-                  >
-                    <SelectOption
-                      value={''}
-                      label={t`Display both 2D and 3D objects (default)`}
-                    />
-                    <SelectOption
-                      value={'2d'}
-                      label={t`Force display only 2D objects`}
-                    />
-                    <SelectOption
-                      value={'3d'}
-                      label={t`Force display only 3D objects`}
-                      disabled={layer.isLightingLayer()}
-                    />
-                    <SelectOption
-                      value={'2d+3d'}
-                      label={t`Force display both 2D and 3D objects`}
-                      disabled={layer.isLightingLayer()}
-                    />
-                  </SelectField>
-                  {layer.getRenderingType() !== '2d' && (
-                    <ColumnStackLayout noMargin>
-                      <ResponsiveLineStackLayout noResponsiveLandscape noMargin>
-                        <SelectField
-                          fullWidth
-                          floatingLabelText={<Trans>Camera type</Trans>}
-                          value={layer.getCameraType()}
-                          onChange={(e, i, newValue: string) => {
-                            layer.setCameraType(newValue);
-                            checkNearPlaneDistanceError(
-                              layer.getCamera3DNearPlaneDistance()
-                            );
-                            forceUpdate();
-                          }}
-                        >
-                          <SelectOption
-                            value={'perspective'}
-                            label={t`Perspective camera`}
-                          />
-                          <SelectOption
-                            value={'orthographic'}
-                            label={t`Orthographic camera`}
-                          />
-                        </SelectField>
-                        <SemiControlledTextField
-                          commitOnBlur
-                          fullWidth
-                          errorText={camera3DFieldOfViewError}
-                          onChange={onChangeCamera3DFieldOfView}
-                          value={layer.getCamera3DFieldOfView().toString(10)}
-                          floatingLabelText={
-                            <Trans>Field of view (in degrees)</Trans>
-                          }
-                          floatingLabelFixed
-                          disabled={layer.getCameraType() !== 'perspective'}
-                        />
-                      </ResponsiveLineStackLayout>
-                      <ResponsiveLineStackLayout noResponsiveLandscape noMargin>
-                        <SemiControlledTextField
-                          commitOnBlur
-                          fullWidth
-                          errorText={camera3DNearPlaneDistanceError}
-                          onChange={onChangeCamera3DNearPlaneDistance}
-                          value={layer
-                            .getCamera3DNearPlaneDistance()
-                            .toString(10)}
-                          floatingLabelText={<Trans>Near plane distance</Trans>}
-                          floatingLabelFixed
-                        />
-                        <SemiControlledTextField
-                          commitOnBlur
-                          fullWidth
-                          errorText={camera3DFarPlaneDistanceError}
-                          onChange={onChangeCamera3DFarPlaneDistance}
-                          value={layer
-                            .getCamera3DFarPlaneDistance()
-                            .toString(10)}
-                          floatingLabelText={<Trans>Far plane distance</Trans>}
-                          floatingLabelFixed
-                        />
-                      </ResponsiveLineStackLayout>
-                      <SemiControlledTextField
-                        commitOnBlur
-                        fullWidth
-                        errorText={camera2DPlaneMaxDrawingDistanceError}
-                        onChange={onChangeCamera2DPlaneMaxDrawingDistance}
-                        value={layer
-                          .getCamera2DPlaneMaxDrawingDistance()
-                          .toString(10)}
-                        floatingLabelText={
-                          <Trans>Maximum 2D drawing distance</Trans>
-                        }
-                        floatingLabelFixed
-                      />
-                    </ColumnStackLayout>
-                  )}
-                </ColumnStackLayout>
-              )}
-              {layer.isLightingLayer() ? (
-                <React.Fragment>
-                  <Text size="block-title">
-                    <Trans>Lighting settings</Trans>
-                  </Text>
-                  <InlineCheckbox
-                    label={<Trans>Automatically follow the base layer.</Trans>}
-                    checked={layer.isFollowingBaseLayerCamera()}
-                    onCheck={(e, checked) => {
-                      layer.setFollowBaseLayerCamera(checked);
-                      forceUpdate();
-                      notifyOfChange();
-                    }}
-                  />
-                  <ColorField
-                    fullWidth
-                    floatingLabelText={<Trans>Ambient light color</Trans>}
-                    disableAlpha
-                    color={rgbColorToRGBString({
-                      r: layer.getAmbientLightColorRed(),
-                      g: layer.getAmbientLightColorGreen(),
-                      b: layer.getAmbientLightColorBlue(),
-                    })}
-                    onChange={newColor => {
-                      const currentRgbColor = {
-                        r: layer.getAmbientLightColorRed(),
-                        g: layer.getAmbientLightColorGreen(),
-                        b: layer.getAmbientLightColorBlue(),
-                      };
-                      const newRgbColor = rgbStringAndAlphaToRGBColor(newColor);
-                      if (
-                        newRgbColor &&
-                        (newRgbColor.r !== currentRgbColor.r ||
-                          newRgbColor.g !== currentRgbColor.g ||
-                          newRgbColor.b !== currentRgbColor.b)
-                      ) {
-                        layer.setAmbientLightColor(
-                          newRgbColor.r,
-                          newRgbColor.g,
-                          newRgbColor.b
+                  <ResponsiveLineStackLayout noResponsiveLandscape noMargin>
+                    <SelectField
+                      fullWidth
+                      floatingLabelText={<Trans>Camera type</Trans>}
+                      value={layer.getCameraType()}
+                      onChange={(e, i, newValue: string) => {
+                        layer.setCameraType(newValue);
+                        checkNearPlaneDistanceError(
+                          layer.getCamera3DNearPlaneDistance()
                         );
                         forceUpdate();
-                        notifyOfChange();
+                      }}
+                    >
+                      <SelectOption
+                        value={'perspective'}
+                        label={t`Perspective camera`}
+                      />
+                      <SelectOption
+                        value={'orthographic'}
+                        label={t`Orthographic camera`}
+                      />
+                    </SelectField>
+                    <SemiControlledTextField
+                      commitOnBlur
+                      fullWidth
+                      errorText={camera3DFieldOfViewError}
+                      onChange={onChangeCamera3DFieldOfView}
+                      value={layer.getCamera3DFieldOfView().toString(10)}
+                      floatingLabelText={
+                        <Trans>Field of view (in degrees)</Trans>
                       }
-                    }}
+                      floatingLabelFixed
+                      disabled={layer.getCameraType() !== 'perspective'}
+                    />
+                  </ResponsiveLineStackLayout>
+                  <ResponsiveLineStackLayout noResponsiveLandscape noMargin>
+                    <SemiControlledTextField
+                      commitOnBlur
+                      fullWidth
+                      errorText={camera3DNearPlaneDistanceError}
+                      onChange={onChangeCamera3DNearPlaneDistance}
+                      value={layer.getCamera3DNearPlaneDistance().toString(10)}
+                      floatingLabelText={<Trans>Near plane distance</Trans>}
+                      floatingLabelFixed
+                    />
+                    <SemiControlledTextField
+                      commitOnBlur
+                      fullWidth
+                      errorText={camera3DFarPlaneDistanceError}
+                      onChange={onChangeCamera3DFarPlaneDistance}
+                      value={layer.getCamera3DFarPlaneDistance().toString(10)}
+                      floatingLabelText={<Trans>Far plane distance</Trans>}
+                      floatingLabelFixed
+                    />
+                  </ResponsiveLineStackLayout>
+                  <SemiControlledTextField
+                    commitOnBlur
+                    fullWidth
+                    errorText={camera2DPlaneMaxDrawingDistanceError}
+                    onChange={onChangeCamera2DPlaneMaxDrawingDistance}
+                    value={layer
+                      .getCamera2DPlaneMaxDrawingDistance()
+                      .toString(10)}
+                    floatingLabelText={
+                      <Trans>Maximum 2D drawing distance</Trans>
+                    }
+                    floatingLabelFixed
                   />
-                </React.Fragment>
-              ) : (
-                // Add some space to avoid a dialog to short that would show scrollbars
-                <React.Fragment>
-                  <Spacer />
-                  <Spacer />
-                </React.Fragment>
+                </ColumnStackLayout>
               )}
             </ColumnStackLayout>
           )}
-          {currentTab === 'effects' && (
-            <EffectsList
-              target="layer"
-              layerRenderingType={layer.getRenderingType()}
-              project={project}
-              resourceManagementProps={resourceManagementProps}
-              projectScopedContainersAccessor={projectScopedContainersAccessor}
-              effectsContainer={layer.getEffects()}
-              onEffectsRenamed={(oldName, newName) => {
-                if (layout) {
-                  gd.WholeProjectRefactorer.renameLayerEffectInScene(
-                    project,
-                    layout,
-                    layer,
-                    oldName,
-                    newName
-                  );
-                } else if (eventsFunctionsExtension && eventsBasedObject) {
-                  gd.WholeProjectRefactorer.renameLayerEffectInEventsBasedObject(
-                    project,
-                    eventsFunctionsExtension,
-                    eventsBasedObject,
-                    layer,
-                    oldName,
-                    newName
-                  );
-                }
-              }}
-              onEffectsUpdated={() => {
-                forceUpdate(); /*Force update to ensure dialog is properly positioned*/
-                notifyOfChange();
-              }}
-              onEffectAdded={() => {
-                setAnyEffectBeenAdded(true);
-              }}
-            />
+          {layer.isLightingLayer() ? (
+            <React.Fragment>
+              <Text size="block-title">
+                <Trans>Lighting settings</Trans>
+              </Text>
+              <InlineCheckbox
+                label={<Trans>Automatically follow the base layer.</Trans>}
+                checked={layer.isFollowingBaseLayerCamera()}
+                onCheck={(e, checked) => {
+                  layer.setFollowBaseLayerCamera(checked);
+                  forceUpdate();
+                  notifyOfChange();
+                }}
+              />
+              <ColorField
+                fullWidth
+                floatingLabelText={<Trans>Ambient light color</Trans>}
+                disableAlpha
+                color={rgbColorToRGBString({
+                  r: layer.getAmbientLightColorRed(),
+                  g: layer.getAmbientLightColorGreen(),
+                  b: layer.getAmbientLightColorBlue(),
+                })}
+                onChange={newColor => {
+                  const currentRgbColor = {
+                    r: layer.getAmbientLightColorRed(),
+                    g: layer.getAmbientLightColorGreen(),
+                    b: layer.getAmbientLightColorBlue(),
+                  };
+                  const newRgbColor = rgbStringAndAlphaToRGBColor(newColor);
+                  if (
+                    newRgbColor &&
+                    (newRgbColor.r !== currentRgbColor.r ||
+                      newRgbColor.g !== currentRgbColor.g ||
+                      newRgbColor.b !== currentRgbColor.b)
+                  ) {
+                    layer.setAmbientLightColor(
+                      newRgbColor.r,
+                      newRgbColor.g,
+                      newRgbColor.b
+                    );
+                    forceUpdate();
+                    notifyOfChange();
+                  }
+                }}
+              />
+            </React.Fragment>
+          ) : (
+            // Add some space to avoid a dialog to short that would show scrollbars
+            <React.Fragment>
+              <Spacer />
+              <Spacer />
+            </React.Fragment>
           )}
-        </Dialog>
+        </ColumnStackLayout>
       )}
-    </I18n>
+      {currentTab === 'effects' && (
+        <EffectsList
+          target="layer"
+          layerRenderingType={layer.getRenderingType()}
+          project={project}
+          resourceManagementProps={resourceManagementProps}
+          projectScopedContainersAccessor={projectScopedContainersAccessor}
+          effectsContainer={layer.getEffects()}
+          onEffectsRenamed={(oldName, newName) => {
+            if (layout) {
+              gd.WholeProjectRefactorer.renameLayerEffectInScene(
+                project,
+                layout,
+                layer,
+                oldName,
+                newName
+              );
+            } else if (eventsFunctionsExtension && eventsBasedObject) {
+              gd.WholeProjectRefactorer.renameLayerEffectInEventsBasedObject(
+                project,
+                eventsFunctionsExtension,
+                eventsBasedObject,
+                layer,
+                oldName,
+                newName
+              );
+            }
+          }}
+          onEffectsUpdated={() => {
+            forceUpdate(); /*Force update to ensure dialog is properly positioned*/
+            notifyOfChange();
+          }}
+          onEffectAdded={() => {
+            setAnyEffectBeenAdded(true);
+          }}
+        />
+      )}
+    </Dialog>
   );
 };
 

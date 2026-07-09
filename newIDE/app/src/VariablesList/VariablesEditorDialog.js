@@ -1,6 +1,7 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import * as React from 'react';
+import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import FlatButton from '../UI/FlatButton';
 import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import { useSerializableObjectsCancelableEditor } from '../Utils/SerializableObjectCancelableEditor';
@@ -62,7 +63,7 @@ type Props = {|
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps | null,
 
   helpPagePath: ?string,
-  scopeName?: string,
+  scopeName?: MessageDescriptor,
   id?: string,
 |};
 

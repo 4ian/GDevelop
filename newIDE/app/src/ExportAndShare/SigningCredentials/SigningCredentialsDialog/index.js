@@ -3,7 +3,6 @@
 import * as React from 'react';
 import Dialog from '../../../UI/Dialog';
 import { t, Trans } from '@lingui/macro';
-import { I18n } from '@lingui/react';
 import { type AuthenticatedUser } from '../../../Profile/AuthenticatedUserContext';
 import {
   getUserSigningCredentials,
@@ -94,89 +93,81 @@ export const SigningCredentialsDialog = ({
   ] = React.useState<?string>(null);
 
   return (
-    <I18n>
-      {({ i18n }) => (
-        <Dialog
-          open
-          title={<Trans>Signing Credentials</Trans>}
-          actions={[
-            <FlatButton
-              key="close"
-              primary
-              label={<Trans>Close</Trans>}
-              onClick={onClose}
-            />,
+    <Dialog
+      open
+      title={<Trans>Signing Credentials</Trans>}
+      actions={[
+        <FlatButton
+          key="close"
+          primary
+          label={<Trans>Close</Trans>}
+          onClick={onClose}
+        />,
+      ]}
+      secondaryActions={[
+        <HelpButton
+          key="help"
+          helpPagePath="/publishing/ios"
+          scopeName={t`iOS publishing`}
+        />,
+        signingCredentials && signingCredentials.length > 0 ? (
+          <RaisedButton
+            key="add-new"
+            primary
+            icon={<Add />}
+            label={<Trans>Add new</Trans>}
+            onClick={() =>
+              setCreateIosSigningCredentialsOpenWithTab(currentTab)
+            }
+          />
+        ) : null,
+      ]}
+      fixedContent={
+        <Tabs
+          value={currentTab}
+          onChange={setCurrentTab}
+          options={[
+            {
+              value: 'apple-certificate',
+              label: <Trans>Apple Certificates & Profiles</Trans>,
+            },
+            {
+              value: 'apple-auth-key',
+              label: <Trans>Auth Key (App Store upload)</Trans>,
+            },
           ]}
-          secondaryActions={[
-            <HelpButton
-              key="help"
-              helpPagePath="/publishing/ios"
-              scopeName={i18n._(t`iOS publishing`)}
-            />,
-            signingCredentials && signingCredentials.length > 0 ? (
-              <RaisedButton
-                key="add-new"
-                primary
-                icon={<Add />}
-                label={<Trans>Add new</Trans>}
-                onClick={() =>
-                  setCreateIosSigningCredentialsOpenWithTab(currentTab)
-                }
-              />
-            ) : null,
-          ]}
-          fixedContent={
-            <Tabs
-              value={currentTab}
-              onChange={setCurrentTab}
-              options={[
-                {
-                  value: 'apple-certificate',
-                  label: <Trans>Apple Certificates & Profiles</Trans>,
-                },
-                {
-                  value: 'apple-auth-key',
-                  label: <Trans>Auth Key (App Store upload)</Trans>,
-                },
-              ]}
-            />
-          }
-          onRequestClose={onClose}
-        >
-          {currentTab === 'apple-certificate' && (
-            <AppleCertificatesList
-              authenticatedUser={authenticatedUser}
-              signingCredentials={signingCredentials}
-              error={error}
-              onRefreshSigningCredentials={onRefreshSigningCredentials}
-              onAddNew={() =>
-                setCreateIosSigningCredentialsOpenWithTab(currentTab)
-              }
-            />
-          )}
-          {currentTab === 'apple-auth-key' && (
-            <AppleAuthKeysList
-              authenticatedUser={authenticatedUser}
-              signingCredentials={signingCredentials}
-              error={error}
-              onRefreshSigningCredentials={onRefreshSigningCredentials}
-              onAddNew={() =>
-                setCreateIosSigningCredentialsOpenWithTab(currentTab)
-              }
-            />
-          )}
-          {createIosSigningCredentialsOpenWithTab && (
-            <CreateIosSigningCredentialsDialog
-              authenticatedUser={authenticatedUser}
-              initialTab={createIosSigningCredentialsOpenWithTab}
-              onClose={() => {
-                setCreateIosSigningCredentialsOpenWithTab(null);
-                onRefreshSigningCredentials();
-              }}
-            />
-          )}
-        </Dialog>
+        />
+      }
+      onRequestClose={onClose}
+    >
+      {currentTab === 'apple-certificate' && (
+        <AppleCertificatesList
+          authenticatedUser={authenticatedUser}
+          signingCredentials={signingCredentials}
+          error={error}
+          onRefreshSigningCredentials={onRefreshSigningCredentials}
+          onAddNew={() => setCreateIosSigningCredentialsOpenWithTab(currentTab)}
+        />
       )}
-    </I18n>
+      {currentTab === 'apple-auth-key' && (
+        <AppleAuthKeysList
+          authenticatedUser={authenticatedUser}
+          signingCredentials={signingCredentials}
+          error={error}
+          onRefreshSigningCredentials={onRefreshSigningCredentials}
+          onAddNew={() => setCreateIosSigningCredentialsOpenWithTab(currentTab)}
+        />
+      )}
+      {createIosSigningCredentialsOpenWithTab && (
+        <CreateIosSigningCredentialsDialog
+          authenticatedUser={authenticatedUser}
+          initialTab={createIosSigningCredentialsOpenWithTab}
+          onClose={() => {
+            setCreateIosSigningCredentialsOpenWithTab(null);
+            onRefreshSigningCredentials();
+          }}
+        />
+      )}
+    </Dialog>
   );
 };

@@ -1,8 +1,7 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import { t } from '@lingui/macro';
-import { I18n } from '@lingui/react';
-import { type I18n as I18nType } from '@lingui/core';
+import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import * as React from 'react';
 import FlatButton from '../UI/FlatButton';
 import ObjectsEditorService from './ObjectsEditorService';
@@ -203,13 +202,13 @@ const InnerDialog = (props: InnerDialogProps) => {
     return undefined;
   })();
 
-  const getContextualScopeName = (i18n: I18nType): string => {
-    if (currentTab === 'behaviors') return i18n._(t`Behaviors`);
-    if (currentTab === 'variables') return i18n._(t`Object Variables`);
-    if (currentTab === 'effects') return i18n._(t`Effects`);
-    if (isSpriteObject && spriteHasAnimations) return i18n._(t`Animations`);
+  const getContextualScopeName = (): MessageDescriptor => {
+    if (currentTab === 'behaviors') return t`Behaviors`;
+    if (currentTab === 'variables') return t`Object Variables`;
+    if (currentTab === 'effects') return t`Effects`;
+    if (isSpriteObject && spriteHasAnimations) return t`Animations`;
     if (objectDisplayName) return objectDisplayName;
-    return i18n._(t`Objects`);
+    return t`Objects`;
   };
 
   const EditorComponent: ?React.ComponentType<EditorProps> =
@@ -291,223 +290,211 @@ const InnerDialog = (props: InnerDialogProps) => {
   );
 
   return (
-    <I18n>
-      {({ i18n }) => (
-        <Dialog
-          title={<Trans>Edit {objectName}</Trans>}
-          key={object && object.ptr}
-          actions={[
-            <FlatButton
-              key="cancel"
-              label={<Trans>Cancel</Trans>}
-              onClick={onCancelChanges}
-            />,
-            <DialogPrimaryButton
-              key="apply"
-              label={<Trans>Apply</Trans>}
-              id="apply-button"
-              primary
-              onClick={onApply}
-            />,
-          ]}
-          secondaryActions={[
-            <HelpButton
-              key="help-button"
-              helpPagePath={contextualHelpPagePath}
-              anchor={contextualHelpAnchor}
-              scopeName={getContextualScopeName(i18n)}
-            />,
-            <HotReloadPreviewButton
-              key="hot-reload-preview-button"
-              {...props.hotReloadPreviewButtonProps}
-            />,
-          ]}
-          onRequestClose={onCancelChanges}
-          onApply={onApply}
-          open={props.open}
-          fullHeight
-          flexBody
-          fixedContent={
-            <Tabs
-              value={currentTab}
-              // $FlowFixMe[incompatible-type]
-              onChange={setCurrentTab}
-              // $FlowFixMe[incompatible-type]
-              options={[
-                {
-                  label: <Trans>Properties</Trans>,
-                  value: 'properties',
-                },
-                {
-                  label: <Trans>Behaviors</Trans>,
-                  value: 'behaviors',
-                  id: 'behaviors-tab',
-                },
-                {
-                  label: <Trans>Variables</Trans>,
-                  value: 'variables',
-                },
-                objectMetadata.hasDefaultBehavior(
-                  'EffectCapability::EffectBehavior'
-                )
-                  ? {
-                      label: <Trans>Effects</Trans>,
-                      value: 'effects',
-                    }
-                  : null,
-              ].filter(Boolean)}
-            />
+    <Dialog
+      title={<Trans>Edit {objectName}</Trans>}
+      key={object && object.ptr}
+      actions={[
+        <FlatButton
+          key="cancel"
+          label={<Trans>Cancel</Trans>}
+          onClick={onCancelChanges}
+        />,
+        <DialogPrimaryButton
+          key="apply"
+          label={<Trans>Apply</Trans>}
+          id="apply-button"
+          primary
+          onClick={onApply}
+        />,
+      ]}
+      secondaryActions={[
+        <HelpButton
+          key="help-button"
+          helpPagePath={contextualHelpPagePath}
+          anchor={contextualHelpAnchor}
+          scopeName={getContextualScopeName()}
+        />,
+        <HotReloadPreviewButton
+          key="hot-reload-preview-button"
+          {...props.hotReloadPreviewButtonProps}
+        />,
+      ]}
+      onRequestClose={onCancelChanges}
+      onApply={onApply}
+      open={props.open}
+      fullHeight
+      flexBody
+      fixedContent={
+        <Tabs
+          value={currentTab}
+          // $FlowFixMe[incompatible-type]
+          onChange={setCurrentTab}
+          // $FlowFixMe[incompatible-type]
+          options={[
+            {
+              label: <Trans>Properties</Trans>,
+              value: 'properties',
+            },
+            {
+              label: <Trans>Behaviors</Trans>,
+              value: 'behaviors',
+              id: 'behaviors-tab',
+            },
+            {
+              label: <Trans>Variables</Trans>,
+              value: 'variables',
+            },
+            objectMetadata.hasDefaultBehavior(
+              'EffectCapability::EffectBehavior'
+            )
+              ? {
+                  label: <Trans>Effects</Trans>,
+                  value: 'effects',
+                }
+              : null,
+          ].filter(Boolean)}
+        />
+      }
+      id="object-editor-dialog"
+    >
+      {currentTab === 'properties' && EditorComponent ? (
+        <Column
+          noMargin
+          expand
+          useFullHeight={
+            true /* Ensure editors with large/scrolling children won't grow outside of the dialog. */
           }
-          id="object-editor-dialog"
+          noOverflowParent={
+            true /* Ensure editors with large/scrolling children won't grow outside of the dialog. */
+          }
         >
-          {currentTab === 'properties' && EditorComponent ? (
-            <Column
-              noMargin
-              expand
-              useFullHeight={
-                true /* Ensure editors with large/scrolling children won't grow outside of the dialog. */
-              }
-              noOverflowParent={
-                true /* Ensure editors with large/scrolling children won't grow outside of the dialog. */
-              }
-            >
-              <EditorComponent
-                objectConfiguration={object.getConfiguration()}
-                project={project}
-                layout={layout}
-                eventsFunctionsExtension={eventsFunctionsExtension}
-                eventsBasedObject={eventsBasedObject}
-                object={object}
-                resourceManagementProps={_resourceManagementProps}
-                projectScopedContainersAccessor={
-                  projectScopedContainersAccessor
-                }
-                onSizeUpdated={
-                  forceUpdate /*Force update to ensure dialog is properly positioned*/
-                }
-                objectName={props.objectName}
-                onObjectUpdated={notifyOfChange}
-                renderObjectNameField={() => (
-                  <SemiControlledTextField
-                    fullWidth
-                    id="object-name"
-                    commitOnBlur
-                    floatingLabelText={<Trans>Object name</Trans>}
-                    floatingLabelFixed
-                    value={objectName}
-                    translatableHintText={t`Object Name`}
-                    onChange={newObjectName => {
-                      if (newObjectName === objectName) return;
+          <EditorComponent
+            objectConfiguration={object.getConfiguration()}
+            project={project}
+            layout={layout}
+            eventsFunctionsExtension={eventsFunctionsExtension}
+            eventsBasedObject={eventsBasedObject}
+            object={object}
+            resourceManagementProps={_resourceManagementProps}
+            projectScopedContainersAccessor={projectScopedContainersAccessor}
+            onSizeUpdated={
+              forceUpdate /*Force update to ensure dialog is properly positioned*/
+            }
+            objectName={props.objectName}
+            onObjectUpdated={notifyOfChange}
+            renderObjectNameField={() => (
+              <SemiControlledTextField
+                fullWidth
+                id="object-name"
+                commitOnBlur
+                floatingLabelText={<Trans>Object name</Trans>}
+                floatingLabelFixed
+                value={objectName}
+                translatableHintText={t`Object Name`}
+                onChange={newObjectName => {
+                  if (newObjectName === objectName) return;
 
-                      setObjectName(
-                        getValidatedObjectOrGroupName(newObjectName)
-                      );
-                      notifyOfChange();
-                    }}
-                    autoFocus="desktop"
-                  />
-                )}
-                onOpenEventBasedObjectEditor={onOpenEventBasedObjectEditor}
-                onOpenEventBasedObjectVariantEditor={
-                  onOpenEventBasedObjectVariantEditor
-                }
-                onDeleteEventsBasedObjectVariant={
-                  onDeleteEventsBasedObjectVariant
-                }
+                  setObjectName(getValidatedObjectOrGroupName(newObjectName));
+                  notifyOfChange();
+                }}
+                autoFocus="desktop"
               />
-            </Column>
-          ) : null}
-          {currentTab === 'behaviors' && (
-            <BehaviorsEditor
-              object={object}
-              isChildObject={!!eventsBasedObject}
-              project={project}
-              eventsFunctionsExtension={eventsFunctionsExtension}
-              layersContainer={layersContainer}
-              resourceManagementProps={_resourceManagementProps}
-              projectScopedContainersAccessor={projectScopedContainersAccessor}
-              onSizeUpdated={
-                forceUpdate /*Force update to ensure dialog is properly positioned*/
-              }
-              onUpdateBehaviorsSharedData={onUpdateBehaviorsSharedData}
-              onBehaviorsUpdated={notifyOfChange}
-              openBehaviorEvents={askConfirmationAndOpenBehaviorEvents}
-              onWillInstallExtension={onWillInstallExtension}
-              onExtensionInstalled={onExtensionInstalled}
-              isListLocked={isBehaviorListLocked}
-            />
-          )}
-          {currentTab === 'variables' && (
-            <Column expand noMargin>
-              {object.getVariables().count() > 0 && DismissableTutorialMessage && (
-                <Line>
-                  <Column noMargin expand>
-                    {DismissableTutorialMessage}
-                  </Column>
-                </Line>
-              )}
-              <VariablesList
-                projectScopedContainersAccessor={
-                  projectScopedContainersAccessor
-                }
-                variablesContainer={object.getVariables()}
-                areObjectVariables
-                emptyPlaceholderTitle={
-                  <Trans>Add your first object variable</Trans>
-                }
-                emptyPlaceholderDescription={
-                  <Trans>
-                    These variables hold additional information on an object.
-                  </Trans>
-                }
-                helpPagePath={'/all-features/variables/object-variables'}
-                onComputeAllVariableNames={onComputeAllVariableNames}
-                onVariablesUpdated={notifyOfChange}
-                isListLocked={isVariableListLocked}
-              />
-            </Column>
-          )}
-          {currentTab === 'effects' && (
-            <EffectsList
-              target="object"
-              // TODO (3D): declare the renderer type in object metadata.
-              layerRenderingType="2d"
-              project={project}
-              resourceManagementProps={_resourceManagementProps}
-              projectScopedContainersAccessor={projectScopedContainersAccessor}
-              effectsContainer={object.getEffects()}
-              onEffectsRenamed={(oldName, newName) => {
-                if (layout) {
-                  gd.WholeProjectRefactorer.renameObjectEffectInScene(
-                    project,
-                    layout,
-                    object,
-                    oldName,
-                    newName
-                  );
-                } else if (eventsFunctionsExtension && eventsBasedObject) {
-                  gd.WholeProjectRefactorer.renameObjectEffectInEventsBasedObject(
-                    project,
-                    eventsFunctionsExtension,
-                    eventsBasedObject,
-                    object,
-                    oldName,
-                    newName
-                  );
-                }
-              }}
-              onEffectsUpdated={() => {
-                forceUpdate(); /*Force update to ensure dialog is properly positioned*/
-                notifyOfChange();
-              }}
-              onEffectAdded={() => {
-                setAnyEffectBeenAdded(true);
-              }}
-            />
-          )}
-        </Dialog>
+            )}
+            onOpenEventBasedObjectEditor={onOpenEventBasedObjectEditor}
+            onOpenEventBasedObjectVariantEditor={
+              onOpenEventBasedObjectVariantEditor
+            }
+            onDeleteEventsBasedObjectVariant={onDeleteEventsBasedObjectVariant}
+          />
+        </Column>
+      ) : null}
+      {currentTab === 'behaviors' && (
+        <BehaviorsEditor
+          object={object}
+          isChildObject={!!eventsBasedObject}
+          project={project}
+          eventsFunctionsExtension={eventsFunctionsExtension}
+          layersContainer={layersContainer}
+          resourceManagementProps={_resourceManagementProps}
+          projectScopedContainersAccessor={projectScopedContainersAccessor}
+          onSizeUpdated={
+            forceUpdate /*Force update to ensure dialog is properly positioned*/
+          }
+          onUpdateBehaviorsSharedData={onUpdateBehaviorsSharedData}
+          onBehaviorsUpdated={notifyOfChange}
+          openBehaviorEvents={askConfirmationAndOpenBehaviorEvents}
+          onWillInstallExtension={onWillInstallExtension}
+          onExtensionInstalled={onExtensionInstalled}
+          isListLocked={isBehaviorListLocked}
+        />
       )}
-    </I18n>
+      {currentTab === 'variables' && (
+        <Column expand noMargin>
+          {object.getVariables().count() > 0 && DismissableTutorialMessage && (
+            <Line>
+              <Column noMargin expand>
+                {DismissableTutorialMessage}
+              </Column>
+            </Line>
+          )}
+          <VariablesList
+            projectScopedContainersAccessor={projectScopedContainersAccessor}
+            variablesContainer={object.getVariables()}
+            areObjectVariables
+            emptyPlaceholderTitle={
+              <Trans>Add your first object variable</Trans>
+            }
+            emptyPlaceholderDescription={
+              <Trans>
+                These variables hold additional information on an object.
+              </Trans>
+            }
+            helpPagePath={'/all-features/variables/object-variables'}
+            onComputeAllVariableNames={onComputeAllVariableNames}
+            onVariablesUpdated={notifyOfChange}
+            isListLocked={isVariableListLocked}
+          />
+        </Column>
+      )}
+      {currentTab === 'effects' && (
+        <EffectsList
+          target="object"
+          // TODO (3D): declare the renderer type in object metadata.
+          layerRenderingType="2d"
+          project={project}
+          resourceManagementProps={_resourceManagementProps}
+          projectScopedContainersAccessor={projectScopedContainersAccessor}
+          effectsContainer={object.getEffects()}
+          onEffectsRenamed={(oldName, newName) => {
+            if (layout) {
+              gd.WholeProjectRefactorer.renameObjectEffectInScene(
+                project,
+                layout,
+                object,
+                oldName,
+                newName
+              );
+            } else if (eventsFunctionsExtension && eventsBasedObject) {
+              gd.WholeProjectRefactorer.renameObjectEffectInEventsBasedObject(
+                project,
+                eventsFunctionsExtension,
+                eventsBasedObject,
+                object,
+                oldName,
+                newName
+              );
+            }
+          }}
+          onEffectsUpdated={() => {
+            forceUpdate(); /*Force update to ensure dialog is properly positioned*/
+            notifyOfChange();
+          }}
+          onEffectAdded={() => {
+            setAnyEffectBeenAdded(true);
+          }}
+        />
+      )}
+    </Dialog>
   );
 };
 

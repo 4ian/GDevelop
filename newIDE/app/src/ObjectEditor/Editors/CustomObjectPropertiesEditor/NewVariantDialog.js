@@ -1,6 +1,5 @@
 // @flow
 import { t, Trans } from '@lingui/macro';
-import { I18n } from '@lingui/react';
 import React from 'react';
 import FlatButton from '../../../UI/FlatButton';
 import Dialog, { DialogPrimaryButton } from '../../../UI/Dialog';
@@ -32,60 +31,56 @@ const NewVariantDialog = ({
   );
 
   return (
-    <I18n>
-      {({ i18n }) => (
-        <Dialog
-          title={<Trans>Create a new variant</Trans>}
-          id="create-variant-dialog"
-          actions={[
-            <FlatButton
-              key="cancel"
-              label={<Trans>Cancel</Trans>}
-              onClick={onCancel}
-            />,
-            <DialogPrimaryButton
-              key="apply"
-              label={<Trans>Create</Trans>}
-              primary
-              onClick={apply}
-            />,
-          ]}
-          secondaryActions={[
-            <HelpButton
-              key="help-button"
-              helpPagePath="/objects/custom-objects-prefab-template"
-              scopeName={i18n._(t`Custom objects`)}
-            />,
-          ]}
-          onRequestClose={onCancel}
-          onApply={apply}
-          open
-          maxWidth="sm"
-        >
-          <ColumnStackLayout noMargin>
-            {isDuplicationBeforeEdition && (
-              <Text>
-                <Trans>
-                  This variant can't be modified directly. It must be duplicated
-                  first.
-                </Trans>
-              </Text>
-            )}
-            <SemiControlledTextField
-              fullWidth
-              id="variant-name"
-              commitOnBlur
-              floatingLabelText={<Trans>Variant name</Trans>}
-              floatingLabelFixed
-              value={variantName}
-              translatableHintText={t`Variant name`}
-              onChange={setVariantName}
-              autoFocus="desktop"
-            />
-          </ColumnStackLayout>
-        </Dialog>
-      )}
-    </I18n>
+    <Dialog
+      title={<Trans>Create a new variant</Trans>}
+      id="create-variant-dialog"
+      actions={[
+        <FlatButton
+          key="cancel"
+          label={<Trans>Cancel</Trans>}
+          onClick={onCancel}
+        />,
+        <DialogPrimaryButton
+          key="apply"
+          label={<Trans>Create</Trans>}
+          primary
+          onClick={apply}
+        />,
+      ]}
+      secondaryActions={[
+        <HelpButton
+          key="help-button"
+          helpPagePath="/objects/custom-objects-prefab-template"
+          scopeName={t`Custom objects`}
+        />,
+      ]}
+      onRequestClose={onCancel}
+      onApply={apply}
+      open
+      maxWidth="sm"
+    >
+      <ColumnStackLayout noMargin>
+        {isDuplicationBeforeEdition && (
+          <Text>
+            <Trans>
+              This variant can't be modified directly. It must be duplicated
+              first.
+            </Trans>
+          </Text>
+        )}
+        <SemiControlledTextField
+          fullWidth
+          id="variant-name"
+          commitOnBlur
+          floatingLabelText={<Trans>Variant name</Trans>}
+          floatingLabelFixed
+          value={variantName}
+          translatableHintText={t`Variant name`}
+          onChange={setVariantName}
+          autoFocus="desktop"
+        />
+      </ColumnStackLayout>
+    </Dialog>
   );
 };
 

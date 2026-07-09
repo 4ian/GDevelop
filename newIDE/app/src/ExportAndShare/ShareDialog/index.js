@@ -1,6 +1,5 @@
 // @flow
 import { Trans, t } from '@lingui/macro';
-import { I18n } from '@lingui/react';
 import * as React from 'react';
 import Dialog from '../../UI/Dialog';
 import HelpButton from '../../UI/HelpButton';
@@ -207,121 +206,111 @@ const ShareDialog = ({
 
   if (!project) return null;
 
-  return (
-    <I18n>
-      {({ i18n }) => {
-        const mainActions = [
-          <FlatButton
-            label={<Trans>Close</Trans>}
-            key="close"
-            primary={false}
-            onClick={onClose}
-            disabled={isNavigationDisabled}
+  const mainActions = [
+    <FlatButton
+      label={<Trans>Close</Trans>}
+      key="close"
+      primary={false}
+      onClick={onClose}
+      disabled={isNavigationDisabled}
+    />,
+  ];
+
+  const secondaryActions =
+    currentTab === 'publish'
+      ? [
+          exporter ? (
+            <HelpButton key="help" helpPagePath={exporter.helpPage} />
+          ) : null,
+          <TextButton
+            key="exports"
+            label={
+              isMobile ? <Trans>Exports</Trans> : <Trans>See all exports</Trans>
+            }
+            onClick={openBuildDialog}
+            disabled={isNavigationDisabled || !isOnline}
+          />,
+        ].filter(Boolean)
+      : [
+          <HelpButton
+            key="help"
+            helpPagePath="/collaboration/invite-collaborators"
+            scopeName={t`Collaboration`}
           />,
         ];
 
-        const secondaryActions =
-          currentTab === 'publish'
-            ? [
-                exporter ? (
-                  <HelpButton key="help" helpPagePath={exporter.helpPage} />
-                ) : null,
-                <TextButton
-                  key="exports"
-                  label={
-                    isMobile ? (
-                      <Trans>Exports</Trans>
-                    ) : (
-                      <Trans>See all exports</Trans>
-                    )
-                  }
-                  onClick={openBuildDialog}
-                  disabled={isNavigationDisabled || !isOnline}
-                />,
-              ].filter(Boolean)
-            : [
-                <HelpButton
-                  key="help"
-                  helpPagePath="/collaboration/invite-collaborators"
-                  scopeName={i18n._(t`Collaboration`)}
-                />,
-              ];
-
-        return (
-          <Dialog
-            // Keep ID for backward compatibility with guided lessons.
-            id="export-dialog"
-            maxWidth={'md'}
-            minHeight={'lg'}
-            title={<Trans>Share</Trans>}
-            // $FlowFixMe[incompatible-type]
-            actions={mainActions}
-            // $FlowFixMe[incompatible-type]
-            secondaryActions={secondaryActions}
-            onRequestClose={onClose}
-            open
-            fixedContent={
-              <Tabs
-                value={currentTab}
-                onChange={setCurrentTab}
-                options={[
-                  {
-                    value: 'publish',
-                    label: <Trans>Publish</Trans>,
-                    id: 'publish-tab',
-                    disabled: isNavigationDisabled,
-                  },
-                  {
-                    value: 'invite',
-                    label: <Trans>Invite</Trans>,
-                    id: 'invite-tab',
-                    disabled: isNavigationDisabled,
-                  },
-                ]}
-              />
-            }
-            flexColumnBody
-          >
-            {currentTab === 'invite' && (
-              <InviteHome
-                cloudProjectId={
-                  storageProvider.internalName === 'Cloud' && fileMetadata
-                    ? fileMetadata.fileIdentifier
-                    : null
-                }
-              />
-            )}
-            {currentTab === 'publish' && (
-              <PublishHome
-                project={project}
-                gameAndBuildsManager={gameAndBuildsManager}
-                onSaveProject={onSaveProject}
-                isSavingProject={isSavingProject}
-                onChangeSubscription={onChangeSubscription}
-                isNavigationDisabled={isNavigationDisabled}
-                setIsNavigationDisabled={setIsNavigationDisabled}
-                selectedExporter={exporter}
-                onChooseSection={setChosenExporterSection}
-                onChooseSubSection={setChosenExporterSubSection}
-                chosenSection={chosenExporterSection}
-                chosenSubSection={chosenExporterSubSection}
-                allExportersRequireOnline={allExportersRequireOnline}
-                showOnlineWebExporterOnly={showOnlineWebExporterOnly}
-              />
-            )}
-            {gameAndBuildsManager.game && (
-              <BuildsDialog
-                open={buildsDialogOpen}
-                onClose={() => setBuildsDialogOpen(false)}
-                authenticatedUser={authenticatedUser}
-                game={gameAndBuildsManager.game}
-                onGameUpdated={gameAndBuildsManager.setGame}
-              />
-            )}
-          </Dialog>
-        );
-      }}
-    </I18n>
+  return (
+    <Dialog
+      // Keep ID for backward compatibility with guided lessons.
+      id="export-dialog"
+      maxWidth={'md'}
+      minHeight={'lg'}
+      title={<Trans>Share</Trans>}
+      // $FlowFixMe[incompatible-type]
+      actions={mainActions}
+      // $FlowFixMe[incompatible-type]
+      secondaryActions={secondaryActions}
+      onRequestClose={onClose}
+      open
+      fixedContent={
+        <Tabs
+          value={currentTab}
+          onChange={setCurrentTab}
+          options={[
+            {
+              value: 'publish',
+              label: <Trans>Publish</Trans>,
+              id: 'publish-tab',
+              disabled: isNavigationDisabled,
+            },
+            {
+              value: 'invite',
+              label: <Trans>Invite</Trans>,
+              id: 'invite-tab',
+              disabled: isNavigationDisabled,
+            },
+          ]}
+        />
+      }
+      flexColumnBody
+    >
+      {currentTab === 'invite' && (
+        <InviteHome
+          cloudProjectId={
+            storageProvider.internalName === 'Cloud' && fileMetadata
+              ? fileMetadata.fileIdentifier
+              : null
+          }
+        />
+      )}
+      {currentTab === 'publish' && (
+        <PublishHome
+          project={project}
+          gameAndBuildsManager={gameAndBuildsManager}
+          onSaveProject={onSaveProject}
+          isSavingProject={isSavingProject}
+          onChangeSubscription={onChangeSubscription}
+          isNavigationDisabled={isNavigationDisabled}
+          setIsNavigationDisabled={setIsNavigationDisabled}
+          selectedExporter={exporter}
+          onChooseSection={setChosenExporterSection}
+          onChooseSubSection={setChosenExporterSubSection}
+          chosenSection={chosenExporterSection}
+          chosenSubSection={chosenExporterSubSection}
+          allExportersRequireOnline={allExportersRequireOnline}
+          showOnlineWebExporterOnly={showOnlineWebExporterOnly}
+        />
+      )}
+      {gameAndBuildsManager.game && (
+        <BuildsDialog
+          open={buildsDialogOpen}
+          onClose={() => setBuildsDialogOpen(false)}
+          authenticatedUser={authenticatedUser}
+          game={gameAndBuildsManager.game}
+          onGameUpdated={gameAndBuildsManager.setGame}
+        />
+      )}
+    </Dialog>
   );
 };
 

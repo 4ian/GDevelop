@@ -1,6 +1,5 @@
 // @flow
 import { t, Trans } from '@lingui/macro';
-import { I18n } from '@lingui/react';
 import * as React from 'react';
 import Dialog from '../../UI/Dialog';
 import FlatButton from '../../UI/FlatButton';
@@ -43,86 +42,82 @@ export default function OptionsEditorDialog({
   const eventsFunctionsExtensionWriter = eventsFunctionsExtensionsState.getEventsFunctionsExtensionWriter();
 
   return (
-    <I18n>
-      {({ i18n }) => (
-        <Dialog
-          title={<Trans>{eventsFunctionsExtension.getName()} options</Trans>}
-          secondaryActions={[
-            <HelpButton
-              key="help"
-              helpPagePath="/extensions/create"
-              scopeName={i18n._(t`Extensions`)}
-            />,
-            eventsFunctionsExtensionWriter ? (
-              <FlatButton
-                leftIcon={<Upload />}
-                key="export"
-                label={<Trans>Export extension</Trans>}
-                onClick={() => {
-                  setExportDialogOpen(true);
-                }}
-                disabled={isLoading}
-              />
-            ) : null,
+    <Dialog
+      title={<Trans>{eventsFunctionsExtension.getName()} options</Trans>}
+      secondaryActions={[
+        <HelpButton
+          key="help"
+          helpPagePath="/extensions/create"
+          scopeName={t`Extensions`}
+        />,
+        eventsFunctionsExtensionWriter ? (
+          <FlatButton
+            leftIcon={<Upload />}
+            key="export"
+            label={<Trans>Export extension</Trans>}
+            onClick={() => {
+              setExportDialogOpen(true);
+            }}
+            disabled={isLoading}
+          />
+        ) : null,
+      ]}
+      actions={[
+        <FlatButton
+          label={<Trans>Close</Trans>}
+          primary={true}
+          keyboardFocused={true}
+          onClick={onClose}
+          disabled={isLoading}
+          key={'close'}
+        />,
+      ]}
+      open={open}
+      fixedContent={
+        <Tabs
+          value={currentTab}
+          onChange={setCurrentTab}
+          options={[
+            {
+              value: 'options',
+              label: <Trans>Options</Trans>,
+            },
+            {
+              value: 'dependencies',
+              label: <Trans>Dependencies</Trans>,
+            },
           ]}
-          actions={[
-            <FlatButton
-              label={<Trans>Close</Trans>}
-              primary={true}
-              keyboardFocused={true}
-              onClick={onClose}
-              disabled={isLoading}
-              key={'close'}
-            />,
-          ]}
-          open={open}
-          fixedContent={
-            <Tabs
-              value={currentTab}
-              onChange={setCurrentTab}
-              options={[
-                {
-                  value: 'options',
-                  label: <Trans>Options</Trans>,
-                },
-                {
-                  value: 'dependencies',
-                  label: <Trans>Dependencies</Trans>,
-                },
-              ]}
-            />
-          }
-          cannotBeDismissed={isLoading}
-          onRequestClose={isLoading ? () => {} : onClose}
-          maxWidth="md"
-        >
-          {currentTab === 'options' && (
-            <Line>
-              <ExtensionOptionsEditor
-                eventsFunctionsExtension={eventsFunctionsExtension}
-                onLoadChange={setIsLoading}
-                isLoading={isLoading}
-              />
-            </Line>
-          )}
-          {currentTab === 'dependencies' && (
-            <Line>
-              <ExtensionDependenciesEditor
-                project={project}
-                resourceManagementProps={resourceManagementProps}
-                eventsFunctionsExtension={eventsFunctionsExtension}
-              />
-            </Line>
-          )}
-          {exportDialogOpen && (
-            <ExtensionExporterDialog
-              project={project}
-              eventsFunctionsExtension={eventsFunctionsExtension}
-              onClose={() => setExportDialogOpen(false)}
-            />
-          )}
-        </Dialog>
+        />
+      }
+      cannotBeDismissed={isLoading}
+      onRequestClose={isLoading ? () => {} : onClose}
+      maxWidth="md"
+    >
+      {currentTab === 'options' && (
+        <Line>
+          <ExtensionOptionsEditor
+            eventsFunctionsExtension={eventsFunctionsExtension}
+            onLoadChange={setIsLoading}
+            isLoading={isLoading}
+          />
+        </Line>
       )}
-    </I18n>
+      {currentTab === 'dependencies' && (
+        <Line>
+          <ExtensionDependenciesEditor
+            project={project}
+            resourceManagementProps={resourceManagementProps}
+            eventsFunctionsExtension={eventsFunctionsExtension}
+          />
+        </Line>
+      )}
+      {exportDialogOpen && (
+        <ExtensionExporterDialog
+          project={project}
+          eventsFunctionsExtension={eventsFunctionsExtension}
+          onClose={() => setExportDialogOpen(false)}
+        />
+      )}
+    </Dialog>
   );
 }

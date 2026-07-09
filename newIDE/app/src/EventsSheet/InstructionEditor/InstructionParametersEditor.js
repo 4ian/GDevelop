@@ -493,10 +493,7 @@ const InstructionParametersEditor: React.ComponentType<{
               </div>
               <Line>
                 {!noHelpButton && (
-                  <HelpButton
-                    helpPagePath="/events"
-                    scopeName={i18n._(t`Events`)}
-                  />
+                  <HelpButton helpPagePath="/events" scopeName={t`Events`} />
                 )}
               </Line>
             </ColumnStackLayout>

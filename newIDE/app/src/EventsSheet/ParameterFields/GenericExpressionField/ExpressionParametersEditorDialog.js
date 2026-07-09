@@ -1,7 +1,6 @@
 // @flow
 import React from 'react';
 import { t, Trans } from '@lingui/macro';
-import { I18n } from '@lingui/react';
 import { type EventsScope } from '../../../InstructionOrExpression/EventsScope';
 import ExpressionParametersEditor from './ExpressionParametersEditor';
 import Dialog, { DialogPrimaryButton } from '../../../UI/Dialog';
@@ -53,62 +52,56 @@ const ExpressionParametersEditorDialog = ({
   );
 
   return (
-    <I18n>
-      {({ i18n }) => (
-        <Dialog
-          title={<Trans>Enter the expression parameters</Trans>}
-          id="expression-parameters-editor-dialog"
-          open
-          actions={[
-            <DialogPrimaryButton
-              id="apply-button"
-              key="apply"
-              label={<Trans>Apply</Trans>}
-              primary
-              onClick={() => onDone(parameterValues)}
-            />,
-          ]}
-          secondaryActions={
-            expressionMetadata.getHelpPath()
-              ? [
-                  <HelpButton
-                    key="help-button"
-                    helpPagePath={expressionMetadata.getHelpPath()}
-                    scopeName={i18n._(t`Expressions`)}
-                  />,
-                ]
-              : []
-          }
-          onRequestClose={onRequestClose}
-          onApply={() => onDone(parameterValues)}
-        >
-          <Column noMargin>
-            <div style={styles.minHeightContainer}>
-              <Text>{expressionMetadata.getDescription()}</Text>
-              <ExpressionParametersEditor
-                project={project}
-                scope={scope}
-                globalObjectsContainer={globalObjectsContainer}
-                objectsContainer={objectsContainer}
-                projectScopedContainersAccessor={
-                  projectScopedContainersAccessor
-                }
-                expressionMetadata={expressionMetadata}
-                parameterValues={parameterValues}
-                onChangeParameter={(editedIndex, value) => {
-                  setParameterValues(
-                    parameterValues.map((oldValue, index) =>
-                      index === editedIndex ? value : oldValue
-                    )
-                  );
-                }}
-                parameterRenderingService={parameterRenderingService}
-              />
-            </div>
-          </Column>
-        </Dialog>
-      )}
-    </I18n>
+    <Dialog
+      title={<Trans>Enter the expression parameters</Trans>}
+      id="expression-parameters-editor-dialog"
+      open
+      actions={[
+        <DialogPrimaryButton
+          id="apply-button"
+          key="apply"
+          label={<Trans>Apply</Trans>}
+          primary
+          onClick={() => onDone(parameterValues)}
+        />,
+      ]}
+      secondaryActions={
+        expressionMetadata.getHelpPath()
+          ? [
+              <HelpButton
+                key="help-button"
+                helpPagePath={expressionMetadata.getHelpPath()}
+                scopeName={t`Expressions`}
+              />,
+            ]
+          : []
+      }
+      onRequestClose={onRequestClose}
+      onApply={() => onDone(parameterValues)}
+    >
+      <Column noMargin>
+        <div style={styles.minHeightContainer}>
+          <Text>{expressionMetadata.getDescription()}</Text>
+          <ExpressionParametersEditor
+            project={project}
+            scope={scope}
+            globalObjectsContainer={globalObjectsContainer}
+            objectsContainer={objectsContainer}
+            projectScopedContainersAccessor={projectScopedContainersAccessor}
+            expressionMetadata={expressionMetadata}
+            parameterValues={parameterValues}
+            onChangeParameter={(editedIndex, value) => {
+              setParameterValues(
+                parameterValues.map((oldValue, index) =>
+                  index === editedIndex ? value : oldValue
+                )
+              );
+            }}
+            parameterRenderingService={parameterRenderingService}
+          />
+        </div>
+      </Column>
+    </Dialog>
   );
 };
 

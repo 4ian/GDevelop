@@ -105,7 +105,7 @@ const LoginWithPurchaseClaimDialog = ({
     <HelpButton
       key="help"
       helpPagePath={'/interface/profile'}
-      scopeName={i18n._(t`Account`)}
+      scopeName={t`Account`}
     />,
   ];
 

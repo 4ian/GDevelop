@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react';
 import { t, Trans } from '@lingui/macro';
-import { I18n } from '@lingui/react';
 import VariablesEditorDialog, {
   type VariableDialogOpeningProps,
 } from './VariablesEditorDialog';
@@ -64,26 +63,22 @@ const GlobalVariablesDialog = ({
   );
 
   return (
-    <I18n>
-      {({ i18n }) => (
-        <VariablesEditorDialog
-          project={project}
-          projectScopedContainersAccessor={projectScopedContainersAccessor}
-          open={open}
-          onCancel={onCancel}
-          onApply={onApply}
-          title={<Trans>Global variables</Trans>}
-          // $FlowFixMe[incompatible-type]
-          tabs={tabs}
-          initiallySelectedVariable={initiallySelectedVariable}
-          helpPagePath={'/all-features/variables/global-variables'}
-          scopeName={i18n._(t`Global variables`)}
-          hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
-          id="global-variables-dialog"
-          isListLocked={isListLocked}
-        />
-      )}
-    </I18n>
+    <VariablesEditorDialog
+      project={project}
+      projectScopedContainersAccessor={projectScopedContainersAccessor}
+      open={open}
+      onCancel={onCancel}
+      onApply={onApply}
+      title={<Trans>Global variables</Trans>}
+      // $FlowFixMe[incompatible-type]
+      tabs={tabs}
+      initiallySelectedVariable={initiallySelectedVariable}
+      helpPagePath={'/all-features/variables/global-variables'}
+      scopeName={t`Global variables`}
+      hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
+      id="global-variables-dialog"
+      isListLocked={isListLocked}
+    />
   );
 };
 

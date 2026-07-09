@@ -86,10 +86,6 @@ gd::String ExpressionCodeGenerator::GenerateExpressionCode(
   }
 
   node->Visit(generator);
-  if (rootType == "string") {
-    return codeGenerator.GenerateStringExpressionResolution(
-        generator.GetOutput(), context);
-  }
   return generator.GetOutput();
 }
 

@@ -1011,7 +1011,6 @@ const pickRandomObject = (instanceContainer, objectsLists) => {
 
 class RuntimeGame {
   constructor(gameData) {
-    this._globalConfig = (gameData && gameData.globalConfig) || {};
     this._variablesContainer = new VariablesContainer(
       gameData && gameData.variables
     );
@@ -1041,10 +1040,6 @@ class RuntimeGame {
 
   getVariables() {
     return this._variablesContainer;
-  }
-
-  getGlobalConfig() {
-    return this._globalConfig;
   }
 
   getVariablesForExtension(extensionName) {
@@ -1293,40 +1288,8 @@ function makeMinimalGDJSMock(options) {
     }
     return 0;
   };
-  const getGlobalConfigValue = (runtimeGame, path) => {
-    let value =
-      runtimeGame && runtimeGame.getGlobalConfig
-        ? runtimeGame.getGlobalConfig()
-        : {};
-    for (const segment of path.trim().split('.')) {
-      if (!segment) continue;
-      if (value === null || typeof value !== 'object') return undefined;
-      if (!Object.prototype.hasOwnProperty.call(value, segment)) {
-        return undefined;
-      }
-      value = value[segment];
-    }
-    return value;
-  };
-  const stringifyGlobalConfigValue = (value) => {
-    if (value === undefined || value === null) return '';
-    if (typeof value === 'string') return value;
-    if (typeof value === 'number' || typeof value === 'boolean') {
-      return '' + value;
-    }
-    try {
-      return JSON.stringify(value);
-    } catch (error) {
-      return '';
-    }
-  };
   const resolveString = (runtimeGame, value) => {
     if (value === undefined || value === null) return '';
-    if (typeof value === 'string') {
-      return value.replace(/\{\{\s*([^{}]+?)\s*\}\}/g, (_match, path) =>
-        stringifyGlobalConfigValue(getGlobalConfigValue(runtimeGame, path))
-      );
-    }
     return '' + value;
   };
   const resolveBoolean = (runtimeGame, value) => {

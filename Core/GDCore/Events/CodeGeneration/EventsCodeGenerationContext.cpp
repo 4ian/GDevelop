@@ -39,8 +39,6 @@ void EventsCodeGenerationContext::InheritsFrom(
   asyncDepth = parent_.asyncDepth;
   depthOfLastUse = parent_.depthOfLastUse;
   customConditionDepth = parent_.customConditionDepth;
-  globalConfigStringExpressionResolutionEnabled =
-      parent_.globalConfigStringExpressionResolutionEnabled;
   contextDepth = parent_.GetContextDepth() + 1;
   if (parent_.maxDepthLevel) {
     maxDepthLevel = parent_.maxDepthLevel;

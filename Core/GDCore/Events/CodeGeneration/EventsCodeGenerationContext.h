@@ -289,22 +289,6 @@ class GD_CORE_API EventsCodeGenerationContext {
   }
 
   /**
-   * \brief Enable resolving global config placeholders in top-level string
-   * expressions generated for actions.
-   */
-  void SetGlobalConfigStringExpressionResolutionEnabled(bool enabled) {
-    globalConfigStringExpressionResolutionEnabled = enabled;
-  }
-
-  /**
-   * \brief Return true if top-level string expressions generated in the current
-   * context should resolve global config placeholders.
-   */
-  bool IsGlobalConfigStringExpressionResolutionEnabled() const {
-    return globalConfigStringExpressionResolutionEnabled;
-  }
-
-  /**
    * \brief Returns true if the given object is already going to be declared
    * in this context (either as a traditional objects list, or an empty one).
    */
@@ -378,9 +362,6 @@ class GD_CORE_API EventsCodeGenerationContext {
   bool objectListParameterPickingAllowed =
       false;  ///< True while condition object-list parameters are being
               ///< generated, so conditions can narrow multiple candidates.
-  bool globalConfigStringExpressionResolutionEnabled =
-      false;  ///< True while top-level string expressions generated for actions
-              ///< should resolve project global config placeholders.
 };
 
 }  // namespace gd

@@ -234,10 +234,6 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
       const gd::NamedPropertyDescriptor& property,
       const gd::String& operandCode) override;
 
-  virtual gd::String GenerateStringExpressionResolution(
-      const gd::String& expressionCode,
-      gd::EventsCodeGenerationContext& context) override;
-
  protected:
   virtual gd::String GenerateParameterCodes(
       const gd::Expression& parameter,

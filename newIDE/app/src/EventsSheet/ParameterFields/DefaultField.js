@@ -15,6 +15,7 @@ import {
   getHighlightSearchTextParts,
   applySyntaxColoring,
 } from '../../Utils/HighlightSearchText';
+import { getMissingGlobalConfigPlaceholderPath } from '../../Utils/GlobalConfigPlaceholderDiagnostics';
 
 export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function DefaultField(props: ParameterFieldProps, ref) {
@@ -69,8 +70,17 @@ export const renderInlineDefaultField = ({
     return <MissingParameterValue />;
   }
   if (!expressionIsValid) {
+    const missingGlobalConfigPath = getMissingGlobalConfigPlaceholderPath(
+      expression.getPlainString(),
+      scope.project
+    );
+    const errorMessage =
+      missingGlobalConfigPath !== null
+        ? `Global config path "{{${missingGlobalConfigPath}}}" does not exist.`
+        : undefined;
+
     return (
-      <InvalidParameterValue>
+      <InvalidParameterValue errorMessage={errorMessage}>
         {renderStylizedText(
           value,
           getHighlightSearchTextParts(value, highlightedSearchText, {

@@ -27,21 +27,63 @@ gd::String ResolveProjectGlobalConfigPlaceholders(
   return value;
 }
 
-gd::String GenerateVariableFromJsonValueCode(const gd::String& value) {
-  const gd::SerializerElement valueElement =
-      gd::Serializer::FromJSON(value.c_str());
+gd::String GenerateEmptyStructureVariableCode() {
   return "(() => { const variable = new gdjs.Variable(); "
-         "variable.fromJSObject(" +
-         gd::Serializer::ToJSON(valueElement) + "); return variable; })()";
+         "variable.castTo(\"structure\"); return variable; })()";
 }
 
-gd::String GenerateVariableFromValueCode(const gd::String& valueCode) {
-  return "(() => { const variable = new gdjs.Variable(); const value = " +
-         valueCode +
-         "; if (typeof value === \"string\") { try { "
-         "variable.fromJSObject(JSON.parse(value)); } catch (error) { "
-         "variable.castTo(\"structure\"); } } else { "
-         "variable.fromJSObject(value); } return variable; })()";
+gd::String GenerateVariableFromValueCode(const gd::String& valueCode,
+                                         const gd::String& propertyName) {
+  return gd::String(R"jscode_template((() => {
+    const variable = new gdjs.Variable();
+    const value = VALUE_CODE;
+    const propertyName = PROPERTY_NAME;
+    const reportInvalidValue = (error) => {
+      if (typeof console !== "undefined" && console.error) {
+        console.error(
+          "Unable to parse JsonObject property " + propertyName +
+            ". Expected a JSON object or array.",
+          value,
+          error
+        );
+      }
+    };
+    if (typeof value === "string") {
+      try {
+        const parsedValue = JSON.parse(value);
+        if (parsedValue === null || typeof parsedValue !== "object") {
+          reportInvalidValue();
+          variable.castTo("structure");
+        } else {
+          variable.fromJSObject(parsedValue);
+        }
+      } catch (error) {
+        reportInvalidValue(error);
+        variable.castTo("structure");
+      }
+    } else if (value === null || typeof value !== "object") {
+      reportInvalidValue();
+      variable.castTo("structure");
+    } else {
+      variable.fromJSObject(value);
+    }
+    return variable;
+  })())jscode_template")
+      .FindAndReplace("VALUE_CODE", valueCode)
+      .FindAndReplace(
+          "PROPERTY_NAME",
+          EventsCodeGenerator::ConvertToStringExplicit(propertyName));
+}
+
+gd::String GenerateVariableFromJsonValueCode(const gd::String& value,
+                                             const gd::String& propertyName) {
+  gd::String trimmedValue = value;
+  if (trimmedValue.Trim().empty()) {
+    return GenerateEmptyStructureVariableCode();
+  }
+
+  return GenerateVariableFromValueCode(
+      EventsCodeGenerator::ConvertToStringExplicit(value), propertyName);
 }
 }  // namespace
 
@@ -523,7 +565,7 @@ gd::String BehaviorCodeGenerator::GeneratePropertyValueCode(
       ResolveProjectGlobalConfigPlaceholders(project, property.GetValue());
 
   if (isJsonObjectProperty) {
-    return GenerateVariableFromJsonValueCode(propertyValue);
+    return GenerateVariableFromJsonValueCode(propertyValue, property.GetName());
   }
 
   if (primitiveType == "string" || valueType == "behavior") {
@@ -548,7 +590,7 @@ gd::String BehaviorCodeGenerator::GeneratePropertyValueResolutionCode(
       gd::ValueTypeMetadata::GetPrimitiveValueType(valueType);
 
   if (property.GetType() == "JsonObject") {
-    return GenerateVariableFromValueCode(valueCode);
+    return GenerateVariableFromValueCode(valueCode, property.GetName());
   } else if (primitiveType == "string" || valueType == "behavior") {
     return "(" + valueCode + " === undefined || " + valueCode +
            " === null ? \"\" : \"\" + " + valueCode + ")";

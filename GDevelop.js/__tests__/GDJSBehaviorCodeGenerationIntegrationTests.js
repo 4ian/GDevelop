@@ -33,6 +33,61 @@ describe('libGD.js - GDJS Behavior Code Generation integration tests', function 
     expect(behavior.doStepPreEvents).not.toBeUndefined();
   });
 
+  it('logs an error when a behavior JsonObject property value is invalid', function () {
+    const project = gd.ProjectHelper.createNewGDJSProject();
+    const eventsFunctionsExtension = project.insertNewEventsFunctionsExtension(
+      'MyExtension',
+      0
+    );
+    const eventsBasedBehavior = eventsFunctionsExtension
+      .getEventsBasedBehaviors()
+      .insertNew('MyBehavior', 0);
+
+    eventsBasedBehavior
+      .getPropertyDescriptors()
+      .insertNew('Config', 0)
+      .setValue('{}')
+      .setType('JsonObject');
+
+    const { gdjs, runtimeScene } = makeMinimalGDJSMock();
+    const CompiledRuntimeBehavior = generateCompiledEventsForEventsBasedBehavior(
+      gd,
+      project,
+      eventsFunctionsExtension,
+      eventsBasedBehavior,
+      gdjs,
+      { logCode: false }
+    );
+    const ownerRuntimeObject = new gdjs.RuntimeObject(runtimeScene, {
+      name: 'MyObject',
+      type: '',
+    });
+    const consoleErrorSpy = jest
+      .spyOn(console, 'error')
+      .mockImplementation(() => {});
+
+    try {
+      new CompiledRuntimeBehavior(
+        runtimeScene,
+        {
+          name: 'MyBehavior',
+          type: 'MyBehaviorType',
+          Config: 'not-json',
+        },
+        ownerRuntimeObject
+      );
+
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        expect.stringContaining('Unable to parse JsonObject property Config'),
+        'not-json',
+        expect.any(SyntaxError)
+      );
+    } finally {
+      consoleErrorSpy.mockRestore();
+      project.delete();
+    }
+  });
+
   it('generates a working behavior with doStepPreEvents using "Trigger Once" condition', function () {
     // Create a new behavior with events in doStepPreEvents
     const project = new gd.ProjectHelper.createNewGDJSProject();

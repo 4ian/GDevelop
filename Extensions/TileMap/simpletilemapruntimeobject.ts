@@ -39,7 +39,7 @@ namespace gdjs {
    */
   export class SimpleTileMapRuntimeObject
     extends gdjs.RuntimeObject
-    implements gdjs.Resizable, gdjs.Scalable, gdjs.OpacityHandler
+    implements gdjs.TileMap, gdjs.Resizable, gdjs.Scalable, gdjs.OpacityHandler
   {
     /**
      * A reusable Point to avoid allocations.
@@ -465,11 +465,13 @@ namespace gdjs {
     }
 
     override getOriginalWidth(): float {
-      return this.getTileMapWidth();
+      const tileMap = this._tileMap;
+      return tileMap ? tileMap.getWidth() : 20;
     }
 
     override getOriginalHeight(): float {
-      return this.getTileMapHeight();
+      const tileMap = this._tileMap;
+      return tileMap ? tileMap.getHeight() : 20;
     }
 
     getScaleX(): float {
@@ -608,24 +610,19 @@ namespace gdjs {
       if (this._transformationIsUpToDate) {
         return;
       }
-      const absScaleX = Math.abs(this._renderer.getScaleX());
-      const absScaleY = Math.abs(this._renderer.getScaleY());
 
       this._tileMapToSceneTransformation.setToIdentity();
-
-      // Translation
       this._tileMapToSceneTransformation.translate(this.getX(), this.getY());
-
-      // Rotation
-      const angleInRadians = (this.getAngle() * Math.PI) / 180;
       this._tileMapToSceneTransformation.rotateAround(
-        angleInRadians,
+        (this.getAngle() * Math.PI) / 180,
         this.getCenterX(),
         this.getCenterY()
       );
+      this._tileMapToSceneTransformation.scale(
+        Math.abs(this._renderer.getScaleX()),
+        Math.abs(this._renderer.getScaleY())
+      );
 
-      // Scale
-      this._tileMapToSceneTransformation.scale(absScaleX, absScaleY);
       if (this._collisionTileMap) {
         const collisionTileMapTransformation =
           this._collisionTileMap.getTransformation();
@@ -675,20 +672,21 @@ namespace gdjs {
       return sceneCoordinates[1];
     }
 
+    /**
+     * The returned array is alway the same.
+     */
     getGridCoordinatesFromSceneCoordinates(
       x: float,
       y: float
     ): [integer, integer] {
       this.updateTransformation();
 
-      const gridCoordinates: FloatPoint =
-        SimpleTileMapRuntimeObject.workingPoint;
-      this._sceneToTileMapTransformation.transform([x, y], gridCoordinates);
+      const result = SimpleTileMapRuntimeObject.workingPoint;
+      this._sceneToTileMapTransformation.transform([x, y], result);
 
-      const columnIndex = Math.floor(gridCoordinates[0] / this._tileSize);
-      const rowIndex = Math.floor(gridCoordinates[1] / this._tileSize);
-
-      return [columnIndex, rowIndex];
+      result[0] = Math.floor(result[0] / this._tileSize);
+      result[1] = Math.floor(result[1] / this._tileSize);
+      return result;
     }
 
     getColumnIndexAtPosition(x: float, y: float): integer {
@@ -888,16 +886,6 @@ namespace gdjs {
 
     getTileMap(): TileMapHelper.EditableTileMap | null {
       return this._tileMap;
-    }
-
-    getTileMapWidth() {
-      const tileMap = this._tileMap;
-      return tileMap ? tileMap.getWidth() : 20;
-    }
-
-    getTileMapHeight() {
-      const tileMap = this._tileMap;
-      return tileMap ? tileMap.getHeight() : 20;
     }
 
     /**

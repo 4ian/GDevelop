@@ -14,7 +14,7 @@ import {
  * This allows to support new file format with only a new parser.
  */
 export declare class EditableTileMap {
-  private _backgroundResourceName?;
+  private _backgroundResourceName;
   private _tileSet;
   private _layers;
   /**
@@ -51,6 +51,7 @@ export declare class EditableTileMap {
     dimY: integer,
     tileSet: Map<integer, TileDefinition>
   );
+  clone(): EditableTileMap;
   /**
    * Loads EditableTileMap from serialized data.
    * Uses object configuration as the source of truth as the serialized data
@@ -145,7 +146,7 @@ export declare class EditableTileMap {
   /**
    * @returns The resource name of the background
    */
-  getBackgroundResourceName(): string;
+  getBackgroundResourceName(): string | null;
   /**
    * @returns All the layers of the tile map.
    */
@@ -204,6 +205,7 @@ declare abstract class AbstractEditableLayer {
    * @param id The layer identifier.
    */
   constructor(tileMap: EditableTileMap, id: integer);
+  abstract clone(tileMap: EditableTileMap, id: integer): AbstractEditableLayer;
   setVisible(visible: boolean): void;
   toJSObject(): EditableTileMapLayerAsJsObject;
   /**
@@ -222,6 +224,7 @@ export declare class EditableObjectLayer extends AbstractEditableLayer {
    * @param id The layer identifier.
    */
   constructor(tileMap: EditableTileMap, id: integer);
+  clone(tileMap: EditableTileMap, id: integer): EditableObjectLayer;
   add(object: TileObject): void;
   isEmpty(): boolean;
 }
@@ -278,7 +281,7 @@ export declare class EditableTileMapLayer extends AbstractEditableLayer {
    * @param id The layer identifier.
    */
   constructor(tileMap: EditableTileMap, id: integer);
-  buildEmptyLayer(dimensionX: number, dimensionY: number): void;
+  clone(tileMap: EditableTileMap, id: integer): EditableTileMapLayer;
   static from(
     editableTileMapLayerAsJsObject: EditableTileMapLayerAsJsObject,
     tileMap: EditableTileMap,

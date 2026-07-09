@@ -5,6 +5,7 @@ import { Trans, t } from '@lingui/macro';
 import Dialog from '../UI/Dialog';
 import FlatButton from '../UI/FlatButton';
 import RaisedButton from '../UI/RaisedButton';
+import TextField from '../UI/TextField';
 import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
 import BackgroundText from '../UI/BackgroundText';
@@ -16,6 +17,7 @@ export type ExternalKind = 'external-layout' | 'external-events';
 export type CreateExternalPayload = {|
   kind: ExternalKind,
   layoutName: string,
+  name: string,
 |};
 
 type Props = {|
@@ -46,8 +48,26 @@ const CreateExternalDialog = ({
   const [layoutName, setLayoutName] = React.useState<string>(
     layoutNames.length === 1 ? layoutNames[0] : ''
   );
+  const [name, setName] = React.useState<string>('');
 
-  const canCreate = !!layoutName;
+  const trimmedName = name.trim();
+
+  let nameError = null;
+  if (!trimmedName) {
+    nameError = <Trans>Enter a name.</Trans>;
+  } else if (
+    kind === 'external-layout' &&
+    project.hasExternalLayoutNamed(trimmedName)
+  ) {
+    nameError = <Trans>This external layout name is already used.</Trans>;
+  } else if (
+    kind === 'external-events' &&
+    project.hasExternalEventsNamed(trimmedName)
+  ) {
+    nameError = <Trans>This external events name is already used.</Trans>;
+  }
+
+  const canCreate = !!layoutName && !nameError;
 
   const create = React.useCallback(
     () => {
@@ -56,9 +76,10 @@ const CreateExternalDialog = ({
       onCreate({
         kind,
         layoutName,
+        name: trimmedName,
       });
     },
-    [canCreate, kind, layoutName, onCreate]
+    [canCreate, kind, layoutName, onCreate, trimmedName]
   );
 
   return (
@@ -118,6 +139,14 @@ const CreateExternalDialog = ({
               />
             ))}
           </SelectField>
+          <TextField
+            value={name}
+            onChange={(event, value) => setName(value)}
+            floatingLabelText={<Trans>Name</Trans>}
+            errorText={nameError}
+            fullWidth
+            autoFocus="desktop"
+          />
           {layoutNames.length === 0 && (
             <BackgroundText>
               <Trans>Create a scene before adding externals.</Trans>

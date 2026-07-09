@@ -5,6 +5,7 @@ import { type State } from './MainFrameState';
 import './MainFrame.css';
 import Snackbar from '@material-ui/core/Snackbar';
 import HomeIcon from '../UI/CustomSvgIcons/Home';
+import AddCircleIcon from '../UI/CustomSvgIcons/AddCircle';
 import AddCommentIcon from '../UI/CustomSvgIcons/AddComment';
 import DebuggerIcon from '../UI/CustomSvgIcons/Debug';
 import ProjectResourcesIcon from '../UI/CustomSvgIcons/ProjectResources';
@@ -6498,6 +6499,22 @@ const MainFrame = (props: Props): React.MixedElement => {
     <RobotIcon size={16} />,
     () => openAskAi(null)
   );
+  addRecentEditorSwitcherSideMenuItem(
+    'preferences',
+    i18n._(t`Preferences`),
+    i18n._(t`Window`),
+    <SettingsIcon />,
+    () => openPreferencesDialog(true)
+  );
+
+  addRecentEditorSwitcherActionItem(
+    'action:create-new-game',
+    i18n._(t`Create new game`),
+    i18n._(t`Project action`),
+    <AddCircleIcon />,
+    'new game create game create project new project',
+    () => setNewProjectSetupDialogOpen(true)
+  );
 
   if (currentProject) {
     addRecentEditorSwitcherActionItem(
@@ -6531,6 +6548,22 @@ const MainFrame = (props: Props): React.MixedElement => {
       <SettingsIcon />,
       'new function add function action condition expression extension function',
       () => createProjectItemFromSwitcher('function')
+    );
+    addRecentEditorSwitcherActionItem(
+      'action:install-extension',
+      i18n._(t`Install extension`),
+      i18n._(t`Project action`),
+      <ExtensionIcon />,
+      'search import install add extension behavior object function store',
+      () => createProjectItemFromSwitcher('install-extension')
+    );
+    addRecentEditorSwitcherActionItem(
+      'action:create-note',
+      i18n._(t`Create a note`),
+      i18n._(t`Project action`),
+      <AddCommentIcon />,
+      'new note create note sticky note comment',
+      createStickyNoteFromTitlebar
     );
     addRecentEditorSwitcherActionItem(
       'action:create-external',

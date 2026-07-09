@@ -5,6 +5,7 @@ import ButtonBase from '@material-ui/core/ButtonBase';
 import Paper from '../UI/Paper';
 import Text from '../UI/Text';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
+import SmallCross from '../UI/CustomSvgIcons/SmallCross';
 import { getShortcutDisplayName } from '../KeyboardShortcuts';
 import {
   type EditorTab,
@@ -26,6 +27,17 @@ export type RecentEditorSwitcherActionItem = {|
   icon: ?React.Node,
   searchTerms?: string,
   activate: () => void,
+|};
+
+type RecentEditorSwitcherAvailableItem = {|
+  id: string,
+  title: string,
+  subtitle: string,
+  icon: ?React.Node,
+  searchTerms: ?string,
+  sideMenuItem: ?RecentEditorSwitcherSideMenuItem,
+  actionItem: ?RecentEditorSwitcherActionItem,
+  source: 'side-menu' | 'action',
 |};
 
 export type RecentEditorSwitcherEntry = {|
@@ -235,6 +247,8 @@ export const getRecentEditorSwitcherEntries = (
   });
 
   actionItems.forEach((actionItem, index) => {
+    if (recentKeyOrder[actionItem.id] === undefined) return;
+
     entriesById[actionItem.id] = {
       id: actionItem.id,
       title: actionItem.title,
@@ -310,13 +324,23 @@ const styles = {
     padding: '0 10px',
   },
   filterInput: {
-    width: '100%',
+    flex: 1,
+    width: 'auto',
     minWidth: 0,
     border: 0,
     outline: 0,
     background: 'transparent',
     fontSize: 13,
     lineHeight: '18px',
+  },
+  clearFilterButton: {
+    width: 24,
+    height: 24,
+    borderRadius: 4,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0,
   },
   shortcutChip: {
     minWidth: 74,
@@ -398,11 +422,18 @@ const styles = {
     fontWeight: 600,
   },
   rowMeta: {
+    minWidth: 0,
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
     fontSize: 12,
     lineHeight: '16px',
+  },
+  rowMetaLine: {
+    minWidth: 0,
+    display: 'flex',
+    alignItems: 'center',
+    gap: 8,
   },
   sideMenuTitle: {
     overflow: 'hidden',
@@ -442,6 +473,7 @@ const styles = {
     lineHeight: '16px',
     fontWeight: 700,
     textTransform: 'uppercase',
+    flexShrink: 0,
   },
   activeDot: {
     width: 8,
@@ -514,8 +546,8 @@ const RecentEditorSwitcher = ({
     null
   );
   const [
-    hoveredSideMenuItemId,
-    setHoveredSideMenuItemId,
+    hoveredAvailableItemId,
+    setHoveredAvailableItemId,
   ] = React.useState<?string>(null);
 
   const entries = React.useMemo(
@@ -537,19 +569,44 @@ const RecentEditorSwitcher = ({
   );
   const normalizedFilterText = filterText.trim().toLowerCase();
 
-  const filteredSideMenuItems = React.useMemo(
+  const availableItems: Array<RecentEditorSwitcherAvailableItem> = React.useMemo(
+    () => [
+      ...sideMenuItems.map(item => ({
+        id: item.id,
+        title: item.title,
+        subtitle: item.subtitle,
+        icon: item.icon,
+        searchTerms: null,
+        sideMenuItem: item,
+        actionItem: null,
+        source: 'side-menu',
+      })),
+      ...actionItems.map(item => ({
+        id: item.id,
+        title: item.title,
+        subtitle: item.subtitle,
+        icon: item.icon,
+        searchTerms: item.searchTerms || null,
+        sideMenuItem: null,
+        actionItem: item,
+        source: 'action',
+      })),
+    ],
+    [actionItems, sideMenuItems]
+  );
+
+  const filteredAvailableItems = React.useMemo(
     () =>
-      sideMenuItems.filter(
-        item =>
-          item.id !== 'start page' &&
-          doesTextMatchFilter(
-            normalizedFilterText,
-            item.title,
-            item.subtitle,
-            item.id
-          )
+      availableItems.filter(item =>
+        doesTextMatchFilter(
+          normalizedFilterText,
+          item.title,
+          item.subtitle,
+          item.id,
+          item.searchTerms
+        )
       ),
-    [normalizedFilterText, sideMenuItems]
+    [availableItems, normalizedFilterText]
   );
 
   const filteredEntries = React.useMemo(
@@ -602,11 +659,13 @@ const RecentEditorSwitcher = ({
 
   React.useEffect(
     () => {
-      if (selectedIndex >= filteredEntries.length) {
-        setSelectedIndex(Math.max(0, filteredEntries.length - 1));
+      const selectableItemsCount =
+        filteredEntries.length + filteredAvailableItems.length;
+      if (selectedIndex >= selectableItemsCount) {
+        setSelectedIndex(Math.max(0, selectableItemsCount - 1));
       }
     },
-    [filteredEntries.length, selectedIndex]
+    [filteredAvailableItems.length, filteredEntries.length, selectedIndex]
   );
 
   React.useEffect(
@@ -643,6 +702,17 @@ const RecentEditorSwitcher = ({
       }
     },
     [onActivate, onActivateActionItem, onActivateSideMenuItem]
+  );
+
+  const activateAvailableItem = React.useCallback(
+    (item: RecentEditorSwitcherAvailableItem) => {
+      if (item.sideMenuItem) {
+        onActivateSideMenuItem(item.sideMenuItem);
+      } else if (item.actionItem) {
+        onActivateActionItem(item.actionItem);
+      }
+    },
+    [onActivateActionItem, onActivateSideMenuItem]
   );
 
   React.useEffect(
@@ -689,41 +759,67 @@ const RecentEditorSwitcher = ({
           }
         }
 
-        if (!filteredEntries.length) return;
+        const selectableItemsCount =
+          filteredEntries.length + filteredAvailableItems.length;
+        if (!selectableItemsCount) return;
 
         if (event.key === 'ArrowDown' || event.key === 'Tab') {
           event.preventDefault();
           event.stopPropagation();
           setSelectedIndex(index =>
             event.shiftKey
-              ? (index - 1 + filteredEntries.length) % filteredEntries.length
-              : (index + 1) % filteredEntries.length
+              ? (index - 1 + selectableItemsCount) % selectableItemsCount
+              : (index + 1) % selectableItemsCount
           );
         } else if (event.key === 'ArrowUp') {
           event.preventDefault();
           event.stopPropagation();
           setSelectedIndex(
-            index =>
-              (index - 1 + filteredEntries.length) % filteredEntries.length
+            index => (index - 1 + selectableItemsCount) % selectableItemsCount
           );
         } else if (event.key === 'Enter') {
           event.preventDefault();
           event.stopPropagation();
-          const entry = filteredEntries[selectedIndex];
-          if (entry) activateEntry(entry);
+          if (selectedIndex < filteredEntries.length) {
+            const entry = filteredEntries[selectedIndex];
+            if (entry) activateEntry(entry);
+            return;
+          }
+
+          const item =
+            filteredAvailableItems[selectedIndex - filteredEntries.length];
+          if (item) activateAvailableItem(item);
         }
       };
 
       document.addEventListener('keydown', onKeyDown, true);
       return () => document.removeEventListener('keydown', onKeyDown, true);
     },
-    [activateEntry, filteredEntries, onClose, open, selectedIndex]
+    [
+      activateAvailableItem,
+      activateEntry,
+      filteredAvailableItems,
+      filteredEntries,
+      onClose,
+      open,
+      selectedIndex,
+    ]
   );
+
+  const clearFilter = React.useCallback(() => {
+    setFilterText('');
+    const filterInput = filterInputRef.current;
+    if (filterInput) filterInput.focus();
+  }, []);
 
   if (!open) return null;
 
-  const selectedEntry =
-    filteredEntries[selectedIndex] || filteredEntries[0] || null;
+  const selectedRecentIndex =
+    selectedIndex < filteredEntries.length ? selectedIndex : -1;
+  const selectedAvailableIndex =
+    selectedIndex >= filteredEntries.length
+      ? selectedIndex - filteredEntries.length
+      : -1;
   const selectedBackgroundColor =
     gdevelopTheme.listItem.selectedBackgroundColor;
   const selectedTextColor = gdevelopTheme.listItem.selectedTextColor;
@@ -744,6 +840,20 @@ const RecentEditorSwitcher = ({
       ? 'rgba(123, 199, 255, 0.36)'
       : 'rgba(0, 111, 186, 0.22)';
   const shortcutDisplayName = getShortcutDisplayName(shortcut);
+  const renderActionBadge = (selected: boolean) => (
+    <span
+      style={{
+        ...styles.sourceBadge,
+        color: selected ? selectedTextColor : actionAccentColor,
+        backgroundColor: selected
+          ? 'rgba(255, 255, 255, 0.16)'
+          : actionBackgroundColor,
+        border: `1px solid ${selected ? selectedTextColor : actionBorderColor}`,
+      }}
+    >
+      <Trans>Action</Trans>
+    </span>
+  );
 
   return (
     <div
@@ -809,9 +919,23 @@ const RecentEditorSwitcher = ({
               value={filterText}
               onChange={event => setFilterText(event.currentTarget.value)}
               placeholder="Filter"
-              aria-label="Filter recent editors"
+              aria-label="Filter editors, actions, and recent operations"
               autoComplete="off"
             />
+            {!!filterText && (
+              <ButtonBase
+                style={{
+                  ...styles.clearFilterButton,
+                  color: mutedTextColor,
+                }}
+                onMouseDown={event => event.preventDefault()}
+                onClick={clearFilter}
+                aria-label="Clear filter"
+                focusRipple
+              >
+                <SmallCross />
+              </ButtonBase>
+            )}
           </div>
           {!!shortcutDisplayName && (
             <div
@@ -835,35 +959,53 @@ const RecentEditorSwitcher = ({
           >
             <div style={styles.columnHeader}>
               <Text noMargin color="secondary">
-                <Trans>Side menu</Trans>
+                <Trans>Editors and actions</Trans>
               </Text>
             </div>
             <div className="almost-invisible-scrollbar" style={styles.list}>
-              {filteredSideMenuItems.length ? (
-                filteredSideMenuItems.map(item => {
-                  const hovered = hoveredSideMenuItemId === item.id;
+              {filteredAvailableItems.length ? (
+                filteredAvailableItems.map((item, index) => {
+                  const hovered = hoveredAvailableItemId === item.id;
+                  const selected = index === selectedAvailableIndex;
+                  const rowTextColor = selected
+                    ? selectedTextColor
+                    : primaryTextColor;
+                  const rowMetaColor = selected
+                    ? selectedTextColor
+                    : mutedTextColor;
+                  const isAction = item.source === 'action';
+
                   return (
                     <ButtonBase
-                      key={item.id}
+                      key={`${item.source}:${item.id}`}
+                      ref={selected ? selectedRowRef : undefined}
                       style={{
                         ...styles.sideMenuRow,
-                        color: primaryTextColor,
-                        backgroundColor: hovered
+                        color: rowTextColor,
+                        backgroundColor: selected
+                          ? selectedBackgroundColor
+                          : hovered
                           ? hoverBackgroundColor
                           : undefined,
                       }}
-                      onMouseEnter={() => setHoveredSideMenuItemId(item.id)}
-                      onMouseLeave={() => setHoveredSideMenuItemId(null)}
-                      onClick={() => onActivateSideMenuItem(item)}
+                      onMouseEnter={() => setHoveredAvailableItemId(item.id)}
+                      onMouseLeave={() => setHoveredAvailableItemId(null)}
+                      onFocus={() =>
+                        setSelectedIndex(filteredEntries.length + index)
+                      }
+                      onClick={() => activateAvailableItem(item)}
                       focusRipple
                     >
                       <span style={styles.iconContainer}>{item.icon}</span>
                       <span style={styles.rowText}>
                         <span style={styles.sideMenuTitle}>{item.title}</span>
-                        <span
-                          style={{ ...styles.rowMeta, color: mutedTextColor }}
-                        >
-                          {item.subtitle}
+                        <span style={styles.rowMetaLine}>
+                          <span
+                            style={{ ...styles.rowMeta, color: rowMetaColor }}
+                          >
+                            {item.subtitle}
+                          </span>
+                          {isAction && renderActionBadge(selected)}
                         </span>
                       </span>
                     </ButtonBase>
@@ -872,7 +1014,7 @@ const RecentEditorSwitcher = ({
               ) : (
                 <div style={styles.emptyState}>
                   <Text noMargin color="secondary">
-                    <Trans>No side menu matches.</Trans>
+                    <Trans>No editor or action matches.</Trans>
                   </Text>
                 </div>
               )}
@@ -886,13 +1028,13 @@ const RecentEditorSwitcher = ({
           >
             <div style={styles.columnHeader}>
               <Text noMargin color="secondary">
-                <Trans>Recent editors and actions</Trans>
+                <Trans>Recent operations</Trans>
               </Text>
             </div>
             {filteredEntries.length ? (
               <div className="almost-invisible-scrollbar" style={styles.list}>
                 {filteredEntries.map((entry, index) => {
-                  const selected = entry === selectedEntry;
+                  const selected = index === selectedRecentIndex;
                   const rowTextColor = selected
                     ? selectedTextColor
                     : primaryTextColor;
@@ -901,6 +1043,8 @@ const RecentEditorSwitcher = ({
                     : mutedTextColor;
                   const isAction = entry.source === 'action';
                   const isWindow = entry.paneIdentifier === 'external';
+                  const hasRecentBadges =
+                    entry.usageCount > 1 || entry.isCurrentTab;
                   const sourceLabel = isWindow
                     ? 'Window'
                     : entry.editorTab
@@ -935,58 +1079,45 @@ const RecentEditorSwitcher = ({
                       </span>
                       <span style={styles.rowText}>
                         <span style={styles.rowTitle}>{entry.title}</span>
-                        <span
-                          style={{ ...styles.rowMeta, color: rowMetaColor }}
-                        >
-                          {entry.subtitle}
-                          {!isAction && (
-                            <React.Fragment>
-                              {' - '}
-                              {sourceLabel}
-                            </React.Fragment>
-                          )}
+                        <span style={styles.rowMetaLine}>
+                          <span
+                            style={{ ...styles.rowMeta, color: rowMetaColor }}
+                          >
+                            {entry.subtitle}
+                            {!isAction && (
+                              <React.Fragment>
+                                {' - '}
+                                {sourceLabel}
+                              </React.Fragment>
+                            )}
+                          </span>
+                          {isAction && renderActionBadge(selected)}
                         </span>
                       </span>
-                      <span style={styles.recentBadges}>
-                        {isAction && (
-                          <span
-                            style={{
-                              ...styles.sourceBadge,
-                              color: selected
-                                ? selectedTextColor
-                                : actionAccentColor,
-                              backgroundColor: selected
-                                ? 'rgba(255, 255, 255, 0.16)'
-                                : actionBackgroundColor,
-                              border: `1px solid ${
-                                selected ? selectedTextColor : actionBorderColor
-                              }`,
-                            }}
-                          >
-                            <Trans>Action</Trans>
-                          </span>
-                        )}
-                        {entry.usageCount > 1 && (
-                          <span
-                            style={{
-                              ...styles.usageBadge,
-                              color: rowTextColor,
-                              backgroundColor: chipBackgroundColor,
-                              border: `1px solid ${borderColor}`,
-                            }}
-                          >
-                            {entry.usageCount}x
-                          </span>
-                        )}
-                        {entry.isCurrentTab && (
-                          <span
-                            style={{
-                              ...styles.activeDot,
-                              backgroundColor: rowTextColor,
-                            }}
-                          />
-                        )}
-                      </span>
+                      {hasRecentBadges ? (
+                        <span style={styles.recentBadges}>
+                          {entry.usageCount > 1 && (
+                            <span
+                              style={{
+                                ...styles.usageBadge,
+                                color: rowTextColor,
+                                backgroundColor: chipBackgroundColor,
+                                border: `1px solid ${borderColor}`,
+                              }}
+                            >
+                              {entry.usageCount}x
+                            </span>
+                          )}
+                          {entry.isCurrentTab && (
+                            <span
+                              style={{
+                                ...styles.activeDot,
+                                backgroundColor: rowTextColor,
+                              }}
+                            />
+                          )}
+                        </span>
+                      ) : null}
                     </ButtonBase>
                   );
                 })}
@@ -995,11 +1126,9 @@ const RecentEditorSwitcher = ({
               <div style={styles.emptyState}>
                 <Text noMargin color="secondary">
                   {normalizedFilterText ? (
-                    <Trans>No recent editor or action matches.</Trans>
+                    <Trans>No recent operation matches.</Trans>
                   ) : (
-                    <Trans>
-                      Select an item from the side menu or run an action.
-                    </Trans>
+                    <Trans>Open an editor or run an action.</Trans>
                   )}
                 </Text>
               </div>

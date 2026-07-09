@@ -760,6 +760,7 @@ const findTreeViewItemById = (
 export type ProjectManagerCreateItemKind =
   | 'scene'
   | 'extension'
+  | 'install-extension'
   | 'external'
   | ExtensionItemKind;
 
@@ -1350,15 +1351,11 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
     );
 
     const addExternalEvents = React.useCallback(
-      (index: number, i18n: I18nType, associatedLayoutName: string) => {
+      (index: number, name: string, associatedLayoutName: string) => {
         if (!project) return;
 
-        const newName = newNameGenerator(
-          i18n._(t`Untitled external events`),
-          name => project.hasExternalEventsNamed(name)
-        );
         const newExternalEvents = project.insertNewExternalEvents(
-          newName,
+          name,
           index + 1
         );
         newExternalEvents.setAssociatedLayout(associatedLayoutName);
@@ -1378,22 +1375,17 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
           scrollToItem(externalEventsItemId);
         }, 100); // A few ms is enough for a new render to be done.
 
-        // We focus it so the user can edit the name directly.
-        editName(externalEventsItemId);
+        onOpenExternalEvents(newExternalEvents.getName());
       },
-      [project, onProjectItemModified, editName, scrollToItem]
+      [project, onProjectItemModified, onOpenExternalEvents, scrollToItem]
     );
 
     const addExternalLayout = React.useCallback(
-      (index: number, i18n: I18nType, associatedLayoutName: string) => {
+      (index: number, name: string, associatedLayoutName: string) => {
         if (!project) return;
 
-        const newName = newNameGenerator(
-          i18n._(t`Untitled external layout`),
-          name => project.hasExternalLayoutNamed(name)
-        );
         const newExternalLayout = project.insertNewExternalLayout(
-          newName,
+          name,
           index + 1
         );
         newExternalLayout.setAssociatedLayout(associatedLayoutName);
@@ -1416,20 +1408,19 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
           scrollToItem(externalLayoutItemId);
         }, 100); // A few ms is enough for a new render to be done.
 
-        // We focus it so the user can edit the name directly.
-        editName(externalLayoutItemId);
+        onOpenExternalLayout(newExternalLayout.getName());
       },
       [
         project,
         onProjectItemModified,
-        editName,
+        onOpenExternalLayout,
         scrollToItem,
         onExternalLayoutAdded,
       ]
     );
 
     const onCreateExternal = React.useCallback(
-      (payload: CreateExternalPayload, i18n: I18nType) => {
+      (payload: CreateExternalPayload) => {
         if (!project) return;
 
         setCreateExternalDialogOpen(false);
@@ -1437,7 +1428,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         if (payload.kind === 'external-layout') {
           addExternalLayout(
             project.getExternalLayoutsCount() - 1,
-            i18n,
+            payload.name,
             payload.layoutName
           );
           return;
@@ -1445,7 +1436,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
 
         addExternalEvents(
           project.getExternalEventsCount() - 1,
-          i18n,
+          payload.name,
           payload.layoutName
         );
       },
@@ -1469,6 +1460,11 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
           return;
         }
 
+        if (itemKind === 'install-extension') {
+          openSearchExtensionDialog();
+          return;
+        }
+
         if (itemKind === 'external') {
           openCreateExternalDialog();
           return;
@@ -1481,6 +1477,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         openCreateSceneDialog,
         openCreateExternalDialog,
         openCreateExtensionItemDialog,
+        openSearchExtensionDialog,
         project,
       ]
     );
@@ -2743,7 +2740,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                       <CreateExternalDialog
                         project={project}
                         onCancel={() => setCreateExternalDialogOpen(false)}
-                        onCreate={payload => onCreateExternal(payload, i18n)}
+                        onCreate={onCreateExternal}
                       />
                     )}
                     {project && extensionsSearchDialogOpen && (

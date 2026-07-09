@@ -105,10 +105,11 @@ describe('libGD.js object serialization', function () {
         ']';
 
       const element = gd.Serializer.fromJSON(json);
+      // Do NOT delete element, it's a static value.
+
       // Round-trips back to the same JSON (also proves the large input was
       // parsed correctly, not just that it didn't crash).
       expect(gd.Serializer.toJSON(element)).toBe(json);
-      element.delete();
     });
   });
 

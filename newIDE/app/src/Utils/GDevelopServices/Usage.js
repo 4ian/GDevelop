@@ -88,6 +88,14 @@ export type Capabilities = {|
     maximumCount: number,
     canMaximumCountBeIncreased: boolean,
     maximumGuestCollaboratorsPerProject: number,
+    // How long after deletion a project can still be restored by the user, in seconds.
+    // -1 means unlimited (within the retention period). This is a "soft" limit:
+    // a subscription can extend it.
+    projectRestorationTimeWindowInSeconds: number,
+    // How long a deleted project is kept before being permanently erased, in days.
+    // This is a "hard" limit, identical for all users: after this delay, the project
+    // is not returned by the API anymore.
+    deletedProjectRetentionInDays: number,
   },
   leaderboards: {
     maximumCountPerGame: number,

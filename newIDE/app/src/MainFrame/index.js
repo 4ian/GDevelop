@@ -22,6 +22,8 @@ import ExternalEventsIcon from '../UI/CustomSvgIcons/ExternalEvents';
 import ExternalLayoutIcon from '../UI/CustomSvgIcons/ExternalLayout';
 import ExtensionIcon from '../UI/CustomSvgIcons/Extension';
 import SearchIcon from '../UI/CustomSvgIcons/Search';
+import SparkleIcon from '../UI/CustomSvgIcons/Sparkle';
+import PlayIcon from '../UI/CustomSvgIcons/Play';
 import ProjectTitlebar from './ProjectTitlebar';
 import StickyNotes, { type StickyNotesInterface } from './StickyNotes';
 import PreferencesDialog from './Preferences/PreferencesDialog';
@@ -114,6 +116,7 @@ import { type EditorCallbacks } from '../EditorFunctions';
 import { renderResourcesEditorContainer } from './EditorContainers/ResourcesEditorContainer';
 import { renderGlobalConfigEditorContainer } from './EditorContainers/GlobalConfigEditorContainer';
 import { renderGlobalEventsSearchEditorContainer } from './EditorContainers/GlobalEventsSearchEditorContainer';
+import { getProjectRootPath } from '../ResourcesEditor/ProjectFilesPanel';
 import {
   type RenderEditorContainerPropsWithRef,
   type SceneEventsOutsideEditorChanges,
@@ -317,6 +320,12 @@ const ipcRendererForUpdates = ipcRenderer;
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
 const gd: libGDevelop = global.gd;
+
+type ResourceToolLauncherKind =
+  | 'image-extender'
+  | 'ai-game-workbench'
+  | 'gorest-spritesheet'
+  | 'advanced-tween-editor';
 
 const editorKindToRenderer: {
   [key: EditorKind]: (props: RenderEditorContainerPropsWithRef) => React.Node,
@@ -4107,6 +4116,82 @@ const MainFrame = (props: Props): React.MixedElement => {
     [getEditorOpeningOptions, setState]
   );
 
+  const openResourceToolFromSwitcher = React.useCallback(
+    (tool: ResourceToolLauncherKind) => {
+      const { i18n } = props;
+
+      const openTool = async () => {
+        if (!ipcRenderer) {
+          showErrorBox({
+            message: i18n._(
+              t`This resource tool is only available in the desktop app.`
+            ),
+            rawError: new Error('Electron IPC renderer is not available.'),
+            errorId: 'resource-tool-desktop-only',
+            doNotReport: true,
+          });
+          return;
+        }
+
+        try {
+          if (tool === 'image-extender') {
+            await ipcRenderer.invoke('image-extender-load');
+            return;
+          }
+
+          if (tool === 'ai-game-workbench') {
+            await ipcRenderer.invoke('ai-game-workbench-load');
+            return;
+          }
+
+          if (tool === 'gorest-spritesheet') {
+            await ipcRenderer.invoke('gorest-spritesheet-load');
+            return;
+          }
+
+          const project = currentProjectRef.current;
+          if (!project) {
+            showErrorBox({
+              message: i18n._(t`Open a project before using this tool.`),
+              rawError: new Error('No project is open.'),
+              errorId: 'resource-tool-no-project',
+              doNotReport: true,
+            });
+            return;
+          }
+
+          const projectRootPath = getProjectRootPath(project);
+          if (!projectRootPath) {
+            showErrorBox({
+              message: i18n._(
+                t`Save the project before opening AdvancedTween Editor.`
+              ),
+              rawError: new Error('The project has no local root path.'),
+              errorId: 'advanced-tween-editor-project-not-saved',
+              doNotReport: true,
+            });
+            return;
+          }
+
+          await ipcRenderer.invoke('advanced-tween-editor-load', {
+            projectRootPath,
+            gameResolutionWidth: project.getGameResolutionWidth(),
+            gameResolutionHeight: project.getGameResolutionHeight(),
+          });
+        } catch (error) {
+          showErrorBox({
+            message: i18n._(t`Unable to open this resource tool.`),
+            rawError: error,
+            errorId: `resource-tool-${tool}-open-error`,
+          });
+        }
+      };
+
+      openTool();
+    },
+    [currentProjectRef, props]
+  );
+
   const openStickyNotesManager = React.useCallback(
     () => {
       setStickyNotesManagerShown(true);
@@ -6572,6 +6657,46 @@ const MainFrame = (props: Props): React.MixedElement => {
       <ExternalEventsIcon />,
       'new external add external events external layout linked scene',
       () => createProjectItemFromSwitcher('external')
+    );
+    addRecentEditorSwitcherActionItem(
+      'action:open-image-extender',
+      i18n._(t`Open Image Extender`),
+      i18n._(t`Resource tool`),
+      <SparkleIcon />,
+      'open image extender resource tool ai image expand',
+      () => {
+        openResourceToolFromSwitcher('image-extender');
+      }
+    );
+    addRecentEditorSwitcherActionItem(
+      'action:open-ai-game-workbench',
+      i18n._(t`Open AI Game Workbench`),
+      i18n._(t`Resource tool`),
+      <SparkleIcon />,
+      'open ai game workbench resource tool image character extension',
+      () => {
+        openResourceToolFromSwitcher('ai-game-workbench');
+      }
+    );
+    addRecentEditorSwitcherActionItem(
+      'action:open-gorest-spritesheet',
+      i18n._(t`Open Gorest Spritesheet`),
+      i18n._(t`Resource tool`),
+      <SparkleIcon />,
+      'open gorest spritesheet resource tool image animation spritesheet',
+      () => {
+        openResourceToolFromSwitcher('gorest-spritesheet');
+      }
+    );
+    addRecentEditorSwitcherActionItem(
+      'action:open-advanced-tween-editor',
+      i18n._(t`Open AdvancedTween Editor`),
+      i18n._(t`Resource tool`),
+      <PlayIcon />,
+      'open advanced tween editor resource tool animation tween',
+      () => {
+        openResourceToolFromSwitcher('advanced-tween-editor');
+      }
     );
 
     addRecentEditorSwitcherSideMenuItem(

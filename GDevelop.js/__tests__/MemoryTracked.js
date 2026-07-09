@@ -262,6 +262,65 @@ describe('Use-after-free detection (MemoryTracked)', function () {
     });
   });
 
+  describe('Tracked class (BaseEvent and its subclasses)', function () {
+    it('throws UseAfterFreeError when using an event removed from its list', function () {
+      const project = gd.ProjectHelper.createNewGDJSProject();
+      const events = new gd.EventsList();
+      const event = events.insertNewEvent(
+        project,
+        'BuiltinCommonInstructions::Standard',
+        0
+      );
+      expect(event.canHaveSubEvents()).toBe(true);
+
+      events.removeEventAt(0);
+
+      expect(() => event.canHaveSubEvents()).toThrow(gd.UseAfterFreeError);
+      expect(() => event.canHaveVariables()).toThrow(gd.UseAfterFreeError);
+      expect(() => event.isDisabled()).toThrow(gd.UseAfterFreeError);
+
+      events.delete();
+      project.delete();
+    });
+
+    it('throws UseAfterFreeError when using an event of a cleared list, through a subclass wrapper', function () {
+      const project = gd.ProjectHelper.createNewGDJSProject();
+      const events = new gd.EventsList();
+      const standardEvent = gd.asStandardEvent(
+        events.insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 0)
+      );
+      standardEvent.getConditions();
+
+      events.clear();
+
+      expect(() => standardEvent.getConditions()).toThrow(gd.UseAfterFreeError);
+
+      events.delete();
+      project.delete();
+    });
+
+    it('tracks alive and dead counts for events', function () {
+      const project = gd.ProjectHelper.createNewGDJSProject();
+      const events = new gd.EventsList();
+      const aliveBefore =
+        gd.MemoryTrackedRegistry.getAliveCountForClass('BaseEvent');
+
+      events.insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 0);
+      events.insertNewEvent(project, 'BuiltinCommonInstructions::Comment', 1);
+      expect(
+        gd.MemoryTrackedRegistry.getAliveCountForClass('BaseEvent')
+      ).toBe(aliveBefore + 2);
+
+      events.clear();
+      expect(
+        gd.MemoryTrackedRegistry.getAliveCountForClass('BaseEvent')
+      ).toBe(aliveBefore);
+
+      events.delete();
+      project.delete();
+    });
+  });
+
   describe('Multiple instances with mixed lifetimes', function () {
     it('independently tracks alive and dead layouts', function () {
       const project = gd.ProjectHelper.createNewGDJSProject();

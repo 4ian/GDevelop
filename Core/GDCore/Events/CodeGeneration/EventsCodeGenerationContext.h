@@ -290,7 +290,7 @@ class GD_CORE_API EventsCodeGenerationContext {
 
   /**
    * \brief Enable replacing global config placeholders in strings generated
-   * for actions.
+   * for event instructions.
    */
   void SetGlobalConfigPlaceholderReplacementEnabled(bool enabled) {
     globalConfigPlaceholderReplacementEnabled = enabled;
@@ -379,8 +379,9 @@ class GD_CORE_API EventsCodeGenerationContext {
       false;  ///< True while condition object-list parameters are being
               ///< generated, so conditions can narrow multiple candidates.
   bool globalConfigPlaceholderReplacementEnabled =
-      false;  ///< True while strings generated for actions should have global
-              ///< config placeholders replaced at code generation time.
+      false;  ///< True while strings generated for event instructions should
+              ///< have global config placeholders replaced at code generation
+              ///< time.
 };
 
 }  // namespace gd

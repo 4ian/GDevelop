@@ -366,6 +366,54 @@ describe('libGD.js - GDJS related tests', function () {
       layoutCodeGenerator.delete();
       project.delete();
     });
+    it('reports missing global config placeholders in condition strings', function () {
+      const project = gd.ProjectHelper.createNewGDJSProject();
+      project.setGlobalConfigJson(JSON.stringify({ labels: {} }));
+      const layout = project.insertNewLayout('Scene', 0);
+      layout.getVariables().insertNew('Result', 0).setString('');
+      const evt = layout
+        .getEvents()
+        .insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 0);
+
+      const condition = new gd.Instruction();
+      condition.setType('StringVariable');
+      condition.setParametersCount(3);
+      condition.setParameter(0, 'Result');
+      condition.setParameter(1, '=');
+      condition.setParameter(2, '"{{labels.missing}}"');
+      gd.asStandardEvent(evt).getConditions().insert(condition, 0);
+      condition.delete();
+
+      const action = new gd.Instruction();
+      action.setType('BuiltinCommonInstructions::SetStringVariable');
+      action.setParametersCount(3);
+      action.setParameter(0, 'Result');
+      action.setParameter(1, '=');
+      action.setParameter(2, '"done"');
+      gd.asStandardEvent(evt).getActions().insert(action, 0);
+      action.delete();
+
+      const layoutCodeGenerator = new gd.LayoutCodeGenerator(project);
+      const diagnosticReport = new gd.DiagnosticReport();
+      layoutCodeGenerator.generateLayoutCompleteCode(
+        layout,
+        new gd.SetString(),
+        diagnosticReport,
+        true
+      );
+
+      expect(diagnosticReport.count()).toBe(1);
+      expect(diagnosticReport.get(0).getType()).toBe(
+        gd.ProjectDiagnostic.UndeclaredVariable
+      );
+      expect(diagnosticReport.get(0).getActualValue()).toBe(
+        '{{labels.missing}}'
+      );
+
+      diagnosticReport.delete();
+      layoutCodeGenerator.delete();
+      project.delete();
+    });
     it('does not generate code for improperly set up actions/conditions', function () {
       const project = gd.ProjectHelper.createNewGDJSProject();
       const layout = project.insertNewLayout('Scene', 0);

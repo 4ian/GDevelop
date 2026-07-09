@@ -187,7 +187,7 @@ describe('libGD.js - GDJS Scene Code Generation integration tests', function () 
     project.delete();
   });
 
-  it('replaces global config placeholders in string action parameters for scene and external events', function () {
+  it('replaces global config placeholders in string action and condition parameters for scene and external events', function () {
     const project = new gd.ProjectHelper.createNewGDJSProject();
     project.setGlobalConfigJson(
       JSON.stringify({
@@ -197,16 +197,27 @@ describe('libGD.js - GDJS Scene Code Generation integration tests', function () 
         },
         signals: {
           scene: 'SceneSignal',
+          external: 'ExternalSignal',
         },
       })
     );
     const layout = project.insertNewLayout('Scene', 0);
     layout.getVariables().insertNew('SceneText', 0).setString('');
     layout.getVariables().insertNew('ExternalText', 1).setString('');
+    layout.getVariables().insertNew('SceneGate', 2).setString('SceneSignal');
+    layout
+      .getVariables()
+      .insertNew('ExternalGate', 3)
+      .setString('ExternalSignal');
     const serializedLayoutEvents = gd.Serializer.fromJSObject([
       {
         type: 'BuiltinCommonInstructions::Standard',
-        conditions: [],
+        conditions: [
+          {
+            type: { value: 'StringVariable' },
+            parameters: ['SceneGate', '=', '"{{signals.scene}}"'],
+          },
+        ],
         actions: [
           {
             type: { value: 'SetStringVariable' },
@@ -237,7 +248,12 @@ describe('libGD.js - GDJS Scene Code Generation integration tests', function () 
     const serializedExternalEventsEvents = gd.Serializer.fromJSObject([
       {
         type: 'BuiltinCommonInstructions::Standard',
-        conditions: [],
+        conditions: [
+          {
+            type: { value: 'StringVariable' },
+            parameters: ['ExternalGate', '=', '"{{signals.external}}"'],
+          },
+        ],
         actions: [
           {
             type: { value: 'SetStringVariable' },
@@ -296,12 +312,15 @@ describe('libGD.js - GDJS Scene Code Generation integration tests', function () 
     project.delete();
   });
 
-  it('replaces global config placeholders in extension event actions', function () {
+  it('replaces global config placeholders in extension event actions and conditions', function () {
     const project = new gd.ProjectHelper.createNewGDJSProject();
     project.setGlobalConfigJson(
       JSON.stringify({
         labels: {
           extension: 'Extension label',
+        },
+        signals: {
+          extension: 'ExtensionSignal',
         },
       })
     );
@@ -309,11 +328,20 @@ describe('libGD.js - GDJS Scene Code Generation integration tests', function () 
     const extension = project.insertNewEventsFunctionsExtension('Extension', 0);
     extension.getSceneVariables().insertNew('Result', 0).setString('');
     const eventsFunction = new gd.EventsFunction();
+    eventsFunction
+      .getParameters()
+      .insertNewParameter('SignalName', 0)
+      .setType('string');
 
     const serializedEvents = gd.Serializer.fromJSObject([
       {
         type: 'BuiltinCommonInstructions::Standard',
-        conditions: [],
+        conditions: [
+          {
+            type: { value: 'StringVariable' },
+            parameters: ['SignalName', '=', '"{{signals.extension}}"'],
+          },
+        ],
         actions: [
           {
             type: { value: 'SetStringVariable' },
@@ -331,17 +359,18 @@ describe('libGD.js - GDJS Scene Code Generation integration tests', function () 
     const serializedSceneElement = new gd.SerializerElement();
     layout.serializeTo(serializedSceneElement);
 
-    const runCompiledEvents = generateCompiledEventsForEventsFunctionWithContext(
-      gd,
-      project,
-      extension,
-      eventsFunction
-    );
+    const runCompiledEvents =
+      generateCompiledEventsForEventsFunctionWithContext(
+        gd,
+        project,
+        extension,
+        eventsFunction
+      );
     const { gdjs, runtimeScene } = makeMinimalGDJSMock({
       gameData: JSON.parse(gd.Serializer.toJSON(serializedProjectElement)),
       sceneData: JSON.parse(gd.Serializer.toJSON(serializedSceneElement)),
     });
-    runCompiledEvents(gdjs, runtimeScene, []);
+    runCompiledEvents(gdjs, runtimeScene, ['ExtensionSignal']);
 
     expect(
       runtimeScene

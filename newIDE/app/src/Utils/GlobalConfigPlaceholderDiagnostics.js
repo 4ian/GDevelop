@@ -78,28 +78,40 @@ const parseGlobalConfigPath = (
   return segments;
 };
 
-const hasGlobalConfigPath = (globalConfig: any, path: string): boolean => {
-  if (!path) return false;
+const getGlobalConfigValueAtPath = (
+  globalConfig: any,
+  path: string
+): {| found: boolean, value: any |} => {
+  if (!path) return { found: false, value: undefined };
 
   let value = globalConfig;
   for (const segment of parseGlobalConfigPath(path)) {
-    if (value === null || value === undefined) return false;
+    if (value === null || value === undefined) {
+      return { found: false, value: undefined };
+    }
 
     if (typeof segment === 'number') {
-      if (!Array.isArray(value) || segment >= value.length) return false;
+      if (!Array.isArray(value) || segment >= value.length) {
+        return { found: false, value: undefined };
+      }
       value = value[segment];
     } else {
       if (
         typeof value !== 'object' ||
         !Object.prototype.hasOwnProperty.call(value, segment)
       ) {
-        return false;
+        return { found: false, value: undefined };
       }
       value = value[segment];
     }
   }
 
-  return true;
+  return { found: true, value };
+};
+
+const hasGlobalConfigPath = (globalConfig: any, path: string): boolean => {
+  if (!path) return false;
+  return getGlobalConfigValueAtPath(globalConfig, path).found;
 };
 
 export const isGlobalConfigPlaceholderDiagnostic = (
@@ -169,4 +181,35 @@ export const getMissingGlobalConfigPlaceholderPath = (
   }
 
   return null;
+};
+
+export const findGlobalConfigPlaceholderInSerializedData = (
+  serializedData: any
+): ?string => {
+  const findInValue = value => {
+    if (typeof value === 'string') {
+      globalConfigPlaceholderCaptureRegex.lastIndex = 0;
+      const match = globalConfigPlaceholderCaptureRegex.exec(value);
+      return match ? match[1].trim() : null;
+    }
+
+    if (Array.isArray(value)) {
+      for (const child of value) {
+        const placeholderPath = findInValue(child);
+        if (placeholderPath !== null) return placeholderPath;
+      }
+      return null;
+    }
+
+    if (value && typeof value === 'object') {
+      for (const key of Object.keys(value)) {
+        const placeholderPath = findInValue(value[key]);
+        if (placeholderPath !== null) return placeholderPath;
+      }
+    }
+
+    return null;
+  };
+
+  return findInValue(serializedData);
 };

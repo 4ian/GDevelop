@@ -341,6 +341,9 @@ gd::String EventsCodeGenerator::GenerateConditionCode(
   maxConditionsListsSize =
       std::max(maxConditionsListsSize, condition.GetSubInstructions().size());
 
+  GlobalConfigPlaceholderReplacementScope
+      globalConfigPlaceholderReplacementScope(context, HasProject());
+
   if (instrInfos.HasCustomCodeGenerator()) {
     context.EnterCustomCondition();
     conditionCode += instrInfos.codeExtraInformation.customCodeGenerator(

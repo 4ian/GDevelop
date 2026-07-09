@@ -671,10 +671,25 @@ const VariablesList: React.ComponentType<{
   ...Props,
   +ref?: React.RefSetter<VariablesListInterface>,
 }> = React.forwardRef<Props, VariablesListInterface>((props, ref) => {
+  // The variables containers can be destroyed on the C++ side while this
+  // component is still mounted (e.g. when the object owning them is deleted
+  // or re-created by a change made outside the editor). Guard them once here:
+  // the nullable typing forces every usage to handle the dead case - in which
+  // case the component renders nothing (the parent editor is responsible for
+  // re-rendering or unmounting it).
+  const aliveVariablesContainer = exceptionallyGuardAgainstDeadObject(
+    props.variablesContainer
+  );
+  const aliveInheritedVariablesContainer = props.inheritedVariablesContainer
+    ? exceptionallyGuardAgainstDeadObject(props.inheritedVariablesContainer)
+    : null;
+
   const historyRef = useRefWithInit(() =>
-    getHistoryInitialState(props.variablesContainer, {
-      historyMaxSize: 50,
-    })
+    aliveVariablesContainer
+      ? getHistoryInitialState(aliveVariablesContainer, {
+          historyMaxSize: 50,
+        })
+      : null
   );
 
   const {
@@ -732,12 +747,12 @@ const VariablesList: React.ComponentType<{
   );
   const [selectedNodes, doSetSelectedNodes] = React.useState<Array<string>>(
     () => {
-      if (!props.initiallySelectedVariableName) {
+      if (!props.initiallySelectedVariableName || !aliveVariablesContainer) {
         return [];
       }
       let variableContext = getVariableContextFromNodeId(
         getNodeIdFromVariableName(props.initiallySelectedVariableName),
-        props.variablesContainer
+        aliveVariablesContainer
       );
       // When a child-variable is not declared, its direct parent is used.
       if (!variableContext.variable) {
@@ -796,9 +811,10 @@ const VariablesList: React.ComponentType<{
   );
 
   const shouldHideExpandIcons =
-    !hasVariablesContainerSubChildren(props.variablesContainer) &&
-    (props.inheritedVariablesContainer
-      ? !hasVariablesContainerSubChildren(props.inheritedVariablesContainer)
+    !!aliveVariablesContainer &&
+    !hasVariablesContainerSubChildren(aliveVariablesContainer) &&
+    (aliveInheritedVariablesContainer
+      ? !hasVariablesContainerSubChildren(aliveInheritedVariablesContainer)
       : true);
 
   const rowRightSideStyle = React.useMemo(
@@ -815,20 +831,21 @@ const VariablesList: React.ComponentType<{
     [containerWidth, props.size]
   );
 
-  const undefinedVariableNames = allVariablesNames
-    ? allVariablesNames.filter(variableName => {
-        return (
-          !props.variablesContainer.has(variableName) &&
-          (!props.inheritedVariablesContainer ||
-            !props.inheritedVariablesContainer.has(variableName))
-        );
-      })
-    : [];
+  const undefinedVariableNames =
+    allVariablesNames && aliveVariablesContainer
+      ? allVariablesNames.filter(variableName => {
+          return (
+            !aliveVariablesContainer.has(variableName) &&
+            (!aliveInheritedVariablesContainer ||
+              !aliveInheritedVariablesContainer.has(variableName))
+          );
+        })
+      : [];
 
   const _onChange = React.useCallback(
     () => {
       if (historyHandler) historyHandler.saveToHistory();
-      else
+      else if (historyRef.current)
         historyRef.current = saveToHistory(
           historyRef.current,
           variablesContainer
@@ -841,7 +858,7 @@ const VariablesList: React.ComponentType<{
   const _undo = React.useCallback(
     () => {
       if (historyHandler) historyHandler.undo();
-      else
+      else if (historyRef.current)
         historyRef.current = undo(historyRef.current, props.variablesContainer);
       setSelectedNodes([]);
     },
@@ -851,7 +868,7 @@ const VariablesList: React.ComponentType<{
   const _redo = React.useCallback(
     () => {
       if (historyHandler) historyHandler.redo();
-      else
+      else if (historyRef.current)
         historyRef.current = redo(historyRef.current, props.variablesContainer);
       setSelectedNodes([]);
     },
@@ -861,12 +878,12 @@ const VariablesList: React.ComponentType<{
   const _canUndo = (): boolean =>
     props.historyHandler
       ? props.historyHandler.canUndo()
-      : canUndo(historyRef.current);
+      : !!historyRef.current && canUndo(historyRef.current);
 
   const _canRedo = (): boolean =>
     props.historyHandler
       ? props.historyHandler.canRedo()
-      : canRedo(historyRef.current);
+      : !!historyRef.current && canRedo(historyRef.current);
 
   const copySelection = React.useCallback(
     () => {
@@ -1659,8 +1676,8 @@ const VariablesList: React.ComponentType<{
     const overwritesInheritedVariable =
       isTopLevel &&
       !isInherited &&
-      props.inheritedVariablesContainer &&
-      props.inheritedVariablesContainer.has(name);
+      !!aliveInheritedVariablesContainer &&
+      aliveInheritedVariablesContainer.has(name);
 
     const typeErrorMessage =
       parentType === gd.Variable.Array &&
@@ -2036,17 +2053,18 @@ const VariablesList: React.ComponentType<{
   );
 
   const renderTree = (i18n: I18nType, isInherited: boolean = false) => {
-    const variablesContainer =
-      isInherited && props.inheritedVariablesContainer
-        ? props.inheritedVariablesContainer
-        : props.variablesContainer;
     // $FlowFixMe[missing-empty-array-annot]
     const allRows = [];
+    const variablesContainer =
+      isInherited && aliveInheritedVariablesContainer
+        ? aliveInheritedVariablesContainer
+        : aliveVariablesContainer;
+    if (!variablesContainer) return allRows;
     mapFor(0, variablesContainer.count(), index => {
       const variable = variablesContainer.getAt(index);
       const name = variablesContainer.getNameAt(index);
       if (isInherited) {
-        if (props.variablesContainer.has(name)) {
+        if (aliveVariablesContainer && aliveVariablesContainer.has(name)) {
           return null;
         }
       }
@@ -2070,6 +2088,13 @@ const VariablesList: React.ComponentType<{
   React.useImperativeHandle(ref, () => ({
     addVariable,
   }));
+
+  if (
+    !aliveVariablesContainer ||
+    (props.inheritedVariablesContainer && !aliveInheritedVariablesContainer)
+  ) {
+    return null;
+  }
 
   const toolbar = (
     <VariablesListToolbar
@@ -2127,9 +2152,9 @@ const VariablesList: React.ComponentType<{
                     ) : (
                       toolbar
                     )}
-                    {props.variablesContainer.count() === 0 &&
-                    (!props.inheritedVariablesContainer ||
-                      props.inheritedVariablesContainer.count() === 0) ? (
+                    {aliveVariablesContainer.count() === 0 &&
+                    (!aliveInheritedVariablesContainer ||
+                      aliveInheritedVariablesContainer.count() === 0) ? (
                       <Column noMargin expand justifyContent="center">
                         {props.emptyPlaceholderTitle &&
                         props.emptyPlaceholderDescription ? (
@@ -2173,7 +2198,7 @@ const VariablesList: React.ComponentType<{
                       </Column>
                     ) : (
                       <ScrollView autoHideScrollbar>
-                        {props.inheritedVariablesContainer
+                        {aliveInheritedVariablesContainer
                           ? renderTree(i18n, true)
                           : null}
                         {renderTree(i18n)}

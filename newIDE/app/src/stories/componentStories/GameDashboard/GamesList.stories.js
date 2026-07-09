@@ -68,6 +68,7 @@ export const NoGamesOrProjects = (): React.Node => {
           onSaveProject={action('onSaveProject')}
           onUnregisterGame={action('onUnregisterGame')}
           onDeleteCloudProject={action('onDeleteCloudProject')}
+          onRestoreCloudProject={action('onRestoreCloudProject')}
           onRegisterProject={action('onRegisterProject')}
           currentPage={currentPage}
           setCurrentPage={setCurrentPage}
@@ -127,6 +128,7 @@ export const WithOnlyGames = (): React.Node => {
           onSaveProject={action('onSaveProject')}
           onUnregisterGame={action('onUnregisterGame')}
           onDeleteCloudProject={action('onDeleteCloudProject')}
+          onRestoreCloudProject={action('onRestoreCloudProject')}
           onRegisterProject={action('onRegisterProject')}
           currentPage={currentPage}
           setCurrentPage={setCurrentPage}
@@ -179,6 +181,7 @@ export const WithOnlyProjects = (): React.Node => {
           onSaveProject={action('onSaveProject')}
           onUnregisterGame={action('onUnregisterGame')}
           onDeleteCloudProject={action('onDeleteCloudProject')}
+          onRestoreCloudProject={action('onRestoreCloudProject')}
           onRegisterProject={action('onRegisterProject')}
           currentPage={currentPage}
           setCurrentPage={setCurrentPage}
@@ -240,6 +243,7 @@ export const WithGamesAndProjects = (): React.Node => {
           onSaveProject={action('onSaveProject')}
           onUnregisterGame={action('onUnregisterGame')}
           onDeleteCloudProject={action('onDeleteCloudProject')}
+          onRestoreCloudProject={action('onRestoreCloudProject')}
           onRegisterProject={action('onRegisterProject')}
           currentPage={currentPage}
           setCurrentPage={setCurrentPage}

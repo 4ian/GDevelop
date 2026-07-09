@@ -7,7 +7,6 @@
 
 #include "GDCore/Events/Event.h"
 #include "GDCore/Events/Expression.h"
-#include "GDCore/Project/MemoryTrackedRegistry.h"
 
 namespace gd {
 class Instruction;
@@ -76,8 +75,6 @@ private:
   long scrollTop = 0;
   long cursorColumn = 0;
   long cursorLine = 0;
-
-  gd::MemoryTracked _memoryTracked{this, "JsCodeEvent"};
 };
 
 }  // namespace gdjs

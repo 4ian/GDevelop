@@ -562,6 +562,8 @@ export const limitsForNoSubscriptionUser: Limits = {
       maximumCount: 3,
       canMaximumCountBeIncreased: true,
       maximumGuestCollaboratorsPerProject: 0,
+      projectRestorationTimeWindowInSeconds: 3600,
+      deletedProjectRetentionInDays: 30,
     },
     leaderboards: {
       maximumCountPerGame: 3,
@@ -625,6 +627,8 @@ export const limitsForSilverUser: Limits = {
       maximumCount: 50,
       canMaximumCountBeIncreased: true,
       maximumGuestCollaboratorsPerProject: 0,
+      projectRestorationTimeWindowInSeconds: 30 * 24 * 3600,
+      deletedProjectRetentionInDays: 30,
     },
     leaderboards: {
       maximumCountPerGame: -1,
@@ -687,6 +691,8 @@ export const limitsForGoldUser: Limits = {
       maximumCount: 100,
       canMaximumCountBeIncreased: true,
       maximumGuestCollaboratorsPerProject: 0,
+      projectRestorationTimeWindowInSeconds: 30 * 24 * 3600,
+      deletedProjectRetentionInDays: 30,
     },
     leaderboards: {
       maximumCountPerGame: -1,
@@ -749,6 +755,8 @@ export const limitsForTeacherUser: Limits = {
       maximumCount: 100,
       canMaximumCountBeIncreased: false,
       maximumGuestCollaboratorsPerProject: 0,
+      projectRestorationTimeWindowInSeconds: 30 * 24 * 3600,
+      deletedProjectRetentionInDays: 30,
     },
     leaderboards: {
       maximumCountPerGame: -1,
@@ -823,6 +831,8 @@ export const limitsForStudentUser: Limits = {
       maximumCount: 100,
       canMaximumCountBeIncreased: false,
       maximumGuestCollaboratorsPerProject: 0,
+      projectRestorationTimeWindowInSeconds: 30 * 24 * 3600,
+      deletedProjectRetentionInDays: 30,
     },
     leaderboards: {
       maximumCountPerGame: -1,
@@ -894,6 +904,8 @@ export const limitsForStartupUser: Limits = {
       maximumCount: 500,
       canMaximumCountBeIncreased: false,
       maximumGuestCollaboratorsPerProject: 1,
+      projectRestorationTimeWindowInSeconds: 30 * 24 * 3600,
+      deletedProjectRetentionInDays: 30,
     },
     leaderboards: {
       maximumCountPerGame: -1,
@@ -956,6 +968,8 @@ export const limitsReached: Limits = {
       maximumCount: 10,
       canMaximumCountBeIncreased: true,
       maximumGuestCollaboratorsPerProject: 0,
+      projectRestorationTimeWindowInSeconds: 3600,
+      deletedProjectRetentionInDays: 30,
     },
     leaderboards: {
       maximumCountPerGame: 3,
@@ -1013,6 +1027,8 @@ export const limitsForNoSubscriptionUserWithCredits: Limits = {
       maximumCount: 10,
       canMaximumCountBeIncreased: true,
       maximumGuestCollaboratorsPerProject: 0,
+      projectRestorationTimeWindowInSeconds: 3600,
+      deletedProjectRetentionInDays: 30,
     },
     leaderboards: {
       maximumCountPerGame: 3,

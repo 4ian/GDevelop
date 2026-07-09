@@ -4925,4 +4925,363 @@ describe('editorFunctions', () => {
       ).toBe(false);
     });
   });
+
+  describe('inspect_project_properties_resources', () => {
+    let project: gdProject;
+
+    beforeEach(() => {
+      // $FlowFixMe[invalid-constructor]
+      project = new gd.ProjectHelper.createNewGDJSProject();
+      project.insertNewLayout('TestScene', 0);
+      project.insertNewLayout('MenuScene', 1);
+
+      const imageResource = new gd.ImageResource();
+      imageResource.setName('hero.png');
+      imageResource.setFile('assets/hero.png');
+      const audioResource = new gd.AudioResource();
+      audioResource.setName('jump.aac');
+      audioResource.setFile('assets/jump.aac');
+      project.getResourcesManager().addResource(imageResource);
+      project.getResourcesManager().addResource(audioResource);
+      imageResource.delete();
+      audioResource.delete();
+    });
+
+    afterEach(() => {
+      project.delete();
+    });
+
+    it('returns the project properties, scene names and a resources summary', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.inspect_project_properties_resources.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {},
+        }
+      );
+
+      expect(result.success).toBe(true);
+      const properties = result.properties || {};
+      expect(properties.name).toBe(project.getName());
+      expect(properties.windowWidth).toBe(project.getGameResolutionWidth());
+      expect(properties.windowHeight).toBe(project.getGameResolutionHeight());
+      expect(properties.scaleMode).toBe(project.getScaleMode());
+      expect(properties.firstLayout).toBe(project.getFirstLayout());
+      expect(result.sceneNames).toEqual(['TestScene', 'MenuScene']);
+      expect(result.resources).toBe(undefined);
+      const resourcesSummary = result.resourcesSummary || {};
+      expect(resourcesSummary.total).toBe(2);
+      expect(resourcesSummary.byKind).toEqual({ image: 1, audio: 1 });
+      expect(resourcesSummary.hint).toContain('filter_by_resource_name');
+      expect(resourcesSummary.hint).toContain('list_all_resources');
+    });
+
+    it('lists all the resources when list_all_resources is true', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.inspect_project_properties_resources.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: { list_all_resources: true },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.resourcesSummary).toBe(undefined);
+      expect(result.resources).toEqual([
+        {
+          name: 'hero.png',
+          kind: 'image',
+          file: 'assets/hero.png',
+          metadata: undefined,
+          originName: undefined,
+          originIdentifier: undefined,
+        },
+        {
+          name: 'jump.aac',
+          kind: 'audio',
+          file: 'assets/jump.aac',
+          metadata: undefined,
+          originName: undefined,
+          originIdentifier: undefined,
+        },
+      ]);
+    });
+
+    it('searches resources by name (case-insensitive)', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.inspect_project_properties_resources.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: { filter_by_resource_name: 'JUMP' },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      const resources = result.resources || [];
+      expect(resources.map(resource => resource.name)).toEqual(['jump.aac']);
+    });
+
+    it('warns when no resource name matches the search', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.inspect_project_properties_resources.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: { filter_by_resource_name: 'ghost' },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.resources).toEqual([]);
+      expect(result.warnings).toContain('No resource name contains "ghost"');
+      expect(result.warnings).toContain('2 resources in total');
+    });
+  });
+
+  describe('change_project_properties_resources', () => {
+    let project: gdProject;
+
+    beforeEach(() => {
+      // $FlowFixMe[invalid-constructor]
+      project = new gd.ProjectHelper.createNewGDJSProject();
+      project.insertNewLayout('TestScene', 0);
+      project.insertNewLayout('MenuScene', 1);
+    });
+
+    afterEach(() => {
+      project.delete();
+    });
+
+    it('changes the game name, resolution and first scene', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_project_properties_resources.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            changed_properties: [
+              { property_name: 'name', new_value: 'My Great Game' },
+              { property_name: 'windowWidth', new_value: '1920' },
+              { property_name: 'windowHeight', new_value: '1080' },
+              { property_name: 'firstLayout', new_value: 'MenuScene' },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(project.getName()).toBe('My Great Game');
+      expect(project.getGameResolutionWidth()).toBe(1920);
+      expect(project.getGameResolutionHeight()).toBe(1080);
+      expect(project.getFirstLayout()).toBe('MenuScene');
+    });
+
+    it('accepts the game property names used by the scene tool', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_project_properties_resources.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            changed_properties: [
+              { property_name: 'gameName', new_value: 'Aliased Name' },
+              { property_name: 'gameResolutionWidth', new_value: '640' },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(project.getName()).toBe('Aliased Name');
+      expect(project.getGameResolutionWidth()).toBe(640);
+    });
+
+    it('validates properties with a fixed set of values', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_project_properties_resources.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            changed_properties: [
+              { property_name: 'scaleMode', new_value: 'nearest' },
+              { property_name: 'orientation', new_value: 'sideways' },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(project.getScaleMode()).toBe('nearest');
+      expect(result.message).toContain('Invalid orientation: "sideways"');
+      expect(result.message).toContain('"landscape"');
+    });
+
+    it('refuses a first scene that does not exist and lists the scenes', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_project_properties_resources.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            changed_properties: [
+              { property_name: 'firstLayout', new_value: 'DoesNotExist' },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(false);
+      expect(result.message).toContain('Scene not found: "DoesNotExist"');
+      expect(result.message).toContain('"TestScene"');
+      expect(result.message).toContain('"MenuScene"');
+      expect(project.getFirstLayout()).toBe('');
+    });
+
+    it('warns on an unknown property and lists the supported ones', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_project_properties_resources.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            changed_properties: [
+              { property_name: 'gravity', new_value: '9.8' },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(false);
+      expect(result.message).toContain('Unknown project property: "gravity"');
+      expect(result.message).toContain('firstLayout');
+    });
+
+    it('fails when no change is provided', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_project_properties_resources.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {},
+        }
+      );
+
+      expect(result.success).toBe(false);
+    });
+
+    const addProjectResources = () => {
+      const imageResource = new gd.ImageResource();
+      imageResource.setName('hero.png');
+      imageResource.setFile('assets/hero.png');
+      const audioResource = new gd.AudioResource();
+      audioResource.setName('jump.aac');
+      audioResource.setFile('assets/jump.aac');
+      project.getResourcesManager().addResource(imageResource);
+      project.getResourcesManager().addResource(audioResource);
+      imageResource.delete();
+      audioResource.delete();
+    };
+
+    const addObjectUsingImageResource = (imageName: string) => {
+      const object = project
+        .getLayout('TestScene')
+        .getObjects()
+        .insertNewObject(project, 'Sprite', 'Hero', 0);
+      const spriteConfiguration = gd.asSpriteConfiguration(
+        object.getConfiguration()
+      );
+      const animation = new gd.Animation();
+      animation.setDirectionsCount(1);
+      const sprite = new gd.Sprite();
+      sprite.setImageName(imageName);
+      animation.getDirection(0).addSprite(sprite);
+      spriteConfiguration.getAnimations().addAnimation(animation);
+      sprite.delete();
+      animation.delete();
+      return object;
+    };
+
+    it('renames a resource and updates the objects using it', async () => {
+      addProjectResources();
+      const object = addObjectUsingImageResource('hero.png');
+
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_project_properties_resources.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            changed_resources: [
+              {
+                resource_name: 'hero.png',
+                new_resource_name: 'hero-sprite.png',
+              },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(project.getResourcesManager().hasResource('hero.png')).toBe(false);
+      expect(project.getResourcesManager().hasResource('hero-sprite.png')).toBe(
+        true
+      );
+      // The file is unchanged, only the resource name is.
+      expect(
+        project
+          .getResourcesManager()
+          .getResource('hero-sprite.png')
+          .getFile()
+      ).toBe('assets/hero.png');
+      expect(
+        gd
+          .asSpriteConfiguration(object.getConfiguration())
+          .getAnimations()
+          .getAnimation(0)
+          .getDirection(0)
+          .getSprite(0)
+          .getImageName()
+      ).toBe('hero-sprite.png');
+    });
+
+    it('deletes a resource not used by any object', async () => {
+      addProjectResources();
+
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_project_properties_resources.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            changed_resources: [
+              { resource_name: 'jump.aac', delete_this_resource: true },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(project.getResourcesManager().hasResource('jump.aac')).toBe(false);
+    });
+
+    it('refuses to delete a resource still used by an object', async () => {
+      addProjectResources();
+      addObjectUsingImageResource('hero.png');
+
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_project_properties_resources.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            changed_resources: [
+              { resource_name: 'hero.png', delete_this_resource: true },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(false);
+      expect(result.message).toContain('NOT deleted');
+      expect(result.message).toContain('Hero');
+      // Must steer away from modifying the objects to force the deletion.
+      expect(result.message).toContain('Do NOT modify');
+      expect(result.message).toContain('report the problem');
+      expect(project.getResourcesManager().hasResource('hero.png')).toBe(true);
+    });
+
+    it('warns when the resource does not exist', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_project_properties_resources.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            changed_resources: [
+              { resource_name: 'ghost.png', delete_this_resource: true },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(false);
+      expect(result.message).toContain('Resource not found: "ghost.png"');
+    });
+  });
 });

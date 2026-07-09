@@ -787,6 +787,12 @@ export default class SceneEditor extends React.Component<Props, State> {
   };
 
   onObjectGroupsModifiedOutsideEditor = () => {
+    // /!\ Drop the group selection to avoid keeping any reference to a group
+    // that could have been deleted or re-created in memory.
+    if (this.state.selectedObjectGroup) {
+      this.setState({ selectedObjectGroup: null });
+    }
+
     // Force refresh of the object groups list.
     this.forceUpdateObjectGroupsList();
   };
@@ -2116,6 +2122,11 @@ export default class SceneEditor extends React.Component<Props, State> {
     groupWithContext: GroupWithContext,
     done: boolean => void
   ) => {
+    // Clear the group selection now, before actually deleting the group,
+    // to prevent any stale reference in a re-render after deletion (the
+    // group properties panel would call into a destroyed gd.ObjectGroup).
+    this.setState({ selectedObjectGroup: null });
+
     // done() actually does the deletion of the object group,
     // so ensure groupWithContext is not used after this call.
     done(true);

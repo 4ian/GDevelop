@@ -8,6 +8,7 @@ namespace gdjs {
    */
   export class WebsocketDebuggerClient extends gdjs.AbstractDebuggerClient {
     _ws: WebSocket | null;
+    private _pendingMessages: string[] = [];
 
     constructor(runtimeGame: RuntimeGame) {
       super(runtimeGame);
@@ -53,9 +54,11 @@ namespace gdjs {
         }
       }
       this._ws.onopen = function open() {
+        that._flushPendingMessages();
         logger.info('Debugger connection open');
       };
       this._ws.onclose = function close() {
+        that._pendingMessages.length = 0;
         logger.info('Debugger connection closed');
 
         if (that._runtimegame.isInGameEdition()) {
@@ -86,6 +89,15 @@ namespace gdjs {
     }
 
     private hasLoggedError: boolean = false;
+    private _flushPendingMessages() {
+      if (!this._ws || this._ws.readyState !== WebSocket.OPEN) return;
+
+      for (const pendingMessage of this._pendingMessages) {
+        this._ws.send(pendingMessage);
+      }
+      this._pendingMessages.length = 0;
+    }
+
     protected _sendMessage(message: string) {
       if (!this._ws) {
         // The error can be logged only once, since logger.warn will call this function again,
@@ -96,7 +108,14 @@ namespace gdjs {
         }
         return;
       }
-      if (this._ws.readyState === WebSocket.OPEN) this._ws.send(message);
+      if (this._ws.readyState === WebSocket.OPEN) {
+        this._ws.send(message);
+      } else if (this._ws.readyState === WebSocket.CONNECTING) {
+        this._pendingMessages.push(message);
+        if (this._pendingMessages.length > 100) {
+          this._pendingMessages.shift();
+        }
+      }
     }
   }
 

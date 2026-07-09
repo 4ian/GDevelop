@@ -320,6 +320,7 @@ def verify_inputs(
     electron_app_dir: Path,
     electron_exe: Path,
     dry_run: bool,
+    check_dev_ports: bool = True,
 ) -> None:
     step("Verify startup inputs")
     www_index = electron_app_dir / "app" / "www" / "index.html"
@@ -332,6 +333,9 @@ def verify_inputs(
         raise RuntimeError(f"Electron executable missing: {electron_exe}")
     if not www_index.exists():
         raise RuntimeError(f"Electron app index missing: {www_index}")
+
+    if not check_dev_ports:
+        return
 
     leftover: list[str] = []
     for port in DEV_PORTS:
@@ -388,7 +392,6 @@ def main() -> int:
     build = args.build
 
     try:
-        stop_existing_processes(repo_root, electron_exe, args.dry_run)
         ensure_electron_dependencies(repo_root, electron_app_dir, electron_exe, args.dry_run)
         ensure_react_app_dependencies(app_dir, args.dry_run)
         ensure_dock_icon(electron_app_dir, args.dry_run)
@@ -425,10 +428,26 @@ def main() -> int:
         if args.no_launch:
             step("Launch Electron")
             print("Skipping launch because --no-launch was set.", flush=True)
-            verify_inputs(repo_root, electron_app_dir, electron_exe, args.dry_run)
+            verify_inputs(
+                repo_root,
+                electron_app_dir,
+                electron_exe,
+                args.dry_run,
+                check_dev_ports=False,
+            )
         else:
-            launch_electron(electron_app_dir, electron_exe, args.dry_run)
+            # Keep the currently running app open while the build runs. Only
+            # stop it after the rebuilt app artifacts are ready to launch.
+            verify_inputs(
+                repo_root,
+                electron_app_dir,
+                electron_exe,
+                args.dry_run,
+                check_dev_ports=False,
+            )
+            stop_existing_processes(repo_root, electron_exe, args.dry_run)
             verify_inputs(repo_root, electron_app_dir, electron_exe, args.dry_run)
+            launch_electron(electron_app_dir, electron_exe, args.dry_run)
             verify_electron_started(repo_root, electron_exe, args.dry_run)
     except (RuntimeError, subprocess.CalledProcessError) as error:
         print(f"ERROR: {error}", file=sys.stderr, flush=True)

@@ -76,6 +76,9 @@ void ResolveGlobalConfigPlaceholdersInSerializedData(
     if (project.ResolveGlobalConfigPlaceholders(
             element.GetValue().GetRawString(), resolvedValue, missingPath)) {
       element.SetStringValue(resolvedValue);
+    } else {
+      gd::LogError("Global config path \"{{" + missingPath +
+                   "}}\" does not exist while exporting project data.");
     }
   }
 

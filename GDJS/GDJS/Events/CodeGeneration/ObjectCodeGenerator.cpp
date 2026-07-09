@@ -8,6 +8,7 @@
 #include "EventsCodeGenerator.h"
 #include "GDCore/Project/EventsBasedObject.h"
 #include "GDCore/Project/EventsFunctionsExtension.h"
+#include "GDCore/Tools/Log.h"
 
 namespace gdjs {
 
@@ -22,6 +23,8 @@ gd::String ResolveProjectGlobalConfigPlaceholders(
     return resolvedValue;
   }
 
+  gd::LogError("Global config path \"{{" + missingPath +
+               "}}\" does not exist while generating object property code.");
   return value;
 }
 

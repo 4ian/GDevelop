@@ -2673,6 +2673,26 @@ describe('libGD.js', function () {
       return isValid;
     };
 
+    const validateWindowTitleParameter = (value) => {
+      const action = new gd.Instruction();
+      action.setType('SetWindowTitle');
+      action.setParametersCount(2);
+      action.setParameter(1, value);
+      const result = gd.InstructionValidator.validateParameter(
+        gd.JsPlatform.get(),
+        projectScopedContainers,
+        action,
+        gd.MetadataProvider.getActionMetadata(
+          gd.JsPlatform.get(),
+          'SetWindowTitle'
+        ),
+        1
+      );
+      const isValid = result.isValid();
+      action.delete();
+      return isValid;
+    };
+
     it('considers an optional parameter left empty as valid', function () {
       // The default value is used when generating the code, so it must not be
       // shown as an error in the events sheet.
@@ -2683,6 +2703,20 @@ describe('libGD.js', function () {
       expect(validateVolumeParameter('50')).toBe(true);
       expect(validateVolumeParameter('1 +')).toBe(false);
       expect(validateVolumeParameter('"Not a number"')).toBe(false);
+    });
+
+    it('validates global config placeholders in string parameters', function () {
+      project.setGlobalConfigJson(
+        JSON.stringify({
+          labels: {
+            title: 'Window title',
+          },
+        })
+      );
+
+      expect(validateWindowTitleParameter('"{{labels.title}}"')).toBe(true);
+      expect(validateWindowTitleParameter('"{{labels.missing}}"')).toBe(false);
+      expect(validateWindowTitleParameter('"{{}}"')).toBe(false);
     });
   });
 

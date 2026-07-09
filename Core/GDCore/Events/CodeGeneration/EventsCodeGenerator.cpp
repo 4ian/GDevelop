@@ -19,6 +19,7 @@
 #include "GDCore/Project/ObjectsContainer.h"
 #include "GDCore/Project/ObjectsContainersList.h"
 #include "GDCore/Project/Project.h"
+#include "GDCore/Tools/Log.h"
 
 using namespace std;
 
@@ -955,6 +956,9 @@ gd::String EventsCodeGenerator::ResolveGlobalConfigPlaceholders(
           plainString, resolvedString, missingPath)) {
     return resolvedString;
   }
+
+  gd::LogError("Global config path \"{{" + missingPath +
+               "}}\" does not exist.");
 
   gd::DiagnosticReport* diagnosticReport = GetDiagnosticReport();
   if (diagnosticReport) {

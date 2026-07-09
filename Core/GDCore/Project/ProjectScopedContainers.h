@@ -47,7 +47,8 @@ class ProjectScopedContainers {
         legacyGlobalVariables(legacyGlobalVariables_),
         legacySceneVariables(legacySceneVariables_),
         propertiesContainersList(propertiesContainersList_),
-        resourcesContainersList(resourcesContainersList_){};
+        resourcesContainersList(resourcesContainersList_),
+        project(nullptr){};
   virtual ~ProjectScopedContainers(){};
 
   static ProjectScopedContainers
@@ -243,6 +244,17 @@ class ProjectScopedContainers {
   };
 
   /**
+   * \brief Return true if this scope was created from a project.
+   */
+  bool HasProject() const { return project != nullptr; }
+
+  /**
+   * \brief Get the project this scope was created from.
+   * \warning This is only valid if HasProject() is true.
+   */
+  const gd::Project &GetProject() const { return *project; }
+
+  /**
    * \brief Return the name of the scene (layout) in scope, or an empty string
    * if the scope is not a scene.
    */
@@ -303,7 +315,8 @@ class ProjectScopedContainers {
   /** Do not use - should be private but accessible to let Emscripten create a
    * temporary. */
   ProjectScopedContainers()
-      : legacyGlobalVariables(nullptr), legacySceneVariables(nullptr){};
+      : legacyGlobalVariables(nullptr), legacySceneVariables(nullptr),
+        project(nullptr){};
 
 private:
   gd::ObjectsContainersList objectsContainersList;
@@ -313,6 +326,7 @@ private:
   gd::PropertiesContainersList propertiesContainersList;
   std::vector<const ParameterMetadataContainer *> parametersVectorsList;
   gd::ResourcesContainersList resourcesContainersList;
+  const gd::Project *project;
 
   gd::String scopeSceneName;
   gd::String scopeExternalEventsName;

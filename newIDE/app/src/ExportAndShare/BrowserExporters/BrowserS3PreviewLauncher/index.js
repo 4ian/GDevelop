@@ -22,6 +22,7 @@ import { getIDEVersionWithHash } from '../../../Version';
 import { setEmbeddedGameFramePreviewLocation } from '../../../EmbeddedGame/EmbeddedGameFrame';
 import { immediatelyOpenNewPreviewWindow } from '../BrowserPreview/BrowserPreviewWindow';
 import { addGlobalObjectGroupsToDataJs } from '../../PreviewGlobalObjectGroupsPatch';
+import { hasGlobalConfigPlaceholderDiagnostic } from '../../../Utils/GlobalConfigPlaceholderDiagnostics';
 const gd: libGDevelop = global.gd;
 
 type State = {|
@@ -236,7 +237,32 @@ export default class BrowserS3PreviewLauncher extends React.Component<
       if (gdevelopResourceToken)
         previewExportOptions.setGDevelopResourceToken(gdevelopResourceToken);
 
-      exporter.exportProjectForPixiPreview(previewExportOptions);
+      const exportSuccessful = exporter.exportProjectForPixiPreview(
+        previewExportOptions
+      );
+      if (
+        hasGlobalConfigPlaceholderDiagnostic(
+          project.getWholeProjectDiagnosticReport()
+        )
+      ) {
+        if (!existingPreviewWindow) {
+          previewWindows.forEach(previewWindow => {
+            try {
+              previewWindow.close();
+            } catch (error) {}
+          });
+        }
+        this.props.onInvalidGlobalConfigPlaceholder();
+        previewExportOptions.delete();
+        exporter.delete();
+        return;
+      }
+      if (!exportSuccessful) {
+        previewExportOptions.delete();
+        exporter.delete();
+        throw new Error('Unable to export the project for preview.');
+      }
+
       browserS3FileSystem.patchPendingTextFile('data.js', contents =>
         addGlobalObjectGroupsToDataJs(project, contents)
       );

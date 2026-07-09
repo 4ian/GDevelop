@@ -21,6 +21,7 @@ import {
   addGlobalObjectGroupsToDataJs,
   addGlobalObjectGroupsToProjectData,
 } from '../../PreviewGlobalObjectGroupsPatch';
+import { hasGlobalConfigPlaceholderDiagnostic } from '../../../Utils/GlobalConfigPlaceholderDiagnostics';
 const electron = optionalRequire('electron');
 const path = optionalRequire('path');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
@@ -409,7 +410,25 @@ export default class LocalPreviewLauncher extends React.Component<
       );
     }
 
-    exporter.exportProjectForPixiPreview(previewExportOptions);
+    const exportSuccessful = exporter.exportProjectForPixiPreview(
+      previewExportOptions
+    );
+    if (
+      hasGlobalConfigPlaceholderDiagnostic(
+        project.getWholeProjectDiagnosticReport()
+      )
+    ) {
+      this.props.onInvalidGlobalConfigPlaceholder();
+      exporter.delete();
+      previewExportOptions.delete();
+      return;
+    }
+    if (!exportSuccessful) {
+      exporter.delete();
+      previewExportOptions.delete();
+      throw new Error('Unable to export the project for preview.');
+    }
+
     const dataJsPath = path.join(outputDir, 'data.js');
     fileSystem.writeToFile(
       dataJsPath,

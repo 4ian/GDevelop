@@ -10,6 +10,7 @@
 #include "GDCore/Project/EventsFunctionsExtension.h"
 #include "GDCore/Serialization/Serializer.h"
 #include "GDCore/Serialization/SerializerElement.h"
+#include "GDCore/Tools/Log.h"
 
 namespace gdjs {
 
@@ -24,6 +25,8 @@ gd::String ResolveProjectGlobalConfigPlaceholders(
     return resolvedValue;
   }
 
+  gd::LogError("Global config path \"{{" + missingPath +
+               "}}\" does not exist while generating behavior property code.");
   return value;
 }
 

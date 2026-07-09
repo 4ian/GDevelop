@@ -263,6 +263,7 @@ import { ProjectManagerDrawer } from '../ProjectManager/ProjectManagerDrawer';
 import DiagnosticReportDialog from '../ExportAndShare/DiagnosticReportDialog';
 import MemoryTrackedRegistryDialog from './MemoryTrackedRegistryDialog';
 import { scanProjectForValidationErrors } from '../Utils/EventsValidationScanner';
+import { hasInvalidGlobalConfigPlaceholderValidationError } from '../Utils/GlobalConfigPlaceholderDiagnostics';
 import { useMultiplayerLobbyConfigurator } from './UseMultiplayerLobbyConfigurator';
 import { useAuthenticatedPlayer } from './UseAuthenticatedPlayer';
 import ListIcon from '../UI/ListIcon';
@@ -656,6 +657,9 @@ const MainFrame = (props: Props): React.MixedElement => {
         const unconditionedActionErrors = validationErrors.filter(
           error => error.type === 'unconditioned-action'
         );
+        const mustBlockForInvalidGlobalConfigPlaceholder = hasInvalidGlobalConfigPlaceholderValidationError(
+          validationErrors
+        );
         const mustBlockForUnsafeExternalLayoutCreation =
           unsafeExternalLayoutCreationErrors.length > 0;
         const mustBlockForAmbiguousObjectPicking =
@@ -663,9 +667,15 @@ const MainFrame = (props: Props): React.MixedElement => {
         const mustBlockForUnconditionedActions =
           unconditionedActionErrors.length > 0;
         const mustBlockForSpecificValidationErrors =
+          mustBlockForInvalidGlobalConfigPlaceholder ||
           mustBlockForUnsafeExternalLayoutCreation ||
           mustBlockForAmbiguousObjectPicking ||
           mustBlockForUnconditionedActions;
+
+        if (mustBlockForInvalidGlobalConfigPlaceholder) {
+          setDiagnosticReportDialogOpen(true);
+          return true;
+        }
 
         if (
           mustBlockForSpecificValidationErrors ||
@@ -7716,6 +7726,9 @@ const MainFrame = (props: Props): React.MixedElement => {
               eventsFunctionsExtensionsContext.getIncludeFileHashs,
             onExport: () => {
               openShareDialog('publish');
+            },
+            onInvalidGlobalConfigPlaceholder: () => {
+              setDiagnosticReportDialogOpen(true);
             },
             onCaptureFinished,
           },

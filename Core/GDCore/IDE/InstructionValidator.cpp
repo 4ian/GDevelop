@@ -18,12 +18,36 @@
 #include "GDCore/Project/ObjectGroup.h"
 #include "GDCore/Project/ObjectsContainer.h"
 #include "GDCore/Project/ObjectsContainersList.h"
+#include "GDCore/Project/Project.h"
 #include "GDCore/Project/ProjectScopedContainers.h"
 #include "GDCore/Project/Variable.h"
 #include "GDCore/Project/VariablesContainer.h"
 #include "GDCore/String.h"
+#include "GDCore/Tools/Log.h"
 
 namespace gd {
+namespace {
+bool ResolveGlobalConfigPlaceholdersForValidation(
+    const gd::ProjectScopedContainers &projectScopedContainers,
+    const gd::String &value,
+    gd::String &resolvedValue) {
+  resolvedValue = value;
+  if (!projectScopedContainers.HasProject() ||
+      value.find("{{") == gd::String::npos) {
+    return true;
+  }
+
+  gd::String missingPath;
+  if (projectScopedContainers.GetProject().ResolveGlobalConfigPlaceholders(
+          value, resolvedValue, missingPath)) {
+    return true;
+  }
+
+  gd::LogError("Global config path \"{{" + missingPath +
+               "}}\" does not exist while validating an event parameter.");
+  return false;
+}
+}  // namespace
 
 ParameterValidationResult InstructionValidator::ValidateParameter(
     const gd::Platform &platform,
@@ -62,6 +86,13 @@ ParameterValidationResult InstructionValidator::ValidateParameter(
     return result;  // Valid by default, no deprecation warning
   }
 
+  gd::String validationValue;
+  if (!ResolveGlobalConfigPlaceholdersForValidation(projectScopedContainers,
+                                                    value, validationValue)) {
+    result.isValid = false;
+    return result;
+  }
+
   if (gd::ParameterMetadata::IsExpression("number", parameterType) ||
       gd::ParameterMetadata::IsExpression("string", parameterType) ||
       gd::ParameterMetadata::IsExpression("variable", parameterType)) {
@@ -90,8 +121,7 @@ ParameterValidationResult InstructionValidator::ValidateParameter(
       const auto &objectsContainersList =
           projectScopedContainers.GetObjectsContainersList();
       const auto &objectName = instruction.GetParameter(0).GetPlainString();
-      const auto &variableName =
-          instruction.GetParameter(parameterIndex).GetPlainString();
+      const auto &variableName = validationValue;
       if (objectsContainersList.HasObjectOrGroupWithVariableNamed(
               objectName,
               gd::InstructionValidator::GetRootVariableName(variableName)) ==
@@ -100,8 +130,7 @@ ParameterValidationResult InstructionValidator::ValidateParameter(
       }
     }
   } else if (gd::ParameterMetadata::IsObject(parameterType)) {
-    const auto &objectOrGroupName =
-        instruction.GetParameter(parameterIndex).GetPlainString();
+    const auto &objectOrGroupName = validationValue;
     if (parameterMetadata.IsOptional() && objectOrGroupName.empty()) {
       result.isValid = true;
       return result;
@@ -116,8 +145,7 @@ ParameterValidationResult InstructionValidator::ValidateParameter(
         InstructionValidator::HasRequiredBehaviors(
             instruction, metadata, parameterIndex, objectsContainersList);
   } else if (gd::ParameterMetadata::IsExpression("resource", parameterType)) {
-    const auto &resourceName =
-        instruction.GetParameter(parameterIndex).GetPlainString();
+    const auto &resourceName = validationValue;
     result.isValid = projectScopedContainers.GetResourcesContainersList()
                          .HasResourceNamed(resourceName);
   }

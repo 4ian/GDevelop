@@ -129,14 +129,30 @@ export const usePreviewDebuggerServerWatcher = (
               );
               return;
             }
-            setDebuggerStatus(debuggerStatus => ({
-              ...debuggerStatus,
-              [id]: {
+            setDebuggerStatus(debuggerStatus => {
+              const nextDebuggerStatus = {
                 isPaused: !!parsedMessage.payload.isPaused,
                 isInGameEdition: !!parsedMessage.payload.isInGameEdition,
                 sceneName: parsedMessage.payload.sceneName,
-              },
-            }));
+              };
+              const previousDebuggerStatus = debuggerStatus[id];
+              if (
+                previousDebuggerStatus &&
+                previousDebuggerStatus.isPaused ===
+                  nextDebuggerStatus.isPaused &&
+                previousDebuggerStatus.isInGameEdition ===
+                  nextDebuggerStatus.isInGameEdition &&
+                previousDebuggerStatus.sceneName ===
+                  nextDebuggerStatus.sceneName
+              ) {
+                return debuggerStatus;
+              }
+
+              return {
+                ...debuggerStatus,
+                [id]: nextDebuggerStatus,
+              };
+            });
           } else if (parsedMessage.command === 'game.crashed') {
             // Only keep the first exception.
             if (parsedMessage.payload.isInGameEdition) {
@@ -222,20 +238,31 @@ export const usePreviewDebuggerServerWatcher = (
     },
     [previewDebuggerServer, setDebuggerStatus]
   );
+  const requestStatusFromLivePreviewDebuggers = React.useCallback(
+    () => {
+      if (!previewDebuggerServer) return;
+
+      previewDebuggerServer.getExistingPreviewDebuggerIds().forEach(id => {
+        previewDebuggerServer.sendMessage(id, { command: 'getStatus' });
+      });
+    },
+    [previewDebuggerServer]
+  );
 
   React.useEffect(
     () => {
       if (!previewDebuggerServer || !Object.keys(debuggerStatus).length) return;
 
-      const intervalId = setInterval(
-        synchronizeDebuggerStatusWithLiveDebuggerIds,
-        1000
-      );
+      const intervalId = setInterval(() => {
+        synchronizeDebuggerStatusWithLiveDebuggerIds();
+        requestStatusFromLivePreviewDebuggers();
+      }, 1000);
       return () => clearInterval(intervalId);
     },
     [
       debuggerStatus,
       previewDebuggerServer,
+      requestStatusFromLivePreviewDebuggers,
       synchronizeDebuggerStatusWithLiveDebuggerIds,
     ]
   );

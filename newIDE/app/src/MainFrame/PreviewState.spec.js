@@ -189,4 +189,54 @@ describe('usePreviewDebuggerServerWatcher', () => {
       if (renderer) renderer.unmount();
     });
   });
+
+  it('periodically asks running native previews for their status', () => {
+    jest.useFakeTimers();
+    const previewDebuggerServer = makePreviewDebuggerServer();
+    let latestResults = null;
+    let renderer = null;
+
+    const HookCapture = () => {
+      latestResults = usePreviewDebuggerServerWatcher(
+        previewDebuggerServer.server
+      );
+      return null;
+    };
+
+    act(() => {
+      renderer = TestRenderer.create(<HookCapture />);
+    });
+
+    act(() => {
+      previewDebuggerServer.setDebuggerIds(['preview-ws-1']);
+      previewDebuggerServer.getCallbacks().onHandleParsedMessage({
+        id: 'preview-ws-1',
+        parsedMessage: {
+          command: 'status',
+          payload: {
+            isPaused: false,
+            isInGameEdition: false,
+            sceneName: 'Game Scene',
+          },
+        },
+      });
+    });
+
+    expect(latestResults.hasNonEditionPreviewsRunning).toBe(true);
+
+    previewDebuggerServer.server.sendMessage.mockClear();
+    act(() => {
+      jest.advanceTimersByTime(1000);
+    });
+
+    expect(previewDebuggerServer.server.sendMessage).toHaveBeenCalledWith(
+      'preview-ws-1',
+      { command: 'getStatus' }
+    );
+
+    act(() => {
+      if (renderer) renderer.unmount();
+    });
+    jest.useRealTimers();
+  });
 });

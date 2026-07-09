@@ -1755,6 +1755,18 @@ gd::String EventsCodeGenerator::GeneratePropertySetterWithoutCasting(
   return propertySetterCode;
 }
 
+gd::String EventsCodeGenerator::GenerateStringExpressionResolution(
+    const gd::String& expressionCode,
+    gd::EventsCodeGenerationContext& context) {
+  if (!HasProjectAndLayout() ||
+      !context.IsGlobalConfigStringExpressionResolutionEnabled()) {
+    return expressionCode;
+  }
+
+  return "gdjs.evtTools.globalConfig.resolveString(runtimeScene.getGame(), " +
+         expressionCode + ")";
+}
+
 gd::String EventsCodeGenerator::GeneratePropertyGetterWithoutCasting(
     const gd::PropertiesContainer& propertiesContainer,
     const gd::NamedPropertyDescriptor& property) {

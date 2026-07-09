@@ -23,6 +23,26 @@
 using namespace std;
 
 namespace gd {
+namespace {
+class GlobalConfigStringExpressionResolutionScope {
+ public:
+  GlobalConfigStringExpressionResolutionScope(
+      gd::EventsCodeGenerationContext& context_, bool enabled)
+      : context(context_),
+        wasEnabled(
+            context_.IsGlobalConfigStringExpressionResolutionEnabled()) {
+    context.SetGlobalConfigStringExpressionResolutionEnabled(enabled);
+  }
+
+  ~GlobalConfigStringExpressionResolutionScope() {
+    context.SetGlobalConfigStringExpressionResolutionEnabled(wasEnabled);
+  }
+
+ private:
+  gd::EventsCodeGenerationContext& context;
+  const bool wasEnabled;
+};
+}  // namespace
 
 /**
  * Generate call using a relational operator.
@@ -639,6 +659,10 @@ gd::String EventsCodeGenerator::GenerateActionCode(
 
   AddIncludeFiles(instrInfos.GetIncludeFiles());
 
+  GlobalConfigStringExpressionResolutionScope
+      globalConfigStringExpressionResolutionScope(context,
+                                                  HasProjectAndLayout());
+
   if (instrInfos.HasCustomCodeGenerator()) {
     return instrInfos.codeExtraInformation.customCodeGenerator(
         action, *this, context);
@@ -979,7 +1003,8 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(
   } else if (ParameterMetadata::IsBehavior(metadata.GetType())) {
     argOutput = GenerateGetBehaviorNameCode(parameter.GetPlainString());
   } else if (metadata.GetType() == "key") {
-    argOutput = "\"" + ConvertToString(parameter.GetPlainString()) + "\"";
+    argOutput = GenerateStringExpressionResolution(
+        ConvertToStringExplicit(parameter.GetPlainString()), context);
   } else if (ParameterMetadata::IsExpression("resource", metadata.GetType())) {
     const auto &resourceName = parameter.GetPlainString();
     const auto &resourcesContainersList =
@@ -1004,7 +1029,8 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(
       argOutput = "\"" + ConvertToString(resourceName) + "\"";
     }
   } else if (metadata.GetType() == "mouse") {
-    argOutput = "\"" + ConvertToString(parameter.GetPlainString()) + "\"";
+    argOutput = GenerateStringExpressionResolution(
+        ConvertToStringExplicit(parameter.GetPlainString()), context);
   } else if (metadata.GetType() == "yesorno") {
     auto parameterString = parameter.GetPlainString();
     // This is duplicated in `InstructionSentenceFormatter::GetFormattedParameterValue`.

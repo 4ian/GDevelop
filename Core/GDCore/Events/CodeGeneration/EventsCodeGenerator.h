@@ -521,6 +521,16 @@ class GD_CORE_API EventsCodeGenerator {
       const gd::NamedPropertyDescriptor& property,
       const gd::String& operandCode);
 
+  /**
+   * \brief Give platforms a chance to wrap a generated top-level string
+   * expression before it is used by an instruction.
+   */
+  virtual gd::String GenerateStringExpressionResolution(
+      const gd::String& expressionCode,
+      gd::EventsCodeGenerationContext& context) {
+    return expressionCode;
+  }
+
  protected:
   virtual const gd::String GenerateRelationalOperatorCodes(
       const gd::String& operatorString);

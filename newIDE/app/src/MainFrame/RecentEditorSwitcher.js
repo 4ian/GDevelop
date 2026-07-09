@@ -429,12 +429,6 @@ const styles = {
     fontSize: 12,
     lineHeight: '16px',
   },
-  rowMetaLine: {
-    minWidth: 0,
-    display: 'flex',
-    alignItems: 'center',
-    gap: 8,
-  },
   sideMenuTitle: {
     overflow: 'hidden',
     textOverflow: 'ellipsis',
@@ -460,20 +454,6 @@ const styles = {
     fontSize: 11,
     lineHeight: '16px',
     fontWeight: 700,
-  },
-  sourceBadge: {
-    minWidth: 42,
-    height: 20,
-    padding: '0 7px',
-    borderRadius: 10,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontSize: 11,
-    lineHeight: '16px',
-    fontWeight: 700,
-    textTransform: 'uppercase',
-    flexShrink: 0,
   },
   activeDot: {
     width: 8,
@@ -829,31 +809,7 @@ const RecentEditorSwitcher = ({
   const hoverBackgroundColor = gdevelopTheme.list.hover.backgroundColor;
   const recentBackgroundColor = gdevelopTheme.paper.backgroundColor.dark;
   const chipBackgroundColor = gdevelopTheme.paper.backgroundColor.medium;
-  const actionAccentColor =
-    gdevelopTheme.palette.type === 'dark' ? '#7BC7FF' : '#006FBA';
-  const actionBackgroundColor =
-    gdevelopTheme.palette.type === 'dark'
-      ? 'rgba(123, 199, 255, 0.12)'
-      : 'rgba(0, 111, 186, 0.08)';
-  const actionBorderColor =
-    gdevelopTheme.palette.type === 'dark'
-      ? 'rgba(123, 199, 255, 0.36)'
-      : 'rgba(0, 111, 186, 0.22)';
   const shortcutDisplayName = getShortcutDisplayName(shortcut);
-  const renderActionBadge = (selected: boolean) => (
-    <span
-      style={{
-        ...styles.sourceBadge,
-        color: selected ? selectedTextColor : actionAccentColor,
-        backgroundColor: selected
-          ? 'rgba(255, 255, 255, 0.16)'
-          : actionBackgroundColor,
-        border: `1px solid ${selected ? selectedTextColor : actionBorderColor}`,
-      }}
-    >
-      <Trans>Action</Trans>
-    </span>
-  );
 
   return (
     <div
@@ -973,12 +929,12 @@ const RecentEditorSwitcher = ({
                   const rowMetaColor = selected
                     ? selectedTextColor
                     : mutedTextColor;
-                  const isAction = item.source === 'action';
 
                   return (
                     <ButtonBase
                       key={`${item.source}:${item.id}`}
                       ref={selected ? selectedRowRef : undefined}
+                      title={`${item.title}\n${item.subtitle}`}
                       style={{
                         ...styles.sideMenuRow,
                         color: rowTextColor,
@@ -999,13 +955,10 @@ const RecentEditorSwitcher = ({
                       <span style={styles.iconContainer}>{item.icon}</span>
                       <span style={styles.rowText}>
                         <span style={styles.sideMenuTitle}>{item.title}</span>
-                        <span style={styles.rowMetaLine}>
-                          <span
-                            style={{ ...styles.rowMeta, color: rowMetaColor }}
-                          >
-                            {item.subtitle}
-                          </span>
-                          {isAction && renderActionBadge(selected)}
+                        <span
+                          style={{ ...styles.rowMeta, color: rowMetaColor }}
+                        >
+                          {item.subtitle}
                         </span>
                       </span>
                     </ButtonBase>
@@ -1050,11 +1003,15 @@ const RecentEditorSwitcher = ({
                     : entry.editorTab
                     ? 'Tab'
                     : 'Menu';
+                  const subtitle = isAction
+                    ? entry.subtitle
+                    : `${entry.subtitle} - ${sourceLabel}`;
 
                   return (
                     <ButtonBase
                       key={entry.id}
                       ref={selected ? selectedRowRef : undefined}
+                      title={`${entry.title}\n${subtitle}`}
                       style={{
                         ...styles.recentRow,
                         color: rowTextColor,
@@ -1079,19 +1036,10 @@ const RecentEditorSwitcher = ({
                       </span>
                       <span style={styles.rowText}>
                         <span style={styles.rowTitle}>{entry.title}</span>
-                        <span style={styles.rowMetaLine}>
-                          <span
-                            style={{ ...styles.rowMeta, color: rowMetaColor }}
-                          >
-                            {entry.subtitle}
-                            {!isAction && (
-                              <React.Fragment>
-                                {' - '}
-                                {sourceLabel}
-                              </React.Fragment>
-                            )}
-                          </span>
-                          {isAction && renderActionBadge(selected)}
+                        <span
+                          style={{ ...styles.rowMeta, color: rowMetaColor }}
+                        >
+                          {subtitle}
                         </span>
                       </span>
                       {hasRecentBadges ? (

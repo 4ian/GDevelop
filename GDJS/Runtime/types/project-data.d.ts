@@ -4,19 +4,6 @@
  * This project is released under the MIT License.
  */
 
-/**
- * Contains the data of a serialized exported project.
- */
-declare type GlobalConfigValue =
-  | null
-  | boolean
-  | number
-  | string
-  | { [key: string]: GlobalConfigValue }
-  | GlobalConfigValue[];
-
-declare type GlobalConfigData = { [key: string]: GlobalConfigValue };
-
 declare interface ProjectData {
   firstLayout: string;
   gdVersion: GdVersionData;
@@ -26,7 +13,6 @@ declare interface ProjectData {
   objects: ObjectData[];
   objectsGroups: ObjectGroupData[];
   variables: RootVariableData[];
-  globalConfig?: GlobalConfigData;
   layouts: LayoutData[];
   externalLayouts: ExternalLayoutData[];
   eventsFunctionsExtensions: EventsFunctionsExtensionData[];

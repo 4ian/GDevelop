@@ -175,7 +175,7 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionCode(
           parameterVariablesContainer,
         parameterResourcesContainer);
 
-  EventsCodeGenerator codeGenerator(projectScopedContainers);
+  EventsCodeGenerator codeGenerator(project, projectScopedContainers);
   codeGenerator.SetCodeNamespace(codeNamespace);
   codeGenerator.SetGenerateCodeForRuntime(compilationForRuntime);
 
@@ -249,7 +249,7 @@ gd::String EventsCodeGenerator::GenerateBehaviorEventsFunctionCode(
           parameterResourcesContainer,
           propertyResourcesContainer);
 
-  EventsCodeGenerator codeGenerator(projectScopedContainers);
+  EventsCodeGenerator codeGenerator(project, projectScopedContainers);
   codeGenerator.SetCodeNamespace(codeNamespace);
   codeGenerator.SetGenerateCodeForRuntime(compilationForRuntime);
 
@@ -346,7 +346,7 @@ gd::String EventsCodeGenerator::GenerateObjectEventsFunctionCode(
           parameterResourcesContainer,
           propertyResourcesContainer);
 
-  EventsCodeGenerator codeGenerator(projectScopedContainers);
+  EventsCodeGenerator codeGenerator(project, projectScopedContainers);
   codeGenerator.SetCodeNamespace(codeNamespace);
   codeGenerator.SetGenerateCodeForRuntime(compilationForRuntime);
 
@@ -1883,6 +1883,12 @@ EventsCodeGenerator::EventsCodeGenerator(const gd::Project& project,
 EventsCodeGenerator::EventsCodeGenerator(
     const gd::ProjectScopedContainers& projectScopedContainers)
     : gd::EventsCodeGenerator(JsPlatform::Get(), projectScopedContainers) {}
+
+EventsCodeGenerator::EventsCodeGenerator(
+    const gd::Project& project,
+    const gd::ProjectScopedContainers& projectScopedContainers)
+    : gd::EventsCodeGenerator(project, JsPlatform::Get(),
+                              projectScopedContainers) {}
 
 EventsCodeGenerator::~EventsCodeGenerator() {}
 

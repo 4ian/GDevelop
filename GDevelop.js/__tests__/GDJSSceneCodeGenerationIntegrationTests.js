@@ -2,6 +2,7 @@ const initializeGDevelopJs = require('../../Binaries/embuild/GDevelop.js/libGD.j
 const { makeMinimalGDJSMock } = require('../TestUtils/GDJSMocks.js');
 const {
   generateCompiledEventsForLayout,
+  generateCompiledEventsForEventsFunctionWithContext,
 } = require('../TestUtils/CodeGenerationHelpers.js');
 
 describe('libGD.js - GDJS Scene Code Generation integration tests', function () {
@@ -183,6 +184,176 @@ describe('libGD.js - GDJS Scene Code Generation integration tests', function () 
 
     expect(runtimeScene.getVariables().get('Counter').getAsNumber()).toBe(2);
 
+    project.delete();
+  });
+
+  it('replaces global config placeholders in string action parameters for scene and external events', function () {
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    project.setGlobalConfigJson(
+      JSON.stringify({
+        labels: {
+          scene: 'Scene label',
+          external: 'External label',
+        },
+        signals: {
+          scene: 'SceneSignal',
+        },
+      })
+    );
+    const layout = project.insertNewLayout('Scene', 0);
+    layout.getVariables().insertNew('SceneText', 0).setString('');
+    layout.getVariables().insertNew('ExternalText', 1).setString('');
+    const serializedLayoutEvents = gd.Serializer.fromJSObject([
+      {
+        type: 'BuiltinCommonInstructions::Standard',
+        conditions: [],
+        actions: [
+          {
+            type: { value: 'SetStringVariable' },
+            parameters: ['SceneText', '=', '"{{labels.scene}}"'],
+          },
+          {
+            type: { value: 'EmitSceneSignal' },
+            parameters: [
+              '',
+              '"{{signals.scene}}"',
+              '"Payload: {{labels.scene}}"',
+            ],
+          },
+        ],
+        events: [],
+      },
+      {
+        type: 'BuiltinCommonInstructions::Link',
+        target: 'External events 1',
+      },
+    ]);
+    layout.getEvents().unserializeFrom(project, serializedLayoutEvents);
+
+    const externalEvents = project.insertNewExternalEvents(
+      'External events 1',
+      0
+    );
+    const serializedExternalEventsEvents = gd.Serializer.fromJSObject([
+      {
+        type: 'BuiltinCommonInstructions::Standard',
+        conditions: [],
+        actions: [
+          {
+            type: { value: 'SetStringVariable' },
+            parameters: [
+              'ExternalText',
+              '=',
+              '"External: {{labels.external}}"',
+            ],
+          },
+        ],
+        events: [],
+      },
+    ]);
+    externalEvents
+      .getEvents()
+      .unserializeFrom(project, serializedExternalEventsEvents);
+
+    const serializedProjectElement = new gd.SerializerElement();
+    project.serializeTo(serializedProjectElement);
+
+    const serializedSceneElement = new gd.SerializerElement();
+    layout.serializeTo(serializedSceneElement);
+
+    const runCompiledEvents = generateCompiledEventsForLayout(
+      gd,
+      project,
+      layout
+    );
+
+    const { gdjs, runtimeScene } = makeMinimalGDJSMock({
+      gameData: JSON.parse(gd.Serializer.toJSON(serializedProjectElement)),
+      sceneData: JSON.parse(gd.Serializer.toJSON(serializedSceneElement)),
+    });
+    const emittedSignals = [];
+    gdjs.evtTools.signal = {
+      emitSceneSignal: (_runtimeScene, signalName, payload) => {
+        emittedSignals.push({ signalName, payload });
+      },
+    };
+    runCompiledEvents(gdjs, runtimeScene);
+
+    expect(runtimeScene.getVariables().get('SceneText').getAsString()).toBe(
+      'Scene label'
+    );
+    expect(runtimeScene.getVariables().get('ExternalText').getAsString()).toBe(
+      'External: External label'
+    );
+    expect(emittedSignals).toEqual([
+      { signalName: 'SceneSignal', payload: 'Payload: Scene label' },
+    ]);
+
+    serializedProjectElement.delete();
+    serializedSceneElement.delete();
+    serializedLayoutEvents.delete();
+    serializedExternalEventsEvents.delete();
+    project.delete();
+  });
+
+  it('replaces global config placeholders in extension event actions', function () {
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    project.setGlobalConfigJson(
+      JSON.stringify({
+        labels: {
+          extension: 'Extension label',
+        },
+      })
+    );
+    const layout = project.insertNewLayout('Scene', 0);
+    const extension = project.insertNewEventsFunctionsExtension('Extension', 0);
+    extension.getSceneVariables().insertNew('Result', 0).setString('');
+    const eventsFunction = new gd.EventsFunction();
+
+    const serializedEvents = gd.Serializer.fromJSObject([
+      {
+        type: 'BuiltinCommonInstructions::Standard',
+        conditions: [],
+        actions: [
+          {
+            type: { value: 'SetStringVariable' },
+            parameters: ['Result', '=', '"{{labels.extension}}"'],
+          },
+        ],
+        events: [],
+      },
+    ]);
+    eventsFunction.getEvents().unserializeFrom(project, serializedEvents);
+
+    const serializedProjectElement = new gd.SerializerElement();
+    project.serializeTo(serializedProjectElement);
+
+    const serializedSceneElement = new gd.SerializerElement();
+    layout.serializeTo(serializedSceneElement);
+
+    const runCompiledEvents = generateCompiledEventsForEventsFunctionWithContext(
+      gd,
+      project,
+      extension,
+      eventsFunction
+    );
+    const { gdjs, runtimeScene } = makeMinimalGDJSMock({
+      gameData: JSON.parse(gd.Serializer.toJSON(serializedProjectElement)),
+      sceneData: JSON.parse(gd.Serializer.toJSON(serializedSceneElement)),
+    });
+    runCompiledEvents(gdjs, runtimeScene, []);
+
+    expect(
+      runtimeScene
+        .getVariablesForExtension('Extension')
+        .get('Result')
+        .getAsString()
+    ).toBe('Extension label');
+
+    serializedProjectElement.delete();
+    serializedSceneElement.delete();
+    serializedEvents.delete();
+    eventsFunction.delete();
     project.delete();
   });
 

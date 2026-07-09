@@ -480,6 +480,13 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
    */
   EventsCodeGenerator(
       const gd::ProjectScopedContainers& projectScopedContainers);
+
+  /**
+   * \brief Construct a code generator for the specified project and containers.
+   */
+  EventsCodeGenerator(
+      const gd::Project& project,
+      const gd::ProjectScopedContainers& projectScopedContainers);
   virtual ~EventsCodeGenerator();
 
   gd::String codeNamespace;  ///< Optional namespace for the generated code,

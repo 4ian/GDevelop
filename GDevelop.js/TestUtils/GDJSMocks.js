@@ -1279,34 +1279,6 @@ function makeMinimalGDJSMock(options) {
     options && options.sceneData,
     runtimeGame
   );
-  const resolveNumber = (runtimeGame, value) => {
-    if (typeof value === 'number') return Number.isFinite(value) ? value : 0;
-    if (typeof value === 'boolean') return value ? 1 : 0;
-    if (typeof value === 'string') {
-      const number = parseFloat(value);
-      return Number.isFinite(number) ? number : 0;
-    }
-    return 0;
-  };
-  const resolveString = (runtimeGame, value) => {
-    if (value === undefined || value === null) return '';
-    return '' + value;
-  };
-  const resolveBoolean = (runtimeGame, value) => {
-    if (typeof value === 'boolean') return value;
-    if (typeof value === 'number') return value !== 0;
-    if (typeof value === 'string') {
-      const normalizedValue = value.trim().toLowerCase();
-      return (
-        normalizedValue === 'true' ||
-        normalizedValue === '1' ||
-        normalizedValue === 'yes' ||
-        normalizedValue === 'on'
-      );
-    }
-    return !!value;
-  };
-
   return {
     gdjs: {
       evtTools: {
@@ -1337,11 +1309,6 @@ function makeMinimalGDJSMock(options) {
         runtimeScene: {
           wait: () => new FakeAsyncTask(),
           noop: () => {},
-        },
-        globalConfig: {
-          resolveNumber,
-          resolveString,
-          resolveBoolean,
         },
         network: {
           variableStructureToJSON: (variable) =>

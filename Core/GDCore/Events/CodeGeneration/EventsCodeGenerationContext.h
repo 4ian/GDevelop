@@ -289,6 +289,22 @@ class GD_CORE_API EventsCodeGenerationContext {
   }
 
   /**
+   * \brief Enable replacing global config placeholders in strings generated
+   * for actions.
+   */
+  void SetGlobalConfigPlaceholderReplacementEnabled(bool enabled) {
+    globalConfigPlaceholderReplacementEnabled = enabled;
+  }
+
+  /**
+   * \brief Return true if strings generated in the current context should have
+   * global config placeholders replaced.
+   */
+  bool IsGlobalConfigPlaceholderReplacementEnabled() const {
+    return globalConfigPlaceholderReplacementEnabled;
+  }
+
+  /**
    * \brief Returns true if the given object is already going to be declared
    * in this context (either as a traditional objects list, or an empty one).
    */
@@ -362,6 +378,9 @@ class GD_CORE_API EventsCodeGenerationContext {
   bool objectListParameterPickingAllowed =
       false;  ///< True while condition object-list parameters are being
               ///< generated, so conditions can narrow multiple candidates.
+  bool globalConfigPlaceholderReplacementEnabled =
+      false;  ///< True while strings generated for actions should have global
+              ///< config placeholders replaced at code generation time.
 };
 
 }  // namespace gd

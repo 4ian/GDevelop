@@ -1091,6 +1091,27 @@ class GD_CORE_API Project {
     globalConfigJson = globalConfigJson_.empty() ? "{}" : globalConfigJson_;
   }
 
+  /**
+   * Get a project-wide JSON configuration value as a string.
+   *
+   * Object and array values are returned as JSON strings.
+   */
+  bool GetGlobalConfigValueAsString(const gd::String& path,
+                                    gd::String& value) const;
+
+  /**
+   * Replace all `{{path.to.value}}` placeholders with values from the
+   * project-wide JSON configuration.
+   *
+   * \param source The source string that can contain placeholders.
+   * \param resolved The string with placeholders replaced when all paths exist.
+   * \param missingPath The first placeholder path that could not be resolved.
+   * \return true if all placeholders were resolved.
+   */
+  bool ResolveGlobalConfigPlaceholders(const gd::String& source,
+                                       gd::String& resolved,
+                                       gd::String& missingPath) const;
+
   ///@}
 
   /** \name Global objects

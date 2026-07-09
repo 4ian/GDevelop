@@ -3874,6 +3874,63 @@ describe('libGD.js', function () {
       fs.delete();
     });
 
+    it('should replace global config placeholders in runtime project data', function () {
+      const fs = new gd.AbstractFileSystemJS();
+      const project = gd.ProjectHelper.createNewGDJSProject();
+      const projectDataElement = new gd.SerializerElement();
+      const layout = project.insertNewLayout('Scene', 0);
+      const object = layout
+        .getObjects()
+        .insertNewObject(project, 'TextObject::Text', 'MyTextObject', 0);
+      gd.asTextObjectConfiguration(object.getConfiguration()).setText(
+        '{{labels.objectText}}'
+      );
+      project.setName('{{labels.projectName}}');
+      project.setGlobalConfigJson(
+        JSON.stringify({
+          labels: {
+            objectText: 'Runtime text',
+            projectName: 'Runtime project',
+          },
+        })
+      );
+      fs.getTempDir = function () {
+        return '/tmp/';
+      };
+      fs.dirNameFrom = function (fullpath) {
+        return path.dirname(fullpath);
+      };
+      fs.fileNameFrom = function (fullpath) {
+        return path.basename(fullpath);
+      };
+      fs.readDir = function () {
+        return new gd.VectorString();
+      };
+      const exporter = new gd.Exporter(fs, 'fake-gdjs-root');
+      const previewExportOptions = new gd.PreviewExportOptions(
+        project,
+        '/path/for/export/'
+      );
+
+      exporter.serializeProjectData(
+        project,
+        previewExportOptions,
+        projectDataElement
+      );
+      const projectData = JSON.parse(gd.Serializer.toJSON(projectDataElement));
+      expect(projectData.properties.name).toBe('Runtime project');
+      expect(projectData.layouts[0].objects[0].content.text).toBe(
+        'Runtime text'
+      );
+      expect(projectData.globalConfig).toBeUndefined();
+
+      previewExportOptions.delete();
+      exporter.delete();
+      projectDataElement.delete();
+      project.delete();
+      fs.delete();
+    });
+
     it('should export preview debug display options in preview project data', function () {
       const fs = new gd.AbstractFileSystemJS();
       const project = gd.ProjectHelper.createNewGDJSProject();

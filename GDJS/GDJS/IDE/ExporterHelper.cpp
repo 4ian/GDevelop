@@ -45,6 +45,7 @@
 #include "GDCore/Project/Project.h"
 #include "GDCore/Project/PropertyDescriptor.h"
 #include "GDCore/Serialization/Serializer.h"
+#include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/Tools/Localization.h"
 #include "GDCore/Tools/Log.h"
 #include "GDJS/Events/CodeGeneration/LayoutCodeGenerator.h"
@@ -65,6 +66,24 @@ double LogTimeSpent(const gd::String &name, double previousTime) {
   gd::LogStatus(name + " took " + gd::String::From(GetTimeSpent(previousTime)) +
                 "ms");
   return GetTimeNow();
+}
+
+void ResolveGlobalConfigPlaceholdersInSerializedData(
+    const gd::Project &project, gd::SerializerElement &element) {
+  if (!element.IsValueUndefined() && element.GetValue().IsString()) {
+    gd::String resolvedValue;
+    gd::String missingPath;
+    if (project.ResolveGlobalConfigPlaceholders(
+            element.GetValue().GetRawString(), resolvedValue, missingPath)) {
+      element.SetStringValue(resolvedValue);
+    }
+  }
+
+  for (const auto &child : element.GetAllChildren()) {
+    if (child.second) {
+      ResolveGlobalConfigPlaceholdersInSerializedData(project, *child.second);
+    }
+  }
 }
 }  // namespace
 
@@ -643,6 +662,7 @@ void ExporterHelper::StripAndSerializeProjectData(
   gd::ProjectStripper::StripProjectForExport(project);
 
   project.SerializeTo(rootElement);
+  ResolveGlobalConfigPlaceholdersInSerializedData(project, rootElement);
   rootElement.RemoveChild("globalConfig");
   SerializeUsedResourcesForRuntime(project, rootElement, projectUsedResources,
                          scenesUsedResources);

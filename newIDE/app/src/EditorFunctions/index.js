@@ -25,6 +25,7 @@ import {
   applyEventsChanges,
 } from './ApplyEventsChanges';
 import { isBehaviorDefaultCapability } from '../BehaviorsEditor/EnumerateBehaviorsMetadata';
+import { renameResourcesInProject } from '../ResourcesList/ResourceUtils';
 import { Trans } from '@lingui/macro';
 import { type I18n as I18nType } from '@lingui/core';
 import Link from '../UI/Link';
@@ -145,6 +146,9 @@ export type EditorFunctionGenericOutput = {|
   instances?: any,
   layers?: any,
   effects?: any,
+  sceneNames?: Array<string>,
+  resources?: any,
+  resourcesSummary?: any,
   behaviors?: Array<SimplifiedBehavior>,
   variables?: Array<SimplifiedVariable>,
   reminder?: string,
@@ -6302,6 +6306,489 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
   modifiesProject: true,
 };
 
+const MAX_LISTED_RESOURCES = 200;
+
+const inspectProjectPropertiesResources: EditorFunction = {
+  renderForEditor: ({ args }) => {
+    const resourceNameFilter = SafeExtractor.extractStringProperty(
+      args,
+      'filter_by_resource_name'
+    );
+    if (resourceNameFilter) {
+      return {
+        text: (
+          <Trans>
+            Read the project properties and resources named "
+            {resourceNameFilter}".
+          </Trans>
+        ),
+      };
+    }
+    const listAllResources = SafeExtractor.extractBooleanProperty(
+      args,
+      'list_all_resources'
+    );
+    if (listAllResources) {
+      return {
+        text: <Trans>Read the project properties and resources.</Trans>,
+      };
+    }
+    return {
+      text: <Trans>Read the project properties.</Trans>,
+    };
+  },
+  launchFunction: async ({ project, args }) => {
+    const resourceNameFilter = SafeExtractor.extractStringProperty(
+      args,
+      'filter_by_resource_name'
+    );
+    const listAllResources =
+      SafeExtractor.extractBooleanProperty(args, 'list_all_resources') || false;
+    const shouldListResources = !!resourceNameFilter || listAllResources;
+
+    const resourcesManager = project.getResourcesManager();
+    const allResourceNames = resourcesManager.getAllResourceNames().toJSArray();
+    const filteredResourceNames = resourceNameFilter
+      ? allResourceNames.filter(resourceName =>
+          resourceName.toLowerCase().includes(resourceNameFilter.toLowerCase())
+        )
+      : allResourceNames;
+    const listedResourceNames = filteredResourceNames.slice(
+      0,
+      MAX_LISTED_RESOURCES
+    );
+    const resources = shouldListResources
+      ? listedResourceNames.map(resourceName => {
+          const resource = resourcesManager.getResource(resourceName);
+          return {
+            name: resourceName,
+            kind: resource.getKind(),
+            file: resource.getFile(),
+            metadata: resource.getMetadata() || undefined,
+            originName: resource.getOriginName() || undefined,
+            originIdentifier: resource.getOriginIdentifier() || undefined,
+          };
+        })
+      : undefined;
+
+    const resourcesCountPerKind: { [string]: number } = {};
+    if (!shouldListResources) {
+      allResourceNames.forEach(resourceName => {
+        const kind = resourcesManager.getResource(resourceName).getKind();
+        resourcesCountPerKind[kind] = (resourcesCountPerKind[kind] || 0) + 1;
+      });
+    }
+    const resourcesSummary = shouldListResources
+      ? undefined
+      : {
+          total: allResourceNames.length,
+          byKind: resourcesCountPerKind,
+          hint:
+            allResourceNames.length > 0
+              ? 'Use `filter_by_resource_name` to search resources by name, or set `list_all_resources` to true to list them all.'
+              : undefined,
+        };
+
+    const truncatedResourcesCount =
+      filteredResourceNames.length - listedResourceNames.length;
+    const resourcesWarning = !shouldListResources
+      ? undefined
+      : resourceNameFilter && filteredResourceNames.length === 0
+      ? `No resource name contains "${resourceNameFilter}" (the project has ${
+          allResourceNames.length
+        } resources in total). Set \`list_all_resources\` to true to list them all.`
+      : truncatedResourcesCount > 0
+      ? `Only the first ${MAX_LISTED_RESOURCES} resources are listed (${truncatedResourcesCount} more not shown). Use \`filter_by_resource_name\` to narrow down the list.`
+      : undefined;
+
+    return {
+      success: true,
+      properties: {
+        name: project.getName(),
+        description: project.getDescription(),
+        version: project.getVersion(),
+        author: project.getAuthor(),
+        packageName: project.getPackageName(),
+        templateSlug: project.getTemplateSlug(),
+        orientation: project.getOrientation(),
+        windowWidth: project.getGameResolutionWidth(),
+        windowHeight: project.getGameResolutionHeight(),
+        adaptGameResolutionAtRuntime: project.getAdaptGameResolutionAtRuntime(),
+        sizeOnStartupMode: project.getSizeOnStartupMode(),
+        scaleMode: project.getScaleMode(),
+        pixelsRounding: project.getPixelsRounding(),
+        antialiasingMode: project.getAntialiasingMode(),
+        minFPS: project.getMinimumFPS(),
+        maxFPS: project.getMaximumFPS(),
+        firstLayout: project.getFirstLayout(),
+      },
+      sceneNames: mapFor(0, project.getLayoutsCount(), i =>
+        project.getLayoutAt(i).getName()
+      ),
+      resources,
+      resourcesSummary,
+      warnings: resourcesWarning,
+    };
+  },
+  modifiesProject: false,
+};
+
+const changeProjectPropertiesResources: EditorFunction = {
+  renderForEditor: ({ args }) => {
+    const changed_properties = SafeExtractor.extractArrayProperty(
+      args,
+      'changed_properties'
+    );
+    const changed_resources = SafeExtractor.extractArrayProperty(
+      args,
+      'changed_resources'
+    );
+    const changedPropertiesCount =
+      (changed_properties && changed_properties.length) || 0;
+    const changedResourcesCount =
+      (changed_resources && changed_resources.length) || 0;
+
+    if (changedPropertiesCount > 0 && changedResourcesCount > 0) {
+      return {
+        text: <Trans>Update some project properties and resources.</Trans>,
+      };
+    }
+
+    if (changed_resources && changedPropertiesCount === 0) {
+      if (changed_resources.length === 1) {
+        const resourceName = SafeExtractor.extractStringProperty(
+          changed_resources[0],
+          'resource_name'
+        );
+        const deleteThisResource = SafeExtractor.extractBooleanProperty(
+          changed_resources[0],
+          'delete_this_resource'
+        );
+        return {
+          text: deleteThisResource ? (
+            <Trans>
+              Remove resource <b>{resourceName}</b>.
+            </Trans>
+          ) : (
+            <Trans>
+              Rename resource <b>{resourceName}</b>.
+            </Trans>
+          ),
+        };
+      }
+      return {
+        text: <Trans>Update {changedResourcesCount} project resources.</Trans>,
+      };
+    }
+
+    if (changed_properties && changed_properties.length === 1) {
+      const propertyName = SafeExtractor.extractStringProperty(
+        changed_properties[0],
+        'property_name'
+      );
+      return {
+        text: (
+          <Trans>
+            Change project property <b>{propertyName}</b>.
+          </Trans>
+        ),
+      };
+    }
+
+    return {
+      text: <Trans>Change {changedPropertiesCount} project properties.</Trans>,
+    };
+  },
+  launchFunction: async ({ project, args }) => {
+    const changed_properties = SafeExtractor.extractArrayProperty(
+      args,
+      'changed_properties'
+    );
+    const changed_resources = SafeExtractor.extractArrayProperty(
+      args,
+      'changed_resources'
+    );
+    if (
+      (!changed_properties || changed_properties.length === 0) &&
+      (!changed_resources || changed_resources.length === 0)
+    ) {
+      return makeGenericFailure(
+        'Missing or empty "changed_properties" and "changed_resources" arguments: at least one change must be provided.'
+      );
+    }
+
+    const changes = [];
+    const warnings = [];
+
+    if (changed_properties)
+      changed_properties.forEach(changed_property => {
+        const propertyName = SafeExtractor.extractStringProperty(
+          changed_property,
+          'property_name'
+        );
+        const newValue = SafeExtractor.extractStringProperty(
+          changed_property,
+          'new_value'
+        );
+        if (propertyName === null || newValue === null) {
+          warnings.push(
+            `Missing "property_name" or "new_value" in changed_properties item: ${JSON.stringify(
+              changed_property
+            )}. Skipped.`
+          );
+          return;
+        }
+
+        if (
+          isFuzzyMatch(propertyName, 'name') ||
+          isFuzzyMatch(propertyName, 'gameName')
+        ) {
+          project.setName(newValue);
+          changes.push(`Set game name to "${newValue}".`);
+        } else if (isFuzzyMatch(propertyName, 'description')) {
+          project.setDescription(newValue);
+          changes.push(`Set game description.`);
+        } else if (isFuzzyMatch(propertyName, 'version')) {
+          project.setVersion(newValue);
+          changes.push(`Set game version to "${newValue}".`);
+        } else if (isFuzzyMatch(propertyName, 'author')) {
+          project.setAuthor(newValue);
+          changes.push(`Set game author to "${newValue}".`);
+        } else if (isFuzzyMatch(propertyName, 'packageName')) {
+          project.setPackageName(newValue);
+          changes.push(`Set package name to "${newValue}".`);
+        } else if (
+          isFuzzyMatch(propertyName, 'orientation') ||
+          isFuzzyMatch(propertyName, 'gameOrientation')
+        ) {
+          if (
+            newValue !== 'default' &&
+            newValue !== 'landscape' &&
+            newValue !== 'portrait'
+          ) {
+            warnings.push(
+              `Invalid orientation: "${newValue}". Must be "default", "landscape" or "portrait". Skipped.`
+            );
+            return;
+          }
+          project.setOrientation(newValue);
+          changes.push(`Set game orientation to ${newValue}.`);
+        } else if (
+          isFuzzyMatch(propertyName, 'windowWidth') ||
+          isFuzzyMatch(propertyName, 'gameResolutionWidth')
+        ) {
+          const newWidth = parseInt(newValue, 10);
+          if (Number.isNaN(newWidth)) {
+            warnings.push(
+              `Invalid windowWidth: "${newValue}". Must be a number of pixels. Skipped.`
+            );
+            return;
+          }
+          project.setGameResolutionSize(
+            newWidth,
+            project.getGameResolutionHeight()
+          );
+          changes.push(`Set game resolution width to ${newWidth}.`);
+        } else if (
+          isFuzzyMatch(propertyName, 'windowHeight') ||
+          isFuzzyMatch(propertyName, 'gameResolutionHeight')
+        ) {
+          const newHeight = parseInt(newValue, 10);
+          if (Number.isNaN(newHeight)) {
+            warnings.push(
+              `Invalid windowHeight: "${newValue}". Must be a number of pixels. Skipped.`
+            );
+            return;
+          }
+          project.setGameResolutionSize(
+            project.getGameResolutionWidth(),
+            newHeight
+          );
+          changes.push(`Set game resolution height to ${newHeight}.`);
+        } else if (isFuzzyMatch(propertyName, 'adaptGameResolutionAtRuntime')) {
+          const adapt = newValue.toLowerCase() === 'true';
+          project.setAdaptGameResolutionAtRuntime(adapt);
+          changes.push(
+            `Set adaptGameResolutionAtRuntime to ${adapt ? 'true' : 'false'}.`
+          );
+        } else if (isFuzzyMatch(propertyName, 'sizeOnStartupMode')) {
+          if (
+            newValue !== '' &&
+            newValue !== 'adaptWidth' &&
+            newValue !== 'adaptHeight'
+          ) {
+            warnings.push(
+              `Invalid sizeOnStartupMode: "${newValue}". Must be "adaptWidth", "adaptHeight" or an empty string. Skipped.`
+            );
+            return;
+          }
+          project.setSizeOnStartupMode(newValue);
+          changes.push(`Set sizeOnStartupMode to "${newValue}".`);
+        } else if (
+          isFuzzyMatch(propertyName, 'scaleMode') ||
+          isFuzzyMatch(propertyName, 'gameScaleMode')
+        ) {
+          if (newValue !== 'linear' && newValue !== 'nearest') {
+            warnings.push(
+              `Invalid scaleMode: "${newValue}". Must be "linear" or "nearest". Skipped.`
+            );
+            return;
+          }
+          project.setScaleMode(newValue);
+          changes.push(`Set game scale mode to ${newValue}.`);
+        } else if (isFuzzyMatch(propertyName, 'pixelsRounding')) {
+          const pixelsRounding = newValue.toLowerCase() === 'true';
+          project.setPixelsRounding(pixelsRounding);
+          changes.push(
+            `Set pixelsRounding to ${pixelsRounding ? 'true' : 'false'}.`
+          );
+        } else if (isFuzzyMatch(propertyName, 'antialiasingMode')) {
+          if (newValue !== 'none' && newValue !== 'MSAA') {
+            warnings.push(
+              `Invalid antialiasingMode: "${newValue}". Must be "none" or "MSAA". Skipped.`
+            );
+            return;
+          }
+          project.setAntialiasingMode(newValue);
+          changes.push(`Set antialiasingMode to ${newValue}.`);
+        } else if (
+          isFuzzyMatch(propertyName, 'minFPS') ||
+          isFuzzyMatch(propertyName, 'minimumFPS')
+        ) {
+          const fps = parseInt(newValue, 10);
+          if (Number.isNaN(fps)) {
+            warnings.push(`Invalid minFPS: "${newValue}". Skipped.`);
+            return;
+          }
+          project.setMinimumFPS(fps);
+          changes.push(`Set minimum FPS to ${fps}.`);
+        } else if (
+          isFuzzyMatch(propertyName, 'maxFPS') ||
+          isFuzzyMatch(propertyName, 'maximumFPS')
+        ) {
+          const fps = parseInt(newValue, 10);
+          if (Number.isNaN(fps)) {
+            warnings.push(`Invalid maxFPS: "${newValue}". Skipped.`);
+            return;
+          }
+          project.setMaximumFPS(fps);
+          changes.push(`Set maximum FPS to ${fps}.`);
+        } else if (
+          isFuzzyMatch(propertyName, 'firstLayout') ||
+          isFuzzyMatch(propertyName, 'firstScene')
+        ) {
+          if (!project.hasLayoutNamed(newValue)) {
+            warnings.push(
+              `${getSceneNotFoundMessage(
+                project,
+                newValue
+              )} \`firstLayout\` not changed.`
+            );
+            return;
+          }
+          project.setFirstLayout(newValue);
+          changes.push(
+            `Set "${newValue}" as the first scene loaded when the game starts (firstLayout).`
+          );
+        } else {
+          warnings.push(
+            `Unknown project property: "${propertyName}". Supported properties: name, description, version, author, packageName, orientation, windowWidth, windowHeight, adaptGameResolutionAtRuntime, sizeOnStartupMode, scaleMode, pixelsRounding, antialiasingMode, minFPS, maxFPS, firstLayout. Skipped.`
+          );
+        }
+      });
+
+    if (changed_resources)
+      changed_resources.forEach(changed_resource => {
+        const resourceName = SafeExtractor.extractStringProperty(
+          changed_resource,
+          'resource_name'
+        );
+        if (resourceName === null) {
+          warnings.push(
+            `Missing "resource_name" in changed_resources item: ${JSON.stringify(
+              changed_resource
+            )}. Skipped.`
+          );
+          return;
+        }
+
+        const resourcesManager = project.getResourcesManager();
+        if (!resourcesManager.hasResource(resourceName)) {
+          warnings.push(
+            `Resource not found: "${resourceName}". Resources can be listed with \`inspect_project_properties_resources\`. Skipped.`
+          );
+          return;
+        }
+
+        const deleteThisResource = SafeExtractor.extractBooleanProperty(
+          changed_resource,
+          'delete_this_resource'
+        );
+        if (deleteThisResource) {
+          const objectsCollector = new gd.ObjectsUsingResourceCollector(
+            resourcesManager,
+            resourceName
+          );
+          gd.ProjectBrowserHelper.exposeProjectObjects(
+            project,
+            // Flow does not know ObjectsUsingResourceCollector inherits from ArbitraryObjectsWorker.
+            // $FlowFixMe[incompatible-type]
+            objectsCollector
+          );
+          const objectNamesUsingResource = objectsCollector
+            .getObjectNames()
+            .toJSArray();
+          objectsCollector.delete();
+
+          if (objectNamesUsingResource.length > 0) {
+            warnings.push(
+              `Resource "${resourceName}" was NOT deleted because it is still used by: ${objectNamesUsingResource.join(
+                ', '
+              )}. Do NOT modify or update these objects to force the deletion. Stop and report the problem instead, so the user can decide what to do with these objects.`
+            );
+            return;
+          }
+
+          resourcesManager.removeResource(resourceName);
+          changes.push(`Deleted resource "${resourceName}".`);
+          return;
+        }
+
+        const newResourceName = SafeExtractor.extractStringProperty(
+          changed_resource,
+          'new_resource_name'
+        );
+        if (newResourceName === null || newResourceName === '') {
+          warnings.push(
+            `No change requested for resource "${resourceName}": set \`new_resource_name\` or \`delete_this_resource\`. Skipped.`
+          );
+          return;
+        }
+        if (newResourceName === resourceName) {
+          changes.push(`Resource already named "${resourceName}".`);
+          return;
+        }
+        if (resourcesManager.hasResource(newResourceName)) {
+          warnings.push(
+            `A resource named "${newResourceName}" already exists. "${resourceName}" was not renamed.`
+          );
+          return;
+        }
+
+        resourcesManager.renameResource(resourceName, newResourceName);
+        renameResourcesInProject(project, {
+          [resourceName]: newResourceName,
+        });
+        changes.push(
+          `Renamed resource "${resourceName}" to "${newResourceName}" (objects and events using it were updated).`
+        );
+      });
+
+    return makeMultipleChangesOutput(changes, warnings);
+  },
+  modifiesProject: true,
+};
+
 // Read the variables to change from a tool call. Supports the batch shape (a
 // `variables` array) and the legacy single-variable shape (fields at the top
 // level), so older tool versions keep working.
@@ -7058,6 +7545,8 @@ export const editorFunctions: { [string]: EditorFunction } = {
   create_scene: createScene,
   inspect_scene_properties_layers_effects: inspectScenePropertiesLayersEffects,
   change_scene_properties_layers_effects_groups: changeScenePropertiesLayersEffectsGroups,
+  inspect_project_properties_resources: inspectProjectPropertiesResources,
+  change_project_properties_resources: changeProjectPropertiesResources,
   add_or_edit_variable: addOrEditVariable,
   inspect_variables: inspectVariables,
   read_full_docs: readFullDocs,

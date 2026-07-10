@@ -1016,7 +1016,7 @@ const defineSimpleTileMap = function (extension, _, gd) {
         .setType('number')
         .setLabel(_('Columns'))
         .setDescription(_('Number of columns.'))
-        .setHidden(true)
+        .setHidden()
     );
     objectProperties.set(
       'rowCount',
@@ -1029,7 +1029,7 @@ const defineSimpleTileMap = function (extension, _, gd) {
         .setType('number')
         .setLabel(_('Rows'))
         .setDescription(_('Number of rows.'))
-        .setHidden(true)
+        .setHidden()
     );
     objectProperties.set(
       'tileSize',
@@ -1042,7 +1042,7 @@ const defineSimpleTileMap = function (extension, _, gd) {
         .setType('number')
         .setLabel(_('Tile size'))
         .setDescription(_('Tile size in pixels.'))
-        .setHidden(true) // Hidden because a full editor is needed to recompute column/row counts
+        .setHidden() // Hidden because a full editor is needed to recompute column/row counts
     );
     objectProperties.set(
       'tilesWithHitBox',
@@ -1052,7 +1052,7 @@ const defineSimpleTileMap = function (extension, _, gd) {
         .setDescription(
           _('The list of tile ids with a hit box (separated by commas).')
         )
-        .setHidden(true)
+        .setHidden()
     );
 
     objectProperties.set(
@@ -1062,7 +1062,7 @@ const defineSimpleTileMap = function (extension, _, gd) {
         .addExtraInfo('image')
         .setLabel(_('Atlas image'))
         .setDescription(_('The Atlas image containing the tileset.'))
-        .setHidden(true) // Hidden because a full editor is needed to recompute column/row counts
+        .setHidden() // Hidden because a full editor is needed to recompute column/row counts
     );
 
     return objectProperties;
@@ -1095,7 +1095,7 @@ const defineSimpleTileMap = function (extension, _, gd) {
       .setValue(instance.getRawStringProperty('tileMap'))
       .setType('string')
       .setLabel('Tilemap')
-      .setHidden(true);
+      .setHidden();
 
     return instanceProperties;
   };
@@ -1152,7 +1152,7 @@ const defineSimpleTileMap = function (extension, _, gd) {
       '',
       'JsPlatform/Extensions/tile_map.svg'
     )
-    .setHidden(true)
+    .setHidden()
     .addParameter('object', _('Tile map'), 'SimpleTileMap', false)
     .addParameter('number', _('Grid X'), '', false)
     .addParameter('number', _('Grid Y'), '', false)
@@ -1166,7 +1166,7 @@ const defineSimpleTileMap = function (extension, _, gd) {
       '',
       'JsPlatform/Extensions/tile_map.svg'
     )
-    .setHidden(true)
+    .setHidden()
     .addParameter('object', _('Tile map'), 'SimpleTileMap', false)
     .addParameter('number', _('Grid X'), '', false)
     .addParameter('number', _('Grid Y'), '', false)
@@ -1182,7 +1182,7 @@ const defineSimpleTileMap = function (extension, _, gd) {
       '',
       'JsPlatform/Extensions/tile_map.svg'
     )
-    .setHidden(true)
+    .setHidden()
     .addParameter('object', _('Tile map'), 'SimpleTileMap', false)
     .addParameter('number', _('Position X'), '', false)
     .addParameter('number', _('Position Y'), '', false)
@@ -1198,7 +1198,7 @@ const defineSimpleTileMap = function (extension, _, gd) {
       '',
       'JsPlatform/Extensions/tile_map.svg'
     )
-    .setHidden(true)
+    .setHidden()
     .addParameter('object', _('Tile map'), 'SimpleTileMap', false)
     .addParameter('number', _('Position X'), '', false)
     .addParameter('number', _('Position Y'), '', false)
@@ -1214,7 +1214,7 @@ const defineSimpleTileMap = function (extension, _, gd) {
       '',
       'JsPlatform/Extensions/tile_map.svg'
     )
-    .setHidden(true)
+    .setHidden()
     .addParameter('object', _('Tile map'), 'SimpleTileMap', false)
     .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
     .addParameter('number', _('Position X'), '', false)
@@ -1234,7 +1234,7 @@ const defineSimpleTileMap = function (extension, _, gd) {
       'res/actions/flipY24.png',
       'res/actions/flipY.png'
     )
-    .setHidden(true)
+    .setHidden()
     .addParameter('object', _('Tile map'), 'SimpleTileMap', false)
     .addParameter('number', _('Position X'), '', false)
     .addParameter('number', _('Position Y'), '', false)
@@ -1254,7 +1254,7 @@ const defineSimpleTileMap = function (extension, _, gd) {
       'res/actions/flipX24.png',
       'res/actions/flipX.png'
     )
-    .setHidden(true)
+    .setHidden()
     .addParameter('object', _('Tile map'), 'SimpleTileMap', false)
     .addParameter('number', _('Position X'), '', false)
     .addParameter('number', _('Position Y'), '', false)
@@ -1272,7 +1272,7 @@ const defineSimpleTileMap = function (extension, _, gd) {
       'JsPlatform/Extensions/tile_map.svg',
       'JsPlatform/Extensions/tile_map.svg'
     )
-    .setHidden(true)
+    .setHidden()
     .addParameter('object', _('Tile map'), 'SimpleTileMap', false)
     .addParameter('number', _('Position X'), '', false)
     .addParameter('number', _('Position Y'), '', false)
@@ -1289,7 +1289,7 @@ const defineSimpleTileMap = function (extension, _, gd) {
       '',
       'JsPlatform/Extensions/tile_map.svg'
     )
-    .setHidden(true)
+    .setHidden()
     .addParameter('object', _('Tile map'), 'SimpleTileMap', false)
     .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
     .addParameter('number', _('Grid X'), '', false)
@@ -1309,7 +1309,7 @@ const defineSimpleTileMap = function (extension, _, gd) {
       'res/actions/flipY24.png',
       'res/actions/flipY.png'
     )
-    .setHidden(true)
+    .setHidden()
     .addParameter('object', _('Tile map'), 'SimpleTileMap', false)
     .addParameter('number', _('Grid X'), '', false)
     .addParameter('number', _('Grid Y'), '', false)
@@ -1329,7 +1329,7 @@ const defineSimpleTileMap = function (extension, _, gd) {
       'res/actions/flipX24.png',
       'res/actions/flipX.png'
     )
-    .setHidden(true)
+    .setHidden()
     .addParameter('object', _('Tile map'), 'SimpleTileMap', false)
     .addParameter('number', _('Grid X'), '', false)
     .addParameter('number', _('Grid Y'), '', false)
@@ -1347,7 +1347,7 @@ const defineSimpleTileMap = function (extension, _, gd) {
       'JsPlatform/Extensions/tile_map.svg',
       'JsPlatform/Extensions/tile_map.svg'
     )
-    .setHidden(true)
+    .setHidden()
     .addParameter('object', _('Tile map'), 'SimpleTileMap', false)
     .addParameter('number', _('Grid X'), '', false)
     .addParameter('number', _('Grid Y'), '', false)
@@ -1366,7 +1366,7 @@ const defineSimpleTileMap = function (extension, _, gd) {
       'res/actions/flipX24.png',
       'res/actions/flipX.png'
     )
-    .setHidden(true)
+    .setHidden()
     .addParameter('object', _('Tile map'), 'SimpleTileMap', false)
     .addParameter('number', _('Position X'), '', false)
     .addParameter('number', _('Position Y'), '', false)
@@ -1385,7 +1385,7 @@ const defineSimpleTileMap = function (extension, _, gd) {
       'res/actions/flipY24.png',
       'res/actions/flipY.png'
     )
-    .setHidden(true)
+    .setHidden()
     .addParameter('object', _('Tile map'), 'SimpleTileMap', false)
     .addParameter('number', _('Position X'), '', false)
     .addParameter('number', _('Position Y'), '', false)
@@ -1404,7 +1404,7 @@ const defineSimpleTileMap = function (extension, _, gd) {
       'res/actions/flipX24.png',
       'res/actions/flipX.png'
     )
-    .setHidden(true)
+    .setHidden()
     .addParameter('object', _('Tile map'), 'SimpleTileMap', false)
     .addParameter('number', _('Grid X'), '', false)
     .addParameter('number', _('Grid Y'), '', false)
@@ -1423,7 +1423,7 @@ const defineSimpleTileMap = function (extension, _, gd) {
       'res/actions/flipY24.png',
       'res/actions/flipY.png'
     )
-    .setHidden(true)
+    .setHidden()
     .addParameter('object', _('Tile map'), 'SimpleTileMap', false)
     .addParameter('number', _('Grid X'), '', false)
     .addParameter('number', _('Grid Y'), '', false)
@@ -1440,7 +1440,7 @@ const defineSimpleTileMap = function (extension, _, gd) {
       _('Size'),
       'res/actions/scaleHeight24_black.png'
     )
-    .setHidden(true)
+    .setHidden()
     .addParameter('object', _('Tile map'), 'SimpleTileMap', false)
     .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
     .setFunctionName('setGridRowCount')
@@ -1456,7 +1456,7 @@ const defineSimpleTileMap = function (extension, _, gd) {
       _('Size'),
       'res/actions/scaleWidth24_black.png'
     )
-    .setHidden(true)
+    .setHidden()
     .addParameter('object', _('Tile map'), 'SimpleTileMap', false)
     .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
     .setFunctionName('setGridColumnCount')

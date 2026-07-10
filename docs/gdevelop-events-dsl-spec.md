@@ -1,11 +1,12 @@
-# IfDo
+# IfDo Events DSL
 
-## A Minimal AI-Friendly DSL for GDevelop Events JSON
+## A Minimal AI-Friendly DSL for GDevelop Events JSON and Functions
 
-**Status:** Version 1.1 design specification  
-**Suggested file extension:** `.events`  
+**Status:** Version 1.2 final design specification  
+**Canonical source filename:** `xx.events`  
+**File extension:** `.events`  
 **Encoding:** UTF-8  
-**Target:** GDevelop scene event sheets and external event sheets
+**Target:** GDevelop scene event sheets, external event sheets, and extension functions
 
 ---
 
@@ -27,18 +28,19 @@ while
 group
 link
 js
+function
 end
 #
 >
 ```
 
-A compiler converts IfDo into the exact GDevelop Events JSON expected by the loaded project, GDevelop version, installed extensions, objects, behaviors, variables, resources, scenes, and external event sheets.
+A compiler converts `.events` source into the exact GDevelop event-sheet or extension-function data expected by the loaded project, GDevelop version, installed extensions, objects, behaviors, variables, resources, scenes, external event sheets, and registered functions.
 
 The AI model should not generate internal GDevelop instruction identifiers or positional JSON parameter arrays.
 
 ### Minimal standard event
 
-```ifdo
+```events
 # Collect a coin
 
 if collision Player Coin
@@ -48,7 +50,7 @@ do scene.score += 1
 
 ### Standard event with a sub-event
 
-```ifdo
+```events
 if collision Player Enemy
 if Player.invincible == false
 do Player.health -= Enemy.damage
@@ -75,7 +77,7 @@ IfDo is designed to be:
 
 ### Non-goals
 
-Version 1.1 is not intended to be:
+Version 1.2 is not intended to be:
 
 - A general-purpose programming language.
 - A full GDevelop project format.
@@ -85,7 +87,7 @@ Version 1.1 is not intended to be:
 - A JavaScript type checker. JavaScript is supported only as an explicit raw-code event.
 - A serialization of editor-only layout details that do not affect event behavior.
 
-One IfDo file represents one scene event sheet or one external event sheet. The target sheet is supplied to the compiler through its API, command line, or editor integration.
+Every source file uses the name pattern `xx.events`, where `xx` is any useful base name. A `.events` file represents either one scene/external event sheet or one extension function. Event-sheet targets are supplied through the compiler API, command line, or editor integration. A function file identifies itself with a `function` header.
 
 ---
 
@@ -108,6 +110,7 @@ The following table maps the items visible in the GDevelop event menus to IfDo.
 | Repeat | `repeat count` |
 | Standard event | `if`, `or`, and `do` lines |
 | While | `while condition` |
+| Extension function | A `.events` file beginning with `function` |
 
 `New Event Below` is an editor insertion command rather than a serialized event type. In a text language, event order already expresses this operation.
 
@@ -121,7 +124,7 @@ Every IfDo condition, action, declaration, branch marker, loop header, group mar
 
 Correct:
 
-```ifdo
+```events
 if collision Player Enemy
 do Player.health -= 10
 ```
@@ -142,19 +145,19 @@ Only leading `>` characters define sub-event depth.
 
 These are equivalent:
 
-```ifdo
+```events
 > if Enemy.health <= 0
 > do delete Enemy
 ```
 
-```ifdo
+```events
 >   if Enemy.health <= 0
 >   do delete Enemy
 ```
 
 The canonical formatter emits one space after the complete depth prefix:
 
-```ifdo
+```events
 > if Enemy.health <= 0
 ```
 
@@ -168,7 +171,7 @@ The canonical formatter uses blank lines between sibling events and around group
 
 Strings use double quotes:
 
-```ifdo
+```events
 do sound.play "sounds/hurt.wav"
 do scene.change "GameOver"
 ```
@@ -214,10 +217,40 @@ sound.play
 
 Bracket indexing accesses a dynamic child of a structure or array:
 
-```ifdo
+```events
 do scene.inventory[item.name] = item.value * 2
 do local.items[0] = "Sword"
 ```
+
+
+### 4.6 File names and file kinds
+
+All DSL source files use the `.events` extension:
+
+```text
+Main.events
+SharedCombat.events
+Combat.Damage.events
+```
+
+`xx.events` means that `xx` is an arbitrary descriptive base name.
+
+A source file has one of two kinds:
+
+1. **Event-sheet file** — contains scene or external events and has no `function` header.
+2. **Function file** — its first nonblank, non-comment statement is a `function` header and the remaining source is that function's event body.
+
+Canonical names are:
+
+```text
+<SceneName>.events
+<ExternalEventSheetName>.events
+<ExtensionName>.<FunctionName>.events
+```
+
+The filename is advisory rather than semantic. The compiler target determines the scene or external event sheet, while a function header determines the extension and function name. The `ifdo-ai` profile requires the canonical filename when the integration can control it.
+
+A `.events` file contains at most one function definition. Multiple functions use multiple files.
 
 ---
 
@@ -225,7 +258,7 @@ do local.items[0] = "Sword"
 
 A standard IfDo event consists of optional local declarations, zero or more conditions, and one or more actions or sub-events.
 
-```ifdo
+```events
 local damage = 10
 if collision Player Enemy
 do Player.health -= local.damage
@@ -233,7 +266,7 @@ do Player.health -= local.damage
 
 Multiple `if` lines mean **AND**:
 
-```ifdo
+```events
 if Player.health > 0
 if key Space pressed
 do Platformer.jump Player
@@ -241,7 +274,7 @@ do Platformer.jump Player
 
 An `or` line extends the immediately preceding condition group:
 
-```ifdo
+```events
 if key Left down
 or key A down
 do Platformer.move_left Player
@@ -249,7 +282,7 @@ do Platformer.move_left Player
 
 Sub-events use depth prefixes:
 
-```ifdo
+```events
 if collision Player Enemy
 do Player.health -= 10
 
@@ -259,7 +292,7 @@ do Player.health -= 10
 
 Groups organize sibling events:
 
-```ifdo
+```events
 group Combat
 
 if collision Bullet Enemy
@@ -275,7 +308,7 @@ end
 
 A full-line comment begins with `#` after the optional depth prefix.
 
-```ifdo
+```events
 # Damage the player only when invincibility is off
 
 if collision Player Enemy
@@ -285,7 +318,7 @@ do Player.health -= Enemy.damage
 
 A nested comment uses the same depth as the location where the GDevelop comment event is inserted:
 
-```ifdo
+```events
 if scene begins
 
 > # Restore an existing save
@@ -295,7 +328,7 @@ if scene begins
 
 Consecutive comments at the same depth may be combined into one multiline GDevelop comment event by the compiler:
 
-```ifdo
+```events
 # Player damage
 # The timer prevents damage every frame
 ```
@@ -318,7 +351,7 @@ The most common GDevelop event is represented directly with `if`, `or`, and `do`
 
 A condition line starts with `if`:
 
-```ifdo
+```events
 if collision Player Enemy
 ```
 
@@ -331,7 +364,7 @@ Conditions may be:
 
 #### Catalog instruction condition
 
-```ifdo
+```events
 if collision Player Enemy
 if key Space pressed
 if Platformer.on_floor Player
@@ -342,7 +375,7 @@ Available instruction names and argument signatures come from the compiler's pro
 
 #### Comparisons
 
-```ifdo
+```events
 if Player.health <= 0
 if scene.score >= 100
 if Player.state == "attacking"
@@ -362,7 +395,7 @@ Supported comparison operators:
 
 #### Boolean references
 
-```ifdo
+```events
 if Player.invincible
 if global.hasSave
 ```
@@ -371,7 +404,7 @@ The referenced value must be known as a boolean.
 
 #### Negation
 
-```ifdo
+```events
 if not Player.invincible
 if not Platformer.on_floor Player
 if not collision Player Wall
@@ -383,7 +416,7 @@ The compiler maps `not` to a GDevelop inverted condition or an equivalent event 
 
 Trigger-once is an ordinary catalog condition:
 
-```ifdo
+```events
 if Player.health <= 0
 if once
 do scene.change "GameOver"
@@ -393,7 +426,7 @@ do scene.change "GameOver"
 
 Each new `if` starts another condition group. Condition groups are joined with AND.
 
-```ifdo
+```events
 if Player.canMove
 if key Left down
 or key A down
@@ -410,7 +443,7 @@ AND
 
 The general rule is:
 
-```ifdo
+```events
 if A
 or B
 or C
@@ -433,7 +466,7 @@ An action line starts with `do`.
 
 #### Catalog action
 
-```ifdo
+```events
 do delete Enemy
 do sound.play "sounds/jump.wav"
 do scene.change "GameOver"
@@ -444,7 +477,7 @@ do create Coin x=Enemy.x y=Enemy.y
 
 Named arguments use `name=value`:
 
-```ifdo
+```events
 do create Enemy x=800 y=400 layer="Game"
 do camera.shake strength=20 duration=0.4s
 ```
@@ -453,7 +486,7 @@ Named arguments are preferred for instructions with more than two parameters.
 
 #### Assignment action
 
-```ifdo
+```events
 do scene.score = 0
 do scene.score += 100
 do Player.health -= Enemy.damage
@@ -477,7 +510,7 @@ The target must be writable according to the project schema.
 
 An event may contain actions without conditions:
 
-```ifdo
+```events
 do Player.angle += 1
 ```
 
@@ -489,7 +522,7 @@ It runs whenever GDevelop evaluates that event, normally once per frame.
 
 A GDevelop local variable is declared with `local` and belongs to one event.
 
-```ifdo
+```events
 local damage = 10
 local soundName = "sounds/hurt.wav"
 if collision Player Enemy
@@ -510,7 +543,7 @@ A local variable is:
 
 For a loop event, local variables are initialized once before the loop starts and remain available throughout its iterations and descendants.
 
-```ifdo
+```events
 local spacing = 50
 repeat 5 index=i
 > do create Coin x=100+i*local.spacing y=200
@@ -520,7 +553,7 @@ repeat 5 index=i
 
 For a standard event or loop, all local declarations appear before the event header:
 
-```ifdo
+```events
 local threshold = 30
 if Player.health < local.threshold
 do Player.animation = "Hurt"
@@ -535,7 +568,7 @@ local threshold = 30
 
 For an `else` branch, declarations appear immediately after `else` or `else if` and before branch conditions or actions:
 
-```ifdo
+```events
 if global.hasSave
 do save.load
 else
@@ -547,7 +580,7 @@ do scene.score = local.startingScore
 
 The compiler infers a local variable's type from its initializer or validates it against imported GDevelop variable metadata.
 
-```ifdo
+```events
 local count = 0
 local title = "Inventory"
 local active = true
@@ -598,7 +631,7 @@ A conditional event must contain at least one action or sub-event.
 
 A parent event may contain only conditions and sub-events:
 
-```ifdo
+```events
 if Player.health > 0
 
 > if key Space pressed
@@ -612,7 +645,7 @@ A parent action after its first child event is invalid.
 
 Each leading `>` increases event depth by one.
 
-```ifdo
+```events
 if collision Player Enemy
 do Player.health -= 10
 
@@ -622,7 +655,7 @@ do Player.health -= 10
 
 A second level uses `>>`:
 
-```ifdo
+```events
 if collision Player Chest
 do Chest.animation = "Open"
 
@@ -660,7 +693,7 @@ Sub-events inherit the parent event's condition context, local variables, and pi
 
 ### 10.1 Else
 
-```ifdo
+```events
 if Player.health > 0
 do Player.animation = "Alive"
 else
@@ -669,7 +702,7 @@ do Player.animation = "Dead"
 
 ### 10.2 Else-if
 
-```ifdo
+```events
 if Player.health <= 0
 do Player.animation = "Dead"
 else if Player.health < 30
@@ -680,7 +713,7 @@ do Player.animation = "Idle"
 
 ### 10.3 OR and additional conditions in else-if
 
-```ifdo
+```events
 if Player.health <= 0
 do Player.animation = "Dead"
 else if Player.health < 30
@@ -693,7 +726,7 @@ do Player.animation = "Idle"
 
 ### 10.4 Branch-local variables
 
-```ifdo
+```events
 if global.hasSave
 do save.load
 else
@@ -703,7 +736,7 @@ do scene.score = local.defaultScore
 
 When a branch-local value must be used by a condition, place a child standard event inside the branch. The child inherits the branch local:
 
-```ifdo
+```events
 if Player.health <= 0
 do Player.animation = "Dead"
 else
@@ -719,7 +752,7 @@ local hurtThreshold = 30
 
 Depth identifies the matching branch:
 
-```ifdo
+```events
 if Player.health > 0
 
 > if Player.health < 20
@@ -747,7 +780,7 @@ do Player.animation = "Dead"
 
 Groups organize events but do not change runtime semantics.
 
-```ifdo
+```events
 group Combat
 
 if collision Bullet Enemy
@@ -763,11 +796,11 @@ end
 
 A group name may be an identifier or a quoted string:
 
-```ifdo
+```events
 group PlayerDamage
 ```
 
-```ifdo
+```events
 group "Player Damage"
 ```
 
@@ -790,14 +823,14 @@ All loop types support optional event-local declarations placed before the loop 
 
 ### 12.1 For each object
 
-```ifdo
+```events
 for each Enemy
 > do Enemy.x += 1
 ```
 
 With a child condition:
 
-```ifdo
+```events
 for each Enemy
 > if Enemy.health <= 0
 > do delete Enemy
@@ -805,14 +838,14 @@ for each Enemy
 
 An object group may be used:
 
-```ifdo
+```events
 for each Enemies
 > do Enemies.move_toward Player speed=80
 ```
 
 Optional loop counter:
 
-```ifdo
+```events
 for each Enemy index=i
 > do Enemy.spawnOrder = i
 ```
@@ -823,7 +856,7 @@ The counter starts at `0` and increments once per processed object instance.
 
 Use `for each child` to iterate through a structure or array variable:
 
-```ifdo
+```events
 for each child scene.inventory as item
 > do DebugText.text = item.name + ": " + item.value
 ```
@@ -838,7 +871,7 @@ item.index   zero-based loop counter
 
 Example with child structures:
 
-```ifdo
+```events
 for each child scene.spawnPoints as point
 > do create Enemy x=scene.spawnPoints[point.name].x y=scene.spawnPoints[point.name].y
 ```
@@ -847,7 +880,7 @@ Using the source path with `point.name` remains valid even when the current chil
 
 Example updating the original structure explicitly:
 
-```ifdo
+```events
 for each child scene.inventory as item
 > do scene.inventory[item.name] = item.value + 1
 ```
@@ -858,14 +891,14 @@ The compiler lowers the alias fields into collision-proof GDevelop local/output 
 
 ### 12.3 Repeat
 
-```ifdo
+```events
 repeat 5
 > do create Coin x=100 y=200
 ```
 
 Optional loop counter:
 
-```ifdo
+```events
 repeat 5 index=i
 > do create Coin x=100+i*50 y=200
 ```
@@ -882,14 +915,14 @@ The repeat count must evaluate to a non-negative integer.
 
 A while event repeats without interruption while all of its condition groups remain true.
 
-```ifdo
+```events
 while scene.queueSize > 0 limit=1000
 > do scene.queueSize -= 1
 ```
 
 An `or` directly after the header extends the first condition group:
 
-```ifdo
+```events
 while scene.queueSize > 0 limit=1000
 or scene.forceDrain
 > do scene.queueSize = max(0, scene.queueSize - 1)
@@ -897,7 +930,7 @@ or scene.forceDrain
 
 Additional `if` groups are joined with AND:
 
-```ifdo
+```events
 while scene.running limit=1000 index=i
 if scene.queueSize > 0
 or scene.forceDrain
@@ -914,7 +947,7 @@ AND
 
 Optional counter:
 
-```ifdo
+```events
 while scene.queueSize > 0 limit=100 index=i
 > do DebugText.text = "Iteration " + i
 > do scene.queueSize -= 1
@@ -932,7 +965,7 @@ A while body should visibly change data involved in the loop condition. The vali
 
 ### 12.5 Loop-local variables
 
-```ifdo
+```events
 local total = 0
 for each child scene.rewards as reward
 > do local.total += reward.value
@@ -945,7 +978,7 @@ The local is initialized once before the loop, not once per iteration.
 
 ### 12.6 Nested loops
 
-```ifdo
+```events
 for each Enemy index=enemyIndex
 > repeat 3 index=sparkIndex
 >> do create Spark x=Enemy.x+sparkIndex*4 y=Enemy.y
@@ -969,19 +1002,19 @@ A link event inserts the events of another event sheet at its source position.
 
 Link an external event sheet:
 
-```ifdo
+```events
 link external "Shared Combat"
 ```
 
 Link another scene's event sheet:
 
-```ifdo
+```events
 link scene "Base Level"
 ```
 
 A link may be a sub-event:
 
-```ifdo
+```events
 if Player.active
 > link external "Player Logic"
 ```
@@ -1001,7 +1034,7 @@ if Player.active
 
 A JavaScript event is an explicit raw-code escape hatch.
 
-```ifdo
+```events
 js
 const score = runtimeScene.getVariables().get("Score");
 score.setNumber(score.getAsNumber() + 1);
@@ -1014,7 +1047,7 @@ end js
 
 Use `objects=<ObjectOrGroup>` to pass the selected instances of one object or object group as the `objects` array:
 
-```ifdo
+```events
 if collision Player Enemy
 
 > js objects=Enemy
@@ -1053,14 +1086,14 @@ local.<variable>
 
 Behavior and instruction namespaces remain explicit:
 
-```ifdo
+```events
 if Platformer.on_floor Player
 do Platformer.jump Player
 ```
 
 Loop aliases are lexical identifiers introduced by a loop header:
 
-```ifdo
+```events
 repeat 5 index=i
 > do scene.lastIndex = i
 
@@ -1085,6 +1118,22 @@ The compiler rejects ambiguous or unknown paths rather than guessing.
 
 Unqualified project variables such as `score` are not allowed in the canonical AI profile.
 
+
+Inside a function file, parameter names are direct read-only symbols and `result` is a reserved writable symbol for returning values:
+
+```text
+target
+amount
+result
+```
+
+Extension-owned state may be exposed by the compiler as:
+
+```text
+extension.global.<variable>
+extension.scene.<variable>
+```
+
 ---
 
 ## 16. Expressions
@@ -1108,7 +1157,7 @@ false
 
 Array and structure literals with values are permitted in local declarations:
 
-```ifdo
+```events
 local numbers = [1, 2, 3]
 local stats = {health: 100, name: "Slime"}
 ```
@@ -1127,7 +1176,7 @@ scene.inventory[item.name]
 
 ### 16.3 Arithmetic
 
-```ifdo
+```events
 do scene.score += Enemy.value * 2
 do Player.x = Enemy.x + 16
 do Player.health = max(0, Player.health - Enemy.damage)
@@ -1151,9 +1200,9 @@ Standard precedence:
 4. `+`, `-`.
 5. Comparisons.
 
-### 16.4 Functions
+### 16.4 Catalog expression calls
 
-Expression functions must come from the compiler catalog:
+Built-in and extension expression calls must come from the compiler catalog:
 
 ```text
 min(a, b)
@@ -1167,7 +1216,372 @@ A model may use only functions listed for the current project and GDevelop versi
 
 ---
 
-## 17. Instruction catalog
+
+## 17. Function files
+
+A function is a specialized `.events` file whose body is written with the same event syntax as every other sheet. This keeps reusable logic inside one language instead of introducing a second programming model.
+
+One file defines exactly one function. The canonical filename mirrors the qualified name:
+
+```text
+Combat.Damage.events
+Combat.IsDead.events
+UI.HealthLabel.events
+```
+
+The function header is the first significant line in the file. There is no closing `end` for the function; the end of the file ends the definition.
+
+### 17.1 Function header
+
+```events
+function <kind> <Extension>.<Name> <parameter>:<type> ...
+```
+
+Supported core kinds are:
+
+| Kind | Used as | Result type |
+|---|---|---|
+| `action` | A `do` instruction | No result |
+| `condition` | An `if` condition | Boolean |
+| `number` | A numeric expression | Number |
+| `text` | A text expression | Text |
+| `lifecycle` | An engine-called extension hook | No result |
+
+Examples:
+
+```events
+function action Combat.Damage target:object amount:number
+```
+
+```events
+function condition Combat.IsDead target:object
+```
+
+```events
+function number Combat.DamageForLevel level:number base:number
+```
+
+```events
+function text UI.HealthLabel health:number maximum:number
+```
+
+The qualified name has exactly two semantic parts:
+
+```text
+ExtensionName.FunctionName
+```
+
+Both parts use normal identifier rules. Extension folders and editor presentation metadata are outside the core DSL.
+
+### 17.2 Parameters
+
+A parameter is declared as:
+
+```text
+name:type
+```
+
+Core portable parameter types are:
+
+```text
+object
+number
+text
+boolean
+```
+
+The compiler catalog may expose additional typed parameters without changing the grammar, for example:
+
+```text
+behavior(target)
+scenevar
+identifier
+key
+mousebutton
+color
+layer
+scene
+point(target)
+animation(target)
+resource.image
+resource.audio
+resource.json
+resource.font
+resource.bitmapfont
+```
+
+A behavior parameter names its associated object parameter:
+
+```events
+function action Movement.Stop target:object mover:behavior(target)
+```
+
+Parameters are read-only. Their names are referenced directly in the function body:
+
+```events
+function action Combat.Damage target:object amount:number
+
+do target.health -= amount
+```
+
+An object parameter behaves as an object alias and carries the picked instances passed by the caller. A value parameter behaves as a typed read-only expression.
+
+Default parameters, variadic parameters, overloaded function names, and positional custom-function calls are not part of version 1.2.
+
+### 17.3 Action functions
+
+Definition:
+
+```events
+function action Combat.Damage target:object amount:number
+
+if target.health > 0
+do target.health -= amount
+
+> if target.health <= 0
+> do delete target
+```
+
+Call:
+
+```events
+if collision Player Enemy
+do Combat.Damage target=Player amount=Enemy.damage
+```
+
+An action function is valid only after `do`.
+
+### 17.4 Condition functions
+
+A condition function writes a Boolean to the reserved target `result`:
+
+```events
+function condition Combat.IsDead target:object
+
+do result = false
+
+if target.health <= 0
+do result = true
+```
+
+Call:
+
+```events
+if Combat.IsDead target=Player
+do scene.change "GameOver"
+```
+
+Negation uses the normal condition syntax:
+
+```events
+if not Inventory.HasItem itemName="Key" quantity=1
+do sound.play "locked.wav"
+```
+
+### 17.5 Number expression functions
+
+```events
+function number Combat.DamageForLevel level:number base:number
+
+do result = base + level * 2
+```
+
+Expression functions use parentheses and comma-separated named arguments:
+
+```events
+do Enemy.health -= Combat.DamageForLevel(level=Player.level, base=10)
+```
+
+A numeric function may read and update a numeric `result`:
+
+```events
+function number Math.ApplyBonuses base:number critical:boolean boosted:boolean
+
+do result = base
+
+if critical
+do result *= 2
+
+if boosted
+do result *= 1.5
+```
+
+### 17.6 Text expression functions
+
+```events
+function text UI.HealthLabel health:number maximum:number
+
+do result = "HP: " + text(health) + "/" + text(maximum)
+```
+
+Call:
+
+```events
+do HealthText.text = UI.HealthLabel(health=Player.health, maximum=Player.maxHealth)
+```
+
+### 17.7 Result semantics
+
+`result` is a reserved writable target available only in `condition`, `number`, and `text` functions.
+
+```events
+do result = true
+do result = 42
+do result = "Ready"
+```
+
+The required type is determined by the function kind:
+
+| Function kind | Valid `result` value |
+|---|---|
+| `condition` | Boolean |
+| `number` | Number |
+| `text` | Text |
+
+Assigning `result` sets the current return value; it does not immediately stop function execution. A later event may replace it. There is no separate early-return statement in version 1.2.
+
+The `ifdo-ai` profile requires an unconditional initial result before any conditional result assignment:
+
+```events
+do result = false
+```
+
+```events
+do result = 0
+```
+
+```events
+do result = ""
+```
+
+This makes every execution path deterministic. Writing `result` in an `action` or `lifecycle` function is an error.
+
+### 17.8 Function locals, loops, groups, and sub-events
+
+Normal event constructs remain valid in a function body:
+
+```events
+function action Effects.SpawnCoins source:object count:number
+
+local spacing = 12
+repeat count index=i
+> do create Coin x=source.x+i*local.spacing y=source.y
+```
+
+```events
+function action Combat.DamageAll targets:object amount:number
+
+for each targets
+> if targets.health > 0
+> do targets.health -= amount
+
+>> if targets.health <= 0
+>> do delete targets
+```
+
+Comments, event groups, local variables, standard events, sub-events, else branches, For Each Object, For Each Child Variable, Repeat, While, JavaScript, and calls to other functions are available when valid for the target compiler.
+
+### 17.9 Calling convention
+
+Custom functions always use named arguments.
+
+Action call:
+
+```events
+do Combat.Damage target=Enemy amount=25
+```
+
+Condition call:
+
+```events
+if Combat.IsDead target=Enemy
+do delete Enemy
+```
+
+Expression call:
+
+```events
+do scene.damage = Combat.DamageForLevel(level=Player.level, base=10)
+```
+
+Action and condition calls omit parentheses to match ordinary catalog instructions. Expression calls require parentheses because they can be nested inside larger expressions.
+
+For action and condition calls, a named argument continues until the next top-level `name=` token or the end of the line. Parenthesized expression calls therefore remain unambiguous:
+
+```events
+do Combat.Damage target=Player amount=Combat.DamageForLevel(level=Enemy.level, base=10) canKill=true
+```
+
+The compiler validates missing, duplicate, unknown, and incorrectly typed arguments before emitting GDevelop data.
+
+### 17.10 Function scope and portability
+
+Function parameters are the primary interface to the caller.
+
+Rules:
+
+1. Value parameters are read-only.
+2. Object parameters are the only portable way to reference caller objects.
+3. Direct scene-object names are rejected in the portable function profile unless they are object parameters.
+4. `local.` variables remain event-local as elsewhere in the language.
+5. Extension-owned variables may be exposed by the compiler as `extension.global.<name>` and `extension.scene.<name>`.
+6. Project-specific access to `scene.` or `global.` variables is allowed only when the function target explicitly enables it.
+7. Event links are not allowed inside function files.
+8. Raw JavaScript follows the same opt-in policy as event sheets.
+9. A function may call another function.
+10. Recursion is available only when the compiler enables it; the `ifdo-ai` profile disables recursion by default.
+
+Invalid portable function:
+
+```events
+function action Combat.Heal target:object amount:number
+
+do Player.health += amount
+```
+
+Correct:
+
+```events
+function action Combat.Heal target:object amount:number
+
+do target.health += amount
+```
+
+### 17.11 Lifecycle functions
+
+A compiler targeting GDevelop versions that expose extension lifecycle hooks may use:
+
+```events
+function lifecycle Analytics.onScenePreEvents
+
+do Analytics.Update
+```
+
+A lifecycle function:
+
+- Uses a compiler-listed lifecycle name.
+- Has no user-defined result.
+- Has no ordinary call site; the engine invokes it.
+- Has no user-defined parameters unless the target registry explicitly permits them.
+- Is rejected when the target GDevelop version does not expose the requested hook.
+
+Lifecycle functions are part of the full profile but should be generated by AI only when the available lifecycle names are included in the prompt catalog.
+
+### 17.12 Function-file rules
+
+- A function file contains exactly one `function` header.
+- The header is at depth zero and precedes all executable events.
+- The canonical formatter puts the header on the first physical line.
+- The body begins after the header and continues to end of file.
+- A function header is invalid in a scene or external event-sheet target.
+- A file without a function header is not inferred to be a function from its filename alone.
+- The canonical function filename is `<Extension>.<Function>.events`.
+- The function becomes an ordinary catalog action, condition, or expression after its signature is registered.
+- Cyclic calls are reported; recursive cycles are rejected by the AI profile unless explicitly enabled.
+
+---
+
+## 18. Instruction catalog
 
 The grammar defines event structure. The instruction catalog defines which conditions, actions, and expressions are valid.
 
@@ -1205,14 +1619,15 @@ The catalog is generated from:
 - Resources.
 - Scene names.
 - External event-sheet names.
+- Registered `.events` function signatures.
 
-### 17.1 Canonical names
+### 18.1 Canonical names
 
 Each instruction has one preferred DSL spelling.
 
 Use:
 
-```ifdo
+```events
 if collision Player Enemy
 ```
 
@@ -1226,23 +1641,23 @@ if Player overlaps Enemy
 
 Human-input aliases may be accepted, but the formatter and AI profile emit only canonical names.
 
-### 17.2 Named parameters
+### 18.2 Named parameters
 
 The registry stores parameter names and types even when GDevelop JSON stores a positional parameter array.
 
 The model writes:
 
-```ifdo
+```events
 do camera.shake strength=20 duration=0.4s
 ```
 
 The compiler writes the exact parameter order expected by GDevelop.
 
-### 17.3 Exact-instruction escape hatch
+### 18.3 Exact-instruction escape hatch
 
 An extension instruction without a friendly alias may be exposed with `@`:
 
-```ifdo
+```events
 do @AdvancedCamera::ShakeCamera duration=0.4s amplitude=20 layer="" camera=0
 ```
 
@@ -1255,9 +1670,9 @@ Rules:
 
 ---
 
-## 18. Runtime semantics
+## 19. Runtime semantics
 
-### 18.1 Object picking
+### 19.1 Object picking
 
 IfDo follows GDevelop-style object-picking behavior:
 
@@ -1267,7 +1682,7 @@ IfDo follows GDevelop-style object-picking behavior:
 4. Sibling events begin with a fresh selection context.
 5. `for each Object` selects one instance per iteration.
 
-```ifdo
+```events
 if Enemy.health <= 0
 do create Coin x=Enemy.x y=Enemy.y
 do delete Enemy
@@ -1275,11 +1690,11 @@ do delete Enemy
 
 Only enemies satisfying the condition are used by the actions.
 
-### 18.2 OR picking
+### 19.2 OR picking
 
 An OR condition group must be lowered through GDevelop's native OR representation or an equivalent structure that preserves selection and execution count.
 
-```ifdo
+```events
 if collision Player Enemy
 or collision Player Projectile
 do Player.health -= 10
@@ -1287,9 +1702,9 @@ do Player.health -= 10
 
 The compiler must not split this into unrelated events if doing so would change picking semantics.
 
-### 18.3 Sub-event inheritance
+### 19.3 Sub-event inheritance
 
-```ifdo
+```events
 if collision Player Enemy
 do Player.health -= Enemy.damage
 
@@ -1299,13 +1714,13 @@ do Player.health -= Enemy.damage
 
 The child receives the selected `Player` and `Enemy` instances.
 
-### 18.4 Local-variable lifetime
+### 19.4 Local-variable lifetime
 
 Event locals initialize before their event conditions. Loop locals initialize once before iteration. Descendants inherit them; siblings do not.
 
-### 18.5 Actions before children
+### 19.5 Actions before children
 
-```ifdo
+```events
 if collision Player Enemy
 do Player.health -= 10
 
@@ -1315,34 +1730,47 @@ do Player.health -= 10
 
 The child sees the updated health value.
 
-### 18.6 Else selection
+### 19.6 Else selection
 
 An else branch runs when its matching event does not run. It does not inherit picks from a failed branch, although it retains picks and locals inherited from an outer parent event.
 
-### 18.7 Loop execution
+### 19.7 Loop execution
 
 - `for each` evaluates its body once per selected instance.
 - `for each child` evaluates its body once per child variable.
 - `repeat` evaluates its body the requested number of times before continuing.
 - `while` evaluates repeatedly without allowing following sibling events to run until the loop ends.
 
-### 18.8 Links
+### 19.8 Links
 
 A link acts as if the target events were inserted at the link's position, subject to GDevelop's link semantics and project compatibility checks.
 
-### 18.9 JavaScript
+### 19.9 JavaScript
 
 A JavaScript event executes when event evaluation reaches it. When nested, it receives the parent picking context for the object or group selected with `objects=`.
 
-### 18.10 Groups and comments
+### 19.10 Groups and comments
 
 Groups and comments preserve source order but do not create runtime, local-variable, or object-selection scopes.
 
+### 19.11 Function calls
+
+- An action function executes its event body at the call position.
+- A condition function executes its body and supplies its Boolean `result` to the calling condition.
+- A number or text function executes its body during expression evaluation and supplies its typed `result`.
+- Object arguments pass the caller's current picked instances into the corresponding object parameter.
+- Function-internal picking follows the same condition, action, loop, and sub-event rules as ordinary event sheets.
+- Parameter bindings and `result` are private to each invocation.
+
 ---
 
-## 19. Parsing model
+## 20. Parsing model
 
-The parser operates in three stages.
+The parser operates in four stages.
+
+### Stage 0: Detect the file kind
+
+The compiler target declares whether the source is an event sheet or a function. When automatic detection is enabled, the first nonblank, non-comment statement `function` marks a function file. The canonical AI profile places the function header first.
 
 ### Stage 1: Recognize raw JavaScript blocks
 
@@ -1380,15 +1808,35 @@ At a given depth:
 - `js` creates a JavaScript event.
 - `group` starts an event group.
 - `end` closes an event group.
+- `function` is valid only as the file header and never as a nested statement.
 
 ---
 
-## 20. Simplified grammar
+## 21. Simplified grammar
 
 The following EBNF describes logical blocks after raw JavaScript extraction and depth processing.
 
 ```ebnf
-file                = { top-item } ;
+file                = event-sheet-file
+                    | function-file ;
+
+event-sheet-file    = event-sheet ;
+
+function-file       = function-header, newline, event-sheet ;
+
+event-sheet         = { top-item } ;
+
+function-header     = "function", function-kind, qualified-name,
+                      { parameter } ;
+
+function-kind       = "action" | "condition" | "number" | "text"
+                    | "lifecycle" ;
+
+qualified-name      = identifier, ".", identifier ;
+
+parameter           = identifier, ":", parameter-type ;
+
+parameter-type      = type-expression ;
 
 top-item            = comment
                     | group
@@ -1501,16 +1949,27 @@ statement           = comment-statement
                     | link-statement
                     | javascript-header
                     | javascript-end ;
+
+custom-action-call  = qualified-name, { named-argument } ;
+
+custom-condition-call = qualified-name, { named-argument } ;
+
+custom-expression-call = qualified-name, "(",
+                      [ named-argument, { ",", named-argument } ], ")" ;
+
+named-argument      = identifier, "=", expression ;
 ```
 
 The instruction catalog and expression parser define `condition-expression`, `action-expression`, and ordinary expressions.
 
 ---
 
-## 21. Compiler architecture
+## 22. Compiler architecture
 
 ```text
-IfDo source
+`.events` source
+    ↓
+File-kind and function-header scanner
     ↓
 Raw JavaScript block scanner
     ↓
@@ -1524,10 +1983,10 @@ Canonical semantic event IR
     ↓
 GDevelop instruction registry resolution
     ↓
-GDevelop Events JSON
+GDevelop event-sheet JSON or extension-function JSON
 ```
 
-### 21.1 Event-type mapping
+### 22.1 Event-type mapping
 
 | IfDo construct | Semantic GDevelop event kind |
 |---|---|
@@ -1543,13 +2002,18 @@ GDevelop Events JSON
 | `link external` / `link scene` | Link event |
 | `js` ... `end js` | JavaScript event |
 | `local` | Local-variable data attached to the owning event |
+| `function action` | Extension action definition |
+| `function condition` | Extension condition definition |
+| `function number` / `function text` | Extension expression definition |
+| `function lifecycle` | Extension lifecycle definition when supported |
+| `do result = ...` | Function return-value action |
 
 The adapter, not the AI, chooses exact internal JSON type identifiers and field names.
 
-### 21.2 Suggested compiler API
+### 22.2 Suggested compiler API
 
 ```text
-compile(source, projectContext, targetEventSheet, options) -> CompileResult
+compile(source, projectContext, target, options) -> CompileResult
 ```
 
 Suggested result:
@@ -1566,13 +2030,16 @@ CompileResult
 - referencedScenes
 - referencedExternalEvents
 - containsJavaScript
+- targetKind
+- functionSignature
+- referencedFunctions
 ```
 
-### 21.3 Semantic IR example
+### 22.3 Semantic IR example
 
 Input:
 
-```ifdo
+```events
 local damage = 10
 if collision Player Enemy
 do Player.health -= local.damage
@@ -1619,7 +2086,7 @@ Possible IR:
 }
 ```
 
-### 21.4 Source maps
+### 22.4 Source maps
 
 Every generated JSON event, local variable, condition, action, and raw-code block should retain a source-map entry with:
 
@@ -1632,11 +2099,11 @@ Every generated JSON event, local variable, condition, action, and raw-code bloc
 
 ---
 
-## 22. Validation rules
+## 23. Validation rules
 
 The compiler validates syntax and project semantics before modifying Events JSON.
 
-### 22.1 Structural validation
+### 23.1 Structural validation
 
 Reject:
 
@@ -1654,8 +2121,14 @@ Reject:
 - Duplicate local, loop-counter, or child aliases.
 - Unterminated JavaScript blocks.
 - `end js` at the wrong depth.
+- More than one function header.
+- A function header below depth zero or after executable statements.
+- A function header in an event-sheet target.
+- Event links inside a function file.
+- `result` writes in action or lifecycle functions.
+- Missing required initial `result` in the AI profile.
 
-### 22.2 Project validation
+### 23.2 Project validation
 
 Reject:
 
@@ -1673,8 +2146,14 @@ Reject:
 - Writes to read-only expressions, aliases, or counters.
 - Invalid object-versus-group usage.
 - Invalid JavaScript `objects=` symbols.
+- Unknown function kinds, names, or parameter types.
+- Unknown, missing, duplicate, or incorrectly typed custom-function arguments.
+- Writes to read-only function parameters.
+- Direct scene-object references prohibited by the selected function portability profile.
+- A function result whose type does not match the function kind.
+- Unsupported lifecycle function names.
 
-### 22.3 AI profile validation
+### 23.3 AI profile validation
 
 The `ifdo-ai` profile additionally rejects:
 
@@ -1687,8 +2166,11 @@ The `ifdo-ai` profile additionally rejects:
 - JavaScript when `allowJavaScript` is false.
 - Link targets not explicitly listed in the prompt context.
 - Shadowing of ancestor locals or aliases.
+- Positional arguments for custom functions.
+- Recursive function-call cycles unless `allowRecursion=true`.
+- Function filenames that do not match `<Extension>.<Function>.events` when filename enforcement is enabled.
 
-### 22.4 Diagnostic examples
+### 23.4 Diagnostic examples
 
 ```text
 E102 Unknown object "Enmey"
@@ -1755,9 +2237,37 @@ E470 JavaScript is disabled
 Set `allowJavaScript=true` only when raw JavaScript is explicitly requested.
 ```
 
+```text
+E510 Cannot write function parameter "amount"
+
+6 | do amount -= 1
+       ^^^^^^
+
+Function parameters are read-only. Copy the value to a local variable when mutation is needed.
+```
+
+```text
+E521 Missing function result initialization
+
+1 | function condition Combat.IsDead target:object
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The `ifdo-ai` profile requires an unconditional `do result = false`
+before conditional result assignments.
+```
+
+```text
+E532 Unknown function argument "ammount"
+
+8 | do Combat.Damage target=Player ammount=10
+                                      ^^^^^^^
+
+Did you mean `amount`?
+```
+
 ---
 
-## 23. Canonical formatting
+## 24. Canonical formatting
 
 The formatter emits one stable representation.
 
@@ -1776,10 +2286,14 @@ The formatter emits one stable representation.
 13. Place `else` immediately after its matching event.
 14. Preserve JavaScript body text while normalizing the final newline.
 15. End the file with a newline.
+16. Put a function header on the first physical line of a function file.
+17. Use named arguments for every custom-function call.
+18. Use `<Extension>.<Function>.events` as the canonical function filename.
+19. Initialize `result` unconditionally in AI-generated condition and expression functions.
 
 Canonical example:
 
-```ifdo
+```events
 group "Player Damage"
 
 # Apply damage from enemies or projectiles
@@ -1803,11 +2317,11 @@ end
 
 ---
 
-## 24. Complete examples
+## 25. Complete examples
 
-### 24.1 Standard events, locals, OR, else, groups, and sub-events
+### 25.1 Standard events, locals, OR, else, groups, and sub-events
 
-```ifdo
+```events
 group Combat
 
 # Damage the player
@@ -1841,9 +2355,9 @@ do Player.animation = "Idle"
 end
 ```
 
-### 24.2 Every loop type
+### 25.2 Every loop type
 
-```ifdo
+```events
 group Loops
 
 # Process each enemy instance
@@ -1875,9 +2389,9 @@ while scene.queueSize > 0 limit=1000 index=i
 end
 ```
 
-### 24.3 Linked events and JavaScript
+### 25.3 Linked events and JavaScript
 
-```ifdo
+```events
 group Reuse
 
 link external "Shared Player Logic"
@@ -1898,9 +2412,60 @@ if collision Player Enemy
 end
 ```
 
+
+### 25.4 Action, condition, and expression functions
+
+`Combat.Damage.events`:
+
+```events
+function action Combat.Damage target:object amount:number canKill:boolean
+
+local finalAmount = max(0, amount)
+
+if target.health > 0
+do target.health -= local.finalAmount
+
+> if target.health <= 0
+> if canKill
+> do delete target
+```
+
+`Combat.IsDead.events`:
+
+```events
+function condition Combat.IsDead target:object
+
+do result = false
+
+if target.health <= 0
+do result = true
+```
+
+`Combat.DamageForLevel.events`:
+
+```events
+function number Combat.DamageForLevel level:number base:number
+
+do result = base + level * 2
+```
+
+`Main.events`:
+
+```events
+group Combat
+
+if collision Player Enemy
+do Combat.Damage target=Player amount=Combat.DamageForLevel(level=Enemy.level, base=10) canKill=true
+
+if Combat.IsDead target=Player
+do scene.change "GameOver"
+
+end
+```
+
 ---
 
-## 25. AI generation contract
+## 26. AI generation contract
 
 A model using IfDo should receive:
 
@@ -1938,6 +2503,15 @@ Rules:
 - Do not emit `js` unless JavaScript is explicitly allowed.
 - Prefer catalog events over JavaScript.
 - Prefer named arguments for complex instructions.
+- Use the `.events` file extension.
+- A function file starts with exactly one `function` header.
+- Use one function per file and the filename `<Extension>.<Function>.events`.
+- Use named arguments for every custom-function call.
+- Treat function parameters as read-only.
+- Initialize `result` unconditionally in condition, number, and text functions.
+- Do not use `result` in action or lifecycle functions.
+- Do not use `link` inside a function file.
+- Do not generate recursive calls unless recursion is explicitly allowed.
 ```
 
 ### Compact grammar prompt
@@ -1996,16 +2570,33 @@ JAVASCRIPT
 js objects=Object
 raw JavaScript
 end js
+
+FUNCTION FILE
+function action Extension.Name target:object amount:number
+function condition Extension.Name target:object
+function number Extension.Name value:number
+function text Extension.Name value:text
+
+FUNCTION RESULT
+do result = false
+do result = 0
+do result = ""
+
+FUNCTION CALL
+do Extension.Action target=Player amount=10
+if Extension.Condition target=Player
+do scene.value = Extension.Number(value=10)
+do Label.text = Extension.Text(value="Ready")
 ```
 
 ---
 
-## 26. Recommended generation workflow
+## 27. Recommended generation workflow
 
 ```text
 Natural-language request
         ↓
-Project context, link targets, and instruction catalog
+Project context, function signatures, link targets, and instruction catalog
         ↓
 AI generates IfDo
         ↓
@@ -2017,7 +2608,7 @@ AI repairs IfDo diagnostics when necessary
         ↓
 Human-readable event diff
         ↓
-Compiler emits GDevelop Events JSON
+Compiler emits GDevelop event-sheet or extension-function JSON
 ```
 
 The compiler must never apply invalid output to a project.
@@ -2026,7 +2617,7 @@ Diagnostics should refer to IfDo source rather than exposing raw JSON errors to 
 
 ---
 
-## 27. Version 1.1 feature set
+## 28. Version 1.2 feature set
 
 ### Included
 
@@ -2054,10 +2645,19 @@ Diagnostics should refer to IfDo source rather than exposing raw JSON errors to 
 - Named instruction parameters.
 - Exact extension-instruction escape hatch.
 - Source maps and repairable diagnostics.
+- `.events` source-file convention.
+- One function definition per function file.
+- Action, condition, number-expression, text-expression, and catalog-listed lifecycle functions.
+- Typed read-only function parameters.
+- Named action, condition, and expression function calls.
+- Typed `result` handling.
+- Function-call validation and recursion checks.
 
 ### Deferred
 
-- User-defined functions in IfDo source.
+- Asynchronous function syntax.
+- Function parameter defaults, variadic parameters, and overloads.
+- Function editor presentation metadata in source.
 - Macros.
 - Object, scene, resource, behavior, or extension declarations.
 - Nested organizational groups in the AI profile.
@@ -2070,7 +2670,7 @@ Diagnostics should refer to IfDo source rather than exposing raw JSON errors to 
 
 ---
 
-## 28. Final design principles
+## 29. Final design principles
 
 1. **The DSL describes intent; the compiler owns GDevelop serialization.**
 2. **Every GDevelop core event type has one clear IfDo representation.**
@@ -2084,10 +2684,13 @@ Diagnostics should refer to IfDo source rather than exposing raw JSON errors to 
 10. **Unknown symbols are errors, never guesses.**
 11. **Compiler validation is mandatory.**
 12. **Generated changes should be reviewed as readable IfDo diffs before application.**
+13. **A function is a specialized `.events` event sheet, not a separate language.**
+14. **Custom-function calls always use named arguments.**
+15. **The filename convention is `xx.events`; function files canonically use `<Extension>.<Function>.events`.**
 
 The complete structural foundation remains small:
 
-```ifdo
+```events
 # comment
 
 local value = 10
@@ -2118,13 +2721,16 @@ end js
 group Name
 # events
 end
+
+function action Extension.Name target:object amount:number
+# function events
 ```
 
 ---
 
-## 29. Compatibility basis
+## 30. Compatibility basis
 
-This design follows the core event categories and behavior documented by GDevelop for standard events, else events, comments, groups, for-each object loops, for-each child-variable loops, repeat loops, while loops, link events, JavaScript events, sub-events, and local variables.
+This design follows the core event categories and behavior documented by GDevelop for standard events, else events, comments, groups, for-each object loops, for-each child-variable loops, repeat loops, while loops, link events, JavaScript events, sub-events, local variables, and extension functions.
 
 Useful official references:
 
@@ -2139,3 +2745,4 @@ Useful official references:
 - [Link events](https://wiki.gdevelop.io/gdevelop5/events/link/)
 - [JavaScript code events](https://wiki.gdevelop.io/gdevelop5/events/js-code/)
 - [Local variables](https://wiki.gdevelop.io/gdevelop5/all-features/variables/local-variables/)
+- [Functions](https://wiki.gdevelop.io/gdevelop5/events/functions/)

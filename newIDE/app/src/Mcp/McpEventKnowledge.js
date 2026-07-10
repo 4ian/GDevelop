@@ -510,7 +510,7 @@ const classifyParameterValueShape = (parameterType: string): string => {
 const summarizeParameter = (
   parameterMetadata: gdParameterMetadata,
   index: number,
-  options?: {| compact?: boolean, dslName?: string |}
+  options?: {| compact?: boolean, parameterName?: string |}
 ): Object => {
   const valueTypeMetadata = parameterMetadata.getValueTypeMetadata();
   const type = parameterMetadata.getType();
@@ -528,9 +528,9 @@ const summarizeParameter = (
   // relationalOperator, yesorno, trueorfalse). E.g. a boolean SetBooleanVariable
   // operator accepts ["True","False","Toggle"] — not yes/no/true/1.
   const acceptedValues = acceptedValuesForParameter(type, extraInfo);
-  const dslName =
-    (options && options.dslName) ||
-    getInstructionParameterBaseDslName(parameterMetadata, index);
+  const parameterName =
+    (options && options.parameterName) ||
+    getInstructionParameterBaseName(parameterMetadata, index);
   if (options && options.compact) {
     // Compact form drops the verbose valueType discriminator object and keeps
     // only what a caller needs to fill the parameter correctly.
@@ -538,7 +538,7 @@ const summarizeParameter = (
       index,
       type,
       name: parameterMetadata.getName() || undefined,
-      dslName,
+      parameterName,
       description: parameterMetadata.getDescription() || undefined,
       isOptional: parameterMetadata.isOptional(),
       defaultValue: parameterMetadata.getDefaultValue() || undefined,
@@ -552,7 +552,7 @@ const summarizeParameter = (
     index,
     type,
     name: parameterMetadata.getName() || undefined,
-    dslName,
+    parameterName,
     description: parameterMetadata.getDescription() || undefined,
     longDescription: parameterMetadata.getLongDescription() || undefined,
     hint: parameterMetadata.getHint() || undefined,
@@ -848,7 +848,7 @@ const summarizeInstructionMetadata = ({
     eventScopes,
     targetScope
   );
-  const parameterDslNames = getUniqueInstructionParameterDslNames(metadata);
+  const parameterNames = getUniqueInstructionParameterNames(metadata);
   if (compact) {
     return {
       kind,
@@ -865,7 +865,7 @@ const summarizeInstructionMetadata = ({
       parameters: mapFor(0, metadata.getParametersCount(), index =>
         summarizeParameter(metadata.getParameter(index), index, {
           compact: true,
-          dslName: parameterDslNames[index],
+          parameterName: parameterNames[index],
         })
       ),
     };
@@ -901,7 +901,7 @@ const summarizeInstructionMetadata = ({
     parameterShape,
     parameters: mapFor(0, metadata.getParametersCount(), index =>
       summarizeParameter(metadata.getParameter(index), index, {
-        dslName: parameterDslNames[index],
+        parameterName: parameterNames[index],
       })
     ),
   };
@@ -925,7 +925,7 @@ const summarizeExpressionMetadata = ({
     eventScopes,
     targetScope
   );
-  const parameterDslNames = getUniqueInstructionParameterDslNames(metadata);
+  const parameterNames = getUniqueInstructionParameterNames(metadata);
   if (compact) {
     return {
       kind: 'expression',
@@ -939,7 +939,7 @@ const summarizeExpressionMetadata = ({
       parameters: mapFor(0, metadata.getParametersCount(), index =>
         summarizeParameter(metadata.getParameter(index), index, {
           compact: true,
-          dslName: parameterDslNames[index],
+          parameterName: parameterNames[index],
         })
       ),
     };
@@ -965,7 +965,7 @@ const summarizeExpressionMetadata = ({
     deprecationMessage: metadata.getDeprecationMessage() || undefined,
     parameters: mapFor(0, metadata.getParametersCount(), index =>
       summarizeParameter(metadata.getParameter(index), index, {
-        dslName: parameterDslNames[index],
+        parameterName: parameterNames[index],
       })
     ),
   };
@@ -1810,7 +1810,7 @@ const normalizeInstructionParameterKey = (value: string): string =>
     .replace(/['’]s\b/g, '')
     .replace(/[^a-z0-9]+/g, '');
 
-const getInstructionParameterDslName = (
+const getInstructionParameterName = (
   parameterMetadata: gdParameterMetadata
 ): string => {
   const typeKey = normalizeInstructionParameterKey(
@@ -1834,7 +1834,7 @@ const getInstructionParameterDslName = (
   return '';
 };
 
-const getInstructionParameterBaseDslName = (
+const getInstructionParameterBaseName = (
   parameterMetadata: gdParameterMetadata,
   index: number
 ): string => {
@@ -1843,7 +1843,7 @@ const getInstructionParameterBaseDslName = (
     parameterMetadata.getDescription() ||
     `Parameter ${index}`;
   return (
-    getInstructionParameterDslName(parameterMetadata) ||
+    getInstructionParameterName(parameterMetadata) ||
     displayName
       .trim()
       .toLowerCase()
@@ -1854,11 +1854,9 @@ const getInstructionParameterBaseDslName = (
   );
 };
 
-const getUniqueInstructionParameterDslNames = (
-  metadata: any
-): Array<string> => {
+const getUniqueInstructionParameterNames = (metadata: any): Array<string> => {
   const baseNames = mapFor(0, metadata.getParametersCount(), index =>
-    getInstructionParameterBaseDslName(metadata.getParameter(index), index)
+    getInstructionParameterBaseName(metadata.getParameter(index), index)
   );
   const counts = {};
   baseNames.forEach(baseName => {
@@ -1936,14 +1934,14 @@ export const buildInstruction = ({
   });
   const consumedParameterKeys: Set<string> = new Set();
   const count = metadata.getParametersCount();
-  const uniqueDslNames = getUniqueInstructionParameterDslNames(metadata);
+  const uniqueParameterNames = getUniqueInstructionParameterNames(metadata);
   const aliasCounts: { [string]: number } = {};
   const rawAliasesByIndex = mapFor(0, count, index => {
     const param = metadata.getParameter(index);
     const aliases = [
       param.getName(),
       param.getDescription(),
-      getInstructionParameterDslName(param),
+      getInstructionParameterName(param),
     ].filter(Boolean);
     aliases.forEach(alias => {
       const normalized = normalizeInstructionParameterKey(alias);
@@ -1961,7 +1959,7 @@ export const buildInstruction = ({
     // machine name. Include both plus stable AI-friendly aliases.
     const paramName = param.getName() || param.getDescription();
     const parameterAliases = [
-      uniqueDslNames[index],
+      uniqueParameterNames[index],
       ...rawAliasesByIndex[index].filter(
         alias => aliasCounts[normalizeInstructionParameterKey(alias)] === 1
       ),
@@ -2038,14 +2036,14 @@ export const buildInstruction = ({
     filled.push({
       index,
       name: paramName,
-      dslName: uniqueDslNames[index],
+      parameterName: uniqueParameterNames[index],
       value: serialized,
     });
   }
   Object.keys(named).forEach(key => {
     if (consumedParameterKeys.has(key)) return;
     warnings.push(
-      `Unknown parameter "${key}" for ${kind} "${type}". Use one of the unique dslName values (${uniqueDslNames.join(
+      `Unknown parameter "${key}" for ${kind} "${type}". Use one of the unique parameterName values (${uniqueParameterNames.join(
         ', '
       )}) or a numeric index.`
     );

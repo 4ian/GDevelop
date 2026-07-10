@@ -65,7 +65,9 @@ Use `gdevelop_capabilities` as the live tool map. It groups tools roughly as:
 - Reading/searching: serialized scene/object/events reads, instance/draw-order/resource audits, event finders, extension inspection, signal usage, cleanup, prefab geometry/bindings.
 - Instruction discovery: event JSON examples, instruction search, exact instruction metadata.
 - Object/assets: resources, Sprite/Text helpers, sprite sheets, tilemaps, bulk scene setup, instances, behaviors, prefab extraction.
-- Events: compact DSL reference, `gdevelop_validate_events`, `gdevelop_apply_events`, instruction metadata search, signal helpers, event finders/linters, and extension event writers.
+- Events: serialized event JSON examples and validation, instruction metadata
+  search, signal helpers, event finders/linters, and scene/extension event
+  writers.
 - Variables/scenes: variable edits/deletes, Global Config edits, scene create/rename/delete, startup scene/project settings.
 - Runtime verification: preview launch, health, `run_frames`, input simulation, runtime state injection, screenshots, static render.
 - Safety/persistence: snapshots, validated in-memory JSON patches/sync, save-and-wait.
@@ -94,66 +96,85 @@ Before risky multi-step work, call `snapshot_project`. If a write partially succ
 
 ## Event Authoring
 
-Use the compact event DSL by default. Raw serialized event JSON is an advanced compatibility path.
+Author events with serializer-compatible GDevelop event JSON.
 
-1. Read `read_scene_events`, then `read_scene_events_serialized`. Keep its `eventSheetRevision` for the write guard.
-2. Find the semantic destination Group and stable target event id. Use `ensure_scene_event_ids` only for older events that do not have ids.
-3. When an instruction type is unknown, call `gdevelop_search_instruction_metadata`. For exact parameters, call `gdevelop_get_instruction_metadata` and use each parameter's `dslName`.
-4. Draft compact DSL with event `kind`, instruction `type`, named `parameters`, and `children`.
-5. Call `gdevelop_validate_events`. It compiles and applies the patch to a temporary project, then returns compact diagnostics and proposed revisions without modifying the live project. Set `include_rendered_events:true` only when human-readable event text is needed.
-6. Fix all errors. Warnings must either be fixed or deliberately justified.
-7. Call `gdevelop_apply_events` with the same `events`/`operations` and `expected_revision` from step 1. Pass `save:true` only when this write must also be persisted before the call returns.
-8. Require a structured receipt with `applied`, `oldRevision`, `newRevision`, `validationState`, and `saveState`. Read back the serialized events, confirm the returned revision/ids, and run `lint_scene_events`.
-9. Runtime-verify gameplay changes before completion.
+1. Read `read_scene_events`, then `read_scene_events_serialized`. Keep its
+   `eventSheetRevision` for the write guard.
+2. Find the semantic destination Group and stable target event id. Use
+   `ensure_scene_event_ids` only for older events that do not have ids.
+3. When an instruction type is unknown, call
+   `gdevelop_search_instruction_metadata`. For exact parameter order and
+   literal syntax, call `gdevelop_get_instruction_metadata`.
+4. Build serialized events with exact event `type` strings, instruction
+   `type: { "value": "..." }` objects, positional string `parameters` arrays,
+   nested `events`, and logical `subInstructions`.
+5. Validate a standalone payload with `gdevelop_validate_events_json` or a
+   large file with `validate_events_json_file`. Fix every error and either fix
+   or deliberately justify warnings.
+6. Call `add_scene_events` with `events_json` for insertion or `event_changes`
+   for targeted patches. Pass `expected_revision` from step 1 and use
+   `dry_run:true` before a risky write.
+7. Read back the serialized events, confirm the returned revision and stable
+   ids, then run `lint_scene_events`.
+8. Runtime-verify gameplay changes before completion.
 
 Hard requirements:
 
-- Every AI-created or AI-modified gameplay event must end inside a semantic Group. Put new gameplay events in a `kind: "group"` event or target an existing Group with `op: "insert_child"`.
-- Groups receive a distinct non-default color when DSL `color` is omitted. Use an explicit `#RRGGBB` only when a particular color is meaningful.
-- Important events should have a descriptive `id`; missing ids are generated automatically. Target ids rather than paths whenever possible.
+- Every AI-created or AI-modified gameplay event must end inside a semantic
+  `BuiltinCommonInstructions::Group`. Insert the Group explicitly or target an
+  existing Group with `insert_as_sub_event`.
+- Give Groups explicit, distinct non-default `colorR`, `colorG`, and `colorB`
+  values.
+- Give important events a descriptive `aiGeneratedEventId` and target ids
+  rather than paths whenever possible.
 - Do not create or modify JavaScript events unless the user explicitly requested JavaScript. Use standard GDevelop events, expressions, behaviors, and extensions first.
 - Never call an event write tool with only an English description.
 
 Event write paths:
 
-- `gdevelop_apply_events` with `events`: append compact DSL events.
-- `gdevelop_apply_events` with `operations`: insert, replace, or delete with simple operation names and stable targets.
-- `gdevelop_create_or_update_extension_function` and `gdevelop_create_or_update_on_signal` accept the same DSL in `events_dsl`.
-- `bulk_edit_scene_assets` accepts the same DSL in `events` or `events_dsl` after creating required resources, objects, behaviors, variables, and instances.
-- `add_scene_events` with `events_json`/`event_changes`: advanced raw serializer compatibility.
+- `add_scene_events` with `events_json`: append serialized events.
+- `add_scene_events` with `event_changes`: insert, replace, merge instructions,
+  or delete using low-level operation names and stable targets.
+- `gdevelop_create_or_update_extension_function` and
+  `gdevelop_create_or_update_on_signal` accept serialized `events_json`.
+- `bulk_edit_scene_assets` accepts serialized events in `events` or
+  `events_json` after creating required resources, objects, behaviors,
+  variables, and instances.
 - `replace_scene_events_from_file`: large whole-sheet replacement; validate/dry-run first and check `subInstructionsPreserved`.
 - `apply_validated_scene_patch`: focused serialized scene fixes when no structured tool covers the change.
 
-Simple operation names are `append`, `insert_before`, `insert_after`, `insert_child`, `replace`, `replace_keep_children`, `append_instructions`, `prepend_instructions`, `replace_actions`, `replace_conditions`, and `delete`. Targets are strings or `{ "event_id": "..." }` / `{ "event_path": "event-0.1" }`.
+Use `gdevelop_get_event_operation_reference` for current low-level operation
+names and target requirements. Common names include `insert_at_end`,
+`insert_before_event`, `insert_after_event`, `insert_as_sub_event`,
+`replace_entire_event_and_sub_events`, `replace_all_actions`,
+`replace_all_conditions`, and `delete_event`.
 
 After any write, inspect `staleStateAdvisory`. If previews may be stale, use `save_and_relaunch_preview_paused` before runtime verification so cleanup happens through the preview relaunch workflow. If editor panels may be stale, trust MCP readback over open tabs until they refresh.
 
-## Event DSL Essentials
+## Serialized Event JSON Essentials
 
 Common event shape:
 
 ```json
 {
-  "scene_name": "Level1",
-  "expected_revision": "fnv1a:...",
+  "type": "BuiltinCommonInstructions::Group",
+  "name": "Initialization",
+  "colorR": 90,
+  "colorG": 160,
+  "colorB": 110,
   "events": [
     {
-      "kind": "group",
-      "name": "Initialization",
-      "children": [
+      "type": "BuiltinCommonInstructions::Standard",
+      "conditions": [
         {
-          "kind": "standard",
-          "conditions": [{ "type": "SceneJustBegins" }],
-          "actions": [
-            {
-              "type": "SetNumberVariable",
-              "parameters": {
-                "variable": "Score",
-                "modification_sign": "=",
-                "value": 0
-              }
-            }
-          ]
+          "type": { "value": "SceneJustBegins" },
+          "parameters": [""]
+        }
+      ],
+      "actions": [
+        {
+          "type": { "value": "SetNumberVariable" },
+          "parameters": ["Score", "=", "0"]
         }
       ]
     }
@@ -161,21 +182,32 @@ Common event shape:
 }
 ```
 
-- Event kinds: `standard`, `group`, `comment`, `repeat`, `while`, `for_each`, `for_each_child_variable`, `else`, `link`, and explicitly requested `javascript`.
-- Instruction `type` is the exact current action/condition type. Named parameter keys are case-insensitive and ignore spaces, underscores, hyphens, and possessive punctuation.
-- Use `{ "any": [...] }`, `{ "all": [...] }`, and `{ "not": {...} }` for OR, AND, and NOT conditions. The compiler creates `subInstructions` correctly.
-- Use `children` for sub-events, `times` for repeat, `object` for for-each, and `while_conditions` for while loops.
-- Event-local scalar variables can be a map such as `{ "damage": 0, "armed": false }`.
-- The compiler fills code-only parameters, orders named parameters, quotes safe string literals, generates missing ids, and assigns Group colors.
-- Repeated metadata names are made unique (`first_object`, `second_object`, and so on). Use those `dslName` values; do not fall back to positional arrays for `CollisionNP` or similar instructions.
-- Normal object and behavior actions operate on all picked instances. Use `for_each` only for instructions whose metadata contains an `objectPtr`, or when one nested execution is required per picked instance. Ambiguity diagnostics include a suggested `for_each` structure.
+- Event `type` uses the exact namespaced serializer type, such as
+  `BuiltinCommonInstructions::Standard`, `::Group`, `::Repeat`, `::While`,
+  `::ForEach`, `::ForEachChildVariable`, `::Else`, `::Link`, `::Comment`, or
+  explicitly requested `::JsCode`.
+- Instruction `type.value` is the exact current action/condition type.
+- Instruction `parameters` is a complete positional string array, including
+  every code-only empty-string slot.
+- OR, AND, and NOT are instructions with types
+  `BuiltinCommonInstructions::Or`, `::And`, and `::Not`. Their child
+  conditions belong in `subInstructions`.
+- Use `events` for sub-events, `repeatExpression` for repeat, `object` for
+  for-each, and `whileConditions` for while loops.
+- Event-local variables use the serialized variable array shape.
+- Normal object and behavior actions operate on all picked instances. Use a
+  serialized `BuiltinCommonInstructions::ForEach` event only for instructions
+  whose metadata contains an `objectPtr`, or when one nested execution is
+  required per picked instance.
 
 Parameter syntax:
 
-- Pass literal values naturally in DSL. The compiler handles safe quoting according to metadata.
+- Parameter values are serialized expression strings. Quote string literals
+  inside the parameter string exactly as required by metadata.
 - Keep expressions as expression strings, for example `Variable(Score)`, `100 * TimeDelta()`, or `"Score: " + ToString(Variable(Score))`.
 - Object, behavior, variable, and resource names remain names; do not invent expression wrappers for them.
-- Use metadata `dslName`, `literalSyntax`, `acceptedValues`, and validation suggestions instead of guessing.
+- Use metadata parameter indexes, `literalSyntax`, `acceptedValues`, and
+  validation suggestions instead of guessing.
 
 Variable and config syntax:
 
@@ -184,15 +216,16 @@ Variable and config syntax:
 - Object variable expression: prefer `Object.Variable(Name)`.
 - Scene/external events can read Global Config with exact placeholders such as `{{cards.Sunflower.price}}`. Extension/prefab/behavior events should receive config through parameters/properties, not direct Global Config expressions. Global Config is read-only at runtime; edit design-time values with `gdevelop_set_global_config_value` / `gdevelop_delete_global_config_value`.
 
-Advanced raw event JSON:
+Event JSON validation:
 
-- Use only when the DSL does not expose a required serializer field or when replacing a large exact event tree from a file.
 - Raw instructions require exact positional arrays, code-only placeholders, quoting, serializer event types, and `subInstructions` placement.
 - Validate raw scene JSON with `gdevelop_validate_events_json`; validate large files with `validate_events_json_file`.
 
 Extension-specific rules:
 
-- Use `gdevelop_validate_extension_events_json` with `events_dsl` for extension function bodies and `gdevelop_create_or_update_extension_function` with `events_dsl` when writing.
+- Use `gdevelop_validate_extension_events_json` with `events_json` for
+  extension function bodies and `gdevelop_create_or_update_extension_function`
+  with `events_json` when writing.
 - Free function sentences reserve `_PARAM0_` for hidden scene context; first user parameter is usually `_PARAM1_`.
 - Behavior functions insert object and behavior parameters before custom parameters; custom sentence placeholders usually start at `_PARAM2_`.
 - Object functions insert the object parameter first; custom placeholders usually start at `_PARAM1_`.
@@ -282,7 +315,8 @@ Before completion, confirm the applicable items:
 - Tool schemas/examples or instruction metadata were used where payload or parameter shape was unclear.
 - Generated events were validated before writing; invalid issues were fixed first.
 - Event writes were read back and `lint_scene_events` passed or remaining warnings were explicitly explained.
-- Created/modified gameplay events are grouped, Group colors are unique (explicit or DSL-generated), and JavaScript was avoided unless requested.
+- Created/modified gameplay events are grouped, Group colors are explicitly
+  unique, and JavaScript was avoided unless requested.
 - Objects, behaviors, variables, resources, Global Config values, and instances were read back when touched.
 - Resource files are non-empty and valid, or invalid paths are reported.
 - Direct JSON patch/sync used validation/dry-run first and was read back after mutation.
@@ -294,10 +328,12 @@ Before completion, confirm the applicable items:
 ## High-Risk Mistakes
 
 - Declaring a documented MCP tool unavailable before discovery/introspection.
-- Writing positional instruction arrays when named DSL parameters and metadata `dslName` values are available.
+- Guessing positional instruction parameters instead of using exact metadata
+  order and preserving code-only slots.
 - Forgetting that events without conditions run every frame.
 - Forgetting to declare variables before event validation.
-- Duplicating events per input key instead of one DSL `{ "any": [...] }` condition.
+- Duplicating events per input key instead of one serialized Or condition with
+  `subInstructions`.
 - Using a plain Standard event Create/action when it should run for each picked instance; use ForEach when needed.
 - Comparing a timer that was never started with `ResetTimer`.
 - Operating on an object group in collision/object-variable logic without runtime verification.
@@ -310,4 +346,9 @@ Before completion, confirm the applicable items:
 
 ## Known Limits
 
-MCP improves safety but does not prove intent. The DSL compiler guarantees serializer shape and parameter ordering, not gameplay correctness. Event validation is structural/metadata-based; lints and gameplay-rule checks are heuristics. Static rendering is approximate and can differ from a running preview. Tilemap collision/walkability and resource audits are useful diagnostics, not full runtime proofs. When confidence matters, verify with a fresh preview, `run_frames`, runtime inspection, screenshots, and concrete state changes.
+MCP improves safety but does not prove intent. Event validation is
+structural/metadata-based; lints and gameplay-rule checks are heuristics.
+Static rendering is approximate and can differ from a running preview. Tilemap
+collision/walkability and resource audits are useful diagnostics, not full
+runtime proofs. When confidence matters, verify with a fresh preview,
+`run_frames`, runtime inspection, screenshots, and concrete state changes.

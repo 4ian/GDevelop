@@ -23,8 +23,6 @@ describe('McpToolCatalog', () => {
     expect(toolNames).toContain('gdevelop_editor_call');
     expect(toolNames).toContain('gdevelop_get_global_config');
     expect(toolNames).toContain('gdevelop_get_events_json_examples');
-    expect(toolNames).toContain('gdevelop_get_event_dsl_reference');
-    expect(toolNames).toContain('gdevelop_validate_events');
     expect(toolNames).toContain('gdevelop_get_event_operation_reference');
     expect(toolNames).toContain('gdevelop_validate_events_json');
     expect(toolNames).toContain('gdevelop_search_instruction_metadata');
@@ -68,6 +66,8 @@ describe('McpToolCatalog', () => {
     expect(toolNames).toContain('create_condition');
     expect(toolNames).toContain('create_signal_emit_action');
     expect(toolNames).toContain('create_signal_received_condition');
+    expect(toolNames).not.toContain('gdevelop_get_event_dsl_reference');
+    expect(toolNames).not.toContain('gdevelop_validate_events');
     expect(toolNames).not.toContain('create_scene');
     expect(toolNames).not.toContain('gdevelop_create_or_update_extension');
     expect(toolNames).not.toContain('gdevelop_run_command');
@@ -119,7 +119,7 @@ describe('McpToolCatalog', () => {
     expect(toolNames).toContain('create_sprite_object_from_resource');
     expect(toolNames).toContain('create_text_object');
     expect(toolNames).toContain('apply_validated_scene_patch');
-    expect(toolNames).toContain('gdevelop_apply_events');
+    expect(toolNames).toContain('add_scene_events');
     expect(toolNames).toContain('patch_scene_event_instruction');
     expect(toolNames).toContain('patch_extension_event_instruction');
     expect(toolNames).toContain('replace_javascript_event_code');
@@ -145,6 +145,7 @@ describe('McpToolCatalog', () => {
     expect(toolNames).toContain('gdevelop_run_command');
     expect(toolNames).toContain('gdevelop_save_project_and_wait');
     expect(toolNames).toContain('save_and_relaunch_preview_paused');
+    expect(toolNames).not.toContain('gdevelop_apply_events');
   });
 
   it('classifies tool permissions', () => {
@@ -165,7 +166,7 @@ describe('McpToolCatalog', () => {
     expect(isWriteTool('bind_sprite_animations_from_directory')).toBe(true);
     expect(isWriteTool('set_tilemap_collision_tiles')).toBe(true);
     expect(isWriteTool('patch_scene_event_instruction')).toBe(true);
-    expect(isWriteTool('gdevelop_apply_events')).toBe(true);
+    expect(isWriteTool('add_scene_events')).toBe(true);
     expect(isWriteTool('patch_extension_event_instruction')).toBe(true);
     expect(isWriteTool('replace_javascript_event_code')).toBe(true);
     expect(isWriteTool('delete_scene_variable')).toBe(true);
@@ -188,7 +189,6 @@ describe('McpToolCatalog', () => {
     expect(isWriteTool('wait_until_preview_ready')).toBe(false);
     expect(isWriteTool('gdevelop_refresh_tool_catalog')).toBe(false);
     expect(isWriteTool('validate_events_json_file')).toBe(false);
-    expect(isWriteTool('gdevelop_validate_events')).toBe(false);
     expect(isWriteTool('gdevelop_validate_extension_events_json')).toBe(false);
     expect(isWriteTool('lint_scene_events')).toBe(false);
     expect(isWriteTool('lint_extension_function_events')).toBe(false);
@@ -225,6 +225,9 @@ describe('McpToolCatalog', () => {
     expect(isKnownMcpTool('gdevelop_inspect_signal_usage')).toBe(true);
     expect(isKnownMcpTool('create_signal_emit_action')).toBe(true);
     expect(isKnownMcpTool('create_signal_received_condition')).toBe(true);
+    expect(isKnownMcpTool('gdevelop_get_event_dsl_reference')).toBe(false);
+    expect(isKnownMcpTool('gdevelop_validate_events')).toBe(false);
+    expect(isKnownMcpTool('gdevelop_apply_events')).toBe(false);
     expect(isCommandTool('gdevelop_save_project_and_wait')).toBe(true);
     expect(isKnownMcpTool('totally_unknown_tool')).toBe(false);
   });
@@ -267,10 +270,6 @@ describe('McpToolCatalog', () => {
   });
 
   it('returns examples for direct event editing and focused deletes', () => {
-    expect(
-      getMcpToolUsageExamples('gdevelop_apply_events').gdevelop_apply_events[0]
-        .arguments.events[0].kind
-    ).toBe('group');
     const examples = getMcpToolUsageExamples('add_scene_events');
     expect(examples.add_scene_events.length).toBeGreaterThan(0);
     expect(examples.add_scene_events[0].arguments.events_json).toEqual(

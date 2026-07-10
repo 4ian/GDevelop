@@ -7,12 +7,21 @@ import {
 import { renderNonTranslatedEventsAsText } from '../EventsSheet/EventsTree/TextRenderer';
 import { scanEventsListForValidationErrors } from '../Utils/EventsValidationScanner';
 import { collectSerializedEventJsonIssues } from './McpEventKnowledge';
-import { getSerializedEventsRevision } from './McpEventDsl';
 import optionalRequire from '../Utils/OptionalRequire';
 
 const gd: libGDevelop = global.gd;
 const fs = optionalRequire('fs');
 const nodePath = optionalRequire('path');
+
+export const getSerializedEventsRevision = (serializedEvents: any): string => {
+  const text = JSON.stringify(serializedEvents || []);
+  let hash = 0x811c9dc5;
+  for (let index = 0; index < text.length; index++) {
+    hash ^= text.charCodeAt(index);
+    hash = Math.imul(hash, 0x01000193);
+  }
+  return `fnv1a:${(hash >>> 0).toString(16).padStart(8, '0')}`;
+};
 
 // Resolve a possibly-relative file path against the opened project's folder, so
 // file-based tools accept the same relative paths resource tools accept.

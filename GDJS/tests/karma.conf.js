@@ -167,6 +167,8 @@ module.exports = function (config) {
       './newIDE/app/resources/GDJS/Runtime/Extensions/Effects/pixi-filters/filter-kawase-blur.js',
       './newIDE/app/resources/GDJS/Runtime/Extensions/TileMap/tilemapcollisionmaskruntimeobject.js',
       './newIDE/app/resources/GDJS/Runtime/Extensions/TileMap/TileMapRuntimeManager.js',
+      './newIDE/app/resources/GDJS/Runtime/Extensions/TileMap/TileMapBehavior.js',
+      './newIDE/app/resources/GDJS/Runtime/Extensions/TileMap/AbstractTileMapRuntimeObject.js',
       './newIDE/app/resources/GDJS/Runtime/Extensions/TileMap/tilemapruntimeobject-pixi-renderer.js',
       './newIDE/app/resources/GDJS/Runtime/Extensions/TileMap/tilemapruntimeobject.js',
       './newIDE/app/resources/GDJS/Runtime/Extensions/TileMap/collision/TileMapCollisionMaskRenderer.js',

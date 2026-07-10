@@ -333,5 +333,5 @@ namespace gdjs {
     }
   }
 
-  gdjs.registerBehavior('TileMap::TileMapBehavior', gdjs.ResizableBehavior);
+  gdjs.registerBehavior('TileMap::TileMapBehavior', gdjs.TileMapBehavior);
 }

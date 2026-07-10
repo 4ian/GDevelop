@@ -48,14 +48,9 @@ namespace gdjs {
    * @category Objects > Tile Map
    */
   export class TileMapRuntimeObject
-    extends gdjs.RuntimeObject
+    extends gdjs.AbstractTileMapRuntimeObject
     implements gdjs.TileMap, gdjs.Resizable, gdjs.Scalable, gdjs.OpacityHandler
   {
-    /**
-     * A reusable Point to avoid allocations.
-     */
-    private static readonly workingPoint: FloatPoint = [0, 0];
-
     _frameElapsedTime: float = 0;
     _opacity: float = 255;
     _tilemapJsonFile: string;
@@ -86,11 +81,6 @@ namespace gdjs {
      */
     private _collisionMaskTag: string;
     private isCollisionMaskEnabled = true;
-    _sceneToTileMapTransformation: gdjs.AffineTransformation =
-      new gdjs.AffineTransformation();
-    _tileMapToSceneTransformation: gdjs.AffineTransformation =
-      new gdjs.AffineTransformation();
-    private _transformationIsUpToDate: boolean = false;
 
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
@@ -248,6 +238,7 @@ namespace gdjs {
       if (initialInstanceData.customSize) {
         this.setWidth(initialInstanceData.width);
         this.setHeight(initialInstanceData.height);
+        this.invalidateTransformation();
       }
       this.setOpacity(
         initialInstanceData.opacity === undefined
@@ -421,6 +412,7 @@ namespace gdjs {
 
       this._renderer.setWidth(width);
       this.invalidateHitboxes();
+      this.invalidateTransformation();
     }
 
     setHeight(height: float): void {
@@ -428,6 +420,7 @@ namespace gdjs {
 
       this._renderer.setHeight(height);
       this.invalidateHitboxes();
+      this.invalidateTransformation();
     }
 
     setSize(newWidth: float, newHeight: float): void {
@@ -479,6 +472,7 @@ namespace gdjs {
 
       this._renderer.setScaleX(scaleX);
       this.invalidateHitboxes();
+      this.invalidateTransformation();
     }
 
     /**
@@ -494,21 +488,25 @@ namespace gdjs {
 
       this._renderer.setScaleY(scaleY);
       this.invalidateHitboxes();
+      this.invalidateTransformation();
     }
 
     setX(x: float): void {
       super.setX(x);
       this._renderer.updatePosition();
+      this.invalidateTransformation();
     }
 
     setY(y: float): void {
       super.setY(y);
       this._renderer.updatePosition();
+      this.invalidateTransformation();
     }
 
     setAngle(angle: float): void {
       super.setAngle(angle);
       this._renderer.updateAngle();
+      this.invalidateTransformation();
     }
 
     setOpacity(opacity: float): void {
@@ -540,45 +538,6 @@ namespace gdjs {
       return this._tileMap;
     }
 
-    getGridRowCount(): integer {
-      return this._tileMap ? this._tileMap.getDimensionY() : 0;
-    }
-
-    getGridColumnCount(): integer {
-      return this._tileMap ? this._tileMap.getDimensionX() : 0;
-    }
-
-    /**
-     * @param x The layer column.
-     * @param y The layer row.
-     * @param layerIndex The layer index.
-     * @returns The tile's id.
-     */
-    getTileId(x: integer, y: integer, layerIndex: integer): integer {
-      if (!this._tileMap) return -1;
-      return this._tileMap.getTileId(x, y, layerIndex);
-    }
-
-    /**
-     * @param x The layer column.
-     * @param y The layer row.
-     * @param layerIndex The layer index.
-     */
-    isTileFlippedOnX(x: integer, y: integer, layerIndex: integer): boolean {
-      if (!this._tileMap) return false;
-      return this._tileMap.isTileFlippedOnX(x, y, layerIndex);
-    }
-
-    /**
-     * @param x The layer column.
-     * @param y The layer row.
-     * @param layerIndex The layer index.
-     */
-    isTileFlippedOnY(x: integer, y: integer, layerIndex: integer): boolean {
-      if (!this._tileMap) return false;
-      return this._tileMap.isTileFlippedOnY(x, y, layerIndex);
-    }
-
     /**
      * Return a tile map that is safe to modify.
      */
@@ -597,300 +556,16 @@ namespace gdjs {
       return this._tileMap;
     }
 
-    updateTransformation() {
-      if (this._transformationIsUpToDate) {
-        return;
-      }
-
-      this._tileMapToSceneTransformation.setToIdentity();
-      this._tileMapToSceneTransformation.translate(this.getX(), this.getY());
-      this._tileMapToSceneTransformation.rotateAround(
-        (this.getAngle() * Math.PI) / 180,
-        this.getCenterX(),
-        this.getCenterY()
-      );
-      this._tileMapToSceneTransformation.scale(
-        Math.abs(this._renderer.getScaleX()),
-        Math.abs(this._renderer.getScaleY())
-      );
-
-      if (this._collisionTileMap) {
-        const collisionTileMapTransformation =
-          this._collisionTileMap.getTransformation();
-        collisionTileMapTransformation.copyFrom(
-          this._tileMapToSceneTransformation
-        );
-        this._collisionTileMap.setTransformation(
-          collisionTileMapTransformation
-        );
-      }
-      this._sceneToTileMapTransformation.copyFrom(
-        this._tileMapToSceneTransformation
-      );
-      this._sceneToTileMapTransformation.invert();
-      this._transformationIsUpToDate = true;
+    getCollisionTileMap(): gdjs.TileMap.TransformedCollisionTileMap | null {
+      return this._collisionTileMap;
     }
 
-    getSceneXCoordinateOfTileCenter(
-      columnIndex: integer,
-      rowIndex: integer
-    ): float {
-      if (!this._tileMap) {
-        return 0;
-      }
-      const sceneCoordinates: FloatPoint = TileMapRuntimeObject.workingPoint;
-      this._tileMapToSceneTransformation.transform(
-        [
-          (columnIndex + 0.5) * this._tileMap.getTileWidth(),
-          (rowIndex + 0.5) * this._tileMap.getTileHeight(),
-        ],
-        sceneCoordinates
-      );
-      return sceneCoordinates[0];
+    getCollisionMaskTag(): string {
+      return this._collisionMaskTag;
     }
 
-    getSceneYCoordinateOfTileCenter(
-      columnIndex: integer,
-      rowIndex: integer
-    ): float {
-      if (!this._tileMap) {
-        return 0;
-      }
-      const sceneCoordinates: FloatPoint = TileMapRuntimeObject.workingPoint;
-      this._tileMapToSceneTransformation.transform(
-        [
-          (columnIndex + 0.5) * this._tileMap.getTileWidth(),
-          (rowIndex + 0.5) * this._tileMap.getTileHeight(),
-        ],
-        sceneCoordinates
-      );
-      return sceneCoordinates[1];
-    }
-
-    /**
-     * The returned array is alway the same.
-     */
-    getGridCoordinatesFromSceneCoordinates(
-      x: float,
-      y: float
-    ): [integer, integer] {
-      this.updateTransformation();
-      const result = TileMapRuntimeObject.workingPoint;
-      if (!this._tileMap) {
-        result[0] = 0;
-        result[1] = 0;
-        return result;
-      }
-      this._sceneToTileMapTransformation.transform([x, y], result);
-
-      result[0] = Math.floor(result[0] / this._tileMap.getTileWidth());
-      result[1] = Math.floor(result[1] / this._tileMap.getTileHeight());
-      return result;
-    }
-
-    getColumnIndexAtPosition(x: float, y: float): integer {
-      return this.getGridCoordinatesFromSceneCoordinates(x, y)[0];
-    }
-
-    getRowIndexAtPosition(x: float, y: float): integer {
-      return this.getGridCoordinatesFromSceneCoordinates(x, y)[1];
-    }
-
-    getTileAtPosition(x: float, y: float): integer {
-      const [columnIndex, rowIndex] =
-        this.getGridCoordinatesFromSceneCoordinates(x, y);
-      return this.getTileAtGridCoordinates(columnIndex, rowIndex);
-    }
-
-    getTileAtGridCoordinates(columnIndex: integer, rowIndex: integer): integer {
-      return this.getTileId(columnIndex, rowIndex, 0);
-    }
-
-    setTileAtPosition(tileId: number, x: float, y: float) {
-      const [columnIndex, rowIndex] =
-        this.getGridCoordinatesFromSceneCoordinates(x, y);
-      this.setTileAtGridCoordinates(tileId, columnIndex, rowIndex);
-    }
-
-    setTileAtGridCoordinates(
-      tileId: number,
-      columnIndex: integer,
-      rowIndex: integer
-    ) {
-      const tileMap = this.getTileMapForEdition();
-      if (!tileMap) {
-        return;
-      }
-      const layer = tileMap.getTileLayer(this._layerIndex);
-      if (!layer) {
-        return;
-      }
-      const oldTileId = layer.getTileId(columnIndex, rowIndex);
-      if (tileId === oldTileId) {
-        return;
-      }
-      layer.setTile(columnIndex, rowIndex, tileId);
-
-      if (this._collisionTileMap) {
-        const oldTileDefinition =
-          oldTileId !== undefined && tileMap.getTileDefinition(oldTileId);
-        const newTileDefinition = tileMap.getTileDefinition(tileId);
-        const hadFullHitBox =
-          !!oldTileDefinition &&
-          oldTileDefinition.hasFullHitBox(this._collisionMaskTag);
-        const haveFullHitBox =
-          !!newTileDefinition &&
-          newTileDefinition.hasFullHitBox(this._collisionMaskTag);
-        if (hadFullHitBox !== haveFullHitBox) {
-          this._collisionTileMap.invalidateTile(
-            this._layerIndex,
-            columnIndex,
-            rowIndex
-          );
-        }
-      }
+    invalidateTileMap(): void {
       this._isTileMapDirty = true;
-    }
-
-    flipTileOnYAtPosition(x: float, y: float, flip: boolean) {
-      const [columnIndex, rowIndex] =
-        this.getGridCoordinatesFromSceneCoordinates(x, y);
-      this.flipTileOnYAtGridCoordinates(columnIndex, rowIndex, flip);
-    }
-
-    flipTileOnXAtPosition(x: float, y: float, flip: boolean) {
-      const [columnIndex, rowIndex] =
-        this.getGridCoordinatesFromSceneCoordinates(x, y);
-      this.flipTileOnXAtGridCoordinates(columnIndex, rowIndex, flip);
-    }
-
-    flipTileOnYAtGridCoordinates(
-      columnIndex: integer,
-      rowIndex: integer,
-      flip: boolean
-    ) {
-      this.flipTileOnY(columnIndex, rowIndex, 0, flip);
-      this._isTileMapDirty = true;
-      // No need to invalidate hit boxes since at the moment, collision mask
-      // cannot be configured on each tile.
-    }
-
-    flipTileOnXAtGridCoordinates(
-      columnIndex: integer,
-      rowIndex: integer,
-      flip: boolean
-    ) {
-      this.flipTileOnX(columnIndex, rowIndex, 0, flip);
-      this._isTileMapDirty = true;
-      // No need to invalidate hit boxes since at the moment, collision mask
-      // cannot be configured on each tile.
-    }
-
-    /**
-     * @param x The layer column.
-     * @param y The layer row.
-     * @param layerIndex The layer index.
-     * @param flip true if the tile should be flipped.
-     */
-    flipTileOnY(x: integer, y: integer, layerIndex: integer, flip: boolean) {
-      const tileMap = this.getTileMapForEdition();
-      if (!tileMap) return;
-      tileMap.flipTileOnY(x, y, layerIndex, flip);
-    }
-
-    /**
-     * @param x The layer column.
-     * @param y The layer row.
-     * @param layerIndex The layer index.
-     * @param flip true if the tile should be flipped.
-     */
-    flipTileOnX(x: integer, y: integer, layerIndex: integer, flip: boolean) {
-      const tileMap = this.getTileMapForEdition();
-      if (!tileMap) return;
-      tileMap.flipTileOnX(x, y, layerIndex, flip);
-    }
-
-    isTileFlippedOnXAtPosition(x: float, y: float) {
-      const [columnIndex, rowIndex] =
-        this.getGridCoordinatesFromSceneCoordinates(x, y);
-
-      return this.isTileFlippedOnX(columnIndex, rowIndex, 0);
-    }
-
-    isTileFlippedOnXAtGridCoordinates(columnIndex: integer, rowIndex: integer) {
-      return this.isTileFlippedOnX(columnIndex, rowIndex, 0);
-    }
-
-    isTileFlippedOnYAtPosition(x: float, y: float) {
-      const [columnIndex, rowIndex] =
-        this.getGridCoordinatesFromSceneCoordinates(x, y);
-
-      return this.isTileFlippedOnY(columnIndex, rowIndex, 0);
-    }
-
-    isTileFlippedOnYAtGridCoordinates(columnIndex: integer, rowIndex: integer) {
-      return this.isTileFlippedOnY(columnIndex, rowIndex, 0);
-    }
-
-    removeTileAtPosition(x: float, y: float) {
-      const [columnIndex, rowIndex] =
-        this.getGridCoordinatesFromSceneCoordinates(x, y);
-      this.removeTileAtGridCoordinates(columnIndex, rowIndex);
-    }
-
-    removeTileAtGridCoordinates(columnIndex: integer, rowIndex: integer) {
-      const tileMap = this.getTileMapForEdition();
-      if (!tileMap) {
-        return;
-      }
-      const layer = tileMap.getTileLayer(this._layerIndex);
-      if (!layer) {
-        return;
-      }
-      const oldTileId = layer.getTileId(columnIndex, rowIndex);
-      if (oldTileId === undefined) {
-        return;
-      }
-      layer.removeTile(columnIndex, rowIndex);
-      if (this._collisionTileMap) {
-        const oldTileDefinition =
-          oldTileId !== undefined && tileMap.getTileDefinition(oldTileId);
-        const hadFullHitBox =
-          !!oldTileDefinition &&
-          oldTileDefinition.hasFullHitBox(this._collisionMaskTag);
-        if (hadFullHitBox) {
-          this._collisionTileMap.invalidateTile(
-            this._layerIndex,
-            columnIndex,
-            rowIndex
-          );
-        }
-      }
-      this._isTileMapDirty = true;
-    }
-
-    setGridRowCount(targetRowCount: integer) {
-      const tileMap = this.getTileMapForEdition();
-      if (targetRowCount <= 0) return;
-      if (!tileMap) return;
-      tileMap.setDimensionY(targetRowCount);
-      if (this._collisionTileMap) {
-        this._collisionTileMap.updateDimensions();
-      }
-      this._isTileMapDirty = true;
-      this.invalidateHitboxes();
-    }
-
-    setGridColumnCount(targetColumnCount: integer) {
-      const tileMap = this.getTileMapForEdition();
-      if (targetColumnCount <= 0) return;
-      if (!tileMap) return;
-      tileMap.setDimensionX(targetColumnCount);
-      if (this._collisionTileMap) {
-        this._collisionTileMap.updateDimensions();
-      }
-      this._isTileMapDirty = true;
-      this.invalidateHitboxes();
     }
 
     /**

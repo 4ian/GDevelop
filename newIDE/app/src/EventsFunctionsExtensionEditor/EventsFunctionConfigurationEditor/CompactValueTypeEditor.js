@@ -104,6 +104,13 @@ const getIdentifierName = (scopedIdentifier: string) =>
     : scopedIdentifier.substring('scene'.length);
 
 const convertTypeToSelectorValue = (value: string) =>
+  value === 'signalName'
+    ? 'string'
+    : value.endsWith('Resource')
+    ? 'jsonResource'
+    : value;
+
+const convertSelectorValueToType = (value: string) =>
   value.endsWith('Resource') ? 'jsonResource' : value;
 
 const convertParameterTypeToPropertyType = (value: string) =>
@@ -135,7 +142,9 @@ export default function CompactValueTypeEditor({
                 <CompactSelectField
                   value={type}
                   onChange={value => {
-                    valueTypeMetadata.setName(value);
+                    valueTypeMetadata.setName(
+                      convertSelectorValueToType(value)
+                    );
                     valueTypeMetadata.setOptional(false);
                     valueTypeMetadata.setDefaultValue('');
                     forceUpdate();
@@ -190,10 +199,6 @@ export default function CompactValueTypeEditor({
                   <SelectOption
                     value="sceneName"
                     label={t`Scene name (text)`}
-                  />
-                  <SelectOption
-                    value="signalName"
-                    label={t`Signal name (text)`}
                   />
                   {!isExpressionType && (
                     <SelectOption

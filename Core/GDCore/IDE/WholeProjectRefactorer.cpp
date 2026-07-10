@@ -87,7 +87,7 @@ void AddFunctionParameter(gd::ParameterMetadataContainer &parameters,
 }
 
 void AddOnSignalDataParameters(gd::ParameterMetadataContainer &parameters) {
-  AddFunctionParameter(parameters, onSignalSignalNameParameterName, "signalName",
+  AddFunctionParameter(parameters, onSignalSignalNameParameterName, "string",
                        "Signal name");
   AddFunctionParameter(parameters, onSignalPayloadParameterName, "string",
                        "Payload");

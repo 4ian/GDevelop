@@ -2221,7 +2221,7 @@ const createOrUpdateOnSignalFunction = (
   let fixedParameters: Array<Object> = signalSignature.map((name, index) => ({
     index,
     name,
-    type: index === 0 ? 'object' : index === 1 ? 'signalName' : 'string',
+    type: index === 0 ? 'object' : 'string',
     description:
       index === 0 ? 'Object' : index === 1 ? 'Signal name' : 'Payload',
   }));

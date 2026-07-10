@@ -68,17 +68,41 @@ double LogTimeSpent(const gd::String &name, double previousTime) {
   return GetTimeNow();
 }
 
+bool ResolveGlobalConfigPlaceholdersInString(const gd::Project &project,
+                                             const gd::String &source,
+                                             gd::String &resolvedValue) {
+  gd::String missingPath;
+  if (project.ResolveGlobalConfigPlaceholders(source, resolvedValue,
+                                              missingPath)) {
+    return true;
+  }
+
+  gd::LogError("Global config path \"{{" + missingPath +
+               "}}\" does not exist while exporting project data.");
+  return false;
+}
+
 void ResolveGlobalConfigPlaceholdersInSerializedData(
     const gd::Project &project, gd::SerializerElement &element) {
   if (!element.IsValueUndefined() && element.GetValue().IsString()) {
+    const gd::String &source = element.GetValue().GetRawString();
     gd::String resolvedValue;
-    gd::String missingPath;
-    if (project.ResolveGlobalConfigPlaceholders(
-            element.GetValue().GetRawString(), resolvedValue, missingPath)) {
+    if (source.find("{{") != gd::String::npos &&
+        ResolveGlobalConfigPlaceholdersInString(project, source,
+                                                resolvedValue)) {
       element.SetStringValue(resolvedValue);
-    } else {
-      gd::LogError("Global config path \"{{" + missingPath +
-                   "}}\" does not exist while exporting project data.");
+    }
+  }
+
+  for (const auto &attribute : element.GetAllAttributes()) {
+    if (attribute.second.IsString()) {
+      const gd::String &source = attribute.second.GetRawString();
+      gd::String resolvedValue;
+      if (source.find("{{") != gd::String::npos &&
+          ResolveGlobalConfigPlaceholdersInString(project, source,
+                                                  resolvedValue)) {
+        element.SetStringAttribute(attribute.first, resolvedValue);
+      }
     }
   }
 

@@ -3919,12 +3919,22 @@ describe('libGD.js', function () {
       gd.asTextObjectConfiguration(object.getConfiguration()).setText(
         '{{labels.objectText}}'
       );
+      project
+        .getVariables()
+        .insertNew('GlobalTextVariable', 0)
+        .setString('{{labels.globalVariableText}}');
+      layout
+        .getVariables()
+        .insertNew('SceneTextVariable', 0)
+        .setString('Scene: {{labels.sceneVariableText}}');
       project.setName('{{labels.projectName}}');
       project.setGlobalConfigJson(
         JSON.stringify({
           labels: {
+            globalVariableText: 'Runtime global variable',
             objectText: 'Runtime text',
             projectName: 'Runtime project',
+            sceneVariableText: 'Runtime scene variable',
           },
         })
       );
@@ -3953,8 +3963,12 @@ describe('libGD.js', function () {
       );
       const projectData = JSON.parse(gd.Serializer.toJSON(projectDataElement));
       expect(projectData.properties.name).toBe('Runtime project');
+      expect(projectData.variables[0].value).toBe('Runtime global variable');
       expect(projectData.layouts[0].objects[0].content.text).toBe(
         'Runtime text'
+      );
+      expect(projectData.layouts[0].variables[0].value).toBe(
+        'Scene: Runtime scene variable'
       );
       expect(projectData.globalConfig).toBeUndefined();
 

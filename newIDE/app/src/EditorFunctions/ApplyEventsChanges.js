@@ -329,12 +329,27 @@ export const applyEventsChanges = (
   const preserveOrAssignRootAiGeneratedEventIds = (
     eventsList: gdEventsList
   ) => {
-    mapFor(0, eventsList.getEventsCount(), i => {
-      const event = eventsList.getEventAt(i);
-      if (!event.getAiGeneratedEventId()) {
-        event.setAiGeneratedEventId(aiGeneratedEventId);
-      }
-    });
+    const assignMissingIds = (list: gdEventsList, path: Array<number>) => {
+      mapFor(0, list.getEventsCount(), i => {
+        const event = list.getEventAt(i);
+        const eventPath = [...path, i];
+        if (!event.getAiGeneratedEventId()) {
+          const isOnlyRootEvent =
+            eventPath.length === 1 && list.getEventsCount() === 1;
+          event.setAiGeneratedEventId(
+            isOnlyRootEvent
+              ? aiGeneratedEventId
+              : `${aiGeneratedEventId}-${eventPath
+                  .map(index => index + 1)
+                  .join('-')}`
+          );
+        }
+        if (event.canHaveSubEvents()) {
+          assignMissingIds(event.getSubEvents(), eventPath);
+        }
+      });
+    };
+    assignMissingIds(eventsList, []);
     collectAiGeneratedEventIds(eventsList);
   };
 

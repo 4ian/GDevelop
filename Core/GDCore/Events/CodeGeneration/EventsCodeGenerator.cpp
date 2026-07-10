@@ -737,11 +737,6 @@ gd::String EventsCodeGenerator::GenerateActionCode(
           GetObjectsContainersList().ExpandObjectName(
               objectName, context.GetCurrentObject());
       for (std::size_t i = 0; i < realObjects.size(); ++i) {
-        context.ObjectsListNeeded(realObjects[i]);
-      }
-      actionCode += GenerateObjectListsPickedInstancesAssertCode(
-          realObjects, context, "object action \"" + objectName + "\"");
-      for (std::size_t i = 0; i < realObjects.size(); ++i) {
         // Setup context
         gd::String objectType =
             GetObjectsContainersList().GetTypeOfObject(realObjects[i]);
@@ -779,11 +774,6 @@ gd::String EventsCodeGenerator::GenerateActionCode(
           MetadataProvider::GetBehaviorMetadata(platform, actualBehaviorType);
 
       AddIncludeFiles(autoInfo.includeFiles);
-      for (std::size_t i = 0; i < realObjects.size(); ++i) {
-        context.ObjectsListNeeded(realObjects[i]);
-      }
-      actionCode += GenerateObjectListsPickedInstancesAssertCode(
-          realObjects, context, "behavior action \"" + objectName + "\"");
       for (std::size_t i = 0; i < realObjects.size(); ++i) {
         // Setup context
         context.SetCurrentObject(realObjects[i]);

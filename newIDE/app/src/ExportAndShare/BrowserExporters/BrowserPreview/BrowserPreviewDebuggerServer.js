@@ -206,6 +206,14 @@ class BrowserPreviewDebuggerServer {
   getExistingPreviewDebuggerIds(): Array<DebuggerId> {
     return getExistingPreviewDebuggerIds();
   }
+  getConnectionInfo(id: DebuggerId): ?Object {
+    return getExistingDebuggerIds().indexOf(id) !== -1
+      ? { debuggerId: id, connected: true }
+      : { debuggerId: id, connected: false };
+  }
+  getLastConnectionInfo(): ?Object {
+    return null;
+  }
   // $FlowFixMe[missing-local-annot]
   getRecentLogs(id: DebuggerId) {
     return [...(recentLogsByDebuggerId[id] || [])];

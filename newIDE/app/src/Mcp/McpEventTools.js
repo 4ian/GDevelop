@@ -7,6 +7,7 @@ import {
 import { renderNonTranslatedEventsAsText } from '../EventsSheet/EventsTree/TextRenderer';
 import { scanEventsListForValidationErrors } from '../Utils/EventsValidationScanner';
 import { collectSerializedEventJsonIssues } from './McpEventKnowledge';
+import { getSerializedEventsRevision } from './McpEventDsl';
 import optionalRequire from '../Utils/OptionalRequire';
 
 const gd: libGDevelop = global.gd;
@@ -35,6 +36,7 @@ type EventReference = {|
   parentList: gdEventsList,
   index: number,
   path: Array<number>,
+  inheritedForEachObjects: Set<string>,
 |};
 
 const getRequiredString = (args: Object, name: string): string => {
@@ -101,7 +103,8 @@ const hasPathPrefix = (
 
 const collectEventReferences = (
   eventsList: gdEventsList,
-  parentPath: Array<number> = []
+  parentPath: Array<number> = [],
+  inheritedForEachObjects: Set<string> = new Set()
 ): Array<EventReference> => {
   const references = [];
   for (let index = 0; index < eventsList.getEventsCount(); index++) {
@@ -112,9 +115,21 @@ const collectEventReferences = (
       parentList: eventsList,
       index,
       path,
+      inheritedForEachObjects: new Set(inheritedForEachObjects),
     });
     if (event.canHaveSubEvents()) {
-      references.push(...collectEventReferences(event.getSubEvents(), path));
+      const childForEachObjects = new Set(inheritedForEachObjects);
+      if (event.getType() === 'BuiltinCommonInstructions::ForEach') {
+        const objectName = gd.asForEachEvent(event).getObjectToPick();
+        if (objectName) childForEachObjects.add(objectName);
+      }
+      references.push(
+        ...collectEventReferences(
+          event.getSubEvents(),
+          path,
+          childForEachObjects
+        )
+      );
     }
   }
   return references;
@@ -352,10 +367,12 @@ export const findEventsInEventsList = ({
   defaultIncludeSerialized?: boolean,
 |}): Array<Object> => {
   const includeSerialized =
-    args && args.summary_only
-      ? false
-      : args && args.include_serialized !== undefined
+    args && args.include_serialized !== undefined
       ? !!args.include_serialized
+      : args && (args.summary_only || args.compact === true)
+      ? false
+      : args && args.compact === false
+      ? true
       : defaultIncludeSerialized !== false;
   return findEventReferences(eventsList, args).map(reference => ({
     ...(owner || {}),
@@ -663,12 +680,15 @@ export const findSceneEvents = (project: gdProject, args: Object): Object => {
     eventsList: scene.getEvents(),
     args,
     owner: { scope: 'scene', sceneName },
-    defaultIncludeSerialized: true,
+    defaultIncludeSerialized: false,
   }).slice(0, limit);
 
   return {
     success: true,
     sceneName,
+    eventSheetRevision: getSerializedEventsRevision(
+      serializeToJSObject(scene.getEvents())
+    ),
     count: matches.length,
     matches,
   };
@@ -691,6 +711,16 @@ export const lintSceneEvents = (project: gdProject, args: Object): Object => {
       ? args.disabled_rules || args.disabledRules
       : []
   );
+  const objectOrGroupNames = new Set<string>();
+  [scene.getObjects(), project.getObjects()].forEach(container => {
+    for (let index = 0; index < container.getObjectsCount(); index++) {
+      objectOrGroupNames.add(container.getObjectAt(index).getName());
+    }
+    const groups = container.getObjectGroups();
+    for (let index = 0; index < groups.count(); index++) {
+      objectOrGroupNames.add(groups.getAt(index).getName());
+    }
+  });
   const issues = [];
   // Track each Group's color to flag default/unset colors and color collisions
   // between distinct Groups (different Groups must use different colors).
@@ -815,17 +845,41 @@ export const lintSceneEvents = (project: gdProject, args: Object): Object => {
           condition.type === 'EstTouche' ||
           /Animation|Variable.*Objet|VarObjet/i.test(condition.type)
       );
+      const pickedObjectNames = new Set<string>();
+      conditions.forEach(condition => {
+        condition.parameters.forEach(parameter => {
+          if (objectOrGroupNames.has(parameter)) {
+            pickedObjectNames.add(parameter);
+          }
+        });
+      });
+      const isAlreadyScopedByParentForEach = Array.from(pickedObjectNames).some(
+        objectName => reference.inheritedForEachObjects.has(objectName)
+      );
+      const collisionPicksObjects = conditions.some(
+        condition =>
+          condition.type === 'CollisionNP' ||
+          condition.type === 'EstEnCollision'
+      );
       if (
         hasCreateAction &&
         conditionPicksObject &&
+        !isAlreadyScopedByParentForEach &&
         !disabledRules.has('create-without-for-each')
       ) {
         issues.push({
-          severity: 'warning',
+          severity: collisionPicksObjects ? 'info' : 'warning',
           type: 'create-without-for-each',
           eventPath,
+          pickedObjectNames: Array.from(pickedObjectNames),
+          inheritedForEachObjects: Array.from(
+            reference.inheritedForEachObjects
+          ),
           suggestion:
-            'This Standard event creates an object while picking instances in its conditions, but Create runs only once (for a single picked instance). If you want each picked instance to create one (e.g. each enemy fires a bullet), wrap this in a ForEach event over that object. If a single Create is intentional, suppress this with disabled_rules: ["create-without-for-each"].',
+            (collisionPicksObjects
+              ? 'A collision condition narrows the picked instances and a single impact Create is commonly intentional. Use a For Each only when every picked collider must create its own object. '
+              : 'This Standard event creates one object after picking instances. If every picked instance must create one (for example, every enemy fires), wrap the event in a For Each. ') +
+            'Suppress this advisory with disabled_rules: ["create-without-for-each"] after confirming the intended cardinality.',
           // Concrete fix the caller can apply: re-author this event as the body
           // of a ForEach over the picked object type (BuiltinCommonInstructions::
           // ForEach with `object` set), keeping the same conditions/actions.
@@ -1019,6 +1073,7 @@ export const lintSceneEvents = (project: gdProject, args: Object): Object => {
     valid: !issues.some(issue => issue.severity === 'error'),
     sceneName,
     eventsCount: references.length,
+    disabledRules: Array.from(disabledRules),
     issues,
   };
 };

@@ -815,6 +815,8 @@ const MainFrame = (props: Props): React.MixedElement => {
     hasUnsavedChanges,
     sealUnsavedChanges,
     triggerUnsavedChanges,
+    getChangesCount,
+    getTimeOfFirstChangeSinceLastSave,
   } = unsavedChanges;
 
   const setSavingProjectInProgress = React.useCallback((isSaving: boolean) => {
@@ -7307,6 +7309,11 @@ const MainFrame = (props: Props): React.MixedElement => {
         launchPreviewForScene: (sceneName: ?string) =>
           launchPreviewForScene(sceneName),
         saveProjectAndWait: () => saveProject(),
+        getPersistenceState: () => ({
+          hasUnsavedChanges: getChangesCount() > 0,
+          changesCount: getChangesCount(),
+          timeOfFirstChangeSinceLastSave: getTimeOfFirstChangeSinceLastSave(),
+        }),
         getEditorSelection: getMcpEditorSelection,
         getPreviewDebuggerServer: () =>
           _previewLauncher.current
@@ -7315,7 +7322,7 @@ const MainFrame = (props: Props): React.MixedElement => {
         closeAllPreviews: () => {
           const previewLauncher = _previewLauncher.current;
           if (previewLauncher && previewLauncher.closeAllPreviews) {
-            previewLauncher.closeAllPreviews();
+            return previewLauncher.closeAllPreviews();
           }
         },
         focusAllPreviews: () => {
@@ -7352,6 +7359,8 @@ const MainFrame = (props: Props): React.MixedElement => {
       i18n,
       mcpEditorCallbacks,
       triggerUnsavedChanges,
+      getChangesCount,
+      getTimeOfFirstChangeSinceLastSave,
       saveProject,
       launchPreviewForScene,
       getMcpEditorSelection,

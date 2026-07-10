@@ -72,6 +72,7 @@ namespace gdjs {
     async processResource(resourceName: string): Promise<void> {
       const resource = this._resourceLoader.getResource(resourceName);
       if (!resource) {
+        if (!resourceName) return;
         logger.warn(
           'Unable to find texture for resource "' + resourceName + '".'
         );
@@ -99,6 +100,7 @@ namespace gdjs {
     async loadResource(resourceName: string): Promise<void> {
       const resource = this._resourceLoader.getResource(resourceName);
       if (!resource) {
+        if (!resourceName) return;
         logger.warn(
           'Unable to find texture for resource "' + resourceName + '".'
         );

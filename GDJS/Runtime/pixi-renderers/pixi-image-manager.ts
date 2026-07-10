@@ -108,6 +108,7 @@ namespace gdjs {
     getPIXITexture(resourceName: string): PIXI.Texture {
       const resource = this._getImageResource(resourceName);
       if (!resource) {
+        if (!resourceName) return this._invalidTexture;
         logger.warn(
           'Unable to find texture for resource "' + resourceName + '".'
         );
@@ -144,6 +145,7 @@ namespace gdjs {
     ): PIXI.Texture {
       const resource = this._getImageResource(resourceName);
       if (!resource) {
+        if (!resourceName) return this._invalidTexture;
         logger.warn(
           'Unable to find texture for resource "' + resourceName + '".'
         );
@@ -227,6 +229,7 @@ namespace gdjs {
     getOrLoadPIXITexture(resourceName: string): PIXI.Texture {
       const resource = this._getImageResource(resourceName);
       if (!resource) {
+        if (!resourceName) return this._invalidTexture;
         logger.warn(
           'Unable to find texture for resource "' + resourceName + '".'
         );
@@ -492,6 +495,7 @@ namespace gdjs {
     async loadResource(resourceName: string): Promise<void> {
       const resource = this._resourceLoader.getResource(resourceName);
       if (!resource) {
+        if (!resourceName) return;
         logger.warn(
           'Unable to find texture for resource "' + resourceName + '".'
         );

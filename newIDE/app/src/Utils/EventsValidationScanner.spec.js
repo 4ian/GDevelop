@@ -1023,7 +1023,7 @@ describe('EventsValidationScanner', () => {
         expect(targetError).toBeDefined();
       });
 
-      it('detects object action parameters without a single picked instance', () => {
+      it('allows all-picked object actions with multiple instances', () => {
         const { project, testLayout } = makeTestProject(gd);
         const events = testLayout.getEvents();
         const secondSpriteObjectInstance = testLayout
@@ -1052,12 +1052,113 @@ describe('EventsValidationScanner', () => {
             e.instructionType === 'Delete' &&
             e.parameterValue === 'MySpriteObject'
         );
+        expect(targetError).toBeUndefined();
+      });
+
+      it('detects single-instance parameters for objects created dynamically', () => {
+        const { project, testLayout } = makeTestProject(gd);
+        const events = testLayout.getEvents();
+
+        const createEvent = events.insertNewEvent(
+          project,
+          'BuiltinCommonInstructions::Standard',
+          0
+        );
+        const createAction = new gd.Instruction();
+        createAction.setType('Create');
+        createAction.setParametersCount(5);
+        createAction.setParameter(1, 'MySpriteObject');
+        createAction.setParameter(2, '0');
+        createAction.setParameter(3, '0');
+        gd.asStandardEvent(createEvent)
+          .getActions()
+          .insert(createAction, 0);
+        createAction.delete();
+
+        const consumeEvent = events.insertNewEvent(
+          project,
+          'BuiltinCommonInstructions::Standard',
+          1
+        );
+        const consumeAction = new gd.Instruction();
+        consumeAction.setType('AddForceTowardObject');
+        consumeAction.setParametersCount(4);
+        consumeAction.setParameter(0, 'MySpriteObject');
+        consumeAction.setParameter(1, 'MySpriteObject');
+        consumeAction.setParameter(2, '100');
+        consumeAction.setParameter(3, '0');
+        gd.asStandardEvent(consumeEvent)
+          .getActions()
+          .insert(consumeAction, 0);
+        consumeAction.delete();
+
+        const errors = scanProjectForValidationErrors(project);
+        const targetError = errors.find(
+          error =>
+            error.type === 'ambiguous-object-picking' &&
+            error.instructionType === 'AddForceTowardObject' &&
+            error.parameterIndex === 1
+        );
         expect(targetError).toBeDefined();
         if (targetError) {
-          expect(targetError.isCondition).toBe(false);
-          expect(targetError.parameterIndex).toBe(0);
-          expect(targetError.locationType).toBe('scene');
-          expect(targetError.locationName).toBe(testLayout.getName());
+          expect(targetError.cardinalitySource).toBe('dynamic-create');
+          expect(targetError.suggestedEventStructure).toBeDefined();
+        }
+      });
+
+      it('expands CreateByName groups when modeling dynamic cardinality', () => {
+        const { project, testLayout } = makeTestProject(gd);
+        const group = testLayout
+          .getObjects()
+          .getObjectGroups()
+          .insertNew('Spawnable', 0);
+        group.addObject('MySpriteObject');
+        const events = testLayout.getEvents();
+        const createEvent = gd.asStandardEvent(
+          events.insertNewEvent(
+            project,
+            'BuiltinCommonInstructions::Standard',
+            0
+          )
+        );
+        const createAction = new gd.Instruction();
+        createAction.setType('CreateByName');
+        createAction.setParametersCount(6);
+        createAction.setParameter(0, '');
+        createAction.setParameter(1, 'Spawnable');
+        createAction.setParameter(2, 'DynamicObjectName');
+        createAction.setParameter(3, '0');
+        createAction.setParameter(4, '0');
+        createAction.setParameter(5, '""');
+        createEvent.getActions().insert(createAction, 0);
+        createAction.delete();
+
+        const consumeEvent = gd.asStandardEvent(
+          events.insertNewEvent(
+            project,
+            'BuiltinCommonInstructions::Standard',
+            1
+          )
+        );
+        const consumeAction = new gd.Instruction();
+        consumeAction.setType('AddForceTowardObject');
+        consumeAction.setParametersCount(4);
+        consumeAction.setParameter(0, 'MySpriteObject');
+        consumeAction.setParameter(1, 'MySpriteObject');
+        consumeAction.setParameter(2, '100');
+        consumeAction.setParameter(3, '0');
+        consumeEvent.getActions().insert(consumeAction, 0);
+        consumeAction.delete();
+
+        const targetError = scanProjectForValidationErrors(project).find(
+          error =>
+            error.type === 'ambiguous-object-picking' &&
+            error.instructionType === 'AddForceTowardObject' &&
+            error.parameterIndex === 1
+        );
+        expect(targetError).toBeDefined();
+        if (targetError) {
+          expect(targetError.cardinalitySource).toBe('dynamic-create');
         }
       });
 

@@ -9,6 +9,7 @@ import {
   enumerateBehaviorsMetadata,
   isBehaviorDefaultCapability,
 } from '../BehaviorsEditor/EnumerateBehaviorsMetadata';
+import { getSerializedEventsRevision } from './McpEventDsl';
 
 const gd: libGDevelop = global.gd;
 const fs = optionalRequire('fs');
@@ -886,6 +887,7 @@ export const renderSceneToPng = (project: gdProject, args: Object): Object => {
 
   return {
     success: true,
+    didModifyProject: false,
     sceneName,
     file: relativeFile,
     resolvedFile: absFile,
@@ -1579,10 +1581,7 @@ const getBgraPixelAsRgba = (
   ];
 };
 
-export const compareImageFiles = (
-  project: gdProject,
-  args: Object
-): Object => {
+export const compareImageFiles = (project: gdProject, args: Object): Object => {
   if (!fs || !path || !zlib) {
     throw new Error('Filesystem/path/zlib access is not available.');
   }
@@ -1717,11 +1716,14 @@ export const cropSceneObjectImage = (
   iterateInitialInstances(scene.getInitialInstances(), instance => {
     if (targetInstance) return;
     if (instance.getObjectName() !== objectName) return;
-    if (instanceId && !instance.getPersistentUuid().startsWith(instanceId)) return;
+    if (instanceId && !instance.getPersistentUuid().startsWith(instanceId))
+      return;
     targetInstance = instance;
   });
   if (!targetInstance) {
-    throw new Error(`No initial instance of "${objectName}" found in "${sceneName}".`);
+    throw new Error(
+      `No initial instance of "${objectName}" found in "${sceneName}".`
+    );
   }
 
   const { width: objectWidth, height: objectHeight } = getInitialInstanceSize(
@@ -1765,7 +1767,8 @@ export const cropSceneObjectImage = (
     }
   }
 
-  const overlayBounds = args.overlay_bounds !== false && args.overlayBounds !== false;
+  const overlayBounds =
+    args.overlay_bounds !== false && args.overlayBounds !== false;
   if (overlayBounds) {
     const left = Math.max(
       0,
@@ -1777,11 +1780,15 @@ export const cropSceneObjectImage = (
     );
     const right = Math.min(
       outputWidth - 1,
-      Math.round(((targetInstance.getX() + objectWidth) * scaleX - cropLeft) * zoom)
+      Math.round(
+        ((targetInstance.getX() + objectWidth) * scaleX - cropLeft) * zoom
+      )
     );
     const bottom = Math.min(
       outputHeight - 1,
-      Math.round(((targetInstance.getY() + objectHeight) * scaleY - cropTop) * zoom)
+      Math.round(
+        ((targetInstance.getY() + objectHeight) * scaleY - cropTop) * zoom
+      )
     );
     const setOverlayPixel = (x, y) => {
       if (x < 0 || y < 0 || x >= outputWidth || y >= outputHeight) return;
@@ -1805,7 +1812,10 @@ export const cropSceneObjectImage = (
   if (directory && !fs.existsSync(directory)) {
     fs.mkdirSync(directory, { recursive: true });
   }
-  fs.writeFileSync(outputPath, encodeRgbaPng(outputWidth, outputHeight, pixels));
+  fs.writeFileSync(
+    outputPath,
+    encodeRgbaPng(outputWidth, outputHeight, pixels)
+  );
 
   return {
     success: true,
@@ -1834,12 +1844,11 @@ export const auditProjectAssetSources = (
   project: gdProject,
   args: Object = {}
 ): Object => {
-  const allowedRoots = (
-    Array.isArray(args.allowed_roots)
-      ? args.allowed_roots
-      : Array.isArray(args.allowedRoots)
-      ? args.allowedRoots
-      : ['assets']
+  const allowedRoots = (Array.isArray(args.allowed_roots)
+    ? args.allowed_roots
+    : Array.isArray(args.allowedRoots)
+    ? args.allowedRoots
+    : ['assets']
   )
     .map(root => (typeof root === 'string' ? root : ''))
     .filter(Boolean);
@@ -1936,26 +1945,48 @@ const assertResourceIsImage = (project: gdProject, imageName: string) => {
   }
 };
 
-// Read an image resource's pixel size from disk (via Electron nativeImage), for
-// center-origin computation. Returns { width, height } or null if unavailable.
+// Read an image resource's pixel size from disk. Electron nativeImage handles
+// all supported formats; the PNG-header fallback also works in Node tests and
+// headless MCP environments where Electron decoding is unavailable.
 const readImageResourceSize = (
   project: gdProject,
   imageName: string
 ): ?{ width: number, height: number } => {
-  if (!nativeImage) return null;
   const resourcesManager = project.getResourcesManager();
   if (!resourcesManager.hasResource(imageName)) return null;
   const file = resourcesManager.getResource(imageName).getFile();
   const absFile = resolveLocalResourceFile(project, file) || file;
   if (!absFile || (fs && !fs.existsSync(absFile))) return null;
-  try {
-    const image = nativeImage.createFromPath(absFile);
-    const size = image.getSize();
-    if (!size.width || !size.height) return null;
-    return { width: size.width, height: size.height };
-  } catch (error) {
-    return null;
+  if (nativeImage) {
+    try {
+      const image = nativeImage.createFromPath(absFile);
+      const size = image.getSize();
+      if (size.width && size.height) {
+        return { width: size.width, height: size.height };
+      }
+    } catch (error) {
+      // Try the lightweight PNG parser below.
+    }
   }
+  if (fs) {
+    try {
+      const header = fs.readFileSync(absFile);
+      const isPng =
+        header.length >= 24 &&
+        header[0] === 137 &&
+        header[1] === 80 &&
+        header[2] === 78 &&
+        header[3] === 71;
+      if (isPng) {
+        const width = header.readUInt32BE(16);
+        const height = header.readUInt32BE(20);
+        if (width && height) return { width, height };
+      }
+    } catch (error) {
+      // No readable image dimensions.
+    }
+  }
+  return null;
 };
 
 const applySpritePoints = (sprite: gdSprite, frame: Object) => {
@@ -2428,6 +2459,115 @@ const getInitialInstanceSize = (
   };
 };
 
+const getInitialInstanceSizeWithSource = (
+  project: gdProject,
+  scene: gdLayout,
+  instance: gdInitialInstance
+): {| width: number, height: number, source: string, exact: boolean |} => {
+  const customWidth = instance.hasCustomSize() ? instance.getCustomWidth() : 0;
+  const customHeight = instance.hasCustomSize()
+    ? instance.getCustomHeight()
+    : 0;
+  if (instance.hasCustomSize()) {
+    if (customWidth > 0 && customHeight > 0) {
+      return {
+        width: customWidth,
+        height: customHeight,
+        source: 'instance-custom-size',
+        exact: true,
+      };
+    }
+  }
+
+  const objectName = instance.getObjectName();
+  const object = scene.getObjects().hasObjectNamed(objectName)
+    ? scene.getObjects().getObject(objectName)
+    : project.getObjects().hasObjectNamed(objectName)
+    ? project.getObjects().getObject(objectName)
+    : null;
+  if (object && object.getType() === 'Sprite') {
+    try {
+      const animations = gd
+        .asSpriteConfiguration(object.getConfiguration())
+        .getAnimations();
+      if (animations.getAnimationsCount() > 0) {
+        const animation = animations.getAnimation(0);
+        if (animation.getDirectionsCount() > 0) {
+          const direction = animation.getDirection(0);
+          if (direction.getSpritesCount() > 0) {
+            const resourceName = direction.getSprite(0).getImageName();
+            const imageSize = resourceName
+              ? readImageResourceSize(project, resourceName)
+              : null;
+            if (imageSize) {
+              return {
+                width: customWidth > 0 ? customWidth : imageSize.width,
+                height: customHeight > 0 ? customHeight : imageSize.height,
+                source:
+                  customWidth > 0 || customHeight > 0
+                    ? 'instance-custom-size+sprite-image-resource'
+                    : 'sprite-image-resource',
+                exact: true,
+              };
+            }
+          }
+        }
+      }
+    } catch (error) {
+      // Fall through to object defaults.
+    }
+  }
+  if (object && object.getType() === 'TextObject::Text') {
+    try {
+      const configuration = gd.asTextObjectConfiguration(
+        object.getConfiguration()
+      );
+      const text = configuration.getText() || '';
+      const characterSize = Math.max(1, configuration.getCharacterSize() || 20);
+      const lineHeight = Math.max(
+        characterSize,
+        configuration.getLineHeight() || characterSize * 1.2
+      );
+      const lines = text.split(/\r?\n/);
+      return {
+        width:
+          customWidth > 0
+            ? customWidth
+            : Math.max(
+                1,
+                ...lines.map(line =>
+                  Math.ceil(line.length * characterSize * 0.6)
+                )
+              ),
+        height:
+          customHeight > 0
+            ? customHeight
+            : Math.max(1, Math.ceil(lines.length * lineHeight)),
+        source:
+          customWidth > 0 || customHeight > 0
+            ? 'instance-custom-size+text-metrics-estimate'
+            : 'text-metrics-estimate',
+        exact: false,
+      };
+    } catch (error) {
+      // Fall through to object defaults.
+    }
+  }
+
+  const defaults = getInitialInstanceSize(instance);
+  return {
+    width: customWidth > 0 ? customWidth : defaults.width,
+    height: customHeight > 0 ? customHeight : defaults.height,
+    source:
+      customWidth > 0 || customHeight > 0
+        ? 'instance-custom-size+fallback-estimate'
+        : instance.getDefaultWidth() > 0 && instance.getDefaultHeight() > 0
+        ? 'object-default-size'
+        : 'fallback-32x32',
+    exact: false,
+  };
+};
+
 export const inspectSceneDrawOrder = (
   project: gdProject,
   args: Object
@@ -2435,7 +2575,8 @@ export const inspectSceneDrawOrder = (
   const sceneName = getRequiredString(args, 'scene_name');
   const scene = getScene(project, sceneName);
   const filterObjectName =
-    getOptionalString(args, 'object_name') || getOptionalString(args, 'objectName');
+    getOptionalString(args, 'object_name') ||
+    getOptionalString(args, 'objectName');
   const layersContainer = scene.getLayers();
   const layers = [];
   const layerIndexByName = {};
@@ -2455,19 +2596,30 @@ export const inspectSceneDrawOrder = (
       return;
     }
     const layerName = instance.getLayer() || '';
-    const { width, height } = getInitialInstanceSize(instance);
+    const size = getInitialInstanceSizeWithSource(project, scene, instance);
+    const { width, height } = size;
+    const object = scene.getObjects().hasObjectNamed(objectName)
+      ? scene.getObjects().getObject(objectName)
+      : project.getObjects().hasObjectNamed(objectName)
+      ? project.getObjects().getObject(objectName)
+      : null;
     instances.push({
       objectName,
+      objectType: object ? object.getType() : undefined,
       instanceId: instance.getPersistentUuid().slice(0, 10),
       sourceIndex,
       layer: layerName,
       layerIndex:
-        layerIndexByName[layerName] !== undefined ? layerIndexByName[layerName] : 0,
+        layerIndexByName[layerName] !== undefined
+          ? layerIndexByName[layerName]
+          : 0,
       zOrder: instance.getZOrder(),
       x: instance.getX(),
       y: instance.getY(),
       width,
       height,
+      dimensionSource: size.source,
+      dimensionsExact: size.exact,
       bounds: {
         left: instance.getX(),
         top: instance.getY(),
@@ -2493,6 +2645,30 @@ export const inspectSceneDrawOrder = (
       drawsAfterCount: drawIndex,
       drawsBeforeCount: instances.length - drawIndex - 1,
     }));
+  const serializedEventsText = JSON.stringify(
+    serializeToJSObject(scene.getEvents())
+  );
+  const hasDynamicObjectCreation = /"value":"Create(?:ByName|Object)?"/.test(
+    serializedEventsText
+  );
+  const baseLayerUiCandidates = drawOrder.filter(
+    instance =>
+      !instance.layer &&
+      (instance.objectType === 'TextObject::Text' ||
+        /(hud|score|health|label|counter|button|overlay|status)/i.test(
+          instance.objectName
+        ))
+  );
+  const hudLayerRisks =
+    hasDynamicObjectCreation && baseLayerUiCandidates.length
+      ? baseLayerUiCandidates.map(instance => ({
+          objectName: instance.objectName,
+          instanceId: instance.instanceId,
+          severity: 'warning',
+          reason:
+            'This UI-like instance is on the base layer while events create objects dynamically. Runtime-created gameplay instances can receive a higher z-order and cover it.',
+        }))
+      : [];
 
   return {
     success: true,
@@ -2501,6 +2677,17 @@ export const inspectSceneDrawOrder = (
     instanceCount: drawOrder.length,
     bottomToTop: drawOrder,
     topToBottom: drawOrder.slice().reverse(),
+    hudLayerGuidance: {
+      recommendedLayer: 'HUD',
+      hasDynamicObjectCreation,
+      risks: hudLayerRisks,
+      reason:
+        'Persistent UI should use a dedicated top layer. Gameplay objects created at runtime can receive z-orders above static base-layer UI, while a higher layer remains above them regardless of z-order.',
+      createWith:
+        'change_scene_properties_layers_effects_groups { changed_layers: [{ layer_name: "HUD" }] }',
+      moveWith:
+        'put_2d_instances { operation: "update", instances: [{ id: "<instanceId>", layer: "HUD" }] }',
+    },
     note:
       'bottomToTop is the static initial-instance draw order: later entries can cover earlier entries when they overlap.',
   };
@@ -2742,7 +2929,9 @@ const sceneEventsMayReferenceVariable = (
   scene: gdLayout,
   rootVariableName: string
 ): boolean => {
-  const serializedEventsText = JSON.stringify(serializeToJSObject(scene.getEvents()));
+  const serializedEventsText = JSON.stringify(
+    serializeToJSObject(scene.getEvents())
+  );
   return new RegExp(
     `(^|[^A-Za-z0-9_])${escapeRegExp(rootVariableName)}([^A-Za-z0-9_]|$)`
   ).test(serializedEventsText);
@@ -3863,6 +4052,38 @@ export const createTextObject = (
       }
     }
   }
+  if (instancePayload) {
+    const hasCustomWidth =
+      instancePayload.width !== undefined ||
+      (instancePayload.customSize &&
+        instancePayload.customSize.width !== undefined) ||
+      (instancePayload.custom_size &&
+        instancePayload.custom_size.width !== undefined);
+    const hasCustomHeight =
+      instancePayload.height !== undefined ||
+      (instancePayload.customSize &&
+        instancePayload.customSize.height !== undefined) ||
+      (instancePayload.custom_size &&
+        instancePayload.custom_size.height !== undefined);
+    if (hasCustomWidth && !hasCustomHeight) {
+      const textObjectConfig = gd.asTextObjectConfiguration(
+        objectResult.object.getConfiguration()
+      );
+      const characterSize = Math.max(
+        1,
+        textObjectConfig.getCharacterSize() || 20
+      );
+      const lineHeight = Math.max(
+        characterSize,
+        textObjectConfig.getLineHeight() || characterSize * 1.2
+      );
+      const lineCount = Math.max(
+        1,
+        (textObjectConfig.getText() || '').split(/\r?\n/).length
+      );
+      instancePayload.height = Math.ceil(lineHeight * lineCount);
+    }
+  }
   const instanceResult = instancePayload
     ? putStructured2dInstances(
         project,
@@ -4281,6 +4502,7 @@ export const readSceneEventsSerialized = (
   const scene = getScene(project, sceneName);
   const serializedEvents = serializeToJSObject(scene.getEvents());
   const rootEvents = Array.isArray(serializedEvents) ? serializedEvents : [];
+  const eventSheetRevision = getSerializedEventsRevision(rootEvents);
 
   // summary_only: return a compact overview (root event count + per-type counts)
   // instead of the full, potentially huge, serialized event tree.
@@ -4293,6 +4515,7 @@ export const readSceneEventsSerialized = (
     return {
       success: true,
       sceneName,
+      eventSheetRevision,
       summary: {
         rootEventsCount: rootEvents.length,
         rootEventTypeCounts: typeCounts,
@@ -4305,6 +4528,7 @@ export const readSceneEventsSerialized = (
   const result: Object = {
     success: true,
     sceneName,
+    eventSheetRevision,
     serializedEvents,
   };
   // The JSON string duplicates serializedEvents and can be very large, so only
@@ -4564,7 +4788,10 @@ export const bindSpriteAnimationsFromDirectory = (
     .filter(entry => entry.isFile() && IMAGE_FILE_RE.test(entry.name))
     .map(entry => path.join(directory, entry.name))
     .sort((left, right) =>
-      left.localeCompare(right, undefined, { numeric: true, sensitivity: 'base' })
+      left.localeCompare(right, undefined, {
+        numeric: true,
+        sensitivity: 'base',
+      })
     );
   if (rootFiles.length && (includeRoot || animationGroups.length === 0)) {
     animationGroups.push({
@@ -4583,7 +4810,10 @@ export const bindSpriteAnimationsFromDirectory = (
   }
 
   const usedResourceNames = new Set(
-    project.getResourcesManager().getAllResourceNames().toJSArray()
+    project
+      .getResourcesManager()
+      .getAllResourceNames()
+      .toJSArray()
   );
   const makeUniqueResourceName = base => {
     let name = base;
@@ -4600,7 +4830,9 @@ export const bindSpriteAnimationsFromDirectory = (
     const animationName = sanitizeResourceNamePart(group.name);
     const frames = group.files.map((file, index) => {
       const resourceName = makeUniqueResourceName(
-        `${sanitizeResourceNamePart(objectName)}_${animationName}_${sanitizeResourceNamePart(
+        `${sanitizeResourceNamePart(
+          objectName
+        )}_${animationName}_${sanitizeResourceNamePart(
           path.basename(file)
         )}_${index}`
       );
@@ -4846,7 +5078,9 @@ export const inspectTilemapPalette = (
       ? args.tileSize
       : parseFloat(readTilemapConfigProperty(object, 'tileSize') || '');
   const tileSize =
-    Number.isFinite(rawTileSize) && rawTileSize > 0 ? Math.floor(rawTileSize) : 16;
+    Number.isFinite(rawTileSize) && rawTileSize > 0
+      ? Math.floor(rawTileSize)
+      : 16;
   const dims = readImageResourceSize(project, atlasImage);
   const rawColumns =
     getFiniteNumber(args.columns) !== null
@@ -5300,8 +5534,7 @@ export const getTilemapTiles = (project: gdProject, args: Object): Object => {
   };
 };
 
-const MCP_TILEMAP_COLLISION_FALLBACK_VARIABLE =
-  '__mcpTilemapCollisionTileIds';
+const MCP_TILEMAP_COLLISION_FALLBACK_VARIABLE = '__mcpTilemapCollisionTileIds';
 
 const parseTileIdList = (value: any): Array<number> => {
   if (Array.isArray(value)) {
@@ -5383,7 +5616,12 @@ const writeTilemapCollisionProperty = (
 const getTilemapGridForObject = (
   project: gdProject,
   args: Object
-): {| scene: gdLayout, object: gdObject, grid: Object, instance: gdInitialInstance |} => {
+): {|
+  scene: gdLayout,
+  object: gdObject,
+  grid: Object,
+  instance: gdInitialInstance,
+|} => {
   const sceneName = getRequiredString(args, 'scene_name');
   const objectName = getRequiredString(args, 'object_name');
   const scene = getScene(project, sceneName);
@@ -5517,7 +5755,10 @@ export const inspectTilemapCollision = (
   };
 };
 
-const readGridPoint = (point: any, name: string): {| x: number, y: number |} => {
+const readGridPoint = (
+  point: any,
+  name: string
+): {| x: number, y: number |} => {
   if (!point || typeof point !== 'object') {
     throw new Error(`${name} must be { x, y } tile coordinates.`);
   }

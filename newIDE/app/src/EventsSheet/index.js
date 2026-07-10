@@ -546,13 +546,23 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
         selection: clearSelection(),
         inlineEditing: false,
         inlineEditingAnchorEl: null,
+        eventsHistory: saveToHistory(
+          state.eventsHistory,
+          this.props.events,
+          'EDIT',
+          {
+            positions: {
+              positionsBeforeAction: [],
+              positionAfterAction: [],
+            },
+            operationLabel: 'Edit events',
+          }
+        ),
         eventsGraphPreviewUpdateId: state.eventsGraphPreviewUpdateId + 1,
       }),
       () => {
-        this._saveChangesToHistory('EDIT', {
-          positionsBeforeAction: [],
-          positionAfterAction: [],
-        });
+        this.updateToolbar();
+        if (this._searchPanel) this._searchPanel.markSearchResultsDirty();
       }
     );
   };

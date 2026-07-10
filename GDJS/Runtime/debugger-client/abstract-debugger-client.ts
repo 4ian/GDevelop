@@ -1198,7 +1198,12 @@ namespace gdjs {
       let width = 0;
       let height = 0;
       let error: string | null = null;
+      let rendered = false;
       try {
+        // Force one render pass without advancing game logic. This makes the
+        // canvas capture deterministic while the preview is paused and avoids
+        // reading a partially composited frame left by a throttled rAF loop.
+        rendered = this._runtimegame.getSceneStack().renderWithoutStep();
         const canvas = this._runtimegame.getRenderer().getCanvas();
         if (!canvas) {
           error = 'No game canvas is available to capture.';
@@ -1216,7 +1221,14 @@ namespace gdjs {
         circularSafeStringify({
           command: 'screenshot',
           messageId,
-          payload: { dataUrl, width, height, error },
+          payload: {
+            dataUrl,
+            width,
+            height,
+            error,
+            rendered,
+            capturedAt: Date.now(),
+          },
         })
       );
     }
@@ -1332,6 +1344,15 @@ namespace gdjs {
           : 1000 / 60;
       let steppedFrames = 0;
       let stoppedEarly = false;
+      let failedFrame: number | null = null;
+      let failure: any = null;
+      const cleanup = {
+        attempted: !!autoRelease || !!(postInputs && postInputs.length),
+        postInputsApplied: 0,
+        keysReleased: false,
+        success: true,
+        error: null as string | null,
+      };
       try {
         // 1. Inject inputs (held keys persist across the stepped frames).
         (inputs || []).forEach((input) => {
@@ -1350,24 +1371,50 @@ namespace gdjs {
             break;
           }
         }
-        // Apply release/post inputs after the stepped frames. This lets
-        // run_frames expose clickAndHold semantics: press before stepping, let
-        // game events observe the held button, then release in the same call.
-        (postInputs || []).forEach((input) => {
-          this._applySimulatedInput(input, applied);
-        });
-        // 4. Optionally release all held keys, so a held key from this call does
-        // NOT silently carry over and keep driving the player on later calls
-        // (a counter-intuitive footgun). Default behavior keeps keys held.
+      } catch (e) {
+        failure = e;
+        error = (e as Error).message || 'Failed to run frames.';
+        failedFrame = Math.min(frames, steppedFrames + 1);
+        stoppedEarly = true;
+      } finally {
+        // Post-inputs and key release are cleanup operations: they must run even
+        // when game events throw in the middle of a stepped frame.
+        try {
+          (postInputs || []).forEach((input) => {
+            this._applySimulatedInput(input, applied);
+            cleanup.postInputsApplied++;
+          });
+        } catch (cleanupError) {
+          cleanup.success = false;
+          cleanup.error =
+            (cleanupError as Error).message ||
+            'Runtime post-input cleanup failed.';
+          if (!error) error = cleanup.error;
+        }
+
+        // Keep key release in its own guarded block. A malformed post-input must
+        // never prevent auto_release from clearing keys held before the failure.
         if (autoRelease) {
-          const inputManager: any = this._runtimegame.getInputManager();
-          if (typeof inputManager.releaseAllPressedKeys === 'function') {
+          try {
+            const inputManager: any = this._runtimegame.getInputManager();
+            if (typeof inputManager.releaseAllPressedKeys !== 'function') {
+              throw new Error(
+                'The runtime input manager cannot release all pressed keys.'
+              );
+            }
             inputManager.releaseAllPressedKeys();
             applied.push('autoReleasedKeys');
+            cleanup.keysReleased = true;
+          } catch (cleanupError) {
+            cleanup.success = false;
+            const releaseError =
+              (cleanupError as Error).message || 'Runtime key release failed.';
+            cleanup.error = cleanup.error
+              ? cleanup.error + ' ' + releaseError
+              : releaseError;
+            if (!error) error = releaseError;
           }
         }
-      } catch (e) {
-        error = (e as Error).message || 'Failed to run frames.';
       }
       // 5. Reply once with the full dump plus the run metadata (including which
       // keys are STILL held), so the bridge can summarize live state without a
@@ -1377,9 +1424,26 @@ namespace gdjs {
         messageId,
         runFrames: {
           applied,
+          requestedFrames: frames,
           steppedFrames,
           deltaMs: delta,
-          stoppedEarly,
+          stoppedEarly: stoppedEarly || steppedFrames < frames,
+          failedFrame,
+          partialStateAvailable: steppedFrames > 0,
+          failure:
+            failure && typeof failure === 'object'
+              ? {
+                  code: failure.code,
+                  name: failure.name,
+                  usage: failure.usage,
+                  pickedInstancesCount: failure.pickedInstancesCount,
+                  eventId: failure.eventId || failure.aiGeneratedEventId,
+                  instructionId: failure.instructionId,
+                  suggestedEventStructure: failure.suggestedEventStructure,
+                  stack: failure.stack,
+                }
+              : undefined,
+          cleanup,
           paused: this._runtimegame.isPaused(),
           heldKeys: this._getHeldKeyCodes(),
           cursorWorldCoordinates: includeCursorWorldCoordinates

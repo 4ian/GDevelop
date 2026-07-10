@@ -7,8 +7,16 @@ export type McpPermissionOptions = {|
 
 export type McpTool = {|
   name: string,
+  title?: string,
   description: string,
   inputSchema: Object,
+  outputSchema?: Object,
+  annotations?: {|
+    readOnlyHint?: boolean,
+    destructiveHint?: boolean,
+    idempotentHint?: boolean,
+    openWorldHint?: boolean,
+  |},
 |};
 
 export type McpResource = {|
@@ -1577,12 +1585,23 @@ const capturePreviewScreenshotSchema = {
     canvas_only: {
       type: 'boolean',
       description:
-        'Default false. When true, skip window/webContents capture and request the game canvas PNG from the renderer, so the result is the canvas content rather than the preview window.',
+        'Canvas capture is already the default. Set true to forbid the full-window fallback.',
     },
     capture_mode: {
       type: 'string',
+      enum: ['canvas', 'window'],
       description:
-        'Optional capture mode. Use "canvas" as an alias for canvas_only:true; omit for auto (main-process window capture first, renderer canvas fallback).',
+        'Default "canvas": force a render and capture exact game-canvas pixels. Use "window" only when the Electron preview chrome/content area is intentionally needed.',
+    },
+    exact_game_resolution: {
+      type: 'boolean',
+      description:
+        'When true, require intrinsic game-canvas output and disable the full-window fallback.',
+    },
+    retry_count: {
+      type: 'number',
+      description:
+        'Automatic retries for black, transparent, dimensionally inconsistent, or unavailable canvas frames. Defaults to 2 (3 total attempts), maximum 5.',
     },
     target_width: {
       type: 'number',
@@ -1735,7 +1754,7 @@ const runFramesSchema = {
     auto_release: {
       type: 'boolean',
       description:
-        'When true, release ALL held keys after stepping, so a key held in this call does not silently carry over and keep driving the game on later calls. The response always lists currently-held keys as heldKeys.',
+        'When true, release ALL held keys in a guaranteed cleanup path after success or runtime failure. The response reports cleanup confirmation and any currently-held keys.',
     },
     instance_positions_for: {
       type: 'array',
@@ -1795,6 +1814,11 @@ const saveAndRelaunchPreviewPausedSchema = {
   properties: {
     scene_name: launchPreviewSchema.properties.scene_name,
     timeout_ms: launchPreviewSchema.properties.timeout_ms,
+    relaunch_attempts: {
+      type: 'number',
+      description:
+        'Number of fresh launch attempts after awaited preview cleanup. Defaults to 2, maximum 4, with exponential backoff.',
+    },
   },
   additionalProperties: true,
 };
@@ -1883,6 +1907,278 @@ const readSerializedSceneSchema = {
   additionalProperties: true,
 };
 
+const eventDslInstructionSchema = {
+  type: 'object',
+  description:
+    'A GDevelop instruction using an exact metadata type and named parameters. Use parameters (or args) as an object keyed by metadata parameter name. Conditions may instead use any/all/not for logical composition.',
+  properties: {
+    type: {
+      type: 'string',
+      description:
+        'Exact action or condition type from gdevelop_search_instruction_metadata.',
+    },
+    parameters: {
+      oneOf: [
+        { type: 'object', additionalProperties: true },
+        { type: 'array', items: {} },
+      ],
+      description:
+        'Prefer an object of named parameter values. A positional array is accepted as an advanced fallback.',
+    },
+    args: {
+      type: 'object',
+      description: 'Alias for parameters when using named values.',
+      additionalProperties: true,
+    },
+    inverted: { type: 'boolean' },
+    children: {
+      type: 'array',
+      description: 'Nested conditions for a logical condition.',
+      items: { type: 'object', additionalProperties: true },
+    },
+    any: {
+      type: 'array',
+      description: 'Shorthand OR: true when any child condition is true.',
+      items: { type: 'object', additionalProperties: true },
+    },
+    all: {
+      type: 'array',
+      description: 'Shorthand AND: true when all child conditions are true.',
+      items: { type: 'object', additionalProperties: true },
+    },
+    not: {
+      type: 'object',
+      description: 'Shorthand NOT around one child condition.',
+      additionalProperties: true,
+    },
+  },
+  additionalProperties: false,
+};
+
+const eventDslEventSchema = {
+  type: 'object',
+  description:
+    'Compact AI event DSL. Every omitted id is generated. children contains sub-events. Raw serializer event objects belong in events_json, not this field.',
+  properties: {
+    kind: {
+      type: 'string',
+      enum: [
+        'standard',
+        'group',
+        'comment',
+        'repeat',
+        'while',
+        'for_each',
+        'for_each_child_variable',
+        'else',
+        'link',
+        'javascript',
+      ],
+    },
+    id: {
+      type: 'string',
+      description:
+        'Optional stable event id. Generated automatically when omitted.',
+    },
+    name: { type: 'string', description: 'Required for group events.' },
+    color: {
+      oneOf: [
+        { type: 'string', description: '#RRGGBB' },
+        { type: 'object', additionalProperties: true },
+      ],
+      description:
+        'Optional group/comment color. Groups receive a non-default color automatically.',
+    },
+    folded: { type: 'boolean' },
+    text: { type: 'string', description: 'Comment text for comment events.' },
+    conditions: {
+      type: 'array',
+      items: eventDslInstructionSchema,
+    },
+    while_conditions: {
+      type: 'array',
+      description:
+        'Loop conditions for while. When omitted, conditions are used as loop conditions.',
+      items: eventDslInstructionSchema,
+    },
+    actions: {
+      type: 'array',
+      items: eventDslInstructionSchema,
+    },
+    children: {
+      type: 'array',
+      description: 'Sub-events in this event or group.',
+      items: { type: 'object', additionalProperties: true },
+    },
+    variables: {
+      oneOf: [
+        { type: 'object', additionalProperties: true },
+        {
+          type: 'array',
+          items: { type: 'object', additionalProperties: true },
+        },
+      ],
+      description:
+        'Event-local variables. Use a simple map such as { damage: 0, armed: false }, or a serialized variable array for structures.',
+    },
+    times: {
+      description: 'Repeat count/expression for repeat events.',
+    },
+    object: { type: 'string', description: 'Object name for for_each.' },
+    iterable: {
+      type: 'string',
+      description: 'Variable expression for for_each_child_variable.',
+    },
+    value_iterator: { type: 'string' },
+    key_iterator: { type: 'string' },
+    target: { type: 'string', description: 'Scene/external events for link.' },
+    code: { type: 'string', description: 'Inline code for javascript.' },
+    parameter_objects: { type: 'string' },
+  },
+  required: ['kind'],
+  additionalProperties: false,
+};
+
+const eventDslOperationSchema = {
+  type: 'object',
+  properties: {
+    op: {
+      type: 'string',
+      enum: [
+        'append',
+        'insert_before',
+        'insert_after',
+        'insert_child',
+        'replace',
+        'replace_keep_children',
+        'append_instructions',
+        'prepend_instructions',
+        'replace_actions',
+        'replace_conditions',
+        'delete',
+      ],
+      description: 'Simple event patch operation.',
+    },
+    target: {
+      oneOf: [
+        { type: 'string' },
+        {
+          type: 'object',
+          properties: {
+            event_id: { type: 'string' },
+            event_path: { type: 'string' },
+          },
+          additionalProperties: false,
+        },
+      ],
+      description:
+        'Stable event id/path. Not needed for append. Prefer { event_id: "..." }.',
+    },
+    events: {
+      type: 'array',
+      items: eventDslEventSchema,
+      description:
+        'DSL events to insert or use as replacement content. Required for every operation except delete.',
+    },
+    undeclared_variables: {
+      type: 'array',
+      items: { type: 'object', additionalProperties: true },
+    },
+    undeclared_object_variables: {
+      type: 'object',
+      additionalProperties: true,
+    },
+    missing_object_behaviors: {
+      type: 'object',
+      additionalProperties: true,
+    },
+    extension_names: { type: 'array', items: { type: 'string' } },
+    missing_resources: {
+      type: 'array',
+      items: { type: 'object', additionalProperties: true },
+    },
+  },
+  required: ['op'],
+  additionalProperties: false,
+};
+
+const eventDslToolSchema = {
+  type: 'object',
+  properties: {
+    scene_name: sceneNameSchema.properties.scene_name,
+    events: {
+      type: 'array',
+      items: eventDslEventSchema,
+      description: 'DSL events to append to the scene.',
+    },
+    operations: {
+      type: 'array',
+      items: eventDslOperationSchema,
+      description:
+        'Precise patches. Use this instead of events when inserting, replacing, or deleting around existing events.',
+    },
+    dry_run: {
+      type: 'boolean',
+      description:
+        'Compile, apply to a temporary event sheet, validate, and render without modifying the project.',
+    },
+    expected_revision: {
+      type: 'string',
+      description:
+        'Optional eventSheetRevision from read_scene_events_serialized. The write is rejected if the event sheet changed.',
+    },
+    event_id_prefix: {
+      type: 'string',
+      description:
+        'Optional prefix for automatically generated stable event ids.',
+    },
+    allow_javascript_events: {
+      type: 'boolean',
+      description:
+        'Default false. Enable only when the user explicitly requested JavaScript events.',
+    },
+    summary_only: {
+      type: 'boolean',
+      description:
+        'Default true. Return diagnostics and revisions without rendered events or normalized JSON.',
+    },
+    errors_only: {
+      type: 'boolean',
+      description: 'Return only validity, event count, and errors.',
+    },
+    include_rendered_events: {
+      type: 'boolean',
+      description: 'Include rendered event-sheet text in the response.',
+    },
+    include_normalized_json: {
+      type: 'boolean',
+      description: 'Include normalized serialized events JSON in the response.',
+    },
+    save: {
+      type: 'boolean',
+      description:
+        'For gdevelop_apply_events, await a verified project save after the event mutation and include persistence evidence.',
+    },
+  },
+  required: ['scene_name'],
+  additionalProperties: false,
+};
+
+const eventDslOutputSchema = {
+  type: 'object',
+  properties: {
+    success: { type: 'boolean' },
+    valid: { type: 'boolean' },
+    dryRun: { type: 'boolean' },
+    sceneName: { type: 'string' },
+    applied: { type: 'boolean' },
+    oldRevision: { type: 'string' },
+    newRevision: { type: 'string' },
+    eventSheetRevision: { type: 'string' },
+  },
+  additionalProperties: true,
+};
+
 const bulkEditSceneAssetsSchema = {
   type: 'object',
   properties: {
@@ -1954,8 +2250,14 @@ const bulkEditSceneAssetsSchema = {
     events: {
       type: 'array',
       description:
-        'Optional scene events to add LAST (after resources/objects/animations/behaviors/variables/instances), as a serialized GDevelop events array (same shape as add_scene_events events_json). Goes through the SAME validation + lint as add_scene_events — Or/And children must be under subInstructions, etc. Lets initial scene setup be done in ONE call.',
+        'Optional compact event DSL events to add LAST. Use kind, named instruction parameters, and children. Raw serialized events are still accepted for compatibility.',
       items: { type: 'object', additionalProperties: true },
+    },
+    events_dsl: {
+      type: 'array',
+      description:
+        'Explicit alias for events when passing the compact event DSL.',
+      items: eventDslEventSchema,
     },
     events_json: {
       type: 'string',
@@ -2028,6 +2330,20 @@ const findSceneEventsSchema = {
     limit: {
       type: 'number',
       description: 'Maximum matches to return. Defaults to 50.',
+    },
+    compact: {
+      type: 'boolean',
+      description:
+        'Default true. Omit serializedEvent from matches. Set false for a full event payload.',
+    },
+    summary_only: {
+      type: 'boolean',
+      description: 'Alias for compact:true.',
+    },
+    include_serialized: {
+      type: 'boolean',
+      description:
+        'Explicitly include or omit serializedEvent. Overrides compact and summary_only.',
     },
   },
   required: ['scene_name'],
@@ -2344,8 +2660,13 @@ const validateEventsJsonFileSchema = {
     summary_only: {
       type: 'boolean',
       description:
-        'When true, omit rendered event text and normalized JSON from the response.',
+        'Default true. Omit rendered event text and normalized JSON from the response.',
     },
+    errors_only: eventDslToolSchema.properties.errors_only,
+    include_rendered_events:
+      eventDslToolSchema.properties.include_rendered_events,
+    include_normalized_json:
+      eventDslToolSchema.properties.include_normalized_json,
     dedupe_errors: {
       type: 'boolean',
       description:
@@ -2390,6 +2711,18 @@ const addSceneEventsSchema = {
   type: 'object',
   properties: {
     scene_name: sceneNameSchema.properties.scene_name,
+    events_dsl: {
+      type: 'array',
+      items: eventDslEventSchema,
+      description:
+        'Preferred MCP input: compact events with kind, named instruction parameters, children, and optional ids. Compiled and validated before writing.',
+    },
+    event_patch: {
+      type: 'array',
+      items: eventDslOperationSchema,
+      description:
+        'Preferred precise-edit input using simple op/target/events fields. Alias of the lower-level event_changes format.',
+    },
     events_json: {
       oneOf: [
         { type: 'string' },
@@ -2411,6 +2744,20 @@ const addSceneEventsSchema = {
         properties: {
           operation_name: {
             type: 'string',
+            enum: [
+              'insert_at_end',
+              'insert_before_event',
+              'insert_after_event',
+              'insert_as_sub_event',
+              'insert_and_replace_event',
+              'replace_entire_event_and_sub_events',
+              'replace_event_but_keep_existing_sub_events',
+              'insert_actions_conditions_at_end',
+              'insert_actions_conditions_at_start',
+              'replace_all_actions',
+              'replace_all_conditions',
+              'delete_event',
+            ],
             description:
               'Operation such as insert_at_end, insert_before_event, insert_after_event, replace_entire_event_and_sub_events, replace_event_but_keep_existing_sub_events, or delete_event.',
           },
@@ -2440,6 +2787,11 @@ const addSceneEventsSchema = {
       description:
         'Optional stable id stamped on directly inserted or changed events.',
     },
+    dry_run: eventDslToolSchema.properties.dry_run,
+    expected_revision: eventDslToolSchema.properties.expected_revision,
+    event_id_prefix: eventDslToolSchema.properties.event_id_prefix,
+    allow_javascript_events:
+      eventDslToolSchema.properties.allow_javascript_events,
   },
   required: ['scene_name'],
   additionalProperties: true,
@@ -2782,6 +3134,12 @@ const extensionFunctionSchema = {
       description:
         'Serialized GDevelop events to replace the function events. Accepts a JSON string, events array, single serialized event object, or { events: [...] }. It is validated before writing, generated JavaScript is preflighted, and function metadata/events are rolled back if validation fails.',
     },
+    events_dsl: {
+      type: 'array',
+      items: eventDslEventSchema,
+      description:
+        'Preferred compact event DSL replacement. The MCP bridge compiles named parameters to serializer-compatible events before extension validation.',
+    },
     serialized_function: {
       type: 'object',
       description:
@@ -2875,6 +3233,7 @@ const validateExtensionEventsJsonSchema = {
     parameters: extensionFunctionSchema.properties.parameters,
     parameters_mode: extensionFunctionSchema.properties.parameters_mode,
     events_json: extensionFunctionSchema.properties.events_json,
+    events_dsl: extensionFunctionSchema.properties.events_dsl,
     require_root_groups:
       lintExtensionFunctionEventsSchema.properties.require_root_groups,
     include_generated_code:
@@ -3107,6 +3466,7 @@ const findExtensionEventsSchema = {
       description:
         'When true, omit serializedEvent from matches. New extension/project searches are compact by default.',
     },
+    compact: findSceneEventsSchema.properties.compact,
     include_serialized: {
       type: 'boolean',
       description:
@@ -3145,6 +3505,7 @@ const findProjectEventsSchema = {
       description: 'Maximum aggregate matches to return. Defaults to 100.',
     },
     summary_only: findExtensionEventsSchema.properties.summary_only,
+    compact: findExtensionEventsSchema.properties.compact,
     include_serialized: findExtensionEventsSchema.properties.include_serialized,
   },
   additionalProperties: true,
@@ -3547,6 +3908,11 @@ const onSignalFunctionSchema = {
       description:
         'Serialized events for the onSignal lifecycle handler. Branch on the fixed SignalName parameter, read Payload through GetArgumentAsString("Payload") or the fixed Payload parameter, and do not use scene-only SignalPayload()/SignalSender* expressions here.',
     },
+    events_dsl: {
+      ...extensionFunctionSchema.properties.events_dsl,
+      description:
+        'Preferred compact event DSL for the onSignal handler. Branch on SignalName and use the Payload parameter inside the function.',
+    },
     dry_run: extensionFunctionSchema.properties.dry_run,
     summary_only: extensionFunctionSchema.properties.summary_only,
   },
@@ -3693,7 +4059,7 @@ const readTools: Array<McpTool> = [
   {
     name: 'gdevelop_get_events_json_examples',
     description:
-      'Return official-doc-informed, serializer-compatible GDevelop event JSON examples and add_scene_events payload shapes.',
+      'Advanced/raw API: return serializer-compatible GDevelop event JSON examples. For normal AI event authoring, use gdevelop_get_event_dsl_reference and gdevelop_apply_events instead.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -3712,10 +4078,47 @@ const readTools: Array<McpTool> = [
     },
   },
   {
+    name: 'gdevelop_get_event_dsl_reference',
+    title: 'GDevelop Event DSL Reference',
+    description:
+      'Return the compact event DSL reference, supported event kinds and patch operations, and a complete named-parameter example. Use this when the gdevelop_apply_events schema is not already visible.',
+    inputSchema: emptyObjectSchema,
+    outputSchema: {
+      type: 'object',
+      properties: {
+        dslVersion: { type: 'string' },
+        eventKinds: { type: 'array', items: { type: 'string' } },
+        operationAliases: { type: 'array', items: { type: 'string' } },
+        rules: { type: 'array', items: { type: 'string' } },
+        example: { type: 'object', additionalProperties: true },
+      },
+      required: ['dslVersion', 'eventKinds', 'operationAliases', 'rules'],
+      additionalProperties: true,
+    },
+    annotations: {
+      readOnlyHint: true,
+      destructiveHint: false,
+      idempotentHint: false,
+    },
+  },
+  {
     name: 'gdevelop_get_event_operation_reference',
     description:
-      'Return the supported add_scene_events event_changes operation names, target path format, and required fields.',
+      'Advanced/raw API: return lower-level add_scene_events event_changes operation names. Normal AI callers should use the simple operations in gdevelop_apply_events.',
     inputSchema: emptyObjectSchema,
+  },
+  {
+    name: 'gdevelop_validate_events',
+    title: 'Validate GDevelop Events',
+    description:
+      'Compile compact event DSL with named instruction parameters, apply operations to a temporary copy of the target scene event sheet, and return rendered events plus actionable validation diagnostics without modifying the project.',
+    inputSchema: eventDslToolSchema,
+    outputSchema: eventDslOutputSchema,
+    annotations: {
+      readOnlyHint: true,
+      destructiveHint: false,
+      idempotentHint: true,
+    },
   },
   {
     name: 'gdevelop_validate_events_json',
@@ -3739,6 +4142,12 @@ const readTools: Array<McpTool> = [
           description:
             'When true, return errors deduplicated by root cause (each with a count) instead of one entry per occurrence.',
         },
+        summary_only: eventDslToolSchema.properties.summary_only,
+        errors_only: eventDslToolSchema.properties.errors_only,
+        include_rendered_events:
+          eventDslToolSchema.properties.include_rendered_events,
+        include_normalized_json:
+          eventDslToolSchema.properties.include_normalized_json,
         allow_javascript_events: {
           type: 'boolean',
           description:
@@ -3797,7 +4206,7 @@ const readTools: Array<McpTool> = [
         compact: {
           type: 'boolean',
           description:
-            'When true, omit verbose per-parameter valueType discriminators and metadata flags; keep type, names, descriptions, parameter types, and literalSyntax hints. Greatly reduces response size.',
+            'Default true. Omit verbose valueType discriminators and metadata flags. Set false only for deep metadata inspection.',
         },
         target_scope: {
           type: 'string',
@@ -3812,7 +4221,7 @@ const readTools: Array<McpTool> = [
   {
     name: 'gdevelop_get_instruction_metadata',
     description:
-      'Return exact GDevelop action, condition, or expression metadata, including parameter order/types/defaults, literalSyntax hints (which parameters need quotes), and event-scope relevance.',
+      'Return exact GDevelop action, condition, or expression metadata, including each parameter dslName for named event DSL arguments, positional order/types/defaults, literalSyntax hints, and event-scope relevance.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -3828,7 +4237,7 @@ const readTools: Array<McpTool> = [
         compact: {
           type: 'boolean',
           description:
-            'When true, return a trimmed result (no verbose valueType nesting), keeping parameter types and literalSyntax hints.',
+            'Default true. Return a trimmed result while keeping unique dslName values, parameter types, and literal syntax. Set false for full metadata.',
         },
         target_scope: {
           type: 'string',
@@ -3854,7 +4263,7 @@ const readTools: Array<McpTool> = [
         parameters: {
           type: 'object',
           description:
-            'Map of parameter NAME (or index) to value. Numbers/operators/object names go in bare; string-expression literals are auto-quoted; code-only params are auto-filled.',
+            'Map of metadata dslName/name (or index) to value. Matching ignores case and punctuation. Numbers/operators/object names go in bare; string-expression literals are auto-quoted; code-only params are auto-filled.',
           additionalProperties: true,
         },
       },
@@ -4089,7 +4498,7 @@ const readTools: Array<McpTool> = [
   {
     name: 'capture_preview_screenshot',
     description:
-      'Capture a PNG screenshot of the current rendered frame from a running preview, to visually verify sprites, layout, and colors. Captured from the MAIN process (webContents.capturePage) when available, so it works even for a backgrounded preview whose renderer is suspended; falls back to the in-game canvas otherwise. Writes the PNG to file_path (recommended) or returns it as a base64 data URL. Note: a screenshot reflects the last RENDERED frame — for state verification that does not need rendering, use run_frames / gdevelop_inspect_running_preview. Launch first with launch_preview { start_paused: true }, then advance with run_frames if needed.',
+      'Capture a PNG after forcing a render without stepping game logic. Defaults to the exact game canvas, detects suspicious black/transparent or inconsistent frames, retries automatically, and reports source, attempts, quality, and pixel hash. Use capture_mode:"window" only for a full Electron window capture. Writes to file_path or returns a base64 data URL.',
     inputSchema: capturePreviewScreenshotSchema,
   },
   {
@@ -4119,7 +4528,7 @@ const readTools: Array<McpTool> = [
   {
     name: 'run_frames',
     description:
-      'ATOMIC runtime test: first preflight the selected preview with getStatus, then inject inputs, step exactly N frames, and return the resulting live state in one call. If the preview is connected but unresponsive, it fails before sending runFrames so stale debugger ids are visible. Use after launch_preview success or wait_until_preview_ready.',
+      'ATOMIC runtime test: preflight the selected preview, inject inputs, step up to N frames, and return live or partial state. The receipt distinguishes completed, partial, failed, timeout, preflight-failed, and cleanup-failed outcomes with requested/stepped frames, failed frame, event/instruction ids when available, and cleanup status. auto_release runs in guaranteed cleanup even after event failure.',
     inputSchema: runFramesSchema,
   },
   {
@@ -4510,9 +4919,22 @@ const writeTools: Array<McpTool> = [
     inputSchema: sceneNameSchema,
   },
   {
+    name: 'gdevelop_apply_events',
+    title: 'Apply GDevelop Events',
+    description:
+      'PRIMARY AI EVENT TOOL. Append or precisely patch native GDevelop events using compact event kinds, named instruction parameters, automatic stable ids/colors, simple op aliases, revision checks, and dry-run validation. Use events for append or operations for insert/replace/delete.',
+    inputSchema: eventDslToolSchema,
+    outputSchema: eventDslOutputSchema,
+    annotations: {
+      readOnlyHint: false,
+      destructiveHint: true,
+      idempotentHint: false,
+    },
+  },
+  {
     name: 'add_scene_events',
     description:
-      'Add events to a scene. For MCP clients, prefer passing events_json or event_changes to write directly without calling the GDevelop event generation service.',
+      'Compatibility/advanced event writer. Accepts compact events_dsl/event_patch as well as raw serializer events_json/event_changes. New AI integrations should prefer gdevelop_apply_events.',
     inputSchema: addSceneEventsSchema,
   },
   {
@@ -4721,7 +5143,7 @@ const commandTools: Array<McpTool> = [
   {
     name: 'gdevelop_run_command',
     description:
-      'Run a GDevelop command palette command by name. This can open dialogs, launch previews, save projects, or navigate the editor. CLOSE_PREVIEW is not a command; use save_and_relaunch_preview_paused for stale preview cleanup.',
+      'Run a GDevelop command palette command by name. SAVE_PROJECT is special-cased to await completion and return verified persistence evidence. Other commands report launch only. CLOSE_PREVIEW is not a command; use save_and_relaunch_preview_paused for stale preview cleanup.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -4737,18 +5159,102 @@ const commandTools: Array<McpTool> = [
   {
     name: 'gdevelop_save_project_and_wait',
     description:
-      'Save the current project and wait for the editor save promise to resolve, returning saved/failed status instead of a launched command.',
+      'Save the current project, await completion, then compare canonical editor and disk hashes. Returns project path, timestamps, dirty counts, disk write evidence, hashesMatch, and a reason distinguishing saved, nothing changed, not marked dirty, save failure, and verification failure.',
     inputSchema: emptyObjectSchema,
   },
   {
     name: 'save_and_relaunch_preview_paused',
     description:
-      "Save the project, close stale previews, launch a fresh debug preview paused, wait until the runtime is ready, and return debugger id, scene/runtime counts, variables, and errors. By default previews the project's FIRST scene (firstLayout); pass scene_name to relaunch on a specific layout.",
+      "Save with persistence evidence, await stale preview/window cleanup, then launch a fresh paused debug preview with retry and exponential backoff. Reports requested, attempted, and confirmed pause states plus every launch attempt and a fallback recovery workflow. By default previews the project's first scene; pass scene_name for a specific layout.",
     inputSchema: saveAndRelaunchPreviewPausedSchema,
   },
 ];
 
 const toolUsageExamples: { [string]: Array<Object> } = {
+  gdevelop_get_event_dsl_reference: [
+    {
+      description: 'Read the compact event DSL reference and example.',
+      arguments: {},
+    },
+  ],
+  gdevelop_validate_events: [
+    {
+      description:
+        'Compile and validate a grouped initialization event without changing the project.',
+      arguments: {
+        scene_name: 'Level1',
+        events: [
+          {
+            kind: 'group',
+            name: 'Initialization',
+            children: [
+              {
+                kind: 'standard',
+                conditions: [{ type: 'SceneJustBegins' }],
+                actions: [
+                  {
+                    type: 'SetNumberVariable',
+                    parameters: {
+                      Variable: 'Score',
+                      'Modification sign': '=',
+                      Value: 0,
+                    },
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+    },
+  ],
+  gdevelop_apply_events: [
+    {
+      description:
+        'Append native grouped events using named parameters. Run with dry_run first, then repeat with dry_run false.',
+      arguments: {
+        scene_name: 'Level1',
+        event_id_prefix: 'level-init',
+        dry_run: true,
+        events: [
+          {
+            kind: 'group',
+            name: 'Initialization',
+            color: '#5aa06e',
+            children: [
+              {
+                kind: 'standard',
+                conditions: [{ type: 'SceneJustBegins' }],
+                actions: [
+                  {
+                    type: 'SetNumberVariable',
+                    parameters: {
+                      Variable: 'Score',
+                      'Modification sign': '=',
+                      Value: 0,
+                    },
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+    },
+    {
+      description: 'Delete one event by stable id with a revision guard.',
+      arguments: {
+        scene_name: 'Level1',
+        expected_revision: 'fnv1a:12345678',
+        operations: [
+          {
+            op: 'delete',
+            target: { event_id: 'old-spawn-rule' },
+          },
+        ],
+      },
+    },
+  ],
   gdevelop_refresh_tool_catalog: [
     {
       description:
@@ -6570,19 +7076,28 @@ export const canCallMcpTool = (
   return { canCall: true };
 };
 
+const withDefaultToolAnnotations = (tool: McpTool): McpTool => {
+  const annotations: any = {
+    readOnlyHint: readToolNames.has(tool.name),
+    ...(tool.annotations || {}),
+  };
+  if (readToolNames.has(tool.name)) annotations.destructiveHint = false;
+  return { ...tool, annotations };
+};
+
 export const getMcpTools = (
   permissions: McpPermissionOptions
-): Array<McpTool> => [
-  ...readTools,
-  ...(permissions.allowWriteTools ? writeTools : []),
-  ...(permissions.allowCommandTools ? commandTools : []),
-];
+): Array<McpTool> =>
+  [
+    ...readTools,
+    ...(permissions.allowWriteTools ? writeTools : []),
+    ...(permissions.allowCommandTools ? commandTools : []),
+  ].map(withDefaultToolAnnotations);
 
-export const getAllMcpToolsForIntrospection = (): Array<McpTool> => [
-  ...readTools,
-  ...writeTools,
-  ...commandTools,
-];
+export const getAllMcpToolsForIntrospection = (): Array<McpTool> =>
+  [...readTools, ...writeTools, ...commandTools].map(
+    withDefaultToolAnnotations
+  );
 
 export const getMcpToolUsageExamples = (
   toolName?: ?string
@@ -6644,6 +7159,7 @@ export const getCapabilitiesSummary = (
       'crop_scene_object_image',
     ],
     'Instruction discovery': [
+      'gdevelop_get_event_dsl_reference',
       'gdevelop_search_instruction_metadata',
       'gdevelop_get_instruction_metadata',
       'gdevelop_get_events_json_examples',
@@ -6667,6 +7183,8 @@ export const getCapabilitiesSummary = (
       'bind_child_sprite_resource_property',
     ],
     'Author events': [
+      'gdevelop_validate_events',
+      'gdevelop_apply_events',
       'create_action',
       'create_condition',
       'create_signal_emit_action',

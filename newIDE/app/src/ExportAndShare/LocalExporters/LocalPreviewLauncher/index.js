@@ -141,11 +141,13 @@ export default class LocalPreviewLauncher extends React.Component<
     ipcRenderer.invoke('preview-close', { windowId });
   };
 
-  closeAllPreviews = () => {
+  closeAllPreviews = async (): Promise<void> => {
     if (ipcRenderer) {
-      ipcRenderer.invoke('preview-close-all').catch(error => {
+      try {
+        await ipcRenderer.invoke('preview-close-all');
+      } catch (error) {
         console.info('Unable to close all preview windows - ignoring.', error);
-      });
+      }
     }
 
     // This should be unnecessary since the preview windows are closed above.

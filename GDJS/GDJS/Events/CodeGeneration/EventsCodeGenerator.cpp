@@ -1070,9 +1070,6 @@ gd::String EventsCodeGenerator::GenerateObjectAction(
     call = "asyncTaskGroup.addTask(" + call + ")";
   }
 
-  actionCode += GenerateObjectListsPickedInstancesAssertCode(
-      std::vector<gd::String>{objectName}, context,
-      "object action \"" + objectName + "\"");
   actionCode +=
       "for(var i = 0, len = " + GetObjectListName(objectName, context) +
       ".length ;i < len;++i) {\n";
@@ -1143,9 +1140,6 @@ gd::String EventsCodeGenerator::GenerateBehaviorAction(
     call = "asyncTaskGroup.addTask(" + call + ")";
   }
 
-  actionCode += GenerateObjectListsPickedInstancesAssertCode(
-      std::vector<gd::String>{objectName}, context,
-      "behavior action \"" + objectName + "\"");
   actionCode +=
       "for(var i = 0, len = " + GetObjectListName(objectName, context) +
       ".length ;i < len;++i) {\n";
@@ -1435,8 +1429,6 @@ gd::String EventsCodeGenerator::GenerateObject(
       };
 
   gd::String output;
-  const bool shouldAssertObjectListParameterPicking =
-      !context.IsObjectListParameterPickingAllowed();
   if (type == "object" || type == "objectList") {
     std::vector<gd::String> realObjects =
         GetObjectsContainersList().ExpandObjectName(objectName,
@@ -1445,14 +1437,7 @@ gd::String EventsCodeGenerator::GenerateObject(
 
     gd::String objectsMapName = useObjectParameterMapWhenAvailable(
         objectName, declareMapOfObjects(realObjects, context));
-    output =
-        shouldAssertObjectListParameterPicking
-            ? "gdjs.assertObjectMapHasNoMoreThanOnePickedInstance(" +
-                  objectsMapName + ", " +
-                  ConvertToStringExplicit("object parameter \"" + objectName +
-                                          "\"") +
-                  ")"
-            : objectsMapName;
+    output = objectsMapName;
   } else if (type == "objectListOrEmptyIfJustDeclared") {
     std::vector<gd::String> realObjects =
         GetObjectsContainersList().ExpandObjectName(objectName,
@@ -1462,14 +1447,7 @@ gd::String EventsCodeGenerator::GenerateObject(
 
     gd::String objectsMapName = useObjectParameterMapWhenAvailable(
         objectName, declareMapOfObjects(realObjects, context));
-    output =
-        shouldAssertObjectListParameterPicking
-            ? "gdjs.assertObjectMapHasNoMoreThanOnePickedInstance(" +
-                  objectsMapName + ", " +
-                  ConvertToStringExplicit("object parameter \"" + objectName +
-                                          "\"") +
-                  ")"
-            : objectsMapName;
+    output = objectsMapName;
   } else if (type == "objectListOrEmptyWithoutPicking") {
     std::vector<gd::String> realObjects =
         GetObjectsContainersList().ExpandObjectName(objectName,
@@ -1492,14 +1470,7 @@ gd::String EventsCodeGenerator::GenerateObject(
         objectName,
         declareMapOfObjects(
             objectToBeDeclaredNames, context, objectNotYetDeclaredNames));
-    output =
-        shouldAssertObjectListParameterPicking
-            ? "gdjs.assertObjectMapHasNoMoreThanOnePickedInstance(" +
-                  objectsMapName + ", " +
-                  ConvertToStringExplicit("object parameter \"" + objectName +
-                                          "\"") +
-                  ")"
-            : objectsMapName;
+    output = objectsMapName;
   } else if (type == "objectPtr") {
     std::vector<gd::String> realObjects =
         GetObjectsContainersList().ExpandObjectName(objectName,

@@ -995,14 +995,14 @@ app.on('ready', function() {
           event.sender.send('debugger-error-received', error);
         }
       },
-      onConnectionClose: ({ id }) => {
+      onConnectionClose: details => {
         if (!event.sender.isDestroyed()) {
-          event.sender.send('debugger-connection-closed', { id });
+          event.sender.send('debugger-connection-closed', details);
         }
       },
-      onConnectionOpen: ({ id }) => {
+      onConnectionOpen: details => {
         if (!event.sender.isDestroyed()) {
-          event.sender.send('debugger-connection-opened', { id });
+          event.sender.send('debugger-connection-opened', details);
         }
       },
       onConnectionError: ({ id, errorMessage }) => {

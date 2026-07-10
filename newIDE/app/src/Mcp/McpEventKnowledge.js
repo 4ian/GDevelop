@@ -510,7 +510,7 @@ const classifyParameterValueShape = (parameterType: string): string => {
 const summarizeParameter = (
   parameterMetadata: gdParameterMetadata,
   index: number,
-  options?: {| compact?: boolean |}
+  options?: {| compact?: boolean, dslName?: string |}
 ): Object => {
   const valueTypeMetadata = parameterMetadata.getValueTypeMetadata();
   const type = parameterMetadata.getType();
@@ -528,6 +528,9 @@ const summarizeParameter = (
   // relationalOperator, yesorno, trueorfalse). E.g. a boolean SetBooleanVariable
   // operator accepts ["True","False","Toggle"] — not yes/no/true/1.
   const acceptedValues = acceptedValuesForParameter(type, extraInfo);
+  const dslName =
+    (options && options.dslName) ||
+    getInstructionParameterBaseDslName(parameterMetadata, index);
   if (options && options.compact) {
     // Compact form drops the verbose valueType discriminator object and keeps
     // only what a caller needs to fill the parameter correctly.
@@ -535,6 +538,7 @@ const summarizeParameter = (
       index,
       type,
       name: parameterMetadata.getName() || undefined,
+      dslName,
       description: parameterMetadata.getDescription() || undefined,
       isOptional: parameterMetadata.isOptional(),
       defaultValue: parameterMetadata.getDefaultValue() || undefined,
@@ -548,6 +552,7 @@ const summarizeParameter = (
     index,
     type,
     name: parameterMetadata.getName() || undefined,
+    dslName,
     description: parameterMetadata.getDescription() || undefined,
     longDescription: parameterMetadata.getLongDescription() || undefined,
     hint: parameterMetadata.getHint() || undefined,
@@ -843,6 +848,7 @@ const summarizeInstructionMetadata = ({
     eventScopes,
     targetScope
   );
+  const parameterDslNames = getUniqueInstructionParameterDslNames(metadata);
   if (compact) {
     return {
       kind,
@@ -859,6 +865,7 @@ const summarizeInstructionMetadata = ({
       parameters: mapFor(0, metadata.getParametersCount(), index =>
         summarizeParameter(metadata.getParameter(index), index, {
           compact: true,
+          dslName: parameterDslNames[index],
         })
       ),
     };
@@ -893,7 +900,9 @@ const summarizeInstructionMetadata = ({
     deprecationMessage: metadata.getDeprecationMessage() || undefined,
     parameterShape,
     parameters: mapFor(0, metadata.getParametersCount(), index =>
-      summarizeParameter(metadata.getParameter(index), index)
+      summarizeParameter(metadata.getParameter(index), index, {
+        dslName: parameterDslNames[index],
+      })
     ),
   };
 };
@@ -916,6 +925,7 @@ const summarizeExpressionMetadata = ({
     eventScopes,
     targetScope
   );
+  const parameterDslNames = getUniqueInstructionParameterDslNames(metadata);
   if (compact) {
     return {
       kind: 'expression',
@@ -929,6 +939,7 @@ const summarizeExpressionMetadata = ({
       parameters: mapFor(0, metadata.getParametersCount(), index =>
         summarizeParameter(metadata.getParameter(index), index, {
           compact: true,
+          dslName: parameterDslNames[index],
         })
       ),
     };
@@ -953,7 +964,9 @@ const summarizeExpressionMetadata = ({
     targetScopeCompatibility: targetScopeCompatibility || undefined,
     deprecationMessage: metadata.getDeprecationMessage() || undefined,
     parameters: mapFor(0, metadata.getParametersCount(), index =>
-      summarizeParameter(metadata.getParameter(index), index)
+      summarizeParameter(metadata.getParameter(index), index, {
+        dslName: parameterDslNames[index],
+      })
     ),
   };
 };
@@ -1790,6 +1803,82 @@ const getInstructionMetadataForValidation = (
   );
 };
 
+const normalizeInstructionParameterKey = (value: string): string =>
+  value
+    .trim()
+    .toLowerCase()
+    .replace(/['’]s\b/g, '')
+    .replace(/[^a-z0-9]+/g, '');
+
+const getInstructionParameterDslName = (
+  parameterMetadata: gdParameterMetadata
+): string => {
+  const typeKey = normalizeInstructionParameterKey(
+    parameterMetadata.getType() || ''
+  );
+  const nameKey = normalizeInstructionParameterKey(
+    parameterMetadata.getName() || ''
+  );
+  const descriptionKey = normalizeInstructionParameterKey(
+    parameterMetadata.getDescription() || ''
+  );
+  if (typeKey === 'relationaloperator' || nameKey === 'relationaloperator') {
+    return 'comparison_sign';
+  }
+  if (typeKey === 'operator' || nameKey === 'operator') {
+    return 'modification_sign';
+  }
+  if (descriptionKey === 'value' || descriptionKey === 'valuetocompare') {
+    return 'value';
+  }
+  return '';
+};
+
+const getInstructionParameterBaseDslName = (
+  parameterMetadata: gdParameterMetadata,
+  index: number
+): string => {
+  const displayName =
+    parameterMetadata.getName() ||
+    parameterMetadata.getDescription() ||
+    `Parameter ${index}`;
+  return (
+    getInstructionParameterDslName(parameterMetadata) ||
+    displayName
+      .trim()
+      .toLowerCase()
+      .replace(/['’]s\b/g, '')
+      .replace(/[^a-z0-9]+/g, '_')
+      .replace(/^_+|_+$/g, '') ||
+    `parameter_${index}`
+  );
+};
+
+const getUniqueInstructionParameterDslNames = (
+  metadata: any
+): Array<string> => {
+  const baseNames = mapFor(0, metadata.getParametersCount(), index =>
+    getInstructionParameterBaseDslName(metadata.getParameter(index), index)
+  );
+  const counts = {};
+  baseNames.forEach(baseName => {
+    counts[baseName] = (counts[baseName] || 0) + 1;
+  });
+  const seen = {};
+  const used = new Set<string>();
+  const ordinals = ['first', 'second', 'third', 'fourth', 'fifth'];
+  return baseNames.map((baseName, index) => {
+    seen[baseName] = (seen[baseName] || 0) + 1;
+    let uniqueName =
+      counts[baseName] > 1
+        ? `${ordinals[seen[baseName] - 1] || seen[baseName]}_${baseName}`
+        : baseName;
+    if (used.has(uniqueName)) uniqueName = `${uniqueName}_${index}`;
+    used.add(uniqueName);
+    return uniqueName;
+  });
+};
+
 // High-level instruction builder (#8): given an instruction type + a map of
 // named parameter values (keyed by parameter name OR index), produce a
 // correctly-ORDERED, fully-populated `parameters` array — code-only slots filled
@@ -1834,25 +1923,87 @@ export const buildInstruction = ({
       )
     );
   }
-  const named = parameters && typeof parameters === 'object' ? parameters : {};
+  const named: { [string]: any } =
+    parameters && typeof parameters === 'object' ? (parameters: any) : {};
+  const normalizedNamedParameters: {
+    [string]: ?{| key: string, value: any |},
+  } = {};
+  Object.keys(named).forEach(key => {
+    normalizedNamedParameters[normalizeInstructionParameterKey(key)] = {
+      key,
+      value: named[key],
+    };
+  });
+  const consumedParameterKeys: Set<string> = new Set();
   const count = metadata.getParametersCount();
-  const out = [];
-  const warnings = [];
-  const filled = [];
+  const uniqueDslNames = getUniqueInstructionParameterDslNames(metadata);
+  const aliasCounts: { [string]: number } = {};
+  const rawAliasesByIndex = mapFor(0, count, index => {
+    const param = metadata.getParameter(index);
+    const aliases = [
+      param.getName(),
+      param.getDescription(),
+      getInstructionParameterDslName(param),
+    ].filter(Boolean);
+    aliases.forEach(alias => {
+      const normalized = normalizeInstructionParameterKey(alias);
+      aliasCounts[normalized] = (aliasCounts[normalized] || 0) + 1;
+    });
+    return aliases;
+  });
+  const out: Array<string> = [];
+  const warnings: Array<string> = [];
+  const filled: Array<Object> = [];
   for (let index = 0; index < count; index++) {
     const param = metadata.getParameter(index);
     const paramType = param.getType();
-    const paramName = param.getName();
+    // Many built-in instructions expose a user-facing description but no
+    // machine name. Include both plus stable AI-friendly aliases.
+    const paramName = param.getName() || param.getDescription();
+    const parameterAliases = [
+      uniqueDslNames[index],
+      ...rawAliasesByIndex[index].filter(
+        alias => aliasCounts[normalizeInstructionParameterKey(alias)] === 1
+      ),
+    ];
+    const parameterTypeKey = normalizeInstructionParameterKey(
+      param.getType() || ''
+    );
+    if (parameterTypeKey === 'relationaloperator') {
+      parameterAliases.push('comparison', 'comparison_operator', 'operator');
+    } else if (parameterTypeKey === 'operator') {
+      parameterAliases.push('operation', 'sign');
+    }
+    let normalizedParameterMatch: ?{| key: string, value: any |} = null;
+    for (const alias of parameterAliases) {
+      const match = alias
+        ? normalizedNamedParameters[normalizeInstructionParameterKey(alias)]
+        : null;
+      if (match) {
+        normalizedParameterMatch = match;
+        break;
+      }
+    }
     if (param.isCodeOnly()) {
       out.push('');
       continue;
     }
     // Look up the provided value by name, then by positional index.
     let value;
-    if (paramName && named[paramName] !== undefined) value = named[paramName];
-    else if (named[String(index)] !== undefined) value = named[String(index)];
-    else if (named[index] !== undefined) value = named[index];
-    else {
+    if (
+      paramName &&
+      aliasCounts[normalizeInstructionParameterKey(paramName)] === 1 &&
+      named[paramName] !== undefined
+    ) {
+      value = named[paramName];
+      consumedParameterKeys.add(paramName);
+    } else if (normalizedParameterMatch) {
+      value = normalizedParameterMatch.value;
+      consumedParameterKeys.add(normalizedParameterMatch.key);
+    } else if (named[String(index)] !== undefined) {
+      value = named[String(index)];
+      consumedParameterKeys.add(String(index));
+    } else {
       const def = param.getDefaultValue();
       if (def) {
         out.push(def);
@@ -1884,8 +2035,21 @@ export const buildInstruction = ({
       if (needsQuotes) serialized = JSON.stringify(serialized);
     }
     out.push(serialized);
-    filled.push({ index, name: paramName, value: serialized });
+    filled.push({
+      index,
+      name: paramName,
+      dslName: uniqueDslNames[index],
+      value: serialized,
+    });
   }
+  Object.keys(named).forEach(key => {
+    if (consumedParameterKeys.has(key)) return;
+    warnings.push(
+      `Unknown parameter "${key}" for ${kind} "${type}". Use one of the unique dslName values (${uniqueDslNames.join(
+        ', '
+      )}) or a numeric index.`
+    );
+  });
   return {
     instruction: { type: { value: type }, parameters: out },
     parameters: out,
@@ -2572,7 +2736,12 @@ export const collectSerializedEventJsonIssues = (
 ): Array<Object> => {
   const issues = [];
 
-  const checkInstruction = (instruction, isCondition, path, instructionPath) => {
+  const checkInstruction = (
+    instruction,
+    isCondition,
+    path,
+    instructionPath
+  ) => {
     if (!instruction || typeof instruction !== 'object') return;
     const type = getSerializedInstructionTypeValue(instruction);
     const legacyReplacement =
@@ -2685,6 +2854,9 @@ export const validateEventsJson = ({
   allowJavaScriptEvents,
   summaryOnly,
   dedupeErrors,
+  errorsOnly,
+  includeRenderedEvents,
+  includeNormalizedJson,
 }: {|
   project: gdProject,
   sceneName?: ?string,
@@ -2692,6 +2864,9 @@ export const validateEventsJson = ({
   allowJavaScriptEvents?: boolean,
   summaryOnly?: boolean,
   dedupeErrors?: boolean,
+  errorsOnly?: boolean,
+  includeRenderedEvents?: boolean,
+  includeNormalizedJson?: boolean,
 |}): Object => {
   if (!eventsJson) {
     return {
@@ -2776,12 +2951,31 @@ export const validateEventsJson = ({
           issues: issuesWithSuggestions,
           issueSummary,
         };
-    if (summaryOnly) return result;
+    if (errorsOnly) {
+      return {
+        valid: errors.length === 0,
+        eventsCount: eventsList.getEventsCount(),
+        errors: dedupeErrors
+          ? issueSummary.rootCauses.filter(
+              cause => cause.type !== 'extra-parameters'
+            )
+          : errors,
+      };
+    }
+
+    const shouldIncludeRenderedEvents =
+      includeRenderedEvents === true || summaryOnly === false;
+    const shouldIncludeNormalizedJson =
+      includeNormalizedJson === true || summaryOnly === false;
 
     return {
       ...result,
-      eventsAsText: renderNonTranslatedEventsAsText({ eventsList }),
-      normalizedEventsJson: serializeToJSON(eventsList),
+      eventsAsText: shouldIncludeRenderedEvents
+        ? renderNonTranslatedEventsAsText({ eventsList })
+        : undefined,
+      normalizedEventsJson: shouldIncludeNormalizedJson
+        ? serializeToJSON(eventsList)
+        : undefined,
     };
   } catch (error) {
     return {
@@ -2800,6 +2994,9 @@ export const validateEventsJsonFile = ({
   allowJavaScriptEvents,
   summaryOnly,
   dedupeErrors,
+  errorsOnly,
+  includeRenderedEvents,
+  includeNormalizedJson,
 }: {|
   project: gdProject,
   sceneName?: ?string,
@@ -2807,6 +3004,9 @@ export const validateEventsJsonFile = ({
   allowJavaScriptEvents?: boolean,
   summaryOnly?: boolean,
   dedupeErrors?: boolean,
+  errorsOnly?: boolean,
+  includeRenderedEvents?: boolean,
+  includeNormalizedJson?: boolean,
 |}): Object => {
   if (!eventsJsonFile) {
     return {
@@ -2842,6 +3042,9 @@ export const validateEventsJsonFile = ({
     allowJavaScriptEvents,
     summaryOnly,
     dedupeErrors,
+    errorsOnly,
+    includeRenderedEvents,
+    includeNormalizedJson,
   });
 
   return {

@@ -22,6 +22,7 @@ import {
   groupValidationErrors,
   type ValidationError,
 } from '../Utils/EventsValidationScanner';
+import { isGlobalConfigPlaceholderDiagnostic } from '../Utils/GlobalConfigPlaceholderDiagnostics';
 import { getFunctionNameFromType } from '../EventsFunctionsExtensionsLoader';
 import Link from '../UI/Link';
 import IconButton from '../UI/IconButton';
@@ -171,7 +172,7 @@ const InvalidParametersSection = ({
   return (
     <ColumnStackLayout noMargin>
       <Text size="block-title">
-        <Trans>Invalid events ({invalidParametersCount})</Trans>
+        <Trans>Invalid events</Trans> ({invalidParametersCount})
       </Text>
       <AlertMessage kind="error">
         <Trans>
@@ -319,6 +320,7 @@ export default function DiagnosticReportDialog({
     (diagnosticReport: gdDiagnosticReport) => {
       // TODO Generalize error aggregation when enough errors are handled to have a clearer view.
       const missingSceneVariables = new Set<string>();
+      const missingGlobalConfigPlaceholders = new Set<string>();
       const unknownObjects = new Set<string>();
       const mismatchedTypeObjects = new Set<string>();
       const unsafeExternalLayouts = new Set<string>();
@@ -326,6 +328,13 @@ export default function DiagnosticReportDialog({
       const missingBehaviorsByObjects = new Map<string, Set<string>>();
       mapFor(0, diagnosticReport.count(), index => {
         const projectDiagnostic = diagnosticReport.get(index);
+
+        if (isGlobalConfigPlaceholderDiagnostic(projectDiagnostic)) {
+          missingGlobalConfigPlaceholders.add(
+            projectDiagnostic.getActualValue()
+          );
+          return;
+        }
 
         const objectName = projectDiagnostic.getObjectName();
         const type = projectDiagnostic.getType();
@@ -439,6 +448,24 @@ export default function DiagnosticReportDialog({
                   <TableRowColumn>
                     <Text size="body" allowSelection>
                       {[...missingSceneVariables].join(', ')}
+                    </Text>
+                  </TableRowColumn>
+                </TableRow>
+              )}
+              {missingGlobalConfigPlaceholders.size > 0 && (
+                <TableRow
+                  style={{
+                    backgroundColor: gdevelopTheme.list.itemsBackgroundColor,
+                  }}
+                >
+                  <TableRowColumn>
+                    <Text size="body">
+                      <Trans>Missing global config values</Trans>
+                    </Text>
+                  </TableRowColumn>
+                  <TableRowColumn>
+                    <Text size="body" allowSelection>
+                      {[...missingGlobalConfigPlaceholders].join(', ')}
                     </Text>
                   </TableRowColumn>
                 </TableRow>

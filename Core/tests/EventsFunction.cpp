@@ -156,7 +156,7 @@ TEST_CASE("EventsFunction", "[common]") {
     REQUIRE(parameters.GetParameter(0).GetExtraInfo() ==
             "MyEventsExtension::MyEventsBasedObject");
     REQUIRE(parameters.GetParameter(1).GetName() == "SignalName");
-    REQUIRE(parameters.GetParameter(1).GetType() == "signalName");
+    REQUIRE(parameters.GetParameter(1).GetType() == "string");
     REQUIRE(parameters.GetParameter(2).GetName() == "Payload");
     REQUIRE(parameters.GetParameter(2).GetType() == "string");
     REQUIRE(parameters.GetParameter(3).GetName() == "EmitterObjectName");

@@ -85,6 +85,7 @@ const PreferencesDialog = ({
     setPreviewCrashReportUploadLevel,
     setTakeScreenshotOnPreview,
     setShowAiAskButtonInTitleBar,
+    setShowAddNoteButtonInTitleBar,
     setAutomaticallyUseCreditsForAiRequests,
     setEnableMcpServer,
     setMcpServerPort,
@@ -695,6 +696,13 @@ const PreferencesDialog = ({
                 onCheck={setShowAiAskButtonInTitleBar}
                 checked={values.showAiAskButtonInTitleBar}
                 label={i18n._(t`Show "Ask AI" button in the title bar`)}
+              />
+              <CompactToggleField
+                labelColor="primary"
+                hideTooltip
+                onCheck={setShowAddNoteButtonInTitleBar}
+                checked={values.showAddNoteButtonInTitleBar}
+                label={i18n._(t`Show "Add Note" button in the title bar`)}
               />
               <CompactToggleField
                 labelColor="primary"

@@ -805,15 +805,12 @@ const GitTool = ({
 
   const revertCommit = React.useCallback(
     async (commit: GitCommit) => {
+      const commitShortHash = commit.shortHash;
       const shouldRevert = await showConfirmation({
         title: t`Revert this commit?`,
         message: hasUnsavedChanges
-          ? t`A new commit will be created that reverses ${
-              commit.shortHash
-            }. Your worktree must be clean before reverting. The project will reload after reverting, so unsaved editor changes will be lost.`
-          : t`A new commit will be created that reverses ${
-              commit.shortHash
-            }. Your worktree must be clean before reverting. The project will reload after reverting.`,
+          ? t`A new commit will be created that reverses ${commitShortHash}. Your worktree must be clean before reverting. The project will reload after reverting, so unsaved editor changes will be lost.`
+          : t`A new commit will be created that reverses ${commitShortHash}. Your worktree must be clean before reverting. The project will reload after reverting.`,
         confirmButtonLabel: t`Revert`,
         dismissButtonLabel: t`Cancel`,
         level: 'warning',
@@ -835,15 +832,12 @@ const GitTool = ({
 
   const resetToCommit = React.useCallback(
     async (commit: GitCommit) => {
+      const commitShortHash = commit.shortHash;
       const shouldReset = await showConfirmation({
         title: t`Reset to this commit?`,
         message: hasUnsavedChanges
-          ? t`This moves the current branch back to ${
-              commit.shortHash
-            } and discards tracked local changes. The project will reload after resetting, so unsaved editor changes will be lost. This is difficult to undo if the commits are not pushed elsewhere.`
-          : t`This moves the current branch back to ${
-              commit.shortHash
-            } and discards tracked local changes. The project will reload after resetting. This is difficult to undo if the commits are not pushed elsewhere.`,
+          ? t`This moves the current branch back to ${commitShortHash} and discards tracked and untracked local changes except the linked folders file. The project will reload after resetting, so unsaved editor changes will be lost. This is difficult to undo if the commits are not pushed elsewhere.`
+          : t`This moves the current branch back to ${commitShortHash} and discards tracked and untracked local changes except the linked folders file. The project will reload after resetting. This is difficult to undo if the commits are not pushed elsewhere.`,
         confirmButtonLabel: t`Reset`,
         dismissButtonLabel: t`Cancel`,
         level: 'warning',

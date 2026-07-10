@@ -17,6 +17,7 @@ const {
 // Map of preview windows with their parent window ID: { previewWindow, parentWindowId }
 let previewWindows = [];
 let debuggerPopOutWindows = new Map();
+let closingDebuggerPopOutWindowIds = new Set();
 
 let openDevToolsByDefault = false;
 const DEBUGGER_POP_OUT_FORCE_CLOSE_DELAY_MS = 17000;
@@ -66,6 +67,23 @@ const getLatestPreviewWindow = parentWindowId => {
 const showWithoutStealingFocus = window => {
   if (typeof window.showInactive === 'function') window.showInactive();
   else window.show();
+};
+
+const focusWindowForInput = window => {
+  if (!window || window.isDestroyed()) return;
+
+  if (window.isMinimized()) window.restore();
+  window.show();
+  if (typeof window.moveTop === 'function') window.moveTop();
+  window.focus();
+
+  if (
+    window.webContents &&
+    !window.webContents.isDestroyed() &&
+    typeof window.webContents.focus === 'function'
+  ) {
+    window.webContents.focus();
+  }
 };
 
 const getPreviewDisplayWorkArea = ({ parentWindow, x, y }) => {
@@ -195,13 +213,15 @@ const keepParentWindowVisibleAfterChildClose = (
         ) &&
         (() => {
           const debuggerWindow = debuggerPopOutWindows.get(parentWindowId);
-          return !debuggerWindow || debuggerWindow.isDestroyed();
+          return (
+            !debuggerWindow ||
+            debuggerWindow.isDestroyed() ||
+            closingDebuggerPopOutWindowIds.has(debuggerWindow.id)
+          );
         })();
 
       if (noOtherChildWindowsRemain) {
-        parentWindow.show();
-        if (typeof parentWindow.moveTop === 'function') parentWindow.moveTop();
-        parentWindow.focus();
+        focusWindowForInput(parentWindow);
       } else {
         showWithoutStealingFocus(parentWindow);
       }
@@ -215,6 +235,8 @@ const keepParentWindowVisibleAfterChildClose = (
 
   setTimeout(restoreParentWindow, 0);
   setTimeout(restoreParentWindow, 100);
+  setTimeout(restoreParentWindow, 300);
+  setTimeout(restoreParentWindow, 700);
 };
 
 const arrangeDebuggerPopOutWithLatestPreview = parentWindowId => {
@@ -295,6 +317,8 @@ const setDebuggerPopOutWindow = (parentWindowId, debuggerWindow) => {
 
   let parentWasMinimizedBeforeDebuggerClose = false;
   debuggerWindow.on('close', () => {
+    closingDebuggerPopOutWindowIds.add(debuggerWindow.id);
+
     const parentWindow =
       parentWindowId !== null ? BrowserWindow.fromId(parentWindowId) : null;
     parentWasMinimizedBeforeDebuggerClose =
@@ -308,6 +332,8 @@ const setDebuggerPopOutWindow = (parentWindowId, debuggerWindow) => {
   });
 
   debuggerWindow.on('closed', () => {
+    closingDebuggerPopOutWindowIds.delete(debuggerWindow.id);
+
     if (debuggerPopOutWindows.get(parentWindowId) === debuggerWindow) {
       debuggerPopOutWindows.delete(parentWindowId);
     }
@@ -342,6 +368,8 @@ const closeDebuggerPopOutWindow = parentWindowId => {
   if (!debuggerWindow || debuggerWindow.isDestroyed()) return;
 
   try {
+    closingDebuggerPopOutWindowIds.add(debuggerWindow.id);
+
     if (typeof debuggerWindow.setParentWindow === 'function') {
       debuggerWindow.setParentWindow(null);
     }
@@ -476,14 +504,13 @@ const openPreviewWindow = ({
         entry => entry.previewWindow !== previewWindow
       );
       updatePowerSaveBlocker();
-      if (
-        previewWindows.some(
-          entry =>
-            entry.parentWindowId === parentWindowId &&
-            entry.previewWindow &&
-            !entry.previewWindow.isDestroyed()
-        )
-      ) {
+      const remainingPreviewWindowsForParent = previewWindows.filter(
+        entry =>
+          entry.parentWindowId === parentWindowId &&
+          entry.previewWindow &&
+          !entry.previewWindow.isDestroyed()
+      ).length;
+      if (remainingPreviewWindowsForParent > 0) {
         arrangeDebuggerPopOutWithLatestPreview(parentWindowId);
       } else {
         closeDebuggerPopOutWindow(parentWindowId);
@@ -494,7 +521,9 @@ const openPreviewWindow = ({
       );
       // Only send message if the parent window still exists
       if (openEvent.sender && !openEvent.sender.isDestroyed()) {
-        openEvent.sender.send('preview-window-closed');
+        openEvent.sender.send('preview-window-closed', {
+          remainingPreviewWindowsForParent,
+        });
       }
       previewWindow = null;
     });

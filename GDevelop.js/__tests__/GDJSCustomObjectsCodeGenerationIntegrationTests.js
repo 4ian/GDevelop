@@ -39,6 +39,52 @@ describe('libGD.js - GDJS Custom Object Code Generation integration tests', func
     ).toBe('2trueTest');
   });
 
+  it('logs an error when a custom object JsonObject property value is invalid', () => {
+    const project = gd.ProjectHelper.createNewGDJSProject();
+    const eventsFunctionsExtension = project.insertNewEventsFunctionsExtension(
+      'MyExtension',
+      0
+    );
+    const eventsBasedObject = eventsFunctionsExtension
+      .getEventsBasedObjects()
+      .insertNew('MyCustomObject', 0);
+
+    eventsBasedObject
+      .getPropertyDescriptors()
+      .insertNew('Config', 0)
+      .setValue('{}')
+      .setType('JsonObject');
+
+    const { gdjs, runtimeScene } = makeMinimalGDJSMock();
+    const CompiledRuntimeCustomObject = generateCompiledEventsForEventsBasedObject(
+      gd,
+      project,
+      eventsFunctionsExtension,
+      eventsBasedObject,
+      gdjs,
+      { logCode: false }
+    );
+    const consoleErrorSpy = jest
+      .spyOn(console, 'error')
+      .mockImplementation(() => {});
+
+    try {
+      new CompiledRuntimeCustomObject(runtimeScene, {
+        type: 'MyExtension::MyCustomObject',
+        content: { Config: 'not-json' },
+      });
+
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        expect.stringContaining('Unable to parse JsonObject property Config'),
+        'not-json',
+        expect.any(SyntaxError)
+      );
+    } finally {
+      consoleErrorSpy.mockRestore();
+      project.delete();
+    }
+  });
+
   it('generates a working custom object function with parameters (with different types), all used in an expression ', () => {
     const { gdjs, runtimeScene } = makeMinimalGDJSMock();
     const extensionModule = generateCompiledEventsForSerializedEventsBasedExtension(

@@ -128,6 +128,7 @@ export const getInitialPreferences = (): {
   resourcesImporationBehavior: string,
   shareDialogDefaultTab: string,
   showAiAskButtonInTitleBar: boolean,
+  showAddNoteButtonInTitleBar: boolean,
   showBasicProfilingCounters: boolean,
   showCreateSectionByDefault: boolean,
   showDeprecatedInstructionWarning: string,
@@ -443,6 +444,10 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     ): any),
     // $FlowFixMe[method-unbinding]
     setShowAiAskButtonInTitleBar: (this._setShowAiAskButtonInTitleBar.bind(
+      this
+    ): any),
+    // $FlowFixMe[method-unbinding]
+    setShowAddNoteButtonInTitleBar: (this._setShowAddNoteButtonInTitleBar.bind(
       this
     ): any),
     // $FlowFixMe[method-unbinding]
@@ -1484,6 +1489,18 @@ export default class PreferencesProvider extends React.Component<Props, State> {
         values: {
           ...state.values,
           showAiAskButtonInTitleBar: newValue,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _setShowAddNoteButtonInTitleBar(newValue: boolean) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          showAddNoteButtonInTitleBar: newValue,
         },
       }),
       () => this._persistValuesToLocalStorage(this.state)

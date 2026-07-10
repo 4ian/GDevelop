@@ -19,10 +19,30 @@
 #include "GDCore/Project/ObjectsContainer.h"
 #include "GDCore/Project/ObjectsContainersList.h"
 #include "GDCore/Project/Project.h"
+#include "GDCore/Tools/Log.h"
 
 using namespace std;
 
 namespace gd {
+namespace {
+class GlobalConfigPlaceholderReplacementScope {
+ public:
+  GlobalConfigPlaceholderReplacementScope(
+      gd::EventsCodeGenerationContext& context_, bool enabled)
+      : context(context_),
+        wasEnabled(context_.IsGlobalConfigPlaceholderReplacementEnabled()) {
+    context.SetGlobalConfigPlaceholderReplacementEnabled(enabled);
+  }
+
+  ~GlobalConfigPlaceholderReplacementScope() {
+    context.SetGlobalConfigPlaceholderReplacementEnabled(wasEnabled);
+  }
+
+ private:
+  gd::EventsCodeGenerationContext& context;
+  const bool wasEnabled;
+};
+}  // namespace
 
 /**
  * Generate call using a relational operator.
@@ -320,6 +340,9 @@ gd::String EventsCodeGenerator::GenerateConditionCode(
   AddIncludeFiles(instrInfos.GetIncludeFiles());
   maxConditionsListsSize =
       std::max(maxConditionsListsSize, condition.GetSubInstructions().size());
+
+  GlobalConfigPlaceholderReplacementScope
+      globalConfigPlaceholderReplacementScope(context, HasProject());
 
   if (instrInfos.HasCustomCodeGenerator()) {
     context.EnterCustomCondition();
@@ -639,6 +662,9 @@ gd::String EventsCodeGenerator::GenerateActionCode(
 
   AddIncludeFiles(instrInfos.GetIncludeFiles());
 
+  GlobalConfigPlaceholderReplacementScope
+      globalConfigPlaceholderReplacementScope(context, HasProject());
+
   if (instrInfos.HasCustomCodeGenerator()) {
     return instrInfos.codeExtraInformation.customCodeGenerator(
         action, *this, context);
@@ -711,11 +737,6 @@ gd::String EventsCodeGenerator::GenerateActionCode(
           GetObjectsContainersList().ExpandObjectName(
               objectName, context.GetCurrentObject());
       for (std::size_t i = 0; i < realObjects.size(); ++i) {
-        context.ObjectsListNeeded(realObjects[i]);
-      }
-      actionCode += GenerateObjectListsPickedInstancesAssertCode(
-          realObjects, context, "object action \"" + objectName + "\"");
-      for (std::size_t i = 0; i < realObjects.size(); ++i) {
         // Setup context
         gd::String objectType =
             GetObjectsContainersList().GetTypeOfObject(realObjects[i]);
@@ -753,11 +774,6 @@ gd::String EventsCodeGenerator::GenerateActionCode(
           MetadataProvider::GetBehaviorMetadata(platform, actualBehaviorType);
 
       AddIncludeFiles(autoInfo.includeFiles);
-      for (std::size_t i = 0; i < realObjects.size(); ++i) {
-        context.ObjectsListNeeded(realObjects[i]);
-      }
-      actionCode += GenerateObjectListsPickedInstancesAssertCode(
-          realObjects, context, "behavior action \"" + objectName + "\"");
       for (std::size_t i = 0; i < realObjects.size(); ++i) {
         // Setup context
         context.SetCurrentObject(realObjects[i]);
@@ -919,6 +935,37 @@ gd::String EventsCodeGenerator::GenerateActionsListCode(
   return outputCode;
 }
 
+gd::String EventsCodeGenerator::ResolveGlobalConfigPlaceholders(
+    const gd::String& plainString,
+    gd::EventsCodeGenerationContext& context) {
+  if (!HasProject() ||
+      !context.IsGlobalConfigPlaceholderReplacementEnabled()) {
+    return plainString;
+  }
+
+  gd::String resolvedString;
+  gd::String missingPath;
+  if (GetProject().ResolveGlobalConfigPlaceholders(
+          plainString, resolvedString, missingPath)) {
+    return resolvedString;
+  }
+
+  gd::LogError("Global config path \"{{" + missingPath +
+               "}}\" does not exist.");
+
+  gd::DiagnosticReport* diagnosticReport = GetDiagnosticReport();
+  if (diagnosticReport) {
+    gd::ProjectDiagnostic projectDiagnostic(
+        gd::ProjectDiagnostic::ErrorType::UndeclaredVariable,
+        "Global config path \"{{" + missingPath + "}}\" does not exist.",
+        "{{" + missingPath + "}}",
+        "A value in the project global config");
+    diagnosticReport->Add(projectDiagnostic);
+  }
+
+  return plainString;
+}
+
 gd::String EventsCodeGenerator::GenerateParameterCodes(
     const gd::Expression& parameter,
     const gd::ParameterMetadata& metadata,
@@ -979,9 +1026,11 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(
   } else if (ParameterMetadata::IsBehavior(metadata.GetType())) {
     argOutput = GenerateGetBehaviorNameCode(parameter.GetPlainString());
   } else if (metadata.GetType() == "key") {
-    argOutput = "\"" + ConvertToString(parameter.GetPlainString()) + "\"";
+    argOutput = ConvertToStringExplicit(
+        ResolveGlobalConfigPlaceholders(parameter.GetPlainString(), context));
   } else if (ParameterMetadata::IsExpression("resource", metadata.GetType())) {
-    const auto &resourceName = parameter.GetPlainString();
+    const auto resourceName =
+        ResolveGlobalConfigPlaceholders(parameter.GetPlainString(), context);
     const auto &resourcesContainersList =
         GetProjectScopedContainers().GetResourcesContainersList();
     const auto sourceType =
@@ -1004,7 +1053,8 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(
       argOutput = "\"" + ConvertToString(resourceName) + "\"";
     }
   } else if (metadata.GetType() == "mouse") {
-    argOutput = "\"" + ConvertToString(parameter.GetPlainString()) + "\"";
+    argOutput = ConvertToStringExplicit(
+        ResolveGlobalConfigPlaceholders(parameter.GetPlainString(), context));
   } else if (metadata.GetType() == "yesorno") {
     auto parameterString = parameter.GetPlainString();
     // This is duplicated in `InstructionSentenceFormatter::GetFormattedParameterValue`.
@@ -1036,7 +1086,8 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(
       if (!metadata.GetType().empty())
         cout << "Warning: Unknown type of parameter \"" << metadata.GetType()
              << "\"." << std::endl;
-      argOutput += "\"" + ConvertToString(parameter.GetPlainString()) + "\"";
+      argOutput += ConvertToStringExplicit(
+          ResolveGlobalConfigPlaceholders(parameter.GetPlainString(), context));
     }
   }
 
@@ -1637,6 +1688,22 @@ EventsCodeGenerator::EventsCodeGenerator(
       projectScopedContainers(projectScopedContainers_),
       hasProjectAndLayout(false),
       project(nullptr),
+      scene(nullptr),
+      errorOccurred(false),
+      compilationForRuntime(false),
+      maxCustomConditionsDepth(0),
+      maxConditionsListsSize(0),
+      eventsListNextUniqueId(0),
+      diagnosticReport(nullptr) {};
+
+EventsCodeGenerator::EventsCodeGenerator(
+    const gd::Project& project_,
+    const gd::Platform& platform_,
+    const gd::ProjectScopedContainers& projectScopedContainers_)
+    : platform(platform_),
+      projectScopedContainers(projectScopedContainers_),
+      hasProjectAndLayout(false),
+      project(&project_),
       scene(nullptr),
       errorOccurred(false),
       compilationForRuntime(false),

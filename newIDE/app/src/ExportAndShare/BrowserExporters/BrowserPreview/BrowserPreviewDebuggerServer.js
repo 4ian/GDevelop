@@ -206,6 +206,14 @@ class BrowserPreviewDebuggerServer {
   getExistingPreviewDebuggerIds(): Array<DebuggerId> {
     return getExistingPreviewDebuggerIds();
   }
+  getConnectionInfo(id: DebuggerId): ?Object {
+    return getExistingDebuggerIds().indexOf(id) !== -1
+      ? { debuggerId: id, connected: true }
+      : { debuggerId: id, connected: false };
+  }
+  getLastConnectionInfo(): ?Object {
+    return null;
+  }
   // $FlowFixMe[missing-local-annot]
   getRecentLogs(id: DebuggerId) {
     return [...(recentLogsByDebuggerId[id] || [])];
@@ -244,9 +252,9 @@ class BrowserPreviewDebuggerServer {
     embbededGameFrameWindow = null;
     notifyConnectionClosed('embedded-game-frame');
   }
-  closeAllConnections() {
+  closeAllPreviewConnections() {
     console.info(
-      'Closing all connections (i.e: windows and the embedded game frame) to the debugger server.'
+      'Closing all preview window connections to the debugger server.'
     );
     Object.keys(existingPreviewWindows).forEach(id => {
       const previewWindow = existingPreviewWindows[id];
@@ -265,7 +273,11 @@ class BrowserPreviewDebuggerServer {
     });
 
     stopWindowClosedPolling();
+    responseCallbacks.clear();
+  }
 
+  closeAllConnections() {
+    this.closeAllPreviewConnections();
     if (embbededGameFrameWindow) {
       embbededGameFrameWindow = null;
       notifyConnectionClosed('embedded-game-frame');

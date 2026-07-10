@@ -210,6 +210,8 @@ export default function TabsTitlebar({
 
   const shouldDisplayAskAi =
     preferences.values.showAiAskButtonInTitleBar && displayAskAi && !hideAskAi;
+  const shouldDisplayStickyNotes =
+    preferences.values.showAddNoteButtonInTitleBar && displayStickyNotes;
   const isAskAiIconAnimated = useIsAskAiIconAnimated(shouldDisplayAskAi);
 
   const [isGlowing, setIsGlowing] = React.useState(false);
@@ -284,7 +286,7 @@ export default function TabsTitlebar({
         </IconButton>
       )}
       {renderTabs(onEditorTabHovered, onEditorTabClosing)}
-      {displayStickyNotes ? (
+      {shouldDisplayStickyNotes ? (
         <div
           style={styles.stickyNotesContainer}
           className={WINDOW_NON_DRAGGABLE_PART_CLASS_NAME}

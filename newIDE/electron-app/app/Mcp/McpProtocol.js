@@ -38,17 +38,27 @@ const createTextToolResult = payload => ({
       text: stringifyToolPayload(payload),
     },
   ],
+  ...(payload && typeof payload === 'object' && !Array.isArray(payload)
+    ? { structuredContent: payload }
+    : {}),
 });
 
-const createErrorToolResult = message => ({
-  isError: true,
-  content: [
-    {
-      type: 'text',
-      text: String(message),
-    },
-  ],
-});
+const createErrorToolResult = message => {
+  const payload = {
+    success: false,
+    error: String(message),
+  };
+  return {
+    isError: true,
+    content: [
+      {
+        type: 'text',
+        text: JSON.stringify(payload, null, 2),
+      },
+    ],
+    structuredContent: payload,
+  };
+};
 
 const getInitializeResult = () => ({
   protocolVersion: MCP_PROTOCOL_VERSION,

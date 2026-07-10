@@ -32,6 +32,7 @@ const run = () => {
         text: JSON.stringify({ hello: 'world' }, null, 2),
       },
     ],
+    structuredContent: { hello: 'world' },
   });
 
   assert.deepStrictEqual(createErrorToolResult('No project opened.'), {
@@ -39,13 +40,27 @@ const run = () => {
     content: [
       {
         type: 'text',
-        text: 'No project opened.',
+        text: JSON.stringify(
+          { success: false, error: 'No project opened.' },
+          null,
+          2
+        ),
       },
     ],
+    structuredContent: {
+      success: false,
+      error: 'No project opened.',
+    },
   });
 
-  assert.strictEqual(validateBearerToken('Bearer secret-token', 'secret-token'), true);
-  assert.strictEqual(validateBearerToken('Bearer wrong-token', 'secret-token'), false);
+  assert.strictEqual(
+    validateBearerToken('Bearer secret-token', 'secret-token'),
+    true
+  );
+  assert.strictEqual(
+    validateBearerToken('Bearer wrong-token', 'secret-token'),
+    false
+  );
   assert.strictEqual(validateBearerToken(null, 'secret-token'), false);
 
   const initializeResult = getInitializeResult();

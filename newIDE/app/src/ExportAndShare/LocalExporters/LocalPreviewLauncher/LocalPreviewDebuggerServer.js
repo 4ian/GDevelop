@@ -17,9 +17,16 @@ const responseCallbacks = new Map<number, (value: Object) => void>();
 let nextMessageWithResponseId = 1;
 const recentLogsByDebuggerId: { [DebuggerId]: Array<Object> } = {};
 const maxRecentLogsPerDebugger = 200;
+const connectionInfoByDebuggerId: { [DebuggerId]: Object } = {};
+const lastConnectionInfoByDebuggerId: { [DebuggerId]: Object } = {};
 
 let embeddedGameFrameWindow: WindowProxy | null = null;
 let isWindowMessageListenerRegistered = false;
+
+const hasDebuggerId = (id: DebuggerId): boolean =>
+  id === 'embedded-game-frame'
+    ? !!embeddedGameFrameWindow
+    : debuggerIds.indexOf(id) !== -1;
 
 const getExistingDebuggerIds = (): Array<DebuggerId> => [
   ...getExistingEmbeddedGameFrameDebuggerIds(),
@@ -36,6 +43,16 @@ const handleParsedMessage = (
   parsedMessage: Object | null
 ): void => {
   if (!parsedMessage) return;
+  if (!hasDebuggerId(id)) {
+    console.warn(
+      `Ignoring message from closed or unknown preview debugger id "${id}".`
+    );
+    return;
+  }
+  if (connectionInfoByDebuggerId[id]) {
+    connectionInfoByDebuggerId[id].lastSeenAt = new Date().toISOString();
+    connectionInfoByDebuggerId[id].lastCommand = parsedMessage.command;
+  }
 
   if (
     parsedMessage.command === 'console.log' ||
@@ -70,11 +87,25 @@ const handleParsedMessage = (
   );
 };
 
-const notifyConnectionClosed = (id: DebuggerId) => {
+const notifyConnectionClosed = (id: DebuggerId, reason?: ?Object) => {
+  const existing = connectionInfoByDebuggerId[id] || {
+    debuggerId: id,
+  };
+  const closedInfo = {
+    ...existing,
+    connected: false,
+    closedAt: new Date().toISOString(),
+    disconnectReason:
+      (reason && (reason.errorMessage || reason.reason)) || 'connection-closed',
+    ...(reason || {}),
+  };
+  lastConnectionInfoByDebuggerId[id] = closedInfo;
+  delete connectionInfoByDebuggerId[id];
   callbacksList.forEach(({ onConnectionClosed }) =>
     onConnectionClosed({
       id,
       debuggerIds: getExistingDebuggerIds(),
+      connectionInfo: closedInfo,
     })
   );
 };
@@ -166,17 +197,30 @@ class LocalPreviewDebuggerServer {
             errorMessage,
           })
         );
-        if (id && wasConnected) notifyConnectionClosed(id);
+        if (id && wasConnected)
+          notifyConnectionClosed(id, {
+            reason: 'send-message-failed',
+            errorMessage,
+          });
       });
 
-      ipcRenderer.on('debugger-connection-closed', (event, { id }) => {
+      ipcRenderer.on('debugger-connection-closed', (event, details) => {
+        const { id } = details;
         removeDebuggerId(id);
-        notifyConnectionClosed(id);
+        notifyConnectionClosed(id, details);
       });
 
-      ipcRenderer.on('debugger-connection-opened', (event, { id }) => {
+      ipcRenderer.on('debugger-connection-opened', (event, details) => {
+        const { id } = details;
         debuggerIds.push(id);
         recentLogsByDebuggerId[id] = [];
+        connectionInfoByDebuggerId[id] = {
+          ...details,
+          debuggerId: id,
+          connected: true,
+          connectedAt: new Date().toISOString(),
+          lastSeenAt: new Date().toISOString(),
+        };
         callbacksList.forEach(({ onConnectionOpened }) =>
           onConnectionOpened({
             id,
@@ -301,6 +345,22 @@ class LocalPreviewDebuggerServer {
   getRecentLogs(id: DebuggerId) {
     return [...(recentLogsByDebuggerId[id] || [])];
   }
+  getConnectionInfo(id: DebuggerId): ?Object {
+    return (
+      connectionInfoByDebuggerId[id] ||
+      lastConnectionInfoByDebuggerId[id] ||
+      null
+    );
+  }
+  getLastConnectionInfo(): ?Object {
+    const closedConnections = Object.keys(lastConnectionInfoByDebuggerId)
+      .map(id => lastConnectionInfoByDebuggerId[id])
+      .filter(Boolean)
+      .sort((left, right) =>
+        String(right.closedAt || '').localeCompare(String(left.closedAt || ''))
+      );
+    return closedConnections[0] || null;
+  }
   // $FlowFixMe[missing-local-annot]
   registerCallbacks(callbacks: PreviewDebuggerServerCallbacks) {
     callbacksList.push(callbacks);
@@ -321,6 +381,13 @@ class LocalPreviewDebuggerServer {
 
     embeddedGameFrameWindow = embeddedWindow;
     recentLogsByDebuggerId['embedded-game-frame'] = [];
+    connectionInfoByDebuggerId['embedded-game-frame'] = {
+      debuggerId: 'embedded-game-frame',
+      connected: true,
+      connectedAt: new Date().toISOString(),
+      lastSeenAt: new Date().toISOString(),
+      windowType: 'embedded-game-frame',
+    };
     callbacksList.forEach(({ onConnectionOpened }) =>
       onConnectionOpened({
         id: 'embedded-game-frame',
@@ -340,15 +407,17 @@ class LocalPreviewDebuggerServer {
 
     embeddedGameFrameWindow = null;
     delete recentLogsByDebuggerId['embedded-game-frame'];
-    notifyConnectionClosed('embedded-game-frame');
+    notifyConnectionClosed('embedded-game-frame', {
+      reason: 'embedded-frame-unregistered',
+    });
   }
-  closeAllConnections() {
+  closeAllPreviewConnections() {
     const previousDebuggerIds = [...debuggerIds];
     debuggerIds.length = 0;
 
     previousDebuggerIds.forEach(id => {
       delete recentLogsByDebuggerId[id];
-      notifyConnectionClosed(id);
+      notifyConnectionClosed(id, { reason: 'closed-by-editor' });
     });
 
     responseCallbacks.clear();
@@ -359,11 +428,16 @@ class LocalPreviewDebuggerServer {
     if (ipcRenderer) {
       ipcRenderer.send('debugger-close-all-connections');
     }
+  }
 
+  closeAllConnections() {
+    this.closeAllPreviewConnections();
     if (embeddedGameFrameWindow) {
       embeddedGameFrameWindow = null;
       delete recentLogsByDebuggerId['embedded-game-frame'];
-      notifyConnectionClosed('embedded-game-frame');
+      notifyConnectionClosed('embedded-game-frame', {
+        reason: 'closed-by-editor',
+      });
     }
   }
 }

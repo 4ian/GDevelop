@@ -8,11 +8,11 @@ import {
   serializeToJSObject,
   unserializeFromJSObject,
 } from '../Utils/Serializer';
-import Text from '../UI/Text';
 import {
   type TreeViewItemContent,
   type TreeItemProps,
   behaviorsRootFolderId,
+  getProjectManagerShortcutExtensionGroupId,
 } from './index';
 import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
 import { type MenuButton } from '../UI/TreeView';
@@ -153,22 +153,7 @@ export class BehaviorShortcutTreeViewItemContent
   }
 
   renderRightComponent(i18n: I18nType): ?React.Node {
-    const extensionName = this.eventsFunctionsExtension.getName();
-    return (
-      <Text
-        size="body2"
-        color="secondary"
-        noMargin
-        style={{
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          whiteSpace: 'nowrap',
-        }}
-        tooltip={extensionName}
-      >
-        {extensionName}
-      </Text>
-    );
+    return null;
   }
 
   getRightButton(i18n: I18nType): ?MenuButton {
@@ -276,6 +261,13 @@ export class BehaviorShortcutTreeViewItemContent
   }
 
   isDescendantOf(itemContent: TreeViewItemContent): boolean {
-    return itemContent.getId() === behaviorsRootFolderId;
+    return (
+      itemContent.getId() === behaviorsRootFolderId ||
+      itemContent.getId() ===
+        getProjectManagerShortcutExtensionGroupId(
+          behaviorsRootFolderId,
+          this.eventsFunctionsExtension
+        )
+    );
   }
 }

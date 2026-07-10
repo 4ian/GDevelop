@@ -1359,6 +1359,8 @@ describe('editorFunctions', () => {
       const generateEvents = jest.fn();
       // $FlowFixMe[underconstrained-implicit-instantiation]
       const onSceneEventsModifiedOutsideEditor = jest.fn();
+      // $FlowFixMe[underconstrained-implicit-instantiation]
+      const searchAndInstallResources = jest.fn();
 
       const result = await editorFunctions.add_scene_events.launchFunction({
         ...makeFakeLaunchFunctionOptionsWithProject(project),
@@ -1376,6 +1378,7 @@ describe('editorFunctions', () => {
         relatedAiRequestId: null,
         generateEvents,
         onSceneEventsModifiedOutsideEditor,
+        searchAndInstallResources,
       });
 
       expect(result).toMatchInlineSnapshot(`
@@ -1386,13 +1389,7 @@ describe('editorFunctions', () => {
           ],
           "lowLevelMutations": 1,
           "message": "Applied 1 requested event operation(s) (insert_at_end: 1); 1 low-level event mutation(s).",
-          "newlyAddedResources": Array [
-            Object {
-              "resourceKind": "fake-resource-kind",
-              "resourceName": "fake-resource-name",
-              "status": "resource-installed",
-            },
-          ],
+          "newlyAddedResources": Array [],
           "operationSummary": Object {
             "insert_at_end": 1,
           },
@@ -1407,10 +1404,55 @@ describe('editorFunctions', () => {
       `);
       expect(testScene.getEvents().getEventsCount()).toBe(1);
       expect(generateEvents).not.toHaveBeenCalled();
+      expect(searchAndInstallResources).not.toHaveBeenCalled();
       expect(onSceneEventsModifiedOutsideEditor).toHaveBeenCalledWith({
         scene: testScene,
         newOrChangedAiGeneratedEventIds: new Set(['mcp-direct-event']),
       });
+    });
+
+    it('does not mutate events when direct-write resource installation fails', async () => {
+      // $FlowFixMe[underconstrained-implicit-instantiation]
+      const onSceneEventsModifiedOutsideEditor = jest.fn();
+      const searchAndInstallResources: any = jest
+        .fn()
+        .mockRejectedValue(new Error('Resource installation unavailable.'));
+      const consoleError = jest
+        .spyOn(console, 'error')
+        .mockImplementation(() => {});
+
+      let result;
+      try {
+        result = await editorFunctions.add_scene_events.launchFunction({
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            events_json: [
+              {
+                type: 'BuiltinCommonInstructions::Comment',
+                comment: 'Must not be inserted.',
+              },
+            ],
+            missing_resources: [
+              { resourceName: 'missing.png', resourceKind: 'image' },
+            ],
+          },
+          relatedAiRequestId: null,
+          onSceneEventsModifiedOutsideEditor,
+          searchAndInstallResources,
+        });
+      } finally {
+        consoleError.mockRestore();
+      }
+
+      if (!result) throw new Error('Expected an editor function result.');
+      expect(result.success).toBe(false);
+      expect(result.message).toContain('Resource installation unavailable.');
+      expect(searchAndInstallResources).toHaveBeenCalledWith({
+        resources: [{ resourceName: 'missing.png', resourceKind: 'image' }],
+      });
+      expect(testScene.getEvents().getEventsCount()).toBe(0);
+      expect(onSceneEventsModifiedOutsideEditor).not.toHaveBeenCalled();
     });
 
     it('accepts a direct structured events_json array and preserves event ids', async () => {

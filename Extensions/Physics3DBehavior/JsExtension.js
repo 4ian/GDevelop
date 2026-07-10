@@ -353,7 +353,9 @@ module.exports = {
         behaviorProperties
           .getOrCreate('meshShapeResourceName')
           .setValue(
-            behaviorContent.getChild('meshShapeResourceName').getStringValue()
+            behaviorContent
+              .getOrCreateChild('meshShapeResourceName')
+              .getStringValue()
           )
           .setType('resource')
           .addExtraInfo('model3D')

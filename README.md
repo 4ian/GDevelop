@@ -275,7 +275,7 @@ Pre-generated documentation of the game engine is [available here](https://docs.
 
 ### Implementation notes
 
-- [Global Config](docs/GlobalConfig.md): project-wide JSON configuration storage, editor support, runtime helpers and event instructions.
+- [Global Config](docs/GlobalConfig.md): project-wide JSON configuration storage, editor support, and code-generation-time placeholder replacement.
 - [Signal System](docs/SignalSystem.md): queued signal notification design for scene events, custom objects and prefabs.
 - [Deterministic Object Picking](docs/DeterministicObjectPicking.md): strict event validation rules for object-consuming actions, expressions, functions, and conditionless actions.
 

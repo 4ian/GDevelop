@@ -45,6 +45,7 @@
 #include "GDCore/Project/Project.h"
 #include "GDCore/Project/PropertyDescriptor.h"
 #include "GDCore/Serialization/Serializer.h"
+#include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/Tools/Localization.h"
 #include "GDCore/Tools/Log.h"
 #include "GDJS/Events/CodeGeneration/LayoutCodeGenerator.h"
@@ -65,6 +66,51 @@ double LogTimeSpent(const gd::String &name, double previousTime) {
   gd::LogStatus(name + " took " + gd::String::From(GetTimeSpent(previousTime)) +
                 "ms");
   return GetTimeNow();
+}
+
+bool ResolveGlobalConfigPlaceholdersInString(const gd::Project &project,
+                                             const gd::String &source,
+                                             gd::String &resolvedValue) {
+  gd::String missingPath;
+  if (project.ResolveGlobalConfigPlaceholders(source, resolvedValue,
+                                              missingPath)) {
+    return true;
+  }
+
+  gd::LogError("Global config path \"{{" + missingPath +
+               "}}\" does not exist while exporting project data.");
+  return false;
+}
+
+void ResolveGlobalConfigPlaceholdersInSerializedData(
+    const gd::Project &project, gd::SerializerElement &element) {
+  if (!element.IsValueUndefined() && element.GetValue().IsString()) {
+    const gd::String &source = element.GetValue().GetRawString();
+    gd::String resolvedValue;
+    if (source.find("{{") != gd::String::npos &&
+        ResolveGlobalConfigPlaceholdersInString(project, source,
+                                                resolvedValue)) {
+      element.SetStringValue(resolvedValue);
+    }
+  }
+
+  for (const auto &attribute : element.GetAllAttributes()) {
+    if (attribute.second.IsString()) {
+      const gd::String &source = attribute.second.GetRawString();
+      gd::String resolvedValue;
+      if (source.find("{{") != gd::String::npos &&
+          ResolveGlobalConfigPlaceholdersInString(project, source,
+                                                  resolvedValue)) {
+        element.SetStringAttribute(attribute.first, resolvedValue);
+      }
+    }
+  }
+
+  for (const auto &child : element.GetAllChildren()) {
+    if (child.second) {
+      ResolveGlobalConfigPlaceholdersInSerializedData(project, *child.second);
+    }
+  }
 }
 }  // namespace
 
@@ -643,6 +689,8 @@ void ExporterHelper::StripAndSerializeProjectData(
   gd::ProjectStripper::StripProjectForExport(project);
 
   project.SerializeTo(rootElement);
+  ResolveGlobalConfigPlaceholdersInSerializedData(project, rootElement);
+  rootElement.RemoveChild("globalConfig");
   SerializeUsedResourcesForRuntime(project, rootElement, projectUsedResources,
                          scenesUsedResources);
   if (isInGameEdition) {
@@ -1235,7 +1283,6 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
   InsertUnique(includesFiles, "events-tools/stringtools.js");
   InsertUnique(includesFiles, "events-tools/windowtools.js");
   InsertUnique(includesFiles, "events-tools/networktools.js");
-  InsertUnique(includesFiles, "events-tools/globalconfigtools.js");
 
   if (gdevelopLogoStyle == "dark") {
     InsertUnique(includesFiles, "splash/gd-logo-dark.js");

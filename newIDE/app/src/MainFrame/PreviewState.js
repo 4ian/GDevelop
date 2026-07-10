@@ -36,6 +36,7 @@ type PreviewDebuggerServerWatcherResults = {|
   clearEditorUncaughtError: () => void,
 
   hardReloadAllPreviews: () => void,
+  clearPreviewDebuggerStatuses: () => void,
 |};
 
 /**
@@ -79,6 +80,7 @@ export const usePreviewDebuggerServerWatcher = (
               ...otherDebuggerStatus
             } = debuggerStatus;
             const liveDebuggerIds = new Set(debuggerIds);
+            let hasRemovedDebuggerStatus = !!closedDebuggerStatus;
             const synchronizedDebuggerStatus: {
               [DebuggerId]: DebuggerStatus,
             } = {};
@@ -86,14 +88,20 @@ export const usePreviewDebuggerServerWatcher = (
               if (liveDebuggerIds.has(debuggerId)) {
                 synchronizedDebuggerStatus[debuggerId] =
                   otherDebuggerStatus[debuggerId];
+              } else {
+                hasRemovedDebuggerStatus = true;
               }
             }
-            console.info(
-              `Connection closed with preview with id "${id}". Last status was:`,
-              closedDebuggerStatus
-            );
+            if (closedDebuggerStatus) {
+              console.info(
+                `Connection closed with preview with id "${id}". Last status was:`,
+                closedDebuggerStatus
+              );
+            }
 
-            return synchronizedDebuggerStatus;
+            return hasRemovedDebuggerStatus
+              ? synchronizedDebuggerStatus
+              : debuggerStatus;
           });
         },
         onConnectionOpened: ({ id, debuggerIds }) => {
@@ -115,14 +123,36 @@ export const usePreviewDebuggerServerWatcher = (
               setGameHotReloadLogs(parsedMessage.payload.logs);
             }
           } else if (parsedMessage.command === 'status') {
-            setDebuggerStatus(debuggerStatus => ({
-              ...debuggerStatus,
-              [id]: {
+            if (!previewDebuggerServer.getExistingDebuggerIds().includes(id)) {
+              console.warn(
+                `Ignoring status from closed or unknown preview debugger id "${id}".`
+              );
+              return;
+            }
+            setDebuggerStatus(debuggerStatus => {
+              const nextDebuggerStatus = {
                 isPaused: !!parsedMessage.payload.isPaused,
                 isInGameEdition: !!parsedMessage.payload.isInGameEdition,
                 sceneName: parsedMessage.payload.sceneName,
-              },
-            }));
+              };
+              const previousDebuggerStatus = debuggerStatus[id];
+              if (
+                previousDebuggerStatus &&
+                previousDebuggerStatus.isPaused ===
+                  nextDebuggerStatus.isPaused &&
+                previousDebuggerStatus.isInGameEdition ===
+                  nextDebuggerStatus.isInGameEdition &&
+                previousDebuggerStatus.sceneName ===
+                  nextDebuggerStatus.sceneName
+              ) {
+                return debuggerStatus;
+              }
+
+              return {
+                ...debuggerStatus,
+                [id]: nextDebuggerStatus,
+              };
+            });
           } else if (parsedMessage.command === 'game.crashed') {
             // Only keep the first exception.
             if (parsedMessage.payload.isInGameEdition) {
@@ -151,6 +181,90 @@ export const usePreviewDebuggerServerWatcher = (
   const clearEditorUncaughtError = React.useCallback(
     () => setEditorUncaughtError(null),
     [setEditorUncaughtError]
+  );
+  const clearPreviewDebuggerStatuses = React.useCallback(
+    () => {
+      setDebuggerStatus(debuggerStatus => {
+        let hasRemovedDebuggerStatus = false;
+        const synchronizedDebuggerStatus: {
+          [DebuggerId]: DebuggerStatus,
+        } = {};
+
+        for (const debuggerId in debuggerStatus) {
+          if (debuggerId === 'embedded-game-frame') {
+            synchronizedDebuggerStatus[debuggerId] = debuggerStatus[debuggerId];
+          } else {
+            hasRemovedDebuggerStatus = true;
+          }
+        }
+
+        return hasRemovedDebuggerStatus
+          ? synchronizedDebuggerStatus
+          : debuggerStatus;
+      });
+    },
+    [setDebuggerStatus]
+  );
+  const synchronizeDebuggerStatusWithLiveDebuggerIds = React.useCallback(
+    () => {
+      if (!previewDebuggerServer) {
+        setDebuggerStatus(debuggerStatus =>
+          Object.keys(debuggerStatus).length ? {} : debuggerStatus
+        );
+        return;
+      }
+
+      const liveDebuggerIds = new Set(
+        previewDebuggerServer.getExistingDebuggerIds()
+      );
+      setDebuggerStatus(debuggerStatus => {
+        let hasRemovedDebuggerStatus = false;
+        const synchronizedDebuggerStatus: {
+          [DebuggerId]: DebuggerStatus,
+        } = {};
+
+        for (const debuggerId in debuggerStatus) {
+          if (liveDebuggerIds.has(debuggerId)) {
+            synchronizedDebuggerStatus[debuggerId] = debuggerStatus[debuggerId];
+          } else {
+            hasRemovedDebuggerStatus = true;
+          }
+        }
+
+        return hasRemovedDebuggerStatus
+          ? synchronizedDebuggerStatus
+          : debuggerStatus;
+      });
+    },
+    [previewDebuggerServer, setDebuggerStatus]
+  );
+  const requestStatusFromLivePreviewDebuggers = React.useCallback(
+    () => {
+      if (!previewDebuggerServer) return;
+
+      previewDebuggerServer.getExistingPreviewDebuggerIds().forEach(id => {
+        previewDebuggerServer.sendMessage(id, { command: 'getStatus' });
+      });
+    },
+    [previewDebuggerServer]
+  );
+
+  React.useEffect(
+    () => {
+      if (!previewDebuggerServer || !Object.keys(debuggerStatus).length) return;
+
+      const intervalId = setInterval(() => {
+        synchronizeDebuggerStatusWithLiveDebuggerIds();
+        requestStatusFromLivePreviewDebuggers();
+      }, 1000);
+      return () => clearInterval(intervalId);
+    },
+    [
+      debuggerStatus,
+      previewDebuggerServer,
+      requestStatusFromLivePreviewDebuggers,
+      synchronizeDebuggerStatusWithLiveDebuggerIds,
+    ]
   );
 
   const hardReloadAllPreviews = React.useCallback(
@@ -192,5 +306,6 @@ export const usePreviewDebuggerServerWatcher = (
     editorUncaughtError,
     clearEditorUncaughtError,
     hardReloadAllPreviews,
+    clearPreviewDebuggerStatuses,
   };
 };

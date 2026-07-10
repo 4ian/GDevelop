@@ -3,6 +3,7 @@ const path = require('path');
 
 const gitCommandTimeoutMs = 120000;
 const gitCommandMaxBuffer = 10 * 1024 * 1024;
+const linkedFoldersFileName = '.gdevelop-folder-links.json';
 
 const runGit = (workingDirectory, args, options = {}) =>
   new Promise((resolve, reject) => {
@@ -103,18 +104,121 @@ const getStatusLabel = (indexStatus, workingTreeStatus) => {
   return 'Changed';
 };
 
+const readGitQuotedPath = quotedPath => {
+  if (!quotedPath || quotedPath[0] !== '"') return null;
+
+  let path = '';
+  for (let index = 1; index < quotedPath.length; index++) {
+    const char = quotedPath[index];
+    if (char === '"') {
+      return {
+        path,
+        endIndex: index + 1,
+      };
+    }
+
+    if (char !== '\\') {
+      path += char;
+      continue;
+    }
+
+    const escapedChar = quotedPath[index + 1];
+    if (escapedChar === undefined) {
+      path += '\\';
+      continue;
+    }
+
+    if (/[0-7]/.test(escapedChar)) {
+      let octal = escapedChar;
+      let octalIndex = index + 2;
+      while (
+        octal.length < 3 &&
+        octalIndex < quotedPath.length &&
+        /[0-7]/.test(quotedPath[octalIndex])
+      ) {
+        octal += quotedPath[octalIndex];
+        octalIndex++;
+      }
+      path += String.fromCharCode(parseInt(octal, 8));
+      index = octalIndex - 1;
+      continue;
+    }
+
+    switch (escapedChar) {
+      case 'a':
+        path += '\x07';
+        break;
+      case 'b':
+        path += '\b';
+        break;
+      case 'f':
+        path += '\f';
+        break;
+      case 'n':
+        path += '\n';
+        break;
+      case 'r':
+        path += '\r';
+        break;
+      case 't':
+        path += '\t';
+        break;
+      case 'v':
+        path += '\v';
+        break;
+      default:
+        path += escapedChar;
+        break;
+    }
+    index++;
+  }
+
+  return null;
+};
+
+const parseGitStatusPath = rawPath => {
+  const path = rawPath.trim();
+  const quotedPath = readGitQuotedPath(path);
+  return quotedPath && quotedPath.endIndex === path.length
+    ? quotedPath.path
+    : path;
+};
+
+const parseGitStatusPaths = rawPath => {
+  const renameSeparator = ' -> ';
+  const path = rawPath.trim();
+  const quotedOldPath = readGitQuotedPath(path);
+
+  if (quotedOldPath) {
+    const remainingPath = path.slice(quotedOldPath.endIndex);
+    if (remainingPath.startsWith(renameSeparator)) {
+      return {
+        oldPath: quotedOldPath.path,
+        filePath: parseGitStatusPath(
+          remainingPath.slice(renameSeparator.length)
+        ),
+      };
+    }
+  }
+
+  const renameIndex = path.indexOf(renameSeparator);
+  return {
+    oldPath:
+      renameIndex === -1
+        ? null
+        : parseGitStatusPath(path.slice(0, renameIndex)),
+    filePath:
+      renameIndex === -1
+        ? parseGitStatusPath(path)
+        : parseGitStatusPath(path.slice(renameIndex + renameSeparator.length)),
+  };
+};
+
 const parseStatusLine = line => {
   const indexStatus = line[0] === ' ' ? '' : line[0];
   const workingTreeStatus = line[1] === ' ' ? '' : line[1];
   const rawPath = line.slice(3);
-  const renameSeparator = ' -> ';
-  const renameIndex = rawPath.indexOf(renameSeparator);
-  const oldPath =
-    renameIndex === -1 ? null : rawPath.slice(0, renameIndex).trim();
-  const filePath =
-    renameIndex === -1
-      ? rawPath
-      : rawPath.slice(renameIndex + renameSeparator.length);
+  const { oldPath, filePath } = parseGitStatusPaths(rawPath);
 
   return {
     path: filePath,
@@ -340,6 +444,11 @@ const resetToCommit = async ({ projectFilePath, commitHash }) => {
 
   const status = await ensureGitRepository(projectFilePath);
   await runGit(status.repoRoot, ['reset', '--hard', commitHash]);
+  await runGit(status.repoRoot, [
+    'clean',
+    '-fd',
+    `--exclude=${linkedFoldersFileName}`,
+  ]);
 
   return getStatus(projectFilePath);
 };

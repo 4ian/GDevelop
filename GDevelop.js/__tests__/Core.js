@@ -2673,6 +2673,26 @@ describe('libGD.js', function () {
       return isValid;
     };
 
+    const validateWindowTitleParameter = (value) => {
+      const action = new gd.Instruction();
+      action.setType('SetWindowTitle');
+      action.setParametersCount(2);
+      action.setParameter(1, value);
+      const result = gd.InstructionValidator.validateParameter(
+        gd.JsPlatform.get(),
+        projectScopedContainers,
+        action,
+        gd.MetadataProvider.getActionMetadata(
+          gd.JsPlatform.get(),
+          'SetWindowTitle'
+        ),
+        1
+      );
+      const isValid = result.isValid();
+      action.delete();
+      return isValid;
+    };
+
     it('considers an optional parameter left empty as valid', function () {
       // The default value is used when generating the code, so it must not be
       // shown as an error in the events sheet.
@@ -2683,6 +2703,20 @@ describe('libGD.js', function () {
       expect(validateVolumeParameter('50')).toBe(true);
       expect(validateVolumeParameter('1 +')).toBe(false);
       expect(validateVolumeParameter('"Not a number"')).toBe(false);
+    });
+
+    it('validates global config placeholders in string parameters', function () {
+      project.setGlobalConfigJson(
+        JSON.stringify({
+          labels: {
+            title: 'Window title',
+          },
+        })
+      );
+
+      expect(validateWindowTitleParameter('"{{labels.title}}"')).toBe(true);
+      expect(validateWindowTitleParameter('"{{labels.missing}}"')).toBe(false);
+      expect(validateWindowTitleParameter('"{{}}"')).toBe(false);
     });
   });
 
@@ -3866,6 +3900,77 @@ describe('libGD.js', function () {
       const projectData = JSON.parse(gd.Serializer.toJSON(projectDataElement));
       expect(projectData.properties.displayCollisionMask).toBe(true);
       expect(projectData.properties.displaySignalAnimations).toBe(true);
+
+      previewExportOptions.delete();
+      exporter.delete();
+      projectDataElement.delete();
+      project.delete();
+      fs.delete();
+    });
+
+    it('should replace global config placeholders in runtime project data', function () {
+      const fs = new gd.AbstractFileSystemJS();
+      const project = gd.ProjectHelper.createNewGDJSProject();
+      const projectDataElement = new gd.SerializerElement();
+      const layout = project.insertNewLayout('Scene', 0);
+      const object = layout
+        .getObjects()
+        .insertNewObject(project, 'TextObject::Text', 'MyTextObject', 0);
+      gd.asTextObjectConfiguration(object.getConfiguration()).setText(
+        '{{labels.objectText}}'
+      );
+      project
+        .getVariables()
+        .insertNew('GlobalTextVariable', 0)
+        .setString('{{labels.globalVariableText}}');
+      layout
+        .getVariables()
+        .insertNew('SceneTextVariable', 0)
+        .setString('Scene: {{labels.sceneVariableText}}');
+      project.setName('{{labels.projectName}}');
+      project.setGlobalConfigJson(
+        JSON.stringify({
+          labels: {
+            globalVariableText: 'Runtime global variable',
+            objectText: 'Runtime text',
+            projectName: 'Runtime project',
+            sceneVariableText: 'Runtime scene variable',
+          },
+        })
+      );
+      fs.getTempDir = function () {
+        return '/tmp/';
+      };
+      fs.dirNameFrom = function (fullpath) {
+        return path.dirname(fullpath);
+      };
+      fs.fileNameFrom = function (fullpath) {
+        return path.basename(fullpath);
+      };
+      fs.readDir = function () {
+        return new gd.VectorString();
+      };
+      const exporter = new gd.Exporter(fs, 'fake-gdjs-root');
+      const previewExportOptions = new gd.PreviewExportOptions(
+        project,
+        '/path/for/export/'
+      );
+
+      exporter.serializeProjectData(
+        project,
+        previewExportOptions,
+        projectDataElement
+      );
+      const projectData = JSON.parse(gd.Serializer.toJSON(projectDataElement));
+      expect(projectData.properties.name).toBe('Runtime project');
+      expect(projectData.variables[0].value).toBe('Runtime global variable');
+      expect(projectData.layouts[0].objects[0].content.text).toBe(
+        'Runtime text'
+      );
+      expect(projectData.layouts[0].variables[0].value).toBe(
+        'Scene: Runtime scene variable'
+      );
+      expect(projectData.globalConfig).toBeUndefined();
 
       previewExportOptions.delete();
       exporter.delete();

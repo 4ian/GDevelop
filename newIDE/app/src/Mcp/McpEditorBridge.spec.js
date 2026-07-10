@@ -63,6 +63,9 @@ describe('McpEditorBridge', () => {
       ...overrides,
     });
 
+  const waitForDeferredNotifications = () =>
+    new Promise(resolve => setTimeout(resolve, 0));
+
   // Build a mock preview debugger server that answers TARGETED requests: when
   // sendMessage(id, {command, messageId}) is called, it replies (via the
   // registered onHandleParsedMessage callback) from that id with the same
@@ -169,6 +172,30 @@ describe('McpEditorBridge', () => {
       'gdevelop_get_editor_state'
     );
     expect(response.tools.map(tool => tool.name)).not.toContain('create_scene');
+  });
+
+  it('returns unexpected tool failures as structured JSON', async () => {
+    const bridge = makeBridge({
+      getProject: () => {
+        throw new Error('Project model is unavailable.');
+      },
+    });
+    const response = await bridge.handleRendererMcpRequest({
+      method: 'tools/call',
+      params: { name: 'gdevelop_get_editor_state', arguments: {} },
+    });
+    const result = JSON.parse(response.content[0].text);
+
+    expect(response.isError).toBe(true);
+    expect(response.structuredContent).toEqual(result);
+    expect(result).toEqual(
+      expect.objectContaining({
+        success: false,
+        code: 'INTERNAL_TOOL_ERROR',
+        toolName: 'gdevelop_get_editor_state',
+        error: 'Project model is unavailable.',
+      })
+    );
   });
 
   it('refreshes the MCP tool catalog in one read-only call', async () => {
@@ -714,6 +741,7 @@ describe('McpEditorBridge', () => {
           name: 'gdevelop_validate_events_json',
           arguments: {
             scene_name: 'Level1',
+            include_rendered_events: true,
             events_json: JSON.stringify([
               {
                 type: 'BuiltinCommonInstructions::Standard',
@@ -775,20 +803,16 @@ describe('McpEditorBridge', () => {
       if (!invalidColorIssue) {
         throw new Error('Expected an invalid color parameter issue.');
       }
-      expect(invalidColorIssue.suggestion).toContain(
-        '"220;30;55"'
-      );
+      expect(invalidColorIssue.suggestion).toContain('"220;30;55"');
       expect(invalidColorValidation.issueSummary.byType).toEqual(
         expect.objectContaining({
           'invalid-parameter': expect.any(Number),
         })
       );
-      const invalidColorRootCause =
-        invalidColorValidation.issueSummary.rootCauses.find(
-          rootCause =>
-            rootCause.suggestion &&
-            rootCause.suggestion.includes('"220;30;55"')
-        );
+      const invalidColorRootCause = invalidColorValidation.issueSummary.rootCauses.find(
+        rootCause =>
+          rootCause.suggestion && rootCause.suggestion.includes('"220;30;55"')
+      );
       expect(invalidColorRootCause).toBeTruthy();
       expect(layout.getEvents().getEventsCount()).toBe(0);
 
@@ -1116,6 +1140,100 @@ describe('McpEditorBridge', () => {
     }
   });
 
+  it('inherits parent For Each scope and downgrades collision Create advice', async () => {
+    const makeInstruction = (type, parameters) => {
+      const instruction = new gd.Instruction();
+      instruction.setType(type);
+      instruction.setParametersCount(parameters.length);
+      parameters.forEach((parameter, index) =>
+        instruction.setParameter(index, parameter)
+      );
+      return instruction;
+    };
+    const project = gd.ProjectHelper.createNewGDJSProject();
+    const layout = project.insertNewLayout('Level1', 0);
+    ['Enemy', 'Player', 'Impact'].forEach((name, index) =>
+      layout.getObjects().insertNewObject(project, 'Sprite', name, index)
+    );
+    const forEach = gd.asForEachEvent(
+      layout
+        .getEvents()
+        .insertNewEvent(project, 'BuiltinCommonInstructions::ForEach', 0)
+    );
+    forEach.setObjectToPick('Enemy');
+    const scopedChild = gd.asStandardEvent(
+      forEach
+        .getSubEvents()
+        .insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 0)
+    );
+    const enemyCondition = makeInstruction('PosX', ['Enemy', '>', '0']);
+    scopedChild.getConditions().insert(enemyCondition, 0);
+    enemyCondition.delete();
+    const scopedCreate = makeInstruction('Create', [
+      '',
+      'Impact',
+      'Enemy.X()',
+      'Enemy.Y()',
+      '""',
+    ]);
+    scopedChild.getActions().insert(scopedCreate, 0);
+    scopedCreate.delete();
+
+    const collisionEvent = gd.asStandardEvent(
+      layout
+        .getEvents()
+        .insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 1)
+    );
+    const collision = makeInstruction('CollisionNP', [
+      'Enemy',
+      'Player',
+      '',
+      '',
+      'no',
+    ]);
+    collisionEvent.getConditions().insert(collision, 0);
+    collision.delete();
+    const collisionCreate = makeInstruction('Create', [
+      '',
+      'Impact',
+      'Enemy.X()',
+      'Enemy.Y()',
+      '""',
+    ]);
+    collisionEvent.getActions().insert(collisionCreate, 0);
+    collisionCreate.delete();
+
+    try {
+      const bridge = makeBridge({ getProject: () => project });
+      const response = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'lint_scene_events',
+          arguments: {
+            scene_name: 'Level1',
+            require_root_groups: false,
+          },
+        },
+      });
+      const lint = JSON.parse(response.content[0].text);
+      const createIssues = lint.issues.filter(
+        issue => issue.type === 'create-without-for-each'
+      );
+
+      expect(createIssues.some(issue => issue.eventPath === 'event-0.0')).toBe(
+        false
+      );
+      const collisionIssue = createIssues.find(
+        issue => issue.eventPath === 'event-1'
+      );
+      expect(collisionIssue).toBeDefined();
+      expect(collisionIssue.severity).toBe('info');
+      expect(collisionIssue.suggestion).toContain('disabled_rules');
+    } finally {
+      project.delete();
+    }
+  });
+
   it('lints timers: CompareTimer with no ResetTimer is flagged; with one is clean', async () => {
     const buildSceneWithTimer = ({ withReset }: { withReset: boolean }) => {
       // $FlowFixMe[invalid-constructor]
@@ -1260,6 +1378,56 @@ describe('McpEditorBridge', () => {
       const types = lint.issues.map(issue => issue.type);
       expect(types).not.toContain('group-default-color');
       expect(types).not.toContain('group-duplicate-color');
+    } finally {
+      project.delete();
+    }
+  });
+
+  it('defers and coalesces scene event editor notifications from concurrent MCP writes', async () => {
+    // $FlowFixMe[invalid-constructor]
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    project.insertNewLayout('Level1', 0);
+    const onSceneEventsModifiedOutsideEditor: any = jest.fn();
+    try {
+      const bridge = makeBridge({
+        getProject: () => project,
+        getPermissions: () => ({
+          allowWriteTools: true,
+          allowCommandTools: false,
+        }),
+        onSceneEventsModifiedOutsideEditor,
+      });
+      const createGroup = (groupName: string, eventId: string) =>
+        bridge.handleRendererMcpRequest({
+          method: 'tools/call',
+          params: {
+            name: 'create_group',
+            arguments: {
+              scene_name: 'Level1',
+              group_name: groupName,
+              ai_generated_event_id: eventId,
+            },
+          },
+        });
+
+      await Promise.all([
+        createGroup('Initialization', 'initialization'),
+        createGroup('Player input', 'player-input'),
+      ]);
+
+      expect(onSceneEventsModifiedOutsideEditor).not.toHaveBeenCalled();
+      await waitForDeferredNotifications();
+      expect(onSceneEventsModifiedOutsideEditor).toHaveBeenCalledTimes(1);
+      expect(onSceneEventsModifiedOutsideEditor).toHaveBeenCalledWith({
+        scene: project.getLayout('Level1'),
+        newOrChangedAiGeneratedEventIds: new Set(),
+      });
+      expect(
+        project
+          .getLayout('Level1')
+          .getEvents()
+          .getEventsCount()
+      ).toBe(2);
     } finally {
       project.delete();
     }
@@ -1431,6 +1599,7 @@ describe('McpEditorBridge', () => {
       expect(applyResult.staleStateAdvisory.previewMayBeStale).toBe(false);
       expect(project.getName()).toBe('After Patch');
       expect(triggerUnsavedChanges).toHaveBeenCalledTimes(1);
+      await waitForDeferredNotifications();
       expect(onSceneEventsModifiedOutsideEditor).toHaveBeenCalled();
       expect(onObjectsModifiedOutsideEditor).toHaveBeenCalled();
       expect(onInstancesModifiedOutsideEditor).toHaveBeenCalled();
@@ -2208,13 +2377,17 @@ describe('McpEditorBridge', () => {
                 type: 'variable',
               },
             ],
-            events_json: [
+            events_dsl: [
               {
-                type: 'BuiltinCommonInstructions::Standard',
+                kind: 'standard',
                 conditions: [
                   {
-                    type: { value: 'NumberVariable' },
-                    parameters: ['SunCountVariable', '>', '0'],
+                    type: 'NumberVariable',
+                    parameters: {
+                      variable: 'SunCountVariable',
+                      comparison_sign: '>',
+                      value: 0,
+                    },
                   },
                 ],
                 actions: [],
@@ -3741,6 +3914,7 @@ describe('McpEditorBridge', () => {
           aiGeneratedEventId: 'second-event',
         })
       );
+      expect(found.matches[0].serializedEvent).toBeUndefined();
 
       const wrapResponse = await bridge.handleRendererMcpRequest({
         method: 'tools/call',
@@ -3828,6 +4002,7 @@ describe('McpEditorBridge', () => {
           comment: 'Leave this outside the group',
         })
       );
+      await waitForDeferredNotifications();
       expect(onSceneEventsModifiedOutsideEditor).toHaveBeenCalled();
     } finally {
       project.delete();
@@ -3899,6 +4074,79 @@ describe('McpEditorBridge', () => {
       const saveResult = JSON.parse(saveResponse.content[0].text);
       expect(saveResult.saved).toBe(true);
       expect(saveProjectAndWait).toHaveBeenCalled();
+    } finally {
+      project.delete();
+      fs.rmSync(tempDir, { recursive: true, force: true });
+    }
+  });
+
+  it('waits for disk persistence and returns matching editor and disk hashes', async () => {
+    const project = gd.ProjectHelper.createNewGDJSProject();
+    project.insertNewLayout('Level1', 0);
+    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gdevelop-save-'));
+    const projectFile = path.join(tempDir, 'game.json');
+    project.setProjectFile(projectFile);
+    fs.writeFileSync(projectFile, JSON.stringify(serializeToJSObject(project)));
+    project.setName('Persisted through MCP');
+    let dirty = true;
+    const saveProjectAndWait: any = jest.fn(async () => {
+      fs.writeFileSync(
+        projectFile,
+        JSON.stringify(serializeToJSObject(project))
+      );
+      dirty = false;
+      return { saved: true };
+    });
+
+    try {
+      const bridge = makeBridge({
+        getProject: () => project,
+        getPermissions: () => ({
+          allowWriteTools: false,
+          allowCommandTools: true,
+        }),
+        getPersistenceState: () => ({
+          hasUnsavedChanges: dirty,
+          changesCount: dirty ? 1 : 0,
+          timeOfFirstChangeSinceLastSave: dirty ? Date.now() - 100 : null,
+        }),
+        saveProjectAndWait,
+      });
+      const response = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'gdevelop_save_project_and_wait',
+          arguments: {},
+        },
+      });
+      const result = JSON.parse(response.content[0].text);
+
+      expect(response.isError).not.toBe(true);
+      expect(result.success).toBe(true);
+      expect(result.saved).toBe(true);
+      expect(result.reason).toBe('saved');
+      expect(result.persistence.projectFile).toBe(projectFile);
+      expect(result.persistence.dirtyBefore).toBe(true);
+      expect(result.persistence.dirtyAfter).toBe(false);
+      expect(result.persistence.diskWriteObserved).toBe(true);
+      expect(result.persistence.hashesMatch).toBe(true);
+      expect(result.persistence.editorHash).toBe(result.persistence.diskHash);
+      expect(Date.parse(result.persistence.completedAt)).not.toBeNaN();
+
+      project.setName('Persisted through SAVE_PROJECT');
+      dirty = true;
+      const commandResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'gdevelop_run_command',
+          arguments: { commandName: 'SAVE_PROJECT' },
+        },
+      });
+      const commandResult = JSON.parse(commandResponse.content[0].text);
+      expect(commandResponse.isError).not.toBe(true);
+      expect(commandResult.completed).toBe(true);
+      expect(commandResult.persistence.hashesMatch).toBe(true);
+      expect(commandResult.persistence.dirtyAfter).toBe(false);
     } finally {
       project.delete();
       fs.rmSync(tempDir, { recursive: true, force: true });
@@ -4294,6 +4542,8 @@ describe('McpEditorBridge', () => {
             create_instance: true,
             x: 16,
             y: 24,
+            align: 'center_x',
+            initially_hidden: true,
           },
         },
       });
@@ -4308,6 +4558,15 @@ describe('McpEditorBridge', () => {
         })
       );
       expect(layout.getInitialInstances().getInstancesCount()).toBe(2);
+      const textInstance = getInitialInstances(
+        layout.getInitialInstances()
+      ).find(instance => instance.getObjectName() === 'ScoreLabel');
+      expect(textInstance).toBeDefined();
+      if (!textInstance)
+        throw new Error('ScoreLabel instance was not created.');
+      expect(textInstance.hasCustomSize()).toBe(true);
+      expect(textInstance.getCustomWidth()).toBeGreaterThan(0);
+      expect(textInstance.getCustomHeight()).toBeGreaterThan(0);
     } finally {
       project.delete();
       fs.rmSync(tempDir, { recursive: true, force: true });
@@ -4863,6 +5122,209 @@ describe('McpEditorBridge', () => {
     );
   });
 
+  it('validates compact event DSL on a temporary event sheet', async () => {
+    const project = gd.ProjectHelper.createNewGDJSProject();
+    project.insertNewLayout('Level1', 0);
+    try {
+      const bridge = makeBridge({ getProject: () => project });
+      const response = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'gdevelop_validate_events',
+          arguments: {
+            scene_name: 'Level1',
+            event_id_prefix: 'initialization',
+            events: [
+              {
+                kind: 'group',
+                name: 'Initialization',
+                children: [
+                  { kind: 'comment', text: 'Initialize level state.' },
+                ],
+              },
+            ],
+          },
+        },
+      });
+      const result = JSON.parse(response.content[0].text);
+
+      expect(response.isError).not.toBe(true);
+      expect(response.structuredContent).toEqual(result);
+      expect(result.success).toBe(true);
+      expect(result.valid).toBe(true);
+      expect(result.dryRun).toBe(true);
+      expect(result.wouldModify).toBe(true);
+      expect(result.eventSheetRevision).toMatch(/^fnv1a:/);
+      expect(result.proposedEventSheetRevision).toMatch(/^fnv1a:/);
+      expect(
+        project
+          .getLayout('Level1')
+          .getEvents()
+          .getEventsCount()
+      ).toBe(0);
+    } finally {
+      project.delete();
+    }
+  });
+
+  it('compiles gdevelop_apply_events DSL before forwarding the write', async () => {
+    const project = gd.ProjectHelper.createNewGDJSProject();
+    project.insertNewLayout('Level1', 0);
+    const processEditorFunctionCalls: any = jest.fn(async () => ({
+      results: [
+        {
+          status: 'finished',
+          call_id: 'mcp-call',
+          success: true,
+          didModifyProject: false,
+          output: { success: true },
+        },
+      ],
+    }));
+    try {
+      const bridge = makeBridge({
+        getProject: () => project,
+        getPermissions: () => ({
+          allowWriteTools: true,
+          allowCommandTools: false,
+        }),
+        processEditorFunctionCalls,
+      });
+      const response = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'gdevelop_apply_events',
+          arguments: {
+            scene_name: 'Level1',
+            event_id_prefix: 'gameplay',
+            events: [
+              {
+                kind: 'group',
+                name: 'Gameplay',
+                children: [{ kind: 'comment', text: 'Gameplay rules.' }],
+              },
+            ],
+          },
+        },
+      });
+
+      expect(response.isError).not.toBe(true);
+      const editorCall =
+        processEditorFunctionCalls.mock.calls[0][0].functionCalls[0];
+      expect(editorCall.name).toBe('add_scene_events');
+      const forwardedArguments = JSON.parse(editorCall.arguments);
+      expect(forwardedArguments.events).toBeUndefined();
+      expect(forwardedArguments.events_dsl).toBeUndefined();
+      expect(forwardedArguments.events_json[0]).toEqual(
+        expect.objectContaining({
+          type: 'BuiltinCommonInstructions::Group',
+          name: 'Gameplay',
+          aiGeneratedEventId: expect.stringMatching(/^gameplay-/),
+        })
+      );
+      expect(forwardedArguments.events_json[0].events[0].type).toBe(
+        'BuiltinCommonInstructions::Comment'
+      );
+    } finally {
+      project.delete();
+    }
+  });
+
+  it('returns a successful revision receipt when an event mutation outlives a reported editor failure', async () => {
+    const project = gd.ProjectHelper.createNewGDJSProject();
+    const layout = project.insertNewLayout('Level1', 0);
+    const triggerUnsavedChanges: any = jest.fn();
+    const processEditorFunctionCalls: any = jest.fn(async () => {
+      layout
+        .getEvents()
+        .insertNewEvent(project, 'BuiltinCommonInstructions::Comment', 0);
+      return {
+        results: [
+          {
+            status: 'finished',
+            call_id: 'mcp-call',
+            success: false,
+            output: { message: 'You must be logged in to use AI.' },
+          },
+        ],
+      };
+    });
+    try {
+      const bridge = makeBridge({
+        getProject: () => project,
+        getPermissions: () => ({
+          allowWriteTools: true,
+          allowCommandTools: false,
+        }),
+        processEditorFunctionCalls,
+        triggerUnsavedChanges,
+      });
+      const response = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'gdevelop_apply_events',
+          arguments: {
+            scene_name: 'Level1',
+            events: [{ kind: 'comment', text: 'Applied once.' }],
+          },
+        },
+      });
+      const result = JSON.parse(response.content[0].text);
+
+      expect(response.isError).not.toBe(true);
+      expect(response.structuredContent).toEqual(result);
+      expect(result.success).toBe(true);
+      expect(result.applied).toBe(true);
+      expect(result.oldRevision).not.toBe(result.newRevision);
+      expect(result.eventSheetRevision).toBe(result.newRevision);
+      expect(result.validationState.valid).toBe(true);
+      expect(result.saveState.requested).toBe(false);
+      expect(result.warning).toContain('logged in');
+      expect(triggerUnsavedChanges).toHaveBeenCalledTimes(1);
+    } finally {
+      project.delete();
+    }
+  });
+
+  it('rejects compact event writes against a stale event sheet revision', async () => {
+    const project = gd.ProjectHelper.createNewGDJSProject();
+    project.insertNewLayout('Level1', 0);
+    const processEditorFunctionCalls: any = jest.fn();
+    try {
+      const bridge = makeBridge({
+        getProject: () => project,
+        getPermissions: () => ({
+          allowWriteTools: true,
+          allowCommandTools: false,
+        }),
+        processEditorFunctionCalls,
+      });
+      const response = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'gdevelop_apply_events',
+          arguments: {
+            scene_name: 'Level1',
+            expected_revision: 'fnv1a:stale',
+            events: [{ kind: 'comment', text: 'Should not be written.' }],
+          },
+        },
+      });
+
+      expect(response.isError).toBe(true);
+      expect(response.structuredContent).toEqual(
+        expect.objectContaining({
+          success: false,
+          code: 'EVENT_SHEET_REVISION_CONFLICT',
+          eventSheetRevision: expect.stringMatching(/^fnv1a:/),
+        })
+      );
+      expect(processEditorFunctionCalls).not.toHaveBeenCalled();
+    } finally {
+      project.delete();
+    }
+  });
+
   it('preserves a structured single Group event while auto-quoting its child events', async () => {
     // $FlowFixMe[invalid-constructor]
     const project = new gd.ProjectHelper.createNewGDJSProject();
@@ -5372,6 +5834,9 @@ describe('McpEditorBridge', () => {
     expect(result.width).toBe(1);
     expect(result.height).toBe(1);
     expect(result.dataUrl).toBe(onePixelPng);
+    expect(result.source).toBe('renderer-canvas');
+    expect(result.exactGameResolution).toBe(true);
+    expect(result.attempt).toBe(1);
   });
 
   it('captures the renderer canvas when canvas_only is requested', async () => {
@@ -5520,6 +5985,50 @@ describe('McpEditorBridge', () => {
     }
   });
 
+  it('assigns unique CollisionNP DSL names and builds it without indexes', async () => {
+    const project = gd.ProjectHelper.createNewGDJSProject();
+    project.insertNewLayout('Level1', 0);
+    try {
+      const bridge = makeBridge({ getProject: () => project });
+      const metadataResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'gdevelop_get_instruction_metadata',
+          arguments: { type: 'CollisionNP', kind: 'condition' },
+        },
+      });
+      const metadata = JSON.parse(metadataResponse.content[0].text);
+      const dslNames = metadata.parameters.map(parameter => parameter.dslName);
+      expect(new Set(dslNames).size).toBe(dslNames.length);
+      expect(dslNames).toEqual(
+        expect.arrayContaining(['first_object', 'second_object'])
+      );
+
+      const conditionResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'create_condition',
+          arguments: {
+            type: 'CollisionNP',
+            parameters: {
+              first_object: 'Player',
+              second_object: 'Enemy',
+            },
+          },
+        },
+      });
+      const condition = JSON.parse(conditionResponse.content[0].text);
+      expect(conditionResponse.isError).not.toBe(true);
+      expect(condition.instruction.parameters[0]).toBe('Player');
+      expect(condition.instruction.parameters[1]).toBe('Enemy');
+      expect(condition.filled.map(parameter => parameter.dslName)).toEqual(
+        expect.arrayContaining(['first_object', 'second_object'])
+      );
+    } finally {
+      project.delete();
+    }
+  });
+
   it('builds signal instructions with dedicated helpers', async () => {
     // $FlowFixMe[invalid-constructor]
     const project = new gd.ProjectHelper.createNewGDJSProject();
@@ -5650,7 +6159,11 @@ describe('McpEditorBridge', () => {
       const result = JSON.parse(response.content[0].text);
       expect(response.isError).not.toBe(true);
       expect(result.functionName).toBe('onSignal');
-      expect(result.signalSignature).toEqual(['Object', 'SignalName', 'Payload']);
+      expect(result.signalSignature).toEqual([
+        'Object',
+        'SignalName',
+        'Payload',
+      ]);
       expect(
         result.function.parameters.map(parameter => parameter.name)
       ).toEqual(['Object', 'SignalName', 'Payload']);
@@ -5850,9 +6363,57 @@ describe('McpEditorBridge', () => {
     // $FlowFixMe[invalid-constructor]
     const project = new gd.ProjectHelper.createNewGDJSProject();
     const layout = project.insertNewLayout('Level1', 0);
+    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gdevelop-size-'));
+    const backgroundImageFile = path.join(tempDir, 'background.png');
+    fs.writeFileSync(
+      backgroundImageFile,
+      Uint8Array.from([
+        137,
+        80,
+        78,
+        71,
+        13,
+        10,
+        26,
+        10,
+        0,
+        0,
+        0,
+        13,
+        73,
+        72,
+        68,
+        82,
+        0,
+        0,
+        3,
+        192,
+        0,
+        0,
+        2,
+        28,
+      ])
+    );
     layout.getObjects().insertNewObject(project, 'Sprite', 'Tiles', 0);
-    layout.getObjects().insertNewObject(project, 'Sprite', 'Back', 1);
+    const backObject = layout
+      .getObjects()
+      .insertNewObject(project, 'Sprite', 'Back', 1);
     layout.getObjects().insertNewObject(project, 'Sprite', 'Front', 2);
+    const backgroundResource = new gd.ImageResource();
+    backgroundResource.setName('Background');
+    backgroundResource.setFile(backgroundImageFile);
+    project.getResourcesManager().addResource(backgroundResource);
+    backgroundResource.delete();
+    const backgroundAnimation = new gd.Animation();
+    backgroundAnimation.setDirectionsCount(1);
+    const backgroundFrame = new gd.Sprite();
+    backgroundFrame.setImageName('Background');
+    backgroundAnimation.getDirection(0).addSprite(backgroundFrame);
+    backgroundFrame.delete();
+    gd.asSpriteConfiguration(backObject.getConfiguration())
+      .getAnimations()
+      .addAnimation(backgroundAnimation);
+    backgroundAnimation.delete();
     const atlas = new gd.ImageResource();
     atlas.setName('Tileset');
     atlas.setFile('assets/tiles.png');
@@ -5908,8 +6469,20 @@ describe('McpEditorBridge', () => {
         'Front',
       ]);
       expect(order.topToBottom[0].objectName).toBe('Front');
+      const backBounds = order.bottomToTop.find(
+        instance => instance.objectName === 'Back'
+      );
+      expect(backBounds).toEqual(
+        expect.objectContaining({
+          width: 960,
+          height: 540,
+          dimensionSource: 'sprite-image-resource',
+          dimensionsExact: true,
+        })
+      );
     } finally {
       project.delete();
+      fs.rmSync(tempDir, { recursive: true, force: true });
     }
   });
 
@@ -6750,8 +7323,14 @@ describe('McpEditorBridge', () => {
         ],
       },
     };
+    let launchCommandCount = 0;
     const runCommand = jest.fn((commandName: string) => {
-      if (commandName === 'LAUNCH_DEBUG_PREVIEW' && callbacks) {
+      if (commandName === 'LAUNCH_DEBUG_PREVIEW') launchCommandCount++;
+      if (
+        commandName === 'LAUNCH_DEBUG_PREVIEW' &&
+        launchCommandCount === 2 &&
+        callbacks
+      ) {
         setTimeout(() => {
           debuggerIds = ['preview-ws-new'];
           callbacks &&
@@ -6832,7 +7411,7 @@ describe('McpEditorBridge', () => {
       method: 'tools/call',
       params: {
         name: 'save_and_relaunch_preview_paused',
-        arguments: { timeout_ms: 1000 },
+        arguments: { timeout_ms: 250 },
       },
     });
     const result = JSON.parse(response.content[0].text);
@@ -6842,13 +7421,19 @@ describe('McpEditorBridge', () => {
     expect(result.saved).toBe(true);
     expect(result.closedWindows).toBe(true);
     expect(result.closedDebuggerConnections).toBe(true);
+    expect(result.requestedPause).toBe(true);
+    expect(result.pauseAttempted).toBe(true);
     expect(result.launch.pauseConfirmed).toBe(true);
+    expect(result.launchAttempts).toHaveLength(2);
+    expect(result.launchAttempts[0].success).toBe(false);
+    expect(result.launchAttempts[1].success).toBe(true);
     expect(result.debuggerId).toBe('preview-ws-new');
     expect(result.sceneName).toBe('Level1');
     expect(result.runtime.objectInstanceCounts.Player).toBe(1);
     expect(saveProjectAndWait).toHaveBeenCalled();
     expect(closeAllPreviews).toHaveBeenCalled();
     expect(closeAllConnections).toHaveBeenCalled();
+    expect(runCommand).toHaveBeenCalledTimes(2);
     expect(runCommand).toHaveBeenCalledWith('LAUNCH_DEBUG_PREVIEW');
     expect(
       sent.some(
@@ -6955,9 +7540,17 @@ describe('McpEditorBridge', () => {
   it('reports when no preview is running for a screenshot', async () => {
     const bridge = makeBridge({
       getPreviewDebuggerServer: () => ({
-        getServerState: () => 'stopped',
+        getServerState: () => 'started',
         getExistingPreviewDebuggerIds: () => [],
         getExistingDebuggerIds: () => [],
+        getLastConnectionInfo: () => ({
+          debuggerId: 'preview-ws-9',
+          connected: false,
+          closedAt: '2026-07-10T00:00:00.000Z',
+          disconnectReason: 'websocket-closed',
+          code: 1001,
+          socketState: 'closed',
+        }),
         sendMessageWithResponse: () => Promise.resolve({}),
       }),
     });
@@ -6968,7 +7561,14 @@ describe('McpEditorBridge', () => {
     });
     const result = JSON.parse(response.content[0].text);
     expect(result.success).toBe(false);
-    expect(result.error).toContain('launch_preview');
+    expect(result.error).toContain('connected');
+    expect(result.connectionInfo).toEqual(
+      expect.objectContaining({
+        debuggerId: 'preview-ws-9',
+        disconnectReason: 'websocket-closed',
+        socketState: 'closed',
+      })
+    );
   });
 
   it('auto-quotes bare identifier-like string parameters', () => {
@@ -7146,6 +7746,120 @@ describe('McpEditorBridge', () => {
     expect(result.runtime.scenes[0].instancePositions.Bullet[0]).toEqual(
       expect.objectContaining({ x: 10, y: 20, layer: 'HUD', zOrder: 7 })
     );
+  });
+
+  it('run_frames reports partial failure coordinates and confirmed cleanup', async () => {
+    const previewDebuggerServer = makeTargetedPreviewServer({
+      responders: {
+        getStatus: { isPaused: true, sceneName: 'Level1' },
+        runFrames: {
+          __fullMessage: {
+            runFrames: {
+              applied: ['keyPressed:32', 'autoReleasedKeys'],
+              requestedFrames: 24,
+              steppedFrames: 17,
+              stoppedEarly: false,
+              failedFrame: 18,
+              partialStateAvailable: true,
+              failure: {
+                code: 'AMBIGUOUS_OBJECT_PICKING',
+                eventId: 'enemy-fire-3',
+                instructionId: 'action-1',
+              },
+              cleanup: {
+                attempted: true,
+                success: true,
+                keysReleased: true,
+              },
+              heldKeys: [],
+              error: 'Ambiguous object picking.',
+            },
+            payload: {
+              _paused: true,
+              _sceneStack: { _stack: [] },
+            },
+          },
+        },
+      },
+    });
+    const bridge = makeBridge({
+      getPreviewDebuggerServer: () => previewDebuggerServer,
+    });
+    const response = await bridge.handleRendererMcpRequest({
+      method: 'tools/call',
+      params: {
+        name: 'run_frames',
+        arguments: {
+          inputs: [{ type: 'keyPressed', key: 'Space' }],
+          frames: 24,
+          auto_release: true,
+        },
+      },
+    });
+    const result = JSON.parse(response.content[0].text);
+
+    expect(result.success).toBe(false);
+    expect(result.outcome).toBe('partial');
+    expect(result.requestedFrames).toBe(24);
+    expect(result.steppedFrames).toBe(17);
+    expect(result.stoppedEarly).toBe(true);
+    expect(result.failedFrame).toBe(18);
+    expect(result.eventId).toBe('enemy-fire-3');
+    expect(result.instructionId).toBe('action-1');
+    expect(result.partialStateAvailable).toBe(true);
+    expect(result.cleanup).toEqual(
+      expect.objectContaining({ success: true, keysReleased: true })
+    );
+    expect(result.heldKeys).toEqual([]);
+  });
+
+  it('run_frames performs fallback key release when runtime cleanup is incomplete', async () => {
+    const previewDebuggerServer = makeTargetedPreviewServer({
+      responders: {
+        getStatus: { isPaused: true, sceneName: 'Level1' },
+        runFrames: {
+          __fullMessage: {
+            runFrames: {
+              steppedFrames: 1,
+              stoppedEarly: true,
+              heldKeys: [32],
+              cleanup: {
+                attempted: true,
+                success: false,
+                keysReleased: false,
+                error: 'Initial cleanup failed.',
+              },
+              error: 'Event failed.',
+            },
+            payload: {
+              _paused: true,
+              _sceneStack: { _stack: [] },
+            },
+          },
+        },
+        simulateInput: { applied: ['releaseAllKeys'], error: null },
+      },
+    });
+    const bridge = makeBridge({
+      getPreviewDebuggerServer: () => previewDebuggerServer,
+    });
+    const response = await bridge.handleRendererMcpRequest({
+      method: 'tools/call',
+      params: {
+        name: 'run_frames',
+        arguments: {
+          inputs: [{ type: 'keyPressed', key: 'Space' }],
+          frames: 2,
+          auto_release: true,
+        },
+      },
+    });
+    const result = JSON.parse(response.content[0].text);
+
+    expect(result.cleanup.success).toBe(true);
+    expect(result.cleanup.keysReleased).toBe(true);
+    expect(result.cleanup.fallback.applied).toEqual(['releaseAllKeys']);
+    expect(result.heldKeys).toEqual([]);
   });
 
   it('run_frames expands clickAndHold and returns cursor world coordinates', async () => {

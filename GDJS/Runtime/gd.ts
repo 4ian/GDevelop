@@ -682,13 +682,32 @@ namespace gdjs {
     usage: string,
     pickedInstancesCount: number
   ): never {
-    const error = new Error(
+    const error: any = new Error(
       'Ambiguous object picking for ' +
         usage +
         ': expected at most one picked instance, but ' +
         pickedInstancesCount +
         ' are picked. Add conditions to pick a single instance, or use a "For each object" event.'
     );
+    const objectNameMatch = /"([^"]+)"/.exec(usage);
+    const objectName = objectNameMatch ? objectNameMatch[1] : undefined;
+    error.code = 'AMBIGUOUS_OBJECT_PICKING';
+    error.usage = usage;
+    error.objectName = objectName;
+    error.pickedInstancesCount = pickedInstancesCount;
+    error.suggestedEventStructure = {
+      kind: 'for_each',
+      object: objectName,
+      children: [
+        {
+          kind: 'standard',
+          conditions: [
+            '<keep or add conditions that narrow this object when needed>',
+          ],
+          actions: ['<move the failing single-instance instruction here>'],
+        },
+      ],
+    };
     throw error;
   };
 

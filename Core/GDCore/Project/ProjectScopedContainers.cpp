@@ -26,6 +26,7 @@ ProjectScopedContainers::MakeNewProjectScopedContainersForProjectAndLayout(
       ResourcesContainersList::MakeNewResourcesContainersListForProject(
           project));
 
+  projectScopedContainers.project = &project;
   projectScopedContainers.scopeSceneName = layout.GetName();
 
   return projectScopedContainers;
@@ -43,6 +44,7 @@ ProjectScopedContainers::MakeNewProjectScopedContainersForProject(
       ResourcesContainersList::MakeNewResourcesContainersListForProject(
           project));
 
+  projectScopedContainers.project = &project;
   return projectScopedContainers;
 }
 
@@ -60,6 +62,7 @@ ProjectScopedContainers::MakeNewProjectScopedContainersForEventsFunctionsExtensi
       ResourcesContainersList::MakeNewResourcesContainersListForProject(
           project));
 
+  projectScopedContainers.project = &project;
   return projectScopedContainers;
 };
 
@@ -91,6 +94,7 @@ ProjectScopedContainers::MakeNewProjectScopedContainersForFreeEventsFunction(
               project, eventsFunctionsExtension, eventsFunction,
               parameterResourcesContainer));
 
+  projectScopedContainers.project = &project;
   projectScopedContainers.AddParameters(eventsFunction.GetParametersForEvents(
       eventsFunctionsExtension.GetEventsFunctions()));
 
@@ -133,6 +137,7 @@ ProjectScopedContainers::MakeNewProjectScopedContainersForBehaviorEventsFunction
               eventsFunction, parameterResourcesContainer,
               propertyResourcesContainer));
 
+  projectScopedContainers.project = &project;
   projectScopedContainers.AddPropertiesContainer(
       eventsBasedBehavior.GetSharedPropertyDescriptors());
   projectScopedContainers.AddPropertiesContainer(
@@ -180,6 +185,7 @@ ProjectScopedContainers::MakeNewProjectScopedContainersForObjectEventsFunction(
               eventsFunction, parameterResourcesContainer,
               propertyResourcesContainer));
 
+  projectScopedContainers.project = &project;
   projectScopedContainers.AddPropertiesContainer(
       eventsBasedObject.GetPropertyDescriptors());
   projectScopedContainers.AddParameters(eventsFunction.GetParametersForEvents(
@@ -231,6 +237,7 @@ ProjectScopedContainers::MakeNewProjectScopedContainersForEventsBasedObject(
       ResourcesContainersList::MakeNewResourcesContainersListForProject(
           project));
 
+  projectScopedContainers.project = &project;
   projectScopedContainers.AddPropertiesContainer(
       eventsBasedObject.GetPropertyDescriptors());
 

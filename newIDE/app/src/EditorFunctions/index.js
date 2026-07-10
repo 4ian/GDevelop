@@ -4489,54 +4489,110 @@ const addSceneEvents: EditorFunction = {
       }
 
       try {
-        for (const change of directEventChanges) {
-          addUndeclaredVariables({
-            project,
-            scene,
-            undeclaredVariables: change.undeclaredVariables,
+        const applyDirectEventDependencies = ({
+          targetProject,
+          targetScene,
+        }: {
+          targetProject: gdProject,
+          targetScene: gdLayout,
+        }) => {
+          for (const change of directEventChanges) {
+            addUndeclaredVariables({
+              project: targetProject,
+              scene: targetScene,
+              undeclaredVariables: change.undeclaredVariables,
+            });
+
+            const objectNamesWithUndeclaredVariables = Object.keys(
+              change.undeclaredObjectVariables
+            );
+            for (const objectName of objectNamesWithUndeclaredVariables) {
+              addObjectUndeclaredVariables({
+                project: targetProject,
+                scene: targetScene,
+                objectName,
+                undeclaredVariables:
+                  change.undeclaredObjectVariables[objectName],
+              });
+            }
+
+            const objectNamesWithMissingBehavior = Object.keys(
+              change.missingObjectBehaviors
+            );
+            for (const objectName of objectNamesWithMissingBehavior) {
+              addMissingObjectBehaviors({
+                project: targetProject,
+                scene: targetScene,
+                objectName,
+                missingBehaviors: change.missingObjectBehaviors[objectName],
+              });
+            }
+          }
+        };
+
+        // Validate the complete change, including auto-declared dependencies and
+        // target paths, on a temporary project. A failed event patch must not
+        // leave variables, behaviors, or a partially edited event sheet behind.
+        const validationProject = gd.ProjectHelper.createNewGDJSProject();
+        try {
+          unserializeFromJSObject(
+            validationProject,
+            serializeToJSObject(project)
+          );
+          const validationScene = validationProject.getLayout(sceneName);
+          applyDirectEventDependencies({
+            targetProject: validationProject,
+            targetScene: validationScene,
           });
-
-          const objectNamesWithUndeclaredVariables = Object.keys(
-            change.undeclaredObjectVariables
-          );
-          for (const objectName of objectNamesWithUndeclaredVariables) {
-            const undeclaredVariables =
-              change.undeclaredObjectVariables[objectName];
-            addObjectUndeclaredVariables({
-              project,
-              scene,
-              objectName,
-              undeclaredVariables,
-            });
+          const validationErrors = validateDirectEventChangesBeforeApply({
+            project: validationProject,
+            scene: validationScene,
+            eventChanges: directEventChanges,
+          });
+          if (validationErrors.length > 0) {
+            return {
+              success: false,
+              message:
+                'Events validation failed. No project changes were applied. Fix the event payload and validate it again before writing.',
+              errors: validationErrors,
+            };
           }
-
-          const objectNamesWithMissingBehavior = Object.keys(
-            change.missingObjectBehaviors
+          const simulatedApplication = applyEventsChanges(
+            validationProject,
+            validationScene.getEvents(),
+            directEventChanges,
+            directGeneratedEventId
           );
-          for (const objectName of objectNamesWithMissingBehavior) {
-            const missingBehaviors = change.missingObjectBehaviors[objectName];
-            addMissingObjectBehaviors({
-              project,
-              scene,
-              objectName,
-              missingBehaviors,
-            });
+          if (
+            simulatedApplication.applied === 0 ||
+            simulatedApplication.errors.length > 0
+          ) {
+            return {
+              success: false,
+              message:
+                'Event patch preflight failed. No project changes were applied.',
+              errors: simulatedApplication.errors,
+            };
           }
+        } finally {
+          validationProject.delete();
         }
 
-        const validationErrors = validateDirectEventChangesBeforeApply({
-          project,
-          scene,
-          eventChanges: directEventChanges,
+        const allMissingResources = directEventChanges.flatMap(
+          change => change.missingResources || []
+        );
+        const newlyAddedResources = allMissingResources.length
+          ? (await searchAndInstallResources({
+              resources: allMissingResources,
+            })).results
+          : [];
+
+        applyDirectEventDependencies({
+          targetProject: project,
+          targetScene: scene,
         });
-        if (validationErrors.length > 0) {
-          return {
-            success: false,
-            message:
-              'Events validation failed. Events were not applied. Fix the event JSON and validate it again before writing.',
-            errors: validationErrors,
-          };
-        }
+
+        const eventsBeforeApply = serializeToJSObject(currentSceneEvents);
 
         const { applied, errors, aiGeneratedEventIds } = applyEventsChanges(
           project,
@@ -4545,10 +4601,17 @@ const addSceneEvents: EditorFunction = {
           directGeneratedEventId
         );
 
-        if (applied === 0) {
+        if (applied === 0 || errors.length > 0) {
+          unserializeFromJSObject(
+            currentSceneEvents,
+            eventsBeforeApply,
+            'unserializeFrom',
+            project
+          );
           return {
             success: false,
-            message: 'Events were provided but not applied.',
+            message:
+              'Event patch failed while applying and the event sheet was restored.',
             errors,
           };
         }
@@ -4560,15 +4623,6 @@ const addSceneEvents: EditorFunction = {
         onSceneEventsModifiedOutsideEditor({
           scene,
           newOrChangedAiGeneratedEventIds: new Set(changedAiGeneratedEventIds),
-        });
-
-        const allMissingResources = directEventChanges.flatMap(
-          change => change.missingResources || []
-        );
-        const {
-          results: newlyAddedResources,
-        } = await searchAndInstallResources({
-          resources: allMissingResources,
         });
 
         // Per-operation summary so the receipt is unambiguous: list each

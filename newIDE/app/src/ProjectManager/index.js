@@ -16,6 +16,7 @@ import CreateEventsFunctionExtensionItemDialog, {
   type CreateExtensionItemPayload,
 } from './CreateEventsFunctionExtensionItemDialog';
 import ExtensionFunctionSelectorDialog from '../EventsFunctionsExtensionEditor/ExtensionFunctionSelectorDialog';
+import CreateSceneDialog from './CreateSceneDialog';
 import CreateExternalDialog, {
   type CreateExternalPayload,
 } from './CreateExternalDialog';
@@ -172,6 +173,11 @@ const customObjectsEmptyPlaceholderId = 'custom-objects-placeholder';
 const behaviorsEmptyPlaceholderId = 'behaviors-placeholder';
 const functionsEmptyPlaceholderId = 'functions-placeholder';
 const externalsEmptyPlaceholderId = 'externals-placeholder';
+
+export const getProjectManagerShortcutExtensionGroupId = (
+  rootFolderId: string,
+  eventsFunctionsExtension: gdEventsFunctionsExtension
+): string => `${rootFolderId}-extension-${eventsFunctionsExtension.ptr}`;
 
 /**
  * Given the currently focused editor tab (its kind and the name of the
@@ -610,6 +616,88 @@ class ActionTreeViewItemContent implements TreeViewItemContent {
   }
 }
 
+class ShortcutExtensionGroupTreeViewItemContent implements TreeViewItemContent {
+  rootFolderId: string;
+  eventsFunctionsExtension: gdEventsFunctionsExtension;
+
+  constructor(
+    rootFolderId: string,
+    eventsFunctionsExtension: gdEventsFunctionsExtension
+  ) {
+    this.rootFolderId = rootFolderId;
+    this.eventsFunctionsExtension = eventsFunctionsExtension;
+  }
+
+  getName(): string | React.Node {
+    return this.eventsFunctionsExtension.getName();
+  }
+
+  getId(): string {
+    return getProjectManagerShortcutExtensionGroupId(
+      this.rootFolderId,
+      this.eventsFunctionsExtension
+    );
+  }
+
+  getHtmlId(index: number): ?string {
+    return `extension-group-item-${index}`;
+  }
+
+  getDataSet(): ?HTMLDataset {
+    return {
+      extension: this.eventsFunctionsExtension.getName(),
+    };
+  }
+
+  getThumbnail(): ?string {
+    return (
+      this.eventsFunctionsExtension.getIconUrl() ||
+      'res/functions/extension_black.svg'
+    );
+  }
+
+  onClick(): void {}
+
+  // $FlowFixMe[missing-local-annot]
+  buildMenuTemplate(i18n: I18nType, index: number) {
+    return [];
+  }
+
+  getRightButton(i18n: I18nType): ?MenuButton {
+    return null;
+  }
+
+  renderRightComponent(i18n: I18nType): ?React.Node {
+    return null;
+  }
+
+  rename(newName: string): void {}
+
+  edit(): void {}
+
+  delete(): void {}
+
+  copy(): void {}
+
+  paste(): void {}
+
+  cut(): void {}
+
+  getIndex(): number {
+    return 0;
+  }
+
+  moveAt(destinationIndex: number): void {}
+
+  isDescendantOf(itemContent: TreeViewItemContent): boolean {
+    return itemContent.getId() === this.rootFolderId;
+  }
+
+  getRootId(): string {
+    return '';
+  }
+}
+
 const getTreeViewItemName = (item: TreeViewItem) => item.content.getName();
 const getTreeViewItemId = (item: TreeViewItem) => item.content.getId();
 const getTreeViewItemHtmlId = (item: TreeViewItem, index: number) =>
@@ -669,11 +757,19 @@ const findTreeViewItemById = (
   return null;
 };
 
+export type ProjectManagerCreateItemKind =
+  | 'scene'
+  | 'extension'
+  | 'install-extension'
+  | 'external'
+  | ExtensionItemKind;
+
 export type ProjectManagerInterface = {|
   forceUpdateList: () => void,
   focusSearchBar: () => void,
   selectAndScrollToItemFromId: (itemId: string) => void,
   activateItemFromId: (itemId: string) => void,
+  createProjectItem: (itemKind: ProjectManagerCreateItemKind) => void,
 |};
 
 type Props = {|
@@ -903,6 +999,10 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       editedVariablesLayout,
       setEditedVariablesLayout,
     ] = React.useState<?gdLayout>(null);
+    const [
+      createSceneDialogIndex,
+      setCreateSceneDialogIndex,
+    ] = React.useState<?number>(null);
     const onOpenLayoutProperties = React.useCallback((layout: ?gdLayout) => {
       setEditedPropertiesLayout(layout);
     }, []);
@@ -996,23 +1096,6 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       []
     );
 
-    React.useImperativeHandle(ref, () => ({
-      forceUpdateList: () => {
-        forceUpdate();
-        if (treeViewRef.current) treeViewRef.current.forceUpdateList();
-      },
-      focusSearchBar: () => {
-        if (searchBarRef.current) searchBarRef.current.focus();
-      },
-      selectAndScrollToItemFromId: (itemId: string) => {
-        selectAndScrollToTreeViewItemFromId(itemId);
-      },
-      activateItemFromId: (itemId: string) => {
-        const item = selectAndScrollToTreeViewItemFromId(itemId);
-        if (item) item.content.onClick();
-      },
-    }));
-
     const onProjectItemModified = React.useCallback(
       () => {
         forceUpdate();
@@ -1037,14 +1120,11 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
     );
 
     const addNewScene = React.useCallback(
-      (index: number, i18n: I18nType) => {
+      (index: number, sceneName: string) => {
         if (!project) return;
 
-        const newName = newNameGenerator(i18n._(t`Untitled scene`), name =>
-          project.hasLayoutNamed(name)
-        );
-        const newScene = project.insertNewLayout(newName, index + 1);
-        newScene.setName(newName);
+        const newScene = project.insertNewLayout(sceneName, index + 1);
+        newScene.setName(sceneName);
         newScene.updateBehaviorsSharedData(project);
         addDefaultLightToAllLayers(newScene);
 
@@ -1056,7 +1136,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         if (treeViewRef.current) {
           treeViewRef.current.openItems([sceneItemId, scenesRootFolderId]);
         }
-        // Scroll to the new behavior.
+        // Scroll to the new scene.
         // Ideally, we'd wait for the list to be updated to scroll, but
         // to simplify the code, we just wait a few ms for a new render
         // to be done.
@@ -1064,10 +1144,31 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
           scrollToItem(sceneItemId);
         }, 100); // A few ms is enough for a new render to be done.
 
-        // We focus it so the user can edit the name directly.
-        editName(sceneItemId);
+        onOpenLayout(sceneName, {
+          openEventsEditor: true,
+          openSceneEditor: true,
+          focusWhenOpened: 'scene',
+        });
       },
-      [project, onProjectItemModified, editName, scrollToItem, onSceneAdded]
+      [project, onProjectItemModified, scrollToItem, onSceneAdded, onOpenLayout]
+    );
+
+    const openCreateSceneDialog = React.useCallback((index: number) => {
+      setCreateSceneDialogIndex(index);
+    }, []);
+
+    const closeCreateSceneDialog = React.useCallback(() => {
+      setCreateSceneDialogIndex(null);
+    }, []);
+
+    const onCreateScene = React.useCallback(
+      (sceneName: string) => {
+        if (createSceneDialogIndex === null) return;
+
+        addNewScene(createSceneDialogIndex, sceneName);
+        setCreateSceneDialogIndex(null);
+      },
+      [addNewScene, createSceneDialogIndex]
     );
 
     const onCreateNewExtension = React.useCallback(
@@ -1121,7 +1222,14 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
             eventsFunctionsExtension,
             eventsBasedObject
           );
-          openItems([customObjectsRootFolderId, itemId]);
+          openItems([
+            customObjectsRootFolderId,
+            getProjectManagerShortcutExtensionGroupId(
+              customObjectsRootFolderId,
+              eventsFunctionsExtension
+            ),
+            itemId,
+          ]);
           setTimeout(() => scrollToItem(itemId), 100);
           onOpenCustomObjectEditor(
             eventsFunctionsExtension,
@@ -1145,7 +1253,13 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
             eventsFunctionsExtension,
             eventsBasedBehavior
           );
-          openItems([behaviorsRootFolderId]);
+          openItems([
+            behaviorsRootFolderId,
+            getProjectManagerShortcutExtensionGroupId(
+              behaviorsRootFolderId,
+              eventsFunctionsExtension
+            ),
+          ]);
           setTimeout(() => scrollToItem(itemId), 100);
           onOpenEventsFunctionsExtension(
             eventsFunctionsExtension.getName(),
@@ -1177,7 +1291,13 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
           eventsFunctionsExtension,
           eventsFunction
         );
-        openItems([functionsRootFolderId]);
+        openItems([
+          functionsRootFolderId,
+          getProjectManagerShortcutExtensionGroupId(
+            functionsRootFolderId,
+            eventsFunctionsExtension
+          ),
+        ]);
         setTimeout(() => scrollToItem(itemId), 100);
         onOpenEventsFunctionsExtension(
           eventsFunctionsExtension.getName(),
@@ -1231,15 +1351,11 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
     );
 
     const addExternalEvents = React.useCallback(
-      (index: number, i18n: I18nType, associatedLayoutName: string) => {
+      (index: number, name: string, associatedLayoutName: string) => {
         if (!project) return;
 
-        const newName = newNameGenerator(
-          i18n._(t`Untitled external events`),
-          name => project.hasExternalEventsNamed(name)
-        );
         const newExternalEvents = project.insertNewExternalEvents(
-          newName,
+          name,
           index + 1
         );
         newExternalEvents.setAssociatedLayout(associatedLayoutName);
@@ -1259,22 +1375,17 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
           scrollToItem(externalEventsItemId);
         }, 100); // A few ms is enough for a new render to be done.
 
-        // We focus it so the user can edit the name directly.
-        editName(externalEventsItemId);
+        onOpenExternalEvents(newExternalEvents.getName());
       },
-      [project, onProjectItemModified, editName, scrollToItem]
+      [project, onProjectItemModified, onOpenExternalEvents, scrollToItem]
     );
 
     const addExternalLayout = React.useCallback(
-      (index: number, i18n: I18nType, associatedLayoutName: string) => {
+      (index: number, name: string, associatedLayoutName: string) => {
         if (!project) return;
 
-        const newName = newNameGenerator(
-          i18n._(t`Untitled external layout`),
-          name => project.hasExternalLayoutNamed(name)
-        );
         const newExternalLayout = project.insertNewExternalLayout(
-          newName,
+          name,
           index + 1
         );
         newExternalLayout.setAssociatedLayout(associatedLayoutName);
@@ -1297,20 +1408,19 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
           scrollToItem(externalLayoutItemId);
         }, 100); // A few ms is enough for a new render to be done.
 
-        // We focus it so the user can edit the name directly.
-        editName(externalLayoutItemId);
+        onOpenExternalLayout(newExternalLayout.getName());
       },
       [
         project,
         onProjectItemModified,
-        editName,
+        onOpenExternalLayout,
         scrollToItem,
         onExternalLayoutAdded,
       ]
     );
 
     const onCreateExternal = React.useCallback(
-      (payload: CreateExternalPayload, i18n: I18nType) => {
+      (payload: CreateExternalPayload) => {
         if (!project) return;
 
         setCreateExternalDialogOpen(false);
@@ -1318,7 +1428,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         if (payload.kind === 'external-layout') {
           addExternalLayout(
             project.getExternalLayoutsCount() - 1,
-            i18n,
+            payload.name,
             payload.layoutName
           );
           return;
@@ -1326,11 +1436,72 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
 
         addExternalEvents(
           project.getExternalEventsCount() - 1,
-          i18n,
+          payload.name,
           payload.layoutName
         );
       },
       [addExternalEvents, addExternalLayout, project]
+    );
+
+    const createProjectItem = React.useCallback(
+      (itemKind: ProjectManagerCreateItemKind) => {
+        if (!project) return;
+
+        if (itemKind === 'scene') {
+          openCreateSceneDialog(project.getLayoutsCount() - 1);
+          return;
+        }
+
+        if (itemKind === 'extension') {
+          const i18n = i18nRef.current;
+          if (!i18n) return;
+
+          onCreateNewExtension(project, i18n);
+          return;
+        }
+
+        if (itemKind === 'install-extension') {
+          openSearchExtensionDialog();
+          return;
+        }
+
+        if (itemKind === 'external') {
+          openCreateExternalDialog();
+          return;
+        }
+
+        openCreateExtensionItemDialog(itemKind);
+      },
+      [
+        onCreateNewExtension,
+        openCreateSceneDialog,
+        openCreateExternalDialog,
+        openCreateExtensionItemDialog,
+        openSearchExtensionDialog,
+        project,
+      ]
+    );
+
+    React.useImperativeHandle(
+      ref,
+      () => ({
+        forceUpdateList: () => {
+          forceUpdate();
+          if (treeViewRef.current) treeViewRef.current.forceUpdateList();
+        },
+        focusSearchBar: () => {
+          if (searchBarRef.current) searchBarRef.current.focus();
+        },
+        selectAndScrollToItemFromId: (itemId: string) => {
+          selectAndScrollToTreeViewItemFromId(itemId);
+        },
+        activateItemFromId: (itemId: string) => {
+          const item = selectAndScrollToTreeViewItemFromId(itemId);
+          if (item) item.content.onClick();
+        },
+        createProjectItem,
+      }),
+      [createProjectItem, forceUpdate, selectAndScrollToTreeViewItemFromId]
     );
 
     const onTreeModified = React.useCallback(
@@ -1737,7 +1908,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                     click: () => {
                       // TODO Add after selected scene?
                       const index = project.getLayoutsCount() - 1;
-                      addNewScene(index, i18n);
+                      openCreateSceneDialog(index);
                     },
                     id: 'add-new-scene-button',
                   }
@@ -1791,7 +1962,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                   }
                 ),
                 getChildren(i18n: I18nType): ?Array<TreeViewItem> {
-                  const customObjectItems: Array<TreeViewItem> = [];
+                  const customObjectExtensionItems: Array<TreeViewItem> = [];
                   const eventsFunctionsExtensionsCount = project.getEventsFunctionsExtensionsCount();
                   for (
                     let extensionIndex = 0;
@@ -1801,6 +1972,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                     const eventsFunctionsExtension = project.getEventsFunctionsExtensionAt(
                       extensionIndex
                     );
+                    const customObjectItems: Array<TreeViewItem> = [];
                     const eventsBasedObjects = eventsFunctionsExtension.getEventsBasedObjects();
                     const eventsBasedObjectsCount = eventsBasedObjects.size();
                     for (
@@ -1847,9 +2019,21 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                           : new LeafTreeViewItem(objectItemContent)
                       );
                     }
+
+                    if (customObjectItems.length > 0) {
+                      customObjectExtensionItems.push(
+                        new TreeViewItemWithChildren(
+                          new ShortcutExtensionGroupTreeViewItemContent(
+                            customObjectsRootFolderId,
+                            eventsFunctionsExtension
+                          ),
+                          customObjectItems
+                        )
+                      );
+                    }
                   }
 
-                  if (customObjectItems.length === 0) {
+                  if (customObjectExtensionItems.length === 0) {
                     return [
                       new PlaceHolderTreeViewItem(
                         customObjectsEmptyPlaceholderId,
@@ -1858,7 +2042,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                     ];
                   }
 
-                  return customObjectItems;
+                  return customObjectExtensionItems;
                 },
               },
               {
@@ -1874,7 +2058,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                   }
                 ),
                 getChildren(i18n: I18nType): ?Array<TreeViewItem> {
-                  const behaviorItems: Array<TreeViewItem> = [];
+                  const behaviorExtensionItems: Array<TreeViewItem> = [];
                   const eventsFunctionsExtensionsCount = project.getEventsFunctionsExtensionsCount();
                   for (
                     let extensionIndex = 0;
@@ -1884,6 +2068,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                     const eventsFunctionsExtension = project.getEventsFunctionsExtensionAt(
                       extensionIndex
                     );
+                    const behaviorItems: Array<TreeViewItem> = [];
                     const eventsBasedBehaviors = eventsFunctionsExtension.getEventsBasedBehaviors();
                     const eventsBasedBehaviorsCount = eventsBasedBehaviors.size();
                     for (
@@ -1901,9 +2086,21 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                         )
                       );
                     }
+
+                    if (behaviorItems.length > 0) {
+                      behaviorExtensionItems.push(
+                        new TreeViewItemWithChildren(
+                          new ShortcutExtensionGroupTreeViewItemContent(
+                            behaviorsRootFolderId,
+                            eventsFunctionsExtension
+                          ),
+                          behaviorItems
+                        )
+                      );
+                    }
                   }
 
-                  if (behaviorItems.length === 0) {
+                  if (behaviorExtensionItems.length === 0) {
                     return [
                       new PlaceHolderTreeViewItem(
                         behaviorsEmptyPlaceholderId,
@@ -1912,7 +2109,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                     ];
                   }
 
-                  return behaviorItems;
+                  return behaviorExtensionItems;
                 },
               },
               {
@@ -1928,7 +2125,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                   }
                 ),
                 getChildren(i18n: I18nType): ?Array<TreeViewItem> {
-                  const functionItems: Array<TreeViewItem> = [];
+                  const functionExtensionItems: Array<TreeViewItem> = [];
                   const eventsFunctionsExtensionsCount = project.getEventsFunctionsExtensionsCount();
                   for (
                     let extensionIndex = 0;
@@ -1938,6 +2135,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                     const eventsFunctionsExtension = project.getEventsFunctionsExtensionAt(
                       extensionIndex
                     );
+                    const functionItems: Array<TreeViewItem> = [];
                     const eventsFunctions = enumerateFunctionsInFolder(
                       eventsFunctionsExtension
                         .getEventsFunctions()
@@ -1958,9 +2156,21 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                         )
                       );
                     }
+
+                    if (functionItems.length > 0) {
+                      functionExtensionItems.push(
+                        new TreeViewItemWithChildren(
+                          new ShortcutExtensionGroupTreeViewItemContent(
+                            functionsRootFolderId,
+                            eventsFunctionsExtension
+                          ),
+                          functionItems
+                        )
+                      );
+                    }
                   }
 
-                  if (functionItems.length === 0) {
+                  if (functionExtensionItems.length === 0) {
                     return [
                       new PlaceHolderTreeViewItem(
                         functionsEmptyPlaceholderId,
@@ -1969,7 +2179,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                     ];
                   }
 
-                  return functionItems;
+                  return functionExtensionItems;
                 },
               },
               {
@@ -2025,7 +2235,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
             ];
       },
       [
-        addNewScene,
+        openCreateSceneDialog,
         behaviorShortcutTreeViewItemProps,
         customObjectTreeViewItemProps,
         externalEventsTreeViewItemProps,
@@ -2126,6 +2336,14 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
           );
           const eventsBasedObjects = eventsFunctionsExtension.getEventsBasedObjects();
           const eventsBasedObjectsCount = eventsBasedObjects.size();
+          if (eventsBasedObjectsCount > 0) {
+            nodeIds.push(
+              getProjectManagerShortcutExtensionGroupId(
+                customObjectsRootFolderId,
+                eventsFunctionsExtension
+              )
+            );
+          }
           for (
             let objectIndex = 0;
             objectIndex < eventsBasedObjectsCount;
@@ -2140,6 +2358,28 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                 )
               );
             }
+          }
+
+          if (eventsFunctionsExtension.getEventsBasedBehaviors().size() > 0) {
+            nodeIds.push(
+              getProjectManagerShortcutExtensionGroupId(
+                behaviorsRootFolderId,
+                eventsFunctionsExtension
+              )
+            );
+          }
+
+          if (
+            enumerateFunctionsInFolder(
+              eventsFunctionsExtension.getEventsFunctions().getRootFolder()
+            ).length > 0
+          ) {
+            nodeIds.push(
+              getProjectManagerShortcutExtensionGroupId(
+                functionsRootFolderId,
+                eventsFunctionsExtension
+              )
+            );
           }
         }
 
@@ -2489,11 +2729,18 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                         onCreate={onCreateExtensionItem}
                       />
                     )}
+                    {project && createSceneDialogIndex !== null && (
+                      <CreateSceneDialog
+                        project={project}
+                        onCancel={closeCreateSceneDialog}
+                        onCreate={onCreateScene}
+                      />
+                    )}
                     {project && createExternalDialogOpen && (
                       <CreateExternalDialog
                         project={project}
                         onCancel={() => setCreateExternalDialogOpen(false)}
-                        onCreate={payload => onCreateExternal(payload, i18n)}
+                        onCreate={onCreateExternal}
                       />
                     )}
                     {project && extensionsSearchDialogOpen && (

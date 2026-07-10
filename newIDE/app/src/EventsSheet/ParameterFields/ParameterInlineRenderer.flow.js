@@ -6,6 +6,7 @@ import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/E
 export type InvalidParameterValueProps = {|
   children: React.Node,
   isEmpty?: boolean,
+  errorMessage?: React.Node,
 |};
 
 export type DeprecatedParameterValueProps = {|

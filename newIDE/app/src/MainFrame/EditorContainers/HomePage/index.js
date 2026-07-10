@@ -22,6 +22,7 @@ import { type LearnCategory } from './LearnSection/Utils';
 import PlaySection from './PlaySection';
 import CreateSection from './CreateSection';
 import StoreSection from './StoreSection';
+import BrowserSection from './BrowserSection';
 import { TutorialContext } from '../../../Tutorial/TutorialContext';
 import { ExampleStoreContext } from '../../../AssetStore/ExampleStore/ExampleStoreContext';
 import { HomePageHeader } from './HomePageHeader';
@@ -81,6 +82,8 @@ const getRequestedTab = (routeArguments: RouteArguments): HomeTab | null => {
     return 'play';
   } else if (routeArguments['initial-dialog'] === 'learn') {
     return 'learn';
+  } else if (routeArguments['initial-dialog'] === 'browser') {
+    return 'browser';
   }
 
   return null;
@@ -706,6 +709,7 @@ export const HomePage: React.ComponentType<Props> = React.memo<Props>(
                       getCourseCompletion={getCourseCompletion}
                     />
                   )}
+                  {activeTab === 'browser' && <BrowserSection />}
                   {activeTab === 'team-view' &&
                     (canUseClassroomFeature(limits) ? (
                       <TeamSection

@@ -55,12 +55,20 @@ module.exports = {
             options.onMessage({ id, message });
           });
 
-          newWebSocket.on('close', () => {
+          newWebSocket.on('close', (code, reasonBuffer) => {
+            const reason = reasonBuffer ? reasonBuffer.toString() : '';
             log.info(
               `Debugger connection with id "${id}" closed for window ${windowId}.`
             );
             delete webSockets[id];
-            options.onConnectionClose({ id });
+            options.onConnectionClose({
+              id,
+              code,
+              reason: reason || 'websocket-closed',
+              editorWindowId: windowId,
+              transport: 'websocket',
+              socketState: 'closed',
+            });
           });
 
           newWebSocket.on('error', error => {
@@ -71,7 +79,12 @@ module.exports = {
             options.onConnectionError({ id, errorMessage });
           });
 
-          options.onConnectionOpen({ id });
+          options.onConnectionOpen({
+            id,
+            editorWindowId: windowId,
+            transport: 'websocket',
+            socketState: 'open',
+          });
         });
 
         wsServer.on('listening', () => {

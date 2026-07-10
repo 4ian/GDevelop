@@ -52,7 +52,7 @@ const closeWindow = (externalWindow: any) => {
 
 type Props = {|
   /** Optional role used by the desktop app to apply native window behavior. */
-  role?: 'debugger',
+  role?: 'debugger' | 'browser',
   /** The title of the new window. */
   title: string,
   /** The content to render in the new window. */

@@ -62,6 +62,15 @@ class GD_CORE_API EventsCodeGenerator {
   EventsCodeGenerator(
       const gd::Platform& platform,
       const gd::ProjectScopedContainers& projectScopedContainers_);
+
+  /**
+   * \brief Construct a code generator for the specified project,
+   * objects/groups and platform.
+   */
+  EventsCodeGenerator(
+      const gd::Project& project_,
+      const gd::Platform& platform,
+      const gd::ProjectScopedContainers& projectScopedContainers_);
   virtual ~EventsCodeGenerator() {};
 
   /**
@@ -355,8 +364,13 @@ class GD_CORE_API EventsCodeGenerator {
   bool HasProjectAndLayout() const { return hasProjectAndLayout; }
 
   /**
+   * \brief Return true if the code generation has access to a project.
+   */
+  bool HasProject() const { return project != nullptr; }
+
+  /**
    * \brief Get the project the code is being generated for.
-   * \warning This is only valid if HasProjectAndLayout() is true.
+   * \warning This is only valid if HasProject() is true.
    */
   const gd::Project& GetProject() const { return *project; }
 
@@ -365,6 +379,14 @@ class GD_CORE_API EventsCodeGenerator {
    * \warning This is only valid if HasProjectAndLayout() is true.
    */
   const gd::Layout& GetLayout() const { return *scene; }
+
+  /**
+   * \brief Replace project global config placeholders in a string when the
+   * current context allows it, and add a diagnostic for missing paths.
+   */
+  gd::String ResolveGlobalConfigPlaceholders(
+      const gd::String& plainString,
+      gd::EventsCodeGenerationContext& context);
 
   /**
    * \brief Get the platform the code is being generated for.

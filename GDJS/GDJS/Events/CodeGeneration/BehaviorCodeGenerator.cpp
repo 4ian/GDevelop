@@ -10,33 +10,83 @@
 #include "GDCore/Project/EventsFunctionsExtension.h"
 #include "GDCore/Serialization/Serializer.h"
 #include "GDCore/Serialization/SerializerElement.h"
+#include "GDCore/Tools/Log.h"
 
 namespace gdjs {
 
 namespace {
-bool GetExactGlobalConfigPlaceholderPath(const gd::String& value,
-                                         gd::String& path) {
+gd::String ResolveProjectGlobalConfigPlaceholders(
+    const gd::Project& project,
+    const gd::String& value) {
+  gd::String resolvedValue;
+  gd::String missingPath;
+  if (project.ResolveGlobalConfigPlaceholders(
+          value, resolvedValue, missingPath)) {
+    return resolvedValue;
+  }
+
+  gd::LogError("Global config path \"{{" + missingPath +
+               "}}\" does not exist while generating behavior property code.");
+  return value;
+}
+
+gd::String GenerateEmptyStructureVariableCode() {
+  return "(() => { const variable = new gdjs.Variable(); "
+         "variable.castTo(\"structure\"); return variable; })()";
+}
+
+gd::String GenerateVariableFromValueCode(const gd::String& valueCode,
+                                         const gd::String& propertyName) {
+  return gd::String(R"jscode_template((() => {
+    const variable = new gdjs.Variable();
+    const value = VALUE_CODE;
+    const propertyName = PROPERTY_NAME;
+    const reportInvalidValue = (error) => {
+      if (typeof console !== "undefined" && console.error) {
+        console.error(
+          "Unable to parse JsonObject property " + propertyName +
+            ". Expected a JSON object or array.",
+          value,
+          error
+        );
+      }
+    };
+    if (typeof value === "string") {
+      try {
+        const parsedValue = JSON.parse(value);
+        if (parsedValue === null || typeof parsedValue !== "object") {
+          reportInvalidValue();
+          variable.castTo("structure");
+        } else {
+          variable.fromJSObject(parsedValue);
+        }
+      } catch (error) {
+        reportInvalidValue(error);
+        variable.castTo("structure");
+      }
+    } else if (value === null || typeof value !== "object") {
+      reportInvalidValue();
+      variable.castTo("structure");
+    } else {
+      variable.fromJSObject(value);
+    }
+    return variable;
+  })())jscode_template")
+      .FindAndReplace("VALUE_CODE", valueCode)
+      .FindAndReplace(
+          "PROPERTY_NAME",
+          EventsCodeGenerator::ConvertToStringExplicit(propertyName));
+}
+
+gd::String GenerateVariableFromJsonValueCode(const gd::String& value,
+                                             const gd::String& propertyName) {
   gd::String trimmedValue = value;
-  trimmedValue = trimmedValue.Trim();
-  if (trimmedValue.length() < 5) return false;
-  if (trimmedValue.substr(0, 2) != "{{") return false;
-  if (trimmedValue.substr(trimmedValue.length() - 2) != "}}") return false;
+  if (trimmedValue.Trim().empty()) {
+    return GenerateEmptyStructureVariableCode();
+  }
 
-  path = trimmedValue.substr(2, trimmedValue.length() - 4).Trim();
-  return !path.empty();
-}
-
-bool HasGlobalConfigPlaceholder(const gd::String& value) {
-  return value.find("{{") != std::string::npos &&
-         value.find("}}") != std::string::npos;
-}
-
-gd::String GenerateJsonObjectPropertySchemaArguments(
-    const gd::NamedPropertyDescriptor& property) {
-  return ", " + gdjs::EventsCodeGenerator::ConvertToStringExplicit(
-                    property.GetValue()) +
-         ", " + gdjs::EventsCodeGenerator::ConvertToStringExplicit(
-                    property.GetName());
+  return GenerateVariableFromValueCode(
+      EventsCodeGenerator::ConvertToStringExplicit(value), propertyName);
 }
 }  // namespace
 
@@ -333,7 +383,7 @@ gd::String BehaviorCodeGenerator::GenerateInitializeVariablesCode(
 gd::String BehaviorCodeGenerator::GenerateInitializePropertyFromDataCode(
     const gd::NamedPropertyDescriptor& property) {
   const gd::String defaultValueCode =
-      GeneratePropertyValueCode(property, "instanceContainer.getGame()");
+      GeneratePropertyValueCode(property);
   const gd::String dataValueCode =
       "behaviorData." + property.GetName() +
       " !== undefined ? behaviorData." + property.GetName() + " : " +
@@ -343,14 +393,13 @@ gd::String BehaviorCodeGenerator::GenerateInitializePropertyFromDataCode(
       .FindAndReplace("PROPERTY_NAME", property.GetName())
       .FindAndReplace(
           "RESOLVED_VALUE",
-          GeneratePropertyValueResolutionCode(
-              property, "instanceContainer.getGame()", dataValueCode));
+          GeneratePropertyValueResolutionCode(property, dataValueCode));
 }
 
 gd::String BehaviorCodeGenerator::GenerateInitializeSharedPropertyFromDataCode(
     const gd::NamedPropertyDescriptor& property) {
   const gd::String defaultValueCode =
-      GeneratePropertyValueCode(property, "instanceContainer.getGame()");
+      GeneratePropertyValueCode(property);
   const gd::String dataValueCode =
       "sharedData." + property.GetName() +
       " !== undefined ? sharedData." + property.GetName() + " : " +
@@ -360,8 +409,7 @@ gd::String BehaviorCodeGenerator::GenerateInitializeSharedPropertyFromDataCode(
       .FindAndReplace("PROPERTY_NAME", property.GetName())
       .FindAndReplace(
           "RESOLVED_VALUE",
-          GeneratePropertyValueResolutionCode(
-              property, "instanceContainer.getGame()", dataValueCode));
+          GeneratePropertyValueResolutionCode(property, dataValueCode));
 }
 
 gd::String
@@ -371,8 +419,7 @@ BehaviorCodeGenerator::GenerateInitializePropertyFromDefaultValueCode(
     this._behaviorData.PROPERTY_NAME = DEFAULT_VALUE;)jscode_template")
       .FindAndReplace("PROPERTY_NAME", property.GetName())
       .FindAndReplace("DEFAULT_VALUE",
-                      GeneratePropertyValueCode(property,
-                                                "instanceContainer.getGame()"));
+                      GeneratePropertyValueCode(property));
 }
 
 gd::String
@@ -382,8 +429,7 @@ BehaviorCodeGenerator::GenerateInitializeSharedPropertyFromDefaultValueCode(
     this.PROPERTY_NAME = DEFAULT_VALUE;)jscode_template")
       .FindAndReplace("PROPERTY_NAME", property.GetName())
       .FindAndReplace("DEFAULT_VALUE",
-                      GeneratePropertyValueCode(property,
-                                                "instanceContainer.getGame()"));
+                      GeneratePropertyValueCode(property));
 }
 
 gd::String BehaviorCodeGenerator::GenerateRuntimeBehaviorPropertyTemplateCode(
@@ -402,8 +448,7 @@ gd::String BehaviorCodeGenerator::GenerateRuntimeBehaviorPropertyTemplateCode(
       .FindAndReplace("SETTER_NAME",
                       GetBehaviorPropertySetterName(property.GetName()))
       .FindAndReplace("DEFAULT_VALUE",
-                      GeneratePropertyValueCode(property,
-                                                "this._runtimeScene.getGame()"))
+                      GeneratePropertyValueCode(property))
       .FindAndReplace("RUNTIME_BEHAVIOR_CLASSNAME",
                       eventsBasedBehavior.GetName())
       .FindAndReplace(
@@ -448,7 +493,7 @@ BehaviorCodeGenerator::GenerateRuntimeBehaviorSharedPropertyTemplateCode(
           "SETTER_NAME",
           GetBehaviorSharedPropertySetterInternalName(property.GetName()))
       .FindAndReplace("DEFAULT_VALUE",
-                      GeneratePropertyValueCode(property, "this._runtimeGame"))
+                      GeneratePropertyValueCode(property))
       .FindAndReplace("RUNTIME_BEHAVIOR_CLASSNAME",
                       eventsBasedBehavior.GetName())
       .FindAndReplace(
@@ -469,7 +514,6 @@ gd::String BehaviorCodeGenerator::GenerateUpdatePropertyFromBehaviorDataCode(
     const gd::NamedPropertyDescriptor& property) {
   const gd::String newValueCode = GeneratePropertyValueResolutionCode(
       property,
-      "this._runtimeScene.getGame()",
       "behaviorOverriding." + property.GetName());
   return gd::String(R"jscode_template(
     if (behaviorOverriding.PROPERTY_NAME !== undefined)
@@ -498,16 +542,12 @@ gd::String BehaviorCodeGenerator::GenerateUpdatePropertyFromNetworkSyncDataCode(
   if (property.GetType() == "JsonObject") {
     return gd::String(R"jscode_template(
     if (networkSyncData.props.PROPERTY_NAME !== undefined)
-      this._behaviorData.PROPERTY_NAME = gdjs.evtTools.globalConfig.resolveVariable(this._runtimeScene.getGame(), networkSyncData.props.PROPERTY_NAME, PROPERTY_SCHEMA, PROPERTY_LABEL);)jscode_template")
+      this._behaviorData.PROPERTY_NAME = RESOLVED_VALUE;)jscode_template")
         .FindAndReplace("PROPERTY_NAME", property.GetName())
         .FindAndReplace(
-            "PROPERTY_SCHEMA",
-            gdjs::EventsCodeGenerator::ConvertToStringExplicit(
-                property.GetValue()))
-        .FindAndReplace(
-            "PROPERTY_LABEL",
-            gdjs::EventsCodeGenerator::ConvertToStringExplicit(
-                property.GetName()));
+            "RESOLVED_VALUE",
+            GeneratePropertyValueResolutionCode(
+                property, "networkSyncData.props." + property.GetName()));
   }
 
   return gd::String(R"jscode_template(
@@ -517,63 +557,28 @@ gd::String BehaviorCodeGenerator::GenerateUpdatePropertyFromNetworkSyncDataCode(
 }
 
 gd::String BehaviorCodeGenerator::GeneratePropertyValueCode(
-    const gd::NamedPropertyDescriptor& property,
-    const gd::String& runtimeGameExpression) {
+    const gd::NamedPropertyDescriptor& property) {
 
   const auto &valueType =
       gd::ValueTypeMetadata::ConvertPropertyTypeToValueType(property.GetType());
   const auto &primitiveType =
       gd::ValueTypeMetadata::GetPrimitiveValueType(valueType);
   const bool isJsonObjectProperty = property.GetType() == "JsonObject";
-  gd::String placeholderPath;
-  const bool hasRuntimeGame = !runtimeGameExpression.empty();
-  if (hasRuntimeGame &&
-      GetExactGlobalConfigPlaceholderPath(property.GetValue(),
-                                          placeholderPath)) {
-    const gd::String placeholderPathCode =
-        EventsCodeGenerator::ConvertToStringExplicit(placeholderPath);
-    if (isJsonObjectProperty) {
-      return "gdjs.evtTools.globalConfig.getVariable(" +
-             runtimeGameExpression + ", " + placeholderPathCode +
-             GenerateJsonObjectPropertySchemaArguments(property) + ")";
-    } else if (primitiveType == "string" || valueType == "behavior") {
-      return "gdjs.evtTools.globalConfig.getString(" + runtimeGameExpression +
-             ", " + placeholderPathCode + ")";
-    } else if (primitiveType == "number") {
-      return "gdjs.evtTools.globalConfig.getNumber(" + runtimeGameExpression +
-             ", " + placeholderPathCode + ")";
-    } else if (primitiveType == "boolean") {
-      return "gdjs.evtTools.globalConfig.getBoolean(" + runtimeGameExpression +
-             ", " + placeholderPathCode + ")";
-    }
-  }
+  const gd::String propertyValue =
+      ResolveProjectGlobalConfigPlaceholders(project, property.GetValue());
 
   if (isJsonObjectProperty) {
-    if (hasRuntimeGame) {
-      return "gdjs.evtTools.globalConfig.resolveVariable(" +
-             runtimeGameExpression + ", " +
-             EventsCodeGenerator::ConvertToStringExplicit(
-                 property.GetValue()) +
-             GenerateJsonObjectPropertySchemaArguments(property) + ")";
-    }
-    return "new gdjs.Variable({type: \"structure\", children: []})";
+    return GenerateVariableFromJsonValueCode(propertyValue, property.GetName());
   }
 
   if (primitiveType == "string" || valueType == "behavior") {
-    if (hasRuntimeGame && HasGlobalConfigPlaceholder(property.GetValue())) {
-      return "gdjs.evtTools.globalConfig.resolvePlaceholders(" +
-             runtimeGameExpression + ", " +
-             EventsCodeGenerator::ConvertToStringExplicit(
-                 property.GetValue()) +
-             ")";
-    }
-    return EventsCodeGenerator::ConvertToStringExplicit(property.GetValue());
+    return EventsCodeGenerator::ConvertToStringExplicit(propertyValue);
   } else if (primitiveType == "number") {
     return "Number(" +
-           EventsCodeGenerator::ConvertToStringExplicit(property.GetValue()) +
+           EventsCodeGenerator::ConvertToStringExplicit(propertyValue) +
            ") || 0";
   } else if (primitiveType == "boolean") {  // TODO: Check if working
-    return property.GetValue() == "true" ? "true" : "false";
+    return propertyValue == "true" || propertyValue == "1" ? "true" : "false";
   }
 
   return "0 /* Error: property was of an unrecognized type */";
@@ -581,7 +586,6 @@ gd::String BehaviorCodeGenerator::GeneratePropertyValueCode(
 
 gd::String BehaviorCodeGenerator::GeneratePropertyValueResolutionCode(
     const gd::NamedPropertyDescriptor& property,
-    const gd::String& runtimeGameExpression,
     const gd::String& valueCode) {
   const auto &valueType =
       gd::ValueTypeMetadata::ConvertPropertyTypeToValueType(property.GetType());
@@ -589,18 +593,16 @@ gd::String BehaviorCodeGenerator::GeneratePropertyValueResolutionCode(
       gd::ValueTypeMetadata::GetPrimitiveValueType(valueType);
 
   if (property.GetType() == "JsonObject") {
-    return "gdjs.evtTools.globalConfig.resolveVariable(" +
-           runtimeGameExpression + ", " + valueCode +
-           GenerateJsonObjectPropertySchemaArguments(property) + ")";
+    return GenerateVariableFromValueCode(valueCode, property.GetName());
   } else if (primitiveType == "string" || valueType == "behavior") {
-    return "gdjs.evtTools.globalConfig.resolveString(" +
-           runtimeGameExpression + ", " + valueCode + ")";
+    return "(" + valueCode + " === undefined || " + valueCode +
+           " === null ? \"\" : \"\" + " + valueCode + ")";
   } else if (primitiveType == "number") {
-    return "gdjs.evtTools.globalConfig.resolveNumber(" +
-           runtimeGameExpression + ", " + valueCode + ")";
+    return "(Number(" + valueCode + ") || 0)";
   } else if (primitiveType == "boolean") {
-    return "gdjs.evtTools.globalConfig.resolveBoolean(" +
-           runtimeGameExpression + ", " + valueCode + ")";
+    return "(" + valueCode + " === true || " + valueCode +
+           " === 1 || " + valueCode + " === \"true\" || " + valueCode +
+           " === \"1\")";
   }
 
   return valueCode;

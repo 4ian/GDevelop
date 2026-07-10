@@ -19,6 +19,14 @@ export type ShowConfirmDialogOptions = {|
   title: MessageDescriptor,
   confirmButtonLabel?: MessageDescriptor,
   dismissButtonLabel?: MessageDescriptor,
+  secondaryActionButtonLabel?: MessageDescriptor,
+  secondaryActionButtonColor?:
+    | 'primary'
+    | 'success'
+    | 'danger'
+    | 'premium'
+    | 'ai',
+  onClickSecondaryAction?: () => void,
   message: MessageDescriptor,
   level?: 'info' | 'warning',
   maxWidth?: 'xs' | 'sm' | 'md',

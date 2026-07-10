@@ -60,7 +60,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
                     "res/conditions/depart24.png",
                     "res/conditions/depart.png")
       .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("signalName", _("Signal name"))
+      .AddParameter("string", _("Signal name"))
       .SetRelevantForLayoutEventsOnly()
       .MarkAsSimple();
 
@@ -74,7 +74,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
                  "res/actions/texte.png",
                  "res/actions/texte.png")
       .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("signalName", _("Signal name"))
+      .AddParameter("string", _("Signal name"))
       .AddParameter("string", _("Payload"), "", true)
       .AddCodeOnlyParameter("signalSenderObjectsContext", "")
       .MarkAsSimple();
@@ -90,7 +90,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
                  "res/actions/texte.png")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("string", _("Object name"))
-      .AddParameter("signalName", _("Signal name"))
+      .AddParameter("string", _("Signal name"))
       .AddParameter("string", _("Payload"), "", true)
       .AddCodeOnlyParameter("signalSenderObjectsContext", "")
       .SetHidden()
@@ -108,7 +108,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
                  "res/actions/texte.png")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("expression", _("Instance id"))
-      .AddParameter("signalName", _("Signal name"))
+      .AddParameter("string", _("Signal name"))
       .AddParameter("string", _("Payload"), "", true)
       .AddCodeOnlyParameter("signalSenderObjectsContext", "")
       .MarkAsAdvanced();
@@ -125,7 +125,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
                  "res/actions/texte.png")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("objectList", _("Objects"))
-      .AddParameter("signalName", _("Signal name"))
+      .AddParameter("string", _("Signal name"))
       .AddParameter("string", _("Payload"), "", true)
       .AddCodeOnlyParameter("signalSenderObjectsContext", "")
       .MarkAsSimple();
@@ -142,7 +142,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
                  "res/actions/texte.png")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("string", _("Object group name"))
-      .AddParameter("signalName", _("Signal name"))
+      .AddParameter("string", _("Signal name"))
       .AddParameter("string", _("Payload"), "", true)
       .AddCodeOnlyParameter("signalSenderObjectsContext", "")
       .SetHidden()

@@ -532,7 +532,7 @@ custom objects remains an internal lifecycle parameter. The editor shows the
 signal data parameters:
 
 ```text
-SignalName          signalName  The delivered signal name.
+SignalName          string      The delivered signal name.
 Payload             string      The delivered payload text.
 ```
 
@@ -644,11 +644,10 @@ Lifecycle
 
 ### 9.5 Signal name input
 
-Signal names are entered through a single dedicated `signalName` parameter type,
-shared by every emit action, the "Signal received" condition, and the scene-only
-`SignalName()` expression. Routing all names through one type gives consistent
-autocomplete across the project and a single point that a discovery UI attaches
-to.
+Signal names are entered through the normal `string` parameter type, shared by
+every emit action, the "Signal received" condition, and the scene-only
+`SignalName()` expression. This keeps signal names on the standard text editor
+surface.
 
 ---
 
@@ -779,7 +778,7 @@ Signal handling touches editor-time code generation and runtime tooling.
 
 - A signal lifecycle function kind for events-based objects.
 - Metadata for the signal actions, condition and expressions.
-- The `signalName` parameter type (§9.6).
+- Signal name parameters use the normal `string` type (§9.5).
 
 `onSignal` is recognized as a reserved lifecycle name by the same predicates that
 recognize `doStepPostEvents` / `onCreated` / `onDestroy`
@@ -1048,11 +1047,11 @@ Within one delivered signal, receivers run in a fixed order:
 Object handlers run before scene conditions. Scene conditions run last, in sheet
 order. Determinism is a hard requirement (section 2.5).
 
-### 14.3 Signal names — free strings through one parameter type
+### 14.3 Signal names — free strings
 
-Signal names are free strings, entered through the single `signalName` parameter
-type (§9.6). This gives consistent autocomplete and a single attachment point for
-project-wide name discovery, without constraining authors to a fixed list.
+Signal names are free strings, entered through normal `string` parameters
+(§9.5). This keeps authoring flexible without constraining authors to a fixed
+list.
 
 ### 14.4 Payload input - an optional string parameter
 
@@ -1133,7 +1132,7 @@ lifecycle handlers, and the scene "Signal received" condition.
 - "Signal received" condition (§9.2, §11.3).
 - `SignalName` / `SignalPayload` / `SignalSenderObjectName`
   / `SignalSenderInstanceId` expressions (§9.3).
-- `signalName` parameter type (§9.6).
+- Signal name parameters use the normal `string` type (§9.5).
 
 ### 15.3 onSignal lifecycle
 

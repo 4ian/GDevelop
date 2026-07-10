@@ -5,6 +5,7 @@ import { type State } from './MainFrameState';
 import './MainFrame.css';
 import Snackbar from '@material-ui/core/Snackbar';
 import HomeIcon from '../UI/CustomSvgIcons/Home';
+import AddCircleIcon from '../UI/CustomSvgIcons/AddCircle';
 import AddCommentIcon from '../UI/CustomSvgIcons/AddComment';
 import DebuggerIcon from '../UI/CustomSvgIcons/Debug';
 import ProjectResourcesIcon from '../UI/CustomSvgIcons/ProjectResources';
@@ -21,12 +22,15 @@ import ExternalEventsIcon from '../UI/CustomSvgIcons/ExternalEvents';
 import ExternalLayoutIcon from '../UI/CustomSvgIcons/ExternalLayout';
 import ExtensionIcon from '../UI/CustomSvgIcons/Extension';
 import SearchIcon from '../UI/CustomSvgIcons/Search';
+import SparkleIcon from '../UI/CustomSvgIcons/Sparkle';
+import PlayIcon from '../UI/CustomSvgIcons/Play';
 import ProjectTitlebar from './ProjectTitlebar';
 import StickyNotes, { type StickyNotesInterface } from './StickyNotes';
 import PreferencesDialog from './Preferences/PreferencesDialog';
 import AboutDialog from './AboutDialog';
 import ProjectManager, {
   type ProjectManagerInterface,
+  type ProjectManagerCreateItemKind,
   getProjectManagerItemId,
   getProjectManagerTreeViewItemIdForEditorTab,
   globalVariablesItemId,
@@ -49,6 +53,7 @@ import PoppedOutWindows from './PoppedOutWindows';
 import RecentEditorSwitcher, {
   type RecentEditorSwitcherEntry,
   type RecentEditorSwitcherSideMenuItem,
+  type RecentEditorSwitcherActionItem,
 } from './RecentEditorSwitcher';
 import {
   getEditorTabsInitialState,
@@ -111,6 +116,7 @@ import { type EditorCallbacks } from '../EditorFunctions';
 import { renderResourcesEditorContainer } from './EditorContainers/ResourcesEditorContainer';
 import { renderGlobalConfigEditorContainer } from './EditorContainers/GlobalConfigEditorContainer';
 import { renderGlobalEventsSearchEditorContainer } from './EditorContainers/GlobalEventsSearchEditorContainer';
+import { getProjectRootPath } from '../ResourcesEditor/ProjectFilesPanel';
 import {
   type RenderEditorContainerPropsWithRef,
   type SceneEventsOutsideEditorChanges,
@@ -257,6 +263,7 @@ import { ProjectManagerDrawer } from '../ProjectManager/ProjectManagerDrawer';
 import DiagnosticReportDialog from '../ExportAndShare/DiagnosticReportDialog';
 import MemoryTrackedRegistryDialog from './MemoryTrackedRegistryDialog';
 import { scanProjectForValidationErrors } from '../Utils/EventsValidationScanner';
+import { hasInvalidGlobalConfigPlaceholderValidationError } from '../Utils/GlobalConfigPlaceholderDiagnostics';
 import { useMultiplayerLobbyConfigurator } from './UseMultiplayerLobbyConfigurator';
 import { useAuthenticatedPlayer } from './UseAuthenticatedPlayer';
 import ListIcon from '../UI/ListIcon';
@@ -273,9 +280,7 @@ import {
   setEditorHotReloadNeeded,
   isEditorHotReloadNeeded,
 } from '../EmbeddedGame/EmbeddedGameFrame';
-import {
-  useActiveEmbeddedGameFrameHoleCount,
-} from '../EmbeddedGame/EmbeddedGameFrameHole';
+import { useActiveEmbeddedGameFrameHoleCount } from '../EmbeddedGame/EmbeddedGameFrameHole';
 import useHomePageSwitch from './useHomePageSwitch';
 import { useNavigationToEvent } from './UseNavigationToEvent';
 import useNavigateFromGlobalSearch from './UseNavigateFromGlobalSearch';
@@ -316,6 +321,12 @@ const ipcRendererForUpdates = ipcRenderer;
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
 const gd: libGDevelop = global.gd;
+
+type ResourceToolLauncherKind =
+  | 'image-extender'
+  | 'ai-game-workbench'
+  | 'gorest-spritesheet'
+  | 'advanced-tween-editor';
 
 const editorKindToRenderer: {
   [key: EditorKind]: (props: RenderEditorContainerPropsWithRef) => React.Node,
@@ -498,6 +509,8 @@ export type Props = {|
   onExportHtml5External?: (project: gdProject, i18n: I18n) => Promise<void>,
 |};
 
+const saveProjectStaleTimeoutMs = 5 * 60 * 1000;
+
 const MainFrame = (props: Props): React.MixedElement => {
   const preferences = React.useContext(PreferencesContext);
   const {
@@ -607,6 +620,8 @@ const MainFrame = (props: Props): React.MixedElement => {
   const saveProjectRef = React.useRef<?(options?: {|
     skipNewVersionWarning: boolean,
   |}) => Promise<?FileMetadata>>(null);
+  const isSavingProjectRef = React.useRef<boolean>(false);
+  const saveProjectStartedAtRef = React.useRef<?number>(null);
   const shortcutMap = useShortcutMap();
   const [
     diagnosticReportDialogOpen,
@@ -642,6 +657,9 @@ const MainFrame = (props: Props): React.MixedElement => {
         const unconditionedActionErrors = validationErrors.filter(
           error => error.type === 'unconditioned-action'
         );
+        const mustBlockForInvalidGlobalConfigPlaceholder = hasInvalidGlobalConfigPlaceholderValidationError(
+          validationErrors
+        );
         const mustBlockForUnsafeExternalLayoutCreation =
           unsafeExternalLayoutCreationErrors.length > 0;
         const mustBlockForAmbiguousObjectPicking =
@@ -649,9 +667,15 @@ const MainFrame = (props: Props): React.MixedElement => {
         const mustBlockForUnconditionedActions =
           unconditionedActionErrors.length > 0;
         const mustBlockForSpecificValidationErrors =
+          mustBlockForInvalidGlobalConfigPlaceholder ||
           mustBlockForUnsafeExternalLayoutCreation ||
           mustBlockForAmbiguousObjectPicking ||
           mustBlockForUnconditionedActions;
+
+        if (mustBlockForInvalidGlobalConfigPlaceholder) {
+          setDiagnosticReportDialogOpen(true);
+          return true;
+        }
 
         if (
           mustBlockForSpecificValidationErrors ||
@@ -683,16 +707,26 @@ const MainFrame = (props: Props): React.MixedElement => {
             : t`Your project has ${
                 validationErrors.length
               } diagnostic error(s). Please fix them before exporting.`;
+          let shouldIgnoreDiagnosticErrors = false;
           const openReport = await showConfirmation({
             title,
             message,
             dismissButtonLabel: t`Close`,
             confirmButtonLabel: t`Open report`,
+            ...(actionType === 'preview'
+              ? {
+                  secondaryActionButtonLabel: t`Ignore and run`,
+                  secondaryActionButtonColor: 'danger',
+                  onClickSecondaryAction: () => {
+                    shouldIgnoreDiagnosticErrors = true;
+                  },
+                }
+              : {}),
           });
           if (openReport) {
             setDiagnosticReportDialogOpen(true);
           }
-          return true;
+          return !shouldIgnoreDiagnosticErrors;
         }
       } catch (error) {
         console.error('Error scanning project for validation errors:', error);
@@ -760,6 +794,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     clearEditorHotReloadLogs,
     clearEditorUncaughtError,
     hardReloadAllPreviews,
+    clearPreviewDebuggerStatuses,
   } = usePreviewDebuggerServerWatcher(previewDebuggerServer);
   const {
     ensureInteractionHappened,
@@ -780,7 +815,49 @@ const MainFrame = (props: Props): React.MixedElement => {
     hasUnsavedChanges,
     sealUnsavedChanges,
     triggerUnsavedChanges,
+    getChangesCount,
+    getTimeOfFirstChangeSinceLastSave,
   } = unsavedChanges;
+
+  const setSavingProjectInProgress = React.useCallback((isSaving: boolean) => {
+    isSavingProjectRef.current = isSaving;
+    saveProjectStartedAtRef.current = isSaving ? Date.now() : null;
+    setIsSavingProject(isSaving);
+  }, []);
+
+  const isSaveProjectInProgress = React.useCallback(
+    (): boolean => {
+      if (!isSavingProjectRef.current) return false;
+
+      const saveProjectStartedAt = saveProjectStartedAtRef.current;
+      if (
+        saveProjectStartedAt &&
+        Date.now() - saveProjectStartedAt > saveProjectStaleTimeoutMs
+      ) {
+        console.warn(
+          'Project save state was still active after the stale timeout. Resetting the save guard so saving can be retried.'
+        );
+        setSavingProjectInProgress(false);
+        return false;
+      }
+
+      return true;
+    },
+    [setSavingProjectInProgress]
+  );
+
+  React.useEffect(
+    () => {
+      if (!isSavingProject) return;
+
+      const intervalId = setInterval(() => {
+        isSaveProjectInProgress();
+      }, 10000);
+
+      return () => clearInterval(intervalId);
+    },
+    [isSavingProject, isSaveProjectInProgress]
+  );
   const {
     currentlyRunningInAppTutorial,
     getInAppTutorialShortHeader,
@@ -823,8 +900,7 @@ const MainFrame = (props: Props): React.MixedElement => {
   const [gameEditorMode, setGameEditorMode] = React.useState<
     'embedded-game' | 'instances-editor'
   >('instances-editor');
-  const activeEmbeddedGameFrameHoleCount =
-    useActiveEmbeddedGameFrameHoleCount();
+  const activeEmbeddedGameFrameHoleCount = useActiveEmbeddedGameFrameHoleCount();
 
   // This is just for testing, to check if we're getting the right state
   // and gives us an idea about the number of re-renders.
@@ -896,6 +972,16 @@ const MainFrame = (props: Props): React.MixedElement => {
   });
 
   const gamesList = useGamesList();
+  const markGameAsSavedIfRelevant = React.useCallback(
+    (gameId: string) => {
+      // The project is already saved on disk when this is called. Do not block
+      // the save UI on an optional online status update.
+      gamesList.markGameAsSavedIfRelevant(gameId).catch(error => {
+        console.error('Error while marking game as saved:', error);
+      });
+    },
+    [gamesList]
+  );
 
   const {
     createCaptureOptionsForPreview,
@@ -1076,8 +1162,21 @@ const MainFrame = (props: Props): React.MixedElement => {
     () => {
       if (!ipcRenderer) return;
 
-      const onPreviewWindowClosed = () => {
-        if (!hasNonEditionPreviewsRunning) {
+      const onPreviewWindowClosed = (
+        event: any,
+        {
+          remainingPreviewWindowsForParent,
+        }: { remainingPreviewWindowsForParent?: number } = {}
+      ) => {
+        const isLastPreviewWindowClosed =
+          remainingPreviewWindowsForParent === 0;
+        if (isLastPreviewWindowClosed) {
+          if (previewDebuggerServer) {
+            previewDebuggerServer.closeAllPreviewConnections();
+          }
+          clearPreviewDebuggerStatuses();
+        }
+        if (isLastPreviewWindowClosed || !hasNonEditionPreviewsRunning) {
           cancelPendingPreviewLaunchAfterWindowClosed(
             'a preview window was closed'
           );
@@ -1096,8 +1195,10 @@ const MainFrame = (props: Props): React.MixedElement => {
     },
     [
       cancelPendingPreviewLaunchAfterWindowClosed,
+      clearPreviewDebuggerStatuses,
       hasNonEditionPreviewsRunning,
       healMainWindowAfterPopOutClose,
+      previewDebuggerServer,
     ]
   );
 
@@ -2112,6 +2213,22 @@ const MainFrame = (props: Props): React.MixedElement => {
     []
   );
 
+  const createProjectItemFromSwitcher = React.useCallback(
+    (itemKind: ProjectManagerCreateItemKind) => {
+      const projectManager = projectManagerRef.current;
+      if (projectManager) {
+        projectManager.createProjectItem(itemKind);
+        return;
+      }
+
+      setTimeout(() => {
+        const projectManager = projectManagerRef.current;
+        if (projectManager) projectManager.createProjectItem(itemKind);
+      }, 0);
+    },
+    []
+  );
+
   const isProjectManagerVisible =
     projectManagerOpen || isProjectManagerPinnedForCurrentProject;
 
@@ -2217,6 +2334,15 @@ const MainFrame = (props: Props): React.MixedElement => {
 
   const activateRecentEditorSwitcherSideMenuItem = React.useCallback(
     (item: RecentEditorSwitcherSideMenuItem) => {
+      setRecentEditorSwitcherOpen(false);
+      recordRecentNavigationEntry(item.id);
+      item.activate();
+    },
+    [recordRecentNavigationEntry]
+  );
+
+  const activateRecentEditorSwitcherActionItem = React.useCallback(
+    (item: RecentEditorSwitcherActionItem) => {
       setRecentEditorSwitcherOpen(false);
       recordRecentNavigationEntry(item.id);
       item.activate();
@@ -3088,6 +3214,10 @@ const MainFrame = (props: Props): React.MixedElement => {
     async (): Promise<?FileMetadata> => {
       if (!currentProject || !currentFileMetadata) return null;
 
+      if (!hasUnsavedChanges) {
+        return currentFileMetadata;
+      }
+
       if (saveProjectRef.current) {
         // Use the normal save path so preview persists the project file.
         return (await saveProjectRef.current()) || null;
@@ -3118,6 +3248,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       _showSnackMessage,
       currentProject,
       currentFileMetadata,
+      hasUnsavedChanges,
       getStorageProviderOperations,
     ]
   );
@@ -3202,7 +3333,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       previewLaunchInProgressRef.current = true;
       previewLaunchPhaseRef.current = 'preparing';
       try {
-        if (!skipDiagnosticErrorBlocking) {
+        if (!isForInGameEdition && !skipDiagnosticErrorBlocking) {
           const shouldBlockPreview = await checkDiagnosticErrorsAndIfShouldBlock(
             currentProject,
             'preview'
@@ -3995,6 +4126,82 @@ const MainFrame = (props: Props): React.MixedElement => {
       }));
     },
     [getEditorOpeningOptions, setState]
+  );
+
+  const openResourceToolFromSwitcher = React.useCallback(
+    (tool: ResourceToolLauncherKind) => {
+      const { i18n } = props;
+
+      const openTool = async () => {
+        if (!ipcRenderer) {
+          showErrorBox({
+            message: i18n._(
+              t`This resource tool is only available in the desktop app.`
+            ),
+            rawError: new Error('Electron IPC renderer is not available.'),
+            errorId: 'resource-tool-desktop-only',
+            doNotReport: true,
+          });
+          return;
+        }
+
+        try {
+          if (tool === 'image-extender') {
+            await ipcRenderer.invoke('image-extender-load');
+            return;
+          }
+
+          if (tool === 'ai-game-workbench') {
+            await ipcRenderer.invoke('ai-game-workbench-load');
+            return;
+          }
+
+          if (tool === 'gorest-spritesheet') {
+            await ipcRenderer.invoke('gorest-spritesheet-load');
+            return;
+          }
+
+          const project = currentProjectRef.current;
+          if (!project) {
+            showErrorBox({
+              message: i18n._(t`Open a project before using this tool.`),
+              rawError: new Error('No project is open.'),
+              errorId: 'resource-tool-no-project',
+              doNotReport: true,
+            });
+            return;
+          }
+
+          const projectRootPath = getProjectRootPath(project);
+          if (!projectRootPath) {
+            showErrorBox({
+              message: i18n._(
+                t`Save the project before opening AdvancedTween Editor.`
+              ),
+              rawError: new Error('The project has no local root path.'),
+              errorId: 'advanced-tween-editor-project-not-saved',
+              doNotReport: true,
+            });
+            return;
+          }
+
+          await ipcRenderer.invoke('advanced-tween-editor-load', {
+            projectRootPath,
+            gameResolutionWidth: project.getGameResolutionWidth(),
+            gameResolutionHeight: project.getGameResolutionHeight(),
+          });
+        } catch (error) {
+          showErrorBox({
+            message: i18n._(t`Unable to open this resource tool.`),
+            rawError: error,
+            errorId: `resource-tool-${tool}-open-error`,
+          });
+        }
+      };
+
+      openTool();
+    },
+    [currentProjectRef, props]
   );
 
   const openStickyNotesManager = React.useCallback(
@@ -5445,7 +5652,7 @@ const MainFrame = (props: Props): React.MixedElement => {
 
       // Protect against concurrent saves, which can trigger issues with the
       // file system.
-      if (isSavingProject) {
+      if (isSaveProjectInProgress()) {
         console.info('Project is already being saved, not triggering save.');
         return;
       }
@@ -5475,7 +5682,7 @@ const MainFrame = (props: Props): React.MixedElement => {
         return;
       }
 
-      setIsSavingProject(true);
+      setSavingProjectInProgress(true);
 
       // At the end of the promise below, currentProject and storageProvider
       // may have changed (if the user opened another project). So we read and
@@ -5583,7 +5790,7 @@ const MainFrame = (props: Props): React.MixedElement => {
         }
 
         if (fileMetadata.gameId) {
-          await gamesList.markGameAsSavedIfRelevant(fileMetadata.gameId);
+          markGameAsSavedIfRelevant(fileMetadata.gameId);
         }
 
         // Save was done on a new file/location, so save it in the
@@ -5637,12 +5844,13 @@ const MainFrame = (props: Props): React.MixedElement => {
           errorId: 'project-save-as-error',
         });
       } finally {
-        setIsSavingProject(false);
+        setSavingProjectInProgress(false);
       }
     },
     [
       i18n,
-      isSavingProject,
+      isSaveProjectInProgress,
+      setSavingProjectInProgress,
       currentProject,
       currentProjectRef,
       currentFileMetadata,
@@ -5659,7 +5867,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       currentlyRunningInAppTutorial,
       showAlert,
       showConfirmation,
-      gamesList,
+      markGameAsSavedIfRelevant,
       hasExtensionLoadErrors,
     ]
   );
@@ -5739,7 +5947,7 @@ const MainFrame = (props: Props): React.MixedElement => {
 
       // Protect against concurrent saves, which can trigger issues with the
       // file system.
-      if (isSavingProject) {
+      if (isSaveProjectInProgress()) {
         console.info('Project is already being saved, not triggering save.');
         return;
       }
@@ -5753,7 +5961,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       }
 
       _showSnackMessage(i18n._(t`Saving...`), null);
-      setIsSavingProject(true);
+      setSavingProjectInProgress(true);
 
       try {
         const saveStartTime = performance.now();
@@ -5797,7 +6005,7 @@ const MainFrame = (props: Props): React.MixedElement => {
           // If project was saved, and a game is registered, ensure the game is
           // marked as saved.
           if (fileMetadata.gameId) {
-            await gamesList.markGameAsSavedIfRelevant(fileMetadata.gameId);
+            markGameAsSavedIfRelevant(fileMetadata.gameId);
           }
 
           setCloudProjectSaveChoiceOpen(false);
@@ -5855,12 +6063,13 @@ const MainFrame = (props: Props): React.MixedElement => {
         });
         _closeSnackMessage();
       } finally {
-        setIsSavingProject(false);
+        setSavingProjectInProgress(false);
       }
     },
     [
       saveWithBackgroundSerializer,
-      isSavingProject,
+      isSaveProjectInProgress,
+      setSavingProjectInProgress,
       currentProject,
       currentProjectRef,
       currentFileMetadata,
@@ -5882,7 +6091,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       showAlert,
       showConfirmation,
       checkedOutVersionStatus,
-      gamesList,
+      markGameAsSavedIfRelevant,
       hasExtensionLoadErrors,
     ]
   );
@@ -6347,6 +6556,24 @@ const MainFrame = (props: Props): React.MixedElement => {
       activate,
     });
   };
+  const recentEditorSwitcherActionItems: Array<RecentEditorSwitcherActionItem> = [];
+  const addRecentEditorSwitcherActionItem = (
+    id: string,
+    title: string,
+    subtitle: string,
+    icon: ?React.Node,
+    searchTerms: string,
+    activate: () => void
+  ) => {
+    recentEditorSwitcherActionItems.push({
+      id,
+      title,
+      subtitle,
+      icon,
+      searchTerms,
+      activate,
+    });
+  };
 
   addRecentEditorSwitcherSideMenuItem(
     'project-manager',
@@ -6369,8 +6596,121 @@ const MainFrame = (props: Props): React.MixedElement => {
     <RobotIcon size={16} />,
     () => openAskAi(null)
   );
+  addRecentEditorSwitcherSideMenuItem(
+    'preferences',
+    i18n._(t`Preferences`),
+    i18n._(t`Window`),
+    <SettingsIcon />,
+    () => openPreferencesDialog(true)
+  );
+
+  addRecentEditorSwitcherActionItem(
+    'action:create-new-game',
+    i18n._(t`Create new game`),
+    i18n._(t`Project action`),
+    <AddCircleIcon />,
+    'new game create game create project new project',
+    () => setNewProjectSetupDialogOpen(true)
+  );
 
   if (currentProject) {
+    addRecentEditorSwitcherActionItem(
+      'action:create-scene',
+      i18n._(t`Create a scene`),
+      i18n._(t`Project action`),
+      <SceneIcon />,
+      'new scene add scene layout level',
+      () => createProjectItemFromSwitcher('scene')
+    );
+    addRecentEditorSwitcherActionItem(
+      'action:create-prefab',
+      i18n._(t`Create a prefab`),
+      i18n._(t`Project action`),
+      <ObjectIcon />,
+      'new prefab add prefab custom object events based object',
+      () => createProjectItemFromSwitcher('prefab')
+    );
+    addRecentEditorSwitcherActionItem(
+      'action:create-behavior',
+      i18n._(t`Create a behavior`),
+      i18n._(t`Project action`),
+      <BehaviorIcon />,
+      'new behavior add behavior events based behavior',
+      () => createProjectItemFromSwitcher('behavior')
+    );
+    addRecentEditorSwitcherActionItem(
+      'action:create-function',
+      i18n._(t`Create a function`),
+      i18n._(t`Project action`),
+      <SettingsIcon />,
+      'new function add function action condition expression extension function',
+      () => createProjectItemFromSwitcher('function')
+    );
+    addRecentEditorSwitcherActionItem(
+      'action:install-extension',
+      i18n._(t`Install extension`),
+      i18n._(t`Project action`),
+      <ExtensionIcon />,
+      'search import install add extension behavior object function store',
+      () => createProjectItemFromSwitcher('install-extension')
+    );
+    addRecentEditorSwitcherActionItem(
+      'action:create-note',
+      i18n._(t`Create a note`),
+      i18n._(t`Project action`),
+      <AddCommentIcon />,
+      'new note create note sticky note comment',
+      createStickyNoteFromTitlebar
+    );
+    addRecentEditorSwitcherActionItem(
+      'action:create-external',
+      i18n._(t`Create external events/layout`),
+      i18n._(t`Project action`),
+      <ExternalEventsIcon />,
+      'new external add external events external layout linked scene',
+      () => createProjectItemFromSwitcher('external')
+    );
+    addRecentEditorSwitcherActionItem(
+      'action:open-image-extender',
+      i18n._(t`Open Image Extender`),
+      i18n._(t`Resource tool`),
+      <SparkleIcon />,
+      'open image extender resource tool ai image expand',
+      () => {
+        openResourceToolFromSwitcher('image-extender');
+      }
+    );
+    addRecentEditorSwitcherActionItem(
+      'action:open-ai-game-workbench',
+      i18n._(t`Open AI Game Workbench`),
+      i18n._(t`Resource tool`),
+      <SparkleIcon />,
+      'open ai game workbench resource tool image character extension',
+      () => {
+        openResourceToolFromSwitcher('ai-game-workbench');
+      }
+    );
+    addRecentEditorSwitcherActionItem(
+      'action:open-gorest-spritesheet',
+      i18n._(t`Open Gorest Spritesheet`),
+      i18n._(t`Resource tool`),
+      <SparkleIcon />,
+      'open gorest spritesheet resource tool image animation spritesheet',
+      () => {
+        openResourceToolFromSwitcher('gorest-spritesheet');
+      }
+    );
+    addRecentEditorSwitcherActionItem(
+      'action:open-advanced-tween-editor',
+      i18n._(t`Open AdvancedTween Editor`),
+      i18n._(t`Resource tool`),
+      <PlayIcon />,
+      'open advanced tween editor resource tool animation tween',
+      () => {
+        openResourceToolFromSwitcher('advanced-tween-editor');
+      }
+    );
+
     addRecentEditorSwitcherSideMenuItem(
       gamePropertiesItemId,
       i18n._(t`Properties & Icons`),
@@ -6969,6 +7309,11 @@ const MainFrame = (props: Props): React.MixedElement => {
         launchPreviewForScene: (sceneName: ?string) =>
           launchPreviewForScene(sceneName),
         saveProjectAndWait: () => saveProject(),
+        getPersistenceState: () => ({
+          hasUnsavedChanges: getChangesCount() > 0,
+          changesCount: getChangesCount(),
+          timeOfFirstChangeSinceLastSave: getTimeOfFirstChangeSinceLastSave(),
+        }),
         getEditorSelection: getMcpEditorSelection,
         getPreviewDebuggerServer: () =>
           _previewLauncher.current
@@ -6977,7 +7322,7 @@ const MainFrame = (props: Props): React.MixedElement => {
         closeAllPreviews: () => {
           const previewLauncher = _previewLauncher.current;
           if (previewLauncher && previewLauncher.closeAllPreviews) {
-            previewLauncher.closeAllPreviews();
+            return previewLauncher.closeAllPreviews();
           }
         },
         focusAllPreviews: () => {
@@ -7014,6 +7359,8 @@ const MainFrame = (props: Props): React.MixedElement => {
       i18n,
       mcpEditorCallbacks,
       triggerUnsavedChanges,
+      getChangesCount,
+      getTimeOfFirstChangeSinceLastSave,
       saveProject,
       launchPreviewForScene,
       getMcpEditorSelection,
@@ -7389,6 +7736,9 @@ const MainFrame = (props: Props): React.MixedElement => {
             onExport: () => {
               openShareDialog('publish');
             },
+            onInvalidGlobalConfigPlaceholder: () => {
+              setDiagnosticReportDialogOpen(true);
+            },
             onCaptureFinished,
           },
           (previewLauncher: ?PreviewLauncherInterface) => {
@@ -7592,12 +7942,14 @@ const MainFrame = (props: Props): React.MixedElement => {
         open={recentEditorSwitcherOpen}
         editorTabs={state.editorTabs}
         sideMenuItems={recentEditorSwitcherSideMenuItems}
+        actionItems={recentEditorSwitcherActionItems}
         recentNavigationEntryIds={recentNavigationEntryIds}
         recentNavigationEntryUseCounts={recentNavigationEntryUseCounts}
         shortcut={shortcutMap['OPEN_RECENT_EDITOR']}
         onClose={() => setRecentEditorSwitcherOpen(false)}
         onActivate={activateRecentEditorSwitcherEntry}
         onActivateSideMenuItem={activateRecentEditorSwitcherSideMenuItem}
+        onActivateActionItem={activateRecentEditorSwitcherActionItem}
       />
       <LoaderModal
         showImmediately={showLoaderImmediately}

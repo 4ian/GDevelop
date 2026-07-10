@@ -6,7 +6,7 @@ const onSignalFunctionName = 'onSignal';
 const signalParameters = [
   {
     name: 'SignalName',
-    type: 'signalName',
+    type: 'string',
     description: 'Signal name',
   },
   {

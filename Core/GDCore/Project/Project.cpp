@@ -47,6 +47,119 @@ using namespace std;
 #undef CreateEvent
 
 namespace gd {
+namespace {
+struct GlobalConfigPathSegment {
+  explicit GlobalConfigPathSegment(const gd::String& key_)
+      : key(key_), index(0), isIndex(false) {}
+  explicit GlobalConfigPathSegment(std::size_t index_)
+      : key(""), index(index_), isIndex(true) {}
+
+  gd::String key;
+  std::size_t index;
+  bool isIndex;
+};
+
+std::vector<GlobalConfigPathSegment> ParseGlobalConfigPath(gd::String path) {
+  std::vector<GlobalConfigPathSegment> segments;
+  path = path.Trim();
+
+  gd::String current;
+  std::size_t position = 0;
+  const auto pushCurrent = [&]() {
+    if (!current.empty()) {
+      segments.push_back(GlobalConfigPathSegment(current));
+      current.clear();
+    }
+  };
+
+  while (position < path.length()) {
+    const auto character = path[position];
+
+    if (character == '.') {
+      pushCurrent();
+      position++;
+      continue;
+    }
+
+    if (character == '[') {
+      pushCurrent();
+      position++;
+      while (position < path.length() &&
+             std::isspace(static_cast<unsigned char>(path[position]))) {
+        position++;
+      }
+
+      if (position < path.length() &&
+          (path[position] == '"' || path[position] == '\'')) {
+        const auto quote = path[position];
+        position++;
+        gd::String quotedSegment;
+        while (position < path.length() && path[position] != quote) {
+          if (path[position] == '\\' && position + 1 < path.length()) {
+            position++;
+          }
+          quotedSegment += path[position];
+          position++;
+        }
+        if (position < path.length() && path[position] == quote) position++;
+        while (position < path.length() &&
+               std::isspace(static_cast<unsigned char>(path[position]))) {
+          position++;
+        }
+        if (position < path.length() && path[position] == ']') position++;
+        segments.push_back(GlobalConfigPathSegment(quotedSegment));
+        continue;
+      }
+
+      gd::String bracketSegment;
+      while (position < path.length() && path[position] != ']') {
+        bracketSegment += path[position];
+        position++;
+      }
+      if (position < path.length() && path[position] == ']') position++;
+      bracketSegment = bracketSegment.Trim();
+      if (bracketSegment.empty()) continue;
+
+      bool isIndex = true;
+      for (const auto bracketCharacter : bracketSegment) {
+        if (!std::isdigit(static_cast<unsigned char>(bracketCharacter))) {
+          isIndex = false;
+          break;
+        }
+      }
+      if (isIndex) {
+        segments.push_back(
+            GlobalConfigPathSegment(
+                static_cast<std::size_t>(bracketSegment.To<unsigned int>())));
+      } else {
+        segments.push_back(GlobalConfigPathSegment(bracketSegment));
+      }
+      continue;
+    }
+
+    current += character;
+    position++;
+  }
+
+  pushCurrent();
+  return segments;
+}
+
+gd::String GlobalConfigValueToString(const gd::SerializerElement& element) {
+  if (!element.IsValueUndefined()) {
+    const auto& value = element.GetValue();
+    if (value.IsString()) return value.GetRawString();
+    return value.GetString();
+  }
+
+  if (element.ConsideredAsArray() || !element.GetAllChildren().empty() ||
+      !element.GetAllAttributes().empty()) {
+    return gd::Serializer::ToJSON(element);
+  }
+
+  return "";
+}
+}  // namespace
 
 Project::Project()
     : name(_("Project")), version("1.0.0"), packageName("com.example.gamename"),
@@ -73,6 +186,72 @@ Project::Project()
 }
 
 Project::~Project() {}
+
+bool Project::GetGlobalConfigValueAsString(const gd::String& path,
+                                           gd::String& value) const {
+  gd::SerializerElement globalConfigElement =
+      gd::Serializer::FromJSON(GetGlobalConfigJson().c_str());
+  const gd::SerializerElement* currentElement = &globalConfigElement;
+
+  for (const auto& segment : ParseGlobalConfigPath(path)) {
+    if (segment.isIndex) {
+      if (!currentElement->ConsideredAsArray() ||
+          segment.index >= currentElement->GetChildrenCount()) {
+        return false;
+      }
+      currentElement = &currentElement->GetChild(segment.index);
+    } else {
+      if (!currentElement->HasChild(segment.key)) {
+        return false;
+      }
+      currentElement = &currentElement->GetChild(segment.key);
+    }
+  }
+
+  value = GlobalConfigValueToString(*currentElement);
+  return true;
+}
+
+bool Project::ResolveGlobalConfigPlaceholders(
+    const gd::String& source,
+    gd::String& resolved,
+    gd::String& missingPath) const {
+  resolved.clear();
+  missingPath.clear();
+
+  std::size_t position = 0;
+  while (position < source.length()) {
+    const std::size_t placeholderStart = source.find("{{", position);
+    if (placeholderStart == gd::String::npos) {
+      resolved += source.substr(position);
+      return true;
+    }
+
+    resolved += source.substr(position, placeholderStart - position);
+
+    const std::size_t placeholderEnd = source.find("}}", placeholderStart + 2);
+    if (placeholderEnd == gd::String::npos) {
+      resolved += source.substr(placeholderStart);
+      return true;
+    }
+
+    const gd::String path =
+        source.substr(placeholderStart + 2,
+                      placeholderEnd - placeholderStart - 2)
+            .Trim();
+    gd::String value;
+    if (path.empty() || !GetGlobalConfigValueAsString(path, value)) {
+      missingPath = path;
+      resolved = source;
+      return false;
+    }
+
+    resolved += value;
+    position = placeholderEnd + 2;
+  }
+
+  return true;
+}
 
 void Project::ResetProjectUuid() { projectUuid = UUID::MakeUuid4(); }
 

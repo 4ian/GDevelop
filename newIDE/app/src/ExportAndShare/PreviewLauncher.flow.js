@@ -98,6 +98,7 @@ export type PreviewLauncherProps = {|
   sourceGameId: string,
   getIncludeFileHashs: () => { [string]: number },
   onExport: () => void,
+  onInvalidGlobalConfigPlaceholder: () => void,
   onCaptureFinished: CaptureOptions => Promise<void>,
 |};
 
@@ -118,6 +119,7 @@ export type PreviewDebuggerServerCallbacks = {|
   onConnectionClosed: ({|
     id: DebuggerId,
     debuggerIds: Array<DebuggerId>,
+    connectionInfo?: Object,
   |}) => void | Promise<void>,
   onConnectionOpened: ({|
     id: DebuggerId,
@@ -147,11 +149,14 @@ export interface PreviewDebuggerServer {
   getExistingEmbeddedGameFrameDebuggerIds(): Array<DebuggerId>;
   getExistingPreviewDebuggerIds(): Array<DebuggerId>;
   getRecentLogs(id: DebuggerId): Array<Object>;
+  getConnectionInfo(id: DebuggerId): ?Object;
+  getLastConnectionInfo(): ?Object;
   sendMessage(id: DebuggerId, message: Object): void;
   sendMessageWithResponse(message: Object): Promise<Object>;
   registerCallbacks(callbacks: PreviewDebuggerServerCallbacks): () => void;
   registerEmbeddedGameFrame(window: WindowProxy): void;
   unregisterEmbeddedGameFrame(window: WindowProxy): void;
+  closeAllPreviewConnections(): void;
   closeAllConnections(): void;
 }
 
@@ -173,7 +178,7 @@ export type PreviewLauncherInterface = {
   launchPreview: (previewOptions: PreviewOptions) => Promise<any>,
   canDoNetworkPreview: () => boolean,
   +closePreview?: (windowId: number) => void,
-  +closeAllPreviews?: () => void,
+  +closeAllPreviews?: () => void | Promise<void>,
   +getPreviewDebuggerServer: () => ?PreviewDebuggerServer,
 };
 

@@ -281,6 +281,27 @@ namespace gdjs {
       }
     }
 
+    /**
+     * Add or update resource data without resetting loading queues.
+     *
+     * This is useful for incremental editor operations, such as dropping a new
+     * model into the in-game editor, where existing scene resources must keep
+     * their loaded texture/model instances.
+     */
+    upsertResources(resourceDataArray: ResourceData[]): void {
+      for (const resourceData of resourceDataArray) {
+        if (!resourceData.file) {
+          // Empty string or missing `file` field: not a valid resource, let's entirely ignore it.
+          continue;
+        }
+
+        this.privateResourceManager._resources.set(
+          resourceData.name,
+          resourceData
+        );
+      }
+    }
+
     async loadAllResources(
       onProgress: (loadingCount: integer, totalCount: integer) => void
     ): Promise<void> {

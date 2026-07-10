@@ -28,6 +28,7 @@ import {
   addGlobalObjectGroupsToDataJs,
   addGlobalObjectGroupsToProjectData,
 } from '../../PreviewGlobalObjectGroupsPatch';
+import { hasGlobalConfigPlaceholderDiagnostic } from '../../../Utils/GlobalConfigPlaceholderDiagnostics';
 const gd: libGDevelop = global.gd;
 
 let nextPreviewId = 1;
@@ -292,7 +293,32 @@ export default class BrowserSWPreviewLauncher extends React.Component<
       console.log(
         `[BrowserSWPreviewLauncher] Exporting project for preview #${previewId}...`
       );
-      exporter.exportProjectForPixiPreview(previewExportOptions);
+      const exportSuccessful = exporter.exportProjectForPixiPreview(
+        previewExportOptions
+      );
+      if (
+        hasGlobalConfigPlaceholderDiagnostic(
+          project.getWholeProjectDiagnosticReport()
+        )
+      ) {
+        if (previewWindows) {
+          previewWindows.forEach(previewWindow => {
+            try {
+              previewWindow.close();
+            } catch (error) {}
+          });
+        }
+        this.props.onInvalidGlobalConfigPlaceholder();
+        previewExportOptions.delete();
+        exporter.delete();
+        return;
+      }
+      if (!exportSuccessful) {
+        previewExportOptions.delete();
+        exporter.delete();
+        throw new Error('Unable to export the project for preview.');
+      }
+
       browserSWFileSystem.patchPendingTextFile('data.js', contents =>
         addGlobalObjectGroupsToDataJs(project, contents)
       );

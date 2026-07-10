@@ -4,6 +4,7 @@ import { mapFor } from './MapFor';
 import { getFunctionNameFromType } from '../EventsFunctionsExtensionsLoader';
 import type { EventPath } from './EventPath';
 import { renderInstructionSentenceAsPlainText } from '../EventsSheet/EventsTree/TextRenderer';
+import { serializeToJSObject } from './Serializer';
 
 const gd: libGDevelop = global.gd;
 
@@ -23,6 +24,8 @@ export type ValidationError = {|
   parameterIndex?: number,
   parameterValue?: string,
   parameterType?: string,
+  cardinalitySource?: 'initial-instances' | 'dynamic-create',
+  suggestedEventStructure?: Object,
   undeclaredVariable?: boolean,
   relatedBehaviorParameterIndex?: number,
   relatedBehaviorParameterValue?: string,
@@ -113,11 +116,7 @@ type EventValidationContext = {|
   singlePickedObjectNames: Set<string>,
 |};
 
-const objectParameterTypesThatConsumePickedInstances = new Set([
-  'object',
-  'objectList',
-  'objectPtr',
-]);
+const objectParameterTypesThatConsumePickedInstances = new Set(['objectPtr']);
 
 const singleInstancePickingInstructionTypes = new Set([
   'PickRandomInstance',
@@ -388,6 +387,67 @@ const buildEventPtrToValidationContextMap = (
   return map;
 };
 
+const collectDynamicallyCreatedObjectNames = (
+  eventsList: gdEventsList,
+  project: gdProject,
+  layout?: ?gdLayout
+): Set<string> => {
+  const objectNames = new Set<string>();
+  const addObjectOrGroup = (rawName: any) => {
+    const name = String(rawName || '')
+      .replace(/^"+|"+$/g, '')
+      .trim();
+    if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(name)) return;
+    objectNames.add(name);
+    const addGroupMembers = (groups: any) => {
+      if (!groups.has(name)) return;
+      groups
+        .get(name)
+        .getAllObjectsNames()
+        .toJSArray()
+        .forEach(objectName => objectNames.add(objectName));
+    };
+    if (layout) addGroupMembers(layout.getObjects().getObjectGroups());
+    addGroupMembers(project.getObjects().getObjectGroups());
+  };
+  const visitInstructions = (instructions: any) => {
+    if (!Array.isArray(instructions)) return;
+    instructions.forEach(instruction => {
+      const type =
+        instruction && instruction.type && typeof instruction.type === 'object'
+          ? instruction.type.value
+          : instruction && instruction.type;
+      if (
+        (type === 'Create' || type === 'CreateObject') &&
+        Array.isArray(instruction.parameters)
+      ) {
+        addObjectOrGroup(instruction.parameters[1]);
+      } else if (
+        type === 'CreateByName' &&
+        Array.isArray(instruction.parameters)
+      ) {
+        // Parameter 1 is the group of potential objects and parameter 2 is the
+        // runtime name expression. Expand the whole group conservatively and
+        // also record a literal object name when the expression is static.
+        addObjectOrGroup(instruction.parameters[1]);
+        addObjectOrGroup(instruction.parameters[2]);
+      }
+      visitInstructions(instruction && instruction.subInstructions);
+    });
+  };
+  const visitEvents = (events: any) => {
+    if (!Array.isArray(events)) return;
+    events.forEach(event => {
+      visitInstructions(event && event.actions);
+      visitInstructions(event && event.conditions);
+      visitInstructions(event && event.whileConditions);
+      visitEvents(event && event.events);
+    });
+  };
+  visitEvents(serializeToJSObject(eventsList));
+  return objectNames;
+};
+
 /**
  * Create a validation worker that uses C++ event traversal.
  * This leverages ReadOnlyArbitraryEventsWorkerWithContext which properly
@@ -396,7 +456,8 @@ const buildEventPtrToValidationContextMap = (
 const createValidationWorker = (
   project: gdProject,
   platform: gdPlatform,
-  errors: Array<ValidationError>
+  errors: Array<ValidationError>,
+  dynamicallyCreatedObjectNames: Set<string> = new Set()
 ): gdReadOnlyArbitraryEventsWorkerWithContextJS => {
   const worker = new gd.ReadOnlyArbitraryEventsWorkerWithContextJS();
   worker.setSkipDisabledEvents(true);
@@ -615,7 +676,6 @@ const createValidationWorker = (
             const variablesContainersList = projectScopedContainers.getVariablesContainersList();
             if (
               variablesContainersList &&
-              typeof variablesContainersList.has === 'function' &&
               !variablesContainersList.has(value)
             ) {
               undeclaredVariable = true;
@@ -647,11 +707,12 @@ const createValidationWorker = (
         value !== '' &&
         !singleInstancePickingInstructionTypes.has(type) &&
         !currentSinglePickedObjectNames.has(value) &&
-        initialInstancesContainMoreThanOneObjectOrGroupInstance(
-          project,
-          projectScopedContainers.getScopeSceneName(),
-          value
-        )
+        (dynamicallyCreatedObjectNames.has(value) ||
+          initialInstancesContainMoreThanOneObjectOrGroupInstance(
+            project,
+            projectScopedContainers.getScopeSceneName(),
+            value
+          ))
       ) {
         errors.push({
           type: 'ambiguous-object-picking',
@@ -664,6 +725,21 @@ const createValidationWorker = (
           parameterIndex,
           parameterValue: value,
           parameterType,
+          cardinalitySource: dynamicallyCreatedObjectNames.has(value)
+            ? 'dynamic-create'
+            : 'initial-instances',
+          suggestedEventStructure: {
+            kind: 'for_each',
+            object: value,
+            children: [
+              {
+                kind: 'standard',
+                actions: [
+                  `<move ${type} here after conditions narrow ${value}>`,
+                ],
+              },
+            ],
+          },
           eventPath: [...currentEventPath],
           ...getValidationErrorLocationInformationFromProjectScopedContainers(
             projectScopedContainers
@@ -695,7 +771,6 @@ export const scanEventsListForValidationErrors = ({
 |}): Array<ValidationError> => {
   const errors: Array<ValidationError> = [];
   const platform = gd.JsPlatform.get();
-  const worker = createValidationWorker(project, platform, errors);
   const projectScopedContainers = layout
     ? gd.ProjectScopedContainers.makeNewProjectScopedContainersForProjectAndLayout(
         project,
@@ -704,6 +779,17 @@ export const scanEventsListForValidationErrors = ({
     : gd.ProjectScopedContainers.makeNewProjectScopedContainersForProject(
         project
       );
+  const dynamicallyCreatedObjectNames = collectDynamicallyCreatedObjectNames(
+    eventsList,
+    project,
+    layout
+  );
+  const worker = createValidationWorker(
+    project,
+    platform,
+    errors,
+    dynamicallyCreatedObjectNames
+  );
 
   try {
     worker.launch(eventsList, projectScopedContainers);
@@ -724,10 +810,24 @@ export const scanProjectForValidationErrors = (
 ): Array<ValidationError> => {
   const errors: Array<ValidationError> = [];
   const platform = gd.JsPlatform.get();
+  const dynamicallyCreatedObjectNames = new Set<string>();
+  for (let index = 0; index < project.getLayoutsCount(); index++) {
+    const layout = project.getLayoutAt(index);
+    collectDynamicallyCreatedObjectNames(
+      layout.getEvents(),
+      project,
+      layout
+    ).forEach(objectName => dynamicallyCreatedObjectNames.add(objectName));
+  }
 
   // Create a single worker for the entire scan. The worker derives
   // location info from ProjectScopedContainers set by the C++ traversal.
-  const worker = createValidationWorker(project, platform, errors);
+  const worker = createValidationWorker(
+    project,
+    platform,
+    errors,
+    dynamicallyCreatedObjectNames
+  );
 
   // Scan all layouts (scenes) and external events via C++ traversal.
   gd.ProjectBrowserHelper.exposeProjectEventsWithoutExtensions(project, worker);

@@ -96,12 +96,10 @@ class ObjectCodeGenerator {
       const gd::NamedPropertyDescriptor& property);
 
   gd::String GeneratePropertyValueCode(
-      const gd::NamedPropertyDescriptor& property,
-      const gd::String& runtimeGameExpression);
+      const gd::NamedPropertyDescriptor& property);
 
   gd::String GeneratePropertyValueResolutionCode(
       const gd::NamedPropertyDescriptor& property,
-      const gd::String& runtimeGameExpression,
       const gd::String& valueCode);
 
   gd::String GenerateUpdatePropertyFromObjectDataCode(

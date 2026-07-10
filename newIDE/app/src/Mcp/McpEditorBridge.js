@@ -12,7 +12,11 @@ import {
   type McpPermissionOptions,
 } from './McpToolCatalog';
 import { makeSimplifiedProjectBuilder } from '../EditorFunctions/SimplifiedProject/SimplifiedProject';
-import { serializeToJSON, serializeToJSObject } from '../Utils/Serializer';
+import {
+  serializeToJSON,
+  serializeToJSObject,
+  unserializeFromJSObject,
+} from '../Utils/Serializer';
 import { renderNonTranslatedEventsAsText } from '../EventsSheet/EventsTree/TextRenderer';
 import { mapFor } from '../Utils/MapFor';
 import { type EditorCallbacks } from '../EditorFunctions';
@@ -27,6 +31,18 @@ import {
   buildInstruction,
   collectSerializedEventJsonIssues,
 } from './McpEventKnowledge';
+import {
+  getEventDslReference,
+  getSerializedEventsRevision,
+  isEventsDsl,
+  normalizeEventDslArguments,
+} from './McpEventDsl';
+import {
+  addMissingObjectBehaviors,
+  addObjectUndeclaredVariables,
+  addUndeclaredVariables,
+  applyEventsChanges,
+} from '../EditorFunctions/ApplyEventsChanges';
 import {
   createOrUpdateExtension,
   createOrUpdateExtensionBehavior,
@@ -132,6 +148,7 @@ import optionalRequire from '../Utils/OptionalRequire';
 const gd: libGDevelop = global.gd;
 const fs = optionalRequire('fs');
 const path = optionalRequire('path');
+const crypto = optionalRequire('crypto');
 const electron = optionalRequire('electron');
 const nativeImage = electron && electron.nativeImage;
 
@@ -201,6 +218,7 @@ type McpTextContent = {|
 type McpToolResult = {|
   content: Array<McpTextContent>,
   isError?: boolean,
+  structuredContent?: Object,
 |};
 
 type McpEditorBridgeContext = {|
@@ -216,9 +234,14 @@ type McpEditorBridgeContext = {|
   // previews the active tab) and flags that scene selection was not honored.
   launchPreviewForScene?: (sceneName: ?string) => mixed,
   saveProjectAndWait?: () => Promise<any>,
+  getPersistenceState?: () => {|
+    hasUnsavedChanges: boolean,
+    changesCount: number,
+    timeOfFirstChangeSinceLastSave: number | null,
+  |},
   getEditorSelection?: () => Object,
   getPreviewDebuggerServer?: () => ?Object,
-  closeAllPreviews?: () => void,
+  closeAllPreviews?: () => mixed,
   focusAllPreviews?: () => void,
   capturePreviewPage?: (windowId: ?number) => Promise<?Object>,
   generateEvents?: Function,
@@ -243,6 +266,48 @@ type McpEditorBridge = {|
   handleRendererMcpRequest: RendererMcpRequest => Promise<any>,
 |};
 
+type SceneEventsOutsideEditorChanges = {|
+  scene: gdLayout,
+  newOrChangedAiGeneratedEventIds: Set<string>,
+|};
+
+type SceneEventsNotifier = SceneEventsOutsideEditorChanges => void;
+
+const createDeferredSceneEventsNotifier = (
+  notifySceneEventsModified: ?SceneEventsNotifier
+): ?SceneEventsNotifier => {
+  if (!notifySceneEventsModified) return undefined;
+
+  const pendingEventIdsByScene: Map<gdLayout, Set<string>> = new Map();
+  let isFlushScheduled = false;
+
+  return changes => {
+    let pendingEventIds = pendingEventIdsByScene.get(changes.scene);
+    if (!pendingEventIds) {
+      pendingEventIds = new Set();
+      pendingEventIdsByScene.set(changes.scene, pendingEventIds);
+    }
+    const eventIds = pendingEventIds;
+    changes.newOrChangedAiGeneratedEventIds.forEach(eventId =>
+      eventIds.add(eventId)
+    );
+
+    if (isFlushScheduled) return;
+    isFlushScheduled = true;
+    setTimeout(() => {
+      isFlushScheduled = false;
+      const pendingNotifications = Array.from(pendingEventIdsByScene.entries());
+      pendingEventIdsByScene.clear();
+      pendingNotifications.forEach(([scene, newOrChangedAiGeneratedEventIds]) =>
+        notifySceneEventsModified({
+          scene,
+          newOrChangedAiGeneratedEventIds,
+        })
+      );
+    }, 0);
+  };
+};
+
 const textResult = (payload: any): McpToolResult => ({
   content: [
     {
@@ -253,22 +318,34 @@ const textResult = (payload: any): McpToolResult => ({
           : JSON.stringify(payload, null, 2),
     },
   ],
+  ...(payload && typeof payload === 'object' && !Array.isArray(payload)
+    ? { structuredContent: payload }
+    : undefined),
 });
 
-const errorResult = (message: string): McpToolResult => ({
-  isError: true,
-  content: [
-    {
-      type: 'text',
-      text: message,
-    },
-  ],
-});
+const errorResult = (message: string, details?: Object): McpToolResult => {
+  const payload = {
+    success: false,
+    error: message,
+    ...(details || {}),
+  };
+  return {
+    isError: true,
+    content: [
+      {
+        type: 'text',
+        text: JSON.stringify(payload, null, 2),
+      },
+    ],
+    structuredContent: payload,
+  };
+};
 
 // Extract the JSON payload from a textResult/errorResult-shaped tool response,
 // so one tool can embed another tool's outcome in its own result.
 const extractToolResultPayload = (toolResult: any): any => {
   if (!toolResult || !Array.isArray(toolResult.content)) return toolResult;
+  if (toolResult.structuredContent) return toolResult.structuredContent;
   const text =
     toolResult.content[0] && typeof toolResult.content[0].text === 'string'
       ? toolResult.content[0].text
@@ -308,6 +385,224 @@ const getProjectFileLocation = (
   const projectFile = project.getProjectFile() || null;
   const projectFolder = projectFile && path ? path.dirname(projectFile) : null;
   return { projectFile, projectFolder };
+};
+
+const stableJsonStringify = (value: any): string => {
+  if (value === undefined) return '"__undefined__"';
+  if (value === null || typeof value !== 'object') {
+    return JSON.stringify(value);
+  }
+  if (Array.isArray(value)) {
+    return `[${value.map(stableJsonStringify).join(',')}]`;
+  }
+  return `{${Object.keys(value)
+    .sort()
+    .map(key => `${JSON.stringify(key)}:${stableJsonStringify(value[key])}`)
+    .join(',')}}`;
+};
+
+const hashStructuredValue = (value: any): string => {
+  const serialized = stableJsonStringify(value);
+  if (crypto && typeof crypto.createHash === 'function') {
+    return crypto
+      .createHash('sha256')
+      .update(serialized)
+      .digest('hex');
+  }
+
+  // Deterministic fallback for browser builds where Node crypto is absent.
+  let hash = 2166136261;
+  for (let index = 0; index < serialized.length; index++) {
+    hash ^= serialized.charCodeAt(index);
+    hash = Math.imul(hash, 16777619);
+  }
+  return `fnv1a-${(hash >>> 0).toString(16).padStart(8, '0')}`;
+};
+
+const readDiskProjectEvidence = (projectFile: ?string): Object => {
+  if (!projectFile) return { exists: false, reason: 'no-project-file' };
+  if (!fs) return { exists: false, reason: 'filesystem-unavailable' };
+  try {
+    const stat = fs.statSync(projectFile);
+    const contents = fs.readFileSync(projectFile, 'utf8');
+    return {
+      exists: true,
+      size: stat.size,
+      modifiedAt: stat.mtime.toISOString(),
+      modifiedAtMs: stat.mtimeMs,
+      hash: hashStructuredValue(JSON.parse(contents)),
+    };
+  } catch (error) {
+    return {
+      exists: false,
+      reason: 'read-failed',
+      error: error.message,
+    };
+  }
+};
+
+const getPersistenceState = (context: McpEditorBridgeContext): Object => {
+  if (typeof context.getPersistenceState !== 'function') {
+    return {
+      available: false,
+      hasUnsavedChanges: undefined,
+      changesCount: undefined,
+      timeOfFirstChangeSinceLastSave: undefined,
+    };
+  }
+  try {
+    return { available: true, ...context.getPersistenceState() };
+  } catch (error) {
+    return { available: false, error: error.message };
+  }
+};
+
+const saveProjectWithEvidence = async (
+  context: McpEditorBridgeContext
+): Promise<Object> => {
+  const requestedAtMs = Date.now();
+  const requestedAt = new Date(requestedAtMs).toISOString();
+  const project = context.getProject();
+  const saveProjectAndWait = context.saveProjectAndWait;
+  if (!project) {
+    if (saveProjectAndWait) {
+      try {
+        const result = await saveProjectAndWait();
+        const saved = !!(
+          result &&
+          (typeof result !== 'object' ||
+            result.saved === undefined ||
+            result.saved === true)
+        );
+        return {
+          success: saved,
+          saved,
+          reason: saved ? 'host-confirmed-without-project-model' : 'no-project',
+          requestedAt,
+          completedAt: new Date().toISOString(),
+          hostReportedSaved: saved,
+          result: result || undefined,
+        };
+      } catch (error) {
+        return {
+          success: false,
+          saved: false,
+          reason: 'save-threw',
+          requestedAt,
+          completedAt: new Date().toISOString(),
+          error: error.message,
+        };
+      }
+    }
+    return {
+      success: false,
+      saved: false,
+      reason: 'no-project',
+      requestedAt,
+      completedAt: new Date().toISOString(),
+    };
+  }
+  if (!saveProjectAndWait) {
+    return {
+      success: false,
+      saved: false,
+      reason: 'save-handler-unavailable',
+      projectFile: project.getProjectFile() || undefined,
+      requestedAt,
+      completedAt: new Date().toISOString(),
+    };
+  }
+
+  const projectFile = project.getProjectFile() || null;
+  const beforeState = getPersistenceState(context);
+  const beforeDisk = readDiskProjectEvidence(projectFile);
+  const editorHashBefore = hashStructuredValue(serializeToJSObject(project));
+  let rawResult = null;
+  let saveError = null;
+  try {
+    rawResult = await saveProjectAndWait();
+  } catch (error) {
+    saveError = error;
+  }
+
+  const completedAtMs = Date.now();
+  const afterState = getPersistenceState(context);
+  const editorHash = hashStructuredValue(serializeToJSObject(project));
+  const afterDisk = readDiskProjectEvidence(projectFile);
+  const hashesMatch = afterDisk.exists
+    ? afterDisk.hash === editorHash
+    : undefined;
+  const diskWriteObserved = !!(
+    afterDisk.exists &&
+    (!beforeDisk.exists ||
+      afterDisk.modifiedAtMs !== beforeDisk.modifiedAtMs ||
+      afterDisk.hash !== beforeDisk.hash)
+  );
+  const dirtyBefore = beforeState.hasUnsavedChanges;
+  const dirtyAfter = afterState.hasUnsavedChanges;
+  const hostReportedSaved = !!(
+    rawResult &&
+    (typeof rawResult !== 'object' ||
+      rawResult.saved === undefined ||
+      rawResult.saved === true)
+  );
+  const nothingChangedBefore = !!(
+    dirtyBefore === false &&
+    beforeDisk.exists &&
+    beforeDisk.hash === editorHashBefore
+  );
+  const verifiedLocalSave = !!(
+    projectFile &&
+    afterDisk.exists &&
+    hashesMatch === true &&
+    (diskWriteObserved || (hostReportedSaved && !nothingChangedBefore))
+  );
+  const saved = projectFile ? verifiedLocalSave : hostReportedSaved;
+
+  let reason = 'save-failed';
+  if (saveError) reason = 'save-threw';
+  else if (saved && diskWriteObserved) reason = 'saved';
+  else if (saved) reason = 'saved-and-verified';
+  else if (!projectFile && !hostReportedSaved) reason = 'no-project-file';
+  else if (nothingChangedBefore && hashesMatch === true)
+    reason = 'nothing-changed';
+  else if (dirtyBefore === false && hashesMatch === false)
+    reason = 'project-not-marked-dirty';
+  else if (hostReportedSaved && hashesMatch === false)
+    reason = 'disk-verification-failed';
+
+  return {
+    success: saved || reason === 'nothing-changed',
+    saved,
+    reason,
+    projectFile: projectFile || undefined,
+    requestedAt,
+    completedAt: new Date(completedAtMs).toISOString(),
+    durationMs: completedAtMs - requestedAtMs,
+    dirtyBefore,
+    dirtyAfter,
+    changesCountBefore: beforeState.changesCount,
+    changesCountAfter: afterState.changesCount,
+    firstUnsavedChangeAt:
+      beforeState.timeOfFirstChangeSinceLastSave != null
+        ? new Date(beforeState.timeOfFirstChangeSinceLastSave).toISOString()
+        : undefined,
+    hostReportedSaved,
+    diskWriteObserved,
+    editorHashBefore,
+    diskHashBefore: beforeDisk.hash,
+    editorHash,
+    diskHash: afterDisk.hash,
+    hashesMatch,
+    file: {
+      exists: !!afterDisk.exists,
+      size: afterDisk.size,
+      modifiedAt: afterDisk.modifiedAt,
+      error: afterDisk.error,
+    },
+    error: saveError ? saveError.message : afterDisk.error,
+    result: rawResult || undefined,
+  };
 };
 
 const getEditorState = (
@@ -1068,15 +1363,9 @@ const captureRunningPreviewState = (
   });
 };
 
-// Capture a screenshot of the current rendered frame from a running preview.
-// Uses the debugger request/response channel (sendMessageWithResponse) to ask
-// the running game for canvas.toDataURL, then writes the PNG to disk (or returns
-// the data URL when no file path is given / filesystem is unavailable).
-//
-// Prefers the MAIN-process capturePage() path (via capturePreviewPage) because
-// it does not run JS in the (possibly OS-suspended) renderer of an occluded
-// preview window. Falls back to the renderer-side canvas.toDataURL debugger
-// command when main-process capture is unavailable or fails.
+// Screenshot helpers can return the exact renderer canvas or an explicit
+// full-window capture. The public path below defaults to the renderer canvas,
+// forces a render first, checks image quality, and retries suspicious frames.
 const resizeScreenshotDataUrlIfNeeded = (
   dataUrl: string,
   width: number,
@@ -1142,6 +1431,59 @@ const resizeScreenshotDataUrlIfNeeded = (
   }
 };
 
+const inspectScreenshotQuality = (
+  dataUrl: string,
+  expectedWidth: number,
+  expectedHeight: number
+): Object => {
+  if (!nativeImage) return { analyzed: false };
+  try {
+    const image = nativeImage.createFromDataURL(dataUrl);
+    const size = image.getSize();
+    const bitmap = image.toBitmap();
+    const pixelCount = size.width * size.height;
+    const stride = Math.max(1, Math.floor(pixelCount / 10000));
+    let samples = 0;
+    let black = 0;
+    let transparent = 0;
+    for (let pixel = 0; pixel < pixelCount; pixel += stride) {
+      const offset = pixel * 4;
+      const blue = bitmap[offset];
+      const green = bitmap[offset + 1];
+      const red = bitmap[offset + 2];
+      const alpha = bitmap[offset + 3];
+      samples++;
+      if (alpha <= 3) transparent++;
+      if (alpha > 3 && red <= 3 && green <= 3 && blue <= 3) black++;
+    }
+    const blackRatio = samples ? black / samples : 1;
+    const transparentRatio = samples ? transparent / samples : 1;
+    const dimensionsMatch =
+      size.width === expectedWidth && size.height === expectedHeight;
+    return {
+      analyzed: true,
+      dimensionsMatch,
+      blackRatio: Math.round(blackRatio * 10000) / 10000,
+      transparentRatio: Math.round(transparentRatio * 10000) / 10000,
+      suspicious:
+        !size.width ||
+        !size.height ||
+        !dimensionsMatch ||
+        blackRatio >= 0.92 ||
+        transparentRatio >= 0.98,
+      pixelHash:
+        crypto && typeof crypto.createHash === 'function'
+          ? crypto
+              .createHash('sha256')
+              .update(image.toPNG())
+              .digest('hex')
+          : undefined,
+    };
+  } catch (error) {
+    return { analyzed: false, suspicious: true, error: error.message };
+  }
+};
+
 const writeOrReturnScreenshot = (
   dataUrl: string,
   width: number,
@@ -1203,7 +1545,7 @@ const writeOrReturnScreenshot = (
   };
 };
 
-const capturePreviewScreenshot = async (
+const capturePreviewScreenshotLegacy = async (
   previewDebuggerServer: ?Object,
   args: Object,
   capturePreviewPage?: ?(windowId: ?number) => Promise<?Object>
@@ -1323,6 +1665,151 @@ const capturePreviewScreenshot = async (
     'renderer-canvas',
     meta
   );
+};
+
+const capturePreviewScreenshot = async (
+  previewDebuggerServer: ?Object,
+  args: Object,
+  capturePreviewPage?: ?(windowId: ?number) => Promise<?Object>
+): Promise<Object> => {
+  const guard = requireRunningPreview(previewDebuggerServer, args);
+  if (!guard.ok) return guard.result;
+  const targetId = guard.targetId;
+  const meta: Object = { debuggerId: targetId };
+  const captureMode =
+    args && typeof args.capture_mode === 'string'
+      ? args.capture_mode.toLowerCase()
+      : 'canvas';
+  if (captureMode === 'legacy') {
+    return capturePreviewScreenshotLegacy(
+      previewDebuggerServer,
+      args,
+      capturePreviewPage
+    );
+  }
+  const requireCanvas = !!(
+    args &&
+    (args.canvas_only || args.exact_game_resolution || captureMode === 'canvas')
+  );
+  const preferWindow = captureMode === 'window' || captureMode === 'page';
+  const retryCount =
+    args && typeof args.retry_count === 'number'
+      ? Math.max(0, Math.min(5, Math.floor(args.retry_count)))
+      : 2;
+  let lastFailure: ?Object = null;
+
+  try {
+    const status = await sendTargetedRequest(
+      (previewDebuggerServer: any),
+      targetId,
+      { command: 'refresh' },
+      { timeoutMs: 1500, returnFullMessage: true }
+    );
+    const dumpPayload =
+      status.matched && status.payload ? status.payload.payload : null;
+    const runtime = dumpPayload
+      ? summarizeRuntimeGameDump(dumpPayload, {})
+      : null;
+    if (runtime && runtime.scenes && runtime.scenes[0]) {
+      meta.sceneName = runtime.scenes[0].name;
+      meta.sceneElapsedTimeSeconds = runtime.scenes[0].sceneElapsedTimeSeconds;
+    }
+  } catch (error) {
+    // Screenshot capture can still proceed without runtime metadata.
+  }
+
+  if (!preferWindow) {
+    for (let attempt = 1; attempt <= retryCount + 1; attempt++) {
+      const canvasResult = await sendTargetedRequest(
+        (previewDebuggerServer: any),
+        targetId,
+        { command: 'captureScreenshot' },
+        { timeoutMs: 2500 }
+      );
+      const payload = canvasResult.payload || {};
+      if (canvasResult.matched && payload.dataUrl) {
+        const quality = inspectScreenshotQuality(
+          payload.dataUrl,
+          payload.width,
+          payload.height
+        );
+        const result = writeOrReturnScreenshot(
+          payload.dataUrl,
+          payload.width,
+          payload.height,
+          args,
+          'renderer-canvas',
+          {
+            ...meta,
+            renderedBeforeCapture: payload.rendered,
+            capturedAt: payload.capturedAt,
+            attempt,
+            attempts: attempt,
+            exactGameResolution: true,
+            quality,
+            qualityWarning:
+              quality.suspicious && attempt === retryCount + 1
+                ? 'The canvas remained mostly black, transparent, or dimensionally inconsistent after automatic retries.'
+                : undefined,
+          }
+        );
+        if (!quality.suspicious || attempt === retryCount + 1) return result;
+      } else {
+        lastFailure = {
+          matched: canvasResult.matched,
+          error:
+            payload.error ||
+            'The game canvas did not return image data before timeout.',
+          width: payload.width,
+          height: payload.height,
+        };
+      }
+      if (attempt <= retryCount) await wait(80 * attempt);
+    }
+  }
+
+  if (!requireCanvas && typeof capturePreviewPage === 'function') {
+    try {
+      const mainResult = await capturePreviewPage(null);
+      if (mainResult && mainResult.dataUrl) {
+        return writeOrReturnScreenshot(
+          mainResult.dataUrl,
+          mainResult.width,
+          mainResult.height,
+          args,
+          'main-process-capturePage',
+          {
+            ...meta,
+            windowId: mainResult.windowId,
+            exactGameResolution: false,
+            canvasFailure: lastFailure || undefined,
+          }
+        );
+      }
+      lastFailure = lastFailure || (mainResult && { error: mainResult.error });
+    } catch (error) {
+      lastFailure = lastFailure || { error: error.message };
+    }
+  }
+
+  return {
+    success: false,
+    running: true,
+    debuggerId: targetId,
+    source: requireCanvas ? 'renderer-canvas' : undefined,
+    error:
+      (lastFailure && lastFailure.error) ||
+      'Screenshot capture failed: no game-canvas image was returned.',
+    width: lastFailure && lastFailure.width,
+    height: lastFailure && lastFailure.height,
+    diagnostics: buildPreviewDiagnostics({
+      running: true,
+      previewIds: guard.previewIds,
+      targetId,
+      timedOut: !!(lastFailure && !lastFailure.matched),
+      operation: 'capture_preview_screenshot',
+    }),
+  };
 };
 
 // Map GDevelop key names to raw DOM key codes (+ location for left/right
@@ -1486,6 +1973,38 @@ const expandRunFramesInput = (raw: any): Object => {
   return { ok: true, preInputs: [resolved.input], postInputs: [] };
 };
 
+const releaseHeldPreviewKeys = async (
+  previewDebuggerServer: Object,
+  targetId: string,
+  timeoutMs: number = 1000
+): Promise<Object> => {
+  const cleanup = await sendTargetedRequest(
+    previewDebuggerServer,
+    targetId,
+    {
+      command: 'simulateInput',
+      inputs: [{ type: 'releaseAllKeys' }],
+    },
+    { timeoutMs }
+  );
+  return cleanup.matched
+    ? {
+        attempted: true,
+        success: !(cleanup.payload && cleanup.payload.error),
+        keysReleased: !(cleanup.payload && cleanup.payload.error),
+        applied: cleanup.payload && cleanup.payload.applied,
+        error: cleanup.payload && cleanup.payload.error,
+      }
+    : {
+        attempted: true,
+        success: false,
+        keysReleased: false,
+        error:
+          (cleanup.payload && cleanup.payload.error) ||
+          'The preview did not confirm key cleanup.',
+      };
+};
+
 // Inject simulated input into a running preview. Sends a 'simulateInput' command
 // (request/response) and returns what was applied.
 const simulatePreviewInput = async (
@@ -1619,6 +2138,12 @@ const runPreviewFrames = async (
         ready: false,
         runtimeReady: false,
         debuggerId: targetId,
+        requestedFrames: frames,
+        steppedFrames: 0,
+        stoppedEarly: true,
+        outcome: 'preflight-failed',
+        partialStateAvailable: false,
+        cleanup: { attempted: false, success: true },
         error:
           'run_frames aborted: the targeted preview is connected but did not answer getStatus, so the runtime debugger channel is not ready.',
         ...readiness,
@@ -1648,6 +2173,13 @@ const runPreviewFrames = async (
   );
 
   if (!matched) {
+    const cleanup = autoRelease
+      ? await releaseHeldPreviewKeys(
+          (previewDebuggerServer: any),
+          targetId,
+          Math.min(1500, timeoutMs)
+        )
+      : { attempted: false, success: true };
     return {
       success: false,
       running: true,
@@ -1657,6 +2189,12 @@ const runPreviewFrames = async (
       debuggerId: targetId,
       error:
         'run_frames timed out: the targeted preview did not reply. The window may still be loading; retry, or use save_and_relaunch_preview_paused to clean up stale previews and relaunch.',
+      requestedFrames: frames,
+      steppedFrames: 0,
+      stoppedEarly: true,
+      outcome: 'timeout',
+      partialStateAvailable: false,
+      cleanup,
       diagnostics: buildPreviewDiagnostics({
         running: true,
         previewIds: guard.previewIds,
@@ -1669,21 +2207,77 @@ const runPreviewFrames = async (
 
   const runMeta = (payload && payload.runFrames) || {};
   const dumpPayload = payload && payload.payload;
-  const heldKeys = Array.isArray(runMeta.heldKeys) ? runMeta.heldKeys : [];
+  let heldKeys = Array.isArray(runMeta.heldKeys) ? runMeta.heldKeys : [];
+  let cleanup = runMeta.cleanup || {
+    attempted: false,
+    success: !autoRelease,
+  };
+  if (
+    autoRelease &&
+    (!cleanup.success || !cleanup.keysReleased || heldKeys.length > 0)
+  ) {
+    const fallbackCleanup = await releaseHeldPreviewKeys(
+      (previewDebuggerServer: any),
+      targetId,
+      Math.min(1500, timeoutMs)
+    );
+    cleanup = {
+      ...cleanup,
+      fallback: fallbackCleanup,
+      success: !!fallbackCleanup.success,
+      keysReleased: !!fallbackCleanup.keysReleased,
+    };
+    if (fallbackCleanup.success) heldKeys = [];
+  }
+  const steppedFrames =
+    typeof runMeta.steppedFrames === 'number' ? runMeta.steppedFrames : 0;
+  const stoppedEarly = !!runMeta.stoppedEarly || steppedFrames < frames;
+  const cleanupFailed = autoRelease && !cleanup.success;
+  const outcome = cleanupFailed
+    ? 'cleanup-failed'
+    : runMeta.error
+    ? steppedFrames > 0
+      ? 'partial'
+      : 'failed'
+    : stoppedEarly
+    ? 'partial'
+    : 'completed';
   return {
-    success: !runMeta.error,
+    success: !runMeta.error && !cleanupFailed,
     running: true,
     debuggerId: targetId,
     applied: runMeta.applied,
-    steppedFrames: runMeta.steppedFrames,
-    stoppedEarly: runMeta.stoppedEarly,
+    requestedFrames: frames,
+    steppedFrames,
+    stoppedEarly,
+    outcome,
+    failedFrame:
+      typeof runMeta.failedFrame === 'number' ? runMeta.failedFrame : undefined,
+    eventId:
+      runMeta.failure && runMeta.failure.eventId
+        ? runMeta.failure.eventId
+        : undefined,
+    instructionId:
+      runMeta.failure && runMeta.failure.instructionId
+        ? runMeta.failure.instructionId
+        : undefined,
+    failure: runMeta.failure || undefined,
+    partialStateAvailable:
+      runMeta.partialStateAvailable !== undefined
+        ? !!runMeta.partialStateAvailable
+        : steppedFrames > 0,
+    cleanup,
     deltaMs: runMeta.deltaMs,
     // Keys STILL held after this call. A held key (keyPressed with no release)
     // carries over to subsequent run_frames and keeps driving the game — pass
     // auto_release:true, or send a keyReleased, to clear it.
     heldKeys,
     cursorWorldCoordinates: runMeta.cursorWorldCoordinates || undefined,
-    error: runMeta.error || undefined,
+    error:
+      runMeta.error ||
+      (cleanupFailed
+        ? cleanup.error || 'run_frames could not confirm key cleanup.'
+        : undefined),
     runtime: summarizeRuntimeGameDump(dumpPayload, {
       positionObjectNames: Array.isArray(args && args.instance_positions_for)
         ? new Set(args.instance_positions_for.map(String))
@@ -1698,6 +2292,24 @@ const runPreviewFrames = async (
         : '') +
       'Frames stepped synchronously on the debugger channel (independent of the render loop), so this works even on a throttled/backgrounded preview window. The game is left paused; control_preview { action: "play" } resumes normal real-time play.',
   };
+};
+
+const getPreviewConnectionInfo = (
+  previewDebuggerServer: ?Object,
+  debuggerId: ?string
+): ?Object => {
+  if (
+    !previewDebuggerServer ||
+    !debuggerId ||
+    typeof previewDebuggerServer.getConnectionInfo !== 'function'
+  ) {
+    return null;
+  }
+  try {
+    return previewDebuggerServer.getConnectionInfo(debuggerId);
+  } catch (error) {
+    return null;
+  }
 };
 
 // Shared guard: confirm a preview is running and return its server + target id.
@@ -1742,12 +2354,17 @@ const requireRunningPreview = (
       ? previewDebuggerServer.getExistingPreviewDebuggerIds()
       : previewDebuggerServer.getExistingDebuggerIds();
   if (!previewIds || !previewIds.length) {
+    const lastConnectionInfo =
+      typeof previewDebuggerServer.getLastConnectionInfo === 'function'
+        ? previewDebuggerServer.getLastConnectionInfo()
+        : null;
     return {
       ok: false,
       result: {
         success: false,
         running: false,
         error: 'No preview is currently connected.',
+        connectionInfo: lastConnectionInfo,
         diagnostics: buildPreviewDiagnostics({
           running: true,
           previewIds: [],
@@ -1773,6 +2390,10 @@ const requireRunningPreview = (
         error: `Preview debugger id "${targetId}" is not connected.`,
         debuggerId: targetId,
         availableDebuggerIds: previewIds,
+        connectionInfo: getPreviewConnectionInfo(
+          previewDebuggerServer,
+          targetId
+        ),
         diagnostics: {
           classification: 'requested-debugger-id-not-connected',
           targetDebuggerId: targetId,
@@ -1877,10 +2498,7 @@ const previewHealthCheck = async (
         'capture_preview_screenshot',
       ]
     : currentRunning
-    ? [
-        'control_preview { action: "focus" }',
-        PREVIEW_CLEANUP_RELAUNCH_ACTION,
-      ]
+    ? ['control_preview { action: "focus" }', PREVIEW_CLEANUP_RELAUNCH_ACTION]
     : ['launch_preview'];
   return {
     success: true,
@@ -1897,6 +2515,7 @@ const previewHealthCheck = async (
     availableDebuggerIds: currentPreviewIds,
     latestDebuggerId: currentLatestDebuggerId,
     targetDebuggerId: targetId,
+    connectionInfo: getPreviewConnectionInfo(previewDebuggerServer, targetId),
     status: status || undefined,
     error: pingFailure && pingFailure.error ? pingFailure.error : undefined,
     diagnostics: buildPreviewDiagnostics({
@@ -2221,7 +2840,7 @@ const createOrUpdateOnSignalFunction = (
   let fixedParameters: Array<Object> = signalSignature.map((name, index) => ({
     index,
     name,
-    type: index === 0 ? 'object' : index === 1 ? 'signalName' : 'string',
+    type: index === 0 ? 'object' : 'string',
     description:
       index === 0 ? 'Object' : index === 1 ? 'Signal name' : 'Payload',
   }));
@@ -2421,6 +3040,7 @@ const buildStaleStateAdvisory = (
               ]
             : []),
           PREVIEW_CLEANUP_RELAUNCH_ACTION,
+          'fallback: gdevelop_save_project_and_wait; control_preview { action: "close", close_all: true }; launch_preview { start_paused: true, force_new: true, timeout_ms: 15000 }; wait_until_preview_ready { require_paused: true }',
           'run runtime checks/screenshots only after relaunching the preview',
         ]
       : [],
@@ -2614,6 +3234,10 @@ const makePreviewRuntimeNotReadyResult = ({
     attempts,
     timeoutMs,
     status: status || undefined,
+    connectionInfo:
+      typeof previewDebuggerServer.getConnectionInfo === 'function'
+        ? previewDebuggerServer.getConnectionInfo(targetId)
+        : undefined,
     error:
       failurePayload && failurePayload.error ? failurePayload.error : undefined,
     diagnostics: buildPreviewDiagnostics({
@@ -2834,6 +3458,7 @@ const pausePreviewAndConfirm = async (
   if (matched && payload && payload.isPaused === true) {
     return {
       pauseRequested: true,
+      pauseAttempted: true,
       pauseConfirmed: true,
       startPaused: true,
       status: payload,
@@ -2852,6 +3477,7 @@ const pausePreviewAndConfirm = async (
   if (statusConfirmation.ready) {
     return {
       pauseRequested: true,
+      pauseAttempted: true,
       pauseConfirmed: true,
       startPaused: true,
       status: statusConfirmation.status,
@@ -2861,6 +3487,7 @@ const pausePreviewAndConfirm = async (
   return {
     ...statusConfirmation,
     pauseRequested: true,
+    pauseAttempted: true,
     pauseConfirmed: false,
     startPaused: false,
     status: matched ? payload : statusConfirmation.status,
@@ -2891,7 +3518,9 @@ const makeLaunchPreviewNotReadyResult = ({
   ready: false,
   runtimeReady: false,
   startPaused: false,
+  requestedStartPaused: !!startPaused,
   pauseRequested: !!startPaused,
+  pauseAttempted: !!readiness.pauseAttempted,
   pauseConfirmed: false,
   debuggerId,
   availableDebuggerIds,
@@ -2973,6 +3602,11 @@ const annotateLaunchSceneResult = (
 ): Object => {
   const annotated: Object = {
     ...result,
+    requestedStartPaused: !!result.pauseRequested || !!result.startPaused,
+    pauseAttempted:
+      result.pauseAttempted !== undefined
+        ? !!result.pauseAttempted
+        : !!result.pauseConfirmed,
     requestedScene: requestedScene || undefined,
     expectedScene: expectedScene || undefined,
     firstLayout: firstLayout || undefined,
@@ -3183,7 +3817,9 @@ const launchPreview = async (
       ready: false,
       runtimeReady: false,
       startPaused: false,
+      requestedStartPaused: startPaused,
       pauseRequested: startPaused || undefined,
+      pauseAttempted: false,
       pauseConfirmed: false,
       failurePhase: 'debugger-server-unavailable',
       note: startPaused
@@ -3216,7 +3852,9 @@ const launchPreview = async (
       ready: false,
       runtimeReady: false,
       startPaused: false,
+      requestedStartPaused: startPaused,
       pauseRequested: startPaused || undefined,
+      pauseAttempted: false,
       pauseConfirmed: false,
       failurePhase: connection.failurePhase || 'debugger-connect',
       availableDebuggerIds: connection.availableDebuggerIds,
@@ -3518,6 +4156,201 @@ const getEventsJsonArgument = (args: ?Object): string | null => {
   return null;
 };
 
+const getSceneEventsRevision = (
+  project: gdProject,
+  sceneName: string
+): string => {
+  if (!project.hasLayoutNamed(sceneName)) {
+    throw new Error(`Scene "${sceneName}" does not exist.`);
+  }
+  return getSerializedEventsRevision(
+    serializeToJSObject(project.getLayout(sceneName).getEvents())
+  );
+};
+
+const makeSimulationEventChanges = (args: Object): Array<any> => {
+  const eventsJson = getEventsJsonArgument(args);
+  if (eventsJson) {
+    return [
+      {
+        operationName: args.operation_name || 'insert_at_end',
+        operationTargetEvent: args.operation_target_event || null,
+        generatedEvents: eventsJson,
+      },
+    ];
+  }
+  if (!Array.isArray(args.event_changes)) return [];
+  return args.event_changes.map(change => ({
+    operationName:
+      (change && (change.operation_name || change.operationName)) ||
+      'insert_at_end',
+    operationTargetEvent:
+      (change &&
+        (change.operation_target_event || change.operationTargetEvent)) ||
+      null,
+    generatedEvents:
+      change && change.generated_events !== undefined
+        ? typeof change.generated_events === 'string'
+          ? change.generated_events
+          : JSON.stringify(change.generated_events)
+        : change && change.generatedEvents !== undefined
+        ? typeof change.generatedEvents === 'string'
+          ? change.generatedEvents
+          : JSON.stringify(change.generatedEvents)
+        : null,
+  }));
+};
+
+const applyEventChangeDependenciesForSimulation = ({
+  project,
+  scene,
+  args,
+}: {
+  project: gdProject,
+  scene: gdLayout,
+  args: Object,
+}) => {
+  if (!Array.isArray(args.event_changes)) return;
+  args.event_changes.forEach(change => {
+    if (!change || typeof change !== 'object') return;
+    addUndeclaredVariables({
+      project,
+      scene,
+      undeclaredVariables:
+        change.undeclared_variables || change.undeclaredVariables || [],
+    });
+    const objectVariables =
+      change.undeclared_object_variables ||
+      change.undeclaredObjectVariables ||
+      {};
+    Object.keys(objectVariables).forEach(objectName =>
+      addObjectUndeclaredVariables({
+        project,
+        scene,
+        objectName,
+        undeclaredVariables: objectVariables[objectName] || [],
+      })
+    );
+    const missingBehaviors =
+      change.missing_object_behaviors || change.missingObjectBehaviors || {};
+    Object.keys(missingBehaviors).forEach(objectName =>
+      addMissingObjectBehaviors({
+        project,
+        scene,
+        objectName,
+        missingBehaviors: missingBehaviors[objectName] || [],
+      })
+    );
+  });
+};
+
+const dryRunSceneEventDsl = ({
+  project,
+  i18n,
+  args,
+}: {
+  project: gdProject,
+  i18n?: any,
+  args: Object,
+}): Object => {
+  const sceneName =
+    args && typeof args.scene_name === 'string' ? args.scene_name : '';
+  if (!sceneName) throw new Error('Missing scene_name.');
+  if (!project.hasLayoutNamed(sceneName)) {
+    throw new Error(`Scene "${sceneName}" does not exist.`);
+  }
+  const normalized = normalizeEventDslArguments({ project, i18n, args });
+  const eventChanges = makeSimulationEventChanges(normalized.args);
+  if (!eventChanges.length) {
+    throw new Error('Provide events or one or more operations.');
+  }
+
+  const currentSerializedEvents = serializeToJSObject(
+    project.getLayout(sceneName).getEvents()
+  );
+  const currentRevision = getSerializedEventsRevision(currentSerializedEvents);
+  const expectedRevision =
+    normalized.args.expected_revision || normalized.args.expectedRevision;
+  if (expectedRevision && expectedRevision !== currentRevision) {
+    return {
+      success: false,
+      valid: false,
+      dryRun: true,
+      changed: false,
+      code: 'EVENT_SHEET_REVISION_CONFLICT',
+      sceneName,
+      expectedRevision,
+      eventSheetRevision: currentRevision,
+      error:
+        'The scene event sheet changed after it was read. Read it again and rebuild the patch against the current revision.',
+    };
+  }
+
+  const validationProject = gd.ProjectHelper.createNewGDJSProject();
+  try {
+    unserializeFromJSObject(validationProject, serializeToJSObject(project));
+    const validationScene = validationProject.getLayout(sceneName);
+    applyEventChangeDependenciesForSimulation({
+      project: validationProject,
+      scene: validationScene,
+      args: normalized.args,
+    });
+    const application = applyEventsChanges(
+      validationProject,
+      validationScene.getEvents(),
+      eventChanges,
+      normalized.args.generated_event_id || 'mcp-dsl-event'
+    );
+    const proposedSerializedEvents = serializeToJSObject(
+      validationScene.getEvents()
+    );
+    const proposedRevision = getSerializedEventsRevision(
+      proposedSerializedEvents
+    );
+    if (application.errors.length) {
+      return {
+        success: false,
+        valid: false,
+        dryRun: true,
+        changed: false,
+        code: 'EVENT_PATCH_INVALID',
+        sceneName,
+        eventSheetRevision: currentRevision,
+        proposedEventSheetRevision: proposedRevision,
+        errors: application.errors,
+        compilations: normalized.compilations,
+      };
+    }
+
+    const validation = validateEventsJson({
+      project: validationProject,
+      sceneName,
+      eventsJson: JSON.stringify(proposedSerializedEvents),
+      allowJavaScriptEvents: !!normalized.args.allow_javascript_events,
+      dedupeErrors: !!normalized.args.dedupe_errors,
+      summaryOnly: normalized.args.summary_only !== false,
+      errorsOnly: !!normalized.args.errors_only,
+      includeRenderedEvents: !!normalized.args.include_rendered_events,
+      includeNormalizedJson: !!normalized.args.include_normalized_json,
+    });
+    return {
+      ...validation,
+      success: validation.valid,
+      dryRun: true,
+      changed: false,
+      wouldModify: proposedRevision !== currentRevision,
+      sceneName,
+      eventSheetRevision: currentRevision,
+      proposedEventSheetRevision: proposedRevision,
+      requestedOperations: eventChanges.length,
+      lowLevelMutations: application.applied,
+      compilations: normalized.compilations,
+    };
+  } finally {
+    validationProject.delete();
+  }
+};
+
 const normalizeSerializedEventsInputForValidation = (value: any): any => {
   if (Array.isArray(value)) return value;
   if (value && typeof value === 'object') {
@@ -3766,64 +4599,116 @@ const callEditorFunction = async ({
   context: McpEditorBridgeContext,
 |}): Promise<McpToolResult> => {
   const project = context.getProject();
+  const isSceneEventWrite = !!(
+    project &&
+    (toolName === 'add_scene_events' || toolName === 'generate_events') &&
+    args &&
+    typeof args.scene_name === 'string' &&
+    project.hasLayoutNamed(args.scene_name)
+  );
+  const oldRevision = isSceneEventWrite
+    ? getSceneEventsRevision((project: any), args.scene_name)
+    : undefined;
   const processEditorFunctionCalls =
     context.processEditorFunctionCalls ||
     getDefaultProcessEditorFunctionCalls();
 
-  const { results } = await processEditorFunctionCalls({
-    project,
-    i18n: context.i18n,
-    editorCallbacks: context.editorCallbacks,
-    toolOptions: { includeEventsJson: true },
-    functionCalls: [
-      {
-        name: toolName,
-        arguments: JSON.stringify(args || {}),
-        call_id: 'mcp-call',
-      },
-    ],
-    relatedAiRequestId: 'mcp',
-    getRelatedAiRequestLastMessages: () => ({
-      lastUserMessage: null,
-      lastAssistantMessages: [],
-    }),
-    generateEvents:
-      context.generateEvents ||
-      (async () => ({
-        generationCompleted: false,
-        errorMessage: 'Event generation is not available through MCP.',
-      })),
-    onSceneEventsModifiedOutsideEditor:
-      context.onSceneEventsModifiedOutsideEditor || (() => {}),
-    onInstancesModifiedOutsideEditor:
-      context.onInstancesModifiedOutsideEditor || (() => {}),
-    onObjectsModifiedOutsideEditor:
-      context.onObjectsModifiedOutsideEditor || (() => {}),
-    onObjectGroupsModifiedOutsideEditor:
-      context.onObjectGroupsModifiedOutsideEditor || (() => {}),
-    ensureExtensionInstalled:
-      context.ensureExtensionInstalled || (async () => {}),
-    onWillInstallExtension: context.onWillInstallExtension || (() => {}),
-    onExtensionInstalled: context.onExtensionInstalled || (() => {}),
-    searchAndInstallAsset:
-      context.searchAndInstallAsset ||
-      (async () => ({
-        status: 'error',
-        message: 'Asset search is not available through MCP.',
-        createdObjects: [],
-        assetShortHeader: null,
-        isTheFirstOfItsTypeInProject: false,
-      })),
-    searchAndInstallResources:
-      context.searchAndInstallResources ||
-      (async () => ({
-        results: [],
-      })),
-    getAssetStoreTagForNewObject:
-      context.getAssetStoreTagForNewObject || (() => null),
-  });
+  let results: Array<any>;
+  try {
+    ({ results } = await processEditorFunctionCalls({
+      project,
+      i18n: context.i18n,
+      editorCallbacks: context.editorCallbacks,
+      toolOptions: { includeEventsJson: true },
+      functionCalls: [
+        {
+          name: toolName,
+          arguments: JSON.stringify(args || {}),
+          call_id: 'mcp-call',
+        },
+      ],
+      relatedAiRequestId: 'mcp',
+      getRelatedAiRequestLastMessages: () => ({
+        lastUserMessage: null,
+        lastAssistantMessages: [],
+      }),
+      generateEvents:
+        context.generateEvents ||
+        (async () => ({
+          generationCompleted: false,
+          errorMessage: 'Event generation is not available through MCP.',
+        })),
+      onSceneEventsModifiedOutsideEditor:
+        context.onSceneEventsModifiedOutsideEditor || (() => {}),
+      onInstancesModifiedOutsideEditor:
+        context.onInstancesModifiedOutsideEditor || (() => {}),
+      onObjectsModifiedOutsideEditor:
+        context.onObjectsModifiedOutsideEditor || (() => {}),
+      onObjectGroupsModifiedOutsideEditor:
+        context.onObjectGroupsModifiedOutsideEditor || (() => {}),
+      ensureExtensionInstalled:
+        context.ensureExtensionInstalled || (async () => {}),
+      onWillInstallExtension: context.onWillInstallExtension || (() => {}),
+      onExtensionInstalled: context.onExtensionInstalled || (() => {}),
+      searchAndInstallAsset:
+        context.searchAndInstallAsset ||
+        (async () => ({
+          status: 'error',
+          message: 'Asset search is not available through MCP.',
+          createdObjects: [],
+          assetShortHeader: null,
+          isTheFirstOfItsTypeInProject: false,
+        })),
+      searchAndInstallResources:
+        context.searchAndInstallResources ||
+        (async () => ({
+          results: [],
+        })),
+      getAssetStoreTagForNewObject:
+        context.getAssetStoreTagForNewObject || (() => null),
+    }));
+  } catch (error) {
+    const newRevision = isSceneEventWrite
+      ? getSceneEventsRevision((project: any), args.scene_name)
+      : undefined;
+    if (isSceneEventWrite && oldRevision !== newRevision) {
+      context.triggerUnsavedChanges();
+      const saveState =
+        args && args.save === true
+          ? {
+              requested: true,
+              ...(context.saveProjectAndWait
+                ? await saveProjectWithEvidence(context)
+                : {
+                    success: false,
+                    saved: false,
+                    reason: 'save-handler-unavailable',
+                  }),
+            }
+          : {
+              requested: false,
+              persistenceState: getPersistenceState(context),
+            };
+      return textResult({
+        success: true,
+        applied: true,
+        sceneName: args.scene_name,
+        oldRevision,
+        newRevision,
+        eventSheetRevision: newRevision,
+        editorReportedSuccess: false,
+        validationState: {
+          valid: true,
+          source: 'revision-readback-after-editor-exception',
+        },
+        saveState,
+        warning: error.message,
+      });
+    }
+    throw error;
+  }
 
-  const firstResult = results[0];
+  const firstResult = results && results[0];
   if (!firstResult) {
     return errorResult('The editor function did not return a result.');
   }
@@ -3840,20 +4725,105 @@ const callEditorFunction = async ({
     context.triggerUnsavedChanges();
   }
 
+  let output = firstResult.output;
+  if (
+    firstResult.didModifyProject &&
+    output &&
+    typeof output === 'object' &&
+    !Array.isArray(output)
+  ) {
+    output = {
+      ...output,
+      persistenceState: getPersistenceState(context),
+    };
+  }
+  const newRevision = isSceneEventWrite
+    ? getSceneEventsRevision((project: any), args.scene_name)
+    : undefined;
+  const eventMutationObserved = !!(
+    isSceneEventWrite &&
+    (oldRevision !== newRevision ||
+      firstResult.didModifyProject ||
+      (output &&
+        typeof output === 'object' &&
+        (output.applied === true || output.lowLevelMutations > 0)))
+  );
+  const recoveredMutationAfterReportedFailure = !!(
+    !firstResult.success && eventMutationObserved
+  );
+  if (recoveredMutationAfterReportedFailure && !firstResult.didModifyProject) {
+    context.triggerUnsavedChanges();
+  }
+  if (isSceneEventWrite && output && typeof output === 'object') {
+    let saveState = {
+      requested: false,
+      persistenceState: getPersistenceState(context),
+    };
+    if (
+      args &&
+      args.save === true &&
+      (firstResult.success || recoveredMutationAfterReportedFailure)
+    ) {
+      saveState = {
+        requested: true,
+        ...(context.saveProjectAndWait
+          ? await saveProjectWithEvidence(context)
+          : {
+              success: false,
+              saved: false,
+              reason: 'save-handler-unavailable',
+            }),
+      };
+    }
+    output = {
+      ...output,
+      success: firstResult.success || recoveredMutationAfterReportedFailure,
+      sceneName: args.scene_name,
+      applied: eventMutationObserved,
+      oldRevision,
+      newRevision,
+      eventSheetRevision: newRevision,
+      validationState: output.validationState || {
+        valid: firstResult.success || recoveredMutationAfterReportedFailure,
+        source: 'direct-event-preflight',
+      },
+      saveState,
+    };
+  }
+
+  // The event sheet revision is the source of truth. If an editor integration
+  // reports an unrelated failure after the model changed, returning an error
+  // would encourage a retry that duplicates the mutation.
+  if (recoveredMutationAfterReportedFailure) {
+    return textResult({
+      ...(output && typeof output === 'object' ? output : {}),
+      success: true,
+      applied: true,
+      editorReportedSuccess: false,
+      warning:
+        firstResult.output && firstResult.output.message
+          ? firstResult.output.message
+          : 'The editor reported a failure after the event sheet revision changed. The mutation was kept and verified by revision readback.',
+    });
+  }
+
   return firstResult.success
     ? textResult(
         firstResult.didModifyProject
           ? withStaleStateAdvisory(
-              firstResult.output,
+              output,
               context,
-              getStaleStateTargetForTool(toolName, args, firstResult.output)
+              getStaleStateTargetForTool(toolName, args, output)
             )
-          : firstResult.output
+          : output
       )
     : errorResult(
         firstResult.output && firstResult.output.message
           ? firstResult.output.message
-          : JSON.stringify(firstResult.output || {}, null, 2)
+          : JSON.stringify(firstResult.output || {}, null, 2),
+        output && typeof output === 'object' && !Array.isArray(output)
+          ? output
+          : undefined
       );
 };
 
@@ -4016,27 +4986,67 @@ const callMcpTool = async ({
     );
   }
 
+  if (toolName === 'gdevelop_get_event_dsl_reference') {
+    return textResult(getEventDslReference());
+  }
+
   if (toolName === 'gdevelop_get_event_operation_reference') {
     return textResult(getEventOperationReference());
   }
 
   if (toolName === 'gdevelop_validate_events_json') {
     if (!project) return errorResult('No project opened.');
+    let validationArgs = args || {};
+    try {
+      validationArgs = normalizeEventDslArguments({
+        project,
+        i18n: context.i18n,
+        args: validationArgs,
+      }).args;
+    } catch (error) {
+      return errorResult(error.message, { code: 'EVENT_DSL_INVALID' });
+    }
     return textResult(
       validateEventsJson({
         project,
         sceneName:
-          args && typeof args.scene_name === 'string' ? args.scene_name : null,
-        eventsJson: getEventsJsonArgument(args),
-        allowJavaScriptEvents: !!(args && args.allow_javascript_events),
-        dedupeErrors: !!(args && args.dedupe_errors),
+          validationArgs && typeof validationArgs.scene_name === 'string'
+            ? validationArgs.scene_name
+            : null,
+        eventsJson: getEventsJsonArgument(validationArgs),
+        allowJavaScriptEvents: !!validationArgs.allow_javascript_events,
+        dedupeErrors: !!validationArgs.dedupe_errors,
+        summaryOnly: validationArgs.summary_only !== false,
+        errorsOnly: !!validationArgs.errors_only,
+        includeRenderedEvents: !!validationArgs.include_rendered_events,
+        includeNormalizedJson: !!validationArgs.include_normalized_json,
       })
     );
   }
 
+  if (toolName === 'gdevelop_validate_events') {
+    if (!project) return errorResult('No project opened.');
+    try {
+      return textResult(
+        dryRunSceneEventDsl({ project, i18n: context.i18n, args: args || {} })
+      );
+    } catch (error) {
+      return errorResult(error.message, { code: 'EVENT_DSL_INVALID' });
+    }
+  }
+
   if (toolName === 'gdevelop_validate_extension_events_json') {
     if (!project) return errorResult('No project opened.');
-    return textResult(validateExtensionEventsJson(project, args || {}));
+    try {
+      const validationArgs = normalizeEventDslArguments({
+        project,
+        i18n: context.i18n,
+        args: args || {},
+      }).args;
+      return textResult(validateExtensionEventsJson(project, validationArgs));
+    } catch (error) {
+      return errorResult(error.message, { code: 'EVENT_DSL_INVALID' });
+    }
   }
 
   if (toolName === 'validate_current_project_json') {
@@ -4076,8 +5086,11 @@ const callMcpTool = async ({
             ? args.events_json_file
             : null,
         allowJavaScriptEvents: !!(args && args.allow_javascript_events),
-        summaryOnly: !!(args && args.summary_only),
+        summaryOnly: !(args && args.summary_only === false),
         dedupeErrors: !!(args && args.dedupe_errors),
+        errorsOnly: !!(args && args.errors_only),
+        includeRenderedEvents: !!(args && args.include_rendered_events),
+        includeNormalizedJson: !!(args && args.include_normalized_json),
       })
     );
   }
@@ -4091,7 +5104,7 @@ const callMcpTool = async ({
         query: args && typeof args.query === 'string' ? args.query : null,
         kind: args && typeof args.kind === 'string' ? args.kind : null,
         limit: args && typeof args.limit === 'number' ? args.limit : null,
-        compact: !!(args && args.compact),
+        compact: !(args && args.compact === false),
         targetScope:
           args && typeof args.target_scope === 'string'
             ? args.target_scope
@@ -4108,7 +5121,7 @@ const callMcpTool = async ({
         i18n: context.i18n,
         type: args && typeof args.type === 'string' ? args.type : null,
         kind: args && typeof args.kind === 'string' ? args.kind : null,
-        compact: !!(args && args.compact),
+        compact: !(args && args.compact === false),
         targetScope:
           args && typeof args.target_scope === 'string'
             ? args.target_scope
@@ -4672,8 +5685,7 @@ const callMcpTool = async ({
   }
 
   if (toolName === 'save_and_relaunch_preview_paused') {
-    const saveProjectAndWait = context.saveProjectAndWait;
-    if (!saveProjectAndWait) {
+    if (!context.saveProjectAndWait) {
       return errorResult(
         'The GDevelop host did not provide saveProjectAndWait, so MCP cannot save before relaunching the preview.'
       );
@@ -4682,11 +5694,11 @@ const callMcpTool = async ({
       ? context.getPreviewDebuggerServer()
       : null;
     try {
-      const save = await saveProjectAndWait();
+      const save = await saveProjectWithEvidence(context);
       let closedWindows = false;
       let closedDebuggerConnections = false;
       if (typeof context.closeAllPreviews === 'function') {
-        context.closeAllPreviews();
+        await Promise.resolve(context.closeAllPreviews());
         closedWindows = true;
       }
       if (
@@ -4696,19 +5708,68 @@ const callMcpTool = async ({
         previewDebuggerServer.closeAllConnections();
         closedDebuggerConnections = true;
       }
-      const launch = await launchPreview(
-        previewDebuggerServer,
-        context.runCommand,
-        {
-          ...(args || {}),
-          start_paused: true,
-          force_new: true,
-        },
-        {
-          getProject: context.getProject,
-          launchPreviewForScene: context.launchPreviewForScene,
+      const closeWaitStartedAt = Date.now();
+      while (
+        previewDebuggerServer &&
+        getPreviewDebuggerIds(previewDebuggerServer).length > 0 &&
+        Date.now() - closeWaitStartedAt < 2000
+      ) {
+        await wait(50);
+      }
+
+      const maximumAttempts =
+        args && typeof args.relaunch_attempts === 'number'
+          ? Math.max(1, Math.min(4, Math.floor(args.relaunch_attempts)))
+          : 2;
+      const launchAttempts = [];
+      let launch = null;
+      for (let attempt = 1; attempt <= maximumAttempts; attempt++) {
+        launch = await launchPreview(
+          previewDebuggerServer,
+          context.runCommand,
+          {
+            ...(args || {}),
+            start_paused: true,
+            force_new: true,
+          },
+          {
+            getProject: context.getProject,
+            launchPreviewForScene: context.launchPreviewForScene,
+          }
+        );
+        launchAttempts.push({
+          attempt,
+          success: !!launch.success,
+          failurePhase: launch.failurePhase,
+          debuggerId: launch.debuggerId,
+          elapsedMs: launch.elapsedMs,
+          requestedPause: true,
+          pauseAttempted: !!launch.pauseAttempted,
+          pauseConfirmed: !!launch.pauseConfirmed,
+          error: launch.error,
+        });
+        if (launch.success) break;
+        if (attempt < maximumAttempts) {
+          // A connected-but-unresponsive launch can leave a stale websocket or
+          // window that the next attempt attaches to. Close it before backing
+          // off so every retry starts from a clean debugger lifecycle.
+          if (typeof context.closeAllPreviews === 'function') {
+            await Promise.resolve(context.closeAllPreviews());
+          }
+          if (
+            previewDebuggerServer &&
+            typeof previewDebuggerServer.closeAllConnections === 'function'
+          ) {
+            previewDebuggerServer.closeAllConnections();
+          }
+          await wait(250 * Math.pow(2, attempt - 1));
         }
-      );
+      }
+      launch = launch || {
+        success: false,
+        failurePhase: 'window-launch',
+        error: 'No preview launch attempt was made.',
+      };
       let inspect = null;
       if (launch.success && launch.debuggerId) {
         inspect = await captureRunningPreviewState(previewDebuggerServer, {
@@ -4718,11 +5779,16 @@ const callMcpTool = async ({
         });
       }
       return textResult({
-        success: !!(save && launch && launch.success),
-        saved: !!save,
+        success: !!(save.success && launch && launch.success),
+        saved: !!save.saved,
         save,
         closedWindows,
         closedDebuggerConnections,
+        closeWaitMs: Date.now() - closeWaitStartedAt,
+        requestedPause: true,
+        pauseAttempted: !!launch.pauseAttempted,
+        pauseConfirmed: !!launch.pauseConfirmed,
+        launchAttempts,
         launch,
         debuggerId: launch.debuggerId || null,
         sceneName:
@@ -4730,7 +5796,7 @@ const callMcpTool = async ({
             inspect.runtime &&
             Array.isArray(inspect.runtime.scenes) &&
             inspect.runtime.scenes[0] &&
-            inspect.runtime.scenes[0].sceneName) ||
+            inspect.runtime.scenes[0].name) ||
           (launch.status && launch.status.sceneName) ||
           null,
         runtime:
@@ -4739,7 +5805,7 @@ const callMcpTool = async ({
                 sceneName:
                   inspect.runtime.scenes &&
                   inspect.runtime.scenes[0] &&
-                  inspect.runtime.scenes[0].sceneName,
+                  inspect.runtime.scenes[0].name,
                 objectInstanceCounts:
                   inspect.runtime.scenes &&
                   inspect.runtime.scenes[0] &&
@@ -4754,7 +5820,7 @@ const callMcpTool = async ({
         errors: inspect && inspect.errors ? inspect.errors : undefined,
         note: launch.success
           ? 'Saved, closed stale previews, launched a fresh debug preview, confirmed pause/readiness, and inspected the runtime snapshot.'
-          : 'The save/close steps ran, but the fresh paused preview did not become ready. See launch diagnostics.',
+          : 'The save/close steps ran, but the fresh paused preview did not become ready after retries. Recovery: call launch_preview { start_paused: true, force_new: true }, then wait_until_preview_ready.',
       });
     } catch (error) {
       return errorResult(error.message);
@@ -4792,6 +5858,21 @@ const callMcpTool = async ({
     if (!commandMetadata) {
       return errorResult(`Unknown command: ${commandName}.`);
     }
+    if (commandName.trim().toUpperCase() === 'SAVE_PROJECT') {
+      const persistence = await saveProjectWithEvidence(context);
+      return persistence.success
+        ? textResult({
+            success: true,
+            commandName,
+            completed: true,
+            persistence,
+          })
+        : errorResult('The project save did not complete successfully.', {
+            commandName,
+            completed: true,
+            persistence,
+          });
+    }
     const didRun = context.runCommand(commandName);
     return didRun
       ? textResult({
@@ -4815,7 +5896,7 @@ const callMcpTool = async ({
       );
     }
     try {
-      const result = await context.saveProjectAndWait();
+      const persistence = await saveProjectWithEvidence(context);
       // Post-save consistency snapshot (#11): report project-level facts so the
       // caller can confirm the saved state matches intent without a separate read.
       const project = context.getProject ? context.getProject() : null;
@@ -4834,8 +5915,10 @@ const callMcpTool = async ({
         };
       }
       return textResult({
-        saved: !!result,
-        result,
+        success: persistence.success,
+        saved: persistence.saved,
+        reason: persistence.reason,
+        persistence,
         consistency,
       });
     } catch (error) {
@@ -4845,6 +5928,19 @@ const callMcpTool = async ({
           : 'Unable to save the project through MCP.'
       );
     }
+  }
+
+  if (toolName === 'gdevelop_apply_events') {
+    if (!project) return errorResult('No project opened.');
+    return callMcpTool({
+      toolName: 'add_scene_events',
+      args: {
+        ...(args || {}),
+        events_dsl: args && args.events,
+        event_patch: args && args.operations,
+      },
+      context,
+    });
   }
 
   if (toolName === 'gdevelop_editor_call') {
@@ -4882,12 +5978,83 @@ const callMcpTool = async ({
     });
   }
 
-  if (
-    (toolName === 'add_scene_events' || toolName === 'generate_events') &&
-    !getEventsJsonArgument(args) &&
-    !args.event_changes
-  ) {
-    return errorResult(mcpDirectEventsRequiredMessage);
+  let eventWriteArgs = args || {};
+  if (toolName === 'add_scene_events' || toolName === 'generate_events') {
+    const hasDslInput = !!(
+      eventWriteArgs.events_dsl !== undefined ||
+      eventWriteArgs.eventsDsl !== undefined ||
+      eventWriteArgs.event_patch !== undefined ||
+      eventWriteArgs.operations !== undefined ||
+      (eventWriteArgs.events !== undefined &&
+        isEventsDsl(eventWriteArgs.events))
+    );
+    if (
+      !getEventsJsonArgument(eventWriteArgs) &&
+      !eventWriteArgs.event_changes &&
+      !hasDslInput
+    ) {
+      return errorResult(mcpDirectEventsRequiredMessage);
+    }
+    if (project) {
+      try {
+        eventWriteArgs = normalizeEventDslArguments({
+          project,
+          i18n: context.i18n,
+          args: eventWriteArgs,
+        }).args;
+      } catch (error) {
+        return errorResult(error.message, { code: 'EVENT_DSL_INVALID' });
+      }
+    } else if (hasDslInput) {
+      return errorResult('No project opened.');
+    }
+    const sceneName = eventWriteArgs.scene_name;
+    if (typeof sceneName !== 'string' || !sceneName) {
+      return errorResult('Missing scene_name.');
+    }
+    let currentRevision;
+    if (project) {
+      try {
+        currentRevision = getSceneEventsRevision(project, sceneName);
+      } catch (error) {
+        return errorResult(error.message);
+      }
+    }
+    const expectedRevision =
+      eventWriteArgs.expected_revision || eventWriteArgs.expectedRevision;
+    if (project && expectedRevision && expectedRevision !== currentRevision) {
+      return errorResult(
+        'The scene event sheet changed after it was read. Read it again and rebuild the patch against the current revision.',
+        {
+          code: 'EVENT_SHEET_REVISION_CONFLICT',
+          sceneName,
+          expectedRevision,
+          eventSheetRevision: currentRevision,
+        }
+      );
+    }
+    if (
+      project &&
+      (eventWriteArgs.dry_run === true || eventWriteArgs.dryRun === true)
+    ) {
+      try {
+        return textResult(
+          dryRunSceneEventDsl({
+            project,
+            i18n: context.i18n,
+            args: eventWriteArgs,
+          })
+        );
+      } catch (error) {
+        return errorResult(error.message, { code: 'EVENT_DSL_INVALID' });
+      }
+    }
+    if (
+      !getEventsJsonArgument(eventWriteArgs) &&
+      !eventWriteArgs.event_changes
+    ) {
+      return errorResult(mcpDirectEventsRequiredMessage);
+    }
   }
 
   let extensionWriteToolHandler = null;
@@ -4928,16 +6095,31 @@ const callMcpTool = async ({
   if (extensionWriteToolHandler) {
     if (!project) return errorResult('No project opened.');
     try {
+      let extensionArgs = args || {};
+      if (
+        toolName === 'gdevelop_create_or_update_extension_function' ||
+        toolName === 'gdevelop_create_or_update_on_signal'
+      ) {
+        extensionArgs = normalizeEventDslArguments({
+          project,
+          i18n: context.i18n,
+          args: extensionArgs,
+        }).args;
+      }
       const extensionPatchSnapshot =
         toolName === 'apply_validated_extension_patch' &&
-        !(args && (args.dry_run === true || args.dryRun === true))
+        !(
+          extensionArgs &&
+          (extensionArgs.dry_run === true || extensionArgs.dryRun === true)
+        )
           ? snapshotProject(project, {
-              label: `before-validated-extension-patch-${(args &&
-                (args.extension_name || args.extensionName)) ||
+              label: `before-validated-extension-patch-${(extensionArgs &&
+                (extensionArgs.extension_name ||
+                  extensionArgs.extensionName)) ||
                 'extension'}`,
             })
           : null;
-      const result = extensionWriteToolHandler(project, args || {});
+      const result = extensionWriteToolHandler(project, extensionArgs);
       if (extensionPatchSnapshot && result.success && !result.dryRun) {
         result.snapshot = extensionPatchSnapshot;
       }
@@ -4947,31 +6129,32 @@ const callMcpTool = async ({
         (toolName === 'apply_validated_extension_patch' &&
           result.scope === 'extension_function') ||
         (toolName === 'gdevelop_create_or_update_extension_function' &&
-          args &&
-          (getEventsJsonArgument(args) ||
-            (args.serialized_function &&
-              typeof args.serialized_function === 'object'))) ||
+          extensionArgs &&
+          (getEventsJsonArgument(extensionArgs) ||
+            (extensionArgs.serialized_function &&
+              typeof extensionArgs.serialized_function === 'object'))) ||
         (toolName === 'gdevelop_create_or_update_on_signal' &&
-          args &&
-          getEventsJsonArgument(args));
+          extensionArgs &&
+          getEventsJsonArgument(extensionArgs));
       if (
         extensionFunctionEventsChanged &&
         !result.dryRun &&
         context.onExtensionFunctionEventsModifiedOutsideEditor
       ) {
         context.onExtensionFunctionEventsModifiedOutsideEditor({
-          extensionName: result.extensionName || args.extension_name,
-          parentKind: result.parentKind || args.parent_kind || 'extension',
+          extensionName: result.extensionName || extensionArgs.extension_name,
+          parentKind:
+            result.parentKind || extensionArgs.parent_kind || 'extension',
           parentName:
             result.parentKind === 'extension' ||
-            args.parent_kind === 'extension'
+            extensionArgs.parent_kind === 'extension'
               ? null
-              : result.parentName || args.parent_name || null,
+              : result.parentName || extensionArgs.parent_name || null,
           functionName:
             result.functionName ||
             (result.function && result.function.name
               ? result.function.name
-              : args.new_function_name || args.function_name),
+              : extensionArgs.new_function_name || extensionArgs.function_name),
           newOrChangedAiGeneratedEventIds: new Set(),
         });
       }
@@ -4985,17 +6168,21 @@ const callMcpTool = async ({
         context.onExtensionModifiedOutsideEditor
       ) {
         context.onExtensionModifiedOutsideEditor(
-          result.extensionName || args.extension_name
+          result.extensionName || extensionArgs.extension_name
         );
       }
-      if (!result.dryRun) {
+      if (
+        !result.dryRun &&
+        result.success !== false &&
+        result.didModifyProject !== false
+      ) {
         context.triggerUnsavedChanges();
       }
       return textResult(
         withStaleStateAdvisory(
           result,
           context,
-          getStaleStateTargetForTool(toolName, args, result)
+          getStaleStateTargetForTool(toolName, extensionArgs, result)
         )
       );
     } catch (error) {
@@ -5050,7 +6237,7 @@ const callMcpTool = async ({
         context.triggerUnsavedChanges();
         notifyProjectModelChangedOutsideEditor(project, context);
         if (result.shouldSave && context.saveProjectAndWait) {
-          result.save = await context.saveProjectAndWait();
+          result.save = await saveProjectWithEvidence(context);
         } else if (result.shouldSave) {
           result.save = {
             saved: false,
@@ -5107,13 +6294,17 @@ const callMcpTool = async ({
     if (!project) return errorResult('No project opened.');
     try {
       const result = projectWriteToolHandler(project, args || {});
-      context.triggerUnsavedChanges();
+      const didModifyProject =
+        result.success !== false && result.didModifyProject !== false;
+      if (didModifyProject) context.triggerUnsavedChanges();
       return textResult(
-        withStaleStateAdvisory(
-          result,
-          context,
-          getStaleStateTargetForTool(toolName, args, result)
-        )
+        didModifyProject
+          ? withStaleStateAdvisory(
+              result,
+              context,
+              getStaleStateTargetForTool(toolName, args, result)
+            )
+          : result
       );
     } catch (error) {
       return errorResult(error.message);
@@ -5194,17 +6385,25 @@ const callMcpTool = async ({
   if (sceneWriteToolHandler) {
     if (!project) return errorResult('No project opened.');
     try {
+      const sceneArgs =
+        toolName === 'bulk_edit_scene_assets'
+          ? normalizeEventDslArguments({
+              project,
+              i18n: context.i18n,
+              args: args || {},
+            }).args
+          : args || {};
       if (
         toolName === 'bulk_edit_scene_assets' &&
-        args &&
-        (getEventsJsonArgument(args) || Array.isArray(args.event_changes))
+        (getEventsJsonArgument(sceneArgs) ||
+          Array.isArray(sceneArgs.event_changes))
       ) {
-        const eventsJson = getEventsJsonArgument(args);
+        const eventsJson = getEventsJsonArgument(sceneArgs);
         const eventsArgs = {
-          scene_name: args.scene_name,
+          scene_name: sceneArgs.scene_name,
           events_json: eventsJson,
-          event_changes: Array.isArray(args.event_changes)
-            ? args.event_changes
+          event_changes: Array.isArray(sceneArgs.event_changes)
+            ? sceneArgs.event_changes
             : undefined,
         };
         const preflightFailure = makeAddSceneEventsPreflightFailure(
@@ -5224,7 +6423,7 @@ const callMcpTool = async ({
         args: Object,
         callbacks: Object
       ) => Object = (sceneWriteToolHandler: any);
-      const result = runSceneWriteTool(project, args || {}, {
+      const result = runSceneWriteTool(project, sceneArgs, {
         onSceneEventsModifiedOutsideEditor:
           context.onSceneEventsModifiedOutsideEditor,
         onInstancesModifiedOutsideEditor:
@@ -5234,12 +6433,15 @@ const callMcpTool = async ({
       // A dry_run handler returns without mutating - don't mark the project
       // dirty and don't run any follow-up writes (e.g. the bulk events step).
       const isDryRun = !!(
-        args &&
-        (args.dry_run === true || args.dryRun === true) &&
+        (sceneArgs.dry_run === true || sceneArgs.dryRun === true) &&
         result &&
         result.dryRun === true
       );
-      const didModifyProject = !(result && result.didModifyProject === false);
+      const didModifyProject = !!(
+        result &&
+        result.success !== false &&
+        result.didModifyProject !== false
+      );
       if (!isDryRun && didModifyProject) context.triggerUnsavedChanges();
 
       // bulk_edit_scene_assets can also write events in the same call. Events are
@@ -5252,17 +6454,16 @@ const callMcpTool = async ({
       if (
         !isDryRun &&
         toolName === 'bulk_edit_scene_assets' &&
-        args &&
-        (getEventsJsonArgument(args) ||
-          Array.isArray(args.events) ||
-          Array.isArray(args.event_changes))
+        (getEventsJsonArgument(sceneArgs) ||
+          Array.isArray(sceneArgs.events) ||
+          Array.isArray(sceneArgs.event_changes))
       ) {
-        const eventsJson = getEventsJsonArgument(args);
+        const eventsJson = getEventsJsonArgument(sceneArgs);
         const eventsArgs = {
-          scene_name: args.scene_name,
+          scene_name: sceneArgs.scene_name,
           events_json: eventsJson,
-          event_changes: Array.isArray(args.event_changes)
-            ? args.event_changes
+          event_changes: Array.isArray(sceneArgs.event_changes)
+            ? sceneArgs.event_changes
             : undefined,
         };
         const eventsResponse = await callEditorFunction({
@@ -5293,7 +6494,7 @@ const callMcpTool = async ({
         withStaleStateAdvisory(
           result,
           context,
-          getStaleStateTargetForTool(toolName, args, result)
+          getStaleStateTargetForTool(toolName, sceneArgs, result)
         )
       );
     } catch (error) {
@@ -5302,8 +6503,9 @@ const callMcpTool = async ({
   }
 
   const finalArgs =
-    (toolName === 'add_scene_events' || toolName === 'generate_events') && args
-      ? autoQuoteAddSceneEventsArgs(project, args)
+    (toolName === 'add_scene_events' || toolName === 'generate_events') &&
+    eventWriteArgs
+      ? autoQuoteAddSceneEventsArgs(project, eventWriteArgs)
       : args || {};
   if (toolName === 'add_scene_events' || toolName === 'generate_events') {
     const preflightFailure = makeAddSceneEventsPreflightFailure(finalArgs);
@@ -5319,60 +6521,82 @@ const callMcpTool = async ({
 
 export const createMcpEditorBridge = (
   context: McpEditorBridgeContext
-): McpEditorBridge => ({
-  handleRendererMcpRequest: async ({
-    method,
-    params,
-  }: RendererMcpRequest): Promise<any> => {
-    const permissions = context.getPermissions();
+): McpEditorBridge => {
+  // MCP requests arrive outside React's event batching. Keep event model writes
+  // synchronous, but refresh mounted event editors on the next task and merge
+  // repeated notifications so a large patch cannot re-enter the React tree.
+  const deferredContext: McpEditorBridgeContext = {
+    ...context,
+    onSceneEventsModifiedOutsideEditor:
+      createDeferredSceneEventsNotifier(
+        context.onSceneEventsModifiedOutsideEditor
+      ) || undefined,
+  };
 
-    if (method === 'tools/list') {
-      return {
-        tools: getMcpTools(permissions),
-      };
-    }
+  return {
+    handleRendererMcpRequest: async ({
+      method,
+      params,
+    }: RendererMcpRequest): Promise<any> => {
+      const permissions = deferredContext.getPermissions();
 
-    if (method === 'resources/list') {
-      return {
-        resources: getMcpResources(),
-      };
-    }
+      if (method === 'tools/list') {
+        return {
+          tools: getMcpTools(permissions),
+        };
+      }
 
-    if (method === 'prompts/list') {
-      return {
-        prompts: getMcpPrompts(),
-      };
-    }
+      if (method === 'resources/list') {
+        return {
+          resources: getMcpResources(),
+        };
+      }
 
-    if (method === 'prompts/get') {
-      const prompt = getPrompt(params && params.name);
-      if (!prompt)
-        throw new Error(`Unknown GDevelop MCP prompt: ${params.name}`);
-      return prompt;
-    }
+      if (method === 'prompts/list') {
+        return {
+          prompts: getMcpPrompts(),
+        };
+      }
 
-    if (method === 'resources/read') {
-      const uri = params && params.uri;
-      if (typeof uri !== 'string') throw new Error('Missing resource uri.');
-      const content = await getResourceContent(uri, context);
-      return {
-        contents: [content],
-      };
-    }
+      if (method === 'prompts/get') {
+        const prompt = getPrompt(params && params.name);
+        if (!prompt)
+          throw new Error(`Unknown GDevelop MCP prompt: ${params.name}`);
+        return prompt;
+      }
 
-    if (method === 'tools/call') {
-      const toolName = params && params.name;
-      if (typeof toolName !== 'string') throw new Error('Missing tool name.');
-      return callMcpTool({
-        toolName,
-        args:
-          params.arguments && typeof params.arguments === 'object'
-            ? params.arguments
-            : {},
-        context,
-      });
-    }
+      if (method === 'resources/read') {
+        const uri = params && params.uri;
+        if (typeof uri !== 'string') throw new Error('Missing resource uri.');
+        const content = await getResourceContent(uri, deferredContext);
+        return {
+          contents: [content],
+        };
+      }
 
-    throw new Error(`Unsupported renderer MCP method: ${method}`);
-  },
-});
+      if (method === 'tools/call') {
+        const toolName = params && params.name;
+        if (typeof toolName !== 'string') throw new Error('Missing tool name.');
+        try {
+          return await callMcpTool({
+            toolName,
+            args:
+              params.arguments && typeof params.arguments === 'object'
+                ? params.arguments
+                : {},
+            context: deferredContext,
+          });
+        } catch (error) {
+          return errorResult(
+            error && error.message
+              ? error.message
+              : 'Unexpected MCP tool failure.',
+            { code: 'INTERNAL_TOOL_ERROR', toolName }
+          );
+        }
+      }
+
+      throw new Error(`Unsupported renderer MCP method: ${method}`);
+    },
+  };
+};

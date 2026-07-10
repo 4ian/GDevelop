@@ -321,6 +321,7 @@ function createNewWindow(windowArgs = args) {
       // as we've not removed dependency on it and on "@electron/remote".
       nodeIntegration: true,
       contextIsolation: false,
+      webviewTag: true,
     },
     enableLargerThanScreen: true,
     backgroundColor: '#000',
@@ -463,6 +464,9 @@ function createNewWindow(windowArgs = args) {
       const isDebuggerPopOut = details.frameName.startsWith(
         'GDevelopWindowPortal-debugger-'
       );
+      const isBrowserPopup = details.frameName.startsWith(
+        'GDevelopWindowPortal-browser-'
+      );
       // Extract the theme background color passed via the features string
       // by WindowPortal (e.g. "...,themeBackgroundColor=%23282828").
       let backgroundColor = '#000';
@@ -494,6 +498,7 @@ function createNewWindow(windowArgs = args) {
             // nodeIntegration: true,
             // contextIsolation: false,
             webSecurity: false,
+            webviewTag: isBrowserPopup,
           },
         },
       };
@@ -990,14 +995,14 @@ app.on('ready', function() {
           event.sender.send('debugger-error-received', error);
         }
       },
-      onConnectionClose: ({ id }) => {
+      onConnectionClose: details => {
         if (!event.sender.isDestroyed()) {
-          event.sender.send('debugger-connection-closed', { id });
+          event.sender.send('debugger-connection-closed', details);
         }
       },
-      onConnectionOpen: ({ id }) => {
+      onConnectionOpen: details => {
         if (!event.sender.isDestroyed()) {
-          event.sender.send('debugger-connection-opened', { id });
+          event.sender.send('debugger-connection-opened', details);
         }
       },
       onConnectionError: ({ id, errorMessage }) => {

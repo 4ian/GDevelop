@@ -1,2 +1,4 @@
 *.autosave
 node_modules/
+.idea/
+.gdevelop/

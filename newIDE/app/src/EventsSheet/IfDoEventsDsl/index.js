@@ -22,6 +22,11 @@ export type ResolveInstruction = (input: {
   line: number,
 }) => LegacyInstruction;
 
+export type FormatInstruction = (input: {
+  kind: 'condition' | 'action',
+  instruction: LegacyInstruction,
+}) => ?string;
+
 export type LowerWhileLimit = (input: {
   limit: string,
   event: Object,
@@ -32,6 +37,10 @@ export type CompileOptions = {
   resolveInstruction?: ResolveInstruction,
   lowerWhileLimit?: LowerWhileLimit,
   jsCodeEventType?: string,
+};
+
+export type ConvertOptions = {
+  formatInstruction?: FormatInstruction,
 };
 
 type PhysicalLine = { text: string, ending: string };
@@ -466,6 +475,9 @@ const parseNamedArguments = (source: string): Metadata => {
   }
   return result;
 };
+
+export const parseCatalogInstructionArguments = (source: string): Metadata =>
+  parseNamedArguments(source);
 
 const SIMPLE_DSL_PATH = /^[A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)*$/;
 
@@ -1016,18 +1028,8 @@ const parseExactInstruction = (
     line
   );
   if (!source.startsWith('@exact')) {
-    if (!options.resolveInstruction) {
-      const builtinInstruction = resolveFriendlyBuiltinInstruction(
-        source,
-        kind
-      );
-      if (!builtinInstruction) {
-        fail(
-          'IFDO_CATALOG_REQUIRED',
-          `Friendly ${kind} requires a project instruction catalog: ${source}`,
-          line
-        );
-      }
+    const builtinInstruction = resolveFriendlyBuiltinInstruction(source, kind);
+    if (builtinInstruction) {
       if (metadata.disabled !== undefined)
         builtinInstruction.disabled = metadata.disabled;
       if (metadata.inverted !== undefined)
@@ -1035,6 +1037,13 @@ const parseExactInstruction = (
       if (metadata.awaited !== undefined)
         builtinInstruction.type.await = metadata.awaited;
       return builtinInstruction;
+    }
+    if (!options.resolveInstruction) {
+      fail(
+        'IFDO_CATALOG_REQUIRED',
+        `Friendly ${kind} requires a project instruction catalog: ${source}`,
+        line
+      );
     }
     const resolved = normalizeInstruction(
       options.resolveInstruction({ kind, source, line }),
@@ -2355,6 +2364,7 @@ const formatInstructionLines = (
   options: {
     rootKeyword?: 'if' | 'or' | 'do',
     expandLogicalOr?: boolean,
+    formatInstruction?: FormatInstruction,
   } = {}
 ): Array<string> => {
   if (
@@ -2372,6 +2382,7 @@ const formatInstructionLines = (
       formatInstructionLines(child, kind, depth, 0, {
         rootKeyword: index === 0 ? options.rootKeyword || 'if' : 'or',
         expandLogicalOr: false,
+        formatInstruction: options.formatInstruction,
       })
     );
   }
@@ -2388,11 +2399,18 @@ const formatInstructionLines = (
   const instructionText = `@exact id=${quote(
     instruction.type.value
   )} parameters=${JSON.stringify(instruction.parameters || [])}`;
-  const friendlyCandidate = formatFriendlyBuiltinInstruction(instruction, kind);
+  const builtinFriendlyCandidate = formatFriendlyBuiltinInstruction(
+    instruction,
+    kind
+  );
+  const catalogFriendlyCandidate =
+    !builtinFriendlyCandidate && options.formatInstruction
+      ? options.formatInstruction({ kind, instruction })
+      : null;
   let friendlyInstructionText = null;
-  if (friendlyCandidate && !(instruction.subInstructions || []).length) {
+  if (builtinFriendlyCandidate && !(instruction.subInstructions || []).length) {
     const resolvedCandidate = resolveFriendlyBuiltinInstruction(
-      friendlyCandidate,
+      builtinFriendlyCandidate,
       kind
     );
     if (
@@ -2401,8 +2419,12 @@ const formatInstructionLines = (
       JSON.stringify(resolvedCandidate.parameters) ===
         JSON.stringify(instruction.parameters || [])
     ) {
-      friendlyInstructionText = friendlyCandidate;
+      friendlyInstructionText = builtinFriendlyCandidate;
     }
+  } else if (catalogFriendlyCandidate) {
+    // Catalog formatters are constructed from the same indexed signature used
+    // by the resolver, so the named form is bijective by construction.
+    friendlyInstructionText = catalogFriendlyCandidate;
   }
   const rootKeyword =
     options.rootKeyword || (kind === 'condition' ? 'if' : 'do');
@@ -2413,7 +2435,9 @@ const formatInstructionLines = (
   );
   (instruction.subInstructions || []).forEach(child => {
     lines.push(
-      ...formatInstructionLines(child, kind, depth, instructionDepth + 1)
+      ...formatInstructionLines(child, kind, depth, instructionDepth + 1, {
+        formatInstruction: options.formatInstruction,
+      })
     );
   });
   return lines;
@@ -2423,7 +2447,10 @@ const appendInstructionEventBody = (
   lines: Array<string>,
   event: Object,
   depth: number,
-  options?: { skipVariables?: boolean }
+  options?: {
+    skipVariables?: boolean,
+    formatInstruction?: FormatInstruction,
+  }
 ) => {
   if (!(options && options.skipVariables)) {
     (event.variables || []).forEach(variable => {
@@ -2435,16 +2462,25 @@ const appendInstructionEventBody = (
     });
   }
   (event.conditions || []).forEach(instruction =>
-    lines.push(...formatInstructionLines(instruction, 'condition', depth))
+    lines.push(
+      ...formatInstructionLines(instruction, 'condition', depth, 0, {
+        formatInstruction: options && options.formatInstruction,
+      })
+    )
   );
   (event.actions || []).forEach(instruction =>
-    lines.push(...formatInstructionLines(instruction, 'action', depth))
+    lines.push(
+      ...formatInstructionLines(instruction, 'action', depth, 0, {
+        formatInstruction: options && options.formatInstruction,
+      })
+    )
   );
 };
 
 const formatEvents = (
   events: Array<Object>,
-  depth: number = 0
+  depth: number = 0,
+  options: ConvertOptions = {}
 ): Array<string> => {
   const lines = [];
   events.forEach((event, eventIndex) => {
@@ -2453,10 +2489,12 @@ const formatEvents = (
       `${depthPrefix(depth)}${formatMetadata('@event', eventMetadata(event))}`
     );
     if (event.type === EVENT_TYPES.standard) {
-      appendInstructionEventBody(lines, event, depth);
+      appendInstructionEventBody(lines, event, depth, {
+        formatInstruction: options.formatInstruction,
+      });
       if (!event.conditions.length && !event.actions.length)
         lines.push(`${depthPrefix(depth)}event`);
-      lines.push(...formatEvents(event.events || [], depth + 1));
+      lines.push(...formatEvents(event.events || [], depth + 1, options));
       return;
     }
     if (event.type === EVENT_TYPES.else) {
@@ -2469,12 +2507,20 @@ const formatEvents = (
         )
       );
       event.conditions.forEach(instruction =>
-        lines.push(...formatInstructionLines(instruction, 'condition', depth))
+        lines.push(
+          ...formatInstructionLines(instruction, 'condition', depth, 0, {
+            formatInstruction: options.formatInstruction,
+          })
+        )
       );
       (event.actions || []).forEach(instruction =>
-        lines.push(...formatInstructionLines(instruction, 'action', depth))
+        lines.push(
+          ...formatInstructionLines(instruction, 'action', depth, 0, {
+            formatInstruction: options.formatInstruction,
+          })
+        )
       );
-      lines.push(...formatEvents(event.events || [], depth + 1));
+      lines.push(...formatEvents(event.events || [], depth + 1, options));
       return;
     }
     if (event.type === EVENT_TYPES.repeat) {
@@ -2492,8 +2538,11 @@ const formatEvents = (
             : ''
         }`
       );
-      appendInstructionEventBody(lines, event, depth, { skipVariables: true });
-      lines.push(...formatEvents(event.events || [], depth + 1));
+      appendInstructionEventBody(lines, event, depth, {
+        skipVariables: true,
+        formatInstruction: options.formatInstruction,
+      });
+      lines.push(...formatEvents(event.events || [], depth + 1, options));
       return;
     }
     if (event.type === EVENT_TYPES.forEach) {
@@ -2515,8 +2564,11 @@ const formatEvents = (
             : ''
         }${event.limit ? ` limit=${quote(event.limit)}` : ''}`
       );
-      appendInstructionEventBody(lines, event, depth, { skipVariables: true });
-      lines.push(...formatEvents(event.events || [], depth + 1));
+      appendInstructionEventBody(lines, event, depth, {
+        skipVariables: true,
+        formatInstruction: options.formatInstruction,
+      });
+      lines.push(...formatEvents(event.events || [], depth + 1, options));
       return;
     }
     if (event.type === EVENT_TYPES.forEachChild) {
@@ -2540,8 +2592,11 @@ const formatEvents = (
             : ''
         }`
       );
-      appendInstructionEventBody(lines, event, depth, { skipVariables: true });
-      lines.push(...formatEvents(event.events || [], depth + 1));
+      appendInstructionEventBody(lines, event, depth, {
+        skipVariables: true,
+        formatInstruction: options.formatInstruction,
+      });
+      lines.push(...formatEvents(event.events || [], depth + 1, options));
       return;
     }
     if (event.type === EVENT_TYPES.while) {
@@ -2573,7 +2628,10 @@ const formatEvents = (
             'condition',
             depth,
             0,
-            { expandLogicalOr: false }
+            {
+              expandLogicalOr: false,
+              formatInstruction: options.formatInstruction,
+            }
           );
           const instructionLine = formatted.pop();
           lines.push(...formatted);
@@ -2589,12 +2647,20 @@ const formatEvents = (
         });
       }
       (event.conditions || []).forEach(instruction =>
-        lines.push(...formatInstructionLines(instruction, 'condition', depth))
+        lines.push(
+          ...formatInstructionLines(instruction, 'condition', depth, 0, {
+            formatInstruction: options.formatInstruction,
+          })
+        )
       );
       (event.actions || []).forEach(instruction =>
-        lines.push(...formatInstructionLines(instruction, 'action', depth))
+        lines.push(
+          ...formatInstructionLines(instruction, 'action', depth, 0, {
+            formatInstruction: options.formatInstruction,
+          })
+        )
       );
-      lines.push(...formatEvents(event.events || [], depth + 1));
+      lines.push(...formatEvents(event.events || [], depth + 1, options));
       return;
     }
     if (event.type === EVENT_TYPES.comment) {
@@ -2618,7 +2684,7 @@ const formatEvents = (
         })}`
       );
       lines.push(`${depthPrefix(depth)}group ${quote(event.name)}`);
-      lines.push(...formatEvents(event.events || [], depth));
+      lines.push(...formatEvents(event.events || [], depth, options));
       lines.push(`${depthPrefix(depth)}end`);
       return;
     }
@@ -2674,9 +2740,12 @@ export const parseIfDoEvents = (
   options: CompileOptions = {}
 ): Array<Object> => new IfDoParser(source, options).parse();
 
-export const convertLegacyEventsJsonToIfDo = (json: string): string => {
+export const convertLegacyEventsJsonToIfDo = (
+  json: string,
+  options: ConvertOptions = {}
+): string => {
   const events = parseLegacyEventsJson(json);
-  return `${formatEvents(events)
+  return `${formatEvents(events, 0, options)
     .join('\n')
     .replace(/\n{3,}/g, '\n\n')}\n`;
 };

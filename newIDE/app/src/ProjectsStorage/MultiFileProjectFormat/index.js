@@ -494,9 +494,12 @@ const putLayoutFile = (files, uri, format, layout) => {
   });
 };
 
-const putEventsFile = (files, uri, events) => {
+const putEventsFile = (files, uri, events, eventsDslOptions) => {
   validateGameUri(uri);
-  files[uri] = convertLegacyEventsJsonToIfDo(JSON.stringify(events || []));
+  files[uri] = convertLegacyEventsJsonToIfDo(
+    JSON.stringify(events || []),
+    eventsDslOptions || {}
+  );
 };
 
 const functionSettingsPayload = (extensionName, functionObject, eventsUri) => ({
@@ -507,7 +510,12 @@ const functionSettingsPayload = (extensionName, functionObject, eventsUri) => ({
   events: eventsUri,
 });
 
-const splitOwnerFunctions = ({ functions, baseSegments, files }) => {
+const splitOwnerFunctions = ({
+  functions,
+  baseSegments,
+  files,
+  eventsDslOptions,
+}) => {
   const functionNames = new Set();
   return (functions || []).map(functionObject => {
     const functionName = String(functionObject.name || '');
@@ -516,7 +524,12 @@ const splitOwnerFunctions = ({ functions, baseSegments, files }) => {
       ...baseSegments,
       `${functionFileName}.events`,
     ]);
-    putEventsFile(files, eventsUri, functionObject.events || []);
+    putEventsFile(
+      files,
+      eventsUri,
+      functionObject.events || [],
+      eventsDslOptions
+    );
     return {
       ...omitFields(functionObject, new Set(['events'])),
       events: eventsUri,
@@ -524,7 +537,13 @@ const splitOwnerFunctions = ({ functions, baseSegments, files }) => {
   });
 };
 
-const splitPrefab = ({ extensionName, prefab, baseSegments, files }) => {
+const splitPrefab = ({
+  extensionName,
+  prefab,
+  baseSegments,
+  files,
+  eventsDslOptions,
+}) => {
   const prefabName = String(prefab.name || '');
   const layoutUri = encodeUriPath([
     ...baseSegments,
@@ -540,6 +559,7 @@ const splitPrefab = ({ extensionName, prefab, baseSegments, files }) => {
     functions: prefab.eventsFunctions,
     baseSegments,
     files,
+    eventsDslOptions,
   });
   const variantNames = new Set();
   const variants = (prefab.variants || []).map(variant => {
@@ -576,7 +596,12 @@ const splitPrefab = ({ extensionName, prefab, baseSegments, files }) => {
   };
 };
 
-const splitBehavior = ({ behavior, baseSegments, files }) => ({
+const splitBehavior = ({
+  behavior,
+  baseSegments,
+  files,
+  eventsDslOptions,
+}) => ({
   kind: 'behavior',
   settingsFormatVersion: MULTI_FILE_FORMAT_VERSION,
   ...omitFields(behavior, new Set(['eventsFunctions'])),
@@ -584,6 +609,7 @@ const splitBehavior = ({ behavior, baseSegments, files }) => ({
     functions: behavior.eventsFunctions,
     baseSegments,
     files,
+    eventsDslOptions,
   }),
 });
 
@@ -635,7 +661,12 @@ export const decomposeLegacyProjectToFiles = (legacyProject, options = {}) => {
       'gdevelop-scene-layout',
       takeFields(layout, SCENE_LAYOUT_FIELDS)
     );
-    putEventsFile(files, eventsUri, layout.events || []);
+    putEventsFile(
+      files,
+      eventsUri,
+      layout.events || [],
+      options.eventsDslOptions
+    );
   });
 
   (project.eventsFunctionsExtensions || []).forEach(extension => {
@@ -670,7 +701,12 @@ export const decomposeLegacyProjectToFiles = (legacyProject, options = {}) => {
           },
         },
       });
-      putEventsFile(files, eventsUri, functionObject.events || []);
+      putEventsFile(
+        files,
+        eventsUri,
+        functionObject.events || [],
+        options.eventsDslOptions
+      );
     });
 
     (extension.eventsBasedObjects || []).forEach(prefab => {
@@ -688,6 +724,7 @@ export const decomposeLegacyProjectToFiles = (legacyProject, options = {}) => {
                 prefab,
                 baseSegments: base,
                 files,
+                eventsDslOptions: options.eventsDslOptions,
               }),
             },
           },
@@ -705,7 +742,12 @@ export const decomposeLegacyProjectToFiles = (legacyProject, options = {}) => {
         extensions: {
           [extensionName]: {
             behaviors: {
-              [name]: splitBehavior({ behavior, baseSegments: base, files }),
+              [name]: splitBehavior({
+                behavior,
+                baseSegments: base,
+                files,
+                eventsDslOptions: options.eventsDslOptions,
+              }),
             },
           },
         },
@@ -754,7 +796,12 @@ export const decomposeLegacyProjectToFiles = (legacyProject, options = {}) => {
         linkedScene: String(external.associatedLayout || ''),
         events: eventsUri,
       });
-      putEventsFile(files, eventsUri, external.events || []);
+      putEventsFile(
+        files,
+        eventsUri,
+        external.events || [],
+        options.eventsDslOptions
+      );
     });
     (project.externalLayouts || []).forEach(external => {
       const name = String(external.name || '');

@@ -11,6 +11,11 @@ import {
   parseTomlSource,
   validateGameUri,
 } from '../MultiFileProjectFormat';
+import {
+  PROJECT_INSTRUCTION_CATALOG_RELATIVE_PATH,
+  createCatalogInstructionResolver,
+  validateProjectInstructionCatalog,
+} from '../../EventsSheet/IfDoEventsDsl/ProjectInstructionCatalog';
 
 const fs = optionalRequire('fs-extra');
 const path = optionalRequire('path');
@@ -227,8 +232,30 @@ export const openMultiFileProject = async (
   entryPath: string,
   options?: Object
 ): Promise<Object> => {
-  const { files } = await readMultiFileSourceTree(entryPath);
-  return composeLegacyProjectFromFiles(files, options || {});
+  const { projectRoot, files } = await readMultiFileSourceTree(entryPath);
+  const effectiveOptions = { ...(options || {}) };
+  const catalogPath = path.join(
+    projectRoot,
+    ...PROJECT_INSTRUCTION_CATALOG_RELATIVE_PATH.split('/')
+  );
+  if (fs.existsSync(catalogPath)) {
+    let catalog;
+    try {
+      catalog = validateProjectInstructionCatalog(
+        JSON.parse(await readBoundedUtf8(catalogPath))
+      );
+    } catch (error) {
+      throw new MultiFileProjectError(
+        'MULTIFILE_INVALID_INSTRUCTION_CATALOG',
+        `Unable to read the generated instruction catalog: ${error.message}`
+      );
+    }
+    effectiveOptions.compileOptions = {
+      resolveInstruction: createCatalogInstructionResolver(catalog),
+      ...((options && options.compileOptions) || {}),
+    };
+  }
+  return composeLegacyProjectFromFiles(files, effectiveOptions);
 };
 
 const sortForCommit = (left: string, right: string): number => {
@@ -425,7 +452,8 @@ export const hashLegacySource = (source: string): string => sha256(source);
 
 export const writeLegacyProjectAsMultiFile = async (
   legacyProject: Object,
-  entryPath: string
+  entryPath: string,
+  options?: Object
 ): Promise<Array<string>> => {
   let migration;
   let previousFiles: { [string]: string } = {};
@@ -437,8 +465,14 @@ export const writeLegacyProjectAsMultiFile = async (
     );
     migration = document.project ? document.project.migration : undefined;
   }
-  const files = decomposeLegacyProjectToFiles(legacyProject, { migration });
-  const verificationProject = composeLegacyProjectFromFiles(files);
+  const files = decomposeLegacyProjectToFiles(legacyProject, {
+    migration,
+    ...((options && options.decomposeOptions) || {}),
+  });
+  const verificationProject = composeLegacyProjectFromFiles(
+    files,
+    (options && options.composeOptions) || {}
+  );
   if (!areLegacyProjectsEquivalent(legacyProject, verificationProject)) {
     throw new MultiFileProjectError(
       'MULTIFILE_SAVE_VERIFICATION_FAILED',

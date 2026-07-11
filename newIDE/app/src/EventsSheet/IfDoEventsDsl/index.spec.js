@@ -464,7 +464,7 @@ do await @exact id="Async" parameters=["x"]
 
     test('uses a project catalog resolver for friendly instructions', () => {
       const output = compileIfDoToLegacyEventsJson(
-        `if collision Player Enemy\ndo delete Enemy\n`,
+        `if custom.collision Player Enemy\ndo custom.delete Enemy\n`,
         {
           resolveInstruction: ({ kind, source }) =>
             kind === 'condition'

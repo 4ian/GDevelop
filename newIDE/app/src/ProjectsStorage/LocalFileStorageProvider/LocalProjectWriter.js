@@ -27,6 +27,13 @@ import {
   type ShowConfirmFunction,
 } from '../../UI/Alert/AlertContext';
 import { writeLegacyProjectAsMultiFile } from './LocalMultiFileProject';
+import {
+  PROJECT_INSTRUCTION_CATALOG_RELATIVE_PATH,
+  buildProjectInstructionCatalog,
+  createCatalogInstructionFormatter,
+  createCatalogInstructionResolver,
+  serializeProjectInstructionCatalog,
+} from '../../EventsSheet/IfDoEventsDsl/ProjectInstructionCatalog';
 
 const fs = optionalRequire('fs-extra');
 const path = optionalRequire('path');
@@ -129,6 +136,22 @@ const writeAndCheckFormattedJSONFile = async (
   await writeAndCheckFile(content, filePath);
 };
 
+export const writeProjectInstructionCatalog = async (
+  project: gdProject,
+  projectPath: string
+): Promise<Object> => {
+  const catalog = buildProjectInstructionCatalog(project);
+  const catalogPath = path.join(
+    projectPath,
+    ...PROJECT_INSTRUCTION_CATALOG_RELATIVE_PATH.split('/')
+  );
+  await writeAndCheckFile(
+    serializeProjectInstructionCatalog(catalog),
+    catalogPath
+  );
+  return catalog;
+};
+
 const writeProjectFiles = async ({
   project,
   filePath,
@@ -159,7 +182,26 @@ const writeProjectFiles = async ({
   const serializeEndTime = Date.now();
 
   if (path.basename(filePath).toLowerCase() === 'project.settings') {
-    await writeLegacyProjectAsMultiFile(serializedProjectObject, filePath);
+    const catalog = buildProjectInstructionCatalog(project);
+    await writeLegacyProjectAsMultiFile(serializedProjectObject, filePath, {
+      decomposeOptions: {
+        eventsDslOptions: {
+          formatInstruction: createCatalogInstructionFormatter(catalog),
+        },
+      },
+      composeOptions: {
+        compileOptions: {
+          resolveInstruction: createCatalogInstructionResolver(catalog),
+        },
+      },
+    });
+    await writeAndCheckFile(
+      serializeProjectInstructionCatalog(catalog),
+      path.join(
+        projectPath,
+        ...PROJECT_INSTRUCTION_CATALOG_RELATIVE_PATH.split('/')
+      )
+    );
     console.log(
       `[LocalProjectWriter] Multi-file project written in ${Date.now() -
         startTime}ms (including ${serializeEndTime -

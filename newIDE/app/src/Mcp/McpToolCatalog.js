@@ -6631,11 +6631,47 @@ const toolUsageExamples: { [string]: Array<Object> } = {
   ],
 };
 
-const writeToolNames: Set<string> = new Set(writeTools.map(tool => tool.name));
-const commandToolNames: Set<string> = new Set(
-  commandTools.map(tool => tool.name)
+const EXPOSED_MCP_TOOL_NAMES: Set<string> = new Set([
+  'gdevelop_get_editor_state',
+  'gdevelop_get_editor_selection',
+  'gdevelop_get_project_summary',
+  'gdevelop_list_scenes',
+  'gdevelop_list_objects',
+  'validate_current_project_json',
+  'inspect_tool_schema',
+  'get_tool_usage_examples',
+  'gdevelop_capabilities',
+  'gdevelop_refresh_tool_catalog',
+  'launch_preview',
+  'wait_until_preview_ready',
+  'preview_health_check',
+  'gdevelop_inspect_running_preview',
+  'run_frames',
+  'simulate_preview_input',
+  'control_preview',
+  'set_runtime_state',
+  'capture_preview_screenshot',
+]);
+
+const exposedReadTools = readTools.filter(tool =>
+  EXPOSED_MCP_TOOL_NAMES.has(tool.name)
 );
-const readToolNames: Set<string> = new Set(readTools.map(tool => tool.name));
+const exposedWriteTools = writeTools.filter(tool =>
+  EXPOSED_MCP_TOOL_NAMES.has(tool.name)
+);
+const exposedCommandTools = commandTools.filter(tool =>
+  EXPOSED_MCP_TOOL_NAMES.has(tool.name)
+);
+
+const writeToolNames: Set<string> = new Set(
+  exposedWriteTools.map(tool => tool.name)
+);
+const commandToolNames: Set<string> = new Set(
+  exposedCommandTools.map(tool => tool.name)
+);
+const readToolNames: Set<string> = new Set(
+  exposedReadTools.map(tool => tool.name)
+);
 
 export const isWriteTool = (toolName: string): boolean =>
   writeToolNames.has(toolName);
@@ -6689,22 +6725,31 @@ export const getMcpTools = (
   permissions: McpPermissionOptions
 ): Array<McpTool> =>
   [
-    ...readTools,
-    ...(permissions.allowWriteTools ? writeTools : []),
-    ...(permissions.allowCommandTools ? commandTools : []),
+    ...exposedReadTools,
+    ...(permissions.allowWriteTools ? exposedWriteTools : []),
+    ...(permissions.allowCommandTools ? exposedCommandTools : []),
   ].map(withDefaultToolAnnotations);
 
 export const getAllMcpToolsForIntrospection = (): Array<McpTool> =>
-  [...readTools, ...writeTools, ...commandTools].map(
+  [...exposedReadTools, ...exposedWriteTools, ...exposedCommandTools].map(
     withDefaultToolAnnotations
   );
 
 export const getMcpToolUsageExamples = (
   toolName?: ?string
 ): { [string]: Array<Object> } => {
-  if (!toolName) return toolUsageExamples;
+  if (!toolName) {
+    const exposedExamples: { [string]: Array<Object> } = {};
+    EXPOSED_MCP_TOOL_NAMES.forEach(name => {
+      if (toolUsageExamples[name])
+        exposedExamples[name] = toolUsageExamples[name];
+    });
+    return exposedExamples;
+  }
   return {
-    [toolName]: toolUsageExamples[toolName] || [],
+    [toolName]: EXPOSED_MCP_TOOL_NAMES.has(toolName)
+      ? toolUsageExamples[toolName] || []
+      : [],
   };
 };
 
@@ -6720,7 +6765,7 @@ export const getCapabilitiesSummary = (
     allByName[tool.name] = tool;
   });
   const categories: { [string]: Array<string> } = {
-    'Project & editor state': [
+    'Editor queries': [
       'gdevelop_get_editor_state',
       'gdevelop_get_project_summary',
       'gdevelop_get_global_config',
@@ -6814,7 +6859,7 @@ export const getCapabilitiesSummary = (
       'rename_scene',
       'set_first_layout',
     ],
-    'Runtime verification': [
+    'Preview debugging': [
       'launch_preview',
       'wait_until_preview_ready',
       'run_frames',
@@ -6847,7 +6892,7 @@ export const getCapabilitiesSummary = (
   });
   return {
     note:
-      'Core GDevelop MCP tools by workflow. This is a curated overview, not the full list — use inspect_tool_schema / get_tool_usage_examples for details, or gdevelop_search_instruction_metadata for GDevelop action/condition/expression types.',
+      'GDevelop MCP is intentionally limited to editor queries and preview debugging. Author the game through project files and .gdevelop/instructions-catalog.json.',
     permissions: {
       writeToolsEnabled: !!permissions.allowWriteTools,
       commandToolsEnabled: !!permissions.allowCommandTools,
@@ -6869,61 +6914,6 @@ export const getMcpResources = (): Array<McpResource> => [
     description: 'Compact summary of the current GDevelop project.',
     mimeType: 'application/json',
   },
-  {
-    uri: 'gdevelop://project/json',
-    name: 'Project JSON',
-    description: 'Full serialized GDevelop project JSON.',
-    mimeType: 'application/json',
-  },
-  {
-    uri: 'gdevelop://project/global-config.json',
-    name: 'Project Global Config',
-    description: 'Project Global Config map as JSON.',
-    mimeType: 'application/json',
-  },
-  {
-    uri: 'gdevelop://project/extensions-summary',
-    name: 'Project extensions summary',
-    description: 'Summary of project-specific extensions.',
-    mimeType: 'application/json',
-  },
-  {
-    uri: 'gdevelop://project/resources.json',
-    name: 'Project resources audit',
-    description:
-      'Project resources, file validity, unused resources, and reference audit.',
-    mimeType: 'application/json',
-  },
-  {
-    uri: 'gdevelop://scene/{sceneName}/events.txt',
-    name: 'Scene events',
-    description: 'Events for a scene rendered as text.',
-    mimeType: 'text/plain',
-  },
-  {
-    uri: 'gdevelop://scene/{sceneName}/events.json',
-    name: 'Serialized scene events',
-    description: 'Raw serialized event JSON for a scene.',
-    mimeType: 'application/json',
-  },
-  {
-    uri: 'gdevelop://scene/{sceneName}/scene.json',
-    name: 'Serialized scene',
-    description: 'Complete serialized JSON for one scene/layout.',
-    mimeType: 'application/json',
-  },
-  {
-    uri: 'gdevelop://scene/{sceneName}/instances.json',
-    name: 'Scene instances',
-    description: 'Instances for a scene serialized as JSON.',
-    mimeType: 'application/json',
-  },
-  {
-    uri: 'gdevelop://scene/{sceneName}/objects.json',
-    name: 'Scene objects',
-    description: 'Objects available in a scene serialized as JSON.',
-    mimeType: 'application/json',
-  },
 ];
 
 export const getMcpPrompts = (): Array<McpPrompt> => [
@@ -6933,44 +6923,14 @@ export const getMcpPrompts = (): Array<McpPrompt> => [
       'Inspect the current game by reading editor state, project summary, scenes, objects, and obvious risks before proposing changes.',
   },
   {
-    name: 'implement-game-feature',
+    name: 'debug-preview',
     description:
-      'Implement a gameplay feature by reading relevant project context, making small tool calls, and verifying the result.',
-    arguments: [
-      {
-        name: 'feature',
-        description: 'Feature to implement.',
-        required: true,
-      },
-    ],
-  },
-  {
-    name: 'fix-scene-events',
-    description:
-      'Debug and repair a scene event sheet by reading events first, applying targeted changes, and reading back the result.',
+      'Launch and inspect a debug preview for a game authored through project files.',
     arguments: [
       {
         name: 'sceneName',
-        description: 'Scene/layout to inspect and fix.',
-        required: true,
+        description: 'Optional scene/layout to preview.',
       },
     ],
-  },
-  {
-    name: 'layout-scene',
-    description:
-      'Improve scene layout by inspecting objects and instances, then using instance placement tools.',
-    arguments: [
-      {
-        name: 'sceneName',
-        description: 'Scene/layout to arrange.',
-        required: true,
-      },
-    ],
-  },
-  {
-    name: 'refactor-gameplay',
-    description:
-      'Refactor gameplay safely with readback between write operations and clear verification steps.',
   },
 ];

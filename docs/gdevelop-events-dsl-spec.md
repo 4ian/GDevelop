@@ -156,22 +156,22 @@ TOML front matter.
 
 The following table maps the items visible in the GDevelop event menus to IfDo.
 
-| GDevelop editor item | IfDo representation |
-|---|---|
-| New Event Below | Source order; place the new event after the previous event |
-| Sub Event | Prefix every line of the child event with `>` |
-| Local Variable | `local name = initialValue` attached to an event |
-| Comment | `# comment text` |
-| Else | `else` or `else if condition` |
-| For each object | `for each Object` |
-| For each child variable | `for each child variablePath as alias` |
-| Event group | `group Name` ... `end` |
-| JavaScript code | `js` ... `end js` |
-| Link external events | `link external "Sheet Name"` |
-| Repeat | `repeat count` |
-| Standard event | `if`, `or`, and `do` lines |
-| While | `while condition` |
-| Extension function | A pure `.events` body referenced by its `function.settings` |
+| GDevelop editor item    | IfDo representation                                         |
+| ----------------------- | ----------------------------------------------------------- |
+| New Event Below         | Source order; place the new event after the previous event  |
+| Sub Event               | Prefix every line of the child event with `>`               |
+| Local Variable          | `local name = initialValue` attached to an event            |
+| Comment                 | `# comment text`                                            |
+| Else                    | `else` or `else if condition`                               |
+| For each object         | `for each Object`                                           |
+| For each child variable | `for each child variablePath as alias`                      |
+| Event group             | `group Name` ... `end`                                      |
+| JavaScript code         | `js` ... `end js`                                           |
+| Link external events    | `link external "Sheet Name"`                                |
+| Repeat                  | `repeat count`                                              |
+| Standard event          | `if`, `or`, and `do` lines                                  |
+| While                   | `while condition`                                           |
+| Extension function      | A pure `.events` body referenced by its `function.settings` |
 
 `New Event Below` is an editor insertion command rather than a serialized event type. In a text language, event order already expresses this operation.
 
@@ -282,7 +282,6 @@ Bracket indexing accesses a dynamic child of a structure or array:
 do scene.inventory[item.name] = item.value * 2
 do local.items[0] = "Sword"
 ```
-
 
 ### 4.6 File names and file kinds
 
@@ -1282,6 +1281,7 @@ The `js` header and `end js` terminator carry the DSL depth. Lines between them 
   `delimiter=` is round-trip syntax only and is not persisted in event JSON.
   Its value contains letters, digits, and underscores. The matching
   `end js <delimiter>` line is the only terminator for that body.
+
 - A JavaScript event is a leaf event.
 - `#` inside the raw body is JavaScript text, not an IfDo comment.
 - The compiler preserves the JavaScript body and line endings, except for optional canonical newline normalization.
@@ -1337,7 +1337,6 @@ The project schema determines whether a path denotes:
 The compiler rejects ambiguous or unknown paths rather than guessing.
 
 Unqualified project variables such as `score` are not allowed in the canonical AI profile.
-
 
 Inside a function file, parameter names are direct read-only symbols and `result` is a reserved writable symbol for returning values:
 
@@ -1436,7 +1435,6 @@ A model may use only functions listed for the current project and GDevelop versi
 
 ---
 
-
 ## 17. Function files
 
 A function uses a pure `.events` body written with the same event syntax as
@@ -1468,16 +1466,16 @@ function <kind> <Extension>.<Name> <parameter>:<type> ...
 
 Supported core kinds are:
 
-| Kind | Used as | Result type |
-|---|---|---|
-| `action` | A `do` instruction | No result |
-| `condition` | An `if` condition | Boolean |
-| `number` | A numeric expression | Number |
-| `text` | A text expression | Text |
-| `number-condition` | A numeric expression also exposed through relational conditions | Number |
-| `text-condition` | A text expression also exposed through relational conditions | Text |
-| `operator-action` | A setter/action paired to a getter | No direct result |
-| `lifecycle` | An engine-called extension hook | No result |
+| Kind               | Used as                                                         | Result type      |
+| ------------------ | --------------------------------------------------------------- | ---------------- |
+| `action`           | A `do` instruction                                              | No result        |
+| `condition`        | An `if` condition                                               | Boolean          |
+| `number`           | A numeric expression                                            | Number           |
+| `text`             | A text expression                                               | Text             |
+| `number-condition` | A numeric expression also exposed through relational conditions | Number           |
+| `text-condition`   | A text expression also exposed through relational conditions    | Text             |
+| `operator-action`  | A setter/action paired to a getter                              | No direct result |
+| `lifecycle`        | An engine-called extension hook                                 | No result        |
 
 These map to the current `Action`, `Condition`, `Expression`,
 `ExpressionAndCondition`, and `ActionWithOperator` serializer values as
@@ -1688,10 +1686,10 @@ do result = "Ready"
 The required type is determined by the function kind:
 
 | Function kind | Valid `result` value |
-|---|---|
-| `condition` | Boolean |
-| `number` | Number |
-| `text` | Text |
+| ------------- | -------------------- |
+| `condition`   | Boolean              |
+| `number`      | Number               |
+| `text`        | Text                 |
 
 Assigning `result` sets the current return value; it does not immediately stop
 function execution. A later event may replace it. There is no separate
@@ -1920,6 +1918,25 @@ An extension instruction without a friendly alias may be exposed with `@`:
 ```events
 do @AdvancedCamera::ShakeCamera duration=0.4s amplitude=20 layer="" camera=0
 ```
+
+In the multi-file project profile, the authoritative named signatures are
+generated at `.gdevelop/instructions-catalog.json` on every project save. The
+generic persisted form uses each catalog parameter's exact `dslName` and a JSON
+string containing the exact serialized operand:
+
+```events
+do @AdvancedCamera::ShakeCamera duration="0.4" amplitude="20" layer="\"\"" camera="0"
+```
+
+The JSON-string rule makes catalog forms lossless without guessing whether an
+operand is an object name, resource name, or nested GDevelop expression. Short
+friendly aliases keep their natural typed syntax.
+
+The generated artifact is deliberately lean and line-oriented. Each action,
+condition, or expression occupies one compact JSON line and contains only
+authoring-relevant names, descriptions, valid scope names, parameter
+signatures, defaults, accepted values, and owner identity. Editor UI metadata
+and fields derivable from the parameter list are not stored.
 
 Rules:
 
@@ -2335,25 +2352,25 @@ GDevelop event-sheet JSON or extension-function JSON
 
 ### 22.1 Event-type mapping
 
-| IfDo construct | Semantic GDevelop event kind |
-|---|---|
-| `if` / `or` / `do` | Standard event |
-| `else` | Else event |
-| `>` | Child event in the parent event's event list |
-| `#` | Comment event |
-| `group` ... `end` | Event group |
-| `for each Object` | For Each Object event |
-| `for each child` | For Each Child Variable event |
-| `repeat` | Repeat event |
-| `while` | While event |
-| `link external` / `link scene` | Link event |
-| `js` ... `end js` | JavaScript event |
-| `local` | Local-variable data attached to the owning event |
-| `function.settings` with `functionType = "Action"` | Extension action definition/target |
-| `function.settings` with `functionType = "Condition"` | Extension condition definition/target |
-| `function.settings` with `functionType = "Expression"` | Extension expression definition/target |
-| Lifecycle name in `function.settings` | Extension lifecycle target when supported |
-| `do result = ...` | Function return-value action |
+| IfDo construct                                         | Semantic GDevelop event kind                     |
+| ------------------------------------------------------ | ------------------------------------------------ |
+| `if` / `or` / `do`                                     | Standard event                                   |
+| `else`                                                 | Else event                                       |
+| `>`                                                    | Child event in the parent event's event list     |
+| `#`                                                    | Comment event                                    |
+| `group` ... `end`                                      | Event group                                      |
+| `for each Object`                                      | For Each Object event                            |
+| `for each child`                                       | For Each Child Variable event                    |
+| `repeat`                                               | Repeat event                                     |
+| `while`                                                | While event                                      |
+| `link external` / `link scene`                         | Link event                                       |
+| `js` ... `end js`                                      | JavaScript event                                 |
+| `local`                                                | Local-variable data attached to the owning event |
+| `function.settings` with `functionType = "Action"`     | Extension action definition/target               |
+| `function.settings` with `functionType = "Condition"`  | Extension condition definition/target            |
+| `function.settings` with `functionType = "Expression"` | Extension expression definition/target           |
+| Lifecycle name in `function.settings`                  | Extension lifecycle target when supported        |
+| `do result = ...`                                      | Function return-value action                     |
 
 The adapter, not the AI, chooses exact internal JSON type identifiers and field names.
 
@@ -2369,7 +2386,7 @@ The first implementation exposes the context-free event-array core from
 ```text
 parseLegacyEventsJson(json) -> normalized event array
 parseIfDoEvents(source, options) -> event array
-convertLegacyEventsJsonToIfDo(json) -> canonical source
+convertLegacyEventsJsonToIfDo(json, options) -> canonical source
 compileIfDoToLegacyEventsJson(source, options) -> normalized JSON
 canonicalizeLegacyEventsJson(json) -> canonical JSON
 areLegacyEventsEquivalent(left, right) -> boolean
@@ -2387,6 +2404,10 @@ lossless without a loaded project while ordinary built-ins remain readable.
 `options.lowerWhileLimit` supplies the catalog-aware lowering for the
 source-only `while limit=` guard. The richer project-aware result below remains
 the editor integration API to build on top of this core.
+
+`options.formatInstruction` is the reverse boundary. The multi-file storage
+adapter builds both callbacks from the saved project instruction catalog, so a
+generic named catalog instruction compiles and decompiles without `@exact`.
 
 Suggested result:
 
@@ -2786,7 +2807,6 @@ if collision Player Enemy
 
 end
 ```
-
 
 ### 25.4 Action, condition, and expression functions
 
@@ -3215,18 +3235,18 @@ annotation and friendly syntax specify the same flag, their values must agree.
 
 ### 31.3 Persisted event types and fields
 
-| Serialized `type` | Current fields in addition to common event fields |
-|---|---|
-| `BuiltinCommonInstructions::Standard` | `conditions`, `actions`, optional `events`, optional `variables` |
-| `BuiltinCommonInstructions::Else` | `conditions`, `actions`, optional `events`, optional `variables` |
-| `BuiltinCommonInstructions::While` | `infiniteLoopWarning`, `whileConditions`, `conditions`, `actions`, optional `events`, optional `variables`, optional `loopIndexVariable` |
-| `BuiltinCommonInstructions::Repeat` | `repeatExpression`, `conditions`, `actions`, optional `events`, optional `variables`, optional `loopIndexVariable` |
-| `BuiltinCommonInstructions::ForEach` | `object`, `conditions`, `actions`, optional `events`, optional `variables`, optional `loopIndexVariable`, optional `orderBy`, `order`, and `limit` |
+| Serialized `type`                                 | Current fields in addition to common event fields                                                                                                                              |
+| ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `BuiltinCommonInstructions::Standard`             | `conditions`, `actions`, optional `events`, optional `variables`                                                                                                               |
+| `BuiltinCommonInstructions::Else`                 | `conditions`, `actions`, optional `events`, optional `variables`                                                                                                               |
+| `BuiltinCommonInstructions::While`                | `infiniteLoopWarning`, `whileConditions`, `conditions`, `actions`, optional `events`, optional `variables`, optional `loopIndexVariable`                                       |
+| `BuiltinCommonInstructions::Repeat`               | `repeatExpression`, `conditions`, `actions`, optional `events`, optional `variables`, optional `loopIndexVariable`                                                             |
+| `BuiltinCommonInstructions::ForEach`              | `object`, `conditions`, `actions`, optional `events`, optional `variables`, optional `loopIndexVariable`, optional `orderBy`, `order`, and `limit`                             |
 | `BuiltinCommonInstructions::ForEachChildVariable` | `iterableVariableName`, `valueIteratorVariableName`, `keyIteratorVariableName`, `conditions`, `actions`, optional `events`, optional `variables`, optional `loopIndexVariable` |
-| `BuiltinCommonInstructions::Group` | `name`, `source`, `creationTime`, `colorR`, `colorG`, `colorB`, `parameters`, `events` |
-| `BuiltinCommonInstructions::Comment` | `color` with background/text RGB, `comment`, optional deprecated `comment2` |
-| `BuiltinCommonInstructions::Link` | `target`, `include.includeConfig`, and optional group or index-range attributes |
-| `BuiltinCommonInstructions::JsCode` | `inlineCode`, `parameterObjects`, `useStrict`, `eventsSheetExpanded` |
+| `BuiltinCommonInstructions::Group`                | `name`, `source`, `creationTime`, `colorR`, `colorG`, `colorB`, `parameters`, `events`                                                                                         |
+| `BuiltinCommonInstructions::Comment`              | `color` with background/text RGB, `comment`, optional deprecated `comment2`                                                                                                    |
+| `BuiltinCommonInstructions::Link`                 | `target`, `include.includeConfig`, and optional group or index-range attributes                                                                                                |
+| `BuiltinCommonInstructions::JsCode`               | `inlineCode`, `parameterObjects`, `useStrict`, `eventsSheetExpanded`                                                                                                           |
 
 This table covers all source-persisted event serializers registered by the
 inspected built-in code: the nine common event classes plus the GDJS JavaScript
@@ -3550,14 +3570,14 @@ supported by the current event. Omitting flags uses current defaults.
 The current `gd::EventsFunction` serializer supports more distinctions than
 the earlier compact function examples:
 
-| Settings `functionType` | IfDo header kind | Current fields/meaning |
-|---|---|---|
-| `Action` | `action` | Callable action, no return value |
-| `Condition` | `condition` | Boolean return through `SetReturnBoolean` |
-| `Expression` + numeric `expressionType` | `number` | Numeric expression return through `SetReturnNumber` |
-| `Expression` + string `expressionType` | `text` | String expression return through `SetReturnString` |
-| `ExpressionAndCondition` | `number-condition` or `text-condition` | One expression exposed with relational-condition support |
-| `ActionWithOperator` | `operator-action` | Setter/action paired with `getterName`; parameters are partly generated from the getter |
+| Settings `functionType`                 | IfDo header kind                       | Current fields/meaning                                                                  |
+| --------------------------------------- | -------------------------------------- | --------------------------------------------------------------------------------------- |
+| `Action`                                | `action`                               | Callable action, no return value                                                        |
+| `Condition`                             | `condition`                            | Boolean return through `SetReturnBoolean`                                               |
+| `Expression` + numeric `expressionType` | `number`                               | Numeric expression return through `SetReturnNumber`                                     |
+| `Expression` + string `expressionType`  | `text`                                 | String expression return through `SetReturnString`                                      |
+| `ExpressionAndCondition`                | `number-condition` or `text-condition` | One expression exposed with relational-condition support                                |
+| `ActionWithOperator`                    | `operator-action`                      | Setter/action paired with `getterName`; parameters are partly generated from the getter |
 
 Deprecated `StringExpression` is accepted by the current loader for compatibility
 and normalized to `Expression` plus string `expressionType` when written.
@@ -3612,10 +3632,10 @@ do result = expression
 maps by function kind to a normal action instruction:
 
 | Function result | Current action type |
-|---|---|
-| Boolean | `SetReturnBoolean` |
-| Number | `SetReturnNumber` |
-| Text | `SetReturnString` |
+| --------------- | ------------------- |
+| Boolean         | `SetReturnBoolean`  |
+| Number          | `SetReturnNumber`   |
+| Text            | `SetReturnString`   |
 
 The expression is the action's positional parameter. Setting a return value
 does not end event execution; later return actions can replace it. The current
@@ -3782,5 +3802,4 @@ applied compatibility normalization.
 - Unsupported/newer type and field tests proving conversion stops without
   writing partial source files.
 - Corpus migration across repository game projects.
-- `current JSON -> DSL -> current JSON -> gd::Project -> canonical current
-  JSON` equality.
+- `current JSON -> DSL -> current JSON -> gd::Project -> canonical current JSON` equality.

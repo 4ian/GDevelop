@@ -21,7 +21,10 @@ import {
   writeMultiFileSourceTree,
 } from './LocalMultiFileProject';
 import { onOpen } from './LocalProjectOpener';
-import { getProjectLocation } from './LocalProjectWriter';
+import {
+  getProjectLocation,
+  writeProjectInstructionCatalog,
+} from './LocalProjectWriter';
 
 const projectFixture = {
   gdVersion: { major: 5, minor: 6, build: 0, revision: 0 },
@@ -94,6 +97,52 @@ describe('Local multi-file project storage', () => {
     expect(new Set(Object.keys(sourceTree.files))).toEqual(
       new Set(Object.keys(files))
     );
+  });
+
+  test('loads named IfDo instructions through the generated catalog', async () => {
+    const entryPath = path.join(temporaryDirectory, 'project.settings');
+    const files = decomposeLegacyProjectToFiles(projectFixture);
+    files['game://scenes/Main/Main.events'] =
+      '@event\ndo @Network::Send url="\\"https://example.com\\"" runtime=""\n';
+    await writeMultiFileSourceTree({ entryPath, files });
+    const catalog = {
+      format: 'gdevelop-ifdo-instruction-catalog',
+      formatVersion: 1,
+      actions: [
+        {
+          kind: 'action',
+          type: 'Network::Send',
+          parameters: [
+            {
+              index: 0,
+              dslName: 'url',
+              isOptional: false,
+              isCodeOnly: false,
+            },
+            {
+              index: 1,
+              dslName: 'runtime',
+              isOptional: false,
+              isCodeOnly: true,
+            },
+          ],
+        },
+      ],
+      conditions: [],
+      expressions: [],
+    };
+    const catalogPath = path.join(
+      temporaryDirectory,
+      '.gdevelop/instructions-catalog.json'
+    );
+    fs.ensureDirSync(path.dirname(catalogPath));
+    fs.writeFileSync(catalogPath, JSON.stringify(catalog), 'utf8');
+
+    const project = await openMultiFileProject(entryPath);
+    expect(project.layouts[0].events[0].actions[0]).toMatchObject({
+      type: { value: 'Network::Send' },
+      parameters: ['"https://example.com"', ''],
+    });
   });
 
   test('writes only changed owned components', async () => {
@@ -205,6 +254,28 @@ describe('Local multi-file project storage', () => {
         newProjectsDefaultFolder: temporaryDirectory,
       }).fileIdentifier
     ).toBe(path.join(temporaryDirectory, 'My Game', 'project.settings'));
+  });
+
+  test('writes the complete AI instruction catalog in .gdevelop', async () => {
+    const gd: libGDevelop = global.gd;
+    const project = gd.ProjectHelper.createNewGDJSProject();
+    const catalog = await writeProjectInstructionCatalog(
+      project,
+      temporaryDirectory
+    );
+    const catalogPath = path.join(
+      temporaryDirectory,
+      '.gdevelop/instructions-catalog.json'
+    );
+
+    expect(fs.existsSync(catalogPath)).toBe(true);
+    expect(JSON.parse(fs.readFileSync(catalogPath, 'utf8')).counts).toEqual(
+      catalog.counts
+    );
+    expect(catalog.counts.actions).toBeGreaterThan(100);
+    expect(catalog.counts.conditions).toBeGreaterThan(100);
+    expect(catalog.counts.expressions).toBeGreaterThan(100);
+    project.delete();
   });
 
   test('rolls back an interrupted staged transaction', async () => {

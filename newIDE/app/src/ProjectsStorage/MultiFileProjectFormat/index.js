@@ -262,8 +262,35 @@ const restoreTomlPayload = (namespace, fileUri) => {
 const normalizeLf = source =>
   source.replace(/^\uFEFF/, '').replace(/\r\n?/g, '\n');
 
+const stripTomlStructuralIndentation = source => {
+  let inMultilineBasicString = false;
+  return source
+    .split('\n')
+    .map(line => {
+      const output = inMultilineBasicString
+        ? line
+        : line.replace(/^[ \t]+/, '');
+      for (let index = 0; index <= output.length - 3; index++) {
+        if (output.slice(index, index + 3) !== '"""') continue;
+        let backslashCount = 0;
+        for (let cursor = index - 1; output[cursor] === '\\'; cursor--)
+          backslashCount++;
+        if (backslashCount % 2 === 0) {
+          inMultilineBasicString = !inMultilineBasicString;
+          index += 2;
+        }
+      }
+      return output;
+    })
+    .join('\n');
+};
+
 const serializeToml = object => {
-  const output = normalizeLf(stringifyToml(object)).trimEnd();
+  // TOML table nesting is already explicit in dotted headers. Keeping every
+  // generated line at column zero avoids presentation-only whitespace churn.
+  const output = stripTomlStructuralIndentation(
+    normalizeLf(stringifyToml(object))
+  ).trimEnd();
   return `${output}\n`;
 };
 

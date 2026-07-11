@@ -222,7 +222,8 @@ describe('IfDo events DSL', () => {
       const output = compileIfDoToLegacyEventsJson(dsl);
 
       expect(areLegacyEventsEquivalent(input, output)).toBe(true);
-      expect(dsl).toContain('@exact id="BuiltinCommonInstructions::Or"');
+      expect(dsl).toContain('or @exact id="Compare"');
+      expect(dsl).not.toContain('@exact id="BuiltinCommonInstructions::Or"');
       expect(dsl).toContain('for each child');
       expect(dsl).toContain('end js');
       expect(dsl).not.toContain('legacy event');
@@ -237,6 +238,80 @@ describe('IfDo events DSL', () => {
       );
       expect(second).toBe(first);
       expect(first.endsWith('\n')).toBe(true);
+    });
+
+    test('emits reversible friendly syntax for the built-in instruction catalog', () => {
+      const events = [
+        standard({
+          conditions: [
+            instruction('SceneJustBegins', ['']),
+            instruction('CollisionNP', ['Enemy', 'Player', '', '', 'no']),
+            instruction('KeyFromTextPressed', ['', '"Left"']),
+            instruction('CompareTimer', ['', '"Spawn"', '>', '0.5']),
+            instruction('NumberVariable', ['Score', '>=', '100']),
+            instruction('NumberObjectVariable', ['Enemy', 'HP', '<=', '0']),
+            instruction('PosX', ['Player', '<', '12']),
+            instruction('BuiltinCommonInstructions::Or', [], {
+              subInstructions: [
+                instruction('PosY', ['Player', '<', '88']),
+                instruction('PosY', ['Player', '>', '462']),
+              ],
+            }),
+          ],
+          actions: [
+            instruction('SetNumberVariable', ['Score', '+', '10']),
+            instruction('SetNumberObjectVariable', ['Enemy', 'HP', '-', '1']),
+            instruction('SetX', ['Player', '=', '12']),
+            instruction('SetY', ['Player', '+', '300*TimeDelta()']),
+            instruction('SetAngle', ['Enemy', '=', '180']),
+            instruction('ResetTimer', ['', '"Spawn"']),
+            instruction('Create', ['', 'Enemy', '100', '-62', '""']),
+            instruction('Delete', ['Enemy', '']),
+            instruction('PlaySound', ['', 'HitSfx', 'no', '55', '0.85']),
+            instruction('Scene', ['', '"GameOver"', 'yes']),
+            instruction('OpacityCapability::OpacityBehavior::SetValue', [
+              'Player',
+              'Opacity',
+              '=',
+              '80',
+            ]),
+            instruction(
+              'TextContainerCapability::TextContainerBehavior::SetValue',
+              ['ScoreText', 'Text', '=', '"SCORE " + ToString(Variable(Score))']
+            ),
+          ],
+        }),
+      ];
+      const input = JSON.stringify(events);
+      const dsl = convertLegacyEventsJsonToIfDo(input);
+      const output = compileIfDoToLegacyEventsJson(dsl);
+
+      expect(areLegacyEventsEquivalent(input, output)).toBe(true);
+      expect(dsl).not.toContain('@exact');
+      expect(dsl).toContain('if scene begins');
+      expect(dsl).toContain('if collision Enemy Player');
+      expect(dsl).toContain('if scene.Score >= 100');
+      expect(dsl).toContain('or Player.y > 462');
+      expect(dsl).toContain('do scene.Score += 10');
+      expect(dsl).toContain('do Enemy.HP -= 1');
+      expect(dsl).toContain('do create Enemy x=100 y=-62 layer=""');
+      expect(dsl).toContain('do Player.opacity = 80');
+      expect(dsl).toContain(
+        'do ScoreText.text = "SCORE " + ToString(Variable(Score))'
+      );
+    });
+
+    test('falls back to exact when a friendly candidate is ambiguous', () => {
+      const input = JSON.stringify([
+        standard({
+          actions: [instruction('SetNumberVariable', ['Score', '=', '"5"'])],
+        }),
+      ]);
+      const dsl = convertLegacyEventsJsonToIfDo(input);
+      expect(dsl).toContain('@exact id="SetNumberVariable"');
+      expect(
+        areLegacyEventsEquivalent(input, compileIfDoToLegacyEventsJson(dsl))
+      ).toBe(true);
     });
 
     test.each([
@@ -634,7 +709,7 @@ do @exact id="Y" parameters=[]
 
     test('requires a catalog for friendly instructions', () => {
       expectCode(
-        () => compileIfDoToLegacyEventsJson('if collision Player Enemy\n'),
+        () => compileIfDoToLegacyEventsJson('if custom.test Player Enemy\n'),
         'IFDO_CATALOG_REQUIRED'
       );
       expectCode(

@@ -265,6 +265,27 @@ describe('GDevelop multi-file project format', () => {
     expect(() => parseTomlSource(`${settings}\n`)).not.toThrow();
   });
 
+  test('writes TOML without indentation', () => {
+    const files = decomposeLegacyProjectToFiles(projectFixture);
+    Object.keys(files)
+      .filter(uri => uri.endsWith('.settings') || uri.endsWith('.layout'))
+      .forEach(uri => {
+        expect(files[uri]).not.toMatch(/^[ \t]+/m);
+      });
+  });
+
+  test('preserves leading whitespace inside multiline TOML strings', () => {
+    const project = JSON.parse(JSON.stringify(projectFixture));
+    project.globalConfig.multiline = 'first line\n second line';
+    const files = decomposeLegacyProjectToFiles(project);
+    const output = composeLegacyProjectFromFiles(files);
+
+    expect(files[MULTI_FILE_ENTRY_URI]).toContain(
+      'multiline = """\nfirst line\n second line"""'
+    );
+    expect(output.globalConfig.multiline).toBe('first line\n second line');
+  });
+
   test('uses canonical safe game URIs and encoded names', () => {
     expect(encodeManagedName('Shared Combat')).toBe('Shared%20Combat');
     expect(encodeManagedName('NUL')).toBe('%4EUL');

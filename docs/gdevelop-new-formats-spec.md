@@ -309,6 +309,9 @@ to the project directory.
 
 Every `.settings` file remains an independent canonical TOML file when stored:
 
+- Canonical `.settings` and `.layout` writers use no indentation. Every
+  non-empty source line begins at column zero; dotted table headers already
+  express nesting without presentation-only leading whitespace.
 - A settings file must not contain the TOML text or namespace subtree owned by
   another settings file.
 - The format has no TOML `include`, import, inheritance, or textual-expansion

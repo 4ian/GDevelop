@@ -87,10 +87,11 @@ instructions without a friendly alias and may be edited when the complete
 catalog signature is understood.
 
 > **Implementation status:** the core parser, compiler, canonical decompiler,
-> JSON normalizer, and equivalence checker are implemented in
+> built-in friendly-instruction mappings, JSON normalizer, and equivalence checker are implemented in
 > `newIDE/app/src/EventsSheet/IfDoEventsDsl/index.js`, with focused and
-> repository-fixture tests in the adjacent `index.spec.js`. Editor catalog and
-> project-storage integration remain separate follow-up work. Sections 31
+> repository-fixture tests in the adjacent `index.spec.js`. The multi-file
+> project storage uses this converter directly. Project-specific aliases for
+> extension instructions still enter through the catalog adapter. Sections 31
 > through 36 are the normative current-JSON mapping and take precedence over
 > earlier illustrative examples when there is a conflict.
 
@@ -2375,11 +2376,17 @@ areLegacyEventsEquivalent(left, right) -> boolean
 ```
 
 `options.resolveInstruction` is the boundary to the loaded project catalog for
-friendly conditions and actions. The context-free decompiler emits typed
-`@exact` instructions, so JSON-to-DSL-to-JSON conversion does not require a
-loaded project. `options.lowerWhileLimit` supplies the catalog-aware lowering
-for the source-only `while limit=` guard. The richer project-aware result below
-remains the editor integration API to build on top of this core.
+project- and extension-specific friendly conditions and actions. The core also
+contains closed, reversible mappings for canonical built-in forms such as
+scene/object assignments and comparisons, collisions, keyboard input, timers,
+object creation/deletion, sound playback, scene changes, capabilities, and OR
+groups. The decompiler recompiles each friendly candidate and uses it only when
+the instruction identifier and positional parameters are identical; otherwise
+it emits typed `@exact`. Consequently JSON-to-DSL-to-JSON conversion remains
+lossless without a loaded project while ordinary built-ins remain readable.
+`options.lowerWhileLimit` supplies the catalog-aware lowering for the
+source-only `while limit=` guard. The richer project-aware result below remains
+the editor integration API to build on top of this core.
 
 Suggested result:
 

@@ -109,18 +109,19 @@ do DebuggerTools::ConsoleLog message_to_log="\"started\""
 > if CollisionNP first_object="Player" second_object="Enemy"
 > do Delete object="Enemy"
 
-group "Combat"
+@group "Combat" source="" creationTime=0 color=[74,176,228] parameters=[]
 @event aiGeneratedEventId="damage-enemy"
 if CollisionNP first_object="Bullet" second_object="Enemy"
 do SetNumberObjectVariable object="Enemy" variable="HP" modification_sign="-" value="1"
 do Delete object="Bullet"
-end
+@end group
 ```
 
-Use `local`, `else`, `repeat`, `while`, `for each`, `for each child`, `group`,
-`link`, and `js ... end js` only according to patterns already present in the
-project. Preserve `@event`, `@instruction`, group, loop, comment, and JavaScript
-metadata when editing existing sources.
+Use `local`, `else`, `repeat`, `while`, `for each`, `for each child`, `link`,
+`@group ... @end group`, and `@js ... @end js` only according to the canonical
+grammar. Write comments as one `@comment "content" background=[r,g,b] text=[r,g,b]` statement; never use hash-comment event syntax. Every `@end`
+requires its `group` or `js` suffix. Preserve `@event`, `@instruction`, group,
+loop, comment, and JavaScript metadata when editing existing sources.
 
 ## Direct-edit workflow
 

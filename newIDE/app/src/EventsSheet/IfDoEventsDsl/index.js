@@ -159,7 +159,7 @@ const EVENT_KEYS = {
 };
 
 export const IFDO_EVENTS_DSL_COVERAGE = Object.freeze({
-  formatVersion: '1.3',
+  formatVersion: '2.0',
   serializerContract: 'repository-current',
   persistedEventTypes: Object.keys(EVENT_KEYS).map(type => ({
     type,
@@ -504,6 +504,23 @@ const parseNamedArguments = (source: string): Metadata => {
   return result;
 };
 
+const parseLeadingStringAndNamedArguments = (
+  source: string,
+  directive: string,
+  line: number
+): {| value: string, metadata: Metadata |} => {
+  const reader = new ValueReader(source);
+  reader.skip();
+  if (reader.source[reader.index] !== '"') {
+    fail('IFDO_SYNTAX', `${directive} requires a quoted string.`, line);
+  }
+  const value = reader.readString();
+  return {
+    value,
+    metadata: parseNamedArguments(reader.source.slice(reader.index)),
+  };
+};
+
 export const parseCatalogInstructionArguments = (source: string): Metadata =>
   parseNamedArguments(source);
 
@@ -558,7 +575,7 @@ const splitPhysicalLines = (source: string): Array<PhysicalLine> => {
 };
 
 const readJavaScriptDelimiter = (header: string, line: number): string => {
-  const args = parseNamedArguments(header.slice('js'.length));
+  const args = parseNamedArguments(header.slice('@js'.length));
   Object.keys(args).forEach(key => {
     if (!['objects', 'strict', 'expanded', 'delimiter'].includes(key)) {
       fail('IFDO_SYNTAX', `Unknown js argument ${key}.`, line);
@@ -584,10 +601,10 @@ const scanSource = (source: string): Array<SourceLine> => {
   for (let index = 0; index < physical.length; index++) {
     let parsed = parsePrefix(physical[index].text, index + 1);
     if (!parsed.text.trim()) continue;
-    if (!parsed.text.startsWith('#')) parsed.text = parsed.text.trimEnd();
-    if (/^js(?:\s|$)/.test(parsed.text)) {
+    parsed.text = parsed.text.trimEnd();
+    if (/^@js(?:\s|$)/.test(parsed.text)) {
       const delimiter = readJavaScriptDelimiter(parsed.text, parsed.line);
-      const terminator = delimiter ? `end js ${delimiter}` : 'end js';
+      const terminator = delimiter ? `@end js ${delimiter}` : '@end js';
       const body: Array<PhysicalLine> = [];
       let foundEnd = false;
       while (++index < physical.length) {
@@ -615,7 +632,7 @@ const scanSource = (source: string): Array<SourceLine> => {
       });
       continue;
     }
-    let balance = parsed.text.startsWith('#') ? 0 : balanceDelta(parsed.text);
+    let balance = balanceDelta(parsed.text);
     while (balance > 0 && index + 1 < physical.length) {
       const continuation = parsePrefix(physical[++index].text, index + 1);
       parsed.text += `\n${continuation.text.trim()}`;
@@ -802,7 +819,7 @@ class IfDoParser {
     return instruction;
   }
 
-  parseList(depth: number, stopAtGroupEnd: boolean = false): Array<Object> {
+  parseList(depth: number, stopAtEndKind: ?string = null): Array<Object> {
     const events = [];
     let current = null;
     let pendingEventMetadata = {};
@@ -844,7 +861,7 @@ class IfDoParser {
     });
 
     const takeSpecialMetadata = (
-      owner: 'comment' | 'group' | 'while' | null,
+      owner: 'while' | null,
       line: number
     ): Metadata => {
       const names = Object.keys(pendingSpecialMetadata);
@@ -891,12 +908,24 @@ class IfDoParser {
         );
       }
       const text = line.text.trim();
-      if (stopAtGroupEnd && text === 'end') {
-        finish();
-        this.index++;
-        return events;
+      if (text.startsWith('@end')) {
+        if (text === '@end') {
+          fail('IFDO_SYNTAX', '@end requires a block-kind suffix.', line.line);
+        }
+        if (stopAtEndKind && text === `@end ${stopAtEndKind}`) {
+          finish();
+          this.index++;
+          return events;
+        }
+        fail('IFDO_SYNTAX', `Unexpected block terminator: ${text}`, line.line);
       }
-      if (text === 'end') fail('IFDO_SYNTAX', 'Unexpected end.', line.line);
+      if (text === 'end' || text.startsWith('end ')) {
+        fail(
+          'IFDO_SYNTAX',
+          'Block terminators must use @end with a block-kind suffix.',
+          line.line
+        );
+      }
 
       if (text.startsWith('@event')) {
         if (hasPendingEventMetadata) {
@@ -934,24 +963,10 @@ class IfDoParser {
         this.index++;
         continue;
       }
-      if (/^@(comment|group|while)(?:\s|$)/.test(text)) {
+      if (/^@while(?:\s|$)/.test(text)) {
         const name = text.slice(1).split(/\s/, 1)[0];
         const metadata = parseNamedArguments(text.slice(name.length + 1));
         const schemas = {
-          comment: {
-            background: 'rgb',
-            text: 'rgb',
-            comment2: 'string',
-          },
-          group: {
-            disabled: 'boolean',
-            folded: 'boolean',
-            aiGeneratedEventId: 'string',
-            source: 'string',
-            creationTime: 'number',
-            color: 'rgb',
-            parameters: 'strings',
-          },
           while: { infiniteLoopWarning: 'boolean' },
         };
         assertMetadata(metadata, schemas[name], `@${name}`, line.line);
@@ -991,14 +1006,40 @@ class IfDoParser {
         continue;
       }
 
-      if (text.startsWith('#')) {
+      if (/^@comment(?:\s|$)/.test(text)) {
         finish();
         rejectPendingVariables('a comment', line.line);
-        const metadata = takeSpecialMetadata('comment', line.line);
+        takeSpecialMetadata(null, line.line);
+        if (hasPendingEventMetadata) {
+          fail(
+            'IFDO_SYNTAX',
+            '@event cannot attach to @comment; put event metadata on @comment.',
+            line.line
+          );
+        }
+        const parsed = parseLeadingStringAndNamedArguments(
+          text.slice('@comment'.length),
+          '@comment',
+          line.line
+        );
+        const metadata = parsed.metadata;
+        assertMetadata(
+          metadata,
+          {
+            disabled: 'boolean',
+            folded: 'boolean',
+            aiGeneratedEventId: 'string',
+            background: 'rgb',
+            text: 'rgb',
+            comment2: 'string',
+          },
+          '@comment',
+          line.line
+        );
         const color = metadata.background || [255, 230, 109];
         const textColor = metadata.text || [0, 0, 0];
         current = {
-          ...commonEvent(EVENT_TYPES.comment, pendingEventMetadata),
+          ...commonEvent(EVENT_TYPES.comment, metadata),
           color: {
             r: Number(color[0] || 0),
             g: Number(color[1] || 0),
@@ -1007,7 +1048,7 @@ class IfDoParser {
             textG: Number(textColor[1] || 0),
             textB: Number(textColor[2] || 0),
           },
-          comment: unescapeComment(text.slice(1).replace(/^ /, '')),
+          comment: parsed.value,
           comment2: metadata.comment2 == null ? '' : String(metadata.comment2),
         };
         pendingEventMetadata = {};
@@ -1017,26 +1058,40 @@ class IfDoParser {
         continue;
       }
 
-      if (text.startsWith('group ')) {
+      if (/^@group(?:\s|$)/.test(text)) {
         finish();
         rejectPendingVariables('a group', line.line);
-        const metadata = takeSpecialMetadata('group', line.line);
-        const groupEventMetadata = { ...pendingEventMetadata };
-        ['disabled', 'folded', 'aiGeneratedEventId'].forEach(field => {
-          if (metadata[field] === undefined) return;
-          if (pendingEventMetadata[field] !== undefined) {
-            fail(
-              'IFDO_SYNTAX',
-              `Duplicate group event metadata ${field}.`,
-              line.line
-            );
-          }
-          groupEventMetadata[field] = metadata[field];
-        });
-        const nameSource = text.slice('group '.length).trim();
+        takeSpecialMetadata(null, line.line);
+        if (hasPendingEventMetadata) {
+          fail(
+            'IFDO_SYNTAX',
+            '@event cannot attach to @group; put event metadata on @group.',
+            line.line
+          );
+        }
+        const parsed = parseLeadingStringAndNamedArguments(
+          text.slice('@group'.length),
+          '@group',
+          line.line
+        );
+        const metadata = parsed.metadata;
+        assertMetadata(
+          metadata,
+          {
+            disabled: 'boolean',
+            folded: 'boolean',
+            aiGeneratedEventId: 'string',
+            source: 'string',
+            creationTime: 'number',
+            color: 'rgb',
+            parameters: 'strings',
+          },
+          '@group',
+          line.line
+        );
         current = {
-          ...commonEvent(EVENT_TYPES.group, groupEventMetadata),
-          name: parseStringOrRaw(nameSource),
+          ...commonEvent(EVENT_TYPES.group, metadata),
+          name: parsed.value,
           source: metadata.source == null ? '' : String(metadata.source),
           creationTime: Number(metadata.creationTime || 0),
           colorR: Number((metadata.color || [74, 176, 228])[0]),
@@ -1050,7 +1105,7 @@ class IfDoParser {
         pendingEventMetadata = {};
         hasPendingEventMetadata = false;
         this.index++;
-        current.events = this.parseList(depth, true);
+        current.events = this.parseList(depth, 'group');
         finish();
         continue;
       }
@@ -1059,7 +1114,7 @@ class IfDoParser {
         finish();
         rejectPendingVariables('JavaScript', line.line);
         takeSpecialMetadata(null, line.line);
-        const args = parseNamedArguments(text.slice('js'.length));
+        const args = parseNamedArguments(text.slice('@js'.length));
         assertMetadata(
           args,
           {
@@ -1320,7 +1375,9 @@ class IfDoParser {
     if (pendingVariables.length) {
       fail('IFDO_SYNTAX', 'Local declarations have no owning event.');
     }
-    if (stopAtGroupEnd) fail('IFDO_SYNTAX', 'Unterminated group.');
+    if (stopAtEndKind) {
+      fail('IFDO_SYNTAX', `Unterminated ${stopAtEndKind} block.`);
+    }
     return events;
   }
 
@@ -1683,34 +1740,6 @@ const parseStructuralHeader = (
   return null;
 };
 
-const escapeComment = (value: string): string => {
-  const escaped = value
-    .replace(/\\/g, '\\\\')
-    .replace(/\r/g, '\\r')
-    .replace(/\n/g, '\\n')
-    .replace(/\t/g, '\\t');
-  return escaped.replace(/[ ]+$/g, spaces => '\\u0020'.repeat(spaces.length));
-};
-
-const unescapeComment = (value: string): string => {
-  let output = '';
-  for (let index = 0; index < value.length; index++) {
-    if (value[index] === '\\' && index + 1 < value.length) {
-      const next = value[++index];
-      if (next === 'n') output += '\n';
-      else if (next === 'r') output += '\r';
-      else if (next === 't') output += '\t';
-      else if (next === 'u' && /^[0-9A-Fa-f]{4}/.test(value.slice(index + 1))) {
-        output += String.fromCharCode(
-          parseInt(value.slice(index + 1, index + 5), 16)
-        );
-        index += 4;
-      } else output += next;
-    } else output += value[index];
-  }
-  return output;
-};
-
 const chooseJavaScriptDelimiter = (body: string, depth: number): string => {
   const physicalLines = splitPhysicalLines(body);
   const hasTerminator = (terminator: string): boolean =>
@@ -1725,9 +1754,9 @@ const chooseJavaScriptDelimiter = (body: string, depth: number): string => {
         parsed.text.trim() === terminator
       );
     });
-  if (!hasTerminator('end js')) return '';
+  if (!hasTerminator('@end js')) return '';
   let suffix = 1;
-  while (hasTerminator(`end js IFDO_${suffix}`)) suffix++;
+  while (hasTerminator(`@end js IFDO_${suffix}`)) suffix++;
   return `IFDO_${suffix}`;
 };
 
@@ -2095,7 +2124,10 @@ const formatEvents = (
   const lines = [];
   events.forEach((event, eventIndex) => {
     if (eventIndex) lines.push('');
-    if (event.type !== EVENT_TYPES.group) {
+    if (
+      event.type !== EVENT_TYPES.group &&
+      event.type !== EVENT_TYPES.comment
+    ) {
       lines.push(
         `${depthPrefix(depth)}${formatMetadata('@event', eventMetadata(event))}`
       );
@@ -2277,18 +2309,21 @@ const formatEvents = (
     }
     if (event.type === EVENT_TYPES.comment) {
       lines.push(
-        `${depthPrefix(depth)}${formatMetadata('@comment', {
-          background: [event.color.r, event.color.g, event.color.b],
-          text: [event.color.textR, event.color.textG, event.color.textB],
-          ...(event.comment2 ? { comment2: event.comment2 } : {}),
-        })}`
+        `${depthPrefix(depth)}${formatMetadata(
+          `@comment ${quote(event.comment)}`,
+          {
+            ...eventMetadata(event),
+            background: [event.color.r, event.color.g, event.color.b],
+            text: [event.color.textR, event.color.textG, event.color.textB],
+            ...(event.comment2 ? { comment2: event.comment2 } : {}),
+          }
+        )}`
       );
-      lines.push(`${depthPrefix(depth)}# ${escapeComment(event.comment)}`);
       return;
     }
     if (event.type === EVENT_TYPES.group) {
       lines.push(
-        `${depthPrefix(depth)}${formatMetadata('@group', {
+        `${depthPrefix(depth)}${formatMetadata(`@group ${quote(event.name)}`, {
           ...eventMetadata(event),
           source: event.source,
           creationTime: event.creationTime,
@@ -2296,9 +2331,8 @@ const formatEvents = (
           parameters: event.parameters,
         })}`
       );
-      lines.push(`${depthPrefix(depth)}group ${quote(event.name)}`);
       lines.push(...formatEvents(event.events || [], depth, options));
-      lines.push(`${depthPrefix(depth)}end`);
+      lines.push(`${depthPrefix(depth)}@end group`);
       return;
     }
     if (event.type === EVENT_TYPES.link) {
@@ -2314,7 +2348,7 @@ const formatEvents = (
     if (event.type === EVENT_TYPES.js) {
       const delimiter = chooseJavaScriptDelimiter(event.inlineCode, depth);
       lines.push(
-        `${depthPrefix(depth)}${formatMetadata('js', {
+        `${depthPrefix(depth)}${formatMetadata('@js', {
           ...(event.parameterObjects
             ? { objects: event.parameterObjects }
             : {}),
@@ -2325,7 +2359,7 @@ const formatEvents = (
       );
       if (event.inlineCode) lines.push(event.inlineCode);
       lines.push(
-        `${depthPrefix(depth)}end js${delimiter ? ` ${delimiter}` : ''}`
+        `${depthPrefix(depth)}@end js${delimiter ? ` ${delimiter}` : ''}`
       );
       return;
     }

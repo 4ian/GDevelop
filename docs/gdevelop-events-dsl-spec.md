@@ -2,7 +2,7 @@
 
 ## A Minimal AI-Friendly DSL for GDevelop Events JSON and Functions
 
-**Status:** Version 1.3 codebase-aligned design specification
+**Status:** Version 2.0 codebase-aligned design specification
 **Canonical source filename:** `xx.events`
 **File extension:** `.events`
 **Encoding:** UTF-8
@@ -39,7 +39,7 @@
 25. [Complete examples](#25-complete-examples)
 26. [AI generation contract](#26-ai-generation-contract)
 27. [Recommended generation workflow](#27-recommended-generation-workflow)
-28. [Version 1.3 feature set](#28-version-13-feature-set)
+28. [Version 2.0 feature set](#28-version-20-feature-set)
 29. [Final design principles](#29-final-design-principles)
 30. [Compatibility basis](#30-compatibility-basis)
 31. [Current implementation boundary](#31-current-implementation-boundary)
@@ -66,16 +66,12 @@ local
 for
 repeat
 while
-group
 link
-js
 function
 event
-end
-#
 >
 ?
-@event / @instruction / @comment / @group / @while / @exact
+@event / @instruction / @comment / @group / @while / @js / @end / @exact
 ```
 
 A compiler converts `.events` source into the exact GDevelop event-sheet or extension-function data expected by the loaded project, GDevelop version, installed extensions, objects, behaviors, variables, resources, scenes, external event sheets, and registered functions.
@@ -98,7 +94,7 @@ parameters.
 ### Minimal standard event
 
 ```events
-# Collect a coin
+@comment "Collect a coin" background=[255,230,109] text=[0,0,0]
 
 if CollisionNP first_object="Player" second_object="Coin"
 do Delete object="Coin"
@@ -132,7 +128,7 @@ IfDo is designed to be:
 
 ### Non-goals
 
-Version 1.3 is not intended to be:
+Version 2.0 is not intended to be:
 
 - A general-purpose programming language.
 - A full GDevelop project format.
@@ -159,12 +155,12 @@ The following table maps the items visible in the GDevelop event menus to IfDo.
 | New Event Below         | Source order; place the new event after the previous event  |
 | Sub Event               | Prefix every line of the child event with `>`               |
 | Local Variable          | `local name = initialValue` attached to an event            |
-| Comment                 | `# comment text`                                            |
+| Comment                 | `@comment "text" background=[...] text=[...]`               |
 | Else                    | `else` or `else if condition`                               |
 | For each object         | `for each Object`                                           |
 | For each child variable | `for each child variablePath as alias`                      |
-| Event group             | `group Name` ... `end`                                      |
-| JavaScript code         | `js` ... `end js`                                           |
+| Event group             | `@group "Name" ... @end group`                             |
+| JavaScript code         | `@js` ... `@end js`                                         |
 | Link external events    | `link external "Sheet Name"`                                |
 | Repeat                  | `repeat count`                                              |
 | Standard event          | `if`, `or`, and `do` lines                                  |
@@ -410,23 +406,24 @@ do Player.health -= 10
 Groups organize sibling events:
 
 ```events
-group Combat
+@group "Combat"
 
 if collision Bullet Enemy
 do Enemy.health -= Bullet.damage
 do delete Bullet
 
-end
+@end group
 ```
 
 ---
 
 ## 6. Comments
 
-A full-line comment begins with `#` after the optional depth prefix.
+A comment is one `@comment` statement containing a required quoted string and
+its presentation colors.
 
 ```events
-# Damage the player only when invincibility is off
+@comment "Damage the player only when invincibility is off" background=[255,230,109] text=[0,0,0]
 
 if collision Player Enemy
 if Player.invincible == false
@@ -438,24 +435,22 @@ A nested comment uses the same depth as the location where the GDevelop comment 
 ```events
 if SceneJustBegins
 
-> # Restore an existing save
+> @comment "Restore an existing save" background=[255,230,109] text=[0,0,0]
 > if global.hasSave == true
 > do scene.score = global.savedScore
 ```
 
-Consecutive comments at the same depth remain separate GDevelop comment
-events in the canonical round-trip profile. Use an escaped newline in one
-statement when one multiline comment event is intended:
+Consecutive `@comment` statements at the same depth remain separate GDevelop
+comment events. Use an escaped newline inside the quoted string when one
+multiline comment event is intended:
 
 ```events
-# Player damage\nThe timer prevents damage every frame
+@comment "Player damage\nThe timer prevents damage every frame" background=[255,230,109] text=[0,0,0]
 ```
 
-Inline comments are intentionally unsupported:
+Hash comments and inline comments are intentionally unsupported:
 
-```text
-do Player.health -= 10 # invalid
-```
+Any hash-prefixed line or trailing hash text is a syntax error.
 
 Comments do not affect runtime behavior, variable scope, or object picking.
 
@@ -774,7 +769,7 @@ for each child
 repeat
 while
 link
-js
+@js
 ```
 
 Consecutive `local` lines form the prelude of the next standard event or loop.
@@ -833,7 +828,7 @@ do Chest.animation = "Open"
 4. A dedent closes the current child block.
 5. Spaces after the prefix do not affect depth.
 6. The recommended maximum AI-generated depth is three levels.
-7. Raw lines inside a `js` block are exempt; only the `js` and `end js` lines carry DSL depth.
+7. Raw lines inside an `@js` block are exempt; only the `@js` and `@end js` lines carry DSL depth.
 
 ### 9.4 Execution order
 
@@ -940,7 +935,7 @@ do Player.animation = "Dead"
 Groups organize events but do not change runtime semantics.
 
 ```events
-group Combat
+@group "Combat"
 
 if collision Bullet Enemy
 do Enemy.health -= Bullet.damage
@@ -950,22 +945,20 @@ if Enemy.health <= 0
 do delete Enemy
 do scene.score += 100
 
-end
+@end group
 ```
 
-A group name may be an identifier or a quoted string:
+A group name is always a quoted string on the same `@group` statement as its
+metadata:
 
 ```events
-group PlayerDamage
-```
-
-```events
-group "Player Damage"
+@group "Player Damage" source="" creationTime=0 color=[74,176,228] parameters=[]
+@end group
 ```
 
 ### Group rules
 
-1. `group` and its matching `end` appear at top level.
+1. `@group` and its matching `@end group` appear at the same event depth.
 2. Groups cannot be nested in the canonical AI profile.
 3. A group may be empty.
 4. Groups preserve contained event order.
@@ -1240,10 +1233,10 @@ if Player.active
 A JavaScript event is a first-class typed event whose body is JavaScript source.
 
 ```events
-js
+@js
 const score = runtimeScene.getVariables().get("Score");
 score.setNumber(score.getAsNumber() + 1);
-end js
+@end js
 ```
 
 `runtimeScene` is available to the JavaScript body.
@@ -1255,37 +1248,39 @@ Use `objects=<ObjectOrGroup>` to pass the selected instances of one object or ob
 ```events
 if collision Player Enemy
 
-> js objects=Enemy
+> @js objects=Enemy
   objects.forEach(enemy => {
     enemy.setOpacity(128);
   });
-> end js
+> @end js
 ```
 
-The `js` header and `end js` terminator carry the DSL depth. Lines between them are preserved as raw JavaScript and do not require `>` prefixes.
+The `@js` header and `@end js` terminator carry the DSL depth. Lines between
+them are preserved as raw JavaScript and do not require `>` prefixes.
 
 ### 14.2 JavaScript rules
 
-- `end js` must occur at the same DSL depth as the opening `js` line.
-- When a raw body contains a line that would be mistaken for `end js` at the
+- `@end js` must occur at the same DSL depth as the opening `@js` line.
+- When a raw body contains a line that would be mistaken for `@end js` at the
   opening depth, the canonical decompiler selects a deterministic delimiter:
 
   ```events
-  js delimiter="IFDO_1"
+  @js delimiter="IFDO_1"
   const source = `
-  end js
+  @end js
   `;
-  end js IFDO_1
+  @end js IFDO_1
   ```
 
   `delimiter=` is round-trip syntax only and is not persisted in event JSON.
   Its value contains letters, digits, and underscores. The matching
-  `end js <delimiter>` line is the only terminator for that body.
+  `@end js <delimiter>` line is the only terminator for that body.
 
 - A JavaScript event is a leaf event.
-- `#` inside the raw body is JavaScript text, not an IfDo comment.
+- `@comment`-looking or hash-prefixed text inside the raw body is JavaScript
+  text, not an IfDo statement.
 - The compiler preserves the JavaScript body and line endings, except for optional canonical newline normalization.
-- At most one object or object group is passed through `objects=` in version 1.1.
+- At most one object or object group is passed through `objects=` in version 2.0.
 - Additional objects can be obtained through `runtimeScene` APIs.
 - The project validator checks the `objects=` symbol but does not claim to prove JavaScript behavior.
 - The `ifdo-ai` profile disables JavaScript unless the caller explicitly sets `allowJavaScript=true`.
@@ -1577,7 +1572,7 @@ do target.health -= amount
 An object parameter behaves as an object alias and carries the picked instances passed by the caller. A value parameter behaves as a typed read-only expression.
 
 Compact-header default syntax, variadic parameters, overloaded function names,
-and positional custom-function calls are not part of version 1.3. Existing
+and positional custom-function calls are not part of version 2.0. Existing
 optional/default parameter metadata is preserved losslessly in the owning
 function settings entry.
 
@@ -1693,7 +1688,7 @@ The required type is determined by the function kind:
 
 Assigning `result` sets the current return value; it does not immediately stop
 function execution. A later event may replace it. There is no separate
-early-return statement in version 1.3.
+early-return statement in version 2.0.
 
 The `ifdo-ai` profile requires an unconditional initial result before any conditional result assignment:
 
@@ -2069,7 +2064,9 @@ behavior method. Standalone APIs may explicitly enable the optional
 
 ### Stage 1: Recognize JavaScript bodies
 
-When a `js` header is found, the parser stores every following physical line as raw code until `end js` at the same DSL depth.
+When an `@js` header is found, the parser stores every following physical line
+as raw code until the matching `@end js` (and optional delimiter) at the same
+DSL depth.
 
 No IfDo tokenization occurs inside the raw body.
 
@@ -2083,13 +2080,13 @@ For every non-raw line:
 4. Store the remaining statement at both depths.
 5. Reject a depth increase greater than one in either hierarchy.
 
-Groups are top-level lexical containers delimited by `group` and `end`.
+Groups are lexical containers delimited by `@group "name"` and `@end group`.
 
 ### Stage 3: Parse statements
 
 At a given depth:
 
-- `#` creates a comment event.
+- `@comment "text" ...` creates a comment event and owns its event and color metadata.
 - `local` adds a declaration to the next event or current else branch.
 - `if` starts a standard event or adds an AND condition before actions begin.
 - `or` extends the current condition group.
@@ -2105,15 +2102,16 @@ At a given depth:
 - `and while` appends an exact sibling to the current while event's
   `whileConditions` list.
 - `link` creates a link event.
-- `js` creates a JavaScript event.
-- `group` starts an event group.
-- `end` closes an event group.
+- `@js` creates a JavaScript event.
+- `@group "name" ...` starts an event group and owns its event metadata.
+- `@end group` closes an event group; `@end js` closes JavaScript raw text.
+- Every `@end` requires its block-kind suffix. Bare `@end` is invalid.
 - `function` is valid only as an explicitly enabled standalone shorthand and
   never in a canonical project file or nested statement.
-- `@event`, `@instruction`, `@comment`, `@group`, and `@while` attach typed
-  round-trip metadata to the next compatible construct. Group event metadata
-  (`disabled`, `folded`, and `aiGeneratedEventId`) belongs directly on
-  `@group`, not on a preceding `@event`.
+- `@event`, `@instruction`, and `@while` attach typed round-trip metadata to
+  the next compatible construct. `@comment` and `@group` are complete event
+  statements rather than pending annotations; their `disabled`, `folded`, and
+  `aiGeneratedEventId` fields belong directly on the same statement.
 
 ### Stage 4: Bind metadata and validate owners
 
@@ -2152,13 +2150,13 @@ parameter           = identifier, ":", parameter-type ;
 parameter-type      = type-expression ;
 
 top-item            = metadata-annotation
-                    | comment
+                    | comment-event
                     | group
                     | node ;
 
-group               = "group", group-name, newline,
-                      { comment | node },
-                      "end", newline ;
+group               = "@group", string, { named-argument }, newline,
+                      { comment-event | node },
+                      "@end", "group", newline ;
 
 node                = { local-declaration },
                       ( standard-event
@@ -2198,8 +2196,6 @@ string-array        = "[", [ string, { ",", string } ], "]" ;
 
 metadata-annotation = "@event", { named-argument }, newline
                     | "@instruction", { named-argument }, newline
-                    | "@comment", { named-argument }, newline
-                    | "@group", { named-argument }, newline
                     | "@while", { named-argument }, newline ;
 
 standard-event      = conditional-event
@@ -2274,16 +2270,16 @@ while-loop          = "while", [ condition ],
 link-event          = "link", [ "external" | "scene" ], string,
                       [ "group=", string | "range=", range ], newline ;
 
-javascript-event    = "js", [ "objects=", object-reference ],
+javascript-event    = "@js", [ "objects=", object-reference ],
                       [ "strict=", boolean ],
                       [ "expanded=", boolean ],
                       [ "delimiter=", string ], newline,
                       raw-javascript,
-                      "end", "js", [ identifier ], newline ;
+                      "@end", "js", [ identifier ], newline ;
 
 child-item          = item-at-parent-depth-plus-one ;
 
-comment             = "#", comment-text, newline ;
+comment-event       = "@comment", string, { named-argument }, newline ;
 
 condition           = [ "not" ], condition-expression ;
 ```
@@ -2316,6 +2312,17 @@ statement           = comment-statement
                     | javascript-end
                     | exact-instruction
                     | metadata-annotation ;
+
+comment-statement   = "@comment", string, { named-argument } ;
+
+group-statement     = "@group", string, { named-argument } ;
+
+end-statement       = ( "@end", "group" )
+                    | ( "@end", "js", [ identifier ] ) ;
+
+javascript-header   = "@js", { named-argument } ;
+
+javascript-end      = "@end", "js", [ identifier ] ;
 
 custom-action-call  = qualified-name, { named-argument } ;
 
@@ -2362,14 +2369,14 @@ GDevelop event-sheet JSON or extension-function JSON
 | `if` / `or` / `do`                                     | Standard event                                   |
 | `else`                                                 | Else event                                       |
 | `>`                                                    | Child event in the parent event's event list     |
-| `#`                                                    | Comment event                                    |
-| `group` ... `end`                                      | Event group                                      |
+| `@comment "text" ...`                                 | Comment event                                    |
+| `@group "name"` ... `@end group`                     | Event group                                      |
 | `for each Object`                                      | For Each Object event                            |
 | `for each child`                                       | For Each Child Variable event                    |
 | `repeat`                                               | Repeat event                                     |
 | `while`                                                | While event                                      |
 | `link external` / `link scene`                         | Link event                                       |
-| `js` ... `end js`                                      | JavaScript event                                 |
+| `@js` ... `@end js`                                    | JavaScript event                                 |
 | `local`                                                | Local-variable data attached to the owning event |
 | `function.settings` with `functionType = "Action"`     | Extension action definition/target               |
 | `function.settings` with `functionType = "Condition"`  | Extension condition definition/target            |
@@ -2511,7 +2518,7 @@ Reject:
 - Orphan `else` lines in the AI profile.
 - Depth jumps larger than one.
 - Parent actions after child events.
-- Missing group `end`.
+- Missing or mismatched `@end group`.
 - Nested groups in the AI profile.
 - Loops without bodies.
 - Conditional events without actions or sub-events.
@@ -2520,7 +2527,8 @@ Reject:
 - Local declarations after an event header.
 - Duplicate local, loop-counter, or child aliases.
 - Unterminated JavaScript blocks.
-- `end js` at the wrong depth.
+- `@end` without a block-kind suffix.
+- `@end js` at the wrong depth or with a mismatched delimiter.
 - A `function` header or TOML front matter in a project-owned `.events` file.
 - More than one function header, or a non-leading header, in explicitly
   enabled standalone mode.
@@ -2631,8 +2639,8 @@ The `ifdo-ai` profile requires `limit=<positive integer>`.
 ```text
 E470 JavaScript is disabled
 
-20 | js objects=Enemy
-     ^^
+20 | @js objects=Enemy
+     ^^^
 
 Set `allowJavaScript=true` only when raw JavaScript is explicitly requested.
 ```
@@ -2676,7 +2684,7 @@ The formatter emits one stable representation.
 2. Use one statement per line.
 3. Use one space after the complete `>` prefix.
 4. Put blank lines between sibling events.
-5. Put a blank line after `group` and before `end` when non-empty.
+5. Put a blank line after `@group` and before `@end group` when non-empty.
 6. Use double-quoted strings.
 7. Use explicit `scene.`, `global.`, and `local.` namespaces.
 8. Use canonical instruction names from the registry.
@@ -2697,9 +2705,9 @@ The formatter emits one stable representation.
 Canonical example:
 
 ```events
-group "Player Damage"
+@group "Player Damage" source="" creationTime=0 color=[74,176,228] parameters=[]
 
-# Apply damage from enemies or projectiles
+@comment "Apply damage from enemies or projectiles" background=[255,230,109] text=[0,0,0]
 
 local damage = 10
 if collision Player Enemy
@@ -2715,7 +2723,7 @@ do timer.reset Player.invincibility
 if timer Player.invincibility >= 1s
 do Player.invincible = false
 
-end
+@end group
 ```
 
 ---
@@ -2725,9 +2733,9 @@ end
 ### 25.1 Standard events, locals, OR, else, groups, and sub-events
 
 ```events
-group Combat
+@group "Combat"
 
-# Damage the player
+@comment "Damage the player" background=[255,230,109] text=[0,0,0]
 
 local damage = 10
 if collision Player Enemy
@@ -2746,7 +2754,7 @@ do timer.reset Player.invincibility
 >> else
 >> do scene.change "GameOver"
 
-# Choose the health animation
+@comment "Choose the health animation" background=[255,230,109] text=[0,0,0]
 
 if Player.health <= 0
 do Player.animation = "Dead"
@@ -2755,64 +2763,64 @@ do Player.animation = "Hurt"
 else
 do Player.animation = "Idle"
 
-end
+@end group
 ```
 
 ### 25.2 Every loop type
 
 ```events
-group Loops
+@group "Loops"
 
-# Process each enemy instance
+@comment "Process each enemy instance" background=[255,230,109] text=[0,0,0]
 
 for each Enemy index=i
 > if Enemy.health <= 0
 > do Enemy.deathOrder = i
 > do delete Enemy
 
-# Process every child in an inventory structure
+@comment "Process every child in an inventory structure" background=[255,230,109] text=[0,0,0]
 
 local total = 0
 for each child scene.inventory as item
 > do local.total += item.value
 > do DebugText.text = item.name + ": " + item.value
 
-# Create fixed rewards
+@comment "Create fixed rewards" background=[255,230,109] text=[0,0,0]
 
 local spacing = 50
 repeat 5 index=i
 > do create Coin x=100+i*local.spacing y=200
 
-# Drain a queue safely
+@comment "Drain a queue safely" background=[255,230,109] text=[0,0,0]
 
 while scene.queueSize > 0 limit=1000 index=i
 > do scene.queueSize -= 1
 > do DebugText.text = "Processed " + (i + 1)
 
-end
+@end group
 ```
 
 ### 25.3 Linked events and JavaScript
 
 ```events
-group Reuse
+@group "Reuse"
 
 link external "Shared Player Logic"
 link scene "Base Level"
 
-end
+@end group
 
-group "Advanced Escape Hatch"
+@group "Advanced Escape Hatch"
 
 if collision Player Enemy
 
-> js objects=Enemy
+> @js objects=Enemy
   objects.forEach(enemy => {
     enemy.setOpacity(128);
   });
-> end js
+> @end js
 
-end
+@end group
 ```
 
 ### 25.4 Action, condition, and expression functions
@@ -2849,7 +2857,7 @@ do result = base + level * 2
 `scenes/Main/Main.events`:
 
 ```events
-group Combat
+@group "Combat"
 
 if collision Player Enemy
 do Combat.Damage target=Player amount=Combat.DamageForLevel(level=Enemy.level, base=10) canKill=true
@@ -2857,7 +2865,7 @@ do Combat.Damage target=Player amount=Combat.DamageForLevel(level=Enemy.level, b
 if Combat.IsDead target=Player
 do scene.change "GameOver"
 
-end
+@end group
 ```
 
 ---
@@ -2897,7 +2905,7 @@ Rules:
 - Use `repeat count index=i` for fixed repetition.
 - Every generated `while` must include `limit=<positive integer>`.
 - Use `link external` or `link scene` only with listed targets.
-- Do not emit `js` unless JavaScript is explicitly allowed.
+- Do not emit `@js` unless JavaScript is explicitly allowed.
 - Prefer catalog events over JavaScript.
 - Prefer named arguments for complex instructions.
 - Use the `.events` file extension.
@@ -2917,7 +2925,7 @@ Rules:
 
 ```text
 COMMENT
-# text
+@comment "text" background=[255,230,109] text=[0,0,0]
 
 LOCAL VARIABLE
 local name = value
@@ -2939,9 +2947,9 @@ SUB-EVENT
 > do action
 
 GROUP
-group Name
+@group "Name"
 ...
-end
+@end group
 
 FOR EACH OBJECT
 for each Object index=i
@@ -2966,9 +2974,9 @@ link external "External Events Name"
 link scene "Scene Name"
 
 JAVASCRIPT
-js objects=Object
+@js objects=Object
 raw JavaScript
-end js
+@end js
 
 FUNCTION FILE
 signature and owner come from TOML settings
@@ -3014,7 +3022,18 @@ Diagnostics should refer to IfDo source and its typed constructs.
 
 ---
 
-## 28. Version 1.3 feature set
+## 28. Version 2.0 feature set
+
+Version 2.0 intentionally replaces the earlier split structural spellings.
+There is no source-compatibility mode:
+
+- `@group "name" ...` is the complete group header; a following `group` line
+  is invalid.
+- `@comment "content" ...` is the complete comment event; hash-comment event
+  syntax is invalid.
+- JavaScript begins with `@js`, not `js`.
+- Blocks close with typed `@end group` or `@end js`; bare `end`, bare `@end`,
+  and `end js` are invalid.
 
 ### Included
 
@@ -3100,7 +3119,7 @@ Diagnostics should refer to IfDo source and its typed constructs.
 The complete structural foundation remains small:
 
 ```events
-# comment
+@comment "comment" background=[255,230,109] text=[0,0,0]
 
 local value = 10
 if condition
@@ -3123,16 +3142,16 @@ while condition limit=1000
 
 link external "Shared Events"
 
-js
+@js
 // raw JavaScript
-end js
+@end js
 
-group Name
-# events
-end
+@group "Name"
+@comment "events" background=[255,230,109] text=[0,0,0]
+@end group
 
-# A function .events file uses the same event statements.
-# Its signature comes from TOML settings, not this body.
+@comment "A function .events file uses the same event statements." background=[255,230,109] text=[0,0,0]
+@comment "Its signature comes from TOML settings, not this body." background=[255,230,109] text=[0,0,0]
 ```
 
 ---
@@ -3499,27 +3518,24 @@ that are present and does not invent `limit=`.
 
 ### 33.3 Comments
 
-One `#` statement maps to one `BuiltinCommonInstructions::Comment` event. A
-newline in one comment value is written as `\n` or a quoted multiline comment
-form; adjacent `#` statements are never automatically merged in the canonical
-round-trip profile because two adjacent comment events are distinguishable in
-JSON.
+One `@comment "content" ...` statement maps to one
+`BuiltinCommonInstructions::Comment` event. Newlines use JSON string escapes;
+adjacent `@comment` statements are never automatically merged because two
+adjacent comment events are distinguishable in JSON.
 
 Presentation metadata is optional in authored source and emitted when needed
 for round-trip fidelity:
 
 ```events
-@comment background=[255,230,109] text=[0,0,0] comment2=""
-# Damage handling
+@comment "Damage handling" background=[255,230,109] text=[0,0,0] comment2=""
 ```
 
 ### 33.4 Groups
 
 ```events
-@group disabled=true source="" creationTime=0 color=[74,176,228] parameters=[]
-group Combat
+@group "Combat" disabled=true source="" creationTime=0 color=[74,176,228] parameters=[]
 ...
-end
+@end group
 ```
 
 maps to `BuiltinCommonInstructions::Group`. `parameters` is the current raw
@@ -3555,9 +3571,9 @@ uses the current external-first behavior with the generic form.
 ### 33.6 JavaScript
 
 ```events
-js objects=Enemy strict=true expanded=false
+@js objects=Enemy strict=true expanded=false
 // source preserved verbatim
-end js
+@end js
 ```
 
 maps to `inlineCode`, `parameterObjects`, `useStrict`, and
@@ -3687,7 +3703,7 @@ instruction JSON fallback constructs are not part of IfDo.
   named argument, annotation, or body form.
 - Local variables and their recursively nested values use the complete typed
   variable grammar; no variable field may be omitted during decompilation.
-- JavaScript remains a first-class `js ... end js` event. Its raw source body
+- JavaScript remains a first-class `@js ... @end js` event. Its raw source body
   does not permit raw event or instruction JSON.
 
 ### 35.2 Instruction completeness

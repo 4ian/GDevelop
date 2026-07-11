@@ -555,7 +555,7 @@ and resource folders.
 ```toml
 [gdevelop]
 combinedSettingsFormatVersion = 1
-eventsDslVersion = "1.3"
+eventsDslVersion = "2.0"
 
 [project]
 kind = "project"
@@ -623,6 +623,9 @@ when composing the legacy `resources` object.
   no self-reference. Its fixed root filename is the entry marker.
 - `project.settings` must not contain `[project.resources]` in canonical
   output. `resources.settings` is the sole writer of that namespace.
+- `[gdevelop].eventsDslVersion` must equal `"2.0"`. Earlier DSL grammars are
+  intentionally rejected rather than rewritten during multi-file loading;
+  legacy JSON import always emits the current grammar.
 - Scene and extension order are contiguous zero-based `order` values owned by
   each `scene.settings` and `extension.settings` fragment respectively.
 - Names are unique within their current legacy container.
@@ -779,7 +782,7 @@ The events file contains only the scene's IfDo DSL body. Its owning
 `scene.settings` supplies its identity and source reference:
 
 ```events
-# Initialize the scene.
+@comment "Initialize the scene." background=[255,230,109] text=[0,0,0]
 
 if once
 do scene.score = 0
@@ -1199,7 +1202,7 @@ An external event sheet is one pure DSL
 come from the matching `external.settings` `eventFiles` entry:
 
 ```events
-# Shared events follow.
+@comment "Shared events follow." background=[255,230,109] text=[0,0,0]
 
 if collision Player Enemy
 do Player.health -= Enemy.damage

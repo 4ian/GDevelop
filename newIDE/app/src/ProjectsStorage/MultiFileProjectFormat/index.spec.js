@@ -229,6 +229,7 @@ describe('GDevelop multi-file project format', () => {
 
     expect(areLegacyProjectsEquivalent(projectFixture, output)).toBe(true);
     expect(files[MULTI_FILE_ENTRY_URI]).toContain('[gdevelop]');
+    expect(files[MULTI_FILE_ENTRY_URI]).toContain('eventsDslVersion = "2.0"');
     expect(files[MULTI_FILE_ENTRY_URI]).not.toContain('sceneFiles');
     expect(files[MULTI_FILE_ENTRY_URI]).not.toContain('extensionFiles');
     expect(files[MULTI_FILE_ENTRY_URI]).not.toContain('externalSettings');
@@ -345,6 +346,18 @@ settings = "game://extensions/Combat/behaviors/Health/behavior.settings"
         composeLegacyProjectFromFiles(files)
       )
     ).toBe(true);
+  });
+
+  test('rejects a project that declares an obsolete events DSL grammar', () => {
+    const files = decomposeLegacyProjectToFiles(projectFixture);
+    files[MULTI_FILE_ENTRY_URI] = files[MULTI_FILE_ENTRY_URI].replace(
+      'eventsDslVersion = "2.0"',
+      'eventsDslVersion = "1.3"'
+    );
+
+    expect(() => composeLegacyProjectFromFiles(files)).toThrow(
+      expect.objectContaining({ code: 'MULTIFILE_UNSUPPORTED_VERSION' })
+    );
   });
 
   test('keeps read compatibility with resources embedded in project.settings', () => {

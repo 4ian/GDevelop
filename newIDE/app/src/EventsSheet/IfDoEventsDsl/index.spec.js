@@ -160,6 +160,9 @@ const allEventTypesFixture = [
   },
   {
     type: 'BuiltinCommonInstructions::Comment',
+    disabled: true,
+    folded: true,
+    aiGeneratedEventId: 'comment-id',
     color: { r: 255, g: 230, b: 109, textR: 1, textG: 2, textB: 3 },
     comment: 'First line\nSecond "line" \\ end',
     comment2: 'deprecated',
@@ -228,7 +231,13 @@ describe('IfDo events DSL', () => {
       expect(dsl).toContain('or @exact id="Compare"');
       expect(dsl).not.toContain('@exact id="BuiltinCommonInstructions::Or"');
       expect(dsl).toContain('for each child');
-      expect(dsl).toContain('end js');
+      expect(dsl).toContain('@js');
+      expect(dsl).toContain('@end js');
+      expect(dsl).toContain('@group "Combat"');
+      expect(dsl).toContain('@end group');
+      expect(dsl).toContain('@comment "First line\\nSecond');
+      expect(dsl).not.toMatch(/^group\s/m);
+      expect(dsl).not.toMatch(/^#(?:\s|$)/m);
       expect(dsl).not.toContain('legacy event');
       expect(dsl).not.toContain('@legacy');
     });
@@ -388,7 +397,7 @@ describe('IfDo events DSL', () => {
     });
 
     test('preserves JavaScript line endings and delimiter-looking body lines', () => {
-      const inlineCode = 'const text = `\r\nend js\r\n`;\r\nreturn text;';
+      const inlineCode = 'const text = `\r\n@end js\r\n`;\r\nreturn text;';
       const input = JSON.stringify([
         {
           type: 'BuiltinCommonInstructions::JsCode',
@@ -400,7 +409,7 @@ describe('IfDo events DSL', () => {
       ]);
       const dsl = convertLegacyEventsJsonToIfDo(input);
       expect(dsl).toContain('delimiter="IFDO_1"');
-      expect(dsl).toContain('end js IFDO_1');
+      expect(dsl).toContain('@end js IFDO_1');
       const output = compileIfDoToLegacyEventsJson(dsl);
       expect(JSON.parse(output)[0].inlineCode).toBe(inlineCode);
       expect(areLegacyEventsEquivalent(input, output)).toBe(true);
@@ -486,8 +495,9 @@ describe('IfDo events DSL', () => {
       const dsl = convertLegacyEventsJsonToIfDo(input);
 
       expect(dsl).toContain(
-        '@group disabled=true folded=true aiGeneratedEventId="disabled-group" source="" creationTime=0 color=[54,52,232] parameters=[]'
+        '@group "Grouped events" disabled=true folded=true aiGeneratedEventId="disabled-group" source="" creationTime=0 color=[54,52,232] parameters=[]'
       );
+      expect(dsl).toContain('@end group');
       expect(dsl.startsWith('@event')).toBe(false);
       expect(
         areLegacyEventsEquivalent(input, compileIfDoToLegacyEventsJson(dsl))
@@ -516,20 +526,74 @@ do await @exact id="Async" parameters=["x"]
       expect(events[0].actions[0].type.await).toBe(true);
     });
 
-    test('accepts old @event group metadata but rejects duplicate ownership', () => {
-      const compatible = parseIfDoEvents(`@event disabled=true
-@group source="" creationTime=0 color=[1,2,3] parameters=[]
-group "Compatible"
-end
+    test('uses one @group statement and a typed @end suffix', () => {
+      const events = parseIfDoEvents(`@group "Consolidated" disabled=true source="" creationTime=0 color=[1,2,3] parameters=[]
+@event
+event
+@end group
 `);
-      expect(compatible[0].disabled).toBe(true);
+      expect(events[0]).toMatchObject({
+        type: 'BuiltinCommonInstructions::Group',
+        name: 'Consolidated',
+        disabled: true,
+        events: [{ type: 'BuiltinCommonInstructions::Standard' }],
+      });
+      expect(() =>
+        parseIfDoEvents(`@group "Missing suffix"
+@end
+`)
+      ).toThrow('@end requires a block-kind suffix');
+      expect(() =>
+        parseIfDoEvents(`@group "Wrong suffix"
+@end js
+`)
+      ).toThrow('Unexpected block terminator');
       expect(() =>
         parseIfDoEvents(`@event disabled=true
-@group disabled=true source="" creationTime=0 color=[1,2,3] parameters=[]
-group "Duplicate"
-end
+@group "Metadata must be consolidated"
+@end group
 `)
-      ).toThrow('Duplicate group event metadata disabled');
+      ).toThrow('@event cannot attach to @group');
+      expect(() => parseIfDoEvents('group "Old syntax"\nend\n')).toThrow(
+        'Unknown statement'
+      );
+      expect(() => parseIfDoEvents('end\n')).toThrow(
+        'Block terminators must use @end'
+      );
+      expect(() =>
+        parseIfDoEvents('@group source=""\ngroup "Old split syntax"\nend\n')
+      ).toThrow('@group requires a quoted string');
+    });
+
+    test('uses one @comment statement with quoted content and colors', () => {
+      const events = parseIfDoEvents(
+        '@comment "Line one\\nLine two" disabled=true background=[1,2,3] text=[4,5,6]\n'
+      );
+      expect(events[0]).toMatchObject({
+        type: 'BuiltinCommonInstructions::Comment',
+        disabled: true,
+        comment: 'Line one\nLine two',
+        color: { r: 1, g: 2, b: 3, textR: 4, textG: 5, textB: 6 },
+      });
+      expect(() => parseIfDoEvents('# old comment\n')).toThrow(
+        'Unknown statement'
+      );
+    });
+
+    test('uses @js and @end js directives', () => {
+      const events = parseIfDoEvents(`@js objects="Enemy" strict=true expanded=false
+const value = 1;
+@end js
+`);
+      expect(events[0]).toMatchObject({
+        type: 'BuiltinCommonInstructions::JsCode',
+        inlineCode: 'const value = 1;',
+        parameterObjects: 'Enemy',
+        useStrict: true,
+      });
+      expect(() => parseIfDoEvents('js\ncode();\n@end js\n')).toThrow(
+        'Unknown statement'
+      );
     });
 
     test('uses a project catalog resolver for friendly instructions', () => {
@@ -694,6 +758,7 @@ do @exact id="Y" parameters=[]
     });
 
     test('publishes the closed serializer coverage manifest', () => {
+      expect(IFDO_EVENTS_DSL_COVERAGE.formatVersion).toBe('2.0');
       expect(IFDO_EVENTS_DSL_COVERAGE.persistedEventTypes).toHaveLength(10);
       expect(
         IFDO_EVENTS_DSL_COVERAGE.persistedEventTypes.map(entry => entry.type)
@@ -811,11 +876,11 @@ do @exact id="Y" parameters=[]
         'IFDO_SYNTAX'
       );
       expectCode(
-        () => compileIfDoToLegacyEventsJson('group "A"\nevent\n'),
+        () => compileIfDoToLegacyEventsJson('@group "A"\nevent\n'),
         'IFDO_SYNTAX'
       );
       expectCode(
-        () => compileIfDoToLegacyEventsJson('js\ncode();\n'),
+        () => compileIfDoToLegacyEventsJson('@js\ncode();\n'),
         'IFDO_SYNTAX'
       );
     });

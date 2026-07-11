@@ -4,6 +4,7 @@ import parseToml from '@iarna/toml/parse-string';
 import stringifyToml from '@iarna/toml/stringify';
 import { sha256 } from 'js-sha256';
 import {
+  IFDO_EVENTS_DSL_COVERAGE,
   compileIfDoToLegacyEventsJson,
   convertLegacyEventsJsonToIfDo,
   parseLegacyEventsJson,
@@ -854,7 +855,7 @@ export const decomposeLegacyProjectToFiles = (legacyProject, options = {}) => {
   putSettingsFile(files, MULTI_FILE_ENTRY_URI, {
     gdevelop: {
       combinedSettingsFormatVersion: MULTI_FILE_FORMAT_VERSION,
-      eventsDslVersion: '1.3',
+      eventsDslVersion: IFDO_EVENTS_DSL_COVERAGE.formatVersion,
     },
     project: projectNamespace,
   });
@@ -1185,6 +1186,7 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
   );
   if (
     gdevelop.combinedSettingsFormatVersion !== MULTI_FILE_FORMAT_VERSION ||
+    gdevelop.eventsDslVersion !== IFDO_EVENTS_DSL_COVERAGE.formatVersion ||
     (gdevelop.entry !== undefined && gdevelop.entry !== MULTI_FILE_ENTRY_URI)
   ) {
     fail(

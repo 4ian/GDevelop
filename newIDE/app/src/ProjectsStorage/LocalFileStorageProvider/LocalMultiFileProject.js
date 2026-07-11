@@ -2,6 +2,7 @@
 
 import optionalRequire from '../../Utils/OptionalRequire';
 import {
+  MULTI_FILE_CONFIG_URI,
   MULTI_FILE_ENTRY_URI,
   MULTI_FILE_RESOURCES_URI,
   MultiFileProjectError,
@@ -184,6 +185,10 @@ const discoverOwnedSettingsUris = async (
   projectRoot: string
 ): Promise<Array<string>> => {
   const discovered = [];
+  const configSettingsPath = path.join(projectRoot, 'config.settings');
+  if (fs.existsSync(configSettingsPath)) {
+    discovered.push(MULTI_FILE_CONFIG_URI);
+  }
   const resourcesSettingsPath = path.join(projectRoot, 'resources.settings');
   if (fs.existsSync(resourcesSettingsPath)) {
     discovered.push(MULTI_FILE_RESOURCES_URI);

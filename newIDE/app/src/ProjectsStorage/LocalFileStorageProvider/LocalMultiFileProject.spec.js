@@ -37,6 +37,7 @@ const projectFixture = {
   objectsFolderStructure: { folderName: '__ROOT', children: [] },
   objectsGroups: [],
   variables: [],
+  globalConfig: {},
   layouts: [
     {
       name: 'Main',
@@ -90,8 +91,14 @@ describe('Local multi-file project storage', () => {
     expect(
       fs.existsSync(path.join(temporaryDirectory, 'resources.settings'))
     ).toBe(true);
+    expect(
+      fs.existsSync(path.join(temporaryDirectory, 'config.settings'))
+    ).toBe(true);
     expect(fs.readFileSync(entryPath, 'utf8')).not.toContain(
       '[project.resources'
+    );
+    expect(fs.readFileSync(entryPath, 'utf8')).not.toContain(
+      '[project.globalConfig'
     );
     expect(
       fs.existsSync(path.join(temporaryDirectory, 'scenes/Main/Main.events'))
@@ -177,6 +184,25 @@ describe('Local multi-file project storage', () => {
     expect(
       await writeLegacyProjectAsMultiFile(changedResourcesProject, entryPath)
     ).toEqual(['game://resources.settings']);
+
+    const changedConfigProject = JSON.parse(
+      JSON.stringify(changedResourcesProject)
+    );
+    changedConfigProject.globalConfig.newSetting = true;
+    expect(
+      await writeLegacyProjectAsMultiFile(changedConfigProject, entryPath)
+    ).toEqual(['game://config.settings']);
+
+    const withoutConfigProject = JSON.parse(
+      JSON.stringify(changedConfigProject)
+    );
+    delete withoutConfigProject.globalConfig;
+    expect(
+      await writeLegacyProjectAsMultiFile(withoutConfigProject, entryPath)
+    ).toEqual(['game://config.settings']);
+    expect(
+      fs.existsSync(path.join(temporaryDirectory, 'config.settings'))
+    ).toBe(false);
   });
 
   test('removes only obsolete files owned by the previous manifest', async () => {

@@ -12,12 +12,13 @@ author the game.
 
 Read, in order:
 
-1. `project.settings` for project-wide configuration.
+1. `project.settings` for project metadata and non-global-config project data.
 2. `resources.settings` for the complete project resource registry.
-3. Relevant child `.settings` files for semantic configuration.
-4. Relevant `.layout` files for visual/UI configuration.
-5. Relevant `.events` files for IfDo event logic.
-6. `.gdevelop/instructions-catalog.json` before adding or changing
+3. `config.settings` for the complete arbitrary global-config subtree.
+4. Relevant child `.settings` files for semantic configuration.
+5. Relevant `.layout` files for visual/UI configuration.
+6. Relevant `.events` files for IfDo event logic.
+7. `.gdevelop/instructions-catalog.json` before adding or changing
    instructions.
 
 The catalog is regenerated from the loaded project every time GDevelop saves.
@@ -33,6 +34,9 @@ generated compatibility/runtime output, not multi-file source.
 
 - `.settings`: TOML semantic/configuration data. Keep every file independent,
   append-safe, and unindented. Never embed another settings fragment.
+- `config.settings`: edit global configuration only under
+  `[project.globalConfig]`; preserve arbitrary keys and the format-owned
+  `[gdevelopConfig]`/`[gdevelopConfig.rawJson]` tables.
 - `.layout`: unindented TOML containing visual/UI data only: objects, layers,
   instances, editor view state, and prefab visual composition.
 - `.events`: IfDo DSL only. Do not embed TOML or raw event JSON.
@@ -49,6 +53,7 @@ manifest entry and every referenced source file in the same change.
 ```text
 project.settings
 resources.settings
+config.settings
 scenes/<Scene>/<Scene>.layout
 scenes/<Scene>/<Scene>.events
 scenes/<Scene>/scene.settings

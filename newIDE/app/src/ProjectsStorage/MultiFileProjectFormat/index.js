@@ -14,9 +14,11 @@ export const MULTI_FILE_FORMAT_VERSION = 1;
 export const MULTI_FILE_ENTRY_NAME = 'project.settings';
 export const MULTI_FILE_ENTRY_URI = 'game://project.settings';
 export const MULTI_FILE_RESOURCES_URI = 'game://resources.settings';
+export const MULTI_FILE_CONFIG_URI = 'game://config.settings';
 
 const PROJECT_SPLIT_FIELDS = new Set([
   'resources',
+  'globalConfig',
   'layouts',
   'externalEvents',
   'externalLayouts',
@@ -112,7 +114,7 @@ const scalarKind = value =>
     ? 'object'
     : typeof value;
 
-const projectTomlPayload = payload => {
+const projectTomlProjection = payload => {
   const rawJson = {};
 
   const visit = (value, pointer) => {
@@ -163,6 +165,11 @@ const projectTomlPayload = payload => {
   };
 
   const projected = visit(payload, '');
+  return { projected, rawJson };
+};
+
+const projectTomlPayload = payload => {
+  const { projected, rawJson } = projectTomlProjection(payload);
   if (Object.prototype.hasOwnProperty.call(projected, 'rawJson')) {
     fail(
       'MULTIFILE_RESERVED_FIELD',
@@ -208,10 +215,8 @@ const setJsonPointer = (root, pointer, value, fileUri) => {
   current[finalToken] = value;
 };
 
-const restoreTomlPayload = (namespace, fileUri) => {
+const restoreTomlProjection = (namespace, rawJson, fileUri) => {
   const payload = clone(namespace);
-  const rawJson = payload.rawJson;
-  delete payload.rawJson;
   if (rawJson !== undefined) {
     asObject(rawJson, 'rawJson', fileUri);
     const pointers = Object.keys(rawJson).sort(
@@ -260,6 +265,13 @@ const restoreTomlPayload = (namespace, fileUri) => {
     });
   }
   return payload;
+};
+
+const restoreTomlPayload = (namespace, fileUri) => {
+  const payload = clone(namespace);
+  const rawJson = payload.rawJson;
+  delete payload.rawJson;
+  return restoreTomlProjection(payload, rawJson, fileUri);
 };
 
 const normalizeLf = source =>
@@ -643,6 +655,25 @@ export const decomposeLegacyProjectToFiles = (legacyProject, options = {}) => {
         },
       },
     });
+  }
+
+  if (project.globalConfig !== undefined) {
+    validateGameUri(MULTI_FILE_CONFIG_URI);
+    const { projected, rawJson } = projectTomlProjection(
+      asObject(project.globalConfig, 'Project globalConfig')
+    );
+    const metadataSource = serializeToml({
+      gdevelopConfig: {
+        settingsFormatVersion: MULTI_FILE_FORMAT_VERSION,
+        ...(Object.keys(rawJson).length ? { rawJson } : {}),
+      },
+    });
+    const configSource = Object.keys(projected).length
+      ? serializeToml({ project: { globalConfig: projected } })
+      : '[project.globalConfig]\n';
+    files[
+      MULTI_FILE_CONFIG_URI
+    ] = `${metadataSource.trimEnd()}\n\n${configSource}`;
   }
 
   (project.layouts || []).forEach((layout, order) => {
@@ -1241,6 +1272,45 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
       );
     }
   }
+  let globalConfigPayload = null;
+  if (files[MULTI_FILE_CONFIG_URI] !== undefined) {
+    if (projectNamespace.globalConfig !== undefined) {
+      fail(
+        'MULTIFILE_OWNERSHIP_CONFLICT',
+        'Global config cannot be stored in both project.settings and config.settings.',
+        MULTI_FILE_CONFIG_URI
+      );
+    }
+    const uri = registerUri(MULTI_FILE_CONFIG_URI);
+    settingsUris.push(uri);
+    const configDocument = parseSettings(files, uri);
+    const configMetadata = asObject(
+      configDocument.gdevelopConfig,
+      'gdevelopConfig',
+      uri
+    );
+    Object.keys(configMetadata).forEach(key => {
+      if (!['settingsFormatVersion', 'rawJson'].includes(key)) {
+        fail(
+          'MULTIFILE_INVALID_SCHEMA',
+          `Unknown gdevelopConfig field ${key}.`,
+          uri
+        );
+      }
+    });
+    if (configMetadata.settingsFormatVersion !== MULTI_FILE_FORMAT_VERSION) {
+      fail(
+        'MULTIFILE_UNSUPPORTED_VERSION',
+        'Invalid global config namespace marker.',
+        uri
+      );
+    }
+    globalConfigPayload = restoreTomlProjection(
+      requireNamespace(configDocument, ['project', 'globalConfig'], uri),
+      configMetadata.rawJson,
+      uri
+    );
+  }
   let externalDocument = null;
   const externalSettingsUri = 'game://externals/external.settings';
   if (
@@ -1527,7 +1597,7 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
     assertContiguousSettingsOrder(extensionDocuments, 'Extension');
   }
 
-  const managedSettingsUriPattern = /^(?:game:\/\/(?:project|resources)\.settings|game:\/\/externals\/external\.settings|game:\/\/scenes\/[^/]+\/scene\.settings|game:\/\/extensions\/[^/]+\/(?:extension\.settings|functions\/[^/]+\/function\.settings|prefabs\/[^/]+\/prefab\.settings|behaviors\/[^/]+\/behavior\.settings))$/;
+  const managedSettingsUriPattern = /^(?:game:\/\/(?:project|resources|config)\.settings|game:\/\/externals\/external\.settings|game:\/\/scenes\/[^/]+\/scene\.settings|game:\/\/extensions\/[^/]+\/(?:extension\.settings|functions\/[^/]+\/function\.settings|prefabs\/[^/]+\/prefab\.settings|behaviors\/[^/]+\/behavior\.settings))$/;
   Object.keys(files)
     .filter(uri => managedSettingsUriPattern.test(uri))
     .forEach(uri => {
@@ -1552,6 +1622,9 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
   );
   if (resourcesPayload) {
     project.resources = removeFormatFields(resourcesPayload);
+  }
+  if (globalConfigPayload) {
+    project.globalConfig = globalConfigPayload;
   }
   project.layouts = sceneDocuments.map(({ entry, uri, document }) => {
     const namespace = restoreTomlPayload(

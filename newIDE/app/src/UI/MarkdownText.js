@@ -26,7 +26,7 @@ export const interpolateMessageDescriptorValues = (
     if (value === null || value === undefined) return source;
 
     return source.replace(
-      new RegExp(`{${escapeRegExp(key)}}`, 'g'),
+      new RegExp(`\\{${escapeRegExp(key)}\\}`, 'g'),
       String(value)
     );
   }, translatedSource);

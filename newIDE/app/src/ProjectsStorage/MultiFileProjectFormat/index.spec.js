@@ -5,6 +5,7 @@ import fs from 'fs';
 // $FlowFixMe[cannot-resolve-module] Jest runs these format tests in Node.
 import path from 'path';
 import {
+  MULTI_FILE_CONFIG_URI,
   MULTI_FILE_ENTRY_URI,
   MULTI_FILE_RESOURCES_URI,
   MultiFileProjectError,
@@ -64,7 +65,12 @@ const projectFixture = {
   objectsFolderStructure: { folderName: '__ROOT', children: [] },
   objectsGroups: [],
   variables: [],
-  globalConfig: { nullable: null, mixed: [1, 'two'] },
+  globalConfig: {
+    enabled: true,
+    rawJson: { userOwned: 'kept' },
+    nullable: null,
+    mixed: [1, 'two'],
+  },
   firstLayout: 'Main',
   previewLayout: 'Main',
   layouts: [
@@ -238,6 +244,8 @@ describe('GDevelop multi-file project format', () => {
     );
     expect(files[MULTI_FILE_ENTRY_URI]).not.toContain('game://scenes/');
     expect(files[MULTI_FILE_ENTRY_URI]).not.toContain('[project.resources');
+    expect(files[MULTI_FILE_ENTRY_URI]).not.toContain('[project.globalConfig');
+    expect(files[MULTI_FILE_CONFIG_URI]).toContain('[project.globalConfig]');
     expect(files[MULTI_FILE_RESOURCES_URI]).toContain('[project.resources]');
     expect(files[MULTI_FILE_RESOURCES_URI]).toContain(
       '[[project.resources.resources]]'
@@ -376,6 +384,47 @@ resourceFolders = []
     ).toBe(true);
   });
 
+  test('keeps read compatibility with global config embedded in project.settings', () => {
+    const project = JSON.parse(JSON.stringify(projectFixture));
+    project.globalConfig = { mode: 'embedded' };
+    const files = decomposeLegacyProjectToFiles(project);
+    delete files[MULTI_FILE_CONFIG_URI];
+    files[MULTI_FILE_ENTRY_URI] += `
+[project.globalConfig]
+mode = "embedded"
+`;
+
+    expect(
+      areLegacyProjectsEquivalent(project, composeLegacyProjectFromFiles(files))
+    ).toBe(true);
+  });
+
+  test('preserves absent and empty global config without ownership ambiguity', () => {
+    const withoutConfig = JSON.parse(JSON.stringify(projectFixture));
+    delete withoutConfig.globalConfig;
+    const filesWithoutConfig = decomposeLegacyProjectToFiles(withoutConfig);
+    expect(filesWithoutConfig[MULTI_FILE_CONFIG_URI]).toBeUndefined();
+    expect(
+      Object.prototype.hasOwnProperty.call(
+        composeLegacyProjectFromFiles(filesWithoutConfig),
+        'globalConfig'
+      )
+    ).toBe(false);
+
+    const withEmptyConfig = JSON.parse(JSON.stringify(projectFixture));
+    withEmptyConfig.globalConfig = {};
+    const filesWithEmptyConfig = decomposeLegacyProjectToFiles(withEmptyConfig);
+    expect(filesWithEmptyConfig[MULTI_FILE_CONFIG_URI]).toContain(
+      '[gdevelopConfig]'
+    );
+    expect(filesWithEmptyConfig[MULTI_FILE_CONFIG_URI]).toContain(
+      '[project.globalConfig]'
+    );
+    expect(
+      composeLegacyProjectFromFiles(filesWithEmptyConfig).globalConfig
+    ).toEqual({});
+  });
+
   test('rejects a discovered child settings fragment without its owner', () => {
     const files = decomposeLegacyProjectToFiles(projectFixture);
     delete files['game://extensions/Combat/extension.settings'];
@@ -400,13 +449,13 @@ resourceFolders = []
 
   test('stores unsupported TOML values as canonical raw JSON pointers', () => {
     const files = decomposeLegacyProjectToFiles(projectFixture);
-    expect(files[MULTI_FILE_ENTRY_URI]).toContain('[project.rawJson]');
-    expect(files[MULTI_FILE_ENTRY_URI]).toContain(
-      '"/globalConfig/nullable" = "null"'
+    expect(files[MULTI_FILE_CONFIG_URI]).toContain('[gdevelopConfig.rawJson]');
+    expect(files[MULTI_FILE_CONFIG_URI]).toContain(
+      '[project.globalConfig.rawJson]'
     );
-    expect(files[MULTI_FILE_ENTRY_URI]).toContain(
-      '"/globalConfig/mixed" = \'[1,"two"]\''
-    );
+    expect(files[MULTI_FILE_CONFIG_URI]).toContain('userOwned = "kept"');
+    expect(files[MULTI_FILE_CONFIG_URI]).toContain('"/nullable" = "null"');
+    expect(files[MULTI_FILE_CONFIG_URI]).toContain('"/mixed" = \'[1,"two"]\'');
     expect(composeLegacyProjectFromFiles(files).globalConfig).toEqual(
       projectFixture.globalConfig
     );
@@ -436,7 +485,7 @@ resourceFolders = []
     const files = decomposeLegacyProjectToFiles(project);
     const output = composeLegacyProjectFromFiles(files);
 
-    expect(files[MULTI_FILE_ENTRY_URI]).toContain(
+    expect(files[MULTI_FILE_CONFIG_URI]).toContain(
       'multiline = """\nfirst line\n second line"""'
     );
     expect(output.globalConfig.multiline).toBe('first line\n second line');

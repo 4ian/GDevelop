@@ -11,7 +11,6 @@ import {
 const path = optionalRequire('path');
 const electron = optionalRequire('electron');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
-const stickyNotesFileName = '.gdevelop-sticky-notes.json';
 
 export const setupResourcesWatcher:
   | (({
@@ -68,7 +67,6 @@ export const setupResourcesWatcher:
           path.sep + 'node_modules', // For projects using npm (node_modules has way too many files and would crash the watcher on macOS)
           path.join(folderPath, gameFile),
           path.join(folderPath, autosaveFile),
-          path.join(folderPath, stickyNotesFileName),
         ];
         if (options && options.isProjectSplitInMultipleFiles) {
           ignore.push(

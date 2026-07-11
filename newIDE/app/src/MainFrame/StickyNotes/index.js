@@ -21,7 +21,8 @@ import optionalRequire from '../../Utils/OptionalRequire';
 import classes from './StickyNotes.module.css';
 
 const stickyNotesDataVersion = 1;
-export const stickyNotesFileName = '.gdevelop-sticky-notes.json';
+export const stickyNotesDirectoryName = '.gdevelop';
+export const stickyNotesFileName = 'sticky-notes.json';
 const defaultNoteWidth = 280;
 const defaultNoteHeight = 220;
 const noteBoundsMargin = 8;
@@ -136,7 +137,11 @@ export const getStickyNotesFilePath = (project: any): ?string => {
 
   const projectFile = project.getProjectFile();
   return projectFile
-    ? path.join(path.dirname(projectFile), stickyNotesFileName)
+    ? path.join(
+        path.dirname(projectFile),
+        stickyNotesDirectoryName,
+        stickyNotesFileName
+      )
     : null;
 };
 
@@ -210,6 +215,7 @@ export const saveStickyNotesToProject = (
   if (!stickyNotesFilePath) return;
 
   try {
+    fs.mkdirSync(path.dirname(stickyNotesFilePath), { recursive: true });
     fs.writeFileSync(
       stickyNotesFilePath,
       JSON.stringify(

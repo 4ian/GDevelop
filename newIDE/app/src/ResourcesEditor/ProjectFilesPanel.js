@@ -60,16 +60,14 @@ const electronWebUtils = electron ? electron.webUtils : null;
 const MAX_SCANNED_FILES = 8000;
 const ignoredDirectoryNames = new Set([
   '.git',
+  '.gdevelop',
   '.svn',
   'node_modules',
   '.cache',
 ]);
 const folderLinksFileName = '.gdevelop-folder-links.json';
 const linkedFoldersRootName = 'Linked folders';
-const ignoredFileNames = new Set([
-  '.gdevelop-sticky-notes.json',
-  folderLinksFileName,
-]);
+const ignoredFileNames = new Set([folderLinksFileName]);
 
 type ProjectFileNodeSource =
   | 'project'

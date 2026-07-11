@@ -86,10 +86,11 @@ typed exact `@exact` form is compiler/decompiler output for registered
 instructions without a friendly alias and may be edited when the complete
 catalog signature is understood.
 
-> **Implementation status:** `.events` parsing, formatting, compilation, and
-> decompilation are not implemented in the current repository. The current
-> implementation persists event arrays through `gd::EventsListSerialization`.
-> This document specifies the adapter that must be implemented. Sections 31
+> **Implementation status:** the core parser, compiler, canonical decompiler,
+> JSON normalizer, and equivalence checker are implemented in
+> `newIDE/app/src/EventsSheet/IfDoEventsDsl/index.js`, with focused and
+> repository-fixture tests in the adjacent `index.spec.js`. Editor catalog and
+> project-storage integration remain separate follow-up work. Sections 31
 > through 36 are the normative current-JSON mapping and take precedence over
 > earlier illustrative examples when there is a conflict.
 
@@ -1114,6 +1115,26 @@ AND
 (scene.queueSize > 0 OR scene.forceDrain)
 ```
 
+The canonical exact profile also represents the full range accepted by the
+current event serializer. A bare `while` preserves an empty
+`whileConditions` array, and each immediately following `and while` preserves
+another sibling entry in that array, in source order:
+
+```events
+@while
+while index="i"
+
+@while
+while @exact id="FirstCondition" parameters=[]
+and while @exact id="SecondCondition" parameters=[]
+if @exact id="AdditionalBodyCondition" parameters=[]
+```
+
+`and while` is reserved for exact round-trip fidelity. It must immediately
+follow the `while` header or another `and while`, before ordinary same-depth
+`if`, `do`, or child-event statements. It is not an `or` alternative: every
+sibling instruction remains a distinct ordered `whileConditions` element.
+
 Optional counter:
 
 ```events
@@ -1131,6 +1152,12 @@ while scene.queueSize > 0 limit=100 index=i
 - It must be a positive integer or a compiler-proven positive integer expression.
 
 A while body should visibly change data involved in the loop condition. The validator should warn when progress cannot be established.
+
+The context-free core requires `options.lowerWhileLimit` for this source-only
+feature. The project-aware callback receives the parsed while event and limit
+expression and must return a fully lowered, serializer-valid while event. This
+keeps instruction identifiers and generated counter details in the loaded
+project/catalog adapter rather than hardcoding them in the syntax parser.
 
 ### 12.5 Loop-local variables
 
@@ -1240,6 +1267,20 @@ The `js` header and `end js` terminator carry the DSL depth. Lines between them 
 ### 14.2 JavaScript rules
 
 - `end js` must occur at the same DSL depth as the opening `js` line.
+- When a raw body contains a line that would be mistaken for `end js` at the
+  opening depth, the canonical decompiler selects a deterministic delimiter:
+
+  ```events
+  js delimiter="IFDO_1"
+  const source = `
+  end js
+  `;
+  end js IFDO_1
+  ```
+
+  `delimiter=` is round-trip syntax only and is not persisted in event JSON.
+  Its value contains letters, digits, and underscores. The matching
+  `end js <delimiter>` line is the only terminator for that body.
 - A JavaScript event is a leaf event.
 - `#` inside the raw body is JavaScript text, not an IfDo comment.
 - The compiler preserves the JavaScript body and line endings, except for optional canonical newline normalization.
@@ -2040,6 +2081,8 @@ At a given depth:
 - `for each child` starts a child-variable loop.
 - `repeat` starts a fixed-count loop.
 - `while` starts a while loop.
+- `and while` appends an exact sibling to the current while event's
+  `whileConditions` list.
 - `link` creates a link event.
 - `js` creates a JavaScript event.
 - `group` starts an event group.
@@ -2106,7 +2149,8 @@ node                = { local-declaration },
 local-declaration   = "local", identifier, [ ":", type-expression ],
                       "=", initializer, { named-argument }, newline ;
 
-initializer         = expression | exact-variable ;
+initializer         = scalar | array-literal | structure-literal
+                    | exact-variable ;
 
 exact-variable      = "var", "(", "type=", string,
                       { ",", variable-field }, ")" ;
@@ -2196,10 +2240,11 @@ repeat-loop         = "repeat", expression,
                       { condition-group }, { action },
                       { child-item } ;
 
-while-loop          = "while", condition,
+while-loop          = "while", [ condition ],
                       [ "limit=", expression ],
                       [ "index=", identifier ], newline,
                       { "or", condition, newline },
+                      { "and", "while", condition, newline },
                       { condition-group },
                       { action }, { child-item } ;
 
@@ -2208,9 +2253,10 @@ link-event          = "link", [ "external" | "scene" ], string,
 
 javascript-event    = "js", [ "objects=", object-reference ],
                       [ "strict=", boolean ],
-                      [ "expanded=", boolean ], newline,
+                      [ "expanded=", boolean ],
+                      [ "delimiter=", string ], newline,
                       raw-javascript,
-                      "end", "js", newline ;
+                      "end", "js", [ identifier ], newline ;
 
 child-item          = item-at-parent-depth-plus-one ;
 
@@ -2315,6 +2361,25 @@ The adapter, not the AI, chooses exact internal JSON type identifiers and field 
 ```text
 compile(source, projectContext, target, options) -> CompileResult
 ```
+
+The first implementation exposes the context-free event-array core from
+`newIDE/app/src/EventsSheet/IfDoEventsDsl/index.js`:
+
+```text
+parseLegacyEventsJson(json) -> normalized event array
+parseIfDoEvents(source, options) -> event array
+convertLegacyEventsJsonToIfDo(json) -> canonical source
+compileIfDoToLegacyEventsJson(source, options) -> normalized JSON
+canonicalizeLegacyEventsJson(json) -> canonical JSON
+areLegacyEventsEquivalent(left, right) -> boolean
+```
+
+`options.resolveInstruction` is the boundary to the loaded project catalog for
+friendly conditions and actions. The context-free decompiler emits typed
+`@exact` instructions, so JSON-to-DSL-to-JSON conversion does not require a
+loaded project. `options.lowerWhileLimit` supplies the catalog-aware lowering
+for the source-only `while limit=` guard. The richer project-aware result below
+remains the editor integration API to build on top of this core.
 
 Suggested result:
 
@@ -2937,9 +3002,11 @@ Diagnostics should refer to IfDo source and its typed constructs.
 - For Each Object loops.
 - For Each Child Variable loops.
 - Fixed-count Repeat loops.
-- While loops with optional safety limits and counters.
+- While loops with optional safety limits, counters, and exact preservation of
+  zero or multiple sibling `whileConditions`.
 - Link events for external event sheets and scene event sheets.
-- JavaScript code events with optional picked-object input.
+- JavaScript code events with optional picked-object input and collision-safe
+  canonical body delimiters.
 - Scene, global, local, object, behavior, and loop-alias namespaces.
 - Structure and array indexing.
 - Project-aware instruction catalog.
@@ -3362,6 +3429,13 @@ Mapping for `ForEach`:
 `Repeat` maps its count to `repeatExpression` and `index=` to
 `loopIndexVariable`.
 
+In canonical decompiler output, raw serializer operand strings on loop headers
+are JSON-quoted, for example `repeat "Variable(Count) + 1"` and
+`order_by="Enemy.Variable(Health) + 1"`. In this exact structural position the
+quotes encode the stored expression text; they do not turn it into a GDevelop
+text expression. Friendly authored source may continue to use the unquoted
+expression spelling shown earlier.
+
 `ForEachChildVariable` maps:
 
 ```events
@@ -3374,8 +3448,14 @@ to `iterableVariableName`, `valueIteratorVariableName`,
 
 `While` has two distinct condition lists:
 
-- The `while` header and immediately following `or` alternatives compile to
-  `whileConditions`.
+- A non-empty `while` header compiles to the first `whileConditions` entry.
+  A bare `while` compiles to an empty `whileConditions` array.
+- Each immediately following `and while` compiles to another distinct,
+  ordered `whileConditions` entry. This is the canonical exact form for
+  current serialized events that contain multiple sibling entries.
+- Friendly `or` alternatives after a non-empty header are lowered into the
+  header condition's `BuiltinCommonInstructions::Or` instruction; they do not
+  create sibling `whileConditions` entries.
 - Additional same-depth `if` groups compile to `conditions`.
 - Same-depth `do` lines compile to `actions`.
 - Child events compile to `events`.
@@ -3602,9 +3682,12 @@ DSL grammar, compiler, decompiler, formatter, and tests must be updated before
 that serializer version can be migrated.
 
 The implementation maintains a machine-readable coverage manifest containing
-the supported serializer/GDevelop version range, every persisted event type and
-field, the variable schema, metadata annotation schemas, and the catalog API
-version. Migration checks this manifest before decompiling the first event.
+the serializer contract, every persisted event type and field, the variable
+schema, and metadata annotation schemas. It is exported as
+`IFDO_EVENTS_DSL_COVERAGE` from
+`newIDE/app/src/EventsSheet/IfDoEventsDsl/index.js`. Migration checks this
+manifest before decompiling the first event; project integration must also bind
+it to the loaded catalog API and supported GDevelop version range.
 
 If conversion encounters an event type, instruction identifier, field, value
 shape, or metadata value outside the active contract:

@@ -2,7 +2,7 @@
 
 ## TOML project/layout/settings files and IfDo event source files
 
-**Status:** Version 1.0 design specification
+**Status:** Version 1.0 implemented format contract
 **Entry file:** `project.settings`
 **Text encoding:** UTF-8 without BOM
 **Line endings:** LF when written by GDevelop
@@ -51,7 +51,17 @@ This specification replaces the single large GDevelop project JSON document with
 
 The format is intended to improve AI editing, human review, merge behavior, and Git history without requiring a runtime-format migration.
 
-This document is a design and implementation contract. The current repository does not yet contain a TOML project reader/writer or an IfDo parser/compiler.
+This document is a design and implementation contract. The repository now
+contains the TOML multi-file adapter in
+`newIDE/app/src/ProjectsStorage/MultiFileProjectFormat`, the local transactional
+filesystem integration in
+`newIDE/app/src/ProjectsStorage/LocalFileStorageProvider/LocalMultiFileProject.js`,
+and the IfDo parser/compiler in
+`newIDE/app/src/EventsSheet/IfDoEventsDsl`. Local opening, changed-component
+saving, autosave snapshots, preview reload, one-time JSON migration, migration
+redirect/divergence checks, and legacy-tree composition use these adapters.
+Cloud/browser providers still require the capability negotiation described in
+phase 5 before they can store this directory format natively.
 
 ---
 
@@ -1532,6 +1542,12 @@ Raw legacy blocks are data. They are never evaluated as code by the source loade
 - Route reload-from-disk preview through the composer.
 - Add temporary-file compatibility for path-only headless tools.
 - Define capability negotiation for cloud/browser providers. A provider must support an atomic multi-artifact project or an archive/virtual-filesystem equivalent before it can claim native support.
+
+The storage-provider interface exposes this negotiation as
+`multiFileProjectSupport = "native" | "archive" | "none"`. The local provider
+declares `native`; providers that omit the field are treated as `none` and keep
+their existing compatibility serialization until they implement an atomic
+multi-artifact or archive backend.
 
 ---
 

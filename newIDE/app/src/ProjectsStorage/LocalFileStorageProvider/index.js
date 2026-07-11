@@ -42,6 +42,7 @@ import { localFileStorageProviderInternalName } from './LocalFileStorageProvider
 export default ({
   internalName: localFileStorageProviderInternalName,
   name: t`Your computer`,
+  multiFileProjectSupport: 'native',
   renderIcon: props => <Computer fontSize={props.size} />,
   getFileMetadataFromAppArguments: (appArguments: AppArguments) => {
     if (!appArguments[POSITIONAL_ARGUMENTS_KEY]) return null;

@@ -64,6 +64,7 @@ export const setupResourcesWatcher:
         const ignore = [
           path.sep + '.DS_Store', // macOS folder attributes file
           path.sep + '.git', // For projects using git as a versioning tool.
+          path.sep + '.gdevelop', // Multi-file transactions, state and autosaves are editor-only.
           path.sep + 'node_modules', // For projects using npm (node_modules has way too many files and would crash the watcher on macOS)
           path.join(folderPath, gameFile),
           path.join(folderPath, autosaveFile),

@@ -3,6 +3,12 @@ import optionalRequire from '../../Utils/OptionalRequire';
 import { type FileMetadata } from '../index';
 import { unsplit } from '../../Utils/ObjectSplitter';
 import { openFilePicker, readJSONFile } from '../../Utils/FileSystem';
+import {
+  getLegacyMigrationSourceHash,
+  hashLegacySource,
+  migrateLegacyProject,
+  openMultiFileProject,
+} from './LocalMultiFileProject';
 const fs = optionalRequire('fs');
 const path = optionalRequire('path');
 
@@ -12,7 +18,7 @@ export const onOpenWithPicker = (): Promise<?FileMetadata> => {
     properties: ['openFile'],
     message:
       'If you want to open your GDevelop 4 project, be sure to save it as a .json file',
-    filters: [{ name: 'GDevelop 6 project', extensions: ['json'] }],
+    filters: [{ name: 'GDevelop project', extensions: ['settings', 'json'] }],
     // $FlowFixMe[incompatible-type]
   }).then(filePath => (filePath ? { fileIdentifier: filePath } : null));
 };
@@ -21,31 +27,75 @@ export const onOpen = (
   fileMetadata: FileMetadata
 ): Promise<{|
   content: Object,
+  fileMetadata?: FileMetadata,
 |}> => {
   const filePath = fileMetadata.fileIdentifier;
+  if (path.basename(filePath).toLowerCase() === 'project.settings') {
+    return openMultiFileProject(filePath).then(content => ({ content }));
+  }
   const projectPath = path.dirname(filePath);
-  return readJSONFile(filePath).then(object => {
-    return unsplit(object, {
-      getReferencePartialObject: referencePath => {
-        return readJSONFile(path.join(projectPath, referencePath) + '.json');
-      },
-      isReferenceMagicPropertyName: '__REFERENCE_TO_SPLIT_OBJECT',
-      // Limit unsplitting to depth 3 (which would allow properties of layouts/external layouts/external events
-      // to be un-splitted, but not the content of these properties), to avoid very slow processing
-      // of large game files.
-      maxUnsplitDepth: 3,
-    }).then(() => {
-      return { content: object };
+  return fs.promises.readFile(filePath, 'utf8').then(legacySource => {
+    return readJSONFile(filePath).then(object => {
+      return unsplit(object, {
+        getReferencePartialObject: referencePath => {
+          return readJSONFile(path.join(projectPath, referencePath) + '.json');
+        },
+        isReferenceMagicPropertyName: '__REFERENCE_TO_SPLIT_OBJECT',
+        // Migration must reconstruct the complete legacy reference tree before
+        // ownership projection. Keep a finite guard against malicious cycles.
+        maxUnsplitDepth: 100,
+      }).then(async () => {
+        const entryPath = path.join(projectPath, 'project.settings');
+        if (fs.existsSync(entryPath)) {
+          const migrationHash = await getLegacyMigrationSourceHash(entryPath);
+          if (
+            migrationHash &&
+            migrationHash !== hashLegacySource(legacySource)
+          ) {
+            throw new Error(
+              'The legacy JSON and migrated project.settings have diverged. Open project.settings or import the changed JSON into a different folder.'
+            );
+          }
+          return {
+            content: await openMultiFileProject(entryPath),
+            fileMetadata: { ...fileMetadata, fileIdentifier: entryPath },
+          };
+        }
+        const migration = await migrateLegacyProject({
+          legacyPath: filePath,
+          legacySource,
+          legacyProject: object,
+        });
+        return {
+          content: object,
+          fileMetadata: {
+            ...fileMetadata,
+            fileIdentifier: migration.entryPath,
+          },
+        };
+      });
     });
   });
 };
+
+export const getMultiFileAutoSavePath = (filePath: string): string =>
+  path.join(
+    path.dirname(filePath),
+    '.gdevelop',
+    'autosave',
+    'current',
+    'project.settings'
+  );
 
 export const getAutoSaveCreationDate = async (
   fileMetadata: FileMetadata,
   compareLastModified: boolean
 ): Promise<?number> => {
   const filePath = fileMetadata.fileIdentifier;
-  const autoSavePath = filePath + '.autosave';
+  const autoSavePath =
+    path.basename(filePath).toLowerCase() === 'project.settings'
+      ? getMultiFileAutoSavePath(filePath)
+      : filePath + '.autosave';
   if (fs.existsSync(autoSavePath)) {
     const autoSavedTime = fs.statSync(autoSavePath).mtime.getTime();
     if (!compareLastModified) {
@@ -78,6 +128,10 @@ export const onGetAutoSave = (
 }> => {
   return Promise.resolve({
     ...fileMetadata,
-    fileIdentifier: fileMetadata.fileIdentifier + '.autosave',
+    fileIdentifier:
+      path.basename(fileMetadata.fileIdentifier).toLowerCase() ===
+      'project.settings'
+        ? getMultiFileAutoSavePath(fileMetadata.fileIdentifier)
+        : fileMetadata.fileIdentifier + '.autosave',
   });
 };

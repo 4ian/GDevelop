@@ -1977,6 +1977,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       try {
         await delay(50);
         let content;
+        let effectiveFileMetadata = fileMetadata;
         let openingError: Error | null = null;
         try {
           const autoSaveFileMetadata = await checkForAutosave();
@@ -1985,6 +1986,9 @@ const MainFrame = (props: Props): React.MixedElement => {
             setLoaderModalProgress
           );
           content = result.content;
+          if (result.fileMetadata) {
+            effectiveFileMetadata = result.fileMetadata;
+          }
         } catch (error) {
           openingError = error;
           // onOpen failed, try to find again an autosave.
@@ -2014,10 +2018,9 @@ const MainFrame = (props: Props): React.MixedElement => {
         try {
           const state = loadFromSerializedProject(
             serializedProject,
-            // Note that fileMetadata is the original, unchanged one, even if we're loading
-            // an autosave. If we're for some reason loading an autosave, we still consider
-            // that we're opening the file that was originally requested by the user.
-            fileMetadata
+            // Autosaves keep the originally requested metadata. A storage adapter may
+            // explicitly redirect a migrated legacy project to project.settings.
+            effectiveFileMetadata
           );
           return state;
         } finally {

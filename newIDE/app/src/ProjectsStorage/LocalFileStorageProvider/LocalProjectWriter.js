@@ -26,6 +26,7 @@ import {
   type ShowAlertFunction,
   type ShowConfirmFunction,
 } from '../../UI/Alert/AlertContext';
+import { writeLegacyProjectAsMultiFile } from './LocalMultiFileProject';
 
 const fs = optionalRequire('fs-extra');
 const path = optionalRequire('path');
@@ -157,6 +158,16 @@ const writeProjectFiles = async ({
   }
   const serializeEndTime = Date.now();
 
+  if (path.basename(filePath).toLowerCase() === 'project.settings') {
+    await writeLegacyProjectAsMultiFile(serializedProjectObject, filePath);
+    console.log(
+      `[LocalProjectWriter] Multi-file project written in ${Date.now() -
+        startTime}ms (including ${serializeEndTime -
+        startTime}ms serialization)`
+    );
+    return;
+  }
+
   if (project.isFolderProject()) {
     const partialObjects = split(serializedProjectObject, {
       pathSeparator: '/',
@@ -237,10 +248,12 @@ export const onSaveProject = async (
 
   const projectPath = path.dirname(filePath);
 
-  try {
-    deleteExistingFilesFromDirs(project, projectPath);
-  } catch (e) {
-    console.warn('Unable to clean project folder before saving project: ', e);
+  if (path.basename(filePath).toLowerCase() !== 'project.settings') {
+    try {
+      deleteExistingFilesFromDirs(project, projectPath);
+    } catch (e) {
+      console.warn('Unable to clean project folder before saving project: ', e);
+    }
   }
 
   await writeProjectFiles({
@@ -313,22 +326,37 @@ export const generateOnChooseSaveProjectAsLocation = ({
   const { name } = options;
   if (path && defaultPath && name) {
     const safeFilename = name.replace(/[<>:"/\\|?*]/g, '_');
-    defaultPath = path.join(path.dirname(defaultPath), `${safeFilename}.json`);
+    defaultPath = path.join(
+      path.dirname(defaultPath),
+      safeFilename,
+      'project.settings'
+    );
   }
 
   const browserWindow = remote.getCurrentWindow();
   const saveDialogOptions = {
     defaultPath,
-    filters: [{ name: 'GDevelop 6 project', extensions: ['json'] }],
+    filters: [{ name: 'GDevelop project', extensions: ['settings'] }],
   };
 
   if (!dialog) {
     throw new Error('Unsupported');
   }
-  const filePath = dialog.showSaveDialogSync(browserWindow, saveDialogOptions);
-  if (!filePath) {
+  const selectedPath = dialog.showSaveDialogSync(
+    browserWindow,
+    saveDialogOptions
+  );
+  if (!selectedPath) {
     return { saveAsLocation: null, saveAsOptions: null };
   }
+  const filePath =
+    path.basename(selectedPath).toLowerCase() === 'project.settings'
+      ? selectedPath
+      : path.join(
+          path.dirname(selectedPath),
+          path.basename(selectedPath, path.extname(selectedPath)),
+          'project.settings'
+        );
 
   return {
     saveAsLocation: {
@@ -417,6 +445,23 @@ export const onAutoSaveProject = (
   project: gdProject,
   fileMetadata: FileMetadata
 ): Promise<void> => {
+  if (
+    path.basename(fileMetadata.fileIdentifier).toLowerCase() ===
+    'project.settings'
+  ) {
+    const autoSaveEntryPath = path.join(
+      path.dirname(fileMetadata.fileIdentifier),
+      '.gdevelop',
+      'autosave',
+      'current',
+      'project.settings'
+    );
+    const serializedProjectObject = serializeToJSObject(project, 'serializeTo');
+    return writeLegacyProjectAsMultiFile(
+      serializedProjectObject,
+      autoSaveEntryPath
+    ).then(() => undefined);
+  }
   const autoSavePath = fileMetadata.fileIdentifier + '.autosave';
   return writeAndCheckFile(serializeToJSON(project), autoSavePath).catch(
     err => {
@@ -450,16 +495,24 @@ export const getProjectLocation = ({
   saveAsLocation: ?SaveAsLocation,
   newProjectsDefaultFolder?: string,
 }): SaveAsLocation => {
+  if (
+    saveAsLocation &&
+    path.basename(saveAsLocation.fileIdentifier).toLowerCase() ===
+      'project.settings'
+  ) {
+    return saveAsLocation;
+  }
   const outputPath = saveAsLocation
     ? path.dirname(saveAsLocation.fileIdentifier)
     : newProjectsDefaultFolder
     ? newProjectsDefaultFolder
     : '';
-  const projectFileName = projectName
-    ? cleanUpProjectFileName(projectName) + '.json'
-    : 'game.json';
+  const projectFileName = 'project.settings';
+  const projectFolder = projectName
+    ? cleanUpProjectFileName(projectName)
+    : 'My project';
   return {
-    fileIdentifier: path.join(outputPath, projectFileName),
+    fileIdentifier: path.join(outputPath, projectFolder, projectFileName),
   };
 };
 
@@ -484,19 +537,16 @@ export const renderNewProjectSaveAsLocationChooser = ({
       fullWidth
       value={path.dirname(projectLocation.fileIdentifier)}
       onChange={newOutputPath => {
-        const newOutputFileIdentifier = path.join(
-          newOutputPath,
-          path.basename(projectLocation.fileIdentifier)
-        );
-        setSaveAsLocation(
-          getProjectLocation({
-            projectName,
-            saveAsLocation: {
-              fileIdentifier: newOutputFileIdentifier,
-            },
-            newProjectsDefaultFolder,
-          })
-        );
+        const projectFolder = projectName
+          ? cleanUpProjectFileName(projectName)
+          : 'My project';
+        setSaveAsLocation({
+          fileIdentifier: path.join(
+            newOutputPath,
+            projectFolder,
+            'project.settings'
+          ),
+        });
       }}
       type="create-game"
     />

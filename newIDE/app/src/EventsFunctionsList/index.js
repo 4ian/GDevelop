@@ -65,6 +65,9 @@ import {
   getFoldersAscendanceWithoutRootFolder,
   enumerateFoldersInContainer,
 } from './EnumerateFunctionFolderOrFunction';
+import { insertNewEventsBasedObject } from './CreateEventsBasedObject';
+import { insertNewEventsBasedBehavior } from './CreateEventsBasedBehavior';
+import { initializeEventsFunctionDisplayName } from './InitializeEventsFunction';
 
 const gd: libGDevelop = global.gd;
 
@@ -667,7 +670,6 @@ type Props = {|
   onSelectExtensionProperties: () => void,
   onSelectExtensionGlobalVariables: () => void,
   onSelectExtensionSceneVariables: () => void,
-  onEventBasedObjectTypeChanged: () => void,
   headerControls?: React.Node,
 |};
 
@@ -688,16 +690,19 @@ const EventsFunctionsList = React.forwardRef<
       onRenameEventsFunction,
       onAddEventsFunction,
       onEventsFunctionAdded,
+      onEventsFunctionMetadataChanged,
       onSelectEventsBasedBehavior,
       onDeleteEventsBasedBehavior,
       onRenameEventsBasedBehavior,
       onEventsBasedBehaviorRenamed,
       onEventsBasedBehaviorPasted,
+      onEventsBasedBehaviorMetadataChanged,
       onSelectEventsBasedObject,
       onDeleteEventsBasedObject,
       onRenameEventsBasedObject,
       onEventsBasedObjectRenamed,
       onEventsBasedObjectPasted,
+      onEventsBasedObjectMetadataChanged,
       onAddEventsBasedObject,
       selectedEventsFunction,
       selectedEventsBasedBehavior,
@@ -707,7 +712,6 @@ const EventsFunctionsList = React.forwardRef<
       onSelectExtensionGlobalVariables,
       onSelectExtensionSceneVariables,
       onOpenCustomObjectEditor,
-      onEventBasedObjectTypeChanged,
       headerControls,
     }: Props,
     ref
@@ -847,6 +851,10 @@ const EventsFunctionsList = React.forwardRef<
               insertionIndex
             );
             eventsFunction.setFunctionType(parameters.functionType);
+            initializeEventsFunctionDisplayName(
+              eventsFunction,
+              eventsFunctionName
+            );
 
             if (
               eventsFunction.isCondition() &&
@@ -891,6 +899,7 @@ const EventsFunctionsList = React.forwardRef<
               unsavedChanges.triggerUnsavedChanges();
             }
             forceUpdate();
+            onEventsFunctionMetadataChanged();
 
             // We focus it so the user can edit the name directly.
             onSelectEventsFunction(
@@ -920,6 +929,7 @@ const EventsFunctionsList = React.forwardRef<
         onSelectEventsBasedObject,
         selectedFunctionFolderOrFunction,
         onEventsFunctionAdded,
+        onEventsFunctionMetadataChanged,
         unsavedChanges,
         forceUpdate,
         onSelectEventsFunction,
@@ -931,19 +941,14 @@ const EventsFunctionsList = React.forwardRef<
 
     const addNewEventsBehavior = React.useCallback(
       () => {
-        const eventBasedBehaviors = eventsFunctionsExtension.getEventsBasedBehaviors();
-
-        const name = newNameGenerator('MyBehavior', name =>
-          eventBasedBehaviors.has(name)
-        );
-        const newEventsBasedBehavior = eventBasedBehaviors.insertNew(
-          name,
-          eventBasedBehaviors.getCount()
+        const newEventsBasedBehavior = insertNewEventsBasedBehavior(
+          eventsFunctionsExtension
         );
         if (unsavedChanges) {
           unsavedChanges.triggerUnsavedChanges();
         }
         forceUpdate();
+        onEventsBasedBehaviorMetadataChanged();
 
         const behaviorItemId = getEventsBasedBehaviorTreeViewItemId(
           newEventsBasedBehavior
@@ -974,6 +979,7 @@ const EventsFunctionsList = React.forwardRef<
         scrollToItem,
         onSelectEventsBasedBehavior,
         unsavedChanges,
+        onEventsBasedBehaviorMetadataChanged,
       ]
     );
 
@@ -985,20 +991,15 @@ const EventsFunctionsList = React.forwardRef<
               return;
             }
 
-            const eventBasedObjects = eventsFunctionsExtension.getEventsBasedObjects();
-
-            const name = newNameGenerator('MyObject', name =>
-              eventBasedObjects.has(name)
-            );
-            const newEventsBasedObject = eventBasedObjects.insertNew(
-              name,
-              eventBasedObjects.getCount()
-            );
-            newEventsBasedObject.markAsRenderedIn3D(parameters.isRenderedIn3D);
+            const newEventsBasedObject = insertNewEventsBasedObject({
+              eventsFunctionsExtension,
+              isRenderedIn3D: parameters.isRenderedIn3D,
+            });
             if (unsavedChanges) {
               unsavedChanges.triggerUnsavedChanges();
             }
             forceUpdate();
+            onEventsBasedObjectMetadataChanged();
 
             const objectItemId = getObjectTreeViewItemId(newEventsBasedObject);
 
@@ -1019,7 +1020,6 @@ const EventsFunctionsList = React.forwardRef<
             // We focus it so the user can edit the name directly.
             onSelectEventsBasedObject(newEventsBasedObject);
             editName(objectItemId);
-            onEventBasedObjectTypeChanged();
           }
         );
       },
@@ -1031,7 +1031,7 @@ const EventsFunctionsList = React.forwardRef<
         onSelectEventsBasedObject,
         editName,
         scrollToItem,
-        onEventBasedObjectTypeChanged,
+        onEventsBasedObjectMetadataChanged,
       ]
     );
 
@@ -1238,6 +1238,7 @@ const EventsFunctionsList = React.forwardRef<
         onRenameEventsFunction,
         onAddEventsFunction,
         onEventsFunctionAdded,
+        onEventsFunctionMetadataChanged,
         addFolder,
         onMovedFunctionFolderOrFunctionToAnotherFolderInSameContainer,
       }),
@@ -1248,6 +1249,7 @@ const EventsFunctionsList = React.forwardRef<
         onRenameEventsFunction,
         onAddEventsFunction,
         onEventsFunctionAdded,
+        onEventsFunctionMetadataChanged,
         addFolder,
         onMovedFunctionFolderOrFunctionToAnotherFolderInSameContainer,
       ]
@@ -1264,6 +1266,7 @@ const EventsFunctionsList = React.forwardRef<
         setSelectedFunctionFolderOrFunction:
           setSelectedFunctionFolderOrFunction.current,
         onEventsFunctionAdded,
+        onEventsFunctionMetadataChanged,
         onSelectEventsFunction,
       }),
       [
@@ -1274,6 +1277,7 @@ const EventsFunctionsList = React.forwardRef<
         addNewEventsFunction,
         onMovedFunctionFolderOrFunctionToAnotherFolderInSameContainer,
         onEventsFunctionAdded,
+        onEventsFunctionMetadataChanged,
         onSelectEventsFunction,
       ]
     );
@@ -1289,6 +1293,7 @@ const EventsFunctionsList = React.forwardRef<
         onRenameEventsBasedBehavior,
         onEventsBasedBehaviorRenamed,
         onEventsBasedBehaviorPasted,
+        onEventsBasedBehaviorMetadataChanged,
         addNewEventsFunction,
         addFolder,
         expandFolders,
@@ -1301,6 +1306,7 @@ const EventsFunctionsList = React.forwardRef<
         onRenameEventsBasedBehavior,
         onEventsBasedBehaviorRenamed,
         onEventsBasedBehaviorPasted,
+        onEventsBasedBehaviorMetadataChanged,
         addNewEventsFunction,
         addFolder,
         expandFolders,
@@ -1318,12 +1324,12 @@ const EventsFunctionsList = React.forwardRef<
         onRenameEventsBasedObject,
         onEventsBasedObjectRenamed,
         onEventsBasedObjectPasted,
+        onEventsBasedObjectMetadataChanged,
         onAddEventsBasedObject,
         addNewEventsFunction,
         addFolder,
         expandFolders,
         onOpenCustomObjectEditor,
-        onEventBasedObjectTypeChanged,
       }),
       [
         treeItemProps,
@@ -1333,12 +1339,12 @@ const EventsFunctionsList = React.forwardRef<
         onRenameEventsBasedObject,
         onEventsBasedObjectRenamed,
         onEventsBasedObjectPasted,
+        onEventsBasedObjectMetadataChanged,
         onAddEventsBasedObject,
         addNewEventsFunction,
         addFolder,
         expandFolders,
         onOpenCustomObjectEditor,
-        onEventBasedObjectTypeChanged,
       ]
     );
 

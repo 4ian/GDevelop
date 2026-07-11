@@ -745,6 +745,8 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     done: boolean => void
   ) => {
     const { project, eventsFunctionsExtension } = this.props;
+    const oldName = eventsFunction.getName();
+    const oldFullName = eventsFunction.getFullName();
 
     const safeAndUniqueNewName = newNameGenerator(
       gd.Project.getSafeName(newName),
@@ -771,6 +773,9 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       safeAndUniqueNewName
     );
     eventsFunction.setName(safeAndUniqueNewName);
+    if (!oldFullName || oldFullName === oldName) {
+      eventsFunction.setFullName(safeAndUniqueNewName);
+    }
 
     done(true);
     if (this.props.onFunctionEdited) {
@@ -785,6 +790,8 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     newName: string,
     done: boolean => void
   ) => {
+    const oldName = eventsFunction.getName();
+    const oldFullName = eventsFunction.getFullName();
     const safeAndUniqueNewName = newNameGenerator(
       gd.Project.getSafeName(newName),
       tentativeNewName => {
@@ -812,6 +819,9 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       safeAndUniqueNewName
     );
     eventsFunction.setName(safeAndUniqueNewName);
+    if (!oldFullName || oldFullName === oldName) {
+      eventsFunction.setFullName(safeAndUniqueNewName);
+    }
 
     done(true);
     if (this.props.onFunctionEdited) {
@@ -826,6 +836,8 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     newName: string,
     done: boolean => void
   ) => {
+    const oldName = eventsFunction.getName();
+    const oldFullName = eventsFunction.getFullName();
     const safeAndUniqueNewName = newNameGenerator(
       gd.Project.getSafeName(newName),
       tentativeNewName => {
@@ -854,6 +866,9 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       safeAndUniqueNewName
     );
     eventsFunction.setName(safeAndUniqueNewName);
+    if (!oldFullName || oldFullName === oldName) {
+      eventsFunction.setFullName(safeAndUniqueNewName);
+    }
 
     done(true);
     if (this.props.onFunctionEdited) {
@@ -1031,6 +1046,8 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     done: boolean => void
   ) => {
     const { project, eventsFunctionsExtension } = this.props;
+    const oldName = eventsBasedBehavior.getName();
+    const oldFullName = eventsBasedBehavior.getFullName();
     const safeAndUniqueNewName = newNameGenerator(
       gd.Project.getSafeName(newName),
       tentativeNewName => {
@@ -1053,6 +1070,9 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       safeAndUniqueNewName
     );
     eventsBasedBehavior.setName(safeAndUniqueNewName);
+    if (!oldFullName || oldFullName === oldName) {
+      eventsBasedBehavior.setFullName(safeAndUniqueNewName);
+    }
 
     done(true);
   };
@@ -1089,7 +1109,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       safeAndUniqueNewName
     );
     eventsBasedObject.setName(safeAndUniqueNewName);
-    if (oldFullName === oldName) {
+    if (!oldFullName || oldFullName === oldName) {
       eventsBasedObject.setFullName(safeAndUniqueNewName);
     }
 
@@ -1169,6 +1189,12 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     }
   };
 
+  _onEventsBasedBehaviorMetadataChanged = () => {
+    if (this.props.onBehaviorEdited) {
+      this.props.onBehaviorEdited();
+    }
+  };
+
   _onEventsBasedObjectRenamed = (eventsBasedObject: gdEventsBasedObject) => {
     // Name of an object changed, so notify parent
     // that an object was edited (to trigger reload of extensions)
@@ -1187,6 +1213,16 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     // It can happen when an event-based object is deleted and another one is
     // renamed to replace it.
     this.props.onEventsBasedObjectChildrenEdited(eventsBasedObject);
+    this.props.onEventBasedObjectTypeChanged();
+  };
+
+  _onEventsBasedObjectMetadataChanged = () => {
+    // Object metadata is cached in the platform extension registry. Refresh it
+    // immediately after adding, deleting, pasting or changing visibility so
+    // object choosers do not keep showing a stale list until the editor closes.
+    if (this.props.onObjectEdited) {
+      this.props.onObjectEdited();
+    }
     this.props.onEventBasedObjectTypeChanged();
   };
 
@@ -1371,6 +1407,12 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       this._onBehaviorEventsFunctionAdded(eventsBasedBehavior);
     } else if (eventsBasedObject) {
       this._onObjectEventsFunctionAdded(eventsBasedObject);
+    }
+  };
+
+  _onEventsFunctionMetadataChanged = () => {
+    if (this.props.onFunctionEdited) {
+      this.props.onFunctionEdited();
     }
   };
 
@@ -2269,6 +2311,9 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                 onRenameEventsFunction={this._makeRenameEventsFunction(i18n)}
                 onAddEventsFunction={this._onAddEventsFunction}
                 onEventsFunctionAdded={this._onEventsFunctionAdded}
+                onEventsFunctionMetadataChanged={
+                  this._onEventsFunctionMetadataChanged
+                }
                 // Behaviors
                 selectedEventsBasedBehavior={selectedEventsBasedBehavior}
                 onSelectEventsBasedBehavior={this._selectEventsBasedBehavior}
@@ -2280,6 +2325,9 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                   this._onEventsBasedBehaviorRenamed
                 }
                 onEventsBasedBehaviorPasted={this._onEventsBasedBehaviorPasted}
+                onEventsBasedBehaviorMetadataChanged={
+                  this._onEventsBasedBehaviorMetadataChanged
+                }
                 // Objects
                 selectedEventsBasedObject={selectedEventsBasedObject}
                 onSelectEventsBasedObject={this._selectEventsBasedObject}
@@ -2289,6 +2337,9 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                 )}
                 onEventsBasedObjectRenamed={this._onEventsBasedObjectRenamed}
                 onEventsBasedObjectPasted={this._onEventsBasedObjectPasted}
+                onEventsBasedObjectMetadataChanged={
+                  this._onEventsBasedObjectMetadataChanged
+                }
                 onAddEventsBasedObject={this._onAddEventsBasedObject}
                 onSelectExtensionProperties={() => this._editOptions(true)}
                 onSelectExtensionGlobalVariables={() =>
@@ -2296,9 +2347,6 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                 }
                 onSelectExtensionSceneVariables={() => this._editVariables()}
                 onOpenCustomObjectEditor={this.props.onOpenCustomObjectEditor}
-                onEventBasedObjectTypeChanged={
-                  this.props.onEventBasedObjectTypeChanged
-                }
                 headerControls={
                   isBehaviorDetailMode ? (
                     <FlatButton

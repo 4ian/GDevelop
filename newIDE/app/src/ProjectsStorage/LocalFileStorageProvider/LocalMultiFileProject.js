@@ -70,6 +70,44 @@ export const resolveGameUriToPath = (
   return resolved;
 };
 
+const removeEmptyManagedParentDirectories = async (
+  projectRoot: string,
+  uris: Array<string>
+): Promise<void> => {
+  const root = path.resolve(projectRoot);
+  const directories: Set<string> = new Set();
+  uris.forEach(uri => {
+    const relative = validateGameUri(uri);
+    const segments = relative.split('/');
+    if (!['scenes', 'extensions', 'externals'].includes(segments[0])) return;
+
+    let directory = path.dirname(resolveGameUriToPath(root, uri));
+    while (directory !== root) {
+      const directorySegments = path.relative(root, directory).split(path.sep);
+      // Keep the stable top-level containers (scenes, extensions, externals).
+      if (directorySegments.length <= 1) break;
+      assertInside(root, directory);
+      directories.add(directory);
+      directory = path.dirname(directory);
+    }
+  });
+
+  const deepestFirst = [...directories].sort(
+    (left, right) => right.split(path.sep).length - left.split(path.sep).length
+  );
+  for (const directory of deepestFirst) {
+    if (!fs.existsSync(directory)) continue;
+    if ((await fs.readdir(directory)).length) continue;
+    try {
+      await fs.rmdir(directory);
+    } catch (error) {
+      // A concurrent write or a user-owned file can make this non-empty after
+      // readdir. Empty-folder cleanup must never make a project save fail.
+      if (!['ENOENT', 'ENOTEMPTY', 'EEXIST'].includes(error.code)) throw error;
+    }
+  }
+};
+
 export const recoverMultiFileTransactions = async (
   projectRoot: string
 ): Promise<void> => {
@@ -144,11 +182,16 @@ export const recoverMultiFileTransactions = async (
           await fs.copy(backup, target, { overwrite: true });
         }
       }
+      await removeEmptyManagedParentDirectories(root, journal.changedUris);
     } else {
       for (const uri of journal.obsoleteUris || []) {
         const target = resolveGameUriToPath(root, uri);
         if (fs.existsSync(target)) await fs.unlink(target);
       }
+      await removeEmptyManagedParentDirectories(
+        root,
+        journal.obsoleteUris || []
+      );
     }
     assertInside(root, transactionRoot);
     await fs.remove(transactionRoot);
@@ -476,12 +519,14 @@ export const writeMultiFileSourceTree = async ({
         2
       )}\n`
     );
+    await removeEmptyManagedParentDirectories(projectRoot, obsoleteUris);
   } catch (error) {
     for (const item of committed.reverse()) {
       if (fs.existsSync(item.backup))
         await fs.copy(item.backup, item.target, { overwrite: true });
       else if (fs.existsSync(item.target)) await fs.unlink(item.target);
     }
+    await removeEmptyManagedParentDirectories(projectRoot, changedUris);
     throw error;
   } finally {
     assertInside(projectRoot, transactionRoot);

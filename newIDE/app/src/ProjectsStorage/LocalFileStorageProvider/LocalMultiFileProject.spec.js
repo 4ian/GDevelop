@@ -229,6 +229,137 @@ describe('Local multi-file project storage', () => {
       fs.existsSync(path.join(temporaryDirectory, 'scenes/Main/Main.events'))
     ).toBe(false);
     expect(fs.readFileSync(userFile, 'utf8')).toBe('keep me');
+    expect(fs.existsSync(path.dirname(userFile))).toBe(true);
+  });
+
+  test('renames all files owned by extension components and removes empty old folders', async () => {
+    const entryPath = path.join(temporaryDirectory, 'project.settings');
+    const makeFunction = name => ({
+      name,
+      functionType: 'Action',
+      fullName: name,
+      description: '',
+      sentence: '',
+      group: '',
+      private: false,
+      async: false,
+      parameters: [],
+      objectGroups: [],
+      events: [],
+    });
+    let project = JSON.parse(JSON.stringify(projectFixture));
+    project.eventsFunctionsExtensions = [
+      {
+        name: 'Combat',
+        fullName: 'Combat',
+        eventsFunctionsFolderStructure: {
+          folderName: '__ROOT',
+          children: [],
+        },
+        eventsFunctions: [makeFunction('CalculateDamage')],
+        eventsBasedObjects: [
+          {
+            name: 'Enemy',
+            fullName: 'Enemy',
+            objects: [],
+            objectsFolderStructure: {
+              folderName: '__ROOT',
+              children: [],
+            },
+            objectsGroups: [],
+            layers: [],
+            instances: [],
+            eventsFunctions: [makeFunction('TakeDamage')],
+            variants: [],
+          },
+        ],
+        eventsBasedBehaviors: [
+          {
+            name: 'Health',
+            fullName: 'Health',
+            eventsFunctions: [makeFunction('Heal')],
+          },
+        ],
+      },
+    ];
+    const exists = relativePath =>
+      fs.existsSync(path.join(temporaryDirectory, ...relativePath.split('/')));
+
+    await writeLegacyProjectAsMultiFile(project, entryPath);
+
+    let renamed = JSON.parse(JSON.stringify(project));
+    renamed.eventsFunctionsExtensions[0].eventsFunctions[0].name =
+      'ComputeDamage';
+    await writeLegacyProjectAsMultiFile(renamed, entryPath);
+    expect(exists('extensions/Combat/functions/CalculateDamage')).toBe(false);
+    expect(
+      exists('extensions/Combat/functions/ComputeDamage/function.settings')
+    ).toBe(true);
+    expect(
+      exists('extensions/Combat/functions/ComputeDamage/ComputeDamage.events')
+    ).toBe(true);
+    project = renamed;
+
+    renamed = JSON.parse(JSON.stringify(project));
+    const renamedPrefab =
+      renamed.eventsFunctionsExtensions[0].eventsBasedObjects[0];
+    renamedPrefab.name = 'Boss';
+    renamedPrefab.eventsFunctions[0].name = 'ReceiveDamage';
+    await writeLegacyProjectAsMultiFile(renamed, entryPath);
+    expect(exists('extensions/Combat/prefabs/Enemy')).toBe(false);
+    expect(exists('extensions/Combat/prefabs/Boss/prefab.settings')).toBe(true);
+    expect(exists('extensions/Combat/prefabs/Boss/Boss.layout')).toBe(true);
+    expect(exists('extensions/Combat/prefabs/Boss/ReceiveDamage.events')).toBe(
+      true
+    );
+    const prefabSettings = fs.readFileSync(
+      path.join(
+        temporaryDirectory,
+        'extensions/Combat/prefabs/Boss/prefab.settings'
+      ),
+      'utf8'
+    );
+    expect(prefabSettings).toContain(
+      'layout = "game://extensions/Combat/prefabs/Boss/Boss.layout"'
+    );
+    expect(prefabSettings).toContain(
+      'events = "game://extensions/Combat/prefabs/Boss/ReceiveDamage.events"'
+    );
+    project = renamed;
+
+    renamed = JSON.parse(JSON.stringify(project));
+    const renamedBehavior =
+      renamed.eventsFunctionsExtensions[0].eventsBasedBehaviors[0];
+    renamedBehavior.name = 'Vitality';
+    renamedBehavior.eventsFunctions[0].name = 'Restore';
+    await writeLegacyProjectAsMultiFile(renamed, entryPath);
+    expect(exists('extensions/Combat/behaviors/Health')).toBe(false);
+    expect(
+      exists('extensions/Combat/behaviors/Vitality/behavior.settings')
+    ).toBe(true);
+    expect(exists('extensions/Combat/behaviors/Vitality/Restore.events')).toBe(
+      true
+    );
+    project = renamed;
+
+    renamed = JSON.parse(JSON.stringify(project));
+    renamed.eventsFunctionsExtensions[0].name = 'Battle';
+    await writeLegacyProjectAsMultiFile(renamed, entryPath);
+    expect(exists('extensions/Combat')).toBe(false);
+    expect(exists('extensions/Battle/extension.settings')).toBe(true);
+    expect(
+      exists('extensions/Battle/functions/ComputeDamage/ComputeDamage.events')
+    ).toBe(true);
+    expect(exists('extensions/Battle/prefabs/Boss/Boss.layout')).toBe(true);
+    expect(exists('extensions/Battle/behaviors/Vitality/Restore.events')).toBe(
+      true
+    );
+    expect(
+      areLegacyProjectsEquivalent(
+        renamed,
+        await openMultiFileProject(entryPath)
+      )
+    ).toBe(true);
   });
 
   test('migrates without modifying the original JSON', async () => {

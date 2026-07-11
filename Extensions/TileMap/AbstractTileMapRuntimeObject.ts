@@ -4,7 +4,10 @@ namespace gdjs {
    * Displays a Tilemap object (LDtk and Tiled).
    * @category Objects > Tile Map
    */
-  export abstract class AbstractTileMapRuntimeObject extends gdjs.RuntimeObject {
+  export abstract class AbstractTileMapRuntimeObject
+    extends gdjs.RuntimeObject
+    implements gdjs.TileMap
+  {
     /**
      * A reusable Point to avoid allocations.
      */
@@ -43,8 +46,191 @@ namespace gdjs {
 
     abstract invalidateTileMap(): void;
 
+    /**
+     * This method is expensive and should not be called.
+     * Prefer using {@link getHitBoxesAround} rather than getHitBoxes.
+     */
+    override getHitBoxes(): gdjs.Polygon[] {
+      return super.getHitBoxes();
+    }
+
+    override updateHitBoxes(): void {
+      this.updateTransformation();
+      const collisionTileMap = this.getCollisionTileMap();
+      if (!collisionTileMap) return;
+      this.hitBoxes = Array.from(
+        collisionTileMap.getAllHitboxes(this.getCollisionMaskTag())
+      );
+      this.hitBoxesDirty = false;
+      this.updateAABB();
+    }
+
+    // This implementation doesn't use updateHitBoxes.
+    // It's important for good performances.
+    override getAABB(): AABB {
+      // It's fine to compute it every time because tile maps are rarely rotated.
+      // It avoids calling updateHitBoxes to rely on hitBoxesDirty to know when
+      // to update.
+      this.updateAABB();
+      return this.aabb;
+    }
+
+    // This implementation doesn't use updateHitBoxes.
+    // It's important for good performances.
+    override updateAABB(): void {
+      if (this.getAngle() === 0) {
+        // Fast computation of AABB for non rotated object
+        this.aabb.min[0] = this.x;
+        this.aabb.min[1] = this.y;
+        this.aabb.max[0] = this.aabb.min[0] + this.getWidth();
+        this.aabb.max[1] = this.aabb.min[1] + this.getHeight();
+      } else {
+        const collisionTileMap = this.getCollisionTileMap();
+        if (!collisionTileMap) return;
+        const affineTransformation = collisionTileMap.getTransformation();
+
+        const left = 0;
+        const right = collisionTileMap.getWidth();
+        const top = 0;
+        const bottom = collisionTileMap.getHeight();
+
+        const workingPoint = this.aabb.min;
+
+        workingPoint[0] = left;
+        workingPoint[1] = top;
+        affineTransformation.transform(workingPoint, workingPoint);
+        const topLeftX = workingPoint[0];
+        const topLeftY = workingPoint[1];
+
+        workingPoint[0] = right;
+        workingPoint[1] = top;
+        affineTransformation.transform(workingPoint, workingPoint);
+        const topRightX = workingPoint[0];
+        const topRightY = workingPoint[1];
+
+        workingPoint[0] = right;
+        workingPoint[1] = bottom;
+        affineTransformation.transform(workingPoint, workingPoint);
+        const bottomRightX = workingPoint[0];
+        const bottomRightY = workingPoint[1];
+
+        workingPoint[0] = left;
+        workingPoint[1] = bottom;
+        affineTransformation.transform(workingPoint, workingPoint);
+        const bottomLeftX = workingPoint[0];
+        const bottomLeftY = workingPoint[1];
+
+        this.aabb.min[0] = Math.min(
+          topLeftX,
+          topRightX,
+          bottomRightX,
+          bottomLeftX
+        );
+        this.aabb.max[0] = Math.max(
+          topLeftX,
+          topRightX,
+          bottomRightX,
+          bottomLeftX
+        );
+        this.aabb.min[1] = Math.min(
+          topLeftY,
+          topRightY,
+          bottomRightY,
+          bottomLeftY
+        );
+        this.aabb.max[1] = Math.max(
+          topLeftY,
+          topRightY,
+          bottomRightY,
+          bottomLeftY
+        );
+      }
+    }
+
+    getHitBoxesAround(
+      left: float,
+      top: float,
+      right: float,
+      bottom: float
+    ): Iterable<gdjs.Polygon> {
+      // This implementation doesn't call updateHitBoxes.
+      // It's important for good performances because there is no need to
+      // update the whole collision mask where only a few hitboxes must be
+      // checked.
+      this.updateTransformation();
+      const collisionTileMap = this.getCollisionTileMap();
+      if (!collisionTileMap) {
+        return [];
+      }
+      return collisionTileMap.getHitboxesAround(
+        this.getCollisionMaskTag(),
+        left,
+        top,
+        right,
+        bottom
+      );
+    }
+
+    override isSpatiallyIndexed(): boolean {
+      return true;
+    }
+
     invalidateTransformation(): void {
       this._transformationIsUpToDate = false;
+    }
+
+    updateTransformation() {
+      if (this._transformationIsUpToDate) {
+        return;
+      }
+
+      this._tileMapToSceneTransformation.setToIdentity();
+      this._tileMapToSceneTransformation.translate(this.getX(), this.getY());
+      this._tileMapToSceneTransformation.rotateAround(
+        (this.getAngle() * Math.PI) / 180,
+        this.getCenterX(),
+        this.getCenterY()
+      );
+      this._tileMapToSceneTransformation.scale(
+        Math.abs(this.getScaleX()),
+        Math.abs(this.getScaleY())
+      );
+      const collisionTileMap = this.getCollisionTileMap();
+      if (collisionTileMap) {
+        const collisionTileMapTransformation =
+          collisionTileMap.getTransformation();
+        collisionTileMapTransformation.copyFrom(
+          this._tileMapToSceneTransformation
+        );
+        collisionTileMap.setTransformation(collisionTileMapTransformation);
+      }
+      this._sceneToTileMapTransformation.copyFrom(
+        this._tileMapToSceneTransformation
+      );
+      this._sceneToTileMapTransformation.invert();
+      this._transformationIsUpToDate = true;
+    }
+
+    /**
+     * The returned array is alway the same.
+     */
+    getGridCoordinatesFromSceneCoordinates(
+      x: float,
+      y: float
+    ): [integer, integer] {
+      this.updateTransformation();
+      const result = AbstractTileMapRuntimeObject.workingPoint;
+      const tileMap = this.getTileMap();
+      if (!tileMap) {
+        result[0] = 0;
+        result[1] = 0;
+        return result;
+      }
+      this._sceneToTileMapTransformation.transform([x, y], result);
+
+      result[0] = Math.floor(result[0] / tileMap.getTileWidth());
+      result[1] = Math.floor(result[1] / tileMap.getTileHeight());
+      return result;
     }
 
     getGridRowCount(): integer {
@@ -91,38 +277,6 @@ namespace gdjs {
       return tileMap.isTileFlippedOnY(x, y, layerIndex);
     }
 
-    updateTransformation() {
-      if (this._transformationIsUpToDate) {
-        return;
-      }
-
-      this._tileMapToSceneTransformation.setToIdentity();
-      this._tileMapToSceneTransformation.translate(this.getX(), this.getY());
-      this._tileMapToSceneTransformation.rotateAround(
-        (this.getAngle() * Math.PI) / 180,
-        this.getCenterX(),
-        this.getCenterY()
-      );
-      this._tileMapToSceneTransformation.scale(
-        Math.abs(this.getScaleX()),
-        Math.abs(this.getScaleY())
-      );
-      const collisionTileMap = this.getCollisionTileMap();
-      if (collisionTileMap) {
-        const collisionTileMapTransformation =
-          collisionTileMap.getTransformation();
-        collisionTileMapTransformation.copyFrom(
-          this._tileMapToSceneTransformation
-        );
-        collisionTileMap.setTransformation(collisionTileMapTransformation);
-      }
-      this._sceneToTileMapTransformation.copyFrom(
-        this._tileMapToSceneTransformation
-      );
-      this._sceneToTileMapTransformation.invert();
-      this._transformationIsUpToDate = true;
-    }
-
     getSceneXCoordinateOfTileCenter(
       columnIndex: integer,
       rowIndex: integer
@@ -161,28 +315,6 @@ namespace gdjs {
         sceneCoordinates
       );
       return sceneCoordinates[1];
-    }
-
-    /**
-     * The returned array is alway the same.
-     */
-    getGridCoordinatesFromSceneCoordinates(
-      x: float,
-      y: float
-    ): [integer, integer] {
-      this.updateTransformation();
-      const result = AbstractTileMapRuntimeObject.workingPoint;
-      const tileMap = this.getTileMap();
-      if (!tileMap) {
-        result[0] = 0;
-        result[1] = 0;
-        return result;
-      }
-      this._sceneToTileMapTransformation.transform([x, y], result);
-
-      result[0] = Math.floor(result[0] / tileMap.getTileWidth());
-      result[1] = Math.floor(result[1] / tileMap.getTileHeight());
-      return result;
     }
 
     getColumnIndexAtPosition(x: float, y: float): integer {

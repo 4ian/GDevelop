@@ -2,11 +2,52 @@
 
 ## A Minimal AI-Friendly DSL for GDevelop Events JSON and Functions
 
-**Status:** Version 1.2 final design specification  
-**Canonical source filename:** `xx.events`  
-**File extension:** `.events`  
-**Encoding:** UTF-8  
+**Status:** Version 1.3 codebase-aligned design specification
+**Canonical source filename:** `xx.events`
+**File extension:** `.events`
+**Encoding:** UTF-8
 **Target:** GDevelop scene event sheets, external event sheets, and extension functions
+
+---
+
+## Contents
+
+1. [Overview](#1-overview)
+2. [Design goals](#2-design-goals)
+3. [GDevelop menu coverage](#3-gdevelop-menu-coverage)
+4. [Source format](#4-source-format)
+5. [Core structural model](#5-core-structural-model)
+6. [Comments](#6-comments)
+7. [Standard events](#7-standard-events)
+8. [Local variables](#8-local-variables)
+9. [Event boundaries and sub-events](#9-event-boundaries-and-sub-events)
+10. [Else and else-if](#10-else-and-else-if)
+11. [Event groups](#11-event-groups)
+12. [Loop events](#12-loop-events)
+13. [Link events](#13-link-events)
+14. [JavaScript code events](#14-javascript-code-events)
+15. [Variables, aliases, and namespaces](#15-variables-aliases-and-namespaces)
+16. [Expressions](#16-expressions)
+17. [Function files](#17-function-files)
+18. [Instruction catalog](#18-instruction-catalog)
+19. [Runtime semantics](#19-runtime-semantics)
+20. [Parsing model](#20-parsing-model)
+21. [Simplified grammar](#21-simplified-grammar)
+22. [Compiler architecture](#22-compiler-architecture)
+23. [Validation rules](#23-validation-rules)
+24. [Canonical formatting](#24-canonical-formatting)
+25. [Complete examples](#25-complete-examples)
+26. [AI generation contract](#26-ai-generation-contract)
+27. [Recommended generation workflow](#27-recommended-generation-workflow)
+28. [Version 1.3 feature set](#28-version-13-feature-set)
+29. [Final design principles](#29-final-design-principles)
+30. [Compatibility basis](#30-compatibility-basis)
+31. [Current implementation boundary](#31-current-implementation-boundary)
+32. [Normative event-to-JSON mapping](#32-normative-event-to-json-mapping)
+33. [Normative structural-event mapping](#33-normative-structural-event-mapping)
+34. [Function metadata and current JSON mapping](#34-function-metadata-and-current-json-mapping)
+35. [Exhaustive typed coverage](#35-exhaustive-typed-coverage)
+36. [Bidirectional conversion algorithm](#36-bidirectional-conversion-algorithm)
 
 ---
 
@@ -29,14 +70,28 @@ group
 link
 js
 function
+event
 end
 #
 >
+?
+@event / @instruction / @comment / @group / @while / @exact
 ```
 
 A compiler converts `.events` source into the exact GDevelop event-sheet or extension-function data expected by the loaded project, GDevelop version, installed extensions, objects, behaviors, variables, resources, scenes, external event sheets, and registered functions.
 
-The AI model should not generate internal GDevelop instruction identifiers or positional JSON parameter arrays.
+The AI model should normally use friendly catalog names rather than internal
+GDevelop instruction identifiers or positional JSON parameter arrays. The
+typed exact `@exact` form is compiler/decompiler output for registered
+instructions without a friendly alias and may be edited when the complete
+catalog signature is understood.
+
+> **Implementation status:** `.events` parsing, formatting, compilation, and
+> decompilation are not implemented in the current repository. The current
+> implementation persists event arrays through `gd::EventsListSerialization`.
+> This document specifies the adapter that must be implemented. Sections 31
+> through 36 are the normative current-JSON mapping and take precedence over
+> earlier illustrative examples when there is a conflict.
 
 ### Minimal standard event
 
@@ -77,7 +132,7 @@ IfDo is designed to be:
 
 ### Non-goals
 
-Version 1.2 is not intended to be:
+Version 1.3 is not intended to be:
 
 - A general-purpose programming language.
 - A full GDevelop project format.
@@ -87,7 +142,11 @@ Version 1.2 is not intended to be:
 - A JavaScript type checker. JavaScript is supported only as an explicit raw-code event.
 - A serialization of editor-only layout details that do not affect event behavior.
 
-Every source file uses the name pattern `xx.events`, where `xx` is any useful base name. A `.events` file represents either one scene/external event sheet or one extension function. Event-sheet targets are supplied through the compiler API, command line, or editor integration. A function file identifies itself with a `function` header.
+Every source file uses the name pattern `xx.events`, where `xx` is any useful
+base name. A `.events` file contains only IfDo DSL event code. In a multi-file
+project, its scene, external-event, or function target is supplied by the
+referencing `.settings` manifest; target configuration is never embedded as
+TOML front matter.
 
 ---
 
@@ -110,7 +169,7 @@ The following table maps the items visible in the GDevelop event menus to IfDo.
 | Repeat | `repeat count` |
 | Standard event | `if`, `or`, and `do` lines |
 | While | `while condition` |
-| Extension function | A `.events` file beginning with `function` |
+| Extension function | A pure `.events` body referenced by its `function.settings` |
 
 `New Event Below` is an editor insertion command rather than a serialized event type. In a text language, event order already expresses this operation.
 
@@ -228,29 +287,86 @@ do local.items[0] = "Sword"
 All DSL source files use the `.events` extension:
 
 ```text
-Main.events
-SharedCombat.events
-Combat.Damage.events
+scenes/Main/Main.events
+externals/SharedCombat.events
+extensions/Combat/functions/Damage/Damage.events
 ```
 
 `xx.events` means that `xx` is an arbitrary descriptive base name.
 
 A source file has one of two kinds:
 
-1. **Event-sheet file** — contains scene or external events and has no `function` header.
-2. **Function file** — its first nonblank, non-comment statement is a `function` header and the remaining source is that function's event body.
+1. **Event-sheet body** — compiled for the scene target supplied by project and
+   scene settings, or the external target supplied by `external.settings`.
+2. **Function body** — compiled for the function signature supplied by
+   `function.settings`, `prefab.settings`, or `behavior.settings`.
+
+Both have the same pure DSL file grammar. Their owning settings determine the
+semantic context.
 
 Canonical names are:
 
 ```text
-<SceneName>.events
-<ExternalEventSheetName>.events
-<ExtensionName>.<FunctionName>.events
+scenes/<SceneName>/<SceneName>.events
+externals/<ExternalEventSheetName>.events
+extensions/<ExtensionName>/functions/<FunctionName>/function.settings
+extensions/<ExtensionName>/functions/<FunctionName>/<FunctionName>.events
+extensions/<ExtensionName>/prefabs/<PrefabName>/<FunctionName>.events
+extensions/<ExtensionName>/behaviors/<BehaviorName>/<FunctionName>.events
 ```
 
-The filename is advisory rather than semantic. The compiler target determines the scene or external event sheet, while a function header determines the extension and function name. The `ifdo-ai` profile requires the canonical filename when the integration can control it.
+In a project, the filename is cross-checked but settings are authoritative.
+External event-sheet paths and linked scenes are listed in
+`externals/external.settings`.
+Extension-level function paths
+are listed in `extension.settings` and resolved through
+`functions/<Function>/function.settings`; prefab and behavior methods are
+listed by their respective owner settings. The `ifdo-ai` profile requires the
+canonical path when the integration can control it.
 
-A `.events` file contains at most one function definition. Multiple functions use multiple files.
+Every managed `.events` reference stored in settings is a canonical
+project-root URI, not a relative path. For example:
+
+```toml
+events = "game://scenes/Main/Main.events"
+events = "game://externals/SharedCombat.events"
+events = "game://extensions/Combat/functions/Damage/Damage.events"
+```
+
+`game://` is rooted at the directory containing `project.settings`. Resolution,
+normalization, containment, and percent-encoding rules are defined in the
+multi-file project format specification. All `.settings` TOML files are
+append-safe namespace fragments; concatenating them in manifest order produces
+the authoritative in-memory `CombinedProjectSettings` compilation document
+without changing the pure DSL grammar described here. Settings fragments remain
+separate files on disk; none embeds or includes another fragment, and the
+combined document is never written as project source.
+
+A `.events` file contains one event body. Multiple functions use multiple
+files/subfolders.
+
+### 4.7 Target binding and file purity
+
+Persisted project `.events` files do not contain TOML front matter. Their
+target is supplied out of band:
+
+```text
+game://project.settings -> game://scenes/Main/scene.settings -> game://scenes/Main/Main.events
+game://project.settings -> game://externals/external.settings -> game://externals/SharedCombat.events
+game://extensions/Combat/extension.settings -> game://extensions/Combat/functions/Damage/function.settings -> game://extensions/Combat/functions/Damage/Damage.events
+game://extensions/Combat/prefabs/Enemy/prefab.settings -> game://extensions/Combat/prefabs/Enemy/TakeDamage.events
+game://extensions/Combat/behaviors/Health/behavior.settings -> game://extensions/Combat/behaviors/Health/Heal.events
+```
+
+All identity, owner, function type, parameters, return type, ordering, and
+editor configuration live in `.settings` TOML. `.layout` TOML is limited to
+visual/UI data. `.events` contains only DSL statements, DSL comments, typed
+metadata annotations, and typed exact catalog instructions defined in this
+document. Raw event or instruction JSON is forbidden.
+
+A standalone authoring API may optionally accept a `function` declaration as
+DSL shorthand when no settings target is available, but the canonical
+multi-file project profile forbids it because it duplicates configuration.
 
 ---
 
@@ -326,11 +442,12 @@ if scene begins
 > do scene.score = global.savedScore
 ```
 
-Consecutive comments at the same depth may be combined into one multiline GDevelop comment event by the compiler:
+Consecutive comments at the same depth remain separate GDevelop comment
+events in the canonical round-trip profile. Use an escaped newline in one
+statement when one multiline comment event is intended:
 
 ```events
-# Player damage
-# The timer prevents damage every frame
+# Player damage\nThe timer prevents damage every frame
 ```
 
 Inline comments are intentionally unsupported:
@@ -516,6 +633,19 @@ do Player.angle += 1
 
 It runs whenever GDevelop evaluates that event, normally once per frame.
 
+An explicitly empty current `Standard` event is written as `event`. The same
+header represents a standard event that has locals and/or child events but no
+conditions or actions:
+
+```events
+@event folded=true
+local placeholder:number = 0
+event
+```
+
+The formatter emits `event` only when no ordinary `if` or `do` line can carry
+that standard event's identity.
+
 ---
 
 ## 8. Local variables
@@ -589,6 +719,34 @@ local data = {}
 ```
 
 Array and structure literals are permitted in local declarations. Complex literals are serialized into GDevelop variable data rather than treated as ordinary GDevelop expression text.
+
+#### Exact variable form
+
+Simple literals are canonical when every nested variable node uses default
+metadata. The typed `var(...)` initializer represents the complete current
+variable serializer when metadata or an otherwise ambiguous type must be
+preserved:
+
+```events
+local state = var(type="enum", value="idle", values=["idle", "run"], persistentUuid="...", folded=false, hasMixedValues=false)
+local data = var(type="structure", children={
+  health: var(type="number", value=100, persistentUuid="...", folded=false),
+  inventory: var(type="array", children=[
+    var(type="string", value="Sword", persistentUuid="...", folded=false)
+  ], persistentUuid="...", folded=true)
+}, persistentUuid="...", folded=false)
+```
+
+The closed `type` set is `string`, `enum`, `number`, `boolean`, `structure`,
+`array`, and `mixed`. `value` is required for primitive types; `values` is
+allowed only for `enum`; and recursive `children` is required for `structure`
+and `array`. `persistentUuid`, `folded`, and `hasMixedValues` map directly to
+the current serializer fields. The shorter declaration suffix `uuid="..."`
+is an authoring alias for a root node's `persistentUuid`.
+
+The exact form is typed DSL, not JSON. Unknown arguments, invalid field/type
+combinations, duplicate structure child names, and non-variable child values
+are errors.
 
 ### 8.4 Local-variable rules
 
@@ -852,6 +1010,17 @@ for each Enemy index=i
 
 The counter starts at `0` and increments once per processed object instance.
 
+The current For Each event also supports sorting and limiting:
+
+```events
+for each Enemy index=i order_by=Enemy.health order=desc limit=10
+> do Enemy.rank = i
+```
+
+`order` is `asc` or `desc`. The current serializer writes `limit` only with
+`orderBy`; the compiler rejects a limit without sorting rather than emitting a
+shape the current writer cannot preserve.
+
 ### 12.2 For each child variable
 
 Use `for each child` to iterate through a structure or array variable:
@@ -1012,6 +1181,15 @@ Link another scene's event sheet:
 link scene "Base Level"
 ```
 
+The canonical round-trip form is untyped because current link JSON stores only a
+target name:
+
+```events
+link "Shared Combat"
+link "Shared Combat" group="Damage"
+link "Shared Combat" range=2..8
+```
+
 A link may be a sub-event:
 
 ```events
@@ -1032,7 +1210,7 @@ if Player.active
 
 ## 14. JavaScript code events
 
-A JavaScript event is an explicit raw-code escape hatch.
+A JavaScript event is a first-class typed event whose body is JavaScript source.
 
 ```events
 js
@@ -1219,19 +1397,28 @@ A model may use only functions listed for the current project and GDevelop versi
 
 ## 17. Function files
 
-A function is a specialized `.events` file whose body is written with the same event syntax as every other sheet. This keeps reusable logic inside one language instead of introducing a second programming model.
+A function uses a pure `.events` body written with the same event syntax as
+every other sheet. Its `.settings` owner supplies the signature and target,
+keeping reusable logic inside one language without mixing TOML configuration
+into DSL source.
 
-One file defines exactly one function. The canonical filename mirrors the qualified name:
+One file defines exactly one function. The canonical path is recorded by the
+owner manifest:
 
 ```text
-Combat.Damage.events
-Combat.IsDead.events
-UI.HealthLabel.events
+extensions/Combat/functions/Damage/function.settings
+extensions/Combat/functions/Damage/Damage.events
+extensions/Combat/prefabs/Enemy/TakeDamage.events
+extensions/Combat/behaviors/Health/Heal.events
 ```
 
-The function header is the first significant line in the file. There is no closing `end` for the function; the end of the file ends the definition.
+In the canonical project profile, `Damage.events` begins directly with event
+statements. `function.settings` supplies the extension-level function
+declaration. Prefab and behavior declarations come from their owner settings.
 
-### 17.1 Function header
+### 17.1 Standalone function-header shorthand
+
+Outside a multi-file project, an API without a `.settings` target may accept:
 
 ```events
 function <kind> <Extension>.<Name> <parameter>:<type> ...
@@ -1245,9 +1432,22 @@ Supported core kinds are:
 | `condition` | An `if` condition | Boolean |
 | `number` | A numeric expression | Number |
 | `text` | A text expression | Text |
+| `number-condition` | A numeric expression also exposed through relational conditions | Number |
+| `text-condition` | A text expression also exposed through relational conditions | Text |
+| `operator-action` | A setter/action paired to a getter | No direct result |
 | `lifecycle` | An engine-called extension hook | No result |
 
+These map to the current `Action`, `Condition`, `Expression`,
+`ExpressionAndCondition`, and `ActionWithOperator` serializer values as
+specified in section 34. `lifecycle` is a checked alias for a specially named
+`Action`, not a distinct stored function type. `async=true` is TOML settings
+metadata rather than a separate result kind.
+
 Examples:
+
+The following `function ...` lines are standalone shorthand illustrations of
+the signatures that normally live in TOML settings. Omit those lines from all
+project-owned `.events` files.
 
 ```events
 function action Combat.Damage target:object amount:number
@@ -1265,17 +1465,27 @@ function number Combat.DamageForLevel level:number base:number
 function text UI.HealthLabel health:number maximum:number
 ```
 
-The qualified name has exactly two semantic parts:
+An extension-level qualified name has two semantic parts:
 
 ```text
 ExtensionName.FunctionName
 ```
 
-Both parts use normal identifier rules. Extension folders and editor presentation metadata are outside the core DSL.
+Prefab and behavior methods use three readable parts and are checked against
+their owner settings:
+
+```text
+ExtensionName.PrefabName.FunctionName
+ExtensionName.BehaviorName.FunctionName
+```
+
+All parts use normal identifier rules. Owner settings, not path spelling
+alone, determine whether the middle part is a prefab or a behavior.
 
 ### 17.2 Parameters
 
-A parameter is declared as:
+A parameter is declared in TOML function/owner settings. The optional
+standalone header shorthand writes it as:
 
 ```text
 name:type
@@ -1326,7 +1536,10 @@ do target.health -= amount
 
 An object parameter behaves as an object alias and carries the picked instances passed by the caller. A value parameter behaves as a typed read-only expression.
 
-Default parameters, variadic parameters, overloaded function names, and positional custom-function calls are not part of version 1.2.
+Compact-header default syntax, variadic parameters, overloaded function names,
+and positional custom-function calls are not part of version 1.3. Existing
+optional/default parameter metadata is preserved losslessly in the owning
+function settings entry.
 
 ### 17.3 Action functions
 
@@ -1438,7 +1651,9 @@ The required type is determined by the function kind:
 | `number` | Number |
 | `text` | Text |
 
-Assigning `result` sets the current return value; it does not immediately stop function execution. A later event may replace it. There is no separate early-return statement in version 1.2.
+Assigning `result` sets the current return value; it does not immediately stop
+function execution. A later event may replace it. There is no separate
+early-return statement in version 1.3.
 
 The `ifdo-ai` profile requires an unconditional initial result before any conditional result assignment:
 
@@ -1569,13 +1784,16 @@ Lifecycle functions are part of the full profile but should be generated by AI o
 
 ### 17.12 Function-file rules
 
-- A function file contains exactly one `function` header.
-- The header is at depth zero and precedes all executable events.
-- The canonical formatter puts the header on the first physical line.
-- The body begins after the header and continues to end of file.
-- A function header is invalid in a scene or external event-sheet target.
-- A file without a function header is not inferred to be a function from its filename alone.
-- The canonical function filename is `<Extension>.<Function>.events`.
+- A project-owned function file contains only its event body; it has no front
+  matter and no `function` header.
+- The compiler receives function identity, owner, signature, result type, and
+  flags from `function.settings`, `prefab.settings`, or `behavior.settings`.
+- A standalone `function` header is accepted only when the compiler API has no
+  settings target and explicitly enables the shorthand.
+- A function header is invalid in the canonical multi-file project profile and
+  in scene/external-event targets.
+- The canonical extension-function path is
+  `functions/<Function>/<Function>.events`, beside `function.settings`.
 - The function becomes an ordinary catalog action, condition, or expression after its signature is registered.
 - Cyclic calls are reported; recursive cycles are rejected by the AI profile unless explicitly enabled.
 
@@ -1619,7 +1837,7 @@ The catalog is generated from:
 - Resources.
 - Scene names.
 - External event-sheet names.
-- Registered `.events` function signatures.
+- Function signatures registered from TOML settings.
 
 ### 18.1 Canonical names
 
@@ -1653,7 +1871,7 @@ do camera.shake strength=20 duration=0.4s
 
 The compiler writes the exact parameter order expected by GDevelop.
 
-### 18.3 Exact-instruction escape hatch
+### 18.3 Exact catalog instruction form
 
 An extension instruction without a friendly alias may be exposed with `@`:
 
@@ -1667,6 +1885,18 @@ Rules:
 - Named arguments are required.
 - The model may not invent an `@` instruction.
 - Every argument remains type-checked.
+
+When named catalog parameters cannot reproduce the stored parameter strings or
+sub-instruction tree exactly, the canonical typed form uses `@exact`:
+
+```events
+@instruction disabled=false inverted=false awaited=false
+if @exact id="BuiltinCommonInstructions::CompareNumbers" parameters=["Variable(Score)", ">=", "100"]
+```
+
+`@instruction` is only the closed metadata annotation for the following
+instruction. `@exact` identifies the registered instruction and carries its
+catalog-validated positional strings. Neither construct accepts arbitrary JSON.
 
 ---
 
@@ -1766,13 +1996,16 @@ Groups and comments preserve source order but do not create runtime, local-varia
 
 ## 20. Parsing model
 
-The parser operates in four stages.
+The parser operates in five stages.
 
-### Stage 0: Detect the file kind
+### Stage 0: Resolve the settings target
 
-The compiler target declares whether the source is an event sheet or a function. When automatic detection is enabled, the first nonblank, non-comment statement `function` marks a function file. The canonical AI profile places the function header first.
+The project manifest and owning `.settings` file declare whether the pure DSL
+source is a scene sheet, external sheet, extension function, prefab method, or
+behavior method. Standalone APIs may explicitly enable the optional
+`function`-header shorthand instead.
 
-### Stage 1: Recognize raw JavaScript blocks
+### Stage 1: Recognize JavaScript bodies
 
 When a `js` header is found, the parser stores every following physical line as raw code until `end js` at the same DSL depth.
 
@@ -1782,10 +2015,11 @@ No IfDo tokenization occurs inside the raw body.
 
 For every non-raw line:
 
-1. Count leading `>` characters.
-2. Ignore spaces immediately after the depth prefix.
-3. Store the remaining statement at that depth.
-4. Reject a depth increase greater than one.
+1. Count leading `>` event-depth characters.
+2. Count optional leading `?` instruction-depth characters after event depth.
+3. Ignore spaces immediately after the prefixes.
+4. Store the remaining statement at both depths.
+5. Reject a depth increase greater than one in either hierarchy.
 
 Groups are top-level lexical containers delimited by `group` and `end`.
 
@@ -1798,6 +2032,8 @@ At a given depth:
 - `if` starts a standard event or adds an AND condition before actions begin.
 - `or` extends the current condition group.
 - `do` adds an action.
+- `event` creates an explicit empty standard event after any pending locals or
+  metadata.
 - `else if` starts another branch.
 - `else` starts the final fallback branch.
 - `for each` starts an object loop.
@@ -1808,7 +2044,16 @@ At a given depth:
 - `js` creates a JavaScript event.
 - `group` starts an event group.
 - `end` closes an event group.
-- `function` is valid only as the file header and never as a nested statement.
+- `function` is valid only as an explicitly enabled standalone shorthand and
+  never in a canonical project file or nested statement.
+- `@event`, `@instruction`, `@comment`, `@group`, and `@while` attach
+  typed round-trip metadata to the next compatible construct.
+
+### Stage 4: Bind metadata and validate owners
+
+Owner settings, manifests, optional standalone function headers, annotations,
+and parsed event nodes are cross-checked before project-aware semantic
+compilation.
 
 ---
 
@@ -1817,12 +2062,11 @@ At a given depth:
 The following EBNF describes logical blocks after raw JavaScript extraction and depth processing.
 
 ```ebnf
-file                = event-sheet-file
-                    | function-file ;
+file                = event-sheet-file ;
 
 event-sheet-file    = event-sheet ;
 
-function-file       = function-header, newline, event-sheet ;
+standalone-function-file = function-header, newline, event-sheet ;
 
 event-sheet         = { top-item } ;
 
@@ -1830,15 +2074,19 @@ function-header     = "function", function-kind, qualified-name,
                       { parameter } ;
 
 function-kind       = "action" | "condition" | "number" | "text"
+                    | "number-condition" | "text-condition"
+                    | "operator-action"
                     | "lifecycle" ;
 
-qualified-name      = identifier, ".", identifier ;
+qualified-name      = identifier, ".", identifier,
+                      [ ".", identifier ] ;
 
 parameter           = identifier, ":", parameter-type ;
 
 parameter-type      = type-expression ;
 
-top-item            = comment
+top-item            = metadata-annotation
+                    | comment
                     | group
                     | node ;
 
@@ -1855,10 +2103,41 @@ node                = { local-declaration },
                     | link-event
                     | javascript-event ;
 
-local-declaration   = "local", identifier, "=", initializer, newline ;
+local-declaration   = "local", identifier, [ ":", type-expression ],
+                      "=", initializer, { named-argument }, newline ;
+
+initializer         = expression | exact-variable ;
+
+exact-variable      = "var", "(", "type=", string,
+                      { ",", variable-field }, ")" ;
+
+variable-field      = "value=", scalar
+                    | "values=", string-array
+                    | "children=", variable-children
+                    | "persistentUuid=", string
+                    | "folded=", boolean
+                    | "hasMixedValues=", boolean ;
+
+variable-children   = "{", [ structure-variable,
+                      { ",", structure-variable } ], "}"
+                    | "[", [ exact-variable,
+                      { ",", exact-variable } ], "]" ;
+
+structure-variable  = ( identifier | string ), ":", exact-variable ;
+
+scalar              = string | number | boolean ;
+
+string-array        = "[", [ string, { ",", string } ], "]" ;
+
+metadata-annotation = "@event", { named-argument }, newline
+                    | "@instruction", { named-argument }, newline
+                    | "@comment", { named-argument }, newline
+                    | "@group", { named-argument }, newline
+                    | "@while", { named-argument }, newline ;
 
 standard-event      = conditional-event
-                    | unconditional-event ;
+                    | unconditional-event
+                    | empty-standard-event ;
 
 conditional-event   = condition-group,
                       { condition-group },
@@ -1869,6 +2148,8 @@ conditional-event   = condition-group,
 unconditional-event = action,
                       { action },
                       { child-item } ;
+
+empty-standard-event = "event", newline, { child-item } ;
 
 condition-group     = "if", condition, newline,
                       { "or", condition, newline } ;
@@ -1889,21 +2170,30 @@ else-branch         = "else", newline,
                       { action },
                       { child-item } ;
 
-action              = "do", action-expression, newline ;
+action              = "do", [ "await" ], action-expression, newline ;
+
+exact-instruction   = "@exact", "id=", string,
+                      "parameters=", string-array ;
 
 foreach-object-loop = "for", "each", object-reference,
-                      [ "index=", identifier ], newline,
-                      child-item,
+                      [ "index=", identifier ],
+                      [ "order_by=", expression ],
+                      [ "order=", ( "asc" | "desc" ) ],
+                      [ "limit=", expression ], newline,
+                      { condition-group }, { action },
                       { child-item } ;
 
 foreach-child-loop  = "for", "each", "child", variable-reference,
-                      "as", identifier, newline,
-                      child-item,
+                      ( "as", identifier
+                      | "value=", identifier,
+                        [ "key=", identifier ],
+                        [ "index=", identifier ] ), newline,
+                      { condition-group }, { action },
                       { child-item } ;
 
 repeat-loop         = "repeat", expression,
                       [ "index=", identifier ], newline,
-                      child-item,
+                      { condition-group }, { action },
                       { child-item } ;
 
 while-loop          = "while", condition,
@@ -1911,12 +2201,14 @@ while-loop          = "while", condition,
                       [ "index=", identifier ], newline,
                       { "or", condition, newline },
                       { condition-group },
-                      child-item,
-                      { child-item } ;
+                      { action }, { child-item } ;
 
-link-event          = "link", ( "external" | "scene" ), string, newline ;
+link-event          = "link", [ "external" | "scene" ], string,
+                      [ "group=", string | "range=", range ], newline ;
 
-javascript-event    = "js", [ "objects=", object-reference ], newline,
+javascript-event    = "js", [ "objects=", object-reference ],
+                      [ "strict=", boolean ],
+                      [ "expanded=", boolean ], newline,
                       raw-javascript,
                       "end", "js", newline ;
 
@@ -1930,12 +2222,16 @@ condition           = [ "not" ], condition-expression ;
 Structural line grammar:
 
 ```ebnf
-source-line         = depth-prefix, statement, newline ;
+source-line         = depth-prefix, instruction-depth-prefix,
+                      statement, newline ;
 
 depth-prefix        = { ">" }, { " " | "\t" } ;
 
+instruction-depth-prefix = { "?" }, { " " | "\t" } ;
+
 statement           = comment-statement
                     | local-statement
+                    | event-statement
                     | group-statement
                     | end-statement
                     | if-statement
@@ -1948,7 +2244,9 @@ statement           = comment-statement
                     | while-statement
                     | link-statement
                     | javascript-header
-                    | javascript-end ;
+                    | javascript-end
+                    | exact-instruction
+                    | metadata-annotation ;
 
 custom-action-call  = qualified-name, { named-argument } ;
 
@@ -1958,6 +2256,8 @@ custom-expression-call = qualified-name, "(",
                       [ named-argument, { ",", named-argument } ], ")" ;
 
 named-argument      = identifier, "=", expression ;
+
+range               = integer, "..", integer ;
 ```
 
 The instruction catalog and expression parser define `condition-expression`, `action-expression`, and ordinary expressions.
@@ -1969,7 +2269,7 @@ The instruction catalog and expression parser define `condition-expression`, `ac
 ```text
 `.events` source
     ↓
-File-kind and function-header scanner
+Settings-target resolver (project profile) or optional standalone-header scanner
     ↓
 Raw JavaScript block scanner
     ↓
@@ -2002,10 +2302,10 @@ GDevelop event-sheet JSON or extension-function JSON
 | `link external` / `link scene` | Link event |
 | `js` ... `end js` | JavaScript event |
 | `local` | Local-variable data attached to the owning event |
-| `function action` | Extension action definition |
-| `function condition` | Extension condition definition |
-| `function number` / `function text` | Extension expression definition |
-| `function lifecycle` | Extension lifecycle definition when supported |
+| `function.settings` with `functionType = "Action"` | Extension action definition/target |
+| `function.settings` with `functionType = "Condition"` | Extension condition definition/target |
+| `function.settings` with `functionType = "Expression"` | Extension expression definition/target |
+| Lifecycle name in `function.settings` | Extension lifecycle target when supported |
 | `do result = ...` | Function return-value action |
 
 The adapter, not the AI, chooses exact internal JSON type identifiers and field names.
@@ -2121,9 +2421,9 @@ Reject:
 - Duplicate local, loop-counter, or child aliases.
 - Unterminated JavaScript blocks.
 - `end js` at the wrong depth.
-- More than one function header.
-- A function header below depth zero or after executable statements.
-- A function header in an event-sheet target.
+- A `function` header or TOML front matter in a project-owned `.events` file.
+- More than one function header, or a non-leading header, in explicitly
+  enabled standalone mode.
 - Event links inside a function file.
 - `result` writes in action or lifecycle functions.
 - Missing required initial `result` in the AI profile.
@@ -2168,7 +2468,7 @@ The `ifdo-ai` profile additionally rejects:
 - Shadowing of ancestor locals or aliases.
 - Positional arguments for custom functions.
 - Recursive function-call cycles unless `allowRecursion=true`.
-- Function filenames that do not match `<Extension>.<Function>.events` when filename enforcement is enabled.
+- Function paths that do not match the owning project manifest when path enforcement is enabled.
 
 ### 23.4 Diagnostic examples
 
@@ -2249,11 +2549,12 @@ Function parameters are read-only. Copy the value to a local variable when mutat
 ```text
 E521 Missing function result initialization
 
-1 | function condition Combat.IsDead target:object
-    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+1 | if target.health <= 0
+    ^^^^^^^^^^^^^^^^^^^^^
 
-The `ifdo-ai` profile requires an unconditional `do result = false`
-before conditional result assignments.
+Function `Combat.IsDead` is a condition according to its settings. The
+`ifdo-ai` profile requires an unconditional `do result = false` before
+conditional result assignments.
 ```
 
 ```text
@@ -2286,9 +2587,11 @@ The formatter emits one stable representation.
 13. Place `else` immediately after its matching event.
 14. Preserve JavaScript body text while normalizing the final newline.
 15. End the file with a newline.
-16. Put a function header on the first physical line of a function file.
+16. Emit only DSL event statements in project-owned `.events` files; do not
+    emit TOML front matter or a function declaration.
 17. Use named arguments for every custom-function call.
-18. Use `<Extension>.<Function>.events` as the canonical function filename.
+18. Use `functions/<Function>/<Function>.events` beside
+    `function.settings` for extension-level functions.
 19. Initialize `result` unconditionally in AI-generated condition and expression functions.
 
 Canonical example:
@@ -2415,11 +2718,10 @@ end
 
 ### 25.4 Action, condition, and expression functions
 
-`Combat.Damage.events`:
+`extensions/Combat/functions/Damage/Damage.events` (signature comes from the
+sibling `function.settings`):
 
 ```events
-function action Combat.Damage target:object amount:number canKill:boolean
-
 local finalAmount = max(0, amount)
 
 if target.health > 0
@@ -2430,26 +2732,22 @@ do target.health -= local.finalAmount
 > do delete target
 ```
 
-`Combat.IsDead.events`:
+`extensions/Combat/functions/IsDead/IsDead.events`:
 
 ```events
-function condition Combat.IsDead target:object
-
 do result = false
 
 if target.health <= 0
 do result = true
 ```
 
-`Combat.DamageForLevel.events`:
+`extensions/Combat/functions/DamageForLevel/DamageForLevel.events`:
 
 ```events
-function number Combat.DamageForLevel level:number base:number
-
 do result = base + level * 2
 ```
 
-`Main.events`:
+`scenes/Main/Main.events`:
 
 ```events
 group Combat
@@ -2504,8 +2802,10 @@ Rules:
 - Prefer catalog events over JavaScript.
 - Prefer named arguments for complex instructions.
 - Use the `.events` file extension.
-- A function file starts with exactly one `function` header.
-- Use one function per file and the filename `<Extension>.<Function>.events`.
+- Output only the event body; never emit TOML front matter or a `function`
+  declaration in a project-owned `.events` file.
+- Use one function body per file. Extension functions use
+  `functions/<Function>/<Function>.events` beside `function.settings`.
 - Use named arguments for every custom-function call.
 - Treat function parameters as read-only.
 - Initialize `result` unconditionally in condition, number, and text functions.
@@ -2572,10 +2872,8 @@ raw JavaScript
 end js
 
 FUNCTION FILE
-function action Extension.Name target:object amount:number
-function condition Extension.Name target:object
-function number Extension.Name value:number
-function text Extension.Name value:text
+signature and owner come from TOML settings
+the .events file contains only the event statements below
 
 FUNCTION RESULT
 do result = false
@@ -2600,7 +2898,7 @@ Project context, function signatures, link targets, and instruction catalog
         ↓
 AI generates IfDo
         ↓
-Raw-block scanner and parser check structure
+JavaScript-body scanner and parser check structure
         ↓
 Semantic validator checks project symbols and types
         ↓
@@ -2613,22 +2911,25 @@ Compiler emits GDevelop event-sheet or extension-function JSON
 
 The compiler must never apply invalid output to a project.
 
-Diagnostics should refer to IfDo source rather than exposing raw JSON errors to the model.
+Diagnostics should refer to IfDo source and its typed constructs.
 
 ---
 
-## 28. Version 1.2 feature set
+## 28. Version 1.3 feature set
 
 ### Included
 
 - Standard conditional events.
 - Unconditional standard events.
+- Explicit empty, local-only, and child-only standard events.
 - Multiple AND condition groups.
 - OR alternatives.
 - Negation.
 - Trigger once.
 - Actions and assignments.
 - Local variables on standard events, else branches, and loops.
+- Recursive exact `var(...)` syntax covering every current variable field and
+  nested value shape.
 - Else and else-if.
 - Sub-events.
 - Event groups.
@@ -2643,21 +2944,29 @@ Diagnostics should refer to IfDo source rather than exposing raw JSON errors to 
 - Structure and array indexing.
 - Project-aware instruction catalog.
 - Named instruction parameters.
-- Exact extension-instruction escape hatch.
+- Exact typed form for any registered extension instruction.
 - Source maps and repairable diagnostics.
 - `.events` source-file convention.
-- One function definition per function file.
-- Action, condition, number-expression, text-expression, and catalog-listed lifecycle functions.
+- One settings-targeted function body per function `.events` file.
+- Action, condition, expression, expression-and-condition, operator-action,
+  and catalog-listed lifecycle functions.
+- Async function metadata and awaited actions supported by the current model.
 - Typed read-only function parameters.
+- Lossless TOML function metadata, including parameter defaults and editor
+  presentation fields.
 - Named action, condition, and expression function calls.
 - Typed `result` handling.
 - Function-call validation and recursion checks.
+- Complete typed event/instruction presentation annotations.
+- Exhaustive typed coverage of every event, instruction, variable, and
+  metadata field persisted by the current serializers.
 
 ### Deferred
 
-- Asynchronous function syntax.
-- Function parameter defaults, variadic parameters, and overloads.
-- Function editor presentation metadata in source.
+- A compact body-syntax shorthand for async declarations (TOML settings are
+  already lossless).
+- Compact header syntax for parameter defaults, variadic parameters, and
+  overloads. Current defaults remain preserved in TOML settings.
 - Macros.
 - Object, scene, resource, behavior, or extension declarations.
 - Nested organizational groups in the AI profile.
@@ -2665,8 +2974,7 @@ Diagnostics should refer to IfDo source rather than exposing raw JSON errors to 
 - Custom operators.
 - Indentation-sensitive blocks.
 - Multiple picked-object parameters for a JavaScript event.
-- Editor layout metadata unrelated to event meaning.
-- Disabled/collapsed presentation metadata as first-class syntax.
+- New presentation metadata that does not exist in the current serializer.
 
 ---
 
@@ -2686,7 +2994,7 @@ Diagnostics should refer to IfDo source rather than exposing raw JSON errors to 
 12. **Generated changes should be reviewed as readable IfDo diffs before application.**
 13. **A function is a specialized `.events` event sheet, not a separate language.**
 14. **Custom-function calls always use named arguments.**
-15. **The filename convention is `xx.events`; function files canonically use `<Extension>.<Function>.events`.**
+15. **The filename convention is `xx.events`; function paths, owners, and signatures are declared only by TOML settings.**
 
 The complete structural foundation remains small:
 
@@ -2722,8 +3030,8 @@ group Name
 # events
 end
 
-function action Extension.Name target:object amount:number
-# function events
+# A function .events file uses the same event statements.
+# Its signature comes from TOML settings, not this body.
 ```
 
 ---
@@ -2746,3 +3054,643 @@ Useful official references:
 - [JavaScript code events](https://wiki.gdevelop.io/gdevelop5/events/js-code/)
 - [Local variables](https://wiki.gdevelop.io/gdevelop5/all-features/variables/local-variables/)
 - [Functions](https://wiki.gdevelop.io/gdevelop5/events/functions/)
+
+---
+
+## 31. Current implementation boundary
+
+This section records what the inspected codebase persists today. It is the
+compatibility target for the DSL; it is not a proposal to change runtime event
+logic.
+
+### 31.1 Event list encoding
+
+`gd::EventsListSerialization::SerializeEventsTo` writes a JSON array. Every
+event has a type and may have common editor attributes:
+
+```json
+{
+  "type": "BuiltinCommonInstructions::Standard",
+  "disabled": false,
+  "folded": false,
+  "aiGeneratedEventId": "optional-id"
+}
+```
+
+`disabled` and `folded` are omitted in ordinary non-canonical serialization
+when false. `aiGeneratedEventId` is omitted when empty. Canonical comparison
+must compare the logical values, not whether an optional default happened to
+be omitted in an old file.
+
+The canonical round-trip profile attaches common metadata to the next event at
+the same depth:
+
+```events
+@event disabled=true folded=true aiGeneratedEventId="generation-42"
+if once
+do scene.score = 0
+```
+
+An `@event` line without a following event at the same depth is invalid.
+
+### 31.2 Instruction encoding
+
+Conditions, actions, and instruction children use the same current shape:
+
+```json
+{
+  "type": {
+    "value": "BuiltinCommonInstructions::CompareNumbers",
+    "inverted": false,
+    "await": false
+  },
+  "disabled": false,
+  "parameters": ["Variable(Score)", ">=", "100"],
+  "subInstructions": []
+}
+```
+
+The important compatibility facts are:
+
+- Instruction identifiers are strings in `type.value`.
+- Parameters are positional strings containing GDevelop expressions or raw
+  parameter text.
+- Inversion and awaiting are flags on `type`.
+- Disabled is a flag on the instruction object.
+- OR, AND, and NOT are ordinary condition instructions whose operands are in
+  `subInstructions`.
+- Any instruction metadata can evolve independently of this stored positional
+  array, so compilation must use the catalog for the loaded project version.
+
+Friendly IfDo normally hides these details. Typed round-trip metadata for the
+next instruction can be written as:
+
+```events
+@instruction disabled=true awaited=true
+do await Network.SendRequest url="https://example.com"
+```
+
+`awaited=true` is valid only for actions whose metadata supports asynchronous
+execution. Condition inversion is canonically written with `not`; it maps to
+`type.inverted`, not automatically to a separate `BuiltinCommonInstructions::Not`
+instruction.
+
+The closed `@instruction` metadata schema is `disabled`, `inverted`, and
+`awaited`. Friendly `not` and `do await` are canonical when applicable. If an
+annotation and friendly syntax specify the same flag, their values must agree.
+
+### 31.3 Persisted event types and fields
+
+| Serialized `type` | Current fields in addition to common event fields |
+|---|---|
+| `BuiltinCommonInstructions::Standard` | `conditions`, `actions`, optional `events`, optional `variables` |
+| `BuiltinCommonInstructions::Else` | `conditions`, `actions`, optional `events`, optional `variables` |
+| `BuiltinCommonInstructions::While` | `infiniteLoopWarning`, `whileConditions`, `conditions`, `actions`, optional `events`, optional `variables`, optional `loopIndexVariable` |
+| `BuiltinCommonInstructions::Repeat` | `repeatExpression`, `conditions`, `actions`, optional `events`, optional `variables`, optional `loopIndexVariable` |
+| `BuiltinCommonInstructions::ForEach` | `object`, `conditions`, `actions`, optional `events`, optional `variables`, optional `loopIndexVariable`, optional `orderBy`, `order`, and `limit` |
+| `BuiltinCommonInstructions::ForEachChildVariable` | `iterableVariableName`, `valueIteratorVariableName`, `keyIteratorVariableName`, `conditions`, `actions`, optional `events`, optional `variables`, optional `loopIndexVariable` |
+| `BuiltinCommonInstructions::Group` | `name`, `source`, `creationTime`, `colorR`, `colorG`, `colorB`, `parameters`, `events` |
+| `BuiltinCommonInstructions::Comment` | `color` with background/text RGB, `comment`, optional deprecated `comment2` |
+| `BuiltinCommonInstructions::Link` | `target`, `include.includeConfig`, and optional group or index-range attributes |
+| `BuiltinCommonInstructions::JsCode` | `inlineCode`, `parameterObjects`, `useStrict`, `eventsSheetExpanded` |
+
+This table covers all source-persisted event serializers registered by the
+inspected built-in code: the nine common event classes plus the GDJS JavaScript
+event. The internal async event is handled separately below because it is a
+generated preprocessing node, not source-project grammar.
+
+The exact JavaScript event type comes from the GDJS platform event registry.
+A compiler must query the registry rather than hardcode a guessed platform
+prefix.
+
+### 31.4 Internal async event
+
+`BuiltinAsync::Async` is an internal preprocessing event created from awaited
+actions by `BaseEvent::PreprocessAsyncActions`. Its class does not implement a
+persisted source serializer. A decompiler must not emit it from normal project
+JSON, and a source compiler must not accept it as an ordinary event. The source
+form is an awaited action (`do await ...`) on a normal persisted event.
+
+### 31.5 Unknown current event behavior
+
+The current `UnserializeEventsFrom` logs an unknown event type and substitutes
+an `EmptyEvent`. Automatic migration must inspect and validate event types
+before this substitution can occur. An event outside the active typed coverage
+contract stops migration with an unsupported-schema diagnostic. The converter
+must never replace it, preserve it as raw JSON, or claim a successful migration.
+
+---
+
+## 32. Normative event-to-JSON mapping
+
+### 32.1 Standard event
+
+One contiguous standard-event block maps to one
+`BuiltinCommonInstructions::Standard` object:
+
+```events
+local damage:number = 10
+if collision Player Enemy
+if Player.invincible == false
+do Player.health -= local.damage
+
+> if Player.health <= 0
+> do delete Player
+```
+
+Mapping:
+
+- `local` declarations -> `variables`.
+- Top-level `if` condition groups -> `conditions`.
+- `do` lines -> `actions`.
+- `>` event blocks -> `events`.
+- Source order is retained within every list.
+
+The variable compiler must preserve current variable types, enum values,
+persistent UUIDs, folded state, and nested values when they exist. A typed
+primitive declaration may use:
+
+```events
+local lives:number = 3 uuid="..." folded=false
+local state:enum("idle", "run", "hurt") = "idle" uuid="..."
+```
+
+The declaration grammar and typed initializer grammar must represent every
+variable type, nested value, enum value, UUID, folded state, and other field
+persisted by the current variable serializer. If a serializer version exposes
+a field the active DSL version cannot represent, migration stops before writing
+new files; it must not drop the field or embed raw JSON.
+
+### 32.2 AND and OR
+
+Separate entries in an event's `conditions` array are ANDed by the current
+code generator.
+
+```events
+if A
+if B
+do X
+```
+
+emits two condition instructions `[A, B]`.
+
+An IfDo alternative group:
+
+```events
+if A
+or B
+or C
+if D
+do X
+```
+
+emits:
+
+```text
+conditions[0]
+  type.value = BuiltinCommonInstructions::Or
+  subInstructions = [A, B, C]
+conditions[1] = D
+```
+
+This preserves GDevelop object-picking behavior for OR, including the union of
+objects picked by successful alternatives. A compiler must not lower this to
+three sibling events, because that changes action count and picking semantics.
+
+Nested `BuiltinCommonInstructions::And`, `Or`, or `Not` instructions that
+cannot be represented by the simple `if`/`or` grouping use the typed exact
+catalog instruction form with instruction-depth prefixes.
+
+### 32.3 Comparisons and assignments
+
+The friendly comparison:
+
+```events
+if scene.score >= 100
+```
+
+typically maps through catalog metadata to a current comparison instruction
+such as `BuiltinCommonInstructions::CompareNumbers`. String comparisons use
+the string comparison metadata. Variable/property/object comparisons may map
+to more specialized registered instructions.
+
+Similarly:
+
+```events
+do scene.score += 10
+```
+
+does not have a universal JSON `assign` node. The compiler resolves the
+writable target and emits the registered action identifier and its exact
+operator/value parameter order. The semantic IR may use `assign`, but emitted
+serializer JSON may not.
+
+### 32.4 Inversion, NOT, disabled, and awaited
+
+- `if not <condition>` sets the resolved condition instruction's `inverted`
+  flag.
+- A stored `BuiltinCommonInstructions::Not` with sub-instructions remains a
+  distinct logical instruction; it is not conflated with the inverted flag.
+- `@instruction disabled=true` maps to the instruction-level `disabled` field.
+- `@instruction inverted=true` maps to `type.inverted` when the friendly `not`
+  form cannot carry the exact stored structure.
+- `@instruction awaited=true` maps to `type.await` when valid for the action.
+- `do await ...` maps to `type.await=true` after metadata validation.
+
+### 32.5 Sub-instructions
+
+Friendly aliases may define a structured form for catalog instructions that
+accept sub-instructions. The generic exact form is:
+
+```events
+if @exact id="BuiltinCommonInstructions::Or" parameters=[]
+  ? @exact id="BuiltinCommonInstructions::CompareNumbers" parameters=["Variable(A)", ">", "0"]
+  ? @exact id="BuiltinCommonInstructions::CompareNumbers" parameters=["Variable(B)", ">", "0"]
+```
+
+Leading `?` increases instruction depth and is separate from event depth `>`.
+Every nested instruction line repeats the event-depth prefix first, then its
+instruction-depth prefix. For example, a nested event containing an OR child
+condition begins with `> if ...` and its instruction children begin with
+`> ? ...`.
+
+The canonical AI profile prefers `if`/`or` and catalog aliases. The exact form
+exists for decompilation and advanced editing.
+
+---
+
+## 33. Normative structural-event mapping
+
+### 33.1 Else
+
+`else` and `else if` compile to a sibling
+`BuiltinCommonInstructions::Else` event. Branch conditions go in its
+`conditions`, actions in `actions`, branch locals in `variables`, and children
+in `events`.
+
+The current runtime determines the chain from contiguous compatible sibling
+events; the JSON does not store a pointer to the matching event. Therefore the
+compiler keeps an else chain contiguous. A comment/group/link between a source
+event and its `else` is rejected in the canonical round-trip profile.
+
+### 33.2 Loops and loop-owned instructions
+
+Loop events can own conditions, actions, locals, and sub-events. Canonical
+syntax keeps loop-owned lines at the loop's depth and child events one level
+deeper:
+
+```events
+for each Enemy index=i order_by=Enemy.health order=desc limit=10
+if Enemy.active
+do Enemy.rank = i
+
+> if Enemy.health <= 0
+> do delete Enemy
+```
+
+Mapping for `ForEach`:
+
+- Header object -> `object`.
+- `index=` -> `loopIndexVariable`.
+- `order_by=` -> `orderBy`.
+- `order=asc|desc` -> `order`.
+- `limit=` -> the current `ForEach.limit` field and is valid only when
+  `order_by` is present, matching current serialization.
+- Same-depth `if`/`do` -> loop `conditions`/`actions`.
+- Child-depth events -> loop `events`.
+
+`Repeat` maps its count to `repeatExpression` and `index=` to
+`loopIndexVariable`.
+
+`ForEachChildVariable` maps:
+
+```events
+for each child scene.inventory value=item key=itemKey index=i
+```
+
+to `iterableVariableName`, `valueIteratorVariableName`,
+`keyIteratorVariableName`, and `loopIndexVariable`. The earlier shorthand
+`as item` means `value=item`, with an empty key iterator.
+
+`While` has two distinct condition lists:
+
+- The `while` header and immediately following `or` alternatives compile to
+  `whileConditions`.
+- Additional same-depth `if` groups compile to `conditions`.
+- Same-depth `do` lines compile to `actions`.
+- Child events compile to `events`.
+- `index=` maps to `loopIndexVariable`.
+- `@while infiniteLoopWarning=true` preserves the editor warning flag.
+
+The source-only `while limit=N` safety feature has no dedicated current JSON
+field. A compiler may lower it to a generated loop index and an additional
+while condition, but it must mark the generated structure so a decompiler can
+recover it. Without that marker, decompilation emits the explicit conditions
+that are present and does not invent `limit=`.
+
+### 33.3 Comments
+
+One `#` statement maps to one `BuiltinCommonInstructions::Comment` event. A
+newline in one comment value is written as `\n` or a quoted multiline comment
+form; adjacent `#` statements are never automatically merged in the canonical
+round-trip profile because two adjacent comment events are distinguishable in
+JSON.
+
+Presentation metadata is optional in authored source and emitted when needed
+for round-trip fidelity:
+
+```events
+@comment background=[255,230,109] text=[0,0,0] comment2=""
+# Damage handling
+```
+
+### 33.4 Groups
+
+```events
+@group source="" creationTime=0 color=[74,176,228] parameters=[]
+group Combat
+...
+end
+```
+
+maps to `BuiltinCommonInstructions::Group`. `parameters` is the current raw
+string array. A group is a true event containing `events`; it is not merely a
+formatter region.
+
+### 33.5 Links
+
+Current link JSON stores only a `target` string, not whether that target was a
+scene or external event sheet. Runtime lookup checks external events before
+scenes. The canonical round-trip spelling is therefore:
+
+```events
+link "Shared Combat"
+link "Shared Combat" group="Damage"
+link "Shared Combat" range=2..8
+```
+
+Mapping:
+
+- Plain link -> `includeConfig = INCLUDE_ALL` (`0`).
+- `group=` -> `INCLUDE_EVENTS_GROUP` (`1`) and `eventsGroup`.
+- `range=start..end` -> deprecated `INCLUDE_BY_INDEX` (`2`), `start`, and
+  inclusive `end`; this form is retained for current JSON round-trip fidelity.
+
+`link external` and `link scene` remain authoring aliases. They validate the
+resolved target kind, but the distinction is not persisted. A project with a
+scene and external sheet of the same name is rejected by the typed aliases or
+uses the current external-first behavior with the generic form.
+
+### 33.6 JavaScript
+
+```events
+js objects=Enemy strict=true expanded=false
+// source preserved verbatim
+end js
+```
+
+maps to `inlineCode`, `parameterObjects`, `useStrict`, and
+`eventsSheetExpanded`. The body preserves all bytes after newline
+normalization. `objects=` accepts the one object/object-group expression
+supported by the current event. Omitting flags uses current defaults.
+
+---
+
+## 34. Function metadata and current JSON mapping
+
+### 34.1 Current function types
+
+The current `gd::EventsFunction` serializer supports more distinctions than
+the earlier compact function examples:
+
+| Settings `functionType` | IfDo header kind | Current fields/meaning |
+|---|---|---|
+| `Action` | `action` | Callable action, no return value |
+| `Condition` | `condition` | Boolean return through `SetReturnBoolean` |
+| `Expression` + numeric `expressionType` | `number` | Numeric expression return through `SetReturnNumber` |
+| `Expression` + string `expressionType` | `text` | String expression return through `SetReturnString` |
+| `ExpressionAndCondition` | `number-condition` or `text-condition` | One expression exposed with relational-condition support |
+| `ActionWithOperator` | `operator-action` | Setter/action paired with `getterName`; parameters are partly generated from the getter |
+
+Deprecated `StringExpression` is accepted by the current loader for compatibility
+and normalized to `Expression` plus string `expressionType` when written.
+
+Extension lifecycle functions are current `Action` functions whose names are
+one of the names accepted by
+`EventsFunctionsExtension::IsExtensionLifecycleEventsFunction`. `lifecycle`
+is a checked source alias; it is not a sixth stored `functionType`.
+
+`async=true` is independent function metadata. The compiler validates which
+function kinds the current editor permits to be asynchronous.
+
+### 34.2 Function settings
+
+The multi-file project format stores every `EventsFunction` field except
+`events` in the owning TOML settings entry:
+
+- `name`, `fullName`, `description`, `sentence`, and `group`.
+- `getterName`.
+- `private`, `async`, `helpUrl`, `deprecated`, and `deprecationMessage`.
+- Exact `functionType` and `expressionType`.
+- Ordered parameters with name, value type, supplementary information,
+  optional/default settings, descriptions, hints, and `codeOnly`.
+- `objectGroups`.
+
+For extension-level functions, the owner is
+`extensions/<Extension>/functions/<Function>/function.settings`. Prefab and
+behavior methods use their `prefab.settings` or `behavior.settings` entries.
+
+The owner settings entry is the complete metadata source and compiler target.
+Canonical project `.events` files contain neither front matter nor a
+`function` declaration.
+
+### 34.3 Parameter references
+
+IfDo permits readable parameter symbols such as `amount`. Current event
+expressions access non-object parameters through catalog expressions such as
+`GetArgumentAsNumber("amount")`, and object/behavior parameters use the
+function context's registered object/behavior names. The compiler performs
+this lowering according to parameter metadata. It must not place a bare
+parameter name into serializer JSON unless that is the current registered syntax
+for that parameter kind.
+
+### 34.4 Return values
+
+The source assignment:
+
+```events
+do result = expression
+```
+
+maps by function kind to a normal action instruction:
+
+| Function result | Current action type |
+|---|---|
+| Boolean | `SetReturnBoolean` |
+| Number | `SetReturnNumber` |
+| Text | `SetReturnString` |
+
+The expression is the action's positional parameter. Setting a return value
+does not end event execution; later return actions can replace it. The current
+code generator reads `eventsFunctionContext.returnValue` and supplies default
+boolean/number/string coercion at the function boundary.
+
+### 34.5 Owner-specific functions
+
+An extension function, prefab method, and behavior method are all serialized
+as `EventsFunction`, but live in different `EventsFunctionsContainer` owners.
+Per-function or owner settings determine the container. Implicit
+object/behavior parameters and generated call names come from the current
+metadata declaration helper; the compiler must not treat all three owners as
+identical extension-level functions.
+
+### 34.6 Folder and order metadata
+
+Function folder structure is not derivable from filenames. `extension.settings`
+preserves the ordered manifest and `eventsFunctionsFolderStructure` for
+extension-level functions, with each entry pointing to
+`functions/<Function>/function.settings`. `prefab.settings` and
+`behavior.settings` preserve the same information for their own methods. A DSL
+decompiler must not sort function files alphabetically and thereby change
+editor presentation/group ownership.
+
+---
+
+## 35. Exhaustive typed coverage
+
+The multi-file source contract must represent every field persisted by the
+current supported GDevelop serializers: IfDo owns event bodies, while the
+owning TOML settings own function identity and metadata. Raw event or
+instruction JSON fallback constructs are not part of IfDo.
+
+### 35.1 Event completeness
+
+- Every persisted event type in section 31.3 has a canonical typed construct.
+- Every additional persisted event type registered by a supported platform
+  extension must provide a versioned typed IfDo adapter. Registering an event
+  serializer without a matching adapter makes that project schema ineligible
+  for conversion.
+- Every common event field is represented by normal syntax or a typed metadata
+  annotation with a closed, validated field schema.
+- Every event-specific field listed in sections 32 and 33 has a typed operand,
+  named argument, annotation, or body form.
+- Local variables and their recursively nested values use the complete typed
+  variable grammar; no variable field may be omitted during decompilation.
+- JavaScript remains a first-class `js ... end js` event. Its raw source body
+  does not permit raw event or instruction JSON.
+
+### 35.2 Instruction completeness
+
+Every condition and action registered in the closed project catalog must be
+representable in one of two typed forms:
+
+1. A friendly alias with named, catalog-typed arguments.
+2. The exact `@exact` form using a registered instruction identifier,
+   its catalog-validated positional parameter strings, flags, and recursively
+   typed `?` sub-instructions.
+
+The exact form is still IfDo syntax: its identifier must exist in the loaded
+catalog, its condition/action kind must match its source position, parameters
+must match the registered signature, and its sub-instruction structure must be
+valid. It is not an arbitrary JSON container.
+
+### 35.3 Unsupported schema handling
+
+The supported serializer version and the DSL coverage version form one
+compatibility contract. When GDevelop adds a persisted event type or field, the
+DSL grammar, compiler, decompiler, formatter, and tests must be updated before
+that serializer version can be migrated.
+
+The implementation maintains a machine-readable coverage manifest containing
+the supported serializer/GDevelop version range, every persisted event type and
+field, the variable schema, metadata annotation schemas, and the catalog API
+version. Migration checks this manifest before decompiling the first event.
+
+If conversion encounters an event type, instruction identifier, field, value
+shape, or metadata value outside the active contract:
+
+- Loading the original JSON through the existing reader may remain available.
+- Automatic conversion stops before any new-format source is committed.
+- The diagnostic identifies the JSON Pointer, serialized type, owning source,
+  and required DSL/compiler version.
+- The converter must not drop the construct, replace it with an empty event,
+  guess a mapping, or store raw JSON in `.events`.
+
+This strict failure rule makes exhaustive typed coverage an implementation
+requirement rather than delegating unsupported data to an opaque fallback.
+
+---
+
+## 36. Bidirectional conversion algorithm
+
+### 36.1 DSL to current serializer JSON
+
+1. Resolve and validate the owning TOML settings target; parse no TOML from
+   the `.events` body.
+2. Scan JavaScript bodies.
+3. Parse event depth and instruction depth.
+4. Build the typed IfDo AST.
+5. Load the closed project-specific catalog.
+6. Resolve names, owners, objects, behaviors, variables, parameters,
+   resources, and function calls.
+7. Lower friendly comparisons, assignments, aliases, and result writes to
+   exact current instruction identifiers and positional parameter strings.
+8. Build exact event objects and attach common/presentation metadata.
+9. Reject any AST construct or catalog value that lacks a complete typed
+   serializer mapping.
+10. Unserialize the result through `EventsListSerialization` in a validation
+    project and reserialize canonically as a self-check.
+
+### 36.2 Current serializer JSON to DSL
+
+1. Read the original event array before unknown events can become `EmptyEvent`.
+2. Normalize fields accepted by current compatibility code.
+3. Resolve each instruction identifier against the loaded catalog.
+4. Recognize bijective friendly patterns: comparisons, assignments, OR groups,
+   return actions, loops, links, comments, groups, and JavaScript.
+5. Emit typed event/instruction metadata for every persisted field.
+6. Emit complete typed variables, including recursively nested values and all
+   serializer metadata.
+7. Compile the candidate source in memory.
+8. Compare the compiled canonical node with the normalized input node.
+9. If comparison fails or any node is outside the active coverage contract,
+   stop conversion with a source-located unsupported-schema diagnostic.
+10. Format canonically and perform a final whole-file compile/compare.
+
+### 36.3 Equivalence definition
+
+Round-trip equivalence is structural equality after current compatibility
+normalization and canonical default expansion. It includes:
+
+- Event and instruction types.
+- All flags and editor metadata.
+- Every parameter string in order.
+- Every sub-instruction and event in order.
+- Local variable type/value/metadata.
+- All event-specific fields.
+
+It does not require preserving obsolete spelling that the current loader
+already normalizes, such as a deprecated field name or deprecated
+`StringExpression` function-type spelling. The migration report lists every
+applied compatibility normalization.
+
+### 36.4 Required implementation tests
+
+- Golden JSON for every row in the persisted-event table.
+- OR picking and nested sub-instruction tests.
+- Disabled, inverted, awaited, folded, and AI-generated ID tests.
+- All variable types, UUIDs, enum values, structures, and arrays.
+- ForEach sort/order/limit and all loop-owned lists.
+- Link include-all/group/range and name-collision behavior.
+- JavaScript flags and byte-preserved body tests.
+- All current function types and owners.
+- Coverage tests proving that every current persisted event type, field, and
+  registered instruction shape has a typed DSL representation.
+- Registry/coverage-manifest tests that fail whenever a supported platform
+  registers a persisted event serializer without a versioned typed adapter.
+- Parser tests rejecting raw event or instruction JSON fallback syntax.
+- Unsupported/newer type and field tests proving conversion stops without
+  writing partial source files.
+- Corpus migration across repository game projects.
+- `current JSON -> DSL -> current JSON -> gd::Project -> canonical current
+  JSON` equality.

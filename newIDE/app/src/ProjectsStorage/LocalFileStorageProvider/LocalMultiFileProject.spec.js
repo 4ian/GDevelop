@@ -22,7 +22,9 @@ import {
 } from './LocalMultiFileProject';
 import { onOpen } from './LocalProjectOpener';
 import {
+  GENERATED_LEGACY_PROJECT_RELATIVE_PATH,
   getProjectLocation,
+  onSaveProject,
   writeProjectInstructionCatalog,
 } from './LocalProjectWriter';
 
@@ -103,7 +105,7 @@ describe('Local multi-file project storage', () => {
     const entryPath = path.join(temporaryDirectory, 'project.settings');
     const files = decomposeLegacyProjectToFiles(projectFixture);
     files['game://scenes/Main/Main.events'] =
-      '@event\ndo @Network::Send url="\\"https://example.com\\"" runtime=""\n';
+      '@event\ndo Network::Send url="\\"https://example.com\\"" runtime=""\n';
     await writeMultiFileSourceTree({ entryPath, files });
     const catalog = {
       format: 'gdevelop-ifdo-instruction-catalog',
@@ -275,6 +277,38 @@ describe('Local multi-file project storage', () => {
     expect(catalog.counts.actions).toBeGreaterThan(100);
     expect(catalog.counts.conditions).toBeGreaterThan(100);
     expect(catalog.counts.expressions).toBeGreaterThan(100);
+    project.delete();
+  });
+
+  test('writes the generated legacy game.json on every multi-file save', async () => {
+    const gd: libGDevelop = global.gd;
+    const project = gd.ProjectHelper.createNewGDJSProject();
+    project.setName('Generated compatibility project');
+    const entryPath = path.join(temporaryDirectory, 'project.settings');
+
+    await onSaveProject(
+      project,
+      ({
+        fileIdentifier: entryPath,
+        name: project.getName(),
+        gameId: project.getProjectUuid(),
+        lastModifiedDate: 0,
+      }: any),
+      undefined,
+      {
+        showAlert: jest.fn(),
+        showConfirmation: jest.fn(),
+      }
+    );
+
+    const generatedPath = path.join(
+      temporaryDirectory,
+      ...GENERATED_LEGACY_PROJECT_RELATIVE_PATH.split('/')
+    );
+    expect(fs.existsSync(generatedPath)).toBe(true);
+    expect(
+      JSON.parse(fs.readFileSync(generatedPath, 'utf8')).properties.name
+    ).toBe('Generated compatibility project');
     project.delete();
   });
 

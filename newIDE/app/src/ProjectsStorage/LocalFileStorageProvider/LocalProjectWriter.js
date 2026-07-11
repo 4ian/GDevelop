@@ -37,6 +37,8 @@ import {
 
 const fs = optionalRequire('fs-extra');
 const path = optionalRequire('path');
+
+export const GENERATED_LEGACY_PROJECT_RELATIVE_PATH = '.gdevelop/game.json';
 const remote = optionalRequire('@electron/remote');
 const dialog = remote ? remote.dialog : null;
 
@@ -200,6 +202,13 @@ const writeProjectFiles = async ({
       path.join(
         projectPath,
         ...PROJECT_INSTRUCTION_CATALOG_RELATIVE_PATH.split('/')
+      )
+    );
+    await writeAndCheckFormattedJSONFile(
+      serializedProjectObject,
+      path.join(
+        projectPath,
+        ...GENERATED_LEGACY_PROJECT_RELATIVE_PATH.split('/')
       )
     );
     console.log(

@@ -18,7 +18,6 @@ const catalogFixture = {
   formatVersion: 1,
   actions: [
     {
-      kind: 'action',
       type: 'Network::Send',
       parameters: [
         { index: 0, dslName: 'url', isOptional: false, isCodeOnly: false },
@@ -29,7 +28,6 @@ const catalogFixture = {
   ],
   conditions: [
     {
-      kind: 'condition',
       type: 'Network::Succeeded',
       parameters: [
         {
@@ -48,8 +46,8 @@ describe('project IfDo instruction catalog', () => {
   test('compiles named catalog instructions with exact serialized operands', () => {
     const output = JSON.parse(
       compileIfDoToLegacyEventsJson(
-        `if @Network::Succeeded request_id="RequestId"\n` +
-          `do @Network::Send url="\\\"https://example.com\\\"" body="Variable(Payload)"\n`,
+        `if Network::Succeeded request_id="RequestId"\n` +
+          `do Network::Send url="\\\"https://example.com\\\"" body="Variable(Payload)"\n`,
         { resolveInstruction: createCatalogInstructionResolver(catalogFixture) }
       )
     );
@@ -89,10 +87,19 @@ describe('project IfDo instruction catalog', () => {
       resolveInstruction: createCatalogInstructionResolver(catalogFixture),
     });
 
-    expect(dsl).toContain('if @Network::Succeeded request_id="RequestId"');
-    expect(dsl).toContain('do @Network::Send');
+    expect(dsl).toContain('if Network::Succeeded request_id="RequestId"');
+    expect(dsl).toContain('do Network::Send');
+    expect(dsl).not.toContain('runtime=');
     expect(dsl).not.toContain('@exact');
     expect(areLegacyEventsEquivalent(input, output)).toBe(true);
+  });
+
+  test('rejects the removed @ catalog prefix', () => {
+    expect(() =>
+      compileIfDoToLegacyEventsJson('do @Network::Send url="x" body="y"\n', {
+        resolveInstruction: createCatalogInstructionResolver(catalogFixture),
+      })
+    ).toThrow('expected InstructionType');
   });
 
   test('generates a deterministic complete catalog from the loaded platform', () => {
@@ -104,6 +111,43 @@ describe('project IfDo instruction catalog', () => {
     expect(catalog.counts.actions).toBeGreaterThan(100);
     expect(catalog.counts.conditions).toBeGreaterThan(100);
     expect(catalog.counts.expressions).toBeGreaterThan(100);
+    expect(catalog.authoring.catalogConditionSyntax).toBe(
+      'if InstructionType dslName="exact serialized operand"'
+    );
+    expect(catalog.authoring.catalogActionSyntax).toBe(
+      'do InstructionType dslName="exact serialized operand"'
+    );
+    expect(
+      [...catalog.actions, ...catalog.conditions, ...catalog.expressions].some(
+        entry => entry.kind !== undefined
+      )
+    ).toBe(false);
+    const sceneInput = JSON.stringify([
+      {
+        type: 'BuiltinCommonInstructions::Standard',
+        conditions: [
+          {
+            type: { value: 'SceneJustBegins' },
+            parameters: [''],
+          },
+        ],
+        actions: [],
+      },
+    ]);
+    const sceneDsl = convertLegacyEventsJsonToIfDo(sceneInput, {
+      formatInstruction: createCatalogInstructionFormatter(catalog),
+    });
+    expect(sceneDsl).toContain('if SceneJustBegins');
+    expect(sceneDsl).not.toContain('scene begins');
+    expect(sceneDsl).not.toContain('parameter_0=');
+    expect(
+      areLegacyEventsEquivalent(
+        sceneInput,
+        compileIfDoToLegacyEventsJson(sceneDsl, {
+          resolveInstruction: createCatalogInstructionResolver(catalog),
+        })
+      )
+    ).toBe(true);
     expect(
       catalog.actions.some(entry => entry.type === 'SetNumberVariable')
     ).toBe(true);

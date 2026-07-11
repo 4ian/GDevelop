@@ -617,12 +617,11 @@ export const decomposeLegacyProjectToFiles = (legacyProject, options = {}) => {
   const project = clone(asObject(legacyProject, 'Project'));
   const files = {};
   const projectPayload = omitFields(project, PROJECT_SPLIT_FIELDS);
-  const sceneFiles = [];
   const extensionFiles = [];
   const sceneNames = new Set();
   const extensionNames = new Set();
 
-  (project.layouts || []).forEach(layout => {
+  (project.layouts || []).forEach((layout, order) => {
     const name = String(layout.name || '');
     const folderName = uniqueManagedName(name, sceneNames);
     const settingsUri = encodeUriPath(['scenes', folderName, 'scene.settings']);
@@ -636,12 +635,6 @@ export const decomposeLegacyProjectToFiles = (legacyProject, options = {}) => {
       folderName,
       `${folderName}.events`,
     ]);
-    sceneFiles.push({
-      name,
-      settings: settingsUri,
-      layout: layoutUri,
-      events: eventsUri,
-    });
     const settingsPayload = omitFields(
       layout,
       new Set([...SCENE_LAYOUT_FIELDS, 'events'])
@@ -651,6 +644,9 @@ export const decomposeLegacyProjectToFiles = (legacyProject, options = {}) => {
         [name]: {
           kind: 'scene',
           settingsFormatVersion: MULTI_FILE_FORMAT_VERSION,
+          order,
+          layout: layoutUri,
+          events: eventsUri,
           ...settingsPayload,
         },
       },
@@ -837,7 +833,6 @@ export const decomposeLegacyProjectToFiles = (legacyProject, options = {}) => {
     kind: 'project',
     settingsFormatVersion: MULTI_FILE_FORMAT_VERSION,
     ...projectPayload,
-    sceneFiles,
     extensionFiles,
     ...(externalSettings ? { externalSettings } : {}),
     ...(options.migration ? { migration: clone(options.migration) } : {}),
@@ -966,6 +961,29 @@ const validateSceneManifestPaths = entry => {
       `Scene ${
         entry.name
       } must reference one settings/layout/events trio in its scene folder.`
+    );
+  }
+};
+
+const validateOwnedScenePaths = (settingsUri, entry) => {
+  const settingsPath = validateGameUri(settingsUri);
+  const layoutPath = validateGameUri(entry.layout);
+  const eventsPath = validateGameUri(entry.events);
+  const settingsSegments = settingsPath.split('/');
+  const folder = settingsSegments[1];
+  if (
+    settingsSegments.length !== 3 ||
+    settingsSegments[0] !== 'scenes' ||
+    settingsSegments[2] !== 'scene.settings' ||
+    layoutPath !== `scenes/${folder}/${folder}.layout` ||
+    eventsPath !== `scenes/${folder}/${folder}.events`
+  ) {
+    fail(
+      'MULTIFILE_INVALID_MANIFEST_PATH',
+      `Scene ${
+        entry.name
+      } must own one layout/events pair in its scene folder.`,
+      settingsUri
     );
   }
 };
@@ -1157,21 +1175,90 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
     settingsUris.push(uri);
     externalDocument = parseSettings(files, uri);
   }
-  const sceneEntries = asArray(
+  const legacySceneEntries = asArray(
     projectNamespace.sceneFiles,
     'project.sceneFiles'
   );
-  assertUniqueManifestNames(
-    sceneEntries,
-    'project.sceneFiles',
-    MULTI_FILE_ENTRY_URI
-  );
-  const sceneDocuments = sceneEntries.map(entry => {
-    validateSceneManifestPaths(entry);
-    const uri = registerUri(expectString(entry.settings, 'scene.settings'));
-    settingsUris.push(uri);
-    return { entry, uri, document: parseSettings(files, uri) };
-  });
+  let sceneDocuments;
+  if (legacySceneEntries.length) {
+    assertUniqueManifestNames(
+      legacySceneEntries,
+      'project.sceneFiles',
+      MULTI_FILE_ENTRY_URI
+    );
+    sceneDocuments = legacySceneEntries.map((entry, order) => {
+      validateSceneManifestPaths(entry);
+      const uri = registerUri(expectString(entry.settings, 'scene.settings'));
+      settingsUris.push(uri);
+      return {
+        entry: { ...entry, order },
+        uri,
+        document: parseSettings(files, uri),
+      };
+    });
+  } else {
+    sceneDocuments = Object.keys(files)
+      .filter(uri => /^game:\/\/scenes\/[^/]+\/scene\.settings$/.test(uri))
+      .map(uri => {
+        registerUri(uri);
+        settingsUris.push(uri);
+        const document = parseSettings(files, uri);
+        const scenes = asObject(document.scenes, 'scenes', uri);
+        const sceneNames = Object.keys(scenes);
+        if (sceneNames.length !== 1) {
+          fail(
+            'MULTIFILE_INVALID_SCHEMA',
+            'scene.settings must contain exactly one scenes.<name> namespace.',
+            uri
+          );
+        }
+        const name = sceneNames[0];
+        const namespace = restoreTomlPayload(
+          requireNamespace(document, ['scenes', name], uri),
+          uri
+        );
+        if (
+          namespace.kind !== 'scene' ||
+          namespace.settingsFormatVersion !== MULTI_FILE_FORMAT_VERSION
+        ) {
+          fail(
+            'MULTIFILE_UNSUPPORTED_VERSION',
+            'Invalid scene namespace marker.',
+            uri
+          );
+        }
+        if (!Number.isInteger(namespace.order) || Number(namespace.order) < 0) {
+          fail(
+            'MULTIFILE_INVALID_SCHEMA',
+            'scenes.<name>.order must be a non-negative integer.',
+            uri
+          );
+        }
+        const entry = {
+          name,
+          order: Number(namespace.order),
+          layout: expectString(namespace.layout, 'scene.layout', uri),
+          events: expectString(namespace.events, 'scene.events', uri),
+        };
+        validateOwnedScenePaths(uri, entry);
+        return { entry, uri, document };
+      })
+      .sort((left, right) => left.entry.order - right.entry.order);
+    assertUniqueManifestNames(
+      sceneDocuments.map(({ entry }) => entry),
+      'scene settings',
+      MULTI_FILE_ENTRY_URI
+    );
+    sceneDocuments.forEach(({ entry, uri }, expectedOrder) => {
+      if (entry.order !== expectedOrder) {
+        fail(
+          'MULTIFILE_INVALID_SCHEMA',
+          `Scene order must be contiguous from 0; expected ${expectedOrder}.`,
+          uri
+        );
+      }
+    });
+  }
   const extensionEntries = asArray(
     projectNamespace.extensionFiles,
     'project.extensionFiles'
@@ -1228,7 +1315,10 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
       uri
     );
     validateManifestIdentity(entry, namespace, uri);
-    const settings = removeFormatFields(namespace);
+    const settings = omitFields(
+      removeFormatFields(namespace),
+      new Set(['order', 'layout', 'events'])
+    );
     const layoutUri = registerUri(
       expectString(entry.layout, 'scene.layout', uri)
     );
@@ -1245,13 +1335,6 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
         );
       }
     });
-    if (settings.events !== undefined) {
-      fail(
-        'MULTIFILE_OWNERSHIP_CONFLICT',
-        'Scene settings cannot contain events.',
-        uri
-      );
-    }
     return {
       ...settings,
       ...layout,

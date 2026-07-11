@@ -216,7 +216,15 @@ describe('GDevelop multi-file project format', () => {
 
     expect(areLegacyProjectsEquivalent(projectFixture, output)).toBe(true);
     expect(files[MULTI_FILE_ENTRY_URI]).toContain('[gdevelop]');
-    expect(files[MULTI_FILE_ENTRY_URI]).toContain('[[project.sceneFiles]]');
+    expect(files[MULTI_FILE_ENTRY_URI]).not.toContain('sceneFiles');
+    expect(files[MULTI_FILE_ENTRY_URI]).not.toContain('game://scenes/');
+    expect(files['game://scenes/Main/scene.settings']).toContain(
+      'layout = "game://scenes/Main/Main.layout"'
+    );
+    expect(files['game://scenes/Main/scene.settings']).toContain(
+      'events = "game://scenes/Main/Main.events"'
+    );
+    expect(files['game://scenes/Main/scene.settings']).toContain('order = 0');
     expect(files['game://scenes/Main/Main.layout']).not.toContain('events');
     expect(files['game://scenes/Main/Main.events']).toContain('@event');
     expect(files['game://externals/external.settings']).toContain(
@@ -321,7 +329,7 @@ describe('GDevelop multi-file project format', () => {
     );
 
     const duplicated = decomposeLegacyProjectToFiles(projectFixture);
-    duplicated[MULTI_FILE_ENTRY_URI] = duplicated[MULTI_FILE_ENTRY_URI].replace(
+    duplicated[sceneSettingsUri] = duplicated[sceneSettingsUri].replace(
       'events = "game://scenes/Main/Main.events"',
       'events = "game://scenes/Main/Main.layout"'
     );

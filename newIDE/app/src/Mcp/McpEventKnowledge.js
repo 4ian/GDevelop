@@ -1920,7 +1920,6 @@ const catalogOwner = (scope: Object): ?Object => {
 
 const catalogInstruction = (summary: Object, scope: Object): Object => {
   const instruction: Object = {
-    kind: summary.kind,
     type: summary.type,
     name: summary.fullName,
     description: summary.description,
@@ -1941,7 +1940,6 @@ const catalogInstruction = (summary: Object, scope: Object): Object => {
 
 const catalogExpression = (summary: Object, scope: Object): Object => {
   const expression: Object = {
-    kind: 'expression',
     type: summary.type,
     name: summary.fullName,
     description: summary.description,
@@ -2019,11 +2017,11 @@ export const buildCompleteProjectInstructionCatalog = ({
     authoring: {
       sourceExtension: '.events',
       preferredSyntax:
-        'Use friendly IfDo syntax when the DSL specification defines it. Otherwise use the catalog form below.',
+        'Use the exact instruction type and named parameters from this catalog. The DSL does not define hardcoded instruction aliases.',
       catalogConditionSyntax:
-        'if @InstructionType dslName="exact serialized operand"',
+        'if InstructionType dslName="exact serialized operand"',
       catalogActionSyntax:
-        'do @InstructionType dslName="exact serialized operand"',
+        'do InstructionType dslName="exact serialized operand"',
       eventScopes: {
         scene: 'Scene and external events',
         extensionFunction: 'Free extension function events',
@@ -2033,6 +2031,7 @@ export const buildCompleteProjectInstructionCatalog = ({
         customObjectInternal: 'Custom object internal events',
       },
       rules: [
+        'Write catalog instruction types directly without an @ prefix.',
         'Use each parameter dslName exactly as listed.',
         'Catalog-form argument values are JSON strings containing the exact GDevelop serialized operand.',
         'Include every required parameter. Code-only parameters may be omitted and compile to an empty string.',

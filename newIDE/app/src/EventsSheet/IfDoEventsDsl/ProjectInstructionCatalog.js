@@ -45,7 +45,7 @@ type CatalogParameter = {
   [string]: any,
 };
 type CatalogEntry = {
-  kind: CatalogKind,
+  kind?: CatalogKind,
   type: string,
   parameters: Array<CatalogParameter>,
   [string]: any,
@@ -70,7 +70,11 @@ const entriesForKind = (
   kind === 'condition' ? catalog.conditions : catalog.actions;
 
 const validateCatalogEntry = (entry: any, kind: CatalogKind) => {
-  if (!entry || typeof entry !== 'object' || entry.kind !== kind)
+  if (
+    !entry ||
+    typeof entry !== 'object' ||
+    (entry.kind !== undefined && entry.kind !== kind)
+  )
     fail('IFDO_CATALOG_INVALID', `Invalid ${kind} catalog entry.`);
   if (typeof entry.type !== 'string' || !entry.type)
     fail('IFDO_CATALOG_INVALID', `A ${kind} catalog entry has no type.`);
@@ -156,11 +160,11 @@ export const createCatalogInstructionResolver = (
     source: string,
     line: number,
   }): LegacyInstruction => {
-    const match = /^@([^\s]+)(?:\s+(.*))?$/.exec(source);
+    const match = /^([^@\s][^\s]*)(?:\s+(.*))?$/.exec(source);
     if (!match) {
       throw new ProjectInstructionCatalogError(
         'IFDO_CATALOG_INSTRUCTION_REQUIRED',
-        `Line ${line}: expected @InstructionType with named arguments.`
+        `Line ${line}: expected InstructionType with named arguments.`
       );
     }
     const type = match[1];
@@ -233,14 +237,17 @@ export const createCatalogInstructionFormatter = (
     const instructionParameters = instruction.parameters || [];
     if (!entry || entry.parameters.length !== instructionParameters.length)
       return null;
-    return `@${entry.type}${
-      entry.parameters.length ? ' ' : ''
-    }${entry.parameters
+    const operands = entry.parameters
+      .map((parameter, index) => ({
+        parameter,
+        value: instructionParameters[index],
+      }))
+      .filter(({ parameter, value }) => !(parameter.isCodeOnly && value === ''))
       .map(
-        (parameter, index) =>
-          `${parameter.dslName}=${JSON.stringify(instructionParameters[index])}`
-      )
-      .join(' ')}`;
+        ({ parameter, value }) =>
+          `${parameter.dslName}=${JSON.stringify(value)}`
+      );
+    return `${entry.type}${operands.length ? ` ${operands.join(' ')}` : ''}`;
   };
 };
 

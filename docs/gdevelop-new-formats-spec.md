@@ -78,7 +78,9 @@ phase 5 before they can store this directory format natively.
 6. **Ordering is explicit.** Array order, scene order, function order, folder order, layer order, object order, and event order are semantically preserved.
 7. **Writes are deterministic and transactional.** Formatting, key order, path spelling, and newline behavior are canonical.
 8. **Legacy import is one-way by default.** The original JSON is retained as an unchanged backup; it is not updated after successful conversion.
-9. **Preview and export never treat the source tree as runtime data.** They receive a temporary legacy serializer tree or, only when a path is required, a temporary JSON file outside the project directory.
+9. **Preview and export never treat the source tree as runtime data.** They
+   receive a composed legacy serializer tree or, when a path is required, the
+   generated `.gdevelop/game.json` compatibility snapshot.
 10. **`.layout` files are visual/UI-focused.** Scene identity, variables,
     runtime/loading/input settings, shared behavior data, and events belong in
     `scene.settings` or `.events`; `.layout` retains only visual/editor data as
@@ -202,6 +204,9 @@ both; the two files remain independent unless both are listed in
   action, condition, and expression with stable named parameters, operand
   syntax, and event-scope compatibility for AI authoring. It is generated
   editor state, not source, and must never be edited by an AI model.
+- `.gdevelop/game.json`, regenerated from the composed legacy serializer tree
+  on every manual project save. It is an ignored runtime/export compatibility
+  snapshot, never editable project source.
 - `.gdevelop/state.json` for local hashes, last-seen modification times, and crash recovery. It is not portable project content.
 
 ---
@@ -287,10 +292,12 @@ only by a newline, in this deterministic dependency order:
    manifest order.
 
 The loader may bootstrap-parse `project.settings` and each subsequently reached
-manifest-bearing settings fragment only to discover the ordered settings graph.
-It then appends the discovered fragments without key rewriting, object merging,
-or conflict resolution. The combined text is parsed once as the authoritative
-settings document; all bootstrap results are discarded.
+managed directory conventions to discover settings fragments. In particular,
+scene settings are discovered as `scenes/*/scene.settings`; they are not listed
+in `project.settings`. The loader then appends the discovered fragments without
+key rewriting, object merging, or conflict resolution. The combined text is
+parsed once as the authoritative settings document; all bootstrap results are
+discarded.
 
 The result is an ephemeral in-memory document called
 `CombinedProjectSettings` in this specification. Conceptually:
@@ -322,9 +329,8 @@ Every `.settings` file remains an independent canonical TOML file when stored:
   another settings file.
 - The format has no TOML `include`, import, inheritance, or textual-expansion
   directive for settings.
-- Manifest URI fields may identify another settings artifact for discovery,
-  ordering, or ownership. Such a URI is a reference, not an include, and does
-  not embed the referenced TOML into the referring file.
+- A scene settings fragment owns its `.layout` and `.events` references. The
+  project fragment never embeds or repeats those references.
 - Loading and compilation append the fragments in memory; saving performs the
   inverse ownership projection and writes each changed subtree only to its
   owning file.
@@ -345,8 +351,9 @@ Additional rules for stored fragments and their combined shape:
   `project.settings` additionally owns the one reserved `[gdevelop]` format
   table used to bootstrap the combined document.
 - A file must not declare or reopen a table owned by another settings file.
-- Project manifest arrays use names such as `sceneFiles` and `extensionFiles`;
-  the external manifest uses `eventFiles` and `layoutFiles`;
+- Project manifest arrays use names such as `extensionFiles`; scenes are
+  discovered from their required folders and carry their order in
+  `scene.settings`. The external manifest uses `eventFiles` and `layoutFiles`;
   extension manifests use `functionFiles`, `prefabFiles`, and `behaviorFiles`.
   These names are deliberately distinct from the `scenes`, `extensions`,
   `functions`, `prefabs`, and `behaviors` namespace tables.
@@ -467,7 +474,6 @@ to references to other `.settings` files and to all `.layout` and `.events`
 files, for example:
 
 ```toml
-settings = "game://scenes/Main/scene.settings"
 layout = "game://scenes/Main/Main.layout"
 events = "game://scenes/Main/Main.events"
 ```
@@ -557,12 +563,6 @@ folderProject = true
 packageName = "com.example.mygame"
 orientation = "default"
 
-[[project.sceneFiles]]
-name = "Main"
-settings = "game://scenes/Main/scene.settings"
-layout = "game://scenes/Main/Main.layout"
-events = "game://scenes/Main/Main.events"
-
 [[project.extensionFiles]]
 name = "Combat"
 settings = "game://extensions/Combat/extension.settings"
@@ -572,10 +572,11 @@ Real files also contain the projected `resources`, `objects`, `objectsFolderStru
 
 ### 6.3 Manifest rules
 
-- `sceneFiles` and `extensionFiles` preserve current project order.
+- `extensionFiles` preserves current extension order. Scene order is the
+  contiguous zero-based `order` value owned by each `scene.settings` fragment.
 - Names are unique within their current legacy container.
-- A scene entry always references one settings, one layout, and one events
-  file in the same scene subfolder.
+- Every discovered `scene.settings` references one layout and one events file
+  in its own scene subfolder.
 - Every managed file reference is a canonical project-root `game://` URI;
   relative paths are invalid.
 - A referenced path occurs only once in the complete project graph.
@@ -635,6 +636,9 @@ from the current `gd::Layout` serializer object:
 [scenes."Main"]
 kind = "scene"
 settingsFormatVersion = 1
+order = 0
+layout = "game://scenes/Main/Main.layout"
+events = "game://scenes/Main/Main.events"
 name = "Main"
 mangledName = "Main"
 title = "My Game"
@@ -647,6 +651,8 @@ disableInputWhenNotFocused = true
 
 It also owns:
 
+- The scene's stable project order and its canonical `game://` layout/events
+  references.
 - Scene variables.
 - Scene object groups used by events and object picking.
 - Behavior shared data used by scene objects.
@@ -717,8 +723,8 @@ copy.
 
 ### 7.3 `<Scene>.events`
 
-The events file contains only the scene's IfDo DSL body. `scene.settings` and
-the `project.settings` scene manifest supply its identity:
+The events file contains only the scene's IfDo DSL body. Its owning
+`scene.settings` supplies its identity and source reference:
 
 ```events
 # Initialize the scene.
@@ -747,14 +753,14 @@ write the three source files independently.
 
 ### 7.5 Cross-file validation
 
-- Manifest scene name, `scene.settings` name, and `.events`/`.layout`
-  basenames must match exactly.
+- The `scene.settings` namespace name and `.events`/`.layout` basenames must
+  match exactly.
 - The settings/layout/events trio is indivisible. A missing member is a load
   error.
-- All three files must resolve inside the scene subfolder recorded by the
-  manifest.
-- Scene rename changes all four identities (manifest plus three files) and
-  project references in one transaction.
+- All three files must resolve inside the discovered scene subfolder.
+- Scene rename changes the settings namespace, the three filenames, and project
+  references in one transaction; `project.settings` has no scene-file manifest
+  entry to update.
 
 ---
 
@@ -1204,7 +1210,9 @@ project.settings
 
 ### 13.3 Two-pass catalog bootstrap
 
-Friendly DSL names cannot be compiled safely without the loaded project's instruction metadata. The loader therefore uses two logical passes:
+Catalog instruction types and named parameters cannot be compiled safely
+without the loaded project's instruction metadata. The loader therefore uses
+two logical passes:
 
 1. Parse all TOML settings/layout files and resolve every pure `.events` body
    through its owner manifest.
@@ -1322,15 +1330,18 @@ The writer:
    installed extensions, object/behavior metadata, and function signatures.
    The lean JSON keeps only DSL-authoring metadata and writes one compact
    instruction per line for targeted `rg` searches. UI icons, help paths,
-   derived parameter templates, and repeated scope labels are excluded. The
-   catalog is deterministically ordered and written only after source
+   derived parameter templates, repeated scope labels, and per-entry `kind`
+   fields already implied by the parent array are excluded. The catalog is
+   deterministically ordered and written only after source
    verification succeeds.
-7. Updates ignored state hashes.
+7. Writes the equivalent composed legacy project to `.gdevelop/game.json` as
+   an ignored compatibility snapshot.
+8. Updates ignored state hashes.
 
 The generated catalog and IfDo compiler share one named-instruction contract.
-For an instruction without a shorter friendly alias, source uses its catalog
-type and each parameter's exact `dslName`; values are JSON strings containing
-the serialized operand. This lets an AI edit `.events` directly without MCP
+Every instruction uses its exact catalog type and each parameter's exact
+`dslName`; values are JSON strings containing the serialized operand. The DSL
+does not hardcode instruction aliases. This lets an AI edit `.events` directly without MCP
 instruction-discovery or event-writing tools. The loader reads the ignored
 catalog to resolve these named forms. Missing, invalid, or stale catalog entries
 produce diagnostics rather than guessed positional arrays.
@@ -1357,7 +1368,8 @@ On next open, an incomplete transaction is either completed from verified stagin
 
 ### 15.3 Autosave
 
-Autosave must not recreate a large legacy JSON project beside the source tree. Recommended behavior:
+Autosave does not rewrite `.gdevelop/game.json`; that compatibility snapshot is
+owned by normal Save/Save As. Recommended autosave behavior:
 
 - Store per-component recovery snapshots under `.gdevelop/autosave/<transaction>/`.
 - Include a small recovery manifest identifying the base hashes.
@@ -1429,7 +1441,10 @@ This metadata does not make the JSON an active source.
 
 ### 16.5 Legacy export/save-as
 
-Writing a permanent legacy JSON is an explicit compatibility export, not normal Save. It composes current sources, validates them, and writes a user-selected `.json`. The editor continues tracking `project.settings` afterward.
+Writing a user-selected legacy JSON outside `.gdevelop/` is an explicit
+compatibility export, not normal Save. It composes current sources, validates
+them, and writes the selected `.json`. The editor continues tracking
+`project.settings`; the ignored `.gdevelop/game.json` snapshot is separate.
 
 ---
 
@@ -1455,16 +1470,20 @@ new source files
 
 The GDJS runtime receives the same serialized runtime project data as before. It does not read TOML, `.layout`, `.settings`, or `.events` files.
 
-### 17.3 Temporary legacy JSON
+### 17.3 Generated legacy JSON
 
-Most current preview/export code accepts a `gd::Project`, so physical JSON is unnecessary. When a headless tool or external exporter requires a project filename:
+Most current preview/export code accepts a `gd::Project`, so physical JSON is
+unnecessary. The editor nevertheless regenerates `.gdevelop/game.json` after a
+successful multi-file save. When a headless tool or external exporter requires
+a project filename:
 
-1. Compose canonical legacy JSON into a unique OS temporary directory.
+1. Ensure `.gdevelop/game.json` matches the current composed project.
 2. Set resource-base resolution to the real project root.
-3. Pass the temporary path only to that compatibility boundary.
-4. Delete it after success or failure.
+3. Pass the generated path only to that compatibility boundary.
 
-Temporary legacy JSON must not be written as `game.json` beside `project.settings`, watched as source, added to recent projects, or committed to Git.
+Generated legacy JSON must stay under `.gdevelop/`. It must not be written
+beside `project.settings`, watched as source, added to recent projects, or
+committed to Git.
 
 ---
 
@@ -1505,7 +1524,8 @@ Moving a function or entity changes owner identity and may change generated inst
 - Stable paths allow Git rename detection.
 - Arrays preserve semantic order; writers must not reorder merely to reduce diff size.
 - Merge conflict markers are syntax errors with clear diagnostics.
-- `.gdevelop/`, temporary legacy JSON, transaction staging, and autosave data should be ignored.
+- `.gdevelop/`, generated compatibility JSON, transaction staging, and autosave
+  data should be ignored.
 
 Recommended `.gitignore` entries:
 
@@ -1549,7 +1569,7 @@ Raw legacy blocks are data. They are never evaluated as code by the source loade
 ### Phase 2: events compiler/decompiler
 
 - Implement the IfDo parser, formatter, semantic IR, compiler, and decompiler from the related spec.
-- Expose catalog metadata needed for friendly instruction mappings.
+- Expose exact catalog instruction types and stable named parameters.
 - Implement typed syntax for every current persisted event/field and the exact
   catalog instruction form before enabling automatic migration.
 
@@ -1569,7 +1589,8 @@ Raw legacy blocks are data. They are never evaluated as code by the source loade
 ### Phase 5: preview/export and non-local providers
 
 - Route reload-from-disk preview through the composer.
-- Add temporary-file compatibility for path-only headless tools.
+- Route path-only headless tools through the generated `.gdevelop/game.json`
+  compatibility snapshot.
 - Define capability negotiation for cloud/browser providers. A provider must support an atomic multi-artifact project or an archive/virtual-filesystem equivalent before it can claim native support.
 
 The storage-provider interface exposes this negotiation as
@@ -1663,7 +1684,8 @@ A conforming implementation must satisfy all of the following:
 
 1. Opening `project.settings` reconstructs a complete current project without runtime changes.
 2. Opening legacy JSON converts once, commits atomically, preserves the original, and switches the editor to the new entry.
-3. Normal Save writes only new-format source files.
+3. Normal Save writes new-format source files plus ignored generated artifacts
+   under `.gdevelop/`; it never recreates an editable root legacy JSON.
 4. Every scene has its own subfolder with `scene.settings`, a visual/UI-focused
    TOML layout, and a DSL events file.
 5. The root `externals/` directory is a sibling of `scenes/`; it contains
@@ -1688,3 +1710,5 @@ A conforming implementation must satisfy all of the following:
     the editor creates the combined project-settings document only in memory
     for validation and compilation, then saves each changed namespace back to
     its owning fragment.
+14. Every normal multi-file Save/Save As regenerates `.gdevelop/game.json` from
+    the verified composed legacy serializer tree.

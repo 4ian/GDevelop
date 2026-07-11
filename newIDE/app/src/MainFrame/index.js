@@ -5287,7 +5287,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       if (!currentProject) return;
 
       if (currentProject.getLayoutsCount() === 0) {
-        const layoutName = i18n._(t`Untitled scene`);
+        const layoutName = 'UntitledScene';
         currentProject.insertNewLayout(layoutName, 0);
         const layout = currentProject.getLayout(layoutName);
         addDefaultLightToAllLayers(layout);
@@ -5310,7 +5310,7 @@ const MainFrame = (props: Props): React.MixedElement => {
         openProjectManager(false);
       }
     },
-    [openLayout, i18n]
+    [openLayout]
   );
 
   const getEditorsTabStateWithAllScenes = React.useCallback(

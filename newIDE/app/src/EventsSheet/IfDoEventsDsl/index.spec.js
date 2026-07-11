@@ -146,6 +146,9 @@ const allEventTypesFixture = [
   },
   {
     type: 'BuiltinCommonInstructions::Group',
+    disabled: true,
+    folded: true,
+    aiGeneratedEventId: 'combat-group',
     name: 'Combat',
     source: 'events.dsl',
     creationTime: 42,
@@ -240,7 +243,7 @@ describe('IfDo events DSL', () => {
       expect(first.endsWith('\n')).toBe(true);
     });
 
-    test('emits reversible friendly syntax for the built-in instruction catalog', () => {
+    test('does not hardcode aliases for built-in instructions', () => {
       const events = [
         standard({
           conditions: [
@@ -287,18 +290,12 @@ describe('IfDo events DSL', () => {
       const output = compileIfDoToLegacyEventsJson(dsl);
 
       expect(areLegacyEventsEquivalent(input, output)).toBe(true);
-      expect(dsl).not.toContain('@exact');
-      expect(dsl).toContain('if scene begins');
-      expect(dsl).toContain('if collision Enemy Player');
-      expect(dsl).toContain('if scene.Score >= 100');
-      expect(dsl).toContain('or Player.y > 462');
-      expect(dsl).toContain('do scene.Score += 10');
-      expect(dsl).toContain('do Enemy.HP -= 1');
-      expect(dsl).toContain('do create Enemy x=100 y=-62 layer=""');
-      expect(dsl).toContain('do Player.opacity = 80');
-      expect(dsl).toContain(
-        'do ScoreText.text = "SCORE " + ToString(Variable(Score))'
-      );
+      expect(dsl).toContain('@exact id="SceneJustBegins" parameters=[""]');
+      expect(dsl).toContain('@exact id="CollisionNP"');
+      expect(dsl).toContain('@exact id="SetNumberVariable"');
+      expect(dsl).not.toContain('scene begins');
+      expect(dsl).not.toContain('collision Enemy Player');
+      expect(dsl).not.toContain('scene.Score');
     });
 
     test('falls back to exact when a friendly candidate is ambiguous', () => {
@@ -439,6 +436,34 @@ describe('IfDo events DSL', () => {
         )
       ).toBe(true);
     });
+
+    test('writes group event metadata on @group instead of @event', () => {
+      const input = JSON.stringify([
+        {
+          type: 'BuiltinCommonInstructions::Group',
+          disabled: true,
+          folded: true,
+          aiGeneratedEventId: 'disabled-group',
+          name: 'Grouped events',
+          source: '',
+          creationTime: 0,
+          colorR: 54,
+          colorG: 52,
+          colorB: 232,
+          parameters: [],
+          events: [standard()],
+        },
+      ]);
+      const dsl = convertLegacyEventsJsonToIfDo(input);
+
+      expect(dsl).toContain(
+        '@group disabled=true folded=true aiGeneratedEventId="disabled-group" source="" creationTime=0 color=[54,52,232] parameters=[]'
+      );
+      expect(dsl.startsWith('@event')).toBe(false);
+      expect(
+        areLegacyEventsEquivalent(input, compileIfDoToLegacyEventsJson(dsl))
+      ).toBe(true);
+    });
   });
 
   describe('DSL -> legacy JSON', () => {
@@ -460,6 +485,22 @@ do await @exact id="Async" parameters=["x"]
       expect(events[0].conditions[0].subInstructions).toHaveLength(2);
       expect(events[0].conditions[0].subInstructions[1].disabled).toBe(true);
       expect(events[0].actions[0].type.await).toBe(true);
+    });
+
+    test('accepts old @event group metadata but rejects duplicate ownership', () => {
+      const compatible = parseIfDoEvents(`@event disabled=true
+@group source="" creationTime=0 color=[1,2,3] parameters=[]
+group "Compatible"
+end
+`);
+      expect(compatible[0].disabled).toBe(true);
+      expect(() =>
+        parseIfDoEvents(`@event disabled=true
+@group disabled=true source="" creationTime=0 color=[1,2,3] parameters=[]
+group "Duplicate"
+end
+`)
+      ).toThrow('Duplicate group event metadata disabled');
     });
 
     test('uses a project catalog resolver for friendly instructions', () => {
@@ -707,7 +748,7 @@ do @exact id="Y" parameters=[]
       );
     });
 
-    test('requires a catalog for friendly instructions', () => {
+    test('requires a catalog for named instructions', () => {
       expectCode(
         () => compileIfDoToLegacyEventsJson('if custom.test Player Enemy\n'),
         'IFDO_CATALOG_REQUIRED'

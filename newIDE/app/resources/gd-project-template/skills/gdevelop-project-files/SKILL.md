@@ -25,8 +25,8 @@ name, group, description, parameter `dslName`, or expression name instead of
 loading the whole file into context. The generated JSON keeps one catalog entry
 per line so a matching search returns only the relevant instruction.
 
-Do not edit legacy project JSON. It is compatibility/runtime output, not
-multi-file source.
+Do not edit legacy project JSON, including `.gdevelop/game.json`. It is
+generated compatibility/runtime output, not multi-file source.
 
 ## File contract
 
@@ -68,30 +68,21 @@ Only create optional folders when the owning manifest references them.
 
 ## Event authoring
 
-Use friendly IfDo syntax when it has an exact reversible form:
-
-```events
-if scene begins
-if collision Player Enemy
-if scene.Score >= 100
-or key "Space" down
-do scene.Score += 10
-do Enemy.HP -= 1
-do create Coin x=Enemy.x y=Enemy.y layer=""
-```
-
-Use the generated catalog for every other instruction. Find the entry under
+Use the generated catalog for every instruction. Find the entry under
 `conditions` or `actions`, use its exact `type`, and supply parameters by their
-exact `dslName`. Catalog-form values are JSON strings containing the exact
-serialized GDevelop operand:
+exact `dslName`. Values are JSON strings containing the exact serialized
+GDevelop operand. The DSL has no hardcoded instruction aliases:
 
 ```events
-if @Extension::Condition target="Player" threshold="Variable(Limit)"
-do @Extension::Action target="Player" text="\"Ready\"" runtime=""
+if Extension::Condition target="Player" threshold="Variable(Limit)"
+do Extension::Action target="Player" text="\"Ready\"" runtime=""
+if SceneJustBegins
 ```
 
 Rules:
 
+- Write catalog instruction types directly; never prefix them with `@`.
+- Do not replace catalog types with prose aliases such as `scene begins`.
 - Use only catalog entries valid for the target event scope.
 - Use every required parameter exactly once.
 - Omit code-only parameters when their value is the standard empty string.
@@ -107,18 +98,18 @@ Common structure:
 
 ```events
 @event aiGeneratedEventId="descriptive-id"
-if condition
-do action
+if SceneJustBegins
+do DebuggerTools::ConsoleLog message_to_log="\"started\""
 
 > @event aiGeneratedEventId="child-id"
-> if condition
-> do action
+> if CollisionNP first_object="Player" second_object="Enemy"
+> do Delete object="Enemy"
 
 group "Combat"
 @event aiGeneratedEventId="damage-enemy"
-if collision Bullet Enemy
-do Enemy.HP -= 1
-do delete Bullet
+if CollisionNP first_object="Bullet" second_object="Enemy"
+do SetNumberObjectVariable object="Enemy" variable="HP" modification_sign="-" value="1"
+do Delete object="Bullet"
 end
 ```
 

@@ -80,18 +80,18 @@ end
 
 A compiler converts `.events` source into the exact GDevelop event-sheet or extension-function data expected by the loaded project, GDevelop version, installed extensions, objects, behaviors, variables, resources, scenes, external event sheets, and registered functions.
 
-The AI model should normally use friendly catalog names rather than internal
-GDevelop instruction identifiers or positional JSON parameter arrays. The
-typed exact `@exact` form is compiler/decompiler output for registered
-instructions without a friendly alias and may be edited when the complete
-catalog signature is understood.
+The AI model uses the exact action or condition `type` and named parameters from
+the generated project catalog rather than positional JSON parameter arrays.
+The DSL core does not hardcode instruction aliases. The typed `@exact` form is
+the lossless fallback when a named catalog signature cannot reproduce stored
+parameters.
 
 > **Implementation status:** the core parser, compiler, canonical decompiler,
-> built-in friendly-instruction mappings, JSON normalizer, and equivalence checker are implemented in
+> catalog adapter, JSON normalizer, and equivalence checker are implemented in
 > `newIDE/app/src/EventsSheet/IfDoEventsDsl/index.js`, with focused and
 > repository-fixture tests in the adjacent `index.spec.js`. The multi-file
-> project storage uses this converter directly. Project-specific aliases for
-> extension instructions still enter through the catalog adapter. Sections 31
+> project storage uses this converter directly. All registered instruction
+> types and parameter names enter through the catalog adapter. Sections 31
 > through 36 are the normative current-JSON mapping and take precedence over
 > earlier illustrative examples when there is a conflict.
 
@@ -100,21 +100,19 @@ catalog signature is understood.
 ```events
 # Collect a coin
 
-if collision Player Coin
-do delete Coin
-do scene.score += 1
+if CollisionNP first_object="Player" second_object="Coin"
+do Delete object="Coin"
+do SetNumberVariable variable="score" modification_sign="+" value="1"
 ```
 
 ### Standard event with a sub-event
 
 ```events
-if collision Player Enemy
-if Player.invincible == false
-do Player.health -= Enemy.damage
-do Player.invincible = true
+if SceneJustBegins
+do DebuggerTools::ConsoleLog message_to_log="\"scene started\""
 
-> if Player.health <= 0
-> do scene.change "GameOver"
+> if CollisionNP first_object="Player" second_object="Enemy"
+> do Delete object="Enemy"
 ```
 
 ---
@@ -436,7 +434,7 @@ do Player.health -= Enemy.damage
 A nested comment uses the same depth as the location where the GDevelop comment event is inserted:
 
 ```events
-if scene begins
+if SceneJustBegins
 
 > # Restore an existing save
 > if global.hasSave == true
@@ -1847,19 +1845,17 @@ A compiler-generated catalog may look like:
 
 ```text
 CONDITIONS
-collision <object> <object>
-key <key> pressed|down|released
-Platformer.on_floor <object>
-timer <timer-reference> >= <duration>
-once
+SceneJustBegins
+CollisionNP first_object=<object> second_object=<object>
+KeyFromTextJustPressed key=<string-expression>
+CompareTimer timer=<timer-reference> comparison_sign=<operator> value=<duration>
 
 ACTIONS
-delete <object>
-create <object> x=<expression> y=<expression> [layer=<string>]
-sound.play <resource>
-scene.change <scene>
-timer.reset <timer-reference>
-Platformer.jump <object>
+Delete object=<object>
+Create object_to_create=<object> x_position=<expression> y_position=<expression> [layer=<string>]
+PlaySound audio_file_or_audio_resource_name=<resource>
+Scene name_of_the_new_scene=<scene>
+ResetTimer timer_name=<timer-reference>
 
 EXPRESSIONS
 min(number, number) -> number
@@ -1881,15 +1877,15 @@ The catalog is generated from:
 
 ### 18.1 Canonical names
 
-Each instruction has one preferred DSL spelling.
+Each instruction has exactly one DSL spelling: its registered catalog `type`.
 
 Use:
 
 ```events
-if collision Player Enemy
+if CollisionNP first_object="Player" second_object="Enemy"
 ```
 
-Do not ask the model to choose among synonyms such as:
+Do not accept prose synonyms such as:
 
 ```text
 if Player hits Enemy
@@ -1897,7 +1893,8 @@ if Player touches Enemy
 if Player overlaps Enemy
 ```
 
-Human-input aliases may be accepted, but the formatter and AI profile emit only canonical names.
+The parser, formatter, and AI profile use only catalog types; there is no
+hardcoded human-input alias table.
 
 ### 18.2 Named parameters
 
@@ -1906,17 +1903,17 @@ The registry stores parameter names and types even when GDevelop JSON stores a p
 The model writes:
 
 ```events
-do camera.shake strength=20 duration=0.4s
+do AdvancedCamera::ShakeCamera strength="20" duration="0.4"
 ```
 
 The compiler writes the exact parameter order expected by GDevelop.
 
 ### 18.3 Exact catalog instruction form
 
-An extension instruction without a friendly alias may be exposed with `@`:
+Every instruction uses its catalog type directly, without a marker prefix:
 
 ```events
-do @AdvancedCamera::ShakeCamera duration=0.4s amplitude=20 layer="" camera=0
+do AdvancedCamera::ShakeCamera duration=0.4s amplitude=20 layer="" camera=0
 ```
 
 In the multi-file project profile, the authoritative named signatures are
@@ -1925,24 +1922,27 @@ generic persisted form uses each catalog parameter's exact `dslName` and a JSON
 string containing the exact serialized operand:
 
 ```events
-do @AdvancedCamera::ShakeCamera duration="0.4" amplitude="20" layer="\"\"" camera="0"
+do AdvancedCamera::ShakeCamera duration="0.4" amplitude="20" layer="\"\"" camera="0"
 ```
 
 The JSON-string rule makes catalog forms lossless without guessing whether an
-operand is an object name, resource name, or nested GDevelop expression. Short
-friendly aliases keep their natural typed syntax.
+operand is an object name, resource name, or nested GDevelop expression.
 
 The generated artifact is deliberately lean and line-oriented. Each action,
 condition, or expression occupies one compact JSON line and contains only
 authoring-relevant names, descriptions, valid scope names, parameter
 signatures, defaults, accepted values, and owner identity. Editor UI metadata
-and fields derivable from the parameter list are not stored.
+and fields derivable from structure or the parameter list are not stored. In
+particular, entries omit `kind` because the parent `actions`, `conditions`, or
+`expressions` array already defines it.
 
 Rules:
 
 - The exact instruction must exist in the catalog.
 - Named arguments are required.
-- The model may not invent an `@` instruction.
+- The model may not invent an instruction type.
+- Catalog instruction types never use an `@` prefix; `@` is reserved for
+  structural metadata directives such as `@event` and `@instruction`.
 - Every argument remains type-checked.
 
 When named catalog parameters cannot reproduce the stored parameter strings or
@@ -2107,8 +2107,10 @@ At a given depth:
 - `end` closes an event group.
 - `function` is valid only as an explicitly enabled standalone shorthand and
   never in a canonical project file or nested statement.
-- `@event`, `@instruction`, `@comment`, `@group`, and `@while` attach
-  typed round-trip metadata to the next compatible construct.
+- `@event`, `@instruction`, `@comment`, `@group`, and `@while` attach typed
+  round-trip metadata to the next compatible construct. Group event metadata
+  (`disabled`, `folded`, and `aiGeneratedEventId`) belongs directly on
+  `@group`, not on a preceding `@event`.
 
 ### Stage 4: Bind metadata and validate owners
 
@@ -2392,15 +2394,11 @@ canonicalizeLegacyEventsJson(json) -> canonical JSON
 areLegacyEventsEquivalent(left, right) -> boolean
 ```
 
-`options.resolveInstruction` is the boundary to the loaded project catalog for
-project- and extension-specific friendly conditions and actions. The core also
-contains closed, reversible mappings for canonical built-in forms such as
-scene/object assignments and comparisons, collisions, keyboard input, timers,
-object creation/deletion, sound playback, scene changes, capabilities, and OR
-groups. The decompiler recompiles each friendly candidate and uses it only when
-the instruction identifier and positional parameters are identical; otherwise
-it emits typed `@exact`. Consequently JSON-to-DSL-to-JSON conversion remains
-lossless without a loaded project while ordinary built-ins remain readable.
+`options.resolveInstruction` is the sole boundary to the loaded project catalog
+for conditions and actions. The core contains no built-in instruction-name,
+comparison, assignment, collision, input, timer, object, sound, scene, or
+capability aliases. Without a loaded catalog, the lossless converter emits and
+accepts typed `@exact` instructions.
 `options.lowerWhileLimit` supplies the catalog-aware lowering for the
 source-only `while limit=` guard. The richer project-aware result below remains
 the editor integration API to build on top of this core.
@@ -3216,8 +3214,8 @@ The important compatibility facts are:
 - Any instruction metadata can evolve independently of this stored positional
   array, so compilation must use the catalog for the loaded project version.
 
-Friendly IfDo normally hides these details. Typed round-trip metadata for the
-next instruction can be written as:
+Named catalog syntax hides the positional array while preserving exact types.
+Typed round-trip metadata for the next instruction can be written as:
 
 ```events
 @instruction disabled=true awaited=true
@@ -3225,13 +3223,13 @@ do await Network.SendRequest url="https://example.com"
 ```
 
 `awaited=true` is valid only for actions whose metadata supports asynchronous
-execution. Condition inversion is canonically written with `not`; it maps to
-`type.inverted`, not automatically to a separate `BuiltinCommonInstructions::Not`
-instruction.
+execution. Condition inversion is written as `@instruction inverted=true`; it
+maps to `type.inverted`, not automatically to a separate
+`BuiltinCommonInstructions::Not` instruction.
 
 The closed `@instruction` metadata schema is `disabled`, `inverted`, and
-`awaited`. Friendly `not` and `do await` are canonical when applicable. If an
-annotation and friendly syntax specify the same flag, their values must agree.
+`awaited`. `do await` is canonical when applicable. If an annotation and
+structural syntax specify the same flag, their values must agree.
 
 ### 31.3 Persisted event types and fields
 
@@ -3357,44 +3355,39 @@ catalog instruction form with instruction-depth prefixes.
 
 ### 32.3 Comparisons and assignments
 
-The friendly comparison:
+The catalog condition:
 
 ```events
-if scene.score >= 100
+if NumberVariable variable="score" comparison_sign=">=" value="100"
 ```
 
-typically maps through catalog metadata to a current comparison instruction
-such as `BuiltinCommonInstructions::CompareNumbers`. String comparisons use
-the string comparison metadata. Variable/property/object comparisons may map
-to more specialized registered instructions.
+maps directly through catalog metadata to the registered `NumberVariable`
+condition and its positional parameter order. Other value, property, or object
+comparisons use their own exact registered types.
 
 Similarly:
 
 ```events
-do scene.score += 10
+do SetNumberVariable variable="score" modification_sign="+" value="10"
 ```
 
-does not have a universal JSON `assign` node. The compiler resolves the
-writable target and emits the registered action identifier and its exact
-operator/value parameter order. The semantic IR may use `assign`, but emitted
-serializer JSON may not.
+maps directly to that registered action identifier and exact parameter order;
+there is no universal JSON `assign` node.
 
 ### 32.4 Inversion, NOT, disabled, and awaited
 
-- `if not <condition>` sets the resolved condition instruction's `inverted`
-  flag.
+- `@instruction inverted=true` sets the following condition instruction's
+  `type.inverted` flag.
 - A stored `BuiltinCommonInstructions::Not` with sub-instructions remains a
   distinct logical instruction; it is not conflated with the inverted flag.
 - `@instruction disabled=true` maps to the instruction-level `disabled` field.
-- `@instruction inverted=true` maps to `type.inverted` when the friendly `not`
-  form cannot carry the exact stored structure.
 - `@instruction awaited=true` maps to `type.await` when valid for the action.
 - `do await ...` maps to `type.await=true` after metadata validation.
 
 ### 32.5 Sub-instructions
 
-Friendly aliases may define a structured form for catalog instructions that
-accept sub-instructions. The generic exact form is:
+Catalog instructions that accept sub-instructions use instruction-depth
+prefixes. The exact fallback form is:
 
 ```events
 if @exact id="BuiltinCommonInstructions::Or" parameters=[]
@@ -3408,8 +3401,8 @@ instruction-depth prefix. For example, a nested event containing an OR child
 condition begins with `> if ...` and its instruction children begin with
 `> ? ...`.
 
-The canonical AI profile prefers `if`/`or` and catalog aliases. The exact form
-exists for decompilation and advanced editing.
+The canonical AI profile uses `if`/`or` and exact catalog types. The `@exact`
+form exists only for lossless fallback and advanced editing.
 
 ---
 
@@ -3460,7 +3453,7 @@ In canonical decompiler output, raw serializer operand strings on loop headers
 are JSON-quoted, for example `repeat "Variable(Count) + 1"` and
 `order_by="Enemy.Variable(Health) + 1"`. In this exact structural position the
 quotes encode the stored expression text; they do not turn it into a GDevelop
-text expression. Friendly authored source may continue to use the unquoted
+text expression. Authored source may continue to use the unquoted
 expression spelling shown earlier.
 
 `ForEachChildVariable` maps:
@@ -3480,7 +3473,7 @@ to `iterableVariableName`, `valueIteratorVariableName`,
 - Each immediately following `and while` compiles to another distinct,
   ordered `whileConditions` entry. This is the canonical exact form for
   current serialized events that contain multiple sibling entries.
-- Friendly `or` alternatives after a non-empty header are lowered into the
+- Structural `or` alternatives after a non-empty header are lowered into the
   header condition's `BuiltinCommonInstructions::Or` instruction; they do not
   create sibling `whileConditions` entries.
 - Additional same-depth `if` groups compile to `conditions`.
@@ -3514,7 +3507,7 @@ for round-trip fidelity:
 ### 33.4 Groups
 
 ```events
-@group source="" creationTime=0 color=[74,176,228] parameters=[]
+@group disabled=true source="" creationTime=0 color=[74,176,228] parameters=[]
 group Combat
 ...
 end
@@ -3522,7 +3515,9 @@ end
 
 maps to `BuiltinCommonInstructions::Group`. `parameters` is the current raw
 string array. A group is a true event containing `events`; it is not merely a
-formatter region.
+formatter region. Because `disabled`, `folded`, and `aiGeneratedEventId` are
+properties of that group event, their canonical owner is `@group`; a separate
+`@event` annotation is emitted only for events inside the group.
 
 ### 33.5 Links
 
@@ -3691,7 +3686,7 @@ instruction JSON fallback constructs are not part of IfDo.
 Every condition and action registered in the closed project catalog must be
 representable in one of two typed forms:
 
-1. A friendly alias with named, catalog-typed arguments.
+1. Its exact catalog `type` with named, catalog-typed arguments.
 2. The exact `@exact` form using a registered instruction identifier,
    its catalog-validated positional parameter strings, flags, and recursively
    typed `?` sub-instructions.
@@ -3743,8 +3738,8 @@ requirement rather than delegating unsupported data to an opaque fallback.
 5. Load the closed project-specific catalog.
 6. Resolve names, owners, objects, behaviors, variables, parameters,
    resources, and function calls.
-7. Lower friendly comparisons, assignments, aliases, and result writes to
-   exact current instruction identifiers and positional parameter strings.
+7. Resolve exact catalog types and named operands to current positional
+   parameter strings.
 8. Build exact event objects and attach common/presentation metadata.
 9. Reject any AST construct or catalog value that lacks a complete typed
    serializer mapping.
@@ -3756,8 +3751,8 @@ requirement rather than delegating unsupported data to an opaque fallback.
 1. Read the original event array before unknown events can become `EmptyEvent`.
 2. Normalize fields accepted by current compatibility code.
 3. Resolve each instruction identifier against the loaded catalog.
-4. Recognize bijective friendly patterns: comparisons, assignments, OR groups,
-   return actions, loops, links, comments, groups, and JavaScript.
+4. Emit instruction catalog types with named parameters; keep event-structure
+   forms for OR groups, loops, links, comments, groups, and JavaScript.
 5. Emit typed event/instruction metadata for every persisted field.
 6. Emit complete typed variables, including recursively nested values and all
    serializer metadata.

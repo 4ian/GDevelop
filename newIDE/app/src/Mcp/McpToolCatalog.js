@@ -4357,7 +4357,19 @@ const writeTools: Array<McpTool> = [
   {
     name: 'create_scene',
     description: 'Create a new scene/layout in the current project.',
-    inputSchema: sceneNameSchema,
+    inputSchema: {
+      type: 'object',
+      properties: {
+        scene_name: {
+          type: 'string',
+          pattern: '^[A-Za-z][A-Za-z0-9]*(?:_[A-Za-z0-9]+)*$',
+          description:
+            'Name of the new scene/layout. Use camelCase or snake_case with no whitespace.',
+        },
+      },
+      required: ['scene_name'],
+      additionalProperties: true,
+    },
   },
   {
     name: 'delete_scene',

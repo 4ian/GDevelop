@@ -3,10 +3,9 @@
 /**
  * Bidirectional converter for the canonical IfDo event DSL.
  *
- * The JSON decompiler emits friendly, reversible forms for the built-in
- * instruction catalog and uses catalog-backed `@exact` only when no proven
- * friendly mapping exists. Project/extension-specific friendly instructions
- * are accepted when a caller supplies `resolveInstruction`.
+ * Instruction names and named parameters come exclusively from the generated
+ * project catalog. The core owns event structure and the lossless `@exact`
+ * fallback, but does not hardcode action or condition aliases.
  */
 
 export type LegacyInstruction = {
@@ -191,7 +190,15 @@ export const IFDO_EVENTS_DSL_COVERAGE = Object.freeze({
     event: ['disabled', 'folded', 'aiGeneratedEventId'],
     instruction: ['disabled', 'inverted', 'awaited'],
     comment: ['background', 'text', 'comment2'],
-    group: ['source', 'creationTime', 'color', 'parameters'],
+    group: [
+      'disabled',
+      'folded',
+      'aiGeneratedEventId',
+      'source',
+      'creationTime',
+      'color',
+      'parameters',
+    ],
     while: ['infiniteLoopWarning'],
     js: ['objects', 'strict', 'expanded', 'delimiter'],
   },
@@ -479,408 +486,6 @@ const parseNamedArguments = (source: string): Metadata => {
 export const parseCatalogInstructionArguments = (source: string): Metadata =>
   parseNamedArguments(source);
 
-const SIMPLE_DSL_PATH = /^[A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)*$/;
-
-const makeInstruction = (
-  type: string,
-  parameters: Array<string>
-): LegacyInstruction => ({
-  type: { value: type, inverted: false, await: false },
-  disabled: false,
-  parameters,
-  subInstructions: [],
-});
-
-/**
- * Split catalog operands without interpreting GDevelop expression syntax.
- * Whitespace inside strings, calls, arrays and structures is preserved.
- */
-const splitCatalogOperands = (source: string): Array<string> => {
-  const operands = [];
-  let start = -1;
-  let depth = 0;
-  let inString = false;
-  let escaped = false;
-  for (let index = 0; index <= source.length; index++) {
-    const character = source[index] || ' ';
-    if (start === -1) {
-      if (/\s/.test(character)) continue;
-      start = index;
-    }
-    if (inString) {
-      if (escaped) escaped = false;
-      else if (character === '\\') escaped = true;
-      else if (character === '"') inString = false;
-      continue;
-    }
-    if (character === '"') inString = true;
-    else if (character === '(' || character === '[' || character === '{')
-      depth++;
-    else if (character === ')' || character === ']' || character === '}')
-      depth--;
-    else if (/\s/.test(character) && depth === 0) {
-      operands.push(source.slice(start, index));
-      start = -1;
-    }
-  }
-  return operands;
-};
-
-const parseRawNamedOperands = (
-  source: string,
-  expectedNames: Array<string>
-): ?{ [string]: string } => {
-  const result = {};
-  for (const operand of splitCatalogOperands(source)) {
-    const equalsIndex = operand.indexOf('=');
-    if (equalsIndex <= 0) return null;
-    const name = operand.slice(0, equalsIndex);
-    const value = operand.slice(equalsIndex + 1);
-    if (
-      !expectedNames.includes(name) ||
-      !value ||
-      Object.prototype.hasOwnProperty.call(result, name)
-    )
-      return null;
-    result[name] = value;
-  }
-  return expectedNames.every(name => result[name] !== undefined)
-    ? result
-    : null;
-};
-
-const dslComparisonOperator = (operator: string): ?string =>
-  operator === '='
-    ? '=='
-    : ['!=', '<', '<=', '>', '>='].includes(operator)
-    ? operator
-    : null;
-
-const jsonComparisonOperator = (operator: string): ?string =>
-  operator === '=='
-    ? '='
-    : ['!=', '<', '<=', '>', '>='].includes(operator)
-    ? operator
-    : null;
-
-const dslAssignmentOperator = (operator: string): ?string =>
-  operator === '='
-    ? '='
-    : ['+', '-', '*', '/'].includes(operator)
-    ? `${operator}=`
-    : null;
-
-const jsonAssignmentOperator = (operator: string): ?string =>
-  operator === '='
-    ? '='
-    : ['+=', '-=', '*=', '/='].includes(operator)
-    ? operator.slice(0, 1)
-    : null;
-
-const formatFriendlyBuiltinInstruction = (
-  instruction: LegacyInstruction,
-  kind: 'condition' | 'action'
-): ?string => {
-  const type = instruction.type.value;
-  const parameters = instruction.parameters || [];
-  const path = value => (SIMPLE_DSL_PATH.test(value) ? value : null);
-
-  if (
-    kind === 'condition' &&
-    type === 'SceneJustBegins' &&
-    parameters.length === 1 &&
-    parameters[0] === ''
-  )
-    return 'scene begins';
-
-  if (
-    kind === 'condition' &&
-    type === 'CollisionNP' &&
-    parameters.length === 5 &&
-    parameters[2] === '' &&
-    parameters[3] === '' &&
-    parameters[4] === 'no' &&
-    path(parameters[0]) &&
-    path(parameters[1])
-  )
-    return `collision ${parameters[0]} ${parameters[1]}`;
-
-  const keySuffixes = {
-    KeyFromTextPressed: 'down',
-    KeyFromTextJustPressed: 'pressed',
-    KeyFromTextReleased: 'released',
-  };
-  if (
-    kind === 'condition' &&
-    keySuffixes[type] &&
-    parameters.length === 2 &&
-    parameters[0] === ''
-  )
-    return `key ${parameters[1]} ${keySuffixes[type]}`;
-
-  if (
-    kind === 'condition' &&
-    type === 'CompareTimer' &&
-    parameters.length === 4 &&
-    parameters[0] === '' &&
-    dslComparisonOperator(parameters[2])
-  )
-    return `timer ${parameters[1]} ${dslComparisonOperator(parameters[2]) ||
-      ''} ${parameters[3]}`;
-
-  if (
-    kind === 'action' &&
-    type === 'ResetTimer' &&
-    parameters.length === 2 &&
-    parameters[0] === ''
-  )
-    return `timer.reset ${parameters[1]}`;
-
-  if (
-    kind === 'action' &&
-    type === 'Delete' &&
-    parameters.length === 2 &&
-    parameters[1] === '' &&
-    path(parameters[0])
-  )
-    return `delete ${parameters[0]}`;
-
-  if (
-    kind === 'action' &&
-    type === 'Create' &&
-    parameters.length === 5 &&
-    parameters[0] === '' &&
-    path(parameters[1])
-  )
-    return `create ${parameters[1]} x=${parameters[2]} y=${
-      parameters[3]
-    } layer=${parameters[4]}`;
-
-  if (
-    kind === 'action' &&
-    type === 'PlaySound' &&
-    parameters.length === 5 &&
-    parameters[0] === ''
-  )
-    return `sound.play resource=${parameters[1]} loop=${parameters[2]} volume=${
-      parameters[3]
-    } pitch=${parameters[4]}`;
-
-  if (
-    kind === 'action' &&
-    type === 'Scene' &&
-    parameters.length === 3 &&
-    parameters[0] === ''
-  )
-    return `scene.change ${parameters[1]} stop_sounds=${parameters[2]}`;
-
-  const actionOperator =
-    kind === 'action' && parameters.length
-      ? dslAssignmentOperator(parameters[parameters.length - 2])
-      : null;
-  const conditionOperator =
-    kind === 'condition' && parameters.length
-      ? dslComparisonOperator(parameters[parameters.length - 2])
-      : null;
-  const operator = actionOperator || conditionOperator;
-  if (!operator) return null;
-  const value = parameters[parameters.length - 1];
-
-  const sceneVariableTypes =
-    kind === 'action'
-      ? new Set(['SetNumberVariable', 'SetStringVariable'])
-      : new Set(['NumberVariable', 'StringVariable']);
-  if (
-    sceneVariableTypes.has(type) &&
-    parameters.length === 3 &&
-    path(parameters[0])
-  )
-    return `scene.${parameters[0]} ${operator} ${value}`;
-
-  const objectVariableTypes =
-    kind === 'action'
-      ? new Set(['SetNumberObjectVariable', 'SetStringObjectVariable'])
-      : new Set(['NumberObjectVariable', 'StringObjectVariable']);
-  if (
-    objectVariableTypes.has(type) &&
-    parameters.length === 4 &&
-    path(parameters[0]) &&
-    path(parameters[1])
-  )
-    return `${parameters[0]}.${parameters[1]} ${operator} ${value}`;
-
-  const objectProperty = {
-    SetX: 'x',
-    PosX: 'x',
-    SetY: 'y',
-    PosY: 'y',
-    SetAngle: 'angle',
-    Angle: 'angle',
-  }[type];
-  if (objectProperty && parameters.length === 3 && path(parameters[0]))
-    return `${parameters[0]}.${objectProperty} ${operator} ${value}`;
-
-  const capabilityProperty = {
-    'OpacityCapability::OpacityBehavior::SetValue': 'opacity',
-    'TextContainerCapability::TextContainerBehavior::SetValue': 'text',
-  }[type];
-  if (
-    kind === 'action' &&
-    capabilityProperty &&
-    parameters.length === 4 &&
-    path(parameters[0])
-  )
-    return `${parameters[0]}.${capabilityProperty} ${operator} ${value}`;
-
-  return null;
-};
-
-const resolveFriendlyBuiltinInstruction = (
-  source: string,
-  kind: 'condition' | 'action'
-): ?LegacyInstruction => {
-  if (kind === 'condition' && source === 'scene begins')
-    return makeInstruction('SceneJustBegins', ['']);
-
-  let match = /^collision\s+(\S+)\s+(\S+)$/.exec(source);
-  if (kind === 'condition' && match)
-    return makeInstruction('CollisionNP', [match[1], match[2], '', '', 'no']);
-
-  match = /^key\s+(.+)\s+(down|pressed|released)$/.exec(source);
-  if (kind === 'condition' && match) {
-    const types = {
-      down: 'KeyFromTextPressed',
-      pressed: 'KeyFromTextJustPressed',
-      released: 'KeyFromTextReleased',
-    };
-    return makeInstruction(types[match[2]], ['', match[1]]);
-  }
-
-  match = /^timer\s+(.+)\s+(==|!=|<=|>=|<|>)\s+(.+)$/.exec(source);
-  if (kind === 'condition' && match) {
-    const operator = jsonComparisonOperator(match[2]);
-    if (operator)
-      return makeInstruction('CompareTimer', [
-        '',
-        match[1],
-        operator,
-        match[3],
-      ]);
-  }
-
-  match = /^timer\.reset\s+(.+)$/.exec(source);
-  if (kind === 'action' && match)
-    return makeInstruction('ResetTimer', ['', match[1]]);
-
-  match = /^delete\s+(\S+)$/.exec(source);
-  if (kind === 'action' && match)
-    return makeInstruction('Delete', [match[1], '']);
-
-  match = /^create\s+(\S+)\s+(.+)$/.exec(source);
-  if (kind === 'action' && match) {
-    const operands = parseRawNamedOperands(match[2], ['x', 'y', 'layer']);
-    if (operands)
-      return makeInstruction('Create', [
-        '',
-        match[1],
-        operands.x,
-        operands.y,
-        operands.layer,
-      ]);
-  }
-
-  match = /^sound\.play\s+(.+)$/.exec(source);
-  if (kind === 'action' && match) {
-    const operands = parseRawNamedOperands(match[1], [
-      'resource',
-      'loop',
-      'volume',
-      'pitch',
-    ]);
-    if (operands)
-      return makeInstruction('PlaySound', [
-        '',
-        operands.resource,
-        operands.loop,
-        operands.volume,
-        operands.pitch,
-      ]);
-  }
-
-  match = /^scene\.change\s+(\S+)\s+(.+)$/.exec(source);
-  if (kind === 'action' && match) {
-    const operands = parseRawNamedOperands(match[2], ['stop_sounds']);
-    if (operands)
-      return makeInstruction('Scene', ['', match[1], operands.stop_sounds]);
-  }
-
-  match = /^([A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)+)\s+(==|!=|<=|>=|=|\+=|-=|\*=|\/=|<|>)\s+(.+)$/.exec(
-    source
-  );
-  if (!match) return null;
-  const target = match[1];
-  const targetParts = target.split('.');
-  const value = match[3];
-  const operator =
-    kind === 'condition'
-      ? jsonComparisonOperator(match[2])
-      : jsonAssignmentOperator(match[2]);
-  if (!operator) return null;
-
-  if (targetParts[0] === 'scene' && targetParts.length >= 2) {
-    const variable = targetParts.slice(1).join('.');
-    const isString = /^"/.test(value.trim());
-    return makeInstruction(
-      kind === 'action'
-        ? isString
-          ? 'SetStringVariable'
-          : 'SetNumberVariable'
-        : isString
-        ? 'StringVariable'
-        : 'NumberVariable',
-      [variable, operator, value]
-    );
-  }
-
-  if (targetParts.length !== 2) return null;
-  const object = targetParts[0];
-  const property = targetParts[1];
-  const propertyTypes = {
-    x: kind === 'action' ? 'SetX' : 'PosX',
-    y: kind === 'action' ? 'SetY' : 'PosY',
-    angle: kind === 'action' ? 'SetAngle' : 'Angle',
-    opacity:
-      kind === 'action' ? 'OpacityCapability::OpacityBehavior::SetValue' : null,
-    text:
-      kind === 'action'
-        ? 'TextContainerCapability::TextContainerBehavior::SetValue'
-        : null,
-  };
-  if (propertyTypes[property]) {
-    const type = propertyTypes[property];
-    return makeInstruction(
-      type,
-      property === 'opacity'
-        ? [object, 'Opacity', operator, value]
-        : property === 'text'
-        ? [object, 'Text', operator, value]
-        : [object, operator, value]
-    );
-  }
-
-  const isString = /^"/.test(value.trim());
-  return makeInstruction(
-    kind === 'action'
-      ? isString
-        ? 'SetStringObjectVariable'
-        : 'SetNumberObjectVariable'
-      : isString
-      ? 'StringObjectVariable'
-      : 'NumberObjectVariable',
-    [object, property, operator, value]
-  );
-};
-
 const balanceDelta = (source: string): number => {
   let delta = 0;
   let inString = false;
@@ -1028,20 +633,10 @@ const parseExactInstruction = (
     line
   );
   if (!source.startsWith('@exact')) {
-    const builtinInstruction = resolveFriendlyBuiltinInstruction(source, kind);
-    if (builtinInstruction) {
-      if (metadata.disabled !== undefined)
-        builtinInstruction.disabled = metadata.disabled;
-      if (metadata.inverted !== undefined)
-        builtinInstruction.type.inverted = metadata.inverted;
-      if (metadata.awaited !== undefined)
-        builtinInstruction.type.await = metadata.awaited;
-      return builtinInstruction;
-    }
     if (!options.resolveInstruction) {
       fail(
         'IFDO_CATALOG_REQUIRED',
-        `Friendly ${kind} requires a project instruction catalog: ${source}`,
+        `${kind} requires a project instruction catalog: ${source}`,
         line
       );
     }
@@ -1328,6 +923,9 @@ class IfDoParser {
             comment2: 'string',
           },
           group: {
+            disabled: 'boolean',
+            folded: 'boolean',
+            aiGeneratedEventId: 'string',
             source: 'string',
             creationTime: 'number',
             color: 'rgb',
@@ -1402,9 +1000,21 @@ class IfDoParser {
         finish();
         rejectPendingVariables('a group', line.line);
         const metadata = takeSpecialMetadata('group', line.line);
+        const groupEventMetadata = { ...pendingEventMetadata };
+        ['disabled', 'folded', 'aiGeneratedEventId'].forEach(field => {
+          if (metadata[field] === undefined) return;
+          if (pendingEventMetadata[field] !== undefined) {
+            fail(
+              'IFDO_SYNTAX',
+              `Duplicate group event metadata ${field}.`,
+              line.line
+            );
+          }
+          groupEventMetadata[field] = metadata[field];
+        });
         const nameSource = text.slice('group '.length).trim();
         current = {
-          ...commonEvent(EVENT_TYPES.group, pendingEventMetadata),
+          ...commonEvent(EVENT_TYPES.group, groupEventMetadata),
           name: parseStringOrRaw(nameSource),
           source: metadata.source == null ? '' : String(metadata.source),
           creationTime: Number(metadata.creationTime || 0),
@@ -2399,39 +2009,15 @@ const formatInstructionLines = (
   const instructionText = `@exact id=${quote(
     instruction.type.value
   )} parameters=${JSON.stringify(instruction.parameters || [])}`;
-  const builtinFriendlyCandidate = formatFriendlyBuiltinInstruction(
-    instruction,
-    kind
-  );
-  const catalogFriendlyCandidate =
-    !builtinFriendlyCandidate && options.formatInstruction
-      ? options.formatInstruction({ kind, instruction })
-      : null;
-  let friendlyInstructionText = null;
-  if (builtinFriendlyCandidate && !(instruction.subInstructions || []).length) {
-    const resolvedCandidate = resolveFriendlyBuiltinInstruction(
-      builtinFriendlyCandidate,
-      kind
-    );
-    if (
-      resolvedCandidate &&
-      resolvedCandidate.type.value === instruction.type.value &&
-      JSON.stringify(resolvedCandidate.parameters) ===
-        JSON.stringify(instruction.parameters || [])
-    ) {
-      friendlyInstructionText = builtinFriendlyCandidate;
-    }
-  } else if (catalogFriendlyCandidate) {
-    // Catalog formatters are constructed from the same indexed signature used
-    // by the resolver, so the named form is bijective by construction.
-    friendlyInstructionText = catalogFriendlyCandidate;
-  }
+  const catalogInstructionText = options.formatInstruction
+    ? options.formatInstruction({ kind, instruction })
+    : null;
   const rootKeyword =
     options.rootKeyword || (kind === 'condition' ? 'if' : 'do');
   lines.push(
     `${prefix}${
       instructionDepth === 0 ? `${rootKeyword} ` : ''
-    }${friendlyInstructionText || instructionText}`
+    }${catalogInstructionText || instructionText}`
   );
   (instruction.subInstructions || []).forEach(child => {
     lines.push(
@@ -2485,9 +2071,11 @@ const formatEvents = (
   const lines = [];
   events.forEach((event, eventIndex) => {
     if (eventIndex) lines.push('');
-    lines.push(
-      `${depthPrefix(depth)}${formatMetadata('@event', eventMetadata(event))}`
-    );
+    if (event.type !== EVENT_TYPES.group) {
+      lines.push(
+        `${depthPrefix(depth)}${formatMetadata('@event', eventMetadata(event))}`
+      );
+    }
     if (event.type === EVENT_TYPES.standard) {
       appendInstructionEventBody(lines, event, depth, {
         formatInstruction: options.formatInstruction,
@@ -2677,6 +2265,7 @@ const formatEvents = (
     if (event.type === EVENT_TYPES.group) {
       lines.push(
         `${depthPrefix(depth)}${formatMetadata('@group', {
+          ...eventMetadata(event),
           source: event.source,
           creationTime: event.creationTime,
           color: [event.colorR, event.colorG, event.colorB],

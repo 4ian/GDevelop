@@ -179,6 +179,25 @@ const findGameUris = (value: any, output: Set<string>) => {
     Object.keys(value).forEach(key => findGameUris(value[key], output));
 };
 
+const discoverSceneSettingsUris = async (
+  projectRoot: string
+): Promise<Array<string>> => {
+  const scenesRoot = path.join(projectRoot, 'scenes');
+  if (!fs.existsSync(scenesRoot)) return [];
+  const entries = await fs.readdir(scenesRoot, { withFileTypes: true });
+  return entries
+    .filter(entry => entry.isDirectory())
+    .map(entry => ({
+      name: entry.name,
+      filePath: path.join(scenesRoot, entry.name, 'scene.settings'),
+    }))
+    .filter(({ filePath }) => fs.existsSync(filePath))
+    .sort((left, right) => left.name.localeCompare(right.name))
+    .map(
+      ({ name }) => `game://scenes/${encodeManagedName(name)}/scene.settings`
+    );
+};
+
 export const readMultiFileSourceTree = async (
   entryPath: string
 ): Promise<{| projectRoot: string, files: { [string]: string } |}> => {
@@ -192,7 +211,10 @@ export const readMultiFileSourceTree = async (
   const projectRoot = path.resolve(path.dirname(entryPath));
   await recoverMultiFileTransactions(projectRoot);
   const files: { [string]: string } = {};
-  const pending: Array<string> = [MULTI_FILE_ENTRY_URI];
+  const pending: Array<string> = [
+    MULTI_FILE_ENTRY_URI,
+    ...(await discoverSceneSettingsUris(projectRoot)),
+  ];
   let totalSize = 0;
 
   while (pending.length) {

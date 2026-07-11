@@ -1880,7 +1880,6 @@ const getUniqueInstructionParameterNames = (metadata: any): Array<string> => {
 const catalogParameters = (parameters: Array<Object>): Array<Object> =>
   parameters.map(parameter => {
     const catalogParameter: Object = {
-      index: parameter.index,
       dslName: parameter.parameterName,
       type: parameter.type,
     };
@@ -1964,21 +1963,21 @@ export const buildCompleteProjectInstructionCatalog = ({
 |}): Object => {
   const collectInstructions = (isCondition: boolean) => {
     const entriesByType: Map<string, Object> = new Map();
-    enumerateAllInstructions(isCondition, project, (i18n || null: any)).forEach(
-      instruction => {
-        if (entriesByType.has(instruction.type)) return;
-        const summary = summarizeInstructionMetadata({
-          type: instruction.type,
-          kind: isCondition ? 'condition' : 'action',
-          metadata: instruction.metadata,
-          fullGroupName: instruction.fullGroupName,
-        });
-        entriesByType.set(
-          instruction.type,
-          catalogInstruction(summary, instruction.scope)
-        );
-      }
-    );
+    enumerateAllInstructions(isCondition, project, (i18n || null: any), {
+      includeHiddenAndCompatibility: true,
+    }).forEach(instruction => {
+      if (entriesByType.has(instruction.type)) return;
+      const summary = summarizeInstructionMetadata({
+        type: instruction.type,
+        kind: isCondition ? 'condition' : 'action',
+        metadata: instruction.metadata,
+        fullGroupName: instruction.fullGroupName,
+      });
+      entriesByType.set(
+        instruction.type,
+        catalogInstruction(summary, instruction.scope)
+      );
+    });
     return Array.from(entriesByType.values()).sort((left, right) =>
       left.type.localeCompare(right.type)
     );
@@ -2037,7 +2036,7 @@ export const buildCompleteProjectInstructionCatalog = ({
         'Include every required parameter. Code-only parameters may be omitted and compile to an empty string.',
         'Keep parameter expressions inside the JSON string, including embedded quotes where required.',
         'Use only entries compatible with the target event scope.',
-        'Use @exact only when a catalog entry explicitly cannot be represented by named parameters.',
+        'Never write @exact. Every serializable instruction type, including hidden compatibility identifiers, is represented by this catalog.',
       ],
     },
     counts: {

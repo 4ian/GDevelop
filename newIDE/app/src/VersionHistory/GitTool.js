@@ -166,6 +166,7 @@ const styles = {
 type Props = {|
   fileMetadata: ?FileMetadata,
   isLocalProject: boolean,
+  isOpen: boolean,
   onReloadProject: () => Promise<void>,
 |};
 
@@ -567,6 +568,7 @@ const SideBySideDiffViewer = ({
 const GitTool = ({
   fileMetadata,
   isLocalProject,
+  isOpen,
   onReloadProject,
 }: Props): React.Node => {
   const { hasUnsavedChanges } = React.useContext(UnsavedChangesContext);
@@ -630,9 +632,15 @@ const GitTool = ({
       setDiffFile(null);
       setDiffText('');
       setDiffErrorMessage(null);
-      refreshStatus();
     },
     [refreshStatus]
+  );
+
+  React.useEffect(
+    () => {
+      if (isOpen) refreshStatus();
+    },
+    [isOpen, refreshStatus]
   );
 
   const runAction = React.useCallback(

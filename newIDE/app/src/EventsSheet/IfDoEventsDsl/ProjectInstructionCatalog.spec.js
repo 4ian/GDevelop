@@ -20,9 +20,9 @@ const catalogFixture = {
     {
       type: 'Network::Send',
       parameters: [
-        { index: 0, dslName: 'url', isOptional: false, isCodeOnly: false },
-        { index: 1, dslName: 'body', isOptional: false, isCodeOnly: false },
-        { index: 2, dslName: 'runtime', isOptional: false, isCodeOnly: true },
+        { dslName: 'url', isOptional: false, isCodeOnly: false },
+        { dslName: 'body', isOptional: false, isCodeOnly: false },
+        { dslName: 'runtime', isOptional: false, isCodeOnly: true },
       ],
     },
   ],
@@ -31,7 +31,6 @@ const catalogFixture = {
       type: 'Network::Succeeded',
       parameters: [
         {
-          index: 0,
           dslName: 'request_id',
           isOptional: false,
           isCodeOnly: false,
@@ -118,8 +117,19 @@ describe('project IfDo instruction catalog', () => {
       'do InstructionType dslName="exact serialized operand"'
     );
     expect(
+      catalog.authoring.rules.some(rule =>
+        rule.startsWith('Never write @exact')
+      )
+    ).toBe(true);
+    expect(
       [...catalog.actions, ...catalog.conditions, ...catalog.expressions].some(
         entry => entry.kind !== undefined
+      )
+    ).toBe(false);
+    expect(
+      [...catalog.actions, ...catalog.conditions, ...catalog.expressions].some(
+        entry =>
+          entry.parameters.some(parameter => parameter.index !== undefined)
       )
     ).toBe(false);
     const sceneInput = JSON.stringify([
@@ -153,6 +163,53 @@ describe('project IfDo instruction catalog', () => {
     ).toBe(true);
     expect(
       catalog.conditions.some(entry => entry.type === 'SceneJustBegins')
+    ).toBe(true);
+    ['MettreX', 'MettreY', 'SetBooleanVariable'].forEach(type => {
+      expect(catalog.actions.some(entry => entry.type === type)).toBe(true);
+    });
+    ['BooleanVariable', 'SourisSurObjet', 'ObjectTimer', 'Egal'].forEach(
+      type => {
+        expect(catalog.conditions.some(entry => entry.type === type)).toBe(
+          true
+        );
+      }
+    );
+    const compatibilityInput = JSON.stringify([
+      {
+        type: 'BuiltinCommonInstructions::Standard',
+        conditions: [
+          {
+            type: { value: 'BooleanVariable' },
+            parameters: ['Disabled', 'True', ''],
+          },
+          {
+            type: { value: 'Egal' },
+            parameters: ['Variable(Value)', '=', '1'],
+          },
+        ],
+        actions: [
+          {
+            type: { value: 'MettreX' },
+            parameters: ['Object', '+', '1'],
+          },
+          {
+            type: { value: 'SetBooleanVariable' },
+            parameters: ['Disabled', 'True', ''],
+          },
+        ],
+      },
+    ]);
+    const compatibilityDsl = convertLegacyEventsJsonToIfDo(compatibilityInput, {
+      formatInstruction: createCatalogInstructionFormatter(catalog),
+    });
+    expect(compatibilityDsl).not.toContain('@exact');
+    expect(
+      areLegacyEventsEquivalent(
+        compatibilityInput,
+        compileIfDoToLegacyEventsJson(compatibilityDsl, {
+          resolveInstruction: createCatalogInstructionResolver(catalog),
+        })
+      )
     ).toBe(true);
     expect(Array.isArray(catalog.actions[0].eventScopes)).toBe(true);
     expect(catalog.actions[0].iconFilename).toBeUndefined();

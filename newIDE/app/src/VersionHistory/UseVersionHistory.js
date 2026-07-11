@@ -476,6 +476,7 @@ const useVersionHistory = ({
                 storageProviderInternalName ===
                 localFileStorageProviderInternalName
               }
+              isOpen={versionHistoryPanelOpen}
               onReloadProject={onReloadProject}
             />
           </Drawer>

@@ -406,6 +406,35 @@ describe('IfDo events DSL', () => {
       expect(areLegacyEventsEquivalent(input, output)).toBe(true);
     });
 
+    test('preserves array-serialized multiline JavaScript without inserting commas', () => {
+      const input = JSON.stringify([
+        {
+          type: 'BuiltinCommonInstructions::JsCode',
+          inlineCode: [
+            'const game = runtimeScene.getGame();\r',
+            'eventsFunctionContext.returnValue = game.isInGameEdition && game.isInGameEdition();',
+          ],
+          parameterObjects: '',
+          useStrict: true,
+          eventsSheetExpanded: false,
+        },
+      ]);
+
+      const dsl = convertLegacyEventsJsonToIfDo(input);
+      expect(dsl).toContain(
+        'const game = runtimeScene.getGame();\r\neventsFunctionContext.returnValue'
+      );
+      expect(dsl).not.toContain(
+        'const game = runtimeScene.getGame();\r,eventsFunctionContext.returnValue'
+      );
+
+      const output = compileIfDoToLegacyEventsJson(dsl);
+      expect(JSON.parse(output)[0].inlineCode).toBe(
+        'const game = runtimeScene.getGame();\r\neventsFunctionContext.returnValue = game.isInGameEdition && game.isInGameEdition();'
+      );
+      expect(areLegacyEventsEquivalent(input, output)).toBe(true);
+    });
+
     test('preserves structural expressions, names, and comment whitespace', () => {
       const input = JSON.stringify([
         {

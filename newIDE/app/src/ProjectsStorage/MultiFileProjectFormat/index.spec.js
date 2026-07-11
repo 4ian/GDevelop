@@ -6,6 +6,7 @@ import fs from 'fs';
 import path from 'path';
 import {
   MULTI_FILE_ENTRY_URI,
+  MULTI_FILE_RESOURCES_URI,
   MultiFileProjectError,
   SCENE_LAYOUT_FIELDS,
   areLegacyProjectsEquivalent,
@@ -46,7 +47,19 @@ const projectFixture = {
     projectUuid: 'project-id',
     folderProject: false,
   },
-  resources: { resources: [], resourceFolders: [] },
+  resources: {
+    resources: [
+      {
+        file: 'assets/Player.png',
+        kind: 'image',
+        metadata: '',
+        name: 'Player.png',
+        smoothed: true,
+        userAdded: true,
+      },
+    ],
+    resourceFolders: [],
+  },
   objects: [],
   objectsFolderStructure: { folderName: '__ROOT', children: [] },
   objectsGroups: [],
@@ -217,7 +230,17 @@ describe('GDevelop multi-file project format', () => {
     expect(areLegacyProjectsEquivalent(projectFixture, output)).toBe(true);
     expect(files[MULTI_FILE_ENTRY_URI]).toContain('[gdevelop]');
     expect(files[MULTI_FILE_ENTRY_URI]).not.toContain('sceneFiles');
+    expect(files[MULTI_FILE_ENTRY_URI]).not.toContain('extensionFiles');
+    expect(files[MULTI_FILE_ENTRY_URI]).not.toContain('externalSettings');
+    expect(files[MULTI_FILE_ENTRY_URI]).not.toMatch(
+      /game:\/\/[^"']+\.settings/
+    );
     expect(files[MULTI_FILE_ENTRY_URI]).not.toContain('game://scenes/');
+    expect(files[MULTI_FILE_ENTRY_URI]).not.toContain('[project.resources');
+    expect(files[MULTI_FILE_RESOURCES_URI]).toContain('[project.resources]');
+    expect(files[MULTI_FILE_RESOURCES_URI]).toContain(
+      '[[project.resources.resources]]'
+    );
     expect(files['game://scenes/Main/scene.settings']).toContain(
       'layout = "game://scenes/Main/Main.layout"'
     );
@@ -235,6 +258,118 @@ describe('GDevelop multi-file project format', () => {
         'game://extensions/Combat/functions/CalculateDamage/function.settings'
       ]
     ).toContain('[extensions.Combat.functions.CalculateDamage]');
+    expect(
+      files[
+        'game://extensions/Combat/functions/CalculateDamage/function.settings'
+      ]
+    ).toContain('order = 0');
+    expect(files['game://extensions/Combat/extension.settings']).toContain(
+      'order = 0'
+    );
+    expect(files['game://extensions/Combat/extension.settings']).not.toContain(
+      'functionFiles'
+    );
+    expect(files['game://extensions/Combat/extension.settings']).not.toContain(
+      'prefabFiles'
+    );
+    expect(files['game://extensions/Combat/extension.settings']).not.toContain(
+      'behaviorFiles'
+    );
+    expect(files['game://extensions/Combat/extension.settings']).not.toMatch(
+      /game:\/\/[^"']+\.settings/
+    );
+  });
+
+  test('discovers settings by fixed folders and restores locally owned order', () => {
+    const project = JSON.parse(JSON.stringify(projectFixture));
+    project.eventsFunctionsExtensions[0].eventsFunctions.push(
+      functionObject('ResetCombat')
+    );
+    project.eventsFunctionsExtensions.push({
+      name: 'Support',
+      fullName: 'Support',
+      version: '1.0.0',
+      eventsFunctionsFolderStructure: {
+        folderName: '__ROOT',
+        children: [],
+      },
+      eventsFunctions: [functionObject('Help')],
+      eventsBasedObjects: [],
+      eventsBasedBehaviors: [],
+    });
+
+    const files = decomposeLegacyProjectToFiles(project);
+    const reversedFiles = Object.fromEntries(Object.entries(files).reverse());
+    const output = composeLegacyProjectFromFiles(reversedFiles);
+
+    expect(
+      output.eventsFunctionsExtensions.map(extension => extension.name)
+    ).toEqual(['Combat', 'Support']);
+    expect(
+      output.eventsFunctionsExtensions[0].eventsFunctions.map(
+        functionObject => functionObject.name
+      )
+    ).toEqual(['CalculateDamage', 'ResetCombat']);
+    expect(files['game://extensions/Support/extension.settings']).toContain(
+      'order = 1'
+    );
+    expect(
+      files['game://extensions/Combat/functions/ResetCombat/function.settings']
+    ).toContain('order = 1');
+  });
+
+  test('keeps read compatibility with settings-file indexes from early drafts', () => {
+    const files = decomposeLegacyProjectToFiles(projectFixture);
+    files[MULTI_FILE_ENTRY_URI] += `
+[[project.extensionFiles]]
+name = "Combat"
+settings = "game://extensions/Combat/extension.settings"
+`;
+    files['game://extensions/Combat/extension.settings'] += `
+[[extensions.Combat.functionFiles]]
+name = "CalculateDamage"
+settings = "game://extensions/Combat/functions/CalculateDamage/function.settings"
+
+[[extensions.Combat.prefabFiles]]
+name = "Enemy"
+settings = "game://extensions/Combat/prefabs/Enemy/prefab.settings"
+
+[[extensions.Combat.behaviorFiles]]
+name = "Health"
+settings = "game://extensions/Combat/behaviors/Health/behavior.settings"
+`;
+
+    expect(
+      areLegacyProjectsEquivalent(
+        projectFixture,
+        composeLegacyProjectFromFiles(files)
+      )
+    ).toBe(true);
+  });
+
+  test('keeps read compatibility with resources embedded in project.settings', () => {
+    const project = JSON.parse(JSON.stringify(projectFixture));
+    project.resources = { resources: [], resourceFolders: [] };
+    const files = decomposeLegacyProjectToFiles(project);
+    delete files[MULTI_FILE_RESOURCES_URI];
+    files[MULTI_FILE_ENTRY_URI] += `
+[project.resources]
+resources = []
+resourceFolders = []
+`;
+
+    expect(
+      areLegacyProjectsEquivalent(project, composeLegacyProjectFromFiles(files))
+    ).toBe(true);
+  });
+
+  test('rejects a discovered child settings fragment without its owner', () => {
+    const files = decomposeLegacyProjectToFiles(projectFixture);
+    delete files['game://extensions/Combat/extension.settings'];
+
+    expect(() => composeLegacyProjectFromFiles(files)).toThrow(
+      expect.objectContaining({ code: 'MULTIFILE_ORPHAN_SETTINGS' })
+    );
   });
 
   test('keeps scene layout files visual/UI-focused', () => {

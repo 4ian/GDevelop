@@ -3,6 +3,7 @@
 import optionalRequire from '../../Utils/OptionalRequire';
 import {
   MULTI_FILE_ENTRY_URI,
+  MULTI_FILE_RESOURCES_URI,
   MultiFileProjectError,
   areLegacyProjectsEquivalent,
   composeLegacyProjectFromFiles,
@@ -179,23 +180,89 @@ const findGameUris = (value: any, output: Set<string>) => {
     Object.keys(value).forEach(key => findGameUris(value[key], output));
 };
 
-const discoverSceneSettingsUris = async (
+const discoverOwnedSettingsUris = async (
   projectRoot: string
 ): Promise<Array<string>> => {
+  const discovered = [];
+  const resourcesSettingsPath = path.join(projectRoot, 'resources.settings');
+  if (fs.existsSync(resourcesSettingsPath)) {
+    discovered.push(MULTI_FILE_RESOURCES_URI);
+  }
   const scenesRoot = path.join(projectRoot, 'scenes');
-  if (!fs.existsSync(scenesRoot)) return [];
-  const entries = await fs.readdir(scenesRoot, { withFileTypes: true });
-  return entries
-    .filter(entry => entry.isDirectory())
-    .map(entry => ({
-      name: entry.name,
-      filePath: path.join(scenesRoot, entry.name, 'scene.settings'),
-    }))
-    .filter(({ filePath }) => fs.existsSync(filePath))
-    .sort((left, right) => left.name.localeCompare(right.name))
-    .map(
-      ({ name }) => `game://scenes/${encodeManagedName(name)}/scene.settings`
-    );
+  if (fs.existsSync(scenesRoot)) {
+    const sceneEntries = await fs.readdir(scenesRoot, {
+      withFileTypes: true,
+    });
+    sceneEntries
+      .filter(entry => entry.isDirectory())
+      .forEach(entry => {
+        const filePath = path.join(scenesRoot, entry.name, 'scene.settings');
+        if (fs.existsSync(filePath)) {
+          discovered.push(
+            `game://scenes/${encodeManagedName(entry.name)}/scene.settings`
+          );
+        }
+      });
+  }
+
+  const externalSettingsPath = path.join(
+    projectRoot,
+    'externals',
+    'external.settings'
+  );
+  if (fs.existsSync(externalSettingsPath)) {
+    discovered.push('game://externals/external.settings');
+  }
+
+  const extensionsRoot = path.join(projectRoot, 'extensions');
+  if (fs.existsSync(extensionsRoot)) {
+    const extensionEntries = await fs.readdir(extensionsRoot, {
+      withFileTypes: true,
+    });
+    for (const extensionEntry of extensionEntries) {
+      if (!extensionEntry.isDirectory()) continue;
+      const extensionRoot = path.join(extensionsRoot, extensionEntry.name);
+      const extensionUriSegment = encodeManagedName(extensionEntry.name);
+      const extensionSettingsPath = path.join(
+        extensionRoot,
+        'extension.settings'
+      );
+      if (fs.existsSync(extensionSettingsPath)) {
+        discovered.push(
+          `game://extensions/${extensionUriSegment}/extension.settings`
+        );
+      }
+      for (const child of [
+        { folder: 'functions', settings: 'function.settings' },
+        { folder: 'prefabs', settings: 'prefab.settings' },
+        { folder: 'behaviors', settings: 'behavior.settings' },
+      ]) {
+        const childRoot = path.join(extensionRoot, child.folder);
+        if (!fs.existsSync(childRoot)) continue;
+        const childEntries = await fs.readdir(childRoot, {
+          withFileTypes: true,
+        });
+        childEntries
+          .filter(entry => entry.isDirectory())
+          .forEach(entry => {
+            const settingsPath = path.join(
+              childRoot,
+              entry.name,
+              child.settings
+            );
+            if (fs.existsSync(settingsPath)) {
+              discovered.push(
+                `game://extensions/${extensionUriSegment}/${
+                  child.folder
+                }/${encodeManagedName(entry.name)}/${child.settings}`
+              );
+            }
+          });
+      }
+    }
+  }
+
+  return discovered.sort((left, right) => left.localeCompare(right));
 };
 
 export const readMultiFileSourceTree = async (
@@ -213,7 +280,7 @@ export const readMultiFileSourceTree = async (
   const files: { [string]: string } = {};
   const pending: Array<string> = [
     MULTI_FILE_ENTRY_URI,
-    ...(await discoverSceneSettingsUris(projectRoot)),
+    ...(await discoverOwnedSettingsUris(projectRoot)),
   ];
   let totalSize = 0;
 

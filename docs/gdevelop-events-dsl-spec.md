@@ -335,8 +335,8 @@ events = "game://extensions/Combat/functions/Damage/Damage.events"
 `game://` is rooted at the directory containing `project.settings`. Resolution,
 normalization, containment, and percent-encoding rules are defined in the
 multi-file project format specification. All `.settings` TOML files are
-append-safe namespace fragments; concatenating them in manifest order produces
-the authoritative in-memory `CombinedProjectSettings` compilation document
+append-safe namespace fragments; concatenating them in locally owned order
+produces the authoritative in-memory `CombinedProjectSettings` compilation document
 without changing the pure DSL grammar described here. Settings fragments remain
 separate files on disk; none embeds or includes another fragment, and the
 combined document is never written as project source.
@@ -346,13 +346,15 @@ files/subfolders.
 
 ### 4.7 Target binding and file purity
 
-Persisted project `.events` files do not contain TOML front matter. Their
-target is supplied out of band:
+Persisted project `.events` files do not contain TOML front matter. Settings
+fragments are independently discovered from fixed folder conventions; no
+settings fragment references another settings fragment. Each discovered owner
+then binds its own `.events` target out of band:
 
 ```text
-game://project.settings -> game://scenes/Main/scene.settings -> game://scenes/Main/Main.events
-game://project.settings -> game://externals/external.settings -> game://externals/SharedCombat.events
-game://extensions/Combat/extension.settings -> game://extensions/Combat/functions/Damage/function.settings -> game://extensions/Combat/functions/Damage/Damage.events
+game://scenes/Main/scene.settings -> game://scenes/Main/Main.events
+game://externals/external.settings -> game://externals/SharedCombat.events
+game://extensions/Combat/functions/Damage/function.settings -> game://extensions/Combat/functions/Damage/Damage.events
 game://extensions/Combat/prefabs/Enemy/prefab.settings -> game://extensions/Combat/prefabs/Enemy/TakeDamage.events
 game://extensions/Combat/behaviors/Health/behavior.settings -> game://extensions/Combat/behaviors/Health/Heal.events
 ```
@@ -1934,7 +1936,8 @@ authoring-relevant names, descriptions, valid scope names, parameter
 signatures, defaults, accepted values, and owner identity. Editor UI metadata
 and fields derivable from structure or the parameter list are not stored. In
 particular, entries omit `kind` because the parent `actions`, `conditions`, or
-`expressions` array already defines it.
+`expressions` array already defines it, and parameters omit `index` because
+their array position is authoritative.
 
 Rules:
 
@@ -2406,6 +2409,12 @@ the editor integration API to build on top of this core.
 `options.formatInstruction` is the reverse boundary. The multi-file storage
 adapter builds both callbacks from the saved project instruction catalog, so a
 generic named catalog instruction compiles and decompiles without `@exact`.
+That catalog enumerates the serialization surface, not merely the instruction
+picker UI: hidden compatibility identifiers, deprecated-but-loadable
+identifiers, and every switchable variable-type variant are included with
+their real metadata-derived parameter names. Consequently, a valid persisted
+instruction never falls back to `@exact` merely because the editor hides it
+from normal menus.
 
 Suggested result:
 
@@ -3695,6 +3704,11 @@ The exact form is still IfDo syntax: its identifier must exist in the loaded
 catalog, its condition/action kind must match its source position, parameters
 must match the registered signature, and its sub-instruction structure must be
 valid. It is not an arbitrary JSON container.
+
+Canonical multi-file project saves use the named catalog form for every
+registered serializable instruction. `@exact` remains a lossless core/import
+form and backward-reading construct; it is not emitted when the complete
+project catalog is available.
 
 ### 35.3 Unsupported schema handling
 

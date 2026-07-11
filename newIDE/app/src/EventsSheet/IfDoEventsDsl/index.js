@@ -235,6 +235,27 @@ const asArray = (value: any, label: string): Array<any> => {
   return value;
 };
 
+// SerializerElement stores strings containing newlines as an array of lines in
+// project JSON. Reproduce GetMultilineStringValue here instead of coercing the
+// array with String(), which would insert commas into JavaScript source code.
+const normalizeMultilineString = (value: any, label: string): string => {
+  if (value == null) return '';
+  if (typeof value === 'string') return value;
+  if (!Array.isArray(value) || !value.every(line => typeof line === 'string')) {
+    fail(
+      'IFDO_INVALID_JSON',
+      `${label} must be a string or an array of strings.`
+    );
+  }
+
+  let result = '';
+  value.forEach(line => {
+    if (result) result += '\n';
+    result += line;
+  });
+  return result;
+};
+
 const assertOnlyKeys = (
   object: Object,
   allowed: Set<string>,
@@ -1927,7 +1948,10 @@ const normalizeEvent = (value: any, label: string): Object => {
   }
   return {
     ...common,
-    inlineCode: String(event.inlineCode || ''),
+    inlineCode: normalizeMultilineString(
+      event.inlineCode,
+      `${label}.inlineCode`
+    ),
     parameterObjects: String(event.parameterObjects || ''),
     useStrict: !!event.useStrict,
     eventsSheetExpanded: !!event.eventsSheetExpanded,

@@ -27,6 +27,7 @@ import {
   onSaveProject,
   writeProjectInstructionCatalog,
 } from './LocalProjectWriter';
+import { ensureProjectHasDefaultScene } from '../../ProjectCreation/CreateProject';
 
 const projectFixture = {
   gdVersion: { major: 5, minor: 6, build: 0, revision: 0 },
@@ -87,6 +88,12 @@ describe('Local multi-file project storage', () => {
     expect(changed).toContain('game://project.settings');
     expect(fs.existsSync(entryPath)).toBe(true);
     expect(
+      fs.existsSync(path.join(temporaryDirectory, 'resources.settings'))
+    ).toBe(true);
+    expect(fs.readFileSync(entryPath, 'utf8')).not.toContain(
+      '[project.resources'
+    );
+    expect(
       fs.existsSync(path.join(temporaryDirectory, 'scenes/Main/Main.events'))
     ).toBe(true);
     expect(
@@ -116,13 +123,11 @@ describe('Local multi-file project storage', () => {
           type: 'Network::Send',
           parameters: [
             {
-              index: 0,
               dslName: 'url',
               isOptional: false,
               isCodeOnly: false,
             },
             {
-              index: 1,
               dslName: 'runtime',
               isOptional: false,
               isCodeOnly: true,
@@ -159,6 +164,19 @@ describe('Local multi-file project storage', () => {
     expect(
       await writeLegacyProjectAsMultiFile(changedProject, entryPath)
     ).toEqual(['game://scenes/Main/scene.settings']);
+
+    const changedResourcesProject = JSON.parse(JSON.stringify(changedProject));
+    changedResourcesProject.resources.resources.push({
+      file: 'assets/New.png',
+      kind: 'image',
+      metadata: '',
+      name: 'New.png',
+      smoothed: true,
+      userAdded: true,
+    });
+    expect(
+      await writeLegacyProjectAsMultiFile(changedResourcesProject, entryPath)
+    ).toEqual(['game://resources.settings']);
   });
 
   test('removes only obsolete files owned by the previous manifest', async () => {
@@ -309,6 +327,44 @@ describe('Local multi-file project storage', () => {
     expect(
       JSON.parse(fs.readFileSync(generatedPath, 'utf8')).properties.name
     ).toBe('Generated compatibility project');
+    project.delete();
+  });
+
+  test('writes the default scene sources on the first project save', async () => {
+    const gd: libGDevelop = global.gd;
+    const project = gd.ProjectHelper.createNewGDJSProject();
+    project.setName('New game');
+    ensureProjectHasDefaultScene(project);
+
+    await onSaveProject(
+      project,
+      ({
+        fileIdentifier: path.join(temporaryDirectory, 'project.settings'),
+        name: project.getName(),
+        gameId: project.getProjectUuid(),
+        lastModifiedDate: 0,
+      }: any),
+      undefined,
+      {
+        showAlert: jest.fn(),
+        showConfirmation: jest.fn(),
+      }
+    );
+
+    const sceneDirectory = path.join(
+      temporaryDirectory,
+      'scenes',
+      'UntitledScene'
+    );
+    expect(fs.existsSync(path.join(sceneDirectory, 'scene.settings'))).toBe(
+      true
+    );
+    expect(
+      fs.existsSync(path.join(sceneDirectory, 'UntitledScene.layout'))
+    ).toBe(true);
+    expect(
+      fs.existsSync(path.join(sceneDirectory, 'UntitledScene.events'))
+    ).toBe(true);
     project.delete();
   });
 

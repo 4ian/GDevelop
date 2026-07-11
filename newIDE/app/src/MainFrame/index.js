@@ -248,7 +248,7 @@ import useCreateProject, {
   type UseCreateProjectReturnType,
 } from '../Utils/UseCreateProject';
 import newNameGenerator from '../Utils/NewNameGenerator';
-import { addDefaultLightToAllLayers } from '../ProjectCreation/CreateProject';
+import { ensureProjectHasDefaultScene } from '../ProjectCreation/CreateProject';
 import { type NewProjectSetup } from '../ProjectCreation/NewProjectSetupDialog';
 import { listAllExamples } from '../Utils/GDevelopServices/Example';
 import UrlStorageProvider from '../ProjectsStorage/UrlStorageProvider';
@@ -5286,12 +5286,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       const { currentProject, editorTabs } = newState;
       if (!currentProject) return;
 
-      if (currentProject.getLayoutsCount() === 0) {
-        const layoutName = 'UntitledScene';
-        currentProject.insertNewLayout(layoutName, 0);
-        const layout = currentProject.getLayout(layoutName);
-        addDefaultLightToAllLayers(layout);
-      }
+      ensureProjectHasDefaultScene(currentProject);
       openLayout(
         currentProject.getLayoutAt(0).getName(),
         {

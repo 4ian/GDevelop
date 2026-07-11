@@ -453,6 +453,21 @@ export const addDefaultLightToAllLayers = (layout: gdLayout): void => {
   }
 };
 
+/**
+ * Ensure a project has the scene that is expected when opening a new game.
+ *
+ * This must be called before the first project save. Otherwise, the scene is
+ * only created when the editor opens and its multi-file sources are absent
+ * until the user saves the project a second time.
+ */
+export const ensureProjectHasDefaultScene = (project: gdProject): void => {
+  if (project.getLayoutsCount() > 0) return;
+
+  const layoutName = 'UntitledScene';
+  project.insertNewLayout(layoutName, 0);
+  addDefaultLightToAllLayers(project.getLayout(layoutName));
+};
+
 const getCompositeSlug = (
   creationSource: NewProjectCreationSource,
   exampleShortHeaderSlug: string

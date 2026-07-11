@@ -37,7 +37,7 @@ type FormatInstruction = (input: {
   instruction: LegacyInstruction,
 }) => ?string;
 type CatalogParameter = {
-  index: number,
+  index?: number,
   dslName: string,
   isOptional?: boolean,
   isCodeOnly?: boolean,
@@ -88,7 +88,7 @@ const validateCatalogEntry = (entry: any, kind: CatalogKind) => {
     if (
       !parameter ||
       typeof parameter !== 'object' ||
-      parameter.index !== index ||
+      (parameter.index !== undefined && parameter.index !== index) ||
       typeof parameter.dslName !== 'string' ||
       !parameter.dslName
     )

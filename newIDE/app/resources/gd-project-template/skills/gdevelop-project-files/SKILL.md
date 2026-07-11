@@ -12,11 +12,12 @@ author the game.
 
 Read, in order:
 
-1. `project.settings` for project manifests and project-wide configuration.
-2. Relevant child `.settings` files for semantic configuration.
-3. Relevant `.layout` files for visual/UI configuration.
-4. Relevant `.events` files for IfDo event logic.
-5. `.gdevelop/instructions-catalog.json` before adding or changing
+1. `project.settings` for project-wide configuration.
+2. `resources.settings` for the complete project resource registry.
+3. Relevant child `.settings` files for semantic configuration.
+4. Relevant `.layout` files for visual/UI configuration.
+5. Relevant `.events` files for IfDo event logic.
+6. `.gdevelop/instructions-catalog.json` before adding or changing
    instructions.
 
 The catalog is regenerated from the loaded project every time GDevelop saves.
@@ -47,6 +48,7 @@ manifest entry and every referenced source file in the same change.
 
 ```text
 project.settings
+resources.settings
 scenes/<Scene>/<Scene>.layout
 scenes/<Scene>/<Scene>.events
 scenes/<Scene>/scene.settings
@@ -87,8 +89,10 @@ Rules:
 - Use every required parameter exactly once.
 - Omit code-only parameters when their value is the standard empty string.
 - Preserve quotes inside string-expression operands.
-- Use `@exact` only when named catalog parameters cannot represent a stored
-  instruction losslessly.
+- Never write `@exact`. The generated catalog includes hidden compatibility
+  identifiers and variable-type variants needed for lossless named syntax. If
+  a persisted type is absent, treat the catalog as stale and regenerate it by
+  saving with the editor before editing that instruction.
 - Keep OR alternatives as consecutive `if`/`or` lines.
 - Prefix every child-event line with `>` and every nested instruction with
   `?`.
@@ -134,7 +138,7 @@ metadata when editing existing sources.
    editor has loaded the changed sources.
 
 For assets, write the asset file inside the project, add/update its resource
-entry in project settings, then reference its project-relative path from UI
+entry in `resources.settings`, then reference its project-relative path from UI
 configuration. Do not create generated images when a code-native or existing
 asset is appropriate.
 

@@ -257,6 +257,10 @@ import { findEmptyPathInWorkspaceFolder } from '../ProjectsStorage/LocalFileStor
 import useEditorTabsStateSaving from './EditorTabs/UseEditorTabsStateSaving';
 import PixiResourcesLoader from '../ObjectsRendering/PixiResourcesLoader';
 import useResourcesWatcher from './ResourcesWatcher';
+import useLocalProjectChangesWatcher, {
+  showLocalProjectFilesChangedDialog,
+} from './LocalProjectChangesWatcher';
+import { localFileStorageProviderInternalName } from '../ProjectsStorage/LocalFileStorageProvider/LocalFileStorageProviderInternalName';
 import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/Errors';
 import { type CourseChapter } from '../Utils/GDevelopServices/Asset';
 import useVersionHistory from '../VersionHistory/UseVersionHistory';
@@ -6124,10 +6128,15 @@ const MainFrame = (props: Props): React.MixedElement => {
   );
 
   const reloadProject = React.useCallback(
-    async (): Promise<void> => {
+    async (options?: {
+      skipUnsavedChangesConfirmation?: boolean,
+    }): Promise<void> => {
       if (!currentProject || !currentFileMetadata) return;
 
-      if (hasUnsavedChanges) {
+      if (
+        hasUnsavedChanges &&
+        !(options && options.skipUnsavedChangesConfirmation)
+      ) {
         const answer = Window.showConfirmDialog(
           i18n._(
             t`Reload the project? Any changes that have not been saved will be lost.`
@@ -6157,6 +6166,49 @@ const MainFrame = (props: Props): React.MixedElement => {
       openFromFileMetadataWithStorageProvider,
     ]
   );
+
+  const backupCurrentProjectToLocalFolder = React.useCallback(
+    async (): Promise<void> => {
+      const localFileStorageProvider = props.storageProviders.find(
+        storageProvider =>
+          storageProvider.internalName === localFileStorageProviderInternalName
+      );
+      if (!localFileStorageProvider) return;
+
+      await saveProjectAsWithStorageProvider({
+        requestedStorageProvider: localFileStorageProvider,
+      });
+    },
+    [props.storageProviders, saveProjectAsWithStorageProvider]
+  );
+
+  const onLocalProjectFilesChanged = React.useCallback(
+    async (): Promise<void> => {
+      await showLocalProjectFilesChangedDialog({
+        showConfirmation,
+        onReloadProject: () =>
+          reloadProject({ skipUnsavedChangesConfirmation: true }),
+        onBackupProject: backupCurrentProjectToLocalFolder,
+      });
+    },
+    [backupCurrentProjectToLocalFolder, reloadProject, showConfirmation]
+  );
+
+  useLocalProjectChangesWatcher({
+    enabled:
+      !!currentProject &&
+      !isProjectOpening &&
+      !isSavingProject &&
+      getStorageProvider().internalName ===
+        localFileStorageProviderInternalName,
+    fileIdentifier: currentFileMetadata
+      ? currentFileMetadata.fileIdentifier
+      : null,
+    lastKnownModificationTime: currentFileMetadata
+      ? currentFileMetadata.lastModifiedDate || null
+      : null,
+    onProjectFilesChanged: onLocalProjectFilesChanged,
+  });
 
   const endTutorial = React.useCallback(
     async (shouldCloseProject?: boolean) => {

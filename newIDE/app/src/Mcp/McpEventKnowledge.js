@@ -586,6 +586,13 @@ const isDeprecatedOrHiddenInstructionMetadata = (
   metadata: gdInstructionMetadata
 ): boolean => metadata.isHidden() || !!metadata.getDeprecationMessage();
 
+const isDeprecatedExpressionMetadata = (
+  metadata: gdExpressionMetadata
+): boolean =>
+  !metadata.isShown() ||
+  metadata.isDeprecated() ||
+  !!metadata.getDeprecationMessage();
+
 const getRawInstructionMetadata = (
   project: gdProject,
   type: string,
@@ -1966,6 +1973,10 @@ export const buildCompleteProjectInstructionCatalog = ({
     enumerateAllInstructions(isCondition, project, (i18n || null: any), {
       includeHiddenAndCompatibility: true,
     }).forEach(instruction => {
+      // The events editor treats every hidden instruction as deprecated and
+      // renders it with the [DEPRECATED] warning, including older APIs such as
+      // TextObject::String that do not carry a deprecation message.
+      if (isDeprecatedOrHiddenInstructionMetadata(instruction.metadata)) return;
       if (entriesByType.has(instruction.type)) return;
       const summary = summarizeInstructionMetadata({
         type: instruction.type,
@@ -1986,6 +1997,7 @@ export const buildCompleteProjectInstructionCatalog = ({
   const expressionsByKey: Map<string, Object> = new Map();
   enumerateAllExpressions('', project, (i18n || null: any)).forEach(
     expression => {
+      if (isDeprecatedExpressionMetadata(expression.metadata)) return;
       const key = `${
         expression.type
       }\u0000${expression.metadata.getReturnType()}`;
@@ -2036,7 +2048,8 @@ export const buildCompleteProjectInstructionCatalog = ({
         'Include every required parameter. Code-only parameters may be omitted and compile to an empty string.',
         'Keep parameter expressions inside the JSON string, including embedded quotes where required.',
         'Use only entries compatible with the target event scope.',
-        'Never write @exact. Every serializable instruction type, including hidden compatibility identifiers, is represented by this catalog.',
+        'Never write @exact. Use only instruction and expression types represented by this catalog.',
+        'Editor-hidden or deprecated instructions and expressions are intentionally excluded and must not be authored.',
       ],
     },
     counts: {

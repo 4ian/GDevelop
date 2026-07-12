@@ -1932,7 +1932,10 @@ signatures, defaults, accepted values, and owner identity. Editor UI metadata
 and fields derivable from structure or the parameter list are not stored. In
 particular, entries omit `kind` because the parent `actions`, `conditions`, or
 `expressions` array already defines it, and parameters omit `index` because
-their array position is authoritative.
+their array position is authoritative. Editor-hidden instructions (which the
+events editor labels `[DEPRECATED]`), instructions carrying a deprecation
+message, and expressions hidden or marked deprecated are excluded so an AI
+cannot select APIs that the editor warns against.
 
 Rules:
 
@@ -2416,12 +2419,10 @@ the editor integration API to build on top of this core.
 `options.formatInstruction` is the reverse boundary. The multi-file storage
 adapter builds both callbacks from the saved project instruction catalog, so a
 generic named catalog instruction compiles and decompiles without `@exact`.
-That catalog enumerates the serialization surface, not merely the instruction
-picker UI: hidden compatibility identifiers, deprecated-but-loadable
-identifiers, and every switchable variable-type variant are included with
-their real metadata-derived parameter names. Consequently, a valid persisted
-instruction never falls back to `@exact` merely because the editor hides it
-from normal menus.
+That catalog enumerates the non-deprecated authoring surface. Editor-hidden
+compatibility identifiers, instructions with deprecation messages, and hidden
+or deprecated expressions are omitted so AI authors cannot introduce entries
+that render with warning/deprecated styling into new event code.
 
 Suggested result:
 

@@ -218,6 +218,9 @@ both; the two files remain independent unless both are listed in
   action, condition, and expression with stable named parameters, operand
   syntax, and event-scope compatibility for AI authoring. It is generated
   editor state, not source, and must never be edited by an AI model.
+  Editor-hidden instructions (which the events editor treats as deprecated),
+  instructions with deprecation messages, and hidden or deprecated expressions
+  are excluded so AI-authored events cannot select APIs that produce warnings.
 - `.gdevelop/game.json`, regenerated from the composed legacy serializer tree
   on every manual project save. It is an ignored runtime/export compatibility
   snapshot, never editable project source.
@@ -1429,9 +1432,10 @@ The writer:
 5. Atomically replaces the target.
 6. Regenerates `.gdevelop/instructions-catalog.json` from the loaded project,
    installed extensions, object/behavior metadata, and function signatures.
-   Enumeration covers every serializable instruction identifier, including
-   hidden compatibility identifiers and switchable variable-type variants;
-   it is deliberately broader than the editor instruction-picker UI.
+   Enumeration covers the non-deprecated authoring surface. It excludes
+   editor-hidden compatibility instructions, instructions with deprecation
+   messages, and expressions that are hidden, marked deprecated, or carry a
+   deprecation message.
    The lean JSON keeps only DSL-authoring metadata and writes one compact
    instruction per line for targeted `rg` searches. UI icons, help paths,
    derived parameter templates, repeated scope labels, per-entry `kind`, and

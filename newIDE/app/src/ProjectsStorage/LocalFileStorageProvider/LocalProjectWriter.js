@@ -34,6 +34,7 @@ import {
   createCatalogInstructionResolver,
   serializeProjectInstructionCatalog,
 } from '../../EventsSheet/IfDoEventsDsl/ProjectInstructionCatalog';
+import { getLocalProjectLastModifiedDate } from './LocalProjectFileModificationTime';
 
 const fs = optionalRequire('fs-extra');
 const path = optionalRequire('path');
@@ -285,7 +286,6 @@ export const onSaveProject = async (
   }
 
   const filePath = fileMetadata.fileIdentifier;
-  const now = Date.now();
   if (!filePath) {
     throw new Error('Unable to find file path before saving.');
   }
@@ -294,7 +294,6 @@ export const onSaveProject = async (
     ...fileMetadata,
     name: project.getName(),
     gameId: project.getProjectUuid(),
-    lastModifiedDate: now,
   };
 
   const projectPath = path.dirname(filePath);
@@ -316,10 +315,14 @@ export const onSaveProject = async (
     canonicalEventSerialization:
       !!saveOptions && !!saveOptions.canonicalEventSerialization,
   });
+  const lastModifiedDate = await getLocalProjectLastModifiedDate(filePath);
   return {
     wasSaved: true,
     // $FlowFixMe[incompatible-type]
-    fileMetadata: newFileMetadata,
+    fileMetadata: {
+      ...newFileMetadata,
+      lastModifiedDate: lastModifiedDate || Date.now(),
+    },
   };
 };
 
@@ -465,7 +468,6 @@ export const onSaveProjectAs = async (
     fileIdentifier: filePath,
     name: project.getName(),
     gameId: project.getProjectUuid(),
-    lastModifiedDate: Date.now(),
   };
 
   // Move (copy or download, etc...) the resources first.
@@ -485,10 +487,14 @@ export const onSaveProjectAs = async (
     // through the normal onSaveProject path, which honors the preference.
     canonicalEventSerialization: false,
   });
+  const lastModifiedDate = await getLocalProjectLastModifiedDate(filePath);
   return {
     wasSaved: true,
     // $FlowFixMe[incompatible-type]
-    fileMetadata: newFileMetadata,
+    fileMetadata: {
+      ...newFileMetadata,
+      lastModifiedDate: lastModifiedDate || Date.now(),
+    },
   };
 };
 

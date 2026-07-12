@@ -12,6 +12,8 @@ import {
   serializeProjectInstructionCatalog,
   validateProjectInstructionCatalog,
 } from './ProjectInstructionCatalog';
+import { enumerateAllInstructions } from '../../InstructionOrExpression/EnumerateInstructions';
+import { enumerateAllExpressions } from '../../InstructionOrExpression/EnumerateExpressions';
 
 const catalogFixture = {
   format: 'gdevelop-ifdo-instruction-catalog',
@@ -46,7 +48,7 @@ describe('project IfDo instruction catalog', () => {
     const output = JSON.parse(
       compileIfDoToLegacyEventsJson(
         `if Network::Succeeded request_id="RequestId"\n` +
-          `do Network::Send url="\\\"https://example.com\\\"" body="Variable(Payload)"\n`,
+          `do Network::Send url="\\"https://example.com\\"" body="Variable(Payload)"\n`,
         { resolveInstruction: createCatalogInstructionResolver(catalogFixture) }
       )
     );
@@ -106,10 +108,68 @@ describe('project IfDo instruction catalog', () => {
     const project = gd.ProjectHelper.createNewGDJSProject();
     const catalog = buildProjectInstructionCatalog(project);
     const serialized = serializeProjectInstructionCatalog(catalog);
+    const deprecatedActionTypes = new Set(
+      enumerateAllInstructions(false, project, (null: any), {
+        includeHiddenAndCompatibility: true,
+      })
+        .filter(
+          ({ metadata }) =>
+            metadata.isHidden() || !!metadata.getDeprecationMessage()
+        )
+        .map(({ type }) => type)
+    );
+    const deprecatedConditionTypes = new Set(
+      enumerateAllInstructions(true, project, (null: any), {
+        includeHiddenAndCompatibility: true,
+      })
+        .filter(
+          ({ metadata }) =>
+            metadata.isHidden() || !!metadata.getDeprecationMessage()
+        )
+        .map(({ type }) => type)
+    );
+    const deprecatedExpressionKeys = new Set(
+      enumerateAllExpressions('', project, (null: any))
+        .filter(
+          ({ metadata }) =>
+            !metadata.isShown() ||
+            metadata.isDeprecated() ||
+            !!metadata.getDeprecationMessage()
+        )
+        .map(({ type, metadata }) => `${type}\u0000${metadata.getReturnType()}`)
+    );
 
     expect(catalog.counts.actions).toBeGreaterThan(100);
     expect(catalog.counts.conditions).toBeGreaterThan(100);
     expect(catalog.counts.expressions).toBeGreaterThan(100);
+    expect(
+      deprecatedActionTypes.size + deprecatedConditionTypes.size
+    ).toBeGreaterThan(0);
+    expect(
+      catalog.actions.some(({ type }) => deprecatedActionTypes.has(type))
+    ).toBe(false);
+    expect(
+      catalog.conditions.some(({ type }) => deprecatedConditionTypes.has(type))
+    ).toBe(false);
+    expect(
+      catalog.expressions.some(({ type, returnType }) =>
+        deprecatedExpressionKeys.has(`${type}\u0000${returnType}`)
+      )
+    ).toBe(false);
+    expect(
+      [...catalog.actions, ...catalog.conditions, ...catalog.expressions].some(
+        entry => entry.deprecationMessage !== undefined
+      )
+    ).toBe(false);
+    expect(
+      catalog.actions.some(({ type }) => type === 'TextObject::String')
+    ).toBe(false);
+    expect(
+      catalog.conditions.some(({ type }) => type === 'TextObject::String')
+    ).toBe(false);
+    expect(
+      catalog.expressions.some(({ type }) => type === 'TextObject::String')
+    ).toBe(false);
     expect(catalog.authoring.catalogConditionSyntax).toBe(
       'if InstructionType dslName="exact serialized operand"'
     );

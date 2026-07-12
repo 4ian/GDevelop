@@ -132,7 +132,9 @@ loop, comment, and JavaScript metadata when editing existing sources.
 
 1. Inspect manifests and only the owned files relevant to the request.
 2. Search `.gdevelop/instructions-catalog.json` for required instructions and
-   expressions.
+   expressions. The generated catalog excludes editor-hidden and deprecated
+   APIs; never invent or reuse an instruction identifier that is absent from it
+   when authoring new events.
 3. Patch source files directly. Use `apply_patch` for precise edits.
 4. Re-read every changed manifest reference and verify that each `game://` URI
    exists and stays inside the project.

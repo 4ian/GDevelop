@@ -9,6 +9,7 @@ import {
   migrateLegacyProject,
   openMultiFileProject,
 } from './LocalMultiFileProject';
+import { getLocalProjectLastModifiedDate } from './LocalProjectFileModificationTime';
 const fs = optionalRequire('fs');
 const path = optionalRequire('path');
 
@@ -31,7 +32,15 @@ export const onOpen = (
 |}> => {
   const filePath = fileMetadata.fileIdentifier;
   if (path.basename(filePath).toLowerCase() === 'project.settings') {
-    return openMultiFileProject(filePath).then(content => ({ content }));
+    return getLocalProjectLastModifiedDate(filePath).then(
+      async lastModifiedDate => ({
+        content: await openMultiFileProject(filePath),
+        fileMetadata: {
+          ...fileMetadata,
+          ...(lastModifiedDate !== null ? { lastModifiedDate } : {}),
+        },
+      })
+    );
   }
   const projectPath = path.dirname(filePath);
   return fs.promises.readFile(filePath, 'utf8').then(legacySource => {
@@ -56,9 +65,16 @@ export const onOpen = (
               'The legacy JSON and migrated project.settings have diverged. Open project.settings or import the changed JSON into a different folder.'
             );
           }
+          const lastModifiedDate = await getLocalProjectLastModifiedDate(
+            entryPath
+          );
           return {
             content: await openMultiFileProject(entryPath),
-            fileMetadata: { ...fileMetadata, fileIdentifier: entryPath },
+            fileMetadata: {
+              ...fileMetadata,
+              fileIdentifier: entryPath,
+              ...(lastModifiedDate !== null ? { lastModifiedDate } : {}),
+            },
           };
         }
         const migration = await migrateLegacyProject({
@@ -66,11 +82,15 @@ export const onOpen = (
           legacySource,
           legacyProject: object,
         });
+        const lastModifiedDate = await getLocalProjectLastModifiedDate(
+          migration.entryPath
+        );
         return {
           content: object,
           fileMetadata: {
             ...fileMetadata,
             fileIdentifier: migration.entryPath,
+            ...(lastModifiedDate !== null ? { lastModifiedDate } : {}),
           },
         };
       });

@@ -658,9 +658,7 @@ export const getLegacyMigrationSourceHash = async (
   if (!fs.existsSync(entryPath)) return null;
   const source = await readBoundedUtf8(entryPath);
   const document = parseTomlSource(source, MULTI_FILE_ENTRY_URI);
-  return document.project && document.project.migration
-    ? document.project.migration.sourceSha256 || null
-    : null;
+  return document.migration ? document.migration.sourceSha256 || null : null;
 };
 
 export const hashLegacySource = (source: string): string => sha256(source);
@@ -678,7 +676,7 @@ export const writeLegacyProjectAsMultiFile = async (
       await readBoundedUtf8(entryPath),
       MULTI_FILE_ENTRY_URI
     );
-    migration = document.project ? document.project.migration : undefined;
+    migration = document.migration;
   }
   const files = decomposeLegacyProjectToFiles(legacyProject, {
     migration,

@@ -5002,10 +5002,7 @@ const callMcpTool = async ({
         const extensionSettingsUri = Object.keys(decomposedFiles).find(uri => {
           if (!uri.endsWith('/extension.settings')) return false;
           const settings = parseTomlSource(decomposedFiles[uri], uri);
-          return !!(
-            settings.extensions &&
-            Object.keys(settings.extensions).indexOf(name) !== -1
-          );
+          return settings.kind === 'extension' && settings.name === name;
         });
         if (!extensionSettingsUri) {
           generatedSources[name] = [];

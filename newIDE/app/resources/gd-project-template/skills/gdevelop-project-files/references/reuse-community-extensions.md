@@ -134,14 +134,14 @@ The native conversion maps the legacy extension as follows:
 | `eventsFunctions[]` metadata | One `functions/<F>/function.settings` each |
 | `eventsFunctions[].events` | Matching `functions/<F>/<F>.events` |
 | `eventsBasedObjects[]` metadata, flat property descriptors, groups, and variables | One `prefabs/<P>/prefab.settings` each |
-| Default child object definitions and attached behaviors | One recursive `prefabs/<P>/objects/<folders>/<Object>.settings` each |
+| Default child object definitions and attached behaviors | One flat `prefabs/<P>/objects/<Object>.settings` each; grouping is `folder` |
 | Prefab default-variant instances/layers/spatial bounds/editor layout state | `<P>.layout` |
-| Prefab `eventsFunctions[]` metadata/bodies and function grouping | `prefabs/<P>/functions/<folders>/<F>/function.settings` plus sibling `<F>.events` |
+| Prefab `eventsFunctions[]` metadata/bodies and function grouping | `prefabs/<P>/functions/<F>/function.settings` (`folder`) plus sibling `<F>.events` |
 | Prefab non-default variant metadata/groups | Its entry in `prefab.settings` |
-| Prefab non-default variant child definitions/behaviors | One recursive `prefabs/<P>/variants/<Variant>/objects/<folders>/<Object>.settings` each |
+| Prefab non-default variant child definitions/behaviors | One flat `prefabs/<P>/variants/<Variant>/objects/<Object>.settings` each; grouping is `folder` |
 | Prefab non-default variant instances/layers/spatial bounds/editor state | `variants/<Variant>.layout` |
 | `eventsBasedBehaviors[]` owner metadata | One `behaviors/<B>/behavior.settings` each |
-| Behavior `eventsFunctions[]` metadata/bodies and function grouping | `behaviors/<B>/functions/<folders>/<F>/function.settings` plus sibling `<F>.events` |
+| Behavior `eventsFunctions[]` metadata/bodies and function grouping | `behaviors/<B>/functions/<F>/function.settings` (`folder`) plus sibling `<F>.events` |
 
 Follow [create-extensions.md](create-extensions.md) for exact ownership and
 examples when adapting the generated sources. The converter, not the model,

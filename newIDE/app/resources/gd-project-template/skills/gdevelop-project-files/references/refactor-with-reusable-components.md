@@ -58,7 +58,7 @@ by stable domain ownership such as `Combat`, `Inventory`, or `UIWidgets`.
    instruction/object/behavior types exist.
 4. Move one coherent behavior at a time:
    - Copy each child object definition and its attached behaviors into an
-     individual recursive `prefab/objects/<folders>/<Object>.settings`; copy
+     individual flat `prefab/objects/<Object>.settings` with `folder` arrays; copy
      only instances/layers/spatial composition into the prefab layout.
    - Move per-instance variables and logic into behavior settings/functions.
    - Move shared calculations into extension-level functions.
@@ -120,7 +120,7 @@ extensions/Combat/
    `Enemy/prefab.settings`.
 2. Put health properties/variables in `Health/behavior.settings`. Put each
    `TakeDamage`/`IsDead` signature in its dedicated recursive
-   `functions/.../<Function>/function.settings` and only its DSL body in the
+   `functions/<Function>/function.settings` (including `folder`) and only its DSL body in the
    sibling `<Function>.events`.
 3. Put the stateless damage formula in `CalculateDamage/function.settings` and
    its DSL body in `CalculateDamage.events`.
@@ -145,10 +145,11 @@ without changing runtime semantics.
 
 Verify at least:
 
-- Every changed settings fragment parses alone and in the combined document.
-- Orders are contiguous; namespaces, folder names, filenames, and `game://`
+- Every changed settings document parses alone, mounts from its canonical path,
+  and merges without ownership conflicts.
+- Orders are contiguous; mounted namespaces, `folder` arrays, filenames, and `game://`
   references match.
-- Object definitions and their behaviors are in the owning settings namespace;
+- Object definitions and their behaviors are in the owning local-root settings document;
   layouts contain only instances, layers, spatial bounds, background, and
   editor-canvas state; events contain only DSL.
 - Every old caller/instance has a mapped replacement; searches find no dangling

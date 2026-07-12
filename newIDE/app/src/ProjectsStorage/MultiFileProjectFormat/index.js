@@ -563,6 +563,129 @@ const projectSettingsNamespace = document => {
   return output;
 };
 
+const findOwnedSettingsPayload = document => {
+  let payload = null;
+  const visit = value => {
+    if (!value || typeof value !== 'object' || Array.isArray(value)) return;
+    if (typeof value.kind === 'string' && value.settingsFormatVersion === 1) {
+      if (payload) {
+        fail(
+          'MULTIFILE_INVALID_SCHEMA',
+          'A settings fragment must own exactly one component namespace.'
+        );
+      }
+      payload = value;
+      return;
+    }
+    Object.keys(value).forEach(key => visit(value[key]));
+  };
+  visit(document);
+  if (!payload) {
+    fail(
+      'MULTIFILE_INVALID_SCHEMA',
+      'A settings fragment is missing its owned component namespace.'
+    );
+  }
+  return payload;
+};
+
+const mountSettingsPayload = (path, payload) => {
+  const document = {};
+  let namespace = document;
+  path.forEach((segment, index) => {
+    if (index === path.length - 1) namespace[segment] = payload;
+    else namespace = namespace[segment] = {};
+  });
+  return document;
+};
+
+const settingsNamespacePathForUri = (uri, payload) => {
+  validateGameUri(uri);
+  const segments = uri
+    .slice('game://'.length)
+    .split('/')
+    .map(segment => decodeURIComponent(segment));
+  const name = String(payload.name || '');
+  if (uri === MULTI_FILE_RESOURCES_URI) return ['project', 'resources'];
+  if (uri === 'game://externals/external.settings') return ['externals'];
+  if (segments.length === 2 && segments[0] === 'objects')
+    return ['project', 'objects', name];
+  if (
+    segments.length === 3 &&
+    segments[0] === 'scenes' &&
+    segments[2] === 'scene.settings'
+  )
+    return ['scenes', name];
+  if (
+    segments.length === 4 &&
+    segments[0] === 'scenes' &&
+    segments[2] === 'objects'
+  )
+    return ['scenes', segments[1], 'objects', name];
+  if (
+    segments.length === 3 &&
+    segments[0] === 'extensions' &&
+    segments[2] === 'extension.settings'
+  )
+    return ['extensions', name];
+  if (
+    segments.length === 5 &&
+    segments[0] === 'extensions' &&
+    segments[2] === 'functions'
+  )
+    return ['extensions', segments[1], 'functions', name];
+  if (
+    segments.length === 5 &&
+    segments[0] === 'extensions' &&
+    ((segments[2] === 'prefabs' && segments[4] === 'prefab.settings') ||
+      (segments[2] === 'behaviors' && segments[4] === 'behavior.settings'))
+  )
+    return ['extensions', segments[1], segments[2], name];
+  if (
+    segments.length === 6 &&
+    segments[0] === 'extensions' &&
+    segments[2] === 'prefabs' &&
+    segments[4] === 'objects'
+  )
+    return ['extensions', segments[1], 'prefabs', segments[3], 'objects', name];
+  if (
+    segments.length === 8 &&
+    segments[0] === 'extensions' &&
+    segments[2] === 'prefabs' &&
+    segments[4] === 'variants' &&
+    segments[6] === 'objects'
+  )
+    return [
+      'extensions',
+      segments[1],
+      'prefabs',
+      segments[3],
+      'variantObjects',
+      segments[5],
+      name,
+    ];
+  if (
+    segments.length === 7 &&
+    segments[0] === 'extensions' &&
+    (segments[2] === 'prefabs' || segments[2] === 'behaviors') &&
+    segments[4] === 'functions' &&
+    segments[6] === 'function.settings'
+  )
+    return [
+      'extensions',
+      segments[1],
+      segments[2],
+      segments[3],
+      'functions',
+      name,
+    ];
+  fail(
+    'MULTIFILE_INVALID_MANIFEST_PATH',
+    'Settings file path does not identify a supported component namespace.',
+    uri
+  );
+};
+
 const putSettingsFile = (files, uri, namespace) => {
   validateGameUri(uri);
   if (files[uri] !== undefined) {
@@ -572,7 +695,14 @@ const putSettingsFile = (files, uri, namespace) => {
       uri
     );
   }
-  files[uri] = serializeToml(projectSettingsNamespace(namespace));
+  const projectedDocument = projectSettingsNamespace(namespace);
+  const payload = findOwnedSettingsPayload(projectedDocument);
+  if (uri === MULTI_FILE_ENTRY_URI) {
+    const gdevelop = projectedDocument.gdevelop || {};
+    files[uri] = serializeToml({ ...gdevelop, ...payload });
+    return;
+  }
+  files[uri] = serializeToml(payload);
 };
 
 const putLayoutFile = (files, uri, format, layout, semanticContext = {}) => {
@@ -625,15 +755,14 @@ const splitOwnerFunctions = ({
   files,
   eventsDslOptions,
 }) => {
-  const pathsByFunctionName = ownedFolderPaths(folderStructure, 'functionName');
+  const foldersByFunctionName = ownedFolderValues(
+    folderStructure,
+    'functionName'
+  );
   (functions || []).forEach((functionObject, order) => {
     const functionName = String(functionObject.name || '');
     const functionFileName = encodeManagedName(functionName);
-    const functionSegments = [
-      ...baseSegments,
-      ...(pathsByFunctionName.get(functionName) || []),
-      functionFileName,
-    ];
+    const functionSegments = [...baseSegments, functionFileName];
     const settingsUri = encodeUriPath([
       ...functionSegments,
       'function.settings',
@@ -649,7 +778,8 @@ const splitOwnerFunctions = ({
         kind: 'function',
         settingsFormatVersion: MULTI_FILE_FORMAT_VERSION,
         order,
-        ...omitFields(functionObject, new Set(['events'])),
+        ...omitFields(functionObject, new Set(['events', 'folder'])),
+        folder: foldersByFunctionName.get(functionName) || [],
         name: functionName,
         events: eventsUri,
       })
@@ -663,10 +793,9 @@ const splitOwnerFunctions = ({
   });
 };
 
-const ownedFolderPaths = (folderStructure, itemNameField) => {
-  const pathsByItemName = new Map();
-  const visit = (folder, parentSegments) => {
-    const usedFolderNames = new Set();
+const ownedFolderValues = (folderStructure, itemNameField) => {
+  const foldersByItemName = new Map();
+  const visit = (folder, parentFolders) => {
     (folder && Array.isArray(folder.children) ? folder.children : []).forEach(
       child => {
         if (
@@ -674,21 +803,17 @@ const ownedFolderPaths = (folderStructure, itemNameField) => {
           typeof child.folderName === 'string' &&
           child[itemNameField] === undefined
         ) {
-          const folderSegment = uniqueManagedName(
-            child.folderName,
-            usedFolderNames
-          );
-          visit(child, [...parentSegments, folderSegment]);
+          visit(child, [...parentFolders, child.folderName]);
         } else if (child && typeof child[itemNameField] === 'string') {
-          if (!pathsByItemName.has(child[itemNameField])) {
-            pathsByItemName.set(child[itemNameField], parentSegments);
+          if (!foldersByItemName.has(child[itemNameField])) {
+            foldersByItemName.set(child[itemNameField], parentFolders);
           }
         }
       }
     );
   };
   visit(folderStructure, []);
-  return pathsByItemName;
+  return foldersByItemName;
 };
 
 const splitObjectDefinitions = ({
@@ -698,12 +823,11 @@ const splitObjectDefinitions = ({
   namespaceForObject,
   files,
 }) => {
-  const pathsByObjectName = ownedFolderPaths(folderStructure, 'objectName');
+  const foldersByObjectName = ownedFolderValues(folderStructure, 'objectName');
   (objects || []).forEach((object, order) => {
     const name = String(object.name || '');
     const uri = encodeUriPath([
       ...baseSegments,
-      ...(pathsByObjectName.get(name) || []),
       `${encodeManagedName(name)}.settings`,
     ]);
     putSettingsFile(
@@ -713,7 +837,8 @@ const splitObjectDefinitions = ({
         kind: 'object',
         settingsFormatVersion: MULTI_FILE_FORMAT_VERSION,
         order,
-        ...object,
+        ...omitFields(object, new Set(['folder'])),
+        folder: foldersByObjectName.get(name) || [],
         name,
       })
     );
@@ -913,8 +1038,8 @@ export const decomposeLegacyProjectToFiles = (legacyProject, options = {}) => {
       },
     });
     const configSource = Object.keys(projected).length
-      ? serializeToml({ project: { globalConfig: projected } })
-      : '[project.globalConfig]\n';
+      ? serializeToml({ settings: projected })
+      : '[settings]\n';
     files[
       MULTI_FILE_CONFIG_URI
     ] = `${metadataSource.trimEnd()}\n\n${configSource}`;
@@ -1182,7 +1307,63 @@ const parseSettings = (files, uri) => {
   if (source === undefined) {
     fail('MULTIFILE_MISSING_FILE', 'Referenced settings file is missing.', uri);
   }
-  return parseTomlSource(source, uri);
+  const localDocument = parseTomlSource(source, uri);
+  if (uri === MULTI_FILE_CONFIG_URI) {
+    if (
+      !localDocument.gdevelopConfig ||
+      !localDocument.settings ||
+      localDocument.project !== undefined
+    ) {
+      fail(
+        'MULTIFILE_INVALID_LOCAL_SETTINGS',
+        'config.settings must contain only local gdevelopConfig and settings tables.',
+        uri
+      );
+    }
+    return {
+      gdevelopConfig: localDocument.gdevelopConfig,
+      project: { globalConfig: localDocument.settings },
+    };
+  }
+  if (uri === MULTI_FILE_ENTRY_URI) {
+    if (
+      typeof localDocument.kind !== 'string' ||
+      localDocument.project !== undefined ||
+      localDocument.gdevelop !== undefined
+    ) {
+      fail(
+        'MULTIFILE_INVALID_LOCAL_SETTINGS',
+        'project.settings must contain a project payload at the TOML root.',
+        uri
+      );
+    }
+    const gdevelop = takeFields(localDocument, [
+      'combinedSettingsFormatVersion',
+      'eventsDslVersion',
+      'entry',
+    ]);
+    const project = omitFields(
+      localDocument,
+      new Set(['combinedSettingsFormatVersion', 'eventsDslVersion', 'entry'])
+    );
+    return { gdevelop, project };
+  }
+  if (
+    typeof localDocument.kind !== 'string' ||
+    ['project', 'scenes', 'extensions', 'externals'].some(
+      key => localDocument[key] !== undefined
+    )
+  ) {
+    fail(
+      'MULTIFILE_INVALID_LOCAL_SETTINGS',
+      'Settings files must contain one local component payload at the TOML root.',
+      uri
+    );
+  }
+  return mountSettingsPayload(
+    settingsNamespacePathForUri(uri, localDocument),
+    localDocument
+  );
 };
 
 const readLayout = (files, uri, expectedFormat, semanticContext = {}) => {
@@ -1446,21 +1627,64 @@ const rawGameUriSegments = uri => {
     .map(segment => decodeURIComponent(segment));
 };
 
+const readFolderValue = (payload, label, uri) => {
+  if (payload.folder === undefined) {
+    fail('MULTIFILE_INVALID_SCHEMA', `${label}.folder is required.`, uri);
+  }
+  const folder = asArray(payload.folder, `${label}.folder`, uri);
+  folder.forEach((name, index) => {
+    if (typeof name !== 'string' || !name.length) {
+      fail(
+        'MULTIFILE_INVALID_SCHEMA',
+        `${label}.folder[${index}] must be a non-empty string.`,
+        uri
+      );
+    }
+  });
+  return folder.slice();
+};
+
+const mergeMountedSettings = (target, source, uri, path = []) => {
+  Object.keys(source).forEach(key => {
+    const nextPath = [...path, key];
+    if (target[key] === undefined) {
+      target[key] = clone(source[key]);
+      return;
+    }
+    if (
+      target[key] &&
+      source[key] &&
+      typeof target[key] === 'object' &&
+      typeof source[key] === 'object' &&
+      !Array.isArray(target[key]) &&
+      !Array.isArray(source[key])
+    ) {
+      mergeMountedSettings(target[key], source[key], uri, nextPath);
+      return;
+    }
+    fail(
+      'MULTIFILE_SETTINGS_MERGE_CONFLICT',
+      `Settings namespace ${nextPath.join('.')} is owned more than once.`,
+      uri
+    );
+  });
+};
+
 const buildLegacyOwnedFolderStructure = (documents, itemNameField) => {
   const root = { folderName: '__ROOT', children: [] };
-  documents.forEach(({ entry, folderSegments }) => {
-    let folder = root;
-    folderSegments.forEach(folderName => {
-      let childFolder = folder.children.find(
+  documents.forEach(document => {
+    let currentFolder = root;
+    document.folder.forEach(folderName => {
+      let childFolder = currentFolder.children.find(
         child => child.folderName === folderName
       );
       if (!childFolder) {
         childFolder = { folderName, children: [] };
-        folder.children.push(childFolder);
+        currentFolder.children.push(childFolder);
       }
-      folder = childFolder;
+      currentFolder = childFolder;
     });
-    folder.children.push({ [itemNameField]: entry.name });
+    currentFolder.children.push({ [itemNameField]: document.entry.name });
   });
   return root;
 };
@@ -1655,6 +1879,21 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
       MULTI_FILE_ENTRY_URI
     );
   }
+  [
+    'sceneFiles',
+    'extensionFiles',
+    'externalSettings',
+    'resources',
+    'globalConfig',
+  ].forEach(retiredField => {
+    if (projectNamespace[retiredField] !== undefined) {
+      fail(
+        'MULTIFILE_INVALID_LOCAL_SETTINGS',
+        `project.settings must not contain retired ${retiredField} ownership.`,
+        MULTI_FILE_ENTRY_URI
+      );
+    }
+  });
 
   const settingsUris = [MULTI_FILE_ENTRY_URI];
   const readObjectDocuments = ({ baseSegments, namespacePath, label }) => {
@@ -1662,7 +1901,7 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
       .filter(candidateUri => {
         const segments = rawGameUriSegments(candidateUri);
         return (
-          segments.length >= baseSegments.length + 1 &&
+          segments.length === baseSegments.length + 1 &&
           baseSegments.every((segment, index) => segments[index] === segment) &&
           segments[segments.length - 1].endsWith('.settings')
         );
@@ -1714,8 +1953,15 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
           entry,
           uri: objectUri,
           document,
-          folderSegments: segments.slice(baseSegments.length, -1),
-          object: omitFields(removeFormatFields(payload), new Set(['order'])),
+          folder: readFolderValue(
+            payload,
+            `${label}.objects.${name}`,
+            objectUri
+          ),
+          object: omitFields(
+            removeFormatFields(payload),
+            new Set(['order', 'folder'])
+          ),
         };
       })
       .sort((left, right) => left.entry.order - right.entry.order);
@@ -1736,7 +1982,7 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
       .filter(candidateUri => {
         const segments = rawGameUriSegments(candidateUri);
         return (
-          segments.length >= baseSegments.length + 2 &&
+          segments.length === baseSegments.length + 2 &&
           baseSegments.every((segment, index) => segments[index] === segment) &&
           segments[segments.length - 1] === 'function.settings'
         );
@@ -1811,10 +2057,14 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
           uri: functionUri,
           document,
           eventsUri,
-          folderSegments: segments.slice(baseSegments.length, -2),
+          folder: readFolderValue(
+            payload,
+            `${label}.functions.${name}`,
+            functionUri
+          ),
           function: omitFields(
             removeFormatFields(payload),
-            new Set(['order', 'events'])
+            new Set(['order', 'events', 'folder'])
           ),
         };
       })
@@ -2033,6 +2283,13 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
         config.manifestName,
         uri
       );
+      if (legacyChildEntries.length) {
+        fail(
+          'MULTIFILE_INVALID_LOCAL_SETTINGS',
+          `${config.manifestName} settings indexes are not supported.`,
+          uri
+        );
+      }
       let ownedDocuments;
       if (legacyChildEntries.length) {
         assertUniqueManifestNames(legacyChildEntries, config.manifestName, uri);
@@ -2304,7 +2561,7 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
     });
   });
 
-  const managedSettingsUriPattern = /^(?:game:\/\/(?:project|resources|config)\.settings|game:\/\/objects\/(?:[^/]+\/)*[^/]+\.settings|game:\/\/externals\/external\.settings|game:\/\/scenes\/[^/]+\/(?:scene\.settings|objects\/(?:[^/]+\/)*[^/]+\.settings)|game:\/\/extensions\/[^/]+\/(?:extension\.settings|functions\/[^/]+\/function\.settings|prefabs\/[^/]+\/(?:prefab\.settings|objects\/(?:[^/]+\/)*[^/]+\.settings|functions\/(?:[^/]+\/)*[^/]+\.settings|variants\/[^/]+\/objects\/(?:[^/]+\/)*[^/]+\.settings)|behaviors\/[^/]+\/(?:behavior\.settings|functions\/(?:[^/]+\/)*[^/]+\.settings)))$/;
+  const managedSettingsUriPattern = /^(?:game:\/\/(?:project|resources|config)\.settings|game:\/\/objects\/(?:[^/]+\/)*[^/]+\.settings|game:\/\/externals\/external\.settings|game:\/\/scenes\/[^/]+\/(?:scene\.settings|objects\/(?:[^/]+\/)*[^/]+\.settings)|game:\/\/extensions\/[^/]+\/(?:extension\.settings|functions\/[^/]+\/function\.settings|prefabs\/[^/]+\/(?:prefab\.settings|objects\/(?:[^/]+\/)*[^/]+\.settings|functions\/(?:[^/]+\/)*[^/]+\/function\.settings|variants\/[^/]+\/objects\/(?:[^/]+\/)*[^/]+\.settings)|behaviors\/[^/]+\/(?:behavior\.settings|functions\/(?:[^/]+\/)*[^/]+\/function\.settings)))$/;
   Object.keys(files)
     .filter(uri => managedSettingsUriPattern.test(uri))
     .forEach(uri => {
@@ -2317,10 +2574,11 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
       }
     });
 
-  // The append-only contract is checked independently from bootstrap parsing.
-  parseTomlSource(
-    settingsUris.map(uri => files[uri].trimEnd()).join('\n\n') + '\n',
-    '<CombinedProjectSettings>'
+  // Local documents are mounted by physical path, then merged strictly.
+  // Duplicate scalar/array ownership is always an error.
+  const combinedSettings = {};
+  settingsUris.forEach(uri =>
+    mergeMountedSettings(combinedSettings, parseSettings(files, uri), uri)
   );
 
   const project = omitFields(

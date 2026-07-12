@@ -136,6 +136,17 @@ describe('project source catalogs', () => {
       project,
       serializedProject,
     });
+    expect(
+      catalog.fileKinds.find(fileKind => fileKind.kind === 'scene-object')
+    ).toMatchObject({
+      path: 'scenes/<Scene>/objects/<Object>.settings',
+      mountedNamespace: 'scenes."<Scene>".objects."<Object>"',
+      tomlRoot: true,
+      requiredFields: expect.arrayContaining(['folder']),
+    });
+    expect(catalog.authoring.rules.join('\n')).toContain(
+      'folder = ["Parent", "Child"]'
+    );
     const entry = catalog.behaviorTypes.find(
       behaviorEntry => behaviorEntry.type === behaviorType
     );

@@ -58,8 +58,8 @@ Ownership is strict:
 - `[gdevelopConfig]` is format metadata owned by the multi-file serializer.
 - `[gdevelopConfig.rawJson]` is format-owned fallback storage for JSON values
   that cannot be represented directly by the TOML projection.
-- `[project.globalConfig]` and its descendants are user configuration data.
-- `project.settings` must not contain `[project.globalConfig]` in newly authored
+- `[settings]` and its descendants are user configuration data.
+- `project.settings` must not contain a global-config table in newly authored
   sources.
 
 Minimal empty source:
@@ -68,7 +68,7 @@ Minimal empty source:
 [gdevelopConfig]
 settingsFormatVersion = 1
 
-[project.globalConfig]
+[settings]
 ```
 
 Do not edit `.gdevelop/game.json`; it is generated compatibility/runtime
@@ -80,7 +80,7 @@ compatibility formats, not the current multi-file authoring contract.
 
 The Global Config root must be a JSON object. TOML strings, finite numbers,
 booleans, nested tables, arrays, and arrays of tables map naturally to JSON.
-Keep settings source unindented and append-safe like every other `.settings`
+Keep settings source unindented and local-root like every other `.settings`
 fragment.
 
 Example project configuration:
@@ -89,23 +89,23 @@ Example project configuration:
 [gdevelopConfig]
 settingsFormatVersion = 1
 
-[project.globalConfig.gameplay]
+[settings.gameplay]
 startingLives = 3
 friendlyFire = false
 difficultyNames = ["Story", "Normal", "Expert"]
 
-[project.globalConfig.signals.card]
+[settings.signals.card]
 selected = "Card.Selected"
 refresh = "Card.Refresh"
 
-[project.globalConfig.cards.Sunflower]
+[settings.cards.Sunflower]
 displayName = "Sunflower"
 price = 50
 cooldown = 7.5
 enabled = true
 tags = ["plant", "producer"]
 
-[project.globalConfig.cards.Sunflower.stats]
+[settings.cards.Sunflower.stats]
 health = 100
 production = 25
 ```
@@ -156,10 +156,10 @@ TOML has special key syntax. Quote keys that contain dots, spaces, or punctuatio
 when they should remain one JSON key:
 
 ```toml
-[project.globalConfig.cards."sun.flower"]
+[settings.cards."sun.flower"]
 displayName = "Sun Flower"
 
-[project.globalConfig.localization."main menu"]
+[settings.localization."main menu"]
 title = "Play"
 ```
 
@@ -181,7 +181,7 @@ settingsFormatVersion = 1
 "/mixed" = '[1,"two",true]'
 "/cards/Sunflower/rewards" = '[null,{"kind":"coin","amount":2}]'
 
-[project.globalConfig]
+[settings]
 enabled = true
 ```
 
@@ -201,7 +201,7 @@ Rules for raw JSON entries:
 - Non-finite numbers (`NaN`, positive/negative infinity) are invalid and cannot
   be stored.
 
-`[project.globalConfig.rawJson]` is not serializer metadata. It is an ordinary,
+`[settings.rawJson]` is not serializer metadata. It is an ordinary,
 legal user key named `rawJson` and must be preserved independently from
 `[gdevelopConfig.rawJson]`.
 
@@ -430,15 +430,15 @@ paths.
 [gdevelopConfig]
 settingsFormatVersion = 1
 
-[project.globalConfig.features]
+[settings.features]
 tutorialEnabled = true
 analyticsEnabled = false
 
-[project.globalConfig.balance.player]
+[settings.balance.player]
 startingHealth = 100
 moveSpeed = 240
 
-[project.globalConfig.balance.enemies.Slime]
+[settings.balance.enemies.Slime]
 health = 30
 damage = 8
 ```
@@ -452,10 +452,10 @@ variables at initialization only if gameplay must later mutate them.
 [gdevelopConfig]
 settingsFormatVersion = 1
 
-[project.globalConfig.waves]
+[settings.waves]
 names = ["opening", "pressure", "boss"]
 
-[project.globalConfig.localization."main menu"]
+[settings.localization."main menu"]
 title = "Start game"
 subtitle = "Choose a save slot"
 ```
@@ -473,7 +473,7 @@ Placeholders:
 [gdevelopConfig]
 settingsFormatVersion = 1
 
-[project.globalConfig.signals.inventory]
+[settings.signals.inventory]
 request = "Inventory.Request"
 result = "Inventory.Result"
 ```
@@ -509,14 +509,14 @@ settingsFormatVersion = 1
 "/release/label" = "null"
 "/spawnPattern" = '[1,"elite",true]'
 
-[project.globalConfig.release]
+[settings.release]
 channel = "preview"
 ```
 
 ## Edit and migration rules
 
 - Read the whole current `config.settings` before modifying one subtree.
-- Edit only `[project.globalConfig]` data and intentionally owned raw JSON
+- Edit only `[settings]` data and intentionally owned raw JSON
   pointers; preserve `[gdevelopConfig]` fields.
 - Keep `settingsFormatVersion = 1` and reject unknown metadata keys rather than
   moving them into user config.
@@ -535,9 +535,9 @@ channel = "preview"
 
 After editing:
 
-1. Parse `config.settings` as standalone TOML and as part of the concatenated
-   append-safe settings document.
-2. Confirm the root under `[project.globalConfig]` is an object and every number
+1. Parse `config.settings` as standalone TOML, mount `[settings]` at
+   `project.globalConfig`, and verify the strict combined merge.
+2. Confirm the root under `[settings]` is an object and every number
    is finite.
 3. Validate every raw pointer, RFC 6901 escape, canonical JSON string, and
    non-overlap rule.
@@ -560,7 +560,7 @@ error with a fabricated value unless that default is part of the user's design.
 - Treating Global Config as runtime mutable state.
 - Editing `.gdevelop/game.json`, legacy project JSON, or an obsolete
   `globalConfig.json` instead of `config.settings`.
-- Putting `[project.globalConfig]` in `project.settings`.
+- Putting global config in `project.settings`.
 - Editing format metadata as user data or confusing the two `rawJson` tables.
 - Writing JSON `null` directly as TOML or storing non-canonical raw JSON.
 - Overlapping raw pointers or forgetting `~0`/`~1` pointer escaping.
@@ -579,7 +579,7 @@ error with a fabricated value unless that default is part of the user's design.
 - Decide explicitly why the data is static config rather than runtime state.
 - Read the complete `config.settings` and relevant owner `.settings`/events.
 - Preserve `[gdevelopConfig]`; author user data only below
-  `[project.globalConfig]`.
+  `[settings]`.
 - Use TOML for directly representable values and canonical raw JSON pointers
   only for lossless fallback cases.
 - Choose stable, case-consistent, typed paths.

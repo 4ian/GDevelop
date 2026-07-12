@@ -20,7 +20,8 @@ Use the narrowest reusable abstraction:
 | A reusable visual object that also owns stateful logic | Prefab plus one or more behaviors |
 
 Keep each child object definition and all of its behaviors in an individual
-`objects/<optional folder path>/<Object>.settings` file. Keep prefab-wide
+`objects/<Object>.settings` file. Store its editor grouping in
+`folder = ["Parent", "Child"]`. Keep prefab-wide
 metadata, groups, variables, and flat property descriptors in
 `prefab.settings`, instance/layer/spatial composition in prefab `.layout`
 files, and executable logic in `.events`.
@@ -34,7 +35,8 @@ files, and executable logic in `.events`.
    implementing a substantial system from scratch.
 3. Choose a stable extension name and the next contiguous zero-based `order`.
 4. Create the owner settings and every required child file in one patch.
-5. Keep each settings fragment independently valid and append-safe. Never add
+5. Keep each settings document independently valid and local-root. Its path
+   supplies the mounted namespace. Never add
    child-settings indexes to `project.settings` or `extension.settings`.
 6. Use `game://` URIs for `.events` and `.layout` references. Never reference a
    `.settings` file.
@@ -76,7 +78,6 @@ extensions/CombatKit/
 `extensions/CombatKit/extension.settings`:
 
 ```toml
-[extensions."CombatKit"]
 kind = "extension"
 settingsFormatVersion = 1
 order = 0
@@ -105,7 +106,6 @@ structure.
 `extensions/CombatKit/functions/ResetCombat/function.settings`:
 
 ```toml
-[extensions."CombatKit".functions."ResetCombat"]
 kind = "function"
 settingsFormatVersion = 1
 order = 0
@@ -138,7 +138,6 @@ do SetBooleanVariable variable="ResetRequested" modification_sign="False"
 `extensions/CombatKit/prefabs/Enemy/prefab.settings`:
 
 ```toml
-[extensions."CombatKit".prefabs."Enemy"]
 kind = "prefab"
 settingsFormatVersion = 1
 order = 0
@@ -173,10 +172,10 @@ propertyDescriptors = []
 `extensions/CombatKit/prefabs/Enemy/functions/Lifecycle/Initialize/function.settings`:
 
 ```toml
-[extensions."CombatKit".prefabs."Enemy".functions."Initialize"]
 kind = "function"
 settingsFormatVersion = 1
 order = 0
+folder = []
 name = "Initialize"
 events = "game://extensions/CombatKit/prefabs/Enemy/functions/Lifecycle/Initialize/Initialize.events"
 functionType = "Action"
@@ -200,10 +199,10 @@ do SetBooleanObjectVariable object="Object" variable="Initialized" modification_
 `extensions/CombatKit/prefabs/Enemy/objects/Visuals/Body.settings`:
 
 ```toml
-[extensions."CombatKit".prefabs."Enemy".objects."Body"]
 kind = "object"
 settingsFormatVersion = 1
 order = 0
+folder = []
 name = "Body"
 type = "Sprite"
 behaviors = []
@@ -212,8 +211,8 @@ effects = []
 ```
 
 Add every child object definition, its variables/effects, and every attached
-behavior to its own recursive object settings file. The directories after
-`objects/` are the editor object-folder path. Add only instances, layers,
+behavior to its own flat object settings file. Its `folder` array is the editor
+object grouping. Add only instances, layers,
 spatial bounds, and editor layout state to `Enemy.layout`. Copy the complete
 object-definition shape from an existing compatible object `.settings` file
 rather than inventing serializer fields. Keep `propertyDescriptors` as one
@@ -222,7 +221,6 @@ flat ordered array in `prefab.settings`; never add property folders.
 `extensions/CombatKit/behaviors/Health/behavior.settings`:
 
 ```toml
-[extensions."CombatKit".behaviors."Health"]
 kind = "behavior"
 settingsFormatVersion = 1
 order = 0
@@ -240,10 +238,10 @@ quickCustomizationVisibility = "default"
 `extensions/CombatKit/behaviors/Health/functions/Combat/TakeDamage/function.settings`:
 
 ```toml
-[extensions."CombatKit".behaviors."Health".functions."TakeDamage"]
 kind = "function"
 settingsFormatVersion = 1
 order = 0
+folder = []
 name = "TakeDamage"
 events = "game://extensions/CombatKit/behaviors/Health/functions/Combat/TakeDamage/TakeDamage.events"
 functionType = "Action"
@@ -272,28 +270,28 @@ selection.
 
 - Add a free function in its own `functions/<Name>/` folder. Put its complete
   signature in `function.settings` and only its body in `<Name>.events`.
-- Add every prefab or behavior function in
-  `functions/<optional folder path>/<Name>/`. Put its complete metadata in
-  `function.settings` and only its body in the sibling `<Name>.events`. The
-  optional physical folders are the editor function grouping; never embed a
+- Add every prefab or behavior function in `functions/<Name>/`. Put its
+  complete metadata and `folder` grouping array in `function.settings` and
+  only its body in the sibling `<Name>.events`. Never embed a
   function entry in `prefab.settings` or `behavior.settings`.
 - Add prefab variants under `variants/<Variant>.layout`; keep the variant's
   identity, layout URI, and groups in its `prefab.settings` entry. Put each
   variant child definition and its behaviors in
-  `variants/<Variant>/objects/<optional folder path>/<Object>.settings`.
-- On rename, update the folder, settings namespace, `name`, `.events` or
+  `variants/<Variant>/objects/<Object>.settings` and store grouping in `folder`.
+- On rename, update the component directory, path-derived namespace, `name`, `.events` or
   `.layout` basename, every `game://` reference, and every caller atomically.
 - On delete, remove callers and scene instances first, reload and verify, then
   remove the component files and close empty folders.
 
 ## Validate the extension
 
-1. Parse every changed settings TOML independently and as concatenated
-   settings; compile every changed `.layout` as Layout DSL version 1.
+1. Parse every changed settings TOML independently, mount it from its canonical
+   path, and verify the strict combined merge; compile every changed `.layout`
+   as Layout DSL version 1.
 2. Verify component orders are contiguous and names/folders/basenames match.
 3. Verify every referenced `.events` and `.layout` file exists.
 4. Verify prefab layouts contain no object definitions or behaviors and that
-   every definition is present in its own recursive object settings file.
+   every definition is present in its own flat object settings file.
    Verify property descriptor arrays are flat and no property folder metadata
    exists.
 5. Verify every action is condition-guarded and every object action targets at

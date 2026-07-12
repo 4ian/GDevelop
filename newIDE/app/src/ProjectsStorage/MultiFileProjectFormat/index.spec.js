@@ -178,7 +178,9 @@ describe('GDevelop multi-file project format', () => {
     const output = composeLegacyProjectFromFiles(files);
 
     expect(areLegacyProjectsEquivalent(projectFixture, output)).toBe(true);
-    expect(files[MULTI_FILE_ENTRY_URI]).toContain('[gdevelop]');
+    expect(files[MULTI_FILE_ENTRY_URI]).toContain(
+      'combinedSettingsFormatVersion = 1'
+    );
     expect(files[MULTI_FILE_ENTRY_URI]).toContain('eventsDslVersion = "2.0"');
     expect(files[MULTI_FILE_ENTRY_URI]).not.toContain('sceneFiles');
     expect(files[MULTI_FILE_ENTRY_URI]).not.toContain('extensionFiles');
@@ -189,11 +191,11 @@ describe('GDevelop multi-file project format', () => {
     expect(files[MULTI_FILE_ENTRY_URI]).not.toContain('game://scenes/');
     expect(files[MULTI_FILE_ENTRY_URI]).not.toContain('[project.resources');
     expect(files[MULTI_FILE_ENTRY_URI]).not.toContain('[project.globalConfig');
-    expect(files[MULTI_FILE_CONFIG_URI]).toContain('[project.globalConfig]');
-    expect(files[MULTI_FILE_RESOURCES_URI]).toContain('[project.resources]');
-    expect(files[MULTI_FILE_RESOURCES_URI]).toContain(
-      '[[project.resources.resources]]'
+    expect(files[MULTI_FILE_CONFIG_URI]).toContain('[settings]');
+    expect(files[MULTI_FILE_RESOURCES_URI]).not.toContain(
+      '[project.resources]'
     );
+    expect(files[MULTI_FILE_RESOURCES_URI]).toContain('[[resources]]');
     expect(files['game://scenes/Main/scene.settings']).toContain(
       'layout = "game://scenes/Main/Main.layout"'
     );
@@ -204,13 +206,13 @@ describe('GDevelop multi-file project format', () => {
     expect(files['game://scenes/Main/Main.layout']).not.toContain('events');
     expect(files['game://scenes/Main/Main.events']).toContain('@event');
     expect(files['game://externals/external.settings']).toContain(
-      '[[externals.eventFiles]]'
+      '[[eventFiles]]'
     );
     expect(
       files[
         'game://extensions/Combat/functions/CalculateDamage/function.settings'
       ]
-    ).toContain('[extensions.Combat.functions.CalculateDamage]');
+    ).not.toContain('[extensions.');
     expect(
       files[
         'game://extensions/Combat/functions/CalculateDamage/function.settings'
@@ -220,7 +222,7 @@ describe('GDevelop multi-file project format', () => {
       files[
         'game://extensions/Combat/prefabs/Enemy/functions/TakeDamage/function.settings'
       ]
-    ).toContain('[extensions.Combat.prefabs.Enemy.functions.TakeDamage]');
+    ).toContain('name = "TakeDamage"');
     expect(
       files[
         'game://extensions/Combat/prefabs/Enemy/functions/TakeDamage/TakeDamage.events'
@@ -230,7 +232,7 @@ describe('GDevelop multi-file project format', () => {
       files[
         'game://extensions/Combat/behaviors/Health/functions/Heal/function.settings'
       ]
-    ).toContain('[extensions.Combat.behaviors.Health.functions.Heal]');
+    ).toContain('name = "Heal"');
     expect(
       files[
         'game://extensions/Combat/behaviors/Health/functions/Heal/Heal.events'
@@ -304,7 +306,7 @@ describe('GDevelop multi-file project format', () => {
     ).toContain('order = 1');
   });
 
-  test('keeps read compatibility with settings-file indexes from early drafts', () => {
+  test('rejects namespaced settings-file indexes from early drafts', () => {
     const files = decomposeLegacyProjectToFiles(projectFixture);
     files[MULTI_FILE_ENTRY_URI] += `
 [[project.extensionFiles]]
@@ -325,12 +327,9 @@ name = "Health"
 settings = "game://extensions/Combat/behaviors/Health/behavior.settings"
 `;
 
-    expect(
-      areLegacyProjectsEquivalent(
-        projectFixture,
-        composeLegacyProjectFromFiles(files)
-      )
-    ).toBe(true);
+    expect(() => composeLegacyProjectFromFiles(files)).toThrow(
+      expect.objectContaining({ code: 'MULTIFILE_INVALID_LOCAL_SETTINGS' })
+    );
   });
 
   test('rejects a project that declares an obsolete events DSL grammar', () => {
@@ -345,7 +344,7 @@ settings = "game://extensions/Combat/behaviors/Health/behavior.settings"
     );
   });
 
-  test('keeps read compatibility with resources embedded in project.settings', () => {
+  test('rejects resources embedded in project.settings', () => {
     const project = JSON.parse(JSON.stringify(projectFixture));
     project.resources = { resources: [], resourceFolders: [] };
     const files = decomposeLegacyProjectToFiles(project);
@@ -356,12 +355,12 @@ resources = []
 resourceFolders = []
 `;
 
-    expect(
-      areLegacyProjectsEquivalent(project, composeLegacyProjectFromFiles(files))
-    ).toBe(true);
+    expect(() => composeLegacyProjectFromFiles(files)).toThrow(
+      expect.objectContaining({ code: 'MULTIFILE_INVALID_LOCAL_SETTINGS' })
+    );
   });
 
-  test('keeps read compatibility with global config embedded in project.settings', () => {
+  test('rejects global config embedded in project.settings', () => {
     const project = JSON.parse(JSON.stringify(projectFixture));
     project.globalConfig = { mode: 'embedded' };
     const files = decomposeLegacyProjectToFiles(project);
@@ -371,9 +370,9 @@ resourceFolders = []
 mode = "embedded"
 `;
 
-    expect(
-      areLegacyProjectsEquivalent(project, composeLegacyProjectFromFiles(files))
-    ).toBe(true);
+    expect(() => composeLegacyProjectFromFiles(files)).toThrow(
+      expect.objectContaining({ code: 'MULTIFILE_INVALID_LOCAL_SETTINGS' })
+    );
   });
 
   test('preserves absent and empty global config without ownership ambiguity', () => {
@@ -394,9 +393,7 @@ mode = "embedded"
     expect(filesWithEmptyConfig[MULTI_FILE_CONFIG_URI]).toContain(
       '[gdevelopConfig]'
     );
-    expect(filesWithEmptyConfig[MULTI_FILE_CONFIG_URI]).toContain(
-      '[project.globalConfig]'
-    );
+    expect(filesWithEmptyConfig[MULTI_FILE_CONFIG_URI]).toContain('[settings]');
     expect(
       composeLegacyProjectFromFiles(filesWithEmptyConfig).globalConfig
     ).toEqual({});
@@ -449,13 +446,14 @@ mode = "embedded"
     expect(layoutDocument).not.toHaveProperty('variables');
     expect(layoutDocument).not.toHaveProperty('objectsGroups');
     expect(layoutDocument).not.toHaveProperty('title');
-    expect(settingsDocument.scenes.Main).not.toHaveProperty('objects');
+    expect(settingsDocument).not.toHaveProperty('objects');
     const objectSettingsDocument = parseTomlSource(
-      files['game://scenes/Main/objects/Actors/Player.settings']
+      files['game://scenes/Main/objects/Player.settings']
     );
-    expect(objectSettingsDocument.scenes.Main.objects.Player).toMatchObject({
+    expect(objectSettingsDocument).toMatchObject({
       kind: 'object',
       order: 0,
+      folder: ['Actors'],
       name: 'Player',
       type: 'Sprite',
       behaviors: [
@@ -465,9 +463,7 @@ mode = "embedded"
         },
       ],
     });
-    expect(settingsDocument.scenes.Main).not.toHaveProperty(
-      'objectsFolderStructure'
-    );
+    expect(settingsDocument).not.toHaveProperty('objectsFolderStructure');
     expect(composeLegacyProjectFromFiles(files).layouts[0].objects).toEqual(
       project.layouts[0].objects
     );
@@ -500,14 +496,15 @@ mode = "embedded"
     const files = decomposeLegacyProjectToFiles(project);
     const projectSettings = parseTomlSource(files[MULTI_FILE_ENTRY_URI]);
     const objectSettings = parseTomlSource(
-      files['game://objects/Actors/GlobalPlayer.settings']
+      files['game://objects/GlobalPlayer.settings']
     );
     const output = composeLegacyProjectFromFiles(files);
 
-    expect(projectSettings.project).not.toHaveProperty('objects');
-    expect(objectSettings.project.objects.GlobalPlayer).toMatchObject({
+    expect(projectSettings).not.toHaveProperty('objects');
+    expect(objectSettings).toMatchObject({
       kind: 'object',
       order: 0,
+      folder: ['Actors'],
       name: 'GlobalPlayer',
       type: 'Sprite',
       behaviors: [{ name: 'Tween', type: 'Tween::TweenBehavior' }],
@@ -519,7 +516,7 @@ mode = "embedded"
     expect(areLegacyProjectsEquivalent(project, output)).toBe(true);
   });
 
-  test('rejects serialized folder trees instead of keeping compatibility', () => {
+  test('rejects namespaced serialized folder trees without compatibility', () => {
     const files = decomposeLegacyProjectToFiles(projectFixture);
     files['game://extensions/Combat/extension.settings'] += `
 [extensions.Combat.eventsFunctionsFolderStructure]
@@ -528,7 +525,7 @@ folderName = "__ROOT"
 
     expect(() => composeLegacyProjectFromFiles(files)).toThrow(
       expect.objectContaining({
-        code: 'MULTIFILE_FORBIDDEN_FOLDER_STRUCTURE',
+        code: 'MULTIFILE_INVALID_LOCAL_SETTINGS',
       })
     );
   });
@@ -594,13 +591,11 @@ folderName = "__ROOT"
 
     const files = decomposeLegacyProjectToFiles(project);
     const prefabFunctionUri =
-      'game://extensions/Combat/prefabs/Enemy/functions/Combat%20actions/TakeDamage/function.settings';
+      'game://extensions/Combat/prefabs/Enemy/functions/TakeDamage/function.settings';
     const behaviorFunctionUri =
-      'game://extensions/Combat/behaviors/Health/functions/Recovery/Heal/function.settings';
-    const prefabFunction = parseTomlSource(files[prefabFunctionUri]).extensions
-      .Combat.prefabs.Enemy.functions.TakeDamage;
-    const behaviorFunction = parseTomlSource(files[behaviorFunctionUri])
-      .extensions.Combat.behaviors.Health.functions.Heal;
+      'game://extensions/Combat/behaviors/Health/functions/Heal/function.settings';
+    const prefabFunction = parseTomlSource(files[prefabFunctionUri]);
+    const behaviorFunction = parseTomlSource(files[behaviorFunctionUri]);
     const output = composeLegacyProjectFromFiles(files);
     const outputPrefab =
       output.eventsFunctionsExtensions[0].eventsBasedObjects[0];
@@ -610,26 +605,28 @@ folderName = "__ROOT"
     expect(prefabFunction).toMatchObject({
       kind: 'function',
       order: 0,
+      folder: ['Combat actions'],
       name: 'TakeDamage',
       events:
-        'game://extensions/Combat/prefabs/Enemy/functions/Combat%20actions/TakeDamage/TakeDamage.events',
+        'game://extensions/Combat/prefabs/Enemy/functions/TakeDamage/TakeDamage.events',
     });
     expect(behaviorFunction).toMatchObject({
       kind: 'function',
       order: 0,
+      folder: ['Recovery'],
       name: 'Heal',
       events:
-        'game://extensions/Combat/behaviors/Health/functions/Recovery/Heal/Heal.events',
+        'game://extensions/Combat/behaviors/Health/functions/Heal/Heal.events',
     });
     expect(
       parseTomlSource(
         files['game://extensions/Combat/prefabs/Enemy/prefab.settings']
-      ).extensions.Combat.prefabs.Enemy
+      )
     ).not.toHaveProperty('functions');
     expect(
       parseTomlSource(
         files['game://extensions/Combat/behaviors/Health/behavior.settings']
-      ).extensions.Combat.behaviors.Health
+      )
     ).not.toHaveProperty('functions');
     expect(outputPrefab.eventsFunctionsFolderStructure).toEqual(
       prefab.eventsFunctionsFolderStructure
@@ -638,6 +635,23 @@ folderName = "__ROOT"
       behavior.eventsFunctionsFolderStructure
     );
     expect(areLegacyProjectsEquivalent(project, output)).toBe(true);
+  });
+
+  test('rejects malformed folder grouping values', () => {
+    const project = JSON.parse(JSON.stringify(projectFixture));
+    project.layouts[0].objects = [
+      { name: 'Player', type: 'Sprite', behaviors: [] },
+    ];
+    const files = decomposeLegacyProjectToFiles(project);
+    const objectUri = 'game://scenes/Main/objects/Player.settings';
+    files[objectUri] = files[objectUri].replace(
+      'folder = [ ]',
+      'folder = "Actors"'
+    );
+
+    expect(() => composeLegacyProjectFromFiles(files)).toThrow(
+      expect.objectContaining({ code: 'MULTIFILE_INVALID_SCHEMA' })
+    );
   });
 
   test('rejects invalid or stray owner-function source paths', () => {
@@ -656,8 +670,8 @@ folderName = "__ROOT"
       projectFixture
     );
     filesWithStraySettings[
-      'game://extensions/Combat/behaviors/Health/functions/Recovery/Heal/notes.settings'
-    ] = '[notes]\nvalue = true\n';
+      'game://extensions/Combat/behaviors/Health/functions/Recovery/Heal/function.settings'
+    ] = 'kind = "function"\nsettingsFormatVersion = 1\n';
     expect(() => composeLegacyProjectFromFiles(filesWithStraySettings)).toThrow(
       expect.objectContaining({ code: 'MULTIFILE_ORPHAN_SETTINGS' })
     );
@@ -696,7 +710,7 @@ folderName = "__ROOT"
     const settingsDocument = parseTomlSource(
       files['game://extensions/Combat/prefabs/Enemy/prefab.settings']
     );
-    const prefabSettings = settingsDocument.extensions.Combat.prefabs.Enemy;
+    const prefabSettings = settingsDocument;
 
     expect(layoutDocument).not.toHaveProperty('objects');
     expect(layoutDocument).not.toHaveProperty('objectsFolderStructure');
@@ -705,13 +719,12 @@ folderName = "__ROOT"
     expect(prefabSettings.objectsGroups).toEqual(prefab.objectsGroups);
     expect(
       parseTomlSource(
-        files[
-          'game://extensions/Combat/prefabs/Enemy/objects/Visuals/Body.settings'
-        ]
-      ).extensions.Combat.prefabs.Enemy.objects.Body
+        files['game://extensions/Combat/prefabs/Enemy/objects/Body.settings']
+      )
     ).toMatchObject({
       kind: 'object',
       order: 0,
+      folder: ['Visuals'],
       name: 'Body',
       type: 'Sprite',
       behaviors: [{ name: 'Tween', type: 'Tween::TweenBehavior' }],
@@ -742,7 +755,7 @@ folderName = "__ROOT"
     const files = decomposeLegacyProjectToFiles(project);
     const prefabSettings = parseTomlSource(
       files['game://extensions/Combat/prefabs/Enemy/prefab.settings']
-    ).extensions.Combat.prefabs.Enemy;
+    );
     const outputPrefab = composeLegacyProjectFromFiles(files)
       .eventsFunctionsExtensions[0].eventsBasedObjects[0];
 
@@ -782,15 +795,17 @@ folderName = "__ROOT"
 
     const files = decomposeLegacyProjectToFiles(project);
     const objectUri =
-      'game://extensions/Combat/prefabs/Enemy/variants/Armored/objects/Equipment/Shield.settings';
+      'game://extensions/Combat/prefabs/Enemy/variants/Armored/objects/Shield.settings';
     const objectDocument = parseTomlSource(files[objectUri]);
     const outputVariant = composeLegacyProjectFromFiles(files)
       .eventsFunctionsExtensions[0].eventsBasedObjects[0].variants[0];
 
-    expect(
-      objectDocument.extensions.Combat.prefabs.Enemy.variantObjects.Armored
-        .Shield
-    ).toMatchObject({ kind: 'object', order: 0, type: 'Sprite' });
+    expect(objectDocument).toMatchObject({
+      kind: 'object',
+      order: 0,
+      folder: ['Equipment'],
+      type: 'Sprite',
+    });
     expect(outputVariant.objects).toEqual(variant.objects);
     expect(outputVariant.objectsFolderStructure).toEqual({
       folderName: '__ROOT',
@@ -852,9 +867,7 @@ folderName = "__ROOT"
   test('stores unsupported TOML values as canonical raw JSON pointers', () => {
     const files = decomposeLegacyProjectToFiles(projectFixture);
     expect(files[MULTI_FILE_CONFIG_URI]).toContain('[gdevelopConfig.rawJson]');
-    expect(files[MULTI_FILE_CONFIG_URI]).toContain(
-      '[project.globalConfig.rawJson]'
-    );
+    expect(files[MULTI_FILE_CONFIG_URI]).toContain('[settings.rawJson]');
     expect(files[MULTI_FILE_CONFIG_URI]).toContain('userOwned = "kept"');
     expect(files[MULTI_FILE_CONFIG_URI]).toContain('"/nullable" = "null"');
     expect(files[MULTI_FILE_CONFIG_URI]).toContain('"/mixed" = \'[1,"two"]\'');
@@ -863,13 +876,18 @@ folderName = "__ROOT"
     );
   });
 
-  test('all settings fragments append into one conflict-free TOML document', () => {
+  test('all settings fragments are local-root TOML documents', () => {
     const files = decomposeLegacyProjectToFiles(projectFixture);
     const settings = Object.keys(files)
       .filter(uri => uri.endsWith('.settings'))
-      .map(uri => files[uri].trimEnd())
-      .join('\n\n');
-    expect(() => parseTomlSource(`${settings}\n`)).not.toThrow();
+      .map(uri => files[uri]);
+    settings.forEach(source => {
+      expect(() => parseTomlSource(source)).not.toThrow();
+      expect(source).not.toMatch(
+        /^\[(?:project|scenes|extensions|externals)\b/m
+      );
+    });
+    expect(() => composeLegacyProjectFromFiles(files)).not.toThrow();
   });
 
   test('writes TOML without indentation', () => {

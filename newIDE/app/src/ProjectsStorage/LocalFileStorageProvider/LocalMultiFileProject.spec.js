@@ -196,7 +196,7 @@ describe('Local multi-file project storage', () => {
     };
     expect(
       await writeLegacyProjectAsMultiFile(changedObjectProject, entryPath)
-    ).toEqual(['game://scenes/Main/objects/Actors/Player.settings']);
+    ).toEqual(['game://scenes/Main/objects/Player.settings']);
 
     const changedInstanceProject = JSON.parse(
       JSON.stringify(changedObjectProject)
@@ -309,9 +309,7 @@ describe('Local multi-file project storage', () => {
     };
     expect(
       await writeLegacyProjectAsMultiFile(changedDefinition, entryPath)
-    ).toEqual([
-      'game://extensions/Local/prefabs/Widget/objects/Parts/Body.settings',
-    ]);
+    ).toEqual(['game://extensions/Local/prefabs/Widget/objects/Body.settings']);
 
     const changedInstance = JSON.parse(JSON.stringify(changedDefinition));
     changedInstance.eventsFunctionsExtensions[0].eventsBasedObjects[0].layers = [
@@ -343,23 +341,18 @@ describe('Local multi-file project storage', () => {
       'Visuals';
     expect(
       await writeLegacyProjectAsMultiFile(movedDefinition, entryPath)
-    ).toEqual(
-      expect.arrayContaining([
-        'game://extensions/Local/prefabs/Widget/objects/Parts/Body.settings',
-        'game://extensions/Local/prefabs/Widget/objects/Visuals/Body.settings',
-      ])
-    );
+    ).toEqual(['game://extensions/Local/prefabs/Widget/objects/Body.settings']);
     expect(
       fs.existsSync(
         path.join(
           temporaryDirectory,
-          'extensions/Local/prefabs/Widget/objects/Parts/Body.settings'
+          'extensions/Local/prefabs/Widget/objects/Body.settings'
         )
       )
-    ).toBe(false);
+    ).toBe(true);
   });
 
-  test('discovers and moves global object settings through physical folders', async () => {
+  test('stores global object grouping in its flat settings file', async () => {
     const entryPath = path.join(temporaryDirectory, 'project.settings');
     const project = JSON.parse(JSON.stringify(projectFixture));
     project.objects = [
@@ -380,7 +373,7 @@ describe('Local multi-file project storage', () => {
     };
 
     expect(await writeLegacyProjectAsMultiFile(project, entryPath)).toEqual(
-      expect.arrayContaining(['game://objects/Actors/GlobalPlayer.settings'])
+      expect.arrayContaining(['game://objects/GlobalPlayer.settings'])
     );
     expect((await openMultiFileProject(entryPath)).objects).toEqual(
       project.objects
@@ -390,20 +383,15 @@ describe('Local multi-file project storage', () => {
     movedProject.objectsFolderStructure.children[0].folderName = 'Shared';
     expect(
       await writeLegacyProjectAsMultiFile(movedProject, entryPath)
-    ).toEqual(
-      expect.arrayContaining([
-        'game://objects/Actors/GlobalPlayer.settings',
-        'game://objects/Shared/GlobalPlayer.settings',
-      ])
-    );
+    ).toEqual(['game://objects/GlobalPlayer.settings']);
     expect(
       fs.existsSync(
-        path.join(temporaryDirectory, 'objects/Actors/GlobalPlayer.settings')
+        path.join(temporaryDirectory, 'objects/GlobalPlayer.settings')
       )
-    ).toBe(false);
+    ).toBe(true);
   });
 
-  test('discovers and moves prefab and behavior functions through physical folders', async () => {
+  test('stores prefab and behavior function grouping in function settings', async () => {
     const entryPath = path.join(temporaryDirectory, 'project.settings');
     const makeFunction = name => ({
       name,
@@ -473,7 +461,7 @@ describe('Local multi-file project storage', () => {
       fs.existsSync(
         path.join(
           temporaryDirectory,
-          'extensions/Local/prefabs/Widget/functions/Lifecycle/Initialize/function.settings'
+          'extensions/Local/prefabs/Widget/functions/Initialize/function.settings'
         )
       )
     ).toBe(true);
@@ -481,7 +469,7 @@ describe('Local multi-file project storage', () => {
       fs.existsSync(
         path.join(
           temporaryDirectory,
-          'extensions/Local/behaviors/Health/functions/Recovery/Heal/Heal.events'
+          'extensions/Local/behaviors/Health/functions/Heal/Heal.events'
         )
       )
     ).toBe(true);
@@ -507,22 +495,18 @@ describe('Local multi-file project storage', () => {
     moved.eventsFunctionsExtensions[0].eventsBasedBehaviors[0].eventsFunctionsFolderStructure.children[0].folderName =
       'State';
     const changed = await writeLegacyProjectAsMultiFile(moved, entryPath);
-    expect(changed).toEqual(
-      expect.arrayContaining([
-        'game://extensions/Local/prefabs/Widget/functions/Lifecycle/Initialize/function.settings',
-        'game://extensions/Local/prefabs/Widget/functions/Setup/Initialize/function.settings',
-        'game://extensions/Local/behaviors/Health/functions/Recovery/Heal/Heal.events',
-        'game://extensions/Local/behaviors/Health/functions/State/Heal/Heal.events',
-      ])
-    );
+    expect(changed).toEqual([
+      'game://extensions/Local/prefabs/Widget/functions/Initialize/function.settings',
+      'game://extensions/Local/behaviors/Health/functions/Heal/function.settings',
+    ]);
     expect(
       fs.existsSync(
         path.join(
           temporaryDirectory,
-          'extensions/Local/prefabs/Widget/functions/Lifecycle'
+          'extensions/Local/prefabs/Widget/functions/Initialize'
         )
       )
-    ).toBe(false);
+    ).toBe(true);
     expect(
       areLegacyProjectsEquivalent(moved, await openMultiFileProject(entryPath))
     ).toBe(true);

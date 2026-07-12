@@ -295,7 +295,8 @@ const SETTINGS_FILE_KINDS = Object.freeze([
   {
     kind: 'project',
     path: 'project.settings',
-    namespace: '[project]',
+    mountedNamespace: 'project',
+    tomlRoot: true,
     requiredFields: ['kind', 'settingsFormatVersion'],
     commonFields: [
       'gdVersion',
@@ -317,9 +318,17 @@ const SETTINGS_FILE_KINDS = Object.freeze([
   },
   {
     kind: 'global-object',
-    path: 'objects/<optional physical folders>/<Object>.settings',
-    namespace: '[project.objects."<Object>"]',
-    requiredFields: ['kind', 'settingsFormatVersion', 'order', 'name', 'type'],
+    path: 'objects/<Object>.settings',
+    mountedNamespace: 'project.objects."<Object>"',
+    tomlRoot: true,
+    requiredFields: [
+      'kind',
+      'settingsFormatVersion',
+      'order',
+      'folder',
+      'name',
+      'type',
+    ],
     commonFields: [
       'behaviors',
       'variables',
@@ -331,23 +340,26 @@ const SETTINGS_FILE_KINDS = Object.freeze([
   {
     kind: 'resources',
     path: 'resources.settings',
-    namespace: '[project.resources]',
+    mountedNamespace: 'project.resources',
+    tomlRoot: true,
     requiredFields: ['kind', 'settingsFormatVersion'],
     commonFields: ['resources', 'resourceFolders'],
   },
   {
     kind: 'config',
     path: 'config.settings',
-    namespace: '[project.globalConfig]',
+    mountedNamespace: 'project.globalConfig',
+    tomlRoot: '[settings]',
     requiredFields: [],
     commonFields: ['arbitrary project global configuration'],
     note:
-      'Format metadata belongs in [gdevelopConfig], never inside [project.globalConfig].',
+      'Format metadata belongs in [gdevelopConfig]; global configuration belongs in the short local [settings] table.',
   },
   {
     kind: 'scene',
     path: 'scenes/<Scene>/scene.settings',
-    namespace: '[scenes."<Scene>"]',
+    mountedNamespace: 'scenes."<Scene>"',
+    tomlRoot: true,
     requiredFields: [
       'kind',
       'settingsFormatVersion',
@@ -374,10 +386,17 @@ const SETTINGS_FILE_KINDS = Object.freeze([
   },
   {
     kind: 'scene-object',
-    path:
-      'scenes/<Scene>/objects/<optional physical folders>/<Object>.settings',
-    namespace: '[scenes."<Scene>".objects."<Object>"]',
-    requiredFields: ['kind', 'settingsFormatVersion', 'order', 'name', 'type'],
+    path: 'scenes/<Scene>/objects/<Object>.settings',
+    mountedNamespace: 'scenes."<Scene>".objects."<Object>"',
+    tomlRoot: true,
+    requiredFields: [
+      'kind',
+      'settingsFormatVersion',
+      'order',
+      'folder',
+      'name',
+      'type',
+    ],
     commonFields: [
       'behaviors',
       'variables',
@@ -389,14 +408,16 @@ const SETTINGS_FILE_KINDS = Object.freeze([
   {
     kind: 'externals',
     path: 'externals/external.settings',
-    namespace: '[externals]',
+    mountedNamespace: 'externals',
+    tomlRoot: true,
     requiredFields: ['kind', 'settingsFormatVersion'],
     commonFields: ['eventFiles', 'layoutFiles'],
   },
   {
     kind: 'extension',
     path: 'extensions/<Extension>/extension.settings',
-    namespace: '[extensions."<Extension>"]',
+    mountedNamespace: 'extensions."<Extension>"',
+    tomlRoot: true,
     requiredFields: ['kind', 'settingsFormatVersion', 'order', 'name'],
     commonFields: ['metadata', 'dependencies', 'variables'],
     forbiddenFields: [
@@ -408,7 +429,8 @@ const SETTINGS_FILE_KINDS = Object.freeze([
   {
     kind: 'function',
     path: 'extensions/<Extension>/functions/<Function>/function.settings',
-    namespace: '[extensions."<Extension>".functions."<Function>"]',
+    mountedNamespace: 'extensions."<Extension>".functions."<Function>"',
+    tomlRoot: true,
     requiredFields: [
       'kind',
       'settingsFormatVersion',
@@ -429,7 +451,8 @@ const SETTINGS_FILE_KINDS = Object.freeze([
   {
     kind: 'prefab',
     path: 'extensions/<Extension>/prefabs/<Prefab>/prefab.settings',
-    namespace: '[extensions."<Extension>".prefabs."<Prefab>"]',
+    mountedNamespace: 'extensions."<Extension>".prefabs."<Prefab>"',
+    tomlRoot: true,
     requiredFields: [
       'kind',
       'settingsFormatVersion',
@@ -457,10 +480,18 @@ const SETTINGS_FILE_KINDS = Object.freeze([
   {
     kind: 'prefab-object',
     path:
-      'extensions/<Extension>/prefabs/<Prefab>/{objects|variants/<Variant>/objects}/<optional physical folders>/<Object>.settings',
-    namespace:
-      '[extensions."<Extension>".prefabs."<Prefab>".{objects|variantObjects."<Variant>"}."<Object>"]',
-    requiredFields: ['kind', 'settingsFormatVersion', 'order', 'name', 'type'],
+      'extensions/<Extension>/prefabs/<Prefab>/{objects|variants/<Variant>/objects}/<Object>.settings',
+    mountedNamespace:
+      'extensions."<Extension>".prefabs."<Prefab>".{objects|variantObjects."<Variant>"}."<Object>"',
+    tomlRoot: true,
+    requiredFields: [
+      'kind',
+      'settingsFormatVersion',
+      'order',
+      'folder',
+      'name',
+      'type',
+    ],
     commonFields: [
       'behaviors',
       'variables',
@@ -472,13 +503,15 @@ const SETTINGS_FILE_KINDS = Object.freeze([
   {
     kind: 'prefab-function',
     path:
-      'extensions/<Extension>/prefabs/<Prefab>/functions/<optional physical folders>/<Function>/function.settings',
-    namespace:
-      '[extensions."<Extension>".prefabs."<Prefab>".functions."<Function>"]',
+      'extensions/<Extension>/prefabs/<Prefab>/functions/<Function>/function.settings',
+    mountedNamespace:
+      'extensions."<Extension>".prefabs."<Prefab>".functions."<Function>"',
+    tomlRoot: true,
     requiredFields: [
       'kind',
       'settingsFormatVersion',
       'order',
+      'folder',
       'name',
       'events',
       'functionType',
@@ -491,12 +524,13 @@ const SETTINGS_FILE_KINDS = Object.freeze([
     ],
     forbiddenFields: ['event body'],
     note:
-      'The physical folders between functions/ and <Function>/ are the editor function folder path. The sibling <Function>.events owns the body.',
+      'folder is an array of editor folder names. The sibling <Function>.events owns the body.',
   },
   {
     kind: 'behavior',
     path: 'extensions/<Extension>/behaviors/<Behavior>/behavior.settings',
-    namespace: '[extensions."<Extension>".behaviors."<Behavior>"]',
+    mountedNamespace: 'extensions."<Extension>".behaviors."<Behavior>"',
+    tomlRoot: true,
     requiredFields: ['kind', 'settingsFormatVersion', 'order', 'name'],
     commonFields: [
       'variables',
@@ -510,13 +544,15 @@ const SETTINGS_FILE_KINDS = Object.freeze([
   {
     kind: 'behavior-function',
     path:
-      'extensions/<Extension>/behaviors/<Behavior>/functions/<optional physical folders>/<Function>/function.settings',
-    namespace:
-      '[extensions."<Extension>".behaviors."<Behavior>".functions."<Function>"]',
+      'extensions/<Extension>/behaviors/<Behavior>/functions/<Function>/function.settings',
+    mountedNamespace:
+      'extensions."<Extension>".behaviors."<Behavior>".functions."<Function>"',
+    tomlRoot: true,
     requiredFields: [
       'kind',
       'settingsFormatVersion',
       'order',
+      'folder',
       'name',
       'events',
       'functionType',
@@ -529,7 +565,7 @@ const SETTINGS_FILE_KINDS = Object.freeze([
     ],
     forbiddenFields: ['event body'],
     note:
-      'The physical folders between functions/ and <Function>/ are the editor function folder path. The sibling <Function>.events owns the body.',
+      'folder is an array of editor folder names. The sibling <Function>.events owns the body.',
   },
 ]);
 
@@ -621,15 +657,17 @@ export const buildProjectSettingsCatalog = ({
     project: projectIdentity(project),
     authoring: {
       sourceExtension: '.settings',
-      syntax: 'TOML 1.0 using append-safe, unindented component fragments.',
+      syntax:
+        'TOML 1.0 using unindented, file-local component documents mounted by physical path.',
       rules: [
         'Read the relevant existing settings file before editing or creating a sibling component.',
-        'Every settings file owns exactly one namespace and must parse both independently and when appended to all other settings files.',
-        'Use quoted TOML path segments for dynamic names and canonical game:// URIs for .layout and .events references.',
+        'Write component fields at the TOML root. Never repeat project, scene, extension, prefab, behavior, function, or object names in TOML table headers; the canonical physical path supplies that namespace.',
+        'At load time the editor parses each local document, mounts it at fileKinds.mountedNamespace, and strictly merges all mounted documents. Duplicate ownership is an error.',
+        'Use canonical game:// URIs for .layout and .events references.',
         'Use kind, settingsFormatVersion=1, and contiguous zero-based order fields exactly where the file-kind entry requires them.',
-        'Never write a legacy *FolderStructure field. Physical component and object directories are the project structure; property descriptors are flat ordered arrays.',
-        'Each global, scene, default-prefab, or variant-prefab object definition and its attached behaviors belong in its physical <Object>.settings file; instances and per-instance behavior overrides belong in .layout.',
-        'Each prefab or behavior function owns functions/<optional folders>/<Function>/function.settings and a sibling <Function>.events body. Owner settings never embed function metadata.',
+        'Never write a legacy *FolderStructure field or optional grouping directories. For an object or owner function, write its editor grouping as folder = ["Parent", "Child"] in that component settings file. Use folder = [] for the root.',
+        'Each global, scene, default-prefab, or variant-prefab object definition and its attached behaviors belong in its flat objects/<Object>.settings source location; instances and per-instance behavior overrides belong in .layout.',
+        'Each prefab or behavior function owns the flat functions/<Function>/function.settings location and a sibling <Function>.events body. Owner settings never embed function metadata.',
         'Preserve unknown serializer fields. Never invent an object, behavior, or effect type absent from this catalog.',
         'Never edit generated files below .gdevelop or legacy game.json.',
       ],

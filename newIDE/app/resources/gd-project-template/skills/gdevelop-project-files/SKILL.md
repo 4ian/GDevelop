@@ -35,8 +35,8 @@ entry per line so a matching search returns only relevant metadata.
 
 Use the catalogs as authoring contracts:
 
-- In `settings-catalog.json`, read `fileKinds` for the target fragment's path,
-  namespace, required/common/forbidden fields, and ownership boundary. Search
+- In `settings-catalog.json`, read `fileKinds` for the target document's path,
+  mounted namespace, local TOML root, required/common/forbidden fields, and ownership boundary. Search
   `objectTypes`, `behaviorTypes`, and `effectTypes` for exact registered type
   names, defaults, requirements, and property metadata. Use `settingsOwners`
   to resolve existing project components and their object definitions.
@@ -68,11 +68,12 @@ generated compatibility/runtime output, not multi-file source.
 
 - `.settings`: TOML semantic/configuration data, including object definitions
   and their complete behavior/variable/effect configuration. Keep every file
-  independent, append-safe, and unindented. Never embed another settings
-  fragment. Follow the matching settings-catalog `fileKinds` entry and use only
-  registered type metadata from that catalog.
-- `config.settings`: edit global configuration only under
-  `[project.globalConfig]`; preserve arbitrary keys and the format-owned
+  independent, local-root, and unindented. The physical path supplies the
+  mounted namespace, so never repeat owner names in long TOML table headers.
+  Never embed another settings document. Follow the matching settings-catalog
+  `fileKinds` entry and use only registered type metadata from that catalog.
+- `config.settings`: edit global configuration only under the short local
+  `[settings]` table; preserve arbitrary keys and the format-owned
   `[gdevelopConfig]`/`[gdevelopConfig.rawJson]` tables.
 - `.layout`: Layout DSL component-tree markup containing placement/layout data
   only: instances, layers, spatial bounds, background, and editor view state.
@@ -88,27 +89,27 @@ generated compatibility/runtime output, not multi-file source.
 Preserve component order, stable names, existing unknown fields, and ownership
 boundaries. Make the smallest coherent patch. When adding a component, create
 its physical component directory and every referenced source file in the same
-change. Never write `eventsFunctionsFolderStructure`,
+change. Never write optional grouping directories or `eventsFunctionsFolderStructure`,
 `objectsFolderStructure`, `propertiesFolderStructure`, or
-`sharedPropertiesFolderStructure`. Physical component and object directories
-replace logical component/object trees. There is no property tree: prefab
+`sharedPropertiesFolderStructure`. Object and owner-function settings store
+editor grouping as `folder = ["Parent", "Child"]`; use `folder = []` for the
+root. There is no property tree: prefab
 `propertyDescriptors` and behavior
 `propertyDescriptors`/`sharedPropertyDescriptors` are flat arrays in source
 order.
 
 Give every global, scene, default-prefab, and variant-prefab object its own
-`<Object>.settings` file under the owner's recursive `objects/` directory. Put
+`<Object>.settings` file directly under the owner's flat `objects/` directory. Put
 the complete object definition there, including behaviors, variables, effects,
 and type-specific configuration. `project.settings`, `scene.settings`, and
 `prefab.settings` must not embed object definitions. Keep object groups and
 other owner-wide configuration in the owner settings. Put only instances,
 layers, background/bounds, and editor layout state in `.layout`.
 
-Give every prefab and behavior function its own recursive
-`functions/<optional folder path>/<Function>/` directory containing
-`function.settings` and `<Function>.events`. The optional physical folders are
-the editor function grouping. `prefab.settings` and `behavior.settings` must
-not embed function metadata.
+Give every prefab and behavior function its own `functions/<Function>/`
+directory containing `function.settings` and `<Function>.events`. Store editor
+grouping in the function settings `folder` array. `prefab.settings` and
+`behavior.settings` must not embed function metadata.
 
 ## Project layout
 
@@ -116,11 +117,11 @@ not embed function metadata.
 project.settings
 resources.settings
 config.settings
-objects/<optional folder path>/<Object>.settings
+objects/<Object>.settings
 scenes/<Scene>/<Scene>.layout
 scenes/<Scene>/<Scene>.events
 scenes/<Scene>/scene.settings
-scenes/<Scene>/objects/<optional folder path>/<Object>.settings
+scenes/<Scene>/objects/<Object>.settings
 externals/external.settings
 externals/<External>.layout
 externals/<External>.events
@@ -129,22 +130,22 @@ extensions/<Extension>/functions/<Function>/function.settings
 extensions/<Extension>/functions/<Function>/<Function>.events
 extensions/<Extension>/prefabs/<Prefab>/prefab.settings
 extensions/<Extension>/prefabs/<Prefab>/<Prefab>.layout
-extensions/<Extension>/prefabs/<Prefab>/functions/<optional folder path>/<Function>/function.settings
-extensions/<Extension>/prefabs/<Prefab>/functions/<optional folder path>/<Function>/<Function>.events
-extensions/<Extension>/prefabs/<Prefab>/objects/<optional folder path>/<Object>.settings
+extensions/<Extension>/prefabs/<Prefab>/functions/<Function>/function.settings
+extensions/<Extension>/prefabs/<Prefab>/functions/<Function>/<Function>.events
+extensions/<Extension>/prefabs/<Prefab>/objects/<Object>.settings
 extensions/<Extension>/prefabs/<Prefab>/variants/<Variant>.layout
-extensions/<Extension>/prefabs/<Prefab>/variants/<Variant>/objects/<optional folder path>/<Object>.settings
+extensions/<Extension>/prefabs/<Prefab>/variants/<Variant>/objects/<Object>.settings
 extensions/<Extension>/behaviors/<Behavior>/behavior.settings
-extensions/<Extension>/behaviors/<Behavior>/functions/<optional folder path>/<Function>/function.settings
-extensions/<Extension>/behaviors/<Behavior>/functions/<optional folder path>/<Function>/<Function>.events
+extensions/<Extension>/behaviors/<Behavior>/functions/<Function>/function.settings
+extensions/<Extension>/behaviors/<Behavior>/functions/<Function>/<Function>.events
 .gdevelop/instructions-catalog.json
 .gdevelop/settings-catalog.json
 .gdevelop/layout-catalog.json
 ```
 
-Only create optional component or object folders when their physical
-organization requires them. Settings files never reference other settings
-files.
+Do not create optional grouping folders. Canonical component directories are
+fixed; object/function grouping belongs in each settings file's `folder`
+array. Settings files never reference other settings files.
 
 ## Task references
 
@@ -318,12 +319,12 @@ Before finishing:
 - Confirm `.layout` files contain only placement/layout concepts and contain no
   `objects`, `objectsGroups`, or behavior definitions.
 - Confirm no `.settings` file contains a legacy `*FolderStructure` property;
-  components and objects are organized only by their physical directories.
+  object/function grouping uses only a valid local `folder` array.
 - Confirm every global, scene, and prefab object definition and its complete
-  behaviors are in its individual `<Object>.settings` namespace.
+  behaviors are at the local root of its individual `<Object>.settings` file.
 - Confirm prefab and behavior property descriptor arrays are flat and contain
   no grouping/folder metadata.
-- Confirm every prefab/behavior function has a dedicated recursive function
+- Confirm every prefab/behavior function has a dedicated flat function
   directory with `function.settings` and its matching sibling `.events`, and
   owner settings contain no embedded function entries.
 - Confirm settings references use `game://` and resolve to existing files.

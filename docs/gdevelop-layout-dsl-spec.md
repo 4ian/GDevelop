@@ -101,7 +101,7 @@ declarations.
 The compiler converts a `.layout` file into exactly the layout-owned fields
 consumed by the current GDevelop serializers. The multi-file project composer
 then merges those fields with the object definitions and configuration from
-the owner's recursive object `.settings` files before calling the existing GDevelop
+the owner's flat object `.settings` files before calling the existing GDevelop
 unserializers. Preview, export, and runtime code continue to consume the
 current in-memory project and compatibility JSON shape.
 
@@ -154,8 +154,8 @@ responsibilities.
 | Concern                                                                                                                                                        | Owner                       |
 | -------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------- |
 | Scene identity and runtime configuration                                                                                                                       | `scene.settings`            |
-| Scene object definitions, effects, and attached behaviors                                                                                                      | `scenes/<Scene>/objects/<folders>/<Object>.settings` |
-| Prefab/variant child object definitions, effects, and attached behaviors                                                                                       | The corresponding recursive prefab object `.settings` file |
+| Scene object definitions, effects, attached behaviors, and editor grouping                                                                                      | `scenes/<Scene>/objects/<Object>.settings` (`folder`) |
+| Prefab/variant child object definitions, effects, attached behaviors, and editor grouping                                                                       | The corresponding flat prefab object `.settings` file (`folder`) |
 | Object groups, scene/prefab variables, and other owner-wide configuration                                                                                      | `scene.settings` or `prefab.settings` |
 | Instance placement, transform, size, opacity, flips, editor locks, custom instance properties, initial instance variables, and per-instance behavior overrides | `.layout`                   |
 | Layer definitions, cameras, layer effects, lighting, and rendering configuration                                                                               | Scene or prefab `.layout`   |
@@ -510,7 +510,8 @@ format itself and are never layout-owned.
 
 The same grammar is used for a prefab's default variant and every named
 variant. The owning `prefab.settings` entry supplies prefab/variant identity;
-recursive default or variant object settings supply object definitions.
+flat default or variant object settings supply object definitions; each
+object's `folder` array supplies editor grouping.
 
 A prefab layout owns exactly:
 
@@ -546,7 +547,7 @@ A prefab layout:
 
 The layout forbids `name`, asset-store identity, object definitions, object
 folders/groups, prefab variables, behavior definitions, property descriptors,
-functions, and variants. Object definitions belong in recursive object
+functions, and variants. Object definitions belong in flat object
 settings; the other configuration remains in `prefab.settings`.
 
 ---

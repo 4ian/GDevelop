@@ -223,9 +223,9 @@ sibling `onSignal.events`. Use the same complete metadata shape as sibling
 prefab functions and verify the fields against `settings-catalog.json`:
 
 ```toml
-[extensions."Cards".prefabs."CardSlot".functions."onSignal"]
 kind = "function"
 settingsFormatVersion = 1
+folder = []
 order = 0
 name = "onSignal"
 functionType = "Action"
@@ -365,7 +365,7 @@ the next dispatch. The scene does not receive this object-targeted signal.
 [gdevelopConfig]
 settingsFormatVersion = 1
 
-[project.globalConfig.signals.card]
+[settings.signals.card]
 selected = "Card.Selected"
 refresh = "Card.Refresh"
 ```

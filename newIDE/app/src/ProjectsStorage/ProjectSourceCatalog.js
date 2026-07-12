@@ -87,12 +87,68 @@ const summarizeProperties = (properties: any): Array<Object> => {
     .filter(Boolean);
 };
 
+const summarizeSerializedProperties = (
+  propertyDescriptors: ?Array<Object>
+): Array<Object> =>
+  (propertyDescriptors || [])
+    .filter(property => !property.hidden && !property.deprecated)
+    .map(property => {
+      const summary: Object = {
+        name: String(property.name || ''),
+        type: String(property.type || ''),
+      };
+      if (property.value !== undefined) summary.defaultValue = property.value;
+      if (property.label) summary.label = property.label;
+      if (property.description) summary.description = property.description;
+      if (property.group) summary.group = property.group;
+      if (property.advanced) summary.advanced = true;
+      if (Array.isArray(property.choices) && property.choices.length) {
+        summary.choices = property.choices.map(choice => ({
+          value: choice.value,
+          label: choice.label,
+        }));
+      }
+      if (Array.isArray(property.extraInfo) && property.extraInfo.length) {
+        summary.extraInfo = property.extraInfo;
+      }
+      return summary;
+    });
+
+const safelySummarizeMetadataProperties = (
+  readProperties: () => any,
+  context: string
+): Array<Object> => {
+  try {
+    return summarizeProperties(readProperties());
+  } catch (error) {
+    console.warn(
+      `[ProjectSourceCatalog] Unable to read ${context}; omitting its property metadata from the generated catalog.`,
+      error
+    );
+    return [];
+  }
+};
+
 const getProjectExtensionNames = (serializedProject: Object): Set<string> =>
   new Set(
     (serializedProject.eventsFunctionsExtensions || []).map(extension =>
       String(extension.name || '')
     )
   );
+
+const getProjectBehaviorDefinitions = (
+  serializedProject: Object
+): Map<string, Object> => {
+  const definitions = new Map();
+  (serializedProject.eventsFunctionsExtensions || []).forEach(extension => {
+    const extensionName = String(extension.name || '');
+    (extension.eventsBasedBehaviors || []).forEach(behavior => {
+      const behaviorName = String(behavior.name || '');
+      definitions.set(`${extensionName}::${behaviorName}`, behavior);
+    });
+  });
+  return definitions;
+};
 
 const collectRegisteredTypes = (
   project: gdProject,
@@ -106,6 +162,9 @@ const collectRegisteredTypes = (
   const behaviorTypes = [];
   const effectTypes = [];
   const localExtensionNames = getProjectExtensionNames(serializedProject);
+  const localBehaviorDefinitions = getProjectBehaviorDefinitions(
+    serializedProject
+  );
   const platform = project.getCurrentPlatform();
   const extensions = toArray(platform.getAllPlatformExtensions());
 
@@ -156,9 +215,29 @@ const collectRegisteredTypes = (
         description: metadata.getDescription(),
         extension: extensionName,
         defaultName: metadata.getDefaultName(),
-        properties: summarizeProperties(metadata.getProperties()),
-        sharedProperties: summarizeProperties(metadata.getSharedProperties()),
+        properties: [],
+        sharedProperties: [],
       };
+      const localBehaviorDefinition = localBehaviorDefinitions.get(
+        behaviorType
+      );
+      if (localBehaviorDefinition) {
+        entry.properties = summarizeSerializedProperties(
+          localBehaviorDefinition.propertyDescriptors
+        );
+        entry.sharedProperties = summarizeSerializedProperties(
+          localBehaviorDefinition.sharedPropertyDescriptors
+        );
+      } else {
+        entry.properties = safelySummarizeMetadataProperties(
+          () => metadata.getProperties(),
+          `properties for behavior ${behaviorType}`
+        );
+        entry.sharedProperties = safelySummarizeMetadataProperties(
+          () => metadata.getSharedProperties(),
+          `shared properties for behavior ${behaviorType}`
+        );
+      }
       const objectType = metadata.getObjectType();
       if (objectType) entry.objectType = objectType;
       const requiredBehaviorTypes = toArray(
@@ -187,7 +266,10 @@ const collectRegisteredTypes = (
           ? ['3d']
           : ['2d', '3d'],
         unique: metadata.isMarkedAsUnique(),
-        parameters: summarizeProperties(metadata.getProperties()),
+        parameters: safelySummarizeMetadataProperties(
+          () => metadata.getProperties(),
+          `parameters for effect ${effectType}`
+        ),
       });
     });
   });

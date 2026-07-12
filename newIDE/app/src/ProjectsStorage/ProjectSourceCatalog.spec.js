@@ -2,11 +2,17 @@
 
 import {
   ProjectSourceCatalogError,
+  buildProjectSettingsCatalog,
   serializeProjectLayoutCatalog,
   serializeProjectSettingsCatalog,
   validateProjectLayoutCatalog,
   validateProjectSettingsCatalog,
 } from './ProjectSourceCatalog';
+import { insertNewEventsBasedBehavior } from '../EventsFunctionsList/CreateEventsBasedBehavior';
+import { reloadProjectEventsFunctionsExtensionMetadata } from '../EventsFunctionsExtensionsLoader';
+import { serializeToJSObject } from '../Utils/Serializer';
+
+const gd: libGDevelop = global.gd;
 
 const base = format => ({
   format,
@@ -76,5 +82,99 @@ describe('project source catalogs', () => {
         effectTypes: [],
       })
     ).toThrow(ProjectSourceCatalogError);
+  });
+
+  test('reads project behavior properties from serialized definitions instead of volatile metadata wrappers', () => {
+    const project = gd.ProjectHelper.createNewGDJSProject();
+    const extensionName = 'CatalogLocalBehaviorTest';
+    const extension = project.insertNewEventsFunctionsExtension(
+      extensionName,
+      0
+    );
+    const behavior = insertNewEventsBasedBehavior(extension);
+    behavior.setName('Movement');
+    behavior.setFullName('Movement');
+    behavior
+      .getPropertyDescriptors()
+      .insertNew('Speed', 0)
+      .setType('Number')
+      .setValue('42')
+      .setLabel('Speed');
+    behavior
+      .getPropertyDescriptors()
+      .insertNew('Internal', 1)
+      .setType('String')
+      .setHidden(true);
+    reloadProjectEventsFunctionsExtensionMetadata(
+      project,
+      extension,
+      ({
+        getIncludeFileFor: () => 'generated.js',
+        writeFunctionCode: async () => {},
+        writeBehaviorCode: async () => {},
+        writeObjectCode: async () => {},
+      }: any),
+      ({ _: value => (typeof value === 'string' ? value : value.id) }: any)
+    );
+
+    const behaviorType = `${extensionName}::Movement`;
+    const platformExtensions = gd.JsPlatform.get().getAllPlatformExtensions();
+    let platformExtension;
+    for (let index = 0; index < platformExtensions.size(); index++) {
+      const candidate = platformExtensions.at(index);
+      if (candidate.getName() === extensionName) {
+        platformExtension = candidate;
+        break;
+      }
+    }
+    expect(platformExtension).toBeDefined();
+    const metadata = platformExtension.getBehaviorMetadata(behaviorType);
+    const getPropertiesSpy = jest.spyOn(metadata, 'getProperties');
+    const serializedProject = serializeToJSObject(project, 'serializeTo');
+
+    const catalog = buildProjectSettingsCatalog({
+      project,
+      serializedProject,
+    });
+    const entry = catalog.behaviorTypes.find(
+      behaviorEntry => behaviorEntry.type === behaviorType
+    );
+
+    expect(entry).toBeDefined();
+    expect(entry.properties).toEqual([
+      {
+        name: 'Speed',
+        type: 'Number',
+        defaultValue: '42',
+        label: 'Speed',
+      },
+    ]);
+    expect(getPropertiesSpy).not.toHaveBeenCalled();
+
+    const serializedWithoutBehaviorDefinition = JSON.parse(
+      JSON.stringify(serializedProject)
+    );
+    serializedWithoutBehaviorDefinition.eventsFunctionsExtensions[0].eventsBasedBehaviors = [];
+    getPropertiesSpy.mockImplementation(() => {
+      throw new WebAssembly.RuntimeError('memory access out of bounds');
+    });
+    const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    const fallbackCatalog = buildProjectSettingsCatalog({
+      project,
+      serializedProject: serializedWithoutBehaviorDefinition,
+    });
+    expect(
+      fallbackCatalog.behaviorTypes.find(
+        behaviorEntry => behaviorEntry.type === behaviorType
+      ).properties
+    ).toEqual([]);
+    expect(getPropertiesSpy).toHaveBeenCalled();
+    expect(warnSpy).toHaveBeenCalledWith(
+      expect.stringContaining(`properties for behavior ${behaviorType}`),
+      expect.any(WebAssembly.RuntimeError)
+    );
+    warnSpy.mockRestore();
+    getPropertiesSpy.mockRestore();
+    project.delete();
   });
 });

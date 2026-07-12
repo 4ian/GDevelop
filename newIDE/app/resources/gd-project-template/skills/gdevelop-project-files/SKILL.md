@@ -8,7 +8,9 @@ description: Create, inspect, modify, refactor, and verify GDevelop games throug
 ## Source of truth
 
 Treat project files as authoritative. Modify them directly; do not use MCP to
-author the game.
+author the game. The sole authoring-related exception is `import_extension`:
+use it once to import and convert an official legacy extension into canonical
+multi-file sources, then continue by editing those generated files directly.
 
 Read, in order:
 
@@ -188,8 +190,12 @@ asset is appropriate.
 
 ## MCP boundary
 
-MCP is synchronization/read/debug-only. Use it only for:
+MCP is extension-import/synchronization/read/debug-only. Use it only for:
 
+- Importing and converting an official legacy extension with
+  `import_extension`. This is the only MCP tool allowed to create project
+  source. It must return the generated source paths; all later adaptation is a
+  direct file edit.
 - Reloading direct disk edits into the editor with `reload_project`.
 - Current editor/project/selection queries.
 - Launching or controlling a debug preview.
@@ -197,9 +203,10 @@ MCP is synchronization/read/debug-only. Use it only for:
 - Inspecting live runtime state, logs, errors, audio, and instance positions.
 - Capturing preview screenshots.
 
-Never use MCP to create scenes, objects, resources, variables, instances,
-extensions, behaviors, prefabs, or events. Never use generic editor-call,
-command, patch, sync, or save tools for authoring.
+Except for the single `import_extension` conversion transaction, never use MCP
+to create scenes, objects, resources, variables, instances, extensions,
+behaviors, prefabs, or events. Never use generic editor-call, command, patch,
+sync, or save tools for authoring.
 
 `reload_project` is a mandatory preview gate. In every direct-edit task, call
 it successfully at least once after the most recent source-file edit and before

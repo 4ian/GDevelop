@@ -17,6 +17,11 @@ import {
   serializeToJSObject,
   unserializeFromJSObject,
 } from '../Utils/Serializer';
+import {
+  decomposeLegacyProjectToFiles,
+  parseTomlSource,
+} from '../ProjectsStorage/MultiFileProjectFormat';
+import { readMultiFileSourceTree } from '../ProjectsStorage/LocalFileStorageProvider/LocalMultiFileProject';
 import { renderNonTranslatedEventsAsText } from '../EventsSheet/EventsTree/TextRenderer';
 import { mapFor } from '../Utils/MapFor';
 import { type EditorCallbacks } from '../EditorFunctions';
@@ -4866,12 +4871,13 @@ const callMcpTool = async ({
         'The GDevelop host did not provide reloadProjectAndWait, so MCP cannot reload project files from disk.'
       );
     }
+    const reloadProjectAndWait = context.reloadProjectAndWait;
 
     const persistenceState = context.getPersistenceState
       ? context.getPersistenceState()
       : null;
     try {
-      const reloadResult = await context.reloadProjectAndWait();
+      const reloadResult = await reloadProjectAndWait();
       if (reloadResult && reloadResult.reloaded === false) {
         return errorResult(
           reloadResult.reason || 'The project could not be reloaded from disk.',
@@ -4897,6 +4903,172 @@ const callMcpTool = async ({
         error && error.message
           ? error.message
           : 'Unable to reload the project from disk.'
+      );
+    }
+  }
+
+  if (toolName === 'import_extension') {
+    if (!project) return errorResult('No project opened.');
+    if (!context.ensureExtensionInstalled) {
+      return errorResult(
+        'The GDevelop host did not provide the native extension importer.'
+      );
+    }
+    if (!context.saveProjectAndWait) {
+      return errorResult(
+        'The GDevelop host did not provide awaited project saving, so converted multi-file sources cannot be generated.'
+      );
+    }
+    const ensureExtensionInstalled = context.ensureExtensionInstalled;
+    const saveProjectAndWait = context.saveProjectAndWait;
+
+    const extensionName =
+      args && typeof args.extension_name === 'string'
+        ? args.extension_name.trim()
+        : '';
+    if (!extensionName) {
+      return errorResult('extension_name must be a non-empty string.');
+    }
+    if (extensionName.length > 128) {
+      return errorResult('extension_name must not exceed 128 characters.');
+    }
+    const projectFile = project.getProjectFile();
+    if (!/[\\/]project\.settings$/i.test(projectFile)) {
+      return errorResult(
+        'import_extension requires a saved multi-file project whose entry file is project.settings.'
+      );
+    }
+
+    const wasAlreadyInstalled = project.hasEventsFunctionsExtensionNamed(
+      extensionName
+    );
+    const installedExtensionNames: Array<string> = [];
+    try {
+      if (!wasAlreadyInstalled) {
+        await ensureExtensionInstalled({
+          extensionName,
+          onWillInstallExtension: (names: Array<string>) => {
+            if (context.onWillInstallExtension)
+              context.onWillInstallExtension(names);
+          },
+          onExtensionInstalled: (names: Array<string>) => {
+            names.forEach(name => {
+              if (installedExtensionNames.indexOf(name) === -1)
+                installedExtensionNames.push(name);
+            });
+            if (context.onExtensionInstalled)
+              context.onExtensionInstalled(names);
+          },
+        });
+      }
+
+      if (!project.hasEventsFunctionsExtensionNamed(extensionName)) {
+        return errorResult(
+          `The native importer did not add "${extensionName}" to the project. Verify the exact repository/registry name and that it is a project extension rather than a built-in extension.`
+        );
+      }
+
+      if (!wasAlreadyInstalled) context.triggerUnsavedChanges();
+      const saveResult = await saveProjectAndWait();
+      if (
+        !saveResult ||
+        (typeof saveResult === 'object' && saveResult.saved === false)
+      ) {
+        const saveFailureReason =
+          saveResult && typeof saveResult === 'object'
+            ? saveResult.reason
+            : 'no-save-receipt';
+        return errorResult(
+          `Extension "${extensionName}" was loaded in editor memory, but its immediate project save failed (${saveFailureReason ||
+            'unknown reason'}). Generated multi-file sources were not confirmed.`,
+          {
+            importerVersion: 3,
+            extensionName,
+            importedExtensions: installedExtensionNames,
+            saved: false,
+            save: saveResult || undefined,
+          }
+        );
+      }
+
+      const namesToReport = installedExtensionNames.length
+        ? installedExtensionNames
+        : [extensionName];
+      const decomposedFiles = decomposeLegacyProjectToFiles(
+        serializeToJSObject(project)
+      );
+      const generatedSources: { [string]: Array<string> } = {};
+      namesToReport.forEach(name => {
+        const extensionSettingsUri = Object.keys(decomposedFiles).find(uri => {
+          if (!uri.endsWith('/extension.settings')) return false;
+          const settings = parseTomlSource(decomposedFiles[uri], uri);
+          return !!(
+            settings.extensions &&
+            Object.keys(settings.extensions).indexOf(name) !== -1
+          );
+        });
+        if (!extensionSettingsUri) {
+          generatedSources[name] = [];
+          return;
+        }
+        const extensionRoot = extensionSettingsUri.slice(
+          0,
+          -'extension.settings'.length
+        );
+        generatedSources[name] = Object.keys(decomposedFiles)
+          .filter(uri => uri.indexOf(extensionRoot) === 0)
+          .sort((left, right) => left.localeCompare(right));
+      });
+
+      const savedSourceTree = await readMultiFileSourceTree(projectFile);
+      const savedSourceUris = new Set(Object.keys(savedSourceTree.files));
+      const missingGeneratedSources: Array<string> = [];
+      Object.keys(generatedSources).forEach(name => {
+        generatedSources[name].forEach(uri => {
+          if (!savedSourceUris.has(uri)) missingGeneratedSources.push(uri);
+        });
+      });
+      if (missingGeneratedSources.length) {
+        return errorResult(
+          `Extension "${extensionName}" was saved, but generated multi-file sources could not be read back from disk.`,
+          {
+            importerVersion: 3,
+            extensionName,
+            importedExtensions: installedExtensionNames,
+            missingGeneratedSources,
+            saved: false,
+          }
+        );
+      }
+
+      return textResult({
+        success: true,
+        importerVersion: 3,
+        extensionName,
+        alreadyInstalled: wasAlreadyInstalled,
+        importedExtensions: installedExtensionNames,
+        projectFile,
+        generatedSources,
+        persistedSourcesVerified: true,
+        save: saveResult,
+        nextAction:
+          'Edit the generated project files directly. Call reload_project after the final file edit and before launch_preview.',
+      });
+    } catch (error) {
+      return errorResult(
+        error && error.message
+          ? error.message
+          : `Unable to import extension "${extensionName}".`,
+        {
+          importerVersion: 3,
+          extensionName,
+          importedExtensions: installedExtensionNames,
+          writerError: {
+            name: error && error.name ? error.name : undefined,
+            code: error && error.code ? error.code : undefined,
+            fileUri: error && error.fileUri ? error.fileUri : undefined,
+          },
+        }
       );
     }
   }

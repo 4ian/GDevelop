@@ -1925,6 +1925,12 @@ do AdvancedCamera::ShakeCamera duration="0.4" amplitude="20" layer="\"\"" camera
 The JSON-string rule makes catalog forms lossless without guessing whether an
 operand is an object name, resource name, or nested GDevelop expression.
 
+Every generated `dslName` obeys the normal identifier grammar. After ordinary
+normalization, a parameter name beginning with a digit is prefixed with
+`parameter_`; for example, the displayed name `3D capability` becomes
+`parameter_3d_capability`. The formatter and parser use this same deterministic
+name so generated DSL always recompiles.
+
 The generated artifact is deliberately lean and line-oriented. Each action,
 condition, or expression occupies one compact JSON line and contains only
 authoring-relevant names, descriptions, valid scope names, parameter

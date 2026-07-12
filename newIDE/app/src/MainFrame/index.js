@@ -113,6 +113,7 @@ import { type OpenAskAiOptions } from '../AiGeneration/Utils';
 import { exceptionallyGuardAgainstDeadObject } from '../Utils/IsNullPtr';
 import { renderAskAiEditorContainer } from '../AiGeneration/AskAiEditorContainer';
 import { createMcpEditorBridge } from '../Mcp/McpEditorBridge';
+import { saveProjectAfterPendingSave } from '../Mcp/McpSaveCoordinator';
 import { type EditorCallbacks } from '../EditorFunctions';
 import { renderResourcesEditorContainer } from './EditorContainers/ResourcesEditorContainer';
 import { renderGlobalConfigEditorContainer } from './EditorContainers/GlobalConfigEditorContainer';
@@ -5922,7 +5923,8 @@ const MainFrame = (props: Props): React.MixedElement => {
   const saveWithBackgroundSerializer = false;
   const saveProject = React.useCallback(
     async (options?: {|
-      skipNewVersionWarning: boolean,
+      skipNewVersionWarning?: boolean,
+      rethrowSaveError?: boolean,
     |}): Promise<?FileMetadata> => {
       if (!currentProject) return;
       // Prevent saving if there are errors in the extension modules, as
@@ -6053,6 +6055,8 @@ const MainFrame = (props: Props): React.MixedElement => {
           return fileMetadata;
         }
       } catch (error) {
+        console.error('Unable to save the project:', error);
+        if (options && options.rethrowSaveError) throw error;
         const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
           error
         );
@@ -7353,6 +7357,16 @@ const MainFrame = (props: Props): React.MixedElement => {
     [editorTabsRef]
   );
 
+  const saveProjectForMcpAndWait = React.useCallback(
+    (): Promise<Object> =>
+      saveProjectAfterPendingSave({
+        isSaveProjectInProgress,
+        saveProject: () => saveProject({ rethrowSaveError: true }),
+        hasExtensionLoadErrors,
+      }),
+    [hasExtensionLoadErrors, isSaveProjectInProgress, saveProject]
+  );
+
   const mcpEditorBridge = React.useMemo(
     () =>
       createMcpEditorBridge({
@@ -7385,7 +7399,7 @@ const MainFrame = (props: Props): React.MixedElement => {
           });
           return { reloaded: true, fileIdentifier };
         },
-        saveProjectAndWait: () => saveProject(),
+        saveProjectAndWait: saveProjectForMcpAndWait,
         getPersistenceState: () => ({
           hasUnsavedChanges: getChangesCount() > 0,
           changesCount: getChangesCount(),
@@ -7438,7 +7452,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       triggerUnsavedChanges,
       getChangesCount,
       getTimeOfFirstChangeSinceLastSave,
-      saveProject,
+      saveProjectForMcpAndWait,
       reloadProject,
       currentFileMetadata,
       launchPreviewForScene,

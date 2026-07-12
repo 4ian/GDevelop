@@ -1554,6 +1554,31 @@ compatibility export, not normal Save. It composes current sources, validates
 them, and writes the selected `.json`. The editor continues tracking
 `project.settings`; the ignored `.gdevelop/game.json` snapshot is separate.
 
+### 16.6 Official extension import boundary
+
+Extensions distributed by the official GDevelop extension registry/repository
+remain legacy JSON interchange artifacts. AI clients must not translate these
+files manually. The editor exposes the narrow MCP tool `import_extension` with
+an exact registry `extension_name`. The tool must:
+
+1. Resolve and download the official serialized extension with the native
+   extension-store service.
+2. Resolve and install required extension dependencies through the same native
+   installation path.
+3. Load the serialized extensions through the current
+   `Project::UnserializeAndInsertExtensionsFrom` model path so compatibility
+   logic and declaration ordering are preserved.
+4. Mark the project changed and immediately await a normal multi-file save.
+5. Read the saved multi-file source tree back from disk and fail the MCP call
+   if any expected generated extension source is absent.
+6. Return the verified `game://extensions/...` source paths for the requested
+   extension and every imported dependency.
+
+This is a conversion transaction, not a general MCP authoring surface. Once it
+succeeds, `.settings`, `.layout`, and `.events` are the editable source of truth;
+the AI edits those files directly and uses `reload_project` before preview. A
+failed import must not be replaced with a partial hand-authored conversion.
+
 ---
 
 ## 17. Preview and export

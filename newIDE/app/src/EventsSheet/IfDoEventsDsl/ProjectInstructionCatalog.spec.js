@@ -14,6 +14,7 @@ import {
 } from './ProjectInstructionCatalog';
 import { enumerateAllInstructions } from '../../InstructionOrExpression/EnumerateInstructions';
 import { enumerateAllExpressions } from '../../InstructionOrExpression/EnumerateExpressions';
+import { normalizeInstructionParameterDslName } from '../../Mcp/McpEventKnowledge';
 
 const catalogFixture = {
   format: 'gdevelop-ifdo-instruction-catalog',
@@ -44,6 +45,75 @@ const catalogFixture = {
 };
 
 describe('project IfDo instruction catalog', () => {
+  test('normalizes digit-leading parameter names into valid DSL identifiers', () => {
+    expect(normalizeInstructionParameterDslName('3d_capability', 1)).toBe(
+      'parameter_3d_capability'
+    );
+    expect(normalizeInstructionParameterDslName('object', 0)).toBe('object');
+  });
+
+  test('rejects catalog parameter names that the DSL cannot parse', () => {
+    expect(() =>
+      validateProjectInstructionCatalog({
+        ...catalogFixture,
+        actions: [
+          {
+            type: 'Invalid::Action',
+            parameters: [{ dslName: '3d_capability' }],
+          },
+        ],
+      })
+    ).toThrow('invalid parameter');
+  });
+
+  test('round-trips an instruction whose displayed parameter starts with a digit', () => {
+    const digitParameterCatalog = {
+      ...catalogFixture,
+      actions: [
+        {
+          type: 'FireBullet::RotateObject',
+          parameters: [
+            {
+              dslName: normalizeInstructionParameterDslName(
+                '3d_capability',
+                0
+              ),
+            },
+          ],
+        },
+      ],
+    };
+    const input = JSON.stringify([
+      {
+        type: 'BuiltinCommonInstructions::Standard',
+        conditions: [],
+        actions: [
+          {
+            type: { value: 'FireBullet::RotateObject' },
+            parameters: ['Object3D'],
+          },
+        ],
+      },
+    ]);
+    const dsl = convertLegacyEventsJsonToIfDo(input, {
+      formatInstruction: createCatalogInstructionFormatter(
+        digitParameterCatalog
+      ),
+    });
+
+    expect(dsl).toContain('parameter_3d_capability="Object3D"');
+    expect(
+      areLegacyEventsEquivalent(
+        input,
+        compileIfDoToLegacyEventsJson(dsl, {
+          resolveInstruction: createCatalogInstructionResolver(
+            digitParameterCatalog
+          ),
+        })
+      )
+    ).toBe(true);
+  });
+
   test('compiles named catalog instructions with exact serialized operands', () => {
     const output = JSON.parse(
       compileIfDoToLegacyEventsJson(

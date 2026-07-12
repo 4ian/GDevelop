@@ -13,7 +13,7 @@ import {
   isWriteTool,
 } from './McpToolCatalog';
 
-const expectedTools = [
+const expectedAlwaysAvailableTools = [
   'gdevelop_get_editor_state',
   'gdevelop_get_editor_selection',
   'gdevelop_get_project_summary',
@@ -36,8 +36,10 @@ const expectedTools = [
   'capture_preview_screenshot',
 ].sort();
 
+const expectedWriteTools = ['import_extension'];
+
 describe('McpToolCatalog', () => {
-  it('exposes only editor queries and preview debugging tools', () => {
+  it('always exposes only the bounded extension importer from write tools', () => {
     const withoutPermissions = getMcpTools({
       allowWriteTools: false,
       allowCommandTools: false,
@@ -48,16 +50,23 @@ describe('McpToolCatalog', () => {
     });
 
     expect(withoutPermissions.map(tool => tool.name).sort()).toEqual(
-      expectedTools
+      [...expectedAlwaysAvailableTools, ...expectedWriteTools].sort()
     );
     expect(withPermissions.map(tool => tool.name).sort()).toEqual(
-      expectedTools
+      [...expectedAlwaysAvailableTools, ...expectedWriteTools].sort()
     );
     expect(
       getAllMcpToolsForIntrospection()
         .map(tool => tool.name)
         .sort()
-    ).toEqual(expectedTools);
+    ).toEqual([...expectedAlwaysAvailableTools, ...expectedWriteTools].sort());
+    expect(isWriteTool('import_extension')).toBe(true);
+    expect(
+      canCallMcpTool('import_extension', {
+        allowWriteTools: false,
+        allowCommandTools: false,
+      })
+    ).toEqual({ canCall: true });
   });
 
   it('does not expose project authoring, save, command, or escape-hatch tools', () => {
@@ -93,6 +102,7 @@ describe('McpToolCatalog', () => {
     });
     expect(Object.keys(capabilities.categories).sort()).toEqual([
       'Editor queries',
+      'Extension import',
       'Preview debugging',
     ]);
     expect(capabilities.note).toContain('project files');

@@ -62,6 +62,7 @@ type CatalogLookup = {
   action: Map<string, CatalogEntry>,
   condition: Map<string, CatalogEntry>,
 };
+const DSL_IDENTIFIER = /^[A-Za-z_][A-Za-z0-9_]*$/;
 
 const entriesForKind = (
   catalog: Catalog,
@@ -90,7 +91,7 @@ const validateCatalogEntry = (entry: any, kind: CatalogKind) => {
       typeof parameter !== 'object' ||
       (parameter.index !== undefined && parameter.index !== index) ||
       typeof parameter.dslName !== 'string' ||
-      !parameter.dslName
+      !DSL_IDENTIFIER.test(parameter.dslName)
     )
       fail(
         'IFDO_CATALOG_INVALID',

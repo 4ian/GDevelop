@@ -5,6 +5,8 @@ import {
   serializeToJSObject,
   unserializeFromJSObject,
 } from '../Utils/Serializer';
+import { decomposeLegacyProjectToFiles } from '../ProjectsStorage/MultiFileProjectFormat';
+import { writeMultiFileSourceTree } from '../ProjectsStorage/LocalFileStorageProvider/LocalMultiFileProject';
 import { getBehaviorsRegistry } from '../Utils/GDevelopServices/Extension';
 
 // Mock the behavior store registry fetch (search_behavior_store) so the test
@@ -218,6 +220,122 @@ describe('McpEditorBridge', () => {
       })
     );
     expect(result.nextAction).toContain('launch_preview');
+  });
+
+  it('imports an extension through the native host and returns generated multi-file sources', async () => {
+    const temporaryDirectory = fs.mkdtempSync(
+      path.join(os.tmpdir(), 'gdevelop-mcp-extension-import-')
+    );
+    const projectFile = path.join(temporaryDirectory, 'project.settings');
+    const project = new gd.Project();
+    project.setProjectFile(projectFile);
+    const ensureExtensionInstalled = jest.fn(async options => {
+      const extension = project.insertNewEventsFunctionsExtension(
+        options.extensionName,
+        0
+      );
+      extension
+        .getEventsFunctions()
+        .insertNewEventsFunction('FormatRating', 0);
+      options.onExtensionInstalled([options.extensionName]);
+    });
+    const saveProjectAndWait = jest.fn(async () => {
+      await writeMultiFileSourceTree({
+        entryPath: projectFile,
+        files: decomposeLegacyProjectToFiles(serializeToJSObject(project)),
+      });
+      return { saved: true };
+    });
+    const triggerUnsavedChanges = jest.fn();
+    const bridge = makeBridge({
+      getProject: () => project,
+      getPermissions: () => ({
+        allowWriteTools: false,
+        allowCommandTools: false,
+      }),
+      ensureExtensionInstalled,
+      saveProjectAndWait,
+      triggerUnsavedChanges,
+    });
+
+    const response = await bridge.handleRendererMcpRequest({
+      method: 'tools/call',
+      params: {
+        name: 'import_extension',
+        arguments: { extension_name: 'StarRatingBar' },
+      },
+    });
+    const result = JSON.parse(response.content[0].text);
+
+    expect(response.isError).not.toBe(true);
+    expect(ensureExtensionInstalled).toHaveBeenCalledWith(
+      expect.objectContaining({ extensionName: 'StarRatingBar' })
+    );
+    expect(triggerUnsavedChanges).toHaveBeenCalledTimes(1);
+    expect(saveProjectAndWait).toHaveBeenCalledTimes(1);
+    expect(result).toEqual(
+      expect.objectContaining({
+        success: true,
+        importerVersion: 3,
+        extensionName: 'StarRatingBar',
+        alreadyInstalled: false,
+        importedExtensions: ['StarRatingBar'],
+        persistedSourcesVerified: true,
+      })
+    );
+    expect(result.generatedSources.StarRatingBar).toContain(
+      'game://extensions/StarRatingBar/extension.settings'
+    );
+    expect(result.generatedSources.StarRatingBar).toEqual(
+      expect.arrayContaining([
+        'game://extensions/StarRatingBar/functions/FormatRating/function.settings',
+        'game://extensions/StarRatingBar/functions/FormatRating/FormatRating.events',
+      ])
+    );
+    project.delete();
+    fs.rmSync(temporaryDirectory, { recursive: true, force: true });
+  });
+
+  it('does not report an extension import as successful without disk persistence', async () => {
+    const temporaryDirectory = fs.mkdtempSync(
+      path.join(os.tmpdir(), 'gdevelop-mcp-extension-unsaved-')
+    );
+    const project = new gd.Project();
+    project.setProjectFile(
+      path.join(temporaryDirectory, 'project.settings')
+    );
+    const bridge = makeBridge({
+      getProject: () => project,
+      ensureExtensionInstalled: async options => {
+        project.insertNewEventsFunctionsExtension(options.extensionName, 0);
+        options.onExtensionInstalled([options.extensionName]);
+      },
+      // Simulate a host that claims to have saved without writing the source
+      // tree. The import tool must detect this during its disk read-back.
+      saveProjectAndWait: async () => ({ saved: true }),
+    });
+
+    const response = await bridge.handleRendererMcpRequest({
+      method: 'tools/call',
+      params: {
+        name: 'import_extension',
+        arguments: { extension_name: 'UnsavedExtension' },
+      },
+    });
+
+    expect(response.isError).toBe(true);
+    const result = JSON.parse(response.content[0].text);
+    expect(result).toEqual(
+      expect.objectContaining({
+        importerVersion: 3,
+        writerError: expect.objectContaining({ code: 'ENOENT' }),
+      })
+    );
+    expect(response.content[0].text).not.toContain(
+      '"persistedSourcesVerified": true'
+    );
+    project.delete();
+    fs.rmSync(temporaryDirectory, { recursive: true, force: true });
   });
 
   it('returns unexpected tool failures as structured JSON', async () => {

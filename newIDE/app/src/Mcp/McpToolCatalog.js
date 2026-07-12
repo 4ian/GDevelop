@@ -4341,6 +4341,29 @@ const readTools: Array<McpTool> = [
 
 const writeTools: Array<McpTool> = [
   {
+    name: 'import_extension',
+    description:
+      'Import an official GDevelop extension by its registry name (persistence protocol v3). GDevelop downloads the legacy extension JSON with its required dependencies, loads it through the native extension model, waits for any active save, immediately saves the project again, reads the canonical multi-file extension sources back from disk before reporting success, and returns the original writer error when persistence fails. After this one conversion step, edit the returned .settings, .layout, and .events files directly.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        extension_name: {
+          type: 'string',
+          description:
+            'Exact extension name from the official GDevelop extensions repository/registry, for example "StarRatingBar".',
+        },
+      },
+      required: ['extension_name'],
+      additionalProperties: false,
+    },
+    annotations: {
+      readOnlyHint: false,
+      destructiveHint: false,
+      idempotentHint: true,
+      openWorldHint: true,
+    },
+  },
+  {
     name: 'initialize_project',
     description:
       'Create and open a NEW GDevelop project (it becomes the current project, so subsequent tools operate on it). By default an empty project with one scene; pass template_slug to start from an example. On desktop it is SAVED to local disk immediately (under the user\'s "GDevelop projects" folder; the saved path is returned as projectFile). NOTE: this replaces the currently open project — an unsaved open project is discarded without confirmation, so save first if needed.',
@@ -4879,6 +4902,13 @@ const commandTools: Array<McpTool> = [
 ];
 
 const toolUsageExamples: { [string]: Array<Object> } = {
+  import_extension: [
+    {
+      description:
+        'Import StarRatingBar and generate its canonical multi-file project sources.',
+      arguments: { extension_name: 'StarRatingBar' },
+    },
+  ],
   gdevelop_refresh_tool_catalog: [
     {
       description:
@@ -6683,6 +6713,7 @@ const EXPOSED_MCP_TOOL_NAMES: Set<string> = new Set([
   'control_preview',
   'set_runtime_state',
   'capture_preview_screenshot',
+  'import_extension',
 ]);
 
 const exposedReadTools = readTools.filter(tool =>
@@ -6698,6 +6729,9 @@ const exposedCommandTools = commandTools.filter(tool =>
 const writeToolNames: Set<string> = new Set(
   exposedWriteTools.map(tool => tool.name)
 );
+const alwaysAvailableWriteToolNames: Set<string> = new Set([
+  'import_extension',
+]);
 const commandToolNames: Set<string> = new Set(
   exposedCommandTools.map(tool => tool.name)
 );
@@ -6727,7 +6761,11 @@ export const canCallMcpTool = (
     };
   }
 
-  if (isWriteTool(toolName) && !permissions.allowWriteTools) {
+  if (
+    isWriteTool(toolName) &&
+    !alwaysAvailableWriteToolNames.has(toolName) &&
+    !permissions.allowWriteTools
+  ) {
     return {
       canCall: false,
       reason: 'Write MCP tools are disabled in GDevelop preferences.',
@@ -6763,7 +6801,11 @@ export const getMcpTools = (
 ): Array<McpTool> =>
   [
     ...exposedReadTools,
-    ...(permissions.allowWriteTools ? exposedWriteTools : []),
+    ...exposedWriteTools.filter(
+      tool =>
+        permissions.allowWriteTools ||
+        alwaysAvailableWriteToolNames.has(tool.name)
+    ),
     ...(permissions.allowCommandTools ? exposedCommandTools : []),
   ].map(withDefaultToolAnnotations);
 
@@ -6802,6 +6844,7 @@ export const getCapabilitiesSummary = (
     allByName[tool.name] = tool;
   });
   const categories: { [string]: Array<string> } = {
+    'Extension import': ['import_extension'],
     'Editor queries': [
       'gdevelop_get_editor_state',
       'gdevelop_get_project_summary',
@@ -6930,7 +6973,7 @@ export const getCapabilitiesSummary = (
   });
   return {
     note:
-      'GDevelop MCP is intentionally limited to editor queries and preview debugging. Author the game through project files and .gdevelop/instructions-catalog.json.',
+      'GDevelop MCP is intentionally limited to one legacy-extension import/conversion tool, editor queries, and preview debugging. After import_extension generates canonical sources, author the game through project files and .gdevelop/instructions-catalog.json.',
     permissions: {
       writeToolsEnabled: !!permissions.allowWriteTools,
       commandToolsEnabled: !!permissions.allowCommandTools,

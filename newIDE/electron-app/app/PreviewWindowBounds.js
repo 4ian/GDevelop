@@ -38,35 +38,32 @@ const setPreviewWindowMenuBarVisibilityAndContentSize = (
 
 const getPreviewBrowserWindowOptionsFittingDisplay = (
   previewBrowserWindowOptions,
-  displayWorkArea,
-  displayScaleFactor = 1
+  displayWorkArea
 ) => {
   if (
     !previewBrowserWindowOptions ||
     !displayWorkArea ||
     !isPositiveFiniteNumber(displayWorkArea.height) ||
-    !isPositiveFiniteNumber(previewBrowserWindowOptions.height) ||
-    !isPositiveFiniteNumber(displayScaleFactor)
+    !isPositiveFiniteNumber(previewBrowserWindowOptions.height)
   ) {
     return previewBrowserWindowOptions;
   }
 
-  // Game resolutions are expressed in physical pixels, while Electron window
-  // bounds are expressed in density-independent pixels. On a HiDPI display,
-  // convert the requested preview size before creating the BrowserWindow so a
-  // 1280x720 game uses a 640x360 content area at a 2x scale factor.
+  // Preview windows always use half of the configured game resolution,
+  // independently of the display's DPI scale. A 1280x720 game therefore opens
+  // in a 640x360 content area on every screen.
   const scaledOptions = {
     ...previewBrowserWindowOptions,
     height: Math.max(
       MIN_PREVIEW_WINDOW_SIZE,
-      Math.floor(previewBrowserWindowOptions.height / displayScaleFactor)
+      Math.floor(previewBrowserWindowOptions.height / 2)
     ),
   };
 
   if (isPositiveFiniteNumber(previewBrowserWindowOptions.width)) {
     scaledOptions.width = Math.max(
       MIN_PREVIEW_WINDOW_SIZE,
-      Math.floor(previewBrowserWindowOptions.width / displayScaleFactor)
+      Math.floor(previewBrowserWindowOptions.width / 2)
     );
   }
 

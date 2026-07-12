@@ -22,8 +22,8 @@ const run = () => {
       height: 900,
     }),
     {
-      width: 506,
-      height: 900,
+      width: 360,
+      height: 640,
       useContentSize: true,
       title: 'Preview',
     }
@@ -40,14 +40,13 @@ const run = () => {
       { width: 720, height: 800 },
       { x: 0, y: 0, width: 1200, height: 900 }
     ),
-    { width: 720, height: 800 }
+    { width: 360, height: 400 }
   );
 
   assert.deepStrictEqual(
     getPreviewBrowserWindowOptionsFittingDisplay(
       { width: 1280, height: 720, useContentSize: true, title: 'Preview' },
-      { x: 0, y: 0, width: 1200, height: 900 },
-      2
+      { x: 0, y: 0, width: 1200, height: 900 }
     ),
     {
       width: 640,
@@ -60,8 +59,7 @@ const run = () => {
   assert.deepStrictEqual(
     getPreviewBrowserWindowOptionsFittingDisplay(
       { width: 2400, height: 2000 },
-      { x: 0, y: 0, width: 1200, height: 900 },
-      2
+      { x: 0, y: 0, width: 1200, height: 900 }
     ),
     { width: 1080, height: 900 }
   );

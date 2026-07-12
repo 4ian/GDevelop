@@ -5,7 +5,7 @@
 - [Reuse-first rule](#reuse-first-rule)
 - [Search the repository](#search-the-repository)
 - [Select and audit a candidate](#select-and-audit-a-candidate)
-- [Download reproducibly](#download-reproducibly)
+- [Identify the registry name](#identify-the-registry-name)
 - [Install into multi-file sources](#install-into-multi-file-sources)
 - [Verify and report](#verify-and-report)
 
@@ -70,9 +70,10 @@ Read the entire candidate JSON and check:
 Reject or isolate extensions with incompatible engine requirements, unsafe
 code, missing dependencies, unclear resource ownership, or excessive scope.
 
-## Download reproducibly
+## Identify the registry name
 
-Pin the selected repository commit rather than relying on a moving `main` URL:
+Use the repository search to identify the candidate's exact top-level `name`.
+Record the repository channel and current commit for the audit trail:
 
 ```powershell
 $sha = git -C $cache rev-parse HEAD
@@ -81,22 +82,51 @@ $extension = Get-Content -Raw $source | ConvertFrom-Json
 if ($extension.name -ne "StarRatingBar") { throw "Unexpected extension" }
 ```
 
-For a direct raw download, use:
-
-```text
-https://raw.githubusercontent.com/GDevelopApp/GDevelop-extensions/<commit>/extensions/reviewed/<ExtensionName>.json
-https://raw.githubusercontent.com/GDevelopApp/GDevelop-extensions/<commit>/extensions/community/<ExtensionName>.json
-```
-
-Validate that the response is JSON, the filename/name match, and the file is
-not an HTML error page. Record repository URL, channel, commit, extension
-version, and any local adaptations in the final report.
+Do not copy or manually translate this JSON into the game project. The native
+import tool resolves the exact registry name, downloads the official serialized
+extension and required dependencies, and performs the conversion transaction.
+Record repository URL, channel, commit observed during audit, extension
+version, and any later local adaptations in the final report.
 
 ## Install into multi-file sources
 
-The downloaded JSON is a legacy interchange artifact, not project source. Do
-not reference or retain it in `project.settings`, `.settings`, `.layout`, or
-`.events`. Convert it into the canonical source tree:
+Repository extensions are legacy JSON interchange artifacts, not project
+source. Do not reference or retain them in `project.settings`, `.settings`,
+`.layout`, or `.events` and do not ask the model to translate their event trees
+by hand.
+
+1. Before making direct project-file edits, call the GDevelop MCP tool:
+
+   ```json
+   {"name":"import_extension","arguments":{"extension_name":"StarRatingBar"}}
+   ```
+
+   This bounded importer is available even when general MCP write tools are
+   disabled. If it is unavailable, report the missing editor capability; do
+   not fall back to manual JSON conversion.
+
+   Before the call, inspect the tool description and require `persistence
+   protocol v3`. Refreshing the MCP catalog does not hot-reload changed editor
+   JavaScript. If the description lacks v3, or a failure reports
+   `importerVersion` below 3, the running GDevelop build is stale and must be
+   rebuilt/restarted before retrying. Protocol v3 exposes the original writer
+   exception instead of replacing it with a generic save error.
+
+2. Require `success: true`, `importerVersion: 3`, and
+   `persistedSourcesVerified: true`. The tool uses GDevelop's native extension
+   installer, installs required dependencies, loads the legacy JSON through the
+   engine model, immediately saves the in-memory project, reads the generated
+   files back from disk, and returns `generatedSources` grouped by imported
+   extension.
+3. Verify that the requested extension has a non-empty generated source list
+   containing `extension.settings`. Treat those returned files as the only
+   editable source from this point onward.
+4. Read and adapt the generated `.settings`, `.layout`, and `.events` files
+   directly. Never edit the downloaded JSON or `.gdevelop/game.json`.
+5. After the final adaptation, call `reload_project`, then debug with a fresh
+   preview.
+
+The native conversion maps the legacy extension as follows:
 
 | Downloaded extension field | Multi-file destination |
 | --- | --- |
@@ -111,36 +141,21 @@ not reference or retain it in `project.settings`, `.settings`, `.layout`, or
 | Behavior `eventsFunctions[].events` | Sibling `<Function>.events` files |
 
 Follow [create-extensions.md](create-extensions.md) for exact ownership and
-examples. Preserve every unknown metadata field in its owning settings file.
-Add `kind`, `settingsFormatVersion = 1`, and contiguous local `order` values.
-Do not add settings-file references to parent settings.
+examples when adapting the generated sources. The converter, not the model,
+owns initial preservation of unknown metadata, ordering, layouts, event
+structure, and DSL serialization. Resolve any later authored or replacement
+instructions through the generated catalog and never introduce `@exact`.
 
-Convert each legacy event tree to IfDo DSL, preserving group/comment/loop/JS
-structure and instruction metadata. Resolve every action and condition through
-the generated catalog; never paste raw event JSON into `.events`, use prose
-aliases, or introduce `@exact`. Replace source instructions excluded as hidden
-or deprecated with current catalog alternatives.
-
-For an extension whose functions call its own newly declared instructions:
-
-1. Write all settings declarations, layouts, and temporary comment-only event
-   bodies so every referenced file exists.
-2. Call `reload_project` to register the extension declarations.
-3. Regenerate/re-read the instruction catalog before translating self-calls.
-4. Replace the temporary bodies with complete converted DSL in dependency
-   order: private helpers, behaviors, prefabs, public functions, then callers.
-5. Call `reload_project` again after the final body is written.
-
-Never leave the extension half-installed. If catalog regeneration or a required
-dependency is unavailable, keep the project unchanged or roll back the whole
-installation transaction.
+If import fails, do not create a partial extension tree. Report the native
+import error and select another registry extension or fix the missing
+dependency/compatibility issue before retrying.
 
 ## Verify and report
 
 1. Parse every new TOML fragment independently and as combined settings.
 2. Confirm no downloaded `.json` file was added to project source.
-3. Confirm all source JSON implementation arrays were mapped to component
-   folders and no function body was dropped.
+3. Confirm the import receipt lists the requested extension, its generated
+   `extension.settings`, and source files for all imported dependencies.
 4. Confirm all dependency instruction types resolve after `reload_project`.
 5. Confirm imported event bodies obey condition and single-instance picking
    rules even when the upstream extension did not.

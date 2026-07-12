@@ -1861,9 +1861,26 @@ const getInstructionParameterBaseName = (
   );
 };
 
+export const normalizeInstructionParameterDslName = (
+  suggestedName: string,
+  index: number
+): string => {
+  const sanitizedName = String(suggestedName)
+    .trim()
+    .replace(/[^A-Za-z0-9_]+/g, '_')
+    .replace(/^_+|_+$/g, '');
+  const nonEmptyName = sanitizedName || `parameter_${index}`;
+  return /^[A-Za-z_]/.test(nonEmptyName)
+    ? nonEmptyName
+    : `parameter_${nonEmptyName}`;
+};
+
 const getUniqueInstructionParameterNames = (metadata: any): Array<string> => {
   const baseNames = mapFor(0, metadata.getParametersCount(), index =>
-    getInstructionParameterBaseName(metadata.getParameter(index), index)
+    normalizeInstructionParameterDslName(
+      getInstructionParameterBaseName(metadata.getParameter(index), index),
+      index
+    )
   );
   const counts = {};
   baseNames.forEach(baseName => {

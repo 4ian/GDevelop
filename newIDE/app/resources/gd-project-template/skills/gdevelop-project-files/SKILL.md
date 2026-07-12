@@ -1,6 +1,6 @@
 ---
 name: gdevelop-project-files
-description: Create, inspect, modify, refactor, and verify GDevelop games through the multi-file project sources (`project.settings`, `.settings`, `.layout`, and `.events`). Use for any GDevelop project, scene, object, behavior, prefab, extension, third-party extension installation, reusable-component refactor, variable, resource, layout, or event-sheet work. Read the generated settings, layout, and instruction catalogs for authoring; synchronize direct edits with the GDevelop MCP `reload_project` tool before preview debugging.
+description: Create, inspect, modify, refactor, and verify GDevelop games through the multi-file project sources (`project.settings`, `.settings`, `.layout`, and `.events`). Use for any GDevelop project, scene, object, behavior, prefab, extension, third-party extension installation, reusable-component refactor, variable, resource, Global Config/placeholder, signal-system, layout, or event-sheet work. Read the generated settings, layout, and instruction catalogs for authoring; synchronize direct edits with the GDevelop MCP `reload_project` tool before preview debugging.
 ---
 
 # GDevelop Project Files
@@ -137,6 +137,17 @@ Load only the references required by the task:
   creating or changing any `.events` file. Use only its canonical IfDo
   structures and the exact types and `dslName` parameters found in the
   generated project instruction catalog.
+- Read [references/global-config.md](references/global-config.md) in full
+  whenever the user asks to create, edit, reorganize, or consume Global Config,
+  or to add/change a `{{...}}` placeholder. Also read the events guide for an
+  event consumer and the extension guide when injecting config into a prefab,
+  behavior, or reusable extension.
+- Read [references/signal-system.md](references/signal-system.md) in full
+  whenever the user asks for signals, messaging, notification, scene/prefab
+  communication, `SignalReceived`, signal sender/payload handling, or an
+  `onSignal` lifecycle. Also read the events guide, and read the extension guide
+  before adding or changing a prefab/custom-object `onSignal` function. Read
+  the Global Config guide too when signal names use placeholders.
 - Read
   [references/reuse-community-extensions.md](references/reuse-community-extensions.md)
   in full before implementing a substantial reusable system or installing a
@@ -291,6 +302,12 @@ Before finishing:
 - Confirm layout elements, attributes, layers, objects, attached behaviors,
   and effect parameters against the matching `layout-catalog.json` context.
 - Confirm catalog instruction types, kinds, scopes, and `dslName` arguments.
+- For Global Config changes, confirm `config.settings` ownership, canonical
+  raw-JSON pointers, placeholder paths/types, and regeneration-time behavior
+  against the Global Config reference.
+- For signal changes, confirm target kind, receiver kind, fixed `onSignal`
+  signature, guarded emission, next-dispatch timing, and preview signal-monitor
+  evidence against the signal-system reference.
 - Confirm every action has an effective condition in its event or ancestor
   chain and no unconditional action can execute every frame.
 - Confirm every object-targeting action operates on a provably single picked

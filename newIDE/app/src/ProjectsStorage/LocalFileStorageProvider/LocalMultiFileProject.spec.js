@@ -190,13 +190,21 @@ describe('Local multi-file project storage', () => {
     const changedInstanceProject = JSON.parse(
       JSON.stringify(changedObjectProject)
     );
+    changedInstanceProject.layouts[0].layers = [{ name: '' }];
     changedInstanceProject.layouts[0].instances.push({
       name: 'Player',
-      persistentUuid: 'player-instance',
+      persistentUuid: '00000000-0000-4000-8000-000000000001',
       x: 100,
       y: 200,
+      angle: 0,
       layer: '',
       zOrder: 1,
+      customSize: false,
+      width: 0,
+      height: 0,
+      numberProperties: [],
+      stringProperties: [],
+      initialVariables: [],
     });
     expect(
       await writeLegacyProjectAsMultiFile(changedInstanceProject, entryPath)
@@ -286,14 +294,24 @@ describe('Local multi-file project storage', () => {
     ]);
 
     const changedInstance = JSON.parse(JSON.stringify(changedDefinition));
+    changedInstance.eventsFunctionsExtensions[0].eventsBasedObjects[0].layers = [
+      { name: '' },
+    ];
     changedInstance.eventsFunctionsExtensions[0].eventsBasedObjects[0].instances.push(
       {
         name: 'Body',
-        persistentUuid: 'body-instance',
+        persistentUuid: '00000000-0000-4000-8000-000000000002',
         x: 0,
         y: 0,
+        angle: 0,
         layer: '',
         zOrder: 0,
+        customSize: false,
+        width: 0,
+        height: 0,
+        numberProperties: [],
+        stringProperties: [],
+        initialVariables: [],
       }
     );
     expect(
@@ -330,7 +348,7 @@ describe('Local multi-file project storage', () => {
 
   test('renames all files owned by extension components and removes empty old folders', async () => {
     const entryPath = path.join(temporaryDirectory, 'project.settings');
-    const makeFunction = name => ({
+    const makeFunction = (name: string) => ({
       name,
       functionType: 'Action',
       fullName: name,
@@ -363,8 +381,15 @@ describe('Local multi-file project storage', () => {
               children: [],
             },
             objectsGroups: [],
+            areaMinX: 0,
+            areaMinY: 0,
+            areaMinZ: 0,
+            areaMaxX: 64,
+            areaMaxY: 64,
+            areaMaxZ: 0,
             layers: [],
             instances: [],
+            editionSettings: {},
             eventsFunctions: [makeFunction('TakeDamage')],
             variants: [],
           },
@@ -378,7 +403,7 @@ describe('Local multi-file project storage', () => {
         ],
       },
     ];
-    const exists = relativePath =>
+    const exists = (relativePath: string) =>
       fs.existsSync(path.join(temporaryDirectory, ...relativePath.split('/')));
 
     await writeLegacyProjectAsMultiFile(project, entryPath);
@@ -501,7 +526,7 @@ describe('Local multi-file project storage', () => {
       path.join(temporaryDirectory, 'project.settings')
     );
     expect(
-      areLegacyProjectsEquivalent(projectFixture, secondResult.content)
+      areLegacyProjectsEquivalent(firstResult.content, secondResult.content)
     ).toBe(true);
 
     fs.writeFileSync(legacyPath, `${legacySource} `, 'utf8');

@@ -4,6 +4,10 @@ import { type FileMetadata } from '../index';
 import { unsplit } from '../../Utils/ObjectSplitter';
 import { openFilePicker, readJSONFile } from '../../Utils/FileSystem';
 import {
+  serializeToJSObject,
+  unserializeFromJSObject,
+} from '../../Utils/Serializer';
+import {
   getLegacyMigrationSourceHash,
   hashLegacySource,
   migrateLegacyProject,
@@ -12,6 +16,19 @@ import {
 import { getLocalProjectLastModifiedDate } from './LocalProjectFileModificationTime';
 const fs = optionalRequire('fs');
 const path = optionalRequire('path');
+const gd: libGDevelop = global.gd;
+
+const normalizeLegacyProjectWithCurrentSerializer = (
+  legacyProject: Object
+): Object => {
+  const project = gd.ProjectHelper.createNewGDJSProject();
+  try {
+    unserializeFromJSObject(project, legacyProject);
+    return serializeToJSObject(project);
+  } finally {
+    project.delete();
+  }
+};
 
 export const onOpenWithPicker = (): Promise<?FileMetadata> => {
   return openFilePicker({
@@ -77,16 +94,19 @@ export const onOpen = (
             },
           };
         }
+        const normalizedLegacyProject = normalizeLegacyProjectWithCurrentSerializer(
+          object
+        );
         const migration = await migrateLegacyProject({
           legacyPath: filePath,
           legacySource,
-          legacyProject: object,
+          legacyProject: normalizedLegacyProject,
         });
         const lastModifiedDate = await getLocalProjectLastModifiedDate(
           migration.entryPath
         );
         return {
-          content: object,
+          content: normalizedLegacyProject,
           fileMetadata: {
             ...fileMetadata,
             fileIdentifier: migration.entryPath,

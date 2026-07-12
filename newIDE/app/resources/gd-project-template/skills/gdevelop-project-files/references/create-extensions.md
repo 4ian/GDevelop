@@ -174,21 +174,10 @@ events = "game://extensions/CombatKit/prefabs/Enemy/Initialize.events"
 
 `Enemy.layout`:
 
-```toml
-format = "gdevelop-prefab-layout"
-formatVersion = 2
-
-[layout]
-areaMinX = 0
-areaMinY = 0
-areaMinZ = 0
-areaMaxX = 64
-areaMaxY = 64
-areaMaxZ = 64
-layers = []
-instances = []
-
-[layout.editionSettings]
+```layout
+<layout version=1>
+  <bounds min=0,0,0 max=64,64,64 />
+</layout>
 ```
 
 `Initialize.events`:
@@ -265,7 +254,8 @@ selection.
 
 ## Validate the extension
 
-1. Parse every changed TOML file independently and as concatenated settings.
+1. Parse every changed settings TOML independently and as concatenated
+   settings; compile every changed `.layout` as Layout DSL version 1.
 2. Verify component orders are contiguous and names/folders/basenames match.
 3. Verify every referenced `.events` and `.layout` file exists.
 4. Verify prefab layouts contain no object definitions or behaviors and that

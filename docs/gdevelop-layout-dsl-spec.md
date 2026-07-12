@@ -2,11 +2,11 @@
 
 ## A Component-Tree Markup for GDevelop Scene, Prefab, and External Layouts
 
-**Status:** Version 1.0 codebase-aligned design specification  
-**Implementation status:** Parser, compiler, and decompiler are not yet implemented  
-**Canonical source filename:** `<Name>.layout`  
-**File extension:** `.layout`  
-**Encoding:** UTF-8  
+**Status:** Version 1.0 implemented format contract
+**Implementation:** `newIDE/app/src/ProjectsStorage/LayoutDsl`
+**Canonical source filename:** `<Name>.layout`
+**File extension:** `.layout`
+**Encoding:** UTF-8
 **Target:** GDevelop scene layouts, prefab/default-variant layouts, prefab variant layouts, and external layouts
 
 ---
@@ -617,8 +617,10 @@ Version 1 supports those current fields and no untyped editor-data escape.
 | `selected-layer` | String | `selectedLayer` |
 | `mode` | `instances-editor` or `embedded-game` | `gameEditorMode` |
 
-`grid-size` components and `zoom` must be at least `0.01`, matching current
-editor preparation and the grid editor. A non-empty `selected-layer` must
+`grid-size` components must be non-negative. The current serialized model can
+contain zero for an inactive or not-yet-prepared grid axis, while the editor
+normalizes active grid sizes to at least `0.01`. `zoom` must be at least
+`0.01`, matching current editor preparation. A non-empty `selected-layer` must
 resolve in a scene/prefab or in the linked scene for an external layout; the
 empty default remains valid for an empty prefab layout.
 
@@ -627,6 +629,13 @@ object. The current editor then applies its contextual defaults. A decompiler
 emits every current field present in the serialized editor-settings object;
 once the current editor has saved those settings, the canonical line is fully
 explicit and stable.
+
+The current arbitrary editor-settings container can also contain only part of
+a grouped tuple. When decompiling such data, missing `grid-size` axes are
+materialized with the current editor default `32`, and missing `grid-offset`
+axes with `0`. This is the same normalization performed by
+`prepareInstancesEditorSettings` and makes the grouped DSL representation safe
+for partially initialized prefab/variant editor settings.
 
 Old editor-only keys not read by `InstancesEditorSettings` are outside version
 1 by design.
@@ -845,7 +854,7 @@ Common instance attributes are:
 | `flip` | `flippedX`, `flippedY`, `flippedZ` |
 | `locked` | `locked` |
 | `sealed` | `sealed` |
-| `keep-ratio` | `keepRatio` |
+| `keep-ratio` | `keepRatio`; the compiler writes `true` and omits `false` to match the current serializer/unserializer pair |
 
 `at` is required. `rotation` defaults to `0`. `z-order` defaults to `0`.
 `opacity` is an integer from `0` through `255`.
@@ -1118,7 +1127,7 @@ base-layer camera, while a newly inserted additional layer can have none.
 | `depth` | Absent (`HasCustomDepth=false`) |
 | `locked` | `false` |
 | `sealed` | `false` |
-| `keep-ratio` | `true`, matching a newly constructed current instance |
+| `keep-ratio` | `true`, matching a newly constructed current instance. The compiler explicitly emits `keepRatio=true`; `false` is represented by absence in the current serializer tree. |
 | Custom properties | Empty |
 | Initial variables | Empty |
 | Behavior overrides | Empty |
@@ -1218,7 +1227,7 @@ angle, optional rotationX/rotationY,
 zOrder, optional opacity/flips,
 layer,
 customSize, width, height, optional depth,
-optional locked/sealed/keepRatio,
+optional locked/sealed and serializer-shaped keepRatio,
 persistentUuid,
 numberProperties, stringProperties,
 initialVariables,
@@ -1609,8 +1618,8 @@ The user requested a clean source format without compatibility syntax.
 
 ## 35. Required implementation and verification
 
-Implementation must be completed before `.layout` markup becomes writable
-project source.
+The implementation components below define `.layout` as writable project
+source and are exercised by the Layout DSL and multi-file integration suites.
 
 ### 35.1 Required components
 
@@ -1620,15 +1629,19 @@ project source.
 - Canonical decompiler from current fragments to markup.
 - Formatter.
 - Structural equivalence checker.
-- Editor language support for syntax highlighting, diagnostics, completion,
-  rename, and formatting.
 - Multi-file project integration replacing TOML layout reading/writing only;
   runtime/preview/export integration remains at the existing composed-project
   boundary.
 
+Editor text-language services are outside the format boundary: the current
+GDevelop scene/prefab editors edit the in-memory model, while external source
+editors edit `.layout` directly. Such services may be added later without
+changing the grammar, compiler, or serializer.
+
 ### 35.2 Required round-trip tests
 
-For every repository project fixture and representative installed extension:
+For every canonical current-serializer fixture and representative installed
+extension fixture that is within version 1 coverage:
 
 ```text
 current serialized layout fragment A
@@ -1657,6 +1670,9 @@ serializer normalization. Tests must cover:
 - Editor settings for scenes, prefabs, variants, and externals.
 - Unsafe/reserved object names using fallback elements.
 - Every diagnostic and malformed literal class.
+
+Historical fixtures containing compatibility-only serializer keys are not
+silently normalized by this suite; version 1 intentionally rejects them.
 
 ### 35.3 Integration invariants
 

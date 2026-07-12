@@ -1,26 +1,18 @@
 // @flow
 
-// $FlowFixMe[cannot-resolve-module] Jest runs these format tests in Node.
-import fs from 'fs';
-// $FlowFixMe[cannot-resolve-module] Jest runs these format tests in Node.
-import path from 'path';
 import {
   MULTI_FILE_CONFIG_URI,
   MULTI_FILE_ENTRY_URI,
-  MULTI_FILE_LAYOUT_FORMAT_VERSION,
   MULTI_FILE_RESOURCES_URI,
   MultiFileProjectError,
-  SCENE_LAYOUT_FIELDS,
   areLegacyProjectsEquivalent,
   composeLegacyProjectFromFiles,
   decomposeLegacyProjectToFiles,
   encodeManagedName,
-  normalizeLegacyProjectForMultiFile,
   parseTomlSource,
   validateGameUri,
 } from './index';
-
-declare var __dirname: string;
+import { compileLayoutDsl } from '../LayoutDsl';
 
 const standardEvent = () => ({
   type: 'BuiltinCommonInstructions::Standard',
@@ -172,58 +164,8 @@ const projectFixture = {
   ],
 };
 
-const collectJsonFiles = (directory: string): Array<string> =>
-  fs.readdirSync(directory).flatMap(name => {
-    const filePath = path.join(directory, name);
-    return fs.statSync(filePath).isDirectory()
-      ? collectJsonFiles(filePath)
-      : filePath.endsWith('.json')
-      ? [filePath]
-      : [];
-  });
-
-const findFirstDifference = (
-  left: any,
-  right: any,
-  pointer: string = ''
-): string => {
-  if (JSON.stringify(left) === JSON.stringify(right)) return '';
-  if (Array.isArray(left) && Array.isArray(right)) {
-    if (left.length !== right.length)
-      return `${pointer}: array lengths ${left.length} !== ${right.length}`;
-    for (let index = 0; index < left.length; index++) {
-      const difference = findFirstDifference(
-        left[index],
-        right[index],
-        `${pointer}/${index}`
-      );
-      if (difference) return difference;
-    }
-    return '';
-  }
-  if (left && right && typeof left === 'object' && typeof right === 'object') {
-    const keys = [
-      ...new Set([...Object.keys(left), ...Object.keys(right)]),
-    ].sort();
-    for (const key of keys) {
-      if (!Object.prototype.hasOwnProperty.call(left, key))
-        return `${pointer}/${key}: missing from input`;
-      if (!Object.prototype.hasOwnProperty.call(right, key))
-        return `${pointer}/${key}: missing from output`;
-      const difference = findFirstDifference(
-        left[key],
-        right[key],
-        `${pointer}/${key}`
-      );
-      if (difference) return difference;
-    }
-    return '';
-  }
-  return `${pointer}: ${JSON.stringify(left)} !== ${JSON.stringify(right)}`;
-};
-
 describe('GDevelop multi-file project format', () => {
-  test('round-trips every component kind through TOML and IfDo', () => {
+  test('round-trips every component kind through settings TOML, Layout DSL, and IfDo', () => {
     const files = decomposeLegacyProjectToFiles(projectFixture, {
       migration: {
         source: 'game://game.json',
@@ -454,25 +396,20 @@ mode = "embedded"
       children: [{ objectName: 'Player' }],
     };
     const files = decomposeLegacyProjectToFiles(project);
-    const layoutDocument = parseTomlSource(
-      files['game://scenes/Main/Main.layout']
-    );
+    const layoutSource = files['game://scenes/Main/Main.layout'];
+    const layoutDocument = compileLayoutDsl(layoutSource, {
+      kind: 'scene',
+      objectNames: ['Player'],
+    });
     const settingsDocument = parseTomlSource(
       files['game://scenes/Main/scene.settings']
     );
-    expect(Object.keys(layoutDocument.layout).sort()).toEqual(
-      [...SCENE_LAYOUT_FIELDS].sort()
-    );
-    expect(layoutDocument.formatVersion).toBe(
-      MULTI_FILE_LAYOUT_FORMAT_VERSION
-    );
-    expect(layoutDocument.layout).not.toHaveProperty('objects');
-    expect(layoutDocument.layout).not.toHaveProperty(
-      'objectsFolderStructure'
-    );
-    expect(layoutDocument.layout).not.toHaveProperty('variables');
-    expect(layoutDocument.layout).not.toHaveProperty('objectsGroups');
-    expect(layoutDocument.layout).not.toHaveProperty('title');
+    expect(layoutSource).toMatch(/^<layout version=1 background=/);
+    expect(layoutDocument).not.toHaveProperty('objects');
+    expect(layoutDocument).not.toHaveProperty('objectsFolderStructure');
+    expect(layoutDocument).not.toHaveProperty('variables');
+    expect(layoutDocument).not.toHaveProperty('objectsGroups');
+    expect(layoutDocument).not.toHaveProperty('title');
     expect(settingsDocument.scenes.Main.objects[0]).toMatchObject({
       name: 'Player',
       type: 'Sprite',
@@ -509,19 +446,18 @@ mode = "embedded"
     ];
     prefab.objectsGroups = [{ name: 'Parts', objects: ['Body'] }];
     const files = decomposeLegacyProjectToFiles(project);
-    const layoutDocument = parseTomlSource(
-      files['game://extensions/Combat/prefabs/Enemy/Enemy.layout']
+    const layoutDocument = compileLayoutDsl(
+      files['game://extensions/Combat/prefabs/Enemy/Enemy.layout'],
+      { kind: 'prefab', objectNames: ['Body'] }
     );
     const settingsDocument = parseTomlSource(
       files['game://extensions/Combat/prefabs/Enemy/prefab.settings']
     );
     const prefabSettings = settingsDocument.extensions.Combat.prefabs.Enemy;
 
-    expect(layoutDocument.layout).not.toHaveProperty('objects');
-    expect(layoutDocument.layout).not.toHaveProperty(
-      'objectsFolderStructure'
-    );
-    expect(layoutDocument.layout).not.toHaveProperty('objectsGroups');
+    expect(layoutDocument).not.toHaveProperty('objects');
+    expect(layoutDocument).not.toHaveProperty('objectsFolderStructure');
+    expect(layoutDocument).not.toHaveProperty('objectsGroups');
     expect(prefabSettings.objects).toEqual(prefab.objects);
     expect(prefabSettings.objectsGroups).toEqual(prefab.objectsGroups);
     expect(
@@ -530,36 +466,30 @@ mode = "embedded"
     ).toEqual(prefab.objects);
   });
 
-  test('loads version-1 object-owning layouts and rewrites them with version-2 ownership', () => {
-    const projectWithoutDefinitions = JSON.parse(
-      JSON.stringify(projectFixture)
-    );
-    delete projectWithoutDefinitions.layouts[0].objects;
-    delete projectWithoutDefinitions.layouts[0].objectsFolderStructure;
-    const files = decomposeLegacyProjectToFiles(projectWithoutDefinitions);
+  test('saves partially initialized prefab editor settings', () => {
+    const project = JSON.parse(JSON.stringify(projectFixture));
+    project.eventsFunctionsExtensions[0].eventsBasedObjects[0].editionSettings = {
+      gridWidth: 16,
+      gridHeight: 24,
+    };
+    const files = decomposeLegacyProjectToFiles(project);
+    expect(
+      files['game://extensions/Combat/prefabs/Enemy/Enemy.layout']
+    ).toContain('grid-size=16,24,32');
+    expect(
+      areLegacyProjectsEquivalent(
+        project,
+        composeLegacyProjectFromFiles(files)
+      )
+    ).toBe(true);
+  });
+
+  test('rejects retired TOML layout sources without a compatibility path', () => {
+    const files = decomposeLegacyProjectToFiles(projectFixture);
     const layoutUri = 'game://scenes/Main/Main.layout';
-    files[layoutUri] = files[layoutUri]
-      .replace('formatVersion = 2', 'formatVersion = 1')
-      .replace(
-        '[layout.uiSettings]',
-        'objects = [{ name = "LegacyPlayer", type = "Sprite", behaviors = [{ name = "Tween", type = "Tween::TweenBehavior" }] }]\n\n[layout.uiSettings]'
-      );
-
-    const composed = composeLegacyProjectFromFiles(files);
-    expect(composed.layouts[0].objects[0]).toMatchObject({
-      name: 'LegacyPlayer',
-      behaviors: [{ name: 'Tween', type: 'Tween::TweenBehavior' }],
-    });
-
-    const rewritten = decomposeLegacyProjectToFiles(composed);
-    const rewrittenLayout = parseTomlSource(rewritten[layoutUri]);
-    const rewrittenSettings = parseTomlSource(
-      rewritten['game://scenes/Main/scene.settings']
-    );
-    expect(rewrittenLayout.formatVersion).toBe(2);
-    expect(rewrittenLayout.layout).not.toHaveProperty('objects');
-    expect(rewrittenSettings.scenes.Main.objects[0].name).toBe(
-      'LegacyPlayer'
+    files[layoutUri] = 'format = "gdevelop-scene-layout"\nformatVersion = 2\n';
+    expect(() => composeLegacyProjectFromFiles(files)).toThrow(
+      expect.objectContaining({ code: 'LAYOUT_SYNTAX' })
     );
   });
 
@@ -589,7 +519,7 @@ mode = "embedded"
   test('writes TOML without indentation', () => {
     const files = decomposeLegacyProjectToFiles(projectFixture);
     Object.keys(files)
-      .filter(uri => uri.endsWith('.settings') || uri.endsWith('.layout'))
+      .filter(uri => uri.endsWith('.settings'))
       .forEach(uri => {
         expect(files[uri]).not.toMatch(/^[ \t]+/m);
       });
@@ -644,9 +574,9 @@ mode = "embedded"
     const objectInLayout = decomposeLegacyProjectToFiles(projectFixture);
     objectInLayout['game://scenes/Main/Main.layout'] = objectInLayout[
       'game://scenes/Main/Main.layout'
-    ].replace('[layout.uiSettings]', 'objects = []\n\n[layout.uiSettings]');
+    ].replace('</layout>', '  <objects />\n</layout>');
     expect(() => composeLegacyProjectFromFiles(objectInLayout)).toThrow(
-      expect.objectContaining({ code: 'MULTIFILE_OWNERSHIP_CONFLICT' })
+      expect.objectContaining({ code: 'LAYOUT_INVALID_CHILD' })
     );
 
     const duplicated = decomposeLegacyProjectToFiles(projectFixture);
@@ -669,27 +599,82 @@ mode = "embedded"
     ).toThrow(MultiFileProjectError);
   });
 
-  test('round-trips all repository GDJS project fixtures', () => {
-    const repositoryRoot = path.resolve(__dirname, '../../../../..');
-    const projectFiles = collectJsonFiles(
-      path.join(repositoryRoot, 'GDJS/tests/games')
+  test('round-trips canonical layout DSL through the multi-file project', () => {
+    const files = decomposeLegacyProjectToFiles(projectFixture);
+    expect(files['game://scenes/Main/Main.layout']).toMatch(
+      /^<layout version=1 background=/
     );
-    let convertedProjects = 0;
-    projectFiles.forEach(filePath => {
-      const project = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-      if (!Array.isArray(project.layouts) || !project.properties) return;
-      const files = decomposeLegacyProjectToFiles(project);
-      const output = composeLegacyProjectFromFiles(files);
-      if (!areLegacyProjectsEquivalent(project, output)) {
-        throw new Error(
-          `Multi-file round-trip failed for ${filePath}: ${findFirstDifference(
-            normalizeLegacyProjectForMultiFile(project),
-            normalizeLegacyProjectForMultiFile(output)
-          )}`
-        );
-      }
-      convertedProjects++;
+    expect(
+      areLegacyProjectsEquivalent(
+        projectFixture,
+        composeLegacyProjectFromFiles(files)
+      )
+    ).toBe(true);
+  });
+
+  test('uses owner metadata and project-wide UUIDs while compiling layouts', () => {
+    const project = JSON.parse(JSON.stringify(projectFixture));
+    project.layouts[0].objects = [
+      {
+        name: 'Player',
+        type: 'Sprite',
+        behaviors: [{ name: 'Move', type: 'Movement::Move' }],
+      },
+    ];
+    project.layouts[0].instances = [
+      {
+        name: 'Player',
+        x: 1,
+        y: 2,
+        angle: 0,
+        zOrder: 0,
+        layer: '',
+        customSize: false,
+        width: 0,
+        height: 0,
+        persistentUuid: '00000000-0000-4000-8000-000000000001',
+        numberProperties: [],
+        stringProperties: [],
+        initialVariables: [],
+        behaviorOverridings: [
+          {
+            name: 'Move',
+            type: 'Movement::Move',
+            speed: 10,
+            isFolded: false,
+            isMuted: false,
+            isInheritedFromObjectType: false,
+            quickCustomizationVisibility: 'default',
+            propertiesQuickCustomizationVisibilities: {},
+          },
+        ],
+      },
+    ];
+    const files = decomposeLegacyProjectToFiles(project);
+    expect(composeLegacyProjectFromFiles(files).layouts[0].instances[0]).toMatchObject({
+      name: 'Player',
+      behaviorOverridings: [
+        { name: 'Move', type: 'Movement::Move', speed: 10 },
+      ],
     });
-    expect(convertedProjects).toBeGreaterThan(20);
+
+    files['game://scenes/Main/Main.layout'] = files[
+      'game://scenes/Main/Main.layout'
+    ].replace(/Player/g, 'Missing');
+    expect(() => composeLegacyProjectFromFiles(files)).toThrow(
+      expect.objectContaining({ code: 'LAYOUT_UNKNOWN_OBJECT' })
+    );
+
+    project.externalLayouts = [
+      {
+        name: 'Duplicate',
+        associatedLayout: 'Main',
+        instances: [JSON.parse(JSON.stringify(project.layouts[0].instances[0]))],
+        editionSettings: {},
+      },
+    ];
+    expect(() => decomposeLegacyProjectToFiles(project)).toThrow(
+      expect.objectContaining({ code: 'LAYOUT_DUPLICATE_UUID' })
+    );
   });
 });

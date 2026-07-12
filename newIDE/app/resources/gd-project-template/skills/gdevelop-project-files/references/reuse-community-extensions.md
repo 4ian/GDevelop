@@ -153,7 +153,8 @@ dependency/compatibility issue before retrying.
 
 ## Verify and report
 
-1. Parse every new TOML fragment independently and as combined settings.
+1. Parse every new settings TOML fragment independently and as combined
+   settings; compile every generated `.layout` as Layout DSL version 1.
 2. Confirm no downloaded `.json` file was added to project source.
 3. Confirm the import receipt lists the requested extension, its generated
    `extension.settings`, and source files for all imported dependencies.

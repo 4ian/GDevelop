@@ -19,8 +19,8 @@ Read, in order:
 3. `config.settings` for the complete arbitrary global-config subtree.
 4. Relevant child `.settings` files for semantic configuration and object
    definitions, including each object's variables, effects, and behaviors.
-5. Relevant `.layout` files for instances, layers, spatial bounds, background,
-   and editor-canvas layout.
+5. Relevant `.layout` files for Layout DSL instances, layers, spatial bounds,
+   background, and editor-canvas layout.
 6. Relevant `.events` files for IfDo event logic.
 7. `.gdevelop/instructions-catalog.json` before adding or changing
    instructions.
@@ -43,9 +43,11 @@ generated compatibility/runtime output, not multi-file source.
 - `config.settings`: edit global configuration only under
   `[project.globalConfig]`; preserve arbitrary keys and the format-owned
   `[gdevelopConfig]`/`[gdevelopConfig.rawJson]` tables.
-- `.layout`: unindented TOML containing placement/layout data only: instances,
-  layers, spatial bounds, background, and editor view state. Never define an
-  object or attach/configure a behavior in a `.layout` file.
+- `.layout`: Layout DSL component-tree markup containing placement/layout data
+  only: instances, layers, spatial bounds, background, and editor view state.
+  Never put TOML, object definitions, or attached behavior definitions in a
+  `.layout` file. Instance behavior overrides are allowed only for behaviors
+  already attached by the owning `.settings` object definition.
 - `.events`: IfDo DSL only. Do not embed TOML or raw event JSON.
 - References: use canonical `game://...` URIs rooted at `project.settings`.
 - `.gdevelop/`: generated/editor state. Read catalogs; do not author sources
@@ -94,6 +96,9 @@ Load only the references required by the task:
 - Read [references/create-extensions.md](references/create-extensions.md) in
   full before creating an extension or adding/removing extension-level
   functions, prefabs, behaviors, or their functions.
+- Read [references/layout-dsl.md](references/layout-dsl.md) in full before
+  creating or changing any `.layout` file. Preserve existing UUIDs and use its
+  exact scene, prefab/variant, or external-layout context rules.
 - Read
   [references/reuse-community-extensions.md](references/reuse-community-extensions.md)
   in full before implementing a substantial reusable system or installing a
@@ -188,8 +193,9 @@ loop, comment, and JavaScript metadata when editing existing sources.
    edit; creating or moving an instance is a layout edit.
 4. Re-read every changed manifest reference and verify that each `game://` URI
    exists and stays inside the project.
-5. Check TOML syntax, duplicate namespaces, event depth, instruction names,
-   named parameters, and asset paths.
+5. Check settings TOML syntax, Layout DSL structure/semantics, duplicate
+   namespaces, event depth, instruction names, named parameters, and asset
+   paths.
 6. Call the GDevelop MCP `reload_project` tool and require a successful reload
    receipt. Do not invoke an MCP save that could replace newer disk edits with
    stale editor memory.
@@ -231,7 +237,8 @@ memory. A later source edit invalidates the earlier reload receipt.
 
 Before finishing:
 
-- Confirm every changed TOML file is unindented and independently parseable.
+- Confirm every changed `.settings` file is unindented TOML and independently
+  parseable; confirm every `.layout` is canonical Layout DSL version 1.
 - Confirm `.layout` files contain only placement/layout concepts and contain no
   `objects`, `objectsFolderStructure`, `objectsGroups`, or behavior definitions.
 - Confirm every object definition and its complete behaviors are in the owning

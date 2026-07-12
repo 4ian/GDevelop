@@ -9,9 +9,13 @@ import {
   convertLegacyEventsJsonToIfDo,
   parseLegacyEventsJson,
 } from '../../EventsSheet/IfDoEventsDsl';
+import {
+  LayoutDslError,
+  compileLayoutDsl,
+  decompileLayoutDsl,
+} from '../LayoutDsl';
 
 export const MULTI_FILE_FORMAT_VERSION = 1;
-export const MULTI_FILE_LAYOUT_FORMAT_VERSION = 2;
 export const MULTI_FILE_ENTRY_NAME = 'project.settings';
 export const MULTI_FILE_ENTRY_URI = 'game://project.settings';
 export const MULTI_FILE_RESOURCES_URI = 'game://resources.settings';
@@ -48,28 +52,11 @@ const PREFAB_LAYOUT_FIELDS = Object.freeze([
 ]);
 
 const EXTERNAL_LAYOUT_FIELDS = Object.freeze(['instances', 'editionSettings']);
-const LEGACY_SCENE_LAYOUT_FIELDS = Object.freeze([
-  ...SCENE_LAYOUT_FIELDS,
-  'objects',
-  'objectsFolderStructure',
-]);
-const LEGACY_PREFAB_LAYOUT_FIELDS = Object.freeze([
-  ...PREFAB_LAYOUT_FIELDS,
-  'objects',
-  'objectsFolderStructure',
-  'objectsGroups',
-]);
-const LAYOUT_FIELDS_BY_FORMAT = Object.freeze({
-  'gdevelop-scene-layout': SCENE_LAYOUT_FIELDS,
-  'gdevelop-prefab-layout': PREFAB_LAYOUT_FIELDS,
-  'gdevelop-prefab-variant-layout': PREFAB_LAYOUT_FIELDS,
-  'gdevelop-external-layout': EXTERNAL_LAYOUT_FIELDS,
-});
-const LEGACY_LAYOUT_FIELDS_BY_FORMAT = Object.freeze({
-  'gdevelop-scene-layout': LEGACY_SCENE_LAYOUT_FIELDS,
-  'gdevelop-prefab-layout': LEGACY_PREFAB_LAYOUT_FIELDS,
-  'gdevelop-prefab-variant-layout': LEGACY_PREFAB_LAYOUT_FIELDS,
-  'gdevelop-external-layout': EXTERNAL_LAYOUT_FIELDS,
+const LAYOUT_DSL_KIND_BY_FORMAT = Object.freeze({
+  'gdevelop-scene-layout': 'scene',
+  'gdevelop-prefab-layout': 'prefab',
+  'gdevelop-prefab-variant-layout': 'prefab-variant',
+  'gdevelop-external-layout': 'external',
 });
 const WINDOWS_DEVICE_NAME = /^(?:CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])(?:\.|$)/i;
 const SIMPLE_URI_SEGMENT = /^[A-Za-z0-9_.-]+$/;
@@ -77,17 +64,29 @@ const SIMPLE_URI_SEGMENT = /^[A-Za-z0-9_.-]+$/;
 export class MultiFileProjectError extends Error {
   code: string;
   fileUri: ?string;
+  line: ?number;
+  column: ?number;
 
   constructor(code: string, message: string, fileUri?: string) {
     super(fileUri ? `${message} (${fileUri})` : message);
     this.name = 'MultiFileProjectError';
     this.code = code;
     this.fileUri = fileUri || null;
+    this.line = null;
+    this.column = null;
   }
 }
 
 const fail = (code: string, message: string, fileUri?: string): empty => {
   throw new MultiFileProjectError(code, message, fileUri);
+};
+
+const rethrowLayoutDslError = (error, fileUri): empty => {
+  const wrapped = new MultiFileProjectError(error.code, error.message);
+  wrapped.fileUri = fileUri;
+  wrapped.line = error.line;
+  wrapped.column = error.column;
+  throw wrapped;
 };
 
 const clone = value => JSON.parse(JSON.stringify(value));
@@ -519,13 +518,30 @@ const putSettingsFile = (files, uri, namespace) => {
   files[uri] = serializeToml(projectSettingsNamespace(namespace));
 };
 
-const putLayoutFile = (files, uri, format, layout) => {
+const putLayoutFile = (
+  files,
+  uri,
+  format,
+  layout,
+  usedInstanceUuids,
+  semanticContext = {}
+) => {
   validateGameUri(uri);
-  files[uri] = serializeToml({
-    format,
-    formatVersion: MULTI_FILE_LAYOUT_FORMAT_VERSION,
-    layout: projectTomlPayload(layout),
-  });
+  const kind = LAYOUT_DSL_KIND_BY_FORMAT[format];
+  if (!kind) fail('MULTIFILE_INVALID_LAYOUT', `Unknown layout format ${format}.`, uri);
+  try {
+    files[uri] = decompileLayoutDsl(layout, {
+      kind,
+      fileUri: uri,
+      usedInstanceUuids,
+      ...semanticContext,
+    });
+  } catch (error) {
+    if (error instanceof LayoutDslError) {
+      rethrowLayoutDslError(error, uri);
+    }
+    throw error;
+  }
 };
 
 const putEventsFile = (files, uri, events, eventsDslOptions) => {
@@ -584,6 +600,7 @@ const splitPrefab = ({
   baseSegments,
   files,
   eventsDslOptions,
+  usedInstanceUuids,
 }) => {
   const prefabName = String(prefab.name || '');
   const layoutUri = encodeUriPath([
@@ -594,7 +611,9 @@ const splitPrefab = ({
     files,
     layoutUri,
     'gdevelop-prefab-layout',
-    takeFields(prefab, PREFAB_LAYOUT_FIELDS)
+    takeFields(prefab, PREFAB_LAYOUT_FIELDS),
+    usedInstanceUuids,
+    layoutObjectContext(prefab.objects || [])
   );
   const functions = splitOwnerFunctions({
     functions: prefab.eventsFunctions,
@@ -615,7 +634,13 @@ const splitPrefab = ({
       files,
       variantLayoutUri,
       'gdevelop-prefab-variant-layout',
-      takeFields(variant, PREFAB_LAYOUT_FIELDS)
+      takeFields(variant, PREFAB_LAYOUT_FIELDS),
+      usedInstanceUuids,
+      layoutObjectContext(
+        variant.objects !== undefined
+          ? variant.objects
+          : prefab.objects || []
+      )
     );
     return {
       ...omitFields(variant, new Set(PREFAB_LAYOUT_FIELDS)),
@@ -663,6 +688,7 @@ export const decomposeLegacyProjectToFiles = (legacyProject, options = {}) => {
   const projectPayload = omitFields(project, PROJECT_SPLIT_FIELDS);
   const sceneNames = new Set();
   const extensionNames = new Set();
+  const usedInstanceUuids = new Set();
 
   if (project.resources !== undefined) {
     putSettingsFile(files, MULTI_FILE_RESOURCES_URI, {
@@ -729,7 +755,9 @@ export const decomposeLegacyProjectToFiles = (legacyProject, options = {}) => {
       files,
       layoutUri,
       'gdevelop-scene-layout',
-      takeFields(layout, SCENE_LAYOUT_FIELDS)
+      takeFields(layout, SCENE_LAYOUT_FIELDS),
+      usedInstanceUuids,
+      layoutObjectContext(layout.objects || [], project.objects || [])
     );
     putEventsFile(
       files,
@@ -792,6 +820,7 @@ export const decomposeLegacyProjectToFiles = (legacyProject, options = {}) => {
                 baseSegments: base,
                 files,
                 eventsDslOptions: options.eventsDslOptions,
+                usedInstanceUuids,
               }),
             },
           },
@@ -883,7 +912,32 @@ export const decomposeLegacyProjectToFiles = (legacyProject, options = {}) => {
         files,
         layoutUri,
         'gdevelop-external-layout',
-        takeFields(external, EXTERNAL_LAYOUT_FIELDS)
+        takeFields(external, EXTERNAL_LAYOUT_FIELDS),
+        usedInstanceUuids,
+        (() => {
+          const linkedScene = (project.layouts || []).find(
+            layout =>
+              String(layout.name || '') ===
+              String(external.associatedLayout || '')
+          );
+          if (!linkedScene)
+            fail(
+              'LAYOUT_UNKNOWN_SCENE',
+              `External layout ${name} references missing scene ${String(
+                external.associatedLayout || ''
+              )}.`,
+              layoutUri
+            );
+          return {
+            ...layoutObjectContext(
+              linkedScene.objects || [],
+              project.objects || []
+            ),
+            layerNames: (linkedScene.layers || []).map(layer =>
+              String(layer.name || '')
+            ),
+          };
+        })()
       );
     });
     putSettingsFile(files, externalSettings, {
@@ -921,44 +975,44 @@ const parseSettings = (files, uri) => {
   return parseTomlSource(source, uri);
 };
 
-const readLayout = (files, uri, expectedFormat) => {
-  const document = parseSettings(files, uri);
-  if (
-    document.format !== expectedFormat ||
-    (document.formatVersion !== 1 &&
-      document.formatVersion !== MULTI_FILE_LAYOUT_FORMAT_VERSION)
-  ) {
-    fail(
-      'MULTIFILE_INVALID_LAYOUT',
-      `Expected ${expectedFormat} version 1 or ${MULTI_FILE_LAYOUT_FORMAT_VERSION}.`,
-      uri
-    );
-  }
-  const layout = restoreTomlPayload(
-    asObject(document.layout, 'layout', uri),
-    uri
-  );
-  if (Object.prototype.hasOwnProperty.call(layout, 'events')) {
-    fail(
-      'MULTIFILE_OWNERSHIP_CONFLICT',
-      'Layout files cannot contain events.',
-      uri
-    );
-  }
-  const allowedFields =
-    document.formatVersion === 1
-      ? LEGACY_LAYOUT_FIELDS_BY_FORMAT[expectedFormat]
-      : LAYOUT_FIELDS_BY_FORMAT[expectedFormat];
-  Object.keys(layout).forEach(field => {
-    if (!allowedFields || allowedFields.indexOf(field) === -1) {
-      fail(
-        'MULTIFILE_OWNERSHIP_CONFLICT',
-        `Layout field ${field} is not owned by ${expectedFormat}; move it to the related settings file.`,
-        uri
-      );
+const readLayout = (files, uri, expectedFormat, semanticContext = {}) => {
+  validateGameUri(uri);
+  const source = files[uri];
+  if (source === undefined) fail('MULTIFILE_MISSING_FILE', 'Referenced layout file is missing.', uri);
+  const kind = LAYOUT_DSL_KIND_BY_FORMAT[expectedFormat];
+  if (!kind) fail('MULTIFILE_INVALID_LAYOUT', `Unknown layout format ${expectedFormat}.`, uri);
+  try {
+    return compileLayoutDsl(source, { kind, fileUri: uri, ...semanticContext });
+  } catch (error) {
+    if (error instanceof LayoutDslError) {
+      rethrowLayoutDslError(error, uri);
     }
+    throw error;
+  }
+};
+
+const layoutObjectContext = (localObjects, fallbackObjects = []) => {
+  const objectsByName = new Map();
+  (fallbackObjects || []).forEach(object =>
+    objectsByName.set(String(object.name || ''), object)
+  );
+  (localObjects || []).forEach(object =>
+    objectsByName.set(String(object.name || ''), object)
+  );
+  const behaviorTypesByObject = {};
+  objectsByName.forEach((object, objectName) => {
+    behaviorTypesByObject[objectName] = (object.behaviors || []).reduce(
+      (result, behavior) => {
+        result[String(behavior.name || '')] = String(behavior.type || '');
+        return result;
+      },
+      {}
+    );
   });
-  return layout;
+  return {
+    objectNames: Array.from(objectsByName.keys()),
+    behaviorTypesByObject,
+  };
 };
 
 const compileEvents = (files, uri, options) => {
@@ -1179,10 +1233,20 @@ const composeOwnerFunctions = (files, entries, options, ownerUri) => {
   });
 };
 
-const composePrefab = (files, namespace, options, uri) => {
+const composePrefab = (
+  files,
+  namespace,
+  options,
+  uri,
+  usedInstanceUuids
+) => {
   const payload = restoreTomlPayload(namespace, uri);
   const layoutUri = expectString(payload.layout, 'prefab.layout', uri);
-  const layout = readLayout(files, layoutUri, 'gdevelop-prefab-layout');
+  const objectContext = layoutObjectContext(payload.objects || []);
+  const layout = readLayout(files, layoutUri, 'gdevelop-prefab-layout', {
+    ...objectContext,
+    usedInstanceUuids,
+  });
   Object.keys(layout).forEach(field => {
     if (payload[field] !== undefined) {
       fail(
@@ -1203,7 +1267,15 @@ const composePrefab = (files, namespace, options, uri) => {
       const variantLayout = readLayout(
         files,
         expectString(entry.layout, 'variant.layout', uri),
-        'gdevelop-prefab-variant-layout'
+        'gdevelop-prefab-variant-layout',
+        {
+          ...layoutObjectContext(
+            entry.objects !== undefined
+              ? entry.objects
+              : payload.objects || []
+          ),
+          usedInstanceUuids,
+        }
       );
       Object.keys(variantLayout).forEach(field => {
         if (entry[field] !== undefined) {
@@ -1680,6 +1752,7 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
   if (globalConfigPayload) {
     project.globalConfig = globalConfigPayload;
   }
+  const usedInstanceUuids = new Set();
   project.layouts = sceneDocuments.map(({ entry, uri, document }) => {
     const namespace = restoreTomlPayload(
       requireNamespace(document, ['scenes', entry.name], uri),
@@ -1696,7 +1769,10 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
     const eventsUri = registerUri(
       expectString(entry.events, 'scene.events', uri)
     );
-    const layout = readLayout(files, layoutUri, 'gdevelop-scene-layout');
+    const layout = readLayout(files, layoutUri, 'gdevelop-scene-layout', {
+      ...layoutObjectContext(settings.objects || [], project.objects || []),
+      usedInstanceUuids,
+    });
     Object.keys(layout).forEach(field => {
       if (settings[field] !== undefined) {
         fail(
@@ -1762,14 +1838,35 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
     );
     project.externalLayouts = project.externalLayouts.map(entry => {
       validateExternalSourceUri(entry.layout, '.layout');
+      const linkedSceneName = String(entry.linkedScene || '');
+      const linkedScene = project.layouts.find(
+        layout => layout.name === linkedSceneName
+      );
+      if (!linkedScene) {
+        fail(
+          'LAYOUT_UNKNOWN_SCENE',
+          `External layout ${String(entry.name || '')} references missing scene ${linkedSceneName}.`,
+          uri
+        );
+      }
       return {
         ...omitFields(entry, new Set(['linkedScene', 'layout'])),
         name: expectString(entry.name, 'external layout name', uri),
-        associatedLayout: String(entry.linkedScene || ''),
+        associatedLayout: linkedSceneName,
         ...readLayout(
           files,
           registerUri(expectString(entry.layout, 'external layout URI', uri)),
-          'gdevelop-external-layout'
+          'gdevelop-external-layout',
+          {
+            ...layoutObjectContext(
+              linkedScene.objects || [],
+              project.objects || []
+            ),
+            layerNames: (linkedScene.layers || []).map(layer =>
+              String(layer.name || '')
+            ),
+            usedInstanceUuids,
+          }
         ),
       };
     });
@@ -1826,7 +1923,13 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
           child.uri
         );
         extension.eventsBasedObjects.push(
-          composePrefab(files, payload, options, child.uri)
+          composePrefab(
+            files,
+            payload,
+            options,
+            child.uri,
+            usedInstanceUuids
+          )
         );
       } else {
         const payload = requireNamespace(
@@ -1851,6 +1954,123 @@ const normalizeFunctionEvents = functions =>
     );
   });
 
+const normalizeLayoutFragment = (layout, editorField, hasLayers = true) => {
+  layout[editorField] = layout[editorField] || {};
+  const editor = layout[editorField];
+  if (
+    editor.gridWidth !== undefined ||
+    editor.gridHeight !== undefined ||
+    editor.gridDepth !== undefined
+  ) {
+    editor.gridWidth =
+      editor.gridWidth === undefined ? 32 : editor.gridWidth;
+    editor.gridHeight =
+      editor.gridHeight === undefined ? 32 : editor.gridHeight;
+    editor.gridDepth =
+      editor.gridDepth === undefined ? 32 : editor.gridDepth;
+  }
+  if (
+    editor.gridOffsetX !== undefined ||
+    editor.gridOffsetY !== undefined ||
+    editor.gridOffsetZ !== undefined
+  ) {
+    editor.gridOffsetX =
+      editor.gridOffsetX === undefined ? 0 : editor.gridOffsetX;
+    editor.gridOffsetY =
+      editor.gridOffsetY === undefined ? 0 : editor.gridOffsetY;
+    editor.gridOffsetZ =
+      editor.gridOffsetZ === undefined ? 0 : editor.gridOffsetZ;
+  }
+  layout.instances = (layout.instances || []).map(instance => {
+    const normalized = {
+      angle: 0,
+      zOrder: 0,
+      layer: '',
+      customSize: false,
+      width: 0,
+      height: 0,
+      numberProperties: [],
+      stringProperties: [],
+      initialVariables: [],
+      ...instance,
+    };
+    if (normalized.z === 0) delete normalized.z;
+    if (normalized.rotationX === 0) delete normalized.rotationX;
+    if (normalized.rotationY === 0) delete normalized.rotationY;
+    if (normalized.opacity === 255) delete normalized.opacity;
+    if (normalized.flippedX === false) delete normalized.flippedX;
+    if (normalized.flippedY === false) delete normalized.flippedY;
+    if (normalized.flippedZ === false) delete normalized.flippedZ;
+    if (normalized.locked === false) delete normalized.locked;
+    if (normalized.sealed === false) delete normalized.sealed;
+    if (normalized.behaviorOverridings) {
+      normalized.behaviorOverridings = normalized.behaviorOverridings.map(
+        behavior => {
+          const normalizedBehavior = { ...behavior };
+          if (normalizedBehavior.isFolded === false)
+            delete normalizedBehavior.isFolded;
+          if (normalizedBehavior.isMuted === false)
+            delete normalizedBehavior.isMuted;
+          if (normalizedBehavior.isInheritedFromObjectType === false)
+            delete normalizedBehavior.isInheritedFromObjectType;
+          if (normalizedBehavior.quickCustomizationVisibility === 'default')
+            delete normalizedBehavior.quickCustomizationVisibility;
+          if (
+            normalizedBehavior.propertiesQuickCustomizationVisibilities &&
+            !Object.keys(
+              normalizedBehavior.propertiesQuickCustomizationVisibilities
+            ).length
+          )
+            delete normalizedBehavior.propertiesQuickCustomizationVisibilities;
+          return normalizedBehavior;
+        }
+      );
+    }
+    return normalized;
+  });
+  if (hasLayers) {
+    layout.layers = (layout.layers || []).map(layer => {
+      const normalizedLayer = {
+        renderingType: '',
+        cameraType: '',
+        defaultCameraBehavior: 'top-left-anchored-if-never-moved',
+        visibility: true,
+        isLocked: false,
+        isLightingLayer: false,
+        followBaseLayerCamera: false,
+        ambientLightColorR: 200,
+        ambientLightColorG: 200,
+        ambientLightColorB: 200,
+        camera3DNearPlaneDistance: 3,
+        camera3DFarPlaneDistance: 10000,
+        camera3DFieldOfView: 45,
+        camera2DPlaneMaxDrawingDistance: 5000,
+        ...layer,
+      };
+      normalizedLayer.cameras = (layer.cameras || []).map(camera => ({
+        defaultSize: true,
+        width: 0,
+        height: 0,
+        defaultViewport: true,
+        viewportLeft: 0,
+        viewportTop: 0,
+        viewportRight: 1,
+        viewportBottom: 1,
+        ...camera,
+      }));
+      normalizedLayer.effects = (layer.effects || []).map(effect => ({
+        folded: false,
+        disabled: false,
+        doubleParameters: {},
+        stringParameters: {},
+        booleanParameters: {},
+        ...effect,
+      }));
+      return normalizedLayer;
+    });
+  }
+};
+
 export const normalizeLegacyProjectForMultiFile = legacyProject => {
   const project = clone(legacyProject);
   project.layouts = project.layouts || [];
@@ -1859,7 +2079,11 @@ export const normalizeLegacyProjectForMultiFile = legacyProject => {
   project.eventsFunctionsExtensions = project.eventsFunctionsExtensions || [];
   project.layouts.forEach(layout => {
     layout.events = parseLegacyEventsJson(JSON.stringify(layout.events || []));
+    normalizeLayoutFragment(layout, 'uiSettings');
   });
+  project.externalLayouts.forEach(external =>
+    normalizeLayoutFragment(external, 'editionSettings', false)
+  );
   project.externalEvents.forEach(external => {
     external.events = parseLegacyEventsJson(
       JSON.stringify(external.events || [])
@@ -1874,6 +2098,10 @@ export const normalizeLegacyProjectForMultiFile = legacyProject => {
       prefab.eventsFunctions = prefab.eventsFunctions || [];
       prefab.variants = prefab.variants || [];
       normalizeFunctionEvents(prefab.eventsFunctions);
+      normalizeLayoutFragment(prefab, 'editionSettings');
+      prefab.variants.forEach(variant =>
+        normalizeLayoutFragment(variant, 'editionSettings')
+      );
     });
     extension.eventsBasedBehaviors.forEach(behavior => {
       behavior.eventsFunctions = behavior.eventsFunctions || [];

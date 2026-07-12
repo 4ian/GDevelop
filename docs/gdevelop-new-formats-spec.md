@@ -1,12 +1,13 @@
 # GDevelop Multi-file Project Format
 
-## TOML project/layout/settings files and IfDo event source files
+## TOML settings, Layout DSL, and IfDo event source files
 
 **Status:** Version 1.0 implemented format contract
 **Entry file:** `project.settings`
 **Text encoding:** UTF-8 without BOM
 **Line endings:** LF when written by GDevelop
-**Related specification:** [gdevelop-events-dsl-spec.md](gdevelop-events-dsl-spec.md)
+**Related specifications:** [gdevelop-events-dsl-spec.md](gdevelop-events-dsl-spec.md),
+[gdevelop-layout-dsl-spec.md](gdevelop-layout-dsl-spec.md)
 
 ---
 
@@ -43,8 +44,9 @@
 
 This specification replaces the single large GDevelop project JSON document with a source-oriented directory tree:
 
-- TOML for project, scene settings, visual scene layout, extension, prefab,
-  and behavior data.
+- TOML for project, scene, extension, prefab, behavior, resource, and global
+  configuration settings.
+- Layout DSL component-tree markup for visual/spatial `.layout` sources.
 - One `.events` source file for every scene event sheet and every events-based function.
 - Stable, explicit file references so a scene, function, behavior, or prefab can be reviewed and changed independently.
 - A compatibility adapter that reconstructs the current legacy serializer tree in memory. The existing `gd::Project`, preview, export, code generation, and runtime paths continue to consume the current model.
@@ -52,7 +54,7 @@ This specification replaces the single large GDevelop project JSON document with
 The format is intended to improve AI editing, human review, merge behavior, and Git history without requiring a runtime-format migration.
 
 This document is a design and implementation contract. The repository now
-contains the TOML multi-file adapter in
+contains the TOML-settings/Layout-DSL multi-file adapter in
 `newIDE/app/src/ProjectsStorage/MultiFileProjectFormat`, the local transactional
 filesystem integration in
 `newIDE/app/src/ProjectsStorage/LocalFileStorageProvider/LocalMultiFileProject.js`,
@@ -120,7 +122,7 @@ The design follows these existing implementation boundaries:
 | Behaviors                      | `EventsBasedBehavior` and `AbstractEventsBasedEntity`                                 | `behavior.settings` owns behavior metadata and each method owns one `.events` file.                                                                      |
 | Existing folder projects       | `LocalProjectWriter`, `LocalProjectOpener`, and `ObjectSplitter`                      | Existing split JSON projects are legacy input. Their reference tree must be unsplit before migration.                                                    |
 | Editor open path               | `ProjectsStorage` to `MainFrame`, then `gd.Serializer.fromJSObject`                   | A new storage adapter should return a composed legacy-shaped object to minimize editor changes.                                                          |
-| Preview/export                 | `gdjs::Exporter`, `ExporterHelper`, and preview launchers                             | Existing exporters can use the composed/in-memory `gd::Project`; no runtime code needs to parse TOML or DSL.                                             |
+| Preview/export                 | `gdjs::Exporter`, `ExporterHelper`, and preview launchers                             | Existing exporters can use the composed/in-memory `gd::Project`; runtime code parses neither settings TOML nor source DSL.                               |
 
 The current optional folder-project mode is not this format. It still writes JSON partials, leaves events embedded, writes a legacy root object containing references, and deletes/recreates split directory contents during save.
 
@@ -232,7 +234,7 @@ both; the two files remain independent unless both are listed in
 
 ## 5. Common file rules
 
-### 5.1 Settings fragments and layout markers
+### 5.1 Settings fragments and layout grammar
 
 Every `.settings` file is a standalone TOML fragment rooted at a unique,
 fully qualified table. It must not emit shared root scalar keys such as
@@ -266,28 +268,22 @@ settingsFormatVersion = 1
 order = 0
 ```
 
-`.layout` files are not appended to the settings document. They retain root
-format markers:
+`.layout` files are not TOML and are not appended to the settings document.
+They use the context supplied by the referencing scene, prefab/variant, or
+external-layout settings entry and must have exactly one Layout DSL root:
 
-```toml
-format = "gdevelop-scene-layout"
-formatVersion = 2
+```layout
+<layout version=1 background=#202030>
+  <layer name="">
+    <camera size=default viewport=default />
+  </layer>
+</layout>
 ```
 
-Allowed layout `format` values in version 2 are:
-
-```text
-gdevelop-scene-layout
-gdevelop-external-layout
-gdevelop-prefab-layout
-gdevelop-prefab-variant-layout
-```
-
-The loader accepts layout format version 1 only as a migration input. Version
-1 may contain object definitions under `layout`; the next canonical save moves
-those definitions and their behaviors into the related settings namespace and
-writes layout format version 2. Newly authored version-2 layouts reject those
-fields.
+There is no compatibility reader for the retired TOML `.layout` draft and no
+format-marker table inside layout source. The complete normative grammar,
+compiler/decompiler mapping, defaults, semantic checks, and canonical writer
+are defined by [gdevelop-layout-dsl-spec.md](gdevelop-layout-dsl-spec.md).
 
 ### 5.1.1 Strict extension ownership
 
@@ -296,7 +292,7 @@ The three source extensions have non-overlapping responsibilities:
 | Extension   | Allowed content                                                                                        | Forbidden content                                                                                            |
 | ----------- | ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------ |
 | `.settings` | TOML identity, metadata, signatures, object definitions and their behaviors/variables/effects, local ordering, and runtime/editor configuration | IfDo statements, instance placement, layer ordering, spatial layout payloads, and references to other settings files |
-| `.layout`   | TOML instances, layers, positions, bounds/dimensions, background, and editor-canvas state               | Object definitions or behaviors, events, function signatures, runtime logic, and general non-layout settings       |
+| `.layout`   | Layout DSL instances, layers, positions, bounds/dimensions, background, and editor-canvas state         | TOML, object/attached-behavior definitions, events, signatures, runtime logic, and general non-layout settings       |
 | `.events`   | Typed IfDo event statements, DSL comments, metadata annotations, and exact catalog instructions        | TOML front matter, settings tables, layout data, raw event/instruction JSON, or legacy project configuration |
 
 The loader rejects a file containing content owned by another extension. It
@@ -358,9 +354,9 @@ to the project directory.
 
 Every `.settings` file remains an independent canonical TOML file when stored:
 
-- Canonical `.settings` and `.layout` writers use no indentation. Every
-  non-empty source line begins at column zero; dotted table headers already
-  express nesting without presentation-only leading whitespace.
+- Canonical `.settings` writers use no indentation: every non-empty settings
+  line begins at column zero. Layout DSL uses canonical two-space structural
+  indentation because hierarchy is part of its human-readable component tree.
 - A settings file must not contain the TOML text or namespace subtree owned by
   another settings file.
 - The format has no TOML `include`, import, inheritance, or textual-expansion
@@ -778,27 +774,18 @@ instances are placed, how layers are arranged, the scene background, and
 editor-canvas state. An instance refers to an object definition owned by
 `scene.settings`; the definition itself never appears in this file.
 
-```toml
-format = "gdevelop-scene-layout"
-formatVersion = 2
+```layout
+<layout version=1 background=#202030>
+  <editor grid=true grid-size=32,32,32 snap=true />
 
-[layout]
-r = 32
-v = 32
-b = 48
-
-[layout.uiSettings]
-# Existing editor settings projection.
-
-[[layout.layers]]
-name = ""
-visibility = true
-isLocked = false
-
-[[layout.instances]]
-name = "Player"
-x = 128.0
-y = 256.0
+  <layer name="">
+    <camera size=default viewport=default />
+    <Player
+      id="ef3ef49d-f20f-4450-b373-0ce43291a002"
+      at=128,256
+    />
+  </layer>
+</layout>
 ```
 
 The scene layout payload may contain only:
@@ -1083,17 +1070,10 @@ The layout contains only spatial/default-variant layout settings.
 `prefab.settings` owns the child object definitions, groups, definition folder
 structure, and embedded behaviors; it does not duplicate layout fields.
 
-```toml
-format = "gdevelop-prefab-layout"
-formatVersion = 2
-
-[layout]
-areaMinX = 0
-areaMinY = 0
-areaMinZ = 0
-areaMaxX = 64
-areaMaxY = 64
-areaMaxZ = 64
+```layout
+<layout version=1>
+  <bounds min=0,0,0 max=64,64,64 />
+</layout>
 ```
 
 When composing legacy JSON, settings-owned object definitions and layout-owned
@@ -1102,9 +1082,9 @@ spatial fields are merged into the prefab object at the same level, matching
 
 ### 9.3 Variant layouts
 
-Current prefabs may contain `variants`. Layout format version 2 stores each
-non-default variant's spatial layout data in `variants/<Variant>.layout` using
-`gdevelop-prefab-variant-layout`. Variant identity and asset-store identifiers
+Current prefabs may contain `variants`. Layout DSL stores each non-default
+variant's spatial data in `variants/<Variant>.layout` using prefab-variant
+context. Variant identity and asset-store identifiers
 as well as its child object definitions, groups, folder structure, and embedded
 behaviors are configuration in the `[[variants]]` entry of `prefab.settings`,
 not in the `.layout` file.
@@ -1268,9 +1248,10 @@ and compiled `events`.
 
 ### 12.3 External layouts
 
-An external layout is one UI-only
-`externals/<ExternalName>.layout` TOML file with format
-`gdevelop-external-layout`. It owns only `instances` and `editionSettings`.
+An external layout is one layout-only
+`externals/<ExternalName>.layout` Layout DSL file compiled in external context.
+It owns only `instances` and `editionSettings`; its `<layer>` elements reference
+the linked scene's existing layers rather than defining layers.
 Its `name`, `linkedScene`, and order come from the corresponding
 `external.settings` `layoutFiles` entry. The composer maps `linkedScene` to
 `associatedLayout` to match `ExternalLayout::SerializeTo`.
@@ -1322,8 +1303,9 @@ Catalog instruction types and named parameters cannot be compiled safely
 without the loaded project's instruction metadata. The loader therefore uses
 two logical passes:
 
-1. Discover and parse all TOML settings/layout files and resolve every pure
-   `.events` body through its owning settings namespace.
+1. Discover and parse all TOML settings fragments, compile every Layout DSL
+   source in its owner context, and resolve every pure `.events` body through
+   its owning settings namespace.
 2. Build a skeleton legacy tree with scenes, objects, variables, resources
    from `resources.settings`, global config from `config.settings`, extension
    declarations, behaviors, prefabs, and function signatures, but empty event
@@ -1334,9 +1316,9 @@ two logical passes:
 6. Insert compiled arrays into the final legacy tree.
 7. Unserialize the final tree into the editor project.
 
-Exact `@exact` instruction syntax can be parsed before the catalog, but its
-identifier, signature, kind, parameters, and sub-instructions are validated
-after bootstrap.
+Instruction statement structure can be parsed before the catalog, but every
+type identifier, signature, kind, parameter, and sub-instruction is resolved
+and validated after bootstrap. The DSL has no `@exact` fallback.
 
 ### 13.4 Unknown data
 
@@ -1369,7 +1351,8 @@ after bootstrap.
    `[project.globalConfig]` ownership.
 6. Resolve all authoritative layout/events URIs, then read those sources with
    a bounded concurrency limit.
-7. Parse `.layout` files separately and validate their layout format markers.
+7. Parse and semantically compile `.layout` files separately using the owning
+   scene, prefab/variant, or linked-scene external context.
 8. Bootstrap the project catalog.
 9. Compile every `.events` file and collect source-mapped diagnostics.
 10. Compose the legacy serializer tree.
@@ -1612,7 +1595,8 @@ new source files
   -> existing runtime `data.js` / project data
 ```
 
-The GDJS runtime receives the same serialized runtime project data as before. It does not read TOML, `.layout`, `.settings`, or `.events` files.
+The GDJS runtime receives the same serialized runtime project data as before.
+It reads neither settings TOML nor `.layout`/`.events` source DSL.
 
 ### 17.3 Generated legacy JSON
 
@@ -1849,7 +1833,7 @@ A conforming implementation must satisfy all of the following:
    arbitrary user keys, and is combined without a reference from
    `project.settings`.
 6. Every scene has its own subfolder with `scene.settings`, a placement-focused
-   TOML layout, and a DSL events file. Object definitions and their behaviors
+   Layout DSL file, and an events DSL file. Object definitions and their behaviors
    belong to `scene.settings`; instances and layers belong to the layout.
 7. The root `externals/` directory is a sibling of `scenes/`; it contains
    `external.settings` plus each `<ExternalName>.events` and

@@ -8,6 +8,7 @@ const {
 const isDev = require('electron-is-dev');
 const { load } = require('./Utils/UrlLoader');
 const {
+  setPreviewWindowMenuBarVisibilityAndContentSize,
   getPreviewBrowserWindowOptionsFittingDisplay,
   getBoundsFittingDisplayHeight,
 } = require('./PreviewWindowBounds');
@@ -455,12 +456,16 @@ const openPreviewWindow = ({
     };
 
     let previewWindow = new BrowserWindow(browserWindowOptions);
+    setPreviewWindowMenuBarVisibilityAndContentSize(
+      previewWindow,
+      fittedPreviewBrowserWindowOptions,
+      hideMenuBar
+    );
     fitPreviewWindowToDisplayHeight(previewWindow, displayWorkArea);
     let parentWasMinimizedBeforePreviewClose = parentWindow
       ? parentWindow.isMinimized()
       : false;
 
-    previewWindow.setMenuBarVisibility(hideMenuBar);
     previewWindow.webContents.on('devtools-opened', () => {
       openDevToolsByDefault = true;
     });

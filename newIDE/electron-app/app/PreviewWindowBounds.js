@@ -5,6 +5,37 @@ const isPositiveFiniteNumber = value =>
 
 const clamp = (value, min, max) => Math.max(min, Math.min(value, max));
 
+const setPreviewWindowMenuBarVisibilityAndContentSize = (
+  previewWindow,
+  previewBrowserWindowOptions,
+  menuBarVisibility
+) => {
+  if (
+    !previewWindow ||
+    typeof previewWindow.setMenuBarVisibility !== 'function'
+  ) {
+    return;
+  }
+
+  // Changing menu bar visibility can preserve the outer window bounds and
+  // consequently change the content height. Reapply the requested content
+  // size afterwards so the game viewport keeps its intended aspect ratio.
+  previewWindow.setMenuBarVisibility(menuBarVisibility);
+
+  if (
+    previewBrowserWindowOptions &&
+    previewBrowserWindowOptions.useContentSize &&
+    isPositiveFiniteNumber(previewBrowserWindowOptions.width) &&
+    isPositiveFiniteNumber(previewBrowserWindowOptions.height) &&
+    typeof previewWindow.setContentSize === 'function'
+  ) {
+    previewWindow.setContentSize(
+      previewBrowserWindowOptions.width,
+      previewBrowserWindowOptions.height
+    );
+  }
+};
+
 const getPreviewBrowserWindowOptionsFittingDisplay = (
   previewBrowserWindowOptions,
   displayWorkArea,
@@ -93,6 +124,7 @@ const getBoundsFittingDisplayHeight = (bounds, displayWorkArea) => {
 };
 
 module.exports = {
+  setPreviewWindowMenuBarVisibilityAndContentSize,
   getPreviewBrowserWindowOptionsFittingDisplay,
   getBoundsFittingDisplayHeight,
 };

@@ -1,6 +1,6 @@
 ---
 name: gdevelop-project-files
-description: Create, inspect, modify, refactor, and verify GDevelop games through the multi-file project sources (`project.settings`, `.settings`, `.layout`, and `.events`). Use for any GDevelop project, scene, object, behavior, prefab, extension, variable, resource, layout, or event-sheet work. Read the generated instruction catalog for event authoring; synchronize direct edits with the GDevelop MCP `reload_project` tool before preview debugging.
+description: Create, inspect, modify, refactor, and verify GDevelop games through the multi-file project sources (`project.settings`, `.settings`, `.layout`, and `.events`). Use for any GDevelop project, scene, object, behavior, prefab, extension, third-party extension installation, reusable-component refactor, variable, resource, layout, or event-sheet work. Read the generated instruction catalog for event authoring; synchronize direct edits with the GDevelop MCP `reload_project` tool before preview debugging.
 ---
 
 # GDevelop Project Files
@@ -72,6 +72,31 @@ extensions/<Extension>/behaviors/<Behavior>/<Function>.events
 ```
 
 Only create optional folders when the owning manifest references them.
+
+## Task references
+
+Load only the references required by the task:
+
+- Read [references/create-extensions.md](references/create-extensions.md) in
+  full before creating an extension or adding/removing extension-level
+  functions, prefabs, behaviors, or their functions.
+- Read
+  [references/reuse-community-extensions.md](references/reuse-community-extensions.md)
+  in full before implementing a substantial reusable system or installing a
+  third-party extension. Search the official GDevelop extensions repository
+  first and prefer adapting a reviewed existing extension over rebuilding a
+  heavy feature from scratch.
+- Read
+  [references/refactor-with-reusable-components.md](references/refactor-with-reusable-components.md)
+  in full whenever the user asks to refactor, extract, deduplicate, modularize,
+  or reorganize project logic with prefabs, behaviors, or functions. Also load
+  the creation guide and, for any substantial subsystem, the reuse guide.
+  Complete the migration and verification; do not stop after suggesting an
+  architecture or creating empty component shells.
+
+Build from scratch only when repository search finds no suitable extension,
+the available extension is incompatible or unsafe, or a small project-specific
+implementation is materially simpler. Record that decision in the task result.
 
 ## Event authoring
 

@@ -1,0 +1,273 @@
+# Create extensions and reusable components
+
+## Contents
+
+- [Choose the component](#choose-the-component)
+- [Required workflow](#required-workflow)
+- [Complete source example](#complete-source-example)
+- [Add or change components](#add-or-change-components)
+- [Validate the extension](#validate-the-extension)
+
+## Choose the component
+
+Use the narrowest reusable abstraction:
+
+| Need | Component |
+| --- | --- |
+| Shared project logic without per-object state | Extension-level function |
+| State and reusable logic attached to one object | Behavior |
+| Reusable visual object composition with child objects and instances | Prefab |
+| A reusable visual object that also owns stateful logic | Prefab plus one or more behaviors |
+
+Keep visual composition in prefab `.layout` files, metadata/signatures in
+`.settings`, and executable logic in `.events`.
+
+## Required workflow
+
+1. Read the current `extension.settings` and every sibling component settings
+   file before editing. Preserve unknown fields and existing order.
+2. Search the official extension repository according to
+   [reuse-community-extensions.md](reuse-community-extensions.md) before
+   implementing a substantial system from scratch.
+3. Choose a stable extension name and the next contiguous zero-based `order`.
+4. Create the owner settings and every required child file in one patch.
+5. Keep each settings fragment independently valid and append-safe. Never add
+   child-settings indexes to `project.settings` or `extension.settings`.
+6. Use `game://` URIs for `.events` and `.layout` references. Never reference a
+   `.settings` file.
+7. Use exact instruction types and `dslName` parameters from
+   `.gdevelop/instructions-catalog.json` in every event body.
+8. Call `reload_project` after the declaration/files exist. If the extension
+   adds instruction types, re-read the regenerated catalog before writing or
+   changing callers.
+9. Reload again after the final edit, then preview every public function,
+   prefab, and behavior path.
+
+## Complete source example
+
+This example creates one extension containing a free function, a prefab, and a
+behavior. Treat instruction names in event examples as catalog lookups: verify
+their exact parameters against the current project catalog.
+
+```text
+extensions/CombatKit/
+  extension.settings
+  functions/ResetCombat/
+    function.settings
+    ResetCombat.events
+  prefabs/Enemy/
+    prefab.settings
+    Enemy.layout
+    Initialize.events
+  behaviors/Health/
+    behavior.settings
+    TakeDamage.events
+```
+
+`extensions/CombatKit/extension.settings`:
+
+```toml
+[extensions."CombatKit"]
+kind = "extension"
+settingsFormatVersion = 1
+order = 0
+name = "CombatKit"
+fullName = "Combat Kit"
+version = "1.0.0"
+extensionNamespace = ""
+shortDescription = "Reusable combat components"
+description = ["Reusable combat components for this project."]
+dimension = ""
+category = "Gameplay"
+author = ""
+authorIds = []
+tags = ["combat"]
+previewIconUrl = ""
+iconUrl = ""
+helpPath = ""
+gdevelopVersion = ""
+
+[extensions."CombatKit".eventsFunctionsFolderStructure]
+folderName = "__ROOT"
+children = []
+```
+
+Do not add `functionFiles`, `prefabFiles`, `behaviorFiles`, or child settings
+paths. Fixed-folder discovery finds the children.
+
+`extensions/CombatKit/functions/ResetCombat/function.settings`:
+
+```toml
+[extensions."CombatKit".functions."ResetCombat"]
+kind = "function"
+settingsFormatVersion = 1
+order = 0
+extension = "CombatKit"
+name = "ResetCombat"
+events = "game://extensions/CombatKit/functions/ResetCombat/ResetCombat.events"
+functionType = "Action"
+fullName = "Reset combat"
+description = "Resets combat state after an explicit request."
+sentence = "Reset combat state"
+group = "Combat"
+getterName = ""
+private = false
+async = false
+helpUrl = ""
+deprecated = false
+deprecationMessage = ""
+parameters = []
+objectGroups = []
+```
+
+`ResetCombat.events`:
+
+```events
+@event aiGeneratedEventId="reset-combat"
+if BooleanVariable variable="ResetRequested" check_if_the_value_is="True"
+do SetBooleanVariable variable="ResetRequested" modification_sign="False"
+```
+
+`extensions/CombatKit/prefabs/Enemy/prefab.settings`:
+
+```toml
+[extensions."CombatKit".prefabs."Enemy"]
+kind = "prefab"
+settingsFormatVersion = 1
+order = 0
+name = "Enemy"
+fullName = "Enemy"
+description = "Reusable enemy composition"
+defaultName = "Enemy"
+assetStoreTag = ""
+private = false
+previewIconUrl = ""
+iconUrl = ""
+helpPath = ""
+is3D = false
+isAnimatable = false
+isTextContainer = false
+isInnerAreaFollowingParentSize = false
+isUsingLegacyInstancesRenderer = false
+layout = "game://extensions/CombatKit/prefabs/Enemy/Enemy.layout"
+variables = []
+
+[[extensions."CombatKit".prefabs."Enemy".functions]]
+name = "Initialize"
+functionType = "Action"
+fullName = "Initialize"
+description = "Initializes one enemy instance."
+sentence = "Initialize _PARAM0_"
+private = false
+async = false
+parameters = [{ name = "Object", description = "Object", type = "object", supplementaryInformation = "CombatKit::Enemy" }]
+objectGroups = []
+events = "game://extensions/CombatKit/prefabs/Enemy/Initialize.events"
+```
+
+`Enemy.layout`:
+
+```toml
+format = "gdevelop-prefab-layout"
+formatVersion = 1
+
+[layout]
+areaMinX = 0
+areaMinY = 0
+areaMinZ = 0
+areaMaxX = 64
+areaMaxY = 64
+areaMaxZ = 64
+objects = []
+objectsGroups = []
+layers = []
+instances = []
+
+[layout.objectsFolderStructure]
+folderName = "__ROOT"
+children = []
+
+[layout.editionSettings]
+```
+
+`Initialize.events`:
+
+```events
+@event aiGeneratedEventId="initialize-enemy"
+if BooleanObjectVariable object="Object" variable="Initialized" check_if_the_value_is="False"
+do SetBooleanObjectVariable object="Object" variable="Initialized" modification_sign="True"
+```
+
+Add child object definitions and instances only to `Enemy.layout`. Copy the
+complete object configuration shape from an existing compatible `.layout`
+rather than inventing serializer fields.
+
+`extensions/CombatKit/behaviors/Health/behavior.settings`:
+
+```toml
+[extensions."CombatKit".behaviors."Health"]
+kind = "behavior"
+settingsFormatVersion = 1
+order = 0
+name = "Health"
+fullName = "Health"
+description = "Adds hit points to one object instance."
+objectType = ""
+private = false
+previewIconUrl = ""
+iconUrl = ""
+helpPath = ""
+quickCustomizationVisibility = "default"
+
+[[extensions."CombatKit".behaviors."Health".functions]]
+name = "TakeDamage"
+functionType = "Action"
+fullName = "Take damage"
+description = "Subtracts damage from one picked object."
+sentence = "_PARAM0_ takes _PARAM2_ damage"
+private = false
+async = false
+parameters = [{ name = "Object", description = "Object", type = "object" }, { name = "Behavior", description = "Behavior", type = "behavior", supplementaryInformation = "CombatKit::Health" }, { name = "Amount", description = "Damage amount", type = "expression" }]
+objectGroups = []
+events = "game://extensions/CombatKit/behaviors/Health/TakeDamage.events"
+```
+
+`TakeDamage.events`:
+
+```events
+@event aiGeneratedEventId="take-damage"
+if NumberObjectVariable object="Object" variable="HP" comparison_sign=">" value="0"
+do SetNumberObjectVariable object="Object" variable="HP" modification_sign="-" value="Amount"
+```
+
+The object and behavior parameters identify one caller instance. Do not remove
+the guarding condition or call this method with an unrestricted multi-instance
+selection.
+
+## Add or change components
+
+- Add a free function in its own `functions/<Name>/` folder. Put its complete
+  signature in `function.settings` and only its body in `<Name>.events`.
+- Add a prefab function as a complete `[[...functions]]` entry in
+  `prefab.settings`; put its body beside the prefab layout.
+- Add a behavior function as a complete `[[...functions]]` entry in
+  `behavior.settings`; put its body beside the behavior settings.
+- Add prefab variants under `variants/<Variant>.layout` and list only their
+  identity/layout URI in `prefab.settings`.
+- On rename, update the folder, settings namespace, `name`, `.events` or
+  `.layout` basename, every `game://` reference, and every caller atomically.
+- On delete, remove callers and scene instances first, reload and verify, then
+  remove the component files and close empty folders.
+
+## Validate the extension
+
+1. Parse every changed TOML file independently and as concatenated settings.
+2. Verify component orders are contiguous and names/folders/basenames match.
+3. Verify every referenced `.events` and `.layout` file exists.
+4. Verify every action is condition-guarded and every object action targets at
+   most one picked instance.
+5. Reload the project and confirm the new instruction/object/behavior types
+   appear in the regenerated catalog.
+6. Instantiate the prefab, attach the behavior, and call each public function
+   from a guarded test event.
+7. Launch a fresh preview and inspect runtime errors, picking, and state.

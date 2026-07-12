@@ -26,4 +26,16 @@ describe('interpolateMessageDescriptorValues', () => {
       })
     ).toBe('Reset to this commit.');
   });
+
+  it('interpolates numeric placeholders without treating braces as a regular expression quantifier', () => {
+    expect(
+      interpolateMessageDescriptorValues('Rename {0} to {1}.', {
+        id: 'Rename {0} to {1}.',
+        values: {
+          0: 'OldPrefab',
+          1: 'NewPrefab',
+        },
+      })
+    ).toBe('Rename OldPrefab to NewPrefab.');
+  });
 });

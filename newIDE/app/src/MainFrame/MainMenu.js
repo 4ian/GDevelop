@@ -36,6 +36,7 @@ export type MainMenuCallbacks = {|
   ) => Promise<void>,
   onSaveProject: () => Promise<?FileMetadata>,
   onSaveProjectAs: () => void,
+  onReloadProject: () => Promise<void>,
   onShowVersionHistory: () => void,
   onCloseProject: () => Promise<boolean>,
   onCloseApp: () => void,
@@ -64,6 +65,7 @@ export type MainMenuEvent =
   | 'main-menu-open-recent'
   | 'main-menu-save'
   | 'main-menu-save-as'
+  | 'main-menu-reload'
   | 'main-menu-show-version-history'
   | 'main-menu-close'
   | 'main-menu-close-app'
@@ -92,6 +94,7 @@ const getMainMenuEventCallback = (
     'main-menu-open-recent': callbacks.onOpenRecentFile,
     'main-menu-save': callbacks.onSaveProject,
     'main-menu-save-as': callbacks.onSaveProjectAs,
+    'main-menu-reload': callbacks.onReloadProject,
     'main-menu-show-version-history': callbacks.onShowVersionHistory,
     'main-menu-close': callbacks.onCloseProject,
     'main-menu-close-app': callbacks.onCloseApp,
@@ -166,6 +169,11 @@ export const buildMainMenuDeclarativeTemplate = ({
         accelerator: getElectronAccelerator(shortcutMap['SAVE_PROJECT_AS']),
         onClickSendEvent: 'main-menu-save-as',
         enabled: canSaveProjectAs,
+      },
+      {
+        label: i18n._(t`Reload project`),
+        onClickSendEvent: 'main-menu-reload',
+        enabled: !!project,
       },
       {
         label: i18n._(t`Show Git tool`),

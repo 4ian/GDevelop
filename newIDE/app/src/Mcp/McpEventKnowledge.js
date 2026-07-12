@@ -510,7 +510,7 @@ const classifyParameterValueShape = (parameterType: string): string => {
 const summarizeParameter = (
   parameterMetadata: gdParameterMetadata,
   index: number,
-  options?: {| compact?: boolean, dslName?: string |}
+  options?: {| compact?: boolean, parameterName?: string |}
 ): Object => {
   const valueTypeMetadata = parameterMetadata.getValueTypeMetadata();
   const type = parameterMetadata.getType();
@@ -528,9 +528,9 @@ const summarizeParameter = (
   // relationalOperator, yesorno, trueorfalse). E.g. a boolean SetBooleanVariable
   // operator accepts ["True","False","Toggle"] — not yes/no/true/1.
   const acceptedValues = acceptedValuesForParameter(type, extraInfo);
-  const dslName =
-    (options && options.dslName) ||
-    getInstructionParameterBaseDslName(parameterMetadata, index);
+  const parameterName =
+    (options && options.parameterName) ||
+    getInstructionParameterBaseName(parameterMetadata, index);
   if (options && options.compact) {
     // Compact form drops the verbose valueType discriminator object and keeps
     // only what a caller needs to fill the parameter correctly.
@@ -538,7 +538,7 @@ const summarizeParameter = (
       index,
       type,
       name: parameterMetadata.getName() || undefined,
-      dslName,
+      parameterName,
       description: parameterMetadata.getDescription() || undefined,
       isOptional: parameterMetadata.isOptional(),
       defaultValue: parameterMetadata.getDefaultValue() || undefined,
@@ -552,7 +552,7 @@ const summarizeParameter = (
     index,
     type,
     name: parameterMetadata.getName() || undefined,
-    dslName,
+    parameterName,
     description: parameterMetadata.getDescription() || undefined,
     longDescription: parameterMetadata.getLongDescription() || undefined,
     hint: parameterMetadata.getHint() || undefined,
@@ -585,6 +585,13 @@ const summarizeParameter = (
 const isDeprecatedOrHiddenInstructionMetadata = (
   metadata: gdInstructionMetadata
 ): boolean => metadata.isHidden() || !!metadata.getDeprecationMessage();
+
+const isDeprecatedExpressionMetadata = (
+  metadata: gdExpressionMetadata
+): boolean =>
+  !metadata.isShown() ||
+  metadata.isDeprecated() ||
+  !!metadata.getDeprecationMessage();
 
 const getRawInstructionMetadata = (
   project: gdProject,
@@ -794,7 +801,7 @@ const getTargetScopeCompatibility = (
   };
 };
 
-const summarizeInstructionMetadata = ({
+export const summarizeInstructionMetadata = ({
   type,
   kind,
   metadata,
@@ -848,7 +855,7 @@ const summarizeInstructionMetadata = ({
     eventScopes,
     targetScope
   );
-  const parameterDslNames = getUniqueInstructionParameterDslNames(metadata);
+  const parameterNames = getUniqueInstructionParameterNames(metadata);
   if (compact) {
     return {
       kind,
@@ -865,7 +872,7 @@ const summarizeInstructionMetadata = ({
       parameters: mapFor(0, metadata.getParametersCount(), index =>
         summarizeParameter(metadata.getParameter(index), index, {
           compact: true,
-          dslName: parameterDslNames[index],
+          parameterName: parameterNames[index],
         })
       ),
     };
@@ -901,13 +908,13 @@ const summarizeInstructionMetadata = ({
     parameterShape,
     parameters: mapFor(0, metadata.getParametersCount(), index =>
       summarizeParameter(metadata.getParameter(index), index, {
-        dslName: parameterDslNames[index],
+        parameterName: parameterNames[index],
       })
     ),
   };
 };
 
-const summarizeExpressionMetadata = ({
+export const summarizeExpressionMetadata = ({
   type,
   metadata,
   fullGroupName,
@@ -925,7 +932,7 @@ const summarizeExpressionMetadata = ({
     eventScopes,
     targetScope
   );
-  const parameterDslNames = getUniqueInstructionParameterDslNames(metadata);
+  const parameterNames = getUniqueInstructionParameterNames(metadata);
   if (compact) {
     return {
       kind: 'expression',
@@ -939,7 +946,7 @@ const summarizeExpressionMetadata = ({
       parameters: mapFor(0, metadata.getParametersCount(), index =>
         summarizeParameter(metadata.getParameter(index), index, {
           compact: true,
-          dslName: parameterDslNames[index],
+          parameterName: parameterNames[index],
         })
       ),
     };
@@ -965,7 +972,7 @@ const summarizeExpressionMetadata = ({
     deprecationMessage: metadata.getDeprecationMessage() || undefined,
     parameters: mapFor(0, metadata.getParametersCount(), index =>
       summarizeParameter(metadata.getParameter(index), index, {
-        dslName: parameterDslNames[index],
+        parameterName: parameterNames[index],
       })
     ),
   };
@@ -1810,7 +1817,7 @@ const normalizeInstructionParameterKey = (value: string): string =>
     .replace(/['’]s\b/g, '')
     .replace(/[^a-z0-9]+/g, '');
 
-const getInstructionParameterDslName = (
+const getInstructionParameterName = (
   parameterMetadata: gdParameterMetadata
 ): string => {
   const typeKey = normalizeInstructionParameterKey(
@@ -1834,7 +1841,7 @@ const getInstructionParameterDslName = (
   return '';
 };
 
-const getInstructionParameterBaseDslName = (
+const getInstructionParameterBaseName = (
   parameterMetadata: gdParameterMetadata,
   index: number
 ): string => {
@@ -1843,7 +1850,7 @@ const getInstructionParameterBaseDslName = (
     parameterMetadata.getDescription() ||
     `Parameter ${index}`;
   return (
-    getInstructionParameterDslName(parameterMetadata) ||
+    getInstructionParameterName(parameterMetadata) ||
     displayName
       .trim()
       .toLowerCase()
@@ -1854,11 +1861,9 @@ const getInstructionParameterBaseDslName = (
   );
 };
 
-const getUniqueInstructionParameterDslNames = (
-  metadata: any
-): Array<string> => {
+const getUniqueInstructionParameterNames = (metadata: any): Array<string> => {
   const baseNames = mapFor(0, metadata.getParametersCount(), index =>
-    getInstructionParameterBaseDslName(metadata.getParameter(index), index)
+    getInstructionParameterBaseName(metadata.getParameter(index), index)
   );
   const counts = {};
   baseNames.forEach(baseName => {
@@ -1877,6 +1882,185 @@ const getUniqueInstructionParameterDslNames = (
     used.add(uniqueName);
     return uniqueName;
   });
+};
+
+const catalogParameters = (parameters: Array<Object>): Array<Object> =>
+  parameters.map(parameter => {
+    const catalogParameter: Object = {
+      dslName: parameter.parameterName,
+      type: parameter.type,
+    };
+    const description = parameter.description || parameter.longDescription;
+    if (description) catalogParameter.description = description;
+    if (parameter.isOptional) catalogParameter.isOptional = true;
+    if (parameter.isCodeOnly) catalogParameter.isCodeOnly = true;
+    if (parameter.defaultValue !== undefined)
+      catalogParameter.defaultValue = parameter.defaultValue;
+    if (parameter.acceptedValues)
+      catalogParameter.acceptedValues = parameter.acceptedValues;
+    if (parameter.extraInfo) catalogParameter.extraInfo = parameter.extraInfo;
+    if (parameter.hint) catalogParameter.hint = parameter.hint;
+    return catalogParameter;
+  });
+
+const catalogEventScopes = (eventScopes: Object): Array<string> =>
+  [
+    'scene',
+    'extensionFunction',
+    'behaviorFunction',
+    'objectFunction',
+    'asyncFunction',
+    'customObjectInternal',
+  ].filter(scopeName => eventScopes[scopeName].valid);
+
+const catalogOwner = (scope: Object): ?Object => {
+  const owner: Object = {};
+  if (scope.extension && scope.extension.name)
+    owner.extension = scope.extension.name;
+  if (scope.objectMetadata && scope.objectMetadata.name)
+    owner.objectType = scope.objectMetadata.name;
+  if (scope.behaviorMetadata && scope.behaviorMetadata.name)
+    owner.behaviorType = scope.behaviorMetadata.name;
+  return Object.keys(owner).length ? owner : undefined;
+};
+
+const catalogInstruction = (summary: Object, scope: Object): Object => {
+  const instruction: Object = {
+    type: summary.type,
+    name: summary.fullName,
+    description: summary.description,
+    sentence: summary.sentence,
+    group: summary.group,
+    eventScopes: catalogEventScopes(summary.eventScopes),
+    parameters: catalogParameters(summary.parameters || []),
+  };
+  if (summary.canHaveSubInstructions) instruction.canHaveSubInstructions = true;
+  if (summary.isAsync) instruction.isAsync = true;
+  if (summary.isOptionallyAsync) instruction.isOptionallyAsync = true;
+  if (summary.deprecationMessage)
+    instruction.deprecationMessage = summary.deprecationMessage;
+  const owner = catalogOwner(scope);
+  if (owner) instruction.owner = owner;
+  return instruction;
+};
+
+const catalogExpression = (summary: Object, scope: Object): Object => {
+  const expression: Object = {
+    type: summary.type,
+    name: summary.fullName,
+    description: summary.description,
+    group: summary.group,
+    returnType: summary.returnType,
+    eventScopes: catalogEventScopes(summary.eventScopes),
+    parameters: catalogParameters(summary.parameters || []),
+  };
+  if (summary.deprecationMessage)
+    expression.deprecationMessage = summary.deprecationMessage;
+  const owner = catalogOwner(scope);
+  if (owner) expression.owner = owner;
+  return expression;
+};
+
+export const buildCompleteProjectInstructionCatalog = ({
+  project,
+  i18n,
+}: {|
+  project: gdProject,
+  i18n?: any,
+|}): Object => {
+  const collectInstructions = (isCondition: boolean) => {
+    const entriesByType: Map<string, Object> = new Map();
+    enumerateAllInstructions(isCondition, project, (i18n || null: any), {
+      includeHiddenAndCompatibility: true,
+    }).forEach(instruction => {
+      // The events editor treats every hidden instruction as deprecated and
+      // renders it with the [DEPRECATED] warning, including older APIs such as
+      // TextObject::String that do not carry a deprecation message.
+      if (isDeprecatedOrHiddenInstructionMetadata(instruction.metadata)) return;
+      if (entriesByType.has(instruction.type)) return;
+      const summary = summarizeInstructionMetadata({
+        type: instruction.type,
+        kind: isCondition ? 'condition' : 'action',
+        metadata: instruction.metadata,
+        fullGroupName: instruction.fullGroupName,
+      });
+      entriesByType.set(
+        instruction.type,
+        catalogInstruction(summary, instruction.scope)
+      );
+    });
+    return Array.from(entriesByType.values()).sort((left, right) =>
+      left.type.localeCompare(right.type)
+    );
+  };
+
+  const expressionsByKey: Map<string, Object> = new Map();
+  enumerateAllExpressions('', project, (i18n || null: any)).forEach(
+    expression => {
+      if (isDeprecatedExpressionMetadata(expression.metadata)) return;
+      const key = `${
+        expression.type
+      }\u0000${expression.metadata.getReturnType()}`;
+      if (expressionsByKey.has(key)) return;
+      const summary = summarizeExpressionMetadata({
+        type: expression.type,
+        metadata: expression.metadata,
+        fullGroupName: expression.fullGroupName,
+      });
+      expressionsByKey.set(key, catalogExpression(summary, expression.scope));
+    }
+  );
+  const expressions = Array.from(expressionsByKey.values()).sort(
+    (left, right) =>
+      left.type.localeCompare(right.type) ||
+      String(left.returnType).localeCompare(String(right.returnType))
+  );
+  const actions = collectInstructions(false);
+  const conditions = collectInstructions(true);
+
+  return {
+    format: 'gdevelop-ifdo-instruction-catalog',
+    formatVersion: 1,
+    project: {
+      name: project.getName(),
+      uuid: project.getProjectUuid(),
+    },
+    authoring: {
+      sourceExtension: '.events',
+      preferredSyntax:
+        'Use the exact instruction type and named parameters from this catalog. The DSL does not define hardcoded instruction aliases.',
+      catalogConditionSyntax:
+        'if InstructionType dslName="exact serialized operand"',
+      catalogActionSyntax:
+        'do InstructionType dslName="exact serialized operand"',
+      eventScopes: {
+        scene: 'Scene and external events',
+        extensionFunction: 'Free extension function events',
+        behaviorFunction: 'Events-based behavior function events',
+        objectFunction: 'Events-based object function events',
+        asyncFunction: 'Asynchronous function events',
+        customObjectInternal: 'Custom object internal events',
+      },
+      rules: [
+        'Write catalog instruction types directly without an @ prefix.',
+        'Use each parameter dslName exactly as listed.',
+        'Catalog-form argument values are JSON strings containing the exact GDevelop serialized operand.',
+        'Include every required parameter. Code-only parameters may be omitted and compile to an empty string.',
+        'Keep parameter expressions inside the JSON string, including embedded quotes where required.',
+        'Use only entries compatible with the target event scope.',
+        'Never write @exact. Use only instruction and expression types represented by this catalog.',
+        'Editor-hidden or deprecated instructions and expressions are intentionally excluded and must not be authored.',
+      ],
+    },
+    counts: {
+      actions: actions.length,
+      conditions: conditions.length,
+      expressions: expressions.length,
+    },
+    actions,
+    conditions,
+    expressions,
+  };
 };
 
 // High-level instruction builder (#8): given an instruction type + a map of
@@ -1936,14 +2120,14 @@ export const buildInstruction = ({
   });
   const consumedParameterKeys: Set<string> = new Set();
   const count = metadata.getParametersCount();
-  const uniqueDslNames = getUniqueInstructionParameterDslNames(metadata);
+  const uniqueParameterNames = getUniqueInstructionParameterNames(metadata);
   const aliasCounts: { [string]: number } = {};
   const rawAliasesByIndex = mapFor(0, count, index => {
     const param = metadata.getParameter(index);
     const aliases = [
       param.getName(),
       param.getDescription(),
-      getInstructionParameterDslName(param),
+      getInstructionParameterName(param),
     ].filter(Boolean);
     aliases.forEach(alias => {
       const normalized = normalizeInstructionParameterKey(alias);
@@ -1961,7 +2145,7 @@ export const buildInstruction = ({
     // machine name. Include both plus stable AI-friendly aliases.
     const paramName = param.getName() || param.getDescription();
     const parameterAliases = [
-      uniqueDslNames[index],
+      uniqueParameterNames[index],
       ...rawAliasesByIndex[index].filter(
         alias => aliasCounts[normalizeInstructionParameterKey(alias)] === 1
       ),
@@ -2038,14 +2222,14 @@ export const buildInstruction = ({
     filled.push({
       index,
       name: paramName,
-      dslName: uniqueDslNames[index],
+      parameterName: uniqueParameterNames[index],
       value: serialized,
     });
   }
   Object.keys(named).forEach(key => {
     if (consumedParameterKeys.has(key)) return;
     warnings.push(
-      `Unknown parameter "${key}" for ${kind} "${type}". Use one of the unique dslName values (${uniqueDslNames.join(
+      `Unknown parameter "${key}" for ${kind} "${type}". Use one of the unique parameterName values (${uniqueParameterNames.join(
         ', '
       )}) or a numeric index.`
     );

@@ -124,9 +124,10 @@ import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/Even
 import { enumerateFunctionsInFolder } from '../EventsFunctionsList/EnumerateFunctionFolderOrFunction';
 import { type EventsFunctionCreationParameters } from '../EventsFunctionsList/EventsFunctionTreeViewItemContent';
 import { projectManagerItemReactDndType } from './ProjectManagerItemDragAndDrop';
+import EventsFunctionsExtensionsContext from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
+import { createEventsFunctionExtensionItem } from './CreateEventsFunctionExtensionItem';
 
 const electron = optionalRequire('electron');
-const gd: libGDevelop = global.gd;
 
 export const getProjectManagerItemId = (identifier: string): string =>
   `project-manager-tab-${identifier}`;
@@ -893,6 +894,9 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
     const unsavedChanges = React.useContext(UnsavedChangesContext);
     const { triggerUnsavedChanges } = unsavedChanges;
     const preferences = React.useContext(PreferencesContext);
+    const eventsFunctionsExtensionsState = React.useContext(
+      EventsFunctionsExtensionsContext
+    );
     const gdevelopTheme = React.useContext(GDevelopThemeContext);
     const { currentlyRunningInAppTutorial } = React.useContext(
       InAppTutorialContext
@@ -1196,25 +1200,17 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       (payload: CreateExtensionItemPayload) => {
         if (!project) return;
 
-        const eventsFunctionsExtension = payload.newExtensionName
-          ? project.insertNewEventsFunctionsExtension(
-              payload.newExtensionName,
-              project.getEventsFunctionsExtensionsCount()
-            )
-          : project.getEventsFunctionsExtension(payload.extensionName);
-
         closeCreateExtensionItemDialog();
+        const createdItem = createEventsFunctionExtensionItem({
+          project,
+          payload,
+          reloadExtensionMetadata:
+            eventsFunctionsExtensionsState.reloadProjectEventsFunctionsExtensionMetadata,
+        });
+        const { eventsFunctionsExtension } = createdItem;
 
-        if (payload.itemKind === 'prefab') {
-          const eventsBasedObjects = eventsFunctionsExtension.getEventsBasedObjects();
-          const eventsBasedObject = eventsBasedObjects.insertNew(
-            payload.itemName,
-            eventsBasedObjects.getCount()
-          );
-          eventsBasedObject.setFullName(payload.itemName);
-          eventsBasedObject.markAsRenderedIn3D(
-            payload.prefabObjectDimension === '3d'
-          );
+        if (createdItem.itemKind === 'prefab') {
+          const { eventsBasedObject } = createdItem;
           onProjectItemModified();
           forceUpdateList();
 
@@ -1239,13 +1235,8 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
           return;
         }
 
-        if (payload.itemKind === 'behavior') {
-          const eventsBasedBehaviors = eventsFunctionsExtension.getEventsBasedBehaviors();
-          const eventsBasedBehavior = eventsBasedBehaviors.insertNew(
-            payload.itemName,
-            eventsBasedBehaviors.getCount()
-          );
-          eventsBasedBehavior.setFullName(payload.itemName);
+        if (createdItem.itemKind === 'behavior') {
+          const { eventsBasedBehavior } = createdItem;
           onProjectItemModified();
           forceUpdateList();
 
@@ -1270,20 +1261,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
           return;
         }
 
-        const eventsFunctionsContainer = eventsFunctionsExtension.getEventsFunctions();
-        const rootFolder = eventsFunctionsContainer.getRootFolder();
-        const eventsFunction = eventsFunctionsContainer.insertNewEventsFunctionInFolder(
-          payload.itemName,
-          rootFolder,
-          rootFolder.getChildrenCount()
-        );
-        eventsFunction.setFunctionType(payload.functionType);
-        if (eventsFunction.isCondition() && !eventsFunction.isExpression()) {
-          gd.PropertyFunctionGenerator.generateConditionSkeleton(
-            project,
-            eventsFunction
-          );
-        }
+        const { eventsFunction } = createdItem;
         onProjectItemModified();
         forceUpdateList();
 
@@ -1315,6 +1293,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         project,
         scrollToItem,
         closeCreateExtensionItemDialog,
+        eventsFunctionsExtensionsState,
       ]
     );
 

@@ -7,6 +7,7 @@ import FlatButton from '../UI/FlatButton';
 import RaisedButton from '../UI/RaisedButton';
 import TextField from '../UI/TextField';
 import { ColumnStackLayout } from '../UI/Layout';
+import { isValidSceneName } from '../Utils/SceneNameValidator';
 
 type Props = {|
   project: gdProject,
@@ -31,6 +32,13 @@ const CreateSceneDialog = ({
   let sceneNameError = null;
   if (!trimmedSceneName) {
     sceneNameError = <Trans>Enter a scene name.</Trans>;
+  } else if (!isValidSceneName(sceneName)) {
+    sceneNameError = (
+      <Trans>
+        Use camelCase or snake_case. Spaces and special characters are not
+        allowed.
+      </Trans>
+    );
   } else if (project.hasLayoutNamed(trimmedSceneName)) {
     sceneNameError = <Trans>This scene name is already used.</Trans>;
   }

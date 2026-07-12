@@ -281,10 +281,15 @@ export const usePreviewDebuggerServerWatcher = (
     [previewDebuggerServer]
   );
 
-  const hasNonEditionPreviewsRunning = Object.keys(debuggerStatus).some(
+  // The embedded game frame is an editor surface, not a native preview window.
+  // It must not keep the global Preview button in its "Update" state.
+  const previewDebuggerStatusIds = Object.keys(debuggerStatus).filter(
+    key => key !== 'embedded-game-frame'
+  );
+  const hasNonEditionPreviewsRunning = previewDebuggerStatusIds.some(
     key => !debuggerStatus[key].isInGameEdition
   );
-  const nonEditionPreviewsCount = Object.keys(debuggerStatus).filter(
+  const nonEditionPreviewsCount = previewDebuggerStatusIds.filter(
     key => !debuggerStatus[key].isInGameEdition
   ).length;
   const hasInGameEditionPreviewRunning = Object.keys(debuggerStatus).some(

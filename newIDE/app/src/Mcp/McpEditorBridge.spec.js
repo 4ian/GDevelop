@@ -171,7 +171,53 @@ describe('McpEditorBridge', () => {
     expect(response.tools.map(tool => tool.name)).toContain(
       'gdevelop_get_editor_state'
     );
+    expect(response.tools.map(tool => tool.name)).toContain('reload_project');
     expect(response.tools.map(tool => tool.name)).not.toContain('create_scene');
+  });
+
+  it('reloads project files from disk and returns a synchronization receipt', async () => {
+    let currentProject: any = {
+      getName: () => 'Before reload',
+      getProjectFile: () => 'C:\\game\\project.settings',
+    };
+    const reloadProjectAndWait: any = (jest.fn(async () => {
+      currentProject = {
+        getName: () => 'After reload',
+        getProjectFile: () => 'C:\\game\\project.settings',
+      };
+      return {
+        reloaded: true,
+        fileIdentifier: 'C:\\game\\project.settings',
+      };
+    }): any);
+    const bridge = makeBridge({
+      getProject: () => currentProject,
+      reloadProjectAndWait,
+      getPersistenceState: () => ({
+        hasUnsavedChanges: true,
+        changesCount: 2,
+        timeOfFirstChangeSinceLastSave: 123,
+      }),
+    });
+
+    const response = await bridge.handleRendererMcpRequest({
+      method: 'tools/call',
+      params: { name: 'reload_project', arguments: {} },
+    });
+    const result = JSON.parse(response.content[0].text);
+
+    expect(response.isError).not.toBe(true);
+    expect(reloadProjectAndWait).toHaveBeenCalledTimes(1);
+    expect(result).toEqual(
+      expect.objectContaining({
+        success: true,
+        reloaded: true,
+        discardedUnsavedInMemoryChanges: true,
+        projectName: 'After reload',
+        projectFile: 'C:\\game\\project.settings',
+      })
+    );
+    expect(result.nextAction).toContain('launch_preview');
   });
 
   it('returns unexpected tool failures as structured JSON', async () => {
@@ -2377,17 +2423,13 @@ describe('McpEditorBridge', () => {
                 type: 'variable',
               },
             ],
-            events_dsl: [
+            events_json: [
               {
-                kind: 'standard',
+                type: 'BuiltinCommonInstructions::Standard',
                 conditions: [
                   {
-                    type: 'NumberVariable',
-                    parameters: {
-                      variable: 'SunCountVariable',
-                      comparison_sign: '>',
-                      value: 0,
-                    },
+                    type: { value: 'NumberVariable' },
+                    parameters: ['SunCountVariable', '>', '0'],
                   },
                 ],
                 actions: [],
@@ -5122,115 +5164,7 @@ describe('McpEditorBridge', () => {
     );
   });
 
-  it('validates compact event DSL on a temporary event sheet', async () => {
-    const project = gd.ProjectHelper.createNewGDJSProject();
-    project.insertNewLayout('Level1', 0);
-    try {
-      const bridge = makeBridge({ getProject: () => project });
-      const response = await bridge.handleRendererMcpRequest({
-        method: 'tools/call',
-        params: {
-          name: 'gdevelop_validate_events',
-          arguments: {
-            scene_name: 'Level1',
-            event_id_prefix: 'initialization',
-            events: [
-              {
-                kind: 'group',
-                name: 'Initialization',
-                children: [
-                  { kind: 'comment', text: 'Initialize level state.' },
-                ],
-              },
-            ],
-          },
-        },
-      });
-      const result = JSON.parse(response.content[0].text);
-
-      expect(response.isError).not.toBe(true);
-      expect(response.structuredContent).toEqual(result);
-      expect(result.success).toBe(true);
-      expect(result.valid).toBe(true);
-      expect(result.dryRun).toBe(true);
-      expect(result.wouldModify).toBe(true);
-      expect(result.eventSheetRevision).toMatch(/^fnv1a:/);
-      expect(result.proposedEventSheetRevision).toMatch(/^fnv1a:/);
-      expect(
-        project
-          .getLayout('Level1')
-          .getEvents()
-          .getEventsCount()
-      ).toBe(0);
-    } finally {
-      project.delete();
-    }
-  });
-
-  it('compiles gdevelop_apply_events DSL before forwarding the write', async () => {
-    const project = gd.ProjectHelper.createNewGDJSProject();
-    project.insertNewLayout('Level1', 0);
-    const processEditorFunctionCalls: any = jest.fn(async () => ({
-      results: [
-        {
-          status: 'finished',
-          call_id: 'mcp-call',
-          success: true,
-          didModifyProject: false,
-          output: { success: true },
-        },
-      ],
-    }));
-    try {
-      const bridge = makeBridge({
-        getProject: () => project,
-        getPermissions: () => ({
-          allowWriteTools: true,
-          allowCommandTools: false,
-        }),
-        processEditorFunctionCalls,
-      });
-      const response = await bridge.handleRendererMcpRequest({
-        method: 'tools/call',
-        params: {
-          name: 'gdevelop_apply_events',
-          arguments: {
-            scene_name: 'Level1',
-            event_id_prefix: 'gameplay',
-            events: [
-              {
-                kind: 'group',
-                name: 'Gameplay',
-                children: [{ kind: 'comment', text: 'Gameplay rules.' }],
-              },
-            ],
-          },
-        },
-      });
-
-      expect(response.isError).not.toBe(true);
-      const editorCall =
-        processEditorFunctionCalls.mock.calls[0][0].functionCalls[0];
-      expect(editorCall.name).toBe('add_scene_events');
-      const forwardedArguments = JSON.parse(editorCall.arguments);
-      expect(forwardedArguments.events).toBeUndefined();
-      expect(forwardedArguments.events_dsl).toBeUndefined();
-      expect(forwardedArguments.events_json[0]).toEqual(
-        expect.objectContaining({
-          type: 'BuiltinCommonInstructions::Group',
-          name: 'Gameplay',
-          aiGeneratedEventId: expect.stringMatching(/^gameplay-/),
-        })
-      );
-      expect(forwardedArguments.events_json[0].events[0].type).toBe(
-        'BuiltinCommonInstructions::Comment'
-      );
-    } finally {
-      project.delete();
-    }
-  });
-
-  it('returns a successful revision receipt when an event mutation outlives a reported editor failure', async () => {
+  it('returns a successful revision receipt when a raw event mutation outlives a reported editor failure', async () => {
     const project = gd.ProjectHelper.createNewGDJSProject();
     const layout = project.insertNewLayout('Level1', 0);
     const triggerUnsavedChanges: any = jest.fn();
@@ -5262,10 +5196,15 @@ describe('McpEditorBridge', () => {
       const response = await bridge.handleRendererMcpRequest({
         method: 'tools/call',
         params: {
-          name: 'gdevelop_apply_events',
+          name: 'add_scene_events',
           arguments: {
             scene_name: 'Level1',
-            events: [{ kind: 'comment', text: 'Applied once.' }],
+            events_json: [
+              {
+                type: 'BuiltinCommonInstructions::Comment',
+                comment: 'Applied once.',
+              },
+            ],
           },
         },
       });
@@ -5286,7 +5225,7 @@ describe('McpEditorBridge', () => {
     }
   });
 
-  it('rejects compact event writes against a stale event sheet revision', async () => {
+  it('rejects raw event writes against a stale event sheet revision', async () => {
     const project = gd.ProjectHelper.createNewGDJSProject();
     project.insertNewLayout('Level1', 0);
     const processEditorFunctionCalls: any = jest.fn();
@@ -5302,11 +5241,16 @@ describe('McpEditorBridge', () => {
       const response = await bridge.handleRendererMcpRequest({
         method: 'tools/call',
         params: {
-          name: 'gdevelop_apply_events',
+          name: 'add_scene_events',
           arguments: {
             scene_name: 'Level1',
             expected_revision: 'fnv1a:stale',
-            events: [{ kind: 'comment', text: 'Should not be written.' }],
+            events_json: [
+              {
+                type: 'BuiltinCommonInstructions::Comment',
+                comment: 'Should not be written.',
+              },
+            ],
           },
         },
       });
@@ -5985,7 +5929,7 @@ describe('McpEditorBridge', () => {
     }
   });
 
-  it('assigns unique CollisionNP DSL names and builds it without indexes', async () => {
+  it('assigns unique CollisionNP parameter names and builds it without indexes', async () => {
     const project = gd.ProjectHelper.createNewGDJSProject();
     project.insertNewLayout('Level1', 0);
     try {
@@ -5998,9 +5942,11 @@ describe('McpEditorBridge', () => {
         },
       });
       const metadata = JSON.parse(metadataResponse.content[0].text);
-      const dslNames = metadata.parameters.map(parameter => parameter.dslName);
-      expect(new Set(dslNames).size).toBe(dslNames.length);
-      expect(dslNames).toEqual(
+      const parameterNames = metadata.parameters.map(
+        parameter => parameter.parameterName
+      );
+      expect(new Set(parameterNames).size).toBe(parameterNames.length);
+      expect(parameterNames).toEqual(
         expect.arrayContaining(['first_object', 'second_object'])
       );
 
@@ -6021,9 +5967,9 @@ describe('McpEditorBridge', () => {
       expect(conditionResponse.isError).not.toBe(true);
       expect(condition.instruction.parameters[0]).toBe('Player');
       expect(condition.instruction.parameters[1]).toBe('Enemy');
-      expect(condition.filled.map(parameter => parameter.dslName)).toEqual(
-        expect.arrayContaining(['first_object', 'second_object'])
-      );
+      expect(
+        condition.filled.map(parameter => parameter.parameterName)
+      ).toEqual(expect.arrayContaining(['first_object', 'second_object']));
     } finally {
       project.delete();
     }

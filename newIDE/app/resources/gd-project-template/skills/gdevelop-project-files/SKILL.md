@@ -1,0 +1,201 @@
+---
+name: gdevelop-project-files
+description: Create, inspect, modify, refactor, and verify GDevelop games through the multi-file project sources (`project.settings`, `.settings`, `.layout`, and `.events`). Use for any GDevelop project, scene, object, behavior, prefab, extension, variable, resource, layout, or event-sheet work. Read the generated instruction catalog for event authoring; synchronize direct edits with the GDevelop MCP `reload_project` tool before preview debugging.
+---
+
+# GDevelop Project Files
+
+## Source of truth
+
+Treat project files as authoritative. Modify them directly; do not use MCP to
+author the game.
+
+Read, in order:
+
+1. `project.settings` for project metadata and non-global-config project data.
+2. `resources.settings` for the complete project resource registry.
+3. `config.settings` for the complete arbitrary global-config subtree.
+4. Relevant child `.settings` files for semantic configuration.
+5. Relevant `.layout` files for visual/UI configuration.
+6. Relevant `.events` files for IfDo event logic.
+7. `.gdevelop/instructions-catalog.json` before adding or changing
+   instructions.
+
+The catalog is regenerated from the loaded project every time GDevelop saves.
+Never edit it. Search it narrowly with `rg` by instruction type, displayed
+name, group, description, parameter `dslName`, or expression name instead of
+loading the whole file into context. The generated JSON keeps one catalog entry
+per line so a matching search returns only the relevant instruction.
+
+Do not edit legacy project JSON, including `.gdevelop/game.json`. It is
+generated compatibility/runtime output, not multi-file source.
+
+## File contract
+
+- `.settings`: TOML semantic/configuration data. Keep every file independent,
+  append-safe, and unindented. Never embed another settings fragment.
+- `config.settings`: edit global configuration only under
+  `[project.globalConfig]`; preserve arbitrary keys and the format-owned
+  `[gdevelopConfig]`/`[gdevelopConfig.rawJson]` tables.
+- `.layout`: unindented TOML containing visual/UI data only: objects, layers,
+  instances, editor view state, and prefab visual composition.
+- `.events`: IfDo DSL only. Do not embed TOML or raw event JSON.
+- References: use canonical `game://...` URIs rooted at `project.settings`.
+- `.gdevelop/`: generated/editor state. Read catalogs; do not author sources
+  there.
+
+Preserve manifest order, stable names, existing unknown fields, and ownership
+boundaries. Make the smallest coherent patch. When adding a component, add its
+manifest entry and every referenced source file in the same change.
+
+## Project layout
+
+```text
+project.settings
+resources.settings
+config.settings
+scenes/<Scene>/<Scene>.layout
+scenes/<Scene>/<Scene>.events
+scenes/<Scene>/scene.settings
+externals/external.settings
+externals/<External>.layout
+externals/<External>.events
+extensions/<Extension>/extension.settings
+extensions/<Extension>/functions/<Function>/function.settings
+extensions/<Extension>/functions/<Function>/<Function>.events
+extensions/<Extension>/prefabs/<Prefab>/prefab.settings
+extensions/<Extension>/prefabs/<Prefab>/<Prefab>.layout
+extensions/<Extension>/prefabs/<Prefab>/<Function>.events
+extensions/<Extension>/behaviors/<Behavior>/behavior.settings
+extensions/<Extension>/behaviors/<Behavior>/<Function>.events
+.gdevelop/instructions-catalog.json
+```
+
+Only create optional folders when the owning manifest references them.
+
+## Event authoring
+
+Use the generated catalog for every instruction. Find the entry under
+`conditions` or `actions`, use its exact `type`, and supply parameters by their
+exact `dslName`. Values are JSON strings containing the exact serialized
+GDevelop operand. The DSL has no hardcoded instruction aliases:
+
+```events
+if Extension::Condition target="Player" threshold="Variable(Limit)"
+do Extension::Action target="Player" text="\"Ready\"" runtime=""
+if SceneJustBegins
+```
+
+Rules:
+
+- Write catalog instruction types directly; never prefix them with `@`.
+- Do not replace catalog types with prose aliases such as `scene begins`.
+- Use only catalog entries valid for the target event scope.
+- Use every required parameter exactly once.
+- Omit code-only parameters when their value is the standard empty string.
+- Preserve quotes inside string-expression operands.
+- Never write `@exact`. If a persisted type is absent, first regenerate the
+  catalog by saving with the editor. Do not reuse it for new events if it stays
+  absent; the catalog intentionally excludes editor-hidden and deprecated APIs.
+- Guard every action with at least one effective condition in its event or an
+  ancestor event. Never place an action on an unconditional path that executes
+  every frame. Use an explicit trigger, state/input check, timer, comparison,
+  or other condition that expresses when the action is allowed to run.
+- Before every object-targeting action, ensure the current picking set contains
+  at most one instance of that object. Use `for each Object` when multiple
+  instances must be processed one at a time, or narrow the selection with
+  conditions such as a unique ID/state match, nearest-object pick, collision,
+  or another deterministic selector. Never rely on an object action implicitly
+  applying to an unrestricted multi-instance selection.
+- Keep OR alternatives as consecutive `if`/`or` lines.
+- Prefix every child-event line with `>` and every nested instruction with
+  `?`.
+- Keep JavaScript events opt-in; use native instructions first.
+
+Common structure:
+
+```events
+@event aiGeneratedEventId="descriptive-id"
+if SceneJustBegins
+do DebuggerTools::ConsoleLog message_to_log="\"started\""
+
+> @event aiGeneratedEventId="child-id"
+> if CollisionNP first_object="Player" second_object="Enemy"
+> do Delete object="Enemy"
+
+@group "Combat" source="" creationTime=0 color=[74,176,228] parameters=[]
+@event aiGeneratedEventId="damage-enemy"
+if CollisionNP first_object="Bullet" second_object="Enemy"
+do SetNumberObjectVariable object="Enemy" variable="HP" modification_sign="-" value="1"
+do Delete object="Bullet"
+@end group
+```
+
+Use `local`, `else`, `repeat`, `while`, `for each`, `for each child`, `link`,
+`@group ... @end group`, and `@js ... @end js` only according to the canonical
+grammar. Write comments as one `@comment "content" background=[r,g,b] text=[r,g,b]` statement; never use hash-comment event syntax. Every `@end`
+requires its `group` or `js` suffix. Preserve `@event`, `@instruction`, group,
+loop, comment, and JavaScript metadata when editing existing sources.
+
+## Direct-edit workflow
+
+1. Inspect manifests and only the owned files relevant to the request.
+2. Search `.gdevelop/instructions-catalog.json` for required instructions and
+   expressions. The generated catalog excludes editor-hidden and deprecated
+   APIs; never invent or reuse an instruction identifier that is absent from it
+   when authoring new events.
+3. Patch source files directly. Use `apply_patch` for precise edits.
+4. Re-read every changed manifest reference and verify that each `game://` URI
+   exists and stays inside the project.
+5. Check TOML syntax, duplicate namespaces, event depth, instruction names,
+   named parameters, and asset paths.
+6. Call the GDevelop MCP `reload_project` tool and require a successful reload
+   receipt. Do not invoke an MCP save that could replace newer disk edits with
+   stale editor memory.
+7. For gameplay or visual changes, call `launch_preview` only after step 6.
+   If any project source changes after the reload, call `reload_project` again
+   before the next preview.
+
+For assets, write the asset file inside the project, add/update its resource
+entry in `resources.settings`, then reference its project-relative path from UI
+configuration. Do not create generated images when a code-native or existing
+asset is appropriate.
+
+## MCP boundary
+
+MCP is synchronization/read/debug-only. Use it only for:
+
+- Reloading direct disk edits into the editor with `reload_project`.
+- Current editor/project/selection queries.
+- Launching or controlling a debug preview.
+- Deterministic frame stepping and input simulation.
+- Inspecting live runtime state, logs, errors, audio, and instance positions.
+- Capturing preview screenshots.
+
+Never use MCP to create scenes, objects, resources, variables, instances,
+extensions, behaviors, prefabs, or events. Never use generic editor-call,
+command, patch, sync, or save tools for authoring.
+
+`reload_project` is a mandatory preview gate. In every direct-edit task, call
+it successfully at least once after the most recent source-file edit and before
+the first `launch_preview`. Never launch or relaunch a preview from stale editor
+memory. A later source edit invalidates the earlier reload receipt.
+
+## Verification
+
+Before finishing:
+
+- Confirm every changed TOML file is unindented and independently parseable.
+- Confirm `.layout` changes are visual/UI-only.
+- Confirm settings references use `game://` and resolve to existing files.
+- Confirm catalog instruction types, kinds, scopes, and `dslName` arguments.
+- Confirm every action has an effective condition in its event or ancestor
+  chain and no unconditional action can execute every frame.
+- Confirm every object-targeting action operates on a provably single picked
+  instance; use `for each` when processing multiple instances.
+- Confirm no legacy JSON was changed.
+- Confirm `reload_project` succeeded after the final source edit and before any
+  `launch_preview` call.
+- Debug runtime behavior with a fresh preview when behavior, rendering, input,
+  audio, timing, or object picking changed.
+- Report changed source files and concrete verification evidence.

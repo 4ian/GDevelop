@@ -32,12 +32,6 @@ import {
   collectSerializedEventJsonIssues,
 } from './McpEventKnowledge';
 import {
-  getEventDslReference,
-  getSerializedEventsRevision,
-  isEventsDsl,
-  normalizeEventDslArguments,
-} from './McpEventDsl';
-import {
   addMissingObjectBehaviors,
   addObjectUndeclaredVariables,
   addUndeclaredVariables,
@@ -118,6 +112,7 @@ import {
   createGroup,
   ensureSceneEventIds,
   findSceneEvents,
+  getSerializedEventsRevision,
   inspectGameplayRules,
   lintSceneEvents,
   moveEventsToGroup,
@@ -233,6 +228,7 @@ type McpEditorBridgeContext = {|
   // tab. Optional: when absent, launch_preview falls back to runCommand (which
   // previews the active tab) and flags that scene selection was not honored.
   launchPreviewForScene?: (sceneName: ?string) => mixed,
+  reloadProjectAndWait?: () => Promise<any>,
   saveProjectAndWait?: () => Promise<any>,
   getPersistenceState?: () => {|
     hasUnsavedChanges: boolean,
@@ -4244,13 +4240,11 @@ const applyEventChangeDependenciesForSimulation = ({
   });
 };
 
-const dryRunSceneEventDsl = ({
+const dryRunSceneEventChanges = ({
   project,
-  i18n,
   args,
 }: {
   project: gdProject,
-  i18n?: any,
   args: Object,
 }): Object => {
   const sceneName =
@@ -4259,18 +4253,16 @@ const dryRunSceneEventDsl = ({
   if (!project.hasLayoutNamed(sceneName)) {
     throw new Error(`Scene "${sceneName}" does not exist.`);
   }
-  const normalized = normalizeEventDslArguments({ project, i18n, args });
-  const eventChanges = makeSimulationEventChanges(normalized.args);
+  const eventChanges = makeSimulationEventChanges(args);
   if (!eventChanges.length) {
-    throw new Error('Provide events or one or more operations.');
+    throw new Error('Provide events_json or one or more event_changes.');
   }
 
   const currentSerializedEvents = serializeToJSObject(
     project.getLayout(sceneName).getEvents()
   );
   const currentRevision = getSerializedEventsRevision(currentSerializedEvents);
-  const expectedRevision =
-    normalized.args.expected_revision || normalized.args.expectedRevision;
+  const expectedRevision = args.expected_revision || args.expectedRevision;
   if (expectedRevision && expectedRevision !== currentRevision) {
     return {
       success: false,
@@ -4293,13 +4285,13 @@ const dryRunSceneEventDsl = ({
     applyEventChangeDependenciesForSimulation({
       project: validationProject,
       scene: validationScene,
-      args: normalized.args,
+      args,
     });
     const application = applyEventsChanges(
       validationProject,
       validationScene.getEvents(),
       eventChanges,
-      normalized.args.generated_event_id || 'mcp-dsl-event'
+      args.generated_event_id || 'mcp-generated-event'
     );
     const proposedSerializedEvents = serializeToJSObject(
       validationScene.getEvents()
@@ -4318,7 +4310,6 @@ const dryRunSceneEventDsl = ({
         eventSheetRevision: currentRevision,
         proposedEventSheetRevision: proposedRevision,
         errors: application.errors,
-        compilations: normalized.compilations,
       };
     }
 
@@ -4326,12 +4317,12 @@ const dryRunSceneEventDsl = ({
       project: validationProject,
       sceneName,
       eventsJson: JSON.stringify(proposedSerializedEvents),
-      allowJavaScriptEvents: !!normalized.args.allow_javascript_events,
-      dedupeErrors: !!normalized.args.dedupe_errors,
-      summaryOnly: normalized.args.summary_only !== false,
-      errorsOnly: !!normalized.args.errors_only,
-      includeRenderedEvents: !!normalized.args.include_rendered_events,
-      includeNormalizedJson: !!normalized.args.include_normalized_json,
+      allowJavaScriptEvents: !!args.allow_javascript_events,
+      dedupeErrors: !!args.dedupe_errors,
+      summaryOnly: args.summary_only !== false,
+      errorsOnly: !!args.errors_only,
+      includeRenderedEvents: !!args.include_rendered_events,
+      includeNormalizedJson: !!args.include_normalized_json,
     });
     return {
       ...validation,
@@ -4344,7 +4335,6 @@ const dryRunSceneEventDsl = ({
       proposedEventSheetRevision: proposedRevision,
       requestedOperations: eventChanges.length,
       lowLevelMutations: application.applied,
-      compilations: normalized.compilations,
     };
   } finally {
     validationProject.delete();
@@ -4869,6 +4859,48 @@ const callMcpTool = async ({
     return textResult(getProjectSummary(project, args.sceneName));
   }
 
+  if (toolName === 'reload_project') {
+    if (!project) return errorResult('No project opened.');
+    if (!context.reloadProjectAndWait) {
+      return errorResult(
+        'The GDevelop host did not provide reloadProjectAndWait, so MCP cannot reload project files from disk.'
+      );
+    }
+
+    const persistenceState = context.getPersistenceState
+      ? context.getPersistenceState()
+      : null;
+    try {
+      const reloadResult = await context.reloadProjectAndWait();
+      if (reloadResult && reloadResult.reloaded === false) {
+        return errorResult(
+          reloadResult.reason || 'The project could not be reloaded from disk.',
+          { reload: reloadResult }
+        );
+      }
+      const reloadedProject = context.getProject();
+      return textResult({
+        success: true,
+        reloaded: true,
+        discardedUnsavedInMemoryChanges:
+          !!persistenceState && persistenceState.hasUnsavedChanges,
+        projectName: reloadedProject ? reloadedProject.getName() : undefined,
+        projectFile: reloadedProject
+          ? reloadedProject.getProjectFile() || undefined
+          : undefined,
+        reload: reloadResult || undefined,
+        nextAction:
+          'Project disk sources are loaded. You may now call launch_preview.',
+      });
+    } catch (error) {
+      return errorResult(
+        error && error.message
+          ? error.message
+          : 'Unable to reload the project from disk.'
+      );
+    }
+  }
+
   if (toolName === 'gdevelop_read_project_json') {
     if (!project) return errorResult('No project opened.');
     return textResult(
@@ -4986,26 +5018,13 @@ const callMcpTool = async ({
     );
   }
 
-  if (toolName === 'gdevelop_get_event_dsl_reference') {
-    return textResult(getEventDslReference());
-  }
-
   if (toolName === 'gdevelop_get_event_operation_reference') {
     return textResult(getEventOperationReference());
   }
 
   if (toolName === 'gdevelop_validate_events_json') {
     if (!project) return errorResult('No project opened.');
-    let validationArgs = args || {};
-    try {
-      validationArgs = normalizeEventDslArguments({
-        project,
-        i18n: context.i18n,
-        args: validationArgs,
-      }).args;
-    } catch (error) {
-      return errorResult(error.message, { code: 'EVENT_DSL_INVALID' });
-    }
+    const validationArgs = args || {};
     return textResult(
       validateEventsJson({
         project,
@@ -5024,28 +5043,12 @@ const callMcpTool = async ({
     );
   }
 
-  if (toolName === 'gdevelop_validate_events') {
-    if (!project) return errorResult('No project opened.');
-    try {
-      return textResult(
-        dryRunSceneEventDsl({ project, i18n: context.i18n, args: args || {} })
-      );
-    } catch (error) {
-      return errorResult(error.message, { code: 'EVENT_DSL_INVALID' });
-    }
-  }
-
   if (toolName === 'gdevelop_validate_extension_events_json') {
     if (!project) return errorResult('No project opened.');
     try {
-      const validationArgs = normalizeEventDslArguments({
-        project,
-        i18n: context.i18n,
-        args: args || {},
-      }).args;
-      return textResult(validateExtensionEventsJson(project, validationArgs));
+      return textResult(validateExtensionEventsJson(project, args || {}));
     } catch (error) {
-      return errorResult(error.message, { code: 'EVENT_DSL_INVALID' });
+      return errorResult(error.message);
     }
   }
 
@@ -5930,19 +5933,6 @@ const callMcpTool = async ({
     }
   }
 
-  if (toolName === 'gdevelop_apply_events') {
-    if (!project) return errorResult('No project opened.');
-    return callMcpTool({
-      toolName: 'add_scene_events',
-      args: {
-        ...(args || {}),
-        events_dsl: args && args.events,
-        event_patch: args && args.operations,
-      },
-      context,
-    });
-  }
-
   if (toolName === 'gdevelop_editor_call') {
     if (!args || typeof args.name !== 'string') {
       return errorResult('Missing EditorFunction name.');
@@ -5980,33 +5970,11 @@ const callMcpTool = async ({
 
   let eventWriteArgs = args || {};
   if (toolName === 'add_scene_events' || toolName === 'generate_events') {
-    const hasDslInput = !!(
-      eventWriteArgs.events_dsl !== undefined ||
-      eventWriteArgs.eventsDsl !== undefined ||
-      eventWriteArgs.event_patch !== undefined ||
-      eventWriteArgs.operations !== undefined ||
-      (eventWriteArgs.events !== undefined &&
-        isEventsDsl(eventWriteArgs.events))
-    );
     if (
       !getEventsJsonArgument(eventWriteArgs) &&
-      !eventWriteArgs.event_changes &&
-      !hasDslInput
+      !eventWriteArgs.event_changes
     ) {
       return errorResult(mcpDirectEventsRequiredMessage);
-    }
-    if (project) {
-      try {
-        eventWriteArgs = normalizeEventDslArguments({
-          project,
-          i18n: context.i18n,
-          args: eventWriteArgs,
-        }).args;
-      } catch (error) {
-        return errorResult(error.message, { code: 'EVENT_DSL_INVALID' });
-      }
-    } else if (hasDslInput) {
-      return errorResult('No project opened.');
     }
     const sceneName = eventWriteArgs.scene_name;
     if (typeof sceneName !== 'string' || !sceneName) {
@@ -6039,14 +6007,13 @@ const callMcpTool = async ({
     ) {
       try {
         return textResult(
-          dryRunSceneEventDsl({
+          dryRunSceneEventChanges({
             project,
-            i18n: context.i18n,
             args: eventWriteArgs,
           })
         );
       } catch (error) {
-        return errorResult(error.message, { code: 'EVENT_DSL_INVALID' });
+        return errorResult(error.message);
       }
     }
     if (
@@ -6095,17 +6062,7 @@ const callMcpTool = async ({
   if (extensionWriteToolHandler) {
     if (!project) return errorResult('No project opened.');
     try {
-      let extensionArgs = args || {};
-      if (
-        toolName === 'gdevelop_create_or_update_extension_function' ||
-        toolName === 'gdevelop_create_or_update_on_signal'
-      ) {
-        extensionArgs = normalizeEventDslArguments({
-          project,
-          i18n: context.i18n,
-          args: extensionArgs,
-        }).args;
-      }
+      const extensionArgs = args || {};
       const extensionPatchSnapshot =
         toolName === 'apply_validated_extension_patch' &&
         !(
@@ -6385,14 +6342,7 @@ const callMcpTool = async ({
   if (sceneWriteToolHandler) {
     if (!project) return errorResult('No project opened.');
     try {
-      const sceneArgs =
-        toolName === 'bulk_edit_scene_assets'
-          ? normalizeEventDslArguments({
-              project,
-              i18n: context.i18n,
-              args: args || {},
-            }).args
-          : args || {};
+      const sceneArgs = args || {};
       if (
         toolName === 'bulk_edit_scene_assets' &&
         (getEventsJsonArgument(sceneArgs) ||

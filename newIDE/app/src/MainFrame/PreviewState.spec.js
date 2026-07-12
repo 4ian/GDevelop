@@ -102,6 +102,45 @@ describe('usePreviewDebuggerServerWatcher', () => {
     });
   });
 
+  it('does not count the embedded game frame as a running native preview', () => {
+    const previewDebuggerServer = makePreviewDebuggerServer();
+    let latestResults = null;
+    let renderer = null;
+
+    const HookCapture = () => {
+      latestResults = usePreviewDebuggerServerWatcher(
+        previewDebuggerServer.server
+      );
+      return null;
+    };
+
+    act(() => {
+      renderer = TestRenderer.create(<HookCapture />);
+    });
+
+    act(() => {
+      previewDebuggerServer.setDebuggerIds(['embedded-game-frame']);
+      previewDebuggerServer.getCallbacks().onHandleParsedMessage({
+        id: 'embedded-game-frame',
+        parsedMessage: {
+          command: 'status',
+          payload: {
+            isPaused: false,
+            isInGameEdition: false,
+            sceneName: 'Game Scene',
+          },
+        },
+      });
+    });
+
+    expect(latestResults.hasNonEditionPreviewsRunning).toBe(false);
+    expect(latestResults.nonEditionPreviewsCount).toBe(0);
+
+    act(() => {
+      if (renderer) renderer.unmount();
+    });
+  });
+
   it('ignores status messages from debugger ids that are already closed', () => {
     const previewDebuggerServer = makePreviewDebuggerServer();
     let latestResults = null;

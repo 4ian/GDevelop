@@ -318,7 +318,8 @@ const enumerateExtensionInstructions = (
   scope: InstructionOrExpressionScope,
   i18n: I18nType,
   objectType?: string,
-  objectBehaviorTypes?: Set<string>
+  objectBehaviorTypes?: Set<string>,
+  includeHiddenAndCompatibility?: boolean = false
 ): Array<EnumeratedInstructionMetadata> => {
   //Get the map containing the metadata of the instructions provided by the extension...
   const instructionsTypes = instructions.keys();
@@ -333,13 +334,17 @@ const enumerateExtensionInstructions = (
     const unifiedInstructionType = gd.VariableInstructionSwitcher.getSwitchableVariableInstructionIdentifier(
       type
     );
-    if (unifiedInstructionType.length > 0 && unifiedInstructionType !== type) {
+    if (
+      !includeHiddenAndCompatibility &&
+      unifiedInstructionType.length > 0 &&
+      unifiedInstructionType !== type
+    ) {
       continue;
     }
 
     const instrMetadata = instructions.get(type);
     if (
-      !instrMetadata.isHidden() &&
+      (includeHiddenAndCompatibility || !instrMetadata.isHidden()) &&
       (!objectType ||
         isObjectInstruction(instrMetadata, objectType, objectBehaviorTypes))
     ) {
@@ -358,9 +363,13 @@ const enumerateExtensionInstructions = (
 export const enumerateAllInstructions = (
   isCondition: boolean,
   project: gdProject,
-  i18n: I18nType
+  i18n: I18nType,
+  options?: {| includeHiddenAndCompatibility?: boolean |}
 ): Array<EnumeratedInstructionMetadata> => {
   let allInstructions: Array<EnumeratedInstructionMetadata> = [];
+  const includeHiddenAndCompatibility = !!(
+    options && options.includeHiddenAndCompatibility
+  );
 
   const allExtensions = gd
     .asPlatform(gd.JsPlatform.get())
@@ -383,7 +392,10 @@ export const enumerateAllInstructions = (
         objectMetadata: undefined,
         behaviorMetadata: undefined,
       },
-      i18n
+      i18n,
+      undefined,
+      undefined,
+      includeHiddenAndCompatibility
     );
     allInstructions = [...allInstructions, ...extensionFreeInstructions];
 
@@ -406,7 +418,10 @@ export const enumerateAllInstructions = (
             ? extension.getAllConditionsForObject(objectType)
             : extension.getAllActionsForObject(objectType),
           scope,
-          i18n
+          i18n,
+          undefined,
+          undefined,
+          includeHiddenAndCompatibility
         ),
       ];
     }
@@ -432,7 +447,10 @@ export const enumerateAllInstructions = (
             : extension.getAllActionsForBehavior(behaviorType),
           // $FlowFixMe[incompatible-type]
           scope,
-          i18n
+          i18n,
+          undefined,
+          undefined,
+          includeHiddenAndCompatibility
         ),
       ];
     }

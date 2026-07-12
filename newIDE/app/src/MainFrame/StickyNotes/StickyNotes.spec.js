@@ -300,7 +300,7 @@ describe('StickyNotes', () => {
     expect(getNextStickyNoteFontSize('small', 'smaller')).toBe('small');
   });
 
-  it('stores notes in a dedicated project sidecar json file', () => {
+  it('stores notes in the project internal data directory', () => {
     const temporaryDirectory = fs.mkdtempSync(
       path.join(os.tmpdir(), 'gdevelop-sticky-notes-')
     );
@@ -313,7 +313,7 @@ describe('StickyNotes', () => {
 
       const stickyNotesFilePath = getStickyNotesFilePath(project);
       expect(stickyNotesFilePath).toBe(
-        path.join(temporaryDirectory, '.gdevelop-sticky-notes.json')
+        path.join(temporaryDirectory, '.gdevelop', 'sticky-notes.json')
       );
       expect(
         JSON.parse(fs.readFileSync(stickyNotesFilePath || '', 'utf8')).version
@@ -359,15 +359,13 @@ describe('StickyNotes', () => {
       'utf8'
     );
 
+    expect(projectFilesPanelSource).toContain("'.gdevelop'");
     expect(projectFilesPanelSource).toContain(
-      "const ignoredFileNames = new Set(['.gdevelop-sticky-notes.json']);"
+      'ignoredDirectoryNames.has(name)'
     );
     expect(projectFilesPanelSource).toContain('ignoredFileNames.has(name)');
     expect(localFileResourcesWatcherSource).toContain(
-      "const stickyNotesFileName = '.gdevelop-sticky-notes.json';"
-    );
-    expect(localFileResourcesWatcherSource).toContain(
-      'path.join(folderPath, stickyNotesFileName)'
+      "path.sep + '.gdevelop'"
     );
   });
 });

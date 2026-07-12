@@ -8,6 +8,7 @@ const {
 const isDev = require('electron-is-dev');
 const { load } = require('./Utils/UrlLoader');
 const {
+  setPreviewWindowMenuBarVisibilityAndContentSize,
   getPreviewBrowserWindowOptionsFittingDisplay,
   getBoundsFittingDisplayHeight,
 } = require('./PreviewWindowBounds');
@@ -86,16 +87,16 @@ const focusWindowForInput = window => {
   }
 };
 
-const getPreviewDisplayWorkArea = ({ parentWindow, x, y }) => {
+const getPreviewDisplay = ({ parentWindow, x, y }) => {
   if (typeof x === 'number' && typeof y === 'number') {
-    return screen.getDisplayNearestPoint({ x, y }).workArea;
+    return screen.getDisplayNearestPoint({ x, y });
   }
 
   if (parentWindow && !parentWindow.isDestroyed()) {
-    return screen.getDisplayMatching(parentWindow.getBounds()).workArea;
+    return screen.getDisplayMatching(parentWindow.getBounds());
   }
 
-  return screen.getPrimaryDisplay().workArea;
+  return screen.getPrimaryDisplay();
 };
 
 const fitPreviewWindowToDisplayHeight = (previewWindow, displayWorkArea) => {
@@ -436,16 +437,17 @@ const openPreviewWindow = ({
     const parentWindowId = parentWindow ? parentWindow.id : null;
     const x = numberOfWindows > 1 ? positions[i + 1].x : undefined;
     const y = numberOfWindows > 1 ? positions[i + 1].y : undefined;
-    const displayWorkArea = getPreviewDisplayWorkArea({
+    const previewDisplay = getPreviewDisplay({
       parentWindow,
       x,
       y,
     });
-    const fittedPreviewBrowserWindowOptions =
-      getPreviewBrowserWindowOptionsFittingDisplay(
-        previewBrowserWindowOptions,
-        displayWorkArea
-      );
+    const displayWorkArea = previewDisplay.workArea;
+    const fittedPreviewBrowserWindowOptions = getPreviewBrowserWindowOptionsFittingDisplay(
+      previewBrowserWindowOptions,
+      displayWorkArea,
+      previewDisplay.scaleFactor
+    );
     const browserWindowOptions = {
       ...fittedPreviewBrowserWindowOptions,
       parent: alwaysOnTop ? parentWindow : null,
@@ -454,12 +456,16 @@ const openPreviewWindow = ({
     };
 
     let previewWindow = new BrowserWindow(browserWindowOptions);
+    setPreviewWindowMenuBarVisibilityAndContentSize(
+      previewWindow,
+      fittedPreviewBrowserWindowOptions,
+      hideMenuBar
+    );
     fitPreviewWindowToDisplayHeight(previewWindow, displayWorkArea);
     let parentWasMinimizedBeforePreviewClose = parentWindow
       ? parentWindow.isMinimized()
       : false;
 
-    previewWindow.setMenuBarVisibility(hideMenuBar);
     previewWindow.webContents.on('devtools-opened', () => {
       openDevToolsByDefault = true;
     });

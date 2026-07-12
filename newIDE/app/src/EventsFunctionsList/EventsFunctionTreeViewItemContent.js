@@ -71,7 +71,11 @@ export const pasteEventsFunction = ({
     'unserializeFrom',
     project
   );
+  const sourceFullName = newEventsFunction.getFullName();
   newEventsFunction.setName(newName);
+  if (!sourceFullName || sourceFullName === name) {
+    newEventsFunction.setFullName(newName);
+  }
   newEventsFunction.setGroup(groupPath);
   if (isTargetFreeFunction) {
     // The Object parameter of custom object or behavior functions must be
@@ -177,6 +181,7 @@ export type EventsFunctionCallbacks = {|
     eventsBasedBehavior: ?gdEventsBasedBehavior,
     eventsBasedObject: ?gdEventsBasedObject
   ) => void,
+  onEventsFunctionMetadataChanged: () => void,
 |};
 
 export type EventFunctionCommonProps = {|
@@ -470,13 +475,15 @@ export class EventsFunctionTreeViewItemContent implements TreeViewItemContent {
   _togglePrivate(): void {
     const eventsFunction = this.functionFolderOrFunction.getFunction();
     eventsFunction.setPrivate(!eventsFunction.isPrivate());
-    this.props.forceUpdateEditor();
+    this._onEventsFunctionModified();
+    this.props.onEventsFunctionMetadataChanged();
   }
 
   _toggleAsync(): void {
     const eventsFunction = this.functionFolderOrFunction.getFunction();
     eventsFunction.setAsync(!eventsFunction.isAsync());
-    this.props.forceUpdateEditor();
+    this._onEventsFunctionModified();
+    this.props.onEventsFunctionMetadataChanged();
   }
 
   delete(): void {
@@ -506,6 +513,7 @@ export class EventsFunctionTreeViewItemContent implements TreeViewItemContent {
 
       eventsFunctionsContainer.removeEventsFunction(eventsFunction.getName());
       this._onEventsFunctionModified();
+      this.props.onEventsFunctionMetadataChanged();
     });
   }
 
@@ -560,6 +568,7 @@ export class EventsFunctionTreeViewItemContent implements TreeViewItemContent {
     );
 
     this._onEventsFunctionModified();
+    this.props.onEventsFunctionMetadataChanged();
     this.props.onSelectEventsFunction(
       newEventsFunction,
       this.props.eventsBasedBehavior,
@@ -578,7 +587,11 @@ export class EventsFunctionTreeViewItemContent implements TreeViewItemContent {
       eventsFunction,
       eventsFunctionsContainer.getEventsFunctionsCount()
     );
+    const sourceFullName = newEventsFunction.getFullName();
     newEventsFunction.setName(newName);
+    if (!sourceFullName || sourceFullName === eventsFunction.getName()) {
+      newEventsFunction.setFullName(newName);
+    }
     const newFunctionFolderOrFunction = eventsFunctionsContainer
       .getRootFolder()
       .getFunctionNamed(newName);
@@ -589,9 +602,14 @@ export class EventsFunctionTreeViewItemContent implements TreeViewItemContent {
         this.functionFolderOrFunction.getParent(),
         this.getIndex() + 1
       );
-    this.props.onEventsFunctionAdded(newEventsFunction);
+    this.props.onEventsFunctionAdded(
+      newEventsFunction,
+      this.props.eventsBasedBehavior,
+      this.props.eventsBasedObject
+    );
 
     this._onEventsFunctionModified();
+    this.props.onEventsFunctionMetadataChanged();
     this.props.onSelectEventsFunction(
       newEventsFunction,
       this.props.eventsBasedBehavior,

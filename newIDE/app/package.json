@@ -49,6 +49,7 @@
   "dependencies": {
     "@blueprintjs/core": "file:src/Utils/BlueprintJsPlaceholder",
     "@blueprintjs/icons": "file:src/Utils/BlueprintJsPlaceholder",
+    "@iarna/toml": "^2.2.5",
     "@lingui/react": "github:4ian/lingui-react#master",
     "@material-ui/core": "4.11.0",
     "@material-ui/icons": "4.9.1",
@@ -62,6 +63,7 @@
     "firebase": "9.0.0-beta.2",
     "fontfaceobserver": "2.0.13",
     "fuse.js": "^6.5.3",
+    "js-sha256": "^0.11.1",
     "js-worker-search": "^1.4.1",
     "jss-rtl": "^0.3.0",
     "lodash": "4.17.4",

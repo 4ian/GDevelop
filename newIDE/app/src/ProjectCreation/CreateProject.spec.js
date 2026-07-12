@@ -6,6 +6,7 @@ import {
   copyProjectTemplateFilesToLocalProjectFolder,
   createNewEmptyProject,
   emptyProjectTemplateFilesSource,
+  ensureProjectHasDefaultScene,
   getProjectTemplateFileDestinationPath,
   initializeLocalProjectGitRepository,
 } from './CreateProject';
@@ -34,6 +35,17 @@ describe('CreateProject template files', () => {
       emptyProjectTemplateFilesSource
     );
     expect(emptyProjectTemplateFilesSource.type).toBe('local-folder');
+  });
+
+  it('adds the default scene once before a new project is first saved', () => {
+    const project = global.gd.ProjectHelper.createNewGDJSProject();
+
+    ensureProjectHasDefaultScene(project);
+    ensureProjectHasDefaultScene(project);
+
+    expect(project.getLayoutsCount()).toBe(1);
+    expect(project.getLayoutAt(0).getName()).toBe('UntitledScene');
+    project.delete();
   });
 
   it('copies files from a GitHub repository tree into the local project folder', async () => {

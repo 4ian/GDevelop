@@ -9,7 +9,7 @@ import {
   enumerateBehaviorsMetadata,
   isBehaviorDefaultCapability,
 } from '../BehaviorsEditor/EnumerateBehaviorsMetadata';
-import { getSerializedEventsRevision } from './McpEventDsl';
+import { getSerializedEventsRevision } from './McpEventTools';
 
 const gd: libGDevelop = global.gd;
 const fs = optionalRequire('fs');

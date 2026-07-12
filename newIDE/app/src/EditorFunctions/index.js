@@ -62,6 +62,7 @@ import {
   getObjectSizeInfoHints,
   type ObjectSizeInfo,
 } from './Utils';
+import { isValidSceneName } from '../Utils/SceneNameValidator';
 
 export type HintEntry = {|
   code: string,
@@ -4981,6 +4982,12 @@ const createScene: EditorFunction = {
       args,
       'background_color'
     );
+
+    if (!isValidSceneName(scene_name)) {
+      return makeGenericFailure(
+        'Scene names must use camelCase or snake_case, without spaces or special characters.'
+      );
+    }
 
     if (project.hasLayoutNamed(scene_name)) {
       const scene = project.getLayout(scene_name);

@@ -1,0 +1,4 @@
+interface:
+  display_name: 'GDevelop Project Files'
+  short_description: 'Build GDevelop games through source files'
+  default_prompt: 'Use $gdevelop-project-files to modify this GDevelop project directly, reload disk edits through MCP, and then verify them in a debug preview.'

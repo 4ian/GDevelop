@@ -1,6 +1,7 @@
 const assert = require('assert');
 
 const {
+  setPreviewWindowMenuBarVisibilityAndContentSize,
   getPreviewBrowserWindowOptionsFittingDisplay,
   getBoundsFittingDisplayHeight,
 } = require('../app/PreviewWindowBounds');
@@ -41,6 +42,45 @@ const run = () => {
     ),
     { width: 720, height: 800 }
   );
+
+  assert.deepStrictEqual(
+    getPreviewBrowserWindowOptionsFittingDisplay(
+      { width: 1280, height: 720, useContentSize: true, title: 'Preview' },
+      { x: 0, y: 0, width: 1200, height: 900 },
+      2
+    ),
+    {
+      width: 640,
+      height: 360,
+      useContentSize: true,
+      title: 'Preview',
+    }
+  );
+
+  assert.deepStrictEqual(
+    getPreviewBrowserWindowOptionsFittingDisplay(
+      { width: 2400, height: 2000 },
+      { x: 0, y: 0, width: 1200, height: 900 },
+      2
+    ),
+    { width: 1080, height: 900 }
+  );
+
+  const windowSizingCalls = [];
+  setPreviewWindowMenuBarVisibilityAndContentSize(
+    {
+      setMenuBarVisibility: isVisible =>
+        windowSizingCalls.push(['setMenuBarVisibility', isVisible]),
+      setContentSize: (width, height) =>
+        windowSizingCalls.push(['setContentSize', width, height]),
+    },
+    { width: 640, height: 360, useContentSize: true },
+    false
+  );
+  assert.deepStrictEqual(windowSizingCalls, [
+    ['setMenuBarVisibility', false],
+    ['setContentSize', 640, 360],
+  ]);
 
   assert.deepStrictEqual(
     getBoundsFittingDisplayHeight(

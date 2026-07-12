@@ -488,6 +488,8 @@ export default class PrefabDetailEditor extends React.Component<Props, State> {
   ) => {
     const { project, eventsFunctionsExtension } = this.props;
     const object = eventsBasedObject || this.props.eventsBasedObject;
+    const oldName = eventsFunction.getName();
+    const oldFullName = eventsFunction.getFullName();
     const safeAndUniqueNewName = newNameGenerator(
       gd.Project.getSafeName(newName),
       tentativeNewName => {
@@ -513,6 +515,9 @@ export default class PrefabDetailEditor extends React.Component<Props, State> {
       safeAndUniqueNewName
     );
     eventsFunction.setName(safeAndUniqueNewName);
+    if (!oldFullName || oldFullName === oldName) {
+      eventsFunction.setFullName(safeAndUniqueNewName);
+    }
 
     done(true);
     if (this.props.onFunctionEdited) {
@@ -1355,6 +1360,10 @@ export default class PrefabDetailEditor extends React.Component<Props, State> {
                     object || eventsBasedObject
                   );
                 }}
+                onEventsFunctionMetadataChanged={() => {
+                  if (this.props.onFunctionEdited)
+                    this.props.onFunctionEdited();
+                }}
                 selectedEventsBasedBehavior={null}
                 onSelectEventsBasedBehavior={() => {}}
                 onDeleteEventsBasedBehavior={(_behavior, cb) => cb(false)}
@@ -1363,6 +1372,7 @@ export default class PrefabDetailEditor extends React.Component<Props, State> {
                 }
                 onEventsBasedBehaviorRenamed={() => {}}
                 onEventsBasedBehaviorPasted={() => {}}
+                onEventsBasedBehaviorMetadataChanged={() => {}}
                 selectedEventsBasedObject={eventsBasedObject}
                 onSelectEventsBasedObject={() =>
                   this._selectPrefabConfiguration()
@@ -1371,15 +1381,16 @@ export default class PrefabDetailEditor extends React.Component<Props, State> {
                 onRenameEventsBasedObject={(_object, _newName, cb) => cb(false)}
                 onEventsBasedObjectRenamed={() => {}}
                 onEventsBasedObjectPasted={() => {}}
+                onEventsBasedObjectMetadataChanged={() => {
+                  if (this.props.onObjectEdited) this.props.onObjectEdited();
+                  this.props.onEventBasedObjectTypeChanged();
+                }}
                 onAddEventsBasedObject={cb => cb(null)}
                 onSelectExtensionProperties={() => {}}
                 onSelectExtensionGlobalVariables={() => {}}
                 onSelectExtensionSceneVariables={() => {}}
                 onOpenCustomObjectEditor={() =>
                   this.props.onOpenCustomObjectEditor(eventsBasedObject)
-                }
-                onEventBasedObjectTypeChanged={
-                  this.props.onEventBasedObjectTypeChanged
                 }
                 headerControls={
                   <div style={styles.functionsListHeaderControls}>

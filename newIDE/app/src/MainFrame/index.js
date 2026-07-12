@@ -24,6 +24,7 @@ import ExtensionIcon from '../UI/CustomSvgIcons/Extension';
 import SearchIcon from '../UI/CustomSvgIcons/Search';
 import SparkleIcon from '../UI/CustomSvgIcons/Sparkle';
 import PlayIcon from '../UI/CustomSvgIcons/Play';
+import RefreshIcon from '../UI/CustomSvgIcons/Refresh';
 import ProjectTitlebar from './ProjectTitlebar';
 import StickyNotes, { type StickyNotesInterface } from './StickyNotes';
 import PreferencesDialog from './Preferences/PreferencesDialog';
@@ -248,7 +249,7 @@ import useCreateProject, {
   type UseCreateProjectReturnType,
 } from '../Utils/UseCreateProject';
 import newNameGenerator from '../Utils/NewNameGenerator';
-import { addDefaultLightToAllLayers } from '../ProjectCreation/CreateProject';
+import { ensureProjectHasDefaultScene } from '../ProjectCreation/CreateProject';
 import { type NewProjectSetup } from '../ProjectCreation/NewProjectSetupDialog';
 import { listAllExamples } from '../Utils/GDevelopServices/Example';
 import UrlStorageProvider from '../ProjectsStorage/UrlStorageProvider';
@@ -256,6 +257,10 @@ import { findEmptyPathInWorkspaceFolder } from '../ProjectsStorage/LocalFileStor
 import useEditorTabsStateSaving from './EditorTabs/UseEditorTabsStateSaving';
 import PixiResourcesLoader from '../ObjectsRendering/PixiResourcesLoader';
 import useResourcesWatcher from './ResourcesWatcher';
+import useLocalProjectChangesWatcher, {
+  showLocalProjectFilesChangedDialog,
+} from './LocalProjectChangesWatcher';
+import { localFileStorageProviderInternalName } from '../ProjectsStorage/LocalFileStorageProvider/LocalFileStorageProviderInternalName';
 import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/Errors';
 import { type CourseChapter } from '../Utils/GDevelopServices/Asset';
 import useVersionHistory from '../VersionHistory/UseVersionHistory';
@@ -1977,6 +1982,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       try {
         await delay(50);
         let content;
+        let effectiveFileMetadata = fileMetadata;
         let openingError: Error | null = null;
         try {
           const autoSaveFileMetadata = await checkForAutosave();
@@ -1985,6 +1991,9 @@ const MainFrame = (props: Props): React.MixedElement => {
             setLoaderModalProgress
           );
           content = result.content;
+          if (result.fileMetadata) {
+            effectiveFileMetadata = result.fileMetadata;
+          }
         } catch (error) {
           openingError = error;
           // onOpen failed, try to find again an autosave.
@@ -2014,10 +2023,9 @@ const MainFrame = (props: Props): React.MixedElement => {
         try {
           const state = loadFromSerializedProject(
             serializedProject,
-            // Note that fileMetadata is the original, unchanged one, even if we're loading
-            // an autosave. If we're for some reason loading an autosave, we still consider
-            // that we're opening the file that was originally requested by the user.
-            fileMetadata
+            // Autosaves keep the originally requested metadata. A storage adapter may
+            // explicitly redirect a migrated legacy project to project.settings.
+            effectiveFileMetadata
           );
           return state;
         } finally {
@@ -5283,12 +5291,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       const { currentProject, editorTabs } = newState;
       if (!currentProject) return;
 
-      if (currentProject.getLayoutsCount() === 0) {
-        const layoutName = i18n._(t`Untitled scene`);
-        currentProject.insertNewLayout(layoutName, 0);
-        const layout = currentProject.getLayout(layoutName);
-        addDefaultLightToAllLayers(layout);
-      }
+      ensureProjectHasDefaultScene(currentProject);
       openLayout(
         currentProject.getLayoutAt(0).getName(),
         {
@@ -5307,7 +5310,7 @@ const MainFrame = (props: Props): React.MixedElement => {
         openProjectManager(false);
       }
     },
-    [openLayout, i18n]
+    [openLayout]
   );
 
   const getEditorsTabStateWithAllScenes = React.useCallback(
@@ -6125,10 +6128,16 @@ const MainFrame = (props: Props): React.MixedElement => {
   );
 
   const reloadProject = React.useCallback(
-    async (): Promise<void> => {
+    async (options?: {
+      skipUnsavedChangesConfirmation?: boolean,
+      rethrowOpenError?: boolean,
+    }): Promise<void> => {
       if (!currentProject || !currentFileMetadata) return;
 
-      if (hasUnsavedChanges) {
+      if (
+        hasUnsavedChanges &&
+        !(options && options.skipUnsavedChangesConfirmation)
+      ) {
         const answer = Window.showConfirmDialog(
           i18n._(
             t`Reload the project? Any changes that have not been saved will be lost.`
@@ -6146,6 +6155,7 @@ const MainFrame = (props: Props): React.MixedElement => {
         {
           ignoreUnsavedChanges: true,
           ignoreAutoSave: true,
+          rethrowOpenError: !!(options && options.rethrowOpenError),
         }
       );
     },
@@ -6158,6 +6168,49 @@ const MainFrame = (props: Props): React.MixedElement => {
       openFromFileMetadataWithStorageProvider,
     ]
   );
+
+  const backupCurrentProjectToLocalFolder = React.useCallback(
+    async (): Promise<void> => {
+      const localFileStorageProvider = props.storageProviders.find(
+        storageProvider =>
+          storageProvider.internalName === localFileStorageProviderInternalName
+      );
+      if (!localFileStorageProvider) return;
+
+      await saveProjectAsWithStorageProvider({
+        requestedStorageProvider: localFileStorageProvider,
+      });
+    },
+    [props.storageProviders, saveProjectAsWithStorageProvider]
+  );
+
+  const onLocalProjectFilesChanged = React.useCallback(
+    async (): Promise<void> => {
+      await showLocalProjectFilesChangedDialog({
+        showConfirmation,
+        onReloadProject: () =>
+          reloadProject({ skipUnsavedChangesConfirmation: true }),
+        onBackupProject: backupCurrentProjectToLocalFolder,
+      });
+    },
+    [backupCurrentProjectToLocalFolder, reloadProject, showConfirmation]
+  );
+
+  useLocalProjectChangesWatcher({
+    enabled:
+      !!currentProject &&
+      !isProjectOpening &&
+      !isSavingProject &&
+      getStorageProvider().internalName ===
+        localFileStorageProviderInternalName,
+    fileIdentifier: currentFileMetadata
+      ? currentFileMetadata.fileIdentifier
+      : null,
+    lastKnownModificationTime: currentFileMetadata
+      ? currentFileMetadata.lastModifiedDate || null
+      : null,
+    onProjectFilesChanged: onLocalProjectFilesChanged,
+  });
 
   const endTutorial = React.useCallback(
     async (shouldCloseProject?: boolean) => {
@@ -6614,6 +6667,16 @@ const MainFrame = (props: Props): React.MixedElement => {
   );
 
   if (currentProject) {
+    addRecentEditorSwitcherActionItem(
+      'action:reload-project',
+      i18n._(t`Reload project`),
+      i18n._(t`Project action`),
+      <RefreshIcon />,
+      'reload project refresh project reopen disk cloud file',
+      () => {
+        reloadProject();
+      }
+    );
     addRecentEditorSwitcherActionItem(
       'action:create-scene',
       i18n._(t`Create a scene`),
@@ -7308,6 +7371,20 @@ const MainFrame = (props: Props): React.MixedElement => {
         },
         launchPreviewForScene: (sceneName: ?string) =>
           launchPreviewForScene(sceneName),
+        reloadProjectAndWait: async () => {
+          if (!currentFileMetadata) {
+            return {
+              reloaded: false,
+              reason: 'The current project has no disk location.',
+            };
+          }
+          const fileIdentifier = currentFileMetadata.fileIdentifier;
+          await reloadProject({
+            skipUnsavedChangesConfirmation: true,
+            rethrowOpenError: true,
+          });
+          return { reloaded: true, fileIdentifier };
+        },
         saveProjectAndWait: () => saveProject(),
         getPersistenceState: () => ({
           hasUnsavedChanges: getChangesCount() > 0,
@@ -7362,6 +7439,8 @@ const MainFrame = (props: Props): React.MixedElement => {
       getChangesCount,
       getTimeOfFirstChangeSinceLastSave,
       saveProject,
+      reloadProject,
+      currentFileMetadata,
       launchPreviewForScene,
       getMcpEditorSelection,
       generateEvents,
@@ -7496,6 +7575,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     onOpenRecentFile: openFromFileMetadataWithStorageProvider,
     onSaveProject: saveProject,
     onSaveProjectAs: saveProjectAs,
+    onReloadProject: reloadProject,
     onShowVersionHistory: openVersionHistoryPanel,
     onCloseProject: askToCloseProject,
     onCloseApp: closeApp,

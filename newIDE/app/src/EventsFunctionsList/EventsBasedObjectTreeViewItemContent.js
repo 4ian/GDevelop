@@ -52,8 +52,8 @@ export type EventsBasedObjectCallbacks = {|
     sourceExtensionName: string,
     sourceEventsBasedObjectName: string
   ) => void,
+  onEventsBasedObjectMetadataChanged: () => void,
   onOpenCustomObjectEditor: (eventsBasedObject: gdEventsBasedObject) => void,
-  onEventBasedObjectTypeChanged: () => void,
 |};
 
 export type EventsBasedObjectProps = {|
@@ -284,12 +284,14 @@ export class EventsBasedObjectTreeViewItemContent
 
       eventsBasedObjectsList.remove(this.eventsBasedObject.getName());
       this._onEventsBasedObjectModified();
+      this.props.onEventsBasedObjectMetadataChanged();
     });
   }
 
   _togglePrivate(): void {
     this.eventsBasedObject.setPrivate(!this.eventsBasedObject.isPrivate());
-    this.props.forceUpdateEditor();
+    this._onEventsBasedObjectModified();
+    this.props.onEventsBasedObjectMetadataChanged();
   }
 
   getIndex(): number {
@@ -374,7 +376,7 @@ export class EventsBasedObjectTreeViewItemContent
     }
 
     this._onEventsBasedObjectModified();
-    this.props.onEventBasedObjectTypeChanged();
+    this.props.onEventsBasedObjectMetadataChanged();
     this.props.onSelectEventsBasedObject(newEventsBasedObject);
     this.props.editName(getObjectTreeViewItemId(newEventsBasedObject));
   }
@@ -391,6 +393,7 @@ export class EventsBasedObjectTreeViewItemContent
     );
     newEventsBasedObject.setFullName(name);
     this._onEventsBasedObjectModified();
+    this.props.onEventsBasedObjectMetadataChanged();
 
     const newEventsBasedObjectId = getObjectTreeViewItemId(
       newEventsBasedObject

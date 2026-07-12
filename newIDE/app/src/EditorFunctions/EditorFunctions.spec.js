@@ -2197,6 +2197,42 @@ describe('editorFunctions', () => {
     });
   });
 
+  describe('create_scene', () => {
+    let project;
+    beforeEach(() => {
+      project = gd.ProjectHelper.createNewGDJSProject();
+    });
+    afterEach(() => {
+      project.delete();
+    });
+
+    it.each(['MainScene', 'mainScene', 'main_scene'])(
+      'creates a scene named %s',
+      async sceneName => {
+        const result = await editorFunctions.create_scene.launchFunction({
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: { scene_name: sceneName },
+        });
+
+        expect(result.success).toBe(true);
+        expect(project.hasLayoutNamed(sceneName)).toBe(true);
+      }
+    );
+
+    it.each(['Main Scene', 'Main\tScene', 'main-scene'])(
+      'rejects the invalid scene name %s',
+      async sceneName => {
+        const result = await editorFunctions.create_scene.launchFunction({
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: { scene_name: sceneName },
+        });
+
+        expect(result.success).toBe(false);
+        expect(project.getLayoutsCount()).toBe(0);
+      }
+    );
+  });
+
   describe('delete_scene', () => {
     let project;
     beforeEach(() => {

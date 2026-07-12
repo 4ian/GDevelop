@@ -24,11 +24,22 @@ export const MULTI_FILE_CONFIG_URI = 'game://config.settings';
 const PROJECT_SPLIT_FIELDS = new Set([
   'resources',
   'globalConfig',
+  'objects',
   'layouts',
   'externalEvents',
   'externalLayouts',
   'eventsFunctionsExtensions',
 ]);
+
+export const LEGACY_FOLDER_STRUCTURE_FIELDS = Object.freeze([
+  'eventsFunctionsFolderStructure',
+  'objectsFolderStructure',
+  'propertiesFolderStructure',
+  'sharedPropertiesFolderStructure',
+]);
+const LEGACY_FOLDER_STRUCTURE_FIELD_SET = new Set(
+  LEGACY_FOLDER_STRUCTURE_FIELDS
+);
 
 export const SCENE_LAYOUT_FIELDS = Object.freeze([
   'r',
@@ -90,6 +101,43 @@ const rethrowLayoutDslError = (error, fileUri): empty => {
 };
 
 const clone = value => JSON.parse(JSON.stringify(value));
+
+const removeLegacyFolderStructures = value => {
+  if (Array.isArray(value)) {
+    value.forEach(removeLegacyFolderStructures);
+    return value;
+  }
+  if (!value || typeof value !== 'object') return value;
+  Object.keys(value).forEach(key => {
+    if (LEGACY_FOLDER_STRUCTURE_FIELD_SET.has(key)) delete value[key];
+    else removeLegacyFolderStructures(value[key]);
+  });
+  return value;
+};
+
+export const removeLegacyFolderStructuresFromProject = legacyProject =>
+  removeLegacyFolderStructures(clone(legacyProject));
+
+const rejectLegacyFolderStructures = (value, fileUri, pointer = '') => {
+  if (Array.isArray(value)) {
+    value.forEach((item, index) =>
+      rejectLegacyFolderStructures(item, fileUri, `${pointer}/${index}`)
+    );
+    return;
+  }
+  if (!value || typeof value !== 'object') return;
+  Object.keys(value).forEach(key => {
+    const childPointer = `${pointer}/${quotePointerToken(key)}`;
+    if (LEGACY_FOLDER_STRUCTURE_FIELD_SET.has(key)) {
+      fail(
+        'MULTIFILE_FORBIDDEN_FOLDER_STRUCTURE',
+        `${key} is not part of the multi-file format. Use the physical project folders instead (${childPointer}).`,
+        fileUri
+      );
+    }
+    rejectLegacyFolderStructures(value[key], fileUri, childPointer);
+  });
+};
 
 const asObject = (value, label, fileUri) => {
   if (!value || typeof value !== 'object' || Array.isArray(value)) {
@@ -289,7 +337,9 @@ const restoreTomlPayload = (namespace, fileUri) => {
   const payload = clone(namespace);
   const rawJson = payload.rawJson;
   delete payload.rawJson;
-  return restoreTomlProjection(payload, rawJson, fileUri);
+  const restoredPayload = restoreTomlProjection(payload, rawJson, fileUri);
+  rejectLegacyFolderStructures(restoredPayload, fileUri);
+  return restoredPayload;
 };
 
 const normalizeLf = source =>
@@ -484,7 +534,7 @@ const omitFields = (source, fields) => {
 };
 
 const projectSettingsNamespace = document => {
-  const output = clone(document);
+  const output = removeLegacyFolderStructures(clone(document));
   let found = false;
   const visit = value => {
     if (!value || typeof value !== 'object' || Array.isArray(value)) return;
@@ -515,6 +565,13 @@ const projectSettingsNamespace = document => {
 
 const putSettingsFile = (files, uri, namespace) => {
   validateGameUri(uri);
+  if (files[uri] !== undefined) {
+    fail(
+      'MULTIFILE_DUPLICATE_SOURCE_PATH',
+      'Two project components resolve to the same settings path.',
+      uri
+    );
+  }
   files[uri] = serializeToml(projectSettingsNamespace(namespace));
 };
 
@@ -587,6 +644,63 @@ const splitOwnerFunctions = ({
   });
 };
 
+const objectFolderPaths = folderStructure => {
+  const pathsByObjectName = new Map();
+  const visit = (folder, parentSegments) => {
+    const usedFolderNames = new Set();
+    (folder && Array.isArray(folder.children) ? folder.children : []).forEach(
+      child => {
+        if (
+          child &&
+          typeof child.folderName === 'string' &&
+          child.objectName === undefined
+        ) {
+          const folderSegment = uniqueManagedName(
+            child.folderName,
+            usedFolderNames
+          );
+          visit(child, [...parentSegments, folderSegment]);
+        } else if (child && typeof child.objectName === 'string') {
+          if (!pathsByObjectName.has(child.objectName)) {
+            pathsByObjectName.set(child.objectName, parentSegments);
+          }
+        }
+      }
+    );
+  };
+  visit(folderStructure, []);
+  return pathsByObjectName;
+};
+
+const splitObjectDefinitions = ({
+  objects,
+  folderStructure,
+  baseSegments,
+  namespaceForObject,
+  files,
+}) => {
+  const pathsByObjectName = objectFolderPaths(folderStructure);
+  (objects || []).forEach((object, order) => {
+    const name = String(object.name || '');
+    const uri = encodeUriPath([
+      ...baseSegments,
+      ...(pathsByObjectName.get(name) || []),
+      `${encodeManagedName(name)}.settings`,
+    ]);
+    putSettingsFile(
+      files,
+      uri,
+      namespaceForObject(name, {
+        kind: 'object',
+        settingsFormatVersion: MULTI_FILE_FORMAT_VERSION,
+        order,
+        ...object,
+        name,
+      })
+    );
+  });
+};
+
 const splitPrefab = ({
   extensionName,
   prefab,
@@ -607,6 +721,23 @@ const splitPrefab = ({
     takeFields(prefab, PREFAB_LAYOUT_FIELDS),
     layoutObjectContext(prefab.objects || [])
   );
+  splitObjectDefinitions({
+    objects: prefab.objects,
+    folderStructure: prefab.objectsFolderStructure,
+    baseSegments: [...baseSegments, 'objects'],
+    files,
+    namespaceForObject: (objectName, payload) => ({
+      extensions: {
+        [extensionName]: {
+          prefabs: {
+            [prefabName]: {
+              objects: { [objectName]: payload },
+            },
+          },
+        },
+      },
+    }),
+  });
   const functions = splitOwnerFunctions({
     functions: prefab.eventsFunctions,
     baseSegments,
@@ -631,14 +762,35 @@ const splitPrefab = ({
         variant.objects !== undefined ? variant.objects : prefab.objects || []
       )
     );
+    splitObjectDefinitions({
+      objects: variant.objects,
+      folderStructure: variant.objectsFolderStructure,
+      baseSegments: [...baseSegments, 'variants', variantFileName, 'objects'],
+      files,
+      namespaceForObject: (objectName, payload) => ({
+        extensions: {
+          [extensionName]: {
+            prefabs: {
+              [prefabName]: {
+                variantObjects: {
+                  [variantName]: {
+                    [objectName]: payload,
+                  },
+                },
+              },
+            },
+          },
+        },
+      }),
+    });
     return {
-      ...omitFields(variant, new Set(PREFAB_LAYOUT_FIELDS)),
+      ...omitFields(variant, new Set([...PREFAB_LAYOUT_FIELDS, 'objects'])),
       layout: variantLayoutUri,
     };
   });
   const metadata = omitFields(
     prefab,
-    new Set([...PREFAB_LAYOUT_FIELDS, 'eventsFunctions', 'variants'])
+    new Set([...PREFAB_LAYOUT_FIELDS, 'objects', 'eventsFunctions', 'variants'])
   );
   return {
     kind: 'prefab',
@@ -677,6 +829,18 @@ export const decomposeLegacyProjectToFiles = (legacyProject, options = {}) => {
   const projectPayload = omitFields(project, PROJECT_SPLIT_FIELDS);
   const sceneNames = new Set();
   const extensionNames = new Set();
+
+  splitObjectDefinitions({
+    objects: project.objects,
+    folderStructure: project.objectsFolderStructure,
+    baseSegments: ['objects'],
+    files,
+    namespaceForObject: (objectName, payload) => ({
+      project: {
+        objects: { [objectName]: payload },
+      },
+    }),
+  });
 
   if (project.resources !== undefined) {
     putSettingsFile(files, MULTI_FILE_RESOURCES_URI, {
@@ -725,8 +889,21 @@ export const decomposeLegacyProjectToFiles = (legacyProject, options = {}) => {
     ]);
     const settingsPayload = omitFields(
       layout,
-      new Set([...SCENE_LAYOUT_FIELDS, 'events'])
+      new Set([...SCENE_LAYOUT_FIELDS, 'events', 'objects'])
     );
+    splitObjectDefinitions({
+      objects: layout.objects,
+      folderStructure: layout.objectsFolderStructure,
+      baseSegments: ['scenes', folderName, 'objects'],
+      files,
+      namespaceForObject: (objectName, payload) => ({
+        scenes: {
+          [name]: {
+            objects: { [objectName]: payload },
+          },
+        },
+      }),
+    });
     putSettingsFile(files, settingsUri, {
       scenes: {
         [name]: {
@@ -1213,6 +1390,33 @@ const onlyNamespaceName = (namespace, label, uri) => {
   return names[0];
 };
 
+const rawGameUriSegments = uri => {
+  validateGameUri(uri);
+  return uri
+    .slice('game://'.length)
+    .split('/')
+    .map(segment => decodeURIComponent(segment));
+};
+
+const buildLegacyObjectsFolderStructure = objectDocuments => {
+  const root = { folderName: '__ROOT', children: [] };
+  objectDocuments.forEach(({ entry, folderSegments }) => {
+    let folder = root;
+    folderSegments.forEach(folderName => {
+      let childFolder = folder.children.find(
+        child => child.folderName === folderName
+      );
+      if (!childFolder) {
+        childFolder = { folderName, children: [] };
+        folder.children.push(childFolder);
+      }
+      folder = childFolder;
+    });
+    folder.children.push({ objectName: entry.name });
+  });
+  return root;
+};
+
 const composeOwnerFunctions = (files, entries, options, ownerUri) => {
   const functionEntries = asArray(entries, 'functions', ownerUri);
   assertUniqueManifestNames(functionEntries, 'functions', ownerUri);
@@ -1229,10 +1433,25 @@ const composeOwnerFunctions = (files, entries, options, ownerUri) => {
   });
 };
 
-const composePrefab = (files, namespace, options, uri) => {
+const composePrefab = (
+  files,
+  namespace,
+  options,
+  uri,
+  objectDocuments = [],
+  variantObjectDocuments = {}
+) => {
   const payload = restoreTomlPayload(namespace, uri);
+  if (payload.objects !== undefined) {
+    fail(
+      'MULTIFILE_OWNERSHIP_CONFLICT',
+      'Prefab objects must be stored in physical objects/**/*.settings files.',
+      uri
+    );
+  }
+  const objects = objectDocuments.map(document => document.object);
   const layoutUri = expectString(payload.layout, 'prefab.layout', uri);
-  const objectContext = layoutObjectContext(payload.objects || []);
+  const objectContext = layoutObjectContext(objects);
   const layout = readLayout(files, layoutUri, 'gdevelop-prefab-layout', {
     ...objectContext,
   });
@@ -1253,14 +1472,23 @@ const composePrefab = (files, namespace, options, uri) => {
   );
   const variants = asArray(payload.variants, 'prefab.variants', uri).map(
     entry => {
+      if (entry.objects !== undefined) {
+        fail(
+          'MULTIFILE_OWNERSHIP_CONFLICT',
+          'Prefab variant objects must be stored in physical objects/**/*.settings files.',
+          uri
+        );
+      }
+      const ownedObjectDocuments = variantObjectDocuments[entry.name] || [];
+      const variantObjects = ownedObjectDocuments.map(
+        document => document.object
+      );
       const variantLayout = readLayout(
         files,
         expectString(entry.layout, 'variant.layout', uri),
         'gdevelop-prefab-variant-layout',
         {
-          ...layoutObjectContext(
-            entry.objects !== undefined ? entry.objects : payload.objects || []
-          ),
+          ...layoutObjectContext(variantObjects),
         }
       );
       Object.keys(variantLayout).forEach(field => {
@@ -1272,14 +1500,28 @@ const composePrefab = (files, namespace, options, uri) => {
           );
         }
       });
-      return { ...omitFields(entry, new Set(['layout'])), ...variantLayout };
+      return {
+        ...omitFields(entry, new Set(['layout'])),
+        objects: variantObjects,
+        objectsFolderStructure: buildLegacyObjectsFolderStructure(
+          ownedObjectDocuments
+        ),
+        ...variantLayout,
+      };
     }
   );
   const metadata = omitFields(
     removeFormatFields(payload),
     new Set(['order', 'layout', 'functions', 'variants'])
   );
-  return { ...metadata, ...layout, eventsFunctions: functions, variants };
+  return {
+    ...metadata,
+    objects,
+    objectsFolderStructure: buildLegacyObjectsFolderStructure(objectDocuments),
+    ...layout,
+    eventsFunctions: functions,
+    variants,
+  };
 };
 
 const composeBehavior = (files, namespace, options, uri) => {
@@ -1354,6 +1596,81 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
   }
 
   const settingsUris = [MULTI_FILE_ENTRY_URI];
+  const readObjectDocuments = ({ baseSegments, namespacePath, label }) => {
+    const documents = Object.keys(files)
+      .filter(candidateUri => {
+        const segments = rawGameUriSegments(candidateUri);
+        return (
+          segments.length >= baseSegments.length + 1 &&
+          baseSegments.every((segment, index) => segments[index] === segment) &&
+          segments[segments.length - 1].endsWith('.settings')
+        );
+      })
+      .map(objectUri => {
+        registerUri(objectUri);
+        settingsUris.push(objectUri);
+        const segments = rawGameUriSegments(objectUri);
+        const document = parseSettings(files, objectUri);
+        const objectsNamespace = requireNamespace(
+          document,
+          namespacePath,
+          objectUri
+        );
+        const name = onlyNamespaceName(
+          objectsNamespace,
+          `${label}.objects`,
+          objectUri
+        );
+        const payload = restoreTomlPayload(objectsNamespace[name], objectUri);
+        if (
+          payload.kind !== 'object' ||
+          payload.settingsFormatVersion !== MULTI_FILE_FORMAT_VERSION
+        ) {
+          fail(
+            'MULTIFILE_UNSUPPORTED_VERSION',
+            'Invalid object namespace marker.',
+            objectUri
+          );
+        }
+        const expectedFilename = `${encodeManagedName(name)}.settings`;
+        if (segments[segments.length - 1] !== expectedFilename) {
+          fail(
+            'MULTIFILE_IDENTITY_MISMATCH',
+            `Object ${name} must be stored as ${expectedFilename}.`,
+            objectUri
+          );
+        }
+        const entry = {
+          name,
+          order: readSettingsOrder(
+            payload,
+            `${label}.objects.${name}`,
+            objectUri
+          ),
+        };
+        validateManifestIdentity(entry, payload, objectUri);
+        return {
+          entry,
+          uri: objectUri,
+          document,
+          folderSegments: segments.slice(baseSegments.length, -1),
+          object: omitFields(removeFormatFields(payload), new Set(['order'])),
+        };
+      })
+      .sort((left, right) => left.entry.order - right.entry.order);
+    assertUniqueManifestNames(
+      documents.map(({ entry }) => entry),
+      `${label} object settings`,
+      MULTI_FILE_ENTRY_URI
+    );
+    assertContiguousSettingsOrder(documents, `${label} object`);
+    return documents;
+  };
+  const projectObjectDocuments = readObjectDocuments({
+    baseSegments: ['objects'],
+    namespacePath: ['project', 'objects'],
+    label: 'project',
+  });
   let resourcesPayload = null;
   if (files[MULTI_FILE_RESOURCES_URI] !== undefined) {
     if (projectNamespace.resources !== undefined) {
@@ -1510,6 +1827,17 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
     );
     assertContiguousSettingsOrder(sceneDocuments, 'Scene');
   }
+  sceneDocuments = sceneDocuments.map(sceneDocument => {
+    const sceneSegments = rawGameUriSegments(sceneDocument.uri);
+    return {
+      ...sceneDocument,
+      objectDocuments: readObjectDocuments({
+        baseSegments: [sceneSegments[0], sceneSegments[1], 'objects'],
+        namespacePath: ['scenes', sceneDocument.entry.name, 'objects'],
+        label: `scenes.${sceneDocument.entry.name}`,
+      }),
+    };
+  });
   const legacyExtensionEntries = asArray(
     projectNamespace.extensionFiles,
     'project.extensionFiles'
@@ -1709,7 +2037,86 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
     assertContiguousSettingsOrder(extensionDocuments, 'Extension');
   }
 
-  const managedSettingsUriPattern = /^(?:game:\/\/(?:project|resources|config)\.settings|game:\/\/externals\/external\.settings|game:\/\/scenes\/[^/]+\/scene\.settings|game:\/\/extensions\/[^/]+\/(?:extension\.settings|functions\/[^/]+\/function\.settings|prefabs\/[^/]+\/prefab\.settings|behaviors\/[^/]+\/behavior\.settings))$/;
+  extensionDocuments.forEach(extensionDocument => {
+    extensionDocument.childDocuments.forEach(childDocument => {
+      if (childDocument.manifestName !== 'prefabFiles') return;
+      const prefabSegments = rawGameUriSegments(childDocument.uri).slice(0, -1);
+      const prefabName = childDocument.entry.name;
+      childDocument.objectDocuments = readObjectDocuments({
+        baseSegments: [...prefabSegments, 'objects'],
+        namespacePath: [
+          'extensions',
+          extensionDocument.entry.name,
+          'prefabs',
+          prefabName,
+          'objects',
+        ],
+        label: `extensions.${
+          extensionDocument.entry.name
+        }.prefabs.${prefabName}`,
+      });
+      const prefabNamespace = requireNamespace(
+        childDocument.document,
+        ['extensions', extensionDocument.entry.name, 'prefabs', prefabName],
+        childDocument.uri
+      );
+      const prefabPayload = restoreTomlPayload(
+        prefabNamespace,
+        childDocument.uri
+      );
+      childDocument.variantObjectDocuments = {};
+      asArray(
+        prefabPayload.variants,
+        'prefab.variants',
+        childDocument.uri
+      ).forEach(variant => {
+        const variantName = expectString(
+          variant.name,
+          'prefab variant name',
+          childDocument.uri
+        );
+        const layoutSegments = rawGameUriSegments(
+          expectString(
+            variant.layout,
+            'prefab variant layout',
+            childDocument.uri
+          )
+        );
+        const layoutFilename = layoutSegments[layoutSegments.length - 1];
+        if (!layoutFilename.endsWith('.layout')) {
+          fail(
+            'MULTIFILE_INVALID_MANIFEST_PATH',
+            'Prefab variant layout must use a .layout file.',
+            childDocument.uri
+          );
+        }
+        const variantFolder = layoutFilename.slice(0, -'.layout'.length);
+        childDocument.variantObjectDocuments[variantName] = readObjectDocuments(
+          {
+            baseSegments: [
+              ...prefabSegments,
+              'variants',
+              variantFolder,
+              'objects',
+            ],
+            namespacePath: [
+              'extensions',
+              extensionDocument.entry.name,
+              'prefabs',
+              prefabName,
+              'variantObjects',
+              variantName,
+            ],
+            label: `extensions.${
+              extensionDocument.entry.name
+            }.prefabs.${prefabName}.variantObjects.${variantName}`,
+          }
+        );
+      });
+    });
+  });
+
+  const managedSettingsUriPattern = /^(?:game:\/\/(?:project|resources|config)\.settings|game:\/\/objects\/(?:[^/]+\/)*[^/]+\.settings|game:\/\/externals\/external\.settings|game:\/\/scenes\/[^/]+\/(?:scene\.settings|objects\/(?:[^/]+\/)*[^/]+\.settings)|game:\/\/extensions\/[^/]+\/(?:extension\.settings|functions\/[^/]+\/function\.settings|prefabs\/[^/]+\/(?:prefab\.settings|objects\/(?:[^/]+\/)*[^/]+\.settings|variants\/[^/]+\/objects\/(?:[^/]+\/)*[^/]+\.settings)|behaviors\/[^/]+\/behavior\.settings))$/;
   Object.keys(files)
     .filter(uri => managedSettingsUriPattern.test(uri))
     .forEach(uri => {
@@ -1732,46 +2139,73 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
     removeFormatFields(projectNamespace),
     new Set(['sceneFiles', 'extensionFiles', 'externalSettings', 'migration'])
   );
+  if (project.objects !== undefined) {
+    fail(
+      'MULTIFILE_OWNERSHIP_CONFLICT',
+      'Global objects must be stored in physical objects/**/*.settings files.',
+      MULTI_FILE_ENTRY_URI
+    );
+  }
+  project.objects = projectObjectDocuments.map(document => document.object);
+  project.objectsFolderStructure = buildLegacyObjectsFolderStructure(
+    projectObjectDocuments
+  );
   if (resourcesPayload) {
     project.resources = removeFormatFields(resourcesPayload);
   }
   if (globalConfigPayload) {
     project.globalConfig = globalConfigPayload;
   }
-  project.layouts = sceneDocuments.map(({ entry, uri, document }) => {
-    const namespace = restoreTomlPayload(
-      requireNamespace(document, ['scenes', entry.name], uri),
-      uri
-    );
-    validateManifestIdentity(entry, namespace, uri);
-    const settings = omitFields(
-      removeFormatFields(namespace),
-      new Set(['order', 'layout', 'events'])
-    );
-    const layoutUri = registerUri(
-      expectString(entry.layout, 'scene.layout', uri)
-    );
-    const eventsUri = registerUri(
-      expectString(entry.events, 'scene.events', uri)
-    );
-    const layout = readLayout(files, layoutUri, 'gdevelop-scene-layout', {
-      ...layoutObjectContext(settings.objects || [], project.objects || []),
-    });
-    Object.keys(layout).forEach(field => {
-      if (settings[field] !== undefined) {
+  project.layouts = sceneDocuments.map(
+    ({ entry, uri, document, objectDocuments }) => {
+      const namespace = restoreTomlPayload(
+        requireNamespace(document, ['scenes', entry.name], uri),
+        uri
+      );
+      validateManifestIdentity(entry, namespace, uri);
+      const settings = omitFields(
+        removeFormatFields(namespace),
+        new Set(['order', 'layout', 'events'])
+      );
+      if (settings.objects !== undefined) {
         fail(
           'MULTIFILE_OWNERSHIP_CONFLICT',
-          `Scene settings duplicate layout field ${field}.`,
+          'Scene objects must be stored in physical objects/**/*.settings files.',
           uri
         );
       }
-    });
-    return {
-      ...settings,
-      ...layout,
-      events: compileEvents(files, eventsUri, options),
-    };
-  });
+      const objects = objectDocuments.map(
+        objectDocument => objectDocument.object
+      );
+      const layoutUri = registerUri(
+        expectString(entry.layout, 'scene.layout', uri)
+      );
+      const eventsUri = registerUri(
+        expectString(entry.events, 'scene.events', uri)
+      );
+      const layout = readLayout(files, layoutUri, 'gdevelop-scene-layout', {
+        ...layoutObjectContext(objects, project.objects || []),
+      });
+      Object.keys(layout).forEach(field => {
+        if (settings[field] !== undefined) {
+          fail(
+            'MULTIFILE_OWNERSHIP_CONFLICT',
+            `Scene settings duplicate layout field ${field}.`,
+            uri
+          );
+        }
+      });
+      return {
+        ...settings,
+        objects,
+        objectsFolderStructure: buildLegacyObjectsFolderStructure(
+          objectDocuments
+        ),
+        ...layout,
+        events: compileEvents(files, eventsUri, options),
+      };
+    }
+  );
 
   project.externalEvents = [];
   project.externalLayouts = [];
@@ -1908,7 +2342,14 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
           child.uri
         );
         extension.eventsBasedObjects.push(
-          composePrefab(files, payload, options, child.uri)
+          composePrefab(
+            files,
+            payload,
+            options,
+            child.uri,
+            child.objectDocuments,
+            child.variantObjectDocuments
+          )
         );
       } else {
         const payload = requireNamespace(
@@ -2058,7 +2499,7 @@ const normalizeLayoutFragment = (layout, editorField, hasLayers = true) => {
 };
 
 export const normalizeLegacyProjectForMultiFile = legacyProject => {
-  const project = clone(legacyProject);
+  const project = removeLegacyFolderStructuresFromProject(legacyProject);
   project.layouts = project.layouts || [];
   project.externalEvents = project.externalEvents || [];
   project.externalLayouts = project.externalLayouts || [];

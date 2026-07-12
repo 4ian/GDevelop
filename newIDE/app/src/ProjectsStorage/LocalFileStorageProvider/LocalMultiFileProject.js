@@ -79,12 +79,13 @@ const removeEmptyManagedParentDirectories = async (
   uris.forEach(uri => {
     const relative = validateGameUri(uri);
     const segments = relative.split('/');
-    if (!['scenes', 'extensions', 'externals'].includes(segments[0])) return;
+    if (!['objects', 'scenes', 'extensions', 'externals'].includes(segments[0]))
+      return;
 
     let directory = path.dirname(resolveGameUriToPath(root, uri));
     while (directory !== root) {
       const directorySegments = path.relative(root, directory).split(path.sep);
-      // Keep the stable top-level containers (scenes, extensions, externals).
+      // Keep the stable top-level containers.
       if (directorySegments.length <= 1) break;
       assertInside(root, directory);
       directories.add(directory);
@@ -224,6 +225,28 @@ const findGameUris = (value: any, output: Set<string>) => {
     Object.keys(value).forEach(key => findGameUris(value[key], output));
 };
 
+const discoverSettingsFilesRecursively = async (
+  directoryPath: string,
+  uriSegments: Array<string>,
+  output: Array<string>
+): Promise<void> => {
+  if (!fs.existsSync(directoryPath)) return;
+  const entries = await fs.readdir(directoryPath, { withFileTypes: true });
+  for (const entry of entries) {
+    const encodedName = encodeManagedName(entry.name);
+    const entryPath = path.join(directoryPath, entry.name);
+    if (entry.isDirectory()) {
+      await discoverSettingsFilesRecursively(
+        entryPath,
+        [...uriSegments, encodedName],
+        output
+      );
+    } else if (entry.isFile() && entry.name.endsWith('.settings')) {
+      output.push(`game://${[...uriSegments, encodedName].join('/')}`);
+    }
+  }
+};
+
 const discoverOwnedSettingsUris = async (
   projectRoot: string
 ): Promise<Array<string>> => {
@@ -236,21 +259,30 @@ const discoverOwnedSettingsUris = async (
   if (fs.existsSync(resourcesSettingsPath)) {
     discovered.push(MULTI_FILE_RESOURCES_URI);
   }
+  await discoverSettingsFilesRecursively(
+    path.join(projectRoot, 'objects'),
+    ['objects'],
+    discovered
+  );
   const scenesRoot = path.join(projectRoot, 'scenes');
   if (fs.existsSync(scenesRoot)) {
     const sceneEntries = await fs.readdir(scenesRoot, {
       withFileTypes: true,
     });
-    sceneEntries
-      .filter(entry => entry.isDirectory())
-      .forEach(entry => {
-        const filePath = path.join(scenesRoot, entry.name, 'scene.settings');
-        if (fs.existsSync(filePath)) {
-          discovered.push(
-            `game://scenes/${encodeManagedName(entry.name)}/scene.settings`
-          );
-        }
-      });
+    for (const entry of sceneEntries) {
+      if (!entry.isDirectory()) continue;
+      const sceneSegment = encodeManagedName(entry.name);
+      const sceneRoot = path.join(scenesRoot, entry.name);
+      const filePath = path.join(sceneRoot, 'scene.settings');
+      if (fs.existsSync(filePath)) {
+        discovered.push(`game://scenes/${sceneSegment}/scene.settings`);
+      }
+      await discoverSettingsFilesRecursively(
+        path.join(sceneRoot, 'objects'),
+        ['scenes', sceneSegment, 'objects'],
+        discovered
+      );
+    }
   }
 
   const externalSettingsPath = path.join(
@@ -290,22 +322,53 @@ const discoverOwnedSettingsUris = async (
         const childEntries = await fs.readdir(childRoot, {
           withFileTypes: true,
         });
-        childEntries
-          .filter(entry => entry.isDirectory())
-          .forEach(entry => {
-            const settingsPath = path.join(
-              childRoot,
-              entry.name,
-              child.settings
+        for (const entry of childEntries) {
+          if (!entry.isDirectory()) continue;
+          const childSegment = encodeManagedName(entry.name);
+          const componentRoot = path.join(childRoot, entry.name);
+          const settingsPath = path.join(componentRoot, child.settings);
+          if (fs.existsSync(settingsPath)) {
+            discovered.push(
+              `game://extensions/${extensionUriSegment}/${
+                child.folder
+              }/${childSegment}/${child.settings}`
             );
-            if (fs.existsSync(settingsPath)) {
-              discovered.push(
-                `game://extensions/${extensionUriSegment}/${
-                  child.folder
-                }/${encodeManagedName(entry.name)}/${child.settings}`
-              );
-            }
+          }
+          if (child.folder !== 'prefabs') continue;
+          await discoverSettingsFilesRecursively(
+            path.join(componentRoot, 'objects'),
+            [
+              'extensions',
+              extensionUriSegment,
+              'prefabs',
+              childSegment,
+              'objects',
+            ],
+            discovered
+          );
+          const variantsRoot = path.join(componentRoot, 'variants');
+          if (!fs.existsSync(variantsRoot)) continue;
+          const variantEntries = await fs.readdir(variantsRoot, {
+            withFileTypes: true,
           });
+          for (const variantEntry of variantEntries) {
+            if (!variantEntry.isDirectory()) continue;
+            const variantSegment = encodeManagedName(variantEntry.name);
+            await discoverSettingsFilesRecursively(
+              path.join(variantsRoot, variantEntry.name, 'objects'),
+              [
+                'extensions',
+                extensionUriSegment,
+                'prefabs',
+                childSegment,
+                'variants',
+                variantSegment,
+                'objects',
+              ],
+              discovered
+            );
+          }
+        }
       }
     }
   }

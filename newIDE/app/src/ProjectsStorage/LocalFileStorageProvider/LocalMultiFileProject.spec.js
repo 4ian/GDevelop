@@ -185,9 +185,18 @@ describe('Local multi-file project storage', () => {
         },
       ],
     });
+    changedObjectProject.layouts[0].objectsFolderStructure = {
+      folderName: '__ROOT',
+      children: [
+        {
+          folderName: 'Actors',
+          children: [{ objectName: 'Player' }],
+        },
+      ],
+    };
     expect(
       await writeLegacyProjectAsMultiFile(changedObjectProject, entryPath)
-    ).toEqual(['game://scenes/Main/scene.settings']);
+    ).toEqual(['game://scenes/Main/objects/Actors/Player.settings']);
 
     const changedInstanceProject = JSON.parse(
       JSON.stringify(changedObjectProject)
@@ -289,10 +298,19 @@ describe('Local multi-file project storage', () => {
         behaviors: [{ name: 'Tween', type: 'Tween::TweenBehavior' }],
       }
     );
+    changedDefinition.eventsFunctionsExtensions[0].eventsBasedObjects[0].objectsFolderStructure = {
+      folderName: '__ROOT',
+      children: [
+        {
+          folderName: 'Parts',
+          children: [{ objectName: 'Body' }],
+        },
+      ],
+    };
     expect(
       await writeLegacyProjectAsMultiFile(changedDefinition, entryPath)
     ).toEqual([
-      'game://extensions/Local/prefabs/Widget/prefab.settings',
+      'game://extensions/Local/prefabs/Widget/objects/Parts/Body.settings',
     ]);
 
     const changedInstance = JSON.parse(JSON.stringify(changedDefinition));
@@ -319,6 +337,70 @@ describe('Local multi-file project storage', () => {
     expect(
       await writeLegacyProjectAsMultiFile(changedInstance, entryPath)
     ).toEqual(['game://extensions/Local/prefabs/Widget/Widget.layout']);
+
+    const movedDefinition = JSON.parse(JSON.stringify(changedInstance));
+    movedDefinition.eventsFunctionsExtensions[0].eventsBasedObjects[0].objectsFolderStructure.children[0].folderName =
+      'Visuals';
+    expect(
+      await writeLegacyProjectAsMultiFile(movedDefinition, entryPath)
+    ).toEqual(
+      expect.arrayContaining([
+        'game://extensions/Local/prefabs/Widget/objects/Parts/Body.settings',
+        'game://extensions/Local/prefabs/Widget/objects/Visuals/Body.settings',
+      ])
+    );
+    expect(
+      fs.existsSync(
+        path.join(
+          temporaryDirectory,
+          'extensions/Local/prefabs/Widget/objects/Parts/Body.settings'
+        )
+      )
+    ).toBe(false);
+  });
+
+  test('discovers and moves global object settings through physical folders', async () => {
+    const entryPath = path.join(temporaryDirectory, 'project.settings');
+    const project = JSON.parse(JSON.stringify(projectFixture));
+    project.objects = [
+      {
+        name: 'GlobalPlayer',
+        type: 'Sprite',
+        behaviors: [],
+      },
+    ];
+    project.objectsFolderStructure = {
+      folderName: '__ROOT',
+      children: [
+        {
+          folderName: 'Actors',
+          children: [{ objectName: 'GlobalPlayer' }],
+        },
+      ],
+    };
+
+    expect(await writeLegacyProjectAsMultiFile(project, entryPath)).toEqual(
+      expect.arrayContaining(['game://objects/Actors/GlobalPlayer.settings'])
+    );
+    expect((await openMultiFileProject(entryPath)).objects).toEqual(
+      project.objects
+    );
+
+    const movedProject = JSON.parse(JSON.stringify(project));
+    movedProject.objectsFolderStructure.children[0].folderName = 'Shared';
+    expect(
+      await writeLegacyProjectAsMultiFile(movedProject, entryPath)
+    ).toEqual(
+      expect.arrayContaining([
+        'game://objects/Actors/GlobalPlayer.settings',
+        'game://objects/Shared/GlobalPlayer.settings',
+      ])
+    );
+    expect(
+      fs.existsSync(
+        path.join(temporaryDirectory, 'objects/Actors/GlobalPlayer.settings')
+      )
+    ).toBe(false);
   });
 
   test('removes only obsolete files owned by the previous manifest', async () => {
@@ -607,10 +689,14 @@ describe('Local multi-file project storage', () => {
 
     expect(fs.existsSync(settingsPath)).toBe(true);
     expect(fs.existsSync(layoutPath)).toBe(true);
-    expect(JSON.parse(fs.readFileSync(settingsPath, 'utf8')).counts).toEqual(
-      settingsCatalog.counts
+    const persistedSettingsCatalog = JSON.parse(
+      fs.readFileSync(settingsPath, 'utf8')
     );
-    expect(settingsCatalog.counts.fileKinds).toBe(9);
+    expect(persistedSettingsCatalog.counts).toEqual(settingsCatalog.counts);
+    expect(JSON.stringify(persistedSettingsCatalog.fileKinds)).not.toMatch(
+      /FolderStructure/
+    );
+    expect(settingsCatalog.counts.fileKinds).toBe(12);
     expect(settingsCatalog.counts.objectTypes).toBeGreaterThan(5);
     expect(settingsCatalog.counts.behaviorTypes).toBeGreaterThan(5);
     expect(layoutCatalog.contexts).toEqual(
@@ -656,6 +742,9 @@ describe('Local multi-file project storage', () => {
     expect(
       JSON.parse(fs.readFileSync(generatedPath, 'utf8')).properties.name
     ).toBe('Generated compatibility project');
+    expect(fs.readFileSync(generatedPath, 'utf8')).not.toMatch(
+      /(?:eventsFunctions|objects|properties|sharedProperties)FolderStructure/
+    );
     expect(
       fs.existsSync(
         path.join(temporaryDirectory, '.gdevelop/settings-catalog.json')

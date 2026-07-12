@@ -3678,15 +3678,14 @@ object/behavior parameters and generated call names come from the current
 metadata declaration helper; the compiler must not treat all three owners as
 identical extension-level functions.
 
-### 34.6 Folder and order metadata
+### 34.6 Physical ownership and order metadata
 
-Function folder structure is not derivable from filenames. `extension.settings`
-preserves the ordered manifest and `eventsFunctionsFolderStructure` for
-extension-level functions, with each entry pointing to
-`functions/<Function>/function.settings`. `prefab.settings` and
-`behavior.settings` preserve the same information for their own methods. A DSL
-decompiler must not sort function files alphabetically and thereby change
-editor presentation/group ownership.
+The multi-file format does not serialize `eventsFunctionsFolderStructure` or
+any other legacy `*FolderStructure` property. Extension-level functions are
+owned by physical `functions/<Function>/` directories. Prefab and behavior
+methods are owned by their physical prefab/behavior directories and sibling
+`.events` files. Contiguous `order` values preserve deterministic legacy array
+order where required; no parallel logical folder tree is generated or read.
 
 ---
 

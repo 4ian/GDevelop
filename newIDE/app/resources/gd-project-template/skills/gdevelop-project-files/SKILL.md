@@ -85,16 +85,24 @@ generated compatibility/runtime output, not multi-file source.
 - `.gdevelop/`: generated/editor state. Read catalogs; do not author sources
   there.
 
-Preserve manifest order, stable names, existing unknown fields, and ownership
-boundaries. Make the smallest coherent patch. When adding a component, add its
-manifest entry and every referenced source file in the same change.
+Preserve component order, stable names, existing unknown fields, and ownership
+boundaries. Make the smallest coherent patch. When adding a component, create
+its physical component directory and every referenced source file in the same
+change. Never write `eventsFunctionsFolderStructure`,
+`objectsFolderStructure`, `propertiesFolderStructure`, or
+`sharedPropertiesFolderStructure`. Physical component and object directories
+replace logical component/object trees. There is no property tree: prefab
+`propertyDescriptors` and behavior
+`propertyDescriptors`/`sharedPropertyDescriptors` are flat arrays in source
+order.
 
-For scenes, put `objects`, `objectsFolderStructure`, `objectsGroups`, and each
-object's embedded behaviors in `scene.settings`; put `instances`, `layers`,
-background color, and `uiSettings` in `<Scene>.layout`. For prefabs and prefab
-variants, put child `objects`, `objectsFolderStructure`, `objectsGroups`, and
-their behaviors in `prefab.settings`; keep only instances, layers, spatial
-bounds, and editor layout state in the corresponding `.layout`.
+Give every global, scene, default-prefab, and variant-prefab object its own
+`<Object>.settings` file under the owner's recursive `objects/` directory. Put
+the complete object definition there, including behaviors, variables, effects,
+and type-specific configuration. `project.settings`, `scene.settings`, and
+`prefab.settings` must not embed object definitions. Keep object groups and
+other owner-wide configuration in the owner settings. Put only instances,
+layers, background/bounds, and editor layout state in `.layout`.
 
 ## Project layout
 
@@ -102,9 +110,11 @@ bounds, and editor layout state in the corresponding `.layout`.
 project.settings
 resources.settings
 config.settings
+objects/<optional folder path>/<Object>.settings
 scenes/<Scene>/<Scene>.layout
 scenes/<Scene>/<Scene>.events
 scenes/<Scene>/scene.settings
+scenes/<Scene>/objects/<optional folder path>/<Object>.settings
 externals/external.settings
 externals/<External>.layout
 externals/<External>.events
@@ -114,6 +124,9 @@ extensions/<Extension>/functions/<Function>/<Function>.events
 extensions/<Extension>/prefabs/<Prefab>/prefab.settings
 extensions/<Extension>/prefabs/<Prefab>/<Prefab>.layout
 extensions/<Extension>/prefabs/<Prefab>/<Function>.events
+extensions/<Extension>/prefabs/<Prefab>/objects/<optional folder path>/<Object>.settings
+extensions/<Extension>/prefabs/<Prefab>/variants/<Variant>.layout
+extensions/<Extension>/prefabs/<Prefab>/variants/<Variant>/objects/<optional folder path>/<Object>.settings
 extensions/<Extension>/behaviors/<Behavior>/behavior.settings
 extensions/<Extension>/behaviors/<Behavior>/<Function>.events
 .gdevelop/instructions-catalog.json
@@ -121,7 +134,9 @@ extensions/<Extension>/behaviors/<Behavior>/<Function>.events
 .gdevelop/layout-catalog.json
 ```
 
-Only create optional folders when the owning manifest references them.
+Only create optional component or object folders when their physical
+organization requires them. Settings files never reference other settings
+files.
 
 ## Task references
 
@@ -293,9 +308,13 @@ Before finishing:
 - Confirm every changed `.settings` file is unindented TOML and independently
   parseable; confirm every `.layout` is canonical Layout DSL version 1.
 - Confirm `.layout` files contain only placement/layout concepts and contain no
-  `objects`, `objectsFolderStructure`, `objectsGroups`, or behavior definitions.
-- Confirm every object definition and its complete behaviors are in the owning
-  scene or prefab `.settings` namespace.
+  `objects`, `objectsGroups`, or behavior definitions.
+- Confirm no `.settings` file contains a legacy `*FolderStructure` property;
+  components and objects are organized only by their physical directories.
+- Confirm every global, scene, and prefab object definition and its complete
+  behaviors are in its individual `<Object>.settings` namespace.
+- Confirm prefab and behavior property descriptor arrays are flat and contain
+  no grouping/folder metadata.
 - Confirm settings references use `game://` and resolve to existing files.
 - Confirm settings file kinds and every object/behavior/effect type against
   `settings-catalog.json`.

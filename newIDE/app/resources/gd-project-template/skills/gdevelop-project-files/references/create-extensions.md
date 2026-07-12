@@ -19,9 +19,11 @@ Use the narrowest reusable abstraction:
 | Reusable composition with child object definitions and placed instances | Prefab |
 | A reusable visual object that also owns stateful logic | Prefab plus one or more behaviors |
 
-Keep child object definitions and all of their behaviors in `prefab.settings`,
-instance/layer/spatial composition in prefab `.layout` files, and executable
-logic in `.events`.
+Keep each child object definition and all of its behaviors in an individual
+`objects/<optional folder path>/<Object>.settings` file. Keep prefab-wide
+metadata, groups, variables, and flat property descriptors in
+`prefab.settings`, instance/layer/spatial composition in prefab `.layout`
+files, and executable logic in `.events`.
 
 ## Required workflow
 
@@ -60,6 +62,8 @@ extensions/CombatKit/
     prefab.settings
     Enemy.layout
     Initialize.events
+    objects/Visuals/
+      Body.settings
   behaviors/Health/
     behavior.settings
     TakeDamage.events
@@ -87,14 +91,12 @@ previewIconUrl = ""
 iconUrl = ""
 helpPath = ""
 gdevelopVersion = ""
-
-[extensions."CombatKit".eventsFunctionsFolderStructure]
-folderName = "__ROOT"
-children = []
 ```
 
 Do not add `functionFiles`, `prefabFiles`, `behaviorFiles`, or child settings
-paths. Fixed-folder discovery finds the children.
+paths. Fixed-folder discovery finds the children. Do not add any legacy
+`*FolderStructure` table: `functions/`, `prefabs/`, and `behaviors/` are the
+structure.
 
 `extensions/CombatKit/functions/ResetCombat/function.settings`:
 
@@ -152,12 +154,8 @@ isInnerAreaFollowingParentSize = false
 isUsingLegacyInstancesRenderer = false
 layout = "game://extensions/CombatKit/prefabs/Enemy/Enemy.layout"
 variables = []
-objects = []
 objectsGroups = []
-
-[extensions."CombatKit".prefabs."Enemy".objectsFolderStructure]
-folderName = "__ROOT"
-children = []
+propertyDescriptors = []
 
 [[extensions."CombatKit".prefabs."Enemy".functions]]
 name = "Initialize"
@@ -188,11 +186,27 @@ if BooleanObjectVariable object="Object" variable="Initialized" check_if_the_val
 do SetBooleanObjectVariable object="Object" variable="Initialized" modification_sign="True"
 ```
 
-Add child object definitions, their variables/effects, and every attached
-behavior to `Enemy`'s namespace in `prefab.settings`. Add only instances,
-layers, spatial bounds, and editor layout state to `Enemy.layout`. Copy the
-complete object-definition shape from an existing compatible `.settings` file
-rather than inventing serializer fields.
+`extensions/CombatKit/prefabs/Enemy/objects/Visuals/Body.settings`:
+
+```toml
+[extensions."CombatKit".prefabs."Enemy".objects."Body"]
+kind = "object"
+settingsFormatVersion = 1
+order = 0
+name = "Body"
+type = "Sprite"
+behaviors = []
+variables = []
+effects = []
+```
+
+Add every child object definition, its variables/effects, and every attached
+behavior to its own recursive object settings file. The directories after
+`objects/` are the editor object-folder path. Add only instances, layers,
+spatial bounds, and editor layout state to `Enemy.layout`. Copy the complete
+object-definition shape from an existing compatible object `.settings` file
+rather than inventing serializer fields. Keep `propertyDescriptors` as one
+flat ordered array in `prefab.settings`; never add property folders.
 
 `extensions/CombatKit/behaviors/Health/behavior.settings`:
 
@@ -245,8 +259,9 @@ selection.
 - Add a behavior function as a complete `[[...functions]]` entry in
   `behavior.settings`; put its body beside the behavior settings.
 - Add prefab variants under `variants/<Variant>.layout`; keep the variant's
-  identity, layout URI, child object definitions/groups/folder structure, and
-  child behaviors in its `prefab.settings` entry.
+  identity, layout URI, and groups in its `prefab.settings` entry. Put each
+  variant child definition and its behaviors in
+  `variants/<Variant>/objects/<optional folder path>/<Object>.settings`.
 - On rename, update the folder, settings namespace, `name`, `.events` or
   `.layout` basename, every `game://` reference, and every caller atomically.
 - On delete, remove callers and scene instances first, reload and verify, then
@@ -259,7 +274,9 @@ selection.
 2. Verify component orders are contiguous and names/folders/basenames match.
 3. Verify every referenced `.events` and `.layout` file exists.
 4. Verify prefab layouts contain no object definitions or behaviors and that
-   these are present in `prefab.settings`.
+   every definition is present in its own recursive object settings file.
+   Verify property descriptor arrays are flat and no property folder metadata
+   exists.
 5. Verify every action is condition-guarded and every object action targets at
    most one picked instance.
 6. Reload the project and confirm the new instruction/object/behavior types

@@ -10,6 +10,7 @@ import {
   decomposeLegacyProjectToFiles,
   encodeManagedName,
   parseTomlSource,
+  removeLegacyFolderStructuresFromProject,
   validateGameUri,
 } from './index';
 import { compileLayoutDsl } from '../LayoutDsl';
@@ -230,6 +231,13 @@ describe('GDevelop multi-file project format', () => {
     expect(files['game://extensions/Combat/extension.settings']).not.toMatch(
       /game:\/\/[^"']+\.settings/
     );
+    Object.entries(files)
+      .filter(([uri]) => uri.endsWith('.settings'))
+      .forEach(([, source]) => {
+        expect(source).not.toMatch(
+          /(?:eventsFunctions|objects|properties|sharedProperties)FolderStructure/
+        );
+      });
   });
 
   test('discovers settings by fixed folders and restores locally owned order', () => {
@@ -393,7 +401,12 @@ mode = "embedded"
     ];
     project.layouts[0].objectsFolderStructure = {
       folderName: '__ROOT',
-      children: [{ objectName: 'Player' }],
+      children: [
+        {
+          folderName: 'Actors',
+          children: [{ objectName: 'Player' }],
+        },
+      ],
     };
     const files = decomposeLegacyProjectToFiles(project);
     const layoutSource = files['game://scenes/Main/Main.layout'];
@@ -410,7 +423,13 @@ mode = "embedded"
     expect(layoutDocument).not.toHaveProperty('variables');
     expect(layoutDocument).not.toHaveProperty('objectsGroups');
     expect(layoutDocument).not.toHaveProperty('title');
-    expect(settingsDocument.scenes.Main.objects[0]).toMatchObject({
+    expect(settingsDocument.scenes.Main).not.toHaveProperty('objects');
+    const objectSettingsDocument = parseTomlSource(
+      files['game://scenes/Main/objects/Actors/Player.settings']
+    );
+    expect(objectSettingsDocument.scenes.Main.objects.Player).toMatchObject({
+      kind: 'object',
+      order: 0,
       name: 'Player',
       type: 'Sprite',
       behaviors: [
@@ -420,16 +439,110 @@ mode = "embedded"
         },
       ],
     });
-    expect(settingsDocument.scenes.Main.objectsFolderStructure).toEqual({
-      folderName: '__ROOT',
-      children: [{ objectName: 'Player' }],
-    });
+    expect(settingsDocument.scenes.Main).not.toHaveProperty(
+      'objectsFolderStructure'
+    );
     expect(composeLegacyProjectFromFiles(files).layouts[0].objects).toEqual(
       project.layouts[0].objects
     );
   });
 
-  test('keeps prefab object definitions and their behaviors in prefab settings', () => {
+  test('stores global objects in physical root object folders', () => {
+    const project = JSON.parse(JSON.stringify(projectFixture));
+    project.objects = [
+      {
+        name: 'GlobalPlayer',
+        type: 'Sprite',
+        behaviors: [
+          {
+            name: 'Tween',
+            type: 'Tween::TweenBehavior',
+          },
+        ],
+      },
+    ];
+    project.objectsFolderStructure = {
+      folderName: '__ROOT',
+      children: [
+        {
+          folderName: 'Actors',
+          children: [{ objectName: 'GlobalPlayer' }],
+        },
+      ],
+    };
+
+    const files = decomposeLegacyProjectToFiles(project);
+    const projectSettings = parseTomlSource(files[MULTI_FILE_ENTRY_URI]);
+    const objectSettings = parseTomlSource(
+      files['game://objects/Actors/GlobalPlayer.settings']
+    );
+    const output = composeLegacyProjectFromFiles(files);
+
+    expect(projectSettings.project).not.toHaveProperty('objects');
+    expect(objectSettings.project.objects.GlobalPlayer).toMatchObject({
+      kind: 'object',
+      order: 0,
+      name: 'GlobalPlayer',
+      type: 'Sprite',
+      behaviors: [{ name: 'Tween', type: 'Tween::TweenBehavior' }],
+    });
+    expect(output.objects).toEqual(project.objects);
+    expect(output.objectsFolderStructure).toEqual(
+      project.objectsFolderStructure
+    );
+    expect(areLegacyProjectsEquivalent(project, output)).toBe(true);
+  });
+
+  test('rejects serialized folder trees instead of keeping compatibility', () => {
+    const files = decomposeLegacyProjectToFiles(projectFixture);
+    files['game://extensions/Combat/extension.settings'] += `
+[extensions.Combat.eventsFunctionsFolderStructure]
+folderName = "__ROOT"
+`;
+
+    expect(() => composeLegacyProjectFromFiles(files)).toThrow(
+      expect.objectContaining({
+        code: 'MULTIFILE_FORBIDDEN_FOLDER_STRUCTURE',
+      })
+    );
+  });
+
+  test('uses physical sources instead of every legacy logical folder tree', () => {
+    const project = JSON.parse(JSON.stringify(projectFixture));
+    const folder = {
+      folderName: '__ROOT',
+      children: [{ folderName: 'Legacy group', children: [] }],
+    };
+    const extension = project.eventsFunctionsExtensions[0];
+    const prefab = extension.eventsBasedObjects[0];
+    const behavior = extension.eventsBasedBehaviors[0];
+
+    project.objectsFolderStructure = folder;
+    project.layouts[0].objectsFolderStructure = folder;
+    extension.eventsFunctionsFolderStructure = folder;
+    prefab.objectsFolderStructure = folder;
+    prefab.eventsFunctionsFolderStructure = folder;
+    prefab.propertiesFolderStructure = folder;
+    prefab.variants[0].objectsFolderStructure = folder;
+    behavior.eventsFunctionsFolderStructure = folder;
+    behavior.propertiesFolderStructure = folder;
+    behavior.sharedPropertiesFolderStructure = folder;
+
+    const files = decomposeLegacyProjectToFiles(project);
+    const output = composeLegacyProjectFromFiles(files);
+
+    expect(
+      Object.entries(files)
+        .filter(([uri]) => uri.endsWith('.settings'))
+        .some(([, source]) => /FolderStructure/.test(source))
+    ).toBe(false);
+    expect(
+      JSON.stringify(removeLegacyFolderStructuresFromProject(output))
+    ).not.toMatch(/FolderStructure/);
+    expect(areLegacyProjectsEquivalent(project, output)).toBe(true);
+  });
+
+  test('stores prefab object definitions in physical object settings', () => {
     const project = JSON.parse(JSON.stringify(projectFixture));
     const prefab = project.eventsFunctionsExtensions[0].eventsBasedObjects[0];
     prefab.objects = [
@@ -444,6 +557,15 @@ mode = "embedded"
         ],
       },
     ];
+    prefab.objectsFolderStructure = {
+      folderName: '__ROOT',
+      children: [
+        {
+          folderName: 'Visuals',
+          children: [{ objectName: 'Body' }],
+        },
+      ],
+    };
     prefab.objectsGroups = [{ name: 'Parts', objects: ['Body'] }];
     const files = decomposeLegacyProjectToFiles(project);
     const layoutDocument = compileLayoutDsl(
@@ -458,12 +580,109 @@ mode = "embedded"
     expect(layoutDocument).not.toHaveProperty('objects');
     expect(layoutDocument).not.toHaveProperty('objectsFolderStructure');
     expect(layoutDocument).not.toHaveProperty('objectsGroups');
-    expect(prefabSettings.objects).toEqual(prefab.objects);
+    expect(prefabSettings).not.toHaveProperty('objects');
     expect(prefabSettings.objectsGroups).toEqual(prefab.objectsGroups);
+    expect(
+      parseTomlSource(
+        files[
+          'game://extensions/Combat/prefabs/Enemy/objects/Visuals/Body.settings'
+        ]
+      ).extensions.Combat.prefabs.Enemy.objects.Body
+    ).toMatchObject({
+      kind: 'object',
+      order: 0,
+      name: 'Body',
+      type: 'Sprite',
+      behaviors: [{ name: 'Tween', type: 'Tween::TweenBehavior' }],
+    });
     expect(
       composeLegacyProjectFromFiles(files).eventsFunctionsExtensions[0]
         .eventsBasedObjects[0].objects
     ).toEqual(prefab.objects);
+  });
+
+  test('keeps prefab properties as flat arrays without property folders', () => {
+    const project = JSON.parse(JSON.stringify(projectFixture));
+    const prefab = project.eventsFunctionsExtensions[0].eventsBasedObjects[0];
+    prefab.propertyDescriptors = [
+      { name: 'Health', type: 'Number', value: '100' },
+      { name: 'Label', type: 'String', value: 'Enemy' },
+    ];
+    prefab.propertiesFolderStructure = {
+      folderName: '__ROOT',
+      children: [
+        {
+          folderName: 'Stats',
+          children: [{ propertyName: 'Health' }],
+        },
+      ],
+    };
+
+    const files = decomposeLegacyProjectToFiles(project);
+    const prefabSettings = parseTomlSource(
+      files['game://extensions/Combat/prefabs/Enemy/prefab.settings']
+    ).extensions.Combat.prefabs.Enemy;
+    const outputPrefab = composeLegacyProjectFromFiles(files)
+      .eventsFunctionsExtensions[0].eventsBasedObjects[0];
+
+    expect(prefabSettings.propertyDescriptors).toEqual(
+      prefab.propertyDescriptors
+    );
+    expect(prefabSettings).not.toHaveProperty('propertiesFolderStructure');
+    expect(outputPrefab.propertyDescriptors).toEqual(
+      prefab.propertyDescriptors
+    );
+    expect(outputPrefab).not.toHaveProperty('propertiesFolderStructure');
+    expect(
+      areLegacyProjectsEquivalent(project, composeLegacyProjectFromFiles(files))
+    ).toBe(true);
+  });
+
+  test('stores prefab variant objects in physical variant folders', () => {
+    const project = JSON.parse(JSON.stringify(projectFixture));
+    const variant =
+      project.eventsFunctionsExtensions[0].eventsBasedObjects[0].variants[0];
+    variant.objects = [
+      {
+        name: 'Shield',
+        type: 'Sprite',
+        behaviors: [],
+      },
+    ];
+    variant.objectsFolderStructure = {
+      folderName: '__ROOT',
+      children: [
+        {
+          folderName: 'Equipment',
+          children: [{ objectName: 'Shield' }],
+        },
+      ],
+    };
+
+    const files = decomposeLegacyProjectToFiles(project);
+    const objectUri =
+      'game://extensions/Combat/prefabs/Enemy/variants/Armored/objects/Equipment/Shield.settings';
+    const objectDocument = parseTomlSource(files[objectUri]);
+    const outputVariant = composeLegacyProjectFromFiles(files)
+      .eventsFunctionsExtensions[0].eventsBasedObjects[0].variants[0];
+
+    expect(
+      objectDocument.extensions.Combat.prefabs.Enemy.variantObjects.Armored
+        .Shield
+    ).toMatchObject({ kind: 'object', order: 0, type: 'Sprite' });
+    expect(outputVariant.objects).toEqual(variant.objects);
+    expect(outputVariant.objectsFolderStructure).toEqual({
+      folderName: '__ROOT',
+      children: [
+        {
+          folderName: 'Equipment',
+          children: [{ objectName: 'Shield' }],
+        },
+      ],
+    });
+    expect(
+      areLegacyProjectsEquivalent(project, composeLegacyProjectFromFiles(files))
+    ).toBe(true);
   });
 
   test('saves partially initialized prefab editor settings', () => {

@@ -57,9 +57,9 @@ by stable domain ownership such as `Combat`, `Inventory`, or `UIWidgets`.
 3. Reload the project, regenerate/re-read the catalog, and confirm all new
    instruction/object/behavior types exist.
 4. Move one coherent behavior at a time:
-   - Copy child object definitions and their attached behaviors into
-     `prefab.settings`; copy only instances/layers/spatial composition into the
-     prefab layout.
+   - Copy each child object definition and its attached behaviors into an
+     individual recursive `prefab/objects/<folders>/<Object>.settings`; copy
+     only instances/layers/spatial composition into the prefab layout.
    - Move per-instance variables and logic into behavior settings/functions.
    - Move shared calculations into extension-level functions.
    - Preserve metadata, defaults, resources, and unknown fields.
@@ -98,6 +98,9 @@ extensions/Combat/
     prefab.settings
     Enemy.layout
     Initialize.events
+    objects/
+      Sprite.settings
+      HealthBar.settings
   behaviors/Health/
     behavior.settings
     TakeDamage.events
@@ -105,8 +108,10 @@ extensions/Combat/
 ```
 
 1. Put the sprite/health-bar child object definitions and their attached
-   behaviors in `Enemy/prefab.settings`; put layers and default instances in
-   `Enemy.layout`.
+   behaviors in `Enemy/objects/Sprite.settings` and
+   `Enemy/objects/HealthBar.settings`; put layers and default instances in
+   `Enemy.layout`. Keep prefab property descriptors flat in
+   `Enemy/prefab.settings`.
 2. Put health properties/variables and `TakeDamage`/`IsDead` signatures in
    `Health/behavior.settings`; put only their DSL bodies in sibling files.
 3. Put the stateless damage formula in `CalculateDamage/function.settings` and

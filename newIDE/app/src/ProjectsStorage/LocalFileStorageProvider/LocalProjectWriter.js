@@ -27,6 +27,7 @@ import {
   type ShowConfirmFunction,
 } from '../../UI/Alert/AlertContext';
 import { writeLegacyProjectAsMultiFile } from './LocalMultiFileProject';
+import { removeLegacyFolderStructuresFromProject } from '../MultiFileProjectFormat';
 import {
   PROJECT_INSTRUCTION_CATALOG_RELATIVE_PATH,
   buildProjectInstructionCatalog,
@@ -272,7 +273,7 @@ const writeProjectFiles = async ({
       path.join(projectPath, ...PROJECT_LAYOUT_CATALOG_RELATIVE_PATH.split('/'))
     );
     await writeAndCheckFormattedJSONFile(
-      serializedProjectObject,
+      removeLegacyFolderStructuresFromProject(serializedProjectObject),
       path.join(
         projectPath,
         ...GENERATED_LEGACY_PROJECT_RELATIVE_PATH.split('/')

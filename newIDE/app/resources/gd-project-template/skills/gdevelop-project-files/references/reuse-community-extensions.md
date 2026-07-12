@@ -133,10 +133,12 @@ The native conversion maps the legacy extension as follows:
 | Top-level metadata except implementation arrays | `extensions/<E>/extension.settings` |
 | `eventsFunctions[]` metadata | One `functions/<F>/function.settings` each |
 | `eventsFunctions[].events` | Matching `functions/<F>/<F>.events` |
-| `eventsBasedObjects[]` metadata plus child object definitions/groups/folders and attached behaviors | One `prefabs/<P>/prefab.settings` each |
+| `eventsBasedObjects[]` metadata, flat property descriptors, groups, variables, and function metadata | One `prefabs/<P>/prefab.settings` each |
+| Default child object definitions and attached behaviors | One recursive `prefabs/<P>/objects/<folders>/<Object>.settings` each |
 | Prefab default-variant instances/layers/spatial bounds/editor layout state | `<P>.layout` |
 | Prefab `eventsFunctions[].events` | Sibling `<Function>.events` files |
-| Prefab non-default variant definitions/behaviors | Its entry in `prefab.settings` |
+| Prefab non-default variant metadata/groups | Its entry in `prefab.settings` |
+| Prefab non-default variant child definitions/behaviors | One recursive `prefabs/<P>/variants/<Variant>/objects/<folders>/<Object>.settings` each |
 | Prefab non-default variant instances/layers/spatial bounds/editor state | `variants/<Variant>.layout` |
 | `eventsBasedBehaviors[]` metadata | One `behaviors/<B>/behavior.settings` each |
 | Behavior `eventsFunctions[].events` | Sibling `<Function>.events` files |

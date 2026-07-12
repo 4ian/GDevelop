@@ -94,13 +94,14 @@ A typical source file is immediately readable:
 </layout>
 ```
 
-`Player` and `ScoreText` are references to object definitions owned by the
-related settings namespace. They are not object declarations.
+`Player` and `ScoreText` are references to individual object definitions
+discovered from the related physical `objects/` directory. They are not object
+declarations.
 
 The compiler converts a `.layout` file into exactly the layout-owned fields
 consumed by the current GDevelop serializers. The multi-file project composer
 then merges those fields with the object definitions and configuration from
-the owning `.settings` file before calling the existing GDevelop
+the owner's recursive object `.settings` files before calling the existing GDevelop
 unserializers. Preview, export, and runtime code continue to consume the
 current in-memory project and compatibility JSON shape.
 
@@ -153,8 +154,9 @@ responsibilities.
 | Concern                                                                                                                                                        | Owner                       |
 | -------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------- |
 | Scene identity and runtime configuration                                                                                                                       | `scene.settings`            |
-| Scene object definitions, object folders/groups, variables, effects, and attached behaviors                                                                    | `scene.settings`            |
-| Prefab/variant child object definitions, folders/groups, effects, and attached behaviors                                                                       | `prefab.settings`           |
+| Scene object definitions, effects, and attached behaviors                                                                                                      | `scenes/<Scene>/objects/<folders>/<Object>.settings` |
+| Prefab/variant child object definitions, effects, and attached behaviors                                                                                       | The corresponding recursive prefab object `.settings` file |
+| Object groups, scene/prefab variables, and other owner-wide configuration                                                                                      | `scene.settings` or `prefab.settings` |
 | Instance placement, transform, size, opacity, flips, editor locks, custom instance properties, initial instance variables, and per-instance behavior overrides | `.layout`                   |
 | Layer definitions, cameras, layer effects, lighting, and rendering configuration                                                                               | Scene or prefab `.layout`   |
 | Scene background                                                                                                                                               | Scene `.layout`             |
@@ -495,17 +497,20 @@ own them:
 ```text
 name, mangledName, title, standardSortMethod, stopSoundsOnStartup,
 resourcesPreloading, resourcesUnloading, disableInputWhenNotFocused,
-objects, objectsFolderStructure, objectsGroups, variables,
+objects, objectsGroups, variables,
 behaviorsSharedData, events
 ```
+
+Legacy `*FolderStructure` fields are forbidden by the multi-file settings
+format itself and are never layout-owned.
 
 ---
 
 ## 11. Prefab and variant layouts
 
 The same grammar is used for a prefab's default variant and every named
-variant. The owning `prefab.settings` entry supplies the prefab/variant
-identity and object definitions.
+variant. The owning `prefab.settings` entry supplies prefab/variant identity;
+recursive default or variant object settings supply object definitions.
 
 A prefab layout owns exactly:
 
@@ -541,7 +546,8 @@ A prefab layout:
 
 The layout forbids `name`, asset-store identity, object definitions, object
 folders/groups, prefab variables, behavior definitions, property descriptors,
-functions, and variants. Those remain in `prefab.settings`.
+functions, and variants. Object definitions belong in recursive object
+settings; the other configuration remains in `prefab.settings`.
 
 ---
 
@@ -1478,8 +1484,8 @@ Instance tag <EnemyBoss> does not resolve to a scene-local or global object.
 
 ## 31. Complete prefab example
 
-The child object definitions `Body` and `HealthBar` are in
-`prefab.settings`; this source only composes their instances.
+The child object definitions `Body` and `HealthBar` are in individual files
+under `objects/`; this source only composes their instances.
 
 ```layout
 <layout version=1>

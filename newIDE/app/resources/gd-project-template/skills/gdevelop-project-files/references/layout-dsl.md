@@ -232,7 +232,8 @@ owning settings. Do not write its behavior type; the compiler derives it.
 - Preserve unknown settings in `.settings`; never move them into layout.
 - Reject rather than invent an unknown object, layer, behavior, effect,
   property, tag, attribute, or serializer fallback.
-- Keep object definitions, attached behaviors, events, resources, variables
-  owned by the scene/prefab itself, and runtime settings outside `.layout`.
+- Keep object definitions and attached behaviors in individual recursive
+  object `.settings` files; keep events, resources, owner variables, and
+  runtime settings outside `.layout`.
 - After an edit, reload the project before previewing so the editor compiler
   validates the file and rebuilds `.gdevelop/game.json`.

@@ -218,8 +218,6 @@ const SETTINGS_FILE_KINDS = Object.freeze([
     commonFields: [
       'gdVersion',
       'properties',
-      'objects',
-      'objectsFolderStructure',
       'objectsGroups',
       'variables',
       'firstLayout',
@@ -228,11 +226,25 @@ const SETTINGS_FILE_KINDS = Object.freeze([
     forbiddenFields: [
       'resources',
       'globalConfig',
+      'objects',
       'layouts',
       'eventsFunctionsExtensions',
       'externalEvents',
       'externalLayouts',
     ],
+  },
+  {
+    kind: 'global-object',
+    path: 'objects/<optional physical folders>/<Object>.settings',
+    namespace: '[project.objects."<Object>"]',
+    requiredFields: ['kind', 'settingsFormatVersion', 'order', 'name', 'type'],
+    commonFields: [
+      'behaviors',
+      'variables',
+      'effects',
+      'type-specific object configuration',
+    ],
+    forbiddenFields: ['instances', 'layers', 'events'],
   },
   {
     kind: 'resources',
@@ -263,14 +275,34 @@ const SETTINGS_FILE_KINDS = Object.freeze([
       'name',
     ],
     commonFields: [
-      'objects',
-      'objectsFolderStructure',
       'objectsGroups',
       'variables',
       'behaviorsSharedData',
       'runtime/loading/input/sound/sort settings',
     ],
-    forbiddenFields: ['instances', 'layers', 'uiSettings', 'r', 'v', 'b'],
+    forbiddenFields: [
+      'objects',
+      'instances',
+      'layers',
+      'uiSettings',
+      'r',
+      'v',
+      'b',
+    ],
+  },
+  {
+    kind: 'scene-object',
+    path:
+      'scenes/<Scene>/objects/<optional physical folders>/<Object>.settings',
+    namespace: '[scenes."<Scene>".objects."<Object>"]',
+    requiredFields: ['kind', 'settingsFormatVersion', 'order', 'name', 'type'],
+    commonFields: [
+      'behaviors',
+      'variables',
+      'effects',
+      'type-specific object configuration',
+    ],
+    forbiddenFields: ['instances', 'layers', 'events'],
   },
   {
     kind: 'externals',
@@ -284,12 +316,7 @@ const SETTINGS_FILE_KINDS = Object.freeze([
     path: 'extensions/<Extension>/extension.settings',
     namespace: '[extensions."<Extension>"]',
     requiredFields: ['kind', 'settingsFormatVersion', 'order', 'name'],
-    commonFields: [
-      'metadata',
-      'dependencies',
-      'variables',
-      'eventsFunctionsFolderStructure',
-    ],
+    commonFields: ['metadata', 'dependencies', 'variables'],
     forbiddenFields: [
       'eventsFunctions',
       'eventsBasedObjects',
@@ -329,8 +356,6 @@ const SETTINGS_FILE_KINDS = Object.freeze([
       'layout',
     ],
     commonFields: [
-      'objects',
-      'objectsFolderStructure',
       'objectsGroups',
       'variables',
       'propertyDescriptors',
@@ -342,7 +367,25 @@ const SETTINGS_FILE_KINDS = Object.freeze([
       'layers',
       'editionSettings',
       'areaMin/Max fields',
+      'objects',
     ],
+    note:
+      'propertyDescriptors is one flat ordered array; property folders do not exist.',
+  },
+  {
+    kind: 'prefab-object',
+    path:
+      'extensions/<Extension>/prefabs/<Prefab>/{objects|variants/<Variant>/objects}/<optional physical folders>/<Object>.settings',
+    namespace:
+      '[extensions."<Extension>".prefabs."<Prefab>".{objects|variantObjects."<Variant>"}."<Object>"]',
+    requiredFields: ['kind', 'settingsFormatVersion', 'order', 'name', 'type'],
+    commonFields: [
+      'behaviors',
+      'variables',
+      'effects',
+      'type-specific object configuration',
+    ],
+    forbiddenFields: ['instances', 'layers', 'events'],
   },
   {
     kind: 'behavior',
@@ -356,6 +399,8 @@ const SETTINGS_FILE_KINDS = Object.freeze([
       'functions',
     ],
     forbiddenFields: ['event bodies'],
+    note:
+      'propertyDescriptors and sharedPropertyDescriptors are flat ordered arrays; property folders do not exist.',
   },
 ]);
 
@@ -453,7 +498,8 @@ export const buildProjectSettingsCatalog = ({
         'Every settings file owns exactly one namespace and must parse both independently and when appended to all other settings files.',
         'Use quoted TOML path segments for dynamic names and canonical game:// URIs for .layout and .events references.',
         'Use kind, settingsFormatVersion=1, and contiguous zero-based order fields exactly where the file-kind entry requires them.',
-        'Object definitions and attached behaviors belong in scene or prefab settings; instances and per-instance behavior overrides belong in .layout.',
+        'Never write a legacy *FolderStructure field. Physical component and object directories are the project structure; property descriptors are flat ordered arrays.',
+        'Each global, scene, default-prefab, or variant-prefab object definition and its attached behaviors belong in its physical <Object>.settings file; instances and per-instance behavior overrides belong in .layout.',
         'Preserve unknown serializer fields. Never invent an object, behavior, or effect type absent from this catalog.',
         'Never edit generated files below .gdevelop or legacy game.json.',
       ],

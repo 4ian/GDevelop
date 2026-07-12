@@ -57,7 +57,9 @@ by stable domain ownership such as `Combat`, `Inventory`, or `UIWidgets`.
 3. Reload the project, regenerate/re-read the catalog, and confirm all new
    instruction/object/behavior types exist.
 4. Move one coherent behavior at a time:
-   - Copy visual child definitions/instances into the prefab layout.
+   - Copy child object definitions and their attached behaviors into
+     `prefab.settings`; copy only instances/layers/spatial composition into the
+     prefab layout.
    - Move per-instance variables and logic into behavior settings/functions.
    - Move shared calculations into extension-level functions.
    - Preserve metadata, defaults, resources, and unknown fields.
@@ -102,7 +104,8 @@ extensions/Combat/
     IsDead.events
 ```
 
-1. Put the sprite/health-bar child objects, layers, and default instances in
+1. Put the sprite/health-bar child object definitions and their attached
+   behaviors in `Enemy/prefab.settings`; put layers and default instances in
    `Enemy.layout`.
 2. Put health properties/variables and `TakeDamage`/`IsDead` signatures in
    `Health/behavior.settings`; put only their DSL bodies in sibling files.
@@ -132,7 +135,9 @@ Verify at least:
 - Every changed settings fragment parses alone and in the combined document.
 - Orders are contiguous; namespaces, folder names, filenames, and `game://`
   references match.
-- No visual data leaked into settings/events and no logic leaked into layouts.
+- Object definitions and their behaviors are in the owning settings namespace;
+  layouts contain only instances, layers, spatial bounds, background, and
+  editor-canvas state; events contain only DSL.
 - Every old caller/instance has a mapped replacement; searches find no dangling
   component, variable, behavior, resource, or instruction references.
 - Every action has an effective condition and every object action receives at

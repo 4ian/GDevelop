@@ -172,7 +172,39 @@ describe('Local multi-file project storage', () => {
       await writeLegacyProjectAsMultiFile(changedProject, entryPath)
     ).toEqual(['game://scenes/Main/scene.settings']);
 
-    const changedResourcesProject = JSON.parse(JSON.stringify(changedProject));
+    const changedObjectProject = JSON.parse(JSON.stringify(changedProject));
+    changedObjectProject.layouts[0].objects.push({
+      name: 'Player',
+      type: 'Sprite',
+      behaviors: [
+        {
+          name: 'PlatformerObject',
+          type: 'PlatformBehavior::PlatformerObjectBehavior',
+        },
+      ],
+    });
+    expect(
+      await writeLegacyProjectAsMultiFile(changedObjectProject, entryPath)
+    ).toEqual(['game://scenes/Main/scene.settings']);
+
+    const changedInstanceProject = JSON.parse(
+      JSON.stringify(changedObjectProject)
+    );
+    changedInstanceProject.layouts[0].instances.push({
+      name: 'Player',
+      persistentUuid: 'player-instance',
+      x: 100,
+      y: 200,
+      layer: '',
+      zOrder: 1,
+    });
+    expect(
+      await writeLegacyProjectAsMultiFile(changedInstanceProject, entryPath)
+    ).toEqual(['game://scenes/Main/Main.layout']);
+
+    const changedResourcesProject = JSON.parse(
+      JSON.stringify(changedInstanceProject)
+    );
     changedResourcesProject.resources.resources.push({
       file: 'assets/New.png',
       kind: 'image',
@@ -203,6 +235,70 @@ describe('Local multi-file project storage', () => {
     expect(
       fs.existsSync(path.join(temporaryDirectory, 'config.settings'))
     ).toBe(false);
+  });
+
+  test('routes prefab definition and instance edits to their owning files', async () => {
+    const entryPath = path.join(temporaryDirectory, 'project.settings');
+    const project = JSON.parse(JSON.stringify(projectFixture));
+    project.eventsFunctionsExtensions = [
+      {
+        name: 'Local',
+        eventsFunctions: [],
+        eventsBasedBehaviors: [],
+        eventsBasedObjects: [
+          {
+            name: 'Widget',
+            areaMinX: 0,
+            areaMinY: 0,
+            areaMinZ: 0,
+            areaMaxX: 64,
+            areaMaxY: 64,
+            areaMaxZ: 64,
+            objects: [],
+            objectsFolderStructure: {
+              folderName: '__ROOT',
+              children: [],
+            },
+            objectsGroups: [],
+            layers: [],
+            instances: [],
+            editionSettings: {},
+            eventsFunctions: [],
+            variants: [],
+          },
+        ],
+      },
+    ];
+    await writeLegacyProjectAsMultiFile(project, entryPath);
+
+    const changedDefinition = JSON.parse(JSON.stringify(project));
+    changedDefinition.eventsFunctionsExtensions[0].eventsBasedObjects[0].objects.push(
+      {
+        name: 'Body',
+        type: 'Sprite',
+        behaviors: [{ name: 'Tween', type: 'Tween::TweenBehavior' }],
+      }
+    );
+    expect(
+      await writeLegacyProjectAsMultiFile(changedDefinition, entryPath)
+    ).toEqual([
+      'game://extensions/Local/prefabs/Widget/prefab.settings',
+    ]);
+
+    const changedInstance = JSON.parse(JSON.stringify(changedDefinition));
+    changedInstance.eventsFunctionsExtensions[0].eventsBasedObjects[0].instances.push(
+      {
+        name: 'Body',
+        persistentUuid: 'body-instance',
+        x: 0,
+        y: 0,
+        layer: '',
+        zOrder: 0,
+      }
+    );
+    expect(
+      await writeLegacyProjectAsMultiFile(changedInstance, entryPath)
+    ).toEqual(['game://extensions/Local/prefabs/Widget/Widget.layout']);
   });
 
   test('removes only obsolete files owned by the previous manifest', async () => {

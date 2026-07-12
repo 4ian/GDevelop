@@ -7,6 +7,7 @@ import path from 'path';
 import {
   MULTI_FILE_CONFIG_URI,
   MULTI_FILE_ENTRY_URI,
+  MULTI_FILE_LAYOUT_FORMAT_VERSION,
   MULTI_FILE_RESOURCES_URI,
   MultiFileProjectError,
   SCENE_LAYOUT_FIELDS,
@@ -434,17 +435,132 @@ mode = "embedded"
     );
   });
 
-  test('keeps scene layout files visual/UI-focused', () => {
-    const files = decomposeLegacyProjectToFiles(projectFixture);
+  test('keeps scene layout files placement-focused', () => {
+    const project = JSON.parse(JSON.stringify(projectFixture));
+    project.layouts[0].objects = [
+      {
+        name: 'Player',
+        type: 'Sprite',
+        behaviors: [
+          {
+            name: 'PlatformerObject',
+            type: 'PlatformBehavior::PlatformerObjectBehavior',
+          },
+        ],
+      },
+    ];
+    project.layouts[0].objectsFolderStructure = {
+      folderName: '__ROOT',
+      children: [{ objectName: 'Player' }],
+    };
+    const files = decomposeLegacyProjectToFiles(project);
     const layoutDocument = parseTomlSource(
       files['game://scenes/Main/Main.layout']
+    );
+    const settingsDocument = parseTomlSource(
+      files['game://scenes/Main/scene.settings']
     );
     expect(Object.keys(layoutDocument.layout).sort()).toEqual(
       [...SCENE_LAYOUT_FIELDS].sort()
     );
+    expect(layoutDocument.formatVersion).toBe(
+      MULTI_FILE_LAYOUT_FORMAT_VERSION
+    );
+    expect(layoutDocument.layout).not.toHaveProperty('objects');
+    expect(layoutDocument.layout).not.toHaveProperty(
+      'objectsFolderStructure'
+    );
     expect(layoutDocument.layout).not.toHaveProperty('variables');
     expect(layoutDocument.layout).not.toHaveProperty('objectsGroups');
     expect(layoutDocument.layout).not.toHaveProperty('title');
+    expect(settingsDocument.scenes.Main.objects[0]).toMatchObject({
+      name: 'Player',
+      type: 'Sprite',
+      behaviors: [
+        {
+          name: 'PlatformerObject',
+          type: 'PlatformBehavior::PlatformerObjectBehavior',
+        },
+      ],
+    });
+    expect(settingsDocument.scenes.Main.objectsFolderStructure).toEqual({
+      folderName: '__ROOT',
+      children: [{ objectName: 'Player' }],
+    });
+    expect(composeLegacyProjectFromFiles(files).layouts[0].objects).toEqual(
+      project.layouts[0].objects
+    );
+  });
+
+  test('keeps prefab object definitions and their behaviors in prefab settings', () => {
+    const project = JSON.parse(JSON.stringify(projectFixture));
+    const prefab = project.eventsFunctionsExtensions[0].eventsBasedObjects[0];
+    prefab.objects = [
+      {
+        name: 'Body',
+        type: 'Sprite',
+        behaviors: [
+          {
+            name: 'Tween',
+            type: 'Tween::TweenBehavior',
+          },
+        ],
+      },
+    ];
+    prefab.objectsGroups = [{ name: 'Parts', objects: ['Body'] }];
+    const files = decomposeLegacyProjectToFiles(project);
+    const layoutDocument = parseTomlSource(
+      files['game://extensions/Combat/prefabs/Enemy/Enemy.layout']
+    );
+    const settingsDocument = parseTomlSource(
+      files['game://extensions/Combat/prefabs/Enemy/prefab.settings']
+    );
+    const prefabSettings = settingsDocument.extensions.Combat.prefabs.Enemy;
+
+    expect(layoutDocument.layout).not.toHaveProperty('objects');
+    expect(layoutDocument.layout).not.toHaveProperty(
+      'objectsFolderStructure'
+    );
+    expect(layoutDocument.layout).not.toHaveProperty('objectsGroups');
+    expect(prefabSettings.objects).toEqual(prefab.objects);
+    expect(prefabSettings.objectsGroups).toEqual(prefab.objectsGroups);
+    expect(
+      composeLegacyProjectFromFiles(files).eventsFunctionsExtensions[0]
+        .eventsBasedObjects[0].objects
+    ).toEqual(prefab.objects);
+  });
+
+  test('loads version-1 object-owning layouts and rewrites them with version-2 ownership', () => {
+    const projectWithoutDefinitions = JSON.parse(
+      JSON.stringify(projectFixture)
+    );
+    delete projectWithoutDefinitions.layouts[0].objects;
+    delete projectWithoutDefinitions.layouts[0].objectsFolderStructure;
+    const files = decomposeLegacyProjectToFiles(projectWithoutDefinitions);
+    const layoutUri = 'game://scenes/Main/Main.layout';
+    files[layoutUri] = files[layoutUri]
+      .replace('formatVersion = 2', 'formatVersion = 1')
+      .replace(
+        '[layout.uiSettings]',
+        'objects = [{ name = "LegacyPlayer", type = "Sprite", behaviors = [{ name = "Tween", type = "Tween::TweenBehavior" }] }]\n\n[layout.uiSettings]'
+      );
+
+    const composed = composeLegacyProjectFromFiles(files);
+    expect(composed.layouts[0].objects[0]).toMatchObject({
+      name: 'LegacyPlayer',
+      behaviors: [{ name: 'Tween', type: 'Tween::TweenBehavior' }],
+    });
+
+    const rewritten = decomposeLegacyProjectToFiles(composed);
+    const rewrittenLayout = parseTomlSource(rewritten[layoutUri]);
+    const rewrittenSettings = parseTomlSource(
+      rewritten['game://scenes/Main/scene.settings']
+    );
+    expect(rewrittenLayout.formatVersion).toBe(2);
+    expect(rewrittenLayout.layout).not.toHaveProperty('objects');
+    expect(rewrittenSettings.scenes.Main.objects[0].name).toBe(
+      'LegacyPlayer'
+    );
   });
 
   test('stores unsupported TOML values as canonical raw JSON pointers', () => {
@@ -523,6 +639,14 @@ mode = "embedded"
     );
     expect(() => composeLegacyProjectFromFiles(files)).toThrow(
       MultiFileProjectError
+    );
+
+    const objectInLayout = decomposeLegacyProjectToFiles(projectFixture);
+    objectInLayout['game://scenes/Main/Main.layout'] = objectInLayout[
+      'game://scenes/Main/Main.layout'
+    ].replace('[layout.uiSettings]', 'objects = []\n\n[layout.uiSettings]');
+    expect(() => composeLegacyProjectFromFiles(objectInLayout)).toThrow(
+      expect.objectContaining({ code: 'MULTIFILE_OWNERSHIP_CONFLICT' })
     );
 
     const duplicated = decomposeLegacyProjectToFiles(projectFixture);

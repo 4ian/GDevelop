@@ -133,10 +133,11 @@ The native conversion maps the legacy extension as follows:
 | Top-level metadata except implementation arrays | `extensions/<E>/extension.settings` |
 | `eventsFunctions[]` metadata | One `functions/<F>/function.settings` each |
 | `eventsFunctions[].events` | Matching `functions/<F>/<F>.events` |
-| `eventsBasedObjects[]` metadata | One `prefabs/<P>/prefab.settings` each |
-| Prefab visual/default-variant fields | `<P>.layout` |
+| `eventsBasedObjects[]` metadata plus child object definitions/groups/folders and attached behaviors | One `prefabs/<P>/prefab.settings` each |
+| Prefab default-variant instances/layers/spatial bounds/editor layout state | `<P>.layout` |
 | Prefab `eventsFunctions[].events` | Sibling `<Function>.events` files |
-| Prefab non-default variant visual fields | `variants/<Variant>.layout` |
+| Prefab non-default variant definitions/behaviors | Its entry in `prefab.settings` |
+| Prefab non-default variant instances/layers/spatial bounds/editor state | `variants/<Variant>.layout` |
 | `eventsBasedBehaviors[]` metadata | One `behaviors/<B>/behavior.settings` each |
 | Behavior `eventsFunctions[].events` | Sibling `<Function>.events` files |
 

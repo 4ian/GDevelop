@@ -17,8 +17,10 @@ Read, in order:
 1. `project.settings` for project metadata and non-global-config project data.
 2. `resources.settings` for the complete project resource registry.
 3. `config.settings` for the complete arbitrary global-config subtree.
-4. Relevant child `.settings` files for semantic configuration.
-5. Relevant `.layout` files for visual/UI configuration.
+4. Relevant child `.settings` files for semantic configuration and object
+   definitions, including each object's variables, effects, and behaviors.
+5. Relevant `.layout` files for instances, layers, spatial bounds, background,
+   and editor-canvas layout.
 6. Relevant `.events` files for IfDo event logic.
 7. `.gdevelop/instructions-catalog.json` before adding or changing
    instructions.
@@ -34,13 +36,16 @@ generated compatibility/runtime output, not multi-file source.
 
 ## File contract
 
-- `.settings`: TOML semantic/configuration data. Keep every file independent,
-  append-safe, and unindented. Never embed another settings fragment.
+- `.settings`: TOML semantic/configuration data, including object definitions
+  and their complete behavior/variable/effect configuration. Keep every file
+  independent, append-safe, and unindented. Never embed another settings
+  fragment.
 - `config.settings`: edit global configuration only under
   `[project.globalConfig]`; preserve arbitrary keys and the format-owned
   `[gdevelopConfig]`/`[gdevelopConfig.rawJson]` tables.
-- `.layout`: unindented TOML containing visual/UI data only: objects, layers,
-  instances, editor view state, and prefab visual composition.
+- `.layout`: unindented TOML containing placement/layout data only: instances,
+  layers, spatial bounds, background, and editor view state. Never define an
+  object or attach/configure a behavior in a `.layout` file.
 - `.events`: IfDo DSL only. Do not embed TOML or raw event JSON.
 - References: use canonical `game://...` URIs rooted at `project.settings`.
 - `.gdevelop/`: generated/editor state. Read catalogs; do not author sources
@@ -49,6 +54,13 @@ generated compatibility/runtime output, not multi-file source.
 Preserve manifest order, stable names, existing unknown fields, and ownership
 boundaries. Make the smallest coherent patch. When adding a component, add its
 manifest entry and every referenced source file in the same change.
+
+For scenes, put `objects`, `objectsFolderStructure`, `objectsGroups`, and each
+object's embedded behaviors in `scene.settings`; put `instances`, `layers`,
+background color, and `uiSettings` in `<Scene>.layout`. For prefabs and prefab
+variants, put child `objects`, `objectsFolderStructure`, `objectsGroups`, and
+their behaviors in `prefab.settings`; keep only instances, layers, spatial
+bounds, and editor layout state in the corresponding `.layout`.
 
 ## Project layout
 
@@ -172,6 +184,8 @@ loop, comment, and JavaScript metadata when editing existing sources.
    APIs; never invent or reuse an instruction identifier that is absent from it
    when authoring new events.
 3. Patch source files directly. Use `apply_patch` for precise edits.
+   Creating or changing an object type or one of its behaviors is a settings
+   edit; creating or moving an instance is a layout edit.
 4. Re-read every changed manifest reference and verify that each `game://` URI
    exists and stays inside the project.
 5. Check TOML syntax, duplicate namespaces, event depth, instruction names,
@@ -218,7 +232,10 @@ memory. A later source edit invalidates the earlier reload receipt.
 Before finishing:
 
 - Confirm every changed TOML file is unindented and independently parseable.
-- Confirm `.layout` changes are visual/UI-only.
+- Confirm `.layout` files contain only placement/layout concepts and contain no
+  `objects`, `objectsFolderStructure`, `objectsGroups`, or behavior definitions.
+- Confirm every object definition and its complete behaviors are in the owning
+  scene or prefab `.settings` namespace.
 - Confirm settings references use `game://` and resolve to existing files.
 - Confirm catalog instruction types, kinds, scopes, and `dslName` arguments.
 - Confirm every action has an effective condition in its event or ancestor

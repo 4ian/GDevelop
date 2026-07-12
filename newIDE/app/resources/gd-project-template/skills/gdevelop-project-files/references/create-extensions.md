@@ -16,11 +16,12 @@ Use the narrowest reusable abstraction:
 | --- | --- |
 | Shared project logic without per-object state | Extension-level function |
 | State and reusable logic attached to one object | Behavior |
-| Reusable visual object composition with child objects and instances | Prefab |
+| Reusable composition with child object definitions and placed instances | Prefab |
 | A reusable visual object that also owns stateful logic | Prefab plus one or more behaviors |
 
-Keep visual composition in prefab `.layout` files, metadata/signatures in
-`.settings`, and executable logic in `.events`.
+Keep child object definitions and all of their behaviors in `prefab.settings`,
+instance/layer/spatial composition in prefab `.layout` files, and executable
+logic in `.events`.
 
 ## Required workflow
 
@@ -151,6 +152,12 @@ isInnerAreaFollowingParentSize = false
 isUsingLegacyInstancesRenderer = false
 layout = "game://extensions/CombatKit/prefabs/Enemy/Enemy.layout"
 variables = []
+objects = []
+objectsGroups = []
+
+[extensions."CombatKit".prefabs."Enemy".objectsFolderStructure]
+folderName = "__ROOT"
+children = []
 
 [[extensions."CombatKit".prefabs."Enemy".functions]]
 name = "Initialize"
@@ -169,7 +176,7 @@ events = "game://extensions/CombatKit/prefabs/Enemy/Initialize.events"
 
 ```toml
 format = "gdevelop-prefab-layout"
-formatVersion = 1
+formatVersion = 2
 
 [layout]
 areaMinX = 0
@@ -178,14 +185,8 @@ areaMinZ = 0
 areaMaxX = 64
 areaMaxY = 64
 areaMaxZ = 64
-objects = []
-objectsGroups = []
 layers = []
 instances = []
-
-[layout.objectsFolderStructure]
-folderName = "__ROOT"
-children = []
 
 [layout.editionSettings]
 ```
@@ -198,8 +199,10 @@ if BooleanObjectVariable object="Object" variable="Initialized" check_if_the_val
 do SetBooleanObjectVariable object="Object" variable="Initialized" modification_sign="True"
 ```
 
-Add child object definitions and instances only to `Enemy.layout`. Copy the
-complete object configuration shape from an existing compatible `.layout`
+Add child object definitions, their variables/effects, and every attached
+behavior to `Enemy`'s namespace in `prefab.settings`. Add only instances,
+layers, spatial bounds, and editor layout state to `Enemy.layout`. Copy the
+complete object-definition shape from an existing compatible `.settings` file
 rather than inventing serializer fields.
 
 `extensions/CombatKit/behaviors/Health/behavior.settings`:
@@ -252,8 +255,9 @@ selection.
   `prefab.settings`; put its body beside the prefab layout.
 - Add a behavior function as a complete `[[...functions]]` entry in
   `behavior.settings`; put its body beside the behavior settings.
-- Add prefab variants under `variants/<Variant>.layout` and list only their
-  identity/layout URI in `prefab.settings`.
+- Add prefab variants under `variants/<Variant>.layout`; keep the variant's
+  identity, layout URI, child object definitions/groups/folder structure, and
+  child behaviors in its `prefab.settings` entry.
 - On rename, update the folder, settings namespace, `name`, `.events` or
   `.layout` basename, every `game://` reference, and every caller atomically.
 - On delete, remove callers and scene instances first, reload and verify, then
@@ -264,10 +268,12 @@ selection.
 1. Parse every changed TOML file independently and as concatenated settings.
 2. Verify component orders are contiguous and names/folders/basenames match.
 3. Verify every referenced `.events` and `.layout` file exists.
-4. Verify every action is condition-guarded and every object action targets at
+4. Verify prefab layouts contain no object definitions or behaviors and that
+   these are present in `prefab.settings`.
+5. Verify every action is condition-guarded and every object action targets at
    most one picked instance.
-5. Reload the project and confirm the new instruction/object/behavior types
+6. Reload the project and confirm the new instruction/object/behavior types
    appear in the regenerated catalog.
-6. Instantiate the prefab, attach the behavior, and call each public function
+7. Instantiate the prefab, attach the behavior, and call each public function
    from a guarded test event.
-7. Launch a fresh preview and inspect runtime errors, picking, and state.
+8. Launch a fresh preview and inspect runtime errors, picking, and state.

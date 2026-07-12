@@ -11,6 +11,7 @@ import {
 } from '../../EventsSheet/IfDoEventsDsl';
 
 export const MULTI_FILE_FORMAT_VERSION = 1;
+export const MULTI_FILE_LAYOUT_FORMAT_VERSION = 2;
 export const MULTI_FILE_ENTRY_NAME = 'project.settings';
 export const MULTI_FILE_ENTRY_URI = 'game://project.settings';
 export const MULTI_FILE_RESOURCES_URI = 'game://resources.settings';
@@ -30,8 +31,6 @@ export const SCENE_LAYOUT_FIELDS = Object.freeze([
   'v',
   'b',
   'uiSettings',
-  'objects',
-  'objectsFolderStructure',
   'instances',
   'layers',
 ]);
@@ -43,15 +42,35 @@ const PREFAB_LAYOUT_FIELDS = Object.freeze([
   'areaMaxX',
   'areaMaxY',
   'areaMaxZ',
-  'objects',
-  'objectsFolderStructure',
-  'objectsGroups',
   'layers',
   'instances',
   'editionSettings',
 ]);
 
 const EXTERNAL_LAYOUT_FIELDS = Object.freeze(['instances', 'editionSettings']);
+const LEGACY_SCENE_LAYOUT_FIELDS = Object.freeze([
+  ...SCENE_LAYOUT_FIELDS,
+  'objects',
+  'objectsFolderStructure',
+]);
+const LEGACY_PREFAB_LAYOUT_FIELDS = Object.freeze([
+  ...PREFAB_LAYOUT_FIELDS,
+  'objects',
+  'objectsFolderStructure',
+  'objectsGroups',
+]);
+const LAYOUT_FIELDS_BY_FORMAT = Object.freeze({
+  'gdevelop-scene-layout': SCENE_LAYOUT_FIELDS,
+  'gdevelop-prefab-layout': PREFAB_LAYOUT_FIELDS,
+  'gdevelop-prefab-variant-layout': PREFAB_LAYOUT_FIELDS,
+  'gdevelop-external-layout': EXTERNAL_LAYOUT_FIELDS,
+});
+const LEGACY_LAYOUT_FIELDS_BY_FORMAT = Object.freeze({
+  'gdevelop-scene-layout': LEGACY_SCENE_LAYOUT_FIELDS,
+  'gdevelop-prefab-layout': LEGACY_PREFAB_LAYOUT_FIELDS,
+  'gdevelop-prefab-variant-layout': LEGACY_PREFAB_LAYOUT_FIELDS,
+  'gdevelop-external-layout': EXTERNAL_LAYOUT_FIELDS,
+});
 const WINDOWS_DEVICE_NAME = /^(?:CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])(?:\.|$)/i;
 const SIMPLE_URI_SEGMENT = /^[A-Za-z0-9_.-]+$/;
 
@@ -504,7 +523,7 @@ const putLayoutFile = (files, uri, format, layout) => {
   validateGameUri(uri);
   files[uri] = serializeToml({
     format,
-    formatVersion: MULTI_FILE_FORMAT_VERSION,
+    formatVersion: MULTI_FILE_LAYOUT_FORMAT_VERSION,
     layout: projectTomlPayload(layout),
   });
 };
@@ -904,10 +923,14 @@ const parseSettings = (files, uri) => {
 
 const readLayout = (files, uri, expectedFormat) => {
   const document = parseSettings(files, uri);
-  if (document.format !== expectedFormat || document.formatVersion !== 1) {
+  if (
+    document.format !== expectedFormat ||
+    (document.formatVersion !== 1 &&
+      document.formatVersion !== MULTI_FILE_LAYOUT_FORMAT_VERSION)
+  ) {
     fail(
       'MULTIFILE_INVALID_LAYOUT',
-      `Expected ${expectedFormat} version 1.`,
+      `Expected ${expectedFormat} version 1 or ${MULTI_FILE_LAYOUT_FORMAT_VERSION}.`,
       uri
     );
   }
@@ -922,6 +945,19 @@ const readLayout = (files, uri, expectedFormat) => {
       uri
     );
   }
+  const allowedFields =
+    document.formatVersion === 1
+      ? LEGACY_LAYOUT_FIELDS_BY_FORMAT[expectedFormat]
+      : LAYOUT_FIELDS_BY_FORMAT[expectedFormat];
+  Object.keys(layout).forEach(field => {
+    if (!allowedFields || allowedFields.indexOf(field) === -1) {
+      fail(
+        'MULTIFILE_OWNERSHIP_CONFLICT',
+        `Layout field ${field} is not owned by ${expectedFormat}; move it to the related settings file.`,
+        uri
+      );
+    }
+  });
   return layout;
 };
 
@@ -1147,6 +1183,15 @@ const composePrefab = (files, namespace, options, uri) => {
   const payload = restoreTomlPayload(namespace, uri);
   const layoutUri = expectString(payload.layout, 'prefab.layout', uri);
   const layout = readLayout(files, layoutUri, 'gdevelop-prefab-layout');
+  Object.keys(layout).forEach(field => {
+    if (payload[field] !== undefined) {
+      fail(
+        'MULTIFILE_OWNERSHIP_CONFLICT',
+        `Prefab settings duplicate layout field ${field}.`,
+        uri
+      );
+    }
+  });
   const functions = composeOwnerFunctions(
     files,
     payload.functions || [],
@@ -1160,6 +1205,15 @@ const composePrefab = (files, namespace, options, uri) => {
         expectString(entry.layout, 'variant.layout', uri),
         'gdevelop-prefab-variant-layout'
       );
+      Object.keys(variantLayout).forEach(field => {
+        if (entry[field] !== undefined) {
+          fail(
+            'MULTIFILE_OWNERSHIP_CONFLICT',
+            `Prefab variant settings duplicate layout field ${field}.`,
+            uri
+          );
+        }
+      });
       return { ...omitFields(entry, new Set(['layout'])), ...variantLayout };
     }
   );
@@ -1643,7 +1697,7 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
       expectString(entry.events, 'scene.events', uri)
     );
     const layout = readLayout(files, layoutUri, 'gdevelop-scene-layout');
-    SCENE_LAYOUT_FIELDS.forEach(field => {
+    Object.keys(layout).forEach(field => {
       if (settings[field] !== undefined) {
         fail(
           'MULTIFILE_OWNERSHIP_CONFLICT',

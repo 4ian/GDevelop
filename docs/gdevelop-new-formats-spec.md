@@ -84,10 +84,12 @@ phase 5 before they can store this directory format natively.
 9. **Preview and export never treat the source tree as runtime data.** They
    receive a composed legacy serializer tree or, when a path is required, the
    generated `.gdevelop/game.json` compatibility snapshot.
-10. **`.layout` files are visual/UI-focused.** Scene identity, variables,
-    runtime/loading/input settings, shared behavior data, and events belong in
-    `scene.settings` or `.events`; `.layout` retains only visual/editor data as
-    far as current polymorphic object serialization safely allows.
+10. **`.layout` files contain placement and layout concepts only.** Object
+    definitions (including their variables, effects, and behavior
+    configurations) belong to the related `.settings` namespace. A scene
+    `.layout` owns instances, layers, background/editor-view properties, and
+    other spatial layout data; it never owns the object definitions instantiated
+    there. Events remain in `.events`.
 11. **Settings are append-safe TOML fragments.** All `.settings` files can be
     discovered from fixed folder conventions, ordered by their locally owned
     `order` values, concatenated, and parsed as one conflict-free in-memory
@@ -269,10 +271,10 @@ format markers:
 
 ```toml
 format = "gdevelop-scene-layout"
-formatVersion = 1
+formatVersion = 2
 ```
 
-Allowed layout `format` values in version 1 are:
+Allowed layout `format` values in version 2 are:
 
 ```text
 gdevelop-scene-layout
@@ -281,14 +283,20 @@ gdevelop-prefab-layout
 gdevelop-prefab-variant-layout
 ```
 
+The loader accepts layout format version 1 only as a migration input. Version
+1 may contain object definitions under `layout`; the next canonical save moves
+those definitions and their behaviors into the related settings namespace and
+writes layout format version 2. Newly authored version-2 layouts reject those
+fields.
+
 ### 5.1.1 Strict extension ownership
 
 The three source extensions have non-overlapping responsibilities:
 
 | Extension   | Allowed content                                                                                        | Forbidden content                                                                                            |
 | ----------- | ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------ |
-| `.settings` | TOML identity, metadata, signatures, variables, local ordering, runtime/editor configuration            | IfDo statements, visual placement/layout payloads, and references to other settings files                    |
-| `.layout`   | TOML visual/UI definitions, layers, instances, positions, dimensions, effects, and editor-canvas state | Events, function signatures, runtime logic, and general non-visual settings                                  |
+| `.settings` | TOML identity, metadata, signatures, object definitions and their behaviors/variables/effects, local ordering, and runtime/editor configuration | IfDo statements, instance placement, layer ordering, spatial layout payloads, and references to other settings files |
+| `.layout`   | TOML instances, layers, positions, bounds/dimensions, background, and editor-canvas state               | Object definitions or behaviors, events, function signatures, runtime logic, and general non-layout settings       |
 | `.events`   | Typed IfDo event statements, DSL comments, metadata annotations, and exact catalog instructions        | TOML front matter, settings tables, layout data, raw event/instruction JSON, or legacy project configuration |
 
 The loader rejects a file containing content owned by another extension. It
@@ -728,8 +736,8 @@ This is a required boundary, not merely a filename convention.
 
 ### 7.1 `scene.settings`
 
-`scene.settings` owns scene identity and non-visual configuration extracted
-from the current `gd::Layout` serializer object:
+`scene.settings` owns scene identity, object definitions, and all non-layout
+configuration extracted from the current `gd::Layout` serializer object:
 
 ```toml
 [scenes."Main"]
@@ -752,6 +760,9 @@ It also owns:
 
 - The scene's stable project order and its canonical `game://` layout/events
   references.
+- Scene object definitions, their object variables/effects, and every behavior
+  configuration attached to those objects.
+- The object-definition folder structure.
 - Scene variables.
 - Scene object groups used by events and object picking.
 - Behavior shared data used by scene objects.
@@ -762,14 +773,14 @@ These fields must not be duplicated in the `.layout` file.
 
 ### 7.2 `<Scene>.layout`
 
-The `.layout` file should contain only visual/UI and scene-editor layout data
-as far as the current object model permits. It owns what is drawn, arranged,
-layered, or displayed in the scene editor—not scene execution logic or general
-scene configuration.
+The `.layout` file contains only scene placement and layout data. It owns where
+instances are placed, how layers are arranged, the scene background, and
+editor-canvas state. An instance refers to an object definition owned by
+`scene.settings`; the definition itself never appears in this file.
 
 ```toml
 format = "gdevelop-scene-layout"
-formatVersion = 1
+formatVersion = 2
 
 [layout]
 r = 32
@@ -784,34 +795,28 @@ name = ""
 visibility = true
 isLocked = false
 
-[[layout.objects]]
-name = "Player"
-type = "Sprite"
-
 [[layout.instances]]
 name = "Player"
 x = 128.0
 y = 256.0
 ```
 
-The visual layout payload may contain:
+The scene layout payload may contain only:
 
-- `objects`
-- `objectsFolderStructure`
 - `instances`
 - `layers`
 - `uiSettings`
 - Background color and other visual editor properties.
 
-Scene object definitions currently combine visual configuration with embedded
-object behavior/variable configuration in one polymorphic serialized object.
-Version 1 keeps each object intact in `.layout` to avoid invasive changes or
-data loss. A later format may split visual object data from object logic after
-the core object serializers expose a safe boundary.
+Object definitions remain intact in `scene.settings`, including polymorphic
+object data and embedded behavior, variable, and effect configuration. The
+composer merges those definitions with this placement payload before calling
+the existing scene unserializer.
 
 The `.layout` file must not contain:
 
 - `events` or event instructions.
+- `objects`, `objectsFolderStructure`, or any object behavior configuration.
 - Scene variables.
 - Scene loading/unloading, input, title, sound-startup, or sort settings.
 - Scene behavior shared data.
@@ -1053,6 +1058,10 @@ shows only identity and event path.
 
 It also owns:
 
+- Child object definitions, their object variables/effects, and all behaviors
+  attached to those objects.
+- `objectsFolderStructure` and `objectsGroups` for the prefab and for every
+  variant.
 - Prefab variables.
 - Attached behavior configurations.
 - Property descriptors and property folder structure.
@@ -1066,18 +1075,17 @@ The default layout maps to the default `EventsBasedObjectVariant` fields:
 
 - `areaMinX`, `areaMinY`, `areaMinZ`
 - `areaMaxX`, `areaMaxY`, `areaMaxZ`
-- `objects`
-- `objectsFolderStructure`
-- `objectsGroups`
 - `layers`
 - `instances`
 - `editionSettings`
 
-The layout contains all visual/default-variant settings. `prefab.settings` does not duplicate them.
+The layout contains only spatial/default-variant layout settings.
+`prefab.settings` owns the child object definitions, groups, definition folder
+structure, and embedded behaviors; it does not duplicate layout fields.
 
 ```toml
 format = "gdevelop-prefab-layout"
-formatVersion = 1
+formatVersion = 2
 
 [layout]
 areaMinX = 0
@@ -1088,15 +1096,18 @@ areaMaxY = 64
 areaMaxZ = 64
 ```
 
-When composing legacy JSON, the default layout fields are merged into the prefab object at the same level, matching `EventsBasedObject::SerializeTo`.
+When composing legacy JSON, settings-owned object definitions and layout-owned
+spatial fields are merged into the prefab object at the same level, matching
+`EventsBasedObject::SerializeTo`.
 
 ### 9.3 Variant layouts
 
-Current prefabs may contain `variants`. Version 1 stores each non-default
-variant's visual data in `variants/<Variant>.layout` using
+Current prefabs may contain `variants`. Layout format version 2 stores each
+non-default variant's spatial layout data in `variants/<Variant>.layout` using
 `gdevelop-prefab-variant-layout`. Variant identity and asset-store identifiers
-are configuration in the `[[variants]]` entry of `prefab.settings`, not in the
-UI-only `.layout` file.
+as well as its child object definitions, groups, folder structure, and embedded
+behaviors are configuration in the `[[variants]]` entry of `prefab.settings`,
+not in the `.layout` file.
 
 ### 9.4 Prefab function files
 
@@ -1402,14 +1413,14 @@ unrelated extensions, or `project.settings`.
 | Project properties and global objects/groups/variables                                                   | `project.settings`                            |
 | Resource entries, origins, metadata, and resource folders                                                | `resources.settings`                          |
 | Arbitrary global configuration                                                                          | `config.settings`                             |
-| Scene identity, variables, object groups, loading/input/sound/sort settings, shared behavior data        | The scene `scene.settings`                    |
-| Scene objects, instances, layers, effects, background, and scene-editor canvas/folder state              | The scene `.layout`                           |
+| Scene identity, object definitions and attached behaviors, definition folders/groups, variables, loading/input/sound/sort settings, and shared behavior data | The scene `scene.settings` |
+| Scene instances, layers, background, and scene-editor canvas/layout state                                | The scene `.layout`                           |
 | Scene events                                                                                             | The scene `.events`                           |
 | Extension metadata, dependencies, variables, extension order, and extension-function folders             | `extension.settings`                          |
 | Extension-level function metadata/signature                                                              | That function subfolder's `function.settings` |
 | Extension function event body                                                                            | That function subfolder's `<Function>.events` |
-| Prefab declaration/properties/variables/behaviors and prefab-function metadata/order/folders             | `prefab.settings`                             |
-| Prefab default or variant visual content                                                                 | The corresponding prefab `.layout`            |
+| Prefab declaration, child object definitions and attached behaviors, definition folders/groups, properties/variables, variants, and function metadata | `prefab.settings` |
+| Prefab default or variant instances, layers, spatial bounds, and editor layout state                     | The corresponding prefab `.layout`            |
 | Prefab function event body                                                                               | That function `.events`                       |
 | Behavior declaration/properties/variables and behavior-function metadata/order/folders                   | `behavior.settings`                           |
 | Behavior function event body                                                                             | That function `.events`                       |
@@ -1703,8 +1714,10 @@ Raw legacy blocks are data. They are never evaluated as code by the source loade
 - Implement canonical JSON-subtree <-> TOML projection and `rawJson` overrides.
 - Implement fixed-path settings discovery, path validation, local ordering,
   and component ownership types.
-- Implement the `gd::Layout` field partition that writes non-visual scene
-  configuration to `scene.settings` and visual/editor data to `.layout`.
+- Implement the `gd::Layout` field partition that writes scene object
+  definitions and their behaviors plus non-layout configuration to
+  `scene.settings`, while `.layout` receives only instances, layers,
+  background, and editor/spatial layout data.
 - Add a legacy composer producing the current JS object/`SerializerElement` shape.
 
 ### Phase 2: events compiler/decompiler
@@ -1766,9 +1779,11 @@ legacy JSON
 - Exhaustive typed DSL coverage for every event/instruction serializer field,
   recursive variable value, and supported platform event adapter; `.events`
   parsing rejects raw event or instruction JSON fallback constructs.
-- Scene settings/layout ownership: non-visual fields are extracted to
-  `scene.settings`, `.layout` contains only allowed visual/editor fields, and
-  the merged legacy layout is structurally equivalent.
+- Scene settings/layout ownership: object definitions and their complete
+  behavior/variable/effect data are extracted to `scene.settings`; `.layout`
+  contains only allowed instances/layers/editor-spatial fields; forbidden
+  cross-file fields are rejected; and the merged legacy layout is structurally
+  equivalent.
 - Nested instruction `subInstructions`, OR/AND/NOT, inverted, awaited, and disabled instructions.
 - Local variable types, UUIDs, enums, arrays, structures, and editor folded state.
 - Async functions, lifecycle functions, `ExpressionAndCondition`, and `ActionWithOperator`.
@@ -1833,8 +1848,9 @@ A conforming implementation must satisfy all of the following:
 5. `config.settings` exclusively owns `[project.globalConfig]`, preserves its
    arbitrary user keys, and is combined without a reference from
    `project.settings`.
-6. Every scene has its own subfolder with `scene.settings`, a visual/UI-focused
-   TOML layout, and a DSL events file.
+6. Every scene has its own subfolder with `scene.settings`, a placement-focused
+   TOML layout, and a DSL events file. Object definitions and their behaviors
+   belong to `scene.settings`; instances and layers belong to the layout.
 7. The root `externals/` directory is a sibling of `scenes/`; it contains
    `external.settings` plus each `<ExternalName>.events` and
    `<ExternalName>.layout`, and `external.settings` owns linked-scene metadata

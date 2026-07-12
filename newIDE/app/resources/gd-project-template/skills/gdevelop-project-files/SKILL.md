@@ -1,6 +1,6 @@
 ---
 name: gdevelop-project-files
-description: Create, inspect, modify, refactor, and verify GDevelop games through the multi-file project sources (`project.settings`, `.settings`, `.layout`, and `.events`). Use for any GDevelop project, scene, object, behavior, prefab, extension, variable, resource, layout, or event-sheet work. Read the generated instruction catalog for event authoring; use GDevelop MCP only for editor-state queries and preview debugging.
+description: Create, inspect, modify, refactor, and verify GDevelop games through the multi-file project sources (`project.settings`, `.settings`, `.layout`, and `.events`). Use for any GDevelop project, scene, object, behavior, prefab, extension, variable, resource, layout, or event-sheet work. Read the generated instruction catalog for event authoring; synchronize direct edits with the GDevelop MCP `reload_project` tool before preview debugging.
 ---
 
 # GDevelop Project Files
@@ -149,10 +149,12 @@ loop, comment, and JavaScript metadata when editing existing sources.
    exists and stays inside the project.
 5. Check TOML syntax, duplicate namespaces, event depth, instruction names,
    named parameters, and asset paths.
-6. Let GDevelop reload the files. Do not invoke an MCP save that could replace
-   newer disk edits with stale editor memory.
-7. For gameplay or visual changes, use preview-debug MCP tools only after the
-   editor has loaded the changed sources.
+6. Call the GDevelop MCP `reload_project` tool and require a successful reload
+   receipt. Do not invoke an MCP save that could replace newer disk edits with
+   stale editor memory.
+7. For gameplay or visual changes, call `launch_preview` only after step 6.
+   If any project source changes after the reload, call `reload_project` again
+   before the next preview.
 
 For assets, write the asset file inside the project, add/update its resource
 entry in `resources.settings`, then reference its project-relative path from UI
@@ -161,8 +163,9 @@ asset is appropriate.
 
 ## MCP boundary
 
-MCP is optional and read/debug-only. Use it only for:
+MCP is synchronization/read/debug-only. Use it only for:
 
+- Reloading direct disk edits into the editor with `reload_project`.
 - Current editor/project/selection queries.
 - Launching or controlling a debug preview.
 - Deterministic frame stepping and input simulation.
@@ -172,6 +175,11 @@ MCP is optional and read/debug-only. Use it only for:
 Never use MCP to create scenes, objects, resources, variables, instances,
 extensions, behaviors, prefabs, or events. Never use generic editor-call,
 command, patch, sync, or save tools for authoring.
+
+`reload_project` is a mandatory preview gate. In every direct-edit task, call
+it successfully at least once after the most recent source-file edit and before
+the first `launch_preview`. Never launch or relaunch a preview from stale editor
+memory. A later source edit invalidates the earlier reload receipt.
 
 ## Verification
 
@@ -186,6 +194,8 @@ Before finishing:
 - Confirm every object-targeting action operates on a provably single picked
   instance; use `for each` when processing multiple instances.
 - Confirm no legacy JSON was changed.
+- Confirm `reload_project` succeeded after the final source edit and before any
+  `launch_preview` call.
 - Debug runtime behavior with a fresh preview when behavior, rendering, input,
   audio, timing, or object picking changed.
 - Report changed source files and concrete verification evidence.

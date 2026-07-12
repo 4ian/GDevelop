@@ -228,6 +228,7 @@ type McpEditorBridgeContext = {|
   // tab. Optional: when absent, launch_preview falls back to runCommand (which
   // previews the active tab) and flags that scene selection was not honored.
   launchPreviewForScene?: (sceneName: ?string) => mixed,
+  reloadProjectAndWait?: () => Promise<any>,
   saveProjectAndWait?: () => Promise<any>,
   getPersistenceState?: () => {|
     hasUnsavedChanges: boolean,
@@ -4856,6 +4857,48 @@ const callMcpTool = async ({
   if (toolName === 'gdevelop_get_project_summary') {
     if (!project) return errorResult('No project opened.');
     return textResult(getProjectSummary(project, args.sceneName));
+  }
+
+  if (toolName === 'reload_project') {
+    if (!project) return errorResult('No project opened.');
+    if (!context.reloadProjectAndWait) {
+      return errorResult(
+        'The GDevelop host did not provide reloadProjectAndWait, so MCP cannot reload project files from disk.'
+      );
+    }
+
+    const persistenceState = context.getPersistenceState
+      ? context.getPersistenceState()
+      : null;
+    try {
+      const reloadResult = await context.reloadProjectAndWait();
+      if (reloadResult && reloadResult.reloaded === false) {
+        return errorResult(
+          reloadResult.reason || 'The project could not be reloaded from disk.',
+          { reload: reloadResult }
+        );
+      }
+      const reloadedProject = context.getProject();
+      return textResult({
+        success: true,
+        reloaded: true,
+        discardedUnsavedInMemoryChanges:
+          !!persistenceState && persistenceState.hasUnsavedChanges,
+        projectName: reloadedProject ? reloadedProject.getName() : undefined,
+        projectFile: reloadedProject
+          ? reloadedProject.getProjectFile() || undefined
+          : undefined,
+        reload: reloadResult || undefined,
+        nextAction:
+          'Project disk sources are loaded. You may now call launch_preview.',
+      });
+    } catch (error) {
+      return errorResult(
+        error && error.message
+          ? error.message
+          : 'Unable to reload the project from disk.'
+      );
+    }
   }
 
   if (toolName === 'gdevelop_read_project_json') {

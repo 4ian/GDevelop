@@ -171,7 +171,53 @@ describe('McpEditorBridge', () => {
     expect(response.tools.map(tool => tool.name)).toContain(
       'gdevelop_get_editor_state'
     );
+    expect(response.tools.map(tool => tool.name)).toContain('reload_project');
     expect(response.tools.map(tool => tool.name)).not.toContain('create_scene');
+  });
+
+  it('reloads project files from disk and returns a synchronization receipt', async () => {
+    let currentProject: any = {
+      getName: () => 'Before reload',
+      getProjectFile: () => 'C:\\game\\project.settings',
+    };
+    const reloadProjectAndWait: any = (jest.fn(async () => {
+      currentProject = {
+        getName: () => 'After reload',
+        getProjectFile: () => 'C:\\game\\project.settings',
+      };
+      return {
+        reloaded: true,
+        fileIdentifier: 'C:\\game\\project.settings',
+      };
+    }): any);
+    const bridge = makeBridge({
+      getProject: () => currentProject,
+      reloadProjectAndWait,
+      getPersistenceState: () => ({
+        hasUnsavedChanges: true,
+        changesCount: 2,
+        timeOfFirstChangeSinceLastSave: 123,
+      }),
+    });
+
+    const response = await bridge.handleRendererMcpRequest({
+      method: 'tools/call',
+      params: { name: 'reload_project', arguments: {} },
+    });
+    const result = JSON.parse(response.content[0].text);
+
+    expect(response.isError).not.toBe(true);
+    expect(reloadProjectAndWait).toHaveBeenCalledTimes(1);
+    expect(result).toEqual(
+      expect.objectContaining({
+        success: true,
+        reloaded: true,
+        discardedUnsavedInMemoryChanges: true,
+        projectName: 'After reload',
+        projectFile: 'C:\\game\\project.settings',
+      })
+    );
+    expect(result.nextAction).toContain('launch_preview');
   });
 
   it('returns unexpected tool failures as structured JSON', async () => {

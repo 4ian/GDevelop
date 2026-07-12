@@ -24,6 +24,7 @@ const expectedTools = [
   'get_tool_usage_examples',
   'gdevelop_capabilities',
   'gdevelop_refresh_tool_catalog',
+  'reload_project',
   'launch_preview',
   'wait_until_preview_ready',
   'preview_health_check',
@@ -96,6 +97,32 @@ describe('McpToolCatalog', () => {
     ]);
     expect(capabilities.note).toContain('project files');
     expect(capabilities.note).toContain('instructions-catalog.json');
+    expect(
+      capabilities.categories['Preview debugging'].map(tool => tool.name)
+    ).toContain('reload_project');
+  });
+
+  it('marks reload_project as an always-available destructive synchronization tool', () => {
+    const tool = getMcpTools({
+      allowWriteTools: false,
+      allowCommandTools: false,
+    }).find(tool => tool.name === 'reload_project');
+
+    expect(tool).toEqual(
+      expect.objectContaining({
+        annotations: expect.objectContaining({
+          readOnlyHint: false,
+          destructiveHint: true,
+          idempotentHint: true,
+        }),
+      })
+    );
+    expect(
+      canCallMcpTool('reload_project', {
+        allowWriteTools: false,
+        allowCommandTools: false,
+      })
+    ).toEqual({ canCall: true });
   });
 
   it('keeps only compact editor resources and debug prompts', () => {

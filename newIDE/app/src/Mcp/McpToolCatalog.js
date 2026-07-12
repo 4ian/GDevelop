@@ -4181,6 +4181,18 @@ const readTools: Array<McpTool> = [
     inputSchema: inspectRunningPreviewSchema,
   },
   {
+    name: 'reload_project',
+    description:
+      'Reload the current project from its disk files and wait for the editor to finish loading them. This discards stale or unsaved in-memory editor changes. After editing project files directly, call this at least once before launch_preview so the preview uses the new disk sources.',
+    inputSchema: emptyObjectSchema,
+    annotations: {
+      readOnlyHint: false,
+      destructiveHint: true,
+      idempotentHint: true,
+      openWorldHint: false,
+    },
+  },
+  {
     name: 'preview_health_check',
     description:
       'Ping the selected preview/debugger channel before runtime calls: reports whether a preview is connected and responsive, available debugger ids, likely stale/disconnected state, and recommended recovery actions such as launch_preview, focus, close, or relaunch.',
@@ -4878,6 +4890,13 @@ const toolUsageExamples: { [string]: Array<Object> } = {
     {
       description:
         'List the curated tool categories before choosing a GDevelop MCP workflow.',
+      arguments: {},
+    },
+  ],
+  reload_project: [
+    {
+      description:
+        'Load direct project-file edits into the editor before launching a preview.',
       arguments: {},
     },
   ],
@@ -6654,6 +6673,7 @@ const EXPOSED_MCP_TOOL_NAMES: Set<string> = new Set([
   'get_tool_usage_examples',
   'gdevelop_capabilities',
   'gdevelop_refresh_tool_catalog',
+  'reload_project',
   'launch_preview',
   'wait_until_preview_ready',
   'preview_health_check',
@@ -6729,7 +6749,12 @@ const withDefaultToolAnnotations = (tool: McpTool): McpTool => {
     readOnlyHint: readToolNames.has(tool.name),
     ...(tool.annotations || {}),
   };
-  if (readToolNames.has(tool.name)) annotations.destructiveHint = false;
+  if (
+    readToolNames.has(tool.name) &&
+    annotations.destructiveHint === undefined
+  ) {
+    annotations.destructiveHint = false;
+  }
   return { ...tool, annotations };
 };
 
@@ -6872,6 +6897,7 @@ export const getCapabilitiesSummary = (
       'set_first_layout',
     ],
     'Preview debugging': [
+      'reload_project',
       'launch_preview',
       'wait_until_preview_ready',
       'run_frames',

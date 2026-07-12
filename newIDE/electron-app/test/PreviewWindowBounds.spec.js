@@ -43,6 +43,29 @@ const run = () => {
   );
 
   assert.deepStrictEqual(
+    getPreviewBrowserWindowOptionsFittingDisplay(
+      { width: 1280, height: 720, useContentSize: true, title: 'Preview' },
+      { x: 0, y: 0, width: 1200, height: 900 },
+      2
+    ),
+    {
+      width: 640,
+      height: 360,
+      useContentSize: true,
+      title: 'Preview',
+    }
+  );
+
+  assert.deepStrictEqual(
+    getPreviewBrowserWindowOptionsFittingDisplay(
+      { width: 2400, height: 2000 },
+      { x: 0, y: 0, width: 1200, height: 900 },
+      2
+    ),
+    { width: 1080, height: 900 }
+  );
+
+  assert.deepStrictEqual(
     getBoundsFittingDisplayHeight(
       { x: 10, y: 10, width: 700, height: 950 },
       { x: 0, y: 0, width: 1000, height: 900 }

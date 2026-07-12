@@ -6130,6 +6130,7 @@ const MainFrame = (props: Props): React.MixedElement => {
   const reloadProject = React.useCallback(
     async (options?: {
       skipUnsavedChangesConfirmation?: boolean,
+      rethrowOpenError?: boolean,
     }): Promise<void> => {
       if (!currentProject || !currentFileMetadata) return;
 
@@ -6154,6 +6155,7 @@ const MainFrame = (props: Props): React.MixedElement => {
         {
           ignoreUnsavedChanges: true,
           ignoreAutoSave: true,
+          rethrowOpenError: !!(options && options.rethrowOpenError),
         }
       );
     },
@@ -7369,6 +7371,20 @@ const MainFrame = (props: Props): React.MixedElement => {
         },
         launchPreviewForScene: (sceneName: ?string) =>
           launchPreviewForScene(sceneName),
+        reloadProjectAndWait: async () => {
+          if (!currentFileMetadata) {
+            return {
+              reloaded: false,
+              reason: 'The current project has no disk location.',
+            };
+          }
+          const fileIdentifier = currentFileMetadata.fileIdentifier;
+          await reloadProject({
+            skipUnsavedChangesConfirmation: true,
+            rethrowOpenError: true,
+          });
+          return { reloaded: true, fileIdentifier };
+        },
         saveProjectAndWait: () => saveProject(),
         getPersistenceState: () => ({
           hasUnsavedChanges: getChangesCount() > 0,
@@ -7423,6 +7439,8 @@ const MainFrame = (props: Props): React.MixedElement => {
       getChangesCount,
       getTimeOfFirstChangeSinceLastSave,
       saveProject,
+      reloadProject,
+      currentFileMetadata,
       launchPreviewForScene,
       getMcpEditorSelection,
       generateEvents,

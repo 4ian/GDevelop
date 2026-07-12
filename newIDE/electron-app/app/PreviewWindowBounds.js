@@ -7,34 +7,55 @@ const clamp = (value, min, max) => Math.max(min, Math.min(value, max));
 
 const getPreviewBrowserWindowOptionsFittingDisplay = (
   previewBrowserWindowOptions,
-  displayWorkArea
+  displayWorkArea,
+  displayScaleFactor = 1
 ) => {
   if (
     !previewBrowserWindowOptions ||
     !displayWorkArea ||
     !isPositiveFiniteNumber(displayWorkArea.height) ||
-    !isPositiveFiniteNumber(previewBrowserWindowOptions.height)
+    !isPositiveFiniteNumber(previewBrowserWindowOptions.height) ||
+    !isPositiveFiniteNumber(displayScaleFactor)
   ) {
     return previewBrowserWindowOptions;
+  }
+
+  // Game resolutions are expressed in physical pixels, while Electron window
+  // bounds are expressed in density-independent pixels. On a HiDPI display,
+  // convert the requested preview size before creating the BrowserWindow so a
+  // 1280x720 game uses a 640x360 content area at a 2x scale factor.
+  const scaledOptions = {
+    ...previewBrowserWindowOptions,
+    height: Math.max(
+      MIN_PREVIEW_WINDOW_SIZE,
+      Math.floor(previewBrowserWindowOptions.height / displayScaleFactor)
+    ),
+  };
+
+  if (isPositiveFiniteNumber(previewBrowserWindowOptions.width)) {
+    scaledOptions.width = Math.max(
+      MIN_PREVIEW_WINDOW_SIZE,
+      Math.floor(previewBrowserWindowOptions.width / displayScaleFactor)
+    );
   }
 
   const maxHeight = Math.max(
     MIN_PREVIEW_WINDOW_SIZE,
     Math.floor(displayWorkArea.height)
   );
-  const requestedHeight = previewBrowserWindowOptions.height;
-  if (requestedHeight <= maxHeight) return previewBrowserWindowOptions;
+  const requestedHeight = scaledOptions.height;
+  if (requestedHeight <= maxHeight) return scaledOptions;
 
   const scale = maxHeight / requestedHeight;
   const fittedOptions = {
-    ...previewBrowserWindowOptions,
+    ...scaledOptions,
     height: maxHeight,
   };
 
-  if (isPositiveFiniteNumber(previewBrowserWindowOptions.width)) {
+  if (isPositiveFiniteNumber(scaledOptions.width)) {
     fittedOptions.width = Math.max(
       MIN_PREVIEW_WINDOW_SIZE,
-      Math.floor(previewBrowserWindowOptions.width * scale)
+      Math.floor(scaledOptions.width * scale)
     );
   }
 

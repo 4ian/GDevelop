@@ -177,8 +177,14 @@ MyGame/
           objects/
             Visuals/
               Body.settings
-          OnCreated.events
-          TakeDamage.events
+          functions/
+            Lifecycle/
+              OnCreated/
+                function.settings
+                OnCreated.events
+            TakeDamage/
+              function.settings
+              TakeDamage.events
           variants/
             Armored.layout
             Armored/
@@ -188,8 +194,14 @@ MyGame/
       behaviors/
         Health/
           behavior.settings
-          OnCreated.events
-          TakeDamage.events
+          functions/
+            Lifecycle/
+              OnCreated/
+                function.settings
+                OnCreated.events
+            TakeDamage/
+              function.settings
+              TakeDamage.events
 
   .gdevelop/
     instructions-catalog.json
@@ -227,9 +239,10 @@ both; the two files remain independent unless both are listed in
   contains exactly one `function.settings` and one matching
   `<FunctionName>.events` file.
 - Exactly one `prefab.settings`, one default `<PrefabName>.layout`, one object
-  settings file per default or variant child object, and one `.events` file per
-  prefab function.
-- Exactly one `behavior.settings` and one `.events` file per behavior function.
+  settings file per default or variant child object, and one dedicated
+  function subfolder per prefab function.
+- Exactly one `behavior.settings` and one dedicated function subfolder per
+  behavior function.
 
 ### 4.2 Optional files
 
@@ -352,6 +365,7 @@ only by a newline, in this deterministic dependency order:
 8. Each extension's per-function, prefab, and behavior settings in their
    locally owned contiguous `order` values.
 9. Each prefab's recursive default and variant object settings in object order.
+10. Each prefab and behavior's recursive function settings in function order.
 
 The loader discovers settings fragments only from the fixed paths
 `resources.settings`, `config.settings`,
@@ -363,7 +377,9 @@ The loader discovers settings fragments only from the fixed paths
 `extensions/*/prefabs/*/prefab.settings`, and
 `extensions/*/prefabs/*/objects/**/*.settings`,
 `extensions/*/prefabs/*/variants/*/objects/**/*.settings`, and
-`extensions/*/behaviors/*/behavior.settings`. No parent settings file lists or
+`extensions/*/prefabs/*/functions/**/function.settings`,
+`extensions/*/behaviors/*/behavior.settings`, and
+`extensions/*/behaviors/*/functions/**/function.settings`. No parent settings file lists or
 references these children. The loader appends the discovered fragments without
 key rewriting, object merging, or conflict resolution. The combined text is
 parsed once as the authoritative settings document; bootstrap results are
@@ -385,6 +401,7 @@ project.settings
   + every prefab.settings
   + every default/variant prefab object settings file
   + every behavior.settings
+  + every prefab/behavior function.settings
       -> CombinedProjectSettings
       -> validate and compile project
 ```
@@ -1132,14 +1149,6 @@ isUsingLegacyInstancesRenderer = false
 
 layout = "game://extensions/Combat/prefabs/Enemy/Enemy.layout"
 
-[[extensions."Combat".prefabs."Enemy".functions]]
-name = "onCreated"
-events = "game://extensions/Combat/prefabs/Enemy/OnCreated.events"
-
-[[extensions."Combat".prefabs."Enemy".functions]]
-name = "TakeDamage"
-events = "game://extensions/Combat/prefabs/Enemy/TakeDamage.events"
-
 [[extensions."Combat".prefabs."Enemy".variants]]
 name = "Armored"
 layout = "game://extensions/Combat/prefabs/Enemy/variants/Armored.layout"
@@ -1147,19 +1156,16 @@ assetStoreAssetId = ""
 assetStoreOriginalName = ""
 ```
 
-Each `[[functions]]` entry uses the same complete function-metadata schema as
-an extension-level per-function `function.settings`; the abbreviated example
-shows only identity and event path.
-
 It also owns:
 
 - `objectsGroups` for the prefab and for every variant.
 - Prefab variables.
 - Flat `propertyDescriptors` in source order. They are one direct TOML array;
   property groups and property folder trees do not exist in this format.
-- Complete metadata and source order for every listed prefab function; the
-  matching `.events` file owns only its body.
 - Variant order.
+
+It never embeds prefab function metadata. Functions are discovered from the
+physical `functions/` directory described in section 9.4.
 
 ### 9.2 `<Prefab>.layout`
 
@@ -1213,10 +1219,38 @@ Their append-safe namespace is
 
 ### 9.4 Prefab function files
 
-Each prefab function is stored directly in the prefab directory as
-`<Function>.events`, as requested. Its complete identity and signature are in
-the matching `[[functions]]` entry of `prefab.settings`; the `.events` file is
-pure IfDo DSL:
+Every prefab function has a dedicated physical directory:
+
+```text
+extensions/<Extension>/prefabs/<Prefab>/functions/<optional folder path>/<Function>/
+  function.settings
+  <Function>.events
+```
+
+The optional directories after `functions/` are the editor function-folder
+path. The final directory name must match the function name. Empty logical
+function folders are not source data. Composition derives the transient legacy
+folder tree exclusively from directories containing functions. For example:
+
+```toml
+[extensions."Combat".prefabs."Enemy".functions."TakeDamage"]
+kind = "function"
+settingsFormatVersion = 1
+order = 0
+name = "TakeDamage"
+events = "game://extensions/Combat/prefabs/Enemy/functions/Combat/TakeDamage/TakeDamage.events"
+functionType = "Action"
+fullName = "Take damage"
+description = "Damages one enemy."
+sentence = "Damage _PARAM0_"
+private = false
+async = false
+parameters = []
+objectGroups = []
+```
+
+`function.settings` owns the complete function identity, signature, metadata,
+and owner-local function order. Its sibling `.events` file owns only pure IfDo DSL:
 
 ```events
 if Object.health > 0
@@ -1243,34 +1277,32 @@ previewIconUrl = ""
 iconUrl = ""
 helpPath = ""
 quickCustomizationVisibility = "default"
-
-[[extensions."Combat".behaviors."Health".functions]]
-name = "onCreated"
-events = "game://extensions/Combat/behaviors/Health/OnCreated.events"
-
-[[extensions."Combat".behaviors."Health".functions]]
-name = "TakeDamage"
-events = "game://extensions/Combat/behaviors/Health/TakeDamage.events"
 ```
-
-Each `[[functions]]` entry uses the same complete function-metadata schema as
-an extension-level per-function `function.settings`; the abbreviated example
-shows only identity and event path.
 
 The file also owns:
 
 - Behavior variables.
 - Flat `propertyDescriptors` and `sharedPropertyDescriptors` arrays in source
   order. No property folder tree is serialized or reconstructed.
-- Complete metadata and source order for every listed behavior function; the
-  matching `.events` file owns only its body.
+- Behavior-wide metadata only. Function metadata is never embedded here.
 
 ### 10.2 Behavior function files
 
-Every behavior method is a sibling `.events` file containing pure IfDo DSL.
-Its identity and signature come from the matching `[[functions]]` entry of
-`behavior.settings`. The legacy composer places the compiled body under the
-behavior's `eventsFunctions` array.
+Every behavior method uses:
+
+```text
+extensions/<Extension>/behaviors/<Behavior>/functions/<optional folder path>/<Function>/
+  function.settings
+  <Function>.events
+```
+
+Its namespace is
+`[extensions."<Extension>".behaviors."<Behavior>".functions."<Function>"]`.
+The physical optional folders reconstruct the editor function grouping;
+`function.settings` owns identity/signature/order, and the sibling `.events`
+owns only the body. The legacy composer places the compiled result under the
+behavior's `eventsFunctions` array. Empty logical function folders are not
+source data.
 
 ---
 
@@ -1280,11 +1312,11 @@ Every extension, prefab, or behavior function `.events` file contains only
 IfDo DSL event code. Complete function identity and settings are stored by its
 owner:
 
-| Function owner | Complete metadata location                        |
-| -------------- | ------------------------------------------------- |
-| Extension      | The function subfolder's `function.settings`      |
-| Prefab         | The prefab's `prefab.settings` function entry     |
-| Behavior       | The behavior's `behavior.settings` function entry |
+| Function owner | Complete metadata location                                         |
+| -------------- | ------------------------------------------------------------------ |
+| Extension      | `functions/<Function>/function.settings`                           |
+| Prefab         | `prefabs/<Prefab>/functions/<folders>/<Function>/function.settings` |
+| Behavior       | `behaviors/<Behavior>/functions/<folders>/<Function>/function.settings` |
 
 Example extension function body:
 
@@ -1416,9 +1448,9 @@ project.settings
 | `extension.settings` + children                                         | One `eventsFunctionsExtensions[]` item                                                              |
 | Physical extension component directories + per-component `order`       | Extension functions, prefabs, and behaviors in deterministic order                                  |
 | `extensions/<E>/functions/<F>/function.settings` + sibling `<F>.events` | One extension `eventsFunctions[]` entry                                                             |
-| `prefabs/<P>/prefab.settings` + recursive default/variant object settings + layouts + functions | Extension `eventsBasedObjects[]` |
-| `behaviors/<B>/behavior.settings` + functions                           | Extension `eventsBasedBehaviors[]`                                                                  |
-| Owner function-settings entry + compiled pure DSL body                  | One `EventsFunction` object; settings provide metadata and body becomes `events`                    |
+| `prefabs/<P>/prefab.settings` + recursive object/function settings + layouts | Extension `eventsBasedObjects[]` |
+| `behaviors/<B>/behavior.settings` + recursive function settings         | Extension `eventsBasedBehaviors[]`                                                                  |
+| Prefab/behavior `functions/<folders>/<F>/function.settings` + sibling `<F>.events` | One owner `EventsFunction`; physical folders reconstruct its transient editor grouping |
 
 ### 13.3 Two-pass catalog bootstrap
 
@@ -1527,12 +1559,14 @@ unrelated extensions, or `project.settings`.
 | Extension metadata, dependencies, variables, and extension order                                        | `extension.settings`                          |
 | Extension-level function metadata/signature                                                              | That function subfolder's `function.settings` |
 | Extension function event body                                                                            | That function subfolder's `<Function>.events` |
-| Prefab declaration, flat property descriptors, groups, variables, variants, and function metadata       | `prefab.settings`                             |
+| Prefab declaration, flat property descriptors, groups, variables, and variants                          | `prefab.settings`                             |
 | A default/variant prefab child object definition, attached behaviors, or physical editor-folder placement | The corresponding recursive prefab object `.settings` file |
 | Prefab default or variant instances, layers, spatial bounds, and editor layout state                     | The corresponding prefab `.layout`            |
-| Prefab function event body                                                                               | That function `.events`                       |
-| Behavior declaration, flat property descriptors, variables, and behavior-function metadata/order        | `behavior.settings`                           |
-| Behavior function event body                                                                             | That function `.events`                       |
+| Prefab function metadata/signature or physical function-folder placement                                 | Its recursive `functions/.../<Function>/function.settings` |
+| Prefab function event body                                                                               | The sibling `<Function>.events`               |
+| Behavior declaration, flat property descriptors, and variables                                          | `behavior.settings`                           |
+| Behavior function metadata/signature or physical function-folder placement                               | Its recursive `functions/.../<Function>/function.settings` |
+| Behavior function event body                                                                             | The sibling `<Function>.events`               |
 | External event/layout identity, linked scene, source URI, and order                                      | `external.settings`                           |
 | External event body                                                                                      | Its `.events`                                 |
 | External layout instances/editor layout data                                                             | Its `.layout`                                 |
@@ -1904,9 +1938,10 @@ legacy JSON
 - Nested instruction `subInstructions`, OR/AND/NOT, inverted, awaited, and disabled instructions.
 - Local variable types, UUIDs, enums, arrays, structures, and editor folded state.
 - Async functions, lifecycle functions, `ExpressionAndCondition`, and `ActionWithOperator`.
-- Per-function `functions/<Function>/function.settings` metadata, matching
-  `.events` filename, missing/unlisted files, owner-identity validation, and
-  the absence of every legacy `*FolderStructure` field.
+- Extension and owner-function `function.settings` metadata, recursive physical
+  folder mapping, matching sibling `.events` filename, missing/unlisted files,
+  owner-identity validation, and the absence of every legacy
+  `*FolderStructure` field.
 - Extension dependencies and cross-extension prefab/behavior references.
 - Prefab default and additional variants.
 - Root-level `externals/external.settings`, external events, and external
@@ -1977,8 +2012,10 @@ A conforming implementation must satisfy all of the following:
    and external-container ordering.
 8. Every extension-level function has a
    `functions/<Function>/function.settings` and matching
-   `<Function>.events`, and every extension, prefab, behavior, and function
-   follows the directory ownership defined here.
+   `<Function>.events`. Every prefab and behavior function similarly has
+   `functions/<optional folders>/<Function>/function.settings` and a matching
+   sibling `<Function>.events`; physical folders replace their logical editor
+   function trees.
 9. Every global, scene, default-prefab, and variant-prefab object definition
    has one `<Object>.settings` file under its owner's physical `objects/`
    directory. Those directories replace logical object-folder trees.

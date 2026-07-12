@@ -61,12 +61,16 @@ extensions/CombatKit/
   prefabs/Enemy/
     prefab.settings
     Enemy.layout
-    Initialize.events
     objects/Visuals/
       Body.settings
+    functions/Lifecycle/Initialize/
+      function.settings
+      Initialize.events
   behaviors/Health/
     behavior.settings
-    TakeDamage.events
+    functions/Combat/TakeDamage/
+      function.settings
+      TakeDamage.events
 ```
 
 `extensions/CombatKit/extension.settings`:
@@ -156,18 +160,6 @@ layout = "game://extensions/CombatKit/prefabs/Enemy/Enemy.layout"
 variables = []
 objectsGroups = []
 propertyDescriptors = []
-
-[[extensions."CombatKit".prefabs."Enemy".functions]]
-name = "Initialize"
-functionType = "Action"
-fullName = "Initialize"
-description = "Initializes one enemy instance."
-sentence = "Initialize _PARAM0_"
-private = false
-async = false
-parameters = [{ name = "Object", description = "Object", type = "object", supplementaryInformation = "CombatKit::Enemy" }]
-objectGroups = []
-events = "game://extensions/CombatKit/prefabs/Enemy/Initialize.events"
 ```
 
 `Enemy.layout`:
@@ -178,7 +170,26 @@ events = "game://extensions/CombatKit/prefabs/Enemy/Initialize.events"
 </layout>
 ```
 
-`Initialize.events`:
+`extensions/CombatKit/prefabs/Enemy/functions/Lifecycle/Initialize/function.settings`:
+
+```toml
+[extensions."CombatKit".prefabs."Enemy".functions."Initialize"]
+kind = "function"
+settingsFormatVersion = 1
+order = 0
+name = "Initialize"
+events = "game://extensions/CombatKit/prefabs/Enemy/functions/Lifecycle/Initialize/Initialize.events"
+functionType = "Action"
+fullName = "Initialize"
+description = "Initializes one enemy instance."
+sentence = "Initialize _PARAM0_"
+private = false
+async = false
+parameters = [{ name = "Object", description = "Object", type = "object", supplementaryInformation = "CombatKit::Enemy" }]
+objectGroups = []
+```
+
+`Initialize/Initialize.events`:
 
 ```events
 @event aiGeneratedEventId="initialize-enemy"
@@ -224,9 +235,17 @@ previewIconUrl = ""
 iconUrl = ""
 helpPath = ""
 quickCustomizationVisibility = "default"
+```
 
-[[extensions."CombatKit".behaviors."Health".functions]]
+`extensions/CombatKit/behaviors/Health/functions/Combat/TakeDamage/function.settings`:
+
+```toml
+[extensions."CombatKit".behaviors."Health".functions."TakeDamage"]
+kind = "function"
+settingsFormatVersion = 1
+order = 0
 name = "TakeDamage"
+events = "game://extensions/CombatKit/behaviors/Health/functions/Combat/TakeDamage/TakeDamage.events"
 functionType = "Action"
 fullName = "Take damage"
 description = "Subtracts damage from one picked object."
@@ -235,10 +254,9 @@ private = false
 async = false
 parameters = [{ name = "Object", description = "Object", type = "object" }, { name = "Behavior", description = "Behavior", type = "behavior", supplementaryInformation = "CombatKit::Health" }, { name = "Amount", description = "Damage amount", type = "expression" }]
 objectGroups = []
-events = "game://extensions/CombatKit/behaviors/Health/TakeDamage.events"
 ```
 
-`TakeDamage.events`:
+`TakeDamage/TakeDamage.events`:
 
 ```events
 @event aiGeneratedEventId="take-damage"
@@ -254,10 +272,11 @@ selection.
 
 - Add a free function in its own `functions/<Name>/` folder. Put its complete
   signature in `function.settings` and only its body in `<Name>.events`.
-- Add a prefab function as a complete `[[...functions]]` entry in
-  `prefab.settings`; put its body beside the prefab layout.
-- Add a behavior function as a complete `[[...functions]]` entry in
-  `behavior.settings`; put its body beside the behavior settings.
+- Add every prefab or behavior function in
+  `functions/<optional folder path>/<Name>/`. Put its complete metadata in
+  `function.settings` and only its body in the sibling `<Name>.events`. The
+  optional physical folders are the editor function grouping; never embed a
+  function entry in `prefab.settings` or `behavior.settings`.
 - Add prefab variants under `variants/<Variant>.layout`; keep the variant's
   identity, layout URI, and groups in its `prefab.settings` entry. Put each
   variant child definition and its behaviors in

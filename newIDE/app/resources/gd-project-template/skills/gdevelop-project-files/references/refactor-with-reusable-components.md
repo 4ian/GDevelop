@@ -97,14 +97,20 @@ extensions/Combat/
   prefabs/Enemy/
     prefab.settings
     Enemy.layout
-    Initialize.events
     objects/
       Sprite.settings
       HealthBar.settings
+    functions/Initialize/
+      function.settings
+      Initialize.events
   behaviors/Health/
     behavior.settings
-    TakeDamage.events
-    IsDead.events
+    functions/Combat/TakeDamage/
+      function.settings
+      TakeDamage.events
+    functions/Queries/IsDead/
+      function.settings
+      IsDead.events
 ```
 
 1. Put the sprite/health-bar child object definitions and their attached
@@ -112,8 +118,10 @@ extensions/Combat/
    `Enemy/objects/HealthBar.settings`; put layers and default instances in
    `Enemy.layout`. Keep prefab property descriptors flat in
    `Enemy/prefab.settings`.
-2. Put health properties/variables and `TakeDamage`/`IsDead` signatures in
-   `Health/behavior.settings`; put only their DSL bodies in sibling files.
+2. Put health properties/variables in `Health/behavior.settings`. Put each
+   `TakeDamage`/`IsDead` signature in its dedicated recursive
+   `functions/.../<Function>/function.settings` and only its DSL body in the
+   sibling `<Function>.events`.
 3. Put the stateless damage formula in `CalculateDamage/function.settings` and
    its DSL body in `CalculateDamage.events`.
 4. Attach `Combat::Health` to the prefab configuration and expose only the

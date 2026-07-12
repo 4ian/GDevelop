@@ -104,6 +104,12 @@ and type-specific configuration. `project.settings`, `scene.settings`, and
 other owner-wide configuration in the owner settings. Put only instances,
 layers, background/bounds, and editor layout state in `.layout`.
 
+Give every prefab and behavior function its own recursive
+`functions/<optional folder path>/<Function>/` directory containing
+`function.settings` and `<Function>.events`. The optional physical folders are
+the editor function grouping. `prefab.settings` and `behavior.settings` must
+not embed function metadata.
+
 ## Project layout
 
 ```text
@@ -123,12 +129,14 @@ extensions/<Extension>/functions/<Function>/function.settings
 extensions/<Extension>/functions/<Function>/<Function>.events
 extensions/<Extension>/prefabs/<Prefab>/prefab.settings
 extensions/<Extension>/prefabs/<Prefab>/<Prefab>.layout
-extensions/<Extension>/prefabs/<Prefab>/<Function>.events
+extensions/<Extension>/prefabs/<Prefab>/functions/<optional folder path>/<Function>/function.settings
+extensions/<Extension>/prefabs/<Prefab>/functions/<optional folder path>/<Function>/<Function>.events
 extensions/<Extension>/prefabs/<Prefab>/objects/<optional folder path>/<Object>.settings
 extensions/<Extension>/prefabs/<Prefab>/variants/<Variant>.layout
 extensions/<Extension>/prefabs/<Prefab>/variants/<Variant>/objects/<optional folder path>/<Object>.settings
 extensions/<Extension>/behaviors/<Behavior>/behavior.settings
-extensions/<Extension>/behaviors/<Behavior>/<Function>.events
+extensions/<Extension>/behaviors/<Behavior>/functions/<optional folder path>/<Function>/function.settings
+extensions/<Extension>/behaviors/<Behavior>/functions/<optional folder path>/<Function>/<Function>.events
 .gdevelop/instructions-catalog.json
 .gdevelop/settings-catalog.json
 .gdevelop/layout-catalog.json
@@ -315,6 +323,9 @@ Before finishing:
   behaviors are in its individual `<Object>.settings` namespace.
 - Confirm prefab and behavior property descriptor arrays are flat and contain
   no grouping/folder metadata.
+- Confirm every prefab/behavior function has a dedicated recursive function
+  directory with `function.settings` and its matching sibling `.events`, and
+  owner settings contain no embedded function entries.
 - Confirm settings references use `game://` and resolve to existing files.
 - Confirm settings file kinds and every object/behavior/effect type against
   `settings-catalog.json`.

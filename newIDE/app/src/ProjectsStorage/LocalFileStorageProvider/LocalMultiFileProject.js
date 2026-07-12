@@ -334,6 +334,19 @@ const discoverOwnedSettingsUris = async (
               }/${childSegment}/${child.settings}`
             );
           }
+          if (child.folder === 'prefabs' || child.folder === 'behaviors') {
+            await discoverSettingsFilesRecursively(
+              path.join(componentRoot, 'functions'),
+              [
+                'extensions',
+                extensionUriSegment,
+                child.folder,
+                childSegment,
+                'functions',
+              ],
+              discovered
+            );
+          }
           if (child.folder !== 'prefabs') continue;
           await discoverSettingsFilesRecursively(
             path.join(componentRoot, 'objects'),

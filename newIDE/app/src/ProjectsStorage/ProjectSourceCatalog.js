@@ -359,7 +359,6 @@ const SETTINGS_FILE_KINDS = Object.freeze([
       'objectsGroups',
       'variables',
       'propertyDescriptors',
-      'functions',
       'variants',
     ],
     forbiddenFields: [
@@ -368,6 +367,7 @@ const SETTINGS_FILE_KINDS = Object.freeze([
       'editionSettings',
       'areaMin/Max fields',
       'objects',
+      'functions',
     ],
     note:
       'propertyDescriptors is one flat ordered array; property folders do not exist.',
@@ -388,6 +388,30 @@ const SETTINGS_FILE_KINDS = Object.freeze([
     forbiddenFields: ['instances', 'layers', 'events'],
   },
   {
+    kind: 'prefab-function',
+    path:
+      'extensions/<Extension>/prefabs/<Prefab>/functions/<optional physical folders>/<Function>/function.settings',
+    namespace:
+      '[extensions."<Extension>".prefabs."<Prefab>".functions."<Function>"]',
+    requiredFields: [
+      'kind',
+      'settingsFormatVersion',
+      'order',
+      'name',
+      'events',
+      'functionType',
+    ],
+    commonFields: [
+      'signature',
+      'parameters',
+      'objectGroups',
+      'editor metadata',
+    ],
+    forbiddenFields: ['event body'],
+    note:
+      'The physical folders between functions/ and <Function>/ are the editor function folder path. The sibling <Function>.events owns the body.',
+  },
+  {
     kind: 'behavior',
     path: 'extensions/<Extension>/behaviors/<Behavior>/behavior.settings',
     namespace: '[extensions."<Extension>".behaviors."<Behavior>"]',
@@ -396,11 +420,34 @@ const SETTINGS_FILE_KINDS = Object.freeze([
       'variables',
       'propertyDescriptors',
       'sharedPropertyDescriptors',
-      'functions',
     ],
-    forbiddenFields: ['event bodies'],
+    forbiddenFields: ['functions', 'event bodies'],
     note:
       'propertyDescriptors and sharedPropertyDescriptors are flat ordered arrays; property folders do not exist.',
+  },
+  {
+    kind: 'behavior-function',
+    path:
+      'extensions/<Extension>/behaviors/<Behavior>/functions/<optional physical folders>/<Function>/function.settings',
+    namespace:
+      '[extensions."<Extension>".behaviors."<Behavior>".functions."<Function>"]',
+    requiredFields: [
+      'kind',
+      'settingsFormatVersion',
+      'order',
+      'name',
+      'events',
+      'functionType',
+    ],
+    commonFields: [
+      'signature',
+      'parameters',
+      'objectGroups',
+      'editor metadata',
+    ],
+    forbiddenFields: ['event body'],
+    note:
+      'The physical folders between functions/ and <Function>/ are the editor function folder path. The sibling <Function>.events owns the body.',
   },
 ]);
 
@@ -500,6 +547,7 @@ export const buildProjectSettingsCatalog = ({
         'Use kind, settingsFormatVersion=1, and contiguous zero-based order fields exactly where the file-kind entry requires them.',
         'Never write a legacy *FolderStructure field. Physical component and object directories are the project structure; property descriptors are flat ordered arrays.',
         'Each global, scene, default-prefab, or variant-prefab object definition and its attached behaviors belong in its physical <Object>.settings file; instances and per-instance behavior overrides belong in .layout.',
+        'Each prefab or behavior function owns functions/<optional folders>/<Function>/function.settings and a sibling <Function>.events body. Owner settings never embed function metadata.',
         'Preserve unknown serializer fields. Never invent an object, behavior, or effect type absent from this catalog.',
         'Never edit generated files below .gdevelop or legacy game.json.',
       ],

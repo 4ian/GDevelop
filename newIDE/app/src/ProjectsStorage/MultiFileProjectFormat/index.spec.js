@@ -216,6 +216,32 @@ describe('GDevelop multi-file project format', () => {
         'game://extensions/Combat/functions/CalculateDamage/function.settings'
       ]
     ).toContain('order = 0');
+    expect(
+      files[
+        'game://extensions/Combat/prefabs/Enemy/functions/TakeDamage/function.settings'
+      ]
+    ).toContain('[extensions.Combat.prefabs.Enemy.functions.TakeDamage]');
+    expect(
+      files[
+        'game://extensions/Combat/prefabs/Enemy/functions/TakeDamage/TakeDamage.events'
+      ]
+    ).toContain('@event');
+    expect(
+      files[
+        'game://extensions/Combat/behaviors/Health/functions/Heal/function.settings'
+      ]
+    ).toContain('[extensions.Combat.behaviors.Health.functions.Heal]');
+    expect(
+      files[
+        'game://extensions/Combat/behaviors/Health/functions/Heal/Heal.events'
+      ]
+    ).toContain('@event');
+    expect(
+      files['game://extensions/Combat/prefabs/Enemy/prefab.settings']
+    ).not.toContain('.functions.');
+    expect(
+      files['game://extensions/Combat/behaviors/Health/behavior.settings']
+    ).not.toContain('.functions.');
     expect(files['game://extensions/Combat/extension.settings']).toContain(
       'order = 0'
     );
@@ -540,6 +566,101 @@ folderName = "__ROOT"
       JSON.stringify(removeLegacyFolderStructuresFromProject(output))
     ).not.toMatch(/FolderStructure/);
     expect(areLegacyProjectsEquivalent(project, output)).toBe(true);
+  });
+
+  test('stores prefab and behavior functions in dedicated physical function folders', () => {
+    const project = JSON.parse(JSON.stringify(projectFixture));
+    const extension = project.eventsFunctionsExtensions[0];
+    const prefab = extension.eventsBasedObjects[0];
+    const behavior = extension.eventsBasedBehaviors[0];
+    prefab.eventsFunctionsFolderStructure = {
+      folderName: '__ROOT',
+      children: [
+        {
+          folderName: 'Combat actions',
+          children: [{ functionName: 'TakeDamage' }],
+        },
+      ],
+    };
+    behavior.eventsFunctionsFolderStructure = {
+      folderName: '__ROOT',
+      children: [
+        {
+          folderName: 'Recovery',
+          children: [{ functionName: 'Heal' }],
+        },
+      ],
+    };
+
+    const files = decomposeLegacyProjectToFiles(project);
+    const prefabFunctionUri =
+      'game://extensions/Combat/prefabs/Enemy/functions/Combat%20actions/TakeDamage/function.settings';
+    const behaviorFunctionUri =
+      'game://extensions/Combat/behaviors/Health/functions/Recovery/Heal/function.settings';
+    const prefabFunction = parseTomlSource(files[prefabFunctionUri]).extensions
+      .Combat.prefabs.Enemy.functions.TakeDamage;
+    const behaviorFunction = parseTomlSource(files[behaviorFunctionUri])
+      .extensions.Combat.behaviors.Health.functions.Heal;
+    const output = composeLegacyProjectFromFiles(files);
+    const outputPrefab =
+      output.eventsFunctionsExtensions[0].eventsBasedObjects[0];
+    const outputBehavior =
+      output.eventsFunctionsExtensions[0].eventsBasedBehaviors[0];
+
+    expect(prefabFunction).toMatchObject({
+      kind: 'function',
+      order: 0,
+      name: 'TakeDamage',
+      events:
+        'game://extensions/Combat/prefabs/Enemy/functions/Combat%20actions/TakeDamage/TakeDamage.events',
+    });
+    expect(behaviorFunction).toMatchObject({
+      kind: 'function',
+      order: 0,
+      name: 'Heal',
+      events:
+        'game://extensions/Combat/behaviors/Health/functions/Recovery/Heal/Heal.events',
+    });
+    expect(
+      parseTomlSource(
+        files['game://extensions/Combat/prefabs/Enemy/prefab.settings']
+      ).extensions.Combat.prefabs.Enemy
+    ).not.toHaveProperty('functions');
+    expect(
+      parseTomlSource(
+        files['game://extensions/Combat/behaviors/Health/behavior.settings']
+      ).extensions.Combat.behaviors.Health
+    ).not.toHaveProperty('functions');
+    expect(outputPrefab.eventsFunctionsFolderStructure).toEqual(
+      prefab.eventsFunctionsFolderStructure
+    );
+    expect(outputBehavior.eventsFunctionsFolderStructure).toEqual(
+      behavior.eventsFunctionsFolderStructure
+    );
+    expect(areLegacyProjectsEquivalent(project, output)).toBe(true);
+  });
+
+  test('rejects invalid or stray owner-function source paths', () => {
+    const files = decomposeLegacyProjectToFiles(projectFixture);
+    const functionUri =
+      'game://extensions/Combat/prefabs/Enemy/functions/TakeDamage/function.settings';
+    files[functionUri] = files[functionUri].replace(
+      'game://extensions/Combat/prefabs/Enemy/functions/TakeDamage/TakeDamage.events',
+      'game://extensions/Combat/prefabs/Enemy/TakeDamage.events'
+    );
+    expect(() => composeLegacyProjectFromFiles(files)).toThrow(
+      expect.objectContaining({ code: 'MULTIFILE_INVALID_MANIFEST_PATH' })
+    );
+
+    const filesWithStraySettings = decomposeLegacyProjectToFiles(
+      projectFixture
+    );
+    filesWithStraySettings[
+      'game://extensions/Combat/behaviors/Health/functions/Recovery/Heal/notes.settings'
+    ] = '[notes]\nvalue = true\n';
+    expect(() => composeLegacyProjectFromFiles(filesWithStraySettings)).toThrow(
+      expect.objectContaining({ code: 'MULTIFILE_ORPHAN_SETTINGS' })
+    );
   });
 
   test('stores prefab object definitions in physical object settings', () => {

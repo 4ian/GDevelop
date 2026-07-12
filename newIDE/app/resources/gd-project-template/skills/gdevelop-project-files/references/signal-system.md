@@ -217,13 +217,16 @@ and whole-project refactorer enforce this exact parameter order:
 2. `SignalName`: visible string parameter.
 3. `Payload`: visible string parameter.
 
-When adding it directly, use the same complete function metadata shape as
-sibling prefab functions, set `name = "onSignal"`, and point `events` to a
-neighboring `.events` file. For example, inside a prefab namespace (verify the
-owner path and fields against `settings-catalog.json`):
+When adding it directly, create
+`prefabs/CardSlot/functions/Lifecycle/onSignal/function.settings` and its
+sibling `onSignal.events`. Use the same complete metadata shape as sibling
+prefab functions and verify the fields against `settings-catalog.json`:
 
 ```toml
-[[extensions."Cards".prefabs."CardSlot".functions]]
+[extensions."Cards".prefabs."CardSlot".functions."onSignal"]
+kind = "function"
+settingsFormatVersion = 1
+order = 0
 name = "onSignal"
 functionType = "Action"
 fullName = "On signal"
@@ -235,7 +238,7 @@ private = false
 async = false
 parameters = [{ name = "Object", description = "Object", type = "object", supplementaryInformation = "Cards::CardSlot" }, { name = "SignalName", description = "Signal name", type = "string" }, { name = "Payload", description = "Payload", type = "string" }]
 objectGroups = []
-events = "game://extensions/Cards/prefabs/CardSlot/onSignal.events"
+events = "game://extensions/Cards/prefabs/CardSlot/functions/Lifecycle/onSignal/onSignal.events"
 ```
 
 In the body, branch on the fixed parameters `SignalName` and `Payload`. Do not

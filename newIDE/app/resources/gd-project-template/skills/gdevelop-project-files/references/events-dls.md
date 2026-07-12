@@ -26,8 +26,9 @@ and event scope:
 
 - `scene.settings` owns a scene event sheet.
 - `external.settings` owns an external event sheet and its linked scene.
-- `function.settings` owns an extension-level function body.
-- `prefab.settings` and `behavior.settings` own their function bodies.
+- A dedicated `function.settings` owns every extension, prefab, or behavior
+  function body. Prefab/behavior methods live under
+  `functions/<optional folders>/<Function>/` with their sibling `.events`.
 
 Read `.gdevelop/instructions-catalog.json` before writing instructions. It is
 regenerated on project save and is read-only. Search it narrowly instead of

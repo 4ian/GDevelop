@@ -224,16 +224,6 @@ describe('project IfDo instruction catalog', () => {
     expect(
       catalog.conditions.some(entry => entry.type === 'SceneJustBegins')
     ).toBe(true);
-    ['MettreX', 'MettreY', 'SetBooleanVariable'].forEach(type => {
-      expect(catalog.actions.some(entry => entry.type === type)).toBe(true);
-    });
-    ['BooleanVariable', 'SourisSurObjet', 'ObjectTimer', 'Egal'].forEach(
-      type => {
-        expect(catalog.conditions.some(entry => entry.type === type)).toBe(
-          true
-        );
-      }
-    );
     const compatibilityInput = JSON.stringify([
       {
         type: 'BuiltinCommonInstructions::Standard',
@@ -262,7 +252,7 @@ describe('project IfDo instruction catalog', () => {
     const compatibilityDsl = convertLegacyEventsJsonToIfDo(compatibilityInput, {
       formatInstruction: createCatalogInstructionFormatter(catalog),
     });
-    expect(compatibilityDsl).not.toContain('@exact');
+    expect(compatibilityDsl).toContain('@exact');
     expect(
       areLegacyEventsEquivalent(
         compatibilityInput,

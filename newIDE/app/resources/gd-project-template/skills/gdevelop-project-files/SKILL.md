@@ -94,10 +94,19 @@ Rules:
 - Use every required parameter exactly once.
 - Omit code-only parameters when their value is the standard empty string.
 - Preserve quotes inside string-expression operands.
-- Never write `@exact`. The generated catalog includes hidden compatibility
-  identifiers and variable-type variants needed for lossless named syntax. If
-  a persisted type is absent, treat the catalog as stale and regenerate it by
-  saving with the editor before editing that instruction.
+- Never write `@exact`. If a persisted type is absent, first regenerate the
+  catalog by saving with the editor. Do not reuse it for new events if it stays
+  absent; the catalog intentionally excludes editor-hidden and deprecated APIs.
+- Guard every action with at least one effective condition in its event or an
+  ancestor event. Never place an action on an unconditional path that executes
+  every frame. Use an explicit trigger, state/input check, timer, comparison,
+  or other condition that expresses when the action is allowed to run.
+- Before every object-targeting action, ensure the current picking set contains
+  at most one instance of that object. Use `for each Object` when multiple
+  instances must be processed one at a time, or narrow the selection with
+  conditions such as a unique ID/state match, nearest-object pick, collision,
+  or another deterministic selector. Never rely on an object action implicitly
+  applying to an unrestricted multi-instance selection.
 - Keep OR alternatives as consecutive `if`/`or` lines.
 - Prefix every child-event line with `>` and every nested instruction with
   `?`.
@@ -172,6 +181,10 @@ Before finishing:
 - Confirm `.layout` changes are visual/UI-only.
 - Confirm settings references use `game://` and resolve to existing files.
 - Confirm catalog instruction types, kinds, scopes, and `dslName` arguments.
+- Confirm every action has an effective condition in its event or ancestor
+  chain and no unconditional action can execute every frame.
+- Confirm every object-targeting action operates on a provably single picked
+  instance; use `for each` when processing multiple instances.
 - Confirm no legacy JSON was changed.
 - Debug runtime behavior with a fresh preview when behavior, rendering, input,
   audio, timing, or object picking changed.

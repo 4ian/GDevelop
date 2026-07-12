@@ -33,6 +33,34 @@ instruction type, displayed name, group, description, parameter `dslName`, or
 expression name in the instruction catalog. Generated JSON keeps one catalog
 entry per line so a matching search returns only relevant metadata.
 
+Use the catalogs as authoring contracts:
+
+- In `settings-catalog.json`, read `fileKinds` for the target fragment's path,
+  namespace, required/common/forbidden fields, and ownership boundary. Search
+  `objectTypes`, `behaviorTypes`, and `effectTypes` for exact registered type
+  names, defaults, requirements, and property metadata. Use `settingsOwners`
+  to resolve existing project components and their object definitions.
+- In `layout-catalog.json`, read `elements` for exact context-specific tags,
+  attributes, literals, child order, defaults, and constraints. Select the one
+  `contexts` entry whose `owner` matches the scene, prefab, variant, or external
+  layout, then use only its listed layers, objects, and attached behaviors.
+  Search `effectTypes` for exact effect parameters and types.
+- If the relevant registered type, file kind, element, or effect is absent,
+  stop instead of guessing. If a direct edit introduces a new object or
+  attached behavior name, validate its registered type in the settings catalog,
+  define it first in the owning `.settings` file, and then reference that exact
+  new name in the same coherent `.layout` patch; the saved layout context will
+  list it after GDevelop regenerates the catalogs.
+
+Search narrowly, for example:
+
+```sh
+rg '"type":"Sprite"' .gdevelop/settings-catalog.json
+rg '"type":"Tween::TweenBehavior"' .gdevelop/settings-catalog.json
+rg '"element":"instance"' .gdevelop/layout-catalog.json
+rg '"owner":{"scene":"Main"}' .gdevelop/layout-catalog.json
+```
+
 Do not edit legacy project JSON, including `.gdevelop/game.json`. It is
 generated compatibility/runtime output, not multi-file source.
 
@@ -41,7 +69,8 @@ generated compatibility/runtime output, not multi-file source.
 - `.settings`: TOML semantic/configuration data, including object definitions
   and their complete behavior/variable/effect configuration. Keep every file
   independent, append-safe, and unindented. Never embed another settings
-  fragment.
+  fragment. Follow the matching settings-catalog `fileKinds` entry and use only
+  registered type metadata from that catalog.
 - `config.settings`: edit global configuration only under
   `[project.globalConfig]`; preserve arbitrary keys and the format-owned
   `[gdevelopConfig]`/`[gdevelopConfig.rawJson]` tables.
@@ -49,7 +78,8 @@ generated compatibility/runtime output, not multi-file source.
   only: instances, layers, spatial bounds, background, and editor view state.
   Never put TOML, object definitions, or attached behavior definitions in a
   `.layout` file. Instance behavior overrides are allowed only for behaviors
-  already attached by the owning `.settings` object definition.
+  already attached by the owning `.settings` object definition. Follow the
+  matching layout-catalog `contexts` entry and `elements` definitions.
 - `.events`: IfDo DSL only. Do not embed TOML or raw event JSON.
 - References: use canonical `game://...` URIs rooted at `project.settings`.
 - `.gdevelop/`: generated/editor state. Read catalogs; do not author sources
@@ -256,6 +286,10 @@ Before finishing:
 - Confirm every object definition and its complete behaviors are in the owning
   scene or prefab `.settings` namespace.
 - Confirm settings references use `game://` and resolve to existing files.
+- Confirm settings file kinds and every object/behavior/effect type against
+  `settings-catalog.json`.
+- Confirm layout elements, attributes, layers, objects, attached behaviors,
+  and effect parameters against the matching `layout-catalog.json` context.
 - Confirm catalog instruction types, kinds, scopes, and `dslName` arguments.
 - Confirm every action has an effective condition in its event or ancestor
   chain and no unconditional action can execute every frame.

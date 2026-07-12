@@ -24,6 +24,7 @@ import ExtensionIcon from '../UI/CustomSvgIcons/Extension';
 import SearchIcon from '../UI/CustomSvgIcons/Search';
 import SparkleIcon from '../UI/CustomSvgIcons/Sparkle';
 import PlayIcon from '../UI/CustomSvgIcons/Play';
+import RefreshIcon from '../UI/CustomSvgIcons/Refresh';
 import ProjectTitlebar from './ProjectTitlebar';
 import StickyNotes, { type StickyNotesInterface } from './StickyNotes';
 import PreferencesDialog from './Preferences/PreferencesDialog';
@@ -6613,6 +6614,16 @@ const MainFrame = (props: Props): React.MixedElement => {
 
   if (currentProject) {
     addRecentEditorSwitcherActionItem(
+      'action:reload-project',
+      i18n._(t`Reload project`),
+      i18n._(t`Project action`),
+      <RefreshIcon />,
+      'reload project refresh project reopen disk cloud file',
+      () => {
+        reloadProject();
+      }
+    );
+    addRecentEditorSwitcherActionItem(
       'action:create-scene',
       i18n._(t`Create a scene`),
       i18n._(t`Project action`),
@@ -7494,6 +7505,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     onOpenRecentFile: openFromFileMetadataWithStorageProvider,
     onSaveProject: saveProject,
     onSaveProjectAs: saveProjectAs,
+    onReloadProject: reloadProject,
     onShowVersionHistory: openVersionHistoryPanel,
     onCloseProject: askToCloseProject,
     onCloseApp: closeApp,

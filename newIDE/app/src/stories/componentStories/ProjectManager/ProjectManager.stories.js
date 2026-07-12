@@ -26,6 +26,7 @@ const mainMenuCallbacks = {
   onOpenRecentFile: () => action('onOpenRecentFile'),
   onSaveProject: () => action('onSaveProject'),
   onSaveProjectAs: () => action('onSaveProjectAs'),
+  onReloadProject: () => action('onReloadProject'),
   onShowVersionHistory: () => action('onShowVersionHistory'),
   onCloseProject: () => action('onCloseProject'),
   onCloseApp: () => action('onCloseApp'),

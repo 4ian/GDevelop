@@ -183,6 +183,11 @@ const ElectronMainMenu = ({
     shouldApply: isFocusedOnMainWindow,
   });
   useIPCEventListener({
+    ipcEvent: 'main-menu-reload',
+    callback: callbacks.onReloadProject,
+    shouldApply: isFocusedOnMainWindow,
+  });
+  useIPCEventListener({
     ipcEvent: 'main-menu-show-version-history',
     callback: callbacks.onShowVersionHistory,
     shouldApply: isFocusedOnMainWindow,

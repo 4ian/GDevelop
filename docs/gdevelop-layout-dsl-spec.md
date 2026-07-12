@@ -150,17 +150,17 @@ Version 1 is not:
 The `.layout`, `.settings`, and `.events` sources have non-overlapping
 responsibilities.
 
-| Concern | Owner |
-| --- | --- |
-| Scene identity and runtime configuration | `scene.settings` |
-| Scene object definitions, object folders/groups, variables, effects, and attached behaviors | `scene.settings` |
-| Prefab/variant child object definitions, folders/groups, effects, and attached behaviors | `prefab.settings` |
-| Instance placement, transform, size, opacity, flips, editor locks, custom instance properties, initial instance variables, and per-instance behavior overrides | `.layout` |
-| Layer definitions, cameras, layer effects, lighting, and rendering configuration | Scene or prefab `.layout` |
-| Scene background | Scene `.layout` |
-| Prefab variant editing bounds | Prefab or variant `.layout` |
-| Editor grid, snapping, selected layer, zoom, mask, and editor mode | `.layout` |
-| Event logic | `.events` |
+| Concern                                                                                                                                                        | Owner                       |
+| -------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------- |
+| Scene identity and runtime configuration                                                                                                                       | `scene.settings`            |
+| Scene object definitions, object folders/groups, variables, effects, and attached behaviors                                                                    | `scene.settings`            |
+| Prefab/variant child object definitions, folders/groups, effects, and attached behaviors                                                                       | `prefab.settings`           |
+| Instance placement, transform, size, opacity, flips, editor locks, custom instance properties, initial instance variables, and per-instance behavior overrides | `.layout`                   |
+| Layer definitions, cameras, layer effects, lighting, and rendering configuration                                                                               | Scene or prefab `.layout`   |
+| Scene background                                                                                                                                               | Scene `.layout`             |
+| Prefab variant editing bounds                                                                                                                                  | Prefab or variant `.layout` |
+| Editor grid, snapping, selected layer, zoom, mask, and editor mode                                                                                             | `.layout`                   |
+| Event logic                                                                                                                                                    | `.events`                   |
 
 The distinction between an attached behavior and a behavior override is
 normative:
@@ -182,12 +182,12 @@ name, variant name, linked-scene name, or settings-file reference.
 
 Its context comes from the settings namespace that references it:
 
-| Referencing owner | Layout context |
-| --- | --- |
-| `scenes.<Scene>.layout` | Scene layout |
-| `extensions.<E>.prefabs.<P>.layout` | Default prefab variant |
-| `extensions.<E>.prefabs.<P>.variants[].layout` | Named prefab variant |
-| `externals.layoutFiles[].layout` | External layout associated with the linked scene stored in `external.settings` |
+| Referencing owner                              | Layout context                                                                 |
+| ---------------------------------------------- | ------------------------------------------------------------------------------ |
+| `scenes.<Scene>.layout`                        | Scene layout                                                                   |
+| `extensions.<E>.prefabs.<P>.layout`            | Default prefab variant                                                         |
+| `extensions.<E>.prefabs.<P>.variants[].layout` | Named prefab variant                                                           |
+| `externals.layoutFiles[].layout`               | External layout associated with the linked scene stored in `external.settings` |
 
 All references use canonical `game://...` project-root URIs. A `.layout` file
 never references another `.settings` or `.layout` file.
@@ -207,22 +207,22 @@ context-appropriate layout data:
 
 The source tree has six structural element families:
 
-| Element | Purpose |
-| --- | --- |
-| `<layout>` | One document root |
-| `<bounds>` | Prefab/default-variant or named-variant editing bounds |
-| `<editor>` | Scene/prefab/external editor-canvas state |
-| `<layer>` | A scene/prefab layer definition or an external-layout layer reference |
-| `<camera>` and `<effect>` | Layer-owned camera and effect entries |
-| Object instance element | A placed instance whose tag is normally the object name |
+| Element                   | Purpose                                                               |
+| ------------------------- | --------------------------------------------------------------------- |
+| `<layout>`                | One document root                                                     |
+| `<bounds>`                | Prefab/default-variant or named-variant editing bounds                |
+| `<editor>`                | Scene/prefab/external editor-canvas state                             |
+| `<layer>`                 | A scene/prefab layer definition or an external-layout layer reference |
+| `<camera>` and `<effect>` | Layer-owned camera and effect entries                                 |
+| Object instance element   | A placed instance whose tag is normally the object name               |
 
 An instance may contain:
 
-| Child | Purpose |
-| --- | --- |
+| Child          | Purpose                                                             |
+| -------------- | ------------------------------------------------------------------- |
 | `<properties>` | Object-type-specific numeric and string initial-instance properties |
-| `<variables>` | Initial instance variables |
-| `<override>` | Per-instance values overriding one already attached behavior |
+| `<variables>`  | Initial instance variables                                          |
+| `<override>`   | Per-instance values overriding one already attached behavior        |
 
 Text nodes are forbidden. All information is expressed by elements and typed
 attributes.
@@ -437,10 +437,10 @@ instructions, CDATA, doctypes, text nodes, and mixed content are invalid.
 
 Context-specific root attributes are:
 
-| Attribute | Type | Context | Current serializer mapping |
-| --- | --- | --- | --- |
-| `version` | Integer `1` | All | Source grammar only; not emitted to runtime data |
-| `background` | `#RRGGBB` | Scene only | `r`, `v`, `b` |
+| Attribute    | Type        | Context    | Current serializer mapping                       |
+| ------------ | ----------- | ---------- | ------------------------------------------------ |
+| `version`    | Integer `1` | All        | Source grammar only; not emitted to runtime data |
+| `background` | `#RRGGBB`   | Scene only | `r`, `v`, `b`                                    |
 
 `background` is required for a scene and forbidden for a prefab or external
 layout. The current scene serializer has no background alpha field.
@@ -521,8 +521,8 @@ It requires one `<bounds>` element:
 <bounds min=0,0,0 max=128,96,0 />
 ```
 
-| DSL | Current serializer mapping |
-| --- | --- |
+| DSL         | Current serializer mapping         |
+| ----------- | ---------------------------------- |
 | `min=x,y,z` | `areaMinX`, `areaMinY`, `areaMinZ` |
 | `max=x,y,z` | `areaMaxX`, `areaMaxY`, `areaMaxZ` |
 
@@ -603,19 +603,19 @@ Version 1 supports those current fields and no untyped editor-data escape.
 />
 ```
 
-| DSL attribute | Type | Current field(s) |
-| --- | --- | --- |
-| `grid` | Boolean | `grid` |
-| `grid-type` | `rectangular` or `isometric` | `gridType` |
-| `grid-size` | Three finite numbers | `gridWidth`, `gridHeight`, `gridDepth` |
-| `grid-offset` | Three finite numbers | `gridOffsetX`, `gridOffsetY`, `gridOffsetZ` |
-| `grid-color` | `#RRGGBB` | `gridColor` as a 24-bit integer |
-| `grid-alpha` | Number in `[0,1]` | `gridAlpha` |
-| `snap` | Boolean | `snap` |
-| `zoom` | Finite number at least `0.01` | `zoomFactor` |
-| `window-mask` | Boolean | `windowMask` |
-| `selected-layer` | String | `selectedLayer` |
-| `mode` | `instances-editor` or `embedded-game` | `gameEditorMode` |
+| DSL attribute    | Type                                  | Current field(s)                            |
+| ---------------- | ------------------------------------- | ------------------------------------------- |
+| `grid`           | Boolean                               | `grid`                                      |
+| `grid-type`      | `rectangular` or `isometric`          | `gridType`                                  |
+| `grid-size`      | Three finite numbers                  | `gridWidth`, `gridHeight`, `gridDepth`      |
+| `grid-offset`    | Three finite numbers                  | `gridOffsetX`, `gridOffsetY`, `gridOffsetZ` |
+| `grid-color`     | `#RRGGBB`                             | `gridColor` as a 24-bit integer             |
+| `grid-alpha`     | Number in `[0,1]`                     | `gridAlpha`                                 |
+| `snap`           | Boolean                               | `snap`                                      |
+| `zoom`           | Finite number at least `0.01`         | `zoomFactor`                                |
+| `window-mask`    | Boolean                               | `windowMask`                                |
+| `selected-layer` | String                                | `selectedLayer`                             |
+| `mode`           | `instances-editor` or `embedded-game` | `gameEditorMode`                            |
 
 `grid-size` components must be non-negative. The current serialized model can
 contain zero for an inactive or not-yet-prepared grid axis, while the editor
@@ -667,21 +667,21 @@ order is layer-array order.
 </layer>
 ```
 
-| DSL attribute | Current field | Allowed/current meaning |
-| --- | --- | --- |
-| `name` | `name` | Required string; unique in the layout |
-| `rendering` | `renderingType` | `""`, `2d`, `3d`, or `2d+3d` |
-| `camera-type` | `cameraType` | `""`, `perspective`, or `orthographic` |
-| `camera-behavior` | `defaultCameraBehavior` | `do-nothing` or `top-left-anchored-if-never-moved` |
-| `visible` | `visibility` | Boolean |
-| `locked` | `isLocked` | Boolean editor lock |
-| `lighting` | `isLightingLayer` | Boolean |
-| `follow-base-camera` | `followBaseLayerCamera` | Boolean |
-| `ambient` | `ambientLightColorR/G/B` | `#RRGGBB` |
-| `near` | `camera3DNearPlaneDistance` | Finite number |
-| `far` | `camera3DFarPlaneDistance` | Finite number greater than `near` |
-| `fov` | `camera3DFieldOfView` | Number greater than `0` and at most `180` |
-| `max-2d-distance` | `camera2DPlaneMaxDrawingDistance` | Positive finite number |
+| DSL attribute        | Current field                     | Allowed/current meaning                            |
+| -------------------- | --------------------------------- | -------------------------------------------------- |
+| `name`               | `name`                            | Required string; unique in the layout              |
+| `rendering`          | `renderingType`                   | `""`, `2d`, `3d`, or `2d+3d`                       |
+| `camera-type`        | `cameraType`                      | `""`, `perspective`, or `orthographic`             |
+| `camera-behavior`    | `defaultCameraBehavior`           | `do-nothing` or `top-left-anchored-if-never-moved` |
+| `visible`            | `visibility`                      | Boolean                                            |
+| `locked`             | `isLocked`                        | Boolean editor lock                                |
+| `lighting`           | `isLightingLayer`                 | Boolean                                            |
+| `follow-base-camera` | `followBaseLayerCamera`           | Boolean                                            |
+| `ambient`            | `ambientLightColorR/G/B`          | `#RRGGBB`                                          |
+| `near`               | `camera3DNearPlaneDistance`       | Finite number                                      |
+| `far`                | `camera3DFarPlaneDistance`        | Finite number greater than `near`                  |
+| `fov`                | `camera3DFieldOfView`             | Number greater than `0` and at most `180`          |
+| `max-2d-distance`    | `camera2DPlaneMaxDrawingDistance` | Positive finite number                             |
 
 For a perspective camera, `near` must be strictly positive. The current editor
 allows a non-positive near distance for an orthographic camera, but it must
@@ -714,19 +714,19 @@ defaultViewport, viewportLeft, viewportTop, viewportRight, viewportBottom
 
 ### 15.1 Size forms
 
-| DSL form | Mapping |
-| --- | --- |
-| `size=default` | `defaultSize=true`, `width=0`, `height=0` |
+| DSL form            | Mapping                                                       |
+| ------------------- | ------------------------------------------------------------- |
+| `size=default`      | `defaultSize=true`, `width=0`, `height=0`                     |
 | `size=default(w,h)` | `defaultSize=true`, preserve stored inactive `width`/`height` |
-| `size=wxh` | `defaultSize=false`, store `width=w`, `height=h` |
+| `size=wxh`          | `defaultSize=false`, store `width=w`, `height=h`              |
 
 ### 15.2 Viewport forms
 
-| DSL form | Mapping |
-| --- | --- |
-| `viewport=default` | `defaultViewport=true`, rectangle `0,0,1,1` |
+| DSL form                    | Mapping                                                        |
+| --------------------------- | -------------------------------------------------------------- |
+| `viewport=default`          | `defaultViewport=true`, rectangle `0,0,1,1`                    |
 | `viewport=default(l,t,r,b)` | `defaultViewport=true`, preserve the stored inactive rectangle |
-| `viewport=l,t,r,b` | `defaultViewport=false`, store the active rectangle |
+| `viewport=l,t,r,b`          | `defaultViewport=false`, store the active rectangle            |
 
 Viewport components must be finite. The current API documents normalized
 viewport coordinates between `0` and `1`; version 1 validates that range and
@@ -751,15 +751,15 @@ editor-duplication bug and resets the layer to one camera.
 />
 ```
 
-| DSL attribute | Current field | Rule |
-| --- | --- | --- |
-| `name` | `name` | Required and unique on the layer |
-| `type` | `effectType` | Required registered effect type |
-| `folded` | `folded` | Boolean, default `false` |
-| `enabled` | Inverse of `disabled` | Boolean, default `true` |
-| `numbers` | `doubleParameters` | Object of finite number values |
-| `strings` | `stringParameters` | Object of string values |
-| `booleans` | `booleanParameters` | Object of Boolean values |
+| DSL attribute | Current field         | Rule                             |
+| ------------- | --------------------- | -------------------------------- |
+| `name`        | `name`                | Required and unique on the layer |
+| `type`        | `effectType`          | Required registered effect type  |
+| `folded`      | `folded`              | Boolean, default `false`         |
+| `enabled`     | Inverse of `disabled` | Boolean, default `true`          |
+| `numbers`     | `doubleParameters`    | Object of finite number values   |
+| `strings`     | `stringParameters`    | Object of string values          |
+| `booleans`    | `booleanParameters`   | Object of Boolean values         |
 
 Parameter names and types are validated against current effect metadata when
 that metadata exists. Typed maps remain separate; converting a string-looking
@@ -808,15 +808,18 @@ properties, variables, var, override
 ### 17.3 Required identity
 
 Every instance requires `id`, mapped to `persistentUuid`. It must be a
-lowercase canonical UUIDv4 string and unique across all initial instances in
-the project:
+lowercase canonical UUIDv4 string and unique among the initial instances in
+its owning `.layout` file:
 
 ```text
 xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx
 ```
 
 The source never uses a display alias in place of the persistent UUID. The UUID
-is required for stable hot reload and editor identity.
+is required for stable hot reload and editor identity. UUIDs are scoped to an
+initial-instances container, so another scene, external layout, prefab, or
+prefab variant may use the same UUID. In particular, duplicating a prefab
+variant preserves child UUIDs intentionally.
 
 ---
 
@@ -842,19 +845,19 @@ Common instance attributes are:
 
 ### 18.1 Normative mapping
 
-| DSL attribute | Current instance field(s) |
-| --- | --- |
-| Parent `<layer name>` | `layer` |
-| `at=x,y` | `x`, `y`, with `z=0` |
-| `at=x,y,z` | `x`, `y`, `z` |
-| `rotation=a` | `angle=a`, with `rotationX=0`, `rotationY=0` |
-| `rotation=x,y,z` | `rotationX=x`, `rotationY=y`, `angle=z` |
-| `z-order` | `zOrder` integer |
-| `opacity` | `opacity` integer |
-| `flip` | `flippedX`, `flippedY`, `flippedZ` |
-| `locked` | `locked` |
-| `sealed` | `sealed` |
-| `keep-ratio` | `keepRatio`; the compiler writes `true` and omits `false` to match the current serializer/unserializer pair |
+| DSL attribute         | Current instance field(s)                                                                                   |
+| --------------------- | ----------------------------------------------------------------------------------------------------------- |
+| Parent `<layer name>` | `layer`                                                                                                     |
+| `at=x,y`              | `x`, `y`, with `z=0`                                                                                        |
+| `at=x,y,z`            | `x`, `y`, `z`                                                                                               |
+| `rotation=a`          | `angle=a`, with `rotationX=0`, `rotationY=0`                                                                |
+| `rotation=x,y,z`      | `rotationX=x`, `rotationY=y`, `angle=z`                                                                     |
+| `z-order`             | `zOrder` integer                                                                                            |
+| `opacity`             | `opacity` integer                                                                                           |
+| `flip`                | `flippedX`, `flippedY`, `flippedZ`                                                                          |
+| `locked`              | `locked`                                                                                                    |
+| `sealed`              | `sealed`                                                                                                    |
+| `keep-ratio`          | `keepRatio`; the compiler writes `true` and omits `false` to match the current serializer/unserializer pair |
 
 `at` is required. `rotation` defaults to `0`. `z-order` defaults to `0`.
 `opacity` is an integer from `0` through `255`.
@@ -870,11 +873,11 @@ once. Axis order is canonically `x,y,z`.
 The current serializer stores `customSize`, `width`, and `height` separately.
 The DSL uses these exact forms:
 
-| DSL | Mapping |
-| --- | --- |
-| Omitted `size` or `size=auto` | `customSize=false`, `width=0`, `height=0` |
-| `size=auto(w,h)` | `customSize=false`, preserving inactive stored `width=w`, `height=h` |
-| `size=wxh` | `customSize=true`, `width=w`, `height=h` |
+| DSL                           | Mapping                                                              |
+| ----------------------------- | -------------------------------------------------------------------- |
+| Omitted `size` or `size=auto` | `customSize=false`, `width=0`, `height=0`                            |
+| `size=auto(w,h)`              | `customSize=false`, preserving inactive stored `width=w`, `height=h` |
+| `size=wxh`                    | `customSize=true`, `width=w`, `height=h`                             |
 
 The `auto(w,h)` form exists only to preserve the current serializer's possible
 inactive width/height values without falsely enabling custom size.
@@ -884,10 +887,10 @@ inactive width/height values without falsely enabling custom size.
 The current serializer has no `customDepth` field. Presence of `depth` means
 custom depth is enabled; absence means it is disabled:
 
-| DSL | Mapping |
-| --- | --- |
+| DSL             | Mapping                                  |
+| --------------- | ---------------------------------------- |
 | Omitted `depth` | No `depth` field; `HasCustomDepth=false` |
-| `depth=d` | Emit `depth=d`; `HasCustomDepth=true` |
+| `depth=d`       | Emit `depth=d`; `HasCustomDepth=true`    |
 
 `defaultWidth`, `defaultHeight`, and `defaultDepth` are deliberately absent
 because current `InitialInstance::SerializeTo` explicitly does not serialize
@@ -912,8 +915,8 @@ current numeric and string property maps.
 </Sprite>
 ```
 
-| DSL | Current field |
-| --- | --- |
+| DSL       | Current field                                                  |
+| --------- | -------------------------------------------------------------- |
 | `numbers` | `numberProperties`, compiled to ordered `{name,value}` entries |
 | `strings` | `stringProperties`, compiled to ordered `{name,value}` entries |
 
@@ -957,14 +960,14 @@ preserved.
 
 ### 20.1 Variable attributes
 
-| Attribute | Rule | Current mapping |
-| --- | --- | --- |
-| `name` | Required for container/structure children; forbidden for array children | `name` on the serialized variable entry |
-| `type` | Required: `string`, `enum`, `number`, `boolean`, `structure`, or `array` | `type` |
-| `value` | Required for primitive types; forbidden for structure/array | `value` |
-| `values` | Allowed only for enum; unique string array | `values` |
-| `folded` | Boolean, default `false` | `folded` |
-| `id` | Optional UUID string | `persistentUuid` |
+| Attribute | Rule                                                                     | Current mapping                         |
+| --------- | ------------------------------------------------------------------------ | --------------------------------------- |
+| `name`    | Required for container/structure children; forbidden for array children  | `name` on the serialized variable entry |
+| `type`    | Required: `string`, `enum`, `number`, `boolean`, `structure`, or `array` | `type`                                  |
+| `value`   | Required for primitive types; forbidden for structure/array              | `value`                                 |
+| `values`  | Allowed only for enum; unique string array                               | `values`                                |
+| `folded`  | Boolean, default `false`                                                 | `folded`                                |
+| `id`      | Optional UUID string                                                     | `persistentUuid`                        |
 
 The current `mixed` type and `hasMixedValues` marker are forbidden for initial
 instance variables. `InitialInstance::UnserializeFrom` explicitly clears that
@@ -999,14 +1002,14 @@ override content for one already attached behavior:
 </Player>
 ```
 
-| Attribute | Rule | Current mapping |
-| --- | --- | --- |
-| `behavior` | Required attached behavior name | `name` |
-| `data` | Required typed data literal containing the behavior content | Behavior serializer content |
-| `folded` | Boolean, default `false` | `isFolded` |
-| `muted` | Boolean, default `false` | `isMuted` |
-| `inherited` | Boolean, default `false` | `isInheritedFromObjectType` |
-| `quick` | `default`, `visible`, or `hidden` | `quickCustomizationVisibility` |
+| Attribute             | Rule                                                          | Current mapping                            |
+| --------------------- | ------------------------------------------------------------- | ------------------------------------------ |
+| `behavior`            | Required attached behavior name                               | `name`                                     |
+| `data`                | Required typed data literal containing the behavior content   | Behavior serializer content                |
+| `folded`              | Boolean, default `false`                                      | `isFolded`                                 |
+| `muted`               | Boolean, default `false`                                      | `isMuted`                                  |
+| `inherited`           | Boolean, default `false`                                      | `isInheritedFromObjectType`                |
+| `quick`               | `default`, `visible`, or `hidden`                             | `quickCustomizationVisibility`             |
 | `property-visibility` | Object mapping property names to `default`/`visible`/`hidden` | `propertiesQuickCustomizationVisibilities` |
 
 The compiler derives the current behavior `type` from the referenced object
@@ -1087,20 +1090,20 @@ Omitted source attributes compile to current editor/model defaults.
 
 ### 23.1 Layer defaults
 
-| Attribute | Default |
-| --- | --- |
-| `rendering` | `""` (current automatic 2D/3D behavior) |
-| `camera-type` | `""` |
-| `camera-behavior` | `top-left-anchored-if-never-moved` |
-| `visible` | `true` |
-| `locked` | `false` |
-| `lighting` | `false` |
-| `follow-base-camera` | `false` |
-| `ambient` | `#C8C8C8` |
-| `near` | `3` |
-| `far` | `10000` |
-| `fov` | `45` |
-| `max-2d-distance` | `5000` |
+| Attribute            | Default                                 |
+| -------------------- | --------------------------------------- |
+| `rendering`          | `""` (current automatic 2D/3D behavior) |
+| `camera-type`        | `""`                                    |
+| `camera-behavior`    | `top-left-anchored-if-never-moved`      |
+| `visible`            | `true`                                  |
+| `locked`             | `false`                                 |
+| `lighting`           | `false`                                 |
+| `follow-base-camera` | `false`                                 |
+| `ambient`            | `#C8C8C8`                               |
+| `near`               | `3`                                     |
+| `far`                | `10000`                                 |
+| `fov`                | `45`                                    |
+| `max-2d-distance`    | `5000`                                  |
 
 No camera is implicitly added by the DSL compiler. Camera elements reproduce
 the current camera vector exactly. Current scene creation normally creates one
@@ -1108,29 +1111,29 @@ base-layer camera, while a newly inserted additional layer can have none.
 
 ### 23.2 Effect defaults
 
-| Attribute | Default |
-| --- | --- |
-| `folded` | `false` |
-| `enabled` | `true` |
-| Typed parameter maps | Empty |
+| Attribute            | Default |
+| -------------------- | ------- |
+| `folded`             | `false` |
+| `enabled`            | `true`  |
+| Typed parameter maps | Empty   |
 
 ### 23.3 Instance defaults
 
-| Attribute | Default |
-| --- | --- |
-| `at` | Required |
-| `rotation` | `0` |
-| `z-order` | `0` |
-| `opacity` | `255` |
-| `flip` | No flipped axes |
-| `size` | `auto` (`customSize=false`, width/height `0`) |
-| `depth` | Absent (`HasCustomDepth=false`) |
-| `locked` | `false` |
-| `sealed` | `false` |
-| `keep-ratio` | `true`, matching a newly constructed current instance. The compiler explicitly emits `keepRatio=true`; `false` is represented by absence in the current serializer tree. |
-| Custom properties | Empty |
-| Initial variables | Empty |
-| Behavior overrides | Empty |
+| Attribute          | Default                                                                                                                                                                  |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `at`               | Required                                                                                                                                                                 |
+| `rotation`         | `0`                                                                                                                                                                      |
+| `z-order`          | `0`                                                                                                                                                                      |
+| `opacity`          | `255`                                                                                                                                                                    |
+| `flip`             | No flipped axes                                                                                                                                                          |
+| `size`             | `auto` (`customSize=false`, width/height `0`)                                                                                                                            |
+| `depth`            | Absent (`HasCustomDepth=false`)                                                                                                                                          |
+| `locked`           | `false`                                                                                                                                                                  |
+| `sealed`           | `false`                                                                                                                                                                  |
+| `keep-ratio`       | `true`, matching a newly constructed current instance. The compiler explicitly emits `keepRatio=true`; `false` is represented by absence in the current serializer tree. |
+| Custom properties  | Empty                                                                                                                                                                    |
+| Initial variables  | Empty                                                                                                                                                                    |
+| Behavior overrides | Empty                                                                                                                                                                    |
 
 Canonical source omits attributes equal to these defaults except required
 identity/context attributes. A non-default false value whose default is true,
@@ -1162,7 +1165,7 @@ Compilation stops before changing the project if any rule fails.
 
 ### 24.3 Instance rules
 
-- Every UUID is valid and project-unique.
+- Every UUID is valid and unique within its owning `.layout` file.
 - Every object tag resolves in the correct context.
 - Every instance is a direct child of one layer.
 - `order` obeys the all-or-none contiguous contract.
@@ -1562,11 +1565,15 @@ scene. Layer elements below are references to that scene's layers.
 
 An AI model editing `.layout` files must:
 
-1. Read the owning settings file before the layout.
+1. Read `.gdevelop/layout-catalog.json` and the owning settings file before the
+   layout. Select the generated context for the owning scene, prefab, variant,
+   or external layout and use only its listed objects, attached behaviors, and
+   layers.
 2. Treat object tags as references to settings-owned definitions, never as
    declarations.
 3. Preserve every existing instance UUID and generate a new UUIDv4 only for a
-   genuinely new instance.
+   genuinely new instance in the same layout. Do not rewrite matching UUIDs in
+   separate scenes, externals, prefabs, or prefab variants.
 4. Preserve global instance order according to section 22.
 5. Place each instance under exactly one valid layer.
 6. Use `<object of="...">` when the name is unsafe or reserved.
@@ -1595,19 +1602,19 @@ For a new ordinary instance, the smallest correct element is:
 
 This specification is aligned to these current implementation boundaries:
 
-| Concern | Current implementation | DSL consequence |
-| --- | --- | --- |
-| Scene serialization | `Core/GDCore/Project/Layout.cpp` | Scene layout owns RGB background, editor settings, instances, and layers; other scene fields remain settings/events-owned. |
-| Prefab variant serialization | `Core/GDCore/Project/EventsBasedObjectVariant.cpp` | Bounds, layers, instances, and edition settings are layout-owned; object definitions/groups remain settings-owned. |
-| External layout serialization | `Core/GDCore/Project/ExternalLayout.cpp` | Only instances and edition settings enter `.layout`; identity and associated scene stay in external settings. |
-| Layer and camera serialization | `Core/GDCore/Project/Layer.cpp` and `Layer.h` | Every current layer/camera field has a typed markup attribute/form. |
-| Effect serialization | `Core/GDCore/Project/Effect.cpp` and `EffectsContainer.cpp` | Effect order and separate number/string/Boolean maps are preserved. |
-| Instance serialization | `Core/GDCore/Project/InitialInstance.cpp` and `InitialInstance.h` | UUID, full 2D/3D transform, size/depth semantics, opacity, flips, locks, maps, variables, and overrides are covered. |
-| Instance order | `Core/GDCore/Project/InitialInstancesContainer.cpp` | Global list order is retained with the all-or-none `order` mechanism when grouping would reorder it. |
-| Variables | `Core/GDCore/Project/Variable.cpp` and `VariablesContainer.cpp` | Primitive, enum, structure, array, fold state, UUID, and child ordering are typed. Mixed selection state is rejected. |
-| Behavior overrides | `Core/GDCore/Project/BehaviorsContainer.cpp` and `BehaviorConfigurationContainer.h` | Attached behavior type is resolved from settings; extension-defined override content uses a typed native data literal. |
-| Current editor settings | `newIDE/app/src/InstancesEditor/InstancesEditorSettings.js` | Version 1 editor markup exposes exactly the fields read/written by the current scene editor. |
-| Current multi-file ownership | `newIDE/app/src/ProjectsStorage/MultiFileProjectFormat/index.js` | The compiler produces only the current scene/prefab/external layout field partitions. |
+| Concern                        | Current implementation                                                              | DSL consequence                                                                                                            |
+| ------------------------------ | ----------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| Scene serialization            | `Core/GDCore/Project/Layout.cpp`                                                    | Scene layout owns RGB background, editor settings, instances, and layers; other scene fields remain settings/events-owned. |
+| Prefab variant serialization   | `Core/GDCore/Project/EventsBasedObjectVariant.cpp`                                  | Bounds, layers, instances, and edition settings are layout-owned; object definitions/groups remain settings-owned.         |
+| External layout serialization  | `Core/GDCore/Project/ExternalLayout.cpp`                                            | Only instances and edition settings enter `.layout`; identity and associated scene stay in external settings.              |
+| Layer and camera serialization | `Core/GDCore/Project/Layer.cpp` and `Layer.h`                                       | Every current layer/camera field has a typed markup attribute/form.                                                        |
+| Effect serialization           | `Core/GDCore/Project/Effect.cpp` and `EffectsContainer.cpp`                         | Effect order and separate number/string/Boolean maps are preserved.                                                        |
+| Instance serialization         | `Core/GDCore/Project/InitialInstance.cpp` and `InitialInstance.h`                   | UUID, full 2D/3D transform, size/depth semantics, opacity, flips, locks, maps, variables, and overrides are covered.       |
+| Instance order                 | `Core/GDCore/Project/InitialInstancesContainer.cpp`                                 | Global list order is retained with the all-or-none `order` mechanism when grouping would reorder it.                       |
+| Variables                      | `Core/GDCore/Project/Variable.cpp` and `VariablesContainer.cpp`                     | Primitive, enum, structure, array, fold state, UUID, and child ordering are typed. Mixed selection state is rejected.      |
+| Behavior overrides             | `Core/GDCore/Project/BehaviorsContainer.cpp` and `BehaviorConfigurationContainer.h` | Attached behavior type is resolved from settings; extension-defined override content uses a typed native data literal.     |
+| Current editor settings        | `newIDE/app/src/InstancesEditor/InstancesEditorSettings.js`                         | Version 1 editor markup exposes exactly the fields read/written by the current scene editor.                               |
+| Current multi-file ownership   | `newIDE/app/src/ProjectsStorage/MultiFileProjectFormat/index.js`                    | The compiler produces only the current scene/prefab/external layout field partitions.                                      |
 
 Fields accepted only by historical compatibility branches—such as old French
 keys, `oglFOV`, `oglZNear`, `oglZFar`, old `floatInfos`/`stringInfos`, or

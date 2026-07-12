@@ -1,8 +1,12 @@
 # Author Layout DSL
 
-Read the owning `.settings` file before editing a `.layout`. Object tags are
-references to settings-owned definitions; they never declare objects or attach
-behaviors. `.layout` is component-tree markup, not XML and not TOML.
+Read `.gdevelop/layout-catalog.json` and the owning `.settings` file before
+editing a `.layout`. Use the catalog context whose owner identifies that scene,
+prefab, variant, or external layout; it is the generated authority for
+resolvable object names, attached behaviors, layers, effects, and exact element
+attributes. Object tags are references to settings-owned definitions; they
+never declare objects or attach behaviors. `.layout` is component-tree markup,
+not XML and not TOML.
 
 ## Contents
 
@@ -162,8 +166,10 @@ UUIDv4 and position:
 
 Attribute order is `of`, `id`, `order`, `at`, `rotation`, `z-order`, `size`,
 `depth`, `opacity`, `flip`, `locked`, `sealed`, `keep-ratio`. Preserve every
-existing UUID. Generate a fresh UUIDv4 only for a genuinely new instance;
-UUIDs are project-wide unique.
+existing UUID. Generate a fresh UUIDv4 only for a genuinely new instance in
+the same `.layout`. UUIDs must be unique within one layout, not across the
+whole project; separate scenes, externals, prefabs, and prefab variants may
+intentionally use matching UUIDs.
 
 Defaults are rotation/z-order zero, opacity 255, no flip, automatic size,
 unlocked, unsealed, and keep-ratio true. Use `size=auto(w x h)` without spaces
@@ -219,6 +225,8 @@ owning settings. Do not write its behavior type; the compiler derives it.
 ## Canonical editing checklist
 
 - Preserve two-space indentation, child/array order, and one final newline.
+- Confirm every element, attribute, object, layer, effect, and override against
+  the matching generated layout-catalog context; never guess an absent entry.
 - Preserve inactive camera/viewport/size data using the explicit `default(...)`
   or `auto(...)` forms.
 - Preserve unknown settings in `.settings`; never move them into layout.

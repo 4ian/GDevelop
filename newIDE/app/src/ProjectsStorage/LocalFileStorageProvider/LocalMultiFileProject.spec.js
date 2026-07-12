@@ -26,6 +26,8 @@ import {
   getProjectLocation,
   onSaveProject,
   writeProjectInstructionCatalog,
+  writeProjectLayoutCatalog,
+  writeProjectSettingsCatalog,
 } from './LocalProjectWriter';
 import { ensureProjectHasDefaultScene } from '../../ProjectCreation/CreateProject';
 
@@ -576,6 +578,55 @@ describe('Local multi-file project storage', () => {
     project.delete();
   });
 
+  test('writes project-aware AI settings and layout catalogs in .gdevelop', async () => {
+    const gd: libGDevelop = global.gd;
+    const project = gd.ProjectHelper.createNewGDJSProject();
+    project.setName('Catalog project');
+    ensureProjectHasDefaultScene(project);
+    const layout = project.getLayoutAt(0);
+    layout.getObjects().insertNewObject(project, 'Sprite', 'Player', 0);
+
+    const settingsCatalog = await writeProjectSettingsCatalog(
+      project,
+      temporaryDirectory
+    );
+    const layoutCatalog = await writeProjectLayoutCatalog(
+      project,
+      temporaryDirectory,
+      undefined,
+      settingsCatalog.effectTypes
+    );
+    const settingsPath = path.join(
+      temporaryDirectory,
+      '.gdevelop/settings-catalog.json'
+    );
+    const layoutPath = path.join(
+      temporaryDirectory,
+      '.gdevelop/layout-catalog.json'
+    );
+
+    expect(fs.existsSync(settingsPath)).toBe(true);
+    expect(fs.existsSync(layoutPath)).toBe(true);
+    expect(JSON.parse(fs.readFileSync(settingsPath, 'utf8')).counts).toEqual(
+      settingsCatalog.counts
+    );
+    expect(settingsCatalog.counts.fileKinds).toBe(9);
+    expect(settingsCatalog.counts.objectTypes).toBeGreaterThan(5);
+    expect(settingsCatalog.counts.behaviorTypes).toBeGreaterThan(5);
+    expect(layoutCatalog.contexts).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          kind: 'scene',
+          owner: { scene: 'UntitledScene' },
+          objects: expect.arrayContaining([
+            expect.objectContaining({ name: 'Player', type: 'Sprite' }),
+          ]),
+        }),
+      ])
+    );
+    project.delete();
+  });
+
   test('writes the generated legacy game.json on every multi-file save', async () => {
     const gd: libGDevelop = global.gd;
     const project = gd.ProjectHelper.createNewGDJSProject();
@@ -605,6 +656,16 @@ describe('Local multi-file project storage', () => {
     expect(
       JSON.parse(fs.readFileSync(generatedPath, 'utf8')).properties.name
     ).toBe('Generated compatibility project');
+    expect(
+      fs.existsSync(
+        path.join(temporaryDirectory, '.gdevelop/settings-catalog.json')
+      )
+    ).toBe(true);
+    expect(
+      fs.existsSync(
+        path.join(temporaryDirectory, '.gdevelop/layout-catalog.json')
+      )
+    ).toBe(true);
     project.delete();
   });
 

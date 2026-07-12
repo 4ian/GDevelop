@@ -35,6 +35,14 @@ import {
   serializeProjectInstructionCatalog,
 } from '../../EventsSheet/IfDoEventsDsl/ProjectInstructionCatalog';
 import { getLocalProjectLastModifiedDate } from './LocalProjectFileModificationTime';
+import {
+  PROJECT_LAYOUT_CATALOG_RELATIVE_PATH,
+  PROJECT_SETTINGS_CATALOG_RELATIVE_PATH,
+  buildProjectLayoutCatalog,
+  buildProjectSettingsCatalog,
+  serializeProjectLayoutCatalog,
+  serializeProjectSettingsCatalog,
+} from '../ProjectSourceCatalog';
 
 const fs = optionalRequire('fs-extra');
 const path = optionalRequire('path');
@@ -155,6 +163,44 @@ export const writeProjectInstructionCatalog = async (
   return catalog;
 };
 
+export const writeProjectSettingsCatalog = async (
+  project: gdProject,
+  projectPath: string,
+  serializedProjectObject?: Object
+): Promise<Object> => {
+  const serializedProject =
+    serializedProjectObject || serializeToJSObject(project, 'serializeTo');
+  const catalog = buildProjectSettingsCatalog({
+    project,
+    serializedProject,
+  });
+  await writeAndCheckFile(
+    serializeProjectSettingsCatalog(catalog),
+    path.join(projectPath, ...PROJECT_SETTINGS_CATALOG_RELATIVE_PATH.split('/'))
+  );
+  return catalog;
+};
+
+export const writeProjectLayoutCatalog = async (
+  project: gdProject,
+  projectPath: string,
+  serializedProjectObject?: Object,
+  effectTypes?: Array<Object>
+): Promise<Object> => {
+  const serializedProject =
+    serializedProjectObject || serializeToJSObject(project, 'serializeTo');
+  const catalog = buildProjectLayoutCatalog({
+    project,
+    serializedProject,
+    effectTypes,
+  });
+  await writeAndCheckFile(
+    serializeProjectLayoutCatalog(catalog),
+    path.join(projectPath, ...PROJECT_LAYOUT_CATALOG_RELATIVE_PATH.split('/'))
+  );
+  return catalog;
+};
+
 const writeProjectFiles = async ({
   project,
   filePath,
@@ -186,6 +232,15 @@ const writeProjectFiles = async ({
 
   if (path.basename(filePath).toLowerCase() === 'project.settings') {
     const catalog = buildProjectInstructionCatalog(project);
+    const settingsCatalog = buildProjectSettingsCatalog({
+      project,
+      serializedProject: serializedProjectObject,
+    });
+    const layoutCatalog = buildProjectLayoutCatalog({
+      project,
+      serializedProject: serializedProjectObject,
+      effectTypes: settingsCatalog.effectTypes,
+    });
     await writeLegacyProjectAsMultiFile(serializedProjectObject, filePath, {
       decomposeOptions: {
         eventsDslOptions: {
@@ -204,6 +259,17 @@ const writeProjectFiles = async ({
         projectPath,
         ...PROJECT_INSTRUCTION_CATALOG_RELATIVE_PATH.split('/')
       )
+    );
+    await writeAndCheckFile(
+      serializeProjectSettingsCatalog(settingsCatalog),
+      path.join(
+        projectPath,
+        ...PROJECT_SETTINGS_CATALOG_RELATIVE_PATH.split('/')
+      )
+    );
+    await writeAndCheckFile(
+      serializeProjectLayoutCatalog(layoutCatalog),
+      path.join(projectPath, ...PROJECT_LAYOUT_CATALOG_RELATIVE_PATH.split('/'))
     );
     await writeAndCheckFormattedJSONFile(
       serializedProjectObject,

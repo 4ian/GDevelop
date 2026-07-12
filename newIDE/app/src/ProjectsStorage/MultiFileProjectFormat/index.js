@@ -518,23 +518,17 @@ const putSettingsFile = (files, uri, namespace) => {
   files[uri] = serializeToml(projectSettingsNamespace(namespace));
 };
 
-const putLayoutFile = (
-  files,
-  uri,
-  format,
-  layout,
-  usedInstanceUuids,
-  semanticContext = {}
-) => {
+const putLayoutFile = (files, uri, format, layout, semanticContext = {}) => {
   validateGameUri(uri);
   const kind = LAYOUT_DSL_KIND_BY_FORMAT[format];
-  if (!kind) fail('MULTIFILE_INVALID_LAYOUT', `Unknown layout format ${format}.`, uri);
+  if (!kind)
+    fail('MULTIFILE_INVALID_LAYOUT', `Unknown layout format ${format}.`, uri);
   try {
     files[uri] = decompileLayoutDsl(layout, {
       kind,
       fileUri: uri,
-      usedInstanceUuids,
       ...semanticContext,
+      usedInstanceUuids: new Set(),
     });
   } catch (error) {
     if (error instanceof LayoutDslError) {
@@ -600,7 +594,6 @@ const splitPrefab = ({
   baseSegments,
   files,
   eventsDslOptions,
-  usedInstanceUuids,
 }) => {
   const prefabName = String(prefab.name || '');
   const layoutUri = encodeUriPath([
@@ -612,7 +605,6 @@ const splitPrefab = ({
     layoutUri,
     'gdevelop-prefab-layout',
     takeFields(prefab, PREFAB_LAYOUT_FIELDS),
-    usedInstanceUuids,
     layoutObjectContext(prefab.objects || [])
   );
   const functions = splitOwnerFunctions({
@@ -635,11 +627,8 @@ const splitPrefab = ({
       variantLayoutUri,
       'gdevelop-prefab-variant-layout',
       takeFields(variant, PREFAB_LAYOUT_FIELDS),
-      usedInstanceUuids,
       layoutObjectContext(
-        variant.objects !== undefined
-          ? variant.objects
-          : prefab.objects || []
+        variant.objects !== undefined ? variant.objects : prefab.objects || []
       )
     );
     return {
@@ -688,7 +677,6 @@ export const decomposeLegacyProjectToFiles = (legacyProject, options = {}) => {
   const projectPayload = omitFields(project, PROJECT_SPLIT_FIELDS);
   const sceneNames = new Set();
   const extensionNames = new Set();
-  const usedInstanceUuids = new Set();
 
   if (project.resources !== undefined) {
     putSettingsFile(files, MULTI_FILE_RESOURCES_URI, {
@@ -756,7 +744,6 @@ export const decomposeLegacyProjectToFiles = (legacyProject, options = {}) => {
       layoutUri,
       'gdevelop-scene-layout',
       takeFields(layout, SCENE_LAYOUT_FIELDS),
-      usedInstanceUuids,
       layoutObjectContext(layout.objects || [], project.objects || [])
     );
     putEventsFile(
@@ -820,7 +807,6 @@ export const decomposeLegacyProjectToFiles = (legacyProject, options = {}) => {
                 baseSegments: base,
                 files,
                 eventsDslOptions: options.eventsDslOptions,
-                usedInstanceUuids,
               }),
             },
           },
@@ -913,7 +899,6 @@ export const decomposeLegacyProjectToFiles = (legacyProject, options = {}) => {
         layoutUri,
         'gdevelop-external-layout',
         takeFields(external, EXTERNAL_LAYOUT_FIELDS),
-        usedInstanceUuids,
         (() => {
           const linkedScene = (project.layouts || []).find(
             layout =>
@@ -978,11 +963,22 @@ const parseSettings = (files, uri) => {
 const readLayout = (files, uri, expectedFormat, semanticContext = {}) => {
   validateGameUri(uri);
   const source = files[uri];
-  if (source === undefined) fail('MULTIFILE_MISSING_FILE', 'Referenced layout file is missing.', uri);
+  if (source === undefined)
+    fail('MULTIFILE_MISSING_FILE', 'Referenced layout file is missing.', uri);
   const kind = LAYOUT_DSL_KIND_BY_FORMAT[expectedFormat];
-  if (!kind) fail('MULTIFILE_INVALID_LAYOUT', `Unknown layout format ${expectedFormat}.`, uri);
+  if (!kind)
+    fail(
+      'MULTIFILE_INVALID_LAYOUT',
+      `Unknown layout format ${expectedFormat}.`,
+      uri
+    );
   try {
-    return compileLayoutDsl(source, { kind, fileUri: uri, ...semanticContext });
+    return compileLayoutDsl(source, {
+      kind,
+      fileUri: uri,
+      ...semanticContext,
+      usedInstanceUuids: new Set(),
+    });
   } catch (error) {
     if (error instanceof LayoutDslError) {
       rethrowLayoutDslError(error, uri);
@@ -1233,19 +1229,12 @@ const composeOwnerFunctions = (files, entries, options, ownerUri) => {
   });
 };
 
-const composePrefab = (
-  files,
-  namespace,
-  options,
-  uri,
-  usedInstanceUuids
-) => {
+const composePrefab = (files, namespace, options, uri) => {
   const payload = restoreTomlPayload(namespace, uri);
   const layoutUri = expectString(payload.layout, 'prefab.layout', uri);
   const objectContext = layoutObjectContext(payload.objects || []);
   const layout = readLayout(files, layoutUri, 'gdevelop-prefab-layout', {
     ...objectContext,
-    usedInstanceUuids,
   });
   Object.keys(layout).forEach(field => {
     if (payload[field] !== undefined) {
@@ -1270,11 +1259,8 @@ const composePrefab = (
         'gdevelop-prefab-variant-layout',
         {
           ...layoutObjectContext(
-            entry.objects !== undefined
-              ? entry.objects
-              : payload.objects || []
+            entry.objects !== undefined ? entry.objects : payload.objects || []
           ),
-          usedInstanceUuids,
         }
       );
       Object.keys(variantLayout).forEach(field => {
@@ -1752,7 +1738,6 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
   if (globalConfigPayload) {
     project.globalConfig = globalConfigPayload;
   }
-  const usedInstanceUuids = new Set();
   project.layouts = sceneDocuments.map(({ entry, uri, document }) => {
     const namespace = restoreTomlPayload(
       requireNamespace(document, ['scenes', entry.name], uri),
@@ -1771,7 +1756,6 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
     );
     const layout = readLayout(files, layoutUri, 'gdevelop-scene-layout', {
       ...layoutObjectContext(settings.objects || [], project.objects || []),
-      usedInstanceUuids,
     });
     Object.keys(layout).forEach(field => {
       if (settings[field] !== undefined) {
@@ -1845,7 +1829,9 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
       if (!linkedScene) {
         fail(
           'LAYOUT_UNKNOWN_SCENE',
-          `External layout ${String(entry.name || '')} references missing scene ${linkedSceneName}.`,
+          `External layout ${String(
+            entry.name || ''
+          )} references missing scene ${linkedSceneName}.`,
           uri
         );
       }
@@ -1865,7 +1851,6 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
             layerNames: (linkedScene.layers || []).map(layer =>
               String(layer.name || '')
             ),
-            usedInstanceUuids,
           }
         ),
       };
@@ -1923,13 +1908,7 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
           child.uri
         );
         extension.eventsBasedObjects.push(
-          composePrefab(
-            files,
-            payload,
-            options,
-            child.uri,
-            usedInstanceUuids
-          )
+          composePrefab(files, payload, options, child.uri)
         );
       } else {
         const payload = requireNamespace(
@@ -1955,19 +1934,26 @@ const normalizeFunctionEvents = functions =>
   });
 
 const normalizeLayoutFragment = (layout, editorField, hasLayers = true) => {
-  layout[editorField] = layout[editorField] || {};
+  // libGD can serialize an untouched custom-object variant editor settings
+  // value as an empty array. The Layout DSL has a structured editor settings
+  // block and therefore reconstructs the same empty value as an object. Both
+  // representations mean that no editor settings are configured.
+  if (
+    !layout[editorField] ||
+    (Array.isArray(layout[editorField]) && !layout[editorField].length)
+  ) {
+    layout[editorField] = {};
+  }
   const editor = layout[editorField];
   if (
     editor.gridWidth !== undefined ||
     editor.gridHeight !== undefined ||
     editor.gridDepth !== undefined
   ) {
-    editor.gridWidth =
-      editor.gridWidth === undefined ? 32 : editor.gridWidth;
+    editor.gridWidth = editor.gridWidth === undefined ? 32 : editor.gridWidth;
     editor.gridHeight =
       editor.gridHeight === undefined ? 32 : editor.gridHeight;
-    editor.gridDepth =
-      editor.gridDepth === undefined ? 32 : editor.gridDepth;
+    editor.gridDepth = editor.gridDepth === undefined ? 32 : editor.gridDepth;
   }
   if (
     editor.gridOffsetX !== undefined ||

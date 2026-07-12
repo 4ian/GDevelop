@@ -1,6 +1,6 @@
 ---
 name: gdevelop-project-files
-description: Create, inspect, modify, refactor, and verify GDevelop games through the multi-file project sources (`project.settings`, `.settings`, `.layout`, and `.events`). Use for any GDevelop project, scene, object, behavior, prefab, extension, third-party extension installation, reusable-component refactor, variable, resource, layout, or event-sheet work. Read the generated instruction catalog for event authoring; synchronize direct edits with the GDevelop MCP `reload_project` tool before preview debugging.
+description: Create, inspect, modify, refactor, and verify GDevelop games through the multi-file project sources (`project.settings`, `.settings`, `.layout`, and `.events`). Use for any GDevelop project, scene, object, behavior, prefab, extension, third-party extension installation, reusable-component refactor, variable, resource, layout, or event-sheet work. Read the generated settings, layout, and instruction catalogs for authoring; synchronize direct edits with the GDevelop MCP `reload_project` tool before preview debugging.
 ---
 
 # GDevelop Project Files
@@ -17,19 +17,21 @@ Read, in order:
 1. `project.settings` for project metadata and non-global-config project data.
 2. `resources.settings` for the complete project resource registry.
 3. `config.settings` for the complete arbitrary global-config subtree.
-4. Relevant child `.settings` files for semantic configuration and object
-   definitions, including each object's variables, effects, and behaviors.
-5. Relevant `.layout` files for Layout DSL instances, layers, spatial bounds,
-   background, and editor-canvas layout.
+4. `.gdevelop/settings-catalog.json`, then relevant child `.settings` files
+   for semantic configuration and object definitions, including each object's
+   variables, effects, and behaviors.
+5. `.gdevelop/layout-catalog.json`, then relevant `.layout` files for Layout
+   DSL instances, layers, spatial bounds, background, and editor-canvas layout.
 6. Relevant `.events` files for IfDo event logic.
 7. `.gdevelop/instructions-catalog.json` before adding or changing
    instructions.
 
-The catalog is regenerated from the loaded project every time GDevelop saves.
-Never edit it. Search it narrowly with `rg` by instruction type, displayed
-name, group, description, parameter `dslName`, or expression name instead of
-loading the whole file into context. The generated JSON keeps one catalog entry
-per line so a matching search returns only the relevant instruction.
+The three catalogs are regenerated from the loaded project every time GDevelop
+saves. Never edit them. Search them narrowly with `rg`: use file kind, object,
+behavior, effect, owner, or layout context in the source catalogs, and use
+instruction type, displayed name, group, description, parameter `dslName`, or
+expression name in the instruction catalog. Generated JSON keeps one catalog
+entry per line so a matching search returns only relevant metadata.
 
 Do not edit legacy project JSON, including `.gdevelop/game.json`. It is
 generated compatibility/runtime output, not multi-file source.
@@ -85,6 +87,8 @@ extensions/<Extension>/prefabs/<Prefab>/<Function>.events
 extensions/<Extension>/behaviors/<Behavior>/behavior.settings
 extensions/<Extension>/behaviors/<Behavior>/<Function>.events
 .gdevelop/instructions-catalog.json
+.gdevelop/settings-catalog.json
+.gdevelop/layout-catalog.json
 ```
 
 Only create optional folders when the owning manifest references them.
@@ -99,6 +103,10 @@ Load only the references required by the task:
 - Read [references/layout-dsl.md](references/layout-dsl.md) in full before
   creating or changing any `.layout` file. Preserve existing UUIDs and use its
   exact scene, prefab/variant, or external-layout context rules.
+- Read [references/events-dls.md](references/events-dls.md) in full before
+  creating or changing any `.events` file. Use only its canonical IfDo
+  structures and the exact types and `dslName` parameters found in the
+  generated project instruction catalog.
 - Read
   [references/reuse-community-extensions.md](references/reuse-community-extensions.md)
   in full before implementing a substantial reusable system or installing a
@@ -183,7 +191,11 @@ loop, comment, and JavaScript metadata when editing existing sources.
 
 ## Direct-edit workflow
 
-1. Inspect manifests and only the owned files relevant to the request.
+1. Inspect manifests and only the owned files relevant to the request. Search
+   `.gdevelop/settings-catalog.json` before adding or changing settings-owned
+   object, behavior, effect, or component definitions. Search
+   `.gdevelop/layout-catalog.json` for the exact layout grammar and matching
+   project context before adding or changing layout content.
 2. Search `.gdevelop/instructions-catalog.json` for required instructions and
    expressions. The generated catalog excludes editor-hidden and deprecated
    APIs; never invent or reuse an instruction identifier that is absent from it

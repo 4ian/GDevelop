@@ -6973,7 +6973,7 @@ export const getCapabilitiesSummary = (
   });
   return {
     note:
-      'GDevelop MCP is intentionally limited to one legacy-extension import/conversion tool, editor queries, and preview debugging. After import_extension generates canonical sources, author the game through project files and .gdevelop/instructions-catalog.json.',
+      'GDevelop MCP is intentionally limited to one legacy-extension import/conversion tool, editor queries, and preview debugging. After import_extension generates canonical sources, author the game through project files and the generated .gdevelop/settings-catalog.json, .gdevelop/layout-catalog.json, and .gdevelop/instructions-catalog.json.',
     permissions: {
       writeToolsEnabled: !!permissions.allowWriteTools,
       commandToolsEnabled: !!permissions.allowCommandTools,

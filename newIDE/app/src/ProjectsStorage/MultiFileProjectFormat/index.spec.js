@@ -477,11 +477,27 @@ mode = "embedded"
       files['game://extensions/Combat/prefabs/Enemy/Enemy.layout']
     ).toContain('grid-size=16,24,32');
     expect(
-      areLegacyProjectsEquivalent(
-        project,
-        composeLegacyProjectFromFiles(files)
-      )
+      areLegacyProjectsEquivalent(project, composeLegacyProjectFromFiles(files))
     ).toBe(true);
+  });
+
+  test('saves custom-object variants with untouched empty editor settings', () => {
+    const project = JSON.parse(JSON.stringify(projectFixture));
+    const variant =
+      project.eventsFunctionsExtensions[0].eventsBasedObjects[0].variants[0];
+
+    // This is the representation emitted by libGD for some newly installed
+    // asset-store custom-object variants (for example StarRatingBar).
+    variant.editionSettings = [];
+
+    const files = decomposeLegacyProjectToFiles(project);
+    const output = composeLegacyProjectFromFiles(files);
+
+    expect(
+      output.eventsFunctionsExtensions[0].eventsBasedObjects[0].variants[0]
+        .editionSettings
+    ).toEqual({});
+    expect(areLegacyProjectsEquivalent(project, output)).toBe(true);
   });
 
   test('rejects retired TOML layout sources without a compatibility path', () => {
@@ -612,7 +628,7 @@ mode = "embedded"
     ).toBe(true);
   });
 
-  test('uses owner metadata and project-wide UUIDs while compiling layouts', () => {
+  test('uses owner metadata and layout-local UUIDs while compiling layouts', () => {
     const project = JSON.parse(JSON.stringify(projectFixture));
     project.layouts[0].objects = [
       {
@@ -651,7 +667,9 @@ mode = "embedded"
       },
     ];
     const files = decomposeLegacyProjectToFiles(project);
-    expect(composeLegacyProjectFromFiles(files).layouts[0].instances[0]).toMatchObject({
+    expect(
+      composeLegacyProjectFromFiles(files).layouts[0].instances[0]
+    ).toMatchObject({
       name: 'Player',
       behaviorOverridings: [
         { name: 'Move', type: 'Movement::Move', speed: 10 },
@@ -669,12 +687,61 @@ mode = "embedded"
       {
         name: 'Duplicate',
         associatedLayout: 'Main',
-        instances: [JSON.parse(JSON.stringify(project.layouts[0].instances[0]))],
+        instances: [
+          JSON.parse(JSON.stringify(project.layouts[0].instances[0])),
+        ],
         editionSettings: {},
       },
     ];
-    expect(() => decomposeLegacyProjectToFiles(project)).toThrow(
-      expect.objectContaining({ code: 'LAYOUT_DUPLICATE_UUID' })
-    );
+    const prefab = project.eventsFunctionsExtensions[0].eventsBasedObjects[0];
+    const variant = prefab.variants[0];
+    const childObject = {
+      name: 'Part',
+      type: 'Sprite',
+      behaviors: [],
+    };
+    const childLayer = { name: '', visibility: true, isLocked: false };
+    const childInstance = {
+      name: 'Part',
+      x: 0,
+      y: 0,
+      angle: 0,
+      zOrder: 0,
+      layer: '',
+      customSize: false,
+      width: 0,
+      height: 0,
+      persistentUuid: '00000000-0000-4000-8000-000000000002',
+      numberProperties: [],
+      stringProperties: [],
+      initialVariables: [],
+    };
+    prefab.objects = [childObject];
+    prefab.layers = [childLayer];
+    prefab.instances = [childInstance];
+    variant.objects = [JSON.parse(JSON.stringify(childObject))];
+    variant.layers = [JSON.parse(JSON.stringify(childLayer))];
+    variant.instances = [JSON.parse(JSON.stringify(childInstance))];
+
+    const duplicateAcrossLayoutsFiles = decomposeLegacyProjectToFiles(project);
+    expect(
+      areLegacyProjectsEquivalent(
+        project,
+        composeLegacyProjectFromFiles(duplicateAcrossLayoutsFiles)
+      )
+    ).toBe(true);
+    expect(
+      duplicateAcrossLayoutsFiles[
+        'game://extensions/Combat/prefabs/Enemy/Enemy.layout'
+      ]
+    ).toContain(childInstance.persistentUuid);
+    expect(
+      duplicateAcrossLayoutsFiles[
+        'game://extensions/Combat/prefabs/Enemy/variants/Armored.layout'
+      ]
+    ).toContain(childInstance.persistentUuid);
+    expect(
+      duplicateAcrossLayoutsFiles['game://externals/Duplicate.layout']
+    ).toContain(project.layouts[0].instances[0].persistentUuid);
   });
 });

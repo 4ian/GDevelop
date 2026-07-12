@@ -180,6 +180,8 @@ MyGame/
 
   .gdevelop/
     instructions-catalog.json
+    settings-catalog.json
+    layout-catalog.json
     state.json
     transactions/
 ```
@@ -225,6 +227,19 @@ both; the two files remain independent unless both are listed in
   Editor-hidden instructions (which the events editor treats as deprecated),
   instructions with deprecation messages, and hidden or deprecated expressions
   are excluded so AI-authored events cannot select APIs that produce warnings.
+- `.gdevelop/settings-catalog.json`, regenerated on every manual project save.
+  It describes the managed settings file kinds and ownership rules, the
+  project components that currently own settings, and the non-hidden object,
+  behavior, and effect types registered for the loaded project. Behavior and
+  effect entries include their authoring property metadata. AI models must
+  consult it before creating settings-owned definitions and must never edit it.
+- `.gdevelop/layout-catalog.json`, regenerated on every manual project save.
+  It describes every Layout DSL element and attribute plus the project-aware
+  scene, prefab, variant, and external-layout contexts. Each context lists the
+  object definitions, attached behaviors, and layers that can be referenced in
+  that layout. Registered effect types and typed parameters are included so an
+  AI model does not guess layout APIs. It is generated state and must never be
+  edited.
 - `.gdevelop/game.json`, regenerated from the composed legacy serializer tree
   on every manual project save. It is an ignored runtime/export compatibility
   snapshot, never editable project source.
@@ -1424,18 +1439,25 @@ The writer:
 3. Writes a sibling temporary file.
 4. Flushes the file and, where supported, its directory entry.
 5. Atomically replaces the target.
-6. Regenerates `.gdevelop/instructions-catalog.json` from the loaded project,
-   installed extensions, object/behavior metadata, and function signatures.
-   Enumeration covers the non-deprecated authoring surface. It excludes
-   editor-hidden compatibility instructions, instructions with deprecation
+6. Regenerates the three AI authoring catalogs under `.gdevelop/` from the
+   loaded project and installed platform metadata:
+   `.gdevelop/instructions-catalog.json`,
+   `.gdevelop/settings-catalog.json`, and
+   `.gdevelop/layout-catalog.json`. The instruction catalog contains actions,
+   conditions, expressions, and function signatures. The settings catalog
+   contains file ownership schemas and registered object/behavior/effect
+   metadata. The layout catalog contains the Layout DSL grammar and each
+   layout's resolvable objects, attached behaviors, and layers.
+   Instruction enumeration covers the non-deprecated authoring surface. It
+   excludes editor-hidden compatibility instructions, instructions with deprecation
    messages, and expressions that are hidden, marked deprecated, or carry a
    deprecation message.
-   The lean JSON keeps only DSL-authoring metadata and writes one compact
-   instruction per line for targeted `rg` searches. UI icons, help paths,
+   The lean JSON catalogs keep only authoring metadata and write one compact
+   catalog entry per line for targeted `rg` searches. UI icons, help paths,
    derived parameter templates, repeated scope labels, per-entry `kind`, and
    parameter `index` fields already implied by their parent arrays are
-   excluded. The catalog is deterministically ordered and written only after source
-   verification succeeds.
+   excluded. The catalogs are deterministically ordered and written only after
+   source verification succeeds.
 7. Writes the equivalent composed legacy project to `.gdevelop/game.json` as
    an ignored compatibility snapshot.
 8. Updates ignored state hashes.

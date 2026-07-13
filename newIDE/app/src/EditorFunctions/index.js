@@ -200,6 +200,7 @@ export type EventsGenerationResult =
 
 export type EventBatch = {|
   eventsDescription: string,
+  eventsScript: string | null,
   placementRelation: string,
   placementTargetEventId: string | null,
   placementExpectedParentEventId: string | null,
@@ -4705,6 +4706,10 @@ const addSceneEvents: EditorFunction = {
               batch,
               'events_description'
             );
+            const eventsScript = SafeExtractor.extractStringProperty(
+              batch,
+              'events_script'
+            );
             const placementRelation = SafeExtractor.extractStringProperty(
               batch,
               'placement_relation'
@@ -4724,18 +4729,34 @@ const addSceneEvents: EditorFunction = {
 
             return (
               <ColumnStackLayout noMargin>
-                <Text
-                  noMargin
-                  allowSelection
-                  color="secondary"
-                  size="body-small"
-                  style={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}
-                >
-                  <b>
-                    <Trans>Description</Trans>
-                  </b>
-                  : {eventsDescription}
-                </Text>
+                {eventsDescription && (
+                  <Text
+                    noMargin
+                    allowSelection
+                    color="secondary"
+                    size="body-small"
+                    style={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}
+                  >
+                    <b>
+                      <Trans>Description</Trans>
+                    </b>
+                    : {eventsDescription}
+                  </Text>
+                )}
+                {eventsScript && (
+                  <Text
+                    noMargin
+                    allowSelection
+                    color="secondary"
+                    size="body-small"
+                    style={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}
+                  >
+                    <b>
+                      <Trans>Events script</Trans>
+                    </b>
+                    : {eventsScript}
+                  </Text>
+                )}
                 {placementRelation && (
                   <Text
                     noMargin
@@ -4961,6 +4982,10 @@ const addSceneEvents: EditorFunction = {
                 batch,
                 'events_description'
               ) || '',
+            eventsScript: SafeExtractor.extractStringProperty(
+              batch,
+              'events_script'
+            ),
             placementRelation:
               SafeExtractor.extractStringProperty(
                 batch,
@@ -4988,9 +5013,16 @@ const addSceneEvents: EditorFunction = {
           'No event batches provided. Provide one or more with a description of events to generate.'
         );
       }
-      if (parsedEventBatches.some(batch => !batch.eventsDescription)) {
+      if (
+        parsedEventBatches.some(
+          batch =>
+            !batch.eventsDescription &&
+            !batch.eventsScript &&
+            batch.placementRelation !== 'delete'
+        )
+      ) {
         return makeGenericFailure(
-          'No events description provided for some event batches. Provide a description for each event(s) to generate.'
+          'No events description/events script provided for some event batches. Provide one for each event(s) to generate.'
         );
       }
     } else if (!eventsDescription) {

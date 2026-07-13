@@ -173,8 +173,84 @@ describe('McpEditorBridge', () => {
     expect(response.tools.map(tool => tool.name)).toContain(
       'gdevelop_get_editor_state'
     );
+    expect(response.tools.map(tool => tool.name)).toContain(
+      'validate_project_files'
+    );
     expect(response.tools.map(tool => tool.name)).toContain('reload_project');
     expect(response.tools.map(tool => tool.name)).not.toContain('create_scene');
+  });
+
+  it('validates multi-file disk sources without reloading the editor', async () => {
+    const temporaryDirectory = fs.mkdtempSync(
+      path.join(os.tmpdir(), 'gdevelop-mcp-validate-project-files-')
+    );
+    const projectFile = path.join(temporaryDirectory, 'project.settings');
+    const project = new gd.Project();
+    project.setName('Disk validation test');
+    project.setProjectFile(projectFile);
+    await writeMultiFileSourceTree({
+      entryPath: projectFile,
+      files: decomposeLegacyProjectToFiles(serializeToJSObject(project)),
+    });
+    const reloadProjectAndWait = jest.fn();
+    const bridge = makeBridge({
+      getProject: () => project,
+      reloadProjectAndWait,
+    });
+
+    const response = await bridge.handleRendererMcpRequest({
+      method: 'tools/call',
+      params: { name: 'validate_project_files', arguments: {} },
+    });
+    const result = JSON.parse(response.content[0].text);
+
+    expect(response.isError).not.toBe(true);
+    expect(reloadProjectAndWait).not.toHaveBeenCalled();
+    expect(result).toEqual(
+      expect.objectContaining({
+        success: true,
+        valid: true,
+        validationMode: 'multi-file-disk-sources',
+        projectFile,
+        generatedGameJson: expect.objectContaining({
+          reconstructedInMemory: true,
+          writtenToDisk: false,
+          byteLength: expect.any(Number),
+        }),
+      })
+    );
+    expect(result.nextAction).toContain('reload_project');
+  });
+
+  it('reports the source file and location for invalid project files', async () => {
+    const temporaryDirectory = fs.mkdtempSync(
+      path.join(os.tmpdir(), 'gdevelop-mcp-invalid-project-files-')
+    );
+    const projectFile = path.join(temporaryDirectory, 'project.settings');
+    const project = new gd.Project();
+    project.setProjectFile(projectFile);
+    const files = decomposeLegacyProjectToFiles(serializeToJSObject(project));
+    files['game://project.settings'] += '\ninvalid = [\n';
+    await writeMultiFileSourceTree({ entryPath: projectFile, files });
+    const bridge = makeBridge({ getProject: () => project });
+
+    const response = await bridge.handleRendererMcpRequest({
+      method: 'tools/call',
+      params: { name: 'validate_project_files', arguments: {} },
+    });
+    const result = JSON.parse(response.content[0].text);
+
+    expect(response.isError).toBe(true);
+    expect(result.valid).toBe(false);
+    expect(result.errors).toEqual([
+      expect.objectContaining({
+        severity: 'error',
+        phase: 'parse-settings',
+        code: 'MULTIFILE_INVALID_TOML',
+        fileUri: 'game://project.settings',
+        filePath: projectFile,
+      }),
+    ]);
   });
 
   it('reloads project files from disk and returns a synchronization receipt', async () => {

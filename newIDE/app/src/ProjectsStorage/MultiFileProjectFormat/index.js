@@ -5,6 +5,7 @@ import stringifyToml from '@iarna/toml/stringify';
 import { sha256 } from 'js-sha256';
 import {
   IFDO_EVENTS_DSL_COVERAGE,
+  IfDoError,
   compileIfDoToLegacyEventsJson,
   convertLegacyEventsJsonToIfDo,
   parseLegacyEventsJson,
@@ -103,6 +104,13 @@ const rethrowLayoutDslError = (error, fileUri): empty => {
   wrapped.fileUri = fileUri;
   wrapped.line = error.line;
   wrapped.column = error.column;
+  throw wrapped;
+};
+
+const rethrowIfDoError = (error, fileUri): empty => {
+  const wrapped = new MultiFileProjectError(error.code, error.message);
+  wrapped.fileUri = fileUri;
+  wrapped.line = error.line;
   throw wrapped;
 };
 
@@ -520,14 +528,11 @@ export const parseTomlSource = (source, fileUri = '<memory>') => {
   if (source.charCodeAt(0) === 0xfeff) {
     fail('MULTIFILE_INVALID_SOURCE', 'UTF-8 BOM is forbidden.', fileUri);
   }
-  if (source.includes('\r')) {
-    fail(
-      'MULTIFILE_INVALID_SOURCE',
-      'Only LF line endings are allowed.',
-      fileUri
-    );
-  }
-  if (/^(?:<<<<<<<|=======|>>>>>>>)/m.test(source)) {
+  // Accept text produced by Git and editors on every operating system. The
+  // serializer still writes canonical LF-only sources, so accepting CRLF or
+  // legacy CR input does not introduce line-ending churn on the next save.
+  const normalizedSource = normalizeLf(source);
+  if (/^(?:<<<<<<<|=======|>>>>>>>)/m.test(normalizedSource)) {
     fail(
       'MULTIFILE_MERGE_CONFLICT',
       'Git conflict markers are not valid.',
@@ -535,7 +540,7 @@ export const parseTomlSource = (source, fileUri = '<memory>') => {
     );
   }
   try {
-    const parsed = parseToml(source);
+    const parsed = parseToml(normalizedSource);
     const rejectDates = value => {
       if (value instanceof Date) {
         fail('MULTIFILE_INVALID_SOURCE', 'TOML dates are forbidden.', fileUri);
@@ -1566,9 +1571,16 @@ const compileEvents = (files, uri, options) => {
       uri
     );
   }
-  return JSON.parse(
-    compileIfDoToLegacyEventsJson(source, options.compileOptions || {})
-  );
+  try {
+    return JSON.parse(
+      compileIfDoToLegacyEventsJson(source, options.compileOptions || {})
+    );
+  } catch (error) {
+    if (error instanceof IfDoError) {
+      rethrowIfDoError(error, uri);
+    }
+    throw error;
+  }
 };
 
 const requireNamespace = (root, path, uri) => {

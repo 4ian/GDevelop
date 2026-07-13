@@ -118,6 +118,25 @@ describe('Local multi-file project storage', () => {
     );
   });
 
+  test('opens a source tree after Git converts settings files to CRLF', async () => {
+    const entryPath = path.join(temporaryDirectory, 'project.settings');
+    const files = decomposeLegacyProjectToFiles(projectFixture);
+    await writeMultiFileSourceTree({ entryPath, files });
+    Object.keys(files).forEach(uri => {
+      if (!uri.endsWith('.settings')) return;
+      const filePath = resolveGameUriToPath(temporaryDirectory, uri);
+      const source = fs.readFileSync(filePath, 'utf8');
+      fs.writeFileSync(filePath, source.replace(/\n/g, '\r\n'), 'utf8');
+    });
+
+    expect(
+      areLegacyProjectsEquivalent(
+        projectFixture,
+        await openMultiFileProject(entryPath)
+      )
+    ).toBe(true);
+  });
+
   test('loads named IfDo instructions through the generated catalog', async () => {
     const entryPath = path.join(temporaryDirectory, 'project.settings');
     const files = decomposeLegacyProjectToFiles(projectFixture);

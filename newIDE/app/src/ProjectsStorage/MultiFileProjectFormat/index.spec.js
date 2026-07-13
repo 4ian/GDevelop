@@ -891,6 +891,18 @@ folderName = "__ROOT"
     expect(() => composeLegacyProjectFromFiles(files)).not.toThrow();
   });
 
+  test('accepts Git-style CRLF line endings in every settings source', () => {
+    const files = decomposeLegacyProjectToFiles(projectFixture);
+    Object.keys(files).forEach(uri => {
+      if (!uri.endsWith('.settings')) return;
+      files[uri] = files[uri].replace(/\n/g, '\r\n');
+    });
+
+    const output = composeLegacyProjectFromFiles(files);
+
+    expect(areLegacyProjectsEquivalent(projectFixture, output)).toBe(true);
+  });
+
   test('stores every settings-owned variable definition as a named inline descriptor', () => {
     const project = JSON.parse(JSON.stringify(projectFixture));
     const numberVariable = (name, value) => ({

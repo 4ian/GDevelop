@@ -20,6 +20,7 @@ const expectedAlwaysAvailableTools = [
   'gdevelop_list_scenes',
   'gdevelop_list_objects',
   'validate_current_project_json',
+  'validate_project_files',
   'inspect_tool_schema',
   'get_tool_usage_examples',
   'gdevelop_capabilities',
@@ -132,6 +133,36 @@ describe('McpToolCatalog', () => {
     expect(tool.description).toContain('regenerate');
     expect(
       canCallMcpTool('reload_project', {
+        allowWriteTools: false,
+        allowCommandTools: false,
+      })
+    ).toEqual({ canCall: true });
+  });
+
+  it('exposes validate_project_files as a no-input read-only validation gate', () => {
+    const tool = getMcpTools({
+      allowWriteTools: false,
+      allowCommandTools: false,
+    }).find(tool => tool.name === 'validate_project_files');
+
+    expect(tool).toEqual(
+      expect.objectContaining({
+        inputSchema: {
+          type: 'object',
+          properties: {},
+          additionalProperties: false,
+        },
+        annotations: expect.objectContaining({
+          readOnlyHint: true,
+          destructiveHint: false,
+          idempotentHint: true,
+        }),
+      })
+    );
+    expect(tool.description).toContain('game.json');
+    expect(tool.description).toContain('before reload_project');
+    expect(
+      canCallMcpTool('validate_project_files', {
         allowWriteTools: false,
         allowCommandTools: false,
       })

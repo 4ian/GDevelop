@@ -515,7 +515,7 @@ const collectExtensionFunctionLintResults = (
   return results;
 };
 
-const validateSerializedProject = (
+export const validateSerializedProject = (
   serializedProject: Object,
   args: Object = {}
 ): Object => {

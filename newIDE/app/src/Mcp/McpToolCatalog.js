@@ -42,6 +42,12 @@ const emptyObjectSchema = {
   additionalProperties: true,
 };
 
+const noInputSchema = {
+  type: 'object',
+  properties: {},
+  additionalProperties: false,
+};
+
 const sceneNameSchema = {
   type: 'object',
   properties: {
@@ -3773,6 +3779,18 @@ const readTools: Array<McpTool> = [
     inputSchema: validateCurrentProjectJsonSchema,
   },
   {
+    name: 'validate_project_files',
+    description:
+      'Load the current local multi-file project from project.settings, reconstruct its legacy game.json representation in memory from all referenced .settings, .layout, and .events files, then validate it through GDevelop and preflight generated extension JavaScript. Accepts no inputs, does not reload the editor or write files, and reports the blocking file, error code, line, column, and source excerpt when available. Call this after direct project-file edits and require valid:true before reload_project.',
+    inputSchema: noInputSchema,
+    annotations: {
+      readOnlyHint: true,
+      destructiveHint: false,
+      idempotentHint: true,
+      openWorldHint: false,
+    },
+  },
+  {
     name: 'inspect_custom_object_runtime_geometry',
     description:
       'Inspect events-based object geometry for prefab coordinate debugging: parent/custom object area, estimated visible child bounds, child local positions, Sprite points/collision masks, and cursor hit-test hints.',
@@ -5635,6 +5653,13 @@ const toolUsageExamples: { [string]: Array<Object> } = {
       },
     },
   ],
+  validate_project_files: [
+    {
+      description:
+        'Validate all current multi-file disk sources before reloading them into the editor.',
+      arguments: {},
+    },
+  ],
   apply_validated_project_json_patch: [
     {
       description:
@@ -6699,6 +6724,7 @@ const EXPOSED_MCP_TOOL_NAMES: Set<string> = new Set([
   'gdevelop_list_scenes',
   'gdevelop_list_objects',
   'validate_current_project_json',
+  'validate_project_files',
   'inspect_tool_schema',
   'get_tool_usage_examples',
   'gdevelop_capabilities',
@@ -6855,6 +6881,7 @@ export const getCapabilitiesSummary = (
       'gdevelop_capabilities',
       'gdevelop_refresh_tool_catalog',
       'validate_current_project_json',
+      'validate_project_files',
     ],
     'Read scene / objects / events': [
       'read_serialized_scene',

@@ -21,7 +21,10 @@ import {
   decomposeLegacyProjectToFiles,
   parseTomlSource,
 } from '../ProjectsStorage/MultiFileProjectFormat';
-import { readMultiFileSourceTree } from '../ProjectsStorage/LocalFileStorageProvider/LocalMultiFileProject';
+import {
+  openMultiFileProject,
+  readMultiFileSourceTree,
+} from '../ProjectsStorage/LocalFileStorageProvider/LocalMultiFileProject';
 import { renderNonTranslatedEventsAsText } from '../EventsSheet/EventsTree/TextRenderer';
 import { mapFor } from '../Utils/MapFor';
 import { type EditorCallbacks } from '../EditorFunctions';
@@ -140,6 +143,7 @@ import {
   applyValidatedProjectJsonPatch,
   syncEditorFromValidatedProjectJson,
   validateCurrentProjectJson,
+  validateSerializedProject,
 } from './McpProjectTools';
 import { ensureOnSignalObjectEventsFunctionProperParameters } from '../EventsFunctionsExtensionEditor/OnSignalEventsFunctionParameters';
 import { getBehaviorsRegistry } from '../Utils/GDevelopServices/Extension';
@@ -339,6 +343,102 @@ const errorResult = (message: string, details?: Object): McpToolResult => {
       },
     ],
     structuredContent: payload,
+  };
+};
+
+const getProjectFilesValidationPhase = (code: ?string): string => {
+  if (!code) return 'load-and-compose-project-files';
+  if (code === 'MULTIFILE_INVALID_TOML') return 'parse-settings';
+  if (code.startsWith('LAYOUT_')) return 'compile-layout';
+  if (code.startsWith('IFDO_')) return 'compile-events';
+  if (
+    code === 'MULTIFILE_MISSING_FILE' ||
+    code === 'MULTIFILE_INVALID_ENTRY' ||
+    code === 'MULTIFILE_PATH_ESCAPE'
+  ) {
+    return 'load-project-files';
+  }
+  return 'compose-game-json';
+};
+
+const getErrorLocation = (
+  error: any
+): {| line: ?number, column: ?number |} => {
+  let line = typeof error.line === 'number' ? error.line : null;
+  let column = typeof error.column === 'number' ? error.column : null;
+  const message = error && error.message ? String(error.message) : '';
+  const tomlLocation = message.match(/\bat row (\d+), col (\d+)/i);
+  if (tomlLocation) {
+    if (line === null) line = Number(tomlLocation[1]);
+    if (column === null) column = Number(tomlLocation[2]);
+  }
+  return { line, column };
+};
+
+const getValidationSourceExcerpt = ({
+  projectFile,
+  fileUri,
+  line,
+}: {| projectFile: string, fileUri: ?string, line: ?number |}): ?Array<Object> => {
+  if (!fs || !path || !fileUri || !line || !fileUri.startsWith('game://')) {
+    return null;
+  }
+  try {
+    const sourcePath = path.resolve(
+      path.dirname(projectFile),
+      ...fileUri.slice('game://'.length).split('/')
+    );
+    const lines = fs.readFileSync(sourcePath, 'utf8').split(/\r?\n|\r/);
+    const firstLine = Math.max(1, line - 2);
+    const lastLine = Math.min(lines.length, line + 2);
+    const excerpt = [];
+    for (let lineNumber = firstLine; lineNumber <= lastLine; lineNumber++) {
+      excerpt.push({
+        line: lineNumber,
+        text: lines[lineNumber - 1],
+        isErrorLine: lineNumber === line,
+      });
+    }
+    return excerpt;
+  } catch (readError) {
+    return null;
+  }
+};
+
+const getProjectFilesValidationDiagnostic = (
+  error: any,
+  projectFile: string
+): Object => {
+  const code =
+    error && typeof error.code === 'string'
+      ? error.code
+      : 'PROJECT_FILES_VALIDATION_FAILED';
+  const fileUri =
+    error && typeof error.fileUri === 'string' ? error.fileUri : null;
+  const { line, column } = getErrorLocation(error);
+  let filePath = null;
+  if (path && fileUri && fileUri.startsWith('game://')) {
+    filePath = path.resolve(
+      path.dirname(projectFile),
+      ...fileUri.slice('game://'.length).split('/')
+    );
+  }
+  return {
+    severity: 'error',
+    phase: getProjectFilesValidationPhase(code),
+    code,
+    errorType:
+      error && typeof error.name === 'string' ? error.name : 'Error',
+    message:
+      error && error.message
+        ? String(error.message)
+        : 'Unable to validate the project files.',
+    fileUri: fileUri || undefined,
+    filePath: filePath || undefined,
+    line: line || undefined,
+    column: column || undefined,
+    sourceExcerpt:
+      getValidationSourceExcerpt({ projectFile, fileUri, line }) || undefined,
   };
 };
 
@@ -4862,6 +4962,103 @@ const callMcpTool = async ({
   if (toolName === 'gdevelop_get_project_summary') {
     if (!project) return errorResult('No project opened.');
     return textResult(getProjectSummary(project, args.sceneName));
+  }
+
+  if (toolName === 'validate_project_files') {
+    if (!project) return errorResult('No project opened.');
+    const projectFile = project.getProjectFile();
+    if (!projectFile) {
+      return errorResult(
+        'The current project has no disk location. Save it as a multi-file project before validating project files.',
+        {
+          valid: false,
+          phase: 'locate-project-files',
+          errors: [
+            {
+              severity: 'error',
+              phase: 'locate-project-files',
+              code: 'PROJECT_FILES_UNSAVED_PROJECT',
+              message: 'The current project has no disk location.',
+            },
+          ],
+        }
+      );
+    }
+    if (!/(?:^|[\\/])project\.settings$/i.test(projectFile)) {
+      return errorResult(
+        'validate_project_files requires a local multi-file project whose entry file is project.settings.',
+        {
+          valid: false,
+          phase: 'locate-project-files',
+          projectFile,
+          errors: [
+            {
+              severity: 'error',
+              phase: 'locate-project-files',
+              code: 'PROJECT_FILES_INVALID_ENTRY',
+              message:
+                'The open project is not using project.settings as its entry file.',
+              filePath: projectFile,
+            },
+          ],
+        }
+      );
+    }
+
+    try {
+      const serializedProject = await openMultiFileProject(projectFile);
+      const generatedJson = JSON.stringify(serializedProject, null, 2);
+      const generatedGameJson = {
+        reconstructedInMemory: true,
+        writtenToDisk: false,
+        targetPath: path
+          ? path.join(path.dirname(projectFile), '.gdevelop', 'game.json')
+          : undefined,
+        byteLength: unescape(encodeURIComponent(generatedJson)).length,
+      };
+      const validation = validateSerializedProject(serializedProject, {
+        include_generated_code: true,
+      });
+      if (!validation.valid) {
+        return errorResult(
+          'The project files were composed into game.json, but the reconstructed project failed GDevelop validation.',
+          {
+            valid: false,
+            phase: 'validate-generated-game-json',
+            validationMode: 'multi-file-disk-sources',
+            projectFile,
+            generatedGameJson,
+            errors: validation.errors || [],
+            validation,
+          }
+        );
+      }
+      return textResult({
+        ...validation,
+        validationMode: 'multi-file-disk-sources',
+        projectFile,
+        generatedGameJson,
+        nextAction:
+          'Project disk sources are valid. You may now call reload_project to load them into the editor.',
+        note:
+          'Loaded every referenced multi-file source and reconstructed the legacy game.json representation in memory. The editor project and disk files were not modified.',
+      });
+    } catch (error) {
+      const diagnostic = getProjectFilesValidationDiagnostic(
+        error,
+        projectFile
+      );
+      return errorResult(
+        'Unable to reconstruct game.json from the multi-file project sources.',
+        {
+          valid: false,
+          phase: diagnostic.phase,
+          validationMode: 'multi-file-disk-sources',
+          projectFile,
+          errors: [diagnostic],
+        }
+      );
+    }
   }
 
   if (toolName === 'reload_project') {

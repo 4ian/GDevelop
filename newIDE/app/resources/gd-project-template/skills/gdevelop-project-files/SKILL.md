@@ -1,6 +1,6 @@
 ---
 name: gdevelop-project-files
-description: Create, inspect, modify, refactor, and verify GDevelop games through the multi-file project sources (`project.settings`, `.settings`, `.layout`, and `.events`). Use for any GDevelop project, scene, object, behavior, prefab, extension, third-party extension installation, reusable-component refactor, variable, resource, Global Config/placeholder, signal-system, layout, or event-sheet work. Read the generated settings, layout, and instruction catalogs for authoring; synchronize direct edits with the GDevelop MCP `reload_project` tool before preview debugging.
+description: Create, inspect, modify, refactor, and verify GDevelop games through the multi-file project sources (`project.settings`, `.settings`, `.layout`, and `.events`). Use for any GDevelop project, scene, object, behavior, prefab, extension, third-party extension installation, reusable-component refactor, variable, resource, Global Config/placeholder, signal-system, layout, or event-sheet work. Read the generated settings, layout, and instruction catalogs for authoring; validate direct edits with the GDevelop MCP `validate_project_files` tool before synchronizing them with `reload_project` and preview debugging.
 ---
 
 # GDevelop Project Files
@@ -279,12 +279,19 @@ loop, comment, and JavaScript metadata when editing existing sources.
 5. Check settings TOML syntax, Layout DSL structure/semantics, duplicate
    namespaces, event depth, instruction names, named parameters, and asset
    paths.
-6. Call the GDevelop MCP `reload_project` tool and require a successful reload
+6. Call the no-input GDevelop MCP `validate_project_files` tool after the most
+   recent source edit. Require `valid: true`; use its file URI, error code,
+   line, column, and source excerpt to fix every reported settings, layout,
+   events, reference, or generated-project validation failure. Call it at least
+   once before calling `reload_project`; a failed validation does not satisfy
+   this gate.
+7. Call the GDevelop MCP `reload_project` tool and require a successful reload
    receipt. Do not invoke an MCP save that could replace newer disk edits with
    stale editor memory.
-7. For gameplay or visual changes, call `launch_preview` only after step 6.
+8. For gameplay or visual changes, call `launch_preview` only after step 7.
    If any project source changes after the reload, call `reload_project` again
-   before the next preview.
+   before the next preview, preceded by a new successful
+   `validate_project_files` call for those edits.
 
 For assets, write the asset file inside the project, add/update its resource
 entry in `resources.settings`, then reference its project-relative path from UI
@@ -300,6 +307,8 @@ MCP is extension-import/synchronization/read/debug-only. Use it only for:
   source. It must return the generated source paths; all later adaptation is a
   direct file edit.
 - Reloading direct disk edits into the editor with `reload_project`.
+- Validating direct disk edits without changing editor memory by calling the
+  no-input `validate_project_files` tool before `reload_project`.
 - Current editor/project/selection queries.
 - Launching or controlling a debug preview.
 - Deterministic frame stepping and input simulation.
@@ -311,10 +320,17 @@ to create scenes, objects, resources, variables, instances, extensions,
 behaviors, prefabs, or events. Never use generic editor-call, command, patch,
 sync, or save tools for authoring.
 
-`reload_project` is a mandatory preview gate. In every direct-edit task, call
-it successfully at least once after the most recent source-file edit and before
-the first `launch_preview`. Never launch or relaunch a preview from stale editor
-memory. A later source edit invalidates the earlier reload receipt.
+`validate_project_files` is a mandatory reload gate. In every direct-edit task,
+call it successfully with no inputs at least once after the most recent
+source-file edit and before `reload_project`. It reconstructs the generated
+`game.json` representation from the multi-file settings, layouts, and events
+without replacing editor memory. A later source edit invalidates the earlier
+validation receipt.
+
+`reload_project` remains a mandatory preview gate. Call it successfully only
+after the validation gate and before the first `launch_preview`. Never launch
+or relaunch a preview from stale editor memory. A later source edit invalidates
+both the validation and reload receipts.
 
 ## Verification
 
@@ -350,6 +366,8 @@ Before finishing:
 - Confirm every object-targeting action operates on a provably single picked
   instance; use `for each` when processing multiple instances.
 - Confirm no legacy JSON was changed.
+- Confirm `validate_project_files` returned `valid: true` after the final source
+  edit and before `reload_project`.
 - Confirm `reload_project` succeeded after the final source edit and before any
   `launch_preview` call.
 - Debug runtime behavior with a fresh preview when behavior, rendering, input,
